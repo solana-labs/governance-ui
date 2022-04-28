@@ -175,9 +175,17 @@ export const AltButton: FunctionComponent<AltButtonProps> = ({
       'py-4 px-2 font-light text-black bg-gradient-to-r from-[#00C2FF] via-[#00E4FF] to-[#87F2FF] transition-to-white-background'
   }
 
+  if (isLoading) {
+    className += ` flex items-center`
+  }
+
   return (
     <button className={className} {...props} disabled={disabled || isLoading}>
-      {isLoading && <Loading />}
+      {isLoading && (
+        <div className="pl-4">
+          <Loading />
+        </div>
+      )}
       <div>{children}</div>
     </button>
   )
