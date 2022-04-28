@@ -50,7 +50,7 @@ const DelegateCard = () => {
           ? realm?.account?.config?.councilMint
           : realm.account.communityMint
 
-      withSetGovernanceDelegate(
+      await withSetGovernanceDelegate(
         instructions,
         realm.owner, // publicKey of program/programId
         programVersion, // program version of realm
@@ -63,6 +63,7 @@ const DelegateCard = () => {
 
       const transaction = new Transaction()
       transaction.add(...instructions)
+
       await sendTransaction({ transaction, wallet, connection, signers })
       setLoading(false)
     } catch (error) {
