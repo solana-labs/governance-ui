@@ -1,4 +1,24 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
-  "cSpell.words": ["Addin", "blockworks", "lamports", "solana"]
+  "cSpell.words": ["Addin", "blockworks", "lamports", "solana"],
+  "workbench.colorCustomizations": {
+    "activityBar.activeBackground": "#b578ff",
+    "activityBar.activeBorder": "#14F195",
+    "activityBar.background": "#b578ff",
+    "activityBar.foreground": "#15202b",
+    "activityBar.inactiveForeground": "#15202b99",
+    "activityBarBadge.background": "#14F195",
+    "activityBarBadge.foreground": "#15202b",
+    "sash.hoverBorder": "#b578ff",
+    "statusBar.background": "#9945ff",
+    "statusBar.foreground": "#e7e7e7",
+    "statusBarItem.hoverBackground": "#b578ff",
+    "statusBarItem.remoteBackground": "#9945ff",
+    "statusBarItem.remoteForeground": "#e7e7e7",
+    "titleBar.activeBackground": "#9945ff",
+    "titleBar.activeForeground": "#e7e7e7",
+    "titleBar.inactiveBackground": "#9945ff99",
+    "titleBar.inactiveForeground": "#e7e7e799"
+  },
+  "peacock.color": "#9945FF"
 }
