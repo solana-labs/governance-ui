@@ -16,6 +16,7 @@ import { sendTransaction } from 'utils/send'
 import { CashIcon, CreditCardIcon } from '@heroicons/react/solid'
 import Button from './Button'
 import Checkbox from '@components/inputs/Checkbox'
+import { tryParseKey } from 'tools/validators/pubkey'
 
 const DelegateCard = () => {
   const {
@@ -59,18 +60,17 @@ const DelegateCard = () => {
         wallet?.publicKey, // governanceAuthority: publicKey of connected wallet
         new PublicKey(delegateKey) // public key of wallet who to delegated vote to
       )
-      const recentBlockhash = await connection.getRecentBlockhash()
-      const transaction = new Transaction({
-        recentBlockhash: recentBlockhash.blockhash,
-      })
+
+      const transaction = new Transaction()
       transaction.add(...instructions)
-      transaction.feePayer = wallet?.publicKey
       await sendTransaction({ transaction, wallet, connection, signers })
       setLoading(false)
     } catch (error) {
       console.log('error', error)
     }
   }
+
+  const parsedDelegateKey = tryParseKey(delegateKey)
 
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
@@ -127,9 +127,7 @@ const DelegateCard = () => {
             onClick={handleDelegate}
             isLoading={isLoading}
             disabled={
-              delegateKey.length < 43 ||
-              delegateKey.length > 46 ||
-              (!ownCouncilTokenRecord && !ownTokenRecord)
+              !parsedDelegateKey || (!ownCouncilTokenRecord && !ownTokenRecord)
             }
           >
             Delegate

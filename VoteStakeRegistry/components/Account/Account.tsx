@@ -50,20 +50,14 @@ const NotificationsPlugin = () => {
   return null
 }
 
-const DelegatePlugin = () => {
-  return (
-    <div className="col-span-12">
-      <DelegateCard />
-    </div>
-  )
-}
-
 const Account = ({ withHeader = true }: { withHeader?: boolean }) => {
   if (withHeader) {
     return (
       <div className="col-span-12 grid grid-cols-12 gap-4">
         <AccountInner withHeader={withHeader} />
-        <DelegatePlugin />
+        <div className="col-span-6">
+          <DelegateCard />
+        </div>
         <NotificationsPlugin />
       </div>
     )
@@ -71,7 +65,9 @@ const Account = ({ withHeader = true }: { withHeader?: boolean }) => {
     return (
       <>
         <AccountInner withHeader={withHeader} />
-        <DelegatePlugin />
+        <div className="col-span-6">
+          <DelegateCard />
+        </div>
         <NotificationsPlugin />
       </>
     )
