@@ -1,15 +1,11 @@
-import {
-  Keypair,
-  PublicKey,
-  Transaction,
-  TransactionInstruction,
-} from '@solana/web3.js'
+import { Keypair, Transaction, TransactionInstruction } from '@solana/web3.js'
 import {
   ChatMessageBody,
   getGovernanceProgramVersion,
   GOVERNANCE_CHAT_PROGRAM_ID,
   Proposal,
   Realm,
+  TokenOwnerRecord,
   withPostChatMessage,
   YesNoVote,
 } from '@solana/spl-governance'
@@ -29,7 +25,7 @@ export async function castVote(
   { connection, wallet, programId, walletPubkey }: RpcContext,
   realm: ProgramAccount<Realm>,
   proposal: ProgramAccount<Proposal>,
-  tokeOwnerRecord: PublicKey,
+  tokeOwnerRecord: ProgramAccount<TokenOwnerRecord>,
   yesNoVote: YesNoVote,
   message?: ChatMessageBody | undefined,
   votingPlugin?: VotingClient
@@ -49,7 +45,8 @@ export async function castVote(
   //will run only if any plugin is connected with realm
   const plugin = await votingPlugin?.withCastPluginVote(
     instructions,
-    proposal.pubkey
+    proposal,
+    tokeOwnerRecord
   )
   await withCastVote(
     instructions,
@@ -59,7 +56,7 @@ export async function castVote(
     proposal.account.governance,
     proposal.pubkey,
     proposal.account.tokenOwnerRecord,
-    tokeOwnerRecord,
+    tokeOwnerRecord.pubkey,
     governanceAuthority,
     proposal.account.governingTokenMint,
     Vote.fromYesNoVote(yesNoVote),
@@ -71,6 +68,7 @@ export async function castVote(
   if (message) {
     const plugin = await votingPlugin?.withUpdateVoterWeightRecord(
       instructions,
+      tokeOwnerRecord,
       'commentProposal'
     )
     await withPostChatMessage(
@@ -81,7 +79,7 @@ export async function castVote(
       realm.pubkey,
       proposal.account.governance,
       proposal.pubkey,
-      tokeOwnerRecord,
+      tokeOwnerRecord.pubkey,
       governanceAuthority,
       payer,
       undefined,

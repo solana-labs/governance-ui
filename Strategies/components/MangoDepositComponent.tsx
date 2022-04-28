@@ -220,7 +220,7 @@ const MangoDepositComponent = ({
         },
         realm!,
         governedTokenAccount!,
-        ownTokenRecord.pubkey,
+        ownTokenRecord,
         defaultProposalMint!,
         governedTokenAccount!.governance!.account!.proposalCount,
         prerequisiteInstructions,
