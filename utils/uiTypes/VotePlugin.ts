@@ -42,6 +42,7 @@ enum VotingClientType {
   NoClient,
   VsrClient,
   NftVoterClient,
+  SwitchboardVoterClient,
 }
 
 class AccountData {
@@ -85,6 +86,10 @@ export class VotingClient {
     }
     if (this.client instanceof NftVoterClient) {
       this.clientType = VotingClientType.NftVoterClient
+      this.noClient = false
+    }
+    if (this.client instanceof SwitchboardQueueVoterClient) {
+      this.clientType = VotingClientType.SwitchboardVoterClient
       this.noClient = false
     }
   }
@@ -161,11 +166,11 @@ export class VotingClient {
       return { voterWeightPk, maxVoterWeightRecord }
     }
     if (this.client instanceof SwitchboardQueueVoterClient) {
-      console.log("It's a switchboard client.");
-      console.log("the realm is");
-      console.log(this.realm);
-      console.log("the wallet is");
-      console.log(this.walletPk);
+      console.log("It's a switchboard client.")
+      console.log('the realm is')
+      console.log(this.realm)
+      console.log('the wallet is')
+      console.log(this.walletPk)
     }
   }
   withCastPluginVote = async (
