@@ -27,7 +27,7 @@ export const Section = ({ bgColor = '', showTopGlow = false, children }) => {
 
 const Solana = () => {
   return (
-    <div className="relative">
+    <div className="relative landing-page">
       <AltNavbar />
       <KickstartSolana />
       <SolanaPerks />

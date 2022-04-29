@@ -40,7 +40,7 @@ module.exports = {
         '"Noto Color Emoji"',
       ],
       display: ['PT Mono', 'monospace'],
-      body: ['Ambit', 'Inter', 'sans-serif'],
+      body: ['Inter', 'sans-serif'],
     },
     extend: {
       cursor: {
