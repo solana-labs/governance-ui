@@ -24,7 +24,11 @@ import StatsView from './components/StatsView'
 const Params = () => {
   const { realm, mint } = useRealm()
   const wallet = useWalletStore((s) => s.current)
-  const { canUseAuthorityInstruction, assetAccounts } = useGovernanceAssets()
+  const {
+    canUseAuthorityInstruction,
+    assetAccounts,
+    auxiliaryTokenAccounts,
+  } = useGovernanceAssets()
   const governancesArray = useGovernanceAssetsStore((s) => s.governancesArray)
   const loadGovernedAccounts = useGovernanceAssetsStore(
     (s) => s.loadGovernedAccounts
@@ -154,6 +158,16 @@ const Params = () => {
                     </Button>
                   )}
                 </div>
+                {auxiliaryTokenAccounts.length && (
+                  <div>
+                    <h2 className="flex items-center">Auxiliary Accounts </h2>
+                    <AccountsView
+                      activeGovernance={{}}
+                      getYesNoString={getYesNoString}
+                      auxiliaryMode={true}
+                    />
+                  </div>
+                )}
               </div>
               <div className="border border-fgd-4 col-span-1 p-4 rounded-md">
                 <h2 className="flex items-center">Config </h2>

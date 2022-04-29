@@ -200,26 +200,22 @@ const AccountOverview = () => {
             {isNFT ? 'Deposit' : 'Copy Deposit Address'}
           </Button>
         </div>
-        <Button
-          tooltipMessage={
-            !canUseTransferInstruction
-              ? 'You need to have connected wallet with ability to create token transfer proposals'
-              : isNFT && nftsCount === 0
-              ? 'Please deposit nfts first'
-              : isAuxiliaryAccount
-              ? "You can't make proposals for auxiliary accounts"
-              : ''
-          }
-          className="w-full"
-          onClick={() => setOpenCommonSendModal(true)}
-          disabled={
-            !canUseTransferInstruction ||
-            (isNFT && nftsCount === 0) ||
-            isAuxiliaryAccount
-          }
-        >
-          Send
-        </Button>
+        {!isAuxiliaryAccount && (
+          <Button
+            tooltipMessage={
+              !canUseTransferInstruction
+                ? 'You need to have connected wallet with ability to create token transfer proposals'
+                : isNFT && nftsCount === 0
+                ? 'Please deposit nfts first'
+                : ''
+            }
+            className="w-full"
+            onClick={() => setOpenCommonSendModal(true)}
+            disabled={!canUseTransferInstruction || (isNFT && nftsCount === 0)}
+          >
+            Send
+          </Button>
+        )}
         {isSol ? (
           <Button
             className="w-full"
