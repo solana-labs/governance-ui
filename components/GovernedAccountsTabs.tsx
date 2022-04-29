@@ -1,6 +1,4 @@
-import { PublicKey } from '@solana/web3.js'
 import { abbreviateAddress } from '@utils/formatting'
-import { emptyPk } from 'NftVotePlugin/sdk/accounts'
 import { FunctionComponent } from 'react'
 import { getAccountName } from './instructions/tools'
 
@@ -15,23 +13,30 @@ const GovernedAccountsTabs: FunctionComponent<GovernedAccountsTabsProps> = ({
   onChange,
   tabs,
 }) => {
-  const activePubKey = activeTab?.pubkey
-  const unusedMintPublicKey = new PublicKey(emptyPk)
   return (
     <div className={`relative`}>
       <div
         className={`absolute bg-primary-light top-0 default-transition left-0 w-1 z-10`}
+        style={{
+          transform: `translateY(${
+            tabs.findIndex(
+              (t) => t.pubkey.toBase58() === activeTab?.pubkey.toBase58()
+            ) * 100
+          }%)`,
+          height: `${100 / tabs.length}%`,
+        }}
       />
       {tabs.map((x) => {
         const pubKey = x.pubkey
+        const activePubKey = activeTab?.pubkey
         const name = getAccountName(pubKey)
         return (
           <button
             key={pubKey}
             onClick={() => onChange(x)}
-            className={`cursor-pointer flex items-center h-16 px-4 relative w-full hover:bg-bkg-3 hover:rounded-md ${
+            className={`cursor-pointer default-transition flex items-center h-16 px-4 relative w-full hover:bg-bkg-3 hover:rounded-md ${
               activePubKey?.toBase58() === pubKey.toBase58()
-                ? `bg-bkg-3 rounded-md rounded-l-none text-primary-light border-l-2 border-primary-light`
+                ? `bg-bkg-3 rounded-md rounded-l-none text-primary-light`
                 : `text-fgd-2 hover:text-primary-light`
             }
             `}
@@ -51,20 +56,6 @@ const GovernedAccountsTabs: FunctionComponent<GovernedAccountsTabsProps> = ({
           </button>
         )
       })}
-      <button
-        key={emptyPk}
-        onClick={() => onChange({ pubkey: unusedMintPublicKey })}
-        className={`cursor-pointer flex items-center h-16 px-4 relative w-full hover:bg-bkg-3 hover:rounded-md ${
-          activePubKey?.toBase58() === unusedMintPublicKey.toBase58()
-            ? `bg-bkg-3 rounded-md rounded-l-none text-primary-light border-l-2 border-primary-light`
-            : `text-fgd-2 hover:text-primary-light`
-        }
-            `}
-      >
-        <div className="text-left">
-          <div className="text-xs text-fgd-3">Auxiliary Accounts</div>
-        </div>
-      </button>
     </div>
   )
 }
