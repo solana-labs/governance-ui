@@ -1,4 +1,3 @@
-import DaoTypes from '../../components_2/DaoTypes'
 import RealmsOptions from '../../components_2/RealmsOptions'
 import DaoCommunity from '../../components_2/DaoCommunity'
 import RealmsMetrics from '../../components_2/RealmsMetrics'
@@ -10,6 +9,7 @@ import Button from '../../components_2/Button'
 
 import KickstartSolana from './components/KickstartSolana'
 import PerfectForDAOs from './components/PerfectForDAOs'
+import SelectDAOToCreate from './components/SelectDAOToCreate'
 import WhatIsSPL from './components/WhatIsSpl'
 
 export const Section = ({ bgColor = '', showTopGlow = false, children }) => {
@@ -63,16 +63,18 @@ const Solana = () => {
     <div className="relative landing-page">
       <AltNavbar />
       <KickstartSolana />
-      <PerfectForDAOs />
+      <Section bgColor="bg-[#201f27]">
+        <PerfectForDAOs />
+      </Section>
       <Section bgColor="bg-[#292833]">
-        <DaoTypes />
+        <SelectDAOToCreate />
       </Section>
       <Section bgColor="bg-[#292833]" showTopGlow>
         <RealmsOptions />
       </Section>
-
-      <WhatIsSPL />
-
+      <Section bgColor="bg-[#292833]">
+        <WhatIsSPL />
+      </Section>
       <Section bgColor="bg-[#292833]">
         <DaoCommunity />
       </Section>
