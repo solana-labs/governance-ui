@@ -226,7 +226,12 @@ body::-webkit-scrollbar-corner {
 }
 
 .transition-to-gradient-background::before {
-  background: linear-gradient(90.65deg, #00C2FF 0.62%, #00E4FF 50.08%, #87F2FF 99.55%);
+  background: linear-gradient(
+    90.65deg,
+    #00c2ff 0.62%,
+    #00e4ff 50.08%,
+    #87f2ff 99.55%
+  );
 }
 
 .transition-to-white-background::before {
