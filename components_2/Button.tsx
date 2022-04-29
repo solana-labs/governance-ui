@@ -44,96 +44,6 @@ const Button: FunctionComponent<ButtonProps> = ({
 
 export default Button
 
-export const PopUpButton: FunctionComponent<ButtonProps> = ({
-  children,
-  onClick,
-  disabled = false,
-  className,
-  isLoading,
-  small = false,
-  tooltipMessage = '',
-  ...props
-}) => {
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className={`${className} default-transition px-8 ${
-        small ? 'py-2' : 'py-3.5'
-      } inline-flex items-center text-fgd-1 text-xs hover:bg-white hover:bg-opacity-30 focus:outline-none active:bg-white active:bg-opacity-20`}
-      {...props}
-    >
-      <Tooltip content={tooltipMessage}>
-        <div>{isLoading ? <Loading /> : children}</div>
-      </Tooltip>
-      <img
-        src="/img/realms-web/buttons/Export-white.svg"
-        className="h-3 ml-2"
-      />
-    </button>
-  )
-}
-
-export const PopUpButtonBorder: FunctionComponent<ButtonProps> = ({
-  children,
-  onClick,
-  disabled = false,
-  className,
-  isLoading,
-  small = false,
-  tooltipMessage = '',
-  ...props
-}) => {
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className={`${className} border border-white default-transition px-8 ${
-        small ? 'py-2' : 'py-4'
-      } inline-flex items-center text-fgd-1 text-black text-xs font-bold hover:bg-white hover:bg-opacity-30 focus:outline-none active:bg-white active:bg-opacity-20`}
-      {...props}
-    >
-      <Tooltip content={tooltipMessage}>
-        <div>{isLoading ? <Loading /> : children}</div>
-      </Tooltip>
-      <img
-        src="/img/realms-web/buttons/Export-black.svg"
-        className="h-3 ml-2"
-      />
-    </button>
-  )
-}
-
-export const ExploreButton: FunctionComponent<ButtonProps> = ({
-  children,
-  onClick,
-  disabled = false,
-  className,
-  isLoading,
-  small = false,
-  tooltipMessage = '',
-  ...props
-}) => {
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className={`${className} default-transition px-8 bg-origin-border ${
-        small ? 'py-2' : 'py-3.5'
-      } inline-flex items-center text-fgd-1 text-xs font-bold hover:bg-gradient-to-r from-realms-theme-blue to-realms-theme-turquoise active:bg-gradient-to-r active:opacity-80`}
-      {...props}
-    >
-      <img
-        src="/img/realms-web/icons/binoculars-white.svg"
-        className="h-4 mr-2"
-      />
-      <Tooltip content={tooltipMessage}>
-        <div>{isLoading ? <Loading /> : children}</div>
-      </Tooltip>
-    </button>
-  )
-}
-
 interface AltButtonProps {
   disabled?: boolean
   isLoading?: boolean
@@ -141,7 +51,7 @@ interface AltButtonProps {
   secondary?: boolean
   tertiary?: boolean
   inverse?: boolean
-  withBoarder?: boolean
+  withBorder?: boolean
 }
 
 export const AltButton: FunctionComponent<AltButtonProps> = ({
@@ -151,7 +61,7 @@ export const AltButton: FunctionComponent<AltButtonProps> = ({
   secondary = false,
   tertiary = false,
   inverse = false,
-  withBoarder = false,
+  withBorder = false,
   ...props
 }) => {
   let className = `z-0 relative transition-all duration-300 rounded-full font-serif text-[16px] hover:cursor-pointer opacity-[84] hover:opacity-100 `
@@ -164,7 +74,7 @@ export const AltButton: FunctionComponent<AltButtonProps> = ({
     // secondary inverse
   } else if (tertiary) {
     className += 'py-3 px-2 font-regular hover:bg-white/10'
-  } else if (withBoarder) {
+  } else if (withBorder) {
     className +=
       'py-3 px-2 font-regular border border-white transition-to-white-background hover:text-black'
   } else if (inverse) {

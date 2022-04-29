@@ -45,7 +45,7 @@ export const AltNavbar = () => {
   return (
     <div
       className={`fixed w-full top-0 z-10 pt-5 pb-5 transition-all duration-300 ${
-        scrollY > 200 ? 'bg-gray-800/70 backdrop-blur-[3px]' : ''
+        scrollY > 200 ? 'bg-[#292833] bg-opacity-90 backdrop-blur-[3px]' : ''
       }`}
     >
       <div className="max-w-[1440px] mx-auto flex items-center justify-between px-4">
@@ -57,7 +57,7 @@ export const AltNavbar = () => {
           <div className="invisible md:visible">
             <AltButton tertiary>
               <div className="relative flex items-center justify-center">
-                <div className="pl-4 pr-2">Read the Docs</div>
+                <div className="pl-4 pr-2 py-1">Read the Docs</div>
                 <img
                   src="/1-Landing-v2/icon-external-link-white.png"
                   className="w-3 h-3 mr-4"

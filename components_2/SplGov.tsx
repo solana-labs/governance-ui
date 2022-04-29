@@ -14,8 +14,10 @@ const SplGov = () => {
       </div>
       <div className="mb-8">
         <h1 className="mt-8 mb-5 font-thin md:text-3xl">SPL Governance</h1>
-        <div className="flex flex-row">
-          <div className="pr-20 basis-2/3">
+        {/* <div className="flex flex-row"> */}
+        <div>
+          {/* <div className="pr-20 basis-2/3"> */}
+          <div>
             <p className="mb-5 text-base tracking-tight text-black">
               The Solana Program Library (SPL) is a collection of on-chain
               programs targeting the Sealevel parallel runtime. These programs
@@ -32,12 +34,13 @@ const SplGov = () => {
               token type goes up.
             </p>
           </div>
-          <div className="pl-16 basis-1/3">
+          {/* <div className="relative basis-1/3 pl-16"> */}
+          <div>
             <p className="mb-5 tracking-tight text-black">
               Solana has compiled a robust library of information to read.
             </p>
 
-            <AltButton withBoarder>
+            <AltButton withBorder>
               <div className="relative flex items-center justify-center px-4">
                 <div className="pr-2">Read about SPL Governance</div>
                 <svg
