@@ -5,7 +5,7 @@ export const DaoType = ({ imgSrc, daoTheme, text }) => {
       <h2 className="mb-2 text-xl font-normal text-center md:text-2xl md:text-left md:mb-5">
         {daoTheme}
       </h2>
-      <p className="font-normal text-center text-[16px] md:text-[18px] text-white/70 md:text-left">
+      <p className="font-light text-center text-[16px] md:text-[18px] text-white/70 md:text-left">
         {text}
       </p>
     </div>

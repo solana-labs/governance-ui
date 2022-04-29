@@ -1,7 +1,3 @@
-// import { useInView } from 'react-intersection-observer'
-// import ScrollWrapper from '../../components_2/ScrollWrapper'
-import KickstartSolana from '../../components_2/KickstartSolana'
-import SolanaPerks from '../../components_2/SolanaPerks'
 import DaoTypes from '../../components_2/DaoTypes'
 import RealmsOptions from '../../components_2/RealmsOptions'
 import SplGov from '../../components_2/SplGov'
@@ -11,6 +7,10 @@ import SocialChannels from '../../components_2/SocialChannels'
 import FreequentlyAskedQuestions from '../../components_2/FreequentlyAskedQuestions'
 import Footer from '../../components_2/Footer'
 import { AltNavbar } from '../../components_2/NavBar'
+import { AltButton } from 'components_2/Button'
+
+import KickstartSolana from './components/KickstartSolana'
+import PerfectForDAOs from './components/PerfectForDAOs'
 
 export const Section = ({ bgColor = '', showTopGlow = false, children }) => {
   return (
@@ -18,10 +18,43 @@ export const Section = ({ bgColor = '', showTopGlow = false, children }) => {
       {showTopGlow && (
         <img src="/1-Landing-v2/divider-glow.png" className="absolute w-full" />
       )}
-      <div className="w-full px-8 mx-auto md:px-16 lg:w-5/6 lg:px-0 xl:px-20 max-w-[1440px]">
+      <div className="w-full px-5 mx-auto md:px-16 lg:w-5/6 lg:px-0 xl:px-20 max-w-[1440px]">
         {children}
       </div>
     </div>
+  )
+}
+
+export const ExploreButton = () => {
+  return (
+    <AltButton secondary>
+      <div className="relative flex items-center justify-center">
+        <div className="bg-[#292833] rounded-full ml-2 mr-2 p-2 absolute left-[-0.5rem]">
+          <div className="bg-[url(/1-Landing-v2/icon-binoculars-blue.png)]  w-5 h-5 bg-cover overflow-hidden text-transparent">
+            Binoculars
+          </div>
+        </div>
+        <div className="relative px-8 left-[0.5rem]">
+          <div className="md:hidden">Explore</div>
+          <div className="hidden md:block">Explore DAOs</div>
+        </div>
+      </div>
+    </AltButton>
+  )
+}
+
+export const ReadTheDocsButton = () => {
+  return (
+    <AltButton tertiary>
+      <div className="relative flex items-center justify-center">
+        <div className="py-1 pl-4 pr-2">Read the Docs</div>
+        <img
+          src="/1-Landing-v2/icon-external-link-white.png"
+          className="w-3 h-3 mr-4"
+          alt="External link icon"
+        />
+      </div>
+    </AltButton>
   )
 }
 
@@ -30,24 +63,28 @@ const Solana = () => {
     <div className="relative landing-page">
       <AltNavbar />
       <KickstartSolana />
-      <Section bgColor="bg-[#201f27]">
-        <SolanaPerks />
-      </Section>
+      <PerfectForDAOs />
       <Section bgColor="bg-[#292833]">
         <DaoTypes />
       </Section>
       <Section bgColor="bg-[#292833]" showTopGlow>
         <RealmsOptions />
       </Section>
-      <Section>
+      <Section bgColor="bg-[#292833]">
         <SplGov />
       </Section>
-      <DaoCommunity />
-      <RealmsMetrics />
-      <div className="px-32">
+      <Section bgColor="bg-[#292833]">
+        <DaoCommunity />
+      </Section>
+      <Section bgColor="bg-[#292833]" showTopGlow>
+        <RealmsMetrics />
+      </Section>
+      <Section bgColor="bg-[#201f27] md:bg-[#292833]">
         <SocialChannels />
-      </div>
-      <FreequentlyAskedQuestions />
+      </Section>
+      <Section bgColor="bg-[#292833]">
+        <FreequentlyAskedQuestions />
+      </Section>
       <Footer />
     </div>
   )

@@ -2,7 +2,7 @@ import { AltButton } from './Button'
 
 const SplGov = () => {
   return (
-    <div className="w-full px-16 py-10 pt-12 bg-cover bg-spl-gov h-fit">
+    <div className="bg-cover md:px-16 md:py-10 md:pt-12 bg-spl-gov h-fit">
       {/* <div className="bg-[url('/img/Spl-Gov-background.svg')]"> */}
       <div className="flex items-center justify-start">
         <div>
@@ -34,7 +34,7 @@ const SplGov = () => {
               token type goes up.
             </p>
           </div>
-          {/* <div className="relative basis-1/3 pl-16"> */}
+          {/* <div className="relative pl-16 basis-1/3"> */}
           <div>
             <p className="mb-5 tracking-tight text-black">
               Solana has compiled a robust library of information to read.

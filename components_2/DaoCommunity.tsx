@@ -3,20 +3,20 @@ import { TextBox } from './TextBox'
 
 const DaoCommunity = () => {
   return (
-    <div className="py-24 px-56">
-      <div className="pb-16">
+    <div className="">
+      <div className="pb-8 md:pb-12">
         <GradientTitle>
           A DAO is a community working together to make decisions
         </GradientTitle>
       </div>
-      <div className="flex flex-row">
-        <div className="basis-1/2">
+      <div className="flex flex-col md:flex-row">
+        <div className="w-full md:w-1/2">
           <div className="pr-20">
-            <p className="text-base font-thin tracking-tight opacity-70 mb-2">
+            <p className="mb-2 text-base font-light tracking-tight opacity-70">
               DAOs (decentralized autonomous organizations) are an effective and
               safe way to work with like-minded folks around the globe.
-            </p>
-            <p className="text-base font-thin tracking-tight opacity-70">
+              <br />
+              <br />
               Think of them like an internet-native business thats collectively
               owned and managed by its members. They have built-in treasuries
               that no one has the authority to access without the approval of
@@ -25,11 +25,11 @@ const DaoCommunity = () => {
             </p>
           </div>
         </div>
-        <div className="basis-1/2">
+        <div className="w-full md:w-1/2">
           <div className="mb-6">
             <p className="font-bold">Industries DAOs Impact:</p>
           </div>
-          <div className="grid grid-rows-4 grid-flow-col gap-y-4">
+          <div className="grid grid-cols-2 gap-y-4">
             <TextBox title="Defi" text="Enable equitable financial markets" />
             <TextBox
               title="Gaming"

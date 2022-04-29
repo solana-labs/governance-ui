@@ -3,17 +3,10 @@ import { OptionsBox } from './OptionsBox'
 
 const RealmsOptions = () => {
   return (
-    // <div className="py-20 px-56 bg-cover bg-bkg-13 flex flex-col items-center ">
-    <div className="py-20 px-56 flex flex-col items-center ">
-      <div className="mb-28">
+    <div className="flex flex-col items-center ">
+      <div className="pt-10 md:pt-24">
         <GradientTitle>What you can do on Realms</GradientTitle>
       </div>
-      {/* <img
-          src="/img/realms-web/backgrounds/glow-round.svg"
-          className="my-2 h-40"
-          alt=""
-        /> */}
-
       <OptionsBox
         imgSrc="PLACEHOLDER-token"
         title="Mint tokens for your community"

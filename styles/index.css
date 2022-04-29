@@ -79,7 +79,7 @@ h4 {
 }
 
 .landing-page {
-  @apply font-sans;
+  @apply font-sans font-light;
 }
 
 .landing-page h1 {

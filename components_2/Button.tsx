@@ -69,7 +69,7 @@ export const AltButton: FunctionComponent<AltButtonProps> = ({
   if (secondary && !inverse) {
     // secondary
     className +=
-      'py-3 px-2 bg-[#201F27] font-regular text-white transition-to-white-background hover:text-[#292833]'
+      'py-3 px-2 bg-[#292833] font-regular text-white transition-to-white-background hover:text-[#292833]'
   } else if (secondary && inverse) {
     // secondary inverse
   } else if (tertiary) {
@@ -84,7 +84,7 @@ export const AltButton: FunctionComponent<AltButtonProps> = ({
   } else {
     // primary
     className +=
-      'py-4 px-2 font-light text-black bg-gradient-to-r from-[#00C2FF] via-[#00E4FF] to-[#87F2FF] transition-to-white-background'
+      'py-4 px-2 font-normal text-black bg-gradient-to-r from-[#00C2FF] via-[#00E4FF] to-[#87F2FF] transition-to-white-background'
   }
 
   if (isLoading) {
