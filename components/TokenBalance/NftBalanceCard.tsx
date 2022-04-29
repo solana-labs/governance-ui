@@ -140,7 +140,7 @@ const NftBalanceCard = () => {
       </div>
       {connected && !ownTokenRecord && (
         <Button className="w-full" onClick={handleRegister}>
-          Register
+          Join
         </Button>
       )}
     </div>

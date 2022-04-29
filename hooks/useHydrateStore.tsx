@@ -15,7 +15,6 @@ export default function useHydrateStore() {
       fetchRealmBySymbol(cluster as string, symbol as string)
     }
   }, [symbol, cluster])
-
   useEffect(() => {
     if (pk && Object.entries(selectedRealmMints).length > 0) {
       fetchProposal(pk)

@@ -46,8 +46,10 @@ const TokenBalanceCardWrapper = ({
       return (
         <>
           <NftBalanceCard></NftBalanceCard>
-          {(!ownCouncilTokenRecord?.account.governingTokenDepositAmount.isZero() ||
-            !councilTokenAccount?.account.amount.isZero()) && (
+          {((ownCouncilTokenRecord &&
+            !ownCouncilTokenRecord?.account.governingTokenDepositAmount.isZero()) ||
+            (councilTokenAccount &&
+              !councilTokenAccount?.account.amount.isZero())) && (
             <TokenBalanceCard proposal={proposal}></TokenBalanceCard>
           )}
         </>

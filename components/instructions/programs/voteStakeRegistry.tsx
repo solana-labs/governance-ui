@@ -26,7 +26,7 @@ interface VotingMintCfgInstruction {
   lockupSaturationSecs: BN
   grantAuthority: PublicKey
 }
-interface GrantInstruction {
+export interface GrantInstruction {
   periods: number
   kind: object
   amount: BN

@@ -114,7 +114,7 @@ const NewProgramForm = () => {
           new PublicKey(form.programId),
           governanceConfig,
           form.transferAuthority,
-          tokenOwnerRecord!.pubkey,
+          tokenOwnerRecord!,
           client
         )
         setIsLoading(false)

@@ -12,6 +12,7 @@ import {
   Governance,
   ProgramAccount,
   Realm,
+  TokenOwnerRecord,
   VoteType,
   withCreateProposal,
 } from '@solana/spl-governance'
@@ -25,6 +26,7 @@ import { sendTransactions, SequenceType } from '@utils/sendTransactions'
 import { chunks } from '@utils/helpers'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
+import { NftVoterClient } from '@solana/governance-program-library'
 
 export interface InstructionDataWithHoldUpTime {
   data: InstructionData | null
@@ -60,7 +62,7 @@ export const createProposal = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
   realm: ProgramAccount<Realm>,
   governance: PublicKey,
-  tokenOwnerRecord: PublicKey,
+  tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>,
   name: string,
   descriptionLink: string,
   governingTokenMint: PublicKey,
@@ -98,6 +100,7 @@ export const createProposal = async (
   //will run only if plugin is connected with realm
   const plugin = await client?.withUpdateVoterWeightRecord(
     instructions,
+    tokenOwnerRecord,
     'createProposal'
   )
 
@@ -107,7 +110,7 @@ export const createProposal = async (
     programVersion,
     realm.pubkey!,
     governance,
-    tokenOwnerRecord,
+    tokenOwnerRecord.pubkey,
     name,
     descriptionLink,
     governingTokenMint,
@@ -125,7 +128,7 @@ export const createProposal = async (
     programId,
     programVersion,
     proposalAddress,
-    tokenOwnerRecord,
+    tokenOwnerRecord.pubkey,
     governanceAuthority,
     signatory,
     payer
@@ -156,7 +159,7 @@ export const createProposal = async (
         programVersion,
         governance,
         proposalAddress,
-        tokenOwnerRecord,
+        tokenOwnerRecord.pubkey,
         governanceAuthority,
         index,
         0,
@@ -207,7 +210,11 @@ export const createProposal = async (
       sendingMessage: `inserting into ${notificationTitle}`,
       successMessage: `inserted into ${notificationTitle}`,
     })
-  } else if (insertInstructionCount <= 2 && !splitToChunkByDefault) {
+  } else if (
+    insertInstructionCount <= 2 &&
+    !splitToChunkByDefault &&
+    !(client?.client instanceof NftVoterClient)
+  ) {
     // This is an arbitrary threshold and we assume that up to 2 instructions can be inserted as a single Tx
     // This is conservative setting and we might need to revise it if we have more empirical examples or
     // reliable way to determine Tx size

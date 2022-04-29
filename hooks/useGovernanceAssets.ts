@@ -227,6 +227,36 @@ export default function useGovernanceAssets() {
       isVisible: canUseAnyInstruction,
     },
     {
+      id: Instructions.ForesightInitMarket,
+      name: 'Foresight: Init Market',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.ForesightInitMarketList,
+      name: 'Foresight: Init Market List',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.ForesightInitCategory,
+      name: 'Foresight: Init Category',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.ForesightResolveMarket,
+      name: 'Foresight: Resolve Market',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.ForesightAddMarketListToCategory,
+      name: 'Foresight: Add Market List To Category',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.ForesightAddMarketMetadata,
+      name: 'Foresight: Add Market Metadata',
+      isVisible: canUseAnyInstruction,
+    },
+    {
       id: Instructions.ProgramUpgrade,
       name: 'Upgrade Program',
       isVisible: canUseProgramUpgradeInstruction,

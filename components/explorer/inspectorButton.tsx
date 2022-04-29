@@ -44,7 +44,7 @@ export default function InspectorButton({
           'confirmed'
         )
         inspectUrl = getExplorerUrl(
-          connection.endpoint,
+          connection.cluster,
           recentActivity[0].signature,
           'tx'
         )

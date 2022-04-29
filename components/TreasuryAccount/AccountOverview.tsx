@@ -163,7 +163,7 @@ const AccountOverview = () => {
             className="default-transition flex items-center text-primary-light hover:text-primary-dark text-sm"
             href={
               accountPublicKey
-                ? getExplorerUrl(connection.endpoint, accountPublicKey)
+                ? getExplorerUrl(connection.cluster, accountPublicKey)
                 : ''
             }
             target="_blank"
@@ -293,11 +293,7 @@ const AccountOverview = () => {
             <a
               href={
                 activity.signature
-                  ? getExplorerUrl(
-                      connection.endpoint,
-                      activity.signature,
-                      'tx'
-                    )
+                  ? getExplorerUrl(connection.cluster, activity.signature, 'tx')
                   : ''
               }
               target="_blank"

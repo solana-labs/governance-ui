@@ -209,7 +209,11 @@ export default function useMembers() {
         })
         .reverse(),
 
-    [JSON.stringify(tokenRecordArray), JSON.stringify(councilRecordArray)]
+    [
+      JSON.stringify(tokenRecordArray),
+      JSON.stringify(councilRecordArray),
+      realm?.pubkey.toBase58(),
+    ]
   )
 
   // Loop through Members list to get our delegates and their tokens
