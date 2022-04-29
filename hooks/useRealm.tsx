@@ -70,22 +70,28 @@ export default function useRealm() {
     [realm, tokenAccounts]
   )
 
-  const ownTokenRecord = useMemo(() => {
+  const ownTokenRecord = useMemo(
+    () =>
+      wallet?.connected && wallet.publicKey
+        ? tokenRecords[wallet.publicKey.toBase58()]
+        : undefined,
+    [tokenRecords, wallet, connected]
+  )
+
+  // returns array of community tokenOwnerRecords that connected wallet has been delegated
+  const ownDelegateTokenRecords = useMemo(() => {
     if (wallet?.connected && wallet.publicKey) {
       const walletId = wallet.publicKey.toBase58()
-
-      // if users wallet has token, use that
-      if (tokenRecords[walletId]) {
-        return tokenRecords[walletId]
-      }
-
-      // if they don't have a token, but are delegated a token, use that
       const delegatedWallets = delegates && delegates[walletId]
       if (delegatedWallets?.communityMembers) {
-        const firstDelegate = delegatedWallets.communityMembers[0]
-        return tokenRecords[firstDelegate.walletAddress]
+        const communityTokenRecords = delegatedWallets.communityMembers.map(
+          (member) => {
+            return tokenRecords[member.walletAddress]
+          }
+        )
+
+        return communityTokenRecords
       }
-      return tokenRecords[walletId]
     }
 
     return undefined
@@ -103,19 +109,28 @@ export default function useRealm() {
     [realm, tokenAccounts]
   )
 
-  const ownCouncilTokenRecord = useMemo(() => {
+  const ownCouncilTokenRecord = useMemo(
+    () =>
+      wallet?.connected && councilMint && wallet.publicKey
+        ? councilTokenOwnerRecords[wallet.publicKey.toBase58()]
+        : undefined,
+    [tokenRecords, wallet, connected]
+  )
+
+  // returns array of council tokenOwnerRecords that connected wallet has been delegated
+  const ownDelegateCouncilTokenRecords = useMemo(() => {
     if (wallet?.connected && councilMint && wallet.publicKey) {
       const walletId = wallet.publicKey.toBase58()
-      // if users wallet has token, use that
-      if (councilTokenOwnerRecords[walletId]) {
-        return councilTokenOwnerRecords[walletId]
-      }
-
-      // if they don't have a token, but are delegated a token, use that
       const delegatedWallets = delegates && delegates[walletId]
+      console.log('delegated wallets', delegatedWallets)
       if (delegatedWallets?.councilMembers) {
-        const firstDelegate = delegatedWallets.councilMembers[0]
-        return councilTokenOwnerRecords[firstDelegate.walletAddress]
+        const councilTokenRecords = delegatedWallets.councilMembers.map(
+          (member) => {
+            return councilTokenOwnerRecords[member.walletAddress]
+          }
+        )
+
+        return councilTokenRecords
       }
     }
     return undefined
@@ -171,6 +186,8 @@ export default function useRealm() {
     councilTokenOwnerRecords,
     toManyCouncilOutstandingProposalsForUse,
     toManyCommunityOutstandingProposalsForUser,
+    ownDelegateTokenRecords,
+    ownDelegateCouncilTokenRecords,
     config,
     currentPluginPk,
     isLockTokensMode,
