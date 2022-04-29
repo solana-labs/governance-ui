@@ -1,13 +1,13 @@
 export const DaoType = ({ imgSrc, daoTheme, text }) => {
   return (
-    <div>
-      <img
-        src={`/img/realms-web/icons/${imgSrc}.svg`}
-        className="mb-8 w-32"
-        alt=""
-      />
-      <h2>{daoTheme}</h2>
-      <p className="opacity-70">{text}</p>
+    <div className="flex flex-col items-center md:items-start">
+      <img src={imgSrc} className="max-w-[220px]" alt="icon" />
+      <h2 className="mb-2 text-xl font-normal text-center md:text-2xl md:text-left md:mb-5">
+        {daoTheme}
+      </h2>
+      <p className="font-normal text-center text-[16px] md:text-[18px] text-white/70 md:text-left">
+        {text}
+      </p>
     </div>
   )
 }

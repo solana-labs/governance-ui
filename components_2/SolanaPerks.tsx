@@ -5,7 +5,7 @@ const SolanaPerks = () => {
   return (
     <div className="pt-10 pb-9 md:pt-20 md:pb-24">
       <div className="flex flex-wrap">
-        <div className="w-full mb-10 md:w-1/3 md:mb-0 md:pr-4">
+        <div className="w-full mb-10 text-center md:w-1/3 md:mb-0 md:pr-4 md:text-left">
           <GradientTitle>Why is Solana</GradientTitle>
           <GradientTitle>perfect for DAOs?</GradientTitle>
         </div>

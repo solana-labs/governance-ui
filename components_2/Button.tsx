@@ -64,12 +64,12 @@ export const AltButton: FunctionComponent<AltButtonProps> = ({
   withBorder = false,
   ...props
 }) => {
-  let className = `z-0 relative transition-all duration-300 rounded-full font-serif text-[16px] hover:cursor-pointer opacity-[84] hover:opacity-100 `
+  let className = `z-0 relative transition-all duration-300 rounded-full font-serif text-[16px] hover:cursor-pointer opacity-[84] hover:opacity-100 change-image-on-hover `
 
   if (secondary && !inverse) {
     // secondary
     className +=
-      'py-3 px-2 bg-[#201F27] font-regular text-white transition-to-white-background hover:text-black'
+      'py-3 px-2 bg-[#201F27] font-regular text-white transition-to-white-background hover:text-[#292833]'
   } else if (secondary && inverse) {
     // secondary inverse
   } else if (tertiary) {
@@ -79,6 +79,8 @@ export const AltButton: FunctionComponent<AltButtonProps> = ({
       'py-3 px-2 font-regular border border-white transition-to-white-background hover:text-black'
   } else if (inverse) {
     // primary inverse
+    className +=
+      'px-7 py-4 md:py-6 bg-[#201f27] transition-to-gradient-background hover:text-[#292833]'
   } else {
     // primary
     className +=
