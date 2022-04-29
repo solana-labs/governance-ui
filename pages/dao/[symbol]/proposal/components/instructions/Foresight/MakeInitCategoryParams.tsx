@@ -7,7 +7,7 @@ import {
   governance as foresightGov,
   consts as foresightConsts,
 } from '@foresight-tmp/foresight-sdk'
-import { commonAssets, ForesightCategoryIdInput } from './utils'
+import { commonAssets, ForesightCategoryIdInput } from '@utils/Foresight'
 import { PublicKey } from '@solana/web3.js'
 
 const MakeInitCategoryParams = ({

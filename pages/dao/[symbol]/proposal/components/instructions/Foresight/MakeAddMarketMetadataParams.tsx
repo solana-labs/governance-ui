@@ -15,16 +15,16 @@ import {
   ForesightMarketIdInput,
   ForesightMarketListIdInput,
   ForesightMarketMetadataFieldSelect,
-} from './utils'
+} from '@utils/Foresight'
 import { PublicKey } from '@solana/web3.js'
 
-const MakeAddMarketMetadataParams = ({
+export default function MakeAddMarketMetadataParams({
   index,
   governance,
 }: {
   index: number
   governance: ProgramAccount<Governance> | null
-}) => {
+}) {
   const {
     inputProps,
     effector,
@@ -65,5 +65,3 @@ const MakeAddMarketMetadataParams = ({
     </>
   )
 }
-
-export default MakeAddMarketMetadataParams

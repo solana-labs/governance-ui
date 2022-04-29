@@ -11,7 +11,7 @@ import {
   ProgramAccount,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
-import GovernedAccountSelect from '../../GovernedAccountSelect'
+import GovernedAccountSelect from '../../pages/dao/[symbol]/proposal/components/GovernedAccountSelect'
 import { Dispatch, useContext, useEffect, useState } from 'react'
 import {
   ForesightHasCategoryId,
@@ -28,7 +28,7 @@ import * as yup from 'yup'
 import { ObjectSchema, StringSchema, NumberSchema } from 'yup'
 import useRealm from '@hooks/useRealm'
 import useWalletStore from 'stores/useWalletStore'
-import { NewProposalContext } from '../../../new'
+import { NewProposalContext } from '../../pages/dao/[symbol]/proposal/new'
 import Select from '@components/inputs/Select'
 
 type EmptyObject = Record<string, never>

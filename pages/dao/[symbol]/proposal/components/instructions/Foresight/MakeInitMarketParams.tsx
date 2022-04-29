@@ -12,7 +12,7 @@ import {
   commonAssets,
   ForesightMarketIdInput,
   ForesightMarketListIdInput,
-} from './utils'
+} from '@utils/Foresight'
 import { PublicKey } from '@solana/web3.js'
 
 const MakeInitMarketParams = ({

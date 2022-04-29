@@ -7,7 +7,7 @@ import {
   governance as foresightGov,
   consts,
 } from '@foresight-tmp/foresight-sdk'
-import { commonAssets, ForesightMarketListIdInput } from './utils'
+import { commonAssets, ForesightMarketListIdInput } from '@utils/Foresight'
 import { PublicKey } from '@solana/web3.js'
 
 const MakeInitMarketListParams = ({

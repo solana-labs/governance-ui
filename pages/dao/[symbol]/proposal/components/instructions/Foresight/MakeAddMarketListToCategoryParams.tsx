@@ -11,7 +11,7 @@ import {
   commonAssets,
   ForesightCategoryIdInput,
   ForesightMarketListIdInput,
-} from './utils'
+} from '@utils/Foresight'
 import { PublicKey } from '@solana/web3.js'
 
 function MakeAddMarketListToCategoryParams({
