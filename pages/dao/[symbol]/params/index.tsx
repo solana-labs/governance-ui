@@ -158,7 +158,7 @@ const Params = () => {
                     </Button>
                   )}
                 </div>
-                {auxiliaryTokenAccounts.length && (
+                {auxiliaryTokenAccounts.length !== 0 && (
                   <div>
                     <h2 className="flex items-center">Auxiliary Accounts </h2>
                     <AccountsView
