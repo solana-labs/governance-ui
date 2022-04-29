@@ -30,9 +30,13 @@ const Solana = () => {
     <div className="relative landing-page">
       <AltNavbar />
       <KickstartSolana />
-      <SolanaPerks />
-      <DaoTypes />
-      <Section showTopGlow>
+      <Section bgColor="bg-[#201f27]">
+        <SolanaPerks />
+      </Section>
+      <Section bgColor="bg-[#292833]">
+        <DaoTypes />
+      </Section>
+      <Section bgColor="bg-[#292833]" showTopGlow>
         <RealmsOptions />
       </Section>
       <Section>

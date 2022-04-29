@@ -19,7 +19,7 @@ const KickstartSolana = () => {
             <h1 className="font-thin tracking-tight md:text-6xl">
               community on Solana
             </h1>
-            <p className="mt-4 text-base tracking-tight text-center md:text-left opacity-70">
+            <p className="mt-4 text-base tracking-tight text-center text-white mb-11 md:mb-14 md:text-left">
               Create and participate in fully on-chain DAOs of all kinds.
             </p>
           </div>
