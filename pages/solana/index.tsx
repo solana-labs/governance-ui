@@ -1,16 +1,16 @@
 import DaoTypes from '../../components_2/DaoTypes'
 import RealmsOptions from '../../components_2/RealmsOptions'
-import SplGov from '../../components_2/SplGov'
 import DaoCommunity from '../../components_2/DaoCommunity'
 import RealmsMetrics from '../../components_2/RealmsMetrics'
 import SocialChannels from '../../components_2/SocialChannels'
 import FreequentlyAskedQuestions from '../../components_2/FreequentlyAskedQuestions'
 import Footer from '../../components_2/Footer'
 import { AltNavbar } from '../../components_2/NavBar'
-import Button from 'components_2/Button'
+import Button from '../../components_2/Button'
 
 import KickstartSolana from './components/KickstartSolana'
 import PerfectForDAOs from './components/PerfectForDAOs'
+import WhatIsSPL from './components/WhatIsSpl'
 
 export const Section = ({ bgColor = '', showTopGlow = false, children }) => {
   return (
@@ -70,9 +70,9 @@ const Solana = () => {
       <Section bgColor="bg-[#292833]" showTopGlow>
         <RealmsOptions />
       </Section>
-      <Section bgColor="bg-[#292833]">
-        <SplGov />
-      </Section>
+
+      <WhatIsSPL />
+
       <Section bgColor="bg-[#292833]">
         <DaoCommunity />
       </Section>
