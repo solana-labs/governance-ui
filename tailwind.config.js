@@ -13,8 +13,34 @@ module.exports = {
   },
   theme: {
     fontFamily: {
-      display: ['PT Mono, monospace'],
-      body: ['Inter, sans-serif'],
+      serif: [
+        'p22-mackinac-pro',
+        'ui-serif',
+        'Georgia',
+        'Cambria',
+        '"Times New Roman"',
+        'Times',
+        'serif',
+      ],
+      sans: [
+        'Ambit',
+        'ui-sans-serif',
+        'system-ui',
+        '-apple-system',
+        'BlinkMacSystemFont',
+        '"Segoe UI"',
+        'Roboto',
+        '"Helvetica Neue"',
+        'Arial',
+        '"Noto Sans"',
+        'sans-serif',
+        '"Apple Color Emoji"',
+        '"Segoe UI Emoji"',
+        '"Segoe UI Symbol"',
+        '"Noto Color Emoji"',
+      ],
+      display: ['PT Mono', 'monospace'],
+      body: ['Ambit', 'Inter', 'sans-serif'],
     },
     extend: {
       cursor: {

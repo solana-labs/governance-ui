@@ -154,7 +154,7 @@ export const AltButton: FunctionComponent<AltButtonProps> = ({
   withBoarder = false,
   ...props
 }) => {
-  let className = `z-0 relative transition-all duration-300 rounded-full text-[16px] hover:cursor-pointer opacity-[84] hover:opacity-100 `
+  let className = `z-0 relative transition-all duration-300 rounded-full font-serif text-[16px] hover:cursor-pointer opacity-[84] hover:opacity-100 `
 
   if (secondary && !inverse) {
     // secondary

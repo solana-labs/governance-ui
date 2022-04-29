@@ -9,6 +9,7 @@ const Document = () => {
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=PT+Mono&display=swap"
           rel="stylesheet"
         />
+        <link rel="stylesheet" href="https://use.typekit.net/cwm7dgy.css" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <meta name="msapplication-TileColor" content="#ffffff" />
         <meta name="theme-color" content="#ffffff" />

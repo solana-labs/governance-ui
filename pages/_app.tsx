@@ -1,5 +1,6 @@
 import { ThemeProvider } from 'next-themes'
 import '../styles/index.css'
+import '../styles/stylesheet-family-support.css'
 import useWallet from '../hooks/useWallet'
 import Notifications from '../components/Notification'
 import NavBar from '../components/NavBar'
