@@ -28,6 +28,7 @@ export enum AccountType {
   MINT,
   PROGRAM,
   NFT,
+  AuxiliaryToken,
 }
 
 export class AccountTypeToken implements AssetAccount {
@@ -51,6 +52,27 @@ export class AccountTypeToken implements AssetAccount {
       amount: tokenAccount!.account.amount,
     }
     this.isToken = true
+  }
+}
+
+export class AccountTypeAuxiliaryToken implements AssetAccount {
+  governance: ProgramAccount<Governance>
+  type: AccountType
+  extensions: AccountExtension
+  pubkey: PublicKey
+  constructor(
+    tokenAccount: TokenProgramAccount<AccountInfo>,
+    mint: TokenProgramAccount<MintInfo>
+  ) {
+    this.governance = {} as any
+    this.pubkey = tokenAccount.publicKey
+    this.type = AccountType.AuxiliaryToken
+    this.extensions = {
+      token: tokenAccount,
+      mint: mint,
+      transferAddress: tokenAccount!.publicKey!,
+      amount: tokenAccount!.account.amount,
+    }
   }
 }
 

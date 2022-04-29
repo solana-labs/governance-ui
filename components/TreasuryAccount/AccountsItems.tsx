@@ -4,8 +4,15 @@ import React from 'react'
 import AccountItem from './AccountItem'
 
 const AccountsItems = () => {
-  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-  const accountsSorted = governedTokenAccountsWithoutNfts.sort((a, b) => {
+  const {
+    governedTokenAccountsWithoutNfts,
+    auxiliaryTokenAccounts,
+  } = useGovernanceAssets()
+  const accounts = [
+    ...governedTokenAccountsWithoutNfts,
+    ...auxiliaryTokenAccounts,
+  ]
+  const accountsSorted = accounts.sort((a, b) => {
     const infoA = getTreasuryAccountItemInfoV2(a)
     const infoB = getTreasuryAccountItemInfoV2(b)
     return infoB.totalPrice - infoA.totalPrice
