@@ -78,15 +78,13 @@ export const voteRegistryStartUnlock = async ({
   instructions.push(internalTransferInst)
 
   if (amountAfterOperation && amountAfterOperation?.isZero()) {
-    const close = client.program.instruction.closeDepositEntry(
-      sourceDepositIdx,
-      {
-        accounts: {
-          voter: voter,
-          voterAuthority: wallet.publicKey,
-        },
-      }
-    )
+    const close = await client.program.methods
+      .closeDepositEntry(sourceDepositIdx)
+      .accounts({
+        voter: voter,
+        voterAuthority: wallet.publicKey,
+      })
+      .instruction()
     instructions.push(close)
   }
 

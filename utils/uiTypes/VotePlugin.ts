@@ -155,19 +155,15 @@ export class VotingClient {
           new AccountData(nft.metadata.pubkey)
         )
       }
-
-      instructions.push(
-        this.client.program.instruction.updateVoterWeightRecord(
-          { [type]: {} },
-          {
-            accounts: {
-              registrar,
-              voterWeightRecord: voterWeightPk,
-            },
-            remainingAccounts: remainingAccounts.slice(0, 10),
-          }
-        )
-      )
+      const inst = await this.client.program.methods
+        .updateVoterWeightRecord({ [type]: {} })
+        .accounts({
+          registrar: registrar,
+          voterWeightRecord: voterWeightPk,
+        })
+        .remainingAccounts(remainingAccounts.slice(0, 10))
+        .instruction()
+      instructions.push(inst)
       return { voterWeightPk, maxVoterWeightRecord }
     }
   }
@@ -248,31 +244,32 @@ export class VotingClient {
       )
       const nftsChunk = chunks(remainingNftsToChunk, 12)
       for (const i of nftsChunk) {
-        instructions.push(
-          this.client.program.instruction.castNftVote(proposal.pubkey, {
-            accounts: {
-              registrar,
-              voterWeightRecord: voterWeightPk,
-              governingTokenOwner: walletPk,
-              payer: walletPk,
-              systemProgram: SYSTEM_PROGRAM_ID,
-            },
-            remainingAccounts: i,
-          })
-        )
-      }
-      instructions.push(
-        this.client.program.instruction.castNftVote(proposal.pubkey, {
-          accounts: {
+        const instruction = await this.client.program.methods
+          .castNftVote(proposal.pubkey)
+          .accounts({
             registrar,
             voterWeightRecord: voterWeightPk,
             governingTokenOwner: walletPk,
             payer: walletPk,
             systemProgram: SYSTEM_PROGRAM_ID,
-          },
-          remainingAccounts: firstFiveNfts,
+          })
+          .remainingAccounts(i)
+          .instruction()
+
+        instructions.push(instruction)
+      }
+      const instruction = await this.client.program.methods
+        .castNftVote(proposal.pubkey)
+        .accounts({
+          registrar,
+          voterWeightRecord: voterWeightPk,
+          governingTokenOwner: walletPk,
+          payer: walletPk,
+          systemProgram: SYSTEM_PROGRAM_ID,
         })
-      )
+        .remainingAccounts(firstFiveNfts)
+        .instruction()
+      instructions.push(instruction)
       return { voterWeightPk, maxVoterWeightRecord }
     }
 
@@ -347,9 +344,24 @@ export class VotingClient {
         remainingAccounts.length
       )
       const nftsChunk = chunks(remainingNftsToChunk, 12)
-      instructions.push(
-        this.client.program.instruction.relinquishNftVote({
-          accounts: {
+      const instruction = await this.client.program.methods
+        .relinquishNftVote()
+        .accounts({
+          registrar,
+          voterWeightRecord: voterWeightPk,
+          governance: proposal.account.governance,
+          proposal: proposal.pubkey,
+          governingTokenOwner: walletPk,
+          voteRecord: voteRecordPk,
+          beneficiary: walletPk,
+        })
+        .remainingAccounts(firstFiveNfts)
+        .instruction()
+      instructions.push(instruction)
+      for (const i of nftsChunk) {
+        const instruction = this.client.program.methods
+          .relinquishNftVote()
+          .accounts({
             registrar,
             voterWeightRecord: voterWeightPk,
             governance: proposal.account.governance,
@@ -357,25 +369,10 @@ export class VotingClient {
             governingTokenOwner: walletPk,
             voteRecord: voteRecordPk,
             beneficiary: walletPk,
-          },
-          remainingAccounts: firstFiveNfts,
-        })
-      )
-      for (const i of nftsChunk) {
-        instructions.push(
-          this.client.program.instruction.relinquishNftVote({
-            accounts: {
-              registrar,
-              voterWeightRecord: voterWeightPk,
-              governance: proposal.account.governance,
-              proposal: proposal.pubkey,
-              governingTokenOwner: walletPk,
-              voteRecord: voteRecordPk,
-              beneficiary: walletPk,
-            },
-            remainingAccounts: i,
           })
-        )
+          .remainingAccounts(i)
+          .instruction()
+        instructions.push(instruction)
       }
       return { voterWeightPk, maxVoterWeightRecord }
     }
