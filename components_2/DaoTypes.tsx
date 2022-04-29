@@ -1,11 +1,11 @@
-import { AltButton } from './Button'
+import Button from './Button'
 import { DaoType } from './DaoType'
 import { DaoIcon } from './DaoIcon'
 import GradientTitle from './GradientTitle'
 
 const StartDaoButton = ({ text }) => {
   return (
-    <AltButton inverse>
+    <Button inverse>
       <div className="flex items-center">
         <div className="pr-2">{text}</div>
         <img
@@ -19,7 +19,7 @@ const StartDaoButton = ({ text }) => {
           alt="arrow"
         />
       </div>
-    </AltButton>
+    </Button>
   )
 }
 

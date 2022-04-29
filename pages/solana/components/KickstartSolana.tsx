@@ -1,4 +1,4 @@
-import { AltButton } from 'components_2/Button'
+import Button from 'components_2/Button'
 import Hero, { HeroH1 } from 'components_2/Hero'
 
 export default function KickstartSolana() {
@@ -16,12 +16,12 @@ export default function KickstartSolana() {
       </div>
       <div className="pb-12 space-y-4 text-center md:pb-24 md:text-left">
         <div>
-          <AltButton>
+          <Button>
             <div className="px-14">Create DAO</div>
-          </AltButton>
+          </Button>
         </div>
         <div className="block md:hidden">
-          <AltButton tertiary>
+          <Button tertiary>
             <div className="relative flex items-center justify-center">
               <div className="pl-4 pr-2">Read the Docs</div>
               <img
@@ -30,7 +30,7 @@ export default function KickstartSolana() {
                 alt="External link icon"
               />
             </div>
-          </AltButton>
+          </Button>
         </div>
       </div>
     </Hero>

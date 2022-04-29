@@ -1,4 +1,4 @@
-import { AltButton } from './Button'
+import Button from './Button'
 
 const SplGov = () => {
   return (
@@ -40,7 +40,7 @@ const SplGov = () => {
               Solana has compiled a robust library of information to read.
             </p>
 
-            <AltButton withBorder>
+            <Button withBorder>
               <div className="relative flex items-center justify-center px-4">
                 <div className="pr-2">Read about SPL Governance</div>
                 <svg
@@ -60,7 +60,7 @@ const SplGov = () => {
                   />
                 </svg>
               </div>
-            </AltButton>
+            </Button>
           </div>
         </div>
       </div>

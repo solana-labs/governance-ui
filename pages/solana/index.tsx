@@ -7,7 +7,7 @@ import SocialChannels from '../../components_2/SocialChannels'
 import FreequentlyAskedQuestions from '../../components_2/FreequentlyAskedQuestions'
 import Footer from '../../components_2/Footer'
 import { AltNavbar } from '../../components_2/NavBar'
-import { AltButton } from 'components_2/Button'
+import Button from 'components_2/Button'
 
 import KickstartSolana from './components/KickstartSolana'
 import PerfectForDAOs from './components/PerfectForDAOs'
@@ -27,7 +27,7 @@ export const Section = ({ bgColor = '', showTopGlow = false, children }) => {
 
 export const ExploreButton = () => {
   return (
-    <AltButton secondary>
+    <Button secondary>
       <div className="relative flex items-center justify-center">
         <div className="bg-[#292833] rounded-full ml-2 mr-2 p-2 absolute left-[-0.5rem]">
           <div className="bg-[url(/1-Landing-v2/icon-binoculars-blue.png)]  w-5 h-5 bg-cover overflow-hidden text-transparent">
@@ -39,13 +39,13 @@ export const ExploreButton = () => {
           <div className="hidden md:block">Explore DAOs</div>
         </div>
       </div>
-    </AltButton>
+    </Button>
   )
 }
 
 export const ReadTheDocsButton = () => {
   return (
-    <AltButton tertiary>
+    <Button tertiary>
       <div className="relative flex items-center justify-center">
         <div className="py-1 pl-4 pr-2">Read the Docs</div>
         <img
@@ -54,7 +54,7 @@ export const ReadTheDocsButton = () => {
           alt="External link icon"
         />
       </div>
-    </AltButton>
+    </Button>
   )
 }
 
