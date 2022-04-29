@@ -13,7 +13,7 @@ import { tryGetMint } from '@utils/tokens'
 import {
   getRegistrarPDA,
   getVoterPDA,
-  unusedMintPk,
+  emptyPk,
   DepositWithMintAccount,
   LockupType,
   Registrar,
@@ -52,7 +52,7 @@ export const getDeposits = async ({
   let votingPowerFromDeposits = new BN(0)
   let deposits: DepositWithMintAccount[] = []
   for (const i of mintCfgs) {
-    if (i.mint.toBase58() !== unusedMintPk) {
+    if (i.mint.toBase58() !== emptyPk) {
       const mint = await tryGetMint(connection, i.mint)
       mints[i.mint.toBase58()] = mint
     }

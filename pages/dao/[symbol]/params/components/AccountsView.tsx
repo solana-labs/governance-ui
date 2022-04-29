@@ -2,20 +2,24 @@ import { getTreasuryAccountItemInfoV2 } from '@utils/treasuryTools'
 import { AccountType } from '@utils/uiTypes/assets'
 import { AddressField } from '../index'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { emptyPk } from 'NftVotePlugin/sdk/accounts'
 
 const AccountsView = ({ activeGovernance, getYesNoString }) => {
-  const { assetAccounts } = useGovernanceAssets()
+  const { assetAccounts, auxiliaryTokenAccounts } = useGovernanceAssets()
+  const accounts = [...assetAccounts, ...auxiliaryTokenAccounts]
   return (
     <div className="space-y-3">
-      {assetAccounts
+      {accounts
         .filter(
           (x) =>
-            x.governance.pubkey.toBase58() ===
-            activeGovernance.pubkey.toBase58()
+            x.governance?.pubkey?.toBase58() ===
+              activeGovernance.pubkey.toBase58() ||
+            (!x.governance.pubkey &&
+              activeGovernance.pubkey.toBase58() === emptyPk)
         )
         .map((x) => {
           const info = getTreasuryAccountItemInfoV2(x)
-          if (x.isToken || x.isSol) {
+          if (x.isToken || x.isSol || x.type === AccountType.AuxiliaryToken) {
             return (
               <div
                 className="bg-bkg-1 p-4 pb-2 rounded-md"

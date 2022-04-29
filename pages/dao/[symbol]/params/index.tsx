@@ -20,11 +20,17 @@ import SetRealmAuthorityModal from './SetRealmAuthorityModal'
 import ParamsView from './components/ParamsView'
 import AccountsView from './components/AccountsView'
 import StatsView from './components/StatsView'
+import { emptyPk } from 'VoteStakeRegistry/sdk/accounts'
 
 const Params = () => {
   const { realm, mint } = useRealm()
   const wallet = useWalletStore((s) => s.current)
-  const { canUseAuthorityInstruction, assetAccounts } = useGovernanceAssets()
+  const {
+    canUseAuthorityInstruction,
+    assetAccounts,
+    auxiliaryTokenAccounts,
+  } = useGovernanceAssets()
+  const accounts = [...assetAccounts, ...auxiliaryTokenAccounts]
   const governancesArray = useGovernanceAssetsStore((s) => s.governancesArray)
   const loadGovernedAccounts = useGovernanceAssetsStore(
     (s) => s.loadGovernedAccounts
@@ -110,7 +116,7 @@ const Params = () => {
           </h1>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 pb-6">
-          {activeGovernance ? (
+          {activeGovernance?.account ? (
             <>
               <div className="border border-fgd-4 col-span-1 p-4 rounded-md">
                 <h2>Addresses</h2>
@@ -210,10 +216,12 @@ const Params = () => {
               </div>
             </>
           ) : (
-            <>
-              <div className="animate-pulse bg-bkg-3 h-48 rounded-md w-full" />
-              <div className="animate-pulse bg-bkg-3 h-48 rounded-md w-full" />
-            </>
+            !activeGovernance?.pubkey && (
+              <>
+                <div className="animate-pulse bg-bkg-3 h-48 rounded-md w-full" />
+                <div className="animate-pulse bg-bkg-3 h-48 rounded-md w-full" />
+              </>
+            )
           )}
         </div>
         {!loadGovernedAccounts ? (
@@ -228,7 +236,7 @@ const Params = () => {
                   )
                 }
                 placeholder="Please select..."
-                value={activeGovernance?.pubkey.toBase58()}
+                value={activeGovernance?.pubkey?.toBase58()}
               >
                 {governancesArray.map((x) => {
                   return (
@@ -253,20 +261,28 @@ const Params = () => {
             {activeGovernance ? (
               <div className="col-span-12 lg:col-span-8">
                 <h3 className="break-all mb-4">
-                  {activeGovernance.pubkey.toBase58()}
+                  {activeGovernance.pubkey.toBase58() === emptyPk
+                    ? 'Auxiliary accounts'
+                    : activeGovernance.pubkey.toBase58()}
                 </h3>
-                {assetAccounts.filter(
+                {accounts.filter(
                   (x) =>
-                    x.governance.pubkey.toBase58() ===
-                    activeGovernance.pubkey.toBase58()
+                    x.governance?.pubkey?.toBase58() ===
+                      activeGovernance.pubkey.toBase58() ||
+                    (!x.governance.pubkey &&
+                      activeGovernance.pubkey.toBase58() === emptyPk)
                 ).length > 0 ? (
                   <Tabs
                     activeTab={activeTab}
                     onChange={(t) => setActiveTab(t)}
-                    tabs={['Params', 'Accounts', 'Statistics']}
+                    tabs={
+                      activeGovernance.pubkey.toBase58() !== emptyPk
+                        ? ['Params', 'Accounts', 'Statistics']
+                        : ['Accounts']
+                    }
                   />
                 ) : null}
-                {activeTab === 'Params' && (
+                {activeTab === 'Params' && activeGovernance?.account && (
                   <ParamsView
                     activeGovernance={activeGovernance}
                     openGovernanceProposalModal={openGovernanceProposalModal}
@@ -278,7 +294,7 @@ const Params = () => {
                     getYesNoString={getYesNoString}
                   />
                 )}
-                {activeTab === 'Statistics' && (
+                {activeTab === 'Statistics' && activeGovernance?.account && (
                   <StatsView activeGovernance={activeGovernance} />
                 )}
               </div>
