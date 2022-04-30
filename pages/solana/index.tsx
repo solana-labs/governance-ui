@@ -1,4 +1,3 @@
-import FreequentlyAskedQuestions from '../../components_2/FreequentlyAskedQuestions'
 import Footer from '../../components_2/Footer'
 import Navbar from '../../components_2/NavBar'
 import Button from '../../components_2/Button'
@@ -11,6 +10,7 @@ import WhatIsSPL from './components/WhatIsSpl'
 import WhatIsADAO from './components/WhatIsADAO'
 import RealmsMetrics from './components/RealmsMetrics'
 import SocialChannels from './components/HMUSocials'
+import FAQs from './components/FAQs'
 
 export const Section = ({ bgColor = '', showTopGlow = false, children }) => {
   return (
@@ -85,7 +85,7 @@ const Solana = () => {
         <SocialChannels />
       </Section>
       <Section bgColor="bg-[#292833]">
-        <FreequentlyAskedQuestions />
+        <FAQs />
       </Section>
       <Footer />
     </div>
