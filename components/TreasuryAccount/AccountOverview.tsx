@@ -179,16 +179,16 @@ const AccountOverview = () => {
       </div>
       <AccountHeader />
       <div
-        className={`flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 pb-8 px-4`}
+        className={`flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 pb-8 px-4 justify-center`}
       >
-        <div className="relative w-full">
+        <div className="relative w-full max-w-lg">
           {isCopied && (
             <div className="absolute bg-bkg-1 left-1/2 p-2 rounded text-fgd-3 text-xs transform -translate-x-1/2 -top-10">
               Copied to Clipboard
             </div>
           )}
           <Button
-            className="w-full"
+            className="w-full max-w-lg"
             onClick={() =>
               isNFT
                 ? setOpenNftDepositModal(true)
@@ -209,7 +209,7 @@ const AccountOverview = () => {
                 ? 'Please deposit nfts first'
                 : ''
             }
-            className="w-full"
+            className="w-full max-w-lg"
             onClick={() => setOpenCommonSendModal(true)}
             disabled={!canUseTransferInstruction || (isNFT && nftsCount === 0)}
           >
@@ -218,7 +218,7 @@ const AccountOverview = () => {
         )}
         {isSol ? (
           <Button
-            className="w-full"
+            className="w-full max-w-lg"
             onClick={() => setOpenMsolConvertModal(true)}
             disabled={!canUseTransferInstruction}
           >
