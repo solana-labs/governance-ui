@@ -295,8 +295,8 @@ const Params = () => {
                 </div>
               ) : null}
             </div>
-            <div className="border border-fgd-4 gap-4 rounded-md p-6">
-              {auxiliaryTokenAccounts.length !== 0 && (
+            {auxiliaryTokenAccounts.length !== 0 && (
+              <div className="border border-fgd-4 gap-4 rounded-md p-6">
                 <div className="max-w-lg">
                   <h2 className="flex items-center">Auxiliary Accounts </h2>
                   <AccountsView
@@ -305,8 +305,8 @@ const Params = () => {
                     auxiliaryMode={true}
                   />
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </>
         ) : (
           <div className="animate-pulse bg-bkg-3 h-48 rounded-lg w-full" />
