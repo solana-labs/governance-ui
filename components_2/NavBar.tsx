@@ -3,7 +3,7 @@ import { ExploreButton, ReadTheDocsButton } from 'pages/solana'
 import { useEffect, useState } from 'react'
 import ConnectWalletButton from './ConnectWalletButton'
 
-export const NavContent = ({ showWalletButton }) => {
+export const NavContent = ({ showWalletButton = false }) => {
   return (
     <div className="max-w-[1440px] mx-auto px-4 flex items-center justify-between">
       <Link href="/solana">
@@ -26,7 +26,12 @@ export const NavContent = ({ showWalletButton }) => {
   )
 }
 
-export const Navbar = ({ showWalletButton }) => {
+interface NavbarProps {
+  showWalletButton?: boolean
+}
+
+export default function Navbar(props: NavbarProps) {
+  const { showWalletButton } = props
   const [scrollY, setScrollY] = useState(0)
 
   useEffect(() => {
@@ -55,5 +60,3 @@ export const Navbar = ({ showWalletButton }) => {
     </div>
   )
 }
-
-export default Navbar
