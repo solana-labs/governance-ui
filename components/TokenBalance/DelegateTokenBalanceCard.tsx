@@ -37,30 +37,34 @@ const DelegateBalanceCard = () => {
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
       <h3 className="mb-0">Your Delegates</h3>
-      <div className="flex space-x-4 items-center mt-4">
-        <div className="bg-bkg-1 px-4 py-2 rounded-md w-full">
-          <p className="text-fgd-3 text-xs">Council Votes</p>
-          <p className="font-bold mb-0 text-fgd-1 text-xl">
-            {getCouncilTokenCount()}
-          </p>
-          <p className="text-fgd-3 text-xs">Delegate Accounts</p>
-          <p className="font-bold mb-0 text-fgd-1 text-xl">
-            {getCouncilDelegateAmt()}
-          </p>
+      {walletId && delegates?.[walletId]?.councilMembers && (
+        <div className="flex space-x-4 items-center mt-4">
+          <div className="bg-bkg-1 px-4 py-2 rounded-md w-full">
+            <p className="text-fgd-3 text-xs">Council Votes</p>
+            <p className="font-bold mb-0 text-fgd-1 text-xl">
+              {getCouncilTokenCount()}
+            </p>
+            <p className="text-fgd-3 text-xs">Delegate Accounts</p>
+            <p className="font-bold mb-0 text-fgd-1 text-xl">
+              {getCouncilDelegateAmt()}
+            </p>
+          </div>
         </div>
-      </div>
-      <div className="flex space-x-4 items-center mt-4">
-        <div className="bg-bkg-1 px-4 py-2 rounded-md w-full">
-          <p className="text-fgd-3 text-xs">Community Votes</p>
-          <p className="font-bold mb-0 text-fgd-1 text-xl">
-            {getCommunityTokenCount()}
-          </p>
-          <p className="text-fgd-3 text-xs">Delegate Accounts</p>
-          <p className="font-bold mb-0 text-fgd-1 text-xl">
-            {getCommunityDelegateAmt()}
-          </p>
+      )}
+      {walletId && delegates?.[walletId]?.communityMembers && (
+        <div className="flex space-x-4 items-center mt-4">
+          <div className="bg-bkg-1 px-4 py-2 rounded-md w-full">
+            <p className="text-fgd-3 text-xs">Community Votes</p>
+            <p className="font-bold mb-0 text-fgd-1 text-xl">
+              {getCommunityTokenCount()}
+            </p>
+            <p className="text-fgd-3 text-xs">Delegate Accounts</p>
+            <p className="font-bold mb-0 text-fgd-1 text-xl">
+              {getCommunityDelegateAmt()}
+            </p>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }
