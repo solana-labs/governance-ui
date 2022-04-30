@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import Button from 'components_2/Button'
 import Hero, { HeroH1 } from 'components_2/Hero'
 
@@ -17,7 +18,9 @@ export default function KickstartSolana() {
       <div className="pb-12 space-y-4 text-center md:pb-24 md:text-left">
         <div>
           <Button>
-            <div className="px-14">Create DAO</div>
+            <Link href="/solana/create_dao">
+              <div className="px-14">Create DAO</div>
+            </Link>
           </Button>
         </div>
         <div className="block md:hidden">

@@ -1,24 +1,27 @@
+import Link from 'next/link'
 import Button from '../../../components_2/Button'
 import { DaoType } from '../../../components_2/DaoType'
 import { DaoIcon } from '../../../components_2/DaoIcon'
 import GradientTitle from '../../../components_2/GradientTitle'
 
-const CreateDaoButton = ({ text }) => {
+const CreateDaoButton = ({ text, href }) => {
   return (
     <Button inverse>
-      <div className="flex items-center">
-        <div className="pr-2">{text}</div>
-        <img
-          src="/1-Landing-v2/icon-arrow-blue.png"
-          className="w-6 h-6 starting-image"
-          alt="arrow"
-        />
-        <img
-          src="/1-Landing-v2/icon-arrow-black.png"
-          className="w-6 h-6 hover-image"
-          alt="arrow"
-        />
-      </div>
+      <Link href={href}>
+        <div className="flex items-center">
+          <div className="pr-2">{text}</div>
+          <img
+            src="/1-Landing-v2/icon-arrow-blue.png"
+            className="w-6 h-6 starting-image"
+            alt="arrow"
+          />
+          <img
+            src="/1-Landing-v2/icon-arrow-black.png"
+            className="w-6 h-6 hover-image"
+            alt="arrow"
+          />
+        </div>
+      </Link>
     </Button>
   )
 }
@@ -40,7 +43,10 @@ export const ListOfDAOTypes = () => {
           </div>
         </div>
         <div className="flex flex-col items-center justify-end md:items-start grow">
-          <CreateDaoButton text="Start Multi-Signature DAO" />
+          <CreateDaoButton
+            text="Start Multi-Signature DAO"
+            href="/solana/create_dao/multisig"
+          />
         </div>
       </div>
       <div className="flex flex-col w-full md:w-[30%]">
@@ -57,7 +63,10 @@ export const ListOfDAOTypes = () => {
           </div>
         </div>
         <div className="flex flex-col items-center justify-end md:items-start grow">
-          <CreateDaoButton text="Start NFT Community DAO" />
+          <CreateDaoButton
+            text="Start NFT Community DAO"
+            href="/solana/create_dao/nft"
+          />
         </div>
       </div>
       <div className="flex flex-col w-full md:w-[30%]">
@@ -74,7 +83,10 @@ export const ListOfDAOTypes = () => {
           </div>
         </div>
         <div className="flex flex-col items-center justify-end md:items-start grow">
-          <CreateDaoButton text="Start Gov Token DAO" />
+          <CreateDaoButton
+            text="Start Gov Token DAO"
+            href="/solana/create_dao/gov-token"
+          />
         </div>
       </div>
     </div>

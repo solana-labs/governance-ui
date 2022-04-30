@@ -1,13 +1,17 @@
+import Link from 'next/link'
 import { ExploreButton, ReadTheDocsButton } from 'pages/solana'
 import { useEffect, useState } from 'react'
 
 export const NavContent = () => {
   return (
     <div className="max-w-[1440px] mx-auto px-4 flex items-center justify-between">
-      <div className="flex items-center space-x-1">
-        <img src="1-Landing-v2/logo-realms-blue.png" className="w-8 h-8" />
-        <span>Realms</span>
-      </div>
+      <Link href="/solana">
+        <div className="flex items-center space-x-1 cursor-pointer hover:brightness-110">
+          <img src="/1-Landing-v2/logo-realms-blue.png" className="w-8 h-8" />
+          <span>Realms</span>
+        </div>
+      </Link>
+
       <div className="flex items-center space-x-7">
         <div className="hidden md:block">
           <ReadTheDocsButton />

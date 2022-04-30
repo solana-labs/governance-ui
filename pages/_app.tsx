@@ -54,8 +54,8 @@ function App({ Component, pageProps }) {
   )
 
   const isRedirecting = router.route === '/'
-  const isLandingPage = router.route === '/solana'
-  const title = realmName ? `${realmName}` : 'Solana Governance'
+  const isLandingPage = /\/solana\/?.*/.test(router.route)
+  const title = realmName ? `${realmName}` : 'Realms'
 
   // Note: ?v==${Date.now()} is added to the url to force favicon refresh.
   // Without it browsers would cache the last used and won't change it for different realms
@@ -146,6 +146,7 @@ function App({ Component, pageProps }) {
           </ThemeProvider>
         ) : (
           <WalletIdentityProvider appName={'Realms'}>
+            <Notifications />
             <Component {...pageProps} />
           </WalletIdentityProvider>
         )}
