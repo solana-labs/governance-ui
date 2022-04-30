@@ -28,6 +28,7 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NftVoterClient } from '@solana/governance-program-library'
 import { notify } from '@utils/notifications'
 import { sendSignedTransaction } from '@utils/send'
+import DelegateBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
@@ -482,6 +483,7 @@ const REALM = () => {
             </div>
             <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
               <TokenBalanceCardWrapper />
+              <DelegateBalanceCard />
               <NFTSCompactWrapper />
               <AccountsCompactWrapper />
               <AssetsCompactWrapper />
