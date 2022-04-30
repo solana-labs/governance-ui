@@ -1,4 +1,3 @@
-import DaoCommunity from '../../components_2/DaoCommunity'
 import RealmsMetrics from '../../components_2/RealmsMetrics'
 import SocialChannels from '../../components_2/SocialChannels'
 import FreequentlyAskedQuestions from '../../components_2/FreequentlyAskedQuestions'
@@ -11,6 +10,7 @@ import PerfectForDAOs from './components/PerfectForDAOs'
 import SelectDAOToCreate from './components/SelectDAOToCreate'
 import WhatRealmsCanDo from './components/WhatRealmsCanDo'
 import WhatIsSPL from './components/WhatIsSpl'
+import WhatIsADAO from './components/WhatIsADAO'
 
 export const Section = ({ bgColor = '', showTopGlow = false, children }) => {
   return (
@@ -76,7 +76,7 @@ const Solana = () => {
         <WhatIsSPL />
       </Section>
       <Section bgColor="bg-[#292833]">
-        <DaoCommunity />
+        <WhatIsADAO />
       </Section>
       <Section bgColor="bg-[#292833]" showTopGlow>
         <RealmsMetrics />
