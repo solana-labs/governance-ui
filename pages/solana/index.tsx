@@ -61,7 +61,7 @@ export const ReadTheDocsButton = () => {
 const Solana = () => {
   return (
     <div className="relative landing-page">
-      <Navbar />
+      <Navbar showWalletButton={false} />
       <KickstartSolana />
       <Section bgColor="bg-[#201f27]">
         <PerfectForDAOs />

@@ -14,8 +14,8 @@ export default function CreateDaoPage() {
   })
 
   return (
-    <div className="relative landing-page">
-      <Navbar />
+    <div className="relative pb-20 landing-page">
+      <Navbar showWalletButton />
       <Hero
         backgroundImgSrc="/1-Landing-v2/creation-bg-desktop.png"
         backgroundColor="bg-[#282933]"

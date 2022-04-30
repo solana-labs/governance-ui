@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import { ExploreButton, ReadTheDocsButton } from 'pages/solana'
 import { useEffect, useState } from 'react'
+import ConnectWalletButton from './ConnectWalletButton'
 
-export const NavContent = () => {
+export const NavContent = ({ showWalletButton }) => {
   return (
     <div className="max-w-[1440px] mx-auto px-4 flex items-center justify-between">
       <Link href="/solana">
@@ -11,18 +12,21 @@ export const NavContent = () => {
           <span>Realms</span>
         </div>
       </Link>
-
-      <div className="flex items-center space-x-7">
-        <div className="hidden md:block">
-          <ReadTheDocsButton />
+      {showWalletButton ? (
+        <ConnectWalletButton />
+      ) : (
+        <div className="flex items-center space-x-7">
+          <div className="hidden md:block">
+            <ReadTheDocsButton />
+          </div>
+          <ExploreButton />
         </div>
-        <ExploreButton />
-      </div>
+      )}
     </div>
   )
 }
 
-export const Navbar = () => {
+export const Navbar = ({ showWalletButton }) => {
   const [scrollY, setScrollY] = useState(0)
 
   useEffect(() => {
@@ -47,7 +51,7 @@ export const Navbar = () => {
         scrollY > 200 ? 'bg-[#292833] bg-opacity-90 backdrop-blur-[3px]' : ''
       }`}
     >
-      <NavContent />
+      <NavContent showWalletButton={showWalletButton} />
     </div>
   )
 }
