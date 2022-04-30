@@ -41,6 +41,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const handleWithDrawFromDeposit = async (
     depositEntry: DepositWithMintAccount
   ) => {
+    console.log(ownTokenRecord!.account!.unrelinquishedVotesCount)
     if (
       ownTokenRecord!.account!.unrelinquishedVotesCount &&
       realm!.account.communityMint.toBase58() ===
