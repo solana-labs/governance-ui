@@ -1,4 +1,3 @@
-import SocialChannels from '../../components_2/SocialChannels'
 import FreequentlyAskedQuestions from '../../components_2/FreequentlyAskedQuestions'
 import Footer from '../../components_2/Footer'
 import Navbar from '../../components_2/NavBar'
@@ -11,6 +10,7 @@ import WhatRealmsCanDo from './components/WhatRealmsCanDo'
 import WhatIsSPL from './components/WhatIsSpl'
 import WhatIsADAO from './components/WhatIsADAO'
 import RealmsMetrics from './components/RealmsMetrics'
+import SocialChannels from './components/HMUSocials'
 
 export const Section = ({ bgColor = '', showTopGlow = false, children }) => {
   return (
