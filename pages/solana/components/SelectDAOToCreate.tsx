@@ -6,8 +6,8 @@ import GradientTitle from '../../../components_2/GradientTitle'
 
 const CreateDaoButton = ({ text, href }) => {
   return (
-    <Button inverse>
-      <Link href={href}>
+    <Link href={href}>
+      <Button inverse>
         <div className="flex items-center">
           <div className="pr-2">{text}</div>
           <img
@@ -21,8 +21,8 @@ const CreateDaoButton = ({ text, href }) => {
             alt="arrow"
           />
         </div>
-      </Link>
-    </Button>
+      </Button>
+    </Link>
   )
 }
 
