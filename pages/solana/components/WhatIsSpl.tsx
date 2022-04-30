@@ -2,44 +2,36 @@ import Button from '../../../components_2/Button'
 
 const SplGov = () => {
   return (
-    <div className="bg-cover md:px-16 md:py-10 md:pt-12 bg-spl-gov h-fit">
-      {/* <div className="bg-[url('/img/Spl-Gov-background.svg')]"> */}
+    <div className="bg-cover rounded pt-14 pb-14 md:px-16 md:pb-[90px] md:pt-12 md:bg-spl-gov ">
       <div className="flex items-center justify-start">
         <div>
           <img src="/img/realms-web/icons/solana-black.svg" className="mr-2" />
         </div>
-        <div>
-          <p className="font-bold text-black">The Solana Standard</p>
-        </div>
+        <div className="font-normal text-black">The Solana Standard</div>
       </div>
-      <div className="mb-8">
-        <h1 className="mt-8 mb-5 font-thin md:text-3xl">SPL Governance</h1>
-        {/* <div className="flex flex-row"> */}
-        <div>
-          {/* <div className="pr-20 basis-2/3"> */}
-          <div>
-            <p className="mb-5 text-base tracking-tight text-black">
-              The Solana Program Library (SPL) is a collection of on-chain
-              programs targeting the Sealevel parallel runtime. These programs
-              are tested against Solana`s implementation of Sealevel,
-              solana-runtime, and deployed to its mainnet. As others implement
-              Sealevel, we will graciously accept patches.
-            </p>
-            <p className="text-base tracking-tight text-black">
-              The Token Swap Program allows simple trading of token pairs
-              without a centralized limit order book. The program uses a
-              mathematical formula called curve to calculate the price of all
-              trades. Curves aim to mimic normal market dynamics: for example,
-              as traders buy a lot of one token type, the value of the other
-              token type goes up.
-            </p>
+      <h2 className="pt-10 pb-6 font-normal md:pt-14 md:pb-9 md:text-3xl">
+        SPL Governance
+      </h2>
+      <div className="flex flex-row flex-wrap lg:flex-nowrap">
+        <div className="space-y-6 text-base font-normal tracking-tight text-black md:pr-8">
+          The Solana Program Library (SPL) is a collection of on-chain programs
+          targeting the Sealevel parallel runtime. These programs are tested
+          against Solana`s implementation of Sealevel, solana-runtime, and
+          deployed to its mainnet. As others implement Sealevel, we will
+          graciously accept patches.
+          <br />
+          <br />
+          The Token Swap Program allows simple trading of token pairs without a
+          centralized limit order book. The program uses a mathematical formula
+          called curve to calculate the price of all trades. Curves aim to mimic
+          normal market dynamics: for example, as traders buy a lot of one token
+          type, the value of the other token type goes up.
+        </div>
+        <div className="w-full md:min-w-[300px]">
+          <div className="text-base font-normal tracking-tight text-black pt-7 lg:pt-0">
+            Solana has compiled a robust library of information to read.
           </div>
-          {/* <div className="relative pl-16 basis-1/3"> */}
-          <div>
-            <p className="mb-5 tracking-tight text-black">
-              Solana has compiled a robust library of information to read.
-            </p>
-
+          <div className="pt-6 text-center">
             <Button withBorder>
               <div className="relative flex items-center justify-center px-4">
                 <div className="pr-2">Read about SPL Governance</div>

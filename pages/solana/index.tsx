@@ -72,7 +72,7 @@ const Solana = () => {
       <Section bgColor="bg-[#292833]" showTopGlow>
         <WhatRealmsCanDo />
       </Section>
-      <Section bgColor="bg-[#292833]">
+      <Section bgColor="bg-spl-gov bg-cover md:bg-[#292833] md:bg-none ">
         <WhatIsSPL />
       </Section>
       <Section bgColor="bg-[#292833]">
