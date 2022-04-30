@@ -184,6 +184,18 @@ const HIDDEN_MNGO_TREASURES = [
   'CaoFkVyPJugKMdzDT1NGnsQJ8dWe4kZFaETCbtWz1QBr',
 ]
 
+//owner and desired accounts we want to show
+export const MNGO_AUXILIARY_TOKEN_ACCOUNTS = [
+  {
+    owner: '9BVcYqEQxyccuwznvxXqDkSJFavvTyheiTYk231T1A8S',
+    accounts: ['59BEyxwrFpt3x4sZ7TcXC3bHx3seGfqGkATcDx6siLWy'],
+  },
+]
+
+export const AUXILIARY_TOKEN_ACCOUNTS = {
+  Mango: MNGO_AUXILIARY_TOKEN_ACCOUNTS,
+}
+
 export const HIDDEN_TREASURES = [...HIDDEN_MNGO_TREASURES]
 
 export interface AccountDescriptor {
