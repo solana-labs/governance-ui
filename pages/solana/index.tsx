@@ -1,4 +1,3 @@
-import RealmsMetrics from '../../components_2/RealmsMetrics'
 import SocialChannels from '../../components_2/SocialChannels'
 import FreequentlyAskedQuestions from '../../components_2/FreequentlyAskedQuestions'
 import Footer from '../../components_2/Footer'
@@ -11,6 +10,7 @@ import SelectDAOToCreate from './components/SelectDAOToCreate'
 import WhatRealmsCanDo from './components/WhatRealmsCanDo'
 import WhatIsSPL from './components/WhatIsSpl'
 import WhatIsADAO from './components/WhatIsADAO'
+import RealmsMetrics from './components/RealmsMetrics'
 
 export const Section = ({ bgColor = '', showTopGlow = false, children }) => {
   return (

@@ -1,16 +1,19 @@
-import GradientTitle from './GradientTitle'
-import { MetricsBoxPlus, MetricsBoxDollar } from './MetricsBox'
+import GradientTitle from '../../../components_2/GradientTitle'
+import {
+  MetricsBoxPlus,
+  MetricsBoxDollar,
+} from '../../../components_2/MetricsBox'
 
 const RealmsMetrics = () => {
   return (
-    <div>
+    <div className="pt-12 md:pt-32 pb-14 md:pb-36">
       <div className="flex flex-col md:flex-row">
         <div className="w-full md:w-1/2">
           <GradientTitle>Key Metrics on Realms</GradientTitle>
         </div>
 
-        <div className="w-full md:w-1/2 grow">
-          <div className="grid grid-cols-2 gap-y-32">
+        <div className="w-full md:w-1/2 pt-7 md:pt-0">
+          <div className="grid grid-cols-2 gap-14 md:gap-32">
             <MetricsBoxDollar
               symbol="$"
               numbers="31.8B"
