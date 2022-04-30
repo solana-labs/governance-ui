@@ -1,7 +1,7 @@
 import SocialChannels from '../../components_2/SocialChannels'
 import FreequentlyAskedQuestions from '../../components_2/FreequentlyAskedQuestions'
 import Footer from '../../components_2/Footer'
-import { AltNavbar } from '../../components_2/NavBar'
+import Navbar from '../../components_2/NavBar'
 import Button from '../../components_2/Button'
 
 import KickstartSolana from './components/KickstartSolana'
@@ -61,7 +61,7 @@ export const ReadTheDocsButton = () => {
 const Solana = () => {
   return (
     <div className="relative landing-page">
-      <AltNavbar />
+      <Navbar />
       <KickstartSolana />
       <Section bgColor="bg-[#201f27]">
         <PerfectForDAOs />
