@@ -90,20 +90,20 @@ export const withCreateNewDeposit = async ({
     )
   }
   if (!existingVoter) {
-    instructions.push(
-      client?.program.instruction.createVoter(voterBump, voterWeightBump, {
-        accounts: {
-          registrar: registrar,
-          voter: voter,
-          voterAuthority: walletPk,
-          voterWeightRecord: voterWeightPk,
-          payer: walletPk,
-          systemProgram: systemProgram,
-          rent: SYSVAR_RENT_PUBKEY,
-          instructions: SYSVAR_INSTRUCTIONS_PUBKEY,
-        },
+    const createVoterIx = await client?.program.methods
+      .createVoter(voterBump, voterWeightBump)
+      .accounts({
+        registrar: registrar,
+        voter: voter,
+        voterAuthority: walletPk,
+        voterWeightRecord: voterWeightPk,
+        payer: walletPk,
+        systemProgram: systemProgram,
+        rent: SYSVAR_RENT_PUBKEY,
+        instructions: SYSVAR_INSTRUCTIONS_PUBKEY,
       })
-    )
+      .instruction()
+    instructions.push(createVoterIx)
   }
   const mintCfgIdx = await getMintCfgIdx(registrar, mintPk, client)
 
@@ -132,28 +132,28 @@ export const withCreateNewDeposit = async ({
   if (createNewDeposit) {
     //in case we do monthly close up we pass months not days.
     const period = getPeriod(lockUpPeriodInDays, lockupKind)
-    const createDepositEntryInstruction = client?.program.instruction.createDepositEntry(
-      firstFreeIdx,
-      { [lockupKind]: {} },
-      //lockup starts now
-      null,
-      period,
-      allowClawback,
-      {
-        accounts: {
-          registrar: registrar,
-          voter: voter,
-          payer: walletPk,
-          voterAuthority: walletPk,
-          depositMint: mintPk,
-          rent: SYSVAR_RENT_PUBKEY,
-          systemProgram: systemProgram,
-          tokenProgram: TOKEN_PROGRAM_ID,
-          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-          vault: voterATAPk,
-        },
-      }
-    )
+    const createDepositEntryInstruction = await client?.program.methods
+      .createDepositEntry(
+        firstFreeIdx,
+        { [lockupKind]: {} },
+        //lockup starts now
+        null,
+        period,
+        allowClawback
+      )
+      .accounts({
+        registrar: registrar,
+        voter: voter,
+        payer: walletPk,
+        voterAuthority: walletPk,
+        depositMint: mintPk,
+        rent: SYSVAR_RENT_PUBKEY,
+        systemProgram: systemProgram,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+        vault: voterATAPk,
+      })
+      .instruction()
     instructions.push(createDepositEntryInstruction)
   }
 

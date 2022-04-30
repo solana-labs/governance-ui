@@ -119,16 +119,15 @@ export class VotingClient {
         walletPk,
         clientProgramId
       )
-      instructions.push(
-        this.client!.program.instruction.updateVoterWeightRecord({
-          accounts: {
-            registrar,
-            voter,
-            voterWeightRecord: voterWeightPk,
-            systemProgram: SYSTEM_PROGRAM_ID,
-          },
+      const updateVoterWeightRecordIx = await this.client!.program.methods.updateVoterWeightRecord()
+        .accounts({
+          registrar,
+          voter,
+          voterWeightRecord: voterWeightPk,
+          systemProgram: SYSTEM_PROGRAM_ID,
         })
-      )
+        .instruction()
+      instructions.push(updateVoterWeightRecordIx)
       return { voterWeightPk, maxVoterWeightRecord: undefined }
     }
 
@@ -155,7 +154,7 @@ export class VotingClient {
           new AccountData(nft.metadata.pubkey)
         )
       }
-      const inst = await this.client.program.methods
+      const updateVoterWeightRecordIx = await this.client.program.methods
         .updateVoterWeightRecord({ [type]: {} })
         .accounts({
           registrar: registrar,
@@ -163,7 +162,7 @@ export class VotingClient {
         })
         .remainingAccounts(remainingAccounts.slice(0, 10))
         .instruction()
-      instructions.push(inst)
+      instructions.push(updateVoterWeightRecordIx)
       return { voterWeightPk, maxVoterWeightRecord }
     }
   }
@@ -244,7 +243,7 @@ export class VotingClient {
       )
       const nftsChunk = chunks(remainingNftsToChunk, 12)
       for (const i of nftsChunk) {
-        const instruction = await this.client.program.methods
+        const castNftVoteIx = await this.client.program.methods
           .castNftVote(proposal.pubkey)
           .accounts({
             registrar,
@@ -256,9 +255,9 @@ export class VotingClient {
           .remainingAccounts(i)
           .instruction()
 
-        instructions.push(instruction)
+        instructions.push(castNftVoteIx)
       }
-      const instruction = await this.client.program.methods
+      const castNftVoteIx2 = await this.client.program.methods
         .castNftVote(proposal.pubkey)
         .accounts({
           registrar,
@@ -269,7 +268,7 @@ export class VotingClient {
         })
         .remainingAccounts(firstFiveNfts)
         .instruction()
-      instructions.push(instruction)
+      instructions.push(castNftVoteIx2)
       return { voterWeightPk, maxVoterWeightRecord }
     }
 
@@ -344,7 +343,7 @@ export class VotingClient {
         remainingAccounts.length
       )
       const nftsChunk = chunks(remainingNftsToChunk, 12)
-      const instruction = await this.client.program.methods
+      const relinquishNftVoteIx = await this.client.program.methods
         .relinquishNftVote()
         .accounts({
           registrar,
@@ -357,9 +356,9 @@ export class VotingClient {
         })
         .remainingAccounts(firstFiveNfts)
         .instruction()
-      instructions.push(instruction)
+      instructions.push(relinquishNftVoteIx)
       for (const i of nftsChunk) {
-        const instruction = this.client.program.methods
+        const relinquishNftVote2Ix = this.client.program.methods
           .relinquishNftVote()
           .accounts({
             registrar,
@@ -372,7 +371,7 @@ export class VotingClient {
           })
           .remainingAccounts(i)
           .instruction()
-        instructions.push(instruction)
+        instructions.push(relinquishNftVote2Ix)
       }
       return { voterWeightPk, maxVoterWeightRecord }
     }

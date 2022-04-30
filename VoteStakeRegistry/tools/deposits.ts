@@ -224,11 +224,11 @@ const getDepositsAdditionalInfoEvents = async (
   for (let i = 0; i < numberOfSimulations; i++) {
     const take = maxRange
     const transaction = new Transaction({ feePayer: walletPk })
-    const instruction = await client.program.methods
+    const logVoterInfoIx = await client.program.methods
       .logVoterInfo(maxRange * i, take)
       .accounts({ registrar, voter })
       .instruction()
-    transaction.add(instruction)
+    transaction.add(logVoterInfoIx)
     const batchOfDeposits = await simulateTransaction(
       connection,
       transaction,

@@ -100,12 +100,13 @@ export const withVoteRegistryWithdraw = async ({
   instructions.push(withdrawInstruction)
 
   if (closeDepositAfterOperation) {
-    const close = client.program.instruction.closeDepositEntry(depositIndex, {
-      accounts: {
+    const close = await client.program.methods
+      .closeDepositEntry(depositIndex)
+      .accounts({
         voter: voter,
         voterAuthority: walletPk,
-      },
-    })
+      })
+      .instruction()
     instructions.push(close)
   }
 }
