@@ -37,11 +37,9 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
     (s) => s.actions
   )
-
   const handleWithDrawFromDeposit = async (
     depositEntry: DepositWithMintAccount
   ) => {
-    console.log(ownTokenRecord!.account!.unrelinquishedVotesCount)
     if (
       ownTokenRecord!.account!.unrelinquishedVotesCount &&
       realm!.account.communityMint.toBase58() ===
