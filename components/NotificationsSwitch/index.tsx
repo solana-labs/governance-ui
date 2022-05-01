@@ -9,16 +9,13 @@ import { WalletType } from '@dialectlabs/react'
 import { Transition } from '@headlessui/react'
 import { useTheme } from 'next-themes'
 import useWalletStore from 'stores/useWalletStore'
+import useNotificationStore from 'stores/useNotificationStore'
+import { ModalStates } from 'stores/useNotificationStore'
 // import { Main } from 'next/document'
 
 const REALMS_PUBLIC_KEY = new anchor.web3.PublicKey(
   'BUxZD6aECR5B5MopyvvYqJxwSKDBhx2jSSo1U32en6mj'
 )
-
-enum ModalStates {
-  Selection = 1,
-  Dialect = 2,
-}
 
 const themeVariables: IncomingThemeVariables = {
   light: {
@@ -52,11 +49,11 @@ export default function NotificationsSwitch() {
   const wrapperRef = useRef(null)
   const { current: wallet, connection } = useWalletStore()
   const cluster = connection.cluster
+  const { modalState, set: setNotificationStore } = useNotificationStore(
+    (s) => s
+  )
 
   const [openModal, setOpenModal] = useState(false)
-  const [modalState, setModalState] = useState<ModalStates>(
-    ModalStates.Selection
-  )
 
   // return (
   //   <NotificationsButton
@@ -107,7 +104,11 @@ export default function NotificationsSwitch() {
                   <div className="flex w-full justify-center pt-3">
                     <button
                       className="bg-white rounded-full py-1 w-full text-black"
-                      onClick={() => setModalState(ModalStates.Dialect)}
+                      onClick={() =>
+                        setNotificationStore((state) => {
+                          state.modalState = ModalStates.Dialect
+                        })
+                      }
                     >
                       Use Dialect
                     </button>
@@ -126,7 +127,11 @@ export default function NotificationsSwitch() {
             theme={theme === 'Dark' ? 'dark' : 'light'}
             variables={themeVariables}
             notifications={[{ name: 'New proposals', detail: 'Event' }]}
-            onBackClick={() => setModalState(ModalStates.Selection)}
+            onBackClick={() =>
+              setNotificationStore((state) => {
+                state.modalState = ModalStates.Selection
+              })
+            }
             channels={['web3']}
           />
         )}

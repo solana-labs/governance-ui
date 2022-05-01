@@ -9,11 +9,18 @@ interface NotificationStore extends State {
     txid?: string
   }>
   set: (x: any) => void
+  modalState: ModalStates
+}
+
+export enum ModalStates {
+  Selection = 1,
+  Dialect = 2,
 }
 
 const useNotificationStore = create<NotificationStore>((set, _get) => ({
   notifications: [],
   set: (fn) => set(produce(fn)),
+  modalState: ModalStates.Selection,
 }))
 
 export default useNotificationStore
