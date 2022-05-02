@@ -28,14 +28,12 @@ export default function Step1({ onSubmit, onPrevClick }) {
 
   useEffect(() => {
     if (query?.step1 && !Array.isArray(query.step1)) {
-      const data = JSON.parse(query.step1)
-      setValue('daoName', data['daoName'], {
-        shouldValidate: true,
-        shouldDirty: true,
-      })
-      setValue('daoDescription', data['daoDescription'], {
-        shouldValidate: true,
-        shouldDirty: true,
+      const formData = JSON.parse(query.step1)
+      Object.keys(schemaObject).forEach((fieldName) => {
+        setValue(fieldName, formData[fieldName], {
+          shouldValidate: true,
+          shouldDirty: true,
+        })
       })
     }
   }, [query])
@@ -44,7 +42,6 @@ export default function Step1({ onSubmit, onPrevClick }) {
     onSubmit({ step: 1, data: values })
   }
 
-  console.log('is valid', isValid, 'errors', errors)
   return (
     <form
       onSubmit={handleSubmit(serializeValues)}
