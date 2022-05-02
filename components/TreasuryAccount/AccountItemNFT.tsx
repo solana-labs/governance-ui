@@ -17,7 +17,7 @@ const AccountItemNFT = ({
   border?: boolean
 }) => {
   const connection = useWalletStore((s) => s.connection)
-  const nftsPerPubkey = useTreasuryAccountStore((s) => s.nftsPerPubkey)
+  const nftsPerPubkey = useTreasuryAccountStore((s) => s.governanceNfts)
   const { setCurrentAccount } = useTreasuryAccountStore()
 
   const accountPublicKey = governedAccountTokenAccount

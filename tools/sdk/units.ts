@@ -1,7 +1,7 @@
-import { BN } from '@project-serum/anchor'
+import { BN, ProgramAccount } from '@project-serum/anchor'
 import { MintInfo } from '@solana/spl-token'
+import { TokenInfo } from '@solana/spl-token-registry'
 import { BigNumber } from 'bignumber.js'
-import { TokenInfoWithMint } from 'stores/useTreasuryAccountStore'
 
 const SECONDS_PER_DAY = 86400
 
@@ -24,14 +24,15 @@ export function fmtMintAmount(mint: MintInfo | undefined, mintAmount: BN) {
     : new BigNumber(mintAmount.toString()).toFormat()
 }
 
-export function fmtTokenInfoWithMint(tokenInfoWithMint: TokenInfoWithMint) {
-  return `${fmtBnMintDecimals(
-    tokenInfoWithMint.amount,
-    tokenInfoWithMint.mintInfo.decimals
-  )} ${
-    tokenInfoWithMint.tokenInfo?.symbol
-      ? tokenInfoWithMint.tokenInfo?.symbol
-      : `${tokenInfoWithMint.mint.toString().substring(0, 12)}...`
+export function fmtTokenInfoWithMint(
+  amount: BN,
+  mintInfo: ProgramAccount<MintInfo>,
+  tokenInfo: TokenInfo | undefined = undefined
+) {
+  return `${fmtBnMintDecimals(amount, mintInfo.account.decimals)} ${
+    tokenInfo?.symbol
+      ? tokenInfo?.symbol
+      : `${mintInfo.publicKey.toString().substring(0, 12)}...`
   }`
 }
 
