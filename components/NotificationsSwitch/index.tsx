@@ -13,15 +13,16 @@ import useNotificationStore from 'stores/useNotificationStore'
 import { ModalStates } from 'stores/useNotificationStore'
 import { BellIcon, KeyIcon, MailIcon } from '@heroicons/react/solid'
 import { DeviceMobileIcon } from '@heroicons/react/outline'
+import styled from '@emotion/styled'
 
 const REALMS_PUBLIC_KEY = new anchor.web3.PublicKey(
   'BUxZD6aECR5B5MopyvvYqJxwSKDBhx2jSSo1U32en6mj'
 )
 
 const TagToIcon = {
-  Wallet: <KeyIcon className="float-left h-5 mr-1 w-5" />,
-  Email: <MailIcon className="float-left h-5 mr-1 w-5" />,
-  Text: <DeviceMobileIcon className="float-left h-5 mr-1 w-5" />,
+  Wallet: <KeyIcon className="float-left h-3 mr-1 w-3" />,
+  Email: <MailIcon className="float-left h-3 mr-1 w-3" />,
+  Text: <DeviceMobileIcon className="float-left h-3 mr-1 w-3" />,
 }
 
 type ChannelType = 'Wallet' | 'Email' | 'Text'
@@ -82,11 +83,15 @@ export default function NotificationsSwitch() {
 
   const [openModal, setOpenModal] = useState(false)
 
+  const StyledChannelName = styled.span`
+    font-size: 0.6rem;
+  `
+
   const Tag = ({ channelName }: { channelName: ChannelType }) => (
     <span>
-      <div className="rounded-full bg-bkg-3 px-3 py-1 mr-1">
+      <div className="flex rounded-full items-center bg-bkg-3 px-3 mr-2">
         {TagToIcon[channelName]}
-        <p className="inline-block font-xs">{channelName}</p>
+        <StyledChannelName>{channelName}</StyledChannelName>
       </div>
     </span>
   )
@@ -98,7 +103,7 @@ export default function NotificationsSwitch() {
     modalState,
   }: NotificationSolutionType) => (
     <div className="w-full p-4">
-      <div className="flex flex-col items-center bg-bkg-1 px-12 py-6">
+      <div className="flex flex-col items-center bg-bkg-1 px-16 py-6">
         <div className="flex w-full justify-between">
           <div>
             <h2 className="inline-block">{name}</h2>
@@ -172,7 +177,7 @@ export default function NotificationsSwitch() {
                 state.modalState = ModalStates.Selection
               })
             }
-            channels={['web3']}
+            channels={['web3', 'email', 'sms', 'telegram']}
           />
         )}
       </Transition>
