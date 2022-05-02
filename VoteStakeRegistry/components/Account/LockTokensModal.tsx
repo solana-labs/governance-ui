@@ -42,7 +42,7 @@ import { calcMintMultiplier } from 'VoteStakeRegistry/tools/deposits'
 import ButtonGroup from '@components/ButtonGroup'
 import InlineNotification from '@components/InlineNotification'
 import Tooltip from '@components/Tooltip'
-import Switch from '@components/Switch'
+//import Switch from '@components/Switch'
 import { notify } from '@utils/notifications'
 
 const YES = 'Yes'
@@ -121,6 +121,7 @@ const LockTokensModal = ({
   )
   const [lockupPeriodDays, setLockupPeriodDays] = useState<number>(0)
   const [allowClawback, setAllowClawback] = useState(false)
+  console.log(setAllowClawback)
   const [lockupPeriod, setLockupPeriod] = useState<Period>(lockupPeriods[0])
   const [amount, setAmount] = useState<number | undefined>()
   const [lockMoreThenDeposited, setLockMoreThenDeposited] = useState<string>(
@@ -487,7 +488,7 @@ const LockTokensModal = ({
                   className="bg-primary-light h-2 rounded-lg"
                 ></div>
               </div>
-              {!depositToUnlock && (
+              {/* {!depositToUnlock && (
                 <div className="flex text-sm text-fgd-2">
                   <div className="pr-5">
                     Allow dao to clawback -{' '}
@@ -503,7 +504,7 @@ const LockTokensModal = ({
                     onChange={(checked) => setAllowClawback(checked)}
                   />
                 </div>
-              )}
+              )} */}
             </div>
           </>
         )

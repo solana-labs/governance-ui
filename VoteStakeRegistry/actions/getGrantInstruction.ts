@@ -69,7 +69,7 @@ export const getGrantInstruction = async ({
     true
   )
 
-  const grantIx = client?.program.methods
+  const grantIx = await client?.program.methods
     .grant(
       voterBump,
       voterWeightBump,

@@ -358,7 +358,7 @@ export class VotingClient {
         .instruction()
       instructions.push(relinquishNftVoteIx)
       for (const i of nftsChunk) {
-        const relinquishNftVote2Ix = this.client.program.methods
+        const relinquishNftVote2Ix = await this.client.program.methods
           .relinquishNftVote()
           .accounts({
             registrar,
