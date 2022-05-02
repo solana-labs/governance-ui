@@ -1,8 +1,4 @@
 import { BN } from '@project-serum/anchor'
-import {
-  /*MaxVoterWeightRecord,*/ ProgramAccount,
-} from '@solana/spl-governance'
-import { NFTWithMeta, VotingClient } from '@utils/uiTypes/VotePlugin'
 import create, { State } from 'zustand'
 
 interface SwitchboardPluginStore extends State {

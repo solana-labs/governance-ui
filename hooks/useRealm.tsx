@@ -16,13 +16,6 @@ import {
   VoteRegistryVoterWeight,
   VoterWeight,
 } from '../models/voteWeights'
-
-import { Wallet } from '@project-serum/common'
-import { QUEUE_LIST } from '../SwitchboardVotePlugin/SwitchboardQueueVoterClient'
-import { Switchboard, IDL } from '../SwitchboardVotePlugin/SwitchboardIdl'
-import * as sbv2 from '../../switchboardv2-api'
-import * as anchor from '@project-serum/anchor'
-
 import useWalletStore from '../stores/useWalletStore'
 import {
   nftPluginsPks,
@@ -55,7 +48,6 @@ export default function useRealm() {
   const nftVotingPower = useNftPluginStore((s) => s.state.votingPower)
   const sbVotingPower = useSwitchboardPluginStore((s) => s.state.votingPower)
   const [realmInfo, setRealmInfo] = useState<RealmInfo | undefined>(undefined)
-  const { getQueuesForSelectedRealm } = useWalletStore((s) => s.actions)
   //getQueuesForSelectedRealm();
 
   //const anchorProvider = new anchor.AnchorProvider(connection, wallet);

@@ -98,7 +98,7 @@ export function useVotingPlugins() {
 
     try {
       // go through queues, get governance addresses until current realm + governance combo exists
-      for (let queue of QUEUE_LIST) {
+      for (const queue of QUEUE_LIST) {
         if (!wallet || !wallet.publicKey || !realm) {
           return
         }
