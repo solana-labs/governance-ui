@@ -150,7 +150,7 @@ export default function NotificationsSwitch() {
           <div ref={wrapperRef} className="w-full h-full bg-bkg-3">
             <div className="h-full flex flex-col items-center py-4">
               <BellIcon className="h-10 ml-2 w-10" />
-              <h2 className="mb-4 pt-4">Realms Notifications</h2>
+              <h2 className="mb-4 pt-4 font-light">Realms Notifications</h2>
               {NotificationSolutions.map((solution) => (
                 <NotificationBox
                   key={solution.name}

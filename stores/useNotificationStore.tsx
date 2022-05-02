@@ -1,5 +1,6 @@
 import create, { State } from 'zustand'
 import produce from 'immer'
+import { persist } from 'zustand/middleware'
 
 interface NotificationStore extends State {
   notifications: Array<{
@@ -17,10 +18,17 @@ export enum ModalStates {
   Dialect = 2,
 }
 
-const useNotificationStore = create<NotificationStore>((set, _get) => ({
-  notifications: [],
-  set: (fn) => set(produce(fn)),
-  modalState: ModalStates.Selection,
-}))
+const useNotificationStore = create<NotificationStore>(
+  persist(
+    (set, _get) => ({
+      notifications: [],
+      set: (fn) => set(produce(fn)),
+      modalState: ModalStates.Selection,
+    }),
+    {
+      name: 'notifications',
+    }
+  )
+)
 
 export default useNotificationStore
