@@ -1,14 +1,14 @@
 import { FunctionComponent } from 'react'
 import Loading from '../components/Loading'
 
-interface ButtonProps {
-  disabled?: boolean
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  // disabled?: boolean
   isLoading?: boolean
-  onClick?: () => void
   secondary?: boolean
   tertiary?: boolean
   inverse?: boolean
   withBorder?: boolean
+  bgOverride?: string
 }
 
 export const Button: FunctionComponent<ButtonProps> = ({
@@ -19,6 +19,7 @@ export const Button: FunctionComponent<ButtonProps> = ({
   tertiary = false,
   inverse = false,
   withBorder = false,
+  bgOverride = '',
   ...props
 }) => {
   let className = `z-0 relative transition-all duration-300 rounded-full font-serif text-[16px] hover:cursor-pointer opacity-[84] hover:opacity-100 change-image-on-hover `
@@ -46,6 +47,10 @@ export const Button: FunctionComponent<ButtonProps> = ({
 
   if (isLoading) {
     className += ` flex items-center`
+  }
+
+  if (bgOverride) {
+    className += ` bg-none ${bgOverride}`
   }
 
   return (

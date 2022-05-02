@@ -254,3 +254,12 @@ body::-webkit-scrollbar-corner {
 .change-image-on-hover:hover .hover-image {
   display: block;
 }
+
+.step-indicator__with-gradient {
+  background: linear-gradient(to right, #00c2ff 0%, #00e4ff 50%, #87f2ff 100%);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+
+  width: fit-content;
+}

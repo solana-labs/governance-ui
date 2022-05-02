@@ -2,7 +2,10 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
 import Navbar from 'components_2/NavBar'
-import { Section } from 'pages/solana'
+
+import GovTokenWizard from './components/GovToken/Wizard'
+import NFTWizard from './components/NFT/Wizard'
+import MultiSigWizard from './components/MultiSig/Wizard'
 
 export default function DAOCreationForm() {
   const router = useRouter()
@@ -29,9 +32,13 @@ export default function DAOCreationForm() {
           quality={100}
         />
       </div>
-      <Section>
-        <div className="pt-40 md:pt-52">{type}</div>
-      </Section>
+      {type === 'gov-token' ? (
+        <GovTokenWizard />
+      ) : type === 'nft' ? (
+        <NFTWizard />
+      ) : (
+        <MultiSigWizard />
+      )}
     </div>
   )
 }
