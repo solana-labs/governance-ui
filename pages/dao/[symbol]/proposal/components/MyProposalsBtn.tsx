@@ -97,7 +97,9 @@ const MyProposalsBn = () => {
         x.account.state === ProposalState.Executing ||
         x.account.state === ProposalState.SigningOff ||
         x.account.state === ProposalState.Succeeded ||
-        x.account.state === ProposalState.ExecutingWithErrors) &&
+        x.account.state === ProposalState.ExecutingWithErrors ||
+        x.account.state === ProposalState.Defeated ||
+        x.account.state === ProposalState.Cancelled) &&
       ownVoteRecordsByProposal[x.pubkey.toBase58()] &&
       !ownVoteRecordsByProposal[x.pubkey.toBase58()]?.account.isRelinquished
   )
@@ -241,24 +243,22 @@ const MyProposalsBn = () => {
       client.client!.program.programId
     )
     for (const i of ownNftVoteRecords) {
-      instructions.push(
-        (client.client as NftVoterClient).program.instruction.relinquishNftVote(
-          {
-            accounts: {
-              registrar,
-              voterWeightRecord: voterWeightPk,
-              governance: proposals[i.account.proposal].account.governance,
-              proposal: i.account.proposal,
-              governingTokenOwner: wallet!.publicKey!,
-              voteRecord: i.publicKey,
-              beneficiary: wallet!.publicKey!,
-            },
-            remainingAccounts: [
-              { pubkey: i.publicKey, isSigner: false, isWritable: true },
-            ],
-          }
-        )
-      )
+      const relinquishNftVoteIx = await (client.client as NftVoterClient).program.methods
+        .relinquishNftVote()
+        .accounts({
+          registrar,
+          voterWeightRecord: voterWeightPk,
+          governance: proposals[i.account.proposal].account.governance,
+          proposal: i.account.proposal,
+          governingTokenOwner: wallet!.publicKey!,
+          voteRecord: i.publicKey,
+          beneficiary: wallet!.publicKey!,
+        })
+        .remainingAccounts([
+          { pubkey: i.publicKey, isSigner: false, isWritable: true },
+        ])
+        .instruction()
+      instructions.push(relinquishNftVoteIx)
     }
     try {
       const insertChunks = chunks(instructions, 10)

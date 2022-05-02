@@ -84,29 +84,29 @@ export const withVoteRegistryWithdraw = async ({
       )
     )
   }
-
-  instructions.push(
-    client?.program.instruction.withdraw(depositIndex!, amount, {
-      accounts: {
-        registrar: registrar,
-        voter: voter,
-        voterAuthority: walletPk,
-        tokenOwnerRecord: tokenOwnerRecordPubKey,
-        voterWeightRecord: voterWeightPk,
-        vault: voterATAPk,
-        destination: ataPk,
-        tokenProgram: TOKEN_PROGRAM_ID,
-      },
+  const withdrawInstruction = await client?.program.methods
+    .withdraw(depositIndex!, amount)
+    .accounts({
+      registrar: registrar,
+      voter: voter,
+      voterAuthority: walletPk,
+      tokenOwnerRecord: tokenOwnerRecordPubKey,
+      voterWeightRecord: voterWeightPk,
+      vault: voterATAPk,
+      destination: ataPk,
+      tokenProgram: TOKEN_PROGRAM_ID,
     })
-  )
+    .instruction()
+  instructions.push(withdrawInstruction)
 
   if (closeDepositAfterOperation) {
-    const close = client.program.instruction.closeDepositEntry(depositIndex, {
-      accounts: {
+    const close = await client.program.methods
+      .closeDepositEntry(depositIndex)
+      .accounts({
         voter: voter,
         voterAuthority: walletPk,
-      },
-    })
+      })
+      .instruction()
     instructions.push(close)
   }
 }
