@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import * as anchor from '@project-serum/anchor'
 import {
   IncomingThemeVariables,
@@ -74,7 +74,6 @@ const themeVariables: IncomingThemeVariables = {
 
 export default function NotificationsSwitch() {
   const { theme } = useTheme()
-  const wrapperRef = useRef()
   const { current: wallet, connection } = useWalletStore()
   const cluster = connection.cluster
   const { modalState, set: setNotificationStore } = useNotificationStore(
