@@ -4,6 +4,8 @@ import { useRouter } from 'next/router'
 import { Section } from 'pages/solana'
 
 import Step1 from './Step1'
+import Step2 from './Step2'
+
 export default function MultiSigWizard() {
   const { query, push } = useRouter()
   const [currentStep, setCurrentStep] = useState(1)
@@ -56,7 +58,9 @@ export default function MultiSigWizard() {
         {currentStep === 1 && (
           <Step1 onPrevClick={handlePreviousButton} onSubmit={handleSubmit} />
         )}
-        {/* {currentStep === 2 && <Step2 onPrevClick={handlePreviousButton} onSubmit={handleSubmit}/>} */}
+        {currentStep === 2 && (
+          <Step2 onPrevClick={handlePreviousButton} onSubmit={handleSubmit} />
+        )}
       </Section>
     </div>
   )

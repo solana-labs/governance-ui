@@ -8,22 +8,7 @@ import FormHeader from '../FormHeader'
 import FormField, { ImageUploader } from '../FormField'
 import Input from '../Input'
 import Button from 'components_2/Button'
-
-// import AdvancedOptionsDropdown from '../AdvancedOptionsDropdown';
-// <AdvancedOptionsDropdown>
-//           <FormField
-//             title="How would you describe your DAO?"
-//             description="What's the best way to communicate the purpose of your DAO and why it's valuable to its members?"
-//             advancedOption
-//           >
-//             <Input
-//               placeholder="e.g. My DAO is..."
-//               data-testid="dao-description-input"
-//               error={errors.daoDescription?.message || ''}
-//               // {...field}
-//             />
-//           </FormField>
-//         </AdvancedOptionsDropdown>
+import FormFooter from '../FormFooter'
 
 export default function Step1({ onSubmit, onPrevClick }) {
   const { query } = useRouter()
@@ -159,32 +144,11 @@ export default function Step1({ onSubmit, onPrevClick }) {
           </Button>
         </FormField>
       </div>
-      <div className="flex flex-wrap items-center justify-between pt-20 md:pt-32">
-        <Button type="button" tertiary>
-          <div className="flex items-center">
-            <img src="/1-Landing-v2/icon-faq.png" className="w-6 h-6 mx-2" />
-            <div className="pr-3">About Multi-Sigs</div>
-          </div>
-        </Button>
-        <div className="flex justify-between w-full mt-8 space-x-8 md:w-fit md:mt-0">
-          <Button type="button" onClick={() => onPrevClick(1)}>
-            <img
-              src="/1-Landing-v2/icon-arrow-black.png"
-              className="w-6 h-6 mx-2 rotate-180"
-            />
-          </Button>
-          <Button
-            type="submit"
-            disabled={!isValid}
-            bgOverride={!isValid ? `bg-[#201f27]` : ''}
-          >
-            <img
-              src="/1-Landing-v2/icon-arrow-black.png"
-              className="w-6 h-6 mx-2"
-            />
-          </Button>
-        </div>
-      </div>
+      <FormFooter
+        isValid={isValid}
+        prevClickHandler={() => onPrevClick(1)}
+        faqTitle="About Multi-Sigs"
+      />
     </form>
   )
 }
