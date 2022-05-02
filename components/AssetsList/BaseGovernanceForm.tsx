@@ -171,6 +171,7 @@ const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
         />
       </div>
       <Select
+        label="Vote tipping"
         value={VoteTipping[form.voteTipping as any]}
         onChange={(selected) =>
           handleSetForm({

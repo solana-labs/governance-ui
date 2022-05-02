@@ -31,6 +31,10 @@ const DiscussionForm = () => {
   const { proposal } = useWalletStore((s) => s.selectedProposal)
   const { fetchChatMessages } = useWalletStore((s) => s.actions)
   const { tokenType } = useWalletStore((s) => s.selectedProposal)
+  const commenterVoterTokenRecord =
+    tokenType === GoverningTokenType.Community
+      ? ownTokenRecord
+      : ownCouncilTokenRecord
 
   const submitComment = async () => {
     setSubmitting(true)
@@ -53,7 +57,7 @@ const DiscussionForm = () => {
         rpcContext,
         realm!,
         proposal!,
-        ownVoterWeight.getTokenRecord(),
+        commenterVoterTokenRecord!,
         msg,
         undefined,
         client
@@ -72,11 +76,6 @@ const DiscussionForm = () => {
 
   const postEnabled =
     proposal && connected && ownVoterWeight.hasAnyWeight() && comment
-
-  const commenterVoterTokenRecord =
-    tokenType === GoverningTokenType.Community
-      ? ownTokenRecord
-      : ownCouncilTokenRecord
 
   const tooltipContent = !connected
     ? 'Connect your wallet to send a comment'

@@ -11,7 +11,6 @@ import {
   Token,
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
-import { BN } from '@project-serum/anchor'
 import {
   getRegistrarPDA,
   getVoterPDA,
@@ -33,6 +32,7 @@ export const withCreateNewDeposit = async ({
   lockUpPeriodInDays,
   lockupKind,
   client,
+  allowClawback = false,
 }: {
   instructions: TransactionInstruction[]
   walletPk: PublicKey
@@ -43,6 +43,7 @@ export const withCreateNewDeposit = async ({
   tokenOwnerRecordPk: PublicKey | null
   lockUpPeriodInDays: number
   lockupKind: LockupType
+  allowClawback?: boolean
   client?: VsrClient
 }) => {
   if (!client) {
@@ -89,20 +90,20 @@ export const withCreateNewDeposit = async ({
     )
   }
   if (!existingVoter) {
-    instructions.push(
-      client?.program.instruction.createVoter(voterBump, voterWeightBump, {
-        accounts: {
-          registrar: registrar,
-          voter: voter,
-          voterAuthority: walletPk,
-          voterWeightRecord: voterWeightPk,
-          payer: walletPk,
-          systemProgram: systemProgram,
-          rent: SYSVAR_RENT_PUBKEY,
-          instructions: SYSVAR_INSTRUCTIONS_PUBKEY,
-        },
+    const createVoterIx = await client?.program.methods
+      .createVoter(voterBump, voterWeightBump)
+      .accounts({
+        registrar: registrar,
+        voter: voter,
+        voterAuthority: walletPk,
+        voterWeightRecord: voterWeightPk,
+        payer: walletPk,
+        systemProgram: systemProgram,
+        rent: SYSVAR_RENT_PUBKEY,
+        instructions: SYSVAR_INSTRUCTIONS_PUBKEY,
       })
-    )
+      .instruction()
+    instructions.push(createVoterIx)
   }
   const mintCfgIdx = await getMintCfgIdx(registrar, mintPk, client)
 
@@ -131,29 +132,28 @@ export const withCreateNewDeposit = async ({
   if (createNewDeposit) {
     //in case we do monthly close up we pass months not days.
     const period = getPeriod(lockUpPeriodInDays, lockupKind)
-    const allowClawback = false
-    const startTime = new BN(new Date().getTime() / 1000)
-    const createDepositEntryInstruction = client?.program.instruction.createDepositEntry(
-      firstFreeIdx,
-      { [lockupKind]: {} },
-      startTime,
-      period,
-      allowClawback,
-      {
-        accounts: {
-          registrar: registrar,
-          voter: voter,
-          payer: walletPk,
-          voterAuthority: walletPk,
-          depositMint: mintPk,
-          rent: SYSVAR_RENT_PUBKEY,
-          systemProgram: systemProgram,
-          tokenProgram: TOKEN_PROGRAM_ID,
-          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-          vault: voterATAPk,
-        },
-      }
-    )
+    const createDepositEntryInstruction = await client?.program.methods
+      .createDepositEntry(
+        firstFreeIdx,
+        { [lockupKind]: {} },
+        //lockup starts now
+        null,
+        period,
+        allowClawback
+      )
+      .accounts({
+        registrar: registrar,
+        voter: voter,
+        payer: walletPk,
+        voterAuthority: walletPk,
+        depositMint: mintPk,
+        rent: SYSVAR_RENT_PUBKEY,
+        systemProgram: systemProgram,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+        vault: voterATAPk,
+      })
+      .instruction()
     instructions.push(createDepositEntryInstruction)
   }
 

@@ -1,15 +1,11 @@
-import {
-  Keypair,
-  PublicKey,
-  Transaction,
-  TransactionInstruction,
-} from '@solana/web3.js'
+import { Keypair, Transaction, TransactionInstruction } from '@solana/web3.js'
 import {
   ChatMessageBody,
   getGovernanceProgramVersion,
   GOVERNANCE_CHAT_PROGRAM_ID,
   Proposal,
   Realm,
+  TokenOwnerRecord,
   withPostChatMessage,
   YesNoVote,
 } from '@solana/spl-governance'
@@ -19,14 +15,17 @@ import { RpcContext } from '@solana/spl-governance'
 import { Vote } from '@solana/spl-governance'
 
 import { withCastVote } from '@solana/spl-governance'
-import { sendTransaction } from '../utils/send'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
+import { chunks } from '@utils/helpers'
+import { sendTransactions, SequenceType } from '@utils/sendTransactions'
+import { sendTransaction } from '@utils/send'
+import { NftVoterClient } from '@solana/governance-program-library'
 
 export async function castVote(
   { connection, wallet, programId, walletPubkey }: RpcContext,
   realm: ProgramAccount<Realm>,
   proposal: ProgramAccount<Proposal>,
-  tokeOwnerRecord: PublicKey,
+  tokeOwnerRecord: ProgramAccount<TokenOwnerRecord>,
   yesNoVote: YesNoVote,
   message?: ChatMessageBody | undefined,
   votingPlugin?: VotingClient
@@ -46,7 +45,8 @@ export async function castVote(
   //will run only if any plugin is connected with realm
   const plugin = await votingPlugin?.withCastPluginVote(
     instructions,
-    proposal.pubkey
+    proposal,
+    tokeOwnerRecord
   )
   await withCastVote(
     instructions,
@@ -56,7 +56,7 @@ export async function castVote(
     proposal.account.governance,
     proposal.pubkey,
     proposal.account.tokenOwnerRecord,
-    tokeOwnerRecord,
+    tokeOwnerRecord.pubkey,
     governanceAuthority,
     proposal.account.governingTokenMint,
     Vote.fromYesNoVote(yesNoVote),
@@ -68,6 +68,7 @@ export async function castVote(
   if (message) {
     const plugin = await votingPlugin?.withUpdateVoterWeightRecord(
       instructions,
+      tokeOwnerRecord,
       'commentProposal'
     )
     await withPostChatMessage(
@@ -78,7 +79,7 @@ export async function castVote(
       realm.pubkey,
       proposal.account.governance,
       proposal.pubkey,
-      tokeOwnerRecord,
+      tokeOwnerRecord.pubkey,
       governanceAuthority,
       payer,
       undefined,
@@ -86,9 +87,42 @@ export async function castVote(
       plugin?.voterWeightPk
     )
   }
+  const shouldChunk = votingPlugin?.client instanceof NftVoterClient
+  const instructionsCountThatMustHaveTheirOwnChunk = message ? 4 : 2
+  if (shouldChunk) {
+    const instructionsWithTheirOwnChunk = instructions.slice(
+      -instructionsCountThatMustHaveTheirOwnChunk
+    )
+    const remainingInstructionsToChunk = instructions.slice(
+      0,
+      instructions.length - instructionsCountThatMustHaveTheirOwnChunk
+    )
+    const splInstructionsWithAccountsChunk = chunks(
+      instructionsWithTheirOwnChunk,
+      2
+    )
+    const nftsAccountsChunks = chunks(remainingInstructionsToChunk, 2)
+    const signerChunks = Array(
+      splInstructionsWithAccountsChunk.length + nftsAccountsChunks.length
+    ).fill([])
+    const singersMap = message
+      ? [...signerChunks.slice(0, signerChunks.length - 1), signers]
+      : signerChunks
+    const instructionsChunks = [
+      ...nftsAccountsChunks,
+      ...splInstructionsWithAccountsChunk,
+    ]
+    await sendTransactions(
+      connection,
+      wallet,
+      instructionsChunks,
+      singersMap,
+      SequenceType.Sequential
+    )
+  } else {
+    const transaction = new Transaction()
+    transaction.add(...instructions)
 
-  const transaction = new Transaction()
-  transaction.add(...instructions)
-
-  await sendTransaction({ transaction, wallet, connection, signers })
+    await sendTransaction({ transaction, wallet, connection, signers })
+  }
 }

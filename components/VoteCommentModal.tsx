@@ -68,7 +68,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
         rpcContext,
         realm!,
         proposal!,
-        voterTokenRecord.pubkey,
+        voterTokenRecord,
         vote,
         msg,
         client

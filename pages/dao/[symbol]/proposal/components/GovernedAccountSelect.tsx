@@ -34,22 +34,23 @@ const GovernedAccountSelect = ({
   function getLabel(value: AssetAccount) {
     if (value) {
       const accountType = value.governance.account.accountType
-      switch (accountType) {
-        case GovernanceAccountType.MintGovernanceV1:
-        case GovernanceAccountType.MintGovernanceV2:
-          return getMintAccountLabelComponent(getMintAccountLabelInfo(value))
-        case GovernanceAccountType.TokenGovernanceV1:
-        case GovernanceAccountType.TokenGovernanceV2:
-          return getTokenAccountLabelComponent(
-            value.isSol
-              ? getSolAccountLabel(value)
-              : getTokenAccountLabelInfo(value)
-          )
-        case GovernanceAccountType.ProgramGovernanceV1:
-        case GovernanceAccountType.ProgramGovernanceV2:
-          return getProgramAccountLabel(value.governance)
-        default:
-          return value.governance.account.governedAccount.toBase58()
+      if (value.isSol || value.isToken) {
+        return getTokenAccountLabelComponent(
+          value.isSol
+            ? getSolAccountLabel(value)
+            : getTokenAccountLabelInfo(value)
+        )
+      } else {
+        switch (accountType) {
+          case GovernanceAccountType.MintGovernanceV1:
+          case GovernanceAccountType.MintGovernanceV2:
+            return getMintAccountLabelComponent(getMintAccountLabelInfo(value))
+          case GovernanceAccountType.ProgramGovernanceV1:
+          case GovernanceAccountType.ProgramGovernanceV2:
+            return getProgramAccountLabel(value.governance)
+          default:
+            return value.governance.account.governedAccount.toBase58()
+        }
       }
     } else {
       return null

@@ -451,12 +451,18 @@ export async function getTransferNftInstruction({
       connection.current,
       nftMint
     )
-    //we find ata from connected wallet that holds the nft
-    const sourceAccount = tokenAccountsWithNftMint.find(
+    const isSolAccSource = tokenAccountsWithNftMint.find(
       (x) =>
         x.account.owner.toBase58() ===
         form.governedTokenAccount.extensions.transferAddress.toBase58()
     )?.publicKey
+    const isGovernanceSource = tokenAccountsWithNftMint.find(
+      (x) =>
+        x.account.owner.toBase58() ===
+        form.governedTokenAccount.governance.pubkey.toBase58()
+    )?.publicKey
+    //we find ata from connected wallet that holds the nft
+    const sourceAccount = isSolAccSource || isGovernanceSource
     if (!sourceAccount) {
       throw 'Nft ata not found for governance'
     }
@@ -489,7 +495,9 @@ export async function getTransferNftInstruction({
       TOKEN_PROGRAM_ID,
       sourceAccount!,
       receiverAddress,
-      form.governedTokenAccount.extensions.transferAddress,
+      isSolAccSource
+        ? form.governedTokenAccount.extensions.transferAddress
+        : form.governedTokenAccount.governance.pubkey,
       [],
       mintAmount
     )

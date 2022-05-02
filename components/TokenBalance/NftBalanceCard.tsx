@@ -43,21 +43,18 @@ const NftBalanceCard = () => {
       wallet!.publicKey!,
       client.client!.program.programId
     )
-    instructions.push(
-      (client.client as NftVoterClient).program.instruction.createVoterWeightRecord(
-        wallet!.publicKey!,
-        {
-          accounts: {
-            voterWeightRecord: voterWeightPk,
-            governanceProgramId: realm!.owner,
-            realm: realm!.pubkey,
-            realmGoverningTokenMint: realm!.account.communityMint,
-            payer: wallet!.publicKey!,
-            systemProgram: SYSTEM_PROGRAM_ID,
-          },
-        }
-      )
-    )
+    const createVoterWeightRecordIx = await (client.client as NftVoterClient).program.methods
+      .createVoterWeightRecord(wallet!.publicKey!)
+      .accounts({
+        voterWeightRecord: voterWeightPk,
+        governanceProgramId: realm!.owner,
+        realm: realm!.pubkey,
+        realmGoverningTokenMint: realm!.account.communityMint,
+        payer: wallet!.publicKey!,
+        systemProgram: SYSTEM_PROGRAM_ID,
+      })
+      .instruction()
+    instructions.push(createVoterWeightRecordIx)
     await withCreateTokenOwnerRecord(
       instructions,
       realm!.owner!,
@@ -128,7 +125,7 @@ const NftBalanceCard = () => {
             onNftSelect={() => {
               return null
             }}
-            ownerPk={wallet!.publicKey!}
+            ownersPk={[wallet!.publicKey!]}
             nftHeight="50px"
             nftWidth="50px"
             selectable={false}
@@ -140,7 +137,7 @@ const NftBalanceCard = () => {
       </div>
       {connected && !ownTokenRecord && (
         <Button className="w-full" onClick={handleRegister}>
-          Register
+          Join
         </Button>
       )}
     </div>

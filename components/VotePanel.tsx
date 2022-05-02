@@ -24,6 +24,7 @@ const VotePanel = () => {
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const { pk } = router.query
   const {
@@ -89,6 +90,7 @@ const VotePanel = () => {
       connection.endpoint
     )
     try {
+      setIsLoading(true)
       const instructions: TransactionInstruction[] = []
 
       if (
@@ -124,6 +126,7 @@ const VotePanel = () => {
     } catch (ex) {
       console.error("Can't relinquish vote", ex)
     }
+    setIsLoading(false)
   }
 
   const handleShowVoteModal = (vote: YesNoVote) => {
@@ -187,10 +190,11 @@ const VotePanel = () => {
           <div className="items-center justify-center flex w-full gap-5">
             {isVoteCast && connected ? (
               <SecondaryButton
+                isLoading={isLoading}
                 small
                 tooltipMessage={withdrawTooltipContent}
                 onClick={() => submitRelinquishVote()}
-                disabled={!isWithdrawEnabled}
+                disabled={!isWithdrawEnabled || isLoading}
               >
                 {isVoting ? 'Withdraw' : 'Release Tokens'}
               </SecondaryButton>

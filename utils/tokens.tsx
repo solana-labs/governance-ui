@@ -281,12 +281,10 @@ export function getSolAccountLabel(acc: AssetAccount | undefined) {
   let amount = ''
   let imgUrl = ''
 
-  if (acc?.extensions.token && acc.extensions.mint) {
+  if (acc?.extensions.mint) {
     const info = tokenService.getTokenInfo(WSOL_MINT)
     imgUrl = info?.logoURI ? info.logoURI : ''
-    tokenAccount =
-      acc.extensions.transferAddress?.toBase58() ||
-      acc.extensions.token.publicKey.toBase58()
+    tokenAccount = acc.extensions.transferAddress!.toBase58()
     tokenName = 'SOL'
 
     tokenAccountName = acc.extensions.transferAddress
@@ -373,22 +371,26 @@ export const getNfts = async (connection: Connection, ownerPk: PublicKey) => {
       publicAddress: ownerPk.toBase58(),
       connection: connection,
     })
+    const tokenAccounts = await getOwnedTokenAccounts(connection, ownerPk)
     const data = Object.keys(nfts).map((key) => nfts[key])
     const arr: NFTWithMint[] = []
     for (let i = 0; i < data.length; i++) {
       try {
         const val = (await axios.get(data[i].data.uri)).data
-        const tokenAccounts = await getTokenAccountsByMint(
-          connection,
-          data[i].mint
-        )
-        arr.push({
-          val,
-          mint: data[i].mint,
-          tokenAddress: tokenAccounts
-            .find((x) => x.account.owner.toBase58() === ownerPk.toBase58())!
-            .publicKey.toBase58(),
+        const tokenAccount = tokenAccounts.find((x) => {
+          return (
+            x.account.mint.toBase58() === data[i].mint &&
+            x.account.amount.cmpn(0) === 1
+          )
         })
+        if (tokenAccount) {
+          arr.push({
+            val,
+            mint: data[i].mint,
+            tokenAddress: tokenAccount.publicKey.toBase58(),
+            token: tokenAccount,
+          })
+        }
       } catch (e) {
         console.log(e)
       }

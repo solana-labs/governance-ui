@@ -41,8 +41,7 @@ const MembersTabs: FunctionComponent<MembersTabsProps> = ({
       />
       {tabs.map((x) => {
         return (
-          mint &&
-          councilMint && (
+          (mint || councilMint) && (
             <MemberItems
               key={x.walletAddress}
               member={x}
@@ -70,8 +69,8 @@ const MemberItems = ({
   onChange,
 }: {
   member: Member
-  mint: MintInfo
-  councilMint: MintInfo
+  mint?: MintInfo
+  councilMint?: MintInfo
   activeTab: Member
   tokenName: string
   onChange: (member: Member) => void

@@ -1,5 +1,5 @@
 import { Wallet } from '@marinade.finance/marinade-ts-sdk'
-import { Provider } from '@project-serum/anchor'
+import { AnchorProvider, BorshInstructionCoder } from '@project-serum/anchor'
 import { NftVoterClient } from '@solana/governance-program-library'
 import { AccountMetaData, getRealm } from '@solana/spl-governance'
 import { Connection, Keypair } from '@solana/web3.js'
@@ -20,16 +20,16 @@ export const NFT_VOTER_INSTRUCTIONS = {
       ],
       getDataUI: async (connection: Connection, data: Uint8Array) => {
         try {
-          const options = Provider.defaultOptions()
-          const provider = new Provider(
+          const options = AnchorProvider.defaultOptions()
+          const provider = new AnchorProvider(
             connection,
             new Wallet(Keypair.generate()),
             options
           )
           const nftClient = await NftVoterClient.connect(provider)
-          const decodedInstructionData = nftClient.program.coder.instruction.decode(
-            Buffer.from(data)
-          )?.data as any
+          const decodedInstructionData = new BorshInstructionCoder(
+            nftClient.program.idl
+          ).decode(Buffer.from(data))?.data as any
           return (
             <div className="space-y-3">
               <div>
@@ -58,8 +58,8 @@ export const NFT_VOTER_INSTRUCTIONS = {
         accounts: AccountMetaData[]
       ) => {
         try {
-          const options = Provider.defaultOptions()
-          const provider = new Provider(
+          const options = AnchorProvider.defaultOptions()
+          const provider = new AnchorProvider(
             connection,
             new Wallet(Keypair.generate()),
             options
@@ -67,9 +67,9 @@ export const NFT_VOTER_INSTRUCTIONS = {
           const realm = await getRealm(connection, accounts[1].pubkey)
           const mint = await tryGetMint(connection, realm.account.communityMint)
           const nftClient = await NftVoterClient.connect(provider)
-          const decodedInstructionData = nftClient.program.coder.instruction.decode(
-            Buffer.from(data)
-          )?.data as any
+          const decodedInstructionData = new BorshInstructionCoder(
+            nftClient.program.idl
+          ).decode(Buffer.from(data))?.data as any
           const weight = fmtTokenAmount(
             decodedInstructionData.weight,
             mint?.account.decimals
