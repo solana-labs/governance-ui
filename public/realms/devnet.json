@@ -152,5 +152,14 @@
     "ogImage": "https://raw.githubusercontent.com/Exonft/SquatchDAO/main/SquatchDAO.jpg",
     "website": "www.squatchdao.com",
     "twitter": "@Squatch_DAO"
+  },
+  {
+    "symbol": "FORE",
+    "displayName": "Foresight DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "HymmUoabLo1sB8nTENxSFz1bAmobMJyGQoXqyXZ9FySB",
+    "ogImage": "https://www.foresight.exchange/logo.png",
+    "website": "https://www.foresight.exchange/",
+    "twitter": "@foresightmkt"
   }
 ]

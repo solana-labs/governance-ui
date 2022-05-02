@@ -59,7 +59,7 @@ export interface DepositWithMintAccount extends Deposit {
   votingPowerBaseline: BN
 }
 
-export const unusedMintPk = '11111111111111111111111111111111'
+export const emptyPk = '11111111111111111111111111111111'
 
 export const getRegistrarPDA = async (
   realmPk: PublicKey,
