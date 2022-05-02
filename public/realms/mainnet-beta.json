@@ -77,6 +77,15 @@
     "bannerImage": "/realms/TheSporagers/img/the_sporagers_banner.jpeg"
   },
   {
+    "symbol": "NFT Club Berlin",
+    "displayName": "NFT Club Berlin",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "E5DCxoF2vjzFeaDBi9kfFDZVoxrpe6nRFfKtm1J8Qdq7",
+    "ogImage": "/realms/NFTClubBerlin/img/logo.png",
+    "website": "http://nftclub.berlin",
+    "twitter": "@NFTClubBerlin"
+  },
+  {
     "symbol": "POOR",
     "displayName": "PoorDao (Famous Fox Edition)",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
