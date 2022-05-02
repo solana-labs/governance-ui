@@ -72,6 +72,15 @@ const themeVariables: IncomingThemeVariables = {
   },
 }
 
+const buttonTheme = {
+  light: {
+    button: `bg-fgd-1 rounded-full py-3 w-full text-white`,
+  },
+  dark: {
+    button: `bg-white rounded-full py-3 w-full text-black`,
+  },
+}
+
 export default function NotificationsSwitch() {
   const { theme } = useTheme()
   const { current: wallet, connection } = useWalletStore()
@@ -122,7 +131,11 @@ export default function NotificationsSwitch() {
 
         <div className="flex w-full justify-center pt-3">
           <button
-            className="bg-white rounded-full py-3 w-full text-black"
+            className={
+              theme === 'Dark'
+                ? buttonTheme.dark.button
+                : buttonTheme.light.button
+            }
             onClick={() =>
               setNotificationStore((state) => {
                 state.modalState = modalState
