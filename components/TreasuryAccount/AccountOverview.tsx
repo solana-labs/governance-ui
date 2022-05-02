@@ -49,6 +49,7 @@ const AccountOverview = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const isNFT = currentAccount?.isNft
   const isSol = currentAccount?.isSol
+  const isSplToken = currentAccount?.type === AccountType.TOKEN
   const isAuxiliaryAccount = currentAccount?.type === AccountType.AuxiliaryToken
   const { canUseTransferInstruction } = useGovernanceAssets()
   const connection = useWalletStore((s) => s.connection)
@@ -205,32 +206,20 @@ const AccountOverview = () => {
             {isNFT ? 'Deposit' : 'Copy Deposit Address'}
           </Button>
         </div>
-        <Button
-          tooltipMessage={
-            !canUseTransferInstruction
-              ? 'You need to have connected wallet with ability to create token transfer proposals'
-              : ''
-          }
-          className="w-full"
-          onClick={() => setTradeSerumInfo({ tokenAccount: currentAccount })}
-          disabled={!canUseTransferInstruction}
-        >
-          Trade On Serum
-        </Button>
-        <Button
-          tooltipMessage={
-            !canUseTransferInstruction
-              ? 'You need to have connected wallet with ability to create token transfer proposals'
-              : isNFT && nftsCount === 0
-              ? 'Please deposit nfts first'
-              : ''
-          }
-          className="w-full"
-          onClick={() => setOpenCommonSendModal(true)}
-          disabled={!canUseTransferInstruction || (isNFT && nftsCount === 0)}
-        >
-          Send
-        </Button>
+        {isSplToken && (
+          <Button
+            tooltipMessage={
+              !canUseTransferInstruction
+                ? 'You need to have connected wallet with ability to create token transfer proposals'
+                : ''
+            }
+            className="w-full"
+            onClick={() => setTradeSerumInfo({ tokenAccount: currentAccount })}
+            disabled={!canUseTransferInstruction}
+          >
+            Trade On Serum
+          </Button>
+        )}
         {!isAuxiliaryAccount && (
           <Button
             tooltipMessage={
