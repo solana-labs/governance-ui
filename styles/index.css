@@ -243,6 +243,11 @@ body::-webkit-scrollbar-corner {
   opacity: 1;
 }
 
+.transition-to-gradient-background:disabled:hover::before,
+.transition-to-white-background:disabled:hover::before {
+  opacity: 0;
+}
+
 .change-image-on-hover:hover .starting-image {
   display: none;
 }

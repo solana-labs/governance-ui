@@ -132,11 +132,7 @@ export default function Step1({ onSubmit, onPrevClick }) {
           </div>
         </Button>
         <div className="flex justify-between w-full mt-8 space-x-8 md:w-fit md:mt-0">
-          <Button
-            type="button"
-            bgOverride="bg-[#201f27]"
-            onClick={() => onPrevClick(1)}
-          >
+          <Button type="button" onClick={() => onPrevClick(1)}>
             <img
               src="/1-Landing-v2/icon-arrow-black.png"
               className="w-6 h-6 mx-2 rotate-180"

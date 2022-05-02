@@ -22,7 +22,7 @@ export const Button: FunctionComponent<ButtonProps> = ({
   bgOverride = '',
   ...props
 }) => {
-  let className = `z-0 relative transition-all duration-300 rounded-full font-serif text-[16px] hover:cursor-pointer opacity-[84] hover:opacity-100 change-image-on-hover `
+  let className = `z-0 relative transition-all duration-300 rounded-full font-serif text-[16px] hover:cursor-pointer disabled:cursor-not-allowed opacity-[84] hover:opacity-100 change-image-on-hover `
 
   if (secondary && !inverse) {
     // secondary
