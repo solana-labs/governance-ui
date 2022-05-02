@@ -20,6 +20,7 @@ import VoteResultStatus from '@components/VoteResultStatus'
 import VoteResults from '@components/VoteResults'
 import { resolveProposalDescription } from '@utils/helpers'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
+import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 
 const Proposal = () => {
   const { realmInfo } = useRealm()
@@ -110,6 +111,7 @@ const Proposal = () => {
 
       <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
         <TokenBalanceCardWrapper proposal={option(proposal?.account)} />
+        <DelegateTokenBalanceCard />
         {showResults ? (
           <div className="bg-bkg-2 rounded-lg">
             <div className="p-4 md:p-6">

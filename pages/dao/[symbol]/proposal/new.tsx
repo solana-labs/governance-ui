@@ -70,6 +70,7 @@ import RealmConfig from './components/instructions/RealmConfig'
 import MakeAddMarketMetadataParams from './components/instructions/Foresight/MakeAddMarketMetadataParams'
 import CloseTokenAccount from './components/instructions/CloseTokenAccount'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
+import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -612,6 +613,7 @@ const New = () => {
       </div>
       <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
         <TokenBalanceCardWrapper />
+        <DelegateTokenBalanceCard />
       </div>
     </div>
   )
