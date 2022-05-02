@@ -11,11 +11,38 @@ import { useTheme } from 'next-themes'
 import useWalletStore from 'stores/useWalletStore'
 import useNotificationStore from 'stores/useNotificationStore'
 import { ModalStates } from 'stores/useNotificationStore'
-// import { Main } from 'next/document'
+import { BellIcon, KeyIcon, MailIcon } from '@heroicons/react/solid'
+import { DeviceMobileIcon } from '@heroicons/react/outline'
 
 const REALMS_PUBLIC_KEY = new anchor.web3.PublicKey(
   'BUxZD6aECR5B5MopyvvYqJxwSKDBhx2jSSo1U32en6mj'
 )
+
+const TagToIcon = {
+  Wallet: <KeyIcon className="float-left h-5 mr-1 w-5" />,
+  Email: <MailIcon className="float-left h-5 mr-1 w-5" />,
+  Text: <DeviceMobileIcon className="float-left h-5 mr-1 w-5" />,
+}
+
+type ChannelType = 'Wallet' | 'Email' | 'Text'
+
+interface NotificationSolutionType {
+  name: string
+  channels: ChannelType[]
+  description: string
+  modalState: ModalStates
+}
+
+const NotificationSolutions: NotificationSolutionType[] = [
+  {
+    name: 'Dialect',
+    channels: ['Wallet', 'Email', 'Text'],
+    description: `Dialect is the first protocol for smart messaging -
+    dynamic, composable dapp notifications and
+    wallet-to-wallet chat`,
+    modalState: ModalStates.Dialect,
+  },
+]
 
 const themeVariables: IncomingThemeVariables = {
   light: {
@@ -55,18 +82,57 @@ export default function NotificationsSwitch() {
 
   const [openModal, setOpenModal] = useState(false)
 
-  // return (
-  //   <NotificationsButton
-  //     wallet={(wallet as unknown) as WalletType}
-  //     network={cluster as string}
-  //     publicKey={REALMS_PUBLIC_KEY}
-  //     theme={theme === 'Dark' ? 'dark' : 'light'}
-  //     variables={themeVariables}
-  //     notifications={[{ name: 'New proposals', detail: 'Event' }]}
-  //   />
-  // )
-  // console.log("bell: ", defaultVariables.dark.icons.bell({}));
-  const BellIcon = defaultVariables.dark.icons.bell
+  const Tag = ({ channelName }: { channelName: ChannelType }) => (
+    <span>
+      <div className="rounded-full bg-bkg-3 px-3 py-1 mr-1">
+        {TagToIcon[channelName]}
+        <p className="inline-block font-xs">{channelName}</p>
+      </div>
+    </span>
+  )
+
+  const NotificationBox = ({
+    name,
+    description,
+    channels,
+    modalState,
+  }: NotificationSolutionType) => (
+    <div className="w-full p-4">
+      <div className="flex flex-col items-center bg-bkg-1 px-12 py-6">
+        <div className="flex w-full justify-between">
+          <div>
+            <h2 className="inline-block">{name}</h2>
+          </div>
+          <div className="flex flex-row">
+            {channels.map((channel) => (
+              <Tag key={channel} channelName={channel} />
+            ))}
+          </div>
+        </div>
+
+        <div className="flex w-full justify-start">
+          <div>
+            <p className="inline-block">{description}</p>
+          </div>
+        </div>
+
+        <div className="flex w-full justify-center pt-3">
+          <button
+            className="bg-white rounded-full py-3 w-full text-black"
+            onClick={() =>
+              setNotificationStore((state) => {
+                state.modalState = modalState
+              })
+            }
+          >
+            Use {name}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+
+  const DialectBellIcon = defaultVariables.dark.icons.bell
 
   return (
     <>
@@ -77,44 +143,18 @@ export default function NotificationsSwitch() {
       >
         {modalState === ModalStates.Selection && (
           <div ref={wrapperRef} className="w-full h-full bg-bkg-3">
-            <div className="h-full flex flex-col items-center py-8">
-              <BellIcon />
-              <h2 className="mb-4">Realms Notifications</h2>
-              <div className="w-full p-4">
-                <div className="flex flex-col items-center bg-bkg-1 px-4 py-6">
-                  <div className="flex w-full justify-between">
-                    <div>
-                      <h2 className="inline-block">Dialect</h2>
-                    </div>
-                    <div>
-                      <p className="inline-block">Wallet</p>
-                    </div>
-                  </div>
-
-                  <div className="flex w-full justify-start">
-                    <div>
-                      <p className="inline-block">
-                        Dialect is the first protocol for smart messaging -
-                        dynamic, composable dapp notifications and
-                        wallet-to-wallet chat
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex w-full justify-center pt-3">
-                    <button
-                      className="bg-white rounded-full py-1 w-full text-black"
-                      onClick={() =>
-                        setNotificationStore((state) => {
-                          state.modalState = ModalStates.Dialect
-                        })
-                      }
-                    >
-                      Use Dialect
-                    </button>
-                  </div>
-                </div>
-              </div>
+            <div className="h-full flex flex-col items-center py-4">
+              <BellIcon className="h-10 ml-2 w-10" />
+              <h2 className="mb-4 pt-4">Realms Notifications</h2>
+              {NotificationSolutions.map((solution) => (
+                <NotificationBox
+                  key={solution.name}
+                  name={solution.name}
+                  description={solution.description}
+                  channels={solution.channels}
+                  modalState={solution.modalState}
+                />
+              ))}
             </div>
           </div>
         )}
@@ -140,7 +180,7 @@ export default function NotificationsSwitch() {
         className="bg-bkg-2 default-transition flex items-center justify-center h-10 rounded-full w-10 hover:bg-bkg-3"
         onClick={() => setOpenModal(!openModal)}
       >
-        <BellIcon />
+        <DialectBellIcon />
       </button>
     </>
   )
