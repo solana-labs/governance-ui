@@ -74,7 +74,7 @@ const themeVariables: IncomingThemeVariables = {
 
 export default function NotificationsSwitch() {
   const { theme } = useTheme()
-  const wrapperRef = useRef(null)
+  const wrapperRef = useRef()
   const { current: wallet, connection } = useWalletStore()
   const cluster = connection.cluster
   const { modalState, set: setNotificationStore } = useNotificationStore(
@@ -140,14 +140,14 @@ export default function NotificationsSwitch() {
   const DialectBellIcon = defaultVariables.dark.icons.bell
 
   return (
-    <>
+    <div className="relative">
       <Transition
         className={defaultVariables.dark.modalWrapper}
         show={openModal}
         {...defaultVariables.animations.popup}
       >
         {modalState === ModalStates.Selection && (
-          <div ref={wrapperRef} className="w-full h-full bg-bkg-3">
+          <div className="w-full h-full bg-bkg-3 absolute top-0 right-0">
             <div className="h-full flex flex-col items-center py-4">
               <BellIcon className="h-10 ml-2 w-10" />
               <h2 className="mb-4 pt-4 font-light">Realms Notifications</h2>
@@ -187,6 +187,6 @@ export default function NotificationsSwitch() {
       >
         <DialectBellIcon />
       </button>
-    </>
+    </div>
   )
 }
