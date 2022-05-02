@@ -5,18 +5,36 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 
 import FormHeader from '../FormHeader'
-import FormField from '../FormField'
+import FormField, { ImageUploader } from '../FormField'
 import Input from '../Input'
 import Button from 'components_2/Button'
+
+// import AdvancedOptionsDropdown from '../AdvancedOptionsDropdown';
+// <AdvancedOptionsDropdown>
+//           <FormField
+//             title="How would you describe your DAO?"
+//             description="What's the best way to communicate the purpose of your DAO and why it's valuable to its members?"
+//             advancedOption
+//           >
+//             <Input
+//               placeholder="e.g. My DAO is..."
+//               data-testid="dao-description-input"
+//               error={errors.daoDescription?.message || ''}
+//               // {...field}
+//             />
+//           </FormField>
+//         </AdvancedOptionsDropdown>
 
 export default function Step1({ onSubmit, onPrevClick }) {
   const { query } = useRouter()
   const schemaObject = {
+    daoAvatar: yup.string().typeError('Required').required('Required'),
     daoName: yup.string().typeError('Required').required('Required'),
     daoDescription: yup.string(),
   }
   const schema = yup.object(schemaObject).required()
   const {
+    getValues,
     setValue,
     control,
     handleSubmit,
@@ -30,7 +48,11 @@ export default function Step1({ onSubmit, onPrevClick }) {
     if (query?.step1 && !Array.isArray(query.step1)) {
       const formData = JSON.parse(query.step1)
       Object.keys(schemaObject).forEach((fieldName) => {
-        setValue(fieldName, formData[fieldName], {
+        const value =
+          fieldName === 'daoAvatar'
+            ? localStorage.getItem(fieldName)
+            : formData[fieldName]
+        setValue(fieldName, value, {
           shouldValidate: true,
           shouldDirty: true,
         })
@@ -39,7 +61,16 @@ export default function Step1({ onSubmit, onPrevClick }) {
   }, [query])
 
   function serializeValues(values) {
+    delete values.daoAvatar
     onSubmit({ step: 1, data: values })
+  }
+
+  function handleAvatarSelect(fileInput) {
+    setValue('daoAvatar', fileInput, {
+      shouldValidate: true,
+      shouldDirty: true,
+    })
+    localStorage.setItem('daoAvatar', fileInput)
   }
 
   return (
@@ -56,6 +87,13 @@ export default function Step1({ onSubmit, onPrevClick }) {
         imgAlt="circles spirling"
       />
       <div className="pt-10 space-y-10 md:space-y-12">
+        <ImageUploader
+          title="Add an avatar"
+          description="The avatar you choose will visually represent your DAO"
+          defaultValue={getValues('daoAvatar')}
+          error={errors.daoAvatar?.message || ''}
+          onSelect={handleAvatarSelect}
+        />
         <Controller
           name="daoName"
           control={control}
@@ -121,7 +159,7 @@ export default function Step1({ onSubmit, onPrevClick }) {
           </Button>
         </FormField>
       </div>
-      <div className="flex flex-wrap items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between pt-20 md:pt-32">
         <Button type="button" tertiary>
           <div className="flex items-center">
             <img src="/1-Landing-v2/icon-faq.png" className="w-6 h-6 mx-2" />
