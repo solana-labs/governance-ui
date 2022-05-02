@@ -3,7 +3,7 @@ import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { NftVoterClient } from '@solana/governance-program-library'
 import { SwitchboardQueueVoterClient } from '../SwitchboardVotePlugin/SwitchboardQueueVoterClient'
 import { getRegistrarPDA, Registrar } from 'VoteStakeRegistry/sdk/accounts'
-import { Provider, Wallet } from '@project-serum/anchor'
+import { AnchorProvider, Wallet } from '@project-serum/anchor'
 import { tryGetNftRegistrar, tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { ConnectionContext } from '@utils/connection'
@@ -67,8 +67,8 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
       ...defaultState,
     },
     handleSetVsrClient: async (wallet, connection) => {
-      const options = Provider.defaultOptions()
-      const provider = new Provider(
+      const options = AnchorProvider.defaultOptions()
+      const provider = new AnchorProvider(
         connection.current,
         (wallet as unknown) as Wallet,
         options
@@ -94,8 +94,8 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
       })
     },
     handleSetNftClient: async (wallet, connection) => {
-      const options = Provider.defaultOptions()
-      const provider = new Provider(
+      const options = AnchorProvider.defaultOptions()
+      const provider = new AnchorProvider(
         connection.current,
         (wallet as unknown) as Wallet,
         options
@@ -121,8 +121,8 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
       })
     },
     handleSetSwitchboardClient: async (wallet, connection) => {
-      const options = Provider.defaultOptions()
-      const provider = new Provider(
+      const options = AnchorProvider.defaultOptions()
+      const provider = new AnchorProvider(
         connection.current,
         (wallet as unknown) as Wallet,
         options

@@ -5,10 +5,15 @@ import { getNfts } from '@utils/tokens'
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 import { PublicKey } from '@solana/web3.js'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
+import useSwitchboardPluginStore from 'SwitchboardVotePlugin/store/switchboardStore'
+import { QUEUE_LIST } from 'SwitchboardVotePlugin/SwitchboardQueueVoterClient'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { getMaxVoterWeightRecord } from '@solana/spl-governance'
 import { getNftMaxVoterWeightRecord } from 'NftVotePlugin/sdk/accounts'
 import { notify } from '@utils/notifications'
+import * as anchor from '@project-serum/anchor'
+import * as sbv2 from '../../switchboardv2-api'
+
 export const vsrPluginsPks: string[] = [
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo',
 ]
@@ -18,7 +23,7 @@ export const nftPluginsPks: string[] = [
 ]
 
 export const switchboardPluginsPks: string[] = [
-  '7PMP6yE6qb3XzBQr5TK2GhuruYayZzBnT8U92ySaLESC',
+  'HFdD2QauAai5W6n36xkt9MUcsNRn1L2WYEMvi5WbnyVJ',
 ]
 
 export function useVotingPlugins() {
@@ -36,13 +41,16 @@ export function useVotingPlugins() {
     setMaxVoterWeight,
     setIsLoadingNfts,
   } = useNftPluginStore()
+  const { setIsLoading, setVotingPower } = useSwitchboardPluginStore()
 
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const connected = useWalletStore((s) => s.connected)
   const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
   const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
-  const switchboardClient = useVotePluginsClientStore((s) => s.state.switchboardClient)
+  const switchboardClient = useVotePluginsClientStore(
+    (s) => s.state.switchboardClient
+  )
   const currentClient = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
@@ -81,6 +89,74 @@ export function useVotingPlugins() {
     }
     setIsLoadingNfts(false)
   }
+  const handleGetSwitchboardVoting = async () => {
+    if (!wallet || !wallet.publicKey || !realm) {
+      return
+    }
+
+    setIsLoading(true)
+
+    try {
+      // go through queues, get governance addresses until current realm + governance combo exists
+      for (const queue of QUEUE_LIST) {
+        if (!wallet || !wallet.publicKey || !realm) {
+          return
+        }
+
+        // get the oracle account associated with wallet
+        const [oracle] = anchor.utils.publicKey.findProgramAddressSync(
+          [
+            Buffer.from('OracleAccountData'),
+            queue.toBuffer(),
+            wallet.publicKey?.toBuffer(),
+          ],
+          sbv2.SBV2_MAINNET_PID
+        )
+
+        // get VWR from the oracle
+        const [
+          voterWeightRecord,
+        ] = anchor.utils.publicKey.findProgramAddressSync(
+          [Buffer.from('VoterWeightRecord'), oracle.toBytes()],
+          sbv2.SBV2_MAINNET_PID
+        )
+
+        // find the governance for this realm / queue
+        const [governance] = anchor.utils.publicKey.findProgramAddressSync(
+          [
+            Buffer.from('account-governance'),
+            realm.pubkey.toBuffer(),
+            queue.toBuffer(),
+          ],
+          sbv2.SBV2_MAINNET_PID // @QUESTION - this param is probably wrong - what should go here?
+        )
+
+        const [
+          voterWeight,
+          governanceAccount,
+        ] = await connection.current.getMultipleAccountsInfo([
+          voterWeightRecord,
+          governance,
+        ])
+
+        // does current realm / governance resolve (at all), does VWR exist
+        if (governanceAccount && voterWeight) {
+          // get voting power
+          setVotingPower(new anchor.BN(1))
+        } else {
+          // 'no sb governance'
+        }
+      }
+    } catch (e) {
+      console.log(e)
+      notify({
+        message: "Something went wrong can't fetch switchboard voting power",
+        type: 'error',
+      })
+    }
+    setIsLoading(false)
+  }
+
   const handleMaxVoterWeight = async () => {
     const { maxVoterWeightRecord } = await getNftMaxVoterWeightRecord(
       realm!.pubkey,
@@ -159,7 +235,7 @@ export function useVotingPlugins() {
       ) {
         // Switchboard: don't think we need this
         //handleSetNftRegistrar(nftClient!, realm)
-        console.log("Switchboard");
+        console.log('Switchboard')
         if (connected) {
           handleSetCurrentRealmVotingClient({
             client: switchboardClient,
@@ -187,12 +263,14 @@ export function useVotingPlugins() {
     connected,
   ])
   useEffect(() => {
+    handleGetSwitchboardVoting()
     if (usedCollectionsPks.length && realm) {
       if (connected && currentClient.walletPk?.toBase58()) {
         handleGetNfts()
       }
-
       handleMaxVoterWeight()
+    } else if (realm) {
+      handleGetSwitchboardVoting()
     } else {
       setVotingNfts([], currentClient, nftMintRegistrar)
       setMaxVoterWeight(null)

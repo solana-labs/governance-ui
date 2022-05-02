@@ -1,6 +1,6 @@
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { Wallet } from '@marinade.finance/marinade-ts-sdk'
-import { BN, Provider } from '@project-serum/anchor'
+import { BN, AnchorProvider } from '@project-serum/anchor'
 import { AccountMetaData } from '@solana/spl-governance'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import { fmtMintAmount } from '@tools/sdk/units'
@@ -52,8 +52,8 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
         accounts: AccountMetaData[]
       ) => {
         try {
-          const options = Provider.defaultOptions()
-          const provider = new Provider(
+          const options = AnchorProvider.defaultOptions()
+          const provider = new AnchorProvider(
             connection,
             new Wallet(Keypair.generate()),
             options
@@ -112,8 +112,8 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
       ],
       getDataUI: async (connection: Connection, data: Uint8Array) => {
         try {
-          const options = Provider.defaultOptions()
-          const provider = new Provider(
+          const options = AnchorProvider.defaultOptions()
+          const provider = new AnchorProvider(
             connection,
             new Wallet(Keypair.generate()),
             options
@@ -190,8 +190,8 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
         accounts: AccountMetaData[]
       ) => {
         try {
-          const options = Provider.defaultOptions()
-          const provider = new Provider(
+          const options = AnchorProvider.defaultOptions()
+          const provider = new AnchorProvider(
             connection,
             new Wallet(Keypair.generate()),
             options
