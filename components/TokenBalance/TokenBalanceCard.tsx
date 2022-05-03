@@ -411,6 +411,7 @@ const TokenDeposit = ({
           Deposit
         </Button>
 
+        {/* asdfads */}
         <Button
           tooltipMessage={withdrawTooltipContent}
           className="sm:w-1/2"
@@ -418,7 +419,9 @@ const TokenDeposit = ({
             !connected ||
             !hasTokensDeposited ||
             (!councilVote && toManyCommunityOutstandingProposalsForUser) ||
-            toManyCouncilOutstandingProposalsForUse
+            toManyCouncilOutstandingProposalsForUse ||
+            wallet?.publicKey?.toBase58() !==
+              depositTokenRecord.account.governingTokenOwner.toBase58()
           }
           onClick={withdrawAllTokens}
         >
