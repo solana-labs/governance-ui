@@ -261,7 +261,7 @@ const REALM = () => {
             selectedProposal.proposalPk,
             selectedProposal.proposal.tokenOwnerRecord,
             ownTokenRecord.pubkey,
-            governanceAuthority, // governance authority
+            governanceAuthority,
             selectedProposal.proposal.governingTokenMint,
             Vote.fromYesNoVote(vote),
             payer,

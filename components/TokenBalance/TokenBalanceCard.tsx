@@ -411,7 +411,6 @@ const TokenDeposit = ({
           Deposit
         </Button>
 
-        {/* asdfads */}
         <Button
           tooltipMessage={withdrawTooltipContent}
           className="sm:w-1/2"
