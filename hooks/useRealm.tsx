@@ -42,6 +42,12 @@ export default function useRealm() {
   const nftVotingPower = useNftPluginStore((s) => s.state.votingPower)
   const [realmInfo, setRealmInfo] = useState<RealmInfo | undefined>(undefined)
   const delegates = useMembersStore((s) => s.compact.delegates)
+  const selectedCouncilDelegate = useWalletStore(
+    (s) => s.selectedCouncilDelegate
+  )
+  const selectedCommunityDelegate = useWalletStore(
+    (s) => s.selectedCommunityDelegate
+  )
 
   useMemo(async () => {
     let realmInfo = isPublicKey(symbol as string)
@@ -70,13 +76,19 @@ export default function useRealm() {
     [realm, tokenAccounts]
   )
 
-  const ownTokenRecord = useMemo(
-    () =>
-      wallet?.connected && wallet.publicKey
-        ? tokenRecords[wallet.publicKey.toBase58()]
-        : undefined,
-    [tokenRecords, wallet, connected]
-  )
+  const ownTokenRecord = useMemo(() => {
+    if (wallet?.connected && wallet.publicKey) {
+      if (
+        selectedCommunityDelegate &&
+        tokenRecords[selectedCommunityDelegate]
+      ) {
+        return tokenRecords[selectedCommunityDelegate]
+      }
+
+      return tokenRecords[wallet.publicKey.toBase58()]
+    }
+    return undefined
+  }, [tokenRecords, wallet, connected, selectedCommunityDelegate])
 
   // returns array of community tokenOwnerRecords that connected wallet has been delegated
   const ownDelegateTokenRecords = useMemo(() => {
@@ -109,20 +121,25 @@ export default function useRealm() {
     [realm, tokenAccounts]
   )
 
-  const ownCouncilTokenRecord = useMemo(
-    () =>
-      wallet?.connected && councilMint && wallet.publicKey
-        ? councilTokenOwnerRecords[wallet.publicKey.toBase58()]
-        : undefined,
-    [tokenRecords, wallet, connected]
-  )
+  const ownCouncilTokenRecord = useMemo(() => {
+    if (wallet?.connected && councilMint && wallet.publicKey) {
+      if (
+        selectedCouncilDelegate &&
+        councilTokenOwnerRecords[selectedCouncilDelegate]
+      ) {
+        return councilTokenOwnerRecords[selectedCouncilDelegate]
+      }
+
+      return councilTokenOwnerRecords[wallet.publicKey.toBase58()]
+    }
+    return undefined
+  }, [tokenRecords, wallet, connected, selectedCouncilDelegate])
 
   // returns array of council tokenOwnerRecords that connected wallet has been delegated
   const ownDelegateCouncilTokenRecords = useMemo(() => {
     if (wallet?.connected && councilMint && wallet.publicKey) {
       const walletId = wallet.publicKey.toBase58()
       const delegatedWallets = delegates && delegates[walletId]
-      console.log('delegated wallets', delegatedWallets)
       if (delegatedWallets?.councilMembers) {
         const councilTokenRecords = delegatedWallets.councilMembers.map(
           (member) => {
