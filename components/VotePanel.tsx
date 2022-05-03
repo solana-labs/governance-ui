@@ -48,8 +48,18 @@ const VotePanel = () => {
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
   const maxVoterWeight =
     useNftPluginStore((s) => s.state.maxVoteRecord)?.pubkey || undefined
+
+  // Handle state based on if a delegated wallet has already voted or not
   const ownVoteRecord =
-    wallet?.publicKey && voteRecordsByVoter[wallet.publicKey.toBase58()]
+    tokenType === GoverningTokenType.Community && ownTokenRecord
+      ? voteRecordsByVoter[
+          ownTokenRecord.account.governingTokenOwner.toBase58()
+        ]
+      : ownCouncilTokenRecord
+      ? voteRecordsByVoter[
+          ownCouncilTokenRecord.account.governingTokenOwner.toBase58()
+        ]
+      : wallet?.publicKey && voteRecordsByVoter[wallet.publicKey.toBase58()]
 
   const voterTokenRecord =
     tokenType === GoverningTokenType.Community
