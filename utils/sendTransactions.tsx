@@ -11,6 +11,15 @@ import {
   Keypair,
 } from '@solana/web3.js'
 
+interface TransactionInstructionWithType {
+  instructionsSet: TransactionInstruction[]
+  sequenceType?: SequenceType
+}
+interface TransactionsPlayingIndexes {
+  transactionsIdx: number[]
+  sequenceType?: SequenceType
+}
+
 // TODO: sendTransactions() was imported from Oyster as is and needs to be reviewed and updated
 // In particular common primitives should be unified with send.tsx and also ensure the same resiliency mechanism
 // is used for monitoring transactions status and timeouts
@@ -333,4 +342,95 @@ export const sendTransactions = async (
   }
 
   return signedTxns.length
+}
+
+/////////////////////////////////////////
+export const sendTransactionsV2 = async (
+  connection: Connection,
+  wallet: WalletSigner,
+  TransactionInstructions: TransactionInstructionWithType[],
+  signersSet: Keypair[][],
+  commitment: Commitment = 'singleGossip',
+  block?: {
+    blockhash: string
+  }
+): Promise<null> => {
+  if (!wallet.publicKey) throw new Error('Wallet not connected!')
+  const startBlock = await connection.getLatestBlockhash(commitment)
+  if (!block) {
+    block = await connection.getLatestBlockhash(commitment)
+  }
+
+  const unsignedTxns: Transaction[] = []
+  const transactionsPlayer: TransactionsPlayingIndexes[] = []
+  for (let i = 0; i < TransactionInstructions.length; i++) {
+    const transactionInstruction = TransactionInstructions[i]
+    const signers = signersSet[i]
+
+    if (transactionInstruction.instructionsSet.length === 0) {
+      continue
+    }
+
+    const transaction = new Transaction({ feePayer: wallet.publicKey })
+    transactionInstruction.instructionsSet.forEach((instruction) =>
+      transaction.add(instruction)
+    )
+    transaction.recentBlockhash = startBlock.blockhash
+
+    if (signers.length > 0) {
+      transaction.partialSign(...signers)
+    }
+    const currentUnsignedTxIdx = unsignedTxns.length
+    const currentTransactionPlayingOrder =
+      transactionsPlayer[transactionsPlayer.length - 1]
+    if (
+      currentTransactionPlayingOrder &&
+      currentTransactionPlayingOrder.sequenceType ===
+        transactionInstruction.sequenceType
+    ) {
+      currentTransactionPlayingOrder.transactionsIdx.push(currentUnsignedTxIdx)
+    } else {
+      transactionsPlayer.push({
+        transactionsIdx: [currentUnsignedTxIdx],
+        sequenceType: transactionInstruction.sequenceType,
+      })
+    }
+    unsignedTxns.push(transaction)
+  }
+  console.log(transactionsPlayer)
+  const signedTxns = await wallet.signAllTransactions(unsignedTxns)
+  for (const fcn of transactionsPlayer) {
+    if (
+      typeof fcn.sequenceType === 'undefined' ||
+      fcn.sequenceType === SequenceType.Parallel
+    ) {
+      await Promise.all(
+        fcn.transactionsIdx.map((x) =>
+          sendSignedTransaction({
+            connection,
+            signedTransaction: signedTxns[x],
+          })
+        )
+      )
+    }
+    if (fcn.sequenceType === SequenceType.Sequential) {
+      for (const innerFcn of fcn.transactionsIdx) {
+        await sendSignedTransaction({
+          connection,
+          signedTransaction: signedTxns[innerFcn],
+        })
+      }
+    }
+  }
+  return null
+}
+
+export const transactionInstructionsToTypedInstructionsSets = (
+  instructionsSet: TransactionInstruction[],
+  type: SequenceType
+): TransactionInstructionWithType => {
+  return {
+    instructionsSet: instructionsSet,
+    sequenceType: type,
+  }
 }
