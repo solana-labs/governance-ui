@@ -55,6 +55,7 @@ export default function Step2({ onSubmit, onPrevClick }) {
   const { query } = useRouter()
   const [pasteBuffer, setPasteBuffer] = useState<string[]>([])
   const [inviteList, setInviteList] = useState<string[]>([])
+  const [validationError, setValidationError] = useState<string>('')
   const schemaObject = {
     daoMembers: yup
       .array()
@@ -84,7 +85,11 @@ export default function Step2({ onSubmit, onPrevClick }) {
           shouldDirty: true,
         })
       })
-      setInviteList(formData.daoMembers || [])
+      setInviteList(
+        formData?.daoMembers?.filter((wallet) => {
+          return validateSolAddress(wallet)
+        }) || []
+      )
     }
   }, [query])
 
@@ -100,18 +105,19 @@ export default function Step2({ onSubmit, onPrevClick }) {
   }
 
   function handlePaste(ev) {
-    ev.preventDefault()
+    setValidationError('')
     const validPastedAddrsses = validateInput(ev.clipboardData.getData('text'))
-    if (validPastedAddrsses.length > 0 && inputElement?.current) {
-      inputElement.current.value = validPastedAddrsses.pop() || ''
+    if (validPastedAddrsses.length === 0) {
+      return setValidationError('Invalid wallet address')
+    } else {
+      ev.preventDefault()
     }
-
-    const updatedPasteBuffer = new Set([...pasteBuffer, ...validPastedAddrsses])
-    setPasteBuffer([...updatedPasteBuffer])
-    console.log('paste', updatedPasteBuffer)
+    const fullAddressSet = new Set([...inviteList, ...validPastedAddrsses])
+    setInviteList([...fullAddressSet])
   }
 
   function handleKeyDown(ev) {
+    setValidationError('')
     if (ev.defaultPrevented) {
       return // Do nothing if the event was already processed
     }
@@ -130,13 +136,17 @@ export default function Step2({ onSubmit, onPrevClick }) {
   }
 
   function addAddressesToInviteList() {
+    setValidationError('')
     const inputString = inputElement?.current?.value
     if (inputString) {
-      const validatedAddressList = validateInput(inputString)
+      const validatedAddress = validateInput(inputString)
+      if (validatedAddress.length === 0) {
+        return setValidationError('Invalid wallet address')
+      }
       const fullAddressSet = new Set([
         ...inviteList,
         ...pasteBuffer,
-        ...validatedAddressList,
+        ...validatedAddress,
       ])
       setPasteBuffer([])
       setInviteList([...fullAddressSet])
@@ -207,7 +217,7 @@ export default function Step2({ onSubmit, onPrevClick }) {
             placeholder="e.g. CWvWQWt5mTv7Zx..."
             data-testid="dao-member-list-input"
             ref={inputElement}
-            error={errors.daoName?.message || ''}
+            error={errors.daoName?.message || validationError}
             onPaste={handlePaste}
             onKeyDown={handleKeyDown}
             defaultValue={userAddress}
@@ -224,26 +234,28 @@ export default function Step2({ onSubmit, onPrevClick }) {
         </FormField>
       </div>
 
-      {isUserDAOMember && (
-        <div className="flex flex-col pt-15">
-          <h3 className="mb-3 text-xl font-light">1 Member</h3>
-          <InviteAddress
-            address={userAddress}
-            currentUser
-            index={0}
-            onRemoveClick={() => removeAddressFromInviteList(userAddress)}
-          />
-        </div>
-      )}
       <div className="flex flex-col mt-16">
         <h3 className="text-xl font-light">
-          {inviteList.filter((address) => address != userAddress).length}{' '}
-          Pending Invites
+          {inviteList.length}{' '}
+          {inviteList.length === 0 || inviteList.length > 1
+            ? 'Addresses'
+            : 'Address'}
         </h3>
         <div className="text-sm opacity-60">
-          Pending invitees must connect their wallet to Realms to become members
+          Once the process is complete, users must connect their wallet to
+          Realms to become DAO members
         </div>
-        {inviteList.filter((address) => address != userAddress).length > 0 ? (
+        {isUserDAOMember && (
+          <div className="flex flex-col mt-8">
+            <InviteAddress
+              address={userAddress}
+              currentUser
+              index={0}
+              onRemoveClick={() => removeAddressFromInviteList(userAddress)}
+            />
+          </div>
+        )}
+        {inviteList.length > 0 ? (
           inviteList
             .filter((address) => address != userAddress)
             .map((address, index) => {
@@ -260,7 +272,7 @@ export default function Step2({ onSubmit, onPrevClick }) {
         ) : (
           <div className="bg-[#201f27] text-lg mt-3 rounded flex flex-col justify-center items-center text-center px-20 py-10">
             <div className="text-5xl">📭</div>
-            <div>You have not added any members yet...</div>
+            <div>You have not added any addresses yet...</div>
           </div>
         )}
       </div>
