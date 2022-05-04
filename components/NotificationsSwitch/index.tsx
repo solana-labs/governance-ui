@@ -22,8 +22,8 @@ const REALMS_PUBLIC_KEY = new anchor.web3.PublicKey(
 )
 
 export function useOutsideAlerter(
-  ref: React.MutableRefObject<null>,
-  bellRef: React.MutableRefObject<null>,
+  ref: React.MutableRefObject<Element | null>,
+  bellRef: React.MutableRefObject<Element | null>,
   setOpen: CallableFunction
 ) {
   useEffect(() => {
@@ -31,11 +31,14 @@ export function useOutsideAlerter(
      * Alert if clicked on outside of element
      */
     function handleClickOutside(event: MouseEvent) {
+      if (event.target instanceof Element) {
+        return
+      }
       if (
         ref.current &&
-        !ref.current.contains(event.target) &&
+        !ref?.current.contains(event.target as Element) &&
         bellRef.current &&
-        !bellRef.current.contains(event.target)
+        !bellRef?.current.contains(event.target as Element)
       ) {
         setOpen(false)
       }
@@ -57,7 +60,7 @@ const TagToIcon = {
   Telegram: <TelegramIcon className="float-left h-3 mr-1 w-3" />,
 }
 
-type ChannelType = 'Wallet' | 'Email' | 'Text'
+type ChannelType = 'Wallet' | 'Email' | 'Text' | 'Telegram'
 
 interface NotificationSolutionType {
   name: string
