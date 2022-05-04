@@ -2,7 +2,7 @@ import React from 'react'
 import useRealm from 'hooks/useRealm'
 
 const AboutRealm = () => {
-  const { realmInfo, realmDisplayName, mint } = useRealm()
+  const { realmInfo, realmDisplayName, symbol } = useRealm()
 
   return (
     <div className="pb-4 space-y-3">
@@ -10,10 +10,12 @@ const AboutRealm = () => {
         <p className="text-xs text-fgd-3">Name</p>
         <p className="text-fgd-1">{realmDisplayName || symbol}</p>
       </div>
-      <div>
-        <p className="text-xs text-fgd-3">Token</p>
-        <p className="text-fgd-1">{mint}</p>
-      </div>
+      {realmInfo?.isCertified ? (
+        <div>
+          <p className="text-xs text-fgd-3">Token</p>
+          <p className="text-fgd-1">{symbol}</p>
+        </div>
+      ) : null}
       {realmInfo?.website ? (
         <div>
           <p className="text-xs text-fgd-3">Website</p>
