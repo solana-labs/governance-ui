@@ -37,6 +37,10 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import Link from 'next/link'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { vsrPluginsPks } from '@hooks/useVotingPlugins'
+import {
+  LOCALNET_REALM_ID as PYTH_LOCALNET_REALM_ID,
+  PythBalance,
+} from 'pyth-staking-api'
 
 const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   const { councilMint, mint, realm, symbol } = useRealm()
@@ -143,12 +147,14 @@ const TokenDeposit = ({
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
   const connection = useWalletStore((s) => s.connection.current)
+  const cluster = useWalletStore((s) => s.connection.cluster)
   const { fetchWalletTokenAccounts, fetchRealm } = useWalletStore(
     (s) => s.actions
   )
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
+  const pythClient = useVotePluginsClientStore((s) => s.state.pythClient)
   const maxVoterWeight =
     useNftPluginStore((s) => s.state.maxVoteRecord)?.pubkey || undefined
   const {
@@ -157,6 +163,7 @@ const TokenDeposit = ({
     realmTokenAccount,
     ownTokenRecord,
     ownCouncilTokenRecord,
+    ownVoterWeight,
     councilTokenAccount,
     proposals,
     governances,
@@ -366,7 +373,9 @@ const TokenDeposit = ({
     : ''
 
   const availableTokens =
-    depositTokenRecord && mint
+    realmInfo?.realmId.toBase58() === PYTH_LOCALNET_REALM_ID.toBase58()
+      ? new PythBalance(ownVoterWeight.votingPower!).toString()
+      : depositTokenRecord && mint
       ? fmtMintAmount(
           mint,
           depositTokenRecord.account.governingTokenDepositAmount
@@ -393,38 +402,43 @@ const TokenDeposit = ({
         </div>
       </div>
 
-      <p
-        className={`mt-2 opacity-70 mb-4 ml-1 text-xs ${
-          canShowAvailableTokensMessage ? 'block' : 'hidden'
-        }`}
-      >
-        You have {tokensToShow} tokens available to {canExecuteAction}.
-      </p>
+      {realmInfo?.realmId.toBase58() ===
+      PYTH_LOCALNET_REALM_ID.toBase58() ? null : (
+        <>
+          <p
+            className={`mt-2 opacity-70 mb-4 ml-1 text-xs ${
+              canShowAvailableTokensMessage ? 'block' : 'hidden'
+            }`}
+          >
+            You have {tokensToShow} tokens available to {canExecuteAction}.
+          </p>
 
-      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-6">
-        <Button
-          tooltipMessage={depositTooltipContent}
-          className="sm:w-1/2"
-          disabled={!connected || !hasTokensInWallet}
-          onClick={depositAllTokens}
-        >
-          Deposit
-        </Button>
+          <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-6">
+            <Button
+              tooltipMessage={depositTooltipContent}
+              className="sm:w-1/2"
+              disabled={!connected || !hasTokensInWallet}
+              onClick={depositAllTokens}
+            >
+              Deposit
+            </Button>
 
-        <Button
-          tooltipMessage={withdrawTooltipContent}
-          className="sm:w-1/2"
-          disabled={
-            !connected ||
-            !hasTokensDeposited ||
-            (!councilVote && toManyCommunityOutstandingProposalsForUser) ||
-            toManyCouncilOutstandingProposalsForUse
-          }
-          onClick={withdrawAllTokens}
-        >
-          Withdraw
-        </Button>
-      </div>
+            <Button
+              tooltipMessage={withdrawTooltipContent}
+              className="sm:w-1/2"
+              disabled={
+                !connected ||
+                !hasTokensDeposited ||
+                (!councilVote && toManyCommunityOutstandingProposalsForUser) ||
+                toManyCouncilOutstandingProposalsForUse
+              }
+              onClick={withdrawAllTokens}
+            >
+              Withdraw
+            </Button>
+          </div>
+        </>
+      )}
       {config?.account.communityVoterWeightAddin &&
         vsrPluginsPks.includes(
           config?.account.communityVoterWeightAddin.toBase58()
