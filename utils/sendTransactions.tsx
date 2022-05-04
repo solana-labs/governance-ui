@@ -53,15 +53,14 @@ async function awaitTransactionSignatureConfirmation(
   connection: Connection,
   commitment: Commitment = 'recent',
   queryStatus = false,
-  startingBlock?: Block
+  startingBlock: Block
 ) {
   //If the validator can’t find a slot number for the blockhash
   //or if the looked up slot number is more than 151 slots lower
   // than the slot number of the block being processed, the transaction will be rejected.
   const timeoutBlockPeriod = 152
-  const timeoutBlockHeight = startingBlock
-    ? startingBlock.lastValidBlockHeight + timeoutBlockPeriod
-    : 0
+  const timeoutBlockHeight =
+    startingBlock.lastValidBlockHeight + timeoutBlockPeriod
   console.log('Start block height', startingBlock?.lastValidBlockHeight)
   console.log('Possible timeout block', timeoutBlockHeight)
   let done = false
@@ -230,7 +229,7 @@ export async function sendSignedTransaction({
   sentMessage?: string
   successMessage?: string
   timeout?: number
-  block?: Block
+  block: Block
 }): Promise<{ txid: string; slot: number }> {
   const rawTransaction = signedTransaction.serialize()
   const startTime = getUnixTs()
@@ -317,9 +316,7 @@ export const sendTransactions = async (
   successCallback: (txid: string, ind: number) => void = (_txid, _ind) => null,
   failCallback: (reason: string, ind: number) => boolean = (_txid, _ind) =>
     false,
-  block?: {
-    blockhash: string
-  }
+  block?: Block
 ): Promise<number> => {
   if (!wallet.publicKey) throw new Error('Wallet not connected!')
 
@@ -359,6 +356,7 @@ export const sendTransactions = async (
     const signedTxnPromise = sendSignedTransaction({
       connection,
       signedTransaction: signedTxns[i],
+      block: block,
     })
 
     signedTxnPromise
@@ -476,7 +474,7 @@ export const sendTransactionsV2 = async (
           sendSignedTransaction({
             connection,
             signedTransaction: signedTxns[x],
-            block,
+            block: block!,
           })
         )
       )
@@ -486,7 +484,7 @@ export const sendTransactionsV2 = async (
         await sendSignedTransaction({
           connection,
           signedTransaction: signedTxns[innerFcn],
-          block,
+          block: block!,
         })
       }
     }
