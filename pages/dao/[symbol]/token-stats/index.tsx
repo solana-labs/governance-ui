@@ -5,7 +5,7 @@ import { MANGO_DAO_TREASURY } from '@components/instructions/tools'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import { SearchIcon, UserCircleIcon } from '@heroicons/react/outline'
 import useRealm from '@hooks/useRealm'
-import { BN } from '@project-serum/anchor'
+import { BN, BorshInstructionCoder } from '@project-serum/anchor'
 import {
   GovernanceAccountType,
   InstructionExecutionStatus,
@@ -221,9 +221,10 @@ const LockTokenStats = () => {
                 x.accounts[9].pubkey.toBase58() === MANGO_MINT
             )
             .map((instruction) => {
-              const data = vsrClient?.program.coder.instruction.decode(
-                Buffer.from(instruction.data)
-              )?.data as GrantInstruction | null
+              const data = new BorshInstructionCoder(
+                vsrClient!.program.idl
+              ).decode(Buffer.from(instruction.data))
+                ?.data as GrantInstruction | null
 
               return {
                 voterPk: instruction.accounts[1].pubkey,

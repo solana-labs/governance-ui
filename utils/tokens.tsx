@@ -377,9 +377,12 @@ export const getNfts = async (connection: Connection, ownerPk: PublicKey) => {
     for (let i = 0; i < data.length; i++) {
       try {
         const val = (await axios.get(data[i].data.uri)).data
-        const tokenAccount = tokenAccounts.find(
-          (x) => x.account.mint.toBase58() === data[i].mint
-        )
+        const tokenAccount = tokenAccounts.find((x) => {
+          return (
+            x.account.mint.toBase58() === data[i].mint &&
+            x.account.amount.cmpn(0) === 1
+          )
+        })
         if (tokenAccount) {
           arr.push({
             val,

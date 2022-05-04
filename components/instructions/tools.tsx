@@ -18,6 +18,7 @@ import { VOTE_STAKE_REGISTRY_INSTRUCTIONS } from './programs/voteStakeRegistry'
 import { MARINADE_INSTRUCTIONS } from './programs/marinade'
 import { SOLEND_PROGRAM_INSTRUCTIONS } from './programs/solend'
 import { ATA_PROGRAM_INSTRUCTIONS } from './programs/associatedTokenAccount'
+import { governance as foresightGov } from '@foresight-tmp/foresight-sdk'
 import { ConnectionContext } from '@utils/connection'
 import { NFT_VOTER_INSTRUCTIONS } from './programs/nftVotingClient'
 /**
@@ -62,6 +63,8 @@ export const ACCOUNT_NAMES = {
     'Mango v3 BTC-PERP Incentive Vault',
   '7Gm5zF6FNJpyhqdwKcEdMQw3r5YzitYUGVDKYMPT1cMy': 'Mango V3 Admin Key',
   MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac: 'MNGO Token Mint',
+  H7uqouPsJkeEiLpCEoC1qYVVquDrZan6ZfdPK2gS44zm: 'FORE Token Mint',
+  [foresightGov.DEVNET_TREASURY.toBase58()]: 'Foresight Devnet Governance',
   EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: 'USDC Token Mint',
 
   MyHd6a7HWKTMeJMHBkrbMq4hZwZxwn9x7dxXcopQ4Wd: 'OMH Token',
@@ -180,6 +183,18 @@ const HIDDEN_MNGO_TREASURES = [
   'FrkLPsCadx4tE4qDobbu2GTD5ffjWBpormHbLLy35PUS',
   'CaoFkVyPJugKMdzDT1NGnsQJ8dWe4kZFaETCbtWz1QBr',
 ]
+
+//owner and desired accounts we want to show
+export const MNGO_AUXILIARY_TOKEN_ACCOUNTS = [
+  {
+    owner: '9BVcYqEQxyccuwznvxXqDkSJFavvTyheiTYk231T1A8S',
+    accounts: ['59BEyxwrFpt3x4sZ7TcXC3bHx3seGfqGkATcDx6siLWy'],
+  },
+]
+
+export const AUXILIARY_TOKEN_ACCOUNTS = {
+  Mango: MNGO_AUXILIARY_TOKEN_ACCOUNTS,
+}
 
 export const HIDDEN_TREASURES = [...HIDDEN_MNGO_TREASURES]
 

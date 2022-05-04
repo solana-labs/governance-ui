@@ -54,19 +54,16 @@ export const withVoteRegistryDeposit = async ({
     communityMintPk,
     client,
   })
-  const depositInstruction = client?.program.instruction.deposit(
-    depositIdx,
-    amount,
-    {
-      accounts: {
-        registrar: registrar,
-        voter: voter,
-        vault: voterATAPk,
-        depositToken: fromPk,
-        depositAuthority: walletPk,
-        tokenProgram: TOKEN_PROGRAM_ID,
-      },
-    }
-  )
+  const depositInstruction = await client?.program.methods
+    .deposit(depositIdx, amount)
+    .accounts({
+      registrar: registrar,
+      voter: voter,
+      vault: voterATAPk,
+      depositToken: fromPk,
+      depositAuthority: walletPk,
+      tokenProgram: TOKEN_PROGRAM_ID,
+    })
+    .instruction()
   instructions.push(depositInstruction)
 }

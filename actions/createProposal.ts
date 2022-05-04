@@ -12,6 +12,7 @@ import {
   Governance,
   ProgramAccount,
   Realm,
+  TokenOwnerRecord,
   VoteType,
   withCreateProposal,
 } from '@solana/spl-governance'
@@ -61,7 +62,7 @@ export const createProposal = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
   realm: ProgramAccount<Realm>,
   governance: PublicKey,
-  tokenOwnerRecord: PublicKey,
+  tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>,
   name: string,
   descriptionLink: string,
   governingTokenMint: PublicKey,
@@ -99,6 +100,7 @@ export const createProposal = async (
   //will run only if plugin is connected with realm
   const plugin = await client?.withUpdateVoterWeightRecord(
     instructions,
+    tokenOwnerRecord,
     'createProposal'
   )
 
@@ -108,7 +110,7 @@ export const createProposal = async (
     programVersion,
     realm.pubkey!,
     governance,
-    tokenOwnerRecord,
+    tokenOwnerRecord.pubkey,
     name,
     descriptionLink,
     governingTokenMint,
@@ -126,7 +128,7 @@ export const createProposal = async (
     programId,
     programVersion,
     proposalAddress,
-    tokenOwnerRecord,
+    tokenOwnerRecord.pubkey,
     governanceAuthority,
     signatory,
     payer
@@ -157,7 +159,7 @@ export const createProposal = async (
         programVersion,
         governance,
         proposalAddress,
-        tokenOwnerRecord,
+        tokenOwnerRecord.pubkey,
         governanceAuthority,
         index,
         0,
