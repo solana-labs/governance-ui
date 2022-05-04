@@ -1,6 +1,6 @@
 import { Fragment } from 'react'
 import { Disclosure, Transition } from '@headlessui/react'
-import GradientTitle from '../../../components_2/GradientTitle'
+import GradientTitle from '../../../components_2/Gradient'
 
 export const FaqPanel = ({ question, answer }) => {
   return (

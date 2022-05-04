@@ -1,3 +1,5 @@
+import { H4 } from './Header'
+
 export const IconInfoBox = ({ imgSrc, title, children }) => {
   return (
     <div className="flex items-start space-x-4 md:flex-col md:space-x-0">
@@ -7,7 +9,7 @@ export const IconInfoBox = ({ imgSrc, title, children }) => {
         alt="icon"
       />
       <div>
-        <h3 className="text-lg font-normal md:text-xl">{title}</h3>
+        <H4>{title}</H4>
         {children}
       </div>
     </div>

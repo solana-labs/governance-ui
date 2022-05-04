@@ -1,4 +1,4 @@
-import GradientTitle from '../../../components_2/GradientTitle'
+import Gradient from '../../../components_2/Gradient'
 import {
   MetricsBoxPlus,
   MetricsBoxDollar,
@@ -9,7 +9,7 @@ const RealmsMetrics = () => {
     <div className="pt-12 md:pt-32 pb-14 md:pb-36">
       <div className="flex flex-col md:flex-row">
         <div className="w-full md:w-1/2">
-          <GradientTitle>Key Metrics on Realms</GradientTitle>
+          <Gradient>Key Metrics on Realms</Gradient>
         </div>
 
         <div className="w-full md:w-1/2 pt-7 md:pt-0">

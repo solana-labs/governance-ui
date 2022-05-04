@@ -1,4 +1,4 @@
-import GradientTitle from '../../../components_2/GradientTitle'
+import { GradientH2, H4 } from '../../../components_2/Header'
 
 const OptionsBox = ({
   imgSrc,
@@ -26,7 +26,7 @@ const OptionsBox = ({
         />
       </div>
       <div className="w-full text-center md:w-1/2 md:text-left md:px-16">
-        <h3 className="mb-4 font-normal">{title}</h3>
+        <H4 className="mb-4">{title}</H4>
         <div className="front-light opacity-70">{description}</div>
       </div>
     </div>
@@ -72,7 +72,7 @@ const WhatRealmsCanDo = () => {
   return (
     <div className="pb-20 pt-9 md:pt-24">
       <div className="text-center">
-        <GradientTitle>What you can do on Realms</GradientTitle>
+        <GradientH2>What you can do on Realms</GradientH2>
       </div>
       <div className="space-y-20 pt-14 md:pt-20">
         {ListOfPros.map((props) => (

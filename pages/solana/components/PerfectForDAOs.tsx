@@ -1,13 +1,13 @@
-import GradientTitle from '../../../components_2/GradientTitle'
 import { IconInfoBox } from '../../../components_2/IconInfoBox'
+import { GradientH2 } from '../../../components_2/Header'
 
 export default function PerfectForDAOs() {
   return (
     <div className="pt-10 pb-9 md:pt-20 md:pb-24">
       <div className="flex flex-wrap">
         <div className="w-full mb-10 text-center md:w-1/3 md:mb-0 md:pr-4 md:text-left">
-          <GradientTitle>Why is Solana</GradientTitle>
-          <GradientTitle>perfect for DAOs?</GradientTitle>
+          <GradientH2>Why is Solana</GradientH2>
+          <GradientH2>perfect for DAOs?</GradientH2>
         </div>
         <div className="flex flex-col w-full space-y-12 md:space-y-0 md:w-2/3 md:grid md:grid-cols-3 md:gap-16">
           <IconInfoBox imgSrc="pie-chart" title="Near-Zero Fees">

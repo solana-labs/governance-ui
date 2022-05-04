@@ -1,4 +1,5 @@
 import Button from '../../../components_2/Button'
+import { H2 } from '../../../components_2/Header'
 
 const SplGov = () => {
   return (
@@ -9,9 +10,9 @@ const SplGov = () => {
         </div>
         <div className="font-normal text-black">The Solana Standard</div>
       </div>
-      <h2 className="pt-10 pb-6 font-normal md:pt-14 md:pb-9 md:text-3xl">
-        SPL Governance
-      </h2>
+      <div className="pt-10 pb-6 md:pt-14 md:pb-9">
+        <H2>SPL Governance</H2>
+      </div>
       <div className="flex flex-row flex-wrap lg:flex-nowrap">
         <div className="space-y-6 text-base font-normal tracking-tight text-black md:pr-8">
           The Solana Program Library (SPL) is a collection of on-chain programs
