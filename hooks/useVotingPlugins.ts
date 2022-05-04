@@ -54,7 +54,11 @@ export function useVotingPlugins() {
     (s) => s.state.nftMintRegistrar
   )
   const usedCollectionsPks: string[] =
-    nftMintRegistrar?.collectionConfigs.map((x) => x.collection.toBase58()) ||
+    (currentPluginPk &&
+      nftPluginsPks.includes(currentPluginPk?.toBase58()) &&
+      nftMintRegistrar?.collectionConfigs.map((x) =>
+        x.collection.toBase58()
+      )) ||
     []
   const handleGetNfts = async () => {
     setIsLoadingNfts(true)
