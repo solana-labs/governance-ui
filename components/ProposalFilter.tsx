@@ -21,7 +21,7 @@ const StyledAlertCount = styled.span`
   font-size: 0.6rem;
 `
 
-const ProposalFilter = ({ filters, setFilters }) => {
+const ProposalFilter = ({ disabled, filters, setFilters }) => {
   const [filterSettings, setFilterSettings] = useReducer(
     (state, newState) => ({ ...state, ...newState }),
     initialFilterSettings
@@ -48,7 +48,8 @@ const ProposalFilter = ({ filters, setFilters }) => {
       {({ open }) => (
         <>
           <Disclosure.Button
-            className={`border border-fgd-3 default-transition font-normal h-10 pl-3 pr-2 rounded-md text-fgd-1 text-sm hover:bg-bkg-3 focus:outline-none`}
+            className={`border border-fgd-3 default-transition font-normal h-10 pl-3 pr-2 rounded-md text-fgd-1 text-sm hover:bg-bkg-3 focus:outline-none disabled:cursor-not-allowed disabled:hover:bg-bkg-2 disabled:opacity-60`}
+            disabled={disabled}
           >
             {filters.length > 0 ? (
               <div className="absolute -top-3 -right-1.5 z-20">

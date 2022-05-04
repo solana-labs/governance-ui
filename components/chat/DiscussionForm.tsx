@@ -3,7 +3,7 @@ import Button from '../Button'
 import Input from '../inputs/Input'
 import useWalletStore from '../../stores/useWalletStore'
 import useRealm from '../../hooks/useRealm'
-import { RpcContext } from '@solana/spl-governance'
+import { RpcContext, GoverningTokenType } from '@solana/spl-governance'
 import { ChatMessageBody, ChatMessageBodyType } from '@solana/spl-governance'
 import { postChatMessage } from '../../actions/chat/postMessage'
 import Loading from '../Loading'
@@ -14,7 +14,13 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 const DiscussionForm = () => {
   const [comment, setComment] = useState('')
   const connected = useWalletStore((s) => s.connected)
-  const { ownVoterWeight, realmInfo, realm } = useRealm()
+  const {
+    ownVoterWeight,
+    realmInfo,
+    realm,
+    ownTokenRecord,
+    ownCouncilTokenRecord,
+  } = useRealm()
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
@@ -24,6 +30,11 @@ const DiscussionForm = () => {
   const connection = useWalletStore((s) => s.connection)
   const { proposal } = useWalletStore((s) => s.selectedProposal)
   const { fetchChatMessages } = useWalletStore((s) => s.actions)
+  const { tokenType } = useWalletStore((s) => s.selectedProposal)
+  const commenterVoterTokenRecord =
+    tokenType === GoverningTokenType.Community
+      ? ownTokenRecord
+      : ownCouncilTokenRecord
 
   const submitComment = async () => {
     setSubmitting(true)
@@ -46,7 +57,7 @@ const DiscussionForm = () => {
         rpcContext,
         realm!,
         proposal!,
-        ownVoterWeight.getTokenRecord(),
+        commenterVoterTokenRecord!,
         msg,
         undefined,
         client
@@ -72,6 +83,8 @@ const DiscussionForm = () => {
     ? 'You need to have deposited some tokens to submit your comment.'
     : !comment
     ? 'Write a comment to submit'
+    : !commenterVoterTokenRecord
+    ? 'You need to have voting power for this community to submit your comment.'
     : ''
 
   return (
@@ -88,7 +101,7 @@ const DiscussionForm = () => {
           <Button
             className="flex-shrink-0"
             onClick={() => submitComment()}
-            disabled={!postEnabled || !comment}
+            disabled={!postEnabled || !comment || !commenterVoterTokenRecord}
           >
             {submitting ? <Loading /> : <span>Send It</span>}
           </Button>

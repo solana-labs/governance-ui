@@ -22,7 +22,6 @@ import InspectorButton from '@components/explorer/inspectorButton'
 import { FlagInstructionErrorButton } from './FlagInstructionErrorButton'
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 import axios from 'axios'
-import { notify } from '@utils/notifications'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import tokenService from '@utils/services/token'
 
@@ -66,8 +65,10 @@ export default function InstructionCard({
       )?.isSol
       const isNFTAccount = nftsGovernedTokenAccounts.find(
         (x) =>
-          x.governance?.pubkey.toBase58() ===
-          tokenAccount?.account.owner.toBase58()
+          x.extensions.transferAddress?.toBase58() ===
+            tokenAccount?.account.owner.toBase58() ||
+          x.governance.pubkey.toBase58() ===
+            tokenAccount?.account.owner.toBase58()
       )
       if (isNFTAccount) {
         const mint = tokenAccount?.account.mint
@@ -81,10 +82,7 @@ export default function InstructionCard({
             const url = (await axios.get(tokenMetadata.data.data.uri)).data
             setNftImgUrl(url.image)
           } catch (e) {
-            notify({
-              type: 'error',
-              message: 'Unable to fetch nft',
-            })
+            console.log(e)
           }
         }
         return

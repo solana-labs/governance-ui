@@ -60,14 +60,16 @@ export const withVoteRegistryWithdraw = async ({
     ASSOCIATED_TOKEN_PROGRAM_ID,
     TOKEN_PROGRAM_ID,
     mintPk,
-    voter
+    voter,
+    true
   )
 
   const ataPk = await Token.getAssociatedTokenAddress(
     ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
     TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
     mintPk, // mint
-    walletPk // owner
+    walletPk, // owner
+    true
   )
   const isExistingAta = await tryGetTokenAccount(connection, ataPk)
   if (!isExistingAta) {
@@ -82,29 +84,29 @@ export const withVoteRegistryWithdraw = async ({
       )
     )
   }
-
-  instructions.push(
-    client?.program.instruction.withdraw(depositIndex!, amount, {
-      accounts: {
-        registrar: registrar,
-        voter: voter,
-        voterAuthority: walletPk,
-        tokenOwnerRecord: tokenOwnerRecordPubKey,
-        voterWeightRecord: voterWeightPk,
-        vault: voterATAPk,
-        destination: ataPk,
-        tokenProgram: TOKEN_PROGRAM_ID,
-      },
+  const withdrawInstruction = await client?.program.methods
+    .withdraw(depositIndex!, amount)
+    .accounts({
+      registrar: registrar,
+      voter: voter,
+      voterAuthority: walletPk,
+      tokenOwnerRecord: tokenOwnerRecordPubKey,
+      voterWeightRecord: voterWeightPk,
+      vault: voterATAPk,
+      destination: ataPk,
+      tokenProgram: TOKEN_PROGRAM_ID,
     })
-  )
+    .instruction()
+  instructions.push(withdrawInstruction)
 
   if (closeDepositAfterOperation) {
-    const close = client.program.instruction.closeDepositEntry(depositIndex, {
-      accounts: {
+    const close = await client.program.methods
+      .closeDepositEntry(depositIndex)
+      .accounts({
         voter: voter,
         voterAuthority: walletPk,
-      },
-    })
+      })
+      .instruction()
     instructions.push(close)
   }
 }

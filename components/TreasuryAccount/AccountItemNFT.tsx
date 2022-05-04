@@ -17,7 +17,7 @@ const AccountItemNFT = ({
   border?: boolean
 }) => {
   const connection = useWalletStore((s) => s.connection)
-  const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts)
+  const nftsPerPubkey = useTreasuryAccountStore((s) => s.governanceNfts)
   const { setCurrentAccount } = useTreasuryAccountStore()
 
   const accountPublicKey = governedAccountTokenAccount
@@ -30,6 +30,14 @@ const AccountItemNFT = ({
   const info = governedAccountTokenAccount.isSol
     ? tokenService.getTokenInfo(WSOL_MINT)
     : undefined
+  const nftsCount = governedAccountTokenAccount.isSol
+    ? nftsPerPubkey[governedAccountTokenAccount.governance.pubkey.toBase58()]
+        ?.length +
+      nftsPerPubkey[
+        governedAccountTokenAccount.extensions.transferAddress!.toBase58()
+      ]?.length
+    : nftsPerPubkey[governedAccountTokenAccount.governance.pubkey.toBase58()]
+        ?.length
   return (
     <div
       onClick={onClick ? onClick : handleGoToAccountOverview}
@@ -58,12 +66,7 @@ const AccountItemNFT = ({
           </div>
         </div>
         <div className="text-fgd-3 text-xs flex flex-col">
-          {governedAccountTokenAccount.governance
-            ? governanceNfts[
-                governedAccountTokenAccount.governance.pubkey.toBase58()
-              ]?.length
-            : 0}{' '}
-          NFTS
+          {governedAccountTokenAccount.governance ? nftsCount : 0} NFTS
         </div>
       </div>
     </div>

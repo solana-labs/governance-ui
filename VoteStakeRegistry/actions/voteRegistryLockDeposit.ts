@@ -27,6 +27,7 @@ export const voteRegistryLockDeposit = async ({
   tokenOwnerRecordPk,
   sourceTokenAccount,
   communityMintPk,
+  allowClawback = false,
 }: {
   rpcContext: RpcContext
   mintPk: PublicKey
@@ -41,6 +42,7 @@ export const voteRegistryLockDeposit = async ({
   tokenOwnerRecordPk: PublicKey | null
   sourceTokenAccount: PublicKey
   communityMintPk: PublicKey
+  allowClawback?: boolean
   client?: VsrClient
 }) => {
   const signers: Keypair[] = []
@@ -71,57 +73,51 @@ export const voteRegistryLockDeposit = async ({
     lockupKind,
     communityMintPk,
     client,
+    allowClawback,
   })
 
   if (!amountFromVoteRegistryDeposit.isZero()) {
-    const internalTransferUnlockedInstruction = client?.program.instruction.internalTransferUnlocked(
-      sourceDepositIdx!,
-      depositIdx,
-      amountFromVoteRegistryDeposit,
-      {
-        accounts: {
-          registrar: registrar,
-          voter: voter,
-          voterAuthority: wallet!.publicKey,
-        },
-      }
-    )
+    const internalTransferUnlockedInstruction = await client?.program.methods
+      .internalTransferUnlocked(
+        sourceDepositIdx!,
+        depositIdx,
+        amountFromVoteRegistryDeposit
+      )
+      .accounts({
+        registrar: registrar,
+        voter: voter,
+        voterAuthority: wallet!.publicKey,
+      })
+      .instruction()
 
     instructions.push(internalTransferUnlockedInstruction)
   }
 
   if (!fromWalletTransferAmount.isZero() && !fromWalletTransferAmount.isNeg()) {
-    const depositInstruction = client?.program.instruction.deposit(
-      depositIdx,
-      fromWalletTransferAmount,
-      {
-        accounts: {
-          registrar: registrar,
-          voter: voter,
-          vault: voterATAPk,
-          depositToken: sourceTokenAccount,
-          depositAuthority: wallet!.publicKey!,
-          tokenProgram: TOKEN_PROGRAM_ID,
-        },
-      }
-    )
+    const depositInstruction = await client?.program.methods
+      .deposit(depositIdx, fromWalletTransferAmount)
+      .accounts({
+        registrar: registrar,
+        voter: voter,
+        vault: voterATAPk,
+        depositToken: sourceTokenAccount,
+        depositAuthority: wallet!.publicKey!,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      })
+      .instruction()
     instructions.push(depositInstruction)
   }
 
   if (!amountFromVoteRegistryDeposit.isZero()) {
     const period = getPeriod(lockUpPeriodInDays, lockupKind)
-    const resetLockup = client?.program.instruction.resetLockup(
-      depositIdx,
-      { [lockupKind]: {} },
-      period,
-      {
-        accounts: {
-          registrar: registrar,
-          voter: voter,
-          voterAuthority: wallet!.publicKey,
-        },
-      }
-    )
+    const resetLockup = await client?.program.methods
+      .resetLockup(depositIdx, { [lockupKind]: {} }, period)
+      .accounts({
+        registrar: registrar,
+        voter: voter,
+        voterAuthority: wallet!.publicKey,
+      })
+      .instruction()
 
     instructions.push(resetLockup)
   }

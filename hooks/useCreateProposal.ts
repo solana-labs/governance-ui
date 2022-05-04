@@ -67,7 +67,7 @@ export default function useCreateProposal() {
       rpcContext,
       realm!,
       selectedGovernance.pubkey,
-      ownTokenRecord!.pubkey,
+      ownTokenRecord!,
       title,
       description,
       proposalMint,

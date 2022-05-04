@@ -7,7 +7,6 @@ import {
   Governance,
   ProgramAccount,
   serializeInstructionToBase64,
-  VoteTipping,
 } from '@solana/spl-governance'
 import { validateInstruction } from '@utils/instructionTools'
 import useWalletStore from 'stores/useWalletStore'
@@ -29,13 +28,11 @@ import {
   getMintDecimalAmountFromNatural,
 } from '@tools/sdk/units'
 import { abbreviateAddress } from '@utils/formatting'
-import Select from '@components/inputs/Select'
 import * as yup from 'yup'
 
 interface GovernanceConfigForm extends BaseGovernanceFormFields {
   title: string
   description: string
-  voteTipping: VoteTipping
 }
 
 const GovernanceConfigModal = ({
@@ -174,23 +171,6 @@ const GovernanceConfigModal = ({
           setForm={setForm}
           setFormErrors={setFormErrors}
         ></BaseGovernanceForm>
-        <Select
-          value={VoteTipping[form.voteTipping as any]}
-          onChange={(selected) =>
-            handleSetForm({
-              value: selected,
-              propertyName: 'voteTipping',
-            })
-          }
-        >
-          {Object.keys(VoteTipping)
-            .filter((vt) => typeof VoteTipping[vt as any] === 'string')
-            .map((vt) => (
-              <Select.Option key={vt} value={vt}>
-                {VoteTipping[vt as any]}{' '}
-              </Select.Option>
-            ))}
-        </Select>
       </div>
       <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
         <Button

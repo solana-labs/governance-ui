@@ -44,18 +44,20 @@ export const getClawbackInstruction = async ({
     ASSOCIATED_TOKEN_PROGRAM_ID,
     TOKEN_PROGRAM_ID,
     grantMintPk,
-    voter
+    voter,
+    true
   )
 
-  const clawbackIx = client?.program.instruction.clawback(voterDepositIndex, {
-    accounts: {
+  const clawbackIx = await client?.program.methods
+    .clawback(voterDepositIndex)
+    .accounts({
       registrar,
       realmAuthority,
       voter,
       vault: voterATAPk,
       destination,
       tokenProgram: TOKEN_PROGRAM_ID,
-    },
-  })
+    })
+    .instruction()
   return clawbackIx
 }

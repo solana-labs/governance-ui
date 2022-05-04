@@ -52,7 +52,7 @@ export default function RealmsDashboard({
           certifiedRealms.map((realm: RealmInfo) => (
             <div
               onClick={() => goToRealm(realm)}
-              className="bg-bkg-2 cursor-pointer default-transition flex flex-col items-center p-8 rounded-lg hover:bg-bkg-3"
+              className="bg-bkg-2 cursor-pointer default-transition flex flex-col items-center justify-center p-8 rounded-lg hover:bg-bkg-3"
               key={realm.realmId.toString()}
             >
               <div className="pb-5">
@@ -96,7 +96,7 @@ export default function RealmsDashboard({
             unchartedRealms.map((realm: RealmInfo) => (
               <div
                 onClick={() => goToRealm(realm)}
-                className="bg-bkg-2 cursor-pointer default-transition flex flex-col items-center p-8 rounded-lg hover:bg-bkg-3"
+                className="bg-bkg-2 cursor-pointer default-transition flex flex-col items-center justify-center p-8 rounded-lg hover:bg-bkg-3"
                 key={realm.realmId.toString()}
               >
                 <div className="pb-5">
