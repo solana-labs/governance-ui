@@ -16,6 +16,7 @@ export const MINT_METADATA = {
   SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt: { name: 'SRM' },
   MyHd6a7HWKTMeJMHBkrbMq4hZwZxwn9x7dxXcopQ4Wd: { name: 'OMH' },
   UXPhBoR3qG4UCiGNJfV7MqhHyFqKN68g45GoYvAeL2M: { name: 'UXP' },
+  H7uqouPsJkeEiLpCEoC1qYVVquDrZan6ZfdPK2gS44zm: { name: 'FORE' },
 }
 
 export function getMintMetadata(
@@ -48,10 +49,9 @@ export const SPL_TOKEN_INSTRUCTIONS = {
           connection,
           accounts[0].pubkey
         )
-        const tokenMint = await tryGetMint(
-          connection,
-          tokenAccount!.account.mint
-        )
+        const tokenMint = tokenAccount
+          ? await tryGetMint(connection, tokenAccount!.account.mint)
+          : null
 
         const tokenMintDescriptor = getMintMetadata(tokenAccount?.account.mint)
 
@@ -167,6 +167,17 @@ export const SPL_TOKEN_INSTRUCTIONS = {
             )}
           </>
         )
+      },
+    },
+    9: {
+      name: 'Close Token Account',
+      accounts: [
+        { name: 'Token Account', important: true },
+        { name: 'Rent destination' },
+        { name: 'Account Owner' },
+      ],
+      getDataUI: async () => {
+        return <></>
       },
     },
   },

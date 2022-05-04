@@ -18,9 +18,9 @@ export function getFormattedStringFromDays(
   const hours = (numberOfDays - Math.floor(numberOfDays)) * HOURS_PER_DAY
   const hoursInt = Math.floor(hours)
   const minutes = Math.floor((hours - hoursInt) * MINS_PER_HOUR)
-  const yearSuffix = years > 1 ? 'years' : 'year'
-  const monthSuffix = months > 1 ? 'months' : 'month'
-  const daysSuffix = days > 1 ? 'days' : 'day'
+  const yearSuffix = years > 1 ? ' years' : ' year'
+  const monthSuffix = months > 1 ? ' months' : ' month'
+  const daysSuffix = days > 1 ? ' days' : ' day'
   const yearsDisplay =
     years > 0 ? years + `${fullFormat ? yearSuffix : 'y'} ` : ''
   const monthsDisplay =

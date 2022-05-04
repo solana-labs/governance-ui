@@ -125,5 +125,41 @@
     "ogImage": "https://media.discordapp.net/attachments/933224453326909490/952347955157950504/alpha-illuminati-logo.png",
     "website": "https://www.alphailluminati.xyz",
     "twitter": "@illuminatialpha"
+  },
+  {
+    "symbol": "LEO",
+    "displayName": "LeoDaoNewYorkCity _ DEMO",
+    "programId": "GTesTBiEWE32WHXXE2S4XbZvA5CrEc4xs6ZgRe895dP",
+    "realmId": "hno4ciEEAB6P7MWkX7xWZx1RkpZqxRBJKveDg4YWoRP",
+    "ogImage": "https://images.squarespace-cdn.com/content/v1/5f09de13169cec7a4b6c23ac/3dd28380-4a26-40cf-b18c-684d73492feb/LeoDao.jpg",
+    "website": "https://leodaonyc.xyz",
+    "twitter": "@LeoDAONYC"
+  },
+  {
+    "symbol": "FSHR",
+    "displayName": "Fashers",
+    "programId": "GTesTBiEWE32WHXXE2S4XbZvA5CrEc4xs6ZgRe895dP",
+    "realmId": "GwqCXifatWJvikdjkkPPsRn1RW8XGYLW8p4xwWzQ66gi",
+    "ogImage": "https://avatars.githubusercontent.com/u/46954203?s=400&u=6c777850a155eeb75586049e7c91dc2baeb97dd1&v=4",
+    "website": "https://fashers.xyz",
+    "twitter": "@Fashers"
+  },
+  {
+    "symbol": "SquatchDAO",
+    "displayName": "SquatchDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "5DqXtnSqxUukgQ8ZJQhTEdF7y3cu3zQuBpREC1g3bNjf",
+    "ogImage": "https://raw.githubusercontent.com/Exonft/SquatchDAO/main/SquatchDAO.jpg",
+    "website": "www.squatchdao.com",
+    "twitter": "@Squatch_DAO"
+  },
+  {
+    "symbol": "FORE",
+    "displayName": "Foresight DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "HymmUoabLo1sB8nTENxSFz1bAmobMJyGQoXqyXZ9FySB",
+    "ogImage": "https://www.foresight.exchange/logo.png",
+    "website": "https://www.foresight.exchange/",
+    "twitter": "@foresightmkt"
   }
 ]

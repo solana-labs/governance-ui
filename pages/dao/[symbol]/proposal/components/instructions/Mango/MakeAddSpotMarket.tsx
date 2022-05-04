@@ -148,7 +148,7 @@ const MakeAddSpotMarket = ({
       tx.add(rootBank.instruction)
 
       tx.recentBlockhash = (
-        await connection.getRecentBlockhash('max')
+        await connection.getLatestBlockhash('max')
       ).blockhash
 
       const signers = [baseVault, nodeBank.account, rootBank.account]

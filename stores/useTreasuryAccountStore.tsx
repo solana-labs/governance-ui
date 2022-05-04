@@ -7,16 +7,7 @@ import { NFTWithMint } from '@utils/uiTypes/nfts'
 import { Connection } from '@solana/web3.js'
 import { TokenInfo } from '@solana/spl-token-registry'
 import { WSOL_MINT } from '@components/instructions/tools'
-import { MintInfo } from '@solana/spl-token'
-import { TokenAccountWithKey } from '@utils/deserializeTokenAccount'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
-
-type TokenAccountWithListInfo = TokenAccountWithKey & {
-  tokenInfo?: TokenInfo
-}
-export type TokenInfoWithMint = TokenAccountWithListInfo & {
-  mintInfo: MintInfo
-}
 
 interface TreasuryAccountStore extends State {
   currentAccount: AssetAccount | null
@@ -25,7 +16,6 @@ interface TreasuryAccountStore extends State {
   recentActivity: ConfirmedSignatureInfo[]
 
   allNfts: NFTWithMint[]
-  allTokenAccounts: TokenInfoWithMint[]
   governanceNfts: {
     [governance: string]: NFTWithMint[]
   }
@@ -46,7 +36,6 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
   tokenInfo: undefined,
   recentActivity: [],
   allNfts: [],
-  allTokenAccounts: [],
   governanceNfts: {},
   isLoadingNfts: false,
   isLoadingRecentActivity: false,
@@ -56,7 +45,7 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
       s.isLoadingNfts = true
     })
     let realmNfts: NFTWithMint[] = []
-    const governanceNfts = {}
+    const nftsPerPubkey = {}
     for (const acc of nftsGovernedTokenAccounts) {
       const governance = acc.governance.pubkey.toBase58()
       try {
@@ -71,19 +60,17 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
               )
             : []
           realmNfts = [...realmNfts, ...solAccountNfts]
-          if (governance) {
-            governanceNfts[governance] = [...solAccountNfts]
-          }
+
+          nftsPerPubkey[acc.extensions.transferAddress!.toBase58()] = [
+            ...solAccountNfts,
+          ]
         }
         realmNfts = [...realmNfts, ...nfts]
         if (governance) {
-          if (governanceNfts[governance]) {
-            governanceNfts[governance] = [
-              ...governanceNfts[governance],
-              ...nfts,
-            ]
+          if (nftsPerPubkey[governance]) {
+            nftsPerPubkey[governance] = [...nftsPerPubkey[governance], ...nfts]
           } else {
-            governanceNfts[governance] = [...nfts]
+            nftsPerPubkey[governance] = [...nfts]
           }
         }
       } catch (e) {
@@ -95,11 +82,20 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
     }
     set((s) => {
       s.allNfts = realmNfts
-      s.governanceNfts = governanceNfts
+      s.governanceNfts = nftsPerPubkey
       s.isLoadingNfts = false
     })
   },
   setCurrentAccount: async (account, connection) => {
+    if (!account) {
+      set((s) => {
+        s.currentAccount = null
+        s.mintAddress = ''
+        s.tokenInfo = undefined
+        s.recentActivity = []
+      })
+      return
+    }
     let mintAddress =
       account && account.extensions.token
         ? account.extensions.token.account.mint.toBase58()

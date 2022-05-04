@@ -2,7 +2,6 @@ import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import {
   Commitment,
   Connection,
-  FeeCalculator,
   RpcResponseAndContext,
   SignatureStatus,
   SimulatedTransactionResponse,
@@ -11,6 +10,21 @@ import {
   TransactionSignature,
   Keypair,
 } from '@solana/web3.js'
+import { notify } from './notifications'
+
+interface TransactionInstructionWithType {
+  instructionsSet: TransactionInstruction[]
+  sequenceType?: SequenceType
+}
+interface TransactionsPlayingIndexes {
+  transactionsIdx: number[]
+  sequenceType?: SequenceType
+}
+
+interface Block {
+  blockhash: string
+  lastValidBlockHeight: number
+}
 
 // TODO: sendTransactions() was imported from Oyster as is and needs to be reviewed and updated
 // In particular common primitives should be unified with send.tsx and also ensure the same resiliency mechanism
@@ -34,12 +48,24 @@ export function getWalletPublicKey(wallet: WalletSigner) {
 
 async function awaitTransactionSignatureConfirmation(
   txid: TransactionSignature,
-  timeout: number,
+  //after that time we will start to check blockHeight
+  startTimeoutCheckThreshold: number,
   connection: Connection,
   commitment: Commitment = 'recent',
-  queryStatus = false
+  queryStatus = false,
+  startingBlock?: Block
 ) {
+  //If the validator can’t find a slot number for the blockhash
+  //or if the looked up slot number is more than 151 slots lower
+  // than the slot number of the block being processed, the transaction will be rejected.
+  const timeoutBlockPeriod = 152
+  const timeoutBlockHeight = startingBlock
+    ? startingBlock.lastValidBlockHeight + timeoutBlockPeriod
+    : 0
+  console.log('Start block height', startingBlock?.lastValidBlockHeight)
+  console.log('Possible timeout block', timeoutBlockHeight)
   let done = false
+  let startTimeoutCheck = false
   let status: SignatureStatus | null = {
     slot: 0,
     confirmations: 0,
@@ -52,9 +78,13 @@ async function awaitTransactionSignatureConfirmation(
         if (done) {
           return
         }
-        done = true
-        reject({ timeout: true })
-      }, timeout)
+        console.log('Starting timeout check')
+        console.log(
+          'Timeout check was set to start after',
+          startTimeoutCheckThreshold
+        )
+        startTimeoutCheck = true
+      }, startTimeoutCheckThreshold)
       try {
         subId = connection.onSignature(
           txid,
@@ -83,9 +113,28 @@ async function awaitTransactionSignatureConfirmation(
         // eslint-disable-next-line no-loop-func
         const fn = async () => {
           try {
-            const signatureStatuses = await connection.getSignatureStatuses([
-              txid,
-            ])
+            const promises: [
+              Promise<RpcResponseAndContext<(SignatureStatus | null)[]>>,
+              Promise<number>?
+            ] = [connection.getSignatureStatuses([txid])]
+            //if startTimeoutThreshold passed we start to check if
+            //current blocks are did not passed timeoutBlockHeight threshold
+            if (startTimeoutCheck) {
+              promises.push(connection.getBlockHeight('confirmed'))
+            }
+            const [signatureStatuses, blockHeight] = await Promise.all(promises)
+            if (
+              typeof blockHeight !== undefined &&
+              timeoutBlockHeight > blockHeight!
+            ) {
+              done = true
+              console.log('Tx Timeout ----')
+              reject({ timeout: true })
+            }
+            if (blockHeight) {
+              console.log('Timeout threshold blockheight', timeoutBlockHeight)
+              console.log('Current blockheight', blockHeight)
+            }
             status = signatureStatuses && signatureStatuses.value[0]
             if (!done) {
               if (!status) {
@@ -115,8 +164,12 @@ async function awaitTransactionSignatureConfirmation(
     fn()
   })
     .catch((err) => {
-      if (err.timeout && status) {
-        status.err = { timeout: true }
+      if (err.timeout) {
+        notify({
+          type: 'warning',
+          message: 'Transactions timeout please try again',
+        })
+        throw { timeout: true }
       }
 
       //@ts-ignore
@@ -163,12 +216,13 @@ export const getUnixTs = () => {
   return new Date().getTime() / 1000
 }
 
-const DEFAULT_TIMEOUT = 30000
+const DEFAULT_TIMEOUT = 60000
 /////////////////////////////////////////////////
 export async function sendSignedTransaction({
   signedTransaction,
   connection,
   timeout = DEFAULT_TIMEOUT,
+  block,
 }: {
   signedTransaction: Transaction
   connection: Connection
@@ -176,6 +230,7 @@ export async function sendSignedTransaction({
   sentMessage?: string
   successMessage?: string
   timeout?: number
+  block?: Block
 }): Promise<{ txid: string; slot: number }> {
   const rawTransaction = signedTransaction.serialize()
   const startTime = getUnixTs()
@@ -204,9 +259,9 @@ export async function sendSignedTransaction({
       timeout,
       connection,
       'recent',
-      true
+      true,
+      block
     )
-
     if (confirmation.err) {
       console.error(confirmation.err)
       throw new Error('Transaction failed: Custom instruction error')
@@ -264,7 +319,6 @@ export const sendTransactions = async (
     false,
   block?: {
     blockhash: string
-    feeCalculator: FeeCalculator
   }
 ): Promise<number> => {
   if (!wallet.publicKey) throw new Error('Wallet not connected!')
@@ -272,9 +326,8 @@ export const sendTransactions = async (
   const unsignedTxns: Transaction[] = []
 
   if (!block) {
-    block = await connection.getRecentBlockhash(commitment)
+    block = await connection.getLatestBlockhash(commitment)
   }
-
   for (let i = 0; i < instructionSet.length; i++) {
     const instructions = instructionSet[i]
     const signers = signersSet[i]
@@ -298,9 +351,7 @@ export const sendTransactions = async (
 
     unsignedTxns.push(transaction)
   }
-
   const signedTxns = await wallet.signAllTransactions(unsignedTxns)
-
   const pendingTxns: Promise<{ txid: string; slot: number }>[] = []
 
   const breakEarlyObject = { breakEarly: false }
@@ -337,4 +388,135 @@ export const sendTransactions = async (
   }
 
   return signedTxns.length
+}
+
+/////////////////////////////////////////
+export const sendTransactionsV2 = async (
+  connection: Connection,
+  wallet: WalletSigner,
+  TransactionInstructions: TransactionInstructionWithType[],
+  signersSet: Keypair[][],
+  block?: Block
+) => {
+  if (!wallet.publicKey) throw new Error('Wallet not connected!')
+  //block will be used for timeout calculation
+  if (!block) {
+    block = await connection.getLatestBlockhash('confirmed')
+  }
+  //max usable transactions per one sign is 40
+  const maxTransactionsInBath = 40
+  const currentTransactions = TransactionInstructions.slice(
+    0,
+    maxTransactionsInBath
+  )
+  const unsignedTxns: Transaction[] = []
+  //this object will determine how we run transactions e.g [ParallelTx, SequenceTx, ParallelTx]
+  const transactionCallOrchestrator: TransactionsPlayingIndexes[] = []
+  for (let i = 0; i < currentTransactions.length; i++) {
+    const transactionInstruction = currentTransactions[i]
+    const signers = signersSet[i]
+
+    if (transactionInstruction.instructionsSet.length === 0) {
+      continue
+    }
+
+    const transaction = new Transaction({ feePayer: wallet.publicKey })
+    transactionInstruction.instructionsSet.forEach((instruction) =>
+      transaction.add(instruction)
+    )
+    transaction.recentBlockhash = block.blockhash
+
+    if (signers.length > 0) {
+      transaction.partialSign(...signers)
+    }
+    //we take last index of unsignedTransactions to have right indexes because
+    //if transactions was empty
+    //then unsigned transactions could not mach TransactionInstructions param indexes
+    const currentUnsignedTxIdx = unsignedTxns.length
+    const currentTransactionCall =
+      transactionCallOrchestrator[transactionCallOrchestrator.length - 1]
+    //we check if last item in current transactions call type is same
+    //if not then we create next transaction type
+    if (
+      currentTransactionCall &&
+      currentTransactionCall.sequenceType ===
+        transactionInstruction.sequenceType
+    ) {
+      currentTransactionCall.transactionsIdx.push(currentUnsignedTxIdx)
+    } else {
+      transactionCallOrchestrator.push({
+        transactionsIdx: [currentUnsignedTxIdx],
+        sequenceType: transactionInstruction.sequenceType,
+      })
+    }
+    unsignedTxns.push(transaction)
+  }
+
+  const signedTxns = await wallet.signAllTransactions(unsignedTxns)
+  console.log(
+    'Transactions play type order',
+    transactionCallOrchestrator.map((x) => {
+      return {
+        ...x,
+        sequenceType:
+          typeof x.sequenceType !== 'undefined'
+            ? SequenceType[SequenceType[x.sequenceType]]
+            : 'Parallel',
+      }
+    })
+  )
+  console.log('Signed transactions', signedTxns)
+  for (const fcn of transactionCallOrchestrator) {
+    if (
+      typeof fcn.sequenceType === 'undefined' ||
+      fcn.sequenceType === SequenceType.Parallel
+    ) {
+      await Promise.all(
+        fcn.transactionsIdx.map((x) =>
+          sendSignedTransaction({
+            connection,
+            signedTransaction: signedTxns[x],
+            block,
+          })
+        )
+      )
+    }
+    if (fcn.sequenceType === SequenceType.Sequential) {
+      for (const innerFcn of fcn.transactionsIdx) {
+        await sendSignedTransaction({
+          connection,
+          signedTransaction: signedTxns[innerFcn],
+          block,
+        })
+      }
+    }
+  }
+  //we call recursively our function to forward rest of transactions if
+  // number of them is higher then maxTransactionsInBath
+  if (TransactionInstructions.length > maxTransactionsInBath) {
+    const forwardedTransactions = TransactionInstructions.slice(
+      maxTransactionsInBath,
+      TransactionInstructions.length
+    )
+    const forwardedSigners = signersSet.slice(
+      maxTransactionsInBath,
+      TransactionInstructions.length
+    )
+    await sendTransactionsV2(
+      connection,
+      wallet,
+      forwardedTransactions,
+      forwardedSigners
+    )
+  }
+}
+
+export const transactionInstructionsToTypedInstructionsSets = (
+  instructionsSet: TransactionInstruction[],
+  type: SequenceType
+): TransactionInstructionWithType => {
+  return {
+    instructionsSet: instructionsSet,
+    sequenceType: type,
+  }
 }

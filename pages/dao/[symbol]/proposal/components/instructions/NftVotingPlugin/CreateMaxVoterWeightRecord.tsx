@@ -54,19 +54,20 @@ const CreateNftPluginMaxVoterWeightRecord = ({
         realm!.account.communityMint,
         nftClient!.program.programId
       )
-      const instruction = nftClient!.program.instruction.createMaxVoterWeightRecord(
-        {
-          accounts: {
-            maxVoterWeightRecord,
-            governanceProgramId: realmInfo!.programId,
-            realm: realm!.pubkey,
-            realmGoverningTokenMint: realm!.account.communityMint,
-            payer: wallet.publicKey!,
-            systemProgram: SYSTEM_PROGRAM_ID,
-          },
-        }
+      const createMaxVoterWeightRecordix = await nftClient!.program.methods
+        .createMaxVoterWeightRecord()
+        .accounts({
+          maxVoterWeightRecord,
+          governanceProgramId: realmInfo!.programId,
+          realm: realm!.pubkey,
+          realmGoverningTokenMint: realm!.account.communityMint,
+          payer: wallet.publicKey!,
+          systemProgram: SYSTEM_PROGRAM_ID,
+        })
+        .instruction()
+      serializedInstruction = serializeInstructionToBase64(
+        createMaxVoterWeightRecordix
       )
-      serializedInstruction = serializeInstructionToBase64(instruction)
     }
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,

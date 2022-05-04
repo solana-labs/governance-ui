@@ -13,6 +13,10 @@ export function getExplorerUrl(
         'http://127.0.0.1:8899'
       )}`
     } else if (endpoint === 'https://api.devnet.solana.com') {
+      // if the default free RPC for devnet is used
+      cluster = 'devnet'
+    } else if (endpoint === 'devnet') {
+      // connection.cluster is passed in
       cluster = 'devnet'
     }
 

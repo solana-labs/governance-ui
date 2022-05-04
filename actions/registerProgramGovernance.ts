@@ -9,6 +9,7 @@ import {
   GovernanceType,
   ProgramAccount,
   Realm,
+  TokenOwnerRecord,
 } from '@solana/spl-governance'
 import { GovernanceConfig } from '@solana/spl-governance'
 import { withCreateProgramGovernance } from '@solana/spl-governance'
@@ -23,7 +24,7 @@ export const registerProgramGovernance = async (
   governedAccount: PublicKey,
   config: GovernanceConfig,
   transferAuthority: boolean,
-  tokenOwnerRecord: PublicKey,
+  tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>,
   client?: VotingClient
 ): Promise<PublicKey> => {
   const instructions: TransactionInstruction[] = []
@@ -41,6 +42,7 @@ export const registerProgramGovernance = async (
   //will run only if plugin is connected with realm
   const plugin = await client?.withUpdateVoterWeightRecord(
     instructions,
+    tokenOwnerRecord,
     'createGovernance'
   )
 
@@ -55,7 +57,7 @@ export const registerProgramGovernance = async (
         config,
         transferAuthority!,
         walletPubkey,
-        tokenOwnerRecord,
+        tokenOwnerRecord.pubkey,
         walletPubkey,
         governanceAuthority,
         plugin?.voterWeightPk

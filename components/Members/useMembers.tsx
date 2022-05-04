@@ -64,7 +64,8 @@ export default function useMembers() {
           ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
           TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
           realm!.account.communityMint, // mint
-          new PublicKey(walletAddress) // owner
+          new PublicKey(walletAddress), // owner
+          true
         )
         ATAS.push(ata)
       }
@@ -202,7 +203,11 @@ export default function useMembers() {
         })
         .reverse(),
 
-    [JSON.stringify(tokenRecordArray), JSON.stringify(councilRecordArray)]
+    [
+      JSON.stringify(tokenRecordArray),
+      JSON.stringify(councilRecordArray),
+      realm?.pubkey.toBase58(),
+    ]
   )
 
   //Move to store if will be used more across application

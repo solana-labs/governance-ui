@@ -61,7 +61,8 @@ export const tryGetAta = async (
     ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
     TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
     mint, // mint
-    owner // owner
+    owner, // owner
+    true
   )
   const tokenAccount = await tryGetTokenAccount(connection, ata)
   return tokenAccount
@@ -308,7 +309,7 @@ export const getTokenTransferSchema = ({
           if (val) {
             try {
               if (
-                governedTokenAccount?.extensions.token?.account.address.toBase58() ==
+                governedTokenAccount?.extensions?.transferAddress?.toBase58() ==
                 val
               ) {
                 return this.createError({
@@ -318,7 +319,7 @@ export const getTokenTransferSchema = ({
               await validateDestinationAccAddress(
                 connection,
                 val,
-                governedTokenAccount?.extensions.token?.account.address
+                governedTokenAccount?.extensions.transferAddress
               )
               return true
             } catch (e) {
