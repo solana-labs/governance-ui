@@ -13,7 +13,7 @@ import FormFooter from '../FormFooter'
 export default function Step1({ onSubmit, onPrevClick }) {
   const { query } = useRouter()
   const schemaObject = {
-    daoAvatar: yup.string().typeError('Required').required('Required'),
+    daoAvatar: yup.string(),
     daoName: yup.string().typeError('Required').required('Required'),
     daoDescription: yup.string(),
   }
@@ -46,7 +46,7 @@ export default function Step1({ onSubmit, onPrevClick }) {
   }, [query])
 
   function serializeValues(values) {
-    delete values.daoAvatar
+    delete values?.daoAvatar
     onSubmit({ step: 1, data: values })
   }
 
@@ -73,8 +73,9 @@ export default function Step1({ onSubmit, onPrevClick }) {
       />
       <div className="pt-10 space-y-10 md:space-y-12">
         <ImageUploader
-          title="Add an avatar"
+          title="What's your DAO's avatar?"
           description="The avatar you choose will visually represent your DAO"
+          optional
           defaultValue={getValues('daoAvatar')}
           error={errors.daoAvatar?.message || ''}
           onSelect={handleAvatarSelect}
