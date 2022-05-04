@@ -43,6 +43,59 @@ module.exports = {
       body: ['Inter', 'sans-serif'],
     },
     extend: {
+      fontSize: {
+        'landing-page': {
+          xs: [
+            '12pt',
+            {
+              letterSpacing: '0pt',
+              lineHeight: 1.4,
+            },
+          ],
+          sm: [
+            '14pt',
+            {
+              letterSpacing: '0pt',
+              lineHeight: 1.4,
+            },
+          ],
+          base: [
+            '18pt',
+            {
+              letterSpacing: '0pt',
+              lineHeight: 1.4,
+            },
+          ],
+          lg: [
+            '20pt',
+            {
+              letterSpacing: '-0.5pt',
+              lineHeight: 1.1,
+            },
+          ],
+          xl: [
+            '24pt',
+            {
+              letterSpacing: '-0.5pt',
+              lineHeight: 1.1,
+            },
+          ],
+          '2xl': [
+            '36pt',
+            {
+              letterSpacing: '-0.5pt',
+              lineHeight: 1.1,
+            },
+          ],
+          '3xl': [
+            '50pt',
+            {
+              letterSpacing: '-0.5pt',
+              lineHeight: 1.1,
+            },
+          ],
+        },
+      },
       cursor: {
         help: 'help',
       },
