@@ -126,6 +126,8 @@ async function awaitTransactionSignatureConfirmation(
               typeof blockHeight !== undefined &&
               timeoutBlockHeight > blockHeight!
             ) {
+              done = true
+              console.log('Tx Timeout ----')
               reject({ timeout: true })
             }
             if (blockHeight) {
@@ -446,7 +448,18 @@ export const sendTransactionsV2 = async (
     unsignedTxns.push(transaction)
   }
   const signedTxns = await wallet.signAllTransactions(unsignedTxns)
-  console.log('Transactions play order', transactionCallOrchestrator)
+  console.log(
+    'Transactions play type order',
+    transactionCallOrchestrator.map((x) => {
+      return {
+        ...x,
+        sequenceType:
+          typeof x.sequenceType !== 'undefined'
+            ? SequenceType[SequenceType[x.sequenceType]]
+            : 'Parallel',
+      }
+    })
+  )
   console.log('Signed transactions', signedTxns)
   for (const fcn of transactionCallOrchestrator) {
     if (
