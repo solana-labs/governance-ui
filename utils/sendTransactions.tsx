@@ -10,6 +10,7 @@ import {
   TransactionSignature,
   Keypair,
 } from '@solana/web3.js'
+import { notify } from './notifications'
 
 interface TransactionInstructionWithType {
   instructionsSet: TransactionInstruction[]
@@ -163,8 +164,12 @@ async function awaitTransactionSignatureConfirmation(
     fn()
   })
     .catch((err) => {
-      if (err.timeout && status) {
-        status.err = { timeout: true }
+      if (err.timeout) {
+        notify({
+          type: 'warning',
+          message: 'Transactions timeout please try again',
+        })
+        throw { timeout: true }
       }
 
       //@ts-ignore
@@ -257,7 +262,6 @@ export async function sendSignedTransaction({
       true,
       block
     )
-
     if (confirmation.err) {
       console.error(confirmation.err)
       throw new Error('Transaction failed: Custom instruction error')
@@ -447,6 +451,7 @@ export const sendTransactionsV2 = async (
     }
     unsignedTxns.push(transaction)
   }
+
   const signedTxns = await wallet.signAllTransactions(unsignedTxns)
   console.log(
     'Transactions play type order',
