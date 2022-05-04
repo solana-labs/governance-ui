@@ -3,11 +3,11 @@
   "cSpell.words": ["Addin", "blockworks", "lamports", "solana"],
   "workbench.colorCustomizations": {
     "activityBar.activeBackground": "#b578ff",
-    "activityBar.activeBorder": "#14F195",
+    "activityBar.activeBorder": "#ffcb9f",
     "activityBar.background": "#b578ff",
     "activityBar.foreground": "#15202b",
     "activityBar.inactiveForeground": "#15202b99",
-    "activityBarBadge.background": "#14F195",
+    "activityBarBadge.background": "#ffcb9f",
     "activityBarBadge.foreground": "#15202b",
     "sash.hoverBorder": "#b578ff",
     "statusBar.background": "#9945ff",

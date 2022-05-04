@@ -1,4 +1,4 @@
-import { H4 } from './Header'
+import Header from './Header'
 
 export const IconInfoBox = ({ imgSrc, title, children }) => {
   return (
@@ -9,7 +9,7 @@ export const IconInfoBox = ({ imgSrc, title, children }) => {
         alt="icon"
       />
       <div>
-        <H4>{title}</H4>
+        <Header as="h4">{title}</Header>
         {children}
       </div>
     </div>

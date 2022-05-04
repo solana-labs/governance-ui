@@ -1,6 +1,8 @@
 import { Fragment } from 'react'
 import { Disclosure, Transition } from '@headlessui/react'
-import GradientTitle from '../../../components_2/Gradient'
+import Header from '../../../components_2/Header'
+import Chevron from '../../../components_2/Chevron'
+import { useIsExtensionWidth } from 'components_2/Utils'
 
 export const FaqPanel = ({ question, answer }) => {
   return (
@@ -13,12 +15,7 @@ export const FaqPanel = ({ question, answer }) => {
                 <div className="mb-0 font-sans text-lg text-left">
                   {question}
                 </div>
-                <img
-                  src="/img/realms-web/icons/chevron.svg"
-                  className={`h-6 ml-5 mt-1 default-transition w-4 ${
-                    open ? 'transform rotate-180' : ''
-                  }`}
-                />
+                <Chevron props={open} />
               </div>
             </Disclosure.Button>
             <Transition
@@ -30,7 +27,9 @@ export const FaqPanel = ({ question, answer }) => {
               leaveTo="transform opacity-0"
             >
               <Disclosure.Panel>
-                <p className="pt-2 md:pb-3 opacity-70 md:w-2/3">{answer}</p>
+                <p className="pt-2 md:pb-3 text-lg opacity-70 md:w-2/3">
+                  {answer}
+                </p>
               </Disclosure.Panel>
             </Transition>
           </>
@@ -69,6 +68,8 @@ const FAQs = [
 ]
 
 const FAQSection = () => {
+  const isExtensionWidth = useIsExtensionWidth()
+
   return (
     <div className="py-20 md:pt-36 md:pb-12">
       <div className="flex flex-wrap">
@@ -78,7 +79,20 @@ const FAQSection = () => {
           alt=""
         />
         <div className="w-full md:w-fit">
-          <GradientTitle>Frequently Asked Questions (FAQs)</GradientTitle>
+          {!isExtensionWidth ? (
+            <Header as="h2" withGradient>
+              Frequently Asked Questions (FAQs)
+            </Header>
+          ) : (
+            <>
+              <Header as="h2" withGradient>
+                Frequently Asked Questions
+              </Header>
+              <Header as="h2" withGradient>
+                (FAQs)
+              </Header>
+            </>
+          )}
         </div>
       </div>
       <div>

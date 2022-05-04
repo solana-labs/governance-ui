@@ -1,4 +1,5 @@
-import { GradientH2 } from 'components_2/Header'
+import Header from 'components_2/Header'
+import { useIsExtensionWidth } from 'components_2/Utils'
 
 const TextBox = ({ title, text }) => {
   return (
@@ -10,19 +11,24 @@ const TextBox = ({ title, text }) => {
 }
 
 const WhatIsADAO = () => {
-  const isMaxWidth = true
+  const isExtensionWidth = useIsExtensionWidth()
 
   return (
     <div className="pt-9 md:pt-24 pb-11 md:pb-32">
       <div className="pb-8 md:pb-12">
-        {isMaxWidth ? (
-          <GradientH2>
+        {!isExtensionWidth ? (
+          <Header as="h2" withGradient>
             A DAO is a community working together to make decisions
-          </GradientH2>
+          </Header>
         ) : (
-          <GradientH2>A DAO is a community working</GradientH2> && (
-            <GradientH2>together to make decisions</GradientH2>
-          )
+          <>
+            <Header as="h2" withGradient>
+              A DAO is a community working
+            </Header>
+            <Header as="h2" withGradient>
+              together to make decisions
+            </Header>
+          </>
         )}
       </div>
       <div className="flex flex-col md:flex-row">

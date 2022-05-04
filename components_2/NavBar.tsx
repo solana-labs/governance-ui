@@ -1,4 +1,4 @@
-import { ExploreButton, ReadTheDocsButton } from 'pages/solana'
+import { ExploreButton, ReadTheDocsButton } from './Button'
 import { useEffect, useState } from 'react'
 
 export const NavContent = () => {

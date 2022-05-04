@@ -1,7 +1,7 @@
 import Button from '../../../components_2/Button'
 import { DaoType } from '../../../components_2/DaoType'
 import { DaoIcon } from '../../../components_2/DaoIcon'
-import { GradientH2 } from '../../../components_2/Header'
+import Header from '../../../components_2/Header'
 
 const CreateDaoButton = ({ text }) => {
   return (
@@ -85,8 +85,12 @@ const SelectDAOToCreate = () => {
   return (
     <div className="pt-16 pb-16 md:pt-24 md:pb-28">
       <div className="mb-4 text-center md:text-left">
-        <GradientH2>What types of DAOs</GradientH2>
-        <GradientH2>would you like to create?</GradientH2>
+        <Header as="h2" withGradient>
+          What types of DAO
+        </Header>
+        <Header as="h2" withGradient>
+          would you like to create?
+        </Header>
       </div>
       <ListOfDAOTypes />
     </div>

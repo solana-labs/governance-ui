@@ -1,14 +1,12 @@
-const Chevron = (open) => {
+export default function Chevron({ props }) {
   return (
-    <div>
+    <>
       <img
         src="/img/realms-web/icons/chevron.svg"
-        className={`h-6 transition-all w-4 ${
-          open ? 'transform rotate-360' : 'transform rotate-180'
+        className={`h-6 ml-5 mt-1 default-transition w-4 ${
+          props ? 'transform' : 'rotate-180'
         }`}
       />
-    </div>
+    </>
   )
 }
-
-export default Chevron

@@ -69,6 +69,7 @@
     "react-intersection-observer": "^9.1.0",
     "react-markdown": "^7.0.0",
     "react-portal": "^4.2.2",
+    "react-responsive": "^9.0.0-beta.6",
     "remark-gfm": "^3.0.1",
     "superstruct": "^0.15.4",
     "ts-node": "^10.7.0",
