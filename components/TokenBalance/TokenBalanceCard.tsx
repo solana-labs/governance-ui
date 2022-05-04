@@ -147,14 +147,12 @@ const TokenDeposit = ({
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
   const connection = useWalletStore((s) => s.connection.current)
-  const cluster = useWalletStore((s) => s.connection.cluster)
   const { fetchWalletTokenAccounts, fetchRealm } = useWalletStore(
     (s) => s.actions
   )
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
-  const pythClient = useVotePluginsClientStore((s) => s.state.pythClient)
   const maxVoterWeight =
     useNftPluginStore((s) => s.state.maxVoteRecord)?.pubkey || undefined
   const {

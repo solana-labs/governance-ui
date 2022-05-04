@@ -177,14 +177,12 @@ export class VotingClient {
         walletPk
       )
 
-      let obj = {}
-      obj[type] = {}
       const {
         voterWeightAccount,
       } = await this.client.stakeConnection.withUpdateVoterWeight(
         instructions,
         stakeAccount!,
-        obj,
+        { [type]: {} },
         voterWeightTarget
       )
 
