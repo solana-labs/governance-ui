@@ -99,6 +99,7 @@ const REALM = () => {
     tokenRecords,
     ownVoterWeight,
     ownTokenRecord,
+    isNftMode,
   } = useRealm()
   const proposalsPerPage = 20
   const [filters, setFilters] = useState<ProposalState[]>([])
@@ -242,7 +243,12 @@ const REALM = () => {
         //will run only if plugin is connected with realm
         const plugin = await client?.withCastPluginVote(
           instructions,
-          selectedProposal.proposalPk
+          {
+            account: selectedProposal.proposal,
+            pubkey: selectedProposal.proposalPk,
+            owner: realm.pubkey,
+          },
+          ownTokenRecord
         )
         if (client.client instanceof NftVoterClient === false) {
           await withCastVote(
@@ -291,7 +297,10 @@ const REALM = () => {
   }
 
   const showMultiVote = useMemo(
-    () => (realm ? realm.account.votingProposalCount > 1 && connected : false),
+    () =>
+      realm
+        ? realm.account.votingProposalCount > 1 && connected && !isNftMode
+        : false,
     [realm, connected]
   )
 

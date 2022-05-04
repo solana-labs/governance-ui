@@ -16,6 +16,7 @@ export const MINT_METADATA = {
   SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt: { name: 'SRM' },
   MyHd6a7HWKTMeJMHBkrbMq4hZwZxwn9x7dxXcopQ4Wd: { name: 'OMH' },
   UXPhBoR3qG4UCiGNJfV7MqhHyFqKN68g45GoYvAeL2M: { name: 'UXP' },
+  H7uqouPsJkeEiLpCEoC1qYVVquDrZan6ZfdPK2gS44zm: { name: 'FORE' },
 }
 
 export function getMintMetadata(
