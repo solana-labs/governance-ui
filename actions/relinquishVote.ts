@@ -12,7 +12,11 @@ import { sendTransaction } from '../utils/send'
 import { withRelinquishVote } from '@solana/spl-governance'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
 import { chunks } from '@utils/helpers'
-import { sendTransactions, SequenceType } from '@utils/sendTransactions'
+import {
+  sendTransactionsV2,
+  SequenceType,
+  transactionInstructionsToTypedInstructionsSets,
+} from '@utils/sendTransactions'
 
 export const relinquishVote = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -43,14 +47,25 @@ export const relinquishVote = async (
   if (shouldChunk) {
     const insertChunks = chunks(instructions, 2)
     const signerChunks = Array(instructions.length).fill([])
-    const instArray = [...insertChunks]
-    await sendTransactions(
-      connection,
-      wallet,
-      instArray,
-      [...signerChunks],
-      SequenceType.Sequential
-    )
+    const instArray = [
+      ...insertChunks
+        .slice(0, 1)
+        .map((x) =>
+          transactionInstructionsToTypedInstructionsSets(
+            x,
+            SequenceType.Sequential
+          )
+        ),
+      ...insertChunks
+        .slice(1, insertChunks.length)
+        .map((x) =>
+          transactionInstructionsToTypedInstructionsSets(
+            x,
+            SequenceType.Parallel
+          )
+        ),
+    ]
+    await sendTransactionsV2(connection, wallet, instArray, [...signerChunks])
   } else {
     const transaction = new Transaction()
     transaction.add(...instructions)

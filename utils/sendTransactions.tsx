@@ -20,6 +20,11 @@ interface TransactionsPlayingIndexes {
   sequenceType?: SequenceType
 }
 
+interface Block {
+  blockhash: string
+  lastValidBlockHeight: number
+}
+
 // TODO: sendTransactions() was imported from Oyster as is and needs to be reviewed and updated
 // In particular common primitives should be unified with send.tsx and also ensure the same resiliency mechanism
 // is used for monitoring transactions status and timeouts
@@ -45,9 +50,16 @@ async function awaitTransactionSignatureConfirmation(
   timeout: number,
   connection: Connection,
   commitment: Commitment = 'recent',
-  queryStatus = false
+  queryStatus = false,
+  startingBlock?: Block
 ) {
+  const timeoutBlockHeight = startingBlock
+    ? startingBlock.lastValidBlockHeight + 152
+    : 0
+  console.log('Start block height', startingBlock?.lastValidBlockHeight)
+  console.log('Possible timeout block', timeoutBlockHeight)
   let done = false
+  let startTimeoutCheck = false
   let status: SignatureStatus | null = {
     slot: 0,
     confirmations: 0,
@@ -60,8 +72,9 @@ async function awaitTransactionSignatureConfirmation(
         if (done) {
           return
         }
-        done = true
-        reject({ timeout: true })
+        console.log('Starting timeout check')
+        console.log('Timeout check was set to start after', timeout)
+        startTimeoutCheck = true
       }, timeout)
       try {
         subId = connection.onSignature(
@@ -91,9 +104,24 @@ async function awaitTransactionSignatureConfirmation(
         // eslint-disable-next-line no-loop-func
         const fn = async () => {
           try {
-            const signatureStatuses = await connection.getSignatureStatuses([
-              txid,
-            ])
+            const promises: [
+              Promise<RpcResponseAndContext<(SignatureStatus | null)[]>>,
+              Promise<number>?
+            ] = [connection.getSignatureStatuses([txid])]
+            if (startTimeoutCheck) {
+              promises.push(connection.getBlockHeight('confirmed'))
+            }
+            const [signatureStatuses, blockHeight] = await Promise.all(promises)
+            if (
+              typeof blockHeight !== undefined &&
+              timeoutBlockHeight > blockHeight!
+            ) {
+              reject({ timeout: true })
+            }
+            if (blockHeight) {
+              console.log('Timeout threshold blockheight', timeoutBlockHeight)
+              console.log('Current blockheight', blockHeight)
+            }
             status = signatureStatuses && signatureStatuses.value[0]
             if (!done) {
               if (!status) {
@@ -171,12 +199,13 @@ export const getUnixTs = () => {
   return new Date().getTime() / 1000
 }
 
-const DEFAULT_TIMEOUT = 60000
+const DEFAULT_TIMEOUT = 3000
 /////////////////////////////////////////////////
 export async function sendSignedTransaction({
   signedTransaction,
   connection,
   timeout = DEFAULT_TIMEOUT,
+  block,
 }: {
   signedTransaction: Transaction
   connection: Connection
@@ -184,6 +213,7 @@ export async function sendSignedTransaction({
   sentMessage?: string
   successMessage?: string
   timeout?: number
+  block?: Block
 }): Promise<{ txid: string; slot: number }> {
   const rawTransaction = signedTransaction.serialize()
   const startTime = getUnixTs()
@@ -212,7 +242,8 @@ export async function sendSignedTransaction({
       timeout,
       connection,
       'recent',
-      true
+      true,
+      block
     )
 
     if (confirmation.err) {
@@ -281,7 +312,6 @@ export const sendTransactions = async (
   if (!block) {
     block = await connection.getLatestBlockhash(commitment)
   }
-
   for (let i = 0; i < instructionSet.length; i++) {
     const instructions = instructionSet[i]
     const signers = signersSet[i]
@@ -351,16 +381,12 @@ export const sendTransactionsV2 = async (
   TransactionInstructions: TransactionInstructionWithType[],
   signersSet: Keypair[][],
   commitment: Commitment = 'singleGossip',
-  block?: {
-    blockhash: string
-  }
-): Promise<null> => {
+  block?: Block
+) => {
   if (!wallet.publicKey) throw new Error('Wallet not connected!')
-  const startBlock = await connection.getLatestBlockhash(commitment)
   if (!block) {
     block = await connection.getLatestBlockhash(commitment)
   }
-
   const unsignedTxns: Transaction[] = []
   const transactionsPlayer: TransactionsPlayingIndexes[] = []
   for (let i = 0; i < TransactionInstructions.length; i++) {
@@ -375,7 +401,7 @@ export const sendTransactionsV2 = async (
     transactionInstruction.instructionsSet.forEach((instruction) =>
       transaction.add(instruction)
     )
-    transaction.recentBlockhash = startBlock.blockhash
+    transaction.recentBlockhash = block.blockhash
 
     if (signers.length > 0) {
       transaction.partialSign(...signers)
@@ -397,8 +423,9 @@ export const sendTransactionsV2 = async (
     }
     unsignedTxns.push(transaction)
   }
-  console.log(transactionsPlayer)
   const signedTxns = await wallet.signAllTransactions(unsignedTxns)
+  console.log('Transactions play order', transactionsPlayer)
+  console.log('Signed transactions', signedTxns)
   for (const fcn of transactionsPlayer) {
     if (
       typeof fcn.sequenceType === 'undefined' ||
@@ -409,6 +436,7 @@ export const sendTransactionsV2 = async (
           sendSignedTransaction({
             connection,
             signedTransaction: signedTxns[x],
+            block,
           })
         )
       )
@@ -418,11 +446,11 @@ export const sendTransactionsV2 = async (
         await sendSignedTransaction({
           connection,
           signedTransaction: signedTxns[innerFcn],
+          block,
         })
       }
     }
   }
-  return null
 }
 
 export const transactionInstructionsToTypedInstructionsSets = (
