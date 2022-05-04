@@ -305,3 +305,17 @@ body::-webkit-scrollbar-corner {
 
   width: fit-content;
 }
+
+.border-gradient {
+  border: 2px solid transparent;
+  background-origin: border-box;
+  background-clip: content-box, border-box;
+}
+.border-gradient.black-fill {
+  background-image: linear-gradient(#292833, #292833),
+    linear-gradient(93deg, #00c2ff 3%, #00e4ff 50%, #87f2ff 98%);
+}
+.border-gradient.white-fill {
+  background-image: linear-gradient(white, white),
+    linear-gradient(93deg, #00c2ff 3%, #00e4ff 50%, #87f2ff 98%);
+}
