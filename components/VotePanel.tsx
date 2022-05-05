@@ -183,8 +183,12 @@ const VotePanel = () => {
 
   const isPanelVisible = (isVoting || isVoteCast) && isVisibleToWallet
 
+  //Todo: move to own components with refactor to dao folder structure
+  const isPyth =
+    realmInfo?.realmId.toBase58() === PYTH_LOCALNET_REALM_ID.toBase58()
+
   const isRelinquishVotePanelVisible = !(
-    realmInfo?.realmId.toBase58() === PYTH_LOCALNET_REALM_ID.toBase58() &&
+    isPyth &&
     isVoteCast &&
     connected &&
     !isVoting
