@@ -34,11 +34,13 @@ import {
 } from 'Strategies/protocols/mango/tools'
 import useMarketStore from 'Strategies/store/marketStore'
 import LoadingRows from './LoadingRows'
+import TradeOnSerum, { TradeOnSerumProps } from './TradeOnSerum'
+import { AccountType } from '@utils/uiTypes/assets'
 
 const AccountOverview = () => {
   const router = useRouter()
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
-  const nftsPerPubkey = useTreasuryAccountStore((s) => s.nftsPerPubkey)
+  const nftsPerPubkey = useTreasuryAccountStore((s) => s.governanceNfts)
   const nftsCount =
     currentAccount?.governance && currentAccount.isNft
       ? nftsPerPubkey[currentAccount?.governance?.pubkey.toBase58()]?.length
@@ -47,6 +49,8 @@ const AccountOverview = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const isNFT = currentAccount?.isNft
   const isSol = currentAccount?.isSol
+  const isSplToken = currentAccount?.type === AccountType.TOKEN
+  const isAuxiliaryAccount = currentAccount?.type === AccountType.AuxiliaryToken
   const { canUseTransferInstruction } = useGovernanceAssets()
   const connection = useWalletStore((s) => s.connection)
   const recentActivity = useTreasuryAccountStore((s) => s.recentActivity)
@@ -73,6 +77,10 @@ const AccountOverview = () => {
     setProposedInvestment,
   ] = useState<TreasuryStrategy | null>(null)
   const [isCopied, setIsCopied] = useState<boolean>(false)
+  const [
+    tradeSerumInfo,
+    setTradeSerumInfo,
+  ] = useState<TradeOnSerumProps | null>(null)
 
   useEffect(() => {
     if (strategies.length > 0) {
@@ -177,16 +185,16 @@ const AccountOverview = () => {
       </div>
       <AccountHeader />
       <div
-        className={`flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 pb-8 px-4`}
+        className={`flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 pb-8 px-4 justify-center`}
       >
-        <div className="relative w-full">
+        <div className="relative w-full max-w-lg">
           {isCopied && (
             <div className="absolute bg-bkg-1 left-1/2 p-2 rounded text-fgd-3 text-xs transform -translate-x-1/2 -top-10">
               Copied to Clipboard
             </div>
           )}
           <Button
-            className="w-full"
+            className="w-full max-w-lg"
             onClick={() =>
               isNFT
                 ? setOpenNftDepositModal(true)
@@ -198,23 +206,39 @@ const AccountOverview = () => {
             {isNFT ? 'Deposit' : 'Copy Deposit Address'}
           </Button>
         </div>
-        <Button
-          tooltipMessage={
-            !canUseTransferInstruction
-              ? 'You need to have connected wallet with ability to create token transfer proposals'
-              : isNFT && nftsCount === 0
-              ? 'Please deposit nfts first'
-              : ''
-          }
-          className="w-full"
-          onClick={() => setOpenCommonSendModal(true)}
-          disabled={!canUseTransferInstruction || (isNFT && nftsCount === 0)}
-        >
-          Send
-        </Button>
+        {isSplToken && (
+          <Button
+            tooltipMessage={
+              !canUseTransferInstruction
+                ? 'You need to have connected wallet with ability to create token transfer proposals'
+                : ''
+            }
+            className="w-full"
+            onClick={() => setTradeSerumInfo({ tokenAccount: currentAccount })}
+            disabled={!canUseTransferInstruction}
+          >
+            Trade On Serum
+          </Button>
+        )}
+        {!isAuxiliaryAccount && (
+          <Button
+            tooltipMessage={
+              !canUseTransferInstruction
+                ? 'You need to have connected wallet with ability to create token transfer proposals'
+                : isNFT && nftsCount === 0
+                ? 'Please deposit nfts first'
+                : ''
+            }
+            className="w-full max-w-lg"
+            onClick={() => setOpenCommonSendModal(true)}
+            disabled={!canUseTransferInstruction || (isNFT && nftsCount === 0)}
+          >
+            Send
+          </Button>
+        )}
         {isSol ? (
           <Button
-            className="w-full"
+            className="w-full max-w-lg"
             onClick={() => setOpenMsolConvertModal(true)}
             disabled={!canUseTransferInstruction}
           >
@@ -229,61 +253,63 @@ const AccountOverview = () => {
           </Button>
         ) : null}
       </div>
-      <div className="pb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="mb-0">
-            {showStrategies ? 'Available Investments' : 'Current Investments'}
-          </h3>
-          <LinkButton
-            className="flex items-center text-primary-light whitespace-nowrap"
-            onClick={() => setShowStrategies(!showStrategies)}
-          >
-            {showStrategies ? (
-              <>
-                <XCircleIcon className="h-5 mr-2 w-5" />
-                Cancel
-              </>
+      {!isAuxiliaryAccount && (
+        <div className="pb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="mb-0">
+              {showStrategies ? 'Available Investments' : 'Current Investments'}
+            </h3>
+            <LinkButton
+              className="flex items-center text-primary-light whitespace-nowrap"
+              onClick={() => setShowStrategies(!showStrategies)}
+            >
+              {showStrategies ? (
+                <>
+                  <XCircleIcon className="h-5 mr-2 w-5" />
+                  Cancel
+                </>
+              ) : (
+                <>
+                  <PlusCircleIcon className="h-5 mr-2 w-5" />
+                  New Investment
+                </>
+              )}
+            </LinkButton>
+          </div>
+          {showStrategies ? (
+            eligibleInvestments.length > 0 ? (
+              eligibleInvestments.map((strat, i) => (
+                <StrategyCard
+                  key={strat.handledTokenSymbol + i}
+                  currentMangoDeposits={currentMangoDeposits}
+                  onClick={() => setProposedInvestment(strat)}
+                  strat={strat}
+                />
+              ))
             ) : (
-              <>
-                <PlusCircleIcon className="h-5 mr-2 w-5" />
-                New Investment
-              </>
-            )}
-          </LinkButton>
-        </div>
-        {showStrategies ? (
-          eligibleInvestments.length > 0 ? (
-            eligibleInvestments.map((strat, i) => (
+              <div className="border border-fgd-4 p-4 rounded-md">
+                <p className="text-center text-fgd-3">
+                  No investments available for this account
+                </p>
+              </div>
+            )
+          ) : accountInvestments.length > 0 ? (
+            accountInvestments.map((strat, i) => (
               <StrategyCard
                 key={strat.handledTokenSymbol + i}
-                currentMangoDeposits={currentMangoDeposits}
-                onClick={() => setProposedInvestment(strat)}
                 strat={strat}
+                currentMangoDeposits={currentMangoDeposits}
               />
             ))
           ) : (
             <div className="border border-fgd-4 p-4 rounded-md">
               <p className="text-center text-fgd-3">
-                No investments available for this account
+                No investments for this account
               </p>
             </div>
-          )
-        ) : accountInvestments.length > 0 ? (
-          accountInvestments.map((strat, i) => (
-            <StrategyCard
-              key={strat.handledTokenSymbol + i}
-              strat={strat}
-              currentMangoDeposits={currentMangoDeposits}
-            />
-          ))
-        ) : (
-          <div className="border border-fgd-4 p-4 rounded-md">
-            <p className="text-center text-fgd-3">
-              No investments for this account
-            </p>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
       <h3 className="mb-4">Recent Activity</h3>
       <div>
         {isLoadingRecentActivity ? (
@@ -371,6 +397,17 @@ const AccountOverview = () => {
           isOpen={openMsolConvertModal}
         >
           <ConvertToMsol />
+        </Modal>
+      )}
+      {tradeSerumInfo && (
+        <Modal
+          sizeClassName="sm:max-w-3xl"
+          onClose={() => {
+            setTradeSerumInfo(null)
+          }}
+          isOpen={!!tradeSerumInfo}
+        >
+          <TradeOnSerum {...tradeSerumInfo} />
         </Modal>
       )}
     </>

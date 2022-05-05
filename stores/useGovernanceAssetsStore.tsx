@@ -8,6 +8,7 @@ import {
 } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import {
+  AUXILIARY_TOKEN_ACCOUNTS,
   DEFAULT_NATIVE_SOL_MINT,
   DEFAULT_NFT_TREASURY_MINT,
   HIDDEN_GOVERNANCES,
@@ -30,6 +31,7 @@ import { ConnectionContext } from '@utils/connection'
 import axios from 'axios'
 import {
   AccountType,
+  AccountTypeAuxiliaryToken,
   AccountTypeMint,
   AccountTypeNFT,
   AccountTypeProgram,
@@ -118,7 +120,7 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
       (x) => x.pubkey.toBase58() === governancePk.toBase58()
     )
     const previousAccounts = _get().assetAccounts.filter(
-      (x) => x.governance.pubkey.toBase58() !== governancePk.toBase58()
+      (x) => x.governance?.pubkey.toBase58() !== governancePk.toBase58()
     )
     const accounts = await getAccountsForGovernances(
       connection,
@@ -226,13 +228,27 @@ const getTokenAssetAccounts = async (
     const governance = governances.find(
       (x) => x.pubkey.toBase58() === tokenAccount.account.owner.toBase58()
     )
-    const account = await getTokenAccountObj(
-      governance!,
-      tokenAccount,
-      mintAccounts
-    )
-    if (account) {
-      accounts.push(account)
+    if (governance) {
+      const account = await getTokenAccountObj(
+        governance!,
+        tokenAccount,
+        mintAccounts
+      )
+      if (account) {
+        accounts.push(account)
+      }
+    } else if (
+      [...Object.values(AUXILIARY_TOKEN_ACCOUNTS).flatMap((x) => x)].find((x) =>
+        x.accounts.includes(tokenAccount.publicKey.toBase58())
+      )
+    ) {
+      const mint = mintAccounts.find(
+        (x) => x.publicKey.toBase58() === tokenAccount.account.mint.toBase58()
+      )
+      const account = new AccountTypeAuxiliaryToken(tokenAccount, mint)
+      if (account) {
+        accounts.push(account)
+      }
     }
   }
   const solAccounts = await getSolAccountsObj(
@@ -365,6 +381,10 @@ const getAccountsForGovernances = async (
   )
   const mintAccounts = getMintAccounts(mintGovernances, mintGovernancesMintInfo)
   const programAccounts = getProgramAssetAccounts(programGovernances)
+  const auxliaryTokenAccounts = AUXILIARY_TOKEN_ACCOUNTS[realm.account.name]
+    ?.length
+    ? AUXILIARY_TOKEN_ACCOUNTS[realm.account.name]
+    : []
   const ownedByGovernancesTokenAccounts = await axios.request({
     url: connection.endpoint,
     method: 'POST',
@@ -397,18 +417,51 @@ const getAccountsForGovernances = async (
           ],
         }
       }),
+      ...auxliaryTokenAccounts.map((x) => {
+        return {
+          jsonrpc: '2.0',
+          id: x.owner,
+          method: 'getProgramAccounts',
+          params: [
+            TOKEN_PROGRAM_ID.toBase58(),
+            {
+              commitment: connection.current.commitment,
+              encoding: 'base64',
+              filters: [
+                {
+                  dataSize: TokenAccountLayout.span, // number of bytes
+                },
+                {
+                  memcmp: {
+                    offset: tokenAccountOwnerOffset, // number of bytes
+                    bytes: x.owner, // base58 encoded string
+                  },
+                },
+              ],
+            },
+          ],
+        }
+      }),
     ]),
   })
-  const tokenAccountsJson = ownedByGovernancesTokenAccounts.data
+  const tokenAccountsJson = ownedByGovernancesTokenAccounts.data.map((x) => {
+    const auxiliaryMatch = auxliaryTokenAccounts.find(
+      (auxAcc) => auxAcc.owner === x.id
+    )
+    if (auxiliaryMatch) {
+      x.result = x.result?.filter((x) =>
+        auxiliaryMatch.accounts.includes(x.pubkey)
+      )
+    }
+    return x
+  })
   const tokenAccountsParsed = tokenAccountsJson.length
-    ? tokenAccountsJson
-        .flatMap((x) => x.result)
-        .map((x) => {
-          const publicKey = new PublicKey(x.pubkey)
-          const data = Buffer.from(x.account.data[0], 'base64')
-          const account = parseTokenAccountData(publicKey, data)
-          return { publicKey, account }
-        })
+    ? [...tokenAccountsJson.flatMap((x) => x.result)].map((x) => {
+        const publicKey = new PublicKey(x.pubkey)
+        const data = Buffer.from(x.account.data[0], 'base64')
+        const account = parseTokenAccountData(publicKey, data)
+        return { publicKey, account }
+      })
     : []
   const tokenAssetAccounts = await getTokenAssetAccounts(
     tokenAccountsParsed,

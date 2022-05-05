@@ -9,6 +9,7 @@ import { executeTransaction } from 'actions/executeTransaction'
 import { ProposalTransaction } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { getProgramVersionForRealm } from '@models/registry/api'
+import { InstructionOptions } from '@components/InstructionOptions'
 
 type ExecuteInstructionProps = {
   onClose: () => void
@@ -37,7 +38,12 @@ const ExecuteInstruction = ({
           connection.endpoint
         )
 
-        await executeTransaction(rpcContext, proposal, instruction)
+        await executeTransaction(
+          rpcContext,
+          proposal,
+          instruction,
+          InstructionOptions.none
+        )
 
         onClose()
       }

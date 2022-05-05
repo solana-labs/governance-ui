@@ -37,14 +37,14 @@ export const closeDeposit = async ({
     wallet!.publicKey!,
     clientProgramId
   )
-  instructions.push(
-    client!.program.instruction.closeDepositEntry(depositIndex, {
-      accounts: {
-        voter: voter,
-        voterAuthority: wallet!.publicKey!,
-      },
+  const closeDepositEntry = await client!.program.methods
+    .closeDepositEntry(depositIndex)
+    .accounts({
+      voter: voter,
+      voterAuthority: wallet!.publicKey!,
     })
-  )
+    .instruction()
+  instructions.push(closeDepositEntry)
 
   const transaction = new Transaction()
   transaction.add(...instructions)
