@@ -1,24 +1,37 @@
 import { ExploreButton, ReadTheDocsButton } from './Button'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import ConnectWalletButton from './ConnectWalletButton'
 
-export const NavContent = () => {
+export const NavContent = ({ showWalletButton = false }) => {
   return (
     <div className="max-w-[1440px] mx-auto px-4 flex items-center justify-between">
-      <div className="flex items-center space-x-1">
-        <img src="1-Landing-v2/logo-realms-blue.png" className="w-8 h-8" />
-        <span>Realms</span>
-      </div>
-      <div className="flex items-center space-x-7">
-        <div className="hidden md:block">
-          <ReadTheDocsButton />
+      <Link href="/solana">
+        <div className="flex items-center space-x-1 cursor-pointer hover:brightness-110">
+          <img src="/1-Landing-v2/logo-realms-blue.png" className="w-8 h-8" />
+          <span>Realms</span>
         </div>
-        <ExploreButton />
-      </div>
+      </Link>
+      {showWalletButton ? (
+        <ConnectWalletButton />
+      ) : (
+        <div className="flex items-center space-x-7">
+          <div className="hidden md:block">
+            <ReadTheDocsButton />
+          </div>
+          <ExploreButton />
+        </div>
+      )}
     </div>
   )
 }
 
-export const Navbar = () => {
+interface NavbarProps {
+  showWalletButton?: boolean
+}
+
+export default function Navbar(props: NavbarProps) {
+  const { showWalletButton } = props
   const [scrollY, setScrollY] = useState(0)
 
   useEffect(() => {
@@ -43,9 +56,7 @@ export const Navbar = () => {
         scrollY > 200 ? 'bg-[#292833] bg-opacity-90 backdrop-blur-[3px]' : ''
       }`}
     >
-      <NavContent />
+      <NavContent showWalletButton={showWalletButton} />
     </div>
   )
 }
-
-export default Navbar
