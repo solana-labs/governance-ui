@@ -162,7 +162,7 @@ export const getUnixTs = () => {
   return new Date().getTime() / 1000
 }
 
-const DEFAULT_TIMEOUT = 50000
+const DEFAULT_TIMEOUT = 60000
 /////////////////////////////////////////////////
 export async function sendSignedTransaction({
   signedTransaction,
@@ -296,9 +296,7 @@ export const sendTransactions = async (
 
     unsignedTxns.push(transaction)
   }
-
   const signedTxns = await wallet.signAllTransactions(unsignedTxns)
-
   const pendingTxns: Promise<{ txid: string; slot: number }>[] = []
 
   const breakEarlyObject = { breakEarly: false }

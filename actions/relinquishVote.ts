@@ -26,7 +26,7 @@ export const relinquishVote = async (
 
   const governanceAuthority = walletPubkey
   const beneficiary = walletPubkey
-  withRelinquishVote(
+  await withRelinquishVote(
     instructions,
     programId,
     proposal.account.governance,
@@ -37,18 +37,17 @@ export const relinquishVote = async (
     governanceAuthority,
     beneficiary
   )
-
   await plugin.withRelinquishVote(instructions, proposal, voteRecord)
-
   const chunkTreshold = 2
   const shouldChunk = instructions.length > chunkTreshold
   if (shouldChunk) {
     const insertChunks = chunks(instructions, 2)
     const signerChunks = Array(instructions.length).fill([])
+    const instArray = [...insertChunks]
     await sendTransactions(
       connection,
       wallet,
-      [...insertChunks],
+      instArray,
       [...signerChunks],
       SequenceType.Sequential
     )
