@@ -3,6 +3,9 @@ import useWalletStore from 'stores/useWalletStore'
 import Select from '@components/inputs/Select'
 import useRealm from 'hooks/useRealm'
 import { DisplayAddress } from '@cardinal/namespaces-components'
+import { fmtMintAmount } from '@tools/sdk/units'
+import { getMintMetadata } from '../instructions/programs/splToken'
+import { BN } from '@project-serum/anchor'
 
 const DelegateBalanceCard = () => {
   const delegates = useMembersStore((s) => s.compact.delegates)
@@ -15,6 +18,8 @@ const DelegateBalanceCard = () => {
     ownDelegateCouncilTokenRecords,
     ownTokenRecord,
     ownCouncilTokenRecord,
+    mint,
+    councilMint,
   } = useRealm()
   const { actions } = useWalletStore((s) => s)
 
@@ -27,14 +32,20 @@ const DelegateBalanceCard = () => {
 
   const getCouncilDelegateAmt = () => {
     if (walletId && delegates?.[walletId]) {
-      return delegates?.[walletId]?.councilMembers?.length || 0
+      return fmtMintAmount(
+        councilMint,
+        new BN(delegates?.[walletId].councilTokenCount || 0)
+      )
     }
     return 0
   }
 
   const getCommunityTokenCount = () => {
     if (walletId && delegates?.[walletId]) {
-      return delegates?.[walletId].communityTokenCount || 0
+      return fmtMintAmount(
+        mint,
+        new BN(delegates?.[walletId].communityTokenCount || 0)
+      )
     }
     return 0
   }
@@ -62,7 +73,7 @@ const DelegateBalanceCard = () => {
           <div className="bg-bkg-1 px-4 py-2 justify-between rounded-md w-full">
             <div className="flex flex-row justify-between w-full mb-2">
               <div>
-                <p className="text-fgd-3 text-xs">Council Votes</p>
+                <p className="text-fgd-3 text-xs"> Council Votes</p>
                 <p className="font-bold mb-0 text-fgd-1 text-xl">
                   {getCouncilTokenCount()}
                 </p>
@@ -119,13 +130,12 @@ const DelegateBalanceCard = () => {
           </div>
         </div>
       )}
-      {/* todo: switch thisback to .communityMembers */}
       {walletId && delegates?.[walletId]?.communityMembers && (
         <div className="flex space-x-4 items-center mt-4">
           <div className="bg-bkg-1 px-4 py-2 justify-between rounded-md w-full">
             <div className="flex flex-row justify-between w-full mb-2">
               <div>
-                <p className="text-fgd-3 text-xs">Council Votes</p>
+                <p className="text-fgd-3 text-xs">Community Votes</p>
                 <p className="font-bold mb-0 text-fgd-1 text-xl">
                   {getCommunityTokenCount()}
                 </p>

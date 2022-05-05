@@ -41,7 +41,7 @@ const NotificationsPlugin = () => {
   const { realmInfo } = useRealm()
   if (realmInfo?.enableNotifi) {
     return (
-      <div className="md:col-span-6 col-span-12">
+      <div className="md:w-1/2 col-span-12">
         <NotificationsCard />
       </div>
     )
@@ -55,17 +55,17 @@ const Account = ({ withHeader = true }: { withHeader?: boolean }) => {
     return (
       <div className="grid grid-cols-12 gap-4">
         <AccountInner withHeader={withHeader} />
-        <div className="md:col-span-6 col-span-12">
+        <NotificationsPlugin />
+        <div className="md:w-1/2 col-span-12">
           <DelegateCard />
         </div>
-        <NotificationsPlugin />
       </div>
     )
   } else {
     return (
       <>
         <AccountInner withHeader={withHeader} />
-        <div className="md:col-span-6 col-span-12">
+        <div className="md:w-1/2 col-span-12">
           <DelegateCard />
         </div>
         <NotificationsPlugin />

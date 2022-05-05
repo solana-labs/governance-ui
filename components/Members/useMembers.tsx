@@ -228,6 +228,7 @@ export default function useMembers() {
           const oldCouncilRecords = delegateMap[walletId].councilMembers || []
 
           delegateMap[walletId] = {
+            ...delegateMap[walletId],
             councilMembers: [...oldCouncilRecords, member],
             councilTokenCount:
               (delegateMap[walletId]?.councilTokenCount || 0) +
@@ -250,8 +251,9 @@ export default function useMembers() {
             delegateMap[walletId].communityMembers || []
 
           delegateMap[walletId] = {
+            ...delegateMap[walletId],
             communityMembers: [...oldCommunityRecords, member],
-            councilTokenCount:
+            communityTokenCount:
               (delegateMap[walletId]?.communityTokenCount || 0) +
               member.communityVotes.toNumber(),
           }
