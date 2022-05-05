@@ -48,9 +48,7 @@ export default function useRealm() {
   const nftVotingPower = useNftPluginStore((s) => s.state.votingPower)
 
   const pythClient = useVotePluginsClientStore((s) => s.state.pythClient)
-  const [pythVoterWeight, setPythVoterWeight] = useState<
-    PythBalance | undefined
-  >(undefined)
+  const [pythVoterWeight, setPythVoterWeight] = useState<PythBalance>()
 
   useEffect(() => {
     const getPythVoterWeight = async () => {
@@ -147,12 +145,13 @@ export default function useRealm() {
     currentPluginPk && vsrPluginsPks.includes(currentPluginPk?.toBase58())
   const isNftMode =
     currentPluginPk && nftPluginsPks.includes(currentPluginPk?.toBase58())
+  const pythVotingPower = pythVoterWeight?.toBN() || new BN(0)
   const ownVoterWeight = getVoterWeight(
     currentPluginPk,
     ownTokenRecord,
     votingPower,
     nftVotingPower,
-    pythVoterWeight?.toBN() || new BN(0),
+    pythVotingPower,
     ownCouncilTokenRecord
   )
   return {

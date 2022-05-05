@@ -9,7 +9,10 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { getMaxVoterWeightRecord } from '@solana/spl-governance'
 import { getNftMaxVoterWeightRecord } from 'NftVotePlugin/sdk/accounts'
 import { notify } from '@utils/notifications'
-import { LOCALNET_STAKING_ADDRESS as PYTH_LOCALNET_STAKING_ADDRESS } from 'pyth-staking-api'
+import {
+  LOCALNET_STAKING_ADDRESS as PYTH_LOCALNET_STAKING_ADDRESS,
+  DEVNET_STAKING_ADDRESS as PYTH_DEVNET_STAKING_ADDRESS,
+} from 'pyth-staking-api'
 
 export const vsrPluginsPks: string[] = [
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo',
@@ -21,6 +24,7 @@ export const nftPluginsPks: string[] = [
 
 export const pythPluginsPks: string[] = [
   PYTH_LOCALNET_STAKING_ADDRESS.toBase58(),
+  PYTH_DEVNET_STAKING_ADDRESS.toBase58(),
 ]
 
 export function useVotingPlugins() {
@@ -33,11 +37,8 @@ export function useVotingPlugins() {
     handleSetPythClient,
     handleSetCurrentRealmVotingClient,
   } = useVotePluginsClientStore()
-  const {
-    setVotingNfts,
-    setMaxVoterWeight,
-    setIsLoadingNfts,
-  } = useNftPluginStore()
+  const { setVotingNfts, setMaxVoterWeight, setIsLoadingNfts } =
+    useNftPluginStore()
 
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
