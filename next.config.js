@@ -34,7 +34,7 @@ config = withTM({
 // STEP 2: Enable bundle analyzer when `ANALYZE=true`.
 config = withBundleAnalyzer(config)
 
-if (process.env.VERCEL_ENV && process.env.SENTRY_AUTH_TOKEN) {
+if (process.env.SENTRY_AUTH_TOKEN) {
 // STEP 3: Sentry error reporting. MUST COME LAST to work with sourcemaps.
 config = withSentryConfig(config, {
   // Additional config options for the Sentry Webpack plugin. Keep in mind that
