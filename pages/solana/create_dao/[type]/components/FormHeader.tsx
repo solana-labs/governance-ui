@@ -11,7 +11,7 @@
 // })
 // const [initialized, setInitialized] = useState(false)
 
-import { HeroH1 } from 'components_2/Hero'
+import Header from 'components_2/Header'
 
 function StepProgressIndicator({
   currentStep,
@@ -66,7 +66,7 @@ export default function FormHeader({
         stepDescription={stepDescription}
       />
       <div className="flex items-center pt-10 md:pt-0">
-        <HeroH1>{title}</HeroH1>
+        <Header as="h1">{title}</Header>
         <img
           src={imgSrc}
           className="max-w-[420px] hidden md:block"
