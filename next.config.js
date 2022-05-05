@@ -16,6 +16,7 @@ let config
 // STEP 1: Add transpiler.
 config = withTM({
   webpack: (config, { isServer }) => {
+    config.experiments = { asyncWebAssembly: true, layers: true }
     config.module.rules.push({
       test: /\.svg$/,
       use: ['@svgr/webpack'],
@@ -35,17 +36,17 @@ config = withTM({
 config = withBundleAnalyzer(config)
 
 if (process.env.SENTRY_AUTH_TOKEN) {
-// STEP 3: Sentry error reporting. MUST COME LAST to work with sourcemaps.
-config = withSentryConfig(config, {
-  // Additional config options for the Sentry Webpack plugin. Keep in mind that
-  // the following options are set automatically, and overriding them is not
-  // recommended:
-  //   release, url, org, project, authToken, configFile, stripPrefix,
-  //   urlPrefix, include, ignore
-  silent: true, // Suppresses all logs
-  // For all available options, see:
-  // https://github.com/getsentry/sentry-webpack-plugin#options.
-})
+  // STEP 3: Sentry error reporting. MUST COME LAST to work with sourcemaps.
+  config = withSentryConfig(config, {
+    // Additional config options for the Sentry Webpack plugin. Keep in mind that
+    // the following options are set automatically, and overriding them is not
+    // recommended:
+    //   release, url, org, project, authToken, configFile, stripPrefix,
+    //   urlPrefix, include, ignore
+    silent: true, // Suppresses all logs
+    // For all available options, see:
+    // https://github.com/getsentry/sentry-webpack-plugin#options.
+  })
 }
 
 module.exports = config
