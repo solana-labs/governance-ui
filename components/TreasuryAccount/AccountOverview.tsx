@@ -34,12 +34,13 @@ import {
 } from 'Strategies/protocols/mango/tools'
 import useMarketStore from 'Strategies/store/marketStore'
 import LoadingRows from './LoadingRows'
+import TradeOnSerum, { TradeOnSerumProps } from './TradeOnSerum'
 import { AccountType } from '@utils/uiTypes/assets'
 
 const AccountOverview = () => {
   const router = useRouter()
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
-  const nftsPerPubkey = useTreasuryAccountStore((s) => s.nftsPerPubkey)
+  const nftsPerPubkey = useTreasuryAccountStore((s) => s.governanceNfts)
   const nftsCount =
     currentAccount?.governance && currentAccount.isNft
       ? nftsPerPubkey[currentAccount?.governance?.pubkey.toBase58()]?.length
@@ -48,6 +49,7 @@ const AccountOverview = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const isNFT = currentAccount?.isNft
   const isSol = currentAccount?.isSol
+  const isSplToken = currentAccount?.type === AccountType.TOKEN
   const isAuxiliaryAccount = currentAccount?.type === AccountType.AuxiliaryToken
   const { canUseTransferInstruction } = useGovernanceAssets()
   const connection = useWalletStore((s) => s.connection)
@@ -75,6 +77,10 @@ const AccountOverview = () => {
     setProposedInvestment,
   ] = useState<TreasuryStrategy | null>(null)
   const [isCopied, setIsCopied] = useState<boolean>(false)
+  const [
+    tradeSerumInfo,
+    setTradeSerumInfo,
+  ] = useState<TradeOnSerumProps | null>(null)
 
   useEffect(() => {
     if (strategies.length > 0) {
@@ -200,6 +206,20 @@ const AccountOverview = () => {
             {isNFT ? 'Deposit' : 'Copy Deposit Address'}
           </Button>
         </div>
+        {isSplToken && (
+          <Button
+            tooltipMessage={
+              !canUseTransferInstruction
+                ? 'You need to have connected wallet with ability to create token transfer proposals'
+                : ''
+            }
+            className="w-full"
+            onClick={() => setTradeSerumInfo({ tokenAccount: currentAccount })}
+            disabled={!canUseTransferInstruction}
+          >
+            Trade On Serum
+          </Button>
+        )}
         {!isAuxiliaryAccount && (
           <Button
             tooltipMessage={
@@ -377,6 +397,17 @@ const AccountOverview = () => {
           isOpen={openMsolConvertModal}
         >
           <ConvertToMsol />
+        </Modal>
+      )}
+      {tradeSerumInfo && (
+        <Modal
+          sizeClassName="sm:max-w-3xl"
+          onClose={() => {
+            setTradeSerumInfo(null)
+          }}
+          isOpen={!!tradeSerumInfo}
+        >
+          <TradeOnSerum {...tradeSerumInfo} />
         </Modal>
       )}
     </>

@@ -53,14 +53,15 @@ async function awaitTransactionSignatureConfirmation(
   connection: Connection,
   commitment: Commitment = 'recent',
   queryStatus = false,
-  startingBlock: Block
+  startingBlock?: Block
 ) {
   //If the validator can’t find a slot number for the blockhash
   //or if the looked up slot number is more than 151 slots lower
   // than the slot number of the block being processed, the transaction will be rejected.
   const timeoutBlockPeriod = 152
-  const timeoutBlockHeight =
-    startingBlock.lastValidBlockHeight + timeoutBlockPeriod
+  const timeoutBlockHeight = startingBlock
+    ? startingBlock.lastValidBlockHeight + timeoutBlockPeriod
+    : 0
   console.log('Start block height', startingBlock?.lastValidBlockHeight)
   console.log('Possible timeout block', timeoutBlockHeight)
   let done = false
@@ -230,6 +231,7 @@ export async function sendSignedTransaction({
   successMessage?: string
   timeout?: number
   block: Block
+  block?: Block
 }): Promise<{ txid: string; slot: number }> {
   const rawTransaction = signedTransaction.serialize()
   const startTime = getUnixTs()
@@ -474,7 +476,7 @@ export const sendTransactionsV2 = async (
           sendSignedTransaction({
             connection,
             signedTransaction: signedTxns[x],
-            block: block!,
+            block,
           })
         )
       )
@@ -484,7 +486,7 @@ export const sendTransactionsV2 = async (
         await sendSignedTransaction({
           connection,
           signedTransaction: signedTxns[innerFcn],
-          block: block!,
+          block,
         })
       }
     }
