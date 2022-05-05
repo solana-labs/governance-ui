@@ -26,8 +26,7 @@ export const Button: FunctionComponent<ButtonProps> = ({
 
   if (secondary && !inverse) {
     // secondary (Explore DAO)
-    className +=
-      'py-3 px-2 h-[48px] md:h-[56px] md:w-[208px] bg-[#201f27] font-regular text-white hover:bg-gradient-to-r from-[#00C2FF] via-[#00E4FF] to-[#87F2FF] hover:text-[#292833] active:opacity-70'
+    className += `py-3 px-2 h-[48px] md:h-[56px] md:w-[208px] ${bgOverride} font-regular text-white hover:bg-gradient-to-r from-[#00C2FF] via-[#00E4FF] to-[#87F2FF] hover:text-[#292833] active:opacity-70`
   } else if (secondary && inverse) {
     // secondary inverse (Read Docs)
   } else if (tertiary) {
@@ -71,16 +70,18 @@ export const Button: FunctionComponent<ButtonProps> = ({
 
 export default Button
 
-export const ExploreButton = () => {
+export const ExploreButton = ({ bgOverride }) => {
   const [isHovering, setIsHovered] = useState(false)
   const onMouseEnter = () => setIsHovered(true)
   const onMouseLeave = () => setIsHovered(false)
 
   return (
     <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
-      <Button secondary>
+      <Button secondary bgOverride={bgOverride}>
         <div className="relative flex items-center justify-center bg-[#]">
-          <div className="bg-[#201f27] rounded-full ml-2 mr-2 p-2 absolute left-[-0.5rem]">
+          <div
+            className={`${bgOverride} rounded-full ml-2 mr-2 p-2 absolute left-[-0.5rem]`}
+          >
             <div
               className={` ${
                 isHovering

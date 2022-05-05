@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import ConnectWalletButton from './ConnectWalletButton'
 
-export const NavContent = ({ showWalletButton = false }) => {
+export const NavContent = ({ showWalletButton = false, bgOverride }) => {
   return (
     <div className="max-w-[1440px] mx-auto px-4 flex items-center justify-between">
       <Link href="/solana">
@@ -19,7 +19,8 @@ export const NavContent = ({ showWalletButton = false }) => {
           <div className="hidden md:block">
             <ReadTheDocsButton />
           </div>
-          <ExploreButton />
+          <ExploreButton bgOverride={bgOverride} />
+          {/* <ExploreButton bgcolour={'#292833'} bg-[#201f27]/> */}
         </div>
       )}
     </div>
@@ -56,7 +57,10 @@ export default function Navbar(props: NavbarProps) {
         scrollY > 200 ? 'bg-[#292833] bg-opacity-90 backdrop-blur-[3px]' : ''
       }`}
     >
-      <NavContent showWalletButton={showWalletButton} />
+      <NavContent
+        showWalletButton={showWalletButton}
+        bgOverride={'bg-[#201f27]'}
+      />
     </div>
   )
 }

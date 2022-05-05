@@ -1,5 +1,4 @@
 import Header from 'components_2/Header'
-import useIsExtensionWidth from 'components_2/Utils'
 
 const TextBox = ({ title, text }) => {
   return (
@@ -11,27 +10,14 @@ const TextBox = ({ title, text }) => {
 }
 
 const WhatIsADAO = () => {
-  // <useIsExtensionWidth width='800'/>
-
-  const isExtensionWidth = useIsExtensionWidth({ width: '1150' })
-
   return (
     <div className="pt-9 md:pt-24 pb-11 md:pb-32">
       <div className="pb-8 md:pb-12">
-        {!isExtensionWidth ? (
-          <Header as="h2" withGradient>
-            A DAO is a community working together to make decisions
-          </Header>
-        ) : (
-          <>
-            <Header as="h2" withGradient>
-              A DAO is a community working <br /> together to make decisions
-            </Header>
-            {/* <Header as="h2" withGradient>
-              together to make decisions
-            </Header> */}
-          </>
-        )}
+        <Header as="h2" withGradient>
+          A DAO is a community working
+          <br className="invisible lg:hidden" />
+          together to make decisions
+        </Header>
       </div>
       <div className="flex flex-col md:flex-row">
         <div className="w-full md:w-1/2">

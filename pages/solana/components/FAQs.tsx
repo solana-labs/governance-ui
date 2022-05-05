@@ -2,7 +2,6 @@ import { Fragment } from 'react'
 import { Disclosure, Transition } from '@headlessui/react'
 import Header from '../../../components_2/Header'
 import Chevron from '../../../components_2/Chevron'
-import useIsExtensionWidth from 'components_2/Utils'
 
 export const FaqPanel = ({ question, answer }) => {
   return (
@@ -68,8 +67,6 @@ const FAQs = [
 ]
 
 const FAQSection = () => {
-  const isExtensionWidth = useIsExtensionWidth({ width: '500' })
-
   return (
     <div className="py-20 md:pt-36 md:pb-12">
       <div className="flex flex-wrap">
@@ -79,17 +76,10 @@ const FAQSection = () => {
           alt=""
         />
         <div className="w-full md:w-fit">
-          {!isExtensionWidth ? (
-            <Header as="h2" withGradient>
-              Frequently Asked Questions (FAQs)
-            </Header>
-          ) : (
-            <>
-              <Header as="h2" withGradient>
-                Frequently Asked Questions <br /> (FAQs)
-              </Header>
-            </>
-          )}
+          <Header as="h2" withGradient>
+            Frequently Asked Questions <br className="invisible md:hidden" />
+            (FAQs)
+          </Header>
         </div>
       </div>
       <div>
