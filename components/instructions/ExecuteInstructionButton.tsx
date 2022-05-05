@@ -17,6 +17,7 @@ import { PublicKey } from '@solana/web3.js'
 import Tooltip from '@components/Tooltip'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { notify } from '@utils/notifications'
+import { InstructionOption } from '@components/InstructionOptions'
 import dayjs from 'dayjs'
 import {
   getFormattedStringFromDays,
@@ -35,11 +36,13 @@ export function ExecuteInstructionButton({
   playing,
   setPlaying,
   proposalInstruction,
+  instructionOption,
 }: {
   proposal: ProgramAccount<Proposal>
   proposalInstruction: ProgramAccount<ProposalTransaction>
   playing: PlayState
   setPlaying: React.Dispatch<React.SetStateAction<PlayState>>
+  instructionOption: InstructionOption
 }) {
   const { realmInfo } = useRealm()
   const wallet = useWalletStore((s) => s.current)
@@ -79,7 +82,12 @@ export function ExecuteInstructionButton({
     setPlaying(PlayState.Playing)
 
     try {
-      await executeTransaction(rpcContext, proposal, proposalInstruction)
+      await executeTransaction(
+        rpcContext,
+        proposal,
+        proposalInstruction,
+        instructionOption
+      )
       await refetchProposals()
     } catch (error) {
       notify({ type: 'error', message: `error executing instruction ${error}` })

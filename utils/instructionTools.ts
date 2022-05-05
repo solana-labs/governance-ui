@@ -11,8 +11,6 @@ import {
 } from '@solana/spl-token'
 import { SignerWalletAdapter, WalletAdapter } from '@solana/wallet-adapter-base'
 import {
-  Account,
-  Keypair,
   PublicKey,
   SystemProgram,
   TransactionInstruction,
@@ -23,15 +21,11 @@ import {
   getMintNaturalAmountFromDecimal,
   parseMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
-import type { ConnectionContext } from 'utils/connection'
+import { ConnectionContext } from 'utils/connection'
 import { getATA } from './ataTools'
 import { isFormValid } from './formValidation'
 import { getTokenAccountsByMint } from './tokens'
 import { UiInstruction } from './uiTypes/proposalCreationTypes'
-import { ConnectedVoltSDK, FriktionSDK } from '@friktion-labs/friktion-sdk'
-import { AnchorWallet } from '@friktion-labs/friktion-sdk/dist/cjs/src/miscUtils'
-import { WSOL_MINT } from '@components/instructions/tools'
-import Decimal from 'decimal.js'
 import { AssetAccount } from '@utils/uiTypes/assets'
 
 export const validateInstruction = async ({
@@ -44,175 +38,427 @@ export const validateInstruction = async ({
   return isValid
 }
 
-export async function getFriktionDepositInstruction({
-  schema,
-  form,
-  amount,
-  connection,
-  wallet,
-  setFormErrors,
-}: {
-  schema: any
-  form: any
-  amount: number
-  programId: PublicKey | undefined
-  connection: ConnectionContext
-  wallet: WalletAdapter | undefined
-  setFormErrors: any
-}): Promise<UiInstruction> {
-  const isValid = await validateInstruction({ schema, form, setFormErrors })
-  let serializedInstruction = ''
-  const prerequisiteInstructions: TransactionInstruction[] = []
-  const governedTokenAccount = form.governedTokenAccount as AssetAccount
-  const voltVaultId = new PublicKey(form.voltVaultId as string)
+// export async function getCastleDepositInstruction({
+//   schema,
+//   form,
+//   amount,
+//   connection,
+//   wallet,
+//   setFormErrors,
+// }: {
+//   schema: any
+//   form: CastleDepositForm
+//   amount: number
+//   programId: PublicKey | undefined
+//   connection: ConnectionContext
+//   wallet: WalletAdapter | undefined
+//   setFormErrors: any
+// }): Promise<UiInstruction> {
+//   const isValid = await validateInstruction({ schema, form, setFormErrors })
 
-  const signers: Keypair[] = []
-  if (
-    isValid &&
-    amount &&
-    governedTokenAccount?.extensions.token?.publicKey &&
-    governedTokenAccount?.extensions.token &&
-    governedTokenAccount?.extensions.mint?.account &&
-    governedTokenAccount?.governance &&
-    wallet
-  ) {
-    const sdk = new FriktionSDK({
-      provider: {
-        connection: connection.current,
-        wallet: (wallet as unknown) as AnchorWallet,
-      },
-    })
-    const cVoltSDK = new ConnectedVoltSDK(
-      connection.current,
-      wallet.publicKey as PublicKey,
-      await sdk.loadVoltByKey(voltVaultId)
-    )
+//   // NOTE - this should be `let serializedInstruction = ''` but it's const so the current changeset passes eslint
+//   let serializedInstruction = ''
 
-    const voltVault = cVoltSDK.voltVault
-    const vaultMint = cVoltSDK.voltVault.vaultMint
+//   const prerequisiteInstructions: TransactionInstruction[] = []
+//   const governedTokenAccount = form.governedTokenAccount as AssetAccount
 
-    //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
-    const { currentAddress: receiverAddress, needToCreateAta } = await getATA({
-      connection: connection,
-      receiverAddress: governedTokenAccount.governance.pubkey,
-      mintPK: vaultMint,
-      wallet,
-    })
-    //we push this createATA instruction to transactions to create right before creating proposal
-    //we don't want to create ata only when instruction is serialized
-    if (needToCreateAta) {
-      prerequisiteInstructions.push(
-        Token.createAssociatedTokenAccountInstruction(
-          ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-          TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-          vaultMint, // mint
-          receiverAddress, // ata
-          governedTokenAccount.governance.pubkey, // owner of token account
-          wallet.publicKey! // fee payer
-        )
-      )
-    }
+//   const signers: Keypair[] = []
 
-    let pendingDepositInfo
-    try {
-      pendingDepositInfo = await cVoltSDK.getPendingDepositForUser()
-    } catch (err) {
-      pendingDepositInfo = null
-    }
+//   if (
+//     isValid &&
+//     amount &&
+//     amount > 0 &&
+//     governedTokenAccount?.extensions.token?.publicKey &&
+//     governedTokenAccount?.extensions.token &&
+//     governedTokenAccount?.extensions.mint?.account &&
+//     governedTokenAccount?.governance &&
+//     wallet &&
+//     wallet.publicKey
+//   ) {
+//     // Create a new provider
+//     const provider = new Provider(
+//       connection.current,
+//       (wallet as unknown) as AnchorWallet,
+//       {
+//         preflightCommitment: 'confirmed',
+//         commitment: 'confirmed',
+//       }
+//     )
 
-    if (
-      pendingDepositInfo &&
-      pendingDepositInfo.roundNumber.lt(voltVault.roundNumber) &&
-      pendingDepositInfo?.numUnderlyingDeposited?.gtn(0)
-    ) {
-      prerequisiteInstructions.push(
-        await cVoltSDK.claimPending(receiverAddress)
-      )
-    }
+//     const configResponse = await fetch('https://api.castle.finance/configs')
+//     const vaults = (await configResponse.json()) as VaultConfig<DeploymentEnvs>[]
 
-    let depositTokenAccountKey: PublicKey | null
+//     // Get the vault that matches the current network and reserve currency
+//     // Note: Assumes one strategy
+//     const vault = vaults
+//       .filter((v) => v.cluster == connection.cluster)
+//       .find((v) => v.vault_id === form.castleVaultId)
 
-    if (governedTokenAccount.isSol) {
-      const { currentAddress: receiverAddress, needToCreateAta } = await getATA(
-        {
-          connection: connection,
-          receiverAddress: governedTokenAccount.governance.pubkey,
-          mintPK: new PublicKey(WSOL_MINT),
-          wallet,
-        }
-      )
-      if (needToCreateAta) {
-        prerequisiteInstructions.push(
-          Token.createAssociatedTokenAccountInstruction(
-            ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-            TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-            new PublicKey(WSOL_MINT), // mint
-            receiverAddress, // ata
-            governedTokenAccount.governance.pubkey, // owner of token account
-            wallet.publicKey! // fee payer
-          )
-        )
-      }
-      depositTokenAccountKey = receiverAddress
-    } else {
-      depositTokenAccountKey = governedTokenAccount.extensions.transferAddress!
-    }
+//     console.log('Depositing into vault:', vault)
+//     if (!vault) {
+//       console.log(vaults, form)
+//       throw new Error('Vault not found in config')
+//     }
 
-    try {
-      let decimals = 9
+//     // Load the vault
+//     const vaultClient = await VaultClient.load(
+//       provider,
+//       new PublicKey(vault.vault_id),
+//       connection.cluster == 'mainnet'
+//         ? DeploymentEnvs.mainnet
+//         : DeploymentEnvs.devnetParity
+//     )
 
-      if (!governedTokenAccount.isSol) {
-        const underlyingAssetMintInfo = await new Token(
-          connection.current,
-          governedTokenAccount.extensions.mint!.publicKey,
-          TOKEN_PROGRAM_ID,
-          (null as unknown) as Account
-        ).getMintInfo()
-        decimals = underlyingAssetMintInfo.decimals
-      }
+//     console.log(vaultClient)
 
-      const depositIx = governedTokenAccount.isSol
-        ? await cVoltSDK.depositWithTransfer(
-            new Decimal(amount),
-            depositTokenAccountKey,
-            receiverAddress,
-            governedTokenAccount.extensions.transferAddress!,
-            governedTokenAccount.governance.pubkey,
-            decimals
-          )
-        : await cVoltSDK.deposit(
-            new Decimal(amount),
-            depositTokenAccountKey,
-            receiverAddress,
-            governedTokenAccount.governance.pubkey,
-            decimals
-          )
+//     const reserveTokenOwner =
+//       governedTokenAccount.extensions.token.account.owner
 
-      const governedAccountIndex = depositIx.keys.findIndex(
-        (k) =>
-          k.pubkey.toString() ===
-          governedTokenAccount.governance?.pubkey.toString()
-      )
-      depositIx.keys[governedAccountIndex].isSigner = true
+//     // Create the DAOs LP ATA if it does not exist already
+//     let createLpAcctIx: TransactionInstruction | undefined = undefined
+//     const userLpTokenAccount = await Token.getAssociatedTokenAddress(
+//       ASSOCIATED_TOKEN_PROGRAM_ID,
+//       TOKEN_PROGRAM_ID,
+//       vaultClient.getVaultState().lpTokenMint,
+//       reserveTokenOwner,
+//       true
+//     )
+//     const userLpTokenAccountInfo = await vaultClient.program.provider.connection.getAccountInfo(
+//       userLpTokenAccount
+//     )
+//     if (userLpTokenAccountInfo == null) {
+//       createLpAcctIx = Token.createAssociatedTokenAccountInstruction(
+//         ASSOCIATED_TOKEN_PROGRAM_ID,
+//         TOKEN_PROGRAM_ID,
+//         vaultClient.getVaultState().lpTokenMint,
+//         userLpTokenAccount,
+//         reserveTokenOwner,
+//         wallet.publicKey
+//       )
+//     }
 
-      serializedInstruction = serializeInstructionToBase64(depositIx)
-    } catch (e) {
-      if (e instanceof Error) {
-        throw new Error('Error: ' + e.message)
-      }
-      throw e
-    }
-  }
-  const obj: UiInstruction = {
-    serializedInstruction,
-    isValid,
-    governance: governedTokenAccount?.governance,
-    prerequisiteInstructions: prerequisiteInstructions,
-    signers,
-    shouldSplitIntoSeparateTxs: true,
-  }
-  return obj
-}
+//     // Get the deposit instruction
+//     const { decimals } = governedTokenAccount.extensions.mint.account
+//     const depositIx = vaultClient.program.instruction.deposit(
+//       new BN(amount * Math.pow(10, decimals)),
+//       {
+//         accounts: {
+//           vault: vaultClient.vaultId,
+//           vaultAuthority: vaultClient.getVaultState().vaultAuthority,
+//           vaultReserveToken: vaultClient.getVaultState().vaultReserveToken,
+//           lpTokenMint: vaultClient.getVaultState().lpTokenMint,
+//           userReserveToken: governedTokenAccount.pubkey,
+//           userLpToken: userLpTokenAccount,
+//           userAuthority: reserveTokenOwner,
+//           tokenProgram: TOKEN_PROGRAM_ID,
+//           clock: SYSVAR_CLOCK_PUBKEY,
+//         },
+//       }
+//     )
+
+//     // Create the LP token account if necessary
+//     if (createLpAcctIx) {
+//       prerequisiteInstructions.push(createLpAcctIx)
+//     }
+
+//     serializedInstruction = serializeInstructionToBase64(depositIx)
+//   }
+
+//   // Build + return UI instruction
+//   const obj: UiInstruction = {
+//     serializedInstruction,
+//     isValid,
+//     governance: governedTokenAccount?.governance,
+//     prerequisiteInstructions: prerequisiteInstructions,
+//     signers,
+//     shouldSplitIntoSeparateTxs: true,
+//   }
+//   console.log('cas: obj', obj)
+
+//   return obj
+// }
+
+// export async function getCastleWithdrawInstruction({
+//   schema,
+//   form,
+//   amount,
+//   connection,
+//   wallet,
+//   setFormErrors,
+// }: {
+//   schema: any
+//   form: CastleDepositForm
+//   amount: number
+//   programId: PublicKey | undefined
+//   connection: ConnectionContext
+//   wallet: WalletAdapter | undefined
+//   setFormErrors: any
+// }): Promise<UiInstruction> {
+//   const isValid = await validateInstruction({ schema, form, setFormErrors })
+
+//   // NOTE - this should be `let serializedInstruction = ''` but it's const so the current changeset passes eslint
+//   let serializedInstruction = ''
+
+//   const prerequisiteInstructions: TransactionInstruction[] = []
+//   const governedTokenAccount = form.governedTokenAccount as AssetAccount
+
+//   const signers: Keypair[] = []
+
+//   if (
+//     isValid &&
+//     amount &&
+//     amount > 0 &&
+//     governedTokenAccount?.extensions.token?.publicKey &&
+//     governedTokenAccount?.extensions.token &&
+//     governedTokenAccount?.extensions.mint?.account &&
+//     governedTokenAccount?.governance &&
+//     wallet &&
+//     wallet.publicKey
+//   ) {
+//     // Create a new provider
+//     const provider = new Provider(
+//       connection.current,
+//       (wallet as unknown) as AnchorWallet,
+//       {
+//         preflightCommitment: 'confirmed',
+//         commitment: 'confirmed',
+//       }
+//     )
+
+//     const configResponse = await fetch('https://api.castle.finance/configs')
+//     const vaults = (await configResponse.json()) as VaultConfig<DeploymentEnvs>[]
+
+//     // Get the vault that matches the current network and reserve currency
+//     // Note: Assumes one strategy
+//     const vault = vaults
+//       .filter((v) => v.cluster == connection.cluster)
+//       .find((v) => v.vault_id === form.castleVaultId)
+
+//     console.log('Withdrawing from vault:', vault)
+//     if (!vault) {
+//       console.log(vaults, form)
+//       throw new Error('Vault not found in config')
+//     }
+
+//     // Load the vault
+//     const vaultClient = await VaultClient.load(
+//       provider,
+//       new PublicKey(vault.vault_id),
+//       connection.cluster == 'mainnet'
+//         ? DeploymentEnvs.mainnet
+//         : DeploymentEnvs.devnetParity
+//     )
+
+//     const lpTokenAccountOwner =
+//       governedTokenAccount.extensions.token.account.owner
+
+//     // Create the DAOs Reserve ATA if it does not exist already
+//     let createReserveAcctIx: TransactionInstruction | undefined = undefined
+//     const userReserveTokenAccount = await Token.getAssociatedTokenAddress(
+//       ASSOCIATED_TOKEN_PROGRAM_ID,
+//       TOKEN_PROGRAM_ID,
+//       vaultClient.getVaultState().reserveTokenMint,
+//       lpTokenAccountOwner,
+//       true
+//     )
+//     const userReserveTokenAccountInfo = await vaultClient.program.provider.connection.getAccountInfo(
+//       userReserveTokenAccount
+//     )
+//     if (userReserveTokenAccountInfo == null) {
+//       createReserveAcctIx = Token.createAssociatedTokenAccountInstruction(
+//         ASSOCIATED_TOKEN_PROGRAM_ID,
+//         TOKEN_PROGRAM_ID,
+//         vaultClient.getVaultState().reserveTokenMint,
+//         userReserveTokenAccount,
+//         lpTokenAccountOwner,
+//         wallet.publicKey
+//       )
+//     }
+
+//     console.log('userReserveTokenAccount', userReserveTokenAccount.toBase58())
+//     console.log(
+//       'vaultClient.getVaultState().vaultReserveToken',
+//       vaultClient.getVaultState().vaultReserveToken.toBase58()
+//     )
+//     // Get withdraw instruction. User selects the LP token to deposit back
+//     // into the vault in exchange for the reserve token
+//     const { decimals } = governedTokenAccount.extensions.mint.account
+//     const withdrawIx = vaultClient.program.instruction.withdraw(
+//       new BN(amount * Math.pow(10, decimals)),
+//       {
+//         accounts: {
+//           vault: vaultClient.vaultId,
+//           vaultAuthority: vaultClient.getVaultState().vaultAuthority,
+//           userAuthority: lpTokenAccountOwner,
+//           userLpToken: governedTokenAccount.pubkey,
+//           userReserveToken: userReserveTokenAccount,
+//           vaultReserveToken: vaultClient.getVaultState().vaultReserveToken,
+//           lpTokenMint: vaultClient.getVaultState().lpTokenMint,
+//           tokenProgram: TOKEN_PROGRAM_ID,
+//           clock: SYSVAR_CLOCK_PUBKEY,
+//         },
+//       }
+//     )
+
+//     // Create the reserve token account if necessary
+//     if (createReserveAcctIx) {
+//       prerequisiteInstructions.push(createReserveAcctIx)
+//     }
+
+//     serializedInstruction = serializeInstructionToBase64(withdrawIx)
+//   }
+
+//   // Build + return UI instruction
+//   const obj: UiInstruction = {
+//     serializedInstruction,
+//     isValid,
+//     governance: governedTokenAccount?.governance,
+//     prerequisiteInstructions: prerequisiteInstructions,
+//     signers,
+//     shouldSplitIntoSeparateTxs: true,
+//   }
+//   console.log('cas: obj', obj)
+
+//   return obj
+// }
+
+// /**
+//  * Pulls the reconcile amount out of the proposal
+//  * @param connection
+//  * @param wallet
+//  * @param proposalTx
+//  */
+// export async function getCastleReconcileInstruction(
+//   connection: Connection,
+//   wallet: WalletAdapter | undefined,
+//   instruction: ProgramAccount<ProposalTransaction>
+// ) {
+//   // Initialize a new provider
+//   const provider = new Provider(
+//     connection,
+//     (wallet as unknown) as AnchorWallet,
+//     {
+//       preflightCommitment: 'confirmed',
+//       commitment: 'confirmed',
+//     }
+//   )
+
+//   // Look up the current network from the endpoint
+//   const network = getNetworkFromEndpoint(connection.rpcEndpoint)
+
+//   // Get the vaults from the config api
+//   const configResponse = await fetch('https://api.castle.finance/configs')
+//   const vaults = (await configResponse.json()) as VaultConfig<DeploymentEnvs>[]
+
+//   // Get the vault that matches the current network and its vault id exists inside the proposal
+//   const vault = vaults
+//     .filter((v) =>
+//       network == 'mainnet'
+//         ? v.deploymentEnv == DeploymentEnvs.mainnet
+//         : v.deploymentEnv == DeploymentEnvs.devnetParity
+//     )
+//     .find((v) =>
+//       instruction.account.instructions
+//         .map((i) => i.accounts.map((a) => a.pubkey.toBase58()))
+//         .flat()
+//         .includes(v.vault_id)
+//     )
+
+//   console.log('Targeted Vault:', vault)
+
+//   if (!vault) {
+//     throw new Error('Vault not found in config')
+//   }
+
+//   // Load the vault
+//   const vaultClient = await VaultClient.load(
+//     provider,
+//     new PublicKey(vault.vault_id),
+//     network == 'mainnet' ? 'mainnet' : 'devnet-parity'
+//   )
+
+//   // Bundle reconcile and refresh into the same tx
+//   const ix = instruction.account.getSingleInstruction()
+
+//   // Grab the amount parameter from the instruction :^)
+//   const amount = new BN(
+//     [...ix.data.slice(8, 16)]
+//       .reverse()
+//       .map((i) => `00${i.toString(16)}`.slice(-2))
+//       .join(''),
+//     16
+//   ).toNumber()
+
+//   console.log('Grabbed', amount, 'from proposal instruction')
+
+//   return await vaultClient.getReconcileTxs(amount)
+// }
+
+// /**
+//  * Constructs refresh transaction based on network and vault and mint and strategy
+//  * @param connection
+//  * @param wallet
+//  * @param instructionOption
+//  * @returns Refresh transaction for the specified mint vault
+//  */
+// export async function getCastleRefreshInstruction(
+//   connection: Connection,
+//   wallet: WalletAdapter | undefined,
+//   instruction: ProgramAccount<ProposalTransaction>
+// ) {
+//   // Initialize a new provider
+//   const provider = new Provider(
+//     connection,
+//     (wallet as unknown) as AnchorWallet,
+//     {
+//       preflightCommitment: 'confirmed',
+//       commitment: 'confirmed',
+//     }
+//   )
+
+//   // Look up the current network from the endpoint
+//   const network = getNetworkFromEndpoint(connection.rpcEndpoint)
+
+//   // Get the vaults from the config api
+//   const configResponse = await fetch('https://api.castle.finance/configs')
+//   const vaults = (await configResponse.json()) as VaultConfig<DeploymentEnvs>[]
+
+//   // Get the vault that matches the current network and its vault id exists inside the proposal
+//   const vault = vaults
+//     .filter((v) =>
+//       network == 'mainnet'
+//         ? v.deploymentEnv == DeploymentEnvs.mainnet
+//         : v.deploymentEnv == DeploymentEnvs.devnetParity
+//     )
+//     .find((v) =>
+//       instruction.account.instructions
+//         .map((i) => i.accounts.map((a) => a.pubkey.toBase58()))
+//         .flat()
+//         .includes(v.vault_id)
+//     )
+
+//   console.log('Targeted Vault:', vault?.vault_id)
+
+//   if (!vault) {
+//     throw new Error('Vault not found in config')
+//   }
+
+//   console.log(network)
+
+//   // Load the vault
+//   const vaultClient = await VaultClient.load(
+//     provider,
+//     new PublicKey(vault.vault_id),
+//     network == 'mainnet' ? DeploymentEnvs.mainnet : DeploymentEnvs.devnetParity
+//   )
+
+//   console.log(vaultClient)
+
+//   // Get refresh ix
+//   const refreshIx = vaultClient.getRefreshIx()
+
+//   return refreshIx
+// }
 
 export async function getGenericTransferInstruction({
   schema,
