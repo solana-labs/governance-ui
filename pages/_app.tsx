@@ -1,5 +1,6 @@
 import { ThemeProvider } from 'next-themes'
 import '../styles/index.css'
+import '../styles/stylesheet-family-support.css'
 import useWallet from '../hooks/useWallet'
 import Notifications from '../components/Notification'
 import NavBar from '../components/NavBar'
@@ -23,6 +24,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { usePrevious } from '@hooks/usePrevious'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useMembers from '@components/Members/useMembers'
+import { useRouter } from 'next/router'
 
 function App({ Component, pageProps }) {
   useHydrateStore()
@@ -34,6 +36,7 @@ function App({ Component, pageProps }) {
   useEffect(() => {
     tokenService.fetchSolanaTokenList()
   }, [])
+  const router = useRouter()
   const { loadMarket } = useMarketStore()
   const { governedTokenAccounts } = useGovernanceAssets()
   const possibleNftsAccounts = governedTokenAccounts.filter(
@@ -49,7 +52,10 @@ function App({ Component, pageProps }) {
   const prevStringifyPossibleNftsAccounts = usePrevious(
     JSON.stringify(possibleNftsAccounts)
   )
-  const title = realmName ? `${realmName}` : 'Solana Governance'
+
+  const isRedirecting = router.route === '/'
+  const isLandingPage = /\/solana\/?.*/.test(router.route)
+  const title = realmName ? `${realmName}` : 'Realms'
 
   // Note: ?v==${Date.now()} is added to the url to force favicon refresh.
   // Without it browsers would cache the last used and won't change it for different realms
@@ -127,17 +133,24 @@ function App({ Component, pageProps }) {
   return (
     <div className="relative">
       <ErrorBoundary>
-        <ThemeProvider defaultTheme="Dark">
+        {!isLandingPage ? (
+          <ThemeProvider defaultTheme="Mango">
+            <WalletIdentityProvider appName={'Realms'}>
+              {!isRedirecting && <NavBar />}
+              <Notifications />
+              <PageBodyContainer>
+                <Component {...pageProps} />
+              </PageBodyContainer>
+            </WalletIdentityProvider>
+            {!isRedirecting && <Footer />}
+          </ThemeProvider>
+        ) : (
           <WalletIdentityProvider appName={'Realms'}>
-            <NavBar />
             <Notifications />
-            <PageBodyContainer>
-              <Component {...pageProps} />
-            </PageBodyContainer>
+            <Component {...pageProps} />
           </WalletIdentityProvider>
-        </ThemeProvider>
+        )}
       </ErrorBoundary>
-      <Footer />
     </div>
   )
 }

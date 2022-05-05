@@ -3,6 +3,7 @@ module.exports = {
   content: [
     './pages/**/*.{js,ts,jsx,tsx}',
     './components/**/*.{js,ts,jsx,tsx}',
+    './components_2/**/*.{js,ts,jsx,tsx}',
     './Strategies/**/*.{js,ts,jsx,tsx}',
     './VoteStakeRegistry/**/*.{js,ts,jsx,tsx}',
   ],
@@ -12,10 +13,89 @@ module.exports = {
   },
   theme: {
     fontFamily: {
-      display: ['PT Mono, monospace'],
-      body: ['Inter, sans-serif'],
+      serif: [
+        'p22-mackinac-pro',
+        'ui-serif',
+        'Georgia',
+        'Cambria',
+        '"Times New Roman"',
+        'Times',
+        'serif',
+      ],
+      sans: [
+        'Ambit',
+        'ui-sans-serif',
+        'system-ui',
+        '-apple-system',
+        'BlinkMacSystemFont',
+        '"Segoe UI"',
+        'Roboto',
+        '"Helvetica Neue"',
+        'Arial',
+        '"Noto Sans"',
+        'sans-serif',
+        '"Apple Color Emoji"',
+        '"Segoe UI Emoji"',
+        '"Segoe UI Symbol"',
+        '"Noto Color Emoji"',
+      ],
+      display: ['PT Mono', 'monospace'],
+      body: ['Inter', 'sans-serif'],
     },
     extend: {
+      fontSize: {
+        'landing-page': {
+          xs: [
+            '12pt',
+            {
+              letterSpacing: '0pt',
+              lineHeight: 1.4,
+            },
+          ],
+          sm: [
+            '14pt',
+            {
+              letterSpacing: '0pt',
+              lineHeight: 1.4,
+            },
+          ],
+          base: [
+            '18pt',
+            {
+              letterSpacing: '0pt',
+              lineHeight: 1.4,
+            },
+          ],
+          lg: [
+            '20pt',
+            {
+              letterSpacing: '-0.5pt',
+              lineHeight: 1.1,
+            },
+          ],
+          xl: [
+            '24pt',
+            {
+              letterSpacing: '-0.5pt',
+              lineHeight: 1.1,
+            },
+          ],
+          '2xl': [
+            '36pt',
+            {
+              letterSpacing: '-0.5pt',
+              lineHeight: 1.1,
+            },
+          ],
+          '3xl': [
+            '50pt',
+            {
+              letterSpacing: '-0.5pt',
+              lineHeight: 1.1,
+            },
+          ],
+        },
+      },
       cursor: {
         help: 'help',
       },
@@ -71,6 +151,17 @@ module.exports = {
           green: '#AFD803',
           blue: '#8AACEB',
         },
+        'realms-theme': {
+          primary: { light: '#292929', dark: '#101010' },
+          'secondary-1': { light: '#AFD803', dark: '#6CBF00' },
+          'secondary-2': { light: '#E54033', dark: '#C7251A' },
+          'bkg-11': '#131418',
+          'bkg-12': '#0c0d0f',
+          'bkg-13': '#50cbf2',
+          lightblue: '#B8ECFB',
+          blue: '#5BD2F8',
+          turquoise: '#47D1C3',
+        },
         'bkg-1': 'var(--bkg-1)',
         'bkg-2': 'var(--bkg-2)',
         'bkg-3': 'var(--bkg-3)',
@@ -89,11 +180,25 @@ module.exports = {
         green: 'var(--green)',
         orange: 'var(--orange)',
         blue: 'var(--blue)',
+        lightblue: 'var(--lightblue)',
+        turquoise: 'var(--turquoise)',
+        'bkg-11': 'var(--bkg-11)',
+        'bkg-12': 'var(--bkg-12)',
+        'bkg-13': 'var(--bkg-13)',
       },
       animation: {
         'connect-wallet-ping':
           'connect-wallet-ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite',
         gradient: 'gradient 4s ease-in-out infinite',
+      },
+      backgroundImage: {
+        'spl-gov': "url('/img/realms-web/backgrounds/spl-gov-background.svg')",
+        'hero-graphic': "url('/img/realms-web/backgrounds/hero-graphic.svg')",
+        'btn-blue': "url('/img/realms-web/buttons/button-create-default.svg')",
+        'btn-blue-hover':
+          "url('/img/realms-web/buttons/button-create-hover.svg')",
+        'btn-blue-active':
+          "url('/img/realms-web/buttons/button-create-active.svg')",
       },
       keyframes: {
         'connect-wallet-ping': {

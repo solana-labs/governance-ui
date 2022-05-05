@@ -23,6 +23,12 @@
   --fgd-2: theme('colors.dark-theme.fgd-2');
   --fgd-3: theme('colors.dark-theme.fgd-3');
   --fgd-4: theme('colors.dark-theme.fgd-4');
+  --bkg-11: theme('colors.realms-theme.bkg-11');
+  --bkg-12: theme('colors.realms-theme.bkg-12');
+  --bkg-13: theme('colors.realms-theme.bkg-13');
+  --blue: theme('colors.realms-theme.blue');
+  --lightblue: theme('colors.realms-theme.lightblue');
+  --turquoise: theme('colors.realms-theme.turquoise');
 }
 
 [data-theme='Light'] {
@@ -49,11 +55,11 @@
 /* base */
 
 * {
-  @apply m-0 p-0;
+  @apply p-0 m-0;
 }
 
 body {
-  @apply bg-bkg-1 text-fgd-1 text-base font-body tracking-wide;
+  @apply text-base tracking-wide bg-bkg-1 text-fgd-1 font-body;
 }
 
 h1 {
@@ -61,19 +67,76 @@ h1 {
 }
 
 h2 {
-  @apply text-xl mb-2 font-bold;
+  @apply mb-2 text-xl font-bold;
 }
 
 h3 {
-  @apply text-lg mb-1 font-bold;
+  @apply mb-1 text-lg font-bold;
 }
 
 h4 {
-  @apply text-sm mb-1 font-bold;
+  @apply mb-1 text-sm font-bold;
 }
 
+.landing-page {
+  @apply font-sans font-light;
+}
+
+.landing-page h1 {
+  @apply font-serif;
+  /* font-size: 50px;
+  letter-spacing: -0.5px;
+  line-height: 110%; */
+}
+
+.landing-page h2 {
+  @apply font-serif;
+  /* font-size: 36px;
+  letter-spacing: -0.5px;
+  line-height: 110%; */
+}
+
+.landing-page h3 {
+  @apply font-serif;
+  /* font-size: 24px;
+  letter-spacing: -0.5px;
+  line-height: 110%; */
+}
+
+.landing-page h4 {
+  @apply font-serif;
+  /* font-size: 20px;
+  letter-spacing: -0.5px;
+  line-height: 110%; */
+}
+
+.landing-page h5 {
+  @apply font-serif;
+  /* font-size: 16px;
+  letter-spacing: -0.5px;
+  line-height: 110%; */
+}
+
+/* .landing-page .text-xs {
+  font-size: 12px;
+  letter-spacing: 0px;
+  line-height: 140%;
+}
+
+.landing-page .text-sm {
+  font-size: 14px;
+  letter-spacing: 0px;
+  line-height: 140%;
+}
+
+.landing-page .text-base {
+  font-size: 18px;
+  letter-spacing: 0px;
+  line-height: 140%;
+} */
+
 p {
-  @apply break-words leading-normal text-fgd-2 text-sm;
+  @apply text-sm leading-normal break-words text-fgd-2;
 }
 
 tbody {
@@ -109,11 +172,11 @@ button {
 }
 
 .markdown a {
-  @apply text-fgd-2 transition-all duration-300 underline hover:text-fgd-3 hover:no-underline;
+  @apply underline transition-all duration-300 text-fgd-2 hover:text-fgd-3 hover:no-underline;
 }
 
 .markdown li {
-  @apply font-normal mb-2 ml-6 list-disc text-fgd-3;
+  @apply mb-2 ml-6 font-normal list-disc text-fgd-3;
 }
 
 .markdown pre {
@@ -175,4 +238,84 @@ body::-webkit-scrollbar-corner {
 
 ::-webkit-calendar-picker-indicator {
   filter: invert(1);
+}
+
+#glow {
+  width: 285px;
+  height: 151px;
+  background: #88d8ee;
+  mix-blend-mode: hard-light;
+  filter: blur(270px);
+}
+
+.transition-to-gradient-background::before,
+.transition-to-white-background::before {
+  position: absolute;
+  content: '';
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease-in;
+  border-radius: 999px;
+}
+
+.transition-to-gradient-background::before {
+  background: linear-gradient(
+    90.65deg,
+    #00c2ff 0.62%,
+    #00e4ff 50.08%,
+    #87f2ff 99.55%
+  );
+}
+
+.transition-to-white-background::before {
+  background-image: linear-gradient(to bottom, white, white);
+}
+
+.transition-to-gradient-background:hover::before,
+.transition-to-white-background:hover::before {
+  opacity: 1;
+}
+
+.transition-to-gradient-background:disabled:hover::before,
+.transition-to-white-background:disabled:hover::before {
+  opacity: 0;
+}
+
+.change-image-on-hover:hover .starting-image {
+  display: none;
+}
+
+.change-image-on-hover .hover-image {
+  display: none;
+}
+
+.change-image-on-hover:hover .hover-image {
+  display: block;
+}
+
+.step-indicator__with-gradient {
+  background: linear-gradient(to right, #00c2ff 0%, #00e4ff 50%, #87f2ff 100%);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+
+  width: fit-content;
+}
+
+.border-gradient {
+  border: 2px solid transparent;
+  background-origin: border-box;
+  background-clip: content-box, border-box;
+}
+.border-gradient.black-fill {
+  background-image: linear-gradient(#292833, #292833),
+    linear-gradient(93deg, #00c2ff 3%, #00e4ff 50%, #87f2ff 98%);
+}
+.border-gradient.white-fill {
+  background-image: linear-gradient(white, white),
+    linear-gradient(93deg, #00c2ff 3%, #00e4ff 50%, #87f2ff 98%);
 }
