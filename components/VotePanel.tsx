@@ -183,7 +183,7 @@ const VotePanel = () => {
 
   const isPanelVisible = (isVoting || isVoteCast) && isVisibleToWallet
 
-  //Todo: move to own components with migration to dao folder structure
+  //Todo: move to own components with refactor to dao folder structure
   const isPyth =
     realmInfo?.realmId.toBase58() === PYTH_LOCALNET_REALM_ID.toBase58()
 
