@@ -29,7 +29,7 @@ export default function KickstartSolana() {
             <div className="relative flex items-center justify-center">
               <div className="pl-4 pr-2">Read the Docs</div>
               <img
-                src="/1-Landing-v2/icon-external-link-white.png"
+                src="/img/realms-web/icons/external-link-white.png"
                 className="w-3 h-3 mr-4"
                 alt="External link icon"
               />

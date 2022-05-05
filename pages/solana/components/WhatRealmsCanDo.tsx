@@ -15,7 +15,7 @@ const OptionsBox = ({
     >
       <div className="relative w-full md:w-1/2">
         <img
-          src="/1-Landing-v2/bg-value-props.png"
+          src="/img/realms-web/backgrounds/bg-value-props.png"
           alt="artistic illustration"
           className="absolute bottom-[-20px] w-full z-[0]"
         />
@@ -37,7 +37,7 @@ const OptionsBox = ({
 
 const ListOfPros = [
   {
-    imgSrc: '/1-Landing-v2/screengrab-tokens.png',
+    imgSrc: '/img/realms-web/backgrounds/screengrab-tokens.png',
     imgAlt: 'Token image',
     title: 'Mint tokens for your community',
     description:
@@ -45,7 +45,7 @@ const ListOfPros = [
     direction: 'ltr',
   },
   {
-    imgSrc: '/1-Landing-v2/screengrab-invite.png',
+    imgSrc: '/img/realms-web/backgrounds/screengrab-invite.png',
     imgAlt: 'Invitation',
     title: 'Invite and Coordinate',
     description:
@@ -53,7 +53,7 @@ const ListOfPros = [
     direction: 'rtl',
   },
   {
-    imgSrc: '/1-Landing-v2/screengrab-vote.png',
+    imgSrc: '/img/realms-web/backgrounds/screengrab-vote.png',
     imgAlt: 'Vote results',
     title: 'Vote on the Issues',
     description:
@@ -61,7 +61,7 @@ const ListOfPros = [
     direction: 'ltr',
   },
   {
-    imgSrc: '/1-Landing-v2/screengrab-allocate.png',
+    imgSrc: '/img/realms-web/backgrounds/screengrab-allocate.png',
     imgAlt: 'Dashboard',
     title: 'Fund and Allocate the Treasury',
     description:

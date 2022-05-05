@@ -8,7 +8,10 @@ export const NavContent = ({ showWalletButton = false, bgOverride }) => {
     <div className="max-w-[1440px] mx-auto px-4 flex items-center justify-between">
       <Link href="/solana">
         <div className="flex items-center space-x-1 cursor-pointer hover:brightness-110">
-          <img src="/1-Landing-v2/logo-realms-blue.png" className="w-8 h-8" />
+          <img
+            src="/img/realms-web/icons/logo-realms-blue.png"
+            className="w-8 h-8"
+          />
           <span>Realms</span>
         </div>
       </Link>

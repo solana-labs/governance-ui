@@ -11,12 +11,12 @@ const CreateDaoButton = ({ text, href }) => {
         <div className="flex items-center">
           <div className="pr-2">{text}</div>
           <img
-            src="/1-Landing-v2/icon-arrow-blue.png"
+            src="/img/realms-web/icons/arrow-blue.png"
             className="w-6 h-6 starting-image"
             alt="arrow"
           />
           <img
-            src="/1-Landing-v2/icon-arrow-black.png"
+            src="/img/realms-web/icons/arrow-black.png"
             className="w-6 h-6 hover-image"
             alt="arrow"
           />
@@ -31,7 +31,7 @@ export const ListOfDAOTypes = () => {
     <div className="flex flex-col justify-between space-y-4 md:flex-row md:space-y-0">
       <div className="flex flex-col w-full md:w-[30%]">
         <DaoType
-          imgSrc="/1-Landing-v2/dao-type-medium-multisig.png"
+          imgSrc="/img/realms-web/icons/dao-type-medium-multisig.png"
           daoTheme="Multi-Signature DAO"
           text='A "multisig" DAO is a shared wallet, typically with two or more members authorizing transactions. This is a secure way for groups to store and access funds'
         />
@@ -51,7 +51,7 @@ export const ListOfDAOTypes = () => {
       </div>
       <div className="flex flex-col w-full md:w-[30%]">
         <DaoType
-          imgSrc="/1-Landing-v2/dao-type-medium-nft.png"
+          imgSrc="/img/realms-web/icons/dao-type-medium-nft.png"
           daoTheme="NFT Community DAO"
           text="NFT Community DAOs leverage NFTs as membership, giving holders of NFTs within specified collections voting power to make investment decisions."
         />
@@ -71,7 +71,7 @@ export const ListOfDAOTypes = () => {
       </div>
       <div className="flex flex-col w-full md:w-[30%]">
         <DaoType
-          imgSrc="/1-Landing-v2/dao-type-medium-govtoken.png"
+          imgSrc="/img/realms-web/icons/dao-type-medium-govtoken.png"
           daoTheme="Governance Token DAO"
           text="Governance Token DAOs help orgs determine how its funds are used. This flat voting hierarchy allows anyone to participate in the decisions of the org."
         />

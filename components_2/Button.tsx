@@ -85,8 +85,8 @@ export const ExploreButton = ({ bgOverride }) => {
             <div
               className={` ${
                 isHovering
-                  ? 'bg-[url(/1-Landing-v2/icon-binoculars-white.png)] '
-                  : 'bg-[url(/1-Landing-v2/icon-binoculars-blue.png)] '
+                  ? 'bg-[url(/img/realms-web/icons/binoculars-white.png)] '
+                  : 'bg-[url(/img/realms-web/icons/binoculars-blue.png)] '
               }
           w-5 h-5 bg-cover overflow-hidden text-transparent`}
             >
@@ -109,7 +109,7 @@ export const ReadTheDocsButton = () => {
       <div className="relative flex items-center justify-center">
         <div className="pl-4 pr-2">Read the Docs</div>
         <img
-          src="/1-Landing-v2/icon-external-link-white.png"
+          src="/img/realms-web/icons/external-link-white.png"
           className="w-3 h-3 mr-4"
           alt="External link icon"
         />

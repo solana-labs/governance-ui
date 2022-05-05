@@ -71,7 +71,7 @@ const FAQSection = () => {
     <div className="py-20 md:pt-36 md:pb-12">
       <div className="flex flex-wrap">
         <img
-          src="/1-Landing-v2/icon-faq.png"
+          src="/img/realms-web/icons/icon-faq.png"
           className="my-2 h-7 md:mr-4"
           alt=""
         />
