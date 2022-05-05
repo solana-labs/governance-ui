@@ -14,7 +14,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 module.exports = withBundleAnalyzer(
   withTM({
     webpack: (config, { isServer }) => {
-      config.experiments = { asyncWebAssembly: true }
+      config.experiments = { asyncWebAssembly: true, layers: true }
       config.module.rules.push({
         test: /\.svg$/,
         use: ['@svgr/webpack'],
