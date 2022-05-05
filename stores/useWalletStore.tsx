@@ -196,19 +196,29 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const connection = get().connection.current
       const connected = get().connected
       const programId = get().selectedRealm.programId
+      const realmId = get().selectedRealm.realm?.pubkey
+      const realmMintPk = get().selectedRealm.realm?.account.communityMint
       const wallet = get().current
       const walletOwner = wallet?.publicKey
       const set = get().set
 
-      if (connected && walletOwner && programId) {
-        const ownVoteRecordsByProposal = await getVoteRecordsByVoterMapByProposal(
-          connection,
-          programId,
-          walletOwner
-        )
-
+      if (connected && walletOwner && programId && realmId) {
+        const [ownVoteRecordsByProposal, tokenRecords] = await Promise.all([
+          getVoteRecordsByVoterMapByProposal(
+            connection,
+            programId,
+            walletOwner
+          ),
+          getTokenOwnerRecordsForRealmMintMapByOwner(
+            connection,
+            programId,
+            realmId,
+            realmMintPk
+          ),
+        ])
         set((state) => {
           state.ownVoteRecordsByProposal = ownVoteRecordsByProposal
+          state.selectedRealm.tokenRecords = tokenRecords
         })
       } else {
         set((state) => {

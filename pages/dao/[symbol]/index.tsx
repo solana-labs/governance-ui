@@ -29,6 +29,7 @@ import { NftVoterClient } from '@solana/governance-program-library'
 import { notify } from '@utils/notifications'
 import { sendSignedTransaction } from '@utils/send'
 import DelegateBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
+import { LOCALNET_REALM_ID as PYTH_LOCALNET_REALM_ID } from 'pyth-staking-api'
 
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
@@ -304,6 +305,9 @@ const REALM = () => {
         : false,
     [realm, connected]
   )
+  //Todo: move to own components with refactor to dao folder structure
+  const isPyth =
+    realmInfo?.realmId.toBase58() === PYTH_LOCALNET_REALM_ID.toBase58()
 
   return (
     <>
@@ -484,7 +488,7 @@ const REALM = () => {
             <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
               <TokenBalanceCardWrapper />
               <DelegateBalanceCard />
-              <NFTSCompactWrapper />
+              {!isPyth && <NFTSCompactWrapper />}
               <AccountsCompactWrapper />
               <AssetsCompactWrapper />
             </div>

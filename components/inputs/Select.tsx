@@ -33,7 +33,10 @@ const Select = ({
   minWidth?: string
 }) => {
   return (
-    <div className={`${wrapperClassNames}`} style={{ minWidth: minWidth }}>
+    <div
+      className={`${wrapperClassNames}`}
+      style={minWidth ? { minWidth: minWidth } : {}}
+    >
       {label && <StyledLabel>{label}</StyledLabel>}
       <div className={`relative ${className} ${error && 'pb-1'}`}>
         <Listbox value={value} onChange={onChange} disabled={disabled}>

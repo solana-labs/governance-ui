@@ -132,6 +132,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
         setReducedDeposits([])
       }
     } catch (e) {
+      console.log(e)
       notify({
         type: 'error',
         message: "Can't fetch deposits",

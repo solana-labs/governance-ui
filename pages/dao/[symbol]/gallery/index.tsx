@@ -23,7 +23,7 @@ const gallery = () => {
   const isLoadingGovernances = useGovernanceAssetsStore(
     (s) => s.loadGovernedAccounts
   )
-  const nftsPerPubkey = useTreasuryAccountStore((s) => s.nftsPerPubkey)
+  const nftsPerPubkey = useTreasuryAccountStore((s) => s.governanceNfts)
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
   const { setCurrentAccount } = useTreasuryAccountStore()
   const [currentAccount, setStateAccount] = useState<AssetAccount | null>(null)

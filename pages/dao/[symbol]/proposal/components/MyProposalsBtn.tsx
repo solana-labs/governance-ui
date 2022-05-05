@@ -16,7 +16,6 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import dayjs from 'dayjs'
 import { notify } from '@utils/notifications'
 import Loading from '@components/Loading'
-import { sendSignedTransaction } from '@utils/sendTransactions'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { sleep } from '@project-serum/common'
@@ -26,6 +25,7 @@ import {
   getNftRegistrarPDA,
   getNftVoterWeightRecord,
 } from 'NftVotePlugin/sdk/accounts'
+import { sendSignedTransaction } from '@utils/send'
 
 const MyProposalsBn = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
@@ -97,7 +97,9 @@ const MyProposalsBn = () => {
         x.account.state === ProposalState.Executing ||
         x.account.state === ProposalState.SigningOff ||
         x.account.state === ProposalState.Succeeded ||
-        x.account.state === ProposalState.ExecutingWithErrors) &&
+        x.account.state === ProposalState.ExecutingWithErrors ||
+        x.account.state === ProposalState.Defeated ||
+        x.account.state === ProposalState.Cancelled) &&
       ownVoteRecordsByProposal[x.pubkey.toBase58()] &&
       !ownVoteRecordsByProposal[x.pubkey.toBase58()]?.account.isRelinquished
   )
@@ -241,24 +243,22 @@ const MyProposalsBn = () => {
       client.client!.program.programId
     )
     for (const i of ownNftVoteRecords) {
-      instructions.push(
-        (client.client as NftVoterClient).program.instruction.relinquishNftVote(
-          {
-            accounts: {
-              registrar,
-              voterWeightRecord: voterWeightPk,
-              governance: proposals[i.account.proposal].account.governance,
-              proposal: i.account.proposal,
-              governingTokenOwner: wallet!.publicKey!,
-              voteRecord: i.publicKey,
-              beneficiary: wallet!.publicKey!,
-            },
-            remainingAccounts: [
-              { pubkey: i.publicKey, isSigner: false, isWritable: true },
-            ],
-          }
-        )
-      )
+      const relinquishNftVoteIx = await (client.client as NftVoterClient).program.methods
+        .relinquishNftVote()
+        .accounts({
+          registrar,
+          voterWeightRecord: voterWeightPk,
+          governance: proposals[i.account.proposal].account.governance,
+          proposal: i.account.proposal,
+          governingTokenOwner: wallet!.publicKey!,
+          voteRecord: i.publicKey,
+          beneficiary: wallet!.publicKey!,
+        })
+        .remainingAccounts([
+          { pubkey: i.publicKey, isSigner: false, isWritable: true },
+        ])
+        .instruction()
+      instructions.push(relinquishNftVoteIx)
     }
     try {
       const insertChunks = chunks(instructions, 10)

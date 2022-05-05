@@ -37,6 +37,10 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import Link from 'next/link'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { vsrPluginsPks } from '@hooks/useVotingPlugins'
+import {
+  LOCALNET_REALM_ID as PYTH_LOCALNET_REALM_ID,
+  PythBalance,
+} from 'pyth-staking-api'
 
 const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   const { councilMint, mint, realm, symbol } = useRealm()
@@ -157,6 +161,7 @@ const TokenDeposit = ({
     realmTokenAccount,
     ownTokenRecord,
     ownCouncilTokenRecord,
+    ownVoterWeight,
     councilTokenAccount,
     proposals,
     governances,
@@ -365,13 +370,18 @@ const TokenDeposit = ({
     ? 'You have to many outstanding proposals to withdraw.'
     : ''
 
-  const availableTokens =
-    depositTokenRecord && mint
-      ? fmtMintAmount(
-          mint,
-          depositTokenRecord.account.governingTokenDepositAmount
-        )
-      : '0'
+  //Todo: move to own components with refactor to dao folder structure
+  const isPyth =
+    realmInfo?.realmId.toBase58() === PYTH_LOCALNET_REALM_ID.toBase58()
+
+  const availableTokens = isPyth
+    ? new PythBalance(ownVoterWeight.votingPower!).toString()
+    : depositTokenRecord && mint
+    ? fmtMintAmount(
+        mint,
+        depositTokenRecord.account.governingTokenDepositAmount
+      )
+    : '0'
 
   const canShowAvailableTokensMessage =
     !hasTokensDeposited && hasTokensInWallet && connected
@@ -393,40 +403,44 @@ const TokenDeposit = ({
         </div>
       </div>
 
-      <p
-        className={`mt-2 opacity-70 mb-4 ml-1 text-xs ${
-          canShowAvailableTokensMessage ? 'block' : 'hidden'
-        }`}
-      >
-        You have {tokensToShow} tokens available to {canExecuteAction}.
-      </p>
+      {!isPyth && (
+        <>
+          <p
+            className={`mt-2 opacity-70 mb-4 ml-1 text-xs ${
+              canShowAvailableTokensMessage ? 'block' : 'hidden'
+            }`}
+          >
+            You have {tokensToShow} tokens available to {canExecuteAction}.
+          </p>
 
-      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-6">
-        <Button
-          tooltipMessage={depositTooltipContent}
-          className="sm:w-1/2"
-          disabled={!connected || !hasTokensInWallet}
-          onClick={depositAllTokens}
-        >
-          Deposit
-        </Button>
+          <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-6">
+            <Button
+              tooltipMessage={depositTooltipContent}
+              className="sm:w-1/2"
+              disabled={!connected || !hasTokensInWallet}
+              onClick={depositAllTokens}
+            >
+              Deposit
+            </Button>
 
-        <Button
-          tooltipMessage={withdrawTooltipContent}
-          className="sm:w-1/2"
-          disabled={
-            !connected ||
-            !hasTokensDeposited ||
-            (!councilVote && toManyCommunityOutstandingProposalsForUser) ||
-            toManyCouncilOutstandingProposalsForUse ||
-            wallet?.publicKey?.toBase58() !==
-              depositTokenRecord.account.governingTokenOwner.toBase58()
-          }
-          onClick={withdrawAllTokens}
-        >
-          Withdraw
-        </Button>
-      </div>
+            <Button
+              tooltipMessage={withdrawTooltipContent}
+              className="sm:w-1/2"
+              disabled={
+                !connected ||
+                !hasTokensDeposited ||
+                (!councilVote && toManyCommunityOutstandingProposalsForUser) ||
+                toManyCouncilOutstandingProposalsForUse ||
+                wallet?.publicKey?.toBase58() !==
+                  depositTokenRecord.account.governingTokenOwner.toBase58()
+              }
+              onClick={withdrawAllTokens}
+            >
+              Withdraw
+            </Button>
+          </div>
+        </>
+      )}
       {config?.account.communityVoterWeightAddin &&
         vsrPluginsPks.includes(
           config?.account.communityVoterWeightAddin.toBase58()
