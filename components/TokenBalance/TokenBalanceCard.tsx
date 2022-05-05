@@ -370,15 +370,18 @@ const TokenDeposit = ({
     ? 'You have to many outstanding proposals to withdraw.'
     : ''
 
-  const availableTokens =
+  //Todo: move to own components with migration to dao folder structure
+  const isPyth =
     realmInfo?.realmId.toBase58() === PYTH_LOCALNET_REALM_ID.toBase58()
-      ? new PythBalance(ownVoterWeight.votingPower!).toString()
-      : depositTokenRecord && mint
-      ? fmtMintAmount(
-          mint,
-          depositTokenRecord.account.governingTokenDepositAmount
-        )
-      : '0'
+
+  const availableTokens = isPyth
+    ? new PythBalance(ownVoterWeight.votingPower!).toString()
+    : depositTokenRecord && mint
+    ? fmtMintAmount(
+        mint,
+        depositTokenRecord.account.governingTokenDepositAmount
+      )
+    : '0'
 
   const canShowAvailableTokensMessage =
     !hasTokensDeposited && hasTokensInWallet && connected
@@ -400,8 +403,7 @@ const TokenDeposit = ({
         </div>
       </div>
 
-      {realmInfo?.realmId.toBase58() ===
-      PYTH_LOCALNET_REALM_ID.toBase58() ? null : (
+      {!isPyth && (
         <>
           <p
             className={`mt-2 opacity-70 mb-4 ml-1 text-xs ${

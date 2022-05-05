@@ -304,6 +304,9 @@ const REALM = () => {
         : false,
     [realm, connected]
   )
+  //Todo: move to own components with migration to dao folder structure
+  const isPyth =
+    realmInfo?.realmId.toBase58() === PYTH_LOCALNET_REALM_ID.toBase58()
 
   return (
     <>
@@ -483,10 +486,7 @@ const REALM = () => {
             </div>
             <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
               <TokenBalanceCardWrapper />
-              {realmInfo?.realmId.toBase58() ===
-              PYTH_LOCALNET_REALM_ID.toBase58() ? null : (
-                <NFTSCompactWrapper />
-              )}
+              {!isPyth && <NFTSCompactWrapper />}
               <AccountsCompactWrapper />
               <AssetsCompactWrapper />
             </div>
