@@ -35,6 +35,7 @@ config = withTM({
 // STEP 2: Enable bundle analyzer when `ANALYZE=true`.
 config = withBundleAnalyzer(config)
 
+if (process.env.VERCEL_ENV) {
 // STEP 3: Sentry error reporting. MUST COME LAST to work with sourcemaps.
 config = withSentryConfig(config, {
   // Additional config options for the Sentry Webpack plugin. Keep in mind that
@@ -46,5 +47,6 @@ config = withSentryConfig(config, {
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options.
 })
+}
 
 module.exports = config
