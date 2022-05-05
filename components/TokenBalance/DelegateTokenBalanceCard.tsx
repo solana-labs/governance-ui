@@ -4,7 +4,6 @@ import Select from '@components/inputs/Select'
 import useRealm from 'hooks/useRealm'
 import { DisplayAddress } from '@cardinal/namespaces-components'
 import { fmtMintAmount } from '@tools/sdk/units'
-import { getMintMetadata } from '../instructions/programs/splToken'
 import { BN } from '@project-serum/anchor'
 
 const DelegateBalanceCard = () => {
