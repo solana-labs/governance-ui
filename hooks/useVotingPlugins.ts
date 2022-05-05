@@ -9,12 +9,22 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { getMaxVoterWeightRecord } from '@solana/spl-governance'
 import { getNftMaxVoterWeightRecord } from 'NftVotePlugin/sdk/accounts'
 import { notify } from '@utils/notifications'
+import {
+  LOCALNET_STAKING_ADDRESS as PYTH_LOCALNET_STAKING_ADDRESS,
+  DEVNET_STAKING_ADDRESS as PYTH_DEVNET_STAKING_ADDRESS,
+} from 'pyth-staking-api'
+
 export const vsrPluginsPks: string[] = [
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo',
 ]
 
 export const nftPluginsPks: string[] = [
   'GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw',
+]
+
+export const pythPluginsPks: string[] = [
+  PYTH_LOCALNET_STAKING_ADDRESS.toBase58(),
+  PYTH_DEVNET_STAKING_ADDRESS.toBase58(),
 ]
 
 export function useVotingPlugins() {
@@ -24,6 +34,7 @@ export function useVotingPlugins() {
     handleSetVsrClient,
     handleSetNftClient,
     handleSetNftRegistrar,
+    handleSetPythClient,
     handleSetCurrentRealmVotingClient,
   } = useVotePluginsClientStore()
   const {
@@ -37,6 +48,8 @@ export function useVotingPlugins() {
   const connected = useWalletStore((s) => s.connected)
   const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
   const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
+  const pythClient = useVotePluginsClientStore((s) => s.state.pythClient)
+
   const currentClient = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
@@ -113,6 +126,7 @@ export function useVotingPlugins() {
   useEffect(() => {
     handleSetVsrClient(wallet, connection)
     handleSetNftClient(wallet, connection)
+    handleSetPythClient(wallet, connection)
   }, [connection.endpoint])
 
   useEffect(() => {
@@ -148,6 +162,22 @@ export function useVotingPlugins() {
         }
       }
     }
+
+    const handlePythPlugin = () => {
+      if (
+        pythClient &&
+        currentPluginPk &&
+        pythPluginsPks.includes(currentPluginPk.toBase58())
+      ) {
+        if (connected) {
+          handleSetCurrentRealmVotingClient({
+            client: pythClient,
+            realm,
+            walletPk: wallet?.publicKey,
+          })
+        }
+      }
+    }
     if (
       !currentClient ||
       currentClient.realm?.pubkey.toBase58() !== realm?.pubkey.toBase58() ||
@@ -155,11 +185,13 @@ export function useVotingPlugins() {
     ) {
       handleNftplugin()
       handleVsrPlugin()
+      handlePythPlugin()
     }
   }, [
     currentPluginPk?.toBase58(),
     vsrClient?.program.programId.toBase58(),
     nftClient?.program.programId.toBase58(),
+    pythClient?.program.programId.toBase58(),
     realm?.pubkey.toBase58(),
     connection.endpoint,
     connected,
