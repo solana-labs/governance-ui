@@ -98,10 +98,7 @@ const SelectDAOToCreate = () => {
     <div className="pt-16 pb-16 md:pt-24 md:pb-28">
       <div className="mb-4 text-center md:text-left">
         <Header as="h2" withGradient>
-          What types of DAO
-        </Header>
-        <Header as="h2" withGradient>
-          would you like to create?
+          What types of DAO <br /> would you like to create?
         </Header>
       </div>
       <ListOfDAOTypes />

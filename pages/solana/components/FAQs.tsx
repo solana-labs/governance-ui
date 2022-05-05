@@ -2,7 +2,7 @@ import { Fragment } from 'react'
 import { Disclosure, Transition } from '@headlessui/react'
 import Header from '../../../components_2/Header'
 import Chevron from '../../../components_2/Chevron'
-import { useIsExtensionWidth } from 'components_2/Utils'
+import useIsExtensionWidth from 'components_2/Utils'
 
 export const FaqPanel = ({ question, answer }) => {
   return (
@@ -68,7 +68,7 @@ const FAQs = [
 ]
 
 const FAQSection = () => {
-  const isExtensionWidth = useIsExtensionWidth()
+  const isExtensionWidth = useIsExtensionWidth({ width: '500' })
 
   return (
     <div className="py-20 md:pt-36 md:pb-12">
@@ -86,10 +86,7 @@ const FAQSection = () => {
           ) : (
             <>
               <Header as="h2" withGradient>
-                Frequently Asked Questions
-              </Header>
-              <Header as="h2" withGradient>
-                (FAQs)
+                Frequently Asked Questions <br /> (FAQs)
               </Header>
             </>
           )}

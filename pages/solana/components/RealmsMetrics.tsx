@@ -3,16 +3,32 @@ import {
   MetricsBoxPlus,
   MetricsBoxDollar,
 } from '../../../components_2/MetricsBox'
+import useIsExtensionWidth from 'components_2/Utils'
 
 const RealmsMetrics = () => {
+  const isExtensionWidth = useIsExtensionWidth({ width: '1200' })
+
   return (
     <div className="pt-12 md:pt-32 pb-14 md:pb-36">
-      <div className="flex flex-col md:flex-row">
-        <div className="w-full md:w-1/2">
+      <div
+        className={`flex flex-col ${!isExtensionWidth ? `md:flex-row` : ``}`}
+      >
+        <div className="w-full md:w-1/2 md:mb-12">
           <Header as="h2" withGradient>
             Key Metrics on Realms
           </Header>
         </div>
+
+        {/* {!isExtensionWidth ? (
+
+
+
+        ) : (
+          <>
+
+
+          </>
+        )} */}
 
         <div className="w-full md:w-1/2 pt-7 md:pt-0">
           <div className="grid grid-cols-2 gap-14 md:gap-32">

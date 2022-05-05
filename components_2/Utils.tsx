@@ -1,7 +1,5 @@
 import { useMediaQuery } from 'react-responsive'
 
-export function useIsExtensionWidth() {
-  return useMediaQuery({ query: '(max-width: 700px)' })
+export default function useIsExtensionWidth({ width }) {
+  return useMediaQuery({ query: `(max-width: ${width}px)` })
 }
-
-// export const isExtension = window.location.protocol === 'chrome-extension:'
