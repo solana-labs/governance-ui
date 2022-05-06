@@ -1,3 +1,4 @@
+import { withSentry } from '@sentry/nextjs'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getAllSplGovernanceProgramIds } from './tools/realms'
 
@@ -6,4 +7,4 @@ const handler = (req: NextApiRequest, res: NextApiResponse) => {
   res.status(200).json(getAllSplGovernanceProgramIds())
 }
 
-export default handler
+export default withSentry(handler)
