@@ -19,6 +19,8 @@ import Checkbox from '@components/inputs/Checkbox'
 import Divider from './Divider'
 import { DisplayAddress } from '@cardinal/namespaces-components'
 import { tryParseKey } from 'tools/validators/pubkey'
+import { XCircleIcon } from '@heroicons/react/outline'
+import Tooltip from './Tooltip'
 
 const DelegateCard = () => {
   const {
@@ -29,6 +31,8 @@ const DelegateCard = () => {
   const [isLoading, setLoading] = useState<boolean>(false)
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection.current)
+  const { fetchRealm } = useWalletStore((s) => s.actions)
+
   const [delegateKey, setDelegateKey] = useState('')
   const [delegateCouncilToken, setDelegateCouncilToken] = useState(false)
   const [delegateCommunityToken, setDelegateCommunityToken] = useState(false)
@@ -78,6 +82,48 @@ const DelegateCard = () => {
       transaction.add(...instructions)
 
       await sendTransaction({ transaction, wallet, connection, signers })
+      await fetchRealm(realm?.owner, realm?.pubkey)
+      setLoading(false)
+    } catch (error) {
+      console.log('error', error)
+    }
+  }
+
+  const handleClearDelegate = async (type: 'council' | 'community') => {
+    const signers: Keypair[] = []
+    const instructions: TransactionInstruction[] = []
+    setLoading(true)
+
+    if (!realm || !realm?.account?.config?.councilMint || !wallet?.publicKey) {
+      return
+    }
+
+    try {
+      const programVersion = await getGovernanceProgramVersion(
+        connection,
+        realm.owner // governance program public key
+      )
+
+      await withSetGovernanceDelegate(
+        instructions,
+        realm.owner, // publicKey of program/programId
+        programVersion, // program version of realm
+        realm.pubkey, // realm public key
+        type === 'council'
+          ? realm?.account?.config?.councilMint
+          : realm.account.communityMint, // mint of governance token
+        wallet?.publicKey, // governingTokenOwner (walletId) publicKey of tokenOwnerRecord of this wallet
+        wallet?.publicKey, // governanceAuthority: publicKey of connected wallet
+        // @ts-ignore
+        null // public key of wallet who to delegated vote to
+      )
+
+      const transaction = new Transaction()
+      transaction.add(...instructions)
+
+      await sendTransaction({ transaction, wallet, connection, signers })
+
+      await fetchRealm(realm?.owner, realm?.pubkey)
       setLoading(false)
     } catch (error) {
       console.log('error', error)
@@ -104,13 +150,23 @@ const DelegateCard = () => {
               <div className="mr-2 py-1 text-sm text-fgd-2 w-40 h-8 flex items-center">
                 Council Delegation
               </div>
-              <DisplayAddress
-                connection={connection}
-                address={ownCouncilTokenRecord?.account.governanceDelegate}
-                height="12px"
-                width="100px"
-                dark={true}
-              />
+              {ownCouncilTokenRecord?.account.governanceDelegate && (
+                <div className="flex items-center content-center">
+                  <DisplayAddress
+                    connection={connection}
+                    address={ownCouncilTokenRecord?.account.governanceDelegate}
+                    height="12px"
+                    width="100px"
+                    dark={true}
+                  />
+                  <Tooltip content={'Remove Delegate'}>
+                    <XCircleIcon
+                      onClick={() => handleClearDelegate('council')}
+                      className="flex-shrink-0 h-5 ml-1 w-5 text-primary-light"
+                    />
+                  </Tooltip>
+                </div>
+              )}
             </div>
           )}
           {ownTokenRecord && (
@@ -118,13 +174,24 @@ const DelegateCard = () => {
               <div className="mr-2 py-1 text-sm text-fgd-2 w-40 h-8 flex items-center">
                 Community Delegation
               </div>
-              <DisplayAddress
-                connection={connection}
-                address={ownTokenRecord?.account.governanceDelegate}
-                height="12px"
-                width="100px"
-                dark={true}
-              />
+
+              {ownTokenRecord?.account.governanceDelegate && (
+                <div className="flex items-center content-center">
+                  <DisplayAddress
+                    connection={connection}
+                    address={ownTokenRecord?.account.governanceDelegate}
+                    height="12px"
+                    width="100px"
+                    dark={true}
+                  />
+                  <Tooltip content={'Remove Delegate'}>
+                    <XCircleIcon
+                      onClick={() => handleClearDelegate('community')}
+                      className="flex-shrink-0 h-5 ml-1 w-5 text-primary-light"
+                    />
+                  </Tooltip>
+                </div>
+              )}
             </div>
           )}
 
@@ -181,7 +248,9 @@ const DelegateCard = () => {
             onClick={handleDelegate}
             isLoading={isLoading}
             disabled={
-              !parsedDelegateKey || (!ownCouncilTokenRecord && !ownTokenRecord)
+              !parsedDelegateKey ||
+              (!ownCouncilTokenRecord && !ownTokenRecord) ||
+              (!delegateCouncilToken && !delegateCommunityToken)
             }
           >
             Delegate
