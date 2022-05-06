@@ -41,6 +41,7 @@ import {
   LOCALNET_REALM_ID as PYTH_LOCALNET_REALM_ID,
   PythBalance,
 } from 'pyth-staking-api'
+import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 
 const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   const { councilMint, mint, realm, symbol } = useRealm()
@@ -124,6 +125,7 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
               councilVote={true}
             />
           )}
+          <DelegateTokenBalanceCard />
         </div>
       ) : (
         <>

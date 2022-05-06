@@ -613,7 +613,6 @@ const New = () => {
       </div>
       <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
         <TokenBalanceCardWrapper />
-        <DelegateTokenBalanceCard />
       </div>
     </div>
   )

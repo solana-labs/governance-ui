@@ -5,6 +5,7 @@ import useRealm from 'hooks/useRealm'
 import { DisplayAddress } from '@cardinal/namespaces-components'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { BN } from '@project-serum/anchor'
+import { useEffect } from 'react'
 
 const DelegateBalanceCard = () => {
   const delegates = useMembersStore((s) => s.compact.delegates)
@@ -21,6 +22,28 @@ const DelegateBalanceCard = () => {
     councilMint,
   } = useRealm()
   const { actions } = useWalletStore((s) => s)
+
+  useEffect(() => {
+    if (
+      !ownCouncilTokenRecord &&
+      ownDelegateCouncilTokenRecords &&
+      ownDelegateCouncilTokenRecords.length > 0
+    ) {
+      actions.selectCouncilDelegate(
+        ownDelegateCouncilTokenRecords[0].account.governingTokenOwner.toBase58()
+      )
+    }
+
+    if (
+      !ownTokenRecord &&
+      ownDelegateTokenRecords &&
+      ownDelegateTokenRecords.length > 0
+    ) {
+      actions.selectCommunityDelegate(
+        ownDelegateTokenRecords[0].account.governingTokenOwner.toBase58()
+      )
+    }
+  }, [walletId])
 
   const getCouncilTokenCount = () => {
     if (walletId && delegates?.[walletId]) {
@@ -64,8 +87,12 @@ const DelegateBalanceCard = () => {
     actions.selectCommunityDelegate(communityPubKey)
   }
 
+  if (!walletId || !delegates?.[walletId]) {
+    return null
+  }
+
   return (
-    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
+    <>
       <h3 className="mb-0">Your Delegates</h3>
       {walletId && delegates?.[walletId]?.councilMembers && (
         <div className="flex space-x-4 items-center mt-4">
@@ -191,7 +218,7 @@ const DelegateBalanceCard = () => {
           </div>
         </div>
       )}
-    </div>
+    </>
   )
 }
 
