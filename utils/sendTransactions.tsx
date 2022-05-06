@@ -482,7 +482,7 @@ export const sendTransactionsV2 = async (
           fcn.transactionsIdx.map((idx) => {
             const transactionIdx = Object.keys(idx)[0]
             const transactionInstructionIdx = idx[transactionIdx]
-            sendSignedTransaction({
+            return sendSignedTransaction({
               connection,
               signedTransaction: signedTxns[transactionIdx],
               block: block!,
