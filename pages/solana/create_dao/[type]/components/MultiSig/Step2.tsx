@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from 'react'
-import { useRouter } from 'next/router'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
@@ -13,6 +12,7 @@ import Input from '../Input'
 import Button from 'components_2/Button'
 
 import { PublicKey } from '@solana/web3.js'
+import { SESSION_STORAGE_FORM_KEY } from './Wizard'
 
 function validateSolAddress(address: string) {
   try {
@@ -52,7 +52,6 @@ function InviteAddress({
 export default function Step2({ onSubmit, onPrevClick }) {
   const { current } = useWalletStore((s) => s)
   const inputElement = useRef<HTMLInputElement>(null)
-  const { query } = useRouter()
   const [pasteBuffer, setPasteBuffer] = useState<string[]>([])
   const [inviteList, setInviteList] = useState<string[]>([])
   const [validationError, setValidationError] = useState<string>('')
@@ -76,8 +75,15 @@ export default function Step2({ onSubmit, onPrevClick }) {
   const isUserDAOMember = userAddress && inviteList.indexOf(userAddress) > -1
 
   useEffect(() => {
-    if (query?.step2 && !Array.isArray(query.step2)) {
-      const formData = JSON.parse(query.step2)
+    // do some checking that user has not skipped step 1
+    const wizardData = JSON.parse(
+      sessionStorage.getItem(SESSION_STORAGE_FORM_KEY) || '{}'
+    )
+    const { step1, step2: formData } = wizardData
+    if (!step1?.daoName) {
+      return onPrevClick(2)
+    }
+    if (formData) {
       Object.keys(schemaObject).forEach((fieldName) => {
         const value = formData[fieldName]
         setValue(fieldName, value, {
@@ -91,7 +97,7 @@ export default function Step2({ onSubmit, onPrevClick }) {
         }) || []
       )
     }
-  }, [query])
+  }, [])
 
   useEffect(() => {
     setValue('daoMembers', inviteList, {

@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
 import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
@@ -8,10 +7,10 @@ import FormHeader from '../FormHeader'
 import FormField from '../FormField'
 import FormFooter from '../FormFooter'
 import Input from '../Input'
+import { SESSION_STORAGE_FORM_KEY } from './Wizard'
 
 export default function Step3({ onSubmit, onPrevClick }) {
   const [numberOfDaoMember, setNumberOfDaoMember] = useState(0)
-  const { query } = useRouter()
   const schemaObject = {
     daoQuorumPercent: yup
       .number()
@@ -36,19 +35,17 @@ export default function Step3({ onSubmit, onPrevClick }) {
 
   useEffect(() => {
     // do some checking that user has not skipped step 2
-    if (!query?.step2) {
+    const wizardData = JSON.parse(
+      sessionStorage.getItem(SESSION_STORAGE_FORM_KEY) || '{}'
+    )
+    const { step2, step3: formData } = wizardData
+    if (!step2?.daoMembers) {
       onPrevClick(3)
-    } else if (
-      !Array.isArray(query.step2) &&
-      !JSON.parse(query.step2).daoMembers
-    ) {
-      onPrevClick(3)
-    } else if (!Array.isArray(query.step2)) {
-      setNumberOfDaoMember(JSON.parse(query.step2).daoMembers.length)
+    } else {
+      setNumberOfDaoMember(step2.daoMembers.length)
     }
 
-    if (query?.step3 && !Array.isArray(query.step3)) {
-      const formData = JSON.parse(query.step3)
+    if (formData) {
       Object.keys(schemaObject).forEach((fieldName) => {
         const value = formData[fieldName]
         setValue(fieldName, value, {
@@ -57,7 +54,7 @@ export default function Step3({ onSubmit, onPrevClick }) {
         })
       })
     }
-  }, [query])
+  }, [])
 
   function serializeValues(values) {
     onSubmit({ step: 3, data: values })

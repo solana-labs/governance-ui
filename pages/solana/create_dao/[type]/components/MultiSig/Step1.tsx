@@ -1,5 +1,4 @@
 import { useEffect } from 'react'
-import { useRouter } from 'next/router'
 import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
@@ -10,8 +9,9 @@ import Input from '../Input'
 import Button from 'components_2/Button'
 import FormFooter from '../FormFooter'
 
+import { SESSION_STORAGE_FORM_KEY } from './Wizard'
+
 export default function Step1({ onSubmit, onPrevClick }) {
-  const { query } = useRouter()
   const schemaObject = {
     daoAvatar: yup.string(),
     daoName: yup.string().typeError('Required').required('Required'),
@@ -30,23 +30,21 @@ export default function Step1({ onSubmit, onPrevClick }) {
   })
 
   useEffect(() => {
-    if (query?.step1 && !Array.isArray(query.step1)) {
-      const formData = JSON.parse(query.step1)
+    const formData = JSON.parse(
+      sessionStorage.getItem(SESSION_STORAGE_FORM_KEY) || '{}'
+    )?.step1
+    if (formData) {
       Object.keys(schemaObject).forEach((fieldName) => {
-        const value =
-          fieldName === 'daoAvatar'
-            ? localStorage.getItem(fieldName)
-            : formData[fieldName]
+        const value = formData[fieldName]
         setValue(fieldName, value, {
           shouldValidate: true,
           shouldDirty: true,
         })
       })
     }
-  }, [query])
+  }, [])
 
   function serializeValues(values) {
-    delete values?.daoAvatar
     onSubmit({ step: 1, data: values })
   }
 
@@ -55,7 +53,6 @@ export default function Step1({ onSubmit, onPrevClick }) {
       shouldValidate: true,
       shouldDirty: true,
     })
-    localStorage.setItem('daoAvatar', fileInput)
   }
 
   return (

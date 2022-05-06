@@ -1,6 +1,19 @@
+import React from 'react'
 import Button from 'components_2/Button'
 
-export default function FormFooter({ isValid, prevClickHandler, faqTitle }) {
+interface FormFooterProps {
+  isValid?: boolean
+  prevClickHandler: React.MouseEventHandler<HTMLButtonElement>
+  submitClickHandler?: React.MouseEventHandler<HTMLButtonElement>
+  faqTitle: string
+}
+
+const FormFooter: React.FC<FormFooterProps> = ({
+  isValid,
+  prevClickHandler,
+  submitClickHandler,
+  faqTitle,
+}) => {
   return (
     <div className="flex flex-wrap items-center justify-between pt-20 md:pt-32">
       <Button type="button" tertiary>
@@ -20,6 +33,7 @@ export default function FormFooter({ isValid, prevClickHandler, faqTitle }) {
           type="submit"
           disabled={!isValid}
           bgOverride={!isValid ? `bg-[#201f27]` : ''}
+          onClick={submitClickHandler}
         >
           <img
             src="/1-Landing-v2/icon-arrow-black.png"
@@ -30,3 +44,5 @@ export default function FormFooter({ isValid, prevClickHandler, faqTitle }) {
     </div>
   )
 }
+
+export default FormFooter

@@ -331,17 +331,22 @@ body::-webkit-scrollbar-corner {
   background-color: #fff;
 } */
 
-input[type="range"].with-gradient {
+input[type='range'].with-gradient {
   -webkit-appearance: none;
   height: 16px;
   background: #1f1f20;
   border-radius: 5px;
-  background-image: linear-gradient(to right, #00c2ff 0%, #00e4ff 50%, #87f2ff 100%);
+  background-image: linear-gradient(
+    to right,
+    #00c2ff 0%,
+    #00e4ff 50%,
+    #87f2ff 100%
+  );
   background-size: 50% 100%;
   background-repeat: no-repeat;
 }
 
-input[type="range"].with-gradient::-moz-range-thumb {
+input[type='range'].with-gradient::-moz-range-thumb {
   -webkit-appearance: none;
   cursor: ew-resize;
   width: 32px;
@@ -351,9 +356,9 @@ input[type="range"].with-gradient::-moz-range-thumb {
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1), 0 1px 3px 0 rgba(0, 0, 0, 0.2);
   border: solid 5px rgba(255, 255, 255, 0.08);
   background-color: #fff;
-  transition: background .3s ease-in-out;
+  transition: background 0.3s ease-in-out;
 }
-input[type="range"].with-gradient::-webkit-slider-thumb {
+input[type='range'].with-gradient::-webkit-slider-thumb {
   -webkit-appearance: none;
   cursor: ew-resize;
   width: 32px;
@@ -363,10 +368,10 @@ input[type="range"].with-gradient::-webkit-slider-thumb {
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1), 0 1px 3px 0 rgba(0, 0, 0, 0.2);
   border: solid 5px rgba(255, 255, 255, 0.08);
   background-color: #fff;
-  transition: background .3s ease-in-out;
+  transition: background 0.3s ease-in-out;
 }
-input[type=range].with-gradient::-moz-range-track,
-input[type=range].with-gradient::-webkit-slider-runnable-track  {
+input[type='range'].with-gradient::-moz-range-track,
+input[type='range'].with-gradient::-webkit-slider-runnable-track {
   -webkit-appearance: none;
   box-shadow: none;
   border: none;
