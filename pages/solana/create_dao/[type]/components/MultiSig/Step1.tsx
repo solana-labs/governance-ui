@@ -3,6 +3,11 @@ import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 
+import { useWalletIdentity } from '@cardinal/namespaces-components'
+
+import { notify } from '@utils/notifications'
+import useWalletStore from 'stores/useWalletStore'
+
 import FormHeader from '../FormHeader'
 import FormField, { ImageUploader } from '../FormField'
 import Input from '../Input'
@@ -12,6 +17,8 @@ import FormFooter from '../FormFooter'
 import { SESSION_STORAGE_FORM_KEY } from './Wizard'
 
 export default function Step1({ onSubmit, onPrevClick }) {
+  const { connected, connection, current: wallet } = useWalletStore((s) => s)
+  const { show } = useWalletIdentity()
   const schemaObject = {
     daoAvatar: yup.string(),
     daoName: yup.string().typeError('Required').required('Required'),
@@ -53,6 +60,22 @@ export default function Step1({ onSubmit, onPrevClick }) {
       shouldValidate: true,
       shouldDirty: true,
     })
+  }
+
+  async function handleLinkTwitterClick() {
+    if (!connected) {
+      try {
+        if (wallet) await wallet.connect()
+        // @ts-ignore
+        await show(wallet, connection.current, connection.cluster)
+      } catch (error) {
+        const err = error as Error
+        return notify({
+          type: 'error',
+          message: err.message,
+        })
+      }
+    }
   }
 
   return (
@@ -119,7 +142,12 @@ export default function Step1({ onSubmit, onPrevClick }) {
           optional
           description="Your your DAO's Twitter  account can connect to Realms (via Cardinal)."
         >
-          <Button secondary bgOverride="bg-[#201f27]" type="button">
+          <Button
+            secondary
+            bgOverride="bg-[#201f27]"
+            type="button"
+            onClick={handleLinkTwitterClick}
+          >
             <div className="relative flex items-center justify-center px-4">
               <svg
                 className="fill-[#6496f6] stroke-[#6496f6]"
