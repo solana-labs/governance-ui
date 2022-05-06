@@ -6,16 +6,18 @@ export default function Header({
   className = '',
   children,
 }) {
-  let classNames = className
-  // if (as === 'h1') {
-  //   classNames += ` `
-  // } else if (as === 'h2') {
-  //   classNames += ` `
-  // } else if (as === 'h3') {
-  //   classNames += ` `
-  // } else if (as === 'h4') {
-  //   classNames += ` `
-  // }
+  let classNames = 'font-light'
+  if (as === 'h1') {
+    classNames += ` `
+  } else if (as === 'h2') {
+    classNames += ` `
+  } else if (as === 'h3') {
+    classNames += ` `
+  } else if (as === 'h4') {
+    classNames += ` `
+  }
+
+  classNames += ` ${className}`
 
   if (withGradient) {
     classNames += ` bg-gradient-to-r from-[#00C2FF] via-[#00E4FF] to-[#87F2FF] bg-clip-text text-transparent`

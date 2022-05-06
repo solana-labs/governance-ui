@@ -1,4 +1,4 @@
-import GradientTitle from '../../../components_2/GradientTitle'
+import Header from 'components_2/Header'
 
 const TextBox = ({ title, text }) => {
   return (
@@ -13,9 +13,9 @@ const WhatIsADAO = () => {
   return (
     <div className="pt-9 md:pt-24 pb-11 md:pb-32">
       <div className="pb-8 md:pb-12">
-        <GradientTitle>
+        <Header as="h2" withGradient>
           A DAO is a community working together to make decisions
-        </GradientTitle>
+        </Header>
       </div>
       <div className="flex flex-col md:flex-row">
         <div className="w-full md:w-1/2">

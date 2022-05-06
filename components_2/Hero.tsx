@@ -1,14 +1,6 @@
 import Image from 'next/image'
 import { Section } from 'pages/solana'
 
-export function HeroH1({ children }) {
-  return (
-    <h1 className="text-4xl font-medium tracking-tight md:text-6xl">
-      {children}
-    </h1>
-  )
-}
-
 export default function Hero({
   backgroundColor = 'bg-[#282933]',
   backgroundImgSrc = '/1-Landing-v2/landing-hero-desktop.png',

@@ -1,16 +1,17 @@
 import Link from 'next/link'
 import Button from 'components_2/Button'
-import Hero, { HeroH1 } from 'components_2/Hero'
+import Hero from 'components_2/Hero'
+import Header from 'components_2/Header'
 
 export default function KickstartSolana() {
   return (
     <Hero>
       <div className="text-center md:text-left">
-        <HeroH1>
+        <Header as="h1" className="hero">
           Kickstart your
           <br />
           community on Solana
-        </HeroH1>
+        </Header>
         <div className="mt-4 text-base font-light tracking-tight text-center text-white mb-11 md:mb-14 md:text-left">
           Create and participate in fully on-chain DAOs of all kinds.
         </div>

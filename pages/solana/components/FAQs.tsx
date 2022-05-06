@@ -1,6 +1,6 @@
 import { Fragment } from 'react'
 import { Disclosure, Transition } from '@headlessui/react'
-import GradientTitle from '../../../components_2/GradientTitle'
+import Header from 'components_2/Header'
 
 export const FaqPanel = ({ question, answer }) => {
   return (
@@ -78,7 +78,9 @@ const FAQSection = () => {
           alt=""
         />
         <div className="w-full md:w-fit">
-          <GradientTitle>Frequently Asked Questions (FAQs)</GradientTitle>
+          <Header as="h2" withGradient>
+            Frequently Asked Questions (FAQs)
+          </Header>
         </div>
       </div>
       <div>
