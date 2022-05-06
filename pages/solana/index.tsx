@@ -16,7 +16,7 @@ export const Section = ({ bgColor = '', showTopGlow = false, children }) => {
     <div className={`w-full ${bgColor} relative`}>
       {showTopGlow && (
         <img
-          src="/img/realms-web/icons/divider-glow.png"
+          src="/img/realms-web/backgrounds/divider-glow.png"
           className="absolute w-full"
         />
       )}

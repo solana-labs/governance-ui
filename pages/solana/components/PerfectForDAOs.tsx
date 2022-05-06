@@ -5,7 +5,7 @@ export default function PerfectForDAOs() {
   return (
     <div className="pt-10 pb-9 md:pt-20 md:pb-24">
       <div className="flex flex-wrap">
-        <div className="w-full mb-10 text-center md:w-1/3 md:mb-0 md:pr-4 md:text-left">
+        <div className="w-full mb-10 text-left md:w-1/3 md:mb-0 md:pr-4 md:text-left">
           <Header as="h2" withGradient>
             Why is Solana <br /> perfect for DAOs?
           </Header>
