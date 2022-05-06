@@ -90,11 +90,10 @@ export async function getCastleDepositInstruction({
       true
     )
 
-    const userLpTokenAccountInfo = await vaultClient.getLpTokenAccountInfo(
-      userLpTokenAccount
-    )
-
-    if (userLpTokenAccountInfo == null) {
+    try {
+      await vaultClient.getLpTokenAccountInfo(userLpTokenAccount)
+    } catch (error) {
+      console.log('Creating LP token account', error)
       createLpAcctIx = Token.createAssociatedTokenAccountInstruction(
         ASSOCIATED_TOKEN_PROGRAM_ID,
         TOKEN_PROGRAM_ID,
@@ -194,11 +193,10 @@ export async function getCastleWithdrawInstruction({
       true
     )
 
-    const userReserveTokenAccountInfo = await vaultClient.getReserveTokenAccountInfo(
-      userReserveTokenAccount
-    )
-
-    if (userReserveTokenAccountInfo == null) {
+    try {
+      await vaultClient.getReserveTokenAccountInfo(userReserveTokenAccount)
+    } catch (error) {
+      console.log('Creating reserve token account', error)
       createReserveAcctIx = Token.createAssociatedTokenAccountInstruction(
         ASSOCIATED_TOKEN_PROGRAM_ID,
         TOKEN_PROGRAM_ID,
