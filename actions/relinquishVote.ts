@@ -65,7 +65,13 @@ export const relinquishVote = async (
           )
         ),
     ]
-    await sendTransactionsV2(connection, wallet, instArray, [...signerChunks])
+    await sendTransactionsV2(
+      connection,
+      wallet,
+      instArray,
+      [...signerChunks],
+      true
+    )
   } else {
     const transaction = new Transaction()
     transaction.add(...instructions)

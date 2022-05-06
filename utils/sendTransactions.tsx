@@ -17,7 +17,7 @@ interface TransactionInstructionWithType {
   sequenceType?: SequenceType
 }
 interface TransactionsPlayingIndexes {
-  transactionsIdx: number[]
+  transactionsIdx: { [txIdx: number]: number }[]
   sequenceType?: SequenceType
 }
 
@@ -124,7 +124,7 @@ async function awaitTransactionSignatureConfirmation(
             const [signatureStatuses, blockHeight] = await Promise.all(promises)
             if (
               typeof blockHeight !== undefined &&
-              timeoutBlockHeight > blockHeight!
+              timeoutBlockHeight <= blockHeight!
             ) {
               done = true
               console.log('Tx Timeout ----')
@@ -222,6 +222,7 @@ export async function sendSignedTransaction({
   connection,
   timeout = DEFAULT_TIMEOUT,
   block,
+  transactionInstructionIdx,
 }: {
   signedTransaction: Transaction
   connection: Connection
@@ -230,6 +231,7 @@ export async function sendSignedTransaction({
   successMessage?: string
   timeout?: number
   block: Block
+  transactionInstructionIdx?: number
 }): Promise<{ txid: string; slot: number }> {
   const rawTransaction = signedTransaction.serialize()
   const startTime = getUnixTs()
@@ -269,7 +271,10 @@ export async function sendSignedTransaction({
     slot = confirmation?.slot || 0
   } catch (err) {
     if (err.timeout) {
-      throw new Error('Timed out awaiting confirmation on transaction')
+      throw {
+        txInstructionIdx: transactionInstructionIdx,
+        error: 'Timed out awaiting confirmation on transaction',
+      }
     }
     let simulateResult: SimulatedTransactionResponse | null = null
     try {
@@ -394,6 +399,7 @@ export const sendTransactionsV2 = async (
   wallet: WalletSigner,
   TransactionInstructions: TransactionInstructionWithType[],
   signersSet: Keypair[][],
+  autoRetry?: boolean,
   block?: Block
 ) => {
   if (!wallet.publicKey) throw new Error('Wallet not connected!')
@@ -440,16 +446,18 @@ export const sendTransactionsV2 = async (
       currentTransactionCall.sequenceType ===
         transactionInstruction.sequenceType
     ) {
-      currentTransactionCall.transactionsIdx.push(currentUnsignedTxIdx)
+      //we push reflection of transactionInstruction as object value for retry.
+      currentTransactionCall.transactionsIdx.push({ [currentUnsignedTxIdx]: i })
     } else {
       transactionCallOrchestrator.push({
-        transactionsIdx: [currentUnsignedTxIdx],
+        //we push reflection of transactionInstruction as object value for retry.
+        transactionsIdx: [{ [currentUnsignedTxIdx]: i }],
         sequenceType: transactionInstruction.sequenceType,
       })
     }
     unsignedTxns.push(transaction)
   }
-
+  console.log(transactionCallOrchestrator)
   const signedTxns = await wallet.signAllTransactions(unsignedTxns)
   console.log(
     'Transactions play type order',
@@ -464,48 +472,79 @@ export const sendTransactionsV2 = async (
     })
   )
   console.log('Signed transactions', signedTxns)
-  for (const fcn of transactionCallOrchestrator) {
-    if (
-      typeof fcn.sequenceType === 'undefined' ||
-      fcn.sequenceType === SequenceType.Parallel
-    ) {
-      await Promise.all(
-        fcn.transactionsIdx.map((x) =>
-          sendSignedTransaction({
-            connection,
-            signedTransaction: signedTxns[x],
-            block: block!,
+  try {
+    for (const fcn of transactionCallOrchestrator) {
+      if (
+        typeof fcn.sequenceType === 'undefined' ||
+        fcn.sequenceType === SequenceType.Parallel
+      ) {
+        await Promise.all(
+          fcn.transactionsIdx.map((idx) => {
+            const transactionIdx = Object.keys(idx)[0]
+            const transactionInstructionIdx = idx[transactionIdx]
+            sendSignedTransaction({
+              connection,
+              signedTransaction: signedTxns[transactionIdx],
+              block: block!,
+              transactionInstructionIdx: transactionInstructionIdx,
+            })
           })
         )
-      )
-    }
-    if (fcn.sequenceType === SequenceType.Sequential) {
-      for (const innerFcn of fcn.transactionsIdx) {
-        await sendSignedTransaction({
-          connection,
-          signedTransaction: signedTxns[innerFcn],
-          block,
-        })
+      }
+      if (fcn.sequenceType === SequenceType.Sequential) {
+        for (const idx of fcn.transactionsIdx) {
+          const transactionIdx = Object.keys(idx)[0]
+          const transactionInstructionIdx = idx[transactionIdx]
+          await sendSignedTransaction({
+            connection,
+            signedTransaction: signedTxns[transactionIdx],
+            block,
+            transactionInstructionIdx: transactionInstructionIdx,
+          })
+        }
       }
     }
-  }
-  //we call recursively our function to forward rest of transactions if
-  // number of them is higher then maxTransactionsInBath
-  if (TransactionInstructions.length > maxTransactionsInBath) {
-    const forwardedTransactions = TransactionInstructions.slice(
-      maxTransactionsInBath,
-      TransactionInstructions.length
-    )
-    const forwardedSigners = signersSet.slice(
-      maxTransactionsInBath,
-      TransactionInstructions.length
-    )
-    await sendTransactionsV2(
-      connection,
-      wallet,
-      forwardedTransactions,
-      forwardedSigners
-    )
+    //we call recursively our function to forward rest of transactions if
+    // number of them is higher then maxTransactionsInBath
+    if (TransactionInstructions.length > maxTransactionsInBath) {
+      const forwardedTransactions = TransactionInstructions.slice(
+        maxTransactionsInBath,
+        TransactionInstructions.length
+      )
+      const forwardedSigners = signersSet.slice(
+        maxTransactionsInBath,
+        TransactionInstructions.length
+      )
+      await sendTransactionsV2(
+        connection,
+        wallet,
+        forwardedTransactions,
+        forwardedSigners,
+        autoRetry
+      )
+    }
+  } catch (e) {
+    if (typeof e?.txInstructionIdx !== 'undefined' && autoRetry) {
+      console.log('Retrying from transactionIx:', e.txInstructionForRetry)
+      const idx = e?.txInstructionIdx
+      const txInstructionForRetry = TransactionInstructions.slice(
+        idx,
+        TransactionInstructions.length
+      )
+      const signersForRetry = signersSet.slice(idx, signersSet.length)
+      notify({
+        type: 'warning',
+        message: 'Transactions timeout running retry',
+      })
+      await sendTransactionsV2(
+        connection,
+        wallet,
+        txInstructionForRetry,
+        signersForRetry
+      )
+    } else {
+      throw e
+    }
   }
 }
 
