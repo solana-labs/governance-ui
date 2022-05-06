@@ -161,5 +161,14 @@
     "ogImage": "https://www.foresight.exchange/logo.png",
     "website": "https://www.foresight.exchange/",
     "twitter": "@foresightmkt"
+  },
+  {
+    "symbol": "PYTH",
+    "displayName": "Pyth DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "44xGQELUXXD1TiLEMc73RBnCxeW8XKw27LyJNpt2G8bF",
+    "ogImage": "/realms/Pyth/img/pyth.svg",
+    "website": "https://pyth.network/",
+    "twitter": "@PythNetwork"
   }
 ]
