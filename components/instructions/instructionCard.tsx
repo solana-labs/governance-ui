@@ -187,15 +187,17 @@ export default function InstructionCard({
               setPlaying={setPlaying}
               instructionOption={instructionOption}
             />
-            {/* Show execution option if the proposal contains a Castle program id */}
+            {/* Show execution option if the proposal contains a specified program id and
+                proposal has not executed already. */}
             {allProposalPrograms?.filter((a) =>
               ALL_CASTLE_PROGRAMS.map((a) => a.toBase58()).includes(a)
-            ) && (
-              <InstructionOptionInput
-                value={instructionOption}
-                setValue={setInstructionOption}
-              />
-            )}
+            ).length > 0 &&
+              playing != PlayState.Played && (
+                <InstructionOptionInput
+                  value={instructionOption}
+                  setValue={setInstructionOption}
+                />
+              )}
           </React.Fragment>
         )}
       </div>

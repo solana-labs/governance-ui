@@ -597,10 +597,10 @@
   resolved "https://registry.yarnpkg.com/@castlefinance/vault-core/-/vault-core-0.1.5.tgz#984da02fc4ca1270359c9c3283243658905eb562"
   integrity sha512-Evq4CslcF5wsnMpd0oTGq4iNfjqprut25GQTQFI6mCTITFtrCa7G7cprw9jaBSXlyX/fpa3LI799VtPhrCoViA==
 
-"@castlefinance/vault-sdk@^2.0.0":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@castlefinance/vault-sdk/-/vault-sdk-2.1.0.tgz#0dd9359954ab94620d7b1cd17a5afe7d39f0a194"
-  integrity sha512-34EqEgTb1e8nHTYWCMA0Ph0x+2RaKE5/ELaMDMm6rB3xg/aCOqqQk0lMwWYCuqsxRp/4aIchQ9wf1uqlKPco5A==
+"@castlefinance/vault-sdk@^2.1.2":
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/@castlefinance/vault-sdk/-/vault-sdk-2.1.2.tgz#7006fb3c1807be2ef3db0599cf154da0513f15f2"
+  integrity sha512-EIKsJm8jUJqcflE2la1jvh/rkOfD3vVI07uMW9yEJ0PmzKUX7QX6PGXnENmnfqzy5NjZ5a6gTw7gOrhRuK4Ofg==
   dependencies:
     "@castlefinance/vault-core" "^0.1.0"
     "@jet-lab/jet-engine" "^0.2.15"

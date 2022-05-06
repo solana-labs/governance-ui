@@ -245,21 +245,23 @@ export async function sendSignedAndAdjacentTransactions({
   const rawTransaction = signedTransaction.serialize()
   const rawAdjTransaction = adjacentTransaction.serialize()
 
-  // Send both transactions at the same time
-  const [txid, adjTxId]: TransactionSignature[] = await Promise.all([
-    connection.sendRawTransaction(rawAdjTransaction, {
-      skipPreflight: true,
-    }),
-    connection.sendRawTransaction(rawTransaction, {
-      skipPreflight: true,
-    }),
+  const proposalTxPromise = connection.sendRawTransaction(rawAdjTransaction, {
+    skipPreflight: true,
+  })
+  await sleep(30)
+  const adjTxPromise = connection.sendRawTransaction(rawTransaction, {
+    skipPreflight: true,
+  })
+
+  const [proposalTxId, adjTxId] = await Promise.all([
+    proposalTxPromise,
+    adjTxPromise,
   ])
-  console.log('txids', txid, adjTxId)
 
   // Retry mechanism
   let done = false
   const startTime = getUnixTs()
-  console.log('Started awaiting confirmation for', txid)
+  console.log('Started awaiting confirmation for', proposalTxId)
   ;(async () => {
     while (!done && getUnixTs() - startTime < timeout) {
       console.log('RETRYING')
@@ -274,7 +276,11 @@ export async function sendSignedAndAdjacentTransactions({
     console.log(
       'calling signatures confirmation',
       await awaitTransactionSignatureConfirmation(adjTxId, timeout, connection),
-      await awaitTransactionSignatureConfirmation(txid, timeout, connection)
+      await awaitTransactionSignatureConfirmation(
+        proposalTxId,
+        timeout,
+        connection
+      )
     )
   } catch (err) {
     if (err.timeout) {
@@ -308,25 +314,28 @@ export async function sendSignedAndAdjacentTransactions({
           if (line.startsWith('Program log: ')) {
             throw new TransactionError(
               'Transaction failed: ' + line.slice('Program log: '.length),
-              txid
+              proposalTxId
             )
           }
         }
       }
-      throw new TransactionError(JSON.stringify(simulateResult.err), txid)
+      throw new TransactionError(
+        JSON.stringify(simulateResult.err),
+        proposalTxId
+      )
     }
 
     console.log('transaction error')
 
-    throw new TransactionError('Transaction failed', txid)
+    throw new TransactionError('Transaction failed', proposalTxId)
   } finally {
     done = true
   }
 
-  notify({ message: successMessage, type: 'success', txid })
+  notify({ message: successMessage, type: 'success', txid: proposalTxId })
 
-  console.log('Latency', txid, getUnixTs() - startTime)
-  return txid
+  console.log('Latency', proposalTxId, getUnixTs() - startTime)
+  return proposalTxId
 }
 
 async function awaitTransactionSignatureConfirmation(

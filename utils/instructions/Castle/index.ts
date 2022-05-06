@@ -23,7 +23,6 @@ import {
   PublicKey,
   TransactionInstruction,
   Keypair,
-  SYSVAR_CLOCK_PUBKEY,
   Connection,
 } from '@solana/web3.js'
 import { ConnectionContext, getNetworkFromEndpoint } from '@utils/connection'
@@ -86,18 +85,20 @@ export async function getCastleDepositInstruction({
     const userLpTokenAccount = await Token.getAssociatedTokenAddress(
       ASSOCIATED_TOKEN_PROGRAM_ID,
       TOKEN_PROGRAM_ID,
-      vaultClient.getVaultState().lpTokenMint,
+      vaultClient.getLpTokenMint(),
       reserveTokenOwner,
       true
     )
-    const userLpTokenAccountInfo = await vaultClient.program.provider.connection.getAccountInfo(
+
+    const userLpTokenAccountInfo = await vaultClient.getLpTokenAccountInfo(
       userLpTokenAccount
     )
+
     if (userLpTokenAccountInfo == null) {
       createLpAcctIx = Token.createAssociatedTokenAccountInstruction(
         ASSOCIATED_TOKEN_PROGRAM_ID,
         TOKEN_PROGRAM_ID,
-        vaultClient.getVaultState().lpTokenMint,
+        vaultClient.getLpTokenMint(),
         userLpTokenAccount,
         reserveTokenOwner,
         wallet.publicKey
@@ -106,21 +107,11 @@ export async function getCastleDepositInstruction({
 
     // Get the deposit instruction
     const { decimals } = governedTokenAccount.extensions.mint.account
-    const depositIx = vaultClient.program.instruction.deposit(
+    const depositIx = vaultClient.getDepositIx(
       new BN(amount * Math.pow(10, decimals)),
-      {
-        accounts: {
-          vault: vaultClient.vaultId,
-          vaultAuthority: vaultClient.getVaultState().vaultAuthority,
-          vaultReserveToken: vaultClient.getVaultState().vaultReserveToken,
-          lpTokenMint: vaultClient.getVaultState().lpTokenMint,
-          userReserveToken: governedTokenAccount.pubkey,
-          userLpToken: userLpTokenAccount,
-          userAuthority: reserveTokenOwner,
-          tokenProgram: TOKEN_PROGRAM_ID,
-          clock: SYSVAR_CLOCK_PUBKEY,
-        },
-      }
+      reserveTokenOwner,
+      userLpTokenAccount,
+      governedTokenAccount.pubkey
     )
 
     // Create the LP token account if necessary
@@ -198,47 +189,35 @@ export async function getCastleWithdrawInstruction({
     const userReserveTokenAccount = await Token.getAssociatedTokenAddress(
       ASSOCIATED_TOKEN_PROGRAM_ID,
       TOKEN_PROGRAM_ID,
-      vaultClient.getVaultState().reserveTokenMint,
+      vaultClient.getReserveTokenMint(),
       lpTokenAccountOwner,
       true
     )
-    const userReserveTokenAccountInfo = await vaultClient.program.provider.connection.getAccountInfo(
+
+    const userReserveTokenAccountInfo = await vaultClient.getReserveTokenAccountInfo(
       userReserveTokenAccount
     )
+
     if (userReserveTokenAccountInfo == null) {
       createReserveAcctIx = Token.createAssociatedTokenAccountInstruction(
         ASSOCIATED_TOKEN_PROGRAM_ID,
         TOKEN_PROGRAM_ID,
-        vaultClient.getVaultState().reserveTokenMint,
+        vaultClient.getReserveTokenMint(),
         userReserveTokenAccount,
         lpTokenAccountOwner,
         wallet.publicKey
       )
     }
 
-    console.log('userReserveTokenAccount', userReserveTokenAccount.toBase58())
-    console.log(
-      'vaultClient.getVaultState().vaultReserveToken',
-      vaultClient.getVaultState().vaultReserveToken.toBase58()
-    )
     // Get withdraw instruction. User selects the LP token to deposit back
     // into the vault in exchange for the reserve token
     const { decimals } = governedTokenAccount.extensions.mint.account
-    const withdrawIx = vaultClient.program.instruction.withdraw(
+
+    const withdrawIx = vaultClient.getWithdrawIx(
       new BN(amount * Math.pow(10, decimals)),
-      {
-        accounts: {
-          vault: vaultClient.vaultId,
-          vaultAuthority: vaultClient.getVaultState().vaultAuthority,
-          userAuthority: lpTokenAccountOwner,
-          userLpToken: governedTokenAccount.pubkey,
-          userReserveToken: userReserveTokenAccount,
-          vaultReserveToken: vaultClient.getVaultState().vaultReserveToken,
-          lpTokenMint: vaultClient.getVaultState().lpTokenMint,
-          tokenProgram: TOKEN_PROGRAM_ID,
-          clock: SYSVAR_CLOCK_PUBKEY,
-        },
-      }
+      lpTokenAccountOwner,
+      governedTokenAccount.pubkey,
+      userReserveTokenAccount
     )
 
     // Create the reserve token account if necessary
