@@ -91,6 +91,12 @@ export interface ProgramUpgradeForm {
   bufferSpillAddress?: string | undefined
 }
 
+export interface CreateStreamForm {
+  governedAccount?: AssetAccount
+  recipient: string
+  tokenAccount: string
+}
+
 export const programUpgradeFormNameOf = getNameOf<ProgramUpgradeForm>()
 
 export interface MangoMakeAddOracleForm {
@@ -271,6 +277,7 @@ export enum Instructions {
   MangoChangeReferralFeeParams,
   MangoChangeSpotMarket,
   MangoCreatePerpMarket,
+  CreateStream,
   Grant,
   Clawback,
   CreateAssociatedTokenAccount,
