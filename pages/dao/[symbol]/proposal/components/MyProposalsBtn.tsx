@@ -16,7 +16,6 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import dayjs from 'dayjs'
 import { notify } from '@utils/notifications'
 import Loading from '@components/Loading'
-import { sendSignedTransaction } from '@utils/sendTransactions'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { sleep } from '@project-serum/common'
@@ -26,6 +25,7 @@ import {
   getNftRegistrarPDA,
   getNftVoterWeightRecord,
 } from 'NftVotePlugin/sdk/accounts'
+import { sendSignedTransaction } from '@utils/send'
 
 const MyProposalsBn = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
@@ -395,13 +395,12 @@ const ProposalList = ({
   proposals: ProgramAccount<Proposal>[]
   isLoading: boolean
 }) => {
-  const { isNftMode } = useRealm()
   return (
     <>
       {' '}
       <h4 className="flex items-center mb-3">
         {title} ({proposals.length})
-        {!isNftMode && btnName && proposals.length !== 0 && (
+        {btnName && proposals.length !== 0 && (
           <div className="ml-auto">
             <Button
               small
