@@ -607,7 +607,6 @@ export async function getConvertToMsolInstruction({
       form.governedTokenAccount.extensions.mint.account.decimals
     )
     const originAccount = form.governedTokenAccount.extensions.transferAddress
-    const destinationAccount = form.destinationAccount.governance.pubkey
 
     const config = new MarinadeConfig({
       connection: connection.current,
@@ -615,8 +614,22 @@ export async function getConvertToMsolInstruction({
     })
     const marinade = new Marinade(config)
 
+    const destinationAccount = form.destinationAccount.pubkey
+
+    const mSolToken = new Token(
+      connection.current,
+      new PublicKey('mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So'),
+      TOKEN_PROGRAM_ID,
+      (null as unknown) as Keypair
+    )
+
+    const destinationAccountInfo = await mSolToken.getAccountInfo(
+      destinationAccount
+    )
+    const destinationAccountOwner = destinationAccountInfo.owner
+
     const { transaction } = await marinade.deposit(new BN(amount), {
-      mintToOwnerAddress: destinationAccount,
+      mintToOwnerAddress: destinationAccountOwner,
     })
 
     if (transaction.instructions.length === 1) {
@@ -624,7 +637,9 @@ export async function getConvertToMsolInstruction({
         transaction.instructions[0]
       )
     } else {
-      throw Error('No mSOL Account can be found for the choosen account.')
+      throw Error(
+        "Marinade's stake instructions could not be calculated correctly."
+      )
     }
   }
 
