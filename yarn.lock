@@ -641,10 +641,10 @@
   version "1.4.0"
   resolved "https://registry.npmjs.org/@csstools/convert-colors/-/convert-colors-1.4.0.tgz"
 
-"@dialectlabs/react-ui@0.8.1":
-  version "0.8.1"
-  resolved "https://registry.yarnpkg.com/@dialectlabs/react-ui/-/react-ui-0.8.1.tgz#082e56a73168d91f2fda3b79c57c4cacd062b8fb"
-  integrity sha512-hgK2c3ohtvmej/h1YTlDpQm1rnF1MieZwlhf9BLAyMecjz/McLQPx1r9YSpAPkb00SMwHpoVB5wnmeIDVQftWg==
+"@dialectlabs/react-ui@0.8.2":
+  version "0.8.2"
+  resolved "https://registry.yarnpkg.com/@dialectlabs/react-ui/-/react-ui-0.8.2.tgz#010fc1a49f4b1b022e0f4b587b51fb16874e8ba9"
+  integrity sha512-h6vr4p0NKY8kH2eJf3i1D2gU79jMoemBcaA3X78bCwTGlUDVXfxL9OO6fyayAQbYOwjj7oV+N3DF+ArfTEfo3A==
   dependencies:
     "@cardinal/namespaces-components" "2.5.0"
     "@dialectlabs/web3" "^0.3.1"
