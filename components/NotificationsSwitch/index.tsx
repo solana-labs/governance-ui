@@ -31,9 +31,6 @@ export function useOutsideAlerter(
      * Alert if clicked on outside of element
      */
     function handleClickOutside(event: MouseEvent) {
-      if (event.target instanceof Element) {
-        return
-      }
       if (
         ref.current &&
         !ref?.current.contains(event.target as Element) &&
