@@ -478,6 +478,7 @@ export const sendTransactionsV2 = async (
         typeof fcn.sequenceType === 'undefined' ||
         fcn.sequenceType === SequenceType.Parallel
       ) {
+        //wait for all Parallel
         await Promise.all(
           fcn.transactionsIdx.map((idx) => {
             const transactionIdx = Object.keys(idx)[0]
@@ -492,6 +493,7 @@ export const sendTransactionsV2 = async (
         )
       }
       if (fcn.sequenceType === SequenceType.Sequential) {
+        //wait for all Sequential
         for (const idx of fcn.transactionsIdx) {
           const transactionIdx = Object.keys(idx)[0]
           const transactionInstructionIdx = idx[transactionIdx]
@@ -525,7 +527,7 @@ export const sendTransactionsV2 = async (
     }
   } catch (e) {
     if (typeof e?.txInstructionIdx !== 'undefined' && autoRetry) {
-      console.log('Retrying from transactionIx:', e.txInstructionForRetry)
+      console.log('Retrying from transactionIx:', e.txInstructionIdx)
       const idx = e?.txInstructionIdx
       const txInstructionForRetry = TransactionInstructions.slice(
         idx,
