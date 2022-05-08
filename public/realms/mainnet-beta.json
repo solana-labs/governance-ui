@@ -697,5 +697,14 @@
     "ogImage": "https://raw.githubusercontent.com/Exonft/SquatchDAO/main/SquatchDAO.jpg",
     "website": "www.squatchdao.com",
     "twitter": "@Squatch_DAO"
+  },
+  {
+    "symbol": "RRA",
+    "displayName": "RRA DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "4pLWsjAJJmyUL73MyxDVcSB3iTR6Yuyx7S98EqSDqjmH",
+    "ogImage": "/realms/RRADAO/rradao_logo.jpg",
+    "website": "https://www.ruderhinos.club",
+    "twitter": "@RudeRhinosClub"
   }
 ]
