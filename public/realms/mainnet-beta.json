@@ -706,5 +706,12 @@
     "ogImage": "/realms/RRADAO/rradao_logo.jpg",
     "website": "https://www.ruderhinos.club",
     "twitter": "@RudeRhinosClub"
+  },
+  {
+    "symbol": "PhoenixDAO",
+    "displayName": "Phoenix DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Fvzr2TsUuUZ4HoZumH6ppa1cacWshU1YUZgGYHPHH4rz",
+    "ogImage": "/realms/PhoenixDAO/phoenixdao_logo.png"
   }
 ]
