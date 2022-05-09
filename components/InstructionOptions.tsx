@@ -5,8 +5,8 @@ import { SelectorIcon } from '@heroicons/react/solid'
 // Add more options as needed
 export enum InstructionOptions {
   none = 'none',
-  castleRefresh = 'Castle: Refresh USDC',
-  castleReconcileRefresh = 'Castle: Reconcile & Refresh USDC',
+  castleRefresh = 'Castle: Refresh',
+  castleReconcileRefresh = 'Castle: Reconcile and Refresh',
 }
 
 export type InstructionOption = `${InstructionOptions}`
@@ -14,9 +14,9 @@ export type InstructionOption = `${InstructionOptions}`
 // Mapping between listbox option label and underlying option
 const executionOptions: { label: string; value: InstructionOption }[] = [
   { label: 'Select Option', value: InstructionOptions.none },
-  { label: 'Castle: Refresh', value: InstructionOptions.castleRefresh },
+  { label: 'Castle: Deposit', value: InstructionOptions.castleRefresh },
   {
-    label: 'Castle: Reconcile',
+    label: 'Castle: Withdraw',
     value: InstructionOptions.castleReconcileRefresh,
   },
 ]
