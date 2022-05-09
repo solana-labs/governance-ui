@@ -28,6 +28,8 @@
     "@cardinal/namespaces-components": "^2.5.5",
     "@castlefinance/vault-core": "^0.1.3",
     "@castlefinance/vault-sdk": "^2.1.2",
+    "@dialectlabs/react": "0.5.1",
+    "@dialectlabs/react-ui": "0.8.2",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
     "@foresight-tmp/foresight-sdk": "^0.1.38",
