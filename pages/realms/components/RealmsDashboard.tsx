@@ -1,8 +1,8 @@
 import useQueryContext from '@hooks/useQueryContext'
 import { RealmInfo } from '@models/registry/api'
+import { useTheme } from 'next-themes'
 import { useRouter } from 'next/router'
 import React, { useMemo } from 'react'
-import { useTheme } from 'next-themes'
 
 export default function RealmsDashboard({
   realms,
@@ -110,7 +110,7 @@ export default function RealmsDashboard({
                     </div>
                   )}
                 </div>
-                <h3 className="text-center ">
+                <h3 className="text-center break-all">
                   {realm.displayName ?? realm.symbol}
                 </h3>
               </div>
