@@ -11,6 +11,7 @@ import {
 } from '@solana/spl-token'
 import { SignerWalletAdapter, WalletAdapter } from '@solana/wallet-adapter-base'
 import {
+  Keypair,
   PublicKey,
   SystemProgram,
   TransactionInstruction,
