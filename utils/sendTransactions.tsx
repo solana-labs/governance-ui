@@ -11,6 +11,11 @@ import {
   Keypair,
 } from '@solana/web3.js'
 import { notify } from './notifications'
+import {
+  closeTransactionProcessUi,
+  incrementProcessedTransactions,
+  showTransactionsProcessUi,
+} from './transactionsLoader'
 
 interface TransactionInstructionWithType {
   instructionsSet: TransactionInstruction[]
@@ -223,6 +228,7 @@ export async function sendSignedTransaction({
   timeout = DEFAULT_TIMEOUT,
   block,
   transactionInstructionIdx,
+  showUiComponent = false,
 }: {
   signedTransaction: Transaction
   connection: Connection
@@ -232,6 +238,7 @@ export async function sendSignedTransaction({
   timeout?: number
   block: Block
   transactionInstructionIdx?: number
+  showUiComponent?: boolean
 }): Promise<{ txid: string; slot: number }> {
   const rawTransaction = signedTransaction.serialize()
   const startTime = getUnixTs()
@@ -301,7 +308,9 @@ export async function sendSignedTransaction({
   } finally {
     done = true
   }
-
+  if (showUiComponent) {
+    incrementProcessedTransactions()
+  }
   console.log('Latency', txid, getUnixTs() - startTime)
   return { txid, slot }
 }
@@ -394,14 +403,23 @@ export const sendTransactions = async (
 }
 
 /////////////////////////////////////////
-export const sendTransactionsV2 = async (
-  connection: Connection,
-  wallet: WalletSigner,
-  TransactionInstructions: TransactionInstructionWithType[],
-  signersSet: Keypair[][],
-  autoRetry?: boolean,
+export const sendTransactionsV2 = async ({
+  connection,
+  wallet,
+  TransactionInstructions,
+  signersSet,
+  autoRetry = false,
+  block,
+  showUiComponent = false,
+}: {
+  connection: Connection
+  wallet: WalletSigner
+  TransactionInstructions: TransactionInstructionWithType[]
+  signersSet: Keypair[][]
+  autoRetry?: boolean
   block?: Block
-) => {
+  showUiComponent?: boolean
+}) => {
   if (!wallet.publicKey) throw new Error('Wallet not connected!')
   //block will be used for timeout calculation
   if (!block) {
@@ -459,6 +477,9 @@ export const sendTransactionsV2 = async (
   }
   console.log(transactionCallOrchestrator)
   const signedTxns = await wallet.signAllTransactions(unsignedTxns)
+  if (showUiComponent) {
+    showTransactionsProcessUi(signedTxns.length)
+  }
   console.log(
     'Transactions play type order',
     transactionCallOrchestrator.map((x) => {
@@ -488,6 +509,7 @@ export const sendTransactionsV2 = async (
               signedTransaction: signedTxns[transactionIdx],
               block: block!,
               transactionInstructionIdx: transactionInstructionIdx,
+              showUiComponent,
             })
           })
         )
@@ -502,6 +524,7 @@ export const sendTransactionsV2 = async (
             signedTransaction: signedTxns[transactionIdx],
             block,
             transactionInstructionIdx: transactionInstructionIdx,
+            showUiComponent,
           })
         }
       }
@@ -517,13 +540,17 @@ export const sendTransactionsV2 = async (
         maxTransactionsInBath,
         TransactionInstructions.length
       )
-      await sendTransactionsV2(
+      await sendTransactionsV2({
         connection,
         wallet,
-        forwardedTransactions,
-        forwardedSigners,
-        autoRetry
-      )
+        TransactionInstructions: forwardedTransactions,
+        signersSet: forwardedSigners,
+        autoRetry,
+        showUiComponent,
+      })
+    }
+    if (showUiComponent) {
+      closeTransactionProcessUi()
     }
   } catch (e) {
     if (typeof e?.txInstructionIdx !== 'undefined' && autoRetry) {
@@ -538,12 +565,13 @@ export const sendTransactionsV2 = async (
         type: 'warning',
         message: 'Transactions timeout running retry',
       })
-      await sendTransactionsV2(
+      await sendTransactionsV2({
         connection,
         wallet,
-        txInstructionForRetry,
-        signersForRetry
-      )
+        TransactionInstructions: txInstructionForRetry,
+        signersSet: signersForRetry,
+        showUiComponent,
+      })
     } else {
       throw e
     }

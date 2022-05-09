@@ -23,6 +23,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { usePrevious } from '@hooks/usePrevious'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useMembers from '@components/Members/useMembers'
+import TransactionLoader from '@components/TransactionLoader'
 
 function App({ Component, pageProps }) {
   useHydrateStore()
@@ -131,6 +132,7 @@ function App({ Component, pageProps }) {
           <WalletIdentityProvider appName={'Realms'}>
             <NavBar />
             <Notifications />
+            <TransactionLoader></TransactionLoader>
             <PageBodyContainer>
               <Component {...pageProps} />
             </PageBodyContainer>

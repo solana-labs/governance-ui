@@ -123,13 +123,14 @@ export async function castVote(
         )
       ),
     ]
-    await sendTransactionsV2(
+    await sendTransactionsV2({
       connection,
       wallet,
-      instructionsChunks,
-      singersMap,
-      true
-    )
+      TransactionInstructions: instructionsChunks,
+      signersSet: singersMap,
+      autoRetry: true,
+      showUiComponent: true,
+    })
   } else {
     const transaction = new Transaction()
     transaction.add(...instructions)

@@ -5,7 +5,7 @@ import type { EndpointInfo } from '../@types/types'
 const ENDPOINTS: EndpointInfo[] = [
   {
     name: 'mainnet',
-    url: process.env.MAINNET_RPC || 'https://api.dao.solana.com/',
+    url: process.env.MAINNET_RPC || 'https://ssc-dao.genesysgo.net/',
   },
   {
     name: 'devnet',
