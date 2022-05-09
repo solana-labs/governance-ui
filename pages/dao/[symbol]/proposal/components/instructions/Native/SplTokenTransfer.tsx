@@ -39,12 +39,7 @@ const SplTokenTransfer = ({
   const shouldBeGoverned = index !== 0 && governance;
   const programId: PublicKey | undefined = realmInfo?.programId;
   const [form, setForm] = useState<SplTokenTransferForm>({
-    destinationAccount: '',
-    // No default transfer amount
-    amount: undefined,
-    governedTokenAccount: undefined,
     programId: programId?.toString(),
-    mintInfo: undefined,
   });
   const [governedAccount, setGovernedAccount] = useState<
     ProgramAccount<Governance> | undefined
@@ -117,7 +112,7 @@ const SplTokenTransfer = ({
   useEffect(() => {
     if (form.destinationAccount) {
       debounce.debounceFcn(async () => {
-        const pubKey = tryParseKey(form.destinationAccount);
+        const pubKey = tryParseKey(form.destinationAccount!);
         if (pubKey) {
           const account = await tryGetTokenAccount(connection.current, pubKey);
           setDestinationAccount(account ? account : null);

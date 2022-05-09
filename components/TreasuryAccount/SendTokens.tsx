@@ -271,7 +271,7 @@ const SendTokens = () => {
   useEffect(() => {
     if (form.destinationAccount) {
       debounce.debounceFcn(async () => {
-        const pubKey = tryParseKey(form.destinationAccount);
+        const pubKey = tryParseKey(form.destinationAccount!);
         if (pubKey) {
           const account = await tryGetTokenAccount(connection.current, pubKey);
           setDestinationAccount(account ? account : null);
@@ -293,8 +293,8 @@ const SendTokens = () => {
   const proposalTitle = isNFT
     ? nftTitle
     : `Pay ${form.amount}${tokenInfo ? ` ${tokenInfo?.symbol} ` : ' '}to ${
-        tryParseKey(form.destinationAccount)
-          ? abbreviateAddress(new PublicKey(form.destinationAccount))
+        tryParseKey(form.destinationAccount!)
+          ? abbreviateAddress(new PublicKey(form.destinationAccount!))
           : ''
       }`;
 

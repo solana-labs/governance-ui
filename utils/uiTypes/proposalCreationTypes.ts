@@ -35,19 +35,31 @@ export interface FormInstructionData {
 }
 
 export interface SplTokenTransferForm {
-  destinationAccount: string;
-  amount: number | undefined;
-  governedTokenAccount: GovernedTokenAccount | undefined;
+  destinationAccount?: string;
+  amount?: number;
+  governedTokenAccount?: GovernedTokenAccount;
   programId: string | undefined;
-  mintInfo: MintInfo | undefined;
+  mintInfo?: MintInfo;
 }
 
 export interface FriktionDepositForm {
-  amount: number | undefined;
-  governedTokenAccount: GovernedTokenAccount | undefined;
-  voltVaultId: string;
-  programId: string | undefined;
-  mintInfo: MintInfo | undefined;
+  uiAmount: number;
+  governedAccount?: GovernedMultiTypeAccount;
+  volt?: string;
+  sourceAccount?: string;
+}
+
+export interface FriktionWithdrawForm {
+  uiAmount: number;
+  governedAccount?: GovernedMultiTypeAccount;
+  volt?: string;
+  receiverAccount?: string;
+}
+
+export interface FriktionClaimWithdrawalForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  volt?: string;
+  receiverAccount?: string;
 }
 
 export interface GrantForm {
@@ -439,6 +451,8 @@ export enum InstructionEnum {
   // Clawback,
   CreateAssociatedTokenAccount,
   FriktionDepositIntoVolt,
+  FriktionWithdrawFromVolt,
+  FriktionClaimWithdrawal,
   LifinityDepositToPool,
   LifinityWithdrawFromPool,
   QuarryClaimRewards,

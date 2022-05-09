@@ -1,16 +1,19 @@
 import { PublicKey } from '@solana/web3.js';
 import Select from '@components/inputs/Select';
+import SelectOptionDetailed, { Flag } from '@components/SelectOptionDetailed';
 import { OwnedTokenAccountsInfo } from '@hooks/useGovernanceUnderlyingTokenAccounts';
 
 const TokenAccountSelect = ({
   label,
   value,
+  filterByMint,
   onChange,
   error,
   ownedTokenAccountsInfo,
 }: {
   label: string;
   value?: string;
+  filterByMint?: PublicKey[];
   onChange: (value: string) => void;
   error: string;
   ownedTokenAccountsInfo?: OwnedTokenAccountsInfo;
@@ -28,33 +31,33 @@ const TokenAccountSelect = ({
       pubkeyString
     ];
 
-    return (
-      <div className="flex flex-col">
-        <div className="mb-0.5">{pubkeyString}</div>
+    const details = [
+      {
+        label: 'Mint Name',
+        text: mintName,
+      },
+      {
+        label: 'UI Balance',
+        text: uiAmount.toString(),
+      },
+      {
+        label: 'Mint',
+        text: mint.toBase58(),
+      },
+    ];
 
-        <div className="flex flex-col">
-          <div className="space-y-0.5 text-xs text-fgd-3">
-            Mint Name: {mintName}
-          </div>
-          <div className="space-y-0.5 text-xs text-fgd-3">
-            UI Balance: {uiAmount}
-          </div>
-          <div className="space-y-0.5 text-xs text-fgd-3 mb-0.5">
-            Mint: {mint.toString()}
-          </div>
-          <div>
-            {isATA ? (
-              <span className="text-xs text-green">
-                Associated Token Account
-              </span>
-            ) : (
-              <span className="text-xs text-red">
-                Not an Associated Token Account
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
+    const diffValue = {
+      label: 'ATA',
+      flag: isATA ? Flag.OK : Flag.Danger,
+      text: `${isATA ? 'Not an' : ''} Associated Token Account`,
+    };
+
+    return (
+      <SelectOptionDetailed
+        title={pubkeyString}
+        details={details}
+        diffValue={diffValue}
+      />
     );
   };
 
@@ -69,11 +72,19 @@ const TokenAccountSelect = ({
       onChange={onChange}
       error={error}
     >
-      {Object.values(ownedTokenAccountsInfo).map(({ pubkey }) => (
-        <Select.Option key={pubkey.toBase58()} value={pubkey.toBase58()}>
-          {getAccountDisplay(pubkey)}
-        </Select.Option>
-      ))}
+      {Object.values(ownedTokenAccountsInfo)
+        .filter(
+          (ownedTokenAccountInfo) =>
+            !filterByMint ||
+            filterByMint.some((mint) =>
+              mint.equals(ownedTokenAccountInfo.mint),
+            ),
+        )
+        .map(({ pubkey }) => (
+          <Select.Option key={pubkey.toBase58()} value={pubkey.toBase58()}>
+            {getAccountDisplay(pubkey)}
+          </Select.Option>
+        ))}
     </Select>
   );
 };

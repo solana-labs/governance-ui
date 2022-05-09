@@ -25,6 +25,7 @@ function useInstructionFormBuilder<
   schema,
   buildInstruction,
   getCustomHoldUpTime,
+  shouldSplitIntoSeparateTxs = false,
 }: {
   index: number;
   initialFormValues: T;
@@ -47,6 +48,7 @@ function useInstructionFormBuilder<
     governedAccountPubkey: PublicKey;
   }) => Promise<TransactionInstruction | SerializedInstruction>;
   getCustomHoldUpTime?: () => Promise<number>;
+  shouldSplitIntoSeparateTxs?: boolean;
 }) {
   const connection = useWalletStore((s) => s.connection);
   const wallet = useWalletStore((s) => s.current);
@@ -111,6 +113,8 @@ function useInstructionFormBuilder<
         isValid: true,
         governance: form.governedAccount?.governance,
         customHoldUpTime,
+        signers: [],
+        shouldSplitIntoSeparateTxs,
       };
     } catch (e) {
       console.error(e);

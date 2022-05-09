@@ -26,6 +26,7 @@ import { UXD_PROTOCOL_STAKING_INSTRUCTIONS } from './programs/uxdProtocolStaking
 import { LIFINITY_PROGRAM_INSTRUCTIONS } from './programs/lifinity';
 import { TRIBECA_PROGRAM_INSTRUCTIONS } from './programs/tribeca';
 import { MAPLE_FINANCE_PROGRAM_INSTRUCTIONS } from './programs/mapleFinance';
+import { FRIKTION_PROGRAM_INSTRUCTIONS } from './programs/friktion';
 /**
  * Default governance program id instance
  */
@@ -123,6 +124,7 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...LIFINITY_PROGRAM_INSTRUCTIONS,
   ...TRIBECA_PROGRAM_INSTRUCTIONS,
   ...MAPLE_FINANCE_PROGRAM_INSTRUCTIONS,
+  ...FRIKTION_PROGRAM_INSTRUCTIONS,
 };
 
 export async function getInstructionDescriptor(
