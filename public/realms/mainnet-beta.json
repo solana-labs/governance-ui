@@ -697,5 +697,21 @@
     "ogImage": "https://raw.githubusercontent.com/Exonft/SquatchDAO/main/SquatchDAO.jpg",
     "website": "www.squatchdao.com",
     "twitter": "@Squatch_DAO"
+  },
+  {
+    "symbol": "RRA",
+    "displayName": "RRA DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "4pLWsjAJJmyUL73MyxDVcSB3iTR6Yuyx7S98EqSDqjmH",
+    "ogImage": "/realms/RRADAO/rradao_logo.jpg",
+    "website": "https://www.ruderhinos.club",
+    "twitter": "@RudeRhinosClub"
+  },
+  {
+    "symbol": "PhoenixDAO",
+    "displayName": "Phoenix DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Fvzr2TsUuUZ4HoZumH6ppa1cacWshU1YUZgGYHPHH4rz",
+    "ogImage": "/realms/PhoenixDAO/phoenixdao_logo.png"
   }
 ]
