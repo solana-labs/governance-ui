@@ -8,7 +8,6 @@ import useHydrateStore from '../hooks/useHydrateStore';
 import useRealm from '../hooks/useRealm';
 import { getResourcePathPart } from '../tools/core/resources';
 import handleRouterHistory from '@hooks/handleRouterHistory';
-import Footer from '@components/Footer';
 import { useEffect } from 'react';
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore';
 import useWalletStore from 'stores/useWalletStore';
@@ -110,7 +109,6 @@ function App({ Component, pageProps }) {
           </WalletIdentityProvider>
         </ThemeProvider>
       </ErrorBoundary>
-      <Footer />
     </div>
   );
 }

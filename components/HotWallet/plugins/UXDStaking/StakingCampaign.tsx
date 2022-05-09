@@ -122,20 +122,6 @@ const StakingCampaign = ({
         </div>
       </div>
 
-      <div className="flex flex-col bg-bkg-1 p-2 rounded-md space-y-1">
-        <div className="flex justify-between">
-          <span className="text-xs">staked mint:</span>
-          <span className="text-xs">
-            {getSplTokenNameByMint(stakingCampaignInfo.stakedMint)}
-          </span>
-        </div>
-
-        <div className="flex justify-between">
-          <span className="text-xs">reward mint:</span>
-          <span className="text-xs">{rewardMintName}</span>
-        </div>
-      </div>
-
       <div className="flex flex-col bg-bkg-1 p-2 rounded-md space-y-1 overflow-x-auto">
         {options}
       </div>

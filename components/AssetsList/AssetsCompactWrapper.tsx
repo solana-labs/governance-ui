@@ -32,5 +32,4 @@ const AssetsCompactWrapper = () => {
     </div>
   );
 };
-
 export default AssetsCompactWrapper;
