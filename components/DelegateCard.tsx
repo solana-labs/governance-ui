@@ -40,19 +40,19 @@ const DelegateCard = () => {
   const handleDelegate = async () => {
     const signers: Keypair[] = []
     const instructions: TransactionInstruction[] = []
-    setLoading(true)
 
-    if (!realm || !realm?.account?.config?.councilMint || !wallet?.publicKey) {
+    if (!realm || !wallet?.publicKey) {
       return
     }
 
     try {
+      setLoading(true)
       const programVersion = await getGovernanceProgramVersion(
         connection,
         realm.owner // governance program public key
       )
 
-      if (delegateCouncilToken) {
+      if (delegateCouncilToken && realm?.account?.config?.councilMint) {
         await withSetGovernanceDelegate(
           instructions,
           realm.owner, // publicKey of program/programId
@@ -86,6 +86,7 @@ const DelegateCard = () => {
       setLoading(false)
     } catch (error) {
       console.log('error', error)
+      setLoading(false)
     }
   }
 
