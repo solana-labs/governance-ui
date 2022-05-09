@@ -1,4 +1,5 @@
 import { ThemeProvider } from 'next-themes'
+import '@dialectlabs/react-ui/index.css'
 import '../styles/index.css'
 import useWallet from '../hooks/useWallet'
 import Notifications from '../components/Notification'
