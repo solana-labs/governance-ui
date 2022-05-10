@@ -31,7 +31,6 @@ type NotifiClientReturnType = ReturnType<typeof useNotifiClient>
 type NotificationCardProps = {
   onBackClick: () => void
   email: string
-
   phoneNumber: string
   telegram: string
   setPreview: Dispatch<SetStateAction<boolean>>
