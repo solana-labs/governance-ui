@@ -2,12 +2,12 @@ import { Disclosure } from '@headlessui/react'
 
 export default function AdvancedOptionsDropdown({ children }) {
   return (
-    <div className="py-8 md:py-12">
+    <div className="">
       <Disclosure>
         {({ open }) => (
           <>
             <Disclosure.Button className="font-light">
-              <div className="flex items-center py-2 pl-4 pr-2 space-x-2 rounded-full w-fit hover:bg-white/10">
+              <div className="flex items-center py-2 pl-4 pr-2 space-x-2 border rounded-full border-white/60 w-fit hover:bg-white/10">
                 <div className="mb-0 font-sans text-lg text-left">
                   Advanced Options
                 </div>

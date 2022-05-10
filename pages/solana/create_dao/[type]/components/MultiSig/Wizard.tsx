@@ -8,7 +8,7 @@ import { createMultisigRealm } from 'actions/createMultisigRealm'
 import useQueryContext from '@hooks/useQueryContext'
 
 import {
-  DEFAULT_GOVERNANCE_PROGRAM_ID,
+  // DEFAULT_GOVERNANCE_PROGRAM_ID,
   DEFAULT_TEST_GOVERNANCE_PROGRAM_ID,
 } from '@components/instructions/tools'
 
@@ -26,6 +26,7 @@ export const STEP1_SCHEMA = {
   avatar: yup.string(),
   name: yup.string().typeError('Required').required('Required'),
   description: yup.string(),
+  programId: yup.string(),
 }
 
 export const STEP2_SCHEMA = {
@@ -53,10 +54,12 @@ export function updateUserInput(schema, setValue) {
   const formData = getFormData()
   Object.keys(schema).forEach((fieldName) => {
     const value = formData[fieldName]
-    setValue(fieldName, value, {
-      shouldValidate: true,
-      shouldDirty: true,
-    })
+    if (value) {
+      setValue(fieldName, value, {
+        shouldValidate: true,
+        shouldDirty: true,
+      })
+    }
   })
 }
 
