@@ -2,12 +2,8 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import * as yup from 'yup'
 import { PublicKey } from '@solana/web3.js'
-import {
-  getGovernanceProgramVersion,
-  MintMaxVoteWeightSource,
-} from '@solana/spl-governance'
+import { getGovernanceProgramVersion } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
-import { registerRealm } from 'actions/registerRealm'
 import { createMultisigRealm } from 'actions/createMultisigRealm'
 import useQueryContext from '@hooks/useQueryContext'
 
@@ -190,17 +186,18 @@ export default function MultiSigWizard() {
       return
     }
     const formData = getFormData()
-    if (
-      !yup
-        .object({
-          ...STEP1_SCHEMA,
-          ...STEP2_SCHEMA,
-          ...STEP3_SCHEMA,
-        })
-        .isValid(formData)
-    ) {
-      return handlePreviousButton(4)
-    }
+    yup
+      .object({
+        ...STEP1_SCHEMA,
+        ...STEP2_SCHEMA,
+        ...STEP3_SCHEMA,
+      })
+      .isValid(formData)
+      .then((valid) => {
+        if (!valid) {
+          return handlePreviousButton(4)
+        }
+      })
   }, [currentStep])
 
   return (

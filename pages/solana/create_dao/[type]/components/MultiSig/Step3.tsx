@@ -33,13 +33,17 @@ export default function Step3({ onSubmit, onPrevClick }) {
 
   useEffect(() => {
     const formData = getFormData()
-
-    if (!yup.object(STEP2_SCHEMA).isValid(formData)) {
-      return onPrevClick(3)
-    } else {
-      setNumberOfDaoMember(formData?.memberAddresses?.length)
-      updateUserInput(STEP3_SCHEMA, setValue)
-    }
+    yup
+      .object(STEP2_SCHEMA)
+      .isValid(formData)
+      .then((valid) => {
+        if (valid) {
+          setNumberOfDaoMember(formData?.memberAddresses?.length)
+          updateUserInput(STEP3_SCHEMA, setValue)
+        } else {
+          onPrevClick(3)
+        }
+      })
   }, [])
 
   function serializeValues(values) {

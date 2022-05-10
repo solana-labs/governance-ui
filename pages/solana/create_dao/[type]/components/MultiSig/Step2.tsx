@@ -75,17 +75,21 @@ export default function Step2({ onSubmit, onPrevClick }) {
 
   useEffect(() => {
     const formData = getFormData()
-
-    if (!yup.object(STEP1_SCHEMA).isValid(formData)) {
-      return onPrevClick(2)
-    } else {
-      updateUserInput(STEP2_SCHEMA, setValue)
-      setInviteList(
-        formData.memberAddresses?.filter((wallet) => {
-          return validateSolAddress(wallet)
-        }) || []
-      )
-    }
+    yup
+      .object(STEP1_SCHEMA)
+      .isValid(formData)
+      .then((valid) => {
+        if (valid) {
+          updateUserInput(STEP2_SCHEMA, setValue)
+          setInviteList(
+            formData.memberAddresses?.filter((wallet) => {
+              return validateSolAddress(wallet)
+            }) || []
+          )
+        } else {
+          onPrevClick(2)
+        }
+      })
   }, [])
 
   useEffect(() => {
