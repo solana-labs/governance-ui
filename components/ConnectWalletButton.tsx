@@ -1,24 +1,27 @@
-import { Menu } from '@headlessui/react'
-import { useEffect, useMemo } from 'react'
-import { CheckCircleIcon, ChevronDownIcon } from '@heroicons/react/solid'
-import styled from '@emotion/styled'
-import useWalletStore from '../stores/useWalletStore'
-import {
-  getWalletProviderByUrl,
-  WALLET_PROVIDERS,
-} from '../utils/wallet-adapters'
 import {
   AddressImage,
   DisplayAddress,
   useAddressName,
   useWalletIdentity,
 } from '@cardinal/namespaces-components'
-import { BackspaceIcon } from '@heroicons/react/solid'
+import styled from '@emotion/styled'
+import { Menu } from '@headlessui/react'
 import { UserCircleIcon } from '@heroicons/react/outline'
+import {
+  BackspaceIcon,
+  CheckCircleIcon,
+  ChevronDownIcon,
+} from '@heroicons/react/solid'
 import { abbreviateAddress } from '@utils/formatting'
-import TwitterIcon from './TwitterIcon'
-import Switch from './Switch'
+import { useEffect, useMemo } from 'react'
 import useLocalStorageState from '../hooks/useLocalStorageState'
+import useWalletStore from '../stores/useWalletStore'
+import {
+  getWalletProviderByUrl,
+  WALLET_PROVIDERS,
+} from '../utils/wallet-adapters'
+import Switch from './Switch'
+import TwitterIcon from './TwitterIcon'
 
 const StyledWalletProviderLabel = styled.p`
   font-size: 0.65rem;
@@ -84,6 +87,7 @@ const ConnectWalletButton = (props) => {
       />
     ) : null
   }, [current?.publicKey?.toBase58()])
+
   const displayAddressImage = useMemo(() => {
     return connected && current?.publicKey ? (
       <div className="w-12 pr-2">
@@ -105,7 +109,8 @@ const ConnectWalletButton = (props) => {
         <img src={provider?.icon} className="h-5 w-5" />
       </div>
     )
-  }, [])
+  }, [provider])
+
   return (
     <div className="flex">
       <div
