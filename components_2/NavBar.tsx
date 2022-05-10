@@ -74,7 +74,7 @@ export default function Navbar(props: NavbarProps) {
         <div className="max-w-[1440px] mx-auto px-4 flex items-center justify-between">
           <RealmsLogo />
           <div>
-            <CreateDaoButton />
+            {showWalletButton ? <ConnectWalletButton /> : <CreateDaoButton />}
           </div>
         </div>
       )}
