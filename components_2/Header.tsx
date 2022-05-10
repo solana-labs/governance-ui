@@ -6,7 +6,7 @@ export default function Header({
   className = '',
   children,
 }) {
-  let classNames = 'font-light'
+  let classNames = 'landing-page font-light'
   if (as === 'h1') {
     classNames += ` `
   } else if (as === 'h2') {
