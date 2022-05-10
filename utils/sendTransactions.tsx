@@ -10,7 +10,6 @@ import {
   TransactionSignature,
   Keypair,
 } from '@solana/web3.js'
-import { notify } from './notifications'
 import {
   closeTransactionProcessUi,
   incrementProcessedTransactions,
@@ -71,6 +70,7 @@ async function awaitTransactionSignatureConfirmation(
   console.log('Possible timeout block', timeoutBlockHeight)
   let done = false
   let startTimeoutCheck = false
+  let timeout = false
   let status: SignatureStatus | null = {
     slot: 0,
     confirmations: 0,
@@ -133,6 +133,7 @@ async function awaitTransactionSignatureConfirmation(
               timeoutBlockHeight <= blockHeight!
             ) {
               done = true
+              timeout = true
               console.log('Tx Timeout ----')
               reject({ timeout: true })
             }
@@ -168,15 +169,7 @@ async function awaitTransactionSignatureConfirmation(
     }
     fn()
   })
-    .catch((err) => {
-      if (err.timeout) {
-        notify({
-          type: 'warning',
-          message: 'Transactions timeout please try again',
-        })
-        throw { timeout: true }
-      }
-
+    .catch(() => {
       //@ts-ignore
       if (connection._signatureSubscriptions[subId])
         connection.removeSignatureListener(subId)
@@ -187,7 +180,7 @@ async function awaitTransactionSignatureConfirmation(
         connection.removeSignatureListener(subId)
     })
   done = true
-  return status
+  return { status, timeout }
 }
 
 //////////////////////////////////////////////
@@ -252,7 +245,7 @@ export async function sendSignedTransaction({
   )
 
   console.log('Started awaiting confirmation for', txid)
-
+  let hasTimeout = false
   let done = false
   ;(async () => {
     while (!done && getUnixTs() - startTime < timeout) {
@@ -271,19 +264,14 @@ export async function sendSignedTransaction({
       true,
       block
     )
-    if (confirmation.err) {
-      console.error(confirmation.err)
+    if (confirmation.status.err) {
+      console.error(confirmation.status.err)
       throw new Error('Transaction failed: Custom instruction error')
     }
 
-    slot = confirmation?.slot || 0
+    slot = confirmation?.status.slot || 0
+    hasTimeout = confirmation.timeout
   } catch (err) {
-    if (err.timeout) {
-      throw {
-        txInstructionIdx: transactionInstructionIdx,
-        error: 'Timed out awaiting confirmation on transaction',
-      }
-    }
     let simulateResult: SimulatedTransactionResponse | null = null
     try {
       simulateResult = (
@@ -303,11 +291,20 @@ export async function sendSignedTransaction({
           }
         }
       }
-      throw new Error(JSON.stringify(simulateResult.err))
+      throw {
+        txInstructionIdx: transactionInstructionIdx,
+        error: JSON.stringify(simulateResult.err),
+      }
     }
     // throw new Error('Transaction failed');
   } finally {
     done = true
+  }
+  if (hasTimeout) {
+    throw {
+      txInstructionIdx: transactionInstructionIdx,
+      error: 'Timed out awaiting confirmation on transaction',
+    }
   }
   if (showUiComponent) {
     incrementProcessedTransactions()
@@ -409,7 +406,6 @@ export const sendTransactionsV2 = async ({
   wallet,
   TransactionInstructions,
   signersSet,
-  autoRetry = false,
   block,
   showUiComponent = false,
 }: {
@@ -417,7 +413,6 @@ export const sendTransactionsV2 = async ({
   wallet: WalletSigner
   TransactionInstructions: TransactionInstructionWithType[]
   signersSet: Keypair[][]
-  autoRetry?: boolean
   block?: Block
   showUiComponent?: boolean
 }) => {
@@ -546,7 +541,6 @@ export const sendTransactionsV2 = async ({
         wallet,
         TransactionInstructions: forwardedTransactions,
         signersSet: forwardedSigners,
-        autoRetry,
         showUiComponent,
       })
     }
@@ -554,10 +548,7 @@ export const sendTransactionsV2 = async ({
       closeTransactionProcessUi()
     }
   } catch (e) {
-    if (
-      (typeof e?.txInstructionIdx !== 'undefined' && autoRetry) ||
-      showUiComponent
-    ) {
+    if (typeof e?.txInstructionIdx !== 'undefined' && showUiComponent) {
       console.log('Retrying from transactionIx:', e.txInstructionIdx)
       const idx = e?.txInstructionIdx
       const txInstructionForRetry = TransactionInstructions.slice(
@@ -575,22 +566,11 @@ export const sendTransactionsV2 = async ({
               signersSet: signersForRetry,
               showUiComponent,
             }),
-          e
+          e.error
         )
-        throw e
       }
-      if (autoRetry) {
-        await sendTransactionsV2({
-          connection,
-          wallet,
-          TransactionInstructions: txInstructionForRetry,
-          signersSet: signersForRetry,
-          showUiComponent,
-        })
-      }
-    } else {
-      throw e
     }
+    throw e
   }
 }
 
