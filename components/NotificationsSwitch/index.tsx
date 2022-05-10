@@ -1,4 +1,6 @@
 import Button from '@components/Button'
+import NotificationsCard from '@components/NotificationsCard'
+import NotifiPreviewCard from '@components/NotificationsCard/NotifiPreviewCard'
 import NotifiIcon from '@components/NotifiIcon'
 import { WalletType } from '@dialectlabs/react'
 import {
@@ -10,11 +12,16 @@ import styled from '@emotion/styled'
 import { Transition } from '@headlessui/react'
 import { DeviceMobileIcon } from '@heroicons/react/outline'
 import { BellIcon, KeyIcon, MailIcon } from '@heroicons/react/solid'
-
+import { EndpointTypes } from '@models/types'
+import {
+  BlockchainEnvironment,
+  Source,
+  useNotifiClient,
+} from '@notifi-network/notifi-react-hooks'
 import * as anchor from '@project-serum/anchor'
 import { useRouter } from 'next/router'
 import { useTheme } from 'next-themes'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import useNotificationStore from 'stores/useNotificationStore'
 import { ModalStates } from 'stores/useNotificationStore'
 import useWalletStore from 'stores/useWalletStore'
@@ -121,6 +128,7 @@ const themeVariables: IncomingThemeVariables = {
 
 export default function NotificationsSwitch() {
   const { theme } = useTheme()
+  const [showPreview, setPreview] = useState(true)
   const router = useRouter()
 
   const { cluster } = router.query
@@ -129,7 +137,89 @@ export default function NotificationsSwitch() {
     (s) => s
   )
 
+  const endpoint = cluster ? (cluster as EndpointTypes) : 'mainnet'
   const wallet = useWalletStore((s) => s.current)
+  const connected = useWalletStore((s) => s.connected)
+  let env = BlockchainEnvironment.MainNetBeta
+
+  switch (endpoint) {
+    case 'mainnet':
+      break
+    case 'devnet':
+      env = BlockchainEnvironment.DevNet
+      break
+    case 'localnet':
+      env = BlockchainEnvironment.LocalNet
+      break
+  }
+  const notifiClient = useNotifiClient({
+    dappAddress: 'solanarealmsdao',
+    env,
+    walletPublicKey: wallet?.publicKey?.toString() ?? '',
+  })
+
+  const { data, isAuthenticated, getConfiguration, deleteAlert } = notifiClient
+
+  const [email, setEmail] = useState<string>('')
+  const [phoneNumber, setPhone] = useState<string>('')
+  const [telegram, setTelegram] = useState<string>('')
+  const [telegramEnabled, setTelegramEnabled] = useState<boolean>(false)
+
+  useEffect(() => {
+    const targetGroup = firstOrNull(data?.targetGroups)
+    if (targetGroup) {
+      setEmail(firstOrNull(targetGroup?.emailTargets)?.emailAddress ?? '')
+      setPhone(firstOrNull(targetGroup?.smsTargets)?.phoneNumber ?? '')
+      setTelegram(firstOrNull(targetGroup?.telegramTargets)?.telegramId ?? '')
+    } else {
+      setEmail(firstOrNull(data?.emailTargets)?.emailAddress ?? '')
+      setPhone(firstOrNull(data?.smsTargets)?.phoneNumber ?? '')
+      setTelegram(firstOrNull(data?.telegramTargets)?.telegramId ?? '')
+    }
+  }, [data])
+
+  const updateTelegramSupported = useCallback(async () => {
+    const { supportedTargetTypes } = await getConfiguration()
+    const telegram = supportedTargetTypes.find((it) => it === 'TELEGRAM')
+    setTelegramEnabled(telegram !== undefined)
+  }, [getConfiguration, setTelegramEnabled])
+
+  useEffect(() => {
+    updateTelegramSupported().catch((e) => {
+      console.error('Failed to get supported type information: ', e)
+    })
+  }, [updateTelegramSupported])
+
+  const firstOrNull = <T,>(
+    arr: ReadonlyArray<T> | null | undefined
+  ): T | null => {
+    if (arr !== null && arr !== undefined) {
+      return arr[0] ?? null
+    }
+    return null
+  }
+
+  useEffect(() => {
+    if (isAuthenticated && connected) {
+      const targetGroup = firstOrNull(data?.targetGroups)
+
+      if (targetGroup) {
+        setEmail(firstOrNull(targetGroup?.emailTargets)?.emailAddress ?? '')
+        setPhone(firstOrNull(targetGroup?.smsTargets)?.phoneNumber ?? '')
+        setTelegram(firstOrNull(targetGroup?.telegramTargets)?.telegramId ?? '')
+      } else {
+        setEmail(firstOrNull(data?.emailTargets)?.emailAddress ?? '')
+        setPhone(firstOrNull(data?.smsTargets)?.phoneNumber ?? '')
+        setTelegram(firstOrNull(data?.telegramTargets)?.telegramId ?? '')
+      }
+
+      if (email || phoneNumber || telegram) {
+        setPreview(true)
+        return
+      }
+    }
+    setPreview(false)
+  }, [connected, data, email, isAuthenticated, phoneNumber, telegram])
 
   const wrapperRef = useRef(null)
   const bellRef = useRef(null)
@@ -160,6 +250,29 @@ export default function NotificationsSwitch() {
     )
   }
 
+  const handleUnsubscribe = useCallback(
+    async (source: Source) => {
+      try {
+        if (data?.alerts) {
+          const sourceId = source.id
+          const alertToDelete = data.alerts?.find((alert) =>
+            alert.sourceGroup.sources.find((source) => source.id === sourceId)
+          )
+
+          alertToDelete?.id &&
+            (await deleteAlert({
+              alertId: alertToDelete.id,
+              keepSourceGroup: true,
+              keepTargetGroup: true,
+            }))
+        }
+      } catch (e) {
+        throw new Error(e)
+      }
+    },
+    [data?.alerts, deleteAlert]
+  )
+
   const NotificationBox = ({
     channels,
     description,
@@ -167,36 +280,53 @@ export default function NotificationsSwitch() {
     name,
   }: NotificationSolutionType) => (
     <div className="w-full p-4">
-      <div className="flex flex-col items-center bg-bkg-1 px-10 py-6 text-sm">
-        <div className="flex w-full">
-          {name === 'notifi' && <NotifiIcon />}
-          <h2 className="inline-block">{name}</h2>
-        </div>
-        <div className="flex w-full items-start mb-4">
-          {channels.map((channel) => (
-            <Tag channelName={channel} key={channel} />
-          ))}
-        </div>
+      {showPreview && name === 'notifi' ? (
+        <NotifiPreviewCard
+          handleDelete={handleUnsubscribe}
+          email={email}
+          // this passes down useNotiClientData
+          {...notifiClient}
+          phoneNumber={phoneNumber}
+          telegram={telegram}
+          telegramEnabled={telegramEnabled}
+          onClick={() =>
+            setNotificationStore((state) => {
+              state.modalState = modalState
+            })
+          }
+        />
+      ) : (
+        <div className="flex flex-col items-center bg-bkg-1 px-10 py-6 text-sm">
+          <div className="flex w-full">
+            {name === 'notifi' && <NotifiIcon />}
+            <h2 className="inline-block">{name}</h2>
+          </div>
+          <div className="flex w-full items-start mb-4">
+            {channels.map((channel) => (
+              <Tag channelName={channel} key={channel} />
+            ))}
+          </div>
 
-        <div className="flex w-full mb-2">
-          <div>
-            <p className="inline-block text-sm">{description}</p>
+          <div className="flex w-full mb-2">
+            <div>
+              <p className="inline-block text-sm">{description}</p>
+            </div>
+          </div>
+
+          <div className="flex w-full justify-center pt-3">
+            <Button
+              className="w-full"
+              onClick={() =>
+                setNotificationStore((state) => {
+                  state.modalState = modalState
+                })
+              }
+            >
+              Use {formatName(name)}
+            </Button>
           </div>
         </div>
-
-        <div className="flex w-full justify-center pt-3">
-          <Button
-            className="w-full"
-            onClick={() =>
-              setNotificationStore((state) => {
-                state.modalState = modalState
-              })
-            }
-          >
-            Use {formatName(name)}
-          </Button>
-        </div>
-      </div>
+      )}
     </div>
   )
 
@@ -243,35 +373,21 @@ export default function NotificationsSwitch() {
           />
         )}
         {modalState === ModalStates.Notifi && (
-          <NotificationCardContainer
-            onBackClick={() =>
-              setNotificationStore((state) => {
-                state.modalState = ModalStates.Selection
-              })
-            }
-          />
-        )}
-        {modalState === ModalStates.Notifi && (
-          //  <NotificationsModal
-          //  wallet={(wallet as unknown) as WalletType}
-          //  network={cluster as string}
-          //  publicKey={REALMS_PUBLIC_KEY}
-          //  theme={theme === 'Dark' ? 'dark' : 'light'}
-          //  variables={themeVariables}
-          //  notifications={[{ name: 'New proposals', detail: 'Event' }]}
-          //  onBackClick={() =>
-          //    setNotificationStore((state) => {
-          //      state.modalState = ModalStates.Selection
-          //    })
-          //  }
-          //  channels={['web3', 'email', 'sms', 'telegram']}
-          //  />
           <NotificationsCard
+            phoneNumber={phoneNumber}
+            email={email}
+            telegram={telegram}
+            setPhone={setPhone}
+            setTelegram={setTelegram}
+            setEmail={setEmail}
+            // this passes down useNotiClientData
+            {...notifiClient}
             onBackClick={() =>
               setNotificationStore((state) => {
                 state.modalState = ModalStates.Selection
               })
             }
+            setPreview={setPreview}
           />
         )}
       </Transition>
