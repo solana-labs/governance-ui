@@ -182,6 +182,7 @@ const HIDDEN_MNGO_TREASURES = [
   'FTiWWq3cgETfPkYqP36xFUhT7KMoFYyCiPKeYQU1e4U8',
   'FrkLPsCadx4tE4qDobbu2GTD5ffjWBpormHbLLy35PUS',
   'CaoFkVyPJugKMdzDT1NGnsQJ8dWe4kZFaETCbtWz1QBr',
+  'PuXf9LNrmtVDhBTxteNTWS8D2SpzbhYvidkSatjRArt',
 ]
 
 //owner and desired accounts we want to show

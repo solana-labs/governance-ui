@@ -434,10 +434,6 @@ export const getStakeSchema = ({ form }) => {
         }
         return this.createError({ message: 'Amount is required' })
       }),
-    destinationAccount: yup
-      .object()
-      .nullable()
-      .required('Destination account is required'),
     governedTokenAccount: yup
       .object()
       .nullable()

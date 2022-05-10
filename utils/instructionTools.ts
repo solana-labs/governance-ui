@@ -586,28 +586,29 @@ export async function getConvertToMsolInstruction({
   schema,
   form,
   connection,
+  wallet,
   setFormErrors,
 }: {
   schema: any
   form: any
   connection: ConnectionContext
+  wallet: WalletAdapter | undefined
   setFormErrors: any
 }): Promise<UiInstruction> {
   const isValid = await validateInstruction({ schema, form, setFormErrors })
   const prerequisiteInstructions: TransactionInstruction[] = []
   let serializedInstruction = ''
 
-  if (
-    isValid &&
-    form.governedTokenAccount.extensions.transferAddress &&
-    form.destinationAccount.governance.pubkey
-  ) {
+  if (isValid && form.governedTokenAccount.extensions.transferAddress) {
     const amount = getMintNaturalAmountFromDecimal(
       form.amount,
       form.governedTokenAccount.extensions.mint.account.decimals
     )
     const originAccount = form.governedTokenAccount.extensions.transferAddress
-    const destinationAccount = form.destinationAccount.governance.pubkey
+    let destinationAccountOwner: PublicKey
+    const mSolMint = new PublicKey(
+      'mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So'
+    )
 
     const config = new MarinadeConfig({
       connection: connection.current,
@@ -615,16 +616,61 @@ export async function getConvertToMsolInstruction({
     })
     const marinade = new Marinade(config)
 
+    if (form.destinationAccount) {
+      const destinationAccount = form.destinationAccount.pubkey
+
+      const mSolToken = new Token(
+        connection.current,
+        mSolMint,
+        TOKEN_PROGRAM_ID,
+        (null as unknown) as Keypair
+      )
+
+      const destinationAccountInfo = await mSolToken.getAccountInfo(
+        destinationAccount
+      )
+      destinationAccountOwner = destinationAccountInfo.owner
+    } else {
+      destinationAccountOwner = originAccount
+      const {
+        currentAddress: destinationAccount,
+        needToCreateAta,
+      } = await getATA({
+        connection: connection,
+        receiverAddress: originAccount,
+        mintPK: mSolMint,
+        wallet,
+      })
+      if (needToCreateAta && wallet?.publicKey) {
+        prerequisiteInstructions.push(
+          Token.createAssociatedTokenAccountInstruction(
+            ASSOCIATED_TOKEN_PROGRAM_ID,
+            TOKEN_PROGRAM_ID,
+            mSolMint,
+            destinationAccount,
+            originAccount,
+            wallet.publicKey
+          )
+        )
+      }
+    }
+
     const { transaction } = await marinade.deposit(new BN(amount), {
-      mintToOwnerAddress: destinationAccount,
+      mintToOwnerAddress: destinationAccountOwner,
     })
 
     if (transaction.instructions.length === 1) {
       serializedInstruction = serializeInstructionToBase64(
         transaction.instructions[0]
       )
+    } else if (transaction.instructions.length === 2) {
+      serializedInstruction = serializeInstructionToBase64(
+        transaction.instructions[1]
+      )
     } else {
-      throw Error('No mSOL Account can be found for the choosen account.')
+      throw Error(
+        "Marinade's stake instructions could not be calculated correctly."
+      )
     }
   }
 
