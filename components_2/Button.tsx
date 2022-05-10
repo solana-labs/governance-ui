@@ -27,14 +27,14 @@ export const Button: FunctionComponent<ButtonProps> = ({
   if (secondary && !inverse) {
     // secondary
     className +=
-      'py-3 px-2 bg-[#292833] font-regular text-white transition-to-white-background hover:text-[#292833]'
+      'py-4 px-2 bg-[#292833] font-regular text-white transition-to-white-background hover:text-[#292833]'
   } else if (secondary && inverse) {
     // secondary inverse
   } else if (tertiary) {
-    className += 'py-3 px-2 font-regular hover:bg-white/10'
+    className += 'py-4 px-2 font-regular hover:bg-white/10'
   } else if (withBorder) {
     className +=
-      'py-3 px-2 font-regular border border-white transition-to-white-background hover:text-black'
+      'py-4 px-2 font-regular border border-white transition-to-white-background hover:text-black'
   } else if (inverse) {
     // primary inverse
     className +=
