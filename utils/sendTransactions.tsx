@@ -104,7 +104,8 @@ async function awaitTransactionSignatureConfirmation(
             if (result.err) {
               console.log('Rejected via websocket', result.err)
               Sentry.captureException(
-                `awaitTransactionSignatureConfirmation line 107: ${result.err}`
+                `awaitTransactionSignatureConfirmation line 107: ${result.err}`,
+                { tags: { sendTransactionsErrors: 'sendTransactionsErrors' } }
               )
               reject(result.err)
             } else {
@@ -154,7 +155,8 @@ async function awaitTransactionSignatureConfirmation(
                 console.log('REST error for', txid, status)
                 done = true
                 Sentry.captureException(
-                  `awaitTransactionSignatureConfirmation line 157: ${status.err}`
+                  `awaitTransactionSignatureConfirmation line 157: ${status.err}`,
+                  { tags: { sendTransactionsErrors: 'sendTransactionsErrors' } }
                 )
                 reject(status.err)
               } else if (!status.confirmations) {
@@ -222,7 +224,7 @@ export const getUnixTs = () => {
   return new Date().getTime() / 1000
 }
 
-const DEFAULT_TIMEOUT = 5000
+const DEFAULT_TIMEOUT = 60000
 /////////////////////////////////////////////////
 export async function sendSignedTransaction({
   signedTransaction,
@@ -278,7 +280,9 @@ export async function sendSignedTransaction({
     slot = confirmation?.status?.slot || 0
     hasTimeout = confirmation.timeout
   } catch (err) {
-    Sentry.captureException(`sendSignedTransaction line 283: ${err}`)
+    Sentry.captureException(`sendSignedTransaction line 283: ${err}`, {
+      tags: { sendTransactionsErrors: 'sendTransactionsErrors' },
+    })
     let simulateResult: SimulatedTransactionResponse | null = null
     try {
       simulateResult = (
@@ -302,7 +306,8 @@ export async function sendSignedTransaction({
         }
       }
       Sentry.captureException(
-        `sendSignedTransaction line 303: ${simulateResult.err}`
+        `sendSignedTransaction line 303: ${simulateResult.err}`,
+        { tags: { sendTransactionsErrors: 'sendTransactionsErrors' } }
       )
       throw {
         txInstructionIdx: transactionInstructionIdx,
@@ -561,7 +566,6 @@ export const sendTransactionsV2 = async ({
       closeTransactionProcessUi()
     }
   } catch (e) {
-    console.log(e, '@@@@@')
     if (typeof e?.txInstructionIdx !== 'undefined' && showUiComponent) {
       console.log('Retrying from transactionIx:', e.txInstructionIdx)
       const idx = e?.txInstructionIdx
