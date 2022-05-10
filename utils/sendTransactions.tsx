@@ -295,9 +295,11 @@ export async function sendSignedTransaction({
           const line = simulateResult.logs[i]
           if (line.startsWith('Program log: ')) {
             Sentry.captureException(`sendSignedTransaction line 298: ${line}`)
-            throw new Error(
-              'Transaction failed: ' + line.slice('Program log: '.length)
-            )
+            throw {
+              txInstructionIdx: transactionInstructionIdx,
+              error:
+                'Transaction failed: ' + line.slice('Program log: '.length),
+            }
           }
         }
       }

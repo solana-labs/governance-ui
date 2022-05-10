@@ -13,10 +13,10 @@ const TransactionLoader = () => {
     hasErrors,
     closeTransactionProcess,
   } = useTransactionsStore()
-  console.log(error)
   const currentlyProcessing = processedTransactions + 1
   return isProcessing ? (
     <Modal
+      hideClose={!hasErrors}
       onClose={() => (hasErrors ? closeTransactionProcess() : null)}
       isOpen={isProcessing}
     >
@@ -27,7 +27,7 @@ const TransactionLoader = () => {
       {hasErrors ? (
         <>
           <div className="text-xs text-red">Transaction error</div>
-          <div className="pb-4">asdasd</div>
+          <div className="pb-4">{error}</div>
           <div className="flex justify-center">
             <Button onClick={() => retryCallback!()}>Retry</Button>
           </div>
