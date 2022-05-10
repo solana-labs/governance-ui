@@ -21,7 +21,7 @@ export default function DAOCreationForm() {
   })
 
   return (
-    <div className="relative pb-20 landing-page">
+    <div className="relative pb-8 md:pb-20 landing-page">
       <Navbar showWalletButton />
       <div className="absolute w-[100vw] h-[100vh]">
         <Image

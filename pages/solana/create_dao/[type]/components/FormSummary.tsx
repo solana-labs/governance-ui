@@ -10,7 +10,9 @@ import Button from 'components_2/Button'
 
 function SummaryCell({ className = '', children }) {
   return (
-    <div className={`bg-[#201f27] rounded-md p-8 grow ${className}`}>
+    <div
+      className={`bg-[#201f27] rounded-md px-4 py-6 md:p-8 grow ${className}`}
+    >
       {children}
     </div>
   )
@@ -55,7 +57,7 @@ export default function WizardSummary({
           </Transition.Child>
 
           <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex items-center justify-center min-h-full p-4 text-center">
+            <div className="flex flex-col items-center justify-center min-h-full text-center md:p-4">
               <Transition.Child
                 as={Fragment}
                 enter="ease-out duration-300"
@@ -65,7 +67,7 @@ export default function WizardSummary({
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Overlay className="w-full max-w-xl p-12 overflow-hidden text-left align-middle transition-all transform bg-[#201F27] rounded-lg space-y-3">
+                <Dialog.Overlay className="flex flex-col justify-center w-full grow md:grow-0 md:max-w-xl p-6 md:p-12 overflow-hidden text-left align-middle transition-all transform bg-[#201F27] md:rounded-lg space-y-3">
                   <img
                     src="/1-Landing-v2/logo-realms-blue.png"
                     className="w-8 h-8"
@@ -78,7 +80,7 @@ export default function WizardSummary({
                     The exact amount will be determined by your wallet.
                   </Text>
 
-                  <div className="flex justify-between pt-6">
+                  <div className="flex flex-wrap items-center justify-center pt-6 space-y-8 md:justify-between md:space-y-0">
                     <Button withBorder onClick={closeModal}>
                       <div className="px-16 min-w-[240px]">Cancel</div>
                     </Button>
@@ -103,9 +105,9 @@ export default function WizardSummary({
         />
         <div className="pt-10">
           <div className="flex flex-col">
-            <SummaryCell className="flex mb-2 space-x-8">
+            <SummaryCell className="flex mb-2 space-x-4 md:space-x-8">
               <div
-                className={`h-[158px] w-[158px] rounded-full flex justify-center ${
+                className={`h-[80px] md:h-[158px] min-w-[80px] md:w-[158px] rounded-full flex justify-center ${
                   formData?.step1?.daoAvatar ? '' : 'bg-[#292833]'
                 }`}
               >

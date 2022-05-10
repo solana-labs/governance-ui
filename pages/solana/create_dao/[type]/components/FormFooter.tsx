@@ -15,14 +15,14 @@ const FormFooter: React.FC<FormFooterProps> = ({
   // faqTitle,
 }) => {
   return (
-    <div className="flex flex-wrap items-center justify-end pt-20 md:pt-32">
+    <div className="flex flex-wrap items-center justify-end pt-10 sm:pt-20 md:pt-32">
       {/* <Button type="button" tertiary>
         <div className="flex items-center">
           <img src="/1-Landing-v2/icon-faq.png" className="w-6 h-6 mx-2" />
           <div className="pr-3">{faqTitle}</div>
         </div>
       </Button> */}
-      <div className="flex justify-between w-full mt-8 space-x-8 md:w-fit md:mt-0">
+      <div className="flex justify-center w-full mt-8 space-x-8 md:justify-between md:w-fit md:mt-0">
         <Button type="button" onClick={prevClickHandler}>
           <img
             src="/1-Landing-v2/icon-arrow-black.png"
