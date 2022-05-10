@@ -58,8 +58,9 @@ export const buildVoltSDK = async ({
 
   return new ConnectedVoltSDK(
     connection,
-    governancePubkey,
+    wallet.publicKey,
     await sdk.loadVoltAndExtraDataByKey(new PublicKey(voltVaultId)),
+    governancePubkey,
   );
 };
 

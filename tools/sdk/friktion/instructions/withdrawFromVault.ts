@@ -34,12 +34,19 @@ const withdrawFromVault = async ({
     cVoltSDK.voltVault.underlyingAssetMint,
   );
 
-  return cVoltSDK.withdrawWithClaim(
+  const withdrawIx = await cVoltSDK.withdrawWithClaim(
     amount,
     govVoltMintATA,
     govUnderlyingATA,
     governancePubkey,
   );
+
+  const governedAccountIndex = withdrawIx.keys.findIndex(
+    (k) => k.pubkey.toString() === governancePubkey.toString(),
+  );
+  withdrawIx.keys[governedAccountIndex].isSigner = true;
+
+  return withdrawIx;
 };
 
 export default withdrawFromVault;

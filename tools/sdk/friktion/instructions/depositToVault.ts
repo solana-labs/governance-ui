@@ -33,15 +33,22 @@ const depositToVolt = async ({
     cVoltSDK.voltVault.vaultMint,
   );
 
-  return cVoltSDK.depositWithClaim(
+  const depositIx = await cVoltSDK.depositWithClaim(
     new Decimal(amount),
     sourceTokenAccount,
     govVoltMintATA,
     false,
-    governancePubkey,
+    undefined,
     governancePubkey,
     decimals,
   );
+
+  const governedAccountIndex = depositIx.keys.findIndex(
+    (k) => k.pubkey.toString() === governancePubkey.toString(),
+  );
+  depositIx.keys[governedAccountIndex].isSigner = true;
+
+  return depositIx;
 };
 
 export default depositToVolt;
