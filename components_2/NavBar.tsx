@@ -1,17 +1,27 @@
-import Link from 'next/link'
-import { ExploreButton, ReadTheDocsButton } from 'pages/solana'
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
+
 import ConnectWalletButton from './ConnectWalletButton'
+import { ExploreButton, ReadTheDocsButton } from 'pages/solana'
+import { CreateDaoButton } from 'pages/solana/components/KickstartSolana'
+
+const SCROLL_BREAK_POINT = 200
+
+function RealmsLogo() {
+  return (
+    <Link href="/solana">
+      <div className="flex items-center space-x-1 cursor-pointer hover:brightness-110">
+        <img src="/1-Landing-v2/logo-realms-blue.png" className="w-8 h-8" />
+        <span>Realms</span>
+      </div>
+    </Link>
+  )
+}
 
 export const NavContent = ({ showWalletButton = false }) => {
   return (
     <div className="max-w-[1440px] mx-auto px-4 flex items-center justify-between">
-      <Link href="/solana">
-        <div className="flex items-center space-x-1 cursor-pointer hover:brightness-110">
-          <img src="/1-Landing-v2/logo-realms-blue.png" className="w-8 h-8" />
-          <span>Realms</span>
-        </div>
-      </Link>
+      <RealmsLogo />
       {showWalletButton ? (
         <ConnectWalletButton />
       ) : (
@@ -53,10 +63,21 @@ export default function Navbar(props: NavbarProps) {
   return (
     <div
       className={`fixed w-full top-0 z-10 pt-5 pb-5 transition-all duration-300 ${
-        scrollY > 200 ? 'bg-[#292833] bg-opacity-90 backdrop-blur-[3px]' : ''
+        scrollY > SCROLL_BREAK_POINT
+          ? 'bg-[#292833] bg-opacity-90 backdrop-blur-[3px]'
+          : ''
       }`}
     >
-      <NavContent showWalletButton={showWalletButton} />
+      {scrollY < SCROLL_BREAK_POINT ? (
+        <NavContent showWalletButton={showWalletButton} />
+      ) : (
+        <div className="max-w-[1440px] mx-auto px-4 flex items-center justify-between">
+          <RealmsLogo />
+          <div>
+            <CreateDaoButton />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
