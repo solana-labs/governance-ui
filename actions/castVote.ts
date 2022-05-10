@@ -128,7 +128,6 @@ export async function castVote(
       wallet,
       TransactionInstructions: instructionsChunks,
       signersSet: singersMap,
-      autoRetry: true,
       showUiComponent: true,
     })
   } else {

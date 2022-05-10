@@ -1,4 +1,5 @@
 import useTransactionsStore from 'stores/useTransactionStore'
+import Button from './Button'
 import Loading from './Loading'
 import Modal from './Modal'
 
@@ -7,12 +8,17 @@ const TransactionLoader = () => {
     isProcessing,
     transactionsCount,
     processedTransactions,
+    retryCallback,
+    error,
+    hasErrors,
+    closeTransactionProcess,
   } = useTransactionsStore()
+  console.log(error)
   const currentlyProcessing = processedTransactions + 1
   return isProcessing ? (
     <Modal
       onClose={() => {
-        return null
+        hasErrors ? closeTransactionProcess : null
       }}
       isOpen={isProcessing}
     >
@@ -36,6 +42,11 @@ const TransactionLoader = () => {
           ></div>
         </div>
       </div>
+      {hasErrors && (
+        <div>
+          <Button onClick={() => retryCallback!()}>Retry</Button>
+        </div>
+      )}
     </Modal>
   ) : null
 }

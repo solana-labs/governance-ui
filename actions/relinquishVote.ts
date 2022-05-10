@@ -70,7 +70,6 @@ export const relinquishVote = async (
       wallet,
       TransactionInstructions: instArray,
       signersSet: [...signerChunks],
-      autoRetry: true,
       showUiComponent: true,
     })
   } else {

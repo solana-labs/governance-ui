@@ -4,17 +4,29 @@ interface TransactionStore extends State {
   isProcessing: boolean
   transactionsCount: number
   processedTransactions: number
+  hasErrors: boolean
+  error: any
+  retryCallback: (() => Promise<void>) | null
   startProcessing: (transactionsCount: number) => void
   incrementProcessedTransactions: () => void
   closeTransactionProcess: () => void
+  showTransactionError: (retryCallback: () => Promise<void>, e: any) => void
 }
 
-const useTransactionsStore = create<TransactionStore>((set, _get) => ({
+const defaultState = {
   isProcessing: false,
   transactionsCount: 0,
   processedTransactions: 0,
+  retryCallback: null,
+  hasErrors: false,
+  error: '',
+}
+
+const useTransactionsStore = create<TransactionStore>((set, _get) => ({
+  ...defaultState,
   startProcessing: (transactionsCount) =>
     set({
+      ...defaultState,
       transactionsCount: transactionsCount,
       isProcessing: true,
     }),
@@ -26,9 +38,14 @@ const useTransactionsStore = create<TransactionStore>((set, _get) => ({
   },
   closeTransactionProcess: () => {
     set({
-      isProcessing: false,
-      transactionsCount: 0,
-      processedTransactions: 0,
+      ...defaultState,
+    })
+  },
+  showTransactionError: (retryCallback, error) => {
+    set({
+      retryCallback: retryCallback,
+      error,
+      hasErrors: true,
     })
   },
 }))

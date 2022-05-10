@@ -14,6 +14,7 @@ import { notify } from './notifications'
 import {
   closeTransactionProcessUi,
   incrementProcessedTransactions,
+  showTransactionError,
   showTransactionsProcessUi,
 } from './transactionsLoader'
 
@@ -553,7 +554,10 @@ export const sendTransactionsV2 = async ({
       closeTransactionProcessUi()
     }
   } catch (e) {
-    if (typeof e?.txInstructionIdx !== 'undefined' && autoRetry) {
+    if (
+      (typeof e?.txInstructionIdx !== 'undefined' && autoRetry) ||
+      showUiComponent
+    ) {
       console.log('Retrying from transactionIx:', e.txInstructionIdx)
       const idx = e?.txInstructionIdx
       const txInstructionForRetry = TransactionInstructions.slice(
@@ -561,17 +565,29 @@ export const sendTransactionsV2 = async ({
         TransactionInstructions.length
       )
       const signersForRetry = signersSet.slice(idx, signersSet.length)
-      notify({
-        type: 'warning',
-        message: 'Transactions timeout running retry',
-      })
-      await sendTransactionsV2({
-        connection,
-        wallet,
-        TransactionInstructions: txInstructionForRetry,
-        signersSet: signersForRetry,
-        showUiComponent,
-      })
+      if (showUiComponent) {
+        showTransactionError(
+          () =>
+            sendTransactionsV2({
+              connection,
+              wallet,
+              TransactionInstructions: txInstructionForRetry,
+              signersSet: signersForRetry,
+              showUiComponent,
+            }),
+          e
+        )
+        throw e
+      }
+      if (autoRetry) {
+        await sendTransactionsV2({
+          connection,
+          wallet,
+          TransactionInstructions: txInstructionForRetry,
+          signersSet: signersForRetry,
+          showUiComponent,
+        })
+      }
     } else {
       throw e
     }

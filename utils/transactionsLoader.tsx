@@ -16,3 +16,11 @@ export function closeTransactionProcessUi() {
   const { closeTransactionProcess } = useTransactionsStore.getState()
   closeTransactionProcess()
 }
+
+export function showTransactionError(
+  retryCallback: () => Promise<void>,
+  e: any
+) {
+  const { showTransactionError } = useTransactionsStore.getState()
+  showTransactionError(retryCallback, e)
+}
