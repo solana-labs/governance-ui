@@ -81,7 +81,7 @@ export default function Step2({ onSubmit, onPrevClick }) {
     } else {
       updateUserInput(STEP2_SCHEMA, setValue)
       setInviteList(
-        formData.memberPks?.filter((wallet) => {
+        formData.memberAddresses?.filter((wallet) => {
           return validateSolAddress(wallet)
         }) || []
       )
@@ -89,7 +89,7 @@ export default function Step2({ onSubmit, onPrevClick }) {
   }, [])
 
   useEffect(() => {
-    setValue('memberPks', inviteList, {
+    setValue('memberAddresses', inviteList, {
       shouldValidate: true,
       shouldDirty: true,
     })
@@ -208,7 +208,7 @@ export default function Step2({ onSubmit, onPrevClick }) {
           )}
           <Input
             type="text"
-            name="memberPks"
+            name="memberAddresses"
             placeholder="e.g. CWvWQWt5mTv7Zx..."
             data-testid="dao-member-list-input"
             ref={inputElement}

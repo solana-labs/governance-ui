@@ -37,7 +37,7 @@ export default function Step3({ onSubmit, onPrevClick }) {
     if (!yup.object(STEP2_SCHEMA).isValid(formData)) {
       return onPrevClick(3)
     } else {
-      setNumberOfDaoMember(formData?.memberPks?.length)
+      setNumberOfDaoMember(formData?.memberAddresses?.length)
       updateUserInput(STEP3_SCHEMA, setValue)
     }
   }, [])

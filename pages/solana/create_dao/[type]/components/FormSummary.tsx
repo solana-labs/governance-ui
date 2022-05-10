@@ -21,6 +21,7 @@ export default function WizardSummary({
   currentStep,
   formData,
   onSubmit,
+  submissionPending = false,
   onPrevClick,
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -38,7 +39,7 @@ export default function WizardSummary({
   const nftCollectionName = formData?.nftCollectionName || '' // 'Bored Ape'
   const nftCollectionCount = formData?.nftCollectionCount || 0 // 1000000
   const quorumThreshold = formData?.quorumThreshold || 0 // 10
-  const numberOfMembers = formData?.memberPks?.length || 0 // 1
+  const numberOfMembers = formData?.memberAddresses?.length || 0 // 1
 
   return (
     <>
@@ -80,12 +81,20 @@ export default function WizardSummary({
                     The exact amount will be determined by your wallet.
                   </Text>
 
-                  <div className="flex flex-wrap items-center justify-center pt-6 space-y-8 md:justify-between md:space-y-0">
+                  <div className="flex flex-wrap items-center justify-center pt-6 space-y-8 sm:space-x-8 md:space-x-0 md:justify-between sm:space-y-0">
                     <Button withBorder onClick={closeModal}>
-                      <div className="px-16 min-w-[240px]">Cancel</div>
+                      <div className="px-16 min-w-[300px] sm:min-w-[240px]">
+                        Cancel
+                      </div>
                     </Button>
-                    <Button onClick={onSubmit}>
-                      <div className="px-16 min-w-[240px]">Create DAO</div>
+                    <Button
+                      onClick={onSubmit}
+                      disabled={submissionPending}
+                      isLoading={submissionPending}
+                    >
+                      <div className="px-16 min-w-[300px] sm:min-w-[240px]">
+                        Create DAO
+                      </div>
                     </Button>
                   </div>
                 </Dialog.Overlay>
