@@ -1,24 +1,29 @@
-import useRealm from '../../hooks/useRealm'
-import useWalletStore from '../../stores/useWalletStore'
-import Button from '../Button'
-import Input from '../inputs/Input'
-import React, { FunctionComponent, useEffect, useState } from 'react'
 import {
   ArrowLeftIcon,
-  ChatAltIcon,
   MailIcon,
   PaperAirplaneIcon,
 } from '@heroicons/react/solid'
 import {
-  BlockchainEnvironment,
+  Alert,
   GqlError,
   MessageSigner,
   useNotifiClient,
 } from '@notifi-network/notifi-react-hooks'
-import { useRouter } from 'next/router'
-import { EndpointTypes } from '@models/types'
+import { isValidPhoneNumber } from 'libphonenumber-js'
+import React, {
+  Dispatch,
+  FunctionComponent,
+  SetStateAction,
+  useEffect,
+  useState,
+} from 'react'
 import { useCallback } from 'react'
+
+import useWalletStore from '../../stores/useWalletStore'
+import Button from '../Button'
+import Input from '../inputs/Input'
 import NotifiFullLogo from './NotifiFullLogo'
+import PhoneInput from './PhoneInput'
 
 const firstOrNull = <T,>(
   arr: ReadonlyArray<T> | null | undefined
@@ -29,10 +34,11 @@ const firstOrNull = <T,>(
   return null
 }
 
+type NotifiClientReturnType = ReturnType<typeof useNotifiClient>
+
 type NotificationCardProps = {
   onBackClick: () => void
   email: string
-
   phoneNumber: string
   telegram: string
   setPreview: Dispatch<SetStateAction<boolean>>
@@ -54,6 +60,7 @@ const NotificationsCard = ({
   createAlert,
   data,
   email,
+  fetchData,
   getConfiguration,
   isAuthenticated,
   logIn,
@@ -73,36 +80,13 @@ const NotificationsCard = ({
 
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
-  const endpoint = cluster ? (cluster as EndpointTypes) : 'mainnet'
-  let env = BlockchainEnvironment.MainNetBeta
 
-  switch (endpoint) {
-    case 'mainnet':
-      break
-    case 'devnet':
-      env = BlockchainEnvironment.DevNet
-      break
-    case 'localnet':
-      env = BlockchainEnvironment.LocalNet
-      break
-  }
-  const {
-    data,
-    logIn,
-    fetchData,
-    isAuthenticated,
-    createAlert,
-    updateAlert,
-    getConfiguration,
-  } = useNotifiClient({
-    dappAddress: realm?.pubkey?.toBase58() ?? '',
-    walletPublicKey: wallet?.publicKey?.toString() ?? '',
-    env,
-  })
+  const alerts = data?.alerts
+  const sources = data?.sources
 
-  const [email, setEmail] = useState<string>('')
-  const [phone, setPhone] = useState<string>('')
-  const [telegram, setTelegram] = useState<string>('')
+  const [localEmail, setLocalEmail] = useState<string>('')
+  const [localPhoneNumber, setLocalPhone] = useState<string>('')
+  const [localTelegram, setLocalTelegram] = useState<string>('')
 
   const updateTelegramSupported = useCallback(async () => {
     const { supportedTargetTypes } = await getConfiguration()
@@ -111,19 +95,60 @@ const NotificationsCard = ({
   }, [getConfiguration, setTelegramEnabled])
 
   useEffect(() => {
-    // can't use async with useEffect
     updateTelegramSupported().catch((e) => {
       console.error('Failed to get supported type information: ', e)
     })
   }, [updateTelegramSupported])
 
   useEffect(() => {
-    // Update state when server data changes
     const targetGroup = firstOrNull(data?.targetGroups)
-    setEmail(firstOrNull(targetGroup?.emailTargets)?.emailAddress ?? '')
-    setPhone(firstOrNull(targetGroup?.smsTargets)?.phoneNumber ?? '')
-    setTelegram(firstOrNull(targetGroup?.telegramTargets)?.telegramId ?? '')
-  }, [data])
+
+    if (email || telegram || phoneNumber) {
+      setLocalEmail(email ?? '')
+      setLocalTelegram(telegram ?? '')
+      setLocalPhone(phoneNumber ?? '')
+      setUnsavedChanges(true)
+    } else if (targetGroup) {
+      setLocalEmail(firstOrNull(targetGroup?.emailTargets)?.emailAddress ?? '')
+      setLocalPhone(firstOrNull(targetGroup?.smsTargets)?.phoneNumber ?? '')
+      setLocalTelegram(
+        firstOrNull(targetGroup?.telegramTargets)?.telegramId ?? ''
+      )
+      setUnsavedChanges(true)
+    } else {
+      setLocalEmail(firstOrNull(data?.emailTargets)?.emailAddress ?? '')
+      setLocalPhone(firstOrNull(data?.smsTargets)?.phoneNumber ?? '')
+      setLocalTelegram(firstOrNull(data?.telegramTargets)?.telegramId ?? '')
+      setUnsavedChanges(true)
+    }
+  }, [
+    data,
+    data?.emailTargets,
+    data?.smsTargets,
+    data?.telegramTargets,
+    email,
+    phoneNumber,
+    telegram,
+  ])
+
+  const checkTelegramUnconfirmed = useCallback((alertsResponse: Alert[]) => {
+    const hasTelegramAlert = alertsResponse.find(
+      (alert) => alert.targetGroup.telegramTargets.length >= 0
+    )
+    const target = hasTelegramAlert?.targetGroup.telegramTargets[0]
+
+    if (target && !target.isConfirmed) {
+      if (target.confirmationUrl) {
+        window.open(target.confirmationUrl)
+      }
+    }
+
+    return alertsResponse.some((alertResponse) =>
+      alertResponse.targetGroup.telegramTargets.some(
+        (target) => !target.isConfirmed
+      )
+    )
+  }, [])
 
   const handleError = (errors: { message: string }[]) => {
     const error = errors.length > 0 ? errors[0] : null
@@ -145,6 +170,7 @@ const NotificationsCard = ({
       if (!isAuthenticated && wallet && wallet.publicKey) {
         try {
           await logIn((wallet as unknown) as MessageSigner)
+          setPreview(true)
         } catch (e) {
           handleError([e])
         }
@@ -152,48 +178,39 @@ const NotificationsCard = ({
       }
       setLoading(false)
     },
-    [setLoading, isAuthenticated, wallet, setErrorMessage, logIn]
+    [setLoading, isAuthenticated, wallet, setErrorMessage, setPreview, logIn]
   )
 
-  const handleSave = async function () {
+  const handleSave = useCallback(async () => {
     setLoading(true)
-
-    let localData = data
-    // user is not authenticated
-    if (!isAuthenticated() && wallet && wallet.publicKey) {
+    if (!isAuthenticated && wallet && wallet.publicKey) {
       try {
         await logIn((wallet as unknown) as MessageSigner)
-        localData = await fetchData()
+        setUnsavedChanges(true)
       } catch (e) {
         handleError([e])
       }
     }
-
-    const alert = firstOrNull(localData?.alerts)
-    const source = firstOrNull(localData?.sources)
-    const filter = firstOrNull(localData?.filters)
-    if (connected && isAuthenticated()) {
+    if (connected && isAuthenticated) {
       try {
-        if (alert !== null) {
-          const alertResult = await updateAlert({
-            alertId: alert.id ?? '',
-            emailAddress: email === '' ? null : email,
-            phoneNumber: phone.length < 12 ? null : phone,
-            telegramId: telegram === '' ? null : telegram,
-          })
+        if (alerts && alerts.length >= 1) {
+          const results: Alert[] = []
 
-          if (alertResult) {
-            if (alertResult.targetGroup?.telegramTargets?.length > 0) {
-              const target = alertResult.targetGroup?.telegramTargets[0]
-              if (target && !target.isConfirmed) {
-                console.log(target.confirmationUrl)
-                if (target.confirmationUrl) {
-                  window.open(target.confirmationUrl)
-                }
-              }
+          for (const alert of alerts) {
+            const alertRes = await updateAlert({
+              alertId: alert.id ?? '',
+              emailAddress: localEmail === '' ? null : localEmail,
+              phoneNumber: isValidPhoneNumber(localPhoneNumber)
+                ? localPhoneNumber
+                : null,
+              telegramId: localTelegram === '' ? null : localTelegram,
+            })
+            if (alertRes) {
+              results.push(alertRes)
             }
           }
           if (results) {
+            setPreview(true)
             setEmail(
               results[0].targetGroup?.emailTargets[0]?.emailAddress ?? ''
             )
@@ -201,7 +218,6 @@ const NotificationsCard = ({
             setTelegram(
               results[0].targetGroup?.telegramTargets[0]?.telegramId ?? ''
             )
-            setPreview(true)
           }
           checkTelegramUnconfirmed(results)
           if (results) {
@@ -223,20 +239,29 @@ const NotificationsCard = ({
                 telegramId: localTelegram === '' ? null : localTelegram,
               })
 
-          if (alertResult) {
-            if (alertResult.targetGroup?.telegramTargets?.length > 0) {
-              const target = alertResult.targetGroup?.telegramTargets[0]
-              if (target && !target.isConfirmed) {
-                console.log(target.confirmationUrl)
-                if (target.confirmationUrl) {
-                  window.open(target.confirmationUrl)
-                }
+              if (alertRes) {
+                results.push(alertRes)
               }
             }
           }
+          if (telegram) {
+            checkTelegramUnconfirmed(results)
+          }
+          if (results && results.length >= 1) {
+            setPreview(true)
+            setEmail(
+              results[0].targetGroup?.emailTargets[0]?.emailAddress ?? ''
+            )
+            setPhone(results[0].targetGroup?.smsTargets[0]?.phoneNumber ?? '')
+            setTelegram(
+              results[0].targetGroup?.telegramTargets[0]?.telegramId ?? ''
+            )
+          }
         }
+        onBackClick?.()
         setUnsavedChanges(false)
       } catch (e) {
+        console.log(e)
         handleError([e])
       }
     }
@@ -246,11 +271,13 @@ const NotificationsCard = ({
     checkTelegramUnconfirmed,
     connected,
     createAlert,
+    fetchData,
     isAuthenticated,
     localEmail,
     localPhoneNumber,
     localTelegram,
     logIn,
+    onBackClick,
     setEmail,
     setPhone,
     setPreview,
@@ -262,61 +289,35 @@ const NotificationsCard = ({
   ])
 
   const handleEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value)
+    setLocalEmail(e.target.value)
     setUnsavedChanges(true)
   }
 
-  const handlePhone = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let val = e.target.value
-    if (val.length > 1) {
-      val = val.substring(2)
-    }
-
-    const re = /^[0-9\b]+$/
-    if (val === '' || (re.test(val) && val.length <= 10)) {
-      setPhone('+1' + val)
-    }
-
+  const handlePhone = (input: string) => {
+    setLocalPhone(input)
     setUnsavedChanges(true)
   }
 
   const handleTelegram = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTelegram(e.target.value)
+    setLocalTelegram(e.target.value)
     setUnsavedChanges(true)
   }
-
-  const isSame =
-    email === localEmail &&
-    phoneNumber === localPhoneNumber &&
-    telegram === localTelegram
 
   const disabled =
     (isAuthenticated && !hasUnsavedChanges) ||
     (localEmail === '' && localTelegram === '' && localPhoneNumber === '')
 
-  const handleBackClick = useCallback(() => {
-    if (isSame && !disabled) {
-      setPreview(true)
-      return
-    }
-    if (disabled) {
-      onBackClick()
-    } else {
-      setPreview(false)
-    }
-  }, [disabled, isSame, onBackClick, setPreview])
-
   return (
-    <div className="bg-bkg-5 w-full p-4 md:p-6 rounded-lg">
-      <div className="flex flex-row items-center align-center">
-        <Button className="bg-transparent" onClick={handleBackClick}>
+    <div className="bg-bkg-5 p-4 md:p-6 rounded-lg shadow-lg ">
+      <div className=" flex flex-row items-center align-center">
+        <Button className="bg-transparent" onClick={onBackClick}>
           <ArrowLeftIcon className="w-6 h-6" fill="grey" />
         </Button>
         <NotifiFullLogo />
       </div>
       {!connected ? (
         <>
-          <div className="text-sm items-center w-full text-center text-th-fgd-1">
+          <div className="text-sm text-th-fgd-1">
             Connect wallet to see options
           </div>
         </>
@@ -327,50 +328,65 @@ const NotificationsCard = ({
               Get notifications for proposals, voting, and results. Add your
               email address, phone number, and/or Telegram.
             </div>
-          </>
-        ) : (
-          <>
-            <div>
-              <div className="text-sm text-th-fgd-1 flex flex-row items-center justify-between mt-4">
-                Get notifications for proposals, voting, and results. Add your
-                email address, phone number, and/or Telegram.
-              </div>
-              {errorMessage.length > 0 ? (
-                <div className="text-sm text-red">{errorMessage}</div>
-              ) : (
-                !isAuthenticated() && (
-                  <div className="text-sm text-fgd-3">
-                    When prompted, sign the transaction.
-                  </div>
-                )
-              )}
-            </div>
-            <div className="pb-5">
+            {errorMessage.length > 0 ? (
+              <div className="text-sm text-red">{errorMessage}</div>
+            ) : (
+              !isAuthenticated && (
+                <div className="text-sm text-fgd-3">
+                  When prompted, sign the transaction.
+                </div>
+              )
+            )}
+          </div>
+          <div className="pb-5">
+            <InputRow
+              icon={
+                <MailIcon className="z-10 h-10 text-primary-light w-7 mr-1 mt-9 absolute left-3.5" />
+              }
+              label="email"
+            >
+              <Input
+                className="min-w-11/12 py-3 px-4 appearance-none w-11/12 pl-14 outline-0 focus:outline-none"
+                onChange={handleEmail}
+                placeholder="you@email.com"
+                type="email"
+                value={localEmail}
+              />
+            </InputRow>
+            <PhoneInput
+              handlePhone={handlePhone}
+              phoneNumber={localPhoneNumber}
+            />
+            {telegramEnabled && (
               <InputRow
-                label="email"
                 icon={
-                  <MailIcon className=" z-10 h-10 text-primary-light w-7 mr-1 mt-9 absolute left-3.5" />
+                  <PaperAirplaneIcon
+                    className="z-10 h-10 text-primary-light w-7 mr-1 mt-8 absolute left-3"
+                    style={{ transform: 'rotate(45deg)' }}
+                  />
                 }
+                label="Telegram"
               >
                 <Input
-                  className="min-w-11/12 py-3 px-4 appearance-none w-11/12 pl-14 outline-0 focus:outline-none"
-                  type="email"
-                  value={email}
-                  onChange={handleEmail}
-                  placeholder="you@email.com"
+                  className="min-w-11/12 py-3 px-4 appearance-none w-11/12 pl-14 outline-0 focus:outline-none flex"
+                  onChange={handleTelegram}
+                  placeholder="Telegram ID"
+                  type="text"
+                  value={localTelegram}
                 />
               </InputRow>
             )}
           </div>
           <div className=" text-xs  place-items-center  align-items-center grid flex-row text-center">
             <div className="w-full place-items-center ">
-              Already Subscribed?{' '}
+              Already Subscribed?
               <a
                 className="text-xs text-primary-dark cursor-pointer "
                 onClick={handleRefresh}
                 rel="noreferrer"
                 title="Click here to load your alert details."
               >
+                {' '}
                 Click here to load your alert details.
               </a>
             </div>
@@ -389,7 +405,7 @@ const NotificationsCard = ({
                   : 'Fetch stored values for existing accounts'
               }
             >
-              {alerts && alerts.length > 0 ? 'Update' : 'Subscribe'}
+              Subscribe
             </Button>
 
             <div className="h-3 grid text-xs w-full place-items-center">
@@ -400,35 +416,11 @@ const NotificationsCard = ({
                 target="_blank"
                 title="Questions? Click to learn more!"
               >
-                {hasUnsavedChanges || isAuthenticated()
-                  ? 'Subscribe'
-                  : 'Refresh'}
-              </Button>
-
-              <div className="h-3 grid text-xs w-full place-items-center">
-                <a
-                  href="https://www.notifi.network/faqs"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-xs text-primary-dark "
-                  title="Questions? Click to learn more!"
-                >
-                  Learn More About Notifi
-                </a>
-              </div>
+                Learn More About Notifi
+              </a>
             </div>
-          </>
-        )
-      ) : (
-        <div className="flex flex-col items-center">
-          <div className="mt-10">
-            Please select a DAO to start using Notifi.
           </div>
-          <div className="animate-pulse bg-bkg-3 h-12 w-full mb-4 mt-10 rounded-lg" />
-          <div className="animate-pulse bg-bkg-3 h-10 w-full mb-4 rounded-lg" />
-          <div className="animate-pulse bg-bkg-3 h-10 w-full  mb-4  rounded-lg" />
-          <div className="animate-pulse bg-bkg-3 w-1/2 h-10  mb-4 flex rounded-lg" />
-        </div>
+        </>
       )}
     </div>
   )
@@ -439,15 +431,15 @@ interface InputRowProps {
   icon: React.ReactNode
 }
 
-const InputRow: FunctionComponent<InputRowProps> = ({
+export const InputRow: FunctionComponent<InputRowProps> = ({
   children,
-  label,
   icon,
+  label,
 }) => {
   return (
     <label
-      htmlFor={label}
       className="relative text-gray-400 focus-within:text-gray-600 place-items-center left-5"
+      htmlFor={label}
     >
       {icon}
       <div className="mr-2 text-sm w-40 h-8 flex items-center"></div>
