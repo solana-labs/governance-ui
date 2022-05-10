@@ -26,8 +26,8 @@ const TransactionLoader = () => {
 
       {hasErrors ? (
         <>
-          <div className="text-xs text-red">Transaction error</div>
-          <div className="pb-4">{error}</div>
+          <div className="text-xs text-red pb-2">Transaction error</div>
+          <div className="mb-5 bg-bkg-1 p-4 rounded-md">{error}</div>
           <div className="flex justify-center">
             <Button onClick={() => retryCallback!()}>Retry</Button>
           </div>

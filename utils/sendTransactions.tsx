@@ -222,7 +222,7 @@ export const getUnixTs = () => {
   return new Date().getTime() / 1000
 }
 
-const DEFAULT_TIMEOUT = 60000
+const DEFAULT_TIMEOUT = 5000
 /////////////////////////////////////////////////
 export async function sendSignedTransaction({
   signedTransaction,
@@ -272,12 +272,10 @@ export async function sendSignedTransaction({
       true,
       block
     )
-    if (confirmation.status.err) {
-      console.error(confirmation.status.err)
+    if (confirmation?.status?.err) {
       throw new Error('Transaction failed: Custom instruction error')
     }
-
-    slot = confirmation?.status.slot || 0
+    slot = confirmation?.status?.slot || 0
     hasTimeout = confirmation.timeout
   } catch (err) {
     Sentry.captureException(`sendSignedTransaction line 283: ${err}`)
@@ -563,6 +561,7 @@ export const sendTransactionsV2 = async ({
       closeTransactionProcessUi()
     }
   } catch (e) {
+    console.log(e, '@@@@@')
     if (typeof e?.txInstructionIdx !== 'undefined' && showUiComponent) {
       console.log('Retrying from transactionIx:', e.txInstructionIdx)
       const idx = e?.txInstructionIdx
