@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
+import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 
 import useWalletStore from 'stores/useWalletStore'
@@ -11,8 +12,12 @@ import FormFooter from '../FormFooter'
 import Input from '../Input'
 import Button from 'components_2/Button'
 
-import { PublicKey } from '@solana/web3.js'
-import { SESSION_STORAGE_FORM_KEY } from './Wizard'
+import {
+  STEP1_SCHEMA,
+  STEP2_SCHEMA,
+  getFormData,
+  updateUserInput,
+} from './Wizard'
 
 function validateSolAddress(address: string) {
   try {
@@ -55,14 +60,8 @@ export default function Step2({ onSubmit, onPrevClick }) {
   const [pasteBuffer, setPasteBuffer] = useState<string[]>([])
   const [inviteList, setInviteList] = useState<string[]>([])
   const [validationError, setValidationError] = useState<string>('')
-  const schemaObject = {
-    daoMembers: yup
-      .array()
-      .of(yup.string())
-      .min(1, 'A DAO needs at least one member')
-      .required('Required'),
-  }
-  const schema = yup.object(schemaObject).required()
+
+  const schema = yup.object(STEP2_SCHEMA).required()
   const {
     setValue,
     handleSubmit,
@@ -75,24 +74,14 @@ export default function Step2({ onSubmit, onPrevClick }) {
   const isUserDAOMember = userAddress && inviteList.indexOf(userAddress) > -1
 
   useEffect(() => {
-    // do some checking that user has not skipped step 1
-    const wizardData = JSON.parse(
-      sessionStorage.getItem(SESSION_STORAGE_FORM_KEY) || '{}'
-    )
-    const { step1, step2: formData } = wizardData
-    if (!step1?.daoName) {
+    const formData = getFormData()
+
+    if (!yup.object(STEP1_SCHEMA).isValid(formData)) {
       return onPrevClick(2)
-    }
-    if (formData) {
-      Object.keys(schemaObject).forEach((fieldName) => {
-        const value = formData[fieldName]
-        setValue(fieldName, value, {
-          shouldValidate: true,
-          shouldDirty: true,
-        })
-      })
+    } else {
+      updateUserInput(STEP2_SCHEMA, setValue)
       setInviteList(
-        formData?.daoMembers?.filter((wallet) => {
+        formData.memberPks?.filter((wallet) => {
           return validateSolAddress(wallet)
         }) || []
       )
@@ -100,7 +89,7 @@ export default function Step2({ onSubmit, onPrevClick }) {
   }, [])
 
   useEffect(() => {
-    setValue('daoMembers', inviteList, {
+    setValue('memberPks', inviteList, {
       shouldValidate: true,
       shouldDirty: true,
     })
@@ -219,7 +208,7 @@ export default function Step2({ onSubmit, onPrevClick }) {
           )}
           <Input
             type="text"
-            name="daoMembers"
+            name="memberPks"
             placeholder="e.g. CWvWQWt5mTv7Zx..."
             data-testid="dao-member-list-input"
             ref={inputElement}

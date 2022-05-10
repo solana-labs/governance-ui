@@ -14,17 +14,12 @@ import Input from '../Input'
 import Button from 'components_2/Button'
 import FormFooter from '../FormFooter'
 
-import { SESSION_STORAGE_FORM_KEY } from './Wizard'
+import { STEP1_SCHEMA, updateUserInput } from './Wizard'
 
 export default function Step1({ onSubmit, onPrevClick }) {
   const { connected, connection, current: wallet } = useWalletStore((s) => s)
   const { show } = useWalletIdentity()
-  const schemaObject = {
-    daoAvatar: yup.string(),
-    daoName: yup.string().typeError('Required').required('Required'),
-    daoDescription: yup.string(),
-  }
-  const schema = yup.object(schemaObject).required()
+  const schema = yup.object(STEP1_SCHEMA).required()
   const {
     getValues,
     setValue,
@@ -37,18 +32,7 @@ export default function Step1({ onSubmit, onPrevClick }) {
   })
 
   useEffect(() => {
-    const formData = JSON.parse(
-      sessionStorage.getItem(SESSION_STORAGE_FORM_KEY) || '{}'
-    )?.step1
-    if (formData) {
-      Object.keys(schemaObject).forEach((fieldName) => {
-        const value = formData[fieldName]
-        setValue(fieldName, value, {
-          shouldValidate: true,
-          shouldDirty: true,
-        })
-      })
-    }
+    updateUserInput(STEP1_SCHEMA, setValue)
   }, [])
 
   function serializeValues(values) {
@@ -56,7 +40,7 @@ export default function Step1({ onSubmit, onPrevClick }) {
   }
 
   function handleAvatarSelect(fileInput) {
-    setValue('daoAvatar', fileInput, {
+    setValue('avatar', fileInput, {
       shouldValidate: true,
       shouldDirty: true,
     })
@@ -96,12 +80,12 @@ export default function Step1({ onSubmit, onPrevClick }) {
           title="What's your DAO's avatar?"
           description="The avatar you choose will visually represent your DAO"
           optional
-          defaultValue={getValues('daoAvatar')}
-          error={errors.daoAvatar?.message || ''}
+          defaultValue={getValues('avatar')}
+          error={errors.avatar?.message || ''}
           onSelect={handleAvatarSelect}
         />
         <Controller
-          name="daoName"
+          name="name"
           control={control}
           defaultValue=""
           render={({ field }) => (
@@ -112,14 +96,14 @@ export default function Step1({ onSubmit, onPrevClick }) {
               <Input
                 placeholder="e.g. RealmsDAO"
                 data-testid="dao-name-input"
-                error={errors.daoName?.message || ''}
+                error={errors.name?.message || ''}
                 {...field}
               />
             </FormField>
           )}
         />
         <Controller
-          name="daoDescription"
+          name="description"
           defaultValue=""
           control={control}
           render={({ field }) => (
@@ -131,7 +115,7 @@ export default function Step1({ onSubmit, onPrevClick }) {
               <Input
                 placeholder="e.g. My DAO is..."
                 data-testid="dao-description-input"
-                error={errors.daoDescription?.message || ''}
+                error={errors.description?.message || ''}
                 {...field}
               />
             </FormField>

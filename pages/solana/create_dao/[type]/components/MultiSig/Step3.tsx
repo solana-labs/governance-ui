@@ -7,19 +7,17 @@ import FormHeader from '../FormHeader'
 import FormField from '../FormField'
 import FormFooter from '../FormFooter'
 import Input from '../Input'
-import { SESSION_STORAGE_FORM_KEY } from './Wizard'
+import {
+  STEP2_SCHEMA,
+  STEP3_SCHEMA,
+  getFormData,
+  updateUserInput,
+} from './Wizard'
 
 export default function Step3({ onSubmit, onPrevClick }) {
   const [numberOfDaoMember, setNumberOfDaoMember] = useState(0)
-  const schemaObject = {
-    daoQuorumPercent: yup
-      .number()
-      .typeError('Required')
-      .max(100, 'Quorum cannot require more than 100% of members')
-      .min(1, 'Quorum must be at least 1% of member')
-      .required('Required'),
-  }
-  const schema = yup.object(schemaObject).required()
+
+  const schema = yup.object(STEP3_SCHEMA).required()
   const {
     control,
     watch,
@@ -30,29 +28,17 @@ export default function Step3({ onSubmit, onPrevClick }) {
     mode: 'all',
     resolver: yupResolver(schema),
   })
-  const quorumPercent = watch('daoQuorumPercent', 50)
+  const quorumPercent = watch('quorumThreshold', 50)
   const quorumSize = Math.ceil((quorumPercent * numberOfDaoMember) / 100)
 
   useEffect(() => {
-    // do some checking that user has not skipped step 2
-    const wizardData = JSON.parse(
-      sessionStorage.getItem(SESSION_STORAGE_FORM_KEY) || '{}'
-    )
-    const { step2, step3: formData } = wizardData
-    if (!step2?.daoMembers) {
-      onPrevClick(3)
-    } else {
-      setNumberOfDaoMember(step2.daoMembers.length)
-    }
+    const formData = getFormData()
 
-    if (formData) {
-      Object.keys(schemaObject).forEach((fieldName) => {
-        const value = formData[fieldName]
-        setValue(fieldName, value, {
-          shouldValidate: true,
-          shouldDirty: true,
-        })
-      })
+    if (!yup.object(STEP2_SCHEMA).isValid(formData)) {
+      return onPrevClick(3)
+    } else {
+      setNumberOfDaoMember(formData?.memberPks?.length)
+      updateUserInput(STEP3_SCHEMA, setValue)
     }
   }, [])
 
@@ -75,7 +61,7 @@ export default function Step3({ onSubmit, onPrevClick }) {
       />
       <div className="pt-10 space-y-10 md:space-y-12">
         <Controller
-          name="daoQuorumPercent"
+          name="quorumThreshold"
           control={control}
           defaultValue="50"
           render={({ field }) => (
@@ -89,7 +75,7 @@ export default function Step3({ onSubmit, onPrevClick }) {
                     <Input
                       placeholder="50"
                       data-testid="dao-quorum-input"
-                      error={errors.daoQuorumPercent?.message || ''}
+                      error={errors.quorumThreshold?.message || ''}
                       {...field}
                     />
                   </div>

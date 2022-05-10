@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+// import { useEffect } from 'react'
 import FormHeader from './FormHeader'
 import FormFooter from './FormFooter'
 
@@ -14,25 +14,16 @@ function SummaryCell({ className = '', children }) {
 }
 export default function WizardSummary({
   currentStep,
-  ssFormkey,
+  formData,
   onSubmit,
   onPrevClick,
 }) {
-  const wizardData = JSON.parse(sessionStorage.getItem(ssFormkey) || '{}')
-  const tokenName = wizardData?.step3?.daoGovTokenName || '' //'Gradiento'
-  const tokenSymbol = wizardData?.step3?.daoGovTokenSymbol || '' // 'GRADO'
-  const nftCollectionName = wizardData?.step2?.nftCollectionName || '' // 'Bored Ape'
-  const nftCollectionCount = wizardData?.step2?.nftCollectionCount || 0 // 1000000
-  const quorumPercent = wizardData?.step3?.daoQuorumPercent || 0 // 10
-  const numberOfMembers = wizardData?.step2?.daoMembers?.length || 0 // 1
-
-  useEffect(() => {
-    // do some checking that user has not skipped the previous step
-    wizardData[`step${currentStep - 1}`]
-    if (!wizardData[`step${currentStep - 1}`]) {
-      return onPrevClick(currentStep - 1)
-    }
-  }, [wizardData])
+  const tokenName = formData?.govTokenName || '' //'Gradiento'
+  const tokenSymbol = formData?.govTokenSymbol || '' // 'GRADO'
+  const nftCollectionName = formData?.nftCollectionName || '' // 'Bored Ape'
+  const nftCollectionCount = formData?.nftCollectionCount || 0 // 1000000
+  const quorumThreshold = formData?.quorumThreshold || 0 // 10
+  const numberOfMembers = formData?.memberPks?.length || 0 // 1
 
   return (
     <div data-testid="wizard-summary">
@@ -49,21 +40,21 @@ export default function WizardSummary({
           <SummaryCell className="flex mb-2 space-x-8">
             <div
               className={`h-[158px] w-[158px] rounded-full flex justify-center ${
-                wizardData?.step1?.daoAvatar ? '' : 'bg-[#292833]'
+                formData?.step1?.daoAvatar ? '' : 'bg-[#292833]'
               }`}
             >
-              {wizardData?.step1?.daoAvatar ? (
-                <img src={wizardData.step1.daoAvatar} />
+              {formData?.avatar ? (
+                <img src={formData.avatar} />
               ) : (
                 <div className="my-auto opacity-50">No avatar</div>
               )}
             </div>
             <div className="flex flex-col">
               <Header as="h1" className="mb-4">
-                {wizardData?.step1?.daoName}
+                {formData?.name}
               </Header>
-              {wizardData?.step1?.daoDescription ? (
-                <Text>{wizardData.step1.daoDescription}</Text>
+              {formData?.description ? (
+                <Text>{formData.description}</Text>
               ) : (
                 <Text className="text-white/60">No DAO description...</Text>
               )}
@@ -124,7 +115,7 @@ export default function WizardSummary({
                 />
               </div>
               <Header as="h1" className="mt-6 text-center">
-                {quorumPercent}%
+                {quorumThreshold}%
               </Header>
               <Text className="mt-2 text-center text-white/50">quroum</Text>
             </SummaryCell>
