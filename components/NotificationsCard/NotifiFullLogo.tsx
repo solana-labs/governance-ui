@@ -2,12 +2,12 @@ import { useTheme } from 'next-themes'
 import NotifiLogoFullDark from './NotifiLogoFullDark'
 import NotifiLogoFullLight from './NotifiLogoFullLight '
 
-const NotifiFullLogo = () => {
+const NotifiFullLogo = ({ height = '23', width = '340' }) => {
   const { theme } = useTheme()
   return theme === 'Dark' ? (
-    <NotifiLogoFullLight height={'35'} />
+    <NotifiLogoFullLight height={height} width={width} />
   ) : (
-    <NotifiLogoFullDark height={'35'} />
+    <NotifiLogoFullDark height={height} width={width} />
   )
 }
 

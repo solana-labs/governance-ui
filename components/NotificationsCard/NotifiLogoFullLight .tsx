@@ -1,7 +1,7 @@
-const NotifiIconDark = ({ height = '50' }) => {
+const NotifiIconDark = ({ height = '50', width = '340' }) => {
   return (
     <svg
-      width="340"
+      width={width}
       height={height}
       viewBox="0 0 442 104"
       fill="none"
