@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import {
   Commitment,
@@ -102,6 +103,9 @@ async function awaitTransactionSignatureConfirmation(
             }
             if (result.err) {
               console.log('Rejected via websocket', result.err)
+              Sentry.captureException(
+                `awaitTransactionSignatureConfirmation line 107: ${result.err}`
+              )
               reject(result.err)
             } else {
               console.log('Resolved via websocket', result)
@@ -137,6 +141,7 @@ async function awaitTransactionSignatureConfirmation(
               console.log('Tx Timeout ----')
               reject({ timeout: true })
             }
+
             if (blockHeight) {
               console.log('Timeout threshold blockheight', timeoutBlockHeight)
               console.log('Current blockheight', blockHeight)
@@ -148,6 +153,9 @@ async function awaitTransactionSignatureConfirmation(
               } else if (status.err) {
                 console.log('REST error for', txid, status)
                 done = true
+                Sentry.captureException(
+                  `awaitTransactionSignatureConfirmation line 157: ${status.err}`
+                )
                 reject(status.err)
               } else if (!status.confirmations) {
                 console.log('REST no confirmations for', txid, status)
@@ -272,6 +280,7 @@ export async function sendSignedTransaction({
     slot = confirmation?.status.slot || 0
     hasTimeout = confirmation.timeout
   } catch (err) {
+    Sentry.captureException(`sendSignedTransaction line 283: ${err}`)
     let simulateResult: SimulatedTransactionResponse | null = null
     try {
       simulateResult = (
@@ -285,12 +294,16 @@ export async function sendSignedTransaction({
         for (let i = simulateResult.logs.length - 1; i >= 0; --i) {
           const line = simulateResult.logs[i]
           if (line.startsWith('Program log: ')) {
+            Sentry.captureException(`sendSignedTransaction line 298: ${line}`)
             throw new Error(
               'Transaction failed: ' + line.slice('Program log: '.length)
             )
           }
         }
       }
+      Sentry.captureException(
+        `sendSignedTransaction line 303: ${simulateResult.err}`
+      )
       throw {
         txInstructionIdx: transactionInstructionIdx,
         error: JSON.stringify(simulateResult.err),
