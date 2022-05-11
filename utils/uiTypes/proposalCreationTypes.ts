@@ -293,6 +293,7 @@ export enum Instructions {
   CreateNftPluginMaxVoterWeight,
   ConfigureNftPluginCollection,
   CloseTokenAccount,
+  VotingMintConfig,
 }
 
 export type createParams = [

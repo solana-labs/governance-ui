@@ -291,6 +291,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseTransferInstruction,
     },
     {
+      id: Instructions.VotingMintConfig,
+      name: 'Vote stake registry voting mint config',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
       id: Instructions.None,
       name: 'None',
       isVisible:

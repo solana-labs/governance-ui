@@ -70,6 +70,7 @@ import RealmConfig from './components/instructions/RealmConfig'
 import MakeAddMarketMetadataParams from './components/instructions/Foresight/MakeAddMarketMetadataParams'
 import CloseTokenAccount from './components/instructions/CloseTokenAccount'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
+import VotingMintConfig from './components/instructions/Vsr/VotingMintConfig'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -458,6 +459,13 @@ const New = () => {
             index={idx}
             governance={governance}
           ></CloseTokenAccount>
+        )
+      case Instructions.VotingMintConfig:
+        return (
+          <VotingMintConfig
+            index={idx}
+            governance={governance}
+          ></VotingMintConfig>
         )
       default:
         null
