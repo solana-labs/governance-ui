@@ -6,11 +6,16 @@ interface TransactionStore extends State {
   processedTransactions: number
   hasErrors: boolean
   error: any
+  txid: string
   retryCallback: (() => Promise<void>) | null
   startProcessing: (transactionsCount: number) => void
   incrementProcessedTransactions: () => void
   closeTransactionProcess: () => void
-  showTransactionError: (retryCallback: () => Promise<void>, e: any) => void
+  showTransactionError: (
+    retryCallback: () => Promise<void>,
+    e: any,
+    txid: string
+  ) => void
 }
 
 const defaultState = {
@@ -20,6 +25,7 @@ const defaultState = {
   retryCallback: null,
   hasErrors: false,
   error: '',
+  txid: '',
 }
 
 const useTransactionsStore = create<TransactionStore>((set, _get) => ({
@@ -41,11 +47,12 @@ const useTransactionsStore = create<TransactionStore>((set, _get) => ({
       ...defaultState,
     })
   },
-  showTransactionError: (retryCallback, error) => {
+  showTransactionError: (retryCallback, error, txid) => {
     set({
       retryCallback: retryCallback,
       error,
       hasErrors: true,
+      txid: txid,
     })
   },
 }))

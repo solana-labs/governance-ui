@@ -10,6 +10,7 @@ const TransactionLoader = () => {
     processedTransactions,
     retryCallback,
     error,
+    txid,
     hasErrors,
     closeTransactionProcess,
   } = useTransactionsStore()
@@ -26,8 +27,12 @@ const TransactionLoader = () => {
 
       {hasErrors ? (
         <>
-          <div className="text-xs text-red pb-2">Transaction error</div>
-          <div className="mb-5 bg-bkg-1 p-4 rounded-md">{error}</div>
+          <div className="text-xs text-red pb-1">Transaction id</div>
+          <div className="mb-2 bg-bkg-1 p-4 rounded-md text-xs break-all">
+            {txid}
+          </div>
+          <div className="text-xs text-red pb-1">Error</div>
+          <div className="mb-5 bg-bkg-1 p-4 rounded-md text-xs">{error}</div>
           <div className="flex justify-center">
             <Button onClick={() => retryCallback!()}>Retry</Button>
           </div>

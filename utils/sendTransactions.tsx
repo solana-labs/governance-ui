@@ -105,7 +105,7 @@ async function awaitTransactionSignatureConfirmation(
               console.log('Rejected via websocket', result.err)
               Sentry.captureException(
                 `awaitTransactionSignatureConfirmation line 107: ${result.err}`,
-                { tags: { sendTransactionsErrors: 'sendTransactionsErrors' } }
+                { tags: { tag: 'sendTransactionsErrors' } }
               )
               reject(result.err)
             } else {
@@ -156,7 +156,7 @@ async function awaitTransactionSignatureConfirmation(
                 done = true
                 Sentry.captureException(
                   `awaitTransactionSignatureConfirmation line 157: ${status.err}`,
-                  { tags: { sendTransactionsErrors: 'sendTransactionsErrors' } }
+                  { tags: { tag: 'sendTransactionsErrors' } }
                 )
                 reject(status.err)
               } else if (!status.confirmations) {
@@ -169,6 +169,10 @@ async function awaitTransactionSignatureConfirmation(
             }
           } catch (e) {
             if (!done) {
+              Sentry.captureException(
+                `awaitTransactionSignatureConfirmation line 173: ${e}`,
+                { tags: { tag: 'sendTransactionsErrors' } }
+              )
               console.log('REST connection error: txid', txid, e)
             }
           }
@@ -281,7 +285,7 @@ export async function sendSignedTransaction({
     hasTimeout = confirmation.timeout
   } catch (err) {
     Sentry.captureException(`sendSignedTransaction line 283: ${err}`, {
-      tags: { sendTransactionsErrors: 'sendTransactionsErrors' },
+      tags: { tag: 'sendTransactionsErrors' },
     })
     let simulateResult: SimulatedTransactionResponse | null = null
     try {
@@ -301,17 +305,19 @@ export async function sendSignedTransaction({
               txInstructionIdx: transactionInstructionIdx,
               error:
                 'Transaction failed: ' + line.slice('Program log: '.length),
+              txid: txid,
             }
           }
         }
       }
       Sentry.captureException(
         `sendSignedTransaction line 303: ${simulateResult.err}`,
-        { tags: { sendTransactionsErrors: 'sendTransactionsErrors' } }
+        { tags: { tag: 'sendTransactionsErrors' } }
       )
       throw {
         txInstructionIdx: transactionInstructionIdx,
         error: JSON.stringify(simulateResult.err),
+        txid: txid,
       }
     }
     // throw new Error('Transaction failed');
@@ -322,6 +328,7 @@ export async function sendSignedTransaction({
     throw {
       txInstructionIdx: transactionInstructionIdx,
       error: 'Timed out awaiting confirmation on transaction',
+      txid: txid,
     }
   }
   if (showUiComponent) {
@@ -584,7 +591,8 @@ export const sendTransactionsV2 = async ({
               signersSet: signersForRetry,
               showUiComponent,
             }),
-          e.error
+          e.error,
+          e.txid
         )
       }
     }
