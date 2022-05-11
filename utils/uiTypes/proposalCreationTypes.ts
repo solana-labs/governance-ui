@@ -294,6 +294,7 @@ export enum Instructions {
   ConfigureNftPluginCollection,
   CloseTokenAccount,
   VotingMintConfig,
+  CreateVsrRegistrar,
 }
 
 export type createParams = [

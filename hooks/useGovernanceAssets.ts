@@ -296,6 +296,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseAuthorityInstruction,
     },
     {
+      id: Instructions.CreateVsrRegistrar,
+      name: 'Vote stake create registrar',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
       id: Instructions.None,
       name: 'None',
       isVisible:

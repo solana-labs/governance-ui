@@ -71,6 +71,7 @@ import MakeAddMarketMetadataParams from './components/instructions/Foresight/Mak
 import CloseTokenAccount from './components/instructions/CloseTokenAccount'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import VotingMintConfig from './components/instructions/Vsr/VotingMintConfig'
+import CreateVsrRegistrar from './components/instructions/Vsr/CreateRegistrar'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -466,6 +467,13 @@ const New = () => {
             index={idx}
             governance={governance}
           ></VotingMintConfig>
+        )
+      case Instructions.CreateVsrRegistrar:
+        return (
+          <CreateVsrRegistrar
+            index={idx}
+            governance={governance}
+          ></CreateVsrRegistrar>
         )
       default:
         null
