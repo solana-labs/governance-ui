@@ -1,3 +1,4 @@
+import { withSentry } from '@sentry/nextjs'
 import {
   getGovernanceAccounts,
   ProgramAccount,
@@ -79,4 +80,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   res.status(200).json(daoStatistics)
 }
 
-export default handler
+export default withSentry(handler)

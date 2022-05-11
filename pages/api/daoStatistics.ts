@@ -14,6 +14,7 @@ import { getAllSplGovernanceProgramIds } from './tools/realms'
 import BigNumber from 'bignumber.js'
 import BN from 'bn.js'
 import { WSOL_MINT_PK } from '@components/instructions/tools'
+import { withSentry } from '@sentry/nextjs'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const conn = new Connection(
@@ -143,4 +144,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   res.status(200).json(daoStatistics)
 }
 
-export default handler
+export default withSentry(handler)

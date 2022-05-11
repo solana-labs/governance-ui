@@ -6,6 +6,8 @@ import {
   MangoInstructionLayout,
 } from '@blockworks-foundation/mango-client'
 import dayjs from 'dayjs'
+import { tryGetTokenMint } from '@utils/tokens'
+import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
 
 function displayInstructionArgument(decodedArgs, argName) {
   return (
@@ -87,7 +89,21 @@ export const MANGO_INSTRUCTIONS = {
         _accounts: AccountMetaData[]
       ) => {
         const args = MangoInstructionLayout.decode(Buffer.from(data), 0).Deposit
-        return <>{displayAllArgs(args)}</>
+        const mint = await tryGetTokenMint(_connection, _accounts[6].pubkey)
+        if (mint) {
+          return (
+            <>
+              Amount:{' '}
+              {getMintDecimalAmountFromNatural(
+                mint!.account!,
+                args.quantity
+              ).toFormat()}{' '}
+              ({args.quantity.toNumber()})
+            </>
+          )
+        } else {
+          return <>{displayAllArgs(args)}</>
+        }
       },
     },
     4: {
