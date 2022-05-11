@@ -155,7 +155,7 @@ async function awaitTransactionSignatureConfirmation(
                 console.log('REST error for', txid, status)
                 done = true
                 Sentry.captureException(
-                  `awaitTransactionSignatureConfirmation line 157: ${status.err}`,
+                  `awaitTransactionSignatureConfirmation line 158: ${status.err}`,
                   { tags: { tag: 'sendTransactionsErrors' } }
                 )
                 reject(status.err)
@@ -284,7 +284,7 @@ export async function sendSignedTransaction({
     slot = confirmation?.status?.slot || 0
     hasTimeout = confirmation.timeout
   } catch (err) {
-    Sentry.captureException(`sendSignedTransaction line 283: ${err}`, {
+    Sentry.captureException(`sendSignedTransaction line 287: ${err}`, {
       tags: { tag: 'sendTransactionsErrors' },
     })
     let simulateResult: SimulatedTransactionResponse | null = null
@@ -300,7 +300,7 @@ export async function sendSignedTransaction({
         for (let i = simulateResult.logs.length - 1; i >= 0; --i) {
           const line = simulateResult.logs[i]
           if (line.startsWith('Program log: ')) {
-            Sentry.captureException(`sendSignedTransaction line 298: ${line}`)
+            Sentry.captureException(`sendSignedTransaction line 303: ${line}`)
             throw {
               txInstructionIdx: transactionInstructionIdx,
               error:
@@ -311,7 +311,7 @@ export async function sendSignedTransaction({
         }
       }
       Sentry.captureException(
-        `sendSignedTransaction line 303: ${simulateResult.err}`,
+        `sendSignedTransaction line 314: ${simulateResult.err}`,
         { tags: { tag: 'sendTransactionsErrors' } }
       )
       throw {
