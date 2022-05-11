@@ -16,8 +16,8 @@ import { DeviceMobileIcon } from '@heroicons/react/outline'
 import styled from '@emotion/styled'
 import Button from '@components/Button'
 import TelegramIcon from './TelegramIcon'
-import NotifiIconLight from './NotifiIconLight'
-import NotifiIconDark from './NotifiIconDark'
+import NotifiIcon from '@components/NotifiIcon'
+import NotificationsCard from '@components/NotificationsCard'
 
 const REALMS_PUBLIC_KEY = new anchor.web3.PublicKey(
   'BUxZD6aECR5B5MopyvvYqJxwSKDBhx2jSSo1U32en6mj'
@@ -75,7 +75,7 @@ const NotificationSolutions: NotificationSolutionType[] = [
     channels: ['Email', 'Text', 'Telegram', 'Notifi Center'],
     description: `
     Get notifications for proposals, voting, and results. Add your email address, phone number, and/or Telegram.`,
-    modalState: ModalStates.Dialect,
+    modalState: ModalStates.Notifi,
   },
   {
     name: 'Dialect',
@@ -149,14 +149,6 @@ export default function NotificationsSwitch() {
           <StyledChannelName>{channelName}</StyledChannelName>
         </div>
       </span>
-    )
-  }
-
-  const NotifiIcon = () => {
-    return theme === 'Dark' ? (
-      <NotifiIconLight height={'30'} width={'30'} />
-    ) : (
-      <NotifiIconDark height={'30'} width={'30'} />
     )
   }
 
@@ -241,6 +233,29 @@ export default function NotificationsSwitch() {
               })
             }
             channels={['web3', 'email', 'sms', 'telegram']}
+          />
+        )}
+        {modalState === ModalStates.Notifi && (
+          //  <NotificationsModal
+          //  wallet={(wallet as unknown) as WalletType}
+          //  network={cluster as string}
+          //  publicKey={REALMS_PUBLIC_KEY}
+          //  theme={theme === 'Dark' ? 'dark' : 'light'}
+          //  variables={themeVariables}
+          //  notifications={[{ name: 'New proposals', detail: 'Event' }]}
+          //  onBackClick={() =>
+          //    setNotificationStore((state) => {
+          //      state.modalState = ModalStates.Selection
+          //    })
+          //  }
+          //  channels={['web3', 'email', 'sms', 'telegram']}
+          //  />
+          <NotificationsCard
+            onBackClick={() =>
+              setNotificationStore((state) => {
+                state.modalState = ModalStates.Selection
+              })
+            }
           />
         )}
       </Transition>
