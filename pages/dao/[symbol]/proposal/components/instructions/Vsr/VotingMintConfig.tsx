@@ -3,6 +3,7 @@ import * as yup from 'yup'
 import {
   Governance,
   ProgramAccount,
+  serializeInstructionToBase64,
   //serializeInstructionToBase64,
 } from '@solana/spl-governance'
 import { validateInstruction } from '@utils/instructionTools'
@@ -19,6 +20,16 @@ import InstructionForm, {
 import { getValidatedPublickKey } from '@utils/validations'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { getScaledFactor } from '@utils/tokens'
+import { yearsToSecs } from 'VoteStakeRegistry/tools/dateTools'
+import { BN } from '@project-serum/anchor'
+import { PublicKey } from '@solana/web3.js'
+import {
+  emptyPk,
+  getRegistrarPDA,
+  Registrar,
+} from 'VoteStakeRegistry/sdk/accounts'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 
 interface ConfigureCollectionForm {
   governedAccount: AssetAccount | undefined
@@ -39,7 +50,7 @@ const VotingMintConfig = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const { realm } = useRealm()
-  //const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
+  const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
   const { assetAccounts } = useGovernanceAssets()
   const wallet = useWalletStore((s) => s.current)
   const shouldBeGoverned = index !== 0 && governance
@@ -51,20 +62,73 @@ const VotingMintConfig = ({
     let serializedInstruction = ''
     if (
       isValid &&
+      form &&
       form!.governedAccount?.governance.pubkey &&
       wallet?.publicKey
     ) {
-      //   const configureCollectionIx = await vsrClient!.program.methods
-      //     .configureVotingMint(        form!.mintIndex, // mint index
-      //     form!.mintDigitShift, // digit_shift
-      //     form!.mintUnlockedFactor, // unlocked_scaled_factor
-      //     form!.mintLockupFactor, // lockup_scaled_factor
-      //     form!.mintLockupSaturation, // lockup_saturation_secs
-      //     form!.grantAuthority!.governance.pubkey!, // grant_authority)
-      //     .accounts({
-      //     })
-      //     .instruction()
-      serializedInstruction = ''
+      const digitShift = form.mintDigitShift
+      const unlockedScaledFactor = getScaledFactor(form.mintUnlockedFactor)
+      const lockupScaledFactor = getScaledFactor(form.mintLockupFactor)
+      const lockupSaturationSecs = new BN(
+        yearsToSecs(form.mintLockupSaturation).toString()
+      )
+      const mint = new PublicKey(form.mint)
+      const mintIndex = form.mintIndex
+      const grantAuthority = form.grantAuthority!.governance.pubkey
+      const { registrar } = await getRegistrarPDA(
+        realm!.pubkey,
+        realm!.account.communityMint,
+        vsrClient!.program.programId!
+      )
+      let remainingAccounts = [
+        {
+          pubkey: mint,
+          isSigner: false,
+          isWritable: false,
+        },
+      ]
+
+      try {
+        // If we can fetch the registrar then use it for the additional mint configs
+        // Note: The registrar might not exist if we are setting this for the first time in a single proposal
+        // In that case we default to 0 existing mints
+        const registrarAcc = (await vsrClient?.program.account.registrar.fetch(
+          registrar
+        )) as Registrar
+
+        const registrarMints = registrarAcc?.votingMints
+          .filter((vm) => !vm.mint.equals(new PublicKey(emptyPk)))
+          .map((vm) => {
+            return {
+              pubkey: vm.mint,
+              isSigner: false,
+              isWritable: false,
+            }
+          })
+
+        remainingAccounts = remainingAccounts.concat(registrarMints)
+      } catch (ex) {
+        console.info("Can't fetch registrar", ex)
+      }
+      const configureCollectionIx = await vsrClient!.program.methods
+        .configureVotingMint(
+          mintIndex, // mint index
+          digitShift, // digit_shift
+          unlockedScaledFactor, // unlocked_scaled_factor
+          lockupScaledFactor, // lockup_scaled_factor
+          lockupSaturationSecs, // lockup_saturation_secs
+          grantAuthority! // grant_authority)
+        )
+        .accounts({
+          registrar,
+          realmAuthority: realm!.account.authority,
+          mint,
+        })
+        .remainingAccounts(remainingAccounts)
+        .instruction()
+      serializedInstruction = serializeInstructionToBase64(
+        configureCollectionIx
+      )
     }
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
@@ -84,11 +148,15 @@ const VotingMintConfig = ({
       .object()
       .nullable()
       .required('Governed account is required'),
-    collection: yup
+    grantAuthority: yup
+      .object()
+      .nullable()
+      .required('Grant authority is required'),
+    mint: yup
       .string()
       .test(
         'accountTests',
-        'Collection address validation error',
+        'mint address validation error',
         function (val: string) {
           if (val) {
             try {
@@ -101,7 +169,7 @@ const VotingMintConfig = ({
             }
           } else {
             return this.createError({
-              message: `Collection address is required`,
+              message: `mint address is required`,
             })
           }
         }
@@ -123,7 +191,7 @@ const VotingMintConfig = ({
     },
     {
       label: 'mint',
-      initialValue: '',
+      initialValue: realm?.account.communityMint.toBase58() || '',
       inputType: 'text',
       name: 'mint',
       type: InstructionInputType.INPUT,
@@ -131,6 +199,7 @@ const VotingMintConfig = ({
     {
       label: 'mint index',
       initialValue: 0,
+      min: 0,
       inputType: 'number',
       name: 'mintIndex',
       type: InstructionInputType.INPUT,
@@ -145,6 +214,7 @@ const VotingMintConfig = ({
     {
       label: 'mint digit shift',
       initialValue: 0,
+      min: 0,
       inputType: 'number',
       name: 'mintDigitShift',
       type: InstructionInputType.INPUT,
@@ -152,6 +222,7 @@ const VotingMintConfig = ({
     {
       label: 'mint unlocked factor',
       initialValue: 0,
+      min: 0,
       inputType: 'number',
       name: 'mintUnlockedFactor',
       type: InstructionInputType.INPUT,
@@ -159,6 +230,7 @@ const VotingMintConfig = ({
     {
       label: 'mint lockup factor',
       initialValue: 0,
+      min: 0,
       inputType: 'number',
       name: 'mintLockupFactor',
       type: InstructionInputType.INPUT,
@@ -166,6 +238,7 @@ const VotingMintConfig = ({
     {
       label: 'mint lockup saturation (years)',
       initialValue: 0,
+      min: 0,
       inputType: 'number',
       name: 'mintLockupSaturation',
       type: InstructionInputType.INPUT,
