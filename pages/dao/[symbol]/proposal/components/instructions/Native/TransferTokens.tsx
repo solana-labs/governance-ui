@@ -164,11 +164,12 @@ const TransferTokens = ({
         );
       }
 
-      // Cannot use u64 here as it doesn't implement toBuffer, gotta do something for that
+      // Tricks, in spl-token code, amount is used as > amount: new u64(amount).toBuffer()
+      // We provide a string
       const amount = uiAmountToNativeBN(
         form.uiAmount!,
         mint.account.decimals,
-      ).toNumber();
+      ).toString();
 
       return Token.createTransferInstruction(
         TOKEN_PROGRAM_ID,
@@ -235,8 +236,8 @@ const TransferTokens = ({
                   onChange={(governedAccount) => {
                     setDestinationGovernedAccount(governedAccount ?? undefined);
                   }}
-                  value={governedAccount}
-                  governance={governedAccount?.governance}
+                  value={destinationGovernedAccount}
+                  governance={destinationGovernedAccount?.governance}
                 />
               </div>
 

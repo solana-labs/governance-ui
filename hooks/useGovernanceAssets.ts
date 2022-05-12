@@ -451,7 +451,7 @@ export default function useGovernanceAssets() {
       packageId: PackageEnum.Friktion,
     },
     [InstructionEnum.Transfer]: {
-      name: 'Transfer Tokens',
+      name: 'Transfer Tokens From Treasuries',
       isVisible: canUseTokenTransferInstruction,
       packageId: PackageEnum.Native,
       tag: 'deprecated',
