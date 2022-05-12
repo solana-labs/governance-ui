@@ -186,7 +186,9 @@ const WithDrawCommunityTokens = () => {
         !hasTokensDeposited ||
         toManyCommunityOutstandingProposalsForUser ||
         toManyCouncilOutstandingProposalsForUse ||
-        isLoading
+        isLoading ||
+        wallet?.publicKey?.toBase58() !==
+          ownTokenRecord?.account.governingTokenOwner.toBase58()
       }
       onClick={withdrawAllTokens}
     >
