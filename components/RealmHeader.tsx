@@ -77,11 +77,11 @@ const RealmHeader = () => {
               </a>
             </Link>
           )}
-          {isLockTokensMode && symbol === 'MNGO' && (
+          {isLockTokensMode && (
             <Link href={fmtUrlWithCluster(`/dao/${symbol}/token-stats`)}>
               <a className="default-transition flex items-center cursor-pointer text-fgd-2 hover:text-fgd-3 text-sm">
                 <ChartPieIcon className="flex-shrink-0 h-5 mr-1 w-5" />
-                MNGO stats
+                {symbol} stats
               </a>
             </Link>
           )}

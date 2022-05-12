@@ -1,6 +1,6 @@
 import { ResponsiveBar } from '@nivo/bar'
 
-const VestingVsTime = ({ data, fmtMangoAmount /* see data tab */ }) => (
+const VestingVsTime = ({ data, fmtAmount /* see data tab */ }) => (
   <ResponsiveBar
     data={data}
     keys={['amount']}
@@ -38,8 +38,8 @@ const VestingVsTime = ({ data, fmtMangoAmount /* see data tab */ }) => (
       },
     ]}
     fill={[{ match: '*', id: 'gradient' }]}
-    label={(v) => fmtMangoAmount(v.value)}
-    axisLeft={{ format: (v) => fmtMangoAmount(v) }}
+    label={(v) => fmtAmount(v.value)}
+    axisLeft={{ format: (v) => fmtAmount(v) }}
     labelSkipWidth={12}
     labelSkipHeight={12}
     labelTextColor="#fff"

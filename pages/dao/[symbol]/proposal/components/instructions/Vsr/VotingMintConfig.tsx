@@ -134,6 +134,7 @@ const VotingMintConfig = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form!.governedAccount?.governance,
+      chunkSplitByDefault: true,
     }
     return obj
   }
@@ -209,7 +210,7 @@ const VotingMintConfig = ({
       initialValue: null,
       name: 'grantAuthority',
       type: InstructionInputType.GOVERNED_ACCOUNT,
-      options: assetAccounts.filter((x) => x.isToken),
+      options: assetAccounts.filter((x) => x.isToken || x.isSol || x.isNft),
     },
     {
       label: 'mint digit shift',
