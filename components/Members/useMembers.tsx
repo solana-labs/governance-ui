@@ -151,11 +151,12 @@ export default function useMembers() {
 
   //for community we exclude people who never vote
   const communityAndCouncilTokenRecords = [
-    ...tokenRecordArray.filter(
-      (x) =>
-        x.community?.account.totalVotesCount &&
-        x.community?.account.totalVotesCount > 0
-    ),
+    // ...tokenRecordArray.filter(
+    //   (x) =>
+    //     x.community?.account.totalVotesCount &&
+    //     x.community?.account.totalVotesCount > 0
+    // ),
+    ...tokenRecordArray,
     ...councilRecordArray,
   ]
   //merge community and council vote records to one big array of members
