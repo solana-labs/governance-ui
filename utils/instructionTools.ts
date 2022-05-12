@@ -11,7 +11,6 @@ import {
 } from '@solana/spl-token'
 import { SignerWalletAdapter, WalletAdapter } from '@solana/wallet-adapter-base'
 import {
-  Account,
   Keypair,
   PublicKey,
   SystemProgram,
@@ -23,15 +22,11 @@ import {
   getMintNaturalAmountFromDecimal,
   parseMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
-import type { ConnectionContext } from 'utils/connection'
+import { ConnectionContext } from 'utils/connection'
 import { getATA } from './ataTools'
 import { isFormValid } from './formValidation'
 import { getTokenAccountsByMint } from './tokens'
 import { UiInstruction } from './uiTypes/proposalCreationTypes'
-import { ConnectedVoltSDK, FriktionSDK } from '@friktion-labs/friktion-sdk'
-import { AnchorWallet } from '@friktion-labs/friktion-sdk/dist/cjs/src/miscUtils'
-import { WSOL_MINT } from '@components/instructions/tools'
-import Decimal from 'decimal.js'
 import { AssetAccount } from '@utils/uiTypes/assets'
 
 export const validateInstruction = async ({
@@ -42,176 +37,6 @@ export const validateInstruction = async ({
   const { isValid, validationErrors } = await isFormValid(schema, form)
   setFormErrors(validationErrors)
   return isValid
-}
-
-export async function getFriktionDepositInstruction({
-  schema,
-  form,
-  amount,
-  connection,
-  wallet,
-  setFormErrors,
-}: {
-  schema: any
-  form: any
-  amount: number
-  programId: PublicKey | undefined
-  connection: ConnectionContext
-  wallet: WalletAdapter | undefined
-  setFormErrors: any
-}): Promise<UiInstruction> {
-  const isValid = await validateInstruction({ schema, form, setFormErrors })
-  let serializedInstruction = ''
-  const prerequisiteInstructions: TransactionInstruction[] = []
-  const governedTokenAccount = form.governedTokenAccount as AssetAccount
-  const voltVaultId = new PublicKey(form.voltVaultId as string)
-
-  const signers: Keypair[] = []
-  if (
-    isValid &&
-    amount &&
-    governedTokenAccount?.extensions.token?.publicKey &&
-    governedTokenAccount?.extensions.token &&
-    governedTokenAccount?.extensions.mint?.account &&
-    governedTokenAccount?.governance &&
-    wallet
-  ) {
-    const sdk = new FriktionSDK({
-      provider: {
-        connection: connection.current,
-        wallet: (wallet as unknown) as AnchorWallet,
-      },
-    })
-    const cVoltSDK = new ConnectedVoltSDK(
-      connection.current,
-      wallet.publicKey as PublicKey,
-      await sdk.loadVoltByKey(voltVaultId)
-    )
-
-    const voltVault = cVoltSDK.voltVault
-    const vaultMint = cVoltSDK.voltVault.vaultMint
-
-    //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
-    const { currentAddress: receiverAddress, needToCreateAta } = await getATA({
-      connection: connection,
-      receiverAddress: governedTokenAccount.governance.pubkey,
-      mintPK: vaultMint,
-      wallet,
-    })
-    //we push this createATA instruction to transactions to create right before creating proposal
-    //we don't want to create ata only when instruction is serialized
-    if (needToCreateAta) {
-      prerequisiteInstructions.push(
-        Token.createAssociatedTokenAccountInstruction(
-          ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-          TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-          vaultMint, // mint
-          receiverAddress, // ata
-          governedTokenAccount.governance.pubkey, // owner of token account
-          wallet.publicKey! // fee payer
-        )
-      )
-    }
-
-    let pendingDepositInfo
-    try {
-      pendingDepositInfo = await cVoltSDK.getPendingDepositForUser()
-    } catch (err) {
-      pendingDepositInfo = null
-    }
-
-    if (
-      pendingDepositInfo &&
-      pendingDepositInfo.roundNumber.lt(voltVault.roundNumber) &&
-      pendingDepositInfo?.numUnderlyingDeposited?.gtn(0)
-    ) {
-      prerequisiteInstructions.push(
-        await cVoltSDK.claimPending(receiverAddress)
-      )
-    }
-
-    let depositTokenAccountKey: PublicKey | null
-
-    if (governedTokenAccount.isSol) {
-      const { currentAddress: receiverAddress, needToCreateAta } = await getATA(
-        {
-          connection: connection,
-          receiverAddress: governedTokenAccount.governance.pubkey,
-          mintPK: new PublicKey(WSOL_MINT),
-          wallet,
-        }
-      )
-      if (needToCreateAta) {
-        prerequisiteInstructions.push(
-          Token.createAssociatedTokenAccountInstruction(
-            ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-            TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-            new PublicKey(WSOL_MINT), // mint
-            receiverAddress, // ata
-            governedTokenAccount.governance.pubkey, // owner of token account
-            wallet.publicKey! // fee payer
-          )
-        )
-      }
-      depositTokenAccountKey = receiverAddress
-    } else {
-      depositTokenAccountKey = governedTokenAccount.extensions.transferAddress!
-    }
-
-    try {
-      let decimals = 9
-
-      if (!governedTokenAccount.isSol) {
-        const underlyingAssetMintInfo = await new Token(
-          connection.current,
-          governedTokenAccount.extensions.mint!.publicKey,
-          TOKEN_PROGRAM_ID,
-          (null as unknown) as Account
-        ).getMintInfo()
-        decimals = underlyingAssetMintInfo.decimals
-      }
-
-      const depositIx = governedTokenAccount.isSol
-        ? await cVoltSDK.depositWithTransfer(
-            new Decimal(amount),
-            depositTokenAccountKey,
-            receiverAddress,
-            governedTokenAccount.extensions.transferAddress!,
-            governedTokenAccount.governance.pubkey,
-            decimals
-          )
-        : await cVoltSDK.deposit(
-            new Decimal(amount),
-            depositTokenAccountKey,
-            receiverAddress,
-            governedTokenAccount.governance.pubkey,
-            decimals
-          )
-
-      const governedAccountIndex = depositIx.keys.findIndex(
-        (k) =>
-          k.pubkey.toString() ===
-          governedTokenAccount.governance?.pubkey.toString()
-      )
-      depositIx.keys[governedAccountIndex].isSigner = true
-
-      serializedInstruction = serializeInstructionToBase64(depositIx)
-    } catch (e) {
-      if (e instanceof Error) {
-        throw new Error('Error: ' + e.message)
-      }
-      throw e
-    }
-  }
-  const obj: UiInstruction = {
-    serializedInstruction,
-    isValid,
-    governance: governedTokenAccount?.governance,
-    prerequisiteInstructions: prerequisiteInstructions,
-    signers,
-    shouldSplitIntoSeparateTxs: true,
-  }
-  return obj
 }
 
 export async function getGenericTransferInstruction({
