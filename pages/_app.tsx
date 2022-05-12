@@ -75,16 +75,17 @@ function App({ Component, pageProps }) {
       ) &&
       realm.pubkey &&
       wallet?.connected &&
+      ownTokenRecord &&
       client
     ) {
       getOwnedDeposits({
         realmPk: realm!.pubkey,
         communityMintPk: realm!.account.communityMint,
-        walletPk: wallet!.publicKey!,
+        walletPk: ownTokenRecord!.account!.governingTokenOwner,
         client: client!,
         connection: connection.current,
       })
-    } else if (!wallet?.connected) {
+    } else if (!wallet?.connected || !ownTokenRecord) {
       resetDepositState()
     }
   }, [

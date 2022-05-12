@@ -220,7 +220,6 @@ export default function useMembers() {
   // Return a object of key: walletId and value: object of arrays for council/community tokenOwnerRecords.
   const getDelegateWalletMap = (members: Array<Member>): Delegates => {
     const delegateMap = {} as Delegates
-
     members.forEach((member: Member) => {
       if (member?.delegateWalletCouncil) {
         const walletId = member?.delegateWalletCouncil.toBase58()
@@ -285,18 +284,8 @@ export default function useMembers() {
       setDelegates(delegateMap)
       setMembers(members)
     }
-    if (
-      realm?.pubkey &&
-      previousRealmPubKey !== realm?.pubkey.toBase58() &&
-      !realm?.account.config.useCommunityVoterWeightAddin
-    ) {
+    if (realm?.pubkey && previousRealmPubKey !== realm?.pubkey.toBase58()) {
       handleSetMembers()
-    }
-    if (
-      !realm?.pubkey ||
-      (realm.pubkey && realm?.account.config.useCommunityVoterWeightAddin)
-    ) {
-      setMembers([])
     }
   }, [realm?.pubkey.toBase58()])
 }

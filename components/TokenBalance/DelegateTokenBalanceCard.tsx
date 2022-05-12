@@ -30,7 +30,7 @@ const DelegateBalanceCard = () => {
       ownDelegateCouncilTokenRecords.length > 0
     ) {
       actions.selectCouncilDelegate(
-        ownDelegateCouncilTokenRecords[0].account.governingTokenOwner.toBase58()
+        ownDelegateCouncilTokenRecords[0]?.account?.governingTokenOwner?.toBase58()
       )
     }
 
@@ -40,7 +40,7 @@ const DelegateBalanceCard = () => {
       ownDelegateTokenRecords.length > 0
     ) {
       actions.selectCommunityDelegate(
-        ownDelegateTokenRecords[0].account.governingTokenOwner.toBase58()
+        ownDelegateTokenRecords[0]?.account?.governingTokenOwner?.toBase58()
       )
     }
   }, [walletId])
@@ -93,7 +93,7 @@ const DelegateBalanceCard = () => {
 
   return (
     <>
-      <h3 className="mb-0">Your Delegates</h3>
+      <h3 className="mb-0 mt-2">Your Delegates</h3>
       {walletId && delegates?.[walletId]?.councilMembers && (
         <div className="flex space-x-4 items-center mt-4">
           <div className="bg-bkg-1 px-4 py-2 justify-between rounded-md w-full">
@@ -116,7 +116,7 @@ const DelegateBalanceCard = () => {
             <Select
               value={
                 (ownCouncilTokenRecord &&
-                  ownCouncilTokenRecord.account.governingTokenOwner.toBase58()) ||
+                  ownCouncilTokenRecord?.account?.governingTokenOwner?.toBase58()) ||
                 ''
               }
               placeholder="Delegate to use for council votes"
@@ -125,7 +125,9 @@ const DelegateBalanceCard = () => {
                 ownCouncilTokenRecord ? (
                   <DisplayAddress
                     connection={connection.current}
-                    address={ownCouncilTokenRecord.account.governingTokenOwner}
+                    address={
+                      ownCouncilTokenRecord?.account?.governingTokenOwner
+                    }
                     height="12px"
                     width="100px"
                     dark={true}
@@ -140,12 +142,12 @@ const DelegateBalanceCard = () => {
               </Select.Option>
               {ownDelegateCouncilTokenRecords?.map((councilDelegate) => (
                 <Select.Option
-                  key={councilDelegate.account.governingTokenOwner.toBase58()}
-                  value={councilDelegate.account.governingTokenOwner.toBase58()}
+                  key={councilDelegate?.account?.governingTokenOwner?.toBase58()}
+                  value={councilDelegate?.account?.governingTokenOwner?.toBase58()}
                 >
                   <DisplayAddress
                     connection={connection.current}
-                    address={councilDelegate.account.governingTokenOwner}
+                    address={councilDelegate?.account?.governingTokenOwner}
                     height="12px"
                     width="100px"
                     dark={true}
@@ -202,12 +204,12 @@ const DelegateBalanceCard = () => {
               </Select.Option>
               {ownDelegateTokenRecords?.map((communityDelegate) => (
                 <Select.Option
-                  key={communityDelegate.account.governingTokenOwner.toBase58()}
-                  value={communityDelegate.account.governingTokenOwner.toBase58()}
+                  key={communityDelegate?.account?.governingTokenOwner?.toBase58()}
+                  value={communityDelegate?.account?.governingTokenOwner?.toBase58()}
                 >
                   <DisplayAddress
                     connection={connection.current}
-                    address={communityDelegate.account.governingTokenOwner}
+                    address={communityDelegate?.account?.governingTokenOwner}
                     height="12px"
                     width="100px"
                     dark={true}

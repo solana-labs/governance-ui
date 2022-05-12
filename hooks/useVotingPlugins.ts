@@ -28,7 +28,7 @@ export const pythPluginsPks: string[] = [
 ]
 
 export function useVotingPlugins() {
-  const { realm, config } = useRealm()
+  const { realm, config, ownTokenRecord } = useRealm()
   const {
     handleSetVsrRegistrar,
     handleSetVsrClient,
@@ -134,14 +134,15 @@ export function useVotingPlugins() {
       if (
         vsrClient &&
         currentPluginPk &&
-        vsrPluginsPks.includes(currentPluginPk.toBase58())
+        vsrPluginsPks.includes(currentPluginPk.toBase58()) &&
+        ownTokenRecord
       ) {
         handleSetVsrRegistrar(vsrClient, realm)
         if (connected) {
           handleSetCurrentRealmVotingClient({
             client: vsrClient,
             realm,
-            walletPk: wallet?.publicKey,
+            walletPk: ownTokenRecord?.account.governingTokenOwner,
           })
         }
       }
@@ -153,11 +154,11 @@ export function useVotingPlugins() {
         nftPluginsPks.includes(currentPluginPk.toBase58())
       ) {
         handleSetNftRegistrar(nftClient!, realm)
-        if (connected) {
+        if (connected && ownTokenRecord) {
           handleSetCurrentRealmVotingClient({
             client: nftClient,
             realm,
-            walletPk: wallet?.publicKey,
+            walletPk: ownTokenRecord?.account.governingTokenOwner,
           })
         }
       }
@@ -169,11 +170,11 @@ export function useVotingPlugins() {
         currentPluginPk &&
         pythPluginsPks.includes(currentPluginPk.toBase58())
       ) {
-        if (connected) {
+        if (connected && ownTokenRecord) {
           handleSetCurrentRealmVotingClient({
             client: pythClient,
             realm,
-            walletPk: wallet?.publicKey,
+            walletPk: ownTokenRecord?.account?.governingTokenOwner,
           })
         }
       }
@@ -195,7 +196,9 @@ export function useVotingPlugins() {
     realm?.pubkey.toBase58(),
     connection.endpoint,
     connected,
+    ownTokenRecord,
   ])
+
   useEffect(() => {
     if (usedCollectionsPks.length && realm) {
       if (connected && currentClient.walletPk?.toBase58()) {
