@@ -3,17 +3,16 @@ import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 
-import { useWalletIdentity } from '@cardinal/namespaces-components'
-
-import { notify } from '@utils/notifications'
-import useWalletStore from 'stores/useWalletStore'
+// import { useWalletIdentity } from '@cardinal/namespaces-components'
+// import { notify } from '@utils/notifications'
+// import useWalletStore from 'stores/useWalletStore'
 
 import FormHeader from '../FormHeader'
 import FormField, { ImageUploader } from '../FormField'
-import Input from '../Input'
-// import Button from 'components_2/Button'
 import FormFooter from '../FormFooter'
 import AdvancedOptionsDropdown from '../AdvancedOptionsDropdown'
+import Input from '../Input'
+// import Button from 'components_2/Button'
 
 import {
   DEFAULT_GOVERNANCE_PROGRAM_ID,
@@ -23,8 +22,8 @@ import {
 import { STEP1_SCHEMA, updateUserInput } from './Wizard'
 
 export default function Step1({ onSubmit, onPrevClick }) {
-  const { connected, connection, current: wallet } = useWalletStore((s) => s)
-  const { show } = useWalletIdentity()
+  // const { connected, connection, current: wallet } = useWalletStore((s) => s)
+  // const { show } = useWalletIdentity()
   const schema = yup.object(STEP1_SCHEMA).required()
   const {
     getValues,
@@ -52,21 +51,21 @@ export default function Step1({ onSubmit, onPrevClick }) {
     })
   }
 
-  async function handleLinkTwitterClick() {
-    if (!connected) {
-      try {
-        if (wallet) await wallet.connect()
-        // @ts-ignore
-        await show(wallet, connection.current, connection.cluster)
-      } catch (error) {
-        const err = error as Error
-        return notify({
-          type: 'error',
-          message: err.message,
-        })
-      }
-    }
-  }
+  // async function handleLinkTwitterClick() {
+  //   if (!connected) {
+  //     try {
+  //       if (wallet) await wallet.connect()
+  //       // @ts-ignore
+  //       await show(wallet, connection.current, connection.cluster)
+  //     } catch (error) {
+  //       const err = error as Error
+  //       return notify({
+  //         type: 'error',
+  //         message: err.message,
+  //       })
+  //     }
+  //   }
+  // }
 
   return (
     <form
