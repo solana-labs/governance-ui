@@ -22,7 +22,11 @@ import { withInsertTransaction } from '@solana/spl-governance'
 import { InstructionData } from '@solana/spl-governance'
 import { sendTransaction } from 'utils/send'
 import { withSignOffProposal } from '@solana/spl-governance'
-import { sendTransactions, SequenceType } from '@utils/sendTransactions'
+import {
+  sendTransactionsV2,
+  SequenceType,
+  transactionInstructionsToTypedInstructionsSets,
+} from '@utils/sendTransactions'
 import { chunks } from '@utils/helpers'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
@@ -218,37 +222,47 @@ export const createProposal = async (
     // This is an arbitrary threshold and we assume that up to 2 instructions can be inserted as a single Tx
     // This is conservative setting and we might need to revise it if we have more empirical examples or
     // reliable way to determine Tx size
-    const transaction = new Transaction()
     // We merge instructions with prerequisiteInstructions
     // Prerequisite  instructions can came from instructions as something we need to do before instruction can be executed
     // For example we create ATAs if they don't exist as part of the proposal creation flow
-    transaction.add(
-      ...prerequisiteInstructions,
-      ...instructions,
-      ...insertInstructions
-    )
 
-    await sendTransaction({
-      transaction,
+    await sendTransactionsV2({
       wallet,
       connection,
-      signers,
-      sendingMessage: `creating ${notificationTitle}`,
-      successMessage: `${notificationTitle} created`,
+      signersSet: [[], [], signers],
+      showUiComponent: true,
+      TransactionInstructions: [
+        prerequisiteInstructions,
+        instructions,
+        insertInstructions,
+      ].map((x) =>
+        transactionInstructionsToTypedInstructionsSets(
+          x,
+          SequenceType.Sequential
+        )
+      ),
     })
   } else {
     const insertChunks = chunks(insertInstructions, 2)
     const signerChunks = Array(insertChunks.length).fill([])
 
     console.log(`Creating proposal using ${insertChunks.length} chunks`)
-
-    await sendTransactions(
-      connection,
+    await sendTransactionsV2({
       wallet,
-      [prerequisiteInstructions, instructions, ...insertChunks],
-      [[], [], ...signerChunks],
-      SequenceType.Sequential
-    )
+      connection,
+      signersSet: [[], [], ...signerChunks],
+      showUiComponent: true,
+      TransactionInstructions: [
+        prerequisiteInstructions,
+        instructions,
+        ...insertChunks,
+      ].map((x) =>
+        transactionInstructionsToTypedInstructionsSets(
+          x,
+          SequenceType.Sequential
+        )
+      ),
+    })
   }
 
   return proposalAddress

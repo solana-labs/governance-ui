@@ -42,6 +42,7 @@ import {
 } from '@models/api'
 import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 import { HIDDEN_PROPOSALS } from '@components/instructions/tools'
+import { sleep } from '@blockworks-foundation/mango-client'
 
 interface WalletStore extends State {
   connected: boolean
@@ -216,6 +217,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
             realmMintPk
           ),
         ])
+        console.log(ownVoteRecordsByProposal, tokenRecords)
         set((state) => {
           state.ownVoteRecordsByProposal = ownVoteRecordsByProposal
           state.selectedRealm.tokenRecords = tokenRecords
@@ -343,6 +345,8 @@ const useWalletStore = create<WalletStore>((set, get) => ({
     },
 
     async refetchProposals() {
+      console.log('REFETCH PROPOSALS')
+      await sleep(200)
       const set = get().set
       const connection = get().connection.current
       const realmId = get().selectedRealm.realm?.pubkey
