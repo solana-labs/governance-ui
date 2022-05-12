@@ -1,40 +1,34 @@
-import {
-  Connection,
-  Keypair,
-  Transaction,
-  TransactionInstruction,
-} from '@solana/web3.js'
+import { Keypair, Transaction, TransactionInstruction } from '@solana/web3.js'
 
 import {
   sendSignedAndAdjacentTransactions,
   sendTransaction,
   signTransactions,
 } from '@utils/send'
-import {
-  InstructionOption,
-  InstructionOptions,
-} from '@components/InstructionOptions'
 import Wallet from '@project-serum/sol-wallet-adapter'
-import {
-  getCastleRefreshInstruction,
-  getCastleReconcileInstruction,
-} from '@utils/instructions/Castle'
-// import { ProgramAccount } from '@project-serum/anchor'
 import {
   RpcContext,
   Proposal,
   ProposalTransaction,
   getGovernanceProgramVersion,
   withExecuteTransaction,
-  WalletSigner,
   ProgramAccount,
 } from '@solana/spl-governance'
 
+/**
+ * Executes a proposal transaction
+ * @param rpcContext RPC contextual information
+ * @param proposal Metadata about the proposal
+ * @param instruction Instruction that will be executed by the proposal
+ * @param adjacentTransaction Optional transaction that is sent in the same slot as the proposal instruction.
+ * @param preExecutionTransactions Optional tansactions that are executed before the proposal instruction
+ */
 export const executeTransaction = async (
   { connection, wallet, programId }: RpcContext,
   proposal: ProgramAccount<Proposal>,
   instruction: ProgramAccount<ProposalTransaction>,
-  instructionOption: InstructionOption
+  adjacentTransaction?: Transaction,
+  preExecutionTransactions?: Transaction[]
 ) => {
   const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []
@@ -56,133 +50,52 @@ export const executeTransaction = async (
     [instruction.account.getSingleInstruction()]
   )
 
-  // Create proposal instruction
-  const transaction = new Transaction().add(...instructions)
+  // Create proposal transaction
+  const proposalTransaction = new Transaction().add(...instructions)
 
-  console.log(instructionOption)
-  // Send transaction based on its execution option
-  switch (instructionOption) {
-    case InstructionOptions.castleRefresh:
-      return await executeWithRefresh(
-        transaction,
-        connection,
-        wallet,
-        instruction
+  // Sign and send all pre-execution transactions
+  if (preExecutionTransactions && !preExecutionTransactions?.length) {
+    await Promise.all(
+      preExecutionTransactions.map((transaction) =>
+        sendTransaction({
+          transaction,
+          wallet,
+          connection,
+          sendingMessage: 'Sending pre-execution transaction',
+          successMessage: 'Sent pre-execution transaction',
+        })
       )
-    case InstructionOptions.castleReconcileRefresh:
-      return await executeWithRefreshAndReconcile(
-        transaction,
-        connection,
-        wallet,
-        instruction
-      )
-    default:
-      await sendTransaction({
-        transaction,
-        wallet,
-        connection,
-        signers,
-        sendingMessage: 'Executing instruction',
-        successMessage: 'Execution finalized',
-      })
-  }
-}
-
-/**
- * Signs and sends proposal transaction with refresh transaction adjacent to it, aiming
- * for both to be in the same slot.
- * @param tx Proposal transaction
- * @param connection
- * @param wallet
- */
-const executeWithRefresh = async (
-  tx: Transaction,
-  connection: Connection,
-  wallet: WalletSigner,
-  instruction: ProgramAccount<ProposalTransaction>
-) => {
-  const refreshIx = await getCastleRefreshInstruction(
-    connection,
-    wallet,
-    instruction
-  )
-
-  const refreshTx = new Transaction().add(refreshIx)
-
-  // Attempt to send both transactions in the same slot
-  const [signedTransaction, signedRefreshTx] = await signTransactions({
-    transactionsAndSigners: [{ transaction: tx }, { transaction: refreshTx }],
-    wallet: (wallet as unknown) as Wallet,
-    connection,
-  })
-
-  await sendSignedAndAdjacentTransactions({
-    signedTransaction,
-    adjacentTransaction: signedRefreshTx,
-    connection,
-    sendingMessage: 'Executing instruction',
-    successMessage: 'Execution finalized',
-  })
-}
-
-/**
- * Withdraw requires three transactions
- * (1) reconcile and refresh ixs
- * (2) refresh and withdraw ixs.
- * @param tx Proposal transaction
- * @param connection
- * @param wallet
- */
-const executeWithRefreshAndReconcile = async (
-  tx: Transaction,
-  connection: Connection,
-  wallet: WalletSigner,
-  instruction: ProgramAccount<ProposalTransaction>
-) => {
-  console.log('executing with reconcile')
-  // Get reconcile txs
-  const reconcileTxs = await getCastleReconcileInstruction(
-    connection,
-    wallet,
-    instruction
-  )
-
-  console.log('reconcileTxs', reconcileTxs)
-  // Sign and send off all reconcile txs
-  await Promise.all(
-    reconcileTxs.map((transaction) =>
-      sendTransaction({
-        transaction,
-        wallet,
-        connection,
-        // sendingMessage: 'Cancelling proposal',
-        successMessage: 'Send reconcile tx',
-      })
     )
-  )
+    console.log('sent preExecutionTransactions', preExecutionTransactions)
+  }
 
-  // Get refresh Tx and sign alongside withdraw
-  const refreshIx = await getCastleRefreshInstruction(
-    connection,
-    wallet,
-    instruction
-  )
-
-  const refreshTx = new Transaction().add(refreshIx)
-
-  // Attempt to send both transactions in the same slot
-  const [signedProposalTx, signedRefreshTx] = await signTransactions({
-    transactionsAndSigners: [{ transaction: tx }, { transaction: refreshTx }],
-    wallet: (wallet as unknown) as Wallet,
-    connection,
-  })
-
-  // Send off refresh + withdraw transactions
-  await sendSignedAndAdjacentTransactions({
-    signedTransaction: signedProposalTx,
-    adjacentTransaction: signedRefreshTx,
-    connection,
-    sendingMessage: 'Executing instruction',
-    successMessage: 'Execution finalized',
-  })
+  // Some proposals require additional adjacent transactions due to tx size limits
+  if (adjacentTransaction) {
+    const [signedProposalTx, signedAdjacentTx] = await signTransactions({
+      transactionsAndSigners: [
+        { transaction: proposalTransaction },
+        { transaction: adjacentTransaction },
+      ],
+      wallet: (wallet as unknown) as Wallet,
+      connection,
+    })
+    // Send proposal transaction with prepended adjacent transaction
+    await sendSignedAndAdjacentTransactions({
+      signedTransaction: signedProposalTx,
+      adjacentTransaction: signedAdjacentTx,
+      connection,
+      sendingMessage: 'Executing instruction',
+      successMessage: 'Execution finalized',
+    })
+  } else {
+    // Send the proposal transaction
+    await sendTransaction({
+      transaction: proposalTransaction,
+      wallet,
+      connection,
+      signers,
+      sendingMessage: 'Executing instruction',
+      successMessage: 'Execution finalized',
+    })
+  }
 }

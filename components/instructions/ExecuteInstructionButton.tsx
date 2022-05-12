@@ -13,16 +13,24 @@ import { RpcContext } from '@solana/spl-governance'
 import useRealm from '@hooks/useRealm'
 import useWalletStore from 'stores/useWalletStore'
 import { ProgramAccount } from '@solana/spl-governance'
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey, Transaction } from '@solana/web3.js'
 import Tooltip from '@components/Tooltip'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { notify } from '@utils/notifications'
-import { InstructionOption } from '@components/InstructionOptions'
+import {
+  InstructionOption,
+  InstructionOptions,
+} from '@components/InstructionOptions'
 import dayjs from 'dayjs'
 import {
   getFormattedStringFromDays,
   SECS_PER_DAY,
 } from 'VoteStakeRegistry/tools/dateTools'
+import {
+  getCastleReconcileInstruction,
+  getCastleRefreshInstruction,
+} from '@utils/instructions/Castle'
+import Wallet from '@project-serum/sol-wallet-adapter'
 
 export enum PlayState {
   Played,
@@ -82,12 +90,46 @@ export function ExecuteInstructionButton({
     setPlaying(PlayState.Playing)
 
     try {
+      let preExecutionTransactions: Transaction[] | undefined = undefined
+      let adjacentTransaction: Transaction | undefined = undefined
+
+      // Depending on the instruction option, add the appropriate pre-execution
+      // and adjacent transactions to the proposal execution
+      switch (instructionOption) {
+        case InstructionOptions.castleRefresh:
+          adjacentTransaction = new Transaction().add(
+            await getCastleRefreshInstruction(
+              rpcContext.connection,
+              (wallet as unknown) as Wallet,
+              proposalInstruction
+            )
+          )
+          break
+        case InstructionOptions.castleReconcileRefresh: {
+          preExecutionTransactions = await getCastleReconcileInstruction(
+            rpcContext.connection,
+            (wallet as unknown) as Wallet,
+            proposalInstruction
+          )
+          adjacentTransaction = new Transaction().add(
+            await getCastleRefreshInstruction(
+              rpcContext.connection,
+              (wallet as unknown) as Wallet,
+              proposalInstruction
+            )
+          )
+          break
+        }
+      }
+
       await executeTransaction(
         rpcContext,
         proposal,
         proposalInstruction,
-        instructionOption
+        adjacentTransaction,
+        preExecutionTransactions
       )
+
       await refetchProposals()
     } catch (error) {
       notify({ type: 'error', message: `error executing instruction ${error}` })
