@@ -3,16 +3,27 @@ import useWalletStore from 'stores/useWalletStore'
 import useRealm from '@hooks/useRealm'
 import { getNfts } from '@utils/tokens'
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
-import { PublicKey } from '@solana/web3.js'
+import { Keypair, PublicKey } from '@solana/web3.js'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import useSwitchboardPluginStore from 'SwitchboardVotePlugin/store/switchboardStore'
 import { QUEUE_LIST } from 'SwitchboardVotePlugin/SwitchboardQueueVoterClient'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { getMaxVoterWeightRecord } from '@solana/spl-governance'
+import {
+  getMaxVoterWeightRecord,
+  getVoterWeightRecord,
+} from '@solana/spl-governance'
 import { getNftMaxVoterWeightRecord } from 'NftVotePlugin/sdk/accounts'
 import { notify } from '@utils/notifications'
+import { AccountLayout, NATIVE_MINT } from '@solana/spl-token'
 import * as anchor from '@project-serum/anchor'
 import * as sbv2 from '../../switchboardv2-api'
+import sbidl from '../../switchboard-core/switchboard_v2/target/idl/switchboard_v2.json'
+
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  TOKEN_PROGRAM_ID,
+  Token,
+} from '@solana/spl-token'
 
 export const vsrPluginsPks: string[] = [
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo',
@@ -97,18 +108,60 @@ export function useVotingPlugins() {
     setIsLoading(true)
 
     try {
-      // go through queues, get governance addresses until current realm + governance combo exists
-      for (const queue of QUEUE_LIST) {
-        if (!wallet || !wallet.publicKey || !realm) {
-          return
+      const options = anchor.AnchorProvider.defaultOptions()
+      const provider = new anchor.AnchorProvider(
+        connection.current,
+        (wallet as unknown) as anchor.Wallet,
+        options
+      )
+      let idl = await anchor.Program.fetchIdl(sbv2.SBV2_MAINNET_PID, provider)
+      if (!idl) {
+        idl = sbidl as anchor.Idl
+      }
+      const switchboardProgram = new anchor.Program(
+        idl,
+        sbv2.SBV2_MAINNET_PID,
+        provider
+      )
+
+      const allQueues = await switchboardProgram.account.oracleQueueAccountData.all()
+
+      const queueListData = allQueues.map(({ publicKey, account }) => {
+        return {
+          queueData: account,
+          queue: publicKey,
         }
+      })
+
+      // go through queues, get governance addresses until current realm + governance combo exists
+      for (const { queue, queueData } of queueListData) {
+        if (!wallet || !wallet.publicKey || !realm || !queueData) {
+          continue
+        }
+
+        const switchTokenMint = new Token(
+          switchboardProgram.provider.connection,
+          (queueData.mint as PublicKey).equals(PublicKey.default)
+            ? NATIVE_MINT
+            : (queueData.mint as PublicKey),
+          TOKEN_PROGRAM_ID,
+          Keypair.generate()
+        )
+
+        // get token wallet for this user associated with this queue's mint
+        const tokenWallet = await Token.getAssociatedTokenAddress(
+          switchTokenMint.associatedProgramId,
+          switchTokenMint.programId,
+          switchTokenMint.publicKey,
+          wallet.publicKey
+        )
 
         // get the oracle account associated with wallet
         const [oracle] = anchor.utils.publicKey.findProgramAddressSync(
           [
             Buffer.from('OracleAccountData'),
             queue.toBuffer(),
-            wallet.publicKey?.toBuffer(),
+            tokenWallet.toBuffer(),
           ],
           sbv2.SBV2_MAINNET_PID
         )
@@ -121,30 +174,25 @@ export function useVotingPlugins() {
           sbv2.SBV2_MAINNET_PID
         )
 
-        // find the governance for this realm / queue
-        const [governance] = anchor.utils.publicKey.findProgramAddressSync(
-          [
-            Buffer.from('account-governance'),
-            realm.pubkey.toBuffer(),
-            queue.toBuffer(),
-          ],
-          sbv2.SBV2_MAINNET_PID // @QUESTION - this param is probably wrong - what should go here?
-        )
+        console.log(voterWeightRecord)
 
-        const [
-          voterWeight,
-          governanceAccount,
-        ] = await connection.current.getMultipleAccountsInfo([
-          voterWeightRecord,
-          governance,
-        ])
+        const vw = await connection.current.getAccountInfo(voterWeightRecord)
+        console.log(vw)
+
+        const vwr = await getVoterWeightRecord(
+          connection.current,
+          voterWeightRecord
+        )
+        console.log(vwr)
 
         // does current realm / governance resolve (at all), does VWR exist
-        if (governanceAccount && voterWeight) {
+        if (vwr && vwr.account.realm.equals(realm.pubkey)) {
+          console.log(vwr.account.voterWeight.toNumber())
           // get voting power
-          setVotingPower(new anchor.BN(1))
+          setVotingPower(vwr.account.voterWeight)
         } else {
           // 'no sb governance'
+          setVotingPower(new anchor.BN(0))
         }
       }
     } catch (e) {

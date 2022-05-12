@@ -136,8 +136,6 @@ export default function useRealm() {
     sbVotingPower
   )
 
-  console.log(ownVoterWeight)
-
   return {
     realm,
     realmInfo,
