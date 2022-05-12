@@ -37,7 +37,7 @@
     "@headlessui/react": "^1.5.0",
     "@heroicons/react": "^1.0.1",
     "@marinade.finance/marinade-ts-sdk": "^2.0.9",
-    "@metaplex-foundation/mpl-token-metadata": "^1.2.5",
+    "@metaplex-foundation/mpl-token-metadata": "^2.1.1",
     "@mithraic-labs/serum-remote": "^0.0.1-rc.16",
     "@next/bundle-analyzer": "^12.1.5",
     "@nfteyez/sol-rayz": "^0.10.2",
