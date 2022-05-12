@@ -123,15 +123,18 @@ const DelegateBalanceCard = () => {
               onChange={handleCouncilSelect}
               componentLabel={
                 ownCouncilTokenRecord ? (
-                  <DisplayAddress
-                    connection={connection.current}
-                    address={
-                      ownCouncilTokenRecord?.account?.governingTokenOwner
-                    }
-                    height="12px"
-                    width="100px"
-                    dark={true}
-                  />
+                  <div className="relative">
+                    <DisplayAddress
+                      connection={connection.current}
+                      address={
+                        ownCouncilTokenRecord?.account?.governingTokenOwner
+                      }
+                      height="12px"
+                      width="100px"
+                      dark={true}
+                    />
+                    <div className="absolute bg-bkg-1 bottom-0 left-0 w-full h-full opacity-0	" />
+                  </div>
                 ) : (
                   ''
                 )
@@ -145,13 +148,16 @@ const DelegateBalanceCard = () => {
                   key={councilDelegate?.account?.governingTokenOwner?.toBase58()}
                   value={councilDelegate?.account?.governingTokenOwner?.toBase58()}
                 >
-                  <DisplayAddress
-                    connection={connection.current}
-                    address={councilDelegate?.account?.governingTokenOwner}
-                    height="12px"
-                    width="100px"
-                    dark={true}
-                  />
+                  <div className="relative">
+                    <DisplayAddress
+                      connection={connection.current}
+                      address={councilDelegate?.account?.governingTokenOwner}
+                      height="12px"
+                      width="100px"
+                      dark={true}
+                    />
+                    <div className="absolute bg-bkg-1 bottom-0 left-0 w-full h-full opacity-0	" />
+                  </div>
                 </Select.Option>
               ))}
             </Select>
@@ -187,13 +193,16 @@ const DelegateBalanceCard = () => {
               onChange={handleCommunitySelect}
               componentLabel={
                 ownTokenRecord ? (
-                  <DisplayAddress
-                    connection={connection.current}
-                    address={ownTokenRecord.account.governingTokenOwner}
-                    height="12px"
-                    width="100px"
-                    dark={true}
-                  />
+                  <div className="relative">
+                    <DisplayAddress
+                      connection={connection.current}
+                      address={ownTokenRecord.account.governingTokenOwner}
+                      height="12px"
+                      width="100px"
+                      dark={true}
+                    />
+                    <div className="absolute bg-bkg-1 bottom-0 left-0 w-full h-full opacity-0	" />
+                  </div>
                 ) : (
                   ''
                 )
@@ -207,13 +216,16 @@ const DelegateBalanceCard = () => {
                   key={communityDelegate?.account?.governingTokenOwner?.toBase58()}
                   value={communityDelegate?.account?.governingTokenOwner?.toBase58()}
                 >
-                  <DisplayAddress
-                    connection={connection.current}
-                    address={communityDelegate?.account?.governingTokenOwner}
-                    height="12px"
-                    width="100px"
-                    dark={true}
-                  />
+                  <div className="relative">
+                    <DisplayAddress
+                      connection={connection.current}
+                      address={communityDelegate?.account?.governingTokenOwner}
+                      height="12px"
+                      width="100px"
+                      dark={true}
+                    />
+                    <div className="absolute bg-bkg-1 bottom-0 left-0 w-full h-full opacity-0	" />
+                  </div>
                 </Select.Option>
               ))}
             </Select>
