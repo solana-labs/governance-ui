@@ -5,6 +5,7 @@ import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 
 import useWalletStore from 'stores/useWalletStore'
+import { notify } from '@utils/notifications'
 
 import FormHeader from '../FormHeader'
 import FormField from '../FormField'
@@ -113,8 +114,8 @@ export default function Step2({ onSubmit, onPrevClick }) {
     } else {
       ev.preventDefault()
     }
-    const fullAddressSet = new Set([...inviteList, ...validPastedAddrsses])
-    setInviteList([...fullAddressSet])
+    const updatedPasteBuffer = new Set([...pasteBuffer, ...validPastedAddrsses])
+    setPasteBuffer([...updatedPasteBuffer])
   }
 
   function handleKeyDown(ev) {
@@ -138,24 +139,30 @@ export default function Step2({ onSubmit, onPrevClick }) {
 
   function addAddressesToInviteList() {
     setValidationError('')
-    const inputString = inputElement?.current?.value
-    if (inputString) {
-      const validatedAddress = validateInput(inputString)
-      if (validatedAddress.length === 0) {
-        return setValidationError('Invalid wallet address')
-      }
-      const fullAddressSet = new Set([
-        ...inviteList,
-        ...pasteBuffer,
-        ...validatedAddress,
-      ])
-      setPasteBuffer([])
-      setInviteList([...fullAddressSet])
 
-      if (inputElement?.current?.value) {
-        inputElement.current.value = ''
-      }
+    const validatedAddress = validateInput(inputElement?.current?.value || '')
+    if (pasteBuffer.length === 0 && validatedAddress.length === 0) {
+      return setValidationError('Invalid wallet address')
     }
+
+    const fullAddressSet = new Set([
+      ...inviteList,
+      ...pasteBuffer,
+      ...validatedAddress,
+    ])
+    setPasteBuffer([])
+    setInviteList([...fullAddressSet])
+    const additionalCount = [...fullAddressSet].length
+
+    if (inputElement?.current?.value) {
+      inputElement.current.value = ''
+    }
+    return notify({
+      type: 'success',
+      message: `Added ${additionalCount} ${
+        additionalCount === 0 || additionalCount > 1 ? 'Addresses' : 'Address'
+      }`,
+    })
   }
 
   function removeAddressFromPasteBuffer(address) {
