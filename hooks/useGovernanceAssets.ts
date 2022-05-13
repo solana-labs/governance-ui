@@ -120,6 +120,11 @@ export default function useGovernanceAssets() {
   )
   const availableInstructions = [
     {
+      id: Instructions.ChangeMakeDonation,
+      name: 'Change - Donation to Charity',
+      isVisible: canUseAnyInstruction,
+    },
+    {
       id: Instructions.Transfer,
       name: 'Transfer Tokens',
       isVisible: canUseTokenTransferInstruction,
@@ -189,16 +194,6 @@ export default function useGovernanceAssets() {
       id: Instructions.Base64,
       name: 'Execute Custom Instruction',
       isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.VotingMintConfig,
-      name: 'Vote Escrowed Tokens: Configure Voting Mint',
-      isVisible: canUseAuthorityInstruction,
-    },
-    {
-      id: Instructions.CreateVsrRegistrar,
-      name: 'Vote Escrowed Tokens: Create Registrar',
-      isVisible: canUseAuthorityInstruction,
     },
     {
       id: Instructions.DepositIntoCastle,

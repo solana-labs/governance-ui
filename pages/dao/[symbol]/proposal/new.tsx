@@ -71,9 +71,8 @@ import RealmConfig from './components/instructions/RealmConfig'
 import MakeAddMarketMetadataParams from './components/instructions/Foresight/MakeAddMarketMetadataParams'
 import CloseTokenAccount from './components/instructions/CloseTokenAccount'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
-import VotingMintConfig from './components/instructions/Vsr/VotingMintConfig'
-import CreateVsrRegistrar from './components/instructions/Vsr/CreateRegistrar'
 import CastleWithdraw from './components/instructions/Castle/CastleWithdraw'
+import ChangeDonation from './components/instructions/Change/ChangeDonation'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -302,6 +301,10 @@ const New = () => {
             governance={governance}
           ></SplTokenTransfer>
         )
+      case Instructions.ChangeMakeDonation:
+        return (
+          <ChangeDonation index={idx} governance={governance}></ChangeDonation>
+        )
       case Instructions.ProgramUpgrade:
         return (
           <ProgramUpgrade index={idx} governance={governance}></ProgramUpgrade>
@@ -467,20 +470,6 @@ const New = () => {
             index={idx}
             governance={governance}
           ></CloseTokenAccount>
-        )
-      case Instructions.VotingMintConfig:
-        return (
-          <VotingMintConfig
-            index={idx}
-            governance={governance}
-          ></VotingMintConfig>
-        )
-      case Instructions.CreateVsrRegistrar:
-        return (
-          <CreateVsrRegistrar
-            index={idx}
-            governance={governance}
-          ></CreateVsrRegistrar>
         )
       default:
         null

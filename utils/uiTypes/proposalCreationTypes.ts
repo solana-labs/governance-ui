@@ -311,8 +311,7 @@ export enum Instructions {
   CreateNftPluginMaxVoterWeight,
   ConfigureNftPluginCollection,
   CloseTokenAccount,
-  VotingMintConfig,
-  CreateVsrRegistrar,
+  ChangeMakeDonation,
 }
 
 export type createParams = [
@@ -339,4 +338,30 @@ export interface InstructionsContext {
   handleSetInstructions: (val, index) => void
   governance: ProgramAccount<Governance> | null | undefined
   setGovernance: (val) => void
+}
+
+export interface ChangeNonprofit {
+  name: string
+  mission: string
+  ein: string
+  classification: string
+  category: string
+  address_line: string
+  city: string
+  state: string
+  zip_code: string
+  icon_url: string
+  email?: string
+  website: string
+  socials: {
+    facebook?: string
+    instagram?: string
+    tiktok?: string
+    twitter?: string
+    youtube?: string
+  }
+  crypto: {
+    solana_address: string
+    ethereum_address: string
+  }
 }
