@@ -269,7 +269,14 @@ const LockTokenStats = () => {
 
   useEffect(() => {
     const getLockedDeposits = async () => {
-      const allVoters = await vsrClient?.program.account.voter.all()
+      const allVoters = await vsrClient?.program.account.voter.all([
+        {
+          memcmp: {
+            offset: 40,
+            bytes: voteStakeRegistryRegistrarPk!.toBase58(),
+          },
+        },
+      ])
       const currentRealmVoters =
         allVoters?.filter(
           (x) =>
@@ -278,7 +285,7 @@ const LockTokenStats = () => {
         ) || []
       setVoters(currentRealmVoters)
     }
-    if (vsrClient) {
+    if (vsrClient && voteStakeRegistryRegistrarPk) {
       getLockedDeposits()
     }
   }, [
