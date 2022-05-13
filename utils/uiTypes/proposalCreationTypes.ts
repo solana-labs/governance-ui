@@ -274,6 +274,22 @@ export interface RefreshReserveForm {
   mintName?: SupportedMintName
 }
 
+export interface GoblinGoldDepositForm {
+  governedTokenAccount?: AssetAccount | undefined
+  goblinGoldVaultId: string
+  uiAmount: string | undefined
+  mintName?: SupportedMintName | undefined
+  mintInfo: MintInfo | undefined
+}
+
+export interface GoblinGoldWithdrawForm {
+  governedAccount?: AssetAccount
+  uiAmount: string
+  mintName?: SupportedMintName
+  destinationLiquidity?: string
+  mintInfo: MintInfo | undefined
+}
+
 export enum Instructions {
   Transfer,
   ProgramUpgrade,
