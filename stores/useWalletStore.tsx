@@ -207,7 +207,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const connected = get().connected
       const programId = get().selectedRealm.programId
       const realmId = get().selectedRealm.realm?.pubkey
-      const realmMintPk = get().selectedRealm.realm?.account.communityMint
       const selectedCouncilDelegate = get().selectedCouncilDelegate
       const selectedCommunityDelegate = get().selectedCommunityDelegate
 
