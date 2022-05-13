@@ -8,13 +8,13 @@ const ASSET_URL =
 export const WALLET_PROVIDERS = [
   {
     name: 'Phantom',
-    url: 'https://www.phantom.app',
-    icon: `https://www.phantom.app/img/logo.png`,
+    url: 'https://phantom.app',
+    icon: `https://phantom.app/img/logo.png`,
     adapter: new PhantomWalletAdapter(),
   },
   {
     name: 'Solflare',
-    url: 'https://solflare.com/',
+    url: 'https://solflare.com',
     icon: `https://solflare.com/logo.png`,
     adapter: new SolflareWalletAdapter(),
   },

@@ -394,3 +394,35 @@ input[type='range'].with-gradient::-webkit-slider-runnable-track {
   border: none;
   background: transparent;
 }
+
+.gradiented-horizontal-rule1 {
+  width: 64px;
+  height: 1px;
+  flex-grow: 0;
+  opacity: 0.5;
+  margin-top: 8px;
+  background-image: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgb(0, 228, 255, 0.8) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+.gradiented-horizontal-rule1:first-of-type {
+  margin-top: 0;
+}
+
+.double-gradient-horizontal-rule {
+  margin: 16px 0;
+  width: 240px;
+  height: 1px;
+  background-image: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgb(0, 228, 255, 0.8) 25%,
+    rgba(255, 255, 255, 0) 40%,
+    rgba(255, 255, 255, 0) 60%,
+    rgb(0, 228, 255, 0.8) 75%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
