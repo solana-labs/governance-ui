@@ -43,6 +43,8 @@ import {
   TrBody,
   TrHead,
 } from '@components/TableElements'
+import { tryParsePublicKey } from '@tools/core/pubkey'
+import { abbreviateAddress } from '@utils/formatting'
 const VestingVsTime = dynamic(
   () => import('VoteStakeRegistry/components/LockTokenStats/VestingVsTime'),
   {
@@ -370,7 +372,10 @@ const LockTokenStats = () => {
       (page + 1) * walletsPerPage
     )
   }
-
+  const parsedSymbol =
+    typeof symbol === 'string' && tryParsePublicKey(symbol)
+      ? abbreviateAddress(new PublicKey(symbol))
+      : symbol
   const renderAddressName = (wallet) => {
     return (
       <DisplayAddress
@@ -404,7 +409,12 @@ const LockTokenStats = () => {
             {realmInfo?.ogImage ? (
               <img src={realmInfo?.ogImage} className="h-8 mr-3 w-8"></img>
             ) : null}
-            <h1 className="mb-0">{symbol} Stats</h1>
+            <h1 className="mb-0">
+              {typeof symbol === 'string' && tryParsePublicKey(symbol)
+                ? realm?.account.name
+                : symbol}{' '}
+              Stats
+            </h1>
           </div>
         </div>
         {symbol === 'MNGO' && (
@@ -419,8 +429,8 @@ const LockTokenStats = () => {
         <div className="col-span-12 md:col-span-6 lg:col-span-3">
           <InfoBox
             className="h-full"
-            tooltip={`Total current amount of ${symbol} locked`}
-            title={`Total ${symbol} Locked`}
+            tooltip={`Total current amount of ${parsedSymbol} locked`}
+            title={`Total ${parsedSymbol} Locked`}
             val={mngoLocked}
           />
         </div>
@@ -428,7 +438,7 @@ const LockTokenStats = () => {
           <InfoBox
             className="h-full"
             title="Locked With Clawback"
-            tooltip={`Currently locked ${symbol} that the DAO can clawback to the treasury vault`}
+            tooltip={`Currently locked ${parsedSymbol} that the DAO can clawback to the treasury vault`}
             val={mngoLockedWithClawback}
           />
         </div>
@@ -454,7 +464,7 @@ const LockTokenStats = () => {
             />
             <InfoBox
               className="mb-4 w-full md:mb-0 lg:mb-4"
-              tooltip={`Historical total amount of ${symbol} granted to contributors`}
+              tooltip={`Historical total amount of ${parsedSymbol} granted to contributors`}
               title="Total Amount From Grants"
               val={givenGrantsTokenAmount}
             />
@@ -468,7 +478,7 @@ const LockTokenStats = () => {
         </div>
         <div className="col-span-12 lg:col-span-8">
           <div className="border border-fgd-4 p-3 rounded-md">
-            <h3 className="p-3">MNGO Vesting vs. Time</h3>
+            <h3 className="p-3">{parsedSymbol} Vesting vs. Time</h3>
             <div style={{ height: '196px' }}>
               <VestingVsTime
                 data={[
@@ -491,7 +501,7 @@ const LockTokenStats = () => {
         <div className="col-span-12">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 mt-6 w-full">
             <h2 className="mb-3 sm:mb-0">
-              Members with Locked {symbol}{' '}
+              Members with Locked {parsedSymbol}{' '}
               <span className="text-sm text-fgd-3 font-normal">
                 ({walletsCount})
               </span>
@@ -517,7 +527,7 @@ const LockTokenStats = () => {
                   <Th>Address</Th>
                   <Th>Lock Type</Th>
                   <Th>Duration</Th>
-                  <Th>Amount ({symbol})</Th>
+                  <Th>Amount ({parsedSymbol})</Th>
                 </TrHead>
               </thead>
               <tbody>
