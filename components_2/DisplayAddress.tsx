@@ -41,7 +41,12 @@ export default function DisplayAddress({
     <div className="flex">
       {displayName?.includes('@')
         ? displayName
-        : displayName || abbreviateAddress(address, 4)}
+        : displayName || (
+            <div className="flex space-x-2">
+              <img src="/1-Landing-v2/icon-wallet-white.svg" alt="icon" />
+              <div>{abbreviateAddress(address, 4)}</div>
+            </div>
+          )}
     </div>
   )
 }

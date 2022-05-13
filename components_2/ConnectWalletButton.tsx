@@ -100,7 +100,7 @@ const ConnectWalletButton = () => {
   }
 
   return (
-    <Menu as="div" className="relative inline-block text-left w-36 md:w-56">
+    <Menu as="div" className="relative inline-block w-40 text-left md:w-56">
       {({ open }) => (
         <>
           <div>
@@ -119,10 +119,6 @@ const ConnectWalletButton = () => {
                           <div className="flex items-center justify-center flex-shrink-0 w-10 h-10 mr-2 rounded-full bg-bkg-4">
                             <UserCircleIcon className="h-9 text-fgd-3 w-9" />
                           </div>
-                          <img
-                            src="/1-Landing-v2/icon-wallet-white.svg"
-                            alt="icon"
-                          />
                         </div>
                       }
                     />
@@ -136,7 +132,7 @@ const ConnectWalletButton = () => {
                     dark={true}
                   />
                 </div>
-                <div className="text-white flex justify-center items-center rounded-full h-6 w-6 bg-[#292833]">
+                <div className="text-white md:flex hidden justify-center items-center rounded-full h-6 w-6 bg-[#292833]">
                   <ChevronDownIcon
                     className={`${
                       open ? '' : 'rotate-180'
@@ -146,7 +142,7 @@ const ConnectWalletButton = () => {
               </Menu.Button>
             ) : (
               <Menu.Button className="flex items-center justify-between w-full px-4 py-3 font-serif text-black bg-white rounded-md hover:brightness-75 focus-visible:brightness-75 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue focus-visible:ring-opacity-100">
-                <div className="flex items-center text-[16px]">
+                <div className="w-full flex items-center text-[16px] justify-center md:justify-start">
                   {walletConnectionPending ? (
                     <img
                       src={provider?.icon}
@@ -160,12 +156,13 @@ const ConnectWalletButton = () => {
                       className="mr-2"
                     />
                   )}
-                  Wallet Sign-In
+                  <span className="hidden md:block">Wallet</span>
+                  <span>Sign-In</span>
                 </div>
                 <div
                   className={`${
                     open ? '' : 'rotate-180'
-                  } default-transition transform text-white flex justify-center items-center rounded-full h-6 w-6 bg-[#292833]`}
+                  } default-transition transform text-white hidden md:flex justify-center items-center rounded-full h-6 w-6 bg-[#292833]`}
                 >
                   <ChevronDownIcon
                     className={`${
@@ -268,7 +265,7 @@ const ConnectWalletButton = () => {
                         className="w-10 h-10"
                       />
                     </div>
-                    <div className="mt-4 mb-8 text-center px-7">
+                    <div className="px-2 mt-4 mb-8 text-center md:px-7">
                       <Text level="2">
                         Which Solana wallet would you like to use?{' '}
                       </Text>
