@@ -23,6 +23,8 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { usePrevious } from '@hooks/usePrevious'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useMembers from '@components/Members/useMembers'
+import TransactionLoader from '@components/TransactionLoader'
+
 import dynamic from 'next/dynamic'
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -134,6 +136,7 @@ function App({ Component, pageProps }) {
           <WalletIdentityProvider appName={'Realms'}>
             <NavBar />
             <Notifications />
+            <TransactionLoader></TransactionLoader>
             <PageBodyContainer>
               <Component {...pageProps} />
             </PageBodyContainer>

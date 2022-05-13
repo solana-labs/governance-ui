@@ -344,7 +344,6 @@ const MangoDepositComponent = ({
               handleSetForm({ propertyName: 'amount', value: e.target.value })
             }
             step={mintMinAmount}
-            suffix="MNGO"
             onBlur={validateAmountOnBlur}
           />
           {selectedMangoAccount === null && (

@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import {
   Commitment,
@@ -10,7 +11,12 @@ import {
   TransactionSignature,
   Keypair,
 } from '@solana/web3.js'
-import { notify } from './notifications'
+import {
+  closeTransactionProcessUi,
+  incrementProcessedTransactions,
+  showTransactionError,
+  showTransactionsProcessUi,
+} from './transactionsLoader'
 
 interface TransactionInstructionWithType {
   instructionsSet: TransactionInstruction[]
@@ -65,6 +71,7 @@ async function awaitTransactionSignatureConfirmation(
   console.log('Possible timeout block', timeoutBlockHeight)
   let done = false
   let startTimeoutCheck = false
+  let timeout = false
   let status: SignatureStatus | null = {
     slot: 0,
     confirmations: 0,
@@ -96,6 +103,10 @@ async function awaitTransactionSignatureConfirmation(
             }
             if (result.err) {
               console.log('Rejected via websocket', result.err)
+              Sentry.captureException(
+                `awaitTransactionSignatureConfirmation line 107: ${result.err}`,
+                { tags: { tag: 'sendTransactionsErrors' } }
+              )
               reject(result.err)
             } else {
               console.log('Resolved via websocket', result)
@@ -127,9 +138,11 @@ async function awaitTransactionSignatureConfirmation(
               timeoutBlockHeight <= blockHeight!
             ) {
               done = true
+              timeout = true
               console.log('Tx Timeout ----')
               reject({ timeout: true })
             }
+
             if (blockHeight) {
               console.log('Timeout threshold blockheight', timeoutBlockHeight)
               console.log('Current blockheight', blockHeight)
@@ -141,6 +154,10 @@ async function awaitTransactionSignatureConfirmation(
               } else if (status.err) {
                 console.log('REST error for', txid, status)
                 done = true
+                Sentry.captureException(
+                  `awaitTransactionSignatureConfirmation line 158: ${status.err}`,
+                  { tags: { tag: 'sendTransactionsErrors' } }
+                )
                 reject(status.err)
               } else if (!status.confirmations) {
                 console.log('REST no confirmations for', txid, status)
@@ -152,6 +169,10 @@ async function awaitTransactionSignatureConfirmation(
             }
           } catch (e) {
             if (!done) {
+              Sentry.captureException(
+                `awaitTransactionSignatureConfirmation line 173: ${e}`,
+                { tags: { tag: 'sendTransactionsErrors' } }
+              )
               console.log('REST connection error: txid', txid, e)
             }
           }
@@ -162,15 +183,7 @@ async function awaitTransactionSignatureConfirmation(
     }
     fn()
   })
-    .catch((err) => {
-      if (err.timeout) {
-        notify({
-          type: 'warning',
-          message: 'Transactions timeout please try again',
-        })
-        throw { timeout: true }
-      }
-
+    .catch(() => {
       //@ts-ignore
       if (connection._signatureSubscriptions[subId])
         connection.removeSignatureListener(subId)
@@ -181,7 +194,7 @@ async function awaitTransactionSignatureConfirmation(
         connection.removeSignatureListener(subId)
     })
   done = true
-  return status
+  return { status, timeout }
 }
 
 //////////////////////////////////////////////
@@ -223,6 +236,7 @@ export async function sendSignedTransaction({
   timeout = DEFAULT_TIMEOUT,
   block,
   transactionInstructionIdx,
+  showUiComponent = false,
 }: {
   signedTransaction: Transaction
   connection: Connection
@@ -232,6 +246,7 @@ export async function sendSignedTransaction({
   timeout?: number
   block: Block
   transactionInstructionIdx?: number
+  showUiComponent?: boolean
 }): Promise<{ txid: string; slot: number }> {
   const rawTransaction = signedTransaction.serialize()
   const startTime = getUnixTs()
@@ -244,7 +259,7 @@ export async function sendSignedTransaction({
   )
 
   console.log('Started awaiting confirmation for', txid)
-
+  let hasTimeout = false
   let done = false
   ;(async () => {
     while (!done && getUnixTs() - startTime < timeout) {
@@ -263,19 +278,15 @@ export async function sendSignedTransaction({
       true,
       block
     )
-    if (confirmation.err) {
-      console.error(confirmation.err)
+    if (confirmation?.status?.err) {
       throw new Error('Transaction failed: Custom instruction error')
     }
-
-    slot = confirmation?.slot || 0
+    slot = confirmation?.status?.slot || 0
+    hasTimeout = confirmation.timeout
   } catch (err) {
-    if (err.timeout) {
-      throw {
-        txInstructionIdx: transactionInstructionIdx,
-        error: 'Timed out awaiting confirmation on transaction',
-      }
-    }
+    Sentry.captureException(`sendSignedTransaction line 287: ${err}`, {
+      tags: { tag: 'sendTransactionsErrors' },
+    })
     let simulateResult: SimulatedTransactionResponse | null = null
     try {
       simulateResult = (
@@ -289,19 +300,40 @@ export async function sendSignedTransaction({
         for (let i = simulateResult.logs.length - 1; i >= 0; --i) {
           const line = simulateResult.logs[i]
           if (line.startsWith('Program log: ')) {
-            throw new Error(
-              'Transaction failed: ' + line.slice('Program log: '.length)
-            )
+            Sentry.captureException(`sendSignedTransaction line 303: ${line}`)
+            throw {
+              txInstructionIdx: transactionInstructionIdx,
+              error:
+                'Transaction failed: ' + line.slice('Program log: '.length),
+              txid: txid,
+            }
           }
         }
       }
-      throw new Error(JSON.stringify(simulateResult.err))
+      Sentry.captureException(
+        `sendSignedTransaction line 314: ${simulateResult.err}`,
+        { tags: { tag: 'sendTransactionsErrors' } }
+      )
+      throw {
+        txInstructionIdx: transactionInstructionIdx,
+        error: JSON.stringify(simulateResult.err),
+        txid: txid,
+      }
     }
     // throw new Error('Transaction failed');
   } finally {
     done = true
   }
-
+  if (hasTimeout) {
+    throw {
+      txInstructionIdx: transactionInstructionIdx,
+      error: 'Timed out awaiting confirmation on transaction',
+      txid: txid,
+    }
+  }
+  if (showUiComponent) {
+    incrementProcessedTransactions()
+  }
   console.log('Latency', txid, getUnixTs() - startTime)
   return { txid, slot }
 }
@@ -394,14 +426,21 @@ export const sendTransactions = async (
 }
 
 /////////////////////////////////////////
-export const sendTransactionsV2 = async (
-  connection: Connection,
-  wallet: WalletSigner,
-  TransactionInstructions: TransactionInstructionWithType[],
-  signersSet: Keypair[][],
-  autoRetry?: boolean,
+export const sendTransactionsV2 = async ({
+  connection,
+  wallet,
+  TransactionInstructions,
+  signersSet,
+  block,
+  showUiComponent = false,
+}: {
+  connection: Connection
+  wallet: WalletSigner
+  TransactionInstructions: TransactionInstructionWithType[]
+  signersSet: Keypair[][]
   block?: Block
-) => {
+  showUiComponent?: boolean
+}) => {
   if (!wallet.publicKey) throw new Error('Wallet not connected!')
   //block will be used for timeout calculation
   if (!block) {
@@ -459,6 +498,9 @@ export const sendTransactionsV2 = async (
   }
   console.log(transactionCallOrchestrator)
   const signedTxns = await wallet.signAllTransactions(unsignedTxns)
+  if (showUiComponent) {
+    showTransactionsProcessUi(signedTxns.length)
+  }
   console.log(
     'Transactions play type order',
     transactionCallOrchestrator.map((x) => {
@@ -478,6 +520,7 @@ export const sendTransactionsV2 = async (
         typeof fcn.sequenceType === 'undefined' ||
         fcn.sequenceType === SequenceType.Parallel
       ) {
+        //wait for all Parallel
         await Promise.all(
           fcn.transactionsIdx.map((idx) => {
             const transactionIdx = Object.keys(idx)[0]
@@ -487,11 +530,13 @@ export const sendTransactionsV2 = async (
               signedTransaction: signedTxns[transactionIdx],
               block: block!,
               transactionInstructionIdx: transactionInstructionIdx,
+              showUiComponent,
             })
           })
         )
       }
       if (fcn.sequenceType === SequenceType.Sequential) {
+        //wait for all Sequential
         for (const idx of fcn.transactionsIdx) {
           const transactionIdx = Object.keys(idx)[0]
           const transactionInstructionIdx = idx[transactionIdx]
@@ -500,6 +545,7 @@ export const sendTransactionsV2 = async (
             signedTransaction: signedTxns[transactionIdx],
             block,
             transactionInstructionIdx: transactionInstructionIdx,
+            showUiComponent,
           })
         }
       }
@@ -515,36 +561,42 @@ export const sendTransactionsV2 = async (
         maxTransactionsInBath,
         TransactionInstructions.length
       )
-      await sendTransactionsV2(
+      await sendTransactionsV2({
         connection,
         wallet,
-        forwardedTransactions,
-        forwardedSigners,
-        autoRetry
-      )
+        TransactionInstructions: forwardedTransactions,
+        signersSet: forwardedSigners,
+        showUiComponent,
+      })
+    }
+    if (showUiComponent) {
+      closeTransactionProcessUi()
     }
   } catch (e) {
-    if (typeof e?.txInstructionIdx !== 'undefined' && autoRetry) {
-      console.log('Retrying from transactionIx:', e.txInstructionForRetry)
+    if (typeof e?.txInstructionIdx !== 'undefined' && showUiComponent) {
+      console.log('Retrying from transactionIx:', e.txInstructionIdx)
       const idx = e?.txInstructionIdx
       const txInstructionForRetry = TransactionInstructions.slice(
         idx,
         TransactionInstructions.length
       )
       const signersForRetry = signersSet.slice(idx, signersSet.length)
-      notify({
-        type: 'warning',
-        message: 'Transactions timeout running retry',
-      })
-      await sendTransactionsV2(
-        connection,
-        wallet,
-        txInstructionForRetry,
-        signersForRetry
-      )
-    } else {
-      throw e
+      if (showUiComponent) {
+        showTransactionError(
+          () =>
+            sendTransactionsV2({
+              connection,
+              wallet,
+              TransactionInstructions: txInstructionForRetry,
+              signersSet: signersForRetry,
+              showUiComponent,
+            }),
+          e.error,
+          e.txid
+        )
+      }
     }
+    throw e
   }
 }
 

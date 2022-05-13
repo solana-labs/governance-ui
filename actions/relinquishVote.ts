@@ -17,6 +17,7 @@ import {
   SequenceType,
   transactionInstructionsToTypedInstructionsSets,
 } from '@utils/sendTransactions'
+import { NftVoterClient } from '@solana/governance-program-library'
 
 export const relinquishVote = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -42,8 +43,7 @@ export const relinquishVote = async (
     beneficiary
   )
   await plugin.withRelinquishVote(instructions, proposal, voteRecord)
-  const chunkTreshold = 2
-  const shouldChunk = instructions.length > chunkTreshold
+  const shouldChunk = plugin?.client instanceof NftVoterClient
   if (shouldChunk) {
     const insertChunks = chunks(instructions, 2)
     const signerChunks = Array(instructions.length).fill([])
@@ -65,13 +65,13 @@ export const relinquishVote = async (
           )
         ),
     ]
-    await sendTransactionsV2(
+    await sendTransactionsV2({
       connection,
       wallet,
-      instArray,
-      [...signerChunks],
-      true
-    )
+      TransactionInstructions: instArray,
+      signersSet: [...signerChunks],
+      showUiComponent: true,
+    })
   } else {
     const transaction = new Transaction()
     transaction.add(...instructions)
