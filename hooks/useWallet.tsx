@@ -87,6 +87,7 @@ export default function useWallet() {
       })
       await actions.fetchWalletTokenAccounts()
       await actions.fetchOwnVoteRecords()
+      await actions.fetchDelegateVoteRecords()
     })
     wallet.on('disconnect', () => {
       setWalletStore((state) => {

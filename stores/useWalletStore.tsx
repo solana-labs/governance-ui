@@ -88,6 +88,12 @@ interface WalletStore extends State {
   actions: any
   selectedCouncilDelegate: string | undefined
   selectedCommunityDelegate: string | undefined
+  councilDelegateVoteRecordsByProposal: {
+    [proposal: string]: ProgramAccount<VoteRecord>
+  }
+  communityDelegateVoteRecordsByProposal: {
+    [proposal: string]: ProgramAccount<VoteRecord>
+  }
 }
 
 const INITIAL_REALM_STATE = {
@@ -131,6 +137,9 @@ const useWalletStore = create<WalletStore>((set, get) => ({
   tokenAccounts: [],
   selectedCouncilDelegate: undefined,
   selectedCommunityDelegate: undefined,
+  councilDelegateVoteRecordsByProposal: {},
+  communityDelegateVoteRecordsByProposal: {},
+
   set: (fn) => set(produce(fn)),
   actions: {
     async fetchRealmBySymbol(cluster: string, symbol: string) {
@@ -193,6 +202,53 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         })
       }
     },
+    async fetchDelegateVoteRecords() {
+      const connection = get().connection.current
+      const connected = get().connected
+      const programId = get().selectedRealm.programId
+      const realmId = get().selectedRealm.realm?.pubkey
+      const realmMintPk = get().selectedRealm.realm?.account.communityMint
+      const selectedCouncilDelegate = get().selectedCouncilDelegate
+      const selectedCommunityDelegate = get().selectedCommunityDelegate
+
+      const set = get().set
+
+      if (connected && selectedCouncilDelegate && programId && realmId) {
+        const councilDelegateVoteRecordsByProposal = await getVoteRecordsByVoterMapByProposal(
+          connection,
+          programId,
+          new PublicKey(selectedCouncilDelegate)
+        )
+
+        set((state) => {
+          state.councilDelegateVoteRecordsByProposal = councilDelegateVoteRecordsByProposal
+        })
+      } else {
+        set((state) => {
+          state.councilDelegateVoteRecordsByProposal = []
+        })
+      }
+
+      if (connected && selectedCommunityDelegate && programId && realmId) {
+        const communityDelegateVoteRecordsByProposal = await getVoteRecordsByVoterMapByProposal(
+          connection,
+          programId,
+          new PublicKey(selectedCommunityDelegate)
+        )
+
+        set((state) => {
+          state.communityDelegateVoteRecordsByProposal = communityDelegateVoteRecordsByProposal
+        })
+      } else {
+        set((state) => {
+          state.communityDelegateVoteRecordsByProposal = []
+        })
+      }
+    },
+
+    // selectedCouncilDelegate: string | undefined
+    // selectedCommunityDelegate: string | undefined
+
     async fetchOwnVoteRecords() {
       const connection = get().connection.current
       const connected = get().connected
@@ -217,7 +273,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
             realmMintPk
           ),
         ])
-        console.log(ownVoteRecordsByProposal, tokenRecords)
         set((state) => {
           state.ownVoteRecordsByProposal = ownVoteRecordsByProposal
           state.selectedRealm.tokenRecords = tokenRecords
@@ -234,6 +289,8 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedRealm = INITIAL_REALM_STATE
       })
     },
+
+    // TODO: When this happens fetch vote records for selected delegate?
     selectCouncilDelegate(councilDelegate) {
       const set = get().set
       set((s) => {
@@ -502,6 +559,8 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         programId,
         proposal.pubkey
       )
+
+      console.log('voteRecords', voteRecordsByVoter)
 
       set((s) => {
         s.selectedProposal.voteRecordsByVoter = voteRecordsByVoter

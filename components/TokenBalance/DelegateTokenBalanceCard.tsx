@@ -21,7 +21,11 @@ const DelegateBalanceCard = () => {
     mint,
     councilMint,
   } = useRealm()
-  const { actions } = useWalletStore((s) => s)
+  const {
+    actions,
+    selectedCommunityDelegate,
+    selectedCouncilDelegate,
+  } = useWalletStore((s) => s)
 
   useEffect(() => {
     if (
@@ -44,6 +48,11 @@ const DelegateBalanceCard = () => {
       )
     }
   }, [walletId])
+
+  // whenever we change delegate, get that delegates vote record so we can display it
+  useEffect(() => {
+    actions.fetchDelegateVoteRecords()
+  }, [selectedCommunityDelegate, selectedCouncilDelegate])
 
   const getCouncilTokenCount = () => {
     if (walletId && delegates?.[walletId]) {
