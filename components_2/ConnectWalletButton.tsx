@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/router'
 import {
   AddressImage,
   useAddressName,
@@ -24,6 +25,7 @@ import Switch from '../components/Switch'
 import DisplayAddress from './DisplayAddress'
 
 const ConnectWalletButton = () => {
+  const { pathname, query, replace } = useRouter()
   const [useDevnet, setUseDevnet] = useLocalStorageState('false')
   const {
     connected,
@@ -48,12 +50,13 @@ const ConnectWalletButton = () => {
   }, [connection.cluster])
 
   function handleToggleDevnet() {
-    setUseDevnet(!useDevnet)
-    if (useDevnet) {
-      window.location.href = `${window.location.pathname}`
-    } else {
-      window.location.href = `${window.location.href}?cluster=devnet`
-    }
+    const devnetEnabled = !useDevnet
+    setUseDevnet(devnetEnabled)
+    replace(
+      { pathname, query: { ...query, cluster: devnetEnabled ? 'devnet' : '' } },
+      undefined,
+      { shallow: true }
+    )
   }
 
   async function handleConnectDisconnect() {

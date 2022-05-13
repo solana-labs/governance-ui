@@ -65,7 +65,7 @@ export function updateUserInput(schema, setValue) {
 
 export default function MultiSigWizard() {
   const { connected, connection, current: wallet } = useWalletStore((s) => s)
-  const { query, push } = useRouter()
+  const { pathname, query, push } = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const [currentStep, setCurrentStep] = useState(0)
   const [requestPending, setRequestPending] = useState(false)
@@ -84,33 +84,19 @@ export default function MultiSigWizard() {
       SESSION_STORAGE_FORM_KEY,
       JSON.stringify(updatedFormState)
     )
-    push(
-      {
-        pathname: '/solana/create_dao/[type]',
-        query: { type: 'multisig', currentStep: nextStep },
-      },
-      undefined,
-      { shallow: true }
-    )
+    push({ pathname, query: { ...query, currentStep: nextStep } }, undefined, {
+      shallow: true,
+    })
   }
 
   function handlePreviousButton(currentStep) {
     if (currentStep === 1) {
-      push(
-        {
-          pathname: '/solana/create_dao/',
-        },
-        undefined,
-        { shallow: true }
-      )
+      push({ pathname: '/solana/create_dao/' }, undefined, { shallow: true })
     } else {
       const previousStep = currentStep - 1
       console.log('Previous click')
       push(
-        {
-          pathname: '/solana/create_dao/[type]',
-          query: { type: 'multisig', currentStep: previousStep },
-        },
+        { pathname, query: { ...query, currentStep: previousStep } },
         undefined,
         { shallow: true }
       )
