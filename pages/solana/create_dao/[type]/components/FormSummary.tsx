@@ -27,7 +27,9 @@ export default function WizardSummary({
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   function closeModal() {
-    setIsModalOpen(false)
+    if (!submissionPending) {
+      setIsModalOpen(false)
+    }
   }
 
   function openModal() {
@@ -82,7 +84,11 @@ export default function WizardSummary({
                   </Text>
 
                   <div className="flex flex-wrap items-center justify-center pt-6 space-y-8 sm:space-x-8 md:space-x-0 md:justify-between sm:space-y-0">
-                    <Button withBorder onClick={closeModal}>
+                    <Button
+                      withBorder
+                      disabled={submissionPending}
+                      onClick={closeModal}
+                    >
                       <div className="px-16 min-w-[300px] sm:min-w-[240px]">
                         Cancel
                       </div>

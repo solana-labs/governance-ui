@@ -22,7 +22,7 @@ export const Button: FunctionComponent<ButtonProps> = ({
   bgOverride = '',
   ...props
 }) => {
-  let className = `z-0 relative transition-all duration-300 rounded-full font-serif text-[16px] hover:cursor-pointer disabled:cursor-not-allowed opacity-[84] hover:opacity-100 change-image-on-hover `
+  let className = `z-0 relative transition-all duration-300 rounded-full font-serif text-[16px] hover:cursor-pointer disabled:cursor-not-allowed opacity-[84] disabled:opacity-50 hover:opacity-100 change-image-on-hover `
 
   if (secondary && !inverse) {
     // secondary
@@ -34,7 +34,7 @@ export const Button: FunctionComponent<ButtonProps> = ({
     className += 'py-4 px-2 font-regular hover:bg-white/10'
   } else if (withBorder) {
     className +=
-      'py-4 px-2 font-regular border border-white transition-to-white-background hover:text-black'
+      'py-4 px-2 font-regular border border-white transition-to-white-background hover:text-black disabled:text-white'
   } else if (inverse) {
     // primary inverse
     className +=
@@ -55,12 +55,13 @@ export const Button: FunctionComponent<ButtonProps> = ({
 
   return (
     <button className={className} {...props} disabled={disabled || isLoading}>
-      {isLoading && (
-        <div className="pl-4">
+      {isLoading ? (
+        <div className="w-24">
           <Loading />
         </div>
+      ) : (
+        children
       )}
-      <div>{children}</div>
     </button>
   )
 }

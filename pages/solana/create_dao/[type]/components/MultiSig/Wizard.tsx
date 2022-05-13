@@ -162,6 +162,11 @@ export default function MultiSigWizard() {
     }
   }
 
+  function promptUserBeforeLeaving(ev) {
+    ev.preventDefault()
+    ev.returnValue = true
+  }
+
   useEffect(() => {
     if (query?.currentStep && !Array.isArray(query.currentStep)) {
       setCurrentStep(Number(query.currentStep))
@@ -188,6 +193,13 @@ export default function MultiSigWizard() {
         }
       })
   }, [currentStep])
+
+  useEffect(() => {
+    window.addEventListener('beforeunload', promptUserBeforeLeaving)
+    return () => {
+      window.removeEventListener('beforeunload', promptUserBeforeLeaving)
+    }
+  }, [])
 
   return (
     <div className="pt-24 md:pt-28">
