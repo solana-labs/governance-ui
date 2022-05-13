@@ -191,6 +191,16 @@ export default function useGovernanceAssets() {
       isVisible: canUseAnyInstruction,
     },
     {
+      id: Instructions.VotingMintConfig,
+      name: 'Vote Escrowed Tokens: Configure Voting Mint',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
+      id: Instructions.CreateVsrRegistrar,
+      name: 'Vote Escrowed Tokens: Create Registrar',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
       id: Instructions.DepositIntoVolt,
       name: 'Friktion: Deposit into Volt',
       isVisible: canUseAnyInstruction,
@@ -289,16 +299,6 @@ export default function useGovernanceAssets() {
       id: Instructions.CloseTokenAccount,
       name: 'Close token account',
       isVisible: canUseTransferInstruction,
-    },
-    {
-      id: Instructions.VotingMintConfig,
-      name: 'Vote stake registry voting mint config',
-      isVisible: canUseAuthorityInstruction,
-    },
-    {
-      id: Instructions.CreateVsrRegistrar,
-      name: 'Vote stake create registrar',
-      isVisible: canUseAuthorityInstruction,
     },
     {
       id: Instructions.None,
