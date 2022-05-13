@@ -279,12 +279,7 @@ const LockTokenStats = () => {
           },
         },
       ])
-      const currentRealmVoters =
-        allVoters?.filter(
-          (x) =>
-            x.account.registrar.toBase58() ===
-            voteStakeRegistryRegistrarPk?.toBase58()
-        ) || []
+      const currentRealmVoters = allVoters && allVoters.length ? allVoters : []
       setVoters(currentRealmVoters)
     }
     if (vsrClient && voteStakeRegistryRegistrarPk) {
