@@ -23,15 +23,21 @@ import { XCircleIcon } from '@heroicons/react/outline'
 import Tooltip from './Tooltip'
 
 const DelegateCard = () => {
-  const { realm, tokenRecords, councilTokenOwnerRecords } = useRealm()
+  const {
+    realm,
+    tokenRecords,
+    councilTokenOwnerRecords,
+    ownTokenRecord,
+    ownCouncilTokenRecord,
+  } = useRealm()
   const [isLoading, setLoading] = useState<boolean>(false)
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection.current)
   const { fetchRealm } = useWalletStore((s) => s.actions)
 
   const [delegateKey, setDelegateKey] = useState('')
-  const [delegateCouncilToken, setDelegateCouncilToken] = useState(false)
-  const [delegateCommunityToken, setDelegateCommunityToken] = useState(false)
+  const [delegateCouncilToken, setDelegateCouncilToken] = useState(true)
+  const [delegateCommunityToken, setDelegateCommunityToken] = useState(true)
 
   const handleDelegate = async () => {
     const signers: Keypair[] = []
@@ -48,7 +54,12 @@ const DelegateCard = () => {
         realm.owner // governance program public key
       )
 
-      if (delegateCouncilToken && realm?.account?.config?.councilMint) {
+      // if checkbox is checked + connected wallet has a token record to delegate
+      if (
+        delegateCouncilToken &&
+        ownCouncilTokenRecord &&
+        realm?.account?.config?.councilMint
+      ) {
         await withSetGovernanceDelegate(
           instructions,
           realm.owner, // publicKey of program/programId
@@ -61,7 +72,8 @@ const DelegateCard = () => {
         )
       }
 
-      if (delegateCommunityToken) {
+      // if checkbox is checked + connected wallet has a token record to delegate
+      if (delegateCommunityToken && ownTokenRecord) {
         await withSetGovernanceDelegate(
           instructions,
           realm.owner, // publicKey of program/programId
@@ -213,7 +225,8 @@ const DelegateCard = () => {
                 <Checkbox
                   checked={delegateCouncilToken}
                   label={'Council Token'}
-                  disabled={councilRecord ? false : true}
+                  // if user only has 1 type of token, then default it checked and disable unchecking
+                  disabled={tokenRecord && councilRecord ? false : true}
                   onChange={() =>
                     setDelegateCouncilToken(!delegateCouncilToken)
                   }
@@ -225,7 +238,8 @@ const DelegateCard = () => {
                 <Checkbox
                   checked={delegateCommunityToken}
                   label={'Community Token'}
-                  disabled={tokenRecord ? false : true}
+                  // if user only has 1 type of token, then default it checked and disable unchecking
+                  disabled={tokenRecord && councilRecord ? false : true}
                   onChange={() =>
                     setDelegateCommunityToken(!delegateCommunityToken)
                   }
