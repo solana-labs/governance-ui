@@ -14,16 +14,16 @@ import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NewProposalContext } from '../../../new'
 import InstructionForm, { InstructionInputType } from '../FormCreator'
-import { getNftRegistrarPDA } from 'NftVotePlugin/sdk/accounts'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { SYSVAR_RENT_PUBKEY } from '@solana/web3.js'
+import { getRegistrarPDA } from 'VoteStakeRegistry/sdk/accounts'
 
-interface CreateNftRegistrarForm {
+interface CreateVsrRegistrarForm {
   governedAccount: AssetAccount | undefined
-  maxCollections: number
 }
 
-const CreateNftPluginRegistrar = ({
+const CreateVsrRegistrar = ({
   index,
   governance,
 }: {
@@ -31,11 +31,11 @@ const CreateNftPluginRegistrar = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const { realm, realmInfo } = useRealm()
-  const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
+  const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
   const { assetAccounts } = useGovernanceAssets()
   const wallet = useWalletStore((s) => s.current)
   const shouldBeGoverned = index !== 0 && governance
-  const [form, setForm] = useState<CreateNftRegistrarForm>()
+  const [form, setForm] = useState<CreateVsrRegistrarForm>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
   async function getInstruction(): Promise<UiInstruction> {
@@ -46,22 +46,23 @@ const CreateNftPluginRegistrar = ({
       form!.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const { registrar } = await getNftRegistrarPDA(
+      const { registrar, registrarBump } = await getRegistrarPDA(
         realm!.pubkey,
         realm!.account.communityMint,
-        nftClient!.program.programId
+        vsrClient!.program.programId
       )
 
-      const createRegistrarIx = await nftClient!.program.methods
-        .createRegistrar(form!.maxCollections)
+      const createRegistrarIx = await vsrClient!.program.methods
+        .createRegistrar(registrarBump)
         .accounts({
           registrar,
           realm: realm!.pubkey,
           governanceProgramId: realmInfo!.programId,
           realmAuthority: realm!.account.authority!,
-          governingTokenMint: realm!.account.communityMint!,
+          realmGoverningTokenMint: realm!.account.communityMint!,
           payer: wallet.publicKey!,
           systemProgram: SYSTEM_PROGRAM_ID,
+          rent: SYSVAR_RENT_PUBKEY,
         })
         .instruction()
       serializedInstruction = serializeInstructionToBase64(createRegistrarIx)
@@ -70,7 +71,6 @@ const CreateNftPluginRegistrar = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form!.governedAccount?.governance,
-      chunkSplitByDefault: true,
     }
     return obj
   }
@@ -100,16 +100,6 @@ const CreateNftPluginRegistrar = ({
           realm?.account.authority?.toBase58()
       ),
     },
-    {
-      label: 'Max collections',
-      initialValue: 10,
-      name: 'maxCollections',
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      min: 1,
-      validateMinMax: true,
-      hide: true,
-    },
   ]
   return (
     <>
@@ -124,4 +114,4 @@ const CreateNftPluginRegistrar = ({
   )
 }
 
-export default CreateNftPluginRegistrar
+export default CreateVsrRegistrar

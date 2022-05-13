@@ -9,6 +9,7 @@ import { getRealmExplorerHost } from 'tools/routing'
 import Tooltip from './Tooltip'
 import useMembersStore from 'stores/useMembersStore'
 import { vsrPluginsPks } from '@hooks/useVotingPlugins'
+import { tryParsePublicKey } from '@tools/core/pubkey'
 
 const RealmHeader = () => {
   const { fmtUrlWithCluster } = useQueryContext()
@@ -77,11 +78,14 @@ const RealmHeader = () => {
               </a>
             </Link>
           )}
-          {isLockTokensMode && symbol === 'MNGO' && (
+          {isLockTokensMode && (
             <Link href={fmtUrlWithCluster(`/dao/${symbol}/token-stats`)}>
               <a className="default-transition flex items-center cursor-pointer text-fgd-2 hover:text-fgd-3 text-sm">
                 <ChartPieIcon className="flex-shrink-0 h-5 mr-1 w-5" />
-                MNGO stats
+                {typeof symbol === 'string' && tryParsePublicKey(symbol)
+                  ? realm?.account.name
+                  : symbol}{' '}
+                stats
               </a>
             </Link>
           )}
