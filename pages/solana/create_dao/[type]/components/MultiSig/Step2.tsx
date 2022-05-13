@@ -37,18 +37,20 @@ function InviteAddress({
 }) {
   return (
     <div className="flex items-center justify-between">
-      <div className="flex items-center">
+      <div className="flex items-center truncate">
         <div
-          className={`flex justify-center items-center rounded-full h-10 w-10 ${
+          className={`flex rounded-full ${
             currentUser ? 'white-fill text-black' : 'black-fill'
-          } border-gradient`}
+          } border-gradient border-1`}
         >
-          {currentUser ? 'Me' : index}
+          <div className="flex items-center justify-center w-10 h-10 ">
+            {currentUser ? 'Me' : index}
+          </div>
         </div>
-        <div className="ml-4 text-2xl">{address}</div>
+        <div className="w-full pr-4 ml-4 text-2xl truncate">{address}</div>
       </div>
-      <div className="cursor-pointer" onClick={onRemoveClick}>
-        <img src="/1-Landing-v2/icon-x.svg" alt="icon" />
+      <div className="cursor-pointer hover:opacity-80" onClick={onRemoveClick}>
+        <img src="/1-Landing-v2/icon-x.svg" alt="icon" className="w-5" />
       </div>
     </div>
   )
