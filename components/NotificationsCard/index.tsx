@@ -340,6 +340,9 @@ const NotificationsCard = ({ onBackClick }: NotificationCardProps) => {
         )
       ) : (
         <div className="flex flex-col items-center">
+          <div className="mt-10">
+            Please select a DAO to start using Notifi.
+          </div>
           <div className="animate-pulse bg-bkg-3 h-12 w-full mb-4 mt-10 rounded-lg" />
           <div className="animate-pulse bg-bkg-3 h-10 w-full mb-4 rounded-lg" />
           <div className="animate-pulse bg-bkg-3 h-10 w-full  mb-4  rounded-lg" />
