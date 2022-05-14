@@ -281,7 +281,6 @@ const NotificationsCard = ({ onBackClick }: NotificationCardProps) => {
                   placeholder="+1 XXX-XXXX"
                 />
               </InputRow>
-
               {telegramEnabled && (
                 <InputRow
                   label="Telegram"
