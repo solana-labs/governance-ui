@@ -339,10 +339,12 @@ const NotificationsCard = ({ onBackClick }: NotificationCardProps) => {
           </>
         )
       ) : (
-        <>
-          <div className="animate-pulse bg-bkg-3 h-12 mb-4 rounded-lg" />
-          <div className="animate-pulse bg-bkg-3 h-10 rounded-lg" />
-        </>
+        <div className="flex flex-col items-center">
+          <div className="animate-pulse bg-bkg-3 h-12 w-full mb-4 mt-10 rounded-lg" />
+          <div className="animate-pulse bg-bkg-3 h-10 w-full mb-4 rounded-lg" />
+          <div className="animate-pulse bg-bkg-3 h-10 w-full  mb-4  rounded-lg" />
+          <div className="animate-pulse bg-bkg-3 w-1/2 h-10  mb-4 flex rounded-lg" />
+        </div>
       )}
     </div>
   )
