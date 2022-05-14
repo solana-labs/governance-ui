@@ -252,51 +252,55 @@ const NotificationsCard = ({ onBackClick }: NotificationCardProps) => {
                 )
               )}
             </div>
-            <InputRow
-              label="E-mail"
-              icon={<MailIcon className="h-8 text-primary-light w-4 mr-1" />}
-            >
-              <Input
-                className="w-full min-w-full"
-                type="email"
-                value={email}
-                onChange={handleEmail}
-                placeholder="you@email.com"
-              />
-            </InputRow>
+            <div className="pb-5">
+              <InputRow
+                label="email"
+                icon={
+                  <MailIcon className=" z-10 h-10 text-primary-light w-7 mr-1 mt-9 absolute left-3.5" />
+                }
+              >
+                <Input
+                  className="min-w-11/12 py-3 px-4 appearance-none w-11/12 pl-14 outline-0 focus:outline-none"
+                  type="email"
+                  value={email}
+                  onChange={handleEmail}
+                  placeholder="you@email.com"
+                />
+              </InputRow>
+              <InputRow
+                label="email"
+                icon={
+                  <ChatAltIcon className=" z-10 h-10 text-primary-light w-7 mr-1 mt-9 absolute left-3" />
+                }
+              >
+                <Input
+                  className="min-w-11/12 py-3 px-4 appearance-none w-11/12 pl-14 outline-0 focus:outline-none"
+                  type="tel"
+                  value={phone}
+                  onChange={handlePhone}
+                  placeholder="+1 XXX-XXXX"
+                />
+              </InputRow>
 
-            <InputRow
-              label="SMS"
-              icon={<ChatAltIcon className="h-8 text-primary-light w-4 mr-1" />}
-            >
-              <Input
-                className="w-full min-w-full"
-                type="tel"
-                value={phone}
-                onChange={handlePhone}
-                placeholder="+1 XXX-XXXX"
-              />
-            </InputRow>
-
-            {telegramEnabled && (
+              {/* {telegramEnabled && ( */}
               <InputRow
                 label="Telegram"
                 icon={
                   <PaperAirplaneIcon
-                    className="mr-0 h-4 text-primary-light w-4"
+                    className="z-10 h-10 text-primary-light w-7 mr-1 mt-8 absolute left-3"
                     style={{ transform: 'rotate(45deg)' }}
                   />
                 }
               >
                 <Input
-                  className="w-full min-w-full"
+                  className="min-w-11/12 py-3 px-4 appearance-none w-11/12 pl-14 outline-0 focus:outline-none flex"
                   type="text"
                   value={telegram}
                   onChange={handleTelegram}
                   placeholder="Telegram ID"
                 />
               </InputRow>
-            )}
+            </div>
             <div className="flex flex-col space-y-4 mt-4 items-start justify-start">
               <Button
                 tooltipMessage={
@@ -351,17 +355,18 @@ interface InputRowProps {
 
 const InputRow: FunctionComponent<InputRowProps> = ({
   children,
-  icon,
   label,
+  icon,
 }) => {
   return (
-    <div className="flex justify-between items-center content-center mt-4 w-full">
-      <div className="mr-2 py-1 text-sm w-40 h-8 flex items-center">
-        {icon}
-        {label}
-      </div>
+    <label
+      htmlFor={label}
+      className="relative text-gray-400 focus-within:text-gray-600 place-items-center left-5"
+    >
+      {icon}
+      <div className="mr-2 text-sm w-40 h-8 flex items-center"></div>
       {children}
-    </div>
+    </label>
   )
 }
 
