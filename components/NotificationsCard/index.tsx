@@ -40,7 +40,7 @@ const NotificationsCard = ({ onBackClick }: NotificationCardProps) => {
   const [isLoading, setLoading] = useState<boolean>(false)
   const [hasUnsavedChanges, setUnsavedChanges] = useState<boolean>(false)
   const [errorMessage, setErrorMessage] = useState<string>('')
-  const [telegramEnabled, setTelegramEnabled] = useState<boolean>(true)
+  const [telegramEnabled, setTelegramEnabled] = useState<boolean>(false)
 
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
@@ -282,26 +282,27 @@ const NotificationsCard = ({ onBackClick }: NotificationCardProps) => {
                 />
               </InputRow>
 
-              {/* {telegramEnabled && ( */}
-              <InputRow
-                label="Telegram"
-                icon={
-                  <PaperAirplaneIcon
-                    className="z-10 h-10 text-primary-light w-7 mr-1 mt-8 absolute left-3"
-                    style={{ transform: 'rotate(45deg)' }}
+              {telegramEnabled && (
+                <InputRow
+                  label="Telegram"
+                  icon={
+                    <PaperAirplaneIcon
+                      className="z-10 h-10 text-primary-light w-7 mr-1 mt-8 absolute left-3"
+                      style={{ transform: 'rotate(45deg)' }}
+                    />
+                  }
+                >
+                  <Input
+                    className="min-w-11/12 py-3 px-4 appearance-none w-11/12 pl-14 outline-0 focus:outline-none flex"
+                    type="text"
+                    value={telegram}
+                    onChange={handleTelegram}
+                    placeholder="Telegram ID"
                   />
-                }
-              >
-                <Input
-                  className="min-w-11/12 py-3 px-4 appearance-none w-11/12 pl-14 outline-0 focus:outline-none flex"
-                  type="text"
-                  value={telegram}
-                  onChange={handleTelegram}
-                  placeholder="Telegram ID"
-                />
-              </InputRow>
+                </InputRow>
+              )}
             </div>
-            <div className="flex flex-col space-y-4 mt-4 items-start justify-start">
+            <div className="flex flex-col space-y-4 mt-4 items-center justify-content-center align-items-center">
               <Button
                 tooltipMessage={
                   disabled
@@ -310,7 +311,7 @@ const NotificationsCard = ({ onBackClick }: NotificationCardProps) => {
                     ? 'Save settings for notifications'
                     : 'Fetch stored values for existing accounts'
                 }
-                className="sm:w-full"
+                className="w-11/12"
                 disabled={disabled}
                 onClick={
                   hasUnsavedChanges || isAuthenticated()
