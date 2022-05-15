@@ -311,6 +311,8 @@ export enum Instructions {
   CreateNftPluginMaxVoterWeight,
   ConfigureNftPluginCollection,
   CloseTokenAccount,
+  VotingMintConfig,
+  CreateVsrRegistrar,
   ChangeMakeDonation,
 }
 
