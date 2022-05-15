@@ -21,12 +21,16 @@ import { CheckCircleIcon, ChevronDownIcon } from '@heroicons/react/solid'
 
 import Text from './Text'
 import Button from './Button'
-import Switch from '../components/Switch'
 import DisplayAddress from './DisplayAddress'
+
+const CLUSTER_MAP = ['localnet', 'devnet', 'mainnet']
 
 const ConnectWalletButton = () => {
   const { pathname, query, replace } = useRouter()
-  const [useDevnet, setUseDevnet] = useLocalStorageState('false')
+  const [currentCluster, setCurrentCluster] = useLocalStorageState(
+    'cluster',
+    'mainnet'
+  )
   const {
     connected,
     current,
@@ -46,7 +50,7 @@ const ConnectWalletButton = () => {
   ])
 
   useEffect(() => {
-    setUseDevnet(connection.cluster === 'devnet')
+    setCurrentCluster(connection.cluster)
   }, [connection.cluster])
 
   useEffect(() => {
@@ -67,14 +71,15 @@ const ConnectWalletButton = () => {
     }
   }, [walletConnectionPending, provider, current])
 
-  function handleToggleDevnet() {
-    const devnetEnabled = !useDevnet
-    setUseDevnet(devnetEnabled)
-    replace(
-      { pathname, query: { ...query, cluster: devnetEnabled ? 'devnet' : '' } },
-      undefined,
-      { shallow: true }
-    )
+  function updateClusterParam(cluster) {
+    replace({ pathname, query: { ...query, cluster } }, undefined, {
+      shallow: true,
+    })
+  }
+
+  function handleClusterToggle(ev) {
+    const selectedCluster = CLUSTER_MAP[ev.target.value]
+    updateClusterParam(selectedCluster)
   }
 
   async function handleConnectDisconnect() {
@@ -205,7 +210,7 @@ const ConnectWalletButton = () => {
             leaveTo="transform opacity-0 scale-95"
           >
             <Menu.Items className="absolute right-0 w-full mt-2 origin-top-right bg-[#201f27] rounded-md shadow-lg ring-1 ring-black text-white ring-opacity-5 focus:outline-none">
-              <div className="flex flex-col px-2 py-2 overflow-scroll h-full max-h-[calc(100vh_-_120px)]">
+              <div className="flex flex-col px-2 py-2 overflow-scroll h-full max-h-[calc(100vh_-_200px)]">
                 {walletConnectionPending ? (
                   <div className="flex flex-col items-center w-full pt-8">
                     <div className='relative mt-0 bg-contain bg-center bg-no-repeat bg-[url("/1-Landing-v2/logo-realms-blue.png")]'>
@@ -348,24 +353,39 @@ const ConnectWalletButton = () => {
                     </div>
                   </>
                 )}
-                <Menu.Item>
-                  {(active) => (
-                    <div
-                      onClick={handleToggleDevnet}
-                      className={`flex items-center p-2 m-auto mt-2 w-fit default-transition h-9 hover:cursor-pointer rounded focus:outline-none ${
-                        active
-                          ? 'brightness-110 hover:ring-2 ring-white ring-opacity-75'
-                          : ''
-                      }`}
+                <div className="relative flex flex-wrap items-center justify-center w-full px-8">
+                  <Text level="2" className="w-full text-center opacity-60">
+                    Cluster select
+                  </Text>
+                  <input
+                    type="range"
+                    min="0"
+                    max="2"
+                    step="1"
+                    className="w-full mt-2 with-gradient focus:outline-none focus:ring-0 focus:shadow-none"
+                    value={CLUSTER_MAP.indexOf(currentCluster)}
+                    onChange={handleClusterToggle}
+                    style={{
+                      backgroundSize: `${
+                        CLUSTER_MAP.indexOf(currentCluster) * 45
+                      }% 100%`,
+                    }}
+                  />
+                </div>
+
+                <div className="flex justify-between">
+                  {CLUSTER_MAP.map((cluster) => (
+                    <button
+                      key={cluster}
+                      onClick={() => updateClusterParam(cluster)}
+                      className={`flex items-center p-2 m-auto mt-2 w-fit default-transition h-9 hover:cursor-pointer rounded focus:outline-none hover:brightness-110 hover:ring-2 hover:ring-white hover:ring-opacity-75'`}
                     >
-                      <Text level="2">Devnet</Text>
-                      <Switch
-                        checked={useDevnet}
-                        onChange={handleToggleDevnet}
-                      />
-                    </div>
-                  )}
-                </Menu.Item>
+                      <Text level="2" className="opacity-60">
+                        {cluster}
+                      </Text>
+                    </button>
+                  ))}
+                </div>
               </div>
             </Menu.Items>
           </Transition>
