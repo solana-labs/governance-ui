@@ -198,9 +198,9 @@ const ConnectWalletButton = () => {
             leaveTo="transform opacity-0 scale-95"
           >
             <Menu.Items className="absolute right-0 w-full mt-2 origin-top-right bg-[#201f27] rounded-md shadow-lg ring-1 ring-black text-white ring-opacity-5 focus:outline-none">
-              <div className="flex flex-col px-2 py-2 overflow-scroll h-full max-h-[350px]">
+              <div className="flex flex-col px-2 py-2 overflow-scroll h-full max-h-[calc(100vh_-_120px)]">
                 {walletConnectionPending ? (
-                  <div className="flex flex-col items-center w-full pt-16">
+                  <div className="flex flex-col items-center w-full pt-8">
                     <div className='relative mt-0 bg-contain bg-center bg-no-repeat bg-[url("/1-Landing-v2/logo-realms-blue.png")]'>
                       <div className="double-gradient-horizontal-rule"></div>
                       <div className="double-gradient-horizontal-rule"></div>
@@ -211,9 +211,9 @@ const ConnectWalletButton = () => {
                         Connecting to <br /> {provider?.name}...
                       </Text>
                     </div>
-                    <div className="flex flex-col justify-end grow">
+                    <div className="flex flex-col justify-end pt-8 pb-4 grow">
                       <Button
-                        withBorder
+                        secondary
                         type="button"
                         onClick={handleCancelConnect}
                       >
