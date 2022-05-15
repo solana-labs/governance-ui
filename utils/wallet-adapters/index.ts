@@ -16,7 +16,7 @@ export const WALLET_PROVIDERS = [
   },
   {
     name: 'Torus',
-    url: 'https://solflare.com',
+    url: 'https://tor.us',
     icon: `/1-Landing-v2/torus-wallet.svg`,
     adapter: new TorusWalletAdapter(),
   },

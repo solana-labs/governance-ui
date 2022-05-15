@@ -49,6 +49,17 @@ const ConnectWalletButton = () => {
     setUseDevnet(connection.cluster === 'devnet')
   }, [connection.cluster])
 
+  useEffect(() => {
+    // Auto connect when current exists
+    async function connect() {
+      await handleConnectDisconnect()
+      setWalletConnectionPending(false)
+    }
+    if (walletConnectionPending && current && current?.url === provider?.url) {
+      connect()
+    }
+  }, [walletConnectionPending, provider, current])
+
   function handleToggleDevnet() {
     const devnetEnabled = !useDevnet
     setUseDevnet(devnetEnabled)
@@ -75,16 +86,20 @@ const ConnectWalletButton = () => {
     }
   }
 
-  useEffect(() => {
-    // Auto connect when current exists
-    async function connect() {
-      await handleConnectDisconnect()
+  async function handleCancelConnect() {
+    try {
+      if (connected) {
+        await current?.disconnect()
+      }
       setWalletConnectionPending(false)
+    } catch (error) {
+      const err = error as Error
+      return notify({
+        type: 'error',
+        message: err.message,
+      })
     }
-    if (walletConnectionPending && current && current?.url === provider?.url) {
-      connect()
-    }
-  }, [walletConnectionPending, provider, current])
+  }
 
   async function handleTwitterIntegration() {
     try {
@@ -183,9 +198,9 @@ const ConnectWalletButton = () => {
             leaveTo="transform opacity-0 scale-95"
           >
             <Menu.Items className="absolute right-0 w-full mt-2 origin-top-right bg-[#201f27] rounded-md shadow-lg ring-1 ring-black text-white ring-opacity-5 focus:outline-none">
-              <div className="flex flex-col px-2 py-2">
+              <div className="flex flex-col px-2 py-2 overflow-scroll h-full max-h-[350px]">
                 {walletConnectionPending ? (
-                  <div className="flex flex-col items-center w-full py-16 min-h-[300px]">
+                  <div className="flex flex-col items-center w-full pt-16">
                     <div className='relative mt-0 bg-contain bg-center bg-no-repeat bg-[url("/1-Landing-v2/logo-realms-blue.png")]'>
                       <div className="double-gradient-horizontal-rule"></div>
                       <div className="double-gradient-horizontal-rule"></div>
@@ -195,6 +210,17 @@ const ConnectWalletButton = () => {
                       <Text>
                         Connecting to <br /> {provider?.name}...
                       </Text>
+                    </div>
+                    <div className="flex flex-col justify-end grow">
+                      <Button
+                        withBorder
+                        type="button"
+                        onClick={handleCancelConnect}
+                      >
+                        <div className="flex justify-center px-6">
+                          <Text level="2">Cancel</Text>
+                        </div>
+                      </Button>
                     </div>
                   </div>
                 ) : walletConnected ? (
@@ -271,7 +297,7 @@ const ConnectWalletButton = () => {
                       </Text>
                     </div>
                     <div className="space-y-2">
-                      {WALLET_PROVIDERS.map(({ name, url, icon }) => (
+                      {WALLET_PROVIDERS.map(({ name, url, adapter }) => (
                         <Menu.Item key={name}>
                           {({ active }) => (
                             <button
@@ -288,12 +314,26 @@ const ConnectWalletButton = () => {
                                 })
                               }}
                             >
-                              <img src={icon} className="w-6 h-6 mr-3" />
-                              <Text level="2">{name}</Text>
-
-                              {provider?.url === url ? (
-                                <CheckCircleIcon className="w-5 h-5 ml-2 text-green" />
-                              ) : null}
+                              <img
+                                src={adapter?.icon}
+                                className="w-6 h-6 mr-3"
+                              />
+                              <div
+                                className={`flex w-full md:flex-row ${
+                                  provider?.url === url
+                                    ? 'items-center'
+                                    : 'flex-col items-baseline justify-between'
+                                }`}
+                              >
+                                <Text level="2">{name}</Text>
+                                {provider?.url === url ? (
+                                  <CheckCircleIcon className="w-5 h-5 ml-2 text-green item-center" />
+                                ) : adapter?.readyState === 'Installed' ? (
+                                  <Text level="3" className="opacity-50">
+                                    Detected
+                                  </Text>
+                                ) : null}
+                              </div>
                             </button>
                           )}
                         </Menu.Item>
