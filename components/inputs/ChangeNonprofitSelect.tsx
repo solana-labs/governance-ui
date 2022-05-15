@@ -4,7 +4,7 @@ import ErrorField from './ErrorField'
 import Input from '@components/inputs/Input'
 import { ChangeNonprofit } from '@utils/uiTypes/proposalCreationTypes'
 
-const copyText = (textToCopy: string = '') => {
+const copyText = (textToCopy = '') => {
   navigator.clipboard.writeText(textToCopy)
 }
 const NonprofitSelect = ({
