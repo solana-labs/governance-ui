@@ -22,7 +22,7 @@ export const WALLET_PROVIDERS = [
   },
   {
     name: 'Glow',
-    url: 'https://glow.app/',
+    url: 'https://glow.app',
     icon: `/1-Landing-v2/glow-wallet.png`,
     adapter: new GlowWalletAdapter(),
   },

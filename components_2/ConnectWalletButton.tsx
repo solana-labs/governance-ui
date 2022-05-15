@@ -50,7 +50,14 @@ const ConnectWalletButton = () => {
   }, [connection.cluster])
 
   useEffect(() => {
-    // Auto connect when current exists
+    // Auto connect when user refreshes the page
+    if (!connected && current && current?.url === provider?.url) {
+      handleConnectDisconnect()
+    }
+  }, [provider, current])
+
+  useEffect(() => {
+    // Connect to wallet on wallet select without the user having the click twice
     async function connect() {
       await handleConnectDisconnect()
       setWalletConnectionPending(false)
@@ -160,8 +167,8 @@ const ConnectWalletButton = () => {
                 <div className="w-full flex items-center text-[16px] justify-center md:justify-start">
                   {walletConnectionPending ? (
                     <img
-                      src={provider?.icon}
-                      alt={provider?.name + ' logo'}
+                      src={current?.icon}
+                      alt={current?.name + ' logo'}
                       className="w-6 h-6 mr-2"
                     />
                   ) : (
