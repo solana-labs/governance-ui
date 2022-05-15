@@ -121,7 +121,7 @@ export default function useGovernanceAssets() {
   const availableInstructions = [
     {
       id: Instructions.ChangeMakeDonation,
-      name: 'Change - Donation to Charity',
+      name: 'Change: Donation to Charity',
       isVisible: canUseAnyInstruction,
     },
     {

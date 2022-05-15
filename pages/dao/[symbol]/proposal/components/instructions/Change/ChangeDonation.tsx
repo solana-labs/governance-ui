@@ -26,6 +26,7 @@ import {
   getSolTransferInstruction,
   getTransferInstruction,
 } from '@utils/instructionTools'
+import NonprofitSelect from '@components/inputs/ChangeNonprofitSelect'
 
 const ChangeDonation = ({
   index,
@@ -91,7 +92,12 @@ const ChangeDonation = ({
       value: selectedNonprofitDetail?.crypto.solana_address,
       propertyName: 'destinationAccount',
     })
+    setSearchResults([])
+    setSearchInput(selectedNonprofit)
     setNonprofit(selectedNonprofitDetail)
+  }
+  const resetSearchResults = (): void => {
+    setSearchResults([])
   }
   const validateAmountOnBlur = () => {
     const value = form.amount
@@ -110,13 +116,15 @@ const ChangeDonation = ({
   let searchTimeout: number | undefined
   const handleSearch = (evt) => {
     setSearchInput(evt.target.value)
-    performSearch()
+    if (evt.target.value === '') {
+      setSearchResults([])
+      setLoading(false)
+      setNonprofit(undefined)
+    } else {
+      performSearch()
+    }
   }
   const performSearch = () => {
-    if (searchInput === '') {
-      setLoading(false)
-      return
-    }
     setLoading(true)
     if (searchTimeout) {
       clearTimeout(searchTimeout)
@@ -276,28 +284,24 @@ const ChangeDonation = ({
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
       ></GovernedAccountSelect>
-      <Input
-        label="Nonprofit name or EIN"
+      <NonprofitSelect
         value={searchInput}
-        onChange={handleSearch}
-        type="text"
-      />
-      <SearchSelect
+        onSearch={handleSearch}
+        onSelect={(nonprofitName) => handleSelectNonProfit(nonprofitName)}
         className="h-12"
+        showSearchResults={searchResults.length > 0}
         disabled={searchResults.length === 0}
-        onChange={(nonprofitName) => handleSelectNonProfit(nonprofitName)}
-        value={'value field'}
+        nonprofitInformation={selectedNonprofit}
       >
         {searchResults.map((foundNonprofit) => (
-          <SearchSelect.Option
+          <NonprofitSelect.Option
             key={foundNonprofit.ein}
             value={foundNonprofit.name}
           >
             <span>{foundNonprofit.name}</span>
-          </SearchSelect.Option>
+          </NonprofitSelect.Option>
         ))}
-      </SearchSelect>
-
+      </NonprofitSelect>
       {destinationAccount && (
         <div>
           <div className="pb-0.5 text-fgd-3 text-xs">Account owner</div>

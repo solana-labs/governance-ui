@@ -342,7 +342,7 @@ export interface InstructionsContext {
 
 export interface ChangeNonprofit {
   name: string
-  mission: string
+  description: string
   ein: string
   classification: string
   category: string
