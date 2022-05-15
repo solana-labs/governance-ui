@@ -7,7 +7,7 @@ import {
 import { AugmentedProvider } from '@saberhq/solana-contrib';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { findATAAddrSync } from '@uxdprotocol/uxd-client';
+import { findATAAddrSync } from '@utils/ataTools';
 import QuarryMineConfiguration, { SupportedMintName } from '../configuration';
 
 export async function withdrawTokensInstruction({

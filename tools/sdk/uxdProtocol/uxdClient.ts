@@ -6,7 +6,7 @@ import {
   findAddrSync,
   MangoDepository,
   UXDClient,
-} from '@uxdprotocol/uxd-client';
+} from '@uxd-protocol/uxd-client';
 
 export const DEPOSITORY_MINTS = {
   devnet: {

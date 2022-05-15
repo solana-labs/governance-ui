@@ -3,11 +3,8 @@ import { Provider } from '@project-serum/anchor';
 import { Token, ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { TransactionInstruction, PublicKey } from '@solana/web3.js';
 import { TOKEN_PROGRAM_ID } from '@utils/tokens';
-import {
-  Controller,
-  findATAAddrSync,
-  UXD_DECIMALS,
-} from '@uxdprotocol/uxd-client';
+import { Controller, UXD_DECIMALS } from '@uxd-protocol/uxd-client';
+import { findATAAddrSync } from '@utils/ataTools';
 import type { ConnectionContext } from 'utils/connection';
 import {
   getDepositoryMintKey,

@@ -1,7 +1,7 @@
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base';
 import { Connection, PublicKey } from '@solana/web3.js';
-import { findATAAddrSync } from '@uxdprotocol/uxd-client';
+import { findATAAddrSync } from '@utils/ataTools';
 import { uiAmountToNativeBN } from '../units';
 import { buildLifinity, getPoolByLabel } from './lifinity';
 

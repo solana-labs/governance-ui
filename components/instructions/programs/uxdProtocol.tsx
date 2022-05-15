@@ -3,7 +3,7 @@ import { struct, u8, nu64 } from 'buffer-layout';
 import { AccountMetaData } from '@solana/spl-governance';
 import { u128, u64 } from '@project-serum/borsh';
 import { INSURANCE_MINTS } from '@tools/sdk/uxdProtocol/uxdClient';
-import { UXD_DECIMALS } from '@uxdprotocol/uxd-client';
+import { UXD_DECIMALS } from '@uxd-protocol/uxd-client';
 import { nativeAmountToFormattedUiAmount } from '@tools/sdk/units';
 import { BN } from '@project-serum/anchor';
 import { tryGetTokenMint } from '@utils/tokens';
