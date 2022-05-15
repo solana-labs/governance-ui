@@ -1,6 +1,5 @@
 import { Listbox } from '@headlessui/react'
-import { ChevronDownIcon } from '@heroicons/react/solid'
-import { StyledLabel, inputClasses } from './styles'
+import { StyledLabel } from './styles'
 import ErrorField from './ErrorField'
 import Input from '@components/inputs/Input'
 import { ChangeNonprofit } from '@utils/uiTypes/proposalCreationTypes'

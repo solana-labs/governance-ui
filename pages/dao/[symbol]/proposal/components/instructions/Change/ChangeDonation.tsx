@@ -1,6 +1,5 @@
-import React, { ReactNode, useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Input from '@components/inputs/Input'
-import SearchSelect from '@components/inputs/SearchSelect'
 import useRealm from '@hooks/useRealm'
 import { AccountInfo } from '@solana/spl-token'
 import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
@@ -96,9 +95,7 @@ const ChangeDonation = ({
     setSearchInput(selectedNonprofit)
     setNonprofit(selectedNonprofitDetail)
   }
-  const resetSearchResults = (): void => {
-    setSearchResults([])
-  }
+
   const validateAmountOnBlur = () => {
     const value = form.amount
 
@@ -158,17 +155,6 @@ const ChangeDonation = ({
     }, 200)
   }
 
-  /* const noSearchTerm = () => {
-  if (!this.searchInput) {
-    return true;
-  }
-  const searchInputEmpty =
-    this.searchInput.value === null || this.searchInput.value === "";
-  const noSelectedCategory = this.selectedCategory === undefined;
-  return searchInputEmpty && noSelectedCategory;
-}
- */
-
   async function getInstruction(): Promise<UiInstruction> {
     return !form.governedTokenAccount?.isSol
       ? getTransferInstruction({
@@ -226,45 +212,6 @@ const ChangeDonation = ({
     destinationAccount?.publicKey &&
     getAccountName(destinationAccount?.account.address)
   const schema = getTokenTransferSchema({ form, connection })
-  const renderSearchResults = () => {
-    console.log('render')
-    ;<div id="search-results" tabIndex={1}>
-      {searchResults.length !== 0 ? (
-        <>
-          <div id="search-results-title">Nonprofits</div>
-          {searchResults.slice(0, 10).map((nonprofit) => {
-            ;<div className="name">${nonprofit.name}</div>
-          })}
-        </>
-      ) : (
-        <></>
-      )}
-      {searchResults.length === 0 && loading ? (
-        <p id="no-results">
-          <b>No results.</b>
-          <br />
-          Are we missing a nonprofit? Email hello@getchange.io and we'll help!
-        </p>
-      ) : (
-        <></>
-      )}
-      $
-      {loading ? (
-        <div id="loading-overlay">
-          <span className="spinner"></span>
-        </div>
-      ) : (
-        <></>
-      )}
-    </div>
-  }
-  const noSearchTerm = () => {
-    if (!searchInput || searchInput === null || searchInput === '') {
-      return true
-    } else {
-      return false
-    }
-  }
 
   return (
     <>
