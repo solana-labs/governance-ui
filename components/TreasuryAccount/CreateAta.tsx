@@ -4,13 +4,35 @@ import tokenService from '@utils/services/token'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { TokenProgramAccount, tryGetMint } from '@utils/tokens'
 import useWalletStore from 'stores/useWalletStore'
-import { PublicKey } from '@solana/web3.js'
+import {
+  Keypair,
+  PublicKey,
+  Transaction,
+  TransactionInstruction,
+} from '@solana/web3.js'
 import { MintInfo } from '@solana/spl-token'
 import { debounce } from '@utils/debounce'
 import Button from '@components/Button'
 import { createATA } from '@utils/ataTools'
+import { tryGetAta } from '@utils/validations'
+import { sendTransaction } from '@utils/send'
+import useRealm from '@hooks/useRealm'
+import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
+import * as serum from '@project-serum/common'
 
-const CreateAta = ({ owner }: { owner: PublicKey }) => {
+const CreateAta = ({
+  owner,
+  governancePk,
+  createCallback,
+}: {
+  owner: PublicKey
+  governancePk: PublicKey
+  createCallback: () => void
+}) => {
+  const { realm } = useRealm()
+  const refetchGovernanceAccounts = useGovernanceAssetsStore(
+    (s) => s.refetchGovernanceAccounts
+  )
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const [isTyping, setIsTyping] = useState(false)
@@ -20,24 +42,27 @@ const CreateAta = ({ owner }: { owner: PublicKey }) => {
     TokenProgramAccount<MintInfo> | undefined
   >(undefined)
   const tokenList = tokenService._tokenList
-  const token = tokenList.find(
+  const foundToken = tokenList.find(
     (x) =>
       x.address.toLowerCase() === query.toLowerCase() ||
       x.name.toLowerCase() === query.toLowerCase() ||
       x.symbol.toLowerCase() === query.toLowerCase()
   )
-  const mint = tryParsePublicKey(query) ? query : ''
+  const typedMint = tryParsePublicKey(query) ? query : ''
   useEffect(() => {
     const validateMint = async () => {
-      const info = await tryGetMint(connection.current, new PublicKey(mint))
+      const info = await tryGetMint(
+        connection.current,
+        new PublicKey(typedMint)
+      )
       setMintInfo(info)
     }
-    if (mint) {
+    if (typedMint) {
       validateMint()
     } else {
       setMintInfo(undefined)
     }
-  }, [mint])
+  }, [typedMint])
   useEffect(() => {
     setIsTyping(!!query)
     debounce.debounceFcn(async () => {
@@ -45,15 +70,56 @@ const CreateAta = ({ owner }: { owner: PublicKey }) => {
     })
   }, [query])
   const handleCreate = async () => {
+    const mintPk = typedMint
+      ? new PublicKey(typedMint)
+      : new PublicKey(foundToken!.address)
+    if (!mintPk) {
+      throw 'Invalid mint'
+    }
+    if (!wallet) {
+      throw 'Wallet not connected'
+    }
     setIsLoading(true)
-    await createATA(
-      connection.current,
-      wallet,
-      new PublicKey(mint) || new PublicKey(token!.address),
-      owner,
-      wallet!.publicKey!
-    )
+    const existingAta = await tryGetAta(connection.current, mintPk, owner)
+    if (!existingAta) {
+      await createATA(
+        connection.current,
+        wallet,
+        mintPk,
+        owner,
+        wallet!.publicKey!
+      )
+    } else {
+      const instructions: TransactionInstruction[] = []
+      const signers: Keypair[] = []
+      const tokenAccount = new Keypair()
+      const provider = new serum.Provider(
+        connection.current,
+        wallet as serum.Wallet,
+        serum.Provider.defaultOptions()
+      )
+      instructions.push(
+        ...(await serum.createTokenAccountInstrs(
+          provider,
+          tokenAccount.publicKey,
+          mintPk,
+          owner
+        ))
+      )
+      signers.push(tokenAccount)
+      const transaction = new Transaction()
+      transaction.add(...instructions)
+
+      await sendTransaction({
+        transaction,
+        wallet: wallet!,
+        connection: connection.current!,
+        signers,
+      })
+    }
+    await refetchGovernanceAccounts(connection, realm!, governancePk)
     setIsLoading(false)
+    createCallback()
   }
   return (
     <div>
@@ -74,19 +140,19 @@ const CreateAta = ({ owner }: { owner: PublicKey }) => {
         <>
           <div className="text-xs" style={{ minHeight: '16px' }}>
             <div className="text-green">
-              {mint && mintInfo && <div>Token found</div>}
+              {typedMint && mintInfo && <div>Token found</div>}
             </div>
             <div className="text-red">
-              {!mintInfo && !token && <div>Token not found</div>}
+              {!mintInfo && !foundToken && <div>Token not found</div>}
             </div>
           </div>
-          {token && (
+          {foundToken && (
             <div className="mt-1">
               <div className="flex items-center text-fgd-1 border border-fgd-4 p-3 rounded-lg w-full">
-                {token?.logoURI && (
+                {foundToken?.logoURI && (
                   <img
                     className={`flex-shrink-0 h-6 w-6 mr-2.5 mt-0.5`}
-                    src={token?.logoURI}
+                    src={foundToken?.logoURI}
                     onError={({ currentTarget }) => {
                       currentTarget.onerror = null // prevents looping
                       currentTarget.hidden = true
@@ -95,9 +161,11 @@ const CreateAta = ({ owner }: { owner: PublicKey }) => {
                 )}
                 <div className="w-full">
                   <div className="flex items-start justify-between mb-1">
-                    <div className="text-xs text-th-fgd-1">{token?.name}</div>
+                    <div className="text-xs text-th-fgd-1">
+                      {foundToken?.name}
+                    </div>
                   </div>
-                  <div className="text-fgd-3 text-xs">{token?.symbol}</div>
+                  <div className="text-fgd-3 text-xs">{foundToken?.symbol}</div>
                 </div>
               </div>
             </div>
@@ -107,7 +175,7 @@ const CreateAta = ({ owner }: { owner: PublicKey }) => {
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
         <Button
           className="ml-auto"
-          disabled={isLoading || (!mint && !token)}
+          disabled={isLoading || (!typedMint && !foundToken)}
           onClick={handleCreate}
           isLoading={isLoading}
         >

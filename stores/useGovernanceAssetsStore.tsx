@@ -129,15 +129,14 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
     )
     set((s) => {
       s.loadGovernedAccounts = false
-      s.governedTokenAccounts = [
-        ...previousAccounts,
-        ...accounts.filter(
+      s.governedTokenAccounts = [...previousAccounts, ...accounts]
+        .filter(
           (x) =>
             x.type === AccountType.TOKEN ||
             x.type === AccountType.NFT ||
             x.type === AccountType.SOL
-        ),
-      ].filter(filterOutHiddenAccs)
+        )
+        .filter(filterOutHiddenAccs)
       s.assetAccounts = [...previousAccounts, ...accounts].filter(
         filterOutHiddenAccs
       )

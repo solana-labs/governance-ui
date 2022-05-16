@@ -423,7 +423,11 @@ const AccountOverview = () => {
           }}
           isOpen={openAtaModal}
         >
-          <CreateAta owner={currentAccount.extensions.transferAddress!} />
+          <CreateAta
+            createCallback={() => setOpenAtaModal(false)}
+            owner={currentAccount.extensions.transferAddress!}
+            governancePk={currentAccount.governance.pubkey}
+          />
         </Modal>
       )}
       {tradeSerumInfo && (
