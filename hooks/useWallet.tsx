@@ -133,7 +133,7 @@ export default function useWallet() {
   useInterval(async () => {
     console.log('refresh')
     // @ts-ignore
-    const currentAddress = window?.solana?._publicKey.toBase58()
+    const currentAddress = window?.solana?._publicKey?.toBase58()
     const staleAddress = wallet?.publicKey?.toString()
     if (staleAddress !== currentAddress) {
       console.log(
