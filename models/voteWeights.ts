@@ -213,7 +213,6 @@ export class VoteNftWeight implements VoterWeightInterface {
 }
 
 export class SwitchboardQueueVoteWeight implements VoterWeightInterface {
-  //TODO implement council
   communityTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
   councilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
   votingPower: BN
@@ -263,27 +262,30 @@ export class SwitchboardQueueVoteWeight implements VoterWeightInterface {
   }
 
   canCreateProposal(config: GovernanceConfig) {
-    console.log(this.votingPower.toNumber())
     return this.votingPower.gt(new BN(0))
   }
   canCreateGovernanceUsingCommunityTokens(realm: ProgramAccount<Realm>) {
+    return true
     return this.hasMinCommunityWeight(
       realm.account.config.minCommunityTokensToCreateGovernance
     )
   }
   canCreateGovernanceUsingCouncilTokens() {
+    return true
     return (
       this.councilTokenRecord &&
       !this.councilTokenRecord.account.governingTokenDepositAmount.isZero()
     )
   }
   canCreateGovernance(realm: ProgramAccount<Realm>) {
+    return true
     return (
       this.canCreateGovernanceUsingCommunityTokens(realm) ||
       this.canCreateGovernanceUsingCouncilTokens()
     )
   }
   hasMinAmountToVote(mintPk: PublicKey) {
+    return true
     const isCommunity =
       this.communityTokenRecord?.account.governingTokenMint.toBase58() ===
       mintPk.toBase58()
