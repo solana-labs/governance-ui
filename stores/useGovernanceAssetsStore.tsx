@@ -381,10 +381,11 @@ const getAccountsForGovernances = async (
   )
   const mintAccounts = getMintAccounts(mintGovernances, mintGovernancesMintInfo)
   const programAccounts = getProgramAssetAccounts(programGovernances)
-  const auxliaryTokenAccounts = AUXILIARY_TOKEN_ACCOUNTS[realm.account.name]
+  const auxiliaryTokenAccounts = AUXILIARY_TOKEN_ACCOUNTS[realm.account.name]
     ?.length
     ? AUXILIARY_TOKEN_ACCOUNTS[realm.account.name]
     : []
+
   const ownedByGovernancesTokenAccounts = await axios.request({
     url: connection.endpoint,
     method: 'POST',
@@ -417,7 +418,7 @@ const getAccountsForGovernances = async (
           ],
         }
       }),
-      ...auxliaryTokenAccounts.map((x) => {
+      ...auxiliaryTokenAccounts.map((x) => {
         return {
           jsonrpc: '2.0',
           id: x.owner,
@@ -445,7 +446,7 @@ const getAccountsForGovernances = async (
     ]),
   })
   const tokenAccountsJson = ownedByGovernancesTokenAccounts.data.map((x) => {
-    const auxiliaryMatch = auxliaryTokenAccounts.find(
+    const auxiliaryMatch = auxiliaryTokenAccounts.find(
       (auxAcc) => auxAcc.owner === x.id
     )
     if (auxiliaryMatch) {
