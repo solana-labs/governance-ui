@@ -36,6 +36,7 @@ import useMarketStore from 'Strategies/store/marketStore'
 import LoadingRows from './LoadingRows'
 import TradeOnSerum, { TradeOnSerumProps } from './TradeOnSerum'
 import { AccountType } from '@utils/uiTypes/assets'
+import CreateAta from './CreateAta'
 
 const AccountOverview = () => {
   const router = useRouter()
@@ -422,7 +423,7 @@ const AccountOverview = () => {
           }}
           isOpen={openAtaModal}
         >
-          <ConvertToMsol />
+          <CreateAta />
         </Modal>
       )}
       {tradeSerumInfo && (
