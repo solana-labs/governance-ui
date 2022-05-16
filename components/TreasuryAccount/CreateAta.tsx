@@ -42,7 +42,7 @@ const CreateAta = ({
     TokenProgramAccount<MintInfo> | undefined
   >(undefined)
   const tokenList = tokenService._tokenList
-  const foundToken = tokenList.find(
+  const foundByNameToken = tokenList.find(
     (x) =>
       x.address.toLowerCase() === query.toLowerCase() ||
       x.name.toLowerCase() === query.toLowerCase() ||
@@ -74,7 +74,7 @@ const CreateAta = ({
   const handleCreate = async () => {
     const mintPk = typedMint
       ? new PublicKey(typedMint)
-      : new PublicKey(foundToken!.address)
+      : new PublicKey(foundByNameToken!.address)
     if (!mintPk) {
       throw 'Invalid mint'
     }
@@ -143,10 +143,12 @@ const CreateAta = ({
           {!isTyping && (
             <>
               <div className="text-green">
-                {typedMint && mintInfo && <div>Token found</div>}
+                {((typedMint && mintInfo) || foundByNameToken) && (
+                  <div>Token found</div>
+                )}
               </div>
               <div className="text-red">
-                {!mintInfo && !foundToken && query && (
+                {!mintInfo && !foundByNameToken && query && (
                   <div>Token not found</div>
                 )}
               </div>
@@ -158,12 +160,12 @@ const CreateAta = ({
             className="flex items-center text-fgd-1 border border-fgd-4 p-3 rounded-lg w-full"
             style={{ minHeight: '60px' }}
           >
-            {!isTyping && foundToken ? (
+            {!isTyping && foundByNameToken ? (
               <>
-                {foundToken?.logoURI && (
+                {foundByNameToken?.logoURI && (
                   <img
                     className={`flex-shrink-0 h-6 w-6 mr-2.5 mt-0.5`}
-                    src={foundToken?.logoURI}
+                    src={foundByNameToken?.logoURI}
                     onError={({ currentTarget }) => {
                       currentTarget.onerror = null // prevents looping
                       currentTarget.hidden = true
@@ -173,10 +175,12 @@ const CreateAta = ({
                 <div className="w-full">
                   <div className="flex items-start justify-between mb-1">
                     <div className="text-xs text-th-fgd-1">
-                      {foundToken?.name}
+                      {foundByNameToken?.name}
                     </div>
                   </div>
-                  <div className="text-fgd-3 text-xs">{foundToken?.symbol}</div>
+                  <div className="text-fgd-3 text-xs">
+                    {foundByNameToken?.symbol}
+                  </div>
                 </div>
               </>
             ) : (
@@ -192,7 +196,7 @@ const CreateAta = ({
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
         <Button
           className="ml-auto"
-          disabled={isLoading || (!typedMint && !foundToken)}
+          disabled={isLoading || (!typedMint && !foundByNameToken)}
           onClick={handleCreate}
           isLoading={isLoading}
         >
