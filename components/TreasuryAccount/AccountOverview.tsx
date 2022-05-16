@@ -415,7 +415,7 @@ const AccountOverview = () => {
           <ConvertToMsol />
         </Modal>
       )}
-      {openAtaModal && (
+      {openAtaModal && isSol && (
         <Modal
           sizeClassName="sm:max-w-3xl"
           onClose={() => {
@@ -423,7 +423,7 @@ const AccountOverview = () => {
           }}
           isOpen={openAtaModal}
         >
-          <CreateAta />
+          <CreateAta owner={currentAccount.extensions.transferAddress!} />
         </Modal>
       )}
       {tradeSerumInfo && (
