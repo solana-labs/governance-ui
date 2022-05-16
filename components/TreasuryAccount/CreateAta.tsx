@@ -19,6 +19,7 @@ import { sendTransaction } from '@utils/send'
 import useRealm from '@hooks/useRealm'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import * as serum from '@project-serum/common'
+import { InformationCircleIcon } from '@heroicons/react/outline'
 
 const CreateAta = ({
   owner,
@@ -185,7 +186,8 @@ const CreateAta = ({
               </>
             ) : (
               <>
-                <span className="text-primary-light">
+                <span className="text-primary-light text-sm flex items-center">
+                  <InformationCircleIcon className="w-5 mr-1"></InformationCircleIcon>{' '}
                   Type exact mint address, token name or symbol
                 </span>
               </>
