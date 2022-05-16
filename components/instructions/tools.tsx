@@ -56,7 +56,7 @@ export const ACCOUNT_NAMES = {
   DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE: 'Mango DAO Governance Realm',
   '7Sn4TN4ZkMghVBAhZ88UkyzXoYkMScaE6qtk9eWV3rJz':
     'Mango DAO Governance Program',
-  '8tKwcKM4obpoPmTZNZKDt5cCkAatrwHBNteXNrZRvjWj': 'Mango DAO Liquidity Pool',
+  '8tKwcKM4obpoPmTZNZKDt5cCkAatrwHBNteXNrZRvjWj': 'Mango Liquidity Payout Pool',
   '59BEyxwrFpt3x4sZ7TcXC3bHx3seGfqGkATcDx6siLWy':
     'Mango v3 Insurance Fund Vault',
   '9qFV99WD5TKnpYw8w3xz3mgMBR5anoSZo2BynrGmNZqY': 'Mango v3 Revenue Vault',
