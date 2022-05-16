@@ -135,7 +135,7 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   )
 }
 
-const TokenDeposit = ({
+export const TokenDeposit = ({
   mint,
   tokenType,
   councilVote,
@@ -442,7 +442,8 @@ const TokenDeposit = ({
       {config?.account.communityVoterWeightAddin &&
         vsrPluginsPks.includes(
           config?.account.communityVoterWeightAddin.toBase58()
-        ) && (
+        ) &&
+        tokenType === GoverningTokenType.Community && (
           <small className="text-xs mt-3 flex items-center">
             <ExclamationIcon className="w-5 h-5 mr-2"></ExclamationIcon>
             Please withdraw your tokens and deposit again to get governance
