@@ -64,7 +64,9 @@ const CreateAta = ({
     }
   }, [typedMint])
   useEffect(() => {
-    setIsTyping(!!query)
+    if (isTyping !== !!query) {
+      setIsTyping(!!query)
+    }
     debounce.debounceFcn(async () => {
       setIsTyping(false)
     })
@@ -136,19 +138,28 @@ const CreateAta = ({
         />
       </div>
 
-      {!isTyping && query && (
-        <>
-          <div className="text-xs" style={{ minHeight: '16px' }}>
-            <div className="text-green">
-              {typedMint && mintInfo && <div>Token found</div>}
-            </div>
-            <div className="text-red">
-              {!mintInfo && !foundToken && <div>Token not found</div>}
-            </div>
-          </div>
-          {foundToken && (
-            <div className="mt-1">
-              <div className="flex items-center text-fgd-1 border border-fgd-4 p-3 rounded-lg w-full">
+      <>
+        <div className="text-xs" style={{ minHeight: '16px' }}>
+          {!isTyping && (
+            <>
+              <div className="text-green">
+                {typedMint && mintInfo && <div>Token found</div>}
+              </div>
+              <div className="text-red">
+                {!mintInfo && !foundToken && query && (
+                  <div>Token not found</div>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+        <div className="mt-1">
+          <div
+            className="flex items-center text-fgd-1 border border-fgd-4 p-3 rounded-lg w-full"
+            style={{ minHeight: '60px' }}
+          >
+            {!isTyping && foundToken ? (
+              <>
                 {foundToken?.logoURI && (
                   <img
                     className={`flex-shrink-0 h-6 w-6 mr-2.5 mt-0.5`}
@@ -167,11 +178,17 @@ const CreateAta = ({
                   </div>
                   <div className="text-fgd-3 text-xs">{foundToken?.symbol}</div>
                 </div>
-              </div>
-            </div>
-          )}
-        </>
-      )}
+              </>
+            ) : (
+              <>
+                <span className="text-primary-light">
+                  Type exact mint address, token name or symbol
+                </span>
+              </>
+            )}
+          </div>
+        </div>
+      </>
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
         <Button
           className="ml-auto"
