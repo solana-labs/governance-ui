@@ -135,7 +135,7 @@ export default function useWallet() {
     // @ts-ignore
     const currentAddress = window?.solana?._publicKey?.toBase58()
     const staleAddress = wallet?.publicKey?.toString()
-    if (staleAddress !== currentAddress) {
+    if (staleAddress && currentAddress && staleAddress !== currentAddress) {
       console.log(
         `Wallet address changed from ${staleAddress} to ${currentAddress}`
       )
