@@ -40,6 +40,7 @@ import CreateAta from './CreateAta'
 
 const AccountOverview = () => {
   const router = useRouter()
+  const { ownTokenRecord, ownCouncilTokenRecord } = useRealm()
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const nftsPerPubkey = useTreasuryAccountStore((s) => s.governanceNfts)
   const nftsCount =
@@ -259,10 +260,16 @@ const AccountOverview = () => {
           <Button
             className="w-full max-w-lg"
             onClick={() => setOpenAtaModal(true)}
-            disabled={!connected}
+            disabled={!connected || !(ownTokenRecord || ownCouncilTokenRecord)}
           >
             <Tooltip
-              content={!connected && 'You need to be connected to your wallet'}
+              content={
+                !connected
+                  ? 'You need to be connected to your wallet'
+                  : !(ownTokenRecord || ownCouncilTokenRecord)
+                  ? 'You need to be member of dao'
+                  : ''
+              }
             >
               <div>Add new token account</div>
             </Tooltip>
