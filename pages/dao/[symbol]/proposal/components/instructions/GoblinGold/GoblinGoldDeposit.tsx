@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
-import BigNumber from 'bignumber.js'
+// import BigNumber from 'bignumber.js'
 import * as yup from 'yup'
 
 import { BN } from '@project-serum/anchor'
 import {
   Governance,
   ProgramAccount,
-  serializeInstructionToBase64,
+  //   serializeInstructionToBase64,
 } from '@solana/spl-governance'
 import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import { PublicKey } from '@solana/web3.js'
@@ -24,7 +24,6 @@ import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-// import { GoblinGoldVaults } from '@goblingold/goblingold-sdk'
 
 export type GoblinGoldVault = {
   name: string
@@ -112,6 +111,11 @@ const GoblinGoldDeposit = ({
       }
     }
 
+    return {
+      serializedInstruction: '',
+      isValid: false,
+      governance: form.governedTokenAccount?.governance,
+    }
     // const tx = await depositGoblinGold({
     //   obligationOwner: form.governedTokenAccount.governance.pubkey,
     //   liquidityAmount: new BN(new BigNumber(form.amount).toString()),
