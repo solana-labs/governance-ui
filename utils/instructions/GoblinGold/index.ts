@@ -48,7 +48,7 @@ export async function getGoblinGoldDepositInstruction({
   let serializedInstruction = ''
   const prerequisiteInstructions: TransactionInstruction[] = []
   const governedTokenAccount = form.governedTokenAccount as AssetAccount
-  const voltVaultId = new PublicKey(form.voltVaultId as string)
+  const goblinGoldVaultId = new PublicKey(form.goblinGoldVaultId as string)
 
   const signers: Keypair[] = []
   if (
@@ -69,7 +69,7 @@ export async function getGoblinGoldDepositInstruction({
     const cVoltSDK = new ConnectedVoltSDK(
       connection.current,
       wallet.publicKey as PublicKey,
-      await sdk.loadVoltByKey(voltVaultId),
+      await sdk.loadVoltByKey(goblinGoldVaultId),
       undefined,
       governedTokenAccount.governance.pubkey
     )
@@ -103,7 +103,7 @@ export async function getGoblinGoldDepositInstruction({
     try {
       const key = (
         await VoltSDK.findPendingDepositInfoAddress(
-          voltVaultId,
+          goblinGoldVaultId,
           governedTokenAccount.governance.pubkey,
           cVoltSDK.sdk.programs.Volt.programId
         )
@@ -233,7 +233,7 @@ export async function getGoblinGoldWithdrawInstruction({
   let serializedInstruction = ''
   const prerequisiteInstructions: TransactionInstruction[] = []
   const governedTokenAccount = form.governedTokenAccount as AssetAccount
-  const voltVaultId = new PublicKey(form.voltVaultId as string)
+  const goblinGoldVaultId = new PublicKey(form.goblinGoldVaultId as string)
   const depositTokenMint = new PublicKey(form.depositTokenMint as string)
   const signers: Keypair[] = []
   if (
@@ -254,7 +254,7 @@ export async function getGoblinGoldWithdrawInstruction({
     const cVoltSDK = new ConnectedVoltSDK(
       connection.current,
       wallet.publicKey as PublicKey,
-      await sdk.loadVoltByKey(voltVaultId),
+      await sdk.loadVoltByKey(goblinGoldVaultId),
       undefined,
       governedTokenAccount.governance.pubkey
     )
@@ -321,7 +321,7 @@ export async function getGoblinGoldWithdrawInstruction({
       try {
         const key = (
           await VoltSDK.findPendingDepositInfoAddress(
-            voltVaultId,
+            goblinGoldVaultId,
             governedTokenAccount.governance.pubkey,
             cVoltSDK.sdk.programs.Volt.programId
           )
@@ -352,7 +352,7 @@ export async function getGoblinGoldWithdrawInstruction({
       try {
         const key = (
           await VoltSDK.findPendingWithdrawalInfoAddress(
-            voltVaultId,
+            goblinGoldVaultId,
             governedTokenAccount.governance.pubkey,
             cVoltSDK.sdk.programs.Volt.programId
           )

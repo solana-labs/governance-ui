@@ -72,6 +72,7 @@ import MakeAddMarketMetadataParams from './components/instructions/Foresight/Mak
 import CloseTokenAccount from './components/instructions/CloseTokenAccount'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import CastleWithdraw from './components/instructions/Castle/CastleWithdraw'
+import GoblinGoldDeposit from './components/instructions/GoblinGold/GoblinGoldDeposit'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -322,6 +323,10 @@ const New = () => {
         return <FriktionDeposit index={idx} governance={governance} />
       case Instructions.WithdrawFromVolt:
         return <FriktionWithdraw index={idx} governance={governance} />
+      case Instructions.DepositIntoGoblinGold:
+        return <GoblinGoldDeposit index={idx} governance={governance} />
+      //   case Instructions.WithdrawFromGoblinGold:
+      //     return <GoblinGoldWithdraw index={idx} governance={governance} />
       case Instructions.CreateSolendObligationAccount:
         return <CreateObligationAccount index={idx} governance={governance} />
       case Instructions.InitSolendObligationAccount:

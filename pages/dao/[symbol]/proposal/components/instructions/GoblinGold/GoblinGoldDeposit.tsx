@@ -24,7 +24,23 @@ import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { GoblinGoldVaults } from '@goblingold/goblingold-sdk'
+// import { GoblinGoldVaults } from '@goblingold/goblingold-sdk'
+
+export type GoblinGoldVault = {
+  name: string
+  tokenInput: string
+  tvl: BN
+  supply: BN
+  apy: string
+  apr: string
+  aboutTxt: string
+  protocolsTxt: string
+  risksTxt: string
+
+  // todo
+  id: string
+  type: string
+}
 
 const GoblinGoldDeposit = ({
   index,
@@ -41,18 +57,21 @@ const GoblinGoldDeposit = ({
   const programId: PublicKey | undefined = realmInfo?.programId
 
   const [form, setForm] = useState<GoblinGoldDepositForm>({
+    amount: undefined,
     governedTokenAccount: undefined,
     goblinGoldVaultId: '',
-    uiAmount: undefined,
     mintName: undefined,
     mintInfo: undefined,
   })
+  const [governedAccount, setGovernedAccount] = useState<
+    ProgramAccount<Governance> | undefined
+  >(undefined)
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
 
-  const [goblinGoldVaults, setGoblinGoldVaults] = useState<
-    VaultConfig<DeploymentEnvs>[] | null
-  >(null)
+  const [goblinGoldVaults, setGoblinGoldVaults] = useState<GoblinGoldVault[]>(
+    []
+  )
 
   const mintMinAmount = form.mintInfo
     ? getMintMinAmountAsDecimal(form.mintInfo)
@@ -63,6 +82,10 @@ const GoblinGoldDeposit = ({
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
+  }
+
+  const setMintInfo = (value) => {
+    setForm({ ...form, mintInfo: value })
   }
 
   const validateInstruction = async (): Promise<boolean> => {
@@ -89,17 +112,17 @@ const GoblinGoldDeposit = ({
       }
     }
 
-    const tx = await depositGoblinGold({
-      obligationOwner: form.governedTokenAccount.governance.pubkey,
-      liquidityAmount: new BN(new BigNumber(form.uiAmount).toString()),
-      mintName: form.mintName,
-    })
+    // const tx = await depositGoblinGold({
+    //   obligationOwner: form.governedTokenAccount.governance.pubkey,
+    //   liquidityAmount: new BN(new BigNumber(form.amount).toString()),
+    //   mintName: form.mintName,
+    // })
 
-    return {
-      serializedInstruction: serializeInstructionToBase64(tx),
-      isValid: true,
-      governance: form.governedTokenAccount.governance,
-    }
+    // return {
+    //   serializedInstruction: serializeInstructionToBase64(tx),
+    //   isValid: true,
+    //   governance: form.governedTokenAccount.governance,
+    // }
   }
 
   const setAmount = (event) => {
@@ -111,7 +134,7 @@ const GoblinGoldDeposit = ({
   }
 
   const validateAmountOnBlur = () => {
-    const value = form.uiAmount
+    const value = form.amount
 
     handleSetForm({
       value: parseFloat(
@@ -127,11 +150,43 @@ const GoblinGoldDeposit = ({
   useEffect(() => {
     // call for the mainnet friktion volts
     const callfriktionRequest = async () => {
-      const response = await fetch(
-        'https://friktion-labs.github.io/mainnet-tvl-snapshots/friktionSnapshot.json'
-      )
-      const parsedResponse = (await response.json()) as GoblinGoldVaults
-      setGoblinGoldVaults(parsedResponse as GoblinGoldVaults[])
+      //   const response = await fetch(
+      //     'https://friktion-labs.github.io/mainnet-tvl-snapshots/friktionSnapshot.json'
+      //   )
+      //   const parsedResponse = (await response.json()) as GoblinGoldVaults
+      //   setGoblinGoldVaults(parsedResponse as GoblinGoldVaults[])
+      const solanaStrategyBestAPY: GoblinGoldVault = {
+        name: 'Best APY',
+        tokenInput: 'SOL',
+        tvl: new BN(0),
+        supply: new BN(0),
+        apy: '0',
+        apr: '0',
+        aboutTxt:
+          'This strategy automatically rebalances between different lending protocols in order to get the maximum yield in each period.',
+        protocolsTxt: 'Mango, Port, Tulip, Solend and Francium',
+        risksTxt:
+          'The protocols being used underneath (although being audited) present some risks. No audit has been done for the current strategy. Use it at your own risk.',
+        id: '5NRMCHoJtq5vNgxmNgDzAqroKxDWM6mmE8HQnt7p4yLM',
+        type: 'bestApy',
+      }
+      const usdcStrategyBestAPY: GoblinGoldVault = {
+        name: 'Best APY',
+        tokenInput: 'USDC',
+        tvl: new BN(0),
+        supply: new BN(0),
+        apy: '0',
+        apr: '0',
+        aboutTxt:
+          'This strategy automatically rebalances between different lending protocols in order to get the maximum yield in each period.',
+        protocolsTxt: 'Mango, Port, Tulip, Solend and Francium',
+        risksTxt:
+          'The protocols being used underneath (although being audited) present some risks. No audit has been done for the current strategy. Use it at your own risk.',
+        id: 'HAYwz6cHGuGAvLNifqGypH4mzv8fF5wv9SvcYLRGd18Q',
+        type: 'bestApy',
+      }
+      const vaults = [solanaStrategyBestAPY, usdcStrategyBestAPY]
+      setGoblinGoldVaults(vaults)
     }
 
     callfriktionRequest()
@@ -146,13 +201,15 @@ const GoblinGoldDeposit = ({
 
   useEffect(() => {
     handleSetInstructions(
-      {
-        governedAccount: form.governedTokenAccount?.governance,
-        getInstruction,
-      },
+      { governedAccount: governedAccount, getInstruction },
       index
     )
   }, [form])
+
+  useEffect(() => {
+    setGovernedAccount(form.governedTokenAccount?.governance)
+    setMintInfo(form.governedTokenAccount?.extensions.mint?.account)
+  }, [form.governedTokenAccount])
 
   const schema = yup.object().shape({
     governedAccount: yup
@@ -160,7 +217,7 @@ const GoblinGoldDeposit = ({
       .nullable()
       .required('Governed account is required'),
     mintName: yup.string().required('Token Name is required'),
-    uiAmount: yup
+    amount: yup
       .number()
       .moreThan(0, 'Amount should be more than 0')
       .required('Amount is required'),
@@ -189,26 +246,23 @@ const GoblinGoldDeposit = ({
         }
         error={formErrors['goblinGoldVaultId']}
       >
-        {goblinGoldVaults
-          ?.filter((x) => !x.isInCircuits)
-          .map((value) => (
-            <Select.Option key={value.vaultId} value={value.vaultId}>
-              <div className="break-all text-fgd-1 ">
-                <div className="mb-2">{`Vault #${value.vaultType} - ${value.underlyingTokenSymbol} - APY: ${value.apy}%`}</div>
-                <div className="space-y-0.5 text-xs text-fgd-3">
-                  <div className="flex items-center">
-                    Deposit Token: {value.depositTokenSymbol}
-                  </div>
-                  {/* <div>Capacity: {}</div> */}
+        {goblinGoldVaults.map((vault) => (
+          <Select.Option key={vault.id} value={vault.id}>
+            <div className="break-all text-fgd-1 ">
+              <div className="mb-2">{`Vault #${vault.type} - ${vault.tokenInput}`}</div>
+              <div className="space-y-0.5 text-xs text-fgd-3">
+                <div className="flex items-center">
+                  Deposit Token: {vault.tokenInput}
                 </div>
               </div>
-            </Select.Option>
-          ))}
+            </div>
+          </Select.Option>
+        ))}
       </Select>
       <Input
         min={mintMinAmount}
         label="Amount"
-        value={form.uiAmount}
+        value={form.amount}
         type="number"
         onChange={setAmount}
         step={mintMinAmount}
