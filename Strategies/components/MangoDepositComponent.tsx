@@ -43,10 +43,12 @@ import { validateInstruction } from '@utils/instructionTools'
 import * as yup from 'yup'
 import { getValidatedPublickKey } from '@utils/validations'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import WithdrawModal from './WithdrawModal'
 
 const DEPOSIT = 'Deposit'
 const CREATE_REF_LINK = 'Create Referral Link'
 const DELEGATE_ACCOUNT = 'Delegate'
+const WITHDRAW = 'Withdraw'
 
 const MangoDepositComponent = ({
   handledMint,
@@ -124,6 +126,7 @@ const MangoDepositComponent = ({
     { val: DEPOSIT, isVisible: true },
     { val: CREATE_REF_LINK, isVisible: selectedMangoAccount !== null },
     { val: DELEGATE_ACCOUNT, isVisible: selectedMangoAccount !== null },
+    { val: WITHDRAW, isVisible: selectedMangoAccount !== null },
   ]
     .filter((x) => x.isVisible)
     .map((x) => x.val)
@@ -314,6 +317,13 @@ const MangoDepositComponent = ({
           market={market}
           mint={new PublicKey(handledMint)}
         ></CreateRefForm>
+      )}
+      {proposalType === WITHDRAW && (
+        <WithdrawModal
+          market={market}
+          governance={governedTokenAccount!.governance!}
+          selectedMangoAccount={selectedMangoAccount!}
+        ></WithdrawModal>
       )}
 
       {proposalType === DEPOSIT && (
