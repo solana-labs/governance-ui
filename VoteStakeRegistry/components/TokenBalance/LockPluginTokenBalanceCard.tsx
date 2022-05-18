@@ -18,6 +18,7 @@ import { ChevronRightIcon } from '@heroicons/react/solid'
 import InlineNotification from '@components/InlineNotification'
 import Link from 'next/link'
 import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
+import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
 
 const LockPluginTokenBalanceCard = ({
   proposal,
@@ -93,7 +94,7 @@ const LockPluginTokenBalanceCard = ({
       {hasLoaded ? (
         <>
           {communityDepositVisible && (
-            <TokenDeposit
+            <TokenDepositLock
               mint={mint}
               tokenType={GoverningTokenType.Community}
               councilVote={false}
@@ -120,7 +121,7 @@ const LockPluginTokenBalanceCard = ({
   )
 }
 
-const TokenDeposit = ({
+const TokenDepositLock = ({
   mint,
   tokenType,
 }: {

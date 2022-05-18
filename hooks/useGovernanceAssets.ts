@@ -191,6 +191,16 @@ export default function useGovernanceAssets() {
       isVisible: canUseAnyInstruction,
     },
     {
+      id: Instructions.VotingMintConfig,
+      name: 'Vote Escrowed Tokens: Configure Voting Mint',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
+      id: Instructions.CreateVsrRegistrar,
+      name: 'Vote Escrowed Tokens: Create Registrar',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
       id: Instructions.DepositIntoCastle,
       name: 'Castle: Deposit into Vault',
       isVisible: canUseAnyInstruction,

@@ -250,7 +250,11 @@ const getVoterWeight = (
 ) => {
   if (currentPluginPk) {
     if (vsrPluginsPks.includes(currentPluginPk.toBase58())) {
-      return new VoteRegistryVoterWeight(ownTokenRecord, votingPower)
+      return new VoteRegistryVoterWeight(
+        ownTokenRecord,
+        ownCouncilTokenRecord,
+        votingPower
+      )
     }
     if (nftPluginsPks.includes(currentPluginPk.toBase58())) {
       return new VoteNftWeight(

@@ -14,6 +14,7 @@ import { notify } from '@utils/notifications'
 import { useRouter } from 'next/router'
 import Input from '@components/inputs/Input'
 import dynamic from 'next/dynamic'
+
 const RealmsDashboard = dynamic(() => import('./components/RealmsDashboard'))
 
 const Realms = () => {
@@ -22,7 +23,6 @@ const Realms = () => {
     ReadonlyArray<RealmInfo>
   >([])
   const [isLoadingRealms, setIsLoadingRealms] = useState(true)
-
   const { actions, selectedRealm, connection } = useWalletStore((s) => s)
   const { connected, current: wallet } = useWalletStore((s) => s)
   const router = useRouter()

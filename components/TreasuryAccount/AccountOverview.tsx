@@ -36,9 +36,11 @@ import useMarketStore from 'Strategies/store/marketStore'
 import LoadingRows from './LoadingRows'
 import TradeOnSerum, { TradeOnSerumProps } from './TradeOnSerum'
 import { AccountType } from '@utils/uiTypes/assets'
+import CreateAta from './CreateAta'
 
 const AccountOverview = () => {
   const router = useRouter()
+  const { ownTokenRecord, ownCouncilTokenRecord } = useRealm()
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const nftsPerPubkey = useTreasuryAccountStore((s) => s.governanceNfts)
   const nftsCount =
@@ -51,6 +53,7 @@ const AccountOverview = () => {
   const isSol = currentAccount?.isSol
   const isSplToken = currentAccount?.type === AccountType.TOKEN
   const isAuxiliaryAccount = currentAccount?.type === AccountType.AuxiliaryToken
+  const connected = useWalletStore((s) => s.connected)
   const { canUseTransferInstruction } = useGovernanceAssets()
   const connection = useWalletStore((s) => s.connection)
   const recentActivity = useTreasuryAccountStore((s) => s.recentActivity)
@@ -63,6 +66,7 @@ const AccountOverview = () => {
   const [openNftDepositModal, setOpenNftDepositModal] = useState(false)
   const [openCommonSendModal, setOpenCommonSendModal] = useState(false)
   const [openMsolConvertModal, setOpenMsolConvertModal] = useState(false)
+  const [openAtaModal, setOpenAtaModal] = useState(false)
   const accountPublicKey = currentAccount?.extensions.transferAddress
   const strategies = useStrategiesStore((s) => s.strategies)
   const [accountInvestments, setAccountInvestments] = useState<
@@ -252,6 +256,25 @@ const AccountOverview = () => {
             </Tooltip>
           </Button>
         ) : null}
+        {isSol ? (
+          <Button
+            className="w-full max-w-lg"
+            onClick={() => setOpenAtaModal(true)}
+            disabled={!connected || !(ownTokenRecord || ownCouncilTokenRecord)}
+          >
+            <Tooltip
+              content={
+                !connected
+                  ? 'You need to be connected to your wallet'
+                  : !(ownTokenRecord || ownCouncilTokenRecord)
+                  ? 'You need to be member of dao'
+                  : ''
+              }
+            >
+              <div>Add new token account</div>
+            </Tooltip>
+          </Button>
+        ) : null}
       </div>
       {!isAuxiliaryAccount && (
         <div className="pb-8">
@@ -397,6 +420,21 @@ const AccountOverview = () => {
           isOpen={openMsolConvertModal}
         >
           <ConvertToMsol />
+        </Modal>
+      )}
+      {openAtaModal && isSol && (
+        <Modal
+          sizeClassName="sm:max-w-3xl"
+          onClose={() => {
+            setOpenAtaModal(false)
+          }}
+          isOpen={openAtaModal}
+        >
+          <CreateAta
+            createCallback={() => setOpenAtaModal(false)}
+            owner={currentAccount.extensions.transferAddress!}
+            governancePk={currentAccount.governance.pubkey}
+          />
         </Modal>
       )}
       {tradeSerumInfo && (

@@ -18,7 +18,6 @@ import { useEffect, useRef, useState } from 'react'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
-import { MANGO_MINT } from 'Strategies/protocols/mango/tools'
 import {
   DAYS_PER_MONTH,
   SECS_PER_MONTH,
@@ -44,7 +43,8 @@ import {
   TrBody,
   TrHead,
 } from '@components/TableElements'
-import { useRouter } from 'next/router'
+import { tryParsePublicKey } from '@tools/core/pubkey'
+import { abbreviateAddress } from '@utils/formatting'
 const VestingVsTime = dynamic(
   () => import('VoteStakeRegistry/components/LockTokenStats/VestingVsTime'),
   {
@@ -58,7 +58,6 @@ const LockTokenStats = () => {
   const walletsPerPage = 10
   const pagination = useRef<{ setPage: (val) => void }>(null)
   const { realmInfo, realm, symbol, mint, proposals } = useRealm()
-  const router = useRouter()
   const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
   const voteStakeRegistryRegistrarPk = useVotePluginsClientStore(
     (s) => s.state.voteStakeRegistryRegistrarPk
@@ -191,7 +190,7 @@ const LockTokenStats = () => {
     }
     return { vestingPerMonth, months }
   }
-  const fmtMangoAmount = (val) => {
+  const fmtAmount = (val) => {
     const formatter = Intl.NumberFormat('en', {
       notation: 'compact',
     })
@@ -218,14 +217,14 @@ const LockTokenStats = () => {
             .filter(
               (x) =>
                 x.data[0] === 145 &&
-                x.accounts[9].pubkey.toBase58() === MANGO_MINT
+                x.accounts[9].pubkey.toBase58() ===
+                  realm?.account.communityMint.toBase58()
             )
             .map((instruction) => {
               const data = new BorshInstructionCoder(
                 vsrClient!.program.idl
               ).decode(Buffer.from(instruction.data))
                 ?.data as GrantInstruction | null
-
               return {
                 voterPk: instruction.accounts[1].pubkey,
                 amount: data?.amount,
@@ -272,17 +271,20 @@ const LockTokenStats = () => {
 
   useEffect(() => {
     const getLockedDeposits = async () => {
-      const allVoters = await vsrClient?.program.account.voter.all()
-      const currentRealmVoters =
-        allVoters?.filter(
-          (x) =>
-            x.account.registrar.toBase58() ===
-            voteStakeRegistryRegistrarPk?.toBase58()
-        ) || []
+      const allVoters = await vsrClient?.program.account.voter.all([
+        {
+          memcmp: {
+            offset: 40,
+            bytes: voteStakeRegistryRegistrarPk!.toBase58(),
+          },
+        },
+      ])
+      const currentRealmVoters = allVoters && allVoters.length ? allVoters : []
       setVoters(currentRealmVoters)
     }
-
-    getLockedDeposits()
+    if (vsrClient && voteStakeRegistryRegistrarPk) {
+      getLockedDeposits()
+    }
   }, [
     vsrClient?.program.programId.toBase58(),
     voteStakeRegistryRegistrarPk?.toBase58(),
@@ -348,7 +350,9 @@ const LockTokenStats = () => {
         .div(perpMarkets[0].liquidityMiningInfo.targetPeriodLength)
       setLiqudiityMiningEmissionPerMonth(emissionPerMonth)
     }
-    mngoPerpMarket()
+    if (symbol === 'MNGO') {
+      mngoPerpMarket()
+    }
   }, [connection.cluster])
   useEffect(() => {
     setPaginatedWallets(paginateWallets(0))
@@ -363,13 +367,10 @@ const LockTokenStats = () => {
       (page + 1) * walletsPerPage
     )
   }
-
-  useEffect(() => {
-    if (symbol && symbol !== 'MNGO') {
-      router.push(`/dao/${symbol}`, undefined, { shallow: true })
-    }
-  }, [symbol])
-
+  const parsedSymbol =
+    typeof symbol === 'string' && tryParsePublicKey(symbol)
+      ? abbreviateAddress(new PublicKey(symbol))
+      : symbol
   const renderAddressName = (wallet) => {
     return (
       <DisplayAddress
@@ -403,21 +404,28 @@ const LockTokenStats = () => {
             {realmInfo?.ogImage ? (
               <img src={realmInfo?.ogImage} className="h-8 mr-3 w-8"></img>
             ) : null}
-            <h1 className="mb-0">{symbol} Stats</h1>
+            <h1 className="mb-0">
+              {typeof symbol === 'string' && tryParsePublicKey(symbol)
+                ? realm?.account.name
+                : symbol}{' '}
+              Stats
+            </h1>
           </div>
         </div>
+        {symbol === 'MNGO' && (
+          <div className="col-span-12 md:col-span-6 lg:col-span-3">
+            <InfoBox
+              className="h-full"
+              title="Circulating Supply"
+              val={circulatingSupply}
+            />
+          </div>
+        )}
         <div className="col-span-12 md:col-span-6 lg:col-span-3">
           <InfoBox
             className="h-full"
-            title="Circulating Supply"
-            val={circulatingSupply}
-          />
-        </div>
-        <div className="col-span-12 md:col-span-6 lg:col-span-3">
-          <InfoBox
-            className="h-full"
-            tooltip="Total current amount of MNGO locked"
-            title="Total MNGO Locked"
+            tooltip={`Total current amount of ${parsedSymbol} locked`}
+            title={`Total ${parsedSymbol} Locked`}
             val={mngoLocked}
           />
         </div>
@@ -425,18 +433,20 @@ const LockTokenStats = () => {
           <InfoBox
             className="h-full"
             title="Locked With Clawback"
-            tooltip="Currently locked MNGO that the DAO can clawback to the treasury vault"
+            tooltip={`Currently locked ${parsedSymbol} that the DAO can clawback to the treasury vault`}
             val={mngoLockedWithClawback}
           />
         </div>
-        <div className="col-span-12 md:col-span-6 lg:col-span-3">
-          <InfoBox
-            className="h-full"
-            title="Liquidity Mining Emissions P/M"
-            tooltip="Total MNGO emissions from all perp markets per month"
-            val={liquidityMiningEmissionPerMonth}
-          />
-        </div>
+        {symbol === 'MNGO' && (
+          <div className="col-span-12 md:col-span-6 lg:col-span-3">
+            <InfoBox
+              className="h-full"
+              title="Liquidity Mining Emissions P/M"
+              tooltip="Total MNGO emissions from all perp markets per month"
+              val={liquidityMiningEmissionPerMonth}
+            />
+          </div>
+        )}
         <div className="col-span-12 mt-4">
           <h2>Vesting and Grants</h2>
         </div>
@@ -449,7 +459,7 @@ const LockTokenStats = () => {
             />
             <InfoBox
               className="mb-4 w-full md:mb-0 lg:mb-4"
-              tooltip="Historical total amount of MNGO granted to contributors "
+              tooltip={`Historical total amount of ${parsedSymbol} granted to contributors`}
               title="Total Amount From Grants"
               val={givenGrantsTokenAmount}
             />
@@ -463,7 +473,7 @@ const LockTokenStats = () => {
         </div>
         <div className="col-span-12 lg:col-span-8">
           <div className="border border-fgd-4 p-3 rounded-md">
-            <h3 className="p-3">MNGO Vesting vs. Time</h3>
+            <h3 className="p-3">{parsedSymbol} Vesting vs. Time</h3>
             <div style={{ height: '196px' }}>
               <VestingVsTime
                 data={[
@@ -478,7 +488,7 @@ const LockTokenStats = () => {
                     }
                   }),
                 ].reverse()}
-                fmtMangoAmount={fmtMangoAmount}
+                fmtAmount={fmtAmount}
               ></VestingVsTime>
             </div>
           </div>
@@ -486,7 +496,7 @@ const LockTokenStats = () => {
         <div className="col-span-12">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 mt-6 w-full">
             <h2 className="mb-3 sm:mb-0">
-              Members with Locked MNGO{' '}
+              Members with Locked {parsedSymbol}{' '}
               <span className="text-sm text-fgd-3 font-normal">
                 ({walletsCount})
               </span>
@@ -512,7 +522,7 @@ const LockTokenStats = () => {
                   <Th>Address</Th>
                   <Th>Lock Type</Th>
                   <Th>Duration</Th>
-                  <Th>Amount (MNGO)</Th>
+                  <Th>Amount ({parsedSymbol})</Th>
                 </TrHead>
               </thead>
               <tbody>
@@ -561,15 +571,13 @@ const LockTokenStats = () => {
               <div>Amount</div>
             </div>
             {paginatedWallets.map((x, index) => {
-              const fmtMangoAmount = (val) => {
+              const fmtAmount = (val) => {
                 return mint ? getMintDecimalAmount(mint!, val).toFormat(0) : '0'
               }
               const type = Object.keys(x.deposit.lockup.kind)[0] as LockupType
               const typeName = type !== 'monthly' ? type : 'Vested'
               const isConstant = type === 'constant'
-              const lockedTokens = fmtMangoAmount(
-                x.deposit.amountDepositedNative
-              )
+              const lockedTokens = fmtAmount(x.deposit.amountDepositedNative)
               return (
                 <ExpandableRow
                   buttonTemplate={
