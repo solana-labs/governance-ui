@@ -24,6 +24,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { getGoblinGoldDepositInstruction } from '@utils/instructions/GoblinGold'
 
 export type GoblinGoldVault = {
   name: string
@@ -59,7 +60,6 @@ const GoblinGoldDeposit = ({
     amount: undefined,
     governedTokenAccount: undefined,
     goblinGoldVaultId: '',
-    mintName: undefined,
     mintInfo: undefined,
   })
   const [governedAccount, setGovernedAccount] = useState<
@@ -94,39 +94,15 @@ const GoblinGoldDeposit = ({
   }
 
   async function getInstruction(): Promise<UiInstruction> {
-    const isValid = await validateInstruction()
-
-    if (
-      !connection ||
-      !isValid ||
-      !programId ||
-      !form.governedTokenAccount?.governance?.account ||
-      !wallet?.publicKey ||
-      !form.mintName
-    ) {
-      return {
-        serializedInstruction: '',
-        isValid: false,
-        governance: form.governedTokenAccount?.governance,
-      }
-    }
-
-    return {
-      serializedInstruction: '',
-      isValid: false,
-      governance: form.governedTokenAccount?.governance,
-    }
-    // const tx = await depositGoblinGold({
-    //   obligationOwner: form.governedTokenAccount.governance.pubkey,
-    //   liquidityAmount: new BN(new BigNumber(form.amount).toString()),
-    //   mintName: form.mintName,
-    // })
-
-    // return {
-    //   serializedInstruction: serializeInstructionToBase64(tx),
-    //   isValid: true,
-    //   governance: form.governedTokenAccount.governance,
-    // }
+    return await getGoblinGoldDepositInstruction({
+      schema,
+      form,
+      amount: form.amount ?? 0,
+      programId,
+      connection,
+      wallet,
+      setFormErrors,
+    })
   }
 
   const setAmount = (event) => {
@@ -216,11 +192,11 @@ const GoblinGoldDeposit = ({
   }, [form.governedTokenAccount])
 
   const schema = yup.object().shape({
-    governedAccount: yup
+    governedTokenAccount: yup
       .object()
       .nullable()
       .required('Governed account is required'),
-    mintName: yup.string().required('Token Name is required'),
+    goblinGoldVaultId: yup.string().required('Vault ID is required'),
     amount: yup
       .number()
       .moreThan(0, 'Amount should be more than 0')
