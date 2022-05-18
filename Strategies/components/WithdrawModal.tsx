@@ -2,12 +2,15 @@ import {
   makeWithdrawInstruction,
   MangoAccount,
   PublicKey,
-  U64_MAX_BN,
 } from '@blockworks-foundation/mango-client'
 import AdditionalProposalOptions from '@components/AdditionalProposalOptions'
 import Button from '@components/Button'
 import Input from '@components/inputs/Input'
+import Loading from '@components/Loading'
+import Tooltip from '@components/Tooltip'
+import { CheckCircleIcon } from '@heroicons/react/outline'
 import useCreateProposal from '@hooks/useCreateProposal'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import {
@@ -15,13 +18,23 @@ import {
   Governance,
   ProgramAccount,
   serializeInstructionToBase64,
+  TOKEN_PROGRAM_ID,
 } from '@solana/spl-governance'
+import { ASSOCIATED_TOKEN_PROGRAM_ID, Token, u64 } from '@solana/spl-token'
+import { TransactionInstruction } from '@solana/web3.js'
 import { tryParsePublicKey } from '@tools/core/pubkey'
+import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
+import { getATA } from '@utils/ataTools'
 import { abbreviateAddress } from '@utils/formatting'
 import { validateInstruction } from '@utils/instructionTools'
 import { notify } from '@utils/notifications'
 import tokenService from '@utils/services/token'
-import { getValidatedPublickKey } from '@utils/validations'
+import { tryGetMint, tryGetTokenAccount } from '@utils/tokens'
+import {
+  getValidateAccount,
+  getValidatedPublickKey,
+  validateDoseTokenAccountMatchMint,
+} from '@utils/validations'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import BigNumber from 'bignumber.js'
 import { useRouter } from 'next/router'
@@ -39,7 +52,9 @@ const WithdrawModal = ({
   governance: ProgramAccount<Governance>
   market: MarketStore
 }) => {
+  const { canUseTransferInstruction } = useGovernanceAssets()
   const router = useRouter()
+  const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const { symbol } = useRealm()
   const group = market.group!
@@ -49,10 +64,12 @@ const WithdrawModal = ({
     title: '',
     description: '',
     withdrawAddress: '',
+    amount: '',
   })
   const [voteByCouncil, setVoteByCouncil] = useState(false)
-  const [depositIdx, setDepositIdx] = useState<number | null>(null)
+  const [depositIdx, setDepositIdx] = useState<number>(0)
   const [formErrors, setFormErrors] = useState({})
+  const selectedDepositMInt = group?.tokens[depositIdx]?.mint
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
@@ -67,22 +84,45 @@ const WithdrawModal = ({
   const schema = yup.object().shape({
     withdrawAddress: yup
       .string()
-      .test('addressTest', 'Address validation error', function (val: string) {
-        if (val) {
-          try {
-            return !!getValidatedPublickKey(val)
-          } catch (e) {
-            console.log(e)
+      .test(
+        'addressTest',
+        'Address validation error',
+        async function (val: string) {
+          if (val) {
+            try {
+              const currentConnection = connection.current
+              const pubKey = getValidatedPublickKey(val)
+              const account = await getValidateAccount(
+                currentConnection,
+                pubKey
+              )
+              if (account?.value !== null) {
+                const tokenAccount = await tryGetTokenAccount(
+                  currentConnection,
+                  pubKey
+                )
+                if (tokenAccount && selectedDepositMInt) {
+                  await validateDoseTokenAccountMatchMint(
+                    tokenAccount.account,
+                    selectedDepositMInt
+                  )
+                }
+              }
+              return true
+            } catch (e) {
+              console.log(e)
+              return this.createError({
+                message: `${e}`,
+              })
+            }
+          } else {
             return this.createError({
-              message: `${e}`,
+              message: `Address is required`,
             })
           }
-        } else {
-          return this.createError({
-            message: `Address is required`,
-          })
         }
-      }),
+      ),
+    amount: yup.string().required('Amount is required'),
   })
   const handlePropose = async (idx: number) => {
     const rootBank = group.rootBankAccounts[idx]!
@@ -90,7 +130,34 @@ const WithdrawModal = ({
     if (!isValid) {
       return
     }
+    const mintPk = group?.tokens[idx].mint
     const address = new PublicKey(form.withdrawAddress)
+    const mintInfo = await tryGetMint(connection.current, mintPk)
+    const mintAmount = parseMintNaturalAmountFromDecimal(
+      form.amount!,
+      mintInfo!.account.decimals!
+    )
+    const prerequisiteInstructions: TransactionInstruction[] = []
+    //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
+    const { currentAddress: receiverAddress, needToCreateAta } = await getATA({
+      connection: connection,
+      receiverAddress: address,
+      mintPK: mintPk,
+      wallet: wallet!,
+    })
+    console.log(needToCreateAta)
+    if (needToCreateAta) {
+      prerequisiteInstructions.push(
+        Token.createAssociatedTokenAccountInstruction(
+          ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+          TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+          mintPk, // mint
+          receiverAddress, // ata
+          address, // owner of token account
+          wallet!.publicKey! // fee payer
+        )
+      )
+    }
     setIsLoading(true)
     const instruction = makeWithdrawInstruction(
       groupConfig.mangoProgramId,
@@ -101,19 +168,22 @@ const WithdrawModal = ({
       rootBank.publicKey,
       rootBank.nodeBanks[0],
       rootBank.nodeBankAccounts[0].vault,
-      address,
+      receiverAddress,
       group.signerKey,
       selectedMangoAccount.spotOpenOrders,
-      U64_MAX_BN,
+      new u64(mintAmount.toString()),
       false
     )
     try {
+      console.log(instruction)
       const instructionData: InstructionDataWithHoldUpTime = {
         data: getInstructionDataFromBase64(
           serializeInstructionToBase64(instruction)
         ),
         holdUpTime: governance!.account!.config.minInstructionHoldUpTime,
-        prerequisiteInstructions: [],
+        prerequisiteInstructions: prerequisiteInstructions,
+        chunkSplitByDefault: true,
+        chunkBy: 1,
       }
       const proposalAddress = await handleCreateProposal({
         title: form.title || proposalTitle,
@@ -130,61 +200,99 @@ const WithdrawModal = ({
       console.log(e)
       notify({ type: 'error', message: "Can't create proposal" })
     }
+    setIsLoading(false)
   }
   return (
     <div>
-      {selectedMangoAccount.deposits.map((x, idx) => {
+      {selectedMangoAccount?.deposits.map((x, idx) => {
         const mint = group?.tokens[idx].mint
         const tokenInfo = tokenService.getTokenInfo(mint!.toBase58())
         const symbol = tokenInfo?.symbol
         return !x.isZero() ? (
-          <div key={idx} onClick={() => setDepositIdx(idx)}>
-            {new BigNumber(
-              selectedMangoAccount
-                .getUiDeposit(market.cache!.rootBankCache[idx], group!, idx)
-                .toNumber()
-            ).toFormat(2)}{' '}
-            {symbol}
+          <div
+            className={`flex items-center p-2 border border-fgd-4 p-3 rounded-lg w-full mb-2 text-sm ${
+              idx === depositIdx ? 'border-primary-light' : ''
+            } hover:cursor-pointer`}
+            key={idx}
+            onClick={() => setDepositIdx(idx)}
+          >
+            <div>
+              {' '}
+              {new BigNumber(
+                selectedMangoAccount
+                  .getUiDeposit(market.cache!.rootBankCache[idx], group!, idx)
+                  .toNumber()
+              ).toFormat(2)}{' '}
+              <span className="text-xs">
+                {symbol ? symbol : abbreviateAddress(mint)}
+              </span>
+            </div>
+            {idx === depositIdx && (
+              <CheckCircleIcon className="w-5 text-green ml-auto"></CheckCircleIcon>
+            )}
           </div>
         ) : null
       })}
-      <Input
-        label={'Withdraw address'}
-        value={form.withdrawAddress}
-        type="text"
-        error={formErrors['withdrawAddress']}
-        onChange={(e) =>
-          handleSetForm({
-            value: e.target.value,
-            propertyName: 'withdrawAddress',
-          })
-        }
-      />
-      <AdditionalProposalOptions
-        title={form.title}
-        description={form.description}
-        defaultTitle={proposalTitle}
-        setTitle={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'title',
-          })
-        }
-        setDescription={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'description',
-          })
-        }
-        voteByCouncil={voteByCouncil}
-        setVoteByCouncil={setVoteByCouncil}
-      />
+      <div className="space-y-4 w-full pb-4">
+        <Input
+          label={'Withdraw address'}
+          value={form.withdrawAddress}
+          type="text"
+          error={formErrors['withdrawAddress']}
+          onChange={(e) =>
+            handleSetForm({
+              value: e.target.value,
+              propertyName: 'withdrawAddress',
+            })
+          }
+        />
+        <Input
+          label={'Amount'}
+          value={form.amount}
+          type="number"
+          min={0}
+          error={formErrors['amount']}
+          onChange={(e) =>
+            handleSetForm({
+              value: e.target.value,
+              propertyName: 'amount',
+            })
+          }
+        />
+        <AdditionalProposalOptions
+          title={form.title}
+          description={form.description}
+          defaultTitle={proposalTitle}
+          setTitle={(evt) =>
+            handleSetForm({
+              value: evt.target.value,
+              propertyName: 'title',
+            })
+          }
+          setDescription={(evt) =>
+            handleSetForm({
+              value: evt.target.value,
+              propertyName: 'description',
+            })
+          }
+          voteByCouncil={voteByCouncil}
+          setVoteByCouncil={setVoteByCouncil}
+        />
+      </div>
       <Button
         className="w-full mt-6"
         onClick={() => handlePropose(depositIdx!)}
-        disabled={isLoading || depositIdx === null}
+        disabled={isLoading || !canUseTransferInstruction}
       >
-        Propose
+        <Tooltip
+          content={
+            !canUseTransferInstruction
+              ? 'Please connect wallet with enough voting power to create treasury proposals'
+              : ''
+          }
+        >
+          {!isLoading ? 'Propose' : <Loading></Loading>}
+        </Tooltip>
       </Button>
     </div>
   )

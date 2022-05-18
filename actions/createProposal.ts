@@ -37,6 +37,7 @@ export interface InstructionDataWithHoldUpTime {
   holdUpTime: number | undefined
   prerequisiteInstructions: TransactionInstruction[]
   chunkSplitByDefault?: boolean
+  chunkBy?: number
   signers?: Keypair[]
   shouldSplitIntoSeparateTxs?: boolean | undefined
 }
@@ -59,6 +60,7 @@ export class InstructionDataWithHoldUpTime {
 
     this.prerequisiteInstructions = instruction.prerequisiteInstructions || []
     this.chunkSplitByDefault = instruction.chunkSplitByDefault || false
+    this.chunkBy = instruction.chunkBy || 2
   }
 }
 
@@ -149,7 +151,11 @@ export const createProposal = async (
   const splitToChunkByDefault = instructionsData.filter(
     (x) => x.chunkSplitByDefault
   ).length
-
+  const chunkBys = instructionsData
+    .filter((x) => x.chunkBy)
+    .map((x) => x.chunkBy!)
+  const chunkBy = Math.min(...chunkBys)
+  console.log(chunkBy)
   for (const [index, instruction] of instructionsData
     .filter((x) => x.data)
     .entries()) {
@@ -243,7 +249,7 @@ export const createProposal = async (
       ),
     })
   } else {
-    const insertChunks = chunks(insertInstructions, 2)
+    const insertChunks = chunks(insertInstructions, chunkBy)
     const signerChunks = Array(insertChunks.length).fill([])
 
     console.log(`Creating proposal using ${insertChunks.length} chunks`)
