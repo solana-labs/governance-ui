@@ -14,7 +14,6 @@ import { PublicKey } from '@solana/web3.js'
 import Input from '@components/inputs/Input'
 import Select from '@components/inputs/Select'
 import useRealm from '@hooks/useRealm'
-import { isFormValid } from '@utils/formValidation'
 import { precision } from '@utils/formatting'
 import {
   GoblinGoldDepositForm,

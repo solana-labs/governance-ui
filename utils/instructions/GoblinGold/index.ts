@@ -168,20 +168,22 @@ export async function getGoblinGoldDepositInstruction({
       throw new Error('Error: selected governance token is not supported')
     }
 
-    // const ataInputAddress = await Token.getAssociatedTokenAddress(
-    //   ASSOCIATED_TOKEN_PROGRAM_ID,
-    //   TOKEN_PROGRAM_ID,
-    //   inputTokenMintAddress,
-    //   governedAccountPk,
-    //   true
-    // )
+    const ataInputAddress = await Token.getAssociatedTokenAddress(
+      ASSOCIATED_TOKEN_PROGRAM_ID,
+      TOKEN_PROGRAM_ID,
+      inputTokenMintAddress,
+      governedAccountPk,
+      true
+    )
 
-    // const ataLpAddress = await createAssociatedTokenAccountIfNotExist(
-    //   connection.current,
-    //   governedAccountPk,
-    //   lpTokenMintAddress,
-    //   prerequisiteInstructions
-    // )
+    const ataLpAddress = await createAssociatedTokenAccountIfNotExist(
+      connection.current,
+      governedAccountPk,
+      lpTokenMintAddress,
+      prerequisiteInstructions
+    )
+
+    console.log('addresses:', ataInputAddress, ataLpAddress)
 
     // const depositIx = await strategyProgram.getDepositIx({
     //   userInputTokenAccount: new PublicKey(ataInputAddress),
