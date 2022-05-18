@@ -1,4 +1,5 @@
 import {
+  BN,
   makeWithdrawInstruction,
   MangoAccount,
   PublicKey,
@@ -20,7 +21,7 @@ import {
   serializeInstructionToBase64,
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-governance'
-import { ASSOCIATED_TOKEN_PROGRAM_ID, Token, u64 } from '@solana/spl-token'
+import { ASSOCIATED_TOKEN_PROGRAM_ID, Token } from '@solana/spl-token'
 import { TransactionInstruction } from '@solana/web3.js'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
@@ -58,7 +59,6 @@ const WithdrawModal = ({
   const wallet = useWalletStore((s) => s.current)
   const { symbol } = useRealm()
   const group = market.group!
-  const groupConfig = market.groupConfig!
   const [isLoading, setIsLoading] = useState(false)
   const [form, setForm] = useState({
     title: '',
@@ -125,12 +125,16 @@ const WithdrawModal = ({
     amount: yup.string().required('Amount is required'),
   })
   const handlePropose = async (idx: number) => {
-    const rootBank = group.rootBankAccounts[idx]!
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     if (!isValid) {
       return
     }
     const mintPk = group?.tokens[idx].mint
+    const tokenIndex = group.getTokenIndex(mintPk)
+    const publicKey =
+      group?.rootBankAccounts?.[tokenIndex]?.nodeBankAccounts[0].publicKey
+    const vault =
+      group?.rootBankAccounts?.[tokenIndex]?.nodeBankAccounts[0].vault
     const address = new PublicKey(form.withdrawAddress)
     const mintInfo = await tryGetMint(connection.current, mintPk)
     const mintAmount = parseMintNaturalAmountFromDecimal(
@@ -145,7 +149,6 @@ const WithdrawModal = ({
       mintPK: mintPk,
       wallet: wallet!,
     })
-    console.log(needToCreateAta)
     if (needToCreateAta) {
       prerequisiteInstructions.push(
         Token.createAssociatedTokenAccountInstruction(
@@ -160,22 +163,21 @@ const WithdrawModal = ({
     }
     setIsLoading(true)
     const instruction = makeWithdrawInstruction(
-      groupConfig.mangoProgramId,
-      groupConfig.publicKey,
+      market.client!.programId,
+      group.publicKey,
       selectedMangoAccount.publicKey,
       wallet!.publicKey!,
       group.mangoCache,
-      rootBank.publicKey,
-      rootBank.nodeBanks[0],
-      rootBank.nodeBankAccounts[0].vault,
+      group.tokens[tokenIndex].rootBank,
+      publicKey!,
+      vault!,
       receiverAddress,
       group.signerKey,
       selectedMangoAccount.spotOpenOrders,
-      new u64(mintAmount.toString()),
+      new BN(mintAmount),
       false
     )
     try {
-      console.log(instruction)
       const instructionData: InstructionDataWithHoldUpTime = {
         data: getInstructionDataFromBase64(
           serializeInstructionToBase64(instruction)
