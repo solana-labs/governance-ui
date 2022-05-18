@@ -50,7 +50,7 @@ const ChangeDonation = ({
   })
 
   const [searchResults, setSearchResults] = useState<ChangeNonprofit[]>([])
-  //const [loading, setLoading] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false)
   const [selectedNonprofit, setNonprofit] = useState<ChangeNonprofit>()
   const [searchInput, setSearchInput] = useState<string>()
 
@@ -115,14 +115,14 @@ const ChangeDonation = ({
     setSearchInput(evt.target.value)
     if (evt.target.value === '') {
       setSearchResults([])
-      //setLoading(false)
+      setLoading(false)
       setNonprofit(undefined)
     } else {
       performSearch()
     }
   }
   const performSearch = () => {
-    //setLoading(true)
+    setLoading(true)
     if (searchTimeout) {
       clearTimeout(searchTimeout)
     }
@@ -152,7 +152,7 @@ const ChangeDonation = ({
           console.log('error finding nonprofits')
         })
         .finally(() => {
-          //setLoading(false)
+          setLoading(false)
         })
     }, 200)
   }
@@ -241,6 +241,7 @@ const ChangeDonation = ({
         showSearchResults={searchResults.length > 0}
         disabled={searchResults.length === 0}
         nonprofitInformation={selectedNonprofit}
+        isLoading={loading}
       >
         {searchResults.map((foundNonprofit) => (
           <NonprofitSelect.Option
