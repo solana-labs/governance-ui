@@ -5,8 +5,7 @@ import {
   VoltSDK,
 } from '@friktion-labs/friktion-sdk'
 import { AnchorWallet } from '@friktion-labs/friktion-sdk/dist/cjs/src/miscUtils'
-import { WSOL_MINT, WSOL_MINT_PK } from '@components/instructions/tools'
-import Decimal from 'decimal.js'
+import { WSOL_MINT_PK } from '@components/instructions/tools'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -15,11 +14,9 @@ import {
 } from '@solana/spl-token'
 import { WalletAdapter } from '@solana/wallet-adapter-base'
 import {
-  Account,
   Keypair,
   PublicKey,
   TransactionInstruction,
-  Transaction,
   Connection,
 } from '@solana/web3.js'
 
@@ -32,8 +29,7 @@ import { AssetAccount } from '@utils/uiTypes/assets'
 
 import { AnchorProvider } from '@project-serum/anchor'
 
-import { GoblinGold, NetworkName, StrategyVault } from 'goblingold-sdk'
-import { GoblinGoldVault } from 'pages/dao/[symbol]/proposal/components/instructions/GoblinGold/GoblinGoldDeposit'
+import { GoblinGold, NetworkName } from 'goblingold-sdk'
 
 async function createAssociatedTokenAccountIfNotExist(
   connection: Connection,
@@ -90,7 +86,8 @@ export async function getGoblinGoldDepositInstruction({
   setFormErrors: any
 }): Promise<UiInstruction> {
   const isValid = await validateInstruction({ schema, form, setFormErrors })
-  let serializedInstruction = ''
+  // TODO: should be let value.
+  const serializedInstruction = ''
   const prerequisiteInstructions: TransactionInstruction[] = []
   const governedTokenAccount = form.governedTokenAccount as AssetAccount
 
@@ -113,6 +110,7 @@ export async function getGoblinGoldDepositInstruction({
       options
     )
 
+    // @ts-ignore: Wallet compatability issues
     const sdk = new GoblinGold(env, endpoint, provider)
     const strategyProgram = sdk.BestApy
 
@@ -170,20 +168,20 @@ export async function getGoblinGoldDepositInstruction({
       throw new Error('Error: selected governance token is not supported')
     }
 
-    const ataInputAddress = await Token.getAssociatedTokenAddress(
-      ASSOCIATED_TOKEN_PROGRAM_ID,
-      TOKEN_PROGRAM_ID,
-      inputTokenMintAddress,
-      governedAccountPk,
-      true
-    )
+    // const ataInputAddress = await Token.getAssociatedTokenAddress(
+    //   ASSOCIATED_TOKEN_PROGRAM_ID,
+    //   TOKEN_PROGRAM_ID,
+    //   inputTokenMintAddress,
+    //   governedAccountPk,
+    //   true
+    // )
 
-    const ataLpAddress = await createAssociatedTokenAccountIfNotExist(
-      connection.current,
-      governedAccountPk,
-      lpTokenMintAddress,
-      prerequisiteInstructions
-    )
+    // const ataLpAddress = await createAssociatedTokenAccountIfNotExist(
+    //   connection.current,
+    //   governedAccountPk,
+    //   lpTokenMintAddress,
+    //   prerequisiteInstructions
+    // )
 
     // const depositIx = await strategyProgram.getDepositIx({
     //   userInputTokenAccount: new PublicKey(ataInputAddress),
@@ -202,6 +200,7 @@ export async function getGoblinGoldDepositInstruction({
     signers,
     shouldSplitIntoSeparateTxs: true,
   }
+
   return obj
 }
 

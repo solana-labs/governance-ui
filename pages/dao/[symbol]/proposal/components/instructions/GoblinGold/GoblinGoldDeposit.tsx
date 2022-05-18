@@ -87,12 +87,6 @@ const GoblinGoldDeposit = ({
     setForm({ ...form, mintInfo: value })
   }
 
-  const validateInstruction = async (): Promise<boolean> => {
-    const { isValid, validationErrors } = await isFormValid(schema, form)
-    setFormErrors(validationErrors)
-    return isValid
-  }
-
   async function getInstruction(): Promise<UiInstruction> {
     return await getGoblinGoldDepositInstruction({
       schema,
