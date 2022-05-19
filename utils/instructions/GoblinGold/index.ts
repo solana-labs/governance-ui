@@ -11,7 +11,6 @@ import {
   TransactionInstruction,
   Connection,
   SystemProgram,
-  Transaction,
 } from '@solana/web3.js'
 
 import type { ConnectionContext } from 'utils/connection'
@@ -23,7 +22,7 @@ import { AssetAccount } from '@utils/uiTypes/assets'
 import { AnchorProvider, Wallet } from '@project-serum/anchor'
 
 import { GoblinGold, NetworkName } from 'goblingold-sdk'
-import { WSOL_MINT, WSOL_MINT_PK } from '@components/instructions/tools'
+import { WSOL_MINT_PK } from '@components/instructions/tools'
 
 import { publicKey, struct, u32, u64, u8 } from '@project-serum/borsh'
 import { closeAccount } from '@project-serum/serum/lib/token-instructions'
