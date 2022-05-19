@@ -3,7 +3,6 @@ import React, { useContext, useEffect, useState } from 'react'
 // import BigNumber from 'bignumber.js'
 import * as yup from 'yup'
 
-import { BN } from '@project-serum/anchor'
 import {
   Governance,
   ProgramAccount,
@@ -24,22 +23,7 @@ import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getGoblinGoldDepositInstruction } from '@utils/instructions/GoblinGold'
-
-export type GoblinGoldVault = {
-  name: string
-  tokenInput: string
-  tvl: BN
-  supply: BN
-  apy: string
-  apr: string
-  aboutTxt: string
-  protocolsTxt: string
-  risksTxt: string
-
-  // todo
-  id: string
-  type: string
-}
+import { StrategyVault } from 'goblingold-sdk'
 
 const GoblinGoldDeposit = ({
   index,
@@ -67,9 +51,7 @@ const GoblinGoldDeposit = ({
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
 
-  const [goblinGoldVaults, setGoblinGoldVaults] = useState<GoblinGoldVault[]>(
-    []
-  )
+  const [goblinGoldVaults, setGoblinGoldVaults] = useState<StrategyVault[]>([])
 
   const mintMinAmount = form.mintInfo
     ? getMintMinAmountAsDecimal(form.mintInfo)
@@ -123,43 +105,9 @@ const GoblinGoldDeposit = ({
   useEffect(() => {
     // call for the mainnet friktion volts
     const callfriktionRequest = async () => {
-      //   const response = await fetch(
-      //     'https://friktion-labs.github.io/mainnet-tvl-snapshots/friktionSnapshot.json'
-      //   )
-      //   const parsedResponse = (await response.json()) as GoblinGoldVaults
-      //   setGoblinGoldVaults(parsedResponse as GoblinGoldVaults[])
-      const solanaStrategyBestAPY: GoblinGoldVault = {
-        name: 'Best APY',
-        tokenInput: 'SOL',
-        tvl: new BN(0),
-        supply: new BN(0),
-        apy: '0',
-        apr: '0',
-        aboutTxt:
-          'This strategy automatically rebalances between different lending protocols in order to get the maximum yield in each period.',
-        protocolsTxt: 'Mango, Port, Tulip, Solend and Francium',
-        risksTxt:
-          'The protocols being used underneath (although being audited) present some risks. No audit has been done for the current strategy. Use it at your own risk.',
-        id: '5NRMCHoJtq5vNgxmNgDzAqroKxDWM6mmE8HQnt7p4yLM',
-        type: 'bestApy',
-      }
-      const usdcStrategyBestAPY: GoblinGoldVault = {
-        name: 'Best APY',
-        tokenInput: 'USDC',
-        tvl: new BN(0),
-        supply: new BN(0),
-        apy: '0',
-        apr: '0',
-        aboutTxt:
-          'This strategy automatically rebalances between different lending protocols in order to get the maximum yield in each period.',
-        protocolsTxt: 'Mango, Port, Tulip, Solend and Francium',
-        risksTxt:
-          'The protocols being used underneath (although being audited) present some risks. No audit has been done for the current strategy. Use it at your own risk.',
-        id: 'HAYwz6cHGuGAvLNifqGypH4mzv8fF5wv9SvcYLRGd18Q',
-        type: 'bestApy',
-      }
-      const vaults = [solanaStrategyBestAPY, usdcStrategyBestAPY]
-      setGoblinGoldVaults(vaults)
+      const response = await fetch('https://data.goblin.gold:7766/vaults')
+      const parsedResponse = (await response.json()) as StrategyVault[]
+      setGoblinGoldVaults(parsedResponse as StrategyVault[])
     }
 
     callfriktionRequest()
@@ -222,10 +170,10 @@ const GoblinGoldDeposit = ({
         {goblinGoldVaults.map((vault) => (
           <Select.Option key={vault.id} value={vault.id}>
             <div className="break-all text-fgd-1 ">
-              <div className="mb-2">{`Vault #${vault.type} - ${vault.tokenInput}`}</div>
+              <div className="mb-2">{`Vault #${vault.type} - ${vault.input.symbol}`}</div>
               <div className="space-y-0.5 text-xs text-fgd-3">
                 <div className="flex items-center">
-                  Deposit Token: {vault.tokenInput}
+                  Deposit Token: {vault.input.symbol}
                 </div>
               </div>
             </div>

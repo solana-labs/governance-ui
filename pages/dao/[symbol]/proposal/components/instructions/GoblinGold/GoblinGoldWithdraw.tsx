@@ -1,25 +1,31 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
-import Input from '@components/inputs/Input'
-import useRealm from '@hooks/useRealm'
+// import BigNumber from 'bignumber.js'
+import * as yup from 'yup'
+
+import {
+  Governance,
+  ProgramAccount,
+  //   serializeInstructionToBase64,
+} from '@solana/spl-governance'
 import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import { PublicKey } from '@solana/web3.js'
+import Input from '@components/inputs/Input'
+import Select from '@components/inputs/Select'
+import useRealm from '@hooks/useRealm'
 import { precision } from '@utils/formatting'
-import useWalletStore from 'stores/useWalletStore'
 import {
-  FriktionWithdrawForm,
+  GoblinGoldWithdrawForm,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
+import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
-import { getFriktionWithdrawSchema } from '@utils/validations'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { Governance } from '@solana/spl-governance'
-import { ProgramAccount } from '@solana/spl-governance'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-import { getFriktionWithdrawInstruction } from '@utils/instructions/Friktion'
-import Select from '@components/inputs/Select'
-import { FriktionSnapshot, VoltSnapshot } from '@friktion-labs/friktion-sdk'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { getGoblinGoldWithdrawInstruction } from '@utils/instructions/GoblinGold'
+import { StrategyVault } from 'goblingold-sdk'
 
-const FriktionWithdraw = ({
+const GoblinGoldWithdraw = ({
   index,
   governance,
 }: {
@@ -32,34 +38,48 @@ const FriktionWithdraw = ({
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<FriktionWithdrawForm>({
+
+  const [form, setForm] = useState<GoblinGoldWithdrawForm>({
     amount: undefined,
     governedTokenAccount: undefined,
-    voltVaultId: '',
-    depositTokenMint: undefined,
-    programId: programId?.toString(),
+    goblinGoldVaultId: '',
     mintInfo: undefined,
   })
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  const [friktionVolts, setFriktionVolts] = useState<VoltSnapshot[] | null>(
-    null
-  )
   const [governedAccount, setGovernedAccount] = useState<
     ProgramAccount<Governance> | undefined
   >(undefined)
   const [formErrors, setFormErrors] = useState({})
+  const { handleSetInstructions } = useContext(NewProposalContext)
+
+  const [goblinGoldVaults, setGoblinGoldVaults] = useState<StrategyVault[]>([])
+
   const mintMinAmount = form.mintInfo
     ? getMintMinAmountAsDecimal(form.mintInfo)
     : 1
+
   const currentPrecision = precision(mintMinAmount)
-  const { handleSetInstructions } = useContext(NewProposalContext)
+
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
+
   const setMintInfo = (value) => {
     setForm({ ...form, mintInfo: value })
   }
+
+  async function getInstruction(): Promise<UiInstruction> {
+    return await getGoblinGoldWithdrawInstruction({
+      schema,
+      form,
+      amount: form.amount ?? 0,
+      programId,
+      connection,
+      wallet,
+      setFormErrors,
+    })
+  }
+
   const setAmount = (event) => {
     const value = event.target.value
     handleSetForm({
@@ -67,6 +87,7 @@ const FriktionWithdraw = ({
       propertyName: 'amount',
     })
   }
+
   const validateAmountOnBlur = () => {
     const value = form.amount
 
@@ -81,25 +102,12 @@ const FriktionWithdraw = ({
     })
   }
 
-  async function getInstruction(): Promise<UiInstruction> {
-    return getFriktionWithdrawInstruction({
-      schema,
-      form,
-      amount: form.amount ?? 0,
-      programId,
-      connection,
-      wallet,
-      setFormErrors,
-    })
-  }
   useEffect(() => {
     // call for the mainnet friktion volts
     const callfriktionRequest = async () => {
-      const response = await fetch(
-        'https://friktion-labs.github.io/mainnet-tvl-snapshots/friktionSnapshot.json'
-      )
-      const parsedResponse = (await response.json()) as FriktionSnapshot
-      setFriktionVolts(parsedResponse.allMainnetVolts as VoltSnapshot[])
+      const response = await fetch('https://data.goblin.gold:7766/vaults')
+      const parsedResponse = (await response.json()) as StrategyVault[]
+      setGoblinGoldVaults(parsedResponse as StrategyVault[])
     }
 
     callfriktionRequest()
@@ -110,21 +118,34 @@ const FriktionWithdraw = ({
       propertyName: 'programId',
       value: programId?.toString(),
     })
-  }, [realmInfo?.programId])
+  }, [programId])
+
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: governedAccount, getInstruction },
       index
     )
   }, [form])
+
   useEffect(() => {
     setGovernedAccount(form.governedTokenAccount?.governance)
     setMintInfo(form.governedTokenAccount?.extensions.mint?.account)
   }, [form.governedTokenAccount])
-  const schema = getFriktionWithdrawSchema()
+
+  const schema = yup.object().shape({
+    governedTokenAccount: yup
+      .object()
+      .nullable()
+      .required('Governed account is required'),
+    goblinGoldVaultId: yup.string().required('Vault ID is required'),
+    amount: yup
+      .number()
+      .moreThan(0, 'Amount should be more than 0')
+      .required('Amount is required'),
+  })
 
   return (
-    <>
+    <React.Fragment>
       <GovernedAccountSelect
         label="Source account"
         governedAccounts={governedTokenAccountsWithoutNfts}
@@ -135,43 +156,29 @@ const FriktionWithdraw = ({
         error={formErrors['governedTokenAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
-      ></GovernedAccountSelect>
+      />
+
       <Select
-        label="Friktion Volt"
-        value={form.voltVaultId}
+        label="GoblinGold Vault Destination"
+        value={form.goblinGoldVaultId}
         placeholder="Please select..."
-        onChange={(value) => {
-          const volt = friktionVolts?.find((x) => x.voltVaultId === value)
-          setFormErrors({})
-          setForm({
-            ...form,
-            voltVaultId: value,
-            depositTokenMint: volt?.depositTokenMint,
-          })
-        }}
-        error={formErrors['voltVaultId']}
+        onChange={(value) =>
+          handleSetForm({ value, propertyName: 'goblinGoldVaultId' })
+        }
+        error={formErrors['goblinGoldVaultId']}
       >
-        {friktionVolts
-          ?.filter((x) => !x.isInCircuits)
-          .map((value) => (
-            <Select.Option key={value.voltVaultId} value={value.voltVaultId}>
-              <div className="break-all text-fgd-1 ">
-                <div className="mb-2">{`Volt #${value.voltType} - ${
-                  value.voltType === 1
-                    ? 'Generate Income'
-                    : value.voltType === 2
-                    ? 'Sustainable Stables'
-                    : ''
-                } - ${value.underlyingTokenSymbol} - APY: ${value.apy}%`}</div>
-                <div className="space-y-0.5 text-xs text-fgd-3">
-                  <div className="flex items-center">
-                    Withdraw Token: {value.depositTokenSymbol}
-                  </div>
-                  {/* <div>Capacity: {}</div> */}
+        {goblinGoldVaults.map((vault) => (
+          <Select.Option key={vault.id} value={vault.id}>
+            <div className="break-all text-fgd-1 ">
+              <div className="mb-2">{`Vault #${vault.type} - ${vault.input.symbol}`}</div>
+              <div className="space-y-0.5 text-xs text-fgd-3">
+                <div className="flex items-center">
+                  Withdraw Token: {vault.input.symbol}
                 </div>
               </div>
-            </Select.Option>
-          ))}
+            </div>
+          </Select.Option>
+        ))}
       </Select>
       <Input
         min={mintMinAmount}
@@ -183,8 +190,8 @@ const FriktionWithdraw = ({
         error={formErrors['amount']}
         onBlur={validateAmountOnBlur}
       />
-    </>
+    </React.Fragment>
   )
 }
 
-export default FriktionWithdraw
+export default GoblinGoldWithdraw

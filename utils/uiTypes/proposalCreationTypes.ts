@@ -74,8 +74,8 @@ export interface GoblinGoldDepositForm {
 export interface GoblinGoldWithdrawForm {
   amount: number | undefined
   governedTokenAccount?: AssetAccount | undefined
+  goblinGoldVaultId?: string
   mintName?: SupportedMintName
-  destinationLiquidity?: string
   mintInfo: MintInfo | undefined
 }
 
