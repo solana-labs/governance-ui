@@ -39,7 +39,8 @@ export default function useCreateProposal() {
     isDraft?: boolean
   }) => {
     const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-      governance!.account.config
+      governance!.account.config,
+      voteByCouncil
     )
 
     const defaultProposalMint =

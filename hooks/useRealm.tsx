@@ -14,6 +14,7 @@ import {
 } from '../models/registry/api'
 import {
   PythVoterWeight,
+  SimpleGatedVoterWeight,
   VoteNftWeight,
   VoteRegistryVoterWeight,
   VoterWeight,
@@ -24,7 +25,9 @@ import {
   nftPluginsPks,
   vsrPluginsPks,
   pythPluginsPks,
+  gatewayPluginsPks,
 } from './useVotingPlugins'
+import useGatewayPluginStore from '../GatewayPlugin/store/gatewayPluginStore'
 
 export default function useRealm() {
   const router = useRouter()
@@ -46,6 +49,7 @@ export default function useRealm() {
   } = useWalletStore((s) => s.selectedRealm)
   const votingPower = useDepositStore((s) => s.state.votingPower)
   const nftVotingPower = useNftPluginStore((s) => s.state.votingPower)
+  const gatewayVotingPower = useGatewayPluginStore((s) => s.state.votingPower)
 
   const pythClient = useVotePluginsClientStore((s) => s.state.pythClient)
   const [pythVoterWeight, setPythVoterWeight] = useState<PythBalance>()
@@ -152,6 +156,7 @@ export default function useRealm() {
     votingPower,
     nftVotingPower,
     pythVotingPower,
+    gatewayVotingPower,
     ownCouncilTokenRecord
   )
   return {
@@ -186,6 +191,7 @@ const getVoterWeight = (
   votingPower: BN,
   nftVotingPower: BN,
   pythVotingPower: BN,
+  gatewayVotingPower: BN,
   ownCouncilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
 ) => {
   if (currentPluginPk) {
@@ -205,6 +211,13 @@ const getVoterWeight = (
     }
     if (pythPluginsPks.includes(currentPluginPk.toBase58())) {
       return new PythVoterWeight(ownTokenRecord, pythVotingPower)
+    }
+    if (gatewayPluginsPks.includes(currentPluginPk.toBase58())) {
+      return new SimpleGatedVoterWeight(
+        ownTokenRecord,
+        ownCouncilTokenRecord,
+        gatewayVotingPower
+      )
     }
   }
   return new VoterWeight(ownTokenRecord, ownCouncilTokenRecord)

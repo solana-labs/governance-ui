@@ -26,7 +26,8 @@ interface VoterWeightInterface {
   canCreateGovernanceUsingCouncilTokens: () => boolean | undefined
   canCreateGovernance: (realm: ProgramAccount<Realm>) => boolean | undefined
   getTokenRecordToCreateProposal: (
-    config: GovernanceConfig
+    config: GovernanceConfig,
+    voteByCouncil: boolean
   ) => ProgramAccount<TokenOwnerRecord>
   hasMinAmountToVote: (mintPk: PublicKey) => boolean | undefined
 }
@@ -413,6 +414,60 @@ export class VoterWeight implements VoterWeightInterface {
     }
 
     throw new Error('Not enough vote weight to create proposal')
+  }
+}
+
+// TODO treat this as temporary - it should delegate to the governance VoterWeight (frontend and on-chain)
+export class SimpleGatedVoterWeight implements VoterWeightInterface {
+  constructor(
+    public communityTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,
+    public councilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,
+    public votingPower: BN
+  ) {}
+
+  hasAnyWeight() {
+    return !!this.communityTokenRecord || !!this.councilTokenRecord
+  }
+
+  // Returns first available tokenRecord
+  getTokenRecord() {
+    return this.getTokenRecord().pubkey
+  }
+
+  hasMinCommunityWeight() {
+    return this.hasAnyWeight()
+  }
+  hasMinCouncilWeight() {
+    return this.hasAnyWeight()
+  }
+
+  canCreateProposal() {
+    return this.hasAnyWeight()
+  }
+  canCreateGovernanceUsingCommunityTokens() {
+    return this.hasMinCommunityWeight()
+  }
+  canCreateGovernanceUsingCouncilTokens() {
+    return this.hasAnyWeight()
+  }
+  canCreateGovernance() {
+    return this.hasAnyWeight()
+  }
+  hasMinAmountToVote() {
+    return this.hasAnyWeight()
+  }
+
+  getTokenRecordToCreateProposal(
+    config: GovernanceConfig,
+    voteByCouncil: boolean
+  ) {
+    if (voteByCouncil && this.councilTokenRecord) {
+      return this.councilTokenRecord
+    }
+    if (this.communityTokenRecord) {
+      return this.communityTokenRecord
+    }
+    throw new Error('Current wallet has no Token Owner Records')
   }
 }
 

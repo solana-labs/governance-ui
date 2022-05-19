@@ -1,5 +1,8 @@
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
-import { NftVoterClient } from '@solana/governance-program-library'
+import {
+  NftVoterClient,
+  GatewayClient,
+} from '@solana/governance-program-library'
 import { PublicKey } from '@solana/web3.js'
 import { Registrar, Voter } from './accounts'
 
@@ -28,6 +31,21 @@ export const tryGetRegistrar = async (
 export const tryGetNftRegistrar = async (
   registrarPk: PublicKey,
   client: NftVoterClient
+) => {
+  try {
+    const existingRegistrar = await client.program.account.registrar.fetch(
+      registrarPk
+    )
+    return existingRegistrar
+  } catch (e) {
+    return null
+  }
+}
+
+// TODO merge with the above, perhaps by creating a parameterised client
+export const tryGetGatewayRegistrar = async (
+  registrarPk: PublicKey,
+  client: GatewayClient
 ) => {
   try {
     const existingRegistrar = await client.program.account.registrar.fetch(

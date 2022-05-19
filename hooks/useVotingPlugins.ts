@@ -13,6 +13,8 @@ import {
   LOCALNET_STAKING_ADDRESS as PYTH_LOCALNET_STAKING_ADDRESS,
   DEVNET_STAKING_ADDRESS as PYTH_DEVNET_STAKING_ADDRESS,
 } from 'pyth-staking-api'
+import useGatewayPluginStore from '../GatewayPlugin/store/gatewayPluginStore'
+import { getGatewayToken } from '../GatewayPlugin/sdk/accounts'
 
 export const vsrPluginsPks: string[] = [
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo',
@@ -20,6 +22,10 @@ export const vsrPluginsPks: string[] = [
 
 export const nftPluginsPks: string[] = [
   'GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw',
+]
+
+export const gatewayPluginsPks: string[] = [
+  'Ggat9fNP9SsZEfxGJqbdZUasBGppksaZUBfL92ntrFEp',
 ]
 
 export const pythPluginsPks: string[] = [
@@ -33,7 +39,9 @@ export function useVotingPlugins() {
     handleSetVsrRegistrar,
     handleSetVsrClient,
     handleSetNftClient,
+    handleSetGatewayClient,
     handleSetNftRegistrar,
+    handleSetGatewayRegistrar,
     handleSetPythClient,
     handleSetCurrentRealmVotingClient,
   } = useVotePluginsClientStore()
@@ -42,12 +50,14 @@ export function useVotingPlugins() {
     setMaxVoterWeight,
     setIsLoadingNfts,
   } = useNftPluginStore()
+  const { setGatewayToken, setIsLoadingGatewayToken } = useGatewayPluginStore()
 
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const connected = useWalletStore((s) => s.connected)
   const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
   const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
+  const gatewayClient = useVotePluginsClientStore((s) => s.state.gatewayClient)
   const pythClient = useVotePluginsClientStore((s) => s.state.pythClient)
 
   const currentClient = useVotePluginsClientStore(
@@ -92,6 +102,35 @@ export function useVotingPlugins() {
     }
     setIsLoadingNfts(false)
   }
+  const handleGetGatewayToken = async () => {
+    console.log('GATEWAY: handleGetGatewayToken')
+    if (realm) {
+      console.log('GATEWAY: realm exists')
+      setIsLoadingGatewayToken(true)
+
+      try {
+        console.log('GATEWAY: getGatewayToken')
+        const gatewayToken = await getGatewayToken(
+          gatewayClient,
+          realm,
+          wallet!.publicKey!
+        )
+        console.log('GATEWAY: getGatewayToken ', gatewayToken)
+
+        if (gatewayToken) {
+          console.log('GATEWAY: setGatewayToken')
+          setGatewayToken(gatewayToken.publicKey, currentClient)
+        }
+      } catch (e) {
+        console.log(e)
+        notify({
+          message: 'Error fetching gateway token',
+          type: 'error',
+        })
+      }
+      setIsLoadingGatewayToken(false)
+    }
+  }
   const handleMaxVoterWeight = async () => {
     const { maxVoterWeightRecord } = await getNftMaxVoterWeightRecord(
       realm!.pubkey,
@@ -126,6 +165,7 @@ export function useVotingPlugins() {
   useEffect(() => {
     handleSetVsrClient(wallet, connection)
     handleSetNftClient(wallet, connection)
+    handleSetGatewayClient(wallet, connection)
     handleSetPythClient(wallet, connection)
   }, [connection.endpoint])
 
@@ -163,6 +203,26 @@ export function useVotingPlugins() {
       }
     }
 
+    const handleGatewayPlugin = () => {
+      console.log('GATEWAY: handleGatewayPlugin')
+      if (
+        gatewayClient &&
+        currentPluginPk &&
+        gatewayPluginsPks.includes(currentPluginPk.toBase58())
+      ) {
+        handleSetGatewayRegistrar(gatewayClient!, realm)
+        if (connected) {
+          handleSetCurrentRealmVotingClient({
+            client: gatewayClient,
+            realm,
+            walletPk: wallet?.publicKey,
+          })
+        }
+
+        handleGetGatewayToken()
+      }
+    }
+
     const handlePythPlugin = () => {
       if (
         pythClient &&
@@ -178,12 +238,20 @@ export function useVotingPlugins() {
         }
       }
     }
+
+    console.log('handling plugins...', {
+      clientWallet: currentClient?.walletPk?.toBase58(),
+      clientRealm: currentClient?.realm?.pubkey?.toBase58(),
+      wallet: wallet?.publicKey?.toBase58(),
+      realm: realm?.pubkey?.toBase58(),
+    })
     if (
       !currentClient ||
       currentClient.realm?.pubkey.toBase58() !== realm?.pubkey.toBase58() ||
       currentClient.walletPk?.toBase58() !== wallet?.publicKey?.toBase58()
     ) {
       handleNftplugin()
+      handleGatewayPlugin()
       handleVsrPlugin()
       handlePythPlugin()
     }
@@ -191,6 +259,7 @@ export function useVotingPlugins() {
     currentPluginPk?.toBase58(),
     vsrClient?.program.programId.toBase58(),
     nftClient?.program.programId.toBase58(),
+    gatewayClient?.program.programId.toBase58(),
     pythClient?.program.programId.toBase58(),
     realm?.pubkey.toBase58(),
     connection.endpoint,
@@ -200,6 +269,7 @@ export function useVotingPlugins() {
     if (usedCollectionsPks.length && realm) {
       if (connected && currentClient.walletPk?.toBase58()) {
         handleGetNfts()
+        handleGetGatewayToken()
       }
 
       handleMaxVoterWeight()

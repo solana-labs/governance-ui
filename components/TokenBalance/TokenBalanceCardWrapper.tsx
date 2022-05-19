@@ -2,7 +2,12 @@ import { Proposal } from '@solana/spl-governance'
 import { Option } from 'tools/core/option'
 import useRealm from '@hooks/useRealm'
 import dynamic from 'next/dynamic'
-import { nftPluginsPks, vsrPluginsPks } from '@hooks/useVotingPlugins'
+import {
+  gatewayPluginsPks,
+  nftPluginsPks,
+  vsrPluginsPks,
+} from '@hooks/useVotingPlugins'
+import GatewayCard from '@components/Gateway/GatewayCard'
 
 const LockPluginTokenBalanceCard = dynamic(
   () =>
@@ -31,6 +36,16 @@ const TokenBalanceCardWrapper = ({
       currentPluginPk && vsrPluginsPks.includes(currentPluginPk?.toBase58())
     const isNftMode =
       currentPluginPk && nftPluginsPks.includes(currentPluginPk?.toBase58())
+    const isGatewayMode =
+      currentPluginPk && gatewayPluginsPks.includes(currentPluginPk?.toBase58())
+
+    console.log('***Is Gateway Mode', {
+      isGatewayMode,
+      isLockTokensMode,
+      isNftMode,
+      currentPluginPk: currentPluginPk?.toBase58(),
+    })
+
     if (
       isLockTokensMode &&
       (!ownTokenRecord ||
@@ -55,8 +70,15 @@ const TokenBalanceCardWrapper = ({
         </>
       )
     }
+
+    // if (isGatewayMode) return <GatewayCard></GatewayCard>
     //Default
-    return <TokenBalanceCard proposal={proposal}></TokenBalanceCard>
+    return (
+      <TokenBalanceCard proposal={proposal}>
+        {/*Add the gateway card if this is a gated DAO*/}
+        {isGatewayMode && <GatewayCard></GatewayCard>}
+      </TokenBalanceCard>
+    )
   }
   return getTokenBalanceCard()
 }

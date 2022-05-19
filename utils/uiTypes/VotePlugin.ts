@@ -22,6 +22,13 @@ import {
   getVoterWeightPDA,
 } from 'VoteStakeRegistry/sdk/accounts'
 import { NFTWithMint } from './nfts'
+import { GatewayClient } from '@solana/governance-program-library/dist'
+import {
+  getGatewayRegistrarPDA,
+  getGatewayToken,
+  getGatewayVoterWeightRecord,
+  getVoteInstruction,
+} from '../../GatewayPlugin/sdk/accounts'
 
 type UpdateVoterWeightRecordTypes =
   | 'castVote'
@@ -45,6 +52,7 @@ enum VotingClientType {
   VsrClient,
   NftVoterClient,
   PythClient,
+  GatewayClient,
 }
 
 class AccountData {
@@ -69,10 +77,11 @@ interface ProgramAddresses {
 
 //Abstract for common functions that plugins will implement
 export class VotingClient {
-  client: VsrClient | NftVoterClient | PythClient | undefined
+  client: VsrClient | NftVoterClient | PythClient | GatewayClient | undefined
   realm: ProgramAccount<Realm> | undefined
   walletPk: PublicKey | null | undefined
   votingNfts: NFTWithMeta[]
+  gatewayToken: PublicKey
   clientType: VotingClientType
   noClient: boolean
   constructor({ client, realm, walletPk }: VotingClientProps) {
@@ -88,6 +97,10 @@ export class VotingClient {
     }
     if (this.client instanceof NftVoterClient) {
       this.clientType = VotingClientType.NftVoterClient
+      this.noClient = false
+    }
+    if (this.client instanceof GatewayClient) {
+      this.clientType = VotingClientType.GatewayClient
       this.noClient = false
     }
     if (this.client instanceof PythClient) {
@@ -171,6 +184,35 @@ export class VotingClient {
         .instruction()
       instructions.push(updateVoterWeightRecordIx)
       return { voterWeightPk, maxVoterWeightRecord }
+    }
+    if (this.client instanceof GatewayClient) {
+      const { registrar } = await getGatewayRegistrarPDA(
+        realm.pubkey,
+        realm.account.communityMint,
+        this.client.program.programId
+      )
+      const { voterWeightPk } = await this._withHandleGatewayVoterWeight(
+        realm,
+        walletPk,
+        clientProgramId,
+        instructions
+      )
+      const gatewayToken = await getGatewayToken(this.client, realm, walletPk)
+
+      // Throw if the user has no gateway token (TODO handle this later)
+      if (!gatewayToken)
+        throw new Error(`Unable to vote: No Gateway Token found`)
+
+      const updateVoterWeightRecordIx = await this.client.program.methods
+        .updateVoterWeightRecord({ [type]: {} })
+        .accounts({
+          registrar: registrar,
+          gatewayToken: gatewayToken.publicKey,
+          voterWeightRecord: voterWeightPk,
+        })
+        .instruction()
+      instructions.push(updateVoterWeightRecordIx)
+      return { voterWeightPk, maxVoterWeightRecord: undefined }
     }
     if (this.client instanceof PythClient) {
       const stakeAccount = await this.client!.stakeConnection.getMainAccount(
@@ -315,6 +357,27 @@ export class VotingClient {
       )
       return props
     }
+
+    if (this.client instanceof GatewayClient) {
+      // get the gateway plugin vote instruction
+      const instruction = await getVoteInstruction(
+        this.client,
+        realm,
+        walletPk,
+        proposal.pubkey
+      )
+
+      instructions.push(instruction)
+
+      const { voterWeightPk } = await this._withHandleGatewayVoterWeight(
+        realm!,
+        walletPk,
+        clientProgramId,
+        instructions
+      )
+
+      return { voterWeightPk, maxVoterWeightRecord: undefined }
+    }
   }
   withRelinquishVote = async (
     instructions,
@@ -446,7 +509,36 @@ export class VotingClient {
       maxVoterWeightRecordBump,
     }
   }
+
+  // TODO: this can probably be merged with the nft voter plugin implementation
+  _withHandleGatewayVoterWeight = async (
+    realm: ProgramAccount<Realm>,
+    walletPk: PublicKey,
+    clientProgramId: PublicKey,
+    _instructions
+  ) => {
+    if (!(this.client instanceof GatewayClient)) {
+      throw 'Method only allowed for gateway client'
+    }
+    const {
+      voterWeightPk,
+      voterWeightRecordBump,
+    } = await getGatewayVoterWeightRecord(
+      realm.pubkey,
+      realm.account.communityMint,
+      walletPk,
+      clientProgramId
+    )
+
+    return {
+      voterWeightPk,
+      voterWeightRecordBump,
+    }
+  }
   _setCurrentVoterNfts = (nfts: NFTWithMeta[]) => {
     this.votingNfts = nfts
+  }
+  _setCurrentVoterGatewayToken = (gatewayToken: PublicKey) => {
+    this.gatewayToken = gatewayToken
   }
 }

@@ -306,6 +306,16 @@ export default function useGovernanceAssets() {
       isVisible: canUseAuthorityInstruction,
     },
     {
+      id: Instructions.CreateGatewayPluginRegistrar,
+      name: 'Civic: Create Gateway plugin registrar',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
+      id: Instructions.ConfigureGatewayPlugin,
+      name: 'Civic: Configure Gateway plugin',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
       id: Instructions.CloseTokenAccount,
       name: 'Close token account',
       isVisible: canUseTransferInstruction,

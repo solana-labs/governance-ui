@@ -1,9 +1,16 @@
 import create, { State } from 'zustand'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
-import { NftVoterClient } from '@solana/governance-program-library'
+import {
+  NftVoterClient,
+  GatewayClient,
+} from '@solana/governance-program-library'
 import { getRegistrarPDA, Registrar } from 'VoteStakeRegistry/sdk/accounts'
 import { AnchorProvider, Wallet } from '@project-serum/anchor'
-import { tryGetNftRegistrar, tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
+import {
+  tryGetGatewayRegistrar,
+  tryGetNftRegistrar,
+  tryGetRegistrar,
+} from 'VoteStakeRegistry/sdk/api'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { ConnectionContext } from '@utils/connection'
 import { ProgramAccount, Realm } from '@solana/spl-governance'
@@ -11,15 +18,18 @@ import { getNftRegistrarPDA } from 'NftVotePlugin/sdk/accounts'
 import { VotingClient, VotingClientProps } from '@utils/uiTypes/VotePlugin'
 import { PythClient } from 'pyth-staking-api'
 import { PublicKey } from '@solana/web3.js'
+import { getGatewayRegistrarPDA } from '../GatewayPlugin/sdk/accounts'
 
 interface UseVotePluginsClientStore extends State {
   state: {
     //diffrent plugins to choose because we will still have functions related only to one plugin
     vsrClient: VsrClient | undefined
     nftClient: NftVoterClient | undefined
+    gatewayClient: GatewayClient | undefined
     pythClient: PythClient | undefined
     voteStakeRegistryRegistrar: Registrar | null
     nftMintRegistrar: any
+    gatewayRegistrar: any
     currentRealmVotingClient: VotingClient
     voteStakeRegistryRegistrarPk: PublicKey | null
   }
@@ -28,6 +38,10 @@ interface UseVotePluginsClientStore extends State {
     connection: ConnectionContext
   ) => void
   handleSetNftClient: (
+    wallet: SignerWalletAdapter | undefined,
+    connection: ConnectionContext
+  ) => void
+  handleSetGatewayClient: (
     wallet: SignerWalletAdapter | undefined,
     connection: ConnectionContext
   ) => void
@@ -43,6 +57,10 @@ interface UseVotePluginsClientStore extends State {
     client: NftVoterClient,
     realm: ProgramAccount<Realm> | undefined
   ) => void
+  handleSetGatewayRegistrar: (
+    client: GatewayClient,
+    realm: ProgramAccount<Realm> | undefined
+  ) => void
   handleSetCurrentRealmVotingClient: ({
     client,
     realm,
@@ -53,10 +71,12 @@ interface UseVotePluginsClientStore extends State {
 const defaultState = {
   vsrClient: undefined,
   nftClient: undefined,
+  gatewayClient: undefined,
   pythClient: undefined,
   voteStakeRegistryRegistrar: null,
   voteStakeRegistryRegistrarPk: null,
   nftMintRegistrar: null,
+  gatewayRegistrar: null,
   currentRealmVotingClient: new VotingClient({
     client: undefined,
     realm: undefined,
@@ -124,6 +144,19 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
         s.state.nftMintRegistrar = existingRegistrar
       })
     },
+    handleSetGatewayRegistrar: async (client, realm) => {
+      const clientProgramId = client!.program.programId
+      const { registrar } = await getGatewayRegistrarPDA(
+        realm!.pubkey,
+        realm!.account.communityMint,
+        clientProgramId
+      )
+      console.log('GATEWAY: registrar', registrar)
+      const existingRegistrar = await tryGetGatewayRegistrar(registrar, client!)
+      set((s) => {
+        s.state.gatewayRegistrar = existingRegistrar
+      })
+    },
     handleSetPythClient: async (wallet, connection) => {
       if (
         connection.cluster === 'localnet' ||
@@ -155,6 +188,21 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
           realm,
           walletPk,
         })
+      })
+    },
+    handleSetGatewayClient: async (wallet, connection) => {
+      const options = AnchorProvider.defaultOptions()
+      const provider = new AnchorProvider(
+        connection.current,
+        (wallet as unknown) as Wallet,
+        options
+      )
+      const gatewayClient = await GatewayClient.connect(
+        provider,
+        connection.cluster === 'devnet'
+      )
+      set((s) => {
+        s.state.gatewayClient = gatewayClient
       })
     },
   })

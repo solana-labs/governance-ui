@@ -313,6 +313,8 @@ export enum Instructions {
   CloseTokenAccount,
   VotingMintConfig,
   CreateVsrRegistrar,
+  CreateGatewayPluginRegistrar,
+  ConfigureGatewayPlugin,
 }
 
 export type createParams = [

@@ -74,6 +74,8 @@ import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import VotingMintConfig from './components/instructions/Vsr/VotingMintConfig'
 import CreateVsrRegistrar from './components/instructions/Vsr/CreateRegistrar'
 import CastleWithdraw from './components/instructions/Castle/CastleWithdraw'
+import CreateGatewayPluginRegistrar from './components/instructions/GatewayPlugin/CreateRegistrar'
+import ConfigureGatewayPlugin from './components/instructions/GatewayPlugin/ConfigureGateway'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -140,6 +142,7 @@ const New = () => {
   }
 
   const getAvailableInstructionsForIndex = (index) => {
+    console.log('Available instructions', availableInstructions)
     if (index === 0) {
       return availableInstructions
     } else {
@@ -366,6 +369,20 @@ const New = () => {
             index={idx}
             governance={governance}
           ></CreateNftPluginMaxVoterWeightRecord>
+        )
+      case Instructions.CreateGatewayPluginRegistrar:
+        return (
+          <CreateGatewayPluginRegistrar
+            index={idx}
+            governance={governance}
+          ></CreateGatewayPluginRegistrar>
+        )
+      case Instructions.ConfigureGatewayPlugin:
+        return (
+          <ConfigureGatewayPlugin
+            index={idx}
+            governance={governance}
+          ></ConfigureGatewayPlugin>
         )
       case Instructions.MangoAddOracle:
         return (
