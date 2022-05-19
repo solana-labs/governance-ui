@@ -16,7 +16,6 @@ import {
 import type { ConnectionContext } from 'utils/connection'
 import { UiInstruction } from '../../uiTypes/proposalCreationTypes'
 import { validateInstruction } from '@utils/instructionTools'
-import BN from 'bn.js'
 import { AssetAccount } from '@utils/uiTypes/assets'
 
 import { GoblinGold, NetworkName } from 'goblingold-sdk'
@@ -25,6 +24,7 @@ import { WSOL_MINT_PK } from '@components/instructions/tools'
 import { publicKey, struct, u32, u64, u8 } from '@project-serum/borsh'
 import { closeAccount } from '@project-serum/serum/lib/token-instructions'
 import { Wallet } from '@project-serum/anchor'
+import { parseMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
 
 // // https://github.com/solana-labs/solana-program-library/blob/master/token/js/client/token.js#L210
 export const ACCOUNT_LAYOUT = struct([
@@ -151,7 +151,6 @@ export async function getGoblinGoldDepositInstruction({
   const governedTokenAccount = form.governedTokenAccount as AssetAccount
 
   const signers: Keypair[] = []
-
   if (
     isValid &&
     amount &&
@@ -159,27 +158,27 @@ export async function getGoblinGoldDepositInstruction({
     governedTokenAccount?.governance &&
     wallet
   ) {
+    // ggUSDC, ggWSOL public key
+    const governedTokenPk = governedTokenAccount.extensions.mint.publicKey
+
+    // owner public key
+    const governedAccountPk = getGovernedAccountPk(governedTokenAccount)
+
     const sdk = new GoblinGold(
-      wallet.publicKey!,
+      governedAccountPk,
       NetworkName.Mainnet,
       connection.current,
       (wallet as unknown) as Wallet
     )
-    const strategyProgram = sdk.BestApy
 
     const vault = await sdk.getVaultById(form.goblinGoldVaultId)
 
     if (!vault) {
       throw new Error('Error: no vault')
     }
+    const strategyProgram = sdk.BestApy
 
     strategyProgram.setToken(vault.input.symbol)
-
-    // USDC, SOL public key
-    const governedTokenPk = governedTokenAccount.extensions.mint.publicKey
-
-    // owner public key
-    const governedAccountPk = getGovernedAccountPk(governedTokenAccount)
 
     const inputTokenMintAddress = new PublicKey(vault.input.mintAddress)
     const lpTokenMintAddress = new PublicKey(vault.lp.mintAddress)
@@ -223,7 +222,10 @@ export async function getGoblinGoldDepositInstruction({
     const depositIx = await strategyProgram.getDepositIx({
       userInputTokenAccount: ataInputAddress,
       userLpTokenAccount: ataLpAddress,
-      amount: new BN(amount),
+      amount: parseMintNaturalAmountFromDecimalAsBN(
+        amount,
+        vault.input.decimals
+      ),
     })
 
     if (governedTokenAccount.isSol) {
@@ -285,27 +287,27 @@ export async function getGoblinGoldWithdrawInstruction({
     governedTokenAccount?.governance &&
     wallet
   ) {
+    // ggUSDC, ggWSOL public key
+    const governedTokenPk = governedTokenAccount.extensions.mint.publicKey
+
+    // owner public key
+    const governedAccountPk = getGovernedAccountPk(governedTokenAccount)
+
     const sdk = new GoblinGold(
-      wallet.publicKey!,
+      governedAccountPk,
       NetworkName.Mainnet,
       connection.current,
       (wallet as unknown) as Wallet
     )
-    const strategyProgram = sdk.BestApy
 
     const vault = await sdk.getVaultById(form.goblinGoldVaultId)
 
     if (!vault) {
       throw new Error('Error: no vault')
     }
+    const strategyProgram = sdk.BestApy
 
     strategyProgram.setToken(vault.input.symbol)
-
-    // ggUSDC, ggWSOL public key
-    const governedTokenPk = governedTokenAccount.extensions.mint.publicKey
-
-    // owner public key
-    const governedAccountPk = getGovernedAccountPk(governedTokenAccount)
 
     const inputTokenMintAddress = new PublicKey(vault.input.mintAddress)
     const lpTokenMintAddress = new PublicKey(vault.lp.mintAddress)
@@ -349,7 +351,10 @@ export async function getGoblinGoldWithdrawInstruction({
     const withdrawIxs = await strategyProgram.getWithdrawIx({
       userInputTokenAccount: ataInputAddress,
       userLpTokenAccount: ataLpAddress,
-      lpAmount: new BN(amount),
+      lpAmount: parseMintNaturalAmountFromDecimalAsBN(
+        amount,
+        vault.lp.decimals
+      ),
     })
 
     const lastIx = withdrawIxs.pop()
