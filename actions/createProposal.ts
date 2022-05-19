@@ -54,10 +54,9 @@ export class InstructionDataWithHoldUpTime {
       ? getInstructionDataFromBase64(instruction.serializedInstruction)
       : null
     this.holdUpTime =
-      typeof instruction.customHoldUpTime !== undefined
+      typeof instruction.customHoldUpTime !== 'undefined'
         ? instruction.customHoldUpTime
         : governance?.account?.config.minInstructionHoldUpTime
-
     this.prerequisiteInstructions = instruction.prerequisiteInstructions || []
     this.chunkSplitByDefault = instruction.chunkSplitByDefault || false
     this.chunkBy = instruction.chunkBy || 2
