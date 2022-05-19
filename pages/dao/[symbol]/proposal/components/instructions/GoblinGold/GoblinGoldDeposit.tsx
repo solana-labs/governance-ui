@@ -103,14 +103,13 @@ const GoblinGoldDeposit = ({
   }
 
   useEffect(() => {
-    // call for the mainnet friktion volts
-    const callfriktionRequest = async () => {
+    // call for the mainnet vaults
+    const fetchVaults = async () => {
       const response = await fetch('https://data.goblin.gold:7766/vaults')
       const parsedResponse = (await response.json()) as StrategyVault[]
       setGoblinGoldVaults(parsedResponse as StrategyVault[])
     }
-
-    callfriktionRequest()
+    fetchVaults()
   }, [])
 
   useEffect(() => {
@@ -170,7 +169,7 @@ const GoblinGoldDeposit = ({
         {goblinGoldVaults.map((vault) => (
           <Select.Option key={vault.id} value={vault.id}>
             <div className="break-all text-fgd-1 ">
-              <div className="mb-2">{`Vault #${vault.type} - ${vault.input.symbol}`}</div>
+              <div className="mb-2">{`Vault: ${vault.type} - ${vault.input.symbol}`}</div>
               <div className="space-y-0.5 text-xs text-fgd-3">
                 <div className="flex items-center">
                   Deposit Token: {vault.input.symbol}

@@ -160,18 +160,7 @@ export async function getGoblinGoldDepositInstruction({
     governedTokenAccount?.governance &&
     wallet
   ) {
-    const provider = new AnchorProvider(
-      connection.current,
-      (wallet as unknown) as Wallet,
-      AnchorProvider.defaultOptions()
-    )
-
-    const sdk = new GoblinGold(
-      NetworkName.Mainnet,
-      'https://ssc-dao.genesysgo.net',
-      // @ts-ignore: Wallet compatability issues
-      provider
-    )
+    const sdk = new GoblinGold(NetworkName.Mainnet)
     const strategyProgram = sdk.BestApy
 
     const vault = await sdk.getVaultById(form.goblinGoldVaultId)
@@ -228,6 +217,7 @@ export async function getGoblinGoldDepositInstruction({
     )
 
     const depositIx = await strategyProgram.getDepositIx({
+      userSigner: governedAccountPk,
       userInputTokenAccount: ataInputAddress,
       userLpTokenAccount: ataLpAddress,
       amount: new BN(amount),
@@ -292,18 +282,7 @@ export async function getGoblinGoldWithdrawInstruction({
     governedTokenAccount?.governance &&
     wallet
   ) {
-    const provider = new AnchorProvider(
-      connection.current,
-      (wallet as unknown) as Wallet,
-      AnchorProvider.defaultOptions()
-    )
-
-    const sdk = new GoblinGold(
-      NetworkName.Mainnet,
-      'https://ssc-dao.genesysgo.net',
-      // @ts-ignore: Wallet compatability issues
-      provider
-    )
+    const sdk = new GoblinGold(NetworkName.Mainnet)
     const strategyProgram = sdk.BestApy
 
     const vault = await sdk.getVaultById(form.goblinGoldVaultId)
@@ -360,6 +339,7 @@ export async function getGoblinGoldWithdrawInstruction({
     )
 
     const withdrawIxs = await strategyProgram.getWithdrawIx({
+      userSigner: governedAccountPk,
       userInputTokenAccount: ataInputAddress,
       userLpTokenAccount: ataLpAddress,
       lpAmount: new BN(amount),
