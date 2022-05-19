@@ -125,9 +125,11 @@ export async function createWrappedNativeAccount(
 }
 
 function getGovernedAccountPk(acc: AssetAccount): PublicKey {
-  return (acc.isSol
-    ? acc.extensions.transferAddress
-    : acc.extensions?.token?.account?.owner) as PublicKey
+  return (
+    acc.isSol
+      ? acc.extensions.transferAddress
+      : acc.extensions?.token?.account?.owner
+  ) as PublicKey
 }
 
 export async function getGoblinGoldDepositInstruction({
@@ -160,7 +162,17 @@ export async function getGoblinGoldDepositInstruction({
     governedTokenAccount?.governance &&
     wallet
   ) {
-    const sdk = new GoblinGold(NetworkName.Mainnet)
+    const provider = new AnchorProvider(
+      connection.current,
+      wallet as unknown as Wallet,
+      AnchorProvider.defaultOptions()
+    )
+    const sdk = new GoblinGold(
+      NetworkName.Mainnet,
+      'https://ssc-dao.genesysgo.net',
+      // @ts-ignore: Wallet compatability issues
+      provider
+    )
     const strategyProgram = sdk.BestApy
 
     const vault = await sdk.getVaultById(form.goblinGoldVaultId)
@@ -282,7 +294,17 @@ export async function getGoblinGoldWithdrawInstruction({
     governedTokenAccount?.governance &&
     wallet
   ) {
-    const sdk = new GoblinGold(NetworkName.Mainnet)
+    const provider = new AnchorProvider(
+      connection.current,
+      wallet as unknown as Wallet,
+      AnchorProvider.defaultOptions()
+    )
+    const sdk = new GoblinGold(
+      NetworkName.Mainnet,
+      'https://ssc-dao.genesysgo.net',
+      // @ts-ignore: Wallet compatability issues
+      provider
+    )
     const strategyProgram = sdk.BestApy
 
     const vault = await sdk.getVaultById(form.goblinGoldVaultId)

@@ -67,7 +67,7 @@
     "buffer-layout": "^1.2.2",
     "classnames": "^2.3.1",
     "dayjs": "^1.11.1",
-    "goblingold-sdk": "^1.0.1",
+    "goblingold-sdk": "^1.1.1",
     "immer": "^9.0.12",
     "next": "^12.1.5",
     "next-themes": "^0.1.1",
