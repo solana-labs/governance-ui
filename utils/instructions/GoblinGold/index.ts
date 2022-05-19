@@ -19,13 +19,12 @@ import { validateInstruction } from '@utils/instructionTools'
 import BN from 'bn.js'
 import { AssetAccount } from '@utils/uiTypes/assets'
 
-import { AnchorProvider, Wallet } from '@project-serum/anchor'
-
 import { GoblinGold, NetworkName } from 'goblingold-sdk'
 import { WSOL_MINT_PK } from '@components/instructions/tools'
 
 import { publicKey, struct, u32, u64, u8 } from '@project-serum/borsh'
 import { closeAccount } from '@project-serum/serum/lib/token-instructions'
+import { Wallet } from '@project-serum/anchor'
 
 // // https://github.com/solana-labs/solana-program-library/blob/master/token/js/client/token.js#L210
 export const ACCOUNT_LAYOUT = struct([
@@ -125,11 +124,9 @@ export async function createWrappedNativeAccount(
 }
 
 function getGovernedAccountPk(acc: AssetAccount): PublicKey {
-  return (
-    acc.isSol
-      ? acc.extensions.transferAddress
-      : acc.extensions?.token?.account?.owner
-  ) as PublicKey
+  return (acc.isSol
+    ? acc.extensions.transferAddress
+    : acc.extensions?.token?.account?.owner) as PublicKey
 }
 
 export async function getGoblinGoldDepositInstruction({
@@ -162,16 +159,11 @@ export async function getGoblinGoldDepositInstruction({
     governedTokenAccount?.governance &&
     wallet
   ) {
-    const provider = new AnchorProvider(
-      connection.current,
-      wallet as unknown as Wallet,
-      AnchorProvider.defaultOptions()
-    )
     const sdk = new GoblinGold(
+      wallet.publicKey!,
       NetworkName.Mainnet,
-      'https://ssc-dao.genesysgo.net',
-      // @ts-ignore: Wallet compatability issues
-      provider
+      connection.current,
+      (wallet as unknown) as Wallet
     )
     const strategyProgram = sdk.BestApy
 
@@ -229,7 +221,6 @@ export async function getGoblinGoldDepositInstruction({
     )
 
     const depositIx = await strategyProgram.getDepositIx({
-      userSigner: governedAccountPk,
       userInputTokenAccount: ataInputAddress,
       userLpTokenAccount: ataLpAddress,
       amount: new BN(amount),
@@ -294,16 +285,11 @@ export async function getGoblinGoldWithdrawInstruction({
     governedTokenAccount?.governance &&
     wallet
   ) {
-    const provider = new AnchorProvider(
-      connection.current,
-      wallet as unknown as Wallet,
-      AnchorProvider.defaultOptions()
-    )
     const sdk = new GoblinGold(
+      wallet.publicKey!,
       NetworkName.Mainnet,
-      'https://ssc-dao.genesysgo.net',
-      // @ts-ignore: Wallet compatability issues
-      provider
+      connection.current,
+      (wallet as unknown) as Wallet
     )
     const strategyProgram = sdk.BestApy
 
@@ -361,7 +347,6 @@ export async function getGoblinGoldWithdrawInstruction({
     )
 
     const withdrawIxs = await strategyProgram.getWithdrawIx({
-      userSigner: governedAccountPk,
       userInputTokenAccount: ataInputAddress,
       userLpTokenAccount: ataLpAddress,
       lpAmount: new BN(amount),
