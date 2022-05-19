@@ -153,7 +153,7 @@ export const createProposal = async (
   const chunkBys = instructionsData
     .filter((x) => x.chunkBy)
     .map((x) => x.chunkBy!)
-  const chunkBy = Math.min(...chunkBys)
+  const chunkBy = chunkBys.length ? Math.min(...chunkBys) : 2
   for (const [index, instruction] of instructionsData
     .filter((x) => x.data)
     .entries()) {
