@@ -86,7 +86,6 @@ const ChangeDonation = ({
     const selectedNonprofitDetail = searchResults.find(
       (nonprofit) => nonprofit.name === selectedNonprofit
     )
-    console.log(selectedNonprofitDetail)
     handleSetForm({
       value: selectedNonprofitDetail?.crypto.solana_address,
       propertyName: 'destinationAccount',
@@ -109,8 +108,6 @@ const ChangeDonation = ({
       propertyName: 'amount',
     })
   }
-
-  let searchTimeout: number | undefined
   const handleSearch = (evt) => {
     setSearchInput(evt.target.value)
     if (evt.target.value === '') {
@@ -118,43 +115,37 @@ const ChangeDonation = ({
       setLoading(false)
       setNonprofit(undefined)
     } else {
-      performSearch()
+      debounce.debounceFcn(performSearch, 300)
     }
   }
   const performSearch = () => {
     setLoading(true)
-    if (searchTimeout) {
-      clearTimeout(searchTimeout)
-    }
-    searchTimeout = window.setTimeout(() => {
-      const queryParams = new URLSearchParams()
-      queryParams.append('search_term', searchInput!)
-      fetch(
-        `https://api.getchange.io/api/v1/nonprofit_basics?${queryParams.toString()}`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      )
-        .then((response) => response.json())
-        .then((response) => {
-          // Some nonprofits do not have crypto addresses; filter these out.
-          return response.nonprofits.filter(
-            (n: any) => n.crypto !== undefined
-          ) as ChangeNonprofit[]
-        })
-        .then((nonprofits) => {
-          console.log(nonprofits)
-          setSearchResults(nonprofits)
-        })
-        .catch(() => {
-          console.log('error finding nonprofits')
-        })
-        .finally(() => {
-          setLoading(false)
-        })
-    }, 200)
+    const queryParams = new URLSearchParams()
+    queryParams.append('search_term', searchInput!)
+    fetch(
+      `https://api.getchange.io/api/v1/nonprofit_basics?${queryParams.toString()}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+      .then((response) => response.json())
+      .then((response) => {
+        // Some nonprofits do not have crypto addresses; filter these out.
+        return response.nonprofits.filter(
+          (n: any) => n.crypto !== undefined
+        ) as ChangeNonprofit[]
+      })
+      .then((nonprofits) => {
+        setSearchResults(nonprofits)
+      })
+      .catch(() => {
+        console.log('error finding nonprofits')
+      })
+      .finally(() => {
+        setLoading(false)
+      })
   }
 
   async function getInstruction(): Promise<UiInstruction> {
