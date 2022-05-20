@@ -51,6 +51,7 @@ const ChangeDonation = ({
 
   const [searchResults, setSearchResults] = useState<ChangeNonprofit[]>([])
   const [loading, setLoading] = useState<boolean>(false)
+  const [isTyping, setIsTyping] = useState<boolean>(false)
   const [selectedNonprofit, setNonprofit] = useState<ChangeNonprofit>()
   const [searchInput, setSearchInput] = useState<string>()
 
@@ -108,20 +109,26 @@ const ChangeDonation = ({
       propertyName: 'amount',
     })
   }
-  const handleSearch = (evt) => {
+  const handleSearch = async (evt) => {
+    const debounceTimer = 300
     setSearchInput(evt.target.value)
+
     if (evt.target.value === '') {
-      setSearchResults([])
-      setLoading(false)
-      setNonprofit(undefined)
+      setTimeout(() => {
+        setSearchResults([])
+        setLoading(false)
+        setIsTyping(false)
+        setNonprofit(undefined)
+      }, debounceTimer)
     } else {
-      debounce.debounceFcn(performSearch, 300)
+      setIsTyping(true)
+      debounce.debounceFcn(() => performSearch(evt.target.value), debounceTimer)
     }
   }
-  const performSearch = () => {
+  const performSearch = (textToSearch: string) => {
     setLoading(true)
     const queryParams = new URLSearchParams()
-    queryParams.append('search_term', searchInput!)
+    queryParams.append('search_term', textToSearch!)
     fetch(
       `https://api.getchange.io/api/v1/nonprofit_basics?${queryParams.toString()}`,
       {
@@ -144,6 +151,7 @@ const ChangeDonation = ({
         console.log('error finding nonprofits')
       })
       .finally(() => {
+        setIsTyping(false)
         setLoading(false)
       })
   }
@@ -229,10 +237,10 @@ const ChangeDonation = ({
         onSearch={handleSearch}
         onSelect={(nonprofitName) => handleSelectNonProfit(nonprofitName)}
         className="h-12"
-        showSearchResults={searchResults.length > 0}
+        showSearchResults={searchResults.length > 0 || isTyping}
         disabled={searchResults.length === 0}
         nonprofitInformation={selectedNonprofit}
-        isLoading={loading}
+        isLoading={loading || isTyping}
       >
         {searchResults.map((foundNonprofit) => (
           <NonprofitSelect.Option

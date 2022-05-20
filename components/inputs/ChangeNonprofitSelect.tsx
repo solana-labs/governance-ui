@@ -85,6 +85,16 @@ const NonprofitSelect = ({
                   ) : (
                     ''
                   )}
+                  {isLoading && children.length === 0 ? (
+                    <NonprofitSelect.Option
+                      key={'loading-spinner'}
+                      value={'loading-spinner'}
+                    >
+                      <span> </span>
+                    </NonprofitSelect.Option>
+                  ) : (
+                    <></>
+                  )}
                   {children}
                 </Listbox.Options>
                 )
@@ -133,7 +143,10 @@ const NonprofitSelect = ({
             copyText(
               nonprofitInformation?.name +
                 ': ' +
-                nonprofitInformation?.description
+                nonprofitInformation?.description +
+                '\n' +
+                'https://getchange.io/solana/cause/' +
+                nonprofitInformation?.crypto.solana_address
             )
           }
         >
