@@ -205,7 +205,8 @@ const MangoDepositComponent = ({
       )
       const defaultProposalMint = voteByCouncil
         ? realm?.account.config.councilMint
-        : !mint?.supply.isZero()
+        : !mint?.supply.isZero() ||
+          realm?.account.config.useMaxCommunityVoterWeightAddin
         ? realm!.account.communityMint
         : !councilMint?.supply.isZero()
         ? realm!.account.config.councilMint
