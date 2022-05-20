@@ -23,8 +23,8 @@ import { WSOL_MINT_PK } from '@components/instructions/tools'
 
 import { publicKey, struct, u32, u64, u8 } from '@project-serum/borsh'
 import { closeAccount } from '@project-serum/serum/lib/token-instructions'
-import { Wallet } from '@project-serum/anchor'
-import { parseMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
+import { Wallet, BN } from '@project-serum/anchor'
+import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
 
 // // https://github.com/solana-labs/solana-program-library/blob/master/token/js/client/token.js#L210
 export const ACCOUNT_LAYOUT = struct([
@@ -76,7 +76,7 @@ async function createAssociatedTokenAccountIfNotExist(
 export async function createWrappedNativeAccount(
   connection: Connection,
   owner: PublicKey,
-  amount: number,
+  amount: number | undefined,
   prerequisiteInstructions: TransactionInstruction[]
 ) {
   // Allocate memory for the account
@@ -98,7 +98,7 @@ export async function createWrappedNativeAccount(
   )
 
   // Send lamports to it (these will be wrapped into native tokens by the token program)
-  if (amount) {
+  if (amount !== undefined) {
     prerequisiteInstructions.push(
       SystemProgram.transfer({
         fromPubkey: owner,
@@ -176,9 +176,15 @@ export async function getGoblinGoldDepositInstruction({
     if (!vault) {
       throw new Error('Error: no vault')
     }
+
     const strategyProgram = sdk.BestApy
 
     strategyProgram.setToken(vault.input.symbol)
+
+    const transferAmount = parseMintNaturalAmountFromDecimal(
+      amount,
+      vault.input.decimals
+    )
 
     const inputTokenMintAddress = new PublicKey(vault.input.mintAddress)
     const lpTokenMintAddress = new PublicKey(vault.lp.mintAddress)
@@ -198,7 +204,7 @@ export async function getGoblinGoldDepositInstruction({
       ataInputAddress = await createWrappedNativeAccount(
         connection.current,
         governedAccountPk,
-        amount,
+        transferAmount,
         prerequisiteInstructions
       )
     } else {
@@ -222,10 +228,7 @@ export async function getGoblinGoldDepositInstruction({
     const depositIx = await strategyProgram.getDepositIx({
       userInputTokenAccount: ataInputAddress,
       userLpTokenAccount: ataLpAddress,
-      amount: parseMintNaturalAmountFromDecimalAsBN(
-        amount,
-        vault.input.decimals
-      ),
+      amount: new BN(transferAmount),
     })
 
     if (governedTokenAccount.isSol) {
@@ -309,6 +312,11 @@ export async function getGoblinGoldWithdrawInstruction({
 
     strategyProgram.setToken(vault.input.symbol)
 
+    const transferAmount = parseMintNaturalAmountFromDecimal(
+      amount,
+      vault.lp.decimals
+    )
+
     const inputTokenMintAddress = new PublicKey(vault.input.mintAddress)
     const lpTokenMintAddress = new PublicKey(vault.lp.mintAddress)
 
@@ -327,7 +335,7 @@ export async function getGoblinGoldWithdrawInstruction({
       ataInputAddress = await createWrappedNativeAccount(
         connection.current,
         governedAccountPk,
-        amount,
+        undefined,
         prerequisiteInstructions
       )
     } else {
@@ -351,10 +359,7 @@ export async function getGoblinGoldWithdrawInstruction({
     const withdrawIxs = await strategyProgram.getWithdrawIx({
       userInputTokenAccount: ataInputAddress,
       userLpTokenAccount: ataLpAddress,
-      lpAmount: parseMintNaturalAmountFromDecimalAsBN(
-        amount,
-        vault.lp.decimals
-      ),
+      lpAmount: new BN(transferAmount),
     })
 
     const lastIx = withdrawIxs.pop()
