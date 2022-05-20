@@ -45,6 +45,7 @@ async function createAssociatedTokenAccountIfNotExist(
   connection: Connection,
   mintAddress: PublicKey,
   owner: PublicKey,
+  payer: PublicKey,
   prerequisiteInstructions: TransactionInstruction[]
 ) {
   const ataAddress = await Token.getAssociatedTokenAddress(
@@ -65,7 +66,7 @@ async function createAssociatedTokenAccountIfNotExist(
         mintAddress,
         ataAddress,
         owner,
-        owner
+        payer
       )
     )
   }
@@ -222,6 +223,7 @@ export async function getGoblinGoldDepositInstruction({
       connection.current,
       lpTokenMintAddress,
       governedAccountPk,
+      wallet.publicKey ? wallet.publicKey : governedAccountPk,
       prerequisiteInstructions
     )
 
@@ -344,6 +346,7 @@ export async function getGoblinGoldWithdrawInstruction({
         connection.current,
         inputTokenMintAddress,
         governedAccountPk,
+        wallet.publicKey ? wallet.publicKey : governedAccountPk,
         prerequisiteInstructions
       )
     }
