@@ -18,7 +18,7 @@ import { UiInstruction } from '../../uiTypes/proposalCreationTypes'
 import { validateInstruction } from '@utils/instructionTools'
 import { AssetAccount } from '@utils/uiTypes/assets'
 
-import { GoblinGold, NetworkName } from 'goblingold-sdk'
+import { GoblinGold } from 'goblingold-sdk'
 import { WSOL_MINT_PK } from '@components/instructions/tools'
 
 import { publicKey, struct, u32, u64, u8 } from '@project-serum/borsh'
@@ -125,9 +125,11 @@ export async function createWrappedNativeAccount(
 }
 
 function getGovernedAccountPk(acc: AssetAccount): PublicKey {
-  return (acc.isSol
-    ? acc.extensions.transferAddress
-    : acc.extensions?.token?.account?.owner) as PublicKey
+  return (
+    acc.isSol
+      ? acc.extensions.transferAddress
+      : acc.extensions?.token?.account?.owner
+  ) as PublicKey
 }
 
 export async function getGoblinGoldDepositInstruction({
@@ -167,9 +169,8 @@ export async function getGoblinGoldDepositInstruction({
 
     const sdk = new GoblinGold(
       governedAccountPk,
-      NetworkName.Mainnet,
       connection.current,
-      (wallet as unknown) as Wallet
+      wallet as unknown as Wallet
     )
 
     const vault = await sdk.getVaultById(form.goblinGoldVaultId)
@@ -300,9 +301,8 @@ export async function getGoblinGoldWithdrawInstruction({
 
     const sdk = new GoblinGold(
       governedAccountPk,
-      NetworkName.Mainnet,
       connection.current,
-      (wallet as unknown) as Wallet
+      wallet as unknown as Wallet
     )
 
     const vault = await sdk.getVaultById(form.goblinGoldVaultId)
