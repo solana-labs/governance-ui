@@ -1,13 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
-// import BigNumber from 'bignumber.js'
-import * as yup from 'yup'
-
-import {
-  Governance,
-  ProgramAccount,
-  //   serializeInstructionToBase64,
-} from '@solana/spl-governance'
+import { Governance, ProgramAccount } from '@solana/spl-governance'
 import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import { PublicKey } from '@solana/web3.js'
 import Input from '@components/inputs/Input'
@@ -24,6 +17,7 @@ import GovernedAccountSelect from '../../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getGoblinGoldDepositInstruction } from '@utils/instructions/GoblinGold'
 import { StrategyVault } from 'goblingold-sdk'
+import { getGoblinGoldDepositSchema } from '@utils/validations'
 
 const GoblinGoldDeposit = ({
   index,
@@ -131,17 +125,7 @@ const GoblinGoldDeposit = ({
     setMintInfo(form.governedTokenAccount?.extensions.mint?.account)
   }, [form.governedTokenAccount])
 
-  const schema = yup.object().shape({
-    governedTokenAccount: yup
-      .object()
-      .nullable()
-      .required('Governed account is required'),
-    goblinGoldVaultId: yup.string().required('Vault ID is required'),
-    amount: yup
-      .number()
-      .moreThan(0, 'Amount should be more than 0')
-      .required('Amount is required'),
-  })
+  const schema = getGoblinGoldDepositSchema({ form })
 
   return (
     <React.Fragment>
@@ -169,7 +153,7 @@ const GoblinGoldDeposit = ({
         {goblinGoldVaults.map((vault) => (
           <Select.Option key={vault.id} value={vault.id}>
             <div className="break-all text-fgd-1 ">
-              <div className="mb-2">{`Vault: ${vault.type} - ${vault.input.symbol}`}</div>
+              <div className="mb-2">{`Vault: ${vault.name} - ${vault.input.symbol}`}</div>
               <div className="space-y-0.5 text-xs text-fgd-3">
                 <div className="flex items-center">
                   Deposit Token: {vault.input.symbol}

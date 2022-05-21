@@ -125,11 +125,9 @@ export async function createWrappedNativeAccount(
 }
 
 function getGovernedAccountPk(acc: AssetAccount): PublicKey {
-  return (
-    acc.isSol
-      ? acc.extensions.transferAddress
-      : acc.extensions?.token?.account?.owner
-  ) as PublicKey
+  return (acc.isSol
+    ? acc.extensions.transferAddress
+    : acc.extensions?.token?.account?.owner) as PublicKey
 }
 
 export async function getGoblinGoldDepositInstruction({
@@ -170,7 +168,7 @@ export async function getGoblinGoldDepositInstruction({
     const sdk = new GoblinGold(
       governedAccountPk,
       connection.current,
-      wallet as unknown as Wallet
+      (wallet as unknown) as Wallet
     )
 
     const vault = await sdk.getVaultById(form.goblinGoldVaultId)
@@ -302,7 +300,7 @@ export async function getGoblinGoldWithdrawInstruction({
     const sdk = new GoblinGold(
       governedAccountPk,
       connection.current,
-      wallet as unknown as Wallet
+      (wallet as unknown) as Wallet
     )
 
     const vault = await sdk.getVaultById(form.goblinGoldVaultId)
@@ -332,8 +330,8 @@ export async function getGoblinGoldWithdrawInstruction({
 
     let ataInputAddress: PublicKey
 
-    if (governedTokenAccount.isSol) {
-      // If the token account is the native SOL, should create and initialize a new account on the special native token mint. And before initializing it, should send lamports to the new account.
+    if (inputTokenMintAddress === WSOL_MINT_PK) {
+      // If the input token account is the native SOL, should create and initialize a new account on the special native token mint. And before initializing it, should send lamports to the new account.
       ataInputAddress = await createWrappedNativeAccount(
         connection.current,
         governedAccountPk,
@@ -365,9 +363,21 @@ export async function getGoblinGoldWithdrawInstruction({
       lpAmount: new BN(transferAmount),
     })
 
-    const lastIx = withdrawIxs.pop()
+    if (inputTokenMintAddress === WSOL_MINT_PK) {
+      const closeAccountIx = closeAccount({
+        source: ataInputAddress,
+        destination: governedAccountPk,
+        owner: governedAccountPk,
+      })
 
-    if (lastIx) serializedInstruction = serializeInstructionToBase64(lastIx)
+      serializedInstruction = serializeInstructionToBase64(closeAccountIx)
+    } else {
+      const lastIx = withdrawIxs.pop()
+
+      if (lastIx) {
+        serializedInstruction = serializeInstructionToBase64(lastIx)
+      }
+    }
 
     prerequisiteInstructions = prerequisiteInstructions.concat(withdrawIxs)
   }

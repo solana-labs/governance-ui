@@ -1,8 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
-// import BigNumber from 'bignumber.js'
-import * as yup from 'yup'
-
 import {
   Governance,
   ProgramAccount,
@@ -24,6 +21,7 @@ import GovernedAccountSelect from '../../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getGoblinGoldWithdrawInstruction } from '@utils/instructions/GoblinGold'
 import { StrategyVault } from 'goblingold-sdk'
+import { getGoblinGoldWithdrawSchema } from '@utils/validations'
 
 const GoblinGoldWithdraw = ({
   index,
@@ -132,17 +130,7 @@ const GoblinGoldWithdraw = ({
     setMintInfo(form.governedTokenAccount?.extensions.mint?.account)
   }, [form.governedTokenAccount])
 
-  const schema = yup.object().shape({
-    governedTokenAccount: yup
-      .object()
-      .nullable()
-      .required('Governed account is required'),
-    goblinGoldVaultId: yup.string().required('Vault ID is required'),
-    amount: yup
-      .number()
-      .moreThan(0, 'Amount should be more than 0')
-      .required('Amount is required'),
-  })
+  const schema = getGoblinGoldWithdrawSchema()
 
   return (
     <React.Fragment>
@@ -170,7 +158,7 @@ const GoblinGoldWithdraw = ({
         {goblinGoldVaults.map((vault) => (
           <Select.Option key={vault.id} value={vault.id}>
             <div className="break-all text-fgd-1 ">
-              <div className="mb-2">{`Vault: ${vault.type} - ${vault.input.symbol}`}</div>
+              <div className="mb-2">{`Vault: ${vault.name} - ${vault.input.symbol}`}</div>
               <div className="space-y-0.5 text-xs text-fgd-3">
                 <div className="flex items-center">
                   Withdraw Token: {vault.input.symbol}
