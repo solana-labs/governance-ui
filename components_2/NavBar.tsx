@@ -68,16 +68,19 @@ export default function Navbar(props: NavbarProps) {
           : ''
       }`}
     >
-      {scrollY < SCROLL_BREAK_POINT ? (
+      <div className={`${scrollY < SCROLL_BREAK_POINT ? 'hidden' : ''}`}>
         <NavContent showWalletButton={showWalletButton} />
-      ) : (
-        <div className="max-w-[1440px] mx-auto px-4 flex items-center justify-between">
-          <RealmsLogo />
-          <div>
-            {showWalletButton ? <ConnectWalletButton /> : <CreateDaoButton />}
-          </div>
+      </div>
+      <div
+        className={`max-w-[1440px] mx-auto px-4 flex items-center justify-between ${
+          scrollY < SCROLL_BREAK_POINT ? '' : 'hidden'
+        }`}
+      >
+        <RealmsLogo />
+        <div>
+          {showWalletButton ? <ConnectWalletButton /> : <CreateDaoButton />}
         </div>
-      )}
+      </div>
     </div>
   )
 }
