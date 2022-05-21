@@ -1,4 +1,5 @@
 import React from 'react'
+import { RadioGroup as HRG } from '@headlessui/react'
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   invalid?: string
@@ -31,3 +32,51 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 )
 
 export default Input
+
+interface RadioGroupOption {
+  label: string
+  value: string | boolean | number
+}
+interface RadioGroupProps {
+  options: RadioGroupOption[]
+  onChange: any
+  onBlur: any
+  value: any
+  disabled?: boolean
+}
+
+export const RadioGroup = ({
+  options,
+  onChange,
+  value,
+  disabled,
+  onBlur,
+}: RadioGroupProps) => {
+  const buttonClass =
+    'z-0 relative w-full transition-all duration-300 rounded-full font-serif text-[16px] hover:cursor-pointer disabled:cursor-not-allowed opacity-[84] disabled:opacity-50 hover:opacity-100 change-image-on-hover py-4 px-2 font-regular border border-white transition-to-white-background hover:text-black disabled:text-white'
+  const selectedButtonClass = 'bg-white text-black'
+
+  return (
+    <HRG onChange={onChange} value={value} onBlur={onBlur} disabled={disabled}>
+      {/* <HRG {...props}> */}
+      <div className={`grid grid-cols-${options.length} gap-4`}>
+        {options.map(({ label, value }) => {
+          return (
+            <HRG.Option value={value} key={label}>
+              {({ checked }) => (
+                <button
+                  type="button"
+                  className={`${buttonClass} ${
+                    checked ? selectedButtonClass : ''
+                  }`}
+                >
+                  {label}
+                </button>
+              )}
+            </HRG.Option>
+          )
+        })}
+      </div>
+    </HRG>
+  )
+}
