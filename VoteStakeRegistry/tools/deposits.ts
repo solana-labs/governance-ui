@@ -1,8 +1,5 @@
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
-import {
-  BN,
-  EventParser,
-} from '@blockworks-foundation/voter-stake-registry-client/node_modules/@project-serum/anchor'
+import { BN, EventParser } from '@project-serum/anchor'
 import {
   ProgramAccount,
   Realm,
@@ -13,7 +10,7 @@ import { tryGetMint } from '@utils/tokens'
 import {
   getRegistrarPDA,
   getVoterPDA,
-  unusedMintPk,
+  emptyPk,
   DepositWithMintAccount,
   LockupType,
   Registrar,
@@ -52,7 +49,7 @@ export const getDeposits = async ({
   let votingPowerFromDeposits = new BN(0)
   let deposits: DepositWithMintAccount[] = []
   for (const i of mintCfgs) {
-    if (i.mint.toBase58() !== unusedMintPk) {
+    if (i.mint.toBase58() !== emptyPk) {
       const mint = await tryGetMint(connection, i.mint)
       mints[i.mint.toBase58()] = mint
     }
@@ -227,14 +224,11 @@ const getDepositsAdditionalInfoEvents = async (
   for (let i = 0; i < numberOfSimulations; i++) {
     const take = maxRange
     const transaction = new Transaction({ feePayer: walletPk })
-    transaction.add(
-      client.program.instruction.logVoterInfo(maxRange * i, take, {
-        accounts: {
-          registrar,
-          voter,
-        },
-      })
-    )
+    const logVoterInfoIx = await client.program.methods
+      .logVoterInfo(maxRange * i, take)
+      .accounts({ registrar, voter })
+      .instruction()
+    transaction.add(logVoterInfoIx)
     const batchOfDeposits = await simulateTransaction(
       connection,
       transaction,

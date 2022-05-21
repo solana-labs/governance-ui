@@ -52,26 +52,25 @@ const CreateNftPluginRegistrar = ({
         nftClient!.program.programId
       )
 
-      const instruction = nftClient!.program.instruction.createRegistrar(
-        form!.maxCollections,
-        {
-          accounts: {
-            registrar,
-            realm: realm!.pubkey,
-            governanceProgramId: realmInfo!.programId,
-            realmAuthority: realm!.account.authority!,
-            governingTokenMint: realm!.account.communityMint!,
-            payer: wallet.publicKey!,
-            systemProgram: SYSTEM_PROGRAM_ID,
-          },
-        }
-      )
-      serializedInstruction = serializeInstructionToBase64(instruction)
+      const createRegistrarIx = await nftClient!.program.methods
+        .createRegistrar(form!.maxCollections)
+        .accounts({
+          registrar,
+          realm: realm!.pubkey,
+          governanceProgramId: realmInfo!.programId,
+          realmAuthority: realm!.account.authority!,
+          governingTokenMint: realm!.account.communityMint!,
+          payer: wallet.publicKey!,
+          systemProgram: SYSTEM_PROGRAM_ID,
+        })
+        .instruction()
+      serializedInstruction = serializeInstructionToBase64(createRegistrarIx)
     }
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form!.governedAccount?.governance,
+      chunkSplitByDefault: true,
     }
     return obj
   }

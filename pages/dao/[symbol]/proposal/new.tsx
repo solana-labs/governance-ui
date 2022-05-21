@@ -10,7 +10,6 @@ import {
 import {
   getInstructionDataFromBase64,
   Governance,
-  GovernanceAccountType,
   ProgramAccount,
 } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
@@ -61,6 +60,7 @@ import MakeAddSpotMarket from './components/instructions/Mango/MakeAddSpotMarket
 import MakeChangeSpotMarket from './components/instructions/Mango/MakeChangeSpotMarket'
 import MakeCreatePerpMarket from './components/instructions/Mango/MakeCreatePerpMarket'
 import useCreateProposal from '@hooks/useCreateProposal'
+import CastleDeposit from './components/instructions/Castle/CastleDeposit'
 import MakeInitMarketParams from './components/instructions/Foresight/MakeInitMarketParams'
 import MakeInitMarketListParams from './components/instructions/Foresight/MakeInitMarketListParams'
 import MakeInitCategoryParams from './components/instructions/Foresight/MakeInitCategoryParams'
@@ -70,6 +70,9 @@ import RealmConfig from './components/instructions/RealmConfig'
 import MakeAddMarketMetadataParams from './components/instructions/Foresight/MakeAddMarketMetadataParams'
 import CloseTokenAccount from './components/instructions/CloseTokenAccount'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
+import VotingMintConfig from './components/instructions/Vsr/VotingMintConfig'
+import CreateVsrRegistrar from './components/instructions/Vsr/CreateRegistrar'
+import CastleWithdraw from './components/instructions/Castle/CastleWithdraw'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -115,33 +118,31 @@ const New = () => {
   const [isLoadingSignedProposal, setIsLoadingSignedProposal] = useState(false)
   const [isLoadingDraft, setIsLoadingDraft] = useState(false)
   const isLoading = isLoadingSignedProposal || isLoadingDraft
-  const customInstructionFilterForSelectedGovernance = (
-    instructionType: Instructions
-  ) => {
-    if (!governance) {
-      return true
-    } else {
-      const governanceType = governance.account.accountType
-      const instructionsAvailiableAfterProgramGovernance = [Instructions.Base64]
-      switch (governanceType) {
-        case GovernanceAccountType.ProgramGovernanceV1:
-        case GovernanceAccountType.ProgramGovernanceV2:
-          return instructionsAvailiableAfterProgramGovernance.includes(
-            instructionType
-          )
-        default:
-          return true
-      }
-    }
-  }
+  //   const customInstructionFilterForSelectedGovernance = (
+  //     instructionType: Instructions
+  //   ) => {
+  //     if (!governance) {
+  //       return true
+  //     } else {
+  //       const governanceType = governance.account.accountType
+  //       const instructionsAvailiableAfterProgramGovernance = [Instructions.Base64]
+  //       switch (governanceType) {
+  //         case GovernanceAccountType.ProgramGovernanceV1:
+  //         case GovernanceAccountType.ProgramGovernanceV2:
+  //           return instructionsAvailiableAfterProgramGovernance.includes(
+  //             instructionType
+  //           )
+  //         default:
+  //           return true
+  //       }
+  //     }
+  //   }
 
   const getAvailableInstructionsForIndex = (index) => {
     if (index === 0) {
       return availableInstructions
     } else {
-      return availableInstructions.filter((x) =>
-        customInstructionFilterForSelectedGovernance(x.id)
-      )
+      return availableInstructions
     }
   }
   const [instructionsData, setInstructions] = useState<
@@ -196,6 +197,7 @@ const New = () => {
     )
 
     const instructions: UiInstruction[] = await handleGetInstructions()
+
     let proposalAddress: PublicKey | null = null
     if (!realm) {
       handleTurnOffLoaders()
@@ -305,6 +307,16 @@ const New = () => {
         return (
           <CreateAssociatedTokenAccount index={idx} governance={governance} />
         )
+      case Instructions.Mint:
+        return <Mint index={idx} governance={governance}></Mint>
+      case Instructions.Base64:
+        return <CustomBase64 index={idx} governance={governance}></CustomBase64>
+      case Instructions.None:
+        return <Empty index={idx} governance={governance}></Empty>
+      case Instructions.DepositIntoCastle:
+        return <CastleDeposit index={idx} governance={governance} />
+      case Instructions.WithrawFromCastle:
+        return <CastleWithdraw index={idx} governance={governance} />
       case Instructions.DepositIntoVolt:
         return <FriktionDeposit index={idx} governance={governance} />
       case Instructions.WithdrawFromVolt:
@@ -331,10 +343,6 @@ const New = () => {
             governance={governance}
           />
         )
-      case Instructions.Mint:
-        return <Mint index={idx} governance={governance}></Mint>
-      case Instructions.Base64:
-        return <CustomBase64 index={idx} governance={governance}></CustomBase64>
       case Instructions.CreateNftPluginRegistrar:
         return (
           <CreateNftPluginRegistrar
@@ -356,8 +364,6 @@ const New = () => {
             governance={governance}
           ></CreateNftPluginMaxVoterWeightRecord>
         )
-      case Instructions.None:
-        return <Empty index={idx} governance={governance}></Empty>
       case Instructions.MangoAddOracle:
         return (
           <MakeAddOracle index={idx} governance={governance}></MakeAddOracle>
@@ -458,6 +464,20 @@ const New = () => {
             index={idx}
             governance={governance}
           ></CloseTokenAccount>
+        )
+      case Instructions.VotingMintConfig:
+        return (
+          <VotingMintConfig
+            index={idx}
+            governance={governance}
+          ></VotingMintConfig>
+        )
+      case Instructions.CreateVsrRegistrar:
+        return (
+          <CreateVsrRegistrar
+            index={idx}
+            governance={governance}
+          ></CreateVsrRegistrar>
         )
       default:
         null

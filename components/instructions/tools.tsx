@@ -21,6 +21,7 @@ import { ATA_PROGRAM_INSTRUCTIONS } from './programs/associatedTokenAccount'
 import { governance as foresightGov } from '@foresight-tmp/foresight-sdk'
 import { ConnectionContext } from '@utils/connection'
 import { NFT_VOTER_INSTRUCTIONS } from './programs/nftVotingClient'
+import { PROGRAM_IDS } from '@castlefinance/vault-sdk'
 /**
  * Default governance program id instance
  */
@@ -55,6 +56,7 @@ export const ACCOUNT_NAMES = {
   DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE: 'Mango DAO Governance Realm',
   '7Sn4TN4ZkMghVBAhZ88UkyzXoYkMScaE6qtk9eWV3rJz':
     'Mango DAO Governance Program',
+  '8tKwcKM4obpoPmTZNZKDt5cCkAatrwHBNteXNrZRvjWj': 'Mango Liquidity Payout Pool',
   '59BEyxwrFpt3x4sZ7TcXC3bHx3seGfqGkATcDx6siLWy':
     'Mango v3 Insurance Fund Vault',
   '9qFV99WD5TKnpYw8w3xz3mgMBR5anoSZo2BynrGmNZqY': 'Mango v3 Revenue Vault',
@@ -182,9 +184,32 @@ const HIDDEN_MNGO_TREASURES = [
   'FTiWWq3cgETfPkYqP36xFUhT7KMoFYyCiPKeYQU1e4U8',
   'FrkLPsCadx4tE4qDobbu2GTD5ffjWBpormHbLLy35PUS',
   'CaoFkVyPJugKMdzDT1NGnsQJ8dWe4kZFaETCbtWz1QBr',
+  'PuXf9LNrmtVDhBTxteNTWS8D2SpzbhYvidkSatjRArt',
 ]
 
+//owner and desired accounts we want to show
+export const MNGO_AUXILIARY_TOKEN_ACCOUNTS = [
+  {
+    owner: '9BVcYqEQxyccuwznvxXqDkSJFavvTyheiTYk231T1A8S',
+    accounts: ['59BEyxwrFpt3x4sZ7TcXC3bHx3seGfqGkATcDx6siLWy'],
+  },
+  {
+    owner: 'GHsErpcUbwiw1eci65HCDQzySKwQCxYRi5MrGeGpq5dn',
+    accounts: ['8tKwcKM4obpoPmTZNZKDt5cCkAatrwHBNteXNrZRvjWj'],
+  },
+]
+
+export const AUXILIARY_TOKEN_ACCOUNTS = {
+  Mango: MNGO_AUXILIARY_TOKEN_ACCOUNTS,
+}
+
 export const HIDDEN_TREASURES = [...HIDDEN_MNGO_TREASURES]
+
+export const ALL_CASTLE_PROGRAMS = [
+  PROGRAM_IDS['devnet-parity'],
+  PROGRAM_IDS['devnet-staging'],
+  PROGRAM_IDS['mainnet'],
+]
 
 export interface AccountDescriptor {
   name: string

@@ -15,6 +15,7 @@ import {
   getNftVoterWeightRecord,
   getNftMaxVoterWeightRecord,
 } from 'NftVotePlugin/sdk/accounts'
+import { PythClient } from 'pyth-staking-api'
 import {
   getRegistrarPDA,
   getVoterPDA,
@@ -30,7 +31,7 @@ type UpdateVoterWeightRecordTypes =
   | 'signOffProposal'
 
 export interface VotingClientProps {
-  client: VsrClient | NftVoterClient | undefined
+  client: VsrClient | NftVoterClient | PythClient | undefined
   realm: ProgramAccount<Realm> | undefined
   walletPk: PublicKey | null | undefined
 }
@@ -43,6 +44,7 @@ enum VotingClientType {
   NoClient,
   VsrClient,
   NftVoterClient,
+  PythClient,
 }
 
 class AccountData {
@@ -67,7 +69,7 @@ interface ProgramAddresses {
 
 //Abstract for common functions that plugins will implement
 export class VotingClient {
-  client: VsrClient | NftVoterClient | undefined
+  client: VsrClient | NftVoterClient | PythClient | undefined
   realm: ProgramAccount<Realm> | undefined
   walletPk: PublicKey | null | undefined
   votingNfts: NFTWithMeta[]
@@ -88,11 +90,16 @@ export class VotingClient {
       this.clientType = VotingClientType.NftVoterClient
       this.noClient = false
     }
+    if (this.client instanceof PythClient) {
+      this.clientType = VotingClientType.PythClient
+      this.noClient = false
+    }
   }
   withUpdateVoterWeightRecord = async (
     instructions: TransactionInstruction[],
     tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>,
-    type: UpdateVoterWeightRecordTypes
+    type: UpdateVoterWeightRecordTypes,
+    voterWeightTarget?: PublicKey
   ): Promise<ProgramAddresses | undefined> => {
     if (this.noClient) {
       return
@@ -119,16 +126,15 @@ export class VotingClient {
         walletPk,
         clientProgramId
       )
-      instructions.push(
-        this.client!.program.instruction.updateVoterWeightRecord({
-          accounts: {
-            registrar,
-            voter,
-            voterWeightRecord: voterWeightPk,
-            systemProgram: SYSTEM_PROGRAM_ID,
-          },
+      const updateVoterWeightRecordIx = await this.client!.program.methods.updateVoterWeightRecord()
+        .accounts({
+          registrar,
+          voter,
+          voterWeightRecord: voterWeightPk,
+          systemProgram: SYSTEM_PROGRAM_ID,
         })
-      )
+        .instruction()
+      instructions.push(updateVoterWeightRecordIx)
       return { voterWeightPk, maxVoterWeightRecord: undefined }
     }
 
@@ -155,20 +161,35 @@ export class VotingClient {
           new AccountData(nft.metadata.pubkey)
         )
       }
-
-      instructions.push(
-        this.client.program.instruction.updateVoterWeightRecord(
-          { [type]: {} },
-          {
-            accounts: {
-              registrar,
-              voterWeightRecord: voterWeightPk,
-            },
-            remainingAccounts: remainingAccounts.slice(0, 10),
-          }
-        )
-      )
+      const updateVoterWeightRecordIx = await this.client.program.methods
+        .updateVoterWeightRecord({ [type]: {} })
+        .accounts({
+          registrar: registrar,
+          voterWeightRecord: voterWeightPk,
+        })
+        .remainingAccounts(remainingAccounts.slice(0, 10))
+        .instruction()
+      instructions.push(updateVoterWeightRecordIx)
       return { voterWeightPk, maxVoterWeightRecord }
+    }
+    if (this.client instanceof PythClient) {
+      const stakeAccount = await this.client!.stakeConnection.getMainAccount(
+        walletPk
+      )
+
+      const {
+        voterWeightAccount,
+      } = await this.client.stakeConnection.withUpdateVoterWeight(
+        instructions,
+        stakeAccount!,
+        { [type]: {} },
+        voterWeightTarget
+      )
+
+      return {
+        voterWeightPk: voterWeightAccount,
+        maxVoterWeightRecord: undefined,
+      }
     }
   }
   withCastPluginVote = async (
@@ -248,31 +269,32 @@ export class VotingClient {
       )
       const nftsChunk = chunks(remainingNftsToChunk, 12)
       for (const i of nftsChunk) {
-        instructions.push(
-          this.client.program.instruction.castNftVote(proposal.pubkey, {
-            accounts: {
-              registrar,
-              voterWeightRecord: voterWeightPk,
-              governingTokenOwner: walletPk,
-              payer: walletPk,
-              systemProgram: SYSTEM_PROGRAM_ID,
-            },
-            remainingAccounts: i,
-          })
-        )
-      }
-      instructions.push(
-        this.client.program.instruction.castNftVote(proposal.pubkey, {
-          accounts: {
+        const castNftVoteIx = await this.client.program.methods
+          .castNftVote(proposal.pubkey)
+          .accounts({
             registrar,
             voterWeightRecord: voterWeightPk,
             governingTokenOwner: walletPk,
             payer: walletPk,
             systemProgram: SYSTEM_PROGRAM_ID,
-          },
-          remainingAccounts: firstFiveNfts,
+          })
+          .remainingAccounts(i)
+          .instruction()
+
+        instructions.push(castNftVoteIx)
+      }
+      const castNftVoteIx2 = await this.client.program.methods
+        .castNftVote(proposal.pubkey)
+        .accounts({
+          registrar,
+          voterWeightRecord: voterWeightPk,
+          governingTokenOwner: walletPk,
+          payer: walletPk,
+          systemProgram: SYSTEM_PROGRAM_ID,
         })
-      )
+        .remainingAccounts(firstFiveNfts)
+        .instruction()
+      instructions.push(castNftVoteIx2)
       return { voterWeightPk, maxVoterWeightRecord }
     }
 
@@ -281,6 +303,15 @@ export class VotingClient {
         instructions,
         tokeOwnerRecord,
         'castVote'
+      )
+      return props
+    }
+    if (this.client instanceof PythClient) {
+      const props = await this.withUpdateVoterWeightRecord(
+        instructions,
+        tokeOwnerRecord,
+        'castVote',
+        proposal.pubkey
       )
       return props
     }
@@ -347,9 +378,24 @@ export class VotingClient {
         remainingAccounts.length
       )
       const nftsChunk = chunks(remainingNftsToChunk, 12)
-      instructions.push(
-        this.client.program.instruction.relinquishNftVote({
-          accounts: {
+      const relinquishNftVoteIx = await this.client.program.methods
+        .relinquishNftVote()
+        .accounts({
+          registrar,
+          voterWeightRecord: voterWeightPk,
+          governance: proposal.account.governance,
+          proposal: proposal.pubkey,
+          governingTokenOwner: walletPk,
+          voteRecord: voteRecordPk,
+          beneficiary: walletPk,
+        })
+        .remainingAccounts(firstFiveNfts)
+        .instruction()
+      instructions.push(relinquishNftVoteIx)
+      for (const i of nftsChunk) {
+        const relinquishNftVote2Ix = await this.client.program.methods
+          .relinquishNftVote()
+          .accounts({
             registrar,
             voterWeightRecord: voterWeightPk,
             governance: proposal.account.governance,
@@ -357,25 +403,10 @@ export class VotingClient {
             governingTokenOwner: walletPk,
             voteRecord: voteRecordPk,
             beneficiary: walletPk,
-          },
-          remainingAccounts: firstFiveNfts,
-        })
-      )
-      for (const i of nftsChunk) {
-        instructions.push(
-          this.client.program.instruction.relinquishNftVote({
-            accounts: {
-              registrar,
-              voterWeightRecord: voterWeightPk,
-              governance: proposal.account.governance,
-              proposal: proposal.pubkey,
-              governingTokenOwner: walletPk,
-              voteRecord: voteRecordPk,
-              beneficiary: walletPk,
-            },
-            remainingAccounts: i,
           })
-        )
+          .remainingAccounts(i)
+          .instruction()
+        instructions.push(relinquishNftVote2Ix)
       }
       return { voterWeightPk, maxVoterWeightRecord }
     }

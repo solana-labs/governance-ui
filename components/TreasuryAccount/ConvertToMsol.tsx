@@ -38,6 +38,7 @@ const ConvertToMsol = () => {
   const router = useRouter()
   const { handleCreateProposal } = useCreateProposal()
   const connection = useWalletStore((s) => s.connection)
+  const wallet = useWalletStore((s) => s.current)
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const notConnectedMessage =
@@ -79,6 +80,7 @@ const ConvertToMsol = () => {
       schema,
       form,
       connection,
+      wallet,
       setFormErrors,
     })
 
@@ -136,21 +138,23 @@ const ConvertToMsol = () => {
       <h3 className="mb-4 flex items-center">Convert SOL to mSOL</h3>
       <AccountLabel></AccountLabel>
       <div className="space-y-4 w-full pb-4">
-        <GovernedAccountSelect
-          label="mSOL Treasury account"
-          governedAccounts={mSolTokenAccounts as AssetAccount[]}
-          shouldBeGoverned={false}
-          governance={currentAccount?.governance}
-          value={form.destinationAccount}
-          onChange={(evt) =>
-            handleSetForm({
-              value: evt,
-              propertyName: 'destinationAccount',
-            })
-          }
-          error={formErrors['destinationAccount']}
-          noMaxWidth={true}
-        ></GovernedAccountSelect>
+        {mSolTokenAccounts.length > 0 && (
+          <GovernedAccountSelect
+            label="mSOL Treasury account"
+            governedAccounts={mSolTokenAccounts as AssetAccount[]}
+            shouldBeGoverned={false}
+            governance={currentAccount?.governance}
+            value={form.destinationAccount}
+            onChange={(evt) =>
+              handleSetForm({
+                value: evt,
+                propertyName: 'destinationAccount',
+              })
+            }
+            error={formErrors['destinationAccount']}
+            noMaxWidth={true}
+          ></GovernedAccountSelect>
+        )}
         <Input
           min={mintMinAmount}
           label="Amount SOL"

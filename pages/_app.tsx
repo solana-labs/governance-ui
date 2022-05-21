@@ -1,8 +1,8 @@
 import { ThemeProvider } from 'next-themes'
+import '@dialectlabs/react-ui/index.css'
 import '../styles/index.css'
 import '../styles/stylesheet-family-support.css'
 import useWallet from '../hooks/useWallet'
-import Notifications from '../components/Notification'
 import NavBar from '../components/NavBar'
 import PageBodyContainer from '../components/PageBodyContainer'
 import useHydrateStore from '../hooks/useHydrateStore'
@@ -24,8 +24,12 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { usePrevious } from '@hooks/usePrevious'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useMembers from '@components/Members/useMembers'
-import { useRouter } from 'next/router'
+import TransactionLoader from '@components/TransactionLoader'
 
+import dynamic from 'next/dynamic'
+const Notifications = dynamic(() => import('../components/Notification'), {
+  ssr: false,
+})
 function App({ Component, pageProps }) {
   useHydrateStore()
   useWallet()
@@ -36,7 +40,6 @@ function App({ Component, pageProps }) {
   useEffect(() => {
     tokenService.fetchSolanaTokenList()
   }, [])
-  const router = useRouter()
   const { loadMarket } = useMarketStore()
   const { governedTokenAccounts } = useGovernanceAssets()
   const possibleNftsAccounts = governedTokenAccounts.filter(
@@ -52,9 +55,6 @@ function App({ Component, pageProps }) {
   const prevStringifyPossibleNftsAccounts = usePrevious(
     JSON.stringify(possibleNftsAccounts)
   )
-
-  const isRedirecting = router.route === '/'
-  const isLandingPage = /\/solana\/?.*/.test(router.route)
   const title = realmName ? `${realmName}` : 'Realms'
 
   // Note: ?v==${Date.now()} is added to the url to force favicon refresh.
@@ -133,24 +133,18 @@ function App({ Component, pageProps }) {
   return (
     <div className="relative">
       <ErrorBoundary>
-        {!isLandingPage ? (
-          <ThemeProvider defaultTheme="Mango">
-            <WalletIdentityProvider appName={'Realms'}>
-              {!isRedirecting && <NavBar />}
-              <Notifications />
-              <PageBodyContainer>
-                <Component {...pageProps} />
-              </PageBodyContainer>
-            </WalletIdentityProvider>
-            {!isRedirecting && <Footer />}
-          </ThemeProvider>
-        ) : (
+        <ThemeProvider defaultTheme="Mango">
           <WalletIdentityProvider appName={'Realms'}>
+            <NavBar />
             <Notifications />
-            <Component {...pageProps} />
+            <TransactionLoader></TransactionLoader>
+            <PageBodyContainer>
+              <Component {...pageProps} />
+            </PageBodyContainer>
           </WalletIdentityProvider>
-        )}
+        </ThemeProvider>
       </ErrorBoundary>
+      <Footer />
     </div>
   )
 }

@@ -10,8 +10,12 @@ export default function useGovernanceAssets() {
   const governedTokenAccounts: AssetAccount[] = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
   )
-  const assetAccounts = useGovernanceAssetsStore((s) => s.assetAccounts)
-
+  const assetAccounts = useGovernanceAssetsStore((s) =>
+    s.assetAccounts.filter((x) => x.type !== AccountType.AuxiliaryToken)
+  )
+  const auxiliaryTokenAccounts = useGovernanceAssetsStore(
+    (s) => s.assetAccounts
+  ).filter((x) => x.type === AccountType.AuxiliaryToken)
   const currentPluginPk = config?.account.communityVoterWeightAddin
   const governancesArray = useGovernanceAssetsStore((s) => s.governancesArray)
 
@@ -187,6 +191,26 @@ export default function useGovernanceAssets() {
       isVisible: canUseAnyInstruction,
     },
     {
+      id: Instructions.VotingMintConfig,
+      name: 'Vote Escrowed Tokens: Configure Voting Mint',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
+      id: Instructions.CreateVsrRegistrar,
+      name: 'Vote Escrowed Tokens: Create Registrar',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
+      id: Instructions.DepositIntoCastle,
+      name: 'Castle: Deposit into Vault',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.WithrawFromCastle,
+      name: 'Castle: Withdraw from Vault',
+      isVisible: canUseAnyInstruction,
+    },
+    {
       id: Instructions.DepositIntoVolt,
       name: 'Friktion: Deposit into Volt',
       isVisible: canUseAnyInstruction,
@@ -313,5 +337,6 @@ export default function useGovernanceAssets() {
     nftsGovernedTokenAccounts,
     canUseAuthorityInstruction,
     assetAccounts,
+    auxiliaryTokenAccounts,
   }
 }
