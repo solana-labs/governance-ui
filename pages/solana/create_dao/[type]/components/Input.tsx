@@ -59,7 +59,7 @@ export const RadioGroup = ({
   return (
     <HRG onChange={onChange} value={value} onBlur={onBlur} disabled={disabled}>
       {/* <HRG {...props}> */}
-      <div className={`grid grid-cols-${options.length} gap-4`}>
+      <div className={`grid md:grid-cols-${options.length} gap-4`}>
         {options.map(({ label, value }) => {
           return (
             <HRG.Option value={value} key={label}>
