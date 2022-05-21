@@ -8,13 +8,13 @@ export default function Header({
 }) {
   let classNames = 'landing-page font-light'
   if (as === 'h1') {
-    classNames += ` `
+    classNames += ` heading-xl`
   } else if (as === 'h2') {
-    classNames += ` `
+    classNames += ` heading-lg`
   } else if (as === 'h3') {
-    classNames += ` `
+    classNames += ` heading-md`
   } else if (as === 'h4') {
-    classNames += ` `
+    classNames += ` heading-sm`
   }
 
   classNames += ` ${className}`

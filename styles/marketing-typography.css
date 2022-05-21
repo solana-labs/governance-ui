@@ -1,0 +1,76 @@
+.landing-page {
+  @apply font-sans font-light;
+}
+
+/* h1, */
+.heading-xl {
+  font-size: 40px;
+  letter-spacing: -0.5px;
+  line-height: 110%;
+  @apply font-serif md:text-[70px];
+}
+
+/* h2, */
+.heading-lg {
+  font-size: 36px;
+  letter-spacing: -0.5px;
+  line-height: 110%;
+  @apply font-serif md:text-[50px];
+}
+
+/* h3, */
+.heading-md {
+  font-size: 24px;
+  letter-spacing: -0.5px;
+  line-height: 110%;
+  @apply font-serif md:text-[36px];
+}
+
+/* h4, */
+.heading-sm {
+  font-size: 20px;
+  letter-spacing: -0.5px;
+  line-height: 110%;
+  @apply font-serif md:text-[22px];
+}
+
+/* h5, */
+.heading-xs {
+  font-size: 16px;
+  letter-spacing: -0.5px;
+  line-height: 110%;
+  @apply font-serif md:text-[20px];
+}
+
+/* h6, */
+.heading-cta {
+  font-size: 16px;
+  letter-spacing: -0.5px;
+  line-height: 110%;
+  @apply font-serif md:text-[18px];
+}
+
+.landing-page.text-base {
+  font-size: 18px;
+  letter-spacing: 0pt;
+  line-height: 140%;
+}
+
+.landing-page.text-sm {
+  font-size: 16px;
+  letter-spacing: 0pt;
+  line-height: 140%;
+}
+
+.landing-page.text-sm.font-bold {
+  font-size: 15px;
+  letter-spacing: 0pt;
+  line-height: 140%;
+  @apply md:text-[16px];
+}
+
+.landing-page.text-xs {
+  font-size: 12px;
+  letter-spacing: 0pt;
+  line-height: 140%;
+}
