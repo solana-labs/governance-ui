@@ -68,6 +68,7 @@ export const RadioGroup = ({
                   className={`${buttonClass} ${
                     checked ? selectedButtonClass : ''
                   }`}
+                  disabled={disabled}
                 >
                   {label}
                 </button>

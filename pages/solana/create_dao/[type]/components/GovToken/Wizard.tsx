@@ -45,29 +45,28 @@ export const STEP2_SCHEMA = {
     .test('is-valid-address', 'Please enter a valid Solana address', (value) =>
       value ? validateSolAddress(value) : true
     ),
+  transferMintAuthorityToDao: yup
+    .boolean()
+    .oneOf(
+      [true, false],
+      'You must specify whether you which to transfer mint authority'
+    )
+    .when('useExistingToken', {
+      is: (val) => val == true,
+      then: yup.boolean().required('Required'),
+      otherwise: yup.boolean().optional(),
+    }),
   tokenName: yup.string(),
   tokenSymbol: yup.string(),
   minimumNumberOfTokensToEditDao: yup
     .number()
-    .nullable()
     .positive('Must be greater than 0')
-    .min(0, 'Must be greater than 0')
-    .transform((value, originalvalue) => {
-      if (Number.isNaN(value) || originalvalue === '') {
-        return null
-      }
-    }),
+    .transform((value) => (isNaN(value) ? undefined : value)),
   mintSupplyFactor: yup
     .number()
-    .nullable()
     .positive('Must be greater than 0')
-    .min(0, 'Must be greater than 0')
     .max(1, 'Must not be greater than 1')
-    .transform((value, originalvalue) => {
-      if (Number.isNaN(value) || originalvalue === '') {
-        return null
-      }
-    }),
+    .transform((value) => (isNaN(value) ? undefined : value)),
 }
 
 export const STEP3_SCHEMA = {
@@ -105,7 +104,7 @@ export function updateUserInput(schema, setValue) {
   const formData = getFormData()
   Object.keys(schema).forEach((fieldName) => {
     const value = formData[fieldName]
-    if (value) {
+    if (typeof value !== 'undefined') {
       setValue(fieldName, value, {
         shouldValidate: true,
         shouldDirty: true,

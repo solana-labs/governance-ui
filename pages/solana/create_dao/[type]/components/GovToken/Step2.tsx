@@ -51,8 +51,6 @@ export default function Step2({ onSubmit, onPrevClick }) {
     watch,
     control,
     setValue,
-    setError,
-    clearErrors,
     handleSubmit,
     formState: { errors, isValid },
   } = useForm({
@@ -105,6 +103,15 @@ export default function Step2({ onSubmit, onPrevClick }) {
     onSubmit({ step: 2, data: values })
   }
 
+  function preventNegativeNumberInput(ev) {
+    const value = ev.target.value
+    if (!isNaN(value) && value < 0) {
+      ev.target.value = 0
+    } else if (isNaN(value)) {
+      ev.target.value = value.slice(0, value.length - 1)
+    }
+  }
+
   return (
     <form
       onSubmit={handleSubmit(serializeValues)}
@@ -126,7 +133,7 @@ export default function Step2({ onSubmit, onPrevClick }) {
           <Controller
             name="useExistingToken"
             control={control}
-            defaultValue=""
+            defaultValue={undefined}
             render={({ field }) => (
               <RadioGroup
                 onChange={field.onChange}
@@ -262,7 +269,7 @@ export default function Step2({ onSubmit, onPrevClick }) {
             <Controller
               name="minimumNumberOfTokensToEditDao"
               control={control}
-              defaultValue={Number()}
+              defaultValue=""
               render={({ field }) => (
                 <FormField
                   title="What is the minimum number of tokens needed to edit this DAO's info?"
@@ -271,18 +278,51 @@ export default function Step2({ onSubmit, onPrevClick }) {
                   optional
                 >
                   <Input
-                    type="number"
-                    step={1}
-                    // min={0}
+                    type="tel"
                     placeholder="1,000,000"
                     data-testid="dao-name-input"
                     error={errors.minimumNumberOfTokensToEditDao?.message || ''}
                     {...field}
                     disabled={useExistingToken && tokenAddress === ''}
+                    onChange={(ev) => {
+                      preventNegativeNumberInput(ev)
+                      field.onChange(ev)
+                    }}
                   />
                 </FormField>
               )}
             />
+          </>
+        )}
+        {useExistingToken === true && (
+          <>
+            <FormField
+              title="Do you want to transfer mint authority of the token to the DAO?"
+              description=""
+              disabled={useExistingToken && tokenAddress === ''}
+            >
+              <Controller
+                name="transferMintAuthorityToDao"
+                control={control}
+                defaultValue={undefined}
+                render={({ field }) => (
+                  <RadioGroup
+                    onChange={field.onChange}
+                    value={field.value}
+                    onBlur={field.onBlur}
+                    options={[
+                      { label: 'Yes', value: true },
+                      { label: 'No', value: false },
+                    ]}
+                    disabled={useExistingToken && tokenAddress === ''}
+                  />
+                )}
+              />
+            </FormField>
+          </>
+        )}
+        {typeof useExistingToken !== 'undefined' && (
+          <>
             <AdvancedOptionsDropdown>
               <Controller
                 name="mintSupplyFactor"
@@ -295,10 +335,15 @@ export default function Step2({ onSubmit, onPrevClick }) {
                     advancedOption
                   >
                     <Input
+                      type="tel"
                       placeholder={`1`}
                       data-testid="programId-input"
                       error={errors.mintSupplyFactor?.message || ''}
                       {...field}
+                      onChange={(ev) => {
+                        preventNegativeNumberInput(ev)
+                        field.onChange(ev)
+                      }}
                     />
                   </FormField>
                 )}
