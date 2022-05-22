@@ -28,7 +28,8 @@ export default function Step3({ onSubmit, onPrevClick }) {
     mode: 'all',
     resolver: yupResolver(schema),
   })
-  const approvalPercent = watch('approvalThreshold', 60)
+  const quorumPercent = watch('quorumThreshold', 50)
+  const quorumSize = Math.ceil((quorumPercent * numberOfDaoMember) / 100)
 
   useEffect(() => {
     const formData = getFormData()
@@ -57,19 +58,19 @@ export default function Step3({ onSubmit, onPrevClick }) {
       <FormHeader
         currentStep={3}
         totalSteps={4}
-        stepDescription="Approval threshold"
-        title="Next, let's determine the approval quorum for community proposals."
+        stepDescription="Approval qurorum"
+        title="Last, let's determine the approval quorum for your shared wallet."
         imgSrc="/1-Landing-v2/dao-type-medium-govtoken.png"
         imgAlt="circles spirling"
       />
       <div className="pt-10 space-y-10 md:space-y-12">
         <Controller
-          name="approvalThreshold"
+          name="quorumThreshold"
           control={control}
-          defaultValue={60}
+          defaultValue={50}
           render={({ field }) => (
             <FormField
-              title="Adjust how much of the total governance token supply needed to pass a proposal"
+              title="Adjust the percentage to determine votes needed to pass a proposal"
               description=""
             >
               <div className="flex items-center justify-between">
@@ -77,9 +78,9 @@ export default function Step3({ onSubmit, onPrevClick }) {
                   <div className="w-[4.5rem]">
                     <Input
                       type="number"
-                      placeholder="60"
+                      placeholder="50"
                       data-testid="dao-quorum-input"
-                      error={errors.approvalThreshold?.message || ''}
+                      error={errors.quorumThreshold?.message || ''}
                       {...field}
                     />
                   </div>
@@ -93,7 +94,7 @@ export default function Step3({ onSubmit, onPrevClick }) {
                     className="w-full with-gradient focus:outline-none focus:ring-0 focus:shadow-none"
                     {...field}
                     style={{
-                      backgroundSize: `${approvalPercent}% 100%`,
+                      backgroundSize: `${quorumPercent}% 100%`,
                     }}
                   />
                   <div className="opacity-60">100%</div>
@@ -109,11 +110,13 @@ export default function Step3({ onSubmit, onPrevClick }) {
         </div>
         <div className="flex flex-col">
           <div className="pb-3 text-sm uppercase opacity-50">
-            Approval threshold
+            Approval quorum
           </div>
           <div className="text-lg">
-            Typically, newer Governance Token DAOs start their community
-            approval quorums around 60% of total token supply.
+            With {numberOfDaoMember} members added to your DAO,
+          </div>
+          <div className="pt-2 text-lg">
+            {quorumSize} members would need to approve a proposal for it to pass{' '}
           </div>
         </div>
       </div>

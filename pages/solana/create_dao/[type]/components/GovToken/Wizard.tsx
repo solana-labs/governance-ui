@@ -19,6 +19,7 @@ import Step1 from './Step1'
 import Step2 from './Step2'
 import Step3 from './Step3'
 import Step4 from './Step4'
+import Step5 from './Step5'
 import FormSummary from '../FormSummary'
 
 export const SESSION_STORAGE_FORM_KEY = 'govtoken-form-data'
@@ -70,19 +71,38 @@ export const STEP2_SCHEMA = {
 }
 
 export const STEP3_SCHEMA = {
+  approvalThreshold: yup
+    .number()
+    .typeError('Required')
+    .max(100, 'Approval cannot require more than 100% of votes')
+    .min(1, 'Approval must be at least 1% of votes')
+    .required('Required'),
+}
+
+export const STEP4_SCHEMA = {
+  addCouncil: yup
+    .boolean()
+    .oneOf(
+      [true, false],
+      'You must specify whether you would like to add a council or not'
+    )
+    .required('Required'),
+}
+
+export const STEP5_SCHEMA = {
+  memberAddresses: yup
+    .array()
+    .of(yup.string())
+    .min(1, 'A DAO needs at least one member')
+    .required('Required'),
+}
+
+export const STEP6_SCHEMA = {
   quorumThreshold: yup
     .number()
     .typeError('Required')
     .max(100, 'Quorum cannot require more than 100% of members')
     .min(1, 'Quorum must be at least 1% of member')
-    .required('Required'),
-}
-
-export const STEP4_SCHEMA = {
-  memberAddresses: yup
-    .array()
-    .of(yup.string())
-    .min(1, 'A DAO needs at least one member')
     .required('Required'),
 }
 
@@ -122,8 +142,14 @@ export default function GovTokenWizard() {
 
   function handleNextButtonClick({ step, data }) {
     const formState = getFormData()
+    let nextStep
+    if (step === 4 && !data.addCouncil) {
+      // skip to the end
+      nextStep = 7
+    } else {
+      nextStep = step + 1
+    }
 
-    const nextStep = step + 1
     const updatedFormState = {
       ...formState,
       ...data,
@@ -143,7 +169,15 @@ export default function GovTokenWizard() {
     if (currentStep === 1) {
       push({ pathname: '/solana/create_dao/' }, undefined, { shallow: true })
     } else {
-      const previousStep = currentStep - 1
+      const formState = getFormData()
+      let previousStep
+      if (currentStep === 7 && !formState.addCouncil) {
+        // skip to the end
+        previousStep = 4
+      } else {
+        previousStep = currentStep - 1
+      }
+
       console.log('Previous click')
       push(
         { pathname, query: { ...query, currentStep: previousStep } },
@@ -279,6 +313,12 @@ export default function GovTokenWizard() {
           />
         )}
         {currentStep === 5 && (
+          <Step5
+            onPrevClick={handlePreviousButton}
+            onSubmit={handleNextButtonClick}
+          />
+        )}
+        {currentStep === 7 && (
           <FormSummary
             currentStep={currentStep}
             formData={getFormData()}
