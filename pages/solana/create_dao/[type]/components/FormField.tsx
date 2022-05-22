@@ -143,14 +143,15 @@ export function ImageUploader({
 
 export default function FormField({
   title,
+  description,
   optional = false,
   advancedOption = false,
-  description,
+  disabled = false,
   error = '',
   children,
 }) {
   return (
-    <div>
+    <div className={disabled ? 'opacity-50 cursor-not-allowed' : ''}>
       <div className="flex items-baseline space-x-3">
         <div className="text-lg md:text-xl">{title}</div>
         {optional && <div className="opacity-60">(optional)</div>}
