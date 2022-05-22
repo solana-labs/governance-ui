@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { PublicKey } from '@solana/web3.js'
@@ -56,9 +56,6 @@ function validateSolAddress(address: string) {
 
 export default function Step2({ onSubmit, onPrevClick }) {
   const [tokenList, setTokenList] = useState<TokenInfo[] | undefined>()
-  const [tokenFromAddress, setTokenFromAddress] = useState<
-    TokenInfo | undefined
-  >()
   const schema = yup.object(STEP2_SCHEMA).required()
   const {
     watch,
@@ -74,6 +71,18 @@ export default function Step2({ onSubmit, onPrevClick }) {
   })
   const useExistingToken = watch('useExistingToken')
   const tokenAddress = watch('tokenAddress')
+  const tokenInfo: TokenInfo | undefined = useMemo(() => {
+    if (!tokenList) {
+      return PENDING_COIN
+    } else if (tokenAddress && validateSolAddress(tokenAddress)) {
+      const tokenInfo = tokenList.find(
+        (token) => token.address === tokenAddress
+      )
+      return tokenInfo || NOTFOUND_COIN
+    } else {
+      return undefined
+    }
+  }, [tokenAddress, tokenList])
 
   useEffect(() => {
     const formData = getFormData()
@@ -107,23 +116,22 @@ export default function Step2({ onSubmit, onPrevClick }) {
     // the quickest look up, but not throw a validation error until onBlur occurs,
     // as well as when the user inputs an address, but the tokenList hasn't resolved
     clearErrors('tokenAddress')
-    console.log('tokenlist exists', !!tokenList, 'token address', tokenAddress)
-    if (!tokenList) {
-      setTokenFromAddress(PENDING_COIN)
-    } else if (tokenAddress && validateSolAddress(tokenAddress)) {
-      const tokenInfo = tokenList.find(
-        (token) => token.address === tokenAddress
-      )
-      setTokenFromAddress(tokenInfo || NOTFOUND_COIN)
-    } else {
-      setTokenFromAddress(undefined)
-    }
-    // setValidatingTokenAddress(false)
-  }, [tokenList, tokenAddress])
+    //   console.log('tokenlist exists', !!tokenList, 'token address', tokenAddress)
+    //   if (!tokenList) {
+    //     setTokenFromAddress(PENDING_COIN)
+    //   } else if (tokenAddress && validateSolAddress(tokenAddress)) {
+    //     const tokenInfo = tokenList.find(
+    //       (token) => token.address === tokenAddress
+    //     )
+    //     setTokenFromAddress(tokenInfo || NOTFOUND_COIN)
+    //   } else {
+    //     setTokenFromAddress(undefined)
+    //   }
+    //   // setValidatingTokenAddress(false)
+  }, [tokenAddress])
 
   async function validateTokenAddress(address) {
     if (address && !validateSolAddress(address)) {
-      setTokenFromAddress(undefined)
       setError('tokenAddress', {
         type: 'custom',
         message: 'Please enter a valid Solana address.',
@@ -201,15 +209,15 @@ export default function Step2({ onSubmit, onPrevClick }) {
                   <div className="w-10">
                     <img
                       src={
-                        tokenFromAddress?.logoURI ||
+                        tokenInfo?.logoURI ||
                         '/1-Landing-v2/icon-token-generic-gradient.png'
                       }
                       alt="token"
                       className="h-full"
                     />
                   </div>
-                  {tokenFromAddress?.name ? (
-                    <Header as="h4">{tokenFromAddress.name}</Header>
+                  {tokenInfo?.name ? (
+                    <Header as="h4">{tokenInfo.name}</Header>
                   ) : (
                     <Text className="text-white/30">
                       <div
@@ -229,8 +237,8 @@ export default function Step2({ onSubmit, onPrevClick }) {
                     <div className="text-[28px] font-normal text-white/30">
                       #
                     </div>
-                    {tokenFromAddress?.symbol ? (
-                      <Header as="h4">{tokenFromAddress.symbol}</Header>
+                    {tokenInfo?.symbol ? (
+                      <Header as="h4">{tokenInfo.symbol}</Header>
                     ) : (
                       <div
                         className="text-[22px] font-bold text-white/30"
