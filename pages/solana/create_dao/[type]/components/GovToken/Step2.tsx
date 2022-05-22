@@ -1,7 +1,6 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { PublicKey } from '@solana/web3.js'
 import { TokenListProvider, TokenInfo } from '@solana/spl-token-registry'
 import * as yup from 'yup'
 
@@ -19,6 +18,7 @@ import {
   STEP2_SCHEMA,
   getFormData,
   updateUserInput,
+  validateSolAddress,
 } from './Wizard'
 import Header from 'components_2/Header'
 import Text from 'components_2/Text'
@@ -44,16 +44,6 @@ const NOTFOUND_COIN = {
   symbol: '(Token has no symbol)',
 }
 
-function validateSolAddress(address: string) {
-  try {
-    const pubkey = new PublicKey(address)
-    const isSolana = PublicKey.isOnCurve(pubkey.toBuffer())
-    return isSolana
-  } catch (error) {
-    return false
-  }
-}
-
 export default function Step2({ onSubmit, onPrevClick }) {
   const [tokenList, setTokenList] = useState<TokenInfo[] | undefined>()
   const schema = yup.object(STEP2_SCHEMA).required()
@@ -66,7 +56,7 @@ export default function Step2({ onSubmit, onPrevClick }) {
     handleSubmit,
     formState: { errors, isValid },
   } = useForm({
-    // mode: 'all',
+    mode: 'all',
     resolver: yupResolver(schema),
   })
   const useExistingToken = watch('useExistingToken')
@@ -110,34 +100,6 @@ export default function Step2({ onSubmit, onPrevClick }) {
 
     getTokenList()
   }, [])
-
-  useEffect(() => {
-    // This handles the case where the user is inputting an address so we want to do
-    // the quickest look up, but not throw a validation error until onBlur occurs,
-    // as well as when the user inputs an address, but the tokenList hasn't resolved
-    clearErrors('tokenAddress')
-    //   console.log('tokenlist exists', !!tokenList, 'token address', tokenAddress)
-    //   if (!tokenList) {
-    //     setTokenFromAddress(PENDING_COIN)
-    //   } else if (tokenAddress && validateSolAddress(tokenAddress)) {
-    //     const tokenInfo = tokenList.find(
-    //       (token) => token.address === tokenAddress
-    //     )
-    //     setTokenFromAddress(tokenInfo || NOTFOUND_COIN)
-    //   } else {
-    //     setTokenFromAddress(undefined)
-    //   }
-    //   // setValidatingTokenAddress(false)
-  }, [tokenAddress])
-
-  async function validateTokenAddress(address) {
-    if (address && !validateSolAddress(address)) {
-      setError('tokenAddress', {
-        type: 'custom',
-        message: 'Please enter a valid Solana address.',
-      })
-    }
-  }
 
   function serializeValues(values) {
     onSubmit({ step: 2, data: values })
@@ -194,10 +156,6 @@ export default function Step2({ onSubmit, onPrevClick }) {
                     data-testid="dao-name-input"
                     error={errors.tokenAddress?.message}
                     {...field}
-                    onBlur={(ev) => {
-                      validateTokenAddress(ev.target.value)
-                      field.onBlur()
-                    }}
                   />
                 </FormField>
               )}

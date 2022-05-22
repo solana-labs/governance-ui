@@ -35,10 +35,16 @@ export const STEP2_SCHEMA = {
     .boolean()
     .oneOf([true, false], 'You must specify whether you have a token already')
     .required('Required'),
-  tokenAddress: yup.string().when('useExistingToken', {
-    is: true,
-    then: yup.string().required('Required'),
-  }),
+  tokenAddress: yup
+    .string()
+    .when('useExistingToken', {
+      is: (val) => val == true,
+      then: yup.string().required('Required'),
+      otherwise: yup.string().optional(),
+    })
+    .test('is-valid-address', 'Please enter a valid Solana address', (value) =>
+      value ? validateSolAddress(value) : true
+    ),
   tokenName: yup.string(),
   tokenSymbol: yup.string(),
   minimumNumberOfTokensToEditDao: yup
@@ -79,6 +85,16 @@ export const STEP4_SCHEMA = {
     .of(yup.string())
     .min(1, 'A DAO needs at least one member')
     .required('Required'),
+}
+
+export function validateSolAddress(address: string) {
+  try {
+    const pubkey = new PublicKey(address)
+    const isSolana = PublicKey.isOnCurve(pubkey.toBuffer())
+    return isSolana
+  } catch (error) {
+    return false
+  }
 }
 
 export function getFormData() {
