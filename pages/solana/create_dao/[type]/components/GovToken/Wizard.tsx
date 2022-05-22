@@ -35,6 +35,33 @@ export const STEP2_SCHEMA = {
     .boolean()
     .oneOf([true, false], 'You must specify whether you have a token already')
     .required('Required'),
+  tokenAddress: yup.string().when('useExistingToken', {
+    is: true,
+    then: yup.string().required('Required'),
+  }),
+  tokenName: yup.string(),
+  tokenSymbol: yup.string(),
+  minimumNumberOfTokensToEditDao: yup
+    .number()
+    .nullable()
+    .positive('Must be greater than 0')
+    .min(0, 'Must be greater than 0')
+    .transform((value, originalvalue) => {
+      if (Number.isNaN(value) || originalvalue === '') {
+        return null
+      }
+    }),
+  mintSupplyFactor: yup
+    .number()
+    .nullable()
+    .positive('Must be greater than 0')
+    .min(0, 'Must be greater than 0')
+    .max(1, 'Must not be greater than 1')
+    .transform((value, originalvalue) => {
+      if (Number.isNaN(value) || originalvalue === '') {
+        return null
+      }
+    }),
 }
 
 export const STEP3_SCHEMA = {

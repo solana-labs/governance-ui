@@ -1,15 +1,17 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { PublicKey } from '@solana/web3.js'
+import { TokenListProvider, TokenInfo } from '@solana/spl-token-registry'
 import * as yup from 'yup'
 
-import { notify } from '@utils/notifications'
+// import { notify } from '@utils/notifications'
 
 // import { RadioGroup } from '@headlessui/react'
 import FormHeader from '../FormHeader'
 import FormField from '../FormField'
 import FormFooter from '../FormFooter'
+import AdvancedOptionsDropdown from '../AdvancedOptionsDropdown'
 import Input, { RadioGroup } from '../Input'
 
 import {
@@ -18,6 +20,29 @@ import {
   getFormData,
   updateUserInput,
 } from './Wizard'
+import Header from 'components_2/Header'
+import Text from 'components_2/Text'
+
+const PENDING_COIN = {
+  chainId: 1,
+  address: 'pending',
+  symbol: 'finding symbol...',
+  name: 'finding name...',
+  decimals: 9,
+  logoURI: '',
+  tags: [''],
+  extensions: {
+    facebook: '',
+    twitter: '',
+    website: '',
+  },
+}
+
+const NOTFOUND_COIN = {
+  ...PENDING_COIN,
+  name: '(Token has no name)',
+  symbol: '(Token has no symbol)',
+}
 
 function validateSolAddress(address: string) {
   try {
@@ -30,17 +55,25 @@ function validateSolAddress(address: string) {
 }
 
 export default function Step2({ onSubmit, onPrevClick }) {
-  const [validationError, setValidationError] = useState<string>('')
+  const [tokenList, setTokenList] = useState<TokenInfo[] | undefined>()
+  const [tokenFromAddress, setTokenFromAddress] = useState<
+    TokenInfo | undefined
+  >()
   const schema = yup.object(STEP2_SCHEMA).required()
   const {
+    watch,
     control,
     setValue,
+    setError,
+    clearErrors,
     handleSubmit,
     formState: { errors, isValid },
   } = useForm({
-    mode: 'all',
+    // mode: 'all',
     resolver: yupResolver(schema),
   })
+  const useExistingToken = watch('useExistingToken')
+  const tokenAddress = watch('tokenAddress')
 
   useEffect(() => {
     const formData = getFormData()
@@ -56,15 +89,50 @@ export default function Step2({ onSubmit, onPrevClick }) {
       })
   }, [])
 
-  function serializeValues(values) {
-    onSubmit({ step: 2, data: values })
+  useEffect(() => {
+    // TODO: wire up to cluster
+    async function getTokenList() {
+      const tokenList = await new TokenListProvider().resolve()
+      const filteredTokenList = tokenList
+        .filterByClusterSlug('mainnet-beta')
+        .getList()
+      setTokenList(filteredTokenList)
+    }
+
+    getTokenList()
+  }, [])
+
+  useEffect(() => {
+    // This handles the case where the user is inputting an address so we want to do
+    // the quickest look up, but not throw a validation error until onBlur occurs,
+    // as well as when the user inputs an address, but the tokenList hasn't resolved
+    clearErrors('tokenAddress')
+    console.log('tokenlist exists', !!tokenList, 'token address', tokenAddress)
+    if (!tokenList) {
+      setTokenFromAddress(PENDING_COIN)
+    } else if (tokenAddress && validateSolAddress(tokenAddress)) {
+      const tokenInfo = tokenList.find(
+        (token) => token.address === tokenAddress
+      )
+      setTokenFromAddress(tokenInfo || NOTFOUND_COIN)
+    } else {
+      setTokenFromAddress(undefined)
+    }
+    // setValidatingTokenAddress(false)
+  }, [tokenList, tokenAddress])
+
+  async function validateTokenAddress(address) {
+    if (address && !validateSolAddress(address)) {
+      setTokenFromAddress(undefined)
+      setError('tokenAddress', {
+        type: 'custom',
+        message: 'Please enter a valid Solana address.',
+      })
+    }
   }
 
-  function validateInput(input: string) {
-    const addressList = input.split(/[\s|,]/).filter((item) => item.length > 2)
-    return [...new Set(addressList)].filter((wallet) => {
-      return validateSolAddress(wallet)
-    })
+  function serializeValues(values) {
+    onSubmit({ step: 2, data: values })
   }
 
   return (
@@ -102,6 +170,176 @@ export default function Step2({ onSubmit, onPrevClick }) {
             )}
           />
         </FormField>
+        {useExistingToken === true && (
+          <>
+            <Controller
+              name="tokenAddress"
+              control={control}
+              defaultValue=""
+              render={({ field }) => (
+                <FormField
+                  title="What is the address of the token you would like to use?"
+                  description="You can verify the correct token in the preview below."
+                >
+                  <Input
+                    placeholder="e.g. CwvWQWt5m..."
+                    data-testid="dao-name-input"
+                    error={errors.tokenAddress?.message}
+                    {...field}
+                    onBlur={(ev) => {
+                      validateTokenAddress(ev.target.value)
+                      field.onBlur()
+                    }}
+                  />
+                </FormField>
+              )}
+            />
+            <div className="grid grid-cols-2 gap-2">
+              <div className="bg-[#201F27] py-5 px-6 flex flex-col rounded-md space-y-5">
+                <Text className="text-white/30">Token Name</Text>
+                <div className="flex items-center space-x-2">
+                  <div className="w-10">
+                    <img
+                      src={
+                        tokenFromAddress?.logoURI ||
+                        '/1-Landing-v2/icon-token-generic-gradient.png'
+                      }
+                      alt="token"
+                      className="h-full"
+                    />
+                  </div>
+                  {tokenFromAddress?.name ? (
+                    <Header as="h4">{tokenFromAddress.name}</Header>
+                  ) : (
+                    <Text className="text-white/30">
+                      <div
+                        className="text-[22px] font-bold"
+                        dangerouslySetInnerHTML={{
+                          __html: `&#8212;`,
+                        }}
+                      ></div>
+                    </Text>
+                  )}
+                </div>
+              </div>
+              <div className="bg-[#201F27] py-5 px-6 flex flex-col rounded-md space-y-5">
+                <Text className="text-white/30">Token Symbol</Text>
+                <div className="flex items-center h-10">
+                  <Text className="flex space-x-2 ">
+                    <div className="text-[28px] font-normal text-white/30">
+                      #
+                    </div>
+                    {tokenFromAddress?.symbol ? (
+                      <Header as="h4">{tokenFromAddress.symbol}</Header>
+                    ) : (
+                      <div
+                        className="text-[22px] font-bold text-white/30"
+                        dangerouslySetInnerHTML={{
+                          __html: `&#8212;`,
+                        }}
+                      ></div>
+                    )}
+                  </Text>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+        {useExistingToken === false && (
+          <>
+            <Header as="h4" className="pb-6 text-center">
+              Good news: we can mint you a brand new one!
+            </Header>
+            <Controller
+              name="tokenName"
+              control={control}
+              defaultValue=""
+              render={({ field }) => (
+                <FormField
+                  title="What would you like to name your token?"
+                  description="Your generated token will be used for voting power."
+                  optional
+                >
+                  <Input
+                    placeholder="e.g. RealmsCoin"
+                    data-testid="dao-name-input"
+                    error={errors.tokenName?.message || ''}
+                    {...field}
+                  />
+                </FormField>
+              )}
+            />
+
+            <Controller
+              name="tokenSymbol"
+              control={control}
+              defaultValue=""
+              render={({ field }) => (
+                <FormField
+                  title="What should your token's symbol be?"
+                  description="A token's symbol is used in wallets to denote the token."
+                  optional
+                >
+                  <Input
+                    placeholder="e.g. REALM"
+                    data-testid="dao-name-input"
+                    error={errors.tokenSymbol?.message || ''}
+                    {...field}
+                  />
+                </FormField>
+              )}
+            />
+          </>
+        )}
+        {typeof useExistingToken !== 'undefined' && (
+          <>
+            <Controller
+              name="minimumNumberOfTokensToEditDao"
+              control={control}
+              defaultValue={Number()}
+              render={({ field }) => (
+                <FormField
+                  title="What is the minimum number of tokens needed to edit this DAO's info?"
+                  description="A user will need at least this many of your governance token to edit and maintain this DAO."
+                  disabled={useExistingToken && tokenAddress === ''}
+                  optional
+                >
+                  <Input
+                    type="number"
+                    step={1}
+                    // min={0}
+                    placeholder="1,000,000"
+                    data-testid="dao-name-input"
+                    error={errors.minimumNumberOfTokensToEditDao?.message || ''}
+                    {...field}
+                    disabled={useExistingToken && tokenAddress === ''}
+                  />
+                </FormField>
+              )}
+            />
+            <AdvancedOptionsDropdown>
+              <Controller
+                name="mintSupplyFactor"
+                defaultValue=""
+                control={control}
+                render={({ field }) => (
+                  <FormField
+                    title="Community mint supply factor"
+                    description='This determines the maximum voting weight of the community token. If set to "1" then total supply of the community governance token is equal to 100% vote.'
+                    advancedOption
+                  >
+                    <Input
+                      placeholder={`1`}
+                      data-testid="programId-input"
+                      error={errors.mintSupplyFactor?.message || ''}
+                      {...field}
+                    />
+                  </FormField>
+                )}
+              />
+            </AdvancedOptionsDropdown>
+          </>
+        )}
       </div>
 
       <FormFooter
