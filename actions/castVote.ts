@@ -1,4 +1,9 @@
-import { Keypair, Transaction, TransactionInstruction } from '@solana/web3.js'
+import {
+  Keypair,
+  PublicKey,
+  Transaction,
+  TransactionInstruction,
+} from '@solana/web3.js'
 import {
   ChatMessageBody,
   getGovernanceProgramVersion,
@@ -14,7 +19,7 @@ import { RpcContext } from '@solana/spl-governance'
 
 import { Vote } from '@solana/spl-governance'
 
-import { withCastVote } from '@solana/spl-governance'
+import { withCastVote } from '@solana/spl-governance' // this is oyster
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
 import { chunks } from '@utils/helpers'
 import {
@@ -66,7 +71,8 @@ export async function castVote(
     Vote.fromYesNoVote(yesNoVote),
     payer,
     plugin?.voterWeightPk,
-    plugin?.maxVoterWeightRecord
+    plugin?.maxVoterWeightRecord,
+    new PublicKey(proposal.account.name)
   )
 
   if (message) {

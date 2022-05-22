@@ -230,9 +230,8 @@ const REALM = () => {
 
     try {
       setIsMultiVoting(true)
-      const {
-        blockhash: recentBlockhash,
-      } = await connection.getLatestBlockhash()
+      const { blockhash: recentBlockhash } =
+        await connection.getLatestBlockhash()
 
       const transactions: Transaction[] = []
       for (let i = 0; i < selectedProposals.length; i++) {
@@ -257,6 +256,7 @@ const REALM = () => {
             realmInfo!.programId,
             realmInfo!.programVersion!,
             realm.pubkey,
+            // new PublicKey(selectedProposal.proposal.name)
             selectedProposal.proposal.governance,
             selectedProposal.proposalPk,
             selectedProposal.proposal.tokenOwnerRecord,
@@ -266,7 +266,8 @@ const REALM = () => {
             Vote.fromYesNoVote(vote),
             payer,
             plugin?.voterWeightPk,
-            plugin?.maxVoterWeightRecord
+            plugin?.maxVoterWeightRecord,
+            new PublicKey(selectedProposal.proposal.name)
           )
         }
 
@@ -338,7 +339,7 @@ const REALM = () => {
               onClick={() => voteOnSelected(YesNoVote.Yes)}
               isLoading={isMultiVoting}
             >
-              Vote Yes
+              Vote Yess
             </Button>
             <Button
               className="whitespace-nowrap"
