@@ -8,8 +8,7 @@ import NFTWizard from './components/NFT/Wizard'
 import MultiSigWizard from './components/MultiSig/Wizard'
 
 export default function DAOCreationForm() {
-  const router = useRouter()
-  const { type } = router.query
+  const { query, replace } = useRouter()
 
   useEffect(() => {
     if (
@@ -19,6 +18,16 @@ export default function DAOCreationForm() {
       document.body.className = 'bg-[#282933]'
     }
   })
+
+  useEffect(() => {
+    if (
+      query?.type !== 'gov-token' &&
+      query?.type !== 'nft' &&
+      query?.type !== 'multisig'
+    ) {
+      replace('/404', undefined, { shallow: true })
+    }
+  }, [query])
 
   return (
     <div className="relative pb-8 md:pb-20 landing-page">
@@ -32,13 +41,10 @@ export default function DAOCreationForm() {
           quality={100}
         />
       </div>
-      {type === 'gov-token' ? (
-        <GovTokenWizard />
-      ) : type === 'nft' ? (
-        <NFTWizard />
-      ) : (
-        <MultiSigWizard />
-      )}
+
+      {query?.type === 'gov-token' && <GovTokenWizard />}
+      {query?.type === 'nft' && <NFTWizard />}
+      {query?.type === 'multisig' && <MultiSigWizard />}
     </div>
   )
 }
