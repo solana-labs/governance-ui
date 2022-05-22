@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
@@ -7,17 +7,25 @@ import FormHeader from '../FormHeader'
 import FormField from '../FormField'
 import FormFooter from '../FormFooter'
 import Input from '../Input'
-import {
-  STEP2_SCHEMA,
-  STEP3_SCHEMA,
-  getFormData,
-  updateUserInput,
-} from './Wizard'
+import { getFormData, updateUserInput } from './Wizard'
 
-export default function Step3({ onSubmit, onPrevClick }) {
-  const [numberOfDaoMember, setNumberOfDaoMember] = useState(0)
+export const ApprovalThresholdSchema = {
+  approvalThreshold: yup
+    .number()
+    .typeError('Required')
+    .max(100, 'Approval cannot require more than 100% of votes')
+    .min(1, 'Approval must be at least 1% of votes')
+    .required('Required'),
+}
 
-  const schema = yup.object(STEP3_SCHEMA).required()
+export default function ApprovalThresholdForm({
+  currentStep,
+  totalSteps,
+  onSubmit,
+  onPrevClick,
+  prevStepSchema,
+}) {
+  const schema = yup.object(ApprovalThresholdSchema).required()
   const {
     control,
     watch,
@@ -31,32 +39,35 @@ export default function Step3({ onSubmit, onPrevClick }) {
   const approvalPercent = watch('approvalThreshold', 60)
 
   useEffect(() => {
-    const formData = getFormData()
-    yup
-      .object(STEP2_SCHEMA)
-      .isValid(formData)
-      .then((valid) => {
-        if (valid) {
-          setNumberOfDaoMember(formData?.memberAddresses?.length)
-          updateUserInput(STEP3_SCHEMA, setValue)
-        } else {
-          onPrevClick(3)
-        }
-      })
+    if (prevStepSchema) {
+      const formData = getFormData()
+      yup
+        .object(prevStepSchema)
+        .isValid(formData)
+        .then((valid) => {
+          if (valid) {
+            updateUserInput(ApprovalThresholdSchema, setValue)
+          } else {
+            onPrevClick(currentStep)
+          }
+        })
+    } else {
+      updateUserInput(ApprovalThresholdSchema, setValue)
+    }
   }, [])
 
   function serializeValues(values) {
-    onSubmit({ step: 3, data: values })
+    onSubmit({ step: currentStep, data: values })
   }
 
   return (
     <form
       onSubmit={handleSubmit(serializeValues)}
-      data-testid="multisig-step-3"
+      data-testid="approval-threshold-form"
     >
       <FormHeader
-        currentStep={3}
-        totalSteps={4}
+        currentStep={currentStep}
+        totalSteps={totalSteps}
         stepDescription="Approval threshold"
         title="Next, let's determine the approval quorum for community proposals."
         imgSrc="/1-Landing-v2/dao-type-medium-govtoken.png"
@@ -119,7 +130,7 @@ export default function Step3({ onSubmit, onPrevClick }) {
       </div>
       <FormFooter
         isValid={isValid}
-        prevClickHandler={() => onPrevClick(3)}
+        prevClickHandler={() => onPrevClick(currentStep)}
         faqTitle="About Approval Quorum"
       />
     </form>

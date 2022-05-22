@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 
 import useWalletStore from 'stores/useWalletStore'
@@ -13,22 +12,7 @@ import FormFooter from '../FormFooter'
 import Input from '../Input'
 import Button from 'components_2/Button'
 
-import {
-  STEP1_SCHEMA,
-  STEP2_SCHEMA,
-  getFormData,
-  updateUserInput,
-} from './Wizard'
-
-function validateSolAddress(address: string) {
-  try {
-    const pubkey = new PublicKey(address)
-    const isSolana = PublicKey.isOnCurve(pubkey.toBuffer())
-    return isSolana
-  } catch (error) {
-    return false
-  }
-}
+import { getFormData, updateUserInput, validateSolAddress } from './Wizard'
 
 function InviteAddress({
   address = '',
@@ -57,14 +41,28 @@ function InviteAddress({
   )
 }
 
-export default function Step5({ onSubmit, onPrevClick }) {
+export const InviteMembersSchema = {
+  memberAddresses: yup
+    .array()
+    .of(yup.string())
+    .min(1, 'A DAO needs at least one member')
+    .required('Required'),
+}
+
+export default function InviteMembersForm({
+  onSubmit,
+  onPrevClick,
+  currentStep,
+  totalSteps,
+  prevStepSchema,
+}) {
   const { current } = useWalletStore((s) => s)
   const inputElement = useRef<HTMLInputElement>(null)
   const [pasteBuffer, setPasteBuffer] = useState<string[]>([])
   const [inviteList, setInviteList] = useState<string[]>([])
   const [validationError, setValidationError] = useState<string>('')
 
-  const schema = yup.object(STEP2_SCHEMA).required()
+  const schema = yup.object(InviteMembersSchema).required()
   const {
     setValue,
     handleSubmit,
@@ -78,21 +76,30 @@ export default function Step5({ onSubmit, onPrevClick }) {
 
   useEffect(() => {
     const formData = getFormData()
-    yup
-      .object(STEP1_SCHEMA)
-      .isValid(formData)
-      .then((valid) => {
-        if (valid) {
-          updateUserInput(STEP2_SCHEMA, setValue)
-          setInviteList(
-            formData.memberAddresses?.filter((wallet) => {
-              return validateSolAddress(wallet)
-            }) || []
-          )
-        } else {
-          onPrevClick(5)
-        }
-      })
+    if (prevStepSchema) {
+      yup
+        .object(prevStepSchema)
+        .isValid(formData)
+        .then((valid) => {
+          if (valid) {
+            updateUserInput(InviteMembersSchema, setValue)
+            setInviteList(
+              formData.memberAddresses?.filter((wallet) => {
+                return validateSolAddress(wallet)
+              }) || []
+            )
+          } else {
+            onPrevClick(currentStep)
+          }
+        })
+    } else {
+      updateUserInput(InviteMembersSchema, setValue)
+      setInviteList(
+        formData.memberAddresses?.filter((wallet) => {
+          return validateSolAddress(wallet)
+        }) || []
+      )
+    }
   }, [])
 
   useEffect(() => {
@@ -103,7 +110,7 @@ export default function Step5({ onSubmit, onPrevClick }) {
   }, [inviteList])
 
   function serializeValues(values) {
-    onSubmit({ step: 2, data: values })
+    onSubmit({ step: currentStep, data: values })
   }
 
   function handlePaste(ev) {
@@ -186,11 +193,11 @@ export default function Step5({ onSubmit, onPrevClick }) {
   return (
     <form
       onSubmit={handleSubmit(serializeValues)}
-      data-testid="multisig-step-2"
+      data-testid="invite-members-form"
     >
       <FormHeader
-        currentStep={5}
-        totalSteps={7}
+        currentStep={currentStep}
+        totalSteps={totalSteps}
         stepDescription="Invite members"
         title="Next, invite members with their Solana Wallet Address."
         imgSrc="/1-Landing-v2/dao-type-medium-govtoken.png"
@@ -286,8 +293,8 @@ export default function Step5({ onSubmit, onPrevClick }) {
       </div>
       <FormFooter
         isValid={isValid}
-        prevClickHandler={() => onPrevClick(5)}
-        faqTitle="About Multisig Membership"
+        prevClickHandler={() => onPrevClick(currentStep)}
+        faqTitle=""
       />
     </form>
   )

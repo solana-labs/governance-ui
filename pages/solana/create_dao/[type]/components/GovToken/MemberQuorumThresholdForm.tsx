@@ -7,17 +7,27 @@ import FormHeader from '../FormHeader'
 import FormField from '../FormField'
 import FormFooter from '../FormFooter'
 import Input from '../Input'
-import {
-  STEP2_SCHEMA,
-  STEP3_SCHEMA,
-  getFormData,
-  updateUserInput,
-} from './Wizard'
+import { getFormData, updateUserInput } from './Wizard'
 
-export default function Step3({ onSubmit, onPrevClick }) {
+export const MemberQuorumThresholdSchema = {
+  quorumThreshold: yup
+    .number()
+    .typeError('Required')
+    .max(100, 'Quorum cannot require more than 100% of members')
+    .min(1, 'Quorum must be at least 1% of member')
+    .required('Required'),
+}
+
+export default function MemberQuorumThresholdForm({
+  currentStep,
+  totalSteps,
+  onSubmit,
+  onPrevClick,
+  prevStepSchema,
+}) {
   const [numberOfDaoMember, setNumberOfDaoMember] = useState(0)
 
-  const schema = yup.object(STEP3_SCHEMA).required()
+  const schema = yup.object(MemberQuorumThresholdSchema).required()
   const {
     control,
     watch,
@@ -33,31 +43,37 @@ export default function Step3({ onSubmit, onPrevClick }) {
 
   useEffect(() => {
     const formData = getFormData()
-    yup
-      .object(STEP2_SCHEMA)
-      .isValid(formData)
-      .then((valid) => {
-        if (valid) {
-          setNumberOfDaoMember(formData?.memberAddresses?.length)
-          updateUserInput(STEP3_SCHEMA, setValue)
-        } else {
-          onPrevClick(3)
-        }
-      })
+    if (prevStepSchema) {
+      yup
+        .object(prevStepSchema)
+        .isValid(formData)
+        .then((valid) => {
+          console.log('is previous step valid', valid, currentStep)
+          if (valid) {
+            setNumberOfDaoMember(formData?.memberAddresses?.length)
+            updateUserInput(MemberQuorumThresholdSchema, setValue)
+          } else {
+            onPrevClick(currentStep)
+          }
+        })
+    } else {
+      setNumberOfDaoMember(formData?.memberAddresses?.length)
+      updateUserInput(MemberQuorumThresholdSchema, setValue)
+    }
   }, [])
 
   function serializeValues(values) {
-    onSubmit({ step: 3, data: values })
+    onSubmit({ step: currentStep, data: values })
   }
 
   return (
     <form
       onSubmit={handleSubmit(serializeValues)}
-      data-testid="multisig-step-3"
+      data-testid="member-quorum-threshold-form"
     >
       <FormHeader
-        currentStep={3}
-        totalSteps={4}
+        currentStep={currentStep}
+        totalSteps={totalSteps}
         stepDescription="Approval qurorum"
         title="Last, let's determine the approval quorum for your shared wallet."
         imgSrc="/1-Landing-v2/dao-type-medium-govtoken.png"
@@ -122,8 +138,8 @@ export default function Step3({ onSubmit, onPrevClick }) {
       </div>
       <FormFooter
         isValid={isValid}
-        prevClickHandler={() => onPrevClick(3)}
-        faqTitle="About Approval Quorum"
+        prevClickHandler={() => onPrevClick(currentStep)}
+        faqTitle=""
       />
     </form>
   )

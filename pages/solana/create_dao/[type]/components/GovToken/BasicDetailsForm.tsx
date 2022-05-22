@@ -14,10 +14,23 @@ import {
   // DEFAULT_TEST_GOVERNANCE_PROGRAM_ID,
 } from '@components/instructions/tools'
 
-import { STEP1_SCHEMA, updateUserInput } from './Wizard'
+import { updateUserInput, getFormData } from './Wizard'
 
-export default function Step1({ onSubmit, onPrevClick }) {
-  const schema = yup.object(STEP1_SCHEMA).required()
+export const BasicDetailsSchema = {
+  avatar: yup.string(),
+  name: yup.string().typeError('Required').required('Required'),
+  description: yup.string(),
+  programId: yup.string(),
+}
+
+export default function BasicDetailsForm({
+  currentStep,
+  totalSteps,
+  onSubmit,
+  onPrevClick,
+  prevStepSchema,
+}) {
+  const schema = yup.object(BasicDetailsSchema).required()
   const {
     getValues,
     setValue,
@@ -30,11 +43,25 @@ export default function Step1({ onSubmit, onPrevClick }) {
   })
 
   useEffect(() => {
-    updateUserInput(STEP1_SCHEMA, setValue)
+    if (prevStepSchema) {
+      const formData = getFormData()
+      yup
+        .object(prevStepSchema)
+        .isValid(formData)
+        .then((valid) => {
+          if (valid) {
+            updateUserInput(BasicDetailsSchema, setValue)
+          } else {
+            onPrevClick(currentStep)
+          }
+        })
+    } else {
+      updateUserInput(BasicDetailsSchema, setValue)
+    }
   }, [])
 
   function serializeValues(values) {
-    onSubmit({ step: 1, data: values })
+    onSubmit({ step: currentStep, data: values })
   }
 
   function handleAvatarSelect(fileInput) {
@@ -47,11 +74,11 @@ export default function Step1({ onSubmit, onPrevClick }) {
   return (
     <form
       onSubmit={handleSubmit(serializeValues)}
-      data-testid="gov-token-step-1"
+      data-testid="basic-details-form"
     >
       <FormHeader
-        currentStep={1}
-        totalSteps={5}
+        currentStep={currentStep}
+        totalSteps={totalSteps}
         stepDescription="Basic details"
         title="Let's gather your Governance Token DAO's basic details."
         imgSrc="/1-Landing-v2/dao-type-medium-govtoken.png"
@@ -127,8 +154,8 @@ export default function Step1({ onSubmit, onPrevClick }) {
       </div>
       <FormFooter
         isValid={isValid}
-        prevClickHandler={() => onPrevClick(1)}
-        faqTitle="About Gov"
+        prevClickHandler={() => onPrevClick(currentStep)}
+        faqTitle=""
       />
     </form>
   )

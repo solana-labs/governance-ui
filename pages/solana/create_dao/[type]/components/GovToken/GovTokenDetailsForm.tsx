@@ -4,24 +4,15 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { TokenListProvider, TokenInfo } from '@solana/spl-token-registry'
 import * as yup from 'yup'
 
-// import { notify } from '@utils/notifications'
-
-// import { RadioGroup } from '@headlessui/react'
+import Header from 'components_2/Header'
+import Text from 'components_2/Text'
 import FormHeader from '../FormHeader'
 import FormField from '../FormField'
 import FormFooter from '../FormFooter'
 import AdvancedOptionsDropdown from '../AdvancedOptionsDropdown'
 import Input, { RadioGroup } from '../Input'
 
-import {
-  STEP1_SCHEMA,
-  STEP2_SCHEMA,
-  getFormData,
-  updateUserInput,
-  validateSolAddress,
-} from './Wizard'
-import Header from 'components_2/Header'
-import Text from 'components_2/Text'
+import { getFormData, updateUserInput, validateSolAddress } from './Wizard'
 
 const PENDING_COIN = {
   chainId: 1,
@@ -44,9 +35,54 @@ const NOTFOUND_COIN = {
   symbol: '(Token has no symbol)',
 }
 
-export default function Step2({ onSubmit, onPrevClick }) {
+export const GovTokenDetailsSchema = {
+  useExistingToken: yup
+    .boolean()
+    .oneOf([true, false], 'You must specify whether you have a token already')
+    .required('Required'),
+  tokenAddress: yup
+    .string()
+    .when('useExistingToken', {
+      is: (val) => val == true,
+      then: yup.string().required('Required'),
+      otherwise: yup.string().optional(),
+    })
+    .test('is-valid-address', 'Please enter a valid Solana address', (value) =>
+      value ? validateSolAddress(value) : true
+    ),
+  transferMintAuthorityToDao: yup
+    .boolean()
+    .oneOf(
+      [true, false],
+      'You must specify whether you which to transfer mint authority'
+    )
+    .when('useExistingToken', {
+      is: (val) => val == true,
+      then: yup.boolean().required('Required'),
+      otherwise: yup.boolean().optional(),
+    }),
+  tokenName: yup.string(),
+  tokenSymbol: yup.string(),
+  minimumNumberOfTokensToEditDao: yup
+    .number()
+    .positive('Must be greater than 0')
+    .transform((value) => (isNaN(value) ? undefined : value)),
+  mintSupplyFactor: yup
+    .number()
+    .positive('Must be greater than 0')
+    .max(1, 'Must not be greater than 1')
+    .transform((value) => (isNaN(value) ? undefined : value)),
+}
+
+export default function GovTokenDetailsForm({
+  currentStep,
+  totalSteps,
+  onSubmit,
+  onPrevClick,
+  prevStepSchema,
+}) {
   const [tokenList, setTokenList] = useState<TokenInfo[] | undefined>()
-  const schema = yup.object(STEP2_SCHEMA).required()
+  const schema = yup.object(GovTokenDetailsSchema).required()
   const {
     watch,
     control,
@@ -73,17 +109,19 @@ export default function Step2({ onSubmit, onPrevClick }) {
   }, [tokenAddress, tokenList])
 
   useEffect(() => {
-    const formData = getFormData()
-    yup
-      .object(STEP1_SCHEMA)
-      .isValid(formData)
-      .then((valid) => {
-        if (valid) {
-          updateUserInput(STEP2_SCHEMA, setValue)
-        } else {
-          onPrevClick(2)
-        }
-      })
+    if (prevStepSchema) {
+      const formData = getFormData()
+      yup
+        .object(prevStepSchema)
+        .isValid(formData)
+        .then((valid) => {
+          if (valid) {
+            updateUserInput(GovTokenDetailsSchema, setValue)
+          } else {
+            onPrevClick(currentStep)
+          }
+        })
+    }
   }, [])
 
   useEffect(() => {
@@ -100,7 +138,7 @@ export default function Step2({ onSubmit, onPrevClick }) {
   }, [])
 
   function serializeValues(values) {
-    onSubmit({ step: 2, data: values })
+    onSubmit({ step: currentStep, data: values })
   }
 
   function preventNegativeNumberInput(ev) {
@@ -115,11 +153,11 @@ export default function Step2({ onSubmit, onPrevClick }) {
   return (
     <form
       onSubmit={handleSubmit(serializeValues)}
-      data-testid="gov-token-step-2"
+      data-testid="govtoken-details-form"
     >
       <FormHeader
-        currentStep={2}
-        totalSteps={5}
+        currentStep={currentStep}
+        totalSteps={totalSteps}
         stepDescription="Determine Token"
         title="Next, determine the token your DAO will use for dovernance tasks."
         imgSrc="/1-Landing-v2/dao-type-medium-govtoken.png"
@@ -355,8 +393,8 @@ export default function Step2({ onSubmit, onPrevClick }) {
 
       <FormFooter
         isValid={isValid}
-        prevClickHandler={() => onPrevClick(2)}
-        faqTitle="About Governance Tokens"
+        prevClickHandler={() => onPrevClick(currentStep)}
+        faqTitle=""
       />
     </form>
   )

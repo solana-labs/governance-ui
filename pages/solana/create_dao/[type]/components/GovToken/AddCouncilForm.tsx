@@ -7,17 +7,27 @@ import FormHeader from '../FormHeader'
 import FormField from '../FormField'
 import FormFooter from '../FormFooter'
 import { RadioGroup } from '../Input'
-import Text from 'components_2/Text'
 
-import {
-  STEP3_SCHEMA,
-  STEP4_SCHEMA,
-  getFormData,
-  updateUserInput,
-} from './Wizard'
+import { getFormData, updateUserInput } from './Wizard'
 
-export default function Step4({ onSubmit, onPrevClick }) {
-  const schema = yup.object(STEP4_SCHEMA).required()
+export const AddCouncilSchema = {
+  addCouncil: yup
+    .boolean()
+    .oneOf(
+      [true, false],
+      'You must specify whether you would like to add a council or not'
+    )
+    .required('Required'),
+}
+
+export default function AddCouncilForm({
+  currentStep,
+  totalSteps,
+  onSubmit,
+  onPrevClick,
+  prevStepSchema,
+}) {
+  const schema = yup.object(AddCouncilSchema).required()
   const {
     control,
     setValue,
@@ -29,31 +39,35 @@ export default function Step4({ onSubmit, onPrevClick }) {
   })
 
   useEffect(() => {
-    const formData = getFormData()
-    yup
-      .object(STEP3_SCHEMA)
-      .isValid(formData)
-      .then((valid) => {
-        if (valid) {
-          updateUserInput(STEP4_SCHEMA, setValue)
-        } else {
-          onPrevClick(4)
-        }
-      })
+    if (prevStepSchema) {
+      const formData = getFormData()
+      yup
+        .object(prevStepSchema)
+        .isValid(formData)
+        .then((valid) => {
+          if (valid) {
+            updateUserInput(AddCouncilSchema, setValue)
+          } else {
+            onPrevClick(currentStep)
+          }
+        })
+    } else {
+      updateUserInput(AddCouncilSchema, setValue)
+    }
   }, [])
 
   function serializeValues(values) {
-    onSubmit({ step: 4, data: values })
+    onSubmit({ step: currentStep, data: values })
   }
 
   return (
     <form
       onSubmit={handleSubmit(serializeValues)}
-      data-testid="govtoken-step-4"
+      data-testid="add-council-form"
     >
       <FormHeader
-        currentStep={4}
-        totalSteps={5}
+        currentStep={currentStep}
+        totalSteps={totalSteps}
         stepDescription="Add a council"
         title="Add a council for your Governance Token DAO."
         imgSrc="/1-Landing-v2/dao-type-medium-govtoken.png"
@@ -86,7 +100,7 @@ export default function Step4({ onSubmit, onPrevClick }) {
       </div>
       <FormFooter
         isValid={isValid}
-        prevClickHandler={() => onPrevClick(4)}
+        prevClickHandler={() => onPrevClick(currentStep)}
         faqTitle="About Governance Token Councils"
       />
     </form>

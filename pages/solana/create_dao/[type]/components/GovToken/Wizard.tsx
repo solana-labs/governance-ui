@@ -15,96 +15,21 @@ import {
 import { notify } from '@utils/notifications'
 import { Section } from 'pages/solana'
 
-import Step1 from './Step1'
-import Step2 from './Step2'
-import Step3 from './Step3'
-import Step4 from './Step4'
-import Step5 from './Step5'
+import BasicDetailsForm, { BasicDetailsSchema } from './BasicDetailsForm'
+import GovTokenDetailsForm, {
+  GovTokenDetailsSchema,
+} from './GovTokenDetailsForm'
+import ApprovalThresholdForm, {
+  ApprovalThresholdSchema,
+} from './ApprovalThresholdForm'
+import AddCouncilForm, { AddCouncilSchema } from './AddCouncilForm'
+import InviteMembersForm, { InviteMembersSchema } from './InviteMembersForm'
+import MemberQuorumThresholdForm, {
+  MemberQuorumThresholdSchema,
+} from './MemberQuorumThresholdForm'
 import FormSummary from '../FormSummary'
 
 export const SESSION_STORAGE_FORM_KEY = 'govtoken-form-data'
-
-export const STEP1_SCHEMA = {
-  avatar: yup.string(),
-  name: yup.string().typeError('Required').required('Required'),
-  description: yup.string(),
-  programId: yup.string(),
-}
-
-export const STEP2_SCHEMA = {
-  useExistingToken: yup
-    .boolean()
-    .oneOf([true, false], 'You must specify whether you have a token already')
-    .required('Required'),
-  tokenAddress: yup
-    .string()
-    .when('useExistingToken', {
-      is: (val) => val == true,
-      then: yup.string().required('Required'),
-      otherwise: yup.string().optional(),
-    })
-    .test('is-valid-address', 'Please enter a valid Solana address', (value) =>
-      value ? validateSolAddress(value) : true
-    ),
-  transferMintAuthorityToDao: yup
-    .boolean()
-    .oneOf(
-      [true, false],
-      'You must specify whether you which to transfer mint authority'
-    )
-    .when('useExistingToken', {
-      is: (val) => val == true,
-      then: yup.boolean().required('Required'),
-      otherwise: yup.boolean().optional(),
-    }),
-  tokenName: yup.string(),
-  tokenSymbol: yup.string(),
-  minimumNumberOfTokensToEditDao: yup
-    .number()
-    .positive('Must be greater than 0')
-    .transform((value) => (isNaN(value) ? undefined : value)),
-  mintSupplyFactor: yup
-    .number()
-    .positive('Must be greater than 0')
-    .max(1, 'Must not be greater than 1')
-    .transform((value) => (isNaN(value) ? undefined : value)),
-}
-
-export const STEP3_SCHEMA = {
-  approvalThreshold: yup
-    .number()
-    .typeError('Required')
-    .max(100, 'Approval cannot require more than 100% of votes')
-    .min(1, 'Approval must be at least 1% of votes')
-    .required('Required'),
-}
-
-export const STEP4_SCHEMA = {
-  addCouncil: yup
-    .boolean()
-    .oneOf(
-      [true, false],
-      'You must specify whether you would like to add a council or not'
-    )
-    .required('Required'),
-}
-
-export const STEP5_SCHEMA = {
-  memberAddresses: yup
-    .array()
-    .of(yup.string())
-    .min(1, 'A DAO needs at least one member')
-    .required('Required'),
-}
-
-export const STEP6_SCHEMA = {
-  quorumThreshold: yup
-    .number()
-    .typeError('Required')
-    .max(100, 'Quorum cannot require more than 100% of members')
-    .min(1, 'Quorum must be at least 1% of member')
-    .required('Required'),
-}
 
 export function validateSolAddress(address: string) {
   try {
@@ -137,15 +62,23 @@ export default function GovTokenWizard() {
   const { connected, connection, current: wallet } = useWalletStore((s) => s)
   const { pathname, query, push } = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
-  const [currentStep, setCurrentStep] = useState(0)
   const [requestPending, setRequestPending] = useState(false)
+  const currentStep = query?.currentStep || 1
+  const steps = [
+    { Form: BasicDetailsForm, schema: BasicDetailsSchema },
+    { Form: GovTokenDetailsForm, schema: GovTokenDetailsSchema },
+    { Form: ApprovalThresholdForm, schema: ApprovalThresholdSchema },
+    { Form: AddCouncilForm, schema: AddCouncilSchema },
+    { Form: InviteMembersForm, schema: InviteMembersSchema },
+    { Form: MemberQuorumThresholdForm, schema: MemberQuorumThresholdSchema },
+  ]
 
   function handleNextButtonClick({ step, data }) {
     const formState = getFormData()
     let nextStep
-    if (step === 4 && !data.addCouncil) {
+    if (data.addCouncil === false) {
       // skip to the end
-      nextStep = 7
+      nextStep = steps.length + 1
     } else {
       nextStep = step + 1
     }
@@ -155,7 +88,7 @@ export default function GovTokenWizard() {
       ...data,
     }
 
-    console.log('next button clicked', updatedFormState)
+    console.log('next button clicked', step, data, nextStep)
     sessionStorage.setItem(
       SESSION_STORAGE_FORM_KEY,
       JSON.stringify(updatedFormState)
@@ -178,7 +111,7 @@ export default function GovTokenWizard() {
         previousStep = currentStep - 1
       }
 
-      console.log('Previous click')
+      console.log('Previous click', previousStep)
       push(
         { pathname, query: { ...query, currentStep: previousStep } },
         undefined,
@@ -252,28 +185,23 @@ export default function GovTokenWizard() {
   }
 
   useEffect(() => {
-    if (query?.currentStep && !Array.isArray(query.currentStep)) {
-      setCurrentStep(Number(query.currentStep))
-    } else {
-      setCurrentStep(1)
-    }
-  }, [query])
-
-  useEffect(() => {
-    if (currentStep < 4) {
+    if (currentStep < steps.length + 1) {
       return
     }
     const formData = getFormData()
     yup
-      .object({
-        ...STEP1_SCHEMA,
-        ...STEP2_SCHEMA,
-        ...STEP3_SCHEMA,
-      })
+      .object(
+        steps.reduce((prev, { schema }) => {
+          return {
+            ...prev,
+            ...schema,
+          }
+        }, {})
+      )
       .isValid(formData)
       .then((valid) => {
         if (!valid) {
-          return handlePreviousButton(4)
+          return handlePreviousButton(steps.length + 1)
         }
       })
   }, [currentStep])
@@ -288,39 +216,28 @@ export default function GovTokenWizard() {
   return (
     <div className="pt-24 md:pt-28">
       <Section>
-        {currentStep === 1 && (
-          <Step1
-            onPrevClick={handlePreviousButton}
-            onSubmit={handleNextButtonClick}
-          />
-        )}
-        {currentStep === 2 && (
-          <Step2
-            onPrevClick={handlePreviousButton}
-            onSubmit={handleNextButtonClick}
-          />
-        )}
-        {currentStep === 3 && (
-          <Step3
-            onPrevClick={handlePreviousButton}
-            onSubmit={handleNextButtonClick}
-          />
-        )}
-        {currentStep === 4 && (
-          <Step4
-            onPrevClick={handlePreviousButton}
-            onSubmit={handleNextButtonClick}
-          />
-        )}
-        {currentStep === 5 && (
-          <Step5
-            onPrevClick={handlePreviousButton}
-            onSubmit={handleNextButtonClick}
-          />
-        )}
-        {currentStep === 7 && (
+        {steps.map(({ Form }, index, stepList) => {
+          return (
+            <div
+              key={index}
+              className={index + 1 == currentStep ? '' : 'hidden'}
+            >
+              <Form
+                currentStep={index + 1}
+                totalSteps={steps.length + 1}
+                prevStepSchema={
+                  index > 0 ? stepList[index - 1].schema : undefined
+                }
+                onPrevClick={handlePreviousButton}
+                onSubmit={handleNextButtonClick}
+              />
+            </div>
+          )
+        })}
+
+        {currentStep == steps.length + 1 && (
           <FormSummary
-            currentStep={currentStep}
+            currentStep={steps.length + 1}
             formData={getFormData()}
             onPrevClick={handlePreviousButton}
             onSubmit={handleSubmitClick}
