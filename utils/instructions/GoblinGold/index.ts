@@ -121,7 +121,7 @@ export async function createWrappedNativeAccount(
     )
   )
 
-  return newAccount.publicKey
+  return newAccount
 }
 
 function getGovernedAccountPk(acc: AssetAccount): PublicKey {
@@ -198,15 +198,17 @@ export async function getGoblinGoldDepositInstruction({
     }
 
     let ataInputAddress: PublicKey
-
+    let ataInputKeypair: Keypair
     if (governedTokenAccount.isSol) {
       // If the token account is the native SOL, should create and initialize a new account on the special native token mint. And before initializing it, should send lamports to the new account.
-      ataInputAddress = await createWrappedNativeAccount(
+      ataInputKeypair = await createWrappedNativeAccount(
         connection.current,
         governedAccountPk,
         transferAmount,
         prerequisiteInstructions
       )
+      ataInputAddress = ataInputKeypair.publicKey
+      signers.push(ataInputKeypair)
     } else {
       ataInputAddress = await Token.getAssociatedTokenAddress(
         ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -329,15 +331,17 @@ export async function getGoblinGoldWithdrawInstruction({
     }
 
     let ataInputAddress: PublicKey
-
+    let ataInputKeypair: Keypair
     if (inputTokenMintAddress === WSOL_MINT_PK) {
       // If the input token account is the native SOL, should create and initialize a new account on the special native token mint. And before initializing it, should send lamports to the new account.
-      ataInputAddress = await createWrappedNativeAccount(
+      ataInputKeypair = await createWrappedNativeAccount(
         connection.current,
         governedAccountPk,
         undefined,
         prerequisiteInstructions
       )
+      ataInputAddress = ataInputKeypair.publicKey
+      signers.push(ataInputKeypair)
     } else {
       // In case of the treasury doesn't have the token account, create it.
       ataInputAddress = await createAssociatedTokenAccountIfNotExist(
