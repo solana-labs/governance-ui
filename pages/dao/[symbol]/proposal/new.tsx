@@ -10,7 +10,6 @@ import {
 import {
   getInstructionDataFromBase64,
   Governance,
-  GovernanceAccountType,
   ProgramAccount,
 } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
@@ -119,33 +118,31 @@ const New = () => {
   const [isLoadingSignedProposal, setIsLoadingSignedProposal] = useState(false)
   const [isLoadingDraft, setIsLoadingDraft] = useState(false)
   const isLoading = isLoadingSignedProposal || isLoadingDraft
-  const customInstructionFilterForSelectedGovernance = (
-    instructionType: Instructions
-  ) => {
-    if (!governance) {
-      return true
-    } else {
-      const governanceType = governance.account.accountType
-      const instructionsAvailiableAfterProgramGovernance = [Instructions.Base64]
-      switch (governanceType) {
-        case GovernanceAccountType.ProgramGovernanceV1:
-        case GovernanceAccountType.ProgramGovernanceV2:
-          return instructionsAvailiableAfterProgramGovernance.includes(
-            instructionType
-          )
-        default:
-          return true
-      }
-    }
-  }
+  //   const customInstructionFilterForSelectedGovernance = (
+  //     instructionType: Instructions
+  //   ) => {
+  //     if (!governance) {
+  //       return true
+  //     } else {
+  //       const governanceType = governance.account.accountType
+  //       const instructionsAvailiableAfterProgramGovernance = [Instructions.Base64]
+  //       switch (governanceType) {
+  //         case GovernanceAccountType.ProgramGovernanceV1:
+  //         case GovernanceAccountType.ProgramGovernanceV2:
+  //           return instructionsAvailiableAfterProgramGovernance.includes(
+  //             instructionType
+  //           )
+  //         default:
+  //           return true
+  //       }
+  //     }
+  //   }
 
   const getAvailableInstructionsForIndex = (index) => {
     if (index === 0) {
       return availableInstructions
     } else {
-      return availableInstructions.filter((x) =>
-        customInstructionFilterForSelectedGovernance(x.id)
-      )
+      return availableInstructions
     }
   }
   const [instructionsData, setInstructions] = useState<
