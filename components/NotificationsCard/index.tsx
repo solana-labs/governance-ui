@@ -1,9 +1,10 @@
-import useRealm from '../hooks/useRealm'
-import useWalletStore from '../stores/useWalletStore'
-import Button from './Button'
-import Input from './inputs/Input'
+import useRealm from '../../hooks/useRealm'
+import useWalletStore from '../../stores/useWalletStore'
+import Button from '../Button'
+import Input from '../inputs/Input'
 import React, { FunctionComponent, useEffect, useState } from 'react'
 import {
+  ArrowLeftIcon,
   ChatAltIcon,
   MailIcon,
   PaperAirplaneIcon,
@@ -17,6 +18,7 @@ import {
 import { useRouter } from 'next/router'
 import { EndpointTypes } from '@models/types'
 import { useCallback } from 'react'
+import NotifiFullLogo from './NotifiFullLogo'
 
 const firstOrNull = <T,>(
   arr: ReadonlyArray<T> | null | undefined
@@ -27,7 +29,11 @@ const firstOrNull = <T,>(
   return null
 }
 
-const NotificationsCard = () => {
+type NotificationCardProps = {
+  onBackClick?: () => void
+}
+
+const NotificationsCard = ({ onBackClick }: NotificationCardProps) => {
   const router = useRouter()
   const { cluster } = router.query
   const { councilMint, mint, realm } = useRealm()
@@ -40,6 +46,7 @@ const NotificationsCard = () => {
   const connected = useWalletStore((s) => s.connected)
   const endpoint = cluster ? (cluster as EndpointTypes) : 'mainnet'
   let env = BlockchainEnvironment.MainNetBeta
+
   switch (endpoint) {
     case 'mainnet':
       break
@@ -213,8 +220,14 @@ const NotificationsCard = () => {
   const disabled = isAuthenticated() && !hasUnsavedChanges
 
   return (
-    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg w-1/2">
-      <h3 className="mb-4">Set up notifications</h3>
+    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg ">
+      <div className=" flex flex-row items-center align-center">
+        <Button className="bg-transparent" onClick={onBackClick}>
+          <ArrowLeftIcon fill="grey" className="w-6 h-6" />
+        </Button>
+        <NotifiFullLogo />
+      </div>
+
       {hasLoaded ? (
         !connected ? (
           <>
@@ -239,52 +252,56 @@ const NotificationsCard = () => {
                 )
               )}
             </div>
-            <InputRow
-              label="E-mail"
-              icon={<MailIcon className="h-8 text-primary-light w-4 mr-1" />}
-            >
-              <Input
-                className="w-full min-w-full"
-                type="email"
-                value={email}
-                onChange={handleEmail}
-                placeholder="you@email.com"
-              />
-            </InputRow>
-
-            <InputRow
-              label="SMS"
-              icon={<ChatAltIcon className="h-8 text-primary-light w-4 mr-1" />}
-            >
-              <Input
-                className="w-full min-w-full"
-                type="tel"
-                value={phone}
-                onChange={handlePhone}
-                placeholder="+1 XXX-XXXX"
-              />
-            </InputRow>
-
-            {telegramEnabled && (
+            <div className="pb-5">
               <InputRow
-                label="Telegram"
+                label="email"
                 icon={
-                  <PaperAirplaneIcon
-                    className="mr-0 h-4 text-primary-light w-4"
-                    style={{ transform: 'rotate(45deg)' }}
-                  />
+                  <MailIcon className=" z-10 h-10 text-primary-light w-7 mr-1 mt-9 absolute left-3.5" />
                 }
               >
                 <Input
-                  className="w-full min-w-full"
-                  type="text"
-                  value={telegram}
-                  onChange={handleTelegram}
-                  placeholder="Telegram ID"
+                  className="min-w-11/12 py-3 px-4 appearance-none w-11/12 pl-14 outline-0 focus:outline-none"
+                  type="email"
+                  value={email}
+                  onChange={handleEmail}
+                  placeholder="you@email.com"
                 />
               </InputRow>
-            )}
-            <div className="flex flex-col space-y-4 mt-4 items-start justify-start">
+              <InputRow
+                label="email"
+                icon={
+                  <ChatAltIcon className=" z-10 h-10 text-primary-light w-7 mr-1 mt-9 absolute left-3" />
+                }
+              >
+                <Input
+                  className="min-w-11/12 py-3 px-4 appearance-none w-11/12 pl-14 outline-0 focus:outline-none"
+                  type="tel"
+                  value={phone}
+                  onChange={handlePhone}
+                  placeholder="+1 XXX-XXXX"
+                />
+              </InputRow>
+              {telegramEnabled && (
+                <InputRow
+                  label="Telegram"
+                  icon={
+                    <PaperAirplaneIcon
+                      className="z-10 h-10 text-primary-light w-7 mr-1 mt-8 absolute left-3"
+                      style={{ transform: 'rotate(45deg)' }}
+                    />
+                  }
+                >
+                  <Input
+                    className="min-w-11/12 py-3 px-4 appearance-none w-11/12 pl-14 outline-0 focus:outline-none flex"
+                    type="text"
+                    value={telegram}
+                    onChange={handleTelegram}
+                    placeholder="Telegram ID"
+                  />
+                </InputRow>
+              )}
+            </div>
+            <div className="flex flex-col space-y-4 mt-4 items-center justify-content-center align-items-center">
               <Button
                 tooltipMessage={
                   disabled
@@ -293,7 +310,7 @@ const NotificationsCard = () => {
                     ? 'Save settings for notifications'
                     : 'Fetch stored values for existing accounts'
                 }
-                className="sm:w-full"
+                className="w-11/12"
                 disabled={disabled}
                 onClick={
                   hasUnsavedChanges || isAuthenticated()
@@ -306,31 +323,31 @@ const NotificationsCard = () => {
                   ? 'Subscribe'
                   : 'Refresh'}
               </Button>
-              <div className="h-3 grid grid-cols-2 text-xs w-full">
-                <div className="flex flex-row text-xs w-full">
-                  Powered by&nbsp;
-                  <NotifiLogo className="min-w-12 w-12 h-3 min-h-3" />
-                </div>
-                <div className="grid justify-items-end">
-                  <a
-                    href="https://www.notifi.network/faqs"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-xs text-primary-dark"
-                    title="Questions? Click to learn more!"
-                  >
-                    Learn More
-                  </a>
-                </div>
+
+              <div className="h-3 grid text-xs w-full place-items-center">
+                <a
+                  href="https://www.notifi.network/faqs"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs text-primary-dark "
+                  title="Questions? Click to learn more!"
+                >
+                  Learn More About Notifi
+                </a>
               </div>
             </div>
           </>
         )
       ) : (
-        <>
-          <div className="animate-pulse bg-bkg-3 h-12 mb-4 rounded-lg" />
-          <div className="animate-pulse bg-bkg-3 h-10 rounded-lg" />
-        </>
+        <div className="flex flex-col items-center">
+          <div className="mt-10">
+            Please select a DAO to start using Notifi.
+          </div>
+          <div className="animate-pulse bg-bkg-3 h-12 w-full mb-4 mt-10 rounded-lg" />
+          <div className="animate-pulse bg-bkg-3 h-10 w-full mb-4 rounded-lg" />
+          <div className="animate-pulse bg-bkg-3 h-10 w-full  mb-4  rounded-lg" />
+          <div className="animate-pulse bg-bkg-3 w-1/2 h-10  mb-4 flex rounded-lg" />
+        </div>
       )}
     </div>
   )
@@ -343,80 +360,18 @@ interface InputRowProps {
 
 const InputRow: FunctionComponent<InputRowProps> = ({
   children,
-  icon,
   label,
+  icon,
 }) => {
   return (
-    <div className="flex justify-between items-center content-center mt-4 w-full">
-      <div className="mr-2 py-1 text-sm w-40 h-8 flex items-center">
-        {icon}
-        {label}
-      </div>
-      {children}
-    </div>
-  )
-}
-
-const NotifiLogo = ({ className }: { className: string }) => {
-  return (
-    <svg
-      className={className}
-      xmlns="http://www.w3.org/2000/svg"
-      width="61"
-      height="14"
-      viewBox="0 0 61 14"
-      fill="currentColor"
+    <label
+      htmlFor={label}
+      className="relative text-gray-400 focus-within:text-gray-600 place-items-center left-5"
     >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M11.4546 8.12234C11.0641 8.23352 10.6519 8.29305 10.2258 8.29305C7.75286 8.29305 5.74812 6.28831 5.74812 3.81534C5.74812 3.37405 5.81196 2.94766 5.9309 2.54492H1.29125C0.57811 2.54492 0 3.12303 0 3.83617V12.7083C0 13.4214 0.57811 13.9995 1.29125 13.9995H10.1633C10.8765 13.9995 11.4546 13.4214 11.4546 12.7083V8.12234Z"
-        fill="#F5F6FB"
-      />
-      <path
-        d="M14.0004 3.18183C14.0004 4.93911 12.5758 6.36366 10.8186 6.36366C9.06127 6.36366 7.63672 4.93911 7.63672 3.18183C7.63672 1.42455 9.06127 0 10.8186 0C12.5758 0 14.0004 1.42455 14.0004 3.18183Z"
-        fill="url(#paint0_linear_790_3397)"
-      />
-      <path
-        d="M27.5799 9.07334V13.9039H29.5859V9.07334C29.5859 6.10438 28.0453 4.16251 25.6059 4.16251C24.4183 4.16251 23.3591 4.86865 23.0061 5.8476V4.27485H21V13.9039H23.0061V9.08939C23.0061 7.38825 23.9529 6.16857 25.2528 6.16857C26.6651 6.16857 27.5799 7.30801 27.5799 9.07334Z"
-        fill="#F5F6FB"
-      />
-      <path
-        d="M30.9267 9.07334C30.9267 11.8658 32.9969 14.0002 35.661 14.0002C38.325 14.0002 40.3792 11.8658 40.3792 9.07334C40.3792 6.29696 38.325 4.16251 35.661 4.16251C32.9969 4.16251 30.9267 6.29696 30.9267 9.07334ZM35.661 6.16857C37.2016 6.16857 38.3732 7.42035 38.3732 9.07334C38.3732 10.7424 37.2016 11.9942 35.661 11.9942C34.1203 11.9942 32.9327 10.7424 32.9327 9.07334C32.9327 7.42035 34.1203 6.16857 35.661 6.16857Z"
-        fill="#F5F6FB"
-      />
-      <path
-        d="M43.2265 2.23669L42.745 4.27485H41.3167V6.16857H42.745V10.5979C42.745 12.9571 43.7079 13.9039 46.0028 13.9039H46.8374V11.9139H46.1954C45.2004 11.9139 44.7511 11.4806 44.7511 10.4856V6.16857H46.8374V4.27485H44.7511V2.23669H43.2265Z"
-        fill="#F5F6FB"
-      />
-      <path
-        d="M50.2386 13.9039V4.27485H48.2325V13.9039H50.2386Z"
-        fill="#F5F6FB"
-      />
-      <path
-        d="M60.5156 13.9039V4.27485H54.995V3.56872C54.995 2.57372 55.4443 2.12435 56.4393 2.12435H57.0813V0.150391H56.2467C53.9518 0.150391 52.9889 1.08121 52.9889 3.45638V4.27485H51.5766V6.16857H52.9889V13.9039H54.995V6.16857H58.5096V13.9039H60.5156Z"
-        fill="#F5F6FB"
-      />
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M49.0032 0C48.4363 0 48.2324 0.311122 48.2324 0.753594V2.3621H49.8052C50.3514 2.3621 50.5945 2.17089 50.5945 1.63162V0.753594C50.5945 0.2489 50.2615 0 49.7499 0H49.0032Z"
-        fill="#F5F6FB"
-      />
-      <defs>
-        <linearGradient
-          id="paint0_linear_790_3397"
-          x1="12.74"
-          y1="0.49587"
-          x2="9.68218"
-          y2="6.36366"
-          gradientUnits="userSpaceOnUse"
-        >
-          <stop stopColor="#FE7970" />
-          <stop offset="1" stopColor="#FEB776" />
-        </linearGradient>
-      </defs>
-    </svg>
+      {icon}
+      <div className="mr-2 text-sm w-40 h-8 flex items-center"></div>
+      {children}
+    </label>
   )
 }
 

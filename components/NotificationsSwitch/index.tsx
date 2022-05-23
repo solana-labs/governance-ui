@@ -16,6 +16,8 @@ import { DeviceMobileIcon } from '@heroicons/react/outline'
 import styled from '@emotion/styled'
 import Button from '@components/Button'
 import TelegramIcon from './TelegramIcon'
+import NotifiIcon from '@components/NotifiIcon'
+import NotificationsCard from '@components/NotificationsCard'
 
 const REALMS_PUBLIC_KEY = new anchor.web3.PublicKey(
   'BUxZD6aECR5B5MopyvvYqJxwSKDBhx2jSSo1U32en6mj'
@@ -55,9 +57,10 @@ const TagToIcon = {
   Email: <MailIcon className="float-left h-3 mr-1 w-3" />,
   Text: <DeviceMobileIcon className="float-left h-3 mr-1 w-3" />,
   Telegram: <TelegramIcon className="float-left h-3 mr-1 w-3" />,
+  NotifiCenter: <BellIcon className="float-left h-3 mr-1 w-3" />,
 }
 
-type ChannelType = 'Wallet' | 'Email' | 'Text' | 'Telegram'
+type ChannelType = 'Wallet' | 'Email' | 'Text' | 'Telegram' | 'Notifi Center'
 
 interface NotificationSolutionType {
   name: string
@@ -67,6 +70,13 @@ interface NotificationSolutionType {
 }
 
 const NotificationSolutions: NotificationSolutionType[] = [
+  {
+    name: 'notifi',
+    channels: ['Email', 'Text', 'Telegram', 'Notifi Center'],
+    description: `
+    Get notifications for proposals, voting, and results. Add your email address, phone number, and/or Telegram.`,
+    modalState: ModalStates.Notifi,
+  },
   {
     name: 'Dialect',
     channels: ['Wallet', 'Email', 'Text', 'Telegram'],
@@ -120,16 +130,27 @@ export default function NotificationsSwitch() {
 
   const StyledChannelName = styled.span`
     font-size: 0.8rem;
+    white-space: nowrap;
   `
 
-  const Tag = ({ channelName }: { channelName: ChannelType }) => (
-    <span>
-      <div className="flex rounded-full items-center bg-bkg-3 px-3 mr-2">
-        {TagToIcon[channelName]}
-        <StyledChannelName>{channelName}</StyledChannelName>
-      </div>
-    </span>
-  )
+  const removeSpaces = (str: string): string => {
+    return str.split(' ').join('')
+  }
+
+  const formatName = (str: string): string => {
+    return str[0].toUpperCase() + str.substring(1)
+  }
+
+  const Tag = ({ channelName }: { channelName: ChannelType }) => {
+    return (
+      <span>
+        <div className="flex rounded-full items-center bg-bkg-3 px-3 mr-2">
+          {TagToIcon[removeSpaces(channelName)]}
+          <StyledChannelName>{channelName}</StyledChannelName>
+        </div>
+      </span>
+    )
+  }
 
   const NotificationBox = ({
     name,
@@ -140,6 +161,7 @@ export default function NotificationsSwitch() {
     <div className="w-full p-4">
       <div className="flex flex-col items-center bg-bkg-1 px-10 py-6">
         <div className="flex w-full">
+          {name === 'notifi' && <NotifiIcon />}
           <h2 className="inline-block">{name}</h2>
         </div>
         <div className="flex w-full items-start mb-4">
@@ -163,7 +185,7 @@ export default function NotificationsSwitch() {
               })
             }
           >
-            Use {name}
+            Use {formatName(name)}
           </Button>
         </div>
       </div>
@@ -211,6 +233,29 @@ export default function NotificationsSwitch() {
               })
             }
             channels={['web3', 'email', 'sms', 'telegram']}
+          />
+        )}
+        {modalState === ModalStates.Notifi && (
+          //  <NotificationsModal
+          //  wallet={(wallet as unknown) as WalletType}
+          //  network={cluster as string}
+          //  publicKey={REALMS_PUBLIC_KEY}
+          //  theme={theme === 'Dark' ? 'dark' : 'light'}
+          //  variables={themeVariables}
+          //  notifications={[{ name: 'New proposals', detail: 'Event' }]}
+          //  onBackClick={() =>
+          //    setNotificationStore((state) => {
+          //      state.modalState = ModalStates.Selection
+          //    })
+          //  }
+          //  channels={['web3', 'email', 'sms', 'telegram']}
+          //  />
+          <NotificationsCard
+            onBackClick={() =>
+              setNotificationStore((state) => {
+                state.modalState = ModalStates.Selection
+              })
+            }
           />
         )}
       </Transition>
