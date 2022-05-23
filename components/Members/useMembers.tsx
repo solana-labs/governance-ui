@@ -151,11 +151,11 @@ export default function useMembers() {
 
   //for community we exclude people who never vote
   const communityAndCouncilTokenRecords = [
-    // ...tokenRecordArray.filter(
-    //   (x) =>
-    //     x.community?.account.totalVotesCount &&
-    //     x.community?.account.totalVotesCount > 0
-    // ),
+    ...tokenRecordArray.filter(
+      (x) =>
+        x.community?.account.totalVotesCount &&
+        x.community?.account.totalVotesCount > 0
+    ),
     ...tokenRecordArray,
     ...councilRecordArray,
   ]
@@ -281,12 +281,28 @@ export default function useMembers() {
       members = matchMembers(members, councilMembers, 'council', true)
       members = matchMembers(members, communityMembers, 'community')
 
-      const delegateMap = getDelegateWalletMap(members)
-      setDelegates(delegateMap)
       setMembers(members)
     }
-    if (realm?.pubkey && previousRealmPubKey !== realm?.pubkey.toBase58()) {
+    const getDelegates = async () => {
+      let members = [...membersWithTokensDeposited]
+      const delegateMap = getDelegateWalletMap(members)
+      setDelegates(delegateMap)
+    }
+
+    if (
+      realm?.pubkey &&
+      previousRealmPubKey !== realm?.pubkey.toBase58() &&
+      !realm?.account.config.useCommunityVoterWeightAddin
+    ) {
       handleSetMembers()
+      getDelegates()
+    }
+    if (
+      !realm?.pubkey ||
+      (realm.pubkey && realm?.account.config.useCommunityVoterWeightAddin)
+    ) {
+      getDelegates()
+      setMembers([])
     }
   }, [realm?.pubkey.toBase58()])
 }
