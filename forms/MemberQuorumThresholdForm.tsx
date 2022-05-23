@@ -45,11 +45,13 @@ export default function MemberQuorumThresholdForm({
   const quorumSize = Math.ceil((quorumPercent * numberOfDaoMembers) / 100)
 
   useEffect(() => {
-    updateUserInput(formData, MemberQuorumThresholdSchema, setValue)
-  }, [])
-
-  useEffect(() => {
-    setNumberOfDaoMembers(formData.memberAddresses?.length)
+    if (typeof formData.addCouncil === 'undefined' || formData?.addCouncil) {
+      updateUserInput(formData, MemberQuorumThresholdSchema, setValue)
+      setNumberOfDaoMembers(formData.memberAddresses?.length)
+    } else {
+      // go to next step:
+      serializeValues({ quorumThreshold: null })
+    }
   }, [formData])
 
   function serializeValues(values) {

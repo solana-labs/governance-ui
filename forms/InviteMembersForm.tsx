@@ -87,12 +87,17 @@ export default function InviteMembersForm({
   const isUserDAOMember = userAddress && inviteList.indexOf(userAddress) > -1
 
   useEffect(() => {
-    updateUserInput(formData, InviteMembersSchema, setValue)
-    setInviteList(
-      formData.memberAddresses?.filter((wallet) => {
-        return validateSolAddress(wallet)
-      }) || []
-    )
+    if (typeof formData.addCouncil === 'undefined' || formData?.addCouncil) {
+      updateUserInput(formData, InviteMembersSchema, setValue)
+      setInviteList(
+        formData.memberAddresses?.filter((wallet) => {
+          return validateSolAddress(wallet)
+        }) || []
+      )
+    } else {
+      // go to next step:
+      serializeValues({ memberAddresses: null })
+    }
   }, [formData])
 
   useEffect(() => {

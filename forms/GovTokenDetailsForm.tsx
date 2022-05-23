@@ -136,7 +136,23 @@ export default function GovTokenDetailsForm({
   }, [])
 
   function serializeValues(values) {
-    onSubmit({ step: currentStep, data: values })
+    const data = {
+      transferMintAuthorityToDao: null,
+      minimumNumberOfTokensToEditDao: null,
+      mintSupplyFactor: null,
+      ...values,
+    }
+    if (values.useExistingToken) {
+      data.newTokenName = null
+      data.newTokenSymbol = null
+      data.tokenInfo = tokenInfo
+    } else {
+      data.tokenAddress = null
+      data.transferMintAuthorityToDao = null
+      data.tokenInfo = null
+    }
+
+    onSubmit({ step: currentStep, data })
   }
 
   function preventNegativeNumberInput(ev) {

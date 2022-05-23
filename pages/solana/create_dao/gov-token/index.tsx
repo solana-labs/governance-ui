@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import * as yup from 'yup'
 
@@ -42,7 +42,7 @@ import MemberQuorumThresholdForm, {
   MemberQuorumThresholdSchema,
   MemberQuorumThreshold,
 } from '../../../../forms/MemberQuorumThresholdForm'
-import FormSummary from '../../../../components_2/FormSummary'
+import FormSummary from 'components_2/FormSummary'
 
 export const SESSION_STORAGE_FORM_KEY = 'govtoken-form-data'
 
@@ -91,6 +91,12 @@ export default function GovTokenWizard() {
     const updatedFormState = {
       ...formData,
       ...data,
+    }
+
+    for (const key in updatedFormState) {
+      if (updatedFormState[key] == null) {
+        delete updatedFormState[key]
+      }
     }
 
     console.log('next button clicked', step, data, nextStep)
@@ -247,6 +253,7 @@ export default function GovTokenWizard() {
 
           {currentStep == steps.length + 1 && (
             <FormSummary
+              type="gov-token"
               currentStep={steps.length + 1}
               formData={formData}
               onPrevClick={handlePreviousButton}
