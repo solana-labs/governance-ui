@@ -1,3 +1,8 @@
+import { UiInstruction } from '../../uiTypes/proposalCreationTypes'
+import { WSOL_MINT_PK } from '@components/instructions/tools'
+import { Wallet, BN } from '@project-serum/anchor'
+import { publicKey, struct, u32, u64, u8 } from '@project-serum/borsh'
+import { closeAccount } from '@project-serum/serum/lib/token-instructions'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -12,19 +17,11 @@ import {
   Connection,
   SystemProgram,
 } from '@solana/web3.js'
-
-import type { ConnectionContext } from 'utils/connection'
-import { UiInstruction } from '../../uiTypes/proposalCreationTypes'
+import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
 import { validateInstruction } from '@utils/instructionTools'
 import { AssetAccount } from '@utils/uiTypes/assets'
-
 import { GoblinGold } from 'goblingold-sdk'
-import { WSOL_MINT_PK } from '@components/instructions/tools'
-
-import { publicKey, struct, u32, u64, u8 } from '@project-serum/borsh'
-import { closeAccount } from '@project-serum/serum/lib/token-instructions'
-import { Wallet, BN } from '@project-serum/anchor'
-import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
+import type { ConnectionContext } from 'utils/connection'
 
 // // https://github.com/solana-labs/solana-program-library/blob/master/token/js/client/token.js#L210
 export const ACCOUNT_LAYOUT = struct([
@@ -77,6 +74,7 @@ async function createAssociatedTokenAccountIfNotExist(
 export async function createWrappedNativeAccount(
   connection: Connection,
   owner: PublicKey,
+  payer: PublicKey,
   amount: number | undefined,
   prerequisiteInstructions: TransactionInstruction[]
 ) {
@@ -90,7 +88,7 @@ export async function createWrappedNativeAccount(
 
   prerequisiteInstructions.push(
     SystemProgram.createAccount({
-      fromPubkey: owner,
+      fromPubkey: payer,
       newAccountPubkey: newAccount.publicKey,
       lamports: balanceNeeded,
       space: ACCOUNT_LAYOUT.span,
@@ -157,7 +155,8 @@ export async function getGoblinGoldDepositInstruction({
     amount &&
     governedTokenAccount?.extensions.mint?.account &&
     governedTokenAccount?.governance &&
-    wallet
+    wallet &&
+    wallet.publicKey
   ) {
     // ggUSDC, ggWSOL public key
     const governedTokenPk = governedTokenAccount.extensions.mint.publicKey
@@ -204,6 +203,7 @@ export async function getGoblinGoldDepositInstruction({
       ataInputKeypair = await createWrappedNativeAccount(
         connection.current,
         governedAccountPk,
+        wallet.publicKey,
         transferAmount,
         prerequisiteInstructions
       )
@@ -224,7 +224,7 @@ export async function getGoblinGoldDepositInstruction({
       connection.current,
       lpTokenMintAddress,
       governedAccountPk,
-      wallet.publicKey ? wallet.publicKey : governedAccountPk,
+      wallet.publicKey,
       prerequisiteInstructions
     )
 
@@ -291,7 +291,8 @@ export async function getGoblinGoldWithdrawInstruction({
     amount &&
     governedTokenAccount?.extensions.mint?.account &&
     governedTokenAccount?.governance &&
-    wallet
+    wallet &&
+    wallet.publicKey
   ) {
     // ggUSDC, ggWSOL public key
     const governedTokenPk = governedTokenAccount.extensions.mint.publicKey
@@ -337,6 +338,7 @@ export async function getGoblinGoldWithdrawInstruction({
       ataInputKeypair = await createWrappedNativeAccount(
         connection.current,
         governedAccountPk,
+        wallet.publicKey,
         undefined,
         prerequisiteInstructions
       )
@@ -348,7 +350,7 @@ export async function getGoblinGoldWithdrawInstruction({
         connection.current,
         inputTokenMintAddress,
         governedAccountPk,
-        wallet.publicKey ? wallet.publicKey : governedAccountPk,
+        wallet.publicKey,
         prerequisiteInstructions
       )
     }
