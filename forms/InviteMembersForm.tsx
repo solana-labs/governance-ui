@@ -6,13 +6,13 @@ import * as yup from 'yup'
 import useWalletStore from 'stores/useWalletStore'
 import { notify } from '@utils/notifications'
 
-import FormHeader from '../FormHeader'
-import FormField from '../FormField'
-import FormFooter from '../FormFooter'
-import Input from '../Input'
-import Button from 'components_2/Button'
+import FormHeader from '../components_2/FormHeader'
+import FormField from '../components_2/FormField'
+import FormFooter from '../components_2/FormFooter'
+import Input from '../components_2/Input'
+import Button from '../components_2/Button'
 
-import { getFormData, updateUserInput, validateSolAddress } from './Wizard'
+import { updateUserInput, validateSolAddress } from '../utils/formValidation'
 
 function InviteAddress({
   address = '',
@@ -45,16 +45,27 @@ export const InviteMembersSchema = {
   memberAddresses: yup
     .array()
     .of(yup.string())
-    .min(1, 'A DAO needs at least one member')
-    .required('Required'),
+    .when('$addCouncil', (addCouncil, schema) => {
+      if (typeof addCouncil === undefined) {
+        return schema.min(1, 'A DAO needs at least one member')
+      } else {
+        return addCouncil
+          ? schema.min(1, 'A DAO needs at least one member')
+          : schema
+      }
+    }),
+}
+
+export interface InviteMembers {
+  memberAddresses: string[]
 }
 
 export default function InviteMembersForm({
+  formData,
   onSubmit,
   onPrevClick,
   currentStep,
   totalSteps,
-  prevStepSchema,
 }) {
   const { current } = useWalletStore((s) => s)
   const inputElement = useRef<HTMLInputElement>(null)
@@ -62,7 +73,7 @@ export default function InviteMembersForm({
   const [inviteList, setInviteList] = useState<string[]>([])
   const [validationError, setValidationError] = useState<string>('')
 
-  const schema = yup.object(InviteMembersSchema).required()
+  const schema = yup.object(InviteMembersSchema)
   const {
     setValue,
     handleSubmit,
@@ -70,37 +81,19 @@ export default function InviteMembersForm({
   } = useForm({
     mode: 'all',
     resolver: yupResolver(schema),
+    context: formData,
   })
   const userAddress = current?.publicKey?.toBase58() || ''
   const isUserDAOMember = userAddress && inviteList.indexOf(userAddress) > -1
 
   useEffect(() => {
-    const formData = getFormData()
-    if (prevStepSchema) {
-      yup
-        .object(prevStepSchema)
-        .isValid(formData)
-        .then((valid) => {
-          if (valid) {
-            updateUserInput(InviteMembersSchema, setValue)
-            setInviteList(
-              formData.memberAddresses?.filter((wallet) => {
-                return validateSolAddress(wallet)
-              }) || []
-            )
-          } else {
-            onPrevClick(currentStep)
-          }
-        })
-    } else {
-      updateUserInput(InviteMembersSchema, setValue)
-      setInviteList(
-        formData.memberAddresses?.filter((wallet) => {
-          return validateSolAddress(wallet)
-        }) || []
-      )
-    }
-  }, [])
+    updateUserInput(formData, InviteMembersSchema, setValue)
+    setInviteList(
+      formData.memberAddresses?.filter((wallet) => {
+        return validateSolAddress(wallet)
+      }) || []
+    )
+  }, [formData])
 
   useEffect(() => {
     setValue('memberAddresses', inviteList, {

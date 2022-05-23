@@ -1,33 +1,36 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 
-import FormHeader from '../FormHeader'
-import FormField from '../FormField'
-import FormFooter from '../FormFooter'
-import Input from '../Input'
-import { getFormData, updateUserInput } from './Wizard'
+import FormHeader from '../components_2/FormHeader'
+import FormField from '../components_2/FormField'
+import FormFooter from '../components_2/FormFooter'
+import Input from '../components_2/Input'
 
-export const MemberQuorumThresholdSchema = {
-  quorumThreshold: yup
+import { updateUserInput } from '../utils/formValidation'
+
+export const ApprovalThresholdSchema = {
+  approvalThreshold: yup
     .number()
     .typeError('Required')
-    .max(100, 'Quorum cannot require more than 100% of members')
-    .min(1, 'Quorum must be at least 1% of member')
+    .max(100, 'Approval cannot require more than 100% of votes')
+    .min(1, 'Approval must be at least 1% of votes')
     .required('Required'),
 }
 
-export default function MemberQuorumThresholdForm({
+export interface ApprovalThreshold {
+  approvalThreshold: number
+}
+
+export default function ApprovalThresholdForm({
+  formData,
   currentStep,
   totalSteps,
   onSubmit,
   onPrevClick,
-  prevStepSchema,
 }) {
-  const [numberOfDaoMember, setNumberOfDaoMember] = useState(0)
-
-  const schema = yup.object(MemberQuorumThresholdSchema).required()
+  const schema = yup.object(ApprovalThresholdSchema).required()
   const {
     control,
     watch,
@@ -38,28 +41,10 @@ export default function MemberQuorumThresholdForm({
     mode: 'all',
     resolver: yupResolver(schema),
   })
-  const quorumPercent = watch('quorumThreshold', 50)
-  const quorumSize = Math.ceil((quorumPercent * numberOfDaoMember) / 100)
+  const approvalPercent = watch('approvalThreshold', 60)
 
   useEffect(() => {
-    const formData = getFormData()
-    if (prevStepSchema) {
-      yup
-        .object(prevStepSchema)
-        .isValid(formData)
-        .then((valid) => {
-          console.log('is previous step valid', valid, currentStep)
-          if (valid) {
-            setNumberOfDaoMember(formData?.memberAddresses?.length)
-            updateUserInput(MemberQuorumThresholdSchema, setValue)
-          } else {
-            onPrevClick(currentStep)
-          }
-        })
-    } else {
-      setNumberOfDaoMember(formData?.memberAddresses?.length)
-      updateUserInput(MemberQuorumThresholdSchema, setValue)
-    }
+    updateUserInput(formData, ApprovalThresholdSchema, setValue)
   }, [])
 
   function serializeValues(values) {
@@ -69,24 +54,24 @@ export default function MemberQuorumThresholdForm({
   return (
     <form
       onSubmit={handleSubmit(serializeValues)}
-      data-testid="member-quorum-threshold-form"
+      data-testid="approval-threshold-form"
     >
       <FormHeader
         currentStep={currentStep}
         totalSteps={totalSteps}
-        stepDescription="Approval qurorum"
-        title="Last, let's determine the approval quorum for your shared wallet."
+        stepDescription="Approval threshold"
+        title="Next, let's determine the approval quorum for community proposals."
         imgSrc="/1-Landing-v2/dao-type-medium-govtoken.png"
         imgAlt="circles spirling"
       />
       <div className="pt-10 space-y-10 md:space-y-12">
         <Controller
-          name="quorumThreshold"
+          name="approvalThreshold"
           control={control}
-          defaultValue={50}
+          defaultValue={60}
           render={({ field }) => (
             <FormField
-              title="Adjust the percentage to determine votes needed to pass a proposal"
+              title="Adjust how much of the total governance token supply needed to pass a proposal"
               description=""
             >
               <div className="flex items-center justify-between">
@@ -94,9 +79,9 @@ export default function MemberQuorumThresholdForm({
                   <div className="w-[4.5rem]">
                     <Input
                       type="number"
-                      placeholder="50"
+                      placeholder="60"
                       data-testid="dao-quorum-input"
-                      error={errors.quorumThreshold?.message || ''}
+                      error={errors.approvalThreshold?.message || ''}
                       {...field}
                     />
                   </div>
@@ -110,7 +95,7 @@ export default function MemberQuorumThresholdForm({
                     className="w-full with-gradient focus:outline-none focus:ring-0 focus:shadow-none"
                     {...field}
                     style={{
-                      backgroundSize: `${quorumPercent}% 100%`,
+                      backgroundSize: `${approvalPercent}% 100%`,
                     }}
                   />
                   <div className="opacity-60">100%</div>
@@ -126,20 +111,18 @@ export default function MemberQuorumThresholdForm({
         </div>
         <div className="flex flex-col">
           <div className="pb-3 text-sm uppercase opacity-50">
-            Approval quorum
+            Approval threshold
           </div>
           <div className="text-lg">
-            With {numberOfDaoMember} members added to your DAO,
-          </div>
-          <div className="pt-2 text-lg">
-            {quorumSize} members would need to approve a proposal for it to pass{' '}
+            Typically, newer Governance Token DAOs start their community
+            approval quorums around 60% of total token supply.
           </div>
         </div>
       </div>
       <FormFooter
         isValid={isValid}
         prevClickHandler={() => onPrevClick(currentStep)}
-        faqTitle=""
+        faqTitle="About Approval Quorum"
       />
     </form>
   )

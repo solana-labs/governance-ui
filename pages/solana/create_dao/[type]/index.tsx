@@ -20,8 +20,10 @@ export default function DAOCreationForm() {
   })
 
   useEffect(() => {
+    console.log(query, query?.type)
     if (
-      query?.type !== 'gov-token' &&
+      query &&
+      query?.type !== 'govtoken' &&
       query?.type !== 'nft' &&
       query?.type !== 'multisig'
     ) {
@@ -42,7 +44,7 @@ export default function DAOCreationForm() {
         />
       </div>
 
-      {query?.type === 'gov-token' && <GovTokenWizard />}
+      {query?.type === 'govtoken' && <GovTokenWizard />}
       {query?.type === 'nft' && <NFTWizard />}
       {query?.type === 'multisig' && <MultiSigWizard />}
     </div>

@@ -1,12 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/router'
 import * as yup from 'yup'
-import { PublicKey } from '@solana/web3.js'
+
 import { getGovernanceProgramVersion } from '@solana/spl-governance'
+import { PublicKey } from '@solana/web3.js'
 import useWalletStore from 'stores/useWalletStore'
 import { createMultisigRealm } from 'actions/createMultisigRealm'
 import useQueryContext from '@hooks/useQueryContext'
-
+import useLocalStorageState from '@hooks/useLocalStorageState'
 import {
   // DEFAULT_GOVERNANCE_PROGRAM_ID,
   DEFAULT_TEST_GOVERNANCE_PROGRAM_ID,
@@ -14,56 +15,61 @@ import {
 
 import { notify } from '@utils/notifications'
 import { Section } from 'pages/solana'
+import Image from 'next/image'
+import Navbar from 'components_2/NavBar'
 
-import BasicDetailsForm, { BasicDetailsSchema } from './BasicDetailsForm'
+import BasicDetailsForm, {
+  BasicDetailsSchema,
+  BasicDetails,
+} from '../../../../forms/BasicDetailsForm'
 import GovTokenDetailsForm, {
   GovTokenDetailsSchema,
-} from './GovTokenDetailsForm'
+  GovTokenDetails,
+} from '../../../../forms/GovTokenDetailsForm'
 import ApprovalThresholdForm, {
   ApprovalThresholdSchema,
-} from './ApprovalThresholdForm'
-import AddCouncilForm, { AddCouncilSchema } from './AddCouncilForm'
-import InviteMembersForm, { InviteMembersSchema } from './InviteMembersForm'
+  ApprovalThreshold,
+} from '../../../../forms/ApprovalThresholdForm'
+import AddCouncilForm, {
+  AddCouncilSchema,
+  AddCouncil,
+} from '../../../../forms/AddCouncilForm'
+import InviteMembersForm, {
+  InviteMembersSchema,
+  InviteMembers,
+} from '../../../../forms/InviteMembersForm'
 import MemberQuorumThresholdForm, {
   MemberQuorumThresholdSchema,
-} from './MemberQuorumThresholdForm'
-import FormSummary from '../FormSummary'
+  MemberQuorumThreshold,
+} from '../../../../forms/MemberQuorumThresholdForm'
+import FormSummary from '../../../../components_2/FormSummary'
 
 export const SESSION_STORAGE_FORM_KEY = 'govtoken-form-data'
 
-export function validateSolAddress(address: string) {
-  try {
-    const pubkey = new PublicKey(address)
-    const isSolana = PublicKey.isOnCurve(pubkey.toBuffer())
-    return isSolana
-  } catch (error) {
-    return false
-  }
-}
-
-export function getFormData() {
-  return JSON.parse(sessionStorage.getItem(SESSION_STORAGE_FORM_KEY) || '{}')
-}
-
-export function updateUserInput(schema, setValue) {
-  const formData = getFormData()
-  Object.keys(schema).forEach((fieldName) => {
-    const value = formData[fieldName]
-    if (typeof value !== 'undefined') {
-      setValue(fieldName, value, {
-        shouldValidate: true,
-        shouldDirty: true,
-      })
-    }
-  })
-}
+type GovToken =
+  | (BasicDetails &
+      GovTokenDetails &
+      ApprovalThreshold &
+      AddCouncil &
+      InviteMembers &
+      MemberQuorumThreshold)
+  | Record<string, never>
 
 export default function GovTokenWizard() {
+  const [formData, setFormData] = useLocalStorageState<GovToken>(
+    SESSION_STORAGE_FORM_KEY,
+    {}
+  )
   const { connected, connection, current: wallet } = useWalletStore((s) => s)
-  const { pathname, query, push } = useRouter()
+  const { pathname, query, push, replace } = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const [requestPending, setRequestPending] = useState(false)
-  const currentStep = query?.currentStep || 1
+  const currentStep =
+    typeof query !== 'undefined'
+      ? query.currentStep
+        ? Number(query.currentStep)
+        : 1
+      : 1
   const steps = [
     { Form: BasicDetailsForm, schema: BasicDetailsSchema },
     { Form: GovTokenDetailsForm, schema: GovTokenDetailsSchema },
@@ -74,7 +80,6 @@ export default function GovTokenWizard() {
   ]
 
   function handleNextButtonClick({ step, data }) {
-    const formState = getFormData()
     let nextStep
     if (data.addCouncil === false) {
       // skip to the end
@@ -84,39 +89,44 @@ export default function GovTokenWizard() {
     }
 
     const updatedFormState = {
-      ...formState,
+      ...formData,
       ...data,
     }
 
     console.log('next button clicked', step, data, nextStep)
-    sessionStorage.setItem(
-      SESSION_STORAGE_FORM_KEY,
-      JSON.stringify(updatedFormState)
-    )
+
+    setFormData(updatedFormState)
     push({ pathname, query: { ...query, currentStep: nextStep } }, undefined, {
       shallow: true,
     })
   }
 
-  function handlePreviousButton(currentStep) {
-    if (currentStep === 1) {
+  function handlePreviousButton(fromStep, overwriteHistory = false) {
+    console.log('previous button clicked from step:', fromStep, currentStep)
+
+    if (fromStep == 1) {
       push({ pathname: '/solana/create_dao/' }, undefined, { shallow: true })
     } else {
-      const formState = getFormData()
       let previousStep
-      if (currentStep === 7 && !formState.addCouncil) {
+      if (fromStep === 7 && !formData?.addCouncil) {
         // skip to the end
         previousStep = 4
       } else {
-        previousStep = currentStep - 1
+        previousStep = fromStep - 1
       }
-
-      console.log('Previous click', previousStep)
-      push(
-        { pathname, query: { ...query, currentStep: previousStep } },
-        undefined,
-        { shallow: true }
-      )
+      if (overwriteHistory) {
+        replace(
+          { pathname, query: { ...query, currentStep: previousStep } },
+          undefined,
+          { shallow: true }
+        )
+      } else {
+        push(
+          { pathname, query: { ...query, currentStep: previousStep } },
+          undefined,
+          { shallow: true }
+        )
+      }
     }
   }
 
@@ -130,7 +140,7 @@ export default function GovTokenWizard() {
       if (!wallet?.publicKey) {
         throw new Error('No valid wallet connected')
       }
-      const formData = getFormData()
+      // const formData = getFormData()
       // const programId = formData.testDao || true
       // ? DEFAULT_TEST_GOVERNANCE_PROGRAM_ID
       // : DEFAULT_GOVERNANCE_PROGRAM_ID
@@ -185,25 +195,16 @@ export default function GovTokenWizard() {
   }
 
   useEffect(() => {
-    if (currentStep < steps.length + 1) {
-      return
-    }
-    const formData = getFormData()
-    yup
-      .object(
-        steps.reduce((prev, { schema }) => {
-          return {
-            ...prev,
-            ...schema,
+    if (currentStep > 1 && currentStep < steps.length + 1) {
+      yup
+        .object(steps[currentStep - 2].schema)
+        .isValid(formData)
+        .then((valid) => {
+          if (!valid) {
+            return handlePreviousButton(currentStep, true)
           }
-        }, {})
-      )
-      .isValid(formData)
-      .then((valid) => {
-        if (!valid) {
-          return handlePreviousButton(steps.length + 1)
-        }
-      })
+        })
+    }
   }, [currentStep])
 
   useEffect(() => {
@@ -214,37 +215,47 @@ export default function GovTokenWizard() {
   }, [])
 
   return (
-    <div className="pt-24 md:pt-28">
-      <Section>
-        {steps.map(({ Form }, index, stepList) => {
-          return (
-            <div
-              key={index}
-              className={index + 1 == currentStep ? '' : 'hidden'}
-            >
-              <Form
-                currentStep={index + 1}
-                totalSteps={steps.length + 1}
-                prevStepSchema={
-                  index > 0 ? stepList[index - 1].schema : undefined
-                }
-                onPrevClick={handlePreviousButton}
-                onSubmit={handleNextButtonClick}
-              />
-            </div>
-          )
-        })}
+    <div className="relative pb-8 md:pb-20 landing-page">
+      <Navbar showWalletButton />
+      <div className="absolute w-[100vw] h-[100vh]">
+        <Image
+          alt="background image"
+          src="/1-Landing-v2/creation-bg-desktop.png"
+          layout="fill"
+          objectFit="cover"
+          quality={100}
+        />
+      </div>
+      <div className="pt-24 md:pt-28">
+        <Section>
+          {steps.map(({ Form }, index) => {
+            return (
+              <div
+                key={index}
+                className={index + 1 == currentStep ? '' : 'hidden'}
+              >
+                <Form
+                  formData={formData}
+                  currentStep={index + 1}
+                  totalSteps={steps.length + 1}
+                  onPrevClick={handlePreviousButton}
+                  onSubmit={handleNextButtonClick}
+                />
+              </div>
+            )
+          })}
 
-        {currentStep == steps.length + 1 && (
-          <FormSummary
-            currentStep={steps.length + 1}
-            formData={getFormData()}
-            onPrevClick={handlePreviousButton}
-            onSubmit={handleSubmitClick}
-            submissionPending={requestPending}
-          />
-        )}
-      </Section>
+          {currentStep == steps.length + 1 && (
+            <FormSummary
+              currentStep={steps.length + 1}
+              formData={formData}
+              onPrevClick={handlePreviousButton}
+              onSubmit={handleSubmitClick}
+              submissionPending={requestPending}
+            />
+          )}
+        </Section>
+      </div>
     </div>
   )
 }

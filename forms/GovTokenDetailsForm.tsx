@@ -6,13 +6,13 @@ import * as yup from 'yup'
 
 import Header from 'components_2/Header'
 import Text from 'components_2/Text'
-import FormHeader from '../FormHeader'
-import FormField from '../FormField'
-import FormFooter from '../FormFooter'
-import AdvancedOptionsDropdown from '../AdvancedOptionsDropdown'
-import Input, { RadioGroup } from '../Input'
+import FormHeader from '../components_2/FormHeader'
+import FormField from '../components_2/FormField'
+import FormFooter from '../components_2/FormFooter'
+import AdvancedOptionsDropdown from '../components_2/AdvancedOptionsDropdown'
+import Input, { RadioGroup } from '../components_2/Input'
 
-import { getFormData, updateUserInput, validateSolAddress } from './Wizard'
+import { updateUserInput, validateSolAddress } from '../utils/formValidation'
 
 const PENDING_COIN = {
   chainId: 1,
@@ -48,7 +48,7 @@ export const GovTokenDetailsSchema = {
       otherwise: yup.string().optional(),
     })
     .test('is-valid-address', 'Please enter a valid Solana address', (value) =>
-      value ? validateSolAddress(value) : true
+      Promise.resolve(value ? validateSolAddress(value) : true)
     ),
   transferMintAuthorityToDao: yup
     .boolean()
@@ -61,8 +61,8 @@ export const GovTokenDetailsSchema = {
       then: yup.boolean().required('Required'),
       otherwise: yup.boolean().optional(),
     }),
-  tokenName: yup.string(),
-  tokenSymbol: yup.string(),
+  newTokenName: yup.string(),
+  newTokenSymbol: yup.string(),
   minimumNumberOfTokensToEditDao: yup
     .number()
     .positive('Must be greater than 0')
@@ -74,12 +74,22 @@ export const GovTokenDetailsSchema = {
     .transform((value) => (isNaN(value) ? undefined : value)),
 }
 
+export interface GovTokenDetails {
+  useExistingToken: boolean
+  tokenAddress?: string
+  transferMintAuthorityToDao?: boolean
+  newTokenName?: string
+  newTokenSymbol?: string
+  minimumNumberOfTokensToEditDao?: number
+  mintSupplyFactor?: number
+}
+
 export default function GovTokenDetailsForm({
+  formData,
   currentStep,
   totalSteps,
   onSubmit,
   onPrevClick,
-  prevStepSchema,
 }) {
   const [tokenList, setTokenList] = useState<TokenInfo[] | undefined>()
   const schema = yup.object(GovTokenDetailsSchema).required()
@@ -109,19 +119,7 @@ export default function GovTokenDetailsForm({
   }, [tokenAddress, tokenList])
 
   useEffect(() => {
-    if (prevStepSchema) {
-      const formData = getFormData()
-      yup
-        .object(prevStepSchema)
-        .isValid(formData)
-        .then((valid) => {
-          if (valid) {
-            updateUserInput(GovTokenDetailsSchema, setValue)
-          } else {
-            onPrevClick(currentStep)
-          }
-        })
-    }
+    updateUserInput(formData, GovTokenDetailsSchema, setValue)
   }, [])
 
   useEffect(() => {
@@ -262,7 +260,7 @@ export default function GovTokenDetailsForm({
               Good news: we can mint you a brand new one!
             </Header>
             <Controller
-              name="tokenName"
+              name="newTokenName"
               control={control}
               defaultValue=""
               render={({ field }) => (
@@ -274,7 +272,7 @@ export default function GovTokenDetailsForm({
                   <Input
                     placeholder="e.g. RealmsCoin"
                     data-testid="dao-name-input"
-                    error={errors.tokenName?.message || ''}
+                    error={errors.newTokenName?.message || ''}
                     {...field}
                   />
                 </FormField>
@@ -282,7 +280,7 @@ export default function GovTokenDetailsForm({
             />
 
             <Controller
-              name="tokenSymbol"
+              name="newTokenSymbol"
               control={control}
               defaultValue=""
               render={({ field }) => (
@@ -294,7 +292,7 @@ export default function GovTokenDetailsForm({
                   <Input
                     placeholder="e.g. REALM"
                     data-testid="dao-name-input"
-                    error={errors.tokenSymbol?.message || ''}
+                    error={errors.newTokenSymbol?.message || ''}
                     {...field}
                   />
                 </FormField>

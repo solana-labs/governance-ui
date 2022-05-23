@@ -1,3 +1,4 @@
+import { PublicKey } from '@solana/web3.js'
 import { SanitizedObject } from './helpers'
 
 export interface formValidation {
@@ -41,4 +42,26 @@ export const isFormValid = async (schema, formValues, abortEarly = false) => {
     }
   }
   return values
+}
+
+export function validateSolAddress(address: string) {
+  try {
+    const pubkey = new PublicKey(address)
+    const isSolana = PublicKey.isOnCurve(pubkey.toBuffer())
+    return isSolana
+  } catch (error) {
+    return false
+  }
+}
+
+export function updateUserInput(formData, schema, setValue) {
+  Object.keys(schema).forEach((fieldName) => {
+    const value = formData[fieldName]
+    if (typeof value !== 'undefined') {
+      setValue(fieldName, value, {
+        shouldValidate: true,
+        shouldDirty: true,
+      })
+    }
+  })
 }

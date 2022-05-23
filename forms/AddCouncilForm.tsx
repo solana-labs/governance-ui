@@ -3,12 +3,12 @@ import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 
-import FormHeader from '../FormHeader'
-import FormField from '../FormField'
-import FormFooter from '../FormFooter'
-import { RadioGroup } from '../Input'
+import FormHeader from '../components_2/FormHeader'
+import FormField from '../components_2/FormField'
+import FormFooter from '../components_2/FormFooter'
+import { RadioGroup } from '../components_2/Input'
 
-import { getFormData, updateUserInput } from './Wizard'
+import { updateUserInput } from '../utils/formValidation'
 
 export const AddCouncilSchema = {
   addCouncil: yup
@@ -20,12 +20,16 @@ export const AddCouncilSchema = {
     .required('Required'),
 }
 
+export interface AddCouncil {
+  addCouncil: boolean
+}
+
 export default function AddCouncilForm({
+  formData,
   currentStep,
   totalSteps,
   onSubmit,
   onPrevClick,
-  prevStepSchema,
 }) {
   const schema = yup.object(AddCouncilSchema).required()
   const {
@@ -39,21 +43,7 @@ export default function AddCouncilForm({
   })
 
   useEffect(() => {
-    if (prevStepSchema) {
-      const formData = getFormData()
-      yup
-        .object(prevStepSchema)
-        .isValid(formData)
-        .then((valid) => {
-          if (valid) {
-            updateUserInput(AddCouncilSchema, setValue)
-          } else {
-            onPrevClick(currentStep)
-          }
-        })
-    } else {
-      updateUserInput(AddCouncilSchema, setValue)
-    }
+    updateUserInput(formData, AddCouncilSchema, setValue)
   }, [])
 
   function serializeValues(values) {

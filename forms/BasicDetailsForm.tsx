@@ -3,18 +3,18 @@ import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 
-import FormHeader from '../FormHeader'
-import FormField, { ImageUploader } from '../FormField'
-import FormFooter from '../FormFooter'
-import AdvancedOptionsDropdown from '../AdvancedOptionsDropdown'
-import Input from '../Input'
+import FormHeader from '../components_2/FormHeader'
+import FormField, { ImageUploader } from '../components_2/FormField'
+import FormFooter from '../components_2/FormFooter'
+import AdvancedOptionsDropdown from '../components_2/AdvancedOptionsDropdown'
+import Input from '../components_2/Input'
 
 import {
   DEFAULT_GOVERNANCE_PROGRAM_ID,
   // DEFAULT_TEST_GOVERNANCE_PROGRAM_ID,
 } from '@components/instructions/tools'
 
-import { updateUserInput, getFormData } from './Wizard'
+import { updateUserInput } from '../utils/formValidation'
 
 export const BasicDetailsSchema = {
   avatar: yup.string(),
@@ -23,12 +23,19 @@ export const BasicDetailsSchema = {
   programId: yup.string(),
 }
 
+export interface BasicDetails {
+  avatar?: string
+  name: string
+  description?: string
+  programId?: string
+}
+
 export default function BasicDetailsForm({
+  formData,
   currentStep,
   totalSteps,
   onSubmit,
   onPrevClick,
-  prevStepSchema,
 }) {
   const schema = yup.object(BasicDetailsSchema).required()
   const {
@@ -43,21 +50,7 @@ export default function BasicDetailsForm({
   })
 
   useEffect(() => {
-    if (prevStepSchema) {
-      const formData = getFormData()
-      yup
-        .object(prevStepSchema)
-        .isValid(formData)
-        .then((valid) => {
-          if (valid) {
-            updateUserInput(BasicDetailsSchema, setValue)
-          } else {
-            onPrevClick(currentStep)
-          }
-        })
-    } else {
-      updateUserInput(BasicDetailsSchema, setValue)
-    }
+    updateUserInput(formData, BasicDetailsSchema, setValue)
   }, [])
 
   function serializeValues(values) {
