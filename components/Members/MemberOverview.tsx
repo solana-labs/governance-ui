@@ -160,6 +160,7 @@ const MemberOverview = ({ member }: { member: Member }) => {
   const paginateVotes = (page) => {
     return ownVoteRecords.slice(page * perPage, (page + 1) * perPage)
   }
+
   const Address = useMemo(() => {
     return (
       <DisplayAddress
@@ -200,6 +201,7 @@ const MemberOverview = ({ member }: { member: Member }) => {
                 <LogoutIcon className="w-4 h-4 ml-1"></LogoutIcon>
               )}
             </div>
+
             <p>Vote Power Rank: {memberVotePowerRank}</p>
           </div>
         )}
@@ -212,7 +214,6 @@ const MemberOverview = ({ member }: { member: Member }) => {
                 <LogoutIcon className="w-3 h-3 ml-1"></LogoutIcon>
               )}
             </div>
-            <div></div>
           </div>
         )}
         <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all">

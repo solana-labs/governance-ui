@@ -52,7 +52,9 @@ const Select = ({
                 })}
               >
                 <div
-                  className={`flex items-center justify-between text-fgd-1 text-left`}
+                  className={`flex items-center justify-between text-left ${
+                    placeholder ? 'text-fgd-3' : 'text-fgd-1'
+                  }`}
                 >
                   {componentLabel
                     ? componentLabel

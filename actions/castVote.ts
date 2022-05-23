@@ -52,6 +52,7 @@ export async function castVote(
     proposal,
     tokeOwnerRecord
   )
+
   await withCastVote(
     instructions,
     programId,

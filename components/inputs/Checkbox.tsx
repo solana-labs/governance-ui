@@ -28,7 +28,7 @@ const Checkbox = ({ checked, label = '', disabled = false, ...props }) => (
     >
       <CheckIcon
         className={`${checked ? 'block' : 'hidden'} h-4 w-4 ${
-          disabled ? 'text-fgd-4' : 'text-primary'
+          disabled ? 'text-fgd-3' : 'text-primary'
         }`}
       />
     </div>

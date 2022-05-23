@@ -17,6 +17,7 @@ import { useEffect, useState } from 'react'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import InlineNotification from '@components/InlineNotification'
 import Link from 'next/link'
+import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
 
 const LockPluginTokenBalanceCard = ({
@@ -110,6 +111,7 @@ const LockPluginTokenBalanceCard = ({
               />
             </div>
           )}
+          <DelegateTokenBalanceCard />
         </>
       ) : (
         <>
