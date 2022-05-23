@@ -284,7 +284,7 @@ export default function useMembers() {
       setMembers(members)
     }
     const getDelegates = async () => {
-      let members = [...membersWithTokensDeposited]
+      const members = [...membersWithTokensDeposited]
       const delegateMap = getDelegateWalletMap(members)
       setDelegates(delegateMap)
     }
