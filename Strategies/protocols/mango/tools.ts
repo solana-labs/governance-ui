@@ -205,7 +205,9 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
         makeDepositInstruction(
           groupConfig.mangoProgramId,
           groupConfig.publicKey,
-          matchedTreasury.governance!.pubkey,
+          matchedTreasury.isSol
+            ? matchedTreasury.governance.pubkey!
+            : matchedTreasury.extensions.token!.account.owner!,
           group.mangoCache,
           mangoAccountPk,
           quoteRootBank!.publicKey,
