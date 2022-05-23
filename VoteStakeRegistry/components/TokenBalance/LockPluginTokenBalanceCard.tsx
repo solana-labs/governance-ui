@@ -50,11 +50,13 @@ const LockPluginTokenBalanceCard = ({
 
   useEffect(() => {
     const getTokenOwnerRecord = async () => {
-      const defaultMint = !mint?.supply.isZero()
-        ? realm!.account.communityMint
-        : !councilMint?.supply.isZero()
-        ? realm!.account.config.councilMint
-        : undefined
+      const defaultMint =
+        !mint?.supply.isZero() ||
+        realm?.account.config.useMaxCommunityVoterWeightAddin
+          ? realm!.account.communityMint
+          : !councilMint?.supply.isZero()
+          ? realm!.account.config.councilMint
+          : undefined
       const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
         realm!.owner,
         realm!.pubkey,
