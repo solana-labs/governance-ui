@@ -80,6 +80,7 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
         provider,
         connection.cluster === 'devnet'
       )
+      console.log(vsrClient, 'STORE')
       set((s) => {
         s.state.vsrClient = vsrClient
       })
