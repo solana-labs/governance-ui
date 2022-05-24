@@ -26,6 +26,7 @@ import {
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useRealm from '@hooks/useRealm'
 import { isFormValid } from '@utils/formValidation'
+import tokenService from '@utils/services/token'
 import {
   CreateStreamForm,
   UiInstruction,
@@ -36,14 +37,18 @@ import useWalletStore from 'stores/useWalletStore'
 
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
+import { mintTo } from '@project-serum/serum/lib/token-instructions'
+import { getMintMetadata } from '@components/instructions/programs/streamflow'
 
-export const STREAMFLOW_TREASURY_PUBLIC_KEY = new PublicKey(
+const STREAMFLOW_TREASURY_PUBLIC_KEY = new PublicKey(
   '5SEpbdjFK5FxwTvfsGMXVQTD2v4M2c5tyRTxhdsPkgDw'
 )
 
-export const WITHDRAWOR_PUBLIC_KEY = new PublicKey(
+const WITHDRAWOR_PUBLIC_KEY = new PublicKey(
   'wdrwhnCv4pzW8beKsbPa4S2UDZrXenjg16KJdKSpb5u'
 )
+
+const STREAMFLOW_PROGRAM_ID = '6h7XgGRiHae5C6p3cWo44Ga7jwxRN4KS8TtLabVVVGYS'
 
 const BufferLayout = require('buffer-layout')
 
@@ -66,13 +71,18 @@ const CreateStream = ({
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
+  const strmProgram = new PublicKey(STREAMFLOW_PROGRAM_ID)
 
   const { assetAccounts } = useGovernanceAssets()
   const shouldBeGoverned = index !== 0 && governance
-  const programId: PublicKey | undefined = realmInfo?.programId
+  const programId: PublicKey | undefined = strmProgram
   const [form, setForm] = useState<CreateStreamForm>({
     recipient: '',
-    tokenAccount: '',
+    start: "",
+    depositedAmount: 0,
+    releaseFrequency: 60,
+    releaseAmount: 0,
+    amountAtCliff: 0
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -90,11 +100,43 @@ const CreateStream = ({
     })
   }
 
-  const setTokenAccount = (event) => {
+  const setStart = (event) => {
     const value = event.target.value
     handleSetForm({
       value: value,
-      propertyName: 'tokenAccount',
+      propertyName: 'start',
+    })
+  }
+
+  const setDepositedAmount = (event) => {
+    const value = event.target.value
+    handleSetForm({
+      value: value,
+      propertyName: 'depositedAmount',
+    })
+  }
+
+  const setReleaseFrequency = (event) => {
+    const value = event.target.value
+    handleSetForm({
+      value: value,
+      propertyName: 'releaseFrequency',
+    })
+  }
+
+  const setReleaseAmount = (event) => {
+    const value = event.target.value
+    handleSetForm({
+      value: value,
+      propertyName: 'releaseAmount',
+    })
+  }
+
+  const setAmountAtCliff = (event) => {
+    const value = event.target.value
+    handleSetForm({
+      value: value,
+      propertyName: 'amountAtCliff',
     })
   }
 
@@ -112,6 +154,8 @@ const CreateStream = ({
       !isValid ||
       !programId ||
       !form.governedAccount?.governance?.account ||
+      !form.tokenAccount ||
+      !form.tokenAccount?.extensions.token ||
       !wallet?.publicKey
     ) {
       return {
@@ -120,13 +164,13 @@ const CreateStream = ({
         governance: form.governedAccount?.governance,
       }
     }
-    const STREAMFLOW_PROGRAM_ID = '6h7XgGRiHae5C6p3cWo44Ga7jwxRN4KS8TtLabVVVGYS'
-    const TOKEN_MINT = 'Gssm3vfi8s65R31SBdmQRq6cKeYojGgup7whkw4VCiQj'
+    const token = getMintMetadata(form.tokenAccount.extensions.token?.account.mint)
+    const decimals = token?.decimals ? token.decimals : 0
+    const tokenMint = form.tokenAccount.extensions.token?.account.mint
     const partnerPublicKey = STREAMFLOW_TREASURY_PUBLIC_KEY
-
-    const strmProgram = new PublicKey(STREAMFLOW_PROGRAM_ID)
-
-    const partnerTokens = await ata(new PublicKey(TOKEN_MINT), partnerPublicKey)
+    
+    const partnerTokens = await ata(tokenMint, partnerPublicKey)
+    const start = Math.floor(Date.parse(form.start) /1000)
     const strmMetadata = Keypair.generate()
 
     const [escrowTokens] = await PublicKey.findProgramAddress(
@@ -134,45 +178,42 @@ const CreateStream = ({
       new PublicKey(STREAMFLOW_PROGRAM_ID)
     )
     const streamflowTreasuryTokens = await ata(
-      new PublicKey(TOKEN_MINT),
+      tokenMint,
       STREAMFLOW_TREASURY_PUBLIC_KEY
     )
-
     const recipientPublicKey = new PublicKey(form.recipient)
     const recipientTokens = await ata(
-      new PublicKey(TOKEN_MINT),
+      tokenMint,
       recipientPublicKey
     )
+    const prerequisiteInstructions: TransactionInstruction[] = [
+      SystemProgram.createAccount({
+        programId: new PublicKey(STREAMFLOW_PROGRAM_ID),
+        space: 1104,
+        lamports: 99388800,
+        fromPubkey: wallet?.publicKey,
+        newAccountPubkey: strmMetadata.publicKey,
+      }),
+    ]
 
-    const prerequisiteInstructions: TransactionInstruction[] = []
-
-    const metadataAcc = SystemProgram.createAccount({
-      programId: new PublicKey(STREAMFLOW_PROGRAM_ID),
-      space: 1500,
-      lamports: 99388800,
-      fromPubkey: wallet?.publicKey,
-      newAccountPubkey: strmMetadata.publicKey,
-    })
-
-    prerequisiteInstructions.push(metadataAcc)
-
-    const tokenAccount = new PublicKey(form.tokenAccount)
+    const tokenAccount = form.tokenAccount.pubkey
 
     const createStreamData = {
-      start: new u64(1677148534), // Timestamp (in seconds) when the stream/token vesting starts.
-      depositedAmount: new u64(1000000000000), // Deposited amount of tokens (in the smallest units).
-      period: new u64(1), // Time step (period) in seconds per which the unlocking occurs.
-      cliff: new u64(1677148534), // Vesting contract "cliff" timestamp in seconds.
-      cliffAmount: new u64(0), // Amount unlocked at the "cliff" timestamp.
-      amountPerPeriod: new u64(5000000000), // Release rate: how many tokens are unlocked per each period.
-      name: 'Test', // The stream name/subject.
+      start: new u64(start), // Timestamp (in seconds) when the stream/token vesting starts.
+      depositedAmount: new u64(
+        form.depositedAmount * 10 ** decimals), // Deposited amount of tokens (in the smallest units).
+      period: new u64(form.releaseFrequency), // Time step (period) in seconds per which the unlocking occurs.
+      cliff: new u64(start), // Vesting contract "cliff" timestamp in seconds.
+      cliffAmount: new u64(form.amountAtCliff * 10 ** decimals), // Amount unlocked at the "cliff" timestamp.
+      amountPerPeriod: new u64(form.releaseAmount * 10 ** decimals), // Release rate: how many tokens are unlocked per each period.
+      name: 'SPL Realms proposal', // The stream name/subject.
       canTopup: false, // setting to FALSE will effectively create a vesting contract.
       cancelableBySender: true, // Whether or not sender can cancel the stream.
       cancelableByRecipient: false, // Whether or not recipient can cancel the stream.
       transferableBySender: true, // Whether or not sender can transfer the stream.
       transferableByRecipient: false, // Whether or not recipient can transfer the stream.
       automaticWithdrawal: false, // Whether or not a 3rd party can initiate withdraw in the name of recipient (currently not used, set it to FALSE).
-      withdrawFrequency: new u64(30),
+      withdrawFrequency: new u64(form.releaseFrequency),
       recipient: recipientPublicKey,
       recipientTokens: recipientTokens,
       streamflowTreasury: STREAMFLOW_TREASURY_PUBLIC_KEY,
@@ -180,15 +221,12 @@ const CreateStream = ({
       partner: partnerPublicKey,
       partnerTokens: partnerTokens,
     }
-    console.log("LOG")
-    console.log(form.governedAccount.pubkey.toBase58())
-    console.log('LOG')
     const createStreamAccounts = {
       sender: form.governedAccount.pubkey,
       senderTokens: tokenAccount,
       metadata: strmMetadata.publicKey,
       escrowTokens,
-      mint: new PublicKey(TOKEN_MINT),
+      mint: tokenMint,
       feeOracle: STREAMFLOW_TREASURY_PUBLIC_KEY,
       rent: SYSVAR_RENT_PUBKEY,
       timelockProgram: new PublicKey(STREAMFLOW_PROGRAM_ID),
@@ -261,12 +299,6 @@ const CreateStream = ({
         BufferLayout.blob(32, 'partner'),
       ]
     )
-    // todo adapt protocol handler to match this setup
-    // add zeros to shorter stream name
-    // derrive streamflow_treasury_tokens on protocol
-    // set partner and partner tokens to streamflow by defualt on protocol
-    // initialize metadata before proposal creation
-    //
     let bufferData = Buffer.alloc(createStreamLayout.span)
 
     const encodedUIntArray = new TextEncoder().encode(createStreamData.name)
@@ -297,7 +329,7 @@ const CreateStream = ({
     const encodeLength = createStreamLayout.encode(decodedData, bufferData)
     bufferData = bufferData.slice(0, encodeLength)
     bufferData = Buffer.concat([
-      Buffer.from(sha256.digest('global:create_v2')).slice(0, 8),
+      Buffer.from(sha256.digest('global:create_unchecked')).slice(0, 8),
       bufferData,
     ])
     const signers: Keypair[] = [strmMetadata]
@@ -359,11 +391,46 @@ const CreateStream = ({
         type="string"
         onChange={setRecipient}
       />
-      <Input
-        label="Token governance"
+      <GovernedAccountSelect
+        label="Token account"
+        governedAccounts={assetAccounts}
+        onChange={(value) => {
+          handleSetForm({ value, propertyName: 'tokenAccount' })
+        }}
         value={form.tokenAccount}
-        type="string"
-        onChange={setTokenAccount}
+        error={formErrors['tokenAccount']}
+        shouldBeGoverned={shouldBeGoverned}
+        governance={governance}
+      />
+      <Input
+        label="Start"
+        value={form.start}
+        type="datetime-local"
+        onChange={setStart}
+      />
+      <Input
+        label="Amount"
+        value={form.depositedAmount}
+        type="number"
+        onChange={setDepositedAmount}
+      />
+      <Input
+        label="Release frequency"
+        value={form.releaseFrequency}
+        type="number"
+        onChange={setReleaseFrequency}
+      />
+      <Input
+        label="Release amount"
+        value={form.releaseAmount}
+        type="number"
+        onChange={setReleaseAmount}
+      />
+      <Input
+        label="Cliff amount"
+        value={form.amountAtCliff}
+        type="number"
+        onChange={setAmountAtCliff}
       />
     </>
   )

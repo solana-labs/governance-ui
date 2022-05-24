@@ -94,7 +94,12 @@ export interface ProgramUpgradeForm {
 export interface CreateStreamForm {
   governedAccount?: AssetAccount
   recipient: string
-  tokenAccount: string
+  tokenAccount?: AssetAccount
+  start: string
+  depositedAmount: number
+  releaseFrequency: number
+  releaseAmount: number
+  amountAtCliff: number
 }
 
 export const programUpgradeFormNameOf = getNameOf<ProgramUpgradeForm>()
