@@ -52,7 +52,7 @@
     "@solana/buffer-layout": "^4.0.0",
     "@sentry/nextjs": "^6.19.7",
     "@solana/governance-program-library": "^0.15.2",
-    "@solana/spl-governance": "^0.0.34",
+    "@solana/spl-governance": "Sapien-news/spl-governance",
     "@solana/spl-token": "0.1.8",
     "@solana/spl-token-registry": "^0.2.3470",
     "@solana/wallet-adapter-base": "^0.9.5",
