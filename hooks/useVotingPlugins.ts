@@ -68,7 +68,6 @@ export function useVotingPlugins() {
     setIsLoadingNfts(true)
     try {
       const nfts = await getNfts(connection.current, wallet!.publicKey!)
-      console.log(nfts)
       const votingNfts = (
         await Promise.all(
           nfts.map((x) => getIsFromCollection(x.mint, x.tokenAddress))
