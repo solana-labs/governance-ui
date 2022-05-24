@@ -68,6 +68,7 @@ export function useVotingPlugins() {
     setIsLoadingNfts(true)
     try {
       const nfts = await getNfts(connection.current, wallet!.publicKey!)
+      console.log(nfts)
       const votingNfts = (
         await Promise.all(
           nfts.map((x) => getIsFromCollection(x.mint, x.tokenAddress))
@@ -141,7 +142,8 @@ export function useVotingPlugins() {
           handleSetCurrentRealmVotingClient({
             client: vsrClient,
             realm,
-            walletPk: ownTokenRecord?.account?.governingTokenOwner,
+            walletPk:
+              ownTokenRecord?.account?.governingTokenOwner || wallet?.publicKey,
           })
         }
       }
@@ -157,7 +159,8 @@ export function useVotingPlugins() {
           handleSetCurrentRealmVotingClient({
             client: nftClient,
             realm,
-            walletPk: ownTokenRecord?.account?.governingTokenOwner,
+            walletPk:
+              ownTokenRecord?.account?.governingTokenOwner || wallet?.publicKey,
           })
         }
       }
@@ -173,7 +176,8 @@ export function useVotingPlugins() {
           handleSetCurrentRealmVotingClient({
             client: pythClient,
             realm,
-            walletPk: ownTokenRecord?.account?.governingTokenOwner,
+            walletPk:
+              ownTokenRecord?.account?.governingTokenOwner || wallet?.publicKey,
           })
         }
       }
