@@ -65,6 +65,11 @@ const LockTokenStats = () => {
   const voteStakeRegistryRegistrar = useVotePluginsClientStore(
     (s) => s.state.voteStakeRegistryRegistrar
   )
+  console.log(
+    vsrClient,
+    voteStakeRegistryRegistrar,
+    voteStakeRegistryRegistrarPk
+  )
   const connection = useWalletStore((s) => s.connection)
   const governedTokenAccounts = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
