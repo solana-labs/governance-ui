@@ -270,6 +270,7 @@ const LockTokenStats = () => {
   }, [voters.length])
 
   useEffect(() => {
+    console.log(vsrClient, voteStakeRegistryRegistrarPk)
     const getLockedDeposits = async () => {
       const allVoters = await vsrClient?.program.account.voter.all([
         {
