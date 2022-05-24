@@ -42,7 +42,7 @@ const AccountsView = ({
                         <img className="h-4 mr-1 w-4" src={info.logo} />
                       )}
                       <span>{`${info.amountFormatted} ${
-                        info.info?.symbol && info.info?.symbol
+                        info.info?.symbol ? info.info?.symbol : info.name
                       }`}</span>
                     </div>
                   }

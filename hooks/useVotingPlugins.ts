@@ -53,7 +53,6 @@ export function useVotingPlugins() {
   const currentClient = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
-  console.log(currentClient, '@##@#@#@#')
   const currentPluginPk = config?.account.communityVoterWeightAddin
   const nftMintRegistrar = useVotePluginsClientStore(
     (s) => s.state.nftMintRegistrar
@@ -125,7 +124,6 @@ export function useVotingPlugins() {
     )
   }
   useEffect(() => {
-    console.log('Handlesetvsrclient')
     handleSetVsrClient(wallet, connection)
     handleSetNftClient(wallet, connection)
     handleSetPythClient(wallet, connection)
@@ -136,15 +134,14 @@ export function useVotingPlugins() {
       if (
         vsrClient &&
         currentPluginPk &&
-        vsrPluginsPks.includes(currentPluginPk.toBase58()) &&
-        ownTokenRecord
+        vsrPluginsPks.includes(currentPluginPk.toBase58())
       ) {
         handleSetVsrRegistrar(vsrClient, realm)
         if (connected) {
           handleSetCurrentRealmVotingClient({
             client: vsrClient,
             realm,
-            walletPk: ownTokenRecord?.account.governingTokenOwner,
+            walletPk: ownTokenRecord?.account?.governingTokenOwner,
           })
         }
       }
@@ -156,11 +153,11 @@ export function useVotingPlugins() {
         nftPluginsPks.includes(currentPluginPk.toBase58())
       ) {
         handleSetNftRegistrar(nftClient!, realm)
-        if (connected && ownTokenRecord) {
+        if (connected) {
           handleSetCurrentRealmVotingClient({
             client: nftClient,
             realm,
-            walletPk: ownTokenRecord?.account.governingTokenOwner,
+            walletPk: ownTokenRecord?.account?.governingTokenOwner,
           })
         }
       }
@@ -172,7 +169,7 @@ export function useVotingPlugins() {
         currentPluginPk &&
         pythPluginsPks.includes(currentPluginPk.toBase58())
       ) {
-        if (connected && ownTokenRecord) {
+        if (connected) {
           handleSetCurrentRealmVotingClient({
             client: pythClient,
             realm,
@@ -186,7 +183,6 @@ export function useVotingPlugins() {
       currentClient.realm?.pubkey.toBase58() !== realm?.pubkey.toBase58() ||
       currentClient.walletPk?.toBase58() !== wallet?.publicKey?.toBase58()
     ) {
-      console.log('handlestplugins')
       handleNftplugin()
       handleVsrPlugin()
       handlePythPlugin()
