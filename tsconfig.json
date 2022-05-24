@@ -17,6 +17,7 @@
     "jsx": "preserve",
     "paths": {
       "@components/*": ["components/*"],
+      "@forms/*": ["forms/*"],
       "@hooks/*": ["hooks/*"],
       "@tools/*": ["tools/*"],
       "@models/*": ["models/*"],

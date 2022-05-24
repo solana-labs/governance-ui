@@ -46,7 +46,7 @@ export const InviteMembersSchema = {
     .array()
     .of(yup.string())
     .when('$addCouncil', (addCouncil, schema) => {
-      if (typeof addCouncil === undefined) {
+      if (typeof addCouncil === 'undefined') {
         return schema.min(1, 'A DAO needs at least one member')
       } else {
         return addCouncil

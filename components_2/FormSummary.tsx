@@ -146,7 +146,7 @@ export default function WizardSummary({
             </SummaryCell>
             <div
               className={`grid ${
-                type !== 'gov-token' ? 'grid-cols-3' : 'grid-cols-2'
+                type !== 'multisig' ? 'grid-cols-3' : 'grid-cols-2'
               } w-full gap-2 mb-2`}
             >
               {type === 'nft' && (
@@ -284,7 +284,7 @@ export default function WizardSummary({
           isValid
           prevClickHandler={() => onPrevClick(currentStep)}
           submitClickHandler={openModal}
-          faqTitle="About Multi-Sigs"
+          faqTitle=""
         />
       </div>
     </>
