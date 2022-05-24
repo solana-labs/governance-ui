@@ -124,6 +124,7 @@ export function useVotingPlugins() {
     )
   }
   useEffect(() => {
+    console.log('Handlesetvsrclient')
     handleSetVsrClient(wallet, connection)
     handleSetNftClient(wallet, connection)
     handleSetPythClient(wallet, connection)
@@ -184,6 +185,7 @@ export function useVotingPlugins() {
       currentClient.realm?.pubkey.toBase58() !== realm?.pubkey.toBase58() ||
       currentClient.walletPk?.toBase58() !== wallet?.publicKey?.toBase58()
     ) {
+      console.log('handlestplugins')
       handleNftplugin()
       handleVsrPlugin()
       handlePythPlugin()
