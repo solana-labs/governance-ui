@@ -444,7 +444,7 @@ const MangoDepositComponent = ({
                   : ''
               }
             >
-              {!isDepositing ? 'Propose deposit' : <Loading></Loading>}
+              {!isDepositing ? 'Propose' : <Loading></Loading>}
             </Tooltip>
           </Button>
         </div>

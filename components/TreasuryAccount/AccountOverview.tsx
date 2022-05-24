@@ -294,7 +294,7 @@ const AccountOverview = () => {
               ) : (
                 <>
                   <PlusCircleIcon className="h-5 mr-2 w-5" />
-                  New Investment
+                  Investments
                 </>
               )}
             </LinkButton>
