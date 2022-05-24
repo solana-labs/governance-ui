@@ -294,7 +294,7 @@ const AccountOverview = () => {
               ) : (
                 <>
                   <PlusCircleIcon className="h-5 mr-2 w-5" />
-                  New Investment
+                  Investments
                 </>
               )}
             </LinkButton>
@@ -492,9 +492,7 @@ const StrategyCard = ({
           <p className="text-xs">Interest Rate</p>
           <p className="font-bold text-green">{apy}</p>
         </div>
-        {onClick ? (
-          <Button onClick={onClick}>{`Propose ${strategyName}`}</Button>
-        ) : null}
+        {onClick ? <Button onClick={onClick}>{`Propose`}</Button> : null}
       </div>
     </div>
   )

@@ -1,5 +1,6 @@
 import {
   BN,
+  makeCloseSpotOpenOrdersInstruction,
   makeWithdrawInstruction,
   MangoAccount,
   PublicKey,
@@ -124,6 +125,7 @@ const WithdrawModal = ({
       ),
     amount: yup.string().required('Amount is required'),
   })
+  console.log(selectedMangoAccount.spotOpenOrders.map((x) => x.toBase58()))
   const handlePropose = async (idx: number) => {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     if (!isValid) {
@@ -162,6 +164,16 @@ const WithdrawModal = ({
       )
     }
     setIsLoading(true)
+    const closeOpenOrders = makeCloseSpotOpenOrdersInstruction(
+      market.client!.programId,
+      group.publicKey,
+      selectedMangoAccount.publicKey,
+      selectedMangoAccount.owner,
+      group.dexProgramId,
+      selectedMangoAccount.spotOpenOrders[0],
+      group.spotMarkets[0].spotMarket,
+      group.signerKey
+    )
     const instruction = makeWithdrawInstruction(
       market.client!.programId,
       group.publicKey,
@@ -173,11 +185,18 @@ const WithdrawModal = ({
       vault!,
       receiverAddress,
       group.signerKey,
-      selectedMangoAccount.spotOpenOrders,
+      [],
       new BN(mintAmount),
       false
     )
     try {
+      const closeInstruction: InstructionDataWithHoldUpTime = {
+        data: getInstructionDataFromBase64(
+          serializeInstructionToBase64(closeOpenOrders)
+        ),
+        holdUpTime: governance!.account!.config.minInstructionHoldUpTime,
+        prerequisiteInstructions: [],
+      }
       const instructionData: InstructionDataWithHoldUpTime = {
         data: getInstructionDataFromBase64(
           serializeInstructionToBase64(instruction)
@@ -190,7 +209,7 @@ const WithdrawModal = ({
       const proposalAddress = await handleCreateProposal({
         title: form.title || proposalTitle,
         description: form.description,
-        instructionsData: [instructionData],
+        instructionsData: [closeInstruction, instructionData],
         governance: governance!,
         voteByCouncil,
       })

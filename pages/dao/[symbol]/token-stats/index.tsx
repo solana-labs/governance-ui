@@ -270,7 +270,6 @@ const LockTokenStats = () => {
   }, [voters.length])
 
   useEffect(() => {
-    console.log(vsrClient, voteStakeRegistryRegistrarPk)
     const getLockedDeposits = async () => {
       const allVoters = await vsrClient?.program.account.voter.all([
         {
@@ -280,7 +279,6 @@ const LockTokenStats = () => {
           },
         },
       ])
-      console.log(allVoters, '@@@@@')
       const currentRealmVoters = allVoters && allVoters.length ? allVoters : []
       setVoters(currentRealmVoters)
     }
