@@ -49,6 +49,15 @@
     "ogImage": "https://trade.mango.markets/assets/icons/logo.svg"
   },
   {
+    "symbol": "WezeshaDAO",
+    "displayName": "Wezesha DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "FEtF7V55LorZmUriVVobubPvLXoS7sfP3smzb5zR4BWz",
+    "website": "https://wezesha.co",
+    "keywords": "Wezesha DAO, Wezesha, Wezesha Coin REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, SPL-TOKEN, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
+    "twitter": "@WezeshaCo"
+  },
+  {
     "symbol": "ORCA",
     "displayName": "Orca DAO",
     "programId": "J9uWvULFL47gtCPvgR3oN7W357iehn5WF2Vn9MJvcSxz",
