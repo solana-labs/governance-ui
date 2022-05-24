@@ -1,6 +1,6 @@
 // workaround for ESM module loader errors
 // see https://github.com/vercel/next.js/issues/25454
-//const { withSentryConfig } = require('@sentry/nextjs')
+const { withSentryConfig } = require('@sentry/nextjs')
 const withTM = require('next-transpile-modules')([
   'react-markdown',
   '@solana/wallet-adapter-base',
@@ -35,18 +35,18 @@ config = withTM({
 // STEP 2: Enable bundle analyzer when `ANALYZE=true`.
 config = withBundleAnalyzer(config)
 
-// if (process.env.SENTRY_AUTH_TOKEN) {
-// STEP 3: Sentry error reporting. MUST COME LAST to work with sourcemaps.
-//   config = withSentryConfig(config, {
-// Additional config options for the Sentry Webpack plugin. Keep in mind that
-// the following options are set automatically, and overriding them is not
-// recommended:
-//   release, url, org, project, authToken, configFile, stripPrefix,
-//   urlPrefix, include, ignore
-//silent: true, // Suppresses all logs
-// For all available options, see:
-// https://github.com/getsentry/sentry-webpack-plugin#options.
-//   })
-// }
+if (process.env.SENTRY_AUTH_TOKEN) {
+  // STEP 3: Sentry error reporting. MUST COME LAST to work with sourcemaps.
+  config = withSentryConfig(config, {
+    // Additional config options for the Sentry Webpack plugin. Keep in mind that
+    // the following options are set automatically, and overriding them is not
+    // recommended:
+    //   release, url, org, project, authToken, configFile, stripPrefix,
+    //   urlPrefix, include, ignore
+    silent: true, // Suppresses all logs
+    // For all available options, see:
+    // https://github.com/getsentry/sentry-webpack-plugin#options.
+  })
+}
 
 module.exports = config
