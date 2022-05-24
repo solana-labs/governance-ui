@@ -504,16 +504,15 @@
   version "0.2.3"
   resolved "https://registry.npmjs.org/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz"
 
-"@blockworks-foundation/mango-client@^3.4.3":
-  version "3.4.4"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-client/-/mango-client-3.4.4.tgz#5ccf688432c54c88b513499edde0dcb9af945a8f"
-  integrity sha512-r4qBcPbxgtfpTWO8Z/ChIY8bQKXXEG+4Bzce+IjHWN32g+UP0tVydMvfYi6WNN9JNrKccR58MujUWvEo7HyniQ==
+"@blockworks-foundation/mango-client@git+https://github.com/blockworks-foundation/mango-client-v3.git#devnet.4":
+  version "3.4.8"
+  resolved "git+https://github.com/blockworks-foundation/mango-client-v3.git#64607b7c3ae5ab7cea24018ba47337337c86d502"
   dependencies:
     "@project-serum/anchor" "^0.21.0"
     "@project-serum/serum" "0.13.55"
     "@project-serum/sol-wallet-adapter" "^0.2.0"
     "@solana/spl-token" "^0.1.6"
-    "@solana/web3.js" "^1.31.0"
+    "@solana/web3.js" "^1.43.1"
     big.js "^6.1.1"
     bn.js "^5.1.0"
     buffer-layout "^1.2.1"
@@ -2776,6 +2775,28 @@
     rpc-websockets "^7.4.2"
     secp256k1 "^4.0.2"
     sinon-chai "^3.7.0"
+    superstruct "^0.14.2"
+    tweetnacl "^1.0.0"
+
+"@solana/web3.js@^1.43.1":
+  version "1.43.1"
+  resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.43.1.tgz#f0cfffe7feb798563440f9ca0b0e9ba099e13967"
+  integrity sha512-s6TRcWz3rYvxM8gg1eQmUAUJQeoXIFMG9MbSWb/uRrLU0q7Xd9Ic1PNbACp1n1O0wyCogTAyFWXXPK476aIVSg==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+    "@ethersproject/sha2" "^5.5.0"
+    "@solana/buffer-layout" "^4.0.0"
+    bigint-buffer "^1.1.5"
+    bn.js "^5.0.0"
+    borsh "^0.7.0"
+    bs58 "^4.0.1"
+    buffer "6.0.1"
+    cross-fetch "^3.1.4"
+    fast-stable-stringify "^1.0.0"
+    jayson "^3.4.4"
+    js-sha3 "^0.8.0"
+    rpc-websockets "^7.4.2"
+    secp256k1 "^4.0.2"
     superstruct "^0.14.2"
     tweetnacl "^1.0.0"
 

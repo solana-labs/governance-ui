@@ -30,7 +30,7 @@ export interface MarketStore extends State {
 }
 const useMarketStore = create<MarketStore>((set, _get) => ({
   loadMarket: async (connection: ConnectionContext, cluster: string) => {
-    const GROUP = cluster === 'devnet' ? 'devnet.2' : 'mainnet.1'
+    const GROUP = cluster === 'devnet' ? 'devnet.4' : 'mainnet.1'
     const mangoConnection =
       cluster === 'localnet'
         ? new Connection(Config.ids().cluster_urls.mainnet)

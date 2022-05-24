@@ -210,7 +210,7 @@ export const MANGO_INSTRUCTIONS = {
         programId: PublicKey,
         cluster: string
       ) => {
-        const GROUP = cluster === 'devnet' ? 'devnet.2' : 'mainnet.1'
+        const GROUP = cluster === 'devnet' ? 'devnet.4' : 'mainnet.1'
         const groupConfig = Config.ids().getGroupWithName(GROUP)!
         const marketConfig = groupConfig!.perpMarkets.find(
           (x) => x.publicKey.toBase58() === _accounts[1].pubkey.toBase58()
@@ -359,4 +359,6 @@ export const MANGO_INSTRUCTIONS = {
 
 // also allow decoding of instructions for devnet versions of mango
 MANGO_INSTRUCTIONS['4skJ85cdxQAFVKbcGgfun8iZPL7BadVYXG3kGEGkufqA'] =
+  MANGO_INSTRUCTIONS['mv3ekLzLbnVPNxjSKvqBpU3ZeZXPQdEC3bp5MDEBG68']
+MANGO_INSTRUCTIONS['5mUyxYoFX2fyQ5A34jErFBRipC5rQNQ8gC2K73qV6xiJ'] =
   MANGO_INSTRUCTIONS['mv3ekLzLbnVPNxjSKvqBpU3ZeZXPQdEC3bp5MDEBG68']

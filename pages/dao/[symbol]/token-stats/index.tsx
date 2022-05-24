@@ -323,7 +323,7 @@ const LockTokenStats = () => {
   }, [depositsWithWallets.length, givenGrantsTokenAmounts.length])
   useEffect(() => {
     const mngoPerpMarket = async () => {
-      const GROUP = connection.cluster === 'devnet' ? 'devnet.2' : 'mainnet.1'
+      const GROUP = connection.cluster === 'devnet' ? 'devnet.4' : 'mainnet.1'
       const groupConfig = Config.ids().getGroupWithName(GROUP)!
       const client = new MangoClient(
         connection.current,
