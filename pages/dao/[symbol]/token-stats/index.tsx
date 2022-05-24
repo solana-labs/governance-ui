@@ -279,6 +279,7 @@ const LockTokenStats = () => {
           },
         },
       ])
+      console.log(allVoters, '@@@@@')
       const currentRealmVoters = allVoters && allVoters.length ? allVoters : []
       setVoters(currentRealmVoters)
     }
