@@ -23,7 +23,7 @@
     ]
   },
   "dependencies": {
-    "@blockworks-foundation/mango-client": "git+https://github.com/blockworks-foundation/mango-client-v3.git#devnet.4",
+    "@blockworks-foundation/mango-client": "^3.4.3",
     "@blockworks-foundation/voter-stake-registry-client": "^0.2.3",
     "@cardinal/namespaces-components": "^2.5.5",
     "@castlefinance/vault-core": "^0.1.3",
