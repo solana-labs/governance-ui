@@ -2,7 +2,6 @@ import { UiInstruction } from '../../uiTypes/proposalCreationTypes'
 import { WSOL_MINT_PK } from '@components/instructions/tools'
 import { Wallet, BN } from '@project-serum/anchor'
 import { publicKey, struct, u32, u64, u8 } from '@project-serum/borsh'
-import { closeAccount } from '@project-serum/serum/lib/token-instructions'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -96,17 +95,6 @@ export async function createWrappedNativeAccount(
     })
   )
 
-  // Send lamports to it (these will be wrapped into native tokens by the token program)
-  if (amount !== undefined) {
-    prerequisiteInstructions.push(
-      SystemProgram.transfer({
-        fromPubkey: owner,
-        toPubkey: newAccount.publicKey,
-        lamports: amount,
-      })
-    )
-  }
-
   // Assign the new account to the native token mint.
   // the account will be initialized with a balance equal to the native token balance.
   // (i.e. amount)
@@ -164,11 +152,11 @@ export async function getGoblinGoldDepositInstruction({
     // owner public key
     const governedAccountPk = getGovernedAccountPk(governedTokenAccount)
 
-    const sdk = new GoblinGold(
-      governedAccountPk,
-      connection.current,
-      (wallet as unknown) as Wallet
-    )
+    const sdk = new GoblinGold({
+      connection: connection.current,
+      wallet: (wallet as unknown) as Wallet,
+      user: governedAccountPk,
+    })
 
     const vault = await sdk.getVaultById(form.goblinGoldVaultId)
 
@@ -228,25 +216,21 @@ export async function getGoblinGoldDepositInstruction({
       prerequisiteInstructions
     )
 
-    const depositIx = await strategyProgram.getDepositIx({
-      userInputTokenAccount: ataInputAddress,
-      userLpTokenAccount: ataLpAddress,
-      amount: new BN(transferAmount),
-    })
-
+    let depositIx
     if (governedTokenAccount.isSol) {
-      prerequisiteInstructions.push(depositIx)
-
-      const closeAccountIx = closeAccount({
-        source: ataInputAddress,
-        destination: governedAccountPk,
-        owner: governedAccountPk,
+      depositIx = await strategyProgram.getDepositFromNativeIx({
+        userWrappedAccount: ataInputAddress,
+        userLpTokenAccount: ataLpAddress,
+        amount: new BN(transferAmount),
       })
-
-      serializedInstruction = serializeInstructionToBase64(closeAccountIx)
     } else {
-      serializedInstruction = serializeInstructionToBase64(depositIx)
+      depositIx = await strategyProgram.getDepositIx({
+        userInputTokenAccount: ataInputAddress,
+        userLpTokenAccount: ataLpAddress,
+        amount: new BN(transferAmount),
+      })
     }
+    serializedInstruction = serializeInstructionToBase64(depositIx)
   }
 
   const obj: UiInstruction = {
@@ -300,11 +284,11 @@ export async function getGoblinGoldWithdrawInstruction({
     // owner public key
     const governedAccountPk = getGovernedAccountPk(governedTokenAccount)
 
-    const sdk = new GoblinGold(
-      governedAccountPk,
-      connection.current,
-      (wallet as unknown) as Wallet
-    )
+    const sdk = new GoblinGold({
+      connection: connection.current,
+      wallet: (wallet as unknown) as Wallet,
+      user: governedAccountPk,
+    })
 
     const vault = await sdk.getVaultById(form.goblinGoldVaultId)
 
@@ -369,22 +353,10 @@ export async function getGoblinGoldWithdrawInstruction({
       lpAmount: new BN(transferAmount),
     })
 
-    if (inputTokenMintAddress === WSOL_MINT_PK) {
-      const closeAccountIx = closeAccount({
-        source: ataInputAddress,
-        destination: governedAccountPk,
-        owner: governedAccountPk,
-      })
-
-      serializedInstruction = serializeInstructionToBase64(closeAccountIx)
-    } else {
-      const lastIx = withdrawIxs.pop()
-
-      if (lastIx) {
-        serializedInstruction = serializeInstructionToBase64(lastIx)
-      }
+    const lastIx = withdrawIxs.pop()
+    if (lastIx) {
+      serializedInstruction = serializeInstructionToBase64(lastIx)
     }
-
     prerequisiteInstructions = prerequisiteInstructions.concat(withdrawIxs)
   }
 
