@@ -7,6 +7,7 @@ import FormHeader from '../components_2/FormHeader'
 import FormField from '../components_2/FormField'
 import FormFooter from '../components_2/FormFooter'
 import Input from '../components_2/Input'
+import { ThresholdAdviceBox } from './MemberQuorumThresholdForm'
 
 import { updateUserInput } from '../utils/formValidation'
 
@@ -105,20 +106,13 @@ export default function ApprovalThresholdForm({
           )}
         />
       </div>
-      <div className="bg-[#201f27] py-8 pr-2 pl-8 flex items-start space-x-8">
-        <div className="w-24 h-24 px-2 py-5 bg-black rounded-lg">
-          <img src="/1-Landing-v2/icon-quorum-gradient.png" />
+      <ThresholdAdviceBox title="Approval threshold">
+        <div className="text-lg">
+          Typically, newer Governance Token DAOs start their community approval
+          quorums around 60% of total token supply.
         </div>
-        <div className="flex flex-col">
-          <div className="pb-3 text-sm uppercase opacity-50">
-            Approval threshold
-          </div>
-          <div className="text-lg">
-            Typically, newer Governance Token DAOs start their community
-            approval quorums around 60% of total token supply.
-          </div>
-        </div>
-      </div>
+      </ThresholdAdviceBox>
+
       <FormFooter
         isValid={isValid}
         prevClickHandler={() => onPrevClick(currentStep)}

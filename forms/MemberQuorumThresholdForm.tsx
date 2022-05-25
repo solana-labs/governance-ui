@@ -22,6 +22,20 @@ export interface MemberQuorumThreshold {
   quorumThreshold: number
 }
 
+export function ThresholdAdviceBox({ title, children }) {
+  return (
+    <div className="bg-[#201f27] py-8 pr-2 pl-8 flex items-start space-x-8">
+      <div className="w-24 h-24 px-2 py-5 bg-black rounded-lg">
+        <img src="/1-Landing-v2/icon-quorum-gradient.png" />
+      </div>
+      <div className="flex flex-col">
+        <div className="pb-3 text-sm uppercase opacity-50">{title}</div>
+        {children}
+      </div>
+    </div>
+  )
+}
+
 export default function MemberQuorumThresholdForm({
   formData,
   currentStep,
@@ -112,24 +126,14 @@ export default function MemberQuorumThresholdForm({
           )}
         />
       </div>
-
-      <div className="bg-[#201f27] py-8 pr-2 pl-8 flex items-start space-x-8">
-        <div className="w-24 h-24 px-2 py-5 bg-black rounded-lg">
-          <img src="/1-Landing-v2/icon-quorum-gradient.png" />
+      <ThresholdAdviceBox title="Member threshold">
+        <div className="text-lg">
+          With {numberOfDaoMembers} members added to your DAO,
         </div>
-        <div className="flex flex-col">
-          <div className="pb-3 text-sm uppercase opacity-50">
-            Approval quorum
-          </div>
-
-          <div className="text-lg">
-            With {numberOfDaoMembers} members added to your DAO,
-          </div>
-          <div className="pt-2 text-lg">
-            {quorumSize} members would need to approve a proposal for it to pass{' '}
-          </div>
+        <div className="pt-2 text-lg">
+          {quorumSize} members would need to approve a proposal for it to pass{' '}
         </div>
-      </div>
+      </ThresholdAdviceBox>
 
       <FormFooter
         isValid={isValid}

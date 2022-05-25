@@ -225,7 +225,7 @@ module.exports = {
     extend: {
       cursor: ['hover', 'focus', 'disabled'],
       opacity: ['disabled'],
-      backgroundColor: ['disabled'],
+      backgroundColor: ['disabled', 'hover'],
       textColor: ['disabled'],
       borderWidth: ['last'],
     },

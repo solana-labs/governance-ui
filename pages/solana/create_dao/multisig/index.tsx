@@ -10,9 +10,9 @@ import { createMultisigRealm } from 'actions/createMultisigRealm'
 import useQueryContext from '@hooks/useQueryContext'
 import useLocalStorageState from '@hooks/useLocalStorageState'
 
-import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
-
 import { notify } from '@utils/notifications'
+
+import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
 import { Section } from 'pages/solana'
 import Image from 'next/image'
 import Navbar from 'components_2/NavBar'
