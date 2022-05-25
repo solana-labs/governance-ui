@@ -296,11 +296,19 @@ input[type='range'].with-gradient::-moz-range-thumb {
   height: 32px;
   flex-grow: 0;
   border-radius: 25px;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1), 0 1px 3px 0 rgba(0, 0, 0, 0.2);
-  border: solid 5px rgba(255, 255, 255, 0.08);
+  outline: solid 8px rgba(255, 255, 255, 0.2);
   background-color: #fff;
   transition: background 0.3s ease-in-out;
 }
+
+input[type='range'].with-gradient:disabled::-moz-range-thumb {
+  background-color: #1f1f20;
+}
+
+input[type='range'].with-gradient:disabled::-webkit-slider-thumb {
+  background-color: #1f1f20;
+}
+
 input[type='range'].with-gradient::-webkit-slider-thumb {
   -webkit-appearance: none;
   cursor: ew-resize;
@@ -308,8 +316,7 @@ input[type='range'].with-gradient::-webkit-slider-thumb {
   height: 32px;
   flex-grow: 0;
   border-radius: 25px;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1), 0 1px 3px 0 rgba(0, 0, 0, 0.2);
-  border: solid 5px rgba(255, 255, 255, 0.08);
+  outline: solid 8px rgba(255, 255, 255, 0.2);
   background-color: #fff;
   transition: background 0.3s ease-in-out;
 }

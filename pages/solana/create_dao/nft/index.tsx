@@ -73,7 +73,13 @@ export default function NFTWizard() {
   ]
 
   function handleNextButtonClick({ step, data }) {
-    const nextStep = step + 1
+    let nextStep
+    if (data.addCouncil === false) {
+      // skip to the end
+      nextStep = step + 3
+    } else {
+      nextStep = step + 1
+    }
 
     const updatedFormState = {
       ...formData,
@@ -100,7 +106,13 @@ export default function NFTWizard() {
     if (fromStep == 1) {
       push({ pathname: '/solana/create_dao/' }, undefined, { shallow: true })
     } else {
-      const previousStep = fromStep - 1
+      let previousStep
+      if (fromStep === steps.length + 1 && !formData?.addCouncil) {
+        // skip from the end
+        previousStep = fromStep - 3
+      } else {
+        previousStep = fromStep - 1
+      }
 
       if (overwriteHistory) {
         replace(
