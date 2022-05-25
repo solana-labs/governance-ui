@@ -253,7 +253,7 @@ export const MANGO_INSTRUCTIONS = {
         programId: PublicKey,
         cluster: string
       ) => {
-        const GROUP = cluster === 'devnet' ? 'devnet.4' : 'mainnet.1'
+        const GROUP = cluster === 'devnet' ? 'devnet.2' : 'mainnet.1'
         const groupConfig = Config.ids().getGroupWithName(GROUP)!
         const marketConfig = groupConfig!.perpMarkets.find(
           (x) => x.publicKey.toBase58() === _accounts[1].pubkey.toBase58()
