@@ -40,6 +40,7 @@ import {
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import BigNumber from 'bignumber.js'
 import { useRouter } from 'next/router'
+import { emptyPk } from 'NftVotePlugin/sdk/accounts'
 import { useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { MarketStore } from 'Strategies/store/marketStore'
@@ -164,21 +165,35 @@ const WithdrawModal = ({
       )
     }
     setIsLoading(true)
-    const closeOpenOrders = makeCloseSpotOpenOrdersInstruction(
-      market.client!.programId,
-      group.publicKey,
-      selectedMangoAccount.publicKey,
-      selectedMangoAccount.owner,
-      group.dexProgramId,
-      selectedMangoAccount.spotOpenOrders[0],
-      group.spotMarkets[0].spotMarket,
-      group.signerKey
-    )
+    const proposalInstructions: InstructionDataWithHoldUpTime[] = []
+    for (const i in selectedMangoAccount.spotOpenOrders.filter(
+      (x) => x.toBase58() !== emptyPk
+    )) {
+      const closeOpenOrders = makeCloseSpotOpenOrdersInstruction(
+        market.client!.programId,
+        group.publicKey,
+        selectedMangoAccount.publicKey,
+        selectedMangoAccount.owner,
+        group.dexProgramId,
+        selectedMangoAccount.spotOpenOrders[i],
+        group.spotMarkets[i].spotMarket,
+        group.signerKey
+      )
+      const closeInstruction: InstructionDataWithHoldUpTime = {
+        data: getInstructionDataFromBase64(
+          serializeInstructionToBase64(closeOpenOrders)
+        ),
+        holdUpTime: governance!.account!.config.minInstructionHoldUpTime,
+        prerequisiteInstructions: [],
+      }
+      proposalInstructions.push(closeInstruction)
+    }
+
     const instruction = makeWithdrawInstruction(
       market.client!.programId,
       group.publicKey,
       selectedMangoAccount.publicKey,
-      wallet!.publicKey!,
+      selectedMangoAccount.owner,
       group.mangoCache,
       group.tokens[tokenIndex].rootBank,
       publicKey!,
@@ -189,27 +204,21 @@ const WithdrawModal = ({
       new BN(mintAmount),
       false
     )
+    const instructionData: InstructionDataWithHoldUpTime = {
+      data: getInstructionDataFromBase64(
+        serializeInstructionToBase64(instruction)
+      ),
+      holdUpTime: governance!.account!.config.minInstructionHoldUpTime,
+      prerequisiteInstructions: prerequisiteInstructions,
+      chunkSplitByDefault: true,
+      chunkBy: 1,
+    }
+    proposalInstructions.push(instructionData)
     try {
-      const closeInstruction: InstructionDataWithHoldUpTime = {
-        data: getInstructionDataFromBase64(
-          serializeInstructionToBase64(closeOpenOrders)
-        ),
-        holdUpTime: governance!.account!.config.minInstructionHoldUpTime,
-        prerequisiteInstructions: [],
-      }
-      const instructionData: InstructionDataWithHoldUpTime = {
-        data: getInstructionDataFromBase64(
-          serializeInstructionToBase64(instruction)
-        ),
-        holdUpTime: governance!.account!.config.minInstructionHoldUpTime,
-        prerequisiteInstructions: prerequisiteInstructions,
-        chunkSplitByDefault: true,
-        chunkBy: 1,
-      }
       const proposalAddress = await handleCreateProposal({
         title: form.title || proposalTitle,
         description: form.description,
-        instructionsData: [closeInstruction, instructionData],
+        instructionsData: [...proposalInstructions],
         governance: governance!,
         voteByCouncil,
       })
