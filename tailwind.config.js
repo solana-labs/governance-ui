@@ -190,17 +190,15 @@ module.exports = {
         'connect-wallet-ping':
           'connect-wallet-ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite',
         gradient: 'gradient 4s ease-in-out infinite',
-      },
-      backgroundImage: {
-        'spl-gov': "url('/img/realms-web/backgrounds/spl-gov-background.svg')",
-        'hero-graphic': "url('/img/realms-web/backgrounds/hero-graphic.svg')",
-        'btn-blue': "url('/img/realms-web/buttons/button-create-default.svg')",
-        'btn-blue-hover':
-          "url('/img/realms-web/buttons/button-create-hover.svg')",
-        'btn-blue-active':
-          "url('/img/realms-web/buttons/button-create-active.svg')",
+        loader: 'loader 0.6s infinite alternate',
       },
       keyframes: {
+        loader: {
+          to: {
+            opacity: 0.1,
+            transform: 'translate3d(0, 0, 0)',
+          },
+        },
         'connect-wallet-ping': {
           '75%, 100%': {
             transform: 'scale(1.06, 1.3)',
