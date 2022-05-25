@@ -138,15 +138,15 @@ const MemberOverview = ({ member }: { member: Member }) => {
   }, [walletAddress])
 
   const memberVotePowerRank = useMemo(() => {
-    const sortedMembers = activeMembers.sort(
-      (a, b) => b.communityVotes.toNumber() - a.communityVotes.toNumber()
+    const sortedMembers = activeMembers.sort((a, b) =>
+      a.communityVotes.cmp(b.communityVotes) === 1 ? -1 : 1
     )
     return (
       sortedMembers.findIndex(
         (m) => m.walletAddress === member?.walletAddress
       ) + 1
     )
-  }, [JSON.stringify(activeMembers), member.walletAddress])
+  }, [JSON.stringify(activeMembers.length), member.walletAddress])
 
   useEffect(() => {
     setRecentVotes(paginateVotes(0))
