@@ -126,7 +126,7 @@ const MangoDepositComponent = ({
     { val: DEPOSIT, isVisible: true },
     { val: CREATE_REF_LINK, isVisible: selectedMangoAccount !== null },
     { val: DELEGATE_ACCOUNT, isVisible: selectedMangoAccount !== null },
-    //{ val: WITHDRAW, isVisible: selectedMangoAccount !== null },
+    { val: WITHDRAW, isVisible: selectedMangoAccount !== null },
   ]
     .filter((x) => x.isVisible)
     .map((x) => x.val)

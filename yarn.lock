@@ -505,15 +505,15 @@
   resolved "https://registry.npmjs.org/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz"
 
 "@blockworks-foundation/mango-client@^3.4.3":
-  version "3.4.4"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-client/-/mango-client-3.4.4.tgz#5ccf688432c54c88b513499edde0dcb9af945a8f"
-  integrity sha512-r4qBcPbxgtfpTWO8Z/ChIY8bQKXXEG+4Bzce+IjHWN32g+UP0tVydMvfYi6WNN9JNrKccR58MujUWvEo7HyniQ==
+  version "3.4.8"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-client/-/mango-client-3.4.8.tgz#5e7998dba29d02975d8be4c5a963f5fd24d64427"
+  integrity sha512-veV3tfUfSZ8gN2I0u2gCj+dSQcD0QB1Imo2XuUdv0IUKb4Um8KoBxxpv1fxVHQ2J5RRSCYNW6DhPiNEnZYhbXg==
   dependencies:
     "@project-serum/anchor" "^0.21.0"
     "@project-serum/serum" "0.13.55"
     "@project-serum/sol-wallet-adapter" "^0.2.0"
     "@solana/spl-token" "^0.1.6"
-    "@solana/web3.js" "^1.31.0"
+    "@solana/web3.js" "^1.37.1"
     big.js "^6.1.1"
     bn.js "^5.1.0"
     buffer-layout "^1.2.1"
