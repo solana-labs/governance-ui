@@ -172,8 +172,8 @@ export default function NFTWizard() {
   }
 
   function promptUserBeforeLeaving(ev) {
-    // ev.preventDefault()
-    // ev.returnValue = true
+    ev.preventDefault()
+    ev.returnValue = true
   }
 
   useEffect(() => {
@@ -198,7 +198,7 @@ export default function NFTWizard() {
 
   return (
     <div className="relative pb-8 md:pb-20 landing-page">
-      {/* <Navbar showWalletButton /> */}
+      <Navbar showWalletButton />
       <div className="absolute w-[100vw] h-[100vh]">
         <Image
           alt="background image"
