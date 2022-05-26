@@ -15,7 +15,7 @@ const FormFooter: React.FC<FormFooterProps> = ({
   // faqTitle,
 }) => {
   return (
-    <div className="flex flex-wrap items-center justify-end pt-10 sm:pt-20 md:pt-32">
+    <div className="flex flex-wrap items-center justify-end pt-10 sm:pt-12 md:pt-16">
       {/* <Button type="button" tertiary>
         <div className="flex items-center">
           <img src="/1-Landing-v2/icon-faq.png" className="w-6 h-6 mx-2" />

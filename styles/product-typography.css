@@ -44,7 +44,7 @@
 .body-xs {
   letter-spacing: 0;
   line-height: 140%;
-  @apply font-sans font-light;
+  @apply font-sans font-normal md:font-light;
 }
 
 .body-base {
@@ -64,7 +64,7 @@
   letter-spacing: 0;
   line-height: 120%;
   font-size: 16px;
-  @apply font-sans font-light;
+  @apply font-sans font-normal md:font-light;
 }
 
 .input-lg,
@@ -72,7 +72,7 @@
 .input-sm {
   letter-spacing: -0.5px;
   line-height: 110%;
-  @apply font-sans font-light;
+  @apply font-sans font-normal md:font-light;
 }
 
 .input-lg {

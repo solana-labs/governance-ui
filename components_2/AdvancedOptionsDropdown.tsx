@@ -1,32 +1,59 @@
 import { Disclosure } from '@headlessui/react'
+import Button from './ProductButtons'
+import Text from './ProductText'
 
-export default function AdvancedOptionsDropdown({ children }) {
+export default function AdvancedOptionsDropdown({
+  className = 'md:pt-10 w-fit',
+  children,
+}) {
   return (
-    <div className="">
+    <div className={className}>
       <Disclosure>
-        {({ open }) => (
-          <>
-            <Disclosure.Button className="font-light">
-              <div className="flex items-center py-2 pl-4 pr-2 space-x-2 border rounded-full border-white/60 w-fit hover:bg-white/10">
-                <div className="mb-0 font-sans text-lg text-left">
+        <Disclosure.Button as="div">
+          {({ open }) => (
+            <>
+              <Button
+                radio
+                selected={open}
+                className="flex items-center justify-center space-x-2 h-fit"
+              >
+                <Text level="2" className="font-normal">
                   Advanced Options
-                </div>
-                <img
-                  src="/img/realms-web/icons/chevron.svg"
-                  className={`h-7 default-transition bg-white/20 rounded-full px-2 w-7 ${
-                    open ? 'transform rotate-180' : ''
+                </Text>
+                <div
+                  className={`default-transition text-white ${
+                    open ? 'text-black transform rotate-180' : ''
                   }`}
-                />
-              </div>
-              <div
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      clipRule="evenodd"
+                      d="M7.99992 9.5858L12.2928 5.29291L13.707 6.70712L7.99992 12.4142L2.29282 6.70712L3.70703 5.29291L7.99992 9.5858Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </div>
+              </Button>
+
+              <Text
+                level="2"
                 className={`${
                   open ? 'visible' : 'invisible'
-                } pt-3 text-white/50`}
+                } pt-3 text-white/60`}
               >
                 Advanced creators may adjust certain aspects of their DAOs.
-              </div>
-            </Disclosure.Button>
-            {/* <Transition
+              </Text>
+            </>
+          )}
+        </Disclosure.Button>
+        {/* <Transition
               enter="transform transition duration-[300ms]"
               enterFrom="opacity-0 h-0"
               enterTo="opacity-100 h-fit"
@@ -34,10 +61,8 @@ export default function AdvancedOptionsDropdown({ children }) {
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             > */}
-            <Disclosure.Panel className="pt-20">{children}</Disclosure.Panel>
-            {/* </Transition> */}
-          </>
-        )}
+        <Disclosure.Panel className="pt-10">{children}</Disclosure.Panel>
+        {/* </Transition> */}
       </Disclosure>
     </div>
   )

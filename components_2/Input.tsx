@@ -4,14 +4,14 @@ import Text from './ProductText'
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   invalid?: string
   error?: string
-  succes?: string
+  success?: string
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ error = '', success = '', value, ...props }, ref) => {
     const hasContent = typeof value !== 'undefined' && value !== ''
     let className =
-      'input-base form-control block w-full pl-2 pt-[15px] pb-[21px] default-transition rounded-t outline-none border-0 border-b bg-transparent'
+      'input-base form-control block w-full pl-2 pt-[15px] pb-[21px] default-transition rounded-t rounded-b-none outline-none border-0 border-b bg-transparent'
 
     if (hasContent) {
       className += ` border-white text-white`
@@ -58,7 +58,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             error ? 'text-error-red' : success ? 'text-confirm-green' : ''
           }`}
         >
-          <div className="pt-[1px]">
+          <div className="pt-[2px]">
             {error ? (
               <svg
                 width="16"

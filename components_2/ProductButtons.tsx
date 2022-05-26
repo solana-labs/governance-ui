@@ -66,7 +66,11 @@ export const Button: FunctionComponent<ButtonProps> = ({
     }
   }, [loadingEnd])
   return (
-    <button className={classNames} {...props}>
+    <button
+      className={classNames}
+      type={radio ? 'button' : props.type}
+      {...props}
+    >
       {!loading && !loadingEnd ? (
         children
       ) : loadingEnd ? (
