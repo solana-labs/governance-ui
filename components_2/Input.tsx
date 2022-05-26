@@ -1,19 +1,50 @@
 import React from 'react'
 import { RadioGroup as HRG } from '@headlessui/react'
-
+import Text from './ProductText'
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   invalid?: string
-  error: string
+  error?: string
+  succes?: string
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ error = '', ...props }, ref) => {
+  ({ error = '', success = '', value, ...props }, ref) => {
+    const hasContent = typeof value !== 'undefined' && value !== ''
     let className =
-      'block w-full px-2 py-4 m-0 font-sans text-2xl font-light transition ease-in-out bg-transparent border-b border-solid form-control placeholder:font-sans md:text-3xl hover:bg-white/5 focus:bg-transparent bg-clip-padding text-white/90 placeholder:text-white/30 focus:text-white focus:outline-none disabled:cursor-not-allowed disabled:hover:bg-transparent'
-    if (error) {
-      className += ` border-[#cb676f]/50 focus:border-red`
+      'input-base form-control block w-full pl-2 pt-[15px] pb-[21px] default-transition rounded-t outline-none border-0 border-b bg-transparent'
+
+    if (hasContent) {
+      className += ` border-white text-white`
     } else {
-      className += ` border-white/20 focus:border-white/50`
+      className += `  border-white/20`
+    }
+
+    className += `
+
+      
+      
+
+      placeholder:text-white/30 
+      active:placeholder:text-white/10 
+      focus:placeholder:text-white/10 
+
+      hover:bg-white/5
+
+      focus:bg-[rgba(255,255,255,0.03)]
+      focus:text-white 
+      focus:outline-none 
+      focus:border-b-[#00E4FF]
+
+      active:bg-[rgba(255,255,255,0.03)]
+      active:border-b-[#00E4FF]
+      
+      disabled:cursor-not-allowed 
+      disabled:hover:bg-transparent
+      `
+
+    if (error) {
+      className += ` border-b-[#cb676f]/50 focus:border-b-red active:border-b-red`
+    } else if (success) {
     }
 
     return (
@@ -22,9 +53,23 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         <div
           className={`${
             error ? 'visibile' : 'invisible'
-          } pt-2 text-base md:text-lg text-red`}
+          } pt-2 text-base md:text-lg text-red flex items-center space-x-2`}
         >
-          {error}
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M12.5852 13.2894C11.3569 14.355 9.75379 15 8 15C4.13401 15 1 11.866 1 8C1 6.24621 1.64496 4.64307 2.71063 3.4148L12.5852 13.2894ZM13.2921 12.5821L3.41794 2.7079C4.6458 1.64386 6.24771 1 8 1C11.866 1 15 4.13401 15 8C15 9.75229 14.3561 11.3542 13.2921 12.5821ZM16 8C16 12.4183 12.4183 16 8 16C3.58172 16 0 12.4183 0 8C0 3.58172 3.58172 0 8 0C12.4183 0 16 3.58172 16 8Z"
+              fill="currentColor"
+            />
+          </svg>
+          <Text level="2">{error}</Text>
         </div>
       </div>
     )

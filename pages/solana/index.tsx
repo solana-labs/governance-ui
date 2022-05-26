@@ -12,13 +12,24 @@ import RealmsMetrics from './components/RealmsMetrics'
 import SocialChannels from './components/HMUSocials'
 import FAQs from './components/FAQs'
 
-export const Section = ({ bgColor = '', showTopGlow = false, children }) => {
+export const Section = ({
+  bgColor = '',
+  showTopGlow = false,
+  children,
+  form = false,
+}) => {
   return (
     <div className={`w-full ${bgColor} relative`}>
       {showTopGlow && (
         <img src="/1-Landing-v2/divider-glow.png" className="absolute w-full" />
       )}
-      <div className="w-full px-5 mx-auto md:px-16 lg:w-5/6 lg:px-0 xl:px-20 max-w-[1440px]">
+      <div
+        className={`w-full mx-auto lg:w-5/6  ${
+          form
+            ? 'max-w-[770px]'
+            : 'max-w-[1440px] px-5 md:px-16 lg:px-0 xl:px-20'
+        }`}
+      >
         {children}
       </div>
     </div>

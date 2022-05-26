@@ -44,6 +44,7 @@
 .body-xs {
   letter-spacing: 0;
   line-height: 140%;
+  @apply font-sans font-light;
 }
 
 .body-base {
@@ -52,9 +53,34 @@
 
 .body-sm {
   font-size: 15px;
-  @apply md:text-[14px];
+  @apply md:text-[16px];
 }
 
 .body-xs {
   font-size: 12px;
+}
+
+.label-base {
+  letter-spacing: 0;
+  line-height: 120%;
+  font-size: 16px;
+  @apply font-sans font-light;
+}
+
+.input-lg,
+.input-base,
+.input-sm {
+  letter-spacing: -0.5px;
+  line-height: 110%;
+  @apply font-sans font-light;
+}
+
+.input-lg {
+  font-size: 28px;
+}
+.input-base {
+  font-size: 25px;
+}
+.input-sm {
+  font-size: 20px;
 }

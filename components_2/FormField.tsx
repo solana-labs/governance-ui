@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState } from 'react'
+import Text from 'components_2/ProductText'
 import Button from 'components_2/Button'
 
 export function ImageUploader({
@@ -152,19 +153,34 @@ export default function FormField({
 }) {
   return (
     <div className={disabled ? 'opacity-50 cursor-not-allowed' : ''}>
-      <div className="flex items-baseline space-x-3">
-        <div className="text-lg md:text-xl">{title}</div>
-        {optional && <div className="opacity-60">(optional)</div>}
-        {advancedOption && (
-          <div className="bg-[#201F27] px-2 text-white/60 rounded">
-            Advanced Option
-          </div>
+      <Text
+        level="1"
+        className={`w-[calc(100%-${
+          advancedOption ? '130' : optional ? '100' : ''
+        }px)] inline-block`}
+      >
+        {title}
+        {optional && (
+          <Text level="2" as="span" className="ml-2 opacity-50">
+            (optional)
+          </Text>
         )}
-      </div>
-      <div className="pt-5 pb-4 text-base opacity-60 md:text-lg">
+
+        {advancedOption && (
+          <Text
+            level="2"
+            as="span"
+            className="bg-[#201F27] px-2 text-white/50 rounded ml-2"
+          >
+            Advanced Option
+          </Text>
+        )}
+      </Text>
+
+      <Text level="2" className="opacity-50">
         {description}
-      </div>
-      <div>{children}</div>
+      </Text>
+      <div className="pt-2">{children}</div>
       <div
         className={`${
           error ? 'visibile' : 'invisible'

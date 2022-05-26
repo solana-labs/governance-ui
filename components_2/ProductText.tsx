@@ -1,7 +1,9 @@
+import { createElement } from 'react'
 export default function Text({
   level = '1',
   className = '',
   bold = false,
+  as = 'div',
   children,
 }) {
   let classNames = bold ? 'font-bold' : ''
@@ -15,5 +17,5 @@ export default function Text({
 
   classNames += ` ${className}`
 
-  return <div className={classNames}>{children}</div>
+  return createElement(as, { className: classNames }, children)
 }

@@ -4,7 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 
 import FormHeader from '../components_2/FormHeader'
-import FormField, { ImageUploader } from '../components_2/FormField'
+import FormField from '../components_2/FormField'
 import FormFooter from '../components_2/FormFooter'
 import AdvancedOptionsDropdown from '../components_2/AdvancedOptionsDropdown'
 import Input from '../components_2/Input'
@@ -39,7 +39,7 @@ export default function BasicDetailsForm({
 }) {
   const schema = yup.object(BasicDetailsSchema).required()
   const {
-    getValues,
+    // getValues,
     setValue,
     control,
     handleSubmit,
@@ -57,12 +57,12 @@ export default function BasicDetailsForm({
     onSubmit({ step: currentStep, data: values })
   }
 
-  function handleAvatarSelect(fileInput) {
-    setValue('avatar', fileInput, {
-      shouldValidate: true,
-      shouldDirty: true,
-    })
-  }
+  // function handleAvatarSelect(fileInput) {
+  //   setValue('avatar', fileInput, {
+  //     shouldValidate: true,
+  //     shouldDirty: true,
+  //   })
+  // }
 
   return (
     <form
@@ -74,18 +74,16 @@ export default function BasicDetailsForm({
         totalSteps={totalSteps}
         stepDescription="Basic details"
         title="Let's gather your Governance Token DAO's basic details."
-        imgSrc="/1-Landing-v2/dao-type-medium-govtoken.png"
-        imgAlt="circles spirling"
       />
       <div className="pt-10 space-y-10 md:space-y-12">
-        <ImageUploader
+        {/* <ImageUploader
           title="What's your DAO's avatar?"
           description="The avatar you choose will visually represent your DAO"
           optional
           defaultValue={getValues('avatar')}
           error={errors.avatar?.message || ''}
           onSelect={handleAvatarSelect}
-        />
+        /> */}
         <Controller
           name="name"
           control={control}

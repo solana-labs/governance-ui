@@ -233,7 +233,7 @@ export default function GovTokenWizard() {
         />
       </div>
       <div className="pt-24 md:pt-28">
-        <Section>
+        <Section form>
           {steps.map(({ Form }, index) => {
             return (
               <div
