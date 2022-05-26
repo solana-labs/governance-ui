@@ -71,10 +71,6 @@ const TokenBalanceCardWrapper = ({
       return (
         <>
           <SwitchboardPermissionCard></SwitchboardPermissionCard>
-          {(!ownCouncilTokenRecord?.account.governingTokenDepositAmount.isZero() ||
-            !councilTokenAccount?.account.amount.isZero()) && (
-            <TokenBalanceCard proposal={proposal}></TokenBalanceCard>
-          )}
         </>
       )
     }

@@ -79,16 +79,22 @@ export const createProposal = async (
 
   // sum up signers
   const signers: Keypair[] = instructionsData.flatMap((x) => x.signers ?? [])
+  console.log("the signers:");
+  console.log(signers);
   const shouldSplitIntoSeparateTxs: boolean = instructionsData
     .flatMap((x) => x.shouldSplitIntoSeparateTxs)
     .some((x) => x)
 
   // Explicitly request the version before making RPC calls to work around race conditions in resolving
   // the version for RealmInfo
-  const programVersion = await getGovernanceProgramVersion(
+
+  // Changed this because it is misbehaving on my local validator setup.
+  /*const programVersion = await getGovernanceProgramVersion(
     connection,
     programId
-  )
+  )*/
+
+  const programVersion = 2;
 
   // V2 Approve/Deny configuration
   const voteType = VoteType.SINGLE_CHOICE
@@ -100,6 +106,8 @@ export const createProposal = async (
     instructions,
     'createProposal'
   )
+  console.log("Plugin");
+  console.log(plugin);
 
   const proposalAddress = await withCreateProposal(
     instructions,
@@ -119,6 +127,25 @@ export const createProposal = async (
     payer,
     plugin?.voterWeightPk
   )
+  console.log("withCreateProposal args:");
+  console.log({
+    instructions: instructions,
+    programId: programId,
+    programVersion: programVersion,
+    realm: realm.pubkey!,
+    governance: governance,
+    tokenOwnerRecord: tokenOwnerRecord,
+    name: name,
+    descriptionLink: descriptionLink,
+    governingTokenMint:governingTokenMint,
+    governanceAuthority:governanceAuthority,
+    proposalIndex:proposalIndex,
+    voteType:voteType,
+    options:options,
+    useDenyOption: useDenyOption,
+    payer:payer,
+    vwr: plugin?.voterWeightPk
+  });
 
   await withAddSignatory(
     instructions,
@@ -190,6 +217,10 @@ export const createProposal = async (
     transaction1.add(...prerequisiteInstructions, ...instructions)
     transaction2.add(...insertInstructions)
 
+    console.log("the two transactions");
+    console.log(transaction1);
+    console.log(transaction2);
+
     await sendTransaction({
       transaction: transaction1,
       wallet,
@@ -215,11 +246,27 @@ export const createProposal = async (
     // We merge instructions with prerequisiteInstructions
     // Prerequisite  instructions can came from instructions as something we need to do before instruction can be executed
     // For example we create ATAs if they don't exist as part of the proposal creation flow
+    console.log("preq");
+    console.log(prerequisiteInstructions);
+    console.log("instructions");
+    console.log(instructions);
+    console.log(insertInstructions);
+    console.log("insert");
     transaction.add(
       ...prerequisiteInstructions,
       ...instructions,
       ...insertInstructions
     )
+
+    console.log("The stuff:");
+    console.log({
+      transaction,
+      wallet,
+      connection,
+      signers,
+      sendingMessage: `creating ${notificationTitle}`,
+      successMessage: `${notificationTitle} created`,
+    });
 
     await sendTransaction({
       transaction,

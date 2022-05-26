@@ -2,7 +2,7 @@ import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import {
   BN,
   EventParser,
-} from '@blockworks-foundation/voter-stake-registry-client/node_modules/@project-serum/anchor'
+} from '@project-serum/anchor'
 import {
   ProgramAccount,
   Realm,

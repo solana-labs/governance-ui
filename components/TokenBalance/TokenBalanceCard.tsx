@@ -69,6 +69,8 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
         : !councilMint?.supply.isZero()
         ? realm!.account.config.councilMint
         : undefined
+      console.log("Is it undefined??");
+      console.log(defaultMint);
       const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
         realm!.owner,
         realm!.pubkey,

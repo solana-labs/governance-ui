@@ -114,6 +114,12 @@ export default function useRealm() {
     realm.account.config.councilMint &&
     !councilMint?.supply.isZero()
 
+  /*console.log("Use realm canChooseWhoVote");
+  console.log(canChooseWhoVote);
+  console.log(realm);
+  console.log(mint);
+  console.log(realm.account.config.useCommunityVoterWeightAddin);*/
+
   //TODO take from realm config when available
   const realmCfgMaxOutstandingProposalCount = 10
   const toManyCommunityOutstandingProposalsForUser =
@@ -179,7 +185,8 @@ const getVoterWeight = (
       )
     }
     if (switchboardPluginsPks.includes(currentPluginPk.toBase58())) {
-      return new SwitchboardQueueVoteWeight(undefined, undefined, sbVotingPower)
+      console.log("IN switchboard thingy");
+      return new SwitchboardQueueVoteWeight(ownTokenRecord, sbVotingPower)
     }
   }
   return new VoterWeight(ownTokenRecord, ownCouncilTokenRecord)

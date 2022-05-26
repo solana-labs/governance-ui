@@ -176,6 +176,7 @@ const New = () => {
     setIsLoadingSignedProposal(false)
     setIsLoadingDraft(false)
   }
+
   const handleCreate = async (isDraft) => {
     setFormErrors({})
     if (isDraft) {
@@ -263,6 +264,9 @@ const New = () => {
 
         router.push(url)
       } catch (ex) {
+        console.log("This error.");
+        console.log("Notifying:");
+        console.log(ex);
         notify({ type: 'error', message: `${ex}` })
       }
     } else {
@@ -270,6 +274,7 @@ const New = () => {
     }
     handleTurnOffLoaders()
   }
+
   useEffect(() => {
     setInstructions([instructionsData[0]])
   }, [instructionsData[0].governedAccount?.pubkey])

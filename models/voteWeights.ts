@@ -214,24 +214,24 @@ export class VoteNftWeight implements VoterWeightInterface {
 
 export class SwitchboardQueueVoteWeight implements VoterWeightInterface {
   communityTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
-  councilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
+  //councilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
   votingPower: BN
 
   constructor(
     communityTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,
-    councilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,
+    //councilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,
     votingPower: BN
   ) {
     this.communityTokenRecord = communityTokenRecord
-    this.councilTokenRecord = councilTokenRecord
+    //this.councilTokenRecord = councilTokenRecord
     this.votingPower = votingPower
   }
 
   // Checks if the voter has any voting weight
   hasAnyWeight() {
     return (
-      !this.votingPower.isZero() ||
-      !this.councilTokenRecord?.account.governingTokenDepositAmount.isZero()
+      !this.votingPower.isZero()
+      //!this.councilTokenRecord?.account.governingTokenDepositAmount.isZero()
     )
   }
 
@@ -240,10 +240,6 @@ export class SwitchboardQueueVoteWeight implements VoterWeightInterface {
     if (this.communityTokenRecord) {
       return this.communityTokenRecord.pubkey
     }
-    if (this.councilTokenRecord) {
-      return this.councilTokenRecord.pubkey
-    }
-
     throw new Error('Current wallet has no Token Owner Records')
   }
 
@@ -253,15 +249,18 @@ export class SwitchboardQueueVoteWeight implements VoterWeightInterface {
     )
   }
   hasMinCouncilWeight(minCouncilWeight: BN) {
-    return (
+    /*return (
       this.councilTokenRecord &&
       this.councilTokenRecord.account.governingTokenDepositAmount.cmp(
         minCouncilWeight
       ) >= 0
-    )
+    )*/
+     return false
   }
 
   canCreateProposal(config: GovernanceConfig) {
+    console.log("canCreateProposal?");
+    console.log(this.votingPower);
     return this.votingPower.gt(new BN(0))
   }
   canCreateGovernanceUsingCommunityTokens(realm: ProgramAccount<Realm>) {
@@ -271,11 +270,12 @@ export class SwitchboardQueueVoteWeight implements VoterWeightInterface {
     )
   }
   canCreateGovernanceUsingCouncilTokens() {
-    return true
+    return false
+    /*return true
     return (
       this.councilTokenRecord &&
       !this.councilTokenRecord.account.governingTokenDepositAmount.isZero()
-    )
+    )*/
   }
   canCreateGovernance(realm: ProgramAccount<Realm>) {
     return true
@@ -302,12 +302,14 @@ export class SwitchboardQueueVoteWeight implements VoterWeightInterface {
 
   getTokenRecordToCreateProposal(config: GovernanceConfig) {
     // Prefer community token owner record as proposal owner
-    if (this.hasMinCommunityWeight(config.minCommunityTokensToCreateProposal)) {
+    /*if (this.hasMinCommunityWeight(config.minCommunityTokensToCreateProposal)) {
       return this.communityTokenRecord!
     }
     if (this.hasMinCouncilWeight(config.minCouncilTokensToCreateProposal)) {
       return this.councilTokenRecord!
-    }
+    }*/
+    return this.communityTokenRecord;
+    //return true;
 
     throw new Error('Not enough vote weight to create proposal')
   }

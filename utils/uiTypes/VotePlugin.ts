@@ -20,6 +20,8 @@ import {
   getVoterWeightPDA,
 } from 'VoteStakeRegistry/sdk/accounts'
 import { NFTWithMint } from './nfts'
+import useSwitchboardPluginStore from 'SwitchboardVotePlugin/store/switchboardStore'
+import * as sbv2 from '../../../switchboardv2-api'
 
 type updateVoterWeightRecordTypes =
   | 'castVote'
@@ -71,6 +73,8 @@ export class VotingClient {
   realm: ProgramAccount<Realm> | undefined
   walletPk: PublicKey | null | undefined
   votingNfts: NFTWithMeta[]
+  oracles: PublicKey[]
+  instructions: TransactionInstruction[]
   clientType: VotingClientType
   noClient: boolean
   constructor({ client, realm, walletPk }: VotingClientProps) {
@@ -78,6 +82,8 @@ export class VotingClient {
     this.realm = realm
     this.walletPk = walletPk
     this.votingNfts = []
+    this.oracles = []
+    this.instructions = []
     this.noClient = true
     this.clientType = VotingClientType.NoClient
     if (this.client instanceof VsrClient) {
@@ -166,11 +172,26 @@ export class VotingClient {
       return { voterWeightPk, maxVoterWeightRecord }
     }
     if (this.client instanceof SwitchboardQueueVoterClient) {
-      console.log("It's a switchboard client.")
+      /*console.log("It's a switchboard client.")
       console.log('the realm is')
       console.log(this.realm)
       console.log('the wallet is')
       console.log(this.walletPk)
+      console.log("MY ORACLES");*/
+      console.log("Vote client logging oracles and instructions");
+      console.log(this.oracles);
+      console.log(this.instructions);
+      instructions.push(
+        this.instructions[0]
+      )
+      let [vwr] = await PublicKey.findProgramAddress(
+          [
+            Buffer.from('VoterWeightRecord'),
+            this.oracles[0].toBytes(),
+          ],
+          new PublicKey("7PMP6yE6qb3XzBQr5TK2GhuruYayZzBnT8U92ySaLESC"),
+      );
+      return { voterWeightPk: vwr, maxVoterWeightRecord: undefined }
     }
   }
   withCastPluginVote = async (
@@ -362,5 +383,11 @@ export class VotingClient {
   }
   _setCurrentVoterNfts = (nfts: NFTWithMeta[]) => {
     this.votingNfts = nfts
+  }
+  _setOracles = (oracles: PublicKey[]) => {
+    this.oracles = oracles
+  }
+  _setInstructions = (instructions: TransactionInstruction[]) => {
+    this.instructions = instructions
   }
 }

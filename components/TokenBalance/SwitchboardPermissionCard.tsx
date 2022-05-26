@@ -37,12 +37,21 @@ const SwitchboardPermissionCard = () => {
     : null
 
   useEffect(() => {
+    console.log("token records:");
+    console.log(tokenRecords);
+    console.log("Own token owner record:");
+    console.log(ownTokenRecord);
     const getTokenOwnerRecord = async () => {
-      const defaultMint = !mint?.supply.isZero()
+      /*const defaultMint = !mint?.supply.isZero()
         ? realm!.account.communityMint
         : !councilMint?.supply.isZero()
         ? realm!.account.config.councilMint
-        : undefined
+        : undefined*/
+      const defaultMint = realm!.account.communityMint;
+      console.log("default mint:");
+      console.log(defaultMint);
+      console.log("realm:");
+      console.log(realm);
       const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
         realm!.owner,
         realm!.pubkey,
