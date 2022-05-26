@@ -59,7 +59,7 @@ const NFTCollectionSelector = ({
                         <div
                           key={index}
                           className={`h-16 w-16 rounded-md ${
-                            src ? '' : 'bg-[#292833]'
+                            src ? '' : 'bg-bkg-grey'
                           } flex items-center`}
                         >
                           {src && (

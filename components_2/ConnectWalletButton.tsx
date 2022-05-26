@@ -159,7 +159,7 @@ const ConnectWalletButton = () => {
                     dark={true}
                   />
                 </div>
-                <div className="text-white md:flex hidden justify-center items-center rounded-full h-6 w-6 bg-[#292833]">
+                <div className="text-white md:flex hidden justify-center items-center rounded-full h-6 w-6 bg-bkg-grey">
                   <ChevronDownIcon
                     className={`${
                       open ? '' : 'rotate-180'
@@ -189,7 +189,7 @@ const ConnectWalletButton = () => {
                 <div
                   className={`${
                     open ? '' : 'rotate-180'
-                  } default-transition transform text-white hidden md:flex justify-center items-center rounded-full h-6 w-6 bg-[#292833]`}
+                  } default-transition transform text-white hidden md:flex justify-center items-center rounded-full h-6 w-6 bg-bkg-grey`}
                 >
                   <ChevronDownIcon
                     className={`${
@@ -209,7 +209,7 @@ const ConnectWalletButton = () => {
             leaveFrom="transform opacity-100 scale-100"
             leaveTo="transform opacity-0 scale-95"
           >
-            <Menu.Items className="absolute right-0 w-full mt-2 origin-top-right bg-[#201f27] rounded-md shadow-lg ring-1 ring-black text-white ring-opacity-5 focus:outline-none">
+            <Menu.Items className="absolute right-0 w-full mt-2 origin-top-right bg-night-grey rounded-md shadow-lg ring-1 ring-black text-white ring-opacity-5 focus:outline-none">
               <div className="flex flex-col px-2 py-2 overflow-scroll h-full max-h-[calc(100vh_-_200px)]">
                 {walletConnectionPending ? (
                   <div className="flex flex-col items-center w-full pt-8">
@@ -314,7 +314,7 @@ const ConnectWalletButton = () => {
                           {({ active }) => (
                             <button
                               type="button"
-                              className={`flex items-center w-full px-4 py-2 font-normal default-transition bg-[#292833] hover:cursor-pointer rounded hover:brightness-110 focus:outline-none ${
+                              className={`flex items-center w-full px-4 py-2 font-normal default-transition bg-bkg-grey hover:cursor-pointer rounded hover:brightness-110 focus:outline-none ${
                                 active
                                   ? 'brightness-110 ring-2 ring-white ring-opacity-75'
                                   : ''

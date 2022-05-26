@@ -11,7 +11,7 @@ import Button from 'components_2/Button'
 function SummaryCell({ className = '', children }) {
   return (
     <div
-      className={`bg-[#201f27] rounded-md px-4 py-6 md:p-8 grow ${className}`}
+      className={`bg-night-grey rounded-md px-4 py-6 md:p-8 grow ${className}`}
     >
       {children}
     </div>
@@ -77,7 +77,7 @@ export default function WizardSummary({
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Overlay className="flex flex-col justify-center w-full grow md:grow-0 md:max-w-xl p-6 md:p-12 overflow-hidden text-left align-middle transition-all transform bg-[#201F27] md:rounded-lg space-y-3">
+                <Dialog.Overlay className="flex flex-col justify-center w-full p-6 space-y-3 overflow-hidden text-left align-middle transition-all transform grow md:grow-0 md:max-w-xl md:p-12 bg-night-grey md:rounded-lg">
                   <img
                     src="/1-Landing-v2/logo-realms-blue.png"
                     className="w-8 h-8"
@@ -270,11 +270,11 @@ export default function WizardSummary({
                 <SummaryCell>
                   <div className="flex items-baseline space-x-3">
                     <div className="text-lg md:text-xl">Program ID</div>
-                    <div className="bg-[#292833] px-2 text-white/60 rounded">
+                    <div className="px-2 rounded bg-bkg-grey text-white/60">
                       Advanced Option
                     </div>
                   </div>
-                  <div className="text-lg mt-2 text-white/50">{programId}</div>
+                  <div className="mt-2 text-lg text-white/50">{programId}</div>
                 </SummaryCell>
               )}
             </div>

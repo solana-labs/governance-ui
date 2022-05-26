@@ -176,7 +176,7 @@ export default function FormField({
               <Text
                 level="2"
                 as="span"
-                className="bg-[#201F27] px-2 text-white/50 rounded ml-2"
+                className="px-2 ml-2 rounded bg-night-grey text-white/50"
               >
                 Advanced Option
               </Text>

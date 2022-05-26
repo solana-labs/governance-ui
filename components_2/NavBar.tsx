@@ -64,7 +64,7 @@ export default function Navbar(props: NavbarProps) {
     <div
       className={`fixed w-full top-0 z-10 pt-5 pb-5 transition-all duration-300 ${
         scrollY > SCROLL_BREAK_POINT
-          ? 'bg-[#292833] bg-opacity-90 backdrop-blur-[3px]'
+          ? 'bg-bkg-grey bg-opacity-90 backdrop-blur-[3px]'
           : ''
       }`}
     >

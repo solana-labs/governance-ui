@@ -32,7 +32,7 @@ const FormFooter: React.FC<FormFooterProps> = ({
         <Button
           type="submit"
           disabled={!isValid}
-          bgOverride={!isValid ? `bg-[#201f27]` : ''}
+          bgOverride={!isValid ? `bg-night-grey` : ''}
           onClick={submitClickHandler}
         >
           <img
