@@ -1,16 +1,5 @@
-// import { useEffect, useState } from 'react'
-// import Multiple from 'multiple.js'
-// useEffect(() => {
-//   if (typeof document !== 'undefined' && !initialized) {
-//     new Multiple({
-//       selector: '.step-indicator-with-gradient',
-//       background: 'linear-gradient(to right, #00c2ff 0%, #00e4ff 50%, #87f2ff 100%);'
-//     })
-//     setInitialized(true)
-//   }
-// })
-// const [initialized, setInitialized] = useState(false)
-import Header from 'components_2/Header'
+import Header from 'components_2/ProductHeader'
+import Text from 'components_2/ProductText'
 function StepProgressIndicator({
   currentStep,
   totalSteps,
@@ -41,8 +30,10 @@ function StepProgressIndicator({
         </div>
       </div>
       <div className="flex pt-2 space-x-1 text-sm md:text-base">
-        <div className="text-[#6de9ff]">Step {currentStep}</div>
-        <div>{stepDescription}</div>
+        <Text level="2" className="text-[#6de9ff]">
+          Step {currentStep}
+        </Text>
+        <Text level="2">{stepDescription}</Text>
       </div>
     </div>
   )
@@ -53,8 +44,6 @@ export default function FormHeader({
   totalSteps,
   stepDescription,
   title,
-  imgSrc,
-  imgAlt,
 }) {
   return (
     <div>
@@ -63,13 +52,10 @@ export default function FormHeader({
         totalSteps={totalSteps}
         stepDescription={stepDescription}
       />
-      <div className="flex items-center pt-10 md:pt-0">
-        <Header as="h1">{title}</Header>
-        <img
-          src={imgSrc}
-          className="max-w-[420px] hidden md:block"
-          alt={imgAlt}
-        />
+      <div className="flex items-center w-full pt-10 md:pt-20">
+        <Header as="h2" className="md:max-w-[633px]">
+          {title}
+        </Header>
       </div>
     </div>
   )
