@@ -55,11 +55,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         <div
           className={`${
             error || success ? 'visibile' : 'invisible'
-          } pt-2 flex items-start space-x-2 min-h-[2.5rem] ${
+          } pt-2 flex items-start space-x-1 min-h-[2.5rem] ${
             error ? 'text-error-red' : success ? 'text-confirm-green' : ''
           }`}
         >
-          <div className="pt-[2px]">
+          <div className="pt-[1px]">
             {error ? (
               <svg
                 width="16"
@@ -68,26 +68,21 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M12.5852 13.2894C11.3569 14.355 9.75379 15 8 15C4.13401 15 1 11.866 1 8C1 6.24621 1.64496 4.64307 2.71063 3.4148L12.5852 13.2894ZM13.2921 12.5821L3.41794 2.7079C4.6458 1.64386 6.24771 1 8 1C11.866 1 15 4.13401 15 8C15 9.75229 14.3561 11.3542 13.2921 12.5821ZM16 8C16 12.4183 12.4183 16 8 16C3.58172 16 0 12.4183 0 8C0 3.58172 3.58172 0 8 0C12.4183 0 16 3.58172 16 8Z"
-                  fill="currentColor"
-                />
+                <circle cx="8" cy="8" r="5.5" stroke="currentColor" />
+                <path d="M4 4L12 12" stroke="currentColor" />
               </svg>
             ) : success ? (
               <svg
                 width="16"
-                height="13"
-                viewBox="0 0 16 13"
+                height="16"
+                viewBox="0 0 16 16"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M15.4141 3.41436L5.99991 12.8286L0.585693 7.41437L3.41412 4.58594L5.99991 7.17172L12.5857 0.585938L15.4141 3.41436Z"
-                  fill="currentColor"
+                  d="M14 4L6 13L2 8"
+                  stroke="currentColor"
+                  strokeWidth="2"
                 />
               </svg>
             ) : (

@@ -27,7 +27,7 @@ export const Button: FunctionComponent<ButtonProps> = ({
       'py-3 px-2 h-[64px] min-w-[208px] text-white border border-white/30 focus:border-white hover:bg-white hover:text-black active:bg-white/70 active:text-black active:border-none disabled:bg-white/10 disabled:text-black disabled:border-none '
   } else if (radio) {
     classNames +=
-      'py-3 px-2 h-[64px] min-w-[208px] text-white border border-white/30 disabled:text-black disabled:border-2'
+      'py-3 px-2 h-[64px] min-w-[208px] text-white border border-white/30 disabled:text-black disabled:border-2 disabled:hover:border-white/30'
     if (selected) {
       classNames +=
         ' bg-white text-black border-white border-2 focus:border-[#00E4FF]'

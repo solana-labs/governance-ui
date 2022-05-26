@@ -209,17 +209,27 @@ export default function GovTokenDetailsForm({
                 <FormField
                   title="What is the address of the token you would like to use?"
                   description="You can verify the correct token in the preview below."
+                  className="mt-10 md:mt-16"
                 >
                   <Input
                     placeholder="e.g. CwvWQWt5m..."
                     data-testid="dao-name-input"
                     error={errors.tokenAddress?.message}
+                    success={
+                      tokenInfo && tokenInfo !== PENDING_COIN
+                        ? 'Token found'
+                        : undefined
+                    }
                     {...field}
                   />
                 </FormField>
               )}
             />
-            <div className="grid grid-cols-2 gap-2">
+            <div
+              className={`grid grid-cols-2 gap-2 pt-2 pb-8 ${
+                tokenInfo === PENDING_COIN ? 'animate-pulse' : ''
+              }`}
+            >
               <div className="bg-[#201F27] py-5 px-6 flex flex-col rounded-md space-y-5">
                 <Text className="text-white/30">Token Name</Text>
                 <div className="flex items-center space-x-2">
