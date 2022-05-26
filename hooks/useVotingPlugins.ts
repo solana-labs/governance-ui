@@ -14,7 +14,7 @@ import {
   DEVNET_STAKING_ADDRESS as PYTH_DEVNET_STAKING_ADDRESS,
 } from 'pyth-staking-api'
 import useGatewayPluginStore from '../GatewayPlugin/store/gatewayPluginStore'
-import { getGatewayToken } from '../GatewayPlugin/sdk/accounts'
+import { getGatewayTokenContext } from '../GatewayPlugin/sdk/accounts'
 
 export const vsrPluginsPks: string[] = [
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo',
@@ -25,7 +25,8 @@ export const nftPluginsPks: string[] = [
 ]
 
 export const gatewayPluginsPks: string[] = [
-  'Ggat9fNP9SsZEfxGJqbdZUasBGppksaZUBfL92ntrFEp',
+  'Ggat9fNP9SsZEfxGJqbdZUasBGppksaZUBfL92ntrFEp', // v0.1 Plugin, usable until v1 is fully tested
+  'Ggatr3wgDLySEwA2qEjt1oiw4BUzp5yMLJyz21919dq6', // v1
 ]
 
 export const pythPluginsPks: string[] = [
@@ -50,7 +51,11 @@ export function useVotingPlugins() {
     setMaxVoterWeight,
     setIsLoadingNfts,
   } = useNftPluginStore()
-  const { setGatewayToken, setIsLoadingGatewayToken } = useGatewayPluginStore()
+  const {
+    setGatewayToken,
+    setIsLoadingGatewayToken,
+    setGatekeeperNetwork,
+  } = useGatewayPluginStore()
 
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
@@ -109,13 +114,18 @@ export function useVotingPlugins() {
       setIsLoadingGatewayToken(true)
 
       try {
-        console.log('GATEWAY: getGatewayToken')
-        const gatewayToken = await getGatewayToken(
+        console.log('GATEWAY: getGatewayTokenContext')
+        const {
+          gatewayToken,
+          gatekeeperNetwork,
+        } = await getGatewayTokenContext(
           gatewayClient,
           realm,
           wallet!.publicKey!
         )
-        console.log('GATEWAY: getGatewayToken ', gatewayToken)
+        console.log('GATEWAY: getGatewayTokenContext ', gatewayToken)
+
+        setGatekeeperNetwork(gatekeeperNetwork)
 
         if (gatewayToken) {
           console.log('GATEWAY: setGatewayToken')

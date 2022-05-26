@@ -25,7 +25,7 @@ import { NFTWithMint } from './nfts'
 import { GatewayClient } from '@solana/governance-program-library/dist'
 import {
   getGatewayRegistrarPDA,
-  getGatewayToken,
+  getGatewayTokenContext,
   getGatewayVoterWeightRecord,
   getVoteInstruction,
 } from '../../GatewayPlugin/sdk/accounts'
@@ -197,14 +197,18 @@ export class VotingClient {
         clientProgramId,
         instructions
       )
-      const gatewayToken = await getGatewayToken(this.client, realm, walletPk)
+      const { gatewayToken } = await getGatewayTokenContext(
+        this.client,
+        realm,
+        walletPk
+      )
 
       // Throw if the user has no gateway token (TODO handle this later)
       if (!gatewayToken)
         throw new Error(`Unable to vote: No Gateway Token found`)
 
       const updateVoterWeightRecordIx = await this.client.program.methods
-        .updateVoterWeightRecord({ [type]: {} })
+        .updateVoterWeightRecord({ [type]: {} }, null)
         .accounts({
           registrar: registrar,
           gatewayToken: gatewayToken.publicKey,
@@ -375,6 +379,8 @@ export class VotingClient {
         clientProgramId,
         instructions
       )
+
+      console.log('withCastPluginVote voterWeightPk', voterWeightPk)
 
       return { voterWeightPk, maxVoterWeightRecord: undefined }
     }

@@ -51,6 +51,12 @@ const ConnectWalletButton = (props) => {
     }
   }
   useEffect(() => {
+    console.log(
+      'checking if the connection is using devnet, and setting the switch accordingly',
+      {
+        cluster: connection.cluster,
+      }
+    )
     setUseDevnet(connection.cluster === 'devnet')
   }, [connection.cluster])
 

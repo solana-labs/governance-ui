@@ -1,13 +1,7 @@
 import { PublicKey } from '@solana/web3.js'
 import { findGatewayToken, GatewayToken } from '@identity.com/solana-gateway-ts'
-import {
-  ProgramAccount,
-  Realm,
-  SYSTEM_PROGRAM_ID,
-} from '@solana/spl-governance'
+import { ProgramAccount, Realm } from '@solana/spl-governance'
 import { GatewayClient } from '@solana/governance-program-library/dist'
-
-export const emptyPk = '11111111111111111111111111111111'
 
 // TODO merge this with NFTVotePlugin as it is essentially identical
 export const getGatewayRegistrarPDA = async (
@@ -65,17 +59,28 @@ export const getGatewayVoterWeightRecord = async (
     ],
     clientProgramId
   )
+
+  console.log('getGatewayVoterWeightRecord', [
+    voterWeightPk,
+    voterWeightRecordBump,
+  ])
+
   return {
     voterWeightPk,
     voterWeightRecordBump,
   }
 }
 
-export const getGatewayToken = async (
+export type GatewayTokenContext = {
+  gatewayToken: GatewayToken | null
+  gatekeeperNetwork: PublicKey
+}
+
+export const getGatewayTokenContext = async (
   client: GatewayClient,
   realm: ProgramAccount<Realm>,
   walletPk: PublicKey
-): Promise<GatewayToken | null> => {
+): Promise<GatewayTokenContext> => {
   // Get the registrar for the realm
   const { registrar } = await getGatewayRegistrarPDA(
     realm.pubkey,
@@ -94,11 +99,13 @@ export const getGatewayToken = async (
   const gatekeeperNetwork = registrarObject.gatekeeperNetwork
 
   // lookup the voter's gateway token in the gatekeeper network
-  return findGatewayToken(
+  const gatewayToken = await findGatewayToken(
     client.program.provider.connection,
     walletPk,
     gatekeeperNetwork
   )
+
+  return { gatewayToken, gatekeeperNetwork }
 }
 
 export const getVoteInstruction = async (
@@ -107,7 +114,7 @@ export const getVoteInstruction = async (
   walletPk: PublicKey,
   proposalPk: PublicKey
 ) => {
-  const gatewayToken = await getGatewayToken(client, realm, walletPk)
+  const { gatewayToken } = await getGatewayTokenContext(client, realm, walletPk)
   // Throw if the user has no gateway token (TODO handle this later)
   if (!gatewayToken) throw new Error(`Unable to vote: No Gateway Token found`)
 
@@ -126,16 +133,13 @@ export const getVoteInstruction = async (
     client.program.programId
   )
 
-  // call castVote on the plugin
+  // call updateVoterWeightRecord on the plugin
   return client.program.methods
-    .castVote(proposalPk)
+    .updateVoterWeightRecord({ castVote: {} }, proposalPk)
     .accounts({
       registrar,
       voterWeightRecord: voterWeightPk,
-      governingTokenOwner: walletPk,
       gatewayToken: gatewayToken.publicKey,
-      payer: walletPk,
-      systemProgram: SYSTEM_PROGRAM_ID,
     })
     .instruction()
 }

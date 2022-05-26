@@ -103,11 +103,31 @@ const CreateGatewayPluginRegistrar = ({
       ),
     },
     {
-      label: 'Gatekeeper Network',
+      label: 'Civic Pass',
       initialValue: '',
       inputType: 'text',
       name: 'gatekeeperNetwork',
-      type: InstructionInputType.INPUT,
+      type: InstructionInputType.SELECT,
+      options: [
+        {
+          key: 'bot-resistance',
+          value: 'ignREusXmGrscGNUesoU9mxfds9AiYTezUKex2PsZV6',
+        },
+        // This is the test gatekeeper network for uniqueness - replace with the prod gkn when live
+        {
+          key: 'uniqueness',
+          value: 'tunQheuPpHhjjsbrUDp4rikqYez9UXv4SXLRHf9Kzsv',
+        },
+        // { key: "uniqueness", value: "uniqobk8oGh4XBLMqM68K8M2zNu3CdYX7q5go7whQiv"} // PROD
+        {
+          key: 'ID Verification',
+          value: 'ni1jXzPTq1yTqo67tUmVgnp22b1qGAAZCtPmHtskqYG',
+        },
+        {
+          key: 'ID Verification DeFi',
+          value: 'gatbGF9DvLAw3kWyn1EmH5Nh1Sqp8sTukF7yaQpSc71',
+        },
+      ],
     },
   ]
   return (

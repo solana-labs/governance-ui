@@ -1,16 +1,18 @@
 import Input from '@components/inputs/Input'
 import Textarea from '@components/inputs/Textarea'
 import { ProgramAccount, Governance } from '@solana/spl-governance'
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { precision } from '@utils/formatting'
 import Switch from '@components/Switch'
+import Select from '@components/inputs/Select'
 
 export enum InstructionInputType {
   GOVERNED_ACCOUNT,
   INPUT,
   TEXTAREA,
   SWITCH,
+  SELECT,
 }
 
 export interface InstructionInput {
@@ -161,7 +163,31 @@ const InstructionInput = ({
           />
         )
       }
-
+      case InstructionInputType.SELECT: {
+        return (
+          <Select
+            label={input.label}
+            value={form[input.name]}
+            onChange={(event) => {
+              handleSetForm({
+                value: event,
+                propertyName: input.name,
+              })
+            }}
+            error={formErrors[input.name]}
+          >
+            {(input.options || []).map((option) => (
+              <Select.Option
+                className="border-red"
+                key={option.key}
+                value={option.value}
+              >
+                {option.key}
+              </Select.Option>
+            ))}
+          </Select>
+        )
+      }
       case InstructionInputType.TEXTAREA:
         return (
           <Textarea

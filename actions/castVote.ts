@@ -52,6 +52,9 @@ export async function castVote(
     proposal,
     tokeOwnerRecord
   )
+
+  console.log('castVote plugin', plugin)
+
   await withCastVote(
     instructions,
     programId,

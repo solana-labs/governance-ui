@@ -10,10 +10,11 @@ import {
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { sendTransaction } from '@utils/send'
 import { getNftVoterWeightRecord } from 'NftVotePlugin/sdk/accounts'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
 import useGatewayPluginStore from '../../GatewayPlugin/store/gatewayPluginStore'
+import { GatewayProvider, IdentityButton } from '@civic/solana-gateway-react'
 
 // TODO lots of overlap with NftBalanceCard here - we need to separate the logic for creating the Token Owner Record
 // from the rest of this logic
@@ -23,8 +24,9 @@ const GatewayCard = () => {
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
-  // TODO consider replacing this with @civic/solana-gateway-react
-  const gatewayToken = useGatewayPluginStore((s) => s.state.gatewayToken)
+  const gatekeeperNetwork = useGatewayPluginStore(
+    (s) => s.state.gatekeeperNetwork
+  )
   const isLoading = useGatewayPluginStore((s) => s.state.isLoadingGatewayToken)
   const connection = useWalletStore((s) => s.connection)
   const [, setTokenOwneRecordPk] = useState('')
@@ -95,6 +97,21 @@ const GatewayCard = () => {
     }
   }, [realm?.pubkey.toBase58(), wallet?.connected])
 
+  // Temporary, until uniquenessPass is live
+  const gatewayStage = useMemo(() => {
+    const uniquenessPass = 'tunQheuPpHhjjsbrUDp4rikqYez9UXv4SXLRHf9Kzsv'
+    if (gatekeeperNetwork && gatekeeperNetwork.toBase58() === uniquenessPass) {
+      return 'preprod'
+    }
+    return 'prod'
+  }, [gatekeeperNetwork])
+
+  console.log('GatewayCard', {
+    connected,
+    wallet,
+    gatekeeperNetwork,
+  })
+
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
       <div className="space-y-4">
@@ -102,18 +119,34 @@ const GatewayCard = () => {
           <div className="text-xs bg-bkg-3 p-3">Please connect your wallet</div>
         )}
         {isLoading && <Loading></Loading>}
-        {!isLoading && connected && !gatewayToken && (
-          <div className="text-xs bg-bkg-3 p-3">
-            Visit <a href="https://getpass.civic.com">getpass.civic.com</a> to
-            get your Civic Pass
-          </div>
-        )}
-        {gatewayToken && (
-          <div className="text-xs bg-bkg-3 p-3">
-            Visit <a href="https://getpass.civic.com">getpass.civic.com</a> to
-            ensure your pass is active.
-          </div>
-        )}
+        {!isLoading &&
+          connected &&
+          wallet &&
+          wallet.publicKey &&
+          gatekeeperNetwork && (
+            <GatewayProvider
+              clusterUrl={connection.endpoint}
+              cluster={connection.cluster}
+              stage={gatewayStage}
+              gatekeeperNetwork={gatekeeperNetwork}
+              wallet={{
+                publicKey: wallet.publicKey,
+                signTransaction: wallet.signTransaction.bind(wallet),
+              }}
+              handleTransaction={async (transaction: Transaction) => {
+                await sendTransaction({
+                  transaction,
+                  wallet: wallet!,
+                  connection: connection.current,
+                  signers: [],
+                  sendingMessage: 'Creating pass',
+                  successMessage: 'Pass created',
+                })
+              }}
+            >
+              <IdentityButton />
+            </GatewayProvider>
+          )}
       </div>
       {connected && !ownTokenRecord && (
         <Button className="w-full" onClick={handleRegister}>

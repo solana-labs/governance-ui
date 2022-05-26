@@ -7,11 +7,13 @@ import { PublicKey } from '@solana/web3.js'
 interface gatewayPluginStore extends State {
   state: {
     gatewayToken: PublicKey | null
+    gatekeeperNetwork: PublicKey | null
     votingPower: BN
     maxVoteRecord: ProgramAccount<MaxVoterWeightRecord> | null
     isLoadingGatewayToken: boolean
   }
   setGatewayToken: (gatewayToken: PublicKey, votingClient: VotingClient) => void
+  setGatekeeperNetwork: (gatekeeperNetwork: PublicKey) => void
   setVotingPower: (gatewayToken: PublicKey) => void
   setMaxVoterWeight: (
     maxVoterRecord: ProgramAccount<MaxVoterWeightRecord> | null
@@ -21,6 +23,7 @@ interface gatewayPluginStore extends State {
 
 const defaultState = {
   gatewayToken: null,
+  gatekeeperNetwork: null,
   votingPower: new BN(0),
   maxVoteRecord: null,
   isLoadingGatewayToken: false,
@@ -43,6 +46,12 @@ const useGatewayPluginStore = create<gatewayPluginStore>((set, _get) => ({
     console.log('GATEWAY: setVotingPower')
     _get().setVotingPower(gatewayToken)
   },
+  setGatekeeperNetwork: (gatekeeperNetwork) => {
+    set((s) => {
+      s.state.gatekeeperNetwork = gatekeeperNetwork
+    })
+  },
+
   setVotingPower: () => {
     set((s) => {
       s.state.votingPower = new BN(1)
