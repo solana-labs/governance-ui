@@ -15,13 +15,15 @@ import BigNumber from 'bignumber.js'
 import BN from 'bn.js'
 import { WSOL_MINT_PK } from '@components/instructions/tools'
 import { withSentry } from '@sentry/nextjs'
+import { parseCertifiedRealms } from '@models/registry/api'
+import mainnetBetaRealms from 'public/realms/mainnet-beta.json'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const conn = new Connection(
     'https://explorer-api.mainnet-beta.solana.com',
     'recent'
   )
-
+  const MAINNET_REALMS = parseCertifiedRealms(mainnetBetaRealms)
   console.log('fetching spl-gov instances...')
   // Get all realms
   //const allProgramIds = getAllSplGovernanceProgramIds().slice(0, 1)
@@ -35,7 +37,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   for (const programId of allProgramIds) {
     const allProgramRealms = await getRealms(conn, new PublicKey(programId))
 
-    allRealms = allRealms.concat(allProgramRealms)
+    allRealms = allRealms
+      .concat(allProgramRealms)
+      .filter((j) =>
+        MAINNET_REALMS.find((x) => x.realmId.toBase58() === j.pubkey.toBase58())
+      )
   }
 
   //allRealms = allRealms.slice(251)
