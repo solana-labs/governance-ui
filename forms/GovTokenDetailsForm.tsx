@@ -120,6 +120,7 @@ export default function GovTokenDetailsForm({
       return undefined
     }
   }, [tokenAddress, tokenList])
+  const noToken = !tokenInfo || tokenInfo === PENDING_COIN
 
   useEffect(() => {
     updateUserInput(formData, GovTokenDetailsSchema, setValue)
@@ -218,11 +219,7 @@ export default function GovTokenDetailsForm({
                     placeholder="e.g. CwvWQWt5m..."
                     data-testid="dao-name-input"
                     error={errors.tokenAddress?.message}
-                    success={
-                      tokenInfo && tokenInfo !== PENDING_COIN
-                        ? 'Token found'
-                        : undefined
-                    }
+                    success={!noToken ? 'Token found' : undefined}
                     {...field}
                   />
                 </FormField>
@@ -290,7 +287,7 @@ export default function GovTokenDetailsForm({
                 <FormField
                   title="What is the minimum number of tokens needed to edit this DAO's info?"
                   description="A user will need at least this many of your governance token to edit and maintain this DAO."
-                  disabled={useExistingToken && tokenAddress === ''}
+                  disabled={noToken}
                   optional
                 >
                   <Input
@@ -300,7 +297,7 @@ export default function GovTokenDetailsForm({
                     Icon={<GenericTokenIcon />}
                     error={errors.minimumNumberOfTokensToEditDao?.message || ''}
                     {...field}
-                    disabled={useExistingToken && tokenAddress === ''}
+                    disabled={noToken}
                     onChange={(ev) => {
                       preventNegativeNumberInput(ev)
                       field.onChange(ev)
@@ -316,7 +313,7 @@ export default function GovTokenDetailsForm({
             <FormField
               title="Do you want to transfer mint authority of the token to the DAO?"
               description=""
-              disabled={useExistingToken && tokenAddress === ''}
+              disabled={noToken}
             >
               <Controller
                 name="transferMintAuthorityToDao"
@@ -331,7 +328,7 @@ export default function GovTokenDetailsForm({
                       { label: 'Yes', value: true },
                       { label: 'No', value: false },
                     ]}
-                    disabled={useExistingToken && tokenAddress === ''}
+                    disabled={noToken}
                   />
                 )}
               />
@@ -340,7 +337,9 @@ export default function GovTokenDetailsForm({
         )}
         {typeof useExistingToken !== 'undefined' && (
           <>
-            <AdvancedOptionsDropdown>
+            <AdvancedOptionsDropdown
+              className={useExistingToken ? undefined : 'mt-8'}
+            >
               <Controller
                 name="mintSupplyFactor"
                 defaultValue=""
