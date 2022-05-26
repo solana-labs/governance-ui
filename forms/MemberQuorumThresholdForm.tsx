@@ -24,7 +24,7 @@ export interface MemberQuorumThreshold {
 
 export function ThresholdAdviceBox({ title, children }) {
   return (
-    <div className="bg-[#201f27] py-8 pr-2 pl-8 flex items-start space-x-8">
+    <div className="bg-night-grey py-8 pr-2 pl-8 flex items-start space-x-8">
       <div className="w-24 h-24 px-2 py-5 bg-black rounded-lg">
         <img src="/1-Landing-v2/icon-quorum-gradient.png" />
       </div>

@@ -283,7 +283,7 @@ export default function InviteMembersForm({
               )
             })
         ) : (
-          <div className="bg-[#201f27] text-lg mt-3 rounded flex flex-col justify-center items-center text-center px-20 py-10">
+          <div className="bg-night-grey text-lg mt-3 rounded flex flex-col justify-center items-center text-center px-20 py-10">
             <div className="text-5xl">📭</div>
             <div>You have not added any addresses yet...</div>
           </div>

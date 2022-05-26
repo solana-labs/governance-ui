@@ -40,7 +40,7 @@ export const ExploreButton = () => {
   return (
     <Button secondary>
       <div className="relative flex items-center justify-center">
-        <div className="bg-[#292833] rounded-full ml-2 mr-2 p-2 absolute left-[-0.5rem]">
+        <div className="bg-bkg-grey rounded-full ml-2 mr-2 p-2 absolute left-[-0.5rem]">
           <div className="bg-[url(/1-Landing-v2/icon-binoculars-blue.png)]  w-5 h-5 bg-cover overflow-hidden text-transparent">
             Binoculars
           </div>
@@ -74,28 +74,28 @@ const Solana = () => {
     <div className="relative landing-page">
       <Navbar />
       <KickstartSolana />
-      <Section bgColor="bg-[#201f27]">
+      <Section bgColor="bg-night-grey">
         <PerfectForDAOs />
       </Section>
-      <Section bgColor="bg-[#292833]">
+      <Section bgColor="bg-bkg-grey">
         <SelectDAOToCreate />
       </Section>
-      <Section bgColor="bg-[#292833]" showTopGlow>
+      <Section bgColor="bg-bkg-grey" showTopGlow>
         <WhatRealmsCanDo />
       </Section>
-      <Section bgColor="bg-spl-gov bg-cover md:bg-[#292833] md:bg-none ">
+      <Section bgColor="bg-spl-gov bg-cover md:bg-bkg-grey md:bg-none ">
         <WhatIsSPL />
       </Section>
-      <Section bgColor="bg-[#292833]">
+      <Section bgColor="bg-bkg-grey">
         <WhatIsADAO />
       </Section>
-      <Section bgColor="bg-[#292833]" showTopGlow>
+      <Section bgColor="bg-bkg-grey" showTopGlow>
         <RealmsMetrics />
       </Section>
-      <Section bgColor="bg-[#201f27] md:bg-[#292833]">
+      <Section bgColor="bg-night-grey md:bg-bkg-grey">
         <SocialChannels />
       </Section>
-      <Section bgColor="bg-[#292833]">
+      <Section bgColor="bg-bkg-grey">
         <FAQs />
       </Section>
       <Footer />
