@@ -4,8 +4,8 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { TokenListProvider, TokenInfo } from '@solana/spl-token-registry'
 import * as yup from 'yup'
 
-import Header from 'components_2/Header'
-import Text from 'components_2/Text'
+import Header from 'components_2/ProductHeader'
+import Text from 'components_2/ProductText'
 import FormHeader from '../components_2/FormHeader'
 import FormField from '../components_2/FormField'
 import FormFooter from '../components_2/FormFooter'
@@ -174,10 +174,8 @@ export default function GovTokenDetailsForm({
         totalSteps={totalSteps}
         stepDescription="Determine Token"
         title="Next, determine the token your DAO will use for dovernance tasks."
-        imgSrc="/1-Landing-v2/dao-type-medium-govtoken.png"
-        imgAlt="circles spirling"
       />
-      <div className="pt-10 space-y-10 md:space-y-12">
+      <div className="pt-16 space-y-10 md:pt-24 md:space-y-12">
         <FormField
           title="Do you have an existing token for your DAO's community?"
           description=""
@@ -187,15 +185,17 @@ export default function GovTokenDetailsForm({
             control={control}
             defaultValue={undefined}
             render={({ field }) => (
-              <RadioGroup
-                onChange={field.onChange}
-                value={field.value}
-                onBlur={field.onBlur}
-                options={[
-                  { label: 'Yes I do', value: true },
-                  { label: "No, let's create one", value: false },
-                ]}
-              />
+              <div className="pt-3">
+                <RadioGroup
+                  onChange={field.onChange}
+                  value={field.value}
+                  onBlur={field.onBlur}
+                  options={[
+                    { label: 'Yes I do', value: true },
+                    { label: "No, let's create one", value: false },
+                  ]}
+                />
+              </div>
             )}
           />
         </FormField>
@@ -272,7 +272,7 @@ export default function GovTokenDetailsForm({
         )}
         {useExistingToken === false && (
           <>
-            <Header as="h4" className="pb-6 text-center">
+            <Header as="h4" className="pt-8 pb-6 text-center md:pt-16">
               Good news: we can mint you a brand new one!
             </Header>
             <Controller

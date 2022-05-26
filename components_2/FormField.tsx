@@ -151,37 +151,41 @@ export default function FormField({
   className = '',
   children,
 }) {
+  const splitTitle = title.split(' ')
   return (
     <div
       className={`${
         disabled ? 'opacity-50 cursor-not-allowed' : ''
       } pt-0 md:pt-8 ${className}`}
     >
-      <Text
-        level="1"
-        className={`w-[calc(100%-${
-          advancedOption ? '130' : optional ? '100' : ''
-        }px)] inline-block`}
-      >
-        {title}
-        {optional && (
-          <Text level="2" as="span" className="ml-2 opacity-50">
-            (optional)
-          </Text>
-        )}
-
-        {advancedOption && (
-          <Text
-            level="2"
-            as="span"
-            className="bg-[#201F27] px-2 text-white/50 rounded ml-2"
-          >
-            Advanced Option
+      <Text level="1">
+        <span>
+          {splitTitle
+            .slice(0, splitTitle.length - (optional || advancedOption ? 1 : 0))
+            .join(' ')}
+        </span>
+        {(optional || advancedOption) && (
+          <Text level="1" as="span" className="whitespace-nowrap">
+            {` ${splitTitle[splitTitle.length - 1]} `}
+            {optional && (
+              <Text level="2" as="span" className="ml-1 opacity-50">
+                (optional)
+              </Text>
+            )}
+            {advancedOption && (
+              <Text
+                level="2"
+                as="span"
+                className="bg-[#201F27] px-2 text-white/50 rounded ml-2"
+              >
+                Advanced Option
+              </Text>
+            )}
           </Text>
         )}
       </Text>
 
-      <Text level="2" className="opacity-50">
+      <Text level="2" className="pt-1 opacity-50">
         {description}
       </Text>
       <div className="pt-2">{children}</div>
