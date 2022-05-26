@@ -44,7 +44,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       )
   }
 
-  //allRealms = allRealms.slice(251)
+  allRealms = allRealms.slice(5)
 
   console.log(`realms count: ${allRealms.length}`)
 
