@@ -7,17 +7,20 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: string
   success?: string
   Icon?: any
+  suffix?: any
   className?: string
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   (
-    { error = '', success = '', value, Icon, className = '', ...props },
+    { error = '', success = '', value, Icon, suffix, className = '', ...props },
     ref
   ) => {
     const hasContent = typeof value !== 'undefined' && value !== ''
     let classNames = `input-base form-control block w-full ${
       Icon ? 'pl-8' : 'pl-2'
+    } ${
+      suffix ? 'pr-8' : 'pr-2'
     } pt-[15px] pb-[21px] default-transition rounded-t rounded-b-none outline-none border-0 border-b bg-transparent`
 
     if (hasContent) {
@@ -63,6 +66,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         <div className="absolute top-[21px] left-2 max-w-[16px] text-white/30">
           {Icon ? Icon : ''}
         </div>
+
+        <div className="absolute top-[21px] right-2 max-w-[16px] text-white/30">
+          {suffix ? suffix : ''}
+        </div>
+
         <input type="text" className={classNames} ref={ref} {...props} />
         <div
           className={`${

@@ -122,8 +122,6 @@ export default function WizardSummary({
           totalSteps={currentStep}
           stepDescription="Summary"
           title="Here's what you created. Does everything look right?"
-          imgSrc="/1-Landing-v2/dao-type-medium-govtoken.png"
-          imgAlt="circles spirling"
         />
         <div className="pt-10">
           <div className="flex flex-col">
