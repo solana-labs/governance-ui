@@ -7,6 +7,7 @@ import FormHeader from '../components_2/FormHeader'
 import FormField from '../components_2/FormField'
 import FormFooter from '../components_2/FormFooter'
 import Input from '../components_2/Input'
+import Text from '../components_2/ProductText'
 
 import { updateUserInput } from '../utils/formValidation'
 
@@ -14,6 +15,8 @@ export const MemberQuorumThresholdSchema = {
   quorumThreshold: yup
     .number()
     .typeError('Required')
+    .positive('Must be greater than 0')
+    .transform((value) => (isNaN(value) ? undefined : value))
     .max(100, 'Quorum cannot require more than 100% of members')
     .min(1, 'Quorum must be at least 1% of member'),
 }
@@ -24,12 +27,14 @@ export interface MemberQuorumThreshold {
 
 export function ThresholdAdviceBox({ title, children }) {
   return (
-    <div className="bg-night-grey py-8 pr-2 pl-8 flex items-start space-x-8">
-      <div className="w-24 h-24 px-2 py-5 bg-black rounded-lg">
-        <img src="/1-Landing-v2/icon-quorum-gradient.png" />
+    <div className="flex flex-col items-start py-4 pl-4 pr-4 mt-4 rounded md:mt-10 md:space-x-4 md:pr-2 md:pl-8 md:py-8 md:flex-row bg-night-grey">
+      <div className="w-16 px-2 py-5 mx-auto bg-black rounded-lg md:w-fit md:mx-0">
+        <img src="/1-Landing-v2/icon-quorum-gradient.png" className="h-full" />
       </div>
-      <div className="flex flex-col">
-        <div className="pb-3 text-sm uppercase opacity-50">{title}</div>
+      <div className="flex flex-col w-full text-center md:text-left">
+        <Text level="3" className="pt-3 pb-3 uppercase opacity-50 md:pt-0">
+          {title}
+        </Text>
         {children}
       </div>
     </div>
@@ -80,10 +85,8 @@ export default function MemberQuorumThresholdForm({
       <FormHeader
         currentStep={currentStep}
         totalSteps={totalSteps}
-        stepDescription="Approval qurorum"
-        title="Last, let's determine the approval quorum for your shared wallet."
-        imgSrc="/1-Landing-v2/dao-type-medium-govtoken.png"
-        imgAlt="circles spirling"
+        stepDescription="Council qurorum"
+        title="Last, let's determine the quorum required for your council."
       />
       <div className="pt-10 space-y-10 md:space-y-12">
         <Controller

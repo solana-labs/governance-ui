@@ -10,7 +10,8 @@ import FormHeader from '../components_2/FormHeader'
 import FormField from '../components_2/FormField'
 import FormFooter from '../components_2/FormFooter'
 import Input from '../components_2/Input'
-import Button from '../components_2/Button'
+import Button from '../components_2/ProductButtons'
+import Text from '../components_2/ProductText'
 
 import { updateUserInput, validateSolAddress } from '../utils/formValidation'
 
@@ -32,10 +33,26 @@ function InviteAddress({
             {currentUser ? 'Me' : index}
           </div>
         </div>
-        <div className="w-full pr-4 ml-4 text-2xl truncate">{address}</div>
+        <div className="w-full pr-4 ml-4 truncate input-base">{address}</div>
       </div>
-      <div className="cursor-pointer hover:opacity-80" onClick={onRemoveClick}>
-        <img src="/1-Landing-v2/icon-x.svg" alt="icon" className="w-5" />
+      <div
+        className="p-3 hover:cursor-pointer text-white/50 hover:text-white active:text-white/70 focus:text-white focus:border focus:border-white disabled:text-white/10"
+        onClick={onRemoveClick}
+      >
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 14 14"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M13 1L1 13M13 13L1 1"
+            stroke="currentColor"
+            strokeOpacity="1"
+            strokeWidth="2"
+          />
+        </svg>
       </div>
     </div>
   )
@@ -198,8 +215,6 @@ export default function InviteMembersForm({
         totalSteps={totalSteps}
         stepDescription="Invite members"
         title="Next, invite members with their Solana Wallet Address."
-        imgSrc="/1-Landing-v2/dao-type-medium-govtoken.png"
-        imgAlt="circles spirling"
       />
       <div className="pt-10 space-y-10 md:space-y-12">
         <FormField
@@ -209,18 +224,12 @@ export default function InviteMembersForm({
           {pasteBuffer.length > 0 && (
             <div className="py-5 space-y-5">
               {pasteBuffer.map((address, index) => (
-                <div
-                  key={index}
-                  className="flex items-baseline justify-between"
-                >
-                  <div className="text-2xl">{address}</div>
-                  <div
-                    className="cursor-pointer"
-                    onClick={() => removeAddressFromPasteBuffer(address)}
-                  >
-                    <img src="/1-Landing-v2/icon-x.svg" alt="icon" />
-                  </div>
-                </div>
+                <InviteAddress
+                  key={address}
+                  address={address}
+                  index={index + 1}
+                  onRemoveClick={() => removeAddressFromPasteBuffer(address)}
+                />
               ))}
             </div>
           )}
@@ -235,29 +244,24 @@ export default function InviteMembersForm({
             onKeyDown={handleKeyDown}
             defaultValue={userAddress}
           />
-          <div className="pt-8">
-            <Button
-              type="button"
-              inverse
-              onClick={() => addAddressesToInviteList()}
-            >
-              <div className="px-12">Add</div>
+          <div className="text-right">
+            <Button type="button" onClick={() => addAddressesToInviteList()}>
+              + Invite
             </Button>
           </div>
         </FormField>
       </div>
 
-      <div className="flex flex-col mt-16">
-        <h3 className="text-xl font-light">
+      <div className="flex flex-col mt-10">
+        <Text level="1">
           {inviteList.length}{' '}
           {inviteList.length === 0 || inviteList.length > 1
             ? 'Addresses'
             : 'Address'}
-        </h3>
-        <div className="text-sm opacity-60">
-          Once the process is complete, users must connect their wallet to
-          Realms to become DAO members
-        </div>
+        </Text>
+        <Text level="2" className="text-white/50">
+          Users must connect their wallet to Realms to become DAO members
+        </Text>
         {isUserDAOMember && (
           <div className="flex flex-col mt-8">
             <InviteAddress
@@ -283,9 +287,11 @@ export default function InviteMembersForm({
               )
             })
         ) : (
-          <div className="bg-night-grey text-lg mt-3 rounded flex flex-col justify-center items-center text-center px-20 py-10">
-            <div className="text-5xl">📭</div>
-            <div>You have not added any addresses yet...</div>
+          <div className="flex flex-col px-8 py-8 mt-4 rounded bg-night-grey">
+            <div className="text-5xl text-center">📭</div>
+            <Text className="text-center">
+              You have not added any addresses yet...
+            </Text>
           </div>
         )}
       </div>

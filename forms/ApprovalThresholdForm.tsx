@@ -7,6 +7,7 @@ import FormHeader from '../components_2/FormHeader'
 import FormField from '../components_2/FormField'
 import FormFooter from '../components_2/FormFooter'
 import Input from '../components_2/Input'
+import Text from '../components_2/ProductText'
 import { ThresholdAdviceBox } from './MemberQuorumThresholdForm'
 
 import { updateUserInput } from '../utils/formValidation'
@@ -61,9 +62,7 @@ export default function ApprovalThresholdForm({
         currentStep={currentStep}
         totalSteps={totalSteps}
         stepDescription="Approval threshold"
-        title="Next, let's determine the approval quorum for community proposals."
-        imgSrc="/1-Landing-v2/dao-type-medium-govtoken.png"
-        imgAlt="circles spirling"
+        title="Next, let's determine the approval threshold for community proposals."
       />
       <div className="pt-10 space-y-10 md:space-y-12">
         <Controller
@@ -72,7 +71,7 @@ export default function ApprovalThresholdForm({
           defaultValue={60}
           render={({ field }) => (
             <FormField
-              title="Adjust how much of the total governance token supply needed to pass a proposal"
+              title="Adjust how much of the total token supply is needed to pass a proposal"
               description=""
             >
               <div className="flex items-center justify-between">
@@ -96,10 +95,12 @@ export default function ApprovalThresholdForm({
                     className="w-full with-gradient focus:outline-none focus:ring-0 focus:shadow-none"
                     {...field}
                     style={{
-                      backgroundSize: `${approvalPercent}% 100%`,
+                      backgroundSize: `${approvalPercent || 0}% 100%`,
                     }}
                   />
-                  <div className="opacity-60">100%</div>
+                  <Text level="2" className="opacity-60">
+                    100%
+                  </Text>
                 </div>
               </div>
             </FormField>
@@ -107,10 +108,10 @@ export default function ApprovalThresholdForm({
         />
       </div>
       <ThresholdAdviceBox title="Approval threshold">
-        <div className="text-lg">
+        <Text level="1">
           Typically, newer Governance Token DAOs start their community approval
           quorums around 60% of total token supply.
-        </div>
+        </Text>
       </ThresholdAdviceBox>
 
       <FormFooter

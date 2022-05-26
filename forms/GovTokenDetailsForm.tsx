@@ -4,8 +4,9 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { TokenListProvider, TokenInfo } from '@solana/spl-token-registry'
 import * as yup from 'yup'
 
+import { preventNegativeNumberInput } from '@utils/helpers'
+
 import Header from 'components_2/ProductHeader'
-import Text from 'components_2/ProductText'
 import FormHeader from '../components_2/FormHeader'
 import FormField from '../components_2/FormField'
 import FormFooter from '../components_2/FormFooter'
@@ -157,15 +158,6 @@ export default function GovTokenDetailsForm({
     }
 
     onSubmit({ step: currentStep, data })
-  }
-
-  function preventNegativeNumberInput(ev) {
-    const value = ev.target.value
-    if (!isNaN(value) && value < 0) {
-      ev.target.value = 0
-    } else if (isNaN(value)) {
-      ev.target.value = value.slice(0, value.length - 1)
-    }
   }
 
   return (
