@@ -148,11 +148,15 @@ export default function FormField({
   optional = false,
   advancedOption = false,
   disabled = false,
-  error = '',
+  className = '',
   children,
 }) {
   return (
-    <div className={disabled ? 'opacity-50 cursor-not-allowed' : ''}>
+    <div
+      className={`${
+        disabled ? 'opacity-50 cursor-not-allowed' : ''
+      } pt-0 md:pt-8 ${className}`}
+    >
       <Text
         level="1"
         className={`w-[calc(100%-${
@@ -181,13 +185,6 @@ export default function FormField({
         {description}
       </Text>
       <div className="pt-2">{children}</div>
-      <div
-        className={`${
-          error ? 'visibile' : 'invisible'
-        } pt-2 text-base md:text-lg text-red min-h-[2rem]`}
-      >
-        {error}
-      </div>
     </div>
   )
 }

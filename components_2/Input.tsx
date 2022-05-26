@@ -43,8 +43,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       `
 
     if (error) {
-      className += ` border-b-[#cb676f]/50 focus:border-b-red active:border-b-red`
+      className += ` border-b-error-red/50 focus:border-b-error-red active:border-b-error-red`
     } else if (success) {
+      className += ` border-b-confirm-green/50 focus:border-b-confirm-green active:border-b-confirm-green`
     }
 
     return (
@@ -52,24 +53,47 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         <input type="text" className={className} ref={ref} {...props} />
         <div
           className={`${
-            error ? 'visibile' : 'invisible'
-          } pt-2 text-base md:text-lg text-red flex items-center space-x-2`}
+            error || success ? 'visibile' : 'invisible'
+          } pt-2 flex items-start space-x-2 min-h-[2.5rem] ${
+            error ? 'text-error-red' : success ? 'text-confirm-green' : ''
+          }`}
         >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M12.5852 13.2894C11.3569 14.355 9.75379 15 8 15C4.13401 15 1 11.866 1 8C1 6.24621 1.64496 4.64307 2.71063 3.4148L12.5852 13.2894ZM13.2921 12.5821L3.41794 2.7079C4.6458 1.64386 6.24771 1 8 1C11.866 1 15 4.13401 15 8C15 9.75229 14.3561 11.3542 13.2921 12.5821ZM16 8C16 12.4183 12.4183 16 8 16C3.58172 16 0 12.4183 0 8C0 3.58172 3.58172 0 8 0C12.4183 0 16 3.58172 16 8Z"
-              fill="currentColor"
-            />
-          </svg>
-          <Text level="2">{error}</Text>
+          <div className="pt-[1px]">
+            {error ? (
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M12.5852 13.2894C11.3569 14.355 9.75379 15 8 15C4.13401 15 1 11.866 1 8C1 6.24621 1.64496 4.64307 2.71063 3.4148L12.5852 13.2894ZM13.2921 12.5821L3.41794 2.7079C4.6458 1.64386 6.24771 1 8 1C11.866 1 15 4.13401 15 8C15 9.75229 14.3561 11.3542 13.2921 12.5821ZM16 8C16 12.4183 12.4183 16 8 16C3.58172 16 0 12.4183 0 8C0 3.58172 3.58172 0 8 0C12.4183 0 16 3.58172 16 8Z"
+                  fill="currentColor"
+                />
+              </svg>
+            ) : success ? (
+              <svg
+                width="16"
+                height="13"
+                viewBox="0 0 16 13"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M15.4141 3.41436L5.99991 12.8286L0.585693 7.41437L3.41412 4.58594L5.99991 7.17172L12.5857 0.585938L15.4141 3.41436Z"
+                  fill="currentColor"
+                />
+              </svg>
+            ) : (
+              <></>
+            )}
+          </div>
+          <Text level="2">{error || success}</Text>
         </div>
       </div>
     )

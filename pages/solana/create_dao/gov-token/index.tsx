@@ -223,7 +223,7 @@ export default function GovTokenWizard() {
   return (
     <div className="relative pb-8 md:pb-20 landing-page">
       <Navbar showWalletButton />
-      <div className="absolute w-[100vw] h-[100vh]">
+      <div className="fixed top-0 w-[100vw] h-[100vh]">
         <Image
           alt="background image"
           src="/1-Landing-v2/creation-bg-desktop.png"

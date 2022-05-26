@@ -185,6 +185,8 @@ module.exports = {
         'bkg-11': 'var(--bkg-11)',
         'bkg-12': 'var(--bkg-12)',
         'bkg-13': 'var(--bkg-13)',
+        'error-red': '#ff7c7c',
+        'confirm-green': '#8effdd',
       },
       animation: {
         'connect-wallet-ping':

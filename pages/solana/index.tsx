@@ -26,7 +26,7 @@ export const Section = ({
       <div
         className={`w-full mx-auto lg:w-5/6  ${
           form
-            ? 'max-w-[770px]'
+            ? 'max-w-[770px] px-4 md:px-0'
             : 'max-w-[1440px] px-5 md:px-16 lg:px-0 xl:px-20'
         }`}
       >
