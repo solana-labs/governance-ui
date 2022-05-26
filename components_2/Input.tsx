@@ -6,21 +6,27 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   invalid?: string
   error?: string
   success?: string
+  Icon?: any
+  className?: string
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ error = '', success = '', value, ...props }, ref) => {
+  (
+    { error = '', success = '', value, Icon, className = '', ...props },
+    ref
+  ) => {
     const hasContent = typeof value !== 'undefined' && value !== ''
-    let className =
-      'input-base form-control block w-full pl-2 pt-[15px] pb-[21px] default-transition rounded-t rounded-b-none outline-none border-0 border-b bg-transparent'
+    let classNames = `input-base form-control block w-full ${
+      Icon ? 'pl-8' : 'pl-2'
+    } pt-[15px] pb-[21px] default-transition rounded-t rounded-b-none outline-none border-0 border-b bg-transparent`
 
     if (hasContent) {
-      className += ` border-white text-white`
+      classNames += ` border-white text-white`
     } else {
-      className += `  border-white/20`
+      classNames += `  border-white/20`
     }
 
-    className += `
+    classNames += `
 
       
       
@@ -39,19 +45,25 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       active:bg-[rgba(255,255,255,0.03)]
       active:border-b-[#00E4FF]
       
+      disabled:placeholder:text-white/30
+      disabled:active:border-b-white/20
       disabled:cursor-not-allowed 
       disabled:hover:bg-transparent
       `
 
     if (error) {
-      className += ` border-b-error-red/50 focus:border-b-error-red active:border-b-error-red`
+      classNames += ` border-b-error-red/50 focus:border-b-error-red active:border-b-error-red`
     } else if (success) {
-      className += ` border-b-confirm-green/50 focus:border-b-confirm-green active:border-b-confirm-green`
+      classNames += ` border-b-confirm-green/50 focus:border-b-confirm-green active:border-b-confirm-green`
     }
 
+    classNames += ` ${className}`
     return (
-      <div>
-        <input type="text" className={className} ref={ref} {...props} />
+      <div className="relative">
+        <div className="absolute top-[21px] left-2 max-w-[16px] text-white/30">
+          {Icon ? Icon : ''}
+        </div>
+        <input type="text" className={classNames} ref={ref} {...props} />
         <div
           className={`${
             error || success ? 'visibile' : 'invisible'

@@ -11,6 +11,9 @@ import FormField from '../components_2/FormField'
 import FormFooter from '../components_2/FormFooter'
 import AdvancedOptionsDropdown from '../components_2/AdvancedOptionsDropdown'
 import Input, { RadioGroup } from '../components_2/Input'
+import TokenInfoTable, {
+  GenericTokenIcon,
+} from '../components_2/TokenInfoTable'
 
 import { updateUserInput, validateSolAddress } from '../utils/formValidation'
 
@@ -225,59 +228,10 @@ export default function GovTokenDetailsForm({
                 </FormField>
               )}
             />
-            <div
-              className={`grid grid-cols-2 gap-2 pt-2 pb-8 ${
-                tokenInfo === PENDING_COIN ? 'animate-pulse' : ''
-              }`}
-            >
-              <div className="bg-[#201F27] py-5 px-6 flex flex-col rounded-md space-y-5">
-                <Text className="text-white/30">Token Name</Text>
-                <div className="flex items-center space-x-2">
-                  <div className="w-10">
-                    <img
-                      src={
-                        tokenInfo?.logoURI ||
-                        '/1-Landing-v2/icon-token-generic-gradient.png'
-                      }
-                      alt="token"
-                      className="h-full"
-                    />
-                  </div>
-                  {tokenInfo?.name ? (
-                    <Header as="h4">{tokenInfo.name}</Header>
-                  ) : (
-                    <Text className="text-white/30">
-                      <div
-                        className="text-[22px] font-bold"
-                        dangerouslySetInnerHTML={{
-                          __html: `&#8212;`,
-                        }}
-                      ></div>
-                    </Text>
-                  )}
-                </div>
-              </div>
-              <div className="bg-[#201F27] py-5 px-6 flex flex-col rounded-md space-y-5">
-                <Text className="text-white/30">Token Symbol</Text>
-                <div className="flex items-center h-10">
-                  <Text className="flex space-x-2 ">
-                    <div className="text-[28px] font-normal text-white/30">
-                      #
-                    </div>
-                    {tokenInfo?.symbol ? (
-                      <Header as="h4">{tokenInfo.symbol}</Header>
-                    ) : (
-                      <div
-                        className="text-[22px] font-bold text-white/30"
-                        dangerouslySetInnerHTML={{
-                          __html: `&#8212;`,
-                        }}
-                      ></div>
-                    )}
-                  </Text>
-                </div>
-              </div>
-            </div>
+            <TokenInfoTable
+              tokenInfo={tokenInfo}
+              loading={tokenInfo === PENDING_COIN}
+            />
           </>
         )}
         {useExistingToken === false && (
@@ -343,6 +297,7 @@ export default function GovTokenDetailsForm({
                     type="tel"
                     placeholder="1,000,000"
                     data-testid="dao-name-input"
+                    Icon={<GenericTokenIcon />}
                     error={errors.minimumNumberOfTokensToEditDao?.message || ''}
                     {...field}
                     disabled={useExistingToken && tokenAddress === ''}
@@ -399,6 +354,7 @@ export default function GovTokenDetailsForm({
                     <Input
                       type="tel"
                       placeholder={`1`}
+                      Icon={<GenericTokenIcon />}
                       data-testid="programId-input"
                       error={errors.mintSupplyFactor?.message || ''}
                       {...field}
