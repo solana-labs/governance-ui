@@ -70,9 +70,10 @@ import RealmConfig from './components/instructions/RealmConfig'
 import MakeAddMarketMetadataParams from './components/instructions/Foresight/MakeAddMarketMetadataParams'
 import CloseTokenAccount from './components/instructions/CloseTokenAccount'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
+import CastleWithdraw from './components/instructions/Castle/CastleWithdraw'
+import ChangeDonation from './components/instructions/Change/ChangeDonation'
 import VotingMintConfig from './components/instructions/Vsr/VotingMintConfig'
 import CreateVsrRegistrar from './components/instructions/Vsr/CreateRegistrar'
-import CastleWithdraw from './components/instructions/Castle/CastleWithdraw'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -298,6 +299,10 @@ const New = () => {
             index={idx}
             governance={governance}
           ></SplTokenTransfer>
+        )
+      case Instructions.ChangeMakeDonation:
+        return (
+          <ChangeDonation index={idx} governance={governance}></ChangeDonation>
         )
       case Instructions.ProgramUpgrade:
         return (
