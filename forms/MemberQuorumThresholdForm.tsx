@@ -10,15 +10,15 @@ import Input from '../components_2/Input'
 import Text from '../components_2/ProductText'
 
 import { updateUserInput } from '../utils/formValidation'
+import { preventNegativeNumberInput } from '@utils/helpers'
 
 export const MemberQuorumThresholdSchema = {
   quorumThreshold: yup
     .number()
-    .typeError('Required')
-    .positive('Must be greater than 0')
     .transform((value) => (isNaN(value) ? undefined : value))
     .max(100, 'Quorum cannot require more than 100% of members')
-    .min(1, 'Quorum must be at least 1% of member'),
+    .min(1, 'Quorum must be at least 1% of member')
+    .required('Required'),
 }
 
 export interface MemberQuorumThreshold {
@@ -98,31 +98,44 @@ export default function MemberQuorumThresholdForm({
               title="Adjust the percentage to determine votes needed to pass a proposal"
               description=""
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <div className="w-[4.5rem]">
+              <div className="flex flex-col-reverse items-baseline md:flex-row">
+                <div className="flex items-center space-x-2 shrink md:max-w-[5.1rem]">
+                  <div className="w-full">
                     <Input
-                      type="number"
+                      type="tel"
                       placeholder="50"
-                      data-testid="dao-quorum-input"
+                      suffix={
+                        <Text level="1" className="">
+                          %
+                        </Text>
+                      }
+                      data-testid="dao-approval-threshold-input"
                       error={errors.quorumThreshold?.message || ''}
+                      className="text-center"
                       {...field}
+                      onChange={(ev) => {
+                        preventNegativeNumberInput(ev)
+                        field.onChange(ev)
+                      }}
                     />
                   </div>
-                  <div className="text-3xl opacity-30">%</div>
                 </div>
-                <div className="relative flex items-center w-full ml-4 space-x-4">
-                  <div className="opacity-60">1%</div>
+                <div className="relative flex items-center w-full mt-5 mb-5 space-x-4 md:ml-4">
+                  <Text level="2" className="text-white/50">
+                    1%
+                  </Text>
                   <input
                     type="range"
                     min={1}
                     className="w-full with-gradient focus:outline-none focus:ring-0 focus:shadow-none"
                     {...field}
                     style={{
-                      backgroundSize: `${quorumPercent}% 100%`,
+                      backgroundSize: `${quorumPercent || 50}% 100%`,
                     }}
                   />
-                  <div className="opacity-60">100%</div>
+                  <Text level="2" className="text-white/50">
+                    100%
+                  </Text>
                 </div>
               </div>
             </FormField>
@@ -130,12 +143,12 @@ export default function MemberQuorumThresholdForm({
         />
       </div>
       <ThresholdAdviceBox title="Member threshold">
-        <div className="text-lg">
+        <Text level="1">
           With {numberOfDaoMembers} members added to your DAO,
-        </div>
-        <div className="pt-2 text-lg">
+        </Text>
+        <Text level="1" className="pt-2">
           {quorumSize} members would need to approve a proposal for it to pass{' '}
-        </div>
+        </Text>
       </ThresholdAdviceBox>
 
       <FormFooter

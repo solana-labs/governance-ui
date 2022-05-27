@@ -3,6 +3,8 @@ import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 
+import { preventNegativeNumberInput } from '@utils/helpers'
+
 import FormHeader from '../components_2/FormHeader'
 import FormField from '../components_2/FormField'
 import FormFooter from '../components_2/FormFooter'
@@ -15,7 +17,7 @@ import { updateUserInput } from '../utils/formValidation'
 export const ApprovalThresholdSchema = {
   approvalThreshold: yup
     .number()
-    .typeError('Required')
+    .transform((value) => (isNaN(value) ? 0 : value))
     .max(100, 'Approval cannot require more than 100% of votes')
     .min(1, 'Approval must be at least 1% of votes')
     .required('Required'),
@@ -74,21 +76,31 @@ export default function ApprovalThresholdForm({
               title="Adjust how much of the total token supply is needed to pass a proposal"
               description=""
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <div className="w-[4.5rem]">
-                    <Input
-                      type="number"
-                      placeholder="60"
-                      data-testid="dao-quorum-input"
-                      error={errors.approvalThreshold?.message || ''}
-                      {...field}
-                    />
-                  </div>
-                  <div className="text-3xl opacity-30">%</div>
-                </div>
-                <div className="relative flex items-center w-full ml-4 space-x-4">
-                  <div className="opacity-60">1%</div>
+              <div className="flex flex-col-reverse md:flex-row md:items-baseline md:space-x-16">
+                {/* <div className="mr-10 w-full2"> */}
+                <Input
+                  type="tel"
+                  placeholder="60"
+                  suffix={
+                    <Text level="1" className="">
+                      %
+                    </Text>
+                  }
+                  data-testid="dao-approval-threshold-input"
+                  error={errors.approvalThreshold?.message || ''}
+                  className="text-center"
+                  // style={{ width: '60px' }}
+                  {...field}
+                  onChange={(ev) => {
+                    preventNegativeNumberInput(ev)
+                    field.onChange(ev)
+                  }}
+                />
+                {/* </div> my-6 */}
+                <div className="relative flex items-center w-full my-6 space-x-4 md:my-0">
+                  <Text level="2" className="opacity-60">
+                    1%
+                  </Text>
                   <input
                     type="range"
                     min={1}

@@ -153,12 +153,11 @@ export default function FormField({
 }) {
   const splitTitle = title.split(' ')
   return (
-    <div
-      className={`${
-        disabled ? 'opacity-50 cursor-not-allowed' : ''
-      } pt-0 md:pt-8 ${className}`}
-    >
-      <Text level="1">
+    <div className={`pt-0 md:pt-8 ${className}`}>
+      <Text
+        level="1"
+        className={disabled ? 'opacity-30 cursor-not-allowed' : ''}
+      >
         <span>
           {splitTitle
             .slice(0, splitTitle.length - (optional || advancedOption ? 1 : 0))
@@ -185,7 +184,12 @@ export default function FormField({
         )}
       </Text>
 
-      <Text level="2" className="pt-1 opacity-50">
+      <Text
+        level="2"
+        className={`pt-1 ${
+          disabled ? 'opacity-30 cursor-not-allowed' : 'opacity-50'
+        }`}
+      >
         {description}
       </Text>
       <div className="pt-2">{children}</div>

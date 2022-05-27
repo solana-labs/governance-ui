@@ -52,6 +52,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       disabled:active:border-b-white/20
       disabled:cursor-not-allowed 
       disabled:hover:bg-transparent
+      disabled:opacity-30
       `
 
     if (error) {
@@ -63,53 +64,71 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     classNames += ` ${className}`
     return (
       <div className="relative">
-        <div className="absolute top-[21px] left-2 max-w-[16px] text-white/30">
+        <div
+          className={`absolute top-[21px] left-2 max-w-[16px]  ${
+            props.disabled ? 'text-white/10' : 'text-white/30'
+          }`}
+        >
           {Icon ? Icon : ''}
         </div>
 
-        <div className="absolute top-[21px] right-2 max-w-[16px] text-white/30">
+        <div
+          className={`absolute top-[21px] right-2 max-w-[16px]  ${
+            props.disabled ? 'text-white/10' : 'text-white/30'
+          }`}
+        >
           {suffix ? suffix : ''}
         </div>
 
-        <input type="text" className={classNames} ref={ref} {...props} />
+        <input
+          type="text"
+          className={classNames}
+          ref={ref}
+          value={value}
+          {...props}
+        />
         <div
           className={`${
             error || success ? 'visibile' : 'invisible'
-          } pt-2 flex items-start space-x-1 min-h-[2.5rem] ${
+          } pt-2 flex items-start min-h-[2.5rem] ${
             error ? 'text-error-red' : success ? 'text-confirm-green' : ''
           }`}
         >
-          <div className="pt-[1px]">
-            {error ? (
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <circle cx="8" cy="8" r="5.5" stroke="currentColor" />
-                <path d="M4 4L12 12" stroke="currentColor" />
-              </svg>
-            ) : success ? (
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M14 4L6 13L2 8"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                />
-              </svg>
-            ) : (
-              <></>
-            )}
-          </div>
-          <Text level="2">{error || success}</Text>
+          <Text level="2">
+            <span className="mr-1 align-text-bottom">
+              {error ? (
+                <svg
+                  className="inline"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="8" cy="8" r="5.5" stroke="currentColor" />
+                  <path d="M4 4L12 12" stroke="currentColor" />
+                </svg>
+              ) : success ? (
+                <svg
+                  className="inline"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M14 4L6 13L2 8"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  />
+                </svg>
+              ) : (
+                <></>
+              )}
+            </span>
+            <span>{error || success}</span>
+          </Text>
         </div>
       </div>
     )
