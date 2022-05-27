@@ -733,6 +733,15 @@
     "website": "https://tokens.amun.com/token/SOLI",
     "twitter": "@Amun"
   },
+  {
+    "symbol": "SBYC",
+    "displayName": "SBYC DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "BycjQ24kBPhdzBbJanQJ1bydLGqZHf3oseGGLVcb2RWK",
+    "ogImage": "/realms/SBYCDAO/img/logo.png",
+    "website": "https://solboredyachtclub.com",
+    "twitter": "@SolBoredYacht"
+  },
     {
     "symbol": "$MasoorDAO",
     "displayName": "Hari's Realm",
