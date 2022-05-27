@@ -5,7 +5,7 @@ class Debounce {
     this.typingTimeout = null
     return this.debounce
   }
-  debounceFcn = (callback) => {
+  debounceFcn = (callback, timeoutDuration = 900) => {
     if (!callback) {
       console.log('missing argument callback')
     }
@@ -14,7 +14,7 @@ class Debounce {
     }
     this.typingTimeout = setTimeout(() => {
       callback()
-    }, 900)
+    }, timeoutDuration)
   }
 }
 export const debounce = new Debounce()
