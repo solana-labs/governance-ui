@@ -1,9 +1,9 @@
 module.exports = {
-  mode: 'jit',
   content: [
     './pages/**/*.{js,ts,jsx,tsx}',
     './components/**/*.{js,ts,jsx,tsx}',
     './components_2/**/*.{js,ts,jsx,tsx}',
+    './forms/**/*.{js,ts,jsx,tsx}',
     './Strategies/**/*.{js,ts,jsx,tsx}',
     './VoteStakeRegistry/**/*.{js,ts,jsx,tsx}',
   ],
@@ -221,15 +221,6 @@ module.exports = {
           },
         },
       },
-    },
-  },
-  variants: {
-    extend: {
-      cursor: ['hover', 'focus', 'disabled'],
-      opacity: ['disabled'],
-      backgroundColor: ['disabled', 'hover'],
-      textColor: ['disabled'],
-      borderWidth: ['last'],
     },
   },
   plugins: [],
