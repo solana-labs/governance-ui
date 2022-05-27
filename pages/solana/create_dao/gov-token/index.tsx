@@ -198,21 +198,10 @@ export default function GovTokenWizard() {
 
   function promptUserBeforeLeaving(ev) {
     ev.preventDefault()
-    ev.returnValue = true
-  }
-
-  useEffect(() => {
-    if (currentStep > 1 && currentStep < steps.length + 1) {
-      yup
-        .object(steps[currentStep - 2].schema)
-        .isValid(formData)
-        .then((valid) => {
-          if (!valid) {
-            return handlePreviousButton(currentStep, true)
-          }
-        })
+    if (formData && Object.keys(formData).length > 0) {
+      ev.returnValue = true
     }
-  }, [currentStep])
+  }
 
   useEffect(() => {
     window.addEventListener('beforeunload', promptUserBeforeLeaving)
