@@ -731,5 +731,14 @@
     "ogImage": "/realms/SOLI/soli_logo.png",
     "website": "https://tokens.amun.com/token/SOLI",
     "twitter": "@Amun"
+  },
+    {
+    "symbol": "$MasoorDAO",
+    "displayName": "Hari's Realm",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "4PYdZHs2hwZYibkvEnpVCJpU7bD4aFUkWtYxGFU25ZWu",
+    "website": "https://www.linkedin.com/in/harimasoor/",
+    "twitter": "@HariOnChain",
+    "ogImage": "/realms/MasoorDAO/MasoorDAO.PNG"
   }
 ]
