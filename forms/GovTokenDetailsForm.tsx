@@ -52,7 +52,7 @@ export const GovTokenDetailsSchema = {
       otherwise: yup.string().optional(),
     })
     .test('is-valid-address', 'Please enter a valid Solana address', (value) =>
-      Promise.resolve(value ? validateSolAddress(value) : true)
+      value ? validateSolAddress(value) : true
     ),
   transferMintAuthorityToDao: yup
     .boolean()

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import * as yup from 'yup'
 import { PublicKey } from '@solana/web3.js'
 import { getGovernanceProgramVersion } from '@solana/spl-governance'
 
@@ -13,6 +12,8 @@ import useLocalStorageState from '@hooks/useLocalStorageState'
 import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
 
 import { notify } from '@utils/notifications'
+import { isWizardValid } from '@utils/formValidation'
+
 import { Section } from 'pages/solana'
 import Image from 'next/image'
 import Navbar from 'components_2/NavBar'
@@ -129,6 +130,7 @@ export default function NFTWizard() {
       }
     }
   }
+
   async function handleSubmit() {
     console.log('submit clicked')
     try {
@@ -189,24 +191,17 @@ export default function NFTWizard() {
   }
 
   useEffect(() => {
-    if (currentStep > 1 && currentStep < steps.length + 1) {
-      yup
-        .object(steps[currentStep - 2].schema)
-        .isValid(formData)
-        .then((valid) => {
-          if (!valid) {
-            return handlePreviousButton(currentStep, true)
-          }
-        })
-    }
-  }, [currentStep])
-
-  useEffect(() => {
     window.addEventListener('beforeunload', promptUserBeforeLeaving)
     return () => {
       window.removeEventListener('beforeunload', promptUserBeforeLeaving)
     }
   }, [])
+
+  useEffect(() => {
+    if (!isWizardValid({ currentStep, steps, formData })) {
+      handlePreviousButton(currentStep, true)
+    }
+  }, [currentStep])
 
   return (
     <div className="relative pb-8 md:pb-20 landing-page">

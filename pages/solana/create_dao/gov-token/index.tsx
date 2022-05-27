@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import * as yup from 'yup'
 
 import { getGovernanceProgramVersion } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
@@ -14,6 +13,8 @@ import {
 } from '@components/instructions/tools'
 
 import { notify } from '@utils/notifications'
+import { isWizardValid } from '@utils/formValidation'
+
 import { Section } from 'pages/solana'
 import Image from 'next/image'
 import Navbar from 'components_2/NavBar'
@@ -219,6 +220,12 @@ export default function GovTokenWizard() {
       window.removeEventListener('beforeunload', promptUserBeforeLeaving)
     }
   }, [])
+
+  useEffect(() => {
+    if (!isWizardValid({ currentStep, steps, formData })) {
+      handlePreviousButton(currentStep, true)
+    }
+  }, [currentStep])
 
   return (
     <div className="relative pb-8 md:pb-20 landing-page">

@@ -1,4 +1,5 @@
 import { PublicKey } from '@solana/web3.js'
+import * as yup from 'yup'
 import { SanitizedObject } from './helpers'
 
 export interface formValidation {
@@ -64,4 +65,26 @@ export function updateUserInput(formData, schema, setValue) {
       })
     }
   })
+}
+
+export function isWizardValid({ currentStep, steps, formData }) {
+  if (currentStep > 1 && currentStep <= steps.length + 1) {
+    const schema = steps
+      .slice(0, currentStep - 1)
+      .map(({ schema }) => schema)
+      .reduce((prev, curr) => {
+        return {
+          ...prev,
+          ...curr,
+        }
+      }, {})
+    try {
+      yup.object(schema).validateSync(formData, { context: formData })
+      return true
+    } catch (error) {
+      console.log('error', error.message, error.value)
+      return false
+    }
+  }
+  return true
 }
