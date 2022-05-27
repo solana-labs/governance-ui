@@ -60,8 +60,6 @@ export default function AddCouncilForm({
         totalSteps={totalSteps}
         stepDescription="Add a council"
         title="Add a council for your Governance Token DAO."
-        imgSrc="/1-Landing-v2/dao-type-medium-govtoken.png"
-        imgAlt="circles spirling"
       />
       <div className="pt-10 space-y-10 md:space-y-12">
         <div className="py-24 text-[24px]">

@@ -146,7 +146,7 @@ export default function MemberQuorumThresholdForm({
         <Text level="1">
           With {numberOfDaoMembers} members added to your DAO,
         </Text>
-        <Text level="1" className="pt-2">
+        <Text level="1" className="md:pt-2">
           {quorumSize} members would need to approve a proposal for it to pass{' '}
         </Text>
       </ThresholdAdviceBox>

@@ -229,8 +229,6 @@ export default function AddNFTCollectionForm({
         totalSteps={totalSteps}
         stepDescription="Add a collection"
         title="Which NFT collection would you like to add to your DAO?"
-        imgSrc="/1-Landing-v2/dao-type-medium-govtoken.png"
-        imgAlt="circles spirling"
       />
       <div className="pt-10 space-y-10 md:space-y-12">
         <Controller
@@ -269,7 +267,7 @@ export default function AddNFTCollectionForm({
         />
         <input className="hidden" {...register('collectionKey')} disabled />
         <div className="flex space-x-2">
-          <div className="flex bg-night-grey flex-col px-4 py-5 rounded-md w-full grow">
+          <div className="flex flex-col w-full px-4 py-5 rounded-md bg-night-grey grow">
             <Text level="2">
               {selectedNFTCollection
                 ? 'Collection preview'
@@ -289,13 +287,13 @@ export default function AddNFTCollectionForm({
                       requestPending ? 'animate-pulse' : ''
                     }`}
                   >
-                    <div className="w-fit bg-bkg-grey text-transparent truncate rounded">
+                    <div className="text-transparent truncate rounded w-fit bg-bkg-grey">
                       Collection name...
                     </div>
-                    <div className="w-fit bg-bkg-grey text-transparent truncate rounded">
+                    <div className="text-transparent truncate rounded w-fit bg-bkg-grey">
                       Loading-long-url-to-some-obscure-wallet-address
                     </div>
-                    <div className="w-fit bg-bkg-grey text-transparent truncate rounded">
+                    <div className="text-transparent truncate rounded w-fit bg-bkg-grey">
                       xx 1234...6789
                     </div>
                   </div>
@@ -337,7 +335,7 @@ export default function AddNFTCollectionForm({
               )}
             </div>
           </div>
-          <div className="flex bg-night-grey flex-col items-center px-8 py-5 text-center rounded-md">
+          <div className="flex flex-col items-center px-8 py-5 text-center rounded-md bg-night-grey">
             <Controller
               name="numberOfNFTs"
               control={control}
