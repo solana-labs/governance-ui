@@ -42,7 +42,7 @@ import MemberQuorumThresholdForm, {
   MemberQuorumThresholdSchema,
   MemberQuorumThreshold,
 } from '../../../../forms/MemberQuorumThresholdForm'
-import FormSummary from 'components_2/FormSummary'
+import CreateDAOWizard from 'components_2/CreateDAOWizard'
 
 export const SESSION_STORAGE_FORM_KEY = 'govtoken-form-data'
 
@@ -136,7 +136,7 @@ export default function GovTokenWizard() {
     }
   }
 
-  async function handleSubmitClick() {
+  async function handleSubmit() {
     console.log('submit clicked')
     try {
       console.log('connection', connected, wallet)
@@ -234,33 +234,16 @@ export default function GovTokenWizard() {
       </div>
       <div className="pt-24 md:pt-28">
         <Section form>
-          {steps.map(({ Form }, index) => {
-            return (
-              <div
-                key={index}
-                className={index + 1 == currentStep ? '' : 'hidden'}
-              >
-                <Form
-                  formData={formData}
-                  currentStep={index + 1}
-                  totalSteps={steps.length + 1}
-                  onPrevClick={handlePreviousButton}
-                  onSubmit={handleNextButtonClick}
-                />
-              </div>
-            )
-          })}
-
-          {currentStep == steps.length + 1 && (
-            <FormSummary
-              type="gov-token"
-              currentStep={steps.length + 1}
-              formData={formData}
-              onPrevClick={handlePreviousButton}
-              onSubmit={handleSubmitClick}
-              submissionPending={requestPending}
-            />
-          )}
+          <CreateDAOWizard
+            type="gov-token"
+            steps={steps}
+            currentStep={currentStep}
+            formData={formData}
+            handlePreviousButton={handlePreviousButton}
+            handleNextButtonClick={handleNextButtonClick}
+            handleSubmit={handleSubmit}
+            submissionPending={requestPending}
+          />
         </Section>
       </div>
     </div>

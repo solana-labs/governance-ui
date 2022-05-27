@@ -7,6 +7,7 @@ import FormHeader from '../components_2/FormHeader'
 import FormField from '../components_2/FormField'
 import FormFooter from '../components_2/FormFooter'
 import { RadioGroup } from '../components_2/Input'
+import Text from '../components_2/ProductText'
 
 import { updateUserInput } from '../utils/formValidation'
 
@@ -61,12 +62,12 @@ export default function AddCouncilForm({
         stepDescription="Add a council"
         title="Add a council for your Governance Token DAO."
       />
-      <div className="pt-10 space-y-10 md:space-y-12">
-        <div className="py-24 text-[24px]">
+      <div className="space-y-10 md:space-y-12">
+        <Text level="1" className="mt-10 mb-16 md:my-18 md:w-[550px]">
           Council members vote on decisions affecting the DAO and its
           treasuries. Since your DAO already has community voting, you may
           choose not to add council members.
-        </div>
+        </Text>
         <FormField title="Do you want to add a council?" description="">
           <Controller
             name="addCouncil"

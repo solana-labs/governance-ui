@@ -64,10 +64,14 @@ export const InviteMembersSchema = {
     .of(yup.string())
     .when('$addCouncil', (addCouncil, schema) => {
       if (typeof addCouncil === 'undefined') {
-        return schema.min(1, 'A DAO needs at least one member')
+        return schema
+          .min(1, 'A DAO needs at least one member')
+          .required('Required')
       } else {
         return addCouncil
-          ? schema.min(1, 'A DAO needs at least one member')
+          ? schema
+              .min(1, 'A DAO needs at least one member')
+              .required('Required')
           : schema
       }
     }),
@@ -78,6 +82,7 @@ export interface InviteMembers {
 }
 
 export default function InviteMembersForm({
+  visible,
   formData,
   onSubmit,
   onPrevClick,
@@ -111,7 +116,7 @@ export default function InviteMembersForm({
           return validateSolAddress(wallet)
         }) || []
       )
-    } else {
+    } else if (visible) {
       // go to next step:
       serializeValues({ memberAddresses: null })
     }

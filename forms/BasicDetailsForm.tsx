@@ -14,13 +14,17 @@ import {
   // DEFAULT_TEST_GOVERNANCE_PROGRAM_ID,
 } from '@components/instructions/tools'
 
-import { updateUserInput } from '../utils/formValidation'
+import { updateUserInput, validateSolAddress } from '../utils/formValidation'
 
 export const BasicDetailsSchema = {
   avatar: yup.string(),
   name: yup.string().typeError('Required').required('Required'),
   description: yup.string(),
-  programId: yup.string(),
+  programId: yup
+    .string()
+    .test('is-valid-address', 'Please enter a valid Solana address', (value) =>
+      Promise.resolve(value ? validateSolAddress(value) : true)
+    ),
 }
 
 export interface BasicDetails {

@@ -53,7 +53,7 @@ export default function FormHeader({
         stepDescription={stepDescription}
       />
       <div className="flex items-center w-full pt-10 md:pt-20">
-        <Header as="h2" className="md:max-w-[633px]">
+        <Header as="h2" className="md:max-w-[550px]">
           {title}
         </Header>
       </div>

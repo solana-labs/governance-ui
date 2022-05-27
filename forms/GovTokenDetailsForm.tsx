@@ -225,7 +225,11 @@ export default function GovTokenDetailsForm({
         )}
         {useExistingToken === false && (
           <>
-            <Header as="h4" className="pt-8 pb-6 text-center md:pt-16">
+            <Header
+              as="h4"
+              className="flex flex-col px-2 py-6 text-center rounded bg-night-grey"
+            >
+              <div>🎉</div>
               Good news: we can mint you a brand new one!
             </Header>
             <Controller

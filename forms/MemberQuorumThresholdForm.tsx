@@ -16,8 +16,15 @@ export const MemberQuorumThresholdSchema = {
     .number()
     .transform((value) => (isNaN(value) ? undefined : value))
     .max(100, 'Quorum cannot require more than 100% of members')
-    .min(1, 'Quorum must be at least 1% of member')
-    .required('Required'),
+    .when('$memberAddresses', (memberAddresses, schema) => {
+      if (memberAddresses) {
+        return schema
+          .min(1, 'Quorum must be at least 1% of member')
+          .required('Required')
+      } else {
+        return schema.min(1, 'Quorum must be at least 1% of member')
+      }
+    }),
 }
 
 export interface MemberQuorumThreshold {
@@ -41,6 +48,7 @@ export function ThresholdAdviceBox({ title, children }) {
 }
 
 export default function MemberQuorumThresholdForm({
+  visible,
   formData,
   currentStep,
   totalSteps,
@@ -57,16 +65,18 @@ export default function MemberQuorumThresholdForm({
   } = useForm({
     mode: 'all',
     resolver: yupResolver(schema),
+    context: formData,
   })
   const [numberOfDaoMembers, setNumberOfDaoMembers] = useState(0)
-  const quorumPercent = watch('quorumThreshold', 50)
-  const quorumSize = Math.ceil((quorumPercent * numberOfDaoMembers) / 100)
+  const quorumPercent = watch('quorumThreshold')
+  const quorumSize =
+    quorumPercent && Math.ceil((quorumPercent * numberOfDaoMembers) / 100)
 
   useEffect(() => {
     if (typeof formData.addCouncil === 'undefined' || formData?.addCouncil) {
       updateUserInput(formData, MemberQuorumThresholdSchema, setValue)
       setNumberOfDaoMembers(formData.memberAddresses?.length)
-    } else {
+    } else if (visible) {
       // go to next step:
       serializeValues({ quorumThreshold: null })
     }
@@ -100,7 +110,7 @@ export default function MemberQuorumThresholdForm({
               <InputRangeSlider
                 field={field}
                 error={error?.message}
-                placeholder="60"
+                placeholder="50"
               />
             </FormField>
           )}
