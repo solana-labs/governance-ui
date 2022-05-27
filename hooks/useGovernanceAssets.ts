@@ -201,6 +201,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseAuthorityInstruction,
     },
     {
+      id: Instructions.ChangeMakeDonation,
+      name: 'Change: Donation to Charity',
+      isVisible: canUseAnyInstruction,
+    },
+    {
       id: Instructions.DepositIntoCastle,
       name: 'Castle: Deposit into Vault',
       isVisible: canUseAnyInstruction,

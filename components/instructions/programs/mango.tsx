@@ -106,6 +106,42 @@ export const MANGO_INSTRUCTIONS = {
         }
       },
     },
+    3: {
+      name: 'Mango v3: Withdraw',
+      accounts: [
+        { name: 'Mango Group' },
+        { name: 'Mango account' },
+        { name: 'Owner' },
+        { name: 'Mango cache' },
+        { name: 'Root bank' },
+        { name: 'Node bank' },
+        { name: 'Token account' },
+        { name: 'Receiver Address' },
+      ],
+      getDataUI: async (
+        _connection: Connection,
+        data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
+        const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
+          .Withdraw
+        const mint = await tryGetTokenMint(_connection, _accounts[6].pubkey)
+        if (mint) {
+          return (
+            <>
+              Amount:{' '}
+              {getMintDecimalAmountFromNatural(
+                mint!.account!,
+                args.quantity
+              ).toFormat()}{' '}
+              ({args.quantity.toNumber()})
+            </>
+          )
+        } else {
+          return <>{displayAllArgs(args)}</>
+        }
+      },
+    },
     4: {
       name: 'Mango v3: Add Spot Market',
       accounts: [
@@ -128,6 +164,13 @@ export const MANGO_INSTRUCTIONS = {
     10: {
       name: 'Mango v3: Add Oracle',
       accounts: [{ name: 'Mango Group' }, { name: 'Oracle' }],
+    },
+    51: {
+      name: 'Mango v3: Close open orders',
+      accounts: [],
+      getDataUI: async () => {
+        return <></>
+      },
     },
     11: {
       name: 'Mango v3: Add Perp Market',
@@ -359,4 +402,6 @@ export const MANGO_INSTRUCTIONS = {
 
 // also allow decoding of instructions for devnet versions of mango
 MANGO_INSTRUCTIONS['4skJ85cdxQAFVKbcGgfun8iZPL7BadVYXG3kGEGkufqA'] =
+  MANGO_INSTRUCTIONS['mv3ekLzLbnVPNxjSKvqBpU3ZeZXPQdEC3bp5MDEBG68']
+MANGO_INSTRUCTIONS['5mUyxYoFX2fyQ5A34jErFBRipC5rQNQ8gC2K73qV6xiJ'] =
   MANGO_INSTRUCTIONS['mv3ekLzLbnVPNxjSKvqBpU3ZeZXPQdEC3bp5MDEBG68']

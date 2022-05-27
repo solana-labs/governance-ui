@@ -505,15 +505,15 @@
   resolved "https://registry.npmjs.org/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz"
 
 "@blockworks-foundation/mango-client@^3.4.3":
-  version "3.4.4"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-client/-/mango-client-3.4.4.tgz#5ccf688432c54c88b513499edde0dcb9af945a8f"
-  integrity sha512-r4qBcPbxgtfpTWO8Z/ChIY8bQKXXEG+4Bzce+IjHWN32g+UP0tVydMvfYi6WNN9JNrKccR58MujUWvEo7HyniQ==
+  version "3.4.8"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-client/-/mango-client-3.4.8.tgz#5e7998dba29d02975d8be4c5a963f5fd24d64427"
+  integrity sha512-veV3tfUfSZ8gN2I0u2gCj+dSQcD0QB1Imo2XuUdv0IUKb4Um8KoBxxpv1fxVHQ2J5RRSCYNW6DhPiNEnZYhbXg==
   dependencies:
     "@project-serum/anchor" "^0.21.0"
     "@project-serum/serum" "0.13.55"
     "@project-serum/sol-wallet-adapter" "^0.2.0"
     "@solana/spl-token" "^0.1.6"
-    "@solana/web3.js" "^1.31.0"
+    "@solana/web3.js" "^1.37.1"
     big.js "^6.1.1"
     bn.js "^5.1.0"
     buffer-layout "^1.2.1"
@@ -10727,23 +10727,24 @@ purgecss@^4.0.3:
     postcss "^8.3.5"
     postcss-selector-parser "^6.0.6"
 
-pyth-staking-api@^1.1.28:
-  version "1.1.28"
-  resolved "https://registry.yarnpkg.com/pyth-staking-api/-/pyth-staking-api-1.1.28.tgz#67c57a3eaf7747e5addd1953b07b0eb06005969d"
-  integrity sha512-fzkOujwY5yQ7Z3pn/XhjwgIS9b9Jw1JafdqifKl+myIfoMmmpMb0EUYxJrZcprO/gVMCkLLl/hz7llfTmzcAMA==
+pyth-staking-api@^1.2.8:
+  version "1.2.8"
+  resolved "https://registry.yarnpkg.com/pyth-staking-api/-/pyth-staking-api-1.2.8.tgz#09dbc66f17bc1c0cc1c168815b86115c8c022ff1"
+  integrity sha512-majfEGXDNEYeDurJnoEdfy4GXojCnUoWikrArMcBgx9IpKSSnCUpmRv2pRbFC/xzvjOSN5sGXvGLGS5XfA6DMQ==
   dependencies:
     "@project-serum/anchor" "0.24.2"
     "@solana/spl-governance" "^0.0.34"
     "@solana/spl-token" "^0.1.8"
     "@solana/web3.js" "^1.36.0"
     encoding "^0.1.13"
-    pyth-staking-wasm "0.2.6"
+    pyth-staking-wasm "0.3.2"
+    ts-node "^10.7.0"
     typescript "^4.3.5"
 
-pyth-staking-wasm@0.2.6:
-  version "0.2.6"
-  resolved "https://registry.yarnpkg.com/pyth-staking-wasm/-/pyth-staking-wasm-0.2.6.tgz#778a53583b06ff719b9e2f1028b5c03de0aee1a8"
-  integrity sha512-anUllRqnaYUyRtqkHJpOWTeSfyn20CgqsmUTOskpeK2gxK1xyK1d3fhnWBg2Ux/3OfNNblv3HjkAFIl/bNrPUA==
+pyth-staking-wasm@0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/pyth-staking-wasm/-/pyth-staking-wasm-0.3.2.tgz#56c67e63797bb9d7cd4a546bdc80d47174ee6940"
+  integrity sha512-hfUVBJDLZK+HWAH9m1DnPyWUc9d/Nce5Okc5h1OulsoDQ9taAJBgsQr8UACnNXupoTYBlykfwUFTJ6cnxd0FEw==
 
 qrcode-terminal@^0.12.0:
   version "0.12.0"
