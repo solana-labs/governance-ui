@@ -6,11 +6,10 @@ import * as yup from 'yup'
 import FormHeader from '../components_2/FormHeader'
 import FormField from '../components_2/FormField'
 import FormFooter from '../components_2/FormFooter'
-import Input from '../components_2/Input'
+import { InputRangeSlider } from '../components_2/Input'
 import Text from '../components_2/ProductText'
 
 import { updateUserInput } from '../utils/formValidation'
-import { preventNegativeNumberInput } from '@utils/helpers'
 
 export const MemberQuorumThresholdSchema = {
   quorumThreshold: yup
@@ -54,7 +53,7 @@ export default function MemberQuorumThresholdForm({
     watch,
     setValue,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { isValid },
   } = useForm({
     mode: 'all',
     resolver: yupResolver(schema),
@@ -93,51 +92,16 @@ export default function MemberQuorumThresholdForm({
           name="quorumThreshold"
           control={control}
           defaultValue={50}
-          render={({ field }) => (
+          render={({ field, fieldState: { error } }) => (
             <FormField
               title="Adjust the percentage to determine votes needed to pass a proposal"
               description=""
             >
-              <div className="flex flex-col-reverse items-baseline md:flex-row">
-                <div className="flex items-center space-x-2 shrink md:max-w-[5.1rem]">
-                  <div className="w-full">
-                    <Input
-                      type="tel"
-                      placeholder="50"
-                      suffix={
-                        <Text level="1" className="">
-                          %
-                        </Text>
-                      }
-                      data-testid="dao-approval-threshold-input"
-                      error={errors.quorumThreshold?.message || ''}
-                      className="text-center"
-                      {...field}
-                      onChange={(ev) => {
-                        preventNegativeNumberInput(ev)
-                        field.onChange(ev)
-                      }}
-                    />
-                  </div>
-                </div>
-                <div className="relative flex items-center w-full mt-5 mb-5 space-x-4 md:ml-4">
-                  <Text level="2" className="text-white/50">
-                    1%
-                  </Text>
-                  <input
-                    type="range"
-                    min={1}
-                    className="w-full with-gradient focus:outline-none focus:ring-0 focus:shadow-none"
-                    {...field}
-                    style={{
-                      backgroundSize: `${quorumPercent || 50}% 100%`,
-                    }}
-                  />
-                  <Text level="2" className="text-white/50">
-                    100%
-                  </Text>
-                </div>
-              </div>
+              <InputRangeSlider
+                field={field}
+                error={error?.message}
+                placeholder="60"
+              />
             </FormField>
           )}
         />

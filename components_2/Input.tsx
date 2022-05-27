@@ -1,5 +1,7 @@
 import React from 'react'
 import { RadioGroup as HRG } from '@headlessui/react'
+import { preventNegativeNumberInput } from '@utils/helpers'
+
 import Button from './ProductButtons'
 import Text from './ProductText'
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -177,5 +179,48 @@ export const RadioGroup = ({
         })}
       </div>
     </HRG>
+  )
+}
+
+export function InputRangeSlider({ field, error = '', placeholder = '50' }) {
+  return (
+    <div className="flex flex-col-reverse sm:flex-row sm:items-baseline sm:space-x-4 md:space-x-8">
+      <div className="w-full sm:w-24">
+        <Input
+          type="tel"
+          placeholder={placeholder}
+          suffix={
+            <Text level="1" className="">
+              %
+            </Text>
+          }
+          data-testid="dao-approval-threshold-input"
+          error={error}
+          className="text-center"
+          {...field}
+          onChange={(ev) => {
+            preventNegativeNumberInput(ev)
+            field.onChange(ev)
+          }}
+        />
+      </div>{' '}
+      <div className="relative flex items-center w-full my-6 space-x-4 md:my-0">
+        <Text level="2" className="opacity-60">
+          1%
+        </Text>
+        <input
+          type="range"
+          min={1}
+          className="w-full with-gradient focus:outline-none focus:ring-0 focus:shadow-none"
+          {...field}
+          style={{
+            backgroundSize: `${field.value || 50}% 100%`,
+          }}
+        />
+        <Text level="2" className="opacity-60">
+          100%
+        </Text>
+      </div>
+    </div>
   )
 }

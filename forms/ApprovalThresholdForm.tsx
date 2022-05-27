@@ -3,12 +3,10 @@ import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 
-import { preventNegativeNumberInput } from '@utils/helpers'
-
 import FormHeader from '../components_2/FormHeader'
 import FormField from '../components_2/FormField'
 import FormFooter from '../components_2/FormFooter'
-import Input from '../components_2/Input'
+import { InputRangeSlider } from '../components_2/Input'
 import Text from '../components_2/ProductText'
 import { ThresholdAdviceBox } from './MemberQuorumThresholdForm'
 
@@ -37,15 +35,13 @@ export default function ApprovalThresholdForm({
   const schema = yup.object(ApprovalThresholdSchema).required()
   const {
     control,
-    watch,
     setValue,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { isValid },
   } = useForm({
     mode: 'all',
     resolver: yupResolver(schema),
   })
-  const approvalPercent = watch('approvalThreshold', 60)
 
   useEffect(() => {
     updateUserInput(formData, ApprovalThresholdSchema, setValue)
@@ -66,55 +62,21 @@ export default function ApprovalThresholdForm({
         stepDescription="Approval threshold"
         title="Next, let's determine the approval threshold for community proposals."
       />
-      <div className="pt-10 space-y-10 md:space-y-12">
+      <div className="mt-10 space-y-10 md:space-y-12">
         <Controller
           name="approvalThreshold"
           control={control}
           defaultValue={60}
-          render={({ field }) => (
+          render={({ field, fieldState: { error } }) => (
             <FormField
               title="Adjust how much of the total token supply is needed to pass a proposal"
               description=""
             >
-              <div className="flex flex-col-reverse md:flex-row md:items-baseline md:space-x-16">
-                {/* <div className="mr-10 w-full2"> */}
-                <Input
-                  type="tel"
-                  placeholder="60"
-                  suffix={
-                    <Text level="1" className="">
-                      %
-                    </Text>
-                  }
-                  data-testid="dao-approval-threshold-input"
-                  error={errors.approvalThreshold?.message || ''}
-                  className="text-center"
-                  // style={{ width: '60px' }}
-                  {...field}
-                  onChange={(ev) => {
-                    preventNegativeNumberInput(ev)
-                    field.onChange(ev)
-                  }}
-                />
-                {/* </div> my-6 */}
-                <div className="relative flex items-center w-full my-6 space-x-4 md:my-0">
-                  <Text level="2" className="opacity-60">
-                    1%
-                  </Text>
-                  <input
-                    type="range"
-                    min={1}
-                    className="w-full with-gradient focus:outline-none focus:ring-0 focus:shadow-none"
-                    {...field}
-                    style={{
-                      backgroundSize: `${approvalPercent || 0}% 100%`,
-                    }}
-                  />
-                  <Text level="2" className="opacity-60">
-                    100%
-                  </Text>
-                </div>
-              </div>
+              <InputRangeSlider
+                field={field}
+                error={error?.message}
+                placeholder="60"
+              />
             </FormField>
           )}
         />
