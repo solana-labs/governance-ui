@@ -223,10 +223,6 @@ export async function getGoblinGoldDepositInstruction({
         userLpTokenAccount: ataLpAddress,
         amount: new BN(transferAmount),
       })
-      const governedAccountIndex = depositIx.keys.findIndex(
-        (k) => k.pubkey.toString() === governedAccountPk.toString()
-      )
-      depositIx.keys[governedAccountIndex].isWritable = true
     } else {
       depositIx = await strategyProgram.getDepositIx({
         userInputTokenAccount: ataInputAddress,
