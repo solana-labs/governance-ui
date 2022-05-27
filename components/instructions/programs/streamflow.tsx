@@ -6,6 +6,7 @@ import BN from 'bn.js'
 import tokenService from '@utils/services/token'
 import VoteResultsBar from '@components/VoteResultsBar'
 import { StreamClient, ClusterExtended, Cluster } from '@streamflow/stream'
+import Button from '@components/Button'
 
 const getNumberFromBN = (value: BN, decimals: number): number =>
   value.gt(new BN(2 ** 53 - 1))
@@ -134,6 +135,8 @@ export const STREAMFLOW_INSTRUCTIONS = {
                   denyVotePercentage={0}
                 />
               </div>
+              <br></br>
+              <Button>Cancel</Button>
             </div>
           </>
         )
