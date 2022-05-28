@@ -17,6 +17,8 @@ import {
 import { ProgramAccount } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 
+const prog_name = "BDxFK1pXTk1FsmGmqkhZzk8ptNXvyEX6WQJcacwLDnVC";
+
 import { Vote } from '@solana/spl-governance'
 
 import { withCastVote } from '@solana/spl-governance' // this is oyster
@@ -72,7 +74,8 @@ export async function castVote(
     payer,
     plugin?.voterWeightPk,
     plugin?.maxVoterWeightRecord,
-    new PublicKey(proposal.account.name)
+    new PublicKey(proposal.account.name),
+    new PublicKey(prog_name)
   )
 
   if (message) {

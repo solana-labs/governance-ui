@@ -29,6 +29,7 @@ import { NftVoterClient } from '@solana/governance-program-library'
 import { notify } from '@utils/notifications'
 import { sendSignedTransaction } from '@utils/send'
 import { LOCALNET_REALM_ID as PYTH_LOCALNET_REALM_ID } from 'pyth-staking-api'
+const prog_name = "BDxFK1pXTk1FsmGmqkhZzk8ptNXvyEX6WQJcacwLDnVC";
 
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
@@ -267,7 +268,8 @@ const REALM = () => {
             payer,
             plugin?.voterWeightPk,
             plugin?.maxVoterWeightRecord,
-            new PublicKey(selectedProposal.proposal.name)
+            new PublicKey(selectedProposal.proposal.name),
+            new PublicKey(prog_name)
           )
         }
 
