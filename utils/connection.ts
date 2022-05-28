@@ -5,9 +5,7 @@ import type { EndpointInfo } from '../@types/types';
 const ENDPOINTS: EndpointInfo[] = [
   {
     name: 'mainnet',
-    url:
-      process.env.MAINNET_RPC ||
-      'https://billowing-proud-glitter.solana-mainnet.quiknode.pro/7f49d7f436c2d3af0738270d90dee86962f13a82/',
+    url: process.env.MAINNET_RPC || 'https://ssc-dao.genesysgo.net',
   },
   {
     name: 'devnet',
@@ -20,8 +18,6 @@ const ENDPOINTS: EndpointInfo[] = [
     url: 'http://127.0.0.1:8899',
   },
 ];
-
-console.log('deployed ENDPOINTS:', ENDPOINTS);
 
 export interface ConnectionContext {
   cluster: EndpointTypes;

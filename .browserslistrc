@@ -1,0 +1,11 @@
+[production]
+last 2 major versions and >0.2%
+Firefox ESR
+not dead
+not ie 11
+not op_mini all
+
+[development]
+last 1 chrome version
+last 1 firefox version
+last 1 safari version
