@@ -2,16 +2,15 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 
 import useLocalStorageState from '@hooks/useLocalStorageState'
-// import { isWizardValid } from '@utils/formValidation'
+import { isWizardValid } from '@utils/formValidation'
 
 import Image from 'next/image'
-// import Navbar from 'components_2/NavBar'
 import CreateDAOWizard from '@components/NewRealmWizard/CreateDAOWizard'
 
 export const Section = ({ children }) => {
   return (
     <div className="relative w-full">
-      <div className="w-full mx-auto lg:w-5/6  max-w-[770px] px-4 sm:px-2 md:px-0">
+      <div className="w-full mx-auto lg:w-5/6  max-w-[770px] px-0">
         {children}
       </div>
     </div>
@@ -45,9 +44,9 @@ export default function FormPage({
   }, [])
 
   useEffect(() => {
-    // if (!isWizardValid({ currentStep, steps, formData })) {
-    //   handlePreviousButton(currentStep, true)
-    // }
+    if (!isWizardValid({ currentStep, steps, formData })) {
+      handlePreviousButton(currentStep, true)
+    }
   }, [currentStep])
 
   function promptUserBeforeLeaving(ev) {
@@ -129,8 +128,7 @@ export default function FormPage({
 
   return (
     <div className="relative pb-8 md:pb-20 landing-page">
-      {/* <Navbar /> */}
-      <div className="fixed top-0 w-[100vw] h-[100vh]">
+      <div className="z-[-1] fixed top-0 left-0 w-[100vw] h-[100vh]">
         <Image
           alt="background image"
           src={bgImg}
@@ -139,7 +137,7 @@ export default function FormPage({
           quality={100}
         />
       </div>
-      <div className="pt-24 md:pt-28">
+      <div className="">
         <Section>
           <CreateDAOWizard
             type={type}
