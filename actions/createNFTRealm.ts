@@ -1,5 +1,4 @@
 import {
-  getTokenOwnerRecordAddress,
   GovernanceConfig,
   MintMaxVoteWeightSource,
   SetRealmAuthorityAction,
@@ -7,7 +6,9 @@ import {
   VoteThresholdPercentage,
   VoteTipping,
   withCreateMintGovernance,
+  withCreateNativeTreasury,
   withCreateRealm,
+  withCreateTokenOwnerRecord,
   withDepositGoverningTokens,
   withSetRealmAuthority,
 } from '@solana/spl-governance'
@@ -18,8 +19,8 @@ import {
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js'
-import { BN, Provider, Wallet } from '@project-serum/anchor'
-
+import { AnchorProvider, Wallet } from '@project-serum/anchor'
+import BN from 'bn.js'
 import { withCreateAssociatedTokenAccount } from '@tools/sdk/splToken/withCreateAssociatedTokenAccount'
 import { withCreateMint } from '@tools/sdk/splToken/withCreateMint'
 import { withMintTo } from '@tools/sdk/splToken/withMintTo'
@@ -35,7 +36,6 @@ import {
   transactionInstructionsToTypedInstructionsSets,
 } from 'utils/sendTransactions'
 import { chunks } from '@utils/helpers'
-import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
 import { nftPluginsPks } from '@hooks/useVotingPlugins'
 
 import {
@@ -59,8 +59,8 @@ export const createNFTRealm = async (
 
   wallet: WalletSigner
 ) => {
-  const options = Provider.defaultOptions()
-  const provider = new Provider(connection, wallet as Wallet, options)
+  const options = AnchorProvider.defaultOptions()
+  const provider = new AnchorProvider(connection, wallet as Wallet, options)
   const nftClient = await NftVoterClient.connect(provider)
 
   const walletPk = getWalletPublicKey(wallet)
@@ -74,9 +74,6 @@ export const createNFTRealm = async (
   const communityMintMaxVoteWeightSource =
     MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION
 
-  // The community mint is going to have 0 supply and we arbitrarily set it to 1m
-  const minCommunityTokensToCreate = MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY
-
   // Community mint decimals
   const communityMintDecimals = 6
 
@@ -89,6 +86,10 @@ export const createNFTRealm = async (
     null,
     communityMintDecimals,
     walletPk
+  )
+  const nftVotingPower = getMintNaturalAmountFromDecimalAsBN(
+    collectionWeight, // TODO: come back to this
+    communityMintDecimals
   )
   console.log('CREATE NFT REALM community mint', communityMintPk.toBase58())
   // Create council mint
@@ -131,11 +132,6 @@ export const createNFTRealm = async (
   const realmInstructions: TransactionInstruction[] = []
   const realmSigners: Keypair[] = []
   const nftSigners: Keypair[] = [] // currently empty because reasons
-  // Convert to mint natural amount
-  const minCommunityTokensToCreateAsMintValue = getMintNaturalAmountFromDecimalAsBN(
-    minCommunityTokensToCreate,
-    communityMintDecimals
-  )
 
   const realmPk = await withCreateRealm(
     realmInstructions,
@@ -147,12 +143,19 @@ export const createNFTRealm = async (
     walletPk,
     councilMintPk,
     communityMintMaxVoteWeightSource,
-    minCommunityTokensToCreateAsMintValue,
+    nftVotingPower,
     new PublicKey(nftPluginsPks[0]),
     new PublicKey(nftPluginsPks[0])
   )
 
-  let tokenOwnerRecordPk: PublicKey
+  withCreateTokenOwnerRecord(
+    realmInstructions,
+    programId,
+    realmPk,
+    walletPk,
+    communityMintPk,
+    walletPk
+  )
 
   // If the current wallet is in the team then deposit the council token
   if (walletAtaPk) {
@@ -169,22 +172,6 @@ export const createNFTRealm = async (
       new BN(tokenAmount)
     )
     console.log('CREATE NFT REALM council token deposited')
-
-    // TODO: return from withDepositGoverningTokens in the SDK
-    tokenOwnerRecordPk = await getTokenOwnerRecordAddress(
-      programId,
-      realmPk,
-      councilMintPk,
-      walletPk
-    )
-    console.log(
-      'CREATE NFT REALM token owner record',
-      tokenOwnerRecordPk.toBase58()
-    )
-  } else {
-    // Let's throw for now if the current wallet isn't in the team
-    // TODO: To fix it we would have to make it temp. as part of the team and then remove after the realm is created
-    throw new Error('Current wallet must be in the team')
   }
 
   // Put community and council mints under the realm governance with default config
@@ -192,7 +179,7 @@ export const createNFTRealm = async (
     voteThresholdPercentage: new VoteThresholdPercentage({
       value: yesVoteThreshold,
     }),
-    minCommunityTokensToCreateProposal: minCommunityTokensToCreateAsMintValue,
+    minCommunityTokensToCreateProposal: nftVotingPower,
     // Do not use instruction hold up time
     minInstructionHoldUpTime: 0,
     // max voting time 3 days
@@ -209,16 +196,26 @@ export const createNFTRealm = async (
     realmPk,
     communityMintPk,
     config,
-    !!walletPk,
+    true,
     walletPk,
-    tokenOwnerRecordPk,
+    walletPk,
     walletPk,
     walletPk
   )
+
   console.log(
     'CREATE NFT REALM community mint governance pk',
     communityMintGovPk.toBase58()
   )
+  console.log('CREATE NFT REALM add treasury')
+
+  await withCreateNativeTreasury(
+    realmInstructions,
+    programId,
+    communityMintGovPk,
+    walletPk
+  )
+
   await withCreateMintGovernance(
     realmInstructions,
     programId,
@@ -226,23 +223,12 @@ export const createNFTRealm = async (
     realmPk,
     councilMintPk,
     config,
-    !!walletPk,
+    true,
     walletPk,
-    tokenOwnerRecordPk,
+    walletPk,
     walletPk,
     walletPk
   )
-
-  // // Set the community governance as the realm authority
-  // withSetRealmAuthority(
-  //   realmInstructions,
-  //   programId,
-  //   programVersion,
-  //   realmPk,
-  //   walletPk,
-  //   communityMintGovPk,
-  //   SetRealmAuthorityAction.SetChecked
-  // )
 
   console.log('CREATE NFT REALM realm public-key', realmPk.toBase58())
   const { registrar } = await getNftRegistrarPDA(
@@ -294,14 +280,8 @@ export const createNFTRealm = async (
     instructionMVWR
   )
 
-  // const communityMintInfo = await tryGetMint(connection, communityMintPk)
-
-  const weight = getMintNaturalAmountFromDecimalAsBN(
-    collectionWeight, // TODO: come back to this
-    communityMintDecimals
-  )
   const instructionCC = nftClient!.program.instruction.configureCollection(
-    weight,
+    nftVotingPower,
     collectionCount,
     {
       accounts: {
@@ -315,7 +295,11 @@ export const createNFTRealm = async (
     }
   )
 
-  console.log('CREATE NFT REALM configure collection', weight, instructionCC)
+  console.log(
+    'CREATE NFT REALM configure collection',
+    nftVotingPower,
+    instructionCC
+  )
 
   const nftConfigurationTransations = [
     instructionCR,
@@ -344,6 +328,7 @@ export const createNFTRealm = async (
     const tx = await sendTransactionsV2({
       connection,
       wallet,
+      showUiComponent: true,
       signersSet: [
         mintsSetupSigners,
         ...councilMembersSignersChunks,

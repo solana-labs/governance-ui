@@ -3,6 +3,7 @@ import {
   SetRealmAuthorityAction,
   VoteThresholdPercentage,
   VoteTipping,
+  withCreateNativeTreasury,
 } from '@solana/spl-governance'
 
 import { withCreateMintGovernance } from '@solana/spl-governance'
@@ -253,6 +254,13 @@ export const createGovTokenRealm = async ({
     walletPk,
     PublicKey.default,
     walletPk,
+    walletPk
+  )
+
+  await withCreateNativeTreasury(
+    realmInstructions,
+    programId,
+    communityMintGovPk,
     walletPk
   )
 

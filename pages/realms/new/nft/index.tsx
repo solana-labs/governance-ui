@@ -113,10 +113,8 @@ export default function NFTWizard() {
         formData.name,
         formData.collectionKey,
         formData.numberOfNFTs,
-        1,
-        // council info
-        formData.quorumThreshold,
-        // councilAddresses,
+        1, // 1 NFT 1 vote
+        formData.approvalThreshold,
         formData?.memberAddresses?.map((w) => new PublicKey(w)) || [],
         wallet
       )
