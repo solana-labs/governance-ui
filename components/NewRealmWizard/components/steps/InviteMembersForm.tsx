@@ -36,8 +36,9 @@ function InviteAddress({
         </div>
         <div className="w-full pr-4 ml-4 truncate input-base">{address}</div>
       </div>
-      <div
-        className="p-3 hover:cursor-pointer text-white/50 hover:text-white active:text-white/70 focus:text-white focus:border focus:border-white disabled:text-white/10"
+      <button
+        type="button"
+        className="p-3 hover:cursor-pointer disabled:cursor-not-allowed text-white/50 hover:text-white active:text-white/70 focus:text-white disabled:text-white/10"
         onClick={onRemoveClick}
       >
         <svg
@@ -54,7 +55,7 @@ function InviteAddress({
             strokeWidth="2"
           />
         </svg>
-      </div>
+      </button>
     </div>
   )
 }
