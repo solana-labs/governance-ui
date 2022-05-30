@@ -189,8 +189,8 @@ export default function GovTokenDetailsForm({
                   value={field.value}
                   onBlur={field.onBlur}
                   options={[
-                    { label: 'Yes I do', value: true },
-                    { label: "No, let's create one", value: false },
+                    { label: 'Yes, I do', value: true },
+                    { label: 'No', value: false },
                   ]}
                 />
               </div>
@@ -225,7 +225,7 @@ export default function GovTokenDetailsForm({
             />
           </>
         )}
-        {useExistingToken === false && (
+        {/*
           <>
             <Header
               as="h4"
@@ -274,8 +274,8 @@ export default function GovTokenDetailsForm({
               )}
             />
           </>
-        )}
-        {typeof useExistingToken !== 'undefined' && (
+        )*/}
+        {useExistingToken && (
           <>
             <Controller
               name="minimumNumberOfTokensToEditDao"
@@ -333,7 +333,7 @@ export default function GovTokenDetailsForm({
             </FormField>
           </>
         )}
-        {typeof useExistingToken !== 'undefined' && (
+        {useExistingToken && (
           <>
             <AdvancedOptionsDropdown
               className={useExistingToken ? undefined : 'mt-8'}

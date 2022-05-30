@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { getGovernanceProgramVersion } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import useWalletStore from 'stores/useWalletStore'
-import { createMultisigRealm } from 'actions/createMultisigRealm'
+import { createGovTokenRealm } from 'actions/createGovTokenRealm'
 import useQueryContext from '@hooks/useQueryContext'
 import useLocalStorageState from '@hooks/useLocalStorageState'
 import {
@@ -88,6 +88,7 @@ export default function GovTokenWizard() {
 
   async function handleSubmit() {
     console.log('submit clicked')
+    setRequestPending(true)
     try {
       console.log('connection', connected, wallet)
       if (!connected) {
@@ -113,16 +114,29 @@ export default function GovTokenWizard() {
         programVersion,
       })
 
-      setRequestPending(true)
-      const results = await createMultisigRealm(
-        connection.current,
-        governanceProgramId,
+      const results = await createGovTokenRealm({
+        wallet,
+        connection: connection.current,
+        programId: governanceProgramId,
         programVersion,
-        formData.name,
-        formData.quorumThreshold,
-        formData.memberAddresses.map((w) => new PublicKey(w)),
-        wallet
-      )
+        realmName: formData.name,
+        // councilVotePercentage: formData.quorumThreshold,
+        tokensToGovernThreshold: formData.minimumNumberOfTokensToEditDao,
+        communityMintSupplyFactor: formData.mintSupplyFactor,
+        communityVotePercentage: formData.approvalThreshold,
+        transferCommunityMintAuthority: formData.transferMintAuthorityToDao,
+        transferCouncilMintAuthority: formData.transferMintAuthorityToDao,
+        createCouncil: formData.addCouncil,
+        existingCouncilMintAddress: formData.tokenAddress
+          ? new PublicKey(formData.tokenAddress)
+          : undefined,
+        existingCommunityMintAddress: formData.tokenAddress
+          ? new PublicKey(formData.tokenAddress)
+          : undefined,
+        councilWalletPks: formData.memberAddresses
+          ? formData.memberAddresses.map((w) => new PublicKey(w))
+          : [],
+      })
 
       if (results) {
         setFormData({})
