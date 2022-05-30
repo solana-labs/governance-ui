@@ -190,3 +190,108 @@ body::-webkit-scrollbar-corner {
 .bg-brand-gradient {
   @apply bg-gradient-to-r from-[#00C2FF] via-[#00E4FF] to-[#87F2FF];
 }
+
+.transition-from-gradient-background::before {
+  position: absolute;
+  content: '';
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 0;
+  opacity: 0;
+  transition: all 0.3s ease-in;
+  border-radius: 999px;
+}
+
+.transition-from-gradient-background:hover::before {
+  opacity: 1;
+  background-image: linear-gradient(to bottom, white, white);
+}
+
+.transition-from-gradient-background:active::before {
+  opacity: 1;
+  background-image: linear-gradient(to bottom, #bebec1, #bebec1);
+}
+
+.transition-from-gradient-background:disabled::before {
+  opacity: 1;
+  background-image: linear-gradient(to bottom, #3e3d47, #3e3d47);
+}
+
+.step-indicator__with-gradient {
+  background: linear-gradient(to right, #00c2ff 0%, #00e4ff 50%, #87f2ff 100%);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+
+  width: fit-content;
+}
+
+.border-gradient {
+  border: 2px solid transparent;
+  background-origin: border-box;
+  background-clip: content-box, border-box;
+}
+.border-gradient.black-fill {
+  background-image: linear-gradient(#292833, #292833),
+    linear-gradient(93deg, #00c2ff 3%, #00e4ff 50%, #87f2ff 98%);
+}
+.border-gradient.white-fill {
+  background-image: linear-gradient(white, white),
+    linear-gradient(93deg, #00c2ff 3%, #00e4ff 50%, #87f2ff 98%);
+}
+
+input[type='range'].with-gradient {
+  -webkit-appearance: none;
+  height: 16px;
+  background: #201f27;
+  border-radius: 5px;
+  background-image: linear-gradient(
+    to right,
+    #00c2ff 0%,
+    #00e4ff 50%,
+    #87f2ff 100%
+  );
+  background-size: 50% 100%;
+  background-repeat: no-repeat;
+}
+
+input[type='range'].with-gradient::-moz-range-thumb {
+  -webkit-appearance: none;
+  cursor: ew-resize;
+  width: 32px;
+  height: 32px;
+  flex-grow: 0;
+  border-radius: 25px;
+  outline: solid 5px rgba(255, 255, 255, 0.08);
+  background-color: #fff;
+  transition: background 0.3s ease-in-out;
+}
+
+input[type='range'].with-gradient:disabled::-moz-range-thumb {
+  background-color: #1f1f20;
+}
+
+input[type='range'].with-gradient:disabled::-webkit-slider-thumb {
+  background-color: #1f1f20;
+}
+
+input[type='range'].with-gradient::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  cursor: ew-resize;
+  width: 32px;
+  height: 32px;
+  flex-grow: 0;
+  border-radius: 25px;
+  outline: solid 5px rgba(255, 255, 255, 0.08);
+  background-color: #fff;
+  transition: background 0.3s ease-in-out;
+}
+input[type='range'].with-gradient::-moz-range-track,
+input[type='range'].with-gradient::-webkit-slider-runnable-track {
+  -webkit-appearance: none;
+  box-shadow: none;
+  border: none;
+  background: transparent;
+}

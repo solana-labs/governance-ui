@@ -25,7 +25,7 @@ const FormFooter: React.FC<FormFooterProps> = ({
         </button>
         <button
           type="submit"
-          className="text-black default-transition rounded-full bg-gradient-to-r from-[#00C2FF] via-[#00E4FF] to-[#87F2FF] transition-from-gradient-background"
+          className="relative text-black default-transition rounded-full bg-gradient-to-r from-[#00C2FF] via-[#00E4FF] to-[#87F2FF] transition-from-gradient-background disabled:cursor-not-allowed"
           disabled={!isValid}
           onClick={submitClickHandler}
         >

@@ -101,7 +101,13 @@ export default function FormPage({
 
     if (fromStep === 0) {
       purgeFormData()
-      push({ pathname: '/solana/create_dao/' }, undefined, { shallow: true })
+      const queryParamsWithoutStep = { ...query }
+      delete queryParamsWithoutStep.currentStep
+      push(
+        { pathname: '/realms/new/', query: queryParamsWithoutStep },
+        undefined,
+        { shallow: true }
+      )
     } else {
       const previousStep = steps
         .map(
