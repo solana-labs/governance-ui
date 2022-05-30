@@ -4,7 +4,6 @@ import { useRouter } from 'next/router'
 import useLocalStorageState from '@hooks/useLocalStorageState'
 import { isWizardValid } from '@utils/formValidation'
 
-import Image from 'next/image'
 import CreateDAOWizard from '@components/NewRealmWizard/CreateDAOWizard'
 
 export const Section = ({ children }) => {
@@ -18,7 +17,6 @@ export const Section = ({ children }) => {
 }
 
 export default function FormPage({
-  bgImg = '/1-Landing-v2/creation-bg-desktop.png',
   type,
   ssFormKey,
   steps,
@@ -128,15 +126,6 @@ export default function FormPage({
 
   return (
     <div className="relative pb-8 md:pb-20 landing-page">
-      <div className="z-[-1] fixed top-0 left-0 w-[100vw] h-[100vh]">
-        <Image
-          alt="background image"
-          src={bgImg}
-          layout="fill"
-          objectFit="cover"
-          quality={100}
-        />
-      </div>
       <div className="">
         <Section>
           <CreateDAOWizard

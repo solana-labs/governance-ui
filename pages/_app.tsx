@@ -194,7 +194,7 @@ function App({ Component, pageProps }) {
         )}
       </Head>
       <ErrorBoundary>
-        <ThemeProvider defaultTheme="Dark">
+        <ThemeProvider defaultTheme="Dark" forcedTheme="Dark">
           <WalletIdentityProvider appName={'Realms'}>
             <NavBar />
             <Notifications />
