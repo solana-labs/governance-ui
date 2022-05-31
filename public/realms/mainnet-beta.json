@@ -760,5 +760,14 @@
     "website": "https://www.linkedin.com/in/harimasoor/",
     "twitter": "@HariOnChain",
     "ogImage": "/realms/MasoorDAO/MasoorDAO.PNG"
+  },
+    {
+    "symbol": "ADAO",
+    "displayName": "Astra DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Cwh2E98xcB5qL8yuGvxdaMezRUQXwdCwcCKhYKqUPqFD",
+    "website": "https://www.youtube.com/channel/UCP6jlgRDcs5S68OVjleMGjg",
+    "twitter": "@MannyAstra",
+    "ogImage": "/realms/Astra/AstraPodcastLogo.PNG"
   }
 ]
