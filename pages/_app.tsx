@@ -194,7 +194,12 @@ function App({ Component, pageProps }) {
         )}
       </Head>
       <ErrorBoundary>
-        <ThemeProvider defaultTheme="Dark" forcedTheme="Dark">
+        <ThemeProvider
+          defaultTheme="Dark"
+          forcedTheme={
+            process.env.NEXT_PUBLIC_ENABLE_LIGHT_MODE === 'true' ? '' : 'Dark'
+          }
+        >
           <WalletIdentityProvider appName={'Realms'}>
             <NavBar />
             <Notifications />
