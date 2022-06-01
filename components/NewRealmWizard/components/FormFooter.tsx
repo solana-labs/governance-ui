@@ -4,14 +4,12 @@ interface FormFooterProps {
   isValid?: boolean
   prevClickHandler: React.MouseEventHandler<HTMLButtonElement>
   submitClickHandler?: React.MouseEventHandler<HTMLButtonElement>
-  faqTitle: string
 }
 
 const FormFooter: React.FC<FormFooterProps> = ({
   isValid,
   prevClickHandler,
   submitClickHandler,
-  // faqTitle,
 }) => {
   return (
     <div className="flex flex-wrap items-center justify-end pt-10 sm:pt-12 md:pt-16">

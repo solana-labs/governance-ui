@@ -48,9 +48,9 @@ interface MultisigRealm {
   communityVotePercentage: number
   // councilVotePercentage: number,
   // councilVoteThreshold: number,
-  existingCommunityMintAddress: PublicKey | undefined
+  existingCommunityMintPk: PublicKey | undefined
   transferCommunityMintAuthority: boolean | undefined
-  existingCouncilMintAddress: PublicKey | undefined
+  existingCouncilMintPk: PublicKey | undefined
   transferCouncilMintAuthority: boolean | undefined
   tokensToGovernThreshold: number | undefined
   communityMintSupplyFactor: number | undefined
@@ -67,9 +67,9 @@ export const createGovTokenRealm = async ({
   communityVotePercentage,
   // councilVotePercentage,
   // councilVoteThreshold,
-  existingCommunityMintAddress,
+  existingCommunityMintPk,
   transferCommunityMintAuthority = true,
-  existingCouncilMintAddress,
+  existingCouncilMintPk,
   transferCouncilMintAuthority = true,
   tokensToGovernThreshold,
   communityMintSupplyFactor: rawCMSF,
@@ -80,16 +80,16 @@ export const createGovTokenRealm = async ({
   const communityMintSupplyFactor = parseMintMaxVoteWeight(rawCMSF)
   const walletPk = getWalletPublicKey(wallet)
   const communityMintAccount =
-    existingCommunityMintAddress &&
-    (await tryGetMint(connection, existingCommunityMintAddress))
-  const zeroCommunityTokenSupply = existingCommunityMintAddress
+    existingCommunityMintPk &&
+    (await tryGetMint(connection, existingCommunityMintPk))
+  const zeroCommunityTokenSupply = existingCommunityMintPk
     ? communityMintAccount?.account.supply.isZero()
     : true
 
   const councilMintAccount =
-    existingCouncilMintAddress &&
-    (await tryGetMint(connection, existingCouncilMintAddress))
-  const zeroCouncilTokenSupply = existingCommunityMintAddress
+    existingCouncilMintPk &&
+    (await tryGetMint(connection, existingCouncilMintPk))
+  const zeroCouncilTokenSupply = existingCommunityMintPk
     ? councilMintAccount?.account.supply.isZero()
     : true
 
@@ -100,11 +100,11 @@ export const createGovTokenRealm = async ({
 
   console.log(
     'CREATE GOV TOKEN REALM - community mint address',
-    existingCommunityMintAddress
+    existingCommunityMintPk
   )
   // Community mint decimals
   const communityMintDecimals = 6
-  let communityMintPk = existingCommunityMintAddress
+  let communityMintPk = existingCommunityMintPk
   if (!communityMintPk) {
     // Create community mint
     communityMintPk = await withCreateMint(
@@ -126,7 +126,7 @@ export const createGovTokenRealm = async ({
   )
   console.log(
     'CREATE GOV TOKEN REALM - council mint address',
-    existingCouncilMintAddress
+    existingCouncilMintPk
   )
   // Create council mint
   let councilMintPk
@@ -145,7 +145,7 @@ export const createGovTokenRealm = async ({
       0,
       walletPk
     )
-  } else if (!existingCouncilMintAddress && createCouncil) {
+  } else if (!existingCouncilMintPk && createCouncil) {
     councilMintPk = await withCreateMint(
       connection,
       mintsSetupInstructions,
@@ -156,7 +156,7 @@ export const createGovTokenRealm = async ({
       walletPk
     )
   } else {
-    councilMintPk = existingCouncilMintAddress
+    councilMintPk = existingCouncilMintPk
   }
 
   let walletAtaPk: PublicKey | undefined

@@ -120,22 +120,25 @@ export default function GovTokenWizard() {
         programId: governanceProgramId,
         programVersion,
         realmName: formData.name,
-        // councilVotePercentage: formData.quorumThreshold,
+        // community
         tokensToGovernThreshold: formData.minimumNumberOfTokensToEditDao,
         communityMintSupplyFactor: formData.mintSupplyFactor,
         communityVotePercentage: formData.approvalThreshold,
-        transferCommunityMintAuthority: formData.transferMintAuthorityToDao,
-        transferCouncilMintAuthority: formData.transferMintAuthorityToDao,
+        existingCommunityMintPk: formData.communityTokenMintAddress
+          ? new PublicKey(formData.communityTokenMintAddress)
+          : undefined,
+        transferCommunityMintAuthority:
+          formData.transferCommunityMintAuthorityToDao,
+        // council
         createCouncil: formData.addCouncil,
-        existingCouncilMintAddress: formData.tokenAddress
-          ? new PublicKey(formData.tokenAddress)
+        // councilVotePercentage: formData.quorumThreshold,
+        existingCouncilMintPk: formData.communityTokenMintAddress
+          ? new PublicKey(formData.communityTokenMintAddress)
           : undefined,
-        existingCommunityMintAddress: formData.tokenAddress
-          ? new PublicKey(formData.tokenAddress)
-          : undefined,
-        councilWalletPks: formData.memberAddresses
-          ? formData.memberAddresses.map((w) => new PublicKey(w))
-          : [],
+        transferCouncilMintAuthority:
+          formData.transferCommunityMintAuthorityToDao,
+        councilWalletPks:
+          formData?.memberAddresses?.map((w) => new PublicKey(w)) || [],
       })
 
       if (results) {

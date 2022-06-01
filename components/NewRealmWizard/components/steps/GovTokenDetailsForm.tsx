@@ -1,12 +1,17 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { TokenListProvider, TokenInfo } from '@solana/spl-token-registry'
 import * as yup from 'yup'
+import { TokenListProvider, TokenInfo } from '@solana/spl-token-registry'
+import { PublicKey } from '@solana/web3.js'
+import { MintInfo, u64 } from '@solana/spl-token'
 
+import useWalletStore from 'stores/useWalletStore'
 import { preventNegativeNumberInput } from '@utils/helpers'
+import { updateUserInput, validateSolAddress } from '@utils/formValidation'
+import { tryGetMint } from '@utils/tokens'
 
-import Header from '@components/Header'
+// import Header from '@components/Header'
 import FormHeader from '@components/NewRealmWizard/components/FormHeader'
 import FormField from '@components/NewRealmWizard/components/FormField'
 import FormFooter from '@components/NewRealmWizard/components/FormFooter'
@@ -16,35 +21,12 @@ import TokenInfoTable, {
   GenericTokenIcon,
 } from '@components/NewRealmWizard/components/TokenInfoTable'
 
-import { updateUserInput, validateSolAddress } from '@utils/formValidation'
-
-const PENDING_COIN = {
-  chainId: 1,
-  address: 'pending',
-  symbol: 'finding symbol...',
-  name: 'finding name...',
-  decimals: 9,
-  logoURI: '',
-  tags: [''],
-  extensions: {
-    facebook: '',
-    twitter: '',
-    website: '',
-  },
-}
-
-const NOTFOUND_COIN = {
-  ...PENDING_COIN,
-  name: '(Token has no name)',
-  symbol: '(Token has no symbol)',
-}
-
 export const GovTokenDetailsSchema = {
   useExistingToken: yup
     .boolean()
     .oneOf([true, false], 'You must specify whether you have a token already')
     .required('Required'),
-  tokenAddress: yup
+  communityTokenMintAddress: yup
     .string()
     .when('useExistingToken', {
       is: (val) => val == true,
@@ -54,7 +36,7 @@ export const GovTokenDetailsSchema = {
     .test('is-valid-address', 'Please enter a valid Solana address', (value) =>
       value ? validateSolAddress(value) : true
     ),
-  transferMintAuthorityToDao: yup
+  transferCommunityMintAuthorityToDao: yup
     .boolean()
     .oneOf(
       [true, false],
@@ -80,12 +62,40 @@ export const GovTokenDetailsSchema = {
 
 export interface GovTokenDetails {
   useExistingToken: boolean
-  tokenAddress?: string
-  transferMintAuthorityToDao?: boolean
+  communityTokenMintAddress?: string
+  transferCommunityMintAuthorityToDao?: boolean
   newTokenName?: string
   newTokenSymbol?: string
   minimumNumberOfTokensToEditDao?: number
   mintSupplyFactor?: number
+}
+
+interface CommunityTokenInfo extends TokenInfo {
+  mint: MintInfo | undefined
+}
+
+const PENDING_COIN: CommunityTokenInfo = {
+  chainId: 1,
+  address: 'pending',
+  symbol: 'finding symbol...',
+  name: 'finding name...',
+  decimals: 9,
+  logoURI: '',
+  tags: [''],
+  extensions: {},
+  mint: {
+    mintAuthority: null,
+    supply: new u64(0),
+    freezeAuthority: null,
+    decimals: 3,
+    isInitialized: false,
+  },
+}
+
+const NOTFOUND_COIN: CommunityTokenInfo = {
+  ...PENDING_COIN,
+  name: '(Token has no name)',
+  symbol: '(Token has no symbol)',
 }
 
 export default function GovTokenDetailsForm({
@@ -96,12 +106,15 @@ export default function GovTokenDetailsForm({
   onSubmit,
   onPrevClick,
 }) {
+  const { connected, connection, current: wallet } = useWalletStore((s) => s)
   const [tokenList, setTokenList] = useState<TokenInfo[] | undefined>()
   const schema = yup.object(GovTokenDetailsSchema).required()
   const {
     watch,
     control,
     setValue,
+    clearErrors,
+    setError,
     handleSubmit,
     formState: { errors, isValid },
   } = useForm({
@@ -109,19 +122,11 @@ export default function GovTokenDetailsForm({
     resolver: yupResolver(schema),
   })
   const useExistingToken = watch('useExistingToken')
-  const tokenAddress = watch('tokenAddress')
-  const tokenInfo: TokenInfo | undefined = useMemo(() => {
-    if (!tokenList) {
-      return PENDING_COIN
-    } else if (tokenAddress && validateSolAddress(tokenAddress)) {
-      const tokenInfo = tokenList.find(
-        (token) => token.address === tokenAddress
-      )
-      return tokenInfo || NOTFOUND_COIN
-    } else {
-      return undefined
-    }
-  }, [tokenAddress, tokenList])
+  const communityTokenMintAddress = watch('communityTokenMintAddress')
+  const [tokenInfo, setTokenInfo] = useState<CommunityTokenInfo | undefined>()
+  const [showTransferMintAuthority, setShowTransferMintAuthority] = useState(
+    false
+  )
   const noToken = !tokenInfo || tokenInfo === PENDING_COIN
 
   useEffect(() => {
@@ -129,21 +134,79 @@ export default function GovTokenDetailsForm({
   }, [])
 
   useEffect(() => {
-    // TODO: wire up to cluster
+    if (useExistingToken && !connected) {
+      wallet?.connect()
+    }
+  }, [useExistingToken, wallet])
+
+  useEffect(() => {
     async function getTokenList() {
       const tokenList = await new TokenListProvider().resolve()
       const filteredTokenList = tokenList
-        .filterByClusterSlug('mainnet-beta')
+        .filterByClusterSlug(
+          connection.cluster === 'mainnet' ? 'mainnet-beta' : connection.cluster
+        )
         .getList()
       setTokenList(filteredTokenList)
     }
 
     getTokenList()
-  }, [])
+  }, [connection.cluster])
+
+  useEffect(() => {
+    async function getMintInfo(communityTokenMintAddress) {
+      setTokenInfo(PENDING_COIN)
+      const mintInfo = await tryGetMint(
+        connection.current,
+        new PublicKey(communityTokenMintAddress)
+      )
+      if (mintInfo) {
+        const tokenInfo =
+          tokenList?.find(
+            (token) => token.address === communityTokenMintAddress
+          ) || NOTFOUND_COIN
+
+        setTokenInfo({ ...tokenInfo, mint: mintInfo?.account })
+      } else {
+        setError('tokenMintAddress', {
+          type: 'is-valid-address',
+          message: 'Not a valid token address',
+        })
+        setTokenInfo(undefined)
+      }
+    }
+    clearErrors()
+    if (
+      communityTokenMintAddress &&
+      validateSolAddress(communityTokenMintAddress)
+    ) {
+      getMintInfo(communityTokenMintAddress)
+    } else {
+      setTokenInfo(undefined)
+    }
+  }, [tokenList, communityTokenMintAddress])
+
+  useEffect(() => {
+    if (noToken) {
+      setShowTransferMintAuthority(false)
+      setValue('transferCommunityMintAuthorityToDao', undefined)
+    } else if (
+      wallet?.publicKey?.toBase58() ===
+      tokenInfo?.mint?.mintAuthority?.toBase58()
+    ) {
+      setShowTransferMintAuthority(true)
+      setValue('transferCommunityMintAuthorityToDao', undefined)
+    } else {
+      setShowTransferMintAuthority(false)
+      setValue('transferCommunityMintAuthorityToDao', false, {
+        shouldValidate: true,
+      })
+    }
+  }, [noToken, wallet, tokenInfo])
 
   function serializeValues(values) {
     const data = {
-      transferMintAuthorityToDao: null,
+      transferCommunityMintAuthorityToDao: null,
       minimumNumberOfTokensToEditDao: null,
       mintSupplyFactor: null,
       ...values,
@@ -153,8 +216,8 @@ export default function GovTokenDetailsForm({
       data.newTokenSymbol = null
       data.tokenInfo = tokenInfo
     } else {
-      data.tokenAddress = null
-      data.transferMintAuthorityToDao = null
+      data.communityTokenMintAddress = null
+      data.transferCommunityMintAuthorityToDao = null
       data.tokenInfo = null
     }
 
@@ -170,8 +233,8 @@ export default function GovTokenDetailsForm({
         type={type}
         currentStep={currentStep}
         totalSteps={totalSteps}
-        stepDescription="token details"
-        title="Next, determine the token your DAO will use for dovernance tasks."
+        stepDescription="community token details"
+        title="Next, determine the community token your DAO will use for governance tasks."
       />
       <div className="pt-16 space-y-10 md:pt-24 md:space-y-12">
         <FormField
@@ -185,9 +248,7 @@ export default function GovTokenDetailsForm({
             render={({ field }) => (
               <div className="pt-3">
                 <RadioGroup
-                  onChange={field.onChange}
-                  value={field.value}
-                  onBlur={field.onBlur}
+                  {...field}
                   options={[
                     { label: 'Yes, I do', value: true },
                     { label: 'No', value: false },
@@ -197,10 +258,10 @@ export default function GovTokenDetailsForm({
             )}
           />
         </FormField>
-        {useExistingToken === true && (
+        {useExistingToken && (
           <>
             <Controller
-              name="tokenAddress"
+              name="communityTokenMintAddress"
               control={control}
               defaultValue=""
               render={({ field }) => (
@@ -212,7 +273,10 @@ export default function GovTokenDetailsForm({
                   <Input
                     placeholder="e.g. CwvWQWt5m..."
                     data-testid="dao-name-input"
-                    error={errors.tokenAddress?.message}
+                    error={
+                      errors.communityTokenMintAddress?.message ||
+                      errors.tokenMintAddress?.message
+                    }
                     success={!noToken ? 'Token found' : undefined}
                     {...field}
                   />
@@ -306,27 +370,23 @@ export default function GovTokenDetailsForm({
             />
           </>
         )}
-        {useExistingToken === true && (
+        {useExistingToken && showTransferMintAuthority && (
           <>
             <FormField
               title="Do you want to transfer mint authority of the token to the DAO?"
               description=""
-              disabled={noToken}
             >
               <Controller
-                name="transferMintAuthorityToDao"
+                name="transferCommunityMintAuthorityToDao"
                 control={control}
                 defaultValue={undefined}
                 render={({ field }) => (
                   <RadioGroup
-                    onChange={field.onChange}
-                    value={field.value}
-                    onBlur={field.onBlur}
+                    {...field}
                     options={[
                       { label: 'Yes', value: true },
                       { label: 'No', value: false },
                     ]}
-                    disabled={noToken}
                   />
                 )}
               />
@@ -371,7 +431,6 @@ export default function GovTokenDetailsForm({
       <FormFooter
         isValid={isValid}
         prevClickHandler={() => onPrevClick(currentStep)}
-        faqTitle=""
       />
     </form>
   )
