@@ -1,5 +1,5 @@
 import { MintMaxVoteWeightSource } from '@solana/spl-governance'
-import { BN } from '@project-serum/anchor'
+import BN from 'bn.js'
 import { BigNumber } from 'bignumber.js'
 
 export const parseMintMaxVoteWeight = (mintMaxVoteWeight) => {
