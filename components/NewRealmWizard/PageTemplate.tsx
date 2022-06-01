@@ -5,6 +5,8 @@ import useLocalStorageState from '@hooks/useLocalStorageState'
 import { isWizardValid } from '@utils/formValidation'
 
 import CreateDAOWizard from '@components/NewRealmWizard/CreateDAOWizard'
+import useWalletStore from 'stores/useWalletStore'
+import useQueryContext from '@hooks/useQueryContext'
 
 export const Section = ({ children }) => {
   return (
@@ -24,6 +26,8 @@ export default function FormPage({
   submissionPending,
 }) {
   const [formData, setFormData] = useLocalStorageState(ssFormKey, {})
+  const { connected, current: wallet } = useWalletStore((s) => s)
+  const { fmtUrlWithCluster } = useQueryContext()
   const { pathname, query, push, replace } = useRouter()
   const currentStep =
     typeof query !== 'undefined'
@@ -40,6 +44,23 @@ export default function FormPage({
       window.removeEventListener('unload', purgeFormData)
     }
   }, [])
+
+  useEffect(() => {
+    async function tryToConnect() {
+      try {
+        if (!connected) {
+          if (wallet) await wallet.connect()
+        }
+        if (!wallet?.publicKey) {
+          throw new Error('No valid wallet connected')
+        }
+      } catch (err) {
+        handlePreviousButton(0)
+      }
+    }
+
+    tryToConnect()
+  }, [connected])
 
   useEffect(() => {
     if (!isWizardValid({ currentStep, steps, formData })) {
@@ -101,13 +122,7 @@ export default function FormPage({
 
     if (fromStep === 0) {
       purgeFormData()
-      const queryParamsWithoutStep = { ...query }
-      delete queryParamsWithoutStep.currentStep
-      push(
-        { pathname: '/realms/new/', query: queryParamsWithoutStep },
-        undefined,
-        { shallow: true }
-      )
+      push(fmtUrlWithCluster('/realms/new/'), undefined, { shallow: true })
     } else {
       const previousStep = steps
         .map(

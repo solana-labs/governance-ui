@@ -50,7 +50,9 @@ const New: React.FC = () => {
         </div>
         <div className="flex items-center justify-center px-4 mt-10 space-x-8">
           <Link href={fmtUrlWithCluster('/realms')}>
-            <NewButton secondary>Back</NewButton>
+            <a>
+              <NewButton secondary>Back</NewButton>
+            </a>
           </Link>
           <a
             href="https://governance-docs.vercel.app/DAO-Management/createing-DAOs/DAO-wizard"
