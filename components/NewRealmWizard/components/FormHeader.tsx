@@ -24,29 +24,32 @@ function StepProgressIndicator({
   }
 
   for (let i = 0; i < totalSteps + 1; i++) {
-    let className = `w-[18px] h-[1px] `
     if (i <= currentStep) {
-      // className += 'step-indicator-with-gradient'
-      elementsWithGradient.push(<div key={i} className={className}></div>)
+      elementsWithGradient.push(
+        <div key={i} dangerouslySetInnerHTML={{ __html: '&mdash;' }}></div>
+      )
     } else {
-      className += 'bg-black'
-      elementsWithoutGradient.push(<div key={i} className={className}></div>)
+      elementsWithoutGradient.push(
+        <div key={i} dangerouslySetInnerHTML={{ __html: '&mdash;' }}></div>
+      )
     }
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col -mt-8">
       <div className="flex space-x-1 step-indicator">
-        <div className="flex space-x-1 step-indicator__with-gradient">
+        <div className="flex text-[24px] leading-[0.5] space-x-1 text-transparent bg-gradient-to-r from-[#00C2FF] via-[#00E4FF] to-[#87F2FF] bg-clip-text">
           {elementsWithGradient}
         </div>
-        <div className="flex space-x-1 step-indicator__without-gradient">
+        <div className="flex text-[24px] leading-[0.5] space-x-1 text-black">
           {elementsWithoutGradient}
         </div>
       </div>
-      <div className="flex pt-2">
+      <div className="flex">
         <Text level="2">
-          <span className="text-[#6de9ff] mr-1">{stepTitle}</span>
+          <span className="bg-gradient-to-r from-[#00C2FF] via-[#00E4FF] to-[#87F2FF] bg-clip-text text-transparent mr-1">
+            {stepTitle}
+          </span>
           {stepDescription}
         </Text>
       </div>

@@ -86,10 +86,7 @@ export default function WizardSummary({
                 leaveTo="opacity-0 scale-95"
               >
                 <Dialog.Overlay className="flex flex-col justify-center w-full p-6 space-y-3 overflow-hidden text-left align-middle transition-all transform grow md:grow-0 md:max-w-xl md:p-12 bg-night-grey md:rounded-lg">
-                  <img
-                    src="/1-Landing-v2/logo-realms-blue.png"
-                    className="w-8 h-8"
-                  />
+                  <img src="/img/logo-realms-blue.png" className="w-8 h-8" />
                   <Header as="h2">The Final Step</Header>
                   <Text className="opacity-60">
                     You are creating a new DAO on Solana and will have to
