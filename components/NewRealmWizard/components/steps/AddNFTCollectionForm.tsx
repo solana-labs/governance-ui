@@ -21,7 +21,7 @@ import Input from '@components/NewRealmWizard/components/Input'
 import Text from '@components/Text'
 import NFTCollectionSelector from '@components/NewRealmWizard/components/NFTCollectionSelector'
 
-import { ThresholdAdviceBox } from '@components/NewRealmWizard/components/steps/MemberQuorumThresholdForm'
+import ThresholdAdviceBox from '@components/NewRealmWizard/components/ThresholdAdviceBox'
 
 async function getNFTCollectionInfo(connection, collectionKey) {
   const {
@@ -44,7 +44,7 @@ export const AddNFTCollectionSchema = {
     .min(1, 'Must be at least 1')
     .transform((value) => (isNaN(value) ? undefined : value))
     .required('Required'),
-  approvalThreshold: yup
+  communityYesVotePercentage: yup
     .number()
     .typeError('Required')
     .max(100, 'Approval cannot require more than 100% of votes')
@@ -54,7 +54,7 @@ export const AddNFTCollectionSchema = {
 
 export interface AddNFTCollection {
   collectionKey: string
-  approvalThreshold: number
+  communityYesVotePercentage: number
   numberOfNFTs: number
 }
 
@@ -109,7 +109,7 @@ export default function AddNFTCollectionForm({
   })
 
   const numberOfNFTs = watch('numberOfNFTs') || 10000
-  const approvalPercent = watch('approvalThreshold', 60)
+  const approvalPercent = watch('communityYesVotePercentage', 60)
   const approvalSize = approvalPercent
     ? Math.ceil((Number(numberOfNFTs) * approvalPercent) / 100)
     : undefined
@@ -123,9 +123,9 @@ export default function AddNFTCollectionForm({
 
   useEffect(() => {
     if (!selectedNFTCollection) {
-      setValue('approvalThreshold', 0, { shouldValidate: false })
+      setValue('communityYesVotePercentage', 0, { shouldValidate: false })
     } else {
-      setValue('approvalThreshold', 60, { shouldValidate: true })
+      setValue('communityYesVotePercentage', 60, { shouldValidate: true })
     }
   }, [selectedNFTCollection])
 
@@ -412,7 +412,7 @@ export default function AddNFTCollectionForm({
           </div>
         </div>
         <Controller
-          name="approvalThreshold"
+          name="communityYesVotePercentage"
           control={control}
           defaultValue={60}
           render={({ field }) => (
@@ -428,7 +428,7 @@ export default function AddNFTCollectionForm({
                       type="number"
                       placeholder="60"
                       data-testid="dao-quorum-input"
-                      error={errors.approvalThreshold?.message || ''}
+                      error={errors.communityYesVotePercentage?.message || ''}
                       disabled={!selectedNFTCollection}
                       {...field}
                     />
@@ -488,7 +488,6 @@ export default function AddNFTCollectionForm({
       <FormFooter
         isValid={isValid}
         prevClickHandler={() => onPrevClick(currentStep)}
-        faqTitle="About Approval Quorum"
       />
     </form>
   )

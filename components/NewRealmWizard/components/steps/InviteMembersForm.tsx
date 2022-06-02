@@ -311,7 +311,6 @@ export default function InviteMembersForm({
       <FormFooter
         isValid={isValid}
         prevClickHandler={() => onPrevClick(currentStep)}
-        faqTitle=""
       />
     </form>
   )

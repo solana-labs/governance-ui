@@ -53,7 +53,7 @@ export default function WizardSummary({
     {}
   const { name: nftCollectionName } = nftCollectionMetaData
   const nftCollectionCount = formData?.numberOfNFTs || 0 // 1000000
-  const approvalThreshold = formData?.approvalThreshold || 0
+  const communityYesVotePercentage = formData?.communityYesVotePercentage || 0
   const quorumThreshold = formData?.quorumThreshold || 0 // 10
   const numberOfMembers = formData?.memberAddresses?.length || 0 // 1
   const programId = formData?.programId || ''
@@ -197,7 +197,7 @@ export default function WizardSummary({
                       />
                     </div>
                     <Header as="h1" className="mt-6 text-center">
-                      {approvalThreshold}%
+                      {communityYesVotePercentage}%
                     </Header>
                     <Text className="mt-2 text-center text-white/50">
                       Approval threshold

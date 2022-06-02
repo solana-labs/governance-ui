@@ -12,7 +12,9 @@ export default function CreateDAOWizard({
 }) {
   return (
     <>
-      {steps.map(({ Form }, index) => {
+      {steps.map(({ Form, ...props }, index) => {
+        delete props.schema
+        delete props.required
         const visible = index == currentStep
         return (
           <div key={index} className={visible ? '' : 'hidden'}>
@@ -24,6 +26,7 @@ export default function CreateDAOWizard({
               totalSteps={steps.length + 1}
               onPrevClick={handlePreviousButton}
               onSubmit={handleNextButtonClick}
+              {...props}
             />
           </div>
         )

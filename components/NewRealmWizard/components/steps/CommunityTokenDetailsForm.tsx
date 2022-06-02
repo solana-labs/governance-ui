@@ -44,11 +44,19 @@ export const CommunityTokenSchema = {
     .number()
     .positive('Must be greater than 0')
     .transform((value) => (isNaN(value) ? undefined : value)),
-  mintSupplyFactor: yup
+  communityMintSupplyFactor: yup
     .number()
     .positive('Must be greater than 0')
     .max(1, 'Must not be greater than 1')
     .transform((value) => (isNaN(value) ? undefined : value)),
+}
+
+export interface CommunityToken {
+  useExistingToken: boolean
+  communityTokenMintAddress?: string
+  transferCommunityMintAuthority?: boolean
+  minimumNumberOfCommunityTokensToGovern?: number
+  communityMintSupplyFactor?: number
 }
 
 export default function CommunityTokenForm({
@@ -126,7 +134,7 @@ export default function CommunityTokenForm({
     const data = {
       transferCommunityMintAuthority: null,
       minimumNumberOfCommunityTokensToGovern: null,
-      mintSupplyFactor: null,
+      communityMintSupplyFactor: null,
       ...values,
     }
     if (values.useExistingCommunityToken) {
@@ -258,7 +266,7 @@ export default function CommunityTokenForm({
       {useExistingCommunityToken && (
         <AdvancedOptionsDropdown>
           <Controller
-            name="mintSupplyFactor"
+            name="communityMintSupplyFactor"
             defaultValue=""
             control={control}
             render={({ field }) => (
@@ -272,7 +280,7 @@ export default function CommunityTokenForm({
                   placeholder={`1`}
                   Icon={<GenericTokenIcon />}
                   data-testid="programId-input"
-                  error={errors.mintSupplyFactor?.message || ''}
+                  error={errors.communityMintSupplyFactor?.message || ''}
                   {...field}
                   onChange={(ev) => {
                     preventNegativeNumberInput(ev)

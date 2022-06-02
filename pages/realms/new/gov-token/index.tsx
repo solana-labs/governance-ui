@@ -7,10 +7,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { createGovTokenRealm } from 'actions/createGovTokenRealm'
 import useQueryContext from '@hooks/useQueryContext'
 import useLocalStorageState from '@hooks/useLocalStorageState'
-import {
-  // DEFAULT_GOVERNANCE_PROGRAM_ID,
-  DEFAULT_TEST_GOVERNANCE_PROGRAM_ID,
-} from '@components/instructions/tools'
+import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
 
 import { notify } from '@utils/notifications'
 
@@ -23,10 +20,12 @@ import CommunityTokenDetailsForm, {
   CommunityTokenSchema,
   CommunityToken,
 } from '@components/NewRealmWizard/components/steps/CommunityTokenDetailsForm'
-import ApprovalThresholdForm, {
-  ApprovalThresholdSchema,
-  ApprovalThreshold,
-} from '@components/NewRealmWizard/components/steps/ApprovalThresholdForm'
+import YesVotePercentageForm, {
+  CommunityYesVotePercentageSchema,
+  CommunityYesVotePercentage,
+  // CouncilYesVotePercentageSchema,
+  // CouncilYesVotePercentage,
+} from '@components/NewRealmWizard/components/steps/YesVotePercentageThresholdForm'
 import AddCouncilForm, {
   AddCouncilSchema,
   AddCouncil,
@@ -35,10 +34,6 @@ import InviteMembersForm, {
   InviteMembersSchema,
   InviteMembers,
 } from '@components/NewRealmWizard/components/steps/InviteMembersForm'
-import MemberQuorumThresholdForm, {
-  MemberQuorumThresholdSchema,
-  MemberQuorumThreshold,
-} from '@components/NewRealmWizard/components/steps/MemberQuorumThresholdForm'
 
 export const SESSION_STORAGE_FORM_KEY = 'govtoken-form-data'
 export const FORM_NAME = 'gov-token'
@@ -46,10 +41,10 @@ export const FORM_NAME = 'gov-token'
 type GovToken =
   | (BasicDetails &
       CommunityToken &
-      ApprovalThreshold &
+      CommunityYesVotePercentage &
       AddCouncil &
-      InviteMembers &
-      MemberQuorumThreshold)
+      InviteMembers)
+  // CouncilYesVotePercentage)
   | Record<string, never>
 
 export default function GovTokenWizard() {
@@ -69,9 +64,10 @@ export default function GovTokenWizard() {
       required: 'true',
     },
     {
-      Form: ApprovalThresholdForm,
-      schema: ApprovalThresholdSchema,
+      Form: YesVotePercentageForm,
+      schema: CommunityYesVotePercentageSchema,
       required: 'true',
+      forCommunity: true,
     },
     { Form: AddCouncilForm, schema: AddCouncilSchema, required: 'true' },
     {
@@ -79,11 +75,12 @@ export default function GovTokenWizard() {
       schema: InviteMembersSchema,
       required: 'form.addCouncil',
     },
-    {
-      Form: MemberQuorumThresholdForm,
-      schema: MemberQuorumThresholdSchema,
-      required: 'form.addCouncil',
-    },
+    // {
+    //   Form: YesVotePercentageForm,
+    //   schema: CouncilYesVotePercentageSchema,
+    //   required: 'true',
+    //   forCouncil: true,
+    // },
   ]
 
   async function handleSubmit() {
@@ -97,13 +94,8 @@ export default function GovTokenWizard() {
       if (!wallet?.publicKey) {
         throw new Error('No valid wallet connected')
       }
-      // const formData = getFormData()
-      // const programId = formData.testDao || true
-      // ? DEFAULT_TEST_GOVERNANCE_PROGRAM_ID
-      // : DEFAULT_GOVERNANCE_PROGRAM_ID
 
-      const programId = DEFAULT_TEST_GOVERNANCE_PROGRAM_ID
-
+      const programId = formData?.programId || DEFAULT_GOVERNANCE_PROGRAM_ID
       const governanceProgramId = new PublicKey(programId)
       const programVersion = await getGovernanceProgramVersion(
         connection.current,
@@ -120,18 +112,18 @@ export default function GovTokenWizard() {
         programId: governanceProgramId,
         programVersion,
         realmName: formData.name,
-        // community
+        // COMMUNITY INFO
         tokensToGovernThreshold:
           formData.minimumNumberOfCommunityTokensToGovern,
-        communityMintSupplyFactor: formData.mintSupplyFactor,
-        communityVotePercentage: formData.approvalThreshold,
+        communityMintSupplyFactor: formData.communityMintSupplyFactor,
+        communityVotePercentage: formData.communityYesVotePercentage,
         existingCommunityMintPk: formData.communityTokenMintAddress
           ? new PublicKey(formData.communityTokenMintAddress)
           : undefined,
         transferCommunityMintAuthority: formData.transferCommunityMintAuthority,
-        // council
+        // COUNCIL INFO
         createCouncil: formData.addCouncil,
-        // councilVotePercentage: formData.quorumThreshold,
+        // councilVotePercentage: formData.communityYesVotePercentage,
         existingCouncilMintPk: formData.councilTokenMintAddress
           ? new PublicKey(formData.councilTokenMintAddress)
           : undefined,

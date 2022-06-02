@@ -28,10 +28,10 @@ import InviteMembersForm, {
   InviteMembersSchema,
   InviteMembers,
 } from '@components/NewRealmWizard/components/steps/InviteMembersForm'
-import MemberQuorumThresholdForm, {
-  MemberQuorumThresholdSchema,
-  MemberQuorumThreshold,
-} from '@components/NewRealmWizard/components/steps/MemberQuorumThresholdForm'
+import YesVotePercentageForm, {
+  CouncilYesVotePercentageSchema,
+  CouncilYesVotePercentage,
+} from '@components/NewRealmWizard/components/steps/YesVotePercentageThresholdForm'
 import FormPage from '@components/NewRealmWizard/PageTemplate'
 
 export const SESSION_STORAGE_FORM_KEY = 'nft-form-data'
@@ -42,7 +42,7 @@ type NFTForm =
       AddNFTCollection &
       AddCouncil &
       InviteMembers &
-      MemberQuorumThreshold)
+      CouncilYesVotePercentage)
   | Record<string, never>
 
 export default function NFTWizard() {
@@ -69,9 +69,10 @@ export default function NFTWizard() {
       required: 'form.addCouncil',
     },
     {
-      Form: MemberQuorumThresholdForm,
-      schema: MemberQuorumThresholdSchema,
+      Form: YesVotePercentageForm,
+      schema: CouncilYesVotePercentageSchema,
       required: 'form.addCouncil',
+      forCouncil: true,
     },
   ]
 
@@ -99,13 +100,6 @@ export default function NFTWizard() {
         programVersion,
       })
 
-      // let councilAddresses
-      // if (formData?.memberAddresses?.length) {
-      //   councilAddresses = formData.memberAddresses.map((w) => new PublicKey(w))
-      // } else {
-      //   councilAddresses = [wallet.publicKey]
-      // }
-
       const results = await createNFTRealm(
         connection.current,
         governanceProgramId,
@@ -114,7 +108,7 @@ export default function NFTWizard() {
         formData.collectionKey,
         formData.numberOfNFTs,
         1, // 1 NFT 1 vote
-        formData.approvalThreshold,
+        formData.communityYesVotePercentage,
         formData?.memberAddresses?.map((w) => new PublicKey(w)) || [],
         wallet
       )

@@ -53,6 +53,9 @@ export const AddCouncilSchema = {
 
 export interface AddCouncil {
   addCouncil: boolean
+  useExistingCouncilToken?: boolean
+  councilTokenMintAddress?: string
+  transferCouncilMintAuthority?: boolean
 }
 
 export default function AddCouncilForm({

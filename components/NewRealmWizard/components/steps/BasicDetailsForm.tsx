@@ -9,10 +9,7 @@ import FormFooter from '@components/NewRealmWizard/components/FormFooter'
 import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
 import Input from '@components/NewRealmWizard/components/Input'
 
-import {
-  DEFAULT_GOVERNANCE_PROGRAM_ID,
-  // DEFAULT_TEST_GOVERNANCE_PROGRAM_ID,
-} from '@components/instructions/tools'
+import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
 
 import { updateUserInput, validateSolAddress } from '@utils/formValidation'
 
@@ -48,7 +45,6 @@ export default function BasicDetailsForm({
 }) {
   const schema = yup.object(BasicDetailsSchema).required()
   const {
-    // getValues,
     setValue,
     control,
     handleSubmit,
@@ -66,13 +62,6 @@ export default function BasicDetailsForm({
     onSubmit({ step: currentStep, data: values })
   }
 
-  // function handleAvatarSelect(fileInput) {
-  //   setValue('avatar', fileInput, {
-  //     shouldValidate: true,
-  //     shouldDirty: true,
-  //   })
-  // }
-
   return (
     <form
       onSubmit={handleSubmit(serializeValues)}
@@ -86,14 +75,6 @@ export default function BasicDetailsForm({
         title="Let's gather your DAO's basic details."
       />
       <div className="pt-10 space-y-10 md:space-y-12">
-        {/* <ImageUploader
-          title="What's your DAO's avatar?"
-          description="The avatar you choose will visually represent your DAO"
-          optional
-          defaultValue={getValues('avatar')}
-          error={errors.avatar?.message || ''}
-          onSelect={handleAvatarSelect}
-        /> */}
         <Controller
           name="name"
           control={control}
@@ -156,7 +137,6 @@ export default function BasicDetailsForm({
       <FormFooter
         isValid={isValid}
         prevClickHandler={() => onPrevClick(currentStep)}
-        faqTitle=""
       />
     </form>
   )

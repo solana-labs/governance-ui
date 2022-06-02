@@ -21,17 +21,17 @@ import InviteMembersForm, {
   InviteMembersSchema,
   InviteMembers,
 } from '@components/NewRealmWizard/components/steps/InviteMembersForm'
-import MemberQuorumThresholdForm, {
-  MemberQuorumThresholdSchema,
-  MemberQuorumThreshold,
-} from '@components/NewRealmWizard/components/steps/MemberQuorumThresholdForm'
+import YesVotePercentageForm, {
+  CouncilYesVotePercentageSchema,
+  CouncilYesVotePercentage,
+} from '@components/NewRealmWizard/components/steps/YesVotePercentageThresholdForm'
 import FormPage from '@components/NewRealmWizard/PageTemplate'
 
 export const SESSION_STORAGE_FORM_KEY = 'multisig-form-data'
 export const FORM_NAME = 'multisig'
 
 type MultisigForm =
-  | (BasicDetails & InviteMembers & MemberQuorumThreshold)
+  | (BasicDetails & InviteMembers & CouncilYesVotePercentage)
   | Record<string, never>
 
 export default function MultiSigWizard() {
@@ -48,14 +48,16 @@ export default function MultiSigWizard() {
     { Form: BasicDetailsForm, schema: BasicDetailsSchema, required: 'true' },
     { Form: InviteMembersForm, schema: InviteMembersSchema, required: 'true' },
     {
-      Form: MemberQuorumThresholdForm,
-      schema: MemberQuorumThresholdSchema,
+      Form: YesVotePercentageForm,
+      schema: CouncilYesVotePercentageSchema,
       required: 'true',
+      forCouncil: true,
     },
   ]
 
   async function handleSubmit() {
     console.log('submit clicked')
+    setRequestPending(true)
     try {
       console.log('connection', connected, wallet)
       if (!connected) {
@@ -76,13 +78,12 @@ export default function MultiSigWizard() {
         programVersion,
       })
 
-      setRequestPending(true)
       const results = await createMultisigRealm(
         connection.current,
         governanceProgramId,
         programVersion,
         formData.name,
-        formData.quorumThreshold,
+        formData.councilYesVotePercentage,
         formData.memberAddresses.map((w) => new PublicKey(w)),
         wallet
       )
