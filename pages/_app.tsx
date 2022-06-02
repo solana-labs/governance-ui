@@ -1,7 +1,7 @@
 import { ThemeProvider } from 'next-themes'
+import '@dialectlabs/react-ui/index.css'
 import '../styles/index.css'
 import useWallet from '../hooks/useWallet'
-import Notifications from '../components/Notification'
 import NavBar from '../components/NavBar'
 import PageBodyContainer from '../components/PageBodyContainer'
 import useHydrateStore from '../hooks/useHydrateStore'
@@ -23,7 +23,12 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { usePrevious } from '@hooks/usePrevious'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useMembers from '@components/Members/useMembers'
+import TransactionLoader from '@components/TransactionLoader'
 
+import dynamic from 'next/dynamic'
+const Notifications = dynamic(() => import('../components/Notification'), {
+  ssr: false,
+})
 function App({ Component, pageProps }) {
   useHydrateStore()
   useWallet()
@@ -72,16 +77,17 @@ function App({ Component, pageProps }) {
       ) &&
       realm.pubkey &&
       wallet?.connected &&
+      ownTokenRecord &&
       client
     ) {
       getOwnedDeposits({
         realmPk: realm!.pubkey,
         communityMintPk: realm!.account.communityMint,
-        walletPk: wallet!.publicKey!,
+        walletPk: ownTokenRecord!.account!.governingTokenOwner,
         client: client!,
         connection: connection.current,
       })
-    } else if (!wallet?.connected) {
+    } else if (!wallet?.connected || !ownTokenRecord) {
       resetDepositState()
     }
   }, [
@@ -131,6 +137,7 @@ function App({ Component, pageProps }) {
           <WalletIdentityProvider appName={'Realms'}>
             <NavBar />
             <Notifications />
+            <TransactionLoader></TransactionLoader>
             <PageBodyContainer>
               <Component {...pageProps} />
             </PageBodyContainer>

@@ -158,7 +158,7 @@ const NewAccountForm = () => {
           realm,
           treasuryType?.value === SOL ? null : new PublicKey(form.mintAddress),
           governanceConfig,
-          tokenOwnerRecord!.pubkey,
+          tokenOwnerRecord!,
           client
         )
         setIsLoading(false)

@@ -33,7 +33,10 @@ const Select = ({
   minWidth?: string
 }) => {
   return (
-    <div className={`${wrapperClassNames}`} style={{ minWidth: minWidth }}>
+    <div
+      className={`${wrapperClassNames}`}
+      style={minWidth ? { minWidth: minWidth } : {}}
+    >
       {label && <StyledLabel>{label}</StyledLabel>}
       <div className={`relative ${className} ${error && 'pb-1'}`}>
         <Listbox value={value} onChange={onChange} disabled={disabled}>
@@ -49,7 +52,9 @@ const Select = ({
                 })}
               >
                 <div
-                  className={`flex items-center justify-between text-fgd-1 text-left`}
+                  className={`flex items-center justify-between text-left ${
+                    placeholder ? 'text-fgd-3' : 'text-fgd-1'
+                  }`}
                 >
                   {componentLabel
                     ? componentLabel

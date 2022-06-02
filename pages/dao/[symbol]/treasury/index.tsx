@@ -22,7 +22,10 @@ export const NEW_TREASURY_ROUTE = `/treasury/new`
 
 const Treasury = () => {
   const { getStrategies } = useStrategiesStore()
-  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
+  const {
+    governedTokenAccountsWithoutNfts,
+    auxiliaryTokenAccounts,
+  } = useGovernanceAssets()
   const { setCurrentAccount } = useTreasuryAccountStore()
   const connection = useWalletStore((s) => s.connection)
   const {
@@ -57,7 +60,16 @@ const Treasury = () => {
           (x) => x.extensions.transferAddress
         )
       ) {
-        setTreasuryAccounts(governedTokenAccountsWithoutNfts)
+        const accounts = [
+          ...governedTokenAccountsWithoutNfts,
+          ...auxiliaryTokenAccounts,
+        ]
+        const accountsSorted = accounts.sort((a, b) => {
+          const infoA = getTreasuryAccountItemInfoV2(a)
+          const infoB = getTreasuryAccountItemInfoV2(b)
+          return infoB.totalPrice - infoA.totalPrice
+        })
+        setTreasuryAccounts(accountsSorted)
       }
     }
     prepTreasuryAccounts()

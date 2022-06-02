@@ -10,8 +10,12 @@ export default function useGovernanceAssets() {
   const governedTokenAccounts: AssetAccount[] = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
   )
-  const assetAccounts = useGovernanceAssetsStore((s) => s.assetAccounts)
-
+  const assetAccounts = useGovernanceAssetsStore((s) =>
+    s.assetAccounts.filter((x) => x.type !== AccountType.AuxiliaryToken)
+  )
+  const auxiliaryTokenAccounts = useGovernanceAssetsStore(
+    (s) => s.assetAccounts
+  ).filter((x) => x.type === AccountType.AuxiliaryToken)
   const currentPluginPk = config?.account.communityVoterWeightAddin
   const governancesArray = useGovernanceAssetsStore((s) => s.governancesArray)
 
@@ -58,11 +62,15 @@ export default function useGovernanceAssets() {
         realm?.account.config.councilMint?.toBase58()
     )
   }
-  // TODO: Check governedAccounts from all governances plus search for token accounts owned by governances
-  const canUseTransferInstruction = canUseGovernanceForInstruction([
-    GovernanceAccountType.TokenGovernanceV1,
-    GovernanceAccountType.TokenGovernanceV2,
-  ])
+  const canUseTransferInstruction = governedTokenAccounts.some((acc) => {
+    const governance = governancesArray.find(
+      (x) => acc.governance.pubkey.toBase58() === x.pubkey.toBase58()
+    )
+    return (
+      governance &&
+      ownVoterWeight.canCreateProposal(governance?.account?.config)
+    )
+  })
 
   const canUseProgramUpgradeInstruction = canUseGovernanceForInstruction([
     GovernanceAccountType.ProgramGovernanceV1,
@@ -183,6 +191,31 @@ export default function useGovernanceAssets() {
       isVisible: canUseAnyInstruction,
     },
     {
+      id: Instructions.VotingMintConfig,
+      name: 'Vote Escrowed Tokens: Configure Voting Mint',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
+      id: Instructions.CreateVsrRegistrar,
+      name: 'Vote Escrowed Tokens: Create Registrar',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
+      id: Instructions.ChangeMakeDonation,
+      name: 'Change: Donation to Charity',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.DepositIntoCastle,
+      name: 'Castle: Deposit into Vault',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.WithrawFromCastle,
+      name: 'Castle: Withdraw from Vault',
+      isVisible: canUseAnyInstruction,
+    },
+    {
       id: Instructions.DepositIntoVolt,
       name: 'Friktion: Deposit into Volt',
       isVisible: canUseAnyInstruction,
@@ -220,6 +253,36 @@ export default function useGovernanceAssets() {
     {
       id: Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity,
       name: 'Solend: Withdraw Funds',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.ForesightInitMarket,
+      name: 'Foresight: Init Market',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.ForesightInitMarketList,
+      name: 'Foresight: Init Market List',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.ForesightInitCategory,
+      name: 'Foresight: Init Category',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.ForesightResolveMarket,
+      name: 'Foresight: Resolve Market',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.ForesightAddMarketListToCategory,
+      name: 'Foresight: Add Market List To Category',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.ForesightAddMarketMetadata,
+      name: 'Foresight: Add Market Metadata',
       isVisible: canUseAnyInstruction,
     },
     {
@@ -279,5 +342,6 @@ export default function useGovernanceAssets() {
     nftsGovernedTokenAccounts,
     canUseAuthorityInstruction,
     assetAccounts,
+    auxiliaryTokenAccounts,
   }
 }

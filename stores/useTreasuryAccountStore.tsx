@@ -7,16 +7,7 @@ import { NFTWithMint } from '@utils/uiTypes/nfts'
 import { Connection } from '@solana/web3.js'
 import { TokenInfo } from '@solana/spl-token-registry'
 import { WSOL_MINT } from '@components/instructions/tools'
-import { MintInfo } from '@solana/spl-token'
-import { TokenAccountWithKey } from '@utils/deserializeTokenAccount'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
-
-type TokenAccountWithListInfo = TokenAccountWithKey & {
-  tokenInfo?: TokenInfo
-}
-export type TokenInfoWithMint = TokenAccountWithListInfo & {
-  mintInfo: MintInfo
-}
 
 interface TreasuryAccountStore extends State {
   currentAccount: AssetAccount | null
@@ -25,8 +16,7 @@ interface TreasuryAccountStore extends State {
   recentActivity: ConfirmedSignatureInfo[]
 
   allNfts: NFTWithMint[]
-  allTokenAccounts: TokenInfoWithMint[]
-  nftsPerPubkey: {
+  governanceNfts: {
     [governance: string]: NFTWithMint[]
   }
   isLoadingNfts: boolean
@@ -46,8 +36,7 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
   tokenInfo: undefined,
   recentActivity: [],
   allNfts: [],
-  allTokenAccounts: [],
-  nftsPerPubkey: {},
+  governanceNfts: {},
   isLoadingNfts: false,
   isLoadingRecentActivity: false,
   isLoadingTokenAccounts: false,
@@ -93,7 +82,7 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
     }
     set((s) => {
       s.allNfts = realmNfts
-      s.nftsPerPubkey = nftsPerPubkey
+      s.governanceNfts = nftsPerPubkey
       s.isLoadingNfts = false
     })
   },

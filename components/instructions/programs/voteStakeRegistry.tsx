@@ -1,6 +1,10 @@
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { Wallet } from '@marinade.finance/marinade-ts-sdk'
-import { BN, AnchorProvider } from '@project-serum/anchor'
+import {
+  AnchorProvider,
+  BN,
+  BorshInstructionCoder,
+} from '@project-serum/anchor'
 import { AccountMetaData } from '@solana/spl-governance'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import { fmtMintAmount } from '@tools/sdk/units'
@@ -26,7 +30,7 @@ interface VotingMintCfgInstruction {
   lockupSaturationSecs: BN
   grantAuthority: PublicKey
 }
-interface GrantInstruction {
+export interface GrantInstruction {
   periods: number
   kind: object
   amount: BN
@@ -59,9 +63,9 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
             options
           )
           const vsrClient = await VsrClient.connect(provider)
-          const decodedInstructionData = vsrClient.program.coder.instruction.decode(
-            Buffer.from(data)
-          )?.data as ClawbackInstruction | null
+          const decodedInstructionData = new BorshInstructionCoder(
+            vsrClient.program.idl
+          ).decode(Buffer.from(data))?.data as ClawbackInstruction | null
           const existingVoter = await tryGetVoter(accounts[2].pubkey, vsrClient)
           const deposit = decodedInstructionData
             ? existingVoter?.deposits[decodedInstructionData.depositEntryIndex]
@@ -119,9 +123,10 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
             options
           )
           const vsrClient = await VsrClient.connect(provider)
-          const decodedInstructionData = vsrClient.program.coder.instruction.decode(
-            Buffer.from(data)
-          )?.data as VotingMintCfgInstruction
+
+          const decodedInstructionData = new BorshInstructionCoder(
+            vsrClient.program.idl
+          ).decode(Buffer.from(data))?.data as VotingMintCfgInstruction
           const {
             maxExtraLockupVoteWeightScaledFactor,
             lockupSaturationSecs,
@@ -197,9 +202,9 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
             options
           )
           const vsrClient = await VsrClient.connect(provider)
-          const decodedInstructionData = vsrClient.program.coder.instruction.decode(
-            Buffer.from(data)
-          )?.data as GrantInstruction | null
+          const decodedInstructionData = new BorshInstructionCoder(
+            vsrClient.program.idl
+          ).decode(Buffer.from(data))?.data as GrantInstruction | null
           const mintPk = accounts[9].pubkey
           const mint = await tryGetMint(connection, mintPk!)
           const lockupKind = decodedInstructionData

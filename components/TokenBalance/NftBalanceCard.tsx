@@ -43,21 +43,18 @@ const NftBalanceCard = () => {
       wallet!.publicKey!,
       client.client!.program.programId
     )
-    instructions.push(
-      (client.client as NftVoterClient).program.instruction.createVoterWeightRecord(
-        wallet!.publicKey!,
-        {
-          accounts: {
-            voterWeightRecord: voterWeightPk,
-            governanceProgramId: realm!.owner,
-            realm: realm!.pubkey,
-            realmGoverningTokenMint: realm!.account.communityMint,
-            payer: wallet!.publicKey!,
-            systemProgram: SYSTEM_PROGRAM_ID,
-          },
-        }
-      )
-    )
+    const createVoterWeightRecordIx = await (client.client as NftVoterClient).program.methods
+      .createVoterWeightRecord(wallet!.publicKey!)
+      .accounts({
+        voterWeightRecord: voterWeightPk,
+        governanceProgramId: realm!.owner,
+        realm: realm!.pubkey,
+        realmGoverningTokenMint: realm!.account.communityMint,
+        payer: wallet!.publicKey!,
+        systemProgram: SYSTEM_PROGRAM_ID,
+      })
+      .instruction()
+    instructions.push(createVoterWeightRecordIx)
     await withCreateTokenOwnerRecord(
       instructions,
       realm!.owner!,
@@ -82,11 +79,13 @@ const NftBalanceCard = () => {
 
   useEffect(() => {
     const getTokenOwnerRecord = async () => {
-      const defaultMint = !mint?.supply.isZero()
-        ? realm!.account.communityMint
-        : !councilMint?.supply.isZero()
-        ? realm!.account.config.councilMint
-        : undefined
+      const defaultMint =
+        !mint?.supply.isZero() ||
+        realm?.account.config.useMaxCommunityVoterWeightAddin
+          ? realm!.account.communityMint
+          : !councilMint?.supply.isZero()
+          ? realm!.account.config.councilMint
+          : undefined
       const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
         realm!.owner,
         realm!.pubkey,
@@ -140,7 +139,7 @@ const NftBalanceCard = () => {
       </div>
       {connected && !ownTokenRecord && (
         <Button className="w-full" onClick={handleRegister}>
-          Register
+          Join
         </Button>
       )}
     </div>

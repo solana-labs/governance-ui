@@ -10,6 +10,8 @@ import { ConnectionContext } from '@utils/connection'
 import { ProgramAccount, Realm } from '@solana/spl-governance'
 import { getNftRegistrarPDA } from 'NftVotePlugin/sdk/accounts'
 import { VotingClient, VotingClientProps } from '@utils/uiTypes/VotePlugin'
+import { PythClient } from 'pyth-staking-api'
+import { PublicKey } from '@solana/web3.js'
 
 interface UseVotePluginsClientStore extends State {
   state: {
@@ -17,9 +19,11 @@ interface UseVotePluginsClientStore extends State {
     vsrClient: VsrClient | undefined
     nftClient: NftVoterClient | undefined
     switchboardClient: SwitchboardQueueVoterClient | undefined
+    pythClient: PythClient | undefined
     voteStakeRegistryRegistrar: Registrar | null
     nftMintRegistrar: any
     currentRealmVotingClient: VotingClient
+    voteStakeRegistryRegistrarPk: PublicKey | null
   }
   handleSetVsrClient: (
     wallet: SignerWalletAdapter | undefined,
@@ -30,6 +34,10 @@ interface UseVotePluginsClientStore extends State {
     connection: ConnectionContext
   ) => void
   handleSetSwitchboardClient: (
+    wallet: SignerWalletAdapter | undefined,
+    connection: ConnectionContext
+  ) => void
+  handleSetPythClient: (
     wallet: SignerWalletAdapter | undefined,
     connection: ConnectionContext
   ) => void
@@ -51,8 +59,13 @@ interface UseVotePluginsClientStore extends State {
 const defaultState = {
   vsrClient: undefined,
   nftClient: undefined,
+<<<<<<< HEAD
   switchboardClient: undefined,
+=======
+  pythClient: undefined,
+>>>>>>> dc2e11d94f735f0a0df6f5be45b6c649157a7c36
   voteStakeRegistryRegistrar: null,
+  voteStakeRegistryRegistrarPk: null,
   nftMintRegistrar: null,
   currentRealmVotingClient: new VotingClient({
     client: undefined,
@@ -91,6 +104,7 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
       const existingRegistrar = await tryGetRegistrar(registrar, client!)
       set((s) => {
         s.state.voteStakeRegistryRegistrar = existingRegistrar
+        s.state.voteStakeRegistryRegistrarPk = registrar
       })
     },
     handleSetNftClient: async (wallet, connection) => {
@@ -120,6 +134,7 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
         s.state.nftMintRegistrar = existingRegistrar
       })
     },
+<<<<<<< HEAD
     handleSetSwitchboardClient: async (wallet, connection) => {
       const options = AnchorProvider.defaultOptions()
       const provider = new AnchorProvider(
@@ -134,6 +149,31 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
       set((s) => {
         s.state.switchboardClient = switchboardClient
       })
+=======
+    handleSetPythClient: async (wallet, connection) => {
+      if (
+        connection.cluster === 'localnet' ||
+        connection.cluster === 'devnet'
+      ) {
+        const options = AnchorProvider.defaultOptions()
+        const provider = new AnchorProvider(
+          connection.current,
+          (wallet as unknown) as Wallet,
+          options
+        )
+        try {
+          const pythClient = await PythClient.connect(
+            provider,
+            connection.cluster
+          )
+          set((s) => {
+            s.state.pythClient = pythClient
+          })
+        } catch (e) {
+          console.error(e)
+        }
+      }
+>>>>>>> dc2e11d94f735f0a0df6f5be45b6c649157a7c36
     },
     handleSetCurrentRealmVotingClient: ({ client, realm, walletPk }) => {
       set((s) => {

@@ -17,6 +17,7 @@ import { getProgramVersionForRealm } from '@models/registry/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { useRouter } from 'next/router'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
+import { LOCALNET_REALM_ID as PYTH_LOCALNET_REALM_ID } from 'pyth-staking-api'
 
 const VotePanel = () => {
   const [showVoteModal, setShowVoteModal] = useState(false)
@@ -24,6 +25,7 @@ const VotePanel = () => {
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const { pk } = router.query
   const {
@@ -47,8 +49,18 @@ const VotePanel = () => {
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
   const maxVoterWeight =
     useNftPluginStore((s) => s.state.maxVoteRecord)?.pubkey || undefined
+
+  // Handle state based on if a delegated wallet has already voted or not
   const ownVoteRecord =
-    wallet?.publicKey && voteRecordsByVoter[wallet.publicKey.toBase58()]
+    tokenType === GoverningTokenType.Community && ownTokenRecord
+      ? voteRecordsByVoter[
+          ownTokenRecord.account.governingTokenOwner.toBase58()
+        ]
+      : ownCouncilTokenRecord
+      ? voteRecordsByVoter[
+          ownCouncilTokenRecord.account.governingTokenOwner.toBase58()
+        ]
+      : wallet?.publicKey && voteRecordsByVoter[wallet.publicKey.toBase58()]
 
   const voterTokenRecord =
     tokenType === GoverningTokenType.Community
@@ -89,6 +101,7 @@ const VotePanel = () => {
       connection.endpoint
     )
     try {
+      setIsLoading(true)
       const instructions: TransactionInstruction[] = []
 
       if (
@@ -124,6 +137,7 @@ const VotePanel = () => {
     } catch (ex) {
       console.error("Can't relinquish vote", ex)
     }
+    setIsLoading(false)
   }
 
   const handleShowVoteModal = (vote: YesNoVote) => {
@@ -178,19 +192,32 @@ const VotePanel = () => {
     : !ownVoteRecord?.account.isRelinquished
 
   const isPanelVisible = (isVoting || isVoteCast) && isVisibleToWallet
+
+  //Todo: move to own components with refactor to dao folder structure
+  const isPyth =
+    realmInfo?.realmId.toBase58() === PYTH_LOCALNET_REALM_ID.toBase58()
+
+  const isRelinquishVotePanelVisible = !(
+    isPyth &&
+    isVoteCast &&
+    connected &&
+    !isVoting
+  )
+
   return (
     <>
-      {isPanelVisible && (
+      {isPanelVisible && isRelinquishVotePanelVisible && (
         <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-4">
           <h3 className="mb-4 text-center">{actionLabel}</h3>
 
           <div className="items-center justify-center flex w-full gap-5">
             {isVoteCast && connected ? (
               <SecondaryButton
+                isLoading={isLoading}
                 small
                 tooltipMessage={withdrawTooltipContent}
                 onClick={() => submitRelinquishVote()}
-                disabled={!isWithdrawEnabled}
+                disabled={!isWithdrawEnabled || isLoading}
               >
                 {isVoting ? 'Withdraw' : 'Release Tokens'}
               </SecondaryButton>

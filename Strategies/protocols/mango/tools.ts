@@ -44,7 +44,10 @@ export const tokenList = {
 }
 export const MANGO = 'Mango'
 export const MANGO_MINT = 'MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac'
+export const USDC_MINT = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
 export const MANGO_MINT_DEVNET = 'Bb9bsTQa1bGEtQ5KagGkvSHyuLqDWumFUcRqFusFNJWC'
+export const MANGO_USDC_MINT_DEVNET =
+  '8FRFC6MoGGkMFQwngccyu69VnYbzykGeez7ignHVAFSN'
 export const tokenListFilter = Object.keys(tokenList).map((x) => {
   return {
     name: x,
@@ -88,6 +91,8 @@ export async function tvl(timestamp, connection: ConnectionContext) {
       const handledMint =
         (info?.address === MANGO_MINT && connection.cluster === 'devnet'
           ? MANGO_MINT_DEVNET
+          : info?.address === USDC_MINT && connection.cluster === 'devnet'
+          ? MANGO_USDC_MINT_DEVNET
           : info?.address) || ''
       const closestVal = findClosestToDate(assetDeposits, date)
       balances.push({
@@ -122,9 +127,9 @@ export const calculateAllDepositsInMangoAccountsForMint = (
 ) => {
   let deposited = 0
   const group = market!.group
-  const depositIndex = group?.tokens.findIndex(
-    (x) => x.mint.toBase58() === mint.toBase58()
-  )
+  const depositIndex =
+    mint &&
+    group?.tokens.findIndex((x) => x.mint.toBase58() === mint.toBase58())
   if (accounts?.length && typeof depositIndex !== 'undefined' && group) {
     const depositsWithAmountHiherThenZero = accounts
       .map((x) => x.deposits[depositIndex])
@@ -200,7 +205,9 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
         makeDepositInstruction(
           groupConfig.mangoProgramId,
           groupConfig.publicKey,
-          matchedTreasury.governance!.pubkey,
+          matchedTreasury.isSol
+            ? matchedTreasury.governance.pubkey!
+            : matchedTreasury.extensions.token!.account.owner!,
           group.mangoCache,
           mangoAccountPk,
           quoteRootBank!.publicKey,

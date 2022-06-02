@@ -8,6 +8,7 @@ import {
   GOVERNANCE_CHAT_PROGRAM_ID,
   Proposal,
   Realm,
+  TokenOwnerRecord,
 } from '@solana/spl-governance'
 import { ChatMessageBody } from '@solana/spl-governance'
 import { withPostChatMessage } from '@solana/spl-governance'
@@ -20,7 +21,7 @@ export async function postChatMessage(
   { connection, wallet, programId, walletPubkey }: RpcContext,
   realm: ProgramAccount<Realm>,
   proposal: ProgramAccount<Proposal>,
-  tokeOwnerRecord: PublicKey,
+  tokeOwnerRecord: ProgramAccount<TokenOwnerRecord>,
   body: ChatMessageBody,
   replyTo?: PublicKey,
   client?: VotingClient
@@ -30,10 +31,10 @@ export async function postChatMessage(
 
   const governanceAuthority = walletPubkey
   const payer = walletPubkey
-
   //will run only if plugin is connected with realm
   const plugin = await client?.withUpdateVoterWeightRecord(
     instructions,
+    tokeOwnerRecord,
     'commentProposal'
   )
 
@@ -45,7 +46,7 @@ export async function postChatMessage(
     realm.pubkey,
     proposal.account.governance,
     proposal.pubkey,
-    tokeOwnerRecord,
+    tokeOwnerRecord.pubkey,
     governanceAuthority,
     payer,
     replyTo,

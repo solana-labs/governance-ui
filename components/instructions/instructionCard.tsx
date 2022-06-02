@@ -6,6 +6,7 @@ import {
   ProposalTransaction,
 } from '@solana/spl-governance'
 import {
+  ALL_CASTLE_PROGRAMS,
   getAccountName,
   getInstructionDescriptor,
   InstructionDescriptor,
@@ -22,9 +23,12 @@ import InspectorButton from '@components/explorer/inspectorButton'
 import { FlagInstructionErrorButton } from './FlagInstructionErrorButton'
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 import axios from 'axios'
-import { notify } from '@utils/notifications'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import tokenService from '@utils/services/token'
+import InstructionOptionInput, {
+  InstructionOption,
+  InstructionOptions,
+} from '@components/InstructionOptions'
 
 export default function InstructionCard({
   index,
@@ -42,6 +46,10 @@ export default function InstructionCard({
   const connection = useWalletStore((s) => s.connection)
   const tokenRecords = useWalletStore((s) => s.selectedRealm)
   const [descriptor, setDescriptor] = useState<InstructionDescriptor>()
+  const [instructionOption, setInstructionOption] = useState<InstructionOption>(
+    InstructionOptions.none
+  )
+
   const [playing, setPlaying] = useState(
     proposalInstruction.account.executedAt
       ? PlayState.Played
@@ -49,6 +57,11 @@ export default function InstructionCard({
   )
   const [nftImgUrl, setNftImgUrl] = useState('')
   const [tokenImgUrl, setTokenImgUrl] = useState('')
+
+  const allProposalPrograms = proposalInstruction.account.instructions
+    ?.map((i) => i.programId.toBase58())
+    .flat()
+
   useEffect(() => {
     getInstructionDescriptor(
       connection,
@@ -83,10 +96,7 @@ export default function InstructionCard({
             const url = (await axios.get(tokenMetadata.data.data.uri)).data
             setNftImgUrl(url.image)
           } catch (e) {
-            notify({
-              type: 'error',
-              message: 'Unable to fetch nft',
-            })
+            console.log(e)
           }
         }
         return
@@ -169,12 +179,26 @@ export default function InstructionCard({
         />
 
         {proposal && (
-          <ExecuteInstructionButton
-            proposal={proposal}
-            proposalInstruction={proposalInstruction}
-            playing={playing}
-            setPlaying={setPlaying}
-          />
+          <React.Fragment>
+            <ExecuteInstructionButton
+              proposal={proposal}
+              proposalInstruction={proposalInstruction}
+              playing={playing}
+              setPlaying={setPlaying}
+              instructionOption={instructionOption}
+            />
+            {/* Show execution option if the proposal contains a specified program id and
+                proposal has not executed already. */}
+            {allProposalPrograms?.filter((a) =>
+              ALL_CASTLE_PROGRAMS.map((a) => a.toBase58()).includes(a)
+            ).length > 0 &&
+              playing != PlayState.Played && (
+                <InstructionOptionInput
+                  value={instructionOption}
+                  setValue={setInstructionOption}
+                />
+              )}
+          </React.Fragment>
         )}
       </div>
     </div>

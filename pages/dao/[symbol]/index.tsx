@@ -28,6 +28,7 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NftVoterClient } from '@solana/governance-program-library'
 import { notify } from '@utils/notifications'
 import { sendSignedTransaction } from '@utils/send'
+import { LOCALNET_REALM_ID as PYTH_LOCALNET_REALM_ID } from 'pyth-staking-api'
 
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
@@ -99,6 +100,7 @@ const REALM = () => {
     tokenRecords,
     ownVoterWeight,
     ownTokenRecord,
+    isNftMode,
   } = useRealm()
   const proposalsPerPage = 20
   const [filters, setFilters] = useState<ProposalState[]>([])
@@ -242,7 +244,12 @@ const REALM = () => {
         //will run only if plugin is connected with realm
         const plugin = await client?.withCastPluginVote(
           instructions,
-          selectedProposal.proposalPk
+          {
+            account: selectedProposal.proposal,
+            pubkey: selectedProposal.proposalPk,
+            owner: realm.pubkey,
+          },
+          ownTokenRecord
         )
         if (client.client instanceof NftVoterClient === false) {
           await withCastVote(
@@ -291,9 +298,15 @@ const REALM = () => {
   }
 
   const showMultiVote = useMemo(
-    () => (realm ? realm.account.votingProposalCount > 1 && connected : false),
+    () =>
+      realm
+        ? realm.account.votingProposalCount > 1 && connected && !isNftMode
+        : false,
     [realm, connected]
   )
+  //Todo: move to own components with refactor to dao folder structure
+  const isPyth =
+    realmInfo?.realmId.toBase58() === PYTH_LOCALNET_REALM_ID.toBase58()
 
   return (
     <>
@@ -473,7 +486,7 @@ const REALM = () => {
             </div>
             <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
               <TokenBalanceCardWrapper />
-              <NFTSCompactWrapper />
+              {!isPyth && <NFTSCompactWrapper />}
               <AccountsCompactWrapper />
               <AssetsCompactWrapper />
             </div>

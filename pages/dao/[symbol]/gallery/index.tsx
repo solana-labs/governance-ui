@@ -23,7 +23,7 @@ const gallery = () => {
   const isLoadingGovernances = useGovernanceAssetsStore(
     (s) => s.loadGovernedAccounts
   )
-  const nftsPerPubkey = useTreasuryAccountStore((s) => s.nftsPerPubkey)
+  const nftsPerPubkey = useTreasuryAccountStore((s) => s.governanceNfts)
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
   const { setCurrentAccount } = useTreasuryAccountStore()
   const [currentAccount, setStateAccount] = useState<AssetAccount | null>(null)
@@ -155,7 +155,7 @@ const gallery = () => {
                   key={idx}
                   href={
                     connection.endpoint && x.mint
-                      ? getExplorerUrl(connection.endpoint, x.mint)
+                      ? getExplorerUrl(connection.cluster, x.mint)
                       : ''
                   }
                   target="_blank"

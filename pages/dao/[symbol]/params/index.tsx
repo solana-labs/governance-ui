@@ -20,19 +20,24 @@ import SetRealmAuthorityModal from './SetRealmAuthorityModal'
 import ParamsView from './components/ParamsView'
 import AccountsView from './components/AccountsView'
 import StatsView from './components/StatsView'
+import { ExclamationIcon } from '@heroicons/react/outline'
+import Tooltip from '@components/Tooltip'
 
 const Params = () => {
   const { realm, mint } = useRealm()
   const wallet = useWalletStore((s) => s.current)
-  const { canUseAuthorityInstruction, assetAccounts } = useGovernanceAssets()
+  const {
+    canUseAuthorityInstruction,
+    assetAccounts,
+    auxiliaryTokenAccounts,
+  } = useGovernanceAssets()
   const governancesArray = useGovernanceAssetsStore((s) => s.governancesArray)
   const loadGovernedAccounts = useGovernanceAssetsStore(
     (s) => s.loadGovernedAccounts
   )
 
-  const realmAuthorityGovernance = assetAccounts.find(
-    (x) =>
-      x.governance.pubkey.toBase58() === realm?.account.authority?.toBase58()
+  const realmAuthorityGovernance = governancesArray.find(
+    (x) => x.pubkey.toBase58() === realm?.account.authority?.toBase58()
   )
   const [isRealmProposalModalOpen, setIsRealmProposalModalOpen] = useState(
     false
@@ -124,6 +129,8 @@ const Params = () => {
                   padding
                   label="Authority"
                   val={realmAccount?.authority?.toBase58()}
+                  warn={!realmAuthorityGovernance}
+                  warningText="None of the governances is realm authority"
                 />
                 <AddressField
                   padding
@@ -218,73 +225,89 @@ const Params = () => {
           )}
         </div>
         {!loadGovernedAccounts ? (
-          <div className="border border-fgd-4 grid grid-cols-12 gap-4 lg:gap-6 p-6 rounded-md">
-            <div className="col-span-12 lg:hidden">
-              <Select
-                className="break-all"
-                label={'Governances'}
-                onChange={(g) =>
-                  setActiveGovernance(
-                    governancesArray.find((acc) => acc.pubkey.toBase58() === g)
-                  )
-                }
-                placeholder="Please select..."
-                value={activeGovernance?.pubkey.toBase58()}
-              >
-                {governancesArray.map((x) => {
-                  return (
-                    <Select.Option
-                      key={x.pubkey.toBase58()}
-                      value={x.pubkey.toBase58()}
-                    >
-                      {x.pubkey.toBase58()}
-                    </Select.Option>
-                  )
-                })}
-              </Select>
-            </div>
-            <div className="hidden lg:block lg:col-span-4">
-              <h3 className="mb-4">{governancesArray.length} Governances</h3>
-              <GovernedAccountsTabs
-                activeTab={activeGovernance}
-                onChange={(g) => setActiveGovernance(g)}
-                tabs={governancesArray}
-              />
-            </div>
-            {activeGovernance ? (
-              <div className="col-span-12 lg:col-span-8">
-                <h3 className="break-all mb-4">
-                  {activeGovernance.pubkey.toBase58()}
-                </h3>
-                {assetAccounts.filter(
-                  (x) =>
-                    x.governance.pubkey.toBase58() ===
-                    activeGovernance.pubkey.toBase58()
-                ).length > 0 ? (
-                  <Tabs
-                    activeTab={activeTab}
-                    onChange={(t) => setActiveTab(t)}
-                    tabs={['Params', 'Accounts', 'Statistics']}
-                  />
-                ) : null}
-                {activeTab === 'Params' && (
-                  <ParamsView
-                    activeGovernance={activeGovernance}
-                    openGovernanceProposalModal={openGovernanceProposalModal}
-                  />
-                )}
-                {activeTab === 'Accounts' && (
-                  <AccountsView
-                    activeGovernance={activeGovernance}
-                    getYesNoString={getYesNoString}
-                  />
-                )}
-                {activeTab === 'Statistics' && (
-                  <StatsView activeGovernance={activeGovernance} />
-                )}
+          <>
+            <div className="border border-fgd-4 grid grid-cols-12 gap-4 lg:gap-6 p-6 rounded-md mb-6">
+              <div className="col-span-12 lg:hidden">
+                <Select
+                  className="break-all"
+                  label={'Governances'}
+                  onChange={(g) =>
+                    setActiveGovernance(
+                      governancesArray.find(
+                        (acc) => acc.pubkey.toBase58() === g
+                      )
+                    )
+                  }
+                  placeholder="Please select..."
+                  value={activeGovernance?.pubkey.toBase58()}
+                >
+                  {governancesArray.map((x) => {
+                    return (
+                      <Select.Option
+                        key={x.pubkey.toBase58()}
+                        value={x.pubkey.toBase58()}
+                      >
+                        {x.pubkey.toBase58()}
+                      </Select.Option>
+                    )
+                  })}
+                </Select>
               </div>
-            ) : null}
-          </div>
+              <div className="hidden lg:block lg:col-span-4">
+                <h3 className="mb-4">{governancesArray.length} Governances</h3>
+                <GovernedAccountsTabs
+                  activeTab={activeGovernance}
+                  onChange={(g) => setActiveGovernance(g)}
+                  tabs={governancesArray}
+                />
+              </div>
+              {activeGovernance ? (
+                <div className="col-span-12 lg:col-span-8">
+                  <h3 className="break-all mb-4">
+                    {activeGovernance.pubkey.toBase58()}
+                  </h3>
+                  {assetAccounts.filter(
+                    (x) =>
+                      x.governance.pubkey.toBase58() ===
+                      activeGovernance.pubkey.toBase58()
+                  ).length > 0 ? (
+                    <Tabs
+                      activeTab={activeTab}
+                      onChange={(t) => setActiveTab(t)}
+                      tabs={['Params', 'Accounts', 'Statistics']}
+                    />
+                  ) : null}
+                  {activeTab === 'Params' && (
+                    <ParamsView
+                      activeGovernance={activeGovernance}
+                      openGovernanceProposalModal={openGovernanceProposalModal}
+                    />
+                  )}
+                  {activeTab === 'Accounts' && (
+                    <AccountsView
+                      activeGovernance={activeGovernance}
+                      getYesNoString={getYesNoString}
+                    />
+                  )}
+                  {activeTab === 'Statistics' && (
+                    <StatsView activeGovernance={activeGovernance} />
+                  )}
+                </div>
+              ) : null}
+            </div>
+            {auxiliaryTokenAccounts.length !== 0 && (
+              <div className="border border-fgd-4 gap-4 rounded-md p-6">
+                <div className="max-w-lg">
+                  <h2 className="flex items-center">Auxiliary Accounts </h2>
+                  <AccountsView
+                    activeGovernance={{}}
+                    getYesNoString={getYesNoString}
+                    auxiliaryMode={true}
+                  />
+                </div>
+              </div>
+            )}
+          </>
         ) : (
           <div className="animate-pulse bg-bkg-3 h-48 rounded-lg w-full" />
         )}
@@ -293,7 +316,14 @@ const Params = () => {
   )
 }
 
-export const AddressField = ({ label, val, padding = false, bg = false }) => {
+export const AddressField = ({
+  label,
+  val,
+  padding = false,
+  bg = false,
+  warn = false,
+  warningText = '',
+}) => {
   const pubkey = isNaN(val) && tryParsePublicKey(val)
   const name = pubkey ? getAccountName(pubkey) : ''
   return (
@@ -307,7 +337,16 @@ export const AddressField = ({ label, val, padding = false, bg = false }) => {
         {pubkey && name ? (
           <>
             <div className="text-xs">{name}</div>
-            <div>{val}</div>
+            <div className="flex items-center">
+              {val}
+              {warn && (
+                <div className="ml-1 text-primary-light">
+                  <Tooltip content={warningText}>
+                    <ExclamationIcon width={16} height={16}></ExclamationIcon>
+                  </Tooltip>
+                </div>
+              )}
+            </div>
           </>
         ) : (
           <div>{val}</div>

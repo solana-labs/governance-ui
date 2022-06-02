@@ -21,7 +21,7 @@ import {
   Deposit,
   DepositWithMintAccount,
   getRegistrarPDA,
-  unusedMintPk,
+  emptyPk,
   Voter,
 } from 'VoteStakeRegistry/sdk/accounts'
 import Select from '@components/inputs/Select'
@@ -159,7 +159,7 @@ const Clawback = ({
       const mints = {}
       if (mintCfgs) {
         for (const i of mintCfgs) {
-          if (i.mint.toBase58() !== unusedMintPk) {
+          if (i.mint.toBase58() !== emptyPk) {
             const mint = await tryGetMint(connection.current, i.mint)
             mints[i.mint.toBase58()] = mint
           }

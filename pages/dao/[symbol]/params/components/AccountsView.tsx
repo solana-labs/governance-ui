@@ -3,19 +3,25 @@ import { AccountType } from '@utils/uiTypes/assets'
 import { AddressField } from '../index'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 
-const AccountsView = ({ activeGovernance, getYesNoString }) => {
-  const { assetAccounts } = useGovernanceAssets()
+const AccountsView = ({
+  activeGovernance,
+  getYesNoString,
+  auxiliaryMode = false,
+}) => {
+  const { assetAccounts, auxiliaryTokenAccounts } = useGovernanceAssets()
+  const accounts = auxiliaryMode ? auxiliaryTokenAccounts : assetAccounts
   return (
     <div className="space-y-3">
-      {assetAccounts
-        .filter(
-          (x) =>
-            x.governance.pubkey.toBase58() ===
-            activeGovernance.pubkey.toBase58()
+      {accounts
+        .filter((x) =>
+          !auxiliaryMode
+            ? x.governance.pubkey.toBase58() ===
+              activeGovernance.pubkey.toBase58()
+            : auxiliaryMode
         )
         .map((x) => {
           const info = getTreasuryAccountItemInfoV2(x)
-          if (x.isToken || x.isSol) {
+          if (x.isToken || x.isSol || x.type === AccountType.AuxiliaryToken) {
             return (
               <div
                 className="bg-bkg-1 p-4 pb-2 rounded-md"
@@ -36,7 +42,7 @@ const AccountsView = ({ activeGovernance, getYesNoString }) => {
                         <img className="h-4 mr-1 w-4" src={info.logo} />
                       )}
                       <span>{`${info.amountFormatted} ${
-                        info.info?.symbol && info.info?.symbol
+                        info.info?.symbol ? info.info?.symbol : info.name
                       }`}</span>
                     </div>
                   }

@@ -61,7 +61,7 @@ const AssetItem = ({
           <a
             className="default-transition flex items-center mt-0.5 text-fgd-3 hover:text-fgd-2 text-xs"
             href={getExplorerUrl(
-              connection.endpoint,
+              connection.cluster,
               item?.account.governedAccount
             )}
             target="_blank"

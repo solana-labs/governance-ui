@@ -21,7 +21,7 @@ import { BN } from '@project-serum/anchor'
 import { nftPluginsPks, vsrPluginsPks } from '@hooks/useVotingPlugins'
 import { AssetAccount } from '@utils/uiTypes/assets'
 
-const getValidateAccount = async (
+export const getValidateAccount = async (
   connection: Connection,
   pubKey: PublicKey
 ) => {
@@ -42,7 +42,7 @@ export const getValidatedPublickKey = (val: string) => {
   }
 }
 
-const validateDoseTokenAccountMatchMint = (
+export const validateDoseTokenAccountMatchMint = (
   tokenAccount: AccountInfo,
   mint: PublicKey
 ) => {
@@ -230,6 +230,59 @@ export const getFriktionDepositSchema = ({ form }) => {
           })
         }
       ),
+  })
+}
+
+export const getCastleDepositSchema = ({ form }) => {
+  const governedTokenAccount = form.governedTokenAccount as AssetAccount
+  return yup.object().shape({
+    governedTokenAccount: yup.object().required('Source account is required'),
+    amount: yup
+      .number()
+      .typeError('Amount is required')
+      .test(
+        'amount',
+        'Transfer amount must be less than the source account available amount',
+        async function (val: number) {
+          const isNft = governedTokenAccount?.isNft
+          if (isNft) {
+            return true
+          }
+          if (val && !form.governedTokenAccount) {
+            return this.createError({
+              message: `Please select source account to validate the amount`,
+            })
+          }
+          if (
+            val &&
+            governedTokenAccount &&
+            governedTokenAccount?.extensions.mint
+          ) {
+            const mintValue = getMintNaturalAmountFromDecimalAsBN(
+              val,
+              governedTokenAccount?.extensions.mint.account.decimals
+            )
+            return !!(governedTokenAccount?.extensions.token?.publicKey &&
+            !governedTokenAccount.isSol
+              ? governedTokenAccount.extensions.token.account.amount.gte(
+                  mintValue
+                )
+              : new BN(
+                  governedTokenAccount.extensions.solAccount!.lamports
+                ).gte(mintValue))
+          }
+          return this.createError({
+            message: `Amount is required`,
+          })
+        }
+      ),
+  })
+}
+
+export const getCastleWithdrawSchema = () => {
+  return yup.object().shape({
+    governedTokenAccount: yup.object().required('Source account is required'),
+    amount: yup.number().typeError('Amount is required'),
   })
 }
 
@@ -434,10 +487,6 @@ export const getStakeSchema = ({ form }) => {
         }
         return this.createError({ message: 'Amount is required' })
       }),
-    destinationAccount: yup
-      .object()
-      .nullable()
-      .required('Destination account is required'),
     governedTokenAccount: yup
       .object()
       .nullable()

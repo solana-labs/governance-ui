@@ -6,7 +6,26 @@
     "realmId": "5piGF94RbCqaogoFFWA9cYmt29qUpQejGCEjRKuwCz7d",
     "bannerImage": "/realms/Ukraine/img/Flag_of_Ukraine.svg",
     "ogImage": "/realms/Ukraine/img/Ukraine_Logo.png",
-    "sharedWalletId": "66pJhhESDjdeBBDdkKmxYYd7q6GUggYPWjxpMKNX39KV"
+    "sharedWalletId": "66pJhhESDjdeBBDdkKmxYYd7q6GUggYPWjxpMKNX39KV",
+    "sortRank":3 
+  },
+  {
+    "symbol": "MNGO",
+    "displayName": "Mango DAO",
+    "programId": "GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J",
+    "realmId": "DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE",
+    "website": "https://mango.markets",
+    "keywords": "Mango Markets, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
+    "twitter": "@mangomarkets",
+    "ogImage": "https://trade.mango.markets/assets/icons/logo.svg",
+    "sortRank":3 
+  },
+  {
+    "symbol": "DTP",
+    "displayName": "The Imperium of Rain",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "6orGiJYGXYk9GT2NFoTv2ZMYpA6asMieAqdek4YRH2Dn",
+    "ogImage": "/realms/RAIN/img/rain_logo.png"
   },
   {
     "symbol": "UkraineUnchained",
@@ -20,14 +39,43 @@
     "sharedWalletId": "BnBe9uwucnLWpKqzgtvGU2aURRXezcqEVCoL8L6CeDgF"
   },
   {
-    "symbol": "MNGO",
-    "displayName": "Mango DAO",
-    "programId": "GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J",
-    "realmId": "DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE",
+    "symbol": "MangoLiquidityDAO",
+    "displayName": "Mango Liquidity DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "DnWHRVRbA2XGwWth2da7iF3Q81cqRHhqJXSPS8J3G6fo",
     "website": "https://mango.markets",
     "keywords": "Mango Markets, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
     "twitter": "@mangomarkets",
     "ogImage": "https://trade.mango.markets/assets/icons/logo.svg"
+  },
+  {
+    "symbol": "WEZ",
+    "displayName": "Wezesha DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "FEtF7V55LorZmUriVVobubPvLXoS7sfP3smzb5zR4BWz",
+    "website": "https://wezesha.co",
+    "keywords": "Wezesha DAO, Wezesha, Wezesha Coin, The Big Five NFTs Club, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, SPL-TOKEN, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
+    "twitter": "@WezeshaCo",
+    "ogImage": "/realms/WezeshaDAO/img/Wezesha_logo.png"
+  },
+  {
+    "symbol": "BFNC",
+    "displayName": "BNFC DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "36YGaNUYtRbaq1fHL4inLvHDxb7W28dBxWSna64v9Tea",
+    "website": "https://bigfivenftclub.com",
+    "keywords": "Big Five NFT Club DAO, BFNC DAO, Big Five Coin, The Big Five NFT Club, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, SPL-TOKEN, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
+    "twitter": "@bigfivenftclub",
+    "ogImage": "/realms/BFNC/img/logo.png"
+  },
+  {
+    "symbol": "ORCA",
+    "displayName": "Orca DAO",
+    "programId": "J9uWvULFL47gtCPvgR3oN7W357iehn5WF2Vn9MJvcSxz",
+    "realmId": "66Du7mXgS2KMQBUk6m9h3TszMjqZqdWhsG3Duuf69VNW",
+    "website": "https://www.orca.so/",
+    "twitter": "@orca_so",
+    "ogImage": "https://learn.orca.so/static/media/logomark.1ef55f8f.svg"
   },
   {
     "symbol": "JET",
@@ -47,6 +95,15 @@
     "twitter": "@TheSporagers",
     "ogImage": "/realms/TheSporagers/img/the_sporagers.png",
     "bannerImage": "/realms/TheSporagers/img/the_sporagers_banner.jpeg"
+  },
+  {
+    "symbol": "NFT Club Berlin",
+    "displayName": "NFT Club Berlin",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "E5DCxoF2vjzFeaDBi9kfFDZVoxrpe6nRFfKtm1J8Qdq7",
+    "ogImage": "/realms/NFTClubBerlin/img/logo.png",
+    "website": "http://nftclub.berlin",
+    "twitter": "@NFTClubBerlin"
   },
   {
     "symbol": "POOR",
@@ -210,7 +267,8 @@
     "realmId": "By2sVGZXwfQq6rAiAM3rNPJ9iQfb5e2QhnF4YjJ4Bip",
     "ogImage": "/realms/Grape/img/grape.png",
     "website": "https://grapes.network/",
-    "twitter": "@grapeprotocol"
+    "twitter": "@grapeprotocol",
+    "sortRank":3 
   },
   {
     "symbol": "MonkeDAO",
@@ -308,6 +366,15 @@
     "keywords": "WOOF",
     "website": "https://woofsolana.io/",
     "twitter": "@WoofSolana"
+  },
+  {
+    "symbol": "NFTOFFROADFC",
+    "displayName": "NFT OFF ROAD FAN CLUB DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "6NaoicaQtUCgEqUuniSzpsKYN9DRaSeGa3Ludk5Mxb18",
+    "ogImage": "/realms/NFTOFFROADFANCLUB/img/logo.png",
+    "website": "https://nftoffroadfan.club/",
+    "twitter": "@NFT_Off_Road_FC"
   },
   {
     "symbol": "GoblinGold",
@@ -632,5 +699,75 @@
     "ogImage": "/realms/FyfyDAO/img/logo.png",
     "website": "https://www.fyfy.io/",
     "twitter": "@fyfyio"
+  },
+  {
+    "symbol": "LoS",
+    "displayName": "Legion of Sol",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "8PqcJBBsZRMHQwMYrP6wx7BFrX4TNpBTWTVegGDNiFEJ",
+    "ogImage": "https://raw.githubusercontent.com/SolStonez/Legion-Key-Logo/main/demon_logo.png",
+    "website": "https://www.legionofsol.io/",
+    "twitter": "@legion_of_sol"
+  },
+  {
+    "symbol": "SquatchDAO",
+    "displayName": "SquatchDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "5DqXtnSqxUukgQ8ZJQhTEdF7y3cu3zQuBpREC1g3bNjf",
+    "ogImage": "https://raw.githubusercontent.com/Exonft/SquatchDAO/main/SquatchDAO.jpg",
+    "website": "www.squatchdao.com",
+    "twitter": "@Squatch_DAO"
+  },
+  {
+    "symbol": "RRA",
+    "displayName": "RRA DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "4pLWsjAJJmyUL73MyxDVcSB3iTR6Yuyx7S98EqSDqjmH",
+    "ogImage": "/realms/RRADAO/rradao_logo.jpg",
+    "website": "https://www.ruderhinos.club",
+    "twitter": "@RudeRhinosClub"
+  },
+  {
+    "symbol": "PhoenixDAO",
+    "displayName": "Phoenix DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Fvzr2TsUuUZ4HoZumH6ppa1cacWshU1YUZgGYHPHH4rz",
+    "ogImage": "/realms/PhoenixDAO/phoenixdao_logo.png"
+  },
+  {
+    "symbol": "SOLI",
+    "displayName": "Solana Ecosystem Index",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "J5ViB3N7S3YRnrMpy7iSy57yYQaviJJDmrfGVT51z44o",
+    "ogImage": "/realms/SOLI/soli_logo.png",
+    "website": "https://tokens.amun.com/token/SOLI",
+    "twitter": "@Amun"
+  },
+  {
+    "symbol": "SBYC",
+    "displayName": "SBYC DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "BycjQ24kBPhdzBbJanQJ1bydLGqZHf3oseGGLVcb2RWK",
+    "ogImage": "/realms/SBYCDAO/img/logo.png",
+    "website": "https://solboredyachtclub.com",
+    "twitter": "@SolBoredYacht"
+  },
+    {
+    "symbol": "$MasoorDAO",
+    "displayName": "Hari's Realm",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "4PYdZHs2hwZYibkvEnpVCJpU7bD4aFUkWtYxGFU25ZWu",
+    "website": "https://www.linkedin.com/in/harimasoor/",
+    "twitter": "@HariOnChain",
+    "ogImage": "/realms/MasoorDAO/MasoorDAO.PNG"
+  },
+    {
+    "symbol": "ADAO",
+    "displayName": "Astra DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Cwh2E98xcB5qL8yuGvxdaMezRUQXwdCwcCKhYKqUPqFD",
+    "website": "https://www.youtube.com/channel/UCP6jlgRDcs5S68OVjleMGjg",
+    "twitter": "@MannyAstra",
+    "ogImage": "/realms/Astra/AstraPodcastLogo.PNG"
   }
 ]

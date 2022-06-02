@@ -29,6 +29,10 @@ import {
   TOKEN_PROGRAM_ID,
   Token,
 } from '@solana/spl-token'
+import {
+  LOCALNET_STAKING_ADDRESS as PYTH_LOCALNET_STAKING_ADDRESS,
+  DEVNET_STAKING_ADDRESS as PYTH_DEVNET_STAKING_ADDRESS,
+} from 'pyth-staking-api'
 
 export const vsrPluginsPks: string[] = [
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo',
@@ -44,14 +48,20 @@ export const switchboardPluginsPks: string[] = [
   'B4EDDdMh5CmB6B9DeMmZmFvRzEgyHR5zWktf6httcMk6'
 ]
 
+export const pythPluginsPks: string[] = [
+  PYTH_LOCALNET_STAKING_ADDRESS.toBase58(),
+  PYTH_DEVNET_STAKING_ADDRESS.toBase58(),
+]
+
 export function useVotingPlugins() {
-  const { realm, config } = useRealm()
+  const { realm, config, ownTokenRecord } = useRealm()
   const {
     handleSetVsrRegistrar,
     handleSetVsrClient,
     handleSetNftClient,
     handleSetSwitchboardClient,
     handleSetNftRegistrar,
+    handleSetPythClient,
     handleSetCurrentRealmVotingClient,
   } = useVotePluginsClientStore()
   const {
@@ -69,6 +79,7 @@ export function useVotingPlugins() {
   const switchboardClient = useVotePluginsClientStore(
     (s) => s.state.switchboardClient
   )
+  const pythClient = useVotePluginsClientStore((s) => s.state.pythClient)
   const currentClient = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
@@ -77,7 +88,11 @@ export function useVotingPlugins() {
     (s) => s.state.nftMintRegistrar
   )
   const usedCollectionsPks: string[] =
-    nftMintRegistrar?.collectionConfigs.map((x) => x.collection.toBase58()) ||
+    (currentPluginPk &&
+      nftPluginsPks.includes(currentPluginPk?.toBase58()) &&
+      nftMintRegistrar?.collectionConfigs.map((x) =>
+        x.collection.toBase58()
+      )) ||
     []
   const handleGetNfts = async () => {
     setIsLoadingNfts(true)
@@ -394,6 +409,7 @@ export function useVotingPlugins() {
     handleSetVsrClient(wallet, connection)
     handleSetNftClient(wallet, connection)
     handleSetSwitchboardClient(wallet, connection)
+    handleSetPythClient(wallet, connection)
   }, [connection.endpoint])
 
   useEffect(() => {
@@ -408,7 +424,8 @@ export function useVotingPlugins() {
           handleSetCurrentRealmVotingClient({
             client: vsrClient,
             realm,
-            walletPk: wallet?.publicKey,
+            walletPk:
+              ownTokenRecord?.account?.governingTokenOwner || wallet?.publicKey,
           })
         }
       }
@@ -424,7 +441,25 @@ export function useVotingPlugins() {
           handleSetCurrentRealmVotingClient({
             client: nftClient,
             realm,
-            walletPk: wallet?.publicKey,
+            walletPk:
+              ownTokenRecord?.account?.governingTokenOwner || wallet?.publicKey,
+          })
+        }
+      }
+    }
+
+    const handlePythPlugin = () => {
+      if (
+        pythClient &&
+        currentPluginPk &&
+        pythPluginsPks.includes(currentPluginPk.toBase58())
+      ) {
+        if (connected) {
+          handleSetCurrentRealmVotingClient({
+            client: pythClient,
+            realm,
+            walletPk:
+              ownTokenRecord?.account?.governingTokenOwner || wallet?.publicKey,
           })
         }
       }
@@ -454,16 +489,23 @@ export function useVotingPlugins() {
     ) {
       handleNftplugin()
       handleVsrPlugin()
+<<<<<<< HEAD
       handleSwitchboardPlugin()
+=======
+      handlePythPlugin()
+>>>>>>> dc2e11d94f735f0a0df6f5be45b6c649157a7c36
     }
   }, [
     currentPluginPk?.toBase58(),
     vsrClient?.program.programId.toBase58(),
     nftClient?.program.programId.toBase58(),
+    pythClient?.program.programId.toBase58(),
     realm?.pubkey.toBase58(),
     connection.endpoint,
     connected,
+    ownTokenRecord,
   ])
+
   useEffect(() => {
     handleGetSwitchboardVoting()
     if (usedCollectionsPks.length && realm) {

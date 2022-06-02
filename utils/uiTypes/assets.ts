@@ -55,6 +55,27 @@ export class AccountTypeToken implements AssetAccount {
   }
 }
 
+export class AccountTypeAuxiliaryToken implements AssetAccount {
+  governance: ProgramAccount<Governance>
+  type: AccountType
+  extensions: AccountExtension
+  pubkey: PublicKey
+  constructor(
+    tokenAccount: TokenProgramAccount<AccountInfo>,
+    mint: TokenProgramAccount<MintInfo>
+  ) {
+    this.governance = {} as any
+    this.pubkey = tokenAccount.publicKey
+    this.type = AccountType.AuxiliaryToken
+    this.extensions = {
+      token: tokenAccount,
+      mint: mint,
+      transferAddress: tokenAccount!.publicKey!,
+      amount: tokenAccount!.account.amount,
+    }
+  }
+}
+
 export class AccountTypeProgram implements AssetAccount {
   governance: ProgramAccount<Governance>
   type: AccountType

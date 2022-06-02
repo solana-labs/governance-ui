@@ -1,23 +1,27 @@
-import { Menu } from '@headlessui/react'
-import { useEffect, useMemo, useState } from 'react'
-import { CheckCircleIcon, ChevronDownIcon } from '@heroicons/react/solid'
-import styled from '@emotion/styled'
-import useWalletStore from '../stores/useWalletStore'
-import {
-  getWalletProviderByUrl,
-  WALLET_PROVIDERS,
-} from '../utils/wallet-adapters'
 import {
   AddressImage,
   DisplayAddress,
   useAddressName,
   useWalletIdentity,
 } from '@cardinal/namespaces-components'
-import { BackspaceIcon } from '@heroicons/react/solid'
+import styled from '@emotion/styled'
+import { Menu } from '@headlessui/react'
 import { UserCircleIcon } from '@heroicons/react/outline'
+import {
+  BackspaceIcon,
+  CheckCircleIcon,
+  ChevronDownIcon,
+} from '@heroicons/react/solid'
 import { abbreviateAddress } from '@utils/formatting'
-import TwitterIcon from './TwitterIcon'
+import { useEffect, useMemo } from 'react'
+import useLocalStorageState from '../hooks/useLocalStorageState'
+import useWalletStore from '../stores/useWalletStore'
+import {
+  getWalletProviderByUrl,
+  WALLET_PROVIDERS,
+} from '../utils/wallet-adapters'
 import Switch from './Switch'
+import TwitterIcon from './TwitterIcon'
 
 const StyledWalletProviderLabel = styled.p`
   font-size: 0.65rem;
@@ -37,13 +41,13 @@ const ConnectWalletButton = (props) => {
     providerUrl,
   ])
 
-  const [useDevnet, setUseDevnet] = useState(false)
+  const [useDevnet, setUseDevnet] = useLocalStorageState('false')
   const handleToggleDevnet = () => {
     setUseDevnet(!useDevnet)
     if (useDevnet) {
-      window.location.replace(`${window.location.pathname}`)
+      window.location.href = `${window.location.pathname}`
     } else {
-      window.location.replace(`${window.location.href}?cluster=devnet`)
+      window.location.href = `${window.location.href}?cluster=devnet`
     }
   }
   useEffect(() => {
@@ -83,6 +87,7 @@ const ConnectWalletButton = (props) => {
       />
     ) : null
   }, [current?.publicKey?.toBase58()])
+
   const displayAddressImage = useMemo(() => {
     return connected && current?.publicKey ? (
       <div className="w-12 pr-2">
@@ -93,18 +98,19 @@ const ConnectWalletButton = (props) => {
           height="40px"
           width="40px"
           placeholder={
-            <div className="bg-bkg-4 flex flex-shrink-0 items-center justify-center h-10 rounded-full w-10 mr-2">
+            <div className="flex items-center justify-center flex-shrink-0 w-10 h-10 mr-2 rounded-full bg-bkg-4">
               <UserCircleIcon className="h-9 text-fgd-3 w-9" />
             </div>
           }
         />{' '}
       </div>
     ) : (
-      <div className="pr-2 pl-2">
-        <img src={provider?.icon} className="h-5 w-5" />
+      <div className="pl-2 pr-2">
+        <img src={provider?.adapter.icon} className="w-5 h-5" />
       </div>
     )
-  }, [])
+  }, [provider])
+
   return (
     <div className="flex">
       <div
@@ -117,7 +123,7 @@ const ConnectWalletButton = (props) => {
         onClick={handleConnectDisconnect}
         {...props}
       >
-        <div className="flex font-bold items-center text-fgd-1 text-left text-sm relative">
+        <div className="relative flex items-center text-sm font-bold text-left text-fgd-1">
           {displayAddressImage}
           <div>
             {connected && current?.publicKey ? (
@@ -152,28 +158,38 @@ const ConnectWalletButton = (props) => {
                   } default-transition h-5 m-auto ml-1 text-primary-light w-5`}
                 />
               </Menu.Button>
-              <Menu.Items className="absolute bg-bkg-1 border border-fgd-4 p-2 right-0 top-14 shadow-md outline-none rounded-md w-48 z-20">
+              <Menu.Items className="absolute right-0 z-20 w-48 p-2 border rounded-md shadow-md outline-none bg-bkg-1 border-fgd-4 top-14">
                 <>
-                  {WALLET_PROVIDERS.map(({ name, url, icon }) => (
+                  {WALLET_PROVIDERS.map(({ name, url, adapter: { icon } }) => (
                     <Menu.Item key={name}>
                       <button
-                        className="flex default-transition h-9 items-center p-2 w-full hover:bg-bkg-3 hover:cursor-pointer hover:rounded font-normal focus:outline-none"
+                        className="flex items-center w-full p-2 font-normal default-transition h-9 hover:bg-bkg-3 hover:cursor-pointer hover:rounded focus:outline-none"
                         onClick={() =>
                           setWalletStore((s) => {
                             s.providerUrl = url
                           })
                         }
                       >
-                        <img src={icon} className="h-4 w-4 mr-2" />
+                        <img src={icon} className="w-4 h-4 mr-2" />
                         <span className="text-sm">{name}</span>
 
                         {provider?.url === url ? (
-                          <CheckCircleIcon className="h-5 ml-2 text-green w-5" />
+                          <CheckCircleIcon className="w-5 h-5 ml-2 text-green" />
                         ) : null}
                       </button>
                     </Menu.Item>
                   ))}
-
+                  <Menu.Item key={'devnet'}>
+                    <div className="flex items-center w-full p-2 font-normal default-transition h-9 hover:bg-bkg-3 hover:cursor-pointer hover:rounded focus:outline-none">
+                      <span className="text-sm">Devnet</span>
+                      <Switch
+                        checked={useDevnet}
+                        onChange={() => {
+                          handleToggleDevnet()
+                        }}
+                      />
+                    </div>
+                  </Menu.Item>
                   {current && current.publicKey && (
                     <>
                       <hr
@@ -190,8 +206,8 @@ const ConnectWalletButton = (props) => {
                           )
                         }
                       >
-                        <button className="flex default-transition h-9 items-center p-2 w-full hover:bg-bkg-3 hover:cursor-pointer hover:rounded font-normal focus:outline-none">
-                          <TwitterIcon className="h-4 w-4 mr-2" />
+                        <button className="flex items-center w-full p-2 font-normal default-transition h-9 hover:bg-bkg-3 hover:cursor-pointer hover:rounded focus:outline-none">
+                          <TwitterIcon className="w-4 h-4 mr-2" />
                           <span className="text-sm">
                             {displayName ? 'Edit Twitter' : 'Link Twitter'}
                           </span>
@@ -201,25 +217,9 @@ const ConnectWalletButton = (props) => {
                         key={'disconnect'}
                         onClick={handleConnectDisconnect}
                       >
-                        <button className="flex default-transition h-9 items-center p-2 w-full hover:bg-bkg-3 hover:cursor-pointer hover:rounded font-normal focus:outline-none">
-                          <BackspaceIcon className="h-4 w-4 mr-2" />
+                        <button className="flex items-center w-full p-2 font-normal default-transition h-9 hover:bg-bkg-3 hover:cursor-pointer hover:rounded focus:outline-none">
+                          <BackspaceIcon className="w-4 h-4 mr-2" />
                           <span className="text-sm">Disconnect</span>
-                        </button>
-                      </Menu.Item>
-                      <Menu.Item
-                        key={'devnet'}
-                        onClick={() => {
-                          handleToggleDevnet()
-                        }}
-                      >
-                        <button className="flex default-transition h-9 items-center p-2 w-full hover:bg-bkg-3 hover:cursor-pointer hover:rounded font-normal focus:outline-none">
-                          <span className="text-sm">Devnet</span>
-                          <Switch
-                            checked={useDevnet}
-                            onChange={() => {
-                              handleToggleDevnet()
-                            }}
-                          />
                         </button>
                       </Menu.Item>
                     </>

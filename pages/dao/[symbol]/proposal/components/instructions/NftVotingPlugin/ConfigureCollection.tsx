@@ -71,25 +71,25 @@ const ConfigureNftPluginCollection = ({
         realm!.account.communityMint,
         nftClient!.program.programId
       )
-      const instruction = nftClient!.program.instruction.configureCollection(
-        weight,
-        form!.size,
-        {
-          accounts: {
-            registrar,
-            realm: realm!.pubkey,
-            realmAuthority: realm!.account.authority!,
-            collection: new PublicKey(form!.collection),
-            maxVoterWeightRecord: maxVoterWeightRecord,
-          },
-        }
+      const configureCollectionIx = await nftClient!.program.methods
+        .configureCollection(weight, form!.size)
+        .accounts({
+          registrar,
+          realm: realm!.pubkey,
+          realmAuthority: realm!.account.authority!,
+          collection: new PublicKey(form!.collection),
+          maxVoterWeightRecord: maxVoterWeightRecord,
+        })
+        .instruction()
+      serializedInstruction = serializeInstructionToBase64(
+        configureCollectionIx
       )
-      serializedInstruction = serializeInstructionToBase64(instruction)
     }
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form!.governedAccount?.governance,
+      chunkSplitByDefault: true,
     }
     return obj
   }

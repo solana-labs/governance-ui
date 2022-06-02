@@ -13,7 +13,7 @@ import { tryGetMint } from '@utils/tokens'
 import {
   getRegistrarPDA,
   getVoterPDA,
-  unusedMintPk,
+  emptyPk,
   DepositWithMintAccount,
   LockupType,
   Registrar,
@@ -52,7 +52,7 @@ export const getDeposits = async ({
   let votingPowerFromDeposits = new BN(0)
   let deposits: DepositWithMintAccount[] = []
   for (const i of mintCfgs) {
-    if (i.mint.toBase58() !== unusedMintPk) {
+    if (i.mint.toBase58() !== emptyPk) {
       const mint = await tryGetMint(connection, i.mint)
       mints[i.mint.toBase58()] = mint
     }
@@ -70,7 +70,6 @@ export const getDeposits = async ({
       .filter((x) => typeof isUsed === 'undefined' || x.isUsed === isUsed)
     const usedDeposits = deposits.filter((x) => x.isUsed)
     const areThereAnyUsedDeposits = usedDeposits.length
-
     if (areThereAnyUsedDeposits) {
       const events = await getDepositsAdditionalInfoEvents(
         client,
@@ -163,16 +162,16 @@ export const getPeriod = (
     lockupKind !== MONTHLY
       ? lockUpPeriodInDays
       : lockUpPeriodInDays / DAYS_PER_MONTH
-  const maxMonthsNumber = 72
-  const daysLimit = 2190
+  //   const maxMonthsNumber = 72
+  //   const daysLimit = 2190
   //additional prevention of lockup being to high in case of monthly lockup 72 months as 6 years
   //in case of other types 2190 days as 6 years
-  if (lockupKind === MONTHLY && period > maxMonthsNumber) {
-    throw 'lockup period is to hight'
-  }
-  if (lockupKind !== MONTHLY && period > daysLimit) {
-    throw 'lockup period is to hight'
-  }
+  //   if (lockupKind === MONTHLY && period > maxMonthsNumber) {
+  //     throw 'lockup period is to hight'
+  //   }
+  //   if (lockupKind !== MONTHLY && period > daysLimit) {
+  //     throw 'lockup period is to hight'
+  //   }
   return period
 }
 
@@ -223,19 +222,16 @@ const getDepositsAdditionalInfoEvents = async (
   const events: any[] = []
   const parser = new EventParser(client.program.programId, client.program.coder)
   const maxRange = 8
-  const itemsCount = usedDeposits.length
-  const numberOfSimulations = Math.ceil(itemsCount / maxRange)
+  const maxIndex = Math.max(...usedDeposits.map((x) => x.index)) + 1
+  const numberOfSimulations = Math.ceil(maxIndex / maxRange)
   for (let i = 0; i < numberOfSimulations; i++) {
     const take = maxRange
     const transaction = new Transaction({ feePayer: walletPk })
-    transaction.add(
-      client.program.instruction.logVoterInfo(maxRange * i, take, {
-        accounts: {
-          registrar,
-          voter,
-        },
-      })
-    )
+    const logVoterInfoIx = await client.program.methods
+      .logVoterInfo(maxRange * i, take)
+      .accounts({ registrar, voter })
+      .instruction()
+    transaction.add(logVoterInfoIx)
     const batchOfDeposits = await simulateTransaction(
       connection,
       transaction,

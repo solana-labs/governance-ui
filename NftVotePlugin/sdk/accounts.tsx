@@ -1,6 +1,6 @@
 import { PublicKey } from '@solana/web3.js'
 
-export const unusedMintPk = '11111111111111111111111111111111'
+export const emptyPk = '11111111111111111111111111111111'
 
 export const getNftRegistrarPDA = async (
   realmPk: PublicKey,

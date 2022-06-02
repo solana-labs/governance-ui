@@ -94,7 +94,7 @@ const MakeCreatePerpMarket = ({
         c.publicKey.equals(new PublicKey(form.mangoGroup!))
       )!
 
-      const oraclePk = new PublicKey(form)
+      const oraclePk = new PublicKey(form.oracleAccount)
 
       const mangoGroup = await new MangoClient(
         connection,
@@ -138,7 +138,7 @@ const MakeCreatePerpMarket = ({
       tx.add(makeAskAccountInstruction.instruction)
 
       tx.recentBlockhash = (
-        await connection.getRecentBlockhash('max')
+        await connection.getLatestBlockhash('max')
       ).blockhash
       const signers = [
         makeEventQueueAccountInstruction.account,

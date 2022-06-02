@@ -8,6 +8,7 @@ import { SupportedMintName } from '@tools/sdk/solend/configuration'
 import { SplTokenUIName } from '@utils/splTokens'
 import { DepositWithMintAccount, Voter } from 'VoteStakeRegistry/sdk/accounts'
 import { LockupKind } from 'VoteStakeRegistry/tools/types'
+import { consts as foresightConsts } from '@foresight-tmp/foresight-sdk'
 import { AssetAccount } from '@utils/uiTypes/assets'
 
 export interface UiInstruction {
@@ -18,6 +19,7 @@ export interface UiInstruction {
   customHoldUpTime?: number
   prerequisiteInstructions?: TransactionInstruction[]
   chunkSplitByDefault?: boolean
+  chunkBy?: number
   signers?: Keypair[]
   shouldSplitIntoSeparateTxs?: boolean | undefined
 }
@@ -25,6 +27,22 @@ export interface SplTokenTransferForm {
   destinationAccount: string
   amount: number | undefined
   governedTokenAccount: AssetAccount | undefined
+  programId: string | undefined
+  mintInfo: MintInfo | undefined
+}
+
+export interface CastleDepositForm {
+  amount: number | undefined
+  governedTokenAccount: AssetAccount | undefined
+  castleVaultId: string
+  programId: string | undefined
+  mintInfo: MintInfo | undefined
+}
+
+export interface CastleWithdrawForm {
+  amount: number | undefined
+  governedTokenAccount: AssetAccount | undefined
+  castleVaultId: string
   programId: string | undefined
   mintInfo: MintInfo | undefined
 }
@@ -181,6 +199,36 @@ export interface MangoMakeChangeReferralFeeParams {
   refShareCentibps: number
   refMngoRequired: number
 }
+
+export interface ForesightHasGovernedAccount {
+  governedAccount: AssetAccount
+}
+
+export interface ForesightHasMarketListId extends ForesightHasGovernedAccount {
+  marketListId: string
+}
+
+export interface ForesightHasMarketId extends ForesightHasMarketListId {
+  marketId: number
+}
+
+export interface ForesightHasCategoryId extends ForesightHasGovernedAccount {
+  categoryId: string
+}
+
+export interface ForesightMakeAddMarketListToCategoryParams
+  extends ForesightHasCategoryId,
+    ForesightHasMarketListId {}
+
+export interface ForesightMakeResolveMarketParams extends ForesightHasMarketId {
+  winner: number
+}
+
+export interface ForesightMakeAddMarketMetadataParams
+  extends ForesightHasMarketId {
+  content: string
+  field: foresightConsts.MarketMetadataFieldName
+}
 export interface Base64InstructionForm {
   governedAccount: AssetAccount | undefined
   base64: string
@@ -243,6 +291,8 @@ export enum Instructions {
   Grant,
   Clawback,
   CreateAssociatedTokenAccount,
+  DepositIntoCastle,
+  WithrawFromCastle,
   DepositIntoVolt,
   WithdrawFromVolt,
   CreateSolendObligationAccount,
@@ -251,11 +301,20 @@ export enum Instructions {
   WithdrawObligationCollateralAndRedeemReserveLiquidity,
   RefreshSolendObligation,
   RefreshSolendReserve,
+  ForesightInitMarket,
+  ForesightInitMarketList,
+  ForesightInitCategory,
+  ForesightResolveMarket,
+  ForesightAddMarketListToCategory,
+  ForesightAddMarketMetadata,
   RealmConfig,
   CreateNftPluginRegistrar,
   CreateNftPluginMaxVoterWeight,
   ConfigureNftPluginCollection,
   CloseTokenAccount,
+  VotingMintConfig,
+  CreateVsrRegistrar,
+  ChangeMakeDonation,
 }
 
 export type createParams = [
@@ -282,4 +341,30 @@ export interface InstructionsContext {
   handleSetInstructions: (val, index) => void
   governance: ProgramAccount<Governance> | null | undefined
   setGovernance: (val) => void
+}
+
+export interface ChangeNonprofit {
+  name: string
+  description: string
+  ein: string
+  classification: string
+  category: string
+  address_line: string
+  city: string
+  state: string
+  zip_code: string
+  icon_url: string
+  email?: string
+  website: string
+  socials: {
+    facebook?: string
+    instagram?: string
+    tiktok?: string
+    twitter?: string
+    youtube?: string
+  }
+  crypto: {
+    solana_address: string
+    ethereum_address: string
+  }
 }

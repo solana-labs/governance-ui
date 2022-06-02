@@ -16,6 +16,7 @@ import {
 } from '@notifi-network/notifi-react-hooks'
 import { useRouter } from 'next/router'
 import { EndpointTypes } from '@models/types'
+import { useCallback } from 'react'
 
 const firstOrNull = <T,>(
   arr: ReadonlyArray<T> | null | undefined
@@ -33,7 +34,7 @@ const NotificationsCard = () => {
   const [isLoading, setLoading] = useState<boolean>(false)
   const [hasUnsavedChanges, setUnsavedChanges] = useState<boolean>(false)
   const [errorMessage, setErrorMessage] = useState<string>('')
-  const enableTelegramInput = false
+  const [telegramEnabled, setTelegramEnabled] = useState<boolean>(false)
 
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
@@ -56,6 +57,7 @@ const NotificationsCard = () => {
     isAuthenticated,
     createAlert,
     updateAlert,
+    getConfiguration,
   } = useNotifiClient({
     dappAddress: realm?.pubkey?.toBase58() ?? '',
     walletPublicKey: wallet?.publicKey?.toString() ?? '',
@@ -65,6 +67,19 @@ const NotificationsCard = () => {
   const [email, setEmail] = useState<string>('')
   const [phone, setPhone] = useState<string>('')
   const [telegram, setTelegram] = useState<string>('')
+
+  const updateTelegramSupported = useCallback(async () => {
+    const { supportedTargetTypes } = await getConfiguration()
+    const telegram = supportedTargetTypes.find((it) => it === 'TELEGRAM')
+    setTelegramEnabled(telegram !== undefined)
+  }, [getConfiguration, setTelegramEnabled])
+
+  useEffect(() => {
+    // can't use async with useEffect
+    updateTelegramSupported().catch((e) => {
+      console.error('Failed to get supported type information: ', e)
+    })
+  }, [updateTelegramSupported])
 
   useEffect(() => {
     // Update state when server data changes
@@ -121,14 +136,26 @@ const NotificationsCard = () => {
     if (connected && isAuthenticated()) {
       try {
         if (alert !== null) {
-          await updateAlert({
+          const alertResult = await updateAlert({
             alertId: alert.id ?? '',
             emailAddress: email === '' ? null : email,
             phoneNumber: phone.length < 12 ? null : phone,
             telegramId: telegram === '' ? null : telegram,
           })
+
+          if (alertResult) {
+            if (alertResult.targetGroup?.telegramTargets?.length > 0) {
+              const target = alertResult.targetGroup?.telegramTargets[0]
+              if (target && !target.isConfirmed) {
+                console.log(target.confirmationUrl)
+                if (target.confirmationUrl) {
+                  window.open(target.confirmationUrl)
+                }
+              }
+            }
+          }
         } else {
-          await createAlert({
+          const alertResult = await createAlert({
             name: `${realm?.account.name} notifications`,
             emailAddress: email === '' ? null : email,
             phoneNumber: phone.length < 12 ? null : phone,
@@ -136,6 +163,18 @@ const NotificationsCard = () => {
             sourceId: source?.id ?? '',
             filterId: filter?.id ?? '',
           })
+
+          if (alertResult) {
+            if (alertResult.targetGroup?.telegramTargets?.length > 0) {
+              const target = alertResult.targetGroup?.telegramTargets[0]
+              if (target && !target.isConfirmed) {
+                console.log(target.confirmationUrl)
+                if (target.confirmationUrl) {
+                  window.open(target.confirmationUrl)
+                }
+              }
+            }
+          }
         }
         setUnsavedChanges(false)
       } catch (e) {
@@ -175,7 +214,7 @@ const NotificationsCard = () => {
 
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
-      <h3 className="mb-4">Notifications</h3>
+      <h3 className="mb-4">Set up notifications</h3>
       {hasLoaded ? (
         !connected ? (
           <>
@@ -187,7 +226,8 @@ const NotificationsCard = () => {
           <>
             <div>
               <div className="text-sm text-th-fgd-1 flex flex-row items-center justify-between mt-4">
-                Notifi me on DAO Proposal Changes
+                Get notifications for proposals, voting, and results. Add your
+                email address, phone number, and/or Telegram.
               </div>
               {errorMessage.length > 0 ? (
                 <div className="text-sm text-red">{errorMessage}</div>
@@ -201,10 +241,10 @@ const NotificationsCard = () => {
             </div>
             <InputRow
               label="E-mail"
-              icon={<MailIcon className="mr-1.5 h-4 text-primary-light w-4" />}
+              icon={<MailIcon className="h-8 text-primary-light w-4 mr-1" />}
             >
               <Input
-                className="my-4"
+                className="w-full min-w-full"
                 type="email"
                 value={email}
                 onChange={handleEmail}
@@ -214,11 +254,10 @@ const NotificationsCard = () => {
 
             <InputRow
               label="SMS"
-              icon={
-                <ChatAltIcon className="mr-1.5 h-4 text-primary-light w-4" />
-              }
+              icon={<ChatAltIcon className="h-8 text-primary-light w-4 mr-1" />}
             >
               <Input
+                className="w-full min-w-full"
                 type="tel"
                 value={phone}
                 onChange={handlePhone}
@@ -226,17 +265,18 @@ const NotificationsCard = () => {
               />
             </InputRow>
 
-            {enableTelegramInput && (
+            {telegramEnabled && (
               <InputRow
                 label="Telegram"
                 icon={
                   <PaperAirplaneIcon
-                    className="mr-1.5 h-4 text-primary-light w-4"
+                    className="mr-0 h-4 text-primary-light w-4"
                     style={{ transform: 'rotate(45deg)' }}
                   />
                 }
               >
                 <Input
+                  className="w-full min-w-full"
                   type="text"
                   value={telegram}
                   onChange={handleTelegram}
@@ -253,7 +293,7 @@ const NotificationsCard = () => {
                     ? 'Save settings for notifications'
                     : 'Fetch stored values for existing accounts'
                 }
-                className="sm:w-1/2"
+                className="sm:w-full"
                 disabled={disabled}
                 onClick={
                   hasUnsavedChanges || isAuthenticated()
@@ -262,21 +302,26 @@ const NotificationsCard = () => {
                 }
                 isLoading={isLoading}
               >
-                {hasUnsavedChanges || isAuthenticated() ? 'Save' : 'Refresh'}
+                {hasUnsavedChanges || isAuthenticated()
+                  ? 'Subscribe'
+                  : 'Refresh'}
               </Button>
-              <div className="flex flex-row justify-start text-xs items-center w-full sm:w-1/2">
-                Powered by&nbsp;
-                <NotifiLogo className="h-3 pb-0.5" />
-                <span className="flex-grow" />
-                <a
-                  href="https://docs.notifi.network/NotifiIntegrationsFAQ.html"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-xs text-primary-dark"
-                  title="Questions? Click to learn more!"
-                >
-                  Learn More
-                </a>
+              <div className="h-3 grid grid-cols-2 text-xs w-full">
+                <div className="flex flex-row text-xs w-full">
+                  Powered by&nbsp;
+                  <NotifiLogo className="min-w-12 w-12 h-3 min-h-3" />
+                </div>
+                <div className="grid justify-items-end">
+                  <a
+                    href="https://www.notifi.network/faqs"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-xs text-primary-dark"
+                    title="Questions? Click to learn more!"
+                  >
+                    Learn More
+                  </a>
+                </div>
               </div>
             </div>
           </>
@@ -302,7 +347,7 @@ const InputRow: FunctionComponent<InputRowProps> = ({
   label,
 }) => {
   return (
-    <div className="flex justify-between items-center content-center mt-4">
+    <div className="flex justify-between items-center content-center mt-4 w-full">
       <div className="mr-2 py-1 text-sm w-40 h-8 flex items-center">
         {icon}
         {label}

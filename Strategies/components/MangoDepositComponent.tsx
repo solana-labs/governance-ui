@@ -43,10 +43,12 @@ import { validateInstruction } from '@utils/instructionTools'
 import * as yup from 'yup'
 import { getValidatedPublickKey } from '@utils/validations'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import WithdrawModal from './WithdrawModal'
 
 const DEPOSIT = 'Deposit'
 const CREATE_REF_LINK = 'Create Referral Link'
 const DELEGATE_ACCOUNT = 'Delegate'
+const WITHDRAW = 'Withdraw'
 
 const MangoDepositComponent = ({
   handledMint,
@@ -124,6 +126,7 @@ const MangoDepositComponent = ({
     { val: DEPOSIT, isVisible: true },
     { val: CREATE_REF_LINK, isVisible: selectedMangoAccount !== null },
     { val: DELEGATE_ACCOUNT, isVisible: selectedMangoAccount !== null },
+    { val: WITHDRAW, isVisible: selectedMangoAccount !== null },
   ]
     .filter((x) => x.isVisible)
     .map((x) => x.val)
@@ -202,7 +205,8 @@ const MangoDepositComponent = ({
       )
       const defaultProposalMint = voteByCouncil
         ? realm?.account.config.councilMint
-        : !mint?.supply.isZero()
+        : !mint?.supply.isZero() ||
+          realm?.account.config.useMaxCommunityVoterWeightAddin
         ? realm!.account.communityMint
         : !councilMint?.supply.isZero()
         ? realm!.account.config.councilMint
@@ -220,7 +224,7 @@ const MangoDepositComponent = ({
         },
         realm!,
         governedTokenAccount!,
-        ownTokenRecord.pubkey,
+        ownTokenRecord,
         defaultProposalMint!,
         governedTokenAccount!.governance!.account!.proposalCount,
         prerequisiteInstructions,
@@ -315,6 +319,13 @@ const MangoDepositComponent = ({
           mint={new PublicKey(handledMint)}
         ></CreateRefForm>
       )}
+      {proposalType === WITHDRAW && (
+        <WithdrawModal
+          market={market}
+          governance={governedTokenAccount!.governance!}
+          selectedMangoAccount={selectedMangoAccount!}
+        ></WithdrawModal>
+      )}
 
       {proposalType === DEPOSIT && (
         <div>
@@ -344,7 +355,6 @@ const MangoDepositComponent = ({
               handleSetForm({ propertyName: 'amount', value: e.target.value })
             }
             step={mintMinAmount}
-            suffix="MNGO"
             onBlur={validateAmountOnBlur}
           />
           {selectedMangoAccount === null && (
@@ -434,7 +444,7 @@ const MangoDepositComponent = ({
                   : ''
               }
             >
-              {!isDepositing ? 'Propose deposit' : <Loading></Loading>}
+              {!isDepositing ? 'Propose' : <Loading></Loading>}
             </Tooltip>
           </Button>
         </div>
