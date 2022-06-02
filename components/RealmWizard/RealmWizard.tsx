@@ -38,6 +38,7 @@ import { formValidation, isFormValid } from '@utils/formValidation'
 import { registerRealm } from 'actions/registerRealm'
 import { getGovernanceProgramVersion } from '@solana/spl-governance'
 import Switch from '@components/Switch'
+import { parseMintMaxVoteWeight } from '@tools/governance/units'
 
 enum LoaderMessage {
   CREATING_ARTIFACTS = 'Creating the DAO artifacts..',
@@ -187,7 +188,7 @@ const RealmWizard: React.FC = () => {
             ? new PublicKey(form.communityMintId)
             : undefined,
           form.councilMintId ? new PublicKey(form.councilMintId) : undefined,
-          form.communityMintMaxVoteWeightSource,
+          parseMintMaxVoteWeight(form.communityMintMaxVoteWeightSource),
           form.minCommunityTokensToCreateGovernance!,
           form.yesThreshold,
           form.communityMintId ? form.transferAuthority : true,
