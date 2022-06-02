@@ -21,14 +21,14 @@ import TokenInfoTable, {
   GenericTokenIcon,
 } from '@components/NewRealmWizard/components/TokenInfoTable'
 
-export const GovTokenDetailsSchema = {
-  useExistingToken: yup
+export const CommunityTokenSchema = {
+  useExistingCommunityToken: yup
     .boolean()
     .oneOf([true, false], 'You must specify whether you have a token already')
     .required('Required'),
   communityTokenMintAddress: yup
     .string()
-    .when('useExistingToken', {
+    .when('useExistingCommunityToken', {
       is: (val) => val == true,
       then: yup.string().required('Required'),
       otherwise: yup.string().optional(),
@@ -42,14 +42,14 @@ export const GovTokenDetailsSchema = {
       [true, false],
       'You must specify whether you which to transfer mint authority'
     )
-    .when('useExistingToken', {
+    .when('useExistingCommunityToken', {
       is: (val) => val == true,
       then: yup.boolean().required('Required'),
       otherwise: yup.boolean().optional(),
     }),
-  newTokenName: yup.string(),
-  newTokenSymbol: yup.string(),
-  minimumNumberOfTokensToEditDao: yup
+  // newTokenName: yup.string(),
+  // newTokenSymbol: yup.string(),
+  minimumNumberOfCommunityTokensToGovern: yup
     .number()
     .positive('Must be greater than 0')
     .transform((value) => (isNaN(value) ? undefined : value)),
@@ -60,13 +60,13 @@ export const GovTokenDetailsSchema = {
     .transform((value) => (isNaN(value) ? undefined : value)),
 }
 
-export interface GovTokenDetails {
-  useExistingToken: boolean
+export interface CommunityToken {
+  useExistingCommunityToken: boolean
   communityTokenMintAddress?: string
   transferCommunityMintAuthorityToDao?: boolean
-  newTokenName?: string
-  newTokenSymbol?: string
-  minimumNumberOfTokensToEditDao?: number
+  // newTokenName?: string
+  // newTokenSymbol?: string
+  minimumNumberOfCommunityTokensToGovern?: number
   mintSupplyFactor?: number
 }
 
@@ -98,7 +98,7 @@ const NOTFOUND_COIN: CommunityTokenInfo = {
   symbol: '(Token has no symbol)',
 }
 
-export default function GovTokenDetailsForm({
+export default function CommunityTokenForm({
   type,
   formData,
   currentStep,
@@ -108,7 +108,7 @@ export default function GovTokenDetailsForm({
 }) {
   const { connected, connection, current: wallet } = useWalletStore((s) => s)
   const [tokenList, setTokenList] = useState<TokenInfo[] | undefined>()
-  const schema = yup.object(GovTokenDetailsSchema).required()
+  const schema = yup.object(CommunityTokenSchema).required()
   const {
     watch,
     control,
@@ -121,7 +121,7 @@ export default function GovTokenDetailsForm({
     mode: 'all',
     resolver: yupResolver(schema),
   })
-  const useExistingToken = watch('useExistingToken')
+  const useExistingCommunityToken = watch('useExistingCommunityToken')
   const communityTokenMintAddress = watch('communityTokenMintAddress')
   const [tokenInfo, setTokenInfo] = useState<CommunityTokenInfo | undefined>()
   const [showTransferMintAuthority, setShowTransferMintAuthority] = useState(
@@ -130,14 +130,14 @@ export default function GovTokenDetailsForm({
   const noToken = !tokenInfo || tokenInfo === PENDING_COIN
 
   useEffect(() => {
-    updateUserInput(formData, GovTokenDetailsSchema, setValue)
+    updateUserInput(formData, CommunityTokenSchema, setValue)
   }, [])
 
   useEffect(() => {
-    if (useExistingToken && !connected) {
+    if (useExistingCommunityToken && !connected) {
       wallet?.connect()
     }
-  }, [useExistingToken, wallet])
+  }, [useExistingCommunityToken, wallet])
 
   useEffect(() => {
     async function getTokenList() {
@@ -207,11 +207,11 @@ export default function GovTokenDetailsForm({
   function serializeValues(values) {
     const data = {
       transferCommunityMintAuthorityToDao: null,
-      minimumNumberOfTokensToEditDao: null,
+      minimumNumberOfCommunityTokensToGovern: null,
       mintSupplyFactor: null,
       ...values,
     }
-    if (values.useExistingToken) {
+    if (values.useExistingCommunityToken) {
       data.newTokenName = null
       data.newTokenSymbol = null
       data.tokenInfo = tokenInfo
@@ -236,17 +236,18 @@ export default function GovTokenDetailsForm({
         stepDescription="community token details"
         title="Next, determine the community token your DAO will use for governance tasks."
       />
-      <div className="pt-16 space-y-10 md:pt-24 md:space-y-12">
-        <FormField
-          title="Do you have an existing token for your DAO's community?"
-          description=""
-        >
-          <Controller
-            name="useExistingToken"
-            control={control}
-            defaultValue={undefined}
-            render={({ field }) => (
-              <div className="pt-3">
+      <div className="mt-16 space-y-10 md:mt-24 md:space-y-12">
+        <Controller
+          name="useExistingCommunityToken"
+          control={control}
+          defaultValue={undefined}
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          render={({ field: { ref, ...field } }) => (
+            <div className="pt-3">
+              <FormField
+                title="Do you have an existing token for your DAO's community?"
+                description=""
+              >
                 <RadioGroup
                   {...field}
                   options={[
@@ -254,29 +255,26 @@ export default function GovTokenDetailsForm({
                     { label: 'No', value: false },
                   ]}
                 />
-              </div>
-            )}
-          />
-        </FormField>
-        {useExistingToken && (
+              </FormField>
+            </div>
+          )}
+        />
+        {useExistingCommunityToken && (
           <>
             <Controller
               name="communityTokenMintAddress"
               control={control}
               defaultValue=""
-              render={({ field }) => (
+              render={({ field, fieldState: { error } }) => (
                 <FormField
-                  title="What is the address of the token you would like to use?"
+                  title="What is the address of the community token you would like to use?"
                   description="You can verify the correct token in the preview below."
                   className="mt-10 md:mt-16"
                 >
                   <Input
                     placeholder="e.g. CwvWQWt5m..."
-                    data-testid="dao-name-input"
-                    error={
-                      errors.communityTokenMintAddress?.message ||
-                      errors.tokenMintAddress?.message
-                    }
+                    data-testid="token-address-input"
+                    error={error?.message || errors.tokenMintAddress?.message}
                     success={!noToken ? 'Token found' : undefined}
                     {...field}
                   />
@@ -287,68 +285,14 @@ export default function GovTokenDetailsForm({
               tokenInfo={tokenInfo}
               loading={tokenInfo === PENDING_COIN}
             />
-          </>
-        )}
-        {/*
-          <>
-            <Header
-              as="h4"
-              className="flex flex-col px-2 py-6 text-center rounded bg-night-grey"
-            >
-              <div>🎉</div>
-              Good news: we can mint you a brand new one!
-            </Header>
             <Controller
-              name="newTokenName"
+              name="minimumNumberOfCommunityTokensToGovern"
               control={control}
               defaultValue=""
               render={({ field }) => (
                 <FormField
-                  title="What would you like to name your token?"
-                  description="Your generated token will be used for voting power."
-                  optional
-                >
-                  <Input
-                    placeholder="e.g. RealmsCoin"
-                    data-testid="dao-name-input"
-                    error={errors.newTokenName?.message || ''}
-                    {...field}
-                  />
-                </FormField>
-              )}
-            />
-
-            <Controller
-              name="newTokenSymbol"
-              control={control}
-              defaultValue=""
-              render={({ field }) => (
-                <FormField
-                  title="What should your token's symbol be?"
-                  description="A token's symbol is used in wallets to denote the token."
-                  optional
-                >
-                  <Input
-                    placeholder="e.g. REALM"
-                    data-testid="dao-name-input"
-                    error={errors.newTokenSymbol?.message || ''}
-                    {...field}
-                  />
-                </FormField>
-              )}
-            />
-          </>
-        )*/}
-        {useExistingToken && (
-          <>
-            <Controller
-              name="minimumNumberOfTokensToEditDao"
-              control={control}
-              defaultValue=""
-              render={({ field }) => (
-                <FormField
-                  title="What is the minimum number of tokens needed to edit this DAO's info?"
-                  description="A user will need at least this many of your governance token to edit and maintain this DAO."
+                  title="What is the minimum number of community tokens needed to govern this DAO?"
+                  description="A user will need at least this many of your community token to edit the DAO as well as make proposals."
                   disabled={noToken}
                   optional
                 >
@@ -357,7 +301,10 @@ export default function GovTokenDetailsForm({
                     placeholder="1,000,000"
                     data-testid="dao-name-input"
                     Icon={<GenericTokenIcon />}
-                    error={errors.minimumNumberOfTokensToEditDao?.message || ''}
+                    error={
+                      errors.minimumNumberOfCommunityTokensToGovern?.message ||
+                      ''
+                    }
                     {...field}
                     disabled={noToken}
                     onChange={(ev) => {
@@ -368,35 +315,32 @@ export default function GovTokenDetailsForm({
                 </FormField>
               )}
             />
-          </>
-        )}
-        {useExistingToken && showTransferMintAuthority && (
-          <>
-            <FormField
-              title="Do you want to transfer mint authority of the token to the DAO?"
-              description=""
-            >
-              <Controller
-                name="transferCommunityMintAuthorityToDao"
-                control={control}
-                defaultValue={undefined}
-                render={({ field }) => (
-                  <RadioGroup
-                    {...field}
-                    options={[
-                      { label: 'Yes', value: true },
-                      { label: 'No', value: false },
-                    ]}
-                  />
-                )}
-              />
-            </FormField>
-          </>
-        )}
-        {useExistingToken && (
-          <>
+            {showTransferMintAuthority && (
+              <>
+                <Controller
+                  name="transferCommunityMintAuthorityToDao"
+                  control={control}
+                  defaultValue={undefined}
+                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                  render={({ field: { ref, ...field } }) => (
+                    <FormField
+                      title="Do you want to transfer mint authority of the token to the DAO?"
+                      description=""
+                    >
+                      <RadioGroup
+                        {...field}
+                        options={[
+                          { label: 'Yes', value: true },
+                          { label: 'No', value: false },
+                        ]}
+                      />
+                    </FormField>
+                  )}
+                />
+              </>
+            )}
             <AdvancedOptionsDropdown
-              className={useExistingToken ? undefined : 'mt-8'}
+              className={useExistingCommunityToken ? undefined : 'mt-8'}
             >
               <Controller
                 name="mintSupplyFactor"

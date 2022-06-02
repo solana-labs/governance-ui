@@ -19,10 +19,10 @@ import BasicDetailsForm, {
   BasicDetailsSchema,
   BasicDetails,
 } from '@components/NewRealmWizard/components/steps/BasicDetailsForm'
-import GovTokenDetailsForm, {
-  GovTokenDetailsSchema,
-  GovTokenDetails,
-} from '@components/NewRealmWizard/components/steps/GovTokenDetailsForm'
+import CommunityTokenDetailsForm, {
+  CommunityTokenSchema,
+  CommunityToken,
+} from '@components/NewRealmWizard/components/steps/CommunityTokenDetailsForm'
 import ApprovalThresholdForm, {
   ApprovalThresholdSchema,
   ApprovalThreshold,
@@ -45,7 +45,7 @@ export const FORM_NAME = 'gov-token'
 
 type GovToken =
   | (BasicDetails &
-      GovTokenDetails &
+      CommunityToken &
       ApprovalThreshold &
       AddCouncil &
       InviteMembers &
@@ -64,8 +64,8 @@ export default function GovTokenWizard() {
   const steps = [
     { Form: BasicDetailsForm, schema: BasicDetailsSchema, required: 'true' },
     {
-      Form: GovTokenDetailsForm,
-      schema: GovTokenDetailsSchema,
+      Form: CommunityTokenDetailsForm,
+      schema: CommunityTokenSchema,
       required: 'true',
     },
     {
@@ -121,7 +121,8 @@ export default function GovTokenWizard() {
         programVersion,
         realmName: formData.name,
         // community
-        tokensToGovernThreshold: formData.minimumNumberOfTokensToEditDao,
+        tokensToGovernThreshold:
+          formData.minimumNumberOfCommunityTokensToGovern,
         communityMintSupplyFactor: formData.mintSupplyFactor,
         communityVotePercentage: formData.approvalThreshold,
         existingCommunityMintPk: formData.communityTokenMintAddress

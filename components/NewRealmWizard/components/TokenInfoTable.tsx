@@ -46,7 +46,7 @@ export function TokenInfoCell({ title = '', children }) {
 export default function TokenInfoTable({ tokenInfo, loading }) {
   return (
     <div
-      className={`grid grid-cols-1 md:grid-cols-2 gap-2 pt-2 pb-8 ${
+      className={`grid grid-cols-1 md:grid-cols-2 gap-2 pt-2 ${
         loading ? 'animate-pulse' : ''
       }`}
     >
