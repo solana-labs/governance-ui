@@ -22,6 +22,7 @@ import * as anchor from '@project-serum/anchor'
 import * as sbv2 from '../../switchboardv2-api'
 //import sbidl from '../../switchboard-core/switchboard_v2/target/idl/switchboard_v2.json'
 import sbidl from '../../reclone-sbc/switchboard_v2/target/idl/switchboard_v2.json';
+import gonidl from '../../reclone-sbc/switchboard_v2/target/idl/gameofnodes.json';
 
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -38,8 +39,9 @@ export const nftPluginsPks: string[] = [
 ]
 
 export const switchboardPluginsPks: string[] = [
-  'HFdD2QauAai5W6n36xkt9MUcsNRn1L2WYEMvi5WbnyVJ',
-  '7PMP6yE6qb3XzBQr5TK2GhuruYayZzBnT8U92ySaLESC',
+  /*'HFdD2QauAai5W6n36xkt9MUcsNRn1L2WYEMvi5WbnyVJ',
+  '7PMP6yE6qb3XzBQr5TK2GhuruYayZzBnT8U92ySaLESC',*/
+  'B4EDDdMh5CmB6B9DeMmZmFvRzEgyHR5zWktf6httcMk6'
 ]
 
 export function useVotingPlugins() {
@@ -122,6 +124,7 @@ export function useVotingPlugins() {
         (wallet as unknown) as anchor.Wallet,
         options
       )
+
       let idl = await anchor.Program.fetchIdl(sbv2.SBV2_MAINNET_PID, provider)
       if (!idl) {
         console.log("Off chain idl");
@@ -129,10 +132,25 @@ export function useVotingPlugins() {
       }
       console.log("IDL");
       console.log(idl);
+
+      let addinIdl = await anchor.Program.fetchIdl(new PublicKey("B4EDDdMh5CmB6B9DeMmZmFvRzEgyHR5zWktf6httcMk6"), provider)
+      if (!addinIdl) {
+        console.log("Off chain addin idl");
+        addinIdl = gonidl as anchor.Idl
+      }
+      console.log("Addin IDL");
+      console.log(addinIdl);
+
       const switchboardProgram = new anchor.Program(
         idl,
         //sbv2.SBV2_MAINNET_PID,
         new PublicKey("7PMP6yE6qb3XzBQr5TK2GhuruYayZzBnT8U92ySaLESC"),
+        provider
+      )
+
+      const addinProgram = new anchor.Program(
+        addinIdl,
+        new PublicKey("B4EDDdMh5CmB6B9DeMmZmFvRzEgyHR5zWktf6httcMk6"),
         provider
       )
 
@@ -156,10 +174,22 @@ export function useVotingPlugins() {
           console.log("LGTM");
         }
         let queuePk = oracleData.queuePubkey;
+
+        let [addinState, _] = await PublicKey.findProgramAddress(
+          [
+            Buffer.from('state'),
+          ],
+          addinProgram.programId,
+        );
+
+        let addinStateData = await addinProgram.account.state.fetch(addinState);
+        console.log("the addinStateData:");
+        console.log(addinStateData);
         let queue = await switchboardProgram.account.oracleQueueAccountData.fetch(queuePk);
         let queueAuthority = queue.authority;
+        let grantAuthority = addinStateData.grantAuthority;
         try {
-          let g = await getGovernanceAccount(provider.connection, queueAuthority, Governance);
+          let g = await getGovernanceAccount(provider.connection, grantAuthority, Governance);
           /*console.log("G");
           console.log(g);
           console.log("Current realm?:");
@@ -179,7 +209,7 @@ export function useVotingPlugins() {
               oracle
             );
             console.log(p);
-            let ix = await p.setVoterWeightTx({govProgram: realm.owner, pubkeySigner: wallet.publicKey});
+            let ix = await p.setVoterWeightTx({govProgram: realm.owner, pubkeySigner: wallet.publicKey}, addinProgram, grantAuthority);
             console.log(ix.instructions);
             setVoterWeightInstructions.push(
               ix.instructions[0]
@@ -202,7 +232,8 @@ export function useVotingPlugins() {
         ] = anchor.utils.publicKey.findProgramAddressSync(
           [Buffer.from('VoterWeightRecord'), myNodesForRealm[0].toBytes()],
           //sbv2.SBV2_MAINNET_PID
-          new PublicKey("7PMP6yE6qb3XzBQr5TK2GhuruYayZzBnT8U92ySaLESC")
+          //new PublicKey("7PMP6yE6qb3XzBQr5TK2GhuruYayZzBnT8U92ySaLESC")
+          new PublicKey("B4EDDdMh5CmB6B9DeMmZmFvRzEgyHR5zWktf6httcMk6"),
         )
         console.log(voterWeightRecord)
         const vw = await connection.current.getAccountInfo(voterWeightRecord)

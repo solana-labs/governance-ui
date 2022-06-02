@@ -189,7 +189,8 @@ export class VotingClient {
             Buffer.from('VoterWeightRecord'),
             this.oracles[0].toBytes(),
           ],
-          new PublicKey("7PMP6yE6qb3XzBQr5TK2GhuruYayZzBnT8U92ySaLESC"),
+          //new PublicKey("7PMP6yE6qb3XzBQr5TK2GhuruYayZzBnT8U92ySaLESC"),
+          new PublicKey("B4EDDdMh5CmB6B9DeMmZmFvRzEgyHR5zWktf6httcMk6"),
       );
       return { voterWeightPk: vwr, maxVoterWeightRecord: undefined }
     }
@@ -255,6 +256,13 @@ export class VotingClient {
       return { voterWeightPk, maxVoterWeightRecord }
     }
     if (this.client instanceof VsrClient) {
+      const props = await this.withUpdateVoterWeightRecord(
+        instructions,
+        'castVote'
+      )
+      return props
+    }
+    if (this.client instanceof SwitchboardQueueVoterClient) {
       const props = await this.withUpdateVoterWeightRecord(
         instructions,
         'castVote'
