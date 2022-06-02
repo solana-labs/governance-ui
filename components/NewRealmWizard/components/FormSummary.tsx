@@ -287,7 +287,6 @@ export default function WizardSummary({
           isValid
           prevClickHandler={() => onPrevClick(currentStep)}
           submitClickHandler={openModal}
-          faqTitle=""
         />
       </div>
     </>
