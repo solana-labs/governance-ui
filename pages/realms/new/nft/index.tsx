@@ -28,21 +28,18 @@ import InviteMembersForm, {
   InviteMembersSchema,
   InviteMembers,
 } from '@components/NewRealmWizard/components/steps/InviteMembersForm'
-import YesVotePercentageForm, {
-  CouncilYesVotePercentageSchema,
-  CouncilYesVotePercentage,
-} from '@components/NewRealmWizard/components/steps/YesVotePercentageThresholdForm'
+// import YesVotePercentageForm, {
+//   CouncilYesVotePercentageSchema,
+//   CouncilYesVotePercentage,
+// } from '@components/NewRealmWizard/components/steps/YesVotePercentageThresholdForm'
 import FormPage from '@components/NewRealmWizard/PageTemplate'
 
 export const SESSION_STORAGE_FORM_KEY = 'nft-form-data'
 export const FORM_NAME = 'nft'
 
 type NFTForm =
-  | (BasicDetails &
-      AddNFTCollection &
-      AddCouncil &
-      InviteMembers &
-      CouncilYesVotePercentage)
+  | (BasicDetails & AddNFTCollection & AddCouncil & InviteMembers)
+  // CouncilYesVotePercentage)
   | Record<string, never>
 
 export default function NFTWizard() {
@@ -68,12 +65,12 @@ export default function NFTWizard() {
       schema: InviteMembersSchema,
       required: 'form.addCouncil',
     },
-    {
-      Form: YesVotePercentageForm,
-      schema: CouncilYesVotePercentageSchema,
-      required: 'form.addCouncil',
-      forCouncil: true,
-    },
+    // {
+    //   Form: YesVotePercentageForm,
+    //   schema: CouncilYesVotePercentageSchema,
+    //   required: 'form.addCouncil',
+    //   forCouncil: true,
+    // },
   ]
 
   async function handleSubmit() {

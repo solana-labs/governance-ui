@@ -52,15 +52,19 @@ export default function TokenInfoTable({ tokenInfo, loading }) {
     >
       <TokenInfoCell title="Token Name">
         <div className="flex items-center space-x-2">
-          <div className="w-9">
-            {tokenInfo?.logoURI ? (
+          {tokenInfo?.logoURI ? (
+            <div className="w-10">
               <img src={tokenInfo?.logoURI} alt="token" className="w-full" />
-            ) : (
-              <div className="text-blue">
-                <GenericTokenIcon />
-              </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="w-10 mr-4">
+              <img
+                src="/icons/generic-token-icon.svg"
+                alt="token icon"
+                className="h-full"
+              />
+            </div>
+          )}
           {tokenInfo?.name ? (
             <Header as="h4">{tokenInfo.name}</Header>
           ) : (

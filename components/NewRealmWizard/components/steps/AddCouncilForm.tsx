@@ -10,7 +10,7 @@ import { RadioGroup } from '@components/NewRealmWizard/components/Input'
 import Text from '@components/Text'
 
 import { updateUserInput, validateSolAddress } from '@utils/formValidation'
-import TokenAddressInput from '../TokenAddressInput'
+import TokenAddressInput, { TokenWithMintInfo } from '../TokenAddressInput'
 
 export const AddCouncilSchema = {
   addCouncil: yup
@@ -81,6 +81,9 @@ export default function AddCouncilForm({
   })
   const addCouncil = watch('addCouncil')
   const useExistingCouncilToken = watch('useExistingCouncilToken')
+  const [councilTokenInfo, setCouncilTokenInfo] = useState<
+    TokenWithMintInfo | undefined
+  >()
   const [showTransferMintAuthority, setShowTransferMintAuthority] = useState(
     false
   )
@@ -95,11 +98,17 @@ export default function AddCouncilForm({
       setValue('transferCouncilMintAuthority', undefined, {
         shouldValidate: true,
       })
+      setCouncilTokenInfo(undefined)
     }
   }, [useExistingCouncilToken])
 
-  function handleTokenInput({ validMintAddress, walletIsMintAuthority }) {
+  function handleTokenInput({
+    tokenInfo,
+    validMintAddress,
+    walletIsMintAuthority,
+  }) {
     setShowTransferMintAuthority(walletIsMintAuthority)
+    setCouncilTokenInfo(tokenInfo)
     if (walletIsMintAuthority) {
       setValue('transferCouncilMintAuthority', undefined)
     } else {
@@ -107,7 +116,7 @@ export default function AddCouncilForm({
         shouldValidate: true,
       })
     }
-    console.log({ validMintAddress, walletIsMintAuthority })
+
     if (!validMintAddress) {
       setError('invalidTokenMintAddress', {
         type: 'is-valid-address',
@@ -132,6 +141,7 @@ export default function AddCouncilForm({
       }
     } else {
       data = values
+      data.councilTokenInfo = councilTokenInfo ? councilTokenInfo : null
     }
     onSubmit({ step: currentStep, data })
   }

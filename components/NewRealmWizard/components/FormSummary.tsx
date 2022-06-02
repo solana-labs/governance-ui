@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import { FunctionComponent, Fragment, useState, ReactElement } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 
 import FormHeader from '@components/NewRealmWizard/components/FormHeader'
@@ -7,10 +7,6 @@ import FormFooter from '@components/NewRealmWizard/components/FormFooter'
 import Header from '@components/Header'
 import Text from '@components/Text'
 import { NewButton as Button } from '@components/Button'
-
-import { FORM_NAME as GOVTOKEN_FORM } from 'pages/realms/new/gov-token'
-import { FORM_NAME as MULTISIG_FORM } from 'pages/realms/new/multisig'
-import { FORM_NAME as NFT_FORM } from 'pages/realms/new/nft'
 
 function SummaryCell({ className = '', children }) {
   return (
@@ -21,6 +17,165 @@ function SummaryCell({ className = '', children }) {
     </div>
   )
 }
+
+interface FieldProps {
+  className?: string
+  img?: string
+  icon?: ReactElement
+  header: string
+  footer: string
+}
+const FieldValue: FunctionComponent<FieldProps> = ({
+  className = '',
+  img = '',
+  icon,
+  header,
+  footer,
+}) => {
+  return (
+    <SummaryCell className={`grid grid-rows-3 ${className}`}>
+      {img || icon ? (
+        <>
+          <div className="h-10 m-auto">
+            {img?.length ? <img src={img} className="h-full" /> : icon}
+          </div>
+          <Header as="h3" className="text-center">
+            {header}
+          </Header>
+        </>
+      ) : (
+        <>
+          <div />
+          <Header as="h1" className="text-center truncate">
+            {header}
+          </Header>
+        </>
+      )}
+
+      <Text className="mt-2 text-center uppercase text-white/50">{footer}</Text>
+    </SummaryCell>
+  )
+}
+
+const COMMUNITY_TYPE = 'COMMUNITY'
+const COUNCIL_TYPE = 'COUNCIL'
+
+function TokenInfo({
+  type = COMMUNITY_TYPE,
+  tokenInfo,
+  transferMintAuthority,
+  mintSupplyFactor = 1,
+}) {
+  return (
+    <>
+      <FieldValue
+        img={tokenInfo?.logoURI || '/icons/generic-token-icon.svg'}
+        header={tokenInfo?.name || '(Unnamed)'}
+        footer={`#${tokenInfo?.symbol || '(No symbol)'}`}
+      />
+      <FieldValue
+        header={transferMintAuthority === false ? 'False' : 'True'}
+        footer={
+          type === COMMUNITY_TYPE
+            ? 'DAO can mint tokens'
+            : type === COUNCIL_TYPE
+            ? 'DAO can invite members'
+            : 'DAO can mint'
+        }
+      />
+      {type === COMMUNITY_TYPE && (
+        <FieldValue
+          header={Number(mintSupplyFactor).toLocaleString()}
+          footer={'Mint supply factor'}
+        />
+      )}
+    </>
+  )
+}
+
+function CommunityInfo({
+  tokenInfo,
+  transferMintAuthority,
+  mintSupplyFactor,
+  yesVotePercentage,
+  minimumNumberOfTokensToGovern,
+  nftInfo,
+}) {
+  const nftIsCommunityToken = !!nftInfo?.name
+  console.log(nftInfo)
+  return (
+    <>
+      <Header as="h2">Community info</Header>
+      <div
+        className={`grid ${
+          nftIsCommunityToken ? 'grid-cols-3' : 'grid-cols-3'
+        } gap-4 mt-4`}
+      >
+        {!nftIsCommunityToken && (
+          <TokenInfo
+            type={COMMUNITY_TYPE}
+            tokenInfo={tokenInfo}
+            transferMintAuthority={transferMintAuthority}
+            mintSupplyFactor={mintSupplyFactor}
+          />
+        )}
+        {nftIsCommunityToken && (
+          <FieldValue
+            img={nftInfo.image || '/icons/threshold-icon.svg'}
+            header={nftInfo?.name}
+            footer={`${Number(
+              nftInfo?.nftCollectionCount
+            ).toLocaleString()} NFTs`}
+          />
+        )}
+        <FieldValue
+          img="/icons/threshold-icon.svg"
+          header={`${yesVotePercentage}%`}
+          footer="Approval threshold"
+        />
+        <FieldValue
+          header={
+            minimumNumberOfTokensToGovern
+              ? Number(minimumNumberOfTokensToGovern).toLocaleString()
+              : 'Disabled'
+          }
+          footer="Min. tokens to edit DAO"
+        />
+      </div>
+    </>
+  )
+}
+
+function CouncilInfo({
+  tokenInfo,
+  transferMintAuthority,
+  yesVotePercentage,
+  numberOfMembers,
+}) {
+  return (
+    <>
+      <Header as="h2">Council info</Header>
+      <div className="grid grid-cols-2 gap-4">
+        <TokenInfo
+          type={COUNCIL_TYPE}
+          tokenInfo={tokenInfo}
+          transferMintAuthority={transferMintAuthority}
+        />
+        <FieldValue
+          img="/icons/council-members-icon.svg"
+          header={numberOfMembers}
+          footer="Council members"
+        />
+        <FieldValue
+          img="/icons/threshold-icon.svg"
+          header={`${yesVotePercentage}%`}
+          footer="Council approval"
+        />
+      </div>
+    </>
+  )
+}
+
 export default function WizardSummary({
   type,
   currentStep,
@@ -41,21 +196,15 @@ export default function WizardSummary({
     setIsModalOpen(true)
   }
 
-  const tokenName = formData?.tokenInfo?.name || formData?.tokenName || '' //'Gradiento'
-  const tokenSymbol = formData?.tokenInfo?.symbol || formData?.tokenSymbol || '' // 'GRADO'
-  const tokenLogo = formData?.tokenInfo?.logoURI
-  const editRights = formData?.minimumNumberOfTokensToEditDao
-  const mintSupplyFactor = formData?.mintSupplyFactor
-  const mintAuthority = formData?.transferMintAuthorityToDao
-  const nftCollectionMetaData =
+  const nftCollectionMetadata =
     (formData?.collectionKey &&
       formData?.collectionMetadata[formData.collectionKey]) ||
     {}
-  const { name: nftCollectionName } = nftCollectionMetaData
   const nftCollectionCount = formData?.numberOfNFTs || 0 // 1000000
-  const communityYesVotePercentage = formData?.communityYesVotePercentage || 0
-  const quorumThreshold = formData?.quorumThreshold || 0 // 10
-  const numberOfMembers = formData?.memberAddresses?.length || 0 // 1
+  const nftCollectionInfo = {
+    ...nftCollectionMetadata,
+    nftCollectionCount,
+  }
   const programId = formData?.programId || ''
 
   return (
@@ -86,9 +235,13 @@ export default function WizardSummary({
                 leaveTo="opacity-0 scale-95"
               >
                 <Dialog.Overlay className="flex flex-col justify-center w-full p-6 space-y-3 overflow-hidden text-left align-middle transition-all transform grow md:grow-0 md:max-w-xl md:p-12 bg-night-grey md:rounded-lg">
-                  <img src="/img/logo-realms-blue.png" className="w-8 h-8" />
-                  <Header as="h2">The Final Step</Header>
-                  <Text className="opacity-60">
+                  <div className="flex items-center mb-2 space-x-4">
+                    <img src="/img/logo-realms-blue.png" className="w-8 h-8" />
+                    <Header as="h2" className="mb-0">
+                      The Final Step
+                    </Header>
+                  </div>
+                  <Text level="2" className="opacity-60">
                     You are creating a new DAO on Solana and will have to
                     confirm a transaction with your currently-connected wallet.
                     The creation of your DAO will cost approximately 0.0001 SOL.
@@ -130,13 +283,8 @@ export default function WizardSummary({
           title="Here's what you created. Does everything look right?"
         />
         <div className="pt-10">
-          <div className="flex flex-col">
-            <SummaryCell className="flex mb-2 space-x-4 md:space-x-8">
-              {formData?.avatar && (
-                <div className="h-[80px] md:h-[158px] min-w-[80px] md:w-[158px] rounded-full flex justify-center">
-                  <img src={formData.avatar} />
-                </div>
-              )}
+          <div className="flex flex-col space-y-4">
+            <SummaryCell className="flex space-x-4 md:space-x-8">
               <div className="flex flex-col">
                 <Header as="h1" className="mb-4">
                   {formData?.name}
@@ -144,130 +292,31 @@ export default function WizardSummary({
                 {formData?.description ? (
                   <Text>{formData.description}</Text>
                 ) : (
-                  <Text className="text-white/60">No DAO description...</Text>
+                  <Text level="2" className="text-white/60">
+                    No DAO description...
+                  </Text>
                 )}
               </div>
             </SummaryCell>
-            <div
-              className={`grid ${
-                type !== MULTISIG_FORM ? 'grid-cols-3' : 'grid-cols-2'
-              } w-full gap-2 mb-2`}
-            >
-              {type === NFT_FORM && (
-                <SummaryCell className="flex flex-col">
-                  <div className="h-10 m-auto">
-                    <img
-                      src="/img/icon-quorum-gradient.png"
-                      className="h-full"
-                    />
-                  </div>
-                  <Header as="h3" className="mt-6 text-center">
-                    {nftCollectionName}
-                  </Header>
-                  <div className="px-2 rounded-full bg-[#424050] w-fit mx-auto mt-2">
-                    <Text>
-                      {Number(nftCollectionCount).toLocaleString()} NFTs
-                    </Text>
-                  </div>
-                </SummaryCell>
-              )}
-              {type === GOVTOKEN_FORM && (
-                <>
-                  <SummaryCell className="flex flex-col">
-                    <div className="h-10 m-auto">
-                      <img
-                        src={
-                          tokenLogo || '/img/icon-token-generic-gradient.png'
-                        }
-                        className="h-full"
-                      />
-                    </div>
-                    <Header as="h3" className="mt-6 text-center truncate">
-                      {tokenName || '(Unnamed)'}
-                    </Header>
-                    <Text className="mt-2 text-center uppercase text-white/50">
-                      #{tokenSymbol || '(No symbol)'}
-                    </Text>
-                  </SummaryCell>
-                  <SummaryCell className="flex flex-col">
-                    <div className="h-10 m-auto">
-                      <img
-                        src="/img/icon-quorum-gradient.png"
-                        className="h-full"
-                      />
-                    </div>
-                    <Header as="h1" className="mt-6 text-center">
-                      {communityYesVotePercentage}%
-                    </Header>
-                    <Text className="mt-2 text-center text-white/50">
-                      Approval threshold
-                    </Text>
-                  </SummaryCell>
-                  {editRights && (
-                    <SummaryCell className="flex flex-col">
-                      <Header as="h1" className="mt-6 text-center">
-                        {Number(editRights).toLocaleString()}
-                      </Header>
-                      <Text className="mt-2 text-center text-white/50">
-                        Min. tokens needed to edit DAO
-                      </Text>
-                    </SummaryCell>
-                  )}
-                  {mintSupplyFactor && (
-                    <SummaryCell className="flex flex-col">
-                      <Header as="h1" className="mt-6 text-center">
-                        {Number(mintSupplyFactor).toLocaleString()}
-                      </Header>
-                      <Text className="mt-2 text-center text-white/50">
-                        Mint supply factor
-                      </Text>
-                    </SummaryCell>
-                  )}
-                  {mintAuthority && (
-                    <SummaryCell className="flex flex-col">
-                      <Header as="h1" className="mt-6 text-center">
-                        {String(mintAuthority)}
-                      </Header>
-                      <Text className="mt-2 text-center text-white/50">
-                        DAO has authority to mint tokens
-                      </Text>
-                    </SummaryCell>
-                  )}
-                </>
-              )}
-              {numberOfMembers > 0 && (
-                <>
-                  <SummaryCell className="flex flex-col">
-                    <div className="h-10 m-auto">
-                      <img
-                        src="/img/icon-members-gradient.png"
-                        className="h-full"
-                      />
-                    </div>
-                    <Header as="h1" className="mt-6 text-center">
-                      {numberOfMembers}
-                    </Header>
-                    <Text className="mt-2 text-center text-white/50">
-                      Council members
-                    </Text>
-                  </SummaryCell>
-                  <SummaryCell className="flex flex-col">
-                    <div className="h-10 m-auto">
-                      <img
-                        src="/img/icon-quorum-gradient.png"
-                        className="h-full"
-                      />
-                    </div>
-                    <Header as="h1" className="mt-6 text-center">
-                      {quorumThreshold}%
-                    </Header>
-                    <Text className="mt-2 text-center text-white/50">
-                      Council quorum
-                    </Text>
-                  </SummaryCell>
-                </>
-              )}
-            </div>
+            <CommunityInfo
+              tokenInfo={formData.communityTokenInfo}
+              transferMintAuthority={formData.transferCommunityMintAuthority}
+              mintSupplyFactor={formData.communityMintSupplyFactor}
+              yesVotePercentage={formData.communityYesVotePercentage}
+              minimumNumberOfTokensToGovern={
+                formData.minimumNumberOfCommunityTokensToGovern
+              }
+              nftInfo={nftCollectionInfo}
+            />
+            {formData.addCouncil && (
+              <CouncilInfo
+                tokenInfo={formData.councilTokenInfo}
+                transferMintAuthority={formData.transferCouncilMintAuthority}
+                yesVotePercentage={formData.communityYesVotePercentage}
+                numberOfMembers={formData?.memberAddresses?.length}
+              />
+            )}
+
             <div className="space-y-2">
               {programId && (
                 <SummaryCell>
