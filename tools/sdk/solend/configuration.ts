@@ -27,7 +27,6 @@ export type SupportedLendingMarketName =
 export type SupportedTokenName = 'USDC' | 'UXD';
 export type SupportedCollateralMintName =
   | 'cUSDC - main pool'
-  | 'cUSDC - stable pool'
   | 'cUXD - stable pool'
   | 'cUXD - coin98 pool';
 
@@ -71,12 +70,6 @@ class SolendConfiguration implements ASolendConfiguration {
     'cUSDC - main pool': {
       name: 'Solend Protocol: cUSDC - main pool',
       mint: new PublicKey('993dVFL2uXWYeoXuEBFXR4BijeXdTv4s6BzsCjJZuwqk'),
-      decimals: 6,
-    },
-
-    'cUSDC - stable pool': {
-      name: 'Solend Protocol: cUSDC - stable pool',
-      mint: new PublicKey('4JZ6PXqRDp8jQxXUYX9cbAzHi6uzZk856aoAqPGdV5Da'),
       decimals: 6,
     },
 
@@ -163,29 +156,6 @@ class SolendConfiguration implements ASolendConfiguration {
           ),
           reserveCollateralSupplySplTokenAccount: new PublicKey(
             '6RTTJkwZ7NuK4JaJnnaUgqU78gaW3A8McDTfiGsBBbLX',
-          ),
-        },
-
-        USDC: {
-          relatedCollateralMint: this.supportedCollateralMintsInformation[
-            'cUSDC - stable pool'
-          ],
-          mint: new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'),
-          decimals: 6,
-          reserve: new PublicKey(
-            'JCRDg9T5mUUxazdJ2nGWDN2pdcXVQc5VM8XDp1DW6Aoa',
-          ),
-          reserveLiquiditySupply: new PublicKey(
-            'z7yTesDCUkvheHnULMjS6dggiiVczpX5JjfTx5atRgQ',
-          ),
-          pythOracle: new PublicKey(
-            'Gnt27xtC473ZT2Mw5u8wZ68Z3gULkSTb5DuxJy7eJotD',
-          ),
-          switchboardFeedAddress: new PublicKey(
-            'CZx29wKMUxaJDq6aLVQTdViPL754tTR64NAgQBUGxxHb',
-          ),
-          reserveCollateralSupplySplTokenAccount: new PublicKey(
-            '7JF8e93t52SGFUHzMt5cD7vte4b8gWZHY99GLziAUeiP',
           ),
         },
       },
