@@ -212,11 +212,13 @@ body::-webkit-scrollbar-corner {
 .transition-from-gradient-background:active::before {
   opacity: 1;
   background-image: linear-gradient(to bottom, #bebec1, #bebec1);
+  outline: 2px solid #bebec1;
 }
 
 .transition-from-gradient-background:disabled::before {
   opacity: 1;
   background-image: linear-gradient(to bottom, #3e3d47, #3e3d47);
+  outline: 2px solid #3e3d47;
 }
 
 .step-indicator__with-gradient {

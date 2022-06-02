@@ -49,10 +49,12 @@ export default function AdvancedOptionsDropdown({
         leaveFrom="opacity-100"
         leaveTo="opacity-0"
       >
-        <Text level="2" className="pt-4 pb-10 pl-2 text-white/60">
-          Advanced creators may adjust certain aspects of their DAOs.
-        </Text>
-        {children}
+        <div className="pl-2">
+          <Text level="2" className="pt-4 pb-10 text-white/60">
+            Advanced creators may adjust certain aspects of their DAOs.
+          </Text>
+          {children}
+        </div>
       </Transition>
     </div>
   )

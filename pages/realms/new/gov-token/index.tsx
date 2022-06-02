@@ -128,16 +128,14 @@ export default function GovTokenWizard() {
         existingCommunityMintPk: formData.communityTokenMintAddress
           ? new PublicKey(formData.communityTokenMintAddress)
           : undefined,
-        transferCommunityMintAuthority:
-          formData.transferCommunityMintAuthorityToDao,
+        transferCommunityMintAuthority: formData.transferCommunityMintAuthority,
         // council
         createCouncil: formData.addCouncil,
         // councilVotePercentage: formData.quorumThreshold,
-        existingCouncilMintPk: formData.communityTokenMintAddress
-          ? new PublicKey(formData.communityTokenMintAddress)
+        existingCouncilMintPk: formData.councilTokenMintAddress
+          ? new PublicKey(formData.councilTokenMintAddress)
           : undefined,
-        transferCouncilMintAuthority:
-          formData.transferCommunityMintAuthorityToDao,
+        transferCouncilMintAuthority: formData.transferCouncilMintAuthority,
         councilWalletPks:
           formData?.memberAddresses?.map((w) => new PublicKey(w)) || [],
       })

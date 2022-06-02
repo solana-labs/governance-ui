@@ -157,7 +157,7 @@ export default function WizardSummary({
                 <SummaryCell className="flex flex-col">
                   <div className="h-10 m-auto">
                     <img
-                      src="/1-Landing-v2/icon-quorum-gradient.png"
+                      src="/img/icon-quorum-gradient.png"
                       className="h-full"
                     />
                   </div>
@@ -177,8 +177,7 @@ export default function WizardSummary({
                     <div className="h-10 m-auto">
                       <img
                         src={
-                          tokenLogo ||
-                          '/1-Landing-v2/icon-token-generic-gradient.png'
+                          tokenLogo || '/img/icon-token-generic-gradient.png'
                         }
                         className="h-full"
                       />
@@ -193,7 +192,7 @@ export default function WizardSummary({
                   <SummaryCell className="flex flex-col">
                     <div className="h-10 m-auto">
                       <img
-                        src="/1-Landing-v2/icon-quorum-gradient.png"
+                        src="/img/icon-quorum-gradient.png"
                         className="h-full"
                       />
                     </div>
@@ -241,7 +240,7 @@ export default function WizardSummary({
                   <SummaryCell className="flex flex-col">
                     <div className="h-10 m-auto">
                       <img
-                        src="/1-Landing-v2/icon-members-gradient.png"
+                        src="/img/icon-members-gradient.png"
                         className="h-full"
                       />
                     </div>
@@ -255,7 +254,7 @@ export default function WizardSummary({
                   <SummaryCell className="flex flex-col">
                     <div className="h-10 m-auto">
                       <img
-                        src="/1-Landing-v2/icon-quorum-gradient.png"
+                        src="/img/icon-quorum-gradient.png"
                         className="h-full"
                       />
                     </div>

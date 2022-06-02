@@ -10,7 +10,7 @@ import { validateSolAddress } from '@utils/formValidation'
 import Input from '@components/NewRealmWizard/components/Input'
 import TokenInfoTable from '@components/NewRealmWizard/components/TokenInfoTable'
 
-interface TokenWithMintInfo extends TokenInfo {
+export interface TokenWithMintInfo extends TokenInfo {
   mint: MintInfo | undefined
 }
 
@@ -109,6 +109,7 @@ export default function TokenAddressInput({
 
     onValidation({
       validMintAddress: tokenMintAddress !== '' ? validMintAddress : true,
+      tokenInfo,
       walletIsMintAuthority,
     })
   }, [validMintAddress, wallet, tokenInfo])
