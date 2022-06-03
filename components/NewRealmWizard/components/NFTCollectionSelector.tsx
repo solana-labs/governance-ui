@@ -26,7 +26,7 @@ const NFTCollectionSelector = ({
         {Object.keys(collections).map((key) => {
           const collection = collections[key]
           const totalNfts = collection.length
-          const images = collection.slice(0, 2).map((nft) => nft.data.image)
+          const images = collection.slice(0, 2).map((nft) => nft.image)
 
           for (let i = images.length; i < 3; i++) {
             images.push('')

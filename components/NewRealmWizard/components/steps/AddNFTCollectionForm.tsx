@@ -22,18 +22,87 @@ import Input, {
 // import Header from '../components_2/ProductHeader'
 import Text from '@components/Text'
 import NFTCollectionSelector from '@components/NewRealmWizard/components/NFTCollectionSelector'
-
 import ThresholdAdviceBox from '@components/NewRealmWizard/components/ThresholdAdviceBox'
 
-async function getNFTCollectionInfo(connection, collectionKey) {
+function filterAndMapVerifiedCollections(nfts) {
+  return nfts
+    .filter((nft) => {
+      if (nft.data?.collection) {
+        return nft.data?.collection?.verified
+      } else {
+        return nft.collection?.verified
+      }
+    })
+    .map((nft) => {
+      if (nft.data.collection) {
+        return nft.data
+      } else {
+        return nft
+      }
+    })
+    .reduce((prev, curr) => {
+      const collectionKey = curr.collection?.key
+      if (typeof collectionKey === 'undefined') return prev
+
+      if (prev[collectionKey]) {
+        prev[collectionKey].push(curr)
+      } else {
+        prev[collectionKey] = [curr]
+      }
+      return prev
+    }, {})
+}
+
+async function enrichItemInfo(item, uri) {
+  const { data: response } = await axios.get(uri)
+  return {
+    ...item,
+    ...response,
+  }
+}
+
+async function enrichCollectionInfo(connection, collectionKey) {
   const {
     data: { data: collectionData },
   } = await Metadata.findByMint(connection, collectionKey)
 
-  const { data: response } = await axios.get(collectionData.uri)
-  return {
-    ...collectionData,
-    ...response,
+  return enrichItemInfo(collectionData, collectionData.uri)
+}
+
+async function getNFTCollectionInfo(connection, collectionKey) {
+  const { data: result } = await Metadata.findByMint(connection, collectionKey)
+  console.log('NFT findByMint result', result)
+  if (result?.collection?.verified && result.collection?.key) {
+    // here we were given a child of the collection (hence the "collection" property is present)
+    const collectionInfo = await enrichCollectionInfo(
+      connection,
+      result.collection.key
+    )
+    const collectionMembers = await enrichItemInfo(result.data, result.data.uri)
+    return { collectionInfo, collectionMembers: [collectionMembers] }
+  } else {
+    // assume we've been given the collection address already, so we need to go find it's children
+    const children = await Metadata.findMany(connection, {
+      updateAuthority: result.updateAuthority,
+    })
+
+    const verifiedCollections = filterAndMapVerifiedCollections(children)
+    if (verifiedCollections[collectionKey]) {
+      const collectionInfo = await enrichCollectionInfo(
+        connection,
+        collectionKey
+      )
+      const collectionMembers = await Promise.all(
+        verifiedCollections[collectionKey].map((item) => {
+          return enrichItemInfo(item.data, item.data.uri)
+        })
+      )
+      return { collectionInfo, collectionMembers }
+    } else {
+      throw new Error(
+        'Address did not return collection with children whose "collection.key" matched'
+      )
+    }
   }
 
   // 3iBYdnzA418tD2o7vm85jBeXgxbdUyXzX9Qfm2XJuKME
@@ -60,6 +129,33 @@ export interface AddNFTCollection {
   numberOfNFTs: number
 }
 
+export interface NFT_Creator {
+  address: string
+  verified: number
+  share: number
+}
+
+interface NFT_Attributes {
+  display_type: string
+  trait_type: string
+  value: number
+}
+export interface NFT {
+  name: string
+  symbol: string
+  uri: string
+  sellerFeeBasisPoints: number
+  creators: NFT_Creator[]
+  description: string
+  seller_fee_basis_points: number
+  image: string
+  animation_url: string
+  external_url: string
+  attributes: NFT_Attributes[]
+  collection: any
+  properties: any
+}
+
 function WalletIcon() {
   return (
     <svg
@@ -79,6 +175,28 @@ function WalletIcon() {
   )
 }
 
+function SkeletonNFTCollectionInfo({ loading = false }) {
+  return (
+    <>
+      <img
+        src="/img/nft-collection-placeholder.png"
+        className={`w-24 h-24 ${loading ? 'animate-pulse' : ''}`}
+      />
+      <div className={`space-y-2 truncate ${loading ? 'animate-pulse' : ''}`}>
+        <div className="text-transparent truncate rounded w-fit bg-bkg-grey">
+          Collection name...
+        </div>
+        <div className="text-transparent truncate rounded w-fit bg-bkg-grey">
+          Loading-long-url-to-some-obscure-wallet-address
+        </div>
+        <div className="text-transparent truncate rounded w-fit bg-bkg-grey">
+          xx 1234...6789
+        </div>
+      </div>
+    </>
+  )
+}
+
 export default function AddNFTCollectionForm({
   type,
   formData,
@@ -92,6 +210,7 @@ export default function AddNFTCollectionForm({
   const [requestPending, setRequestPending] = useState(false)
   // const [modalOpen, setModalOpen] = useState(true)
   const [collectionMetadata, setCollectionMetadata] = useState({})
+  const [collectionMembers, setCollectionMembers] = useState<NFT[]>([])
   const [collectionsAvailable, setCollectionsAvailable] = useState({})
   const [selectedNFTCollection, setSelectedNFTCollection] = useState('')
   const schema = yup.object(AddNFTCollectionSchema).required()
@@ -146,26 +265,28 @@ export default function AddNFTCollectionForm({
     clearErrors()
     setSelectedNFTCollection('')
     setCollectionMetadata({})
+    setCollectionMembers([])
     const addressInput = getValues('addressInput')
     const isValidAddress = validateSolAddress(addressInput)
 
     if (isValidAddress) {
       setRequestPending(true)
       try {
-        const collectionInfo = await getNFTCollectionInfo(
-          connection.current,
-          addressInput
-        )
-        console.log(collectionInfo)
+        const {
+          collectionInfo,
+          collectionMembers,
+        } = await getNFTCollectionInfo(connection.current, addressInput)
+        console.log('NFT collection info:', collectionInfo)
         setValue('collectionKey', addressInput)
         setSelectedNFTCollection(addressInput)
         setCollectionMetadata({ [addressInput]: collectionInfo })
+        setCollectionMembers(collectionMembers)
         setRequestPending(false)
       } catch (err) {
         setRequestPending(false)
         setError(
           'addressInput',
-          { type: 'custom', message: 'Verified collection not found' },
+          { type: 'custom', message: 'Address is not a verified collection' },
           { shouldFocus: true }
         )
       }
@@ -187,38 +308,23 @@ export default function AddNFTCollectionForm({
         connection.current,
         wallet.publicKey
       )
-      const verifiedCollections = ownedNfts
-        .filter((nft) => nft.collection?.verified && nft.collection?.key)
-        .reduce((prev, curr) => {
-          const collectionKey = curr.collection?.key
-          if (typeof collectionKey === 'undefined') return prev
-
-          if (prev[collectionKey]) {
-            prev[collectionKey].push(curr)
-          } else {
-            prev[collectionKey] = [curr]
-          }
-          return prev
-        }, {})
+      console.log('NFT wallet contents', ownedNfts)
+      const verifiedCollections = filterAndMapVerifiedCollections(ownedNfts)
+      console.log('NFT verified collections', verifiedCollections)
 
       const collectionMetadata = {}
       for (const collectionKey in verifiedCollections) {
-        const {
-          data: { data: collectionData },
-        } = await Metadata.findByMint(connection.current, collectionKey)
-        const { data: response } = await axios.get(collectionData.uri)
-        collectionMetadata[collectionKey] = {
-          ...collectionData,
-          ...response,
-        }
-        const nfts = verifiedCollections[collectionKey].slice(0, 2)
-        for (let i = 0; i < nfts.length; i++) {
-          const { data: response } = await axios.get(nfts[i].data.uri)
-          nfts[i].data = {
-            ...nfts[i].data,
-            ...response,
-          }
-        }
+        collectionMetadata[collectionKey] = await enrichCollectionInfo(
+          connection.current,
+          collectionKey
+        )
+
+        const nfts = await Promise.all(
+          verifiedCollections[collectionKey].slice(0, 2).map((nft) => {
+            return enrichItemInfo(nft.data, nft.data.uri)
+          })
+        )
+        verifiedCollections[collectionKey] = nfts
       }
 
       console.log(collectionMetadata, verifiedCollections)
@@ -268,6 +374,7 @@ export default function AddNFTCollectionForm({
                 data-testid="nft-address"
                 error={errors.addressInput?.message || ''}
                 {...field}
+                disabled={requestPending}
                 onKeyDown={(ev) => {
                   if (ev.key === 'Enter') {
                     handleAdd()
@@ -279,7 +386,7 @@ export default function AddNFTCollectionForm({
                   type="submit"
                   onClick={handleAdd}
                   loading={requestPending}
-                  disabled={!field.value}
+                  disabled={!field.value || requestPending}
                   className="w-full md:w-fit"
                 >
                   + Add
@@ -310,35 +417,31 @@ export default function AddNFTCollectionForm({
             </Text>
             <div className="flex mt-5 space-x-2">
               {!selectedNFTCollection ? (
-                <>
-                  <img
-                    src="/1-Landing-v2/avatar-nft.png"
-                    className={`w-24 h-24 ${
-                      requestPending ? 'animate-pulse' : ''
-                    }`}
-                  />
-                  <div
-                    className={`space-y-2 truncate ${
-                      requestPending ? 'animate-pulse' : ''
-                    }`}
-                  >
-                    <div className="text-transparent truncate rounded w-fit bg-bkg-grey">
-                      Collection name...
-                    </div>
-                    <div className="text-transparent truncate rounded w-fit bg-bkg-grey">
-                      Loading-long-url-to-some-obscure-wallet-address
-                    </div>
-                    <div className="text-transparent truncate rounded w-fit bg-bkg-grey">
-                      xx 1234...6789
-                    </div>
-                  </div>
-                </>
+                <SkeletonNFTCollectionInfo loading={requestPending} />
               ) : (
                 <div className="flex items-center space-x-2">
-                  <div>
+                  <div className="relative h-24 w-28">
+                    {collectionMembers.slice(0, 3).map((nft, index) => {
+                      return (
+                        <img
+                          key={nft.name}
+                          src={nft.image}
+                          alt="collection item"
+                          className={`absolute w-24 h-24 rounded-md ${
+                            index === 0
+                              ? 'rotate-[-9deg]'
+                              : index === 1
+                              ? 'rotate-[-15deg]'
+                              : index === 2
+                              ? 'rotate-[15deg]'
+                              : 'rotate-[9deg]'
+                          }`}
+                        />
+                      )
+                    })}
                     <img
                       src={collectionMetadata[selectedNFTCollection]?.image}
-                      className="w-24 h-24 rounded-md"
+                      className="absolute w-24 h-24 rounded-md"
                     />
                   </div>
                   <div className="truncate">
