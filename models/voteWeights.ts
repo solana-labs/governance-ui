@@ -361,8 +361,6 @@ export class SwitchboardQueueVoteWeight implements VoterWeightInterface {
   }
 
   canCreateProposal(config: GovernanceConfig) {
-    console.log("canCreateProposal?");
-    console.log(this.votingPower);
     return this.votingPower.gt(new BN(0))
   }
   canCreateGovernanceUsingCommunityTokens(realm: ProgramAccount<Realm>) {
