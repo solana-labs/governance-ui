@@ -273,7 +273,6 @@ const New = () => {
 
         router.push(url)
       } catch (ex) {
-        console.log("This error.");
         console.log("Notifying:");
         console.log(ex);
         notify({ type: 'error', message: `${ex}` })

@@ -23,8 +23,6 @@ export default function useCreateProposal() {
     canChooseWhoVote,
     config,
   } = useRealm()
-  console.log("In Proposal Hook. Mint:");
-  console.log(mint);
   const { getRpcContext } = useRpcContext()
   const handleCreateProposal = async ({
     title,
@@ -63,10 +61,6 @@ export default function useCreateProposal() {
         : !councilMint?.supply.isZero()
         ? realm!.account.config.councilMint
         : undefined
-    console.log("Ah it's this part.");
-    console.log(`da community mint is ${defaultProposalMint.toBase58()}`);
-    console.log(`da realm mint is ${realm.account.communityMint.toBase58()}`);
-    //console.log(`da mint ${mint.publicKey.toBase58()}`);
 
     const proposalMint =
       canChooseWhoVote && voteByCouncil
@@ -81,8 +75,7 @@ export default function useCreateProposal() {
     const selectedGovernance = (await fetchRealmGovernance(
       governance?.pubkey
     )) as ProgramAccount<Governance>
-    console.log("Own token record... you're undefined, aren't ya???");
-    console.log(ownTokenRecord);
+
     const proposalAddress = await createProposal(
       rpcContext,
       realm!,

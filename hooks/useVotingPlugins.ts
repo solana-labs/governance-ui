@@ -123,16 +123,13 @@ export function useVotingPlugins() {
     setIsLoadingNfts(false)
   }
   const handleGetSwitchboardVoting = async () => {
-    console.log("HANDLE GET SB VOTING");
     if (!wallet || !wallet.publicKey || !realm) {
-      console.log("returning");
       return
     }
 
     setIsLoading(true)
 
     try {
-      console.log("IN TRY BLOCK");
       const options = anchor.AnchorProvider.defaultOptions()
       const provider = new anchor.AnchorProvider(
         connection.current,
@@ -153,8 +150,6 @@ export function useVotingPlugins() {
         console.log("Off chain addin idl");
         addinIdl = gonidl as anchor.Idl
       }
-      console.log("Addin IDL");
-      console.log(addinIdl);
 
       const switchboardProgram = new anchor.Program(
         idl,
@@ -182,11 +177,7 @@ export function useVotingPlugins() {
 
       for (const { oracle, oracleData } of oracleData) {
         if (!wallet || !wallet.publicKey || !realm || !oracleData) {
-          console.log("Continuing");
           continue
-        }
-        else {
-          console.log("LGTM");
         }
         let queuePk = oracleData.queuePubkey;
 
@@ -198,20 +189,11 @@ export function useVotingPlugins() {
         );
 
         let addinStateData = await addinProgram.account.state.fetch(addinState);
-        console.log("the addinStateData:");
-        console.log(addinStateData);
         let queue = await switchboardProgram.account.oracleQueueAccountData.fetch(queuePk);
         let queueAuthority = queue.authority;
         let grantAuthority = addinStateData.grantAuthority;
         try {
           let g = await getGovernanceAccount(provider.connection, grantAuthority, Governance);
-          /*console.log("G");
-          console.log(g);
-          console.log("Current realm?:");
-          console.log(g.account.realm.equals(realm.pubkey));
-          console.log(`${g.account.realm.toBase58()} ${realm.pubkey}`);
-          console.log("Owned by you:");
-          console.log(oracleData.oracleAuthority.equals(wallet.publicKey));*/
           if (
             g.account.realm.equals(realm.pubkey) &&
             oracleData.oracleAuthority.equals(wallet.publicKey)
@@ -223,9 +205,7 @@ export function useVotingPlugins() {
               queuePk,
               oracle
             );
-            console.log(p);
             let ix = await p.setVoterWeightTx({govProgram: realm.owner, pubkeySigner: wallet.publicKey}, addinProgram, grantAuthority);
-            console.log(ix.instructions);
             setVoterWeightInstructions.push(
               ix.instructions[0]
             );
@@ -250,11 +230,9 @@ export function useVotingPlugins() {
           //new PublicKey("7PMP6yE6qb3XzBQr5TK2GhuruYayZzBnT8U92ySaLESC")
           new PublicKey("B4EDDdMh5CmB6B9DeMmZmFvRzEgyHR5zWktf6httcMk6"),
         )
-        console.log(voterWeightRecord)
-        const vw = await connection.current.getAccountInfo(voterWeightRecord)
-        console.log(vw)
 
-        console.log("Getting voter weight");
+        const vw = await connection.current.getAccountInfo(voterWeightRecord)
+
         const vwr = await getVoterWeightRecord(
           connection.current,
           voterWeightRecord
@@ -263,7 +241,7 @@ export function useVotingPlugins() {
         if (vwr && vwr.account.realm.equals(realm.pubkey)) {
           console.log(vwr.account.voterWeight.toNumber())
           // get voting power
-          console.log("VOTER WEIGHT FOUND AND SET");
+          console.log("SWITCHBOARD VOTER WEIGHT FOUND AND SET");
           setVotingPower(vwr.account.voterWeight)
         } else {
           // 'no sb governance'
@@ -276,94 +254,6 @@ export function useVotingPlugins() {
         console.log(e);
       }
 
-      /*
-      const allQueues = await switchboardProgram.account.oracleQueueAccountData.all()
-      console.log("method");
-      console.log(switchboardProgram.account.oracleQueueAccountData.all);
-
-      const queueListData = allQueues.map(({ publicKey, account }) => {
-        return {
-          queueData: account,
-          queue: publicKey,
-        }
-      })
-
-      // go through queues, get governance addresses until current realm + governance combo exists
-      for (const { queue, queueData } of queueListData) {
-        if (!wallet || !wallet.publicKey || !realm || !queueData) {
-          console.log("Continuing");
-          continue
-        }
-        else {
-          console.log("LGTM");
-        }
-
-        console.log("getting token mint");
-        const switchTokenMint = new Token(
-          switchboardProgram.provider.connection,
-          (queueData.mint as PublicKey).equals(PublicKey.default)
-            ? NATIVE_MINT
-            : (queueData.mint as PublicKey),
-          TOKEN_PROGRAM_ID,
-          Keypair.generate()
-        )
-
-        console.log("getting token wallet");
-        // get token wallet for this user associated with this queue's mint
-        const tokenWallet = await Token.getAssociatedTokenAddress(
-          switchTokenMint.associatedProgramId,
-          switchTokenMint.programId,
-          switchTokenMint.publicKey,
-          wallet.publicKey
-        )
-
-        // get the oracle account associated with wallet
-        console.log("getting oracle");
-        const [oracle] = anchor.utils.publicKey.findProgramAddressSync(
-          [
-            Buffer.from('OracleAccountData'),
-            queue.toBuffer(),
-            tokenWallet.toBuffer(),
-          ],
-          //sbv2.SBV2_MAINNET_PID
-          new PublicKey("7PMP6yE6qb3XzBQr5TK2GhuruYayZzBnT8U92ySaLESC"),
-        )
-        console.log("the oracle is: ");
-        console.log(oracle);
-
-        // get VWR from the oracle
-        console.log("getting vwr");
-        const [
-          voterWeightRecord,
-        ] = anchor.utils.publicKey.findProgramAddressSync(
-          [Buffer.from('VoterWeightRecord'), oracle.toBytes()],
-          //sbv2.SBV2_MAINNET_PID
-          new PublicKey("7PMP6yE6qb3XzBQr5TK2GhuruYayZzBnT8U92ySaLESC")
-        )
-        console.log(voterWeightRecord)
-
-        const vw = await connection.current.getAccountInfo(voterWeightRecord)
-        console.log(vw)
-
-        console.log("Getting voter weight");
-        const vwr = await getVoterWeightRecord(
-          connection.current,
-          voterWeightRecord
-        )
-        console.log(vwr)
-
-        // does current realm / governance resolve (at all), does VWR exist
-        if (vwr && vwr.account.realm.equals(realm.pubkey)) {
-          console.log(vwr.account.voterWeight.toNumber())
-          // get voting power
-          console.log("VOTER WEIGHT FOUND AND SET");
-          setVotingPower(vwr.account.voterWeight)
-        } else {
-          // 'no sb governance'
-          setVotingPower(new anchor.BN(0))
-          console.log("NO VOTER WEIGHT");
-        }
-      }*/
     } catch (e) {
       console.log(e)
       notify({
