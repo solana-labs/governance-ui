@@ -1,7 +1,7 @@
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 import { NftVoterClient } from '@solana/governance-program-library'
-import { SwitchboardQueueVoterClient } from '../../SwitchboardVotePlugin/SwitchboardQueueVoterClient'
+import { SwitchboardQueueVoterClient, SWITCHBOARD_ID, SWITCHBOARD_ADDIN_ID } from '../../SwitchboardVotePlugin/SwitchboardQueueVoterClient'
 import {
   ProgramAccount,
   Realm,
@@ -221,8 +221,7 @@ export class VotingClient {
             Buffer.from('VoterWeightRecord'),
             this.oracles[0].toBytes(),
           ],
-          //new PublicKey("7PMP6yE6qb3XzBQr5TK2GhuruYayZzBnT8U92ySaLESC"),
-          new PublicKey("B4EDDdMh5CmB6B9DeMmZmFvRzEgyHR5zWktf6httcMk6"),
+          SWITCHBOARD_ADDIN_ID,
       );
       return { voterWeightPk: vwr, maxVoterWeightRecord: undefined }
     }

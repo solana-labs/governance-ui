@@ -6,7 +6,7 @@ import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import useSwitchboardPluginStore from 'SwitchboardVotePlugin/store/switchboardStore'
-import { QUEUE_LIST } from 'SwitchboardVotePlugin/SwitchboardQueueVoterClient'
+import { QUEUE_LIST, SWITCHBOARD_ID, SWITCHBOARD_ADDIN_ID } from 'SwitchboardVotePlugin/SwitchboardQueueVoterClient'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import {
   getMaxVoterWeightRecord,
@@ -21,8 +21,8 @@ import { AccountLayout, NATIVE_MINT } from '@solana/spl-token'
 import * as anchor from '@project-serum/anchor'
 import * as sbv2 from '../../switchboardv2-api'
 //import sbidl from '../../switchboard-core/switchboard_v2/target/idl/switchboard_v2.json'
-import sbidl from '../../reclone-sbc/switchboard_v2/target/idl/switchboard_v2.json';
-import gonidl from '../../reclone-sbc/switchboard_v2/target/idl/gameofnodes.json';
+import sbidl from 'SwitchboardVotePlugin/switchboard_v2.json';
+import gonidl from 'SwitchboardVotePlugin/gameofnodes.json';
 
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -43,9 +43,7 @@ export const nftPluginsPks: string[] = [
 ]
 
 export const switchboardPluginsPks: string[] = [
-  /*'HFdD2QauAai5W6n36xkt9MUcsNRn1L2WYEMvi5WbnyVJ',
-  '7PMP6yE6qb3XzBQr5TK2GhuruYayZzBnT8U92ySaLESC',*/
-  'B4EDDdMh5CmB6B9DeMmZmFvRzEgyHR5zWktf6httcMk6'
+  SWITCHBOARD_ADDIN_ID.toBase58()
 ]
 
 export const pythPluginsPks: string[] = [
@@ -145,7 +143,7 @@ export function useVotingPlugins() {
       console.log("IDL");
       console.log(idl);
 
-      let addinIdl = await anchor.Program.fetchIdl(new PublicKey("B4EDDdMh5CmB6B9DeMmZmFvRzEgyHR5zWktf6httcMk6"), provider)
+      let addinIdl = await anchor.Program.fetchIdl(SWITCHBOARD_ADDIN_ID, provider)
       if (!addinIdl) {
         console.log("Off chain addin idl");
         addinIdl = gonidl as anchor.Idl
@@ -153,14 +151,13 @@ export function useVotingPlugins() {
 
       const switchboardProgram = new anchor.Program(
         idl,
-        //sbv2.SBV2_MAINNET_PID,
-        new PublicKey("7PMP6yE6qb3XzBQr5TK2GhuruYayZzBnT8U92ySaLESC"),
+        SWITCHBOARD_ID,
         provider
       )
 
       const addinProgram = new anchor.Program(
         addinIdl,
-        new PublicKey("B4EDDdMh5CmB6B9DeMmZmFvRzEgyHR5zWktf6httcMk6"),
+        SWITCHBOARD_ADDIN_ID,
         provider
       )
 
@@ -226,9 +223,7 @@ export function useVotingPlugins() {
           voterWeightRecord,
         ] = anchor.utils.publicKey.findProgramAddressSync(
           [Buffer.from('VoterWeightRecord'), myNodesForRealm[0].toBytes()],
-          //sbv2.SBV2_MAINNET_PID
-          //new PublicKey("7PMP6yE6qb3XzBQr5TK2GhuruYayZzBnT8U92ySaLESC")
-          new PublicKey("B4EDDdMh5CmB6B9DeMmZmFvRzEgyHR5zWktf6httcMk6"),
+          SWITCHBOARD_ADDIN_ID
         )
 
         const vw = await connection.current.getAccountInfo(voterWeightRecord)

@@ -7,6 +7,10 @@ export const SWITCHBOARD_ID = new PublicKey(
   '7PMP6yE6qb3XzBQr5TK2GhuruYayZzBnT8U92ySaLESC'
 )
 
+export const SWITCHBOARD_ADDIN_ID = new PublicKey(
+  'B4EDDdMh5CmB6B9DeMmZmFvRzEgyHR5zWktf6httcMk6'
+);
+
 export const QUEUE_LIST: PublicKey[] = [
   new PublicKey('7QN4mJo9U58XMeHEyfY6ckKxAkVLkqVtcWjwgNU6xaE'),
 ]

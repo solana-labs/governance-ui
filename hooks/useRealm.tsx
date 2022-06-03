@@ -35,8 +35,6 @@ export default function useRealm() {
   const connection = useWalletStore((s) => s.connection)
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
-  /*const provider = new anchor.Provider(connection, wallet);
-  const switchboardProgram = new anchor.Program<Switchboard>(IDL, new PublicKey("7PMP6yE6qb3XzBQr5TK2GhuruYayZzBnT8U92ySaLESC"), provider);*/
   const tokenAccounts = useWalletStore((s) => s.tokenAccounts)
   const {
     realm,
