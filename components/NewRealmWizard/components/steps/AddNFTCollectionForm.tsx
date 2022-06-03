@@ -16,7 +16,9 @@ import FormHeader from '@components/NewRealmWizard/components/FormHeader'
 import FormField from '@components/NewRealmWizard/components/FormField'
 import FormFooter from '@components/NewRealmWizard/components/FormFooter'
 import { NewButton as Button } from '@components/Button'
-import Input from '@components/NewRealmWizard/components/Input'
+import Input, {
+  InputRangeSlider,
+} from '@components/NewRealmWizard/components/Input'
 // import Header from '../components_2/ProductHeader'
 import Text from '@components/Text'
 import NFTCollectionSelector from '@components/NewRealmWizard/components/NFTCollectionSelector'
@@ -100,6 +102,7 @@ export default function AddNFTCollectionForm({
     getValues,
     setValue,
     setError,
+    setFocus,
     clearErrors,
     handleSubmit,
     formState: { errors, isValid },
@@ -123,9 +126,9 @@ export default function AddNFTCollectionForm({
 
   useEffect(() => {
     if (!selectedNFTCollection) {
-      setValue('communityYesVotePercentage', 0, { shouldValidate: false })
+      setFocus('addressInput')
     } else {
-      setValue('communityYesVotePercentage', 60, { shouldValidate: true })
+      setFocus('numberOfNFTs')
     }
   }, [selectedNFTCollection])
 
@@ -414,40 +417,18 @@ export default function AddNFTCollectionForm({
           name="communityYesVotePercentage"
           control={control}
           defaultValue={60}
-          render={({ field }) => (
+          render={({ field, fieldState: { error } }) => (
             <FormField
               title="Adjust how much of the total NFT supply is needed to pass a proposal"
               description=""
               disabled={!selectedNFTCollection}
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <div className="w-[4.5rem]">
-                    <Input
-                      type="number"
-                      placeholder="60"
-                      data-testid="dao-quorum-input"
-                      error={errors.communityYesVotePercentage?.message || ''}
-                      disabled={!selectedNFTCollection}
-                      {...field}
-                    />
-                  </div>
-                  <div className="text-3xl opacity-30">%</div>
-                </div>
-                <div className="relative flex items-center w-full ml-4 space-x-4">
-                  <div className="opacity-60">1%</div>
-                  <input
-                    type="range"
-                    min={1}
-                    className="w-full with-gradient focus:outline-none focus:ring-0 focus:shadow-none"
-                    {...field}
-                    style={{
-                      backgroundSize: `${approvalPercent}% 100%`,
-                    }}
-                  />
-                  <div className="opacity-60">100%</div>
-                </div>
-              </div>
+              <InputRangeSlider
+                field={field}
+                error={error?.message}
+                placeholder="60"
+                disabled={!selectedNFTCollection}
+              />
             </FormField>
           )}
         />

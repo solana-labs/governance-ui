@@ -182,7 +182,12 @@ export const RadioGroup = ({
   )
 }
 
-export function InputRangeSlider({ field, error = '', placeholder = '50' }) {
+export function InputRangeSlider({
+  field,
+  error = '',
+  placeholder = '50',
+  disabled = false,
+}) {
   return (
     <div className="flex flex-col-reverse sm:flex-row sm:items-baseline sm:space-x-4 md:space-x-8">
       <div className="w-full sm:w-24">
@@ -194,6 +199,7 @@ export function InputRangeSlider({ field, error = '', placeholder = '50' }) {
               %
             </Text>
           }
+          disabled={disabled}
           data-testid="dao-approval-threshold-input"
           error={error}
           className="text-center"
@@ -204,18 +210,23 @@ export function InputRangeSlider({ field, error = '', placeholder = '50' }) {
           }}
         />
       </div>{' '}
-      <div className="relative flex items-center w-full my-6 space-x-4 md:my-0">
+      <div
+        className={`relative flex items-center w-full my-6 space-x-4 md:my-0 ${
+          disabled ? 'opacity-50' : ''
+        }`}
+      >
         <Text level="2" className="opacity-60">
           1%
         </Text>
         <input
           type="range"
           min={1}
-          className="w-full with-gradient focus:outline-none focus:ring-0 focus:shadow-none"
+          className="w-full with-gradient focus:outline-none focus:ring-0 focus:shadow-none disabled:cursor-not-allowed"
           {...field}
           style={{
             backgroundSize: `${field.value || 50}% 100%`,
           }}
+          disabled={disabled}
         />
         <Text level="2" className="opacity-60">
           100%
