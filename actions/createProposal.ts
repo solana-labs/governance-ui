@@ -260,29 +260,8 @@ export const createProposal = async (
     // We merge instructions with prerequisiteInstructions
     // Prerequisite  instructions can came from instructions as something we need to do before instruction can be executed
     // For example we create ATAs if they don't exist as part of the proposal creation flow
-    console.log("preq");
-    console.log(prerequisiteInstructions);
-    console.log("instructions");
-    console.log(instructions);
-    console.log(insertInstructions);
-    console.log("insert");
-    transaction.add(
-      ...prerequisiteInstructions,
-      ...instructions,
-      ...insertInstructions
-    )
 
-    console.log("The stuff:");
-    console.log({
-      transaction,
-      wallet,
-      connection,
-      signers,
-      sendingMessage: `creating ${notificationTitle}`,
-      successMessage: `${notificationTitle} created`,
-    });
-
-    await sendTransactionV2({
+    await sendTransactionsV2({
       wallet,
       connection,
       signersSet: [[], [], signers],
