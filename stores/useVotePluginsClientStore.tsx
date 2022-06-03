@@ -59,11 +59,8 @@ interface UseVotePluginsClientStore extends State {
 const defaultState = {
   vsrClient: undefined,
   nftClient: undefined,
-<<<<<<< HEAD
   switchboardClient: undefined,
-=======
   pythClient: undefined,
->>>>>>> dc2e11d94f735f0a0df6f5be45b6c649157a7c36
   voteStakeRegistryRegistrar: null,
   voteStakeRegistryRegistrarPk: null,
   nftMintRegistrar: null,
@@ -134,7 +131,6 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
         s.state.nftMintRegistrar = existingRegistrar
       })
     },
-<<<<<<< HEAD
     handleSetSwitchboardClient: async (wallet, connection) => {
       const options = AnchorProvider.defaultOptions()
       const provider = new AnchorProvider(
@@ -149,7 +145,7 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
       set((s) => {
         s.state.switchboardClient = switchboardClient
       })
-=======
+    },
     handleSetPythClient: async (wallet, connection) => {
       if (
         connection.cluster === 'localnet' ||
@@ -173,7 +169,6 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
           console.error(e)
         }
       }
->>>>>>> dc2e11d94f735f0a0df6f5be45b6c649157a7c36
     },
     handleSetCurrentRealmVotingClient: ({ client, realm, walletPk }) => {
       set((s) => {

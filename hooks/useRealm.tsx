@@ -75,7 +75,6 @@ export default function useRealm() {
     getPythVoterWeight()
   }, [connected])
 
-  const [realmInfo, setRealmInfo] = useState<RealmInfo | undefined>(undefined)
   const delegates = useMembersStore((s) => s.compact.delegates)
   const selectedCouncilDelegate = useWalletStore(
     (s) => s.selectedCouncilDelegate
@@ -224,7 +223,7 @@ export default function useRealm() {
     ownTokenRecord,
     votingPower,
     nftVotingPower,
-    sbVotingPower
+    sbVotingPower,
     pythVotingPower,
     ownCouncilTokenRecord
   )
@@ -262,7 +261,7 @@ const getVoterWeight = (
   votingPower: BN,
   nftVotingPower: BN,
   ownCouncilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,
-  sbVotingPower: BN
+  sbVotingPower: BN,
   pythVotingPower: BN,
 ) => {
   if (currentPluginPk) {

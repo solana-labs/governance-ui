@@ -489,11 +489,8 @@ export function useVotingPlugins() {
     ) {
       handleNftplugin()
       handleVsrPlugin()
-<<<<<<< HEAD
       handleSwitchboardPlugin()
-=======
       handlePythPlugin()
->>>>>>> dc2e11d94f735f0a0df6f5be45b6c649157a7c36
     }
   }, [
     currentPluginPk?.toBase58(),
