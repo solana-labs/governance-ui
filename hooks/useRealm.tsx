@@ -194,12 +194,6 @@ export default function useRealm() {
     realm.account.config.councilMint &&
     !councilMint?.supply.isZero()
 
-  /*console.log("Use realm canChooseWhoVote");
-  console.log(canChooseWhoVote);
-  console.log(realm);
-  console.log(mint);
-  console.log(realm.account.config.useCommunityVoterWeightAddin);*/
-
   //TODO take from realm config when available
   const realmCfgMaxOutstandingProposalCount = 10
   const toManyCommunityOutstandingProposalsForUser =
@@ -260,9 +254,9 @@ const getVoterWeight = (
   ownTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,
   votingPower: BN,
   nftVotingPower: BN,
-  ownCouncilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,
   sbVotingPower: BN,
   pythVotingPower: BN,
+  ownCouncilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,
 ) => {
   if (currentPluginPk) {
     if (vsrPluginsPks.includes(currentPluginPk.toBase58())) {

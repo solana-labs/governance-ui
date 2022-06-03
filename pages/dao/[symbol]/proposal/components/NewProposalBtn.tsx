@@ -34,9 +34,7 @@ const NewProposalBtn = () => {
     ? 'Connect your wallet to create new proposal'
     : governanceItems.length === 0
     ? 'There is no governance configuration to create a new proposal'
-    : !governanceItems.some((g) =>
-        ownVoterWeight.canCreateProposal(g.account.config)
-      )
+    : !governanceItems.some((g) => ownVoterWeight.canCreateProposal(g.account.config))
     ? "You don't have enough governance power to create a new proposal"
     : toManyCommunityOutstandingProposalsForUser
     ? 'Too many community outstanding proposals. You need to finalize them before creating a new one.'

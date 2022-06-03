@@ -35,6 +35,8 @@ const useSwitchboardPluginStore = create<SwitchboardPluginStore>(
     },
     setVotingPower: (votingPower) => {
       set((s) => {
+        console.log("In setVotingPower");
+        console.log(votingPower);
         s.state.votingPower = votingPower
       })
     },
