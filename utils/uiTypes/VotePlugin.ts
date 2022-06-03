@@ -344,6 +344,7 @@ export class VotingClient {
     if (this.client instanceof SwitchboardQueueVoterClient) {
       const props = await this.withUpdateVoterWeightRecord(
         instructions,
+        tokeOwnerRecord,
         'castVote'
       )
       return props
