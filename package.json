@@ -35,7 +35,7 @@
     "@emotion/styled": "^11.8.1",
     "@friktion-labs/friktion-sdk": "^1.1.118",
     "@foresight-tmp/foresight-sdk": "^0.1.46",
-    "@headlessui/react": "^1.6.0",
+    "@headlessui/react": "^1.6.4",
     "@heroicons/react": "^1.0.1",
     "@hookform/resolvers": "^2.8.10",
     "@marinade.finance/marinade-ts-sdk": "^2.0.9",

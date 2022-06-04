@@ -6,7 +6,6 @@ import { isWizardValid } from '@utils/formValidation'
 
 import CreateDAOWizard from '@components/NewRealmWizard/CreateDAOWizard'
 import useWalletStore from 'stores/useWalletStore'
-import useQueryContext from '@hooks/useQueryContext'
 
 export const Section = ({ children }) => {
   return (
@@ -117,14 +116,19 @@ export default function FormPage({
   }
 
   function handlePreviousButton(fromStep, overwriteHistory = false) {
-    console.log('previous button clicked from step:', fromStep, currentStep)
+    console.log(
+      'previous button clicked from step:',
+      fromStep,
+      currentStep,
+      query
+    )
 
     if (fromStep === 0) {
       purgeFormData()
       push(
         {
           pathname: '/realms/new/',
-          query: query?.cluster ? { cluser: query.cluser } : {},
+          query: query?.cluster ? { cluster: query.cluster } : {},
         },
         undefined,
         { shallow: true }

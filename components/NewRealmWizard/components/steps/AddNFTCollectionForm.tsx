@@ -21,8 +21,8 @@ import Input, {
 } from '@components/NewRealmWizard/components/Input'
 // import Header from '../components_2/ProductHeader'
 import Text from '@components/Text'
-import NFTCollectionSelector from '@components/NewRealmWizard/components/NFTCollectionSelector'
 import ThresholdAdviceBox from '@components/NewRealmWizard/components/ThresholdAdviceBox'
+import NFTCollectionModal from '../NFTCollectionModal'
 
 function filterAndMapVerifiedCollections(nfts) {
   return nfts
@@ -156,7 +156,7 @@ export interface NFT {
   properties: any
 }
 
-function WalletIcon() {
+export function WalletIcon() {
   return (
     <svg
       width="16"
@@ -208,7 +208,7 @@ export default function AddNFTCollectionForm({
   const { connected, connection, current: wallet } = useWalletStore((s) => s)
   const [walletConnecting, setWalletConnecting] = useState(false)
   const [requestPending, setRequestPending] = useState(false)
-  // const [modalOpen, setModalOpen] = useState(true)
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const [collectionMetadata, setCollectionMetadata] = useState({})
   const [collectionMembers, setCollectionMembers] = useState<NFT[]>([])
   const [collectionsAvailable, setCollectionsAvailable] = useState({})
@@ -327,10 +327,25 @@ export default function AddNFTCollectionForm({
         verifiedCollections[collectionKey] = nfts
       }
 
-      console.log(collectionMetadata, verifiedCollections)
+      console.log(
+        'NFT collection metadata and nfts',
+        collectionMetadata,
+        verifiedCollections
+      )
       setCollectionMetadata(collectionMetadata)
       setCollectionsAvailable(verifiedCollections)
-      // setModalOpen(true)
+      if (Object.keys(verifiedCollections).length === 0) {
+        setError(
+          'addressInput',
+          {
+            type: 'custom',
+            message: 'Current wallet has no verified collection',
+          },
+          { shouldFocus: true }
+        )
+      } else {
+        setIsModalOpen(true)
+      }
       setWalletConnecting(false)
     } catch (error) {
       setWalletConnecting(false)
@@ -342,10 +357,6 @@ export default function AddNFTCollectionForm({
       })
     }
   }
-
-  // function closeModal() {
-  //   setModalOpen(false)
-  // }
 
   return (
     <form
@@ -444,12 +455,12 @@ export default function AddNFTCollectionForm({
                       className="absolute w-24 h-24 rounded-md"
                     />
                   </div>
-                  <div className="truncate">
-                    <Text level="1" className="">
+                  <div className="w-1/2 truncate md:w-full">
+                    <Text level="1" className="break-words">
                       {collectionMetadata[selectedNFTCollection]?.name ||
                         '(Collection has no name)'}
                     </Text>
-                    <Text level="2" className="text-white/70">
+                    <Text level="2" className="truncate text-white/70">
                       {collectionMetadata[selectedNFTCollection]
                         ?.external_url ? (
                         <a
@@ -537,14 +548,17 @@ export default function AddNFTCollectionForm({
         />
       </div>
 
-      <NFTCollectionSelector
+      <NFTCollectionModal
+        show={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        walletPk={wallet?.publicKey}
         collections={collectionsAvailable}
         metadata={collectionMetadata}
-        onChange={(val) => {
+        onSelect={(val) => {
           setSelectedNFTCollection(val)
           setValue('collectionKey', val)
         }}
-        value={selectedNFTCollection}
+        selectedNFTCollection={selectedNFTCollection}
       />
 
       <ThresholdAdviceBox title="Approval threshold">
