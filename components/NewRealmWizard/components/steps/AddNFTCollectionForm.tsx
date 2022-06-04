@@ -408,7 +408,7 @@ export default function AddNFTCollectionForm({
           )}
         />
         <input className="hidden" {...register('collectionKey')} disabled />
-        <div className="flex space-x-2">
+        <div className="flex flex-wrap space-y-4 md:flex-nowrap md:space-y-0 md:space-x-2">
           <div className="flex flex-col w-full px-4 py-5 rounded-md bg-night-grey grow">
             <Text level="2">
               {selectedNFTCollection
@@ -481,7 +481,7 @@ export default function AddNFTCollectionForm({
               )}
             </div>
           </div>
-          <div className="flex flex-col items-center px-8 pt-5 text-center rounded-md bg-night-grey">
+          <div className="flex flex-col items-center px-8 pt-5 text-center rounded-md grow md:grow-0 bg-night-grey">
             <Controller
               name="numberOfNFTs"
               control={control}

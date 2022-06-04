@@ -27,7 +27,6 @@ export default function FormPage({
 }) {
   const [formData, setFormData] = useLocalStorageState(ssFormKey, {})
   const { connected, current: wallet } = useWalletStore((s) => s)
-  const { fmtUrlWithCluster } = useQueryContext()
   const { pathname, query, push, replace } = useRouter()
   const currentStep =
     typeof query !== 'undefined'
@@ -55,7 +54,7 @@ export default function FormPage({
           throw new Error('No valid wallet connected')
         }
       } catch (err) {
-        handlePreviousButton(0)
+        if (currentStep > 0) handlePreviousButton(1)
       }
     }
 
@@ -63,7 +62,7 @@ export default function FormPage({
   }, [connected])
 
   useEffect(() => {
-    if (!isWizardValid({ currentStep, steps, formData })) {
+    if (currentStep > 0 && !isWizardValid({ currentStep, steps, formData })) {
       handlePreviousButton(currentStep, true)
     }
   }, [currentStep])
@@ -122,7 +121,14 @@ export default function FormPage({
 
     if (fromStep === 0) {
       purgeFormData()
-      push(fmtUrlWithCluster('/realms/new/'), undefined, { shallow: true })
+      push(
+        {
+          pathname: '/realms/new/',
+          query: query?.cluster ? { cluser: query.cluser } : {},
+        },
+        undefined,
+        { shallow: true }
+      )
     } else {
       const previousStep = steps
         .map(
