@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { abbreviateAddress } from '@utils/formatting'
 
 import Header from '@components/Header'
@@ -10,14 +11,14 @@ export default function NFTCollectionModal({
   show,
   walletPk,
   collections,
-  metadata,
-  selectedNFTCollection,
   onClose,
   onSelect,
 }) {
+  const [selected, setSelected] = useState('')
   function handleClose() {
-    onSelect('')
+    onSelect({ key: selected, collection: collections[selected] })
     onClose()
+    setSelected('')
   }
 
   return (
@@ -37,31 +38,20 @@ export default function NFTCollectionModal({
         </div>
       }
       confirmButton={
-        <Button
-          type="button"
-          onClick={onClose}
-          disabled={!selectedNFTCollection}
-          className="w-full md:w-fit md:ml-4"
-        >
+        <Button type="button" onClick={handleClose} disabled={!selected}>
           Choose
         </Button>
       }
       closeButton={
-        <Button
-          type="button"
-          secondary
-          onClick={handleClose}
-          className="w-full md:w-fit"
-        >
-          {selectedNFTCollection ? 'Cancel' : 'Close'}
+        <Button type="button" secondary onClick={handleClose}>
+          {selected ? 'Cancel' : 'Close'}
         </Button>
       }
     >
       <NFTCollectionSelector
         collections={collections}
-        metadata={metadata}
-        onChange={onSelect}
-        value={selectedNFTCollection}
+        onChange={setSelected}
+        value={selected}
       />
     </ConfirmationDialog>
   )

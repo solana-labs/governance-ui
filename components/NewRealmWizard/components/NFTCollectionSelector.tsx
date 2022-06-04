@@ -2,12 +2,7 @@ import { RadioGroup } from '@headlessui/react'
 import Header from '@components/Header'
 import Text from '@components/Text'
 
-const NFTCollectionSelector = ({
-  collections = {},
-  metadata = {},
-  onChange,
-  value,
-}) => {
+const NFTCollectionSelector = ({ collections = {}, onChange, value }) => {
   const optionClass =
     'z-0 flex flex-wrap md:items-center md:space-x-8 flex-wrap py-4 px-2 md:px-8 relative w-full default-transition rounded-md hover:cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 hover:opacity-100 hover:bg-black'
 
@@ -24,8 +19,8 @@ const NFTCollectionSelector = ({
       <div className={`w-full space-y-3`}>
         {Object.keys(collections).map((key) => {
           const collection = collections[key]
-          const totalNfts = collection.length
-          const images = collection.slice(0, 2).map((nft) => nft.image)
+          const totalNfts = collection.nfts.length
+          const images = collection.nfts.slice(0, 2).map((nft) => nft.image)
 
           for (let i = images.length; i < 3; i++) {
             images.push('')
@@ -41,13 +36,13 @@ const NFTCollectionSelector = ({
                 >
                   <div className="">
                     <img
-                      src={metadata[key]?.image}
+                      src={collection?.image}
                       className="w-16 h-16 border border-gray-700 rounded-full md:w-20 md:h-20"
                       alt="Collection icon"
                     />
                   </div>
                   <div className="flex flex-col mx-4 grow w-min md:mx-0">
-                    <Text>{metadata[key]?.name}</Text>
+                    <Text>{collection?.name}</Text>
                     <Text level="2" className="text-white/50">
                       {totalNfts} {`NFT${totalNfts === 1 ? '' : 's'}`}
                     </Text>

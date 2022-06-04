@@ -111,9 +111,12 @@ export function NewModal({ isOpen, onClose = () => null, header, children }) {
   )
 }
 
+function noop() {
+  return
+}
 export function ConfirmationDialog({
   isOpen,
-  onClose = () => null,
+  onClose = noop,
   header,
   confirmButton,
   closeButton,
@@ -122,17 +125,12 @@ export function ConfirmationDialog({
   return (
     <NewModal isOpen={isOpen} header={header}>
       <div className="overflow-scroll">{children}</div>
-      <div className="flex flex-col items-center justify-end mt-4 space-y-4 md:justify-start md:space-y-0 md:flex-row-reverse grow">
-        {confirmButton}
+      <div className="flex flex-col items-center justify-end mt-4 space-y-4 md:space-x-4 md:justify-start md:space-y-0 md:flex-row-reverse grow">
+        <div className="md:ml-4">{confirmButton}</div>
         {closeButton ? (
           closeButton
         ) : (
-          <NewButton
-            type="button"
-            secondary
-            onClick={onClose}
-            className="w-full md:w-fit"
-          >
+          <NewButton type="button" secondary onClick={onClose}>
             Close
           </NewButton>
         )}
