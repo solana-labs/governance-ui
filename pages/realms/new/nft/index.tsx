@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import { PublicKey } from '@solana/web3.js'
-import { getGovernanceProgramVersion } from '@solana/spl-governance'
-import { createNFTRealm } from 'actions/createNFTRealm'
+import createNFTRealm from 'actions/createNFTRealm'
 import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
 
 import useWalletStore from 'stores/useWalletStore'
@@ -86,29 +85,32 @@ export default function NFTWizard() {
         throw new Error('No valid wallet connected')
       }
 
-      const programId = formData?.programId || DEFAULT_GOVERNANCE_PROGRAM_ID
-      const governanceProgramId = new PublicKey(programId)
-      const programVersion = await getGovernanceProgramVersion(
-        connection.current,
-        governanceProgramId
-      )
-      console.log('CREATE REALM Program', {
-        governanceProgramId: governanceProgramId.toBase58(),
-        programVersion,
-      })
+      const programIdAddress =
+        formData?.programId || DEFAULT_GOVERNANCE_PROGRAM_ID
 
-      const results = await createNFTRealm(
-        connection.current,
-        governanceProgramId,
-        programVersion,
-        formData.name,
-        formData.collectionKey,
-        formData.numberOfNFTs,
-        1, // 1 NFT 1 vote
-        formData.communityYesVotePercentage,
-        formData?.memberAddresses?.map((w) => new PublicKey(w)) || [],
-        wallet
-      )
+      const results = await createNFTRealm({
+        wallet,
+        connection: connection.current,
+        programIdAddress,
+
+        realmName: formData.name,
+        collectionAddress: formData.collectionKey,
+        collectionCount: formData.numberOfNFTs,
+        tokensToGovernThreshold: 1, // 1 NFT 1 vote
+
+        existingCommunityMintPk: undefined,
+        communityYesVotePercentage: formData.communityYesVotePercentage,
+
+        // COUNCIL INFO
+        createCouncil: formData.addCouncil,
+        // councilVotePercentage: formData.communityYesVotePercentage,
+        existingCouncilMintPk: formData.councilTokenMintAddress
+          ? new PublicKey(formData.councilTokenMintAddress)
+          : undefined,
+        transferCouncilMintAuthority: formData.transferCouncilMintAuthority,
+        councilWalletPks:
+          formData?.memberAddresses?.map((w) => new PublicKey(w)) || [],
+      })
 
       if (results) {
         setFormData({})

@@ -302,6 +302,7 @@ export async function prepareRealmCreation({
   }
 
   return {
+    communityMintGovPk,
     communityMintPk,
     councilMintPk,
     realmPk,
@@ -310,5 +311,9 @@ export async function prepareRealmCreation({
     mintsSetupInstructions,
     mintsSetupSigners,
     councilMembersInstructions,
+    walletPk,
+    programIdPk,
+    programVersion,
+    minCommunityTokensToCreateAsMintValue,
   }
 }
