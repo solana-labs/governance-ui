@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 
-import { getGovernanceProgramVersion } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import useWalletStore from 'stores/useWalletStore'
-import { createGovTokenRealm } from 'actions/createGovTokenRealm'
+import createTokenizedRealm from 'actions/createTokenizedRealm'
 import useQueryContext from '@hooks/useQueryContext'
 import useLocalStorageState from '@hooks/useLocalStorageState'
 import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
@@ -95,28 +94,19 @@ export default function GovTokenWizard() {
         throw new Error('No valid wallet connected')
       }
 
-      const programId = formData?.programId || DEFAULT_GOVERNANCE_PROGRAM_ID
-      const governanceProgramId = new PublicKey(programId)
-      const programVersion = await getGovernanceProgramVersion(
-        connection.current,
-        governanceProgramId
-      )
-      console.log('CREATE REALM Program', {
-        governanceProgramId: governanceProgramId.toBase58(),
-        programVersion,
-      })
+      const programIdAddress =
+        formData?.programId || DEFAULT_GOVERNANCE_PROGRAM_ID
 
-      const results = await createGovTokenRealm({
+      const results = await createTokenizedRealm({
         wallet,
         connection: connection.current,
-        programId: governanceProgramId,
-        programVersion,
+        programIdAddress,
         realmName: formData.name,
         // COMMUNITY INFO
         tokensToGovernThreshold:
           formData.minimumNumberOfCommunityTokensToGovern,
         communityMintSupplyFactor: formData.communityMintSupplyFactor,
-        communityVotePercentage: formData.communityYesVotePercentage,
+        communityYesVotePercentage: formData.communityYesVotePercentage,
         existingCommunityMintPk: formData.communityTokenMintAddress
           ? new PublicKey(formData.communityTokenMintAddress)
           : undefined,
