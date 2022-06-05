@@ -79,7 +79,7 @@ function TokenInfo({
           type === COMMUNITY_TYPE
             ? 'DAO can mint tokens'
             : type === COUNCIL_TYPE
-            ? 'DAO can invite members'
+            ? 'DAO can add members'
             : 'DAO can mint'
         }
       />
@@ -102,7 +102,7 @@ function CommunityInfo({
   nftInfo,
 }) {
   const nftIsCommunityToken = !!nftInfo?.name
-  console.log(nftInfo)
+
   return (
     <>
       <Header as="h2">Community info</Header>
