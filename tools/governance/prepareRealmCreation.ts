@@ -1,32 +1,95 @@
-import { PublicKey } from '@solana/web3.js'
-import { getGovernanceProgramVersion } from '@solana/spl-governance'
-import { parseMintMaxVoteWeight } from '@tools/governance/units'
-import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
+import {
+  PublicKey,
+  Keypair,
+  TransactionInstruction,
+  Connection,
+} from '@solana/web3.js'
+import {
+  getGovernanceProgramVersion,
+  WalletSigner,
+} from '@solana/spl-governance'
+
+import {
+  GovernanceConfig,
+  SetRealmAuthorityAction,
+  VoteThresholdPercentage,
+  VoteTipping,
+  withCreateNativeTreasury,
+  withCreateMintGovernance,
+  withCreateRealm,
+  withDepositGoverningTokens,
+  withSetRealmAuthority,
+} from '@solana/spl-governance'
+
+import { getWalletPublicKey } from '@utils/sendTransactions'
 import { tryGetMint } from '@utils/tokens'
+
+import { parseMintMaxVoteWeight } from '@tools/governance/units'
+import {
+  getTimestampFromDays,
+  getMintNaturalAmountFromDecimalAsBN,
+} from '@tools/sdk/units'
 import { withCreateMint } from '@tools/sdk/splToken/withCreateMint'
 import { withCreateAssociatedTokenAccount } from '@tools/sdk/splToken/withCreateAssociatedTokenAccount'
 import { withMintTo } from '@tools/sdk/splToken/withMintTo'
-import { getWalletPublicKey } from '@utils/sendTransactions'
 import { MAX_TOKENS_TO_DISABLE } from '@tools/constants'
+
+import BN from 'bn.js'
+
+interface RealmCreation {
+  connection: Connection
+  wallet: WalletSigner
+  programIdAddress: string
+
+  realmName: string
+  tokensToGovernThreshold: number | undefined
+  maxVotingTimeInDays?: number
+
+  communityYesVotePercentage: number
+  existingCommunityMintPk: PublicKey | undefined
+  transferCommunityMintAuthority: boolean
+  communityMintSupplyFactor: number | undefined
+  communityMintDecimals?: number
+
+  createCouncil: boolean
+  existingCouncilMintPk: PublicKey | undefined
+  transferCouncilMintAuthority: boolean
+  councilWalletPks: PublicKey[]
+
+  additionalRealmPlugins?: PublicKey[]
+}
 
 export async function prepareRealmCreation({
   connection,
   wallet,
   programIdAddress,
+
+  realmName,
   tokensToGovernThreshold,
+  maxVotingTimeInDays = 3,
 
   existingCommunityMintPk,
+  communityYesVotePercentage,
   communityMintSupplyFactor: rawCMSF,
+  transferCommunityMintAuthority,
+  communityMintDecimals = 6,
 
-  createCouncil = false,
+  createCouncil,
   existingCouncilMintPk,
-
+  transferCouncilMintAuthority,
   councilWalletPks,
 
-  mintsSetupInstructions,
-  mintsSetupSigners,
-  councilMembersInstructions,
-}) {
+  additionalRealmPlugins = [],
+}: RealmCreation) {
+  const realmInstructions: TransactionInstruction[] = []
+  const realmSigners: Keypair[] = []
+
+  const mintsSetupInstructions: TransactionInstruction[] = []
+  const councilMembersInstructions: TransactionInstruction[] = []
+
+  const mintsSetupSigners: Keypair[] = []
+  const initialCouncilTokenAmount = 1
+
   const communityMintSupplyFactor = parseMintMaxVoteWeight(rawCMSF)
   const walletPk = getWalletPublicKey(wallet)
   const programIdPk = new PublicKey(programIdAddress)
@@ -55,8 +118,7 @@ export async function prepareRealmCreation({
     : true
 
   console.log('Prepare realm - community mint address', existingCommunityMintPk)
-  // Community mint decimals
-  const communityMintDecimals = 6
+
   let communityMintPk = existingCommunityMintPk
   if (!communityMintPk) {
     // Create community mint
@@ -144,14 +206,109 @@ export async function prepareRealmCreation({
         )
       : MAX_TOKENS_TO_DISABLE
 
-  return {
+  const realmPk = await withCreateRealm(
+    realmInstructions,
     programIdPk,
     programVersion,
+    realmName,
     walletPk,
-    walletAtaPk,
     communityMintPk,
+    walletPk,
     councilMintPk,
     communityMintSupplyFactor,
     minCommunityTokensToCreateAsMintValue,
+    ...additionalRealmPlugins
+  )
+
+  // If the current wallet is in the team then deposit the council token
+  if (walletAtaPk) {
+    await withDepositGoverningTokens(
+      realmInstructions,
+      programIdPk,
+      programVersion,
+      realmPk,
+      walletAtaPk,
+      councilMintPk,
+      walletPk,
+      walletPk,
+      walletPk,
+      new BN(initialCouncilTokenAmount)
+    )
+  }
+
+  // Put community and council mints under the realm governance with default config
+  const config = new GovernanceConfig({
+    voteThresholdPercentage: new VoteThresholdPercentage({
+      value: communityYesVotePercentage,
+    }),
+    minCommunityTokensToCreateProposal: minCommunityTokensToCreateAsMintValue,
+    // Do not use instruction hold up time
+    minInstructionHoldUpTime: 0,
+    // max voting time 3 days
+    maxVotingTime: getTimestampFromDays(maxVotingTimeInDays),
+    voteTipping: VoteTipping.Strict,
+    proposalCoolOffTime: 0,
+    minCouncilTokensToCreateProposal: new BN(initialCouncilTokenAmount),
+  })
+
+  const communityMintGovPk = await withCreateMintGovernance(
+    realmInstructions,
+    programIdPk,
+    programVersion,
+    realmPk,
+    communityMintPk,
+    config,
+    transferCommunityMintAuthority,
+    walletPk,
+    PublicKey.default,
+    walletPk,
+    walletPk
+  )
+
+  await withCreateNativeTreasury(
+    realmInstructions,
+    programIdPk,
+    communityMintGovPk,
+    walletPk
+  )
+
+  if (councilMintPk) {
+    await withCreateMintGovernance(
+      realmInstructions,
+      programIdPk,
+      programVersion,
+      realmPk,
+      councilMintPk,
+      config,
+      transferCouncilMintAuthority,
+      walletPk,
+      PublicKey.default,
+      walletPk,
+      walletPk
+    )
+  }
+
+  // Set the community governance as the realm authority
+  if (transferCommunityMintAuthority) {
+    withSetRealmAuthority(
+      realmInstructions,
+      programIdPk,
+      programVersion,
+      realmPk,
+      walletPk,
+      communityMintGovPk,
+      SetRealmAuthorityAction.SetChecked
+    )
+  }
+
+  return {
+    communityMintPk,
+    councilMintPk,
+    realmPk,
+    realmInstructions,
+    realmSigners,
+    mintsSetupInstructions,
+    mintsSetupSigners,
+    councilMembersInstructions,
   }
 }

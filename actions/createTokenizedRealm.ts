@@ -1,20 +1,5 @@
-import { Keypair, TransactionInstruction } from '@solana/web3.js'
-import {
-  GovernanceConfig,
-  SetRealmAuthorityAction,
-  VoteThresholdPercentage,
-  VoteTipping,
-  withCreateNativeTreasury,
-} from '@solana/spl-governance'
-
-import { withCreateMintGovernance } from '@solana/spl-governance'
-import { withCreateRealm } from '@solana/spl-governance'
-import { withDepositGoverningTokens } from '@solana/spl-governance'
-import { withSetRealmAuthority } from '@solana/spl-governance'
-import { BN } from '@project-serum/anchor'
 import { Connection, PublicKey } from '@solana/web3.js'
 
-import { getTimestampFromDays } from '@tools/sdk/units'
 import {
   sendTransactionsV2,
   transactionInstructionsToTypedInstructionsSets,
@@ -62,137 +47,33 @@ export default async function createTokenizedRealm({
   // councilYesVotePercentage,
   councilWalletPks,
 }: TokenizedRealm) {
-  const realmInstructions: TransactionInstruction[] = []
-  const realmSigners: Keypair[] = []
-
-  const mintsSetupInstructions: TransactionInstruction[] = []
-  const councilMembersInstructions: TransactionInstruction[] = []
-
-  const mintsSetupSigners: Keypair[] = []
-  const tokenAmount = 1
-
   const {
-    programIdPk,
-    programVersion,
-    walletPk,
-    walletAtaPk,
     communityMintPk,
     councilMintPk,
-    communityMintSupplyFactor,
-    minCommunityTokensToCreateAsMintValue,
+    realmPk,
+    realmInstructions,
+    realmSigners,
+    mintsSetupInstructions,
+    mintsSetupSigners,
+    councilMembersInstructions,
   } = await prepareRealmCreation({
     connection,
     wallet,
     programIdAddress,
+
+    realmName,
     tokensToGovernThreshold,
 
     existingCommunityMintPk,
     communityMintSupplyFactor: rawCMSF,
+    transferCommunityMintAuthority,
+    communityYesVotePercentage,
 
     createCouncil,
     existingCouncilMintPk,
-
+    transferCouncilMintAuthority,
     councilWalletPks,
-
-    mintsSetupInstructions,
-    mintsSetupSigners,
-    councilMembersInstructions,
   })
-
-  const realmPk = await withCreateRealm(
-    realmInstructions,
-    programIdPk,
-    programVersion,
-    realmName,
-    walletPk,
-    communityMintPk,
-    walletPk,
-    councilMintPk,
-    communityMintSupplyFactor,
-    minCommunityTokensToCreateAsMintValue,
-    undefined
-  )
-
-  // If the current wallet is in the team then deposit the council token
-  if (walletAtaPk) {
-    await withDepositGoverningTokens(
-      realmInstructions,
-      programIdPk,
-      programVersion,
-      realmPk,
-      walletAtaPk,
-      councilMintPk,
-      walletPk,
-      walletPk,
-      walletPk,
-      new BN(tokenAmount)
-    )
-  }
-
-  // Put community and council mints under the realm governance with default config
-  const config = new GovernanceConfig({
-    voteThresholdPercentage: new VoteThresholdPercentage({
-      value: communityYesVotePercentage,
-    }),
-    minCommunityTokensToCreateProposal: minCommunityTokensToCreateAsMintValue,
-    // Do not use instruction hold up time
-    minInstructionHoldUpTime: 0,
-    // max voting time 3 days
-    maxVotingTime: getTimestampFromDays(3),
-    voteTipping: VoteTipping.Strict,
-    proposalCoolOffTime: 0,
-    minCouncilTokensToCreateProposal: new BN(1),
-  })
-
-  const communityMintGovPk = await withCreateMintGovernance(
-    realmInstructions,
-    programIdPk,
-    programVersion,
-    realmPk,
-    communityMintPk,
-    config,
-    transferCommunityMintAuthority,
-    walletPk,
-    PublicKey.default,
-    walletPk,
-    walletPk
-  )
-
-  await withCreateNativeTreasury(
-    realmInstructions,
-    programIdPk,
-    communityMintGovPk,
-    walletPk
-  )
-
-  if (councilMintPk) {
-    await withCreateMintGovernance(
-      realmInstructions,
-      programIdPk,
-      programVersion,
-      realmPk,
-      councilMintPk,
-      config,
-      transferCouncilMintAuthority,
-      walletPk,
-      PublicKey.default,
-      walletPk,
-      walletPk
-    )
-  }
-
-  // Set the community governance as the realm authority
-  if (transferCommunityMintAuthority) {
-    withSetRealmAuthority(
-      realmInstructions,
-      programIdPk,
-      programVersion,
-      realmPk,
-      walletPk,
-      communityMintGovPk,
-      SetRealmAuthorityAction.SetChecked
-    )
-  }
 
   try {
     const councilMembersChunks = chunks(councilMembersInstructions, 10)
