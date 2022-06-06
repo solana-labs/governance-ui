@@ -19,10 +19,10 @@ const New: React.FC = () => {
       url: '/realms/new/nft',
       name: 'NFT Community DAO',
       description:
-        'NFT Community DAOs leverage NFTs as membership,  giving NFT holders voting power to make decisions.',
+        'NFT Community DAOs leverage NFTs as membership, giving NFT holders voting power to make decisions.',
     },
     {
-      url: '/realms/new/gov-token',
+      url: '/realms/new/tokenized',
       name: 'Tokenized DAO',
       description:
         'DAO members receive a governance token to denote their membership and allow them to vote on proposals.',
