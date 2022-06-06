@@ -1,7 +1,7 @@
 import Header from '@components/Header'
 import Text from '@components/Text'
 
-import { FORM_NAME as GOVTOKEN_FORM } from 'pages/realms/new/gov-token'
+import { FORM_NAME as GOVTOKEN_FORM } from 'pages/realms/new/tokenized'
 import { FORM_NAME as MULTISIG_FORM } from 'pages/realms/new/multisig'
 import { FORM_NAME as NFT_FORM } from 'pages/realms/new/nft'
 
@@ -16,9 +16,9 @@ function StepProgressIndicator({
   let stepTitle = ''
 
   if (formType == GOVTOKEN_FORM) {
-    stepTitle = 'Gov token DAO:'
+    stepTitle = 'Tokenized DAO:'
   } else if (formType == MULTISIG_FORM) {
-    stepTitle = 'Multisig wallet DAO:'
+    stepTitle = 'Multisig wallet:'
   } else if (formType == NFT_FORM) {
     stepTitle = 'NFT community DAO:'
   }

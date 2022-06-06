@@ -34,8 +34,8 @@ import InviteMembersForm, {
   InviteMembers,
 } from '@components/NewRealmWizard/components/steps/InviteMembersForm'
 
-export const SESSION_STORAGE_FORM_KEY = 'govtoken-form-data'
-export const FORM_NAME = 'gov-token'
+export const SESSION_STORAGE_FORM_KEY = 'tokenized-form-data'
+export const FORM_NAME = 'tokenized'
 
 type GovToken =
   | (BasicDetails &
