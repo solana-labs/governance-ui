@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import { PublicKey } from '@solana/web3.js'
-import { getGovernanceProgramVersion } from '@solana/spl-governance'
 
 import useWalletStore from 'stores/useWalletStore'
 import createMultisigWallet from 'actions/createMultisigWallet'

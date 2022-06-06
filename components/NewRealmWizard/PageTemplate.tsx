@@ -24,15 +24,10 @@ export default function FormPage({
   handleSubmit,
   submissionPending,
 }) {
-  const [formData, setFormData] = useLocalStorageState(ssFormKey, {})
+  const [formData, setFormData] = useLocalStorageState<any>(ssFormKey, {})
   const { connected, current: wallet } = useWalletStore((s) => s)
-  const { pathname, query, push, replace } = useRouter()
-  const currentStep =
-    typeof query !== 'undefined'
-      ? query.currentStep
-        ? Number(query.currentStep)
-        : 0
-      : 0
+  const { query, push } = useRouter()
+  const currentStep = formData?.currentStep || 0
 
   useEffect(() => {
     window.addEventListener('beforeunload', promptUserBeforeLeaving)
@@ -62,7 +57,7 @@ export default function FormPage({
 
   useEffect(() => {
     if (currentStep > 0 && !isWizardValid({ currentStep, steps, formData })) {
-      handlePreviousButton(currentStep, true)
+      handlePreviousButton(currentStep)
     }
   }, [currentStep])
 
@@ -82,14 +77,6 @@ export default function FormPage({
       ...formData,
       ...data,
     }
-
-    for (const key in updatedFormState) {
-      if (updatedFormState[key] == null) {
-        delete updatedFormState[key]
-      }
-    }
-    setFormData(updatedFormState)
-
     const nextStep = steps
       .map(
         ({ required }) =>
@@ -98,24 +85,19 @@ export default function FormPage({
       )
       .indexOf(true, fromStep + 1)
 
+    updatedFormState.currentStep = nextStep > -1 ? nextStep : steps.length + 1
+
     console.log('next button clicked', fromStep, nextStep)
 
-    push(
-      {
-        pathname,
-        query: {
-          ...query,
-          currentStep: nextStep > -1 ? nextStep : steps.length + 1,
-        },
-      },
-      undefined,
-      {
-        shallow: true,
+    for (const key in updatedFormState) {
+      if (updatedFormState[key] == null) {
+        delete updatedFormState[key]
       }
-    )
+    }
+    setFormData(updatedFormState)
   }
 
-  function handlePreviousButton(fromStep, overwriteHistory = false) {
+  function handlePreviousButton(fromStep) {
     console.log(
       'previous button clicked from step:',
       fromStep,
@@ -141,17 +123,12 @@ export default function FormPage({
         )
         .lastIndexOf(true, fromStep - 1)
 
-      let transferFunction
-      if (overwriteHistory) {
-        transferFunction = replace
-      } else {
-        transferFunction = push
+      const updatedFormState = {
+        ...formData,
+        currentStep: previousStep,
       }
-      transferFunction(
-        { pathname, query: { ...query, currentStep: previousStep } },
-        undefined,
-        { shallow: true }
-      )
+
+      setFormData(updatedFormState)
     }
   }
 
