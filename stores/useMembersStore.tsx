@@ -1,6 +1,6 @@
 import create, { State } from 'zustand'
 import { ViewState } from '@components/Members/types'
-import { Member } from '@utils/uiTypes/members'
+import { Member, Delegates } from '@utils/uiTypes/members'
 
 interface MembersStore extends State {
   compact: {
@@ -8,11 +8,13 @@ interface MembersStore extends State {
     currentMember: Member | null
     members: Member[]
     activeMembers: Member[]
+    delegates: Delegates | null
   }
   setCurrentCompactViewMember: (item: Member) => void
   setCurrentCompactView: (viewState: ViewState) => void
   resetCompactViewState: () => void
   setMembers: (members: Member[]) => void
+  setDelegates: (delegates: Delegates) => void
 }
 
 const compactDefaultState = {
@@ -20,6 +22,7 @@ const compactDefaultState = {
   currentMember: null,
   members: [],
   activeMembers: [],
+  delegates: null,
 }
 
 const useMembersStore = create<MembersStore>((set, _get) => ({
@@ -48,6 +51,11 @@ const useMembersStore = create<MembersStore>((set, _get) => ({
     set((s) => {
       s.compact.members = members
       s.compact.activeMembers = activeMembers
+    })
+  },
+  setDelegates: (delegates: Delegates) => {
+    set((s) => {
+      s.compact.delegates = delegates
     })
   },
 }))

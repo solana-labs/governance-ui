@@ -213,7 +213,7 @@ const NotificationsCard = () => {
   const disabled = isAuthenticated() && !hasUnsavedChanges
 
   return (
-    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg w-1/2">
+    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
       <h3 className="mb-4">Set up notifications</h3>
       {hasLoaded ? (
         !connected ? (

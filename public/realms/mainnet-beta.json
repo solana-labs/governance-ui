@@ -49,6 +49,26 @@
     "ogImage": "https://trade.mango.markets/assets/icons/logo.svg"
   },
   {
+    "symbol": "WEZ",
+    "displayName": "Wezesha DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "FEtF7V55LorZmUriVVobubPvLXoS7sfP3smzb5zR4BWz",
+    "website": "https://wezesha.co",
+    "keywords": "Wezesha DAO, Wezesha, Wezesha Coin, The Big Five NFTs Club, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, SPL-TOKEN, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
+    "twitter": "@WezeshaCo",
+    "ogImage": "/realms/WezeshaDAO/img/Wezesha_dao_logo.png"
+  },
+  {
+    "symbol": "BFNC",
+    "displayName": "BFNC DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "36YGaNUYtRbaq1fHL4inLvHDxb7W28dBxWSna64v9Tea",
+    "website": "https://bigfivenftclub.com",
+    "keywords": "Big Five NFT Club DAO, BFNC DAO, Big Five Coin, The Big Five NFT Club, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, SPL-TOKEN, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
+    "twitter": "@bigfivenftclub",
+    "ogImage": "/realms/BFNC/img/logo.png"
+  },
+  {
     "symbol": "ORCA",
     "displayName": "Orca DAO",
     "programId": "J9uWvULFL47gtCPvgR3oN7W357iehn5WF2Vn9MJvcSxz",
@@ -722,5 +742,41 @@
     "ogImage": "/realms/SOLI/soli_logo.png",
     "website": "https://tokens.amun.com/token/SOLI",
     "twitter": "@Amun"
+  },
+  {
+    "symbol": "SBYC",
+    "displayName": "SBYC DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "BycjQ24kBPhdzBbJanQJ1bydLGqZHf3oseGGLVcb2RWK",
+    "ogImage": "/realms/SBYCDAO/img/logo.png",
+    "website": "https://solboredyachtclub.com",
+    "twitter": "@SolBoredYacht"
+  },
+    {
+    "symbol": "$MasoorDAO",
+    "displayName": "Hari's Realm",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "4PYdZHs2hwZYibkvEnpVCJpU7bD4aFUkWtYxGFU25ZWu",
+    "website": "https://www.linkedin.com/in/harimasoor/",
+    "twitter": "@HariOnChain",
+    "ogImage": "/realms/MasoorDAO/MasoorDAO.PNG"
+  },
+    {
+    "symbol": "ADAO",
+    "displayName": "Astra DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Cwh2E98xcB5qL8yuGvxdaMezRUQXwdCwcCKhYKqUPqFD",
+    "website": "https://www.youtube.com/channel/UCP6jlgRDcs5S68OVjleMGjg",
+    "twitter": "@MannyAstra",
+    "ogImage": "/realms/Astra/AstraPodcastLogo.PNG"
+  },
+    {
+    "symbol": "CreatedBy",
+    "displayName": "CreatedBy DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "BE5wCCi9fg5YxUWos5A9JYACCLTPCKbcbJknTMxz76g4",
+    "website": "https://createdby.io",
+    "twitter": "@CreatedByIO",
+    "ogImage": "/realms/CreatedBy/CreatedBy.PNG"
   }
 ]

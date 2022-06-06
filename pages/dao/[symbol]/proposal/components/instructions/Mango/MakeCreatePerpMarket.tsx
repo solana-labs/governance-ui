@@ -94,7 +94,7 @@ const MakeCreatePerpMarket = ({
         c.publicKey.equals(new PublicKey(form.mangoGroup!))
       )!
 
-      const oraclePk = new PublicKey(form)
+      const oraclePk = new PublicKey(form.oracleAccount)
 
       const mangoGroup = await new MangoClient(
         connection,

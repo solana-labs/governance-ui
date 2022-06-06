@@ -21,7 +21,7 @@ import { BN } from '@project-serum/anchor'
 import { nftPluginsPks, vsrPluginsPks } from '@hooks/useVotingPlugins'
 import { AssetAccount } from '@utils/uiTypes/assets'
 
-const getValidateAccount = async (
+export const getValidateAccount = async (
   connection: Connection,
   pubKey: PublicKey
 ) => {
@@ -42,7 +42,7 @@ export const getValidatedPublickKey = (val: string) => {
   }
 }
 
-const validateDoseTokenAccountMatchMint = (
+export const validateDoseTokenAccountMatchMint = (
   tokenAccount: AccountInfo,
   mint: PublicKey
 ) => {

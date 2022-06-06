@@ -41,6 +41,7 @@ import {
   LOCALNET_REALM_ID as PYTH_LOCALNET_REALM_ID,
   PythBalance,
 } from 'pyth-staking-api'
+import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 
 const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   const { councilMint, mint, realm, symbol } = useRealm()
@@ -68,11 +69,13 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   )
   useEffect(() => {
     const getTokenOwnerRecord = async () => {
-      const defaultMint = !mint?.supply.isZero()
-        ? realm!.account.communityMint
-        : !councilMint?.supply.isZero()
-        ? realm!.account.config.councilMint
-        : undefined
+      const defaultMint =
+        !mint?.supply.isZero() ||
+        realm?.account.config.useMaxCommunityVoterWeightAddin
+          ? realm!.account.communityMint
+          : !councilMint?.supply.isZero()
+          ? realm!.account.config.councilMint
+          : undefined
       const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
         realm!.owner,
         realm!.pubkey,
@@ -124,6 +127,7 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
               councilVote={true}
             />
           )}
+          <DelegateTokenBalanceCard />
         </div>
       ) : (
         <>
@@ -135,7 +139,7 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   )
 }
 
-const TokenDeposit = ({
+export const TokenDeposit = ({
   mint,
   tokenType,
   councilVote,
@@ -430,7 +434,9 @@ const TokenDeposit = ({
                 !connected ||
                 !hasTokensDeposited ||
                 (!councilVote && toManyCommunityOutstandingProposalsForUser) ||
-                toManyCouncilOutstandingProposalsForUse
+                toManyCouncilOutstandingProposalsForUse ||
+                wallet?.publicKey?.toBase58() !==
+                  depositTokenRecord.account.governingTokenOwner.toBase58()
               }
               onClick={withdrawAllTokens}
             >
@@ -442,7 +448,8 @@ const TokenDeposit = ({
       {config?.account.communityVoterWeightAddin &&
         vsrPluginsPks.includes(
           config?.account.communityVoterWeightAddin.toBase58()
-        ) && (
+        ) &&
+        tokenType === GoverningTokenType.Community && (
           <small className="text-xs mt-3 flex items-center">
             <ExclamationIcon className="w-5 h-5 mr-2"></ExclamationIcon>
             Please withdraw your tokens and deposit again to get governance
