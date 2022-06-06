@@ -322,7 +322,12 @@ export async function getGoblinGoldWithdrawInstruction({
       true
     )
 
-    const createVaultIxsIxs = await strategyProgram.createVaultUserTicketAccount()
+    const createVaultIxsIxs = await strategyProgram.createVaultUserTicketAccount(
+      {
+        userSigner: wallet.publicKey,
+        userTicketAccountOwner: governedAccountPk,
+      }
+    )
 
     if (createVaultIxsIxs != null)
       prerequisiteInstructions = prerequisiteInstructions.concat(

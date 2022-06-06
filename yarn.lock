@@ -2811,6 +2811,28 @@
     superstruct "^0.14.2"
     tweetnacl "^1.0.0"
 
+"@solana/web3.js@^1.35.0", "@solana/web3.js@^1.43.1":
+  version "1.43.5"
+  resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.43.5.tgz#ab12bb6ab3fff0a08e8c7453b4fc4cda9f66df11"
+  integrity sha512-/PF4Fp+2jvCt9R3hYrf+tVUZXpPXZaHcwpaY/ytgdcswy8YiYf2snug52BJTCTlxwiXJipS4JpIo7rJJO0nN6w==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+    "@ethersproject/sha2" "^5.5.0"
+    "@solana/buffer-layout" "^4.0.0"
+    bigint-buffer "^1.1.5"
+    bn.js "^5.0.0"
+    borsh "^0.7.0"
+    bs58 "^4.0.1"
+    buffer "6.0.1"
+    fast-stable-stringify "^1.0.0"
+    jayson "^3.4.4"
+    js-sha3 "^0.8.0"
+    node-fetch "2"
+    rpc-websockets "^7.4.2"
+    secp256k1 "^4.0.2"
+    superstruct "^0.14.2"
+    tweetnacl "^1.0.0"
+
 "@solana/web3.js@^1.42.0":
   version "1.43.1"
   resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.43.1.tgz#f0cfffe7feb798563440f9ca0b0e9ba099e13967"
@@ -6819,10 +6841,10 @@ globby@^6.1.0:
     pify "^2.0.0"
     pinkie-promise "^2.0.0"
 
-goblingold-sdk@^1.2.33:
-  version "1.2.33"
-  resolved "https://registry.yarnpkg.com/goblingold-sdk/-/goblingold-sdk-1.2.33.tgz#81c5c659259c9b87b944040ebd2d040c65607f9a"
-  integrity sha512-weQBahV/1Ne10ftZF/hG81JN0lE96IcWdDehR0LU/oio7iL5+uYw8RHLI8xztd147HkvRPPB3tuJH6ZwQBdfEA==
+goblingold-sdk@^1.2.35:
+  version "1.2.35"
+  resolved "https://registry.yarnpkg.com/goblingold-sdk/-/goblingold-sdk-1.2.35.tgz#918ba1dddadfbf12132d10f0d841d62525612e68"
+  integrity sha512-TiDwIenuLKrlCzlZVYXxALa2YOfR/tG3GxHc5w7qv2UXqAZDnQ9eIUJVEk/FMR20dX/MPrfxfiJxXH8zVO8xrg==
   dependencies:
     "@project-serum/anchor" "^0.24.2"
     "@solana/buffer-layout" "^4.0.0"
