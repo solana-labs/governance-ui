@@ -769,5 +769,14 @@
     "website": "https://www.youtube.com/channel/UCP6jlgRDcs5S68OVjleMGjg",
     "twitter": "@MannyAstra",
     "ogImage": "/realms/Astra/AstraPodcastLogo.PNG"
+  },
+    {
+    "symbol": "CreatedBy",
+    "displayName": "CreatedBy DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "BE5wCCi9fg5YxUWos5A9JYACCLTPCKbcbJknTMxz76g4",
+    "website": "https://createdby.io",
+    "twitter": "@CreatedByIO",
+    "ogImage": "/realms/CreatedBy/CreatedBy.PNG"
   }
 ]

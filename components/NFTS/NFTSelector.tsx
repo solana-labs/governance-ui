@@ -70,7 +70,7 @@ function NFTSelector(
     if (ownersPk.length && !isPredefinedMode) {
       handleGetNfts()
     }
-  }, [ownersPk.length])
+  }, [JSON.stringify(ownersPk.map((x) => x.toBase58()))])
   useEffect(() => {
     if (!isPredefinedMode) {
       onNftSelect(selectedNfts)
