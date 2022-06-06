@@ -316,12 +316,10 @@ export class VoteNftWeight implements VoterWeightInterface {
 
 export class SwitchboardQueueVoteWeight implements VoterWeightInterface {
   communityTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
-  //councilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
   votingPower: BN
 
   constructor(
     communityTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,
-    //councilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,
     votingPower: BN
   ) {
     this.communityTokenRecord = communityTokenRecord
@@ -333,7 +331,6 @@ export class SwitchboardQueueVoteWeight implements VoterWeightInterface {
   hasAnyWeight() {
     return (
       !this.votingPower.isZero()
-      //!this.councilTokenRecord?.account.governingTokenDepositAmount.isZero()
     )
   }
 
@@ -351,12 +348,6 @@ export class SwitchboardQueueVoteWeight implements VoterWeightInterface {
     )
   }
   hasMinCouncilWeight(minCouncilWeight: BN) {
-    /*return (
-      this.councilTokenRecord &&
-      this.councilTokenRecord.account.governingTokenDepositAmount.cmp(
-        minCouncilWeight
-      ) >= 0
-    )*/
      return false
   }
 
@@ -371,11 +362,6 @@ export class SwitchboardQueueVoteWeight implements VoterWeightInterface {
   }
   canCreateGovernanceUsingCouncilTokens() {
     return false
-    /*return true
-    return (
-      this.councilTokenRecord &&
-      !this.councilTokenRecord.account.governingTokenDepositAmount.isZero()
-    )*/
   }
   canCreateGovernance(realm: ProgramAccount<Realm>) {
     return true
@@ -401,15 +387,7 @@ export class SwitchboardQueueVoteWeight implements VoterWeightInterface {
   }
 
   getTokenRecordToCreateProposal(config: GovernanceConfig) {
-    // Prefer community token owner record as proposal owner
-    /*if (this.hasMinCommunityWeight(config.minCommunityTokensToCreateProposal)) {
-      return this.communityTokenRecord!
-    }
-    if (this.hasMinCouncilWeight(config.minCouncilTokensToCreateProposal)) {
-      return this.councilTokenRecord!
-    }*/
     return this.communityTokenRecord;
-    //return true;
 
     throw new Error('Not enough vote weight to create proposal')
   }

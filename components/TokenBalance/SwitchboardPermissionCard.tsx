@@ -4,34 +4,21 @@ import Button from '@components/Button'
 import { ChevronRightIcon } from '@heroicons/react/outline'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
-//import { NftVoterClient } from '@solana/governance-program-library'
 import {
   getTokenOwnerRecordAddress,
-  //SYSTEM_PROGRAM_ID,
-  //withCreateTokenOwnerRecord,
 } from '@solana/spl-governance'
-//import { Transaction, TransactionInstruction } from '@solana/web3.js'
-//import { sendTransaction } from '@utils/send'
 import Link from 'next/link'
-//import { getNftVoterWeightRecord } from 'NftVotePlugin/sdk/accounts'
-//import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { useState, useEffect } from 'react'
-//import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
 
 const SwitchboardPermissionCard = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
-  /*const client = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  );*/
-  //const nfts = useNftPluginStore((s) => s.state.votingNfts)
-  //const isLoading = useNftPluginStore((s) => s.state.isLoadingNfts)
-  //const connection = useWalletStore((s) => s.connection)
+
   const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
   const { tokenRecords, realm, symbol, mint, councilMint } = useRealm()
-  //const { fetchRealm } = useWalletStore((s) => s.actions)
+
   const ownTokenRecord = wallet?.publicKey
     ? tokenRecords[wallet.publicKey!.toBase58()]
     : null

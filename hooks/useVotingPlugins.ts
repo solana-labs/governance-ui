@@ -20,8 +20,8 @@ import { notify } from '@utils/notifications'
 import { AccountLayout, NATIVE_MINT } from '@solana/spl-token'
 import * as anchor from '@project-serum/anchor'
 import * as sbv2 from '@switchboard-xyz/switchboard-v2'
-import sbidl from 'SwitchboardVotePlugin/switchboard_v2.json';
-import gonidl from 'SwitchboardVotePlugin/gameofnodes.json';
+import sbIdl from 'SwitchboardVotePlugin/switchboard_v2.json';
+import gonIdl from 'SwitchboardVotePlugin/gameofnodes.json';
 
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -137,7 +137,7 @@ export function useVotingPlugins() {
       let idl = await anchor.Program.fetchIdl(sbv2.SBV2_MAINNET_PID, provider)
       if (!idl) {
         console.log("Off chain idl");
-        idl = sbidl as anchor.Idl
+        idl = sbIdl as anchor.Idl
       }
       console.log("IDL");
       console.log(idl);
@@ -145,7 +145,7 @@ export function useVotingPlugins() {
       let addinIdl = await anchor.Program.fetchIdl(SWITCHBOARD_ADDIN_ID, provider)
       if (!addinIdl) {
         console.log("Off chain addin idl");
-        addinIdl = gonidl as anchor.Idl
+        addinIdl = gonIdl as anchor.Idl
       }
 
       const switchboardProgram = new anchor.Program(
@@ -201,14 +201,14 @@ export function useVotingPlugins() {
               queuePk,
               oracle
             );
-            //let ix = await p.setVoterWeightTx({govProgram: realm.owner, pubkeySigner: wallet.publicKey}, addinProgram, grantAuthority);
-            console.log(realm);
+
             let ix = await p.setVoterWeightTx({
               govProgram: realm.owner, 
               pubkeySigner: wallet.publicKey,
               addinProgram: addinProgram,
               realm: realm.pubkey,
             });
+
             setVoterWeightInstructions.push(
               ix.instructions[0]
             );

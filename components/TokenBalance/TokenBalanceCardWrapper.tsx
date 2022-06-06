@@ -71,9 +71,7 @@ const TokenBalanceCardWrapper = ({
         ownTokenRecord.account.governingTokenDepositAmount.isZero())
     ) {
       return (
-        <>
-          <SwitchboardPermissionCard></SwitchboardPermissionCard>
-        </>
+        <SwitchboardPermissionCard></SwitchboardPermissionCard>
       )
     }
     //Default

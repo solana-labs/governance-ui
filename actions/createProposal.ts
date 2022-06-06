@@ -86,8 +86,6 @@ export const createProposal = async (
 
   // sum up signers
   const signers: Keypair[] = instructionsData.flatMap((x) => x.signers ?? [])
-  console.log("the signers:");
-  console.log(signers);
   const shouldSplitIntoSeparateTxs: boolean = instructionsData
     .flatMap((x) => x.shouldSplitIntoSeparateTxs)
     .some((x) => x)
@@ -114,8 +112,6 @@ export const createProposal = async (
     tokenOwnerRecord,
     'createProposal'
   )
-  console.log("Plugin");
-  console.log(plugin);
 
   const proposalAddress = await withCreateProposal(
     instructions,
@@ -227,10 +223,6 @@ export const createProposal = async (
 
     transaction1.add(...prerequisiteInstructions, ...instructions)
     transaction2.add(...insertInstructions)
-
-    console.log("the two transactions");
-    console.log(transaction1);
-    console.log(transaction2);
 
     await sendTransaction({
       transaction: transaction1,

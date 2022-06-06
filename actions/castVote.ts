@@ -42,14 +42,10 @@ export async function castVote(
   // Explicitly request the version before making RPC calls to work around race conditions in resolving
   // the version for RealmInfo
 
-  // commented out for my localnet setup
-  /*const programVersion = await getGovernanceProgramVersion(
+  const programVersion = await getGovernanceProgramVersion(
     connection,
     programId
-  )*/
-
-  const programVersion = 2;
-
+  )
 
   //will run only if any plugin is connected with realm
   const plugin = await votingPlugin?.withCastPluginVote(

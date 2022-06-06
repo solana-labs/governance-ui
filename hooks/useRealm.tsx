@@ -51,9 +51,6 @@ export default function useRealm() {
   const nftVotingPower = useNftPluginStore((s) => s.state.votingPower)
   const sbVotingPower = useSwitchboardPluginStore((s) => s.state.votingPower)
   const [realmInfo, setRealmInfo] = useState<RealmInfo | undefined>(undefined)
-  //getQueuesForSelectedRealm();
-
-  //const anchorProvider = new anchor.AnchorProvider(connection, wallet);
 
   const pythClient = useVotePluginsClientStore((s) => s.state.pythClient)
   const [pythVoterWeight, setPythVoterWeight] = useState<PythBalance>()
