@@ -4,7 +4,7 @@ import { PublicKey } from '@solana/web3.js'
 import { getGovernanceProgramVersion } from '@solana/spl-governance'
 
 import useWalletStore from 'stores/useWalletStore'
-import { createMultisigRealm } from 'actions/createMultisigRealm'
+import createMultisigWallet from 'actions/createMultisigWallet'
 
 import useQueryContext from '@hooks/useQueryContext'
 import useLocalStorageState from '@hooks/useLocalStorageState'
@@ -67,26 +67,18 @@ export default function MultiSigWizard() {
         throw new Error('No valid wallet connected')
       }
 
-      const programId = formData?.programId || DEFAULT_GOVERNANCE_PROGRAM_ID
-      const governanceProgramId = new PublicKey(programId)
-      const programVersion = await getGovernanceProgramVersion(
-        connection.current,
-        governanceProgramId
-      )
-      console.log('CREATE REALM Program', {
-        governanceProgramId: governanceProgramId.toBase58(),
-        programVersion,
-      })
+      const programIdAddress =
+        formData?.programId || DEFAULT_GOVERNANCE_PROGRAM_ID
 
-      const results = await createMultisigRealm(
-        connection.current,
-        governanceProgramId,
-        programVersion,
-        formData.name,
-        formData.councilYesVotePercentage,
-        formData.memberAddresses.map((w) => new PublicKey(w)),
-        wallet
-      )
+      const results = await createMultisigWallet({
+        wallet,
+        connection: connection.current,
+        programIdAddress,
+
+        realmName: formData.name,
+        councilYesVotePercentage: formData.councilYesVotePercentage,
+        councilWalletPks: formData.memberAddresses.map((w) => new PublicKey(w)),
+      })
 
       if (results) {
         setFormData({})

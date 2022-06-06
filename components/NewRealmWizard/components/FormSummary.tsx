@@ -8,6 +8,8 @@ import Text from '@components/Text'
 import { NewButton as Button } from '@components/Button'
 import { ConfirmationDialog } from '@components/Modal'
 
+import { FORM_NAME as MULTISIG_FORM } from 'pages/realms/new/multisig'
+
 function SummaryCell({ className = '', children }) {
   return (
     <div
@@ -264,21 +266,26 @@ export default function WizardSummary({
                 )}
               </div>
             </SummaryCell>
-            <CommunityInfo
-              tokenInfo={formData.communityTokenInfo}
-              transferMintAuthority={formData.transferCommunityMintAuthority}
-              mintSupplyFactor={formData.communityMintSupplyFactor}
-              yesVotePercentage={formData.communityYesVotePercentage}
-              minimumNumberOfTokensToGovern={
-                formData.minimumNumberOfCommunityTokensToGovern
-              }
-              nftInfo={nftCollectionInfo}
-            />
-            {formData.addCouncil && (
+            {type !== MULTISIG_FORM && (
+              <CommunityInfo
+                tokenInfo={formData.communityTokenInfo}
+                transferMintAuthority={formData.transferCommunityMintAuthority}
+                mintSupplyFactor={formData.communityMintSupplyFactor}
+                yesVotePercentage={formData.communityYesVotePercentage}
+                minimumNumberOfTokensToGovern={
+                  formData.minimumNumberOfCommunityTokensToGovern
+                }
+                nftInfo={nftCollectionInfo}
+              />
+            )}
+            {(formData.addCouncil || formData?.memberAddresses?.length > 0) && (
               <CouncilInfo
                 tokenInfo={formData.councilTokenInfo}
                 transferMintAuthority={formData.transferCouncilMintAuthority}
-                yesVotePercentage={formData.communityYesVotePercentage}
+                yesVotePercentage={
+                  formData?.councilYesVotePercentage ||
+                  formData.communityYesVotePercentage
+                }
                 numberOfMembers={formData?.memberAddresses?.length}
               />
             )}
