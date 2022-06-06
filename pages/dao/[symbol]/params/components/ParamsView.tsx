@@ -15,16 +15,18 @@ const ParamsView = ({ activeGovernance, openGovernanceProposalModal }) => {
   const realmAccount = realm?.account
   const communityMint = realmAccount?.communityMint.toBase58()
 
-  const minCommunityTokensToCreateProposal =
-    mint &&
-    MAX_TOKENS_TO_DISABLE.eq(
-      activeGovernance.account.config.minCommunityTokensToCreateProposal
-    )
+  const minCommunityTokensToCreateProposal = activeGovernance?.account?.config
+    ?.minCommunityTokensToCreateProposal
+    ? mint &&
+      MAX_TOKENS_TO_DISABLE.eq(
+        activeGovernance.account.config.minCommunityTokensToCreateProposal
+      )
       ? 'Disabled'
       : fmtMintAmount(
           mint,
-          activeGovernance.account.config.minCommunityTokensToCreateProposal
+          activeGovernance?.account?.config?.minCommunityTokensToCreateProposal
         )
+    : 'calculating...'
 
   return (
     <>
