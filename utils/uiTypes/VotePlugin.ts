@@ -24,7 +24,7 @@ import {
 } from 'VoteStakeRegistry/sdk/accounts'
 import { NFTWithMint } from './nfts'
 import useSwitchboardPluginStore from 'SwitchboardVotePlugin/store/switchboardStore'
-import * as sbv2 from '../../../switchboardv2-api'
+import * as sbv2 from '@switchboard-xyz/switchboard-v2'
 
 type UpdateVoterWeightRecordTypes =
   | 'castVote'

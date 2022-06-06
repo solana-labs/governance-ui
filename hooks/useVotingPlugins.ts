@@ -19,8 +19,7 @@ import { getNftMaxVoterWeightRecord } from 'NftVotePlugin/sdk/accounts'
 import { notify } from '@utils/notifications'
 import { AccountLayout, NATIVE_MINT } from '@solana/spl-token'
 import * as anchor from '@project-serum/anchor'
-import * as sbv2 from '../../switchboardv2-api'
-//import sbidl from '../../switchboard-core/switchboard_v2/target/idl/switchboard_v2.json'
+import * as sbv2 from '@switchboard-xyz/switchboard-v2'
 import sbidl from 'SwitchboardVotePlugin/switchboard_v2.json';
 import gonidl from 'SwitchboardVotePlugin/gameofnodes.json';
 
@@ -202,7 +201,14 @@ export function useVotingPlugins() {
               queuePk,
               oracle
             );
-            let ix = await p.setVoterWeightTx({govProgram: realm.owner, pubkeySigner: wallet.publicKey}, addinProgram, grantAuthority);
+            //let ix = await p.setVoterWeightTx({govProgram: realm.owner, pubkeySigner: wallet.publicKey}, addinProgram, grantAuthority);
+            console.log(realm);
+            let ix = await p.setVoterWeightTx({
+              govProgram: realm.owner, 
+              pubkeySigner: wallet.publicKey,
+              addinProgram: addinProgram,
+              realm: realm.pubkey,
+            });
             setVoterWeightInstructions.push(
               ix.instructions[0]
             );
