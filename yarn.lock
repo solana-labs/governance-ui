@@ -6541,10 +6541,10 @@ globby@^6.1.0:
     pify "^2.0.0"
     pinkie-promise "^2.0.0"
 
-goblingold-sdk@^1.2.23:
-  version "1.2.23"
-  resolved "https://registry.yarnpkg.com/goblingold-sdk/-/goblingold-sdk-1.2.23.tgz#656984bb8f4ade5bedeac9863ac790921458f2b3"
-  integrity sha512-+5P16FU77D9ydoAP5JPzqBtjtZpOjcER5UnKMxyprXHeD3qwE4nIfjITQzOes/xHSc3wu2SgRYTc0mZr2SlHvA==
+goblingold-sdk@^1.2.33:
+  version "1.2.33"
+  resolved "https://registry.yarnpkg.com/goblingold-sdk/-/goblingold-sdk-1.2.33.tgz#81c5c659259c9b87b944040ebd2d040c65607f9a"
+  integrity sha512-weQBahV/1Ne10ftZF/hG81JN0lE96IcWdDehR0LU/oio7iL5+uYw8RHLI8xztd147HkvRPPB3tuJH6ZwQBdfEA==
   dependencies:
     "@project-serum/anchor" "^0.24.2"
     "@solana/buffer-layout" "^4.0.0"

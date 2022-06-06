@@ -304,7 +304,6 @@ export async function getGoblinGoldWithdrawInstruction({
       vault.lp.decimals
     )
 
-    const inputTokenMintAddress = new PublicKey(vault.input.mintAddress)
     const lpTokenMintAddress = new PublicKey(vault.lp.mintAddress)
 
     if (vault.name !== 'Best APY') {
@@ -315,30 +314,6 @@ export async function getGoblinGoldWithdrawInstruction({
       throw new Error('Error: selected governance token is not supported')
     }
 
-    let ataInputAddress: PublicKey
-    let ataInputKeypair: Keypair
-    if (inputTokenMintAddress === WSOL_MINT_PK) {
-      // If the input token account is the native SOL, should create and initialize a new account on the special native token mint. And before initializing it, should send lamports to the new account.
-      ataInputKeypair = await createWrappedNativeAccount(
-        connection.current,
-        governedAccountPk,
-        wallet.publicKey,
-        undefined,
-        prerequisiteInstructions
-      )
-      ataInputAddress = ataInputKeypair.publicKey
-      signers.push(ataInputKeypair)
-    } else {
-      // In case of the treasury doesn't have the token account, create it.
-      ataInputAddress = await createAssociatedTokenAccountIfNotExist(
-        connection.current,
-        inputTokenMintAddress,
-        governedAccountPk,
-        wallet.publicKey,
-        prerequisiteInstructions
-      )
-    }
-
     const ataLpAddress = await Token.getAssociatedTokenAddress(
       ASSOCIATED_TOKEN_PROGRAM_ID,
       TOKEN_PROGRAM_ID,
@@ -347,17 +322,18 @@ export async function getGoblinGoldWithdrawInstruction({
       true
     )
 
-    const withdrawIxs = await strategyProgram.getWithdrawIx({
-      userInputTokenAccount: ataInputAddress,
+    const createVaultIxsIxs = await strategyProgram.createVaultUserTicketAccount()
+
+    if (createVaultIxsIxs != null)
+      prerequisiteInstructions = prerequisiteInstructions.concat(
+        createVaultIxsIxs
+      )
+
+    const withdrawIxs = await strategyProgram.getOpenWithdrawTicketIx({
       userLpTokenAccount: ataLpAddress,
       lpAmount: new BN(transferAmount),
     })
-
-    const lastIx = withdrawIxs.pop()
-    if (lastIx) {
-      serializedInstruction = serializeInstructionToBase64(lastIx)
-    }
-    prerequisiteInstructions = prerequisiteInstructions.concat(withdrawIxs)
+    serializedInstruction = serializeInstructionToBase64(withdrawIxs)
   }
 
   const obj: UiInstruction = {
