@@ -59,7 +59,8 @@ body {
 h1,
 h2,
 h3,
-h4 {
+h4,
+.heading-cta {
   letter-spacing: -0.5px;
   line-height: 110%;
   @apply font-serif font-normal;
@@ -79,6 +80,12 @@ h3 {
 
 h4 {
   @apply mb-1 text-sm font-bold;
+}
+
+/* CTAs */
+.heading-cta {
+  font-size: 14px;
+  @apply md:text-[16px] font-bold;
 }
 
 p {
