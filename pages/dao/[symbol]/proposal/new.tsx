@@ -74,6 +74,8 @@ import CastleWithdraw from './components/instructions/Castle/CastleWithdraw'
 import ChangeDonation from './components/instructions/Change/ChangeDonation'
 import VotingMintConfig from './components/instructions/Vsr/VotingMintConfig'
 import CreateVsrRegistrar from './components/instructions/Vsr/CreateRegistrar'
+import GoblinGoldDeposit from './components/instructions/GoblinGold/GoblinGoldDeposit'
+import GoblinGoldWithdraw from './components/instructions/GoblinGold/GoblinGoldWithdraw'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -326,6 +328,10 @@ const New = () => {
         return <FriktionDeposit index={idx} governance={governance} />
       case Instructions.WithdrawFromVolt:
         return <FriktionWithdraw index={idx} governance={governance} />
+      case Instructions.DepositIntoGoblinGold:
+        return <GoblinGoldDeposit index={idx} governance={governance} />
+      case Instructions.WithdrawFromGoblinGold:
+        return <GoblinGoldWithdraw index={idx} governance={governance} />
       case Instructions.CreateSolendObligationAccount:
         return <CreateObligationAccount index={idx} governance={governance} />
       case Instructions.InitSolendObligationAccount:
