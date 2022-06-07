@@ -21,7 +21,7 @@ import {
   WALLET_PROVIDERS,
 } from '../utils/wallet-adapters'
 import Switch from './Switch'
-import TwitterIcon from './TwitterIcon'
+import { TwitterIcon } from './icons'
 
 const StyledWalletProviderLabel = styled.p`
   font-size: 0.65rem;
