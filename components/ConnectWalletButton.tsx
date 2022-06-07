@@ -37,10 +37,9 @@ const ConnectWalletButton = (props) => {
     set: setWalletStore,
   } = useWalletStore((s) => s)
 
-  const provider = useMemo(
-    () => getWalletProviderByUrl(providerUrl),
-    [providerUrl]
-  )
+  const provider = useMemo(() => getWalletProviderByUrl(providerUrl), [
+    providerUrl,
+  ])
 
   const [useDevnet, setUseDevnet] = useLocalStorageState('false')
   const handleToggleDevnet = () => {

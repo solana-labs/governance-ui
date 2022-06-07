@@ -117,8 +117,9 @@ const MyProposalsBn = () => {
     if (!wallet || !programId || !realm) return
     setIsLoading(true)
     try {
-      const { blockhash: recentBlockhash } =
-        await connection.getLatestBlockhash()
+      const {
+        blockhash: recentBlockhash,
+      } = await connection.getLatestBlockhash()
 
       const transactions: Transaction[] = []
       for (let i = 0; i < proposalsArray.length; i++) {
@@ -242,9 +243,7 @@ const MyProposalsBn = () => {
       client.client!.program.programId
     )
     for (const i of ownNftVoteRecords) {
-      const relinquishNftVoteIx = await (
-        client.client as NftVoterClient
-      ).program.methods
+      const relinquishNftVoteIx = await (client.client as NftVoterClient).program.methods
         .relinquishNftVote()
         .accounts({
           registrar,
@@ -265,8 +264,9 @@ const MyProposalsBn = () => {
       const insertChunks = chunks(instructions, 10)
       const instArray = [...insertChunks]
       const transactions: Transaction[] = []
-      const { blockhash: recentBlockhash } =
-        await connection.getLatestBlockhash()
+      const {
+        blockhash: recentBlockhash,
+      } = await connection.getLatestBlockhash()
       for (let i = 0; i < instArray.length; i++) {
         const instructionsChunk = instArray[i]
 

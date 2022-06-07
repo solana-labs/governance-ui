@@ -57,20 +57,24 @@ export const voteRegistryLockDeposit = async ({
     amountFromVoteRegistryDeposit
   )
   const instructions: TransactionInstruction[] = []
-  const { depositIdx, voter, registrar, voterATAPk } =
-    await withCreateNewDeposit({
-      instructions,
-      walletPk: rpcContext.walletPubkey,
-      mintPk,
-      realmPk,
-      programId,
-      tokenOwnerRecordPk,
-      lockUpPeriodInDays,
-      lockupKind,
-      communityMintPk,
-      client,
-      allowClawback,
-    })
+  const {
+    depositIdx,
+    voter,
+    registrar,
+    voterATAPk,
+  } = await withCreateNewDeposit({
+    instructions,
+    walletPk: rpcContext.walletPubkey,
+    mintPk,
+    realmPk,
+    programId,
+    tokenOwnerRecordPk,
+    lockUpPeriodInDays,
+    lockupKind,
+    communityMintPk,
+    client,
+    allowClawback,
+  })
 
   if (!amountFromVoteRegistryDeposit.isZero()) {
     const internalTransferUnlockedInstruction = await client?.program.methods

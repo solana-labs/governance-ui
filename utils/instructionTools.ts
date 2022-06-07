@@ -448,7 +448,7 @@ export async function getConvertToMsolInstruction({
         connection.current,
         mSolMint,
         TOKEN_PROGRAM_ID,
-        null as unknown as Keypair
+        (null as unknown) as Keypair
       )
 
       const destinationAccountInfo = await mSolToken.getAccountInfo(
@@ -457,13 +457,15 @@ export async function getConvertToMsolInstruction({
       destinationAccountOwner = destinationAccountInfo.owner
     } else {
       destinationAccountOwner = originAccount
-      const { currentAddress: destinationAccount, needToCreateAta } =
-        await getATA({
-          connection: connection,
-          receiverAddress: originAccount,
-          mintPK: mSolMint,
-          wallet,
-        })
+      const {
+        currentAddress: destinationAccount,
+        needToCreateAta,
+      } = await getATA({
+        connection: connection,
+        receiverAddress: originAccount,
+        mintPK: mSolMint,
+        wallet,
+      })
       if (needToCreateAta && wallet?.publicKey) {
         prerequisiteInstructions.push(
           Token.createAssociatedTokenAccountInstruction(

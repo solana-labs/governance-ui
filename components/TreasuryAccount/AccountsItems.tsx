@@ -4,8 +4,10 @@ import React from 'react'
 import AccountItem from './AccountItem'
 
 const AccountsItems = () => {
-  const { governedTokenAccountsWithoutNfts, auxiliaryTokenAccounts } =
-    useGovernanceAssets()
+  const {
+    governedTokenAccountsWithoutNfts,
+    auxiliaryTokenAccounts,
+  } = useGovernanceAssets()
   const accounts = [
     ...governedTokenAccountsWithoutNfts,
     ...auxiliaryTokenAccounts,

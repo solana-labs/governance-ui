@@ -75,10 +75,12 @@ const MangoDepositComponent = ({
     symbol,
   } = useRealm()
   const [isDepositing, setIsDepositing] = useState(false)
-  const [selectedMangoAccount, setSelectedMangoAccount] =
-    useState<MangoAccount | null>(
-      mangoAccounts.length ? mangoAccounts[0] : null
-    )
+  const [
+    selectedMangoAccount,
+    setSelectedMangoAccount,
+  ] = useState<MangoAccount | null>(
+    mangoAccounts.length ? mangoAccounts[0] : null
+  )
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
@@ -162,10 +164,9 @@ const MangoDepositComponent = ({
       )
     }
 
-    const minRentAmount =
-      await connection.current.getMinimumBalanceForRentExemption(
-        MangoAccountLayout.span
-      )
+    const minRentAmount = await connection.current.getMinimumBalanceForRentExemption(
+      MangoAccountLayout.span
+    )
 
     const transferIx = SystemProgram.transfer({
       fromPubkey: wallet!.publicKey!,

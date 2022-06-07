@@ -13,8 +13,11 @@ export async function createObligationAccount({
     walletAddress
   )
 
-  const { seed, lamports, space } =
-    SolendConfiguration.createObligationConfiguration
+  const {
+    seed,
+    lamports,
+    space,
+  } = SolendConfiguration.createObligationConfiguration
 
   return SystemProgram.createAccountWithSeed({
     basePubkey: walletAddress,

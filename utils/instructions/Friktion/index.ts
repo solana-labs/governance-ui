@@ -24,7 +24,6 @@ import type { ConnectionContext } from 'utils/connection'
 import { getATA } from '../../ataTools'
 import { UiInstruction } from '../../uiTypes/proposalCreationTypes'
 import { validateInstruction } from '@utils/instructionTools'
-import BN from 'bn.js'
 import { AssetAccount } from '@utils/uiTypes/assets'
 
 export async function getFriktionDepositInstruction({
@@ -62,7 +61,7 @@ export async function getFriktionDepositInstruction({
     const sdk = new FriktionSDK({
       provider: {
         connection: connection.current,
-        wallet: wallet as unknown as AnchorWallet,
+        wallet: (wallet as unknown) as AnchorWallet,
       },
     })
     const cVoltSDK = new ConnectedVoltSDK(
@@ -132,7 +131,7 @@ export async function getFriktionDepositInstruction({
           connection.current,
           governedTokenAccount.extensions.mint.publicKey,
           TOKEN_PROGRAM_ID,
-          null as unknown as Account
+          (null as unknown) as Account
         ).getMintInfo()
         decimals = underlyingAssetMintInfo.decimals
       }
@@ -142,6 +141,7 @@ export async function getFriktionDepositInstruction({
             new Decimal(amount),
             depositTokenAccountKey,
             receiverAddress,
+            true,
             governedTokenAccount.extensions.transferAddress!,
             governedTokenAccount.governance.pubkey,
             decimals
@@ -160,7 +160,7 @@ export async function getFriktionDepositInstruction({
         const transferAddressIndex = depositIx.keys.findIndex(
           (k) =>
             k.pubkey.toString() ===
-            governedTokenAccount.transferAddress?.toString()
+            governedTokenAccount.extensions.transferAddress?.toString()
         )
         depositIx.keys[transferAddressIndex].isSigner = true
         depositIx.keys[transferAddressIndex].isWritable = true
@@ -226,7 +226,7 @@ export async function getFriktionWithdrawInstruction({
     const sdk = new FriktionSDK({
       provider: {
         connection: connection.current,
-        wallet: wallet as unknown as AnchorWallet,
+        wallet: (wallet as unknown) as AnchorWallet,
       },
     })
     const cVoltSDK = new ConnectedVoltSDK(
@@ -242,13 +242,15 @@ export async function getFriktionWithdrawInstruction({
       let depositTokenDest: PublicKey | null
 
       if (governedTokenAccount.isSol) {
-        const { currentAddress: receiverAddress, needToCreateAta } =
-          await getATA({
-            connection: connection,
-            receiverAddress: governedTokenAccount.governance.pubkey,
-            mintPK: new PublicKey(WSOL_MINT),
-            wallet,
-          })
+        const {
+          currentAddress: receiverAddress,
+          needToCreateAta,
+        } = await getATA({
+          connection: connection,
+          receiverAddress: governedTokenAccount.governance.pubkey,
+          mintPK: new PublicKey(WSOL_MINT),
+          wallet,
+        })
         if (needToCreateAta) {
           prerequisiteInstructions.push(
             Token.createAssociatedTokenAccountInstruction(
@@ -278,7 +280,9 @@ export async function getFriktionWithdrawInstruction({
         new Decimal(amount),
         vaultTokenAccount,
         depositTokenDest,
-        governedTokenAccount.governance.pubkey
+        governedTokenAccount.governance.pubkey,
+        undefined,
+        true
       )
 
       const governedAccountIndex = withdrawIx.keys.findIndex(
@@ -324,21 +328,21 @@ export async function getFriktionClaimPendingDepositInstruction({
   const isValid = await validateInstruction({ schema, form, setFormErrors })
   let serializedInstruction = ''
   const prerequisiteInstructions: TransactionInstruction[] = []
-  const governedTokenAccount = form.governedTokenAccount as GovernedTokenAccount
+  const governedTokenAccount = form.governedTokenAccount as AssetAccount
   const voltVaultId = new PublicKey(form.voltVaultId as string)
   const signers: Keypair[] = []
   if (
     isValid &&
-    governedTokenAccount?.token?.publicKey &&
-    governedTokenAccount?.token &&
-    governedTokenAccount?.mint?.account &&
+    governedTokenAccount?.extensions.token?.publicKey &&
+    governedTokenAccount?.extensions.token &&
+    governedTokenAccount?.extensions.mint?.account &&
     governedTokenAccount?.governance &&
     wallet
   ) {
     const sdk = new FriktionSDK({
       provider: {
         connection: connection.current,
-        wallet: wallet as unknown as AnchorWallet,
+        wallet: (wallet as unknown) as AnchorWallet,
       },
     })
     const cVoltSDK = new ConnectedVoltSDK(
@@ -383,8 +387,9 @@ export async function getFriktionClaimPendingDepositInstruction({
           cVoltSDK.sdk.programs.Volt.programId
         )
       )[0]
-      const acct =
-        await cVoltSDK.sdk.programs.Volt.account.pendingDeposit.fetch(key)
+      const acct = await cVoltSDK.sdk.programs.Volt.account.pendingDeposit.fetch(
+        key
+      )
       const pendingDepositInfo = {
         ...acct,
         key: key,
@@ -435,21 +440,21 @@ export async function getFriktionClaimPendingWithdrawInstruction({
   const isValid = await validateInstruction({ schema, form, setFormErrors })
   let serializedInstruction = ''
   const prerequisiteInstructions: TransactionInstruction[] = []
-  const governedTokenAccount = form.governedTokenAccount as GovernedTokenAccount
+  const governedTokenAccount = form.governedTokenAccount as AssetAccount
   const voltVaultId = new PublicKey(form.voltVaultId as string)
   const signers: Keypair[] = []
   if (
     isValid &&
-    governedTokenAccount?.token?.publicKey &&
-    governedTokenAccount?.token &&
-    governedTokenAccount?.mint?.account &&
+    governedTokenAccount?.extensions.token?.publicKey &&
+    governedTokenAccount?.extensions.token &&
+    governedTokenAccount?.extensions.mint?.account &&
     governedTokenAccount?.governance &&
     wallet
   ) {
     const sdk = new FriktionSDK({
       provider: {
         connection: connection.current,
-        wallet: wallet as unknown as AnchorWallet,
+        wallet: (wallet as unknown) as AnchorWallet,
       },
     })
     const cVoltSDK = new ConnectedVoltSDK(
@@ -465,13 +470,15 @@ export async function getFriktionClaimPendingWithdrawInstruction({
       let depositTokenDest: PublicKey | null
 
       if (governedTokenAccount.isSol) {
-        const { currentAddress: receiverAddress, needToCreateAta } =
-          await getATA({
-            connection: connection,
-            receiverAddress: governedTokenAccount.governance.pubkey,
-            mintPK: new PublicKey(WSOL_MINT),
-            wallet,
-          })
+        const {
+          currentAddress: receiverAddress,
+          needToCreateAta,
+        } = await getATA({
+          connection: connection,
+          receiverAddress: governedTokenAccount.governance.pubkey,
+          mintPK: new PublicKey(WSOL_MINT),
+          wallet,
+        })
         if (needToCreateAta) {
           prerequisiteInstructions.push(
             Token.createAssociatedTokenAccountInstruction(
@@ -486,7 +493,7 @@ export async function getFriktionClaimPendingWithdrawInstruction({
         }
         depositTokenDest = receiverAddress
       } else {
-        depositTokenDest = governedTokenAccount.transferAddress!
+        depositTokenDest = governedTokenAccount.extensions.transferAddress!
       }
 
       const key = (

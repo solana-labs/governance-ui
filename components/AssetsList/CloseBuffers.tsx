@@ -37,8 +37,10 @@ interface CloseBuffersForm {
 
 const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
   const { handleCreateProposal } = useCreateProposal()
-  const { governedTokenAccountsWithoutNfts, assetAccounts } =
-    useGovernanceAssets()
+  const {
+    governedTokenAccountsWithoutNfts,
+    assetAccounts,
+  } = useGovernanceAssets()
   const router = useRouter()
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)

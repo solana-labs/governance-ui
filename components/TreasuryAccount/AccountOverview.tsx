@@ -76,11 +76,15 @@ const AccountOverview = () => {
     TreasuryStrategy[]
   >([])
   const [showStrategies, setShowStrategies] = useState(false)
-  const [proposedInvestment, setProposedInvestment] =
-    useState<TreasuryStrategy | null>(null)
+  const [
+    proposedInvestment,
+    setProposedInvestment,
+  ] = useState<TreasuryStrategy | null>(null)
   const [isCopied, setIsCopied] = useState<boolean>(false)
-  const [tradeSerumInfo, setTradeSerumInfo] =
-    useState<TradeOnSerumProps | null>(null)
+  const [
+    tradeSerumInfo,
+    setTradeSerumInfo,
+  ] = useState<TradeOnSerumProps | null>(null)
 
   useEffect(() => {
     if (strategies.length > 0) {

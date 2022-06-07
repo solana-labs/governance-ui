@@ -52,14 +52,13 @@ type SupportedMintsInformation = {
 }
 
 class SolendConfiguration implements ASolendConfiguration {
-  protected supportedCollateralMintsInformation: SupportedCollateralMintsInformation =
-    {
-      cUSDC: {
-        name: 'Solend Protocol: cUSDC',
-        mint: new PublicKey('993dVFL2uXWYeoXuEBFXR4BijeXdTv4s6BzsCjJZuwqk'),
-        decimals: 6,
-      },
-    }
+  protected supportedCollateralMintsInformation: SupportedCollateralMintsInformation = {
+    cUSDC: {
+      name: 'Solend Protocol: cUSDC',
+      mint: new PublicKey('993dVFL2uXWYeoXuEBFXR4BijeXdTv4s6BzsCjJZuwqk'),
+      decimals: 6,
+    },
+  }
 
   protected supportedMintsInformation: SupportedMintsInformation = {
     USDC: {
