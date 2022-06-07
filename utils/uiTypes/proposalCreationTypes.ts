@@ -64,6 +64,22 @@ export interface FriktionWithdrawForm {
   mintInfo: MintInfo | undefined
 }
 
+export interface GoblinGoldDepositForm {
+  amount: number | undefined
+  governedTokenAccount?: AssetAccount | undefined
+  goblinGoldVaultId: string
+  mintName?: SupportedMintName | undefined
+  mintInfo: MintInfo | undefined
+}
+
+export interface GoblinGoldWithdrawForm {
+  amount: number | undefined
+  governedTokenAccount?: AssetAccount | undefined
+  goblinGoldVaultId?: string
+  mintName?: SupportedMintName
+  mintInfo: MintInfo | undefined
+}
+
 export interface GrantForm {
   destinationAccount: string
   amount: number | undefined
@@ -295,6 +311,8 @@ export enum Instructions {
   WithrawFromCastle,
   DepositIntoVolt,
   WithdrawFromVolt,
+  DepositIntoGoblinGold,
+  WithdrawFromGoblinGold,
   CreateSolendObligationAccount,
   InitSolendObligationAccount,
   DepositReserveLiquidityAndObligationCollateral,
