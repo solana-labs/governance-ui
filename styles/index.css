@@ -72,6 +72,12 @@ h4 {
   @apply mb-1 text-sm font-bold;
 }
 
+/* CTAs */
+.heading-cta {
+  font-size: 14px;
+  @apply md:text-[16px] font-bold;
+}
+
 p {
   @apply text-sm leading-normal break-words text-fgd-2;
 }
