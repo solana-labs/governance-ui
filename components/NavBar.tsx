@@ -31,7 +31,9 @@ const NavBar = () => {
           <div className="min-w-[33%] sm:min-w-fit sm:space-x-4 sm:mx-4 flex justify-between">
             <NotificationsSwitch />
             <ThemeSwitch />
+            <NotificationsSwitch />
           </div>
+          <ConnectWalletButton />
         </div>
       </div>
       <div className="flex justify-end px-4 space-x-4 sm:hidden">
