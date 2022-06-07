@@ -53,29 +53,36 @@
 }
 
 body {
-  @apply text-base tracking-wide bg-bkg-1 text-fgd-1 font-body;
+  @apply text-base bg-bkg-1 text-fgd-1 font-body;
+}
+
+.text-base,
+.text-sm,
+.text-xs {
+  letter-spacing: 1px;
+  line-height: 140%;
 }
 
 h1 {
-  @apply text-2xl font-bold;
+  @apply text-3xl font-normal;
 }
 
 h2 {
-  @apply mb-2 text-xl font-bold;
+  @apply mb-2 text-xl font-normal;
 }
 
 h3 {
-  @apply mb-1 text-lg font-bold;
+  @apply mb-1 text-lg font-semibold font-body;
 }
 
 h4 {
-  @apply mb-1 text-sm font-bold;
+  @apply mb-1 text-base font-semibold font-body;
 }
 
 /* CTAs */
 .heading-cta {
   font-size: 14px;
-  @apply md:text-[16px] font-bold;
+  @apply md:text-[16px] font-normal;
 }
 
 p {
@@ -87,7 +94,7 @@ tbody {
 }
 
 .hero-text {
-  @apply text-2xl font-bold;
+  @apply text-2xl font-normal;
 }
 
 button {
