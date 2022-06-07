@@ -49,11 +49,20 @@
 /* base */
 
 * {
-  @apply m-0 p-0;
+  @apply p-0 m-0;
 }
 
 body {
-  @apply bg-bkg-1 text-fgd-1 text-base font-body tracking-wide;
+  @apply text-base tracking-wide bg-bkg-1 text-fgd-1 font-body;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  letter-spacing: -0.5px;
+  line-height: 110%;
+  @apply font-serif font-normal;
 }
 
 h1 {
@@ -61,19 +70,19 @@ h1 {
 }
 
 h2 {
-  @apply text-xl mb-2 font-bold;
+  @apply mb-2 text-xl font-bold;
 }
 
 h3 {
-  @apply text-lg mb-1 font-bold;
+  @apply mb-1 text-lg font-bold;
 }
 
 h4 {
-  @apply text-sm mb-1 font-bold;
+  @apply mb-1 text-sm font-bold;
 }
 
 p {
-  @apply break-words leading-normal text-fgd-2 text-sm;
+  @apply text-sm leading-normal break-words text-fgd-2;
 }
 
 tbody {
@@ -109,11 +118,11 @@ button {
 }
 
 .markdown a {
-  @apply text-fgd-2 transition-all duration-300 underline hover:text-fgd-3 hover:no-underline;
+  @apply underline transition-all duration-300 text-fgd-2 hover:text-fgd-3 hover:no-underline;
 }
 
 .markdown li {
-  @apply font-normal mb-2 ml-6 list-disc text-fgd-3;
+  @apply mb-2 ml-6 font-normal list-disc text-fgd-3;
 }
 
 .markdown pre {

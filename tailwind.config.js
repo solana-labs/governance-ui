@@ -1,5 +1,4 @@
 module.exports = {
-  mode: 'jit',
   content: [
     './pages/**/*.{js,ts,jsx,tsx}',
     './components/**/*.{js,ts,jsx,tsx}',
@@ -12,8 +11,9 @@ module.exports = {
   },
   theme: {
     fontFamily: {
+      serif: ['p22-mackinac-pro, ui-serif, serif'],
       display: ['PT Mono, monospace'],
-      body: ['Inter, sans-serif'],
+      body: ['Ambit, sans-serif'],
     },
     extend: {
       cursor: {
@@ -114,15 +114,6 @@ module.exports = {
           },
         },
       },
-    },
-  },
-  variants: {
-    extend: {
-      cursor: ['hover', 'focus', 'disabled'],
-      opacity: ['disabled'],
-      backgroundColor: ['disabled'],
-      textColor: ['disabled'],
-      borderWidth: ['last'],
     },
   },
   plugins: [],
