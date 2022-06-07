@@ -14,7 +14,7 @@ module.exports = {
       serif: ['p22-mackinac-pro, ui-serif, serif'],
       sans: ['Ambit, sans-serif'],
       display: ['PT Mono, monospace'],
-      body: ['Inter, sans-serif'],
+      body: ['Ambit, sans-serif'],
     },
     extend: {
       cursor: {

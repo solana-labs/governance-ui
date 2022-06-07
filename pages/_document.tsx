@@ -7,11 +7,12 @@ const Document = () => {
         <link rel="preconnect" href="https://fonts.gstatic.com" />
         <link rel="preconnect" href="https://use.typekit.net" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=PT+Mono&display=swap"
+          href="https://fonts.googleapis.com/css2?family=PT+Mono&display=swap"
           rel="stylesheet"
         />
         <link rel="stylesheet" href="https://use.typekit.net/cwm7dgy.css" />
         <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <meta name="msapplication-TileColor" content="#ffffff" />
         <meta
           name="msapplication-TileImage"
