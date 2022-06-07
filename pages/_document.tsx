@@ -11,8 +11,12 @@ const Document = () => {
           rel="stylesheet"
         />
         <link rel="stylesheet" href="https://use.typekit.net/cwm7dgy.css" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="manifest" href="/manifest.json" />
         <meta name="msapplication-TileColor" content="#ffffff" />
+        <meta
+          name="msapplication-TileImage"
+          content="/favicons/ms-icon-144x144.png"
+        />
         <meta name="theme-color" content="#ffffff" />
 
         <meta property="og:type" content="website" />
