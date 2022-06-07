@@ -868,17 +868,19 @@
     lodash.isundefined "^3.0.1"
     lodash.uniq "^4.5.0"
 
-"@foresight-tmp/foresight-sdk@^0.1.38":
-  version "0.1.38"
-  resolved "https://registry.yarnpkg.com/@foresight-tmp/foresight-sdk/-/foresight-sdk-0.1.38.tgz#601dffa26e88a3c3d4f580ccd433064328d06de1"
-  integrity sha512-Zn7IOm4JMnVFLUyn9bq0za9gvWnEmIVNfaJbVU8RV6M/Vco/w1lkwLGqe2o1jkmqUHlsb7rvv+FzCSGFbaZNqA==
+"@foresight-tmp/foresight-sdk@^0.1.39":
+  version "0.1.39"
+  resolved "https://registry.yarnpkg.com/@foresight-tmp/foresight-sdk/-/foresight-sdk-0.1.39.tgz#fe631553c4421923001ee90f81459e0f264bb16b"
+  integrity sha512-yE5f7F6CcHY3Y82lBGb28j8rNLSpuxz5dfVwcncDKCJUpUNSA9UlcN4j7TFfAa0GDUphcJgEnTUvpq0Acobvqw==
   dependencies:
     "@project-serum/anchor" "^0.23.0"
-    "@project-serum/serum" "^0.13.61"
+    "@project-serum/serum" "0.13.64"
     "@solana/web3.js" "^1.37.1"
+    assert "^2.0.0"
     axios "^0.24.0"
     buffer-layout "^1.2.2"
     lodash "^4.17.21"
+    process "^0.11.10"
 
 "@friktion-labs/entropy-client@^1.0.0":
   version "1.4.78"
@@ -1978,6 +1980,17 @@
   version "0.13.55"
   resolved "https://registry.yarnpkg.com/@project-serum/serum/-/serum-0.13.55.tgz#2ac44fe7b07651274eb57ac54ea9325789df5dd7"
   integrity sha512-SPQ4NsuNbBJO3mLGnTYbjt47WCXoNIcW2C9xv0gNXyG62dxgONsAEEgErKv1gT34hWCMPsXFSpatnX6ppriq7w==
+  dependencies:
+    "@project-serum/anchor" "^0.11.1"
+    "@solana/spl-token" "^0.1.6"
+    "@solana/web3.js" "^1.21.0"
+    bn.js "^5.1.2"
+    buffer-layout "^1.2.0"
+
+"@project-serum/serum@0.13.64":
+  version "0.13.64"
+  resolved "https://registry.yarnpkg.com/@project-serum/serum/-/serum-0.13.64.tgz#d5a9009ded8d2539ebfd12e1ff58b9028cfcdf45"
+  integrity sha512-33d8K3qcbiFnL1Azv5k6IYMtJYjCqqmFkf95w5W8MPB0A+5zQfOwhEfXQuBw0ExZ8ft5s9Vy8sReLyx0SsINWA==
   dependencies:
     "@project-serum/anchor" "^0.11.1"
     "@solana/spl-token" "^0.1.6"
