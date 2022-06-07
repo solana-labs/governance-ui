@@ -12,7 +12,6 @@ const Document = () => {
         />
         <link rel="stylesheet" href="https://use.typekit.net/cwm7dgy.css" />
         <link rel="manifest" href="/manifest.json" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <meta name="msapplication-TileColor" content="#ffffff" />
         <meta
           name="msapplication-TileImage"
