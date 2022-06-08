@@ -53,6 +53,8 @@ import FriktionDeposit from './components/instructions/Friktion/FriktionDeposit'
 import CreateNftPluginRegistrar from './components/instructions/NftVotingPlugin/CreateRegistrar'
 import CreateNftPluginMaxVoterWeightRecord from './components/instructions/NftVotingPlugin/CreateMaxVoterWeightRecord'
 import ConfigureNftPluginCollection from './components/instructions/NftVotingPlugin/ConfigureCollection'
+import SwitchboardAdmitOracle from './components/instructions/Switchboard/AdmitOracle'
+import SwitchboardRevokeOracle from './components/instructions/Switchboard/RevokeOracle'
 import FriktionWithdraw from './components/instructions/Friktion/FriktionWithdraw'
 import MakeChangePerpMarket from './components/instructions/Mango/MakeChangePerpMarket'
 import MakeAddOracle from './components/instructions/Mango/MakeAddOracle'
@@ -326,6 +328,10 @@ const New = () => {
         return <CastleDeposit index={idx} governance={governance} />
       case Instructions.WithrawFromCastle:
         return <CastleWithdraw index={idx} governance={governance} />
+      case Instructions.SwitchboardAdmitOracle:
+        return <SwitchboardAdmitOracle index={idx} governance={governance} />
+      case Instructions.SwitchboardRevokeOracle:
+        return <SwitchboardRevokeOracle index={idx} governance={governance} />
       case Instructions.DepositIntoVolt:
         return <FriktionDeposit index={idx} governance={governance} />
       case Instructions.WithdrawFromVolt:

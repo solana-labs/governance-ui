@@ -216,6 +216,16 @@ export default function useGovernanceAssets() {
       isVisible: canUseAnyInstruction,
     },
     {
+      id: Instructions.SwitchboardAdmitOracle,
+      name: 'Switchboard: Admit Oracle to Queue',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.SwitchboardRevokeOracle,
+      name: 'Switchboard: Remove Oracle from Queue',
+      isVisible: canUseAnyInstruction,
+    },
+    {
       id: Instructions.DepositIntoVolt,
       name: 'Friktion: Deposit into Volt',
       isVisible: canUseAnyInstruction,

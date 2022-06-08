@@ -239,6 +239,11 @@ export interface EmptyInstructionForm {
   governedAccount: AssetAccount | undefined
 }
 
+export interface SwitchboardAdmitOracleForm {
+  oraclePubkey: AssetAccount
+  queuePubkey: AssetAccount
+}
+
 export interface CreateAssociatedTokenAccountForm {
   governedAccount?: AssetAccount
   splTokenMintUIName?: SplTokenUIName
@@ -293,6 +298,8 @@ export enum Instructions {
   CreateAssociatedTokenAccount,
   DepositIntoCastle,
   WithrawFromCastle,
+  SwitchboardAdmitOracle,
+  SwitchboardRevokeOracle,
   DepositIntoVolt,
   WithdrawFromVolt,
   CreateSolendObligationAccount,

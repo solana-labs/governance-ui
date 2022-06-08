@@ -11,6 +11,14 @@ export const SWITCHBOARD_ADDIN_ID = new PublicKey(
   'B4EDDdMh5CmB6B9DeMmZmFvRzEgyHR5zWktf6httcMk6'
 );
 
+export const SWITCHBOARD_GRANT_AUTHORITY = new PublicKey(
+  '5wD32vPTeBk3UJfTCQUpa4KbrHZ5xxc8f4eLnqTPNW8L'
+);
+
+export const SWITCHBOARD_REVOKE_AUTHORITY = new PublicKey(
+  '9rkK8T8wnYXZ1SSC6g2ZhbnyL5K5v546XSbNJv7og87b'
+);
+
 export const QUEUE_LIST: PublicKey[] = [
   new PublicKey('7QN4mJo9U58XMeHEyfY6ckKxAkVLkqVtcWjwgNU6xaE'),
 ]
