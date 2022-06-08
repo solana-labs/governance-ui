@@ -81,11 +81,11 @@ h2 {
 }
 
 h3 {
-  @apply mb-1 text-lg font-semibold font-body;
+  @apply mb-1 text-lg font-body;
 }
 
 h4 {
-  @apply mb-1 text-base font-semibold font-body;
+  @apply mb-1 text-base font-body;
 }
 
 /* CTAs */
