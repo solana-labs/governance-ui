@@ -195,29 +195,29 @@ const ConnectWalletButton = (props) => {
                       <hr
                         className={`border border-fgd-3 opacity-50 mt-2 mb-2`}
                       ></hr>
-                      <Menu.Item
-                        key={'twitter'}
-                        onClick={() =>
-                          show(
-                            // @ts-ignore
-                            current,
-                            connection.current,
-                            connection.cluster
-                          )
-                        }
-                      >
-                        <button className="flex items-center w-full p-2 font-normal default-transition h-9 hover:bg-bkg-3 hover:cursor-pointer hover:rounded focus:outline-none">
+                      <Menu.Item key={'twitter'}>
+                        <button
+                          className="flex items-center w-full p-2 font-normal default-transition h-9 hover:bg-bkg-3 hover:cursor-pointer hover:rounded focus:outline-none"
+                          onClick={() =>
+                            show(
+                              // @ts-ignore
+                              current,
+                              connection.current,
+                              connection.cluster
+                            )
+                          }
+                        >
                           <TwitterIcon className="w-4 h-4 mr-2" />
                           <span className="text-sm">
                             {displayName ? 'Edit Twitter' : 'Link Twitter'}
                           </span>
                         </button>
                       </Menu.Item>
-                      <Menu.Item
-                        key={'disconnect'}
-                        onClick={handleConnectDisconnect}
-                      >
-                        <button className="flex items-center w-full p-2 font-normal default-transition h-9 hover:bg-bkg-3 hover:cursor-pointer hover:rounded focus:outline-none">
+                      <Menu.Item key={'disconnect'}>
+                        <button
+                          className="flex items-center w-full p-2 font-normal default-transition h-9 hover:bg-bkg-3 hover:cursor-pointer hover:rounded focus:outline-none"
+                          onClick={handleConnectDisconnect}
+                        >
                           <BackspaceIcon className="w-4 h-4 mr-2" />
                           <span className="text-sm">Disconnect</span>
                         </button>
