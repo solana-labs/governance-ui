@@ -90,8 +90,8 @@ export interface GoblinGoldWithdrawForm {
   governedTokenAccount?: AssetAccount | undefined
   goblinGoldVaultId?: string
   mintName?: SupportedMintName
+  mintInfo: MintInfo | undefined
 }
-
 
 export interface GrantForm {
   destinationAccount: string
