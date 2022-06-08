@@ -11,8 +11,7 @@ export default function AdvancedOptionsDropdown({
   return (
     <div className={className}>
       <Button
-        radio
-        selected={open}
+        secondary
         className="flex items-center justify-center space-x-2 h-fit"
         onClick={() => setOpen(!open)}
       >
@@ -20,9 +19,7 @@ export default function AdvancedOptionsDropdown({
           Advanced Options
         </Text>
         <div
-          className={`default-transition text-white ${
-            open ? 'text-black transform rotate-180' : ''
-          }`}
+          className={`default-transition ${open ? 'transform rotate-180' : ''}`}
         >
           <svg
             width="16"
