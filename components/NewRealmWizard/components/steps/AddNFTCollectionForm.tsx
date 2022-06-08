@@ -429,10 +429,23 @@ export default function AddNFTCollectionForm({
 
         <div className="flex flex-wrap space-y-4 md:flex-nowrap md:space-y-0 md:space-x-2">
           <div className="flex flex-col w-full px-4 py-5 rounded-md bg-night-grey grow">
-            <Text level="2">
-              {!selectedNFTCollection?.name
-                ? 'Add a collection or select one from your wallet...'
-                : 'Collection preview'}
+            <Text level="2" className="flex space-x-4">
+              {!selectedNFTCollection?.name ? (
+                'Link a collection to preview...'
+              ) : (
+                <>
+                  <div className="text-green">Verified collection</div>
+                  <div
+                    className="underline hover:text-white/50 hover:cursor-pointer"
+                    onClick={() => {
+                      setValue('collectionKey', '')
+                      setSelectedNFTCollection(undefined)
+                    }}
+                  >
+                    Clear
+                  </div>
+                </>
+              )}
             </Text>
             <div className="flex mt-5 space-x-2">
               {!selectedNFTCollection?.name ? (
