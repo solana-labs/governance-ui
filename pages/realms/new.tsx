@@ -33,7 +33,7 @@ const New: React.FC = () => {
       <Header as="h1" className="text-center">
         What type of DAO would you like to create?
       </Header>
-      <div className="px-4 pt-5 pb-4 mt-8 rounded bg-bkg-grey lg:mt-16">
+      <div className="px-4 pt-5 pb-4 mt-8 rounded bg-night-grey lg:mt-16">
         <div className="grid grid-cols-1 gap-4 text-center lg:grid-cols-3 ">
           {DAO_TYPES.map(({ url, name, description }) => (
             <Link key={name} href={fmtUrlWithCluster(url)}>
