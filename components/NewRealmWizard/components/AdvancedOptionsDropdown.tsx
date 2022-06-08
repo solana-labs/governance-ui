@@ -12,6 +12,7 @@ export default function AdvancedOptionsDropdown({
     <div className={className}>
       <Button
         secondary
+        type="button"
         className="flex items-center justify-center space-x-2 h-fit"
         onClick={() => setOpen(!open)}
       >
