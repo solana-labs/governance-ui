@@ -15,10 +15,15 @@ export default function NFTCollectionModal({
   onSelect,
 }) {
   const [selected, setSelected] = useState('')
-  function handleClose() {
-    onSelect({ key: selected, collection: collections[selected] })
+
+  function close() {
     onClose()
     setSelected('')
+  }
+
+  function handleChoose() {
+    onSelect({ key: selected, collection: collections[selected] })
+    close()
   }
 
   return (
@@ -38,12 +43,12 @@ export default function NFTCollectionModal({
         </div>
       }
       confirmButton={
-        <Button type="button" onClick={handleClose} disabled={!selected}>
+        <Button type="button" onClick={handleChoose} disabled={!selected}>
           Choose
         </Button>
       }
       closeButton={
-        <Button type="button" secondary onClick={handleClose}>
+        <Button type="button" secondary onClick={close}>
           {selected ? 'Cancel' : 'Close'}
         </Button>
       }
