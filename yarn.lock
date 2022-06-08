@@ -919,10 +919,10 @@
     dotenv-expand "^6.0.1"
     yargs "^17.0.1"
 
-"@friktion-labs/friktion-sdk@^1.1.114":
-  version "1.1.114"
-  resolved "https://registry.yarnpkg.com/@friktion-labs/friktion-sdk/-/friktion-sdk-1.1.114.tgz#48742e3b02b487335cb18d88970c474501ce1597"
-  integrity sha512-BHgQf1jRpYwF3u6R6SIdz8+aWhgIf0FkvKmCx4Hc1yKWJRLPL7U74SC0pXslCmkjW6976iNwtdST83xriawsLA==
+"@friktion-labs/friktion-sdk@^1.1.115":
+  version "1.1.115"
+  resolved "https://registry.yarnpkg.com/@friktion-labs/friktion-sdk/-/friktion-sdk-1.1.115.tgz#a95a530e5379e40805dd6aee3e5b4794db2843ad"
+  integrity sha512-IfXn8iscNqEVlLkfA3Cg0wD5dHIMXlDsWJoDvxpSuLjzKZfiYdj4YcFvKgc6K5RVFk42izI9fYf0B7901kvTng==
   dependencies:
     "@blockworks-foundation/mango-client" "3.4.5"
     "@friktion-labs/entropy-client" "^1.7.3"
