@@ -27,9 +27,9 @@ export default function NFTCollectionModal({
       onClose={onClose}
       header={
         <div className="flex flex-col items-center mb-2 space-x-4 text-center">
-          <Header as="h2">Choose a collection for you DAO</Header>
+          <Header as="h4">Choose a collection for you DAO</Header>
           <Header
-            as="h4"
+            as="h6"
             className="flex items-center justify-center space-x-4 text-white/50"
           >
             <WalletIcon />
