@@ -64,7 +64,7 @@ body {
 }
 
 h1 {
-  @apply text-3xl font-normal;
+  @apply font-serif text-3xl font-normal;
 }
 
 h2 {
