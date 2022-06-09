@@ -81,10 +81,9 @@ export const FORESIGHT_INSTRUCTIONS = {
       accounts: findAccounts('addMarketListToCategory'),
       getDataUI: async (
         _connection: Connection,
-        data: Uint8Array,
+        _data: Uint8Array,
         _accounts: AccountMetaData[]
       ) => {
-        const _data = data // eslint-disable-line @typescript-eslint/no-unused-vars
         return <></>
       },
     },
