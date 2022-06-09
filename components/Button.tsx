@@ -1,5 +1,5 @@
 import { FunctionComponent, useState, useEffect } from 'react'
-import Loading from './Loading'
+import Loading, { LoadingDots } from './Loading'
 import Tooltip from './Tooltip'
 import Header from './Header'
 import GradientCheckmarkCircle from './NewRealmWizard/components/GradientCheckmarkCircle'
@@ -172,17 +172,7 @@ export const NewButton: FunctionComponent<NewButtonProps> = ({
           </svg>
         </div>
       ) : (
-        <div className="flex items-center justify-center">
-          <span className="w-2 h-2 mx-[2px] bg-white rounded-full animate-loader"></span>
-          <span
-            className="w-2 h-2 mx-[2px] bg-white rounded-full animate-loader"
-            style={{ animationDelay: '0.2s' }}
-          ></span>
-          <span
-            className="w-2 h-2 mx-[2px] bg-white rounded-full animate-loader"
-            style={{ animationDelay: '0.4s' }}
-          ></span>
-        </div>
+        <LoadingDots />
       )}
     </button>
   )
