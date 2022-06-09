@@ -69,11 +69,11 @@ h3,
 h4 {
   letter-spacing: 0px;
   line-height: 110%;
-  @apply font-serif font-normal;
+  @apply font-normal;
 }
 
 h1 {
-  @apply text-3xl font-normal;
+  @apply font-serif text-3xl font-normal;
 }
 
 h2 {
