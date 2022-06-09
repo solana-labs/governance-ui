@@ -24,8 +24,11 @@ export default function FormPage({
   handleSubmit,
   submissionPending,
 }) {
-  const [formData, setFormData] = useLocalStorageState<any>(ssFormKey, {})
   const { connected, current: wallet } = useWalletStore((s) => s)
+  const userAddress = wallet?.publicKey?.toBase58()
+  const [formData, setFormData] = useLocalStorageState<any>(ssFormKey, {
+    memberAddresses: userAddress ? [userAddress] : undefined,
+  })
   const { query, push } = useRouter()
   const currentStep = formData?.currentStep || 0
 

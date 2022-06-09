@@ -1,40 +1,72 @@
-import { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
-
-import useWalletStore from 'stores/useWalletStore'
-import { notify } from '@utils/notifications'
+import clsx from 'clsx'
 
 import FormHeader from '@components/NewRealmWizard/components/FormHeader'
 import FormField from '@components/NewRealmWizard/components/FormField'
 import FormFooter from '@components/NewRealmWizard/components/FormFooter'
 import Input from '@components/NewRealmWizard/components/Input'
-import { NewButton as Button } from '@components/Button'
-import Text from '@components/Text'
 
 import { updateUserInput, validateSolAddress } from '@utils/formValidation'
 import { FORM_NAME as MULTISIG_FORM } from 'pages/realms/new/multisig'
+import { textToAddressList } from '@utils/textToAddressList'
+
+const getUniq = (addresses: string[]) => {
+  const uniq = new Set<string>()
+  addresses.forEach((address) => uniq.add(address))
+  return Array.from(uniq.values())
+}
 
 function InviteAddress({
   address = '',
   currentUser = false,
   index,
+  invalid = false,
   onRemoveClick,
 }) {
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center truncate">
-        <div
-          className={`flex rounded-full ${
-            currentUser ? 'white-fill text-black' : 'black-fill'
-          } border-gradient border-1`}
-        >
-          <div className="flex items-center justify-center w-10 h-10 ">
-            {currentUser ? 'Me' : index}
+        {invalid ? (
+          <svg
+            className="h-11 w-11 shrink-0"
+            viewBox="0 0 32 32"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle cx="16" cy="16" r="15.5" fill="#201F27" stroke="#FF7C7C" />
+            <path
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M20.5857 21.2889C19.3574 22.3549 17.754 23 16 23C12.134 23 9 19.866 9 16C9 14.246 9.64514 12.6426 10.7111 11.4143L20.5857 21.2889ZM21.2926 20.5815L11.4185 10.7075C12.6463 9.64368 14.248 9 16 9C19.866 9 23 12.134 23 16C23 17.752 22.3563 19.3537 21.2926 20.5815ZM24 16C24 20.4183 20.4183 24 16 24C11.5817 24 8 20.4183 8 16C8 11.5817 11.5817 8 16 8C20.4183 8 24 11.5817 24 16Z"
+              fill="#FF7C7C"
+            />
+          </svg>
+        ) : (
+          <div
+            className={`flex rounded-full ${
+              currentUser ? 'white-fill text-black' : 'black-fill'
+            } border-gradient border-1`}
+          >
+            <div className="flex items-center justify-center w-10 h-10 ">
+              {currentUser ? 'Me' : index}
+            </div>
           </div>
+        )}
+        <div
+          className={clsx(
+            'w-full',
+            'pr-4',
+            'ml-4',
+            'truncate',
+            'input-base',
+            invalid && 'text-error-red'
+          )}
+        >
+          {address}
         </div>
-        <div className="w-full pr-4 ml-4 truncate input-base">{address}</div>
       </div>
       <button
         type="button"
@@ -92,11 +124,9 @@ export default function InviteMembersForm({
   currentStep,
   totalSteps,
 }) {
-  const { current } = useWalletStore((s) => s)
   const inputElement = useRef<HTMLInputElement>(null)
-  const [pasteBuffer, setPasteBuffer] = useState<string[]>([])
   const [inviteList, setInviteList] = useState<string[]>([])
-  const [validationError, setValidationError] = useState<string>('')
+  const [invalidAddresses, setInvalidAddresses] = useState<string[]>([])
 
   const schema = yup.object(InviteMembersSchema)
   const {
@@ -108,8 +138,6 @@ export default function InviteMembersForm({
     resolver: yupResolver(schema),
     context: formData,
   })
-  const userAddress = current?.publicKey?.toBase58() || ''
-  const isUserDAOMember = userAddress && inviteList.indexOf(userAddress) > -1
 
   useEffect(() => {
     if (typeof formData.addCouncil === 'undefined' || formData?.addCouncil) {
@@ -126,7 +154,7 @@ export default function InviteMembersForm({
   }, [formData])
 
   useEffect(() => {
-    setValue('memberAddresses', inviteList, {
+    setValue('memberAddresses', getUniq(inviteList), {
       shouldValidate: true,
       shouldDirty: true,
     })
@@ -136,71 +164,33 @@ export default function InviteMembersForm({
     onSubmit({ step: currentStep, data: values })
   }
 
-  function handlePaste(ev) {
-    setValidationError('')
-    const validPastedAddrsses = validateInput(ev.clipboardData.getData('text'))
-    if (validPastedAddrsses.length === 0) {
-      return setValidationError('Invalid wallet address')
-    } else {
-      ev.preventDefault()
-    }
-    const updatedPasteBuffer = new Set([...pasteBuffer, ...validPastedAddrsses])
-    setPasteBuffer([...updatedPasteBuffer])
+  function setAddressList(textBlock: string) {
+    const { valid, invalid } = textToAddressList(textBlock)
+    setInviteList((currentList) => currentList.concat(valid))
+    setInvalidAddresses((currentList) => currentList.concat(invalid))
+  }
+
+  function handleBlur(ev) {
+    setAddressList(ev.currentTarget.value)
+    ev.currentTarget.value = ''
+  }
+
+  function handlePaste(ev: React.ClipboardEvent<HTMLInputElement>) {
+    setAddressList(ev.clipboardData.getData('text'))
+    ev.clipboardData.clearData()
+    // Don't allow the paste event to populate the input field
+    ev.preventDefault()
   }
 
   function handleKeyDown(ev) {
-    setValidationError('')
     if (ev.defaultPrevented) {
       return // Do nothing if the event was already processed
     }
 
     if (ev.key === 'Enter') {
-      addAddressesToInviteList()
+      setAddressList(ev.currentTarget.value)
+      ev.currentTarget.value = ''
       ev.preventDefault()
-    }
-  }
-
-  function validateInput(input: string) {
-    const addressList = input.split(/[\s|,]/).filter((item) => item.length > 2)
-    return [...new Set(addressList)].filter((wallet) => {
-      return validateSolAddress(wallet)
-    })
-  }
-
-  function addAddressesToInviteList() {
-    setValidationError('')
-
-    const validatedAddress = validateInput(inputElement?.current?.value || '')
-    if (pasteBuffer.length === 0 && validatedAddress.length === 0) {
-      return setValidationError('Invalid wallet address')
-    }
-
-    const fullAddressSet = new Set([
-      ...inviteList,
-      ...pasteBuffer,
-      ...validatedAddress,
-    ])
-    setPasteBuffer([])
-    setInviteList([...fullAddressSet])
-    const additionalCount = [...fullAddressSet].length
-
-    if (inputElement?.current?.value) {
-      inputElement.current.value = ''
-    }
-    return notify({
-      type: 'success',
-      message: `Added ${additionalCount} ${
-        additionalCount === 0 || additionalCount > 1 ? 'Addresses' : 'Address'
-      }`,
-    })
-  }
-
-  function removeAddressFromPasteBuffer(address) {
-    const newList = pasteBuffer.slice()
-    const index = pasteBuffer.indexOf(address)
-    if (index > -1) {
-      newList.splice(index, 1)
-      setPasteBuffer(newList)
     }
   }
 
@@ -212,6 +202,21 @@ export default function InviteMembersForm({
       setInviteList(newList)
     }
   }
+
+  function removeAddressFromInvalidList(address) {
+    const newList = invalidAddresses.slice()
+    const index = invalidAddresses.indexOf(address)
+    if (index > -1) {
+      newList.splice(index, 1)
+      setInvalidAddresses(newList)
+    }
+  }
+
+  const error =
+    errors.daoName?.message ||
+    (invalidAddresses.length > 0
+      ? 'Invalid addresses will not be included'
+      : '')
 
   return (
     <form
@@ -226,19 +231,35 @@ export default function InviteMembersForm({
           type === MULTISIG_FORM ? ' ' : ' council '
         }members with their Solana Wallet Address`}
       />
-      <div className="mt-16 space-y-10 md:space-y-12">
+      <div className="pt-24 space-y-10 md:space-y-12">
         <FormField
-          title="Invite members"
           description="Add Solana wallet addressses, separated by a comma or line-break."
+          title="Invite members"
+          titleExtra={
+            !!inviteList.length && (
+              <div className="text-[18px] text-white leading-[25px] px-2 bg-[#201F27] rounded">
+                {getUniq(inviteList).length}
+              </div>
+            )
+          }
         >
-          {pasteBuffer.length > 0 && (
+          {(inviteList.length > 0 || invalidAddresses.length > 0) && (
             <div className="py-5 space-y-5">
-              {pasteBuffer.map((address, index) => (
+              {inviteList.map((address, index) => (
                 <InviteAddress
                   key={address}
                   address={address}
                   index={index + 1}
-                  onRemoveClick={() => removeAddressFromPasteBuffer(address)}
+                  onRemoveClick={() => removeAddressFromInviteList(address)}
+                />
+              ))}
+              {invalidAddresses.map((address, index) => (
+                <InviteAddress
+                  invalid
+                  key={address}
+                  address={address}
+                  index={index + 1}
+                  onRemoveClick={() => removeAddressFromInvalidList(address)}
                 />
               ))}
             </div>
@@ -249,61 +270,12 @@ export default function InviteMembersForm({
             placeholder="e.g. CWvWQWt5mTv7Zx..."
             data-testid="dao-member-list-input"
             ref={inputElement}
-            error={errors.daoName?.message || validationError}
+            error={error}
+            onBlur={handleBlur}
             onPaste={handlePaste}
             onKeyDown={handleKeyDown}
-            defaultValue={userAddress}
           />
-          <div className="text-right">
-            <Button type="button" onClick={() => addAddressesToInviteList()}>
-              + Invite
-            </Button>
-          </div>
         </FormField>
-      </div>
-
-      <div className="flex flex-col mt-10">
-        <Text level="1">
-          {inviteList.length}{' '}
-          {inviteList.length === 0 || inviteList.length > 1
-            ? 'Addresses'
-            : 'Address'}
-        </Text>
-        <Text level="2" className="text-white/50">
-          Users must connect their wallet to Realms to become DAO members
-        </Text>
-        {isUserDAOMember && (
-          <div className="flex flex-col mt-8">
-            <InviteAddress
-              address={userAddress}
-              currentUser
-              index={0}
-              onRemoveClick={() => removeAddressFromInviteList(userAddress)}
-            />
-          </div>
-        )}
-        {inviteList.length > 0 ? (
-          inviteList
-            .filter((address) => address != userAddress)
-            .map((address, index) => {
-              return (
-                <div key={address} className="mt-8">
-                  <InviteAddress
-                    address={address}
-                    index={index + 1}
-                    onRemoveClick={() => removeAddressFromInviteList(address)}
-                  />
-                </div>
-              )
-            })
-        ) : (
-          <div className="flex flex-col px-8 py-8 mt-4 rounded bg-night-grey">
-            <div className="text-5xl text-center">📭</div>
-            <Text className="text-center">
-              You have not added any addresses yet...
-            </Text>
-          </div>
-        )}
       </div>
       <FormFooter
         isValid={isValid}
