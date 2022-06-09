@@ -374,8 +374,6 @@ export class VotingClient {
         instructions
       )
 
-      console.log('withCastPluginVote voterWeightPk', voterWeightPk)
-
       return { voterWeightPk, maxVoterWeightRecord: undefined }
     }
   }

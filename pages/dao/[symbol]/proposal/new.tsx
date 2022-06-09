@@ -144,7 +144,6 @@ const New = () => {
   //   }
 
   const getAvailableInstructionsForIndex = (index) => {
-    console.log('Available instructions', availableInstructions)
     if (index === 0) {
       return availableInstructions
     } else {
