@@ -404,7 +404,10 @@ export default function AddNFTCollectionForm({
           control={control}
           defaultValue=""
           render={({ field, fieldState: { error } }) => (
-            <FormField title="Paste your NFT collection address" description="">
+            <FormField
+              title="What is the NFT collection address?"
+              description="Only collections verified via Metaplex can be used."
+            >
               <Input
                 placeholder="e.g. SMBH3wF6baUj6JWtzYvqcKuj2XCKWDqQxzspY12xPND"
                 data-testid="nft-address"
