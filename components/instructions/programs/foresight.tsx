@@ -16,6 +16,14 @@ function displayParsedArg(argName: string, parsed: string): JSX.Element {
   )
 }
 
+function toDecodable(data: Uint8Array): Buffer {
+  return Buffer.from(data.slice(8))
+}
+
+function decodeIxData(data: Uint8Array, layout: any): any {
+  return layout.decode(toDecodable(data))
+}
+
 function findAccounts(ixName: string): { name: string }[] {
   return IDL.instructions
     .find((ix) => ix.name === ixName)!
@@ -34,7 +42,7 @@ export const FORESIGHT_INSTRUCTIONS = {
         data: Uint8Array,
         _accounts: AccountMetaData[]
       ) => {
-        const args = initCategoryLayout.decode(Buffer.from(data.slice(8)))
+        const args = decodeIxData(data, initCategoryLayout)
         return (
           <>
             {displayParsedArg(
@@ -53,7 +61,7 @@ export const FORESIGHT_INSTRUCTIONS = {
         data: Uint8Array,
         _accounts: AccountMetaData[]
       ) => {
-        const args = initMarketListLayout.decode(Buffer.from(data.slice(8)))
+        const args = decodeIxData(data, initMarketListLayout)
         return (
           <>
             {displayParsedArg(
@@ -72,7 +80,7 @@ export const FORESIGHT_INSTRUCTIONS = {
         data: Uint8Array,
         _accounts: AccountMetaData[]
       ) => {
-        const args = initMarketLayout.decode(Buffer.from(data.slice(8)))
+        const args = decodeIxData(data, initMarketLayout)
         return <>{displayParsedArg('marketId', args.marketId[0].toString())}</>
       },
     },
@@ -95,9 +103,7 @@ export const FORESIGHT_INSTRUCTIONS = {
         data: Uint8Array,
         _accounts: AccountMetaData[]
       ) => {
-        const args = writeToFieldMarketMetadataLayout.decode(
-          Buffer.from(data.slice(8))
-        )
+        const args = decodeIxData(data, writeToFieldMarketMetadataLayout)
         const field = generatedTypes.MarketMetadataFields.fromDecoded(
           args.field
         ).kind
@@ -117,7 +123,7 @@ export const FORESIGHT_INSTRUCTIONS = {
         data: Uint8Array,
         _accounts: AccountMetaData[]
       ) => {
-        const args = resolveMarketLayout.decode(Buffer.from(data.slice(8)))
+        const args = decodeIxData(data, resolveMarketLayout)
         const winner = args.winningBracket === 0 ? 'YES' : 'NO'
         return <>{displayParsedArg('Winner', winner)}</>
       },
