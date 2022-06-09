@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Transition } from '@headlessui/react'
-import { NewButton as Button } from '@components/Button'
 import Text from '@components/Text'
 
 export default function AdvancedOptionsDropdown({
@@ -10,10 +9,11 @@ export default function AdvancedOptionsDropdown({
   const [open, setOpen] = useState(false)
   return (
     <div className={className}>
-      <Button
-        secondary
+      <button
         type="button"
-        className="flex items-center justify-center space-x-2 h-fit"
+        className={`flex items-center justify-center px-4 py-2 space-x-2 rounded-full h-fit outline ${
+          open ? 'text-white/80 bg-white/5' : 'text-white/70'
+        } outline-white/20 hover:outline-white/50 hover:text-white/70 focused:outline-white/50 focused:opacity-30 disabled:cursor-not-allowed`}
         onClick={() => setOpen(!open)}
       >
         <Text level="2" className="font-normal">
@@ -37,7 +37,7 @@ export default function AdvancedOptionsDropdown({
             />
           </svg>
         </div>
-      </Button>
+      </button>
       <Transition
         show={open}
         enter="transform transition duration-[400ms]"
