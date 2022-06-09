@@ -4,7 +4,6 @@ import useQueryContext from '@hooks/useQueryContext'
 
 import Header from '@components/Header'
 import Text from '@components/Text'
-import { NewButton } from '@components/Button'
 
 const New: React.FC = () => {
   const { fmtUrlWithCluster } = useQueryContext()
