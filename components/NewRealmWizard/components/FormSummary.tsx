@@ -247,7 +247,6 @@ export default function WizardSummary({
           type={type}
           currentStep={currentStep}
           totalSteps={currentStep}
-          stepDescription="Summary"
           title="Here's what you created. Does everything look right?"
         />
         <div className="pt-10">

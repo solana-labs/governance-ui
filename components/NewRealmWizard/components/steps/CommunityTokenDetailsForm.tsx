@@ -157,8 +157,7 @@ export default function CommunityTokenForm({
         type={type}
         currentStep={currentStep}
         totalSteps={totalSteps}
-        stepDescription="community token details"
-        title="Next, determine the community token your DAO will use for governance tasks."
+        title="Next, determine the community token your DAO will use for governance tasks"
       />
       <div className="mt-16 space-y-10 md:mt-24 md:space-y-20">
         <Controller

@@ -13,6 +13,8 @@ import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
 
 import { updateUserInput, validateSolAddress } from '@utils/formValidation'
 
+import { FORM_NAME as MUTISIG_FORM } from 'pages/realms/new/multisig'
+
 export const BasicDetailsSchema = {
   avatar: yup.string(),
   name: yup
@@ -71,17 +73,20 @@ export default function BasicDetailsForm({
         type={type}
         currentStep={currentStep}
         totalSteps={totalSteps}
-        stepDescription="basic details"
-        title="Let's gather your DAO's basic details."
+        title="Let's get started"
       />
-      <div className="mt-12 space-y-10 md:space-y-12">
+      <div className="mt-16 space-y-10 md:space-y-12">
         <Controller
           name="name"
           control={control}
           defaultValue=""
           render={({ field }) => (
             <FormField
-              title="What is the name of your DAO?"
+              title={
+                type === MUTISIG_FORM
+                  ? 'What is the name of your wallet?'
+                  : 'What is the name of your DAO?'
+              }
               description="It's best to choose a descriptive, memorable name for you and your members."
             >
               <Input

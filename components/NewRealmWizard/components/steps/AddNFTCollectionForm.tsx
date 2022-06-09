@@ -373,10 +373,9 @@ export default function AddNFTCollectionForm({
         type={type}
         currentStep={currentStep}
         totalSteps={totalSteps}
-        stepDescription="add a collection"
-        title="Which NFT collection would you like to add to your DAO?"
+        title="Select an NFT collection for you DAO"
       />
-      <div className="pt-10 space-y-10 md:space-y-12">
+      <div className="mt-20 space-y-10 md:space-y-12">
         <Controller
           name="addressInput"
           control={control}
@@ -398,25 +397,17 @@ export default function AddNFTCollectionForm({
                   }
                 }}
               />
-              <div className="flex flex-col items-center justify-between space-y-4 md:space-y-0 md:flex-row-reverse">
-                <Button
-                  type="submit"
-                  onClick={handleAdd}
-                  loading={requestPending}
-                  disabled={!field.value || requestPending}
-                  className="w-full md:w-fit"
-                >
-                  + Add
-                </Button>
+              <div className="flex items-center justify-center space-x-4 md:justify-end">
+                <Text level="2">or</Text>
                 <Button
                   type="button"
                   secondary
                   disabled={requestPending || walletConnecting}
                   loading={walletConnecting}
                   onClick={handleSelectFromWallet}
-                  className="w-full md:w-fit"
+                  className=""
                 >
-                  <div className="flex items-center justify-center space-x-2">
+                  <div className="flex items-center justify-center px-4 space-x-2">
                     <WalletIcon />
                     <span>Select from Wallet</span>
                   </div>

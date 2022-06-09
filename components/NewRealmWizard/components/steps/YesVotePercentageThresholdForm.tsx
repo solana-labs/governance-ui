@@ -103,10 +103,9 @@ export default function YesVotePercentageForm({
         type={type}
         currentStep={currentStep}
         totalSteps={totalSteps}
-        stepDescription="vote percentage threshold"
-        title="Next, let's determine the vote percentage for approving community proposals."
+        title="Next, let's determine the vote percentage for approving community proposals"
       />
-      <div className="mt-10 space-y-10 md:space-y-12">
+      <div className="mt-16 space-y-10 md:space-y-12">
         <Controller
           name={fieldName}
           control={control}

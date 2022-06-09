@@ -222,14 +222,11 @@ export default function InviteMembersForm({
         type={type}
         currentStep={currentStep}
         totalSteps={totalSteps}
-        stepDescription={`invite${
-          type === MULTISIG_FORM ? ' ' : ' council '
-        }members`}
         title={`Next, invite${
           type === MULTISIG_FORM ? ' ' : ' council '
-        }members with their Solana Wallet Address.`}
+        }members with their Solana Wallet Address`}
       />
-      <div className="pt-10 space-y-10 md:space-y-12">
+      <div className="mt-16 space-y-10 md:space-y-12">
         <FormField
           title="Invite members"
           description="Add Solana wallet addressses, separated by a comma or line-break."
