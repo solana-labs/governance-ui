@@ -34,7 +34,13 @@ import useRealm from '@hooks/useRealm'
 import Button from '@components/Button'
 import Tooltip from '@components/Tooltip'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { BN, Program, Provider, web3 } from '@project-serum/anchor'
+import {
+  BN,
+  Program,
+  AnchorProvider,
+  Wallet,
+  web3,
+} from '@project-serum/anchor'
 import { getValidatedPublickKey } from '@utils/validations'
 import { validateInstruction } from '@utils/instructionTools'
 import {
@@ -57,6 +63,7 @@ import {
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { TokenProgramAccount } from '@utils/tokens'
+import { Keypair } from '@solana/web3.js'
 
 export type TradeOnSerumProps = { tokenAccount: AssetAccount }
 
@@ -293,7 +300,12 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
     if (wallet && wallet.publicKey && isValid) {
       // create the anchor Program
       // @ts-ignore: Wallet compatability issues
-      const provider = new Provider(connection.current, wallet, {})
+      const options = AnchorProvider.defaultOptions()
+      const provider = new AnchorProvider(
+        connection.current,
+        new Wallet(Keypair.generate()),
+        options
+      )
       const program = new Program<SerumRemote>(
         SerumRemoteIDL,
         serumRemoteProgramId,

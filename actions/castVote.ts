@@ -53,8 +53,6 @@ export async function castVote(
     tokeOwnerRecord
   )
 
-  console.log('castVote plugin', plugin)
-
   await withCastVote(
     instructions,
     programId,

@@ -19,6 +19,7 @@ import {
   VoteRegistryVoterWeight,
   VoterWeight,
 } from '../models/voteWeights'
+import useMembersStore from 'stores/useMembersStore'
 
 import useWalletStore from '../stores/useWalletStore'
 import {
@@ -70,6 +71,14 @@ export default function useRealm() {
   }, [connected])
 
   const [realmInfo, setRealmInfo] = useState<RealmInfo | undefined>(undefined)
+  const delegates = useMembersStore((s) => s.compact.delegates)
+  const selectedCouncilDelegate = useWalletStore(
+    (s) => s.selectedCouncilDelegate
+  )
+  const selectedCommunityDelegate = useWalletStore(
+    (s) => s.selectedCommunityDelegate
+  )
+
   useMemo(async () => {
     let realmInfo = isPublicKey(symbol as string)
       ? realm
@@ -97,13 +106,38 @@ export default function useRealm() {
     [realm, tokenAccounts]
   )
 
-  const ownTokenRecord = useMemo(
-    () =>
-      wallet?.connected && wallet.publicKey
-        ? tokenRecords[wallet.publicKey.toBase58()]
-        : undefined,
-    [tokenRecords, wallet, connected]
-  )
+  const ownTokenRecord = useMemo(() => {
+    if (wallet?.connected && wallet.publicKey) {
+      if (
+        selectedCommunityDelegate &&
+        tokenRecords[selectedCommunityDelegate]
+      ) {
+        return tokenRecords[selectedCommunityDelegate]
+      }
+
+      return tokenRecords[wallet.publicKey.toBase58()]
+    }
+    return undefined
+  }, [tokenRecords, wallet, connected, selectedCommunityDelegate])
+
+  // returns array of community tokenOwnerRecords that connected wallet has been delegated
+  const ownDelegateTokenRecords = useMemo(() => {
+    if (wallet?.connected && wallet.publicKey) {
+      const walletId = wallet.publicKey.toBase58()
+      const delegatedWallets = delegates && delegates[walletId]
+      if (delegatedWallets?.communityMembers) {
+        const communityTokenRecords = delegatedWallets.communityMembers.map(
+          (member) => {
+            return tokenRecords[member.walletAddress]
+          }
+        )
+
+        return communityTokenRecords
+      }
+    }
+
+    return undefined
+  }, [tokenRecords, wallet, connected])
 
   const councilTokenAccount = useMemo(
     () =>
@@ -117,13 +151,37 @@ export default function useRealm() {
     [realm, tokenAccounts]
   )
 
-  const ownCouncilTokenRecord = useMemo(
-    () =>
-      wallet?.connected && councilMint && wallet.publicKey
-        ? councilTokenOwnerRecords[wallet.publicKey.toBase58()]
-        : undefined,
-    [tokenRecords, wallet, connected]
-  )
+  const ownCouncilTokenRecord = useMemo(() => {
+    if (wallet?.connected && councilMint && wallet.publicKey) {
+      if (
+        selectedCouncilDelegate &&
+        councilTokenOwnerRecords[selectedCouncilDelegate]
+      ) {
+        return councilTokenOwnerRecords[selectedCouncilDelegate]
+      }
+
+      return councilTokenOwnerRecords[wallet.publicKey.toBase58()]
+    }
+    return undefined
+  }, [tokenRecords, wallet, connected, selectedCouncilDelegate])
+
+  // returns array of council tokenOwnerRecords that connected wallet has been delegated
+  const ownDelegateCouncilTokenRecords = useMemo(() => {
+    if (wallet?.connected && councilMint && wallet.publicKey) {
+      const walletId = wallet.publicKey.toBase58()
+      const delegatedWallets = delegates && delegates[walletId]
+      if (delegatedWallets?.councilMembers) {
+        const councilTokenRecords = delegatedWallets.councilMembers.map(
+          (member) => {
+            return councilTokenOwnerRecords[member.walletAddress]
+          }
+        )
+
+        return councilTokenRecords
+      }
+    }
+    return undefined
+  }, [tokenRecords, wallet, connected])
 
   const canChooseWhoVote =
     realm?.account.communityMint &&
@@ -178,6 +236,8 @@ export default function useRealm() {
     councilTokenOwnerRecords,
     toManyCouncilOutstandingProposalsForUse,
     toManyCommunityOutstandingProposalsForUser,
+    ownDelegateTokenRecords,
+    ownDelegateCouncilTokenRecords,
     config,
     currentPluginPk,
     isLockTokensMode,

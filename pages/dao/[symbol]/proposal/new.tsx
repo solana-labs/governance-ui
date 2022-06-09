@@ -10,7 +10,6 @@ import {
 import {
   getInstructionDataFromBase64,
   Governance,
-  GovernanceAccountType,
   ProgramAccount,
 } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
@@ -71,9 +70,12 @@ import RealmConfig from './components/instructions/RealmConfig'
 import MakeAddMarketMetadataParams from './components/instructions/Foresight/MakeAddMarketMetadataParams'
 import CloseTokenAccount from './components/instructions/CloseTokenAccount'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
+import CastleWithdraw from './components/instructions/Castle/CastleWithdraw'
+import ChangeDonation from './components/instructions/Change/ChangeDonation'
 import VotingMintConfig from './components/instructions/Vsr/VotingMintConfig'
 import CreateVsrRegistrar from './components/instructions/Vsr/CreateRegistrar'
-import CastleWithdraw from './components/instructions/Castle/CastleWithdraw'
+import GoblinGoldDeposit from './components/instructions/GoblinGold/GoblinGoldDeposit'
+import GoblinGoldWithdraw from './components/instructions/GoblinGold/GoblinGoldWithdraw'
 import CreateGatewayPluginRegistrar from './components/instructions/GatewayPlugin/CreateRegistrar'
 import ConfigureGatewayPlugin from './components/instructions/GatewayPlugin/ConfigureGateway'
 
@@ -121,34 +123,32 @@ const New = () => {
   const [isLoadingSignedProposal, setIsLoadingSignedProposal] = useState(false)
   const [isLoadingDraft, setIsLoadingDraft] = useState(false)
   const isLoading = isLoadingSignedProposal || isLoadingDraft
-  const customInstructionFilterForSelectedGovernance = (
-    instructionType: Instructions
-  ) => {
-    if (!governance) {
-      return true
-    } else {
-      const governanceType = governance.account.accountType
-      const instructionsAvailiableAfterProgramGovernance = [Instructions.Base64]
-      switch (governanceType) {
-        case GovernanceAccountType.ProgramGovernanceV1:
-        case GovernanceAccountType.ProgramGovernanceV2:
-          return instructionsAvailiableAfterProgramGovernance.includes(
-            instructionType
-          )
-        default:
-          return true
-      }
-    }
-  }
+  //   const customInstructionFilterForSelectedGovernance = (
+  //     instructionType: Instructions
+  //   ) => {
+  //     if (!governance) {
+  //       return true
+  //     } else {
+  //       const governanceType = governance.account.accountType
+  //       const instructionsAvailiableAfterProgramGovernance = [Instructions.Base64]
+  //       switch (governanceType) {
+  //         case GovernanceAccountType.ProgramGovernanceV1:
+  //         case GovernanceAccountType.ProgramGovernanceV2:
+  //           return instructionsAvailiableAfterProgramGovernance.includes(
+  //             instructionType
+  //           )
+  //         default:
+  //           return true
+  //       }
+  //     }
+  //   }
 
   const getAvailableInstructionsForIndex = (index) => {
     console.log('Available instructions', availableInstructions)
     if (index === 0) {
       return availableInstructions
     } else {
-      return availableInstructions.filter((x) =>
-        customInstructionFilterForSelectedGovernance(x.id)
-      )
+      return availableInstructions
     }
   }
   const [instructionsData, setInstructions] = useState<
@@ -305,6 +305,10 @@ const New = () => {
             governance={governance}
           ></SplTokenTransfer>
         )
+      case Instructions.ChangeMakeDonation:
+        return (
+          <ChangeDonation index={idx} governance={governance}></ChangeDonation>
+        )
       case Instructions.ProgramUpgrade:
         return (
           <ProgramUpgrade index={idx} governance={governance}></ProgramUpgrade>
@@ -327,6 +331,10 @@ const New = () => {
         return <FriktionDeposit index={idx} governance={governance} />
       case Instructions.WithdrawFromVolt:
         return <FriktionWithdraw index={idx} governance={governance} />
+      case Instructions.DepositIntoGoblinGold:
+        return <GoblinGoldDeposit index={idx} governance={governance} />
+      case Instructions.WithdrawFromGoblinGold:
+        return <GoblinGoldWithdraw index={idx} governance={governance} />
       case Instructions.CreateSolendObligationAccount:
         return <CreateObligationAccount index={idx} governance={governance} />
       case Instructions.InitSolendObligationAccount:

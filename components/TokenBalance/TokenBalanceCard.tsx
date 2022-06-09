@@ -41,6 +41,7 @@ import {
   LOCALNET_REALM_ID as PYTH_LOCALNET_REALM_ID,
   PythBalance,
 } from 'pyth-staking-api'
+import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 
 type Props = { proposal?: Option<Proposal> }
 const TokenBalanceCard: FC<Props> = ({ proposal, children }) => {
@@ -69,11 +70,13 @@ const TokenBalanceCard: FC<Props> = ({ proposal, children }) => {
   )
   useEffect(() => {
     const getTokenOwnerRecord = async () => {
-      const defaultMint = !mint?.supply.isZero()
-        ? realm!.account.communityMint
-        : !councilMint?.supply.isZero()
-        ? realm!.account.config.councilMint
-        : undefined
+      const defaultMint =
+        !mint?.supply.isZero() ||
+        realm?.account.config.useMaxCommunityVoterWeightAddin
+          ? realm!.account.communityMint
+          : !councilMint?.supply.isZero()
+          ? realm!.account.config.councilMint
+          : undefined
       const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
         realm!.owner,
         realm!.pubkey,
@@ -125,6 +128,7 @@ const TokenBalanceCard: FC<Props> = ({ proposal, children }) => {
               councilVote={true}
             />
           )}
+          <DelegateTokenBalanceCard />
         </div>
       ) : (
         <>
@@ -432,7 +436,9 @@ export const TokenDeposit = ({
                 !connected ||
                 !hasTokensDeposited ||
                 (!councilVote && toManyCommunityOutstandingProposalsForUser) ||
-                toManyCouncilOutstandingProposalsForUse
+                toManyCouncilOutstandingProposalsForUse ||
+                wallet?.publicKey?.toBase58() !==
+                  depositTokenRecord.account.governingTokenOwner.toBase58()
               }
               onClick={withdrawAllTokens}
             >

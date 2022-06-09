@@ -154,6 +154,8 @@ const EXCLUDED_REALMS = new Map<string, string>([
   ['9Xe5qW76XPhyohKaz8joecybGnKrgT4N6JNEuM5ZZwa9', ''], // 1SOL test
   ['2mDwFhax7XcudkVzoV85pxo3B5aRqCt3diavVydjkBJC', ''], // 1SOL test
   ['DkSvNgykZPPFczhJVh8HDkhz25ByrDoPcB32q75AYu9k', ''], // UXDProtocolDAO test
+  ['CvAD2XnHuJCzTyqRRHZtqRigVw11i9CDH8ACRGQpxhuf', ''], // Savana Sins Club
+  ['AxuK6ZGEQS2vrLXwJeK5pZFBAAPamEUyQXptfEEnCHuD', ''],
 ])
 
 // Returns all known realms from all known spl-gov instances which are not certified
