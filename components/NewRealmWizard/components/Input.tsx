@@ -190,7 +190,7 @@ export function InputRangeSlider({
   disabled = false,
 }) {
   return (
-    <div className="flex flex-col-reverse sm:flex-row sm:items-baseline sm:space-x-4 md:space-x-8">
+    <div className="flex flex-col-reverse sm:flex-row sm:items-baseline sm:space-x-2">
       <div className="w-full sm:w-24">
         <Input
           type="tel"
@@ -212,12 +212,12 @@ export function InputRangeSlider({
         />
       </div>{' '}
       <div
-        className={`relative flex items-center w-full my-6 space-x-4 md:my-0 ${
+        className={`relative flex items-center w-full my-6 space-x-4 md:my-0 bg-white/5 h-[64px] rounded px-6 grow ${
           disabled ? 'opacity-50' : ''
         }`}
       >
         <Text level="2" className="opacity-60">
-          1%
+          0%
         </Text>
         <input
           type="range"
