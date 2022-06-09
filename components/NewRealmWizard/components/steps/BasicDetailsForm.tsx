@@ -20,7 +20,7 @@ export const BasicDetailsSchema = {
     .typeError('Required')
     .required('Required')
     .max(32, 'Name must not be longer than 32 characters'),
-  description: yup.string(),
+  // description: yup.string(),
   programId: yup
     .string()
     .test('is-valid-address', 'Please enter a valid Solana address', (value) =>
@@ -31,7 +31,7 @@ export const BasicDetailsSchema = {
 export interface BasicDetails {
   avatar?: string
   name: string
-  description?: string
+  // description?: string
   programId?: string
 }
 
@@ -74,7 +74,7 @@ export default function BasicDetailsForm({
         stepDescription="basic details"
         title="Let's gather your DAO's basic details."
       />
-      <div className="pt-10 space-y-10 md:space-y-12">
+      <div className="mt-12 space-y-10 md:space-y-12">
         <Controller
           name="name"
           control={control}
@@ -93,7 +93,7 @@ export default function BasicDetailsForm({
             </FormField>
           )}
         />
-        <Controller
+        {/* <Controller
           name="description"
           defaultValue=""
           control={control}
@@ -111,7 +111,7 @@ export default function BasicDetailsForm({
               />
             </FormField>
           )}
-        />
+        /> */}
         <AdvancedOptionsDropdown>
           <Controller
             name="programId"

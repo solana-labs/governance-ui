@@ -192,7 +192,7 @@ export default function FormField({
       >
         {description}
       </Text>
-      <div className="mt-2">{children}</div>
+      <div className="mt-4">{children}</div>
     </div>
   )
 }

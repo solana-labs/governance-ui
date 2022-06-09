@@ -40,6 +40,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       active:placeholder:text-white/10 
       focus:placeholder:text-white/10 
 
+      bg-[rgba(255,255,255,0.03)]
       hover:bg-white/5
 
       focus:bg-[rgba(255,255,255,0.03)]
