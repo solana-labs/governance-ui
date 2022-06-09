@@ -31,24 +31,34 @@ export default function NFTCollectionModal({
       isOpen={show}
       onClose={onClose}
       header={
-        <div className="flex flex-col items-center mb-2 space-x-4 text-center">
-          <Header as="h4">Choose a collection for you DAO</Header>
+        <div className="flex flex-col items-center py-4 mb-2 space-x-4 text-center">
+          <Header as="h4">Choose a collection from your wallet</Header>
           <Header
             as="h6"
-            className="flex items-center justify-center space-x-4 text-white/50"
+            className="flex items-center justify-center mt-1 space-x-1 text-white/50"
           >
             <WalletIcon />
-            {walletPk && abbreviateAddress(walletPk)}
+            <div>{walletPk && abbreviateAddress(walletPk)}</div>
           </Header>
         </div>
       }
       confirmButton={
-        <Button type="button" onClick={handleChoose} disabled={!selected}>
+        <Button
+          type="button"
+          onClick={handleChoose}
+          disabled={!selected}
+          className="w-full md:w-fit"
+        >
           Choose
         </Button>
       }
       closeButton={
-        <Button type="button" secondary onClick={close}>
+        <Button
+          type="button"
+          secondary
+          onClick={close}
+          className="w-full md:w-fit"
+        >
           {selected ? 'Cancel' : 'Close'}
         </Button>
       }

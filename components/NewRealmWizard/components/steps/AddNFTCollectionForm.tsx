@@ -182,14 +182,11 @@ export function WalletIcon() {
   )
 }
 
-function SkeletonNFTCollectionInfo({ loading = false }) {
+function SkeletonNFTCollectionInfo() {
   return (
     <>
-      <img
-        src="/img/nft-collection-placeholder.png"
-        className={`w-24 h-24 ${loading ? 'animate-pulse' : ''}`}
-      />
-      <div className={`space-y-2 truncate ${loading ? 'animate-pulse' : ''}`}>
+      <img src="/img/nft-collection-placeholder.png" className="w-24 h-24" />
+      <div className="space-y-2 truncate">
         <div className="text-transparent truncate rounded w-fit bg-bkg-grey">
           Collection name...
         </div>
@@ -235,7 +232,7 @@ export default function AddNFTCollectionForm({
     setFocus,
     clearErrors,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { isValid },
   } = useForm({
     mode: 'all',
     resolver: yupResolver(schema),
@@ -254,7 +251,7 @@ export default function AddNFTCollectionForm({
 
   useEffect(() => {
     if (!selectedNFTCollection) {
-      setFocus('addressInput')
+      setFocus('collectionInput')
     } else {
       setFocus('numberOfNFTs')
     }
@@ -264,7 +261,7 @@ export default function AddNFTCollectionForm({
     const data = {
       numberOfNFTs: null,
       ...values,
-      addressInput: null,
+      collectionInput: null,
       collectionMetadata: selectedNFTCollection,
     }
     onSubmit({ step: currentStep, data })
@@ -273,29 +270,41 @@ export default function AddNFTCollectionForm({
   async function handleAdd() {
     clearErrors()
 
-    const addressInput = getValues('addressInput')
-    const isValidAddress = validateSolAddress(addressInput)
+    const collectionInput = getValues('collectionInput')
+    const isValidAddress = validateSolAddress(collectionInput)
 
     if (isValidAddress) {
       setRequestPending(true)
       try {
         const collectionInfo = await getNFTCollectionInfo(
           connection.current,
-          addressInput
+          collectionInput
         )
         console.log('NFT collection info from user input:', collectionInfo)
-        setValue('collectionKey', addressInput)
+        setValue('collectionKey', collectionInput)
         setSelectedNFTCollection(collectionInfo)
         setRequestPending(false)
       } catch (err) {
         setRequestPending(false)
         setError(
-          'addressInput',
+          'collectionInput',
           { type: 'custom', message: 'Address is not a verified collection' },
           { shouldFocus: true }
         )
       }
     }
+  }
+
+  async function handleClearSelectedNFT() {
+    setValue('collectionInput', '')
+    setValue('collectionKey', '')
+    setSelectedNFTCollection(undefined)
+  }
+
+  async function handlePaste(ev) {
+    const value = ev.clipboardData.getData('text')
+    setValue('collectionInput', value, { shouldValidate: true })
+    handleAdd()
   }
 
   async function handleSelectFromWallet() {
@@ -341,7 +350,7 @@ export default function AddNFTCollectionForm({
       )
       if (Object.keys(verifiedCollections).length === 0) {
         setError(
-          'addressInput',
+          'collectionInput',
           {
             type: 'custom',
             message: 'Current wallet has no verified collection',
@@ -369,6 +378,20 @@ export default function AddNFTCollectionForm({
       onSubmit={handleSubmit(serializeValues)}
       data-testid="approval-threshold-form"
     >
+      <NFTCollectionModal
+        show={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        walletPk={wallet?.publicKey}
+        collections={collectionsInWallet}
+        onSelect={({ key, collection }) => {
+          if (key && collection) {
+            clearErrors('collectionInput')
+            setValue('collectionInput', '')
+            setValue('collectionKey', key)
+            setSelectedNFTCollection(collection)
+          }
+        }}
+      />
       <FormHeader
         type={type}
         currentStep={currentStep}
@@ -377,18 +400,15 @@ export default function AddNFTCollectionForm({
       />
       <div className="mt-20 space-y-10 md:space-y-12">
         <Controller
-          name="addressInput"
+          name="collectionInput"
           control={control}
           defaultValue=""
-          render={({ field }) => (
-            <FormField
-              title="What is the collection URL or Address?"
-              description=""
-            >
+          render={({ field, fieldState: { error } }) => (
+            <FormField title="Paste your NFT collection address" description="">
               <Input
                 placeholder="e.g. SMBH3wF6baUj6JWtzYvqcKuj2XCKWDqQxzspY12xPND"
                 data-testid="nft-address"
-                error={errors.addressInput?.message || ''}
+                error={error?.message || ''}
                 {...field}
                 disabled={requestPending}
                 onKeyDown={(ev) => {
@@ -396,8 +416,9 @@ export default function AddNFTCollectionForm({
                     handleAdd()
                   }
                 }}
+                onPaste={handlePaste}
               />
-              <div className="flex items-center justify-center space-x-4 md:justify-end">
+              <div className="flex items-center justify-center space-x-4 md:justify-start">
                 <Text level="2">or</Text>
                 <Button
                   type="button"
@@ -418,97 +439,105 @@ export default function AddNFTCollectionForm({
         />
         <input className="hidden" {...register('collectionKey')} disabled />
 
-        <div className="flex flex-wrap space-y-4 md:flex-nowrap md:space-y-0 md:space-x-2">
-          <div className="flex flex-col w-full px-4 py-5 rounded-md bg-night-grey grow">
+        <div
+          className={`flex flex-col w-full px-4 py-5 rounded-md bg-night-grey  ${
+            requestPending ? 'animate-pulse' : ''
+          }`}
+        >
+          {requestPending ? (
+            <Text level="2">Getting collection data</Text>
+          ) : (
             <Text level="2" className="flex space-x-4">
               {!selectedNFTCollection?.name ? (
-                'Link a collection to preview...'
+                'Select a collection to preview...'
               ) : (
                 <>
                   <div className="text-green">Verified collection</div>
                   <div
                     className="underline hover:text-white/50 hover:cursor-pointer"
-                    onClick={() => {
-                      setValue('collectionKey', '')
-                      setSelectedNFTCollection(undefined)
-                    }}
+                    onClick={handleClearSelectedNFT}
                   >
                     Clear
                   </div>
                 </>
               )}
             </Text>
-            <div className="flex mt-5 space-x-2">
-              {!selectedNFTCollection?.name ? (
-                <SkeletonNFTCollectionInfo loading={requestPending} />
-              ) : (
-                <div className="flex items-center">
-                  <div className="relative h-24 mr-2 w-28 md:mr-4">
-                    {selectedNFTCollection?.nfts
-                      ?.slice(0, 3)
-                      .map((nft, index) => {
-                        return (
-                          <img
-                            key={nft.name}
-                            src={nft.image}
-                            alt="collection item"
-                            className={`absolute w-24 rounded-md ${
-                              index === 0
-                                ? 'rotate-[-9deg]'
-                                : index === 1
-                                ? 'rotate-[-15deg]'
-                                : index === 2
-                                ? 'rotate-[15deg]'
-                                : 'rotate-[9deg]'
-                            }`}
-                          />
-                        )
-                      })}
-                    <img
-                      src={selectedNFTCollection?.image}
-                      className="absolute w-24 rounded-md"
-                    />
-                  </div>
-                  <div className="w-1/2 md:w-full">
-                    <Text level="1" className="break-words">
-                      {selectedNFTCollection?.name ||
-                        '(Collection has no name)'}
-                    </Text>
-                    <Text level="2" className="truncate text-white/70">
-                      {selectedNFTCollection?.external_url ? (
-                        <a
-                          href={selectedNFTCollection.external_url}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          {selectedNFTCollection.external_url}
-                        </a>
-                      ) : (
-                        '(Collection has no external address)'
-                      )}
-                    </Text>
-                    <Text
-                      level="2"
-                      className="flex items-baseline mt-2 space-x-2 text-white/50"
-                    >
-                      <WalletIcon />
-                      <span>
-                        {collectionKey && abbreviateAddress(collectionKey)}
-                      </span>
-                    </Text>
-                  </div>
+          )}
+
+          <div className="flex mt-5 space-x-2">
+            {!selectedNFTCollection?.name ? (
+              <SkeletonNFTCollectionInfo />
+            ) : (
+              <div className="flex">
+                <div className="relative h-24 pl-2 w-28">
+                  {selectedNFTCollection?.nfts
+                    ?.slice(0, 3)
+                    .map((nft, index) => {
+                      return (
+                        <img
+                          key={nft.name}
+                          src={nft.image}
+                          alt="collection item"
+                          className={`absolute w-24 rounded-md ${
+                            index === 0
+                              ? 'rotate-[-9deg]'
+                              : index === 1
+                              ? 'rotate-[-15deg]'
+                              : index === 2
+                              ? 'rotate-[15deg]'
+                              : 'rotate-[9deg]'
+                          }`}
+                        />
+                      )
+                    })}
+                  <img
+                    src={selectedNFTCollection?.image}
+                    className="absolute w-24 rounded-md"
+                  />
                 </div>
-              )}
-            </div>
+                <div className="w-full pl-8">
+                  <Text level="1" className="break-words">
+                    {selectedNFTCollection?.name || '(Collection has no name)'}
+                  </Text>
+                  <Text level="2" className="truncate text-white/70">
+                    {selectedNFTCollection?.external_url ? (
+                      <a
+                        href={selectedNFTCollection.external_url}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {selectedNFTCollection.external_url}
+                      </a>
+                    ) : (
+                      '(Collection has no external address)'
+                    )}
+                  </Text>
+                  <Text
+                    level="2"
+                    className="flex items-baseline mt-2 space-x-2 text-white/50"
+                  >
+                    <WalletIcon />
+                    <span>
+                      {collectionKey && abbreviateAddress(collectionKey)}
+                    </span>
+                  </Text>
+                </div>
+              </div>
+            )}
           </div>
-          <div className="flex flex-col items-center px-8 pt-5 text-center rounded-md grow md:grow-0 bg-night-grey">
+        </div>
+
+        {selectedNFTCollection && (
+          <>
             <Controller
               name="numberOfNFTs"
               control={control}
               defaultValue=""
               render={({ field, fieldState: { error } }) => (
-                <div className="flex flex-col justify-between h-full">
-                  <Text level="2">How many NFTs are in this collection?</Text>
+                <FormField
+                  title="How many NFTs are in this collection?"
+                  description=""
+                >
                   <Input
                     Icon={
                       <svg
@@ -531,66 +560,50 @@ export default function AddNFTCollectionForm({
                     disabled={!selectedNFTCollection}
                     {...field}
                   />
-                </div>
+                </FormField>
               )}
             />
-          </div>
-        </div>
-        <Controller
-          name="communityYesVotePercentage"
-          control={control}
-          defaultValue={60}
-          render={({ field, fieldState: { error } }) => (
-            <FormField
-              title="Adjust how much of the total NFT supply is needed to pass a proposal"
-              description=""
-              disabled={!selectedNFTCollection}
-            >
-              <InputRangeSlider
-                field={field}
-                error={error?.message}
-                placeholder="60"
-                disabled={!selectedNFTCollection}
-              />
-            </FormField>
-          )}
-        />
-      </div>
+            <Controller
+              name="communityYesVotePercentage"
+              control={control}
+              defaultValue={60}
+              render={({ field, fieldState: { error } }) => (
+                <FormField
+                  title="Adjust how much of the total NFT supply is needed to pass a proposal"
+                  description=""
+                >
+                  <InputRangeSlider
+                    field={field}
+                    error={error?.message}
+                    placeholder="60"
+                  />
+                </FormField>
+              )}
+            />
 
-      <NFTCollectionModal
-        show={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        walletPk={wallet?.publicKey}
-        collections={collectionsInWallet}
-        onSelect={({ key, collection }) => {
-          if (key && collection) {
-            setValue('collectionKey', key)
-            setSelectedNFTCollection(collection)
-          }
-        }}
-      />
-
-      <ThresholdAdviceBox title="Approval threshold">
-        {approvalPercent > 0 ? (
-          <>
-            <div className="text-lg">
-              With {numberOfNFTs.toLocaleString()} NFTs in your DAO
-            </div>
-            <div className="pt-2 text-lg">
-              {approvalSize?.toLocaleString()} worth of NFTs would need to
-              approve a proposal for it to pass.
-            </div>
+            <ThresholdAdviceBox title="Approval threshold">
+              {approvalPercent > 0 ? (
+                <>
+                  <div className="text-lg">
+                    With {numberOfNFTs.toLocaleString()} NFTs in your DAO
+                  </div>
+                  <div className="pt-2 text-lg">
+                    {approvalSize?.toLocaleString()} worth of NFTs would need to
+                    approve a proposal for it to pass.
+                  </div>
+                </>
+              ) : (
+                <div
+                  className="text-[22px] font-bold opacity-20"
+                  dangerouslySetInnerHTML={{
+                    __html: `&#8212;`,
+                  }}
+                ></div>
+              )}
+            </ThresholdAdviceBox>
           </>
-        ) : (
-          <div
-            className="text-[22px] font-bold opacity-20"
-            dangerouslySetInnerHTML={{
-              __html: `&#8212;&#8212;&#8212;`,
-            }}
-          ></div>
         )}
-      </ThresholdAdviceBox>
-
+      </div>
       <FormFooter
         isValid={isValid}
         prevClickHandler={() => onPrevClick(currentStep)}

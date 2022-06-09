@@ -125,15 +125,22 @@ export function ConfirmationDialog({
   return (
     <NewModal isOpen={isOpen} header={header}>
       <div className="overflow-scroll">{children}</div>
-      <div className="flex flex-col items-center justify-end mt-4 space-y-4 md:space-x-4 md:justify-start md:space-y-0 md:flex-row-reverse grow">
-        <div className="md:ml-4">{confirmButton}</div>
-        {closeButton ? (
-          closeButton
-        ) : (
-          <NewButton type="button" secondary onClick={onClose}>
-            Close
-          </NewButton>
-        )}
+      <div className="flex flex-col items-center justify-end w-full mt-6 space-y-4 md:space-x-4 md:justify-start md:space-y-0 md:flex-row-reverse grow">
+        <div className="w-full md:ml-4 md:w-fit">{confirmButton}</div>
+        <div className="w-full md:w-fit">
+          {closeButton ? (
+            closeButton
+          ) : (
+            <NewButton
+              type="button"
+              secondary
+              onClick={onClose}
+              className="w-full md:w-fit"
+            >
+              Close
+            </NewButton>
+          )}
+        </div>
       </div>
     </NewModal>
   )
