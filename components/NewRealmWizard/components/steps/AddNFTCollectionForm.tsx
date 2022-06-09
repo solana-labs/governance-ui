@@ -239,7 +239,7 @@ export default function AddNFTCollectionForm({
   })
   const collectionKey = watch('collectionKey')
   const numberOfNFTs = watch('numberOfNFTs') || 10000
-  const approvalPercent = watch('communityYesVotePercentage', 60)
+  const approvalPercent = watch('communityYesVotePercentage', 60) || 60
   const approvalSize = approvalPercent
     ? Math.ceil((Number(numberOfNFTs) * approvalPercent) / 100)
     : undefined
@@ -585,24 +585,15 @@ export default function AddNFTCollectionForm({
             />
 
             <ThresholdAdviceBox title="Approval threshold">
-              {approvalPercent > 0 ? (
-                <>
-                  <div className="text-lg">
-                    With {numberOfNFTs.toLocaleString()} NFTs in your DAO
-                  </div>
-                  <div className="pt-2 text-lg">
-                    {approvalSize?.toLocaleString()} worth of NFTs would need to
-                    approve a proposal for it to pass.
-                  </div>
-                </>
-              ) : (
-                <div
-                  className="text-[22px] font-bold opacity-20"
-                  dangerouslySetInnerHTML={{
-                    __html: `&#8212;`,
-                  }}
-                ></div>
-              )}
+              <Text level="1" className="space-y-1">
+                <div>
+                  With {numberOfNFTs?.toLocaleString() || '???'} NFT holders,
+                </div>
+                <div>
+                  {approvalSize?.toLocaleString() || '???'} members would need
+                  to approve a proposal for it to pass.
+                </div>
+              </Text>
             </ThresholdAdviceBox>
           </>
         )}
