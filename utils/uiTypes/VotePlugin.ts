@@ -25,7 +25,6 @@ import { NFTWithMint } from './nfts'
 import { GatewayClient } from '@solana/governance-program-library/dist'
 import {
   getGatewayRegistrarPDA,
-  getGatewayTokenContext,
   getGatewayVoterWeightRecord,
   getVoteInstruction,
 } from '../../GatewayPlugin/sdk/accounts'
@@ -197,21 +196,15 @@ export class VotingClient {
         clientProgramId,
         instructions
       )
-      const { gatewayToken } = await getGatewayTokenContext(
-        this.client,
-        realm,
-        walletPk
-      )
 
-      // Throw if the user has no gateway token (TODO handle this later)
-      if (!gatewayToken)
-        throw new Error(`Unable to vote: No Gateway Token found`)
+      if (!this.gatewayToken)
+        throw new Error(`Unable to execute transaction: No Civic Pass found`)
 
       const updateVoterWeightRecordIx = await this.client.program.methods
         .updateVoterWeightRecord({ [type]: {} }, null)
         .accounts({
           registrar: registrar,
-          gatewayToken: gatewayToken.publicKey,
+          gatewayToken: this.gatewayToken,
           voterWeightRecord: voterWeightPk,
         })
         .instruction()
@@ -366,6 +359,7 @@ export class VotingClient {
       // get the gateway plugin vote instruction
       const instruction = await getVoteInstruction(
         this.client,
+        this.gatewayToken,
         realm,
         walletPk,
         proposal.pubkey

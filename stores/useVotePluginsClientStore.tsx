@@ -6,11 +6,7 @@ import {
 } from '@solana/governance-program-library'
 import { getRegistrarPDA, Registrar } from 'VoteStakeRegistry/sdk/accounts'
 import { AnchorProvider, Wallet } from '@project-serum/anchor'
-import {
-  tryGetGatewayRegistrar,
-  tryGetNftRegistrar,
-  tryGetRegistrar,
-} from 'VoteStakeRegistry/sdk/api'
+import { tryGetNftRegistrar, tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { ConnectionContext } from '@utils/connection'
 import { ProgramAccount, Realm } from '@solana/spl-governance'
@@ -19,6 +15,7 @@ import { VotingClient, VotingClientProps } from '@utils/uiTypes/VotePlugin'
 import { PythClient } from 'pyth-staking-api'
 import { PublicKey } from '@solana/web3.js'
 import { getGatewayRegistrarPDA } from '../GatewayPlugin/sdk/accounts'
+import { tryGetGatewayRegistrar } from '../GatewayPlugin/sdk/api'
 
 interface UseVotePluginsClientStore extends State {
   state: {
@@ -151,7 +148,6 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
         realm!.account.communityMint,
         clientProgramId
       )
-      console.log('GATEWAY: registrar', registrar)
       const existingRegistrar = await tryGetGatewayRegistrar(registrar, client!)
       set((s) => {
         s.state.gatewayRegistrar = existingRegistrar

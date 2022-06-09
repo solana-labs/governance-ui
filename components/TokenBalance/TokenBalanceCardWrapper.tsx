@@ -39,13 +39,6 @@ const TokenBalanceCardWrapper = ({
     const isGatewayMode =
       currentPluginPk && gatewayPluginsPks.includes(currentPluginPk?.toBase58())
 
-    console.log('***Is Gateway Mode', {
-      isGatewayMode,
-      isLockTokensMode,
-      isNftMode,
-      currentPluginPk: currentPluginPk?.toBase58(),
-    })
-
     if (
       isLockTokensMode &&
       (!ownTokenRecord ||

@@ -720,22 +720,22 @@
     bigint-buffer "^1.1.5"
     buffer-layout "^1.2.2"
 
-"@civic/common-gateway-react@^0.1.9-beta1":
-  version "0.1.9-beta1"
-  resolved "https://registry.yarnpkg.com/@civic/common-gateway-react/-/common-gateway-react-0.1.9-beta1.tgz#93e4532635f0e75d2ca18f0510bdbc18ed5337cf"
-  integrity sha512-1sVJ5we5okqnypx2Kjam//niK0ZUGOb07XSQvhfKer3L6LAvmI74sHD3itIzC0orFzrWZKn0jwMR0b8GPYCY1A==
+"@civic/common-gateway-react@^0.1.10-alpha1":
+  version "0.1.10-alpha1"
+  resolved "https://registry.yarnpkg.com/@civic/common-gateway-react/-/common-gateway-react-0.1.10-alpha1.tgz#53899310e5d041f5515a61f5a864b8685e969bb1"
+  integrity sha512-orXd4IoU6ymw4O1/ejuYMR+iJvAyCqNoyvPkUeASIQMLgJBhm3VqkTayeX9iaOh4PjldxWTW1DqdcJfEg3rnYQ==
   dependencies:
     fetch-retry-ts "^1.1.24"
     iframe-resizer-react "^1.1.0"
     ramda "^0.27.1"
     styled-components "^5.3.1"
 
-"@civic/solana-gateway-react@0.7.4-beta1":
-  version "0.7.4-beta1"
-  resolved "https://registry.yarnpkg.com/@civic/solana-gateway-react/-/solana-gateway-react-0.7.4-beta1.tgz#4e3577a6e4ee35dadd17b04c8268b4d1f9c4f56f"
-  integrity sha512-SHnGmPrcmvBy3dXyQ9lnH8IZa2w5BMGrILBYafPnng+qpWz2zudsZ6a5kJZsJ1IaoWYc5y2aLqNrTCIxSr29Rw==
+"@civic/solana-gateway-react@0.7.5-alpha2":
+  version "0.7.5-alpha2"
+  resolved "https://registry.yarnpkg.com/@civic/solana-gateway-react/-/solana-gateway-react-0.7.5-alpha2.tgz#604589778dc08aeb242a2c9e12d46e07890596bb"
+  integrity sha512-9Xp+ui+gx1FK0J2ZgK3QM+aahiCUVzYNh24S7C+1kKg4+0GjDKmgGpX+kCpiFtUMi1i6RTyXUe9d1iyd9+I28A==
   dependencies:
-    "@civic/common-gateway-react" "^0.1.9-beta1"
+    "@civic/common-gateway-react" "^0.1.10-alpha1"
     "@identity.com/prove-solana-wallet" "^0.2.3"
     "@identity.com/solana-gateway-ts" "^0.7.0"
     "@solana/web3.js" "^1.33.0"
@@ -2652,10 +2652,10 @@
   dependencies:
     buffer "~6.0.3"
 
-"@solana/governance-program-library@npm:@civic/governance-program-library#v0.15.2-beta9.tgz":
-  version "0.15.2-beta9"
-  resolved "https://registry.yarnpkg.com/@civic/governance-program-library/-/governance-program-library-0.15.2-beta9.tgz#d4751f515fb841c12aac5e1785c8ed6a15657ab4"
-  integrity sha512-9ugFuM9+hSfEOEJ3PNBfdQlswqlktpAjGG985YZqoOOWkF1AQQbWfDVSAzUlDNrE080ZQasuc3iJ+YhoVmjj3g==
+"@solana/governance-program-library@npm:@civic/governance-program-library#v0.15.2-beta10":
+  version "0.15.2-beta10"
+  resolved "https://registry.yarnpkg.com/@civic/governance-program-library/-/governance-program-library-0.15.2-beta10.tgz#197d977bae29149724a1668e88bf720408a50336"
+  integrity sha512-8adYMi+1Zn8t0NJOpsc5BR87wSeXPtzrbbrtqHZSnngkmTawcoVUb6aOprffAaayk9k+hJ4GpQVVmmyOnmJhRQ==
   dependencies:
     "@project-serum/anchor" "^0.24.2"
     "@project-serum/serum" "^0.13.61"

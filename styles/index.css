@@ -176,3 +176,7 @@ body::-webkit-scrollbar-corner {
 ::-webkit-calendar-picker-indicator {
   filter: invert(1);
 }
+
+.gatewayButton > span {
+  @apply !text-bkg-2 !pl-0 !text-sm;
+}

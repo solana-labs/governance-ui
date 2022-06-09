@@ -26,6 +26,7 @@ import useMembers from '@components/Members/useMembers'
 import TransactionLoader from '@components/TransactionLoader'
 
 import dynamic from 'next/dynamic'
+import { GatewayProvider } from '@components/Gateway/GatewayProvider'
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
 })
@@ -134,12 +135,14 @@ function App({ Component, pageProps }) {
       <ErrorBoundary>
         <ThemeProvider defaultTheme="Dark">
           <WalletIdentityProvider appName={'Realms'}>
-            <NavBar />
-            <Notifications />
-            <TransactionLoader></TransactionLoader>
-            <PageBodyContainer>
-              <Component {...pageProps} />
-            </PageBodyContainer>
+            <GatewayProvider>
+              <NavBar />
+              <Notifications />
+              <TransactionLoader></TransactionLoader>
+              <PageBodyContainer>
+                <Component {...pageProps} />
+              </PageBodyContainer>
+            </GatewayProvider>
           </WalletIdentityProvider>
         </ThemeProvider>
       </ErrorBoundary>

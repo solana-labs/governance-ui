@@ -1,5 +1,4 @@
 import { PublicKey } from '@solana/web3.js'
-import { findGatewayToken, GatewayToken } from '@identity.com/solana-gateway-ts'
 import { ProgramAccount, Realm } from '@solana/spl-governance'
 import { GatewayClient } from '@solana/governance-program-library/dist'
 
@@ -60,61 +59,37 @@ export const getGatewayVoterWeightRecord = async (
     clientProgramId
   )
 
-  console.log('getGatewayVoterWeightRecord', [
-    voterWeightPk,
-    voterWeightRecordBump,
-  ])
-
   return {
     voterWeightPk,
     voterWeightRecordBump,
   }
 }
 
-export type GatewayTokenContext = {
-  gatewayToken: GatewayToken | null
-  gatekeeperNetwork: PublicKey
-}
-
-export const getGatewayTokenContext = async (
+export const getGatekeeperNetwork = async (
   client: GatewayClient,
-  realm: ProgramAccount<Realm>,
-  walletPk: PublicKey
-): Promise<GatewayTokenContext> => {
+  realm: ProgramAccount<Realm>
+): Promise<PublicKey> => {
   // Get the registrar for the realm
   const { registrar } = await getGatewayRegistrarPDA(
     realm.pubkey,
     realm.account.communityMint,
     client.program.programId
   )
-  console.log('GATEWAY: getGatewayToken registrar', registrar)
-  console.log('GATEWAY: getGatewayToken program', client.program.account)
-  // @ts-ignore
   const registrarObject = await client.program.account.registrar.fetch(
     registrar
   )
 
   // Find the gatekeeper network from the registrar
-  console.log('GATEWAY: getGatewayToken registrarObject', registrarObject)
-  const gatekeeperNetwork = registrarObject.gatekeeperNetwork
-
-  // lookup the voter's gateway token in the gatekeeper network
-  const gatewayToken = await findGatewayToken(
-    client.program.provider.connection,
-    walletPk,
-    gatekeeperNetwork
-  )
-
-  return { gatewayToken, gatekeeperNetwork }
+  return registrarObject.gatekeeperNetwork
 }
 
 export const getVoteInstruction = async (
   client: GatewayClient,
+  gatewayToken: PublicKey,
   realm: ProgramAccount<Realm>,
   walletPk: PublicKey,
   proposalPk: PublicKey
 ) => {
-  const { gatewayToken } = await getGatewayTokenContext(client, realm, walletPk)
   // Throw if the user has no gateway token (TODO handle this later)
   if (!gatewayToken) throw new Error(`Unable to vote: No Gateway Token found`)
 
@@ -139,7 +114,7 @@ export const getVoteInstruction = async (
     .accounts({
       registrar,
       voterWeightRecord: voterWeightPk,
-      gatewayToken: gatewayToken.publicKey,
+      gatewayToken,
     })
     .instruction()
 }

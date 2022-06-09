@@ -43,7 +43,6 @@ const useGatewayPluginStore = create<gatewayPluginStore>((set, _get) => ({
     set((s) => {
       s.state.gatewayToken = gatewayToken
     })
-    console.log('GATEWAY: setVotingPower')
     _get().setVotingPower(gatewayToken)
   },
   setGatekeeperNetwork: (gatekeeperNetwork) => {

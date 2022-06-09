@@ -14,7 +14,8 @@ import {
   DEVNET_STAKING_ADDRESS as PYTH_DEVNET_STAKING_ADDRESS,
 } from 'pyth-staking-api'
 import useGatewayPluginStore from '../GatewayPlugin/store/gatewayPluginStore'
-import { getGatewayTokenContext } from '../GatewayPlugin/sdk/accounts'
+import { getGatekeeperNetwork } from '../GatewayPlugin/sdk/accounts'
+import { useGateway } from '@civic/solana-gateway-react'
 
 export const vsrPluginsPks: string[] = [
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo',
@@ -64,6 +65,15 @@ export function useVotingPlugins() {
   const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
   const gatewayClient = useVotePluginsClientStore((s) => s.state.gatewayClient)
   const pythClient = useVotePluginsClientStore((s) => s.state.pythClient)
+  const { gatewayToken } = useGateway()
+
+  // As soon as the Civic GatewayProvider finds a gateway token
+  // add it to the state, so that the voting plugin can use it
+  useEffect(() => {
+    if (gatewayToken) {
+      setGatewayToken(gatewayToken.publicKey, currentClient)
+    }
+  }, [gatewayToken])
 
   const currentClient = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
@@ -107,30 +117,17 @@ export function useVotingPlugins() {
     }
     setIsLoadingNfts(false)
   }
-  const handleGetGatewayToken = async () => {
-    console.log('GATEWAY: handleGetGatewayToken')
+  const handleRegisterGatekeeperNetwork = async () => {
     if (realm) {
-      console.log('GATEWAY: realm exists')
       setIsLoadingGatewayToken(true)
 
       try {
-        console.log('GATEWAY: getGatewayTokenContext')
-        const {
-          gatewayToken,
-          gatekeeperNetwork,
-        } = await getGatewayTokenContext(
+        const gatekeeperNetwork = await getGatekeeperNetwork(
           gatewayClient,
-          realm,
-          wallet!.publicKey!
+          realm
         )
-        console.log('GATEWAY: getGatewayTokenContext ', gatewayToken)
 
         setGatekeeperNetwork(gatekeeperNetwork)
-
-        if (gatewayToken) {
-          console.log('GATEWAY: setGatewayToken')
-          setGatewayToken(gatewayToken.publicKey, currentClient)
-        }
       } catch (e) {
         console.log(e)
         notify({
@@ -213,8 +210,11 @@ export function useVotingPlugins() {
       }
     }
 
+    // If the current realm uses Civic Pass
+    // register the gatekeeper network (the "type" of Civic)
+    // in the Civic GatewayProvider.
+    // This updates the UI to show if the user has a gateway token
     const handleGatewayPlugin = () => {
-      console.log('GATEWAY: handleGatewayPlugin')
       if (
         gatewayClient &&
         currentPluginPk &&
@@ -229,7 +229,7 @@ export function useVotingPlugins() {
           })
         }
 
-        handleGetGatewayToken()
+        handleRegisterGatekeeperNetwork()
       }
     }
 
@@ -249,12 +249,6 @@ export function useVotingPlugins() {
       }
     }
 
-    console.log('handling plugins...', {
-      clientWallet: currentClient?.walletPk?.toBase58(),
-      clientRealm: currentClient?.realm?.pubkey?.toBase58(),
-      wallet: wallet?.publicKey?.toBase58(),
-      realm: realm?.pubkey?.toBase58(),
-    })
     if (
       !currentClient ||
       currentClient.realm?.pubkey.toBase58() !== realm?.pubkey.toBase58() ||
@@ -279,7 +273,7 @@ export function useVotingPlugins() {
     if (usedCollectionsPks.length && realm) {
       if (connected && currentClient.walletPk?.toBase58()) {
         handleGetNfts()
-        handleGetGatewayToken()
+        handleRegisterGatekeeperNetwork()
       }
 
       handleMaxVoterWeight()
