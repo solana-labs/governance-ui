@@ -292,7 +292,7 @@ export default function useGovernanceAssets() {
     },
     {
       id: Instructions.ForesightSetMarketMetadata,
-      name: 'Foresight: Add Market Metadata',
+      name: 'Foresight: Set Market Metadata',
       isVisible: canUseAnyInstruction,
     },
     {
