@@ -396,7 +396,7 @@ export default function AddNFTCollectionForm({
         type={type}
         currentStep={currentStep}
         totalSteps={totalSteps}
-        title="Select an NFT collection for you DAO"
+        title="Select an NFT collection for your DAO"
       />
       <div className="mt-20 space-y-10 md:space-y-12">
         <Controller

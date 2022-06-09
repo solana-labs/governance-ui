@@ -1,6 +1,7 @@
 import { RadioGroup } from '@headlessui/react'
 import Header from '@components/Header'
 import Text from '@components/Text'
+import GradientCheckmarkCircle from './GradientCheckmarkCircle'
 
 const NFTCollectionSelector = ({ collections = {}, onChange, value }) => {
   const optionClass =
@@ -67,31 +68,7 @@ const NFTCollectionSelector = ({ collections = {}, onChange, value }) => {
                       )
                     })}
                   </div>
-                  <div
-                    className={`h-8 w-8 rounded-full flex items-center justify-center text-black border ${
-                      checked
-                        ? 'bg-gradient-to-r from-[#00C2FF] via-[#00E4FF] to-[#87F2FF]'
-                        : ''
-                    }
-                    ${active ? 'border-white text-white' : 'border-white/30'}`}
-                  >
-                    {checked && (
-                      <svg
-                        width="16"
-                        height="13"
-                        viewBox="0 0 16 13"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          clipRule="evenodd"
-                          d="M15.4142 3.41421L6 12.8284L0.585785 7.41421L3.41421 4.58579L6 7.17157L12.5858 0.585785L15.4142 3.41421Z"
-                          fill="currentColor"
-                        />
-                      </svg>
-                    )}
-                  </div>
+                  <GradientCheckmarkCircle selected={checked} />
                 </div>
               )}
             </RadioGroup.Option>

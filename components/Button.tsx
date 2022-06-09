@@ -1,7 +1,8 @@
 import { FunctionComponent, useState, useEffect } from 'react'
 import Loading from './Loading'
 import Tooltip from './Tooltip'
-
+import Header from './Header'
+import GradientCheckmarkCircle from './NewRealmWizard/components/GradientCheckmarkCircle'
 interface ButtonProps {
   className?: string
   isLoading?: boolean
@@ -101,8 +102,6 @@ export const NewButton: FunctionComponent<NewButtonProps> = ({
   className = '',
   loading = false,
   secondary = false,
-  radio = false,
-  selected = false,
   children,
   ...props
 }) => {
@@ -122,16 +121,6 @@ export const NewButton: FunctionComponent<NewButtonProps> = ({
   } else if (secondary) {
     classNames +=
       'py-3 px-2 h-[64px] min-w-[208px] text-white border border-white/30 focus:border-white hover:bg-white hover:text-black active:bg-white/70 active:text-black active:border-none disabled:bg-white/10 disabled:text-black disabled:border-none '
-  } else if (radio) {
-    classNames +=
-      'py-3 px-2 h-[64px] min-w-[208px] text-white border border-white/30 disabled:text-black disabled:border-2 disabled:hover:border-white/30'
-    if (selected) {
-      classNames +=
-        ' bg-white text-black border-white border-2 focus:border-[#00E4FF]'
-    } else {
-      classNames +=
-        ' focus:bg-white/10 focus:border-none hover:border-white hover:bg-none '
-    }
   } else {
     // this is a primary button
     // TODO: make sure this using the typogrpahic class for CTAs
@@ -160,7 +149,6 @@ export const NewButton: FunctionComponent<NewButtonProps> = ({
   return (
     <button
       className={classNames}
-      type={radio ? 'button' : props.type}
       disabled={props.disabled || loading || loadingEnd}
       {...props}
     >
@@ -196,6 +184,43 @@ export const NewButton: FunctionComponent<NewButtonProps> = ({
           ></span>
         </div>
       )}
+    </button>
+  )
+}
+
+export const RadioButton: FunctionComponent<NewButtonProps> = ({
+  className = '',
+  selected = false,
+  children,
+  ...props
+}) => {
+  const [hoverState, setHoverState] = useState(false)
+  let classNames =
+    'py-3 px-2 h-[72px] min-w-[208px] text-white rounded border border-white/30 hover:bg-white/10 hover:border-white disabled:opacity-20 disabled:hover:border-white/30'
+  if (selected) {
+    classNames += ' bg-white/10 border-white focus:border-blue'
+  } else {
+    classNames += ' focus:bg-white/30 focus:border-none'
+  }
+
+  classNames += ` ${className}`
+  return (
+    <button
+      className={classNames}
+      type="button"
+      disabled={props.disabled}
+      {...props}
+      onMouseOver={() => {
+        setHoverState(true)
+      }}
+      onMouseOut={() => {
+        setHoverState(false)
+      }}
+    >
+      <div className="flex items-center justify-center space-x-3">
+        <GradientCheckmarkCircle selected={selected} hover={hoverState} />
+        <Header as="h6">{children}</Header>
+      </div>
     </button>
   )
 }

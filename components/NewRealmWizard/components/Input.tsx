@@ -2,7 +2,7 @@ import React from 'react'
 import { RadioGroup as HRG } from '@headlessui/react'
 import { preventNegativeNumberInput } from '@utils/helpers'
 
-import { NewButton as Button } from '@components/Button'
+import { RadioButton } from '@components/Button'
 import Text from '@components/Text'
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   invalid?: string
@@ -166,14 +166,13 @@ export const RadioGroup = ({
           return (
             <HRG.Option value={value} key={label}>
               {({ checked }) => (
-                <Button
-                  radio
+                <RadioButton
                   selected={checked}
                   disabled={disabled}
                   className="w-full"
                 >
                   {label}
-                </Button>
+                </RadioButton>
               )}
             </HRG.Option>
           )
