@@ -67,7 +67,7 @@ import MakeInitCategoryParams from './components/instructions/Foresight/MakeInit
 import MakeResolveMarketParams from './components/instructions/Foresight/MakeResolveMarketParams'
 import MakeAddMarketListToCategoryParams from './components/instructions/Foresight/MakeAddMarketListToCategoryParams'
 import RealmConfig from './components/instructions/RealmConfig'
-import MakeAddMarketMetadataParams from './components/instructions/Foresight/MakeAddMarketMetadataParams'
+import MakeSetMarketMetadataParams from './components/instructions/Foresight/MakeSetMarketMetadataParams'
 import CloseTokenAccount from './components/instructions/CloseTokenAccount'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import CastleWithdraw from './components/instructions/Castle/CastleWithdraw'
@@ -456,12 +456,12 @@ const New = () => {
             governance={governance}
           ></MakeAddMarketListToCategoryParams>
         )
-      case Instructions.ForesightAddMarketMetadata:
+      case Instructions.ForesightSetMarketMetadata:
         return (
-          <MakeAddMarketMetadataParams
+          <MakeSetMarketMetadataParams
             index={idx}
             governance={governance}
-          ></MakeAddMarketMetadataParams>
+          ></MakeSetMarketMetadataParams>
         )
       case Instructions.RealmConfig:
         return <RealmConfig index={idx} governance={governance}></RealmConfig>
