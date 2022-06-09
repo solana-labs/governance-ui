@@ -30,18 +30,19 @@ const New: React.FC = () => {
   ]
   return (
     <>
-      <Header as="h1" className="text-center">
-        What type of DAO would you like to create?
+      <Header as="h2" className="mt-8 ">
+        What type of DAO <br />
+        would you like to create?
       </Header>
-      <div className="px-4 pt-5 pb-4 mt-8 rounded bg-night-grey lg:mt-16">
-        <div className="grid grid-cols-1 gap-4 text-center lg:grid-cols-3 ">
+      <div className="pt-5 pb-4 mx-auto mt-8 rounded lg:mt-16">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {DAO_TYPES.map(({ url, name, description }) => (
             <Link key={name} href={fmtUrlWithCluster(url)}>
-              <a className="flex flex-col items-start px-5 py-3 border rounded cursor-pointer default-transition hover:bg-bkg-3">
-                <Header as="h2" className="mb-6">
+              <a className="flex flex-col items-start px-12 py-12 rounded cursor-pointer hover:outline hover:outline-white/50 bg-bkg-3">
+                <Header as="h4" className="mb-6">
                   {name}
                 </Header>
-                <Text level="2" className="text-left">
+                <Text level="2" className="text-left text-white/70">
                   {description}
                 </Text>
               </a>
@@ -49,17 +50,12 @@ const New: React.FC = () => {
           ))}
         </div>
         <div className="flex items-center justify-center px-4 mt-10 space-x-8">
-          <Link href={fmtUrlWithCluster('/realms')}>
-            <a>
-              <NewButton secondary>Back</NewButton>
-            </a>
-          </Link>
           <a
             href="https://governance-docs.vercel.app/DAO-Management/createing-DAOs/DAO-wizard"
             target="_blank"
             rel="noopener noreferrer"
           >
-            <div className="rounded px-3 py-1.5 hover:text-primary-dark default-transition cursor-pointer ">
+            <div className="rounded px-3 py-1.5 hover:text-primary-dark default-transition cursor-pointer underline">
               <span className="text-sm font-semibold">Tutorial Docs</span>
             </div>
           </a>
