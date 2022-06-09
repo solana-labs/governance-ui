@@ -231,7 +231,7 @@ export default function InviteMembersForm({
           type === MULTISIG_FORM ? ' ' : ' council '
         }members with their Solana Wallet Address`}
       />
-      <div className="pt-24 space-y-10 md:space-y-12">
+      <div className="mt-24 space-y-10 md:space-y-12">
         <FormField
           description="Add Solana wallet addressses, separated by a comma or line-break."
           title="Invite members"
