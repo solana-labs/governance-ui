@@ -919,10 +919,10 @@
     dotenv-expand "^6.0.1"
     yargs "^17.0.1"
 
-"@friktion-labs/friktion-sdk@^1.1.116":
-  version "1.1.116"
-  resolved "https://registry.yarnpkg.com/@friktion-labs/friktion-sdk/-/friktion-sdk-1.1.116.tgz#f9b9b0fa4355bdff17e25d49cfe4ca8536f38c50"
-  integrity sha512-vtIAp7ezZ7x0UiDzH8yAGAYU9UirlEjS2NAXmsww/+Pnf8mO+vuvuHV1Xia6miBekAg5mzd4xloqbS8IOdR1Hg==
+"@friktion-labs/friktion-sdk@^1.1.118":
+  version "1.1.118"
+  resolved "https://registry.yarnpkg.com/@friktion-labs/friktion-sdk/-/friktion-sdk-1.1.118.tgz#8c7258f4317780e4c6bcffbf8a973ecf87a60cbf"
+  integrity sha512-fZTqpl6qKsWIQWp+QrHfYP4/f0IbqCuujhJBrH2JjUzXsVjzDKZDFuOv6jOFis4YNPqu5P6Ne2jRJr6OHtrQ8Q==
   dependencies:
     "@blockworks-foundation/mango-client" "3.4.5"
     "@friktion-labs/entropy-client" "^1.7.3"
@@ -930,9 +930,9 @@
     "@project-serum/anchor" "^0.25.0-beta.1"
     "@project-serum/common" "^0.0.1-beta.3"
     "@project-serum/serum" "^0.13.61"
-    "@saberhq/anchor-contrib" "1.13.0"
-    "@saberhq/solana-contrib" "1.13.0"
-    "@saberhq/token-utils" "1.13.0"
+    "@saberhq/anchor-contrib" "1.12.53"
+    "@saberhq/solana-contrib" "1.12.53"
+    "@saberhq/token-utils" "1.12.53"
     "@solana/spl-token" "^0.1.8"
     "@solana/web3.js" "^1.42.0"
     "@switchboard-xyz/switchboard-v2" "^0.0.34"
@@ -2235,29 +2235,28 @@
     "@react-spring/shared" "~9.4.0"
     "@react-spring/types" "~9.4.0"
 
-"@saberhq/anchor-contrib@1.13.0":
-  version "1.13.0"
-  resolved "https://registry.yarnpkg.com/@saberhq/anchor-contrib/-/anchor-contrib-1.13.0.tgz#f057d3b3ed6b2a6173b4e19b40b19f56c60b91e9"
-  integrity sha512-EHOJizlPMQsHYtaVlJBompEnJx3keGjZ0Nyio8wPHjAJ044RAK83ib96+LK5s4pb+6l4pVHyjkpRWyZG8Z152w==
+"@saberhq/anchor-contrib@1.12.53":
+  version "1.12.53"
+  resolved "https://registry.yarnpkg.com/@saberhq/anchor-contrib/-/anchor-contrib-1.12.53.tgz#4cc46fdf0639315db73573b3190a1d6d5b942412"
+  integrity sha512-RYLHKYVxE3Oz0BeNgi6nIXH1kfGYYE4cYLgEAgBwbi4fFA3bFWNXVgXMiBDHBDBwx3wdKpKj/USDGz7xOcbtFw==
   dependencies:
-    "@saberhq/solana-contrib" "^1.13.0"
+    "@saberhq/solana-contrib" "^1.12.53"
     eventemitter3 "^4.0.7"
     lodash.camelcase "^4.3.0"
     lodash.mapvalues "^4.6.0"
-    tslib "^2.4.0"
+    tslib "^2.3.1"
 
-"@saberhq/solana-contrib@1.13.0", "@saberhq/solana-contrib@^1.12.53", "@saberhq/solana-contrib@^1.13.0":
-  version "1.13.0"
-  resolved "https://registry.yarnpkg.com/@saberhq/solana-contrib/-/solana-contrib-1.13.0.tgz#0e5f360cfbed90e9786d0e89db6589f8c5299bab"
-  integrity sha512-LNFd1KHQ9GrbeAyF61moTtIt92qC+9bRaP1nHMNyOxjp7Q0sQhBm8QrW8Nez5tz8H3OYB2ZFr7LWvQ+6ddn9fg==
+"@saberhq/solana-contrib@1.12.53":
+  version "1.12.53"
+  resolved "https://registry.yarnpkg.com/@saberhq/solana-contrib/-/solana-contrib-1.12.53.tgz#1a946e55ce9a63ceffe4485ec9c31cd9fc890f52"
+  integrity sha512-DpAKOYc2DucUpbnR6rV2P0vvlCexkMBpRYR24Y3ZMc1mgNPK/PCmV6nCm/xDYiOutQ29LeNv0jbUqlg5tdz69Q==
   dependencies:
-    "@solana/buffer-layout" "^4.0.0"
     "@types/promise-retry" "^1.1.3"
-    "@types/retry" "^0.12.2"
+    "@types/retry" "^0.12.1"
     promise-retry "^2.0.1"
     retry "^0.13.1"
     tiny-invariant "^1.2.0"
-    tslib "^2.4.0"
+    tslib "^2.3.1"
 
 "@saberhq/solana-contrib@^1.12.23", "@saberhq/solana-contrib@^1.12.26", "@saberhq/solana-contrib@^1.12.35":
   version "1.12.48"
@@ -2271,7 +2270,32 @@
     tiny-invariant "^1.2.0"
     tslib "^2.3.1"
 
-"@saberhq/token-utils@1.13.0", "@saberhq/token-utils@^1.12.53":
+"@saberhq/solana-contrib@^1.12.53", "@saberhq/solana-contrib@^1.13.0":
+  version "1.13.0"
+  resolved "https://registry.yarnpkg.com/@saberhq/solana-contrib/-/solana-contrib-1.13.0.tgz#0e5f360cfbed90e9786d0e89db6589f8c5299bab"
+  integrity sha512-LNFd1KHQ9GrbeAyF61moTtIt92qC+9bRaP1nHMNyOxjp7Q0sQhBm8QrW8Nez5tz8H3OYB2ZFr7LWvQ+6ddn9fg==
+  dependencies:
+    "@solana/buffer-layout" "^4.0.0"
+    "@types/promise-retry" "^1.1.3"
+    "@types/retry" "^0.12.2"
+    promise-retry "^2.0.1"
+    retry "^0.13.1"
+    tiny-invariant "^1.2.0"
+    tslib "^2.4.0"
+
+"@saberhq/token-utils@1.12.53":
+  version "1.12.53"
+  resolved "https://registry.yarnpkg.com/@saberhq/token-utils/-/token-utils-1.12.53.tgz#405cebd330e68e537b4ce5ffc21462eced22cba7"
+  integrity sha512-r7tCdHZV+ANY2H53xjUJEVpXn27a7fZTpLZKRx7HVeG9/cTwccV0vec1f28Vfu1LNYdnIMeKSaCLk1I7CK05cg==
+  dependencies:
+    "@saberhq/solana-contrib" "^1.12.53"
+    "@solana/buffer-layout" "^4.0.0"
+    "@solana/spl-token" "^0.1.8"
+    "@ubeswap/token-math" "^4.4.4"
+    tiny-invariant "^1.2.0"
+    tslib "^2.3.1"
+
+"@saberhq/token-utils@^1.12.53":
   version "1.13.0"
   resolved "https://registry.yarnpkg.com/@saberhq/token-utils/-/token-utils-1.13.0.tgz#ffafb6a3a38742761a44a831c2f8d70875d6d8a8"
   integrity sha512-24GxCywSRqn37Nx8tZ6w9pFjg+/RPUVbxh6pEouSBvB/H5eE3kqt5uitwIpRTIctkNcH+1x0khnEn1evk99HPg==
@@ -2559,9 +2583,9 @@
     cross-fetch "3.0.6"
 
 "@solana/spl-token-registry@^0.2.3775":
-  version "0.2.4388"
-  resolved "https://registry.yarnpkg.com/@solana/spl-token-registry/-/spl-token-registry-0.2.4388.tgz#7b0bbf33022856add4fb945526f110683f593a0f"
-  integrity sha512-EC5+z5PJkH7Usfz/R3zfO7hwrwjnxz1WYog9S22Fp+nmKOZGjG0iUxVIolE4lW4kPXSKIg5mvyzTu+1oeL1nkg==
+  version "0.2.4389"
+  resolved "https://registry.yarnpkg.com/@solana/spl-token-registry/-/spl-token-registry-0.2.4389.tgz#e3bbc16e4360bd6bebd3ecdb3349e0aec6d626fa"
+  integrity sha512-AGcyMr0wphSMDzL6stPV1V2lLIYGPtPhr1L3HC1NeTB+wAojcQFDr8ngHAWoAH5TDWnYxIpH2LN3Viggf/eNag==
   dependencies:
     cross-fetch "3.0.6"
 
@@ -3527,7 +3551,7 @@
     "@typescript-eslint/types" "5.21.0"
     eslint-visitor-keys "^3.0.0"
 
-"@ubeswap/token-math@^4.4.8":
+"@ubeswap/token-math@^4.4.4", "@ubeswap/token-math@^4.4.8":
   version "4.4.8"
   resolved "https://registry.yarnpkg.com/@ubeswap/token-math/-/token-math-4.4.8.tgz#7530627c6d11ecfb3a8159b66567764256352f9e"
   integrity sha512-/j8fld29BlWUA3hfBgFPuVorzOkhvnUyORk053pPJX0m9zhoFieRIT65A2sOGgF5Cffxj/OjN1ycAatD8vv6xg==
