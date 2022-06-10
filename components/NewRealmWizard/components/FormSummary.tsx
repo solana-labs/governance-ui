@@ -83,7 +83,9 @@ function CommunityInfo({
               level="2"
               className="flex items-center px-6 py-1 ml-2 text-white rounded bg-bkg-grey"
             >
-              {tokenInfo?.symbol ? `#${tokenInfo.symbol}` : '(No symbol)'}
+              {tokenInfo?.symbol && tokenInfo.symbol !== '(No symbol)'
+                ? `#${tokenInfo.symbol}`
+                : '(No symbol)'}
             </Text>
           }
         >
@@ -150,7 +152,7 @@ function CouncilInfo({
             level="2"
             className="flex items-center px-6 py-1 ml-2 text-white rounded bg-bkg-grey"
           >
-            {tokenInfo.symbol !== '(No symbol)'
+            {tokenInfo?.symbol && tokenInfo.symbol !== '(No symbol)'
               ? `#${tokenInfo.symbol}`
               : '(No symbol)'}
           </Text>

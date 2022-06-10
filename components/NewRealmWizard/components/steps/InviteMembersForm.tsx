@@ -48,7 +48,7 @@ function InviteAddress({
           <div
             className={`flex rounded-full ${
               currentUser ? 'white-fill text-black' : 'black-fill'
-            } border-gradient border-1`}
+            } border-gradient`}
           >
             <div className="flex items-center justify-center w-10 h-10 ">
               {currentUser ? 'Me' : index}

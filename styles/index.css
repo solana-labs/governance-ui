@@ -200,29 +200,33 @@ body::-webkit-scrollbar-corner {
   left: 0;
   z-index: 0;
   opacity: 0;
-  transition: all 0.3s ease-in;
+  background-image: linear-gradient(to bottom, white, white);
+  transition: all 0.3s linear;
   border-radius: 999px;
 }
 
 .transition-from-gradient-background:hover::before {
   opacity: 1;
-  background-image: linear-gradient(to bottom, white, white);
 }
 
 .transition-from-gradient-background:active::before {
   opacity: 1;
   background-image: linear-gradient(to bottom, #bebec1, #bebec1);
-  outline: 2px solid #bebec1;
+  border: 1px solid #bebec1;
+}
+
+.transition-from-gradient-background:disabled {
+  background-image: none;
 }
 
 .transition-from-gradient-background:disabled::before {
   opacity: 1;
   background-image: linear-gradient(to bottom, #3e3d47, #3e3d47);
-  outline: 2px solid #3e3d47;
+  border: 1px solid #3e3d47;
 }
 
 .border-gradient {
-  border: 2px solid transparent;
+  border: 1px solid transparent;
   background-origin: border-box;
   background-clip: content-box, border-box;
 }

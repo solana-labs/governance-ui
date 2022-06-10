@@ -186,7 +186,7 @@ export const RadioButton: FunctionComponent<NewButtonProps> = ({
 }) => {
   const [hoverState, setHoverState] = useState(false)
   let classNames =
-    'py-3 px-2 h-[72px] min-w-[208px] text-white rounded border border-white/30 hover:bg-white/10 hover:border-white disabled:opacity-20 disabled:hover:border-white/30'
+    'default-transition py-3 px-2 h-[72px] min-w-[208px] text-white rounded border border-white/30 hover:bg-white/10 hover:border-white disabled:opacity-20 disabled:hover:border-white/30'
   if (selected) {
     classNames += ' bg-white/10 border-white focus:border-blue'
   } else {
