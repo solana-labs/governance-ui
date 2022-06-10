@@ -34,6 +34,7 @@ h6.heading-cta {
   @apply md:text-[16px];
 }
 
+.body-lg,
 .body-base,
 .body-sm,
 .body-sm.font-bold,
@@ -41,6 +42,10 @@ h6.heading-cta {
   letter-spacing: 0;
   line-height: 140%;
   @apply font-normal font-body md:font-light;
+}
+
+.body-lg {
+  font-size: 25px;
 }
 
 .body-base {

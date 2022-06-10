@@ -15,8 +15,8 @@ export interface TokenWithMintInfo extends TokenInfo {
 }
 
 const PENDING_COIN: TokenWithMintInfo = {
-  chainId: 1,
-  address: 'pending',
+  chainId: 0,
+  address: '',
   symbol: 'finding symbol...',
   name: 'finding name...',
   decimals: 9,
@@ -34,8 +34,8 @@ const PENDING_COIN: TokenWithMintInfo = {
 
 const NOTFOUND_COIN: TokenWithMintInfo = {
   ...PENDING_COIN,
-  name: '(Token has no name)',
-  symbol: '(Token has no symbol)',
+  name: '(Unnamed)',
+  symbol: '(No symbol)',
 }
 
 export default function TokenAddressInput({

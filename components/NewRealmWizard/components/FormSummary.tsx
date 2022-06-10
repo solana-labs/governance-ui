@@ -1,97 +1,38 @@
-import { FunctionComponent, Fragment, useState, ReactElement } from 'react'
-
 import FormHeader from '@components/NewRealmWizard/components/FormHeader'
 import FormFooter from '@components/NewRealmWizard/components/FormFooter'
 
 import Header from '@components/Header'
 import Text from '@components/Text'
-import { NewButton as Button } from '@components/Button'
-import { ConfirmationDialog } from '@components/Modal'
 
 import { FORM_NAME as MULTISIG_FORM } from 'pages/realms/new/multisig'
 
-function SummaryCell({ className = '', children }) {
-  return (
-    <div
-      className={`bg-night-grey rounded-md px-4 py-6 md:p-8 grow ${className}`}
-    >
-      {children}
-    </div>
-  )
-}
-
-interface FieldProps {
-  className?: string
-  img?: string
-  icon?: ReactElement
-  header: string
-  footer: string
-}
-const FieldValue: FunctionComponent<FieldProps> = ({
+function SummaryModule({
   className = '',
-  img = '',
-  icon,
-  header,
-  footer,
-}) => {
-  return (
-    <SummaryCell className={`grid grid-rows-3 ${className}`}>
-      {img || icon ? (
-        <>
-          <div className="h-10 m-auto">
-            {img?.length ? <img src={img} className="h-full" /> : icon}
-          </div>
-          <Header as="h3" className="text-center">
-            {header}
-          </Header>
-        </>
-      ) : (
-        <>
-          <div />
-          <Header as="h1" className="text-center truncate">
-            {header}
-          </Header>
-        </>
-      )}
-
-      <Text className="mt-2 text-center uppercase text-white/50">{footer}</Text>
-    </SummaryCell>
-  )
-}
-
-const COMMUNITY_TYPE = 'COMMUNITY'
-const COUNCIL_TYPE = 'COUNCIL'
-
-function TokenInfo({
-  type = COMMUNITY_TYPE,
-  tokenInfo,
-  transferMintAuthority,
-  mintSupplyFactor = 1,
+  title,
+  advancedOption = false,
+  rightSide = <></>,
+  children,
 }) {
   return (
-    <>
-      <FieldValue
-        img={tokenInfo?.logoURI || '/icons/generic-token-icon.svg'}
-        header={tokenInfo?.name || '(Unnamed)'}
-        footer={`#${tokenInfo?.symbol || '(No symbol)'}`}
-      />
-      <FieldValue
-        header={transferMintAuthority === false ? 'False' : 'True'}
-        footer={
-          type === COMMUNITY_TYPE
-            ? 'DAO can mint tokens'
-            : type === COUNCIL_TYPE
-            ? 'DAO can add members'
-            : 'DAO can mint'
-        }
-      />
-      {type === COMMUNITY_TYPE && (
-        <FieldValue
-          header={Number(mintSupplyFactor).toLocaleString()}
-          footer={'Mint supply factor'}
-        />
-      )}
-    </>
+    <div
+      className={`bg-night-grey rounded-md pl-6 pr-8 py-6 grow ${className} flex justify-between items-center`}
+    >
+      <div className="flex flex-col">
+        <Text level="2" className="flex mb-2 text-white/50">
+          {title}
+          {advancedOption && (
+            <Text
+              level="3"
+              className="flex items-center px-2 ml-2 rounded bg-bkg-grey text-white/70"
+            >
+              Advanced Option
+            </Text>
+          )}
+        </Text>
+        {children}
+      </div>
+      <div>{rightSide ? rightSide : <></>}</div>
+    </div>
   )
 }
 
@@ -107,42 +48,83 @@ function CommunityInfo({
 
   return (
     <>
-      <Header as="h2">Community info</Header>
-      <div
-        className={`grid ${
-          nftIsCommunityToken ? 'grid-cols-3' : 'grid-cols-3'
-        } gap-4 mt-4`}
-      >
-        {!nftIsCommunityToken && (
-          <TokenInfo
-            type={COMMUNITY_TYPE}
-            tokenInfo={tokenInfo}
-            transferMintAuthority={transferMintAuthority}
-            mintSupplyFactor={mintSupplyFactor}
-          />
-        )}
-        {nftIsCommunityToken && (
-          <FieldValue
-            img={nftInfo.image || '/icons/threshold-icon.svg'}
-            header={nftInfo?.name}
-            footer={`${Number(
-              nftInfo?.nftCollectionCount
-            ).toLocaleString()} NFTs`}
-          />
-        )}
-        <FieldValue
-          img="/icons/threshold-icon.svg"
-          header={`${yesVotePercentage}%`}
-          footer="Approval threshold"
-        />
-        <FieldValue
-          header={
-            minimumNumberOfTokensToGovern
-              ? Number(minimumNumberOfTokensToGovern).toLocaleString()
-              : 'Disabled'
+      <div>
+        <Text level="1" className="mt-6">
+          Community info
+        </Text>
+      </div>
+      {nftIsCommunityToken ? (
+        <SummaryModule
+          title="Selected NFT collection"
+          rightSide={
+            <Text
+              level="2"
+              className="flex items-center px-6 py-1 ml-2 text-white rounded bg-bkg-grey"
+            >
+              {nftInfo?.nftCollectionCount?.toLocaleString()} NFTs
+            </Text>
           }
-          footer="Min. tokens to edit DAO"
-        />
+        >
+          <div className="flex">
+            <img
+              src={nftInfo.image || '/icons/threshold-icon.svg'}
+              className="w-8"
+            />
+            <Text level="0" className="ml-3 body-lg">
+              {nftInfo?.name || '(Collection has no name)'}
+            </Text>
+          </div>
+        </SummaryModule>
+      ) : (
+        <SummaryModule
+          title="Community token"
+          rightSide={
+            <Text
+              level="2"
+              className="flex items-center px-6 py-1 ml-2 text-white rounded bg-bkg-grey"
+            >
+              {tokenInfo?.symbol ? `#${tokenInfo.symbol}` : '(No symbol)'}
+            </Text>
+          }
+        >
+          <div className="flex">
+            <img
+              src={tokenInfo?.logoURI || '/icons/generic-token-icon.svg'}
+              className="w-8"
+            />
+            <Text level="0" className="ml-3 body-lg">
+              {tokenInfo?.name || '(Unnamed)'}
+            </Text>
+          </div>
+        </SummaryModule>
+      )}
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <SummaryModule title="Approval threshold">
+          <Text level="0" className="body-lg">
+            {yesVotePercentage}%
+          </Text>
+        </SummaryModule>
+        <SummaryModule
+          title={`Can DAO mint ${nftIsCommunityToken ? 'NFTs' : 'Tokens'}?`}
+        >
+          <Text level="0" className="body-lg">
+            {transferMintAuthority === true ? 'Yes' : 'No'}
+          </Text>
+        </SummaryModule>
+        {minimumNumberOfTokensToGovern && (
+          <SummaryModule title="Min. number of tokens needed to edit DAO">
+            <Text level="0" className="body-lg">
+              {minimumNumberOfTokensToGovern.toLocaleString()}
+            </Text>
+          </SummaryModule>
+        )}
+        {mintSupplyFactor && (
+          <SummaryModule title="Mint supply factor">
+            <Text level="0" className="body-lg">
+              {mintSupplyFactor}
+            </Text>
+          </SummaryModule>
+        )}
       </div>
     </>
   )
@@ -156,23 +138,50 @@ function CouncilInfo({
 }) {
   return (
     <>
-      <Header as="h2">Council info</Header>
-      <div className="grid grid-cols-2 gap-4">
-        <TokenInfo
-          type={COUNCIL_TYPE}
-          tokenInfo={tokenInfo}
-          transferMintAuthority={transferMintAuthority}
-        />
-        <FieldValue
-          img="/icons/council-members-icon.svg"
-          header={numberOfMembers}
-          footer="Council members"
-        />
-        <FieldValue
-          img="/icons/threshold-icon.svg"
-          header={`${yesVotePercentage}%`}
-          footer="Council approval"
-        />
+      <div>
+        <Text level="1" className="mt-6">
+          Council info
+        </Text>
+      </div>
+      <SummaryModule
+        title="Council token"
+        rightSide={
+          <Text
+            level="2"
+            className="flex items-center px-6 py-1 ml-2 text-white rounded bg-bkg-grey"
+          >
+            {tokenInfo.symbol !== '(No symbol)'
+              ? `#${tokenInfo.symbol}`
+              : '(No symbol)'}
+          </Text>
+        }
+      >
+        <div className="flex">
+          <img
+            src={tokenInfo?.logoURI || '/icons/generic-token-icon.svg'}
+            className="w-8"
+          />
+          <Text level="0" className="ml-3 body-lg">
+            {tokenInfo?.name || '(Unnamed)'}
+          </Text>
+        </div>
+      </SummaryModule>
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
+        <SummaryModule title="Council members">
+          <Text level="0" className="body-lg">
+            {numberOfMembers}
+          </Text>
+        </SummaryModule>
+        <SummaryModule title="Approval threshold">
+          <Text level="0" className="body-lg">
+            {yesVotePercentage}%
+          </Text>
+        </SummaryModule>
+        <SummaryModule title="Can DAO add council members?">
+          <Text level="0" className="body-lg">
+            {transferMintAuthority === true ? 'Yes' : 'No'}
+          </Text>
+        </SummaryModule>
       </div>
     </>
   )
@@ -186,18 +195,6 @@ export default function WizardSummary({
   submissionPending = false,
   onPrevClick,
 }) {
-  const [isModalOpen, setIsModalOpen] = useState(false)
-
-  function closeModal() {
-    if (!submissionPending) {
-      setIsModalOpen(false)
-    }
-  }
-
-  function openModal() {
-    setIsModalOpen(true)
-  }
-
   const nftCollectionMetadata =
     (formData?.collectionKey && formData?.collectionMetadata) || {}
   const nftCollectionCount = formData?.numberOfNFTs || 0
@@ -208,79 +205,53 @@ export default function WizardSummary({
   const programId = formData?.programId || ''
 
   return (
-    <>
-      <ConfirmationDialog
-        isOpen={isModalOpen}
-        onClose={submissionPending ? undefined : closeModal}
-        header={
-          <div className="flex items-center justify-center mb-2 space-x-2">
-            <img src="/img/logo-realms-blue.png" className="w-8 h-8" />
-            <Header as="h2" className="mb-0">
-              The Final Step
-            </Header>
-          </div>
-        }
-        closeButton={
-          <Button secondary disabled={submissionPending} onClick={closeModal}>
-            Cancel
-          </Button>
-        }
-        confirmButton={
-          <Button
-            onClick={onSubmit}
-            disabled={submissionPending}
-            loading={submissionPending}
-          >
-            Create DAO
-          </Button>
-        }
-      >
-        <Text level="2" className="opacity-60">
-          You are creating a new DAO on Solana and will have to confirm a
-          transaction with your currently-connected wallet. The creation of your
-          DAO will cost approximately 0.0001 SOL. The exact amount will be
-          determined by your wallet.
-        </Text>
-      </ConfirmationDialog>
-      <div data-testid="wizard-summary">
-        <FormHeader
-          type={type}
-          currentStep={currentStep}
-          totalSteps={currentStep}
-          title="Here's what you created. Does everything look right?"
-        />
-        <div className="pt-10">
-          <div className="flex flex-col space-y-4">
-            <SummaryCell className="flex space-x-4 md:space-x-8">
-              <div className="flex flex-col">
-                <Header as="h1" className="mb-4">
-                  {formData?.name}
+    <div data-testid="wizard-summary">
+      <FormHeader
+        type={type}
+        currentStep={currentStep}
+        totalSteps={currentStep}
+        title="Here's what you created. Does everything look right?"
+      />
+      <div className="mt-10 space-y-2">
+        <SummaryModule
+          title={type === MULTISIG_FORM ? 'Wallet name' : 'DAO name'}
+        >
+          <Header as="h3">{formData?.name}</Header>
+        </SummaryModule>
+        {type === MULTISIG_FORM ? (
+          <div className="grid grid-cols-2 gap-2">
+            <SummaryModule title="Invited members">
+              <Header as="h3">{formData?.memberAddresses?.length}</Header>
+            </SummaryModule>
+            <SummaryModule title="Approval threshold">
+              <Header as="h3" className="flex items-end">
+                {formData?.councilYesVotePercentage}
+
+                <Header as="h4" className="mb-0">
+                  %
                 </Header>
-                {formData?.description ? (
-                  <Text>{formData.description}</Text>
-                ) : (
-                  <Text level="2" className="text-white/60">
-                    No DAO description...
-                  </Text>
-                )}
-              </div>
-            </SummaryCell>
-            {type !== MULTISIG_FORM && (
-              <CommunityInfo
-                tokenInfo={formData.communityTokenInfo}
-                transferMintAuthority={formData.transferCommunityMintAuthority}
-                mintSupplyFactor={formData.communityMintSupplyFactor}
-                yesVotePercentage={formData.communityYesVotePercentage}
-                minimumNumberOfTokensToGovern={
-                  formData.minimumNumberOfCommunityTokensToGovern
-                }
-                nftInfo={nftCollectionInfo}
-              />
-            )}
+              </Header>
+            </SummaryModule>
+          </div>
+        ) : (
+          <>
+            <CommunityInfo
+              tokenInfo={formData.communityTokenInfo}
+              transferMintAuthority={formData.transferCommunityMintAuthority}
+              mintSupplyFactor={formData.communityMintSupplyFactor}
+              yesVotePercentage={formData.communityYesVotePercentage}
+              minimumNumberOfTokensToGovern={
+                formData.minimumNumberOfCommunityTokensToGovern
+              }
+              nftInfo={nftCollectionInfo}
+            />
             {(formData.addCouncil || formData?.memberAddresses?.length > 0) && (
               <CouncilInfo
                 tokenInfo={formData.councilTokenInfo}
-                transferMintAuthority={formData.transferCouncilMintAuthority}
+                transferMintAuthority={
+                  formData.transferCouncilMintAuthority ||
+                  !formData.useExistingCouncilToken
+                }
                 yesVotePercentage={
                   formData?.councilYesVotePercentage ||
                   formData.communityYesVotePercentage
@@ -288,28 +259,21 @@ export default function WizardSummary({
                 numberOfMembers={formData?.memberAddresses?.length}
               />
             )}
-
-            <div className="space-y-2">
-              {programId && (
-                <SummaryCell>
-                  <div className="flex items-baseline space-x-3">
-                    <div className="text-lg md:text-xl">Program ID</div>
-                    <div className="px-2 rounded bg-bkg-grey text-white/60">
-                      Advanced Option
-                    </div>
-                  </div>
-                  <div className="mt-2 text-lg text-white/50">{programId}</div>
-                </SummaryCell>
-              )}
-            </div>
-          </div>
-        </div>
-        <FormFooter
-          isValid
-          prevClickHandler={() => onPrevClick(currentStep)}
-          submitClickHandler={openModal}
-        />
+          </>
+        )}
+        {programId && (
+          <SummaryModule title="Program ID" advancedOption>
+            <Header as="h3">{programId}</Header>
+          </SummaryModule>
+        )}
       </div>
-    </>
+      <FormFooter
+        isValid
+        loading={submissionPending}
+        ctaText={type === MULTISIG_FORM ? 'Create wallet' : 'Create DAO'}
+        prevClickHandler={() => onPrevClick(currentStep)}
+        submitClickHandler={onSubmit}
+      />
+    </div>
   )
 }
