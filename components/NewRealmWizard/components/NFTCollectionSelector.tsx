@@ -5,7 +5,7 @@ import GradientCheckmarkCircle from './GradientCheckmarkCircle'
 
 const NFTCollectionSelector = ({ collections = {}, onChange, value }) => {
   const optionClass =
-    'z-0 flex flex-wrap md:items-center md:space-x-8 flex-wrap py-4 px-2 md:px-8 relative w-full default-transition rounded-md hover:cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 hover:opacity-100 hover:bg-black'
+    'z-0 group flex flex-wrap md:items-center md:space-x-8 flex-wrap py-4 px-2 md:px-8 relative w-full default-transition rounded-md hover:cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 hover:opacity-100 hover:bg-black'
 
   if (Object.keys(collections).length === 0) {
     return (

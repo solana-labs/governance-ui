@@ -1,11 +1,11 @@
-export default function ({ selected = false, hover = false }) {
+export default function ({ selected = false }) {
   return (
     <div
       className={`h-[32px] w-[32px] rounded-full flex items-center justify-center text-black ${
         selected
           ? 'bg-gradient-to-r from-[#00C2FF] via-[#00E4FF] to-[#87F2FF]'
-          : 'border'
-      } ${hover ? 'border-white/50' : 'border-white/30'}`}
+          : 'border border-white/30'
+      } group-hover:border-white/50`}
     >
       {selected && (
         <svg

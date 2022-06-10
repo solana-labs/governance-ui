@@ -1,4 +1,4 @@
-import { FunctionComponent, useState } from 'react'
+import { FunctionComponent } from 'react'
 import Loading, { LoadingDots } from './Loading'
 import Tooltip from './Tooltip'
 import Header from './Header'
@@ -139,9 +139,8 @@ export const RadioButton: FunctionComponent<NewButtonProps> = ({
   children,
   ...props
 }) => {
-  const [hoverState, setHoverState] = useState(false)
   let classNames =
-    'default-transition py-3 px-2 h-[72px] min-w-[208px] text-white rounded border border-white/30 hover:bg-white/10 hover:border-white disabled:opacity-20 disabled:hover:border-white/30'
+    'group default-transition py-3 px-2 h-[72px] min-w-[208px] text-white rounded border border-white/30 hover:bg-white/10 hover:border-white disabled:opacity-20 disabled:hover:border-white/30'
   if (selected) {
     classNames += ' bg-white/10 border-white focus:border-blue'
   } else {
@@ -155,15 +154,9 @@ export const RadioButton: FunctionComponent<NewButtonProps> = ({
       type="button"
       disabled={props.disabled}
       {...props}
-      onMouseOver={() => {
-        setHoverState(true)
-      }}
-      onMouseOut={() => {
-        setHoverState(false)
-      }}
     >
       <div className="flex items-center pl-4 space-x-3 md:pl-0 md:justify-center">
-        <GradientCheckmarkCircle selected={selected} hover={hoverState} />
+        <GradientCheckmarkCircle selected={selected} />
         <Header as="cta">{children}</Header>
       </div>
     </button>
