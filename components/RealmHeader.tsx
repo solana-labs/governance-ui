@@ -58,11 +58,6 @@ const RealmHeader = () => {
               )}
               <div className="flex items-center">
                 <h1 className="ml-3">{realmDisplayName}</h1>
-                {realmInfo?.isCertified ? (
-                  <Tooltip content="Certified DAO">
-                    <BadgeCheckIcon className="cursor-help h-5 ml-1.5 text-green w-5" />
-                  </Tooltip>
-                ) : null}
               </div>
             </div>
           </div>
