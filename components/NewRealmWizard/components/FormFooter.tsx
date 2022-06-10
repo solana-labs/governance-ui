@@ -38,7 +38,7 @@ const FormFooter: React.FC<FormFooterProps> = ({
   submitClickHandler,
 }) => {
   return (
-    <div className="flex flex-wrap items-center justify-end pt-10 sm:pt-12 md:pt-16">
+    <div className="absolute right-0 flex items-center bottom-10 sm:bottom-20">
       <div className="flex justify-center w-full mt-8 space-x-4 md:justify-between md:w-fit md:mt-0">
         <button
           type="button"
