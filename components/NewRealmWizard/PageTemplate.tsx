@@ -1,7 +1,6 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 
-import useLocalStorageState from '@hooks/useLocalStorageState'
 import { isWizardValid } from '@utils/formValidation'
 
 import CreateDAOWizard from '@components/NewRealmWizard/CreateDAOWizard'
@@ -19,27 +18,17 @@ export const Section = ({ children }) => {
 
 export default function FormPage({
   type,
-  ssFormKey,
   steps,
   handleSubmit,
   submissionPending,
 }) {
   const { connected, current: wallet } = useWalletStore((s) => s)
   const userAddress = wallet?.publicKey?.toBase58()
-  const [formData, setFormData] = useLocalStorageState<any>(ssFormKey, {
+  const [formData, setFormData] = useState<any>({
     memberAddresses: userAddress ? [userAddress] : undefined,
   })
   const { query, push } = useRouter()
   const currentStep = formData?.currentStep || 0
-
-  useEffect(() => {
-    window.addEventListener('beforeunload', promptUserBeforeLeaving)
-    window.addEventListener('unload', purgeFormData)
-    return () => {
-      window.removeEventListener('beforeunload', promptUserBeforeLeaving)
-      window.removeEventListener('unload', purgeFormData)
-    }
-  }, [])
 
   useEffect(() => {
     async function tryToConnect() {
@@ -63,17 +52,6 @@ export default function FormPage({
       handlePreviousButton(currentStep)
     }
   }, [currentStep])
-
-  function promptUserBeforeLeaving(ev) {
-    ev.preventDefault()
-    if (formData) {
-      ev.returnValue = true
-    }
-  }
-
-  function purgeFormData() {
-    setFormData({})
-  }
 
   function handleNextButtonClick({ step: fromStep, data }) {
     const updatedFormState = {
@@ -109,7 +87,6 @@ export default function FormPage({
     )
 
     if (fromStep === 0) {
-      purgeFormData()
       push(
         {
           pathname: '/realms/new/',

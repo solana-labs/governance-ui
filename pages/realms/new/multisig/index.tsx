@@ -103,7 +103,6 @@ export default function MultiSigWizard() {
   return (
     <FormPage
       type={FORM_NAME}
-      ssFormKey={SESSION_STORAGE_FORM_KEY}
       steps={steps}
       handleSubmit={handleSubmit}
       submissionPending={requestPending}

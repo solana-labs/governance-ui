@@ -4,6 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import clsx from 'clsx'
 
+import useWalletStore from 'stores/useWalletStore'
 import FormHeader from '@components/NewRealmWizard/components/FormHeader'
 import FormField from '@components/NewRealmWizard/components/FormField'
 import FormFooter from '@components/NewRealmWizard/components/FormFooter'
@@ -124,6 +125,8 @@ export default function InviteMembersForm({
   currentStep,
   totalSteps,
 }) {
+  const { current } = useWalletStore((s) => s)
+  const userAddress = current?.publicKey?.toBase58()
   const inputElement = useRef<HTMLInputElement>(null)
   const [inviteList, setInviteList] = useState<string[]>([])
   const [invalidAddresses, setInvalidAddresses] = useState<string[]>([])
@@ -249,6 +252,7 @@ export default function InviteMembersForm({
                 <InviteAddress
                   key={address}
                   address={address}
+                  currentUser={address === userAddress}
                   index={index + 1}
                   onRemoveClick={() => removeAddressFromInviteList(address)}
                 />
