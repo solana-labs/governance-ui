@@ -16,9 +16,10 @@ export default function Header({
   } else if (as === 'h4') {
     classNames += ` heading-sm`
   } else if (as === 'h5') {
-    className += ` heading-xs`
-  } else if (as === 'h6') {
-    className += ` heading-cta`
+    classNames += ` heading-xs`
+  } else if (as === 'h6' || as === 'cta') {
+    as = 'div'
+    classNames += ` heading-cta`
   }
 
   classNames += ` ${className}`

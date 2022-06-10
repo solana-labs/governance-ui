@@ -2,7 +2,7 @@ h1.heading-xl,
 h2.heading-lg,
 h3.heading-base,
 h4.heading-sm,
-h6.heading-cta {
+.heading-cta {
   letter-spacing: -0.5px;
   line-height: 110%;
   @apply font-serif font-normal;
@@ -29,9 +29,9 @@ h4.heading-sm {
 }
 
 /* CTAs */
-h6.heading-cta {
-  font-size: 14px;
-  @apply md:text-[16px];
+.heading-cta {
+  font-size: 16px;
+  @apply md:text-[18px];
 }
 
 .body-base,

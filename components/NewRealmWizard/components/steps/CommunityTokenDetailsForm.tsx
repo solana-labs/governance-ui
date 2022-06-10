@@ -174,8 +174,8 @@ export default function CommunityTokenForm({
                 <RadioGroup
                   {...field}
                   options={[
-                    { label: 'Yes, I do', value: true },
-                    { label: 'No', value: false },
+                    { label: 'Yes', value: true },
+                    { label: 'No, make one for me', value: false },
                   ]}
                 />
               </FormField>

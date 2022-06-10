@@ -57,7 +57,7 @@ const FormFooter: React.FC<FormFooterProps> = ({
           {loading ? (
             <LoadingDots className="px-8" />
           ) : ctaText ? (
-            <Header as="h6" className="relative z-20 px-8">
+            <Header as="cta" className="relative z-20 px-8">
               {ctaText}
             </Header>
           ) : (

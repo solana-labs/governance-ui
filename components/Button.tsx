@@ -207,9 +207,9 @@ export const RadioButton: FunctionComponent<NewButtonProps> = ({
         setHoverState(false)
       }}
     >
-      <div className="flex items-center justify-center space-x-3">
+      <div className="flex items-center pl-4 space-x-3 md:pl-0 md:justify-center">
         <GradientCheckmarkCircle selected={selected} hover={hoverState} />
-        <Header as="h6">{children}</Header>
+        <Header as="cta">{children}</Header>
       </div>
     </button>
   )

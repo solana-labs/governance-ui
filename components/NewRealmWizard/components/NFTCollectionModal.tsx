@@ -34,7 +34,7 @@ export default function NFTCollectionModal({
         <div className="flex flex-col items-center py-4 mb-2 space-x-4 text-center">
           <Header as="h4">Choose a collection from your wallet</Header>
           <Header
-            as="h6"
+            as="cta"
             className="flex items-center justify-center mt-1 space-x-1 text-white/50"
           >
             <WalletIcon />
