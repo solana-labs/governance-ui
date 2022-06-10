@@ -56,12 +56,8 @@ export default function TokenInfoTable({ tokenInfo, loading }) {
               <img src={tokenInfo?.logoURI} alt="token" className="w-full" />
             </div>
           ) : (
-            <div className="w-10 mr-4">
-              <img
-                src="/icons/generic-token-icon.svg"
-                alt="token icon"
-                className="h-full"
-              />
+            <div className="w-10 mr-4 text-white/50">
+              <GenericTokenIcon />
             </div>
           )}
           {tokenInfo?.name ? (

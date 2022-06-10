@@ -5,6 +5,7 @@ import Header from '@components/Header'
 import Text from '@components/Text'
 
 import { FORM_NAME as MULTISIG_FORM } from 'pages/realms/new/multisig'
+import { GenericTokenIcon } from './TokenInfoTable'
 
 function SummaryModule({
   className = '',
@@ -90,10 +91,13 @@ function CommunityInfo({
           }
         >
           <div className="flex items-center">
-            <img
-              src={tokenInfo?.logoURI || '/icons/generic-token-icon.svg'}
-              className="w-8"
-            />
+            {tokenInfo?.logoURI ? (
+              <img src={tokenInfo.logoURI} className="w-8" />
+            ) : (
+              <div className="w-8 text-white/50">
+                <GenericTokenIcon />
+              </div>
+            )}
             <Text level="0" className="ml-2 input-base">
               {tokenInfo?.name || '(Unnamed)'}
             </Text>
@@ -159,10 +163,13 @@ function CouncilInfo({
         }
       >
         <div className="flex items-center">
-          <img
-            src={tokenInfo?.logoURI || '/icons/generic-token-icon.svg'}
-            className="w-8"
-          />
+          {tokenInfo?.logoURI ? (
+            <img src={tokenInfo.logoURI} className="w-8" />
+          ) : (
+            <div className="w-8 text-white/50">
+              <GenericTokenIcon />
+            </div>
+          )}
           <Text level="0" className="ml-2 input-base">
             {tokenInfo?.name || '(Unnamed)'}
           </Text>
