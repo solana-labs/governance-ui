@@ -1,4 +1,3 @@
-import Header from '@components/Header'
 import Text from '@components/Text'
 
 export function GenericTokenIcon() {
