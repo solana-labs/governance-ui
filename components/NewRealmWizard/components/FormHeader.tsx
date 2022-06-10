@@ -11,9 +11,9 @@ function StepProgressIndicator({ formType, currentStep, totalSteps }) {
   if (formType == GOVTOKEN_FORM) {
     stepTitle = 'Tokenized DAO: '
   } else if (formType == MULTISIG_FORM) {
-    stepTitle = 'Multisig wallet: '
+    stepTitle = 'Multisig Wallet: '
   } else if (formType == NFT_FORM) {
-    stepTitle = 'NFT community DAO: '
+    stepTitle = 'NFT Community DAO: '
   }
 
   return (

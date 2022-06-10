@@ -65,7 +65,7 @@ function CommunityInfo({
             </Text>
           }
         >
-          <div className="flex">
+          <div className="flex items-center">
             <img
               src={nftInfo.image || '/icons/threshold-icon.svg'}
               className="w-8"
@@ -87,7 +87,7 @@ function CommunityInfo({
             </Text>
           }
         >
-          <div className="flex">
+          <div className="flex items-center">
             <img
               src={tokenInfo?.logoURI || '/icons/generic-token-icon.svg'}
               className="w-8"
