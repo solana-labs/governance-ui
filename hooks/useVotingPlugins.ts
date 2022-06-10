@@ -136,15 +136,11 @@ export function useVotingPlugins() {
 
       let idl = await anchor.Program.fetchIdl(sbv2.SBV2_MAINNET_PID, provider)
       if (!idl) {
-        console.log("Off chain idl");
         idl = sbIdl as anchor.Idl
       }
-      console.log("IDL");
-      console.log(idl);
 
       let addinIdl = await anchor.Program.fetchIdl(SWITCHBOARD_ADDIN_ID, provider)
       if (!addinIdl) {
-        console.log("Off chain addin idl");
         addinIdl = gonIdl as anchor.Idl
       }
 
@@ -216,13 +212,11 @@ export function useVotingPlugins() {
         }
         catch (e) {
           console.log(e);
-          console.log("the authority isn't a governance");
         }
       }
 
       setOracleKeys(myNodesForRealm, currentClient);
       setInstructions(setVoterWeightInstructions, currentClient);
-      console.log(myNodesForRealm);
 
       try {
         const [
@@ -238,16 +232,12 @@ export function useVotingPlugins() {
           connection.current,
           voterWeightRecord
         )
-        console.log(vwr)
         if (vwr && vwr.account.realm.equals(realm.pubkey)) {
-          console.log(vwr.account.voterWeight.toNumber())
           // get voting power
-          console.log("SWITCHBOARD VOTER WEIGHT FOUND AND SET");
           setVotingPower(vwr.account.voterWeight)
         } else {
           // 'no sb governance'
           setVotingPower(new anchor.BN(0))
-          console.log("NO VOTER WEIGHT");
         }
       }
       catch(e) {
