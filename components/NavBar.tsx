@@ -13,8 +13,13 @@ const NavBar = () => {
       <div className="flex items-center justify-between h-20 col-span-12 px-4 xl:col-start-2 xl:col-span-10 md:px-8 xl:px-4">
         <Link href={fmtUrlWithCluster('/realms')}>
           <div className="flex cursor-pointer sm:items-center min-w-[36px]">
-            <img src="/img/logo-realms-blue.png" className="w-8 h-8" />
-            <span className="hidden font-light sm:block sm:ml-1">Realms</span>
+            <picture>
+              <source
+                srcSet="/img/logotype-realms-blue-white.svg"
+                media="(min-width: 640px)"
+              />
+              <img src="/img/logo-realms.svg" className="w-8 h-8 md:w-24" />
+            </picture>
           </div>
         </Link>
         <div className="flex flex-wrap items-center justify-end">
