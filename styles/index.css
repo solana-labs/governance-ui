@@ -261,7 +261,7 @@ input[type='range'].with-gradient::-moz-range-thumb {
   height: 32px;
   flex-grow: 0;
   border-radius: 25px;
-  outline: solid 5px rgba(255, 255, 255, 0.08);
+  border: solid 5px rgba(255, 255, 255, 0.08);
   background-color: #fff;
   transition: background 0.3s ease-in-out;
 }
@@ -281,7 +281,7 @@ input[type='range'].with-gradient::-webkit-slider-thumb {
   height: 32px;
   flex-grow: 0;
   border-radius: 25px;
-  outline: solid 5px rgba(255, 255, 255, 0.08);
+  border: solid 5px rgba(255, 255, 255, 0.08);
   background-color: #fff;
   transition: background 0.3s ease-in-out;
 }

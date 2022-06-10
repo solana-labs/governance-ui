@@ -406,7 +406,20 @@ export default function AddNFTCollectionForm({
           render={({ field, fieldState: { error } }) => (
             <FormField
               title="What is the NFT collection address?"
-              description="Only collections verified via Metaplex can be used."
+              description={
+                <div>
+                  Only{' '}
+                  <a
+                    href="https://www.metaplex.com/posts/certified-collections"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline hover:text-white/50"
+                  >
+                    Metaplex standard certified collections
+                  </a>{' '}
+                  may be used.
+                </div>
+              }
             >
               <Input
                 placeholder="e.g. SMBH3wF6baUj6JWtzYvqcKuj2XCKWDqQxzspY12xPND"
@@ -471,8 +484,8 @@ export default function AddNFTCollectionForm({
             {!selectedNFTCollection?.name ? (
               <SkeletonNFTCollectionInfo />
             ) : (
-              <div className="flex">
-                <div className="relative h-24 pl-2 w-28">
+              <div className="flex w-full">
+                <div className="relative h-24 pl-2 shrink-0 w-28">
                   {selectedNFTCollection?.nfts
                     ?.slice(0, 3)
                     .map((nft, index) => {
@@ -498,7 +511,7 @@ export default function AddNFTCollectionForm({
                     className="absolute w-24 rounded-md"
                   />
                 </div>
-                <div className="w-full pl-8">
+                <div className="grid w-full pl-4">
                   <Text level="1" className="break-words">
                     {selectedNFTCollection?.name || '(Collection has no name)'}
                   </Text>
@@ -512,7 +525,7 @@ export default function AddNFTCollectionForm({
                         {selectedNFTCollection.external_url}
                       </a>
                     ) : (
-                      '(Collection has no external address)'
+                      '(No external address)'
                     )}
                   </Text>
                   <Text

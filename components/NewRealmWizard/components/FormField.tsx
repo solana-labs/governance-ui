@@ -146,7 +146,7 @@ interface Props {
   advancedOption?: boolean
   children: React.ReactNode
   className?: string
-  description: string
+  description: string | React.ReactNode
   disabled?: boolean
   optional?: boolean
   title: string
