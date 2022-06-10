@@ -15,6 +15,7 @@ import {
 import { PublicKey } from '@solana/web3.js'
 import Button, { LinkButton, SecondaryButton } from '@components/Button'
 import Input from '@components/inputs/Input'
+import {SWITCHBOARD_GRANT_AUTHORITY} from '../../../../SwitchboardVotePlugin/SwitchboardQueueVoterClient'
 import Select from '@components/inputs/Select'
 import Textarea from '@components/inputs/Textarea'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
@@ -256,10 +257,27 @@ const New = () => {
 
       try {
         // Fetch governance to get up to date proposalCount
-        selectedGovernance = (await fetchRealmGovernance(
-          governance.pubkey
-        )) as ProgramAccount<Governance>
 
+        if (governance.pubkey != undefined) {
+          selectedGovernance = (await fetchRealmGovernance(
+            governance.pubkey
+          )) as ProgramAccount<Governance>
+        }
+        else {
+          selectedGovernance = (await fetchRealmGovernance(
+            governance
+          )) as ProgramAccount<Governance>
+        }
+
+        console.log("creating proposal with args:");
+        console.log({
+          title: form.title,
+          description: form.description,
+          governance: selectedGovernance,
+          instructionsData,
+          voteByCouncil,
+          isDraft,
+        });
         proposalAddress = await handleCreateProposal({
           title: form.title,
           description: form.description,
@@ -290,11 +308,16 @@ const New = () => {
   }, [instructionsData[0].governedAccount?.pubkey])
 
   useEffect(() => {
+    console.log("this useeffect was called...");
     const governedAccount = extractGovernanceAccountFromInstructionsData(
       instructionsData
     )
 
     setGovernance(governedAccount)
+    try {
+    console.log(`${governedAccount.toBase58()} vs ${SWITCHBOARD_GRANT_AUTHORITY.toBase58()}`);
+    }
+    catch(e) {}
   }, [instructionsData])
 
   const getCurrentInstruction = ({ typeId, idx }) => {
@@ -619,8 +642,7 @@ const New = () => {
             </NewProposalContext.Provider>
             <div className="flex justify-end mt-4 mb-8 px-6">
               <LinkButton
-                className="flex font-bold items-center text-fgd-1 text-sm"
-                onClick={addInstruction}
+                className="flex font-bold items-center text-fgd-1 text-sm" onClick={addInstruction}
               >
                 <PlusCircleIcon className="h-5 mr-1.5 text-green w-5" />
                 Add transaction

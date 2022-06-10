@@ -1,5 +1,5 @@
 import { Program, Provider } from '@project-serum/anchor'
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey, Transaction } from '@solana/web3.js'
 import { Switchboard, IDL } from './SwitchboardIdl'
 //import { NftVoter, IDL } from './nft_voter';
 
@@ -39,4 +39,30 @@ export class SwitchboardQueueVoterClient {
       devnet
     )
   }
+}
+
+export async function grantPermissionTx (
+  program: Program, 
+  grantAuthority: PublicKey,
+  switchboardProgram: PublicKey,
+  permission: PublicKey,
+): Promise<Transaction> {
+
+  let [addinState, _] = await PublicKey.findProgramAddress(
+    [
+      Buffer.from('state'),
+    ],
+    program.programId,
+  );
+
+  return await program.methods
+    .grantPermission()
+    .accounts({
+      state: addinState,
+      grantAuthority: grantAuthority,
+      switchboardProgram: switchboardProgram,
+      permission: permission
+    })
+    .transaction();
+
 }

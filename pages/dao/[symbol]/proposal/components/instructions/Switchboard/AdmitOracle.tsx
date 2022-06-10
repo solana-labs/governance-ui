@@ -1,8 +1,12 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
 //import { ForesightHasMarketId } from '@utils/uiTypes/proposalCreationTypes'
-import { Governance } from '@solana/spl-governance'
-import { ProgramAccount } from '@solana/spl-governance'
+import { 
+  ProgramAccount,
+  serializeInstructionToBase64,
+  Governance,
+  getGovernance
+} from '@solana/spl-governance'
 /*import {
   governance as foresightGov,
   utils,
@@ -24,7 +28,13 @@ import useWalletStore from 'stores/useWalletStore'
 import * as anchor from '@project-serum/anchor'
 import sbIdl from 'SwitchboardVotePlugin/switchboard_v2.json';
 import gonIdl from 'SwitchboardVotePlugin/gameofnodes.json';
-import { QUEUE_LIST, SWITCHBOARD_ID, SWITCHBOARD_ADDIN_ID, SWITCHBOARD_GRANT_AUTHORITY } from 'SwitchboardVotePlugin/SwitchboardQueueVoterClient'
+import { 
+  QUEUE_LIST, 
+  SWITCHBOARD_ID, 
+  SWITCHBOARD_ADDIN_ID, 
+  SWITCHBOARD_GRANT_AUTHORITY,
+  grantPermissionTx
+} from 'SwitchboardVotePlugin/SwitchboardQueueVoterClient'
 import { NewProposalContext } from '../../../new'
 
 const SwitchboardAdmitOracle = ({
@@ -65,12 +75,11 @@ const SwitchboardAdmitOracle = ({
 
   const { realm } = useRealm()
   const [form, setForm] = useState<SwitchboardAdmitOracleForm>({})
-  const [programs, setPrograms] = useState({});
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
-  const { handleSetInstructions } = useContext(NewProposalContext)
+  const { handleSetInstructions, setGovernance } = useContext(NewProposalContext)
 
-  useEffect(() => {
+  /*useEffect(() => {
 
     async function getIdls() {
       const options = anchor.AnchorProvider.defaultOptions()
@@ -97,27 +106,25 @@ const SwitchboardAdmitOracle = ({
         SWITCHBOARD_ID,
         provider
       )
+      console.log(switchboardProgram);
 
       const addinProgram = new anchor.Program(
         addinIdl,
         SWITCHBOARD_ADDIN_ID,
         provider
       )
+      console.log(switchboardProgram);
+
       setPrograms({...programs, ['provider']: provider});
-      console.log(programs);
       setPrograms({...programs, ['addinProgram']: addinProgram});
-      console.log(programs);
       setPrograms({...programs, ['switchboardProgram']: switchboardProgram});
-      console.log(programs);
       setPrograms({...programs, ['addinIdl']: addinIdl});
-      console.log(programs);
       setPrograms({...programs, ['idl']: idl});
-      console.log(programs);
 
     }
     getIdls();
 
-  }, [realm]);
+  }, [realm]);*/
 
   useEffect(() => {
 
@@ -128,39 +135,20 @@ const SwitchboardAdmitOracle = ({
 
   }, [form]);
 
+  /*useEffect(() => {
+    async function getAndSetGov() {
+      let gov = await getGovernance(connection.current, SWITCHBOARD_GRANT_AUTHORITY);
+      console.log("GOT GOV");
+      console.log(gov);
+      setGovernance(SWITCHBOARD_GRANT_AUTHORITY);
+      //console.log("And set it.");
+    }
+    getAndSetGov();
+  }, [realm]);*/
+
   async function getInstruction(): Promise<UiInstruction> {
 
-      let provider = programs.provider;
-
-      console.log("IN GET INSTRUCTION");
-      console.log(programs);
-      let [addinState, _] = await PublicKey.findProgramAddress(
-        [
-          Buffer.from('state'),
-        ],
-        programs.addinProgram.programId,
-      );
-
-      let p = sbv2.PermissionAccount.fromSeed(
-        programs.switchboardProgram,
-        addinState,
-        form.queuePubkey,
-        form.oraclePubkey,
-      );
-
-      let setTx = await p.setTx({
-        permission: sbv2.SwitchboardPermission.PERMIT_ORACLE_HEARTBEAT,
-        addinProgram: programs.addinProgram,
-        realm: realm,
-      });
-
-      return {
-        serializedInstruction: serializeInstructionToBase64(setTx.instructions[0]),
-        isValid: true,
-        governance: SWITCHBOARD_GRANT_AUTHORITY,
-      };
-
-      /*const options = anchor.AnchorProvider.defaultOptions()
+      const options = anchor.AnchorProvider.defaultOptions()
       const provider = new anchor.AnchorProvider(
         connection.current,
         (wallet as unknown) as anchor.Wallet,
@@ -168,13 +156,13 @@ const SwitchboardAdmitOracle = ({
       )
 
       const switchboardProgram = new anchor.Program(
-        programs.idl,
+        sbIdl,
         SWITCHBOARD_ID,
         provider
       )
 
       const addinProgram = new anchor.Program(
-        programs.addinIdl,
+        gonIdl,
         SWITCHBOARD_ADDIN_ID,
         provider
       )
@@ -186,23 +174,27 @@ const SwitchboardAdmitOracle = ({
         addinProgram.programId,
       );
 
-      let addinStateData = await addinProgram.account.state.fetch(addinState);
       let p = sbv2.PermissionAccount.fromSeed(
         switchboardProgram,
         addinState,
-        form.queuePubkey,
-        form.oraclePubkey,
+        new PublicKey(form.queuePubkey),
+        new PublicKey(form.oraclePubkey),
+      )[0];
+      console.log("P:");
+      console.log(p);
+
+      let grantTx = await grantPermissionTx(
+        addinProgram,
+        SWITCHBOARD_GRANT_AUTHORITY,
+        SWITCHBOARD_ID,
+        p.publicKey
       );
-      let setTx = await p.setTx({
-        permission: sbv2.SwitchboardPermission.PERMIT_ORACLE_HEARTBEAT,
-        addinProgram: addinProgram,
-        realm: realm,
-      });
+
       return {
-        serializedInstruction: serializeInstructionToBase64(setTx.instructions[0]),
+        serializedInstruction: serializeInstructionToBase64(grantTx.instructions[0]),
         isValid: true,
-        governance: addinStateData.grantAuthority,
-      };*/
+        governance: SWITCHBOARD_GRANT_AUTHORITY,
+      };
       /*const isValid = await validateInstruction()
 
       if (
@@ -253,7 +245,8 @@ const SwitchboardAdmitOracle = ({
       type="text"
       value={form.oraclePubkey}
       onChange={(text) => {
-        setForm({ ...form, ['oraclePubkey']: text.target.value })
+        setForm({ ...form, ['oraclePubkey']: text.target.value });
+        setGovernance();
       }}
     />
     <Input
