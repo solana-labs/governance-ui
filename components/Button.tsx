@@ -1,4 +1,4 @@
-import { FunctionComponent, useState, useEffect } from 'react'
+import { FunctionComponent, useState } from 'react'
 import Loading, { LoadingDots } from './Loading'
 import Tooltip from './Tooltip'
 import Header from './Header'
@@ -105,19 +105,11 @@ export const NewButton: FunctionComponent<NewButtonProps> = ({
   children,
   ...props
 }) => {
-  const [loadingStart, setLoadingStart] = useState(false)
-  const [loadingEnd, setLoadingEnd] = useState(false)
-
   let classNames = `heading-cta default-transition rounded-full focus-visible:outline-none disabled:cursor-not-allowed `
 
-  if (loading || loadingEnd) {
-    classNames += ' h-[64px] min-w-[208px] border'
-    if (loadingEnd) {
-      classNames +=
-        ' border-confirm-green disabled:border-confirm-green text-confirm-green disabled:text-confirm-green'
-    } else {
-      classNames += ' border-white disabled:border-white'
-    }
+  if (loading) {
+    classNames +=
+      ' h-[64px] min-w-[208px] border border-white/30 disabled:border-white/30'
   } else if (secondary) {
     classNames +=
       'py-3 px-2 h-[64px] min-w-[208px] text-white border border-white/30 focus:border-white hover:bg-white hover:text-black active:bg-white/70 active:text-black active:border-none disabled:bg-white/10 disabled:text-black disabled:border-none '
@@ -130,50 +122,13 @@ export const NewButton: FunctionComponent<NewButtonProps> = ({
 
   classNames += ` ${className}`
 
-  useEffect(() => {
-    if (!loading && loadingStart) {
-      setLoadingEnd(true)
-      setLoadingStart(false)
-    } else {
-      setLoadingStart(true)
-    }
-  }, [loading])
-
-  useEffect(() => {
-    if (loadingEnd) {
-      setTimeout(() => {
-        setLoadingEnd(false)
-      }, 3000)
-    }
-  }, [loadingEnd])
   return (
     <button
       className={classNames}
-      disabled={props.disabled || loading || loadingEnd}
+      disabled={props.disabled || loading}
       {...props}
     >
-      {!loading && !loadingEnd ? (
-        children
-      ) : loadingEnd ? (
-        <div className="flex justify-center">
-          <svg
-            width="16"
-            height="13"
-            viewBox="0 0 16 13"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M15.4144 3.41436L6.00015 12.8286L0.585938 7.41437L3.41436 4.58594L6.00015 7.17172L12.5859 0.585938L15.4144 3.41436Z"
-              fill="currentColor"
-            />
-          </svg>
-        </div>
-      ) : (
-        <LoadingDots />
-      )}
+      {!loading ? children : <LoadingDots />}
     </button>
   )
 }
