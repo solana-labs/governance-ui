@@ -8,7 +8,7 @@ const RelevantLinks = {
 
 const Socials = {
   Twitter: {
-    url: 'https://twitter.com/solana',
+    url: 'https://twitter.com/Realms_DAOs',
     imgSrc: '/icons/twitter.svg',
   },
   Github: {

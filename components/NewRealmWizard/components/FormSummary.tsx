@@ -15,7 +15,7 @@ function SummaryModule({
 }) {
   return (
     <div
-      className={`bg-night-grey rounded-md pl-6 pr-8 py-6 grow ${className} flex justify-between items-center`}
+      className={`bg-night-grey rounded-md pl-6 pr-8 py-6 grow ${className} flex flex-wrap justify-between items-center`}
     >
       <div className="flex flex-col">
         <Text level="2" className="flex mb-2 text-white/50">
@@ -31,7 +31,7 @@ function SummaryModule({
         </Text>
         {children}
       </div>
-      <div>{rightSide ? rightSide : <></>}</div>
+      <div className="mt-2 md:mt-0">{rightSide ? rightSide : <></>}</div>
     </div>
   )
 }
@@ -59,7 +59,7 @@ function CommunityInfo({
           rightSide={
             <Text
               level="2"
-              className="flex items-center px-6 py-1 ml-2 text-white rounded bg-bkg-grey"
+              className="flex items-center px-6 py-1 text-white rounded bg-bkg-grey"
             >
               {nftInfo?.nftCollectionCount?.toLocaleString()} NFTs
             </Text>
@@ -81,7 +81,7 @@ function CommunityInfo({
           rightSide={
             <Text
               level="2"
-              className="flex items-center px-6 py-1 ml-2 text-white rounded bg-bkg-grey"
+              className="flex items-center px-6 py-1 text-white rounded bg-bkg-grey"
             >
               {tokenInfo?.symbol && tokenInfo.symbol !== '(No symbol)'
                 ? `#${tokenInfo.symbol}`
@@ -94,7 +94,7 @@ function CommunityInfo({
               src={tokenInfo?.logoURI || '/icons/generic-token-icon.svg'}
               className="w-8"
             />
-            <Text level="0" className="ml-3 input-base">
+            <Text level="0" className="ml-2 input-base">
               {tokenInfo?.name || '(Unnamed)'}
             </Text>
           </div>
@@ -150,7 +150,7 @@ function CouncilInfo({
         rightSide={
           <Text
             level="2"
-            className="flex items-center px-6 py-1 ml-2 text-white rounded bg-bkg-grey"
+            className="flex items-center px-6 py-1 text-white rounded bg-bkg-grey"
           >
             {tokenInfo?.symbol && tokenInfo.symbol !== '(No symbol)'
               ? `#${tokenInfo.symbol}`
@@ -158,12 +158,12 @@ function CouncilInfo({
           </Text>
         }
       >
-        <div className="flex">
+        <div className="flex items-center">
           <img
             src={tokenInfo?.logoURI || '/icons/generic-token-icon.svg'}
             className="w-8"
           />
-          <Text level="0" className="ml-3 input-base">
+          <Text level="0" className="ml-2 input-base">
             {tokenInfo?.name || '(Unnamed)'}
           </Text>
         </div>
