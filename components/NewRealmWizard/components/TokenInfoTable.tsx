@@ -66,7 +66,9 @@ export default function TokenInfoTable({ tokenInfo, loading }) {
             </div>
           )}
           {tokenInfo?.name ? (
-            <Header as="h4">{tokenInfo.name}</Header>
+            <Text level="0" className="input-base">
+              {tokenInfo.name}
+            </Text>
           ) : (
             <Text className="ml-2 text-white/30">
               <div
@@ -82,10 +84,13 @@ export default function TokenInfoTable({ tokenInfo, loading }) {
       <TokenInfoCell title="Token Symbol">
         <Text className="flex items-center">
           {tokenInfo?.symbol ? (
-            <Header as="h4" className="flex items-baseline space-x-2">
+            <Text
+              level="0"
+              className="flex items-baseline space-x-2 input-base"
+            >
               <div className="text-white/30">#</div>
               <div>{tokenInfo.symbol}</div>
-            </Header>
+            </Text>
           ) : (
             <div
               className="text-[22px] font-normal text-white/30"

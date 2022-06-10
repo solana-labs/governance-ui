@@ -70,7 +70,7 @@ function CommunityInfo({
               src={nftInfo.image || '/icons/threshold-icon.svg'}
               className="w-8"
             />
-            <Text level="0" className="ml-3 body-lg">
+            <Text level="0" className="ml-3 input-base">
               {nftInfo?.name || '(Collection has no name)'}
             </Text>
           </div>
@@ -92,7 +92,7 @@ function CommunityInfo({
               src={tokenInfo?.logoURI || '/icons/generic-token-icon.svg'}
               className="w-8"
             />
-            <Text level="0" className="ml-3 body-lg">
+            <Text level="0" className="ml-3 input-base">
               {tokenInfo?.name || '(Unnamed)'}
             </Text>
           </div>
@@ -100,27 +100,27 @@ function CommunityInfo({
       )}
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         <SummaryModule title="Approval threshold">
-          <Text level="0" className="body-lg">
+          <Text level="0" className="input-base">
             {yesVotePercentage}%
           </Text>
         </SummaryModule>
         <SummaryModule
           title={`Can DAO mint ${nftIsCommunityToken ? 'NFTs' : 'Tokens'}?`}
         >
-          <Text level="0" className="body-lg">
+          <Text level="0" className="input-base">
             {transferMintAuthority === true ? 'Yes' : 'No'}
           </Text>
         </SummaryModule>
         {minimumNumberOfTokensToGovern && (
           <SummaryModule title="Min. number of tokens needed to edit DAO">
-            <Text level="0" className="body-lg">
+            <Text level="0" className="input-base">
               {minimumNumberOfTokensToGovern.toLocaleString()}
             </Text>
           </SummaryModule>
         )}
         {mintSupplyFactor && (
           <SummaryModule title="Mint supply factor">
-            <Text level="0" className="body-lg">
+            <Text level="0" className="input-base">
               {mintSupplyFactor}
             </Text>
           </SummaryModule>
@@ -161,24 +161,24 @@ function CouncilInfo({
             src={tokenInfo?.logoURI || '/icons/generic-token-icon.svg'}
             className="w-8"
           />
-          <Text level="0" className="ml-3 body-lg">
+          <Text level="0" className="ml-3 input-base">
             {tokenInfo?.name || '(Unnamed)'}
           </Text>
         </div>
       </SummaryModule>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
         <SummaryModule title="Council members">
-          <Text level="0" className="body-lg">
+          <Text level="0" className="input-base">
             {numberOfMembers}
           </Text>
         </SummaryModule>
         <SummaryModule title="Approval threshold">
-          <Text level="0" className="body-lg">
+          <Text level="0" className="input-base">
             {yesVotePercentage}%
           </Text>
         </SummaryModule>
         <SummaryModule title="Can DAO add council members?">
-          <Text level="0" className="body-lg">
+          <Text level="0" className="input-base">
             {transferMintAuthority === true ? 'Yes' : 'No'}
           </Text>
         </SummaryModule>
