@@ -204,15 +204,6 @@ export class VotingClient {
       }
     }
     if (this.client instanceof SwitchboardQueueVoterClient) {
-      /*console.log("It's a switchboard client.")
-      console.log('the realm is')
-      console.log(this.realm)
-      console.log('the wallet is')
-      console.log(this.walletPk)
-      console.log("MY ORACLES");*/
-      console.log("Vote client logging oracles and instructions");
-      console.log(this.oracles);
-      console.log(this.instructions);
       instructions.push(
         this.instructions[0]
       )

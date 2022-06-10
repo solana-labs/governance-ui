@@ -45,8 +45,7 @@ export default function useCreateProposal() {
 
     const defaultProposalMint =
       !mint?.supply.isZero() ||
-      realm?.account.config.useMaxCommunityVoterWeightAddin ||
-      true
+      realm?.account.config.useMaxCommunityVoterWeightAddin
         ? realm!.account.communityMint
         : !councilMint?.supply.isZero()
         ? realm!.account.config.councilMint

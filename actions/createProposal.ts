@@ -131,25 +131,6 @@ export const createProposal = async (
     payer,
     plugin?.voterWeightPk
   )
-  console.log("withCreateProposal args:");
-  console.log({
-    instructions: instructions,
-    programId: programId,
-    programVersion: programVersion,
-    realm: realm.pubkey!,
-    governance: governance,
-    tokenOwnerRecord: tokenOwnerRecord,
-    name: name,
-    descriptionLink: descriptionLink,
-    governingTokenMint:governingTokenMint,
-    governanceAuthority:governanceAuthority,
-    proposalIndex:proposalIndex,
-    voteType:voteType,
-    options:options,
-    useDenyOption: useDenyOption,
-    payer:payer,
-    vwr: plugin?.voterWeightPk
-  });
 
   await withAddSignatory(
     instructions,
