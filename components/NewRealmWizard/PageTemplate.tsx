@@ -8,7 +8,7 @@ import useWalletStore from 'stores/useWalletStore'
 
 export const Section = ({ children }) => {
   return (
-    <div className="w-full mx-auto lg:w-5/6  max-w-[770px] px-0 pb-44 relative min-h-[calc(100vh_-_100px)]">
+    <div className="w-full mx-auto lg:w-5/6  max-w-[770px] px-0 pb-[250px] relative min-h-[calc(100vh_-_100px)]">
       {children}
     </div>
   )
