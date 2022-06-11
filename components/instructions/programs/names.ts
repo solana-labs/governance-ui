@@ -31,7 +31,7 @@ export const PROGRAM_NAMES = {
   SysvarC1ock11111111111111111111111111111111: 'Sysvar: Clock',
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo':
     'Mango Voter Stake Registry Program',
-  [foresightConsts.DEVNET_PID]: 'Foresight Devnet',
+  [foresightConsts.PROGRAM_ID]: 'Foresight Dex',
   ...GOVERNANCE_PROGRAM_NAMES,
 }
 
