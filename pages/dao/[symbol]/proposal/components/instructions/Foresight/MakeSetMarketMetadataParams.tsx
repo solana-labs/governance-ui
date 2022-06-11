@@ -7,7 +7,6 @@ import {
   governance as foresightGov,
   consts as foresightConsts,
   utils,
-  consts,
 } from '@foresight-tmp/foresight-sdk'
 import {
   commonAssets,
@@ -16,7 +15,6 @@ import {
   ForesightMarketListIdInput,
   ForesightMarketMetadataFieldSelect,
 } from '@utils/Foresight'
-import { PublicKey } from '@solana/web3.js'
 
 export default function MakeSetMarketMetadataParams({
   index,
@@ -49,7 +47,6 @@ export default function MakeSetMarketMetadataParams({
       Buffer.from(form.marketListId.padEnd(20)),
       form.content,
       new field(),
-      new PublicKey(consts.DEVNET_PID),
       wallet!.publicKey!
     )
     return ix
