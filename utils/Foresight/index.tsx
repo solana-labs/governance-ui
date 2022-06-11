@@ -18,7 +18,7 @@ import {
   ForesightHasGovernedAccount,
   ForesightHasMarketId,
   ForesightHasMarketListId,
-  ForesightMakeAddMarketMetadataParams,
+  ForesightMakeSetMarketMetadataParams,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import Input from '@components/inputs/Input'
@@ -367,7 +367,7 @@ export function ForesightWinnerInput(props: InputProps<ForesightHasMarketId>) {
 }
 
 export function ForesightContentInput(
-  props: InputProps<ForesightMakeAddMarketMetadataParams>
+  props: InputProps<ForesightMakeSetMarketMetadataParams>
 ) {
   return (
     <Input
@@ -386,7 +386,7 @@ export function ForesightContentInput(
 }
 
 export function ForesightMarketMetadataFieldSelect(
-  props: InputProps<ForesightMakeAddMarketMetadataParams>
+  props: InputProps<ForesightMakeSetMarketMetadataParams>
 ) {
   return (
     <Select
