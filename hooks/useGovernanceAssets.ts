@@ -317,10 +317,6 @@ export default function useGovernanceAssets() {
       isVisible: canUseAuthorityInstruction,
     },
     {
-      id: Instructions.ChangeMakeDonation,
-      name: 'Change: Donation to Charity',
-    },
-    {
       id: Instructions.DepositIntoVolt,
       name: 'Friktion: Deposit into Volt',
       isVisible: canUseAnyInstruction,
@@ -358,6 +354,7 @@ export default function useGovernanceAssets() {
     {
       id: Instructions.WithdrawFromGoblinGold,
       name: 'GoblinGold: Withdraw from GoblinGold',
+      isVisible: canUseAnyInstruction,
     },
     {
       id: Instructions.CreateSolendObligationAccount,
