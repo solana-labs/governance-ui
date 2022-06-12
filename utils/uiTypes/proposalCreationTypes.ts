@@ -240,7 +240,7 @@ export interface ForesightMakeResolveMarketParams extends ForesightHasMarketId {
   winner: number
 }
 
-export interface ForesightMakeAddMarketMetadataParams
+export interface ForesightMakeSetMarketMetadataParams
   extends ForesightHasMarketId {
   content: string
   field: foresightConsts.MarketMetadataFieldName
@@ -324,7 +324,7 @@ export enum Instructions {
   ForesightInitCategory,
   ForesightResolveMarket,
   ForesightAddMarketListToCategory,
-  ForesightAddMarketMetadata,
+  ForesightSetMarketMetadata,
   RealmConfig,
   CreateNftPluginRegistrar,
   CreateNftPluginMaxVoterWeight,

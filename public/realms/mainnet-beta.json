@@ -144,7 +144,8 @@
     "symbol": "Governance",
     "displayName": "Governance",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "FMEWULPSGR1BKVJK4K7xTjhG23NfYxeAn2bamYgNoUck"
+    "realmId": "FMEWULPSGR1BKVJK4K7xTjhG23NfYxeAn2bamYgNoUck",
+    "ogImage": "/realms/Governance/img/spl-governance-logo.svg"
   },
   {
     "symbol": "Yield Farming",
@@ -778,5 +779,14 @@
     "website": "https://createdby.io",
     "twitter": "@CreatedByIO",
     "ogImage": "/realms/CreatedBy/CreatedBy.PNG"
-  }
+  },
+    {
+    "symbol": "SAMO",
+    "displayName": "SamoDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "GC6GDrJTVEY2ZxQ9NaC7n54tvz2HKM5f29LBzP7SjJ6h",
+    "website": "https://samoyedcoin.com",
+    "twitter": "@Samo_DAO",
+    "ogImage": "/realms/SamoDAO/SamoDAO.png"
+    }
 ]

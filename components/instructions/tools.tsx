@@ -22,6 +22,7 @@ import { governance as foresightGov } from '@foresight-tmp/foresight-sdk'
 import { ConnectionContext } from '@utils/connection'
 import { NFT_VOTER_INSTRUCTIONS } from './programs/nftVotingClient'
 import { PROGRAM_IDS } from '@castlefinance/vault-sdk'
+import { FORESIGHT_INSTRUCTIONS } from './programs/foresight'
 /**
  * Default governance program id instance
  */
@@ -240,6 +241,7 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...RAYDIUM_INSTRUCTIONS,
   ...MARINADE_INSTRUCTIONS,
   ...SOLEND_PROGRAM_INSTRUCTIONS,
+  ...FORESIGHT_INSTRUCTIONS,
   ...ATA_PROGRAM_INSTRUCTIONS,
   ...SYSTEM_INSTRUCTIONS,
   ...VOTE_STAKE_REGISTRY_INSTRUCTIONS,
