@@ -82,7 +82,7 @@ async function fetchMarketListId(
 }
 
 export const FORESIGHT_INSTRUCTIONS = {
-  [consts.DEVNET_PID]: {
+  [consts.PROGRAM_ID]: {
     65: {
       name: 'Foresight: Init Category',
       accounts: findAccounts('initCategory'),
@@ -215,7 +215,7 @@ export const FORESIGHT_INSTRUCTIONS = {
           const marketListId = Buffer.from(marketAccount.marketListId)
           const [metadataPubkey] = utils.publicKey.findProgramAddressSync(
             [Buffer.from('market_metadata'), marketId, marketListId],
-            new PublicKey(consts.DEVNET_PID)
+            consts.PROGRAM_ID_PUBKEY
           )
           const metadataAccount = await generatedAccounts.MarketMetadata.fetch(
             connection,

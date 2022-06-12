@@ -97,7 +97,17 @@ export default function useGovernanceAssets() {
     realmAuth && ownVoterWeight.canCreateProposal(realmAuth?.account.config)
 
   const getAvailableInstructions = () => {
-    return availableInstructions.filter((itx) => itx.isVisible)
+    let toBeFiltered: {
+      id: Instructions
+      name: string
+      isVisible: boolean | undefined
+    }[]
+    if (symbol === 'FORE') {
+      toBeFiltered = [...foresightInstructions, ...commonInstructions]
+    } else {
+      toBeFiltered = availableInstructions
+    }
+    return toBeFiltered.filter((itx) => itx.isVisible)
   }
   const governedTokenAccountsWithoutNfts = governedTokenAccounts.filter(
     (x) => x.type !== AccountType.NFT
@@ -118,7 +128,8 @@ export default function useGovernanceAssets() {
       )
     }
   )
-  const availableInstructions = [
+
+  const commonInstructions = [
     {
       id: Instructions.Transfer,
       name: 'Transfer Tokens',
@@ -140,6 +151,111 @@ export default function useGovernanceAssets() {
         currentPluginPk &&
         vsrPluginsPks.includes(currentPluginPk.toBase58()),
     },
+    {
+      id: Instructions.Mint,
+      name: 'Mint Tokens',
+      isVisible: canUseMintInstruction,
+    },
+    {
+      id: Instructions.CreateAssociatedTokenAccount,
+      name: 'Create Associated Token Account',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.Base64,
+      name: 'Execute Custom Instruction',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.VotingMintConfig,
+      name: 'Vote Escrowed Tokens: Configure Voting Mint',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
+      id: Instructions.CreateVsrRegistrar,
+      name: 'Vote Escrowed Tokens: Create Registrar',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
+      id: Instructions.ChangeMakeDonation,
+      name: 'Change: Donation to Charity',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.ProgramUpgrade,
+      name: 'Upgrade Program',
+      isVisible: canUseProgramUpgradeInstruction,
+    },
+    {
+      id: Instructions.CreateNftPluginRegistrar,
+      name: 'Create NFT plugin registrar',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
+      id: Instructions.ConfigureNftPluginCollection,
+      name: 'Configure NFT plugin collection',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
+      id: Instructions.RealmConfig,
+      name: 'Realm config',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
+      id: Instructions.CreateNftPluginMaxVoterWeight,
+      name: 'Create NFT plugin max voter weight',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
+      id: Instructions.CloseTokenAccount,
+      name: 'Close token account',
+      isVisible: canUseTransferInstruction,
+    },
+    {
+      id: Instructions.None,
+      name: 'None',
+      isVisible:
+        realm &&
+        Object.values(governances).some((g) =>
+          ownVoterWeight.canCreateProposal(g.account.config)
+        ),
+    },
+  ]
+  const foresightInstructions = [
+    {
+      id: Instructions.ForesightInitMarket,
+      name: 'Foresight: Init Market',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.ForesightInitMarketList,
+      name: 'Foresight: Init Market List',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.ForesightInitCategory,
+      name: 'Foresight: Init Category',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.ForesightResolveMarket,
+      name: 'Foresight: Resolve Market',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.ForesightAddMarketListToCategory,
+      name: 'Foresight: Add Market List To Category',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.ForesightSetMarketMetadata,
+      name: 'Foresight: Set Market Metadata',
+      isVisible: canUseAnyInstruction,
+    },
+  ]
+
+  const availableInstructions = [
+    ...commonInstructions,
     {
       id: Instructions.MangoChangePerpMarket,
       name: 'Mango: Change Perp Market',
@@ -203,7 +319,6 @@ export default function useGovernanceAssets() {
     {
       id: Instructions.ChangeMakeDonation,
       name: 'Change: Donation to Charity',
-      isVisible: canUseAnyInstruction,
     },
     {
       id: Instructions.DepositIntoVolt,
@@ -274,75 +389,7 @@ export default function useGovernanceAssets() {
       name: 'Solend: Withdraw Funds',
       isVisible: canUseAnyInstruction,
     },
-    {
-      id: Instructions.ForesightInitMarket,
-      name: 'Foresight: Init Market',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.ForesightInitMarketList,
-      name: 'Foresight: Init Market List',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.ForesightInitCategory,
-      name: 'Foresight: Init Category',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.ForesightResolveMarket,
-      name: 'Foresight: Resolve Market',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.ForesightAddMarketListToCategory,
-      name: 'Foresight: Add Market List To Category',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.ForesightSetMarketMetadata,
-      name: 'Foresight: Set Market Metadata',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.ProgramUpgrade,
-      name: 'Upgrade Program',
-      isVisible: canUseProgramUpgradeInstruction,
-    },
-    {
-      id: Instructions.CreateNftPluginRegistrar,
-      name: 'Create NFT plugin registrar',
-      isVisible: canUseAuthorityInstruction,
-    },
-    {
-      id: Instructions.ConfigureNftPluginCollection,
-      name: 'Configure NFT plugin collection',
-      isVisible: canUseAuthorityInstruction,
-    },
-    {
-      id: Instructions.RealmConfig,
-      name: 'Realm config',
-      isVisible: canUseAuthorityInstruction,
-    },
-    {
-      id: Instructions.CreateNftPluginMaxVoterWeight,
-      name: 'Create NFT plugin max voter weight',
-      isVisible: canUseAuthorityInstruction,
-    },
-    {
-      id: Instructions.CloseTokenAccount,
-      name: 'Close token account',
-      isVisible: canUseTransferInstruction,
-    },
-    {
-      id: Instructions.None,
-      name: 'None',
-      isVisible:
-        realm &&
-        Object.values(governances).some((g) =>
-          ownVoterWeight.canCreateProposal(g.account.config)
-        ),
-    },
+    ...foresightInstructions,
   ]
 
   return {
