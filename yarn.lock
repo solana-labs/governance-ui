@@ -886,10 +886,10 @@
     lodash.isundefined "^3.0.1"
     lodash.uniq "^4.5.0"
 
-"@foresight-tmp/foresight-sdk@^0.1.44":
-  version "0.1.44"
-  resolved "https://registry.yarnpkg.com/@foresight-tmp/foresight-sdk/-/foresight-sdk-0.1.44.tgz#b7fee32272a9f16fd12e93da1bcbba532bb90183"
-  integrity sha512-MMBGcfKIwcRrllih2IaOEdnSZuE0fYrNQcSJBAuwxG6ORknKShYHPqp2cRq5NEnNZS90I0AMzhpdDXv+N/302g==
+"@foresight-tmp/foresight-sdk@^0.1.45":
+  version "0.1.46"
+  resolved "https://registry.yarnpkg.com/@foresight-tmp/foresight-sdk/-/foresight-sdk-0.1.46.tgz#f928dde22f424cfd438f8c9116d5ce84f5b56864"
+  integrity sha512-fqYnT+OrRDe84OWoDGow4KB5KYX/sRP+jg0Ylz0ExdNqoewK8gLmmAg6AvPc+B9ItAhcDhEBf0H/cGG6HpIQdw==
   dependencies:
     "@project-serum/anchor" "^0.23.0"
     "@project-serum/serum" "0.13.64"
