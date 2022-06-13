@@ -205,7 +205,7 @@ export default function CommunityTokenForm({
                 </FormField>
               )}
             />
-            {showTransferMintAuthority && (
+            {validMintAddress && (
               <>
                 <Controller
                   name="transferCommunityMintAuthority"
@@ -215,7 +215,7 @@ export default function CommunityTokenForm({
                   render={({ field: { ref, ...field } }) => (
                     <FormField
                       title="Do you want to transfer mint authority of the token to the DAO?"
-                      description=""
+                      description='You must connect the wallet which owns this token before you can select "Yes".'
                     >
                       <RadioGroup
                         {...field}
@@ -223,46 +223,48 @@ export default function CommunityTokenForm({
                           { label: 'Yes', value: true },
                           { label: 'No', value: false },
                         ]}
+                        disabled={!showTransferMintAuthority}
+                      />
+                    </FormField>
+                  )}
+                />
+
+                <Controller
+                  name="minimumNumberOfCommunityTokensToGovern"
+                  control={control}
+                  defaultValue=""
+                  render={({ field }) => (
+                    <FormField
+                      title="What is the minimum number of community tokens needed to govern this DAO?"
+                      description="A user will need at least this many of your community token to edit the DAO as well as make proposals."
+                      disabled={!validMintAddress}
+                      optional
+                    >
+                      <Input
+                        type="tel"
+                        placeholder="1,000,000"
+                        data-testid="dao-name-input"
+                        Icon={<GenericTokenIcon />}
+                        error={
+                          errors.minimumNumberOfCommunityTokensToGovern
+                            ?.message || ''
+                        }
+                        {...field}
+                        disabled={!validMintAddress}
+                        onChange={(ev) => {
+                          preventNegativeNumberInput(ev)
+                          field.onChange(ev)
+                        }}
                       />
                     </FormField>
                   )}
                 />
               </>
             )}
-            <Controller
-              name="minimumNumberOfCommunityTokensToGovern"
-              control={control}
-              defaultValue=""
-              render={({ field }) => (
-                <FormField
-                  title="What is the minimum number of community tokens needed to govern this DAO?"
-                  description="A user will need at least this many of your community token to edit the DAO as well as make proposals."
-                  disabled={!validMintAddress}
-                  optional
-                >
-                  <Input
-                    type="tel"
-                    placeholder="1,000,000"
-                    data-testid="dao-name-input"
-                    Icon={<GenericTokenIcon />}
-                    error={
-                      errors.minimumNumberOfCommunityTokensToGovern?.message ||
-                      ''
-                    }
-                    {...field}
-                    disabled={!validMintAddress}
-                    onChange={(ev) => {
-                      preventNegativeNumberInput(ev)
-                      field.onChange(ev)
-                    }}
-                  />
-                </FormField>
-              )}
-            />
           </>
         )}
       </div>
-      {useExistingCommunityToken && (
+      {useExistingCommunityToken && validMintAddress && (
         <AdvancedOptionsDropdown>
           <Controller
             name="communityMintSupplyFactor"

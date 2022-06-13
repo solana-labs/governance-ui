@@ -84,6 +84,7 @@ export default function AddCouncilForm({
   const [councilTokenInfo, setCouncilTokenInfo] = useState<
     TokenWithMintInfo | undefined
   >()
+  const [validMintAddress, setValidMintAddress] = useState(false)
   const [showTransferMintAuthority, setShowTransferMintAuthority] = useState(
     false
   )
@@ -109,6 +110,7 @@ export default function AddCouncilForm({
   }) {
     setShowTransferMintAuthority(walletIsMintAuthority)
     setCouncilTokenInfo(tokenInfo)
+    setValidMintAddress(validMintAddress)
     if (walletIsMintAuthority) {
       setValue('transferCouncilMintAuthority', undefined)
     } else {
@@ -226,7 +228,7 @@ export default function AddCouncilForm({
             )}
           />
         )}
-        {addCouncil && useExistingCouncilToken && showTransferMintAuthority && (
+        {validMintAddress && (
           <Controller
             name="transferCouncilMintAuthority"
             control={control}
@@ -235,7 +237,7 @@ export default function AddCouncilForm({
             render={({ field: { ref, ...field } }) => (
               <FormField
                 title="Do you want to transfer mint authority of this council token to the DAO?"
-                description=""
+                description='You must connect the wallet which owns this token before you can select "Yes".'
               >
                 <RadioGroup
                   {...field}
@@ -243,6 +245,7 @@ export default function AddCouncilForm({
                     { label: 'Yes', value: true },
                     { label: 'No', value: false },
                   ]}
+                  disabled={!showTransferMintAuthority}
                 />
               </FormField>
             )}

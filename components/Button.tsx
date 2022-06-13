@@ -136,11 +136,17 @@ export const NewButton: FunctionComponent<NewButtonProps> = ({
 export const RadioButton: FunctionComponent<NewButtonProps> = ({
   className = '',
   selected = false,
+  disabled = false,
   children,
   ...props
 }) => {
   let classNames =
-    'group default-transition py-3 px-2 h-[72px] min-w-[208px] text-white rounded border border-white/30 hover:bg-white/10 hover:border-white disabled:opacity-20 disabled:hover:border-white/30'
+    'default-transition py-3 px-2 h-[72px] min-w-[208px] text-white rounded border border-white/30 disabled:opacity-20 disabled:cursor-not-allowed'
+
+  if (!disabled) {
+    classNames += 'group hover:bg-white/10 hover:border-white'
+  }
+
   if (selected) {
     classNames += ' bg-white/10 border-white focus:border-blue'
   } else {
@@ -149,12 +155,7 @@ export const RadioButton: FunctionComponent<NewButtonProps> = ({
 
   classNames += ` ${className}`
   return (
-    <button
-      className={classNames}
-      type="button"
-      disabled={props.disabled}
-      {...props}
-    >
+    <button className={classNames} type="button" disabled={disabled} {...props}>
       <div className="flex items-center pl-4 space-x-3 md:pl-0 md:justify-center">
         <GradientCheckmarkCircle selected={selected} />
         <Header as="cta">{children}</Header>
