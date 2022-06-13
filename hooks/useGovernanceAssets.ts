@@ -292,14 +292,29 @@ export default function useGovernanceAssets() {
       isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
     },
     {
-      id: Instructions.DepositIntoCastle,
-      name: 'Castle: Deposit into Vault',
+      id: Instructions.Mint,
+      name: 'Mint Tokens',
+      isVisible: canUseMintInstruction,
+    },
+    {
+      id: Instructions.CreateAssociatedTokenAccount,
+      name: 'Create Associated Token Account',
       isVisible: canUseAnyInstruction,
     },
     {
-      id: Instructions.WithrawFromCastle,
-      name: 'Castle: Withdraw from Vault',
+      id: Instructions.Base64,
+      name: 'Execute Custom Instruction',
       isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.VotingMintConfig,
+      name: 'Vote Escrowed Tokens: Configure Voting Mint',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
+      id: Instructions.CreateVsrRegistrar,
+      name: 'Vote Escrowed Tokens: Create Registrar',
+      isVisible: canUseAuthorityInstruction,
     },
     {
       id: Instructions.DepositIntoVolt,
@@ -309,6 +324,26 @@ export default function useGovernanceAssets() {
     {
       id: Instructions.WithdrawFromVolt,
       name: 'Friktion: Withdraw from Volt',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.ClaimPendingDeposit,
+      name: 'Friktion: Claim Volt Tokens',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.ClaimPendingWithdraw,
+      name: 'Friktion: Claim Pending Withdraw',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.DepositIntoCastle,
+      name: 'Castle: Deposit into Vault',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.WithrawFromCastle,
+      name: 'Castle: Withdraw from Vault',
       isVisible: canUseAnyInstruction,
     },
     {
