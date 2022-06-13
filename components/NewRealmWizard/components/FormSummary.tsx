@@ -37,8 +37,40 @@ function SummaryModule({
   )
 }
 
+function TokenInfoSummary({ title, name, symbol, logoURI }) {
+  return (
+    <SummaryModule
+      title={title}
+      rightSide={
+        symbol && (
+          <Text
+            level="2"
+            className="flex items-center px-6 py-1 text-white rounded bg-bkg-grey"
+          >
+            #{symbol}
+          </Text>
+        )
+      }
+    >
+      <div className="flex items-center">
+        {logoURI ? (
+          <img src={logoURI} className="w-8" />
+        ) : (
+          <div className="w-8 text-white/50">
+            <GenericTokenIcon />
+          </div>
+        )}
+        <Text level="0" className="ml-2 input-base">
+          {name || '(Unnamed)'}
+        </Text>
+      </div>
+    </SummaryModule>
+  )
+}
+
 function CommunityInfo({
   tokenInfo,
+  mintAddress,
   transferMintAuthority,
   mintSupplyFactor,
   yesVotePercentage,
@@ -46,6 +78,10 @@ function CommunityInfo({
   nftInfo,
 }) {
   const nftIsCommunityToken = !!nftInfo?.name
+  const updatedTokenInfo = {
+    ...tokenInfo,
+    name: tokenInfo?.name || mintAddress || 'Token will be generated',
+  }
 
   return (
     <>
@@ -77,32 +113,7 @@ function CommunityInfo({
           </div>
         </SummaryModule>
       ) : (
-        <SummaryModule
-          title="Community token"
-          rightSide={
-            <Text
-              level="2"
-              className="flex items-center px-6 py-1 text-white rounded bg-bkg-grey"
-            >
-              {tokenInfo?.symbol && tokenInfo.symbol !== '(No symbol)'
-                ? `#${tokenInfo.symbol}`
-                : '(No symbol)'}
-            </Text>
-          }
-        >
-          <div className="flex items-center">
-            {tokenInfo?.logoURI ? (
-              <img src={tokenInfo.logoURI} className="w-8" />
-            ) : (
-              <div className="w-8 text-white/50">
-                <GenericTokenIcon />
-              </div>
-            )}
-            <Text level="0" className="ml-2 input-base">
-              {tokenInfo?.name || '(Unnamed)'}
-            </Text>
-          </div>
-        </SummaryModule>
+        <TokenInfoSummary title="Community token" {...updatedTokenInfo} />
       )}
       <div
         className={`grid grid-cols-1 gap-2 ${
@@ -115,7 +126,7 @@ function CommunityInfo({
           </Text>
         </SummaryModule>
         {!nftIsCommunityToken && (
-          <SummaryModule title="Transfer mint authority to DAO?">
+          <SummaryModule title="Transfer mint authority?">
             <Text level="0" className="input-base">
               {transferMintAuthority === true ? 'Yes' : 'No'}
             </Text>
@@ -142,10 +153,16 @@ function CommunityInfo({
 
 function CouncilInfo({
   tokenInfo,
+  mintAddress,
   transferMintAuthority,
   yesVotePercentage,
   numberOfMembers,
 }) {
+  const updatedTokenInfo = {
+    ...tokenInfo,
+    name: tokenInfo?.name || mintAddress || 'Token will be generated',
+  }
+
   return (
     <>
       <div>
@@ -153,32 +170,7 @@ function CouncilInfo({
           Council info
         </Text>
       </div>
-      <SummaryModule
-        title="Council token"
-        rightSide={
-          <Text
-            level="2"
-            className="flex items-center px-6 py-1 text-white rounded bg-bkg-grey"
-          >
-            {tokenInfo?.symbol && tokenInfo.symbol !== '(No symbol)'
-              ? `#${tokenInfo.symbol}`
-              : '(No symbol)'}
-          </Text>
-        }
-      >
-        <div className="flex items-center">
-          {tokenInfo?.logoURI ? (
-            <img src={tokenInfo.logoURI} className="w-8" />
-          ) : (
-            <div className="w-8 text-white/50">
-              <GenericTokenIcon />
-            </div>
-          )}
-          <Text level="0" className="ml-2 input-base">
-            {tokenInfo?.name || '(Unnamed)'}
-          </Text>
-        </div>
-      </SummaryModule>
+      <TokenInfoSummary title="Council token" {...updatedTokenInfo} />
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
         <SummaryModule title="Council members">
           <Text level="0" className="input-base">
@@ -190,7 +182,7 @@ function CouncilInfo({
             {yesVotePercentage}%
           </Text>
         </SummaryModule>
-        <SummaryModule title="Transfer mint authority to DAO?">
+        <SummaryModule title="Transfer mint authority?">
           <Text level="0" className="input-base">
             {transferMintAuthority === true ? 'Yes' : 'No'}
           </Text>
@@ -215,6 +207,7 @@ export default function WizardSummary({
     ...nftCollectionMetadata,
     nftCollectionCount,
   }
+
   const programId = formData?.programId || ''
 
   return (
@@ -249,6 +242,7 @@ export default function WizardSummary({
         ) : (
           <>
             <CommunityInfo
+              mintAddress={formData.communityTokenMintAddress}
               tokenInfo={formData.communityTokenInfo}
               transferMintAuthority={formData.transferCommunityMintAuthority}
               mintSupplyFactor={formData.communityMintSupplyFactor}
@@ -261,6 +255,7 @@ export default function WizardSummary({
             {(formData.addCouncil || formData?.memberAddresses?.length > 0) && (
               <CouncilInfo
                 tokenInfo={formData.councilTokenInfo}
+                mintAddress={formData.councilTokenMintAddress}
                 transferMintAuthority={
                   formData.transferCouncilMintAuthority ||
                   !formData.useExistingCouncilToken

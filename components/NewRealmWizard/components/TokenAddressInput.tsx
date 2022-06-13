@@ -34,8 +34,8 @@ const PENDING_COIN: TokenWithMintInfo = {
 
 const NOTFOUND_COIN: TokenWithMintInfo = {
   ...PENDING_COIN,
-  name: '(Unnamed)',
-  symbol: '(No symbol)',
+  name: '',
+  symbol: '',
 }
 
 export default function TokenAddressInput({
