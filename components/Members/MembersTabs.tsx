@@ -126,9 +126,7 @@ const MemberItems = ({
           {renderAddressImage}
         </div>
         <div>
-          <h3 className="flex mb-1 text-base font-semibold">
-            {renderAddressName}
-          </h3>
+          <h3 className="flex mb-1 text-base font-bold">{renderAddressName}</h3>
           <p className="mb-0 text-xs text-fgd-1">Votes Cast: {votesCasted}</p>
           <span className="text-xs text-fgd-3">
             {(communityAmount || !councilAmount) && (

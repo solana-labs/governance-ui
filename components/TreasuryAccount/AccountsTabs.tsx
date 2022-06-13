@@ -49,7 +49,7 @@ const AccountsTabs: FunctionComponent<AccountsTabsProps> = ({
             `}
           >
             <div className="text-left">
-              <h3 className="flex mb-1 text-base font-semibold">
+              <h3 className="flex mb-1 text-base font-bold">
                 {logo && (
                   <img
                     src={logo}

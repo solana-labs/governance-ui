@@ -67,13 +67,13 @@ h1,
 h2,
 h3,
 h4 {
-  letter-spacing: 0px;
+  letter-spacing: 0.5px;
   line-height: 110%;
   @apply font-normal;
 }
 
 h1 {
-  @apply font-serif text-3xl font-normal;
+  @apply text-3xl font-normal;
 }
 
 h2 {
@@ -81,11 +81,11 @@ h2 {
 }
 
 h3 {
-  @apply mb-1 text-lg font-body;
+  @apply mb-1 text-lg font-semibold font-body;
 }
 
 h4 {
-  @apply mb-1 text-base font-body;
+  @apply mb-1 text-base font-semibold font-body;
 }
 
 /* CTAs */
@@ -123,7 +123,7 @@ button {
 }
 
 .markdown > p {
-  @apply mb-2;
+  @apply mb-2 text-fgd-1;
 }
 
 .markdown ul {
@@ -131,11 +131,11 @@ button {
 }
 
 .markdown a {
-  @apply underline transition-all duration-300 text-fgd-2 hover:text-fgd-3 hover:no-underline;
+  @apply underline transition-all duration-300 text-fgd-1 hover:text-fgd-2 hover:no-underline;
 }
 
 .markdown li {
-  @apply mb-2 ml-6 font-normal list-disc text-fgd-3;
+  @apply mb-2 ml-6 font-normal list-disc text-fgd-2;
 }
 
 .markdown pre {
