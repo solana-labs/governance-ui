@@ -110,9 +110,7 @@ function CommunityInfo({
             {yesVotePercentage}%
           </Text>
         </SummaryModule>
-        <SummaryModule
-          title={`Can DAO mint ${nftIsCommunityToken ? 'NFTs' : 'Tokens'}?`}
-        >
+        <SummaryModule title="Transfer DAO mint authority?">
           <Text level="0" className="input-base">
             {transferMintAuthority === true ? 'Yes' : 'No'}
           </Text>
@@ -186,7 +184,7 @@ function CouncilInfo({
             {yesVotePercentage}%
           </Text>
         </SummaryModule>
-        <SummaryModule title="Can DAO add council members?">
+        <SummaryModule title="Transfer DAO mint authority?">
           <Text level="0" className="input-base">
             {transferMintAuthority === true ? 'Yes' : 'No'}
           </Text>

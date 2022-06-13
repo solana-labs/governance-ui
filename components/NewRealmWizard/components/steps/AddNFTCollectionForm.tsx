@@ -600,7 +600,11 @@ export default function AddNFTCollectionForm({
             <ThresholdAdviceBox title="Approval threshold">
               <Text level="1" className="space-y-1">
                 <div>
-                  With {numberOfNFTs?.toLocaleString() || '???'} NFT holders,
+                  With{' '}
+                  {numberOfNFTs && !isNaN(numberOfNFTs)
+                    ? Number(numberOfNFTs).toLocaleString()
+                    : '???'}{' '}
+                  NFT holders,
                 </div>
                 <div>
                   {approvalSize?.toLocaleString() || '???'} members would need
