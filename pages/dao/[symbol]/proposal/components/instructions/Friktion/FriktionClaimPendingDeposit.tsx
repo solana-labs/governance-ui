@@ -1,25 +1,22 @@
 import React, { useContext, useEffect, useState } from 'react'
-import Input from '@components/inputs/Input'
 import useRealm from '@hooks/useRealm'
-import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import { PublicKey } from '@solana/web3.js'
-import { precision } from '@utils/formatting'
 import useWalletStore from 'stores/useWalletStore'
 import {
-  FriktionDepositForm,
+  FriktionClaimPendingDepositForm,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
-import { getFriktionDepositSchema } from '@utils/validations'
+import { getFriktionClaimPendingDepositSchema } from '@utils/validations'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-import { getFriktionDepositInstruction } from '@utils/instructions/Friktion'
+import { getFriktionClaimPendingDepositInstruction } from '@utils/instructions/Friktion'
 import Select from '@components/inputs/Select'
 import { FriktionSnapshot, VoltSnapshot } from '@friktion-labs/friktion-sdk'
 
-const FriktionDeposit = ({
+const FriktionClaimPendingDeposit = ({
   index,
   governance,
 }: {
@@ -32,8 +29,7 @@ const FriktionDeposit = ({
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<FriktionDepositForm>({
-    amount: undefined,
+  const [form, setForm] = useState<FriktionClaimPendingDepositForm>({
     governedTokenAccount: undefined,
     voltVaultId: '',
     programId: programId?.toString(),
@@ -47,10 +43,6 @@ const FriktionDeposit = ({
     ProgramAccount<Governance> | undefined
   >(undefined)
   const [formErrors, setFormErrors] = useState({})
-  const mintMinAmount = form.mintInfo
-    ? getMintMinAmountAsDecimal(form.mintInfo)
-    : 1
-  const currentPrecision = precision(mintMinAmount)
   const { handleSetInstructions } = useContext(NewProposalContext)
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
@@ -59,31 +51,11 @@ const FriktionDeposit = ({
   const setMintInfo = (value) => {
     setForm({ ...form, mintInfo: value })
   }
-  const setAmount = (event) => {
-    const value = event.target.value
-    handleSetForm({
-      value: value,
-      propertyName: 'amount',
-    })
-  }
-  const validateAmountOnBlur = () => {
-    const value = form.amount
 
-    handleSetForm({
-      value: parseFloat(
-        Math.max(
-          Number(mintMinAmount),
-          Math.min(Number(Number.MAX_SAFE_INTEGER), Number(value))
-        ).toFixed(currentPrecision)
-      ),
-      propertyName: 'amount',
-    })
-  }
   async function getInstruction(): Promise<UiInstruction> {
-    return getFriktionDepositInstruction({
+    return getFriktionClaimPendingDepositInstruction({
       schema,
       form,
-      amount: form.amount ?? 0,
       programId,
       connection,
       wallet,
@@ -119,7 +91,7 @@ const FriktionDeposit = ({
     setGovernedAccount(form.governedTokenAccount?.governance)
     setMintInfo(form.governedTokenAccount?.extensions.mint?.account)
   }, [form.governedTokenAccount])
-  const schema = getFriktionDepositSchema({ form })
+  const schema = getFriktionClaimPendingDepositSchema()
 
   return (
     <>
@@ -165,18 +137,8 @@ const FriktionDeposit = ({
             </Select.Option>
           ))}
       </Select>
-      <Input
-        min={mintMinAmount}
-        label="Amount"
-        value={form.amount}
-        type="number"
-        onChange={setAmount}
-        step={mintMinAmount}
-        error={formErrors['amount']}
-        onBlur={validateAmountOnBlur}
-      />
     </>
   )
 }
 
-export default FriktionDeposit
+export default FriktionClaimPendingDeposit
