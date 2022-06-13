@@ -102,7 +102,7 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-react": "^7.29.4",
     "eslint-plugin-react-hooks": "^4.5.0",
-    "husky": "^6.0.0",
+    "husky": "^8.0.1",
     "jest": "^27.4.5",
     "lint-staged": "^10.0.10",
     "next-router-mock": "^0.6.7",
