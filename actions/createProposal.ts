@@ -209,7 +209,6 @@ export const createProposal = async (
       sendingMessage: `creating ${notificationTitle}`,
       successMessage: `${notificationTitle} created`,
     })
-
     await sendTransaction({
       transaction: transaction2,
       wallet,

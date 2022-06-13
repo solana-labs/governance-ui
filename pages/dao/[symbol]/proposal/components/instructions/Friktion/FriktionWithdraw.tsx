@@ -36,7 +36,6 @@ const FriktionWithdraw = ({
     amount: undefined,
     governedTokenAccount: undefined,
     voltVaultId: '',
-    depositTokenMint: undefined,
     programId: programId?.toString(),
     mintInfo: undefined,
   })
@@ -140,15 +139,9 @@ const FriktionWithdraw = ({
         label="Friktion Volt"
         value={form.voltVaultId}
         placeholder="Please select..."
-        onChange={(value) => {
-          const volt = friktionVolts?.find((x) => x.voltVaultId === value)
-          setFormErrors({})
-          setForm({
-            ...form,
-            voltVaultId: value,
-            depositTokenMint: volt?.depositTokenMint,
-          })
-        }}
+        onChange={(value) =>
+          handleSetForm({ value, propertyName: 'voltVaultId' })
+        }
         error={formErrors['voltVaultId']}
       >
         {friktionVolts
