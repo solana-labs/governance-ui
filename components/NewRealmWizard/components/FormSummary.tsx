@@ -104,17 +104,23 @@ function CommunityInfo({
           </div>
         </SummaryModule>
       )}
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+      <div
+        className={`grid grid-cols-1 gap-2 ${
+          !nftIsCommunityToken ? 'sm:grid-cols-2' : ''
+        }`}
+      >
         <SummaryModule title="Approval threshold">
           <Text level="0" className="input-base">
             {yesVotePercentage}%
           </Text>
         </SummaryModule>
-        <SummaryModule title="Transfer DAO mint authority?">
-          <Text level="0" className="input-base">
-            {transferMintAuthority === true ? 'Yes' : 'No'}
-          </Text>
-        </SummaryModule>
+        {!nftIsCommunityToken && (
+          <SummaryModule title="Transfer mint authority to DAO?">
+            <Text level="0" className="input-base">
+              {transferMintAuthority === true ? 'Yes' : 'No'}
+            </Text>
+          </SummaryModule>
+        )}
         {minimumNumberOfTokensToGovern && (
           <SummaryModule title="Min. number of tokens needed to edit DAO">
             <Text level="0" className="input-base">
@@ -184,7 +190,7 @@ function CouncilInfo({
             {yesVotePercentage}%
           </Text>
         </SummaryModule>
-        <SummaryModule title="Transfer DAO mint authority?">
+        <SummaryModule title="Transfer mint authority to DAO?">
           <Text level="0" className="input-base">
             {transferMintAuthority === true ? 'Yes' : 'No'}
           </Text>
