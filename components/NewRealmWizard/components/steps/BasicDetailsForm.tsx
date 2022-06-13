@@ -98,25 +98,6 @@ export default function BasicDetailsForm({
             </FormField>
           )}
         />
-        {/* <Controller
-          name="description"
-          defaultValue=""
-          control={control}
-          render={({ field }) => (
-            <FormField
-              title="How would you describe your DAO?"
-              description="What's the best way to communicate the purpose of your DAO and why it's valuable to its members?"
-              optional
-            >
-              <Input
-                placeholder="e.g. My DAO is..."
-                data-testid="dao-description-input"
-                error={errors.description?.message || ''}
-                {...field}
-              />
-            </FormField>
-          )}
-        /> */}
         <AdvancedOptionsDropdown>
           <Controller
             name="programId"
@@ -124,7 +105,7 @@ export default function BasicDetailsForm({
             control={control}
             render={({ field }) => (
               <FormField
-                title="My DAO's Program ID"
+                title="Custom Program ID"
                 description="When updating, ensure you transfer all assets to a new DAO using the new program. This cannot be changed."
                 advancedOption
               >

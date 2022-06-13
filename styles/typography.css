@@ -5,17 +5,17 @@ h4.heading-sm,
 .heading-cta {
   letter-spacing: -0.5px;
   line-height: 110%;
-  @apply font-serif font-normal;
+  @apply font-normal;
 }
 
 h1.heading-xl {
   font-size: 36px;
-  @apply md:text-[70px];
+  @apply font-serif md:text-[70px];
 }
 
 h2.heading-lg {
   font-size: 36px;
-  @apply md:text-[50px];
+  @apply font-serif md:text-[50px];
 }
 
 h3.heading-base {

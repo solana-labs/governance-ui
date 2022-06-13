@@ -103,7 +103,9 @@ export default function YesVotePercentageForm({
         type={type}
         currentStep={currentStep}
         totalSteps={totalSteps}
-        title="Next, let's determine the vote percentage for approving community proposals"
+        title={`Next, set your ${
+          forCommunity ? "DAO's" : "wallet's"
+        } approval threshold`}
       />
       <div className="mt-16 space-y-10 md:space-y-12">
         <Controller
