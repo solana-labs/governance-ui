@@ -101,7 +101,7 @@ button {
 }
 
 .markdown > p {
-  @apply mb-2;
+  @apply mb-2 text-fgd-1;
 }
 
 .markdown ul {
@@ -109,11 +109,11 @@ button {
 }
 
 .markdown a {
-  @apply underline transition-all duration-300 text-fgd-2 hover:text-fgd-3 hover:no-underline;
+  @apply underline transition-all duration-300 text-fgd-1 hover:text-fgd-2 hover:no-underline;
 }
 
 .markdown li {
-  @apply mb-2 ml-6 font-normal list-disc text-fgd-3;
+  @apply mb-2 ml-6 font-normal list-disc text-fgd-2;
 }
 
 .markdown pre {
