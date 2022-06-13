@@ -157,9 +157,9 @@ export function useVotingPlugins() {
       )
 
       const allOracles = await switchboardProgram.account.oracleAccountData.all();
-      const oracleData = allOracles.map(({publicKey, account}) => {
+      const oData = allOracles.map(({publicKey, account}) => {
         return {
-          oracleData: account,
+          oracleData: account as any,
           oracle: publicKey,
         }
       });
@@ -167,11 +167,11 @@ export function useVotingPlugins() {
       let myNodesForRealm: PublicKey[] = [];
       let setVoterWeightInstructions: TransactionInstruction[] = [];
 
-      for (const { oracle, oracleData } of oracleData) {
-        if (!wallet || !wallet.publicKey || !realm || !oracleData) {
+      for (const { oracle, oracleData } of oData) {
+        if (!wallet || !wallet.publicKey || !realm || !oData) {
           continue
         }
-        let queuePk = oracleData.queuePubkey;
+        let queuePk = oracleData.queuePubkey as PublicKey;
 
         let [addinState, _] = await PublicKey.findProgramAddress(
           [
@@ -182,8 +182,8 @@ export function useVotingPlugins() {
 
         let addinStateData = await addinProgram.account.state.fetch(addinState);
         let queue = await switchboardProgram.account.oracleQueueAccountData.fetch(queuePk);
-        let queueAuthority = queue.authority;
-        let grantAuthority = addinStateData.grantAuthority;
+        let queueAuthority = queue.authority as PublicKey;
+        let grantAuthority = addinStateData.grantAuthority as PublicKey;
         try {
           let g = await getGovernanceAccount(provider.connection, grantAuthority, Governance);
           if (

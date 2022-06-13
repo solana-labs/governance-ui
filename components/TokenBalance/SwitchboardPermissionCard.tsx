@@ -17,7 +17,7 @@ const SwitchboardPermissionCard = () => {
   const wallet = useWalletStore((s) => s.current)
 
   const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
-  const { tokenRecords, realm, symbol, mint, councilMint } = useRealm()
+  const { tokenRecords, realm, symbol } = useRealm()
 
   const ownTokenRecord = wallet?.publicKey
     ? tokenRecords[wallet.publicKey!.toBase58()]

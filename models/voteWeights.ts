@@ -388,8 +388,9 @@ export class SwitchboardQueueVoteWeight implements VoterWeightInterface {
   }
 
   getTokenRecordToCreateProposal(config: GovernanceConfig) {
-    return this.communityTokenRecord;
-
+    if (this.communityTokenRecord !== undefined) {
+      return this.communityTokenRecord;
+    }
     throw new Error('Not enough vote weight to create proposal')
   }
 }

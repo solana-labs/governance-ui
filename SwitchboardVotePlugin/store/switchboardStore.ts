@@ -13,7 +13,7 @@ interface SwitchboardPluginStore extends State {
   setVotingPower: (votingPower: BN) => void
   setIsLoading: (val: boolean) => void
   setOracleKeys: (keys: Array<PublicKey>, votingClient: VotingClient) => void
-  instructions: (instructions: Array<TransactionInstruction>, votingClient: VotingClient) => void
+  setInstructions: (instructions: Array<TransactionInstruction>, votingClient: VotingClient) => void
 }
 
 const defaultState = {

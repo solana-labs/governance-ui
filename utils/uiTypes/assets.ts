@@ -29,6 +29,7 @@ export enum AccountType {
   PROGRAM,
   NFT,
   GENERIC,
+  AuxiliaryToken,
 }
 
 export class AccountTypeToken implements AssetAccount {
