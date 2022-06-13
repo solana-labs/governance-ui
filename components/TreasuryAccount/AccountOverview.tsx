@@ -1,6 +1,6 @@
 import Button, { LinkButton } from '@components/Button'
 import { getExplorerUrl } from '@components/explorer/tools'
-import { getAccountName } from '@components/instructions/tools'
+import { getAccountName, WSOL_MINT } from '@components/instructions/tools'
 import Modal from '@components/Modal'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
@@ -35,10 +35,13 @@ import {
 import useMarketStore from 'Strategies/store/marketStore'
 import LoadingRows from './LoadingRows'
 import TradeOnSerum, { TradeOnSerumProps } from './TradeOnSerum'
-import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
+import { AccountType } from '@utils/uiTypes/assets'
 import CreateAta from './CreateAta'
-import { getReserveData, getReserves, SOLEND } from 'Strategies/protocols/solend'
-import { StrategyType } from '@castlefinance/vault-core'
+import {
+  cTokenExchangeRate,
+  getReserveData,
+  SOLEND,
+} from 'Strategies/protocols/solend'
 
 type InvestmentType = TreasuryStrategy & {
   investedAmount: number
@@ -48,7 +51,7 @@ const AccountOverview = () => {
   const router = useRouter()
   const { ownTokenRecord, ownCouncilTokenRecord } = useRealm()
   const {
-    governedTokenAccountsWithoutNfts,
+    governedTokenAccounts,
     auxiliaryTokenAccounts,
   } = useGovernanceAssets()
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
@@ -61,6 +64,7 @@ const AccountOverview = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const isNFT = currentAccount?.isNft
   const isSol = currentAccount?.isSol
+  const [loading, setLoading] = useState(true)
   const isSplToken = currentAccount?.type === AccountType.TOKEN
   const isAuxiliaryAccount = currentAccount?.type === AccountType.AuxiliaryToken
   const { canUseTransferInstruction } = useGovernanceAssets()
@@ -80,106 +84,88 @@ const AccountOverview = () => {
   const [accountInvestments, setAccountInvestments] = useState<
     InvestmentType[]
   >([])
-  const [eligibleInvestments, setEligibleInvestments] = useState<
-    InvestmentType[]
-  >([])
   const [showStrategies, setShowStrategies] = useState(false)
   const [
     proposedInvestment,
     setProposedInvestment,
-  ] = useState<TreasuryStrategy | null>(null)
+  ] = useState<InvestmentType | null>(null)
   const [isCopied, setIsCopied] = useState<boolean>(false)
   const [
     tradeSerumInfo,
     setTradeSerumInfo,
   ] = useState<TradeOnSerumProps | null>(null)
+  const visibleInvestments = strategies.filter(
+    (strat) =>
+      strat.handledMint ===
+      (currentAccount?.isSol
+        ? WSOL_MINT
+        : currentAccount?.extensions.token?.account.mint.toString())
+  )
+  const visibleAccounts = accountInvestments.filter(
+    (strat) =>
+      strat.handledMint ===
+      (currentAccount?.isSol
+        ? WSOL_MINT
+        : currentAccount?.extensions.token?.account.mint.toString())
+  )
 
-  useEffect(() => {
-    if (strategies.length > 0) {
-      const eligibleInvestments = strategies.filter(
-        (strat) =>
-          strat.handledMint ===
-          currentAccount?.extensions.token?.account.mint.toString()
-      ).map(strat => ({
-        ...strat,
-        investedAmount: 0,
-      }))
-      setEligibleInvestments(eligibleInvestments)
-    }
-  }, [currentAccount, strategies])
-
-  // Solend
   useEffect(() => {
     const getSlndCTokens = async () => {
       const accounts = [
-        ...governedTokenAccountsWithoutNfts,
+        ...governedTokenAccounts,
         ...auxiliaryTokenAccounts,
-      ];
+        ...(currentAccount?.isSol ? [currentAccount] : []),
+      ]
 
-      const solendStrategy = strategies.filter(
-        (strat) =>
-          strat.handledMint ===
-          currentAccount?.extensions.token?.account.mint.toString()
-          && strat.protocolName === SOLEND
+      const solendStrategy = visibleInvestments.filter(
+        (strat) => strat.protocolName === SOLEND
       )[0]
 
-      const relevantAccs = accounts.map(acc => {
-        const reserve = (solendStrategy as SolendStrategy )?.reserves.find(reserve => reserve.mintAddress === currentAccount?.extensions.token?.account.mint.toString() && reserve.collateralMintAddress === acc.extensions.mint?.publicKey.toBase58());
-        if (!reserve || !solendStrategy) return null;
+      const relevantAccs = accounts
+        .map((acc) => {
+          const reserve = (solendStrategy as SolendStrategy)?.reserves.find(
+            (reserve) =>
+              reserve.mintAddress ===
+                (currentAccount?.isSol
+                  ? WSOL_MINT
+                  : currentAccount?.extensions.token?.account.mint.toString()) &&
+              reserve.collateralMintAddress ===
+                acc.extensions.mint?.publicKey.toBase58()
+          )
+          if (!reserve || !solendStrategy) return null
+
+          return {
+            acc,
+            reserve,
+          }
+        })
+        .filter(Boolean)
+
+      const reserveStats = await getReserveData(
+        relevantAccs.map((data) => data!.reserve.reserveAddress)
+      )
+
+      return relevantAccs.map((data) => {
+        const reserve = data!.reserve
+        const account = data!.acc
+
+        const stat = reserveStats.find(
+          (stat) => stat.reserve.lendingMarket === reserve.marketAddress
+        )!
 
         return {
-          acc
-          , reserve
-        };
-      }).filter(Boolean);
-
-
-      const reserveStats = await getReserveData(relevantAccs.map((data) => data!.reserve.reserveAddress));
-
-      const slndStrats = relevantAccs.map(data => {
-        const reserve = data!.reserve;
-        const account = data!.acc;
-
-        const stat = reserveStats.find(stat => stat.reserve.lendingMarket === reserve.marketAddress)!;
-
-        const cTokenExchangeRate = new BigNumber(stat.reserve.liquidity.availableAmount ?? '0').plus(
-          new BigNumber(stat.reserve.liquidity.borrowedAmountWads).shiftedBy(-18)
-        ).dividedBy(
-          new BigNumber(stat.reserve.collateral.mintTotalSupply)
-        ).toNumber()
-
-        return ({
-        ...solendStrategy,
-        apy: `${reserve.supplyApy.toFixed(2)}%`,
-        protocolName: `${solendStrategy.protocolName} (${reserve.marketName} Pool)`,
-        investedAmount: (account.extensions.amount?.toNumber() ?? 0) * cTokenExchangeRate / (10 ** reserve.decimals),
-      })
-    }) as Array<InvestmentType>
-
-
-      setAccountInvestments(
-        [
-          ...slndStrats,
-          ...accountInvestments.filter(invest => invest.protocolName.slice(0, SOLEND.length) !== SOLEND),
-        ]
-      )
-      setEligibleInvestments(
-        [
-          ...slndStrats,
-          ...accountInvestments.filter(invest => invest.protocolName.slice(0, SOLEND.length) !== SOLEND),
-        ]
-      )
+          ...solendStrategy,
+          apy: `${reserve.supplyApy.toFixed(2)}%`,
+          protocolName: solendStrategy.protocolName,
+          strategySubtext: `${reserve.marketName} Pool`,
+          investedAmount:
+            ((account.extensions.amount?.toNumber() ?? 0) *
+              cTokenExchangeRate(stat)) /
+            10 ** reserve.decimals,
+        }
+      }) as Array<InvestmentType>
     }
 
-
-    if (eligibleInvestments.filter((x) => x.protocolName === SOLEND).length) {
-      console.log('change');
-      getSlndCTokens();
-    }
-  }, [eligibleInvestments, currentAccount])
-  
-  // Mango
-  useEffect(() => {
     const handleGetMangoAccounts = async () => {
       const currentAccountMint = currentAccount?.extensions.token?.account.mint
       const currentPositions = calculateAllDepositsInMangoAccountsForMint(
@@ -189,34 +175,35 @@ const AccountOverview = () => {
       )
 
       if (currentPositions > 0) {
-        setAccountInvestments(
-          [
-            ...accountInvestments.filter((x) => x.protocolName !== MANGO),
-            ...eligibleInvestments.map(invest => ({
-              ...invest,
-              amount: currentPositions
-            })).filter((x) => x.protocolName === MANGO),
-          ]
-        )
-        setEligibleInvestments(
-          [
-            ...eligibleInvestments.filter((x) => x.protocolName !== MANGO),
-            ...eligibleInvestments.map(invest => ({
-              ...invest,
-              amount: currentPositions
-            })).filter((x) => x.protocolName === MANGO),
-          ]
-        )
-      } else {
-        setAccountInvestments(
-          accountInvestments.filter((x) => x.protocolName !== MANGO),
-        )
+        return strategies
+          .map((invest) => ({
+            ...invest,
+            investedAmount: currentPositions,
+          }))
+          .filter((x) => x.protocolName === MANGO)
       }
+
+      return []
     }
-    if (eligibleInvestments.filter((x) => x.protocolName === MANGO).length) {
-      handleGetMangoAccounts()
+
+    const loadData = async () => {
+      const requests = [] as Array<Promise<Array<InvestmentType>>>
+      if (visibleInvestments.filter((x) => x.protocolName === MANGO).length) {
+        requests.push(handleGetMangoAccounts())
+      }
+      if (visibleInvestments.filter((x) => x.protocolName === SOLEND).length) {
+        requests.push(getSlndCTokens())
+      }
+
+      const results = await Promise.all(requests)
+      setLoading(false)
+
+      setAccountInvestments(results.flatMap((x) => x))
     }
-  }, [eligibleInvestments, currentAccount, mngoAccounts])
+
+    loadData()
+  }, [currentAccount, mngoAccounts])
+
   useEffect(() => {
     const getMangoAcccounts = async () => {
       const accounts = await tryGetMangoAccountsForOwner(
@@ -228,7 +215,7 @@ const AccountOverview = () => {
     if (currentAccount) {
       getMangoAcccounts()
     }
-  }, [currentAccount, eligibleInvestments, market])
+  }, [currentAccount, market])
 
   useEffect(() => {
     if (isCopied) {
@@ -240,12 +227,12 @@ const AccountOverview = () => {
   }, [isCopied])
 
   useEffect(() => {
-    if (eligibleInvestments.length && accountInvestments.length === 0) {
-      setShowStrategies(true);
+    if (visibleInvestments.length && visibleAccounts.length === 0) {
+      setShowStrategies(true)
     } else {
-      setShowStrategies(false);
+      setShowStrategies(false)
     }
-  }, [eligibleInvestments, accountInvestments])
+  }, [currentAccount, visibleAccounts.length, visibleInvestments.length])
 
   const handleCopyAddress = (address: string) => {
     navigator.clipboard.writeText(address)
@@ -256,6 +243,14 @@ const AccountOverview = () => {
     return null
   }
 
+  const deposits = visibleAccounts.reduce(
+    (acc, account) => ({
+      ...acc,
+      [account.protocolName]:
+        (acc[account.protocolName] ?? 0) + account.investedAmount,
+    }),
+    {}
+  )
   return (
     <>
       <div className="flex items-center justify-between mb-2 py-2">
@@ -407,12 +402,17 @@ const AccountOverview = () => {
             </LinkButton>
           </div>
           {showStrategies ? (
-            eligibleInvestments.length > 0 ? (
-              eligibleInvestments.map((strat, i) => (
+            visibleInvestments.length > 0 ? (
+              visibleInvestments.map((strat, i) => (
                 <StrategyCard
                   key={strat.handledTokenSymbol + i}
-                  currentDeposits={strat.investedAmount}
-                  onClick={() => setProposedInvestment(strat)}
+                  currentDeposits={deposits[strat.protocolName] ?? 0}
+                  onClick={() => {
+                    setProposedInvestment({
+                      ...strat,
+                      investedAmount: deposits[strat.protocolName] ?? 0,
+                    })
+                  }}
                   strat={strat}
                 />
               ))
@@ -423,8 +423,8 @@ const AccountOverview = () => {
                 </p>
               </div>
             )
-          ) : accountInvestments.length > 0 ? (
-            accountInvestments.map((strat, i) => (
+          ) : visibleAccounts.length > 0 ? (
+            visibleAccounts.map((strat, i) => (
               <StrategyCard
                 key={strat.handledTokenSymbol + i}
                 strat={strat}
@@ -434,7 +434,7 @@ const AccountOverview = () => {
           ) : (
             <div className="border border-fgd-4 p-4 rounded-md">
               <p className="text-center text-fgd-3">
-                No investments for this account
+                {loading ? 'Loading...' : 'No investments for this account'}
               </p>
             </div>
           )}
@@ -478,7 +478,7 @@ const AccountOverview = () => {
         <DepositModal
           governedTokenAccount={currentAccount}
           mangoAccounts={mngoAccounts}
-          currentPosition={currentDeposits}
+          currentPosition={proposedInvestment.investedAmount}
           apy={proposedInvestment.apy}
           handledMint={proposedInvestment.handledMint}
           onClose={() => {
@@ -574,6 +574,7 @@ const StrategyCard = ({
     handledTokenImgSrc,
     strategyName,
     protocolName,
+    strategySubtext,
     handledTokenSymbol,
     apy,
   } = strat
@@ -584,14 +585,14 @@ const StrategyCard = ({
     <div className="border border-fgd-4 flex items-center justify-between mt-2 p-4 rounded-md">
       <div className="flex items-center">
         {strat.protocolLogoSrc ? (
-            <img
-              src={strat.protocolLogoSrc}
-              style={{
-                marginRight: -8,
-              }}
-              className="h-8 rounded-full w-8"
-            ></img>
-          ) : null}
+          <img
+            src={strat.protocolLogoSrc}
+            style={{
+              marginRight: -8,
+            }}
+            className="h-8 rounded-full w-8"
+          ></img>
+        ) : null}
         {handledTokenImgSrc ? (
           <img
             src={strat.handledTokenImgSrc}
@@ -599,7 +600,9 @@ const StrategyCard = ({
           ></img>
         ) : null}
         <div>
-          <p className="text-xs">{`${strategyName} ${handledTokenSymbol} on ${protocolName}`}</p>
+          <p className="text-xs">{`${strategyName} ${handledTokenSymbol} on ${protocolName}${
+            strategySubtext ? ` - ${strategySubtext}` : ''
+          }`}</p>
           <p className="font-bold text-fgd-1">{`${currentPositionFtm} ${handledTokenSymbol}`}</p>
         </div>
       </div>

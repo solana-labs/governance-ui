@@ -22,6 +22,7 @@ const DepositModal = ({
   const currentPositionFtm = new BigNumber(
     currentPosition.toFixed(0)
   ).toFormat()
+  console.log('hi')
   return (
     <Modal onClose={onClose} isOpen={Boolean(proposedInvestment)}>
       <ModalHeader
@@ -36,7 +37,6 @@ const DepositModal = ({
           proposedInvestment={proposedInvestment as SolendStrategy}
           governedTokenAccount={governedTokenAccount}
           handledMint={handledMint}
-          currentPosition={currentPosition}
           createProposalFcn={createProposalFcn}
         />
       ) : null}

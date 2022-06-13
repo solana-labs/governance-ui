@@ -1,19 +1,36 @@
 import { BN } from '@project-serum/anchor'
-import { 
+import {
   ProgramAccount,
-  Realm,getInstructionDataFromBase64, RpcContext, serializeInstructionToBase64, TokenOwnerRecord } from '@solana/spl-governance'
-import { ASSOCIATED_TOKEN_PROGRAM_ID, Token, TOKEN_PROGRAM_ID } from '@solana/spl-token'
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
-import { depositReserveLiquidityInstruction, redeemReserveCollateralInstruction } from '@solendprotocol/solend-sdk'
-import { fmtMintAmount, getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
+  Realm,
+  getInstructionDataFromBase64,
+  RpcContext,
+  serializeInstructionToBase64,
+  TokenOwnerRecord,
+} from '@solana/spl-governance'
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  NATIVE_MINT,
+  Token,
+  TOKEN_PROGRAM_ID,
+} from '@solana/spl-token'
+import { PublicKey, SystemProgram } from '@solana/web3.js'
+import {
+  depositReserveLiquidityInstruction,
+  redeemReserveCollateralInstruction,
+  syncNative,
+} from '@solendprotocol/solend-sdk'
 import tokenService from '@utils/services/token'
-import { createProposal, InstructionDataWithHoldUpTime } from 'actions/createProposal'
+import {
+  createProposal,
+  InstructionDataWithHoldUpTime,
+} from 'actions/createProposal'
 import axios from 'axios'
 import { SolendStrategy } from 'Strategies/types/types'
 
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { ConnectionContext } from '@utils/connection'
+import BigNumber from 'bignumber.js'
 
 const MAINNET_PROGRAM = 'So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo'
 const DEVNET_PROGRAM = 'ALend7Ketfx5bxh6ghsCDXAoDrhvEmsXT3cynB6aPLgx'
@@ -28,12 +45,13 @@ const SOLEND_ENDPOINT = 'https://api.solend.fi'
 export type CreateSolendStrategyParams = (
   rpcContext: RpcContext,
   form: {
-    title: string,
-    description: string,
+    title: string
+    description: string
     action: 'Deposit' | 'Withdraw'
-    amount: number,
-    proposalCount: number,
-    reserve: SolendSubStrategy,
+    bnAmount: BN
+    amountFmt: string
+    proposalCount: number
+    reserve: SolendSubStrategy
   },
   realm: ProgramAccount<Realm>,
   treasuaryAccount: AssetAccount,
@@ -43,95 +61,105 @@ export type CreateSolendStrategyParams = (
   isDraft: boolean,
   connection: ConnectionContext,
   client?: VotingClient
-) => Promise<PublicKey>;
+) => Promise<PublicKey>
 
-type Config = Array<MarketConfig>;
+type Config = Array<MarketConfig>
 
 type MarketConfig = {
-  name: string;
-  isPrimary: boolean;
-  description: string;
-  creator: string;
-  address: string;
-  authorityAddress: string;
-  reserves: Array<ReserveConfig>;
-};
+  name: string
+  isPrimary: boolean
+  description: string
+  creator: string
+  address: string
+  authorityAddress: string
+  reserves: Array<ReserveConfig>
+}
 
 type ReserveConfig = {
   liquidityToken: {
-    coingeckoID: string;
-    decimals: number;
-    logo: string;
-    mint: string;
-    name: string;
-    symbol: string;
-    volume24h: number;
-  };
-  pythOracle: string;
-  switchboardOracle: string;
-  address: string;
-  collateralMintAddress: string;
-  collateralSupplyAddress: string;
-  liquidityAddress: string;
-  liquidityFeeReceiverAddress: string;
-  userSupplyCap: number;
-};
+    coingeckoID: string
+    decimals: number
+    logo: string
+    mint: string
+    name: string
+    symbol: string
+    volume24h: number
+  }
+  pythOracle: string
+  switchboardOracle: string
+  address: string
+  collateralMintAddress: string
+  collateralSupplyAddress: string
+  liquidityAddress: string
+  liquidityFeeReceiverAddress: string
+  userSupplyCap: number
+}
 
 type ReserveStat = {
   reserve: {
-    lendingMarket: string,
+    lendingMarket: string
     liquidity: {
-      mintPubkey: string,
-      mintDecimals: number,
-      supplyPubkey: string,
-      pythOracle: string,
-      switchboardOracle: string,
-      availableAmount: string,
-      borrowedAmountWads: string,
-      cumulativeBorrowRateWads: string,
+      mintPubkey: string
+      mintDecimals: number
+      supplyPubkey: string
+      pythOracle: string
+      switchboardOracle: string
+      availableAmount: string
+      borrowedAmountWads: string
+      cumulativeBorrowRateWads: string
       marketPrice: string
-    },  
+    }
     collateral: {
-        mintPubkey: string,
-        mintTotalSupply: string,
-        supplyPubkey: string
-    },
-  };
+      mintPubkey: string
+      mintTotalSupply: string
+      supplyPubkey: string
+    }
+  }
   rates: {
-    supplyInterest: string,
+    supplyInterest: string
     borrowInterest: string
   }
 }
 
 export type SolendSubStrategy = {
-  marketAddress: string;
-  marketName: string;
-  reserveAddress: string;
-  mintAddress: string;
-  logo: string;
-  symbol: string;
-  decimals: number;
-  liquidity: number;
-  supplyApy: number;
-  isPrimary: boolean;
-  liquidityAddress: string,
-  collateralMintAddress: string,
-  marketAuthorityAddress: string,
+  marketAddress: string
+  marketName: string
+  reserveAddress: string
+  mintAddress: string
+  logo: string
+  symbol: string
+  decimals: number
+  liquidity: number
+  supplyApy: number
+  isPrimary: boolean
+  liquidityAddress: string
+  collateralMintAddress: string
+  marketAuthorityAddress: string
 }
 
-export async function getReserveData(reserveIds: Array<string>): Promise<Array<ReserveStat>> {
+export async function getReserveData(
+  reserveIds: Array<string>
+): Promise<Array<ReserveStat>> {
+  if (!reserveIds.length) return []
   const stats = (
     await (
       await axios.get(
-        `${SOLEND_ENDPOINT}/v1/reserves?ids=${reserveIds
-          .join(',')}`
+        `${SOLEND_ENDPOINT}/v1/reserves?ids=${reserveIds.join(',')}`
       )
     ).data
-  ).results as Array<ReserveStat>;
+  ).results as Array<ReserveStat>
 
-  return stats;
+  return stats
 }
 
+export function cTokenExchangeRate(reserve: ReserveStat) {
+  return new BigNumber(reserve.reserve.liquidity.availableAmount ?? '0')
+    .plus(
+      new BigNumber(reserve.reserve.liquidity.borrowedAmountWads).shiftedBy(-18)
+    )
+    .dividedBy(new BigNumber(reserve.reserve.collateral.mintTotalSupply))
+    .toNumber()
+}
 
 export async function getReserve(): Promise<Config> {
   return await (
@@ -147,16 +175,18 @@ export async function getConfig(): Promise<Config> {
 
 export async function getReserves(): Promise<Config[0]['reserves']> {
   const config = await getConfig()
-  const reserves = config.flatMap(market => market.reserves.map(reserve => ({
-    marketName: market.name,
-    marketDescription: market.description,
-    marketAddress: market.address,
-    marketPrimary: market.isPrimary,
-    marketAuthorityAddress: market.authorityAddress,
-    ...reserve,
-  })))
+  const reserves = config.flatMap((market) =>
+    market.reserves.map((reserve) => ({
+      marketName: market.name,
+      marketDescription: market.description,
+      marketAddress: market.address,
+      marketPrimary: market.isPrimary,
+      marketAuthorityAddress: market.authorityAddress,
+      ...reserve,
+    }))
+  )
 
-  return reserves;
+  return reserves
 }
 
 export async function getSolendStrategies() {
@@ -164,19 +194,22 @@ export async function getSolendStrategies() {
 
   // method to fetch solend strategies
   const config = await getConfig()
-  const reserves = config.flatMap(market => market.reserves.map(reserve => ({
-    marketName: market.name,
-    marketDescription: market.description,
-    marketAddress: market.address,
-    marketPrimary: market.isPrimary,
-    marketAuthorityAddress: market.authorityAddress,
-    ...reserve,
-  })))
+  const reserves = config.flatMap((market) =>
+    market.reserves.map((reserve) => ({
+      marketName: market.name,
+      marketDescription: market.description,
+      marketAddress: market.address,
+      marketPrimary: market.isPrimary,
+      marketAuthorityAddress: market.authorityAddress,
+      ...reserve,
+    }))
+  )
 
-  const stats = await getReserveData(reserves.map(reserve => reserve.address));
+  const stats = await getReserveData(reserves.map((reserve) => reserve.address))
 
-  const mergedData = reserves.map((reserve ,index) => ({
-    marketName: reserve.marketName.charAt(0).toUpperCase() + reserve.marketName.slice(1),
+  const mergedData = reserves.map((reserve, index) => ({
+    marketName:
+      reserve.marketName.charAt(0).toUpperCase() + reserve.marketName.slice(1),
     marketAddress: reserve.marketAddress,
     reserveAddress: reserve.address,
     mintAddress: reserve.liquidityToken.mint,
@@ -187,26 +220,38 @@ export async function getSolendStrategies() {
     isPrimary: reserve.marketPrimary,
     logo: reserve.liquidityToken.logo,
     symbol: reserve.liquidityToken.symbol,
-    liquidity: Number(stats[index].reserve.liquidity.availableAmount) / (10 ** stats[index].reserve.liquidity.mintDecimals) * (Number(stats[index].reserve.liquidity.marketPrice) / 10 ** 18),
+    liquidity:
+      (Number(stats[index].reserve.liquidity.availableAmount) /
+        10 ** stats[index].reserve.liquidity.mintDecimals) *
+      (Number(stats[index].reserve.liquidity.marketPrice) / 10 ** 18),
     supplyApy: Number(stats[index].rates.supplyInterest),
   })) as Array<SolendSubStrategy>
-  
-  const aggregatedData = mergedData.reduce((acc, reserve) => ({
-    ...acc,
-    [reserve.symbol]: (acc[reserve.symbol] ?? []).concat(reserve),
-  }), {} as {
-    [symbol: string]: typeof mergedData
-  });
+
+  const aggregatedData = mergedData.reduce(
+    (acc, reserve) => ({
+      ...acc,
+      [reserve.symbol]: (acc[reserve.symbol] ?? []).concat(reserve),
+    }),
+    {} as {
+      [symbol: string]: typeof mergedData
+    }
+  )
 
   for (const [symbol, reserves] of Object.entries(aggregatedData)) {
-    const tokenData = reserves[0];
-    const maxApy = Math.max(...reserves.map(reserve => reserve.supplyApy));
-    const totalLiquidity = reserves.reduce((acc, reserve) => (acc + reserve.liquidity), 0)
+    const tokenData = reserves[0]
+    const maxApy = Math.max(...reserves.map((reserve) => reserve.supplyApy))
+    const totalLiquidity = reserves.reduce(
+      (acc, reserve) => acc + reserve.liquidity,
+      0
+    )
 
     strats.push({
       liquidity: totalLiquidity,
       handledTokenSymbol: symbol,
-      apy: reserves.length > 1 ? `Up to ${maxApy.toFixed(2)}%` : `${maxApy.toFixed(2)}%`,
+      apy:
+        reserves.length > 1
+          ? `Up to ${maxApy.toFixed(2)}%`
+          : `${maxApy.toFixed(2)}%`,
       protocolName: SOLEND,
       protocolSymbol: SOLEND_SYMBOL,
       handledMint: tokenData.mintAddress,
@@ -227,11 +272,12 @@ export async function getSolendStrategies() {
 async function handleSolendAction(
   rpcContext: RpcContext,
   form: {
-    action: 'Deposit' | 'Withdraw',
-    title: string,
-    description: string,
-    amount: number,
-    reserve: SolendSubStrategy,
+    action: 'Deposit' | 'Withdraw'
+    title: string
+    description: string
+    bnAmount: BN
+    reserve: SolendSubStrategy
+    amountFmt: string
   },
   realm: ProgramAccount<Realm>,
   matchedTreasury: AssetAccount,
@@ -242,108 +288,201 @@ async function handleSolendAction(
   connection: ConnectionContext,
   client?: VotingClient
 ) {
-  const setupInstructions: TransactionInstruction[] = []
+  const isSol = matchedTreasury.isSol
   const insts: InstructionDataWithHoldUpTime[] = []
+  const owner = isSol
+    ? matchedTreasury!.pubkey
+    : matchedTreasury!.extensions!.token!.account.owner
 
   const slndProgramAddress =
-    connection.cluster === 'mainnet'
-      ? MAINNET_PROGRAM
-      : DEVNET_PROGRAM
+    connection.cluster === 'mainnet' ? MAINNET_PROGRAM : DEVNET_PROGRAM
 
-  const bnAmount = getMintNaturalAmountFromDecimalAsBN(
-    form.amount,
-    matchedTreasury.extensions.mint!.account.decimals,
-  )
-
-  const fmtAmount = fmtMintAmount(
-    matchedTreasury.extensions.mint?.account,
-    new BN(form.amount)
-  )
-
-  const ataDepositAddress = await Token.getAssociatedTokenAddress(
+  const ctokenATA = await Token.getAssociatedTokenAddress(
     ASSOCIATED_TOKEN_PROGRAM_ID,
     TOKEN_PROGRAM_ID,
     new PublicKey(form.reserve.collateralMintAddress),
-    matchedTreasury!.extensions!.token!.account.owner,
+    owner,
     true
   )
 
-  const liquidityWithdrawAddress = await Token.getAssociatedTokenAddress(
+  const liquidityATA = await Token.getAssociatedTokenAddress(
     ASSOCIATED_TOKEN_PROGRAM_ID,
     TOKEN_PROGRAM_ID,
-    new PublicKey(form.reserve.collateralMintAddress),
-    matchedTreasury!.extensions!.token!.account.owner,
+    new PublicKey(form.reserve.mintAddress),
+    owner,
     true
   )
 
+  let createAtaInst
 
   if (form.action === 'Deposit') {
     const depositAccountInfo = await connection.current.getAccountInfo(
-      ataDepositAddress,
-    );
+      ctokenATA
+    )
     if (!depositAccountInfo) {
       // generate the instruction for creating the ATA
-      const createAtaIx = Token.createAssociatedTokenAccountInstruction(
+      createAtaInst = Token.createAssociatedTokenAccountInstruction(
         ASSOCIATED_TOKEN_PROGRAM_ID,
         TOKEN_PROGRAM_ID,
         new PublicKey(form.reserve.collateralMintAddress),
-        ataDepositAddress,
-        matchedTreasury!.extensions!.token!.account.owner,
-        rpcContext.walletPubkey
+        ctokenATA,
+        owner,
+        owner
       )
-      setupInstructions.push(createAtaIx)
     }
   } else {
     const withdrawAccountInfo = await connection.current.getAccountInfo(
-      liquidityWithdrawAddress,
-    );
+      liquidityATA
+    )
     if (!withdrawAccountInfo) {
       // generate the instruction for creating the ATA
-      const createAtaIx = Token.createAssociatedTokenAccountInstruction(
+      createAtaInst = Token.createAssociatedTokenAccountInstruction(
         ASSOCIATED_TOKEN_PROGRAM_ID,
         TOKEN_PROGRAM_ID,
-        matchedTreasury.extensions.token?.publicKey!,
-        liquidityWithdrawAddress,
-        matchedTreasury!.extensions!.token!.account.owner,
-        rpcContext.walletPubkey
+        matchedTreasury.extensions.token!.publicKey,
+        liquidityATA,
+        owner,
+        owner
       )
-      setupInstructions.push(createAtaIx)
     }
   }
 
-  const actionIx = form.action === 'Deposit' ? depositReserveLiquidityInstruction(
-    bnAmount,
-    matchedTreasury.extensions.token?.publicKey!,
-    ataDepositAddress,
-    new PublicKey(form.reserve.reserveAddress),
-    new PublicKey(form.reserve.liquidityAddress),
-    new PublicKey(form.reserve.collateralMintAddress),
-    new PublicKey(form.reserve.marketAddress),
-    new PublicKey(form.reserve.marketAuthorityAddress),
-    matchedTreasury!.extensions!.token!.account.owner,
-    new PublicKey(slndProgramAddress)
-  ) : redeemReserveCollateralInstruction(
-    bnAmount,
-    ataDepositAddress,
-    matchedTreasury.extensions.token?.publicKey!,
-    new PublicKey(form.reserve.reserveAddress),
-    new PublicKey(form.reserve.collateralMintAddress),
-    new PublicKey(form.reserve.liquidityAddress),
-    new PublicKey(form.reserve.marketAddress),
-    new PublicKey(form.reserve.marketAuthorityAddress),
-    matchedTreasury!.extensions!.token!.account.owner,
-    new PublicKey(slndProgramAddress)
-  );
+  if (createAtaInst) {
+    const createAtaInstObj = {
+      data: getInstructionDataFromBase64(
+        serializeInstructionToBase64(createAtaInst)
+      ),
+      holdUpTime: matchedTreasury.governance!.account!.config
+        .minInstructionHoldUpTime,
+      prerequisiteInstructions: [],
+      chunkSplitByDefault: true,
+    }
+    insts.push(createAtaInstObj)
+  }
+
+  const setupInsts: InstructionDataWithHoldUpTime[] = []
+  const cleanupInsts: InstructionDataWithHoldUpTime[] = []
+
+  if (isSol) {
+    const userWSOLAccountInfo = await connection.current.getAccountInfo(
+      liquidityATA
+    )
+
+    const rentExempt = await Token.getMinBalanceRentForExemptAccount(
+      connection.current
+    )
+
+    const sendAction = form.action === 'Deposit'
+
+    const transferLamportsIx = SystemProgram.transfer({
+      fromPubkey: owner,
+      toPubkey: liquidityATA,
+      lamports:
+        (userWSOLAccountInfo ? 0 : rentExempt) +
+        (sendAction ? form.bnAmount.toNumber() : 0),
+    })
+
+    const transferLamportInst = {
+      data: getInstructionDataFromBase64(
+        serializeInstructionToBase64(transferLamportsIx)
+      ),
+      holdUpTime: matchedTreasury.governance!.account!.config
+        .minInstructionHoldUpTime,
+      prerequisiteInstructions: [],
+      chunkSplitByDefault: true,
+    }
+
+    setupInsts.push(transferLamportInst)
+
+    const closeWSOLAccountIx = Token.createCloseAccountInstruction(
+      TOKEN_PROGRAM_ID,
+      liquidityATA,
+      owner,
+      owner,
+      []
+    )
+
+    const closeWSOLInst = {
+      data: getInstructionDataFromBase64(
+        serializeInstructionToBase64(closeWSOLAccountIx)
+      ),
+      holdUpTime: matchedTreasury.governance!.account!.config
+        .minInstructionHoldUpTime,
+      prerequisiteInstructions: [],
+      chunkSplitByDefault: true,
+    }
+
+    if (userWSOLAccountInfo) {
+      const syncIx = syncNative(liquidityATA)
+      const syncInst = {
+        data: getInstructionDataFromBase64(
+          serializeInstructionToBase64(syncIx)
+        ),
+        holdUpTime: matchedTreasury.governance!.account!.config
+          .minInstructionHoldUpTime,
+        prerequisiteInstructions: [],
+        chunkSplitByDefault: true,
+      }
+      if (sendAction) {
+        setupInsts.push(syncInst)
+      } else {
+        cleanupInsts.push(closeWSOLInst)
+      }
+    } else {
+      const createUserWSOLAccountIx = Token.createAssociatedTokenAccountInstruction(
+        ASSOCIATED_TOKEN_PROGRAM_ID,
+        TOKEN_PROGRAM_ID,
+        NATIVE_MINT,
+        liquidityATA,
+        owner,
+        owner
+      )
+      const createUserWSOLAccountInst = {
+        data: getInstructionDataFromBase64(
+          serializeInstructionToBase64(createUserWSOLAccountIx)
+        ),
+        holdUpTime: matchedTreasury.governance!.account!.config
+          .minInstructionHoldUpTime,
+        prerequisiteInstructions: [],
+        chunkSplitByDefault: true,
+      }
+      setupInsts.push(createUserWSOLAccountInst)
+      cleanupInsts.push(closeWSOLInst)
+    }
+  }
+
+  const actionIx =
+    form.action === 'Deposit'
+      ? depositReserveLiquidityInstruction(
+          form.bnAmount,
+          liquidityATA,
+          ctokenATA,
+          new PublicKey(form.reserve.reserveAddress),
+          new PublicKey(form.reserve.liquidityAddress),
+          new PublicKey(form.reserve.collateralMintAddress),
+          new PublicKey(form.reserve.marketAddress),
+          new PublicKey(form.reserve.marketAuthorityAddress),
+          owner,
+          new PublicKey(slndProgramAddress)
+        )
+      : redeemReserveCollateralInstruction(
+          form.bnAmount,
+          ctokenATA,
+          liquidityATA,
+          new PublicKey(form.reserve.reserveAddress),
+          new PublicKey(form.reserve.collateralMintAddress),
+          new PublicKey(form.reserve.liquidityAddress),
+          new PublicKey(form.reserve.marketAddress),
+          new PublicKey(form.reserve.marketAuthorityAddress),
+          owner,
+          new PublicKey(slndProgramAddress)
+        )
 
   const depositSolendInsObj = {
-    data: getInstructionDataFromBase64(
-      serializeInstructionToBase64(
-        actionIx
-      )
-    ),
+    data: getInstructionDataFromBase64(serializeInstructionToBase64(actionIx)),
     holdUpTime: matchedTreasury.governance!.account!.config
       .minInstructionHoldUpTime,
-    prerequisiteInstructions: [...setupInstructions],
+    prerequisiteInstructions: [],
     chunkSplitByDefault: true,
   }
   insts.push(depositSolendInsObj)
@@ -354,15 +493,17 @@ async function handleSolendAction(
     matchedTreasury.governance!.pubkey,
     tokenOwnerRecord,
     form.title ||
-      `${form.action} ${form.amount} ${
+      `${form.action} ${form.amountFmt} ${
         tokenService.getTokenInfo(
           matchedTreasury.extensions.mint!.publicKey.toBase58()
         )?.symbol || 'tokens'
-      } ${form.action ==='Deposit' ? 'into' : 'from'} the Solend ${form.reserve.name} pool`,
+      } ${form.action === 'Deposit' ? 'into' : 'from'} the Solend ${
+        form.reserve.marketName
+      } pool`,
     form.description,
     governingTokenMint,
     proposalIndex,
-    insts,
+    [...setupInsts, ...insts, ...cleanupInsts],
     isDraft,
     client
   )
