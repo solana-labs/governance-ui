@@ -93,7 +93,9 @@ const SolendDeposit = ({
     title: '',
     description: '',
     amount: undefined,
-    reserve: proposedInvestment.reserves.find((reserve) => reserve.isPrimary)!,
+    reserve:
+      proposedInvestment.reserves.find((reserve) => reserve.isPrimary) ??
+      proposedInvestment.reserves[0]!,
   })
   const [formErrors, setFormErrors] = useState({})
   const proposalTitle = `Deposit ${form.amount} ${
