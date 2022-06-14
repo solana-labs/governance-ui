@@ -81,7 +81,7 @@ function CommunityInfo({
   const nftIsCommunityToken = !!nftInfo?.name
   const updatedTokenInfo = {
     ...tokenInfo,
-    name: tokenInfo?.name || mintAddress || 'Token will be generated',
+    name: tokenInfo?.name || mintAddress || '(To be generated)',
   }
 
   return (
@@ -161,7 +161,7 @@ function CouncilInfo({
 }) {
   const updatedTokenInfo = {
     ...tokenInfo,
-    name: tokenInfo?.name || mintAddress || 'Token will be generated',
+    name: tokenInfo?.name || mintAddress || '(To be generated)',
   }
 
   return (
