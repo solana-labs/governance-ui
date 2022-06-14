@@ -85,7 +85,9 @@ const SolendWithdraw = ({
     title: '',
     description: '',
     amount: undefined,
-    reserve: proposedInvestment.reserves.find((reserve) => reserve.isPrimary)!,
+    reserve:
+      proposedInvestment.reserves.find((reserve) => reserve.isPrimary) ??
+      proposedInvestment.reserves[0]!,
     max: false,
   })
   const [formErrors, setFormErrors] = useState({})
