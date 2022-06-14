@@ -1,14 +1,14 @@
+import NotificationsCard from '@components/NotificationsCard'
+import NotifiPreviewCard from '@components/NotificationsCard/NotifiPreviewCard'
 import { EndpointTypes } from '@models/types'
-import { Source } from '@notifi-network/notifi-core'
 import {
   BlockchainEnvironment,
+  Source,
   useNotifiClient,
 } from '@notifi-network/notifi-react-hooks'
-import { useRouter } from 'next-router-mock'
-import React, { useCallback, useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
+import { useCallback, useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
-import NotificationsCard from '.'
-import NotifiPreviewCard from './NotifiPreviewCard'
 
 type Props = {
   onBackClick: () => void
@@ -102,8 +102,7 @@ const NotificationCardContainer: React.FC<Props> = ({ onBackClick }) => {
         setPreview(true)
         return
       }
-    }
-    setPreview(false)
+    } else setPreview(false)
   }, [connected, data, email, isAuthenticated, phoneNumber, telegram])
 
   const handleUnsubscribe = useCallback(
@@ -129,30 +128,35 @@ const NotificationCardContainer: React.FC<Props> = ({ onBackClick }) => {
     [data?.alerts, deleteAlert]
   )
 
-  return showPreview ? (
-    <NotifiPreviewCard
-      handleDelete={handleUnsubscribe}
-      email={email}
-      // this passes down useNotiClientData
-      {...notifiClient}
-      phoneNumber={phoneNumber}
-      telegram={telegram}
-      telegramEnabled={telegramEnabled}
-      onClick={() => setPreview(false)}
-    />
-  ) : (
-    <NotificationsCard
-      phoneNumber={phoneNumber}
-      email={email}
-      telegram={telegram}
-      setPhone={setPhone}
-      setTelegram={setTelegram}
-      setEmail={setEmail}
-      // this passes down useNotiClientData
-      {...notifiClient}
-      onBackClick={onBackClick}
-      setPreview={setPreview}
-    />
+  return (
+    <div className="h-[576]px] w-[507px] absolute top-4 right-0">
+      {showPreview ? (
+        <NotifiPreviewCard
+          handleDelete={handleUnsubscribe}
+          email={email}
+          // this passes down useNotiClientData
+          {...notifiClient}
+          phoneNumber={phoneNumber}
+          telegram={telegram}
+          telegramEnabled={telegramEnabled}
+          onBackClick={onBackClick}
+          onClick={() => setPreview(false)}
+        />
+      ) : (
+        <NotificationsCard
+          phoneNumber={phoneNumber}
+          email={email}
+          telegram={telegram}
+          setPhone={setPhone}
+          setTelegram={setTelegram}
+          setEmail={setEmail}
+          // this passes down useNotiClientData
+          {...notifiClient}
+          onBackClick={onBackClick}
+          setPreview={setPreview}
+        />
+      )}
+    </div>
   )
 }
 
