@@ -31,6 +31,7 @@ type NotifiClientReturnType = ReturnType<typeof useNotifiClient>
 type NotificationCardProps = {
   onBackClick: () => void
   email: string
+
   phoneNumber: string
   telegram: string
   setPreview: Dispatch<SetStateAction<boolean>>
@@ -297,18 +298,6 @@ const NotificationsCard = ({
     (isAuthenticated && !hasUnsavedChanges) ||
     (localEmail === '' && localTelegram === '' && localPhoneNumber === '') ||
     errorMessage !== ''
-
-  const handleBackClick = useCallback(() => {
-    if (isSame && !disabled) {
-      setPreview(true)
-      return
-    }
-    if (disabled) {
-      onBackClick()
-    } else {
-      setPreview(false)
-    }
-  }, [disabled, isSame, onBackClick, setPreview])
 
   const handleBackClick = useCallback(() => {
     if (isSame && !disabled) {
