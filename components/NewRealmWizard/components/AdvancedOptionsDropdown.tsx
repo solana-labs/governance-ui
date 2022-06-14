@@ -47,7 +47,7 @@ export default function AdvancedOptionsDropdown({
         leaveFrom="opacity-100"
         leaveTo="opacity-0"
       >
-        <div className="pt-10 pl-2">{children}</div>
+        <div className="pt-10">{children}</div>
       </Transition>
     </div>
   )
