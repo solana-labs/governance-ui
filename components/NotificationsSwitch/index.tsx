@@ -182,6 +182,7 @@ export default function NotificationsSwitch() {
           <div>
             <p className="inline-block text-sm">{description}</p>
           </div>
+        </div>
 
         <div className="flex w-full justify-center pt-3">
           <Button
@@ -195,7 +196,7 @@ export default function NotificationsSwitch() {
             Use {formatName(name)}
           </Button>
         </div>
-      )}
+      </div>
     </div>
   )
 
