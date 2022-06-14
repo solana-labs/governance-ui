@@ -39,6 +39,7 @@ type NotifiClientReturnType = ReturnType<typeof useNotifiClient>
 type NotificationCardProps = {
   onBackClick: () => void
   email: string
+
   phoneNumber: string
   telegram: string
   setPreview: Dispatch<SetStateAction<boolean>>
@@ -210,7 +211,6 @@ const NotificationsCard = ({
             }
           }
           if (results) {
-            setPreview(true)
             setEmail(
               results[0].targetGroup?.emailTargets[0]?.emailAddress ?? ''
             )
@@ -218,6 +218,7 @@ const NotificationsCard = ({
             setTelegram(
               results[0].targetGroup?.telegramTargets[0]?.telegramId ?? ''
             )
+            setPreview(true)
           }
           checkTelegramUnconfirmed(results)
           if (results) {
@@ -258,7 +259,6 @@ const NotificationsCard = ({
             )
           }
         }
-        onBackClick?.()
         setUnsavedChanges(false)
       } catch (e) {
         console.log(e)
@@ -277,7 +277,6 @@ const NotificationsCard = ({
     localPhoneNumber,
     localTelegram,
     logIn,
-    onBackClick,
     setEmail,
     setPhone,
     setPreview,
@@ -303,14 +302,31 @@ const NotificationsCard = ({
     setUnsavedChanges(true)
   }
 
+  const isSame =
+    email === localEmail &&
+    phoneNumber === localPhoneNumber &&
+    telegram === localTelegram
+
   const disabled =
     (isAuthenticated && !hasUnsavedChanges) ||
     (localEmail === '' && localTelegram === '' && localPhoneNumber === '')
 
+  const handleBackClick = () => {
+    if (isSame && !disabled) {
+      setPreview(true)
+      return
+    }
+    if (disabled) {
+      onBackClick()
+    } else {
+      setPreview(false)
+    }
+  }
+
   return (
-    <div className="bg-bkg-5 p-4 md:p-6 rounded-lg shadow-lg">
+    <div className="bg-bkg-5 w-full p-4 md:p-6 rounded-lg shadow-lg">
       <div className="flex flex-row items-center align-center">
-        <Button className="bg-transparent" onClick={onBackClick}>
+        <Button className="bg-transparent" onClick={handleBackClick}>
           <ArrowLeftIcon className="w-6 h-6" fill="grey" />
         </Button>
         <NotifiFullLogo />
@@ -379,14 +395,13 @@ const NotificationsCard = ({
           </div>
           <div className=" text-xs  place-items-center  align-items-center grid flex-row text-center">
             <div className="w-full place-items-center ">
-              Already Subscribed?
+              Already Subscribed?{' '}
               <a
                 className="text-xs text-primary-dark cursor-pointer "
                 onClick={handleRefresh}
                 rel="noreferrer"
                 title="Click here to load your alert details."
               >
-                {' '}
                 Click here to load your alert details.
               </a>
             </div>
