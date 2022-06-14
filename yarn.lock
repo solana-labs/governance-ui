@@ -727,22 +727,22 @@
     bigint-buffer "^1.1.5"
     buffer-layout "^1.2.2"
 
-"@civic/common-gateway-react@^0.1.10-alpha1":
-  version "0.1.10"
-  resolved "https://registry.yarnpkg.com/@civic/common-gateway-react/-/common-gateway-react-0.1.10.tgz#e246b3b201a5b63c48422bca3ea72867b4a94525"
-  integrity sha512-JMEqhv0/wmdLB3HrCM+7NRltyuneeFiNwTWDff5ZKHvAfhp+zCA2TmJEnM3RyBkT4i9d3RN1P1no91gnpZqy3w==
+"@civic/common-gateway-react@^0.1.11-alpha2":
+  version "0.1.11-alpha2"
+  resolved "https://registry.yarnpkg.com/@civic/common-gateway-react/-/common-gateway-react-0.1.11-alpha2.tgz#a21acf97258e09332c6165c9b2f375b4546b69bb"
+  integrity sha512-j+qp+ApJr/b/0fsPW5BK53GpOYxRpxBImUgm1sxQM60NAIOI4iLh1HDFYUam4El5VtfBSekzK8jpB+Tek0YFKw==
   dependencies:
     fetch-retry-ts "^1.1.24"
     iframe-resizer-react "^1.1.0"
     ramda "^0.27.1"
     styled-components "^5.3.1"
 
-"@civic/solana-gateway-react@0.7.5-alpha2":
-  version "0.7.5-alpha2"
-  resolved "https://registry.yarnpkg.com/@civic/solana-gateway-react/-/solana-gateway-react-0.7.5-alpha2.tgz#604589778dc08aeb242a2c9e12d46e07890596bb"
-  integrity sha512-9Xp+ui+gx1FK0J2ZgK3QM+aahiCUVzYNh24S7C+1kKg4+0GjDKmgGpX+kCpiFtUMi1i6RTyXUe9d1iyd9+I28A==
+"@civic/solana-gateway-react@0.7.6-alpha2":
+  version "0.7.6-alpha2"
+  resolved "https://registry.yarnpkg.com/@civic/solana-gateway-react/-/solana-gateway-react-0.7.6-alpha2.tgz#66b9db6d06afef4c3c0844a69a2e6b303c36eb03"
+  integrity sha512-YOJPwNjNnaFvYwxlhgcsBIiUMIwnIZ963JM2cObGf9YPELwcqgU3y3u0V+LW4DBWqfwiH7NoWcwmURNXUREg2Q==
   dependencies:
-    "@civic/common-gateway-react" "^0.1.10-alpha1"
+    "@civic/common-gateway-react" "^0.1.11-alpha2"
     "@identity.com/prove-solana-wallet" "^0.2.3"
     "@identity.com/solana-gateway-ts" "^0.7.0"
     "@solana/web3.js" "^1.33.0"
