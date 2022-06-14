@@ -11,6 +11,7 @@ import Text from '@components/Text'
 import ThresholdAdviceBox from '@components/NewRealmWizard/components/ThresholdAdviceBox'
 
 import { updateUserInput } from '@utils/formValidation'
+import { FORM_NAME as MUTISIG_FORM } from 'pages/realms/new/multisig'
 
 export const CommunityYesVotePercentageSchema = {
   communityYesVotePercentage: yup
@@ -147,7 +148,8 @@ export default function YesVotePercentageForm({
         ) : forCouncil && formData?.memberAddresses?.length >= 0 ? (
           <>
             <Text level="1">
-              With {formData.memberAddresses.length} members added to your DAO,
+              With {formData.memberAddresses.length} members added to your{' '}
+              {type === MUTISIG_FORM ? 'wallet' : 'DAO'},
             </Text>
             <Text level="1" className="md:pt-2">
               {Math.ceil(

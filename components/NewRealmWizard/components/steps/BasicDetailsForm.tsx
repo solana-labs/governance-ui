@@ -90,7 +90,11 @@ export default function BasicDetailsForm({
               description="It's best to choose a descriptive, memorable name for you and your members."
             >
               <Input
-                placeholder="e.g. RealmsDAO"
+                placeholder={
+                  type === MUTISIG_FORM
+                    ? 'e.g. Realms wallet'
+                    : 'e.g. Realms DAO'
+                }
                 data-testid="dao-name-input"
                 error={errors.name?.message || ''}
                 {...field}
