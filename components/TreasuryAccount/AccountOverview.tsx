@@ -245,8 +245,8 @@ const AccountOverview = () => {
   )
   return (
     <>
-      <div className="flex items-center justify-between mb-2 py-2">
-        <h2 className="mb-0">
+      <div className="flex items-center justify-between py-2 mb-2">
+        <h2 className="mb-0 font-bold">
           {currentAccount?.extensions.transferAddress &&
           getAccountName(currentAccount.extensions.transferAddress)
             ? getAccountName(currentAccount.extensions.transferAddress)
@@ -266,7 +266,7 @@ const AccountOverview = () => {
             </p>
           )}
           <a
-            className="default-transition flex items-center text-primary-light hover:text-primary-dark text-sm"
+            className="flex items-center text-sm default-transition text-primary-light hover:text-primary-dark"
             href={
               accountPublicKey
                 ? getExplorerUrl(connection.cluster, accountPublicKey)
@@ -277,7 +277,7 @@ const AccountOverview = () => {
             onClick={(e) => e.stopPropagation()}
           >
             Explorer
-            <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 w-4" />
+            <ExternalLinkIcon className="flex-shrink-0 w-4 h-4 ml-2" />
           </a>
         </div>
       </div>
@@ -287,7 +287,7 @@ const AccountOverview = () => {
       >
         <div className="relative w-full max-w-lg">
           {isCopied && (
-            <div className="absolute bg-bkg-1 left-1/2 p-2 rounded text-fgd-3 text-xs transform -translate-x-1/2 -top-10">
+            <div className="absolute p-2 text-xs transform -translate-x-1/2 rounded bg-bkg-1 left-1/2 text-fgd-3 -top-10">
               Copied to Clipboard
             </div>
           )}
@@ -382,12 +382,12 @@ const AccountOverview = () => {
             >
               {showStrategies ? (
                 <>
-                  <XCircleIcon className="h-5 mr-2 w-5" />
+                  <XCircleIcon className="w-5 h-5 mr-2" />
                   Cancel
                 </>
               ) : (
                 <>
-                  <PlusCircleIcon className="h-5 mr-2 w-5" />
+                  <PlusCircleIcon className="w-5 h-5 mr-2" />
                   Investments
                 </>
               )}
@@ -409,7 +409,7 @@ const AccountOverview = () => {
                 />
               ))
             ) : (
-              <div className="border border-fgd-4 p-4 rounded-md">
+              <div className="p-4 border rounded-md border-fgd-4">
                 <p className="text-center text-fgd-3">
                   No investments available for this account
                 </p>
@@ -424,7 +424,7 @@ const AccountOverview = () => {
               />
             ))
           ) : (
-            <div className="border border-fgd-4 p-4 rounded-md">
+            <div className="p-4 border rounded-md border-fgd-4">
               <p className="text-center text-fgd-3">
                 {loading ? 'Loading...' : 'No investments for this account'}
               </p>
@@ -446,22 +446,22 @@ const AccountOverview = () => {
               }
               target="_blank"
               rel="noopener noreferrer"
-              className="border border-fgd-4 default-transition flex items-center justify-between rounded-md hover:bg-bkg-3 hover:border-primary-light p-4 text-sm text-th-fgd-1 mb-2"
+              className="flex items-center justify-between p-4 mb-2 text-sm border rounded-md border-fgd-4 default-transition hover:bg-bkg-3 hover:border-primary-light text-th-fgd-1"
               key={activity.signature}
             >
               <div>{activity.signature.substring(0, 12)}...</div>
               <div className="flex items-center">
-                <div className="text-fgd-3 text-sm">
+                <div className="text-sm text-fgd-3">
                   {activity.blockTime
                     ? fmtUnixTime(new BN(activity.blockTime))
                     : null}
                 </div>
-                <ExternalLinkIcon className="h-4 ml-2 w-4 text-primary-light" />
+                <ExternalLinkIcon className="w-4 h-4 ml-2 text-primary-light" />
               </div>
             </a>
           ))
         ) : (
-          <div className="border border-fgd-4 p-4 rounded-md">
+          <div className="p-4 border rounded-md border-fgd-4">
             <p className="text-center text-fgd-3">No recent activity</p>
           </div>
         )}
@@ -574,7 +574,7 @@ const StrategyCard = ({
     currentDeposits.toFixed(2)
   ).toFormat()
   return (
-    <div className="border border-fgd-4 flex items-center justify-between mt-2 p-4 rounded-md">
+    <div className="flex items-center justify-between p-4 mt-2 border rounded-md border-fgd-4">
       <div className="flex items-center">
         {strat.protocolLogoSrc ? (
           <img
@@ -588,7 +588,7 @@ const StrategyCard = ({
         {handledTokenImgSrc ? (
           <img
             src={strat.handledTokenImgSrc}
-            className="h-8 mr-3 rounded-full w-8"
+            className="w-8 h-8 mr-3 rounded-full"
           ></img>
         ) : null}
         <div>
