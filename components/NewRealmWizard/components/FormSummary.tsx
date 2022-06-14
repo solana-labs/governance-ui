@@ -233,9 +233,7 @@ export default function WizardSummary({
               <Header as="h3" className="flex items-end">
                 {formData?.councilYesVotePercentage}
 
-                <Header as="h4" className="mb-0">
-                  %
-                </Header>
+                <div className="mb-0 heading-sm">%</div>
               </Header>
             </SummaryModule>
           </div>
@@ -280,7 +278,7 @@ export default function WizardSummary({
         loading={submissionPending}
         ctaText={type === MULTISIG_FORM ? 'Create wallet' : 'Create DAO'}
         prevClickHandler={() => onPrevClick(currentStep)}
-        submitClickHandler={onSubmit}
+        submitClickHandler={() => onSubmit(formData)}
       />
     </div>
   )

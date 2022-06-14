@@ -6,7 +6,6 @@ import useWalletStore from 'stores/useWalletStore'
 import createMultisigWallet from 'actions/createMultisigWallet'
 
 import useQueryContext from '@hooks/useQueryContext'
-import useLocalStorageState from '@hooks/useLocalStorageState'
 
 import { notify } from '@utils/notifications'
 
@@ -26,18 +25,11 @@ import YesVotePercentageForm, {
 } from '@components/NewRealmWizard/components/steps/YesVotePercentageThresholdForm'
 import FormPage from '@components/NewRealmWizard/PageTemplate'
 
-export const SESSION_STORAGE_FORM_KEY = 'multisig-form-data'
 export const FORM_NAME = 'multisig'
 
-type MultisigForm =
-  | (BasicDetails & InviteMembers & CouncilYesVotePercentage)
-  | Record<string, never>
+type MultisigForm = BasicDetails & InviteMembers & CouncilYesVotePercentage
 
 export default function MultiSigWizard() {
-  const [formData, setFormData] = useLocalStorageState<MultisigForm>(
-    SESSION_STORAGE_FORM_KEY,
-    {}
-  )
   const { connected, connection, current: wallet } = useWalletStore((s) => s)
   const { push } = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
@@ -54,7 +46,7 @@ export default function MultiSigWizard() {
     },
   ]
 
-  async function handleSubmit() {
+  async function handleSubmit(formData: MultisigForm) {
     console.log('submit clicked')
     setRequestPending(true)
     try {
@@ -80,7 +72,6 @@ export default function MultiSigWizard() {
       })
 
       if (results) {
-        setFormData({})
         push(
           fmtUrlWithCluster(`/dao/${results.realmPk.toBase58()}`),
           undefined,
@@ -102,6 +93,7 @@ export default function MultiSigWizard() {
 
   return (
     <FormPage
+      autoInviteWallet
       type={FORM_NAME}
       steps={steps}
       handleSubmit={handleSubmit}

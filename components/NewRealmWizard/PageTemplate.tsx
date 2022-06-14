@@ -15,6 +15,7 @@ export const Section = ({ children }) => {
 }
 
 export default function FormPage({
+  autoInviteWallet = false,
   type,
   steps,
   handleSubmit,
@@ -23,7 +24,8 @@ export default function FormPage({
   const { connected, current: wallet } = useWalletStore((s) => s)
   const userAddress = wallet?.publicKey?.toBase58()
   const [formData, setFormData] = useState<any>({
-    memberAddresses: userAddress ? [userAddress] : undefined,
+    memberAddresses:
+      autoInviteWallet && userAddress ? [userAddress] : undefined,
   })
   const { query, push } = useRouter()
   const currentStep = formData?.currentStep || 0

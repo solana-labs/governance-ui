@@ -5,7 +5,7 @@ import { PublicKey } from '@solana/web3.js'
 import useWalletStore from 'stores/useWalletStore'
 import createTokenizedRealm from 'actions/createTokenizedRealm'
 import useQueryContext from '@hooks/useQueryContext'
-import useLocalStorageState from '@hooks/useLocalStorageState'
+
 import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
 
 import { notify } from '@utils/notifications'
@@ -22,8 +22,6 @@ import CommunityTokenDetailsForm, {
 import YesVotePercentageForm, {
   CommunityYesVotePercentageSchema,
   CommunityYesVotePercentage,
-  // CouncilYesVotePercentageSchema,
-  // CouncilYesVotePercentage,
 } from '@components/NewRealmWizard/components/steps/YesVotePercentageThresholdForm'
 import AddCouncilForm, {
   AddCouncilSchema,
@@ -34,23 +32,15 @@ import InviteMembersForm, {
   InviteMembers,
 } from '@components/NewRealmWizard/components/steps/InviteMembersForm'
 
-export const SESSION_STORAGE_FORM_KEY = 'tokenized-form-data'
 export const FORM_NAME = 'tokenized'
 
-type GovToken =
-  | (BasicDetails &
-      CommunityToken &
-      CommunityYesVotePercentage &
-      AddCouncil &
-      InviteMembers)
-  // CouncilYesVotePercentage)
-  | Record<string, never>
+type CommunityTokenForm = BasicDetails &
+  CommunityToken &
+  CommunityYesVotePercentage &
+  AddCouncil &
+  InviteMembers
 
-export default function GovTokenWizard() {
-  const [formData, setFormData] = useLocalStorageState<GovToken>(
-    SESSION_STORAGE_FORM_KEY,
-    {}
-  )
+export default function CommunityTokenWizard() {
   const { connected, connection, current: wallet } = useWalletStore((s) => s)
   const { push } = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
@@ -82,7 +72,7 @@ export default function GovTokenWizard() {
     // },
   ]
 
-  async function handleSubmit() {
+  async function handleSubmit(formData: CommunityTokenForm) {
     console.log('submit clicked')
     setRequestPending(true)
     try {
@@ -123,7 +113,6 @@ export default function GovTokenWizard() {
       })
 
       if (results) {
-        setFormData({})
         push(
           fmtUrlWithCluster(`/dao/${results.realmPk.toBase58()}`),
           undefined,

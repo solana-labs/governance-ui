@@ -31,9 +31,7 @@ export const BasicDetailsSchema = {
 }
 
 export interface BasicDetails {
-  avatar?: string
   name: string
-  // description?: string
   programId?: string
 }
 

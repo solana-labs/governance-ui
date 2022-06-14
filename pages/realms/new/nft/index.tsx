@@ -7,7 +7,6 @@ import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
 import useWalletStore from 'stores/useWalletStore'
 
 import useQueryContext from '@hooks/useQueryContext'
-import useLocalStorageState from '@hooks/useLocalStorageState'
 
 import { notify } from '@utils/notifications'
 
@@ -27,25 +26,14 @@ import InviteMembersForm, {
   InviteMembersSchema,
   InviteMembers,
 } from '@components/NewRealmWizard/components/steps/InviteMembersForm'
-// import YesVotePercentageForm, {
-//   CouncilYesVotePercentageSchema,
-//   CouncilYesVotePercentage,
-// } from '@components/NewRealmWizard/components/steps/YesVotePercentageThresholdForm'
+
 import FormPage from '@components/NewRealmWizard/PageTemplate'
 
-export const SESSION_STORAGE_FORM_KEY = 'nft-form-data'
 export const FORM_NAME = 'nft'
 
-type NFTForm =
-  | (BasicDetails & AddNFTCollection & AddCouncil & InviteMembers)
-  // CouncilYesVotePercentage)
-  | Record<string, never>
+type NFTForm = BasicDetails & AddNFTCollection & AddCouncil & InviteMembers
 
 export default function NFTWizard() {
-  const [formData, setFormData] = useLocalStorageState<NFTForm>(
-    SESSION_STORAGE_FORM_KEY,
-    {}
-  )
   const { connected, connection, current: wallet } = useWalletStore((s) => s)
   const { push } = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
@@ -64,15 +52,9 @@ export default function NFTWizard() {
       schema: InviteMembersSchema,
       required: 'form.addCouncil',
     },
-    // {
-    //   Form: YesVotePercentageForm,
-    //   schema: CouncilYesVotePercentageSchema,
-    //   required: 'form.addCouncil',
-    //   forCouncil: true,
-    // },
   ]
 
-  async function handleSubmit() {
+  async function handleSubmit(formData: NFTForm) {
     console.log('submit clicked')
     setRequestPending(true)
 
@@ -113,7 +95,6 @@ export default function NFTWizard() {
       })
 
       if (results) {
-        setFormData({})
         push(
           fmtUrlWithCluster(`/dao/${results.realmPk.toBase58()}`),
           undefined,
