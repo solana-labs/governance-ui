@@ -788,5 +788,14 @@
     "website": "https://samoyedcoin.com",
     "twitter": "@Samo_DAO",
     "ogImage": "/realms/SamoDAO/SamoDAO.png"
+    },
+    {
+      "symbol": "FORE",
+      "displayName": "Foresight DAO",
+      "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+      "realmId": "CZatgrcvaDN9ib1sQeSCJWUnBXc899ydTB9vfAHHBVfP",
+      "ogImage": "https://www.foresight.exchange/logo.png",
+      "website": "https://www.foresight.exchange/",
+      "twitter": "@foresightmkt"
     }
 ]

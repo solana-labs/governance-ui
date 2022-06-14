@@ -36,9 +36,13 @@ type SetFormErrors = Dispatch<React.SetStateAction<EmptyObject>>
 
 export function getFilteredTokenAccounts(): AssetAccount[] {
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-  return governedTokenAccountsWithoutNfts.filter((x) =>
-    x.extensions.transferAddress?.equals(foresightGov.DEVNET_TREASURY)
-  )
+  return governedTokenAccountsWithoutNfts.filter((x) => {
+    const transferAddress = x.extensions.transferAddress
+    return (
+      transferAddress?.equals(foresightGov.DEVNET_TREASURY) ||
+      transferAddress?.equals(foresightGov.MAINNET_TREASURY)
+    )
+  })
 }
 
 type HandleSetForm = ({
