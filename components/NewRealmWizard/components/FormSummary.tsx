@@ -5,6 +5,7 @@ import Header from '@components/Header'
 import Text from '@components/Text'
 
 import { FORM_NAME as MULTISIG_FORM } from 'pages/realms/new/multisig'
+import { FORM_NAME as COMMUNITY_TOKEN_FORM } from 'pages/realms/new/community-token'
 import { GenericTokenIcon } from './TokenInfoTable'
 
 function SummaryModule({
@@ -276,7 +277,15 @@ export default function WizardSummary({
       <FormFooter
         isValid
         loading={submissionPending}
-        ctaText={type === MULTISIG_FORM ? 'Create wallet' : 'Create DAO'}
+        ctaText={
+          type === MULTISIG_FORM
+            ? 'Create wallet'
+            : `Create ${
+                type === COMMUNITY_TOKEN_FORM
+                  ? 'Community Token'
+                  : 'NFT Community'
+              } DAO`
+        }
         prevClickHandler={() => onPrevClick(currentStep)}
         submitClickHandler={() => onSubmit(formData)}
       />
