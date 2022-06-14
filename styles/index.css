@@ -101,7 +101,7 @@ button {
 }
 
 .markdown > p {
-  @apply mb-2;
+  @apply mb-2 text-[#D1D6DB];
 }
 
 .markdown ul {
