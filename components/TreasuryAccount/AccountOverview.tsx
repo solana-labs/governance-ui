@@ -1,6 +1,6 @@
 import Button, { LinkButton } from '@components/Button'
 import { getExplorerUrl } from '@components/explorer/tools'
-import { getAccountName } from '@components/instructions/tools'
+import { getAccountName, WSOL_MINT } from '@components/instructions/tools'
 import Modal from '@components/Modal'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
@@ -24,7 +24,7 @@ import Tooltip from '@components/Tooltip'
 import ConvertToMsol from './ConvertToMsol'
 import useStrategiesStore from 'Strategies/store/useStrategiesStore'
 import DepositModal from 'Strategies/components/DepositModal'
-import { TreasuryStrategy } from 'Strategies/types/types'
+import { SolendStrategy, TreasuryStrategy } from 'Strategies/types/types'
 import BigNumber from 'bignumber.js'
 import { MangoAccount } from '@blockworks-foundation/mango-client'
 import {
@@ -37,10 +37,23 @@ import LoadingRows from './LoadingRows'
 import TradeOnSerum, { TradeOnSerumProps } from './TradeOnSerum'
 import { AccountType } from '@utils/uiTypes/assets'
 import CreateAta from './CreateAta'
+import {
+  cTokenExchangeRate,
+  getReserveData,
+  SOLEND,
+} from 'Strategies/protocols/solend'
+
+type InvestmentType = TreasuryStrategy & {
+  investedAmount: number
+}
 
 const AccountOverview = () => {
   const router = useRouter()
   const { ownTokenRecord, ownCouncilTokenRecord } = useRealm()
+  const {
+    governedTokenAccounts,
+    auxiliaryTokenAccounts,
+  } = useGovernanceAssets()
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const nftsPerPubkey = useTreasuryAccountStore((s) => s.governanceNfts)
   const nftsCount =
@@ -51,17 +64,16 @@ const AccountOverview = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const isNFT = currentAccount?.isNft
   const isSol = currentAccount?.isSol
+  const [loading, setLoading] = useState(true)
   const isSplToken = currentAccount?.type === AccountType.TOKEN
   const isAuxiliaryAccount = currentAccount?.type === AccountType.AuxiliaryToken
-  const connected = useWalletStore((s) => s.connected)
   const { canUseTransferInstruction } = useGovernanceAssets()
-  const connection = useWalletStore((s) => s.connection)
+  const { connection, connected } = useWalletStore((s) => s)
   const recentActivity = useTreasuryAccountStore((s) => s.recentActivity)
   const isLoadingRecentActivity = useTreasuryAccountStore(
     (s) => s.isLoadingRecentActivity
   )
   const market = useMarketStore((s) => s)
-  const [currentMangoDeposits, setCurrentMangoDeposits] = useState(0)
   const [mngoAccounts, setMngoAccounts] = useState<MangoAccount[]>([])
   const [openNftDepositModal, setOpenNftDepositModal] = useState(false)
   const [openCommonSendModal, setOpenCommonSendModal] = useState(false)
@@ -70,33 +82,82 @@ const AccountOverview = () => {
   const accountPublicKey = currentAccount?.extensions.transferAddress
   const strategies = useStrategiesStore((s) => s.strategies)
   const [accountInvestments, setAccountInvestments] = useState<
-    TreasuryStrategy[]
-  >([])
-  const [eligibleInvestments, setEligibleInvestments] = useState<
-    TreasuryStrategy[]
+    InvestmentType[]
   >([])
   const [showStrategies, setShowStrategies] = useState(false)
   const [
     proposedInvestment,
     setProposedInvestment,
-  ] = useState<TreasuryStrategy | null>(null)
+  ] = useState<InvestmentType | null>(null)
   const [isCopied, setIsCopied] = useState<boolean>(false)
   const [
     tradeSerumInfo,
     setTradeSerumInfo,
   ] = useState<TradeOnSerumProps | null>(null)
+  const strategyMint = currentAccount?.isSol
+    ? WSOL_MINT
+    : currentAccount?.extensions.token?.account.mint.toString()
+  const visibleInvestments = strategies.filter(
+    (strat) => strat.handledMint === strategyMint
+  )
+  const visibleAccounts = accountInvestments.filter(
+    (strat) => strat.handledMint === strategyMint
+  )
 
   useEffect(() => {
-    if (strategies.length > 0) {
-      const eligibleInvestments = strategies.filter(
-        (strat) =>
-          strat.handledMint ===
-          currentAccount?.extensions.token?.account.mint.toString()
+    const getSlndCTokens = async () => {
+      const accounts = [
+        ...governedTokenAccounts,
+        ...auxiliaryTokenAccounts,
+        ...(currentAccount?.isSol ? [currentAccount] : []),
+      ]
+
+      const solendStrategy = visibleInvestments.filter(
+        (strat) => strat.protocolName === SOLEND
+      )[0]
+
+      const relevantAccs = accounts
+        .map((acc) => {
+          const reserve = (solendStrategy as SolendStrategy)?.reserves.find(
+            (reserve) =>
+              reserve.mintAddress === strategyMint &&
+              reserve.collateralMintAddress ===
+                acc.extensions.mint?.publicKey.toBase58()
+          )
+          if (!reserve || !solendStrategy) return null
+
+          return {
+            acc,
+            reserve,
+          }
+        })
+        .filter(Boolean)
+
+      const reserveStats = await getReserveData(
+        relevantAccs.map((data) => data!.reserve.reserveAddress)
       )
-      setEligibleInvestments(eligibleInvestments)
+
+      return relevantAccs.map((data) => {
+        const reserve = data!.reserve
+        const account = data!.acc
+
+        const stat = reserveStats.find(
+          (stat) => stat.reserve.lendingMarket === reserve.marketAddress
+        )!
+
+        return {
+          ...solendStrategy,
+          apy: `${reserve.supplyApy.toFixed(2)}%`,
+          protocolName: solendStrategy.protocolName,
+          strategySubtext: `${reserve.marketName} Pool`,
+          investedAmount:
+            ((account.extensions.amount?.toNumber() ?? 0) *
+              cTokenExchangeRate(stat)) /
+            10 ** reserve.decimals,
+        }
+      }) as Array<InvestmentType>
     }
-  }, [currentAccount, strategies])
-  useEffect(() => {
+
     const handleGetMangoAccounts = async () => {
       const currentAccountMint = currentAccount?.extensions.token?.account.mint
       const currentPositions = calculateAllDepositsInMangoAccountsForMint(
@@ -104,20 +165,37 @@ const AccountOverview = () => {
         currentAccountMint!,
         market
       )
-      setCurrentMangoDeposits(currentPositions)
 
       if (currentPositions > 0) {
-        setAccountInvestments(
-          eligibleInvestments.filter((x) => x.protocolName === MANGO)
-        )
-      } else {
-        setAccountInvestments([])
+        return strategies
+          .map((invest) => ({
+            ...invest,
+            investedAmount: currentPositions,
+          }))
+          .filter((x) => x.protocolName === MANGO)
       }
+
+      return []
     }
-    if (eligibleInvestments.filter((x) => x.protocolName === MANGO).length) {
-      handleGetMangoAccounts()
+
+    const loadData = async () => {
+      const requests = [] as Array<Promise<Array<InvestmentType>>>
+      if (visibleInvestments.filter((x) => x.protocolName === MANGO).length) {
+        requests.push(handleGetMangoAccounts())
+      }
+      if (visibleInvestments.filter((x) => x.protocolName === SOLEND).length) {
+        requests.push(getSlndCTokens())
+      }
+
+      const results = await Promise.all(requests)
+      setLoading(false)
+
+      setAccountInvestments(results.flatMap((x) => x))
     }
-  }, [eligibleInvestments, currentAccount, mngoAccounts])
+
+    loadData()
+  }, [currentAccount, mngoAccounts])
+
   useEffect(() => {
     const getMangoAcccounts = async () => {
       const accounts = await tryGetMangoAccountsForOwner(
@@ -129,7 +207,7 @@ const AccountOverview = () => {
     if (currentAccount) {
       getMangoAcccounts()
     }
-  }, [currentAccount, eligibleInvestments, market])
+  }, [currentAccount, market])
 
   useEffect(() => {
     if (isCopied) {
@@ -140,6 +218,14 @@ const AccountOverview = () => {
     }
   }, [isCopied])
 
+  useEffect(() => {
+    if (visibleInvestments.length && visibleAccounts.length === 0) {
+      setShowStrategies(true)
+    } else {
+      setShowStrategies(false)
+    }
+  }, [currentAccount, visibleAccounts.length, visibleInvestments.length])
+
   const handleCopyAddress = (address: string) => {
     navigator.clipboard.writeText(address)
     setIsCopied(true)
@@ -149,6 +235,14 @@ const AccountOverview = () => {
     return null
   }
 
+  const deposits = visibleAccounts.reduce(
+    (acc, account) => ({
+      ...acc,
+      [account.protocolName]:
+        (acc[account.protocolName] ?? 0) + account.investedAmount,
+    }),
+    {}
+  )
   return (
     <>
       <div className="flex items-center justify-between mb-2 py-2">
@@ -300,12 +394,17 @@ const AccountOverview = () => {
             </LinkButton>
           </div>
           {showStrategies ? (
-            eligibleInvestments.length > 0 ? (
-              eligibleInvestments.map((strat, i) => (
+            visibleInvestments.length > 0 ? (
+              visibleInvestments.map((strat, i) => (
                 <StrategyCard
                   key={strat.handledTokenSymbol + i}
-                  currentMangoDeposits={currentMangoDeposits}
-                  onClick={() => setProposedInvestment(strat)}
+                  currentDeposits={deposits[strat.protocolName] ?? 0}
+                  onClick={() => {
+                    setProposedInvestment({
+                      ...strat,
+                      investedAmount: deposits[strat.protocolName] ?? 0,
+                    })
+                  }}
                   strat={strat}
                 />
               ))
@@ -316,18 +415,18 @@ const AccountOverview = () => {
                 </p>
               </div>
             )
-          ) : accountInvestments.length > 0 ? (
-            accountInvestments.map((strat, i) => (
+          ) : visibleAccounts.length > 0 ? (
+            visibleAccounts.map((strat, i) => (
               <StrategyCard
                 key={strat.handledTokenSymbol + i}
                 strat={strat}
-                currentMangoDeposits={currentMangoDeposits}
+                currentDeposits={strat.investedAmount}
               />
             ))
           ) : (
             <div className="border border-fgd-4 p-4 rounded-md">
               <p className="text-center text-fgd-3">
-                No investments for this account
+                {loading ? 'Loading...' : 'No investments for this account'}
               </p>
             </div>
           )}
@@ -371,13 +470,13 @@ const AccountOverview = () => {
         <DepositModal
           governedTokenAccount={currentAccount}
           mangoAccounts={mngoAccounts}
-          currentPosition={currentMangoDeposits}
+          currentPosition={proposedInvestment.investedAmount}
           apy={proposedInvestment.apy}
           handledMint={proposedInvestment.handledMint}
           onClose={() => {
             setProposedInvestment(null)
           }}
-          isOpen={proposedInvestment}
+          proposedInvestment={proposedInvestment}
           protocolName={proposedInvestment.protocolName}
           protocolLogoSrc={proposedInvestment.protocolLogoSrc}
           handledTokenName={proposedInvestment.handledTokenSymbol}
@@ -455,27 +554,37 @@ const AccountOverview = () => {
 interface StrategyCardProps {
   onClick?: () => void
   strat: TreasuryStrategy
-  currentMangoDeposits: number
+  currentDeposits: number
 }
 
 const StrategyCard = ({
   onClick,
   strat,
-  currentMangoDeposits,
+  currentDeposits,
 }: StrategyCardProps) => {
   const {
     handledTokenImgSrc,
     strategyName,
     protocolName,
+    strategySubtext,
     handledTokenSymbol,
     apy,
   } = strat
   const currentPositionFtm = new BigNumber(
-    currentMangoDeposits.toFixed(0)
+    currentDeposits.toFixed(2)
   ).toFormat()
   return (
     <div className="border border-fgd-4 flex items-center justify-between mt-2 p-4 rounded-md">
       <div className="flex items-center">
+        {strat.protocolLogoSrc ? (
+          <img
+            src={strat.protocolLogoSrc}
+            style={{
+              marginRight: -8,
+            }}
+            className="h-8 rounded-full w-8"
+          ></img>
+        ) : null}
         {handledTokenImgSrc ? (
           <img
             src={strat.handledTokenImgSrc}
@@ -483,7 +592,9 @@ const StrategyCard = ({
           ></img>
         ) : null}
         <div>
-          <p className="text-xs">{`${strategyName} ${handledTokenSymbol} on ${protocolName}`}</p>
+          <p className="text-xs">{`${strategyName} ${handledTokenSymbol} on ${protocolName}${
+            strategySubtext ? ` - ${strategySubtext}` : ''
+          }`}</p>
           <p className="font-bold text-fgd-1">{`${currentPositionFtm} ${handledTokenSymbol}`}</p>
         </div>
       </div>
