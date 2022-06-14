@@ -129,10 +129,12 @@ export default function TokenAddressInput({
           setTokenMintAddress(ev.target.value)
         }}
       />
-      <TokenInfoTable
-        tokenInfo={tokenInfo}
-        loading={tokenInfo === PENDING_COIN}
-      />
+      {tokenInfo?.name && tokenInfo.name !== PENDING_COIN.name && (
+        <TokenInfoTable
+          tokenInfo={tokenInfo}
+          loading={tokenInfo === PENDING_COIN}
+        />
+      )}
     </>
   ) : (
     <></>

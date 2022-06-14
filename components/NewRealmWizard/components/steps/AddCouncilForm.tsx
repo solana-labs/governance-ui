@@ -237,7 +237,11 @@ export default function AddCouncilForm({
             render={({ field: { ref, ...field } }) => (
               <FormField
                 title="Do you want to transfer mint authority of this council token to the DAO?"
-                description='You must connect the wallet which owns this token before you can select "Yes".'
+                description={
+                  !showTransferMintAuthority
+                    ? ''
+                    : 'You must connect the wallet which owns this token before you can select "Yes".'
+                }
               >
                 <RadioGroup
                   {...field}

@@ -43,7 +43,12 @@ export const CommunityTokenSchema = {
   minimumNumberOfCommunityTokensToGovern: yup
     .number()
     .positive('Must be greater than 0')
-    .transform((value) => (isNaN(value) ? undefined : value)),
+    .transform((value) => (isNaN(value) ? undefined : value))
+    .when('useExistingCommunityToken', {
+      is: (val) => val == true,
+      then: yup.number().required('Required'),
+      otherwise: yup.number().optional(),
+    }),
   communityMintSupplyFactor: yup
     .number()
     .positive('Must be greater than 0')
@@ -215,7 +220,11 @@ export default function CommunityTokenForm({
                   render={({ field: { ref, ...field } }) => (
                     <FormField
                       title="Do you want to transfer mint authority of the token to the DAO?"
-                      description='You must connect the wallet which owns this token before you can select "Yes".'
+                      description={
+                        !showTransferMintAuthority
+                          ? ''
+                          : 'You must connect the wallet which owns this token before you can select "Yes".'
+                      }
                     >
                       <RadioGroup
                         {...field}
@@ -232,13 +241,12 @@ export default function CommunityTokenForm({
                 <Controller
                   name="minimumNumberOfCommunityTokensToGovern"
                   control={control}
-                  defaultValue=""
+                  defaultValue={1000000}
                   render={({ field }) => (
                     <FormField
-                      title="What is the minimum number of community tokens needed to govern this DAO?"
-                      description="A user will need at least this many of your community token to edit the DAO as well as make proposals."
+                      title="What is the minimum number of community tokens needed to manage this DAO?"
+                      description="A user will need at least this many community token to edit the DAO"
                       disabled={!validMintAddress}
-                      optional
                     >
                       <Input
                         type="tel"
