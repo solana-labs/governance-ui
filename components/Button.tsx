@@ -24,7 +24,7 @@ const Button: FunctionComponent<ButtonProps> = ({
 }) => {
   return (
     <button
-      className={`${className} default-transition heading-cta px-4 rounded-full ${
+      className={`${className} default-transition font-bold px-4 rounded-full ${
         small ? 'py-1' : 'py-2.5'
       } text-sm focus:outline-none ${
         disabled
@@ -58,7 +58,7 @@ export const SecondaryButton: FunctionComponent<ButtonProps> = ({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`${className} border border-primary-light heading-cta default-transition rounded-full px-4 ${
+      className={`${className} border border-primary-light font-bold default-transition rounded-full px-4 ${
         small ? 'py-1' : 'py-2.5'
       } text-primary-light text-sm hover:border-primary-dark hover:text-primary-dark focus:outline-none disabled:border-fgd-3 disabled:text-fgd-3 disabled:cursor-not-allowed`}
       {...props}
