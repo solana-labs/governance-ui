@@ -14,10 +14,22 @@ import { updateUserInput, validateSolAddress } from '@utils/formValidation'
 import { FORM_NAME as MULTISIG_FORM } from 'pages/realms/new/multisig'
 import { textToAddressList } from '@utils/textToAddressList'
 
-const getUniq = (addresses: string[]) => {
-  const uniq = new Set<string>()
-  addresses.forEach((address) => uniq.add(address))
-  return Array.from(uniq.values())
+/**
+ * Convert a list of addresses into a list of uniques and duplicates
+ */
+const splitUniques = (addresses: string[]) => {
+  const unique = new Set<string>()
+  const duplicate: string[] = []
+
+  addresses.forEach((address) => {
+    if (unique.has(address)) {
+      duplicate.push(address)
+    } else {
+      unique.add(address)
+    }
+  })
+
+  return { duplicate, unique: Array.from(unique.values()) }
 }
 
 function InviteAddress({
@@ -146,9 +158,10 @@ export default function InviteMembersForm({
     if (typeof formData.addCouncil === 'undefined' || formData?.addCouncil) {
       updateUserInput(formData, InviteMembersSchema, setValue)
       setInviteList(
-        formData.memberAddresses?.filter((wallet) => {
-          return validateSolAddress(wallet)
-        }) || []
+        (current) =>
+          formData.memberAddresses?.filter((wallet) => {
+            return validateSolAddress(wallet)
+          }) || current
       )
     } else if (visible) {
       // go to next step:
@@ -157,29 +170,41 @@ export default function InviteMembersForm({
   }, [formData])
 
   useEffect(() => {
-    setValue('memberAddresses', getUniq(inviteList), {
+    setValue('memberAddresses', splitUniques(inviteList).unique, {
       shouldValidate: true,
       shouldDirty: true,
     })
   }, [inviteList])
 
+  // The user can get to this screen without connecting their wallet. If they
+  // connect their wallet after being in a disconnected state, we want to
+  // populate the invite list with their wallet address.
+  useEffect(() => {
+    if (userAddress && !inviteList.includes(userAddress)) {
+      setInviteList((currentList) => currentList.concat(userAddress))
+    }
+  }, [userAddress])
+
   function serializeValues(values) {
     onSubmit({ step: currentStep, data: values })
   }
 
-  function setAddressList(textBlock: string) {
+  function addToAddressList(textBlock: string) {
     const { valid, invalid } = textToAddressList(textBlock)
-    setInviteList((currentList) => currentList.concat(valid))
-    setInvalidAddresses((currentList) => currentList.concat(invalid))
+    const { unique, duplicate } = splitUniques(inviteList.concat(valid))
+    setInviteList(unique)
+    setInvalidAddresses((currentList) =>
+      currentList.concat(invalid).concat(duplicate)
+    )
   }
 
   function handleBlur(ev) {
-    setAddressList(ev.currentTarget.value)
+    addToAddressList(ev.currentTarget.value)
     ev.currentTarget.value = ''
   }
 
   function handlePaste(ev: React.ClipboardEvent<HTMLInputElement>) {
-    setAddressList(ev.clipboardData.getData('text'))
+    addToAddressList(ev.clipboardData.getData('text'))
     ev.clipboardData.clearData()
     // Don't allow the paste event to populate the input field
     ev.preventDefault()
@@ -191,7 +216,7 @@ export default function InviteMembersForm({
     }
 
     if (ev.key === 'Enter') {
-      setAddressList(ev.currentTarget.value)
+      addToAddressList(ev.currentTarget.value)
       ev.currentTarget.value = ''
       ev.preventDefault()
     }
@@ -218,7 +243,7 @@ export default function InviteMembersForm({
   const error =
     errors.daoName?.message ||
     (invalidAddresses.length > 0
-      ? 'Invalid addresses will not be included'
+      ? 'Invalid and duplicate addresses will not be included'
       : '')
 
   return (
@@ -241,7 +266,7 @@ export default function InviteMembersForm({
           titleExtra={
             !!inviteList.length && (
               <div className="text-[18px] text-white leading-[25px] px-2 bg-[#201F27] rounded">
-                {getUniq(inviteList).length}
+                {inviteList.length}
               </div>
             )
           }
@@ -260,7 +285,7 @@ export default function InviteMembersForm({
               {invalidAddresses.map((address, index) => (
                 <InviteAddress
                   invalid
-                  key={address}
+                  key={address + index}
                   address={address}
                   index={index + 1}
                   onRemoveClick={() => removeAddressFromInvalidList(address)}
