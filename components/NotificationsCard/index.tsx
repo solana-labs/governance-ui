@@ -30,8 +30,25 @@ const firstOrNull = <T,>(
 }
 
 type NotificationCardProps = {
-  onBackClick?: () => void
-}
+  onBackClick: () => void
+  email: string
+
+  phoneNumber: string
+  telegram: string
+  setPreview: Dispatch<SetStateAction<boolean>>
+  setEmail: Dispatch<SetStateAction<string>>
+  setTelegram: Dispatch<SetStateAction<string>>
+  setPhone: Dispatch<SetStateAction<string>>
+} & Pick<
+  NotifiClientReturnType,
+  | 'createAlert'
+  | 'logIn'
+  | 'fetchData'
+  | 'data'
+  | 'isAuthenticated'
+  | 'updateAlert'
+  | 'getConfiguration'
+>
 
 const NotificationsCard = ({ onBackClick }: NotificationCardProps) => {
   const router = useRouter()
@@ -160,15 +177,35 @@ const NotificationsCard = ({ onBackClick }: NotificationCardProps) => {
               }
             }
           }
+          if (results) {
+            setEmail(
+              results[0].targetGroup?.emailTargets[0]?.emailAddress ?? ''
+            )
+            setPhone(results[0].targetGroup?.smsTargets[0]?.phoneNumber ?? '')
+            setTelegram(
+              results[0].targetGroup?.telegramTargets[0]?.telegramId ?? ''
+            )
+            setPreview(true)
+          }
+          checkTelegramUnconfirmed(results)
+          if (results) {
+            setPreview(true)
+          }
         } else {
-          const alertResult = await createAlert({
-            name: `${realm?.account.name} notifications`,
-            emailAddress: email === '' ? null : email,
-            phoneNumber: phone.length < 12 ? null : phone,
-            telegramId: telegram === '' ? null : telegram,
-            sourceId: source?.id ?? '',
-            filterId: filter?.id ?? '',
-          })
+          const results: Alert[] = []
+          if (sources && sources.length >= 1) {
+            for (const source of sources) {
+              const filterId = source.applicableFilters[0].id
+              const alertRes = await createAlert({
+                emailAddress: localEmail === '' ? null : localEmail,
+                filterId: filterId ?? '',
+                name: `${source.name} notification`,
+                phoneNumber: isValidPhoneNumber(localPhoneNumber)
+                  ? localPhoneNumber
+                  : null,
+                sourceId: source?.id ?? '',
+                telegramId: localTelegram === '' ? null : localTelegram,
+              })
 
           if (alertResult) {
             if (alertResult.targetGroup?.telegramTargets?.length > 0) {
@@ -187,9 +224,26 @@ const NotificationsCard = ({ onBackClick }: NotificationCardProps) => {
       }
     }
     setLoading(false)
-  }
-
-  const hasLoaded = mint || councilMint
+  }, [
+    alerts,
+    checkTelegramUnconfirmed,
+    connected,
+    createAlert,
+    fetchData,
+    isAuthenticated,
+    localEmail,
+    localPhoneNumber,
+    localTelegram,
+    logIn,
+    setEmail,
+    setPhone,
+    setPreview,
+    setTelegram,
+    sources,
+    telegram,
+    updateAlert,
+    wallet,
+  ])
 
   const handleEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value)
@@ -215,13 +269,32 @@ const NotificationsCard = ({ onBackClick }: NotificationCardProps) => {
     setUnsavedChanges(true)
   }
 
-  const disabled = isAuthenticated() && !hasUnsavedChanges
+  const isSame =
+    email === localEmail &&
+    phoneNumber === localPhoneNumber &&
+    telegram === localTelegram
+
+  const disabled =
+    (isAuthenticated && !hasUnsavedChanges) ||
+    (localEmail === '' && localTelegram === '' && localPhoneNumber === '')
+
+  const handleBackClick = () => {
+    if (isSame && !disabled) {
+      setPreview(true)
+      return
+    }
+    if (disabled) {
+      onBackClick()
+    } else {
+      setPreview(false)
+    }
+  }
 
   return (
-    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg ">
-      <div className=" flex flex-row items-center align-center">
-        <Button className="bg-transparent" onClick={onBackClick}>
-          <ArrowLeftIcon fill="grey" className="w-6 h-6" />
+    <div className="bg-bkg-5 w-full p-4 md:p-6 rounded-lg shadow-lg">
+      <div className="flex flex-row items-center align-center">
+        <Button className="bg-transparent" onClick={handleBackClick}>
+          <ArrowLeftIcon className="w-6 h-6" fill="grey" />
         </Button>
         <NotifiFullLogo />
       </div>
@@ -265,39 +338,19 @@ const NotificationsCard = ({ onBackClick }: NotificationCardProps) => {
                   placeholder="you@email.com"
                 />
               </InputRow>
-              <InputRow
-                label="email"
-                icon={
-                  <ChatAltIcon className=" z-10 h-10 text-primary-light w-7 mr-1 mt-9 absolute left-3" />
-                }
+            )}
+          </div>
+          <div className=" text-xs  place-items-center  align-items-center grid flex-row text-center">
+            <div className="w-full place-items-center ">
+              Already Subscribed?{' '}
+              <a
+                className="text-xs text-primary-dark cursor-pointer "
+                onClick={handleRefresh}
+                rel="noreferrer"
+                title="Click here to load your alert details."
               >
-                <Input
-                  className="min-w-11/12 py-3 px-4 appearance-none w-11/12 pl-14 outline-0 focus:outline-none"
-                  type="tel"
-                  value={phone}
-                  onChange={handlePhone}
-                  placeholder="+1 XXX-XXXX"
-                />
-              </InputRow>
-              {telegramEnabled && (
-                <InputRow
-                  label="Telegram"
-                  icon={
-                    <PaperAirplaneIcon
-                      className="z-10 h-10 text-primary-light w-7 mr-1 mt-8 absolute left-3"
-                      style={{ transform: 'rotate(45deg)' }}
-                    />
-                  }
-                >
-                  <Input
-                    className="min-w-11/12 py-3 px-4 appearance-none w-11/12 pl-14 outline-0 focus:outline-none flex"
-                    type="text"
-                    value={telegram}
-                    onChange={handleTelegram}
-                    placeholder="Telegram ID"
-                  />
-                </InputRow>
-              )}
+                Click here to load your alert details.
+              </a>
             </div>
             <div className="flex flex-col space-y-4 mt-4 items-center justify-content-center align-items-center">
               <Button
