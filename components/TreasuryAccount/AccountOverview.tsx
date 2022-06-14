@@ -94,19 +94,14 @@ const AccountOverview = () => {
     tradeSerumInfo,
     setTradeSerumInfo,
   ] = useState<TradeOnSerumProps | null>(null)
+  const strategyMint = currentAccount?.isSol
+    ? WSOL_MINT
+    : currentAccount?.extensions.token?.account.mint.toString()
   const visibleInvestments = strategies.filter(
-    (strat) =>
-      strat.handledMint ===
-      (currentAccount?.isSol
-        ? WSOL_MINT
-        : currentAccount?.extensions.token?.account.mint.toString())
+    (strat) => strat.handledMint === strategyMint
   )
   const visibleAccounts = accountInvestments.filter(
-    (strat) =>
-      strat.handledMint ===
-      (currentAccount?.isSol
-        ? WSOL_MINT
-        : currentAccount?.extensions.token?.account.mint.toString())
+    (strat) => strat.handledMint === strategyMint
   )
 
   useEffect(() => {
@@ -125,10 +120,7 @@ const AccountOverview = () => {
         .map((acc) => {
           const reserve = (solendStrategy as SolendStrategy)?.reserves.find(
             (reserve) =>
-              reserve.mintAddress ===
-                (currentAccount?.isSol
-                  ? WSOL_MINT
-                  : currentAccount?.extensions.token?.account.mint.toString()) &&
+              reserve.mintAddress === strategyMint &&
               reserve.collateralMintAddress ===
                 acc.extensions.mint?.publicKey.toBase58()
           )
