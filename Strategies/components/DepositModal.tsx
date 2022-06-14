@@ -22,7 +22,7 @@ const DepositModal = ({
   const currentPositionFtm = new BigNumber(
     currentPosition.toFixed(0)
   ).toFormat()
-  console.log('hi')
+
   return (
     <Modal onClose={onClose} isOpen={Boolean(proposedInvestment)}>
       <ModalHeader
