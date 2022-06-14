@@ -12,8 +12,9 @@ module.exports = {
   theme: {
     fontFamily: {
       serif: ['p22-mackinac-pro, ui-serif, serif'],
+      sans: ['Ambit, sans-serif'],
       display: ['PT Mono, monospace'],
-      body: ['Ambit, sans-serif'],
+      body: ['Inter, sans-serif'],
     },
     extend: {
       cursor: {

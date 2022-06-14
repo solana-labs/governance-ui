@@ -29,7 +29,7 @@ const Button: FunctionComponent<ButtonProps> = ({
       } text-sm focus:outline-none ${
         disabled
           ? 'bg-fgd-4 cursor-not-allowed text-fgd-3'
-          : 'bg-primary-light text-bkg-2 hover:bg-primary-dark'
+          : 'bg-primary-light text-bkg-2 hover:bg-fgd-1'
       }`}
       {...props}
       style={style}
