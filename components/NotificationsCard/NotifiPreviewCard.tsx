@@ -115,42 +115,45 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
   )
 
   return (
-    <div className="grid grid-cols-12 bg-bkg-1 px-10 py-3 text-sm w-full">
-      <div className="col-span-12">
-        <p className="py-0.5">{email}</p>
-        <p className="py-0.5">{phoneNumber}</p>
-        {telegramEnabled && <p className="py-0.5">{telegram}</p>}
+    <div className="bg-bkg-5 p-4 h-[500px] md:p-6 rounded-lg shadow-lg">
+      <h2 className="mb-2 font-light text-center">Realms Notifications</h2>
+      <div className="grid grid-cols-12 bg-bkg-5 px-10 py-3 text-sm w-full">
+        <div className="col-span-12">
+          <p className="py-0.5">{email}</p>
+          <p className="py-0.5">{phoneNumber}</p>
+          {telegramEnabled && <p className="py-0.5">{telegram}</p>}
+          <a
+            className="text-sm text-primary-dark cursor-pointer pb-2 font-medium"
+            onClick={handleEdit}
+          >
+            Edit Information
+          </a>
+        </div>
+
+        {notificationsToggle && notificationsToggle.length >= 1 && (
+          <>
+            <Line />
+            <div className="max-h-[200px] w-full snap-y col-span-12 overflow-scroll">
+              {notificationsToggle}
+            </div>
+            <Line />
+          </>
+        )}
+        <div className="col-span-12 flex flex-row pt-4 items-center">
+          <p className="text-white text-[10px] font-light w-fit whitespace-nowrap flex-start">
+            Powered by
+          </p>
+          <span>
+            <NotifiFullLogo height="12" width="60" />
+          </span>
+        </div>
         <a
-          className="text-sm text-primary-dark cursor-pointer pb-2 font-medium"
-          onClick={handleEdit}
+          className="col-end-13 text-xs text-primary-dark cursor-pointer col-span-3 relative -top-4"
+          href="https://docs.notifi.network/"
         >
-          Edit Information
+          Learn More
         </a>
       </div>
-
-      {notificationsToggle && notificationsToggle.length >= 1 && (
-        <>
-          <Line />
-          <div className="max-h-[200px] w-full snap-y col-span-12 overflow-scroll">
-            {notificationsToggle}
-          </div>
-          <Line />
-        </>
-      )}
-      <div className="col-span-12 flex flex-row pt-4 items-center">
-        <p className="text-white text-[10px] font-light w-fit whitespace-nowrap flex-start">
-          Powered by
-        </p>
-        <span>
-          <NotifiFullLogo height="12" width="60" />
-        </span>
-      </div>
-      <a
-        className="col-end-13 text-xs text-primary-dark cursor-pointer col-span-3 relative -top-4"
-        href="https://docs.notifi.network/"
-      >
-        Learn More
-      </a>
     </div>
   )
 }
