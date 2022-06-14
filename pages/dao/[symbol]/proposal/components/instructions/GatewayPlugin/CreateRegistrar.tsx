@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import * as yup from 'yup'
 import {
   Governance,
@@ -13,15 +13,23 @@ import useWalletStore from 'stores/useWalletStore'
 import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NewProposalContext } from '../../../new'
-import InstructionForm, { InstructionInputType } from '../FormCreator'
+import InstructionForm, {
+  InstructionInput,
+  InstructionInputType,
+} from '../FormCreator'
 import { getGatewayRegistrarPDA } from 'GatewayPlugin/sdk/accounts'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { PublicKey } from '@solana/web3.js'
+import { InformationCircleIcon } from '@heroicons/react/outline'
+import Tooltip from '@components/Tooltip'
+import { makeInvalidReturnValueError } from '@jest/transform/build/runtimeErrorsAndWarnings'
 
 interface CreateGatewayRegistrarForm {
   governedAccount: AssetAccount | undefined
-  gatekeeperNetwork: PublicKey
+  gatekeeperNetwork: PublicKey // populated by dropdown
+  otherGatekeeperNetwork: PublicKey | undefined // manual entry
+  predecessor: PublicKey | undefined // if part of a chain of plugins
 }
 
 const CreateGatewayPluginRegistrar = ({
@@ -39,6 +47,11 @@ const CreateGatewayPluginRegistrar = ({
   const [form, setForm] = useState<CreateGatewayRegistrarForm>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
+
+  const chosenGatekeeperNetwork = useMemo(() => {
+    return form?.otherGatekeeperNetwork || form?.gatekeeperNetwork
+  }, [form])
+
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstruction = ''
@@ -61,7 +74,7 @@ const CreateGatewayPluginRegistrar = ({
           governanceProgramId: realmInfo!.programId,
           realmAuthority: realm!.account.authority!,
           governingTokenMint: realm!.account.communityMint!,
-          gatekeeperNetwork: form!.gatekeeperNetwork,
+          gatekeeperNetwork: chosenGatekeeperNetwork,
           payer: wallet.publicKey!,
           systemProgram: SYSTEM_PROGRAM_ID,
         })
@@ -88,7 +101,7 @@ const CreateGatewayPluginRegistrar = ({
       .nullable()
       .required('Governed account is required'),
   })
-  const inputs = [
+  const inputs: InstructionInput[] = [
     {
       label: 'Governance',
       initialValue: null,
@@ -104,10 +117,17 @@ const CreateGatewayPluginRegistrar = ({
     },
     {
       label: 'Civic Pass',
-      initialValue: '',
+      initialValue: null,
       inputType: 'text',
       name: 'gatekeeperNetwork',
       type: InstructionInputType.SELECT,
+      additionalComponent: (
+        <Tooltip content="The type of Civic Pass to add to the DAO. Visit civic.com for details">
+          <span>
+            <InformationCircleIcon className="w-4 h-4 ml-1"></InformationCircleIcon>
+          </span>
+        </Tooltip>
+      ),
       options: [
         {
           key: 'Bot Resistance',
@@ -125,9 +145,36 @@ const CreateGatewayPluginRegistrar = ({
           key: 'ID Verification for DeFi',
           value: 'gatbGF9DvLAw3kWyn1EmH5Nh1Sqp8sTukF7yaQpSc71',
         },
+        {
+          key: 'Other',
+          value: '',
+        },
       ],
     },
+    {
+      label: 'Other Pass',
+      initialValue: null,
+      inputType: 'text',
+      name: 'otherGatekeeperNetwork',
+      type: InstructionInputType.INPUT,
+      hide: () => form?.gatekeeperNetwork?.toString() !== '', // Other selected
+    },
+    {
+      label: 'Predecessor plugin (optional)',
+      initialValue: '',
+      inputType: 'text',
+      name: 'predecessor',
+      type: InstructionInputType.INPUT,
+      additionalComponent: (
+        <Tooltip content="If the DAO is using more than one plugin, this is the program ID of the previous plugin in the chain.">
+          <span>
+            <InformationCircleIcon className="w-4 h-4 ml-1"></InformationCircleIcon>
+          </span>
+        </Tooltip>
+      ),
+    },
   ]
+
   return (
     <>
       <InstructionForm

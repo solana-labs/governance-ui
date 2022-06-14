@@ -29,7 +29,7 @@ export interface InstructionInput {
   shouldBeGoverned?: false | ProgramAccount<Governance> | null
   governance?: ProgramAccount<Governance> | null
   options?: any[]
-  hide?: boolean
+  hide?: boolean | (() => boolean)
   validateMinMax?: boolean
   precision?: number
   additionalComponent?: JSX.Element
@@ -64,7 +64,7 @@ const InstructionForm = ({
   return (
     <>
       {inputs
-        .filter((x) => !x.hide)
+        .filter((x) => !(typeof x.hide === 'function' ? x.hide() : x.hide))
         .map((x) => (
           <InstructionInput
             key={x.name}
