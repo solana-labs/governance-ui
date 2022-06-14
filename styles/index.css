@@ -53,36 +53,23 @@
 }
 
 body {
-  @apply text-base bg-bkg-1 text-fgd-1 font-body;
-}
-
-.text-base,
-.text-sm,
-.text-xs {
-  letter-spacing: 1px;
-  line-height: 140%;
+  @apply text-base tracking-wide bg-bkg-1 text-fgd-1 font-body;
 }
 
 h1 {
-  @apply text-3xl font-normal;
+  @apply text-2xl font-bold;
 }
 
 h2 {
-  @apply mb-2 text-xl font-normal;
+  @apply mb-2 text-xl font-bold;
 }
 
 h3 {
-  @apply mb-1 text-lg font-semibold font-body;
+  @apply mb-1 text-lg font-bold;
 }
 
 h4 {
-  @apply mb-1 text-base font-semibold font-body;
-}
-
-/* CTAs */
-.heading-cta {
-  font-size: 14px;
-  @apply md:text-[16px] font-normal;
+  @apply mb-1 text-sm font-bold;
 }
 
 p {
@@ -94,7 +81,7 @@ tbody {
 }
 
 .hero-text {
-  @apply text-2xl font-normal;
+  @apply text-2xl font-bold;
 }
 
 button {
@@ -114,7 +101,7 @@ button {
 }
 
 .markdown > p {
-  @apply mb-2 text-fgd-1;
+  @apply mb-2;
 }
 
 .markdown ul {
@@ -122,11 +109,11 @@ button {
 }
 
 .markdown a {
-  @apply underline transition-all duration-300 text-fgd-1 hover:text-fgd-2 hover:no-underline;
+  @apply underline transition-all duration-300 text-fgd-2 hover:text-fgd-3 hover:no-underline;
 }
 
 .markdown li {
-  @apply mb-2 ml-6 font-normal list-disc text-fgd-2;
+  @apply mb-2 ml-6 font-normal list-disc text-fgd-3;
 }
 
 .markdown pre {
