@@ -119,7 +119,9 @@ export default function AddCouncilForm({
       })
     }
 
-    if (!validMintAddress) {
+    if (validMintAddress || /finding/.test(tokenInfo?.name)) {
+      clearErrors('invalidTokenMintAddress')
+    } else {
       setError('invalidTokenMintAddress', {
         type: 'is-valid-address',
         message: 'Not a valid token address',
@@ -128,8 +130,6 @@ export default function AddCouncilForm({
       setValue('transferCouncilMintAuthority', undefined, {
         shouldValidate: true,
       })
-    } else {
-      clearErrors('invalidTokenMintAddress')
     }
   }
 
@@ -238,7 +238,7 @@ export default function AddCouncilForm({
               <FormField
                 title="Do you want to transfer mint authority of this council token to the DAO?"
                 description={
-                  !showTransferMintAuthority
+                  showTransferMintAuthority
                     ? ''
                     : 'You must connect the wallet which owns this token before you can select "Yes".'
                 }

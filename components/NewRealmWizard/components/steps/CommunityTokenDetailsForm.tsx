@@ -125,7 +125,7 @@ export default function CommunityTokenForm({
       })
     }
 
-    if (validMintAddress) {
+    if (validMintAddress || /finding/.test(tokenInfo?.name)) {
       clearErrors('invalidTokenMintAddress')
     } else {
       setError('invalidTokenMintAddress', {
@@ -221,7 +221,7 @@ export default function CommunityTokenForm({
                     <FormField
                       title="Do you want to transfer mint authority of the token to the DAO?"
                       description={
-                        !showTransferMintAuthority
+                        showTransferMintAuthority
                           ? ''
                           : 'You must connect the wallet which owns this token before you can select "Yes".'
                       }
