@@ -91,7 +91,7 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   const hasLoaded = mint || councilMint
 
   return (
-    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
+    <div className="p-4 rounded-lg bg-bkg-2 md:p-6">
       <div className="flex items-center justify-between">
         <h3 className="mb-0">Your Account</h3>
         <Link
@@ -107,7 +107,7 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
             }`}
           >
             View
-            <ChevronRightIcon className="flex-shrink-0 h-6 w-6" />
+            <ChevronRightIcon className="flex-shrink-0 w-6 h-6" />
           </a>
         </Link>
       </div>
@@ -131,8 +131,8 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
         </div>
       ) : (
         <>
-          <div className="animate-pulse bg-bkg-3 h-12 mb-4 rounded-lg" />
-          <div className="animate-pulse bg-bkg-3 h-10 rounded-lg" />
+          <div className="h-12 mb-4 rounded-lg animate-pulse bg-bkg-3" />
+          <div className="h-10 rounded-lg animate-pulse bg-bkg-3" />
         </>
       )}
     </div>
@@ -400,10 +400,12 @@ export const TokenDeposit = ({
 
   return (
     <>
-      <div className="flex space-x-4 items-center mt-4">
-        <div className="bg-bkg-1 px-4 py-2 rounded-md w-full">
-          <p className="text-fgd-3 text-xs">{depositTokenName} Votes</p>
-          <p className="font-bold mb-0 text-fgd-1 text-xl">{availableTokens}</p>
+      <div className="flex items-center mt-4 space-x-4">
+        <div className="w-full px-4 py-2 rounded-md bg-bkg-1">
+          <p className="text-xs text-fgd-3">{depositTokenName} Votes</p>
+          <p className="mb-0 text-xl font-bold text-fgd-1 hero-text">
+            {availableTokens}
+          </p>
         </div>
       </div>
 
@@ -417,7 +419,7 @@ export const TokenDeposit = ({
             You have {tokensToShow} tokens available to {canExecuteAction}.
           </p>
 
-          <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-6">
+          <div className="flex flex-col mt-6 space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
             <Button
               tooltipMessage={depositTooltipContent}
               className="sm:w-1/2"
@@ -450,7 +452,7 @@ export const TokenDeposit = ({
           config?.account.communityVoterWeightAddin.toBase58()
         ) &&
         tokenType === GoverningTokenType.Community && (
-          <small className="text-xs mt-3 flex items-center">
+          <small className="flex items-center mt-3 text-xs">
             <ExclamationIcon className="w-5 h-5 mr-2"></ExclamationIcon>
             Please withdraw your tokens and deposit again to get governance
             power

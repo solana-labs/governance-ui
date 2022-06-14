@@ -105,7 +105,7 @@ const MemberItems = ({
         address={new PublicKey(walletAddress)}
         height="32px"
         width="32px"
-        placeholder={<UserCircleIcon className="h-6 text-fgd-3 w-6" />}
+        placeholder={<UserCircleIcon className="w-6 h-6 text-fgd-3" />}
       />
     ),
     [walletAddress]
@@ -122,13 +122,13 @@ const MemberItems = ({
           `}
     >
       <div className="flex items-center text-left">
-        <div className="bg-bkg-4 flex flex-shrink-0 items-center justify-center h-8 rounded-full w-8 mr-2">
+        <div className="flex items-center justify-center flex-shrink-0 w-8 h-8 mr-2 rounded-full bg-bkg-4">
           {renderAddressImage}
         </div>
         <div>
-          <h3 className="mb-1 text-sm flex">{renderAddressName}</h3>
-          <p className="mb-0 text-fgd-1 text-xs">Votes Cast: {votesCasted}</p>
-          <span className="text-fgd-3 text-xs">
+          <h3 className="flex mb-1 text-base font-bold">{renderAddressName}</h3>
+          <p className="mb-0 text-xs text-fgd-1">Votes Cast: {votesCasted}</p>
+          <span className="text-xs text-fgd-3">
             {(communityAmount || !councilAmount) && (
               <span className="flex items-center">
                 {tokenName} Votes {communityAmount || 0}

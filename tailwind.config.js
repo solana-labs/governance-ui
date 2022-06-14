@@ -1,5 +1,4 @@
 module.exports = {
-  mode: 'jit',
   content: [
     './pages/**/*.{js,ts,jsx,tsx}',
     './components/**/*.{js,ts,jsx,tsx}',
@@ -12,6 +11,8 @@ module.exports = {
   },
   theme: {
     fontFamily: {
+      serif: ['p22-mackinac-pro, ui-serif, serif'],
+      sans: ['Ambit, sans-serif'],
       display: ['PT Mono, monospace'],
       body: ['Inter, sans-serif'],
     },
@@ -21,21 +22,21 @@ module.exports = {
       },
       colors: {
         'dark-theme': {
-          primary: { light: '#E1CE7A', dark: '#D2B537' },
+          primary: { light: '#5DC9EB', dark: '#cecece' },
           'secondary-1': { light: '#AFD803', dark: '#6CBF00' },
           'secondary-2': { light: '#FFCB1B', dark: '#F48F25' },
-          'bkg-1': '#121417',
-          'bkg-2': '#202429',
-          'bkg-3': '#2F343B',
+          'bkg-1': '#17161c',
+          'bkg-2': '#201F27',
+          'bkg-3': '#17161c',
           'bkg-4': '#363D44',
-          'fgd-1': '#F6F5F3',
-          'fgd-2': '#D1D6DB',
+          'fgd-1': '#E5E5E6',
+          'fgd-2': '#8C8F93',
           'fgd-3': '#A4ACB7',
           'fgd-4': '#40474F',
           orange: '#F7A531',
-          red: '#cb676f',
-          green: '#78C46C',
-          blue: '#8AACEB',
+          red: '#FF7C7C',
+          green: '#30C89A',
+          blue: '#00e4ff',
         },
         'light-theme': {
           primary: { light: '#292929', dark: '#101010' },
@@ -114,15 +115,6 @@ module.exports = {
           },
         },
       },
-    },
-  },
-  variants: {
-    extend: {
-      cursor: ['hover', 'focus', 'disabled'],
-      opacity: ['disabled'],
-      backgroundColor: ['disabled'],
-      textColor: ['disabled'],
-      borderWidth: ['last'],
     },
   },
   plugins: [],
