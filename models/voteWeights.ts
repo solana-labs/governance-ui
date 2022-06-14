@@ -317,13 +317,14 @@ export class VoteNftWeight implements VoterWeightInterface {
 export class SwitchboardQueueVoteWeight implements VoterWeightInterface {
   communityTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
   votingPower: BN
+  councilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
 
   constructor(
     communityTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,
     votingPower: BN
   ) {
     this.communityTokenRecord = communityTokenRecord
-    //this.councilTokenRecord = councilTokenRecord
+    this.councilTokenRecord = undefined
     this.votingPower = votingPower
   }
 
@@ -387,8 +388,9 @@ export class SwitchboardQueueVoteWeight implements VoterWeightInterface {
   }
 
   getTokenRecordToCreateProposal(config: GovernanceConfig) {
-    return this.communityTokenRecord;
-
+    if (this.communityTokenRecord !== undefined) {
+      return this.communityTokenRecord;
+    }
     throw new Error('Not enough vote weight to create proposal')
   }
 }

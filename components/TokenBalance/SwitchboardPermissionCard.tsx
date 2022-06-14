@@ -17,28 +17,15 @@ const SwitchboardPermissionCard = () => {
   const wallet = useWalletStore((s) => s.current)
 
   const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
-  const { tokenRecords, realm, symbol, mint, councilMint } = useRealm()
+  const { tokenRecords, realm, symbol } = useRealm()
 
   const ownTokenRecord = wallet?.publicKey
     ? tokenRecords[wallet.publicKey!.toBase58()]
     : null
 
   useEffect(() => {
-    console.log("token records:");
-    console.log(tokenRecords);
-    console.log("Own token owner record:");
-    console.log(ownTokenRecord);
     const getTokenOwnerRecord = async () => {
-      /*const defaultMint = !mint?.supply.isZero()
-        ? realm!.account.communityMint
-        : !councilMint?.supply.isZero()
-        ? realm!.account.config.councilMint
-        : undefined*/
       const defaultMint = realm!.account.communityMint;
-      console.log("default mint:");
-      console.log(defaultMint);
-      console.log("realm:");
-      console.log(realm);
       const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
         realm!.owner,
         realm!.pubkey,

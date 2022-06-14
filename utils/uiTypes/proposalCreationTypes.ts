@@ -59,8 +59,37 @@ export interface FriktionWithdrawForm {
   amount: number | undefined
   governedTokenAccount: AssetAccount | undefined
   voltVaultId: string
-  depositTokenMint: string | undefined
   programId: string | undefined
+  mintInfo: MintInfo | undefined
+}
+
+export interface FriktionClaimPendingDepositForm {
+  governedTokenAccount: AssetAccount | undefined
+  voltVaultId: string
+  programId: string | undefined
+  mintInfo: MintInfo | undefined
+}
+
+export interface FriktionClaimPendingWithdrawForm {
+  governedTokenAccount: AssetAccount | undefined
+  voltVaultId: string
+  programId: string | undefined
+  mintInfo: MintInfo | undefined
+}
+
+export interface GoblinGoldDepositForm {
+  amount: number | undefined
+  governedTokenAccount?: AssetAccount | undefined
+  goblinGoldVaultId: string
+  mintName?: SupportedMintName | undefined
+  mintInfo: MintInfo | undefined
+}
+
+export interface GoblinGoldWithdrawForm {
+  amount: number | undefined
+  governedTokenAccount?: AssetAccount | undefined
+  goblinGoldVaultId?: string
+  mintName?: SupportedMintName
   mintInfo: MintInfo | undefined
 }
 
@@ -224,7 +253,7 @@ export interface ForesightMakeResolveMarketParams extends ForesightHasMarketId {
   winner: number
 }
 
-export interface ForesightMakeAddMarketMetadataParams
+export interface ForesightMakeSetMarketMetadataParams
   extends ForesightHasMarketId {
   content: string
   field: foresightConsts.MarketMetadataFieldName
@@ -296,12 +325,14 @@ export enum Instructions {
   Grant,
   Clawback,
   CreateAssociatedTokenAccount,
-  DepositIntoCastle,
-  WithrawFromCastle,
-  SwitchboardAdmitOracle,
-  SwitchboardRevokeOracle,
   DepositIntoVolt,
   WithdrawFromVolt,
+  ClaimPendingDeposit,
+  ClaimPendingWithdraw,
+  DepositIntoCastle,
+  WithrawFromCastle,
+  DepositIntoGoblinGold,
+  WithdrawFromGoblinGold,
   CreateSolendObligationAccount,
   InitSolendObligationAccount,
   DepositReserveLiquidityAndObligationCollateral,
@@ -313,7 +344,7 @@ export enum Instructions {
   ForesightInitCategory,
   ForesightResolveMarket,
   ForesightAddMarketListToCategory,
-  ForesightAddMarketMetadata,
+  ForesightSetMarketMetadata,
   RealmConfig,
   CreateNftPluginRegistrar,
   CreateNftPluginMaxVoterWeight,

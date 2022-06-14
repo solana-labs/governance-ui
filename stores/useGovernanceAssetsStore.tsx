@@ -123,7 +123,7 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
     const governancesArray = _get().governancesArray.filter(
       (x) => x.pubkey.toBase58() === governancePk.toBase58()
     )
-    console.log(governancesArray)
+
     const previousAccounts = _get().assetAccounts.filter(
       (x) => x.governance?.pubkey.toBase58() !== governancePk.toBase58()
     )

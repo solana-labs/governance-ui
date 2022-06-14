@@ -17,7 +17,13 @@
     "test-all": "yarn lint && yarn type-check && yarn test",
     "notifier": "ts-node scripts/governance-notifier.ts"
   },
+  "lint-staged": {
+    "*.@(ts|tsx|js|jsx)": [
+      "yarn format"
+    ]
+  },
   "dependencies": {
+    "@switchboard-xyz/switchboard-v2": "^0.0.110",
     "@blockworks-foundation/mango-client": "^3.5.0",
     "@blockworks-foundation/voter-stake-registry-client": "^0.2.3",
     "@cardinal/namespaces-components": "^2.5.5",
@@ -27,8 +33,8 @@
     "@dialectlabs/react-ui": "0.8.2",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
-    "@foresight-tmp/foresight-sdk": "^0.1.38",
-    "@friktion-labs/friktion-sdk": "^1.1.25",
+    "@friktion-labs/friktion-sdk": "^1.1.118",
+    "@foresight-tmp/foresight-sdk": "^0.1.44",
     "@headlessui/react": "^1.5.0",
     "@heroicons/react": "^1.0.1",
     "@marinade.finance/marinade-ts-sdk": "^2.0.9",
@@ -36,8 +42,6 @@
     "@mithraic-labs/serum-remote": "^0.0.1-rc.16",
     "@next/bundle-analyzer": "^12.1.5",
     "@nfteyez/sol-rayz": "^0.10.2",
-    "@notifi-network/notifi-react-hooks": "^0.11.0",
-    "@project-serum/anchor": "0.24.2",
     "@nivo/bar": "^0.79.1",
     "@nivo/core": "^0.79.0",
     "@notifi-network/notifi-react-hooks": "^0.12.1",
@@ -51,7 +55,7 @@
     "@solana/governance-program-library": "^0.15.2",
     "@solana/spl-governance": "^0.0.34",
     "@solana/spl-token": "0.1.8",
-    "@solana/spl-token-registry": "^0.2.3470",
+    "@solana/spl-token-registry": "^0.2.3775",
     "@solana/wallet-adapter-base": "^0.9.5",
     "@solana/wallet-adapter-glow": "^0.1.1",
     "@solana/wallet-adapter-phantom": "^0.9.3",
@@ -60,13 +64,13 @@
     "@solana/wallet-adapter-torus": "^0.11.11",
     "@solana/web3.js": "^1.37.1",
     "@solendprotocol/solend-sdk": "^0.5.5",
-    "@switchboard-xyz/switchboard-v2": "^0.0.108",
     "@tippyjs/react": "^4.2.6",
     "axios": "^0.26.1",
     "bignumber.js": "^9.0.2",
     "buffer-layout": "^1.2.2",
     "classnames": "^2.3.1",
     "dayjs": "^1.11.1",
+    "goblingold-sdk": "^1.2.35",
     "immer": "^9.0.12",
     "next": "^12.1.5",
     "next-themes": "^0.1.1",
@@ -95,15 +99,15 @@
     "@types/react": "^17.0.44",
     "@typescript-eslint/eslint-plugin": "^5.21.0",
     "@typescript-eslint/parser": "^5.18.0",
-    "eslint": "^8.12.0",
-    "eslint-config-prettier": "^8.3.0",
+    "eslint": "^8.14.0",
+    "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-react": "^7.29.4",
-    "eslint-plugin-react-hooks": "^4.3.0",
+    "eslint-plugin-react-hooks": "^4.5.0",
     "husky": "^6.0.0",
     "jest": "^27.4.5",
     "lint-staged": "^10.0.10",
     "next-router-mock": "^0.6.7",
-    "postcss": "^8.2.12",
+    "postcss": "^8.4.12",
     "postcss-preset-env": "^6.7.0",
     "prettier": "^2.0.2",
     "tailwindcss": "^3.0.23",
@@ -114,5 +118,8 @@
     "twin": {
       "preset": "emotion"
     }
+  },
+  "resolutions": {
+    "port-sdk/@saberhq/token-utils": "1.12.53"
   }
 }
