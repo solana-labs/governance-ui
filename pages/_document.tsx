@@ -5,12 +5,18 @@ const Document = () => {
     <Html>
       <Head>
         <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link rel="preconnect" href="https://use.typekit.net" />
         <link
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=PT+Mono&display=swap"
           rel="stylesheet"
         />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="stylesheet" href="https://use.typekit.net/cwm7dgy.css" />
+        <link rel="manifest" href="/manifest.json" />
         <meta name="msapplication-TileColor" content="#ffffff" />
+        <meta
+          name="msapplication-TileImage"
+          content="/favicons/ms-icon-144x144.png"
+        />
         <meta name="theme-color" content="#ffffff" />
 
         <meta property="og:type" content="website" />
