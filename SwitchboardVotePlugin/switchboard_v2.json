@@ -1857,10 +1857,7 @@
           {
             "name": "ebuf",
             "type": {
-              "array": [
-                "u8",
-                992
-              ]
+              "array": ["u8", 992]
             }
           }
         ]
@@ -1888,28 +1885,19 @@
           {
             "name": "name",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           },
           {
             "name": "metadata",
             "type": {
-              "array": [
-                "u8",
-                128
-              ]
+              "array": ["u8", 128]
             }
           },
           {
             "name": "reserved1",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           },
           {
@@ -1981,10 +1969,7 @@
           {
             "name": "jobPubkeysData",
             "type": {
-              "array": [
-                "publicKey",
-                16
-              ]
+              "array": ["publicKey", 16]
             }
           },
           {
@@ -2005,10 +1990,7 @@
           {
             "name": "jobsChecksum",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           },
           {
@@ -2036,19 +2018,13 @@
           {
             "name": "jobWeights",
             "type": {
-              "array": [
-                "u8",
-                16
-              ]
+              "array": ["u8", 16]
             }
           },
           {
             "name": "ebuf",
             "type": {
-              "array": [
-                "u8",
-                147
-              ]
+              "array": ["u8", 147]
             }
           }
         ]
@@ -2082,10 +2058,7 @@
           {
             "name": "ebuf",
             "type": {
-              "array": [
-                "u8",
-                256
-              ]
+              "array": ["u8", 256]
             }
           }
         ]
@@ -2099,10 +2072,7 @@
           {
             "name": "ebuf",
             "type": {
-              "array": [
-                "u8",
-                256
-              ]
+              "array": ["u8", 256]
             }
           }
         ]
@@ -2152,10 +2122,7 @@
           {
             "name": "ebuf",
             "type": {
-              "array": [
-                "u8",
-                256
-              ]
+              "array": ["u8", 256]
             }
           }
         ]
@@ -2169,19 +2136,13 @@
           {
             "name": "name",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           },
           {
             "name": "metadata",
             "type": {
-              "array": [
-                "u8",
-                64
-              ]
+              "array": ["u8", 64]
             }
           },
           {
@@ -2263,10 +2224,7 @@
           {
             "name": "ebuf",
             "type": {
-              "array": [
-                "u8",
-                968
-              ]
+              "array": ["u8", 968]
             }
           },
           {
@@ -2288,19 +2246,13 @@
           {
             "name": "name",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           },
           {
             "name": "metadata",
             "type": {
-              "array": [
-                "u8",
-                64
-              ]
+              "array": ["u8", 64]
             }
           },
           {
@@ -2322,10 +2274,7 @@
           {
             "name": "ebuf",
             "type": {
-              "array": [
-                "u8",
-                255
-              ]
+              "array": ["u8", 255]
             }
           },
           {
@@ -2343,19 +2292,13 @@
           {
             "name": "name",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           },
           {
             "name": "metadata",
             "type": {
-              "array": [
-                "u8",
-                128
-              ]
+              "array": ["u8", 128]
             }
           },
           {
@@ -2387,10 +2330,7 @@
           {
             "name": "ebuf",
             "type": {
-              "array": [
-                "u8",
-                256
-              ]
+              "array": ["u8", 256]
             }
           }
         ]
@@ -2404,19 +2344,13 @@
           {
             "name": "name",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           },
           {
             "name": "metadata",
             "type": {
-              "array": [
-                "u8",
-                64
-              ]
+              "array": ["u8", 64]
             }
           },
           {
@@ -2430,10 +2364,7 @@
           {
             "name": "hash",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           },
           {
@@ -2520,10 +2451,7 @@
           {
             "name": "ebuf",
             "type": {
-              "array": [
-                "u8",
-                1024
-              ]
+              "array": ["u8", 1024]
             }
           }
         ]
@@ -2537,10 +2465,7 @@
           {
             "name": "name",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           },
           {
@@ -2562,10 +2487,7 @@
           {
             "name": "jobHash",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           },
           {
@@ -2619,19 +2541,13 @@
           {
             "name": "name",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           },
           {
             "name": "metadata",
             "type": {
-              "array": [
-                "u8",
-                128
-              ]
+              "array": ["u8", 128]
             }
           },
           {
@@ -2744,10 +2660,7 @@
           {
             "name": "jobsChecksum",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           },
           {
@@ -2884,10 +2797,7 @@
           {
             "name": "name",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           },
           {
@@ -3017,10 +2927,7 @@
           {
             "name": "name",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           },
           {
@@ -3161,19 +3068,13 @@
           {
             "name": "name",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           },
           {
             "name": "metadata",
             "type": {
-              "array": [
-                "u8",
-                64
-              ]
+              "array": ["u8", 64]
             }
           },
           {
@@ -3514,10 +3415,7 @@
           {
             "name": "bytes",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           }
         ]
@@ -3531,10 +3429,7 @@
           {
             "name": "bytes",
             "type": {
-              "array": [
-                "u64",
-                5
-              ]
+              "array": ["u64", 5]
             }
           }
         ]
@@ -3676,10 +3571,7 @@
           {
             "name": "data",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           }
         ]
@@ -3737,10 +3629,7 @@
           {
             "name": "oraclePubkeysData",
             "type": {
-              "array": [
-                "publicKey",
-                16
-              ]
+              "array": ["publicKey", 16]
             }
           },
           {
@@ -3757,28 +3646,19 @@
           {
             "name": "currentPayout",
             "type": {
-              "array": [
-                "i64",
-                16
-              ]
+              "array": ["i64", 16]
             }
           },
           {
             "name": "mediansFulfilled",
             "type": {
-              "array": [
-                "bool",
-                16
-              ]
+              "array": ["bool", 16]
             }
           },
           {
             "name": "errorsFulfilled",
             "type": {
-              "array": [
-                "bool",
-                16
-              ]
+              "array": ["bool", 16]
             }
           }
         ]
@@ -3896,10 +3776,7 @@
           {
             "name": "reprProof",
             "type": {
-              "array": [
-                "u8",
-                80
-              ]
+              "array": ["u8", 80]
             }
           },
           {
@@ -4052,46 +3929,31 @@
           {
             "name": "p1Bytes",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           },
           {
             "name": "p2Bytes",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           },
           {
             "name": "p3Bytes",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           },
           {
             "name": "p4Bytes",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           },
           {
             "name": "cPrimeHashbuf",
             "type": {
-              "array": [
-                "u8",
-                16
-              ]
+              "array": ["u8", 16]
             }
           },
           {
@@ -4117,10 +3979,7 @@
           {
             "name": "result",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           }
         ]
@@ -4193,10 +4052,7 @@
           {
             "name": "ixData",
             "type": {
-              "array": [
-                "u8",
-                1024
-              ]
+              "array": ["u8", 1024]
             }
           },
           {
@@ -4214,10 +4070,7 @@
           {
             "name": "alpha",
             "type": {
-              "array": [
-                "u8",
-                256
-              ]
+              "array": ["u8", 256]
             }
           },
           {
@@ -4235,10 +4088,7 @@
           {
             "name": "result",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           },
           {
@@ -4248,10 +4098,7 @@
           {
             "name": "ebuf",
             "type": {
-              "array": [
-                "u8",
-                256
-              ]
+              "array": ["u8", 256]
             }
           }
         ]

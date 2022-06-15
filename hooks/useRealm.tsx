@@ -251,7 +251,7 @@ const getVoterWeight = (
   nftVotingPower: BN,
   sbVotingPower: BN,
   pythVotingPower: BN,
-  ownCouncilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,
+  ownCouncilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
 ) => {
   if (currentPluginPk) {
     if (vsrPluginsPks.includes(currentPluginPk.toBase58())) {

@@ -6,6 +6,7 @@ import {
 } from '@solana/web3.js'
 
 import {
+  getGovernanceProgramVersion,
   getInstructionDataFromBase64,
   getSignatoryRecordAddress,
   Governance,
@@ -93,12 +94,10 @@ export const createProposal = async (
   // the version for RealmInfo
 
   // Changed this because it is misbehaving on my local validator setup.
-  /*const programVersion = await getGovernanceProgramVersion(
+  const programVersion = await getGovernanceProgramVersion(
     connection,
     programId
-  )*/
-
-  const programVersion = 2;
+  )
 
   // V2 Approve/Deny configuration
   const voteType = VoteType.SINGLE_CHOICE

@@ -330,9 +330,7 @@ export class SwitchboardQueueVoteWeight implements VoterWeightInterface {
 
   // Checks if the voter has any voting weight
   hasAnyWeight() {
-    return (
-      !this.votingPower.isZero()
-    )
+    return !this.votingPower.isZero()
   }
 
   // Returns first available tokenRecord
@@ -349,7 +347,7 @@ export class SwitchboardQueueVoteWeight implements VoterWeightInterface {
     )
   }
   hasMinCouncilWeight(_minCouncilWeight: BN) {
-     return false
+    return false
   }
 
   canCreateProposal(_config: GovernanceConfig) {
@@ -389,7 +387,7 @@ export class SwitchboardQueueVoteWeight implements VoterWeightInterface {
 
   getTokenRecordToCreateProposal(_config: GovernanceConfig) {
     if (this.communityTokenRecord !== undefined) {
-      return this.communityTokenRecord;
+      return this.communityTokenRecord
     }
     throw new Error('Not enough vote weight to create proposal')
   }

@@ -1,7 +1,10 @@
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 import { NftVoterClient } from '@solana/governance-program-library'
-import { SwitchboardQueueVoterClient, SWITCHBOARD_ADDIN_ID } from '../../SwitchboardVotePlugin/SwitchboardQueueVoterClient'
+import {
+  SwitchboardQueueVoterClient,
+  SWITCHBOARD_ADDIN_ID,
+} from '../../SwitchboardVotePlugin/SwitchboardQueueVoterClient'
 import {
   ProgramAccount,
   Realm,
@@ -32,7 +35,12 @@ type UpdateVoterWeightRecordTypes =
   | 'signOffProposal'
 
 export interface VotingClientProps {
-  client: VsrClient | NftVoterClient | SwitchboardQueueVoterClient | PythClient | undefined
+  client:
+    | VsrClient
+    | NftVoterClient
+    | SwitchboardQueueVoterClient
+    | PythClient
+    | undefined
   realm: ProgramAccount<Realm> | undefined
   walletPk: PublicKey | null | undefined
 }
@@ -71,7 +79,12 @@ interface ProgramAddresses {
 
 //Abstract for common functions that plugins will implement
 export class VotingClient {
-  client: VsrClient | NftVoterClient | SwitchboardQueueVoterClient | PythClient | undefined
+  client:
+    | VsrClient
+    | NftVoterClient
+    | SwitchboardQueueVoterClient
+    | PythClient
+    | undefined
   realm: ProgramAccount<Realm> | undefined
   walletPk: PublicKey | null | undefined
   votingNfts: NFTWithMeta[]
@@ -202,16 +215,11 @@ export class VotingClient {
       }
     }
     if (this.client instanceof SwitchboardQueueVoterClient) {
-      instructions.push(
-        this.instructions[0]
-      )
+      instructions.push(this.instructions[0])
       const [vwr] = await PublicKey.findProgramAddress(
-          [
-            Buffer.from('VoterWeightRecord'),
-            this.oracles[0].toBytes(),
-          ],
-          SWITCHBOARD_ADDIN_ID,
-      );
+        [Buffer.from('VoterWeightRecord'), this.oracles[0].toBytes()],
+        SWITCHBOARD_ADDIN_ID
+      )
       return { voterWeightPk: vwr, maxVoterWeightRecord: undefined }
     }
   }

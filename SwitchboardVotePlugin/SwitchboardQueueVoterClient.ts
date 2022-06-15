@@ -9,15 +9,15 @@ export const SWITCHBOARD_ID = new PublicKey(
 
 export const SWITCHBOARD_ADDIN_ID = new PublicKey(
   'B4EDDdMh5CmB6B9DeMmZmFvRzEgyHR5zWktf6httcMk6'
-);
+)
 
 export const SWITCHBOARD_GRANT_AUTHORITY = new PublicKey(
   '5wD32vPTeBk3UJfTCQUpa4KbrHZ5xxc8f4eLnqTPNW8L'
-);
+)
 
 export const SWITCHBOARD_REVOKE_AUTHORITY = new PublicKey(
   '9rkK8T8wnYXZ1SSC6g2ZhbnyL5K5v546XSbNJv7og87b'
-);
+)
 
 export const QUEUE_LIST: PublicKey[] = [
   new PublicKey('7QN4mJo9U58XMeHEyfY6ckKxAkVLkqVtcWjwgNU6xaE'),
@@ -41,19 +41,17 @@ export class SwitchboardQueueVoterClient {
   }
 }
 
-export async function grantPermissionTx (
-  program: Program, 
+export async function grantPermissionTx(
+  program: Program,
   grantAuthority: PublicKey,
   switchboardProgram: PublicKey,
-  permission: PublicKey,
+  permission: PublicKey
 ): Promise<Transaction> {
-  console.log("IN GRANT FUNC");
+  console.log('IN GRANT FUNC')
   const [addinState] = await PublicKey.findProgramAddress(
-    [
-      Buffer.from('state'),
-    ],
-    program.programId,
-  );
+    [Buffer.from('state')],
+    program.programId
+  )
 
   return await program.methods
     .grantPermission()
@@ -61,26 +59,23 @@ export async function grantPermissionTx (
       state: addinState,
       grantAuthority: grantAuthority,
       switchboardProgram: switchboardProgram,
-      permission: permission
+      permission: permission,
     })
-    .transaction();
-
+    .transaction()
 }
 
-export async function revokePermissionTx (
-  program: Program, 
+export async function revokePermissionTx(
+  program: Program,
   revokeAuthority: PublicKey,
   switchboardProgram: PublicKey,
-  permission: PublicKey,
+  permission: PublicKey
 ): Promise<Transaction> {
-  console.log("IN REVOKE FUNC");
+  console.log('IN REVOKE FUNC')
 
   const [addinState] = await PublicKey.findProgramAddress(
-    [
-      Buffer.from('state'),
-    ],
-    program.programId,
-  );
+    [Buffer.from('state')],
+    program.programId
+  )
 
   return await program.methods
     .revokePermission()
@@ -88,8 +83,7 @@ export async function revokePermissionTx (
       state: addinState,
       revokeAuthority: revokeAuthority,
       switchboardProgram: switchboardProgram,
-      permission: permission
+      permission: permission,
     })
-    .transaction();
-
+    .transaction()
 }
