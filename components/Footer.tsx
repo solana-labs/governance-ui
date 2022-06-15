@@ -3,7 +3,7 @@ import Image from 'next/image'
 const RelevantLinks = {
   Docs: 'https://docs.realms.today/',
   'Programs Github':
-    '"https://github.com/solana-labs/solana-program-library/blob/master/governance/README.md"',
+    'https://github.com/solana-labs/solana-program-library/blob/master/governance/README.md',
 }
 
 const Socials = {
