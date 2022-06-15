@@ -40,7 +40,7 @@ h4.heading-sm {
 .body-xs {
   letter-spacing: 0;
   line-height: 140%;
-  @apply font-normal font-body md:font-light;
+  @apply font-sans font-normal md:font-light;
 }
 
 .body-lg {
@@ -64,7 +64,7 @@ h4.heading-sm {
   letter-spacing: 0;
   line-height: 120%;
   font-size: 16px;
-  @apply font-normal font-body md:font-light;
+  @apply font-sans font-normal md:font-light;
 }
 
 .input-lg,
@@ -72,7 +72,7 @@ h4.heading-sm {
 .input-sm {
   letter-spacing: -0.5px;
   line-height: 110%;
-  @apply font-normal font-body md:font-light;
+  @apply font-sans font-normal md:font-light;
 }
 
 .input-lg {
