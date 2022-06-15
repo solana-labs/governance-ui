@@ -101,7 +101,7 @@ button {
 }
 
 .markdown > p {
-  @apply mb-2 text-[#D1D6DB];
+  @apply mb-2 text-fgd-1;
 }
 
 .markdown ul {
@@ -113,7 +113,7 @@ button {
 }
 
 .markdown li {
-  @apply mb-2 ml-6 font-normal list-disc text-fgd-3;
+  @apply mb-2 ml-6 font-normal list-disc text-fgd-2;
 }
 
 .markdown pre {
