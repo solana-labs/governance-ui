@@ -309,7 +309,11 @@ const NotificationsCard = ({
     } else {
       setPreview(false)
     }
+<<<<<<< HEAD
   }, [disabled, isSame, onBackClick, setPreview])
+=======
+  }, [])
+>>>>>>> 6e2ddad (updates padding)
 
   return (
     <div className="bg-bkg-5 w-full p-4 md:p-6 rounded-lg">
