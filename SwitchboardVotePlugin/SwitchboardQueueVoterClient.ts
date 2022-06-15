@@ -47,8 +47,8 @@ export async function grantPermissionTx (
   switchboardProgram: PublicKey,
   permission: PublicKey,
 ): Promise<Transaction> {
-
-  let [addinState, _] = await PublicKey.findProgramAddress(
+  console.log("IN GRANT FUNC");
+  let [addinState] = await PublicKey.findProgramAddress(
     [
       Buffer.from('state'),
     ],
@@ -60,6 +60,33 @@ export async function grantPermissionTx (
     .accounts({
       state: addinState,
       grantAuthority: grantAuthority,
+      switchboardProgram: switchboardProgram,
+      permission: permission
+    })
+    .transaction();
+
+}
+
+export async function revokePermissionTx (
+  program: Program, 
+  revokeAuthority: PublicKey,
+  switchboardProgram: PublicKey,
+  permission: PublicKey,
+): Promise<Transaction> {
+  console.log("IN REVOKE FUNC");
+
+  let [addinState] = await PublicKey.findProgramAddress(
+    [
+      Buffer.from('state'),
+    ],
+    program.programId,
+  );
+
+  return await program.methods
+    .revokePermission()
+    .accounts({
+      state: addinState,
+      revokeAuthority: revokeAuthority,
       switchboardProgram: switchboardProgram,
       permission: permission
     })

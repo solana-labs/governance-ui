@@ -318,13 +318,11 @@ const New = () => {
     )
 
     setGovernance(governedAccount)
-    try {
-    console.log(`${governedAccount.toBase58()} vs ${SWITCHBOARD_GRANT_AUTHORITY.toBase58()}`);
-    }
-    catch(e) {}
   }, [instructionsData])
 
   const getCurrentInstruction = ({ typeId, idx }) => {
+    console.log("IN GET CURRENT INSTRUCTION:");
+    console.log(typeId);
     switch (typeId) {
       case Instructions.Transfer:
         return (
@@ -371,6 +369,12 @@ const New = () => {
         return <GoblinGoldDeposit index={idx} governance={governance} />
       case Instructions.WithdrawFromGoblinGold:
         return <GoblinGoldWithdraw index={idx} governance={governance} />
+
+
+      case Instructions.SwitchboardAdmitOracle:
+        return <SwitchboardAdmitOracle index={idx} governance={governance} />
+      case Instructions.SwitchboardRevokeOracle:
+        return <SwitchboardRevokeOracle index={idx} governance={governance} />
 
       case Instructions.CreateSolendObligationAccount:
         return <CreateObligationAccount index={idx} governance={governance} />

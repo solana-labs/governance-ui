@@ -78,7 +78,7 @@
         },
         {
           "name": "permission",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         }
       ],

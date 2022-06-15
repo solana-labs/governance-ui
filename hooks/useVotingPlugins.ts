@@ -228,15 +228,21 @@ export function useVotingPlugins() {
 
         const vw = await connection.current.getAccountInfo(voterWeightRecord)
 
-        const vwr = await getVoterWeightRecord(
-          connection.current,
-          voterWeightRecord
-        )
-        if (vwr && vwr.account.realm.equals(realm.pubkey)) {
-          // get voting power
-          setVotingPower(vwr.account.voterWeight)
-        } else {
-          // 'no sb governance'
+        try {
+          const vwr = await getVoterWeightRecord(
+            connection.current,
+            voterWeightRecord
+          )
+          if (vwr && vwr.account.realm.equals(realm.pubkey)) {
+            // get voting power
+            setVotingPower(vwr.account.voterWeight)
+          } else {
+            // 'no sb governance'
+            setVotingPower(new anchor.BN(0))
+          }
+        }
+        catch (e) {
+          console.log("Couldn't get voter weight record. Setting to zero.");
           setVotingPower(new anchor.BN(0))
         }
       }

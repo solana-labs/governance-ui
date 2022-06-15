@@ -10,14 +10,22 @@ import {
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import useWalletStore from 'stores/useWalletStore'
+import useSwitchboardPluginStore from 'SwitchboardVotePlugin/store/switchboardStore'
+import { sbRefreshWeight } from  '../../actions/switchboardRefreshVoterWeight'
 
 const SwitchboardPermissionCard = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
 
+  const switchboardVoterWeight = useSwitchboardPluginStore((s) => s.state.votingPower)
+  const switchboardRefreshInstructions = useSwitchboardPluginStore((s) => s.state.instructions)
+  console.log("sbis:");
+  console.log();
+
   const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
   const { tokenRecords, realm, symbol } = useRealm()
+  const connection = useWalletStore((s) => s.connection)
 
   const ownTokenRecord = wallet?.publicKey
     ? tokenRecords[wallet.publicKey!.toBase58()]
@@ -59,10 +67,27 @@ const SwitchboardPermissionCard = () => {
           </a>
         </Link>
       </div>
-      <div className="space-y-4">Switchboard</div>
-      {connected && !ownTokenRecord && (
-        <Button className="w-full">Go to Switchboard.xyz</Button>
-      )}
+      <div className="space-y-4">
+      {
+        (() => {
+          console.log(switchboardVoterWeight);
+          console.log(`does it equal zero: ${switchboardVoterWeight.isZero()}`);
+          if (switchboardVoterWeight.isZero()) {
+            return (<span>You do not have voting rights</span>)
+          }
+          else {
+            return (<span>You have voting rights!</span>)
+          }
+        })()
+      }
+      </div>
+      <Button className="w-full" onClick={() => {
+        sbRefreshWeight(
+          switchboardRefreshInstructions[0],
+          connection,
+          wallet
+        )
+      }}>Refresh Voting Rights</Button>
     </div>
   )
 }
