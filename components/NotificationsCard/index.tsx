@@ -321,7 +321,7 @@ const NotificationsCard = ({
     } else {
       setPreview(false)
     }
-  }, [])
+  }, [disabled, isSame, onBackClick, setPreview])
 
   return (
     <div className="bg-bkg-5 w-full p-4 md:p-6 rounded-lg">
