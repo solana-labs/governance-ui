@@ -165,8 +165,8 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
           </>
         )}
       </div>
-      <div className="w-full ">
-        <div className="flex px-6 justify-between flex-row">
+      <div className="w-full">
+        <div className="flex px-6 pt-1 justify-between flex-row">
           <div className=" flex flex-row">
             <p className="text-white text-[10px] font-light whitespace-nowrap flex-start">
               Powered by
