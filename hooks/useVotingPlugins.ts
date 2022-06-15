@@ -7,7 +7,7 @@ import { PublicKey } from '@solana/web3.js'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { getMaxVoterWeightRecord } from '@solana/spl-governance'
-import { getNftMaxVoterWeightRecord } from 'NftVotePlugin/sdk/accounts'
+import { getMaxVoterWeightRecord as getPluginMaxVoterWeightRecord } from '@utils/plugin/accounts'
 import { notify } from '@utils/notifications'
 import {
   LOCALNET_STAKING_ADDRESS as PYTH_LOCALNET_STAKING_ADDRESS,
@@ -26,8 +26,8 @@ export const nftPluginsPks: string[] = [
 ]
 
 export const gatewayPluginsPks: string[] = [
-  'Ggat9fNP9SsZEfxGJqbdZUasBGppksaZUBfL92ntrFEp', // v0.1 Plugin, usable until v1 is fully tested
   'Ggatr3wgDLySEwA2qEjt1oiw4BUzp5yMLJyz21919dq6', // v1
+  'GgathUhdrCWRHowoRKACjgWhYHfxCEdBi5ViqYN6HVxk', // v2, supporting composition
 ]
 
 export const pythPluginsPks: string[] = [
@@ -139,7 +139,7 @@ export function useVotingPlugins() {
     }
   }
   const handleMaxVoterWeight = async () => {
-    const { maxVoterWeightRecord } = await getNftMaxVoterWeightRecord(
+    const { maxVoterWeightRecord } = await getPluginMaxVoterWeightRecord(
       realm!.pubkey,
       realm!.account.communityMint,
       nftClient!.program.programId

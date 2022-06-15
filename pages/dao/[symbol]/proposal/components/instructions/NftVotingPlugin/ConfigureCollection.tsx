@@ -18,14 +18,14 @@ import InstructionForm, {
   InstructionInputType,
 } from '../FormCreator'
 import { PublicKey } from '@solana/web3.js'
-import {
-  getNftMaxVoterWeightRecord,
-  getNftRegistrarPDA,
-} from 'NftVotePlugin/sdk/accounts'
 import { getValidatedPublickKey } from '@utils/validations'
 import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import {
+  getMaxVoterWeightRecord,
+  getRegistrarPDA,
+} from '@utils/plugin/accounts'
 
 interface ConfigureCollectionForm {
   governedAccount: AssetAccount | undefined
@@ -61,12 +61,12 @@ const ConfigureNftPluginCollection = ({
         form!.weight,
         mint!.decimals
       )
-      const { registrar } = await getNftRegistrarPDA(
+      const { registrar } = await getRegistrarPDA(
         realm!.pubkey,
         realm!.account.communityMint,
         nftClient!.program.programId
       )
-      const { maxVoterWeightRecord } = await getNftMaxVoterWeightRecord(
+      const { maxVoterWeightRecord } = await getMaxVoterWeightRecord(
         realm!.pubkey,
         realm!.account.communityMint,
         nftClient!.program.programId

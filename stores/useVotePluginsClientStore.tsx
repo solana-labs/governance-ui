@@ -5,16 +5,15 @@ import {
   GatewayClient,
 } from '@solana/governance-program-library'
 import { getRegistrarPDA, Registrar } from 'VoteStakeRegistry/sdk/accounts'
+import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts'
 import { AnchorProvider, Wallet } from '@project-serum/anchor'
 import { tryGetNftRegistrar, tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { ConnectionContext } from '@utils/connection'
 import { ProgramAccount, Realm } from '@solana/spl-governance'
-import { getNftRegistrarPDA } from 'NftVotePlugin/sdk/accounts'
 import { VotingClient, VotingClientProps } from '@utils/uiTypes/VotePlugin'
 import { PythClient } from 'pyth-staking-api'
 import { PublicKey } from '@solana/web3.js'
-import { getGatewayRegistrarPDA } from '../GatewayPlugin/sdk/accounts'
 import { tryGetGatewayRegistrar } from '../GatewayPlugin/sdk/api'
 
 interface UseVotePluginsClientStore extends State {
@@ -131,7 +130,7 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
     },
     handleSetNftRegistrar: async (client, realm) => {
       const clientProgramId = client!.program.programId
-      const { registrar } = await getNftRegistrarPDA(
+      const { registrar } = await getPluginRegistrarPDA(
         realm!.pubkey,
         realm!.account.communityMint,
         clientProgramId
@@ -143,7 +142,7 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
     },
     handleSetGatewayRegistrar: async (client, realm) => {
       const clientProgramId = client!.program.programId
-      const { registrar } = await getGatewayRegistrarPDA(
+      const { registrar } = await getPluginRegistrarPDA(
         realm!.pubkey,
         realm!.account.communityMint,
         clientProgramId

@@ -1,8 +1,6 @@
 import { PublicKey } from '@solana/web3.js'
 
-export const emptyPk = '11111111111111111111111111111111'
-
-export const getNftRegistrarPDA = async (
+export const getRegistrarPDA = async (
   realmPk: PublicKey,
   mint: PublicKey,
   clientProgramId: PublicKey
@@ -17,7 +15,7 @@ export const getNftRegistrarPDA = async (
   }
 }
 
-export const getNftMaxVoterWeightRecord = async (
+export const getMaxVoterWeightRecord = async (
   realmPk: PublicKey,
   mint: PublicKey,
   clientProgramId: PublicKey
@@ -39,7 +37,7 @@ export const getNftMaxVoterWeightRecord = async (
   }
 }
 
-export const getNftVoterWeightRecord = async (
+export const getVoterWeightRecord = async (
   realmPk: PublicKey,
   mint: PublicKey,
   walletPk: PublicKey,
@@ -57,6 +55,7 @@ export const getNftVoterWeightRecord = async (
     ],
     clientProgramId
   )
+
   return {
     voterWeightPk,
     voterWeightRecordBump,

@@ -17,13 +17,12 @@ import InstructionForm, {
   InstructionInput,
   InstructionInputType,
 } from '../FormCreator'
-import { getGatewayRegistrarPDA } from 'GatewayPlugin/sdk/accounts'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { PublicKey } from '@solana/web3.js'
 import { InformationCircleIcon } from '@heroicons/react/outline'
 import Tooltip from '@components/Tooltip'
-import { makeInvalidReturnValueError } from '@jest/transform/build/runtimeErrorsAndWarnings'
+import { getRegistrarPDA } from '@utils/plugin/accounts'
 
 interface CreateGatewayRegistrarForm {
   governedAccount: AssetAccount | undefined
@@ -60,11 +59,15 @@ const CreateGatewayPluginRegistrar = ({
       form!.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const { registrar } = await getGatewayRegistrarPDA(
+      const { registrar } = await getRegistrarPDA(
         realm!.pubkey,
         realm!.account.communityMint,
         gatewayClient!.program.programId
       )
+
+      const remainingAccounts = form!.predecessor
+        ? [{ pubkey: form!.predecessor, isSigner: false, isWritable: false }]
+        : []
 
       const createRegistrarIx = await gatewayClient!.program.methods
         .createRegistrar()
@@ -78,16 +81,16 @@ const CreateGatewayPluginRegistrar = ({
           payer: wallet.publicKey!,
           systemProgram: SYSTEM_PROGRAM_ID,
         })
+        .remainingAccounts(remainingAccounts)
         .instruction()
       serializedInstruction = serializeInstructionToBase64(createRegistrarIx)
     }
-    const obj: UiInstruction = {
+    return {
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form!.governedAccount?.governance,
       chunkSplitByDefault: true,
     }
-    return obj
   }
   useEffect(() => {
     handleSetInstructions(

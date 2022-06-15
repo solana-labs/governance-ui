@@ -9,12 +9,12 @@ import {
 } from '@solana/spl-governance'
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { sendTransaction } from '@utils/send'
-import { getNftVoterWeightRecord } from 'NftVotePlugin/sdk/accounts'
 import { useState, useEffect } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
 import useGatewayPluginStore from '../../GatewayPlugin/store/gatewayPluginStore'
 import { GatewayButton } from '@components/Gateway/GatewayButton'
+import { getVoterWeightRecord } from '@utils/plugin/accounts'
 
 // TODO lots of overlap with NftBalanceCard here - we need to separate the logic for creating the Token Owner Record
 // from the rest of this logic
@@ -37,7 +37,7 @@ const GatewayCard = () => {
     : null
   const handleRegister = async () => {
     const instructions: TransactionInstruction[] = []
-    const { voterWeightPk } = await getNftVoterWeightRecord(
+    const { voterWeightPk } = await getVoterWeightRecord(
       realm!.pubkey,
       realm!.account.communityMint,
       wallet!.publicKey!,

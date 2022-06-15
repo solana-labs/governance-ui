@@ -10,11 +10,6 @@ import {
 } from '@solana/spl-governance'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { chunks } from '@utils/helpers'
-import {
-  getNftRegistrarPDA,
-  getNftVoterWeightRecord,
-  getNftMaxVoterWeightRecord,
-} from 'NftVotePlugin/sdk/accounts'
 import { PythClient } from 'pyth-staking-api'
 import {
   getRegistrarPDA,
@@ -24,10 +19,14 @@ import {
 import { NFTWithMint } from './nfts'
 import { GatewayClient } from '@solana/governance-program-library/dist'
 import {
-  getGatewayRegistrarPDA,
-  getGatewayVoterWeightRecord,
+  getPreviousVotingWeightRecord,
   getVoteInstruction,
 } from '../../GatewayPlugin/sdk/accounts'
+import {
+  getVoterWeightRecord as getPluginVoterWeightRecord,
+  getRegistrarPDA as getPluginRegistrarPDA,
+  getMaxVoterWeightRecord as getPluginMaxVoterWeightRecord,
+} from '@utils/plugin/accounts'
 
 type UpdateVoterWeightRecordTypes =
   | 'castVote'
@@ -151,7 +150,7 @@ export class VotingClient {
     }
 
     if (this.client instanceof NftVoterClient) {
-      const { registrar } = await getNftRegistrarPDA(
+      const { registrar } = await getPluginRegistrarPDA(
         realm.pubkey,
         realm.account.communityMint,
         this.client!.program.programId
@@ -185,11 +184,6 @@ export class VotingClient {
       return { voterWeightPk, maxVoterWeightRecord }
     }
     if (this.client instanceof GatewayClient) {
-      const { registrar } = await getGatewayRegistrarPDA(
-        realm.pubkey,
-        realm.account.communityMint,
-        this.client.program.programId
-      )
       const { voterWeightPk } = await this._withHandleGatewayVoterWeight(
         realm,
         walletPk,
@@ -200,14 +194,12 @@ export class VotingClient {
       if (!this.gatewayToken)
         throw new Error(`Unable to execute transaction: No Civic Pass found`)
 
-      const updateVoterWeightRecordIx = await this.client.program.methods
-        .updateVoterWeightRecord({ [type]: {} }, null)
-        .accounts({
-          registrar: registrar,
-          gatewayToken: this.gatewayToken,
-          voterWeightRecord: voterWeightPk,
-        })
-        .instruction()
+      const updateVoterWeightRecordIx = await getVoteInstruction(
+        this.client,
+        this.gatewayToken,
+        realm,
+        walletPk
+      )
       instructions.push(updateVoterWeightRecordIx)
       return { voterWeightPk, maxVoterWeightRecord: undefined }
     }
@@ -250,7 +242,7 @@ export class VotingClient {
     }
 
     if (this.client instanceof NftVoterClient) {
-      const { registrar } = await getNftRegistrarPDA(
+      const { registrar } = await getPluginRegistrarPDA(
         realm.pubkey,
         realm.account.communityMint,
         this.client!.program.programId
@@ -361,8 +353,7 @@ export class VotingClient {
         this.client,
         this.gatewayToken,
         realm,
-        walletPk,
-        proposal.pubkey
+        walletPk
       )
 
       instructions.push(instruction)
@@ -396,7 +387,7 @@ export class VotingClient {
     }
 
     if (this.client instanceof NftVoterClient) {
-      const { registrar } = await getNftRegistrarPDA(
+      const { registrar } = await getPluginRegistrarPDA(
         realm.pubkey,
         realm.account.communityMint,
         this.client!.program.programId
@@ -484,7 +475,7 @@ export class VotingClient {
     const {
       voterWeightPk,
       voterWeightRecordBump,
-    } = await getNftVoterWeightRecord(
+    } = await getPluginVoterWeightRecord(
       realm!.pubkey,
       realm!.account.communityMint,
       walletPk!,
@@ -494,7 +485,7 @@ export class VotingClient {
     const {
       maxVoterWeightRecord,
       maxVoterWeightRecordBump,
-    } = await getNftMaxVoterWeightRecord(
+    } = await getPluginMaxVoterWeightRecord(
       realm!.pubkey,
       realm!.account.communityMint,
       clientProgramId
@@ -521,14 +512,21 @@ export class VotingClient {
     const {
       voterWeightPk,
       voterWeightRecordBump,
-    } = await getGatewayVoterWeightRecord(
+    } = await getPluginVoterWeightRecord(
       realm.pubkey,
       realm.account.communityMint,
       walletPk,
       clientProgramId
     )
 
+    const previousVoterWeightPk = await getPreviousVotingWeightRecord(
+      this.client,
+      realm,
+      walletPk
+    )
+
     return {
+      previousVoterWeightPk,
       voterWeightPk,
       voterWeightRecordBump,
     }

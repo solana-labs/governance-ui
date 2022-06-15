@@ -1,9 +1,10 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import * as yup from 'yup'
 import {
   Governance,
   ProgramAccount,
   serializeInstructionToBase64,
+  SYSTEM_PROGRAM_ID,
 } from '@solana/spl-governance'
 import { validateInstruction } from '@utils/instructionTools'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
@@ -18,20 +19,16 @@ import InstructionForm, {
   InstructionInputType,
 } from '../FormCreator'
 import { PublicKey } from '@solana/web3.js'
-import {
-  getGatewayMaxVoterWeightRecord,
-  getGatewayRegistrarPDA,
-} from 'GatewayPlugin/sdk/accounts'
 import { getValidatedPublickKey } from '@utils/validations'
-import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
-import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { getRegistrarPDA } from '@utils/plugin/accounts'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
-interface ConfigureCollectionForm {
+interface ConfigureGatewayForm {
   governedAccount: AssetAccount | undefined
-  weight: number
-  size: number
-  collection: string
+  gatekeeperNetwork: PublicKey // populated by dropdown
+  otherGatekeeperNetwork: PublicKey | undefined // manual entry
+  predecessor: PublicKey | undefined // if part of a chain of plugins
 }
 
 const ConfigureGatewayPlugin = ({
@@ -41,56 +38,55 @@ const ConfigureGatewayPlugin = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { realm, mint } = useRealm()
+  const { realm } = useRealm()
   const gatewayClient = useVotePluginsClientStore((s) => s.state.gatewayClient)
   const { assetAccounts } = useGovernanceAssets()
   const wallet = useWalletStore((s) => s.current)
   const shouldBeGoverned = index !== 0 && governance
-  const [form, setForm] = useState<ConfigureCollectionForm>()
+  const [form, setForm] = useState<ConfigureGatewayForm>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
+
+  const chosenGatekeeperNetwork = useMemo(() => {
+    return form?.otherGatekeeperNetwork || form?.gatekeeperNetwork
+  }, [form])
+
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstruction = ''
     if (
       isValid &&
-      form!.governedAccount?.governance.pubkey &&
+      form!.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const weight = getMintNaturalAmountFromDecimalAsBN(
-        form!.weight,
-        mint!.decimals
-      )
-      const { registrar } = await getGatewayRegistrarPDA(
+      const remainingAccounts = form!.predecessor
+        ? [{ pubkey: form!.predecessor, isSigner: false, isWritable: false }]
+        : []
+      const { registrar } = await getRegistrarPDA(
         realm!.pubkey,
         realm!.account.communityMint,
         gatewayClient!.program.programId
       )
-      const { maxVoterWeightRecord } = await getGatewayMaxVoterWeightRecord(
-        realm!.pubkey,
-        realm!.account.communityMint,
-        gatewayClient!.program.programId
-      )
-      const configureCollectionIx = await gatewayClient!.program.methods
-        .configureCollection(weight, form!.size)
+      const updateRegistrarIx = await gatewayClient!.program.methods
+        .updateRegistrar()
         .accounts({
           registrar,
           realm: realm!.pubkey,
           realmAuthority: realm!.account.authority!,
-          collection: new PublicKey(form!.collection),
-          maxVoterWeightRecord: maxVoterWeightRecord,
+          governingTokenMint: realm!.account.communityMint!,
+          gatekeeperNetwork: chosenGatekeeperNetwork,
+          payer: wallet.publicKey!,
+          systemProgram: SYSTEM_PROGRAM_ID,
         })
+        .remainingAccounts(remainingAccounts)
         .instruction()
-      serializedInstruction = serializeInstructionToBase64(
-        configureCollectionIx
-      )
+      serializedInstruction = serializeInstructionToBase64(updateRegistrarIx)
     }
-    const obj: UiInstruction = {
+    return {
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form!.governedAccount?.governance,
     }
-    return obj
   }
   useEffect(() => {
     handleSetInstructions(
