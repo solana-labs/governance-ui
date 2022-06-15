@@ -320,8 +320,6 @@ export enum Instructions {
   Grant,
   Clawback,
   CreateAssociatedTokenAccount,
-  DepositIntoCastle,
-  WithrawFromCastle,
   DepositIntoVolt,
   WithdrawFromVolt,
   ClaimPendingDeposit,
