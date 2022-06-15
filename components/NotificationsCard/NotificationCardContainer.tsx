@@ -91,7 +91,7 @@ const NotificationCardContainer: React.FC<Props> = ({ onBackClick }) => {
   }
 
   useEffect(() => {
-    if (isAuthenticated && connected) {
+    if (isAuthenticated && connected && isInitialized) {
       const targetGroup = firstOrNull(data?.targetGroups)
 
       if (targetGroup) {
@@ -103,13 +103,20 @@ const NotificationCardContainer: React.FC<Props> = ({ onBackClick }) => {
         setPhone(firstOrNull(data?.smsTargets)?.phoneNumber ?? '')
         setTelegram(firstOrNull(data?.telegramTargets)?.telegramId ?? '')
       }
-
-      if (email || phoneNumber || telegram) {
-        setPreview(true)
-        return
-      }
+    }
+    if (email || phoneNumber || telegram) {
+      setPreview(true)
     } else setPreview(false)
-  }, [connected, data, email, isAuthenticated, phoneNumber, telegram])
+  }, [
+    connected,
+    data,
+    email,
+    isAuthenticated,
+    setPreview,
+    isInitialized,
+    phoneNumber,
+    telegram,
+  ])
 
   const handleDelete = useCallback(
     async (source: Source) => {
@@ -135,7 +142,7 @@ const NotificationCardContainer: React.FC<Props> = ({ onBackClick }) => {
   )
 
   return (
-    <div className="h-[576px] w-[507px] absolute -top-4 right-0">
+    <div className="h-[507px] w-[446px] absolute -top-4 right-0">
       <div className="bg-bkg-5 w-full h-full rounded-lg">
         <div className="flex flex-row w-full items-center align-center">
           {!isInitialized && (
