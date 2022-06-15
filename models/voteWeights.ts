@@ -348,11 +348,11 @@ export class SwitchboardQueueVoteWeight implements VoterWeightInterface {
       this.communityTokenRecord && this.votingPower.cmp(minCommunityWeight) >= 0
     )
   }
-  hasMinCouncilWeight(minCouncilWeight: BN) {
+  hasMinCouncilWeight(_minCouncilWeight: BN) {
      return false
   }
 
-  canCreateProposal(config: GovernanceConfig) {
+  canCreateProposal(_config: GovernanceConfig) {
     return this.votingPower.gt(new BN(0))
   }
   canCreateGovernanceUsingCommunityTokens(realm: ProgramAccount<Realm>) {
@@ -387,7 +387,7 @@ export class SwitchboardQueueVoteWeight implements VoterWeightInterface {
     }
   }
 
-  getTokenRecordToCreateProposal(config: GovernanceConfig) {
+  getTokenRecordToCreateProposal(_config: GovernanceConfig) {
     if (this.communityTokenRecord !== undefined) {
       return this.communityTokenRecord;
     }

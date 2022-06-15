@@ -1,7 +1,7 @@
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 import { NftVoterClient } from '@solana/governance-program-library'
-import { SwitchboardQueueVoterClient, SWITCHBOARD_ID, SWITCHBOARD_ADDIN_ID } from '../../SwitchboardVotePlugin/SwitchboardQueueVoterClient'
+import { SwitchboardQueueVoterClient, SWITCHBOARD_ADDIN_ID } from '../../SwitchboardVotePlugin/SwitchboardQueueVoterClient'
 import {
   ProgramAccount,
   Realm,
@@ -23,8 +23,6 @@ import {
   getVoterWeightPDA,
 } from 'VoteStakeRegistry/sdk/accounts'
 import { NFTWithMint } from './nfts'
-import useSwitchboardPluginStore from 'SwitchboardVotePlugin/store/switchboardStore'
-import * as sbv2 from '@switchboard-xyz/switchboard-v2'
 
 type UpdateVoterWeightRecordTypes =
   | 'castVote'
@@ -207,7 +205,7 @@ export class VotingClient {
       instructions.push(
         this.instructions[0]
       )
-      let [vwr] = await PublicKey.findProgramAddress(
+      const [vwr] = await PublicKey.findProgramAddress(
           [
             Buffer.from('VoterWeightRecord'),
             this.oracles[0].toBytes(),

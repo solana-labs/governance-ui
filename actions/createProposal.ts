@@ -6,7 +6,6 @@ import {
 } from '@solana/web3.js'
 
 import {
-  getGovernanceProgramVersion,
   getInstructionDataFromBase64,
   getSignatoryRecordAddress,
   Governance,

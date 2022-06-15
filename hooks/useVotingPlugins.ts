@@ -3,31 +3,24 @@ import useWalletStore from 'stores/useWalletStore'
 import useRealm from '@hooks/useRealm'
 import { getNfts } from '@utils/tokens'
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
-import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import useSwitchboardPluginStore from 'SwitchboardVotePlugin/store/switchboardStore'
-import { QUEUE_LIST, SWITCHBOARD_ID, SWITCHBOARD_ADDIN_ID } from 'SwitchboardVotePlugin/SwitchboardQueueVoterClient'
+import { SWITCHBOARD_ID, SWITCHBOARD_ADDIN_ID } from 'SwitchboardVotePlugin/SwitchboardQueueVoterClient'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import {
   getMaxVoterWeightRecord,
   getVoterWeightRecord,
   getGovernanceAccount,
-  GovernanceAccountType,
   Governance
 } from '@solana/spl-governance'
 import { getNftMaxVoterWeightRecord } from 'NftVotePlugin/sdk/accounts'
 import { notify } from '@utils/notifications'
-import { AccountLayout, NATIVE_MINT } from '@solana/spl-token'
 import * as anchor from '@project-serum/anchor'
 import * as sbv2 from '@switchboard-xyz/switchboard-v2'
 import sbIdl from 'SwitchboardVotePlugin/switchboard_v2.json';
 import gonIdl from 'SwitchboardVotePlugin/gameofnodes.json';
 
-import {
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  TOKEN_PROGRAM_ID,
-  Token,
-} from '@solana/spl-token'
 import {
   LOCALNET_STAKING_ADDRESS as PYTH_LOCALNET_STAKING_ADDRESS,
   DEVNET_STAKING_ADDRESS as PYTH_DEVNET_STAKING_ADDRESS,
@@ -164,41 +157,41 @@ export function useVotingPlugins() {
         }
       });
       
-      let myNodesForRealm: PublicKey[] = [];
-      let setVoterWeightInstructions: TransactionInstruction[] = [];
+      const myNodesForRealm: PublicKey[] = [];
+      const setVoterWeightInstructions: TransactionInstruction[] = [];
 
       for (const { oracle, oracleData } of oData) {
         if (!wallet || !wallet.publicKey || !realm || !oData) {
           continue
         }
-        let queuePk = oracleData.queuePubkey as PublicKey;
+        const queuePk = oracleData.queuePubkey as PublicKey;
 
-        let [addinState, _] = await PublicKey.findProgramAddress(
+        const [addinState] = await PublicKey.findProgramAddress(
           [
             Buffer.from('state'),
           ],
           addinProgram.programId,
         );
 
-        let addinStateData = await addinProgram.account.state.fetch(addinState);
-        let queue = await switchboardProgram.account.oracleQueueAccountData.fetch(queuePk);
-        let queueAuthority = queue.authority as PublicKey;
-        let grantAuthority = addinStateData.grantAuthority as PublicKey;
+        const addinStateData = await addinProgram.account.state.fetch(addinState);
+        const queue = await switchboardProgram.account.oracleQueueAccountData.fetch(queuePk);
+        const queueAuthority = queue.authority as PublicKey;
+        const grantAuthority = addinStateData.grantAuthority as PublicKey;
         try {
-          let g = await getGovernanceAccount(provider.connection, grantAuthority, Governance);
+          const g = await getGovernanceAccount(provider.connection, grantAuthority, Governance);
           if (
             g.account.realm.equals(realm.pubkey) &&
             oracleData.oracleAuthority.equals(wallet.publicKey)
           ) {
             myNodesForRealm.push(oracle);
-            let [p] = sbv2.PermissionAccount.fromSeed(
+            const [p] = sbv2.PermissionAccount.fromSeed(
               switchboardProgram,
               queueAuthority,
               queuePk,
               oracle
             );
 
-            let ix = await p.setVoterWeightTx({
+            const ix = await p.setVoterWeightTx({
               govProgram: realm.owner, 
               pubkeySigner: wallet.publicKey,
               addinProgram: addinProgram,
@@ -225,8 +218,6 @@ export function useVotingPlugins() {
           [Buffer.from('VoterWeightRecord'), myNodesForRealm[0].toBytes()],
           SWITCHBOARD_ADDIN_ID
         )
-
-        const vw = await connection.current.getAccountInfo(voterWeightRecord)
 
         const vwr = await getVoterWeightRecord(
           connection.current,

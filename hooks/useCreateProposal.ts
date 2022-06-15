@@ -21,7 +21,6 @@ export default function useCreateProposal() {
     mint,
     councilMint,
     canChooseWhoVote,
-    config,
   } = useRealm()
   const { getRpcContext } = useRpcContext()
   const handleCreateProposal = async ({
