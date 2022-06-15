@@ -29,7 +29,7 @@ const Button: FunctionComponent<ButtonProps> = ({
       } text-sm focus:outline-none ${
         disabled
           ? 'bg-fgd-4 cursor-not-allowed text-fgd-3'
-          : 'bg-primary-light text-bkg-2 hover:bg-primary-dark'
+          : 'bg-primary-light text-bkg-2 hover:bg-fgd-1'
       }`}
       {...props}
       style={style}
@@ -58,7 +58,7 @@ export const SecondaryButton: FunctionComponent<ButtonProps> = ({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`${className} border border-primary-light default-transition font-bold rounded-full px-4 ${
+      className={`${className} border border-primary-light font-bold default-transition rounded-full px-4 ${
         small ? 'py-1' : 'py-2.5'
       } text-primary-light text-sm hover:border-primary-dark hover:text-primary-dark focus:outline-none disabled:border-fgd-3 disabled:text-fgd-3 disabled:cursor-not-allowed`}
       {...props}

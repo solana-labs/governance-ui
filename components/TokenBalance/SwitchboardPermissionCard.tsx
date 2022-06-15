@@ -24,12 +24,8 @@ const SwitchboardPermissionCard = () => {
   console.log();
 
   const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
-  const { tokenRecords, realm, symbol } = useRealm()
+  const { realm, symbol } = useRealm()
   const connection = useWalletStore((s) => s.connection)
-
-  const ownTokenRecord = wallet?.publicKey
-    ? tokenRecords[wallet.publicKey!.toBase58()]
-    : null
 
   useEffect(() => {
     const getTokenOwnerRecord = async () => {

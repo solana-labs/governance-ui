@@ -49,7 +49,7 @@ const AccountsTabs: FunctionComponent<AccountsTabsProps> = ({
             `}
           >
             <div className="text-left">
-              <h3 className="mb-1 text-sm flex">
+              <h3 className="flex mb-1 text-base font-bold">
                 {logo && (
                   <img
                     src={logo}
@@ -62,11 +62,11 @@ const AccountsTabs: FunctionComponent<AccountsTabsProps> = ({
                 )}{' '}
                 {name}
               </h3>
-              <p className="mb-0 text-fgd-1 text-xs">
+              <p className="mb-0 text-xs text-fgd-1">
                 {amountFormatted} {symbol}
               </p>
               {displayPrice && (
-                <span className="text-fgd-3 text-xs">${displayPrice}</span>
+                <span className="text-xs text-fgd-3">${displayPrice}</span>
               )}
             </div>
           </button>

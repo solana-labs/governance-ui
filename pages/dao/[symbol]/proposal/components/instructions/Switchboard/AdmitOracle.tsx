@@ -13,36 +13,30 @@ import {
   consts,
 } from '@foresight-tmp/foresight-sdk'*/
 import {
-  commonAssets,
-  ForesightMarketIdInput,
-  ForesightMarketListIdInput,
-} from '@utils/Foresight'
-import {
   SwitchboardAdmitOracleForm
 } from '@utils/uiTypes/proposalCreationTypes'
 import { PublicKey } from '@solana/web3.js'
 import Input from '@components/inputs/Input'
 import * as sbv2 from '@switchboard-xyz/switchboard-v2'
-import useRealm from '@hooks/useRealm'
 import useWalletStore from 'stores/useWalletStore'
 import * as anchor from '@project-serum/anchor'
 import sbIdl from 'SwitchboardVotePlugin/switchboard_v2.json';
 import gonIdl from 'SwitchboardVotePlugin/gameofnodes.json';
 import { 
-  QUEUE_LIST, 
   SWITCHBOARD_ID, 
   SWITCHBOARD_ADDIN_ID, 
   SWITCHBOARD_GRANT_AUTHORITY,
   grantPermissionTx
 } from 'SwitchboardVotePlugin/SwitchboardQueueVoterClient'
 import { NewProposalContext } from '../../../new'
+import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
 const SwitchboardAdmitOracle = ({
   index,
-  governance,
+  _governance,
 }: {
   index: number
-  governance: ProgramAccount<Governance> | null
+  _governance: ProgramAccount<Governance> | null
 }) => {
   /*const {
     inputProps,
@@ -73,11 +67,10 @@ const SwitchboardAdmitOracle = ({
     </>
   )*/
 
-  const { realm } = useRealm()
-  const [form, setForm] = useState<SwitchboardAdmitOracleForm>({})
+  const [form, setForm] = useState<SwitchboardAdmitOracleForm>({oraclePubkey: undefined, queuePubkey: undefined})
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
-  const { handleSetInstructions, setGovernance } = useContext(NewProposalContext)
+  const { handleSetInstructions } = useContext(NewProposalContext)
 
   /*useEffect(() => {
 
@@ -156,78 +149,60 @@ const SwitchboardAdmitOracle = ({
       )
 
       const switchboardProgram = new anchor.Program(
-        sbIdl,
+        sbIdl as anchor.Idl,
         SWITCHBOARD_ID,
         provider
       )
 
       const addinProgram = new anchor.Program(
-        gonIdl,
+        gonIdl as anchor.Idl,
         SWITCHBOARD_ADDIN_ID,
         provider
       )
 
-      let [addinState, _] = await PublicKey.findProgramAddress(
+      const [addinState] = await PublicKey.findProgramAddress(
         [
           Buffer.from('state'),
         ],
         addinProgram.programId,
       );
 
-      let p = sbv2.PermissionAccount.fromSeed(
+      let qPk;
+      if (form === undefined) {
+        qPk = PublicKey.default
+      }
+      else {
+        qPk = form.queuePubkey
+      }
+      let oPk;
+      if (form === undefined) {
+        oPk = PublicKey.default
+      }
+      else {
+        oPk = form.oraclePubkey
+      }
+      const p = sbv2.PermissionAccount.fromSeed(
         switchboardProgram,
         addinState,
-        new PublicKey(form.queuePubkey),
-        new PublicKey(form.oraclePubkey),
+        new PublicKey(qPk),
+        new PublicKey(oPk),
       )[0];
       console.log("P:");
       console.log(p);
 
-      let grantTx = await grantPermissionTx(
+      const grantTx = await grantPermissionTx(
         addinProgram,
         SWITCHBOARD_GRANT_AUTHORITY,
         SWITCHBOARD_ID,
         p.publicKey
       );
 
+      const gov = await getGovernance(connection.current, SWITCHBOARD_GRANT_AUTHORITY);
       return {
         serializedInstruction: serializeInstructionToBase64(grantTx.instructions[0]),
         isValid: true,
-        governance: SWITCHBOARD_GRANT_AUTHORITY,
+        governance: gov,
       };
-      /*const isValid = await validateInstruction()
-
-      if (
-        !connection ||
-        !isValid ||
-        !programId ||
-        !form.governedAccount?.governance?.account ||
-        !form.splTokenMintUIName ||
-        !wallet?.publicKey
-      ) {
-        return {
-          serializedInstruction: '',
-          isValid: false,
-          governance: form.governedAccount?.governance,
-        }
-      }
-
-      const [tx] = await createAssociatedTokenAccount(
-        // fundingAddress
-        wallet.publicKey,
-
-        // walletAddress
-        form.governedAccount.governance.pubkey,
-
-        // splTokenMintAddress
-        getSplTokenMintAddressByUIName(form.splTokenMintUIName)
-      )
-
-      return {
-        serializedInstruction: serializeInstructionToBase64(tx),
-        isValid: true,
-        governance: form.governedAccount.governance,
-      }*/
     }
 
   return (
@@ -243,18 +218,40 @@ const SwitchboardAdmitOracle = ({
     <Input
       label="Oracle Pubkey"
       type="text"
-      value={form.oraclePubkey}
+      value={
+        (() => {
+          let oPk;
+          if (form === undefined) {
+            oPk = PublicKey.default
+          }
+          else {
+            oPk = form.oraclePubkey
+          }
+          return oPk
+        })()
+      }
       onChange={(text) => {
-        setForm({ ...form, ['oraclePubkey']: text.target.value });
-        setGovernance();
+        setForm({ ...form, ['oraclePubkey']: new PublicKey(text.target.value) });
+        //setGovernance();
       }}
     />
     <Input
       label="Queue Pubkey"
       type="text"
-      value={form.queuePubkey}
+      value={
+        (() => {
+          let qPk;
+          if (form === undefined) {
+            qPk = PublicKey.default
+          }
+          else {
+            qPk = form.queuePubkey
+          }
+          return qPk
+        })()
+      }
       onChange={(text) => {
-        setForm({ ...form, ['queuePubkey']: text.target.value })
+        setForm({ ...form, ['queuePubkey']: new PublicKey(text.target.value) })
       }}
     />
     </>

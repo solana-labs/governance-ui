@@ -13,36 +13,30 @@ import {
   consts,
 } from '@foresight-tmp/foresight-sdk'*/
 import {
-  commonAssets,
-  ForesightMarketIdInput,
-  ForesightMarketListIdInput,
-} from '@utils/Foresight'
-import {
   SwitchboardRevokeOracleForm
 } from '@utils/uiTypes/proposalCreationTypes'
 import { PublicKey } from '@solana/web3.js'
 import Input from '@components/inputs/Input'
 import * as sbv2 from '@switchboard-xyz/switchboard-v2'
-import useRealm from '@hooks/useRealm'
 import useWalletStore from 'stores/useWalletStore'
 import * as anchor from '@project-serum/anchor'
 import sbIdl from 'SwitchboardVotePlugin/switchboard_v2.json';
 import gonIdl from 'SwitchboardVotePlugin/gameofnodes.json';
 import { 
-  QUEUE_LIST, 
   SWITCHBOARD_ID, 
   SWITCHBOARD_ADDIN_ID, 
   SWITCHBOARD_REVOKE_AUTHORITY,
   revokePermissionTx
 } from 'SwitchboardVotePlugin/SwitchboardQueueVoterClient'
 import { NewProposalContext } from '../../../new'
+import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
 const SwitchboardRevokeOracle = ({
   index,
-  governance,
+  _governance,
 }: {
   index: number
-  governance: ProgramAccount<Governance> | null
+  _governance: ProgramAccount<Governance> | null
 }) => {
   /*const {
     inputProps,
@@ -73,11 +67,10 @@ const SwitchboardRevokeOracle = ({
     </>
   )*/
 
-  const { realm } = useRealm()
-  const [form, setForm] = useState<SwitchboardRevokeOracleForm>({})
+  const [form, setForm] = useState<SwitchboardRevokeOracleForm>({oraclePubkey: undefined, queuePubkey: undefined})
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
-  const { handleSetInstructions, setGovernance } = useContext(NewProposalContext)
+  const { handleSetInstructions } = useContext(NewProposalContext)
 
   /*useEffect(() => {
 
@@ -156,44 +149,58 @@ const SwitchboardRevokeOracle = ({
       )
 
       const switchboardProgram = new anchor.Program(
-        sbIdl,
+        sbIdl as anchor.Idl,
         SWITCHBOARD_ID,
         provider
       )
 
       const addinProgram = new anchor.Program(
-        gonIdl,
+        gonIdl as anchor.Idl,
         SWITCHBOARD_ADDIN_ID,
         provider
       )
 
-      let [addinState] = await PublicKey.findProgramAddress(
+      const [addinState] = await PublicKey.findProgramAddress(
         [
           Buffer.from('state'),
         ],
         addinProgram.programId,
       );
 
-      let p = sbv2.PermissionAccount.fromSeed(
+      let qPk;
+      if (form === undefined) {
+        qPk = PublicKey.default
+      }
+      else {
+        qPk = form.queuePubkey
+      }
+      let oPk;
+      if (form === undefined) {
+        oPk = PublicKey.default
+      }
+      else {
+        oPk = form.oraclePubkey
+      }
+
+      const p = sbv2.PermissionAccount.fromSeed(
         switchboardProgram,
         addinState,
-        new PublicKey(form.queuePubkey),
-        new PublicKey(form.oraclePubkey),
+        new PublicKey(qPk),
+        new PublicKey(oPk),
       )[0];
-      console.log("P:");
-      console.log(p);
 
-      let revokeTx = await revokePermissionTx(
+      const revokeTx = await revokePermissionTx(
         addinProgram,
         SWITCHBOARD_REVOKE_AUTHORITY,
         SWITCHBOARD_ID,
         p.publicKey
       );
 
+      const gov = await getGovernance(connection.current, SWITCHBOARD_REVOKE_AUTHORITY);
       return {
         serializedInstruction: serializeInstructionToBase64(revokeTx.instructions[0]),
         isValid: true,
-        governance: SWITCHBOARD_REVOKE_AUTHORITY,
+        governance: gov,
       };
       /*const isValid = await validateInstruction()
 
@@ -245,8 +252,8 @@ const SwitchboardRevokeOracle = ({
       type="text"
       value={form.oraclePubkey}
       onChange={(text) => {
-        setForm({ ...form, ['oraclePubkey']: text.target.value });
-        setGovernance();
+        setForm({ ...form, ['oraclePubkey']: new PublicKey(text.target.value) });
+        //setGovernance();
       }}
     />
     <Input
@@ -254,7 +261,7 @@ const SwitchboardRevokeOracle = ({
       type="text"
       value={form.queuePubkey}
       onChange={(text) => {
-        setForm({ ...form, ['queuePubkey']: text.target.value })
+        setForm({ ...form, ['queuePubkey']: new PublicKey(text.target.value) })
       }}
     />
     </>

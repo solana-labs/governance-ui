@@ -15,7 +15,6 @@ import {
 import { PublicKey } from '@solana/web3.js'
 import Button, { LinkButton, SecondaryButton } from '@components/Button'
 import Input from '@components/inputs/Input'
-import {SWITCHBOARD_GRANT_AUTHORITY} from '../../../../SwitchboardVotePlugin/SwitchboardQueueVoterClient'
 import Select from '@components/inputs/Select'
 import Textarea from '@components/inputs/Textarea'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
@@ -372,9 +371,9 @@ const New = () => {
 
 
       case Instructions.SwitchboardAdmitOracle:
-        return <SwitchboardAdmitOracle index={idx} governance={governance} />
+        return <SwitchboardAdmitOracle index={idx} _governance={governance} />
       case Instructions.SwitchboardRevokeOracle:
-        return <SwitchboardRevokeOracle index={idx} governance={governance} />
+        return <SwitchboardRevokeOracle index={idx} _governance={governance} />
 
       case Instructions.CreateSolendObligationAccount:
         return <CreateObligationAccount index={idx} governance={governance} />

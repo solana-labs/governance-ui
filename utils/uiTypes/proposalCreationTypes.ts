@@ -269,13 +269,13 @@ export interface EmptyInstructionForm {
 }
 
 export interface SwitchboardAdmitOracleForm {
-  oraclePubkey: AssetAccount
-  queuePubkey: AssetAccount
+  oraclePubkey: PublicKey | undefined
+  queuePubkey: PublicKey | undefined
 }
 
 export interface SwitchboardRevokeOracleForm {
-  oraclePubkey: AssetAccount
-  queuePubkey: AssetAccount
+  oraclePubkey: PublicKey | undefined
+  queuePubkey: PublicKey | undefined
 }
 
 export interface CreateAssociatedTokenAccountForm {
