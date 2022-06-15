@@ -318,7 +318,7 @@ const NotificationsCard = ({
     } else {
       setPreview(false)
     }
-  }, [])
+  }, [disabled, isSame, onBackClick, setPreview])
 
   return (
     <div className="bg-bkg-5 w-full p-4 md:p-6 rounded-lg">
@@ -330,7 +330,7 @@ const NotificationsCard = ({
       </div>
       {!connected ? (
         <>
-          <div className="text-sm text-th-fgd-1">
+          <div className="text-sm items-center w-full text-center text-th-fgd-1">
             Connect wallet to see options
           </div>
         </>
