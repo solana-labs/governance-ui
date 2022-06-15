@@ -1,7 +1,6 @@
 import { Keypair, Transaction, TransactionInstruction } from '@solana/web3.js'
 import {
   ChatMessageBody,
-  getGovernanceProgramVersion,
   GOVERNANCE_CHAT_PROGRAM_ID,
   Proposal,
   Realm,
