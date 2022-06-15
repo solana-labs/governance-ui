@@ -268,6 +268,16 @@ export interface EmptyInstructionForm {
   governedAccount: AssetAccount | undefined
 }
 
+export interface SwitchboardAdmitOracleForm {
+  oraclePubkey: PublicKey | undefined
+  queuePubkey: PublicKey | undefined
+}
+
+export interface SwitchboardRevokeOracleForm {
+  oraclePubkey: PublicKey | undefined
+  queuePubkey: PublicKey | undefined
+}
+
 export interface CreateAssociatedTokenAccountForm {
   governedAccount?: AssetAccount
   splTokenMintUIName?: SplTokenUIName
@@ -332,6 +342,8 @@ export enum Instructions {
   InitSolendObligationAccount,
   DepositReserveLiquidityAndObligationCollateral,
   WithdrawObligationCollateralAndRedeemReserveLiquidity,
+  SwitchboardAdmitOracle,
+  SwitchboardRevokeOracle,
   RefreshSolendObligation,
   RefreshSolendReserve,
   ForesightInitMarket,

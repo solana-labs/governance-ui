@@ -6,7 +6,6 @@ import {
 } from '@solana/web3.js'
 
 import {
-  getGovernanceProgramVersion,
   getInstructionDataFromBase64,
   getSignatoryRecordAddress,
   Governance,
@@ -92,10 +91,14 @@ export const createProposal = async (
 
   // Explicitly request the version before making RPC calls to work around race conditions in resolving
   // the version for RealmInfo
-  const programVersion = await getGovernanceProgramVersion(
+
+  // Changed this because it is misbehaving on my local validator setup.
+  /*const programVersion = await getGovernanceProgramVersion(
     connection,
     programId
-  )
+  )*/
+
+  const programVersion = 2;
 
   // V2 Approve/Deny configuration
   const voteType = VoteType.SINGLE_CHOICE
