@@ -1,7 +1,6 @@
 import { Keypair, Transaction, TransactionInstruction } from '@solana/web3.js'
 import {
   ChatMessageBody,
-  getGovernanceProgramVersion,
   GOVERNANCE_CHAT_PROGRAM_ID,
   Proposal,
   Realm,
@@ -41,10 +40,13 @@ export async function castVote(
   const payer = walletPubkey
   // Explicitly request the version before making RPC calls to work around race conditions in resolving
   // the version for RealmInfo
-  const programVersion = await getGovernanceProgramVersion(
+
+  /*const programVersion = await getGovernanceProgramVersion(
     connection,
     programId
-  )
+  )*/
+ 
+  const programVersion = 2;
 
   //will run only if any plugin is connected with realm
   const plugin = await votingPlugin?.withCastPluginVote(

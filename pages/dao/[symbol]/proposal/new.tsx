@@ -53,6 +53,8 @@ import FriktionDeposit from './components/instructions/Friktion/FriktionDeposit'
 import CreateNftPluginRegistrar from './components/instructions/NftVotingPlugin/CreateRegistrar'
 import CreateNftPluginMaxVoterWeightRecord from './components/instructions/NftVotingPlugin/CreateMaxVoterWeightRecord'
 import ConfigureNftPluginCollection from './components/instructions/NftVotingPlugin/ConfigureCollection'
+import SwitchboardAdmitOracle from './components/instructions/Switchboard/AdmitOracle'
+import SwitchboardRevokeOracle from './components/instructions/Switchboard/RevokeOracle'
 import FriktionWithdraw from './components/instructions/Friktion/FriktionWithdraw'
 import FriktionClaimPendingDeposit from './components/instructions/Friktion/FriktionClaimPendingDeposit'
 import FriktionClaimPendingWithdraw from './components/instructions/Friktion/FriktionClaimPendingWithdraw'
@@ -188,6 +190,7 @@ const New = () => {
     setIsLoadingSignedProposal(false)
     setIsLoadingDraft(false)
   }
+
   const handleCreate = async (isDraft) => {
     setFormErrors({})
     if (isDraft) {
@@ -257,10 +260,27 @@ const New = () => {
 
       try {
         // Fetch governance to get up to date proposalCount
-        selectedGovernance = (await fetchRealmGovernance(
-          governance.pubkey
-        )) as ProgramAccount<Governance>
 
+        if (governance.pubkey != undefined) {
+          selectedGovernance = (await fetchRealmGovernance(
+            governance.pubkey
+          )) as ProgramAccount<Governance>
+        }
+        else {
+          selectedGovernance = (await fetchRealmGovernance(
+            governance
+          )) as ProgramAccount<Governance>
+        }
+
+        console.log("creating proposal with args:");
+        console.log({
+          title: form.title,
+          description: form.description,
+          governance: selectedGovernance,
+          instructionsData,
+          voteByCouncil,
+          isDraft,
+        });
         proposalAddress = await handleCreateProposal({
           title: form.title,
           description: form.description,
@@ -276,6 +296,8 @@ const New = () => {
 
         router.push(url)
       } catch (ex) {
+        console.log("Notifying:");
+        console.log(ex);
         notify({ type: 'error', message: `${ex}` })
       }
     } else {
@@ -283,11 +305,13 @@ const New = () => {
     }
     handleTurnOffLoaders()
   }
+
   useEffect(() => {
     setInstructions([instructionsData[0]])
   }, [instructionsData[0].governedAccount?.pubkey])
 
   useEffect(() => {
+    console.log("this useeffect was called...");
     const governedAccount = extractGovernanceAccountFromInstructionsData(
       instructionsData
     )
@@ -296,6 +320,8 @@ const New = () => {
   }, [instructionsData])
 
   const getCurrentInstruction = ({ typeId, idx }) => {
+    console.log("IN GET CURRENT INSTRUCTION:");
+    console.log(typeId);
     switch (typeId) {
       case Instructions.Transfer:
         return (
@@ -342,6 +368,12 @@ const New = () => {
         return <GoblinGoldDeposit index={idx} governance={governance} />
       case Instructions.WithdrawFromGoblinGold:
         return <GoblinGoldWithdraw index={idx} governance={governance} />
+
+
+      case Instructions.SwitchboardAdmitOracle:
+        return <SwitchboardAdmitOracle index={idx} _governance={governance} />
+      case Instructions.SwitchboardRevokeOracle:
+        return <SwitchboardRevokeOracle index={idx} _governance={governance} />
 
       case Instructions.CreateSolendObligationAccount:
         return <CreateObligationAccount index={idx} governance={governance} />
@@ -626,8 +658,7 @@ const New = () => {
             </NewProposalContext.Provider>
             <div className="flex justify-end mt-4 mb-8 px-6">
               <LinkButton
-                className="flex font-bold items-center text-fgd-1 text-sm"
-                onClick={addInstruction}
+                className="flex font-bold items-center text-fgd-1 text-sm" onClick={addInstruction}
               >
                 <PlusCircleIcon className="h-5 mr-1.5 text-green w-5" />
                 Add transaction

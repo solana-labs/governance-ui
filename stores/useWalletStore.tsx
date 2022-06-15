@@ -135,11 +135,11 @@ const useWalletStore = create<WalletStore>((set, get) => ({
   selectedProposal: INITIAL_PROPOSAL_STATE,
   providerUrl: undefined,
   tokenAccounts: [],
+  switchboardProgram: undefined,
   selectedCouncilDelegate: undefined,
   selectedCommunityDelegate: undefined,
   councilDelegateVoteRecordsByProposal: {},
   communityDelegateVoteRecordsByProposal: {},
-
   set: (fn) => set(produce(fn)),
   actions: {
     async fetchRealmBySymbol(cluster: string, symbol: string) {
