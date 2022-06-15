@@ -12,8 +12,8 @@ export default function AdvancedOptionsDropdown({
       <button
         type="button"
         className={`flex items-center justify-center px-4 py-2 space-x-2 rounded-full h-fit border ${
-          open ? 'text-white/80 bg-white/5' : 'text-white/70'
-        } border-white/20 hover:border-white/50 hover:text-white/70 focus:border-white/50 disabled:cursor-not-allowed`}
+          open ? 'bg-bkg-2' : 'text-fgd-2'
+        } border-fgd-4 hover:border-fgd-1 hover:bg-bkg-3 hover:text-fgd-1 focus:border-fgd-2 disabled:cursor-not-allowed`}
         onClick={() => setOpen(!open)}
       >
         <Text level="2" className="font-normal">

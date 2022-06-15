@@ -3,13 +3,13 @@ import { FunctionComponent } from 'react'
 export const LoadingDots = ({ className = '' }) => {
   return (
     <div className={`flex items-center justify-center ${className}`}>
-      <span className="w-2 h-2 mx-[2px] bg-white rounded-full animate-loader"></span>
+      <span className="w-2 h-2 mx-[2px] bg-primary-dark rounded-full animate-loader"></span>
       <span
-        className="w-2 h-2 mx-[2px] bg-white rounded-full animate-loader"
+        className="w-2 h-2 mx-[2px] bg-primary-dark rounded-full animate-loader"
         style={{ animationDelay: '0.2s' }}
       ></span>
       <span
-        className="w-2 h-2 mx-[2px] bg-white rounded-full animate-loader"
+        className="w-2 h-2 mx-[2px] bg-primary-dark rounded-full animate-loader"
         style={{ animationDelay: '0.4s' }}
       ></span>
     </div>

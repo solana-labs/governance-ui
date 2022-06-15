@@ -37,11 +37,11 @@ const New: React.FC = () => {
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {DAO_TYPES.map(({ url, name, description }) => (
             <Link key={name} href={fmtUrlWithCluster(url)}>
-              <a className="flex flex-col items-start px-12 py-12 border rounded cursor-pointer border-bkg-3 hover:border hover:border-fgd-1 bg-bkg-2">
+              <a className="flex flex-col items-start px-12 py-12 border rounded cursor-pointer border-bkg-2 hover:border hover:border-fgd-1 bg-bkg-3">
                 <Header as="h4" className="mb-6">
                   {name}
                 </Header>
-                <Text level="2" className="text-left text-white/70">
+                <Text level="2" className="text-left text-fgd-2">
                   {description}
                 </Text>
               </a>

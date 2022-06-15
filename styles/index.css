@@ -200,9 +200,9 @@ body::-webkit-scrollbar-corner {
   left: 0;
   z-index: 0;
   opacity: 0;
-  background-image: linear-gradient(to bottom, white, white);
   transition: all 0.3s linear;
   border-radius: 999px;
+  @apply border bg-gradient-to-r from-fgd-1 to-fgd-1;
 }
 
 .transition-from-gradient-background:hover::before {
@@ -211,8 +211,7 @@ body::-webkit-scrollbar-corner {
 
 .transition-from-gradient-background:active::before {
   opacity: 1;
-  background-image: linear-gradient(to bottom, #bebec1, #bebec1);
-  border: 1px solid #bebec1;
+  @apply border-fgd-3 bg-gradient-to-r from-fgd-3 to-fgd-3;
 }
 
 .transition-from-gradient-background:disabled {
@@ -221,8 +220,7 @@ body::-webkit-scrollbar-corner {
 
 .transition-from-gradient-background:disabled::before {
   opacity: 1;
-  background-image: linear-gradient(to bottom, #3e3d47, #3e3d47);
-  border: 1px solid #3e3d47;
+  @apply border border-fgd-4 bg-gradient-to-r from-fgd-4 to-fgd-4;
 }
 
 .border-gradient {

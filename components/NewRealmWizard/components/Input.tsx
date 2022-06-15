@@ -23,36 +23,29 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       Icon ? 'pl-8' : 'pl-2'
     } ${
       suffix ? 'pr-8' : 'pr-2'
-    } pt-[15px] pb-[21px] default-transition rounded-t rounded-b-none outline-none border-0 border-b bg-transparent`
+    } pt-[15px] pb-[21px] default-transition rounded-t rounded-b-none outline-none border-0 border-b border-bkg-4 bg-bkg-3`
 
     if (hasContent) {
-      classNames += ` border-white text-white`
+      classNames += ` text-fgd-1 cursor-text`
     } else {
-      classNames += `  border-white/20`
+      classNames += ` border-bkg-3 cursor-pointer`
     }
 
     classNames += `
+      placeholder:text-fgd-2
+      active:placeholder:text-fgd-3 
+      focus:placeholder:text-fgd-3 
+
+      hover:border-fgd-2
 
       
-      
-
-      placeholder:text-white/30 
-      active:placeholder:text-white/10 
-      focus:placeholder:text-white/10 
-
-      bg-[rgba(255,255,255,0.03)]
-      hover:bg-white/5
-
-      focus:bg-[rgba(255,255,255,0.03)]
-      focus:text-white 
       focus:outline-none 
       focus:border-b-[#00E4FF]
 
-      active:bg-[rgba(255,255,255,0.03)]
       active:border-b-[#00E4FF]
       
-      disabled:placeholder:text-white/30
-      disabled:active:border-b-white/20
+      disabled:placeholder:text-fgd-2
+      disabled:active:border-b-fgd-3
       disabled:cursor-not-allowed 
       disabled:hover:bg-transparent
       disabled:opacity-30

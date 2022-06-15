@@ -413,7 +413,7 @@ export default function AddNFTCollectionForm({
                     href="https://www.metaplex.com/posts/certified-collections"
                     target="_blank"
                     rel="noreferrer"
-                    className="underline hover:text-white/50"
+                    className="underline hover:text-fgd-3"
                   >
                     Metaplex standard certified collections
                   </a>{' '}
@@ -456,7 +456,7 @@ export default function AddNFTCollectionForm({
         <input className="hidden" {...register('collectionKey')} disabled />
 
         <div
-          className={`flex flex-col w-full px-4 py-5 rounded-md bg-night-grey  ${
+          className={`flex flex-col w-full px-4 py-5 rounded-md bg-bkg-3  ${
             requestPending ? 'animate-pulse' : ''
           }`}
         >

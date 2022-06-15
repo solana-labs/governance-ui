@@ -42,7 +42,7 @@ const FormFooter: React.FC<FormFooterProps> = ({
       <div className="flex justify-center w-full mt-8 space-x-4 md:justify-between md:w-fit md:mt-0">
         <button
           type="button"
-          className="border rounded-full default-transition border-white/10 hover:border-white/70 active:border-transparent active:bg-white/10 disabled:bg-white/10 disabled:hover:border-white/10 hover:bg-white/5 disabled:active:border-none disabled:text-white/50 focus:border-white focus:bg-white/10 disabled:cursor-not-allowed"
+          className="border rounded-full default-transition border-fgd-4 hover:border-fgd-2 active:border-transparent active:bg-fgd-4 disabled:bg-fgd-4 disabled:hover:border-fgd-4 hover:bg-fgd-4 disabled:active:border-none disabled:text-fgd-3 focus:border-fgd-1 focus:bg-fgd-4 disabled:cursor-not-allowed"
           disabled={loading}
           onClick={prevClickHandler}
         >
@@ -50,7 +50,7 @@ const FormFooter: React.FC<FormFooterProps> = ({
         </button>
         <button
           type="submit"
-          className="relative text-black rounded-full border-gradient focus:border-white hover:text-black default-transition bg-brand-gradient transition-from-gradient-background disabled:cursor-not-allowed"
+          className="relative rounded-full text-bkg-1 border-gradient active:border-fgd-3 hover:text-bkg-1 default-transition bg-brand-gradient transition-from-gradient-background disabled:cursor-not-allowed"
           disabled={!isValid || loading}
           onClick={submitClickHandler}
         >

@@ -61,7 +61,7 @@ export const SecondaryButton: FunctionComponent<ButtonProps> = ({
       disabled={disabled}
       className={`${className} border border-primary-light font-bold default-transition rounded-full px-4 ${
         small ? 'py-1' : 'py-2.5'
-      } text-primary-light text-sm hover:border-primary-dark hover:text-primary-dark focus:outline-none disabled:border-fgd-3 disabled:text-fgd-3 disabled:cursor-not-allowed`}
+      } text-primary-light text-sm hover:border-bkg-1 hover:text-bkg-1 focus:outline-none disabled:border-fgd-3 disabled:text-fgd-3 disabled:cursor-not-allowed`}
       {...props}
     >
       <Tooltip content={tooltipMessage}>
@@ -109,15 +109,15 @@ export const NewButton: FunctionComponent<NewButtonProps> = ({
 
   if (loading) {
     classNames +=
-      ' h-[64px] min-w-[208px] border border-white/30 disabled:border-white/30'
+      ' h-[64px] min-w-[208px] border border-fgd-3 disabled:border-fgd-3'
   } else if (secondary) {
     classNames +=
-      'py-3 px-2 h-[64px] min-w-[208px] text-white border border-white/30 focus:border-white hover:bg-white hover:text-black active:bg-white/70 active:text-black active:border-none disabled:bg-white/10 disabled:text-black disabled:border-none '
+      'py-3 px-2 h-[64px] min-w-[208px] text-fgd-1 border border-fgd-3 focus:border-fgd-1 hover:bg-fgd-1 hover:text-bkg-1 active:bg-fgd-2 active:text-bkg-1 active:border-none disabled:bg-fgd-4 disabled:text-bkg-1 disabled:border-none '
   } else {
     // this is a primary button
     // TODO: make sure this using the typogrpahic class for CTAs
     classNames +=
-      'py-4 px-2 h-[64px] min-w-[208px] text-black bg-white hover:bg-white/70 active:bg-white/50 active:border-none focus:border-2 focus:border-[#00E4FF] disabled:bg-white/10'
+      'py-4 px-2 h-[64px] min-w-[208px] text-primary-light bg-fgd-1 hover:bg-fgd-2 active:bg-fgd-3 active:border-none focus:border-2 focus:border-[#00E4FF] disabled:bg-fgd-4'
   }
 
   classNames += ` ${className}`
@@ -141,18 +141,18 @@ export const RadioButton: FunctionComponent<NewButtonProps> = ({
   ...props
 }) => {
   let classNames =
-    'group default-transition py-3 px-2 h-[72px] min-w-[208px] text-white rounded border disabled:cursor-not-allowed'
+    'group default-transition py-3 px-2 h-[72px] min-w-[208px] text-fgd-1rounded border disabled:cursor-not-allowed'
 
   if (selected) {
-    classNames += ' bg-white/10 border-white focus:border-blue'
+    classNames += ' bg-white/10 border-fgd-1 focus:border-blue'
   } else {
-    classNames += ' focus:bg-white/30 focus:border-none'
+    classNames += ' focus:bg-fgd-3 focus:border-none'
   }
 
   if (!disabled) {
-    classNames += 'hover:bg-white/10 hover:border-white border-white/30'
+    classNames += 'hover:bg-white/10 hover:border-fgd-1border-fgd-3'
   } else {
-    classNames += ' bg-transparent text-white/30 border-white/10'
+    classNames += ' bg-transparent text-fgd-3 border-white/10'
   }
 
   classNames += ` ${className}`
