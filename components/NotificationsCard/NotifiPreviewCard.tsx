@@ -30,7 +30,7 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
 }) => {
   const alerts = data?.alerts
   const sources = data?.sources
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setLoading] = useState(false)
 
   const handleEdit = useCallback(() => {
     onClick()
@@ -40,8 +40,22 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
     <div className="border-b-2 border-white-800 opacity-20 col-span-12 py-3" />
   )
 
+  const handleUnsubscribe = useCallback(
+    async (source: Source) => {
+      if (isLoading) {
+        return
+      }
+      handleDelete(source)
+    },
+    [handleDelete, isLoading]
+  )
+
   const handleSubscribe = useCallback(
     async (source: Source) => {
+      if (isLoading) {
+        return
+      }
+
       if (!source) {
         throw new Error('No source provided')
       }
@@ -50,32 +64,30 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
       if (!filterId) {
         throw new Error('No filter id found')
       }
-      if (!isLoading) {
-        try {
-          setIsLoading(true)
-          const alertResult = await createAlert({
-            emailAddress: email === '' ? null : email,
-            filterId: filterId ?? '',
-            name: `${source.name} notification`,
-            phoneNumber: phoneNumber === '' ? null : phoneNumber,
-            sourceId: source.id ?? '',
-            telegramId: telegram === '' ? null : telegram,
-          })
+      try {
+        setLoading(true)
+        const alertResult = await createAlert({
+          emailAddress: email === '' ? null : email,
+          filterId: filterId ?? '',
+          name: `${source.name} notification`,
+          phoneNumber: phoneNumber === '' ? null : phoneNumber,
+          sourceId: source.id ?? '',
+          telegramId: telegram === '' ? null : telegram,
+        })
 
-          if (alertResult) {
-            if (alertResult.targetGroup?.telegramTargets?.length > 0) {
-              const target = alertResult.targetGroup?.telegramTargets[0]
-              if (target && !target.isConfirmed) {
-                if (target.confirmationUrl) {
-                  window.open(target.confirmationUrl)
-                }
+        if (alertResult) {
+          if (alertResult.targetGroup?.telegramTargets?.length > 0) {
+            const target = alertResult.targetGroup?.telegramTargets[0]
+            if (target && !target.isConfirmed) {
+              if (target.confirmationUrl) {
+                window.open(target.confirmationUrl)
               }
             }
           }
-          setIsLoading(false)
-        } catch (e) {
-          throw new Error(e)
         }
+        setLoading(false)
+      } catch (e) {
+        throw new Error(e)
       }
     },
     [createAlert, email, phoneNumber, telegram, isLoading]
@@ -84,7 +96,7 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
   const daoNotifications = useMemo(
     () => (source: Source) => {
       const handleClick = (source: Source) => {
-        isChecked ? handleDelete(source) : handleSubscribe(source)
+        isChecked ? handleUnsubscribe(source) : handleSubscribe(source)
       }
       const sourceId = source.id
 
