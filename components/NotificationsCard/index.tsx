@@ -9,6 +9,7 @@ import {
   MessageSigner,
   useNotifiClient,
 } from '@notifi-network/notifi-react-hooks'
+import { firstOrNull } from '@utils/helpers'
 import { isValidPhoneNumber } from 'libphonenumber-js'
 import React, {
   Dispatch,
@@ -24,15 +25,6 @@ import Button from '../Button'
 import Input from '../inputs/Input'
 import NotifiFullLogo from './NotifiFullLogo'
 import PhoneInput from './PhoneInput'
-
-const firstOrNull = <T,>(
-  arr: ReadonlyArray<T> | null | undefined
-): T | null => {
-  if (arr !== null && arr !== undefined) {
-    return arr[0] ?? null
-  }
-  return null
-}
 
 type NotifiClientReturnType = ReturnType<typeof useNotifiClient>
 
@@ -258,7 +250,6 @@ const NotificationsCard = ({
         }
         setUnsavedChanges(false)
       } catch (e) {
-        console.log(e)
         handleError([e])
       }
     }
@@ -305,7 +296,8 @@ const NotificationsCard = ({
 
   const disabled =
     (isAuthenticated && !hasUnsavedChanges) ||
-    (localEmail === '' && localTelegram === '' && localPhoneNumber === '')
+    (localEmail === '' && localTelegram === '' && localPhoneNumber === '') ||
+    errorMessage !== ''
 
   const handleBackClick = useCallback(() => {
     if (isSame && !disabled) {
@@ -335,11 +327,11 @@ const NotificationsCard = ({
         </>
       ) : (
         <>
-          <div>
-            <div className="text-sm text-th-fgd-1 flex flex-row items-center justify-between mt-4">
-              Get notifications for proposals, voting, and results. Add your
-              email address, phone number, and/or Telegram.
-            </div>
+          <div className="text-sm text-th-fgd-1 flex flex-row items-center justify-between mt-4">
+            Get notifications for proposals, voting, and results. Add your email
+            address, phone number, and/or Telegram.
+          </div>
+          <div className="min-h-[20px]">
             {errorMessage.length > 0 ? (
               <div className="text-sm text-red">{errorMessage}</div>
             ) : (
@@ -350,7 +342,7 @@ const NotificationsCard = ({
               )
             )}
           </div>
-          <div className="pb-5">
+          <div className="pb-5 -mt-2">
             <InputRow
               icon={
                 <MailIcon className="z-10 h-10 text-primary-light w-7 mr-1 mt-9 absolute left-3.5" />
@@ -368,6 +360,7 @@ const NotificationsCard = ({
             <PhoneInput
               handlePhone={handlePhone}
               phoneNumber={localPhoneNumber}
+              setErrorMessage={setErrorMessage}
             />
             {telegramEnabled && (
               <InputRow

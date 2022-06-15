@@ -28,3 +28,12 @@ export async function resolveProposalDescription(descriptionLink: string) {
     return descriptionLink
   }
 }
+
+export const firstOrNull = <T>(
+  arr: ReadonlyArray<T> | null | undefined
+): T | null => {
+  if (arr !== null && arr !== undefined) {
+    return arr[0] ?? null
+  }
+  return null
+}
