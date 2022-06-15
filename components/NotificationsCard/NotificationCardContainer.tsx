@@ -41,7 +41,13 @@ const NotificationCardContainer: React.FC<Props> = ({ onBackClick }) => {
     walletPublicKey: wallet?.publicKey?.toString() ?? '',
   })
 
-  const { data, isAuthenticated, getConfiguration, deleteAlert } = notifiClient
+  const {
+    data,
+    isAuthenticated,
+    getConfiguration,
+    deleteAlert,
+    isInitialized,
+  } = notifiClient
 
   const [email, setEmail] = useState<string>('')
   const [phoneNumber, setPhone] = useState<string>('')
@@ -128,34 +134,56 @@ const NotificationCardContainer: React.FC<Props> = ({ onBackClick }) => {
     [data?.alerts, deleteAlert]
   )
 
+  console.log('isInitlaized', isInitialized)
   return (
-    <div className="h-[576]px] w-[507px] absolute top-4 right-0">
-      {showPreview ? (
-        <NotifiPreviewCard
-          handleDelete={handleUnsubscribe}
-          email={email}
-          // this passes down useNotiClientData
-          {...notifiClient}
-          phoneNumber={phoneNumber}
-          telegram={telegram}
-          telegramEnabled={telegramEnabled}
-          onBackClick={onBackClick}
-          onClick={() => setPreview(false)}
-        />
-      ) : (
-        <NotificationsCard
-          phoneNumber={phoneNumber}
-          email={email}
-          telegram={telegram}
-          setPhone={setPhone}
-          setTelegram={setTelegram}
-          setEmail={setEmail}
-          // this passes down useNotiClientData
-          {...notifiClient}
-          onBackClick={onBackClick}
-          setPreview={setPreview}
-        />
-      )}
+    <div className="h-[576px] w-[507px] absolute -top-4 right-0">
+      <div className="bg-bkg-5 w-full h-full md:p-6 rounded-lg shadow-lg">
+        <div className="flex flex-row w-full items-center align-center">
+          {!isInitialized && (
+            <div className="h-[576px] align-center justify-center w-full">
+              <div className="space-y-2 align-center items-center w-full mb-2">
+                <div className="animate-pulse bg-bkg-4 w-full h-12 rounded-md" />
+                <div className="animate-pulse bg-bkg-4 w-full h-12 rounded-md" />
+                <div className="animate-pulse bg-bkg-4 w-full h-12 rounded-md" />
+                <div className="animate-pulse bg-bkg-4 w-full h-12 rounded-md" />
+              </div>
+              <div className="space-y-2 align-center items-center w-full">
+                <div className="animate-pulse bg-bkg-4 w-full h-12 rounded-md" />
+                <div className="animate-pulse bg-bkg-4 w-full h-12 rounded-md" />
+                <div className="animate-pulse bg-bkg-4 w-full h-12 rounded-md" />
+                <div className="animate-pulse bg-bkg-4 w-full h-12 rounded-md" />
+              </div>
+            </div>
+          )}
+          {showPreview && isInitialized && (
+            <NotifiPreviewCard
+              handleDelete={handleUnsubscribe}
+              email={email}
+              // this passes down useNotiClientData
+              {...notifiClient}
+              phoneNumber={phoneNumber}
+              telegram={telegram}
+              telegramEnabled={telegramEnabled}
+              onBackClick={onBackClick}
+              onClick={() => setPreview(false)}
+            />
+          )}
+          {!showPreview && isInitialized && (
+            <NotificationsCard
+              phoneNumber={phoneNumber}
+              email={email}
+              telegram={telegram}
+              setPhone={setPhone}
+              setTelegram={setTelegram}
+              setEmail={setEmail}
+              // this passes down useNotiClientData
+              {...notifiClient}
+              onBackClick={onBackClick}
+              setPreview={setPreview}
+            />
+          )}
+        </div>
+      </div>
     </div>
   )
 }
