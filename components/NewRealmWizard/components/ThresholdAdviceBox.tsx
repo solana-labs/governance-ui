@@ -13,7 +13,7 @@ export default function ThresholdAdviceBox({ title, children }) {
         <img src="/icons/threshold-icon.svg" alt="voting icon" />
       </div>
       <div className="flex flex-col w-full text-center md:text-left md:ml-10">
-        <Text level="2" className="my-2 capitalize text-white/70 md:mt-0">
+        <Text level="2" className="my-2 capitalize text-fgd-2 md:mt-0">
           {title}
         </Text>
         {children}

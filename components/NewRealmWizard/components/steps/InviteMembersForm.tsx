@@ -58,11 +58,7 @@ function InviteAddress({
             />
           </svg>
         ) : (
-          <div
-            className={`flex rounded-full ${
-              currentUser ? 'white-fill text-black' : 'black-fill'
-            } border-gradient`}
-          >
+          <div className={`flex rounded-full border-gradient transparent-fill`}>
             <div className="flex items-center justify-center w-10 h-10 ">
               {currentUser ? 'Me' : index}
             </div>
@@ -83,7 +79,7 @@ function InviteAddress({
       </div>
       <button
         type="button"
-        className="p-3 hover:cursor-pointer disabled:cursor-not-allowed text-white/50 hover:text-white active:text-white/70 focus:text-white disabled:text-white/10"
+        className="p-3 hover:cursor-pointer disabled:cursor-not-allowed text-fgd-2 hover:text-fgd-1 active:text-fgd-1 focus:text-white disabled:text-fgd-3"
         onClick={onRemoveClick}
       >
         <svg
@@ -265,7 +261,7 @@ export default function InviteMembersForm({
           title="Invite members"
           titleExtra={
             !!inviteList.length && (
-              <div className="text-[18px] text-white leading-[25px] px-2 bg-[#201F27] rounded">
+              <div className="text-[18px] text-bkg-1 leading-[25px] px-2 bg-fgd-1 rounded">
                 {inviteList.length}
               </div>
             )
