@@ -63,6 +63,12 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
     [handleDelete, isLoading]
   )
 
+  useEffect(() => {
+    if (!isAuthenticated) {
+      onClick()
+    }
+  }, [isAuthenticated])
+
   const handleUnsubscribe = useCallback(
     async (source: Source) => {
       if (isLoading) {
