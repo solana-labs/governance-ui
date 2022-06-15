@@ -105,7 +105,7 @@ const ConnectWalletButton = (props) => {
 
   const displayAddressImage = useMemo(() => {
     return connected && current?.publicKey ? (
-      <div className="w-12 pr-2">
+      <div className="hidden w-12 pr-2 sm:block">
         <AddressImage
           dark={true}
           connection={connection.current}
@@ -120,7 +120,7 @@ const ConnectWalletButton = (props) => {
         />{' '}
       </div>
     ) : (
-      <div className="pl-2 pr-2">
+      <div className="hidden pl-2 pr-2 sm:block">
         <img src={provider?.adapter.icon} className="w-5 h-5" />
       </div>
     )

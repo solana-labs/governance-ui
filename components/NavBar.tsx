@@ -22,17 +22,9 @@ const NavBar = () => {
             </picture>
           </div>
         </Link>
-        <div className="flex items-center justify-end space-x-4">
-          {process.env.NEXT_PUBLIC_ENABLE_LIGHT_MODE === 'true' && (
-            <ThemeSwitch />
-          )}
+        <div className="flex items-center justify-end space-x-2 md:space-x-4">
+          <ThemeSwitch />
           <NotificationsSwitch />
-          <ConnectWalletButton />
-          <div className="min-w-[33%] sm:min-w-fit sm:space-x-4 sm:mx-4 flex justify-between">
-            <NotificationsSwitch />
-            <ThemeSwitch />
-            <NotificationsSwitch />
-          </div>
           <ConnectWalletButton />
         </div>
       </div>

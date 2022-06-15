@@ -109,7 +109,7 @@ button {
 }
 
 .markdown a {
-  @apply underline transition-all duration-300 text-fgd-1 hover:text-fgd-2 hover:no-underline;
+  @apply underline break-all transition-all duration-300 text-fgd-1 hover:text-fgd-2 hover:no-underline;
 }
 
 .markdown li {
