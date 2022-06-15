@@ -2,7 +2,7 @@ import Button from '../Button'
 import Switch from '@components/Switch'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
 import { Source, useNotifiClient } from '@notifi-network/notifi-react-hooks'
-import React, { FunctionComponent, useCallback, useMemo } from 'react'
+import React, { FunctionComponent, useCallback, useMemo, useState } from 'react'
 
 import NotifiFullLogo from './NotifiFullLogo'
 type NotifiClientReturnType = ReturnType<typeof useNotifiClient>
@@ -30,6 +30,7 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
 }) => {
   const alerts = data?.alerts
   const sources = data?.sources
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleEdit = useCallback(() => {
     onClick()
@@ -49,32 +50,35 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
       if (!filterId) {
         throw new Error('No filter id found')
       }
+      if (!isLoading) {
+        try {
+          setIsLoading(true)
+          const alertResult = await createAlert({
+            emailAddress: email === '' ? null : email,
+            filterId: filterId ?? '',
+            name: `${source.name} notification`,
+            phoneNumber: phoneNumber === '' ? null : phoneNumber,
+            sourceId: source.id ?? '',
+            telegramId: telegram === '' ? null : telegram,
+          })
 
-      try {
-        const alertResult = await createAlert({
-          emailAddress: email === '' ? null : email,
-          filterId: filterId ?? '',
-          name: `${source.name} notification`,
-          phoneNumber: phoneNumber === '' ? null : phoneNumber,
-          sourceId: source.id ?? '',
-          telegramId: telegram === '' ? null : telegram,
-        })
-
-        if (alertResult) {
-          if (alertResult.targetGroup?.telegramTargets?.length > 0) {
-            const target = alertResult.targetGroup?.telegramTargets[0]
-            if (target && !target.isConfirmed) {
-              if (target.confirmationUrl) {
-                window.open(target.confirmationUrl)
+          if (alertResult) {
+            if (alertResult.targetGroup?.telegramTargets?.length > 0) {
+              const target = alertResult.targetGroup?.telegramTargets[0]
+              if (target && !target.isConfirmed) {
+                if (target.confirmationUrl) {
+                  window.open(target.confirmationUrl)
+                }
               }
             }
           }
+          setIsLoading(false)
+        } catch (e) {
+          throw new Error(e)
         }
-      } catch (e) {
-        throw new Error(e)
       }
     },
-    [createAlert, email, phoneNumber, telegram]
+    [createAlert, email, phoneNumber, telegram, isLoading]
   )
 
   const daoNotifications = useMemo(

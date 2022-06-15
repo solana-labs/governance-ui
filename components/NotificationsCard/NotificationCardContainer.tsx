@@ -134,13 +134,12 @@ const NotificationCardContainer: React.FC<Props> = ({ onBackClick }) => {
     [data?.alerts, deleteAlert]
   )
 
-  console.log('isInitlaized', isInitialized)
   return (
     <div className="h-[576px] w-[507px] absolute -top-4 right-0">
       <div className="bg-bkg-5 w-full h-full md:p-6 rounded-lg shadow-lg">
         <div className="flex flex-row w-full items-center align-center">
           {!isInitialized && (
-            <div className="h-[576px] align-center justify-center w-full">
+            <div className="h-[576px] pt-10 w-full">
               <div className="space-y-2 align-center items-center w-full mb-2">
                 <div className="animate-pulse bg-bkg-4 w-full h-12 rounded-md" />
                 <div className="animate-pulse bg-bkg-4 w-full h-12 rounded-md" />

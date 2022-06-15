@@ -354,23 +354,31 @@ const NotificationsCard = ({ onBackClick }: NotificationCardProps) => {
                 Click here to load your alert details.
               </a>
             </div>
-            <div className="flex flex-col space-y-4 mt-4 items-center justify-content-center align-items-center">
-              <Button
-                tooltipMessage={
-                  disabled
-                    ? 'No unsaved changes!'
-                    : isAuthenticated()
-                    ? 'Save settings for notifications'
-                    : 'Fetch stored values for existing accounts'
-                }
-                className="w-11/12"
-                disabled={disabled}
-                onClick={
-                  hasUnsavedChanges || isAuthenticated()
-                    ? handleSave
-                    : handleRefresh
-                }
-                isLoading={isLoading}
+          </div>
+          <div className="flex flex-col space-y-4 mt-4 items-center justify-content-center align-items-center">
+            <Button
+              className="w-11/12"
+              disabled={disabled}
+              isLoading={isLoading}
+              onClick={handleSave}
+              tooltipMessage={
+                disabled
+                  ? 'No unsaved changes!'
+                  : isAuthenticated
+                  ? 'Save settings for notifications'
+                  : 'Fetch stored values for existing accounts'
+              }
+            >
+              {alerts && alerts.length > 0 ? 'Update' : 'Subscribe'}
+            </Button>
+
+            <div className="h-3 grid text-xs w-full place-items-center">
+              <a
+                className="text-xs text-primary-dark "
+                href="https://www.notifi.network/faqs"
+                rel="noreferrer"
+                target="_blank"
+                title="Questions? Click to learn more!"
               >
                 {hasUnsavedChanges || isAuthenticated()
                   ? 'Subscribe'
