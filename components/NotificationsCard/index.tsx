@@ -311,7 +311,7 @@ const NotificationsCard = ({
     }
   }, [disabled, isSame, onBackClick, setPreview])
 
-  const handleBackClick = () => {
+  const handleBackClick = useCallback(() => {
     if (isSame && !disabled) {
       setPreview(true)
       return
@@ -321,7 +321,7 @@ const NotificationsCard = ({
     } else {
       setPreview(false)
     }
-  }
+  }, [])
 
   return (
     <div className="bg-bkg-5 w-full p-4 md:p-6 rounded-lg">
