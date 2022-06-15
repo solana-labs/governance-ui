@@ -420,7 +420,7 @@ const NotificationsCard = ({
                   : 'Fetch stored values for existing accounts'
               }
             >
-              Subscribe
+              {alerts && alerts.length > 0 ? 'Update' : 'Subscribe'}
             </Button>
 
             <div className="h-3 grid text-xs w-full place-items-center">
