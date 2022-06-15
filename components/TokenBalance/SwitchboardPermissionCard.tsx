@@ -4,24 +4,26 @@ import Button from '@components/Button'
 import { ChevronRightIcon } from '@heroicons/react/outline'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
-import {
-  getTokenOwnerRecordAddress,
-} from '@solana/spl-governance'
+import { getTokenOwnerRecordAddress } from '@solana/spl-governance'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import useSwitchboardPluginStore from 'SwitchboardVotePlugin/store/switchboardStore'
-import { sbRefreshWeight } from  '../../actions/switchboardRefreshVoterWeight'
+import { sbRefreshWeight } from '../../actions/switchboardRefreshVoterWeight'
 
 const SwitchboardPermissionCard = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
 
-  const switchboardVoterWeight = useSwitchboardPluginStore((s) => s.state.votingPower)
-  const switchboardRefreshInstructions = useSwitchboardPluginStore((s) => s.state.instructions)
-  console.log("sbis:");
-  console.log();
+  const switchboardVoterWeight = useSwitchboardPluginStore(
+    (s) => s.state.votingPower
+  )
+  const switchboardRefreshInstructions = useSwitchboardPluginStore(
+    (s) => s.state.instructions
+  )
+  console.log('sbis:')
+  console.log()
 
   const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
   const { realm, symbol } = useRealm()
@@ -29,7 +31,7 @@ const SwitchboardPermissionCard = () => {
 
   useEffect(() => {
     const getTokenOwnerRecord = async () => {
-      const defaultMint = realm!.account.communityMint;
+      const defaultMint = realm!.account.communityMint
       const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
         realm!.owner,
         realm!.pubkey,
@@ -64,26 +66,24 @@ const SwitchboardPermissionCard = () => {
         </Link>
       </div>
       <div className="space-y-4">
-      {
-        (() => {
-          console.log(switchboardVoterWeight);
-          console.log(`does it equal zero: ${switchboardVoterWeight.isZero()}`);
+        {(() => {
+          console.log(switchboardVoterWeight)
+          console.log(`does it equal zero: ${switchboardVoterWeight.isZero()}`)
           if (switchboardVoterWeight.isZero()) {
-            return (<span>You do not have voting rights</span>)
+            return <span>You do not have voting rights</span>
+          } else {
+            return <span>You have voting rights!</span>
           }
-          else {
-            return (<span>You have voting rights!</span>)
-          }
-        })()
-      }
+        })()}
       </div>
-      <Button className="w-full" onClick={() => {
-        sbRefreshWeight(
-          switchboardRefreshInstructions[0],
-          connection,
-          wallet
-        )
-      }}>Refresh Voting Rights</Button>
+      <Button
+        className="w-full"
+        onClick={() => {
+          sbRefreshWeight(switchboardRefreshInstructions[0], connection, wallet)
+        }}
+      >
+        Refresh Voting Rights
+      </Button>
     </div>
   )
 }

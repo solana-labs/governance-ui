@@ -265,14 +265,13 @@ const New = () => {
           selectedGovernance = (await fetchRealmGovernance(
             governance.pubkey
           )) as ProgramAccount<Governance>
-        }
-        else {
+        } else {
           selectedGovernance = (await fetchRealmGovernance(
             governance
           )) as ProgramAccount<Governance>
         }
 
-        console.log("creating proposal with args:");
+        console.log('creating proposal with args:')
         console.log({
           title: form.title,
           description: form.description,
@@ -280,7 +279,7 @@ const New = () => {
           instructionsData,
           voteByCouncil,
           isDraft,
-        });
+        })
         proposalAddress = await handleCreateProposal({
           title: form.title,
           description: form.description,
@@ -296,8 +295,8 @@ const New = () => {
 
         router.push(url)
       } catch (ex) {
-        console.log("Notifying:");
-        console.log(ex);
+        console.log('Notifying:')
+        console.log(ex)
         notify({ type: 'error', message: `${ex}` })
       }
     } else {
@@ -311,7 +310,7 @@ const New = () => {
   }, [instructionsData[0].governedAccount?.pubkey])
 
   useEffect(() => {
-    console.log("this useeffect was called...");
+    console.log('this useeffect was called...')
     const governedAccount = extractGovernanceAccountFromInstructionsData(
       instructionsData
     )
@@ -320,8 +319,8 @@ const New = () => {
   }, [instructionsData])
 
   const getCurrentInstruction = ({ typeId, idx }) => {
-    console.log("IN GET CURRENT INSTRUCTION:");
-    console.log(typeId);
+    console.log('IN GET CURRENT INSTRUCTION:')
+    console.log(typeId)
     switch (typeId) {
       case Instructions.Transfer:
         return (
@@ -368,7 +367,6 @@ const New = () => {
         return <GoblinGoldDeposit index={idx} governance={governance} />
       case Instructions.WithdrawFromGoblinGold:
         return <GoblinGoldWithdraw index={idx} governance={governance} />
-
 
       case Instructions.SwitchboardAdmitOracle:
         return <SwitchboardAdmitOracle index={idx} _governance={governance} />
@@ -658,7 +656,8 @@ const New = () => {
             </NewProposalContext.Provider>
             <div className="flex justify-end mt-4 mb-8 px-6">
               <LinkButton
-                className="flex font-bold items-center text-fgd-1 text-sm" onClick={addInstruction}
+                className="flex font-bold items-center text-fgd-1 text-sm"
+                onClick={addInstruction}
               >
                 <PlusCircleIcon className="h-5 mr-1.5 text-green w-5" />
                 Add transaction

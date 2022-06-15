@@ -70,10 +70,8 @@ const TokenBalanceCardWrapper = ({
       (!ownTokenRecord ||
         ownTokenRecord.account.governingTokenDepositAmount.isZero())
     ) {
-      console.log("IS SWITCHBOARD MODE");
-      return (
-        <SwitchboardPermissionCard></SwitchboardPermissionCard>
-      )
+      console.log('IS SWITCHBOARD MODE')
+      return <SwitchboardPermissionCard></SwitchboardPermissionCard>
     }
     //Default
     return <TokenBalanceCard proposal={proposal}></TokenBalanceCard>
