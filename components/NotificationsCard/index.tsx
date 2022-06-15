@@ -125,20 +125,23 @@ const NotificationsCard = ({ onBackClick }: NotificationCardProps) => {
     setLoading(false)
   }
 
-  const handleRefresh = async function () {
-    setLoading(true)
-    setErrorMessage('')
-    // user is not authenticated
-    if (!isAuthenticated() && wallet && wallet.publicKey) {
-      try {
-        await logIn((wallet as unknown) as MessageSigner)
-      } catch (e) {
-        handleError([e])
+  const handleRefresh = useCallback(
+    async function () {
+      setLoading(true)
+      setErrorMessage('')
+      // user is not authenticated
+      if (!isAuthenticated && wallet && wallet.publicKey) {
+        try {
+          await logIn((wallet as unknown) as MessageSigner)
+        } catch (e) {
+          handleError([e])
+        }
+        setLoading(false)
       }
       setLoading(false)
-    }
-    setLoading(false)
-  }
+    },
+    [setLoading, isAuthenticated, wallet, setErrorMessage, logIn]
+  )
 
   const handleSave = async function () {
     setLoading(true)
