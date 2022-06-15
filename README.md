@@ -1,6 +1,7 @@
 # Switchboard Add-in Support
 
-## To set this up for development with Switchboard, the first step is to get [this](https://github.com/switchboard-xyz/switchboard-core/blob/main/switchboard_v2/tests/addin-tests.ts) to work. 
+## To set this up for development with Switchboard, the first step is to get [this](https://github.com/switchboard-xyz/switchboard-core/blob/main/switchboard_v2/tests/addin-tests.ts) to work.
+
 - [install anchor](https://project-serum.github.io/anchor/getting-started/installation.html#installing-dependencies)[install anchor](https://project-serum.github.io/anchor/getting-started/installation.html#installing-dependencies) if you don't currently have it installed
 - navigate to the `switchboard_v2` directory within `switchboard-core` and run `anchor test`. This will build switchboardv2 and run the addin-tests.ts script, which will set up a realm, governance, queue, oracles, permissions, and proposal.
 - you will need to make sure the pubkeys of the governance program and switchboard program throughout the codebase are pointed to your local pubkeys of those programs:
@@ -12,6 +13,7 @@
 - start the governance-ui by running `yarn dev`
 
 ## Working on governance-ui
+
 - most of the work is in `hooks/useRealm.ts` and `hooks/useVotingPlugins.ts` in the governance-ui. The UI work is in `components/TokenBalance`
 
 # NextJS Typescript Boilerplate

@@ -6,20 +6,23 @@ import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import useSwitchboardPluginStore from 'SwitchboardVotePlugin/store/switchboardStore'
-import { SWITCHBOARD_ID, SWITCHBOARD_ADDIN_ID } from 'SwitchboardVotePlugin/SwitchboardQueueVoterClient'
+import {
+  SWITCHBOARD_ID,
+  SWITCHBOARD_ADDIN_ID,
+} from 'SwitchboardVotePlugin/SwitchboardQueueVoterClient'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import {
   getMaxVoterWeightRecord,
   getVoterWeightRecord,
   getGovernanceAccount,
-  Governance
+  Governance,
 } from '@solana/spl-governance'
 import { getNftMaxVoterWeightRecord } from 'NftVotePlugin/sdk/accounts'
 import { notify } from '@utils/notifications'
 import * as anchor from '@project-serum/anchor'
 import * as sbv2 from '@switchboard-xyz/switchboard-v2'
-import sbIdl from 'SwitchboardVotePlugin/switchboard_v2.json';
-import gonIdl from 'SwitchboardVotePlugin/gameofnodes.json';
+import sbIdl from 'SwitchboardVotePlugin/switchboard_v2.json'
+import gonIdl from 'SwitchboardVotePlugin/gameofnodes.json'
 
 import {
   LOCALNET_STAKING_ADDRESS as PYTH_LOCALNET_STAKING_ADDRESS,
@@ -34,9 +37,7 @@ export const nftPluginsPks: string[] = [
   'GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw',
 ]
 
-export const switchboardPluginsPks: string[] = [
-  SWITCHBOARD_ADDIN_ID.toBase58()
-]
+export const switchboardPluginsPks: string[] = [SWITCHBOARD_ADDIN_ID.toBase58()]
 
 export const pythPluginsPks: string[] = [
   PYTH_LOCALNET_STAKING_ADDRESS.toBase58(),
@@ -59,7 +60,12 @@ export function useVotingPlugins() {
     setMaxVoterWeight,
     setIsLoadingNfts,
   } = useNftPluginStore()
-  const { setIsLoading, setVotingPower, setOracleKeys, setInstructions } = useSwitchboardPluginStore()
+  const {
+    setIsLoading,
+    setVotingPower,
+    setOracleKeys,
+    setInstructions,
+  } = useSwitchboardPluginStore()
 
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
@@ -132,7 +138,10 @@ export function useVotingPlugins() {
         idl = sbIdl as anchor.Idl
       }
 
-      let addinIdl = await anchor.Program.fetchIdl(SWITCHBOARD_ADDIN_ID, provider)
+      let addinIdl = await anchor.Program.fetchIdl(
+        SWITCHBOARD_ADDIN_ID,
+        provider
+      )
       if (!addinIdl) {
         addinIdl = gonIdl as anchor.Idl
       }
@@ -149,67 +158,70 @@ export function useVotingPlugins() {
         provider
       )
 
-      const allOracles = await switchboardProgram.account.oracleAccountData.all();
-      const oData = allOracles.map(({publicKey, account}) => {
+      const allOracles = await switchboardProgram.account.oracleAccountData.all()
+      const oData = allOracles.map(({ publicKey, account }) => {
         return {
           oracleData: account as any,
           oracle: publicKey,
         }
-      });
-      
-      const myNodesForRealm: PublicKey[] = [];
-      const setVoterWeightInstructions: TransactionInstruction[] = [];
+      })
+
+      const myNodesForRealm: PublicKey[] = []
+      const setVoterWeightInstructions: TransactionInstruction[] = []
 
       for (const { oracle, oracleData } of oData) {
         if (!wallet || !wallet.publicKey || !realm || !oData) {
           continue
         }
-        const queuePk = oracleData.queuePubkey as PublicKey;
+        const queuePk = oracleData.queuePubkey as PublicKey
 
         const [addinState] = await PublicKey.findProgramAddress(
-          [
-            Buffer.from('state'),
-          ],
-          addinProgram.programId,
-        );
+          [Buffer.from('state')],
+          addinProgram.programId
+        )
 
-        const addinStateData = await addinProgram.account.state.fetch(addinState);
-        const queue = await switchboardProgram.account.oracleQueueAccountData.fetch(queuePk);
-        const queueAuthority = queue.authority as PublicKey;
-        const grantAuthority = addinStateData.grantAuthority as PublicKey;
+        const addinStateData = await addinProgram.account.state.fetch(
+          addinState
+        )
+        const queue = await switchboardProgram.account.oracleQueueAccountData.fetch(
+          queuePk
+        )
+        const queueAuthority = queue.authority as PublicKey
+        const grantAuthority = addinStateData.grantAuthority as PublicKey
         try {
-          const g = await getGovernanceAccount(provider.connection, grantAuthority, Governance);
+          const g = await getGovernanceAccount(
+            provider.connection,
+            grantAuthority,
+            Governance
+          )
           if (
             g.account.realm.equals(realm.pubkey) &&
             oracleData.oracleAuthority.equals(wallet.publicKey)
           ) {
-            myNodesForRealm.push(oracle);
+            myNodesForRealm.push(oracle)
             const [p] = sbv2.PermissionAccount.fromSeed(
               switchboardProgram,
               queueAuthority,
               queuePk,
               oracle
-            );
+            )
 
             const ix = await p.setVoterWeightTx({
-              govProgram: realm.owner, 
+              govProgram: realm.owner,
               pubkeySigner: wallet.publicKey,
               addinProgram: addinProgram,
               realm: realm.pubkey,
-            });
+            })
 
-            setVoterWeightInstructions.push(
-              ix.instructions[0]
-            );
+            setVoterWeightInstructions.push(ix.instructions[0])
           }
-        }
-        catch (e) {
-          console.log(e);
+        } catch (e) {
+          console.log(e)
         }
       }
 
-      setOracleKeys(myNodesForRealm, currentClient);
-      setInstructions(setVoterWeightInstructions, currentClient);
+      setOracleKeys(myNodesForRealm, currentClient)
+      setInstructions(setVoterWeightInstructions, currentClient)
 
       try {
         const [
@@ -231,17 +243,14 @@ export function useVotingPlugins() {
             // 'no sb governance'
             setVotingPower(new anchor.BN(0))
           }
-        }
-        catch (e) {
-          console.log("Couldn't get voter weight record. Setting to zero.");
+        } catch (e) {
+          console.log("Couldn't get voter weight record. Setting to zero.")
           setVotingPower(new anchor.BN(0))
         }
+      } catch (e) {
+        console.log("Couldn't get VWR")
+        console.log(e)
       }
-      catch(e) {
-        console.log("Couldn't get VWR");
-        console.log(e);
-      }
-
     } catch (e) {
       console.log(e)
       notify({
