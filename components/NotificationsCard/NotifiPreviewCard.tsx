@@ -135,7 +135,7 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
   )
 
   return (
-    <div className="bg-bkg-5 p-4 h-full w-full md:p-6 rounded-lg shadow-lg">
+    <div className="bg-bkg-5 p-4 h-full w-full rounded-lg">
       <div className="flex flex-row items-center align-center">
         <Button className="bg-transparent" onClick={onBackClick}>
           <ArrowLeftIcon className="w-6 h-6" fill="#80829D" />

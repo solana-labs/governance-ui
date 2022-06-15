@@ -111,7 +111,7 @@ const NotificationCardContainer: React.FC<Props> = ({ onBackClick }) => {
     } else setPreview(false)
   }, [connected, data, email, isAuthenticated, phoneNumber, telegram])
 
-  const handleUnsubscribe = useCallback(
+  const handleDelete = useCallback(
     async (source: Source) => {
       try {
         if (data?.alerts) {
@@ -136,10 +136,10 @@ const NotificationCardContainer: React.FC<Props> = ({ onBackClick }) => {
 
   return (
     <div className="h-[576px] w-[507px] absolute -top-4 right-0">
-      <div className="bg-bkg-5 w-full h-full md:p-6 rounded-lg shadow-lg">
+      <div className="bg-bkg-5 w-full h-full rounded-lg">
         <div className="flex flex-row w-full items-center align-center">
           {!isInitialized && (
-            <div className="h-[576px] pt-10 w-full">
+            <div className="h-[576px] pt-10 w-full px-4">
               <div className="space-y-2 align-center items-center w-full mb-2">
                 <div className="animate-pulse bg-bkg-4 w-full h-12 rounded-md" />
                 <div className="animate-pulse bg-bkg-4 w-full h-12 rounded-md" />
@@ -156,7 +156,7 @@ const NotificationCardContainer: React.FC<Props> = ({ onBackClick }) => {
           )}
           {showPreview && isInitialized && (
             <NotifiPreviewCard
-              handleDelete={handleUnsubscribe}
+              handleDelete={handleDelete}
               email={email}
               // this passes down useNotiClientData
               {...notifiClient}

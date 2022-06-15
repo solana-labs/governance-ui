@@ -50,10 +50,22 @@ type NotificationCardProps = {
   | 'getConfiguration'
 >
 
-const NotificationsCard = ({ onBackClick }: NotificationCardProps) => {
-  const router = useRouter()
-  const { cluster } = router.query
-  const { councilMint, mint, realm } = useRealm()
+const NotificationsCard = ({
+  createAlert,
+  data,
+  email,
+  getConfiguration,
+  isAuthenticated,
+  logIn,
+  onBackClick,
+  phoneNumber,
+  setEmail,
+  setPhone,
+  setPreview,
+  setTelegram,
+  telegram,
+  updateAlert,
+}: NotificationCardProps) => {
   const [isLoading, setLoading] = useState<boolean>(false)
   const [hasUnsavedChanges, setUnsavedChanges] = useState<boolean>(false)
   const [errorMessage, setErrorMessage] = useState<string>('')
@@ -232,7 +244,6 @@ const NotificationsCard = ({ onBackClick }: NotificationCardProps) => {
     checkTelegramUnconfirmed,
     connected,
     createAlert,
-    fetchData,
     isAuthenticated,
     localEmail,
     localPhoneNumber,
@@ -281,7 +292,7 @@ const NotificationsCard = ({ onBackClick }: NotificationCardProps) => {
     (isAuthenticated && !hasUnsavedChanges) ||
     (localEmail === '' && localTelegram === '' && localPhoneNumber === '')
 
-  const handleBackClick = () => {
+  const handleBackClick = useCallback(() => {
     if (isSame && !disabled) {
       setPreview(true)
       return
@@ -291,10 +302,10 @@ const NotificationsCard = ({ onBackClick }: NotificationCardProps) => {
     } else {
       setPreview(false)
     }
-  }
+  }, [])
 
   return (
-    <div className="bg-bkg-5 w-full p-4 md:p-6 rounded-lg shadow-lg">
+    <div className="bg-bkg-5 w-full p-4 md:p-6 rounded-lg">
       <div className="flex flex-row items-center align-center">
         <Button className="bg-transparent" onClick={handleBackClick}>
           <ArrowLeftIcon className="w-6 h-6" fill="grey" />
