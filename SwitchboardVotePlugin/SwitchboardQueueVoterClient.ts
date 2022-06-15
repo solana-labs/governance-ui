@@ -1,5 +1,5 @@
 import { Program, Provider } from '@project-serum/anchor'
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey, Transaction } from '@solana/web3.js'
 import { Switchboard, IDL } from './SwitchboardIdl'
 //import { NftVoter, IDL } from './nft_voter';
 
@@ -9,6 +9,14 @@ export const SWITCHBOARD_ID = new PublicKey(
 
 export const SWITCHBOARD_ADDIN_ID = new PublicKey(
   'B4EDDdMh5CmB6B9DeMmZmFvRzEgyHR5zWktf6httcMk6'
+);
+
+export const SWITCHBOARD_GRANT_AUTHORITY = new PublicKey(
+  '5wD32vPTeBk3UJfTCQUpa4KbrHZ5xxc8f4eLnqTPNW8L'
+);
+
+export const SWITCHBOARD_REVOKE_AUTHORITY = new PublicKey(
+  '9rkK8T8wnYXZ1SSC6g2ZhbnyL5K5v546XSbNJv7og87b'
 );
 
 export const QUEUE_LIST: PublicKey[] = [
@@ -31,4 +39,57 @@ export class SwitchboardQueueVoterClient {
       devnet
     )
   }
+}
+
+export async function grantPermissionTx (
+  program: Program, 
+  grantAuthority: PublicKey,
+  switchboardProgram: PublicKey,
+  permission: PublicKey,
+): Promise<Transaction> {
+  console.log("IN GRANT FUNC");
+  let [addinState] = await PublicKey.findProgramAddress(
+    [
+      Buffer.from('state'),
+    ],
+    program.programId,
+  );
+
+  return await program.methods
+    .grantPermission()
+    .accounts({
+      state: addinState,
+      grantAuthority: grantAuthority,
+      switchboardProgram: switchboardProgram,
+      permission: permission
+    })
+    .transaction();
+
+}
+
+export async function revokePermissionTx (
+  program: Program, 
+  revokeAuthority: PublicKey,
+  switchboardProgram: PublicKey,
+  permission: PublicKey,
+): Promise<Transaction> {
+  console.log("IN REVOKE FUNC");
+
+  let [addinState] = await PublicKey.findProgramAddress(
+    [
+      Buffer.from('state'),
+    ],
+    program.programId,
+  );
+
+  return await program.methods
+    .revokePermission()
+    .accounts({
+      state: addinState,
+      revokeAuthority: revokeAuthority,
+      switchboardProgram: switchboardProgram,
+      permission: permission
+    })
+    .transaction();
+
 }
