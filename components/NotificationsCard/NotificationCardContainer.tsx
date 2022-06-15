@@ -104,9 +104,13 @@ const NotificationCardContainer: React.FC<Props> = ({ onBackClick }) => {
         setTelegram(firstOrNull(data?.telegramTargets)?.telegramId ?? '')
       }
     }
-    if (email || phoneNumber || telegram) {
-      setPreview(true)
-    } else setPreview(false)
+
+    // Handles when the alerts.length is the same as sources
+    if (data?.alerts && data.alerts.length === data?.sources.length) {
+      if (email || phoneNumber || telegram) {
+        setPreview(true)
+      }
+    }
   }, [
     connected,
     data,

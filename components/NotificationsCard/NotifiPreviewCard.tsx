@@ -2,7 +2,13 @@ import Button from '../Button'
 import Switch from '@components/Switch'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
 import { Source, useNotifiClient } from '@notifi-network/notifi-react-hooks'
-import React, { FunctionComponent, useCallback, useMemo, useState } from 'react'
+import React, {
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 
 import NotifiFullLogo from './NotifiFullLogo'
 type NotifiClientReturnType = ReturnType<typeof useNotifiClient>
@@ -15,7 +21,7 @@ type NotifiPreviewCardProps = {
   phoneNumber: string
   telegram: string
   handleDelete: (source: Source) => Promise<void>
-} & Pick<NotifiClientReturnType, 'createAlert' | 'data'>
+} & Pick<NotifiClientReturnType, 'createAlert' | 'data' | 'isAuthenticated'>
 
 const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
   createAlert,
@@ -27,6 +33,7 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
   phoneNumber,
   telegram,
   telegramEnabled,
+  isAuthenticated,
 }) => {
   const alerts = data?.alerts
   const sources = data?.sources
@@ -39,6 +46,12 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
   const Line = () => (
     <div className="border-b-2 border-white-800 opacity-20 col-span-12 py-3" />
   )
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      onClick()
+    }
+  }, [isAuthenticated])
 
   const handleUnsubscribe = useCallback(
     async (source: Source) => {
@@ -135,7 +148,7 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
   )
 
   return (
-    <div className="bg-bkg-5 p-4 h-full w-full rounded-lg">
+    <div className="bg-bkg-5 p-4 h-full w-full md:p-6 rounded-lg">
       <div className="flex flex-row items-center align-center">
         <Button className="bg-transparent" onClick={onBackClick}>
           <ArrowLeftIcon className="w-6 h-6" fill="#80829D" />
@@ -146,9 +159,9 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
         <div className="col-span-12">
           <p className="py-0.5">{email}</p>
           <p className="py-0.5">{phoneNumber}</p>
-          {telegramEnabled && <p className="py-0.5">{telegram}</p>}
+          {telegramEnabled && <p className="py-0.5 pb-2">{telegram}</p>}
           <a
-            className="text-sm text-primary-dark cursor-pointer pb-2 font-medium"
+            className="text-sm text-blue cursor-pointer pb-2 font-medium underline color=00E4FF"
             onClick={handleEdit}
           >
             Edit Information
@@ -165,8 +178,8 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
           </>
         )}
       </div>
-      <div className="w-full">
-        <div className="flex px-6 pt-1 justify-between flex-row">
+      <div className="w-full ">
+        <div className="flex px-6 justify-between flex-row">
           <div className=" flex flex-row">
             <p className="text-white text-[10px] font-light whitespace-nowrap flex-start">
               Powered by
@@ -176,7 +189,7 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
             </span>
           </div>
           <a
-            className="text-xs text-[10px] underline cursor-pointer col-span-3 relative "
+            className="text-xs text-[10px] underline cursor-pointer text-blue col-span-3 relative "
             href="https://docs.notifi.network/"
           >
             Learn More

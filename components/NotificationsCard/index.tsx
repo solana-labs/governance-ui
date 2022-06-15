@@ -237,7 +237,6 @@ const NotificationsCard = ({
                 sourceId: source?.id ?? '',
                 telegramId: localTelegram === '' ? null : localTelegram,
               })
-
               if (alertRes) {
                 results.push(alertRes)
               }
@@ -394,7 +393,7 @@ const NotificationsCard = ({
             <div className="w-full place-items-center ">
               Already Subscribed?{' '}
               <a
-                className="text-xs text-primary-dark cursor-pointer "
+                className="text-xs text-blue cursor-pointer "
                 onClick={handleRefresh}
                 rel="noreferrer"
                 title="Click here to load your alert details."
@@ -422,7 +421,7 @@ const NotificationsCard = ({
 
             <div className="h-3 grid text-xs w-full place-items-center">
               <a
-                className="text-xs text-primary-dark "
+                className="text-xs text-blue "
                 href="https://www.notifi.network/faqs"
                 rel="noreferrer"
                 target="_blank"
