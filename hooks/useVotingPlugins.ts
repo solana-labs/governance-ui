@@ -184,7 +184,9 @@ export function useVotingPlugins() {
     if (
       !currentClient ||
       currentClient.realm?.pubkey.toBase58() !== realm?.pubkey.toBase58() ||
-      currentClient.walletPk?.toBase58() !== wallet?.publicKey?.toBase58()
+      currentClient.walletPk?.toBase58() !== wallet?.publicKey?.toBase58() ||
+      currentClient.walletPk?.toBase58() !==
+        ownTokenRecord?.account?.governingTokenOwner.toBase58()
     ) {
       handleNftplugin()
       handleVsrPlugin()
