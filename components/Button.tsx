@@ -141,18 +141,18 @@ export const RadioButton: FunctionComponent<NewButtonProps> = ({
   ...props
 }) => {
   let classNames =
-    'group default-transition py-3 px-2 h-[72px] min-w-[208px] text-fgd-1rounded border disabled:cursor-not-allowed'
+    'group default-transition py-3 px-2 h-[72px] min-w-[208px] text-fgd-1 rounded border disabled:cursor-not-allowed'
 
   if (selected) {
-    classNames += ' bg-white/10 border-fgd-1 focus:border-blue'
+    classNames += ' bg-bkg-4 border-fgd-1 focus:border-blue'
   } else {
     classNames += ' focus:bg-fgd-3 focus:border-none'
   }
 
   if (!disabled) {
-    classNames += 'hover:bg-white/10 hover:border-fgd-1border-fgd-3'
+    classNames += 'hover:bg-bkg-4 hover:border-fgd-1 border-fgd-3'
   } else {
-    classNames += ' bg-transparent text-fgd-3 border-white/10'
+    classNames += ' bg-none text-fgd-3 border-bkg-4'
   }
 
   classNames += ` ${className}`

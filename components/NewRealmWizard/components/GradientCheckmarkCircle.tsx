@@ -1,11 +1,11 @@
 export default function ({ selected = false }) {
   return (
     <div
-      className={`h-[32px] w-[32px] rounded-full flex items-center justify-center text-black ${
+      className={`h-[32px] w-[32px] rounded-full flex items-center justify-center text-fgd-1 ${
         selected
           ? 'bg-gradient-to-r from-[#00C2FF] via-[#00E4FF] to-[#87F2FF]'
-          : 'border border-white/30'
-      } group-hover:border-white/50 hover:border-white/50  group-disabled:opacity-30 group-disabled:group-hover:border-white/30 group-disabled:hover:border-white/30`}
+          : 'border border-fgd-4'
+      } group-hover:border-fgd-3 hover:border-fgd-3  group-disabled:opacity-30 group-disabled:group-hover:border-fgd-3 group-disabled:hover:border-fgd-3`}
     >
       {selected && (
         <svg
