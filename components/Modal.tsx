@@ -1,9 +1,5 @@
-import { Fragment } from 'react'
-import { Dialog, Transition } from '@headlessui/react'
-
 import { XIcon } from '@heroicons/react/outline'
 import { Portal } from 'react-portal'
-import { NewButton } from './Button'
 
 const Modal = ({
   isOpen,
@@ -71,77 +67,3 @@ const Header = ({ children }) => {
 Modal.Header = Header
 
 export default Modal
-
-export function NewModal({ isOpen, onClose = () => null, header, children }) {
-  return (
-    <Transition show={isOpen} as={Fragment}>
-      <Dialog onClose={onClose}>
-        <Transition.Child
-          as={Fragment}
-          enter="ease-out duration-300"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="ease-in duration-200"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
-          <div className="fixed inset-0 bg-black/30" />
-        </Transition.Child>
-
-        <Transition.Child
-          as={Fragment}
-          enter="ease-out duration-300"
-          enterFrom="opacity-0 scale-95"
-          enterTo="opacity-100 scale-100"
-          leave="ease-in duration-200"
-          leaveFrom="opacity-100 scale-100"
-          leaveTo="opacity-0 scale-95"
-        >
-          <div className="fixed inset-0 flex p-4 md:items-center md:justify-center bg-bkg-grey md:max-w-3xl md:h-fit md:rounded md:my-auto md:mx-auto">
-            <Dialog.Panel className="flex flex-col w-full h-full md:max-h-[70vh]">
-              <div className="flex flex-col">
-                <Dialog.Title>{header}</Dialog.Title>
-              </div>
-              {children}
-            </Dialog.Panel>
-          </div>
-        </Transition.Child>
-      </Dialog>
-    </Transition>
-  )
-}
-
-function noop() {
-  return
-}
-export function ConfirmationDialog({
-  isOpen,
-  onClose = noop,
-  header,
-  confirmButton,
-  closeButton,
-  children,
-}) {
-  return (
-    <NewModal isOpen={isOpen} header={header}>
-      <div className="overflow-scroll">{children}</div>
-      <div className="flex flex-col items-center justify-end w-full mt-6 space-y-4 md:space-x-4 md:justify-start md:space-y-0 md:flex-row-reverse grow">
-        <div className="w-full md:ml-4 md:w-fit">{confirmButton}</div>
-        <div className="w-full md:w-fit">
-          {closeButton ? (
-            closeButton
-          ) : (
-            <NewButton
-              type="button"
-              secondary
-              onClick={onClose}
-              className="w-full md:w-fit"
-            >
-              Close
-            </NewButton>
-          )}
-        </div>
-      </div>
-    </NewModal>
-  )
-}

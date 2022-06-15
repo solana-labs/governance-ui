@@ -17,15 +17,15 @@ function SummaryModule({
 }) {
   return (
     <div
-      className={`bg-night-grey rounded-md pl-6 pr-8 py-6 grow ${className} flex flex-wrap justify-between items-center`}
+      className={`bg-bkg-2 rounded-md pl-6 pr-8 py-6 grow ${className} flex flex-wrap justify-between items-center`}
     >
       <div className="flex flex-col">
-        <Text level="2" className="flex mb-2 text-white/50">
+        <Text level="2" className="flex mb-2 text-fgd-2">
           {title}
           {advancedOption && (
             <Text
               level="3"
-              className="flex items-center px-2 ml-2 rounded bg-bkg-grey text-white/70"
+              className="flex items-center px-2 ml-2 rounded bg-bkg-3 text-fgd-2"
             >
               Advanced Option
             </Text>
@@ -46,7 +46,7 @@ function TokenInfoSummary({ title, name, symbol, logoURI }) {
         symbol && (
           <Text
             level="2"
-            className="flex items-center px-6 py-1 text-white rounded bg-bkg-grey"
+            className="flex items-center px-6 py-1 rounded bg-bkg-3"
           >
             #{symbol}
           </Text>
@@ -57,7 +57,7 @@ function TokenInfoSummary({ title, name, symbol, logoURI }) {
         {logoURI ? (
           <img src={logoURI} className="w-8" />
         ) : (
-          <div className="w-8 text-white/50">
+          <div className="w-8 text-fgd-2">
             <GenericTokenIcon />
           </div>
         )}
@@ -97,7 +97,7 @@ function CommunityInfo({
           rightSide={
             <Text
               level="2"
-              className="flex items-center px-6 py-1 text-white rounded bg-bkg-grey"
+              className="flex items-center px-6 py-1 rounded bg-bkg-3"
             >
               {nftInfo?.nftCollectionCount?.toLocaleString()} NFTs
             </Text>

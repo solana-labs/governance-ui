@@ -5,7 +5,7 @@ import GradientCheckmarkCircle from './GradientCheckmarkCircle'
 
 const NFTCollectionSelector = ({ collections = {}, onChange, value }) => {
   const optionClass =
-    'z-0 group flex flex-wrap md:items-center md:space-x-8 flex-wrap py-4 px-2 md:px-8 relative w-full default-transition rounded-md hover:cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 hover:opacity-100 hover:bg-black'
+    'z-0 group flex flex-wrap md:items-center md:space-x-8 flex-wrap py-4 px-2 md:px-8 relative w-full default-transition rounded-md hover:cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 hover:opacity-100 hover:bg-bkg-4'
 
   if (Object.keys(collections).length === 0) {
     return (
@@ -32,19 +32,19 @@ const NFTCollectionSelector = ({ collections = {}, onChange, value }) => {
               {({ active, checked }) => (
                 <div
                   className={`${optionClass} ${
-                    active || checked ? 'bg-black' : ' bg-night-grey'
+                    active || checked ? 'bg-bkg-1' : ' bg-bkg-3'
                   }`}
                 >
                   <div className="">
                     <img
                       src={collection?.image}
-                      className="w-16 h-16 border border-gray-700 rounded-full md:w-20 md:h-20"
+                      className="w-16 h-16 border rounded-full border-fgd-1 md:w-20 md:h-20"
                       alt="Collection icon"
                     />
                   </div>
                   <div className="flex flex-col mx-4 grow w-min md:mx-0">
                     <Text>{collection?.name}</Text>
-                    <Text level="2" className="text-white/50">
+                    <Text level="2" className="text-fgd-2">
                       {totalNfts} {`NFT${totalNfts === 1 ? '' : 's'}`}
                     </Text>
                   </div>
@@ -54,7 +54,7 @@ const NFTCollectionSelector = ({ collections = {}, onChange, value }) => {
                         <div
                           key={index}
                           className={`w-12 h-12 md:h-16 md:w-16 rounded-md ${
-                            src ? '' : 'bg-bkg-grey'
+                            src ? '' : 'bg-bkg-2'
                           } flex items-center`}
                         >
                           {src && (

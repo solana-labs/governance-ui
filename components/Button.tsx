@@ -117,7 +117,7 @@ export const NewButton: FunctionComponent<NewButtonProps> = ({
     // this is a primary button
     // TODO: make sure this using the typogrpahic class for CTAs
     classNames +=
-      'py-4 px-2 h-[64px] min-w-[208px] text-primary-light bg-fgd-1 hover:bg-fgd-2 active:bg-fgd-3 active:border-none focus:border-2 focus:border-[#00E4FF] disabled:bg-fgd-4'
+      'py-4 px-2 h-[64px] min-w-[208px] text-bkg-1 bg-fgd-1 hover:bg-fgd-2 active:bg-fgd-3 active:border-none focus:border-2 focus:border-[#00E4FF] disabled:bg-fgd-4'
   }
 
   classNames += ` ${className}`

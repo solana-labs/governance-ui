@@ -54,7 +54,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     if (error) {
       classNames += ` border-b-error-red/50 focus:border-b-error-red active:border-b-error-red`
     } else if (success) {
-      classNames += ` border-b-confirm-green/50 focus:border-b-confirm-green active:border-b-confirm-green`
+      classNames += ` border-b-green focus:border-b-green active:border-b-green`
     }
 
     classNames += ` ${className}`
@@ -87,7 +87,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           className={`${
             error || success ? 'visibile' : 'invisible'
           } pt-2 flex items-start min-h-[2.5rem] ${
-            error ? 'text-error-red' : success ? 'text-confirm-green' : ''
+            error ? 'text-error-red' : success ? 'text-green' : ''
           }`}
         >
           <Text level="2">
