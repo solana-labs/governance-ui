@@ -2,7 +2,9 @@ import Input from '@components/inputs/Input'
 import { Listbox, Transition } from '@headlessui/react'
 import { ChatAltIcon, ChevronDownIcon } from '@heroicons/react/outline'
 import { isValidPhoneNumber } from 'libphonenumber-js'
+import { Dispatch, SetStateAction } from 'react'
 import { Fragment, useCallback, useEffect, useState } from 'react'
+
 import { InputRow } from '.'
 import { countryMap } from './data'
 import { splitPhoneNumber } from './phoneUtils'
@@ -10,9 +12,10 @@ import { splitPhoneNumber } from './phoneUtils'
 type Props = {
   handlePhone: (input: string) => void
   phoneNumber: string
+  setErrorMessage: Dispatch<SetStateAction<string>>
 }
 
-const PhoneInput = ({ handlePhone, phoneNumber }: Props) => {
+const PhoneInput = ({ handlePhone, phoneNumber, setErrorMessage }: Props) => {
   const [selectedCountryCode, setCountryCode] = useState('US')
   const [dialCode, setDialCode] = useState('+1')
   const [baseNumber, setBaseNumber] = useState('')
@@ -29,11 +32,23 @@ const PhoneInput = ({ handlePhone, phoneNumber }: Props) => {
     [baseNumber, handlePhone]
   )
 
+  const splitPhoneNumbers = useCallback(
+    (phoneNumber: string) => {
+      const { baseNumber, countryCode } = splitPhoneNumber(phoneNumber)
+      if (!countryCode || !baseNumber) {
+        setErrorMessage('Improper phone, please try again')
+      }
+      setBaseNumber(baseNumber)
+      setCountryCode(countryCode)
+    },
+    [setErrorMessage]
+  )
+
   useEffect(() => {
-    if (phoneNumber) {
+    if (phoneNumber && isValidPhoneNumber(phoneNumber)) {
       splitPhoneNumbers(phoneNumber)
     }
-  }, [phoneNumber])
+  }, [phoneNumber, splitPhoneNumbers, isValidPhoneNumber])
 
   const onChange = useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -46,41 +61,37 @@ const PhoneInput = ({ handlePhone, phoneNumber }: Props) => {
     [dialCode, handlePhone]
   )
 
-  const splitPhoneNumbers = (phoneNumber: string) => {
+  const validatePhoneNumber = () => {
     if (!isValidPhoneNumber(phoneNumber)) {
-      return
+      setErrorMessage('You have entered an invalid number')
     }
-    const { baseNumber, countryCode } = splitPhoneNumber(phoneNumber)
-    if (!countryCode || !baseNumber) {
-      throw new Error('Improper phone')
-    }
-    setBaseNumber(baseNumber)
-    setCountryCode(countryCode)
   }
 
   return (
     <InputRow
-      label="phone"
       icon={
         <ChatAltIcon className=" z-10 h-10 text-primary-light w-7 mr-1 mt-9 absolute left-3" />
       }
+      label="phone"
     >
       <Input
         className="min-w-11/12 py-3 pl-[130px] px-4 appearance-none w-11/12 outline-0 focus:outline-none"
+        onChange={onChange}
+        onFocus={() => setErrorMessage('')}
+        onBlur={validatePhoneNumber}
+        placeholder="XXX-XXX-XXXX"
         type="tel"
         value={baseNumber}
-        onChange={onChange}
-        placeholder="XXX-XXX-XXXX"
       />
       <div className="absolute h-10 inset-y-8">
-        <Listbox value={selectedCountryCode} onChange={selectCountryHandler}>
+        <Listbox onChange={selectCountryHandler} value={selectedCountryCode}>
           <div className="relative h-10 w-[120px]">
             <Listbox.Button className="relative h-[45px] w-full cursor-default rounded-lg bg-none pl-12 pr-5 text-left shadow-md focus:outline-primary-light focus:ring-primary-light focus:ring-1 focus:text-primary-light sm:text-sm text-gray-400">
               <span className="block truncate">{dialCode}</span>
               <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2 z-10">
                 <ChevronDownIcon
-                  className="h-5 w-5 text-gray-400 focus:color-primary-light focus:text-primary-light"
                   aria-hidden="true"
+                  className="h-5 w-5 text-gray-400 focus:color-primary-light focus:text-primary-light"
                 />
               </span>
             </Listbox.Button>
@@ -96,7 +107,6 @@ const PhoneInput = ({ handlePhone, phoneNumber }: Props) => {
                     const { dialCode, flag, name } = countryMetadata
                     return (
                       <Listbox.Option
-                        key={idx}
                         className={({ active }) =>
                           `relative cursor-default select-none py-2 pl-2 pr-4 z-20 ${
                             active
@@ -104,6 +114,7 @@ const PhoneInput = ({ handlePhone, phoneNumber }: Props) => {
                               : 'text-gray-300'
                           }`
                         }
+                        key={idx}
                         value={countryCode}
                       >
                         {({ selected }) => (
