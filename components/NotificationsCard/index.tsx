@@ -304,7 +304,7 @@ const NotificationsCard = ({
     } else {
       setPreview(false)
     }
-  }, [])
+  }, [disabled, isSame, onBackClick, setPreview])
 
   return (
     <div className="bg-bkg-5 w-full p-4 md:p-6 rounded-lg">
@@ -314,12 +314,18 @@ const NotificationsCard = ({
         </Button>
         <NotifiFullLogo />
       </div>
-
-      {hasLoaded ? (
-        !connected ? (
-          <>
-            <div className="text-sm text-th-fgd-1">
-              Connect wallet to see options
+      {!connected ? (
+        <>
+          <div className="text-sm items-center w-full text-center text-th-fgd-1">
+            Connect wallet to see options
+          </div>
+        </>
+      ) : (
+        <>
+          <div>
+            <div className="text-sm text-th-fgd-1 flex flex-row items-center justify-between mt-4">
+              Get notifications for proposals, voting, and results. Add your
+              email address, phone number, and/or Telegram.
             </div>
           </>
         ) : (
