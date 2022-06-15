@@ -210,7 +210,7 @@ export default function NotificationsSwitch() {
         {...defaultVariables.animations.popup}
       >
         {modalState === ModalStates.Selection && (
-          <div className="w-fit h-fit bg-bkg-5 top-4 right-0 absolute rounded-lg shadow-md">
+          <div className="w-fit h-fit bg-bkg-5 -top-4 right-0 absolute rounded-lg shadow-md">
             <div className="h-full flex flex-col items-center pt-4">
               <h2 className="mb-2 font-light">Realms Notifications</h2>
               {NotificationSolutions.map((solution) => (
