@@ -137,6 +137,7 @@ const NotificationCardContainer: React.FC<Props> = ({ onBackClick }) => {
     [data?.alerts, deleteAlert]
   )
 
+  console.log('isInitlaized', isInitialized)
   return (
     <div className="h-[507px] w-[446px] absolute -top-4 right-0">
       <div className="bg-bkg-5 w-full h-full rounded-lg">
