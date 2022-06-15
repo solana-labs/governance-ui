@@ -6,6 +6,7 @@ import {
   Source,
   useNotifiClient,
 } from '@notifi-network/notifi-react-hooks'
+import { firstOrNull } from '@utils/helpers'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
@@ -80,15 +81,6 @@ const NotificationCardContainer: React.FC<Props> = ({ onBackClick }) => {
       console.error('Failed to get supported type information: ', e)
     })
   }, [updateTelegramSupported])
-
-  const firstOrNull = <T,>(
-    arr: ReadonlyArray<T> | null | undefined
-  ): T | null => {
-    if (arr !== null && arr !== undefined) {
-      return arr[0] ?? null
-    }
-    return null
-  }
 
   useEffect(() => {
     if (isAuthenticated && connected && isInitialized) {

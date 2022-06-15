@@ -23,6 +23,10 @@ type NotifiPreviewCardProps = {
   handleDelete: (source: Source) => Promise<void>
 } & Pick<NotifiClientReturnType, 'createAlert' | 'data' | 'isAuthenticated'>
 
+const Line = () => (
+  <div className="border-b-2 border-white-800 opacity-20 col-span-12 py-3" />
+)
+
 const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
   createAlert,
   data,
@@ -42,10 +46,6 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
   const handleEdit = useCallback(() => {
     onClick()
   }, [onClick])
-
-  const Line = () => (
-    <div className="border-b-2 border-white-800 opacity-20 col-span-12 py-3" />
-  )
 
   useEffect(() => {
     if (!isAuthenticated) {
