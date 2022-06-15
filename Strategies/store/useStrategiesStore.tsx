@@ -1,6 +1,7 @@
 import { ConnectionContext } from '@utils/connection'
 import { notify } from '@utils/notifications'
 import { tvl } from 'Strategies/protocols/mango/tools'
+import { getSolendStrategies } from 'Strategies/protocols/solend'
 import { TreasuryStrategy } from 'Strategies/types/types'
 import create, { State } from 'zustand'
 
@@ -19,8 +20,11 @@ const useStrategiesStore = create<StrategiesStore>((set, _get) => ({
     })
     try {
       const mango = await tvl(Date.now() / 1000, connection)
+      const solend = await getSolendStrategies()
+
       //add fetch functions for your protocol in promise.all
-      const strategies: TreasuryStrategy[] = [...mango]
+      const strategies: TreasuryStrategy[] = [...solend, ...mango]
+
       set((s) => {
         s.strategies = strategies
       })

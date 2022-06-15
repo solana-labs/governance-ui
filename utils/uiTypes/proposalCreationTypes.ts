@@ -19,6 +19,7 @@ export interface UiInstruction {
   customHoldUpTime?: number
   prerequisiteInstructions?: TransactionInstruction[]
   chunkSplitByDefault?: boolean
+  chunkBy?: number
   signers?: Keypair[]
   shouldSplitIntoSeparateTxs?: boolean | undefined
 }
@@ -58,8 +59,37 @@ export interface FriktionWithdrawForm {
   amount: number | undefined
   governedTokenAccount: AssetAccount | undefined
   voltVaultId: string
-  depositTokenMint: string | undefined
   programId: string | undefined
+  mintInfo: MintInfo | undefined
+}
+
+export interface FriktionClaimPendingDepositForm {
+  governedTokenAccount: AssetAccount | undefined
+  voltVaultId: string
+  programId: string | undefined
+  mintInfo: MintInfo | undefined
+}
+
+export interface FriktionClaimPendingWithdrawForm {
+  governedTokenAccount: AssetAccount | undefined
+  voltVaultId: string
+  programId: string | undefined
+  mintInfo: MintInfo | undefined
+}
+
+export interface GoblinGoldDepositForm {
+  amount: number | undefined
+  governedTokenAccount?: AssetAccount | undefined
+  goblinGoldVaultId: string
+  mintName?: SupportedMintName | undefined
+  mintInfo: MintInfo | undefined
+}
+
+export interface GoblinGoldWithdrawForm {
+  amount: number | undefined
+  governedTokenAccount?: AssetAccount | undefined
+  goblinGoldVaultId?: string
+  mintName?: SupportedMintName
   mintInfo: MintInfo | undefined
 }
 
@@ -223,7 +253,7 @@ export interface ForesightMakeResolveMarketParams extends ForesightHasMarketId {
   winner: number
 }
 
-export interface ForesightMakeAddMarketMetadataParams
+export interface ForesightMakeSetMarketMetadataParams
   extends ForesightHasMarketId {
   content: string
   field: foresightConsts.MarketMetadataFieldName
@@ -294,6 +324,12 @@ export enum Instructions {
   WithrawFromCastle,
   DepositIntoVolt,
   WithdrawFromVolt,
+  ClaimPendingDeposit,
+  ClaimPendingWithdraw,
+  DepositIntoCastle,
+  WithrawFromCastle,
+  DepositIntoGoblinGold,
+  WithdrawFromGoblinGold,
   CreateSolendObligationAccount,
   InitSolendObligationAccount,
   DepositReserveLiquidityAndObligationCollateral,
@@ -305,7 +341,7 @@ export enum Instructions {
   ForesightInitCategory,
   ForesightResolveMarket,
   ForesightAddMarketListToCategory,
-  ForesightAddMarketMetadata,
+  ForesightSetMarketMetadata,
   RealmConfig,
   CreateNftPluginRegistrar,
   CreateNftPluginMaxVoterWeight,
@@ -313,6 +349,7 @@ export enum Instructions {
   CloseTokenAccount,
   VotingMintConfig,
   CreateVsrRegistrar,
+  ChangeMakeDonation,
 }
 
 export type createParams = [
@@ -339,4 +376,30 @@ export interface InstructionsContext {
   handleSetInstructions: (val, index) => void
   governance: ProgramAccount<Governance> | null | undefined
   setGovernance: (val) => void
+}
+
+export interface ChangeNonprofit {
+  name: string
+  description: string
+  ein: string
+  classification: string
+  category: string
+  address_line: string
+  city: string
+  state: string
+  zip_code: string
+  icon_url: string
+  email?: string
+  website: string
+  socials: {
+    facebook?: string
+    instagram?: string
+    tiktok?: string
+    twitter?: string
+    youtube?: string
+  }
+  crypto: {
+    solana_address: string
+    ethereum_address: string
+  }
 }

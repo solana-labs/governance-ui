@@ -28,7 +28,7 @@ export const pythPluginsPks: string[] = [
 ]
 
 export function useVotingPlugins() {
-  const { realm, config } = useRealm()
+  const { realm, config, ownTokenRecord } = useRealm()
   const {
     handleSetVsrRegistrar,
     handleSetVsrClient,
@@ -141,7 +141,8 @@ export function useVotingPlugins() {
           handleSetCurrentRealmVotingClient({
             client: vsrClient,
             realm,
-            walletPk: wallet?.publicKey,
+            walletPk:
+              ownTokenRecord?.account?.governingTokenOwner || wallet?.publicKey,
           })
         }
       }
@@ -157,7 +158,8 @@ export function useVotingPlugins() {
           handleSetCurrentRealmVotingClient({
             client: nftClient,
             realm,
-            walletPk: wallet?.publicKey,
+            walletPk:
+              ownTokenRecord?.account?.governingTokenOwner || wallet?.publicKey,
           })
         }
       }
@@ -173,7 +175,8 @@ export function useVotingPlugins() {
           handleSetCurrentRealmVotingClient({
             client: pythClient,
             realm,
-            walletPk: wallet?.publicKey,
+            walletPk:
+              ownTokenRecord?.account?.governingTokenOwner || wallet?.publicKey,
           })
         }
       }
@@ -195,7 +198,9 @@ export function useVotingPlugins() {
     realm?.pubkey.toBase58(),
     connection.endpoint,
     connected,
+    ownTokenRecord,
   ])
+
   useEffect(() => {
     if (usedCollectionsPks.length && realm) {
       if (connected && currentClient.walletPk?.toBase58()) {

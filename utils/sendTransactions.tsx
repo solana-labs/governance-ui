@@ -573,8 +573,7 @@ export const sendTransactionsV2 = async ({
       closeTransactionProcessUi()
     }
   } catch (e) {
-    if (typeof e?.txInstructionIdx !== 'undefined' && showUiComponent) {
-      console.log('Retrying from transactionIx:', e.txInstructionIdx)
+    if (showUiComponent) {
       const idx = e?.txInstructionIdx
       const txInstructionForRetry = TransactionInstructions.slice(
         idx,
@@ -591,7 +590,7 @@ export const sendTransactionsV2 = async ({
               signersSet: signersForRetry,
               showUiComponent,
             }),
-          e.error,
+          e.error ? e.error : `${e}`,
           e.txid
         )
       }

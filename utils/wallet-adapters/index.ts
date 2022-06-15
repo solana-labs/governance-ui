@@ -1,27 +1,33 @@
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom'
 import { SolletWalletAdapter } from '@solana/wallet-adapter-sollet'
 import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare'
-
-const ASSET_URL =
-  'https://cdn.jsdelivr.net/gh/solana-labs/oyster@main/assets/wallets'
+import { TorusWalletAdapter } from '@solana/wallet-adapter-torus'
+import { GlowWalletAdapter } from '@solana/wallet-adapter-glow'
 
 export const WALLET_PROVIDERS = [
   {
     name: 'Phantom',
-    url: 'https://www.phantom.app',
-    icon: `https://www.phantom.app/img/logo.png`,
+    url: 'https://phantom.app',
     adapter: new PhantomWalletAdapter(),
   },
   {
+    name: 'Torus',
+    url: 'https://tor.us',
+    adapter: new TorusWalletAdapter(),
+  },
+  {
+    name: 'Glow',
+    url: 'https://glow.app',
+    adapter: new GlowWalletAdapter(),
+  },
+  {
     name: 'Solflare',
-    url: 'https://solflare.com/',
-    icon: `https://solflare.com/logo.png`,
+    url: 'https://solflare.com',
     adapter: new SolflareWalletAdapter(),
   },
   {
     name: 'Sollet.io',
     url: 'https://www.sollet.io',
-    icon: `${ASSET_URL}/sollet.svg`,
     adapter: new SolletWalletAdapter({ provider: 'https://www.sollet.io' }),
   },
 ]

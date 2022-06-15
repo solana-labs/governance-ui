@@ -18,7 +18,7 @@ import {
   ForesightHasGovernedAccount,
   ForesightHasMarketId,
   ForesightHasMarketListId,
-  ForesightMakeAddMarketMetadataParams,
+  ForesightMakeSetMarketMetadataParams,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import Input from '@components/inputs/Input'
@@ -36,9 +36,13 @@ type SetFormErrors = Dispatch<React.SetStateAction<EmptyObject>>
 
 export function getFilteredTokenAccounts(): AssetAccount[] {
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-  return governedTokenAccountsWithoutNfts.filter((x) =>
-    x.extensions.transferAddress?.equals(foresightGov.DEVNET_TREASURY)
-  )
+  return governedTokenAccountsWithoutNfts.filter((x) => {
+    const transferAddress = x.extensions.transferAddress
+    return (
+      transferAddress?.equals(foresightGov.DEVNET_TREASURY) ||
+      transferAddress?.equals(foresightGov.MAINNET_TREASURY)
+    )
+  })
 }
 
 type HandleSetForm = ({
@@ -367,7 +371,7 @@ export function ForesightWinnerInput(props: InputProps<ForesightHasMarketId>) {
 }
 
 export function ForesightContentInput(
-  props: InputProps<ForesightMakeAddMarketMetadataParams>
+  props: InputProps<ForesightMakeSetMarketMetadataParams>
 ) {
   return (
     <Input
@@ -386,7 +390,7 @@ export function ForesightContentInput(
 }
 
 export function ForesightMarketMetadataFieldSelect(
-  props: InputProps<ForesightMakeAddMarketMetadataParams>
+  props: InputProps<ForesightMakeSetMarketMetadataParams>
 ) {
   return (
     <Select
