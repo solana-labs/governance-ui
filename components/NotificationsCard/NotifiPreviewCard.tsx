@@ -84,9 +84,6 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
               }
             }
           }
-          setIsLoading(false)
-        } catch (e) {
-          throw new Error(e)
         }
         setLoading(false)
       } catch (e) {
