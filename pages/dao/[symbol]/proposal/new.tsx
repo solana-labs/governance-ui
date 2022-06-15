@@ -54,6 +54,8 @@ import CreateNftPluginRegistrar from './components/instructions/NftVotingPlugin/
 import CreateNftPluginMaxVoterWeightRecord from './components/instructions/NftVotingPlugin/CreateMaxVoterWeightRecord'
 import ConfigureNftPluginCollection from './components/instructions/NftVotingPlugin/ConfigureCollection'
 import FriktionWithdraw from './components/instructions/Friktion/FriktionWithdraw'
+import FriktionClaimPendingDeposit from './components/instructions/Friktion/FriktionClaimPendingDeposit'
+import FriktionClaimPendingWithdraw from './components/instructions/Friktion/FriktionClaimPendingWithdraw'
 import MakeChangePerpMarket from './components/instructions/Mango/MakeChangePerpMarket'
 import MakeAddOracle from './components/instructions/Mango/MakeAddOracle'
 import MakeAddSpotMarket from './components/instructions/Mango/MakeAddSpotMarket'
@@ -67,13 +69,15 @@ import MakeInitCategoryParams from './components/instructions/Foresight/MakeInit
 import MakeResolveMarketParams from './components/instructions/Foresight/MakeResolveMarketParams'
 import MakeAddMarketListToCategoryParams from './components/instructions/Foresight/MakeAddMarketListToCategoryParams'
 import RealmConfig from './components/instructions/RealmConfig'
-import MakeAddMarketMetadataParams from './components/instructions/Foresight/MakeAddMarketMetadataParams'
+import MakeSetMarketMetadataParams from './components/instructions/Foresight/MakeSetMarketMetadataParams'
 import CloseTokenAccount from './components/instructions/CloseTokenAccount'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import CastleWithdraw from './components/instructions/Castle/CastleWithdraw'
 import ChangeDonation from './components/instructions/Change/ChangeDonation'
 import VotingMintConfig from './components/instructions/Vsr/VotingMintConfig'
 import CreateVsrRegistrar from './components/instructions/Vsr/CreateRegistrar'
+import GoblinGoldDeposit from './components/instructions/GoblinGold/GoblinGoldDeposit'
+import GoblinGoldWithdraw from './components/instructions/GoblinGold/GoblinGoldWithdraw'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -318,14 +322,27 @@ const New = () => {
         return <CustomBase64 index={idx} governance={governance}></CustomBase64>
       case Instructions.None:
         return <Empty index={idx} governance={governance}></Empty>
-      case Instructions.DepositIntoCastle:
-        return <CastleDeposit index={idx} governance={governance} />
-      case Instructions.WithrawFromCastle:
-        return <CastleWithdraw index={idx} governance={governance} />
       case Instructions.DepositIntoVolt:
         return <FriktionDeposit index={idx} governance={governance} />
       case Instructions.WithdrawFromVolt:
         return <FriktionWithdraw index={idx} governance={governance} />
+      case Instructions.ClaimPendingDeposit:
+        return (
+          <FriktionClaimPendingDeposit index={idx} governance={governance} />
+        )
+      case Instructions.ClaimPendingWithdraw:
+        return (
+          <FriktionClaimPendingWithdraw index={idx} governance={governance} />
+        )
+      case Instructions.DepositIntoCastle:
+        return <CastleDeposit index={idx} governance={governance} />
+      case Instructions.WithrawFromCastle:
+        return <CastleWithdraw index={idx} governance={governance} />
+      case Instructions.DepositIntoGoblinGold:
+        return <GoblinGoldDeposit index={idx} governance={governance} />
+      case Instructions.WithdrawFromGoblinGold:
+        return <GoblinGoldWithdraw index={idx} governance={governance} />
+
       case Instructions.CreateSolendObligationAccount:
         return <CreateObligationAccount index={idx} governance={governance} />
       case Instructions.InitSolendObligationAccount:
@@ -450,12 +467,12 @@ const New = () => {
             governance={governance}
           ></MakeAddMarketListToCategoryParams>
         )
-      case Instructions.ForesightAddMarketMetadata:
+      case Instructions.ForesightSetMarketMetadata:
         return (
-          <MakeAddMarketMetadataParams
+          <MakeSetMarketMetadataParams
             index={idx}
             governance={governance}
-          ></MakeAddMarketMetadataParams>
+          ></MakeSetMarketMetadataParams>
         )
       case Instructions.RealmConfig:
         return <RealmConfig index={idx} governance={governance}></RealmConfig>

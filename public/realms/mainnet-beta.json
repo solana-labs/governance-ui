@@ -40,7 +40,7 @@
   },
   {
     "symbol": "MangoLiquidityDAO",
-    "displayName": "Mango Liquidity DAO",
+    "displayName": "Mango Liquidity Council",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "DnWHRVRbA2XGwWth2da7iF3Q81cqRHhqJXSPS8J3G6fo",
     "website": "https://mango.markets",
@@ -56,11 +56,11 @@
     "website": "https://wezesha.co",
     "keywords": "Wezesha DAO, Wezesha, Wezesha Coin, The Big Five NFTs Club, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, SPL-TOKEN, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
     "twitter": "@WezeshaCo",
-    "ogImage": "/realms/WezeshaDAO/img/Wezesha_logo.png"
+    "ogImage": "/realms/WezeshaDAO/img/wezesha_dao_logo.png"
   },
   {
     "symbol": "BFNC",
-    "displayName": "BNFC DAO",
+    "displayName": "BFNC DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "36YGaNUYtRbaq1fHL4inLvHDxb7W28dBxWSna64v9Tea",
     "website": "https://bigfivenftclub.com",
@@ -144,7 +144,8 @@
     "symbol": "Governance",
     "displayName": "Governance",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "FMEWULPSGR1BKVJK4K7xTjhG23NfYxeAn2bamYgNoUck"
+    "realmId": "FMEWULPSGR1BKVJK4K7xTjhG23NfYxeAn2bamYgNoUck",
+    "ogImage": "/realms/Governance/img/spl-governance-logo.svg"
   },
   {
     "symbol": "Yield Farming",
@@ -778,5 +779,23 @@
     "website": "https://createdby.io",
     "twitter": "@CreatedByIO",
     "ogImage": "/realms/CreatedBy/CreatedBy.png"
-  }
+  },
+    {
+    "symbol": "SAMO",
+    "displayName": "SamoDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "GC6GDrJTVEY2ZxQ9NaC7n54tvz2HKM5f29LBzP7SjJ6h",
+    "website": "https://samoyedcoin.com",
+    "twitter": "@Samo_DAO",
+    "ogImage": "/realms/SamoDAO/SamoDAO.png"
+    },
+    {
+      "symbol": "FORE",
+      "displayName": "Foresight DAO",
+      "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+      "realmId": "CZatgrcvaDN9ib1sQeSCJWUnBXc899ydTB9vfAHHBVfP",
+      "ogImage": "https://www.foresight.exchange/logo.png",
+      "website": "https://www.foresight.exchange/",
+      "twitter": "@foresightmkt"
+    }
 ]

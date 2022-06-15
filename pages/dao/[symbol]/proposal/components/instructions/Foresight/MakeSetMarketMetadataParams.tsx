@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React from 'react'
-import { ForesightMakeAddMarketMetadataParams } from '@utils/uiTypes/proposalCreationTypes'
+import { ForesightMakeSetMarketMetadataParams } from '@utils/uiTypes/proposalCreationTypes'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import {
   governance as foresightGov,
   consts as foresightConsts,
   utils,
-  consts,
 } from '@foresight-tmp/foresight-sdk'
 import {
   commonAssets,
@@ -16,9 +15,8 @@ import {
   ForesightMarketListIdInput,
   ForesightMarketMetadataFieldSelect,
 } from '@utils/Foresight'
-import { PublicKey } from '@solana/web3.js'
 
-export default function MakeAddMarketMetadataParams({
+export default function MakeSetMarketMetadataParams({
   index,
   governance,
 }: {
@@ -30,7 +28,7 @@ export default function MakeAddMarketMetadataParams({
     effector,
     governedAccountSelect,
     wallet,
-  } = commonAssets<ForesightMakeAddMarketMetadataParams>(
+  } = commonAssets<ForesightMakeSetMarketMetadataParams>(
     {
       marketListId: '',
       marketId: 0,
@@ -42,14 +40,13 @@ export default function MakeAddMarketMetadataParams({
     index,
     governance
   )
-  async function ixCreator(form: ForesightMakeAddMarketMetadataParams) {
+  async function ixCreator(form: ForesightMakeSetMarketMetadataParams) {
     const field = foresightConsts.MARKET_METADATA_FIELDS[form.field]
     const { ix } = await foresightGov.genWriteToFieldMarketMetadataIx(
       utils.intToArray(form.marketId, 1),
       Buffer.from(form.marketListId.padEnd(20)),
       form.content,
       new field(),
-      new PublicKey(consts.DEVNET_PID),
       wallet!.publicKey!
     )
     return ix
