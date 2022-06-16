@@ -8,8 +8,8 @@ import CreateDAOWizard from '@components/NewRealmWizard/CreateDAOWizard'
 import useWalletStore from 'stores/useWalletStore'
 
 // import { FORM_NAME as NFT_FORM } from 'pages/realms/new/nft'
-import { FORM_NAME as COMMUNITY_TOKEN_FORM } from 'pages/realms/new/multisig'
-import { FORM_NAME as MULTISIG_WALLET_FORM } from 'pages/realms/new/community-token'
+import { FORM_NAME as MULTISIG_WALLET_FORM } from 'pages/realms/new/multisig'
+import { FORM_NAME as COMMUNITY_TOKEN_FORM } from 'pages/realms/new/community-token'
 
 export const Section = ({ children }) => {
   return (
