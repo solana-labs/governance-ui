@@ -96,12 +96,17 @@ export default function AddCouncilForm({
   useEffect(() => {
     if (!useExistingCouncilToken) {
       setValue('councilTokenMintAddress', '')
-      setValue('transferCouncilMintAuthority', undefined, {
-        shouldValidate: true,
-      })
+      setValue('transferCouncilMintAuthority', undefined)
       setCouncilTokenInfo(undefined)
+      setValidMintAddress(false)
     }
   }, [useExistingCouncilToken])
+
+  useEffect(() => {
+    if (!addCouncil) {
+      setValue('useExistingCouncilToken', undefined, { shouldValidate: true })
+    }
+  }, [addCouncil])
 
   function handleTokenInput({
     tokenInfo,
@@ -112,7 +117,9 @@ export default function AddCouncilForm({
     setCouncilTokenInfo(tokenInfo)
     setValidMintAddress(validMintAddress)
     if (walletIsMintAuthority) {
-      setValue('transferCouncilMintAuthority', undefined)
+      setValue('transferCouncilMintAuthority', undefined, {
+        shouldValidate: true,
+      })
     } else {
       setValue('transferCouncilMintAuthority', false, {
         shouldValidate: true,
