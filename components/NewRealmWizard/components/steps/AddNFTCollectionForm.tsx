@@ -247,7 +247,7 @@ export default function AddNFTCollectionForm({
     setFocus,
     clearErrors,
     handleSubmit,
-    formState: { isValid },
+    formState: { errors, isValid },
   } = useForm({
     mode: 'all',
     resolver: yupResolver(schema),
@@ -282,14 +282,11 @@ export default function AddNFTCollectionForm({
     onSubmit({ step: currentStep, data })
   }
 
-  async function handleAdd() {
+  async function handleAdd(collectionInput) {
     clearErrors()
 
-    const collectionInput = getValues('collectionInput')
-    const isValidAddress = validateSolAddress(collectionInput)
-
-    if (isValidAddress) {
-      handleClearSelectedNFT()
+    if (validateSolAddress(collectionInput)) {
+      handleClearSelectedNFT(false)
       setRequestPending(true)
       try {
         const collectionInfo = await getNFTCollectionInfo(
@@ -308,19 +305,25 @@ export default function AddNFTCollectionForm({
           { shouldFocus: true }
         )
       }
+    } else {
+      setError('collectionInputError', {
+        type: 'custom',
+        message: 'Address is invalid',
+      })
     }
   }
 
-  async function handleClearSelectedNFT() {
-    setValue('collectionInput', '')
+  async function handleClearSelectedNFT(clearInput = true) {
+    if (clearInput) {
+      setValue('collectionInput', '')
+    }
     setValue('collectionKey', '')
     setSelectedNFTCollection(undefined)
   }
 
   async function handlePaste(ev) {
     const value = ev.clipboardData.getData('text')
-    setValue('collectionInput', value, { shouldValidate: true })
-    handleAdd()
+    handleAdd(value)
   }
 
   async function handleSelectFromWallet() {
@@ -440,15 +443,21 @@ export default function AddNFTCollectionForm({
               <Input
                 placeholder="e.g. SMBH3wF6baUj6JWtzYvqcKuj2XCKWDqQxzspY12xPND"
                 data-testid="nft-address"
-                error={error?.message || ''}
+                error={
+                  error?.message || errors?.collectionInputError?.message || ''
+                }
                 {...field}
                 disabled={requestPending}
                 onKeyDown={(ev) => {
                   if (ev.key === 'Enter') {
-                    handleAdd()
+                    handleAdd(ev.currentTarget.value)
                   }
                 }}
                 onPaste={handlePaste}
+                onBlur={(ev) => {
+                  field.onBlur()
+                  handleAdd(ev.currentTarget.value)
+                }}
               />
               <div className="flex items-center justify-center space-x-4 md:justify-start">
                 <Text level="2">or</Text>
