@@ -272,6 +272,15 @@
     "sortRank":3 
   },
   {
+      "symbol": "RED",
+      "displayName": "Realms Ecosystem DAO",
+      "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+      "realmId": "C1tyCAEnbt4d63nbF36PGLc8gCC9DdtRXttXWGZwsAdF",
+      "ogImage": "/realms/RED/RED.png",
+      "website": "Realms.Today",
+      "twitter": "@Realms_DAOs"
+  },
+  {
     "symbol": "MonkeDAO",
     "displayName": "MonkeDAO",
     "programId": "GMnke6kxYvqoAXgbFGnu84QzvNHoqqTnijWSXYYTFQbB",
@@ -797,14 +806,5 @@
       "ogImage": "https://www.foresight.exchange/logo.png",
       "website": "https://www.foresight.exchange/",
       "twitter": "@foresightmkt"
-    }
-    {
-      "symbol": "RED",
-      "displayName": "Realms Ecosystem DAO",
-      "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-      "realmId": "C1tyCAEnbt4d63nbF36PGLc8gCC9DdtRXttXWGZwsAdF",
-      "ogImage": "/realms/RED/RED.png",
-      "website": "Realms.Today",
-      "twitter": "@Realms_DAOs"
     }
 ]
