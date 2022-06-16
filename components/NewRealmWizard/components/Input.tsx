@@ -23,32 +23,30 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       Icon ? 'pl-8' : 'pl-2'
     } ${
       suffix ? 'pr-8' : 'pr-2'
-    } pt-[15px] pb-[21px] default-transition rounded-t rounded-b-none outline-none border-0 border-b border-bkg-4 bg-bkg-3`
+    } pt-[15px] pb-[21px] default-transition rounded-t rounded-b-none outline-none border-b border-b-bkg-4 bg-bkg-2`
 
     if (hasContent) {
-      classNames += ` text-fgd-1 cursor-text`
+      classNames += ` cursor-text`
     } else {
-      classNames += ` border-bkg-3 cursor-pointer`
+      classNames += ` cursor-pointer`
     }
 
     classNames += `
-      placeholder:text-fgd-2
-      active:placeholder:text-fgd-3 
-      focus:placeholder:text-fgd-3 
-
+      placeholder:text-bkg-4
+      active:bg-bkg-3
+      focus:bg-bkg-3
+      hover:bg-bkg-3
       hover:border-fgd-2
-
       
       focus:outline-none 
-      focus:border-b-[#00E4FF]
+      focus:border-primary-light
 
-      active:border-b-[#00E4FF]
+      active:border-primary-light
       
-      disabled:placeholder:text-fgd-2
-      disabled:active:border-b-fgd-3
       disabled:cursor-not-allowed 
-      disabled:hover:bg-transparent
       disabled:opacity-30
+      disabled:hover:bg-bkg-2
+      disabled:hover:border-b-bkg-4
       `
 
     if (error) {
@@ -62,7 +60,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       <div className="relative">
         <div
           className={`absolute top-[21px] left-2 max-w-[16px]  ${
-            props.disabled ? 'text-white/10' : 'text-white/30'
+            props.disabled ? 'opacity-30' : 'text-fgd-4'
           }`}
         >
           {Icon ? Icon : ''}
@@ -70,7 +68,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
         <div
           className={`absolute top-[21px] right-2 max-w-[16px]  ${
-            props.disabled ? 'text-white/10' : 'text-white/30'
+            props.disabled ? 'opacity-30' : 'text-fgd-4'
           }`}
         >
           {suffix ? suffix : ''}
@@ -204,7 +202,7 @@ export function InputRangeSlider({
         />
       </div>{' '}
       <div
-        className={`relative flex items-center w-full my-6 space-x-4 md:my-0 bg-white/5 h-[64px] rounded px-6 grow ${
+        className={`relative flex items-center w-full my-6 space-x-4 md:my-0 bg-bkg-2 h-[64px] rounded px-6 grow ${
           disabled ? 'opacity-50' : ''
         }`}
       >

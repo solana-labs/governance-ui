@@ -236,7 +236,6 @@ body::-webkit-scrollbar-corner {
 input[type='range'].with-gradient {
   -webkit-appearance: none;
   height: 16px;
-  background: #201f27;
   border-radius: 5px;
   background-image: linear-gradient(
     to right,
@@ -246,6 +245,7 @@ input[type='range'].with-gradient {
   );
   background-size: 50% 100%;
   background-repeat: no-repeat;
+  @apply bg-bkg-3;
 }
 
 input[type='range'].with-gradient::-moz-range-thumb {
