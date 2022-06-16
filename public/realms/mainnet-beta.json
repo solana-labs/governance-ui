@@ -250,7 +250,6 @@
     "twitter": "@grapeprotocol",
     "sortRank":3 
   },
-
   {
     "symbol": "RED",
     "displayName": "Realms Ecosystem DAO",
@@ -260,7 +259,6 @@
     "twitter": "@Realms_DAOs",
     "ogImage": "/realms/RED/RED.png"
   },
-  
   {
     "symbol": "MonkeDAO",
     "displayName": "MonkeDAO",
