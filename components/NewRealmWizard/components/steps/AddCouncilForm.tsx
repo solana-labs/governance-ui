@@ -164,7 +164,7 @@ export default function AddCouncilForm({
         type={type}
         currentStep={currentStep}
         totalSteps={totalSteps}
-        title="Add a council to your DAO."
+        title="Add a council to your DAO"
       />
       <div className="space-y-10 md:space-y-20">
         <Text level="1" className="mt-10 mb-16 md:my-18 md:w-[550px]">

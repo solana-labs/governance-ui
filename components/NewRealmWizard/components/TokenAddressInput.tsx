@@ -6,12 +6,16 @@ import { PublicKey } from '@solana/web3.js'
 import useWalletStore from 'stores/useWalletStore'
 import { tryGetMint } from '@utils/tokens'
 import { validateSolAddress } from '@utils/formValidation'
+import { getMintSupplyAsDecimal } from '@tools/sdk/units'
 
 import Input from '@components/NewRealmWizard/components/Input'
 import TokenInfoTable from '@components/NewRealmWizard/components/TokenInfoTable'
 
+interface MintInfoWithDecimalSupply extends MintInfo {
+  supplyAsDecimal: number
+}
 export interface TokenWithMintInfo extends TokenInfo {
-  mint: MintInfo | undefined
+  mint: MintInfoWithDecimalSupply | undefined
 }
 
 const PENDING_COIN: TokenWithMintInfo = {
@@ -29,6 +33,7 @@ const PENDING_COIN: TokenWithMintInfo = {
     freezeAuthority: null,
     decimals: 3,
     isInitialized: false,
+    supplyAsDecimal: 0,
   },
 }
 
@@ -83,7 +88,13 @@ export default function TokenAddressInput({
           tokenList?.find((token) => token.address === tokenMintAddress) ||
           NOTFOUND_COIN
 
-        setTokenInfo({ ...tokenInfo, mint: mintInfo?.account })
+        setTokenInfo({
+          ...tokenInfo,
+          mint: {
+            ...mintInfo.account,
+            supplyAsDecimal: getMintSupplyAsDecimal(mintInfo.account),
+          },
+        })
       } else {
         setTokenInfo(undefined)
       }

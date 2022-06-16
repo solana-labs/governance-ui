@@ -22,7 +22,7 @@ export const CommunityTokenSchema = {
   communityTokenMintAddress: yup
     .string()
     .when('useExistingCommunityToken', {
-      is: (val) => val == true,
+      is: true,
       then: yup.string().required('Required'),
       otherwise: yup.string().optional(),
     })
@@ -36,7 +36,7 @@ export const CommunityTokenSchema = {
       'You must specify whether you which to transfer mint authority'
     )
     .when('useExistingCommunityToken', {
-      is: (val) => val == true,
+      is: true,
       then: yup.boolean().required('Required'),
       otherwise: yup.boolean().optional(),
     }),
@@ -44,8 +44,11 @@ export const CommunityTokenSchema = {
     .number()
     .positive('Must be greater than 0')
     .transform((value) => (isNaN(value) ? undefined : value))
-    .when('useExistingCommunityToken', {
-      is: (val) => val == true,
+    .when(['tokenSupply', 'useExistingCommunityToken'], {
+      is: (tokenSupply, useExistingCommunityToken) => {
+        if (!useExistingCommunityToken) return false
+        return isNaN(tokenSupply) ? false : tokenSupply > 0
+      },
       then: yup.number().required('Required'),
       otherwise: yup.number().optional(),
     }),
@@ -100,7 +103,9 @@ export default function CommunityTokenForm({
 
   useEffect(() => {
     if (!useExistingCommunityToken) {
-      setValue('communityTokenMintAddress', '')
+      setValue('communityTokenMintAddress', undefined)
+      setValue('tokenSupply', undefined)
+      setValue('minimumNumberOfCommunityTokensToGovern', undefined)
       setValue('transferCommunityMintAuthority', undefined, {
         shouldValidate: true,
       })
@@ -123,6 +128,19 @@ export default function CommunityTokenForm({
       setValue('transferCommunityMintAuthority', false, {
         shouldValidate: true,
       })
+    }
+
+    if (validMintAddress) {
+      if (tokenInfo?.mint?.supplyAsDecimal > 0) {
+        setValue('tokenSupply', tokenInfo.mint.supplyAsDecimal)
+        setValue(
+          'minimumNumberOfCommunityTokensToGovern',
+          Math.ceil(tokenInfo.mint.supplyAsDecimal * 0.01)
+        )
+      } else {
+        setValue('tokenSupply', undefined)
+        setValue('minimumNumberOfCommunityTokensToGovern', undefined)
+      }
     }
 
     if (validMintAddress || /finding/.test(tokenInfo?.name)) {
@@ -162,7 +180,7 @@ export default function CommunityTokenForm({
         type={type}
         currentStep={currentStep}
         totalSteps={totalSteps}
-        title="Next, determine the community token your DAO will use for governance tasks"
+        title="Next, determine the DAO's community token"
       />
       <div className="mt-16 space-y-10 md:mt-24 md:space-y-20">
         <Controller
@@ -174,7 +192,7 @@ export default function CommunityTokenForm({
             <div className="pt-3">
               <FormField
                 title="Do you have an existing token for your DAO's community?"
-                description=""
+                description="Holders of this token will be able to vote and/or edit your DAO."
               >
                 <RadioGroup
                   {...field}
@@ -196,7 +214,7 @@ export default function CommunityTokenForm({
               render={({ field, fieldState: { error } }) => (
                 <FormField
                   title="What is the address of the community token you would like to use?"
-                  description="You can verify the correct token in the preview below."
+                  description="If your token is listed with Solana, you'll see a preview below."
                   className="mt-10 md:mt-16"
                 >
                   <TokenAddressInput
@@ -238,35 +256,37 @@ export default function CommunityTokenForm({
                   )}
                 />
 
-                <Controller
-                  name="minimumNumberOfCommunityTokensToGovern"
-                  control={control}
-                  defaultValue={1000000}
-                  render={({ field }) => (
-                    <FormField
-                      title="What is the minimum number of community tokens needed to manage this DAO?"
-                      description="A user will need at least this many community token to edit the DAO"
-                      disabled={!validMintAddress}
-                    >
-                      <Input
-                        type="tel"
-                        placeholder="1,000,000"
-                        data-testid="dao-name-input"
-                        Icon={<GenericTokenIcon />}
-                        error={
-                          errors.minimumNumberOfCommunityTokensToGovern
-                            ?.message || ''
-                        }
-                        {...field}
+                {!!communityTokenInfo?.mint?.supplyAsDecimal && (
+                  <Controller
+                    name="minimumNumberOfCommunityTokensToGovern"
+                    control={control}
+                    defaultValue={''}
+                    render={({ field }) => (
+                      <FormField
+                        title="What is the minimum number of community tokens needed to manage this DAO?"
+                        description="A user will need at least this many community token to edit the DAO"
                         disabled={!validMintAddress}
-                        onChange={(ev) => {
-                          preventNegativeNumberInput(ev)
-                          field.onChange(ev)
-                        }}
-                      />
-                    </FormField>
-                  )}
-                />
+                      >
+                        <Input
+                          type="tel"
+                          placeholder="1,000,000"
+                          data-testid="dao-name-input"
+                          Icon={<GenericTokenIcon />}
+                          error={
+                            errors.minimumNumberOfCommunityTokensToGovern
+                              ?.message || ''
+                          }
+                          {...field}
+                          disabled={!validMintAddress}
+                          onChange={(ev) => {
+                            preventNegativeNumberInput(ev)
+                            field.onChange(ev)
+                          }}
+                        />
+                      </FormField>
+                    )}
+                  />
+                )}
               </>
             )}
           </>
