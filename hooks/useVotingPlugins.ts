@@ -30,7 +30,6 @@ import {
 } from 'pyth-staking-api'
 import useGatewayPluginStore from '../GatewayPlugin/store/gatewayPluginStore'
 import { getGatekeeperNetwork } from '../GatewayPlugin/sdk/accounts'
-import { useGateway } from '@civic/solana-gateway-react'
 
 export const vsrPluginsPks: string[] = [
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo',
@@ -71,7 +70,6 @@ export function useVotingPlugins() {
     setIsLoadingNfts,
   } = useNftPluginStore()
   const {
-    setGatewayToken,
     setIsLoadingGatewayToken,
     setGatekeeperNetwork,
   } = useGatewayPluginStore()
@@ -92,15 +90,6 @@ export function useVotingPlugins() {
     (s) => s.state.switchboardClient
   )
   const pythClient = useVotePluginsClientStore((s) => s.state.pythClient)
-  const { gatewayToken } = useGateway()
-
-  // As soon as the Civic GatewayProvider finds a gateway token
-  // add it to the state, so that the voting plugin can use it
-  useEffect(() => {
-    if (gatewayToken) {
-      setGatewayToken(gatewayToken.publicKey, currentClient)
-    }
-  }, [gatewayToken])
 
   const currentClient = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
