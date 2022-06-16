@@ -11,18 +11,16 @@ import { abbreviateAddress } from '@utils/formatting'
 
 import useWalletStore from 'stores/useWalletStore'
 
-// import { Dialog, Transition } from '@headlessui/react'
+import { NewButton as Button } from '@components/Button'
+import Text from '@components/Text'
 import FormHeader from '@components/NewRealmWizard/components/FormHeader'
 import FormField from '@components/NewRealmWizard/components/FormField'
 import FormFooter from '@components/NewRealmWizard/components/FormFooter'
-import { NewButton as Button } from '@components/Button'
 import Input, {
   InputRangeSlider,
 } from '@components/NewRealmWizard/components/Input'
-// import Header from '../components_2/ProductHeader'
-import Text from '@components/Text'
 import ThresholdAdviceBox from '@components/NewRealmWizard/components/ThresholdAdviceBox'
-import NFTCollectionModal from '../NFTCollectionModal'
+import NFTCollectionModal from '@components/NewRealmWizard/components/NFTCollectionModal'
 
 function filterAndMapVerifiedCollections(nfts) {
   return nfts
@@ -241,7 +239,6 @@ export default function AddNFTCollectionForm({
     control,
     register,
     watch,
-    getValues,
     setValue,
     setError,
     setFocus,
