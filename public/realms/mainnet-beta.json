@@ -272,13 +272,14 @@
     "sortRank":3 
   },
   {
-      "symbol": "RED",
-      "displayName": "Realms Ecosystem DAO",
-      "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-      "realmId": "C1tyCAEnbt4d63nbF36PGLc8gCC9DdtRXttXWGZwsAdF",
-      "ogImage": "/realms/RED/RED.png",
-      "website": "Realms.Today",
-      "twitter": "@Realms_DAOs"
+    "symbol": "RED",
+    "displayName": "Realms Ecosystem DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "C1tyCAEnbt4d63nbF36PGLc8gCC9DdtRXttXWGZwsAdF",
+    "ogImage": "/realms/RED/RED.png",
+    "website": "https://realms.notion.site/Realms-Ecosystem-DAO-RED-2b82519e797b4696968c5c909812f418",
+    "twitter": "@Realms_DAOs"
+    "sortRank":2
   },
   {
     "symbol": "MonkeDAO",
