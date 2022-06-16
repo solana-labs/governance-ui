@@ -271,7 +271,9 @@ export default function WizardSummary({
         )}
         {programId && (
           <SummaryModule title="Program ID" advancedOption>
-            <Header as="h3">{programId}</Header>
+            <div className="grid">
+              <div className="truncate input-base">{programId}</div>
+            </div>
           </SummaryModule>
         )}
       </div>
