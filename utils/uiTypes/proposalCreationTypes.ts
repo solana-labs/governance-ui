@@ -59,7 +59,20 @@ export interface FriktionWithdrawForm {
   amount: number | undefined
   governedTokenAccount: AssetAccount | undefined
   voltVaultId: string
-  depositTokenMint: string | undefined
+  programId: string | undefined
+  mintInfo: MintInfo | undefined
+}
+
+export interface FriktionClaimPendingDepositForm {
+  governedTokenAccount: AssetAccount | undefined
+  voltVaultId: string
+  programId: string | undefined
+  mintInfo: MintInfo | undefined
+}
+
+export interface FriktionClaimPendingWithdrawForm {
+  governedTokenAccount: AssetAccount | undefined
+  voltVaultId: string
   programId: string | undefined
   mintInfo: MintInfo | undefined
 }
@@ -255,6 +268,16 @@ export interface EmptyInstructionForm {
   governedAccount: AssetAccount | undefined
 }
 
+export interface SwitchboardAdmitOracleForm {
+  oraclePubkey: PublicKey | undefined
+  queuePubkey: PublicKey | undefined
+}
+
+export interface SwitchboardRevokeOracleForm {
+  oraclePubkey: PublicKey | undefined
+  queuePubkey: PublicKey | undefined
+}
+
 export interface CreateAssociatedTokenAccountForm {
   governedAccount?: AssetAccount
   splTokenMintUIName?: SplTokenUIName
@@ -307,16 +330,20 @@ export enum Instructions {
   Grant,
   Clawback,
   CreateAssociatedTokenAccount,
-  DepositIntoCastle,
-  WithrawFromCastle,
   DepositIntoVolt,
   WithdrawFromVolt,
+  ClaimPendingDeposit,
+  ClaimPendingWithdraw,
+  DepositIntoCastle,
+  WithrawFromCastle,
   DepositIntoGoblinGold,
   WithdrawFromGoblinGold,
   CreateSolendObligationAccount,
   InitSolendObligationAccount,
   DepositReserveLiquidityAndObligationCollateral,
   WithdrawObligationCollateralAndRedeemReserveLiquidity,
+  SwitchboardAdmitOracle,
+  SwitchboardRevokeOracle,
   RefreshSolendObligation,
   RefreshSolendReserve,
   ForesightInitMarket,

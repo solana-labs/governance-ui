@@ -92,6 +92,8 @@ export const createProposal = async (
 
   // Explicitly request the version before making RPC calls to work around race conditions in resolving
   // the version for RealmInfo
+
+  // Changed this because it is misbehaving on my local validator setup.
   const programVersion = await getGovernanceProgramVersion(
     connection,
     programId
@@ -209,7 +211,6 @@ export const createProposal = async (
       sendingMessage: `creating ${notificationTitle}`,
       successMessage: `${notificationTitle} created`,
     })
-
     await sendTransaction({
       transaction: transaction2,
       wallet,

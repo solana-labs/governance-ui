@@ -6,6 +6,7 @@ import {
   gatewayPluginsPks,
   nftPluginsPks,
   vsrPluginsPks,
+  switchboardPluginsPks,
 } from '@hooks/useVotingPlugins'
 import GatewayCard from '@components/Gateway/GatewayCard'
 
@@ -17,6 +18,9 @@ const LockPluginTokenBalanceCard = dynamic(
 )
 const TokenBalanceCard = dynamic(() => import('./TokenBalanceCard'))
 const NftBalanceCard = dynamic(() => import('./NftBalanceCard'))
+const SwitchboardPermissionCard = dynamic(
+  () => import('./SwitchboardPermissionCard')
+)
 
 const TokenBalanceCardWrapper = ({
   proposal,
@@ -38,6 +42,9 @@ const TokenBalanceCardWrapper = ({
       currentPluginPk && nftPluginsPks.includes(currentPluginPk?.toBase58())
     const isGatewayMode =
       currentPluginPk && gatewayPluginsPks.includes(currentPluginPk?.toBase58())
+    const isSwitchboardMode =
+      currentPluginPk &&
+      switchboardPluginsPks.includes(currentPluginPk?.toBase58())
 
     if (
       isLockTokensMode &&
@@ -63,8 +70,14 @@ const TokenBalanceCardWrapper = ({
         </>
       )
     }
-
-    // if (isGatewayMode) return <GatewayCard></GatewayCard>
+    if (
+      isSwitchboardMode &&
+      (!ownTokenRecord ||
+        ownTokenRecord.account.governingTokenDepositAmount.isZero())
+    ) {
+      console.log('IS SWITCHBOARD MODE')
+      return <SwitchboardPermissionCard></SwitchboardPermissionCard>
+    }
     //Default
     return (
       <TokenBalanceCard proposal={proposal}>

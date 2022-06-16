@@ -4,6 +4,7 @@ import {
   NftVoterClient,
   GatewayClient,
 } from '@solana/governance-program-library'
+import { SwitchboardQueueVoterClient } from '../SwitchboardVotePlugin/SwitchboardQueueVoterClient'
 import { getRegistrarPDA, Registrar } from 'VoteStakeRegistry/sdk/accounts'
 import { AnchorProvider, Wallet } from '@project-serum/anchor'
 import { tryGetNftRegistrar, tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
@@ -23,6 +24,7 @@ interface UseVotePluginsClientStore extends State {
     vsrClient: VsrClient | undefined
     nftClient: NftVoterClient | undefined
     gatewayClient: GatewayClient | undefined
+    switchboardClient: SwitchboardQueueVoterClient | undefined
     pythClient: PythClient | undefined
     voteStakeRegistryRegistrar: Registrar | null
     nftMintRegistrar: any
@@ -35,6 +37,10 @@ interface UseVotePluginsClientStore extends State {
     connection: ConnectionContext
   ) => void
   handleSetNftClient: (
+    wallet: SignerWalletAdapter | undefined,
+    connection: ConnectionContext
+  ) => void
+  handleSetSwitchboardClient: (
     wallet: SignerWalletAdapter | undefined,
     connection: ConnectionContext
   ) => void
@@ -69,6 +75,7 @@ const defaultState = {
   vsrClient: undefined,
   nftClient: undefined,
   gatewayClient: undefined,
+  switchboardClient: undefined,
   pythClient: undefined,
   voteStakeRegistryRegistrar: null,
   voteStakeRegistryRegistrarPk: null,
@@ -151,6 +158,21 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
       const existingRegistrar = await tryGetGatewayRegistrar(registrar, client!)
       set((s) => {
         s.state.gatewayRegistrar = existingRegistrar
+      })
+    },
+    handleSetSwitchboardClient: async (wallet, connection) => {
+      const options = AnchorProvider.defaultOptions()
+      const provider = new AnchorProvider(
+        connection.current,
+        (wallet as unknown) as Wallet,
+        options
+      )
+      const switchboardClient = await SwitchboardQueueVoterClient.connect(
+        provider,
+        connection.cluster === 'devnet'
+      )
+      set((s) => {
+        s.state.switchboardClient = switchboardClient
       })
     },
     handleSetPythClient: async (wallet, connection) => {
