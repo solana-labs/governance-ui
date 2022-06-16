@@ -99,7 +99,8 @@ function CommunityInfo({
               level="2"
               className="flex items-center px-6 py-1 rounded bg-bkg-3"
             >
-              {nftInfo?.nftCollectionCount?.toLocaleString()} NFTs
+              {nftInfo?.nftCollectionCount?.toLocaleString()}
+              {nftInfo?.nftCollectionCount !== 1 ? ' NFTs' : ' NFT'}
             </Text>
           }
         >

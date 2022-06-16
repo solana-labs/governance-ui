@@ -496,7 +496,7 @@ export default function AddNFTCollectionForm({
                   <div className="text-green">Verified collection</div>
                   <div
                     className="underline hover:text-fgd-2 hover:cursor-pointer"
-                    onClick={handleClearSelectedNFT}
+                    onClick={() => handleClearSelectedNFT(true)}
                   >
                     Clear
                   </div>
