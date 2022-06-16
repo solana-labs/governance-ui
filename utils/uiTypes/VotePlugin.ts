@@ -2,6 +2,10 @@ import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 import { NftVoterClient } from '@solana/governance-program-library'
 import {
+  SwitchboardQueueVoterClient,
+  SWITCHBOARD_ADDIN_ID,
+} from '../../SwitchboardVotePlugin/SwitchboardQueueVoterClient'
+import {
   ProgramAccount,
   Realm,
   SYSTEM_PROGRAM_ID,
@@ -36,7 +40,12 @@ type UpdateVoterWeightRecordTypes =
   | 'signOffProposal'
 
 export interface VotingClientProps {
-  client: VsrClient | NftVoterClient | PythClient | undefined
+  client:
+    | VsrClient
+    | NftVoterClient
+    | SwitchboardQueueVoterClient
+    | PythClient
+    | undefined
   realm: ProgramAccount<Realm> | undefined
   walletPk: PublicKey | null | undefined
 }
@@ -49,6 +58,7 @@ enum VotingClientType {
   NoClient,
   VsrClient,
   NftVoterClient,
+  SwitchboardVoterClient,
   PythClient,
   GatewayClient,
 }
@@ -75,11 +85,19 @@ interface ProgramAddresses {
 
 //Abstract for common functions that plugins will implement
 export class VotingClient {
-  client: VsrClient | NftVoterClient | PythClient | GatewayClient | undefined
+  client:
+    | VsrClient
+    | NftVoterClient
+    | SwitchboardQueueVoterClient
+    | PythClient
+    | GatewayClient
+    | undefined
   realm: ProgramAccount<Realm> | undefined
   walletPk: PublicKey | null | undefined
   votingNfts: NFTWithMeta[]
   gatewayToken: PublicKey
+  oracles: PublicKey[]
+  instructions: TransactionInstruction[]
   clientType: VotingClientType
   noClient: boolean
   constructor({ client, realm, walletPk }: VotingClientProps) {
@@ -87,6 +105,8 @@ export class VotingClient {
     this.realm = realm
     this.walletPk = walletPk
     this.votingNfts = []
+    this.oracles = []
+    this.instructions = []
     this.noClient = true
     this.clientType = VotingClientType.NoClient
     if (this.client instanceof VsrClient) {
@@ -95,6 +115,10 @@ export class VotingClient {
     }
     if (this.client instanceof NftVoterClient) {
       this.clientType = VotingClientType.NftVoterClient
+      this.noClient = false
+    }
+    if (this.client instanceof SwitchboardQueueVoterClient) {
+      this.clientType = VotingClientType.SwitchboardVoterClient
       this.noClient = false
     }
     if (this.client instanceof GatewayClient) {
@@ -222,6 +246,14 @@ export class VotingClient {
         maxVoterWeightRecord: undefined,
       }
     }
+    if (this.client instanceof SwitchboardQueueVoterClient) {
+      instructions.push(this.instructions[0])
+      const [vwr] = await PublicKey.findProgramAddress(
+        [Buffer.from('VoterWeightRecord'), this.oracles[0].toBytes()],
+        SWITCHBOARD_ADDIN_ID
+      )
+      return { voterWeightPk: vwr, maxVoterWeightRecord: undefined }
+    }
   }
   withCastPluginVote = async (
     instructions: TransactionInstruction[],
@@ -330,6 +362,14 @@ export class VotingClient {
     }
 
     if (this.client instanceof VsrClient) {
+      const props = await this.withUpdateVoterWeightRecord(
+        instructions,
+        tokeOwnerRecord,
+        'castVote'
+      )
+      return props
+    }
+    if (this.client instanceof SwitchboardQueueVoterClient) {
       const props = await this.withUpdateVoterWeightRecord(
         instructions,
         tokeOwnerRecord,
@@ -536,5 +576,11 @@ export class VotingClient {
   }
   _setCurrentVoterGatewayToken = (gatewayToken: PublicKey) => {
     this.gatewayToken = gatewayToken
+  }
+  _setOracles = (oracles: PublicKey[]) => {
+    this.oracles = oracles
+  }
+  _setInstructions = (instructions: TransactionInstruction[]) => {
+    this.instructions = instructions
   }
 }

@@ -23,6 +23,7 @@
     ]
   },
   "dependencies": {
+    "@switchboard-xyz/switchboard-v2": "^0.0.110",
     "@blockworks-foundation/mango-client": "^3.5.0",
     "@blockworks-foundation/voter-stake-registry-client": "^0.2.3",
     "@cardinal/namespaces-components": "^2.5.5",
@@ -33,9 +34,9 @@
     "@dialectlabs/react-ui": "0.8.2",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
-    "@foresight-tmp/foresight-sdk": "^0.1.44",
-    "@friktion-labs/friktion-sdk": "^1.1.25",
-    "@headlessui/react": "^1.5.0",
+    "@friktion-labs/friktion-sdk": "^1.1.118",
+    "@foresight-tmp/foresight-sdk": "^0.1.46",
+    "@headlessui/react": "^1.6.0",
     "@heroicons/react": "^1.0.1",
     "@identity.com/solana-gateway-ts": "^0.8.2",
     "@marinade.finance/marinade-ts-sdk": "^2.0.9",
@@ -53,10 +54,10 @@
     "@project-serum/sol-wallet-adapter": "^0.2.6",
     "@sentry/nextjs": "^6.19.7",
     "@solana/buffer-layout": "^4.0.0",
-    "@solana/governance-program-library": "npm:@civic/governance-program-library#v0.16.0-beta4",
+    "@solana/governance-program-library": "npm:@civic/governance-program-library@0.16.0-beta4",
     "@solana/spl-governance": "^0.0.34",
     "@solana/spl-token": "0.1.8",
-    "@solana/spl-token-registry": "^0.2.3470",
+    "@solana/spl-token-registry": "^0.2.3775",
     "@solana/wallet-adapter-base": "^0.9.5",
     "@solana/wallet-adapter-glow": "^0.1.1",
     "@solana/wallet-adapter-phantom": "^0.9.3",
@@ -100,15 +101,15 @@
     "@types/react": "^17.0.44",
     "@typescript-eslint/eslint-plugin": "^5.21.0",
     "@typescript-eslint/parser": "^5.18.0",
-    "eslint": "^8.12.0",
-    "eslint-config-prettier": "^8.3.0",
+    "eslint": "^8.14.0",
+    "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-react": "^7.29.4",
-    "eslint-plugin-react-hooks": "^4.3.0",
+    "eslint-plugin-react-hooks": "^4.5.0",
     "husky": "^6.0.0",
     "jest": "^27.4.5",
     "lint-staged": "^10.0.10",
     "next-router-mock": "^0.6.7",
-    "postcss": "^8.2.12",
+    "postcss": "^8.4.12",
     "postcss-preset-env": "^6.7.0",
     "prettier": "^2.0.2",
     "tailwindcss": "^3.0.23",
@@ -119,5 +120,8 @@
     "twin": {
       "preset": "emotion"
     }
+  },
+  "resolutions": {
+    "port-sdk/@saberhq/token-utils": "1.12.53"
   }
 }
