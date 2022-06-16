@@ -251,6 +251,15 @@
     "sortRank":3 
   },
   {
+    "symbol": "RED",
+    "displayName": "Realms Ecosystem DAO",
+    "programId": "C1tyCAEnbt4d63nbF36PGLc8gCC9DdtRXttXWGZwsAdF",
+    "realmId": "4PYdZHs2hwZYibkvEnpVCJpU7bD4aFUkWtYxGFU25ZWu",
+    "website": "https://realms.notion.site/Realms-Ecosystem-DAO-RED-2b82519e797b4696968c5c909812f418",
+    "twitter": "@Realms_DAOs",
+    "ogImage": "/realms/RED/RED.png"
+  },
+  {
     "symbol": "MonkeDAO",
     "displayName": "MonkeDAO",
     "programId": "GMnke6kxYvqoAXgbFGnu84QzvNHoqqTnijWSXYYTFQbB",
