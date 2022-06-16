@@ -1,10 +1,15 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
+import Head from 'next/head'
 
 import { isWizardValid } from '@utils/formValidation'
 
 import CreateDAOWizard from '@components/NewRealmWizard/CreateDAOWizard'
 import useWalletStore from 'stores/useWalletStore'
+
+// import { FORM_NAME as NFT_FORM } from 'pages/realms/new/nft'
+import { FORM_NAME as COMMUNITY_TOKEN_FORM } from 'pages/realms/new/multisig'
+import { FORM_NAME as MULTISIG_WALLET_FORM } from 'pages/realms/new/community-token'
 
 export const Section = ({ children }) => {
   return (
@@ -29,6 +34,13 @@ export default function FormPage({
   })
   const { query, push } = useRouter()
   const currentStep = formData?.currentStep || 0
+  const title = `Create ${
+    type === MULTISIG_WALLET_FORM
+      ? 'multi-signature wallet'
+      : type === COMMUNITY_TOKEN_FORM
+      ? 'community token DAO'
+      : 'NFT community DAO'
+  } | Realms`
 
   useEffect(() => {
     async function tryToConnect() {
@@ -113,17 +125,22 @@ export default function FormPage({
   }
 
   return (
-    <Section>
-      <CreateDAOWizard
-        type={type}
-        steps={steps}
-        currentStep={currentStep}
-        formData={formData}
-        handlePreviousButton={handlePreviousButton}
-        handleNextButtonClick={handleNextButtonClick}
-        handleSubmit={handleSubmit}
-        submissionPending={submissionPending}
-      />
-    </Section>
+    <>
+      <Head>
+        <title>{title}</title>
+      </Head>
+      <Section>
+        <CreateDAOWizard
+          type={type}
+          steps={steps}
+          currentStep={currentStep}
+          formData={formData}
+          handlePreviousButton={handlePreviousButton}
+          handleNextButtonClick={handleNextButtonClick}
+          handleSubmit={handleSubmit}
+          submissionPending={submissionPending}
+        />
+      </Section>
+    </>
   )
 }

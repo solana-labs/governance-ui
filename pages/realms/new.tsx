@@ -1,5 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
+import Head from 'next/head'
 import useQueryContext from '@hooks/useQueryContext'
 
 import Header from '@components/Header'
@@ -29,6 +30,9 @@ const New: React.FC = () => {
   ]
   return (
     <>
+      <Head>
+        <title>Create new DAO | Realms</title>
+      </Head>
       <Header as="h2" className="mt-8 ">
         What type of DAO <br />
         would you like to create?
