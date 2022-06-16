@@ -62,7 +62,7 @@ const PhoneInput = ({ handlePhone, phoneNumber, setErrorMessage }: Props) => {
   )
 
   const validatePhoneNumber = () => {
-    if (!isValidPhoneNumber(phoneNumber)) {
+    if (!isValidPhoneNumber(phoneNumber) && phoneNumber !== '') {
       setErrorMessage('You have entered an invalid number')
     }
   }
@@ -101,7 +101,7 @@ const PhoneInput = ({ handlePhone, phoneNumber, setErrorMessage }: Props) => {
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <Listbox.Options className="absolute z-20 max-h-60 w-[400px] overflow-auto rounded-md bg-bkg-3 text-gray-400 py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+              <Listbox.Options className="absolute z-20 max-h-60 w-[400px] overflow-scroll rounded-md bg-bkg-3 text-gray-400 py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                 {Object.entries(countryMap).map(
                   ([countryCode, countryMetadata], idx) => {
                     const { dialCode, flag, name } = countryMetadata
