@@ -228,7 +228,7 @@ export default function AddCouncilForm({
             )}
           />
         )}
-        {validMintAddress && (
+        {validMintAddress && councilTokenInfo && (
           <Controller
             name="transferCouncilMintAuthority"
             control={control}
