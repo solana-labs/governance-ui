@@ -180,7 +180,7 @@ export default function CommunityTokenForm({
         type={type}
         currentStep={currentStep}
         totalSteps={totalSteps}
-        title="Next, determine the DAO's community token"
+        title="Next, determine the DAO’s community token."
       />
       <div className="mt-16 space-y-10 md:mt-24 md:space-y-20">
         <Controller

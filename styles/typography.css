@@ -20,18 +20,18 @@ h2.heading-lg {
 
 h3.heading-base {
   font-size: 24px;
-  @apply md:text-[36px];
+  @apply font-sans md:text-[36px];
 }
 
 h4.heading-sm {
   font-size: 18px;
-  @apply md:text-[24px];
+  @apply font-sans md:text-[24px];
 }
 
 /* CTAs */
 .heading-cta {
   font-size: 16px;
-  @apply md:text-[18px];
+  @apply font-sans md:text-[18px];
 }
 
 .body-base,

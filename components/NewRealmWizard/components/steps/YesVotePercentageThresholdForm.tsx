@@ -106,7 +106,7 @@ export default function YesVotePercentageForm({
         totalSteps={totalSteps}
         title={`Next, set your ${
           forCommunity ? "DAO's" : "wallet's"
-        } approval threshold`}
+        } approval threshold.`}
       />
       <div className="mt-16 space-y-10 md:space-y-12">
         <Controller

@@ -71,7 +71,7 @@ export default function BasicDetailsForm({
         type={type}
         currentStep={currentStep}
         totalSteps={totalSteps}
-        title="Let's get started"
+        title="Let's get started."
       />
       <div className="mt-16 space-y-10 md:space-y-12">
         <Controller
@@ -108,7 +108,7 @@ export default function BasicDetailsForm({
             render={({ field }) => (
               <FormField
                 title="Custom Program ID"
-                description="When updating, ensure you transfer all assets to a new DAO using the new program. This cannot be changed."
+                description="Provide the program ID of your own instance of spl-governance you want to use for the organisation. This cannot be changed after the organisation is created."
                 advancedOption
               >
                 <Input

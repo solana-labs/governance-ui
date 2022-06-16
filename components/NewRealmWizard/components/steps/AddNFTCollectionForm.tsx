@@ -392,7 +392,7 @@ export default function AddNFTCollectionForm({
   return (
     <form
       onSubmit={handleSubmit(serializeValues)}
-      data-testid="approval-threshold-form"
+      data-testid="add-nft-collection-form"
     >
       <NFTCollectionModal
         show={isModalOpen}
@@ -412,7 +412,7 @@ export default function AddNFTCollectionForm({
         type={type}
         currentStep={currentStep}
         totalSteps={totalSteps}
-        title="Select an NFT collection for your DAO"
+        title="Select an NFT collection for your DAO."
       />
       <div className="mt-20 space-y-10 md:space-y-12">
         <Controller
@@ -574,7 +574,7 @@ export default function AddNFTCollectionForm({
               render={({ field, fieldState: { error } }) => (
                 <FormField
                   title="How many NFTs are in this collection?"
-                  description=""
+                  description="This is necessary for calculating the number of votes needed for a proposal to pass. Please be accurate."
                 >
                   <Input
                     Icon={
@@ -592,7 +592,7 @@ export default function AddNFTCollectionForm({
                       </svg>
                     }
                     type="tel"
-                    placeholder="10,000"
+                    placeholder="e.g. 10,000"
                     data-testid="nft-collection-count"
                     error={error?.message || ''}
                     disabled={!selectedNFTCollection}

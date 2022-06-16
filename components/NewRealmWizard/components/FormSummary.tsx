@@ -218,7 +218,7 @@ export default function WizardSummary({
         type={type}
         currentStep={currentStep}
         totalSteps={currentStep}
-        title={`Nearly done, let's check that things look right`}
+        title={`Nearly done, let's check that things look right.`}
       />
       <div className="mt-10 space-y-2">
         <SummaryModule

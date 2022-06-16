@@ -253,7 +253,7 @@ export default function InviteMembersForm({
         totalSteps={totalSteps}
         title={`Next, invite${
           type === MULTISIG_FORM ? ' ' : ' council '
-        }members with their Solana Wallet Address`}
+        }members with their Solana Wallet Address.`}
       />
       <div className="mt-24 space-y-10 md:space-y-12">
         <FormField
