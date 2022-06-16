@@ -300,8 +300,8 @@ export default function CommunityTokenForm({
             control={control}
             render={({ field }) => (
               <FormField
-                title="Community mint supply factor"
-                description='This determines the maximum voting weight of the community token. If set to "1" then total supply of the community governance token is equal to 100% vote.'
+                title="Circulation supply factor"
+                description="This determines the votes needed to pass a proposal by calculating the number of tokens in circulation (instead of using the total Mint supply)."
                 advancedOption
               >
                 <Input

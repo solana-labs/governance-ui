@@ -8,6 +8,8 @@ import { FORM_NAME as MULTISIG_FORM } from 'pages/realms/new/multisig'
 import { FORM_NAME as COMMUNITY_TOKEN_FORM } from 'pages/realms/new/community-token'
 import { GenericTokenIcon } from './TokenInfoTable'
 
+const TO_BE_GENERATED = '(To be generated)'
+
 function SummaryModule({
   className = '',
   title,
@@ -81,7 +83,7 @@ function CommunityInfo({
   const nftIsCommunityToken = !!nftInfo?.name
   const updatedTokenInfo = {
     ...tokenInfo,
-    name: tokenInfo?.name || mintAddress || '(To be generated)',
+    name: tokenInfo?.name || mintAddress || TO_BE_GENERATED,
   }
 
   return (
@@ -127,7 +129,7 @@ function CommunityInfo({
             {yesVotePercentage}%
           </Text>
         </SummaryModule>
-        {!nftIsCommunityToken && (
+        {updatedTokenInfo.name !== TO_BE_GENERATED && !nftIsCommunityToken && (
           <SummaryModule title="Transfer mint authority?">
             <Text level="0" className="input-base">
               {transferMintAuthority === true ? 'Yes' : 'No'}
@@ -135,14 +137,14 @@ function CommunityInfo({
           </SummaryModule>
         )}
         {minimumNumberOfTokensToGovern && (
-          <SummaryModule title="Min. number of tokens needed to edit DAO">
+          <SummaryModule title="Min. number of tokens needed to manage DAO">
             <Text level="0" className="input-base">
               {minimumNumberOfTokensToGovern.toLocaleString()}
             </Text>
           </SummaryModule>
         )}
         {mintSupplyFactor && (
-          <SummaryModule title="Mint supply factor">
+          <SummaryModule title="Circulation supply factor">
             <Text level="0" className="input-base">
               {mintSupplyFactor}
             </Text>
@@ -162,7 +164,7 @@ function CouncilInfo({
 }) {
   const updatedTokenInfo = {
     ...tokenInfo,
-    name: tokenInfo?.name || mintAddress || '(To be generated)',
+    name: tokenInfo?.name || mintAddress || TO_BE_GENERATED,
   }
 
   return (
@@ -184,11 +186,13 @@ function CouncilInfo({
             {yesVotePercentage}%
           </Text>
         </SummaryModule> */}
-        <SummaryModule title="Transfer mint authority?">
-          <Text level="0" className="input-base">
-            {transferMintAuthority === true ? 'Yes' : 'No'}
-          </Text>
-        </SummaryModule>
+        {updatedTokenInfo.name !== TO_BE_GENERATED && (
+          <SummaryModule title="Transfer mint authority?">
+            <Text level="0" className="input-base">
+              {transferMintAuthority === true ? 'Yes' : 'No'}
+            </Text>
+          </SummaryModule>
+        )}
       </div>
     </>
   )
