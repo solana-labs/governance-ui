@@ -94,6 +94,13 @@ export default function AddCouncilForm({
   }, [])
 
   useEffect(() => {
+    setValue(
+      'addCouncil',
+      formData.useExistingCommunityToken === false || undefined
+    )
+  }, [formData.useExistingCommunityToken])
+
+  useEffect(() => {
     if (!useExistingCouncilToken) {
       setValue('councilTokenMintAddress', '')
       setValue('transferCouncilMintAuthority', undefined)
@@ -185,9 +192,16 @@ export default function AddCouncilForm({
                   { label: 'Yes', value: true },
                   { label: 'No, skip this step', value: false },
                 ]}
+                disabled={formData.useExistingCommunityToken === false}
               />
             )}
           />
+          {formData.useExistingCommunityToken === false && (
+            <Text level="2" className="mt-2 text-fgd-2">
+              A council is required to govern the DAO until the community token
+              is distributed to members.
+            </Text>
+          )}
         </FormField>
 
         {addCouncil && (
