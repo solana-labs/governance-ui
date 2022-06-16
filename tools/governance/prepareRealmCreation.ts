@@ -72,7 +72,6 @@ export async function prepareRealmCreation({
   communityYesVotePercentage,
   communityMintSupplyFactor: rawCMSF,
   transferCommunityMintAuthority,
-  communityMintDecimals = 6,
 
   createCouncil,
   existingCouncilMintPk,
@@ -109,6 +108,10 @@ export async function prepareRealmCreation({
   const zeroCommunityTokenSupply = existingCommunityMintPk
     ? communityMintAccount?.account.supply.isZero()
     : true
+  const communityMintDecimals = communityMintAccount?.account?.decimals || 6
+
+  console.log('Prepare realm - community mint address', existingCommunityMintPk)
+  console.log('Prepare realm - community mint account', communityMintAccount)
 
   const councilMintAccount =
     existingCouncilMintPk &&
@@ -117,7 +120,8 @@ export async function prepareRealmCreation({
     ? councilMintAccount?.account.supply.isZero()
     : true
 
-  console.log('Prepare realm - community mint address', existingCommunityMintPk)
+  console.log('Prepare realm - council mint address', existingCouncilMintPk)
+  console.log('Prepare realm - council mint account', councilMintAccount)
 
   let communityMintPk = existingCommunityMintPk
   if (!communityMintPk) {
