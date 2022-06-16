@@ -66,7 +66,13 @@ async function enrichCollectionInfo(connection, collectionKey) {
     data: { data: collectionData },
   } = await Metadata.findByMint(connection, collectionKey)
 
-  return enrichItemInfo(collectionData, collectionData.uri)
+  return enrichItemInfo(
+    {
+      ...collectionData,
+      collectionMintAddress: collectionKey,
+    },
+    collectionData.uri
+  )
 }
 
 async function getNFTCollectionInfo(connection, collectionKey) {
@@ -283,6 +289,7 @@ export default function AddNFTCollectionForm({
     const isValidAddress = validateSolAddress(collectionInput)
 
     if (isValidAddress) {
+      handleClearSelectedNFT()
       setRequestPending(true)
       try {
         const collectionInfo = await getNFTCollectionInfo(
@@ -290,7 +297,7 @@ export default function AddNFTCollectionForm({
           collectionInput
         )
         console.log('NFT collection info from user input:', collectionInfo)
-        setValue('collectionKey', collectionInput)
+        setValue('collectionKey', collectionInfo.collectionMintAddress)
         setSelectedNFTCollection(collectionInfo)
         setRequestPending(false)
       } catch (err) {
@@ -449,7 +456,7 @@ export default function AddNFTCollectionForm({
                   type="button"
                   secondary
                   disabled={requestPending || walletConnecting}
-                  loading={walletConnecting}
+                  loading={requestPending || walletConnecting}
                   onClick={handleSelectFromWallet}
                   className=""
                 >
