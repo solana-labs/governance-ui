@@ -320,7 +320,9 @@ export default function AddNFTCollectionForm({
 
   async function handlePaste(ev) {
     const value = ev.clipboardData.getData('text')
-    handleAdd(value)
+    ev.currentTarget.value += value
+    setValue('collectionInput', ev.currentTarget.value)
+    handleAdd(ev.currentTarget.value)
   }
 
   async function handleSelectFromWallet() {
