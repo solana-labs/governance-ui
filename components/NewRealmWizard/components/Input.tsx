@@ -15,7 +15,16 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   (
-    { error = '', success = '', value, Icon, suffix, className = '', ...props },
+    {
+      error = '',
+      success = '',
+      value,
+      Icon,
+      suffix,
+      className = '',
+      autoComplete = 'off',
+      ...props
+    },
     ref
   ) => {
     const hasContent = typeof value !== 'undefined' && value !== ''
@@ -79,6 +88,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           className={classNames}
           ref={ref}
           value={value}
+          autoComplete={autoComplete}
           {...props}
         />
         <div

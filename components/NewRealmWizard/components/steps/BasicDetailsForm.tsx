@@ -115,6 +115,7 @@ export default function BasicDetailsForm({
                   placeholder={`e.g. ${DEFAULT_GOVERNANCE_PROGRAM_ID}`}
                   data-testid="programId-input"
                   error={errors.programId?.message || ''}
+                  autoComplete="on"
                   {...field}
                 />
               </FormField>
