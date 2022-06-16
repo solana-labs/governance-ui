@@ -88,17 +88,18 @@ export default function AddCouncilForm({
   const [showTransferMintAuthority, setShowTransferMintAuthority] = useState(
     false
   )
+  const forceCouncil =
+    formData.useExistingCommunityToken === false ||
+    (formData?.communityTokenInfo?.mint?.supplyAsDecimal === 0 &&
+      formData.transferCommunityMintAuthority)
 
   useEffect(() => {
     updateUserInput(formData, AddCouncilSchema, setValue)
   }, [])
 
   useEffect(() => {
-    setValue(
-      'addCouncil',
-      formData.useExistingCommunityToken === false || undefined
-    )
-  }, [formData.useExistingCommunityToken])
+    setValue('addCouncil', forceCouncil || undefined)
+  }, [forceCouncil])
 
   useEffect(() => {
     if (!useExistingCouncilToken) {
@@ -192,11 +193,11 @@ export default function AddCouncilForm({
                   { label: 'Yes', value: true },
                   { label: 'No, skip this step', value: false },
                 ]}
-                disabled={formData.useExistingCommunityToken === false}
+                disabled={forceCouncil}
               />
             )}
           />
-          {formData.useExistingCommunityToken === false && (
+          {forceCouncil && (
             <Text level="2" className="mt-2 text-fgd-2">
               A council is required to govern the DAO until the community token
               is distributed to members.
