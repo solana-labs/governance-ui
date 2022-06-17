@@ -11,6 +11,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   Icon?: any
   suffix?: any
   className?: string
+  warning?: string
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -23,6 +24,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       suffix,
       className = '',
       autoComplete = 'off',
+      warning = '',
       ...props
     },
     ref
@@ -46,13 +48,13 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       focus:bg-bkg-3
       hover:bg-bkg-3
       hover:border-fgd-2
-      
-      focus:outline-none 
+
+      focus:outline-none
       focus:border-primary-light
 
       active:border-primary-light
-      
-      disabled:cursor-not-allowed 
+
+      disabled:cursor-not-allowed
       disabled:opacity-30
       disabled:hover:bg-bkg-2
       disabled:hover:border-b-bkg-4
@@ -93,16 +95,22 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         />
         <div
           className={`${
-            error || success ? 'visibile' : 'invisible'
+            error || warning || success ? 'visibile' : 'invisible'
           } pt-2 flex items-start min-h-[2.5rem] ${
-            error ? 'text-error-red' : success ? 'text-green' : ''
+            error
+              ? 'text-error-red'
+              : warning
+              ? 'text-[#FFE27C]'
+              : success
+              ? 'text-green'
+              : ''
           }`}
         >
-          <Text level="2">
+          <Text level="2" className="flex items-start">
             <span className="mr-1 align-text-bottom">
               {error ? (
                 <svg
-                  className="inline"
+                  className="inline align-text-top"
                   width="16"
                   height="16"
                   viewBox="0 0 16 16"
@@ -112,9 +120,24 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                   <circle cx="8" cy="8" r="5.5" stroke="currentColor" />
                   <path d="M4 4L12 12" stroke="currentColor" />
                 </svg>
+              ) : warning ? (
+                <svg
+                  className="inline align-text-top"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="8" cy="8" r="7.5" stroke="currentColor" />
+                  <path
+                    d="M8.313 9.643L8.43 3H7.247L7.364 9.643H8.313ZM7.767 12.165C8.209 12.165 8.547 11.814 8.547 11.385C8.547 10.956 8.209 10.618 7.767 10.618C7.351 10.618 7 10.956 7 11.385C7 11.814 7.351 12.165 7.767 12.165Z"
+                    fill="currentColor"
+                  />
+                </svg>
               ) : success ? (
                 <svg
-                  className="inline"
+                  className="inline align-text-top"
                   width="16"
                   height="16"
                   viewBox="0 0 16 16"
@@ -131,7 +154,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                 <></>
               )}
             </span>
-            <span>{error || success}</span>
+            <span>{error || warning || success}</span>
           </Text>
         </div>
       </div>

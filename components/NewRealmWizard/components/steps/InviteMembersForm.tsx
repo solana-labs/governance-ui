@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
+import type { ConditionBuilder } from 'yup/lib/Condition'
 import clsx from 'clsx'
 
 import useWalletStore from 'stores/useWalletStore'
@@ -105,8 +106,14 @@ export const InviteMembersSchema = {
   memberAddresses: yup
     .array()
     .of(yup.string())
-    .when('$addCouncil', (addCouncil, schema) => {
-      if (typeof addCouncil === 'undefined') {
+    .when(['$addCouncil', '$useExistingCouncilToken'], ((
+      addCouncil,
+      useExistingCouncilToken,
+      schema
+    ) => {
+      if (useExistingCouncilToken) {
+        return schema.min(0).required('Required')
+      } else if (typeof addCouncil === 'undefined') {
         return schema
           .min(1, 'A DAO needs at least one member')
           .required('Required')
@@ -117,7 +124,7 @@ export const InviteMembersSchema = {
               .required('Required')
           : schema
       }
-    }),
+    }) as ConditionBuilder<any>),
 }
 
 export interface InviteMembers {
@@ -138,6 +145,7 @@ export default function InviteMembersForm({
   const inputElement = useRef<HTMLInputElement>(null)
   const [inviteList, setInviteList] = useState<string[]>([])
   const [invalidAddresses, setInvalidAddresses] = useState<string[]>([])
+  const [lacksMintAuthority, setLackMintAuthority] = useState(false)
 
   const schema = yup.object(InviteMembersSchema)
   const {
@@ -153,12 +161,23 @@ export default function InviteMembersForm({
   useEffect(() => {
     if (typeof formData.addCouncil === 'undefined' || formData?.addCouncil) {
       updateUserInput(formData, InviteMembersSchema, setValue)
-      setInviteList(
-        (current) =>
-          formData.memberAddresses?.filter((wallet) => {
-            return validateSolAddress(wallet)
-          }) || current
-      )
+      if (
+        formData.useExistingCouncilToken &&
+        formData.councilTokenInfo?.mint?.mintAuthority?.toBase58() !==
+          userAddress
+      ) {
+        setLackMintAuthority(true)
+        setInviteList([])
+        setInvalidAddresses([])
+      } else {
+        setLackMintAuthority(false)
+        setInviteList(
+          (current) =>
+            formData.memberAddresses?.filter((wallet) => {
+              return validateSolAddress(wallet)
+            }) || current
+        )
+      }
     } else if (visible) {
       // go to next step:
       serializeValues({ memberAddresses: null })
@@ -176,7 +195,11 @@ export default function InviteMembersForm({
   // connect their wallet after being in a disconnected state, we want to
   // populate the invite list with their wallet address.
   useEffect(() => {
-    if (userAddress && !inviteList.includes(userAddress)) {
+    if (
+      userAddress &&
+      !inviteList.includes(userAddress) &&
+      !lacksMintAuthority
+    ) {
       setInviteList((currentList) => currentList.concat(userAddress))
     }
   }, [userAddress])
@@ -186,6 +209,10 @@ export default function InviteMembersForm({
   }
 
   function addToAddressList(textBlock: string) {
+    if (lacksMintAuthority) {
+      return
+    }
+
     const { valid, invalid } = textToAddressList(textBlock)
     const { unique, duplicate } = splitUniques(inviteList.concat(valid))
     setInviteList(unique)
@@ -258,6 +285,7 @@ export default function InviteMembersForm({
       <div className="mt-24 space-y-10 md:space-y-12">
         <FormField
           description="Add Solana wallet addressses, separated by a comma or line-break."
+          disabled={lacksMintAuthority}
           title="Invite members"
           titleExtra={
             !!inviteList.length && (
@@ -294,8 +322,14 @@ export default function InviteMembersForm({
             name="memberAddresses"
             placeholder="e.g. CWvWQWt5mTv7Zx..."
             data-testid="dao-member-list-input"
+            disabled={lacksMintAuthority}
             ref={inputElement}
             error={error}
+            warning={
+              lacksMintAuthority
+                ? 'You do not own the mint authority for this token, therefore you cannot invite members to your DAO. Anyone who owns the token is able to join your DAO as a council member.'
+                : undefined
+            }
             onBlur={handleBlur}
             onPaste={handlePaste}
             onKeyDown={handleKeyDown}
@@ -303,7 +337,7 @@ export default function InviteMembersForm({
         </FormField>
       </div>
       <FormFooter
-        isValid={isValid}
+        isValid={isValid || lacksMintAuthority}
         prevClickHandler={() => onPrevClick(currentStep)}
       />
     </form>
