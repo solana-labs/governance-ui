@@ -66,7 +66,6 @@ export default function ProposalVoteResult(props: Props) {
               'flex-col',
               'flex',
               'items-center',
-              '-ml-[0.5px]',
               'p-2',
               'rounded',
               'text-white',
@@ -98,7 +97,6 @@ export default function ProposalVoteResult(props: Props) {
               'flex-col',
               'flex',
               'items-center',
-              'ml-[2px]',
               'p-2',
               'rounded',
               'text-white',
@@ -127,7 +125,7 @@ export default function ProposalVoteResult(props: Props) {
           {threshold && (
             <>
               <div
-                className="absolute bg-yellow-900 top-0 bottom-0 w-[3px]"
+                className="absolute bg-purple-800 top-0 bottom-0 w-[3px]"
                 style={{ left: `${threshold}%` }}
               />
               <div
@@ -135,19 +133,19 @@ export default function ProposalVoteResult(props: Props) {
                   '-translate-x-1/2',
                   '-translate-y-2',
                   'absolute',
-                  'bg-yellow-900',
+                  'bg-purple-800',
                   'bottom-full',
                   'flex-col',
                   'flex',
                   'items-center',
-                  'ml-[2px]',
+                  'ml-[1px]',
                   'p-2',
                   'rounded',
                   'text-white',
                   'after:-mt-[6px]',
                   'after:-translate-x-1/2',
                   'after:absolute',
-                  'after:bg-yellow-900',
+                  'after:bg-purple-800',
                   'after:h-[8px]',
                   'after:left-1/2',
                   'after:rotate-45',
