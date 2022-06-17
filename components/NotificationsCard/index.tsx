@@ -154,7 +154,6 @@ const NotificationsCard = ({ onBackClick }: NotificationCardProps) => {
             if (alertResult.targetGroup?.telegramTargets?.length > 0) {
               const target = alertResult.targetGroup?.telegramTargets[0]
               if (target && !target.isConfirmed) {
-                console.log(target.confirmationUrl)
                 if (target.confirmationUrl) {
                   window.open(target.confirmationUrl)
                 }
@@ -175,7 +174,6 @@ const NotificationsCard = ({ onBackClick }: NotificationCardProps) => {
             if (alertResult.targetGroup?.telegramTargets?.length > 0) {
               const target = alertResult.targetGroup?.telegramTargets[0]
               if (target && !target.isConfirmed) {
-                console.log(target.confirmationUrl)
                 if (target.confirmationUrl) {
                   window.open(target.confirmationUrl)
                 }
