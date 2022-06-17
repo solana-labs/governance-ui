@@ -266,9 +266,7 @@ const MemberOverview = ({ member }: { member: Member }) => {
                     className="bg-bkg-1 space-y-2 mt-2 px-4 py-3 rounded-md"
                     key={index}
                   >
-                    <p
-                      className={`flex items-center text-xs text-fgd-3 text-xs`}
-                    >
+                    <p className={`flex items-center text-fgd-3 text-xs`}>
                       <ChatAltIcon className="flex-shrink-0 h-5 mr-1.5 text-fgd-2 w-5" />
                       {msg}
                     </p>

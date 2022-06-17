@@ -190,3 +190,10 @@ body::-webkit-scrollbar-corner {
 .bg-brand-gradient {
   @apply bg-gradient-to-r from-[#00C2FF] via-[#00E4FF] to-[#87F2FF];
 }
+
+/* break-words is depricated a tailwind and CSS class, 
+advised to use overflow-wrap instead - see documentation below
+https://developer.mozilla.org/en-US/docs/Web/CSS/word-break#values */
+.overflow-wrap-anywhere {
+  overflow-wrap: anywhere;
+}
