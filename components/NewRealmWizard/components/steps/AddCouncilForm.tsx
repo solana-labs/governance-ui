@@ -7,6 +7,7 @@ import FormHeader from '@components/NewRealmWizard/components/FormHeader'
 import FormField from '@components/NewRealmWizard/components/FormField'
 import FormFooter from '@components/NewRealmWizard/components/FormFooter'
 import { RadioGroup } from '@components/NewRealmWizard/components/Input'
+import AdviceBox from '@components/NewRealmWizard/components/AdviceBox'
 import Text from '@components/Text'
 
 import { updateUserInput, validateSolAddress } from '@utils/formValidation'
@@ -175,11 +176,18 @@ export default function AddCouncilForm({
         title="Add a council to your DAO."
       />
       <div className="space-y-10 md:space-y-20">
-        <Text level="1" className="mt-10 mb-16 md:my-18 md:w-[550px]">
-          Council members vote on decisions affecting the DAO and its
-          treasuries. Since your DAO already has community voting, you may
-          choose not to add council members.
-        </Text>
+        <div className="mt-10 mb-16 md:my-18">
+          <AdviceBox
+            title="About Councils"
+            icon={<img src="/icons/council-icon.svg" alt="council icon" />}
+          >
+            Council members can supervise and moderate DAO activities. It’s
+            recommended to always create the council for DAOs in their
+            incubation stage to prevent governance attacks or accidental losses
+            of assets managed by the DAO.
+          </AdviceBox>
+        </div>
+
         <FormField title="Do you want to add a council?" description="">
           <Controller
             name="addCouncil"

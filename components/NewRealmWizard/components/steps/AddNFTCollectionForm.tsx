@@ -19,7 +19,7 @@ import FormFooter from '@components/NewRealmWizard/components/FormFooter'
 import Input, {
   InputRangeSlider,
 } from '@components/NewRealmWizard/components/Input'
-import ThresholdAdviceBox from '@components/NewRealmWizard/components/ThresholdAdviceBox'
+import AdviceBox from '@components/NewRealmWizard/components/AdviceBox'
 import NFTCollectionModal from '@components/NewRealmWizard/components/NFTCollectionModal'
 
 function filterAndMapVerifiedCollections(nfts) {
@@ -621,7 +621,10 @@ export default function AddNFTCollectionForm({
               )}
             />
 
-            <ThresholdAdviceBox title="Approval threshold">
+            <AdviceBox
+              title="Approval threshold"
+              icon={<img src="/icons/threshold-icon.svg" alt="voting icon" />}
+            >
               <Text level="1" className="space-y-1 text-white/70">
                 <div>
                   With{' '}
@@ -635,7 +638,7 @@ export default function AddNFTCollectionForm({
                   to approve a proposal for it to pass.
                 </div>
               </Text>
-            </ThresholdAdviceBox>
+            </AdviceBox>
           </>
         )}
       </div>

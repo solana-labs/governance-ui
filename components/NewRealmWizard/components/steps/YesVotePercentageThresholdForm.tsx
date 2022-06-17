@@ -8,7 +8,7 @@ import FormField from '@components/NewRealmWizard/components/FormField'
 import FormFooter from '@components/NewRealmWizard/components/FormFooter'
 import { InputRangeSlider } from '@components/NewRealmWizard/components/Input'
 import Text from '@components/Text'
-import ThresholdAdviceBox from '@components/NewRealmWizard/components/ThresholdAdviceBox'
+import AdviceBox from '@components/NewRealmWizard/components/AdviceBox'
 
 import { updateUserInput } from '@utils/formValidation'
 import { FORM_NAME as MUTISIG_FORM } from 'pages/realms/new/multisig'
@@ -131,7 +131,7 @@ export default function YesVotePercentageForm({
           )}
         />
       </div>
-      <ThresholdAdviceBox
+      <AdviceBox
         title={
           forCommunity
             ? 'Approval percentage'
@@ -139,6 +139,7 @@ export default function YesVotePercentageForm({
             ? 'Member percentage'
             : 'Yes vote percentage'
         }
+        icon={<img src="/icons/threshold-icon.svg" alt="voting icon" />}
       >
         {forCommunity ? (
           <Text level="1">
@@ -163,7 +164,7 @@ export default function YesVotePercentageForm({
             Typically, newer DAOs start their approval percentage around 60%.
           </Text>
         )}
-      </ThresholdAdviceBox>
+      </AdviceBox>
 
       <FormFooter
         isValid={isValid}
