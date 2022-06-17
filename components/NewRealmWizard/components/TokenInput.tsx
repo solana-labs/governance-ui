@@ -49,7 +49,11 @@ const NOTFOUND_COIN: TokenWithMintInfo = {
   symbol: '',
 }
 
+export const COMMUNITY_TOKEN = 'community token'
+export const COUNCIL_TOKEN = 'council token'
+
 export default function TokenInput({
+  type,
   control,
   onValidation,
   disableMinTokenInput = false,
@@ -135,7 +139,11 @@ export default function TokenInput({
   return (
     <>
       <Controller
-        name="communityTokenMintAddress"
+        name={
+          type === COMMUNITY_TOKEN
+            ? 'communityTokenMintAddress'
+            : 'councilTokenMintAddress'
+        }
         control={control}
         defaultValue=""
         render={({ field, fieldState: { error } }) => (
@@ -170,7 +178,11 @@ export default function TokenInput({
       {validMintAddress && (
         <>
           <Controller
-            name="transferCommunityMintAuthority"
+            name={
+              type === COMMUNITY_TOKEN
+                ? 'transferCommunityMintAuthority'
+                : 'transferCouncilMintAuthority'
+            }
             control={control}
             defaultValue={undefined}
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -206,7 +218,11 @@ export default function TokenInput({
 
           {!!tokenInfo?.mint?.supplyAsDecimal && !disableMinTokenInput && (
             <Controller
-              name="minimumNumberOfCommunityTokensToGovern"
+              name={
+                type === COMMUNITY_TOKEN
+                  ? 'minimumNumberOfCommunityTokensToGovern'
+                  : 'minimumNumberOfCouncilTokensToGovern'
+              }
               control={control}
               defaultValue={''}
               render={({ field, fieldState: { error } }) => (

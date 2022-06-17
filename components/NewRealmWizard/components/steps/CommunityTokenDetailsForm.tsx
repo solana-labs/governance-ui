@@ -12,7 +12,7 @@ import FormFooter from '@components/NewRealmWizard/components/FormFooter'
 import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
 import Input, { RadioGroup } from '@components/NewRealmWizard/components/Input'
 import { GenericTokenIcon } from '@components/NewRealmWizard/components/TokenInfoTable'
-import TokenInput, { TokenWithMintInfo } from '../TokenInput'
+import TokenInput, { TokenWithMintInfo, COMMUNITY_TOKEN } from '../TokenInput'
 
 export const CommunityTokenSchema = {
   useExistingCommunityToken: yup
@@ -175,7 +175,11 @@ export default function CommunityTokenForm({
           )}
         />
         {useExistingCommunityToken && (
-          <TokenInput control={control} onValidation={handleTokenInput} />
+          <TokenInput
+            type={COMMUNITY_TOKEN}
+            control={control}
+            onValidation={handleTokenInput}
+          />
         )}
       </div>
       {useExistingCommunityToken === false && (

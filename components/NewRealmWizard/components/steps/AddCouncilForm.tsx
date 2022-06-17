@@ -11,7 +11,7 @@ import AdviceBox from '@components/NewRealmWizard/components/AdviceBox'
 import Text from '@components/Text'
 
 import { updateUserInput, validateSolAddress } from '@utils/formValidation'
-import TokenAddressInput, { TokenWithMintInfo } from '../TokenAddressInput'
+import TokenInput, { TokenWithMintInfo, COUNCIL_TOKEN } from '../TokenInput'
 
 export const AddCouncilSchema = {
   addCouncil: yup
@@ -71,11 +71,9 @@ export default function AddCouncilForm({
   const {
     control,
     setValue,
-    clearErrors,
-    setError,
     handleSubmit,
     watch,
-    formState: { isValid, errors },
+    formState: { isValid },
   } = useForm({
     mode: 'all',
     resolver: yupResolver(schema),
@@ -85,10 +83,6 @@ export default function AddCouncilForm({
   const [councilTokenInfo, setCouncilTokenInfo] = useState<
     TokenWithMintInfo | undefined
   >()
-  const [validMintAddress, setValidMintAddress] = useState(false)
-  const [showTransferMintAuthority, setShowTransferMintAuthority] = useState(
-    false
-  )
   const forceCouncil =
     formData.useExistingCommunityToken === false ||
     (formData?.communityTokenInfo?.mint?.supplyAsDecimal === 0 &&
@@ -107,7 +101,6 @@ export default function AddCouncilForm({
       setValue('councilTokenMintAddress', '')
       setValue('transferCouncilMintAuthority', undefined)
       setCouncilTokenInfo(undefined)
-      setValidMintAddress(false)
     }
   }, [useExistingCouncilToken])
 
@@ -117,36 +110,11 @@ export default function AddCouncilForm({
     }
   }, [addCouncil])
 
-  function handleTokenInput({
-    tokenInfo,
-    validMintAddress,
-    walletIsMintAuthority,
-  }) {
-    setShowTransferMintAuthority(walletIsMintAuthority)
+  function handleTokenInput({ tokenInfo }) {
     setCouncilTokenInfo(tokenInfo)
-    setValidMintAddress(validMintAddress)
-    if (walletIsMintAuthority) {
-      setValue('transferCouncilMintAuthority', undefined, {
-        shouldValidate: true,
-      })
-    } else {
-      setValue('transferCouncilMintAuthority', false, {
-        shouldValidate: true,
-      })
-    }
-
-    if (validMintAddress || /finding/.test(tokenInfo?.name)) {
-      clearErrors('invalidTokenMintAddress')
-    } else {
-      setError('invalidTokenMintAddress', {
-        type: 'is-valid-address',
-        message: 'Not a valid token address',
-      })
-
-      setValue('transferCouncilMintAuthority', undefined, {
-        shouldValidate: true,
-      })
-    }
+    setValue('transferCouncilMintAuthority', undefined, {
+      shouldValidate: true,
+    })
   }
 
   function serializeValues(values) {
@@ -236,53 +204,11 @@ export default function AddCouncilForm({
           />
         )}
         {addCouncil && useExistingCouncilToken && (
-          <Controller
-            name="councilTokenMintAddress"
+          <TokenInput
+            type={COUNCIL_TOKEN}
             control={control}
-            defaultValue=""
-            render={({ field, fieldState: { error } }) => (
-              <FormField
-                title="What is the address of the council token you would like to use?"
-                description="You can verify the correct token in the preview below."
-                className="mt-10 md:mt-16"
-              >
-                <TokenAddressInput
-                  disabled={!useExistingCouncilToken}
-                  field={field}
-                  error={
-                    error?.message || errors.invalidTokenMintAddress?.message
-                  }
-                  onValidation={handleTokenInput}
-                />
-              </FormField>
-            )}
-          />
-        )}
-        {validMintAddress && councilTokenInfo && (
-          <Controller
-            name="transferCouncilMintAuthority"
-            control={control}
-            defaultValue={undefined}
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            render={({ field: { ref, ...field } }) => (
-              <FormField
-                title="Do you want to transfer mint authority of this council token to the DAO?"
-                description={
-                  showTransferMintAuthority
-                    ? ''
-                    : 'You must connect the wallet which owns this token before you can select "Yes".'
-                }
-              >
-                <RadioGroup
-                  {...field}
-                  options={[
-                    { label: 'Yes', value: true },
-                    { label: 'No', value: false },
-                  ]}
-                  disabled={!showTransferMintAuthority}
-                />
-              </FormField>
-            )}
+            disableMinTokenInput
+            onValidation={handleTokenInput}
           />
         )}
       </div>
