@@ -152,7 +152,7 @@ export const RadioButton: FunctionComponent<NewButtonProps> = ({
   if (!disabled) {
     classNames += 'hover:bg-bkg-4 hover:border-fgd-1 border-fgd-3'
   } else {
-    classNames += ' bg-none text-fgd-3 border-bkg-4 opacity-80'
+    classNames += ' bg-none text-fgd-4 border-bkg-4'
   }
 
   classNames += ` ${className}`
