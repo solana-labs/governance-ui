@@ -2,11 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "target": "es6",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": false,
@@ -19,41 +15,19 @@
     "resolveJsonModule": true,
     "jsx": "preserve",
     "paths": {
-      "@components/*": [
-        "components/*"
-      ],
-      "@hooks/*": [
-        "hooks/*"
-      ],
-      "@tools/*": [
-        "tools/*"
-      ],
-      "@models/*": [
-        "models/*"
-      ],
-      "@utils/*": [
-        "utils/*"
-      ]
+      "@components/*": ["components/*"],
+      "@hooks/*": ["hooks/*"],
+      "@tools/*": ["tools/*"],
+      "@models/*": ["models/*"],
+      "@utils/*": ["utils/*"]
     },
     "incremental": true,
     "isolatedModules": true
   },
-  "exclude": [
-    "node_modules",
-    ".next",
-    "out",
-    "docs"
-  ],
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.js"
-  ],
+  "exclude": ["node_modules", ".next", "out", "docs"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js"],
   "ts-node": {
-    "require": [
-      "tsconfig-paths/register"
-    ],
+    "require": ["tsconfig-paths/register"],
     "compilerOptions": {
       "module": "commonjs"
     }

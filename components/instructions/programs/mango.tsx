@@ -2,12 +2,17 @@ import { Connection, PublicKey } from '@solana/web3.js'
 import { AccountMetaData } from '@solana/spl-governance'
 import {
   Config,
+  IDS,
   MangoClient,
   MangoInstructionLayout,
 } from '@blockworks-foundation/mango-client'
 import dayjs from 'dayjs'
 import { tryGetTokenMint } from '@utils/tokens'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
+import {
+  ASSET_TYPE,
+  MARKET_MODE,
+} from 'pages/dao/[symbol]/proposal/components/instructions/Mango/MakeSetMarketMode'
 
 function displayInstructionArgument(decodedArgs, argName) {
   return (
@@ -395,6 +400,43 @@ export const MANGO_INSTRUCTIONS = {
         const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
           .ChangeReferralFeeParams
         return <>{displayAllArgs(args)}</>
+      },
+    },
+    66: {
+      name: 'Mango v3: Set Market Mode',
+      accounts: {
+        0: { name: 'Mango Group' },
+        1: { name: 'Admin Pk' },
+      },
+      getDataUI: async (
+        _connection: Connection,
+        data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
+        const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
+          .SetMarketMode
+        return (
+          <>
+            <div>
+              Market:{' '}
+              {
+                IDS.groups.find(
+                  (x) => x.publicKey === _accounts[0].pubkey.toBase58()
+                )![args.marketType === 0 ? 'spotMarkets' : 'perpMarkets'][
+                  args.marketIndex
+                ].name
+              }
+            </div>
+            <div>
+              Market Mode:{' '}
+              {MARKET_MODE.find((x) => x.value === args.marketMode)?.name}
+            </div>
+            <div>
+              Market Type:{' '}
+              {ASSET_TYPE.find((x) => x.value === args.marketType)?.name}
+            </div>
+          </>
+        )
       },
     },
   },

@@ -25,7 +25,7 @@ import InstructionForm, {
   InstructionInputType,
 } from '../FormCreator'
 
-const ASSET_TYPE = [
+export const ASSET_TYPE = [
   {
     name: 'Token',
     value: 0,
@@ -36,7 +36,7 @@ const ASSET_TYPE = [
   },
 ]
 
-const MARKET_MODE = [
+export const MARKET_MODE = [
   {
     name: 'Default',
     value: 0,
@@ -107,21 +107,13 @@ const MakeSetMarketMode = ({
       wallet?.publicKey
     ) {
       //Mango instruction call and serialize
-      console.log(
-        form.governedAccount.governance.account.governedAccount,
-        new PublicKey(form.mangoGroup!.value),
-        new PublicKey(form.adminPk),
-        new BN(form.marketIndex!.value),
-        Number(form.marketMode!.value),
-        Number(form.marketType)
-      )
       const addOracleIx = makeSetMarketModeInstruction(
         form.governedAccount.governance.account.governedAccount,
         new PublicKey(form.mangoGroup!.value),
         new PublicKey(form.adminPk),
         new BN(form.marketIndex!.value),
         Number(form.marketMode!.value),
-        Number(form.marketType)
+        Number(form.marketType!.value)
       )
 
       serializedInstruction = serializeInstructionToBase64(addOracleIx)
@@ -154,10 +146,18 @@ const MakeSetMarketMode = ({
       .required('Program governed account is required'),
   })
   const getOptionsForMarketIndex = () => {
+    const currentMangoGroup = IDS.groups.find(
+      (x) => x.publicKey === form.mangoGroup?.value
+    )!
     return form.mangoGroup && form.marketType
-      ? IDS.groups.find((x) => x.publicKey === form.mangoGroup?.value)![
+      ? currentMangoGroup[
           Number(form.marketType.value) === 0 ? 'spotMarkets' : 'perpMarkets'
-        ]
+        ].map((x) => {
+          return {
+            name: x.name,
+            value: x.marketIndex,
+          }
+        })
       : []
   }
   const inputs: InstructionInput[] = [
