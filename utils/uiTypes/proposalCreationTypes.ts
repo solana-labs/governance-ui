@@ -146,6 +146,20 @@ export interface MangoMakeAddOracleForm {
   oracleAccount: string | undefined
 }
 
+type NameValue = {
+  name: string
+  value: string
+}
+
+export interface MangoMakeSetMarketModeForm {
+  governedAccount: AssetAccount | null
+  mangoGroup: NameValue | null
+  marketIndex: NameValue | null
+  marketMode: NameValue | null
+  marketType: NameValue | null
+  adminPk: string
+}
+
 export interface MangoMakeAddSpotMarketForm {
   governedAccount: AssetAccount | undefined
   programId: string | undefined
