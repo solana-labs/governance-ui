@@ -95,6 +95,7 @@ export default async function createNFTRealm({
     tokensToGovernThreshold,
 
     existingCommunityMintPk,
+    nftCollectionCount: collectionCount,
     communityMintSupplyFactor: undefined,
     transferCommunityMintAuthority: false, // delay this until we have created NFT instructions
     communityYesVotePercentage,

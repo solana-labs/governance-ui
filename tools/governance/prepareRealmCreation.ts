@@ -45,11 +45,11 @@ interface RealmCreation {
   tokensToGovernThreshold: number | undefined
   maxVotingTimeInDays?: number
 
-  communityYesVotePercentage: number
+  nftCollectionCount?: number
   existingCommunityMintPk: PublicKey | undefined
-  transferCommunityMintAuthority: boolean
   communityMintSupplyFactor: number | undefined
-  communityMintDecimals?: number
+  communityYesVotePercentage: number
+  transferCommunityMintAuthority: boolean
 
   createCouncil: boolean
   existingCouncilMintPk: PublicKey | undefined
@@ -68,6 +68,7 @@ export async function prepareRealmCreation({
   tokensToGovernThreshold,
   maxVotingTimeInDays = 3,
 
+  nftCollectionCount = 0,
   existingCommunityMintPk,
   communityYesVotePercentage,
   communityMintSupplyFactor: rawCMSF,
@@ -149,6 +150,7 @@ export async function prepareRealmCreation({
   if (
     zeroCommunityTokenSupply &&
     zeroCouncilTokenSupply &&
+    nftCollectionCount === 0 &&
     councilWalletPks.length === 0
   ) {
     councilWalletPks.push(wallet.publicKey as PublicKey)
