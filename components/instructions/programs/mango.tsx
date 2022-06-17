@@ -415,16 +415,17 @@ export const MANGO_INSTRUCTIONS = {
       ) => {
         const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
           .SetMarketMode
+        const mangoGroup = IDS.groups.find(
+          (x) => x.publicKey === _accounts[0].pubkey.toBase58()
+        )!
         return (
           <>
             <div>
               Market:{' '}
               {
-                IDS.groups.find(
-                  (x) => x.publicKey === _accounts[0].pubkey.toBase58()
-                )![args.marketType === 0 ? 'spotMarkets' : 'perpMarkets'][
-                  args.marketIndex
-                ].name
+                mangoGroup[
+                  args.marketType === 0 ? 'spotMarkets' : 'perpMarkets'
+                ]!.find((x) => x.marketIndex === Number(args.marketIndex))!.name
               }
             </div>
             <div>

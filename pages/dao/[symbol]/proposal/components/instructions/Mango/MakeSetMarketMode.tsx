@@ -46,11 +46,11 @@ export const MARKET_MODE = [
     value: 1,
   },
   {
-    name: 'CloseOnly',
+    name: 'Close Only',
     value: 2,
   },
   {
-    name: 'ForceCloseOnly',
+    name: 'Force Close Only',
     value: 3,
   },
   {
@@ -58,7 +58,7 @@ export const MARKET_MODE = [
     value: 4,
   },
   {
-    name: 'SwappingSpotMarket',
+    name: 'Swapping Spot Market',
     value: 5,
   },
 ]
@@ -139,7 +139,11 @@ const MakeSetMarketMode = ({
     )
   }, [form])
   const schema = yup.object().shape({
-    bufferAddress: yup.number(),
+    mangoGroup: yup.object().nullable().required('Mango group is required'),
+    marketIndex: yup.object().nullable().required('Market index is required'),
+    adminPk: yup.string().required('Admin Pk is required'),
+    marketMode: yup.object().nullable().required('Market Mode is required'),
+    marketType: yup.object().nullable().required('Market Type is required'),
     governedAccount: yup
       .object()
       .nullable()
