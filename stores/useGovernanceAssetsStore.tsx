@@ -100,7 +100,6 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
       ? await getAccountsForGovernances(connection, realm, governancesArray)
       : []
 
-    console.log(accounts)
     set((s) => {
       s.governancesArray = governancesArray
       s.loadGovernedAccounts = false
@@ -586,7 +585,6 @@ const getSolAccountsInfo = async (
 
 const filterOutHiddenAccs = (x: AssetAccount) => {
   const pubkey = typeof x.pubkey === 'string' ? x.pubkey : x.pubkey.toBase58()
-  console.log()
   return (
     HIDDEN_TREASURES.findIndex((x) => x === pubkey) === -1 &&
     (!x.extensions.token ||
