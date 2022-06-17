@@ -93,76 +93,88 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           autoComplete={autoComplete}
           {...props}
         />
-        <div
-          className={`${
-            error || warning || success ? 'visibile' : 'invisible'
-          } pt-2 flex items-start min-h-[2.5rem] ${
-            error
-              ? 'text-error-red'
-              : warning
-              ? 'text-[#FFE27C]'
-              : success
-              ? 'text-green'
-              : ''
-          }`}
-        >
-          <Text level="2" className="flex items-start">
-            <span className="mr-1 align-text-bottom">
-              {error ? (
-                <svg
-                  className="inline align-text-top"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <circle cx="8" cy="8" r="5.5" stroke="currentColor" />
-                  <path d="M4 4L12 12" stroke="currentColor" />
-                </svg>
-              ) : warning ? (
-                <svg
-                  className="inline align-text-top"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <circle cx="8" cy="8" r="7.5" stroke="currentColor" />
-                  <path
-                    d="M8.313 9.643L8.43 3H7.247L7.364 9.643H8.313ZM7.767 12.165C8.209 12.165 8.547 11.814 8.547 11.385C8.547 10.956 8.209 10.618 7.767 10.618C7.351 10.618 7 10.956 7 11.385C7 11.814 7.351 12.165 7.767 12.165Z"
-                    fill="currentColor"
-                  />
-                </svg>
-              ) : success ? (
-                <svg
-                  className="inline align-text-top"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M14 4L6 13L2 8"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  />
-                </svg>
-              ) : (
-                <></>
-              )}
-            </span>
-            <span>{error || warning || success}</span>
-          </Text>
-        </div>
+        <FieldMessage
+          error={error}
+          warning={warning}
+          success={success}
+          className="min-h-[2.5rem]"
+        />
       </div>
     )
   }
 )
 
 export default Input
+
+export function FieldMessage({
+  error = '',
+  warning = '',
+  success = '',
+  className = '',
+}) {
+  return (
+    <div
+      className={`${
+        error || warning || success ? 'visibile' : 'invisible'
+      } pt-2 flex items-start ${
+        error
+          ? 'text-error-red'
+          : warning
+          ? 'text-orange'
+          : success
+          ? 'text-green'
+          : ''
+      } ${className}`}
+    >
+      <Text level="2" className="flex items-start">
+        <span className="mr-1 align-text-bottom">
+          {error ? (
+            <svg
+              className="inline align-text-top"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle cx="8" cy="8" r="5.5" stroke="currentColor" />
+              <path d="M4 4L12 12" stroke="currentColor" />
+            </svg>
+          ) : warning ? (
+            <svg
+              className="inline align-text-top"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle cx="8" cy="8" r="7.5" stroke="currentColor" />
+              <path
+                d="M8.313 9.643L8.43 3H7.247L7.364 9.643H8.313ZM7.767 12.165C8.209 12.165 8.547 11.814 8.547 11.385C8.547 10.956 8.209 10.618 7.767 10.618C7.351 10.618 7 10.956 7 11.385C7 11.814 7.351 12.165 7.767 12.165Z"
+                fill="currentColor"
+              />
+            </svg>
+          ) : success ? (
+            <svg
+              className="inline align-text-top"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M14 4L6 13L2 8" stroke="currentColor" strokeWidth="2" />
+            </svg>
+          ) : (
+            <></>
+          )}
+        </span>
+        <span>{error || warning || success}</span>
+      </Text>
+    </div>
+  )
+}
 
 interface RadioGroupOption {
   label: string
@@ -174,35 +186,55 @@ interface RadioGroupProps {
   onBlur: any
   value: any
   disabled?: boolean
+  disabledValues?: any[]
+  error?: string
+  warning?: string
+  success?: string
 }
 
 export const RadioGroup = ({
   options,
   onChange,
+  onBlur,
   value,
   disabled,
-  onBlur,
+  disabledValues = [],
+  error,
+  warning,
+  success,
 }: RadioGroupProps) => {
   return (
-    <HRG onChange={onChange} value={value} onBlur={onBlur} disabled={disabled}>
-      <div className={`grid md:grid-cols-${options.length} gap-6`}>
-        {options.map(({ label, value }) => {
-          return (
-            <HRG.Option value={value} key={label}>
-              {({ checked }) => (
-                <RadioButton
-                  selected={checked}
-                  disabled={disabled}
-                  className="w-full"
-                >
-                  {label}
-                </RadioButton>
-              )}
-            </HRG.Option>
-          )
-        })}
-      </div>
-    </HRG>
+    <>
+      <HRG
+        onChange={onChange}
+        value={value}
+        onBlur={onBlur}
+        disabled={disabled}
+      >
+        <div className={`grid md:grid-cols-${options.length} gap-6`}>
+          {options.map(({ label, value }) => {
+            return (
+              <HRG.Option
+                value={value}
+                key={label}
+                disabled={disabled || disabledValues.indexOf(value) > -1}
+              >
+                {({ checked }) => (
+                  <RadioButton
+                    selected={checked}
+                    disabled={disabled || disabledValues.indexOf(value) > -1}
+                    className="w-full"
+                  >
+                    {label}
+                  </RadioButton>
+                )}
+              </HRG.Option>
+            )
+          })}
+        </div>
+      </HRG>
+      <FieldMessage error={error} warning={warning} success={success} />
+    </>
   )
 }
 
