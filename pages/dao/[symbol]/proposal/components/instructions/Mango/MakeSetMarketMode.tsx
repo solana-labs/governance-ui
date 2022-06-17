@@ -18,6 +18,7 @@ import {
   IDS,
   makeSetMarketModeInstruction,
   BN,
+  Config,
 } from '@blockworks-foundation/mango-client'
 import { AccountType } from '@utils/uiTypes/assets'
 import InstructionForm, {
@@ -106,9 +107,12 @@ const MakeSetMarketMode = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
+      const groupConfig = Config.ids().groups.find((c) =>
+        c.publicKey.equals(new PublicKey(form.mangoGroup!.value))
+      )!
       //Mango instruction call and serialize
       const addOracleIx = makeSetMarketModeInstruction(
-        form.governedAccount.governance.account.governedAccount,
+        groupConfig.mangoProgramId,
         new PublicKey(form.mangoGroup!.value),
         new PublicKey(form.adminPk),
         new BN(form.marketIndex!.value),

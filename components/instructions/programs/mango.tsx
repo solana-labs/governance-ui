@@ -406,7 +406,6 @@ export const MANGO_INSTRUCTIONS = {
       name: 'Mango v3: Set Market Mode',
       accounts: {
         0: { name: 'Mango Group' },
-        1: { name: 'Admin Pk' },
       },
       getDataUI: async (
         _connection: Connection,
