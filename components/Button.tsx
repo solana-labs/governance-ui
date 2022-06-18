@@ -61,7 +61,7 @@ export const SecondaryButton: FunctionComponent<ButtonProps> = ({
       disabled={disabled}
       className={`${className} border border-primary-light font-bold default-transition rounded-full px-4 ${
         small ? 'py-1' : 'py-2.5'
-      } text-primary-light text-sm hover:border-bkg-1 hover:text-bkg-1 focus:outline-none disabled:border-fgd-3 disabled:text-fgd-3 disabled:cursor-not-allowed`}
+      } text-primary-light text-sm hover:border-fgd-1 hover:text-fgd-1 focus:outline-none disabled:border-fgd-4 disabled:text-fgd-3 disabled:cursor-not-allowed`}
       {...props}
     >
       <Tooltip content={tooltipMessage}>
