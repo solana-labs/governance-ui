@@ -27,7 +27,7 @@ module.exports = {
           'secondary-2': { light: '#FFCB1B', dark: '#F48F25' },
           'bkg-1': '#17161c',
           'bkg-2': '#201F27',
-          'bkg-3': '#17161c',
+          'bkg-3': '#292833',
           'bkg-4': '#363D44',
           'fgd-1': '#E5E5E6',
           'fgd-2': '#8C8F93',
@@ -90,11 +90,16 @@ module.exports = {
         green: 'var(--green)',
         orange: 'var(--orange)',
         blue: 'var(--blue)',
+        'error-red': '#ff7c7c',
+        'confirm-green': '#8effdd',
+        'bkg-grey': '#292833',
+        'night-grey': '#201F27',
       },
       animation: {
         'connect-wallet-ping':
           'connect-wallet-ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite',
         gradient: 'gradient 4s ease-in-out infinite',
+        loader: 'loader 0.6s infinite alternate',
       },
       keyframes: {
         'connect-wallet-ping': {
@@ -112,6 +117,12 @@ module.exports = {
           },
           '100%': {
             'background-position': '15% 0%',
+          },
+        },
+        loader: {
+          to: {
+            opacity: 0.1,
+            transform: 'translate3d(0, 0, 0)',
           },
         },
       },

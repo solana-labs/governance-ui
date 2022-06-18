@@ -15,6 +15,7 @@ import InstructionForm, {
   InstructionInput,
   InstructionInputType,
 } from '../instructions/FormCreator'
+import { MAX_TOKENS_TO_DISABLE } from '@tools/constants'
 
 export interface RealmConfigForm {
   governedAccount: AssetAccount | undefined
@@ -47,10 +48,14 @@ const RealmConfigFormComponent = ({
   const minCommunity = mint ? getMintMinAmountAsDecimal(mint) : 0
   const minCommunityTokensToCreateProposal =
     realm && mint
-      ? getMintDecimalAmount(
-          mint,
+      ? MAX_TOKENS_TO_DISABLE.eq(
           realm.account.config.minCommunityTokensToCreateGovernance
         )
+        ? MAX_TOKENS_TO_DISABLE
+        : getMintDecimalAmount(
+            mint,
+            realm.account.config.minCommunityTokensToCreateGovernance
+          )
       : new BigNumber(0)
 
   const currentPrecision = precision(minCommunity)

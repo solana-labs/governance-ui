@@ -15,7 +15,7 @@ import BigNumber from 'bignumber.js'
 import React, { useEffect, useState } from 'react'
 
 export interface BaseGovernanceFormFields {
-  minCommunityTokensToCreateProposal: number
+  minCommunityTokensToCreateProposal: number | string
   minInstructionHoldUpTime: number
   maxVotingTime: number
   voteThreshold: number
@@ -157,7 +157,7 @@ const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
         }
         error={formErrors['voteThreshold']}
       />
-      <div className="pb-5 max-w-lg">
+      <div className="max-w-lg pb-5">
         <AmountSlider
           step={1}
           value={form.voteThreshold}

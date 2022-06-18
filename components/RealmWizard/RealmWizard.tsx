@@ -36,13 +36,9 @@ import { useEffect } from 'react'
 import { CreateFormSchema } from './validators/createRealmValidator'
 import { formValidation, isFormValid } from '@utils/formValidation'
 import { registerRealm } from 'actions/registerRealm'
-import {
-  getGovernanceProgramVersion,
-  MintMaxVoteWeightSource,
-} from '@solana/spl-governance'
+import { getGovernanceProgramVersion } from '@solana/spl-governance'
 import Switch from '@components/Switch'
-import { BN } from '@project-serum/anchor'
-import BigNumber from 'bignumber.js'
+import { parseMintMaxVoteWeight } from '@tools/governance/units'
 
 enum LoaderMessage {
   CREATING_ARTIFACTS = 'Creating the DAO artifacts..',
@@ -153,23 +149,6 @@ const RealmWizard: React.FC = () => {
   }
 
   /**
-   * Get the mint max vote weight parsed to `MintMaxVoteWeightSource`
-   */
-  const getMintMaxVoteWeight = () => {
-    let value = MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION.value
-    if (form.communityMintMaxVoteWeightSource) {
-      const fraction = new BigNumber(form.communityMintMaxVoteWeightSource)
-        .shiftedBy(MintMaxVoteWeightSource.SUPPLY_FRACTION_DECIMALS)
-        .toString()
-      value = new BN(fraction)
-    }
-
-    return new MintMaxVoteWeightSource({
-      value,
-    })
-  }
-
-  /**
    * Get the array of wallets parsed into public keys or undefined if not eligible
    */
   const getTeamWallets = (): PublicKey[] | undefined =>
@@ -209,7 +188,7 @@ const RealmWizard: React.FC = () => {
             ? new PublicKey(form.communityMintId)
             : undefined,
           form.councilMintId ? new PublicKey(form.councilMintId) : undefined,
-          getMintMaxVoteWeight(),
+          parseMintMaxVoteWeight(form.communityMintMaxVoteWeightSource),
           form.minCommunityTokensToCreateGovernance!,
           form.yesThreshold,
           form.communityMintId ? form.transferAuthority : true,
@@ -415,10 +394,10 @@ const RealmWizard: React.FC = () => {
     >
       <div className="pointer">
         <a
-          className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1"
+          className="flex items-center text-sm transition-all text-fgd-3 hover:text-fgd-1"
           onClick={handleBackButtonClick}
         >
-          <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
+          <ArrowLeftIcon className="w-4 h-4 mr-1 text-primary-light" />
           Back
         </a>
       </div>
@@ -438,7 +417,7 @@ const RealmWizard: React.FC = () => {
             } pr-10 mr-3 mt-10`}
           >
             {ctl.getMode() === RealmWizardMode.BASIC && ctl.isLastStep() && (
-              <div className="flex justify-left items-center">
+              <div className="flex items-center justify-left">
                 <Switch
                   className="mt-2 mb-2"
                   checked={testRealmCheck}

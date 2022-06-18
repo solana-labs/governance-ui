@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router'
 import {
   AddressImage,
   DisplayAddress,
@@ -29,6 +30,11 @@ const StyledWalletProviderLabel = styled.p`
 `
 
 const ConnectWalletButton = (props) => {
+  const { pathname, query, replace } = useRouter()
+  const [currentCluster, setCurrentCluster] = useLocalStorageState(
+    'cluster',
+    'mainnet'
+  )
   const {
     connected,
     current,
@@ -36,23 +42,32 @@ const ConnectWalletButton = (props) => {
     connection,
     set: setWalletStore,
   } = useWalletStore((s) => s)
-
   const provider = useMemo(() => getWalletProviderByUrl(providerUrl), [
     providerUrl,
   ])
 
-  const [useDevnet, setUseDevnet] = useLocalStorageState('false')
-  const handleToggleDevnet = () => {
-    setUseDevnet(!useDevnet)
-    if (useDevnet) {
-      window.location.href = `${window.location.pathname}`
-    } else {
-      window.location.href = `${window.location.href}?cluster=devnet`
-    }
-  }
   useEffect(() => {
-    setUseDevnet(connection.cluster === 'devnet')
+    setCurrentCluster(connection.cluster)
   }, [connection.cluster])
+
+  function updateClusterParam(cluster) {
+    const newQuery = {
+      ...query,
+      cluster,
+    }
+    if (!cluster) {
+      delete newQuery.cluster
+    }
+    replace({ pathname, query: newQuery }, undefined, {
+      shallow: true,
+    })
+  }
+
+  function handleToggleDevnet() {
+    const isDevnet = !(currentCluster === 'devnet')
+    setCurrentCluster(isDevnet ? 'devnet' : 'mainnet')
+    updateClusterParam(isDevnet ? 'devnet' : null)
+  }
 
   const handleConnectDisconnect = async () => {
     try {
@@ -90,7 +105,7 @@ const ConnectWalletButton = (props) => {
 
   const displayAddressImage = useMemo(() => {
     return connected && current?.publicKey ? (
-      <div className="w-12 pr-2">
+      <div className="hidden w-12 pr-2 sm:block">
         <AddressImage
           dark={true}
           connection={connection.current}
@@ -105,7 +120,7 @@ const ConnectWalletButton = (props) => {
         />{' '}
       </div>
     ) : (
-      <div className="pl-2 pr-2">
+      <div className="hidden pl-2 pr-2 sm:block">
         <img src={provider?.adapter.icon} className="w-5 h-5" />
       </div>
     )
@@ -183,7 +198,7 @@ const ConnectWalletButton = (props) => {
                     <div className="flex items-center w-full p-2 font-normal default-transition h-9 hover:bg-bkg-3 hover:cursor-pointer hover:rounded focus:outline-none">
                       <span className="text-sm">Devnet</span>
                       <Switch
-                        checked={useDevnet}
+                        checked={currentCluster === 'devnet'}
                         onChange={() => {
                           handleToggleDevnet()
                         }}

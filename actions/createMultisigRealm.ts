@@ -5,6 +5,7 @@ import {
   SetRealmAuthorityAction,
   VoteThresholdPercentage,
   VoteTipping,
+  withCreateNativeTreasury,
 } from '@solana/spl-governance'
 
 import { withCreateMintGovernance } from '@solana/spl-governance'
@@ -28,8 +29,9 @@ import {
 } from '@tools/sdk/units'
 import {
   getWalletPublicKey,
-  sendTransactions,
+  sendTransactionsV2,
   SequenceType,
+  transactionInstructionsToTypedInstructionsSets,
   WalletSigner,
 } from 'utils/sendTransactions'
 import { chunks } from '@utils/helpers'
@@ -209,6 +211,15 @@ export const createMultisigRealm = async (
     walletPk
   )
 
+  await withCreateNativeTreasury(
+    realmInstructions,
+    programId,
+    communityMintGovPk,
+    walletPk
+  )
+
+  console.log('CREATE NFT REALM governance config created', config)
+
   // Set the community governance as the realm authority
   withSetRealmAuthority(
     realmInstructions,
@@ -227,13 +238,26 @@ export const createMultisigRealm = async (
       []
     )
 
-    const tx = await sendTransactions(
+    const tx = await sendTransactionsV2({
       connection,
+      showUiComponent: true,
       wallet,
-      [mintsSetupInstructions, ...councilMembersChunks, realmInstructions],
-      [mintsSetupSigners, ...councilMembersSignersChunks, realmSigners],
-      SequenceType.Sequential
-    )
+      signersSet: [
+        mintsSetupSigners,
+        ...councilMembersSignersChunks,
+        realmSigners,
+      ],
+      TransactionInstructions: [
+        mintsSetupInstructions,
+        ...councilMembersChunks,
+        realmInstructions,
+      ].map((x) =>
+        transactionInstructionsToTypedInstructionsSets(
+          x,
+          SequenceType.Sequential
+        )
+      ),
+    })
 
     return {
       tx,
