@@ -1,6 +1,7 @@
 import {
   SetRealmAuthorityAction,
   SYSTEM_PROGRAM_ID,
+  withCreateTokenOwnerRecord,
   withSetRealmAuthority,
 } from '@solana/spl-governance'
 
@@ -22,6 +23,7 @@ import { chunks } from '@utils/helpers'
 import { nftPluginsPks } from '@hooks/useVotingPlugins'
 
 import {
+  getNftVoterWeightRecord,
   getNftMaxVoterWeightRecord,
   getNftRegistrarPDA,
 } from 'NftVotePlugin/sdk/accounts'
@@ -117,21 +119,20 @@ export default async function createNFTRealm({
     communityMintPk,
     nftClient!.program.programId
   )
-  const instructionCR = nftClient!.program.instruction.createRegistrar(
-    10, // TODO: trust
-    {
-      accounts: {
-        registrar,
-        realm: realmPk,
-        governanceProgramId: programIdPk,
-        // realmAuthority: communityMintGovPk,
-        realmAuthority: walletPk,
-        governingTokenMint: communityMintPk,
-        payer: walletPk,
-        systemProgram: SYSTEM_PROGRAM_ID,
-      },
-    }
-  )
+  const instructionCR = await nftClient!.program.methods
+    .createRegistrar(10) // Max collections
+    .accounts({
+      registrar,
+      realm: realmPk,
+      governanceProgramId: programIdPk,
+      // realmAuthority: communityMintGovPk,
+      realmAuthority: walletPk,
+      governingTokenMint: communityMintPk,
+      payer: walletPk,
+      systemProgram: SYSTEM_PROGRAM_ID,
+    })
+    .instruction()
+
   console.log(
     'CREATE NFT REALM registrar PDA',
     registrar.toBase58(),
@@ -143,38 +144,34 @@ export default async function createNFTRealm({
     communityMintPk,
     nftClient!.program.programId
   )
-  const instructionMVWR = nftClient!.program.instruction.createMaxVoterWeightRecord(
-    {
-      accounts: {
-        maxVoterWeightRecord,
-        governanceProgramId: programIdPk,
-        realm: realmPk,
-        realmGoverningTokenMint: communityMintPk,
-        payer: walletPk,
-        systemProgram: SYSTEM_PROGRAM_ID,
-      },
-    }
-  )
+  const instructionMVWR = await nftClient!.program.methods
+    .createMaxVoterWeightRecord()
+    .accounts({
+      maxVoterWeightRecord,
+      governanceProgramId: programIdPk,
+      realm: realmPk,
+      realmGoverningTokenMint: communityMintPk,
+      payer: walletPk,
+      systemProgram: SYSTEM_PROGRAM_ID,
+    })
+    .instruction()
   console.log(
     'CREATE NFT REALM max voter weight record',
     maxVoterWeightRecord.toBase58(),
     instructionMVWR
   )
 
-  const instructionCC = nftClient!.program.instruction.configureCollection(
-    minCommunityTokensToCreateAsMintValue,
-    collectionCount,
-    {
-      accounts: {
-        registrar,
-        realm: realmPk,
-        // realmAuthority: communityMintGovPk,
-        realmAuthority: walletPk,
-        collection: new PublicKey(collectionAddress),
-        maxVoterWeightRecord: maxVoterWeightRecord,
-      },
-    }
-  )
+  const instructionCC = await nftClient!.program.methods
+    .configureCollection(minCommunityTokensToCreateAsMintValue, collectionCount)
+    .accounts({
+      registrar,
+      realm: realmPk,
+      // realmAuthority: communityMintGovPk,
+      realmAuthority: walletPk,
+      collection: new PublicKey(collectionAddress),
+      maxVoterWeightRecord: maxVoterWeightRecord,
+    })
+    .instruction()
 
   console.log(
     'CREATE NFT REALM configure collection',
@@ -197,6 +194,38 @@ export default async function createNFTRealm({
     walletPk,
     communityMintGovPk,
     SetRealmAuthorityAction.SetChecked
+  )
+
+  const { voterWeightPk } = await getNftVoterWeightRecord(
+    realmPk,
+    communityMintPk,
+    walletPk,
+    nftClient.program.programId
+  )
+  console.log('NFT realm voter weight', voterWeightPk.toBase58())
+  const createVoterWeightRecord = await nftClient.program.methods
+    .createVoterWeightRecord(walletPk)
+    .accounts({
+      voterWeightRecord: voterWeightPk,
+      governanceProgramId: programIdPk,
+      realm: realmPk,
+      realmGoverningTokenMint: communityMintPk,
+      payer: walletPk,
+      systemProgram: SYSTEM_PROGRAM_ID,
+    })
+    .instruction()
+  console.log(
+    'NFT realm voter weight record instruction',
+    createVoterWeightRecord
+  )
+  nftConfigurationInstructions.push(createVoterWeightRecord)
+  await withCreateTokenOwnerRecord(
+    nftConfigurationInstructions,
+    programIdPk,
+    realmPk,
+    walletPk,
+    communityMintPk,
+    walletPk
   )
 
   try {
