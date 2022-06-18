@@ -80,6 +80,7 @@ import VotingMintConfig from './components/instructions/Vsr/VotingMintConfig'
 import CreateVsrRegistrar from './components/instructions/Vsr/CreateRegistrar'
 import GoblinGoldDeposit from './components/instructions/GoblinGold/GoblinGoldDeposit'
 import GoblinGoldWithdraw from './components/instructions/GoblinGold/GoblinGoldWithdraw'
+import MakeSetMarketMode from './components/instructions/Mango/MakeSetMarketMode'
 import CreateGatewayPluginRegistrar from './components/instructions/GatewayPlugin/CreateRegistrar'
 
 const schema = yup.object().shape({
@@ -271,16 +272,6 @@ const New = () => {
             governance
           )) as ProgramAccount<Governance>
         }
-
-        console.log('creating proposal with args:')
-        console.log({
-          title: form.title,
-          description: form.description,
-          governance: selectedGovernance,
-          instructionsData,
-          voteByCouncil,
-          isDraft,
-        })
         proposalAddress = await handleCreateProposal({
           title: form.title,
           description: form.description,
@@ -296,7 +287,6 @@ const New = () => {
 
         router.push(url)
       } catch (ex) {
-        console.log('Notifying:')
         console.log(ex)
         notify({ type: 'error', message: `${ex}` })
       }
@@ -311,7 +301,6 @@ const New = () => {
   }, [instructionsData[0].governedAccount?.pubkey])
 
   useEffect(() => {
-    console.log('this useeffect was called...')
     const governedAccount = extractGovernanceAccountFromInstructionsData(
       instructionsData
     )
@@ -320,8 +309,6 @@ const New = () => {
   }, [instructionsData])
 
   const getCurrentInstruction = ({ typeId, idx }) => {
-    console.log('IN GET CURRENT INSTRUCTION:')
-    console.log(typeId)
     switch (typeId) {
       case Instructions.Transfer:
         return (
@@ -469,6 +456,13 @@ const New = () => {
             index={idx}
             governance={governance}
           ></MakeCreatePerpMarket>
+        )
+      case Instructions.MangoSetMarketMode:
+        return (
+          <MakeSetMarketMode
+            index={idx}
+            governance={governance}
+          ></MakeSetMarketMode>
         )
       case Instructions.ForesightInitMarket:
         return (
@@ -632,8 +626,8 @@ const New = () => {
                       onChange={(value) => setInstructionType({ value, idx })}
                       value={instruction.type?.name}
                     >
-                      {availableInstructionsForIdx.map((inst) => (
-                        <Select.Option key={inst.id} value={inst}>
+                      {availableInstructionsForIdx.map((inst, idx) => (
+                        <Select.Option key={idx} value={inst}>
                           <span>{inst.name}</span>
                         </Select.Option>
                       ))}

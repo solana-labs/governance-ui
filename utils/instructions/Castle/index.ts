@@ -93,7 +93,6 @@ export async function getCastleDepositInstruction({
     try {
       await vaultClient.getLpTokenAccountInfo(userLpTokenAccount)
     } catch (error) {
-      console.log('Creating LP token account', error)
       createLpAcctIx = Token.createAssociatedTokenAccountInstruction(
         ASSOCIATED_TOKEN_PROGRAM_ID,
         TOKEN_PROGRAM_ID,
@@ -130,7 +129,6 @@ export async function getCastleDepositInstruction({
     signers,
     shouldSplitIntoSeparateTxs: true,
   }
-  console.log('cas: obj', obj)
 
   return obj
 }
@@ -177,8 +175,6 @@ export async function getCastleWithdrawInstruction({
       connection,
       form
     )
-
-    console.log(vaultClient)
 
     const lpTokenAccountOwner =
       governedTokenAccount.extensions.token.account.owner
@@ -235,7 +231,6 @@ export async function getCastleWithdrawInstruction({
     signers,
     shouldSplitIntoSeparateTxs: true,
   }
-  console.log('cas: obj', obj)
 
   return obj
 }
@@ -268,8 +263,6 @@ export async function getCastleReconcileInstruction(
       .join(''),
     16
   ).toNumber()
-
-  console.log('Grabbed', amount, 'from proposal instruction')
 
   return await vaultClient.getReconcileTxs(amount)
 }

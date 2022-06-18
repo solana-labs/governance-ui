@@ -21,7 +21,7 @@ import { PublicKey } from '@solana/web3.js'
 
 interface CreateGatewayRegistrarForm {
   governedAccount: AssetAccount | undefined
-  gatekeeperNetwork: PublicKey
+  gatekeeperNetwork: { name: string; value: PublicKey }
 }
 
 const CreateGatewayPluginRegistrar = ({
@@ -61,7 +61,7 @@ const CreateGatewayPluginRegistrar = ({
           governanceProgramId: realmInfo!.programId,
           realmAuthority: realm!.account.authority!,
           governingTokenMint: realm!.account.communityMint!,
-          gatekeeperNetwork: form!.gatekeeperNetwork,
+          gatekeeperNetwork: form!.gatekeeperNetwork.value,
           payer: wallet.publicKey!,
           systemProgram: SYSTEM_PROGRAM_ID,
         })
@@ -110,19 +110,19 @@ const CreateGatewayPluginRegistrar = ({
       type: InstructionInputType.SELECT,
       options: [
         {
-          key: 'Bot Resistance',
+          name: 'Bot Resistance',
           value: 'ignREusXmGrscGNUesoU9mxfds9AiYTezUKex2PsZV6',
         },
         {
-          key: 'Uniqueness',
+          name: 'Uniqueness',
           value: 'uniqobk8oGh4XBLMqM68K8M2zNu3CdYX7q5go7whQiv',
         },
         {
-          key: 'ID Verification',
+          name: 'ID Verification',
           value: 'ni1jXzPTq1yTqo67tUmVgnp22b1qGAAZCtPmHtskqYG',
         },
         {
-          key: 'ID Verification for DeFi',
+          name: 'ID Verification for DeFi',
           value: 'gatbGF9DvLAw3kWyn1EmH5Nh1Sqp8sTukF7yaQpSc71',
         },
       ],
