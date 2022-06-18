@@ -144,7 +144,7 @@ export const FRIKTION_PROGRAM_INSTRUCTIONS = {
             <p>{`Amount to Withdraw: ${nativeAmountToFormattedUiAmount(
               new BN(withdrawAmount),
               volt.shareTokenDecimals,
-            )} ${volt.depositTokenSymbol}`}</p>
+            )} ${volt.shareTokenSymbol}`}</p>
           </>
         );
       },

@@ -30,6 +30,7 @@ type VoltState = {
   pendingWithdrawal: string;
   deposited: string;
   claimable: string;
+  tokenPrice: string;
 };
 
 export type VoltData = VoltSnapshot & VoltState;
@@ -113,7 +114,8 @@ const fetchVoltRound = async ({
     voltVaultId,
     governancePubkey,
   });
-
+  const factor = await cVoltSDK.getCurrentEpochInfo();
+  console.log('factor', factor);
   const balances = await cVoltSDK.getBalancesForUser(governancePubkey);
   console.log(
     'balances',
@@ -123,11 +125,14 @@ const fetchVoltRound = async ({
     ),
   );
 
+  const epochInfo = await cVoltSDK.getCurrentEpochInfo();
+
   return {
     pendingDeposit: balances?.pendingDeposits.toString() ?? '0',
     pendingWithdrawal: balances?.pendingWithdrawals.toString() ?? '0',
     deposited: balances?.totalBalance.toString() ?? '0',
     claimable: balances?.claimableUnderlying.toString() ?? '0',
+    tokenPrice: (epochInfo.vaultTokenPrice as string) ?? '0',
   };
 };
 

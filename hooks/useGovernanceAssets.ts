@@ -444,11 +444,13 @@ export default function useGovernanceAssets() {
       name: 'Withdraw from Volt',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.Friktion,
+      tag: 'beta',
     },
     [InstructionEnum.FriktionClaimWithdrawal]: {
       name: 'Claim Pending Withdrawal',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.Friktion,
+      tag: 'beta',
     },
     [InstructionEnum.Transfer]: {
       name: 'Transfer Tokens From Treasuries',

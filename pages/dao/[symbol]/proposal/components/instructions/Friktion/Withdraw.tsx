@@ -86,6 +86,13 @@ const Withdraw = ({
       text: volt.apy.toString() + '%',
     },
     {
+      label: 'Vault Token Amount',
+      text:
+        Number(volt.tokenPrice) > 0
+          ? (Number(volt.deposited) / Number(volt.tokenPrice)).toString()
+          : '0',
+    },
+    {
       label: 'Pending Withdrawal',
       text: volt.pendingWithdrawal,
       flag: Number(volt.deposited) > 0 ? Flag.Warning : Flag.OK,
@@ -161,7 +168,7 @@ const Withdraw = ({
 
               <Input
                 min={0}
-                label="Amount"
+                label="UI Amount of claimable vault token"
                 value={form.uiAmount}
                 type="number"
                 onChange={(evt) => {
@@ -171,6 +178,17 @@ const Withdraw = ({
                   });
                 }}
                 error={formErrors['uiAmount']}
+              />
+
+              <Input
+                type="number"
+                label={`UI Amount of ${
+                  friktionVolts[form.volt].depositTokenSymbol
+                } to withdraw`}
+                value={
+                  form.uiAmount * Number(friktionVolts[form.volt].tokenPrice)
+                }
+                disabled={true}
               />
             </>
           )}
