@@ -244,11 +244,12 @@ export default function AddNFTCollectionForm({
     setFocus,
     clearErrors,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { isValid },
   } = useForm({
     mode: 'all',
     resolver: yupResolver(schema),
   })
+  const [unverifiedCollection, setUnverifiedCollection] = useState(false)
   const collectionKey = watch('collectionKey')
   const numberOfNFTs = watch('numberOfNFTs') || 10000
   const approvalPercent = watch('communityYesVotePercentage', 60) || 60
@@ -262,12 +263,12 @@ export default function AddNFTCollectionForm({
   }, [])
 
   useEffect(() => {
-    if (!selectedNFTCollection) {
-      setFocus('collectionInput')
-    } else {
+    if (unverifiedCollection || selectedNFTCollection) {
       setFocus('numberOfNFTs')
+    } else {
+      // setFocus('collectionInput')
     }
-  }, [selectedNFTCollection])
+  }, [unverifiedCollection, selectedNFTCollection])
 
   function serializeValues(values) {
     const data = {
@@ -296,15 +297,12 @@ export default function AddNFTCollectionForm({
         setRequestPending(false)
       } catch (err) {
         setRequestPending(false)
-        setError(
-          'collectionInput',
-          { type: 'custom', message: 'Address is not a verified collection' },
-          { shouldFocus: true }
-        )
+        setValue('collectionKey', collectionInput)
+        setUnverifiedCollection(true)
       }
     } else {
-      setError('collectionInputError', {
-        type: 'custom',
+      setError('collectionInput', {
+        type: 'error',
         message: 'Address is invalid',
       })
     }
@@ -314,7 +312,9 @@ export default function AddNFTCollectionForm({
     if (clearInput) {
       setValue('collectionInput', '')
     }
+    clearErrors('collectionInput')
     setValue('collectionKey', '')
+    setUnverifiedCollection(false)
     setSelectedNFTCollection(undefined)
   }
 
@@ -323,6 +323,7 @@ export default function AddNFTCollectionForm({
     ev.currentTarget.value += value
     setValue('collectionInput', ev.currentTarget.value)
     handleAdd(ev.currentTarget.value)
+    ev.preventDefault()
   }
 
   async function handleSelectFromWallet() {
@@ -370,7 +371,7 @@ export default function AddNFTCollectionForm({
         setError(
           'collectionInput',
           {
-            type: 'custom',
+            type: 'error',
             message: 'Current wallet has no verified collection',
           },
           { shouldFocus: true }
@@ -403,8 +404,7 @@ export default function AddNFTCollectionForm({
         collections={collectionsInWallet}
         onSelect={({ key, collection }) => {
           if (key && collection) {
-            clearErrors('collectionInput')
-            setValue('collectionInput', '')
+            handleClearSelectedNFT(true)
             setValue('collectionKey', key)
             setSelectedNFTCollection(collection)
           }
@@ -442,8 +442,11 @@ export default function AddNFTCollectionForm({
               <Input
                 placeholder="e.g. SMBH3wF6baUj6JWtzYvqcKuj2XCKWDqQxzspY12xPND"
                 data-testid="nft-address"
-                error={
-                  error?.message || errors?.collectionInputError?.message || ''
+                error={error?.message || ''}
+                warning={
+                  unverifiedCollection
+                    ? 'Caution: we could not verify this address is a "certified" collection.'
+                    : ''
                 }
                 {...field}
                 disabled={requestPending}
@@ -454,7 +457,7 @@ export default function AddNFTCollectionForm({
                 }}
                 onPaste={handlePaste}
                 onBlur={(ev) => {
-                  field.onBlur()
+                  // field.onBlur()
                   handleAdd(ev.currentTarget.value)
                 }}
               />
@@ -479,95 +482,98 @@ export default function AddNFTCollectionForm({
         />
         <input className="hidden" {...register('collectionKey')} disabled />
 
-        <div
-          className={`flex flex-col w-full px-4 py-5 rounded-md bg-bkg-3  ${
-            requestPending ? 'animate-pulse' : ''
-          }`}
-        >
-          {requestPending ? (
-            <Text level="2">Getting collection data</Text>
-          ) : (
-            <Text level="2" className="flex space-x-4">
-              {!selectedNFTCollection?.name ? (
-                'Select a collection to preview...'
-              ) : (
-                <>
-                  <div className="text-green">Verified collection</div>
-                  <div
-                    className="underline hover:text-fgd-2 hover:cursor-pointer"
-                    onClick={() => handleClearSelectedNFT(true)}
-                  >
-                    Clear
-                  </div>
-                </>
-              )}
-            </Text>
-          )}
-
-          <div className="flex mt-5 space-x-2">
-            {!selectedNFTCollection?.name ? (
-              <SkeletonNFTCollectionInfo />
+        {!unverifiedCollection && (
+          <div
+            className={`flex flex-col w-full px-4 py-5 rounded-md bg-bkg-3  ${
+              requestPending ? 'animate-pulse' : ''
+            }`}
+          >
+            {requestPending ? (
+              <Text level="2">Getting collection data</Text>
             ) : (
-              <div className="flex w-full">
-                <div className="relative h-24 pl-2 shrink-0 w-28">
-                  {selectedNFTCollection?.nfts
-                    ?.slice(0, 3)
-                    .map((nft, index) => {
-                      return (
-                        <img
-                          key={nft.name}
-                          src={nft.image}
-                          alt="collection item"
-                          className={`absolute w-24 rounded-md ${
-                            index === 0
-                              ? 'rotate-[-9deg]'
-                              : index === 1
-                              ? 'rotate-[-15deg]'
-                              : index === 2
-                              ? 'rotate-[15deg]'
-                              : 'rotate-[9deg]'
-                          }`}
-                        />
-                      )
-                    })}
-                  <img
-                    src={selectedNFTCollection?.image}
-                    className="absolute w-24 rounded-md"
-                  />
-                </div>
-                <div className="grid w-full pl-4">
-                  <Text level="1" className="break-words">
-                    {selectedNFTCollection?.name || '(Collection has no name)'}
-                  </Text>
-                  <Text level="2" className="truncate text-fgd-2">
-                    {selectedNFTCollection?.external_url ? (
-                      <a
-                        href={selectedNFTCollection.external_url}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        {selectedNFTCollection.external_url}
-                      </a>
-                    ) : (
-                      '(No external address)'
-                    )}
-                  </Text>
-                  <Text
-                    level="2"
-                    className="flex items-baseline mt-2 space-x-2 text-fgd-2"
-                  >
-                    <WalletIcon />
-                    <span>
-                      {collectionKey && abbreviateAddress(collectionKey)}
-                    </span>
-                  </Text>
-                </div>
-              </div>
+              <Text level="2" className="flex space-x-4">
+                {!selectedNFTCollection?.name ? (
+                  'Select a collection to preview...'
+                ) : (
+                  <>
+                    <div className="text-green">Verified collection</div>
+                    <div
+                      className="underline hover:text-fgd-2 hover:cursor-pointer"
+                      onClick={() => handleClearSelectedNFT(true)}
+                    >
+                      Clear
+                    </div>
+                  </>
+                )}
+              </Text>
             )}
-          </div>
-        </div>
 
-        {selectedNFTCollection && (
+            <div className="flex mt-5 space-x-2">
+              {!selectedNFTCollection?.name ? (
+                <SkeletonNFTCollectionInfo />
+              ) : (
+                <div className="flex w-full">
+                  <div className="relative h-24 pl-2 shrink-0 w-28">
+                    {selectedNFTCollection?.nfts
+                      ?.slice(0, 3)
+                      .map((nft, index) => {
+                        return (
+                          <img
+                            key={nft.name}
+                            src={nft.image}
+                            alt="collection item"
+                            className={`absolute w-24 rounded-md ${
+                              index === 0
+                                ? 'rotate-[-9deg]'
+                                : index === 1
+                                ? 'rotate-[-15deg]'
+                                : index === 2
+                                ? 'rotate-[15deg]'
+                                : 'rotate-[9deg]'
+                            }`}
+                          />
+                        )
+                      })}
+                    <img
+                      src={selectedNFTCollection?.image}
+                      className="absolute w-24 rounded-md"
+                    />
+                  </div>
+                  <div className="grid w-full pl-4">
+                    <Text level="1" className="break-words">
+                      {selectedNFTCollection?.name ||
+                        '(Collection has no name)'}
+                    </Text>
+                    <Text level="2" className="truncate text-fgd-2">
+                      {selectedNFTCollection?.external_url ? (
+                        <a
+                          href={selectedNFTCollection.external_url}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {selectedNFTCollection.external_url}
+                        </a>
+                      ) : (
+                        '(No external address)'
+                      )}
+                    </Text>
+                    <Text
+                      level="2"
+                      className="flex items-baseline mt-2 space-x-2 text-fgd-2"
+                    >
+                      <WalletIcon />
+                      <span>
+                        {collectionKey && abbreviateAddress(collectionKey)}
+                      </span>
+                    </Text>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {collectionKey && (
           <>
             <Controller
               name="numberOfNFTs"
@@ -597,7 +603,6 @@ export default function AddNFTCollectionForm({
                     placeholder="e.g. 10,000"
                     data-testid="nft-collection-count"
                     error={error?.message || ''}
-                    disabled={!selectedNFTCollection}
                     {...field}
                   />
                 </FormField>
