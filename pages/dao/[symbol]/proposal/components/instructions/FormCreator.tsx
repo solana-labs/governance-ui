@@ -5,12 +5,14 @@ import { useState, useEffect } from 'react'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { precision } from '@utils/formatting'
 import Switch from '@components/Switch'
+import Select from '@components/inputs/Select'
 
 export enum InstructionInputType {
   GOVERNED_ACCOUNT,
   INPUT,
   TEXTAREA,
   SWITCH,
+  SELECT,
 }
 
 export interface InstructionInput {
@@ -109,6 +111,26 @@ const InstructionInput = ({
             shouldBeGoverned={input.shouldBeGoverned}
             governance={input.governance}
           />
+        )
+      case InstructionInputType.SELECT:
+        return (
+          <Select
+            label={input.label}
+            value={form[input.name]?.name}
+            placeholder="Please select..."
+            onChange={(value) => {
+              handleSetForm({ value, propertyName: input.name })
+            }}
+            error={formErrors[input.name]}
+          >
+            {input.options?.map((x, idx) => (
+              <Select.Option key={idx} value={x}>
+                <div className="flex flex-col">
+                  <span>{x.name}</span>
+                </div>
+              </Select.Option>
+            ))}
+          </Select>
         )
       case InstructionInputType.INPUT: {
         const validateAmountOnBlur = () => {

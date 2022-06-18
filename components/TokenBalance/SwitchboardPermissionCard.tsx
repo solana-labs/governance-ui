@@ -22,8 +22,6 @@ const SwitchboardPermissionCard = () => {
   const switchboardRefreshInstructions = useSwitchboardPluginStore(
     (s) => s.state.instructions
   )
-  console.log('sbis:')
-  console.log()
 
   const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
   const { realm, symbol } = useRealm()
@@ -67,8 +65,6 @@ const SwitchboardPermissionCard = () => {
       </div>
       <div className="space-y-4">
         {(() => {
-          console.log(switchboardVoterWeight)
-          console.log(`does it equal zero: ${switchboardVoterWeight.isZero()}`)
           if (switchboardVoterWeight.isZero()) {
             return <span>You do not have voting rights</span>
           } else {
