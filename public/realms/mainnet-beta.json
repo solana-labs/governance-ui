@@ -807,5 +807,14 @@
       "ogImage": "https://www.foresight.exchange/logo.png",
       "website": "https://www.foresight.exchange/",
       "twitter": "@foresightmkt"
+    },
+    {
+      "symbol": "SLND",
+      "displayName": "Solend DAO",
+      "programId": "[TBD]",
+      "realmId": "[TBD]",
+      "ogImage": "https://solend-image-assets.s3.us-east-2.amazonaws.com/1280-circle.png",
+      "website": "https://solend.fi/",
+      "twitter": "@solendprotocol"
     }
 ]
