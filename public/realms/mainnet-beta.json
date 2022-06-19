@@ -811,10 +811,11 @@
     {
       "symbol": "SLND",
       "displayName": "Solend DAO",
-      "programId": "[TBD]",
-      "realmId": "[TBD]",
+      "programId": "A7kmu2kUcnQwAVn8B4znQmGJeUrsJ1WEhYVMtmiBLkEr",
+      "realmId": "6gcJCdWmWe2JuMX7Tyhs3gQD5pgxRZcF4kz8LTKMMTH9",
       "ogImage": "https://solend-image-assets.s3.us-east-2.amazonaws.com/1280-circle.png",
       "website": "https://solend.fi/",
-      "twitter": "@solendprotocol"
+      "twitter": "@solendprotocol",
+      "sortRank": 4
     }
 ]
