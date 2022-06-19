@@ -18,6 +18,7 @@ import {
   ForesightHasGovernedAccount,
   ForesightHasMarketId,
   ForesightHasMarketListId,
+  ForesightMakeResolveMarketParams,
   ForesightMakeSetMarketMetadataParams,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
@@ -30,6 +31,7 @@ import useRealm from '@hooks/useRealm'
 import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../pages/dao/[symbol]/proposal/new'
 import Select from '@components/inputs/Select'
+import TextareaProps from '@components/inputs/Textarea'
 
 type EmptyObject = Record<string, never>
 type SetFormErrors = Dispatch<React.SetStateAction<EmptyObject>>
@@ -352,13 +354,15 @@ export function ForesightMarketIdInput(
   )
 }
 
-export function ForesightWinnerInput(props: InputProps<ForesightHasMarketId>) {
+export function ForesightWinnerInput(
+  props: InputProps<ForesightMakeResolveMarketParams>
+) {
   return (
     <Input
       label="Winner"
-      value={props.form.marketId}
+      value={props.form.winner}
+      min={-1}
       type="number"
-      min={0}
       onChange={(evt) =>
         props.handleSetForm({
           value: evt.target.value,
@@ -374,7 +378,7 @@ export function ForesightContentInput(
   props: InputProps<ForesightMakeSetMarketMetadataParams>
 ) {
   return (
-    <Input
+    <TextareaProps
       label="Content"
       value={props.form.content}
       type="text"
