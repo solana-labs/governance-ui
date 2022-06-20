@@ -17,7 +17,10 @@ const Document = () => {
           name="msapplication-TileImage"
           content="/favicons/ms-icon-144x144.png"
         />
-        <meta name="twitter:image" content="/img/logo-realms.png"></meta>
+        <meta
+          property="twitter:image"
+          content="https://realms.today/img/logo-realms.png"
+        />
         <meta name="theme-color" content="#ffffff" />
         <meta name="twitter:title" content="Realms" />
         <meta property="og:type" content="website" />
