@@ -18,6 +18,10 @@ const Document = () => {
           content="/favicons/ms-icon-144x144.png"
         />
         <meta
+          httpEquiv="Content-Security-Policy"
+          content="upgrade-insecure-requests"
+        />
+        <meta
           property="twitter:image"
           content="https://raw.githubusercontent.com/solana-labs/governance-ui/main/public/img/logo-realms.png"
         />
