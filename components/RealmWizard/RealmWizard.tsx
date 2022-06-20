@@ -1,48 +1,48 @@
 import React, { useState } from 'react'
 import RealmWizardController from './controller/RealmWizardController'
 // import CreateRealmForm from './components/CreateRealmForm'
-import Loading from '@components/Loading'
-import WizardModeSelect from './components/Steps/WizardModeSelect'
-import { notify } from '@utils/notifications'
+import Button from '@components/Button'
 import {
-  MultisigOptions,
+  DEFAULT_GOVERNANCE_PROGRAM_ID,
+  DEFAULT_TEST_GOVERNANCE_PROGRAM_ID,
+} from '@components/instructions/tools'
+import Loading from '@components/Loading'
+import { PublicKey } from '@solana/web3.js'
+import { notify } from '@utils/notifications'
+import { useMemo } from 'react'
+import useWalletStore from 'stores/useWalletStore'
+import {
   BespokeConfig,
   BespokeCouncil,
   BespokeInfo,
+  MultisigOptions,
   RealmCreated,
 } from './components/Steps'
-import { useMemo } from 'react'
-import Button from '@components/Button'
+import WizardModeSelect from './components/Steps/WizardModeSelect'
 import {
   RealmArtifacts,
   RealmWizardMode,
   RealmWizardStep,
   StepDirection,
 } from './interfaces/Realm'
-import { PublicKey } from '@solana/web3.js'
-import useWalletStore from 'stores/useWalletStore'
-import {
-  DEFAULT_GOVERNANCE_PROGRAM_ID,
-  DEFAULT_TEST_GOVERNANCE_PROGRAM_ID,
-} from '@components/instructions/tools'
 
-import Tooltip from '@components/Tooltip'
 import { StyledLabel } from '@components/inputs/styles'
-import { createMultisigRealm } from 'actions/createMultisigRealm'
+import Switch from '@components/Switch'
+import Tooltip from '@components/Tooltip'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
 import useQueryContext from '@hooks/useQueryContext'
-import router from 'next/router'
-import { useEffect } from 'react'
-import { CreateFormSchema } from './validators/createRealmValidator'
-import { formValidation, isFormValid } from '@utils/formValidation'
-import { registerRealm } from 'actions/registerRealm'
+import { BN } from '@project-serum/anchor'
 import {
   getGovernanceProgramVersion,
   MintMaxVoteWeightSource,
 } from '@solana/spl-governance'
-import Switch from '@components/Switch'
-import { BN } from '@project-serum/anchor'
+import { formValidation, isFormValid } from '@utils/formValidation'
+import { createMultisigRealm } from 'actions/createMultisigRealm'
+import { registerRealm } from 'actions/registerRealm'
 import BigNumber from 'bignumber.js'
+import router from 'next/router'
+import { useEffect } from 'react'
+import { CreateFormSchema } from './validators/createRealmValidator'
 
 enum LoaderMessage {
   CREATING_ARTIFACTS = 'Creating the DAO artifacts..',
@@ -120,7 +120,7 @@ const RealmWizard: React.FC = () => {
       ? DEFAULT_TEST_GOVERNANCE_PROGRAM_ID
       : DEFAULT_GOVERNANCE_PROGRAM_ID
 
-    const governanceProgramId = new PublicKey(programId)
+    const governanceProgramId = new PublicKey(programId!)
     const programVersion = await getGovernanceProgramVersion(
       connection.current,
       governanceProgramId
