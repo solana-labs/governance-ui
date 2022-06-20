@@ -119,6 +119,7 @@ function App({ Component, pageProps }) {
         {faviconUrl ? (
           <>
             <link rel="icon" href={faviconUrl} />
+            <meta name="twitter:image:src" content={realmInfo?.ogImage}></meta>
           </>
         ) : (
           <>
