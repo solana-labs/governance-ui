@@ -17,10 +17,14 @@ const Document = () => {
           name="msapplication-TileImage"
           content="/favicons/ms-icon-144x144.png"
         />
+        <meta
+          name="twitter:image:src"
+          content="https://realms.today/img/logo-realms.svg"
+        ></meta>
         <meta name="theme-color" content="#ffffff" />
 
         <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:card" content="Realms" />
       </Head>
       <body>
         <Main />
