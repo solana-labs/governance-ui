@@ -19,9 +19,9 @@ const Document = () => {
         />
         <meta name="twitter:image:src" content="/img/logo-realms.svg"></meta>
         <meta name="theme-color" content="#ffffff" />
-
+        <meta name="twitter:title" content="Realms" />
         <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="Realms" />
+        <meta name="twitter:card" content="summary" />
       </Head>
       <body>
         <Main />
