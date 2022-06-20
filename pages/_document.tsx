@@ -19,7 +19,7 @@ const Document = () => {
         />
         <meta
           property="twitter:image"
-          content="https://realms.today/img/logo-realms.png"
+          content="https://raw.githubusercontent.com/solana-labs/governance-ui/ad94da179bb40716c37006f4efa759a622550d7c/public/img/logo-realms.png"
         />
         <meta name="theme-color" content="#ffffff" />
         <meta name="twitter:title" content="Realms" />
