@@ -116,7 +116,10 @@ function App({ Component, pageProps }) {
       <Head>
         <meta property="og:title" content={title} />
         <title>{title}</title>
-        <meta name="twitter:image:src" content={realmInfo?.ogImage}></meta>
+        <meta
+          name="twitter:image:src"
+          content="https://realms.today/img/logo-realms.svg"
+        ></meta>
         {faviconUrl ? (
           <>
             <link rel="icon" href={faviconUrl} />
