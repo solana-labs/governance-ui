@@ -42,6 +42,7 @@ import {
   getReserveData,
   SOLEND,
 } from 'Strategies/protocols/solend'
+import tokenService from '@utils/services/token'
 
 type InvestmentType = TreasuryStrategy & {
   investedAmount: number
@@ -243,6 +244,72 @@ const AccountOverview = () => {
     }),
     {}
   )
+
+  const StaticInvestmentsComponent = () => {
+    const currentTokenImg = currentAccount.isToken
+      ? tokenService.getTokenInfo(
+          currentAccount.extensions.mint!.publicKey.toBase58()
+        )?.logoURI || ''
+      : ''
+    const marinadeStrategy = {
+      liquidity: 0,
+      protocolSymbol: '',
+      apy: '',
+      protocolName: 'Marinade',
+      handledMint: '',
+      handledTokenSymbol: '',
+      handledTokenImgSrc:
+        'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png',
+      protocolLogoSrc:
+        'https://raw.githubusercontent.com/LP-Finance-Inc/token-image/main/msol.png',
+      strategyName: 'Stake',
+      strategyDescription: '',
+      createProposalFcn: () => null,
+    }
+    const serumStrategy = {
+      liquidity: 0,
+      protocolSymbol: '',
+      apy: '',
+      protocolName: 'Serum',
+      handledMint: '',
+      handledTokenSymbol: '',
+      handledTokenImgSrc: currentTokenImg,
+      protocolLogoSrc:
+        'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt/logo.png',
+      strategyName: 'Trade',
+      strategyDescription: '',
+      createProposalFcn: () => null,
+    }
+    return (
+      <>
+        {isSol && (
+          <StrategyCard
+            onClick={() => setOpenMsolConvertModal(true)}
+            currentDeposits={0}
+            strat={marinadeStrategy}
+          ></StrategyCard>
+        )}
+        {isSplToken && (
+          <StrategyCard
+            onClick={() => setTradeSerumInfo({ tokenAccount: currentAccount })}
+            currentDeposits={0}
+            strat={serumStrategy}
+          ></StrategyCard>
+        )}
+      </>
+    )
+  }
+  const NoInvestmentsIndicator = () => {
+    return (
+      <>
+        <div className="p-4 border rounded-md border-fgd-4">
+          <p className="text-center text-fgd-3">
+            {loading ? 'Loading...' : 'No investments for this account'}
+          </p>
+        </div>
+      </>
+    )
+  }
   return (
     <>
       <div className="flex items-center justify-between py-2 mb-2">
@@ -304,20 +371,6 @@ const AccountOverview = () => {
             {isNFT ? 'Deposit' : 'Copy Deposit Address'}
           </Button>
         </div>
-        {isSplToken && (
-          <Button
-            tooltipMessage={
-              !canUseTransferInstruction
-                ? 'You need to have connected wallet with ability to create token transfer proposals'
-                : ''
-            }
-            className="w-full"
-            onClick={() => setTradeSerumInfo({ tokenAccount: currentAccount })}
-            disabled={!canUseTransferInstruction}
-          >
-            Trade On Serum
-          </Button>
-        )}
         {!isAuxiliaryAccount && (
           <Button
             tooltipMessage={
@@ -334,22 +387,6 @@ const AccountOverview = () => {
             Send
           </Button>
         )}
-        {isSol ? (
-          <Button
-            className="w-full max-w-lg"
-            onClick={() => setOpenMsolConvertModal(true)}
-            disabled={!canUseTransferInstruction}
-          >
-            <Tooltip
-              content={
-                !canUseTransferInstruction &&
-                'You need to be connected to your wallet to have the ability to create a staking proposal'
-              }
-            >
-              <div>Stake with Marinade</div>
-            </Tooltip>
-          </Button>
-        ) : null}
         {isSol ? (
           <Button
             className="w-full max-w-lg"
@@ -394,27 +431,23 @@ const AccountOverview = () => {
             </LinkButton>
           </div>
           {showStrategies ? (
-            visibleInvestments.length > 0 ? (
-              visibleInvestments.map((strat, i) => (
-                <StrategyCard
-                  key={strat.handledTokenSymbol + i}
-                  currentDeposits={deposits[strat.protocolName] ?? 0}
-                  onClick={() => {
-                    setProposedInvestment({
-                      ...strat,
-                      investedAmount: deposits[strat.protocolName] ?? 0,
-                    })
-                  }}
-                  strat={strat}
-                />
-              ))
-            ) : (
-              <div className="p-4 border rounded-md border-fgd-4">
-                <p className="text-center text-fgd-3">
-                  No investments available for this account
-                </p>
-              </div>
-            )
+            <>
+              {visibleInvestments.length > 0 &&
+                visibleInvestments.map((strat, i) => (
+                  <StrategyCard
+                    key={strat.handledTokenSymbol + i}
+                    currentDeposits={deposits[strat.protocolName] ?? 0}
+                    onClick={() => {
+                      setProposedInvestment({
+                        ...strat,
+                        investedAmount: deposits[strat.protocolName] ?? 0,
+                      })
+                    }}
+                    strat={strat}
+                  />
+                ))}
+              <StaticInvestmentsComponent></StaticInvestmentsComponent>
+            </>
           ) : visibleAccounts.length > 0 ? (
             visibleAccounts.map((strat, i) => (
               <StrategyCard
@@ -424,14 +457,11 @@ const AccountOverview = () => {
               />
             ))
           ) : (
-            <div className="p-4 border rounded-md border-fgd-4">
-              <p className="text-center text-fgd-3">
-                {loading ? 'Loading...' : 'No investments for this account'}
-              </p>
-            </div>
+            <NoInvestmentsIndicator></NoInvestmentsIndicator>
           )}
         </div>
       )}
+
       <h3 className="mb-4">Recent Activity</h3>
       <div>
         {isLoadingRecentActivity ? (
@@ -595,12 +625,14 @@ const StrategyCard = ({
           <p className="text-xs">{`${strategyName} ${handledTokenSymbol} on ${protocolName}${
             strategySubtext ? ` - ${strategySubtext}` : ''
           }`}</p>
-          <p className="font-bold text-fgd-1">{`${currentPositionFtm} ${handledTokenSymbol}`}</p>
+          {(handledTokenSymbol || currentPositionFtm !== '0') && (
+            <p className="font-bold text-fgd-1">{`${currentPositionFtm} ${handledTokenSymbol}`}</p>
+          )}
         </div>
       </div>
       <div className="flex items-center space-x-4">
         <div className="text-right">
-          <p className="text-xs">Interest Rate</p>
+          {apy && <p className="text-xs">Interest Rate</p>}
           <p className="font-bold text-green">{apy}</p>
         </div>
         {onClick ? <Button onClick={onClick}>{`Propose`}</Button> : null}
