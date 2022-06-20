@@ -1,5 +1,21 @@
 import { FunctionComponent } from 'react'
 
+export const LoadingDots = ({ className = '' }) => {
+  return (
+    <div className={`flex items-center justify-center ${className}`}>
+      <span className="w-2 h-2 mx-[2px] bg-primary-dark rounded-full animate-loader"></span>
+      <span
+        className="w-2 h-2 mx-[2px] bg-primary-dark rounded-full animate-loader"
+        style={{ animationDelay: '0.2s' }}
+      ></span>
+      <span
+        className="w-2 h-2 mx-[2px] bg-primary-dark rounded-full animate-loader"
+        style={{ animationDelay: '0.4s' }}
+      ></span>
+    </div>
+  )
+}
+
 interface LoadingProps {
   className?: string
   w?: string
@@ -12,7 +28,7 @@ const Loading: FunctionComponent<LoadingProps> = ({
   h = 5,
 }) => {
   return (
-    <div className="w-full flex justify-center">
+    <div className="flex justify-center w-full">
       <svg
         className={`${className} animate-spin h-${w} w-${h}`}
         xmlns="http://www.w3.org/2000/svg"

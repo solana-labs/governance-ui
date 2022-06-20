@@ -37,6 +37,7 @@ export interface InstructionDataWithHoldUpTime {
   holdUpTime: number | undefined
   prerequisiteInstructions: TransactionInstruction[]
   chunkSplitByDefault?: boolean
+  chunkBy?: number
   signers?: Keypair[]
   shouldSplitIntoSeparateTxs?: boolean | undefined
 }
@@ -53,12 +54,12 @@ export class InstructionDataWithHoldUpTime {
       ? getInstructionDataFromBase64(instruction.serializedInstruction)
       : null
     this.holdUpTime =
-      typeof instruction.customHoldUpTime !== undefined
+      typeof instruction.customHoldUpTime !== 'undefined'
         ? instruction.customHoldUpTime
         : governance?.account?.config.minInstructionHoldUpTime
-
     this.prerequisiteInstructions = instruction.prerequisiteInstructions || []
     this.chunkSplitByDefault = instruction.chunkSplitByDefault || false
+    this.chunkBy = instruction.chunkBy || 2
   }
 }
 
@@ -91,6 +92,8 @@ export const createProposal = async (
 
   // Explicitly request the version before making RPC calls to work around race conditions in resolving
   // the version for RealmInfo
+
+  // Changed this because it is misbehaving on my local validator setup.
   const programVersion = await getGovernanceProgramVersion(
     connection,
     programId
@@ -149,7 +152,10 @@ export const createProposal = async (
   const splitToChunkByDefault = instructionsData.filter(
     (x) => x.chunkSplitByDefault
   ).length
-
+  const chunkBys = instructionsData
+    .filter((x) => x.chunkBy)
+    .map((x) => x.chunkBy!)
+  const chunkBy = chunkBys.length ? Math.min(...chunkBys) : 2
   for (const [index, instruction] of instructionsData
     .filter((x) => x.data)
     .entries()) {
@@ -205,7 +211,6 @@ export const createProposal = async (
       sendingMessage: `creating ${notificationTitle}`,
       successMessage: `${notificationTitle} created`,
     })
-
     await sendTransaction({
       transaction: transaction2,
       wallet,
@@ -243,7 +248,7 @@ export const createProposal = async (
       ),
     })
   } else {
-    const insertChunks = chunks(insertInstructions, 2)
+    const insertChunks = chunks(insertInstructions, chunkBy)
     const signerChunks = Array(insertChunks.length).fill([])
 
     console.log(`Creating proposal using ${insertChunks.length} chunks`)

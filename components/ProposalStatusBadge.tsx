@@ -3,6 +3,7 @@ import useRealmGovernance from '../hooks/useRealmGovernance'
 import { Proposal, ProposalState } from '@solana/spl-governance'
 import useWalletStore from '../stores/useWalletStore'
 import { isYesVote } from '@models/voteRecords'
+import useRealm from '@hooks/useRealm'
 
 function getProposalStateLabel(state: ProposalState, hasVoteEnded: boolean) {
   switch (state) {
@@ -49,10 +50,36 @@ const ProposalStateBadge = ({
   open: boolean
 }) => {
   const governance = useRealmGovernance(proposal.governance)
+  const { realm } = useRealm()
 
-  const ownVoteRecord = useWalletStore((s) => s.ownVoteRecordsByProposal)[
+  const {
+    communityDelegateVoteRecordsByProposal,
+    councilDelegateVoteRecordsByProposal,
+  } = useWalletStore((s) => s)
+
+  const walletVoteRecord = useWalletStore((s) => s.ownVoteRecordsByProposal)[
     proposalPk.toBase58()
   ]
+
+  let ownVoteRecord = walletVoteRecord
+
+  // if delegate is selected, use that delegates vote record for vote status to display
+  if (
+    communityDelegateVoteRecordsByProposal[proposalPk.toBase58()] &&
+    proposal.governingTokenMint.toBase58() ===
+      realm?.account?.communityMint.toBase58()
+  ) {
+    ownVoteRecord =
+      communityDelegateVoteRecordsByProposal[proposalPk.toBase58()]
+  }
+
+  if (
+    councilDelegateVoteRecordsByProposal[proposalPk.toBase58()] &&
+    proposal.governingTokenMint.toBase58() ===
+      realm?.account?.config?.councilMint?.toBase58()
+  ) {
+    ownVoteRecord = councilDelegateVoteRecordsByProposal[proposalPk.toBase58()]
+  }
 
   let statusLabel = getProposalStateLabel(
     proposal.state,
@@ -82,7 +109,7 @@ const ProposalStateBadge = ({
         <div
           className={`${getProposalStateStyle(
             proposal.state
-          )} inline-block px-2 py-1 rounded-full text-xs`}
+          )} min-w-max inline-block px-2 py-1 rounded-full text-xs`}
         >
           {statusLabel}
         </div>

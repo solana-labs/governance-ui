@@ -122,16 +122,16 @@ const Treasury = () => {
 
   return (
     <>
-      <div className="bg-bkg-2 rounded-lg p-4 md:p-6">
+      <div className="p-4 rounded-lg bg-bkg-2 md:p-6">
         <div className="grid grid-cols-12 gap-6">
           <div className="col-span-12">
             <div className="mb-4">
               <PreviousRouteBtn />
             </div>
-            <div className="border-b border-fgd-4 flex flex-col md:flex-row justify-between pb-4">
-              <div className="flex items-center mb-2 md:mb-0 py-2">
+            <div className="flex flex-col justify-between pb-4 border-b border-fgd-4 md:flex-row">
+              <div className="flex items-center py-2 mb-2 md:mb-0">
                 {realmInfo?.ogImage ? (
-                  <img src={realmInfo?.ogImage} className="h-8 mr-3 w-8"></img>
+                  <img src={realmInfo?.ogImage} className="w-8 h-8 mr-3"></img>
                 ) : null}
                 <div>
                   <p className="">{realmInfo?.displayName}</p>
@@ -139,12 +139,12 @@ const Treasury = () => {
                 </div>
               </div>
               {totalPriceFormatted && (
-                <div className="bg-bkg-1 px-4 py-2 rounded-md">
+                <div className="px-4 py-2 rounded-md bg-bkg-1">
                   <div className="flex items-center">
-                    <CurrencyDollarIcon className="flex-shrink-0 h-8 mr-2 text-primary-light w-8" />
+                    <CurrencyDollarIcon className="flex-shrink-0 w-8 h-8 mr-2 text-primary-light" />
                     <div>
                       <p className="">Treasury Value</p>
-                      <div className="font-bold text-fgd-1 text-2xl">
+                      <div className="text-2xl hero-text text-fgd-1">
                         ${totalPriceFormatted}
                       </div>
                     </div>
@@ -155,7 +155,7 @@ const Treasury = () => {
           </div>
           <>
             <div className="col-span-12 lg:col-span-4">
-              <div className="flex items-center justify-between pb-4 pt-3">
+              <div className="flex items-center justify-between pt-3 pb-4">
                 <h2 className="mb-0 text-base">Treasury Accounts</h2>
                 <Tooltip
                   contentClassName="ml-auto"
@@ -166,7 +166,7 @@ const Treasury = () => {
                     disabled={!isConnectedWithGovernanceCreationPermission}
                     onClick={goToNewAccountForm}
                   >
-                    <PlusCircleIcon className="h-5 mr-2 w-5" />
+                    <PlusCircleIcon className="w-5 h-5 mr-2" />
                     New DAO wallet
                   </LinkButton>
                 </Tooltip>

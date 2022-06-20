@@ -1,8 +1,10 @@
 import { PublicKey } from '@solana/web3.js'
+import { consts as foresightConsts } from '@foresight-tmp/foresight-sdk/'
 
 export const GOVERNANCE_PROGRAM_NAMES = {
   GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J: 'Mango Governance Program',
   AVoAYTs36yB5izAaBkxRG67wL1AMwG3vo41hKtUSb8is: 'Serum Governance Program',
+  GTesTBiEWE32WHXXE2S4XbZvA5CrEc4xs6ZgRe895dP: 'Test Governance Program',
   GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw: 'Governance Program',
   '5sGZEdn32y8nHax7TxEyoHuPS3UXfPWtisgm8kqxat8H':
     'Phantasia Governance Program',
@@ -29,6 +31,7 @@ export const PROGRAM_NAMES = {
   SysvarC1ock11111111111111111111111111111111: 'Sysvar: Clock',
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo':
     'Mango Voter Stake Registry Program',
+  [foresightConsts.PROGRAM_ID]: 'Foresight Dex',
   ...GOVERNANCE_PROGRAM_NAMES,
 }
 

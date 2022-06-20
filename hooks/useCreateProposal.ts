@@ -44,7 +44,7 @@ export default function useCreateProposal() {
 
     const defaultProposalMint =
       !mint?.supply.isZero() ||
-      realm?.account.config.useMaxCommunityVoterWeightAddin
+      realm?.account.config.useCommunityVoterWeightAddin
         ? realm!.account.communityMint
         : !councilMint?.supply.isZero()
         ? realm!.account.config.councilMint
@@ -63,6 +63,7 @@ export default function useCreateProposal() {
     const selectedGovernance = (await fetchRealmGovernance(
       governance?.pubkey
     )) as ProgramAccount<Governance>
+
     const proposalAddress = await createProposal(
       rpcContext,
       realm!,

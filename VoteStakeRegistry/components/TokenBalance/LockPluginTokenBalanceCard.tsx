@@ -17,6 +17,7 @@ import { useEffect, useState } from 'react'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import InlineNotification from '@components/InlineNotification'
 import Link from 'next/link'
+import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
 
 const LockPluginTokenBalanceCard = ({
@@ -50,11 +51,13 @@ const LockPluginTokenBalanceCard = ({
 
   useEffect(() => {
     const getTokenOwnerRecord = async () => {
-      const defaultMint = !mint?.supply.isZero()
-        ? realm!.account.communityMint
-        : !councilMint?.supply.isZero()
-        ? realm!.account.config.councilMint
-        : undefined
+      const defaultMint =
+        !mint?.supply.isZero() ||
+        realm?.account.config.useMaxCommunityVoterWeightAddin
+          ? realm!.account.communityMint
+          : !councilMint?.supply.isZero()
+          ? realm!.account.config.councilMint
+          : undefined
       const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
         realm!.owner,
         realm!.pubkey,
@@ -108,6 +111,7 @@ const LockPluginTokenBalanceCard = ({
               />
             </div>
           )}
+          <DelegateTokenBalanceCard />
         </>
       ) : (
         <>
