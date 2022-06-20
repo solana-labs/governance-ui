@@ -116,10 +116,10 @@ function App({ Component, pageProps }) {
       <Head>
         <meta property="og:title" content={title} />
         <title>{title}</title>
+        <meta name="twitter:image:src" content={realmInfo?.ogImage}></meta>
         {faviconUrl ? (
           <>
             <link rel="icon" href={faviconUrl} />
-            <meta name="twitter:image:src" content={realmInfo?.ogImage}></meta>
           </>
         ) : (
           <>
