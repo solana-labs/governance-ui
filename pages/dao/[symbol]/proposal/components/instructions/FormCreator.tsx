@@ -1,7 +1,7 @@
 import Input from '@components/inputs/Input'
 import Textarea from '@components/inputs/Textarea'
 import { ProgramAccount, Governance } from '@solana/spl-governance'
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { precision } from '@utils/formatting'
 import Switch from '@components/Switch'
@@ -183,7 +183,6 @@ const InstructionInput = ({
           />
         )
       }
-
       case InstructionInputType.TEXTAREA:
         return (
           <Textarea

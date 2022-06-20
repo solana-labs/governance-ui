@@ -192,7 +192,8 @@ const SolendWithdraw = ({
         connection.endpoint
       )
       const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-        governedTokenAccount!.governance!.account.config
+        governedTokenAccount!.governance!.account.config,
+        voteByCouncil
       )
       const defaultProposalMint = voteByCouncil
         ? realm?.account.config.councilMint

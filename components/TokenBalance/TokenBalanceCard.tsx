@@ -32,7 +32,7 @@ import { notify } from '@utils/notifications'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import { ExclamationIcon } from '@heroicons/react/outline'
 import useQueryContext from '@hooks/useQueryContext'
-import { useEffect, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import Link from 'next/link'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
@@ -43,7 +43,8 @@ import {
 } from 'pyth-staking-api'
 import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 
-const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
+type Props = { proposal?: Option<Proposal> }
+const TokenBalanceCard: FC<Props> = ({ proposal, children }) => {
   const { councilMint, mint, realm, symbol } = useRealm()
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
@@ -133,6 +134,7 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
           <div className="h-10 rounded-lg animate-pulse bg-bkg-3" />
         </>
       )}
+      {children}
     </div>
   )
 }

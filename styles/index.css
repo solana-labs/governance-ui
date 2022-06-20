@@ -293,3 +293,7 @@ https://developer.mozilla.org/en-US/docs/Web/CSS/word-break#values */
 .overflow-wrap-anywhere {
   overflow-wrap: anywhere;
 }
+
+.gatewayButton > span {
+  @apply !text-bkg-2 !pl-0 !text-sm;
+}

@@ -81,6 +81,7 @@ import CreateVsrRegistrar from './components/instructions/Vsr/CreateRegistrar'
 import GoblinGoldDeposit from './components/instructions/GoblinGold/GoblinGoldDeposit'
 import GoblinGoldWithdraw from './components/instructions/GoblinGold/GoblinGoldWithdraw'
 import MakeSetMarketMode from './components/instructions/Mango/MakeSetMarketMode'
+import CreateGatewayPluginRegistrar from './components/instructions/GatewayPlugin/CreateRegistrar'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -402,6 +403,13 @@ const New = () => {
             index={idx}
             governance={governance}
           ></CreateNftPluginMaxVoterWeightRecord>
+        )
+      case Instructions.CreateGatewayPluginRegistrar:
+        return (
+          <CreateGatewayPluginRegistrar
+            index={idx}
+            governance={governance}
+          ></CreateGatewayPluginRegistrar>
         )
       case Instructions.MangoAddOracle:
         return (

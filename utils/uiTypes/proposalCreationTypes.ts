@@ -374,6 +374,8 @@ export enum Instructions {
   CloseTokenAccount,
   VotingMintConfig,
   CreateVsrRegistrar,
+  CreateGatewayPluginRegistrar,
+  ConfigureGatewayPlugin,
   ChangeMakeDonation,
 }
 

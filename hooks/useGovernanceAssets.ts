@@ -197,6 +197,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseAuthorityInstruction,
     },
     {
+      id: Instructions.CreateGatewayPluginRegistrar,
+      name: 'Civic: Create Gateway plugin registrar',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
       id: Instructions.RealmConfig,
       name: 'Realm config',
       isVisible: canUseAuthorityInstruction,
