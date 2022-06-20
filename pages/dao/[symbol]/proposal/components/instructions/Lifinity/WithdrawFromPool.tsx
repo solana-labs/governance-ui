@@ -4,8 +4,8 @@ import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
 import { LifinityWithdrawFromPoolForm } from '@utils/uiTypes/proposalCreationTypes';
 import Select from '@components/inputs/Select';
 import {
-  getLPTokenBalance,
-  getWithdrawOut,
+  calculateMinimumWithdrawAmounts,
+  getUserLiquidityPoolTokenUiBalance,
   poolLabels,
 } from '@tools/sdk/lifinity/lifinity';
 import SelectOptionList from '../../SelectOptionList';
@@ -22,7 +22,7 @@ const schema = yup.object().shape({
     .object()
     .nullable()
     .required('Governed account is required'),
-  liquidityPool: yup.string().required('Liquidity Pool is required'),
+  poolName: yup.string().required('Liquidity Pool is required'),
   uiAmountTokenLP: yup
     .number()
     .moreThan(0, 'LP Token Amount to withdraw must be more than 0')
@@ -62,79 +62,85 @@ const WithdrawFromPool = ({
       wallet,
       governedAccountPubkey,
     }) {
-      const { uiAmountTokenA, uiAmountTokenB } = await getWithdrawOut({
+      const {
+        minimumAmountTokenA,
+        minimumAmountTokenB,
+        lpTokenAmount,
+      } = await calculateMinimumWithdrawAmounts({
         connection: connection,
-        liquidityPool: form.liquidityPool!,
-        lpTokenAmount: form.uiAmountTokenLP!,
+        poolName: form.poolName!,
+        uiLpTokenAmount: form.uiAmountTokenLP!,
         slippage: form.slippage,
       });
 
       return withdrawFromPool({
         connection,
         wallet,
-        liquidityPool: form.liquidityPool!,
+        poolName: form.poolName!,
         userTransferAuthority: governedAccountPubkey,
-        uiAmountTokenLP: form.uiAmountTokenLP!,
-        uiAmountTokenA,
-        uiAmountTokenB,
+        lpTokenAmount,
+        minimumAmountTokenA,
+        minimumAmountTokenB,
       });
     },
   });
 
   useEffect(() => {
     async function fetchLpMintInfo() {
-      if (!governedAccountPubkey || !form.liquidityPool) return;
+      if (!governedAccountPubkey || !form.poolName) return;
 
       try {
-        const { maxBalance } = await getLPTokenBalance({
+        const uiBalance = await getUserLiquidityPoolTokenUiBalance({
           wallet: governedAccountPubkey,
-          liquidityPool: form.liquidityPool,
+          poolName: form.poolName,
           connection: connection.current,
         });
-        setMaxLPTokenAmount(maxBalance);
+
+        setMaxLPTokenAmount(uiBalance);
       } catch (e) {
         notify({
           type: 'error',
           message: 'Could not fetch LP Account',
-          description: `${form.liquidityPool} LP Token Account could not be found for the selected Governance`,
+          description: `${form.poolName} LP Token Account could not be found for the selected Governance`,
         });
       }
     }
     fetchLpMintInfo();
-  }, [governedAccount?.governance?.pubkey, form.liquidityPool]);
+  }, [governedAccount?.governance?.pubkey, form.poolName]);
 
   useEffect(() => {
     debounce.debounceFcn(async () => {
-      if (!form.uiAmountTokenLP || !form.liquidityPool) return;
-      const { uiAmountTokenA, uiAmountTokenB } = await getWithdrawOut({
+      if (!form.uiAmountTokenLP || !form.poolName) return;
+      const {
+        minimumWithdrawnUiAmountTokenA,
+        minimumWithdrawnUiAmountTokenB,
+      } = await calculateMinimumWithdrawAmounts({
         connection: connection.current,
-        liquidityPool: form.liquidityPool,
-        lpTokenAmount: form.uiAmountTokenLP!,
+        poolName: form.poolName,
+        uiLpTokenAmount: form.uiAmountTokenLP!,
         slippage: form.slippage,
       });
 
       setTokenAmounts({
-        uiAmountTokenA,
-        uiAmountTokenB,
+        uiAmountTokenA: minimumWithdrawnUiAmountTokenA,
+        uiAmountTokenB: minimumWithdrawnUiAmountTokenB,
       });
     });
-  }, [form.liquidityPool, form.uiAmountTokenLP, form.slippage]);
+  }, [form.poolName, form.uiAmountTokenLP, form.slippage]);
 
   return (
     <>
       <Select
         label="Lifinity Liquidity Pool"
-        value={form.liquidityPool}
+        value={form.poolName}
         placeholder="Please select..."
-        onChange={(value) =>
-          handleSetForm({ value, propertyName: 'liquidityPool' })
-        }
-        error={formErrors['liquidityPool']}
+        onChange={(value) => handleSetForm({ value, propertyName: 'poolName' })}
+        error={formErrors['poolName']}
       >
         <SelectOptionList list={poolLabels} />
       </Select>
 
-      {form.liquidityPool && (
+      {form.poolName && (
         <>
           <Input
             label={`Amount of LP Token to redeem - max: ${maxLPTokenAmount}`}

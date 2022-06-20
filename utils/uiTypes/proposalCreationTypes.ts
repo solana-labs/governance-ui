@@ -22,6 +22,7 @@ import ATribecaConfiguration from '@tools/sdk/tribeca/ATribecaConfiguration';
 import { InstructionType } from '@hooks/useGovernanceAssets';
 import { SupportedSaberPoolNames } from '@tools/sdk/saberPools/configuration';
 import { PoolName as MapleFinancePoolName } from '@tools/sdk/mapleFinance/configuration';
+import { PoolNames as LifinityPoolNames } from '@tools/sdk/lifinity/poolList';
 
 export interface FormInstructionData {
   serializedInstruction: string;
@@ -123,7 +124,7 @@ export interface EmptyInstructionForm {
 
 export interface LifinityDepositToPoolForm {
   governedAccount?: GovernedMultiTypeAccount;
-  liquidityPool?: string;
+  poolName?: LifinityPoolNames;
   uiAmountTokenA?: number;
   uiAmountTokenB?: number;
   amountTokenLP?: number;
@@ -132,7 +133,7 @@ export interface LifinityDepositToPoolForm {
 
 export interface LifinityWithdrawFromPoolForm {
   governedAccount?: GovernedMultiTypeAccount;
-  liquidityPool?: string;
+  poolName?: LifinityPoolNames;
   uiAmountTokenLP?: number;
   slippage: number;
 }

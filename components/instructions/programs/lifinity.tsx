@@ -3,14 +3,15 @@ import { nu64, struct, u8 } from 'buffer-layout';
 import { AccountMetaData } from '@solana/spl-governance';
 import {
   AMM_PROGRAM_ADDR,
-  getPoolLabelByPoolMint,
+  getPoolNameByPoolTokenMint,
+  InstructionsCodes,
 } from '@tools/sdk/lifinity/lifinity';
-import { tryGetMint } from '@utils/tokens';
+import { tryGetMint, tryGetTokenMint } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 
 export const LIFINITY_PROGRAM_INSTRUCTIONS = {
-  [AMM_PROGRAM_ADDR]: {
-    32: {
+  [AMM_PROGRAM_ADDR.toBase58()]: {
+    [InstructionsCodes.DepositAllTokenTypes]: {
       name: 'Lifinity - Deposit All Token Types',
       accounts: [
         'amm',
@@ -46,38 +47,40 @@ export const LIFINITY_PROGRAM_INSTRUCTIONS = {
           nu64('maximumTokenAAmount'),
           nu64('maximumTokenBAmount'),
         ]);
-        const tokenAAcc = accounts[5].pubkey;
-        const tokenBAcc = accounts[6].pubkey;
-        const tokenLPAcc = accounts[7].pubkey;
 
-        const [tokenAInfo, tokenBInfo, tokenLPInfo] = await Promise.all([
-          tryGetMint(connection, tokenAAcc),
-          tryGetMint(connection, tokenBAcc),
-          tryGetMint(connection, tokenLPAcc),
+        const tokenAccountTokenA = accounts[5].pubkey;
+        const tokenAccountTokenB = accounts[6].pubkey;
+        const lpMint = accounts[7].pubkey;
+
+        const [mintInfoTokenA, mintInfoTokenB, lpMintInfo] = await Promise.all([
+          tryGetTokenMint(connection, tokenAccountTokenA),
+          tryGetTokenMint(connection, tokenAccountTokenB),
+          tryGetMint(connection, lpMint),
         ]);
-        if (!tokenAInfo || !tokenBInfo || !tokenLPInfo) {
+
+        if (!mintInfoTokenA || !mintInfoTokenB || !lpMintInfo) {
           throw new Error('could not load token infos');
         }
+
         const {
           maximumTokenAAmount,
           maximumTokenBAmount,
           poolTokenAmount,
         } = dataLayout.decode(Buffer.from(data)) as any;
 
-        const uiAmountTokenA = new BigNumber(maximumTokenAAmount).shiftedBy(
-          -tokenLPInfo.account.decimals,
-        );
-        toString();
-
-        const uiAmountTokenB = new BigNumber(maximumTokenBAmount).shiftedBy(
-          -tokenLPInfo.account.decimals,
-        );
-        toString();
-        const uiAmountTokenLP = new BigNumber(poolTokenAmount)
-          .shiftedBy(-tokenLPInfo.account.decimals)
+        const uiAmountTokenA = new BigNumber(maximumTokenAAmount)
+          .shiftedBy(-mintInfoTokenA.account.decimals)
           .toString();
 
-        const poolLabel = getPoolLabelByPoolMint(tokenLPAcc.toBase58());
+        const uiAmountTokenB = new BigNumber(maximumTokenBAmount)
+          .shiftedBy(-mintInfoTokenB.account.decimals)
+          .toString();
+
+        const uiAmountTokenLP = new BigNumber(poolTokenAmount)
+          .shiftedBy(-lpMintInfo.account.decimals)
+          .toString();
+
+        const poolLabel = getPoolNameByPoolTokenMint(lpMint);
 
         return (
           <>
@@ -89,7 +92,7 @@ export const LIFINITY_PROGRAM_INSTRUCTIONS = {
         );
       },
     },
-    189: {
+    [InstructionsCodes.WithdrawAllTokenTypes]: {
       name: 'Lifinity - Withdraw All Token Types',
       accounts: [
         'amm',
@@ -123,35 +126,36 @@ export const LIFINITY_PROGRAM_INSTRUCTIONS = {
           nu64('minimumTokenBAmount'),
         ]);
 
-        const tokenAAcc = accounts[4].pubkey;
-        const tokenBAcc = accounts[5].pubkey;
-        const tokenLPAcc = accounts[6].pubkey;
+        const tokenAccountTokenA = accounts[4].pubkey;
+        const tokenAccountTokenB = accounts[5].pubkey;
+        const lpMint = accounts[6].pubkey;
 
-        const [tokenAInfo, tokenBInfo, tokenLPInfo] = await Promise.all([
-          tryGetMint(connection, tokenAAcc),
-          tryGetMint(connection, tokenBAcc),
-          tryGetMint(connection, tokenLPAcc),
+        const [mintInfoTokenA, mintInfoTokenB, lpMintInfo] = await Promise.all([
+          tryGetTokenMint(connection, tokenAccountTokenA),
+          tryGetTokenMint(connection, tokenAccountTokenB),
+          tryGetMint(connection, lpMint),
         ]);
-        if (!tokenAInfo || !tokenBInfo || !tokenLPInfo) {
+
+        if (!mintInfoTokenA || !mintInfoTokenB || !lpMintInfo) {
           throw new Error('could not load token infos');
         }
+
         const {
           minimumTokenAAmount,
           minimumTokenBAmount,
           poolTokenAmount,
         } = dataLayout.decode(Buffer.from(data)) as any;
 
-        const uiAmountTokenA = new BigNumber(minimumTokenAAmount).shiftedBy(
-          -tokenLPInfo.account.decimals,
-        );
-        toString();
+        const uiAmountTokenA = new BigNumber(minimumTokenAAmount)
+          .shiftedBy(-mintInfoTokenA.account.decimals)
+          .toString();
 
-        const uiAmountTokenB = new BigNumber(minimumTokenBAmount).shiftedBy(
-          -tokenLPInfo.account.decimals,
-        );
-        toString();
+        const uiAmountTokenB = new BigNumber(minimumTokenBAmount)
+          .shiftedBy(-mintInfoTokenB.account.decimals)
+          .toString();
+
         const uiAmountTokenLP = new BigNumber(poolTokenAmount)
-          .shiftedBy(-tokenLPInfo.account.decimals)
+          .shiftedBy(-lpMintInfo.account.decimals)
           .toString();
 
         return (

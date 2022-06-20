@@ -12,6 +12,7 @@ export type SplTokenInformation = {
 
 export type SupportedSplTokenNames =
   | 'USDC'
+  | 'USDT'
   | 'WSOL'
   | 'UXP'
   | 'UXD'
@@ -29,6 +30,12 @@ export const SPL_TOKENS: {
   USDC: {
     name: 'USD Coin',
     mint: new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'),
+    decimals: 6,
+  },
+
+  USDT: {
+    name: 'USDT',
+    mint: new PublicKey('Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB'),
     decimals: 6,
   },
 

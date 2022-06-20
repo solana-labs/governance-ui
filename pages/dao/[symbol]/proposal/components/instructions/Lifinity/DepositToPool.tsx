@@ -7,7 +7,10 @@ import depositToPool from '@tools/sdk/lifinity/depositToPool';
 import Select from '@components/inputs/Select';
 import SelectOptionList from '../../SelectOptionList';
 import Input from '@components/inputs/Input';
-import { getDepositOut, poolLabels } from '@tools/sdk/lifinity/lifinity';
+import {
+  calculateDepositAmounts,
+  poolLabels,
+} from '@tools/sdk/lifinity/lifinity';
 import { debounce } from '@utils/debounce';
 
 const SLIPPAGE_OPTIONS = [0.5, 1, 2];
@@ -17,7 +20,7 @@ const schema = yup.object().shape({
     .object()
     .nullable()
     .required('Governed account is required'),
-  liquidityPool: yup.string().required('Liquidity Pool is required'),
+  poolName: yup.string().required('Liquidity Pool is required'),
   uiAmountTokenA: yup
     .number()
     .moreThan(0, 'Token A Amount to deposit must be more than 0')
@@ -58,21 +61,26 @@ const DepositToPool = ({
       governedAccountPubkey,
     }) {
       // let's recalculate at the last moment to get the LP amount.
-      const depositAmountOut = await getDepositOut({
+      const {
+        maximumAmountTokenA,
+        maximumAmountTokenB,
+        amountLpToken,
+      } = await calculateDepositAmounts({
         connection: connection,
         wallet,
         uiAmountTokenA: form.uiAmountTokenA!,
         slippage: form.slippage,
-        poolLabel: form.liquidityPool!,
+        poolName: form.poolName!,
       });
+
       return depositToPool({
         connection,
-        authority: governedAccountPubkey,
         wallet,
-        liquidityPool: form.liquidityPool!,
-        uiAmountTokenA: form.uiAmountTokenA!,
-        uiAmountTokenB: depositAmountOut.amountOut,
-        uiAmountTokenLP: depositAmountOut.lpReceived,
+        userTransferAuthority: governedAccountPubkey,
+        poolName: form.poolName!,
+        maximumAmountTokenA,
+        maximumAmountTokenB,
+        amountLpToken,
         slippage: form.slippage,
       });
     },
@@ -80,16 +88,17 @@ const DepositToPool = ({
 
   useEffect(() => {
     debounce.debounceFcn(async () => {
-      if (!form.uiAmountTokenA || !form.liquidityPool || !wallet) return;
-      const depositAmountOut = await getDepositOut({
+      if (!form.uiAmountTokenA || !form.poolName || !wallet) return;
+      const { maximumUiAmountTokenB } = await calculateDepositAmounts({
         connection: connection.current,
         wallet,
         uiAmountTokenA: form.uiAmountTokenA,
         slippage: form.slippage,
-        poolLabel: form.liquidityPool,
+        poolName: form.poolName,
       });
+
       handleSetForm({
-        value: depositAmountOut.amountOut,
+        value: maximumUiAmountTokenB,
         propertyName: 'uiAmountTokenB',
       });
     });
@@ -104,16 +113,15 @@ const DepositToPool = ({
     <>
       <Select
         label="Lifinity Liquidity Pool"
-        value={form.liquidityPool}
+        value={form.poolName}
         placeholder="Please select..."
-        onChange={(value) =>
-          handleSetForm({ value, propertyName: 'liquidityPool' })
-        }
-        error={formErrors['liquidityPool']}
+        onChange={(value) => handleSetForm({ value, propertyName: 'poolName' })}
+        error={formErrors['poolName']}
       >
         <SelectOptionList list={poolLabels} />
       </Select>
-      {form.liquidityPool && (
+
+      {form.poolName && (
         <>
           <Input
             label="Amount of Token A to deposit"
@@ -128,6 +136,7 @@ const DepositToPool = ({
             }
             error={formErrors['uiAmountTokenA']}
           />
+
           <Input
             label="Maximum Amount of Token B to deposit"
             value={form.uiAmountTokenB}
@@ -135,6 +144,7 @@ const DepositToPool = ({
             min={0}
             disabled={true}
           />
+
           <Select
             label="Slippage (%)"
             value={form.slippage}

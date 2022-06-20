@@ -7,11 +7,17 @@ import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { findATAAddrSync } from '@utils/ataTools';
-import { uiAmountToNativeBigN, uiAmountToNativeBN } from '../units';
 import { LifinityAmmIDL } from './idl/lifinity_amm_idl';
-import { IPoolInfo, PoolList } from './poolList';
+import { IPoolInfo, PoolList, PoolNames } from './poolList';
 
-export const AMM_PROGRAM_ADDR = 'EewxydAPCCVuNEyrVN68PuSYdQ7wKn27V9Gjeoi8dy3S';
+export const AMM_PROGRAM_ADDR = new PublicKey(
+  'EewxydAPCCVuNEyrVN68PuSYdQ7wKn27V9Gjeoi8dy3S',
+);
+
+export const InstructionsCodes = {
+  DepositAllTokenTypes: 32,
+  WithdrawAllTokenTypes: 189,
+};
 
 export const buildLifinity = ({
   connection,
@@ -22,334 +28,322 @@ export const buildLifinity = ({
 }) => {
   return new Program(
     LifinityAmmIDL,
-    new PublicKey(AMM_PROGRAM_ADDR),
+    AMM_PROGRAM_ADDR,
     new Provider(connection, wallet, Provider.defaultOptions()),
   );
 };
 
-const getWalletNftAccounts = async ({
+export const getWalletNftAccounts = async ({
   connection,
   wallet,
 }: {
   connection: Connection;
   wallet: PublicKey;
 }): Promise<{
-  lifinityTokenAccount: string | undefined;
-  lifinityMetaAccount: string | undefined;
-}> => {
-  let lifinityTokenAccount;
-  let lifinityMetaAccount;
-  const parsedTokenAccounts = await connection.getParsedTokenAccountsByOwner(
+  lifinityNftAccount: PublicKey;
+  lifinityNftMetaAccount: PublicKey;
+} | null> => {
+  const {
+    value: parsedTokenAccounts,
+  } = await connection.getParsedTokenAccountsByOwner(
     wallet,
     {
       programId: TOKEN_PROGRAM_ID,
     },
     'confirmed',
   );
-  for (const tokenAccountInfo of parsedTokenAccounts.value) {
-    const tokenAccountPubkey = tokenAccountInfo.pubkey;
-    const parsedInfo = tokenAccountInfo.account.data.parsed.info;
-    if (parsedInfo.tokenAmount.amount > 0) {
-      const mintAddress = parsedInfo.mint;
 
-      const metadataPDA = await mplTokenMetadata.Metadata.getPDA(mintAddress);
-      const mintAccInfo = await connection.getAccountInfo(metadataPDA);
-      if (mintAccInfo) {
-        const {
-          data: { updateAuthority },
-        } = mplTokenMetadata.Metadata.from(
-          // @ts-ignore
-          new mplCore.Account(mintAddress, mintAccInfo),
-        );
-        if (
-          updateAuthority === 'BihU63mFnjLaBNPXxaDj8WUPBepZqqB4T2RHBJ99f2xo' ||
-          updateAuthority === 'H5q7Z2FJ5KaWmtGquGqoYJYrM73BEpoabzas5y12s38T'
-        ) {
-          lifinityTokenAccount = tokenAccountPubkey;
-          lifinityMetaAccount = metadataPDA;
-          break;
-        }
-      }
+  for (const tokenAccountInfo of parsedTokenAccounts) {
+    const {
+      pubkey: tokenAccountPubkey,
+      account: {
+        data: {
+          parsed: {
+            info: {
+              mint,
+              tokenAmount: { amount },
+            },
+          },
+        },
+      },
+    } = tokenAccountInfo;
+
+    if (amount <= 0) {
+      continue;
     }
+
+    const metadataPDA = await mplTokenMetadata.Metadata.getPDA(mint);
+    const mintAccInfo = await connection.getAccountInfo(metadataPDA);
+
+    if (!mintAccInfo) {
+      continue;
+    }
+
+    const {
+      data: { updateAuthority },
+    } = mplTokenMetadata.Metadata.from(
+      // @ts-ignore
+      new mplCore.Account(mint, mintAccInfo),
+    );
+
+    // No idea why these check exists, took them from the lifinity-sdk
+    if (
+      updateAuthority !== 'BihU63mFnjLaBNPXxaDj8WUPBepZqqB4T2RHBJ99f2xo' &&
+      updateAuthority !== 'H5q7Z2FJ5KaWmtGquGqoYJYrM73BEpoabzas5y12s38T'
+    ) {
+      continue;
+    }
+
+    return {
+      lifinityNftAccount: tokenAccountPubkey,
+      lifinityNftMetaAccount: metadataPDA,
+    };
   }
-  return { lifinityTokenAccount, lifinityMetaAccount };
+
+  return null;
 };
 
-export const getLPTokenBalance = async ({
+export const getUserLiquidityPoolTokenUiBalance = async ({
   connection,
-  liquidityPool,
+  poolName,
   wallet,
 }: {
   connection: Connection;
-  liquidityPool: string;
+  poolName: PoolNames;
   wallet: PublicKey;
-}) => {
-  const pool = getPoolByLabel(liquidityPool);
-  const lpMint = new PublicKey(pool.poolMint);
-  const [lpTokenAccount] = findATAAddrSync(wallet, lpMint);
-  const [lpInfo, lpUserBalance] = await Promise.all([
-    connection.getTokenSupply(lpMint),
-    connection.getTokenAccountBalance(lpTokenAccount),
-  ]);
-  return {
-    lpTokenAccount,
-    maxBalance: lpUserBalance.value.uiAmount ?? 0,
-    decimals: lpInfo.value.decimals,
-  };
+}): Promise<number> => {
+  const {
+    lpToken: { mint: lpTokenMint },
+  } = getPoolInfoByName(poolName);
+
+  const [lpTokenATA] = findATAAddrSync(wallet, lpTokenMint);
+
+  const lpUserBalance = await connection.getTokenAccountBalance(lpTokenATA);
+
+  return lpUserBalance.value.uiAmount ?? 0;
 };
 
-export const getWithdrawOut = async ({
+// Calculate how much tokenA and tokenB will be withdrawn from the pool
+// at its current state for the provided amount of LP tokens
+export const calculateMinimumWithdrawAmounts = async ({
   connection,
-  liquidityPool,
-  lpTokenAmount,
+  poolName,
+  uiLpTokenAmount,
   slippage,
 }: {
   connection: Connection;
-  liquidityPool: string;
-  lpTokenAmount: number;
+  poolName: PoolNames;
+  uiLpTokenAmount: number;
   slippage: number;
-}) => {
-  const pool = getPoolByLabel(liquidityPool);
-  const lpAccount = await connection.getTokenSupply(
-    new PublicKey(pool.poolMint),
-  );
-  const poolAccountTokenA = await connection.getTokenAccountBalance(
-    new PublicKey(pool.poolCoinTokenAccount),
-  );
-  const poolAccountTokenB = await connection.getTokenAccountBalance(
-    new PublicKey(pool.poolPcTokenAccount),
-  );
-  const minimumTokenAAmount = calculateMinimumTokenWithdrawAmountFromLP({
-    tokenBalance: poolAccountTokenA.value.amount,
-    tokenDecimals: pool.poolCoinDecimal,
-    lpAmount: lpTokenAmount.toString(),
+}): Promise<{
+  minimumAmountTokenA: BigNumber;
+  minimumAmountTokenB: BigNumber;
+  lpTokenAmount: BigNumber;
+  minimumWithdrawnUiAmountTokenA: number;
+  minimumWithdrawnUiAmountTokenB: number;
+  uiLpTokenAmount: number;
+}> => {
+  const {
+    lpToken: { mint: lpTokenMint, decimals: lpTokenDecimals },
+    tokenA: { tokenAccount: tokenAccountTokenA, decimals: decimalsTokenA },
+    tokenB: { tokenAccount: tokenAccountTokenB, decimals: decimalsTokenB },
+  } = getPoolInfoByName(poolName);
+
+  const [
+    lpAccount,
+    {
+      value: { amount: balanceTokenA },
+    },
+    {
+      value: { amount: balanceTokenB },
+    },
+  ] = await Promise.all([
+    connection.getTokenSupply(lpTokenMint),
+    connection.getTokenAccountBalance(tokenAccountTokenA),
+    connection.getTokenAccountBalance(tokenAccountTokenB),
+  ]);
+
+  const lpAmount = new BigNumber(uiLpTokenAmount)
+    .shiftedBy(lpTokenDecimals)
+    .decimalPlaces(lpTokenDecimals);
+
+  const minimumAmountTokenA = calculateMinimumTokenWithdrawAmountFromLP({
+    tokenBalance: new BigNumber(balanceTokenA),
     lpSupply: lpAccount.value.amount,
+    lpAmount,
     slippage,
   });
-  const minimumTokenBAmount = calculateMinimumTokenWithdrawAmountFromLP({
-    tokenBalance: poolAccountTokenB.value.amount,
-    tokenDecimals: pool.poolCoinDecimal,
-    lpAmount: lpTokenAmount.toString(),
+
+  const minimumAmountTokenB = calculateMinimumTokenWithdrawAmountFromLP({
+    tokenBalance: new BigNumber(balanceTokenB),
     lpSupply: lpAccount.value.amount,
+    lpAmount,
     slippage,
   });
+
   return {
-    uiAmountTokenA: minimumTokenAAmount.toNumber(),
-    uiAmountTokenB: minimumTokenBAmount.toNumber(),
+    minimumAmountTokenA,
+    minimumAmountTokenB,
+    lpTokenAmount: new BigNumber(uiLpTokenAmount)
+      .shiftedBy(lpTokenDecimals)
+      .decimalPlaces(lpTokenDecimals),
+    minimumWithdrawnUiAmountTokenA: minimumAmountTokenA
+      .shiftedBy(-decimalsTokenA)
+      .toNumber(),
+
+    minimumWithdrawnUiAmountTokenB: minimumAmountTokenB
+      .shiftedBy(-decimalsTokenB)
+      .toNumber(),
+
+    uiLpTokenAmount,
   };
 };
 
 const calculateMinimumTokenWithdrawAmountFromLP = ({
   tokenBalance,
-  tokenDecimals,
   lpAmount,
   lpSupply,
   slippage,
 }: {
-  tokenBalance: string;
-  tokenDecimals: number;
-  lpAmount: string;
+  tokenBalance: BigNumber;
+  lpAmount: BigNumber;
   lpSupply: string;
   slippage: number | string;
 }) => {
-  const tokenBalanceBN = new BigNumber(tokenBalance);
-  const percent = new BigNumber(+slippage + 100).div(new BigNumber(100));
-  const lpAmountBN = new BigNumber(lpAmount);
-  const lpSupplyBN = new BigNumber(lpSupply);
+  const percent = (+slippage + 100) / 100;
 
-  return tokenBalanceBN
-    .multipliedBy(lpAmountBN)
-    .dividedBy(lpSupplyBN)
-    .dividedBy(percent)
-    .decimalPlaces(tokenDecimals);
+  // Example
+
+  // The pool contains 2 tokens
+  //
+  // Token A => 20 tokens
+  // Token B => 20 tokens
+  //
+  // Their price is the same, 1 token A == 1 token B
+  //
+  // It exists 100 liquidity pool tokens (lpSupply)
+  //
+  //
+  // Imagine the users wants to withdraw for 10 LP tokens from the pool with a 2% slippage
+  // the calculation are:
+  //
+  // 20 * 10 / 100 / ((100 + 2) / 100) = 1.96078431373
+  //
+  // The user will receive 1.96 Token for withdrawing for 10 LP tokens.
+
+  return tokenBalance
+    .multipliedBy(lpAmount)
+    .dividedBy(lpSupply)
+    .dividedBy(percent);
 };
 
-const getOutAmount = (
-  poolInfo: IPoolInfo,
-  amount: number | string,
-  fromCoinMint: string,
-  toCoinMint: string,
-  slippage: number,
-  coinBalance: BigNumber,
-  pcBalance: BigNumber,
-) => {
-  const price = pcBalance.dividedBy(coinBalance);
-
-  const fromAmount = new BigNumber(amount);
-
-  const percent = new BigNumber(100)
-    .plus(new BigNumber(slippage))
-    .dividedBy(new BigNumber(100));
-
-  if (!coinBalance || !pcBalance) {
-    return new BigNumber(0);
-  }
-
-  if (
-    fromCoinMint === poolInfo.poolCoinMint &&
-    toCoinMint === poolInfo.poolPcMint
-  ) {
-    // outcoin is pc
-    return fromAmount.multipliedBy(price).multipliedBy(percent);
-  }
-
-  if (
-    fromCoinMint === poolInfo.poolPcMint &&
-    toCoinMint === poolInfo.poolCoinMint
-  ) {
-    // outcoin is coin
-    return fromAmount.dividedBy(percent).dividedBy(price);
-  }
-
-  return new BigNumber(0);
-};
-
-export const getDepositOut = async ({
+// Calculate the maximum amount of Token A and Token B to deposit to get a specific LP Token amount
+// Do the calculation based on the current state of the pool, slippage and an amount of Token A
+export const calculateDepositAmounts = async ({
   connection,
   uiAmountTokenA,
   slippage,
-  poolLabel,
+  poolName,
 }: {
   connection: Connection;
   wallet: SignerWalletAdapter;
   uiAmountTokenA: number;
   slippage: number;
-  poolLabel: string;
-}) => {
-  const pool = getPoolByLabel(poolLabel);
-  const amount = new BigNumber(uiAmountTokenA.toString());
-  const lpSup = await connection.getTokenSupply(new PublicKey(pool.poolMint));
-  const lpSupply = uiAmountToNativeBigN(
-    lpSup.value.amount,
-    lpSup.value.decimals,
-  );
+  poolName: PoolNames;
+}): Promise<{
+  maximumAmountTokenA: BigNumber;
+  maximumAmountTokenB: BigNumber;
+  amountLpToken: BigNumber;
+  maximumUiAmountTokenA: number;
+  maximumUiAmountTokenB: number;
+  uiAmountLpToken: number;
+}> => {
+  const poolInfo = getPoolInfoByName(poolName);
 
-  const coin = await connection.getTokenAccountBalance(
-    new PublicKey(pool.poolCoinTokenAccount),
-  );
-  const coinBalance = uiAmountToNativeBigN(
-    coin.value.amount,
-    coin.value.decimals,
-  );
+  const {
+    lpToken: { mint: mintLpToken, decimals: decimalsLpToken },
+    tokenA: { decimals: decimalsTokenA, tokenAccount: tokenAccountTokenA },
+    tokenB: { decimals: decimalsTokenB, tokenAccount: tokenAccountTokenB },
+  } = poolInfo;
 
-  const pc = await connection.getTokenAccountBalance(
-    new PublicKey(pool.poolPcTokenAccount),
-  );
-  const pcBalance = uiAmountToNativeBigN(pc.value.amount, pc.value.decimals);
+  const [
+    rawLiquidityPoolTokenSupply,
+    rawBalanceTokenA,
+    rawBalanceTokenB,
+  ] = await Promise.all([
+    connection.getTokenSupply(mintLpToken),
+    connection.getTokenAccountBalance(tokenAccountTokenA),
+    connection.getTokenAccountBalance(tokenAccountTokenB),
+  ]);
 
-  const coinAddress = pool.poolCoinMint;
-  const pcAddress = pool.poolPcMint;
+  const lpTokenSupply = new BigNumber(rawLiquidityPoolTokenSupply.value.amount);
+  const balanceTokenA = new BigNumber(rawBalanceTokenA.value.amount);
+  const uiBalanceTokenA = rawBalanceTokenA.value.uiAmount ?? 0;
+  const uiBalanceTokenB = rawBalanceTokenB.value.uiAmount ?? 0;
 
-  const outAmount = getOutAmount(
-    pool,
-    amount.toString(),
-    coinAddress,
-    pcAddress,
-    slippage,
-    coinBalance,
-    pcBalance,
-  );
-  // Bruh
-  const lpReceived =
-    Math.floor(
-      ((amount.toNumber() * Math.pow(10, pool.poolCoinDecimal)) /
-        coinBalance.toNumber()) *
-        lpSupply.toNumber(),
-    ) / Math.pow(10, pool.poolMintDecimal);
-  const amountOut =
-    Math.floor(outAmount.toNumber() * Math.pow(10, pool.poolPcDecimal)) /
-    Math.pow(10, pool.poolPcDecimal);
+  // Example:
+  // The pool contains 2 tokens
+  //
+  // Token A => 20 tokens
+  // Token B => 20 tokens
+  //
+  // Their price is the same, 1 token A == 1 token B
+  //
+  // It exists 100 liquidity pool tokens (lpSupply)
+  //
+  // Imagine the users wants to deposit 10 token A in the pool with a 2% slippage
+  // The calculation are:
+  //
+  // amountTokenB = amountTokenA * tokenAPrice * percent
+  //         10.2 = 10 * (20 / 20) * ((100 + 2) / 100)
+  //
+  // amountLpToken = amountTokenA / balanceTokenA * lpTokenSupply
+  //            50 = 10 / 20 * 100
+  //
+  // The user should deposit a maximum of 10.2 Token B along with Token B and will receive 50 LP Tokens
+
+  const maximumAmountTokenA = new BigNumber(uiAmountTokenA)
+    .shiftedBy(decimalsTokenA)
+    .decimalPlaces(decimalsTokenA);
+
+  const tokenAPrice = uiBalanceTokenB / uiBalanceTokenA;
+
+  const percent = (100 + slippage) / 100;
+
+  const maximumUiAmountTokenB = new BigNumber(uiAmountTokenA)
+    .multipliedBy(tokenAPrice)
+    .multipliedBy(percent)
+    .toNumber();
+
+  const amountLpToken = maximumAmountTokenA
+    .dividedBy(balanceTokenA)
+    .multipliedBy(lpTokenSupply);
+
+  const maximumAmountTokenB = new BigNumber(maximumUiAmountTokenB)
+    .shiftedBy(decimalsTokenB)
+    .decimalPlaces(decimalsTokenB);
+
+  const uiAmountLpToken = amountLpToken.shiftedBy(-decimalsLpToken).toNumber();
+
   return {
-    amountIn: uiAmountTokenA,
-    amountOut,
-    lpReceived,
+    maximumUiAmountTokenA: uiAmountTokenA,
+    maximumUiAmountTokenB,
+    uiAmountLpToken,
+    maximumAmountTokenA,
+    maximumAmountTokenB,
+    amountLpToken,
   };
 };
 
-export const poolLabels = Object.keys(PoolList);
+export const poolLabels = Object.keys(PoolList) as PoolNames[];
 
-export const getPoolByLabel = (label: string) => PoolList[label];
+export const getPoolInfoByName = (label: PoolNames): IPoolInfo =>
+  PoolList[label];
 
-export const getPoolLabelByPoolMint = (mint: string) => {
-  const [label] = Object.entries(PoolList).find(
-    ([, data]) => data.poolMint === mint,
+export const getPoolNameByPoolTokenMint = (poolTokenMint: PublicKey) => {
+  const [label] = Object.entries(PoolList).find(([, { lpToken: { mint } }]) =>
+    mint.equals(poolTokenMint),
   ) ?? ['not found'];
+
   return label;
-};
-
-export const depositAllTokenTypesItx = async ({
-  connection,
-  liquidityPool,
-  uiAmountTokenA,
-  uiAmountTokenB,
-  uiAmountTokenLP,
-  userTransferAuthority,
-  wallet,
-}: {
-  connection: Connection;
-  liquidityPool: string;
-  uiAmountTokenA: number;
-  uiAmountTokenB: number;
-  uiAmountTokenLP: number;
-  userTransferAuthority: PublicKey;
-  wallet: Wallet;
-}) => {
-  const program = buildLifinity({ connection, wallet });
-
-  const pool = getPoolByLabel(liquidityPool);
-  const [authority] = await PublicKey.findProgramAddress(
-    [new PublicKey(pool.amm).toBuffer()],
-    program.programId,
-  );
-  const [sourceAInfo] = findATAAddrSync(
-    userTransferAuthority,
-    new PublicKey(pool.poolCoinMint),
-  );
-  const [sourceBInfo] = findATAAddrSync(
-    userTransferAuthority,
-    new PublicKey(pool.poolPcMint),
-  );
-  const [destination] = findATAAddrSync(
-    userTransferAuthority,
-    new PublicKey(pool.poolMint),
-  );
-  console.log('destination', destination.toBase58());
-
-  const {
-    lifinityTokenAccount,
-    lifinityMetaAccount,
-  } = await getWalletNftAccounts({
-    connection,
-    wallet: userTransferAuthority,
-  });
-  if (!lifinityTokenAccount || !lifinityMetaAccount)
-    throw new Error('Wallet does not hold Lifinity Igniter');
-
-  const itx = program.instruction.depositAllTokenTypes(
-    uiAmountToNativeBN(uiAmountTokenLP, pool.poolMintDecimal),
-    uiAmountToNativeBN(uiAmountTokenA, pool.poolCoinDecimal),
-    uiAmountToNativeBN(uiAmountTokenB, pool.poolPcDecimal),
-    {
-      accounts: {
-        amm: new PublicKey(pool.amm),
-        authority,
-        userTransferAuthorityInfo: userTransferAuthority,
-        sourceAInfo,
-        sourceBInfo,
-        tokenA: new PublicKey(pool.poolCoinTokenAccount),
-        tokenB: new PublicKey(pool.poolPcTokenAccount),
-        poolMint: new PublicKey(pool.poolMint),
-        destination,
-        tokenProgram: TOKEN_PROGRAM_ID,
-        configAccount: new PublicKey(pool.configAccount),
-        holderAccountInfo: userTransferAuthority,
-        lifinityNftAccount: new PublicKey(lifinityTokenAccount),
-        lifinityNftMetaAccount: new PublicKey(lifinityMetaAccount),
-      },
-      instructions: [],
-      signers: [],
-    },
-  );
-
-  return itx;
 };
