@@ -1,39 +1,33 @@
-import {
-  Connection,
-  PublicKey,
-  // TransactionInstruction,
-  // Account,
-  // Transaction,
-} from '@solana/web3.js'
 import { AccountMetaData, InstructionData } from '@solana/spl-governance'
+import { Connection, PublicKey } from '@solana/web3.js'
 
+import { PROGRAM_IDS } from '@castlefinance/vault-sdk'
+import { governance as foresightGov } from '@foresight-tmp/foresight-sdk'
+import { ConnectionContext } from '@utils/connection'
+import { ATA_PROGRAM_INSTRUCTIONS } from './programs/associatedTokenAccount'
 import { BPF_UPGRADEABLE_LOADER_INSTRUCTIONS } from './programs/bpfUpgradeableLoader'
+import { FORESIGHT_INSTRUCTIONS } from './programs/foresight'
 import { GOVERNANCE_INSTRUCTIONS } from './programs/governance'
 import { MANGO_INSTRUCTIONS } from './programs/mango'
+import { MARINADE_INSTRUCTIONS } from './programs/marinade'
 import { getProgramName, isGovernanceProgram } from './programs/names'
+import { NFT_VOTER_INSTRUCTIONS } from './programs/nftVotingClient'
 import { RAYDIUM_INSTRUCTIONS } from './programs/raydium'
+import { SOLEND_PROGRAM_INSTRUCTIONS } from './programs/solend'
 import { SPL_TOKEN_INSTRUCTIONS } from './programs/splToken'
 import { SYSTEM_INSTRUCTIONS } from './programs/system'
 import { VOTE_STAKE_REGISTRY_INSTRUCTIONS } from './programs/voteStakeRegistry'
-import { MARINADE_INSTRUCTIONS } from './programs/marinade'
-import { SOLEND_PROGRAM_INSTRUCTIONS } from './programs/solend'
-import { ATA_PROGRAM_INSTRUCTIONS } from './programs/associatedTokenAccount'
-import { governance as foresightGov } from '@foresight-tmp/foresight-sdk'
-import { ConnectionContext } from '@utils/connection'
-import { NFT_VOTER_INSTRUCTIONS } from './programs/nftVotingClient'
-import { PROGRAM_IDS } from '@castlefinance/vault-sdk'
-import { FORESIGHT_INSTRUCTIONS } from './programs/foresight'
 /**
  * Default governance program id instance
  */
 export const DEFAULT_GOVERNANCE_PROGRAM_ID =
-  'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
+  process.env.DEFAULT_GOVERNANCE_PROGRAM_ID
 
 /**
  * Default TEST governance program id instance
  */
 export const DEFAULT_TEST_GOVERNANCE_PROGRAM_ID =
-  'GTesTBiEWE32WHXXE2S4XbZvA5CrEc4xs6ZgRe895dP'
+  process.env.DEFAULT_TEST_GOVERNANCE_PROGRAM_ID
 
 export const MANGO_DAO_TREASURY = '9RGoboEjmaAjSCXsKi6p6zJucnwF3Eg5NUN9jPS6ziL3'
 
