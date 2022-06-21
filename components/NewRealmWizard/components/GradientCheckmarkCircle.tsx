@@ -5,7 +5,7 @@ export default function ({ selected = false }) {
         selected
           ? 'bg-gradient-to-r from-[#00C2FF] via-[#00E4FF] to-[#87F2FF]'
           : 'border border-fgd-4'
-      } group-hover:border-fgd-3 hover:border-fgd-3  group-disabled:text-fgd-4 group-disabled:group-hover:border-fgd-4 group-disabled:hover:border-fgd-4`}
+      } group-hover:border-fgd-3 hover:border-fgd-3 group-disabled:group-hover:border-fgd-4 group-disabled:hover:border-fgd-4`}
     >
       {selected && (
         <svg
