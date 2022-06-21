@@ -18,13 +18,13 @@ import Input from '@components/inputs/Input'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import {
   Config,
-  I80F48,
   makeChangeSpotMarketParamsInstruction,
   MangoClient,
   optionalBNFromString,
   QUOTE_INDEX,
 } from '@blockworks-foundation/mango-client'
 import { AccountType } from '@utils/uiTypes/assets'
+import { I80F48OptionalFromNumber } from '@utils/tokens'
 
 const MakeChangeQuoteParams = ({
   index,
@@ -83,9 +83,14 @@ const MakeChangeQuoteParams = ({
 
       const client = new MangoClient(connection, groupConfig.mangoProgramId)
       const mangoGroup = await client.getMangoGroup(groupConfig.publicKey)
-
+      console.log(mangoGroup)
       const rootBanks = await mangoGroup.loadRootBanks(connection)
       const rootBank = rootBanks[QUOTE_INDEX]
+      console.log(
+        rootBank?.optimalRate.toNumber(),
+        rootBank?.optimalUtil.toNumber(),
+        rootBank?.maxRate.toNumber()
+      )
       const instruction = makeChangeSpotMarketParamsInstruction(
         groupConfig.mangoProgramId,
         mangoGroup.publicKey,
@@ -96,9 +101,9 @@ const MakeChangeQuoteParams = ({
         undefined,
         undefined,
         undefined,
-        I80F48.fromNumber(form.optUtil),
-        I80F48.fromNumber(form.optRate),
-        I80F48.fromNumber(form.maxRate),
+        I80F48OptionalFromNumber(form.optUtil),
+        I80F48OptionalFromNumber(form.optRate),
+        I80F48OptionalFromNumber(form.maxRate),
         optionalBNFromString('0')
       )
 
