@@ -94,7 +94,7 @@ export async function tryGetMint(
 }
 
 export const I80F48OptionalFromNumber = (val: number | undefined) => {
-  return typeof val !== 'undefined' ? I80F48.fromNumber(val) : undefined
+  return val || val === 0 ? I80F48.fromNumber(val) : undefined
 }
 
 export async function tryGetTokenAccount(
