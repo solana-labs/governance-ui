@@ -1,3 +1,4 @@
+import { useTheme } from 'next-themes'
 import useQueryContext from '@hooks/useQueryContext'
 import Link from 'next/link'
 
@@ -7,6 +8,7 @@ import ThemeSwitch from './ThemeSwitch'
 
 const NavBar = () => {
   const { fmtUrlWithCluster } = useQueryContext()
+  const { theme } = useTheme()
 
   return (
     <div className="flex flex-col sm:grid sm:grid-cols-12">
@@ -15,7 +17,9 @@ const NavBar = () => {
           <div className="flex cursor-pointer sm:items-center min-w-[36px]">
             <picture>
               <source
-                srcSet="/img/logotype-realms-blue-white.svg"
+                srcSet={`/img/logotype-realms-blue-${
+                  theme === 'Dark' ? 'white' : 'black'
+                }.svg`}
                 media="(min-width: 640px)"
               />
               <img src="/img/logo-realms.svg" className="w-8 h-8 sm:w-24" />
