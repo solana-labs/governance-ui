@@ -10,6 +10,7 @@ import { getRealmExplorerHost } from 'tools/routing'
 import useMembersStore from 'stores/useMembersStore'
 import { vsrPluginsPks } from '@hooks/useVotingPlugins'
 import { tryParsePublicKey } from '@tools/core/pubkey'
+import Head from 'next/head'
 
 const RealmHeader = () => {
   const { fmtUrlWithCluster } = useQueryContext()
@@ -28,6 +29,11 @@ const RealmHeader = () => {
 
   return (
     <div className="px-4 pt-4 pb-4 rounded-t-lg bg-bkg-2 md:px-6 md:pt-6">
+      <Head>
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content={`${realmDisplayName} DAO`} />
+        <meta name="twitter:image" content={realmInfo?.ogImage} />
+      </Head>
       <div
         className={`flex items-center ${
           isBackNavVisible ? 'justify-between' : 'justify-end'
