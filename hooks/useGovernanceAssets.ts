@@ -272,6 +272,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
     },
     {
+      id: Instructions.MangoChangeQuoteParams,
+      name: 'Mango: Change Quote Params',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
       id: Instructions.MangoChangeReferralFeeParams,
       name: 'Mango: Change Referral Fee Params',
       isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
