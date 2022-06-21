@@ -391,7 +391,7 @@ export const MANGO_INSTRUCTIONS = {
       name: 'Mango v3: Change Spot Market Params',
       accounts: {
         0: { name: 'Mango Group' },
-        1: { name: 'Spot market' },
+        1: { name: '' },
         2: { name: 'Root bank' },
       },
       getDataUI: (
