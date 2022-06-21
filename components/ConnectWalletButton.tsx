@@ -130,7 +130,7 @@ const ConnectWalletButton = (props) => {
     <div className="flex">
       <div
         disabled={connected}
-        className={`bg-bkg-2 hover:bg-bkg-3  border border-fgd-4 border-r-0 default-transition flex h-12 items-center pl-1 pr-2 rounded-l-full rounded-r-none ${
+        className={`bg-bkg-2 hover:bg-bkg-3  border border-fgd-4 border-r-0 default-transition flex h-12 items-center pl-2 sm:pl-1 pr-1 sm:pr-2 rounded-l-full rounded-r-none ${
           connected
             ? 'cursor-default'
             : 'cursor-pointer hover:bg-bkg-3 focus:outline-none'
@@ -165,7 +165,7 @@ const ConnectWalletButton = (props) => {
           {({ open }) => (
             <>
               <Menu.Button
-                className={`border bg-bkg-2 border-fgd-4 cursor-pointer default-transition h-12 w-12 py-2 px-2 rounded-r-full hover:bg-bkg-3 focus:outline-none`}
+                className={`border bg-bkg-2 border-fgd-4 cursor-pointer default-transition h-12 w-8 sm:w-12 py-2 sm:px-2 rounded-r-full hover:bg-bkg-3 focus:outline-none`}
               >
                 <ChevronDownIcon
                   className={`${
