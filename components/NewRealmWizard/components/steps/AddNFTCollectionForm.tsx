@@ -346,7 +346,7 @@ export default function AddNFTCollectionForm({
           collectionKey
         )
         const nftsWithInfo = await Promise.all(
-          verfiedNfts[collectionKey].slice(0, 2).map((nft) => {
+          verfiedNfts[collectionKey].slice(0, 3).map((nft) => {
             return enrichItemInfo(nft.data, nft.data.uri)
           })
         )
@@ -621,7 +621,7 @@ export default function AddNFTCollectionForm({
             />
 
             <AdviceBox title="Approval threshold" icon={<ScalesIcon />}>
-              <Text level="1" className="space-y-1 text-white/70">
+              <Text level="1" className="space-y-1 text-fgd-1">
                 <div>
                   With{' '}
                   {numberOfNFTs && !isNaN(numberOfNFTs)
