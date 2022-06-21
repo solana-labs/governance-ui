@@ -387,6 +387,23 @@ export const MANGO_INSTRUCTIONS = {
         return <>{displayAllArgs(args)}</>
       },
     },
+    59: {
+      name: 'Mango v3: Change Quote Params',
+      accounts: {
+        0: { name: 'Mango Group' },
+        1: { name: '' },
+        2: { name: '' },
+      },
+      getDataUI: (
+        _connection: Connection,
+        data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
+        const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
+          .ChangeSpotMarketParams
+        return <>{displayAllArgs(args)}</>
+      },
+    },
     61: {
       name: 'Mango v3: Change Referral Fee Params',
       accounts: {
