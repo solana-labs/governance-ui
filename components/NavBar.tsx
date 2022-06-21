@@ -18,7 +18,7 @@ const NavBar = () => {
             <picture>
               <source
                 srcSet={`/img/logotype-realms-blue-${
-                  theme === 'Dark' ? 'white' : 'black'
+                  theme === 'Light' ? 'black' : 'white'
                 }.svg`}
                 media="(min-width: 640px)"
               />

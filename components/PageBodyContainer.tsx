@@ -19,12 +19,12 @@ const PageBodyContainer = ({ children }) => {
           <picture>
             <source
               srcSet={`/img/bg-desktop-${
-                theme === 'Dark' ? 'dark' : 'light'
+                theme === 'Light' ? 'light' : 'dark'
               }.png`}
               media="(min-width: 640px)"
             />
             <img
-              src={`/img/bg-mobile-${theme === 'Dark' ? 'dark' : 'light'}.png`}
+              src={`/img/bg-mobile-${theme === 'Light' ? 'light' : 'dark'}.png`}
             />
           </picture>
         </div>
