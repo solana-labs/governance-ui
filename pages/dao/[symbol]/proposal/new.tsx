@@ -82,6 +82,7 @@ import GoblinGoldDeposit from './components/instructions/GoblinGold/GoblinGoldDe
 import GoblinGoldWithdraw from './components/instructions/GoblinGold/GoblinGoldWithdraw'
 import MakeSetMarketMode from './components/instructions/Mango/MakeSetMarketMode'
 import CreateGatewayPluginRegistrar from './components/instructions/GatewayPlugin/CreateRegistrar'
+import MakeChangeQuoteParams from './components/instructions/Mango/MakeChangeQuoteParams'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -449,6 +450,13 @@ const New = () => {
             index={idx}
             governance={governance}
           ></MakeChangeSpotMarket>
+        )
+      case Instructions.MangoChangeQuoteParams:
+        return (
+          <MakeChangeQuoteParams
+            index={idx}
+            governance={governance}
+          ></MakeChangeQuoteParams>
         )
       case Instructions.MangoCreatePerpMarket:
         return (

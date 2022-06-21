@@ -179,9 +179,9 @@ export interface MangoMakeChangeSpotMarketForm {
   programId: string | undefined
   mangoGroup: string | undefined
   baseSymbol: string | undefined
-  maintLeverage: number
-  initLeverage: number
-  liquidationFee: number
+  maintLeverage: number | undefined
+  initLeverage: number | undefined
+  liquidationFee: number | undefined
   optUtil: number
   optRate: number
   maxRate: number
@@ -342,6 +342,7 @@ export enum Instructions {
   MangoChangeSpotMarket,
   MangoCreatePerpMarket,
   MangoSetMarketMode,
+  MangoChangeQuoteParams,
   Grant,
   Clawback,
   CreateAssociatedTokenAccount,

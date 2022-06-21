@@ -18,17 +18,15 @@ import Input from '@components/inputs/Input'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import {
   Config,
-  getSpotMarketByBaseSymbol,
-  getTokenBySymbol,
   I80F48,
   makeChangeSpotMarketParamsInstruction,
   MangoClient,
   optionalBNFromString,
+  QUOTE_INDEX,
 } from '@blockworks-foundation/mango-client'
-import * as serum from '@project-serum/serum'
 import { AccountType } from '@utils/uiTypes/assets'
 
-const MakeChangeSpotMarket = ({
+const MakeChangeQuoteParams = ({
   index,
   governance,
 }: {
@@ -50,9 +48,9 @@ const MakeChangeSpotMarket = ({
     programId: programId?.toString(),
     mangoGroup: undefined,
     baseSymbol: undefined,
-    maintLeverage: 10,
-    initLeverage: 5,
-    liquidationFee: 0.05,
+    maintLeverage: undefined,
+    initLeverage: undefined,
+    liquidationFee: undefined,
     optUtil: 0.7,
     optRate: 0.03,
     maxRate: 0.75,
@@ -86,34 +84,22 @@ const MakeChangeSpotMarket = ({
       const client = new MangoClient(connection, groupConfig.mangoProgramId)
       const mangoGroup = await client.getMangoGroup(groupConfig.publicKey)
 
-      const spotMarketConfig = getSpotMarketByBaseSymbol(
-        groupConfig,
-        form.baseSymbol!
-      )
-      const spotMarket = await serum.Market.load(
-        connection,
-        spotMarketConfig!.publicKey,
-        undefined,
-        groupConfig.serumProgramId
-      )
       const rootBanks = await mangoGroup.loadRootBanks(connection)
-      const tokenBySymbol = getTokenBySymbol(groupConfig, form.baseSymbol!)
-      const tokenIndex = mangoGroup.getTokenIndex(tokenBySymbol.mintKey)
-      const rootBank = rootBanks[tokenIndex]
-
+      const rootBank = rootBanks[QUOTE_INDEX]
       const instruction = makeChangeSpotMarketParamsInstruction(
         groupConfig.mangoProgramId,
         mangoGroup.publicKey,
-        spotMarket.publicKey,
+        //Passed but actually not used random spot market
+        groupConfig.spotMarkets[0].publicKey,
         rootBank!.publicKey,
         form.governedAccount.governance.pubkey,
-        I80F48.fromNumber(form.maintLeverage!),
-        I80F48.fromNumber(form.initLeverage!),
-        I80F48.fromNumber(form.liquidationFee!),
+        undefined,
+        undefined,
+        undefined,
         I80F48.fromNumber(form.optUtil),
         I80F48.fromNumber(form.optRate),
         I80F48.fromNumber(form.maxRate),
-        optionalBNFromString(form.version)
+        optionalBNFromString('0')
       )
 
       serializedInstruction = serializeInstructionToBase64(instruction)
@@ -174,57 +160,6 @@ const MakeChangeSpotMarket = ({
         error={formErrors['mangoGroup']}
       />
       <Input
-        label="Base symbol"
-        value={form.baseSymbol}
-        type="text"
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'baseSymbol',
-          })
-        }
-        error={formErrors['baseSymbol']}
-      />
-      <Input
-        label="Maintenance leverage"
-        value={form.maintLeverage}
-        type="number"
-        min={1}
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'maintLeverage',
-          })
-        }
-        error={formErrors['maintLeverage']}
-      />
-      <Input
-        label="Initial leverage"
-        value={form.initLeverage}
-        type="number"
-        min={1}
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'initLeverage',
-          })
-        }
-        error={formErrors['initLeverage']}
-      />
-      <Input
-        label="Liquidation fee"
-        value={form.liquidationFee}
-        type="number"
-        min={0}
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'liquidationFee',
-          })
-        }
-        error={formErrors['liquidationFee']}
-      />
-      <Input
         label="Optimal utilization"
         value={form.optUtil}
         type="number"
@@ -265,21 +200,8 @@ const MakeChangeSpotMarket = ({
         }
         error={formErrors['maxRate']}
       />
-
-      <Input
-        label="Version"
-        value={form.version}
-        type="text"
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'version',
-          })
-        }
-        error={formErrors['version']}
-      />
     </>
   )
 }
 
-export default MakeChangeSpotMarket
+export default MakeChangeQuoteParams
