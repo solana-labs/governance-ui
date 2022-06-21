@@ -388,11 +388,11 @@ export const MANGO_INSTRUCTIONS = {
       },
     },
     59: {
-      name: 'Mango v3: Change Quote Params',
+      name: 'Mango v3: Change Spot Market Params',
       accounts: {
         0: { name: 'Mango Group' },
-        1: { name: '' },
-        2: { name: '' },
+        1: { name: 'Spot Market' },
+        2: { name: 'Root Bank' },
       },
       getDataUI: (
         _connection: Connection,
