@@ -39,7 +39,7 @@ module.exports = {
           blue: '#00e4ff',
         },
         'light-theme': {
-          primary: { light: '#5DC9EB', dark: '#101010' },
+          primary: { light: '#19A0CA', dark: '#101010' },
           'secondary-1': { light: '#AFD803', dark: '#6CBF00' },
           'secondary-2': { light: '#E54033', dark: '#C7251A' },
           'fgd-1': '#3d3d3d',
