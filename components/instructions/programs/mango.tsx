@@ -392,7 +392,7 @@ export const MANGO_INSTRUCTIONS = {
       accounts: {
         0: { name: 'Mango Group' },
         1: { name: '' },
-        2: { name: 'Root bank' },
+        2: { name: '' },
       },
       getDataUI: (
         _connection: Connection,
