@@ -6,10 +6,10 @@ import {
   makeSetDelegateInstruction,
   MangoAccount,
 } from '@blockworks-foundation/mango-client'
-import { WSOL_MINT } from '@components/instructions/tools'
 import {
   closeAccount,
   initializeAccount,
+  WRAPPED_SOL_MINT,
 } from '@project-serum/serum/lib/token-instructions'
 import {
   getInstructionDataFromBase64,
@@ -18,7 +18,7 @@ import {
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-governance'
 import { Keypair, LAMPORTS_PER_SOL, SystemProgram } from '@solana/web3.js'
-import { fmtMintAmount, getMintDecimalAmount } from '@tools/sdk/units'
+import { fmtMintAmount } from '@tools/sdk/units'
 import { ConnectionContext } from '@utils/connection'
 import tokenService from '@utils/services/token'
 import {
@@ -26,6 +26,7 @@ import {
   InstructionDataWithHoldUpTime,
 } from 'actions/createProposal'
 import axios from 'axios'
+import BigNumber from 'bignumber.js'
 import { MarketStore } from 'Strategies/store/marketStore'
 import {
   TreasuryStrategy,
@@ -177,11 +178,9 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
     matchedTreasury.extensions.mint?.account,
     new BN(form.mintAmount)
   )
-  const decimalAmount = getMintDecimalAmount(
-    matchedTreasury.extensions.mint!.account!,
-    new BN(form.mintAmount)
-  )
-  console.log(decimalAmount)
+  const decimalAmount = new BigNumber(form.mintAmount)
+    .shiftedBy(-matchedTreasury.extensions.mint!.account.decimals)
+    .toNumber()
   const group = market!.group!
   const groupConfig = market!.groupConfig!
   const rootBank = group.tokens.find(
@@ -213,39 +212,37 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
   const insts: InstructionDataWithHoldUpTime[] = []
   if (matchedTreasury.isSol) {
     wrappedSolAccount = new Keypair()
-    const lamports =
-      Math.round(decimalAmount.toNumber() + LAMPORTS_PER_SOL) + 1e7
-    const createMangoAccountIns = SystemProgram.createAccount({
-      fromPubkey: matchedTreasury.pubkey,
-      newAccountPubkey: wrappedSolAccount?.publicKey,
-      lamports,
-      space: 165,
-      programId: TOKEN_PROGRAM_ID,
-    })
-    const instructionData = {
-      data: getInstructionDataFromBase64(
-        serializeInstructionToBase64(createMangoAccountIns)
-      ),
-      holdUpTime: matchedTreasury.governance!.account!.config
-        .minInstructionHoldUpTime,
-      prerequisiteInstructions: [],
-      splitToChunkByDefault: true,
-    }
-    insts.push(instructionData)
+    const lamports = Math.round(decimalAmount + LAMPORTS_PER_SOL) + 1e7
     insts.push({
       data: getInstructionDataFromBase64(
         serializeInstructionToBase64(
-          initializeAccount({
-            account: wrappedSolAccount?.publicKey,
-            mint: WSOL_MINT,
-            owner: matchedTreasury.pubkey,
+          SystemProgram.createAccount({
+            fromPubkey: matchedTreasury.extensions.transferAddress!,
+            newAccountPubkey: wrappedSolAccount?.publicKey,
+            lamports,
+            space: 165,
+            programId: TOKEN_PROGRAM_ID,
           })
         )
       ),
       holdUpTime: matchedTreasury.governance!.account!.config
         .minInstructionHoldUpTime,
       prerequisiteInstructions: [],
-      chunkSplitByDefault: true,
+    })
+    insts.push({
+      data: getInstructionDataFromBase64(
+        serializeInstructionToBase64(
+          initializeAccount({
+            account: wrappedSolAccount?.publicKey,
+            mint: WRAPPED_SOL_MINT,
+            owner: matchedTreasury.governance.pubkey!,
+          })
+        )
+      ),
+      holdUpTime: matchedTreasury.governance!.account!.config
+        .minInstructionHoldUpTime,
+      prerequisiteInstructions: [],
+      signers: [wrappedSolAccount],
     })
   }
   const depositMangoAccountInsObj = {
