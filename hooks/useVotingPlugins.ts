@@ -267,10 +267,6 @@ export function useVotingPlugins() {
       }
     } catch (e) {
       console.log(e)
-      notify({
-        message: "Something went wrong can't fetch switchboard voting power",
-        type: 'error',
-      })
     }
     setIsLoading(false)
   }
