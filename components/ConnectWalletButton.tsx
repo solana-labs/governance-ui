@@ -47,7 +47,9 @@ const ConnectWalletButton = (props) => {
   ])
 
   useEffect(() => {
-    setCurrentCluster(connection.cluster)
+    if (connection.cluster !== currentCluster) {
+      setCurrentCluster(connection.cluster)
+    }
   }, [connection.cluster])
 
   function updateClusterParam(cluster) {
