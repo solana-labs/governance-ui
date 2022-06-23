@@ -27,10 +27,14 @@ export function getMintDecimalAmount(mint: MintInfo, mintAmount: BN) {
 export function nativeAmountToFormattedUiAmount(
   nativeAmount: BN,
   decimals: number,
-) {
+): string {
   return Number(
     new BigNumber(nativeAmount.toString()).shiftedBy(-decimals).toString(),
   ).toLocaleString();
+}
+
+export function nativeBNToUiAmount(nativeAmount: BN, decimals: number): number {
+  return new BigNumber(nativeAmount.toString()).shiftedBy(-decimals).toNumber();
 }
 
 export function getBigNumberAmount(amount: BN | number) {

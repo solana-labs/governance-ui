@@ -23,6 +23,7 @@ import { InstructionType } from '@hooks/useGovernanceAssets';
 import { SupportedSaberPoolNames } from '@tools/sdk/saberPools/configuration';
 import { PoolName as MapleFinancePoolName } from '@tools/sdk/mapleFinance/configuration';
 import { PoolNames as LifinityPoolNames } from '@tools/sdk/lifinity/poolList';
+import { PoolName as DeltafiPoolName } from '@components/SelectDeltafiPool';
 
 export interface FormInstructionData {
   serializedInstruction: string;
@@ -441,6 +442,29 @@ export interface MapleFinanceLenderDepositForm {
   poolName?: MapleFinancePoolName;
 }
 
+export interface DeltafiPoolDepositForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  poolName?: DeltafiPoolName;
+  uiBaseAmount?: number;
+  uiQuoteAmount?: number;
+  uiMinBaseShare?: number;
+  uiMinQuoteShare?: number;
+}
+
+export interface DeltafiPoolWithdrawForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  poolName?: DeltafiPoolName;
+  uiBaseShare?: number;
+  uiQuoteShare?: number;
+  uiMinBaseAmount?: number;
+  uiMinQuoteAmount?: number;
+}
+
+export interface DeltafiCreateLiquidityProviderForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  poolName?: DeltafiPoolName;
+}
+
 export enum InstructionEnum {
   Transfer,
   ProgramUpgrade,
@@ -502,6 +526,9 @@ export enum InstructionEnum {
   UXDStakingRefillRewardVault,
   NativeTransferTokensForm,
   MapleFinanceLenderDepositForm,
+  DeltafiPoolDeposit,
+  DeltafiCreateLiquidityProvider,
+  DeltafiPoolWithdraw,
 }
 
 export enum PackageEnum {
@@ -518,6 +545,7 @@ export enum PackageEnum {
   Quarry,
   Lifinity,
   MapleFinance,
+  Deltafi,
 }
 
 export type createParams = [

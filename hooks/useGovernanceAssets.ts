@@ -216,6 +216,10 @@ export default function useGovernanceAssets() {
       name: 'Maple Finance',
       image: '/img/mapleFinance.png',
     },
+    [PackageEnum.Deltafi]: {
+      name: 'Deltafi',
+      image: '/img/deltafi.png',
+    },
   };
 
   const instructions: Instructions = {
@@ -523,6 +527,24 @@ export default function useGovernanceAssets() {
       name: 'Transfer Tokens',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.Native,
+      tag: 'beta',
+    },
+    [InstructionEnum.DeltafiCreateLiquidityProvider]: {
+      name: 'Create Liquidity Provider',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Deltafi,
+      tag: 'beta',
+    },
+    [InstructionEnum.DeltafiPoolDeposit]: {
+      name: 'Deposit Tokens on Pool',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Deltafi,
+      tag: 'beta',
+    },
+    [InstructionEnum.DeltafiPoolWithdraw]: {
+      name: 'Withdraw Tokens from Pool',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Deltafi,
       tag: 'beta',
     },
   };

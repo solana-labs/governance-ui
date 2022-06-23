@@ -27,6 +27,7 @@ import { LIFINITY_PROGRAM_INSTRUCTIONS } from './programs/lifinity';
 import { TRIBECA_PROGRAM_INSTRUCTIONS } from './programs/tribeca';
 import { MAPLE_FINANCE_PROGRAM_INSTRUCTIONS } from './programs/mapleFinance';
 import { FRIKTION_PROGRAM_INSTRUCTIONS } from './programs/friktion';
+import { DELTAFI_PROGRAM_INSTRUCTIONS } from './programs/deltafi';
 /**
  * Default governance program id instance
  */
@@ -125,6 +126,7 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...TRIBECA_PROGRAM_INSTRUCTIONS,
   ...MAPLE_FINANCE_PROGRAM_INSTRUCTIONS,
   ...FRIKTION_PROGRAM_INSTRUCTIONS,
+  ...DELTAFI_PROGRAM_INSTRUCTIONS,
 };
 
 export async function getInstructionDescriptor(
