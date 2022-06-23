@@ -59,8 +59,37 @@ export interface FriktionWithdrawForm {
   amount: number | undefined
   governedTokenAccount: AssetAccount | undefined
   voltVaultId: string
-  depositTokenMint: string | undefined
   programId: string | undefined
+  mintInfo: MintInfo | undefined
+}
+
+export interface FriktionClaimPendingDepositForm {
+  governedTokenAccount: AssetAccount | undefined
+  voltVaultId: string
+  programId: string | undefined
+  mintInfo: MintInfo | undefined
+}
+
+export interface FriktionClaimPendingWithdrawForm {
+  governedTokenAccount: AssetAccount | undefined
+  voltVaultId: string
+  programId: string | undefined
+  mintInfo: MintInfo | undefined
+}
+
+export interface GoblinGoldDepositForm {
+  amount: number | undefined
+  governedTokenAccount?: AssetAccount | undefined
+  goblinGoldVaultId: string
+  mintName?: SupportedMintName | undefined
+  mintInfo: MintInfo | undefined
+}
+
+export interface GoblinGoldWithdrawForm {
+  amount: number | undefined
+  governedTokenAccount?: AssetAccount | undefined
+  goblinGoldVaultId?: string
+  mintName?: SupportedMintName
   mintInfo: MintInfo | undefined
 }
 
@@ -117,6 +146,20 @@ export interface MangoMakeAddOracleForm {
   oracleAccount: string | undefined
 }
 
+type NameValue = {
+  name: string
+  value: string
+}
+
+export interface MangoMakeSetMarketModeForm {
+  governedAccount: AssetAccount | null
+  mangoGroup: NameValue | null
+  marketIndex: NameValue | null
+  marketMode: NameValue | null
+  marketType: NameValue | null
+  adminPk: string
+}
+
 export interface MangoMakeAddSpotMarketForm {
   governedAccount: AssetAccount | undefined
   programId: string | undefined
@@ -136,9 +179,9 @@ export interface MangoMakeChangeSpotMarketForm {
   programId: string | undefined
   mangoGroup: string | undefined
   baseSymbol: string | undefined
-  maintLeverage: number
-  initLeverage: number
-  liquidationFee: number
+  maintLeverage: number | undefined
+  initLeverage: number | undefined
+  liquidationFee: number | undefined
   optUtil: number
   optRate: number
   maxRate: number
@@ -224,7 +267,7 @@ export interface ForesightMakeResolveMarketParams extends ForesightHasMarketId {
   winner: number
 }
 
-export interface ForesightMakeAddMarketMetadataParams
+export interface ForesightMakeSetMarketMetadataParams
   extends ForesightHasMarketId {
   content: string
   field: foresightConsts.MarketMetadataFieldName
@@ -237,6 +280,16 @@ export interface Base64InstructionForm {
 
 export interface EmptyInstructionForm {
   governedAccount: AssetAccount | undefined
+}
+
+export interface SwitchboardAdmitOracleForm {
+  oraclePubkey: PublicKey | undefined
+  queuePubkey: PublicKey | undefined
+}
+
+export interface SwitchboardRevokeOracleForm {
+  oraclePubkey: PublicKey | undefined
+  queuePubkey: PublicKey | undefined
 }
 
 export interface CreateAssociatedTokenAccountForm {
@@ -288,17 +341,25 @@ export enum Instructions {
   MangoChangeReferralFeeParams,
   MangoChangeSpotMarket,
   MangoCreatePerpMarket,
+  MangoSetMarketMode,
+  MangoChangeQuoteParams,
   Grant,
   Clawback,
   CreateAssociatedTokenAccount,
-  DepositIntoCastle,
-  WithrawFromCastle,
   DepositIntoVolt,
   WithdrawFromVolt,
+  ClaimPendingDeposit,
+  ClaimPendingWithdraw,
+  DepositIntoCastle,
+  WithrawFromCastle,
+  DepositIntoGoblinGold,
+  WithdrawFromGoblinGold,
   CreateSolendObligationAccount,
   InitSolendObligationAccount,
   DepositReserveLiquidityAndObligationCollateral,
   WithdrawObligationCollateralAndRedeemReserveLiquidity,
+  SwitchboardAdmitOracle,
+  SwitchboardRevokeOracle,
   RefreshSolendObligation,
   RefreshSolendReserve,
   ForesightInitMarket,
@@ -306,7 +367,7 @@ export enum Instructions {
   ForesightInitCategory,
   ForesightResolveMarket,
   ForesightAddMarketListToCategory,
-  ForesightAddMarketMetadata,
+  ForesightSetMarketMetadata,
   RealmConfig,
   CreateNftPluginRegistrar,
   CreateNftPluginMaxVoterWeight,
@@ -314,6 +375,8 @@ export enum Instructions {
   CloseTokenAccount,
   VotingMintConfig,
   CreateVsrRegistrar,
+  CreateGatewayPluginRegistrar,
+  ConfigureGatewayPlugin,
   ChangeMakeDonation,
 }
 

@@ -12,7 +12,7 @@ const Modal = ({
   return (
     <Portal>
       <div
-        className="fixed z-30 inset-0 overflow-y-auto"
+        className="fixed inset-0 z-30 overflow-y-auto"
         aria-labelledby="modal-title"
         role="dialog"
         aria-modal="true"
@@ -20,7 +20,7 @@ const Modal = ({
         <div className="flex items-center min-h-screen px-4 pb-20 text-center sm:block sm:p-0">
           {isOpen ? (
             <div
-              className="fixed inset-0 bg-black bg-opacity-70 transition-opacity"
+              className="fixed inset-0 transition-opacity bg-black bg-opacity-70"
               aria-hidden="true"
               onClick={onClose}
             ></div>

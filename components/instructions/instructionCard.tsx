@@ -218,21 +218,23 @@ export function InstructionProgram({
       <span className="font-bold text-fgd-1 text-sm">Program</span>
       <div className="flex items-center pt-1 lg:pt-0">
         <a
-          className="text-sm hover:brightness-[1.15] focus:outline-none"
+          className="text-sm hover:brightness-[1.15] focus:outline-none flex items-center"
           href={getExplorerUrl(endpoint, programId)}
           target="_blank"
           rel="noopener noreferrer"
         >
-          {programId.toBase58()}
-          {programLabel && (
-            <div className="mt-1 text-fgd-3 lg:text-right text-xs">
-              {programLabel}
-            </div>
-          )}
+          <div>
+            {programId.toBase58()}
+            {programLabel && (
+              <div className="mt-1 text-fgd-3 lg:text-right text-xs">
+                {programLabel}
+              </div>
+            )}
+          </div>
+          <ExternalLinkIcon
+            className={`flex-shrink-0 h-4 w-4 ml-2 text-primary-light`}
+          />
         </a>
-        <ExternalLinkIcon
-          className={`flex-shrink-0 h-4 w-4 ml-2 text-primary-light`}
-        />
       </div>
     </div>
   )
@@ -276,21 +278,23 @@ export function InstructionAccount({
       </div>
       <div className="flex items-center">
         <a
-          className="text-sm hover:brightness-[1.15] focus:outline-none"
+          className="text-sm hover:brightness-[1.15] focus:outline-none flex items-center"
           href={getExplorerUrl(endpoint, accountMeta.pubkey)}
           target="_blank"
           rel="noopener noreferrer"
         >
-          {accountMeta.pubkey.toBase58()}
-          {accountLabel && (
-            <div className="mt-0.5 text-fgd-3 text-right text-xs">
-              {accountLabel}
-            </div>
-          )}
+          <div>
+            {accountMeta.pubkey.toBase58()}
+            {accountLabel && (
+              <div className="mt-0.5 text-fgd-3 text-right text-xs">
+                {accountLabel}
+              </div>
+            )}
+          </div>
+          <ExternalLinkIcon
+            className={`flex-shrink-0 h-4 w-4 ml-2 text-primary-light`}
+          />
         </a>
-        <ExternalLinkIcon
-          className={`flex-shrink-0 h-4 w-4 ml-2 text-primary-light`}
-        />
       </div>
     </div>
   )

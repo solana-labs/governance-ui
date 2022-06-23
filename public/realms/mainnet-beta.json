@@ -40,7 +40,7 @@
   },
   {
     "symbol": "MangoLiquidityDAO",
-    "displayName": "Mango Liquidity DAO",
+    "displayName": "Mango Liquidity Council",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "DnWHRVRbA2XGwWth2da7iF3Q81cqRHhqJXSPS8J3G6fo",
     "website": "https://mango.markets",
@@ -144,7 +144,8 @@
     "symbol": "Governance",
     "displayName": "Governance",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "FMEWULPSGR1BKVJK4K7xTjhG23NfYxeAn2bamYgNoUck"
+    "realmId": "FMEWULPSGR1BKVJK4K7xTjhG23NfYxeAn2bamYgNoUck",
+    "ogImage": "/realms/Governance/img/spl-governance-logo.svg"
   },
   {
     "symbol": "Yield Farming",
@@ -269,6 +270,16 @@
     "website": "https://grapes.network/",
     "twitter": "@grapeprotocol",
     "sortRank":3 
+  },
+  {
+    "symbol": "RED",
+    "displayName": "Realms Ecosystem DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "C1tyCAEnbt4d63nbF36PGLc8gCC9DdtRXttXWGZwsAdF",
+    "ogImage": "/realms/RED/RED.png",
+    "website": "https://realms.notion.site/Realms-Ecosystem-DAO-RED-2b82519e797b4696968c5c909812f418",
+    "twitter": "@Realms_DAOs",
+    "sortRank":2
   },
   {
     "symbol": "MonkeDAO",
@@ -777,6 +788,34 @@
     "realmId": "BE5wCCi9fg5YxUWos5A9JYACCLTPCKbcbJknTMxz76g4",
     "website": "https://createdby.io",
     "twitter": "@CreatedByIO",
-    "ogImage": "/realms/CreatedBy/CreatedBy.PNG"
-  }
+    "ogImage": "/realms/CreatedBy/CreatedBy.png"
+  },
+    {
+    "symbol": "SAMO",
+    "displayName": "SamoDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "GC6GDrJTVEY2ZxQ9NaC7n54tvz2HKM5f29LBzP7SjJ6h",
+    "website": "https://samoyedcoin.com",
+    "twitter": "@Samo_DAO",
+    "ogImage": "/realms/SamoDAO/SamoDAO.png"
+    },
+    {
+      "symbol": "FORE",
+      "displayName": "Foresight DAO",
+      "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+      "realmId": "CZatgrcvaDN9ib1sQeSCJWUnBXc899ydTB9vfAHHBVfP",
+      "ogImage": "https://www.foresight.exchange/logo.png",
+      "website": "https://www.foresight.exchange/",
+      "twitter": "@foresightmkt"
+    },
+    {
+      "symbol": "SLND",
+      "displayName": "Solend DAO",
+      "programId": "A7kmu2kUcnQwAVn8B4znQmGJeUrsJ1WEhYVMtmiBLkEr",
+      "realmId": "7sf3tcWm58vhtkJMwuw2P3T6UBX7UE5VKxPMnXJUZ1Hn",
+      "ogImage": "https://solend-image-assets.s3.us-east-2.amazonaws.com/1280-circle.png",
+      "website": "https://solend.fi/",
+      "twitter": "@solendprotocol",
+      "sortRank": 2
+    }
 ]

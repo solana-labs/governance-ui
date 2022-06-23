@@ -29,6 +29,7 @@ import {
 } from '@tools/sdk/units'
 import { abbreviateAddress } from '@utils/formatting'
 import * as yup from 'yup'
+import { MAX_TOKENS_TO_DISABLE } from '@tools/constants'
 
 interface GovernanceConfigForm extends BaseGovernanceFormFields {
   title: string
@@ -58,10 +59,12 @@ const GovernanceConfigModal = ({
     title: '',
     description: '',
     minCommunityTokensToCreateProposal: mint
-      ? getMintDecimalAmountFromNatural(
-          mint,
-          config?.minCommunityTokensToCreateProposal
-        ).toNumber()
+      ? MAX_TOKENS_TO_DISABLE.eq(config?.minCommunityTokensToCreateProposal)
+        ? MAX_TOKENS_TO_DISABLE.toString()
+        : getMintDecimalAmountFromNatural(
+            mint,
+            config?.minCommunityTokensToCreateProposal
+          ).toNumber()
       : 0,
     minInstructionHoldUpTime: getDaysFromTimestamp(
       config?.minInstructionHoldUpTime
@@ -128,8 +131,8 @@ const GovernanceConfigModal = ({
       onClose={closeProposalModal}
       isOpen={isProposalModalOpen}
     >
-      <div className="space-y-4 w-full">
-        <h3 className="mb-4 flex flex-col">
+      <div className="w-full space-y-4">
+        <h3 className="flex flex-col mb-4">
           Change Governance Config:{' '}
           {governance && abbreviateAddress(governance.pubkey)}
         </h3>
@@ -172,7 +175,7 @@ const GovernanceConfigModal = ({
           setFormErrors={setFormErrors}
         ></BaseGovernanceForm>
       </div>
-      <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
+      <div className="flex justify-end pt-6 mt-6 space-x-4 border-t border-fgd-4">
         <Button
           isLoading={creatingProposal}
           disabled={creatingProposal}
