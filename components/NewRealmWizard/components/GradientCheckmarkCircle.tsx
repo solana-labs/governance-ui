@@ -1,7 +1,7 @@
 export default function ({ selected = false }) {
   return (
     <div
-      className={`h-[32px] w-[32px] rounded-full flex items-center justify-center text-fgd-1 ${
+      className={`h-[32px] w-[32px] rounded-full flex items-center justify-center text-black ${
         selected
           ? 'bg-gradient-to-r from-[#00C2FF] via-[#00E4FF] to-[#87F2FF]'
           : 'border border-fgd-4'
