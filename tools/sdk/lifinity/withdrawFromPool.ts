@@ -1,3 +1,4 @@
+import { BN } from '@project-serum/anchor';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base';
 import { Connection, PublicKey } from '@solana/web3.js';
@@ -43,9 +44,9 @@ const withdrawFromPool = async ({
   const [sourceTokenLP] = findATAAddrSync(userTransferAuthority, mintLpToken);
 
   return program.instruction.withdrawAllTokenTypes(
-    lpTokenAmount,
-    minimumAmountTokenA,
-    minimumAmountTokenB,
+    new BN(Math.floor(lpTokenAmount.toNumber())),
+    new BN(Math.ceil(minimumAmountTokenA.toNumber())),
+    new BN(Math.ceil(minimumAmountTokenB.toNumber())),
     {
       accounts: {
         amm,
