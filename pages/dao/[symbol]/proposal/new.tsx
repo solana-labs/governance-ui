@@ -62,7 +62,7 @@ const New = () => {
     fetchRealmGovernance,
     fetchTokenAccountsForSelectedRealmGovernance,
   } = useWalletStore((s) => s.actions);
-  const [voteByCouncil, setVoteByCouncil] = useState(false);
+  const [voteByCouncil, setVoteByCouncil] = useState(true);
   const [form, setForm] = useState<Form>({
     title: '',
     description: '',

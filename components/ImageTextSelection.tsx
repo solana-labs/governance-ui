@@ -16,42 +16,57 @@ export default function ImageTextSelection<T>({
   imageTextElements: ImageTextElement<T>[];
 }) {
   return (
-    <div className={`flex items-center space-x-3 h-12 ${className}`}>
-      {imageTextElements.map(({ id, name, image }, index) => {
-        return (
-          <div
-            className="relative h-full w-auto pt-2 pb-2 flex justify-center items-center"
-            key={index}
-          >
-            {image ? (
-              // Image
-              <img
-                title={name}
-                src={image}
-                className={`h-7 max-w-7 p-0.5 hover:grayscale-0 ${
-                  selected !== id ? 'grayscale' : ''
-                } cursor-pointer`}
-                onClick={() => onClick(id)}
-              />
-            ) : (
-              // Text
-              <span
-                className={`text-xs hover:text-white cursor-pointer ${
-                  selected !== id ? 'text-gray-400' : 'text-white'
-                }`}
-                onClick={() => onClick(id)}
-              >
-                {name}
-              </span>
-            )}
+    <div className="flex h-auto border-b border-fgd-3">
+      <div
+        className="h-auto pl-2 pr-2 flex justify-center items-center border-r shrink-0 text-sm text-fgd-3 text-center"
+        style={{
+          width: '6rem',
+          minWidth: '6rem',
+          maxWidth: '6rem',
+        }}
+      >
+        {selected === null
+          ? 'All'
+          : imageTextElements.find(({ id }) => id === selected)!.name}
+      </div>
 
-            {selected === id ? (
-              // Selected visual
-              <div className="p-0 absolute bottom-0 w-full h-0.5 flex justify-center bg-fgd-3 rounded-tl rounded-tr" />
-            ) : null}
-          </div>
-        );
-      })}
+      <div className={`flex items-center space-x-2 flex-wrap ${className}`}>
+        {imageTextElements.map(({ id, name, image }, index) => {
+          return (
+            <div
+              className="relative h-12 w-auto pt-2 pb-2 flex justify-center items-center"
+              key={index}
+            >
+              {image ? (
+                // Image
+                <img
+                  title={name}
+                  src={image}
+                  className={`h-7 max-w-5 p-1 hover:grayscale-0 ${
+                    selected !== id ? 'grayscale' : ''
+                  } cursor-pointer`}
+                  onClick={() => onClick(id)}
+                />
+              ) : (
+                // Text
+                <span
+                  className={`text-xs hover:text-white cursor-pointer ${
+                    selected !== id ? 'text-gray-400' : 'text-white'
+                  }`}
+                  onClick={() => onClick(id)}
+                >
+                  {name}
+                </span>
+              )}
+
+              {selected === id ? (
+                // Selected visual
+                <div className="p-0 absolute bottom-0 w-full h-0.5 flex justify-center bg-fgd-3 rounded-tl rounded-tr" />
+              ) : null}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
