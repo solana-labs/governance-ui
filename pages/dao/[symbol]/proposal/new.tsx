@@ -158,7 +158,7 @@ const New = () => {
   }
   const [instructionsData, setInstructions] = useState<
     ComponentInstructionData[]
-  >([{ type: availableInstructions[0] }])
+  >([{ type: undefined }])
   const handleSetInstructions = (val: any, index) => {
     const newInstructions = [...instructionsData]
     newInstructions[index] = { ...instructionsData[index], ...val }
@@ -299,8 +299,10 @@ const New = () => {
   }
 
   useEffect(() => {
-    setInstructions([instructionsData[0]])
-  }, [instructionsData[0].governedAccount?.pubkey])
+    if (instructionsData?.length) {
+      setInstructions([instructionsData[0]])
+    }
+  }, [instructionsData[0]?.governedAccount?.pubkey])
 
   useEffect(() => {
     const governedAccount = extractGovernanceAccountFromInstructionsData(

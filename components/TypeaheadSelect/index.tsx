@@ -65,6 +65,7 @@ export default function TypeaheadSelect<O extends Option>(props: Props<O>) {
               placeholder={props.placeholder}
               onChange={(e) => setQuery(e.currentTarget.value)}
               onBlur={() => setQuery('')}
+              onFocus={(e) => e.currentTarget.select()}
             />
             <ChevronDownIcon
               className={classNames(
