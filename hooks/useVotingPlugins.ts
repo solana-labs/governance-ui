@@ -450,7 +450,14 @@ export function useVotingPlugins() {
   ])
 
   useEffect(() => {
-    handleGetSwitchboardVoting()
+
+    if (
+      currentPluginPk &&
+      switchboardPluginsPks.includes(currentPluginPk.toBase58())
+    ) {
+      handleGetSwitchboardVoting()
+    }
+
     if (usedCollectionsPks.length && realm) {
       if (connected && currentClient.walletPk?.toBase58()) {
         handleGetNfts()
