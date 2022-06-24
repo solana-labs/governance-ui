@@ -17,7 +17,13 @@ import {
   serializeInstructionToBase64,
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-governance'
-import { Keypair, LAMPORTS_PER_SOL, SystemProgram } from '@solana/web3.js'
+import {
+  Keypair,
+  LAMPORTS_PER_SOL,
+  SystemProgram,
+  TransactionInstruction,
+} from '@solana/web3.js'
+import { syncNative } from '@solendprotocol/solend-sdk'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { ConnectionContext } from '@utils/connection'
 import tokenService from '@utils/services/token'
@@ -210,40 +216,47 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
   )
   let wrappedSolAccount: null | Keypair = null
   const insts: InstructionDataWithHoldUpTime[] = []
+  const localPrequisteInstructions: TransactionInstruction[] = []
   if (matchedTreasury.isSol) {
     wrappedSolAccount = new Keypair()
-    const lamports = Math.round(decimalAmount + LAMPORTS_PER_SOL) + 1e7
-    insts.push({
+    const lamports = decimalAmount * LAMPORTS_PER_SOL
+    localPrequisteInstructions.push(
+      SystemProgram.createAccount({
+        fromPubkey: rpcContext.wallet.publicKey!,
+        newAccountPubkey: wrappedSolAccount?.publicKey,
+        lamports: Number(1e7),
+        space: 165,
+        programId: TOKEN_PROGRAM_ID,
+      }),
+      initializeAccount({
+        account: wrappedSolAccount?.publicKey,
+        mint: WRAPPED_SOL_MINT,
+        owner: matchedTreasury.governance.pubkey!,
+      })
+    )
+    const transferIx = SystemProgram.transfer({
+      fromPubkey: matchedTreasury.extensions.transferAddress!,
+      toPubkey: wrappedSolAccount!.publicKey!,
+      lamports: lamports,
+    })
+    const instructionData = {
       data: getInstructionDataFromBase64(
-        serializeInstructionToBase64(
-          SystemProgram.createAccount({
-            fromPubkey: matchedTreasury.extensions.transferAddress!,
-            newAccountPubkey: wrappedSolAccount?.publicKey,
-            lamports,
-            space: 165,
-            programId: TOKEN_PROGRAM_ID,
-          })
-        )
+        serializeInstructionToBase64(transferIx)
       ),
       holdUpTime: matchedTreasury.governance!.account!.config
         .minInstructionHoldUpTime,
-      prerequisiteInstructions: [],
-    })
-    insts.push({
-      data: getInstructionDataFromBase64(
-        serializeInstructionToBase64(
-          initializeAccount({
-            account: wrappedSolAccount?.publicKey,
-            mint: WRAPPED_SOL_MINT,
-            owner: matchedTreasury.governance.pubkey!,
-          })
-        )
-      ),
+      prerequisiteInstructions: [...localPrequisteInstructions],
+      prerequisiteInstructionsSigners: [wrappedSolAccount],
+    }
+    insts.push(instructionData)
+    const syncIx = syncNative(wrappedSolAccount.publicKey!)
+    const syncInst = {
+      data: getInstructionDataFromBase64(serializeInstructionToBase64(syncIx)),
       holdUpTime: matchedTreasury.governance!.account!.config
         .minInstructionHoldUpTime,
       prerequisiteInstructions: [],
-      signers: [wrappedSolAccount],
-    })
+    }
+    insts.push(syncInst)
   }
   const depositMangoAccountInsObj = {
     data: getInstructionDataFromBase64(
@@ -316,8 +329,8 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
         serializeInstructionToBase64(
           closeAccount({
             source: wrappedSolAccount.publicKey,
-            destination: matchedTreasury.pubkey,
-            owner: matchedTreasury.pubkey,
+            destination: matchedTreasury.extensions.transferAddress,
+            owner: matchedTreasury.governance.pubkey,
           })
         )
       ),

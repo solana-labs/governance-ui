@@ -19,6 +19,7 @@ export interface UiInstruction {
   customHoldUpTime?: number
   prerequisiteInstructions?: TransactionInstruction[]
   chunkSplitByDefault?: boolean
+  prerequisiteInstructionsSigners?: Keypair[]
   chunkBy?: number
   signers?: Keypair[]
   shouldSplitIntoSeparateTxs?: boolean | undefined
