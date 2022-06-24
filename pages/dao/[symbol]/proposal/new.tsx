@@ -15,7 +15,6 @@ import {
 import { PublicKey } from '@solana/web3.js'
 import Button, { LinkButton, SecondaryButton } from '@components/Button'
 import Input from '@components/inputs/Input'
-import Select from '@components/inputs/Select'
 import Textarea from '@components/inputs/Textarea'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -83,6 +82,8 @@ import GoblinGoldWithdraw from './components/instructions/GoblinGold/GoblinGoldW
 import MakeSetMarketMode from './components/instructions/Mango/MakeSetMarketMode'
 import CreateGatewayPluginRegistrar from './components/instructions/GatewayPlugin/CreateRegistrar'
 import MakeChangeQuoteParams from './components/instructions/Mango/MakeChangeQuoteParams'
+import TypeaheadSelect from '@components/TypeaheadSelect'
+import { StyledLabel } from '@components/inputs/styles'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -622,24 +623,22 @@ const New = () => {
                     key={idx}
                     className="mb-3 border border-fgd-4 p-4 md:p-6 rounded-lg"
                   >
-                    <Select
-                      className="h-12"
-                      disabled={!getAvailableInstructionsForIndex.length}
-                      placeholder={`${
-                        availableInstructionsForIdx.length
-                          ? 'Select instruction'
-                          : 'No available instructions'
-                      }`}
-                      label={`Transaction ${idx + 1}`}
-                      onChange={(value) => setInstructionType({ value, idx })}
-                      value={instruction.type?.name}
-                    >
-                      {availableInstructionsForIdx.map((inst, idx) => (
-                        <Select.Option key={idx} value={inst}>
-                          <span>{inst.name}</span>
-                        </Select.Option>
-                      ))}
-                    </Select>
+                    <StyledLabel>Transaction {idx + 1}</StyledLabel>
+                    <TypeaheadSelect
+                      className="max-w-lg"
+                      options={availableInstructionsForIdx.map(
+                        (instruction) => ({
+                          data: instruction,
+                          key: instruction.id.toString(),
+                          text: instruction.name,
+                        })
+                      )}
+                      placeholder="Add an action to this choice"
+                      selected={instruction.type?.id.toString()}
+                      onSelect={(option) => {
+                        setInstructionType({ value: option?.data, idx })
+                      }}
+                    />
                     <div className="flex items-end pt-4">
                       <InstructionContentContainer
                         idx={idx}
