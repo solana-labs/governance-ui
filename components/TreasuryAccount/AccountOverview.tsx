@@ -620,7 +620,9 @@ const StrategyCard = ({
             src={strat.handledTokenImgSrc}
             className="w-8 h-8 mr-3 rounded-full"
           ></img>
-        ) : null}
+        ) : (
+          <div className="w-8 h-8 mr-3 rounded-full"></div>
+        )}
         <div>
           <p className="text-xs">{`${strategyName} ${handledTokenSymbol} on ${protocolName}${
             strategySubtext ? ` - ${strategySubtext}` : ''
