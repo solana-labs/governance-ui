@@ -1,7 +1,7 @@
 import {
   BN,
   makeCloseSpotOpenOrdersInstruction,
-  makeWithdrawInstruction,
+  makeWithdraw2Instruction,
   MangoAccount,
   PublicKey,
 } from '@blockworks-foundation/mango-client'
@@ -182,10 +182,9 @@ const WithdrawModal = ({
         initializeAccount({
           account: wrappedSolAccount?.publicKey,
           mint: WRAPPED_SOL_MINT,
-          owner: address,
+          owner: new PublicKey(form.withdrawAddress),
         })
       )
-      console.log('1234555')
     } else {
       //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
       const { currentAddress: receiverAddress, needToCreateAta } = await getATA(
@@ -204,7 +203,7 @@ const WithdrawModal = ({
             TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
             mintPk, // mint
             receiverAddress, // ata
-            address, // owner of token account
+            new PublicKey(form.withdrawAddress), // owner of token account
             wallet!.publicKey! // fee payer
           )
         )
@@ -236,7 +235,7 @@ const WithdrawModal = ({
       proposalInstructions.push(closeInstruction)
     }
 
-    const instruction = makeWithdrawInstruction(
+    const instruction = makeWithdraw2Instruction(
       market.client!.programId,
       group.publicKey,
       selectedMangoAccount.publicKey,
