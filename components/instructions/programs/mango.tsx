@@ -416,7 +416,7 @@ export const MANGO_INSTRUCTIONS = {
         return <>{displayAllArgs(args)}</>
       },
     },
-    66: {
+    67: {
       name: 'Mango v3: Set Market Mode',
       accounts: {
         0: { name: 'Mango Group' },
