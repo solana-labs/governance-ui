@@ -25,44 +25,7 @@ import InstructionForm, {
   InstructionInput,
   InstructionInputType,
 } from '../FormCreator'
-
-export const ASSET_TYPE = [
-  {
-    name: 'Token',
-    value: 0,
-  },
-  {
-    name: 'Perp',
-    value: 1,
-  },
-]
-
-export const MARKET_MODE = [
-  {
-    name: 'Default',
-    value: 0,
-  },
-  {
-    name: 'Active',
-    value: 1,
-  },
-  {
-    name: 'Close Only',
-    value: 2,
-  },
-  {
-    name: 'Force Close Only',
-    value: 3,
-  },
-  {
-    name: 'Inactive',
-    value: 4,
-  },
-  {
-    name: 'Swapping Spot Market',
-    value: 5,
-  },
-]
+import { ASSET_TYPE, MARKET_MODE } from 'Strategies/protocols/mango/tools'
 
 const MakeSetMarketMode = ({
   index,

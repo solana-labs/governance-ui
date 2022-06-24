@@ -9,10 +9,7 @@ import {
 import dayjs from 'dayjs'
 import { tryGetTokenMint } from '@utils/tokens'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
-import {
-  ASSET_TYPE,
-  MARKET_MODE,
-} from 'pages/dao/[symbol]/proposal/components/instructions/Mango/MakeSetMarketMode'
+import { ASSET_TYPE, MARKET_MODE } from 'Strategies/protocols/mango/tools'
 
 function displayInstructionArgument(decodedArgs, argName) {
   return (
@@ -419,7 +416,7 @@ export const MANGO_INSTRUCTIONS = {
         return <>{displayAllArgs(args)}</>
       },
     },
-    66: {
+    67: {
       name: 'Mango v3: Set Market Mode',
       accounts: {
         0: { name: 'Mango Group' },
