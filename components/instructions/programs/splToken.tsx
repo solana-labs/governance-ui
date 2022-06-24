@@ -180,5 +180,12 @@ export const SPL_TOKEN_INSTRUCTIONS = {
         return <></>
       },
     },
+    17: {
+      name: 'Sync Native',
+      accounts: [],
+      getDataUI: async () => {
+        return <></>
+      },
+    },
   },
 }

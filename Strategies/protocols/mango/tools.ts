@@ -220,12 +220,17 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
   if (matchedTreasury.isSol) {
     wrappedSolAccount = new Keypair()
     const lamports = decimalAmount * LAMPORTS_PER_SOL
+    const space = 165
+    const rent = await rpcContext.connection.getMinimumBalanceForRentExemption(
+      space,
+      'processed'
+    )
     localPrequisteInstructions.push(
       SystemProgram.createAccount({
         fromPubkey: rpcContext.wallet.publicKey!,
         newAccountPubkey: wrappedSolAccount?.publicKey,
-        lamports: Number(1e7),
-        space: 165,
+        lamports: rent,
+        space: space,
         programId: TOKEN_PROGRAM_ID,
       }),
       initializeAccount({
