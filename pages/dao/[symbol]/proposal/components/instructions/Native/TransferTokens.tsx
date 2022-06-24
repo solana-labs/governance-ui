@@ -9,7 +9,7 @@ import Input from '@components/inputs/Input';
 import useGovernanceUnderlyingTokenAccounts from '@hooks/useGovernanceUnderlyingTokenAccounts';
 import TokenAccountSelect from '../../TokenAccountSelect';
 import Switch from '@components/Switch';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import GovernedAccountSelect from '../../GovernedAccountSelect';
 import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts';
 
@@ -187,6 +187,31 @@ const TransferTokens = ({
     governedAccountPubkey,
   );
 
+  const [sourceMint, setSourceMint] = useState<PublicKey | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      if (!form.source) {
+        setSourceMint(null);
+      }
+
+      try {
+        const source = new PublicKey(form.source!);
+
+        const sourceMint = await tryGetTokenMint(connection.current, source);
+
+        if (!sourceMint) {
+          throw new Error('Cannot load mint info');
+        }
+
+        setSourceMint(sourceMint.publicKey);
+      } catch {
+        // Ignore the error
+        setSourceMint(null);
+      }
+    })();
+  }, [form.source]);
+
   // Hardcoded gate used to be clear about what cluster is supported for now
   if (connection.cluster !== 'mainnet') {
     return <>This instruction does not support {connection.cluster}</>;
@@ -234,6 +259,9 @@ const TransferTokens = ({
                 <GovernedAccountSelect
                   governedAccounts={governedMultiTypeAccounts}
                   onChange={(governedAccount) => {
+                    // Reset the destination
+                    handleSetForm({ value: '', propertyName: 'destination' });
+
                     setDestinationGovernedAccount(governedAccount ?? undefined);
                   }}
                   value={destinationGovernedAccount}
@@ -253,6 +281,7 @@ const TransferTokens = ({
                   ownedTokenAccountsInfo={
                     destinationGovernedAccountOwnedTokenAccountsInfo
                   }
+                  filterByMint={sourceMint ? [sourceMint] : undefined}
                 />
               ) : (
                 <></>

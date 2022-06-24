@@ -58,6 +58,7 @@ export default function InstructionCard({
       connection.current,
       proposalInstruction.account.getSingleInstruction(),
     ).then((d) => setDescriptor(d));
+
     const getAmountImg = async () => {
       const sourcePk = proposalInstruction.account.getSingleInstruction()
         .accounts[0].pubkey;
@@ -248,7 +249,9 @@ export function InstructionAccount({
         <p className="font-bold text-fgd-1">{`Account ${index + 1}`}</p>
         {descriptor?.accounts && (
           <div className="mt-0.5 text-fgd-3 text-xs">
-            {descriptor.accounts[index]?.name}
+            {typeof descriptor.accounts[index] === 'string'
+              ? descriptor.accounts[index]
+              : descriptor.accounts[index]?.name}
           </div>
         )}
       </div>

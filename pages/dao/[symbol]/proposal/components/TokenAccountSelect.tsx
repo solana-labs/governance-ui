@@ -27,6 +27,10 @@ const TokenAccountSelect = ({
 
     const pubkeyString = pubkey.toString();
 
+    if (!ownedTokenAccountsInfo[pubkeyString]) {
+      return null;
+    }
+
     const { mint, uiAmount, mintName, isATA } = ownedTokenAccountsInfo[
       pubkeyString
     ];

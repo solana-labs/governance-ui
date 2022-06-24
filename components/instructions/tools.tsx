@@ -51,6 +51,9 @@ export const ACCOUNT_NAMES = {
   '4dQ66QipF693wXjf832n1PXvAVz1A252P8EoSY2CFqjg': 'SBR Treasury Vault',
   '6VfHhLym1TjQhD64ZL8Qi5eMVcCzgkUsa8evEKGKRXto': 'SOL Treasury Vault',
   E2SZHFGNbNpaQv62RQb6AcDu6c1EBBC7tG3xsQMk2XKB: 'SUNNY Treasury Vault',
+  // Tricks to display the hot wallet name, Please recode this
+  '89j5yTsuqCpdeJUW566FrkVrpEwMHpqUvm47yanBsh7b':
+    'SOL Treasury Vault / Hot Wallet',
 };
 
 // Blacklisted governances which should not be displayed in the UI

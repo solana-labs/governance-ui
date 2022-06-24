@@ -16,9 +16,9 @@ export default function ImageTextSelection<T>({
   imageTextElements: ImageTextElement<T>[];
 }) {
   return (
-    <div className="flex h-auto border-b border-fgd-3">
+    <div className="flex h-auto border-b border-fgd-3 grow w-full">
       <div
-        className="h-auto pl-2 pr-2 flex justify-center items-center border-r shrink-0 text-sm text-fgd-3 text-center"
+        className="h-auto pl-2 pr-2 flex justify-center items-center border-r shrink-0 text-xs text-fgd-3 text-center"
         style={{
           width: '6rem',
           minWidth: '6rem',

@@ -14,6 +14,8 @@ import { getProgramName } from '@components/instructions/programs/names';
 import ImageTextSelection, {
   ImageTextElement,
 } from '@components/ImageTextSelection';
+import { FireIcon } from '@heroicons/react/outline';
+import useHotWallet from '@hooks/useHotWallet';
 
 const treasuryImage = '/img/treasury.svg';
 const mintImage = '/img/mint.svg';
@@ -320,6 +322,8 @@ export default function GovernedAccountSelect<
   label?: string;
   noMaxWidth?: boolean;
 }) {
+  const { hotWalletAccount } = useHotWallet();
+
   const [
     selectedGovernanceAccountConfigurationId,
     setSelectedGovernanceAccountConfigurationId,
@@ -405,17 +409,46 @@ export default function GovernedAccountSelect<
     );
   }, [value, selectedGovernanceAccountConfigurationId]);
 
+  const loadHotWallet = () => {
+    // Select 'All'
+    setSelectedGovernanceAccountConfigurationId(null);
+
+    if (!hotWalletAccount) {
+      onChange(null);
+      return;
+    }
+
+    // Select the hot wallet
+    const hotWallet =
+      governedAccounts.find((account) =>
+        account.governance?.pubkey.equals(hotWalletAccount.publicKey),
+      ) ?? null;
+
+    onChange(hotWallet);
+  };
+
   return (
     <div className="flex flex-col">
       <span className="mb-2">{label}</span>
 
       <div className="flex flex-col bg-bkg-1 w-full max-w-lg border border-fgd-3 default-transition rounded-md h-auto">
-        <ImageTextSelection
-          className="pl-4 pr-4 w-full"
-          selected={selectedGovernanceAccountConfigurationId}
-          imageTextElements={availableGovernanceTypes}
-          onClick={setSelectedGovernanceAccountConfigurationId}
-        />
+        <div className="flex w-full grow">
+          <ImageTextSelection
+            className="pl-4 pr-4 shrink grow w-full"
+            selected={selectedGovernanceAccountConfigurationId}
+            imageTextElements={availableGovernanceTypes}
+            onClick={setSelectedGovernanceAccountConfigurationId}
+          />
+
+          {hotWalletAccount ? (
+            <div className="flex w-12 shrink-0 border-l border-b border-fgd-3 justify-center items-center">
+              <FireIcon
+                className="w-6 text-fgd-3 hover:text-white pointer"
+                onClick={() => loadHotWallet()}
+              />
+            </div>
+          ) : null}
+        </div>
 
         <Select
           className="p-2 w-full text-sm"
