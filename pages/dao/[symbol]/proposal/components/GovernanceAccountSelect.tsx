@@ -1,14 +1,7 @@
 import Select from '@components/inputs/Select'
-import { Governance, GovernanceAccountType } from '@solana/spl-governance'
+import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import {
-  getMintAccountLabelInfo,
-  getSolAccountLabel,
-  getTokenAccountLabelInfo,
-} from '@utils/tokens'
 import React, { useEffect } from 'react'
-import { getProgramName } from '@components/instructions/programs/names'
-import { AssetAccount } from '@utils/uiTypes/assets'
 
 const GovernanceAccountSelect = ({
   onChange,

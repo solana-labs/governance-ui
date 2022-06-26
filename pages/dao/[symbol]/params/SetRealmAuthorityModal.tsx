@@ -1,7 +1,6 @@
 import Modal from '@components/Modal'
 import { useState } from 'react'
 import Button from '@components/Button'
-import GovernedAccountSelect from '../proposal/components/GovernedAccountSelect'
 import {
   Governance,
   ProgramAccount,
@@ -13,7 +12,6 @@ import useWalletStore from 'stores/useWalletStore'
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { sendTransaction } from '@utils/send'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { AssetAccount } from '@utils/uiTypes/assets'
 import GovernanceAccountSelect from '../proposal/components/GovernanceAccountSelect'
 
 const SetRealmAuthorityModal = ({
