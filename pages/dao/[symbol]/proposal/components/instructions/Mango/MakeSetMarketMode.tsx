@@ -138,7 +138,7 @@ const MakeSetMarketMode = ({
       name: 'governedAccount',
       type: InstructionInputType.GOVERNED_ACCOUNT,
       shouldBeGoverned: shouldBeGoverned as any,
-      governance: form.governedAccount?.governance,
+      governance: governance,
       options: governedProgramAccounts,
     },
     {
