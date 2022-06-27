@@ -2,6 +2,7 @@ import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import { LinkIcon } from '@heroicons/react/outline'
 import MyProposalsBtn from 'pages/dao/[symbol]/proposal/components/MyProposalsBtn'
 import useWalletStore from 'stores/useWalletStore'
+import DelegateCard from '@components/DelegateCard'
 
 const AccountInner = ({ withHeader = true }: { withHeader?: boolean }) => {
   const connected = useWalletStore((s) => s.connected)
@@ -37,12 +38,18 @@ const Account = ({ withHeader = true }: { withHeader?: boolean }) => {
     return (
       <div className="grid grid-cols-12 gap-4">
         <AccountInner withHeader={withHeader} />
+        <div className="md:w-1/2 col-span-12">
+          <DelegateCard />
+        </div>
       </div>
     )
   } else {
     return (
       <>
         <AccountInner withHeader={withHeader} />
+        <div className="md:w-1/2 col-span-12">
+          <DelegateCard />
+        </div>
       </>
     )
   }
