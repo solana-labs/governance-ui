@@ -485,6 +485,10 @@ export const MANGO_INSTRUCTIONS = {
               Market Type:{' '}
               {ASSET_TYPE.find((x) => x.value === args.marketType)?.name}
             </div>
+            <div className="mt-5">
+              Raw args
+              <div>{displayAllArgs(args)}</div>
+            </div>
           </>
         )
       },
