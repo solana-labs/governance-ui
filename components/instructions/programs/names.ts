@@ -10,6 +10,7 @@ export const GOVERNANCE_PROGRAM_NAMES = {
     'Phantasia Governance Program',
   smfjietFKFJ4Sbw1cqESBTpPhF4CwbMwN8kBEC1e5ui:
     'Strangemood Foundation Governance Program',
+  GovHgfDPyQ1GwazJTDY2avSVY8GGcpmCapmmCsymRaGe: 'PSY DO Governance Program',
 }
 
 // Well known program names displayed on the instruction card
