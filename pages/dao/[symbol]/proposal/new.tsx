@@ -629,14 +629,20 @@ const New = () => {
                     <TypeaheadSelect
                       className="max-w-lg"
                       options={availableInstructionsForIdx.map(
-                        (instruction) => ({
-                          data: instruction,
-                          key: instruction.id.toString(),
-                          text: instruction.name,
+                        (availableInstruction) => ({
+                          data: availableInstruction,
+                          key: availableInstruction.id.toString(),
+                          text: availableInstruction.name,
                         })
                       )}
                       placeholder="Add an action to this choice"
-                      selected={instruction.type?.id.toString()}
+                      selected={
+                        instruction.type
+                          ? {
+                              key: instruction.type.id.toString(),
+                            }
+                          : undefined
+                      }
                       onSelect={(option) => {
                         setInstructionType({ value: option?.data, idx })
                       }}

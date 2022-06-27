@@ -12,13 +12,15 @@ interface Props<O extends Option> {
   className?: string
   placeholder?: string
   options: O[]
-  selected?: O['key']
+  selected?: Pick<O, 'key'>
   onSelect(option?: O): void
 }
 
 export default function TypeaheadSelect<O extends Option>(props: Props<O>) {
   const [query, setQuery] = useState('')
-  const value = props.options.find((option) => option.key === props.selected)
+  const value = props.options.find(
+    (option) => option.key === props.selected?.key
+  )
   const list = props.options.filter((option) => {
     if (!query) {
       return true
@@ -28,7 +30,13 @@ export default function TypeaheadSelect<O extends Option>(props: Props<O>) {
   })
 
   return (
-    <Combobox value={value} onChange={props.onSelect}>
+    <Combobox
+      value={value}
+      onChange={(value) => {
+        props.onSelect(value)
+        setQuery('')
+      }}
+    >
       {({ open }) => {
         const isOpen = !!(open && list.length)
 
@@ -64,7 +72,6 @@ export default function TypeaheadSelect<O extends Option>(props: Props<O>) {
               displayValue={(option: O) => option?.text || ''}
               placeholder={props.placeholder}
               onChange={(e) => setQuery(e.currentTarget.value)}
-              onBlur={() => setQuery('')}
               onFocus={(e) => e.currentTarget.select()}
             />
             <ChevronDownIcon
