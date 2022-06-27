@@ -635,7 +635,7 @@ const New = () => {
                           text: availableInstruction.name,
                         })
                       )}
-                      placeholder="Add an action to this choice"
+                      placeholder="Add a transaction"
                       selected={
                         instruction.type
                           ? {
