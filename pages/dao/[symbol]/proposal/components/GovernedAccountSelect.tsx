@@ -121,7 +121,6 @@ const GovernedAccountSelect = ({
       })
     }
   }, [JSON.stringify(governedAccounts)])
-  console.log(governance?.pubkey.toBase58())
   return (
     <Select
       label={label}
