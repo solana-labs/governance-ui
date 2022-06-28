@@ -817,5 +817,14 @@
       "website": "https://solend.fi/",
       "twitter": "@solendprotocol",
       "sortRank": 2
-    }
+    },
+    {
+    "symbol": "FSGOV",
+    "displayName": "Flipside Governance",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "81dgxBYogwBPS17aUCY1ScFqSKrehECdFxA8Ywa9CiVb",
+    "website": "https://flipsidecrypto.xyz/",
+    "twitter": "@flipsidecrypto",
+    "ogImage": "/realms/FSLOGO/FLIPSIDE-LOGO-WHITE.png"
+  }
 ]
