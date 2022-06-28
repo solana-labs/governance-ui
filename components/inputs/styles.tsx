@@ -1,5 +1,6 @@
 import styled from '@emotion/styled'
 import tw from 'twin.macro'
+import classNames from 'classnames'
 
 export const StyledLabel = styled.div`
   ${tw`mb-1.5 text-sm text-fgd-1`}
@@ -13,6 +14,7 @@ export const inputClasses = ({
   error,
   noMaxWidth = false,
   useDefaultStyle = true,
+  showErrorState = false,
 }) => {
   const disabledStyle =
     'cursor-not-allowed opacity-50 text-fgd-3 border bg-bkg-1 border-bkg-4'
@@ -20,8 +22,13 @@ export const inputClasses = ({
   const defaultStyle = `${
     disabled
       ? disabledStyle
-      : 'hover:border-primary-light focus:border-primary-light focus:outline-none bg-bkg-1'
-  } px-3 py-2 h-auto w-full border border-fgd-3 default-transition text-sm text-fgd-1 rounded-md ${className}`
+      : classNames(
+          'bg-bkg-1',
+          'focus:outline-none',
+          !showErrorState && 'hover:border-primary-light',
+          !showErrorState && 'focus:border-primary-light'
+        )
+  } px-3 py-2 h-auto w-full border default-transition text-sm text-fgd-1 rounded-md ${className}`
 
   return `
     ${
@@ -30,6 +37,6 @@ export const inputClasses = ({
         : `${disabled && disabledStyle} ${className}`
     }
     ${!noMaxWidth && 'max-w-lg'}
-    ${error ? 'border-red' : 'border-fgd-4'}
+    ${error || showErrorState ? 'border-red' : 'border-fgd-3'}
   `
 }

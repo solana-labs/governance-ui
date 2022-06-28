@@ -84,6 +84,9 @@ import CreateGatewayPluginRegistrar from './components/instructions/GatewayPlugi
 import MakeChangeQuoteParams from './components/instructions/Mango/MakeChangeQuoteParams'
 import TypeaheadSelect from '@components/TypeaheadSelect'
 import { StyledLabel } from '@components/inputs/styles'
+import classNames from 'classnames'
+
+const TITLE_LENGTH_LIMIT = 130
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -549,6 +552,8 @@ const New = () => {
     }
   }
 
+  const titleTooLong = form.title.length > TITLE_LENGTH_LIMIT
+
   return (
     <div className="grid grid-cols-12 gap-4">
       <div
@@ -572,13 +577,14 @@ const New = () => {
             </div>
           </div>
           <div className="pt-2">
-            <div className="pb-4">
+            <div className="pb-4 relative min-h-[100px]">
               <Input
                 label="Title"
                 placeholder="Title of your proposal"
                 value={form.title}
                 type="text"
                 error={formErrors['title']}
+                showErrorState={titleTooLong}
                 onChange={(evt) =>
                   handleSetForm({
                     value: evt.target.value,
@@ -586,6 +592,19 @@ const New = () => {
                   })
                 }
               />
+              <div className="max-w-lg w-full absolute bottom-4 left-0">
+                <div
+                  className={classNames(
+                    'absolute',
+                    'bottom-0',
+                    'right-0',
+                    'text-xs',
+                    titleTooLong ? 'text-error-red' : 'text-white/50'
+                  )}
+                >
+                  {form.title.length} / {TITLE_LENGTH_LIMIT}
+                </div>
+              </div>
             </div>
             <Textarea
               className="mb-3"
