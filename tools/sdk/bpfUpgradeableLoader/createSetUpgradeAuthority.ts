@@ -1,11 +1,13 @@
+import { BPF_UPGRADE_LOADER_ID } from '@solana/spl-governance'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 
 export async function createSetUpgradeAuthority(
   programId: PublicKey,
   upgradeAuthority: PublicKey,
-  newUpgradeAuthority: PublicKey,
-  bpfUpgradableLoaderId: PublicKey
+  newUpgradeAuthority: PublicKey
 ) {
+  const bpfUpgradableLoaderId = BPF_UPGRADE_LOADER_ID
+
   const [programDataAddress] = await PublicKey.findProgramAddress(
     [programId.toBuffer()],
     bpfUpgradableLoaderId

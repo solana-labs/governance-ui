@@ -14,6 +14,7 @@ import Modal from '@components/Modal'
 import UpgradeProgram from './UpgradeProgram'
 import CloseBuffers from './CloseBuffers'
 import { getExplorerUrl } from '@components/explorer/tools'
+import TransferUpgradeAuthority from './TransferUpgradeAuthority'
 
 const AssetItem = ({
   item,
@@ -26,6 +27,9 @@ const AssetItem = ({
   const [slot, setSlot] = useState(0)
   const [openUpgradeModal, setOpenUpgradeModal] = useState(false)
   const [openCloseBuffersModal, setOpenCloseBuffersModal] = useState(false)
+  const [openTransferAuthorityModal, setOpenTransferAuthorityModal] = useState(
+    false
+  )
   const [loadSlot, setLoadSlot] = useState(false)
   const connection = useWalletStore((s) => s.connection)
   const name = item ? getProgramName(item.account.governedAccount) : ''
@@ -116,6 +120,20 @@ const AssetItem = ({
                 <div>Close Buffers</div>
               </Tooltip>
             </SecondaryButton>
+            <SecondaryButton
+              className="sm:w-1/2 text-sm"
+              onClick={() => setOpenTransferAuthorityModal(true)}
+              disabled={!canUseProgramUpgradeInstruction}
+            >
+              <Tooltip
+                content={
+                  !canUseProgramUpgradeInstruction &&
+                  'You need to have connected wallet with ability to create upgrade proposals'
+                }
+              >
+                <div>Transfer Authority</div>
+              </Tooltip>
+            </SecondaryButton>
           </div>
         </>
       )}
@@ -137,6 +155,16 @@ const AssetItem = ({
           isOpen={openCloseBuffersModal}
         >
           <CloseBuffers program={item} />
+        </Modal>
+      )}
+      {openTransferAuthorityModal && (
+        <Modal
+          onClose={() => {
+            setOpenTransferAuthorityModal(false)
+          }}
+          isOpen={openTransferAuthorityModal}
+        >
+          <TransferUpgradeAuthority program={item} />
         </Modal>
       )}
     </div>
