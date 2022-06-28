@@ -27,6 +27,7 @@ config = withTM({
   env: {
     REALM: process.env.REALM,
     MAINNET_RPC: process.env.MAINNET_RPC,
+    MAINNET_RPC_HOT: process.env.MAINNET_RPC_HOT,
     DEVNET_RPC: process.env.DEVNET_RPC,
     DEFAULT_GOVERNANCE_PROGRAM_ID: process.env.DEFAULT_GOVERNANCE_PROGRAM_ID,
   },
