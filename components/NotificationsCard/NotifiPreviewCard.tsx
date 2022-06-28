@@ -196,7 +196,7 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
           </div>
           <a
             className="text-xs text-[10px] underline cursor-pointer text-blue col-span-3 relative "
-            href="https://docs.notifi.network/"
+            href="https://www.notifi.network/faqs"
           >
             Learn More
           </a>
