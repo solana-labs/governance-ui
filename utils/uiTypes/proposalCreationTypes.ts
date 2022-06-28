@@ -451,6 +451,20 @@ export interface DeltafiPoolDepositForm {
   uiMinQuoteShare?: number;
 }
 
+export interface DeltafiFarmDepositForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  poolName?: DeltafiPoolName;
+  uiBaseAmount?: number;
+  uiQuoteAmount?: number;
+}
+
+export interface DeltafiFarmWithdrawForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  poolName?: DeltafiPoolName;
+  uiBaseAmount?: number;
+  uiQuoteAmount?: number;
+}
+
 export interface DeltafiPoolWithdrawForm {
   governedAccount?: GovernedMultiTypeAccount;
   poolName?: DeltafiPoolName;
@@ -461,6 +475,11 @@ export interface DeltafiPoolWithdrawForm {
 }
 
 export interface DeltafiCreateLiquidityProviderForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  poolName?: DeltafiPoolName;
+}
+
+export interface DeltafiCreateFarmUserForm {
   governedAccount?: GovernedMultiTypeAccount;
   poolName?: DeltafiPoolName;
 }
@@ -529,6 +548,9 @@ export enum InstructionEnum {
   DeltafiPoolDeposit,
   DeltafiCreateLiquidityProvider,
   DeltafiPoolWithdraw,
+  DeltafiCreateFarmUser,
+  DeltafiFarmDeposit,
+  DeltafiFarmWithdraw,
 }
 
 export enum PackageEnum {

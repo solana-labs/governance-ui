@@ -2,13 +2,16 @@ import * as yup from 'yup';
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
 import deltafiConfiguration, {
   DeltafiDexV2,
+  PoolInfo,
+  UserStakeInfo,
 } from '@tools/sdk/deltafi/configuration';
 import { GovernedMultiTypeAccount } from '@utils/tokens';
-import { DeltafiPoolDepositForm } from '@utils/uiTypes/proposalCreationTypes';
-import deposit from '@tools/sdk/deltafi/instructions/deposit';
+import { DeltafiFarmWithdrawForm } from '@utils/uiTypes/proposalCreationTypes';
 import Input from '@components/inputs/Input';
 import SelectDeltafiPool, { PoolName } from '@components/SelectDeltafiPool';
 import { uiAmountToNativeBN } from '@tools/sdk/units';
+import { useState, useEffect } from 'react';
+import withdrawFromFarm from '@tools/sdk/deltafi/instructions/withdrawFromFarm';
 import useDeltafiProgram from '@hooks/useDeltafiProgram';
 
 const schema = yup.object().shape({
@@ -25,17 +28,9 @@ const schema = yup.object().shape({
     .number()
     .typeError('Quote Amount has to be a number')
     .required('Quote Amount is required'),
-  uiMinBaseShare: yup
-    .number()
-    .typeError('Min Base Share has to be a number')
-    .required('Min Base Share is required'),
-  uiMinQuoteShare: yup
-    .number()
-    .typeError('Min Quote Share has to be a number')
-    .required('Min Quote Share is required'),
 });
 
-const DeltafiPoolDeposit = ({
+const DeltafiFarmWithdraw = ({
   index,
   governedAccount,
 }: {
@@ -46,11 +41,20 @@ const DeltafiPoolDeposit = ({
 
   const deltafiProgram = useDeltafiProgram();
 
+  const [poolInfo, setPoolInfo] = useState<PoolInfo | null>(null);
+
+  const [userStakeInfo, setUserStakeInfo] = useState<UserStakeInfo | null>(
+    null,
+  );
+
   const {
     form,
     handleSetForm,
     formErrors,
-  } = useInstructionFormBuilder<DeltafiPoolDepositForm>({
+    governedAccountPubkey,
+    connection,
+    wallet,
+  } = useInstructionFormBuilder<DeltafiFarmWithdrawForm>({
     index,
     initialFormValues: {
       governedAccount,
@@ -69,12 +73,12 @@ const DeltafiPoolDeposit = ({
         throw new Error('Deltafi program not loaded yet');
       }
 
-      const poolInfo = deltafiConfiguration.getPoolInfoByPoolName(
-        form.poolName!,
-      );
-
       if (!poolInfo) {
         throw new Error('Pool info is required');
+      }
+
+      if (!poolInfo.farmInfo) {
+        throw new Error('Farm info is required');
       }
 
       const baseDecimals = deltafiConfiguration.getBaseOrQuoteMintDecimals(
@@ -84,17 +88,39 @@ const DeltafiPoolDeposit = ({
         poolInfo.mintQuote,
       );
 
-      return deposit({
+      return withdrawFromFarm({
         deltafiProgram,
         authority: governedAccountPubkey,
         poolInfo,
+        farmInfo: poolInfo.farmInfo,
         baseAmount: uiAmountToNativeBN(form.uiBaseAmount!, baseDecimals),
         quoteAmount: uiAmountToNativeBN(form.uiQuoteAmount!, quoteDecimals),
-        minBaseShare: uiAmountToNativeBN(form.uiMinBaseShare!, baseDecimals),
-        minQuoteShare: uiAmountToNativeBN(form.uiMinQuoteShare!, quoteDecimals),
       });
     },
   });
+
+  useEffect(() => {
+    (async () => {
+      if (
+        !poolInfo ||
+        !governedAccountPubkey ||
+        !wallet ||
+        !deltafiProgram ||
+        !connection
+      ) {
+        setUserStakeInfo(null);
+        return;
+      }
+
+      setUserStakeInfo(
+        await deltafiConfiguration.getUserStakeInfo({
+          poolInfo,
+          authority: governedAccountPubkey,
+          deltafiProgram,
+        }),
+      );
+    })();
+  }, [poolInfo, connection, governedAccountPubkey, deltafiProgram]);
 
   return (
     <>
@@ -102,13 +128,21 @@ const DeltafiPoolDeposit = ({
         title="Pool"
         poolInfoList={poolInfoList}
         selectedValue={form.poolName}
-        onSelect={(poolName: PoolName) =>
+        onSelect={(poolName: PoolName) => {
+          const poolInfo = deltafiConfiguration.getPoolInfoByPoolName(poolName);
+
+          setPoolInfo(poolInfo ?? null);
+
           handleSetForm({
             value: poolName,
             propertyName: 'poolName',
-          })
-        }
+          });
+        }}
       />
+
+      {poolInfo && !poolInfo.farmInfo ? (
+        <span>This pool does not contains a farm</span>
+      ) : null}
 
       <Input
         min={0}
@@ -124,6 +158,20 @@ const DeltafiPoolDeposit = ({
         error={formErrors['uiBaseAmount']}
       />
 
+      {userStakeInfo ? (
+        <div
+          className="text-xs mt-0 text-fgd-3 hover:text-white pointer"
+          onClick={() =>
+            handleSetForm({
+              value: userStakeInfo.inFarm.uiBase,
+              propertyName: 'uiBaseAmount',
+            })
+          }
+        >
+          Max {userStakeInfo.inFarm.uiBase}
+        </div>
+      ) : null}
+
       <Input
         min={0}
         label="Quote Amount"
@@ -138,35 +186,21 @@ const DeltafiPoolDeposit = ({
         error={formErrors['uiQuoteAmount']}
       />
 
-      <Input
-        min={0}
-        label="Min Base Share"
-        value={form.uiMinBaseShare}
-        type="number"
-        onChange={(evt) => {
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'uiMinBaseShare',
-          });
-        }}
-        error={formErrors['uiMinBaseShare']}
-      />
-
-      <Input
-        min={0}
-        label="Min Quote Share"
-        value={form.uiMinQuoteShare}
-        type="number"
-        onChange={(evt) => {
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'uiMinQuoteShare',
-          });
-        }}
-        error={formErrors['uiMinQuoteShare']}
-      />
+      {userStakeInfo ? (
+        <div
+          className="text-xs mt-0 text-fgd-3 hover:text-white pointer"
+          onClick={() =>
+            handleSetForm({
+              value: userStakeInfo.inFarm.uiQuote,
+              propertyName: 'uiQuoteAmount',
+            })
+          }
+        >
+          Max {userStakeInfo.inFarm.uiQuote}
+        </div>
+      ) : null}
     </>
   );
 };
 
-export default DeltafiPoolDeposit;
+export default DeltafiFarmWithdraw;

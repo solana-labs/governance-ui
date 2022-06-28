@@ -2,11 +2,13 @@ import * as yup from 'yup';
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
 import deltafiConfiguration, {
   DeltafiDexV2,
+  PoolInfo,
 } from '@tools/sdk/deltafi/configuration';
 import { GovernedMultiTypeAccount } from '@utils/tokens';
-import { DeltafiCreateLiquidityProviderForm } from '@utils/uiTypes/proposalCreationTypes';
+import { DeltafiCreateFarmUserForm } from '@utils/uiTypes/proposalCreationTypes';
 import SelectDeltafiPool, { PoolName } from '@components/SelectDeltafiPool';
-import createLiquidityProviderV2 from '@tools/sdk/deltafi/instructions/createLiquidityProviderV2';
+import createFarmUserV2 from '@tools/sdk/deltafi/instructions/createFarmUserV2';
+import { useState } from 'react';
 import useDeltafiProgram from '@hooks/useDeltafiProgram';
 
 const schema = yup.object().shape({
@@ -17,7 +19,7 @@ const schema = yup.object().shape({
   poolName: yup.string().required('Pool name is required'),
 });
 
-const DeltafiCreateLiquidityProvider = ({
+const DeltafiCreateFarmUserV2 = ({
   index,
   governedAccount,
 }: {
@@ -28,10 +30,12 @@ const DeltafiCreateLiquidityProvider = ({
 
   const deltafiProgram = useDeltafiProgram();
 
+  const [poolInfo, setPoolInfo] = useState<PoolInfo | null>(null);
+
   const {
     form,
     handleSetForm,
-  } = useInstructionFormBuilder<DeltafiCreateLiquidityProviderForm>({
+  } = useInstructionFormBuilder<DeltafiCreateFarmUserForm>({
     index,
     initialFormValues: {
       governedAccount,
@@ -56,31 +60,46 @@ const DeltafiCreateLiquidityProvider = ({
       );
 
       if (!poolInfo) {
-        throw new Error('Pool info is required');
+        throw new Error(`Cannot find pool info with name ${form.poolName!}`);
       }
 
-      return createLiquidityProviderV2({
+      if (!poolInfo.farmInfo) {
+        throw new Error('Selected pool does not have a farm');
+      }
+
+      return createFarmUserV2({
         deltafiProgram,
         authority: governedAccountPubkey,
         poolInfo,
+        farmInfo: poolInfo.farmInfo,
         payer: wallet.publicKey!,
       });
     },
   });
 
   return (
-    <SelectDeltafiPool
-      title="Pool"
-      poolInfoList={poolInfoList}
-      selectedValue={form.poolName}
-      onSelect={(poolName: PoolName) =>
-        handleSetForm({
-          value: poolName,
-          propertyName: 'poolName',
-        })
-      }
-    />
+    <>
+      <SelectDeltafiPool
+        title="Pool"
+        poolInfoList={poolInfoList}
+        selectedValue={form.poolName}
+        onSelect={(poolName: PoolName) => {
+          const poolInfo = poolInfoList.find(({ name }) => name === poolName);
+
+          setPoolInfo(poolInfo ?? null);
+
+          handleSetForm({
+            value: poolName,
+            propertyName: 'poolName',
+          });
+        }}
+      />
+
+      {poolInfo && !poolInfo.farmInfo ? (
+        <div className="text-sm mt-2">This pool does not contains a farm</div>
+      ) : null}
+    </>
   );
 };
 
-export default DeltafiCreateLiquidityProvider;
+export default DeltafiCreateFarmUserV2;

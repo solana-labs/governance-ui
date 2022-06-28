@@ -2,14 +2,17 @@ import * as yup from 'yup';
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
 import deltafiConfiguration, {
   DeltafiDexV2,
+  PoolInfo,
+  UserStakeInfo,
 } from '@tools/sdk/deltafi/configuration';
 import { GovernedMultiTypeAccount } from '@utils/tokens';
 import { DeltafiPoolWithdrawForm } from '@utils/uiTypes/proposalCreationTypes';
 import Input from '@components/inputs/Input';
 import SelectDeltafiPool, { PoolName } from '@components/SelectDeltafiPool';
-import { nativeBNToUiAmount, uiAmountToNativeBN } from '@tools/sdk/units';
+import { uiAmountToNativeBN } from '@tools/sdk/units';
 import withdraw from '@tools/sdk/deltafi/instructions/withdraw';
 import { useEffect, useState } from 'react';
+import useDeltafiProgram from '@hooks/useDeltafiProgram';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -42,18 +45,15 @@ const DeltafiPoolWithdraw = ({
   index: number;
   governedAccount?: GovernedMultiTypeAccount;
 }) => {
-  const [selectedPoolName, setSelectedPoolName] = useState<PoolName | null>(
+  const deltafiProgram = useDeltafiProgram();
+
+  const [poolInfo, setPoolInfo] = useState<PoolInfo | null>(null);
+
+  const [userStakeInfo, setUserStakeInfo] = useState<UserStakeInfo | null>(
     null,
   );
 
-  const [lpProviderInfo, setLpProviderInfo] = useState<{
-    uiBaseShare: number;
-    uiQuoteShare: number;
-  } | null>(null);
-
-  const { poolInfoList, tokenInfoList } = DeltafiDexV2.configuration[
-    'mainnet-prod'
-  ];
+  const { poolInfoList } = DeltafiDexV2.configuration;
 
   const {
     form,
@@ -69,8 +69,6 @@ const DeltafiPoolWithdraw = ({
     },
     schema,
     buildInstruction: async function ({
-      connection,
-      wallet,
       cluster,
       governedAccountPubkey,
       form,
@@ -79,26 +77,24 @@ const DeltafiPoolWithdraw = ({
         throw new Error('Other cluster than mainnet are not supported yet.');
       }
 
-      const deltafiProgram = deltafiConfiguration.getDeltafiProgram({
-        connection,
-        wallet,
-      });
+      if (!deltafiProgram) {
+        throw new Error('Deltafi program not loaded yet');
+      }
 
-      // We consider that the configuration must have token info about tokens used in pools
-      // thus the use of !
-      const poolInfo = poolInfoList.find(({ name }) => name === form.poolName!);
+      const poolInfo = deltafiConfiguration.getPoolInfoByPoolName(
+        form.poolName!,
+      );
 
       if (!poolInfo) {
         throw new Error('Pool info is required');
       }
 
-      const { decimals: baseDecimals } = tokenInfoList.find((token) =>
-        token.mint.equals(poolInfo.mintBase),
-      )!;
-
-      const { decimals: quoteDecimals } = tokenInfoList.find((token) =>
-        token.mint.equals(poolInfo.mintQuote),
-      )!;
+      const baseDecimals = deltafiConfiguration.getBaseOrQuoteMintDecimals(
+        poolInfo.mintBase,
+      );
+      const quoteDecimals = deltafiConfiguration.getBaseOrQuoteMintDecimals(
+        poolInfo.mintQuote,
+      );
 
       return withdraw({
         deltafiProgram,
@@ -116,73 +112,28 @@ const DeltafiPoolWithdraw = ({
     },
   });
 
-  // Load User Liquidity Pool Shares
   useEffect(() => {
     (async () => {
       if (
-        !selectedPoolName ||
+        !poolInfo ||
         !governedAccountPubkey ||
-        !connection ||
-        !wallet
+        !wallet ||
+        !deltafiProgram ||
+        !connection
       ) {
-        setLpProviderInfo(null);
+        setUserStakeInfo(null);
         return;
       }
 
-      const poolInfo = poolInfoList.find(({ name }) => name === form.poolName!);
-
-      if (!poolInfo) {
-        throw new Error('Pool info is required');
-      }
-
-      const deltafiProgram = deltafiConfiguration.getDeltafiProgram({
-        connection: connection.current,
-        wallet,
-      });
-
-      const [
-        lpProvider,
-      ] = await deltafiConfiguration.findLiquidityProviderAddress({
-        poolInfo,
-        authority: governedAccountPubkey,
-      });
-
-      const lpProviderInfo = await deltafiProgram.account.liquidityProvider.fetchNullable(
-        lpProvider,
+      setUserStakeInfo(
+        await deltafiConfiguration.getUserStakeInfo({
+          poolInfo,
+          authority: governedAccountPubkey,
+          deltafiProgram,
+        }),
       );
-
-      if (!lpProviderInfo) {
-        setLpProviderInfo(null);
-        return;
-      }
-
-      const { decimals: baseDecimals } = tokenInfoList.find((token) =>
-        token.mint.equals(poolInfo.mintBase),
-      )!;
-
-      const { decimals: quoteDecimals } = tokenInfoList.find((token) =>
-        token.mint.equals(poolInfo.mintQuote),
-      )!;
-
-      console.log('LP INFOS', lpProviderInfo);
-      console.log('LP INFOS -->', {
-        baseShare: lpProviderInfo.baseShare.toString(),
-        quoteShare: lpProviderInfo.quoteShare.toString(),
-        stakedBaseShare: lpProviderInfo.stakedBaseShare.toString(),
-        stakedQuoteShare: lpProviderInfo.stakedQuoteShare.toString(),
-        a: nativeBNToUiAmount(lpProviderInfo.baseShare, baseDecimals),
-        b: nativeBNToUiAmount(lpProviderInfo.quoteShare, quoteDecimals),
-      });
-
-      setLpProviderInfo({
-        uiBaseShare: nativeBNToUiAmount(lpProviderInfo.baseShare, baseDecimals),
-        uiQuoteShare: nativeBNToUiAmount(
-          lpProviderInfo.quoteShare,
-          quoteDecimals,
-        ),
-      });
     })();
-  }, [selectedPoolName, governedAccountPubkey, connection, wallet]);
+  }, [poolInfo, connection, governedAccountPubkey, deltafiProgram]);
 
   return (
     <>
@@ -191,12 +142,14 @@ const DeltafiPoolWithdraw = ({
         poolInfoList={poolInfoList}
         selectedValue={form.poolName}
         onSelect={(poolName: PoolName) => {
+          const poolInfo = poolInfoList.find(({ name }) => name === poolName);
+
+          setPoolInfo(poolInfo ?? null);
+
           handleSetForm({
             value: poolName,
             propertyName: 'poolName',
           });
-
-          setSelectedPoolName(poolName);
         }}
       />
 
@@ -214,17 +167,17 @@ const DeltafiPoolWithdraw = ({
         error={formErrors['uiBaseShare']}
       />
 
-      {lpProviderInfo ? (
+      {userStakeInfo ? (
         <div
           className="text-xs pointer text-fgd-3 hover:text-white"
           onClick={() => {
             handleSetForm({
-              value: lpProviderInfo.uiBaseShare,
+              value: userStakeInfo.inPool.uiBase,
               propertyName: 'uiBaseShare',
             });
           }}
         >
-          max: {lpProviderInfo.uiBaseShare}
+          max: {userStakeInfo.inPool.uiBase}
         </div>
       ) : null}
 
@@ -242,17 +195,17 @@ const DeltafiPoolWithdraw = ({
         error={formErrors['uiQuoteShare']}
       />
 
-      {lpProviderInfo ? (
+      {userStakeInfo ? (
         <div
           className="text-xs pointer text-fgd-3 hover:text-white"
           onClick={() => {
             handleSetForm({
-              value: lpProviderInfo.uiQuoteShare,
+              value: userStakeInfo.inPool.uiQuote,
               propertyName: 'uiQuoteShare',
             });
           }}
         >
-          max: {lpProviderInfo.uiQuoteShare}
+          max: {userStakeInfo.inPool.uiQuote}
         </div>
       ) : null}
 

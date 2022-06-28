@@ -22,16 +22,6 @@ export default async function createLiquidityProviderV2({
     }),
   ]);
 
-  console.log('CreateLiquidityProvider', {
-    lpBump,
-    marketConfig: configKey.toBase58(),
-    swapInfo: poolInfo.swapInfo.toBase58(),
-    liquidityProvider: lpPublicKey.toBase58(),
-    owner: authority.toBase58(),
-    systemProgram: SystemProgram.programId.toBase58(),
-    rent: SYSVAR_RENT_PUBKEY.toBase58(),
-  });
-
   return deltafiProgram.instruction.createLiquidityProviderV2(lpBump, {
     accounts: {
       marketConfig: configKey,
