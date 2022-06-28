@@ -109,7 +109,7 @@ const ProposalStateBadge = ({
         <div
           className={`${getProposalStateStyle(
             proposal.state
-          )} inline-block px-2 py-1 rounded-full text-xs`}
+          )} min-w-max inline-block px-2 py-1 rounded-full text-xs`}
         >
           {statusLabel}
         </div>

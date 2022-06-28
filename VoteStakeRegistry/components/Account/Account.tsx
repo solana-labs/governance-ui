@@ -1,12 +1,8 @@
-import dynamic from 'next/dynamic'
-import useRealm from '@hooks/useRealm'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import { LinkIcon } from '@heroicons/react/outline'
 import MyProposalsBtn from 'pages/dao/[symbol]/proposal/components/MyProposalsBtn'
 import useWalletStore from 'stores/useWalletStore'
-
-const NotificationsCard = dynamic(() => import('@components/NotificationsCard'))
-const DelegateCard = dynamic(() => import('@components/DelegateCard'))
+import DelegateCard from '@components/DelegateCard'
 
 const AccountInner = ({ withHeader = true }: { withHeader?: boolean }) => {
   const connected = useWalletStore((s) => s.connected)
@@ -37,25 +33,11 @@ const AccountInner = ({ withHeader = true }: { withHeader?: boolean }) => {
   )
 }
 
-const NotificationsPlugin = () => {
-  const { realmInfo } = useRealm()
-  if (realmInfo?.enableNotifi) {
-    return (
-      <div className="md:w-1/2 col-span-12">
-        <NotificationsCard />
-      </div>
-    )
-  }
-
-  return null
-}
-
 const Account = ({ withHeader = true }: { withHeader?: boolean }) => {
   if (withHeader) {
     return (
       <div className="grid grid-cols-12 gap-4">
         <AccountInner withHeader={withHeader} />
-        <NotificationsPlugin />
         <div className="md:w-1/2 col-span-12">
           <DelegateCard />
         </div>
@@ -68,7 +50,6 @@ const Account = ({ withHeader = true }: { withHeader?: boolean }) => {
         <div className="md:w-1/2 col-span-12">
           <DelegateCard />
         </div>
-        <NotificationsPlugin />
       </>
     )
   }

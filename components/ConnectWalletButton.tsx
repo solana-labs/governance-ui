@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router'
 import {
   AddressImage,
   DisplayAddress,
@@ -21,7 +22,7 @@ import {
   WALLET_PROVIDERS,
 } from '../utils/wallet-adapters'
 import Switch from './Switch'
-import TwitterIcon from './TwitterIcon'
+import { TwitterIcon } from './icons'
 
 const StyledWalletProviderLabel = styled.p`
   font-size: 0.65rem;
@@ -29,6 +30,11 @@ const StyledWalletProviderLabel = styled.p`
 `
 
 const ConnectWalletButton = (props) => {
+  const { pathname, query, replace } = useRouter()
+  const [currentCluster, setCurrentCluster] = useLocalStorageState(
+    'cluster',
+    'mainnet'
+  )
   const {
     connected,
     current,
@@ -36,23 +42,34 @@ const ConnectWalletButton = (props) => {
     connection,
     set: setWalletStore,
   } = useWalletStore((s) => s)
-
   const provider = useMemo(() => getWalletProviderByUrl(providerUrl), [
     providerUrl,
   ])
 
-  const [useDevnet, setUseDevnet] = useLocalStorageState('false')
-  const handleToggleDevnet = () => {
-    setUseDevnet(!useDevnet)
-    if (useDevnet) {
-      window.location.href = `${window.location.pathname}`
-    } else {
-      window.location.href = `${window.location.href}?cluster=devnet`
-    }
-  }
   useEffect(() => {
-    setUseDevnet(connection.cluster === 'devnet')
+    if (connection.cluster !== currentCluster) {
+      setCurrentCluster(connection.cluster)
+    }
   }, [connection.cluster])
+
+  function updateClusterParam(cluster) {
+    const newQuery = {
+      ...query,
+      cluster,
+    }
+    if (!cluster) {
+      delete newQuery.cluster
+    }
+    replace({ pathname, query: newQuery }, undefined, {
+      shallow: true,
+    })
+  }
+
+  function handleToggleDevnet() {
+    const isDevnet = !(currentCluster === 'devnet')
+    setCurrentCluster(isDevnet ? 'devnet' : 'mainnet')
+    updateClusterParam(isDevnet ? 'devnet' : null)
+  }
 
   const handleConnectDisconnect = async () => {
     try {
@@ -90,7 +107,7 @@ const ConnectWalletButton = (props) => {
 
   const displayAddressImage = useMemo(() => {
     return connected && current?.publicKey ? (
-      <div className="w-12 pr-2">
+      <div className="hidden w-12 pr-2 sm:block">
         <AddressImage
           dark={true}
           connection={connection.current}
@@ -105,7 +122,7 @@ const ConnectWalletButton = (props) => {
         />{' '}
       </div>
     ) : (
-      <div className="pl-2 pr-2">
+      <div className="hidden pl-2 pr-2 sm:block">
         <img src={provider?.adapter.icon} className="w-5 h-5" />
       </div>
     )
@@ -115,7 +132,7 @@ const ConnectWalletButton = (props) => {
     <div className="flex">
       <div
         disabled={connected}
-        className={`bg-transparent border border-fgd-4 border-r-0 default-transition flex h-12 items-center pl-1 pr-2 rounded-l-full rounded-r-none ${
+        className={`bg-bkg-2 hover:bg-bkg-3  border border-fgd-4 border-r-0 default-transition flex h-12 items-center pl-1 pr-2 rounded-l-full rounded-r-none ${
           connected
             ? 'cursor-default'
             : 'cursor-pointer hover:bg-bkg-3 focus:outline-none'
@@ -150,7 +167,7 @@ const ConnectWalletButton = (props) => {
           {({ open }) => (
             <>
               <Menu.Button
-                className={`border border-fgd-4 cursor-pointer default-transition h-12 w-12 py-2 px-2 rounded-r-full hover:bg-bkg-3 focus:outline-none`}
+                className={`border bg-bkg-2 border-fgd-4 cursor-pointer default-transition h-12 w-12 py-2 px-2 rounded-r-full hover:bg-bkg-3 focus:outline-none`}
               >
                 <ChevronDownIcon
                   className={`${
@@ -183,7 +200,7 @@ const ConnectWalletButton = (props) => {
                     <div className="flex items-center w-full p-2 font-normal default-transition h-9 hover:bg-bkg-3 hover:cursor-pointer hover:rounded focus:outline-none">
                       <span className="text-sm">Devnet</span>
                       <Switch
-                        checked={useDevnet}
+                        checked={currentCluster === 'devnet'}
                         onChange={() => {
                           handleToggleDevnet()
                         }}
@@ -195,29 +212,29 @@ const ConnectWalletButton = (props) => {
                       <hr
                         className={`border border-fgd-3 opacity-50 mt-2 mb-2`}
                       ></hr>
-                      <Menu.Item
-                        key={'twitter'}
-                        onClick={() =>
-                          show(
-                            // @ts-ignore
-                            current,
-                            connection.current,
-                            connection.cluster
-                          )
-                        }
-                      >
-                        <button className="flex items-center w-full p-2 font-normal default-transition h-9 hover:bg-bkg-3 hover:cursor-pointer hover:rounded focus:outline-none">
+                      <Menu.Item key={'twitter'}>
+                        <button
+                          className="flex items-center w-full p-2 font-normal default-transition h-9 hover:bg-bkg-3 hover:cursor-pointer hover:rounded focus:outline-none"
+                          onClick={() =>
+                            show(
+                              // @ts-ignore
+                              current,
+                              connection.current,
+                              connection.cluster
+                            )
+                          }
+                        >
                           <TwitterIcon className="w-4 h-4 mr-2" />
                           <span className="text-sm">
                             {displayName ? 'Edit Twitter' : 'Link Twitter'}
                           </span>
                         </button>
                       </Menu.Item>
-                      <Menu.Item
-                        key={'disconnect'}
-                        onClick={handleConnectDisconnect}
-                      >
-                        <button className="flex items-center w-full p-2 font-normal default-transition h-9 hover:bg-bkg-3 hover:cursor-pointer hover:rounded focus:outline-none">
+                      <Menu.Item key={'disconnect'}>
+                        <button
+                          className="flex items-center w-full p-2 font-normal default-transition h-9 hover:bg-bkg-3 hover:cursor-pointer hover:rounded focus:outline-none"
+                          onClick={handleConnectDisconnect}
+                        >
                           <BackspaceIcon className="w-4 h-4 mr-2" />
                           <span className="text-sm">Disconnect</span>
                         </button>

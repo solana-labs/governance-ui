@@ -18,8 +18,19 @@ import {
 } from '@solana/spl-token'
 import { Connection } from '@solana/web3.js'
 import { BN } from '@project-serum/anchor'
-import { nftPluginsPks, vsrPluginsPks } from '@hooks/useVotingPlugins'
+import {
+  nftPluginsPks,
+  vsrPluginsPks,
+  gatewayPluginsPks,
+} from '@hooks/useVotingPlugins'
 import { AssetAccount } from '@utils/uiTypes/assets'
+
+// Plugins supported by Realms
+const supportedPlugins = [
+  ...nftPluginsPks,
+  ...vsrPluginsPks,
+  ...gatewayPluginsPks,
+]
 
 export const getValidateAccount = async (
   connection: Connection,
@@ -344,6 +355,18 @@ export const getGoblinGoldWithdrawSchema = () => {
   })
 }
 
+export const getFriktionClaimPendingDepositSchema = () => {
+  return yup.object().shape({
+    governedTokenAccount: yup.object().required('Source account is required'),
+  })
+}
+
+export const getFriktionClaimPendingWithdrawSchema = () => {
+  return yup.object().shape({
+    governedTokenAccount: yup.object().required('Source account is required'),
+  })
+}
+
 export const getTokenTransferSchema = ({
   form,
   connection,
@@ -566,7 +589,7 @@ export const getRealmCfgSchema = ({ form }) => {
           if (val) {
             try {
               getValidatedPublickKey(val)
-              if ([...nftPluginsPks, ...vsrPluginsPks].includes(val)) {
+              if (supportedPlugins.includes(val)) {
                 return true
               } else {
                 return this.createError({

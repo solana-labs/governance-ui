@@ -97,7 +97,17 @@ export default function useGovernanceAssets() {
     realmAuth && ownVoterWeight.canCreateProposal(realmAuth?.account.config)
 
   const getAvailableInstructions = () => {
-    return availableInstructions.filter((itx) => itx.isVisible)
+    let toBeFiltered: {
+      id: Instructions
+      name: string
+      isVisible: boolean | undefined
+    }[]
+    if (symbol === 'FORE') {
+      toBeFiltered = [...foresightInstructions, ...commonInstructions]
+    } else {
+      toBeFiltered = availableInstructions
+    }
+    return toBeFiltered.filter((itx) => itx.isVisible)
   }
   const governedTokenAccountsWithoutNfts = governedTokenAccounts.filter(
     (x) => x.type !== AccountType.NFT
@@ -118,7 +128,8 @@ export default function useGovernanceAssets() {
       )
     }
   )
-  const availableInstructions = [
+
+  const commonInstructions = [
     {
       id: Instructions.Transfer,
       name: 'Transfer Tokens',
@@ -139,41 +150,6 @@ export default function useGovernanceAssets() {
         canUseTokenTransferInstruction &&
         currentPluginPk &&
         vsrPluginsPks.includes(currentPluginPk.toBase58()),
-    },
-    {
-      id: Instructions.MangoChangePerpMarket,
-      name: 'Mango: Change Perp Market',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
-    },
-    {
-      id: Instructions.MangoChangeSpotMarket,
-      name: 'Mango: Change Spot Market',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
-    },
-    {
-      id: Instructions.MangoChangeReferralFeeParams,
-      name: 'Mango: Change Referral Fee Params',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
-    },
-    {
-      id: Instructions.MangoChangeMaxAccounts,
-      name: 'Mango: Change Max Accounts',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
-    },
-    {
-      id: Instructions.MangoAddOracle,
-      name: 'Mango: Add Oracle',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
-    },
-    {
-      id: Instructions.MangoAddSpotMarket,
-      name: 'Mango: Add Spot Market',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
-    },
-    {
-      id: Instructions.MangoCreatePerpMarket,
-      name: 'Mango: Create Perp Market',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
     },
     {
       id: Instructions.Mint,
@@ -206,6 +182,151 @@ export default function useGovernanceAssets() {
       isVisible: canUseAnyInstruction,
     },
     {
+      id: Instructions.ProgramUpgrade,
+      name: 'Upgrade Program',
+      isVisible: canUseProgramUpgradeInstruction,
+    },
+    {
+      id: Instructions.CreateNftPluginRegistrar,
+      name: 'Create NFT plugin registrar',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
+      id: Instructions.ConfigureNftPluginCollection,
+      name: 'Configure NFT plugin collection',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
+      id: Instructions.CreateGatewayPluginRegistrar,
+      name: 'Civic: Create Gateway plugin registrar',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
+      id: Instructions.RealmConfig,
+      name: 'Realm config',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
+      id: Instructions.CreateNftPluginMaxVoterWeight,
+      name: 'Create NFT plugin max voter weight',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
+      id: Instructions.CloseTokenAccount,
+      name: 'Close token account',
+      isVisible: canUseTransferInstruction,
+    },
+    {
+      id: Instructions.None,
+      name: 'None',
+      isVisible:
+        realm &&
+        Object.values(governances).some((g) =>
+          ownVoterWeight.canCreateProposal(g.account.config)
+        ),
+    },
+  ]
+  const foresightInstructions = [
+    {
+      id: Instructions.ForesightInitMarket,
+      name: 'Foresight: Init Market',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.ForesightInitMarketList,
+      name: 'Foresight: Init Market List',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.ForesightInitCategory,
+      name: 'Foresight: Init Category',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.ForesightResolveMarket,
+      name: 'Foresight: Resolve Market',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.ForesightAddMarketListToCategory,
+      name: 'Foresight: Add Market List To Category',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.ForesightSetMarketMetadata,
+      name: 'Foresight: Set Market Metadata',
+      isVisible: canUseAnyInstruction,
+    },
+  ]
+
+  const availableInstructions = [
+    ...commonInstructions,
+    {
+      id: Instructions.MangoChangePerpMarket,
+      name: 'Mango: Change Perp Market',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoChangeSpotMarket,
+      name: 'Mango: Change Spot Market',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoChangeQuoteParams,
+      name: 'Mango: Change Quote Params',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoChangeReferralFeeParams,
+      name: 'Mango: Change Referral Fee Params',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoChangeMaxAccounts,
+      name: 'Mango: Change Max Accounts',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoAddOracle,
+      name: 'Mango: Add Oracle',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoAddSpotMarket,
+      name: 'Mango: Add Spot Market',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoCreatePerpMarket,
+      name: 'Mango: Create Perp Market',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoSetMarketMode,
+      name: 'Mango: Set Market Mode',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.DepositIntoVolt,
+      name: 'Friktion: Deposit into Volt',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.WithdrawFromVolt,
+      name: 'Friktion: Withdraw from Volt',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.ClaimPendingDeposit,
+      name: 'Friktion: Claim Volt Tokens',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.ClaimPendingWithdraw,
+      name: 'Friktion: Claim Pending Withdraw',
+      isVisible: canUseAnyInstruction,
+    },
+    {
       id: Instructions.DepositIntoCastle,
       name: 'Castle: Deposit into Vault',
       isVisible: canUseAnyInstruction,
@@ -216,13 +337,13 @@ export default function useGovernanceAssets() {
       isVisible: canUseAnyInstruction,
     },
     {
-      id: Instructions.DepositIntoVolt,
-      name: 'Friktion: Deposit into Volt',
+      id: Instructions.SwitchboardAdmitOracle,
+      name: 'Switchboard: Admit Oracle to Queue',
       isVisible: canUseAnyInstruction,
     },
     {
-      id: Instructions.WithdrawFromVolt,
-      name: 'Friktion: Withdraw from Volt',
+      id: Instructions.SwitchboardRevokeOracle,
+      name: 'Switchboard: Remove Oracle from Queue',
       isVisible: canUseAnyInstruction,
     },
     {
@@ -265,75 +386,7 @@ export default function useGovernanceAssets() {
       name: 'Solend: Withdraw Funds',
       isVisible: canUseAnyInstruction,
     },
-    {
-      id: Instructions.ForesightInitMarket,
-      name: 'Foresight: Init Market',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.ForesightInitMarketList,
-      name: 'Foresight: Init Market List',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.ForesightInitCategory,
-      name: 'Foresight: Init Category',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.ForesightResolveMarket,
-      name: 'Foresight: Resolve Market',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.ForesightAddMarketListToCategory,
-      name: 'Foresight: Add Market List To Category',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.ForesightAddMarketMetadata,
-      name: 'Foresight: Add Market Metadata',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.ProgramUpgrade,
-      name: 'Upgrade Program',
-      isVisible: canUseProgramUpgradeInstruction,
-    },
-    {
-      id: Instructions.CreateNftPluginRegistrar,
-      name: 'Create NFT plugin registrar',
-      isVisible: canUseAuthorityInstruction,
-    },
-    {
-      id: Instructions.ConfigureNftPluginCollection,
-      name: 'Configure NFT plugin collection',
-      isVisible: canUseAuthorityInstruction,
-    },
-    {
-      id: Instructions.RealmConfig,
-      name: 'Realm config',
-      isVisible: canUseAuthorityInstruction,
-    },
-    {
-      id: Instructions.CreateNftPluginMaxVoterWeight,
-      name: 'Create NFT plugin max voter weight',
-      isVisible: canUseAuthorityInstruction,
-    },
-    {
-      id: Instructions.CloseTokenAccount,
-      name: 'Close token account',
-      isVisible: canUseTransferInstruction,
-    },
-    {
-      id: Instructions.None,
-      name: 'None',
-      isVisible:
-        realm &&
-        Object.values(governances).some((g) =>
-          ownVoterWeight.canCreateProposal(g.account.config)
-        ),
-    },
+    ...foresightInstructions,
   ]
 
   return {

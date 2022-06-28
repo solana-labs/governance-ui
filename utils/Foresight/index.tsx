@@ -18,7 +18,8 @@ import {
   ForesightHasGovernedAccount,
   ForesightHasMarketId,
   ForesightHasMarketListId,
-  ForesightMakeAddMarketMetadataParams,
+  ForesightMakeResolveMarketParams,
+  ForesightMakeSetMarketMetadataParams,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import Input from '@components/inputs/Input'
@@ -30,15 +31,20 @@ import useRealm from '@hooks/useRealm'
 import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../pages/dao/[symbol]/proposal/new'
 import Select from '@components/inputs/Select'
+import TextareaProps from '@components/inputs/Textarea'
 
 type EmptyObject = Record<string, never>
 type SetFormErrors = Dispatch<React.SetStateAction<EmptyObject>>
 
 export function getFilteredTokenAccounts(): AssetAccount[] {
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-  return governedTokenAccountsWithoutNfts.filter((x) =>
-    x.extensions.transferAddress?.equals(foresightGov.DEVNET_TREASURY)
-  )
+  return governedTokenAccountsWithoutNfts.filter((x) => {
+    const transferAddress = x.extensions.transferAddress
+    return (
+      transferAddress?.equals(foresightGov.DEVNET_TREASURY) ||
+      transferAddress?.equals(foresightGov.MAINNET_TREASURY)
+    )
+  })
 }
 
 type HandleSetForm = ({
@@ -348,13 +354,15 @@ export function ForesightMarketIdInput(
   )
 }
 
-export function ForesightWinnerInput(props: InputProps<ForesightHasMarketId>) {
+export function ForesightWinnerInput(
+  props: InputProps<ForesightMakeResolveMarketParams>
+) {
   return (
     <Input
       label="Winner"
-      value={props.form.marketId}
+      value={props.form.winner}
+      min={-1}
       type="number"
-      min={0}
       onChange={(evt) =>
         props.handleSetForm({
           value: evt.target.value,
@@ -367,10 +375,10 @@ export function ForesightWinnerInput(props: InputProps<ForesightHasMarketId>) {
 }
 
 export function ForesightContentInput(
-  props: InputProps<ForesightMakeAddMarketMetadataParams>
+  props: InputProps<ForesightMakeSetMarketMetadataParams>
 ) {
   return (
-    <Input
+    <TextareaProps
       label="Content"
       value={props.form.content}
       type="text"
@@ -386,7 +394,7 @@ export function ForesightContentInput(
 }
 
 export function ForesightMarketMetadataFieldSelect(
-  props: InputProps<ForesightMakeAddMarketMetadataParams>
+  props: InputProps<ForesightMakeSetMarketMetadataParams>
 ) {
   return (
     <Select

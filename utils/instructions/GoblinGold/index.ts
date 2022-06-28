@@ -242,8 +242,6 @@ export async function getGoblinGoldDepositInstruction({
     shouldSplitIntoSeparateTxs: true,
   }
 
-  console.log('goblingold instruction:', obj)
-
   return obj
 }
 
@@ -349,8 +347,6 @@ export async function getGoblinGoldWithdrawInstruction({
     signers,
     shouldSplitIntoSeparateTxs: true,
   }
-
-  console.log('goblingold instruction:', obj)
 
   return obj
 }

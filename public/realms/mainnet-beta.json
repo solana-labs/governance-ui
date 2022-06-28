@@ -69,6 +69,16 @@
     "ogImage": "/realms/BFNC/img/logo.png"
   },
   {
+    "symbol": "Wisdom Enterprising",
+    "displayName": "Wisdom Enterprising",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "4SGq4WekURkhi6Y3JfxN1ockV5qfwuPahFjB4sLe1bZx",
+    "website": "https://wisdomenterprising.com",
+    "keywords": "Wisdom Enterprising, realms.today, Decentralized, Web3, Wezesha",
+    "twitter": "@jakubsimek",
+    "ogImage": "/realms/WisdomEnterprising/img/WE.jpg"
+  },
+  {
     "symbol": "ORCA",
     "displayName": "Orca DAO",
     "programId": "J9uWvULFL47gtCPvgR3oN7W357iehn5WF2Vn9MJvcSxz",
@@ -144,7 +154,8 @@
     "symbol": "Governance",
     "displayName": "Governance",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "FMEWULPSGR1BKVJK4K7xTjhG23NfYxeAn2bamYgNoUck"
+    "realmId": "FMEWULPSGR1BKVJK4K7xTjhG23NfYxeAn2bamYgNoUck",
+    "ogImage": "/realms/Governance/img/spl-governance-logo.svg"
   },
   {
     "symbol": "Yield Farming",
@@ -269,6 +280,16 @@
     "website": "https://grapes.network/",
     "twitter": "@grapeprotocol",
     "sortRank":3 
+  },
+  {
+    "symbol": "RED",
+    "displayName": "Realms Ecosystem DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "C1tyCAEnbt4d63nbF36PGLc8gCC9DdtRXttXWGZwsAdF",
+    "ogImage": "/realms/RED/RED.png",
+    "website": "https://realms.notion.site/Realms-Ecosystem-DAO-RED-2b82519e797b4696968c5c909812f418",
+    "twitter": "@Realms_DAOs",
+    "sortRank":2
   },
   {
     "symbol": "MonkeDAO",
@@ -776,8 +797,8 @@
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "BE5wCCi9fg5YxUWos5A9JYACCLTPCKbcbJknTMxz76g4",
     "website": "https://createdby.io",
+    "ogImage": "/realms/CreatedBy/CreatedBy.PNG",
     "twitter": "@CreatedByIO",
-    "ogImage": "/realms/CreatedBy/CreatedBy.PNG"
   },
     {
     "symbol": "SAMO",
@@ -785,7 +806,35 @@
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "GC6GDrJTVEY2ZxQ9NaC7n54tvz2HKM5f29LBzP7SjJ6h",
     "website": "https://samoyedcoin.com",
+     "ogImage": "realms/SamoDAO/SamoDAO Realms Icon.png",
     "twitter": "@Samo_DAO",
-    "ogImage": "realms/SamoDAO/SamoDAO Realms Icon.png"
-    }
-]
+    },
+    {
+      "symbol": "FORE",
+      "displayName": "Foresight DAO",
+      "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+      "realmId": "CZatgrcvaDN9ib1sQeSCJWUnBXc899ydTB9vfAHHBVfP",
+      "ogImage": "https://www.foresight.exchange/logo.png",
+      "website": "https://www.foresight.exchange/",
+      "twitter": "@foresightmkt"
+    },
+    {
+      "symbol": "SLND",
+      "displayName": "Solend DAO",
+      "programId": "A7kmu2kUcnQwAVn8B4znQmGJeUrsJ1WEhYVMtmiBLkEr",
+      "realmId": "7sf3tcWm58vhtkJMwuw2P3T6UBX7UE5VKxPMnXJUZ1Hn",
+      "ogImage": "https://solend-image-assets.s3.us-east-2.amazonaws.com/1280-circle.png",
+      "website": "https://solend.fi/",
+      "twitter": "@solendprotocol",
+      "sortRank": 2
+    },
+    {
+    "symbol": "FSGOV",
+    "displayName": "Flipside Governance",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "81dgxBYogwBPS17aUCY1ScFqSKrehECdFxA8Ywa9CiVb",
+    "website": "https://flipsidecrypto.xyz/",
+    "twitter": "@flipsidecrypto",
+    "ogImage": "/realms/FSLOGO/FLIPSIDE-LOGO-WHITE.png"
+        },
+  }

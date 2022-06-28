@@ -26,6 +26,7 @@ import { BN } from '@project-serum/anchor'
 import { abbreviateAddress } from './formatting'
 import BigNumber from 'bignumber.js'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import { I80F48 } from '@blockworks-foundation/mango-client'
 
 export type TokenAccount = AccountInfo
 export type MintAccount = MintInfo
@@ -90,6 +91,10 @@ export async function tryGetMint(
   } catch (ex) {
     console.error(`Can't fetch mint ${publicKey?.toBase58()}`, ex)
   }
+}
+
+export const I80F48OptionalFromNumber = (val: number | undefined) => {
+  return val || val === 0 ? I80F48.fromNumber(val) : undefined
 }
 
 export async function tryGetTokenAccount(
