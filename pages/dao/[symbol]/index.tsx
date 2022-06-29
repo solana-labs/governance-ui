@@ -14,11 +14,11 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets';
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore';
 import { usePrevious } from '@hooks/usePrevious';
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper';
-import ApproveAllBtn from './proposal/components/ApproveAllBtn';
 import dynamic from 'next/dynamic';
 import Loading from '@components/Loading';
 import PaginationComponent from '@components/Pagination';
 import HotWallet from '@components/HotWallet/HotWallet';
+import SearchInput from '@components/SearchInput';
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper'),
 );
@@ -49,7 +49,9 @@ const compareProposals = (
 
   if (p1Rank > p2Rank) {
     return 1;
-  } else if (p1Rank < p2Rank) {
+  }
+
+  if (p1Rank < p2Rank) {
     return -1;
   }
 
@@ -59,7 +61,9 @@ const compareProposals = (
 
     if (p1VotingRank > p2VotingRank) {
       return 1;
-    } else if (p1VotingRank < p2VotingRank) {
+    }
+
+    if (p1VotingRank < p2VotingRank) {
       return -1;
     }
 
@@ -99,9 +103,12 @@ const REALM = () => {
   const [paginatedProposals, setPaginatedProposals] = useState<
     [string, ProgramAccount<Proposal>][]
   >([]);
+
   const [filteredProposals, setFilteredProposals] = useState(
     displayedProposals,
   );
+
+  const [filterText, setFilterText] = useState<string>('');
 
   const allProposals = Object.entries(proposals).sort((a, b) =>
     compareProposals(b[1].account, a[1].account, governances),
@@ -110,26 +117,27 @@ const REALM = () => {
   useEffect(() => {
     setPaginatedProposals(paginateProposals(0));
   }, [filteredProposals]);
+
   useEffect(() => {
+    let proposals = allProposals;
+
     if (filters.length > 0) {
-      const proposals = allProposals.filter(
+      proposals = proposals.filter(
         ([, v]) => !filters.includes(v.account.state),
       );
-      setFilteredProposals(proposals);
-    } else {
-      setFilteredProposals(allProposals);
     }
-  }, [filters]);
 
-  useEffect(() => {
-    const proposals =
-      filters.length > 0
-        ? allProposals.filter(([, v]) => !filters.includes(v.account.state))
-        : allProposals;
+    const formattedFilterText = filterText.trim().toLowerCase();
 
-    setDisplayedProposals(proposals);
+    if (formattedFilterText.length) {
+      proposals = proposals.filter(([, v]) =>
+        v.account.name.toLowerCase().includes(formattedFilterText),
+      );
+    }
+
     setFilteredProposals(proposals);
-  }, [proposals]);
+    setDisplayedProposals(proposals);
+  }, [filters, filterText, proposals]);
 
   useEffect(() => {
     if (
@@ -143,12 +151,14 @@ const REALM = () => {
   const onProposalPageChange = (page) => {
     setPaginatedProposals(paginateProposals(page));
   };
+
   const paginateProposals = (page) => {
     return filteredProposals.slice(
       page * proposalsPerPage,
       (page + 1) * proposalsPerPage,
     );
   };
+
   return (
     <>
       <div className="grid grid-cols-12 gap-4">
@@ -190,12 +200,11 @@ const REALM = () => {
                   </>
                 ) : null}
               </div>
+
               <div className="flex items-center justify-between pb-3">
                 <h4 className="text-fgd-2">{`${filteredProposals.length} proposals`}</h4>
+
                 <div className="flex items-center">
-                  <div className="mr-4">
-                    <ApproveAllBtn />
-                  </div>
                   <div className="mr-4">
                     <NewProposalBtn />
                   </div>
@@ -203,6 +212,14 @@ const REALM = () => {
                   <ProposalFilter filters={filters} setFilters={setFilters} />
                 </div>
               </div>
+
+              <SearchInput
+                className="mb-4"
+                value={filterText}
+                onChange={setFilterText}
+                placeholder="Search Proposals"
+              />
+
               <div className="space-y-3">
                 {filteredProposals.length > 0 ? (
                   <>
