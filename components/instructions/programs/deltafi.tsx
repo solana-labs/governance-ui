@@ -5,6 +5,7 @@ import { DeltafiDexV2 } from '@tools/sdk/deltafi/configuration';
 import { tryGetTokenMint } from '@utils/tokens';
 import { BN } from '@blockworks-foundation/mango-client';
 import { nativeAmountToFormattedUiAmount } from '@tools/sdk/units';
+import { ANCHOR_DISCRIMINATOR_LAYOUT } from '@utils/helpers';
 
 export const DELTAFI_PROGRAM_INSTRUCTIONS = {
   [DeltafiDexV2.DeltafiProgramId.toBase58()]: {
@@ -25,13 +26,7 @@ export const DELTAFI_PROGRAM_INSTRUCTIONS = {
       ) => {
         const dataLayout = struct([
           u8('instruction'),
-          u8('SIGHASH_1'),
-          u8('SIGHASH_2'),
-          u8('SIGHASH_3'),
-          u8('SIGHASH_4'),
-          u8('SIGHASH_5'),
-          u8('SIGHASH_6'),
-          u8('SIGHASH_7'),
+          ...ANCHOR_DISCRIMINATOR_LAYOUT,
           nu64('baseAmount'),
           nu64('quoteAmount'),
         ]);
@@ -65,13 +60,7 @@ export const DELTAFI_PROGRAM_INSTRUCTIONS = {
       ) => {
         const dataLayout = struct([
           u8('instruction'),
-          u8('SIGHASH_1'),
-          u8('SIGHASH_2'),
-          u8('SIGHASH_3'),
-          u8('SIGHASH_4'),
-          u8('SIGHASH_5'),
-          u8('SIGHASH_6'),
-          u8('SIGHASH_7'),
+          ...ANCHOR_DISCRIMINATOR_LAYOUT,
           nu64('baseAmount'),
           nu64('quoteAmount'),
         ]);
@@ -103,36 +92,17 @@ export const DELTAFI_PROGRAM_INSTRUCTIONS = {
       getDataUI: async (
         _connection: Connection,
         data: Uint8Array,
-        accounts: AccountMetaData[],
+        _accounts: AccountMetaData[],
       ) => {
         const dataLayout = struct([
           u8('instruction'),
-          u8('SIGHASH_1'),
-          u8('SIGHASH_2'),
-          u8('SIGHASH_3'),
-          u8('SIGHASH_4'),
-          u8('SIGHASH_5'),
-          u8('SIGHASH_6'),
-          u8('SIGHASH_7'),
+          ...ANCHOR_DISCRIMINATOR_LAYOUT,
           u8('bump'),
         ]);
 
         const { bump } = dataLayout.decode(Buffer.from(data)) as any;
 
-        const marketConfig = accounts[0].pubkey;
-        const liquidityProvider = accounts[2].pubkey;
-        const owner = accounts[3].pubkey;
-        const payer = accounts[4].pubkey;
-
-        return (
-          <>
-            <p>{`Bump: ${bump.toString()}`}</p>
-            <p>{`Market Config: ${marketConfig.toBase58()}`}</p>
-            <p>{`Liquidity Provider: ${liquidityProvider.toBase58()}`}</p>
-            <p>{`Owner: ${owner.toBase58()}`}</p>
-            <p>{`Payer: ${payer.toBase58()}`}</p>
-          </>
-        );
+        return <p>{`Bump: ${bump.toString()}`}</p>;
       },
     },
 
@@ -170,36 +140,17 @@ export const DELTAFI_PROGRAM_INSTRUCTIONS = {
       getDataUI: async (
         _connection: Connection,
         data: Uint8Array,
-        accounts: AccountMetaData[],
+        _accounts: AccountMetaData[],
       ) => {
         const dataLayout = struct([
           u8('instruction'),
-          u8('SIGHASH_1'),
-          u8('SIGHASH_2'),
-          u8('SIGHASH_3'),
-          u8('SIGHASH_4'),
-          u8('SIGHASH_5'),
-          u8('SIGHASH_6'),
-          u8('SIGHASH_7'),
+          ...ANCHOR_DISCRIMINATOR_LAYOUT,
           u8('bump'),
         ]);
 
         const { bump } = dataLayout.decode(Buffer.from(data)) as any;
 
-        const marketConfig = accounts[0].pubkey;
-        const liquidityProvider = accounts[2].pubkey;
-        const owner = accounts[3].pubkey;
-        const payer = accounts[4].pubkey;
-
-        return (
-          <>
-            <p>{`Bump: ${bump.toString()}`}</p>
-            <p>{`Market Config: ${marketConfig.toBase58()}`}</p>
-            <p>{`Liquidity Provider: ${liquidityProvider.toBase58()}`}</p>
-            <p>{`Owner: ${owner.toBase58()}`}</p>
-            <p>{`Payer: ${payer.toBase58()}`}</p>
-          </>
-        );
+        return <p>{`Bump: ${bump.toString()}`}</p>;
       },
     },
 
@@ -226,13 +177,7 @@ export const DELTAFI_PROGRAM_INSTRUCTIONS = {
       ) => {
         const dataLayout = struct([
           u8('instruction'),
-          u8('SIGHASH_1'),
-          u8('SIGHASH_2'),
-          u8('SIGHASH_3'),
-          u8('SIGHASH_4'),
-          u8('SIGHASH_5'),
-          u8('SIGHASH_6'),
-          u8('SIGHASH_7'),
+          ...ANCHOR_DISCRIMINATOR_LAYOUT,
           nu64('baseShare'),
           nu64('quoteShare'),
           nu64('minBaseAmount'),
@@ -280,10 +225,10 @@ export const DELTAFI_PROGRAM_INSTRUCTIONS = {
 
         return (
           <>
-            <p>{`UI Base Share: ${uiBaseShare.toLocaleString()}`}</p>
-            <p>{`UI Quote Share: ${uiQuoteShare.toLocaleString()}`}</p>
-            <p>{`UI Min Base Amount: ${uiMinBaseAmount.toLocaleString()}`}</p>
-            <p>{`UI Min Quote Amount: ${uiMinQuoteAmount.toLocaleString()}`}</p>
+            <p>{`UI Base Share: ${uiBaseShare}`}</p>
+            <p>{`UI Quote Share: ${uiQuoteShare}`}</p>
+            <p>{`UI Min Base Amount: ${uiMinBaseAmount}`}</p>
+            <p>{`UI Min Quote Amount: ${uiMinQuoteAmount}`}</p>
           </>
         );
       },
@@ -312,13 +257,7 @@ export const DELTAFI_PROGRAM_INSTRUCTIONS = {
       ) => {
         const dataLayout = struct([
           u8('instruction'),
-          u8('SIGHASH_1'),
-          u8('SIGHASH_2'),
-          u8('SIGHASH_3'),
-          u8('SIGHASH_4'),
-          u8('SIGHASH_5'),
-          u8('SIGHASH_6'),
-          u8('SIGHASH_7'),
+          ...ANCHOR_DISCRIMINATOR_LAYOUT,
           nu64('baseAmount'),
           nu64('quoteAmount'),
           nu64('minBaseShare'),
@@ -366,10 +305,10 @@ export const DELTAFI_PROGRAM_INSTRUCTIONS = {
 
         return (
           <>
-            <p>{`UI Base Amount: ${uiBaseAmount.toLocaleString()}`}</p>
-            <p>{`UI Quote Amount: ${uiQuoteAmount.toLocaleString()}`}</p>
-            <p>{`UI Min Base Share: ${uiMinBaseShare.toLocaleString()}`}</p>
-            <p>{`UI Min Quote Share: ${uiMinQuoteShare.toLocaleString()}`}</p>
+            <p>{`UI Base Amount: ${uiBaseAmount}`}</p>
+            <p>{`UI Quote Amount: ${uiQuoteAmount}`}</p>
+            <p>{`UI Min Base Share: ${uiMinBaseShare}`}</p>
+            <p>{`UI Min Quote Share: ${uiMinQuoteShare}`}</p>
           </>
         );
       },

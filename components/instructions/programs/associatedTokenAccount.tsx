@@ -32,6 +32,7 @@ export const ATA_PROGRAM_INSTRUCTIONS = {
             <span>New Associated Token Amount Address:</span>
             <span>{ata}</span>
           </div>
+
           <div className="flex justify-between">
             <span>Token Name</span>
             <span>{tokenName}</span>

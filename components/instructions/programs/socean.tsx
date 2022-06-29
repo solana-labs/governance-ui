@@ -1,9 +1,13 @@
-import BigNumber from 'bignumber.js';
 import { nu64, struct, u8 } from 'buffer-layout';
 import { AccountMetaData } from '@solana/spl-governance';
 import { Connection } from '@solana/web3.js';
 import soceanConfiguration from '@tools/sdk/socean/configuration';
 import { tryGetMint, tryGetTokenMint } from '@utils/tokens';
+import { ANCHOR_DISCRIMINATOR_LAYOUT } from '@utils/helpers';
+import {
+  nativeAmountToFormattedUiAmount,
+  nativeBNToUiAmount,
+} from '@tools/sdk/units';
 
 export const SOCEAN_PROGRAM_INSTRUCTIONS = {
   [soceanConfiguration.bondingProgramId.mainnet.toBase58()]: {
@@ -31,13 +35,7 @@ export const SOCEAN_PROGRAM_INSTRUCTIONS = {
 
         const dataLayout = struct([
           u8('instruction'),
-          u8('SIGHASH_1'),
-          u8('SIGHASH_2'),
-          u8('SIGHASH_3'),
-          u8('SIGHASH_4'),
-          u8('SIGHASH_5'),
-          u8('SIGHASH_6'),
-          u8('SIGHASH_7'),
+          ...ANCHOR_DISCRIMINATOR_LAYOUT,
           nu64('amount'),
         ]);
 
@@ -47,11 +45,10 @@ export const SOCEAN_PROGRAM_INSTRUCTIONS = {
 
         if (!bondedMintInfo) throw new Error('Cannot load bonded mint info');
 
-        const uiAmount = Number(
-          new BigNumber(amount)
-            .shiftedBy(-bondedMintInfo.account.decimals)
-            .toString(),
-        ).toLocaleString();
+        const uiAmount = nativeAmountToFormattedUiAmount(
+          amount,
+          bondedMintInfo.account.decimals,
+        );
 
         owner;
         return (
@@ -103,13 +100,7 @@ export const SOCEAN_PROGRAM_INSTRUCTIONS = {
 
         const dataLayout = struct([
           u8('instruction'),
-          u8('SIGHASH_1'),
-          u8('SIGHASH_2'),
-          u8('SIGHASH_3'),
-          u8('SIGHASH_4'),
-          u8('SIGHASH_5'),
-          u8('SIGHASH_6'),
-          u8('SIGHASH_7'),
+          ...ANCHOR_DISCRIMINATOR_LAYOUT,
           nu64('depositAmount'),
         ]);
 
@@ -119,11 +110,10 @@ export const SOCEAN_PROGRAM_INSTRUCTIONS = {
 
         if (!bondedMintInfo) throw new Error('Cannot load source account info');
 
-        const uiDepositAmount = Number(
-          new BigNumber(depositAmount)
-            .shiftedBy(-bondedMintInfo.account.decimals)
-            .toString(),
-        ).toLocaleString();
+        const uiDepositAmount = nativeAmountToFormattedUiAmount(
+          depositAmount,
+          bondedMintInfo.account.decimals,
+        );
 
         return (
           <div className="flex flex-col">
@@ -171,13 +161,7 @@ export const SOCEAN_PROGRAM_INSTRUCTIONS = {
 
         const dataLayout = struct([
           u8('instruction'),
-          u8('SIGHASH_1'),
-          u8('SIGHASH_2'),
-          u8('SIGHASH_3'),
-          u8('SIGHASH_4'),
-          u8('SIGHASH_5'),
-          u8('SIGHASH_6'),
-          u8('SIGHASH_7'),
+          ...ANCHOR_DISCRIMINATOR_LAYOUT,
           nu64('purchaseAmount'),
           nu64('expectedPayment'),
           nu64('slippageTolerance'),
@@ -199,31 +183,21 @@ export const SOCEAN_PROGRAM_INSTRUCTIONS = {
         if (!bondedMintInfo)
           throw new Error('Cannot load sale destination info');
 
-        const uiPurchaseAmount = Number(
-          new BigNumber(purchaseAmount)
-            .shiftedBy(-bondedMintInfo.account.decimals)
-            .toString(),
-        ).toLocaleString();
+        const uiPurchaseAmount = nativeAmountToFormattedUiAmount(
+          purchaseAmount,
+          bondedMintInfo.account.decimals,
+        );
 
-        const uiExpectedPayment = Number(
-          new BigNumber(expectedPayment)
-            .shiftedBy(-sourceMintInfo.account.decimals)
-            .toString(),
-        ).toLocaleString();
+        const uiExpectedPayment = nativeAmountToFormattedUiAmount(
+          expectedPayment,
+          sourceMintInfo.account.decimals,
+        );
 
         const uiSlippageTolerance = (slippageTolerance / 10).toLocaleString();
 
         const uiPurchaseRatio = (
-          Number(
-            new BigNumber(expectedPayment)
-              .shiftedBy(-sourceMintInfo.account.decimals)
-              .toNumber(),
-          ) /
-          Number(
-            new BigNumber(purchaseAmount)
-              .shiftedBy(-bondedMintInfo.account.decimals)
-              .toNumber(),
-          )
+          nativeBNToUiAmount(expectedPayment, sourceMintInfo.account.decimals) /
+          nativeBNToUiAmount(purchaseAmount, bondedMintInfo.account.decimals)
         ).toLocaleString();
 
         return (

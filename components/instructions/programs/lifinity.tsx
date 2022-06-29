@@ -7,27 +7,28 @@ import {
   InstructionsCodes,
 } from '@tools/sdk/lifinity/lifinity';
 import { tryGetMint, tryGetTokenMint } from '@utils/tokens';
-import BigNumber from 'bignumber.js';
+import { ANCHOR_DISCRIMINATOR_LAYOUT } from '@utils/helpers';
+import { nativeAmountToFormattedUiAmount } from '@tools/sdk/units';
 
 export const LIFINITY_PROGRAM_INSTRUCTIONS = {
   [AMM_PROGRAM_ADDR.toBase58()]: {
     [InstructionsCodes.DepositAllTokenTypes]: {
       name: 'Lifinity - Deposit All Token Types',
       accounts: [
-        'amm',
-        'authority',
-        'userTransferAuthority',
-        'sourceAInfo',
-        'sourceBInfo',
-        'tokenA',
-        'tokenB',
-        'poolMint',
-        'destination',
-        'tokenProgram',
-        'configAccount',
-        'holderAccountInfo',
-        'lifinityNftAccount',
-        'lifinityNftMetaAccount',
+        'Amm',
+        'Authority',
+        'User Transfer Authority',
+        'Source A Info',
+        'Source B Info',
+        'Token A',
+        'Token B',
+        'Pool Mint',
+        'Destination',
+        'Token Program',
+        'Config Account',
+        'Holder Account Info',
+        'Lifinity Nft Account',
+        'Lifinity Nft MetaAccount',
       ],
       getDataUI: async (
         connection: Connection,
@@ -36,13 +37,7 @@ export const LIFINITY_PROGRAM_INSTRUCTIONS = {
       ) => {
         const dataLayout = struct([
           u8('instruction'),
-          u8('SIGHASH_1'),
-          u8('SIGHASH_2'),
-          u8('SIGHASH_3'),
-          u8('SIGHASH_4'),
-          u8('SIGHASH_5'),
-          u8('SIGHASH_6'),
-          u8('SIGHASH_7'),
+          ...ANCHOR_DISCRIMINATOR_LAYOUT,
           nu64('poolTokenAmount'),
           nu64('maximumTokenAAmount'),
           nu64('maximumTokenBAmount'),
@@ -68,17 +63,20 @@ export const LIFINITY_PROGRAM_INSTRUCTIONS = {
           poolTokenAmount,
         } = dataLayout.decode(Buffer.from(data)) as any;
 
-        const uiAmountTokenA = new BigNumber(maximumTokenAAmount)
-          .shiftedBy(-mintInfoTokenA.account.decimals)
-          .toString();
+        const uiAmountTokenA = nativeAmountToFormattedUiAmount(
+          maximumTokenAAmount,
+          mintInfoTokenA.account.decimals,
+        );
 
-        const uiAmountTokenB = new BigNumber(maximumTokenBAmount)
-          .shiftedBy(-mintInfoTokenB.account.decimals)
-          .toString();
+        const uiAmountTokenB = nativeAmountToFormattedUiAmount(
+          maximumTokenBAmount,
+          mintInfoTokenB.account.decimals,
+        );
 
-        const uiAmountTokenLP = new BigNumber(poolTokenAmount)
-          .shiftedBy(-lpMintInfo.account.decimals)
-          .toString();
+        const uiAmountTokenLP = nativeAmountToFormattedUiAmount(
+          poolTokenAmount,
+          lpMintInfo.account.decimals,
+        );
 
         const poolLabel = getPoolNameByPoolTokenMint(lpMint);
 
@@ -95,17 +93,17 @@ export const LIFINITY_PROGRAM_INSTRUCTIONS = {
     [InstructionsCodes.WithdrawAllTokenTypes]: {
       name: 'Lifinity - Withdraw All Token Types',
       accounts: [
-        'amm',
-        'authority',
-        'userTransferAuthority',
-        'source',
-        'tokenA',
-        'tokenB',
-        'poolMint',
-        'destTokenAInfo',
-        'destTokenBInfo',
-        'feeAccount',
-        'tokenProgram',
+        'Amm',
+        'Authority',
+        'User Transfer Authority',
+        'Source',
+        'Token A',
+        'Token B',
+        'Pool Mint',
+        'Dest Token A Info',
+        'Dest Token B Info',
+        'Fee Account',
+        'Token Program',
       ],
       getDataUI: async (
         connection: Connection,
@@ -114,13 +112,7 @@ export const LIFINITY_PROGRAM_INSTRUCTIONS = {
       ) => {
         const dataLayout = struct([
           u8('instruction'),
-          u8('SIGHASH_1'),
-          u8('SIGHASH_2'),
-          u8('SIGHASH_3'),
-          u8('SIGHASH_4'),
-          u8('SIGHASH_5'),
-          u8('SIGHASH_6'),
-          u8('SIGHASH_7'),
+          ...ANCHOR_DISCRIMINATOR_LAYOUT,
           nu64('poolTokenAmount'),
           nu64('minimumTokenAAmount'),
           nu64('minimumTokenBAmount'),
@@ -146,17 +138,20 @@ export const LIFINITY_PROGRAM_INSTRUCTIONS = {
           poolTokenAmount,
         } = dataLayout.decode(Buffer.from(data)) as any;
 
-        const uiAmountTokenA = new BigNumber(minimumTokenAAmount)
-          .shiftedBy(-mintInfoTokenA.account.decimals)
-          .toString();
+        const uiAmountTokenA = nativeAmountToFormattedUiAmount(
+          minimumTokenAAmount,
+          mintInfoTokenA.account.decimals,
+        );
 
-        const uiAmountTokenB = new BigNumber(minimumTokenBAmount)
-          .shiftedBy(-mintInfoTokenB.account.decimals)
-          .toString();
+        const uiAmountTokenB = nativeAmountToFormattedUiAmount(
+          minimumTokenBAmount,
+          mintInfoTokenB.account.decimals,
+        );
 
-        const uiAmountTokenLP = new BigNumber(poolTokenAmount)
-          .shiftedBy(-lpMintInfo.account.decimals)
-          .toString();
+        const uiAmountTokenLP = nativeAmountToFormattedUiAmount(
+          poolTokenAmount,
+          lpMintInfo.account.decimals,
+        );
 
         return (
           <>

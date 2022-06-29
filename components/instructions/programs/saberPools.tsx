@@ -1,8 +1,8 @@
-import BigNumber from 'bignumber.js';
 import { nu64, struct, u8 } from 'buffer-layout';
 import { AccountMetaData } from '@solana/spl-governance';
 import { Connection } from '@solana/web3.js';
 import saberPoolsConfiguration from '@tools/sdk/saberPools/configuration';
+import { nativeAmountToFormattedUiAmount } from '@tools/sdk/units';
 
 export const SABER_POOLS_PROGRAM_INSTRUCTIONS = {
   [saberPoolsConfiguration.saberStableSwapProgramId.toBase58()]: {
@@ -24,7 +24,6 @@ export const SABER_POOLS_PROGRAM_INSTRUCTIONS = {
         data: Uint8Array,
         accounts: AccountMetaData[],
       ) => {
-        const owner = accounts[2].pubkey.toString();
         const sourceA = accounts[3].pubkey.toString();
         const sourceB = accounts[4].pubkey.toString();
         const tokenAccountA = accounts[5].pubkey;
@@ -50,25 +49,18 @@ export const SABER_POOLS_PROGRAM_INSTRUCTIONS = {
           Buffer.from(data),
         ) as any;
 
-        const uiTokenAmountA = Number(
-          new BigNumber(tokenAmountA)
-            .shiftedBy(-pool.tokenAccountA.decimals)
-            .toString(),
-        ).toLocaleString();
+        const uiTokenAmountA = nativeAmountToFormattedUiAmount(
+          tokenAmountA,
+          pool.tokenAccountA.decimals,
+        );
 
-        const uiTokenAmountB = Number(
-          new BigNumber(tokenAmountB)
-            .shiftedBy(-pool.tokenAccountB.decimals)
-            .toString(),
-        ).toLocaleString();
+        const uiTokenAmountB = nativeAmountToFormattedUiAmount(
+          tokenAmountB,
+          pool.tokenAccountB.decimals,
+        );
 
         return (
           <div className="flex flex-col">
-            <div className="flex">
-              <span>Owner:</span>
-              <span>{owner}</span>
-            </div>
-
             <div className="flex">
               <span>From {pool.tokenAccountA.name} Account:</span>
               <span>{sourceA}</span>
@@ -143,17 +135,15 @@ export const SABER_POOLS_PROGRAM_INSTRUCTIONS = {
           Buffer.from(data),
         ) as any;
 
-        const uiPoolTokenAmount = Number(
-          new BigNumber(poolTokenAmount)
-            .shiftedBy(-pool.poolToken.decimals)
-            .toString(),
-        ).toLocaleString();
+        const uiPoolTokenAmount = nativeAmountToFormattedUiAmount(
+          poolTokenAmount,
+          pool.poolToken.decimals,
+        );
 
-        const uiMinimumTokenAmount = Number(
-          new BigNumber(minimumTokenAmount)
-            .shiftedBy(-baseTokenAccountInfo.decimals)
-            .toString(),
-        ).toLocaleString();
+        const uiMinimumTokenAmount = nativeAmountToFormattedUiAmount(
+          minimumTokenAmount,
+          baseTokenAccountInfo.decimals,
+        );
 
         return (
           <div className="flex flex-col">

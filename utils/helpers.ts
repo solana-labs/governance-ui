@@ -1,3 +1,4 @@
+import { u8 } from 'buffer-layout';
 import { fetchGistFile } from './github';
 
 export function capitalize(str?: string) {
@@ -28,3 +29,6 @@ export async function resolveProposalDescription(descriptionLink: string) {
     return descriptionLink;
   }
 }
+
+// Anchor instruction adds a 7 byte discriminator prefix on instruction data
+export const ANCHOR_DISCRIMINATOR_LAYOUT = Array.from(new Array(7)).map(u8);

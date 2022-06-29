@@ -7,19 +7,20 @@ import { UXD_DECIMALS } from '@uxd-protocol/uxd-client';
 import { nativeAmountToFormattedUiAmount } from '@tools/sdk/units';
 import { BN } from '@project-serum/anchor';
 import { tryGetTokenMint } from '@utils/tokens';
+import { ANCHOR_DISCRIMINATOR_LAYOUT } from '@utils/helpers';
 
 export const UXD_PROGRAM_INSTRUCTIONS = {
   UXD8m9cvwk4RcSxnX2HZ9VudQCEeDH6fRnB4CAP57Dr: {
     137: {
       name: 'UXD - Initialize Controller',
       accounts: [
-        'authority',
-        'payer',
-        'controller',
-        'redeemableMint',
-        'systemProgram',
-        'tokenProgram',
-        'rent',
+        'Authority',
+        'Payer',
+        'Controller',
+        'Redeemable Mint',
+        'System Program',
+        'Token Program',
+        'Rent',
       ],
       getDataUI: (
         _connection: Connection,
@@ -28,20 +29,14 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
       ) => {
         const dataLayout = struct([
           u8('instruction'),
-          u8('SIGHASH_1'),
-          u8('SIGHASH_2'),
-          u8('SIGHASH_3'),
-          u8('SIGHASH_4'),
-          u8('SIGHASH_5'),
-          u8('SIGHASH_6'),
-          u8('SIGHASH_7'),
+          ...ANCHOR_DISCRIMINATOR_LAYOUT,
           u8('bump'),
           u8('redeemableBump'),
           u8('redeemableMintDecimals'),
         ]);
 
         const args = dataLayout.decode(Buffer.from(data)) as any;
-        console.log('args', args);
+
         return (
           <>
             <p>{`bump: ${args.bump}`}</p>
@@ -53,7 +48,7 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
     },
     45: {
       name: 'UXD - Set Redeemable Global Supply Cap',
-      accounts: ['authority', 'controller'],
+      accounts: ['Authority', 'Controller'],
       getDataUI: (
         _connection: Connection,
         data: Uint8Array,
@@ -61,17 +56,12 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
       ) => {
         const dataLayout = struct([
           u8('instruction'),
-          u8('SIGHASH_1'),
-          u8('SIGHASH_2'),
-          u8('SIGHASH_3'),
-          u8('SIGHASH_4'),
-          u8('SIGHASH_5'),
-          u8('SIGHASH_6'),
-          u8('SIGHASH_7'),
+          ...ANCHOR_DISCRIMINATOR_LAYOUT,
           u128('redeemableGlobalSupplyCap'),
         ]);
 
         const args = dataLayout.decode(Buffer.from(data)) as any;
+
         return (
           <>
             <p>{`Redeemable Global Supply Cap: ${nativeAmountToFormattedUiAmount(
@@ -84,7 +74,7 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
     },
     213: {
       name: 'UXD - Set Mango Depositories Redeemable Supply Soft Cap',
-      accounts: ['authority', 'controller'],
+      accounts: ['Authority', 'Controller'],
       getDataUI: (
         _connection: Connection,
         data: Uint8Array,
@@ -92,17 +82,11 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
       ) => {
         const dataLayout = struct([
           u8('instruction'),
-          u8('SIGHASH_1'),
-          u8('SIGHASH_2'),
-          u8('SIGHASH_3'),
-          u8('SIGHASH_4'),
-          u8('SIGHASH_5'),
-          u8('SIGHASH_6'),
-          u8('SIGHASH_7'),
+          ...ANCHOR_DISCRIMINATOR_LAYOUT,
           u128('softCap'),
         ]);
         const args = dataLayout.decode(Buffer.from(data)) as any;
-        console.log('args', args);
+
         return (
           <>
             <p>{`Redeemable Supply Soft Cap: ${nativeAmountToFormattedUiAmount(
@@ -116,20 +100,20 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
     133: {
       name: 'UXD - Register Mango Depository',
       accounts: [
-        'authority',
-        'payer',
-        'controller',
-        'depository',
-        'collateralMint', // BTC/ WSOL.....
-        'insuranceMint', // USDC
-        'depositoryCollateralPassthroughAccount',
-        'depositoryInsurancePassthroughAccount',
-        'depositoryMangoAccount',
-        'mangoGroup',
-        'rent',
-        'systemProgram',
-        'tokenProgram',
-        'mangoProgram',
+        'Authority',
+        'Payer',
+        'Controller',
+        'Depository',
+        'Collateral Mint', // BTC/ WSOL.....
+        'Insurance Mint', // USDC
+        'Depository Collateral Passthrough Account',
+        'Depository Insurance Passthrough Account',
+        'Depository Mango Account',
+        'Mango Group',
+        'Rent',
+        'System Program',
+        'Token Program',
+        'Mango Program',
       ],
       getDataUI: (
         _connection: Connection,
@@ -138,20 +122,14 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
       ) => {
         const dataLayout = struct([
           u8('instruction'),
-          u8('SIGHASH_1'),
-          u8('SIGHASH_2'),
-          u8('SIGHASH_3'),
-          u8('SIGHASH_4'),
-          u8('SIGHASH_5'),
-          u8('SIGHASH_6'),
-          u8('SIGHASH_7'),
+          ...ANCHOR_DISCRIMINATOR_LAYOUT,
           u8('bump'),
           u8('collateralPassthroughBump'),
           u8('insurancePassthroughBump'),
           u8('mangoAccountBump'),
         ]);
         const args = dataLayout.decode(Buffer.from(data)) as any;
-        console.log('args', args);
+
         return (
           <>
             <p>{`bump: ${args.bump.toString()}`}</p>
@@ -165,22 +143,22 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
     198: {
       name: 'UXD - Deposit Insurance To Mango Depository',
       accounts: [
-        'authority',
-        'controller',
-        'depository',
-        'insuranceMint',
-        'authorityInsurance',
-        'depositoryInsurancePassthroughAccount',
-        'depositoryMangoAccount',
+        'Authority',
+        'Controller',
+        'Depository',
+        'Insurance Mint',
+        'Authority Insurance',
+        'Depository Insurance Passthrough Account',
+        'Depository Mango Account',
         // mango accounts for CPI
-        'mangoGroup',
-        'mangoCache',
-        'mangoRootBank',
-        'mangoNodeBank',
-        'mangoVault',
+        'Mango Group',
+        'Mango Cache',
+        'Mango Root Bank',
+        'Mango Node Bank',
+        'Mango Vault',
         //
-        'tokenProgram',
-        'mangoProgram',
+        'Token Program',
+        'Mango Program',
       ],
       getDataUI: async (
         _connection: Connection,
@@ -189,18 +167,12 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
       ) => {
         const dataLayout = struct([
           u8('instruction'),
-          u8('SIGHASH_1'),
-          u8('SIGHASH_2'),
-          u8('SIGHASH_3'),
-          u8('SIGHASH_4'),
-          u8('SIGHASH_5'),
-          u8('SIGHASH_6'),
-          u8('SIGHASH_7'),
+          ...ANCHOR_DISCRIMINATOR_LAYOUT,
           u64('insuranceAmount'),
         ]);
 
         const args = dataLayout.decode(Buffer.from(data)) as any;
-        console.log('args', args);
+
         return (
           <>
             <p>{`Insurance Amount to deposit: ${nativeAmountToFormattedUiAmount(
@@ -214,22 +186,22 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
     227: {
       name: 'UXD - Withdraw Insurance From Mango Depository',
       accounts: [
-        'authority',
-        'controller',
-        'depository',
-        'collateralMint',
-        'quoteMint',
-        'authorityQuote',
-        'depositoryMangoAccount',
-        'mangoGroup',
-        'mangoCache',
-        'mangoSigner',
-        'mangoRootBank',
-        'mangoNodeBank',
-        'mangoVault',
-        'systemProgram',
-        'tokenProgram',
-        'mangoProgram',
+        'Authority',
+        'Controller',
+        'Depository',
+        'Collateral Mint',
+        'Quote Mint',
+        'Authority Quote',
+        'Depository Mango Account',
+        'Mango Group',
+        'Mango Cache',
+        'Mango Signer',
+        'Mango Root Bank',
+        'Mango Node Bank',
+        'Mango Vault',
+        'System Program',
+        'Token Program',
+        'Mango Program',
       ],
       getDataUI: async (
         connection: Connection,
@@ -238,13 +210,7 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
       ) => {
         const dataLayout = struct([
           u8('instruction'),
-          u8('SIGHASH_1'),
-          u8('SIGHASH_2'),
-          u8('SIGHASH_3'),
-          u8('SIGHASH_4'),
-          u8('SIGHASH_5'),
-          u8('SIGHASH_6'),
-          u8('SIGHASH_7'),
+          ...ANCHOR_DISCRIMINATOR_LAYOUT,
           nu64('insuranceAmount'),
         ]);
 

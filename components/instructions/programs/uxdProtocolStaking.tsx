@@ -4,23 +4,24 @@ import { AccountMetaData } from '@solana/spl-governance';
 import stakingConfiguration from '@tools/sdk/uxdProtocolStaking/configuration';
 import { tryGetMint, tryGetTokenMint } from '@utils/tokens';
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units';
+import { ANCHOR_DISCRIMINATOR_LAYOUT } from '@utils/helpers';
 
 const config = {
   [stakingConfiguration.instructionCodes.initializeStakingCampaign]: {
     name: 'UXD Staking - Initialize Staking Campaign',
     accounts: [
-      'authority',
-      'payer',
-      'stakingCampaign',
-      'rewardMint',
-      'stakedMint',
-      'rewardVault',
-      'stakedVault',
-      'authorityRewardAta',
-      'systemProgram',
-      'tokenProgram',
-      'associatedTokenProgram',
-      'rent',
+      'Authority',
+      'Payer',
+      'Staking Campaign',
+      'Reward Mint',
+      'Staked Mint',
+      'Reward Vault',
+      'Staked Vault',
+      'Authority Reward Ata',
+      'System Program',
+      'Token Program',
+      'Associated Token Program',
+      'Rent',
     ],
     getDataUI: async (
       connection: Connection,
@@ -31,22 +32,13 @@ const config = {
 
       const dataLayout = struct([
         u8('instruction'),
-        u8('SIGHASH_1'),
-        u8('SIGHASH_2'),
-        u8('SIGHASH_3'),
-        u8('SIGHASH_4'),
-        u8('SIGHASH_5'),
-        u8('SIGHASH_6'),
-        u8('SIGHASH_7'),
+        ...ANCHOR_DISCRIMINATOR_LAYOUT,
         nu64('startTs'),
         u8('optionEndTs'),
         ...(data.length === 33 ? [nu64('endTs')] : []),
         nu64('rewardDepositAmount'),
       ]);
 
-      const authority = accounts[0].pubkey;
-      const payer = accounts[1].pubkey;
-      const campaignPDA = accounts[2].pubkey;
       const rewardMint = accounts[3].pubkey;
       const stakedMint = accounts[4].pubkey;
 
@@ -73,9 +65,6 @@ const config = {
 
       return (
         <>
-          <p>{`authority: ${authority.toBase58()}`}</p>
-          <p>{`payer: ${payer.toBase58()}`}</p>
-          <p>{`campaign PDA: ${campaignPDA.toBase58()}`}</p>
           <p>{`start of the campaign: ${startDate}`}</p>
           <p>{`end of the campaign: ${endDate}`}</p>
           <p>{`reward deposit amount: ${rewardDepositAmountUi}`}</p>
@@ -88,11 +77,11 @@ const config = {
 
   [stakingConfiguration.instructionCodes.addStakingOption]: {
     name: 'UXD Staking - Add Staking Options',
-    accounts: ['authority', 'payer', 'stakingCampaign'],
+    accounts: ['Authority', 'Payer', 'Staking Campaign'],
     getDataUI: async (
       _connection: Connection,
       data: Uint8Array,
-      accounts: AccountMetaData[],
+      _accounts: AccountMetaData[],
     ) => {
       // 12 Byte is the header that is always there
       // 16 bytes = 8 for lockupSecs, 8 for apr
@@ -100,13 +89,7 @@ const config = {
 
       const dataLayout = struct([
         u8('instruction'),
-        u8('SIGHASH_1'),
-        u8('SIGHASH_2'),
-        u8('SIGHASH_3'),
-        u8('SIGHASH_4'),
-        u8('SIGHASH_5'),
-        u8('SIGHASH_6'),
-        u8('SIGHASH_7'),
+        ...ANCHOR_DISCRIMINATOR_LAYOUT,
         u32('nbOption'),
 
         ...Array.from(new Array(nbOptions)).reduce((acc, _, index) => {
@@ -114,24 +97,17 @@ const config = {
         }, []),
       ]);
 
-      const authority = accounts[0].pubkey;
-      const payer = accounts[1].pubkey;
-      const campaignPDA = accounts[2].pubkey;
-
       const args = dataLayout.decode(Buffer.from(data)) as any;
 
       return (
         <>
-          <p>{`authority: ${authority.toBase58()}`}</p>
-          <p>{`payer: ${payer.toBase58()}`}</p>
-          <p>{`campaign PDA: ${campaignPDA.toBase58()}`}</p>
-
           {Array.from(new Array(nbOptions)).map((_, index) => {
             return (
               <>
                 <p>{`option ${index + 1} lockup time in seconds: ${Number(
                   args[`lockupSecs${index}`],
                 ).toLocaleString()}`}</p>
+
                 <p>{`option ${index + 1} apr: ${
                   args[`apr${index}`] / (stakingConfiguration.APR_BASIS / 100)
                 }%`}</p>
@@ -145,28 +121,18 @@ const config = {
 
   [stakingConfiguration.instructionCodes.activateStakingOption]: {
     name: 'UXD Staking - Activate Staking Options',
-    accounts: ['authority', 'payer', 'stakingCampaign'],
+    accounts: ['Authority', 'Payer', 'Staking Campaign'],
     getDataUI: async (
       _connection: Connection,
       data: Uint8Array,
-      accounts: AccountMetaData[],
+      _accounts: AccountMetaData[],
     ) => {
       const dataLayout = struct([
         u8('instruction'),
-        u8('SIGHASH_1'),
-        u8('SIGHASH_2'),
-        u8('SIGHASH_3'),
-        u8('SIGHASH_4'),
-        u8('SIGHASH_5'),
-        u8('SIGHASH_6'),
-        u8('SIGHASH_7'),
+        ...ANCHOR_DISCRIMINATOR_LAYOUT,
         u8('stakingOptionIdentifier'),
         u8('activate'),
       ]);
-
-      const authority = accounts[0].pubkey;
-      const payer = accounts[1].pubkey;
-      const campaignPDA = accounts[2].pubkey;
 
       const args = dataLayout.decode(Buffer.from(data)) as any;
 
@@ -174,9 +140,6 @@ const config = {
 
       return (
         <>
-          <p>{`authority: ${authority.toBase58()}`}</p>
-          <p>{`payer: ${payer.toBase58()}`}</p>
-          <p>{`campaign PDA: ${campaignPDA.toBase58()}`}</p>
           <p>{`staking option identifier: ${stakingOptionIdentifier.toString()}`}</p>
           <p>{`status: ${activate === 0 ? 'DEACTIVATE' : 'ACTIVATE'}`}</p>
         </>
@@ -187,49 +150,35 @@ const config = {
   [stakingConfiguration.instructionCodes.finalizeStakingCampaign]: {
     name: 'UXD Staking - Finalize Staking Campaign',
     accounts: [
-      'authority',
-      'payer',
-      'stakingCampaign',
-      'rewardMint',
-      'rewardVault',
-      'authorityRewardAta',
-      'systemProgram',
-      'tokenProgram',
-      'associatedTokenProgram',
-      'rent',
+      'Authority',
+      'Payer',
+      'Staking Campaign',
+      'Reward Mint',
+      'Reward Vault',
+      'Authority Reward Ata',
+      'System Program',
+      'Token Program',
+      'Associated Token Program',
+      'Rent',
     ],
     getDataUI: async (
       _connection: Connection,
       _data: Uint8Array,
-      accounts: AccountMetaData[],
+      _accounts: AccountMetaData[],
     ) => {
-      const authority = accounts[0].pubkey;
-      const payer = accounts[1].pubkey;
-      const campaignPDA = accounts[2].pubkey;
-      const rewardMint = accounts[3].pubkey;
-      const rewardVault = accounts[4].pubkey;
-
-      return (
-        <>
-          <p>{`authority: ${authority.toBase58()}`}</p>
-          <p>{`payer: ${payer.toBase58()}`}</p>
-          <p>{`campaign PDA: ${campaignPDA.toBase58()}`}</p>
-          <p>{`reward mint: ${rewardMint.toBase58()}`}</p>
-          <p>{`reward vault: ${rewardVault.toBase58()}`}</p>
-        </>
-      );
+      return null;
     },
   },
 
   [stakingConfiguration.instructionCodes.refillRewardVault]: {
     name: 'UXD Staking - Refill Reward Vault',
     accounts: [
-      'authority',
-      'payer',
-      'stakingCampaign',
-      'rewardVault',
-      'authorityRewardAta',
-      'tokenProgram',
+      'Authority',
+      'Payer',
+      'Staking Campaign',
+      'Reward Vault',
+      'Authority Reward Ata',
+      'Token Program',
     ],
     getDataUI: async (
       connection: Connection,
@@ -238,21 +187,11 @@ const config = {
     ) => {
       const dataLayout = struct([
         u8('instruction'),
-        u8('SIGHASH_1'),
-        u8('SIGHASH_2'),
-        u8('SIGHASH_3'),
-        u8('SIGHASH_4'),
-        u8('SIGHASH_5'),
-        u8('SIGHASH_6'),
-        u8('SIGHASH_7'),
+        ...ANCHOR_DISCRIMINATOR_LAYOUT,
         nu64('rewardRefillAmount'),
       ]);
 
-      const authority = accounts[0].pubkey;
-      const payer = accounts[1].pubkey;
-      const campaignPDA = accounts[2].pubkey;
       const rewardVault = accounts[3].pubkey;
-      const authorityRewardAta = accounts[4].pubkey;
 
       const args = dataLayout.decode(Buffer.from(data)) as any;
 
@@ -274,11 +213,6 @@ const config = {
 
       return (
         <>
-          <p>{`authority: ${authority.toBase58()}`}</p>
-          <p>{`payer: ${payer.toBase58()}`}</p>
-          <p>{`reward vault: ${rewardVault.toBase58()}`}</p>
-          <p>{`authority reward ATA: ${authorityRewardAta.toBase58()}`}</p>
-          <p>{`campaign PDA: ${campaignPDA.toBase58()}`}</p>
           <p>{`reward refill amount: ${rewardRefillAmountUi}`}</p>
         </>
       );

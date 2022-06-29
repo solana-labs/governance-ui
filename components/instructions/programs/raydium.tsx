@@ -10,18 +10,18 @@ const RAYDIUM_AMM_INSTRUCTIONS = {
       name: 'Raydium: Add Liquidity',
       accounts: [
         { name: 'Token Program' },
-        { name: 'ammId' },
-        { name: 'ammAuthority' },
-        { name: 'ammOpenOrders' },
-        { name: 'ammTargetOrders' },
-        { name: 'lpMintAddress' },
-        { name: 'poolCoinTokenAccount' },
-        { name: 'poolPcTokenAccount' },
-        { name: 'serumMarket' },
-        { name: 'userCoinTokenAccount' },
-        { name: 'userPcTokenAccount' },
-        { name: 'userLpTokenAccount' },
-        { name: 'userOwner' },
+        { name: 'Amm Id' },
+        { name: 'Amm Authority' },
+        { name: 'Amm Open Orders' },
+        { name: 'Amm Target Orders' },
+        { name: 'Lp Mint Address' },
+        { name: 'Pool Coin Token Account' },
+        { name: 'Pool Pc Token Account' },
+        { name: 'Serum Market' },
+        { name: 'User Coin Token Account' },
+        { name: 'User Pc Token Account' },
+        { name: 'User Lp Token Account' },
+        { name: 'User Owner' },
       ],
       getDataUI: async (
         connection: Connection,
@@ -30,12 +30,12 @@ const RAYDIUM_AMM_INSTRUCTIONS = {
       ) => {
         const poolCoinMint = await tryGetTokenMint(
           connection,
-          accounts[6].pubkey, // poolCoinTokenAccount
+          accounts[6].pubkey, // Pool Coin Token Account
         );
 
         const poolPcMint = await tryGetTokenMint(
           connection,
-          accounts[7].pubkey, // poolPcTokenAccount
+          accounts[7].pubkey, // Pool Pc Token Account
         );
 
         const dataLayout = struct([
@@ -70,18 +70,18 @@ const RAYDIUM_STAKING_INSTRUCTIONS = {
     1: {
       name: 'Raydium: Deposit',
       accounts: [
-        { name: 'poolId' },
-        { name: 'poolAuthority' },
-        { name: 'userInfoAccount' },
-        { name: 'userOwner' },
-        { name: 'userLpTokenAccount' },
-        { name: 'poolLpTokenAccount' },
-        { name: 'userRewardTokenAccount' },
-        { name: 'poolRewardTokenAccount' },
+        { name: 'Pool Id' },
+        { name: 'Pool Authority' },
+        { name: 'User Info Account' },
+        { name: 'User Owner' },
+        { name: 'User Lp Token Account' },
+        { name: 'Pool Lp Token Account' },
+        { name: 'User Reward Token Account' },
+        { name: 'Pool Reward Token Account' },
         { name: 'Sysvar: Clock' },
         { name: 'Token Program' },
-        { name: 'userRewardTokenAccountB' },
-        { name: 'poolRewardTokenAccountB' },
+        { name: 'User Reward Token Account B' },
+        { name: 'Pool Reward Token Account B' },
       ],
       getDataUI: async (
         connection: Connection,
@@ -90,7 +90,7 @@ const RAYDIUM_STAKING_INSTRUCTIONS = {
       ) => {
         const lpTokenMint = await tryGetTokenMint(
           connection,
-          accounts[4].pubkey, // userLpTokenAccount
+          accounts[4].pubkey, // User Lp Token Account
         );
         const dataLayout = struct([u8('instruction'), nu64('amount')]);
 
