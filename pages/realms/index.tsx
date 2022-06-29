@@ -64,7 +64,7 @@ const Realms = () => {
         let message = err.message
 
         if (err.name === 'WalletNotReadyError') {
-          message = 'You need to connect a wallet to continue'
+          message = 'You must connect a wallet to create a DAO'
         }
 
         return notify({ message, type: 'error' })
