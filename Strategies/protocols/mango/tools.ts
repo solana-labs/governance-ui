@@ -7,10 +7,23 @@ import {
   MangoAccount,
 } from '@blockworks-foundation/mango-client'
 import {
+  closeAccount,
+  initializeAccount,
+  WRAPPED_SOL_MINT,
+} from '@project-serum/serum/lib/token-instructions'
+import {
   getInstructionDataFromBase64,
   getNativeTreasuryAddress,
   serializeInstructionToBase64,
+  TOKEN_PROGRAM_ID,
 } from '@solana/spl-governance'
+import {
+  Keypair,
+  LAMPORTS_PER_SOL,
+  SystemProgram,
+  TransactionInstruction,
+} from '@solana/web3.js'
+import { syncNative } from '@solendprotocol/solend-sdk'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { ConnectionContext } from '@utils/connection'
 import tokenService from '@utils/services/token'
@@ -19,6 +32,7 @@ import {
   InstructionDataWithHoldUpTime,
 } from 'actions/createProposal'
 import axios from 'axios'
+import BigNumber from 'bignumber.js'
 import { MarketStore } from 'Strategies/store/marketStore'
 import {
   TreasuryStrategy,
@@ -170,6 +184,9 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
     matchedTreasury.extensions.mint?.account,
     new BN(form.mintAmount)
   )
+  const decimalAmount = new BigNumber(form.mintAmount)
+    .shiftedBy(-matchedTreasury.extensions.mint!.account.decimals)
+    .toNumber()
   const group = market!.group!
   const groupConfig = market!.groupConfig!
   const rootBank = group.tokens.find(
@@ -193,12 +210,59 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
         groupConfig.mangoProgramId
       )
     )[0]
-
   const solAddress = await getNativeTreasuryAddress(
     realm!.owner,
     matchedTreasury!.governance!.pubkey
   )
-
+  let wrappedSolAccount: null | Keypair = null
+  const insts: InstructionDataWithHoldUpTime[] = []
+  const localPrequisteInstructions: TransactionInstruction[] = []
+  if (matchedTreasury.isSol) {
+    wrappedSolAccount = new Keypair()
+    const lamports = decimalAmount * LAMPORTS_PER_SOL
+    const space = 165
+    const rent = await rpcContext.connection.getMinimumBalanceForRentExemption(
+      space,
+      'processed'
+    )
+    localPrequisteInstructions.push(
+      SystemProgram.createAccount({
+        fromPubkey: rpcContext.wallet.publicKey!,
+        newAccountPubkey: wrappedSolAccount?.publicKey,
+        lamports: rent,
+        space: space,
+        programId: TOKEN_PROGRAM_ID,
+      }),
+      initializeAccount({
+        account: wrappedSolAccount?.publicKey,
+        mint: WRAPPED_SOL_MINT,
+        owner: matchedTreasury.governance.pubkey!,
+      })
+    )
+    const transferIx = SystemProgram.transfer({
+      fromPubkey: matchedTreasury.extensions.transferAddress!,
+      toPubkey: wrappedSolAccount!.publicKey!,
+      lamports: lamports,
+    })
+    const instructionData = {
+      data: getInstructionDataFromBase64(
+        serializeInstructionToBase64(transferIx)
+      ),
+      holdUpTime: matchedTreasury.governance!.account!.config
+        .minInstructionHoldUpTime,
+      prerequisiteInstructions: [...localPrequisteInstructions],
+      prerequisiteInstructionsSigners: [wrappedSolAccount],
+    }
+    insts.push(instructionData)
+    const syncIx = syncNative(wrappedSolAccount.publicKey!)
+    const syncInst = {
+      data: getInstructionDataFromBase64(serializeInstructionToBase64(syncIx)),
+      holdUpTime: matchedTreasury.governance!.account!.config
+        .minInstructionHoldUpTime,
+      prerequisiteInstructions: [],
+    }
+    insts.push(syncInst)
+  }
   const depositMangoAccountInsObj = {
     data: getInstructionDataFromBase64(
       serializeInstructionToBase64(
@@ -213,7 +277,8 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
           quoteRootBank!.publicKey,
           quoteNodeBank!.publicKey,
           quoteNodeBank!.vault,
-          matchedTreasury.extensions.transferAddress!,
+          wrappedSolAccount?.publicKey ??
+            matchedTreasury.extensions.transferAddress!,
           new BN(form.mintAmount)
         )
       )
@@ -223,7 +288,6 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
     prerequisiteInstructions: [],
     chunkSplitByDefault: true,
   }
-  const insts: InstructionDataWithHoldUpTime[] = []
   if (!form.mangoAccountPk) {
     const createMangoAccountIns = makeCreateMangoAccountInstruction(
       groupConfig.mangoProgramId,
@@ -264,6 +328,24 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
     insts.push(instructionData)
   }
   insts.push(depositMangoAccountInsObj)
+  if (wrappedSolAccount) {
+    const instructionData = {
+      data: getInstructionDataFromBase64(
+        serializeInstructionToBase64(
+          closeAccount({
+            source: wrappedSolAccount.publicKey,
+            destination: matchedTreasury.extensions.transferAddress,
+            owner: matchedTreasury.governance.pubkey,
+          })
+        )
+      ),
+      holdUpTime: matchedTreasury.governance!.account!.config
+        .minInstructionHoldUpTime,
+      prerequisiteInstructions: [],
+      splitToChunkByDefault: true,
+    }
+    insts.push(instructionData)
+  }
   const proposalAddress = await createProposal(
     rpcContext,
     realm,
@@ -314,3 +396,41 @@ export const tryGetMangoAccountsForOwner = async (
     return null
   }
 }
+
+export const ASSET_TYPE = [
+  {
+    name: 'Token',
+    value: 0,
+  },
+  {
+    name: 'Perp',
+    value: 1,
+  },
+]
+
+export const MARKET_MODE = [
+  {
+    name: 'Default',
+    value: 0,
+  },
+  {
+    name: 'Active',
+    value: 1,
+  },
+  {
+    name: 'Close Only',
+    value: 2,
+  },
+  {
+    name: 'Force Close Only',
+    value: 3,
+  },
+  {
+    name: 'Inactive',
+    value: 4,
+  },
+  {
+    name: 'Swapping Spot Market',
+    value: 5,
+  },
+]

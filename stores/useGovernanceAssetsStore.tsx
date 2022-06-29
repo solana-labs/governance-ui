@@ -31,6 +31,7 @@ import { ConnectionContext } from '@utils/connection'
 import axios from 'axios'
 import {
   AccountType,
+  AccountTypeGeneric,
   AccountTypeAuxiliaryToken,
   AccountTypeMint,
   AccountTypeNFT,
@@ -98,6 +99,7 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
     const accounts = governancesArray.length
       ? await getAccountsForGovernances(connection, realm, governancesArray)
       : []
+
     set((s) => {
       s.governancesArray = governancesArray
       s.loadGovernedAccounts = false
@@ -116,9 +118,11 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
     set((s) => {
       s.loadGovernedAccounts = false
     })
+
     const governancesArray = _get().governancesArray.filter(
       (x) => x.pubkey.toBase58() === governancePk.toBase58()
     )
+
     const previousAccounts = _get().assetAccounts.filter(
       (x) => x.governance?.pubkey.toBase58() !== governancePk.toBase58()
     )
@@ -298,6 +302,19 @@ const getProgramAssetAccounts = (
   return accounts
 }
 
+const getGenericAssetAccounts = (
+  genericGovernances: ProgramAccount<Governance>[]
+) => {
+  const accounts: AccountTypeGeneric[] = []
+  genericGovernances.forEach((programGov) => {
+    const account = new AccountTypeGeneric(programGov)
+    if (account) {
+      accounts.push(account)
+    }
+  })
+  return accounts
+}
+
 const getGovernancesByAccountTypes = (
   governancesArray: ProgramAccount<Governance>[],
   types: GovernanceAccountType[]
@@ -374,6 +391,9 @@ const getAccountsForGovernances = async (
     GovernanceAccountType.ProgramGovernanceV1,
     GovernanceAccountType.ProgramGovernanceV2,
   ])
+
+  const genericGovernances = getGenericAssetAccounts(governancesArray)
+
   const mintGovernancesMintInfo = await getMultipleAccountInfoChunked(
     connection.current,
     mintGovernances.map((x) => x.account.governedAccount)
@@ -463,6 +483,7 @@ const getAccountsForGovernances = async (
         return { publicKey, account }
       })
     : []
+
   const tokenAssetAccounts = await getTokenAssetAccounts(
     tokenAccountsParsed,
     governancesArray,
@@ -475,7 +496,12 @@ const getAccountsForGovernances = async (
       .filter((x) => x.extensions.mint?.publicKey)
       .map((x) => x.extensions.mint!.publicKey.toBase58())
   )
-  return [...mintAccounts, ...programAccounts, ...governedTokenAccounts]
+  return [
+    ...mintAccounts,
+    ...programAccounts,
+    ...governedTokenAccounts,
+    ...genericGovernances,
+  ]
 }
 
 const getMintAccountsInfo = async (
@@ -561,6 +587,8 @@ const filterOutHiddenAccs = (x: AssetAccount) => {
   const pubkey = typeof x.pubkey === 'string' ? x.pubkey : x.pubkey.toBase58()
   return (
     HIDDEN_TREASURES.findIndex((x) => x === pubkey) === -1 &&
-    (!x.extensions.token || !x.extensions.token?.account.isFrozen)
+    (!x.extensions.token ||
+      !x.extensions.token?.account.isFrozen ||
+      x.type !== AccountType.GENERIC)
   )
 }
