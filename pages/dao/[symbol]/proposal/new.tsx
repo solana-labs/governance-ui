@@ -32,6 +32,7 @@ import InstructionsForm from '@components/InstructionsForm';
 import GovernedAccountSelect from './components/GovernedAccountSelect';
 import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts';
 import { GovernedMultiTypeAccount } from '@utils/tokens';
+import DryRunInstructionsBtn from './components/DryRunInstructionsBtn';
 
 type Form = {
   title: string;
@@ -293,6 +294,10 @@ const New = () => {
             >
               Save draft
             </SecondaryButton>
+
+            <DryRunInstructionsBtn
+              getFormInstructionsData={getFormInstructionsData}
+            />
 
             <Button
               isLoading={isLoadingSignedProposal}
