@@ -442,7 +442,8 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
           isDraft: false,
         })
         const url = fmtUrlWithCluster(
-          `/dao/${symbol}/proposal/${proposalAddress}`
+          `/dao/${symbol}/proposal/${proposalAddress}`,
+          true
         )
 
         router.push(url)
