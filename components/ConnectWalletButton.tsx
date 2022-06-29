@@ -23,6 +23,7 @@ import {
 } from '../utils/wallet-adapters'
 import Switch from './Switch'
 import { TwitterIcon } from './icons'
+import { notify } from '@utils/notifications'
 
 const StyledWalletProviderLabel = styled.p`
   font-size: 0.65rem;
@@ -78,7 +79,13 @@ const ConnectWalletButton = (props) => {
       } else {
         await current?.connect()
       }
-    } catch (e) {
+    } catch (e: any) {
+      if (e.name === 'WalletNotReadyError') {
+        notify({
+          type: 'error',
+          message: 'You must have a wallet installed to connect',
+        })
+      }
       console.warn('handleConnectDisconnect', e)
     }
   }
