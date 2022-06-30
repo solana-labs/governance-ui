@@ -344,6 +344,7 @@ export enum Instructions {
   MangoCreatePerpMarket,
   MangoSetMarketMode,
   MangoChangeQuoteParams,
+  MangoRemoveSpotMarket,
   Grant,
   Clawback,
   CreateAssociatedTokenAccount,
