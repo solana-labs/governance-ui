@@ -450,7 +450,6 @@ export function useVotingPlugins() {
   ])
 
   useEffect(() => {
-
     if (
       currentPluginPk &&
       switchboardPluginsPks.includes(currentPluginPk.toBase58())

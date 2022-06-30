@@ -312,6 +312,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
     },
     {
+      id: Instructions.MangoRemovePerpMarket,
+      name: 'Mango: Remove Perp Market',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
       id: Instructions.DepositIntoVolt,
       name: 'Friktion: Deposit into Volt',
       isVisible: canUseAnyInstruction,

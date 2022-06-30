@@ -26,7 +26,7 @@ import InstructionForm, {
   InstructionInputType,
 } from '../FormCreator'
 
-const MakeRemoveSpotMarket = ({
+const MakeRemovePerpMarket = ({
   index,
   governance,
 }: {
@@ -44,8 +44,10 @@ const MakeRemoveSpotMarket = ({
   const [form, setForm] = useState<MangoRemovePerpMarketForm>({
     governedAccount: null,
     mangoGroup: null,
-    marketIndex: null,
+    marketPk: null,
     adminPk: '',
+    mngoDaoVaultPk: '',
+    mngoVaultPk: null,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -75,7 +77,7 @@ const MakeRemoveSpotMarket = ({
         groupConfig.mangoProgramId,
         new PublicKey(form.mangoGroup!.value),
         new PublicKey(form.adminPk),
-        new BN(form.marketIndex!.value),
+        new BN(form.marketPk!.value),
         0,
         0
       )
@@ -121,7 +123,7 @@ const MakeRemoveSpotMarket = ({
       ? currentMangoGroup['perpMarkets'].map((x) => {
           return {
             name: x.name,
-            value: x.marketIndex,
+            value: x.publicKey,
           }
         })
       : []
@@ -146,10 +148,10 @@ const MakeRemoveSpotMarket = ({
       }),
     },
     {
-      label: 'Market index',
-      initialValue: form.marketIndex,
+      label: 'Market',
+      initialValue: form.marketPk,
       type: InstructionInputType.SELECT,
-      name: 'marketIndex',
+      name: 'marketPk',
       options: getOptionsForMarketIndex(),
     },
     {
@@ -157,6 +159,19 @@ const MakeRemoveSpotMarket = ({
       initialValue: form.adminPk,
       type: InstructionInputType.INPUT,
       name: 'adminPk',
+    },
+    {
+      label: 'Mango DAO Vault PublicKey',
+      initialValue: form.mngoDaoVaultPk,
+      type: InstructionInputType.INPUT,
+      name: 'mngoDaoVaultPk',
+    },
+    {
+      label: 'Mango vault',
+      initialValue: form.mngoVaultPk,
+      type: InstructionInputType.SELECT,
+      name: 'mngoVaultPk',
+      options: [],
     },
   ]
 
@@ -175,4 +190,4 @@ const MakeRemoveSpotMarket = ({
   )
 }
 
-export default MakeRemoveSpotMarket
+export default MakeRemovePerpMarket
