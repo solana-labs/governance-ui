@@ -4,6 +4,7 @@ import { tvl } from 'Strategies/protocols/mango/tools'
 import { getSolendStrategies } from 'Strategies/protocols/solend'
 import { TreasuryStrategy } from 'Strategies/types/types'
 import create, { State } from 'zustand'
+import { getEverlendStrategies } from '../protocols/everlend/tools'
 
 interface StrategiesStore extends State {
   strategies: TreasuryStrategy[]
@@ -21,9 +22,10 @@ const useStrategiesStore = create<StrategiesStore>((set, _get) => ({
     try {
       const mango = await tvl(Date.now() / 1000, connection)
       const solend = await getSolendStrategies()
+      const everlend = await getEverlendStrategies(connection)
 
       //add fetch functions for your protocol in promise.all
-      const strategies: TreasuryStrategy[] = [...solend, ...mango]
+      const strategies: TreasuryStrategy[] = [...solend, ...mango, ...everlend]
 
       set((s) => {
         s.strategies = strategies
