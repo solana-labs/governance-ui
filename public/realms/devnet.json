@@ -178,5 +178,14 @@
     "realmId": "Bi65vLgphakAdFTZj6pUWweNaYaviPtSDf5VJ3WD6YL",
     "ogImage": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/AXY11ExJToaGPKp7BmGjkzitfs1ta7cmjJn58Pn2t3Z1/logo.jpg",
     "website": "https://axy.network/"
+  },
+  {
+    "symbol": "YMDAO",
+    "displayName": "Yellow Man DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "8PdjmsN5qvSnJtJ7bTQbGkZtuHmSBeQ6ESnrHdUx3bZ",
+    "website": "https://yellowman.vercel.app/",
+    "keywords": "YELLOW MAN",
+    "ogImage": "/realms/YMDAO/img/ymdaologo.png"
   }
 ]
