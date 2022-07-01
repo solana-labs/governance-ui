@@ -85,6 +85,8 @@ import MakeChangeQuoteParams from './components/instructions/Mango/MakeChangeQuo
 import TypeaheadSelect from '@components/TypeaheadSelect'
 import { StyledLabel } from '@components/inputs/styles'
 import classNames from 'classnames'
+import MakeRemoveSpotMarket from './components/instructions/Mango/MakeRemoveSpotMarket'
+import MakeRemovePerpMarket from './components/instructions/Mango/MakeRemovePerpMarket'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -477,6 +479,20 @@ const New = () => {
             index={idx}
             governance={governance}
           ></MakeSetMarketMode>
+        )
+      case Instructions.MangoRemoveSpotMarket:
+        return (
+          <MakeRemoveSpotMarket
+            index={idx}
+            governance={governance}
+          ></MakeRemoveSpotMarket>
+        )
+      case Instructions.MangoRemovePerpMarket:
+        return (
+          <MakeRemovePerpMarket
+            index={idx}
+            governance={governance}
+          ></MakeRemovePerpMarket>
         )
       case Instructions.ForesightInitMarket:
         return (

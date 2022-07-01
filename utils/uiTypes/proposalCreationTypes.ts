@@ -161,6 +161,22 @@ export interface MangoMakeSetMarketModeForm {
   adminPk: string
 }
 
+export interface MangoRemovePerpMarketForm {
+  governedAccount: AssetAccount | null
+  mangoGroup: NameValue | null
+  marketPk: NameValue | null
+  adminPk: string
+  mngoDaoVaultPk: string
+}
+
+export interface MangoRemoveSpotMarketForm {
+  governedAccount: AssetAccount | null
+  mangoGroup: NameValue | null
+  marketIndex: NameValue | null
+  adminPk: string
+  adminVaultPk: string
+}
+
 export interface MangoMakeAddSpotMarketForm {
   governedAccount: AssetAccount | undefined
   programId: string | undefined
@@ -344,6 +360,8 @@ export enum Instructions {
   MangoCreatePerpMarket,
   MangoSetMarketMode,
   MangoChangeQuoteParams,
+  MangoRemoveSpotMarket,
+  MangoRemovePerpMarket,
   Grant,
   Clawback,
   CreateAssociatedTokenAccount,
