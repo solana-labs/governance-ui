@@ -85,6 +85,15 @@ const MakeRemoveSpotMarket = ({
       )
       const marketIndex = Number(form.marketIndex!.value)
       const rootBanks = await group.loadRootBanks(connection.current)
+      console.log(
+        rootBanks[marketIndex]!.nodeBankAccounts.map((x) => {
+          return x.publicKey.toBase58() === emptyPk
+            ? new PublicKey(emptyPk)
+            : x.vault
+        })
+          .concat(new Array(7).fill(new PublicKey(emptyPk)))
+          .slice(0, 7)
+      )
       //Mango instruction call and serialize
       const removePerpMarketIx = makeRemoveSpotMarketInstruction(
         groupConfig.mangoProgramId,
@@ -100,6 +109,8 @@ const MakeRemoveSpotMarket = ({
             ? new PublicKey(emptyPk)
             : x.vault
         })
+          .concat(new Array(7).fill(new PublicKey(emptyPk)))
+          .slice(0, 8)
       )
 
       serializedInstruction = serializeInstructionToBase64(removePerpMarketIx)
