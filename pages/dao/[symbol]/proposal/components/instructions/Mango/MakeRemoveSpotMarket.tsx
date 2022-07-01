@@ -104,13 +104,7 @@ const MakeRemoveSpotMarket = ({
         new PublicKey(form.adminVaultPk),
         group.signerKey,
         rootBanks[marketIndex]!.nodeBanks,
-        rootBanks[marketIndex]!.nodeBankAccounts.map((x) => {
-          return x.publicKey.toBase58() === emptyPk
-            ? new PublicKey(emptyPk)
-            : x.vault
-        })
-          .concat(new Array(7).fill(new PublicKey(emptyPk)))
-          .slice(0, 8)
+        rootBanks[marketIndex]!.nodeBankAccounts.map((x) => x.vault)
       )
 
       serializedInstruction = serializeInstructionToBase64(removePerpMarketIx)
@@ -170,7 +164,7 @@ const MakeRemoveSpotMarket = ({
       name: 'governedAccount',
       type: InstructionInputType.GOVERNED_ACCOUNT,
       shouldBeGoverned: shouldBeGoverned as any,
-      governance: form.governedAccount?.governance,
+      governance: governance,
       options: governedProgramAccounts,
     },
     {
