@@ -297,34 +297,20 @@ export async function prepareRealmCreation({
     walletPk
   )
 
-  if (councilMintPk) {
-    if (councilMintHasMintAuthority) {
-      await withCreateMintGovernance(
-        realmInstructions,
-        programIdPk,
-        programVersion,
-        realmPk,
-        councilMintPk,
-        config,
-        transferCouncilMintAuthority,
-        walletPk,
-        PublicKey.default,
-        walletPk,
-        walletPk
-      )
-    } else {
-      await withCreateGovernance(
-        realmInstructions,
-        programIdPk,
-        programVersion,
-        realmPk,
-        councilMintPk,
-        config,
-        PublicKey.default,
-        walletPk,
-        walletPk
-      )
-    }
+  if (councilMintPk && councilMintHasMintAuthority) {
+    await withCreateMintGovernance(
+      realmInstructions,
+      programIdPk,
+      programVersion,
+      realmPk,
+      councilMintPk,
+      config,
+      transferCouncilMintAuthority,
+      walletPk,
+      PublicKey.default,
+      walletPk,
+      walletPk
+    )
   }
 
   // Set the community governance as the realm authority
