@@ -16,9 +16,9 @@ import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import {
   IDS,
-  makeSetMarketModeInstruction,
-  BN,
   Config,
+  MangoClient,
+  makeRemovePerpMarketInstruction,
 } from '@blockworks-foundation/mango-client'
 import { AccountType } from '@utils/uiTypes/assets'
 import InstructionForm, {
@@ -39,6 +39,7 @@ const MakeRemovePerpMarket = ({
   const governedProgramAccounts = assetAccounts.filter(
     (x) => x.type === AccountType.PROGRAM
   )
+  const connection = useWalletStore((s) => s.connection)
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<MangoRemovePerpMarketForm>({
@@ -72,17 +73,36 @@ const MakeRemovePerpMarket = ({
       const groupConfig = Config.ids().groups.find((c) =>
         c.publicKey.equals(new PublicKey(form.mangoGroup!.value))
       )!
+      const client = new MangoClient(
+        connection.current,
+        groupConfig.mangoProgramId
+      )
+      const perpMarketInfo = groupConfig.perpMarkets.find(
+        (x) => x.publicKey.toBase58() === form.marketPk?.value
+      )
+      const group = await client.getMangoGroup(groupConfig.publicKey)
+      const perpMarket = await group.loadPerpMarket(
+        connection.current,
+        perpMarketInfo!.marketIndex,
+        perpMarketInfo!.baseDecimals,
+        perpMarketInfo!.quoteDecimals
+      )
+
       //Mango instruction call and serialize
-      const addOracleIx = makeSetMarketModeInstruction(
+      const removePerpMarketIx = makeRemovePerpMarketInstruction(
         groupConfig.mangoProgramId,
         new PublicKey(form.mangoGroup!.value),
         new PublicKey(form.adminPk),
-        new BN(form.marketPk!.value),
-        0,
-        0
+        perpMarket.publicKey,
+        perpMarket.eventQueue,
+        perpMarket.bids,
+        perpMarket.asks,
+        perpMarket.mngoVault,
+        new PublicKey(form.mngoDaoVaultPk),
+        new PublicKey(form.adminPk)
       )
 
-      serializedInstruction = serializeInstructionToBase64(addOracleIx)
+      serializedInstruction = serializeInstructionToBase64(removePerpMarketIx)
     }
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
@@ -165,13 +185,6 @@ const MakeRemovePerpMarket = ({
       initialValue: form.mngoDaoVaultPk,
       type: InstructionInputType.INPUT,
       name: 'mngoDaoVaultPk',
-    },
-    {
-      label: 'Mango vault',
-      initialValue: form.mngoVaultPk,
-      type: InstructionInputType.SELECT,
-      name: 'mngoVaultPk',
-      options: [],
     },
   ]
 
