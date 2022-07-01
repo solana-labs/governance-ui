@@ -524,6 +524,27 @@ export const MANGO_INSTRUCTIONS = {
         )
       },
     },
+    69: {
+      name: 'Mango v3: Remove Perp Market',
+      accounts: {
+        0: { name: 'Mango Group' },
+        1: { name: 'Admin Pk' },
+        2: { name: 'Dust account' },
+        3: { name: 'Root Bank' },
+        4: { name: 'Admin vault' },
+        5: { name: 'Signer' },
+        6: { name: 'nodeBanks' },
+        7: { name: 'vaults' },
+      },
+      getDataUI: async (
+        _connection: Connection,
+        data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
+        console.log(data)
+        return <></>
+      },
+    },
   },
 }
 
