@@ -134,9 +134,9 @@ const MakeRemovePerpMarket = ({
   }, [JSON.stringify(form)])
   const schema = yup.object().shape({
     mangoGroup: yup.object().nullable().required('Mango group is required'),
-    marketPk: yup.object().nullable().required('Market index is required'),
+    marketPk: yup.object().nullable().required('Market pk is required'),
     adminPk: yup.string().required('Admin Pk is required'),
-    mngoDaoVaultPk: yup.string().required('Admin Pk is required'),
+    mngoDaoVaultPk: yup.string().required('Mango dao vault pk is required'),
     governedAccount: yup
       .object()
       .nullable()

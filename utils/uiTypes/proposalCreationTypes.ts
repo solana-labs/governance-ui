@@ -172,10 +172,9 @@ export interface MangoRemovePerpMarketForm {
 export interface MangoRemoveSpotMarketForm {
   governedAccount: AssetAccount | null
   mangoGroup: NameValue | null
-  marketPk: NameValue | null
+  marketIndex: NameValue | null
   adminPk: string
-  mngoDaoVaultPk: string
-  mngoVaultPk: NameValue | null
+  adminVaultPk: string
 }
 
 export interface MangoMakeAddSpotMarketForm {

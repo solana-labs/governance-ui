@@ -6,7 +6,7 @@ import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import {
   UiInstruction,
-  MangoRemovePerpMarketForm,
+  MangoRemoveSpotMarketForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -18,13 +18,15 @@ import {
   IDS,
   Config,
   MangoClient,
-  makeRemovePerpMarketInstruction,
+  makeRemoveSpotMarketInstruction,
 } from '@blockworks-foundation/mango-client'
 import { AccountType } from '@utils/uiTypes/assets'
 import InstructionForm, {
   InstructionInput,
   InstructionInputType,
 } from '../FormCreator'
+import { usePrevious } from '@hooks/usePrevious'
+import { emptyPk } from 'NftVotePlugin/sdk/accounts'
 
 const MakeRemoveSpotMarket = ({
   index,
@@ -42,12 +44,12 @@ const MakeRemoveSpotMarket = ({
   const connection = useWalletStore((s) => s.connection)
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<MangoRemovePerpMarketForm>({
+  const [form, setForm] = useState<MangoRemoveSpotMarketForm>({
     governedAccount: null,
     mangoGroup: null,
-    marketPk: null,
+    marketIndex: null,
     adminPk: '',
-    mngoDaoVaultPk: '',
+    adminVaultPk: '',
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -76,29 +78,28 @@ const MakeRemoveSpotMarket = ({
         connection.current,
         groupConfig.mangoProgramId
       )
-      const perpMarketInfo = groupConfig.perpMarkets.find(
-        (x) => x.publicKey.toBase58() === form.marketPk?.value
-      )
       const group = await client.getMangoGroup(groupConfig.publicKey)
-      const perpMarket = await group.loadPerpMarket(
-        connection.current,
-        perpMarketInfo!.marketIndex,
-        perpMarketInfo!.baseDecimals,
-        perpMarketInfo!.quoteDecimals
+      const [dustAccountPk] = await PublicKey.findProgramAddress(
+        [group.publicKey.toBytes(), Buffer.from('DustAccount', 'utf-8')],
+        groupConfig.mangoProgramId
       )
-
+      const marketIndex = Number(form.marketIndex!.value)
+      const rootBanks = await group.loadRootBanks(connection.current)
       //Mango instruction call and serialize
-      const removePerpMarketIx = makeRemovePerpMarketInstruction(
+      const removePerpMarketIx = makeRemoveSpotMarketInstruction(
         groupConfig.mangoProgramId,
-        new PublicKey(form.mangoGroup!.value),
+        groupConfig.publicKey,
         new PublicKey(form.adminPk),
-        perpMarket.publicKey,
-        perpMarket.eventQueue,
-        perpMarket.bids,
-        perpMarket.asks,
-        perpMarket.mngoVault,
-        new PublicKey(form.mngoDaoVaultPk),
-        new PublicKey(form.adminPk)
+        dustAccountPk,
+        rootBanks[marketIndex]!.publicKey,
+        new PublicKey(form.adminVaultPk),
+        group.signerKey,
+        rootBanks[marketIndex]!.nodeBanks,
+        rootBanks[marketIndex]!.nodeBankAccounts.map((x) => {
+          return x.publicKey.toBase58() === emptyPk
+            ? new PublicKey(emptyPk)
+            : x.vault
+        })
       )
 
       serializedInstruction = serializeInstructionToBase64(removePerpMarketIx)
@@ -110,25 +111,29 @@ const MakeRemoveSpotMarket = ({
     }
     return obj
   }
-  useEffect(() => {
-    handleSetForm({
-      propertyName: 'programId',
-      value: programId?.toString(),
-    })
-  }, [realmInfo?.programId])
-
+  const previousProgramGov = usePrevious(
+    form.governedAccount?.governance.pubkey.toBase58()
+  )
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
-  }, [form])
+    if (
+      form.governedAccount?.governance.pubkey.toBase58() !== form.adminPk &&
+      previousProgramGov !== form.governedAccount?.governance.pubkey.toBase58()
+    ) {
+      handleSetForm({
+        propertyName: 'adminPk',
+        value: form.governedAccount?.governance.pubkey.toBase58(),
+      })
+    }
+  }, [JSON.stringify(form)])
   const schema = yup.object().shape({
     mangoGroup: yup.object().nullable().required('Mango group is required'),
-    marketPk: yup.object().nullable().required('Market index is required'),
+    marketIndex: yup.object().nullable().required('Market index is required'),
     adminPk: yup.string().required('Admin Pk is required'),
-    mngoDaoVaultPk: yup.string().required('Admin Pk is required'),
-    dminPk: yup.string().required('Admin Pk is required'),
+    adminVaultPk: yup.string().required('Admin vault pk is required'),
     governedAccount: yup
       .object()
       .nullable()
@@ -139,17 +144,17 @@ const MakeRemoveSpotMarket = ({
       (x) => x.publicKey === form.mangoGroup?.value
     )!
     return form.mangoGroup
-      ? currentMangoGroup['perpMarkets'].map((x) => {
+      ? currentMangoGroup['spotMarkets'].map((x) => {
           return {
             name: x.name,
-            value: x.publicKey,
+            value: x.marketIndex,
           }
         })
       : []
   }
   const inputs: InstructionInput[] = [
     {
-      label: 'Governance',
+      label: 'Program',
       initialValue: form.governedAccount,
       name: 'governedAccount',
       type: InstructionInputType.GOVERNED_ACCOUNT,
@@ -168,9 +173,9 @@ const MakeRemoveSpotMarket = ({
     },
     {
       label: 'Market',
-      initialValue: form.marketPk,
+      initialValue: form.marketIndex,
       type: InstructionInputType.SELECT,
-      name: 'marketPk',
+      name: 'marketIndex',
       options: getOptionsForMarketIndex(),
     },
     {
@@ -180,10 +185,11 @@ const MakeRemoveSpotMarket = ({
       name: 'adminPk',
     },
     {
-      label: 'Mango DAO Vault PublicKey',
-      initialValue: form.mngoDaoVaultPk,
+      label:
+        'Mango DAO spot token account (ATA with same mint as removed spot)',
+      initialValue: form.adminVaultPk,
       type: InstructionInputType.INPUT,
-      name: 'mngoDaoVaultPk',
+      name: 'adminVaultPk',
     },
   ]
 
