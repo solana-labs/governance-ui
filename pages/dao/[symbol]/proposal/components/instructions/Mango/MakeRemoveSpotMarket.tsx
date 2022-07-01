@@ -185,8 +185,7 @@ const MakeRemoveSpotMarket = ({
       name: 'adminPk',
     },
     {
-      label:
-        'Mango DAO spot token account (ATA with same mint as removed spot)',
+      label: 'Mango DAO token account (ATA with same mint as removed market)',
       initialValue: form.adminVaultPk,
       type: InstructionInputType.INPUT,
       name: 'adminVaultPk',
