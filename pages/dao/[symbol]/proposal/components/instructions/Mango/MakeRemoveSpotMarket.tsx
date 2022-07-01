@@ -16,9 +16,9 @@ import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import {
   IDS,
-  makeSetMarketModeInstruction,
-  BN,
   Config,
+  MangoClient,
+  makeRemovePerpMarketInstruction,
 } from '@blockworks-foundation/mango-client'
 import { AccountType } from '@utils/uiTypes/assets'
 import InstructionForm, {
@@ -39,13 +39,15 @@ const MakeRemoveSpotMarket = ({
   const governedProgramAccounts = assetAccounts.filter(
     (x) => x.type === AccountType.PROGRAM
   )
+  const connection = useWalletStore((s) => s.connection)
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<MangoRemovePerpMarketForm>({
     governedAccount: null,
     mangoGroup: null,
-    marketIndex: null,
+    marketPk: null,
     adminPk: '',
+    mngoDaoVaultPk: '',
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -70,17 +72,36 @@ const MakeRemoveSpotMarket = ({
       const groupConfig = Config.ids().groups.find((c) =>
         c.publicKey.equals(new PublicKey(form.mangoGroup!.value))
       )!
+      const client = new MangoClient(
+        connection.current,
+        groupConfig.mangoProgramId
+      )
+      const perpMarketInfo = groupConfig.perpMarkets.find(
+        (x) => x.publicKey.toBase58() === form.marketPk?.value
+      )
+      const group = await client.getMangoGroup(groupConfig.publicKey)
+      const perpMarket = await group.loadPerpMarket(
+        connection.current,
+        perpMarketInfo!.marketIndex,
+        perpMarketInfo!.baseDecimals,
+        perpMarketInfo!.quoteDecimals
+      )
+
       //Mango instruction call and serialize
-      const addOracleIx = makeSetMarketModeInstruction(
+      const removePerpMarketIx = makeRemovePerpMarketInstruction(
         groupConfig.mangoProgramId,
         new PublicKey(form.mangoGroup!.value),
         new PublicKey(form.adminPk),
-        new BN(form.marketIndex!.value),
-        0,
-        0
+        perpMarket.publicKey,
+        perpMarket.eventQueue,
+        perpMarket.bids,
+        perpMarket.asks,
+        perpMarket.mngoVault,
+        new PublicKey(form.mngoDaoVaultPk),
+        new PublicKey(form.adminPk)
       )
 
-      serializedInstruction = serializeInstructionToBase64(addOracleIx)
+      serializedInstruction = serializeInstructionToBase64(removePerpMarketIx)
     }
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
@@ -104,10 +125,10 @@ const MakeRemoveSpotMarket = ({
   }, [form])
   const schema = yup.object().shape({
     mangoGroup: yup.object().nullable().required('Mango group is required'),
-    marketIndex: yup.object().nullable().required('Market index is required'),
+    marketPk: yup.object().nullable().required('Market index is required'),
     adminPk: yup.string().required('Admin Pk is required'),
-    marketMode: yup.object().nullable().required('Market Mode is required'),
-    marketType: yup.object().nullable().required('Market Type is required'),
+    mngoDaoVaultPk: yup.string().required('Admin Pk is required'),
+    dminPk: yup.string().required('Admin Pk is required'),
     governedAccount: yup
       .object()
       .nullable()
@@ -121,7 +142,7 @@ const MakeRemoveSpotMarket = ({
       ? currentMangoGroup['perpMarkets'].map((x) => {
           return {
             name: x.name,
-            value: x.marketIndex,
+            value: x.publicKey,
           }
         })
       : []
@@ -146,10 +167,10 @@ const MakeRemoveSpotMarket = ({
       }),
     },
     {
-      label: 'Market index',
-      initialValue: form.marketIndex,
+      label: 'Market',
+      initialValue: form.marketPk,
       type: InstructionInputType.SELECT,
-      name: 'marketIndex',
+      name: 'marketPk',
       options: getOptionsForMarketIndex(),
     },
     {
@@ -157,6 +178,12 @@ const MakeRemoveSpotMarket = ({
       initialValue: form.adminPk,
       type: InstructionInputType.INPUT,
       name: 'adminPk',
+    },
+    {
+      label: 'Mango DAO Vault PublicKey',
+      initialValue: form.mngoDaoVaultPk,
+      type: InstructionInputType.INPUT,
+      name: 'mngoDaoVaultPk',
     },
   ]
 

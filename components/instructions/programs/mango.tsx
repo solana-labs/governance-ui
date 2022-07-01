@@ -489,6 +489,41 @@ export const MANGO_INSTRUCTIONS = {
         )
       },
     },
+    68: {
+      name: 'Mango v3: Remove Perp Market',
+      accounts: {
+        0: { name: 'Mango Group' },
+        1: { name: 'Admin Pk' },
+        2: { name: 'Perp Market Pk' },
+        3: { name: 'Event Queue' },
+        4: { name: 'Bids' },
+        5: { name: 'Asks' },
+        6: { name: 'MNGO vault Pk' },
+        7: { name: 'Mango dao treasury vault' },
+        8: { name: 'Signer Pk' },
+      },
+      getDataUI: async (
+        _connection: Connection,
+        data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
+        const mangoGroup = IDS.groups.find(
+          (x) => x.publicKey === _accounts[0].pubkey.toBase58()
+        )!
+        return (
+          <>
+            <div>
+              Market:{' '}
+              {
+                mangoGroup['perpMarkets']!.find(
+                  (x) => x.publicKey === _accounts[2].pubkey.toBase58()
+                )!.name
+              }
+            </div>
+          </>
+        )
+      },
+    },
   },
 }
 

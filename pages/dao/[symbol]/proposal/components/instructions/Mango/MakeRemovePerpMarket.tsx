@@ -25,6 +25,8 @@ import InstructionForm, {
   InstructionInput,
   InstructionInputType,
 } from '../FormCreator'
+import { MANGO_MINT, MANGO_MINT_DEVNET } from 'Strategies/protocols/mango/tools'
+import { usePrevious } from '@hooks/usePrevious'
 
 const MakeRemovePerpMarket = ({
   index,
@@ -35,7 +37,7 @@ const MakeRemovePerpMarket = ({
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
-  const { assetAccounts } = useGovernanceAssets()
+  const { assetAccounts, governedTokenAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
     (x) => x.type === AccountType.PROGRAM
   )
@@ -48,7 +50,6 @@ const MakeRemovePerpMarket = ({
     marketPk: null,
     adminPk: '',
     mngoDaoVaultPk: '',
-    mngoVaultPk: null,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -99,7 +100,7 @@ const MakeRemovePerpMarket = ({
         perpMarket.asks,
         perpMarket.mngoVault,
         new PublicKey(form.mngoDaoVaultPk),
-        new PublicKey(form.adminPk)
+        group.signerKey
       )
 
       serializedInstruction = serializeInstructionToBase64(removePerpMarketIx)
@@ -111,25 +112,31 @@ const MakeRemovePerpMarket = ({
     }
     return obj
   }
-  useEffect(() => {
-    handleSetForm({
-      propertyName: 'programId',
-      value: programId?.toString(),
-    })
-  }, [realmInfo?.programId])
-
+  const mngoTokenMint =
+    connection.cluster === 'devnet' ? MANGO_MINT_DEVNET : MANGO_MINT
+  const previousProgramGov = usePrevious(
+    form.governedAccount?.governance.pubkey.toBase58()
+  )
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
-  }, [form])
+    if (
+      form.governedAccount?.governance.pubkey.toBase58() !== form.adminPk &&
+      previousProgramGov !== form.governedAccount?.governance.pubkey.toBase58()
+    ) {
+      handleSetForm({
+        propertyName: 'adminPk',
+        value: form.governedAccount?.governance.pubkey.toBase58(),
+      })
+    }
+  }, [JSON.stringify(form)])
   const schema = yup.object().shape({
     mangoGroup: yup.object().nullable().required('Mango group is required'),
-    marketIndex: yup.object().nullable().required('Market index is required'),
+    marketPk: yup.object().nullable().required('Market index is required'),
     adminPk: yup.string().required('Admin Pk is required'),
-    marketMode: yup.object().nullable().required('Market Mode is required'),
-    marketType: yup.object().nullable().required('Market Type is required'),
+    mngoDaoVaultPk: yup.string().required('Admin Pk is required'),
     governedAccount: yup
       .object()
       .nullable()
@@ -150,7 +157,7 @@ const MakeRemovePerpMarket = ({
   }
   const inputs: InstructionInput[] = [
     {
-      label: 'Governance',
+      label: 'Program',
       initialValue: form.governedAccount,
       name: 'governedAccount',
       type: InstructionInputType.GOVERNED_ACCOUNT,
@@ -182,7 +189,9 @@ const MakeRemovePerpMarket = ({
     },
     {
       label: 'Mango DAO Vault PublicKey',
-      initialValue: form.mngoDaoVaultPk,
+      initialValue: governedTokenAccounts
+        .find((x) => x.extensions.mint?.publicKey.toBase58() === mngoTokenMint)
+        ?.extensions.transferAddress?.toBase58(),
       type: InstructionInputType.INPUT,
       name: 'mngoDaoVaultPk',
     },

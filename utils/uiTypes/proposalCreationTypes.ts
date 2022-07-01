@@ -167,6 +167,14 @@ export interface MangoRemovePerpMarketForm {
   marketPk: NameValue | null
   adminPk: string
   mngoDaoVaultPk: string
+}
+
+export interface MangoRemoveSpotMarketForm {
+  governedAccount: AssetAccount | null
+  mangoGroup: NameValue | null
+  marketPk: NameValue | null
+  adminPk: string
+  mngoDaoVaultPk: string
   mngoVaultPk: NameValue | null
 }
 
