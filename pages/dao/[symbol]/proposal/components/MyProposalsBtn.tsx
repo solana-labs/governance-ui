@@ -228,7 +228,7 @@ const MyProposalsBn = () => {
       withInstruction
     )
   }
-  const releaseNfts = async () => {
+  const releaseNfts = async (count = null) => {
     setIsLoading(true)
     const instructions: TransactionInstruction[] = []
     const { registrar } = await getNftRegistrarPDA(
@@ -242,7 +242,11 @@ const MyProposalsBn = () => {
       wallet!.publicKey!,
       client.client!.program.programId
     )
-    for (const i of ownNftVoteRecords) {
+    const nfts = ownNftVoteRecords.slice(
+      0,
+      count ? count : ownNftVoteRecords.length
+    )
+    for (const i of nfts) {
       const relinquishNftVoteIx = await (client.client as NftVoterClient).program.methods
         .relinquishNftVote()
         .accounts({
@@ -371,6 +375,15 @@ const MyProposalsBn = () => {
                     small
                   >
                     Release nfts
+                  </Button>
+                  <Button
+                    isLoading={isLoading}
+                    disabled={isLoading || !ownNftVoteRecordsFilterd.length}
+                    onClick={() => releaseNfts(20)}
+                    className="ml-2"
+                    small
+                  >
+                    Release first 20
                   </Button>
                 </h4>
               </div>
