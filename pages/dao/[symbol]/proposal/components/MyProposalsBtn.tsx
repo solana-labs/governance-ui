@@ -26,6 +26,11 @@ import {
   getNftVoterWeightRecord,
 } from 'NftVotePlugin/sdk/accounts'
 import { sendSignedTransaction } from '@utils/send'
+import {
+  sendTransactionsV2,
+  SequenceType,
+  transactionInstructionsToTypedInstructionsSets,
+} from '@utils/sendTransactions'
 
 const MyProposalsBn = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
@@ -266,32 +271,19 @@ const MyProposalsBn = () => {
     }
     try {
       const insertChunks = chunks(instructions, 10)
-      const instArray = [...insertChunks]
-      const transactions: Transaction[] = []
-      const {
-        blockhash: recentBlockhash,
-      } = await connection.getLatestBlockhash()
-      for (let i = 0; i < instArray.length; i++) {
-        const instructionsChunk = instArray[i]
-
-        const transaction = new Transaction({
-          recentBlockhash,
-          feePayer: wallet!.publicKey!,
-        })
-        transaction.add(...instructionsChunk)
-        transaction.recentBlockhash = recentBlockhash
-        transaction.setSigners(
-          // fee payed by the wallet owner
-          wallet!.publicKey!
-        )
-        transactions.push(transaction)
-      }
-      const signedTXs = await wallet!.signAllTransactions(transactions)
-      await Promise.all(
-        signedTXs.map((transaction) =>
-          sendSignedTransaction({ signedTransaction: transaction, connection })
-        )
-      )
+      const signerChunks = Array(insertChunks.length).fill([])
+      await sendTransactionsV2({
+        connection,
+        showUiComponent: true,
+        wallet: wallet!,
+        signersSet: [...signerChunks],
+        TransactionInstructions: insertChunks.map((x) =>
+          transactionInstructionsToTypedInstructionsSets(
+            x,
+            SequenceType.Parallel
+          )
+        ),
+      })
       setIsLoading(false)
       getNftsVoteRecord()
     } catch (e) {
