@@ -43,9 +43,7 @@ const MyProposalsBn = () => {
     (s) => s.ownVoteRecordsByProposal
   )
   const [ownNftVoteRecords, setOwnNftVoteRecords] = useState<any[]>([])
-  const ownNftVoteRecordsFilterd = ownNftVoteRecords.filter(
-    (x) => !ownVoteRecordsByProposal[x.account.proposal.toBase58()]
-  )
+  const ownNftVoteRecordsFilterd = ownNftVoteRecords
   const maxVoterWeight =
     useNftPluginStore((s) => s.state.maxVoteRecord)?.pubkey || undefined
   const { realm, programId } = useWalletStore((s) => s.selectedRealm)
@@ -247,9 +245,9 @@ const MyProposalsBn = () => {
       wallet!.publicKey!,
       client.client!.program.programId
     )
-    const nfts = ownNftVoteRecords.slice(
+    const nfts = ownNftVoteRecordsFilterd.slice(
       0,
-      count ? count : ownNftVoteRecords.length
+      count ? count : ownNftVoteRecordsFilterd.length
     )
     for (const i of nfts) {
       const relinquishNftVoteIx = await (client.client as NftVoterClient).program.methods
@@ -302,6 +300,7 @@ const MyProposalsBn = () => {
         },
       },
     ])
+
     const nftVoteRecordsFiltered = nftVoteRecords.filter(
       (x) => proposals[x.account.proposal.toBase58()]
     )
