@@ -26,6 +26,7 @@ import InstructionForm, {
   InstructionInputType,
 } from '../FormCreator'
 import { usePrevious } from '@hooks/usePrevious'
+import { emptyPk } from 'NftVotePlugin/sdk/accounts'
 
 const MakeRemoveSpotMarket = ({
   index,
@@ -93,7 +94,9 @@ const MakeRemoveSpotMarket = ({
         rootBanks[marketIndex]!.publicKey,
         new PublicKey(form.adminVaultPk),
         group.signerKey,
-        rootBanks[marketIndex]!.nodeBanks,
+        rootBanks[marketIndex]!.nodeBanks.filter(
+          (x) => x.toBase58() !== emptyPk
+        ),
         rootBanks[marketIndex]!.nodeBankAccounts.map((x) => x.vault)
       )
 
