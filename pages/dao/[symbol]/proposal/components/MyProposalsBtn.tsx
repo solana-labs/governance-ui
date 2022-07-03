@@ -228,7 +228,7 @@ const MyProposalsBn = () => {
       withInstruction
     )
   }
-  const releaseNfts = async (count = null) => {
+  const releaseNfts = async (count: number | null = null) => {
     setIsLoading(true)
     const instructions: TransactionInstruction[] = []
     const { registrar } = await getNftRegistrarPDA(
