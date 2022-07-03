@@ -271,11 +271,12 @@ const MyProposalsBn = () => {
     }
     try {
       const insertChunks = chunks(instructions, 10)
+      const signerChunks = Array(insertChunks.length).fill([])
       await sendTransactionsV2({
         connection,
         showUiComponent: true,
         wallet: wallet!,
-        signersSet: [],
+        signersSet: [...signerChunks],
         TransactionInstructions: insertChunks.map((x) =>
           transactionInstructionsToTypedInstructionsSets(
             x,
