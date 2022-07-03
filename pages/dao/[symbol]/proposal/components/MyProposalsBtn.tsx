@@ -257,7 +257,8 @@ const MyProposalsBn = () => {
         .accounts({
           registrar,
           voterWeightRecord: voterWeightPk,
-          governance: proposals[i.account.proposal].account.governance,
+          governance:
+            proposals[i.account.proposal.toBase58()].account.governance,
           proposal: i.account.proposal,
           governingTokenOwner: wallet!.publicKey!,
           voteRecord: i.publicKey,
@@ -280,7 +281,7 @@ const MyProposalsBn = () => {
         TransactionInstructions: insertChunks.map((x) =>
           transactionInstructionsToTypedInstructionsSets(
             x,
-            SequenceType.Parallel
+            SequenceType.Sequential
           )
         ),
       })
@@ -301,7 +302,9 @@ const MyProposalsBn = () => {
         },
       },
     ])
-    const nftVoteRecordsFiltered = nftVoteRecords
+    const nftVoteRecordsFiltered = nftVoteRecords.filter(
+      (x) => proposals[x.account.proposal.toBase58()]
+    )
     setOwnNftVoteRecords(nftVoteRecordsFiltered)
   }
   useEffect(() => {
@@ -362,7 +365,7 @@ const MyProposalsBn = () => {
                   <Button
                     isLoading={isLoading}
                     disabled={isLoading || !ownNftVoteRecordsFilterd.length}
-                    onClick={releaseNfts}
+                    onClick={() => releaseNfts()}
                     className="ml-2"
                     small
                   >
