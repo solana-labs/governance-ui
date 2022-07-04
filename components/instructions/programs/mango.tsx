@@ -528,8 +528,8 @@ export const MANGO_INSTRUCTIONS = {
         )
       },
     },
-    69: {
-      name: 'Mango v3: Remove Perp Market',
+    70: {
+      name: 'Mango v3: Remove Spot Market',
       accounts: {
         0: { name: 'Mango Group' },
         1: { name: 'Admin Pk' },
