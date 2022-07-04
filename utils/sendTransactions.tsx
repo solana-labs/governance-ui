@@ -447,7 +447,7 @@ export const sendTransactionsV2 = async ({
     block = await connection.getLatestBlockhash('confirmed')
   }
   //max usable transactions per one sign is 40
-  const maxTransactionsInBath = 40
+  const maxTransactionsInBath = 30
   const currentTransactions = TransactionInstructions.slice(
     0,
     maxTransactionsInBath
