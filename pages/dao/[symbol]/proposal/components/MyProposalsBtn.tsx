@@ -279,7 +279,7 @@ const MyProposalsBn = () => {
         TransactionInstructions: insertChunks.map((x) =>
           transactionInstructionsToTypedInstructionsSets(
             x,
-            SequenceType.Sequential
+            SequenceType.Parallel
           )
         ),
       })
@@ -373,11 +373,11 @@ const MyProposalsBn = () => {
                   <Button
                     isLoading={isLoading}
                     disabled={isLoading || !ownNftVoteRecordsFilterd.length}
-                    onClick={() => releaseNfts(20)}
+                    onClick={() => releaseNfts(50)}
                     className="ml-2"
                     small
                   >
-                    Release first 20
+                    Release first 50
                   </Button>
                 </h4>
               </div>
