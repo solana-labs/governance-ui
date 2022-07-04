@@ -451,8 +451,8 @@ export const sendTransactionsV2 = async ({
     TransactionInstructions.filter(
       (x) => x.sequenceType === SequenceType.Sequential
     ).length > 0
-      ? 25
-      : 35
+      ? 20
+      : 30
   const currentTransactions = TransactionInstructions.slice(
     0,
     maxTransactionsInBath
