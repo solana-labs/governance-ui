@@ -83,11 +83,7 @@ const Proposal = () => {
                 <h1 className="mr-2 overflow-wrap-anywhere">
                   {proposal?.account.name}
                 </h1>
-                <ProposalStateBadge
-                  proposalPk={proposal.pubkey}
-                  proposal={proposal.account}
-                  open={true}
-                />
+                <ProposalStateBadge proposal={proposal.account} />
               </div>
             </div>
 

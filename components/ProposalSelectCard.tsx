@@ -51,11 +51,7 @@ const ProposalSelectCard = ({
         <div className="flex items-start justify-between">
           <h3 className="text-fgd-1">{proposal.name}</h3>
           <div className="flex items-center pl-4 pt-1">
-            <ProposalStateBadge
-              proposalPk={proposalPk}
-              proposal={proposal}
-              open={false}
-            />
+            <ProposalStateBadge proposal={proposal} />
             <div
               className={`bg-bkg-1 border ${
                 checked ? 'border-primary-light' : 'border-fgd-4'

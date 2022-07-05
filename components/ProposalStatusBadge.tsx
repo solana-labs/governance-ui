@@ -1,121 +1,151 @@
-import { PublicKey } from '@solana/web3.js'
-import useRealmGovernance from '../hooks/useRealmGovernance'
 import { Proposal, ProposalState } from '@solana/spl-governance'
-import useWalletStore from '../stores/useWalletStore'
-import { isYesVote } from '@models/voteRecords'
+import classNames from 'classnames'
+
 import useRealm from '@hooks/useRealm'
+import useRealmGovernance from '../hooks/useRealmGovernance'
 
-function getProposalStateLabel(state: ProposalState, hasVoteEnded: boolean) {
-  switch (state) {
+interface OtherState {
+  isCreator: boolean
+  isSignatory: boolean
+  votingEnded: boolean
+}
+
+function getBorderColor(
+  proposalState: ProposalState,
+  otherState: Pick<OtherState, 'isCreator' | 'isSignatory' | 'votingEnded'>
+) {
+  switch (proposalState) {
+    case ProposalState.Cancelled:
+    case ProposalState.Completed:
+    case ProposalState.Defeated:
     case ProposalState.ExecutingWithErrors:
-      return 'Execution Errors'
+      return 'border-transparent'
+    case ProposalState.Draft:
+      return otherState.isCreator ? 'border-white' : 'border-transparent'
+    case ProposalState.SigningOff:
+      return otherState.isSignatory ? 'border-[#F5A458]' : 'border-transparent'
+    case ProposalState.Executing:
+    case ProposalState.Succeeded:
+      return 'border-[#5DC9EB]'
     case ProposalState.Voting:
-      // If there is no tipping point and voting period ends then proposal stays in Voting state and needs to be manually finalized
-      return hasVoteEnded ? 'Finalizing' : 'Voting'
+      return otherState.votingEnded ? 'border-[#5DC9EB]' : 'border-[#8EFFDD]'
+  }
+}
+
+function getLabel(
+  proposalState: ProposalState,
+  otherState: Pick<OtherState, 'votingEnded'>
+) {
+  switch (proposalState) {
+    case ProposalState.Cancelled:
+      return 'Cancelled'
+    case ProposalState.Completed:
+      return 'Completed'
+    case ProposalState.Defeated:
+      return 'Defeated'
+    case ProposalState.Draft:
+      return 'Draft'
+    case ProposalState.Executing:
+      return 'Executable'
+    case ProposalState.ExecutingWithErrors:
+      return 'Executing w/ errors'
+    case ProposalState.SigningOff:
+      return 'Signing off'
+    case ProposalState.Succeeded:
+      return 'Executable'
+    case ProposalState.Voting:
+      return otherState.votingEnded ? 'Finalizing' : 'Voting'
+  }
+}
+
+function getOpacity(
+  proposalState: ProposalState,
+  otherState: Pick<OtherState, 'isCreator' | 'isSignatory'>
+) {
+  switch (proposalState) {
+    case ProposalState.Cancelled:
+    case ProposalState.Completed:
+    case ProposalState.Defeated:
+    case ProposalState.ExecutingWithErrors:
+      return 'opacity-70'
+    case ProposalState.Draft:
+      return otherState.isCreator ? '' : 'opacity-70'
+    case ProposalState.SigningOff:
+      return otherState.isSignatory ? '' : 'opacity-70'
     default:
-      return ProposalState[state]
+      return ''
   }
 }
 
-function getProposalStateStyle(state: ProposalState) {
-  if (
-    state === ProposalState.Voting ||
-    state === ProposalState.Executing ||
-    state === ProposalState.SigningOff
-  ) {
-    return 'border border-blue text-blue'
-  } else if (
-    state === ProposalState.Completed ||
-    state === ProposalState.Succeeded
-  ) {
-    return 'border border-green text-green'
-  } else if (
-    state === ProposalState.Cancelled ||
-    state === ProposalState.Defeated ||
-    state === ProposalState.ExecutingWithErrors
-  ) {
-    return 'border border-red text-red'
-  } else {
-    return 'border border-fgd-3 text-fgd-3'
+function getTextColor(
+  proposalState: ProposalState,
+  otherState: Pick<OtherState, 'votingEnded'>
+) {
+  switch (proposalState) {
+    case ProposalState.Cancelled:
+    case ProposalState.Draft:
+      return 'text-white'
+    case ProposalState.Completed:
+      return 'text-[#8EFFDD]'
+    case ProposalState.Defeated:
+    case ProposalState.ExecutingWithErrors:
+      return 'text-[#FF7C7C]'
+    case ProposalState.Executing:
+    case ProposalState.SigningOff:
+      return 'text-[#F5A458]'
+    case ProposalState.Succeeded:
+      return 'text-[#5DC9EB]'
+    case ProposalState.Voting:
+      return otherState.votingEnded
+        ? 'bg-gradient-to-r from-[#00C2FF] via-[#00E4FF] to-[#87F2FF] bg-clip-text text-transparent'
+        : 'text-[#8EFFDD]'
   }
 }
 
-const ProposalStateBadge = ({
-  proposalPk,
-  proposal,
-  open,
-}: {
-  proposalPk: PublicKey
+interface Props {
+  className?: string
   proposal: Proposal
-  open: boolean
-}) => {
-  const governance = useRealmGovernance(proposal.governance)
-  const { realm } = useRealm()
+}
 
-  const {
-    communityDelegateVoteRecordsByProposal,
-    councilDelegateVoteRecordsByProposal,
-  } = useWalletStore((s) => s)
+export default function ProposalStateBadge(props: Props) {
+  const { ownTokenRecord, ownCouncilTokenRecord } = useRealm()
+  const governance = useRealmGovernance(props.proposal.governance)
 
-  const walletVoteRecord = useWalletStore((s) => s.ownVoteRecordsByProposal)[
-    proposalPk.toBase58()
-  ]
+  const isCreator =
+    ownTokenRecord?.pubkey.equals(props.proposal.tokenOwnerRecord) ||
+    ownCouncilTokenRecord?.pubkey.equals(props.proposal.tokenOwnerRecord) ||
+    false
 
-  let ownVoteRecord = walletVoteRecord
+  // For now, we're not going to display any special UI if the user is a signatory
+  const isSignatory = false
 
-  // if delegate is selected, use that delegates vote record for vote status to display
-  if (
-    communityDelegateVoteRecordsByProposal[proposalPk.toBase58()] &&
-    proposal.governingTokenMint.toBase58() ===
-      realm?.account?.communityMint.toBase58()
-  ) {
-    ownVoteRecord =
-      communityDelegateVoteRecordsByProposal[proposalPk.toBase58()]
-  }
+  const votingEnded =
+    governance && props.proposal.getTimeToVoteEnd(governance) < 0
 
-  if (
-    councilDelegateVoteRecordsByProposal[proposalPk.toBase58()] &&
-    proposal.governingTokenMint.toBase58() ===
-      realm?.account?.config?.councilMint?.toBase58()
-  ) {
-    ownVoteRecord = councilDelegateVoteRecordsByProposal[proposalPk.toBase58()]
-  }
-
-  let statusLabel = getProposalStateLabel(
-    proposal.state,
-    governance && proposal.getTimeToVoteEnd(governance) < 0
-  )
-
-  if (ownVoteRecord) {
-    statusLabel =
-      statusLabel + ': ' + (isYesVote(ownVoteRecord.account) ? 'Yes' : 'No')
+  const otherState = {
+    isCreator,
+    isSignatory,
+    votingEnded,
   }
 
   return (
-    <>
-      {open ? (
-        <>
-          <div className="flex items-center justify-end gap-4">
-            <div
-              className={`${getProposalStateStyle(
-                proposal.state
-              )} inline-block px-2 py-1 rounded-full text-xs`}
-            >
-              {statusLabel}
-            </div>
-          </div>
-        </>
-      ) : (
-        <div
-          className={`${getProposalStateStyle(
-            proposal.state
-          )} min-w-max inline-block px-2 py-1 rounded-full text-xs`}
-        >
-          {statusLabel}
-        </div>
+    <div
+      className={classNames(
+        props.className,
+        'border',
+        'inline-flex',
+        'min-w-max',
+        'items-center',
+        'px-2',
+        'py-1',
+        'rounded-full',
+        'text-xs',
+        getBorderColor(props.proposal.state, otherState),
+        getOpacity(props.proposal.state, otherState),
+        getTextColor(props.proposal.state, otherState)
       )}
-    </>
+    >
+      {getLabel(props.proposal.state, otherState)}
+    </div>
   )
 }
-
-export default ProposalStateBadge
