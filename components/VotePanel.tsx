@@ -9,6 +9,8 @@ import useRealm from '../hooks/useRealm'
 import { ProposalState } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { GoverningTokenType } from '@solana/spl-governance'
+import { ThumbUpIcon, ThumbDownIcon } from '@heroicons/react/solid'
+import HollowButton from './HollowButton'
 
 import useWalletStore from '../stores/useWalletStore'
 import Button, { SecondaryButton } from './Button'
@@ -18,6 +20,7 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { useRouter } from 'next/router'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { LOCALNET_REALM_ID as PYTH_LOCALNET_REALM_ID } from 'pyth-staking-api'
+import { isYesVote } from '@models/voteRecords'
 
 const VotePanel = () => {
   const [showVoteModal, setShowVoteModal] = useState(false)
@@ -154,9 +157,7 @@ const VotePanel = () => {
       ? `Cast your ${
           tokenType === GoverningTokenType.Community ? 'community' : 'council'
         } vote`
-      : isVoting
-      ? 'Withdraw your vote'
-      : 'Release your tokens'
+      : 'You voted!'
 
   const withdrawTooltipContent = !connected
     ? 'You need to connect your wallet'
@@ -212,36 +213,51 @@ const VotePanel = () => {
 
           <div className="items-center justify-center flex w-full gap-5">
             {isVoteCast && connected ? (
-              <SecondaryButton
-                isLoading={isLoading}
-                small
-                tooltipMessage={withdrawTooltipContent}
-                onClick={() => submitRelinquishVote()}
-                disabled={!isWithdrawEnabled || isLoading}
-              >
-                {isVoting ? 'Withdraw' : 'Release Tokens'}
-              </SecondaryButton>
+              <div className="flex flex-col gap-6 min-w-[200px]">
+                {ownVoteRecord &&
+                  (isYesVote(ownVoteRecord.account) ? (
+                    <HollowButton selected>
+                      <ThumbUpIcon className="h-4 w-4 mr-1 fill-[#8EFFDD]" />{' '}
+                      Yes
+                    </HollowButton>
+                  ) : (
+                    <HollowButton selected>
+                      <ThumbDownIcon className="h-4 w-4 mr-1 fill-[#FF7C7C]" />{' '}
+                      No
+                    </HollowButton>
+                  ))}
+                <Button
+                  isLoading={isLoading}
+                  tooltipMessage={withdrawTooltipContent}
+                  onClick={() => submitRelinquishVote()}
+                  disabled={!isWithdrawEnabled || isLoading}
+                >
+                  {isVoting ? 'Withdraw' : 'Release Tokens'}
+                </Button>
+              </div>
             ) : (
               <>
                 {isVoting && (
                   <div className="w-full flex justify-between items-center gap-5">
-                    <Button
-                      tooltipMessage={voteTooltipContent}
+                    <HollowButton
+                      tooltip={voteTooltipContent}
                       className="w-1/2"
                       onClick={() => handleShowVoteModal(YesNoVote.Yes)}
                       disabled={!isVoteEnabled}
                     >
+                      <ThumbUpIcon className="h-4 w-4 mr-1 fill-[#8EFFDD]" />{' '}
                       Vote Yes
-                    </Button>
+                    </HollowButton>
 
-                    <Button
-                      tooltipMessage={voteTooltipContent}
+                    <HollowButton
+                      tooltip={voteTooltipContent}
                       className="w-1/2"
                       onClick={() => handleShowVoteModal(YesNoVote.No)}
                       disabled={!isVoteEnabled}
                     >
+                      <ThumbDownIcon className="h-4 w-4 mr-1 fill-[#FF7C7C]" />
                       Vote No
-                    </Button>
+                    </HollowButton>
                   </div>
                 )}
               </>

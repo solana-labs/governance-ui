@@ -113,6 +113,7 @@ const Proposal = () => {
 
       <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
         <TokenBalanceCardWrapper proposal={option(proposal?.account)} />
+        <VotePanel />
         {showResults ? (
           <div className="bg-bkg-2 rounded-lg">
             <div className="p-4 md:p-6">
@@ -161,7 +162,6 @@ const Proposal = () => {
           </div>
         ) : null}
 
-        <VotePanel />
         <ProposalActionsPanel />
       </div>
     </div>
