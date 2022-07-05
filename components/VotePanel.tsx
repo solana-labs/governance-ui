@@ -13,7 +13,7 @@ import { ThumbUpIcon, ThumbDownIcon } from '@heroicons/react/solid'
 import HollowButton from './HollowButton'
 
 import useWalletStore from '../stores/useWalletStore'
-import Button, { SecondaryButton } from './Button'
+import Button from './Button'
 import VoteCommentModal from './VoteCommentModal'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
