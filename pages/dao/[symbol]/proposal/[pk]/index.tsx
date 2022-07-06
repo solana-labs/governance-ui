@@ -130,7 +130,7 @@ const Proposal = () => {
         )}
         <VotePanel />
         {proposal && currentWallet && showProposalExecution && (
-          <ProposalExecutionCard proposal={proposal} />
+          <ProposalExecutionCard />
         )}
         {showResults ? (
           <div className="bg-bkg-2 rounded-lg">
