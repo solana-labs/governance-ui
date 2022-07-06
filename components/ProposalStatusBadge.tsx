@@ -4,29 +4,46 @@ import classNames from 'classnames'
 import useRealm from '@hooks/useRealm'
 import useRealmGovernance from '../hooks/useRealmGovernance'
 
+const hasInstructions = (proposal: Proposal) => {
+  if (proposal.instructionsCount) {
+    return true
+  }
+
+  if (proposal.options) {
+    for (const option of proposal.options) {
+      if (option.instructionsCount) {
+        return true
+      }
+    }
+  }
+
+  return false
+}
+
 interface OtherState {
   isCreator: boolean
   isSignatory: boolean
+  proposal: Proposal
   votingEnded: boolean
 }
 
-function getBorderColor(
-  proposalState: ProposalState,
-  otherState: Pick<OtherState, 'isCreator' | 'isSignatory' | 'votingEnded'>
-) {
+function getBorderColor(proposalState: ProposalState, otherState: OtherState) {
   switch (proposalState) {
     case ProposalState.Cancelled:
     case ProposalState.Completed:
     case ProposalState.Defeated:
     case ProposalState.ExecutingWithErrors:
       return 'border-transparent'
+    case ProposalState.Executing:
+      return 'border-[#5DC9EB]'
     case ProposalState.Draft:
       return otherState.isCreator ? 'border-white' : 'border-transparent'
     case ProposalState.SigningOff:
       return otherState.isSignatory ? 'border-[#F5A458]' : 'border-transparent'
-    case ProposalState.Executing:
     case ProposalState.Succeeded:
-      return 'border-[#5DC9EB]'
+      return !hasInstructions(otherState.proposal)
+        ? 'border-transparent'
+        : 'border-[#5DC9EB]'
     case ProposalState.Voting:
       return otherState.votingEnded ? 'border-[#5DC9EB]' : 'border-[#8EFFDD]'
   }
@@ -34,7 +51,7 @@ function getBorderColor(
 
 function getLabel(
   proposalState: ProposalState,
-  otherState: Pick<OtherState, 'votingEnded'>
+  otherState: Pick<OtherState, 'proposal' | 'votingEnded'>
 ) {
   switch (proposalState) {
     case ProposalState.Cancelled:
@@ -52,7 +69,7 @@ function getLabel(
     case ProposalState.SigningOff:
       return 'Signing off'
     case ProposalState.Succeeded:
-      return 'Executable'
+      return !hasInstructions(otherState.proposal) ? 'Completed' : 'Executable'
     case ProposalState.Voting:
       return otherState.votingEnded ? 'Finalizing' : 'Voting'
   }
@@ -60,7 +77,7 @@ function getLabel(
 
 function getOpacity(
   proposalState: ProposalState,
-  otherState: Pick<OtherState, 'isCreator' | 'isSignatory'>
+  otherState: Pick<OtherState, 'isCreator' | 'isSignatory' | 'proposal'>
 ) {
   switch (proposalState) {
     case ProposalState.Cancelled:
@@ -72,6 +89,8 @@ function getOpacity(
       return otherState.isCreator ? '' : 'opacity-70'
     case ProposalState.SigningOff:
       return otherState.isSignatory ? '' : 'opacity-70'
+    case ProposalState.Succeeded:
+      return !hasInstructions(otherState.proposal) ? 'opacity-70' : ''
     default:
       return ''
   }
@@ -79,7 +98,7 @@ function getOpacity(
 
 function getTextColor(
   proposalState: ProposalState,
-  otherState: Pick<OtherState, 'votingEnded'>
+  otherState: Pick<OtherState, 'proposal' | 'votingEnded'>
 ) {
   switch (proposalState) {
     case ProposalState.Cancelled:
@@ -94,7 +113,9 @@ function getTextColor(
     case ProposalState.SigningOff:
       return 'text-[#F5A458]'
     case ProposalState.Succeeded:
-      return 'text-[#5DC9EB]'
+      return !hasInstructions(otherState.proposal)
+        ? 'text-[#8EFFDD]'
+        : 'text-[#5DC9EB]'
     case ProposalState.Voting:
       return otherState.votingEnded
         ? 'bg-gradient-to-r from-[#00C2FF] via-[#00E4FF] to-[#87F2FF] bg-clip-text text-transparent'
@@ -126,6 +147,7 @@ export default function ProposalStateBadge(props: Props) {
     isCreator,
     isSignatory,
     votingEnded,
+    proposal: props.proposal,
   }
 
   return (

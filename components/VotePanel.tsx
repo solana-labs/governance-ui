@@ -10,7 +10,6 @@ import { ProposalState } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { GoverningTokenType } from '@solana/spl-governance'
 import { ThumbUpIcon, ThumbDownIcon } from '@heroicons/react/solid'
-import HollowButton from './HollowButton'
 
 import useWalletStore from '../stores/useWalletStore'
 import Button from './Button'
@@ -216,48 +215,66 @@ const VotePanel = () => {
               <div className="flex flex-col gap-6 min-w-[200px]">
                 {ownVoteRecord &&
                   (isYesVote(ownVoteRecord.account) ? (
-                    <HollowButton selected>
-                      <ThumbUpIcon className="h-4 w-4 mr-1 fill-[#8EFFDD]" />{' '}
-                      Yes
-                    </HollowButton>
+                    <Button disabled>
+                      <div className="flex flex-row items-center justify-center">
+                        <div className="bg-black rounded-full mr-1 p-[6px]">
+                          <ThumbUpIcon className="h-4 w-4 fill-[#8EFFDD]" />{' '}
+                        </div>
+                        Yes
+                      </div>
+                    </Button>
                   ) : (
-                    <HollowButton selected>
-                      <ThumbDownIcon className="h-4 w-4 mr-1 fill-[#FF7C7C]" />{' '}
-                      No
-                    </HollowButton>
+                    <Button disabled>
+                      <div className="flex flex-row items-center justify-center">
+                        <div className="bg-black rounded-full mr-1 p-[6px]">
+                          <ThumbDownIcon className="h-4 w-4 fill-[#FF7C7C]" />{' '}
+                        </div>
+                        No
+                      </div>
+                    </Button>
                   ))}
-                <Button
-                  isLoading={isLoading}
-                  tooltipMessage={withdrawTooltipContent}
-                  onClick={() => submitRelinquishVote()}
-                  disabled={!isWithdrawEnabled || isLoading}
-                >
-                  {isVoting ? 'Withdraw' : 'Release Tokens'}
-                </Button>
+                {isVoting && (
+                  <Button
+                    isLoading={isLoading}
+                    tooltipMessage={withdrawTooltipContent}
+                    onClick={() => submitRelinquishVote()}
+                    disabled={!isWithdrawEnabled || isLoading}
+                  >
+                    Withdraw
+                  </Button>
+                )}
               </div>
             ) : (
               <>
                 {isVoting && (
                   <div className="w-full flex justify-between items-center gap-5">
-                    <HollowButton
-                      tooltip={voteTooltipContent}
+                    <Button
+                      tooltipMessage={voteTooltipContent}
                       className="w-1/2"
                       onClick={() => handleShowVoteModal(YesNoVote.Yes)}
                       disabled={!isVoteEnabled}
                     >
-                      <ThumbUpIcon className="h-4 w-4 mr-1 fill-[#8EFFDD]" />{' '}
-                      Vote Yes
-                    </HollowButton>
+                      <div className="flex flex-row items-center justify-center">
+                        <div className="bg-black rounded-full mr-1 p-[6px]">
+                          <ThumbUpIcon className="h-3 w-3 fill-[#8EFFDD]" />{' '}
+                        </div>
+                        Vote Yes
+                      </div>
+                    </Button>
 
-                    <HollowButton
-                      tooltip={voteTooltipContent}
+                    <Button
+                      tooltipMessage={voteTooltipContent}
                       className="w-1/2"
                       onClick={() => handleShowVoteModal(YesNoVote.No)}
                       disabled={!isVoteEnabled}
                     >
-                      <ThumbDownIcon className="h-4 w-4 mr-1 fill-[#FF7C7C]" />
-                      Vote No
-                    </HollowButton>
+                      <div className="flex flex-row items-center justify-center">
+                        <div className="bg-black rounded-full mr-1 p-[6px]">
+                          <ThumbDownIcon className="h-3 w-3 fill-[#FF7C7C]" />
+                        </div>
+                        Vote No
+                      </div>
+                    </Button>
                   </div>
                 )}
               </>

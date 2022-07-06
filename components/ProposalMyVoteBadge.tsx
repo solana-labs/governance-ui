@@ -10,6 +10,7 @@ import { ThumbUpIcon, ThumbDownIcon } from '@heroicons/react/solid'
 import { isYesVote } from '@models/voteRecords'
 import useRealm from '@hooks/useRealm'
 import useWalletStore from '../stores/useWalletStore'
+import Tooltip from './Tooltip'
 
 interface VoteRecords {
   [proposal: string]: ProgramAccount<VoteRecord>
@@ -68,35 +69,35 @@ export default function ProposalMyVoteBadge(props: Props) {
     realm
   )
 
-  console.log(
-    communityDelegateVoteRecords,
-    councilDelegateVoteRecords,
-    ownVoteRecords
-  )
-
   if (!ownVoteRecord) {
     return null
   }
 
+  const isYes = isYesVote(ownVoteRecord.account)
+
   return (
-    <div
-      className={classNames(
-        props.className,
-        'flex-row',
-        'flex',
-        'gap-1',
-        'items-center',
-        'opacity-70',
-        'text-white',
-        'text-xs'
-      )}
-    >
-      My vote
-      {isYesVote(ownVoteRecord.account) ? (
-        <ThumbUpIcon className="w-4 h-4" />
-      ) : (
-        <ThumbDownIcon className="w-4 h-4" />
-      )}
-    </div>
+    <Tooltip content={isYes ? 'You voted "Yes"' : 'You voted "No"'}>
+      <div
+        className={classNames(
+          props.className,
+          'border',
+          'rounded-full',
+          'flex-row',
+          'flex',
+          'gap-1',
+          'items-center',
+          'p-[6px]',
+          'text-white',
+          'text-xs',
+          isYes ? 'border-[#8EFFDD]' : 'border-[#FF7C7C]'
+        )}
+      >
+        {isYes ? (
+          <ThumbUpIcon className="w-3 h-3 fill-[#8EFFDD]" />
+        ) : (
+          <ThumbDownIcon className="w-3 h-3 fill-[#FF7C7C]" />
+        )}
+      </div>
+    </Tooltip>
   )
 }
