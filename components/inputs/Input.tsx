@@ -29,6 +29,7 @@ const Input = ({
   error = '',
   max = Number.MAX_SAFE_INTEGER,
   step,
+  showErrorState = false,
   noMaxWidth,
   useDefaultStyle = true,
   subtitle,
@@ -57,6 +58,7 @@ const Input = ({
           error,
           noMaxWidth,
           useDefaultStyle,
+          showErrorState,
         })}
         disabled={disabled}
         step={step}

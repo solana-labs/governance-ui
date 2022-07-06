@@ -6,6 +6,7 @@ import GovernedAccountSelect from '../GovernedAccountSelect'
 import { precision } from '@utils/formatting'
 import Switch from '@components/Switch'
 import Select from '@components/inputs/Select'
+import { usePrevious } from '@hooks/usePrevious'
 
 export enum InstructionInputType {
   GOVERNED_ACCOUNT,
@@ -53,14 +54,19 @@ const InstructionForm = ({
     setFormErrors({})
     setInnerForm({ ...outerForm, [propertyName]: value })
   }
+  const previousInitialValue = usePrevious(
+    JSON.stringify(inputs.map((x) => x.initialValue))
+  )
   useEffect(() => {
     setForm(form)
-  }, [form])
+  }, [JSON.stringify(form)])
   useEffect(() => {
     setInnerForm({
       ...inputs.reduce((a, v) => ({ ...a, [v.name]: v.initialValue }), {}),
     })
-  }, [JSON.stringify(inputs.map((x) => x.initialValue))])
+  }, [
+    previousInitialValue !== JSON.stringify(inputs.map((x) => x.initialValue)),
+  ])
   return (
     <>
       {inputs

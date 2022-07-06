@@ -6,7 +6,7 @@ import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import {
   UiInstruction,
-  MangoMakeSetMarketModeForm,
+  MangoRemoveSpotMarketForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -16,18 +16,19 @@ import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import {
   IDS,
-  makeSetMarketModeInstruction,
-  BN,
   Config,
+  MangoClient,
+  makeRemoveSpotMarketInstruction,
 } from '@blockworks-foundation/mango-client'
 import { AccountType } from '@utils/uiTypes/assets'
 import InstructionForm, {
   InstructionInput,
   InstructionInputType,
 } from '../FormCreator'
-import { ASSET_TYPE, MARKET_MODE } from 'Strategies/protocols/mango/tools'
+import { usePrevious } from '@hooks/usePrevious'
+import { emptyPk } from 'NftVotePlugin/sdk/accounts'
 
-const MakeSetMarketMode = ({
+const MakeRemoveSpotMarket = ({
   index,
   governance,
 }: {
@@ -40,15 +41,15 @@ const MakeSetMarketMode = ({
   const governedProgramAccounts = assetAccounts.filter(
     (x) => x.type === AccountType.PROGRAM
   )
+  const connection = useWalletStore((s) => s.connection)
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<MangoMakeSetMarketModeForm>({
+  const [form, setForm] = useState<MangoRemoveSpotMarketForm>({
     governedAccount: null,
     mangoGroup: null,
     marketIndex: null,
     adminPk: '',
-    marketMode: null,
-    marketType: null,
+    adminVaultPk: '',
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -73,17 +74,33 @@ const MakeSetMarketMode = ({
       const groupConfig = Config.ids().groups.find((c) =>
         c.publicKey.equals(new PublicKey(form.mangoGroup!.value))
       )!
+      const client = new MangoClient(
+        connection.current,
+        groupConfig.mangoProgramId
+      )
+      const group = await client.getMangoGroup(groupConfig.publicKey)
+      const [dustAccountPk] = await PublicKey.findProgramAddress(
+        [group.publicKey.toBytes(), Buffer.from('DustAccount', 'utf-8')],
+        groupConfig.mangoProgramId
+      )
+      const marketIndex = Number(form.marketIndex!.value)
+      const rootBanks = await group.loadRootBanks(connection.current)
       //Mango instruction call and serialize
-      const addOracleIx = makeSetMarketModeInstruction(
+      const removePerpMarketIx = makeRemoveSpotMarketInstruction(
         groupConfig.mangoProgramId,
-        new PublicKey(form.mangoGroup!.value),
+        groupConfig.publicKey,
         new PublicKey(form.adminPk),
-        new BN(form.marketIndex!.value),
-        Number(form.marketMode!.value),
-        Number(form.marketType!.value)
+        dustAccountPk,
+        rootBanks[marketIndex]!.publicKey,
+        new PublicKey(form.adminVaultPk),
+        group.signerKey,
+        rootBanks[marketIndex]!.nodeBanks.filter(
+          (x) => x.toBase58() !== emptyPk
+        ),
+        rootBanks[marketIndex]!.nodeBankAccounts.map((x) => x.vault)
       )
 
-      serializedInstruction = serializeInstructionToBase64(addOracleIx)
+      serializedInstruction = serializeInstructionToBase64(removePerpMarketIx)
     }
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
@@ -92,25 +109,29 @@ const MakeSetMarketMode = ({
     }
     return obj
   }
-  useEffect(() => {
-    handleSetForm({
-      propertyName: 'programId',
-      value: programId?.toString(),
-    })
-  }, [realmInfo?.programId])
-
+  const previousProgramGov = usePrevious(
+    form.governedAccount?.governance.pubkey.toBase58()
+  )
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
-  }, [form])
+    if (
+      form.governedAccount?.governance.pubkey.toBase58() !== form.adminPk &&
+      previousProgramGov !== form.governedAccount?.governance.pubkey.toBase58()
+    ) {
+      handleSetForm({
+        propertyName: 'adminPk',
+        value: form.governedAccount?.governance.pubkey.toBase58(),
+      })
+    }
+  }, [JSON.stringify(form)])
   const schema = yup.object().shape({
     mangoGroup: yup.object().nullable().required('Mango group is required'),
     marketIndex: yup.object().nullable().required('Market index is required'),
     adminPk: yup.string().required('Admin Pk is required'),
-    marketMode: yup.object().nullable().required('Market Mode is required'),
-    marketType: yup.object().nullable().required('Market Type is required'),
+    adminVaultPk: yup.string().required('Admin vault pk is required'),
     governedAccount: yup
       .object()
       .nullable()
@@ -120,10 +141,8 @@ const MakeSetMarketMode = ({
     const currentMangoGroup = IDS.groups.find(
       (x) => x.publicKey === form.mangoGroup?.value
     )!
-    return form.mangoGroup && form.marketType
-      ? currentMangoGroup[
-          Number(form.marketType.value) === 0 ? 'spotMarkets' : 'perpMarkets'
-        ].map((x) => {
+    return form.mangoGroup
+      ? currentMangoGroup['spotMarkets'].map((x) => {
           return {
             name: x.name,
             value: x.marketIndex,
@@ -133,7 +152,7 @@ const MakeSetMarketMode = ({
   }
   const inputs: InstructionInput[] = [
     {
-      label: 'Governance',
+      label: 'Program',
       initialValue: form.governedAccount,
       name: 'governedAccount',
       type: InstructionInputType.GOVERNED_ACCOUNT,
@@ -151,31 +170,23 @@ const MakeSetMarketMode = ({
       }),
     },
     {
-      label: 'Market type',
-      initialValue: form.marketType,
-      type: InstructionInputType.SELECT,
-      name: 'marketType',
-      options: ASSET_TYPE,
-    },
-    {
-      label: 'Market index',
+      label: 'Market',
       initialValue: form.marketIndex,
       type: InstructionInputType.SELECT,
       name: 'marketIndex',
       options: getOptionsForMarketIndex(),
     },
     {
-      label: 'Market mode',
-      initialValue: form.marketMode,
-      type: InstructionInputType.SELECT,
-      name: 'marketMode',
-      options: MARKET_MODE,
-    },
-    {
       label: 'Admin PublicKey',
       initialValue: form.adminPk,
       type: InstructionInputType.INPUT,
       name: 'adminPk',
+    },
+    {
+      label: 'Mango DAO token account (ATA with same mint as removed market)',
+      initialValue: form.adminVaultPk,
+      type: InstructionInputType.INPUT,
+      name: 'adminVaultPk',
     },
   ]
 
@@ -194,4 +205,4 @@ const MakeSetMarketMode = ({
   )
 }
 
-export default MakeSetMarketMode
+export default MakeRemoveSpotMarket

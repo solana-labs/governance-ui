@@ -43,6 +43,8 @@ import {
   SOLEND,
 } from 'Strategies/protocols/solend'
 import tokenService from '@utils/services/token'
+import { EVERLEND } from '../../Strategies/protocols/everlend/tools'
+import { findAssociatedTokenAccount } from '@everlend/common'
 
 type InvestmentType = TreasuryStrategy & {
   investedAmount: number
@@ -179,6 +181,32 @@ const AccountOverview = () => {
       return []
     }
 
+    const handleEverlendAccounts = async (): Promise<InvestmentType[]> => {
+      const everlendStrategy = visibleInvestments.filter(
+        (strat) => strat.protocolName === EVERLEND
+      )[0]
+
+      const tokenMintATA = await findAssociatedTokenAccount(
+        isSol
+          ? currentAccount!.pubkey
+          : currentAccount!.extensions!.token!.account.owner,
+
+        new PublicKey(
+          (everlendStrategy as TreasuryStrategy & { poolMint: string }).poolMint
+        )
+      )
+      const tokenMintATABalance = await connection.current.getTokenAccountBalance(
+        tokenMintATA
+      )
+
+      return [
+        {
+          ...everlendStrategy,
+          investedAmount: Number(tokenMintATABalance.value.uiAmount),
+        },
+      ].filter((strat) => strat.investedAmount !== 0)
+    }
+
     const loadData = async () => {
       const requests = [] as Array<Promise<Array<InvestmentType>>>
       if (visibleInvestments.filter((x) => x.protocolName === MANGO).length) {
@@ -186,6 +214,12 @@ const AccountOverview = () => {
       }
       if (visibleInvestments.filter((x) => x.protocolName === SOLEND).length) {
         requests.push(getSlndCTokens())
+      }
+
+      if (
+        visibleInvestments.filter((x) => x.protocolName === EVERLEND).length
+      ) {
+        requests.push(handleEverlendAccounts())
       }
 
       const results = await Promise.all(requests)

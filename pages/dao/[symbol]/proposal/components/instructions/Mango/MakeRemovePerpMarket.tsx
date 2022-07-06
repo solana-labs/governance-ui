@@ -6,7 +6,7 @@ import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import {
   UiInstruction,
-  MangoMakeSetMarketModeForm,
+  MangoRemovePerpMarketForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -16,18 +16,19 @@ import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import {
   IDS,
-  makeSetMarketModeInstruction,
-  BN,
   Config,
+  MangoClient,
+  makeRemovePerpMarketInstruction,
 } from '@blockworks-foundation/mango-client'
 import { AccountType } from '@utils/uiTypes/assets'
 import InstructionForm, {
   InstructionInput,
   InstructionInputType,
 } from '../FormCreator'
-import { ASSET_TYPE, MARKET_MODE } from 'Strategies/protocols/mango/tools'
+import { MANGO_MINT, MANGO_MINT_DEVNET } from 'Strategies/protocols/mango/tools'
+import { usePrevious } from '@hooks/usePrevious'
 
-const MakeSetMarketMode = ({
+const MakeRemovePerpMarket = ({
   index,
   governance,
 }: {
@@ -36,19 +37,19 @@ const MakeSetMarketMode = ({
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
-  const { assetAccounts } = useGovernanceAssets()
+  const { assetAccounts, governedTokenAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
     (x) => x.type === AccountType.PROGRAM
   )
+  const connection = useWalletStore((s) => s.connection)
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<MangoMakeSetMarketModeForm>({
+  const [form, setForm] = useState<MangoRemovePerpMarketForm>({
     governedAccount: null,
     mangoGroup: null,
-    marketIndex: null,
+    marketPk: null,
     adminPk: '',
-    marketMode: null,
-    marketType: null,
+    mngoDaoVaultPk: '',
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -73,17 +74,36 @@ const MakeSetMarketMode = ({
       const groupConfig = Config.ids().groups.find((c) =>
         c.publicKey.equals(new PublicKey(form.mangoGroup!.value))
       )!
+      const client = new MangoClient(
+        connection.current,
+        groupConfig.mangoProgramId
+      )
+      const perpMarketInfo = groupConfig.perpMarkets.find(
+        (x) => x.publicKey.toBase58() === form.marketPk?.value
+      )
+      const group = await client.getMangoGroup(groupConfig.publicKey)
+      const perpMarket = await group.loadPerpMarket(
+        connection.current,
+        perpMarketInfo!.marketIndex,
+        perpMarketInfo!.baseDecimals,
+        perpMarketInfo!.quoteDecimals
+      )
+
       //Mango instruction call and serialize
-      const addOracleIx = makeSetMarketModeInstruction(
+      const removePerpMarketIx = makeRemovePerpMarketInstruction(
         groupConfig.mangoProgramId,
         new PublicKey(form.mangoGroup!.value),
         new PublicKey(form.adminPk),
-        new BN(form.marketIndex!.value),
-        Number(form.marketMode!.value),
-        Number(form.marketType!.value)
+        perpMarket.publicKey,
+        perpMarket.eventQueue,
+        perpMarket.bids,
+        perpMarket.asks,
+        perpMarket.mngoVault,
+        new PublicKey(form.mngoDaoVaultPk),
+        group.signerKey
       )
 
-      serializedInstruction = serializeInstructionToBase64(addOracleIx)
+      serializedInstruction = serializeInstructionToBase64(removePerpMarketIx)
     }
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
@@ -92,25 +112,31 @@ const MakeSetMarketMode = ({
     }
     return obj
   }
-  useEffect(() => {
-    handleSetForm({
-      propertyName: 'programId',
-      value: programId?.toString(),
-    })
-  }, [realmInfo?.programId])
-
+  const mngoTokenMint =
+    connection.cluster === 'devnet' ? MANGO_MINT_DEVNET : MANGO_MINT
+  const previousProgramGov = usePrevious(
+    form.governedAccount?.governance.pubkey.toBase58()
+  )
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
-  }, [form])
+    if (
+      form.governedAccount?.governance.pubkey.toBase58() !== form.adminPk &&
+      previousProgramGov !== form.governedAccount?.governance.pubkey.toBase58()
+    ) {
+      handleSetForm({
+        propertyName: 'adminPk',
+        value: form.governedAccount?.governance.pubkey.toBase58(),
+      })
+    }
+  }, [JSON.stringify(form)])
   const schema = yup.object().shape({
     mangoGroup: yup.object().nullable().required('Mango group is required'),
-    marketIndex: yup.object().nullable().required('Market index is required'),
+    marketPk: yup.object().nullable().required('Market pk is required'),
     adminPk: yup.string().required('Admin Pk is required'),
-    marketMode: yup.object().nullable().required('Market Mode is required'),
-    marketType: yup.object().nullable().required('Market Type is required'),
+    mngoDaoVaultPk: yup.string().required('Mango dao vault pk is required'),
     governedAccount: yup
       .object()
       .nullable()
@@ -120,20 +146,18 @@ const MakeSetMarketMode = ({
     const currentMangoGroup = IDS.groups.find(
       (x) => x.publicKey === form.mangoGroup?.value
     )!
-    return form.mangoGroup && form.marketType
-      ? currentMangoGroup[
-          Number(form.marketType.value) === 0 ? 'spotMarkets' : 'perpMarkets'
-        ].map((x) => {
+    return form.mangoGroup
+      ? currentMangoGroup['perpMarkets'].map((x) => {
           return {
             name: x.name,
-            value: x.marketIndex,
+            value: x.publicKey,
           }
         })
       : []
   }
   const inputs: InstructionInput[] = [
     {
-      label: 'Governance',
+      label: 'Program',
       initialValue: form.governedAccount,
       name: 'governedAccount',
       type: InstructionInputType.GOVERNED_ACCOUNT,
@@ -151,31 +175,25 @@ const MakeSetMarketMode = ({
       }),
     },
     {
-      label: 'Market type',
-      initialValue: form.marketType,
+      label: 'Market',
+      initialValue: form.marketPk,
       type: InstructionInputType.SELECT,
-      name: 'marketType',
-      options: ASSET_TYPE,
-    },
-    {
-      label: 'Market index',
-      initialValue: form.marketIndex,
-      type: InstructionInputType.SELECT,
-      name: 'marketIndex',
+      name: 'marketPk',
       options: getOptionsForMarketIndex(),
-    },
-    {
-      label: 'Market mode',
-      initialValue: form.marketMode,
-      type: InstructionInputType.SELECT,
-      name: 'marketMode',
-      options: MARKET_MODE,
     },
     {
       label: 'Admin PublicKey',
       initialValue: form.adminPk,
       type: InstructionInputType.INPUT,
       name: 'adminPk',
+    },
+    {
+      label: 'Mango DAO Vault PublicKey',
+      initialValue: governedTokenAccounts
+        .find((x) => x.extensions.mint?.publicKey.toBase58() === mngoTokenMint)
+        ?.extensions.transferAddress?.toBase58(),
+      type: InstructionInputType.INPUT,
+      name: 'mngoDaoVaultPk',
     },
   ]
 
@@ -194,4 +212,4 @@ const MakeSetMarketMode = ({
   )
 }
 
-export default MakeSetMarketMode
+export default MakeRemovePerpMarket

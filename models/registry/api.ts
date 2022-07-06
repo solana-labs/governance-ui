@@ -105,7 +105,7 @@ export function getCertifiedRealmInfo(
 // If they keep getting added we might want to use some pattern to exclude them
 
 // Other excluded ones are know test DAOs like Test 'Grape Test' for example
-
+//hidden realms
 const EXCLUDED_REALMS = new Map<string, string>([
   ['HtV3PXqDhuPoCTDfYhaWxrs5e7oYk96zYpiWSrWCj6FC', ''],
   ['3mBJhp6w7Sqi6JhbnNvV6yi3RHDveUGsmzeyWprBFBWB', ''],
@@ -156,6 +156,7 @@ const EXCLUDED_REALMS = new Map<string, string>([
   ['DkSvNgykZPPFczhJVh8HDkhz25ByrDoPcB32q75AYu9k', ''], // UXDProtocolDAO test
   ['CvAD2XnHuJCzTyqRRHZtqRigVw11i9CDH8ACRGQpxhuf', ''], // Savana Sins Club
   ['AxuK6ZGEQS2vrLXwJeK5pZFBAAPamEUyQXptfEEnCHuD', ''],
+  ['24pZ9VkpRGTH6wHqjSsySYHpxAKbQL1Tczb6b7zytomZ', ''],
 ])
 
 // Returns all known realms from all known spl-gov instances which are not certified

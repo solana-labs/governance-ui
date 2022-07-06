@@ -54,13 +54,20 @@ const Realms = () => {
   const handleCreateRealmButtonClick = async () => {
     if (!connected) {
       try {
-        if (wallet) await wallet.connect()
+        if (wallet) {
+          await wallet.connect()
+        } else {
+          throw new Error('You need to connect a wallet to continue')
+        }
       } catch (error) {
         const err = error as Error
-        return notify({
-          type: 'error',
-          message: err.message,
-        })
+        let message = err.message
+
+        if (err.name === 'WalletNotReadyError') {
+          message = 'You must connect a wallet to create a DAO'
+        }
+
+        return notify({ message, type: 'error' })
       }
     }
     router.push(fmtUrlWithCluster(`/realms/new`))

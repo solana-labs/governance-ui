@@ -972,6 +972,29 @@
     "@ethersproject/logger" "^5.5.0"
     hash.js "1.1.7"
 
+"@everlend/common@workspace:^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@everlend/common/-/common-0.0.3.tgz#b18d7e025592a6f863dc84abf563ca2b25df0ac2"
+  integrity sha512-hj729mHUw250kJNKgdhfK/ZLiUJOSze2IquGyNs6qooMe856Au9E/vi3RlkuCzDMe3nkvvC8mpRzjzRmkwpJWw==
+  dependencies:
+    "@solana/spl-token" "^0.1.5"
+    "@solana/web3.js" "^1.16.1"
+    borsh "^0.6.0"
+    bs58 "^4.0.1"
+    buffer "^6.0.3"
+
+"@everlend/general-pool@^0.0.19":
+  version "0.0.19"
+  resolved "https://registry.yarnpkg.com/@everlend/general-pool/-/general-pool-0.0.19.tgz#35c449cee0dfd9f9d3c49f1f3dbbd7cc59927634"
+  integrity sha512-GoEntJ9fchb4QUd/cLF1unpovlaWZEcEMcMiavClQfM49HR9U3VglUYGhQJ/6uRABnr43qH3YfMTccnZ7y/lvw==
+  dependencies:
+    "@everlend/common" "workspace:^0.0.3"
+    "@solana/spl-token" "^0.1.5"
+    "@solana/web3.js" "^1.16.1"
+    borsh "^0.6.0"
+    bs58 "^4.0.1"
+    buffer "^6.0.3"
+
 "@fast-csv/format@4.3.5":
   version "4.3.5"
   resolved "https://registry.npmjs.org/@fast-csv/format/-/format-4.3.5.tgz"
@@ -2784,7 +2807,7 @@
     buffer-layout "^1.2.0"
     dotenv "10.0.0"
 
-"@solana/spl-token@0.1.8", "@solana/spl-token@^0.1.6", "@solana/spl-token@^0.1.8":
+"@solana/spl-token@0.1.8", "@solana/spl-token@^0.1.5", "@solana/spl-token@^0.1.6", "@solana/spl-token@^0.1.8":
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/@solana/spl-token/-/spl-token-0.1.8.tgz#f06e746341ef8d04165e21fc7f555492a2a0faa6"
   integrity sha512-LZmYCKcPQDtJgecvWOgT/cnoIQPWjdH+QVyzPcFvyDUiT0DiRjZaam4aqNUyvchLFhzgunv3d9xOoyE34ofdoQ==
@@ -2972,6 +2995,28 @@
     cross-fetch "^3.1.4"
     jayson "^3.4.4"
     js-sha3 "^0.8.0"
+    rpc-websockets "^7.4.2"
+    secp256k1 "^4.0.2"
+    superstruct "^0.14.2"
+    tweetnacl "^1.0.0"
+
+"@solana/web3.js@^1.16.1":
+  version "1.44.2"
+  resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.44.2.tgz#5303efd94a7f2d6054a1483a4b4db4a26eb2a392"
+  integrity sha512-DvrJMoKonLuaX0/KyyJXcP/+w+9q8mve4gN3hC2Ptg51K/Gi1/cx6oQN2lbRZb4wYPBd2s2GDAJAJUAwZGsEug==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+    "@ethersproject/sha2" "^5.5.0"
+    "@solana/buffer-layout" "^4.0.0"
+    bigint-buffer "^1.1.5"
+    bn.js "^5.0.0"
+    borsh "^0.7.0"
+    bs58 "^4.0.1"
+    buffer "6.0.1"
+    fast-stable-stringify "^1.0.0"
+    jayson "^3.4.4"
+    js-sha3 "^0.8.0"
+    node-fetch "2"
     rpc-websockets "^7.4.2"
     secp256k1 "^4.0.2"
     superstruct "^0.14.2"
