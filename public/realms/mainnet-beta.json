@@ -836,5 +836,14 @@
     "website": "https://flipsidecrypto.xyz/",
     "twitter": "@flipsidecrypto",
     "ogImage": "/realms/FSLOGO/FLIPSIDE-LOGO-WHITE.png"
+  },
+  {
+    "symbol": "AthensDAO",
+    "displayName": "AthensDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "CErE41LChpKNpRKpcRKkbmYbEs8PiVcoKQpHUqryy7gm",
+    "website": "https://athensdao.net/",
+    "twitter": "@GrapeAthensDAO",
+    "ogImage": "/realms/AthensDAO/AthensDAO_Logo.jpg"
   }
 ]
