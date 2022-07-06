@@ -207,7 +207,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
         </div>
         <div className="flex items-center justify-between mb-4">
           <h1 className="leading-none mb-0">
-            Your Account{' '}
+            My Voting Power{' '}
             <span className="font-normal text-fgd-2 text-xs">
               ({realmInfo?.displayName})
             </span>
