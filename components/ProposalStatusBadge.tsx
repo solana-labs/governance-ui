@@ -110,6 +110,7 @@ function getTextColor(
     case ProposalState.ExecutingWithErrors:
       return 'text-[#FF7C7C]'
     case ProposalState.Executing:
+      return 'text-[#5DC9EB]'
     case ProposalState.SigningOff:
       return 'text-[#F5A458]'
     case ProposalState.Succeeded:

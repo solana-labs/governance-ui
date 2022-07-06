@@ -94,9 +94,10 @@ export default function ProposalExecutionCard(props: Props) {
             ? 'Execution Hold Up Time'
             : 'Execute Proposal'}
         </h3>
-        {minHoldUpTime !== null && (
+        {!!executed.length && (
           <div className="text-xs text-white/50">
             {executed.length} {ntext(executed.length, 'transaction')} executed
+            {!!ready.length && `. ${ready.length} ready to execute.`}
           </div>
         )}
         <div className="mt-4">
