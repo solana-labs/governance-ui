@@ -5,7 +5,11 @@ import { useEffect, useState, useRef } from 'react'
 
 import { ntext } from '@utils/ntext'
 
-const diffTime = (ended: boolean, now: dayjs.Dayjs, end: dayjs.Dayjs) => {
+export const diffTime = (
+  ended: boolean,
+  now: dayjs.Dayjs,
+  end: dayjs.Dayjs
+) => {
   if (ended) {
     return {
       days: 0,

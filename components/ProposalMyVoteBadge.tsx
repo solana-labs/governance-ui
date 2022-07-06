@@ -16,7 +16,7 @@ interface VoteRecords {
   [proposal: string]: ProgramAccount<VoteRecord>
 }
 
-function getOwnVoteRecord(
+export function getOwnVoteRecord(
   communityDelegateVoteRecords: VoteRecords,
   councilDelegateVoteRecords: VoteRecords,
   ownVoteRecords: VoteRecords,

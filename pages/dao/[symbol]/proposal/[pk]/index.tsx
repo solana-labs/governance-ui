@@ -23,6 +23,8 @@ import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import Link from 'next/link'
 import useQueryContext from '@hooks/useQueryContext'
 import { ChevronRightIcon } from '@heroicons/react/solid'
+import ProposalExecutionCard from '@components/ProposalExecutionCard'
+import useWalletStore from 'stores/useWalletStore'
 
 const Proposal = () => {
   const { realmInfo, symbol } = useRealm()
@@ -31,6 +33,7 @@ const Proposal = () => {
   const { yesVoteProgress, yesVotesRequired } = useProposalVotes(
     proposal?.account
   )
+  const currentWallet = useWalletStore((s) => s.current)
 
   const showResults =
     proposal &&
@@ -56,6 +59,16 @@ const Proposal = () => {
   }, [descriptionLink])
 
   const { fmtUrlWithCluster } = useQueryContext()
+  const showTokenBalance = proposal
+    ? proposal.account.state === ProposalState.Draft ||
+      proposal.account.state === ProposalState.SigningOff ||
+      proposal.account.state === ProposalState.Voting
+    : true
+  const showProposalExecution =
+    proposal &&
+    (proposal.account.state === ProposalState.Succeeded ||
+      proposal.account.state === ProposalState.Executing ||
+      proposal.account.state === ProposalState.ExecutingWithErrors)
 
   return (
     <div className="grid grid-cols-12 gap-4">
@@ -112,8 +125,13 @@ const Proposal = () => {
       </div>
 
       <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
-        <TokenBalanceCardWrapper proposal={option(proposal?.account)} />
+        {showTokenBalance && (
+          <TokenBalanceCardWrapper proposal={option(proposal?.account)} />
+        )}
         <VotePanel />
+        {proposal && currentWallet && showProposalExecution && (
+          <ProposalExecutionCard proposal={proposal} />
+        )}
         {showResults ? (
           <div className="bg-bkg-2 rounded-lg">
             <div className="p-4 md:p-6">

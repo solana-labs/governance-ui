@@ -110,7 +110,10 @@ export function ExecuteAllInstructionButton({
   ) {
     return (
       <Button small disabled={!connected} onClick={onExecuteInstructions}>
-        Execute All
+        Execute
+        {proposalInstructions.length > 1
+          ? ` (${proposalInstructions.length})`
+          : ''}
       </Button>
     )
   }
