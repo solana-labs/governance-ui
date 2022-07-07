@@ -1,5 +1,5 @@
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
-import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
+import { deprecated } from '@metaplex-foundation/mpl-token-metadata'
 import { NftVoterClient } from '@solana/governance-program-library'
 import {
   SwitchboardQueueVoterClient,
@@ -52,7 +52,7 @@ export interface VotingClientProps {
 }
 
 export interface NFTWithMeta extends NFTWithMint {
-  metadata: Metadata
+  metadata: deprecated.Metadata
 }
 
 enum VotingClientType {

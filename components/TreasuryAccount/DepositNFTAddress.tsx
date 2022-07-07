@@ -4,7 +4,7 @@ import Input from '@components/inputs/Input'
 import { tryParseKey } from '@tools/validators/pubkey'
 import { debounce } from '@utils/debounce'
 import useWalletStore from 'stores/useWalletStore'
-import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
+import { deprecated } from '@metaplex-foundation/mpl-token-metadata'
 import axios from 'axios'
 import { notify } from '@utils/notifications'
 import Loading from '@components/Loading'
@@ -25,6 +25,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import DepositLabel from './DepositLabel'
 import NFTAccountSelect from './NFTAccountSelect'
 import ImgWithLoader from '@components/ImgWithLoader'
+
 const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
 
@@ -35,7 +36,9 @@ const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
     mint: '',
   })
   const [isLoading, setIsLoading] = useState(false)
-  const [nftMetaData, setNftMetaData] = useState<Metadata | null>(null)
+  const [nftMetaData, setNftMetaData] = useState<deprecated.Metadata | null>(
+    null
+  )
   const [isInvalidMint, setIsInvalidMint] = useState(false)
   const [formErrors, setFormErrors] = useState({})
   const [imgUrl, setImgUrl] = useState('')
@@ -97,8 +100,8 @@ const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
         if (pubKey) {
           setIsLoading(true)
           try {
-            const metadataPDA = await Metadata.getPDA(pubKey)
-            const tokenMetadata = await Metadata.load(
+            const metadataPDA = await deprecated.Metadata.getPDA(pubKey)
+            const tokenMetadata = await deprecated.Metadata.load(
               connection.current,
               metadataPDA
             )
