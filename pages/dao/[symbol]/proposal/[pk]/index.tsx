@@ -10,11 +10,9 @@ import ApprovalQuorum from 'components/ApprovalQuorum'
 import useRealm from 'hooks/useRealm'
 import useProposalVotes from 'hooks/useProposalVotes'
 import ProposalTimeStatus from 'components/ProposalTimeStatus'
-import { option } from 'tools/core/option'
 import React, { useEffect, useState } from 'react'
 import ProposalActionsPanel from '@components/ProposalActions'
 import { getRealmExplorerHost } from 'tools/routing'
-import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import { ProposalState } from '@solana/spl-governance'
 import VoteResultStatus from '@components/VoteResultStatus'
 import VoteResults from '@components/VoteResults'
@@ -25,6 +23,7 @@ import useQueryContext from '@hooks/useQueryContext'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import ProposalExecutionCard from '@components/ProposalExecutionCard'
 import useWalletStore from 'stores/useWalletStore'
+import ProposalVotingPower from '@components/ProposalVotingPower'
 
 const Proposal = () => {
   const { realmInfo, symbol } = useRealm()
@@ -125,9 +124,7 @@ const Proposal = () => {
       </div>
 
       <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
-        {showTokenBalance && (
-          <TokenBalanceCardWrapper proposal={option(proposal?.account)} />
-        )}
+        {showTokenBalance && <ProposalVotingPower />}
         <VotePanel />
         {proposal && currentWallet && showProposalExecution && (
           <ProposalExecutionCard />

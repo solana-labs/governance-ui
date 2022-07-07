@@ -192,6 +192,7 @@ const VotePanel = () => {
     : !ownVoteRecord?.account.isRelinquished
 
   const isPanelVisible = (isVoting || isVoteCast) && isVisibleToWallet
+  const didNotVote = !!proposal && !isVoting && !isVoteCast && isVisibleToWallet
 
   //Todo: move to own components with refactor to dao folder structure
   const isPyth =
@@ -297,6 +298,14 @@ const VotePanel = () => {
               voterTokenRecord={voterTokenRecord!}
             />
           ) : null}
+        </div>
+      )}
+      {didNotVote && (
+        <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-4 flex flex-col items-center">
+          <h3 className="mb-3 text-center">You did not vote</h3>
+          <div className="border border-white/10 h-10 w-48 rounded-full text-white/10 flex items-center justify-center">
+            &mdash;
+          </div>
         </div>
       )}
     </>
