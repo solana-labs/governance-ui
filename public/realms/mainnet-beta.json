@@ -836,8 +836,17 @@
     "website": "https://flipsidecrypto.xyz/",
     "twitter": "@flipsidecrypto",
     "ogImage": "/realms/FSLOGO/FLIPSIDE-LOGO-WHITE.png"
-  },
-  {
+    },
+    {
+    "symbol": "GrapeCCSubDAO",
+    "displayName": "Grape CC SubDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "A9zS9kTuobH3nSyzvhtVqhRA61vXs2wnxrQgMScUBzur",
+    "website": "https://services.grapes.network/",
+    "twitter": "@grapeprotocol",
+    "ogImage": "/realms/GrapeCCSubDAO/GrapeCCSubDAO.png"
+   },
+   {
     "symbol": "AthensDAO",
     "displayName": "AthensDAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
