@@ -42,7 +42,7 @@
     "@identity.com/solana-gateway-ts": "^0.8.2",
     "@marinade.finance/marinade-ts-sdk": "^2.0.9",
     "@metaplex-foundation/js": "^0.11.7",
-    "@metaplex-foundation/mpl-token-metadata": "^2.2.1",
+    "@metaplex-foundation/mpl-token-metadata": "~2.0",
     "@mithraic-labs/serum-remote": "^0.0.1-rc.16",
     "@next/bundle-analyzer": "^12.1.5",
     "@nfteyez/sol-rayz": "^0.10.2",
