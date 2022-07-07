@@ -643,3 +643,20 @@ export const getRealmCfgSchema = ({ form }) => {
       ),
   })
 }
+
+export const getCreateTokenMetadataSchema = () => {
+  return yup.object().shape({
+    name: yup.string().required('Name is required'),
+    symbol: yup.string().required('Symbol is required'),
+    uri: yup.string().required('URI is required'),
+    mintAccount: yup.object().nullable().required('Mint is required'),
+  })
+}
+export const getUpdateTokenMetadataSchema = () => {
+  return yup.object().shape({
+    name: yup.string().required('Name is required'),
+    symbol: yup.string().required('Symbol is required'),
+    uri: yup.string().required('URI is required'),
+    mintAccount: yup.object().nullable().required('Mint is required'),
+  })
+}

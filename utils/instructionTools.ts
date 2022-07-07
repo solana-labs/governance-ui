@@ -28,6 +28,11 @@ import { isFormValid } from './formValidation'
 import { getTokenAccountsByMint } from './tokens'
 import { UiInstruction } from './uiTypes/proposalCreationTypes'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import {
+  createCreateMetadataAccountV2Instruction,
+  createUpdateMetadataAccountV2Instruction,
+} from '@metaplex-foundation/mpl-token-metadata'
+import { findMetadataPda } from '@metaplex-foundation/js'
 
 export const validateInstruction = async ({
   schema,
@@ -570,5 +575,126 @@ export const getTransferInstructionObj = async ({
     new u64(mintAmount.toString())
   )
   obj.transferInstruction = transferIx
+  return obj
+}
+
+export async function getCreateTokenMetadataInstruction({
+  schema,
+  form,
+  programId,
+  governedMintInfoAccount,
+  setFormErrors,
+  mintAuthority,
+  payerSolTreasury,
+}: {
+  schema: any
+  form: any
+  programId: PublicKey | undefined
+  governedMintInfoAccount: AssetAccount | undefined
+  setFormErrors: any
+  mintAuthority: PublicKey | null | undefined
+  payerSolTreasury: PublicKey | null | undefined
+}): Promise<UiInstruction> {
+  const isValid = await validateInstruction({ schema, form, setFormErrors })
+  let serializedInstruction = ''
+  const prerequisiteInstructions: TransactionInstruction[] = []
+  if (
+    isValid &&
+    programId &&
+    form.mintAccount?.pubkey &&
+    mintAuthority &&
+    payerSolTreasury
+  ) {
+    const metadataPDA = await findMetadataPda(form.mintAccount?.pubkey)
+
+    const tokenMetadata = {
+      name: form.name,
+      symbol: form.symbol,
+      uri: form.uri,
+      sellerFeeBasisPoints: 0,
+      creators: null,
+      collection: null,
+      uses: null,
+    }
+
+    const transferIx = createCreateMetadataAccountV2Instruction(
+      {
+        metadata: metadataPDA,
+        mint: form.mintAccount?.pubkey,
+        mintAuthority,
+        payer: payerSolTreasury,
+        updateAuthority: mintAuthority,
+      },
+      {
+        createMetadataAccountArgsV2: {
+          data: tokenMetadata,
+          isMutable: true,
+        },
+      }
+    )
+    serializedInstruction = serializeInstructionToBase64(transferIx)
+  }
+  const obj: UiInstruction = {
+    serializedInstruction,
+    isValid,
+    governance: governedMintInfoAccount?.governance,
+    prerequisiteInstructions: prerequisiteInstructions,
+  }
+  return obj
+}
+export async function getUpdateTokenMetadataInstruction({
+  schema,
+  form,
+  programId,
+  governedMintInfoAccount,
+  setFormErrors,
+  mintAuthority,
+}: {
+  schema: any
+  form: any
+  programId: PublicKey | undefined
+  governedMintInfoAccount: AssetAccount | undefined
+  setFormErrors: any
+  mintAuthority: PublicKey | null | undefined
+}): Promise<UiInstruction> {
+  const isValid = await validateInstruction({ schema, form, setFormErrors })
+  let serializedInstruction = ''
+  const prerequisiteInstructions: TransactionInstruction[] = []
+  if (isValid && programId && form.mintAccount?.pubkey && mintAuthority) {
+    const metadataPDA = await findMetadataPda(form.mintAccount?.pubkey)
+
+    const tokenMetadata = {
+      name: form.name,
+      symbol: form.symbol,
+      uri: form.uri,
+      sellerFeeBasisPoints: 0,
+      creators: null,
+      collection: null,
+      uses: null,
+    }
+
+    const transferIx = createUpdateMetadataAccountV2Instruction(
+      {
+        metadata: metadataPDA,
+        updateAuthority: mintAuthority,
+      },
+      {
+        updateMetadataAccountArgsV2: {
+          data: tokenMetadata,
+          updateAuthority: mintAuthority,
+          primarySaleHappened: true,
+          isMutable: true,
+        },
+      }
+    )
+    serializedInstruction = serializeInstructionToBase64(transferIx)
+  }
+
+  const obj: UiInstruction = {
+    serializedInstruction,
+    isValid,
+    governance: governedMintInfoAccount?.governance,
+    prerequisiteInstructions: prerequisiteInstructions,
+  }
   return obj
 }

@@ -82,6 +82,8 @@ import GoblinGoldWithdraw from './components/instructions/GoblinGold/GoblinGoldW
 import MakeSetMarketMode from './components/instructions/Mango/MakeSetMarketMode'
 import CreateGatewayPluginRegistrar from './components/instructions/GatewayPlugin/CreateRegistrar'
 import MakeChangeQuoteParams from './components/instructions/Mango/MakeChangeQuoteParams'
+import CreateTokenMetadata from './components/instructions/CreateTokenMetadata'
+import UpdateTokenMetadata from './components/instructions/UpdateTokenMetadata'
 import TypeaheadSelect from '@components/TypeaheadSelect'
 import { StyledLabel } from '@components/inputs/styles'
 import classNames from 'classnames'
@@ -562,6 +564,20 @@ const New = () => {
             index={idx}
             governance={governance}
           ></CreateVsrRegistrar>
+        )
+      case Instructions.CreateTokenMetadata:
+        return (
+          <CreateTokenMetadata
+            index={idx}
+            governance={governance}
+          ></CreateTokenMetadata>
+        )
+      case Instructions.UpdateTokenMetadata:
+        return (
+          <UpdateTokenMetadata
+            index={idx}
+            governance={governance}
+          ></UpdateTokenMetadata>
         )
       default:
         null

@@ -14,6 +14,7 @@ import {
 
 export function InstructionPanel() {
   const { instructions, proposal } = useProposal()
+  console.log({ instructions })
   const { realmInfo } = useRealm()
   const mounted = useRef(false)
   useEffect(() => {
