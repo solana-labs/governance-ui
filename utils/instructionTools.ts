@@ -632,6 +632,7 @@ export async function getCreateTokenMetadataInstruction({
         },
       }
     )
+    transferIx.keys[3].isWritable = true
     serializedInstruction = serializeInstructionToBase64(transferIx)
   }
   const obj: UiInstruction = {
