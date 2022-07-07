@@ -313,6 +313,9 @@ export class VotingClient {
       )
       for (let i = 0; i < this.votingNfts.length; i++) {
         const nft = this.votingNfts[i]
+        if (!nft.metadata.data) {
+          return
+        }
         const [nftVoteRecord] = await PublicKey.findProgramAddress(
           [
             Buffer.from('nft-vote-record'),
