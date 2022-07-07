@@ -92,7 +92,7 @@ const TokenBalanceCard: FC<Props> = ({ proposal, children }) => {
   return (
     <div className="p-4 rounded-lg bg-bkg-2 md:p-6">
       <div className="flex items-center justify-between">
-        <h3 className="mb-0">My Voting Power</h3>
+        <h3 className="mb-0">Your account</h3>
         <Link
           href={fmtUrlWithCluster(
             `/dao/${symbol}/account/${tokenOwnerRecordPk}`

@@ -4,7 +4,7 @@ import classNames from 'classnames'
 import useRealm from '@hooks/useRealm'
 import useRealmGovernance from '../hooks/useRealmGovernance'
 
-const hasInstructions = (proposal: Proposal) => {
+export const hasInstructions = (proposal: Proposal) => {
   if (proposal.instructionsCount) {
     return true
   }

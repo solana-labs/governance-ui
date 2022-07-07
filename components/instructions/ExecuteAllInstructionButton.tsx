@@ -25,15 +25,19 @@ export enum PlayState {
 }
 
 export function ExecuteAllInstructionButton({
+  className,
   proposal,
   playing,
   setPlaying,
   proposalInstructions,
+  small,
 }: {
+  className?: string
   proposal: ProgramAccount<Proposal>
   proposalInstructions: ProgramAccount<ProposalTransaction>[]
   playing: PlayState
   setPlaying: React.Dispatch<React.SetStateAction<PlayState>>
+  small?: boolean
 }) {
   const { realmInfo } = useRealm()
   const wallet = useWalletStore((s) => s.current)
@@ -109,7 +113,12 @@ export function ExecuteAllInstructionButton({
     )
   ) {
     return (
-      <Button small disabled={!connected} onClick={onExecuteInstructions}>
+      <Button
+        className={className}
+        small={small ?? true}
+        disabled={!connected}
+        onClick={onExecuteInstructions}
+      >
         Execute
         {proposalInstructions.length > 1
           ? ` (${proposalInstructions.length})`

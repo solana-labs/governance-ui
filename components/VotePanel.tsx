@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-
+import classNames from 'classnames'
 import { withFinalizeVote, YesNoVote } from '@solana/spl-governance'
 import { TransactionInstruction } from '@solana/web3.js'
 import { useCallback, useState } from 'react'
@@ -215,23 +215,15 @@ const VotePanel = () => {
               <div className="flex flex-col gap-6 min-w-[200px]">
                 {ownVoteRecord &&
                   (isYesVote(ownVoteRecord.account) ? (
-                    <Button disabled>
-                      <div className="flex flex-row items-center justify-center">
-                        <div className="bg-black rounded-full mr-1 p-[6px]">
-                          <ThumbUpIcon className="h-4 w-4 fill-[#8EFFDD]" />{' '}
-                        </div>
-                        Yes
-                      </div>
-                    </Button>
+                    <div className="flex flex-row items-center justify-center h-10 w-48 rounded-full border border-black">
+                      <ThumbUpIcon className="h-4 w-4 fill-[#8EFFDD] mr-1" />{' '}
+                      Yes
+                    </div>
                   ) : (
-                    <Button disabled>
-                      <div className="flex flex-row items-center justify-center">
-                        <div className="bg-black rounded-full mr-1 p-[6px]">
-                          <ThumbDownIcon className="h-4 w-4 fill-[#FF7C7C]" />{' '}
-                        </div>
-                        No
-                      </div>
-                    </Button>
+                    <div className="flex flex-row items-center justify-center h-10 w-48 rounded-full border border-black">
+                      <ThumbDownIcon className="h-4 w-4 fill-[#FF7C7C] mr-1" />{' '}
+                      No
+                    </div>
                   ))}
                 {isVoting && (
                   <Button
@@ -255,7 +247,15 @@ const VotePanel = () => {
                       disabled={!isVoteEnabled}
                     >
                       <div className="flex flex-row items-center justify-center">
-                        <div className="bg-black rounded-full mr-1 p-[6px]">
+                        <div
+                          className={classNames(
+                            'bg-black',
+                            'rounded-full',
+                            'mr-1',
+                            'p-[6px]',
+                            !isVoteEnabled && 'opacity-30'
+                          )}
+                        >
                           <ThumbUpIcon className="h-3 w-3 fill-[#8EFFDD]" />{' '}
                         </div>
                         Vote Yes
@@ -269,7 +269,15 @@ const VotePanel = () => {
                       disabled={!isVoteEnabled}
                     >
                       <div className="flex flex-row items-center justify-center">
-                        <div className="bg-black rounded-full mr-1 p-[6px]">
+                        <div
+                          className={classNames(
+                            'bg-black',
+                            'rounded-full',
+                            'mr-1',
+                            'p-[6px]',
+                            !isVoteEnabled && 'opacity-30'
+                          )}
+                        >
                           <ThumbDownIcon className="h-3 w-3 fill-[#FF7C7C]" />
                         </div>
                         Vote No

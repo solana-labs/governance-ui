@@ -108,13 +108,15 @@ export default function ProposalExecutionCard(props: Props) {
         <div className="mt-4">
           {ready.length ? (
             <ExecuteAllInstructionButton
+              className="w-48"
               proposal={proposal}
               playing={playState}
               setPlaying={setPlayState}
+              small={false}
               proposalInstructions={ready}
             />
           ) : (
-            <Button small disabled>
+            <Button className="w-48" disabled>
               Execute
             </Button>
           )}
@@ -125,7 +127,7 @@ export default function ProposalExecutionCard(props: Props) {
           </div>
         )}
         {timeLeft && (
-          <div className="bg-black rounded-full h-8 px-8 flex flex-row items-center justify-center mt-2 text-xs text-white">
+          <div className="bg-black rounded-full h-10 w-48 px-8 flex flex-row items-center justify-center mt-2 text-xs text-white">
             <LockClosedIcon className="h-3 w-3 mr-3" />
             {timeLeft.days}d &nbsp; : &nbsp;
             {timeLeft.hours}h &nbsp; : &nbsp;

@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useState } from 'react'
-
+import { ThumbDownIcon, ThumbUpIcon } from '@heroicons/react/solid'
 import {
   ChatMessageBody,
   ChatMessageBodyType,
@@ -116,7 +116,19 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
           className="w-44 flex items-center justify-center"
           onClick={() => submitVote(vote)}
         >
-          {submitting ? <Loading /> : <span>Vote {voteString}</span>}
+          <div className="flex items-center">
+            {!submitting &&
+              (vote === YesNoVote.Yes ? (
+                <div className="bg-black rounded-full mr-1 p-[6px]">
+                  <ThumbUpIcon className="h-4 w-4 fill-[#8EFFDD]" />{' '}
+                </div>
+              ) : (
+                <div className="bg-black rounded-full mr-1 p-[6px]">
+                  <ThumbDownIcon className="h-4 w-4 fill-[#FF7C7C]" />{' '}
+                </div>
+              ))}
+            {submitting ? <Loading /> : <span>Vote {voteString}</span>}
+          </div>
         </Button>
       </div>
     </Modal>
