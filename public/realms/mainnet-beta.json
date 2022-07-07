@@ -845,5 +845,14 @@
     "website": "https://athensdao.net/",
     "twitter": "@GrapeAthensDAO",
     "ogImage": "/realms/AthensDAO/AthensDAO_Logo.jpg"
+  },
+  {
+    "symbol": "BOOT",
+    "displayName": "Bootstrap DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "9Fr59GhDJ3HZoTovm83JGEBgi8QjzKGyvqVchcp2u1na",
+    "website": "https://www.bootstrapdao.xyz/",
+    "twitter": "@BootstrapDao",
+    "ogImage": "/realms/BootstrapDAO/BootRealms.png"
   }
-]
+ ]
