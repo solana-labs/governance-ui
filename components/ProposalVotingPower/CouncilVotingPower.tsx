@@ -45,7 +45,7 @@ export default function CouncilVotingPower(props: Props) {
       <div className="text-white/50 text-xs">{tokenName} Council Votes</div>
       <div className="flex items-center justify-between mt-1">
         <div className="text-white font-bold text-2xl">{amount.toFormat()}</div>
-        {max && (
+        {max && !max.isZero() && (
           <div className="text-[11px] leading-[15px] text-white/70 text-right">
             {amount.shiftedBy(2).dividedBy(max).toFixed(2)}% of total
             <br />

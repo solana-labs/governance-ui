@@ -1,6 +1,14 @@
 import classNames from 'classnames'
 
 import useWalletStore from 'stores/useWalletStore'
+import {
+  gatewayPluginsPks,
+  switchboardPluginsPks,
+} from '@hooks/useVotingPlugins'
+import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
+import useRealm from '@hooks/useRealm'
+import useProposal from '@hooks/useProposal'
+import { option } from '@tools/core/option'
 
 import VotingPower from './VotingPower'
 
@@ -10,6 +18,21 @@ interface Props {
 
 export default function ProposalVotingPower(props: Props) {
   const connected = !!useWalletStore((s) => s.current?.connected)
+  const { config } = useRealm()
+  const { proposal } = useProposal()
+
+  const currentPluginPk = config?.account?.communityVoterWeightAddin
+
+  const isUsingGatewayPlugin =
+    currentPluginPk && gatewayPluginsPks.includes(currentPluginPk.toBase58())
+
+  const isUsingSwitchboardPlugin =
+    currentPluginPk &&
+    switchboardPluginsPks.includes(currentPluginPk.toBase58())
+
+  if (isUsingGatewayPlugin || isUsingSwitchboardPlugin) {
+    return <TokenBalanceCardWrapper proposal={option(proposal?.account)} />
+  }
 
   return (
     <div

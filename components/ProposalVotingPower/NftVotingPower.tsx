@@ -2,7 +2,6 @@ import classNames from 'classnames'
 import { BigNumber } from 'bignumber.js'
 
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
-import useRealm from '@hooks/useRealm'
 
 interface Props {
   className?: string
@@ -11,12 +10,13 @@ interface Props {
 export default function NftVotingPower(props: Props) {
   const nfts = useNftPluginStore((s) => s.state.votingNfts)
   const votingPower = useNftPluginStore((s) => s.state.votingPower)
-  const { realm } = useRealm()
+  const maxWeight = useNftPluginStore((s) => s.state.maxVoteRecord)
 
   const displayNfts = nfts.slice(0, 3)
   const remainingCount = Math.max(nfts.length - 3, 0)
-  const maxStr = realm?.account.config.communityMintMaxVoteWeightSource.value.toString()
-  const max = maxStr ? new BigNumber(maxStr) : null
+  const max = maxWeight
+    ? new BigNumber(maxWeight.account.maxVoterWeight.toString())
+    : null
   const amount = new BigNumber(votingPower.toString())
 
   return (
