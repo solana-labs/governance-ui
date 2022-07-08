@@ -584,6 +584,7 @@ export async function getCreateTokenMetadataInstruction({
   schema,
   form,
   programId,
+  connection,
   wallet,
   governedMintInfoAccount,
   setFormErrors,
@@ -594,6 +595,7 @@ export async function getCreateTokenMetadataInstruction({
   schema: any
   form: any
   programId: PublicKey | undefined
+  connection: ConnectionContext
   wallet: WalletAdapter | undefined
   governedMintInfoAccount: AssetAccount | undefined
   setFormErrors: any
@@ -622,17 +624,6 @@ export async function getCreateTokenMetadataInstruction({
     payer &&
     wallet
   ) {
-    if (shouldMakeSolTreasury && !payerSolTreasury) {
-      const mintAmount = parseMintNaturalAmountFromDecimal(0.006, 9)
-      const preTransferIx = SystemProgram.transfer({
-        fromPubkey: wallet.publicKey!,
-        toPubkey: payer,
-        lamports: mintAmount,
-      })
-      preTransferIx.keys[0].isWritable = true
-      prerequisiteInstructions.push(preTransferIx)
-    }
-
     const metadataPDA = await findMetadataPda(form.mintAccount?.pubkey)
 
     const tokenMetadata = {
@@ -643,6 +634,42 @@ export async function getCreateTokenMetadataInstruction({
       creators: null,
       collection: null,
       uses: null,
+    }
+
+    const treasuryFee = await connection.current.getMinimumBalanceForRentExemption(
+      0
+    )
+    // Todo: metadataSize is hardcoded at this moment but should be caliculated in the future.
+    // On 8.July.2022, Metadata.getMinimumBalanceForRentExemption is returning wrong price.
+    // const metadataFee = await Metadata.getMinimumBalanceForRentExemption(
+    //   {
+    //     key: Key.MetadataV1,
+    //     updateAuthority: mintAuthority,
+    //     mint: form.mintAccount?.pubkey,
+    //     data: tokenMetadata,
+    //     primarySaleHappened: true,
+    //     isMutable: true,
+    //     tokenStandard: TokenStandard.Fungible,
+    //     uses: null,
+    //     collection: null,
+    //     editionNonce: 255,
+    //   },
+    //   connection.current
+    // )
+    const metadataFee = await connection.current.getMinimumBalanceForRentExemption(
+      679
+    )
+    const treasuryInfo = await connection.current.getAccountInfo(payer)
+    const solTreasury = treasuryInfo?.lamports ?? 0
+    const amount = treasuryFee + metadataFee - solTreasury
+    if (amount > 0) {
+      const preTransferIx = SystemProgram.transfer({
+        fromPubkey: wallet.publicKey!,
+        toPubkey: payer,
+        lamports: amount,
+      })
+      preTransferIx.keys[0].isWritable = true
+      prerequisiteInstructions.push(preTransferIx)
     }
 
     const transferIx = createCreateMetadataAccountV2Instruction(

@@ -23,6 +23,7 @@ const CreateTokenMetadata = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
+  const connection = useWalletStore((s) => s.connection)
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const mintGovernancesWithMintInfo = assetAccounts.filter(
@@ -61,6 +62,7 @@ const CreateTokenMetadata = ({
       schema,
       form,
       programId,
+      connection,
       wallet,
       governedMintInfoAccount: form.mintAccount,
       setFormErrors,
@@ -121,8 +123,8 @@ const CreateTokenMetadata = ({
         <>
           <div>
             <div className="pb-0.5 text-fgd-3 text-xs">
-              This will make SOL wallet for the governance and send 0.006 SOL
-              from your wallet to execute the transactions.
+              This will make SOL wallet for the governance and send SOL ({'<'}{' '}
+              0.006) from your wallet to execute the transactions.
             </div>
           </div>
         </>
