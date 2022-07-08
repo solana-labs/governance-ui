@@ -20,13 +20,13 @@ import {
   Config,
   getSpotMarketByBaseSymbol,
   getTokenBySymbol,
-  I80F48,
   makeChangeSpotMarketParamsInstruction,
   MangoClient,
   optionalBNFromString,
 } from '@blockworks-foundation/mango-client'
 import * as serum from '@project-serum/serum'
 import { AccountType } from '@utils/uiTypes/assets'
+import { I80F48OptionalFromNumber } from '@utils/tokens'
 
 const MakeChangeSpotMarket = ({
   index,
@@ -107,12 +107,12 @@ const MakeChangeSpotMarket = ({
         spotMarket.publicKey,
         rootBank!.publicKey,
         form.governedAccount.governance.pubkey,
-        I80F48.fromNumber(form.maintLeverage),
-        I80F48.fromNumber(form.initLeverage),
-        I80F48.fromNumber(form.liquidationFee),
-        I80F48.fromNumber(form.optUtil),
-        I80F48.fromNumber(form.optRate),
-        I80F48.fromNumber(form.maxRate),
+        I80F48OptionalFromNumber(form.maintLeverage),
+        I80F48OptionalFromNumber(form.initLeverage),
+        I80F48OptionalFromNumber(form.liquidationFee),
+        I80F48OptionalFromNumber(form.optUtil),
+        I80F48OptionalFromNumber(form.optRate),
+        I80F48OptionalFromNumber(form.maxRate),
         optionalBNFromString(form.version)
       )
 

@@ -1,0 +1,86 @@
+h1.heading-xl,
+h2.heading-lg,
+h3.heading-base,
+h4.heading-sm,
+.heading-cta {
+  letter-spacing: -0.5px;
+  line-height: 110%;
+  @apply font-normal;
+}
+
+h1.heading-xl {
+  font-size: 36px;
+  @apply font-serif md:text-[70px];
+}
+
+h2.heading-lg {
+  font-size: 36px;
+  @apply font-serif md:text-[50px];
+}
+
+h3.heading-base {
+  font-size: 24px;
+  @apply font-sans md:text-[36px];
+}
+
+h4.heading-sm {
+  font-size: 18px;
+  @apply font-sans md:text-[24px];
+}
+
+/* CTAs */
+.heading-cta {
+  font-size: 16px;
+  @apply font-sans md:text-[18px];
+}
+
+.body-base,
+.body-sm,
+.body-sm.font-bold,
+.body-xs {
+  letter-spacing: 0;
+  line-height: 140%;
+  @apply font-sans font-normal;
+}
+
+.body-lg {
+  font-size: 25px;
+}
+
+.body-base {
+  font-size: 18px;
+}
+
+.body-sm {
+  font-size: 15px;
+  @apply md:text-[16px];
+}
+
+.body-xs {
+  font-size: 12px;
+}
+
+.label-base {
+  letter-spacing: 0;
+  line-height: 120%;
+  font-size: 16px;
+  @apply font-sans font-normal;
+}
+
+.input-lg,
+.input-base,
+.input-sm {
+  letter-spacing: -0.5px;
+  line-height: 110%;
+  @apply font-sans font-normal;
+}
+
+.input-lg {
+  font-size: 28px;
+}
+.input-base {
+  font-size: 25px;
+}
+.input-sm {
+  font-size: 20px;
+}

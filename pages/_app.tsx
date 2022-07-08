@@ -2,6 +2,7 @@ import { ThemeProvider } from 'next-themes'
 import '@dialectlabs/react-ui/index.css'
 // import '../styles/ambit-font.css'
 import '../styles/index.css'
+import '../styles/typography.css'
 import useWallet from '../hooks/useWallet'
 import NavBar from '../components/NavBar'
 import PageBodyContainer from '../components/PageBodyContainer'
@@ -9,7 +10,6 @@ import useHydrateStore from '../hooks/useHydrateStore'
 import useRealm from '../hooks/useRealm'
 import { getResourcePathPart } from '../tools/core/resources'
 import handleRouterHistory from '@hooks/handleRouterHistory'
-import Footer from '@components/Footer'
 import { useEffect } from 'react'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import useWalletStore from 'stores/useWalletStore'
@@ -29,6 +29,7 @@ import TransactionLoader from '@components/TransactionLoader'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import { GatewayProvider } from '@components/Gateway/GatewayProvider'
+
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
 })
@@ -208,7 +209,6 @@ function App({ Component, pageProps }) {
           </WalletIdentityProvider>
         </ThemeProvider>
       </ErrorBoundary>
-      <Footer />
     </div>
   )
 }

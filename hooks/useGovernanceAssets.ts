@@ -277,6 +277,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
     },
     {
+      id: Instructions.MangoChangeQuoteParams,
+      name: 'Mango: Change Quote Params',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
       id: Instructions.MangoChangeReferralFeeParams,
       name: 'Mango: Change Referral Fee Params',
       isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
@@ -302,29 +307,19 @@ export default function useGovernanceAssets() {
       isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
     },
     {
-      id: Instructions.Mint,
-      name: 'Mint Tokens',
-      isVisible: canUseMintInstruction,
+      id: Instructions.MangoSetMarketMode,
+      name: 'Mango: Set Market Mode',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
     },
     {
-      id: Instructions.CreateAssociatedTokenAccount,
-      name: 'Create Associated Token Account',
-      isVisible: canUseAnyInstruction,
+      id: Instructions.MangoRemoveSpotMarket,
+      name: 'Mango: Remove Spot Market',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
     },
     {
-      id: Instructions.Base64,
-      name: 'Execute Custom Instruction',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.VotingMintConfig,
-      name: 'Vote Escrowed Tokens: Configure Voting Mint',
-      isVisible: canUseAuthorityInstruction,
-    },
-    {
-      id: Instructions.CreateVsrRegistrar,
-      name: 'Vote Escrowed Tokens: Create Registrar',
-      isVisible: canUseAuthorityInstruction,
+      id: Instructions.MangoRemovePerpMarket,
+      name: 'Mango: Remove Perp Market',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
     },
     {
       id: Instructions.DepositIntoVolt,

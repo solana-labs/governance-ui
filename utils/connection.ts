@@ -5,13 +5,11 @@ import type { EndpointInfo } from '../@types/types'
 const ENDPOINTS: EndpointInfo[] = [
   {
     name: 'mainnet',
-    url:
-      process.env.MAINNET_RPC ||
-      'https://explorer-api.mainnet-beta.solana.com/',
+    url: process.env.MAINNET_RPC || 'https://api.dao.solana.com/',
   },
   {
     name: 'devnet',
-    url: process.env.DEVNET_RPC || 'https://explorer-api.devnet.solana.com/',
+    url: process.env.DEVNET_RPC || 'https://api.dao.devnet.solana.com/',
   },
   {
     name: 'localnet',

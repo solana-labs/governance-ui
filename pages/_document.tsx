@@ -17,8 +17,16 @@ const Document = () => {
           name="msapplication-TileImage"
           content="/favicons/ms-icon-144x144.png"
         />
+        <meta
+          httpEquiv="Content-Security-Policy"
+          content="upgrade-insecure-requests"
+        />
+        <meta
+          property="twitter:image"
+          content="https://raw.githubusercontent.com/solana-labs/governance-ui/main/public/img/logo-realms.png"
+        />
         <meta name="theme-color" content="#ffffff" />
-
+        <meta name="twitter:title" content="Realms" />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary" />
       </Head>

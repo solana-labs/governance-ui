@@ -54,13 +54,20 @@ const Realms = () => {
   const handleCreateRealmButtonClick = async () => {
     if (!connected) {
       try {
-        if (wallet) await wallet.connect()
+        if (wallet) {
+          await wallet.connect()
+        } else {
+          throw new Error('You need to connect a wallet to continue')
+        }
       } catch (error) {
         const err = error as Error
-        return notify({
-          type: 'error',
-          message: err.message,
-        })
+        let message = err.message
+
+        if (err.name === 'WalletNotReadyError') {
+          message = 'You must connect a wallet to create a DAO'
+        }
+
+        return notify({ message, type: 'error' })
       }
     }
     router.push(fmtUrlWithCluster(`/realms/new`))
@@ -85,8 +92,8 @@ const Realms = () => {
   }
   return (
     <div>
-      <div className="flex items-center justify-between mb-6 w-full">
-        <h1 className="mb-0">DAOs</h1>
+      <div className="flex flex-wrap items-center justify-between w-full mb-6">
+        <h1 className="mb-4 sm:mb-0">DAOs</h1>
         <div className="flex space-x-4">
           <Input
             className="pl-8"
@@ -94,7 +101,7 @@ const Realms = () => {
             type="text"
             onChange={(e) => filterDaos(e.target.value)}
             placeholder={`Search DAOs...`}
-            prefix={<SearchIcon className="h-5 w-5 text-fgd-3" />}
+            prefix={<SearchIcon className="w-5 h-5 text-fgd-3" />}
           />
           <Button
             className="whitespace-nowrap"

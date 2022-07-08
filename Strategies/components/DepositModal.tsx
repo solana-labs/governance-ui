@@ -4,6 +4,7 @@ import SolendModalContent from './SolendModalContent'
 import MangoDeposit from './MangoDepositComponent'
 import BigNumber from 'bignumber.js'
 import { SolendStrategy } from 'Strategies/types/types'
+import EverlendModalContent from './EverlendModalContent'
 
 const DepositModal = ({
   onClose,
@@ -48,6 +49,14 @@ const DepositModal = ({
           currentPositionFtm={currentPositionFtm}
           createProposalFcn={createProposalFcn}
         ></MangoDeposit>
+      ) : null}
+      {protocolName === 'Everlend' ? (
+        <EverlendModalContent
+          proposedInvestment={proposedInvestment}
+          governedTokenAccount={governedTokenAccount}
+          handledMint={handledMint}
+          createProposalFcn={createProposalFcn}
+        />
       ) : null}
     </Modal>
   )

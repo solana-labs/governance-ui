@@ -40,7 +40,7 @@ export const getPredecessorProgramId = async (
   )
 
   // Find the gatekeeper network from the registrar
-  return registrarObject.previousVotingWeightPluginProgramId
+  return registrarObject.previousVoterWeightPluginProgramId
 }
 
 export const getPreviousVotingWeightRecord = async (
@@ -98,19 +98,19 @@ export const getVoteInstruction = async (
 
   // the previous voting weight record in the chain of plugins,
   // or the token owner record if this is the first plugin in the chain
-  const inputVotingWeight = await getPreviousVotingWeightRecord(
+  const inputVoterWeight = await getPreviousVotingWeightRecord(
     client,
     realm,
     walletPk
   )
 
-  // call updateVoterWeightRecord on the plugin
+  // call updateVotingWeightRecord on the plugin
   return client.program.methods
     .updateVoterWeightRecord()
     .accounts({
       registrar,
       voterWeightRecord: voterWeightPk,
-      inputVotingWeight,
+      inputVoterWeight,
       gatewayToken,
     })
     .instruction()

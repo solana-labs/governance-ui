@@ -11,7 +11,6 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import { BN } from '@project-serum/anchor'
 import {
   getNativeTreasuryAddress,
   RpcContext,
@@ -90,9 +89,7 @@ const MangoDepositComponent = ({
   const wallet = useWalletStore((s) => s.current)
   const tokenInfo = tokenService.getTokenInfo(handledMint)
   const { canUseTransferInstruction } = useGovernanceAssets()
-  const treasuryAmount = governedTokenAccount.extensions?.token
-    ? governedTokenAccount.extensions.token.account.amount
-    : new BN(0)
+  const treasuryAmount = governedTokenAccount.extensions.amount!
   const mintInfo = governedTokenAccount.extensions?.mint?.account
   const [form, setForm] = useState({
     title: '',

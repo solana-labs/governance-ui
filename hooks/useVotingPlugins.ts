@@ -268,10 +268,6 @@ export function useVotingPlugins() {
       }
     } catch (e) {
       console.log(e)
-      notify({
-        message: "Something went wrong can't fetch switchboard voting power",
-        type: 'error',
-      })
     }
     setIsLoading(false)
   }
@@ -297,6 +293,7 @@ export function useVotingPlugins() {
       setIsLoadingGatewayToken(false)
     }
   }
+
   const handleMaxVoterWeight = async () => {
     const { maxVoterWeightRecord } = await getPluginMaxVoterWeightRecord(
       realm!.pubkey,
@@ -455,7 +452,13 @@ export function useVotingPlugins() {
   ])
 
   useEffect(() => {
-    handleGetSwitchboardVoting()
+    if (
+      currentPluginPk &&
+      switchboardPluginsPks.includes(currentPluginPk.toBase58())
+    ) {
+      handleGetSwitchboardVoting()
+    }
+
     if (usedCollectionsPks.length && realm) {
       if (connected && currentClient.walletPk?.toBase58()) {
         handleGetNfts()

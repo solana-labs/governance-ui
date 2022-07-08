@@ -47,7 +47,6 @@ export async function grantPermissionTx(
   switchboardProgram: PublicKey,
   permission: PublicKey
 ): Promise<Transaction> {
-  console.log('IN GRANT FUNC')
   const [addinState] = await PublicKey.findProgramAddress(
     [Buffer.from('state')],
     program.programId
@@ -70,8 +69,6 @@ export async function revokePermissionTx(
   switchboardProgram: PublicKey,
   permission: PublicKey
 ): Promise<Transaction> {
-  console.log('IN REVOKE FUNC')
-
   const [addinState] = await PublicKey.findProgramAddress(
     [Buffer.from('state')],
     program.programId

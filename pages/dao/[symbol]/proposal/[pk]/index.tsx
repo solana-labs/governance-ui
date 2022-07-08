@@ -20,9 +20,12 @@ import VoteResultStatus from '@components/VoteResultStatus'
 import VoteResults from '@components/VoteResults'
 import { resolveProposalDescription } from '@utils/helpers'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
+import Link from 'next/link'
+import useQueryContext from '@hooks/useQueryContext'
+import { ChevronRightIcon } from '@heroicons/react/solid'
 
 const Proposal = () => {
-  const { realmInfo } = useRealm()
+  const { realmInfo, symbol } = useRealm()
   const { proposal, descriptionLink } = useProposal()
   const [description, setDescription] = useState('')
   const { yesVoteProgress, yesVotesRequired } = useProposalVotes(
@@ -51,6 +54,9 @@ const Proposal = () => {
       handleResolveDescription()
     }
   }, [descriptionLink])
+
+  const { fmtUrlWithCluster } = useQueryContext()
+
   return (
     <div className="grid grid-cols-12 gap-4">
       <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12 md:col-span-7 lg:col-span-8 space-y-3">
@@ -74,7 +80,9 @@ const Proposal = () => {
 
             <div className="py-4">
               <div className="flex items-center justify-between mb-1">
-                <h1 className="mr-2">{proposal?.account.name}</h1>
+                <h1 className="mr-2 overflow-wrap-anywhere">
+                  {proposal?.account.name}
+                </h1>
                 <ProposalStateBadge
                   proposalPk={proposal.pubkey}
                   proposal={proposal.account}
@@ -138,6 +146,21 @@ const Proposal = () => {
                 </div>
               )}
               <VoteResults proposal={proposal.account} />
+              {proposal && (
+                <div className="flex justify-end mt-4">
+                  <Link
+                    href={fmtUrlWithCluster(
+                      `/dao/${symbol}/proposal/${proposal.pubkey}/explore`
+                    )}
+                    passHref
+                  >
+                    <a className="text-sm flex items-center default-transition text-fgd-2 transition-all hover:text-fgd-3">
+                      Explore
+                      <ChevronRightIcon className="flex-shrink-0 h-6 w-6" />
+                    </a>
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         ) : null}

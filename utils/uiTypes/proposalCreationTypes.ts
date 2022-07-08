@@ -19,6 +19,7 @@ export interface UiInstruction {
   customHoldUpTime?: number
   prerequisiteInstructions?: TransactionInstruction[]
   chunkSplitByDefault?: boolean
+  prerequisiteInstructionsSigners?: Keypair[]
   chunkBy?: number
   signers?: Keypair[]
   shouldSplitIntoSeparateTxs?: boolean | undefined
@@ -146,6 +147,36 @@ export interface MangoMakeAddOracleForm {
   oracleAccount: string | undefined
 }
 
+type NameValue = {
+  name: string
+  value: string
+}
+
+export interface MangoMakeSetMarketModeForm {
+  governedAccount: AssetAccount | null
+  mangoGroup: NameValue | null
+  marketIndex: NameValue | null
+  marketMode: NameValue | null
+  marketType: NameValue | null
+  adminPk: string
+}
+
+export interface MangoRemovePerpMarketForm {
+  governedAccount: AssetAccount | null
+  mangoGroup: NameValue | null
+  marketPk: NameValue | null
+  adminPk: string
+  mngoDaoVaultPk: string
+}
+
+export interface MangoRemoveSpotMarketForm {
+  governedAccount: AssetAccount | null
+  mangoGroup: NameValue | null
+  marketIndex: NameValue | null
+  adminPk: string
+  adminVaultPk: string
+}
+
 export interface MangoMakeAddSpotMarketForm {
   governedAccount: AssetAccount | undefined
   programId: string | undefined
@@ -165,9 +196,9 @@ export interface MangoMakeChangeSpotMarketForm {
   programId: string | undefined
   mangoGroup: string | undefined
   baseSymbol: string | undefined
-  maintLeverage: number
-  initLeverage: number
-  liquidationFee: number
+  maintLeverage: number | undefined
+  initLeverage: number | undefined
+  liquidationFee: number | undefined
   optUtil: number
   optRate: number
   maxRate: number
@@ -327,6 +358,10 @@ export enum Instructions {
   MangoChangeReferralFeeParams,
   MangoChangeSpotMarket,
   MangoCreatePerpMarket,
+  MangoSetMarketMode,
+  MangoChangeQuoteParams,
+  MangoRemoveSpotMarket,
+  MangoRemovePerpMarket,
   Grant,
   Clawback,
   CreateAssociatedTokenAccount,

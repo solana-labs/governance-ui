@@ -6,6 +6,7 @@ import GovernedAccountSelect from '../GovernedAccountSelect'
 import { precision } from '@utils/formatting'
 import Switch from '@components/Switch'
 import Select from '@components/inputs/Select'
+import { usePrevious } from '@hooks/usePrevious'
 
 export enum InstructionInputType {
   GOVERNED_ACCOUNT,
@@ -53,14 +54,19 @@ const InstructionForm = ({
     setFormErrors({})
     setInnerForm({ ...outerForm, [propertyName]: value })
   }
+  const previousInitialValue = usePrevious(
+    JSON.stringify(inputs.map((x) => x.initialValue))
+  )
   useEffect(() => {
     setForm(form)
-  }, [form])
+  }, [JSON.stringify(form)])
   useEffect(() => {
     setInnerForm({
       ...inputs.reduce((a, v) => ({ ...a, [v.name]: v.initialValue }), {}),
     })
-  }, [JSON.stringify(inputs.map((x) => x.initialValue))])
+  }, [
+    previousInitialValue !== JSON.stringify(inputs.map((x) => x.initialValue)),
+  ])
   return (
     <>
       {inputs
@@ -112,6 +118,26 @@ const InstructionInput = ({
             governance={input.governance}
           />
         )
+      case InstructionInputType.SELECT:
+        return (
+          <Select
+            label={input.label}
+            value={form[input.name]?.name}
+            placeholder="Please select..."
+            onChange={(value) => {
+              handleSetForm({ value, propertyName: input.name })
+            }}
+            error={formErrors[input.name]}
+          >
+            {input.options?.map((x, idx) => (
+              <Select.Option key={idx} value={x}>
+                <div className="flex flex-col">
+                  <span>{x.name}</span>
+                </div>
+              </Select.Option>
+            ))}
+          </Select>
+        )
       case InstructionInputType.INPUT: {
         const validateAmountOnBlur = () => {
           const value = form[input.name]
@@ -161,31 +187,6 @@ const InstructionInput = ({
                 : null
             }
           />
-        )
-      }
-      case InstructionInputType.SELECT: {
-        return (
-          <Select
-            label={input.label}
-            value={form[input.name]}
-            onChange={(event) => {
-              handleSetForm({
-                value: event,
-                propertyName: input.name,
-              })
-            }}
-            error={formErrors[input.name]}
-          >
-            {(input.options || []).map((option) => (
-              <Select.Option
-                className="border-red"
-                key={option.key}
-                value={option.value}
-              >
-                {option.key}
-              </Select.Option>
-            ))}
-          </Select>
         )
       }
       case InstructionInputType.TEXTAREA:

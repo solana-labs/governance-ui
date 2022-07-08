@@ -1,8 +1,9 @@
 import Modal from '@components/Modal'
 import { useState } from 'react'
 import Button from '@components/Button'
-import GovernedAccountSelect from '../proposal/components/GovernedAccountSelect'
 import {
+  Governance,
+  ProgramAccount,
   SetRealmAuthorityAction,
   withSetRealmAuthority,
 } from '@solana/spl-governance'
@@ -11,7 +12,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { sendTransaction } from '@utils/send'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { AssetAccount } from '@utils/uiTypes/assets'
+import GovernanceAccountSelect from '../proposal/components/GovernanceAccountSelect'
 
 const SetRealmAuthorityModal = ({
   closeModal,
@@ -24,8 +25,10 @@ const SetRealmAuthorityModal = ({
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const { fetchRealm, fetchAllRealms } = useWalletStore((s) => s.actions)
-  const { assetAccounts } = useGovernanceAssets()
-  const [account, setAccount] = useState<AssetAccount | null>(null)
+  const { governancesArray } = useGovernanceAssets()
+  const [account, setAccount] = useState<ProgramAccount<Governance> | null>(
+    null
+  )
   const [settingAuthority, setSettingAuthority] = useState(false)
   const handleSetAuthority = async () => {
     setSettingAuthority(true)
@@ -36,7 +39,7 @@ const SetRealmAuthorityModal = ({
       realmInfo!.programVersion!,
       realm!.pubkey!,
       wallet!.publicKey!,
-      account!.governance.pubkey,
+      account!.pubkey,
       SetRealmAuthorityAction.SetChecked
     )
     const transaction = new Transaction({ feePayer: wallet!.publicKey })
@@ -60,9 +63,9 @@ const SetRealmAuthorityModal = ({
         <h3 className="mb-4 flex flex-col">Set realm authority</h3>
       </div>
       <div>
-        <GovernedAccountSelect
+        <GovernanceAccountSelect
           label="Governance"
-          governedAccounts={assetAccounts}
+          governanceAccounts={governancesArray}
           onChange={(value) => {
             setAccount(value)
           }}

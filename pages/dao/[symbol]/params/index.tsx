@@ -3,6 +3,7 @@ import GovernedAccountsTabs from '@components/GovernedAccountsTabs'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import useRealm from '@hooks/useRealm'
 import { fmtMintAmount } from '@tools/sdk/units'
+import { MAX_TOKENS_TO_DISABLE } from '@tools/constants'
 import { capitalize } from '@utils/helpers'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import Tabs from '@components/Tabs'
@@ -78,6 +79,12 @@ const Params = () => {
   const getYesNoString = (val) => {
     return val ? ' Yes' : ' No'
   }
+  const minCommunityTokensToCreateGovernance =
+    realmConfig &&
+    MAX_TOKENS_TO_DISABLE.eq(realmConfig.minCommunityTokensToCreateGovernance)
+      ? 'Disabled'
+      : realmConfig?.minCommunityTokensToCreateGovernance &&
+        fmtMintAmount(mint, realmConfig.minCommunityTokensToCreateGovernance)
 
   useEffect(() => {
     if (governancesArray.length > 0) {
@@ -106,19 +113,19 @@ const Params = () => {
           closeModal={closeSetRealmAuthorityModal}
         ></SetRealmAuthorityModal>
       )}
-      <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12">
+      <div className="col-span-12 p-4 rounded-lg bg-bkg-2 md:p-6">
         <div className="mb-4">
           <PreviousRouteBtn />
         </div>
         <div className="flex items-center justify-between mb-6">
-          <h1 className="leading-none mb-0">
+          <h1 className="mb-0 leading-none">
             {realmAccount?.name} DAO Parameters
           </h1>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 pb-6">
+        <div className="grid grid-cols-1 gap-4 pb-6 lg:grid-cols-2 lg:gap-6">
           {activeGovernance ? (
             <>
-              <div className="border border-fgd-4 col-span-1 p-4 rounded-md">
+              <div className="col-span-1 p-4 border rounded-md border-fgd-4">
                 <h2>Addresses</h2>
                 <AddressField
                   padding
@@ -163,7 +170,7 @@ const Params = () => {
                   )}
                 </div>
               </div>
-              <div className="border border-fgd-4 col-span-1 p-4 rounded-md">
+              <div className="col-span-1 p-4 border rounded-md border-fgd-4">
                 <h2 className="flex items-center">Config </h2>
                 {communityMintMaxVoteWeightSource && (
                   <AddressField
@@ -175,13 +182,7 @@ const Params = () => {
                 <AddressField
                   padding
                   label="Min community tokens to create governance"
-                  val={
-                    realmConfig &&
-                    fmtMintAmount(
-                      mint,
-                      realmConfig!.minCommunityTokensToCreateGovernance
-                    )
-                  }
+                  val={minCommunityTokensToCreateGovernance}
                 />
                 <AddressField
                   padding
@@ -219,14 +220,14 @@ const Params = () => {
             </>
           ) : (
             <>
-              <div className="animate-pulse bg-bkg-3 h-48 rounded-md w-full" />
-              <div className="animate-pulse bg-bkg-3 h-48 rounded-md w-full" />
+              <div className="w-full h-48 rounded-md animate-pulse bg-bkg-3" />
+              <div className="w-full h-48 rounded-md animate-pulse bg-bkg-3" />
             </>
           )}
         </div>
         {!loadGovernedAccounts ? (
           <>
-            <div className="border border-fgd-4 grid grid-cols-12 gap-4 lg:gap-6 p-6 rounded-md mb-6">
+            <div className="grid grid-cols-12 gap-4 p-6 mb-6 border rounded-md border-fgd-4 lg:gap-6">
               <div className="col-span-12 lg:hidden">
                 <Select
                   className="break-all"
@@ -263,7 +264,7 @@ const Params = () => {
               </div>
               {activeGovernance ? (
                 <div className="col-span-12 lg:col-span-8">
-                  <h3 className="break-all mb-4">
+                  <h3 className="mb-4 break-all">
                     {activeGovernance.pubkey.toBase58()}
                   </h3>
                   {assetAccounts.filter(
@@ -296,7 +297,7 @@ const Params = () => {
               ) : null}
             </div>
             {auxiliaryTokenAccounts.length !== 0 && (
-              <div className="border border-fgd-4 gap-4 rounded-md p-6">
+              <div className="gap-4 p-6 border rounded-md border-fgd-4">
                 <div className="max-w-lg">
                   <h2 className="flex items-center">Auxiliary Accounts </h2>
                   <AccountsView
@@ -309,7 +310,7 @@ const Params = () => {
             )}
           </>
         ) : (
-          <div className="animate-pulse bg-bkg-3 h-48 rounded-lg w-full" />
+          <div className="w-full h-48 rounded-lg animate-pulse bg-bkg-3" />
         )}
       </div>
     </div>

@@ -1,7 +1,7 @@
 import { getProgramDataAccount } from '@solana/spl-governance'
 import { Connection, PublicKey } from '@solana/web3.js'
 
-export async function getProgramSlot(
+export async function getProgramData(
   connection: Connection,
   programId: string
 ) {
@@ -10,5 +10,5 @@ export async function getProgramSlot(
     new PublicKey(programId)
   )
 
-  return programData.slot
+  return programData
 }

@@ -15,7 +15,6 @@ import {
 import { PublicKey } from '@solana/web3.js'
 import Button, { LinkButton, SecondaryButton } from '@components/Button'
 import Input from '@components/inputs/Input'
-import Select from '@components/inputs/Select'
 import Textarea from '@components/inputs/Textarea'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -80,8 +79,17 @@ import VotingMintConfig from './components/instructions/Vsr/VotingMintConfig'
 import CreateVsrRegistrar from './components/instructions/Vsr/CreateRegistrar'
 import GoblinGoldDeposit from './components/instructions/GoblinGold/GoblinGoldDeposit'
 import GoblinGoldWithdraw from './components/instructions/GoblinGold/GoblinGoldWithdraw'
+import MakeSetMarketMode from './components/instructions/Mango/MakeSetMarketMode'
 import CreateGatewayPluginRegistrar from './components/instructions/GatewayPlugin/CreateRegistrar'
 import ConfigureGatewayPlugin from './components/instructions/GatewayPlugin/ConfigureGateway'
+import MakeChangeQuoteParams from './components/instructions/Mango/MakeChangeQuoteParams'
+import TypeaheadSelect from '@components/TypeaheadSelect'
+import { StyledLabel } from '@components/inputs/styles'
+import classNames from 'classnames'
+import MakeRemoveSpotMarket from './components/instructions/Mango/MakeRemoveSpotMarket'
+import MakeRemovePerpMarket from './components/instructions/Mango/MakeRemovePerpMarket'
+
+const TITLE_LENGTH_LIMIT = 130
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -156,7 +164,7 @@ const New = () => {
   }
   const [instructionsData, setInstructions] = useState<
     ComponentInstructionData[]
-  >([{ type: availableInstructions[0] }])
+  >([{ type: undefined }])
   const handleSetInstructions = (val: any, index) => {
     const newInstructions = [...instructionsData]
     newInstructions[index] = { ...instructionsData[index], ...val }
@@ -272,16 +280,6 @@ const New = () => {
             governance
           )) as ProgramAccount<Governance>
         }
-
-        console.log('creating proposal with args:')
-        console.log({
-          title: form.title,
-          description: form.description,
-          governance: selectedGovernance,
-          instructionsData,
-          voteByCouncil,
-          isDraft,
-        })
         proposalAddress = await handleCreateProposal({
           title: form.title,
           description: form.description,
@@ -297,7 +295,6 @@ const New = () => {
 
         router.push(url)
       } catch (ex) {
-        console.log('Notifying:')
         console.log(ex)
         notify({ type: 'error', message: `${ex}` })
       }
@@ -308,11 +305,12 @@ const New = () => {
   }
 
   useEffect(() => {
-    setInstructions([instructionsData[0]])
-  }, [instructionsData[0].governedAccount?.pubkey])
+    if (instructionsData?.length) {
+      setInstructions([instructionsData[0]])
+    }
+  }, [instructionsData[0]?.governedAccount?.pubkey])
 
   useEffect(() => {
-    console.log('this useeffect was called...')
     const governedAccount = extractGovernanceAccountFromInstructionsData(
       instructionsData
     )
@@ -321,8 +319,6 @@ const New = () => {
   }, [instructionsData])
 
   const getCurrentInstruction = ({ typeId, idx }) => {
-    console.log('IN GET CURRENT INSTRUCTION:')
-    console.log(typeId)
     switch (typeId) {
       case Instructions.Transfer:
         return (
@@ -471,12 +467,40 @@ const New = () => {
             governance={governance}
           ></MakeChangeSpotMarket>
         )
+      case Instructions.MangoChangeQuoteParams:
+        return (
+          <MakeChangeQuoteParams
+            index={idx}
+            governance={governance}
+          ></MakeChangeQuoteParams>
+        )
       case Instructions.MangoCreatePerpMarket:
         return (
           <MakeCreatePerpMarket
             index={idx}
             governance={governance}
           ></MakeCreatePerpMarket>
+        )
+      case Instructions.MangoSetMarketMode:
+        return (
+          <MakeSetMarketMode
+            index={idx}
+            governance={governance}
+          ></MakeSetMarketMode>
+        )
+      case Instructions.MangoRemoveSpotMarket:
+        return (
+          <MakeRemoveSpotMarket
+            index={idx}
+            governance={governance}
+          ></MakeRemoveSpotMarket>
+        )
+      case Instructions.MangoRemovePerpMarket:
+        return (
+          <MakeRemovePerpMarket
+            index={idx}
+            governance={governance}
+          ></MakeRemovePerpMarket>
         )
       case Instructions.ForesightInitMarket:
         return (
@@ -552,6 +576,8 @@ const New = () => {
     }
   }
 
+  const titleTooLong = form.title.length > TITLE_LENGTH_LIMIT
+
   return (
     <div className="grid grid-cols-12 gap-4">
       <div
@@ -575,13 +601,14 @@ const New = () => {
             </div>
           </div>
           <div className="pt-2">
-            <div className="pb-4">
+            <div className="pb-4 relative min-h-[100px]">
               <Input
                 label="Title"
                 placeholder="Title of your proposal"
                 value={form.title}
                 type="text"
                 error={formErrors['title']}
+                showErrorState={titleTooLong}
                 onChange={(evt) =>
                   handleSetForm({
                     value: evt.target.value,
@@ -589,6 +616,19 @@ const New = () => {
                   })
                 }
               />
+              <div className="max-w-lg w-full absolute bottom-4 left-0">
+                <div
+                  className={classNames(
+                    'absolute',
+                    'bottom-0',
+                    'right-0',
+                    'text-xs',
+                    titleTooLong ? 'text-error-red' : 'text-white/50'
+                  )}
+                >
+                  {form.title.length} / {TITLE_LENGTH_LIMIT}
+                </div>
+              </div>
             </div>
             <Textarea
               className="mb-3"
@@ -628,24 +668,28 @@ const New = () => {
                     key={idx}
                     className="mb-3 border border-fgd-4 p-4 md:p-6 rounded-lg"
                   >
-                    <Select
-                      className="h-12"
-                      disabled={!getAvailableInstructionsForIndex.length}
-                      placeholder={`${
-                        availableInstructionsForIdx.length
-                          ? 'Select instruction'
-                          : 'No available instructions'
-                      }`}
-                      label={`Transaction ${idx + 1}`}
-                      onChange={(value) => setInstructionType({ value, idx })}
-                      value={instruction.type?.name}
-                    >
-                      {availableInstructionsForIdx.map((inst) => (
-                        <Select.Option key={inst.id} value={inst}>
-                          <span>{inst.name}</span>
-                        </Select.Option>
-                      ))}
-                    </Select>
+                    <StyledLabel>Transaction {idx + 1}</StyledLabel>
+                    <TypeaheadSelect
+                      className="max-w-lg"
+                      options={availableInstructionsForIdx.map(
+                        (availableInstruction) => ({
+                          data: availableInstruction,
+                          key: availableInstruction.id.toString(),
+                          text: availableInstruction.name,
+                        })
+                      )}
+                      placeholder="Add a transaction"
+                      selected={
+                        instruction.type
+                          ? {
+                              key: instruction.type.id.toString(),
+                            }
+                          : undefined
+                      }
+                      onSelect={(option) => {
+                        setInstructionType({ value: option?.data, idx })
+                      }}
+                    />
                     <div className="flex items-end pt-4">
                       <InstructionContentContainer
                         idx={idx}

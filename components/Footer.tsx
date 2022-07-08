@@ -8,7 +8,7 @@ const RelevantLinks = {
 
 const Socials = {
   Twitter: {
-    url: 'https://twitter.com/solana',
+    url: 'https://twitter.com/Realms_DAOs',
     imgSrc: '/icons/twitter.svg',
   },
   Github: {
@@ -27,7 +27,7 @@ const Footer = () => {
   if (REALM) return null
   else
     return (
-      <div className="absolute bottom-0 left-0 flex flex-row justify-around w-full h-20 px-12 border-t bg-bkg-1 gap-y-8 md:gap-y-0 border-brand-gradient">
+      <div className="absolute bottom-0 left-0 flex flex-row justify-around w-full h-20 px-12 border-t border-bkg-4 bg-bkg-2 gap-y-8 md:gap-y-0">
         <div className="flex items-center justify-center gap-x-5 md:gap-x-6 ">
           {Object.keys(RelevantLinks).map((linkTitle) => {
             const href = RelevantLinks[linkTitle]
@@ -36,7 +36,7 @@ const Footer = () => {
                 key={linkTitle}
                 href={href}
                 target="_blank"
-                className="text-base font-bold default-transition hover:text-primary-dark"
+                className="text-base font-bold default-transition hover:text-fgd-2"
                 rel="noreferrer"
               >
                 {linkTitle}
@@ -63,15 +63,13 @@ const Footer = () => {
         </div>
 
         <div className="items-center justify-center hidden gap-x-1 md:flex">
-          <p className="text-base font-light hover:text-primary-dark ">
-            Powered by
-          </p>
+          <p className="text-base font-light">Powered by</p>
 
           <a
             rel="noreferrer"
             href="https://solana.com/"
             target="_blank"
-            className="text-base font-bold default-transition hover:text-primary-dark"
+            className="text-base font-bold default-transition hover:text-fgd-2"
           >
             Solana
           </a>

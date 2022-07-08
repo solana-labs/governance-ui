@@ -125,6 +125,10 @@ export class VotingClient {
       this.clientType = VotingClientType.GatewayClient
       this.noClient = false
     }
+    if (this.client instanceof GatewayClient) {
+      this.clientType = VotingClientType.GatewayClient
+      this.noClient = false
+    }
     if (this.client instanceof PythClient) {
       this.clientType = VotingClientType.PythClient
       this.noClient = false

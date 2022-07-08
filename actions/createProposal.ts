@@ -40,6 +40,7 @@ export interface InstructionDataWithHoldUpTime {
   chunkBy?: number
   signers?: Keypair[]
   shouldSplitIntoSeparateTxs?: boolean | undefined
+  prerequisiteInstructionsSigners?: Keypair[]
 }
 
 export class InstructionDataWithHoldUpTime {
@@ -60,6 +61,8 @@ export class InstructionDataWithHoldUpTime {
     this.prerequisiteInstructions = instruction.prerequisiteInstructions || []
     this.chunkSplitByDefault = instruction.chunkSplitByDefault || false
     this.chunkBy = instruction.chunkBy || 2
+    this.prerequisiteInstructionsSigners =
+      instruction.prerequisiteInstructionsSigners || []
   }
 }
 
@@ -83,7 +86,7 @@ export const createProposal = async (
   const payer = walletPubkey
   const notificationTitle = isDraft ? 'proposal draft' : 'proposal'
   const prerequisiteInstructions: TransactionInstruction[] = []
-
+  const prerequisiteInstructionsSigners: Keypair[] = []
   // sum up signers
   const signers: Keypair[] = instructionsData.flatMap((x) => x.signers ?? [])
   const shouldSplitIntoSeparateTxs: boolean = instructionsData
@@ -162,6 +165,11 @@ export const createProposal = async (
     if (instruction.data) {
       if (instruction.prerequisiteInstructions) {
         prerequisiteInstructions.push(...instruction.prerequisiteInstructions)
+      }
+      if (instruction.prerequisiteInstructionsSigners) {
+        prerequisiteInstructionsSigners.push(
+          ...instruction.prerequisiteInstructionsSigners
+        )
       }
       await withInsertTransaction(
         insertInstructions,
@@ -255,7 +263,7 @@ export const createProposal = async (
     await sendTransactionsV2({
       wallet,
       connection,
-      signersSet: [[], [], ...signerChunks],
+      signersSet: [[...prerequisiteInstructionsSigners], [], ...signerChunks],
       showUiComponent: true,
       TransactionInstructions: [
         prerequisiteInstructions,

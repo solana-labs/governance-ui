@@ -28,7 +28,7 @@ export function InstructionPanel() {
 
   const [currentSlot, setCurrentSlot] = useState(0)
 
-  const canExecuteAt = proposal!.account.votingCompletedAt
+  const canExecuteAt = proposal?.account.votingCompletedAt
     ? proposal!.account.votingCompletedAt.toNumber() + 1
     : 0
 
