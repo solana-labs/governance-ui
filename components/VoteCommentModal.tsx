@@ -119,13 +119,9 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
           <div className="flex items-center">
             {!submitting &&
               (vote === YesNoVote.Yes ? (
-                <div className="bg-black rounded-full mr-1 p-[6px]">
-                  <ThumbUpIcon className="h-4 w-4 fill-[#8EFFDD]" />{' '}
-                </div>
+                <ThumbUpIcon className="h-4 w-4 fill-black mr-2" />
               ) : (
-                <div className="bg-black rounded-full mr-1 p-[6px]">
-                  <ThumbDownIcon className="h-4 w-4 fill-[#FF7C7C]" />{' '}
-                </div>
+                <ThumbDownIcon className="h-4 w-4 fill-black mr-2" />
               ))}
             {submitting ? <Loading /> : <span>Vote {voteString}</span>}
           </div>

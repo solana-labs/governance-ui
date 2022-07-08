@@ -12,7 +12,7 @@ interface Args {
   client?: VsrClient
   connection: Connection
   endpoint: string
-  tokenOwnerRecordPk: PublicKey
+  tokenOwnerRecordPk: PublicKey | null
   realm: ProgramAccount<Realm>
   realmInfo: RealmInfo
   realmTokenAccount: TokenProgramAccount<TokenAccount>

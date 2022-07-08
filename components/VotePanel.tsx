@@ -255,7 +255,7 @@ const VotePanel = () => {
                       disabled={!isVoteEnabled}
                     >
                       <div className="flex flex-row items-center justify-center">
-                        <ThumbUpIcon className="h-4 w-4  mr-2" />
+                        <ThumbUpIcon className="h-4 w-4 mr-2" />
                         Vote Yes
                       </div>
                     </Button>
@@ -267,7 +267,7 @@ const VotePanel = () => {
                       disabled={!isVoteEnabled}
                     >
                       <div className="flex flex-row items-center justify-center">
-                        <ThumbDownIcon className="h-4 w-4  mr-2" />
+                        <ThumbDownIcon className="h-4 w-4 mr-2" />
                         Vote No
                       </div>
                     </Button>
