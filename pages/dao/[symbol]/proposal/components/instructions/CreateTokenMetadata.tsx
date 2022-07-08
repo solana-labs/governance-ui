@@ -14,6 +14,7 @@ import { getCreateTokenMetadataSchema } from 'utils/validations'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { getCreateTokenMetadataInstruction } from 'utils/instructionTools'
 import { AccountType } from '@utils/uiTypes/assets'
+import useWalletStore from 'stores/useWalletStore'
 
 const CreateTokenMetadata = ({
   index,
@@ -36,6 +37,7 @@ const CreateTokenMetadata = ({
     mintAccount: undefined,
     programId: programId?.toString(),
   })
+  const wallet = useWalletStore((s) => s.current)
   const [governedAccount, setGovernedAccount] = useState<
     ProgramAccount<Governance> | undefined
   >(undefined)
@@ -59,10 +61,12 @@ const CreateTokenMetadata = ({
       schema,
       form,
       programId,
+      wallet,
       governedMintInfoAccount: form.mintAccount,
       setFormErrors,
       mintAuthority,
       payerSolTreasury,
+      shouldMakeSolTreasury,
     })
   }
 
@@ -113,62 +117,53 @@ const CreateTokenMetadata = ({
         governance={governance}
       ></GovernedAccountSelect>
 
-      {shouldMakeSolTreasury ? (
+      {shouldMakeSolTreasury && (
         <>
           <div>
             <div className="pb-0.5 text-fgd-3 text-xs">
-              Please make SOL treasury for this governance from below link.
+              This will make SOL wallet for the governance and send 0.006 SOL
+              from your wallet to execute the transactions.
             </div>
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href="https://realms-explorer.com/"
-              className="text-xs"
-            >
-              https://realms-explorer.com/
-            </a>
           </div>
         </>
-      ) : (
-        <>
-          <Input
-            label="Name"
-            value={form.name}
-            type="text"
-            onChange={(evt) =>
-              handleSetForm({
-                value: evt.target.value,
-                propertyName: 'name',
-              })
-            }
-            error={formErrors['name']}
-          />
-          <Input
-            label="Symbol"
-            value={form.symbol}
-            type="text"
-            onChange={(evt) =>
-              handleSetForm({
-                value: evt.target.value,
-                propertyName: 'symbol',
-              })
-            }
-            error={formErrors['symbol']}
-          />
-          <Input
-            label="URI"
-            value={form.uri}
-            type="text"
-            onChange={(evt) =>
-              handleSetForm({
-                value: evt.target.value,
-                propertyName: 'uri',
-              })
-            }
-            error={formErrors['uri']}
-          />
-        </>
       )}
+
+      <Input
+        label="Name"
+        value={form.name}
+        type="text"
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'name',
+          })
+        }
+        error={formErrors['name']}
+      />
+      <Input
+        label="Symbol"
+        value={form.symbol}
+        type="text"
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'symbol',
+          })
+        }
+        error={formErrors['symbol']}
+      />
+      <Input
+        label="URI"
+        value={form.uri}
+        type="text"
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'uri',
+          })
+        }
+        error={formErrors['uri']}
+      />
     </>
   )
 }

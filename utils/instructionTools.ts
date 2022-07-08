@@ -1,4 +1,5 @@
 import {
+  getNativeTreasuryAddress,
   Governance,
   ProgramAccount,
   serializeInstructionToBase64,
@@ -232,6 +233,7 @@ export async function getSolTransferInstruction({
       form.amount!,
       governedTokenAccount.extensions.mint.account.decimals
     )
+    console.log(governedTokenAccount.extensions.mint.account.decimals)
 
     const transferIx = SystemProgram.transfer({
       fromPubkey: sourceAccount!,
@@ -582,29 +584,55 @@ export async function getCreateTokenMetadataInstruction({
   schema,
   form,
   programId,
+  wallet,
   governedMintInfoAccount,
   setFormErrors,
   mintAuthority,
   payerSolTreasury,
+  shouldMakeSolTreasury,
 }: {
   schema: any
   form: any
   programId: PublicKey | undefined
+  wallet: WalletAdapter | undefined
   governedMintInfoAccount: AssetAccount | undefined
   setFormErrors: any
   mintAuthority: PublicKey | null | undefined
   payerSolTreasury: PublicKey | null | undefined
+  shouldMakeSolTreasury: boolean
 }): Promise<UiInstruction> {
   const isValid = await validateInstruction({ schema, form, setFormErrors })
   let serializedInstruction = ''
   const prerequisiteInstructions: TransactionInstruction[] = []
+
+  let payer = payerSolTreasury
+
+  if (!payer && shouldMakeSolTreasury && governedMintInfoAccount) {
+    payer = await getNativeTreasuryAddress(
+      governedMintInfoAccount.governance.owner,
+      governedMintInfoAccount.governance.pubkey
+    )
+  }
+
   if (
     isValid &&
     programId &&
     form.mintAccount?.pubkey &&
     mintAuthority &&
-    payerSolTreasury
+    payer &&
+    wallet
   ) {
+    if (shouldMakeSolTreasury && !payerSolTreasury) {
+      const mintAmount = parseMintNaturalAmountFromDecimal(0.006, 9)
+      const preTransferIx = SystemProgram.transfer({
+        fromPubkey: wallet.publicKey!,
+        toPubkey: payer,
+        lamports: mintAmount,
+      })
+      preTransferIx.keys[0].isWritable = true
+      prerequisiteInstructions.push(preTransferIx)
+    }
+
     const metadataPDA = await findMetadataPda(form.mintAccount?.pubkey)
 
     const tokenMetadata = {
@@ -622,7 +650,7 @@ export async function getCreateTokenMetadataInstruction({
         metadata: metadataPDA,
         mint: form.mintAccount?.pubkey,
         mintAuthority,
-        payer: payerSolTreasury,
+        payer,
         updateAuthority: mintAuthority,
       },
       {
