@@ -56,7 +56,7 @@ export default function LockedCouncilVotingPower(props: Props) {
     realm && proposal && councilMint
       ? new BigNumber(
           calculateMaxVoteScore(realm, proposal, councilMint).toString()
-        )
+        ).shiftedBy(-councilMint.decimals)
       : null
 
   return (
@@ -76,13 +76,13 @@ export default function LockedCouncilVotingPower(props: Props) {
         <p className="flex mb-1.5 text-xs">
           <span>{tokenName} Deposited</span>
           <span className="font-bold ml-auto text-fgd-1">
-            {tokenAmount.toString()}
+            {tokenAmount.toFormat()}
           </span>
         </p>
         <p className="flex text-xs">
           <span>{tokenName} Locked</span>
           <span className="font-bold ml-auto text-fgd-1">
-            {lockedTokensAmount.toString()}
+            {lockedTokensAmount.toFormat()}
           </span>
         </p>
       </div>

@@ -11,7 +11,7 @@ import { GoverningTokenType } from '@solana/spl-governance'
 import { BanIcon, ThumbUpIcon, ThumbDownIcon } from '@heroicons/react/solid'
 
 import useWalletStore from '../stores/useWalletStore'
-import { SecondaryButton } from './Button'
+import Button, { SecondaryButton } from './Button'
 import VoteCommentModal from './VoteCommentModal'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
@@ -156,7 +156,7 @@ const VotePanel = () => {
       ? `Cast your ${
           tokenType === GoverningTokenType.Community ? 'community' : 'council'
         } vote`
-      : 'My vote:'
+      : 'Your vote'
 
   const withdrawTooltipContent = !connected
     ? 'You need to connect your wallet'
@@ -209,20 +209,20 @@ const VotePanel = () => {
     <>
       {isPanelVisible && isRelinquishVotePanelVisible && (
         <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-4">
-          <div className="flex flex-row items-center justify-center">
-            <h3 className="text-center mb-0">{actionLabel}</h3>
+          <div className="flex flex-col items-center justify-center">
+            <h3 className="text-center">{actionLabel}</h3>
             {isVoteCast &&
               connected &&
               ownVoteRecord &&
               (isYesVote(ownVoteRecord.account) ? (
                 <Tooltip content={`You voted "Yes"`}>
-                  <div className="flex flex-row items-center justify-center rounded-full border border-[#8EFFDD] p-2 ml-2">
+                  <div className="flex flex-row items-center justify-center rounded-full border border-[#8EFFDD] p-2 mt-2">
                     <ThumbUpIcon className="h-4 w-4 fill-[#8EFFDD]" />
                   </div>
                 </Tooltip>
               ) : (
                 <Tooltip content={`You voted "No"`}>
-                  <div className="flex flex-row items-center justify-center rounded-full border border-[#FF7C7C] p-2 ml-2">
+                  <div className="flex flex-row items-center justify-center rounded-full border border-[#FF7C7C] p-2 mt-2">
                     <ThumbDownIcon className="h-4 w-4 fill-[#FF7C7C]" />
                   </div>
                 </Tooltip>
@@ -248,29 +248,29 @@ const VotePanel = () => {
               <>
                 {isVoting && (
                   <div className="w-full flex justify-between items-center gap-5">
-                    <SecondaryButton
+                    <Button
                       tooltipMessage={voteTooltipContent}
                       className="w-1/2"
                       onClick={() => handleShowVoteModal(YesNoVote.Yes)}
                       disabled={!isVoteEnabled}
                     >
                       <div className="flex flex-row items-center justify-center">
-                        <ThumbUpIcon className="h-4 w-4 fill-[#8EFFDD] mr-2" />
+                        <ThumbUpIcon className="h-4 w-4  mr-2" />
                         Vote Yes
                       </div>
-                    </SecondaryButton>
+                    </Button>
 
-                    <SecondaryButton
+                    <Button
                       tooltipMessage={voteTooltipContent}
                       className="w-1/2"
                       onClick={() => handleShowVoteModal(YesNoVote.No)}
                       disabled={!isVoteEnabled}
                     >
                       <div className="flex flex-row items-center justify-center">
-                        <ThumbDownIcon className="h-4 w-4 fill-[#FF7C7C] mr-2" />
+                        <ThumbDownIcon className="h-4 w-4  mr-2" />
                         Vote No
                       </div>
-                    </SecondaryButton>
+                    </Button>
                   </div>
                 )}
               </>
@@ -287,11 +287,11 @@ const VotePanel = () => {
           ) : null}
         </div>
       )}
-      {didNotVote && hasMinAmountToVote && (
-        <div className="bg-bkg-2 p-4 md:p-6 rounded-lg flex flex-row items-center justify-center">
-          <h3 className="text-center mb-0">My vote:</h3>
+      {didNotVote && (
+        <div className="bg-bkg-2 p-4 md:p-6 rounded-lg flex flex-col items-center justify-center">
+          <h3 className="text-center mb-0">You didn&apos;t vote</h3>
           <Tooltip content="You did not vote on this proposal">
-            <div className="flex flex-row items-center justify-center rounded-full border border-white/50 p-2 ml-2">
+            <div className="flex flex-row items-center justify-center rounded-full border border-white/50 p-2 mt-2">
               <BanIcon className="h-4 w-4 fill-white/50" />
             </div>
           </Tooltip>

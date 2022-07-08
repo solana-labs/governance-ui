@@ -125,10 +125,6 @@ const Proposal = () => {
 
       <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
         {showTokenBalance && <ProposalVotingPower />}
-        <VotePanel />
-        {proposal && currentWallet && showProposalExecution && (
-          <ProposalExecutionCard />
-        )}
         {showResults ? (
           <div className="bg-bkg-2 rounded-lg">
             <div className="p-4 md:p-6">
@@ -176,7 +172,10 @@ const Proposal = () => {
             </div>
           </div>
         ) : null}
-
+        <VotePanel />
+        {proposal && currentWallet && showProposalExecution && (
+          <ProposalExecutionCard />
+        )}
         <ProposalActionsPanel />
       </div>
     </div>

@@ -89,7 +89,9 @@ export default function LockedCommunityVotingPower(props: Props) {
 
   const max =
     realm && proposal && mint
-      ? new BigNumber(calculateMaxVoteScore(realm, proposal, mint).toString())
+      ? new BigNumber(
+          calculateMaxVoteScore(realm, proposal, mint).toString()
+        ).shiftedBy(-mint.decimals)
       : null
 
   const deposit = useCallback(async () => {
@@ -181,9 +183,12 @@ export default function LockedCommunityVotingPower(props: Props) {
       {depositAmount.isGreaterThan(0) && (
         <>
           <div className="mt-3 text-xs text-white/50">
-            You have {depositAmount.toString()} more {tokenName} votes in your
-            wallet. Do you want to deposit them to increase your voting power in
-            this Realm?
+            You have{' '}
+            {mint
+              ? depositAmount.shiftedBy(-mint.decimals).toFormat()
+              : depositAmount.toFormat()}{' '}
+            more {tokenName} votes in your wallet. Do you want to deposit them
+            to increase your voting power in this Realm?
           </div>
           <SecondaryButton className="mt-4 w-48" onClick={deposit}>
             Deposit

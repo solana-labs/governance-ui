@@ -51,7 +51,7 @@ export default function CouncilVotingPower(props: Props) {
     realm && proposal && councilMint
       ? new BigNumber(
           calculateMaxVoteScore(realm, proposal, councilMint).toString()
-        )
+        ).shiftedBy(-councilMint.decimals)
       : null
 
   const deposit = useCallback(async () => {
@@ -94,9 +94,12 @@ export default function CouncilVotingPower(props: Props) {
       {depositAmount.isGreaterThan(0) && (
         <>
           <div className="mt-3 text-xs text-white/50">
-            You have {depositAmount.toString()} more {tokenName} council votes
-            in your wallet. Do you want to deposit them to increase your voting
-            power in this Realm?
+            You have{' '}
+            {councilMint
+              ? depositAmount.shiftedBy(-councilMint.decimals).toFormat()
+              : depositAmount.toFormat()}{' '}
+            more {tokenName} council votes in your wallet. Do you want to
+            deposit them to increase your voting power in this Realm?
           </div>
           <SecondaryButton className="mt-4 w-48" onClick={deposit}>
             Deposit
