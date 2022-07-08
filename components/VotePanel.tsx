@@ -73,14 +73,14 @@ const VotePanel = () => {
   const isVoting =
     proposal?.account.state === ProposalState.Voting && !hasVoteTimeExpired
 
-  const isVoteEnabled =
-    connected &&
-    isVoting &&
-    !isVoteCast &&
+  const hasMinAmountToVote =
     voterTokenRecord &&
     ownVoterWeight.hasMinAmountToVote(
       voterTokenRecord.account.governingTokenMint
     )
+
+  const isVoteEnabled =
+    connected && isVoting && !isVoteCast && hasMinAmountToVote
 
   const isWithdrawEnabled =
     connected &&
@@ -300,7 +300,7 @@ const VotePanel = () => {
           ) : null}
         </div>
       )}
-      {didNotVote && (
+      {didNotVote && hasMinAmountToVote && (
         <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-4 flex flex-col items-center">
           <h3 className="mb-3 text-center">You did not vote</h3>
           <div className="border border-white/10 h-10 w-48 rounded-full text-white/10 flex items-center justify-center">

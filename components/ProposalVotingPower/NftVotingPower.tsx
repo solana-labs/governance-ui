@@ -3,6 +3,8 @@ import { BigNumber } from 'bignumber.js'
 
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 
+import VotingPowerPct from './VotingPowerPct'
+
 interface Props {
   className?: string
 }
@@ -39,13 +41,7 @@ export default function NftVotingPower(props: Props) {
             </div>
           )}
         </div>
-        {max && (
-          <div className="text-[11px] leading-[15px] text-white/70 text-right">
-            {amount.shiftedBy(2).dividedBy(max).toFixed(2)}% of total
-            <br />
-            voting power
-          </div>
-        )}
+        {max && !max.isZero() && <VotingPowerPct amount={amount} total={max} />}
       </div>
     </div>
   )

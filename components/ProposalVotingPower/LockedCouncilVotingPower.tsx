@@ -7,6 +7,7 @@ import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { fmtMintAmount, getMintDecimalAmount } from '@tools/sdk/units'
 
 import { getMintMetadata } from '../instructions/programs/splToken'
+import VotingPowerPct from './VotingPowerPct'
 
 interface Props {
   className?: string
@@ -67,11 +68,7 @@ export default function LockedCouncilVotingPower(props: Props) {
             {amount.toFormat()}
           </div>
           {max && !max.isZero() && (
-            <div className="text-[11px] leading-[15px] text-white/70 text-right">
-              {amount.shiftedBy(2).dividedBy(max).toFixed(2)}% of total
-              <br />
-              voting power
-            </div>
+            <VotingPowerPct amount={amount} total={max} />
           )}
         </div>
       </div>

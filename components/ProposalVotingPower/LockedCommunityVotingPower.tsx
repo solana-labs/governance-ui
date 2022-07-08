@@ -15,6 +15,7 @@ import { notify } from '@utils/notifications'
 
 import { getMintMetadata } from '../instructions/programs/splToken'
 import depositTokensVST from './depositTokensVSR'
+import VotingPowerPct from './VotingPowerPct'
 
 interface Props {
   className?: string
@@ -159,11 +160,7 @@ export default function LockedCommunityVotingPower(props: Props) {
             )}
           </div>
           {max && !max.isZero() && (
-            <div className="text-[11px] leading-[15px] text-white/70 text-right">
-              {amount.shiftedBy(2).dividedBy(max).toFixed(2)}% of total
-              <br />
-              voting power
-            </div>
+            <VotingPowerPct amount={amount} total={max} />
           )}
         </div>
       </div>
