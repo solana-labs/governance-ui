@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import classNames from 'classnames'
 import { withFinalizeVote, YesNoVote } from '@solana/spl-governance'
 import { TransactionInstruction } from '@solana/web3.js'
 import { useCallback, useState } from 'react'
@@ -9,10 +8,10 @@ import useRealm from '../hooks/useRealm'
 import { ProposalState } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { GoverningTokenType } from '@solana/spl-governance'
-import { ThumbUpIcon, ThumbDownIcon } from '@heroicons/react/solid'
+import { BanIcon, ThumbUpIcon, ThumbDownIcon } from '@heroicons/react/solid'
 
 import useWalletStore from '../stores/useWalletStore'
-import Button from './Button'
+import { SecondaryButton } from './Button'
 import VoteCommentModal from './VoteCommentModal'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
@@ -20,6 +19,7 @@ import { useRouter } from 'next/router'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { LOCALNET_REALM_ID as PYTH_LOCALNET_REALM_ID } from 'pyth-staking-api'
 import { isYesVote } from '@models/voteRecords'
+import Tooltip from '@components/Tooltip'
 
 const VotePanel = () => {
   const [showVoteModal, setShowVoteModal] = useState(false)
@@ -156,7 +156,7 @@ const VotePanel = () => {
       ? `Cast your ${
           tokenType === GoverningTokenType.Community ? 'community' : 'council'
         } vote`
-      : 'You voted!'
+      : 'My vote:'
 
   const withdrawTooltipContent = !connected
     ? 'You need to connect your wallet'
@@ -209,81 +209,68 @@ const VotePanel = () => {
     <>
       {isPanelVisible && isRelinquishVotePanelVisible && (
         <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-4">
-          <h3 className="mb-4 text-center">{actionLabel}</h3>
+          <div className="flex flex-row items-center justify-center">
+            <h3 className="text-center mb-0">{actionLabel}</h3>
+            {isVoteCast &&
+              connected &&
+              ownVoteRecord &&
+              (isYesVote(ownVoteRecord.account) ? (
+                <Tooltip content={`You voted "Yes"`}>
+                  <div className="flex flex-row items-center justify-center rounded-full border border-[#8EFFDD] p-2 ml-2">
+                    <ThumbUpIcon className="h-4 w-4 fill-[#8EFFDD]" />
+                  </div>
+                </Tooltip>
+              ) : (
+                <Tooltip content={`You voted "No"`}>
+                  <div className="flex flex-row items-center justify-center rounded-full border border-[#FF7C7C] p-2 ml-2">
+                    <ThumbDownIcon className="h-4 w-4 fill-[#FF7C7C]" />
+                  </div>
+                </Tooltip>
+              ))}
+          </div>
 
           <div className="items-center justify-center flex w-full gap-5">
             {isVoteCast && connected ? (
-              <div className="flex flex-col gap-6 min-w-[200px]">
-                {ownVoteRecord &&
-                  (isYesVote(ownVoteRecord.account) ? (
-                    <div className="flex flex-row items-center justify-center h-10 w-48 rounded-full border border-black">
-                      <ThumbUpIcon className="h-4 w-4 fill-[#8EFFDD] mr-1" />{' '}
-                      Yes
-                    </div>
-                  ) : (
-                    <div className="flex flex-row items-center justify-center h-10 w-48 rounded-full border border-black">
-                      <ThumbDownIcon className="h-4 w-4 fill-[#FF7C7C] mr-1" />{' '}
-                      No
-                    </div>
-                  ))}
+              <div className="flex flex-col gap-6 items-center">
                 {isVoting && (
-                  <Button
+                  <SecondaryButton
+                    className="min-w-[200px]"
                     isLoading={isLoading}
                     tooltipMessage={withdrawTooltipContent}
                     onClick={() => submitRelinquishVote()}
                     disabled={!isWithdrawEnabled || isLoading}
                   >
                     Withdraw
-                  </Button>
+                  </SecondaryButton>
                 )}
               </div>
             ) : (
               <>
                 {isVoting && (
                   <div className="w-full flex justify-between items-center gap-5">
-                    <Button
+                    <SecondaryButton
                       tooltipMessage={voteTooltipContent}
                       className="w-1/2"
                       onClick={() => handleShowVoteModal(YesNoVote.Yes)}
                       disabled={!isVoteEnabled}
                     >
                       <div className="flex flex-row items-center justify-center">
-                        <div
-                          className={classNames(
-                            'bg-black',
-                            'rounded-full',
-                            'mr-1',
-                            'p-[6px]',
-                            !isVoteEnabled && 'opacity-30'
-                          )}
-                        >
-                          <ThumbUpIcon className="h-3 w-3 fill-[#8EFFDD]" />{' '}
-                        </div>
+                        <ThumbUpIcon className="h-4 w-4 fill-[#8EFFDD] mr-2" />
                         Vote Yes
                       </div>
-                    </Button>
+                    </SecondaryButton>
 
-                    <Button
+                    <SecondaryButton
                       tooltipMessage={voteTooltipContent}
                       className="w-1/2"
                       onClick={() => handleShowVoteModal(YesNoVote.No)}
                       disabled={!isVoteEnabled}
                     >
                       <div className="flex flex-row items-center justify-center">
-                        <div
-                          className={classNames(
-                            'bg-black',
-                            'rounded-full',
-                            'mr-1',
-                            'p-[6px]',
-                            !isVoteEnabled && 'opacity-30'
-                          )}
-                        >
-                          <ThumbDownIcon className="h-3 w-3 fill-[#FF7C7C]" />
-                        </div>
+                        <ThumbDownIcon className="h-4 w-4 fill-[#FF7C7C] mr-2" />
                         Vote No
                       </div>
-                    </Button>
+                    </SecondaryButton>
                   </div>
                 )}
               </>
@@ -301,11 +288,13 @@ const VotePanel = () => {
         </div>
       )}
       {didNotVote && hasMinAmountToVote && (
-        <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-4 flex flex-col items-center">
-          <h3 className="mb-3 text-center">You did not vote</h3>
-          <div className="border border-white/10 h-10 w-48 rounded-full text-white/10 flex items-center justify-center">
-            &mdash;
-          </div>
+        <div className="bg-bkg-2 p-4 md:p-6 rounded-lg flex flex-row items-center justify-center">
+          <h3 className="text-center mb-0">My vote:</h3>
+          <Tooltip content="You did not vote on this proposal">
+            <div className="flex flex-row items-center justify-center rounded-full border border-white/50 p-2 ml-2">
+              <BanIcon className="h-4 w-4 fill-white/50" />
+            </div>
+          </Tooltip>
         </div>
       )}
     </>
