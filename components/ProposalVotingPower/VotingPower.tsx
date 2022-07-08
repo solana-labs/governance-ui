@@ -13,6 +13,7 @@ import { TokenProgramAccount } from '@utils/tokens'
 import useRealm from '@hooks/useRealm'
 import { nftPluginsPks, vsrPluginsPks } from '@hooks/useVotingPlugins'
 import useProposal from '@hooks/useProposal'
+import useWalletStore from 'stores/useWalletStore'
 
 import CommunityVotingPower from './CommunityVotingPower'
 import CouncilVotingPower from './CouncilVotingPower'
@@ -30,13 +31,13 @@ enum Type {
 
 function getTypes(
   config?: ProgramAccount<RealmConfigAccount>,
-  ownTokenRecord?: ProgramAccount<TokenOwnerRecord>,
-  ownCouncilTokenRecord?: ProgramAccount<TokenOwnerRecord>,
+  councilMint?: MintInfo,
   councilTokenAccount?: TokenProgramAccount<AccountInfo>,
-  realm?: ProgramAccount<Realm>,
-  proposal?: ProgramAccount<Proposal>,
   mint?: MintInfo,
-  councilMint?: MintInfo
+  ownCouncilTokenRecord?: ProgramAccount<TokenOwnerRecord>,
+  ownTokenRecord?: ProgramAccount<TokenOwnerRecord>,
+  proposal?: ProgramAccount<Proposal>,
+  realm?: ProgramAccount<Realm>
 ) {
   const types: Type[] = []
 
@@ -98,26 +99,35 @@ export default function VotingPower(props: Props) {
   const { proposal } = useProposal()
   const {
     config,
+    councilMint,
     councilTokenAccount,
+    mint,
     ownCouncilTokenRecord,
     ownTokenRecord,
-    mint,
     realm,
-    councilMint,
   } = useRealm()
+  const connected = useWalletStore((s) => s.connected)
 
   const types = getTypes(
     config,
-    ownTokenRecord,
-    ownCouncilTokenRecord,
+    councilMint,
     councilTokenAccount,
-    realm,
-    proposal,
     mint,
-    councilMint
+    ownCouncilTokenRecord,
+    ownTokenRecord,
+    proposal,
+    realm
   )
 
-  if (types.length === 0) {
+  if (!connected) {
+    return (
+      <div
+        className={classNames(props.className, 'rounded-md bg-bkg-1 h-[76px]')}
+      />
+    )
+  }
+
+  if (connected && types.length === 0) {
     return (
       <div className={classNames(props.className, 'text-xs', 'text-white/50')}>
         You do not have any voting power
