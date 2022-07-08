@@ -21,6 +21,16 @@ export default function NftVotingPower(props: Props) {
     : null
   const amount = new BigNumber(votingPower.toString())
 
+  if (nfts.length === 0) {
+    return (
+      <div className={classNames(props.className, 'text-xs', 'text-white/50')}>
+        You do not have any voting power
+        <br />
+        in this realm.
+      </div>
+    )
+  }
+
   return (
     <div
       className={classNames(props.className, 'p-3', 'rounded-md', 'bg-bkg-1')}
