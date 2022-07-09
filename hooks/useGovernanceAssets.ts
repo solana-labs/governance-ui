@@ -327,6 +327,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
     },
     {
+      id: Instructions.MangoSwapSpotMarket,
+      name: 'Mango: Swap Spot Market',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
       id: Instructions.DepositIntoVolt,
       name: 'Friktion: Deposit into Volt',
       isVisible: canUseAnyInstruction,
