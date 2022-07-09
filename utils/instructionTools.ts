@@ -233,7 +233,6 @@ export async function getSolTransferInstruction({
       form.amount!,
       governedTokenAccount.extensions.mint.account.decimals
     )
-    console.log(governedTokenAccount.extensions.mint.account.decimals)
 
     const transferIx = SystemProgram.transfer({
       fromPubkey: sourceAccount!,
