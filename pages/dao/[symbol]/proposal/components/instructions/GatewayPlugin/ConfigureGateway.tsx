@@ -4,7 +4,6 @@ import {
   Governance,
   ProgramAccount,
   serializeInstructionToBase64,
-  SYSTEM_PROGRAM_ID,
 } from '@solana/spl-governance'
 import { validateInstruction } from '@utils/instructionTools'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
@@ -67,20 +66,17 @@ const ConfigureGatewayPlugin = ({
         realm!.account.communityMint,
         gatewayClient!.program.programId
       )
-      const updateRegistrarIx = await gatewayClient!.program.methods
-        .updateRegistrar()
+      const configureRegistrarTx = await gatewayClient!.program.methods
+        .configureRegistrar()
         .accounts({
           registrar,
           realm: realm!.pubkey,
           realmAuthority: realm!.account.authority!,
-          governingTokenMint: realm!.account.communityMint!,
           gatekeeperNetwork: chosenGatekeeperNetwork,
-          payer: wallet.publicKey!,
-          systemProgram: SYSTEM_PROGRAM_ID,
         })
         .remainingAccounts(remainingAccounts)
         .instruction()
-      serializedInstruction = serializeInstructionToBase64(updateRegistrarIx)
+      serializedInstruction = serializeInstructionToBase64(configureRegistrarTx)
     }
     return {
       serializedInstruction: serializedInstruction,

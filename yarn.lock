@@ -2737,10 +2737,10 @@
   dependencies:
     buffer "~6.0.3"
 
-"@solana/governance-program-library@npm:@civic/governance-program-library@0.17.0":
-  version "0.17.0"
-  resolved "https://registry.yarnpkg.com/@civic/governance-program-library/-/governance-program-library-0.17.0.tgz#819d2ec97003f35ee4f9672a26098fb92e1f05f3"
-  integrity sha512-TzKo8164+EskFdlx7qKnbuF4lSGbIIahVQiQGuvF6YN2nZg1EQy9WXwJMIn9OdQktQnkk2x6JJS/MH6Vlxq3DA==
+"@solana/governance-program-library@npm:@civic/governance-program-library@0.17.2":
+  version "0.17.2"
+  resolved "https://registry.yarnpkg.com/@civic/governance-program-library/-/governance-program-library-0.17.2.tgz#04e1ebf22215e6a651b58ae6463d199b9316374e"
+  integrity sha512-GkYQXjNZ//wjqO7A//NQb30blSKLNzFKVqpOssd5dSsthi/SPLZAyEJf6mHj8q+exqcIid2/GzM6GL8nY2hBgw==
   dependencies:
     "@project-serum/anchor" "^0.24.2"
     "@project-serum/serum" "^0.13.61"
