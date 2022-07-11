@@ -88,6 +88,7 @@ import { StyledLabel } from '@components/inputs/styles'
 import classNames from 'classnames'
 import MakeRemoveSpotMarket from './components/instructions/Mango/MakeRemoveSpotMarket'
 import MakeRemovePerpMarket from './components/instructions/Mango/MakeRemovePerpMarket'
+import MakeSwapSpotMarket from './components/instructions/Mango/MakeSwapSpotMarket'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -501,6 +502,13 @@ const New = () => {
             index={idx}
             governance={governance}
           ></MakeRemovePerpMarket>
+        )
+      case Instructions.MangoSwapSpotMarket:
+        return (
+          <MakeSwapSpotMarket
+            index={idx}
+            governance={governance}
+          ></MakeSwapSpotMarket>
         )
       case Instructions.ForesightInitMarket:
         return (
