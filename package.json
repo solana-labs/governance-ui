@@ -23,7 +23,7 @@
     ]
   },
   "dependencies": {
-    "@blockworks-foundation/mango-client": "^3.6.5",
+    "@blockworks-foundation/mango-client": "^3.6.7",
     "@blockworks-foundation/voter-stake-registry-client": "^0.2.3",
     "@cardinal/namespaces-components": "^2.5.5",
     "@castlefinance/vault-core": "^0.1.3",
