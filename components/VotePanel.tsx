@@ -192,7 +192,13 @@ const VotePanel = () => {
     : !ownVoteRecord?.account.isRelinquished
 
   const isPanelVisible = (isVoting || isVoteCast) && isVisibleToWallet
-  const didNotVote = !!proposal && !isVoting && !isVoteCast && isVisibleToWallet
+  const didNotVote =
+    !!proposal &&
+    !isVoting &&
+    proposal.account.state !== ProposalState.Cancelled &&
+    proposal.account.state !== ProposalState.Draft &&
+    !isVoteCast &&
+    isVisibleToWallet
 
   //Todo: move to own components with refactor to dao folder structure
   const isPyth =
@@ -289,11 +295,9 @@ const VotePanel = () => {
       )}
       {didNotVote && (
         <div className="bg-bkg-2 p-4 md:p-6 rounded-lg flex flex-col items-center justify-center">
-          <h3 className="text-center mb-0">You didn&apos;t vote</h3>
+          <h3 className="text-center mb-0">You did not vote</h3>
           <Tooltip content="You did not vote on this proposal">
-            <div className="flex flex-row items-center justify-center rounded-full border border-white/50 p-2 mt-2">
-              <BanIcon className="h-4 w-4 fill-white/50" />
-            </div>
+            <BanIcon className="h-[34px] w-[34px] fill-white/50 mt-2" />
           </Tooltip>
         </div>
       )}

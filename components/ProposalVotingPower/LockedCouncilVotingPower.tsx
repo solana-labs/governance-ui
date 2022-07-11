@@ -76,13 +76,13 @@ export default function LockedCouncilVotingPower(props: Props) {
         <p className="flex mb-1.5 text-xs">
           <span>{tokenName} Deposited</span>
           <span className="font-bold ml-auto text-fgd-1">
-            {tokenAmount.toFormat()}
+            {tokenAmount.isNaN() ? '0' : tokenAmount.toFormat()}
           </span>
         </p>
         <p className="flex text-xs">
           <span>{tokenName} Locked</span>
           <span className="font-bold ml-auto text-fgd-1">
-            {lockedTokensAmount.toFormat()}
+            {lockedTokensAmount.isNaN() ? '0' : lockedTokensAmount.toFormat()}
           </span>
         </p>
       </div>

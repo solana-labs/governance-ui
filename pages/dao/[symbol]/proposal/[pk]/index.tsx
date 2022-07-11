@@ -27,7 +27,7 @@ import ProposalVotingPower from '@components/ProposalVotingPower'
 
 const Proposal = () => {
   const { realmInfo, symbol } = useRealm()
-  const { proposal, descriptionLink } = useProposal()
+  const { proposal, descriptionLink, governance } = useProposal()
   const [description, setDescription] = useState('')
   const { yesVoteProgress, yesVotesRequired } = useProposalVotes(
     proposal?.account
@@ -47,6 +47,11 @@ const Proposal = () => {
       proposal.account.state === ProposalState.Succeeded ||
       proposal.account.state === ProposalState.ExecutingWithErrors)
 
+  const votingEnded =
+    !!governance &&
+    !!proposal &&
+    proposal.account.getTimeToVoteEnd(governance.account) < 0
+
   useEffect(() => {
     const handleResolveDescription = async () => {
       const description = await resolveProposalDescription(descriptionLink!)
@@ -61,7 +66,7 @@ const Proposal = () => {
   const showTokenBalance = proposal
     ? proposal.account.state === ProposalState.Draft ||
       proposal.account.state === ProposalState.SigningOff ||
-      proposal.account.state === ProposalState.Voting
+      (proposal.account.state === ProposalState.Voting && !votingEnded)
     : true
   const showProposalExecution =
     proposal &&

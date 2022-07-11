@@ -6,7 +6,7 @@ import { useCallback } from 'react'
 import { calculateMaxVoteScore } from '@models/proposal/calulateMaxVoteScore'
 import useProposal from '@hooks/useProposal'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
-import { fmtMintAmount, getMintDecimalAmount } from '@tools/sdk/units'
+import { getMintDecimalAmount } from '@tools/sdk/units'
 import Tooltip from '@components/Tooltip'
 import { SecondaryButton } from '@components/Button'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
@@ -75,7 +75,9 @@ export default function LockedCommunityVotingPower(props: Props) {
 
   const tokenAmount =
     depositRecord && mint
-      ? new BigNumber(fmtMintAmount(mint, depositRecord.amountDepositedNative))
+      ? new BigNumber(
+          getMintDecimalAmount(mint, depositRecord.amountDepositedNative)
+        )
       : new BigNumber('0')
 
   const lockedTokensAmount = deposits
@@ -171,13 +173,13 @@ export default function LockedCommunityVotingPower(props: Props) {
         <p className="flex mb-1.5 text-xs">
           <span>{tokenName} Deposited</span>
           <span className="font-bold ml-auto text-fgd-1">
-            {tokenAmount.toString()}
+            {tokenAmount.isNaN() ? '0' : tokenAmount.toFormat()}
           </span>
         </p>
         <p className="flex text-xs">
           <span>{tokenName} Locked</span>
           <span className="font-bold ml-auto text-fgd-1">
-            {lockedTokensAmount.toString()}
+            {lockedTokensAmount.isNaN() ? '0' : lockedTokensAmount.toFormat()}
           </span>
         </p>
       </div>
