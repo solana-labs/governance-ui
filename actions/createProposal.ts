@@ -257,7 +257,9 @@ export const createProposal = async (
     })
   } else {
     const insertChunks = chunks(insertInstructions, chunkBy)
-    const signerChunks = Array(insertChunks.length).fill([])
+    const signerChunks = Array(insertChunks.length)
+    signerChunks.push(...chunks(signers, chunkBy))
+    signerChunks.fill([])
 
     console.log(`Creating proposal using ${insertChunks.length} chunks`)
     await sendTransactionsV2({

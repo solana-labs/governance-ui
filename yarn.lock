@@ -608,10 +608,10 @@
     toformat "^2.0.0"
     yargs "^17.0.1"
 
-"@blockworks-foundation/mango-client@^3.6.5":
-  version "3.6.5"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-client/-/mango-client-3.6.5.tgz#9efc5bd0a47de6b831fec3d5fe83eafbb92859c5"
-  integrity sha512-/JRmyurZMnkcwFwHViZ2ouMpvFBAz806iOg0h06cateqeCA+dXoP/mU8SprswWR+ObxUb7Xtb62+AJDpN3qHWw==
+"@blockworks-foundation/mango-client@^3.6.7":
+  version "3.6.7"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-client/-/mango-client-3.6.7.tgz#ecc59bfc41af20cb0699f588e5477634b40cbbd7"
+  integrity sha512-AKPFzkDArQ4w1eO9xYQPwXoxuzpKNKWyryDmtNLm3YSgzpNQbKAfD6VH9Hxw3m3Kcq5YzYH9pIHSae+qFgOTvw==
   dependencies:
     "@project-serum/anchor" "^0.21.0"
     "@project-serum/serum" "0.13.55"
