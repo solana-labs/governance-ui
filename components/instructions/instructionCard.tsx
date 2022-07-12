@@ -24,6 +24,7 @@ import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 import axios from 'axios'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import tokenService from '@utils/services/token'
+import StreamCard from '@components/StreamCard'
 
 export default function InstructionCard({
   index,
@@ -156,6 +157,15 @@ export default function InstructionCard({
       )}
       <div className="flex justify-end items-center gap-x-4 mt-6 mb-8">
         <InspectorButton proposalInstruction={proposalInstruction} />
+
+        {descriptor?.name == 'Streamflow: Create' && (
+          <StreamCard
+            connection={connection.current}
+            accounts={
+              proposalInstruction.account.getSingleInstruction().accounts
+            }
+          />
+        )}
 
         <FlagInstructionErrorButton
           playState={playing}

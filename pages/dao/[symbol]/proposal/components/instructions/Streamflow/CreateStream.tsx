@@ -225,7 +225,6 @@ const CreateStream = ({
       withdrawor: WITHDRAWOR_PUBLIC_KEY,
       systemProgram: SystemProgram.programId,
     }
-
     const tx = createUncheckedStreamInstruction(
       createStreamData,
       strmProgram,
