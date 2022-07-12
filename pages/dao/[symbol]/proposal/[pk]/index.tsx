@@ -24,6 +24,7 @@ import { ChevronRightIcon } from '@heroicons/react/solid'
 import ProposalExecutionCard from '@components/ProposalExecutionCard'
 import useWalletStore from 'stores/useWalletStore'
 import ProposalVotingPower from '@components/ProposalVotingPower'
+import { useMediaQuery } from 'react-responsive'
 
 const Proposal = () => {
   const { realmInfo, symbol } = useRealm()
@@ -51,6 +52,8 @@ const Proposal = () => {
     !!governance &&
     !!proposal &&
     proposal.account.getTimeToVoteEnd(governance.account) < 0
+
+  const isTwoCol = useMediaQuery({ query: '(min-width: 768px)' })
 
   useEffect(() => {
     const handleResolveDescription = async () => {
@@ -117,7 +120,7 @@ const Proposal = () => {
             )}
 
             <InstructionPanel />
-            <DiscussionPanel />
+            {isTwoCol && <DiscussionPanel />}
           </>
         ) : (
           <>
@@ -182,6 +185,11 @@ const Proposal = () => {
           <ProposalExecutionCard />
         )}
         <ProposalActionsPanel />
+        {!isTwoCol && proposal && (
+          <div className="bg-bkg-2 rounded-lg p-4 md:p-6 ">
+            <DiscussionPanel />
+          </div>
+        )}
       </div>
     </div>
   )
