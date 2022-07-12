@@ -456,11 +456,6 @@ export async function getConvertToMsolInstruction({
         destinationAccount
       )
       destinationAccountOwner = destinationAccountInfo.owner
-      // msol "C6cuodjcn6CpTB1u2rFhjfbkdS7mxEUe4yo8AwDXcvpT" "8ynBdnMKXirW8UeSaamRXoA1kSDYPFVfBi9q2PNKtw6L" "C6cuodjcn6CpTB1u2rFhjfbkdS7mxEUe4yo8AwDXcvpT"
-      // stSol "C6cuodjcn6CpTB1u2rFhjfbkdS7mxEUe4yo8AwDXcvpT" "Cf8A5mSKDBKjRzt4EsnesqE8b9zVuJ6A3aqYBtte4xyK" "C6cuodjcn6CpTB1u2rFhjfbkdS7mxEUe4yo8AwDXcvpT"
-      console.log(destinationAccountOwner)
-      console.log(destinationAccount)
-      console.log(originAccount)
     } else {
       destinationAccountOwner = originAccount
       const {

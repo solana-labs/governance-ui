@@ -8,7 +8,7 @@ import BufferLayout from 'buffer-layout'
 export const LIDO_INSTRUCTIONS = {
   CbxVmURN74QZGuFj6qKjM8VDM8b8KKZrbPFLM2CC2hC8: {
     1: {
-      name: 'Lifo: Stake SOL for stSOL',
+      name: 'Lido: Stake SOL for stSOL',
       accounts: [
         { name: 'Lido State' },
         { name: 'Source' },
