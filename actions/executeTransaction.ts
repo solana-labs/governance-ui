@@ -40,7 +40,7 @@ export const executeTransaction = async (
 
   transaction.add(...instructions)
 
-  await sendTransaction({
+  const c = await sendTransaction({
     transaction,
     wallet,
     connection,
@@ -48,4 +48,5 @@ export const executeTransaction = async (
     sendingMessage: 'Executing instruction',
     successMessage: 'Execution finalized',
   })
+  console.log(c)
 }

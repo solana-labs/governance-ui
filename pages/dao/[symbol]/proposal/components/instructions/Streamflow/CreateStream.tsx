@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
 import Input from 'components/inputs/Input'
-import { sha256 } from 'js-sha256'
 
 import {
   Governance,
@@ -12,8 +11,6 @@ import {
   TOKEN_PROGRAM_ID,
   ASSOCIATED_TOKEN_PROGRAM_ID,
   u64,
-  AccountInfo as TokenAccount,
-  AccountLayout,
 } from '@solana/spl-token'
 import * as yup from 'yup'
 import {
@@ -26,7 +23,6 @@ import {
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useRealm from '@hooks/useRealm'
 import { isFormValid } from '@utils/formValidation'
-import tokenService from '@utils/services/token'
 import {
   CreateStreamForm,
   UiInstruction,
@@ -37,8 +33,8 @@ import useWalletStore from 'stores/useWalletStore'
 
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-import { mintTo } from '@project-serum/serum/lib/token-instructions'
 import { getMintMetadata } from '@components/instructions/programs/streamflow'
+import { createUncheckedStreamInstruction } from '@streamflow/stream'
 
 const STREAMFLOW_TREASURY_PUBLIC_KEY = new PublicKey(
   '5SEpbdjFK5FxwTvfsGMXVQTD2v4M2c5tyRTxhdsPkgDw'
@@ -48,9 +44,7 @@ const WITHDRAWOR_PUBLIC_KEY = new PublicKey(
   'wdrwhnCv4pzW8beKsbPa4S2UDZrXenjg16KJdKSpb5u'
 )
 
-const STREAMFLOW_PROGRAM_ID = '6h7XgGRiHae5C6p3cWo44Ga7jwxRN4KS8TtLabVVVGYS'
-
-const BufferLayout = require('buffer-layout')
+const STREAMFLOW_PROGRAM_ID = 'DcAwL38mreGvUyykD2iitqcgu9hpFbtzxfaGpLi72kfY'
 
 async function ata(mint: PublicKey, account: PublicKey) {
   return await Token.getAssociatedTokenAddress(
@@ -66,7 +60,7 @@ const CreateStream = ({
   governance,
 }: {
   index: number
-  governance: ProgramAccount<Governance>
+  governance: ProgramAccount<Governance> | null
 }) => {
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
@@ -78,11 +72,11 @@ const CreateStream = ({
   const programId: PublicKey | undefined = strmProgram
   const [form, setForm] = useState<CreateStreamForm>({
     recipient: '',
-    start: "",
+    start: '',
     depositedAmount: 0,
     releaseFrequency: 60,
     releaseAmount: 0,
-    amountAtCliff: 0
+    amountAtCliff: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -164,13 +158,15 @@ const CreateStream = ({
         governance: form.governedAccount?.governance,
       }
     }
-    const token = getMintMetadata(form.tokenAccount.extensions.token?.account.mint)
+    const token = getMintMetadata(
+      form.tokenAccount.extensions.token?.account.mint
+    )
     const decimals = token?.decimals ? token.decimals : 0
     const tokenMint = form.tokenAccount.extensions.token?.account.mint
     const partnerPublicKey = STREAMFLOW_TREASURY_PUBLIC_KEY
-    
+
     const partnerTokens = await ata(tokenMint, partnerPublicKey)
-    const start = Math.floor(Date.parse(form.start) /1000)
+    const start = Math.floor(Date.parse(form.start) / 1000)
     const strmMetadata = Keypair.generate()
 
     const [escrowTokens] = await PublicKey.findProgramAddress(
@@ -182,10 +178,7 @@ const CreateStream = ({
       STREAMFLOW_TREASURY_PUBLIC_KEY
     )
     const recipientPublicKey = new PublicKey(form.recipient)
-    const recipientTokens = await ata(
-      tokenMint,
-      recipientPublicKey
-    )
+    const recipientTokens = await ata(tokenMint, recipientPublicKey)
     const prerequisiteInstructions: TransactionInstruction[] = [
       SystemProgram.createAccount({
         programId: new PublicKey(STREAMFLOW_PROGRAM_ID),
@@ -199,20 +192,19 @@ const CreateStream = ({
     const tokenAccount = form.tokenAccount.pubkey
 
     const createStreamData = {
-      start: new u64(start), // Timestamp (in seconds) when the stream/token vesting starts.
-      depositedAmount: new u64(
-        form.depositedAmount * 10 ** decimals), // Deposited amount of tokens (in the smallest units).
-      period: new u64(form.releaseFrequency), // Time step (period) in seconds per which the unlocking occurs.
-      cliff: new u64(start), // Vesting contract "cliff" timestamp in seconds.
-      cliffAmount: new u64(form.amountAtCliff * 10 ** decimals), // Amount unlocked at the "cliff" timestamp.
-      amountPerPeriod: new u64(form.releaseAmount * 10 ** decimals), // Release rate: how many tokens are unlocked per each period.
-      name: 'SPL Realms proposal', // The stream name/subject.
-      canTopup: false, // setting to FALSE will effectively create a vesting contract.
-      cancelableBySender: true, // Whether or not sender can cancel the stream.
-      cancelableByRecipient: false, // Whether or not recipient can cancel the stream.
-      transferableBySender: true, // Whether or not sender can transfer the stream.
-      transferableByRecipient: false, // Whether or not recipient can transfer the stream.
-      automaticWithdrawal: false, // Whether or not a 3rd party can initiate withdraw in the name of recipient (currently not used, set it to FALSE).
+      start: new u64(start),
+      depositedAmount: new u64(form.depositedAmount * 10 ** decimals),
+      period: new u64(form.releaseFrequency),
+      cliff: new u64(start),
+      cliffAmount: new u64(form.amountAtCliff * 10 ** decimals),
+      amountPerPeriod: new u64(form.releaseAmount * 10 ** decimals),
+      name: 'SPL Realms proposal',
+      canTopup: false,
+      cancelableBySender: true,
+      cancelableByRecipient: false,
+      transferableBySender: true,
+      transferableByRecipient: false,
+      automaticWithdrawal: false,
       withdrawFrequency: new u64(form.releaseFrequency),
       recipient: recipientPublicKey,
       recipientTokens: recipientTokens,
@@ -234,117 +226,20 @@ const CreateStream = ({
       withdrawor: WITHDRAWOR_PUBLIC_KEY,
       systemProgram: SystemProgram.programId,
     }
-    const keys = [
-      { pubkey: createStreamAccounts.sender, isSigner: true, isWritable: true },
-      {
-        pubkey: createStreamAccounts.senderTokens,
-        isSigner: false,
-        isWritable: true,
-      },
-      {
-        pubkey: createStreamAccounts.metadata,
-        isSigner: false,
-        isWritable: true,
-      },
-      {
-        pubkey: createStreamAccounts.escrowTokens,
-        isSigner: false,
-        isWritable: true,
-      },
-      {
-        pubkey: createStreamAccounts.withdrawor,
-        isSigner: false,
-        isWritable: true,
-      },
-      { pubkey: createStreamAccounts.mint, isSigner: false, isWritable: false },
-      {
-        pubkey: createStreamAccounts.feeOracle,
-        isSigner: false,
-        isWritable: false,
-      },
-      { pubkey: createStreamAccounts.rent, isSigner: false, isWritable: false },
-      {
-        pubkey: createStreamAccounts.timelockProgram,
-        isSigner: false,
-        isWritable: false,
-      },
-      {
-        pubkey: createStreamAccounts.tokenProgram,
-        isSigner: false,
-        isWritable: false,
-      },
-      {
-        pubkey: createStreamAccounts.systemProgram,
-        isSigner: false,
-        isWritable: false,
-      },
-    ]
-    const createStreamLayout: typeof BufferLayout.Structure = BufferLayout.struct(
-      [
-        BufferLayout.blob(8, 'start_time'),
-        BufferLayout.blob(8, 'net_amount_deposited'),
-        BufferLayout.blob(8, 'period'),
-        BufferLayout.blob(8, 'amount_per_period'),
-        BufferLayout.blob(8, 'cliff'),
-        BufferLayout.blob(8, 'cliff_amount'),
-        BufferLayout.u8('cancelable_by_sender'),
-        BufferLayout.u8('cancelable_by_recipient'),
-        BufferLayout.u8('automatic_withdrawal'),
-        BufferLayout.u8('transferable_by_sender'),
-        BufferLayout.u8('transferable_by_recipient'),
-        BufferLayout.u8('can_topup'),
-        BufferLayout.blob(64, 'stream_name'),
-        BufferLayout.blob(8, 'withdraw_frequency'),
-        BufferLayout.blob(32, 'recipient'),
-        BufferLayout.blob(32, 'partner'),
-      ]
-    )
-    let bufferData = Buffer.alloc(createStreamLayout.span)
 
-    const encodedUIntArray = new TextEncoder().encode(createStreamData.name)
-    let streamNameBuffer = Buffer.alloc(64).fill(
-      encodedUIntArray,
-      0,
-      encodedUIntArray.byteLength
+    const tx = createUncheckedStreamInstruction(
+      createStreamData,
+      strmProgram,
+      createStreamAccounts
     )
-
-    const decodedData = {
-      start_time: createStreamData.start.toBuffer(),
-      net_amount_deposited: createStreamData.depositedAmount.toBuffer(),
-      period: createStreamData.period.toBuffer(),
-      amount_per_period: createStreamData.amountPerPeriod.toBuffer(),
-      cliff: createStreamData.cliff.toBuffer(),
-      cliff_amount: createStreamData.cliffAmount.toBuffer(),
-      cancelable_by_sender: createStreamData.cancelableBySender,
-      cancelable_by_recipient: createStreamData.cancelableByRecipient,
-      automatic_withdrawal: createStreamData.automaticWithdrawal,
-      transferable_by_sender: createStreamData.transferableBySender,
-      transferable_by_recipient: createStreamData.transferableByRecipient,
-      can_topup: createStreamData.canTopup,
-      stream_name: streamNameBuffer,
-      withdraw_frequency: createStreamData.withdrawFrequency.toBuffer(),
-      recipient: createStreamData.recipient.toBuffer(),
-      partner: createStreamData.partner.toBuffer(),
-    }
-    const encodeLength = createStreamLayout.encode(decodedData, bufferData)
-    bufferData = bufferData.slice(0, encodeLength)
-    bufferData = Buffer.concat([
-      Buffer.from(sha256.digest('global:create_unchecked')).slice(0, 8),
-      bufferData,
-    ])
     const signers: Keypair[] = [strmMetadata]
-    const tx = new TransactionInstruction({
-      keys,
-      programId: strmProgram,
-      data: bufferData,
-    })
     return {
       serializedInstruction: serializeInstructionToBase64(tx),
       isValid: true,
       governance: form.governedAccount.governance,
       prerequisiteInstructions: prerequisiteInstructions,
       shouldSplitIntoSeparateTxs: true,
-      signers
+      signers,
     }
   }
 

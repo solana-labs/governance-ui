@@ -58,7 +58,7 @@ import FriktionWithdraw from './components/instructions/Friktion/FriktionWithdra
 import MakeChangePerpMarket from './components/instructions/Mango/MakeChangePerpMarket'
 import MakeAddOracle from './components/instructions/Mango/MakeAddOracle'
 import MakeAddSpotMarket from './components/instructions/Mango/MakeAddSpotMarket'
-import CreateStream from './components/instructions/Solend/CreateStream'
+import CreateStream from './components/instructions/Streamflow/CreateStream'
 import MakeChangeSpotMarket from './components/instructions/Mango/MakeChangeSpotMarket'
 import MakeCreatePerpMarket from './components/instructions/Mango/MakeCreatePerpMarket'
 import useCreateProposal from '@hooks/useCreateProposal'
