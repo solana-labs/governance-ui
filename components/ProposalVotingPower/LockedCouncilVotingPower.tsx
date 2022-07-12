@@ -1,5 +1,6 @@
 import useRealm from '@hooks/useRealm'
 import { BigNumber } from 'bignumber.js'
+import classNames from 'classnames'
 
 import { calculateMaxVoteScore } from '@models/proposal/calulateMaxVoteScore'
 import useProposal from '@hooks/useProposal'
@@ -59,19 +60,35 @@ export default function LockedCouncilVotingPower(props: Props) {
         ).shiftedBy(-councilMint.decimals)
       : null
 
+  if (!(realm && councilMint)) {
+    return (
+      <div
+        className={classNames(props.className, 'rounded-md bg-bkg-1 h-[76px]')}
+      />
+    )
+  }
+
   return (
     <div className={props.className}>
-      <div className={'p-3 rounded-md bg-bkg-1'}>
-        <div className="text-white/50 text-xs">{tokenName} Council Votes</div>
-        <div className="flex items-center justify-between mt-1">
-          <div className="text-white font-bold text-2xl">
-            {amount.toFormat()}
-          </div>
-          {max && !max.isZero() && (
-            <VotingPowerPct amount={amount} total={max} />
-          )}
+      {amount.isZero() ? (
+        <div className={'text-xs text-white/50'}>
+          You do not have any voting power
+          <br />
+          in this realm.
         </div>
-      </div>
+      ) : (
+        <div className={'p-3 rounded-md bg-bkg-1'}>
+          <div className="text-white/50 text-xs">{tokenName} Council Votes</div>
+          <div className="flex items-center justify-between mt-1">
+            <div className="text-white font-bold text-2xl">
+              {amount.toFormat()}
+            </div>
+            {max && !max.isZero() && (
+              <VotingPowerPct amount={amount} total={max} />
+            )}
+          </div>
+        </div>
+      )}
       <div className="pt-4 px-4">
         <p className="flex mb-1.5 text-xs">
           <span>{tokenName} Deposited</span>
