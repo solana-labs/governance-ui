@@ -225,7 +225,10 @@ const VotePanel = () => {
   const accountsToVoteFor: AccountsToVoteFor = [
     // The user own account first
     {
-      tokenRecord: ownTokenRecord,
+      tokenRecord:
+        tokenType === GoverningTokenType.Community
+          ? ownTokenRecord
+          : ownCouncilTokenRecord,
       voterWeight: ownVoterWeight,
       voteRecord: voteRecordsByVoter[wallet.publicKey.toBase58()],
       voterTokenRecord:
