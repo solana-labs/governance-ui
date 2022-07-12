@@ -3,6 +3,7 @@ import { RealmInfo } from '@models/registry/api'
 import { useTheme } from 'next-themes'
 import { useRouter } from 'next/router'
 import React, { useMemo } from 'react'
+import RealmsGrid from './RealmsGrid'
 
 export default function RealmsDashboard({
   realms,
@@ -47,6 +48,7 @@ export default function RealmsDashboard({
     </div>
   ) : (
     <>
+      <RealmsGrid realms={certifiedRealms}/>
       <div className="grid grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
         {certifiedRealms?.length > 0 ? (
           certifiedRealms.map((realm: RealmInfo) => (

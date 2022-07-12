@@ -299,3 +299,13 @@ https://developer.mozilla.org/en-US/docs/Web/CSS/word-break#values */
 .gatewayButton > span {
   @apply !text-bkg-2 !pl-0 !text-sm;
 }
+
+.react-grid-item.react-grid-placeholder {
+  background: none !important;
+  z-index: 2;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
