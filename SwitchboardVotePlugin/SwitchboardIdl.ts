@@ -4672,7 +4672,7 @@ export type Switchboard = {
     {
       code: 6045
       name: 'InsufficientStakeError'
-      msg: 'An account provided insufficient lidoStake for action.'
+      msg: 'An account provided insufficient stake for action.'
     },
     {
       code: 6046
@@ -9531,7 +9531,7 @@ export const IDL: Switchboard = {
     {
       code: 6045,
       name: 'InsufficientStakeError',
-      msg: 'An account provided insufficient lidoStake for action.',
+      msg: 'An account provided insufficient stake for action.',
     },
     {
       code: 6046,
