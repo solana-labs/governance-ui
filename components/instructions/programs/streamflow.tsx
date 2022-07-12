@@ -31,6 +31,8 @@ export const MINT_METADATA = {
   Gssm3vfi8s65R31SBdmQRq6cKeYojGgup7whkw4VCiQj: { symbol: 'STRM', decimals: 9 },
 }
 
+const BufferLayout = require('buffer-layout')
+
 export function getMintMetadata(
   tokenMintPk: PublicKey | undefined
 ): TokenMintMetadata {
