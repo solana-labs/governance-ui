@@ -21,7 +21,6 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useRealm from '@hooks/useRealm'
 import { isFormValid } from '@utils/formValidation'
 import {
   CreateStreamForm,
@@ -64,7 +63,6 @@ const CreateStream = ({
 }) => {
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
-  const { realmInfo } = useRealm()
   const strmProgram = new PublicKey(STREAMFLOW_PROGRAM_ID)
 
   const { assetAccounts } = useGovernanceAssets()

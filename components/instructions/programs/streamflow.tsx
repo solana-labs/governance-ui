@@ -1,25 +1,16 @@
 import { Connection, PublicKey } from '@solana/web3.js'
 import { AccountMetaData } from '@solana/spl-governance'
-import useWalletStore from 'stores/useWalletStore'
 import BN from 'bn.js'
 
 import tokenService from '@utils/services/token'
 import VoteResultsBar from '@components/VoteResultsBar'
-import { StreamClient, ClusterExtended, Cluster } from '@streamflow/stream'
+import { StreamClient, Cluster } from '@streamflow/stream'
 import Button from '@components/Button'
 
 const getNumberFromBN = (value: BN, decimals: number): number =>
   value.gt(new BN(2 ** 53 - 1))
     ? value.div(new BN(10 ** decimals)).toNumber()
     : value.toNumber() / 10 ** decimals
-
-const getCluster = (name: string): ClusterExtended => {
-  if (name == 'devnet') {
-    return Cluster.Devnet
-  } else {
-    return Cluster.Mainnet
-  }
-}
 
 export interface TokenMintMetadata {
   readonly decimals: number
@@ -30,8 +21,6 @@ export interface TokenMintMetadata {
 export const MINT_METADATA = {
   Gssm3vfi8s65R31SBdmQRq6cKeYojGgup7whkw4VCiQj: { symbol: 'STRM', decimals: 9 },
 }
-
-const BufferLayout = require('buffer-layout')
 
 export function getMintMetadata(
   tokenMintPk: PublicKey | undefined
