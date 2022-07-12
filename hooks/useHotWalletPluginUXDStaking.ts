@@ -108,7 +108,7 @@ const useHotWalletPluginUXDStaking = (hotWalletAccount: HotWalletAccount) => {
       console.log(e);
       setStakingCampaignsInfo([]);
     }
-  }, [connection, hotWalletAccount]);
+  }, [connection, hotWalletAccount, sssClient]);
 
   useEffect(() => {
     loadUXDStakingCampaignInfo();
