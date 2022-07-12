@@ -92,7 +92,7 @@ const TokenBalanceCard: FC<Props> = ({ proposal, children }) => {
   return (
     <div className="p-4 rounded-lg bg-bkg-2 md:p-6">
       <div className="flex items-center justify-between">
-        <h3 className="mb-0">Your Account</h3>
+        <h3 className="mb-0">Your account</h3>
         <Link
           href={fmtUrlWithCluster(
             `/dao/${symbol}/account/${tokenOwnerRecordPk}`
@@ -401,11 +401,13 @@ export const TokenDeposit = ({
   return (
     <>
       <div className="flex items-center mt-4 space-x-4">
-        <div className="w-full px-4 py-2 rounded-md bg-bkg-1">
-          <p className="text-xs text-fgd-3">{depositTokenName} Votes</p>
-          <p className="mb-0 text-xl font-bold text-fgd-1 hero-text">
-            {availableTokens}
-          </p>
+        <div className="w-full px-4 py-2 rounded-md bg-bkg-1 flex flex-row items-center justify-between">
+          <div>
+            <p className="text-xs text-fgd-3">{depositTokenName} Votes</p>
+            <p className="mb-0 text-xl font-bold text-fgd-1 hero-text">
+              {availableTokens}
+            </p>
+          </div>
         </div>
       </div>
 

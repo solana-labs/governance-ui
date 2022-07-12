@@ -1,6 +1,9 @@
 import useRealm from 'hooks/useRealm'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import ProposalFilter from 'components/ProposalFilter'
+import ProposalFilter, {
+  InitialFilters,
+  Filters,
+} from 'components/ProposalFilter'
 import {
   Governance,
   ProgramAccount,
@@ -29,6 +32,7 @@ import { NftVoterClient } from '@solana/governance-program-library'
 import { notify } from '@utils/notifications'
 import { sendSignedTransaction } from '@utils/send'
 import { LOCALNET_REALM_ID as PYTH_LOCALNET_REALM_ID } from 'pyth-staking-api'
+import { hasInstructions } from '@components/ProposalStatusBadge'
 
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
@@ -44,6 +48,77 @@ const RealmHeader = dynamic(() => import('components/RealmHeader'))
 const DepositLabel = dynamic(
   () => import('@components/TreasuryAccount/DepositLabel')
 )
+
+const filterProposals = (
+  proposals: [string, ProgramAccount<Proposal>][],
+  filters: Filters
+) => {
+  return proposals.filter(([, proposal]) => {
+    if (
+      !filters.Cancelled &&
+      proposal.account.state === ProposalState.Cancelled
+    ) {
+      return false
+    }
+
+    if (!filters.Completed) {
+      if (proposal.account.state === ProposalState.Completed) {
+        return false
+      }
+
+      if (
+        proposal.account.state === ProposalState.Succeeded &&
+        !hasInstructions(proposal.account)
+      ) {
+        return false
+      }
+    }
+
+    if (
+      !filters.Defeated &&
+      proposal.account.state === ProposalState.Defeated
+    ) {
+      return false
+    }
+
+    if (!filters.Draft && proposal.account.state === ProposalState.Draft) {
+      return false
+    }
+
+    if (!filters.Executable) {
+      if (proposal.account.state === ProposalState.Executing) {
+        return false
+      }
+
+      if (
+        proposal.account.state === ProposalState.Succeeded &&
+        hasInstructions(proposal.account)
+      ) {
+        return false
+      }
+    }
+
+    if (
+      !filters.ExecutingWithErrors &&
+      proposal.account.state === ProposalState.ExecutingWithErrors
+    ) {
+      return false
+    }
+
+    if (
+      !filters.SigningOff &&
+      proposal.account.state === ProposalState.SigningOff
+    ) {
+      return false
+    }
+
+    if (!filters.Voting && proposal.account.state === ProposalState.Voting) {
+      return false
+    }
+
+    return true
+  })
+}
 
 const compareProposals = (
   p1: Proposal,
@@ -103,7 +178,7 @@ const REALM = () => {
     isNftMode,
   } = useRealm()
   const proposalsPerPage = 20
-  const [filters, setFilters] = useState<ProposalState[]>([])
+  const [filters, setFilters] = useState<Filters>(InitialFilters)
   const [displayedProposals, setDisplayedProposals] = useState(
     Object.entries(proposals)
   )
@@ -138,10 +213,8 @@ const REALM = () => {
   }, [JSON.stringify(filteredProposals)])
 
   useEffect(() => {
-    let proposals =
-      filters.length > 0
-        ? allProposals.filter(([, v]) => !filters.includes(v.account.state))
-        : allProposals
+    let proposals = filterProposals(allProposals, filters)
+
     if (proposalSearch) {
       proposals = proposals.filter(([, v]) =>
         v.account.name
@@ -153,10 +226,7 @@ const REALM = () => {
   }, [filters, proposalSearch])
 
   useEffect(() => {
-    const proposals =
-      filters.length > 0
-        ? allProposals.filter(([, v]) => !filters.includes(v.account.state))
-        : allProposals
+    const proposals = filterProposals(allProposals, filters)
     setDisplayedProposals(proposals)
     setFilteredProposals(proposals)
   }, [JSON.stringify(proposals)])
@@ -193,10 +263,7 @@ const REALM = () => {
     if (multiVoteMode) {
       setFilteredProposals(votingProposals)
     } else {
-      const proposals =
-        filters.length > 0
-          ? allProposals.filter(([, v]) => !filters.includes(v.account.state))
-          : allProposals
+      const proposals = filterProposals(allProposals, filters)
       setFilteredProposals(proposals)
     }
   }, [multiVoteMode])
@@ -408,7 +475,7 @@ const REALM = () => {
                         <ProposalFilter
                           disabled={multiVoteMode}
                           filters={filters}
-                          setFilters={setFilters}
+                          onChange={setFilters}
                         />
                       </div>
                       <div
