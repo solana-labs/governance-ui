@@ -50,7 +50,7 @@ export function getMintMetadata(
 }
 
 export const STREAMFLOW_INSTRUCTIONS = {
-  '6h7XgGRiHae5C6p3cWo44Ga7jwxRN4KS8TtLabVVVGYS': {
+  DcAwL38mreGvUyykD2iitqcgu9hpFbtzxfaGpLi72kfY: {
     174: {
       name: 'Streamflow: Create',
       accounts: [
