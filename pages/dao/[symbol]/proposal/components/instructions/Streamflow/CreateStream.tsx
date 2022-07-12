@@ -44,7 +44,8 @@ const WITHDRAWOR_PUBLIC_KEY = new PublicKey(
   'wdrwhnCv4pzW8beKsbPa4S2UDZrXenjg16KJdKSpb5u'
 )
 
-const STREAMFLOW_PROGRAM_ID = 'DcAwL38mreGvUyykD2iitqcgu9hpFbtzxfaGpLi72kfY'
+export const STREAMFLOW_PROGRAM_ID =
+  'DcAwL38mreGvUyykD2iitqcgu9hpFbtzxfaGpLi72kfY'
 
 async function ata(mint: PublicKey, account: PublicKey) {
   return await Token.getAssociatedTokenAddress(
