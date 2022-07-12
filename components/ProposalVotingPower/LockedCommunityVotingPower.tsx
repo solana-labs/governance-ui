@@ -39,6 +39,7 @@ export default function LockedCommunityVotingPower(props: Props) {
     (s) => s.state.votingPowerFromDeposits
   )
   const wallet = useWalletStore((s) => s.current)
+  const isLoading = useDepositStore((s) => s.state.isLoading)
 
   const currentTokenOwnerRecord =
     wallet && wallet.publicKey
@@ -149,7 +150,7 @@ export default function LockedCommunityVotingPower(props: Props) {
     wallet,
   ])
 
-  if (!(realm && realmInfo && currentTokenOwnerRecord)) {
+  if (isLoading || !(votingPower && mint)) {
     return (
       <div
         className={classNames(props.className, 'rounded-md bg-bkg-1 h-[76px]')}

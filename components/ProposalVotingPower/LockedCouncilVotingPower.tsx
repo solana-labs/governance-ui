@@ -19,6 +19,7 @@ export default function LockedCouncilVotingPower(props: Props) {
   const { proposal } = useProposal()
   const deposits = useDepositStore((s) => s.state.deposits)
   const votingPower = useDepositStore((s) => s.state.votingPower)
+  const isLoading = useDepositStore((s) => s.state.isLoading)
 
   const depositRecord = deposits.find(
     (deposit) =>
@@ -60,7 +61,7 @@ export default function LockedCouncilVotingPower(props: Props) {
         ).shiftedBy(-councilMint.decimals)
       : null
 
-  if (!(realm && councilMint)) {
+  if (isLoading || !(votingPower && councilMint)) {
     return (
       <div
         className={classNames(props.className, 'rounded-md bg-bkg-1 h-[76px]')}
