@@ -63,8 +63,9 @@ export async function castVotes({
     client,
   );
 
+  // +1 because we need 1 more vote than the quorum
   let relativeRequiredVote =
-    vote === YesNoVote.Yes ? yesVotesRequired : noVotesRequired;
+    vote === YesNoVote.Yes ? yesVotesRequired + 1 : noVotesRequired + 1;
 
   for (const tokenOwnerRecord of tokenOwnerRecordsToVoteWith) {
     // we check that the votes will stop once the proposal passes.
