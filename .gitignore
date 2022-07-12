@@ -35,3 +35,6 @@ yarn-error.log*
 
 # TypeScript cache
 *.tsbuildinfo
+
+#IDE specific
+.idea
