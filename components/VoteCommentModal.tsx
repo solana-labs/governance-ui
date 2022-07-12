@@ -1,14 +1,17 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { useState } from 'react';
 
 import {
   ChatMessageBody,
   ChatMessageBodyType,
+  GoverningTokenType,
+  ProgramAccount,
+  TokenOwnerRecord,
   YesNoVote,
 } from '@solana/spl-governance';
 import { RpcContext } from '@solana/spl-governance';
 import useWalletStore from '../stores/useWalletStore';
 import useRealm from '../hooks/useRealm';
-import { castVote } from '../actions/castVote';
+import { castVotes } from '../actions/castVotes';
 
 import Button, { SecondaryButton } from './Button';
 // import { notify } from '../utils/notifications'
@@ -16,39 +19,42 @@ import Loading from './Loading';
 import Modal from './Modal';
 import Input from './inputs/Input';
 import Tooltip from './Tooltip';
-import { TokenOwnerRecord } from '@solana/spl-governance';
-import { ProgramAccount } from '@solana/spl-governance';
 import { getProgramVersionForRealm } from '@models/registry/api';
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore';
+import useProposalVotes from '@hooks/useProposalVotes';
 
-interface VoteCommentModalProps {
-  onClose: () => void;
-  isOpen: boolean;
-  vote: YesNoVote;
-  voterTokenRecord: ProgramAccount<TokenOwnerRecord>;
-}
-
-const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
+const VoteCommentModal = ({
   onClose,
   isOpen,
   vote,
-  voterTokenRecord,
+  tokenOwnerRecordsToVoteWith,
+}: {
+  onClose: () => void;
+  isOpen: boolean;
+  vote: YesNoVote;
+  tokenOwnerRecordsToVoteWith: ProgramAccount<TokenOwnerRecord>[];
 }) => {
   const client = useVoteStakeRegistryClientStore((s) => s.state.client);
   const [submitting, setSubmitting] = useState(false);
   const [comment, setComment] = useState('');
   const wallet = useWalletStore((s) => s.current);
   const connection = useWalletStore((s) => s.connection);
-  const { proposal } = useWalletStore((s) => s.selectedProposal);
+  const { proposal, tokenType } = useWalletStore((s) => s.selectedProposal);
   const { fetchChatMessages } = useWalletStore((s) => s.actions);
   const { fetchVoteRecords } = useWalletStore((s) => s.actions);
-  const { realm, realmInfo } = useRealm();
+  const { realm, realmInfo, mint, councilMint } = useRealm();
   const { fetchRealm } = useWalletStore((s) => s.actions);
+
+  const { yesVotesRequired, noVotesRequired } = useProposalVotes(
+    proposal?.account,
+  );
 
   const submitVote = async (vote: YesNoVote) => {
     const programId = realmInfo?.programId;
     const realmId = realmInfo?.realmId;
+
     setSubmitting(true);
+
     const rpcContext = new RpcContext(
       proposal!.owner,
       getProgramVersionForRealm(realmInfo!),
@@ -57,7 +63,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
       connection.endpoint,
     );
 
-    const msg = comment
+    const message = comment
       ? new ChatMessageBody({
           type: ChatMessageBodyType.Text,
           value: comment,
@@ -65,15 +71,25 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
       : undefined;
 
     try {
-      await castVote(
+      const usedMint =
+        tokenType === GoverningTokenType.Community ? mint : councilMint;
+
+      if (!usedMint) {
+        throw new Error('Mint not found');
+      }
+
+      await castVotes({
         rpcContext,
-        realm!,
-        proposal!,
-        voterTokenRecord.pubkey,
+        realm: realm!,
+        proposal: proposal!,
+        tokenOwnerRecordsToVoteWith,
+        yesVotesRequired,
+        noVotesRequired,
+        mint: usedMint,
         vote,
-        msg,
+        message,
         client,
-      );
+      });
     } catch (ex) {
       //TODO: How do we present transaction errors to users? Just the notification?
       console.error("Can't cast vote", ex);

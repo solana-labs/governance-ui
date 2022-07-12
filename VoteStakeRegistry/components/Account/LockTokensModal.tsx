@@ -42,6 +42,7 @@ import { calcMintMultiplier } from 'VoteStakeRegistry/tools/deposits';
 import ButtonGroup from '@components/ButtonGroup';
 import InlineNotification from '@components/InlineNotification';
 import Tooltip from '@components/Tooltip';
+import { BN_ZERO } from '@utils/helpers';
 
 const YES = 'Yes';
 const NO = 'No';
@@ -221,7 +222,7 @@ const LockTokensModal = ({
       mint!.decimals,
     );
     const totalAmountInDeposit =
-      depositRecord?.amountDepositedNative || new BN(0);
+      depositRecord?.amountDepositedNative || BN_ZERO;
     const whatWillBeLeftInsideDeposit = totalAmountInDeposit.sub(
       totalAmountToLock,
     );

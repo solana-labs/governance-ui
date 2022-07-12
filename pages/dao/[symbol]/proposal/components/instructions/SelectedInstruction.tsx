@@ -52,6 +52,7 @@ import UXDSetMangoDepositoriesRedeemableSoftCap from './UXD/SetMangoDepositories
 import UXDSetRedeemableGlobalSupplyCap from './UXD/SetRedeemGlobalSupplyCap';
 import UXDWithdrawInsuranceFromMangoDepository from './UXD/WithdrawInsuranceFromMangoDepository';
 import UXDStakingInitializeStakingCampaign from './UXDStaking/InitializeStakingCampaign';
+import UXDStakingMigrateStakingCampaignFromV1ToV2 from './UXDStaking/MigrateStakingCampaignFromV1ToV2';
 import UXDStakingFinalizeStakingCampaign from './UXDStaking/FinalizeStakingCampaign';
 import UXDStakingAddStakingOption from './UXDStaking/AddStakingOption';
 import UXDStakingActivateStakingOption from './UXDStaking/ActivateStakingOption';
@@ -229,6 +230,13 @@ const SelectedInstruction = ({
     case InstructionEnum.UXDWithdrawInsuranceFromMangoDepository:
       return (
         <UXDWithdrawInsuranceFromMangoDepository
+          index={index}
+          governedAccount={governedAccount}
+        />
+      );
+    case InstructionEnum.UXDStakingMigrateStakingCampaignFromV1ToV2:
+      return (
+        <UXDStakingMigrateStakingCampaignFromV1ToV2
           index={index}
           governedAccount={governedAccount}
         />

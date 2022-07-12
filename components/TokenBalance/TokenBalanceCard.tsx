@@ -7,7 +7,14 @@ import {
 } from '@solana/web3.js';
 import BN from 'bn.js';
 import useRealm from '@hooks/useRealm';
-import { getProposal, Proposal, ProposalState } from '@solana/spl-governance';
+import {
+  getProposal,
+  ProgramAccount,
+  Proposal,
+  ProposalState,
+  TokenOwnerRecord,
+  VoteRecord,
+} from '@solana/spl-governance';
 import { getUnrelinquishedVoteRecords } from '@models/api';
 import { withDepositGoverningTokens } from '@solana/spl-governance';
 import { withRelinquishVote } from '@solana/spl-governance';
@@ -21,13 +28,36 @@ import { GoverningTokenType } from '@solana/spl-governance';
 import { fmtMintAmount } from '@tools/sdk/units';
 import { getMintMetadata } from '../instructions/programs/splToken';
 import { withFinalizeVote } from '@solana/spl-governance';
-import { chunks } from '@utils/helpers';
+import { BN_ZERO, chunks } from '@utils/helpers';
 import { getProgramVersionForRealm } from '@models/registry/api';
 import { notify } from '@utils/notifications';
 import { ExclamationIcon } from '@heroicons/react/outline';
+import { VoteRegistryVoterWeight, VoterWeight } from '@models/voteWeights';
+import { fmtTokenAmount } from '@utils/formatting';
+import Tooltip from '@components/Tooltip';
+
+type AccountToVoteFor = {
+  tokenRecord?: ProgramAccount<TokenOwnerRecord>;
+  voterWeight?: VoteRegistryVoterWeight | VoterWeight;
+  voteRecord?: ProgramAccount<VoteRecord>;
+  voterTokenRecord?: ProgramAccount<TokenOwnerRecord>;
+};
+
+type AccountsToVoteFor = AccountToVoteFor[];
+
+function countVotingPower(accountsToVoteFor: AccountsToVoteFor) {
+  return accountsToVoteFor.reduce(
+    (acc, account) =>
+      account.voterTokenRecord
+        ? acc.add(account.voterTokenRecord.account.governingTokenDepositAmount)
+        : acc,
+    BN_ZERO,
+  );
+}
 
 const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
-  const { councilMint, mint, realm } = useRealm();
+  const { realm, councilMint, mint } = useRealm();
+
   const isDepositVisible = (
     depositMint: MintInfo | undefined,
     realmMint: PublicKey | undefined,
@@ -106,11 +136,70 @@ const TokenDeposit = ({
     governances,
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
+    tokenRecords,
   } = useRealm();
+
+  const { voteRecordsByVoter } = useWalletStore((s) => s.selectedProposal);
+
+  // Look for accounts where the user is the delegate
+  const getDelegatedAccounts = (): {
+    address: string;
+    nbToken: number;
+  }[] => {
+    if (!wallet?.publicKey) {
+      return [];
+    }
+
+    if (!mint) {
+      throw new Error('Mint info not found');
+    }
+
+    return Object.entries(tokenRecords)
+      .filter(([, value]) =>
+        value.account.governanceDelegate?.equals(wallet.publicKey!),
+      )
+      .map(([key, value]) => ({
+        address: key,
+        nbToken: fmtTokenAmount(
+          value.account.governingTokenDepositAmount,
+          mint.decimals,
+        ),
+      }));
+  };
+
+  // Show nothing if not connected
+  if (!wallet?.publicKey) {
+    return <></>;
+  }
+
   // Do not show deposits for mints with zero supply because nobody can deposit anyway
   if (!mint || mint.supply.isZero()) {
     return null;
   }
+
+  const delegatedAccounts = getDelegatedAccounts().map(
+    ({ address: delegatedAccountAddress }) => ({
+      tokenRecord: tokenRecords[delegatedAccountAddress],
+      voterWeight: new VoterWeight(ownTokenRecord, ownCouncilTokenRecord),
+      voteRecord: voteRecordsByVoter[delegatedAccountAddress],
+      voterTokenRecord:
+        tokenType === GoverningTokenType.Community
+          ? tokenRecords[delegatedAccountAddress]
+          : ownCouncilTokenRecord,
+    }),
+  );
+
+  const votingPowerOfDelegatedAccounts = countVotingPower(delegatedAccounts);
+  const uiVotingPowerOfDelegatedAccounts = fmtTokenAmount(
+    votingPowerOfDelegatedAccounts,
+    mint.decimals,
+  );
+
+  console.log(
+    'votingPowerOfDelegatedAccounts',
+    votingPowerOfDelegatedAccounts.toString(),
+    fmtTokenAmount(votingPowerOfDelegatedAccounts, mint.decimals).toString(),
+  );
 
   const depositTokenRecord =
     tokenType === GoverningTokenType.Community
@@ -194,6 +283,12 @@ const TokenDeposit = ({
       for (const voteRecord of Object.values(voteRecords)) {
         let proposal = proposals[voteRecord.account.proposal.toBase58()];
         if (!proposal) {
+          continue;
+        }
+
+        // In the voteRecords, council token votes and governing token votes are mixed up
+        // Gotta be sure here we deal only with the appropriate one
+        if (!depositMint!.equals(proposal.account.governingTokenMint)) {
           continue;
         }
 
@@ -284,11 +379,11 @@ const TokenDeposit = ({
   };
 
   const hasTokensInWallet =
-    depositTokenAccount && depositTokenAccount.account.amount.gt(new BN(0));
+    depositTokenAccount && depositTokenAccount.account.amount.gt(BN_ZERO);
 
   const hasTokensDeposited =
     depositTokenRecord &&
-    depositTokenRecord.account.governingTokenDepositAmount.gt(new BN(0));
+    depositTokenRecord.account.governingTokenDepositAmount.gt(BN_ZERO);
 
   const depositTooltipContent = !connected
     ? 'Connect your wallet to deposit'
@@ -329,7 +424,19 @@ const TokenDeposit = ({
       <div className="flex space-x-4 items-center">
         <div className="bg-bkg-1 px-4 py-2 rounded-md w-full">
           <p className="text-fgd-3 text-xs">{depositTokenName} Votes</p>
-          <p className="font-bold mb-0 text-fgd-1 text-xl">{availableTokens}</p>
+          <p className="font-bold mb-0 text-fgd-1 text-xl flex">
+            {availableTokens}
+            {uiVotingPowerOfDelegatedAccounts > 0 ? (
+              <Tooltip content="Voting power of delegated accounts">
+                <div className="flex items-center">
+                  <div className="text-fgd-3 h-6 w-1 bg-bkg-2 ml-2" />
+                  <span className="text-primary-light ml-2">
+                    {uiVotingPowerOfDelegatedAccounts.toString()}
+                  </span>
+                </div>
+              </Tooltip>
+            ) : null}
+          </p>
         </div>
       </div>
 

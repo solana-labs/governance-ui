@@ -3,10 +3,10 @@ import { EndpointTypes } from '@models/types';
 import { Connection, PublicKey } from '@solana/web3.js';
 import {
   createAndInitializeMango,
-  findAddrSync,
   MangoDepository,
   UXDClient,
 } from '@uxd-protocol/uxd-client';
+import { findAddrSync } from '@uxdprotocol/uxd-staking-client';
 
 export const DEPOSITORY_MINTS = {
   devnet: {

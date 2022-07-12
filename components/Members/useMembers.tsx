@@ -15,10 +15,9 @@ import {
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token';
 import { Member } from 'utils/uiTypes/members';
-import { BN } from '@project-serum/anchor';
 import { PublicKey } from '@solana/web3.js';
 import { usePrevious } from '@hooks/usePrevious';
-import { capitalize } from '@utils/helpers';
+import { BN_ZERO, capitalize } from '@utils/helpers';
 export default function useMembers() {
   const { tokenRecords, councilTokenOwnerRecords, realm } = useRealm();
   const connection = useWalletStore((s) => s.connection);
@@ -75,7 +74,8 @@ export default function useMembers() {
         .filter((x) => x)
         .map((r) => {
           const publicKey = r!.owner;
-          const data = Buffer.from(r!.data);
+          // TRICK to make it compile
+          const data = Buffer.from(r!.data as any);
           const account = parseTokenAccountData(r!.owner, data);
           return { publicKey, account };
         });
@@ -111,7 +111,7 @@ export default function useMembers() {
           walletAddress: memberToMatch.account.owner.toBase58(),
           votesCasted: 0,
           [votesPropoName]: memberToMatch.account.amount,
-          communityVotes: new BN(0),
+          communityVotes: BN_ZERO,
           [hasVotesOutsidePropName]: true,
         });
       }
@@ -192,8 +192,8 @@ export default function useMembers() {
                 {
                   walletAddress: '',
                   votesCasted: 0,
-                  councilVotes: new BN(0),
-                  communityVotes: new BN(0),
+                  councilVotes: BN_ZERO,
+                  communityVotes: BN_ZERO,
                 },
               ),
           };

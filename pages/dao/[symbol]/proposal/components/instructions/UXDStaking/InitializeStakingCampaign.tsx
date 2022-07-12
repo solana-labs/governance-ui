@@ -1,10 +1,5 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React from 'react';
 import * as yup from 'yup';
-import {
-  SingleSideStakingClient,
-  StakingCampaign,
-} from '@uxdprotocol/uxd-staking-client';
 import Input from '@components/inputs/Input';
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
 import { GovernedMultiTypeAccount } from '@utils/tokens';
@@ -12,8 +7,9 @@ import { UXDStakingInitializeStakingCampaignForm } from '@utils/uiTypes/proposal
 import uxdProtocolStakingConfiguration from '@tools/sdk/uxdProtocolStaking/configuration';
 import { getSplTokenInformationByUIName } from '@utils/splTokens';
 import SelectSplToken from '../../SelectSplToken';
-import { findATAAddrSync } from '@utils/ataTools';
 import useWalletStore from 'stores/useWalletStore';
+import useRealm from '@hooks/useRealm';
+import useSingleSideStakingClient from '@hooks/useSingleSideStakingClient';
 
 const InitializeStakingCampaign = ({
   index,
@@ -23,6 +19,8 @@ const InitializeStakingCampaign = ({
   governedAccount?: GovernedMultiTypeAccount;
 }) => {
   const wallet = useWalletStore((s) => s.current);
+  const { realmInfo } = useRealm();
+  const { client: sssClient } = useSingleSideStakingClient();
 
   const nowInSec = Math.floor(Date.now() / 1000);
 
@@ -67,9 +65,13 @@ const InitializeStakingCampaign = ({
         );
       }
 
-      const client: SingleSideStakingClient = new SingleSideStakingClient(
-        programId,
-      );
+      if (!realmInfo) {
+        throw new Error('Realm info not loaded');
+      }
+
+      if (!sssClient) {
+        throw new Error('Single side staking client not loaded');
+      }
 
       const rewardSplToken = getSplTokenInformationByUIName(
         form.rewardMintUIName!,
@@ -80,38 +82,16 @@ const InitializeStakingCampaign = ({
 
       const authority = governedAccount!.governance!.pubkey;
 
-      const [rewardVaultPda] = findATAAddrSync(authority, rewardSplToken.mint);
-      const [stakedVaultPda] = findATAAddrSync(authority, stakedSplToken.mint);
-
-      const stakingCampaign = StakingCampaign.setup(
-        rewardSplToken.mint,
-        rewardSplToken.decimals,
-        stakedSplToken.mint,
-        stakedSplToken.decimals,
-        programId,
-        Number(form.startTs!),
-        form.endTs ? form.endTs : undefined,
-      );
-
-      console.log('Initialize Staking Campaign', {
-        authority: authority.toString(),
-        campaignPDA: stakingCampaign.pda.toString(),
-        rewardSplTokenMint: rewardSplToken.mint.toString(),
-        rewardSplTokenDecimals: rewardSplToken.decimals,
-        rewardVaultPda: rewardVaultPda.toString(),
-        stakedSplTokenMint: stakedSplToken.mint.toString(),
-        stakedSplTokenDecimals: stakedSplToken.decimals,
-        stakedVaultPda: stakedVaultPda.toString(),
-        startTs: form.startTs,
-        endTs: form.endTs,
-        payer: wallet!.publicKey!.toBase58(),
-        uiRewardAmountToDeposit: form.uiRewardAmountToDeposit?.toString(),
-      });
-
-      return client.createInitializeStakingCampaignInstruction({
+      return sssClient.createInitializeStakingCampaignInstruction({
         authority,
-        stakingCampaign,
-        rewardDepositAmount: form.uiRewardAmountToDeposit!,
+        rewardMintDecimals: rewardSplToken.decimals,
+        rewardMint: rewardSplToken.mint,
+        stakedMint: stakedSplToken.mint,
+        governanceProgram: realmInfo.programId,
+        governanceRealm: realmInfo.realmId,
+        startTs: form.startTs!,
+        endTs: form.endTs,
+        uiRewardDepositAmount: form.uiRewardAmountToDeposit!,
         options: uxdProtocolStakingConfiguration.TXN_OPTS,
         payer: wallet!.publicKey!,
       });

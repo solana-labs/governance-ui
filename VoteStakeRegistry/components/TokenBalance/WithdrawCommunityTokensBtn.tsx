@@ -1,7 +1,6 @@
 import Button from '@components/Button';
 import useRealm from '@hooks/useRealm';
 import { getUnrelinquishedVoteRecords } from '@models/api';
-import { BN } from '@project-serum/anchor';
 import {
   getProposal,
   ProposalState,
@@ -9,7 +8,7 @@ import {
   withRelinquishVote,
 } from '@solana/spl-governance';
 import { Transaction, TransactionInstruction } from '@solana/web3.js';
-import { chunks } from '@utils/helpers';
+import { BN_ZERO, chunks } from '@utils/helpers';
 import { sendTransaction } from '@utils/send';
 import useWalletStore from 'stores/useWalletStore';
 import { withVoteRegistryWithdraw } from 'VoteStakeRegistry/sdk/withVoteRegistryWithdraw';
@@ -167,7 +166,7 @@ const WithDrawCommunityTokens = () => {
     setIsLoading(false);
   };
   const hasTokensDeposited =
-    depositRecord && depositRecord.amountDepositedNative.gt(new BN(0));
+    depositRecord && depositRecord.amountDepositedNative.gt(BN_ZERO);
   const withdrawTooltipContent = !connected
     ? 'Connect your wallet to withdraw'
     : !hasTokensDeposited

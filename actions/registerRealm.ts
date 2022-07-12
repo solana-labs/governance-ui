@@ -25,7 +25,7 @@ import {
 import { withCreateMint } from '@tools/sdk/splToken/withCreateMint';
 import { withCreateAssociatedTokenAccount } from '@tools/sdk/splToken/withCreateAssociatedTokenAccount';
 import { withMintTo } from '@tools/sdk/splToken/withMintTo';
-import { chunks } from '@utils/helpers';
+import { chunks, BN_ZERO } from '@utils/helpers';
 import {
   SignerWalletAdapter,
   WalletConnectionError,
@@ -111,7 +111,7 @@ async function prepareMintInstructions(
           ownerPk,
           _mintPk,
         );
-        const shouldMint = !ata?.account.amount.gt(new BN(0));
+        const shouldMint = !ata?.account.amount.gt(BN_ZERO);
 
         const ataPk =
           ata?.publicKey ??

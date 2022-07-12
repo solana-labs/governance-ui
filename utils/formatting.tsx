@@ -1,10 +1,11 @@
 import BN from 'bn.js';
 import dayjs from 'dayjs';
 import { PublicKey } from '@solana/web3.js';
+import { BN_ZERO } from './helpers';
 const relativeTime = require('dayjs/plugin/relativeTime');
 
 const votePrecision = 10000;
-export const calculatePct = (c: BN = new BN(0), total?: BN) => {
+export const calculatePct = (c: BN = BN_ZERO, total?: BN) => {
   if (total?.isZero()) {
     return 0;
   }
@@ -18,7 +19,7 @@ export const calculatePct = (c: BN = new BN(0), total?: BN) => {
   );
 };
 
-export const fmtTokenAmount = (c: BN = new BN(0), decimals?: number) =>
+export const fmtTokenAmount = (c: BN = BN_ZERO, decimals?: number) =>
   c.div(new BN(10).pow(new BN(decimals ?? 0))).toNumber();
 
 dayjs.extend(relativeTime);

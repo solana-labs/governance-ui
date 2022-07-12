@@ -11,29 +11,40 @@ import { ProgramAccount } from '@solana/spl-governance';
 import { sendTransaction } from '../utils/send';
 import { withRelinquishVote } from '@solana/spl-governance';
 
-export const relinquishVote = async (
-  { connection, wallet, programId, walletPubkey }: RpcContext,
-  proposal: ProgramAccount<Proposal>,
-  tokenOwnerRecord: PublicKey,
-  voteRecord: PublicKey,
-  instructions: TransactionInstruction[] = [],
-) => {
+export default async ({
+  rpcContext: { connection, wallet, programId, walletPubkey },
+  proposal,
+  records,
+  instructions = [],
+}: {
+  rpcContext: RpcContext;
+  proposal: ProgramAccount<Proposal>;
+
+  records: {
+    tokenOwnerRecord: PublicKey;
+    voteRecord: PublicKey;
+  }[];
+
+  instructions: TransactionInstruction[];
+}) => {
   const signers: Keypair[] = [];
 
   const governanceAuthority = walletPubkey;
   const beneficiary = walletPubkey;
 
-  withRelinquishVote(
-    instructions,
-    programId,
-    proposal.account.governance,
-    proposal.pubkey,
-    tokenOwnerRecord,
-    proposal.account.governingTokenMint,
-    voteRecord,
-    governanceAuthority,
-    beneficiary,
-  );
+  for (const record of records) {
+    withRelinquishVote(
+      instructions,
+      programId,
+      proposal.account.governance,
+      proposal.pubkey,
+      record.tokenOwnerRecord,
+      proposal.account.governingTokenMint,
+      record.voteRecord,
+      governanceAuthority,
+      beneficiary,
+    );
+  }
 
   const transaction = new Transaction();
   transaction.add(...instructions);

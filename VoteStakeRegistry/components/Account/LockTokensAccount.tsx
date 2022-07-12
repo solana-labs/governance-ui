@@ -31,6 +31,7 @@ import {
 import { getMintMetadata } from '@components/instructions/programs/splToken';
 import Account from './Account';
 import { abbreviateAddress } from '@utils/formatting';
+import { BN_ZERO } from '@utils/helpers';
 interface DepositBox {
   mintPk: PublicKey;
   mint: MintInfo;
@@ -46,9 +47,9 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
   const [reducedDeposits, setReducedDeposits] = useState<DepositBox[]>([]);
   const ownDeposits = useDepositStore((s) => s.state.deposits);
   const [deposits, setDeposits] = useState<DepositWithMintAccount[]>([]);
-  const [votingPower, setVotingPower] = useState<BN>(new BN(0));
+  const [votingPower, setVotingPower] = useState<BN>(BN_ZERO);
   const [votingPowerFromDeposits, setVotingPowerFromDeposits] = useState<BN>(
-    new BN(0),
+    BN_ZERO,
   );
   const [isOwnerOfDeposits, setIsOwnerOfDeposits] = useState(true);
   const tokenOwnerRecordWalletPk = Object.keys(tokenRecords)?.find(
@@ -125,8 +126,8 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
         setDeposits(deposits);
         setReducedDeposits(reducedDeposits);
       } else if (!wallet?.connected) {
-        setVotingPowerFromDeposits(new BN(0));
-        setVotingPower(new BN(0));
+        setVotingPowerFromDeposits(BN_ZERO);
+        setVotingPower(BN_ZERO);
         setDeposits([]);
         setReducedDeposits([]);
       }

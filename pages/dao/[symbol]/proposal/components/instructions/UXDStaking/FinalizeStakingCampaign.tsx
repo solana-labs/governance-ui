@@ -1,11 +1,5 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React from 'react';
 import * as yup from 'yup';
-import {
-  getOnchainStakingCampaign,
-  SingleSideStakingClient,
-  StakingCampaign,
-} from '@uxdprotocol/uxd-staking-client';
 import Input from '@components/inputs/Input';
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
 import { GovernedMultiTypeAccount } from '@utils/tokens';
@@ -13,6 +7,7 @@ import { UXDStakingFinalizeStakingCampaignForm } from '@utils/uiTypes/proposalCr
 import uxdProtocolStakingConfiguration from '@tools/sdk/uxdProtocolStaking/configuration';
 import useWalletStore from 'stores/useWalletStore';
 import { PublicKey } from '@solana/web3.js';
+import useSingleSideStakingClient from '@hooks/useSingleSideStakingClient';
 
 const FinalizeStakingCampaign = ({
   index,
@@ -22,6 +17,7 @@ const FinalizeStakingCampaign = ({
   governedAccount?: GovernedMultiTypeAccount;
 }) => {
   const wallet = useWalletStore((s) => s.current);
+  const { client: sssClient } = useSingleSideStakingClient();
 
   const {
     form,
@@ -53,41 +49,14 @@ const FinalizeStakingCampaign = ({
         );
       }
 
+      if (!sssClient) {
+        throw new Error('Single side staking client not loaded');
+      }
+
       const stakingCampaignPda = new PublicKey(form.stakingCampaignPda!);
 
-      const stakingCampaignState = await getOnchainStakingCampaign(
+      return sssClient.createFinalizeStakingCampaignInstruction({
         stakingCampaignPda,
-        connection.current,
-        uxdProtocolStakingConfiguration.TXN_OPTS,
-      );
-
-      const client: SingleSideStakingClient = new SingleSideStakingClient(
-        programId,
-      );
-
-      const authority = governedAccount!.governance!.pubkey;
-
-      console.log('Finalize Staking Campaign', {
-        stakingCampaignPda: stakingCampaignPda.toString(),
-        authority: authority.toString(),
-        rewardMint: stakingCampaignState.rewardMint.toString(),
-        rewardMintDecimals: stakingCampaignState.rewardMintDecimals,
-        rewardVault: stakingCampaignState.rewardVault.toString(),
-        stakedMint: stakingCampaignState.stakedMint.toString(),
-        stakedMintDecimals: stakingCampaignState.stakedMintDecimals,
-        stakedVault: stakingCampaignState.stakedVault.toString(),
-        startTs: stakingCampaignState.startTs.toString(),
-        endTs: stakingCampaignState.endTs?.toString(),
-      });
-
-      const stakingCampaign = StakingCampaign.fromState(
-        stakingCampaignPda,
-        stakingCampaignState,
-      );
-
-      return client.createFinalizeStakingCampaignInstruction({
-        authority,
-        stakingCampaign,
         options: uxdProtocolStakingConfiguration.TXN_OPTS,
         payer: wallet!.publicKey!,
       });

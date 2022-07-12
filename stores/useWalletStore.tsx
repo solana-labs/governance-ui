@@ -211,10 +211,14 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         realmId = realmInfo?.realmId;
         programId = realmInfo?.programId;
       } else {
-        const realmAccountInfo = await connection.current.getAccountInfo(
-          realmId,
-        );
-        programId = realmAccountInfo?.owner;
+        try {
+          const realmAccountInfo = await connection.current.getAccountInfo(
+            realmId,
+          );
+          programId = realmAccountInfo?.owner;
+        } catch {
+          //
+        }
       }
       if (realmId && programId) {
         const programVersion = await getGovernanceProgramVersion(

@@ -8,11 +8,11 @@ export function getExplorerUrl(
 ) {
   const getClusterUrlParam = () => {
     let cluster = '';
-    if (endpoint === 'localnet') {
+    if (endpoint.includes('localnet')) {
       cluster = `custom&customUrl=${encodeURIComponent(
         'http://127.0.0.1:8899',
       )}`;
-    } else if (endpoint === 'https://api.devnet.solana.com') {
+    } else if (endpoint.includes('devnet')) {
       cluster = 'devnet';
     }
 

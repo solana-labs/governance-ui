@@ -11,7 +11,6 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets';
 import useQueryContext from '@hooks/useQueryContext';
 import useRealm from '@hooks/useRealm';
 import { getProgramVersionForRealm } from '@models/registry/api';
-import { BN } from '@project-serum/anchor';
 import {
   getNativeTreasuryAddress,
   RpcContext,
@@ -43,6 +42,7 @@ import AdditionalProposalOptions from '@components/AdditionalProposalOptions';
 import { validateInstruction } from '@utils/instructionTools';
 import * as yup from 'yup';
 import { getValidatedPublickKey } from '@utils/validations';
+import { BN_ZERO } from '@utils/helpers';
 
 const DEPOSIT = 'Deposit';
 const CREATE_REF_LINK = 'Create Referral Link';
@@ -88,7 +88,7 @@ const MangoDepositComponent = ({
   const { canUseTransferInstruction } = useGovernanceAssets();
   const treasuryAmount = governedTokenAccount?.token
     ? governedTokenAccount.token.account.amount
-    : new BN(0);
+    : BN_ZERO;
   const mintInfo = governedTokenAccount?.mint?.account;
   const [form, setForm] = useState({
     title: '',

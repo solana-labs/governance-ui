@@ -11,9 +11,8 @@ const ENDPOINTS: EndpointInfo[] = [
   },
   {
     name: 'devnet',
-    url:
-      process.env.DEVNET_RPC ||
-      'https://psytrbhymqlkfrhudd.dev.genesysgo.net:8899',
+    url: process.env.DEVNET_RPC || 'https://api.dao.devnet.solana.com',
+    //'https://psytrbhymqlkfrhudd.dev.genesysgo.net:8899',
   },
   {
     name: 'localnet',

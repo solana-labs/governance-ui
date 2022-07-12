@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useEffect, useState } from 'react';
 import { useHasVoteTimeExpired } from '../hooks/useHasVoteTimeExpired';
 import useRealm from '../hooks/useRealm';

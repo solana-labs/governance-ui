@@ -1,11 +1,5 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React from 'react';
 import * as yup from 'yup';
-import {
-  getOnchainStakingCampaign,
-  SingleSideStakingClient,
-  StakingCampaign,
-} from '@uxdprotocol/uxd-staking-client';
 import Input from '@components/inputs/Input';
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
 import { GovernedMultiTypeAccount } from '@utils/tokens';
@@ -13,6 +7,7 @@ import { UXDStakingRefillRewardVaultForm } from '@utils/uiTypes/proposalCreation
 import uxdProtocolStakingConfiguration from '@tools/sdk/uxdProtocolStaking/configuration';
 import useWalletStore from 'stores/useWalletStore';
 import { PublicKey } from '@solana/web3.js';
+import useSingleSideStakingClient from '@hooks/useSingleSideStakingClient';
 
 const RefillRewardVault = ({
   index,
@@ -22,6 +17,7 @@ const RefillRewardVault = ({
   governedAccount?: GovernedMultiTypeAccount;
 }) => {
   const wallet = useWalletStore((s) => s.current);
+  const { client: sssClient } = useSingleSideStakingClient();
 
   const {
     form,
@@ -57,44 +53,15 @@ const RefillRewardVault = ({
         );
       }
 
+      if (!sssClient) {
+        throw new Error('Single side staking client not loaded');
+      }
+
       const stakingCampaignPda = new PublicKey(form.stakingCampaignPda!);
 
-      const stakingCampaignState = await getOnchainStakingCampaign(
+      return sssClient.createRefillRewardVaultInstruction({
         stakingCampaignPda,
-        connection.current,
-        uxdProtocolStakingConfiguration.TXN_OPTS,
-      );
-
-      const client: SingleSideStakingClient = new SingleSideStakingClient(
-        programId,
-      );
-
-      const authority = governedAccount!.governance!.pubkey;
-
-      console.log('Refill Reward Vault Staking Campaign', {
         uiRewardRefillAmount: form.uiRewardRefillAmount!,
-        stakingCampaignPda: stakingCampaignPda.toString(),
-        authority: authority.toString(),
-        rewardMint: stakingCampaignState.rewardMint.toString(),
-        rewardMintDecimals: stakingCampaignState.rewardMintDecimals,
-        rewardVault: stakingCampaignState.rewardVault.toString(),
-        stakedMint: stakingCampaignState.stakedMint.toString(),
-        stakedMintDecimals: stakingCampaignState.stakedMintDecimals,
-        stakedVault: stakingCampaignState.stakedVault.toString(),
-        startTs: stakingCampaignState.startTs.toString(),
-        endTs: stakingCampaignState.endTs?.toString(),
-        initialRewardAmount: stakingCampaignState.initialRewardAmount.toString(),
-      });
-
-      const stakingCampaign = StakingCampaign.fromState(
-        stakingCampaignPda,
-        stakingCampaignState,
-      );
-
-      return client.createRefillRewardVaultInstruction({
-        authority,
-        stakingCampaign,
-        rewardRefillAmount: form.uiRewardRefillAmount!,
         options: uxdProtocolStakingConfiguration.TXN_OPTS,
         payer: wallet!.publicKey!,
       });

@@ -1,6 +1,5 @@
 import { MintInfo } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
-import BN from 'bn.js';
 import useRealm from '@hooks/useRealm';
 import { getTokenOwnerRecordAddress, Proposal } from '@solana/spl-governance';
 import useWalletStore from '../../../stores/useWalletStore';
@@ -18,6 +17,7 @@ import { useEffect, useState } from 'react';
 import { ChevronRightIcon } from '@heroicons/react/solid';
 import InlineNotification from '@components/InlineNotification';
 import { LinkButton } from '@components/Button';
+import { BN_ZERO } from '@utils/helpers';
 
 const LockPluginTokenBalanceCard = ({
   proposal,
@@ -142,7 +142,7 @@ const TokenDeposit = ({
         typeof x.lockup.kind['none'] === 'undefined' &&
         x.mint.publicKey.toBase58() === realm?.account.communityMint.toBase58(),
     )
-    .reduce((curr, next) => curr.add(next.currentlyLocked), new BN(0));
+    .reduce((curr, next) => curr.add(next.currentlyLocked), BN_ZERO);
 
   const depositRecord = deposits.find(
     (x) =>
@@ -171,10 +171,10 @@ const TokenDeposit = ({
   }`;
 
   const hasTokensInWallet =
-    depositTokenAccount && depositTokenAccount.account.amount.gt(new BN(0));
+    depositTokenAccount && depositTokenAccount.account.amount.gt(BN_ZERO);
 
   const hasTokensDeposited =
-    depositRecord && depositRecord.amountDepositedNative.gt(new BN(0));
+    depositRecord && depositRecord.amountDepositedNative.gt(BN_ZERO);
 
   const lockTokensFmt =
     lockedTokensAmount && mint ? fmtMintAmount(mint, lockedTokensAmount) : '0';

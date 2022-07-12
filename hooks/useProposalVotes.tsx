@@ -25,6 +25,8 @@ export default function useProposalVotes(proposal?: Proposal) {
       noVoteCount: 0,
       minimumYesVotes: 0,
       yesVotesRequired: 0,
+      minimumNoVotes: 0,
+      noVotesRequired: 0,
     };
 
   const voteThresholdPct =
@@ -66,6 +68,15 @@ export default function useProposalVotes(proposal?: Proposal) {
       ? Math.ceil(rawYesVotesRequired)
       : rawYesVotesRequired;
 
+  const minimumNoVotes =
+    fmtTokenAmount(maxVoteWeight, proposalMint.decimals) - minimumYesVotes;
+
+  const rawNoVotesRequired = minimumNoVotes - noVoteCount;
+  const noVotesRequired =
+    proposalMint.decimals == 0
+      ? Math.ceil(rawNoVotesRequired)
+      : rawNoVotesRequired;
+
   return {
     voteThresholdPct,
     yesVotePct,
@@ -76,5 +87,7 @@ export default function useProposalVotes(proposal?: Proposal) {
     relativeNoVotes,
     minimumYesVotes,
     yesVotesRequired,
+    rawNoVotesRequired,
+    noVotesRequired,
   };
 }

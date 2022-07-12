@@ -4,6 +4,7 @@ import { Connection, PublicKey } from '@solana/web3.js';
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client';
 import { BN } from '@blockworks-foundation/voter-stake-registry-client/node_modules/@project-serum/anchor';
 import { getDeposits } from 'VoteStakeRegistry/tools/deposits';
+import { BN_ZERO } from '@utils/helpers';
 
 interface DepositStore extends State {
   state: {
@@ -31,8 +32,8 @@ interface DepositStore extends State {
 
 const defaultState = {
   deposits: [],
-  votingPower: new BN(0),
-  votingPowerFromDeposits: new BN(0),
+  votingPower: BN_ZERO,
+  votingPowerFromDeposits: BN_ZERO,
 };
 
 const useDepositStore = create<DepositStore>((set, _get) => ({

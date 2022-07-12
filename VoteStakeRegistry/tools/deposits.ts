@@ -1,14 +1,12 @@
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client';
-import {
-  BN,
-  EventParser,
-} from '@blockworks-foundation/voter-stake-registry-client/node_modules/@project-serum/anchor';
+import { EventParser } from '@blockworks-foundation/voter-stake-registry-client/node_modules/@project-serum/anchor';
 import {
   ProgramAccount,
   Realm,
   simulateTransaction,
 } from '@solana/spl-governance';
 import { PublicKey, Transaction, Connection } from '@solana/web3.js';
+import { BN_ZERO } from '@utils/helpers';
 import { tryGetMint } from '@utils/tokens';
 import {
   getRegistrarPDA,
@@ -48,8 +46,8 @@ export const getDeposits = async ({
   const existingRegistrar = await tryGetRegistrar(registrar, client);
   const mintCfgs = existingRegistrar?.votingMints || [];
   const mints = {};
-  let votingPower = new BN(0);
-  let votingPowerFromDeposits = new BN(0);
+  let votingPower = BN_ZERO;
+  let votingPowerFromDeposits = BN_ZERO;
   let deposits: DepositWithMintAccount[] = [];
   for (const i of mintCfgs) {
     if (i.mint.toBase58() !== unusedMintPk) {
@@ -90,14 +88,14 @@ export const getDeposits = async ({
           (info) => info.data.depositEntryIndex === x.index,
         ).data;
 
-        x.currentlyLocked = additionalInfoData.locking?.amount || new BN(0);
-        x.available = additionalInfoData.unlocked || new BN(0);
-        x.vestingRate = additionalInfoData.locking?.vesting?.rate || new BN(0);
+        x.currentlyLocked = additionalInfoData.locking?.amount || BN_ZERO;
+        x.available = additionalInfoData.unlocked || BN_ZERO;
+        x.vestingRate = additionalInfoData.locking?.vesting?.rate || BN_ZERO;
         x.nextVestingTimestamp =
           additionalInfoData.locking?.vesting?.nextTimestamp || null;
-        x.votingPower = additionalInfoData.votingPower || new BN(0);
+        x.votingPower = additionalInfoData.votingPower || BN_ZERO;
         x.votingPowerBaseline =
-          additionalInfoData.votingPowerBaseline || new BN(0);
+          additionalInfoData.votingPowerBaseline || BN_ZERO;
         return x;
       });
       if (

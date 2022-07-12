@@ -95,10 +95,19 @@ const StakingCampaign = ({
         </div>
 
         <div className="flex justify-between">
-          <span className="text-xs">total staked amount:</span>
+          <span className="text-xs">total staked amount v1:</span>
           <span className="text-xs">
-            {stakingCampaignInfo.stakedVaultBalance
-              ? `${stakingCampaignInfo.stakedVaultBalance.toLocaleString()} ${stackedMintName}`
+            {stakingCampaignInfo.uiStakedTokensV1
+              ? `${stakingCampaignInfo.uiStakedTokensV1.toLocaleString()} ${stackedMintName}`
+              : 'unknown'}
+          </span>
+        </div>
+
+        <div className="flex justify-between">
+          <span className="text-xs">total staked amount v2:</span>
+          <span className="text-xs">
+            {stakingCampaignInfo.uiStakedTokensV2
+              ? `${stakingCampaignInfo.uiStakedTokensV2.toLocaleString()} ${stackedMintName}`
               : 'unknown'}
           </span>
         </div>

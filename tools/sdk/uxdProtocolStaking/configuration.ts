@@ -1,11 +1,12 @@
 import { EndpointTypes } from '@models/types';
 import { ConfirmOptions, PublicKey } from '@solana/web3.js';
+import { APR_BASIS } from '@uxdprotocol/uxd-staking-client';
 
 class UXDProtocolStakingConfiguration {
   public readonly programId: {
     [cluster in EndpointTypes]?: PublicKey;
   } = {
-    devnet: new PublicKey('G32Z4MiJhFfaidSLCz36WBLzcNJQ4o4mv6dHLzM35Huq'),
+    devnet: new PublicKey('7LTH42cyxBxC14rdpLtoL2ur8daZzudNk5ozp7uzgy8n'),
     mainnet: new PublicKey('UXDSkps5NR8Lu1HB5uPLFfuB34hZ6DCk7RhYZZtGzbF'),
   };
 
@@ -24,7 +25,7 @@ class UXDProtocolStakingConfiguration {
   };
 
   // 10_000 = 100%, 5_000 = 50% ...
-  public readonly APR_BASIS = 10_000;
+  public readonly APR_BASIS = APR_BASIS;
 }
 
 export default new UXDProtocolStakingConfiguration();

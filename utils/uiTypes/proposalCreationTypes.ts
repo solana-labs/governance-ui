@@ -392,6 +392,11 @@ export interface QuarryMineClaimRewardsForm {
   mintName?: QuarryMineSupportedMintName;
 }
 
+export interface UXDStakingMigrateStakingCampaignFromV1ToV2Form {
+  governedAccount?: GovernedMultiTypeAccount;
+  stakingCampaignPda?: string;
+}
+
 export interface UXDStakingInitializeStakingCampaignForm {
   governedAccount?: GovernedMultiTypeAccount;
   rewardMintUIName?: SplTokenUIName;
@@ -543,6 +548,7 @@ export enum InstructionEnum {
   UXDStakingAddStakingOption,
   UXDStakingActivateStakingOption,
   UXDStakingRefillRewardVault,
+  UXDStakingMigrateStakingCampaignFromV1ToV2,
   NativeTransferTokensForm,
   MapleFinanceLenderDepositForm,
   DeltafiPoolDeposit,

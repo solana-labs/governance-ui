@@ -37,7 +37,9 @@ const TribecaGaugesEpoch = ({
     }
 
     const descriptor = setInterval(() => {
-      setTime(formatNbSec(nextEpoch.sub(new BN(Date.now()).div(new BN(1000)))));
+      setTime(
+        formatNbSec(nextEpoch.sub(new BN(Date.now()).div(new BN(1_000)))),
+      );
     }, 500);
 
     return () => {

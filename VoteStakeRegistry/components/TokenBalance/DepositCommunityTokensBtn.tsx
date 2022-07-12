@@ -2,8 +2,8 @@ import Button from '@components/Button';
 import Loading from '@components/Loading';
 import useRealm from '@hooks/useRealm';
 import { getProgramVersionForRealm } from '@models/registry/api';
-import { BN } from '@project-serum/anchor';
 import { RpcContext } from '@solana/spl-governance';
+import { BN_ZERO } from '@utils/helpers';
 import { notify } from '@utils/notifications';
 import { useState } from 'react';
 import useWalletStore from 'stores/useWalletStore';
@@ -70,7 +70,7 @@ const DepositCommunityTokensBtn = ({ className = '' }) => {
   };
 
   const hasTokensInWallet =
-    realmTokenAccount && realmTokenAccount.account.amount.gt(new BN(0));
+    realmTokenAccount && realmTokenAccount.account.amount.gt(BN_ZERO);
 
   const depositTooltipContent = !connected
     ? 'Connect your wallet to deposit'

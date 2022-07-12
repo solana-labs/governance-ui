@@ -498,6 +498,11 @@ export default function useGovernanceAssets() {
       ),
       packageId: PackageEnum.Native,
     },
+    [InstructionEnum.UXDStakingMigrateStakingCampaignFromV1ToV2]: {
+      name: 'Migrate Staking Campaign From v1 to v2',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.UXDStaking,
+    },
     [InstructionEnum.UXDStakingInitializeStakingCampaign]: {
       name: 'Initialize Staking Campaign',
       isVisible: canUseAnyInstruction,

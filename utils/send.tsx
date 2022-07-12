@@ -121,11 +121,10 @@ export async function sendSignedTransaction({
   timeout?: number;
 }): Promise<string> {
   // debugger
-  console.log('raw tx');
   const rawTransaction = signedTransaction.serialize();
   const startTime = getUnixTs();
 
-  console.log('raw tx', rawTransaction);
+  console.log('raw tx', rawTransaction.toString('base64'));
 
   notify({ message: sendingMessage });
   console.log('notify');
