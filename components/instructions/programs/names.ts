@@ -28,6 +28,8 @@ export const PROGRAM_NAMES = {
 
   MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD: 'Marinade Staking Program',
 
+  CbxVmURN74QZGuFj6qKjM8VDM8b8KKZrbPFLM2CC2hC8: 'Lido Staking Program',
+
   SysvarRent111111111111111111111111111111111: 'Sysvar: Rent',
   SysvarC1ock11111111111111111111111111111111: 'Sysvar: Clock',
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo':

@@ -23,6 +23,7 @@ import { ConnectionContext } from '@utils/connection'
 import { NFT_VOTER_INSTRUCTIONS } from './programs/nftVotingClient'
 import { PROGRAM_IDS } from '@castlefinance/vault-sdk'
 import { FORESIGHT_INSTRUCTIONS } from './programs/foresight'
+import { LIDO_INSTRUCTIONS } from './programs/lido'
 /**
  * Default governance program id instance
  */
@@ -242,6 +243,7 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...MANGO_INSTRUCTIONS,
   ...RAYDIUM_INSTRUCTIONS,
   ...MARINADE_INSTRUCTIONS,
+  ...LIDO_INSTRUCTIONS,
   ...SOLEND_PROGRAM_INSTRUCTIONS,
   ...FORESIGHT_INSTRUCTIONS,
   ...ATA_PROGRAM_INSTRUCTIONS,

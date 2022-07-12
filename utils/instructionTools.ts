@@ -28,6 +28,7 @@ import { isFormValid } from './formValidation'
 import { getTokenAccountsByMint } from './tokens'
 import { UiInstruction } from './uiTypes/proposalCreationTypes'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import { lidoStake } from '@utils/lidoStake'
 
 export const validateInstruction = async ({
   schema,
@@ -455,6 +456,11 @@ export async function getConvertToMsolInstruction({
         destinationAccount
       )
       destinationAccountOwner = destinationAccountInfo.owner
+      // msol "C6cuodjcn6CpTB1u2rFhjfbkdS7mxEUe4yo8AwDXcvpT" "8ynBdnMKXirW8UeSaamRXoA1kSDYPFVfBi9q2PNKtw6L" "C6cuodjcn6CpTB1u2rFhjfbkdS7mxEUe4yo8AwDXcvpT"
+      // stSol "C6cuodjcn6CpTB1u2rFhjfbkdS7mxEUe4yo8AwDXcvpT" "Cf8A5mSKDBKjRzt4EsnesqE8b9zVuJ6A3aqYBtte4xyK" "C6cuodjcn6CpTB1u2rFhjfbkdS7mxEUe4yo8AwDXcvpT"
+      console.log(destinationAccountOwner)
+      console.log(destinationAccount)
+      console.log(originAccount)
     } else {
       destinationAccountOwner = originAccount
       const {
@@ -507,6 +513,100 @@ export async function getConvertToMsolInstruction({
   }
 
   return obj
+}
+
+export async function getConvertToStSolInstruction({
+  schema,
+  form,
+  connection,
+  wallet,
+  setFormErrors,
+  config,
+}: {
+  schema: any
+  form: any
+  connection: ConnectionContext
+  wallet: WalletAdapter | undefined
+  setFormErrors: any
+  config: any
+}): Promise<UiInstruction> {
+  const isValid = await validateInstruction({ schema, form, setFormErrors })
+  const prerequisiteInstructions: TransactionInstruction[] = []
+  let serializedInstruction = ''
+
+  if (isValid && form.governedTokenAccount.extensions.transferAddress) {
+    const amount = getMintNaturalAmountFromDecimal(
+      form.amount,
+      form.governedTokenAccount.extensions.mint.account.decimals
+    )
+    let originAccount = form.governedTokenAccount.extensions.transferAddress
+    let associatedStSolAccount: PublicKey
+
+    if (form.destinationAccount) {
+      associatedStSolAccount = form.destinationAccount.pubkey
+
+      const stSolToken = new Token(
+        connection.current,
+        config.stSolMint,
+        TOKEN_PROGRAM_ID,
+        (null as unknown) as Keypair
+      )
+
+      const destinationAccountInfo = await stSolToken.getAccountInfo(
+        associatedStSolAccount
+      )
+      originAccount = destinationAccountInfo.owner
+    } else {
+      const { currentAddress: stSolAccount, needToCreateAta } = await getATA({
+        connection: connection,
+        receiverAddress: originAccount,
+        mintPK: config.stSolMint,
+        wallet,
+      })
+      associatedStSolAccount = stSolAccount
+      if (needToCreateAta && wallet?.publicKey) {
+        prerequisiteInstructions.push(
+          Token.createAssociatedTokenAccountInstruction(
+            ASSOCIATED_TOKEN_PROGRAM_ID,
+            TOKEN_PROGRAM_ID,
+            config.stSolMint,
+            associatedStSolAccount,
+            originAccount,
+            wallet.publicKey
+          )
+        )
+      }
+    }
+
+    const transaction = await lidoStake({
+      connection: connection.current,
+      payer: originAccount,
+      stSolAddress: associatedStSolAccount,
+      amount,
+      config,
+    })
+
+    if (transaction.instructions.length === 1) {
+      serializedInstruction = serializeInstructionToBase64(
+        transaction.instructions[0]
+      )
+    } else if (transaction.instructions.length === 2) {
+      serializedInstruction = serializeInstructionToBase64(
+        transaction.instructions[1]
+      )
+    } else {
+      throw Error(
+        `Lido's lidoStake instructions could not be calculated correctly.`
+      )
+    }
+  }
+
+  return {
+    serializedInstruction,
+    isValid,
+    governance: form.governedTokenAccount?.governance,
+    prerequisiteInstructions: prerequisiteInstructions,
+  }
 }
 
 export const getTransferInstructionObj = async ({
