@@ -1,27 +1,27 @@
 import { useTheme } from 'next-themes'
-import React, { useEffect, useState } from 'react'
-import GridLayout from 'react-grid-layout'
+import React, { useState } from 'react'
+import {Responsive, WidthProvider} from 'react-grid-layout'
 import "/node_modules/react-grid-layout/css/styles.css"
 import "/node_modules/react-resizable/css/styles.css"
-import { withSize } from 'react-sizeme'
 import { useRouter } from 'next/router'
 import useQueryContext from '@hooks/useQueryContext'
 import { RealmInfo } from '@models/registry/api'
-import { LastUpdateLayout } from '@solendprotocol/solend-sdk'
 
-const SAVED_GRID = "realmsGrid"
+const SAVED_LAYOUTS = "realmsGrid"
+
+const ResponsiveGridLayout = WidthProvider(Responsive)
 
 export default function RealmsGrid({
   realms,
+  editing
 }: {
   realms: readonly RealmInfo[]
+  editing: boolean
 }) {
-
-    useEffect(() => {
-        console.log(layout)
-    })
-
-    const [layout, setLayout] = useState(generateLayout())
+    const columns = { lg: 10, md: 10, sm: 4, xs: 4, xxs: 4 }
+    const breakpoints =  {lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }
+    const [currBreakpoint, setCurrBreakpoint] = useState("lg")
+    const [layouts, setLayouts] = useState({lg: generateLayout("lg"), md: generateLayout("md"), sm: generateLayout("sm"), xs: generateLayout("xs"), xxs: generateLayout("xxs")})    
     const router = useRouter()
     const { fmtUrlWithCluster } = useQueryContext()
     const { theme } = useTheme()
@@ -36,47 +36,52 @@ export default function RealmsGrid({
     }
 
 
-  function generateLayout() {    
+  function generateLayout(bp) {    
     let currX = 0;
     return realms.map((realm) => {
         let obj;
-        const savedItem = localStorage.getItem(SAVED_GRID);
-        if (savedItem) {
-            obj = JSON.parse(savedItem).find(item => item['i'] == realm.realmId.toString());
+        const savedGrid = localStorage.getItem(SAVED_LAYOUTS);
+        if (savedGrid) {
+            obj = JSON.parse(savedGrid)[bp].find(item => item['i'] == realm.realmId.toString());
         } else {
             obj = {
                 i: realm.realmId.toString(),
                 x: currX,
                 y: 0,
                 w: 2,
-                h: 3
+                h: 2
             }    
         }
-        currX = (currX + 2) % 10
+        currX = (currX + 2) % columns[bp]
         return obj;
     })
   }
 
-  const updateLayout = (newLayout) => {
-    setLayout(newLayout);
-    localStorage.setItem(SAVED_GRID, JSON.stringify(newLayout));
+  const updateLayouts = (currentLayout, allLayouts) => {
+    setLayouts(allLayouts);
+    localStorage.setItem(SAVED_LAYOUTS, JSON.stringify(allLayouts));
   } 
 
   return (
-    <GridLayout
+    <ResponsiveGridLayout
     className="layout"
-    layout={layout}
-    cols={10}
-    rowHeight={50}
-    width={1200}
-    onLayoutChange={(layout) => updateLayout(layout)}
+    layouts={layouts}
+    breakpoints={breakpoints}
+    cols={columns}
+    rowHeight={100}
+    margin={[15, 15]}
+    containerPadding={[0, 0]}
+    onLayoutChange={(currentLayout, allLayouts) => updateLayouts(currentLayout, allLayouts)}
+    onBreakpointChange={(newBreakpoint) => setCurrBreakpoint(newBreakpoint)}
+    isResizable={editing}
+    isDraggable={editing}
     >
         {realms.length > 0 && realms.map((realm) => (
             <div
-              onClick={() => goToRealm(realm)}
-              className="flex flex-col items-center justify-center p-8 rounded-lg cursor-pointer bg-bkg-2 default-transition hover:bg-bkg-3"
+              onClick={() => editing ? null : goToRealm(realm)}
+              className={`flex group flex-col items-center justify-center overflow-hidden p-8 rounded-lg cursor-pointer default-transition hover:bg-bkg-3 active:cursor-grabbing ${editing ? ` bg-bkg-3 cursor-grab`: `bg-bkg-2`}`}
               key={realm.realmId.toString()}
-              data-grid={layout.find(item => item['i'] == realm.realmId.toString())}
+              data-grid={layouts[currBreakpoint].find(item => item['i'] == realm.realmId.toString())}
             >
               <div className="pb-5">
                 {realm.ogImage ? (
@@ -101,11 +106,11 @@ export default function RealmsGrid({
                   </div>
                 )}
               </div>
-              <h3 className="text-center ">
+              <h3 className="text-center">
                 {realm.displayName ?? realm.symbol}
               </h3>
             </div>
         ))}
-    </GridLayout>
+    </ResponsiveGridLayout>
   )
 }

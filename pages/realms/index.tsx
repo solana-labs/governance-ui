@@ -23,6 +23,7 @@ const Realms = () => {
     ReadonlyArray<RealmInfo>
   >([])
   const [isLoadingRealms, setIsLoadingRealms] = useState(true)
+  const [editingGrid, setEditingGrid] = useState(false)
   const { actions, selectedRealm, connection } = useWalletStore((s) => s)
   const { connected, current: wallet } = useWalletStore((s) => s)
   const router = useRouter()
@@ -94,7 +95,7 @@ const Realms = () => {
     <div>
       <div className="flex flex-wrap items-center justify-between w-full mb-6">
         <h1 className="mb-4 sm:mb-0">DAOs</h1>
-        <div className="flex space-x-4">
+        <div className="flex space-x-4 items-center">
           <Input
             className="pl-8"
             value={searchString}
@@ -103,6 +104,9 @@ const Realms = () => {
             placeholder={`Search DAOs...`}
             prefix={<SearchIcon className="w-5 h-5 text-fgd-3" />}
           />
+          <Button className="whitespace-nowrap" onClick={() => setEditingGrid(!editingGrid)}>
+            {editingGrid ? "Done" : "Edit DAOs"}
+          </Button>          
           <Button
             className="whitespace-nowrap"
             onClick={handleCreateRealmButtonClick}
@@ -113,7 +117,9 @@ const Realms = () => {
       </div>
       <RealmsDashboard
         realms={filteredRealms}
+        isSearching={searchString.length > 0}
         isLoading={isLoadingRealms}
+        editing={editingGrid}
       ></RealmsDashboard>
     </div>
   )

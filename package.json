@@ -92,7 +92,6 @@
     "react-hook-form": "^7.31.3",
     "react-markdown": "^7.0.0",
     "react-portal": "^4.2.2",
-    "react-sizeme": "^3.0.2",
     "react-virtualized-auto-sizer": "^1.0.6",
     "react-window": "^1.8.7",
     "remark-gfm": "^3.0.1",

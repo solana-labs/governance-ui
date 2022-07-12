@@ -7,10 +7,14 @@ import RealmsGrid from './RealmsGrid'
 
 export default function RealmsDashboard({
   realms,
+  isSearching,
   isLoading,
+  editing
 }: {
   realms: readonly RealmInfo[]
+  isSearching: boolean
   isLoading: boolean
+  editing: boolean
 }) {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
@@ -47,8 +51,8 @@ export default function RealmsDashboard({
       <div className="col-span-1 rounded-lg animate-pulse bg-bkg-2 h-44" />
     </div>
   ) : (
-    <>
-      <RealmsGrid realms={certifiedRealms}/>
+    !isSearching ? <RealmsGrid realms={certifiedRealms} editing={editing}/> :
+    <>      
       <div className="grid grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
         {certifiedRealms?.length > 0 ? (
           certifiedRealms.map((realm: RealmInfo) => (
