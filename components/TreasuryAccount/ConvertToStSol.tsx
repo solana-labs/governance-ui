@@ -47,11 +47,12 @@ const getProposalText = (amount) => {
 
 const LIDO_ADDRESS = '49Yi1TKkNyYjPAFdR9LBvoHcUjuPX4Df5T5yv39w2XTn'
 const STSOL_MINT = '7dHbWXmci3dT8UFYWYZweBLXgycu7Y3iL6trKn1Y7ARj'
-const PROGRAM_ID = 'CrX7kMhLC3cSsXJdT7JDgqrRVWGnUpX3gfEfxxU2NVLi'
+export const LIDO_PROGRAM_ID = 'CrX7kMhLC3cSsXJdT7JDgqrRVWGnUpX3gfEfxxU2NVLi'
 
 const LIDO_ADDRESS_DEVNET = '8sqs4Jzs8uq7CEtimhXf32gioVUN3n5Qk65YMkNU5E4F'
 const STSOL_MINT_DEVNET = '5nnLCgZn1EQaLj1ub8vYbQgBhkWi97x4JC5ARVPhci4V'
-const PROGRAM_ID_DEVNET = 'CbxVmURN74QZGuFj6qKjM8VDM8b8KKZrbPFLM2CC2hC8'
+export const LIDO_PROGRAM_ID_DEVNET =
+  'CbxVmURN74QZGuFj6qKjM8VDM8b8KKZrbPFLM2CC2hC8'
 
 const ConvertToStSol = () => {
   const { canChooseWhoVote, realm, symbol } = useRealm()
@@ -93,13 +94,13 @@ const ConvertToStSol = () => {
     let config = {
       lidoAddress: new PublicKey(LIDO_ADDRESS),
       stSolMint: new PublicKey(STSOL_MINT),
-      programId: new PublicKey(PROGRAM_ID),
+      programId: new PublicKey(LIDO_PROGRAM_ID),
     }
     if (connection.cluster === 'devnet') {
       config = {
         lidoAddress: new PublicKey(LIDO_ADDRESS_DEVNET),
         stSolMint: new PublicKey(STSOL_MINT_DEVNET),
-        programId: new PublicKey(PROGRAM_ID_DEVNET),
+        programId: new PublicKey(LIDO_PROGRAM_ID_DEVNET),
       }
     }
     const instruction: UiInstruction = await getConvertToStSolInstruction({
@@ -172,7 +173,7 @@ const ConvertToStSol = () => {
   return (
     <>
       <h3 className="mb-4 flex items-center">Convert SOL to stSol</h3>
-      <AccountLabel></AccountLabel>
+      <AccountLabel />
       <div className="space-y-4 w-full pb-4">
         {stSolTokenAccounts.length > 0 && (
           <GovernedAccountSelect
@@ -262,14 +263,14 @@ const ConvertToStSol = () => {
                   propertyName: 'description',
                 })
               }
-            ></Textarea>
+            />
             {canChooseWhoVote && (
               <VoteBySwitch
                 checked={voteByCouncil}
                 onChange={() => {
                   setVoteByCouncil(!voteByCouncil)
                 }}
-              ></VoteBySwitch>
+              />
             )}
           </>
         )}
