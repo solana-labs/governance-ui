@@ -574,19 +574,9 @@ const New = () => {
           ></CreateVsrRegistrar>
         )
       case Instructions.CreateTokenMetadata:
-        return (
-          <CreateTokenMetadata
-            index={idx}
-            governance={governance}
-          ></CreateTokenMetadata>
-        )
+        return <CreateTokenMetadata index={idx} governance={governance} />
       case Instructions.UpdateTokenMetadata:
-        return (
-          <UpdateTokenMetadata
-            index={idx}
-            governance={governance}
-          ></UpdateTokenMetadata>
-        )
+        return <UpdateTokenMetadata index={idx} governance={governance} />
       default:
         null
     }

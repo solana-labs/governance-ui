@@ -93,7 +93,7 @@ const UpdateTokenMetadata = ({
         error={formErrors['mintAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
-      ></GovernedAccountSelect>
+      />
 
       <Input
         label="Name"

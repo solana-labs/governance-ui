@@ -117,7 +117,7 @@ const CreateTokenMetadata = ({
         error={formErrors['mintAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
-      ></GovernedAccountSelect>
+      />
 
       {shouldMakeSolTreasury && (
         <>
