@@ -1,38 +1,64 @@
-import { Connection, PublicKey, SystemProgram } from '@solana/web3.js'
+import { Connection, PublicKey } from '@solana/web3.js'
 import { AccountMetaData } from '@solana/spl-governance'
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
+import BN from 'bn.js'
 
 import tokenService from '@utils/services/token'
 import VoteResultsBar from '@components/VoteResultsBar'
 import {
   StreamClient,
-  ClusterExtended,
   Cluster,
   getNumberFromBN,
-  cancelStreamInstruction,
+  Stream,
 } from '@streamflow/stream'
 import Button from '@components/Button'
 
-import { serializeInstructionToBase64 } from '@solana/spl-governance'
+function deserStream(
+  data: Uint8Array,
+  stream: Stream,
+  decimals
+): {
+  start: number
+  amountDeposited: number
+  releaseFrequency: number
+  releaseAmount: number
+  amountAtCliff: number
+  cancelable: boolean
+} {
+  if (stream.createdAt > 0) {
+    return {
+      start: stream.start,
+      amountDeposited: getNumberFromBN(stream.depositedAmount, decimals),
+      releaseFrequency: stream.period,
+      releaseAmount: getNumberFromBN(stream.amountPerPeriod, decimals),
+      amountAtCliff: getNumberFromBN(stream.cliffAmount, decimals),
+      cancelable: stream.cancelableBySender,
+    }
+  }
+  // stream not yet initialized -> we deserialize from instruction data
+  console.log('YEAH HERE')
+  const start = new BN(data.slice(8, 16), 'le').toNumber()
+  const amountDeposited = getNumberFromBN(
+    new BN(data.slice(16, 24), 'le'),
+    decimals
+  )
+  const releaseFrequency = new BN(data.slice(24, 32), 'le').toNumber()
+  const releaseAmount = getNumberFromBN(
+    new BN(data.slice(32, 40), 'le'),
+    decimals
+  )
+  const amountAtCliff = getNumberFromBN(
+    new BN(data.slice(48, 56), 'le'),
+    decimals
+  )
 
-import useWalletStore from 'stores/useWalletStore'
-import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
-import useCreateProposal from '@hooks/useCreateProposal'
-import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
-import useQueryContext from '@hooks/useQueryContext'
-import { useRouter } from 'next/router'
-import { notify } from '@utils/notifications'
-import useRealm from '@hooks/useRealm'
-import { useState } from 'react'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-
-import { STREAMFLOW_PROGRAM_ID } from 'pages/dao/[symbol]/proposal/components/instructions/Streamflow/CreateStream'
-
-const getCluster = (name: string): ClusterExtended => {
-  if (name == 'devnet') {
-    return Cluster.Devnet
-  } else {
-    return Cluster.Mainnet
+  const cancelable = Boolean(data.slice(56, 57))
+  return {
+    start,
+    amountDeposited,
+    releaseFrequency,
+    releaseAmount,
+    amountAtCliff,
+    cancelable,
   }
 }
 
@@ -67,30 +93,23 @@ export const STREAMFLOW_INSTRUCTIONS = {
     174: {
       name: 'Streamflow: Create',
       accounts: [
-        { name: 'Source', important: true },
-        { name: 'Token account', important: true },
-        { name: 'Authority' },
-        { name: 'Authority' },
+        { name: 'Payer treasury', important: true },
+        { name: 'Token treasury', important: true },
+        { name: 'Contract metadata' },
+        { name: 'PDA Token account' },
         { name: 'Liquidator' },
         { name: 'Mint' },
         { name: 'Streamflow treasury' },
+        { name: 'Rent' },
+        { name: 'Streamflow program' },
+        { name: 'Token program' },
+        { name: 'System program' },
       ],
       getDataUI: async (
         connection: Connection,
-        _data: Uint8Array,
+        data: Uint8Array,
         accounts: AccountMetaData[]
       ) => {
-        // const router = useRouter()
-        // const { realm, mint, realmInfo, symbol } = useRealm()
-        // const { assetAccounts } = useGovernanceAssets()
-
-        // const { fmtUrlWithCluster } = useQueryContext()
-        // const wallet = useWalletStore((s) => s.current)
-        // const { handleCreateProposal } = useCreateProposal()
-        // const [voteByCouncil, setVoteByCouncil] = useState(false)
-        // const defaultCancelTitle = 'Cancel streamflow contract'
-        // const [creatingProposal, setCreatingProposal] = useState(false)
-
         try {
           const cli = new StreamClient(
             connection.rpcEndpoint,
@@ -98,128 +117,75 @@ export const STREAMFLOW_INSTRUCTIONS = {
             undefined,
             accounts[0].pubkey.toBase58()
           )
-          const contract_metadata = accounts[2].pubkey
-          const stream = await cli.getOne(contract_metadata.toBase58())
-          const creator_governance = new PublicKey(stream.sender)
-          console.log(stream.mint)
-          const decimals = getMintMetadata(new PublicKey(stream.mint)).decimals
-          const start = stream.start
-          const amountDeposited = getNumberFromBN(
-            stream.depositedAmount,
-            decimals
-          )
-          const releaseFrequency = stream.period
-          const releaseAmount = getNumberFromBN(
-            stream.amountPerPeriod,
-            decimals
-          )
-          const amountAtCliff = getNumberFromBN(stream.cliffAmount, decimals)
 
+          const contract_metadata = accounts[2].pubkey
+          const mint = accounts[5].pubkey
+          var stream = await cli.getOne(contract_metadata.toBase58())
+          const isExecuted = stream.createdAt > 0
+          const mintMetadata = getMintMetadata(mint)
+          const decimals = mintMetadata.decimals
+          const streamData = deserStream(data, stream, decimals)
           let unlockedPercent = 0
           const unlocked = stream.unlocked(
             new Date().getTime() / 1000,
             decimals
           )
-          unlockedPercent = Math.round((unlocked / amountDeposited) * 100)
-
-          // const handleCreate = async () => {
-          //   let serializedInstruction = ''
-          //   if (wallet?.publicKey && realm) {
-          //     setCreatingProposal(true)
-          //     const cancelStreamAccounts = {
-          //       authority: creator_governance,
-          //       sender: creator_governance,
-          //       senderTokens: new PublicKey(stream.senderTokens),
-          //       recipient: new PublicKey(stream.recipient),
-          //       recipientTokens: new PublicKey(stream.recipientTokens),
-          //       metadata: new PublicKey(contract_metadata),
-          //       escrowTokens: new PublicKey(stream.escrowTokens),
-          //       streamflowTreasury: new PublicKey(stream.streamflowTreasury),
-          //       streamflowTreasuryTokens: new PublicKey(
-          //         stream.streamflowTreasuryTokens
-          //       ),
-          //       partner: new PublicKey(stream.partner),
-          //       partnerTokens: new PublicKey(stream.partnerTokens),
-          //       mint: new PublicKey(stream.mint),
-          //       tokenProgram: new PublicKey(TOKEN_PROGRAM_ID),
-          //       systemProgram: SystemProgram.programId,
-          //     }
-          //     const instruction = cancelStreamInstruction(
-          //       new PublicKey(STREAMFLOW_PROGRAM_ID),
-          //       cancelStreamAccounts
-          //     )
-          //     const governance = assetAccounts.find(
-          //       (account) => account.pubkey === creator_governance
-          //     )?.governance
-          //     serializedInstruction = serializeInstructionToBase64(instruction)
-          //     const obj: UiInstruction = {
-          //       serializedInstruction: serializedInstruction,
-          //       isValid: true,
-          //       governance,
-          //     }
-          //     const instructionData = new InstructionDataWithHoldUpTime({
-          //       instruction: obj,
-          //       governance,
-          //     })
-          //     try {
-          //       const proposalAddress = await handleCreateProposal({
-          //         title: defaultCancelTitle,
-          //         description: '',
-          //         voteByCouncil,
-          //         instructionsData: [instructionData],
-          //         governance: governance!,
-          //       })
-          //       const url = fmtUrlWithCluster(
-          //         `/dao/${symbol}/proposal/${proposalAddress}`
-          //       )
-          //       router.push(url)
-          //     } catch (ex) {
-          //       notify({ type: 'error', message: `${ex}` })
-          //     }
-          //     setCreatingProposal(false)
-          //   }
-          // }
+          unlockedPercent = Math.round(
+            (unlocked / streamData.amountDeposited) * 100
+          )
 
           return (
             <>
               <div>
                 <div>
                   <span>Start:</span>
-                  <span> {new Date(start * 1000).toISOString()} UTC</span>
+                  <span>
+                    {' '}
+                    {new Date(streamData.start * 1000).toISOString()} UTC
+                  </span>
                 </div>
 
                 <div>
                   <span>Amount:</span>
-                  <span> {amountDeposited}</span>
+                  <span>
+                    {' '}
+                    {streamData.amountDeposited} {mintMetadata.symbol}
+                  </span>
                 </div>
                 <div>
                   <span>Unlocked every:</span>
-                  <span> {releaseFrequency} seconds</span>
+                  <span> {streamData.releaseFrequency} seconds</span>
                 </div>
                 <div>
                   <span>Release amount:</span>
-                  <span> {releaseAmount}</span>
+                  <span>
+                    {' '}
+                    {streamData.releaseAmount} {mintMetadata.symbol}
+                  </span>
                 </div>
                 <div>
                   <span>Released at start:</span>
-                  <span> {amountAtCliff}</span>
+                  <span> {streamData.amountAtCliff}</span>
                 </div>
-                <br></br>
                 <div>
-                  <span>Unlocked:</span>
-                  <VoteResultsBar
-                    approveVotePercentage={unlockedPercent}
-                    denyVotePercentage={0}
-                  />
+                  <span>Contract is cancelable:</span>
+                  <span> {streamData.cancelable ? 'Yes' : 'No'}</span>
                 </div>
                 <br></br>
-                {/* <Button onClick={}>Cancel</Button> */}
-                <Button>Cancel</Button>
+                {isExecuted && (
+                  <div>
+                    <span>Unlocked:</span>
+                    <VoteResultsBar
+                      approveVotePercentage={unlockedPercent}
+                      denyVotePercentage={0}
+                    />
+                    <br></br>
+                  </div>
+                )}
               </div>
             </>
           )
         } catch (error) {
-          console.log('HEEEEYOOOOO')
           console.log(error)
           return <></>
         }

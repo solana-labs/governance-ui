@@ -90,11 +90,10 @@ export default function StreamCard({
   })
 
   const contract_metadata = accounts[2].pubkey
-  if (!stream) {
+  if (stream?.createdAt == 0 || !stream?.cancelableBySender) {
     return <></>
   }
   const creator_governance = new PublicKey(stream.sender)
-  console.log(stream.mint)
 
   const handleCancel = async () => {
     let serializedInstruction = ''

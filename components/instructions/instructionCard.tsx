@@ -155,17 +155,14 @@ export default function InstructionCard({
       ) : (
         <InstructionData descriptor={descriptor}></InstructionData>
       )}
+      {descriptor?.name == 'Streamflow: Create' && (
+        <StreamCard
+          connection={connection.current}
+          accounts={proposalInstruction.account.getSingleInstruction().accounts}
+        />
+      )}
       <div className="flex justify-end items-center gap-x-4 mt-6 mb-8">
         <InspectorButton proposalInstruction={proposalInstruction} />
-
-        {descriptor?.name == 'Streamflow: Create' && (
-          <StreamCard
-            connection={connection.current}
-            accounts={
-              proposalInstruction.account.getSingleInstruction().accounts
-            }
-          />
-        )}
 
         <FlagInstructionErrorButton
           playState={playing}
