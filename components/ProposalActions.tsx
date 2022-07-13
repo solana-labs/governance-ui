@@ -217,7 +217,7 @@ const ProposalActionsPanel = () => {
                 onClick={() => handleCancelProposal(proposal)}
                 disabled={!connected}
               >
-                Cancel
+                Cancel Proposal
               </SecondaryButton>
             )}
 

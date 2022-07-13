@@ -1,9 +1,9 @@
 import React from 'react'
 import { VoteRecord } from '@solana/spl-governance'
 import {
-  CheckCircleIcon,
   UserCircleIcon,
-  XCircleIcon,
+  ThumbUpIcon,
+  ThumbDownIcon,
 } from '@heroicons/react/solid'
 import { ExternalLinkIcon } from '@heroicons/react/solid'
 import { ChatMessage } from '@solana/spl-governance'
@@ -61,11 +61,11 @@ const Comment = ({
           <div className="bg-bkg-3 hidden lg:flex lg:items-center px-4 py-2 rounded-full">
             <div className="flex items-center pr-2 text-fgd-1 text-xs">
               {isYesVote(voteRecord) ? (
-                <CheckCircleIcon className="h-5 mr-1 text-green w-5" />
+                <ThumbUpIcon className="h-4 mr-2 fill-[#8EFFDD] w-4" />
               ) : (
-                <XCircleIcon className="h-5 mr-1 text-red w-5" />
+                <ThumbDownIcon className="h-4 mr-2 fill-[#FF7C7C] w-4" />
               )}
-              {isYesVote(voteRecord) ? 'Approve' : 'Deny'}
+              {isYesVote(voteRecord) ? 'Yes' : 'No'}
             </div>
             <span className="text-fgd-4">|</span>
             <span className="pl-2 text-xs">
