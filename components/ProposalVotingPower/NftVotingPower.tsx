@@ -13,6 +13,7 @@ export default function NftVotingPower(props: Props) {
   const nfts = useNftPluginStore((s) => s.state.votingNfts)
   const votingPower = useNftPluginStore((s) => s.state.votingPower)
   const maxWeight = useNftPluginStore((s) => s.state.maxVoteRecord)
+  const isLoading = useNftPluginStore((s) => s.state.isLoadingNfts)
 
   const displayNfts = nfts.slice(0, 3)
   const remainingCount = Math.max(nfts.length - 3, 0)
@@ -20,6 +21,14 @@ export default function NftVotingPower(props: Props) {
     ? new BigNumber(maxWeight.account.maxVoterWeight.toString())
     : null
   const amount = new BigNumber(votingPower.toString())
+
+  if (isLoading) {
+    return (
+      <div
+        className={classNames(props.className, 'rounded-md bg-bkg-1 h-[76px]')}
+      />
+    )
+  }
 
   if (nfts.length === 0) {
     return (

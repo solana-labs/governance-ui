@@ -1,5 +1,6 @@
 import { BigNumber } from 'bignumber.js'
 import { useCallback } from 'react'
+import classNames from 'classnames'
 
 import useRealm from '@hooks/useRealm'
 import { calculateMaxVoteScore } from '@models/proposal/calulateMaxVoteScore'
@@ -78,19 +79,35 @@ export default function CouncilVotingPower(props: Props) {
     wallet,
   ])
 
+  if (!(realm && realmInfo && ownCouncilTokenRecord)) {
+    return (
+      <div
+        className={classNames(props.className, 'rounded-md bg-bkg-1 h-[76px]')}
+      />
+    )
+  }
+
   return (
     <div className={props.className}>
-      <div className={'p-3 rounded-md bg-bkg-1'}>
-        <div className="text-white/50 text-xs">{tokenName} Council Votes</div>
-        <div className="flex items-center justify-between mt-1">
-          <div className="text-white font-bold text-2xl">
-            {amount.toFormat()}
-          </div>
-          {max && !max.isZero() && (
-            <VotingPowerPct amount={amount} total={max} />
-          )}
+      {amount.isZero() ? (
+        <div className={'text-xs text-white/50'}>
+          You do not have any voting power
+          <br />
+          in this realm.
         </div>
-      </div>
+      ) : (
+        <div className={'p-3 rounded-md bg-bkg-1'}>
+          <div className="text-white/50 text-xs">{tokenName} Council Votes</div>
+          <div className="flex items-center justify-between mt-1">
+            <div className="text-white font-bold text-2xl">
+              {amount.toFormat()}
+            </div>
+            {max && !max.isZero() && (
+              <VotingPowerPct amount={amount} total={max} />
+            )}
+          </div>
+        </div>
+      )}
       {depositAmount.isGreaterThan(0) && (
         <>
           <div className="mt-3 text-xs text-white/50">
