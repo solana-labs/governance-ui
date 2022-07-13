@@ -309,3 +309,8 @@ https://developer.mozilla.org/en-US/docs/Web/CSS/word-break#values */
   -o-user-select: none;
   user-select: none;
 }
+
+.react-resizable-handle::after,
+.react-resizable-handle-se::after {
+  border-color: white !important;
+}

@@ -1,6 +1,5 @@
 import useQueryContext from '@hooks/useQueryContext'
 import { RealmInfo } from '@models/registry/api'
-import { useTheme } from 'next-themes'
 import { useRouter } from 'next/router'
 import React, { useMemo } from 'react'
 import RealmsGrid from './RealmsGrid'
@@ -42,7 +41,6 @@ export default function RealmsDashboard({
 }) {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
-  const { theme } = useTheme()
 
   const goToRealm = (realmInfo: RealmInfo) => {
     const symbol =
