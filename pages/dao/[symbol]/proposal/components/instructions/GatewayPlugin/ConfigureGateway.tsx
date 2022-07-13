@@ -67,7 +67,7 @@ const ConfigureGatewayPlugin = ({
         gatewayClient!.program.programId
       )
       const configureRegistrarTx = await gatewayClient!.program.methods
-        .configureRegistrar()
+        .configureRegistrar(false)
         .accounts({
           registrar,
           realm: realm!.pubkey,

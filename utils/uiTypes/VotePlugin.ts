@@ -1,6 +1,9 @@
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
-import { NftVoterClient } from '@solana/governance-program-library'
+import {
+  NftVoterClient,
+  GatewayClient,
+} from '@solana/governance-program-library'
 import {
   SwitchboardQueueVoterClient,
   SWITCHBOARD_ADDIN_ID,
@@ -21,7 +24,6 @@ import {
   getVoterWeightPDA,
 } from 'VoteStakeRegistry/sdk/accounts'
 import { NFTWithMint } from './nfts'
-import { GatewayClient } from '@solana/governance-program-library/dist'
 import {
   getPreviousVotingWeightRecord,
   getVoteInstruction,
@@ -45,6 +47,7 @@ export interface VotingClientProps {
     | NftVoterClient
     | SwitchboardQueueVoterClient
     | PythClient
+    | GatewayClient
     | undefined
   realm: ProgramAccount<Realm> | undefined
   walletPk: PublicKey | null | undefined

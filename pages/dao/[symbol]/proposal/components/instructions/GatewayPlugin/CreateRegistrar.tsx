@@ -70,7 +70,7 @@ const CreateGatewayPluginRegistrar = ({
         : []
 
       const createRegistrarIx = await gatewayClient!.program.methods
-        .createRegistrar()
+        .createRegistrar(false)
         .accounts({
           registrar,
           realm: realm!.pubkey,
@@ -142,7 +142,7 @@ const CreateGatewayPluginRegistrar = ({
         },
         {
           key: 'ID Verification',
-          value: 'ni1jXzPTq1yTqo67tUmVgnp22b1qGAAZCtPmHtskqYG',
+          value: 'bni1ewus6aMxTxBi5SAfzEmmXLf8KcVFRmTfproJuKw',
         },
         {
           key: 'ID Verification for DeFi',

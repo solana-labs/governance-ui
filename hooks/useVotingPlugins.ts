@@ -273,7 +273,7 @@ export function useVotingPlugins() {
   }
 
   const handleRegisterGatekeeperNetwork = async () => {
-    if (realm) {
+    if (realm && gatewayClient) {
       setIsLoadingGatewayToken(true)
 
       try {
