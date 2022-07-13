@@ -79,7 +79,7 @@ export default function RealmsGrid({
         {realms.length > 0 && realms.map((realm) => (
             <div
               onClick={() => editing ? null : goToRealm(realm)}
-              className={`flex group flex-col items-center justify-center overflow-hidden p-8 rounded-lg cursor-pointer default-transition hover:bg-bkg-3 active:cursor-grabbing ${editing ? ` bg-bkg-3 cursor-grab`: `bg-bkg-2`}`}
+              className={`flex group flex-col items-center justify-center overflow-hidden p-8 rounded-lg cursor-pointer default-transition active:cursor-grabbing ${editing ? ` bg-bkg-4 opacity-75 shadow-inner-xl shadow-white cursor-grab`: `hover:bg-bkg-3 bg-bkg-2`}`}
               key={realm.realmId.toString()}
               data-grid={layouts[currBreakpoint].find(item => item['i'] == realm.realmId.toString())}
             >
