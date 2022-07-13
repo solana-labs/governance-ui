@@ -7,6 +7,7 @@ import ApprovalQuorum from './ApprovalQuorum'
 import useRealm from '../hooks/useRealm'
 import useProposalVotes from '../hooks/useProposalVotes'
 import ProposalTimeStatus from './ProposalTimeStatus'
+import ProposalMyVoteBadge from '../components/ProposalMyVoteBadge'
 
 import useQueryContext from '../hooks/useQueryContext'
 import { PublicKey } from '@solana/web3.js'
@@ -47,11 +48,13 @@ const ProposalCard = ({ proposalPk, proposal }: ProposalCardProps) => {
                   {proposal.name}
                 </h3>
                 <div className="flex items-center pl-4 pt-1">
-                  <ProposalStateBadge
-                    proposalPk={proposalPk}
-                    proposal={proposal}
-                    open={false}
-                  />
+                  {proposal.state === ProposalState.Voting && (
+                    <ProposalMyVoteBadge
+                      className="mr-2"
+                      proposal={{ account: proposal, pubkey: proposalPk }}
+                    />
+                  )}
+                  <ProposalStateBadge proposal={proposal} />
                   <StyledSvg className="default-transition h-6 ml-3 text-fgd-2 w-6" />
                 </div>
               </div>
