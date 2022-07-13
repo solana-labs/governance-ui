@@ -137,6 +137,7 @@ const TokenDeposit = ({
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
     tokenRecords,
+    councilTokenOwnerRecords,
   } = useRealm();
 
   const { voteRecordsByVoter } = useWalletStore((s) => s.selectedProposal);
@@ -179,13 +180,16 @@ const TokenDeposit = ({
 
   const delegatedAccounts = getDelegatedAccounts().map(
     ({ address: delegatedAccountAddress }) => ({
-      tokenRecord: tokenRecords[delegatedAccountAddress],
+      tokenRecord:
+        tokenType === GoverningTokenType.Community
+          ? tokenRecords[delegatedAccountAddress]
+          : councilTokenOwnerRecords[delegatedAccountAddress],
       voterWeight: new VoterWeight(ownTokenRecord, ownCouncilTokenRecord),
       voteRecord: voteRecordsByVoter[delegatedAccountAddress],
       voterTokenRecord:
         tokenType === GoverningTokenType.Community
           ? tokenRecords[delegatedAccountAddress]
-          : ownCouncilTokenRecord,
+          : councilTokenOwnerRecords[delegatedAccountAddress],
     }),
   );
 

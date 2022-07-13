@@ -164,6 +164,7 @@ const VotePanel = () => {
     tokenRecords,
     councilMint,
     mint,
+    councilTokenOwnerRecords,
   } = useRealm();
 
   const client = useVoteStakeRegistryClientStore((s) => s.state.client);
@@ -239,13 +240,16 @@ const VotePanel = () => {
 
     // Then the delegated accounts
     ...delegatedAccounts.map(({ address: delegatedAccountAddress }) => ({
-      tokenRecord: tokenRecords[delegatedAccountAddress],
+      tokenRecord:
+        tokenType === GoverningTokenType.Community
+          ? tokenRecords[delegatedAccountAddress]
+          : councilTokenOwnerRecords[delegatedAccountAddress],
       voterWeight: new VoterWeight(ownTokenRecord, ownCouncilTokenRecord),
       voteRecord: voteRecordsByVoter[delegatedAccountAddress],
       voterTokenRecord:
         tokenType === GoverningTokenType.Community
           ? tokenRecords[delegatedAccountAddress]
-          : ownCouncilTokenRecord,
+          : councilTokenOwnerRecords[delegatedAccountAddress],
     })),
   ];
 
