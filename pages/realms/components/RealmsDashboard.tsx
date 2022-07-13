@@ -5,11 +5,35 @@ import { useRouter } from 'next/router'
 import React, { useMemo } from 'react'
 import RealmsGrid from './RealmsGrid'
 
+const RealmBox = ({ goToRealm, realm }) => {
+  return (
+    <div
+      onClick={() => goToRealm(realm)}
+      className="flex flex-col items-center justify-center p-8 rounded-lg cursor-pointer bg-bkg-2 default-transition hover:bg-bkg-3"
+    >
+      <div className="pb-5">
+        {realm.ogImage ? (
+          <div className="bg-[rgba(255,255,255,0.06)] rounded-full h-16 w-16 flex items-center justify-center">
+            <img className="w-10" src={realm.ogImage}></img>
+          </div>
+        ) : (
+          <div className="bg-[rgba(255,255,255,0.06)] h-16 w-16 flex font-bold items-center justify-center rounded-full text-fgd-3">
+            {realm.displayName?.charAt(0)}
+          </div>
+        )}
+      </div>
+      <h3 className="text-center break-all">
+        {realm.displayName ?? realm.symbol}
+      </h3>
+    </div>
+  )
+}
+
 export default function RealmsDashboard({
   realms,
   isSearching,
   isLoading,
-  editing
+  editing,
 }: {
   realms: readonly RealmInfo[]
   isSearching: boolean
@@ -51,75 +75,38 @@ export default function RealmsDashboard({
       <div className="col-span-1 rounded-lg animate-pulse bg-bkg-2 h-44" />
     </div>
   ) : (
-    !isSearching ? <RealmsGrid realms={certifiedRealms} editing={editing}/> :
-    <>      
-      <div className="grid grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
-        {certifiedRealms?.length > 0 ? (
-          certifiedRealms.map((realm: RealmInfo) => (
-            <div
-              onClick={() => goToRealm(realm)}
-              className="flex flex-col items-center justify-center p-8 rounded-lg cursor-pointer bg-bkg-2 default-transition hover:bg-bkg-3"
-              key={realm.realmId.toString()}
-            >
-              <div className="pb-5">
-                {realm.ogImage ? (
-                  <div
-                    className={`${
-                      theme === 'Dark'
-                        ? 'bg-[rgba(255,255,255,0.06)]'
-                        : 'bg-[rgba(0,0,0,0.06)]'
-                    } rounded-full h-16 w-16 flex items-center justify-center`}
-                  >
-                    <img className="w-10" src={realm.ogImage}></img>
-                  </div>
-                ) : (
-                  <div
-                    className={`${
-                      theme === 'Dark'
-                        ? 'bg-[rgba(255,255,255,0.06)]'
-                        : 'bg-[rgba(0,0,0,0.06)]'
-                    } h-16 w-16 flex font-bold items-center justify-center rounded-full text-fgd-3`}
-                  >
-                    {realm.displayName?.charAt(0)}
-                  </div>
-                )}
+    <>
+      {!isSearching ? (
+        <RealmsGrid realms={certifiedRealms} editing={editing} />
+      ) : (
+        <>
+          <div className="grid grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
+            {certifiedRealms?.length > 0 ? (
+              certifiedRealms.map((realm: RealmInfo) => (
+                <RealmBox
+                  key={realm.realmId.toString()}
+                  goToRealm={goToRealm}
+                  realm={realm}
+                />
+              ))
+            ) : (
+              <div className="col-span-5 p-8 text-center rounded-lg bg-bkg-2">
+                <p>No results</p>
               </div>
-              <h3 className="text-center ">
-                {realm.displayName ?? realm.symbol}
-              </h3>
-            </div>
-          ))
-        ) : (
-          <div className="col-span-5 p-8 text-center rounded-lg bg-bkg-2">
-            <p>No results</p>
+            )}
           </div>
-        )}
-      </div>
+        </>
+      )}
       <div className="pt-12">
         <h2 className="mb-4">Unchartered DAOs</h2>
         <div className="grid grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
           {unchartedRealms?.length > 0 ? (
             unchartedRealms.map((realm: RealmInfo) => (
-              <div
-                onClick={() => goToRealm(realm)}
-                className="flex flex-col items-center justify-center p-8 rounded-lg cursor-pointer bg-bkg-2 default-transition hover:bg-bkg-3"
+              <RealmBox
                 key={realm.realmId.toString()}
-              >
-                <div className="pb-5">
-                  {realm.ogImage ? (
-                    <div className="bg-[rgba(255,255,255,0.06)] rounded-full h-16 w-16 flex items-center justify-center">
-                      <img className="w-10" src={realm.ogImage}></img>
-                    </div>
-                  ) : (
-                    <div className="bg-[rgba(255,255,255,0.06)] h-16 w-16 flex font-bold items-center justify-center rounded-full text-fgd-3">
-                      {realm.displayName?.charAt(0)}
-                    </div>
-                  )}
-                </div>
-                <h3 className="text-center break-all">
-                  {realm.displayName ?? realm.symbol}
-                </h3>
-              </div>
+                goToRealm={goToRealm}
+                realm={realm}
+              />
             ))
           ) : (
             <div className="col-span-5 p-8 text-center rounded-lg bg-bkg-2">
