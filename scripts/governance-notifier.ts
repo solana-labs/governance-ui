@@ -102,7 +102,7 @@ async function runNotifier() {
 
       const msg = `“${
         proposal.account.name
-      }” proposal just opened for voting 🗳 https://dao-beta.mango.markets/dao/${escape(
+      }” proposal just opened for voting 🗳 https://realms.today/dao/${escape(
         REALM_SYMBOL
       )}/proposal/${k}`
 
