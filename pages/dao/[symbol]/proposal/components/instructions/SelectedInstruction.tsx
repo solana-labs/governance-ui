@@ -66,6 +66,7 @@ import DeltafiPoolWithdraw from './Deltafi/Withdraw';
 import DeltafiCreateFarmUser from './Deltafi/CreateFarmUserV2';
 import DeltafiDepositToFarm from './Deltafi/DepositToFarm';
 import DeltafiFarmWithdraw from './Deltafi/WithdrawFromFarm';
+import NativeBurnSplTokens from './Native/BurnSplTokens';
 
 const SelectedInstruction = ({
   itxType,
@@ -444,6 +445,10 @@ const SelectedInstruction = ({
     case InstructionEnum.DeltafiFarmWithdraw:
       return (
         <DeltafiFarmWithdraw index={index} governedAccount={governedAccount} />
+      );
+    case InstructionEnum.NativeBurnSplTokens:
+      return (
+        <NativeBurnSplTokens index={index} governedAccount={governedAccount} />
       );
     default:
       return null;

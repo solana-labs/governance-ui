@@ -496,6 +496,12 @@ export interface DeltafiCreateFarmUserForm {
   poolName?: DeltafiPoolName;
 }
 
+export interface NativeBurnSplTokensForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  uiAmount?: number;
+  source?: string;
+}
+
 export enum InstructionEnum {
   Transfer,
   ProgramUpgrade,
@@ -565,6 +571,7 @@ export enum InstructionEnum {
   DeltafiCreateFarmUser,
   DeltafiFarmDeposit,
   DeltafiFarmWithdraw,
+  NativeBurnSplTokens,
 }
 
 export enum PackageEnum {
