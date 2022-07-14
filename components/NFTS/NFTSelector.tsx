@@ -32,17 +32,21 @@ function NFTSelector(
     nftHeight?: string
     selectable?: boolean
     predefinedNfts?: NFTWithMint[]
-    selectedNft: NFTWithMint
+    selectedNft?: NFTWithMint | null
   },
   ref: React.Ref<NftSelectorFunctions>
 ) {
   const isPredefinedMode = typeof predefinedNfts !== 'undefined'
   const [nfts, setNfts] = useState<NFTWithMint[]>([])
-  const [selected, setSelected] = useState<NFTWithMint>(selectedNft)
+  const [selected, setSelected] = useState<NFTWithMint | null>(null)
   const connection = useWalletStore((s) => s.connection)
   const [isLoading, setIsLoading] = useState(false)
   const handleSelectNft = (nft: NFTWithMint) => {
-    setSelected(nft)
+    if (selected && nft.mint == selected.mint) {
+      setSelected(null)
+    } else {
+      setSelected(nft)
+    }
   }
   const handleGetNfts = async () => {
     setIsLoading(true)
@@ -61,12 +65,17 @@ function NFTSelector(
   }))
 
   useEffect(() => {
+    if (selectedNft) {
+      setSelected(selectedNft)
+    }
+  }, [])
+  useEffect(() => {
     if (ownersPk.length && !isPredefinedMode) {
       handleGetNfts()
     }
   }, [JSON.stringify(ownersPk.map((x) => x.toBase58()))])
   useEffect(() => {
-    if (!isPredefinedMode) {
+    if (!isPredefinedMode && selected) {
       onNftSelect([selected])
     }
   }, [selected])
@@ -96,7 +105,7 @@ function NFTSelector(
                     height: nftHeight,
                   }}
                 >
-                  {x.mint === selected.mint && (
+                  {selected && x.mint === selected.mint && (
                     <CheckCircleIcon className="w-10 h-10 absolute text-green z-10"></CheckCircleIcon>
                   )}
                   <ImgWithLoader style={{ width: '150px' }} src={x.val.image} />

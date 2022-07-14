@@ -31,7 +31,7 @@ const gallery = () => {
   const [nfts, setNfts] = useState<NFTWithMint[]>([])
   const [openNftDepositModal, setOpenNftDepositModal] = useState(false)
   const [openSendNftsModal, setOpenSendNftsModal] = useState(false)
-  const [selectedNft, setSelectedNft] = useState<NFTWithMint>()
+  const [selectedNft, setSelectedNft] = useState<NFTWithMint | null>(null)
   const handleCloseModal = () => {
     setOpenNftDepositModal(false)
   }
@@ -81,6 +81,7 @@ const gallery = () => {
               <div className="flex ">
                 <LinkButton
                   onClick={() => {
+                    setSelectedNft(null)
                     setCurrentAccount(nftsGovernedTokenAccounts[0], connection)
                     setOpenSendNftsModal(true)
                   }}
