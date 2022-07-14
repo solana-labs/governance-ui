@@ -30,7 +30,7 @@ export const signOffProposal = async (
     connection,
     programId
   )
-  const hasSignatoriesCount = proposal.account.signatoriesCount === 0
+  const hasNoSignatories = proposal.account.signatoriesCount === 0
   withSignOffProposal(
     instructions,
     programId,
@@ -38,11 +38,9 @@ export const signOffProposal = async (
     realmPk,
     proposal.account.governance,
     proposal.pubkey,
-    !hasSignatoriesCount
-      ? signatoryRecord!.account.signatory
-      : wallet.publicKey!,
-    !hasSignatoriesCount ? signatoryRecord!.pubkey! : undefined,
-    !hasSignatoriesCount ? undefined : proposal.account.tokenOwnerRecord
+    !hasNoSignatories ? signatoryRecord!.account.signatory : wallet.publicKey!,
+    !hasNoSignatories ? signatoryRecord!.pubkey! : undefined,
+    !hasNoSignatories ? undefined : proposal.account.tokenOwnerRecord
   )
 
   const transaction = new Transaction()

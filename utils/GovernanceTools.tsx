@@ -9,7 +9,7 @@ import {
   getTimestampFromDays,
   parseMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
-import { U64_MAX } from '@marinade.finance/marinade-ts-sdk/dist/src/util'
+import { MAX_TOKENS_TO_DISABLE } from '@tools/constants'
 
 export interface GovernanceConfigValues {
   minTokensToCreateProposal: number | string
@@ -32,7 +32,7 @@ export function parseMinTokensToCreate(
 
 export function getGovernanceConfig(values: GovernanceConfigValues) {
   const minTokensToCreateProposal = new BN(values.minTokensToCreateProposal).eq(
-    U64_MAX
+    MAX_TOKENS_TO_DISABLE
   )
     ? values.minTokensToCreateProposal
     : parseMinTokensToCreate(

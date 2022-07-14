@@ -1,4 +1,3 @@
-import { U64_MAX } from '@marinade.finance/marinade-ts-sdk/dist/src/util'
 import {
   AccountMetaData,
   getGovernance,
@@ -18,6 +17,7 @@ import {
 } from '@solana/spl-governance'
 import { GOVERNANCE_SCHEMA } from '@solana/spl-governance'
 import { Connection } from '@solana/web3.js'
+import { MAX_TOKENS_TO_DISABLE } from '@tools/constants'
 import { fmtMintAmount, getDaysFromTimestamp } from '@tools/sdk/units'
 import { deserialize } from 'borsh'
 
@@ -50,7 +50,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
           : undefined
         const isMaxNumber =
           args.config.minCommunityTokensToCreateProposal.toString() ===
-          U64_MAX.toString()
+          MAX_TOKENS_TO_DISABLE.toString()
         return (
           <>
             <p>

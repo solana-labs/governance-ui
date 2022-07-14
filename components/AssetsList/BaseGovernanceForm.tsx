@@ -4,7 +4,7 @@ import AmountSlider from '@components/Slider'
 import Switch from '@components/Switch'
 import useRealm from '@hooks/useRealm'
 import { VoteTipping } from '@solana/spl-governance'
-import { U64_MAX } from '@solendprotocol/solend-sdk/dist/examples/common'
+import { MAX_TOKENS_TO_DISABLE } from '@tools/constants'
 import {
   fmtPercentage,
   getMintMinAmountAsDecimal,
@@ -30,7 +30,7 @@ const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
     number | undefined
   >()
   const isMaxMinCommunityNumber =
-    form.minCommunityTokensToCreateProposal === U64_MAX.toString()
+    form.minCommunityTokensToCreateProposal === MAX_TOKENS_TO_DISABLE.toString()
   const [showMinCommunity, setMinCommunity] = useState(!isMaxMinCommunityNumber)
 
   const handleSetForm = ({ propertyName, value }) => {
@@ -46,8 +46,8 @@ const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
 
     handleSetForm({
       value:
-        e.target.value === U64_MAX
-          ? U64_MAX
+        e.target.value === MAX_TOKENS_TO_DISABLE.toString()
+          ? MAX_TOKENS_TO_DISABLE.toString()
           : parseFloat(
               Math.max(
                 Number(min),
@@ -117,7 +117,7 @@ const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
                 })
               } else {
                 handleSetForm({
-                  value: U64_MAX,
+                  value: MAX_TOKENS_TO_DISABLE.toString(),
                   propertyName: 'minCommunityTokensToCreateProposal',
                 })
               }
