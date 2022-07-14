@@ -123,7 +123,9 @@ const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
               }
             }}
           />{' '}
-          <div className="ml-3">Disabled / Enabled</div>
+          <div className="ml-3">
+            {showMinCommunity ? 'Enabled' : 'Disabled'}
+          </div>
         </div>
       </div>
 
