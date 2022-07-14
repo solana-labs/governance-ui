@@ -17,14 +17,14 @@ import { tryParsePublicKey } from '@tools/core/pubkey'
 import { getAccountName } from '@components/instructions/tools'
 import useWalletStore from 'stores/useWalletStore'
 import SetRealmAuthorityModal from './SetRealmAuthorityModal'
-import MetadataCreationModal from './MetadataCreationModal'
+// import MetadataCreationModal from './MetadataCreationModal'
 
 import ParamsView from './components/ParamsView'
 import AccountsView from './components/AccountsView'
 import StatsView from './components/StatsView'
 import { ExclamationIcon } from '@heroicons/react/outline'
 import Tooltip from '@components/Tooltip'
-import { AccountType } from '@utils/uiTypes/assets'
+// import { AccountType } from '@utils/uiTypes/assets'
 
 const Params = () => {
   const { realm, mint } = useRealm()
@@ -35,27 +35,27 @@ const Params = () => {
     auxiliaryTokenAccounts,
   } = useGovernanceAssets()
   const governancesArray = useGovernanceAssetsStore((s) => s.governancesArray)
-  const mintGovernancesWithMintInfo = assetAccounts.filter((x) => {
-    return x.type === AccountType.MINT
-  })
+  // const mintGovernancesWithMintInfo = assetAccounts.filter((x) => {
+  //   return x.type === AccountType.MINT
+  // })
 
-  const hasAuthorityGovernances = governancesArray.filter((governance) => {
-    const filteredMintGovernances = mintGovernancesWithMintInfo.filter(
-      (mintGovernance) =>
-        mintGovernance.governance.pubkey.toString() ===
-        governance.pubkey.toString()
-    )
+  // const hasAuthorityGovernances = governancesArray.filter((governance) => {
+  //   const filteredMintGovernances = mintGovernancesWithMintInfo.filter(
+  //     (mintGovernance) =>
+  //       mintGovernance.governance.pubkey.toString() ===
+  //       governance.pubkey.toString()
+  //   )
 
-    if (filteredMintGovernances.length == 0) {
-      return false
-    }
+  //   if (filteredMintGovernances.length == 0) {
+  //     return false
+  //   }
 
-    return (
-      filteredMintGovernances[0].governance.pubkey.toString() ===
-      governance.pubkey.toString()
-    )
-  })
-  const showCreateMetadataButton = !!hasAuthorityGovernances.length
+  //   return (
+  //     filteredMintGovernances[0].governance.pubkey.toString() ===
+  //     governance.pubkey.toString()
+  //   )
+  // })
+  // const showCreateMetadataButton = !!hasAuthorityGovernances.length
 
   const loadGovernedAccounts = useGovernanceAssetsStore(
     (s) => s.loadGovernedAccounts
@@ -71,10 +71,10 @@ const Params = () => {
     isGovernanceProposalModalOpen,
     setIsGovernanceProposalModalOpen,
   ] = useState(false)
-  const [
-    isMetadataCreationModalOpen,
-    setIsMetadataCreationModalOpen,
-  ] = useState(false)
+  // const [
+  //   isMetadataCreationModalOpen,
+  //   setIsMetadataCreationModalOpen,
+  // ] = useState(false)
   const [activeGovernance, setActiveGovernance] = useState<any>(null)
   const [activeTab, setActiveTab] = useState('Params')
   const [isRealmAuthorityModalOpen, setRealmAuthorityModalIsOpen] = useState(
@@ -92,12 +92,12 @@ const Params = () => {
   const closeRealmProposalModal = () => {
     setIsRealmProposalModalOpen(false)
   }
-  const openMetadataCreationModal = () => {
-    setIsMetadataCreationModalOpen(true)
-  }
-  const closeMetadataCreationModal = () => {
-    setIsMetadataCreationModalOpen(false)
-  }
+  // const openMetadataCreationModal = () => {
+  //   setIsMetadataCreationModalOpen(true)
+  // }
+  // const closeMetadataCreationModal = () => {
+  //   setIsMetadataCreationModalOpen(false)
+  // }
   const openGovernanceProposalModal = () => {
     setIsGovernanceProposalModalOpen(true)
   }
@@ -147,13 +147,13 @@ const Params = () => {
           closeModal={closeSetRealmAuthorityModal}
         ></SetRealmAuthorityModal>
       )}
-      {isMetadataCreationModalOpen && (
+      {/* {isMetadataCreationModalOpen && (
         <MetadataCreationModal
           governance={activeGovernance}
           isOpen={isMetadataCreationModalOpen}
           closeModal={closeMetadataCreationModal}
         ></MetadataCreationModal>
-      )}
+      )} */}
       <div className="col-span-12 p-4 rounded-lg bg-bkg-2 md:p-6">
         <div className="mb-4">
           <PreviousRouteBtn />
@@ -210,7 +210,7 @@ const Params = () => {
                     </Button>
                   )}
                 </div>
-                <div className="flex">
+                {/* <div className="flex">
                   {showCreateMetadataButton && (
                     <Button
                       disabled={
@@ -229,7 +229,7 @@ const Params = () => {
                       Create metadata
                     </Button>
                   )}
-                </div>
+                </div> */}
               </div>
               <div className="col-span-1 p-4 border rounded-md border-fgd-4">
                 <h2 className="flex items-center">Config </h2>
