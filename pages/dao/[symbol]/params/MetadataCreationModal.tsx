@@ -56,6 +56,23 @@ const MetadataCreationModal = ({
   })
   console.log({ mintGovernancesWithMintInfo })
 
+  // const check0 = {
+  //   pubkey: mintGovernancesWithMintInfo[0].pubkey.toString(),
+  //   governance: mintGovernancesWithMintInfo[0].governance.pubkey.toString(),
+  //   owner: mintGovernancesWithMintInfo[0].governance.owner.toString(),
+  //   governecAccount: mintGovernancesWithMintInfo[0].governance.account.governedAccount.toString(),
+  //   realm: mintGovernancesWithMintInfo[0].governance.account.realm.toString(),
+  // }
+  // const check1 = {
+  //   pubkey: mintGovernancesWithMintInfo[1].pubkey.toString(),
+  //   governance: mintGovernancesWithMintInfo[1].governance.pubkey.toString(),
+  //   owner: mintGovernancesWithMintInfo[1].governance.owner.toString(),
+  //   governecAccount: mintGovernancesWithMintInfo[1].governance.account.governedAccount.toString(),
+  //   realm: mintGovernancesWithMintInfo[1].governance.account.realm.toString(),
+  // }
+  // console.log({ check0 })
+  // console.log({ check1 })
+
   const shouldBeGoverned = false
   const config = governance?.account.config
   const { fmtUrlWithCluster } = useQueryContext()
