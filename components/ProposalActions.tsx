@@ -149,7 +149,7 @@ const ProposalActionsPanel = () => {
           rpcContext,
           realmInfo.realmId,
           proposal,
-          signatoryRecord
+          proposal.account.tokenOwnerRecord
         )
 
         await refetchProposals()
