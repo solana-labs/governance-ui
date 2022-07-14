@@ -15,6 +15,7 @@ import { LinkButton } from '@components/Button'
 import SendTokens from '@components/TreasuryAccount/SendTokens'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import { MdScheduleSend } from 'react-icons/md'
 
 const gallery = () => {
   const connection = useWalletStore((s) => s.connection)
@@ -30,6 +31,7 @@ const gallery = () => {
   const [nfts, setNfts] = useState<NFTWithMint[]>([])
   const [openNftDepositModal, setOpenNftDepositModal] = useState(false)
   const [openSendNftsModal, setOpenSendNftsModal] = useState(false)
+  const [selectedNft, setSelectedNft] = useState<NFTWithMint>()
   const handleCloseModal = () => {
     setOpenNftDepositModal(false)
   }
@@ -150,23 +152,42 @@ const gallery = () => {
               </>
             ) : nfts.length ? (
               nfts.map((x, idx) => (
-                <a
-                  className="bg-bkg-4 col-span-1 flex items-center justify-center rounded-lg filter drop-shadow-xl"
+                <div
                   key={idx}
-                  href={
-                    connection.endpoint && x.mint
-                      ? getExplorerUrl(connection.cluster, x.mint)
-                      : ''
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
+                  className="relative group bg-bkg-4 col-span-1 flex items-center justify-center rounded-lg filter drop-shadow-xl"
                 >
-                  <ImgWithLoader
-                    className="bg-bkg-2 cursor-pointer default-transition h-full w-full rounded-md border border-transparent transform scale-90 hover:scale-95"
-                    src={x.val.image}
-                  />
-                </a>
+                  <a
+                    key={idx}
+                    href={
+                      connection.endpoint && x.mint
+                        ? getExplorerUrl(connection.cluster, x.mint)
+                        : ''
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <ImgWithLoader
+                      className="bg-bkg-2 cursor-pointer default-transition h-full w-full rounded-md border border-transparent transform scale-90 group-hover:scale-95 group-hover:opacity-50"
+                      src={x.val.image}
+                    />
+                  </a>
+                  <button
+                    className="hidden group-hover:block absolute w-20 h-20 items-center justify-center flex-auto text-primary-light"
+                    onClick={() => {
+                      setCurrentAccount(
+                        nftsGovernedTokenAccounts[0],
+                        connection
+                      )
+                      setSelectedNft(x)
+                      setOpenSendNftsModal(true)
+                    }}
+                  >
+                    <div className="bg-white rounded-full flex items-center justify-center h-full w-full p-2 hover:opacity-75">
+                      <MdScheduleSend className="h-full w-full p-3" />
+                    </div>
+                  </button>
+                </div>
               ))
             ) : (
               <div className="col-span-4 text-fgd-3 flex flex-col items-center">
@@ -191,7 +212,7 @@ const gallery = () => {
           onClose={handleCloseSendModal}
           isOpen={openSendNftsModal}
         >
-          <SendTokens isNft></SendTokens>
+          <SendTokens isNft selectedNft={selectedNft}></SendTokens>
         </Modal>
       )}
     </div>
