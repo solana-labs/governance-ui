@@ -57,13 +57,15 @@ export const GOVERNANCE_INSTRUCTIONS = {
               {`voteThresholdPercentage:
               ${args.config.voteThresholdPercentage.value.toLocaleString()}%`}
             </p>
-            {!isMaxNumber && (
+            {isMaxNumber ? (
+              <p>minCommunityTokensToCreateProposal: Disabled</p>
+            ) : (
               <p>
                 {`minCommunityTokensToCreateProposal:
               ${fmtMintAmount(
                 communityMint?.account,
                 args.config.minCommunityTokensToCreateProposal
-              )}`}
+              )}`}{' '}
                 ({args.config.minCommunityTokensToCreateProposal.toNumber()})
               </p>
             )}

@@ -103,22 +103,32 @@ const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
 
   return (
     <>
-      {isMaxMinCommunityNumber && (
-        <div className="text-sm mb-3">
-          <div className="mb-2">Use community tokens</div>
-          <div className="flex flex-row text-xs items-center">
-            <Switch
-              checked={showMinCommunity}
-              onChange={() => {
-                setMinCommunity(!showMinCommunity)
-              }}
-            />
-          </div>
+      <div className="text-sm mb-3">
+        <div className="mb-2">Min community tokens to create proposal</div>
+        <div className="flex flex-row text-xs items-center">
+          <Switch
+            checked={showMinCommunity}
+            onChange={() => {
+              setMinCommunity(!showMinCommunity)
+              if (!showMinCommunity === true) {
+                handleSetForm({
+                  value: 1,
+                  propertyName: 'minCommunityTokensToCreateProposal',
+                })
+              } else {
+                handleSetForm({
+                  value: U64_MAX,
+                  propertyName: 'minCommunityTokensToCreateProposal',
+                })
+              }
+            }}
+          />{' '}
+          <div className="ml-3">Disabled / Enabled</div>
         </div>
-      )}
+      </div>
+
       {showMinCommunity && (
         <Input
-          label="Min community tokens to create proposal"
           value={form.minCommunityTokensToCreateProposal}
           type="number"
           name="minCommunityTokensToCreateProposal"
@@ -134,7 +144,7 @@ const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
           error={formErrors['minCommunityTokensToCreateProposal']}
         />
       )}
-      {getSupplyPercent()}
+      {showMinCommunity && getSupplyPercent()}
       <Input
         label="min instruction hold up time (days)"
         value={form.minInstructionHoldUpTime}
