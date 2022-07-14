@@ -41,8 +41,14 @@ const Deposit = ({
     associatedTokenAccounts,
     setAssociatedTokenAccounts,
   ] = useState<null | {
-    A: PublicKey;
-    B: PublicKey;
+    A: {
+      account: PublicKey;
+      uiBalance: string;
+    };
+    B: {
+      account: PublicKey;
+      uiBalance: string;
+    };
   }>(null);
 
   const {
@@ -68,9 +74,6 @@ const Deposit = ({
       return deposit({
         authority: governedAccountPubkey,
         pool,
-        sourceA: associatedTokenAccounts.A,
-        sourceB: associatedTokenAccounts.B,
-
         tokenAmountA: uiAmountToNativeBN(
           form.uiTokenAmountA!.toString(),
           pool.tokenAccountA.decimals,
@@ -88,37 +91,42 @@ const Deposit = ({
   });
 
   useEffect(() => {
-    if (!governedAccountPubkey) {
-      return;
-    }
+    (async () => {
+      if (!governedAccountPubkey) {
+        return;
+      }
 
-    if (!pool) {
-      setAssociatedTokenAccounts(null);
-      return;
-    }
+      if (!pool) {
+        setAssociatedTokenAccounts(null);
+        return;
+      }
 
-    console.log('governedAccountPubkey', governedAccountPubkey.toBase58());
-    console.log(
-      'pool.tokenAccountA.mint',
-      pool.tokenAccountA.name,
-      pool.tokenAccountA.tokenMint.toBase58(),
-    );
-    console.log(
-      'pool.tokenAccountB.mint',
-      pool.tokenAccountB.name,
-      pool.tokenAccountB.tokenMint.toBase58(),
-    );
-
-    setAssociatedTokenAccounts({
-      A: findATAAddrSync(
+      const [sourceA] = findATAAddrSync(
         governedAccountPubkey,
         pool.tokenAccountA.tokenMint,
-      )[0],
-      B: findATAAddrSync(
+      );
+
+      const [sourceB] = findATAAddrSync(
         governedAccountPubkey,
         pool.tokenAccountB.tokenMint,
-      )[0],
-    });
+      );
+
+      const [amountA, amountB] = await Promise.all([
+        connection.current.getTokenAccountBalance(sourceA),
+        connection.current.getTokenAccountBalance(sourceB),
+      ]);
+
+      setAssociatedTokenAccounts({
+        A: {
+          account: sourceA,
+          uiBalance: amountA.value.uiAmountString ?? '',
+        },
+        B: {
+          account: sourceB,
+          uiBalance: amountB.value.uiAmountString ?? '',
+        },
+      });
+    })();
   }, [pool, governedAccountPubkey]);
 
   // Hardcoded gate used to be clear about what cluster is supported for now
@@ -151,20 +159,6 @@ const Deposit = ({
 
       {pool && (
         <>
-          <div className="flex flex-col">
-            <span>{pool.tokenAccountA.name} ATA</span>
-            <span className="text-fgd-3 text-sm">
-              {associatedTokenAccounts?.A.toBase58() ?? '-'}
-            </span>
-          </div>
-
-          <div className="flex flex-col">
-            <span>{pool.tokenAccountB.name} ATA</span>
-            <span className="text-fgd-3 text-sm">
-              {associatedTokenAccounts?.B.toBase58() ?? '-'}
-            </span>
-          </div>
-
           <Input
             label={`${pool.tokenAccountA.name} Amount`}
             value={form.uiTokenAmountA}
@@ -179,6 +173,17 @@ const Deposit = ({
             error={formErrors['uiTokenAmountA']}
           />
 
+          {associatedTokenAccounts ? (
+            <div className="text-xs text-fgd-3 mt-0 flex flex-col">
+              <span>
+                {pool.tokenAccountA.name} ATA:{' '}
+                {associatedTokenAccounts?.A.account.toBase58() ?? '-'}
+              </span>
+
+              <span>max: {associatedTokenAccounts?.A.uiBalance}</span>
+            </div>
+          ) : null}
+
           <Input
             label={`${pool.tokenAccountB.name} Amount`}
             value={form.uiTokenAmountB}
@@ -192,6 +197,17 @@ const Deposit = ({
             }
             error={formErrors['uiTokenAmountB']}
           />
+
+          {associatedTokenAccounts ? (
+            <div className="text-xs text-fgd-3 mt-0 flex flex-col">
+              <span>
+                {pool.tokenAccountB.name} ATA:{' '}
+                {associatedTokenAccounts?.B.account.toBase58() ?? '-'}
+              </span>
+
+              <span>max: {associatedTokenAccounts?.B.uiBalance}</span>
+            </div>
+          ) : null}
 
           <Input
             label={`${pool.poolToken.name} Minimum Amount`}

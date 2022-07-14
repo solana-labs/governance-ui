@@ -22,6 +22,7 @@ import QuarryWithdrawTokens from './quarryMine/WithdrawTokens';
 import SaberPeripheryRedeemAllTokenFromMintProxy from './SaberPeriphery/RedeemAllTokensFromMintProxy';
 import SaberPoolsDeposit from './SaberPools/Deposit';
 import SaberPoolsWithdrawOne from './SaberPools/WithdrawOne';
+import SaberPoolsSwap from './SaberPools/Swap';
 import SoceanCancelVest from './Socean/CancelVest';
 import SoceanCloseAuction from './Socean/CloseAuction';
 import SoceanDepositToAuctionPool from './Socean/DepositToAuctionPool';
@@ -185,6 +186,8 @@ const SelectedInstruction = ({
           governedAccount={governedAccount}
         />
       );
+    case InstructionEnum.SaberPoolsSwap:
+      return <SaberPoolsSwap index={index} governedAccount={governedAccount} />;
     case InstructionEnum.SaberPeripheryRedeemAllTokensFromMintProxy:
       return (
         <SaberPeripheryRedeemAllTokenFromMintProxy

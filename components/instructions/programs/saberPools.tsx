@@ -1,7 +1,10 @@
+import BigNumber from 'bignumber.js';
 import { nu64, struct, u8 } from 'buffer-layout';
 import { AccountMetaData } from '@solana/spl-governance';
 import { Connection } from '@solana/web3.js';
 import saberPoolsConfiguration from '@tools/sdk/saberPools/configuration';
+import { SwapSide } from '@tools/sdk/saberPools/swap';
+import { tryGetTokenMint } from '@utils/tokens';
 import { nativeAmountToFormattedUiAmount } from '@tools/sdk/units';
 
 export const SABER_POOLS_PROGRAM_INSTRUCTIONS = {
@@ -165,6 +168,99 @@ export const SABER_POOLS_PROGRAM_INSTRUCTIONS = {
             <div className="flex">
               <span>To {baseTokenAccountInfo.name} Account:</span>
               <span>{destinationAccount}</span>
+            </div>
+          </div>
+        );
+      },
+    },
+
+    [saberPoolsConfiguration.stableSwapInstructions.swap]: {
+      name: 'Saber Pools - Swap',
+      accounts: [
+        'Swap Account',
+        'Authority',
+        'User Authority',
+        'User Source',
+        'Pool Source',
+        'Pool Destination',
+        'User Destination',
+        'Admin Destination',
+        'Token Program Id',
+      ],
+
+      getDataUI: async (
+        connection: Connection,
+        data: Uint8Array,
+        accounts: AccountMetaData[],
+      ) => {
+        const userSource = accounts[3].pubkey;
+        const poolDestination = accounts[5].pubkey;
+
+        const [mintSell, mintBuy] = await Promise.all([
+          tryGetTokenMint(connection, userSource),
+          tryGetTokenMint(connection, poolDestination),
+        ]);
+
+        if (!mintSell || !mintBuy) {
+          throw new Error('Cannot load info about mints');
+        }
+
+        const pool = saberPoolsConfiguration.getPoolByTokenMints(
+          mintSell.publicKey,
+          mintBuy.publicKey,
+        );
+
+        if (!pool) {
+          return <div>Unknown Pool</div>;
+        }
+
+        const swapSide: SwapSide = pool.tokenAccountA.tokenMint.equals(
+          mintSell.publicKey,
+        )
+          ? 'swapAforB'
+          : 'swapBforA';
+
+        const sellToken =
+          swapSide === 'swapAforB' ? pool.tokenAccountA : pool.tokenAccountB;
+        const buyToken =
+          swapSide === 'swapAforB' ? pool.tokenAccountB : pool.tokenAccountA;
+
+        const dataLayout = struct([
+          u8('instruction'),
+          nu64('amountIn'),
+          nu64('minimumAmountOut'),
+        ]);
+
+        const { amountIn, minimumAmountOut } = dataLayout.decode(
+          Buffer.from(data),
+        ) as any;
+
+        const uiAmountIn = Number(
+          new BigNumber(amountIn).shiftedBy(-sellToken.decimals).toString(),
+        ).toLocaleString();
+
+        const uiMinimumAmountOut = Number(
+          new BigNumber(minimumAmountOut)
+            .shiftedBy(-buyToken.decimals)
+            .toString(),
+        ).toLocaleString();
+
+        return (
+          <div className="flex flex-col">
+            <div className="flex">
+              <span>
+                Sell {sellToken.name} for {buyToken.name}
+              </span>
+            </div>
+
+            <div className="flex">
+              <span>{sellToken.name} Amount In:</span>
+              <span>{uiAmountIn}</span>
+            </div>
+
+            <div className="flex">
+              <span>{buyToken.name} Minimum Amount Out:</span>
+              <span>{uiMinimumAmountOut}</span>
             </div>
           </div>
         );

@@ -394,6 +394,12 @@ export default function useGovernanceAssets() {
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.Saber,
     },
+    [InstructionEnum.SaberPoolsSwap]: {
+      name: 'Swap',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Saber,
+      tag: 'beta',
+    },
     [InstructionEnum.SaberPeripheryRedeemAllTokensFromMintProxy]: {
       name: 'Redeem All Tokens From Mint Proxy',
       isVisible: canUseAnyInstruction,

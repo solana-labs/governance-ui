@@ -3,21 +3,18 @@ import { depositInstruction } from '@saberhq/stableswap-sdk';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { findAssociatedTokenAddress } from '@utils/associated';
+import { findATAAddrSync } from '@utils/ataTools';
 import saberPoolsConfiguration, { Pool } from './configuration';
 
 export async function deposit({
   authority,
   pool,
-  sourceA,
-  sourceB,
   tokenAmountA,
   tokenAmountB,
   minimumPoolTokenAmount,
 }: {
   authority: PublicKey;
   pool: Pool;
-  sourceA: PublicKey;
-  sourceB: PublicKey;
   tokenAmountA: BN;
   tokenAmountB: BN;
   minimumPoolTokenAmount: BN;
@@ -26,6 +23,9 @@ export async function deposit({
     authority,
     pool.poolToken.mint,
   );
+
+  const [sourceA] = findATAAddrSync(authority, pool.tokenAccountA.tokenMint);
+  const [sourceB] = findATAAddrSync(authority, pool.tokenAccountB.tokenMint);
 
   // TRICKS
   // Have to add manually the toBuffer method as it's required by the @saberhq/stableswap-sdk package

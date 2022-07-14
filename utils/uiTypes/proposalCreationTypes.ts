@@ -247,6 +247,13 @@ export interface SaberPoolsWithdrawOneForm {
   uiMinimumTokenAmount?: number;
 }
 
+export interface SaberPoolsSwapForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  poolName?: SupportedSaberPoolNames;
+  uiAmountIn?: number;
+  uiMinimumAmountOut?: number;
+}
+
 export interface SaberPeripheryRedeemAllTokensFromMintProxyForm {
   governedAccount?: GovernedMultiTypeAccount;
   mintName?: QuarryMineSupportedMintName;
@@ -513,6 +520,7 @@ export enum InstructionEnum {
   RaydiumRemoveLiquidity,
   SaberPoolsDeposit,
   SaberPoolsWithdrawOne,
+  SaberPoolsSwap,
   SaberPeripheryRedeemAllTokensFromMintProxy,
   SolendCreateObligationAccount,
   SolendInitObligationAccount,

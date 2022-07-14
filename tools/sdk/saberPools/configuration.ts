@@ -77,6 +77,7 @@ class SaberPools {
   };
 
   public readonly stableSwapInstructions = {
+    swap: 1,
     deposit: 2,
     withdrawOne: 4,
   };
@@ -86,6 +87,19 @@ class SaberPools {
       acc[key] = poolToken;
       return acc;
     }, {} as SupportedSaberPoolsMintsInformation);
+  }
+
+  public getPoolByTokenMints(
+    mint1: PublicKey,
+    mint2: PublicKey,
+  ): Pool | undefined {
+    return Object.values(this.pools).find(
+      (pool) =>
+        (pool.tokenAccountA.tokenMint.equals(mint1) ||
+          pool.tokenAccountA.tokenMint.equals(mint2)) &&
+        (pool.tokenAccountB.tokenMint.equals(mint1) ||
+          pool.tokenAccountB.tokenMint.equals(mint2)),
+    );
   }
 
   public getPoolByTokenAccounts(
