@@ -63,27 +63,33 @@ export default function RealmsGrid({
 
   function generateLayout(bp) {
     let currX = 0
-    const savedGrid = localStorage.getItem(SAVED_LAYOUTS)
-    return realms.map((realm) => {
-      let obj
-      if (savedGrid) {
-        obj = JSON.parse(savedGrid)[bp].find(
-          (item) => item?.i == realm.realmId.toString()
-        )
-      }
-      if (!obj) {
-        localStorage.removeItem(SAVED_LAYOUTS)
-        obj = {
-          i: realm.realmId.toString(),
-          x: currX,
-          y: 0,
-          w: 2,
-          h: 2,
+    let savedGrid
+    if (typeof window !== 'undefined') {
+      savedGrid = localStorage.getItem(SAVED_LAYOUTS)
+    }
+    return (
+      realms &&
+      realms.map((realm) => {
+        let obj
+        if (savedGrid) {
+          obj = JSON.parse(savedGrid)[bp].find(
+            (item) => item?.i == realm.realmId.toString()
+          )
         }
-      }
-      currX = (currX + 2) % columns[bp]
-      return obj
-    })
+        if (!obj) {
+          localStorage.removeItem(SAVED_LAYOUTS)
+          obj = {
+            i: realm.realmId.toString(),
+            x: currX,
+            y: 0,
+            w: 2,
+            h: 2,
+          }
+        }
+        currX = (currX + 2) % columns[bp]
+        return obj
+      })
+    )
   }
 
   const updateLayouts = (currentLayout, allLayouts) => {
@@ -107,7 +113,7 @@ export default function RealmsGrid({
       isResizable={editing}
       isDraggable={editing}
     >
-      {realms.length > 0 &&
+      {realms &&
         realms.map((realm) => (
           <div
             onClick={() => (editing ? null : goToRealm(realm))}
