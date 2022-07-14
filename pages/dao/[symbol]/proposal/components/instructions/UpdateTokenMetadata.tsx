@@ -97,6 +97,7 @@ const UpdateTokenMetadata = ({
 
       <Input
         label="Name"
+        placeholder={'Token name'}
         value={form.name}
         type="text"
         onChange={(evt) =>
@@ -109,6 +110,7 @@ const UpdateTokenMetadata = ({
       />
       <Input
         label="Symbol"
+        placeholder={'Token symbol like "USDC"'}
         value={form.symbol}
         type="text"
         onChange={(evt) =>
@@ -121,6 +123,7 @@ const UpdateTokenMetadata = ({
       />
       <Input
         label="URI"
+        placeholder={'URI for Token metadata JSON'}
         value={form.uri}
         type="text"
         onChange={(evt) =>
