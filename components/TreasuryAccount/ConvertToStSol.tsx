@@ -172,7 +172,7 @@ const ConvertToStSol = () => {
 
   return (
     <>
-      <h3 className="mb-4 flex items-center">Convert SOL to stSol</h3>
+      <h3 className="mb-4 flex items-center">Convert SOL to stSOL</h3>
       <AccountLabel />
       <div className="space-y-4 w-full pb-4">
         {stSolTokenAccounts.length > 0 && (
