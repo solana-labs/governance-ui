@@ -30,6 +30,8 @@ import { AssetAccount } from '@utils/uiTypes/assets'
 import GovernedAccountSelect from '@components/inputs/GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { AccountType } from '@utils/uiTypes/assets'
+import Bundlr from '@bundlr-network/client'
+import { LAMPORTS_PER_SOL } from '@solana/web3.js'
 
 interface GovernanceConfigForm {
   mintAccount: AssetAccount | undefined
@@ -47,14 +49,12 @@ const MetadataCreationModal = ({
   isOpen: boolean
   governance: ProgramAccount<Governance>
 }) => {
-  console.log({ governance })
   const router = useRouter()
   const { realm, canChooseWhoVote, symbol, mint } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const mintGovernancesWithMintInfo = assetAccounts.filter((x) => {
     return x.type === AccountType.MINT
   })
-  console.log({ mintGovernancesWithMintInfo })
 
   // const check0 = {
   //   pubkey: mintGovernancesWithMintInfo[0].pubkey.toString(),
@@ -83,6 +83,7 @@ const MetadataCreationModal = ({
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [selectedImage, setSelectedImage] = useState<null | string>(null)
   const [imageFile, setImageFile] = useState<null | Buffer>(null)
+  const [imageUrl, setImageUrl] = useState<null | string>(null)
   const [form, setForm] = useState<GovernanceConfigForm>({
     mintAccount: undefined,
     name: '',
@@ -120,12 +121,38 @@ const MetadataCreationModal = ({
     let serializedInstruction = ''
     if (isValid && governance?.account && wallet?.publicKey && realm) {
       setCreatingProposal(true)
+      uploadImage()
 
       setCreatingProposal(false)
     }
   }
 
-  const uploadImage = () => {}
+  const uploadImage = async () => {
+    const bundlr = new Bundlr('http://node1.bundlr.network', 'solana', wallet)
+    if (imageFile == null) return
+    const price = await bundlr.utils.getPrice('solana', imageFile.length)
+    const amount = bundlr.utils.unitConverter(price)
+    const amountNum = amount.toNumber()
+
+    const loadedBalance = await bundlr.getLoadedBalance()
+    const balance = bundlr.utils.unitConverter(loadedBalance.toNumber())
+    const balanceNum = balance.toNumber()
+
+    if (balanceNum < amountNum) {
+      await bundlr.fund(LAMPORTS_PER_SOL)
+    }
+
+    const imageResult = await bundlr.uploader.upload(imageFile, [
+      { name: 'Content-Type', value: 'image/png' },
+    ])
+
+    const arweaveImageUrl = `https://arweave.net/${imageResult.data.id}?ext=png`
+
+    if (arweaveImageUrl) {
+      setImageUrl(arweaveImageUrl)
+    }
+  }
+  console.log(imageUrl)
   const createJson = () => {}
   const uploadJson = () => {}
 
@@ -200,7 +227,7 @@ const MetadataCreationModal = ({
         <Input
           label="Symbol"
           placeholder={'Token symbol like "USDC"'}
-          value={form?.name}
+          value={form?.symbol}
           type="text"
           error={formErrors['symbol']}
           onChange={(evt) =>
