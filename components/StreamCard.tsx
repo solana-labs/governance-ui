@@ -3,11 +3,10 @@ import { AccountMetaData } from '@solana/spl-governance'
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 
 import tokenService from '@utils/services/token'
-import VoteResultsBar from '@components/VoteResultsBar'
+
 import {
   StreamClient,
   Cluster,
-  getNumberFromBN,
   cancelStreamInstruction,
   Stream,
 } from '@streamflow/stream'

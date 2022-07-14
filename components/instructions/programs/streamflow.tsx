@@ -11,6 +11,60 @@ import {
   Stream,
 } from '@streamflow/stream'
 import Button from '@components/Button'
+import { PERIOD } from 'pages/dao/[symbol]/proposal/components/instructions/Streamflow/CreateStream'
+
+export const DEFAULT_DECIMAL_PLACES = 2
+
+export const formatAmount = (
+  amount: number,
+  decimals: number,
+  decimalPlaces?: number
+) => amount.toFixed(decimalPlaces || decimals)
+
+export const roundAmount = (
+  amount: number,
+  decimalPlaces = DEFAULT_DECIMAL_PLACES
+) => {
+  const tens = 10 ** decimalPlaces
+  return Math.round(amount * tens) / tens
+}
+
+const isMoreThanOne = (amount: number) => (amount > 1 ? 's' : '')
+
+export const formatPeriodOfTime = (period: number): string => {
+  if (!period) return '0 seconds'
+  const years = period / PERIOD.YEAR
+  if (Math.floor(years))
+    return `${years > 1 ? years : ''} year${isMoreThanOne(years)}`
+
+  const months = period / PERIOD.MONTH
+  if (Math.floor(months))
+    return `${
+      months > 1 ? formatAmount(months, 0, DEFAULT_DECIMAL_PLACES) : ''
+    } month${isMoreThanOne(months)}`
+
+  const weeks = period / PERIOD.WEEK
+  if (Math.floor(weeks))
+    return `${weeks > 1 ? weeks : ''} week${isMoreThanOne(weeks)}`
+
+  const days = period / PERIOD.DAY
+  if (Math.floor(days))
+    return `${days > 1 ? days : ''} day${isMoreThanOne(days)}`
+
+  const hours = period / PERIOD.HOUR
+  if (Math.floor(hours))
+    return `${hours > 1 ? hours : ''} hour${isMoreThanOne(hours)}`
+
+  const minutes = period / PERIOD.MINUTE
+  if (Math.floor(minutes))
+    return `${minutes > 1 ? minutes : ''} minute${isMoreThanOne(minutes)}`
+
+  const seconds = period / PERIOD.SECOND
+  if (Math.floor(seconds))
+    return `${seconds > 1 ? seconds : ''} second${isMoreThanOne(seconds)}`
+
+  return ''
+}
 
 function deserStream(
   data: Uint8Array,
@@ -35,7 +89,6 @@ function deserStream(
     }
   }
   // stream not yet initialized -> we deserialize from instruction data
-  console.log('YEAH HERE')
   const start = new BN(data.slice(8, 16), 'le').toNumber()
   const amountDeposited = getNumberFromBN(
     new BN(data.slice(16, 24), 'le'),
@@ -126,12 +179,9 @@ export const STREAMFLOW_INSTRUCTIONS = {
           const decimals = mintMetadata.decimals
           const streamData = deserStream(data, stream, decimals)
           let unlockedPercent = 0
-          const unlocked = stream.unlocked(
-            new Date().getTime() / 1000,
-            decimals
-          )
+          const withdrawn = getNumberFromBN(stream.withdrawnAmount, decimals)
           unlockedPercent = Math.round(
-            (unlocked / streamData.amountDeposited) * 100
+            (withdrawn / streamData.amountDeposited) * 100
           )
 
           return (
@@ -154,7 +204,10 @@ export const STREAMFLOW_INSTRUCTIONS = {
                 </div>
                 <div>
                   <span>Unlocked every:</span>
-                  <span> {streamData.releaseFrequency} seconds</span>
+                  <span>
+                    {' '}
+                    {formatPeriodOfTime(streamData.releaseFrequency)}
+                  </span>
                 </div>
                 <div>
                   <span>Release amount:</span>
@@ -174,7 +227,7 @@ export const STREAMFLOW_INSTRUCTIONS = {
                 <br></br>
                 {isExecuted && (
                   <div>
-                    <span>Unlocked:</span>
+                    <span>Unlocked: {unlockedPercent}%</span>
                     <VoteResultsBar
                       approveVotePercentage={unlockedPercent}
                       denyVotePercentage={0}
@@ -190,6 +243,24 @@ export const STREAMFLOW_INSTRUCTIONS = {
           return <></>
         }
       },
+    },
+    232: {
+      name: 'Streamflow: Cancel',
+      accounts: [
+        { name: 'Authority', important: true },
+        { name: 'Payer treasury', important: true },
+        { name: 'Token treasury' },
+        { name: 'Recipient' },
+        { name: 'Recipient Associated token account' },
+        { name: 'Contract metadata' },
+        { name: 'PDA Token account' },
+        { name: 'Streamflow treasury' },
+        { name: 'Streamflow treasury Associated token account' },
+        { name: 'Partner' },
+        { name: 'Partner treasury Associated token account' },
+        { name: 'Mint' },
+        { name: 'Token program' },
+      ],
     },
   },
 }

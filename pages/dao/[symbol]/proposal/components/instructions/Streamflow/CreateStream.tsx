@@ -34,6 +34,7 @@ import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { getMintMetadata } from '@components/instructions/programs/streamflow'
 import { createUncheckedStreamInstruction } from '@streamflow/stream'
+import Select from '@components/inputs/Select'
 
 const STREAMFLOW_TREASURY_PUBLIC_KEY = new PublicKey(
   '5SEpbdjFK5FxwTvfsGMXVQTD2v4M2c5tyRTxhdsPkgDw'
@@ -45,6 +46,26 @@ const WITHDRAWOR_PUBLIC_KEY = new PublicKey(
 
 export const STREAMFLOW_PROGRAM_ID =
   'DcAwL38mreGvUyykD2iitqcgu9hpFbtzxfaGpLi72kfY'
+
+export const PERIOD = {
+  SECOND: 1,
+  MINUTE: 60,
+  HOUR: 3600,
+  DAY: 24 * 3600,
+  WEEK: 7 * 24 * 3600,
+  MONTH: Math.floor(30.4167 * 24 * 3600), //30.4167 days
+  YEAR: 365 * 24 * 3600, // 365 days
+}
+
+const releaseFrequencyUnits = {
+  0: { idx: 0, display: 'seconds', value: PERIOD.SECOND },
+  1: { idx: 1, display: 'minutes', value: PERIOD.MINUTE },
+  2: { idx: 2, display: 'hours', value: PERIOD.HOUR },
+  3: { idx: 3, display: 'days', value: PERIOD.DAY },
+  4: { idx: 4, display: 'weeks', value: PERIOD.WEEK },
+  5: { idx: 5, display: 'months', value: PERIOD.MONTH },
+  6: { idx: 6, display: 'years', value: PERIOD.YEAR },
+}
 
 async function ata(mint: PublicKey, account: PublicKey) {
   return await Token.getAssociatedTokenAddress(
@@ -69,6 +90,7 @@ const CreateStream = ({
   const { assetAccounts } = useGovernanceAssets()
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = strmProgram
+  const [releaseUnitIdx, setReleaseUnitIdx] = useState<number>(0)
   const [form, setForm] = useState<CreateStreamForm>({
     recipient: '',
     start: '',
@@ -190,10 +212,12 @@ const CreateStream = ({
 
     const tokenAccount = form.tokenAccount.pubkey
 
+    const period =
+      form.releaseFrequency * releaseFrequencyUnits[releaseUnitIdx].value
     const createStreamData = {
       start: new u64(start),
       depositedAmount: new u64(form.depositedAmount * 10 ** decimals),
-      period: new u64(form.releaseFrequency),
+      period: new u64(period),
       cliff: new u64(start),
       cliffAmount: new u64(form.amountAtCliff * 10 ** decimals),
       amountPerPeriod: new u64(form.releaseAmount * 10 ** decimals),
@@ -242,13 +266,6 @@ const CreateStream = ({
   }
 
   useEffect(() => {
-    handleSetForm({
-      propertyName: 'programId',
-      value: programId?.toString(),
-    })
-  }, [programId])
-
-  useEffect(() => {
     handleSetInstructions(
       {
         governedAccount: form.governedAccount?.governance,
@@ -278,12 +295,6 @@ const CreateStream = ({
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
       />
-      <Input
-        label="Recipient"
-        value={form.recipient}
-        type="string"
-        onChange={setRecipient}
-      />
       <GovernedAccountSelect
         label="Token account"
         governedAccounts={assetAccounts}
@@ -294,6 +305,12 @@ const CreateStream = ({
         error={formErrors['tokenAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
+      />
+      <Input
+        label="Recipient"
+        value={form.recipient}
+        type="string"
+        onChange={setRecipient}
       />
       <Input
         label="Start"
@@ -313,6 +330,22 @@ const CreateStream = ({
         type="number"
         onChange={setReleaseFrequency}
       />
+      <Select
+        label={'Release unit'}
+        onChange={(unitIdx) => {
+          setReleaseUnitIdx(unitIdx)
+        }}
+        placeholder="Please select..."
+        value={releaseFrequencyUnits[releaseUnitIdx].display}
+      >
+        {Object.values(releaseFrequencyUnits).map((unit) => {
+          return (
+            <Select.Option key={unit.idx} value={unit.idx}>
+              {unit.display}
+            </Select.Option>
+          )
+        })}
+      </Select>
       <Input
         label="Release amount"
         value={form.releaseAmount}

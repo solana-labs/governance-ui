@@ -283,6 +283,7 @@ export enum Instructions {
   MangoChangeSpotMarket,
   MangoCreatePerpMarket,
   CreateStream,
+  CancelStream,
   Grant,
   Clawback,
   CreateAssociatedTokenAccount,
