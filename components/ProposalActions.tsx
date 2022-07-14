@@ -57,8 +57,9 @@ const ProposalActionsPanel = () => {
   }, [proposal, realmInfo, walletPk])
 
   const canSignOff =
-    (proposal?.account.tokenOwnerRecord.toBase58() ===
-      ownTokenRecord?.pubkey.toBase58() ||
+    (signatoryRecord ||
+      proposal?.account.tokenOwnerRecord.toBase58() ===
+        ownTokenRecord?.pubkey.toBase58() ||
       proposal?.account.tokenOwnerRecord.toBase58() ===
         ownCouncilTokenRecord?.pubkey.toBase58()) &&
     (proposal?.account.state === ProposalState.Draft ||
@@ -148,7 +149,12 @@ const ProposalActionsPanel = () => {
           connection.endpoint
         )
 
-        await signOffProposal(rpcContext, realmInfo.realmId, proposal)
+        await signOffProposal(
+          rpcContext,
+          realmInfo.realmId,
+          proposal,
+          signatoryRecord
+        )
 
         await refetchProposals()
       }
