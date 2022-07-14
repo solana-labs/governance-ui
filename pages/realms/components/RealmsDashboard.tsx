@@ -1,8 +1,9 @@
 import useQueryContext from '@hooks/useQueryContext'
 import { RealmInfo } from '@models/registry/api'
 import { useRouter } from 'next/router'
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import RealmsGrid from './RealmsGrid'
+import { BsLayoutWtf, BsCheck } from 'react-icons/bs'
 
 const RealmBox = ({ goToRealm, realm }) => {
   return (
@@ -42,6 +43,8 @@ export default function RealmsDashboard({
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
 
+  const [editingUnchartedRealms, setEditingUnchartedRealms] = useState(false)
+
   const goToRealm = (realmInfo: RealmInfo) => {
     const symbol =
       realmInfo.isCertified && realmInfo.symbol
@@ -75,7 +78,11 @@ export default function RealmsDashboard({
   ) : (
     <>
       {!isSearching ? (
-        <RealmsGrid realms={certifiedRealms} editing={editing} />
+        <RealmsGrid
+          realms={certifiedRealms}
+          editing={editing}
+          storageVariable={'certifiedRealms'}
+        />
       ) : (
         <>
           <div className="grid grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
@@ -96,22 +103,44 @@ export default function RealmsDashboard({
         </>
       )}
       <div className="pt-12">
-        <h2 className="mb-4">Unchartered DAOs</h2>
-        <div className="grid grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
-          {unchartedRealms?.length > 0 ? (
-            unchartedRealms.map((realm: RealmInfo) => (
-              <RealmBox
-                key={realm.realmId.toString()}
-                goToRealm={goToRealm}
-                realm={realm}
-              />
-            ))
-          ) : (
-            <div className="col-span-5 p-8 text-center rounded-lg bg-bkg-2">
-              <p>No results</p>
-            </div>
-          )}
+        <div className="flex items-center justify-between">
+          <h2 className="mb-4">Unchartered DAOs</h2>
+          <button
+            className="bg-bkg-2 default-transition flex items-center justify-center h-10 rounded-full w-10 hover:bg-bkg-3"
+            onClick={() => setEditingUnchartedRealms(!editingUnchartedRealms)}
+          >
+            {editingUnchartedRealms ? (
+              <BsCheck className="h-6 w-6 text-fgd-1" />
+            ) : (
+              <BsLayoutWtf className="h-4 text-fgd-1 w-4" />
+            )}
+          </button>
         </div>
+        {!isSearching ? (
+          <RealmsGrid
+            realms={unchartedRealms}
+            editing={editingUnchartedRealms}
+            storageVariable={'unchartedRealms'}
+          />
+        ) : (
+          <>
+            <div className="grid grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
+              {unchartedRealms?.length > 0 ? (
+                unchartedRealms.map((realm: RealmInfo) => (
+                  <RealmBox
+                    key={realm.realmId.toString()}
+                    goToRealm={goToRealm}
+                    realm={realm}
+                  />
+                ))
+              ) : (
+                <div className="col-span-5 p-8 text-center rounded-lg bg-bkg-2">
+                  <p>No results</p>
+                </div>
+              )}
+            </div>
+          </>
+        )}
       </div>
     </>
   )

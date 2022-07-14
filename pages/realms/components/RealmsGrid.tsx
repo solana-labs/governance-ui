@@ -7,16 +7,16 @@ import { useRouter } from 'next/router'
 import useQueryContext from '@hooks/useQueryContext'
 import { RealmInfo } from '@models/registry/api'
 
-const SAVED_LAYOUTS = 'realmsGrid'
-
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
 export default function RealmsGrid({
   realms,
   editing,
+  storageVariable,
 }: {
   realms: readonly RealmInfo[]
   editing: boolean
+  storageVariable: string
 }) {
   const columns = { lg: 10, md: 10, sm: 4, xs: 4, xxs: 4 }
   const breakpoints = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }
@@ -33,14 +33,14 @@ export default function RealmsGrid({
   const { theme } = useTheme()
 
   useEffect(() => {
-    const savedGrid = localStorage.getItem(SAVED_LAYOUTS)
+    const savedGrid = localStorage.getItem(storageVariable)
     if (savedGrid) {
       if (
         !JSON.parse(savedGrid)['lg'].find(
           (item) => item.i == realms[0].realmId.toString()
         )
       ) {
-        localStorage.removeItem(SAVED_LAYOUTS)
+        localStorage.removeItem(storageVariable)
       }
     }
     setLayouts({
@@ -65,7 +65,7 @@ export default function RealmsGrid({
     let currX = 0
     let savedGrid
     if (typeof window !== 'undefined') {
-      savedGrid = localStorage.getItem(SAVED_LAYOUTS)
+      savedGrid = localStorage.getItem(storageVariable)
     }
     return (
       realms &&
@@ -77,7 +77,7 @@ export default function RealmsGrid({
           )
         }
         if (!obj) {
-          localStorage.removeItem(SAVED_LAYOUTS)
+          localStorage.removeItem(storageVariable)
           obj = {
             i: realm.realmId.toString(),
             x: currX,
@@ -94,7 +94,7 @@ export default function RealmsGrid({
 
   const updateLayouts = (currentLayout, allLayouts) => {
     setLayouts(allLayouts)
-    localStorage.setItem(SAVED_LAYOUTS, JSON.stringify(allLayouts))
+    localStorage.setItem(storageVariable, JSON.stringify(allLayouts))
   }
 
   return (
