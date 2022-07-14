@@ -23,7 +23,7 @@ const ProposalActionsPanel = () => {
   const { governance, proposal, proposalOwner } = useWalletStore(
     (s) => s.selectedProposal
   )
-  const { realmInfo } = useRealm()
+  const { realmInfo, ownTokenRecord, ownCouncilTokenRecord } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
@@ -57,7 +57,10 @@ const ProposalActionsPanel = () => {
   }, [proposal, realmInfo, walletPk])
 
   const canSignOff =
-    signatoryRecord &&
+    (proposal?.account.tokenOwnerRecord.toBase58() ===
+      ownTokenRecord?.pubkey.toBase58() ||
+      proposal?.account.tokenOwnerRecord.toBase58() ===
+        ownCouncilTokenRecord?.pubkey.toBase58()) &&
     (proposal?.account.state === ProposalState.Draft ||
       proposal?.account.state === ProposalState.SigningOff)
 
@@ -145,12 +148,7 @@ const ProposalActionsPanel = () => {
           connection.endpoint
         )
 
-        await signOffProposal(
-          rpcContext,
-          realmInfo.realmId,
-          proposal,
-          proposal.account.tokenOwnerRecord
-        )
+        await signOffProposal(rpcContext, realmInfo.realmId, proposal)
 
         await refetchProposals()
       }

@@ -17,8 +17,7 @@ import { withSignOffProposal } from '@solana/spl-governance'
 export const signOffProposal = async (
   { connection, wallet, programId }: RpcContext,
   realmPk: PublicKey,
-  proposal: ProgramAccount<Proposal>,
-  tokenOwnerRecord: PublicKey
+  proposal: ProgramAccount<Proposal>
 ) => {
   const instructions: TransactionInstruction[] = []
   const signers: Keypair[] = []
@@ -39,7 +38,7 @@ export const signOffProposal = async (
     proposal.pubkey,
     wallet.publicKey!,
     undefined,
-    tokenOwnerRecord
+    proposal.account.tokenOwnerRecord
   )
 
   const transaction = new Transaction()
