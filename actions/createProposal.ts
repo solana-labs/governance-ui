@@ -240,7 +240,7 @@ export const createProposal = async (
     const signerChunks = Array(insertChunks.length)
     signerChunks.push(...chunks(signers, chunkBy))
     signerChunks.fill([])
-    console.log(insertChunks)
+
     console.log(`Creating proposal using ${insertChunks.length} chunks`)
     await sendTransactionsV2({
       wallet,
