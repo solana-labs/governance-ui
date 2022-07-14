@@ -9,6 +9,7 @@ import {
   getTimestampFromDays,
   parseMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
+import { U64_MAX } from '@marinade.finance/marinade-ts-sdk/dist/src/util'
 
 export interface GovernanceConfigValues {
   minTokensToCreateProposal: number | string
@@ -30,11 +31,14 @@ export function parseMinTokensToCreate(
 }
 
 export function getGovernanceConfig(values: GovernanceConfigValues) {
-  const minTokensToCreateProposal = parseMinTokensToCreate(
-    values.minTokensToCreateProposal,
-    values.mintDecimals
+  const minTokensToCreateProposal = new BN(values.minTokensToCreateProposal).eq(
+    U64_MAX
   )
-
+    ? values.minTokensToCreateProposal
+    : parseMinTokensToCreate(
+        values.minTokensToCreateProposal,
+        values.mintDecimals
+      )
   return new GovernanceConfig({
     voteThresholdPercentage: new VoteThresholdPercentage({
       value: values.voteThresholdPercentage,

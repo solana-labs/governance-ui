@@ -1,3 +1,4 @@
+import { U64_MAX } from '@marinade.finance/marinade-ts-sdk/dist/src/util'
 import {
   AccountMetaData,
   getGovernance,
@@ -47,21 +48,25 @@ export const GOVERNANCE_INSTRUCTIONS = {
         const councilMint = realm.account.config.councilMint
           ? await tryGetMint(connection, realm.account.config.councilMint)
           : undefined
-
+        const isMaxNumber =
+          args.config.minCommunityTokensToCreateProposal.toString() ===
+          U64_MAX.toString()
         return (
           <>
             <p>
               {`voteThresholdPercentage:
               ${args.config.voteThresholdPercentage.value.toLocaleString()}%`}
             </p>
-            <p>
-              {`minCommunityTokensToCreateProposal:
+            {!isMaxNumber && (
+              <p>
+                {`minCommunityTokensToCreateProposal:
               ${fmtMintAmount(
                 communityMint?.account,
                 args.config.minCommunityTokensToCreateProposal
-              )}`}{' '}
-              ({args.config.minCommunityTokensToCreateProposal.toNumber()})
-            </p>
+              )}`}
+                ({args.config.minCommunityTokensToCreateProposal.toNumber()})
+              </p>
+            )}
             <p>
               {`minCouncilTokensToCreateProposal:
               ${fmtMintAmount(
