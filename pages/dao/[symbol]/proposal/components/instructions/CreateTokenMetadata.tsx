@@ -57,7 +57,7 @@ const CreateTokenMetadata = ({
     setForm({ ...form, [propertyName]: value })
   }
 
-  async function getInstruction(): Promise<UiInstruction> {
+  function getInstruction(): Promise<UiInstruction> {
     return getCreateTokenMetadataInstruction({
       schema,
       form,

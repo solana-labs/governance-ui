@@ -50,7 +50,7 @@ const UpdateTokenMetadata = ({
     setForm({ ...form, [propertyName]: value })
   }
 
-  async function getInstruction(): Promise<UiInstruction> {
+  function getInstruction(): Promise<UiInstruction> {
     return getUpdateTokenMetadataInstruction({
       schema,
       form,
