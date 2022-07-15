@@ -40,9 +40,13 @@ function NFTSelector(
   const connection = useWalletStore((s) => s.connection)
   const [isLoading, setIsLoading] = useState(false)
   const handleSelectNft = (nft: NFTWithMint) => {
-    const isSelected = selectedNfts.find((x) => x.mint === nft.mint)
+    const isSelected = selectedNfts.find(
+      (x) => x.mintAddress === nft.mintAddress
+    )
     if (isSelected) {
-      setSelectedNfts([...selectedNfts.filter((x) => x.mint !== nft.mint)])
+      setSelectedNfts([
+        ...selectedNfts.filter((x) => x.mintAddress !== nft.mintAddress),
+      ])
     } else {
       //For now only one nft at the time
       setSelectedNfts([nft])

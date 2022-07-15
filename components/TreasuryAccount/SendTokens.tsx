@@ -130,7 +130,7 @@ const SendTokens = ({ isNft = false }) => {
   }
 
   async function getInstruction(): Promise<UiInstruction> {
-    const selectedNftMint = selectedNfts[0]?.mint
+    const selectedNftMint = selectedNfts[0]?.mintAddress
     const defaultProps = {
       schema,
       form,
@@ -230,7 +230,7 @@ const SendTokens = ({ isNft = false }) => {
 
   const schema = getTokenTransferSchema({ form, connection, nftMode: isNft })
   const transactionDolarAmount = calcTransactionDolarAmount(form.amount)
-  const nftName = selectedNfts[0]?.val?.name
+  const nftName = selectedNfts[0]?.name
   const nftTitle = `Send ${nftName ? nftName : 'NFT'} to ${
     tryParseKey(form.destinationAccount)
       ? abbreviateAddress(new PublicKey(form.destinationAccount))
