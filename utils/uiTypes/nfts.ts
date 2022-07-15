@@ -9,19 +9,20 @@ interface NFTProperties {
   category: string
   files: NFTFiles[]
 }
-export interface NFTData {
+
+interface NFTCreator {
+  verified: boolean
+}
+
+interface NFTCollectionProperties {
+  mintAddress: string
+  creators: NFTCreator
+}
+export interface NFTWithMint {
   image: string
   name: string
   description: string
   properties: NFTProperties
-  collection: {
-    family: string
-    name: string
-  }
-}
-export interface NFTWithMint {
-  val: NFTData
-  mint: string
-  tokenAddress: string
-  token: TokenProgramAccount<AccountInfo>
+  collection: NFTCollectionProperties
+  mintAddress: string
 }

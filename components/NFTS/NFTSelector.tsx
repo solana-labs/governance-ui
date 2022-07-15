@@ -93,7 +93,7 @@ function NFTSelector(
               {nfts.map((x) => (
                 <div
                   onClick={() => (selectable ? handleSelectNft(x) : null)}
-                  key={x.mint}
+                  key={x.mintAddress}
                   className={`bg-bkg-2 flex items-center justify-center cursor-pointer default-transition rounded-lg border border-transparent ${
                     selectable ? 'hover:border-primary-dark' : ''
                   } relative overflow-hidden`}
@@ -103,11 +103,11 @@ function NFTSelector(
                   }}
                 >
                   {selectedNfts.find(
-                    (selectedNfts) => selectedNfts.mint === x.mint
+                    (selectedNfts) => selectedNfts.mintAddress === x.mintAddress
                   ) && (
                     <CheckCircleIcon className="w-10 h-10 absolute text-green z-10"></CheckCircleIcon>
                   )}
-                  <ImgWithLoader style={{ width: '150px' }} src={x.val.image} />
+                  <ImgWithLoader style={{ width: '150px' }} src={x.image} />
                 </div>
               ))}
             </div>

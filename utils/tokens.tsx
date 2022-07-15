@@ -27,6 +27,7 @@ import { abbreviateAddress } from './formatting'
 import BigNumber from 'bignumber.js'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { I80F48 } from '@blockworks-foundation/mango-client'
+import { NFTWithMeta } from './uiTypes/VotePlugin'
 
 export type TokenAccount = AccountInfo
 export type MintAccount = MintInfo
@@ -370,37 +371,62 @@ export const deserializeMint = (data: Buffer) => {
   return mintInfo as MintInfo
 }
 
-export const getNfts = async (connection: Connection, ownerPk: PublicKey) => {
-  try {
-    const nfts = await getParsedNftAccountsByOwner({
-      publicAddress: ownerPk.toBase58(),
-      connection: connection,
-    })
-    const tokenAccounts = await getOwnedTokenAccounts(connection, ownerPk)
-    const data = Object.keys(nfts).map((key) => nfts[key])
-    const arr: NFTWithMint[] = []
-    for (let i = 0; i < data.length; i++) {
-      try {
-        const val = (await axios.get(data[i].data.uri)).data
-        const tokenAccount = tokenAccounts.find((x) => {
-          return (
-            x.account.mint.toBase58() === data[i].mint &&
-            x.account.amount.cmpn(0) === 1
-          )
-        })
-        if (tokenAccount) {
-          arr.push({
-            val,
-            mint: data[i].mint,
-            tokenAddress: tokenAccount.publicKey.toBase58(),
-            token: tokenAccount,
-          })
+// creators: (5) [{…}, {…}, {…}, {…}, {…}]
+// name: "Terrarium Tank"
+// sellerFeeBasisPoints: 500
+// symbol: "STNK"
+// uri: "https://d1b6hed00dtfsr.cloudfront.net/tank/4Dt9sfqfUckUbR5vgYiPzDoGUxbGqYp4T5iKZySnesSC.json"
+// [[Prototype]]: Object
+// editionNonce: null
+// isMutable: 1
+// key: 4
+// mint: "Ddxp1xG4szBE8snwVDaREtE61tn2M9TJniAyz6VKLVUr"
+// primarySaleHappened: 1
+// updateAuthority: "37M6hd5KQpYuRJfWPGi75Jp7MzFrnuvfRVXc2K2FBaRQ"
+const fetchNftsFromHolaplexIndexer = async (owner: PublicKey) => {
+  const result = await fetch('https://graph.holaplex.com/v1', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      query: `
+        query nfts($owners: [PublicKey!]) {
+            nfts(
+              owners: $owners,
+               limit: 10000, offset: 0) {
+              name
+              mintAddress
+              address
+              image
+              updateAuthorityAddress
+              collection {
+                mintAddress
+              }
+          
+            }
+          
         }
-      } catch (e) {
-        console.log(e)
-      }
-    }
-    return arr
+      `,
+      variables: {
+        owners: [owner.toBase58()],
+      },
+    }),
+  })
+
+  let body = await result.json()
+  console.log({ body })
+  return body.data
+}
+
+export const getNfts = async (
+  connection: Connection,
+  ownerPk: PublicKey
+): Promise<NFTWithMeta[]> => {
+  try {
+    const data = await fetchNftsFromHolaplexIndexer(ownerPk)
+    console.log('here are the nfts', data.nfts)
+    return data.nfts
   } catch (error) {
     notify({
       type: 'error',
