@@ -7,7 +7,7 @@ import {
   SYSTEM_PROGRAM_ID,
 } from '@solana/spl-governance'
 import { validateInstruction } from '@utils/instructionTools'
-import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
+import { NameValue, UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from '@hooks/useRealm'
@@ -26,8 +26,8 @@ import { getRegistrarPDA } from '@utils/plugin/accounts'
 
 interface CreateGatewayRegistrarForm {
   governedAccount: AssetAccount | undefined
-  gatekeeperNetwork: PublicKey // populated by dropdown
-  otherGatekeeperNetwork: PublicKey | undefined // manual entry
+  gatekeeperNetwork: NameValue // populated by dropdown
+  otherGatekeeperNetwork: NameValue | undefined // manual entry
   predecessor: PublicKey | undefined // if part of a chain of plugins
 }
 
@@ -48,7 +48,10 @@ const CreateGatewayPluginRegistrar = ({
   const { handleSetInstructions } = useContext(NewProposalContext)
 
   const chosenGatekeeperNetwork = useMemo(() => {
-    return form?.otherGatekeeperNetwork || form?.gatekeeperNetwork
+    const chosenEntry = form?.otherGatekeeperNetwork || form?.gatekeeperNetwork
+    if (chosenEntry) {
+      return new PublicKey(chosenEntry.value)
+    }
   }, [form])
 
   async function getInstruction(): Promise<UiInstruction> {
@@ -133,23 +136,23 @@ const CreateGatewayPluginRegistrar = ({
       ),
       options: [
         {
-          key: 'Bot Resistance',
+          name: 'Bot Resistance',
           value: 'ignREusXmGrscGNUesoU9mxfds9AiYTezUKex2PsZV6',
         },
         {
-          key: 'Uniqueness',
+          name: 'Uniqueness',
           value: 'uniqobk8oGh4XBLMqM68K8M2zNu3CdYX7q5go7whQiv',
         },
         {
-          key: 'ID Verification',
+          name: 'ID Verification',
           value: 'bni1ewus6aMxTxBi5SAfzEmmXLf8KcVFRmTfproJuKw',
         },
         {
-          key: 'ID Verification for DeFi',
+          name: 'ID Verification for DeFi',
           value: 'gatbGF9DvLAw3kWyn1EmH5Nh1Sqp8sTukF7yaQpSc71',
         },
         {
-          key: 'Other',
+          name: 'Other',
           value: '',
         },
       ],
@@ -160,7 +163,7 @@ const CreateGatewayPluginRegistrar = ({
       inputType: 'text',
       name: 'otherGatekeeperNetwork',
       type: InstructionInputType.INPUT,
-      hide: () => form?.gatekeeperNetwork?.toString() !== '', // Other selected
+      hide: () => form?.gatekeeperNetwork?.value.toString() !== '', // Other selected
     },
     {
       label: 'Predecessor plugin (optional)',

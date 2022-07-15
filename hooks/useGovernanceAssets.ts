@@ -203,7 +203,7 @@ export default function useGovernanceAssets() {
     },
     {
       id: Instructions.ConfigureGatewayPlugin,
-      name: 'Civic: Configure Gateway plugin',
+      name: 'Civic: Configure existing Gateway plugin',
       isVisible: canUseAuthorityInstruction,
     },
     {
