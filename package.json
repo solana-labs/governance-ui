@@ -54,7 +54,7 @@
     "@project-serum/sol-wallet-adapter": "^0.2.6",
     "@sentry/nextjs": "^6.19.7",
     "@solana/buffer-layout": "^4.0.0",
-    "@solana/governance-program-library": "^0.16.7",
+    "@solana/governance-program-library": "npm:@civic/governance-program-library@0.16.9-beta.2",
     "@solana/spl-governance": "^0.0.34",
     "@solana/spl-token": "0.1.8",
     "@solana/spl-token-registry": "^0.2.3775",
@@ -131,7 +131,6 @@
     }
   },
   "resolutions": {
-    "port-sdk/@saberhq/token-utils": "1.12.53",
-    "@project-serum/anchor": "0.25.0"
+    "port-sdk/@saberhq/token-utils": "1.12.53"
   }
 }

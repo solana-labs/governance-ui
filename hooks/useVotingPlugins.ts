@@ -326,12 +326,14 @@ export function useVotingPlugins() {
     )
   }
   useEffect(() => {
-    handleSetVsrClient(wallet, connection)
-    handleSetNftClient(wallet, connection)
-    handleSetSwitchboardClient(wallet, connection)
-    handleSetGatewayClient(wallet, connection)
-    handleSetPythClient(wallet, connection)
-  }, [connection.endpoint])
+    if (wallet) {
+      handleSetVsrClient(wallet, connection)
+      handleSetNftClient(wallet, connection)
+      handleSetSwitchboardClient(wallet, connection)
+      handleSetGatewayClient(wallet, connection)
+      handleSetPythClient(wallet, connection)
+    }
+  }, [connection.endpoint, wallet])
 
   useEffect(() => {
     const handleVsrPlugin = () => {
