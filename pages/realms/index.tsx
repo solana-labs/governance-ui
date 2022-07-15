@@ -128,9 +128,9 @@ const Realms = () => {
       </div>
       <RealmsDashboard
         realms={filteredRealms}
-        isSearching={searchString.length > 0}
         isLoading={isLoadingRealms}
         editing={editingGrid}
+        clearSearch={() => filterDaos('')}
       ></RealmsDashboard>
     </div>
   )

@@ -31,14 +31,14 @@ const RealmBox = ({ goToRealm, realm }) => {
 
 export default function RealmsDashboard({
   realms,
-  isSearching,
   isLoading,
   editing,
+  clearSearch,
 }: {
   realms: readonly RealmInfo[]
-  isSearching: boolean
   isLoading: boolean
   editing: boolean
+  clearSearch: () => void
 }) {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
@@ -77,70 +77,29 @@ export default function RealmsDashboard({
     </div>
   ) : (
     <>
-      {!isSearching ? (
-        <RealmsGrid
-          realms={certifiedRealms}
-          editing={editing}
-          storageVariable={'certifiedRealms'}
-        />
-      ) : (
-        <>
-          <div className="grid grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
-            {certifiedRealms?.length > 0 ? (
-              certifiedRealms.map((realm: RealmInfo) => (
-                <RealmBox
-                  key={realm.realmId.toString()}
-                  goToRealm={goToRealm}
-                  realm={realm}
-                />
-              ))
-            ) : (
-              <div className="col-span-5 p-8 text-center rounded-lg bg-bkg-2">
-                <p>No results</p>
-              </div>
-            )}
-          </div>
-        </>
-      )}
+      <RealmsGrid
+        realms={certifiedRealms}
+        editing={editing}
+        storageVariable={'certifiedRealms'}
+        clearSearch={clearSearch}
+      />
       <div className="pt-12">
-        <div className="flex items-center justify-between">
-          <h2 className="mb-4">Unchartered DAOs</h2>
-          <button
-            className="bg-bkg-2 default-transition flex items-center justify-center h-10 rounded-full w-10 hover:bg-bkg-3"
-            onClick={() => setEditingUnchartedRealms(!editingUnchartedRealms)}
-          >
-            {editingUnchartedRealms ? (
-              <BsCheck className="h-6 w-6 text-fgd-1" />
-            ) : (
-              <BsLayoutWtf className="h-4 text-fgd-1 w-4" />
-            )}
-          </button>
-        </div>
-        {!isSearching ? (
-          <RealmsGrid
-            realms={unchartedRealms}
-            editing={editingUnchartedRealms}
-            storageVariable={'unchartedRealms'}
-          />
-        ) : (
-          <>
-            <div className="grid grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
-              {unchartedRealms?.length > 0 ? (
-                unchartedRealms.map((realm: RealmInfo) => (
-                  <RealmBox
-                    key={realm.realmId.toString()}
-                    goToRealm={goToRealm}
-                    realm={realm}
-                  />
-                ))
-              ) : (
-                <div className="col-span-5 p-8 text-center rounded-lg bg-bkg-2">
-                  <p>No results</p>
-                </div>
-              )}
+        <h2 className="mb-4">Unchartered DAOs</h2>
+        <div className="grid grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
+          {unchartedRealms?.length > 0 ? (
+            unchartedRealms.map((realm: RealmInfo) => (
+              <RealmBox
+                key={realm.realmId.toString()}
+                goToRealm={goToRealm}
+                realm={realm}
+              />
+            ))
+          ) : (
+            <div className="col-span-5 p-8 text-center rounded-lg bg-bkg-2">
+              <p>No results</p>
             </div>
-          </>
-        )}
+          )}
+        </div>
       </div>
     </>
   )
