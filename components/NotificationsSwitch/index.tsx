@@ -239,7 +239,7 @@ export default function NotificationsSwitch() {
             publicKey={REALMS_PUBLIC_KEY}
             theme={theme === 'Dark' ? 'dark' : 'light'}
             variables={themeVariables}
-            wallet={(wallet as unknown) as WalletType}
+            wallet={wallet as unknown as WalletType}
           />
         )}
         {modalState === ModalStates.Notifi && (

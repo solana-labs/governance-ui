@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
-import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
+import { deprecated } from '@metaplex-foundation/mpl-token-metadata'
 import axios from 'axios'
 
 import { updateUserInput, validateSolAddress } from '@utils/formValidation'
@@ -60,9 +60,16 @@ async function enrichItemInfo(item, uri) {
 }
 
 async function enrichCollectionInfo(connection, collectionKey) {
-  const {
-    data: { data: collectionData },
-  } = await Metadata.findByMint(connection, collectionKey)
+  const tempData = await deprecated.Metadata.findByMint(
+    connection,
+    collectionKey
+  )
+
+  const collectionData = tempData.data?.data
+
+  if (!collectionData) {
+    return
+  }
 
   return enrichItemInfo(
     {
@@ -74,7 +81,13 @@ async function enrichCollectionInfo(connection, collectionKey) {
 }
 
 async function getNFTCollectionInfo(connection, collectionKey) {
-  const { data: result } = await Metadata.findByMint(connection, collectionKey)
+  const { data: result } = await deprecated.Metadata.findByMint(
+    connection,
+    collectionKey
+  )
+  if (!result) {
+    return
+  }
   console.log('NFT findByMint result', result)
   if (result?.collection?.verified && result.collection?.key) {
     // here we were given a child of the collection (hence the "collection" property is present)
@@ -87,7 +100,7 @@ async function getNFTCollectionInfo(connection, collectionKey) {
     return collectionInfo
   } else {
     // assume we've been given the collection address already, so we need to go find it's children
-    const children = await Metadata.findMany(connection, {
+    const children = await deprecated.Metadata.findMany(connection, {
       updateAuthority: result.updateAuthority,
     })
 
@@ -229,10 +242,8 @@ export default function AddNFTCollectionForm({
 
   const [collectionsInWallet, setCollectionsInWallet] = useState({})
 
-  const [
-    selectedNFTCollection,
-    setSelectedNFTCollection,
-  ] = useState<NFTCollection>()
+  const [selectedNFTCollection, setSelectedNFTCollection] =
+    useState<NFTCollection>()
 
   const schema = yup.object(AddNFTCollectionSchema).required()
   const {
@@ -337,7 +348,7 @@ export default function AddNFTCollectionForm({
         throw new Error('No valid wallet connected')
       }
 
-      const ownedNfts = await Metadata.findDataByOwner(
+      const ownedNfts = await deprecated.Metadata.findDataByOwner(
         connection.current,
         wallet.publicKey
       )

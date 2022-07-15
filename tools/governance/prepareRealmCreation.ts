@@ -113,9 +113,8 @@ export async function prepareRealmCreation({
   // If we're using an existing community mint check if we can create a governance for it
   // 1) The mint must have mintAuthority
   // 2) The current wallet must be the authority
-  let createCommunityMintGovernance = communityMintAccount?.account.mintAuthority?.equals(
-    walletPk
-  )
+  let createCommunityMintGovernance =
+    communityMintAccount?.account.mintAuthority?.equals(walletPk)
 
   console.log('Prepare realm - community mint address', existingCommunityMintPk)
   console.log('Prepare realm - community mint account', communityMintAccount)

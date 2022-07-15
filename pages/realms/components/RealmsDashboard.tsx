@@ -24,13 +24,15 @@ export default function RealmsDashboard({
     router.push(url)
   }
 
-  const certifiedRealms = useMemo(() => realms?.filter((r) => r.isCertified), [
-    realms,
-  ])
+  const certifiedRealms = useMemo(
+    () => realms?.filter((r) => r.isCertified),
+    [realms]
+  )
 
-  const unchartedRealms = useMemo(() => realms?.filter((r) => !r.isCertified), [
-    realms,
-  ])
+  const unchartedRealms = useMemo(
+    () => realms?.filter((r) => !r.isCertified),
+    [realms]
+  )
 
   return isLoading ? (
     <div className="grid grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">

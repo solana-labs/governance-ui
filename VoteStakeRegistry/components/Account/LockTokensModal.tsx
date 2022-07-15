@@ -124,9 +124,8 @@ const LockTokensModal = ({
   console.log(setAllowClawback)
   const [lockupPeriod, setLockupPeriod] = useState<Period>(lockupPeriods[0])
   const [amount, setAmount] = useState<number | undefined>()
-  const [lockMoreThenDeposited, setLockMoreThenDeposited] = useState<string>(
-    YES
-  )
+  const [lockMoreThenDeposited, setLockMoreThenDeposited] =
+    useState<string>(YES)
   const [lockupType, setLockupType] = useState<LockupKind>(lockupTypes[0])
   const [
     vestingPeriod,
@@ -221,9 +220,8 @@ const LockTokensModal = ({
     )
     const totalAmountInDeposit =
       depositRecord?.amountDepositedNative || new BN(0)
-    const whatWillBeLeftInsideDeposit = totalAmountInDeposit.sub(
-      totalAmountToLock
-    )
+    const whatWillBeLeftInsideDeposit =
+      totalAmountInDeposit.sub(totalAmountToLock)
     const amountFromDeposit = whatWillBeLeftInsideDeposit.isNeg()
       ? totalAmountInDeposit
       : totalAmountToLock
@@ -283,9 +281,8 @@ const LockTokensModal = ({
 
     const totalAmountInDeposit = depositToUnlock.currentlyLocked
 
-    const whatWillBeLeftInsideDeposit = totalAmountInDeposit.sub(
-      totalAmountToUnlock
-    )
+    const whatWillBeLeftInsideDeposit =
+      totalAmountInDeposit.sub(totalAmountToUnlock)
 
     await voteRegistryStartUnlock({
       rpcContext,

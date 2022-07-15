@@ -45,12 +45,10 @@ const WithdrawObligationCollateralAndRedeemReserveLiquidity = ({
 
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [
-    form,
-    setForm,
-  ] = useState<WithdrawObligationCollateralAndRedeemReserveLiquidityForm>({
-    uiAmount: '0',
-  })
+  const [form, setForm] =
+    useState<WithdrawObligationCollateralAndRedeemReserveLiquidityForm>({
+      uiAmount: '0',
+    })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
 

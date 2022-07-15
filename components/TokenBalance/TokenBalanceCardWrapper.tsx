@@ -27,12 +27,8 @@ const TokenBalanceCardWrapper = ({
 }: {
   proposal?: Option<Proposal>
 }) => {
-  const {
-    ownTokenRecord,
-    config,
-    ownCouncilTokenRecord,
-    councilTokenAccount,
-  } = useRealm()
+  const { ownTokenRecord, config, ownCouncilTokenRecord, councilTokenAccount } =
+    useRealm()
   const currentPluginPk = config?.account?.communityVoterWeightAddin
   const getTokenBalanceCard = () => {
     //based on realm config it will provide proper tokenBalanceCardComponent

@@ -100,7 +100,7 @@ const MakeChangePerpMarket = ({
         form.mngoPerPeriod
           ? new BN(
               Math.round(
-                ((form.mngoPerPeriod as any) as number) * Math.pow(10, 6)
+                (form.mngoPerPeriod as any as number) * Math.pow(10, 6)
               )
             )
           : undefined,
@@ -141,13 +141,13 @@ const MakeChangePerpMarket = ({
 
   const recommendedLmSizeShift =
     form.maxDepthBps &&
-    Math.floor(Math.log2((form.maxDepthBps as any) as number) - 3)
+    Math.floor(Math.log2(form.maxDepthBps as any as number) - 3)
 
   const recommendedMaintLeverage =
-    form.initLeverage && ((form.initLeverage as any) as number) * 2
+    form.initLeverage && (form.initLeverage as any as number) * 2
 
   const recommendedLiquidationFee =
-    form.initLeverage && 1 / (((form.initLeverage as any) as number) * 4)
+    form.initLeverage && 1 / ((form.initLeverage as any as number) * 4)
 
   return (
     <>

@@ -43,9 +43,8 @@ const EverlendModalContent = ({
         owner,
         new PublicKey(proposedInvestment.poolMint)
       )
-      const tokenMintATABalance = await connection.current.getTokenAccountBalance(
-        tokenMintATA
-      )
+      const tokenMintATABalance =
+        await connection.current.getTokenAccountBalance(tokenMintATA)
       setDepositedAmount(Number(tokenMintATABalance.value.uiAmount))
     }
     loadMaxAmount()

@@ -86,14 +86,15 @@ export const prepareSolDepositTx = async (
   tx.add(transferLamportsIx)
 
   if (!userWSOLAccountInfo) {
-    const createUserWSOLAccountIx = Token.createAssociatedTokenAccountInstruction(
-      ASSOCIATED_TOKEN_PROGRAM_ID,
-      TOKEN_PROGRAM_ID,
-      NATIVE_MINT,
-      source,
-      payerPublicKey,
-      payerPublicKey
-    )
+    const createUserWSOLAccountIx =
+      Token.createAssociatedTokenAccountInstruction(
+        ASSOCIATED_TOKEN_PROGRAM_ID,
+        TOKEN_PROGRAM_ID,
+        NATIVE_MINT,
+        source,
+        payerPublicKey,
+        payerPublicKey
+      )
     tx.add(createUserWSOLAccountIx)
   } else {
     const syncIx = syncNative(source)

@@ -111,9 +111,11 @@ export async function createWrappedNativeAccount(
 }
 
 function getGovernedAccountPk(acc: AssetAccount): PublicKey {
-  return (acc.isSol
-    ? acc.extensions.transferAddress
-    : acc.extensions?.token?.account?.owner) as PublicKey
+  return (
+    acc.isSol
+      ? acc.extensions.transferAddress
+      : acc.extensions?.token?.account?.owner
+  ) as PublicKey
 }
 
 export async function getGoblinGoldDepositInstruction({
@@ -154,7 +156,7 @@ export async function getGoblinGoldDepositInstruction({
 
     const sdk = new GoblinGold({
       connection: connection.current,
-      wallet: (wallet as unknown) as Wallet,
+      wallet: wallet as unknown as Wallet,
       user: governedAccountPk,
     })
 
@@ -284,7 +286,7 @@ export async function getGoblinGoldWithdrawInstruction({
 
     const sdk = new GoblinGold({
       connection: connection.current,
-      wallet: (wallet as unknown) as Wallet,
+      wallet: wallet as unknown as Wallet,
       user: governedAccountPk,
     })
 
@@ -320,17 +322,15 @@ export async function getGoblinGoldWithdrawInstruction({
       true
     )
 
-    const createVaultIxsIxs = await strategyProgram.createVaultUserTicketAccount(
-      {
+    const createVaultIxsIxs =
+      await strategyProgram.createVaultUserTicketAccount({
         userSigner: wallet.publicKey,
         userTicketAccountOwner: governedAccountPk,
-      }
-    )
+      })
 
     if (createVaultIxsIxs != null)
-      prerequisiteInstructions = prerequisiteInstructions.concat(
-        createVaultIxsIxs
-      )
+      prerequisiteInstructions =
+        prerequisiteInstructions.concat(createVaultIxsIxs)
 
     const withdrawIxs = await strategyProgram.getOpenWithdrawTicketIx({
       userLpTokenAccount: ataLpAddress,

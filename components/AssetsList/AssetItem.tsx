@@ -28,9 +28,8 @@ const AssetItem = ({
   const [slot, setSlot] = useState(0)
   const [openUpgradeModal, setOpenUpgradeModal] = useState(false)
   const [openCloseBuffersModal, setOpenCloseBuffersModal] = useState(false)
-  const [openTransferAuthorityModal, setOpenTransferAuthorityModal] = useState(
-    false
-  )
+  const [openTransferAuthorityModal, setOpenTransferAuthorityModal] =
+    useState(false)
   const [loadData, setLoadData] = useState(false)
   const connection = useWalletStore((s) => s.connection)
   const name = item ? getProgramName(item.account.governedAccount) : ''

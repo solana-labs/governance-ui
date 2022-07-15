@@ -19,7 +19,8 @@
       "@hooks/*": ["hooks/*"],
       "@tools/*": ["tools/*"],
       "@models/*": ["models/*"],
-      "@utils/*": ["utils/*"]
+      "@utils/*": ["utils/*"],
+      "@pages/*": ["pages/*"]
     },
     "incremental": true,
     "isolatedModules": true

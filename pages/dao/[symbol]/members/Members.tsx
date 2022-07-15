@@ -26,10 +26,8 @@ const Members = () => {
   const membersPerPage = 10
   const activeMembers = useMembersStore((s) => s.compact.activeMembers)
   const connected = useWalletStore((s) => s.connected)
-  const {
-    canUseMintInstruction,
-    canMintRealmCouncilToken,
-  } = useGovernanceAssets()
+  const { canUseMintInstruction, canMintRealmCouncilToken } =
+    useGovernanceAssets()
   const [paginatedMembers, setPaginatedMembers] = useState<Member[]>([])
   const [activeMember, setActiveMember] = useState<Member>(activeMembers[0])
   const [openAddMemberModal, setOpenAddMemberModal] = useState(false)

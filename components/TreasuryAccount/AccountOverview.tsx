@@ -57,10 +57,8 @@ type InvestmentType = TreasuryStrategy & {
 const AccountOverview = () => {
   const router = useRouter()
   const { ownTokenRecord, ownCouncilTokenRecord } = useRealm()
-  const {
-    governedTokenAccounts,
-    auxiliaryTokenAccounts,
-  } = useGovernanceAssets()
+  const { governedTokenAccounts, auxiliaryTokenAccounts } =
+    useGovernanceAssets()
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const nftsPerPubkey = useTreasuryAccountStore((s) => s.governanceNfts)
   const nftsCount =
@@ -92,15 +90,11 @@ const AccountOverview = () => {
     InvestmentType[]
   >([])
   const [showStrategies, setShowStrategies] = useState(false)
-  const [
-    proposedInvestment,
-    setProposedInvestment,
-  ] = useState<InvestmentType | null>(null)
+  const [proposedInvestment, setProposedInvestment] =
+    useState<InvestmentType | null>(null)
   const [isCopied, setIsCopied] = useState<boolean>(false)
-  const [
-    tradeSerumInfo,
-    setTradeSerumInfo,
-  ] = useState<TradeOnSerumProps | null>(null)
+  const [tradeSerumInfo, setTradeSerumInfo] =
+    useState<TradeOnSerumProps | null>(null)
   const strategyMint = currentAccount?.isSol
     ? WSOL_MINT
     : currentAccount?.extensions.token?.account.mint.toString()
@@ -198,9 +192,8 @@ const AccountOverview = () => {
           (everlendStrategy as TreasuryStrategy & { poolMint: string }).poolMint
         )
       )
-      const tokenMintATABalance = await connection.current.getTokenAccountBalance(
-        tokenMintATA
-      )
+      const tokenMintATABalance =
+        await connection.current.getTokenAccountBalance(tokenMintATA)
 
       return [
         {

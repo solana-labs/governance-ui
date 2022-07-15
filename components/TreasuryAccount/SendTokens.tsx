@@ -85,10 +85,8 @@ const SendTokens = ({
   const [selectedNfts, setSelectedNfts] = useState<NFTWithMint[]>([])
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [showOptions, setShowOptions] = useState(false)
-  const [
-    destinationAccount,
-    setDestinationAccount,
-  ] = useState<TokenProgramAccount<AccountInfo> | null>(null)
+  const [destinationAccount, setDestinationAccount] =
+    useState<TokenProgramAccount<AccountInfo> | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
   const destinationAccountName =

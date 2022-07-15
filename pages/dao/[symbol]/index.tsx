@@ -297,9 +297,8 @@ const REALM = () => {
 
     try {
       setIsMultiVoting(true)
-      const {
-        blockhash: recentBlockhash,
-      } = await connection.getLatestBlockhash()
+      const { blockhash: recentBlockhash } =
+        await connection.getLatestBlockhash()
 
       const transactions: Transaction[] = []
       for (let i = 0; i < selectedProposals.length; i++) {

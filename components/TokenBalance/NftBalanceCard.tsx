@@ -43,7 +43,9 @@ const NftBalanceCard = () => {
       wallet!.publicKey!,
       client.client!.program.programId
     )
-    const createVoterWeightRecordIx = await (client.client as NftVoterClient).program.methods
+    const createVoterWeightRecordIx = await (
+      client.client as NftVoterClient
+    ).program.methods
       .createVoterWeightRecord(wallet!.publicKey!)
       .accounts({
         voterWeightRecord: voterWeightPk,

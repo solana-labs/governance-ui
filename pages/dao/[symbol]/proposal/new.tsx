@@ -82,6 +82,8 @@ import GoblinGoldWithdraw from './components/instructions/GoblinGold/GoblinGoldW
 import MakeSetMarketMode from './components/instructions/Mango/MakeSetMarketMode'
 import CreateGatewayPluginRegistrar from './components/instructions/GatewayPlugin/CreateRegistrar'
 import MakeChangeQuoteParams from './components/instructions/Mango/MakeChangeQuoteParams'
+import CreateTokenMetadata from './components/instructions/CreateTokenMetadata'
+import UpdateTokenMetadata from './components/instructions/UpdateTokenMetadata'
 import TypeaheadSelect from '@components/TypeaheadSelect'
 import { StyledLabel } from '@components/inputs/styles'
 import classNames from 'classnames'
@@ -101,9 +103,8 @@ const defaultGovernanceCtx: InstructionsContext = {
   governance: null,
   setGovernance: () => null,
 }
-export const NewProposalContext = createContext<InstructionsContext>(
-  defaultGovernanceCtx
-)
+export const NewProposalContext =
+  createContext<InstructionsContext>(defaultGovernanceCtx)
 
 // Takes the first encountered governance account
 function extractGovernanceAccountFromInstructionsData(
@@ -129,10 +130,8 @@ const New = () => {
     description: '',
   })
   const [formErrors, setFormErrors] = useState({})
-  const [
-    governance,
-    setGovernance,
-  ] = useState<ProgramAccount<Governance> | null>(null)
+  const [governance, setGovernance] =
+    useState<ProgramAccount<Governance> | null>(null)
   const [isLoadingSignedProposal, setIsLoadingSignedProposal] = useState(false)
   const [isLoadingDraft, setIsLoadingDraft] = useState(false)
   const isLoading = isLoadingSignedProposal || isLoadingDraft
@@ -312,9 +311,8 @@ const New = () => {
   }, [instructionsData[0]?.governedAccount?.pubkey])
 
   useEffect(() => {
-    const governedAccount = extractGovernanceAccountFromInstructionsData(
-      instructionsData
-    )
+    const governedAccount =
+      extractGovernanceAccountFromInstructionsData(instructionsData)
 
     setGovernance(governedAccount)
   }, [instructionsData])
@@ -579,6 +577,10 @@ const New = () => {
             governance={governance}
           ></CreateVsrRegistrar>
         )
+      case Instructions.CreateTokenMetadata:
+        return <CreateTokenMetadata index={idx} governance={governance} />
+      case Instructions.UpdateTokenMetadata:
+        return <UpdateTokenMetadata index={idx} governance={governance} />
       default:
         null
     }
@@ -668,9 +670,8 @@ const New = () => {
             >
               <h2>Transactions</h2>
               {instructionsData.map((instruction, idx) => {
-                const availableInstructionsForIdx = getAvailableInstructionsForIndex(
-                  idx
-                )
+                const availableInstructionsForIdx =
+                  getAvailableInstructionsForIndex(idx)
                 return (
                   <div
                     key={idx}

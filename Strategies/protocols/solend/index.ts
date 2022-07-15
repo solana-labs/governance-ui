@@ -352,8 +352,8 @@ async function handleSolendAction(
       data: getInstructionDataFromBase64(
         serializeInstructionToBase64(createAtaInst)
       ),
-      holdUpTime: matchedTreasury.governance!.account!.config
-        .minInstructionHoldUpTime,
+      holdUpTime:
+        matchedTreasury.governance!.account!.config.minInstructionHoldUpTime,
       prerequisiteInstructions: [],
       chunkSplitByDefault: true,
     }
@@ -386,8 +386,8 @@ async function handleSolendAction(
       data: getInstructionDataFromBase64(
         serializeInstructionToBase64(transferLamportsIx)
       ),
-      holdUpTime: matchedTreasury.governance!.account!.config
-        .minInstructionHoldUpTime,
+      holdUpTime:
+        matchedTreasury.governance!.account!.config.minInstructionHoldUpTime,
       prerequisiteInstructions: [],
       chunkSplitByDefault: true,
     }
@@ -406,8 +406,8 @@ async function handleSolendAction(
       data: getInstructionDataFromBase64(
         serializeInstructionToBase64(closeWSOLAccountIx)
       ),
-      holdUpTime: matchedTreasury.governance!.account!.config
-        .minInstructionHoldUpTime,
+      holdUpTime:
+        matchedTreasury.governance!.account!.config.minInstructionHoldUpTime,
       prerequisiteInstructions: [],
       chunkSplitByDefault: true,
     }
@@ -418,8 +418,8 @@ async function handleSolendAction(
         data: getInstructionDataFromBase64(
           serializeInstructionToBase64(syncIx)
         ),
-        holdUpTime: matchedTreasury.governance!.account!.config
-          .minInstructionHoldUpTime,
+        holdUpTime:
+          matchedTreasury.governance!.account!.config.minInstructionHoldUpTime,
         prerequisiteInstructions: [],
         chunkSplitByDefault: true,
       }
@@ -429,20 +429,21 @@ async function handleSolendAction(
         cleanupInsts.push(closeWSOLInst)
       }
     } else {
-      const createUserWSOLAccountIx = Token.createAssociatedTokenAccountInstruction(
-        ASSOCIATED_TOKEN_PROGRAM_ID,
-        TOKEN_PROGRAM_ID,
-        NATIVE_MINT,
-        liquidityATA,
-        owner,
-        owner
-      )
+      const createUserWSOLAccountIx =
+        Token.createAssociatedTokenAccountInstruction(
+          ASSOCIATED_TOKEN_PROGRAM_ID,
+          TOKEN_PROGRAM_ID,
+          NATIVE_MINT,
+          liquidityATA,
+          owner,
+          owner
+        )
       const createUserWSOLAccountInst = {
         data: getInstructionDataFromBase64(
           serializeInstructionToBase64(createUserWSOLAccountIx)
         ),
-        holdUpTime: matchedTreasury.governance!.account!.config
-          .minInstructionHoldUpTime,
+        holdUpTime:
+          matchedTreasury.governance!.account!.config.minInstructionHoldUpTime,
         prerequisiteInstructions: [],
         chunkSplitByDefault: true,
       }
@@ -480,8 +481,8 @@ async function handleSolendAction(
 
   const depositSolendInsObj = {
     data: getInstructionDataFromBase64(serializeInstructionToBase64(actionIx)),
-    holdUpTime: matchedTreasury.governance!.account!.config
-      .minInstructionHoldUpTime,
+    holdUpTime:
+      matchedTreasury.governance!.account!.config.minInstructionHoldUpTime,
     prerequisiteInstructions: [],
     chunkSplitByDefault: true,
   }

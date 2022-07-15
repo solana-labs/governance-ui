@@ -94,7 +94,7 @@ export default function BasicDetailsForm({
                     : 'e.g. Realms DAO'
                 }
                 data-testid="dao-name-input"
-                error={errors.name?.message || ''}
+                error={errors.name?.message?.toString() || ''}
                 {...field}
               />
             </FormField>
@@ -114,7 +114,7 @@ export default function BasicDetailsForm({
                 <Input
                   placeholder={`e.g. ${DEFAULT_GOVERNANCE_PROGRAM_ID}`}
                   data-testid="programId-input"
-                  error={errors.programId?.message || ''}
+                  error={errors.programId?.message?.toString() || ''}
                   autoComplete="on"
                   {...field}
                 />

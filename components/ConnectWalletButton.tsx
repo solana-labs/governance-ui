@@ -43,9 +43,10 @@ const ConnectWalletButton = (props) => {
     connection,
     set: setWalletStore,
   } = useWalletStore((s) => s)
-  const provider = useMemo(() => getWalletProviderByUrl(providerUrl), [
-    providerUrl,
-  ])
+  const provider = useMemo(
+    () => getWalletProviderByUrl(providerUrl),
+    [providerUrl]
+  )
 
   useEffect(() => {
     if (connection.cluster !== currentCluster) {

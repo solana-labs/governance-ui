@@ -57,14 +57,8 @@ const EverlendDeposit = ({
   const [isDepositing, setIsDepositing] = useState(false)
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
-  const {
-    realmInfo,
-    realm,
-    mint,
-    councilMint,
-    ownVoterWeight,
-    symbol,
-  } = useRealm()
+  const { realmInfo, realm, mint, councilMint, ownVoterWeight, symbol } =
+    useRealm()
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient

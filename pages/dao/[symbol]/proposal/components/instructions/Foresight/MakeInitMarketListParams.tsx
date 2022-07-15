@@ -13,16 +13,12 @@ const MakeInitMarketListParams = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const {
-    inputProps,
-    effector,
-    governedAccountSelect,
-    wallet,
-  } = commonAssets<ForesightHasMarketListId>(
-    { marketListId: '' },
-    index,
-    governance
-  )
+  const { inputProps, effector, governedAccountSelect, wallet } =
+    commonAssets<ForesightHasMarketListId>(
+      { marketListId: '' },
+      index,
+      governance
+    )
   async function ixCreator(form: ForesightHasMarketListId) {
     const { ix } = await foresightGov.genInitMarketListIx(
       Buffer.from(form.marketListId.padEnd(20)),

@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from '@hooks/useRealm'
 import { getNfts } from '@utils/tokens'
-import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
+import { deprecated } from '@metaplex-foundation/mpl-token-metadata'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import useSwitchboardPluginStore from 'SwitchboardVotePlugin/store/switchboardStore'
@@ -63,21 +63,12 @@ export function useVotingPlugins() {
     handleSetPythClient,
     handleSetCurrentRealmVotingClient,
   } = useVotePluginsClientStore()
-  const {
-    setVotingNfts,
-    setMaxVoterWeight,
-    setIsLoadingNfts,
-  } = useNftPluginStore()
-  const {
-    setIsLoadingGatewayToken,
-    setGatekeeperNetwork,
-  } = useGatewayPluginStore()
-  const {
-    setIsLoading,
-    setVotingPower,
-    setOracleKeys,
-    setInstructions,
-  } = useSwitchboardPluginStore()
+  const { setVotingNfts, setMaxVoterWeight, setIsLoadingNfts } =
+    useNftPluginStore()
+  const { setIsLoadingGatewayToken, setGatekeeperNetwork } =
+    useGatewayPluginStore()
+  const { setIsLoading, setVotingPower, setOracleKeys, setInstructions } =
+    useSwitchboardPluginStore()
 
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
@@ -112,7 +103,10 @@ export function useVotingPlugins() {
         await Promise.all(
           nfts.map((x) => getIsFromCollection(x.mint, x.tokenAddress))
         )
-      ).filter((x) => x) as { metadata: Metadata; tokenAddress: PublicKey }[]
+      ).filter((x) => x) as {
+        metadata: deprecated.Metadata
+        tokenAddress: PublicKey
+      }[]
       const nftsWithMeta = votingNfts.map((x) => {
         const nft = nfts.find(
           (nft) => nft.tokenAddress === x.tokenAddress.toBase58()
@@ -143,7 +137,7 @@ export function useVotingPlugins() {
       const options = anchor.AnchorProvider.defaultOptions()
       const provider = new anchor.AnchorProvider(
         connection.current,
-        (wallet as unknown) as anchor.Wallet,
+        wallet as unknown as anchor.Wallet,
         options
       )
 
@@ -172,7 +166,8 @@ export function useVotingPlugins() {
         provider
       )
 
-      const allOracles = await switchboardProgram.account.oracleAccountData.all()
+      const allOracles =
+        await switchboardProgram.account.oracleAccountData.all()
       const oData = allOracles.map(({ publicKey, account }) => {
         return {
           oracleData: account as any,
@@ -197,9 +192,8 @@ export function useVotingPlugins() {
         const addinStateData = await addinProgram.account.state.fetch(
           addinState
         )
-        const queue = await switchboardProgram.account.oracleQueueAccountData.fetch(
-          queuePk
-        )
+        const queue =
+          await switchboardProgram.account.oracleQueueAccountData.fetch(queuePk)
         const queueAuthority = queue.authority as PublicKey
         const grantAuthority = addinStateData.grantAuthority as PublicKey
         try {
@@ -238,12 +232,11 @@ export function useVotingPlugins() {
       setInstructions(setVoterWeightInstructions, currentClient)
 
       try {
-        const [
-          voterWeightRecord,
-        ] = anchor.utils.publicKey.findProgramAddressSync(
-          [Buffer.from('VoterWeightRecord'), myNodesForRealm[0].toBytes()],
-          SWITCHBOARD_ADDIN_ID
-        )
+        const [voterWeightRecord] =
+          anchor.utils.publicKey.findProgramAddressSync(
+            [Buffer.from('VoterWeightRecord'), myNodesForRealm[0].toBytes()],
+            SWITCHBOARD_ADDIN_ID
+          )
 
         try {
           const vwr = await getVoterWeightRecord(
@@ -310,16 +303,19 @@ export function useVotingPlugins() {
     }
   }
   const getIsFromCollection = async (mint: string, tokenAddress: string) => {
-    const metadataAccount = await Metadata.getPDA(mint)
-    const metadata = await Metadata.load(connection.current, metadataAccount)
+    const metadataAccount = await deprecated.Metadata.getPDA(mint)
+    const metadata = await deprecated.Metadata.load(
+      connection.current,
+      metadataAccount
+    )
     return (
       !!(
-        metadata.data.collection?.key &&
+        metadata?.data?.collection?.key &&
         usedCollectionsPks.includes(metadata.data.collection?.key) &&
         metadata.data.collection.verified
       ) && {
         tokenAddress: new PublicKey(tokenAddress),
-        metadata: metadata as Metadata,
+        metadata: metadata as deprecated.Metadata,
       }
     )
   }

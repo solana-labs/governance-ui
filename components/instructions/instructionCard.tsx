@@ -21,7 +21,7 @@ import { ExecuteInstructionButton, PlayState } from './ExecuteInstructionButton'
 import { ProgramAccount } from '@solana/spl-governance'
 import InspectorButton from '@components/explorer/inspectorButton'
 import { FlagInstructionErrorButton } from './FlagInstructionErrorButton'
-import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
+import { deprecated } from '@metaplex-foundation/mpl-token-metadata'
 import axios from 'axios'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import tokenService from '@utils/services/token'
@@ -39,10 +39,8 @@ export default function InstructionCard({
   proposal: ProgramAccount<Proposal>
   proposalInstruction: ProgramAccount<ProposalTransaction>
 }) {
-  const {
-    nftsGovernedTokenAccounts,
-    governedTokenAccountsWithoutNfts,
-  } = useGovernanceAssets()
+  const { nftsGovernedTokenAccounts, governedTokenAccountsWithoutNfts } =
+    useGovernanceAssets()
   const connection = useWalletStore((s) => s.connection)
   const tokenRecords = useWalletStore((s) => s.selectedRealm)
   const [descriptor, setDescriptor] = useState<InstructionDescriptor>()
@@ -68,8 +66,8 @@ export default function InstructionCard({
       proposalInstruction.account.getSingleInstruction()
     ).then((d) => setDescriptor(d))
     const getAmountImg = async () => {
-      const sourcePk = proposalInstruction.account.getSingleInstruction()
-        .accounts[0].pubkey
+      const sourcePk =
+        proposalInstruction.account.getSingleInstruction().accounts[0].pubkey
       const tokenAccount = await tryGetTokenAccount(
         connection.current,
         sourcePk
@@ -88,13 +86,15 @@ export default function InstructionCard({
         const mint = tokenAccount?.account.mint
         if (mint) {
           try {
-            const metadataPDA = await Metadata.getPDA(mint)
-            const tokenMetadata = await Metadata.load(
+            const metadataPDA = await deprecated.Metadata.getPDA(mint)
+            const tokenMetadata = await deprecated.Metadata.load(
               connection.current,
               metadataPDA
             )
-            const url = (await axios.get(tokenMetadata.data.data.uri)).data
-            setNftImgUrl(url.image)
+            if (tokenMetadata.data?.data.uri) {
+              const url = (await axios.get(tokenMetadata.data.data.uri)).data
+              setNftImgUrl(url.image)
+            }
           } catch (e) {
             console.log(e)
           }

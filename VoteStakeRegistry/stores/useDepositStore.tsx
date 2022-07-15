@@ -58,18 +58,15 @@ const useDepositStore = create<DepositStore>((set, _get) => ({
       s.state.isLoading = true
     })
 
-    const {
-      votingPower,
-      deposits,
-      votingPowerFromDeposits,
-    } = await getDeposits({
-      isUsed,
-      realmPk,
-      walletPk,
-      communityMintPk,
-      client,
-      connection,
-    })
+    const { votingPower, deposits, votingPowerFromDeposits } =
+      await getDeposits({
+        isUsed,
+        realmPk,
+        walletPk,
+        communityMintPk,
+        client,
+        connection,
+      })
 
     set((s) => {
       s.state.votingPower = votingPower

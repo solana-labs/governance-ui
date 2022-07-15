@@ -46,14 +46,8 @@ const EverlendWithdraw = ({
   })
   const [formErrors, setFormErrors] = useState({})
 
-  const {
-    realmInfo,
-    realm,
-    mint,
-    councilMint,
-    ownVoterWeight,
-    symbol,
-  } = useRealm()
+  const { realmInfo, realm, mint, councilMint, ownVoterWeight, symbol } =
+    useRealm()
   const { canUseTransferInstruction } = useGovernanceAssets()
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const client = useVotePluginsClientStore(
