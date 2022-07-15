@@ -5,7 +5,7 @@ import {
   Clusters,
 } from '@castlefinance/vault-core'
 import { VaultClient } from '@castlefinance/vault-sdk'
-import * as anchor from '@project-serum/anchor'
+import { Provider } from '@castlefinance/vault-sdk/node_modules/@project-serum/anchor'
 import { AnchorWallet } from '@friktion-labs/friktion-sdk/dist/cjs/src/miscUtils'
 import {
   serializeInstructionToBase64,
@@ -303,7 +303,7 @@ const getCastleVaultClientFromForm = async (
   form: CastleDepositForm | CastleWithdrawForm
 ) => {
   // Create a new provider
-  const provider = new anchor.AnchorProvider(
+  const provider = new Provider(
     connection.current,
     (wallet as unknown) as AnchorWallet,
     {
@@ -350,7 +350,7 @@ const getCastleVaultClientFromProposal = async (
   instruction: ProgramAccount<ProposalTransaction>
 ) => {
   // Create a new provider
-  const provider = new anchor.AnchorProvider(
+  const provider = new Provider(
     connection,
     (wallet as unknown) as AnchorWallet,
     {
