@@ -131,6 +131,7 @@
     }
   },
   "resolutions": {
-    "port-sdk/@saberhq/token-utils": "1.12.53"
+    "port-sdk/@saberhq/token-utils": "1.12.53",
+    "@project-serum/anchor": "0.25.0"
   }
 }

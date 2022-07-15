@@ -1,5 +1,5 @@
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
-import { BN, EventParser } from '@project-serum/anchor'
+import { BN, Coder, EventParser } from '@project-serum/anchor'
 import {
   ProgramAccount,
   Realm,
@@ -217,7 +217,10 @@ const getDepositsAdditionalInfoEvents = async (
   //anchor dont allow to switch wallets inside existing client
   //parse events response as anchor do
   const events: any[] = []
-  const parser = new EventParser(client.program.programId, client.program.coder)
+  const parser = new EventParser(
+    client.program.programId,
+    client.program.coder as Coder
+  )
   const maxRange = 8
   const maxIndex = Math.max(...usedDeposits.map((x) => x.index)) + 1
   const numberOfSimulations = Math.ceil(maxIndex / maxRange)
@@ -234,9 +237,9 @@ const getDepositsAdditionalInfoEvents = async (
       transaction,
       'recent'
     )
-    parser.parseLogs(batchOfDeposits.value.logs!, (event) => {
+    for (const event of parser.parseLogs(batchOfDeposits.value.logs!)) {
       events.push(event)
-    })
+    }
   }
   return events
 }
