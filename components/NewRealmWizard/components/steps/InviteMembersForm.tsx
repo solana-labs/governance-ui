@@ -324,7 +324,7 @@ export default function InviteMembersForm({
             data-testid="dao-member-list-input"
             disabled={lacksMintAuthority}
             ref={inputElement}
-            error={error}
+            error={error.toString() || ''}
             warning={
               lacksMintAuthority
                 ? 'You do not own the mint authority for this token, therefore you cannot invite members to your DAO. Anyone who owns the token is able to join your DAO as a council member.'

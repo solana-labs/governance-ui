@@ -4,7 +4,7 @@ import {
   PendingDepositWithKey,
   VoltSDK,
 } from '@friktion-labs/friktion-sdk'
-import { AnchorWallet } from '@friktion-labs/friktion-sdk/dist/cjs/src/miscUtils'
+import { Wallet as AnchorWallet } from '@project-serum/anchor'
 import { WSOL_MINT } from '@components/instructions/tools'
 import Decimal from 'decimal.js'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
