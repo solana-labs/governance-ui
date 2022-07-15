@@ -213,27 +213,28 @@ const WithdrawModal = ({
 
     setIsLoading(true)
     const proposalInstructions: InstructionDataWithHoldUpTime[] = []
-    for (const i in selectedMangoAccount.spotOpenOrders.filter(
-      (x) => x.toBase58() !== emptyPk
-    )) {
-      const closeOpenOrders = makeCloseSpotOpenOrdersInstruction(
-        market.client!.programId,
-        group.publicKey,
-        selectedMangoAccount.publicKey,
-        selectedMangoAccount.owner,
-        group.dexProgramId,
-        selectedMangoAccount.spotOpenOrders[i],
-        group.spotMarkets[i].spotMarket,
-        group.signerKey
-      )
-      const closeInstruction: InstructionDataWithHoldUpTime = {
-        data: getInstructionDataFromBase64(
-          serializeInstructionToBase64(closeOpenOrders)
-        ),
-        holdUpTime: governance!.account!.config.minInstructionHoldUpTime,
-        prerequisiteInstructions: [],
+    for (const i in selectedMangoAccount.spotOpenOrders) {
+      if (selectedMangoAccount.spotOpenOrders[i].toBase58() !== emptyPk) {
+        const closeOpenOrders = makeCloseSpotOpenOrdersInstruction(
+          market.client!.programId,
+          group.publicKey,
+          selectedMangoAccount.publicKey,
+          selectedMangoAccount.owner,
+          group.dexProgramId,
+          selectedMangoAccount.spotOpenOrders[i],
+          group.spotMarkets[i].spotMarket,
+          group.signerKey,
+          true
+        )
+        const closeInstruction: InstructionDataWithHoldUpTime = {
+          data: getInstructionDataFromBase64(
+            serializeInstructionToBase64(closeOpenOrders)
+          ),
+          holdUpTime: governance!.account!.config.minInstructionHoldUpTime,
+          prerequisiteInstructions: [],
+        }
+        proposalInstructions.push(closeInstruction)
       }
-      proposalInstructions.push(closeInstruction)
     }
 
     const instruction = makeWithdraw2Instruction(

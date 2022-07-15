@@ -89,6 +89,7 @@ import classNames from 'classnames'
 import MakeRemoveSpotMarket from './components/instructions/Mango/MakeRemoveSpotMarket'
 import MakeRemovePerpMarket from './components/instructions/Mango/MakeRemovePerpMarket'
 import MakeSwapSpotMarket from './components/instructions/Mango/MakeSwapSpotMarket'
+import MakeRemoveOracle from './components/instructions/Mango/MakeRemoveOracle'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -509,6 +510,13 @@ const New = () => {
             index={idx}
             governance={governance}
           ></MakeSwapSpotMarket>
+        )
+      case Instructions.MangoRemoveOracle:
+        return (
+          <MakeRemoveOracle
+            index={idx}
+            governance={governance}
+          ></MakeRemoveOracle>
         )
       case Instructions.ForesightInitMarket:
         return (

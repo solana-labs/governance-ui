@@ -8,7 +8,6 @@ import {
 import {
   getGovernanceProgramVersion,
   getInstructionDataFromBase64,
-  getSignatoryRecordAddress,
   Governance,
   ProgramAccount,
   Realm,
@@ -16,7 +15,6 @@ import {
   VoteType,
   withCreateProposal,
 } from '@solana/spl-governance'
-import { withAddSignatory } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { withInsertTransaction } from '@solana/spl-governance'
 import { InstructionData } from '@solana/spl-governance'
@@ -133,24 +131,6 @@ export const createProposal = async (
     plugin?.voterWeightPk
   )
 
-  await withAddSignatory(
-    instructions,
-    programId,
-    programVersion,
-    proposalAddress,
-    tokenOwnerRecord.pubkey,
-    governanceAuthority,
-    signatory,
-    payer
-  )
-
-  // TODO: Return signatoryRecordAddress from the SDK call
-  const signatoryRecordAddress = await getSignatoryRecordAddress(
-    programId,
-    proposalAddress,
-    signatory
-  )
-
   const insertInstructions: TransactionInstruction[] = []
   const splitToChunkByDefault = instructionsData.filter(
     (x) => x.chunkSplitByDefault
@@ -199,8 +179,8 @@ export const createProposal = async (
       governance,
       proposalAddress,
       signatory,
-      signatoryRecordAddress,
-      undefined
+      undefined,
+      tokenOwnerRecord.pubkey
     )
   }
 
@@ -257,7 +237,9 @@ export const createProposal = async (
     })
   } else {
     const insertChunks = chunks(insertInstructions, chunkBy)
-    const signerChunks = Array(insertChunks.length).fill([])
+    const signerChunks = Array(insertChunks.length)
+    signerChunks.push(...chunks(signers, chunkBy))
+    signerChunks.fill([])
 
     console.log(`Creating proposal using ${insertChunks.length} chunks`)
     await sendTransactionsV2({

@@ -1,6 +1,10 @@
 import Button, { LinkButton } from '@components/Button'
 import { getExplorerUrl } from '@components/explorer/tools'
-import { getAccountName, WSOL_MINT } from '@components/instructions/tools'
+import {
+  getAccountName,
+  WSOL_MINT,
+  WSOL_MINT_PK,
+} from '@components/instructions/tools'
 import Modal from '@components/Modal'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
@@ -106,7 +110,6 @@ const AccountOverview = () => {
   const visibleAccounts = accountInvestments.filter(
     (strat) => strat.handledMint === strategyMint
   )
-
   useEffect(() => {
     const getSlndCTokens = async () => {
       const accounts = [
@@ -162,13 +165,14 @@ const AccountOverview = () => {
     }
 
     const handleGetMangoAccounts = async () => {
-      const currentAccountMint = currentAccount?.extensions.token?.account.mint
+      const currentAccountMint = currentAccount?.isSol
+        ? WSOL_MINT_PK
+        : currentAccount?.extensions.token?.account.mint
       const currentPositions = calculateAllDepositsInMangoAccountsForMint(
         mngoAccounts,
         currentAccountMint!,
         market
       )
-
       if (currentPositions > 0) {
         return strategies
           .map((invest) => ({
@@ -177,7 +181,6 @@ const AccountOverview = () => {
           }))
           .filter((x) => x.protocolName === MANGO)
       }
-
       return []
     }
 
@@ -222,15 +225,18 @@ const AccountOverview = () => {
         requests.push(handleEverlendAccounts())
       }
 
-      const results = await Promise.all(requests)
+      const results = (await Promise.allSettled(requests))
+        .filter((x) => x.status === 'fulfilled')
+        //@ts-ignore
+        .map((x) => x.value)
+
       setLoading(false)
 
       setAccountInvestments(results.flatMap((x) => x))
     }
 
     loadData()
-  }, [currentAccount, mngoAccounts])
-
+  }, [currentAccount, mngoAccounts, visibleInvestments.length])
   useEffect(() => {
     const getMangoAcccounts = async () => {
       const accounts = await tryGetMangoAccountsForOwner(
@@ -495,7 +501,6 @@ const AccountOverview = () => {
           )}
         </div>
       )}
-
       <h3 className="mb-4">Recent Activity</h3>
       <div>
         {isLoadingRecentActivity ? (
