@@ -1,10 +1,8 @@
 import useQueryContext from '@hooks/useQueryContext'
 import { RealmInfo } from '@models/registry/api'
 import { useRouter } from 'next/router'
-import React, { useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import RealmsGrid from './RealmsGrid'
-import { BsLayoutWtf, BsCheck } from 'react-icons/bs'
-
 const RealmBox = ({ goToRealm, realm }) => {
   return (
     <div
@@ -42,8 +40,6 @@ export default function RealmsDashboard({
 }) {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
-
-  const [editingUnchartedRealms, setEditingUnchartedRealms] = useState(false)
 
   const goToRealm = (realmInfo: RealmInfo) => {
     const symbol =
