@@ -6,9 +6,8 @@ type PhoneData = {
 }
 
 export const splitPhoneNumber = (phoneNumber: string): PhoneData => {
-  const { country: countryCode, nationalNumber: baseNumber } = parsePhoneNumber(
-    phoneNumber
-  )
+  const { country: countryCode, nationalNumber: baseNumber } =
+    parsePhoneNumber(phoneNumber)
   if (!countryCode || !baseNumber) {
     throw new Error('No country or phone found')
   }

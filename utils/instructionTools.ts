@@ -454,7 +454,7 @@ export async function getConvertToMsolInstruction({
         connection.current,
         mSolMint,
         TOKEN_PROGRAM_ID,
-        (null as unknown) as Keypair
+        null as unknown as Keypair
       )
 
       const destinationAccountInfo = await mSolToken.getAccountInfo(
@@ -463,15 +463,13 @@ export async function getConvertToMsolInstruction({
       destinationAccountOwner = destinationAccountInfo.owner
     } else {
       destinationAccountOwner = originAccount
-      const {
-        currentAddress: destinationAccount,
-        needToCreateAta,
-      } = await getATA({
-        connection: connection,
-        receiverAddress: originAccount,
-        mintPK: mSolMint,
-        wallet,
-      })
+      const { currentAddress: destinationAccount, needToCreateAta } =
+        await getATA({
+          connection: connection,
+          receiverAddress: originAccount,
+          mintPK: mSolMint,
+          wallet,
+        })
       if (needToCreateAta && wallet?.publicKey) {
         prerequisiteInstructions.push(
           Token.createAssociatedTokenAccountInstruction(
@@ -635,9 +633,8 @@ export async function getCreateTokenMetadataInstruction({
       uses: null,
     }
 
-    const treasuryFee = await connection.current.getMinimumBalanceForRentExemption(
-      0
-    )
+    const treasuryFee =
+      await connection.current.getMinimumBalanceForRentExemption(0)
     // Todo: metadataSize is hardcoded at this moment but should be caliculated in the future.
     // On 8.July.2022, Metadata.getMinimumBalanceForRentExemption is returning wrong price.
     // const metadataFee = await Metadata.getMinimumBalanceForRentExemption(
@@ -655,9 +652,8 @@ export async function getCreateTokenMetadataInstruction({
     //   },
     //   connection.current
     // )
-    const metadataFee = await connection.current.getMinimumBalanceForRentExemption(
-      679
-    )
+    const metadataFee =
+      await connection.current.getMinimumBalanceForRentExemption(679)
     const treasuryInfo = await connection.current.getAccountInfo(payer)
     const solTreasury = treasuryInfo?.lamports ?? 0
     const amount = treasuryFee + metadataFee - solTreasury

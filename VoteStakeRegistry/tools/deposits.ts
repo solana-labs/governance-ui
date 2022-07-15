@@ -188,12 +188,14 @@ export const calcMintMultiplier = (
       maxExtraLockupVoteWeightScaledFactor,
     } = mintCfg
     const depositScaledFactorNum = baselineVoteWeightScaledFactor.toNumber()
-    const maxExtraLockupVoteWeightScaledFactorNum = maxExtraLockupVoteWeightScaledFactor.toNumber()
+    const maxExtraLockupVoteWeightScaledFactorNum =
+      maxExtraLockupVoteWeightScaledFactor.toNumber()
     const lockupSaturationSecsNum = lockupSaturationSecs.toNumber()
     //(deposit_scaled_factor + max_extra_lockup_vote_weight_scaled_factor * min(lockup_secs, lockup_saturation_secs) / lockup_saturation_secs) / deposit_scaled_factor
     const calced = calcMultiplier({
       depositScaledFactor: depositScaledFactorNum,
-      maxExtraLockupVoteWeightScaledFactor: maxExtraLockupVoteWeightScaledFactorNum,
+      maxExtraLockupVoteWeightScaledFactor:
+        maxExtraLockupVoteWeightScaledFactorNum,
       lockupSaturationSecs: lockupSaturationSecsNum,
       lockupSecs,
     })

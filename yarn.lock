@@ -3401,7 +3401,7 @@
     snake-case "^3.0.4"
     toml "^3.0.0"
 
-"@project-serum/anchor@^0.25.0-beta.1":
+"@project-serum/anchor@^0.25.0", "@project-serum/anchor@^0.25.0-beta.1":
   version "0.25.0"
   resolved "https://registry.yarnpkg.com/@project-serum/anchor/-/anchor-0.25.0.tgz#88ee4843336005cf5a64c80636ce626f0996f503"
   integrity sha512-E6A5Y/ijqpfMJ5psJvbw0kVTzLZFUcOFgs6eSM2M2iWE1lVRF18T6hWZVNl6zqZsoz98jgnNHtVGJMs+ds9A7A==

@@ -47,7 +47,7 @@ export default function DialectNotificationsButton() {
 
   return (
     <NotificationsButton
-      wallet={(wallet as unknown) as WalletType}
+      wallet={wallet as unknown as WalletType}
       network={cluster as string}
       publicKey={REALMS_PUBLIC_KEY}
       theme={theme === 'Dark' ? 'dark' : 'light'}

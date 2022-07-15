@@ -55,9 +55,8 @@ export default function ProposalExecutionCard(props: Props) {
   const timer = useRef<undefined | number>()
 
   const allTransactions = Object.values(instructions)
-  const { executed, ready, notReady, minHoldUpTime } = parseTransactions(
-    allTransactions
-  )
+  const { executed, ready, notReady, minHoldUpTime } =
+    parseTransactions(allTransactions)
 
   useEffect(() => {
     if (typeof window !== 'undefined' && minHoldUpTime) {

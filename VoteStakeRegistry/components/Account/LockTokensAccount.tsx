@@ -79,19 +79,16 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
         wallet?.publicKey &&
         client
       ) {
-        const {
-          deposits,
-          votingPower,
-          votingPowerFromDeposits,
-        } = await getDeposits({
-          realmPk: realm!.pubkey,
-          communityMintPk: realm!.account.communityMint,
-          walletPk: tokenOwnerRecordWalletPk
-            ? new PublicKey(tokenOwnerRecordWalletPk)
-            : wallet.publicKey,
-          client: client!,
-          connection: connection,
-        })
+        const { deposits, votingPower, votingPowerFromDeposits } =
+          await getDeposits({
+            realmPk: realm!.pubkey,
+            communityMintPk: realm!.account.communityMint,
+            walletPk: tokenOwnerRecordWalletPk
+              ? new PublicKey(tokenOwnerRecordWalletPk)
+              : wallet.publicKey,
+            client: client!,
+            connection: connection,
+          })
         const reducedDeposits = deposits.reduce((curr, next) => {
           const nextType = Object.keys(next.lockup.kind)[0]
           const isUnlockedType = unlockedTypes.includes(nextType)

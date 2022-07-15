@@ -36,13 +36,14 @@ export default function InspectorButton({
       )
     } else {
       try {
-        const recentActivity = await connection.current.getConfirmedSignaturesForAddress2(
-          proposalInstruction.pubkey,
-          {
-            limit: 5,
-          },
-          'confirmed'
-        )
+        const recentActivity =
+          await connection.current.getConfirmedSignaturesForAddress2(
+            proposalInstruction.pubkey,
+            {
+              limit: 5,
+            },
+            'confirmed'
+          )
         inspectUrl = getExplorerUrl(
           connection.cluster,
           recentActivity[0].signature,

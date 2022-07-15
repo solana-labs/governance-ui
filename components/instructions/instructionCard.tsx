@@ -39,10 +39,8 @@ export default function InstructionCard({
   proposal: ProgramAccount<Proposal>
   proposalInstruction: ProgramAccount<ProposalTransaction>
 }) {
-  const {
-    nftsGovernedTokenAccounts,
-    governedTokenAccountsWithoutNfts,
-  } = useGovernanceAssets()
+  const { nftsGovernedTokenAccounts, governedTokenAccountsWithoutNfts } =
+    useGovernanceAssets()
   const connection = useWalletStore((s) => s.connection)
   const tokenRecords = useWalletStore((s) => s.selectedRealm)
   const [descriptor, setDescriptor] = useState<InstructionDescriptor>()
@@ -68,8 +66,8 @@ export default function InstructionCard({
       proposalInstruction.account.getSingleInstruction()
     ).then((d) => setDescriptor(d))
     const getAmountImg = async () => {
-      const sourcePk = proposalInstruction.account.getSingleInstruction()
-        .accounts[0].pubkey
+      const sourcePk =
+        proposalInstruction.account.getSingleInstruction().accounts[0].pubkey
       const tokenAccount = await tryGetTokenAccount(
         connection.current,
         sourcePk

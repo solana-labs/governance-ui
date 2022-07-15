@@ -242,10 +242,8 @@ export default function AddNFTCollectionForm({
 
   const [collectionsInWallet, setCollectionsInWallet] = useState({})
 
-  const [
-    selectedNFTCollection,
-    setSelectedNFTCollection,
-  ] = useState<NFTCollection>()
+  const [selectedNFTCollection, setSelectedNFTCollection] =
+    useState<NFTCollection>()
 
   const schema = yup.object(AddNFTCollectionSchema).required()
   const {

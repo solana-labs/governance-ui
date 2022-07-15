@@ -100,7 +100,7 @@ export function ExecuteInstructionButton({
           adjacentTransaction = new Transaction().add(
             await getCastleRefreshInstruction(
               rpcContext.connection,
-              (wallet as unknown) as Wallet,
+              wallet as unknown as Wallet,
               proposalInstruction
             )
           )
@@ -108,13 +108,13 @@ export function ExecuteInstructionButton({
         case InstructionOptions.castleReconcileRefresh: {
           preExecutionTransactions = await getCastleReconcileInstruction(
             rpcContext.connection,
-            (wallet as unknown) as Wallet,
+            wallet as unknown as Wallet,
             proposalInstruction
           )
           adjacentTransaction = new Transaction().add(
             await getCastleRefreshInstruction(
               rpcContext.connection,
-              (wallet as unknown) as Wallet,
+              wallet as unknown as Wallet,
               proposalInstruction
             )
           )

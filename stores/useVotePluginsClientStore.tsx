@@ -97,7 +97,7 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
       const options = AnchorProvider.defaultOptions()
       const provider = new AnchorProvider(
         connection.current,
-        (wallet as unknown) as Wallet,
+        wallet as unknown as Wallet,
         options
       )
       const vsrClient = await VsrClient.connect(
@@ -125,7 +125,7 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
       const options = AnchorProvider.defaultOptions()
       const provider = new AnchorProvider(
         connection.current,
-        (wallet as unknown) as Wallet,
+        wallet as unknown as Wallet,
         options
       )
       const nftClient = await NftVoterClient.connect(
@@ -164,7 +164,7 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
       const options = AnchorProvider.defaultOptions()
       const provider = new AnchorProvider(
         connection.current,
-        (wallet as unknown) as Wallet,
+        wallet as unknown as Wallet,
         options
       )
       const switchboardClient = await SwitchboardQueueVoterClient.connect(
@@ -183,7 +183,7 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
         const options = AnchorProvider.defaultOptions()
         const provider = new AnchorProvider(
           connection.current,
-          (wallet as unknown) as Wallet,
+          wallet as unknown as Wallet,
           options
         )
         try {
@@ -212,7 +212,7 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
       const options = AnchorProvider.defaultOptions()
       const provider = new AnchorProvider(
         connection.current,
-        (wallet as unknown) as Wallet,
+        wallet as unknown as Wallet,
         options
       )
       const gatewayClient = await GatewayClient.connect(

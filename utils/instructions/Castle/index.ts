@@ -305,7 +305,7 @@ const getCastleVaultClientFromForm = async (
   // Create a new provider
   const provider = new Provider(
     connection.current,
-    (wallet as unknown) as AnchorWallet,
+    wallet as unknown as AnchorWallet,
     {
       preflightCommitment: 'confirmed',
       commitment: 'confirmed',
@@ -350,14 +350,10 @@ const getCastleVaultClientFromProposal = async (
   instruction: ProgramAccount<ProposalTransaction>
 ) => {
   // Create a new provider
-  const provider = new Provider(
-    connection,
-    (wallet as unknown) as AnchorWallet,
-    {
-      preflightCommitment: 'confirmed',
-      commitment: 'confirmed',
-    }
-  )
+  const provider = new Provider(connection, wallet as unknown as AnchorWallet, {
+    preflightCommitment: 'confirmed',
+    commitment: 'confirmed',
+  })
 
   const network = getNetworkFromEndpoint(connection.rpcEndpoint)
   const vaults = await getCastleVaults()

@@ -213,14 +213,16 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const set = get().set
 
       if (connected && selectedCouncilDelegate && programId && realmId) {
-        const councilDelegateVoteRecordsByProposal = await getVoteRecordsByVoterMapByProposal(
-          connection,
-          programId,
-          new PublicKey(selectedCouncilDelegate)
-        )
+        const councilDelegateVoteRecordsByProposal =
+          await getVoteRecordsByVoterMapByProposal(
+            connection,
+            programId,
+            new PublicKey(selectedCouncilDelegate)
+          )
 
         set((state) => {
-          state.councilDelegateVoteRecordsByProposal = councilDelegateVoteRecordsByProposal
+          state.councilDelegateVoteRecordsByProposal =
+            councilDelegateVoteRecordsByProposal
         })
       } else {
         set((state) => {
@@ -229,14 +231,16 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       }
 
       if (connected && selectedCommunityDelegate && programId && realmId) {
-        const communityDelegateVoteRecordsByProposal = await getVoteRecordsByVoterMapByProposal(
-          connection,
-          programId,
-          new PublicKey(selectedCommunityDelegate)
-        )
+        const communityDelegateVoteRecordsByProposal =
+          await getVoteRecordsByVoterMapByProposal(
+            connection,
+            programId,
+            new PublicKey(selectedCommunityDelegate)
+          )
 
         set((state) => {
-          state.communityDelegateVoteRecordsByProposal = communityDelegateVoteRecordsByProposal
+          state.communityDelegateVoteRecordsByProposal =
+            communityDelegateVoteRecordsByProposal
         })
       } else {
         set((state) => {
@@ -340,31 +344,27 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const realmCouncilMintPk = realm.account.config.councilMint
       const realmCouncilMint =
         realmCouncilMintPk && realmMints[realmCouncilMintPk.toBase58()]
-      const [
-        governances,
-        tokenRecords,
-        councilTokenOwnerRecords,
-        config,
-      ] = await Promise.all([
-        getGovernanceAccounts(connection, programId, Governance, [
-          pubkeyFilter(1, realmId)!,
-        ]),
+      const [governances, tokenRecords, councilTokenOwnerRecords, config] =
+        await Promise.all([
+          getGovernanceAccounts(connection, programId, Governance, [
+            pubkeyFilter(1, realmId)!,
+          ]),
 
-        getTokenOwnerRecordsForRealmMintMapByOwner(
-          connection,
-          programId,
-          realmId,
-          realmMintPk
-        ),
+          getTokenOwnerRecordsForRealmMintMapByOwner(
+            connection,
+            programId,
+            realmId,
+            realmMintPk
+          ),
 
-        getTokenOwnerRecordsForRealmMintMapByOwner(
-          connection,
-          programId,
-          realmId,
-          realmCouncilMintPk
-        ),
-        getRealmConfig(connection, programId, realmId),
-      ])
+          getTokenOwnerRecordsForRealmMintMapByOwner(
+            connection,
+            programId,
+            realmId,
+            realmCouncilMintPk
+          ),
+          getRealmConfig(connection, programId, realmId),
+        ])
 
       const governancesMap = accountsToPubkeyMap(governances)
 

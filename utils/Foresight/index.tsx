@@ -242,11 +242,9 @@ function ForesightUseEffects<T extends ForesightHasGovernedAccount>(
   }, [form])
 }
 
-export function getSchema<T extends ForesightHasGovernedAccount>(
-  extraFields: {
-    [name in keyof Omit<T, 'governedAccount'>]: StringSchema | NumberSchema
-  }
-) {
+export function getSchema<T extends ForesightHasGovernedAccount>(extraFields: {
+  [name in keyof Omit<T, 'governedAccount'>]: StringSchema | NumberSchema
+}) {
   return yup.object().shape({
     governedAccount: yup
       .object()

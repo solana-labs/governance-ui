@@ -17,16 +17,12 @@ function MakeAddMarketListToCategoryParams({
   index: number
   governance: ProgramAccount<Governance> | null
 }) {
-  const {
-    inputProps,
-    effector,
-    governedAccountSelect,
-    wallet,
-  } = commonAssets<ForesightMakeAddMarketListToCategoryParams>(
-    { categoryId: '', marketListId: '' },
-    index,
-    governance
-  )
+  const { inputProps, effector, governedAccountSelect, wallet } =
+    commonAssets<ForesightMakeAddMarketListToCategoryParams>(
+      { categoryId: '', marketListId: '' },
+      index,
+      governance
+    )
   async function ixCreator(form: ForesightMakeAddMarketListToCategoryParams) {
     const { ix } = await foresightGov.genAddMarketListToCategoryIx(
       Buffer.from(form.categoryId.padEnd(20)),

@@ -118,13 +118,14 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
     let recentActivity = []
     const address = account.extensions.transferAddress
     try {
-      recentActivity = await connection.current.getConfirmedSignaturesForAddress2(
-        address,
-        {
-          limit: 5,
-        },
-        'confirmed'
-      )
+      recentActivity =
+        await connection.current.getConfirmedSignaturesForAddress2(
+          address,
+          {
+            limit: 5,
+          },
+          'confirmed'
+        )
     } catch (e) {
       notify({
         type: 'error',

@@ -29,7 +29,7 @@ export function getAccountsByFilters<AccountType extends GovernanceAccount>({
         getGovernanceAccounts(
           connection,
           programId,
-          (accountClass as unknown) as new (args: any) => AccountType,
+          accountClass as unknown as new (args: any) => AccountType,
           filters
         ),
       (error) =>

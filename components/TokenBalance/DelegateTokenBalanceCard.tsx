@@ -21,11 +21,8 @@ const DelegateBalanceCard = () => {
     mint,
     councilMint,
   } = useRealm()
-  const {
-    actions,
-    selectedCommunityDelegate,
-    selectedCouncilDelegate,
-  } = useWalletStore((s) => s)
+  const { actions, selectedCommunityDelegate, selectedCouncilDelegate } =
+    useWalletStore((s) => s)
 
   useEffect(() => {
     if (

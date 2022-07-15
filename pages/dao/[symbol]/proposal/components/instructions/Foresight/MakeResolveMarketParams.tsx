@@ -18,15 +18,12 @@ const MakeResolveMarketParams = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const {
-    inputProps,
-    effector,
-    governedAccountSelect,
-  } = commonAssets<ForesightMakeResolveMarketParams>(
-    { marketListId: '', marketId: 0, winner: 0 },
-    index,
-    governance
-  )
+  const { inputProps, effector, governedAccountSelect } =
+    commonAssets<ForesightMakeResolveMarketParams>(
+      { marketListId: '', marketId: 0, winner: 0 },
+      index,
+      governance
+    )
   async function ixCreator(form: ForesightMakeResolveMarketParams) {
     const ix = await foresightGov.genResolveMarketIx(
       form.winner,

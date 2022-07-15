@@ -29,11 +29,8 @@ import { AccountType } from '@utils/uiTypes/assets'
 const Params = () => {
   const { realm, mint } = useRealm()
   const wallet = useWalletStore((s) => s.current)
-  const {
-    canUseAuthorityInstruction,
-    assetAccounts,
-    auxiliaryTokenAccounts,
-  } = useGovernanceAssets()
+  const { canUseAuthorityInstruction, assetAccounts, auxiliaryTokenAccounts } =
+    useGovernanceAssets()
   const governancesArray = useGovernanceAssetsStore((s) => s.governancesArray)
   const mintGovernancesWithMintInfo = assetAccounts.filter((x) => {
     return x.type === AccountType.MINT
@@ -64,22 +61,16 @@ const Params = () => {
   const realmAuthorityGovernance = governancesArray.find(
     (x) => x.pubkey.toBase58() === realm?.account.authority?.toBase58()
   )
-  const [isRealmProposalModalOpen, setIsRealmProposalModalOpen] = useState(
-    false
-  )
-  const [
-    isGovernanceProposalModalOpen,
-    setIsGovernanceProposalModalOpen,
-  ] = useState(false)
-  const [
-    isMetadataCreationModalOpen,
-    setIsMetadataCreationModalOpen,
-  ] = useState(false)
+  const [isRealmProposalModalOpen, setIsRealmProposalModalOpen] =
+    useState(false)
+  const [isGovernanceProposalModalOpen, setIsGovernanceProposalModalOpen] =
+    useState(false)
+  const [isMetadataCreationModalOpen, setIsMetadataCreationModalOpen] =
+    useState(false)
   const [activeGovernance, setActiveGovernance] = useState<any>(null)
   const [activeTab, setActiveTab] = useState('Params')
-  const [isRealmAuthorityModalOpen, setRealmAuthorityModalIsOpen] = useState(
-    false
-  )
+  const [isRealmAuthorityModalOpen, setRealmAuthorityModalIsOpen] =
+    useState(false)
   const realmAccount = realm?.account
   const communityMint = realmAccount?.communityMint.toBase58()
   const councilMintPk = realmAccount?.config.councilMint?.toBase58()

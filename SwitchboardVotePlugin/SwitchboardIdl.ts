@@ -9311,8 +9311,7 @@ export const IDL: Switchboard = {
     {
       code: 6002,
       name: 'IncorrectProgramOwnerError',
-      msg:
-        'An account required to be owned by the program has a different owner.',
+      msg: 'An account required to be owned by the program has a different owner.',
     },
     {
       code: 6003,
@@ -9327,8 +9326,7 @@ export const IDL: Switchboard = {
     {
       code: 6005,
       name: 'AggregatorCurrentRoundClosed',
-      msg:
-        "Aggregator's current round is closed. No results are being accepted.",
+      msg: "Aggregator's current round is closed. No results are being accepted.",
     },
     {
       code: 6006,
@@ -9418,14 +9416,12 @@ export const IDL: Switchboard = {
     {
       code: 6023,
       name: 'AggregatorLeaseInsufficientFunds',
-      msg:
-        'Aggregator update call attempted but attached lease has insufficient funds.',
+      msg: 'Aggregator update call attempted but attached lease has insufficient funds.',
     },
     {
       code: 6024,
       name: 'IncorrectTokenAccountMint',
-      msg:
-        'The provided token account does not point to the Switchboard token mint.',
+      msg: 'The provided token account does not point to the Switchboard token mint.',
     },
     {
       code: 6025,
@@ -9495,8 +9491,7 @@ export const IDL: Switchboard = {
     {
       code: 6038,
       name: 'AggregatorLockedError',
-      msg:
-        'Aggregator is locked, no setting modifications or job additions allowed.',
+      msg: 'Aggregator is locked, no setting modifications or job additions allowed.',
     },
     {
       code: 6039,
@@ -9556,8 +9551,7 @@ export const IDL: Switchboard = {
     {
       code: 6050,
       name: 'OracleWalletMismatchError',
-      msg:
-        'An unexpected oracle wallet account was provided for the transaction.',
+      msg: 'An unexpected oracle wallet account was provided for the transaction.',
     },
     {
       code: 6051,
@@ -9582,8 +9576,7 @@ export const IDL: Switchboard = {
     {
       code: 6055,
       name: 'ExcessiveLeaseWithdrawlError',
-      msg:
-        'You must leave enough funds to perform at least 1 update in the lease.',
+      msg: 'You must leave enough funds to perform at least 1 update in the lease.',
     },
     {
       code: 6056,

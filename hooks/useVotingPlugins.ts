@@ -63,21 +63,12 @@ export function useVotingPlugins() {
     handleSetPythClient,
     handleSetCurrentRealmVotingClient,
   } = useVotePluginsClientStore()
-  const {
-    setVotingNfts,
-    setMaxVoterWeight,
-    setIsLoadingNfts,
-  } = useNftPluginStore()
-  const {
-    setIsLoadingGatewayToken,
-    setGatekeeperNetwork,
-  } = useGatewayPluginStore()
-  const {
-    setIsLoading,
-    setVotingPower,
-    setOracleKeys,
-    setInstructions,
-  } = useSwitchboardPluginStore()
+  const { setVotingNfts, setMaxVoterWeight, setIsLoadingNfts } =
+    useNftPluginStore()
+  const { setIsLoadingGatewayToken, setGatekeeperNetwork } =
+    useGatewayPluginStore()
+  const { setIsLoading, setVotingPower, setOracleKeys, setInstructions } =
+    useSwitchboardPluginStore()
 
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
@@ -146,7 +137,7 @@ export function useVotingPlugins() {
       const options = anchor.AnchorProvider.defaultOptions()
       const provider = new anchor.AnchorProvider(
         connection.current,
-        (wallet as unknown) as anchor.Wallet,
+        wallet as unknown as anchor.Wallet,
         options
       )
 
@@ -175,7 +166,8 @@ export function useVotingPlugins() {
         provider
       )
 
-      const allOracles = await switchboardProgram.account.oracleAccountData.all()
+      const allOracles =
+        await switchboardProgram.account.oracleAccountData.all()
       const oData = allOracles.map(({ publicKey, account }) => {
         return {
           oracleData: account as any,
@@ -200,9 +192,8 @@ export function useVotingPlugins() {
         const addinStateData = await addinProgram.account.state.fetch(
           addinState
         )
-        const queue = await switchboardProgram.account.oracleQueueAccountData.fetch(
-          queuePk
-        )
+        const queue =
+          await switchboardProgram.account.oracleQueueAccountData.fetch(queuePk)
         const queueAuthority = queue.authority as PublicKey
         const grantAuthority = addinStateData.grantAuthority as PublicKey
         try {
@@ -241,12 +232,11 @@ export function useVotingPlugins() {
       setInstructions(setVoterWeightInstructions, currentClient)
 
       try {
-        const [
-          voterWeightRecord,
-        ] = anchor.utils.publicKey.findProgramAddressSync(
-          [Buffer.from('VoterWeightRecord'), myNodesForRealm[0].toBytes()],
-          SWITCHBOARD_ADDIN_ID
-        )
+        const [voterWeightRecord] =
+          anchor.utils.publicKey.findProgramAddressSync(
+            [Buffer.from('VoterWeightRecord'), myNodesForRealm[0].toBytes()],
+            SWITCHBOARD_ADDIN_ID
+          )
 
         try {
           const vwr = await getVoterWeightRecord(

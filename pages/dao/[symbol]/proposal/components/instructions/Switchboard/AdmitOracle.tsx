@@ -51,7 +51,7 @@ const SwitchboardAdmitOracle = ({
     const options = anchor.AnchorProvider.defaultOptions()
     const provider = new anchor.AnchorProvider(
       connection.current,
-      (wallet as unknown) as anchor.Wallet,
+      wallet as unknown as anchor.Wallet,
       options
     )
 

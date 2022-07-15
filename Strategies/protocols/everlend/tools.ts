@@ -150,8 +150,8 @@ export async function handleEverlendAction(
         data: getInstructionDataFromBase64(
           serializeInstructionToBase64(instruction)
         ),
-        holdUpTime: matchedTreasury.governance!.account!.config
-          .minInstructionHoldUpTime,
+        holdUpTime:
+          matchedTreasury.governance!.account!.config.minInstructionHoldUpTime,
         prerequisiteInstructions: [],
       })
     })
@@ -172,8 +172,8 @@ export async function handleEverlendAction(
         data: getInstructionDataFromBase64(
           serializeInstructionToBase64(instruction)
         ),
-        holdUpTime: matchedTreasury.governance!.account!.config
-          .minInstructionHoldUpTime,
+        holdUpTime:
+          matchedTreasury.governance!.account!.config.minInstructionHoldUpTime,
         prerequisiteInstructions: [],
         chunkSplitByDefault: true,
       })
@@ -184,8 +184,8 @@ export async function handleEverlendAction(
         data: getInstructionDataFromBase64(
           serializeInstructionToBase64(closeIx)
         ),
-        holdUpTime: matchedTreasury.governance!.account!.config
-          .minInstructionHoldUpTime,
+        holdUpTime:
+          matchedTreasury.governance!.account!.config.minInstructionHoldUpTime,
         prerequisiteInstructions: [],
         chunkSplitByDefault: true,
       })

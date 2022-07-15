@@ -161,7 +161,7 @@ const NotificationsCard = ({
       // user is not authenticated
       if (!isAuthenticated && wallet && wallet.publicKey) {
         try {
-          await logIn((wallet as unknown) as MessageSigner)
+          await logIn(wallet as unknown as MessageSigner)
         } catch (e) {
           handleError([e])
         }
@@ -176,7 +176,7 @@ const NotificationsCard = ({
     setLoading(true)
     if (!isAuthenticated && wallet && wallet.publicKey) {
       try {
-        await logIn((wallet as unknown) as MessageSigner)
+        await logIn(wallet as unknown as MessageSigner)
         setUnsavedChanges(true)
       } catch (e) {
         handleError([e])
