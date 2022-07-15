@@ -40,6 +40,7 @@ import {
   AccountTypeToken,
   AssetAccount,
 } from '@utils/uiTypes/assets'
+import group from '@utils/group'
 
 const tokenAccountOwnerOffset = 32
 
@@ -333,36 +334,44 @@ const getSolAccountObj = async (
   solAcc: SolAccInfo
 ) => {
   if (solAcc.acc) {
-    const tokenAccountsOwnedBySolAccountInfo = await connection.current.getTokenAccountsByOwner(
-      solAcc.nativeSolAddress,
-      {
-        programId: TOKEN_PROGRAM_ID,
-      }
-    )
-    const tokenAccountsOwnedBySolAccounts = tokenAccountsOwnedBySolAccountInfo.value.map(
-      (x) => {
+    const tokenAccountsOwnedBySolAccountInfo =
+      await connection.current.getTokenAccountsByOwner(
+        solAcc.nativeSolAddress,
+        {
+          programId: TOKEN_PROGRAM_ID,
+        }
+      )
+    const tokenAccountsOwnedBySolAccounts =
+      tokenAccountsOwnedBySolAccountInfo.value.map((x) => {
         const publicKey = x.pubkey
         const data = Buffer.from(x.account.data)
         const account = parseTokenAccountData(publicKey, data)
         return { publicKey, account }
-      }
+      })
+    const groups = group(tokenAccountsOwnedBySolAccounts)
+    const results = await Promise.all(
+      groups.map((group) => {
+        if (group.length) {
+          return getMintAccountsInfo(
+            connection,
+            group.map((x) => x.account.mint)
+          )
+        } else {
+          return []
+        }
+      })
     )
 
-    const mintAccounts = tokenAccountsOwnedBySolAccounts.length
-      ? await getMintAccountsInfo(
-          connection,
-          tokenAccountsOwnedBySolAccounts.map((x) => x.account.mint)
-        )
-      : []
+    const mintAccounts = results.flat()
+
     for (const acc of tokenAccountsOwnedBySolAccounts) {
       const account = await getTokenAccountObj(governance, acc, mintAccounts)
       if (account) {
         accounts.push(account)
       }
     }
-    const minRentAmount = await connection.current.getMinimumBalanceForRentExemption(
-      0
-    )
+    const minRentAmount =
+      await connection.current.getMinimumBalanceForRentExemption(0)
     const solAccount = solAcc.acc as AccountInfoGen<Buffer | ParsedAccountData>
     solAccount.lamports =
       solAccount.lamports !== 0

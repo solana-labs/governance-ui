@@ -90,6 +90,7 @@ import classNames from 'classnames'
 import MakeRemoveSpotMarket from './components/instructions/Mango/MakeRemoveSpotMarket'
 import MakeRemovePerpMarket from './components/instructions/Mango/MakeRemovePerpMarket'
 import MakeSwapSpotMarket from './components/instructions/Mango/MakeSwapSpotMarket'
+import MakeRemoveOracle from './components/instructions/Mango/MakeRemoveOracle'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -102,9 +103,8 @@ const defaultGovernanceCtx: InstructionsContext = {
   governance: null,
   setGovernance: () => null,
 }
-export const NewProposalContext = createContext<InstructionsContext>(
-  defaultGovernanceCtx
-)
+export const NewProposalContext =
+  createContext<InstructionsContext>(defaultGovernanceCtx)
 
 // Takes the first encountered governance account
 function extractGovernanceAccountFromInstructionsData(
@@ -130,10 +130,8 @@ const New = () => {
     description: '',
   })
   const [formErrors, setFormErrors] = useState({})
-  const [
-    governance,
-    setGovernance,
-  ] = useState<ProgramAccount<Governance> | null>(null)
+  const [governance, setGovernance] =
+    useState<ProgramAccount<Governance> | null>(null)
   const [isLoadingSignedProposal, setIsLoadingSignedProposal] = useState(false)
   const [isLoadingDraft, setIsLoadingDraft] = useState(false)
   const isLoading = isLoadingSignedProposal || isLoadingDraft
@@ -313,9 +311,8 @@ const New = () => {
   }, [instructionsData[0]?.governedAccount?.pubkey])
 
   useEffect(() => {
-    const governedAccount = extractGovernanceAccountFromInstructionsData(
-      instructionsData
-    )
+    const governedAccount =
+      extractGovernanceAccountFromInstructionsData(instructionsData)
 
     setGovernance(governedAccount)
   }, [instructionsData])
@@ -504,6 +501,13 @@ const New = () => {
             governance={governance}
           ></MakeSwapSpotMarket>
         )
+      case Instructions.MangoRemoveOracle:
+        return (
+          <MakeRemoveOracle
+            index={idx}
+            governance={governance}
+          ></MakeRemoveOracle>
+        )
       case Instructions.ForesightInitMarket:
         return (
           <MakeInitMarketParams
@@ -666,9 +670,8 @@ const New = () => {
             >
               <h2>Transactions</h2>
               {instructionsData.map((instruction, idx) => {
-                const availableInstructionsForIdx = getAvailableInstructionsForIndex(
-                  idx
-                )
+                const availableInstructionsForIdx =
+                  getAvailableInstructionsForIndex(idx)
                 return (
                   <div
                     key={idx}

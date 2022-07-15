@@ -1,14 +1,23 @@
-import { PublicKey } from '@solana/web3.js'
+import { Connection, PublicKey } from '@solana/web3.js'
 import axios from 'axios'
 import { getConnectionContext } from 'utils/connection'
-import { pubkeyFilter } from '@solana/spl-governance'
-import { getAccountTypes, Governance, Proposal } from '@solana/spl-governance'
-import { ProgramAccount } from '@solana/spl-governance'
-import { getCertifiedRealmInfo } from '../models/registry/api'
-import { getGovernanceAccounts } from './api'
+import {
+  getGovernanceAccounts,
+  Governance,
+  Proposal,
+  ProposalState,
+  pubkeyFilter,
+} from '@solana/spl-governance'
+import { getCertifiedRealmInfo } from '@models/registry/api'
+import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 
 const fiveMinutesSeconds = 5 * 60
 const toleranceSeconds = 30
+
+if (!process.env.CLUSTER_URL) {
+  console.error('Please set CLUSTER_URL to a rpc node of choice!')
+  process.exit(1)
+}
 
 function errorWrapper() {
   runNotifier().catch((error) => {
@@ -19,101 +28,133 @@ function errorWrapper() {
 // run every 5 mins, checks if a governance proposal just opened in the last 5 mins
 // and notifies on WEBHOOK_URL
 async function runNotifier() {
-  const nowInSeconds = new Date().getTime() / 1000
-
-  const MAINNET_RPC_NODE =
-    process.env.CLUSTER_URL || 'https://api.mainnet-beta.solana.com'
-  const connectionContext = getConnectionContext('mainnet')
-
   const REALM_SYMBOL = process.env.REALM_SYMBOL || 'MNGO'
+  const connectionContext = getConnectionContext('mainnet')
   const realmInfo = await getCertifiedRealmInfo(REALM_SYMBOL, connectionContext)
 
-  const governances = await getGovernanceAccounts<Governance>(
+  const connection = new Connection(process.env.CLUSTER_URL!)
+  console.log(`- getting all governance accounts for ${REALM_SYMBOL}`)
+  const governances = await getGovernanceAccounts(
+    connection,
     realmInfo!.programId,
-    MAINNET_RPC_NODE,
     Governance,
-    getAccountTypes(Governance),
     [pubkeyFilter(1, realmInfo!.realmId)!]
   )
 
-  const governanceIds = Object.keys(governances).map((k) => new PublicKey(k))
+  const governancesMap = accountsToPubkeyMap(governances)
 
+  console.log(`- getting all proposals for all governances`)
   const proposalsByGovernance = await Promise.all(
-    governanceIds.map((governanceId) => {
-      return getGovernanceAccounts<Proposal>(
-        realmInfo!.programId,
-        MAINNET_RPC_NODE,
-        Proposal,
-        getAccountTypes(Proposal),
-        [pubkeyFilter(1, governanceId)!]
-      )
+    Object.keys(governancesMap).map((governancePk) => {
+      return getGovernanceAccounts(connection, realmInfo!.programId, Proposal, [
+        pubkeyFilter(1, new PublicKey(governancePk))!,
+      ])
     })
-  )
-
-  const proposals: {
-    [proposal: string]: ProgramAccount<Proposal>
-  } = Object.assign({}, ...proposalsByGovernance)
-
-  const realmGovernances = Object.fromEntries(
-    Object.entries(governances).filter(([_k, v]) =>
-      v.account.realm.equals(realmInfo!.realmId)
-    )
-  )
-
-  const realmProposals = Object.fromEntries(
-    Object.entries(proposals).filter(([_k, v]) =>
-      Object.keys(realmGovernances).includes(v.account.governance.toBase58())
-    )
   )
 
   console.log(`- scanning all '${REALM_SYMBOL}' proposals`)
   let countJustOpenedForVoting = 0
+  let countOpenForVotingSinceSomeTime = 0
   let countVotingNotStartedYet = 0
   let countClosed = 0
-  for (const k in realmProposals) {
-    const proposal = realmProposals[k]
+  let countCancelled = 0
+  const nowInSeconds = new Date().getTime() / 1000
+  for (const proposals_ of proposalsByGovernance) {
+    for (const proposal of proposals_) {
+      //// debugging
+      // console.log(
+      //   `-- proposal ${proposal.account.governance.toBase58()} - ${
+      //     proposal.account.name
+      //   }`
+      // )
 
-    if (
-      // voting is closed
-      proposal.account.votingCompletedAt
-    ) {
-      countClosed++
-      continue
-    }
+      if (
+        // proposal is cancelled
+        proposal.account.state === ProposalState.Cancelled
+      ) {
+        countCancelled++
+        continue
+      }
 
-    if (
-      // voting has not started yet
-      !proposal.account.votingAt
-    ) {
-      countVotingNotStartedYet++
-      continue
-    }
+      if (
+        // voting is closed
+        proposal.account.votingCompletedAt
+      ) {
+        countClosed++
+        continue
+      }
 
-    if (
-      // proposal opened in last 5 mins
-      nowInSeconds - proposal.account.votingAt.toNumber() <=
-      fiveMinutesSeconds + toleranceSeconds
-      // proposal opened in last 24 hrs - useful to notify when bot recently stopped working
-      // and missed the 5 min window
-      // (nowInSeconds - proposal.info.votingAt.toNumber())/(60 * 60) <=
-      // 24
-    ) {
-      countJustOpenedForVoting++
+      if (
+        // voting has not started yet
+        !proposal.account.votingAt
+      ) {
+        countVotingNotStartedYet++
+        continue
+      }
 
-      const msg = `“${
-        proposal.account.name
-      }” proposal just opened for voting 🗳 https://dao-beta.mango.markets/dao/${escape(
-        REALM_SYMBOL
-      )}/proposal/${k}`
+      if (
+        // proposal opened in last 5 mins
+        nowInSeconds - proposal.account.votingAt.toNumber() <=
+        fiveMinutesSeconds + toleranceSeconds
+        // proposal opened in last 24 hrs - useful to notify when bot recently stopped working
+        // and missed the 5 min window
+        // (nowInSeconds - proposal.info.votingAt.toNumber())/(60 * 60) <=
+        // 24
+      ) {
+        countJustOpenedForVoting++
 
-      console.log(msg)
-      if (process.env.WEBHOOK_URL) {
-        axios.post(process.env.WEBHOOK_URL, { content: msg })
+        const msg = `“${
+          proposal.account.name
+        }” proposal just opened for voting 🗳 https://dao-beta.mango.markets/dao/${escape(
+          REALM_SYMBOL
+        )}/proposal/${proposal.pubkey.toBase58()}`
+
+        console.log(msg)
+        if (process.env.WEBHOOK_URL) {
+          axios.post(process.env.WEBHOOK_URL, { content: msg })
+        }
+      }
+      // note that these could also include those in finalizing state, but this is just for logging
+      else if (proposal.account.state === ProposalState.Voting) {
+        countOpenForVotingSinceSomeTime++
+
+        //// in case bot has an issue, uncomment, and run from local with webhook url set as env var
+        // const msg = `“${
+        //     proposal.account.name
+        // }” proposal just opened for voting 🗳 https://dao-beta.mango.markets/dao/${escape(
+        //     REALM_SYMBOL
+        // )}/proposal/${proposal.pubkey.toBase58()}`
+        //
+        // console.log(msg)
+        // if (process.env.WEBHOOK_URL) {
+        //   axios.post(process.env.WEBHOOK_URL, { content: msg })
+        // }
+      }
+
+      const remainingInSeconds =
+        governancesMap[proposal.account.governance.toBase58()].account.config
+          .maxVotingTime +
+        proposal.account.votingAt.toNumber() -
+        nowInSeconds
+      if (
+        remainingInSeconds > 86400 &&
+        remainingInSeconds < 86400 + fiveMinutesSeconds + toleranceSeconds
+      ) {
+        const msg = `“${
+          proposal.account.name
+        }” proposal will close for voting 🗳 https://realms.today/dao/${escape(
+          REALM_SYMBOL
+        )}/proposal/${proposal.pubkey.toBase58()} in 24 hrs`
+
+        console.log(msg)
+        if (process.env.WEBHOOK_URL) {
+          axios.post(process.env.WEBHOOK_URL, { content: msg })
+        }
       }
     }
   }
   console.log(
-    `-- countJustOpenedForVoting: ${countJustOpenedForVoting}, countVotingNotStartedYet: ${countVotingNotStartedYet}, countClosed: ${countClosed}`
+    `-- countOpenForVotingSinceSomeTime: ${countOpenForVotingSinceSomeTime}, countJustOpenedForVoting: ${countJustOpenedForVoting}, countVotingNotStartedYet: ${countVotingNotStartedYet}, countClosed: ${countClosed}, countCancelled: ${countCancelled}`
   )
 }
 

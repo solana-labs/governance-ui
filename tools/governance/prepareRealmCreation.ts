@@ -110,10 +110,11 @@ export async function prepareRealmCreation({
     : true
   const communityMintDecimals = communityMintAccount?.account?.decimals || 6
 
-  // If we're using an existing community mint, check that it has mint authority
-  const communityMintHasMintAuthority = communityMintAccount
-    ? !!communityMintAccount.account.mintAuthority
-    : true
+  // If we're using an existing community mint check if we can create a governance for it
+  // 1) The mint must have mintAuthority
+  // 2) The current wallet must be the auhtority
+  const canCreateCommunityMintGovernance =
+    communityMintAccount?.account.mintAuthority?.equals(walletPk)
 
   console.log('Prepare realm - community mint address', existingCommunityMintPk)
   console.log('Prepare realm - community mint account', communityMintAccount)
@@ -264,7 +265,7 @@ export async function prepareRealmCreation({
     minCouncilTokensToCreateProposal: new BN(initialCouncilTokenAmount),
   })
 
-  const communityMintGovPk = communityMintHasMintAuthority
+  const communityMintGovPk = canCreateCommunityMintGovernance
     ? await withCreateMintGovernance(
         realmInstructions,
         programIdPk,
