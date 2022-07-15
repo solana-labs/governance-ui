@@ -279,10 +279,25 @@ function RealmsGrid({
               )
           )}
       </GridLayout>
-      {/* <hr className="my-6 border-white" /> */}
-      {/* <div className="grid grid-flow-row grid-cols-2 GAP-4 md:grid-cols-3 lg:grid-cols-5">
-        {unchartedItems}
-      </div> */}
+      {!searching && !editing && (
+        <div className="pt-12">
+          <h2 className="mb-4">Uncharted DAOs</h2>
+          <div className="grid grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
+            {unchartedRealms &&
+              unchartedRealms.map((realm) => (
+                <div
+                  key={realm?.realmId.toString()}
+                  onClick={() => (editing ? null : goToRealm(realm))}
+                  data-grid={layout.find(
+                    (item) => item?.i == realm?.realmId.toString()
+                  )}
+                >
+                  <RealmBox realm={realm} editing={false} theme={theme} />
+                </div>
+              ))}{' '}
+          </div>
+        </div>
+      )}
     </>
   )
 }
