@@ -81,6 +81,7 @@ import GoblinGoldDeposit from './components/instructions/GoblinGold/GoblinGoldDe
 import GoblinGoldWithdraw from './components/instructions/GoblinGold/GoblinGoldWithdraw'
 import MakeSetMarketMode from './components/instructions/Mango/MakeSetMarketMode'
 import CreateGatewayPluginRegistrar from './components/instructions/GatewayPlugin/CreateRegistrar'
+import ConfigureGatewayPlugin from './components/instructions/GatewayPlugin/ConfigureGateway'
 import MakeChangeQuoteParams from './components/instructions/Mango/MakeChangeQuoteParams'
 import TypeaheadSelect from '@components/TypeaheadSelect'
 import { StyledLabel } from '@components/inputs/styles'
@@ -421,6 +422,13 @@ const New = () => {
             index={idx}
             governance={governance}
           ></CreateGatewayPluginRegistrar>
+        )
+      case Instructions.ConfigureGatewayPlugin:
+        return (
+          <ConfigureGatewayPlugin
+            index={idx}
+            governance={governance}
+          ></ConfigureGatewayPlugin>
         )
       case Instructions.MangoAddOracle:
         return (
