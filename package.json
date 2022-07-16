@@ -25,6 +25,7 @@
   "dependencies": {
     "@blockworks-foundation/mango-client": "^3.6.7",
     "@blockworks-foundation/voter-stake-registry-client": "^0.2.3",
+    "@bundlr-network/client": "^0.7.15",
     "@cardinal/namespaces-components": "^2.5.5",
     "@castlefinance/vault-core": "^0.1.3",
     "@castlefinance/vault-sdk": "^2.1.2",
@@ -88,6 +89,7 @@
     "rc-slider": "^9.7.5",
     "react": "^18.1.0",
     "react-dom": "^18.0.0",
+    "react-dropzone": "^14.2.2",
     "react-headless-pagination": "^0.1.0",
     "react-hook-form": "^7.31.3",
     "react-markdown": "^7.0.0",
