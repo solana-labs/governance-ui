@@ -35,7 +35,9 @@ const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
     mint: '',
   })
   const [isLoading, setIsLoading] = useState(false)
-  const [nftMetaData, setNftMetaData] = useState<Metadata | null>(null)
+  const [nftMetaData, setNftMetaData] = useState<deprecated.Metadata | null>(
+    null
+  )
   const [isInvalidMint, setIsInvalidMint] = useState(false)
   const [formErrors, setFormErrors] = useState({})
   const [imgUrl, setImgUrl] = useState('')
