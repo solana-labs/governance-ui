@@ -105,7 +105,7 @@ async function runNotifier() {
 
         const msg = `“${
           proposal.account.name
-        }” proposal just opened for voting 🗳 https://dao-beta.mango.markets/dao/${escape(
+        }” proposal just opened for voting 🗳 https://realms.today/dao/${escape(
           REALM_SYMBOL
         )}/proposal/${proposal.pubkey.toBase58()}`
 
@@ -121,7 +121,7 @@ async function runNotifier() {
         //// in case bot has an issue, uncomment, and run from local with webhook url set as env var
         // const msg = `“${
         //     proposal.account.name
-        // }” proposal just opened for voting 🗳 https://dao-beta.mango.markets/dao/${escape(
+        // }” proposal just opened for voting 🗳 https://realms.today/dao/${escape(
         //     REALM_SYMBOL
         // )}/proposal/${proposal.pubkey.toBase58()}`
         //
