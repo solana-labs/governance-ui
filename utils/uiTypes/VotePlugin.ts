@@ -1,6 +1,9 @@
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { deprecated } from '@metaplex-foundation/mpl-token-metadata'
-import { NftVoterClient } from '@solana/governance-program-library'
+import {
+  NftVoterClient,
+  GatewayClient,
+} from '@solana/governance-program-library'
 import {
   SwitchboardQueueVoterClient,
   SWITCHBOARD_ADDIN_ID,
