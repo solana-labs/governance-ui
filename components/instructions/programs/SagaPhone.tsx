@@ -15,12 +15,12 @@ export const SAGA_PHONE = {
     194: {
       name: 'Purchase',
       accounts: [
-        'Issuer',
-        'Purchaser',
-        'Payer',
-        'Receipt',
-        'Receipt Tokens',
-        'Purchaser Tokens',
+        { name: 'Issuer' },
+        { name: 'Purchaser' },
+        { name: 'Payer' },
+        { name: 'Receipt' },
+        { name: 'Receipt Tokens' },
+        { name: 'Purchaser Tokens' },
       ],
       getDataUI: async (connection: Connection, data: Uint8Array) => {
         try {
@@ -34,11 +34,11 @@ export const SAGA_PHONE = {
     102: {
       name: 'Update Quantity',
       accounts: [
-        'Issuer',
-        'Purchaser',
-        'Receipt',
-        'Receipt Tokens',
-        'Purchaser Tokens',
+        { name: 'Issuer' },
+        { name: 'Purchaser' },
+        { name: 'Receipt' },
+        { name: 'Receipt Tokens' },
+        { name: 'Purchaser Tokens' },
       ],
       getDataUI: async (connection: Connection, data: Uint8Array) => {
         try {
