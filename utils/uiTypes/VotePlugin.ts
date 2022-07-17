@@ -29,7 +29,6 @@ import {
   getVoterWeightPDA,
 } from 'VoteStakeRegistry/sdk/accounts'
 import { NFTWithMint } from './nfts'
-import { GatewayClient } from '@solana/governance-program-library/dist'
 import {
   getGatewayRegistrarPDA,
   getGatewayVoterWeightRecord,
