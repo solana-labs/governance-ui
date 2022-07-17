@@ -88,11 +88,10 @@ const CreateTokenMetadata = ({
   useEffect(() => {
     setGovernedAccount(form?.mintAccount?.governance)
     setMintAuthority(form?.mintAccount?.extensions.mint?.account.mintAuthority)
-
     const currentGovernanceSolTreasury = assetAccounts.filter(
       (x) =>
-        x.governance.pubkey.toBase58() === governance?.pubkey.toBase58() &&
-        x.isSol
+        x.governance.pubkey.toString() ===
+          form.mintAccount?.governance.pubkey.toString() && x.isSol
     )
     if (currentGovernanceSolTreasury.length !== 0) {
       setShouldMakeSolTreasury(false)
@@ -100,8 +99,16 @@ const CreateTokenMetadata = ({
       setPayerSolTreasury(solTreasury)
     } else if (form.mintAccount != null && governance != null) {
       setShouldMakeSolTreasury(true)
+      setPayerSolTreasury(undefined)
     }
-  }, [form.mintAccount, governance])
+  }, [
+    form,
+    governance,
+    setMintAuthority,
+    setShouldMakeSolTreasury,
+    setPayerSolTreasury,
+    assetAccounts,
+  ])
 
   const schema = getCreateTokenMetadataSchema()
 

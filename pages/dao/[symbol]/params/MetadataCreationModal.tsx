@@ -145,19 +145,23 @@ const MetadataCreationModal = ({
       })
 
       try {
-        const proposalAddress = await handleCreateProposal({
-          title: isCurrentMetadataExist
-            ? `Update metadata for ${form.mintAccount?.pubkey.toString()}`
-            : `Create metadata for ${form.mintAccount?.pubkey.toString()}`,
-          description: form!.description ? form!.description : '',
-          voteByCouncil,
-          instructionsData: [instructionData],
-          governance: governance!,
-        })
-        const url = fmtUrlWithCluster(
-          `/dao/${symbol}/proposal/${proposalAddress}`
-        )
-        router.push(url)
+        if (form.mintAccount?.governance) {
+          const proposalAddress = await handleCreateProposal({
+            title: isCurrentMetadataExist
+              ? `Update metadata for ${form.mintAccount?.pubkey.toString()}`
+              : `Create metadata for ${form.mintAccount?.pubkey.toString()}`,
+            description: form!.description ? form!.description : '',
+            voteByCouncil,
+            instructionsData: [instructionData],
+            governance: form.mintAccount?.governance,
+          })
+          const url = fmtUrlWithCluster(
+            `/dao/${symbol}/proposal/${proposalAddress}`
+          )
+          router.push(url)
+        } else {
+          throw new Error('Governance not exist')
+        }
       } catch (ex) {
         notify({ type: 'error', message: `${ex}` })
       }
@@ -248,8 +252,8 @@ const MetadataCreationModal = ({
     setMintAuthority(form?.mintAccount?.extensions.mint?.account.mintAuthority)
     const currentGovernanceSolTreasury = assetAccounts.filter(
       (x) =>
-        x.governance.pubkey.toBase58() === governance?.pubkey.toBase58() &&
-        x.isSol
+        x.governance.pubkey.toString() ===
+          form.mintAccount?.governance.pubkey.toString() && x.isSol
     )
     if (currentGovernanceSolTreasury.length !== 0) {
       setShouldMakeSolTreasury(false)
@@ -257,8 +261,15 @@ const MetadataCreationModal = ({
       setPayerSolTreasury(solTreasury)
     } else if (form.mintAccount != null && governance != null) {
       setShouldMakeSolTreasury(true)
+      setPayerSolTreasury(undefined)
     }
-  }, [form.mintAccount])
+  }, [
+    form,
+    setMintAuthority,
+    setShouldMakeSolTreasury,
+    setPayerSolTreasury,
+    assetAccounts,
+  ])
 
   return (
     <Modal sizeClassName="sm:max-w-3xl" onClose={closeModal} isOpen={isOpen}>
