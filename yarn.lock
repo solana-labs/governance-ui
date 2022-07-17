@@ -755,15 +755,15 @@
     ramda "^0.27.1"
     styled-components "^5.3.1"
 
-"@civic/solana-gateway-react@0.9.0-beta.2":
-  version "0.9.0-beta.2"
-  resolved "https://registry.yarnpkg.com/@civic/solana-gateway-react/-/solana-gateway-react-0.9.0-beta.2.tgz#f8188e861e422403ca39a4ee5012f0af17ead2ec"
-  integrity sha512-1JoQYRoFL0982wEvCSpm6HIeFhMo4hg8ZlNWoVs7SiVUx3WfZbMoNxirCSvLz7tEtFm4SM7S19zfLzSXDIsihA==
+"@civic/solana-gateway-react@0.9.0":
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/@civic/solana-gateway-react/-/solana-gateway-react-0.9.0.tgz#df093cd4c35d6ac3fa2870d8a1c4d91ffe0cf315"
+  integrity sha512-9cwNnJZsdcv7rRMV1vJnefeTMFD+EbpH9JNjx9NoAzXWZbzJ/2Aff/JSPKeRdvt+bxM60i3k+d43Ws7w3IDmhQ==
   dependencies:
     "@civic/common-gateway-react" "^0.2.0"
-    "@identity.com/prove-solana-wallet" "^0.2.8"
+    "@identity.com/prove-solana-wallet" "0.2.9"
     "@identity.com/solana-gateway-ts" "^0.7.0"
-    "@solana/web3.js" "^1.33.0"
+    "@solana/web3.js" "1.39.0"
 
 "@colors/colors@1.5.0":
   version "1.5.0"
@@ -1127,7 +1127,7 @@
   resolved "https://registry.npmjs.org/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz"
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
 
-"@identity.com/prove-solana-wallet@^0.2.8":
+"@identity.com/prove-solana-wallet@0.2.9":
   version "0.2.9"
   resolved "https://registry.yarnpkg.com/@identity.com/prove-solana-wallet/-/prove-solana-wallet-0.2.9.tgz#b75419a1a7baaed25ac489055c13188c295fcfd4"
   integrity sha512-BpDyNbMp1j+yGlGooTd/D8Qs+DtkblvPqBMRjK9pMI2dG6HcAYUaG5NFt+yB9mfl1sGu10LuTBGqL5KS4Ggu8Q==
@@ -3077,28 +3077,6 @@
     rpc-websockets "^7.4.2"
     secp256k1 "^4.0.2"
     sinon-chai "^3.7.0"
-    superstruct "^0.14.2"
-    tweetnacl "^1.0.0"
-
-"@solana/web3.js@^1.33.0":
-  version "1.44.1"
-  resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.44.1.tgz#98bc2c07d5281087b332dd925e2d6723228d68b8"
-  integrity sha512-s9nJdNAfmQKvn7K+pGcDZyJXhVN0Dy4yX0DzO+8yHSju1dF/RGJCR5TAUaAb3sZJgM+zxgyPu/P16Ji5HkdNOQ==
-  dependencies:
-    "@babel/runtime" "^7.12.5"
-    "@ethersproject/sha2" "^5.5.0"
-    "@solana/buffer-layout" "^4.0.0"
-    bigint-buffer "^1.1.5"
-    bn.js "^5.0.0"
-    borsh "^0.7.0"
-    bs58 "^4.0.1"
-    buffer "6.0.1"
-    fast-stable-stringify "^1.0.0"
-    jayson "^3.4.4"
-    js-sha3 "^0.8.0"
-    node-fetch "2"
-    rpc-websockets "^7.4.2"
-    secp256k1 "^4.0.2"
     superstruct "^0.14.2"
     tweetnacl "^1.0.0"
 

@@ -6,6 +6,7 @@ import {
 } from '@solana/spl-governance'
 import { GatewayClient } from '@solana/governance-program-library/dist'
 import { getRegistrarPDA, getVoterWeightRecord } from '@utils/plugin/accounts'
+import { notify } from '@utils/notifications'
 
 export const getGatekeeperNetwork = async (
   client: GatewayClient,
@@ -79,7 +80,13 @@ export const getVoteInstruction = async (
   walletPk: PublicKey
 ) => {
   // Throw if the user has no gateway token (TODO handle this later)
-  if (!gatewayToken) throw new Error(`Unable to vote: No Gateway Token found`)
+  if (!gatewayToken) {
+    const error = new Error(
+      `Unable to execute transaction: No Civic Pass found`
+    )
+    notify({ type: 'error', message: `${error}` })
+    throw error
+  }
 
   // get the user's voter weight account address
   const { voterWeightPk } = await getVoterWeightRecord(
