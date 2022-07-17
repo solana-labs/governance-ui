@@ -1,6 +1,7 @@
 import BN from 'bn.js'
 
 import {
+  Connection,
   Keypair,
   PublicKey,
   SystemProgram,
@@ -10,6 +11,7 @@ import { Program, AnchorProvider } from '@project-serum/anchor'
 
 import { IDL, Mortar } from './schema'
 import { ASSOCIATED_TOKEN_PROGRAM_ID, Token } from '@solana/spl-token'
+import { tryGetTokenAccount } from '@utils/tokens'
 
 export const TOKEN_PROGRAM_ID = new PublicKey(
   'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'
@@ -63,13 +65,14 @@ export const getReceiptKey = (
   )[0]
 }
 
-export const getPurchaseInstructions = (
+export const getPurchaseInstructions = async (
   feePayer: PublicKey,
   issuer: PublicKey,
   purchaser: PublicKey,
   mint: PublicKey, // issuer.paymentMint
-  quantity: BN
-): TransactionInstruction[] => {
+  quantity: BN,
+  connection: Connection
+): Promise<TransactionInstruction[]> => {
   const program = new Program<Mortar>(
     IDL,
     MORTAR_PROGRAM_ID,
@@ -83,33 +86,38 @@ export const getPurchaseInstructions = (
   const receiptTokens = getATAKeySync(mint, receipt)
   const purchaserTokens = getATAKeySync(mint, purchaser)
 
-  transactionInstructions.push(
-    Token.createAssociatedTokenAccountInstruction(
-      ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-      TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-      mint, // mint
-      receiptTokens, // ata
-      receipt, // owner of token account
-      feePayer // fee payer
+  const tokenAccount = await tryGetTokenAccount(connection, receiptTokens)
+  if (!tokenAccount) {
+    transactionInstructions.push(
+      Token.createAssociatedTokenAccountInstruction(
+        ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+        TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+        mint, // mint
+        receiptTokens, // ata
+        receipt, // owner of token account
+        feePayer // fee payer
+      )
     )
-  )
+  }
 
-  transactionInstructions.push(
-    program.instruction.purchaseWithPayer({
-      accounts: {
-        issuer,
-        purchaser,
-        payer: feePayer,
-        receipt,
-        receiptTokens,
-        purchaserTokens,
-        systemProgram: SystemProgram.programId,
-        tokenProgram: TOKEN_PROGRAM_ID,
-      },
-    })
-  )
+  if (tokenAccount?.account.amount.isZero() || !tokenAccount) {
+    transactionInstructions.push(
+      program.instruction.purchaseWithPayer({
+        accounts: {
+          issuer,
+          purchaser,
+          payer: feePayer,
+          receipt,
+          receiptTokens,
+          purchaserTokens,
+          systemProgram: SystemProgram.programId,
+          tokenProgram: TOKEN_PROGRAM_ID,
+        },
+      })
+    )
+  }
 
-  if (!quantity.eq(new BN(1))) {
+  if (!quantity.eq(new BN(1)) || !tokenAccount?.account.amount.isZero()) {
     transactionInstructions.push(
       program.instruction.updateQuantity(quantity, {
         accounts: {

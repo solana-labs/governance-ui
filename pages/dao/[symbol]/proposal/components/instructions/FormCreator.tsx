@@ -33,7 +33,7 @@ export interface InstructionInput {
   hide?: boolean
   validateMinMax?: boolean
   precision?: number
-  additionalComponent?: JSX.Element
+  additionalComponent?: JSX.Element | null
 }
 
 const InstructionForm = ({

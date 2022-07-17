@@ -27,6 +27,7 @@ import {
 } from './mortar'
 import { BN } from '@project-serum/anchor'
 import { USDC_MINT } from 'Strategies/protocols/mango/tools'
+import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
 
 const SagaPreOrder = ({
   index,
@@ -42,6 +43,7 @@ const SagaPreOrder = ({
   const isDevnet = connection.cluster === 'devnet'
   const ISSUER = isDevnet ? DEVNET_ISSUER : MAINNET_ISSUER
   const SALE_MINT = isDevnet ? USDC_DEVNET : new PublicKey(USDC_MINT)
+  const onePhoneDepositPrice = isDevnet ? 250 : 100
   const governedSolAccounts = assetAccounts.filter(
     (x) =>
       x.type === AccountType.SOL &&
@@ -79,12 +81,13 @@ const SagaPreOrder = ({
       wallet?.publicKey
     ) {
       //Mango instruction call and serialize
-      const instructions = getPurchaseInstructions(
+      const instructions = await getPurchaseInstructions(
         form.governedAccount.extensions.transferAddress!,
         ISSUER,
         form.governedAccount.extensions.transferAddress!,
         SALE_MINT,
-        new BN(form.quantity)
+        new BN(form.quantity),
+        connection.current
       )
 
       serializedInstructions = instructions.map((x) =>
@@ -127,6 +130,24 @@ const SagaPreOrder = ({
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governance,
       options: governedSolAccounts,
+      additionalComponent: form.governedAccount ? (
+        <div>
+          Associated USDC token account balance:{' '}
+          {(() => {
+            const usdcATA = assetAccounts.find(
+              (x) =>
+                x.extensions.token?.account.owner.toBase58() ===
+                form.governedAccount?.extensions.transferAddress?.toBase58()
+            )
+            return assetAccounts
+              ? formatMintNaturalAmountAsDecimal(
+                  usdcATA!.extensions.mint!.account!,
+                  usdcATA!.extensions.token!.account.amount
+                )
+              : null
+          })()}
+        </div>
+      ) : null,
     },
     {
       label: 'Quantity',
@@ -136,6 +157,12 @@ const SagaPreOrder = ({
       name: 'quantity',
       inputType: 'number',
       min: 1,
+      additionalComponent: (
+        <div>
+          To Deposit:{' '}
+          {form.quantity ? Number(form.quantity) * onePhoneDepositPrice : 0}
+        </div>
+      ),
     },
   ]
 
