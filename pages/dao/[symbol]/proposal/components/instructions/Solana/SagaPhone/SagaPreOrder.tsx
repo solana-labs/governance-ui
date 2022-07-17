@@ -19,8 +19,14 @@ import InstructionForm, {
   InstructionInput,
   InstructionInputType,
 } from '../../FormCreator'
-import { DEVNET_ISSUER, getPurchaseInstructions, USDC_DEVNET } from './mortar'
+import {
+  DEVNET_ISSUER,
+  getPurchaseInstructions,
+  MAINNET_ISSUER,
+  USDC_DEVNET,
+} from './mortar'
 import { BN } from '@project-serum/anchor'
+import { USDC_MINT } from 'Strategies/protocols/mango/tools'
 
 const SagaPreOrder = ({
   index,
@@ -30,10 +36,21 @@ const SagaPreOrder = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
+  const { connection } = useWalletStore()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
+  const isDevnet = connection.cluster === 'devnet'
+  const ISSUER = isDevnet ? DEVNET_ISSUER : MAINNET_ISSUER
+  const SALE_MINT = isDevnet ? USDC_DEVNET : new PublicKey(USDC_MINT)
   const governedSolAccounts = assetAccounts.filter(
-    (x) => x.type === AccountType.SOL
+    (x) =>
+      x.type === AccountType.SOL &&
+      assetAccounts.find(
+        (j) =>
+          j.extensions.token?.account.owner.toBase58() ===
+            x.extensions.transferAddress?.toBase58() &&
+          j.extensions.mint?.publicKey.toBase58() === SALE_MINT.toBase58()
+      )
   )
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
@@ -64,9 +81,9 @@ const SagaPreOrder = ({
       //Mango instruction call and serialize
       const instructions = getPurchaseInstructions(
         form.governedAccount.extensions.transferAddress!,
-        DEVNET_ISSUER,
+        ISSUER,
         form.governedAccount.extensions.transferAddress!,
-        USDC_DEVNET,
+        SALE_MINT,
         new BN(form.quantity)
       )
 
@@ -103,7 +120,7 @@ const SagaPreOrder = ({
   })
   const inputs: InstructionInput[] = [
     {
-      label: 'Governance',
+      label: 'SOL account with owned USDC token account',
       initialValue: form.governedAccount,
       name: 'governedAccount',
       type: InstructionInputType.GOVERNED_ACCOUNT,
@@ -115,6 +132,7 @@ const SagaPreOrder = ({
       label: 'Quantity',
       initialValue: form.quantity,
       type: InstructionInputType.INPUT,
+      validateMinMax: true,
       name: 'quantity',
       inputType: 'number',
       min: 1,

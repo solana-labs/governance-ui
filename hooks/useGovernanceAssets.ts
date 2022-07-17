@@ -218,7 +218,7 @@ export default function useGovernanceAssets() {
     },
     {
       id: Instructions.SagaPreOrder,
-      name: 'Saga phone pre-order',
+      name: 'Pre-order Saga Phone',
       isVisible: canUseTokenTransferInstruction,
     },
     {

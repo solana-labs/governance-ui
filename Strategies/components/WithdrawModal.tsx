@@ -264,7 +264,11 @@ const WithdrawModal = ({
       chunkBy: 1,
     }
     proposalInstructions.push(instructionData)
-    if (wrappedSolAccount) {
+    if (
+      wrappedSolAccount &&
+      (selectedMangoAccount.owner.toBase58() === form.withdrawAddress ||
+        selectedMangoAccount.owner.toBase58() === governance.pubkey.toBase58())
+    ) {
       const closeAobInstruction = closeAccount({
         source: wrappedSolAccount.publicKey,
         destination: new PublicKey(form.withdrawAddress),
