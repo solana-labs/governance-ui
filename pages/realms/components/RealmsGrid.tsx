@@ -12,48 +12,50 @@ import { IoIosRemoveCircleOutline } from 'react-icons/io'
 
 const RealmBox = ({ editing, realm, theme, removeItem, inGrid = false }) => {
   return (
-    <div
-      className={`flex relative w-full h-full group flex-col items-center justify-center overflow-hidden p-8 rounded-lg cursor-pointer default-transition active:cursor-grabbing ${
-        editing
-          ? ` bg-bkg-4 opacity-75 cursor-grab hover:opacity-90`
-          : `hover:bg-bkg-3 bg-bkg-2`
-      }`}
-    >
+    <div className="relative h-full w-full group">
+      <div
+        className={`flex relative w-full h-full flex-col items-center justify-center overflow-hidden p-8 rounded-lg cursor-pointer default-transition active:cursor-grabbing ${
+          editing
+            ? ` bg-bkg-4 cursor-grab opacity-75 group-hover:opacity-90`
+            : `hover:bg-bkg-3 bg-bkg-2`
+        }`}
+      >
+        <div className="pb-5">
+          {realm.ogImage ? (
+            <div
+              className={`${
+                theme === 'Dark'
+                  ? 'bg-[rgba(255,255,255,0.06)]'
+                  : 'bg-[rgba(0,0,0,0.06)]'
+              } rounded-full h-16 w-16 flex items-center justify-center`}
+            >
+              <img className="w-10" src={realm.ogImage}></img>
+            </div>
+          ) : (
+            <div
+              className={`${
+                theme === 'Dark'
+                  ? 'bg-[rgba(255,255,255,0.06)]'
+                  : 'bg-[rgba(0,0,0,0.06)]'
+              } h-16 w-16 flex font-bold items-center justify-center rounded-full text-fgd-3`}
+            >
+              {realm.displayName?.charAt(0)}
+            </div>
+          )}
+        </div>
+        <h3 className="text-center">{realm.displayName ?? realm.symbol}</h3>
+      </div>
       {editing && (
-        <AiOutlineDrag className="absolute top-1 left-1 rounded-full h-8 w-8" />
+        <AiOutlineDrag className="absolute cursor-grab active:cursor-grabbing left-0 right-0 top-0 bottom-0 m-auto h-20 w-20" />
       )}
       {editing && inGrid && (
         <div
           onClick={() => removeItem(realm.realmId.toString())}
-          className="absolute top-1 right-1 rounded-full cursor-pointer hover:opacity-90"
+          className="absolute top-1 right-1 rounded-full cursor-pointer hover:opacity-50"
         >
           <IoIosRemoveCircleOutline className="h-8 w-8 z-50" />
         </div>
       )}
-      <div className="pb-5">
-        {realm.ogImage ? (
-          <div
-            className={`${
-              theme === 'Dark'
-                ? 'bg-[rgba(255,255,255,0.06)]'
-                : 'bg-[rgba(0,0,0,0.06)]'
-            } rounded-full h-16 w-16 flex items-center justify-center`}
-          >
-            <img className="w-10" src={realm.ogImage}></img>
-          </div>
-        ) : (
-          <div
-            className={`${
-              theme === 'Dark'
-                ? 'bg-[rgba(255,255,255,0.06)]'
-                : 'bg-[rgba(0,0,0,0.06)]'
-            } h-16 w-16 flex font-bold items-center justify-center rounded-full text-fgd-3`}
-          >
-            {realm.displayName?.charAt(0)}
-          </div>
-        )}
-      </div>
-      <h3 className="text-center">{realm.displayName ?? realm.symbol}</h3>
     </div>
   )
 }
@@ -230,9 +232,10 @@ function RealmsGrid({
   return (
     <>
       <div
-        className="flex flex-col gap-4"
+        className="pb-4 mb-4"
         style={{ borderBottom: searching || editing ? '1px solid white' : '' }}
       >
+        {(searching || editing) && <h2 className="my-4">All DAOs</h2>}
         <div
           className="overflow-scroll flex flex-nowrap h-auto transition-all duration-200 ease-in-out"
           style={{
@@ -288,20 +291,24 @@ function RealmsGrid({
       <div
         className="relative z-50"
         style={{
-          borderBottom: gridRealms?.length > 0 ? '1px solid white' : '',
           marginBottom: gridRealms?.length > 0 ? '15px' : '',
         }}
       >
+        {(gridRealms?.length > 0 || editing) && (
+          <h2 className="my-4">Favourites</h2>
+        )}
         <GridLayout
-          className={`layout ${editing || searching ? 'min-h-[70px] ' : ''} ${
-            gridRealms?.length > 0 ? 'border-b border-white' : ''
+          className={`layout ${
+            editing || searching
+              ? 'min-h-[70px] '
+              : 'min-h-0 h-0 overflow-hidden'
           }`}
           layout={layout}
           width={width}
           cols={columns}
           rowHeight={ROW_HEIGHT}
           margin={[GAP, GAP]}
-          containerPadding={[0, GAP]}
+          containerPadding={[0, 0]}
           onDragStart={resetGrid}
           onDragStop={(layout) => updateItem(layout)}
           onResizeStart={resetGrid}
@@ -337,12 +344,13 @@ function RealmsGrid({
         {gridRealms?.length == 0 && (editing || searching) && (
           <div className="text-confirm-green flex items-center -z-50 justify-center left-0 right-0 mx-auto absolute top-2 gap-2 w-fit">
             <AiOutlinePlusCircle className="h-10 w-10" />
-            <div>Add realms to the grid</div>
+            <div>Add DAOs to this grid by dragging</div>
           </div>
         )}
       </div>
       {!searching && !editing && (
         <div>
+          <h2 className="my-4">Certified DAOs</h2>
           <div className="grid grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
             {certifiedRealms &&
               getRealmsOutsideGrid(certifiedRealms).map((realm) => (
