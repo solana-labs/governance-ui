@@ -17,6 +17,7 @@ import {
 } from '@solana/spl-governance'
 import { GOVERNANCE_SCHEMA } from '@solana/spl-governance'
 import { Connection } from '@solana/web3.js'
+import { MAX_TOKENS_TO_DISABLE } from '@tools/constants'
 import { fmtMintAmount, getDaysFromTimestamp } from '@tools/sdk/units'
 import { deserialize } from 'borsh'
 
@@ -47,21 +48,27 @@ export const GOVERNANCE_INSTRUCTIONS = {
         const councilMint = realm.account.config.councilMint
           ? await tryGetMint(connection, realm.account.config.councilMint)
           : undefined
-
+        const isMaxNumber =
+          args.config.minCommunityTokensToCreateProposal.toString() ===
+          MAX_TOKENS_TO_DISABLE.toString()
         return (
           <>
             <p>
               {`voteThresholdPercentage:
               ${args.config.voteThresholdPercentage.value.toLocaleString()}%`}
             </p>
-            <p>
-              {`minCommunityTokensToCreateProposal:
+            {isMaxNumber ? (
+              <p>minCommunityTokensToCreateProposal: Disabled</p>
+            ) : (
+              <p>
+                {`minCommunityTokensToCreateProposal:
               ${fmtMintAmount(
                 communityMint?.account,
                 args.config.minCommunityTokensToCreateProposal
               )}`}{' '}
-              ({args.config.minCommunityTokensToCreateProposal.toNumber()})
-            </p>
+                ({args.config.minCommunityTokensToCreateProposal.toNumber()})
+              </p>
+            )}
             <p>
               {`minCouncilTokensToCreateProposal:
               ${fmtMintAmount(

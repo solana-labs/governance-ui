@@ -6,7 +6,7 @@ import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import {
   UiInstruction,
-  MangoRemoveSpotMarketForm,
+  MangoRemoveOracleForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -17,8 +17,7 @@ import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import {
   IDS,
   Config,
-  MangoClient,
-  makeRemoveSpotMarketInstruction,
+  makeRemoveOracleInstruction,
 } from '@blockworks-foundation/mango-client'
 import { AccountType } from '@utils/uiTypes/assets'
 import InstructionForm, {
@@ -26,9 +25,8 @@ import InstructionForm, {
   InstructionInputType,
 } from '../FormCreator'
 import { usePrevious } from '@hooks/usePrevious'
-import { emptyPk } from '../../../../../../../VoteStakeRegistry/sdk/accounts'
 
-const MakeRemoveSpotMarket = ({
+const MakeRemoveOracle = ({
   index,
   governance,
 }: {
@@ -41,15 +39,13 @@ const MakeRemoveSpotMarket = ({
   const governedProgramAccounts = assetAccounts.filter(
     (x) => x.type === AccountType.PROGRAM
   )
-  const connection = useWalletStore((s) => s.connection)
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<MangoRemoveSpotMarketForm>({
+  const [form, setForm] = useState<MangoRemoveOracleForm>({
     governedAccount: null,
     mangoGroup: null,
-    marketIndex: null,
     adminPk: '',
-    adminVaultPk: '',
+    oraclePk: null,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -74,33 +70,16 @@ const MakeRemoveSpotMarket = ({
       const groupConfig = Config.ids().groups.find((c) =>
         c.publicKey.equals(new PublicKey(form.mangoGroup!.value))
       )!
-      const client = new MangoClient(
-        connection.current,
-        groupConfig.mangoProgramId
-      )
-      const group = await client.getMangoGroup(groupConfig.publicKey)
-      const [dustAccountPk] = await PublicKey.findProgramAddress(
-        [group.publicKey.toBytes(), Buffer.from('DustAccount', 'utf-8')],
-        groupConfig.mangoProgramId
-      )
-      const marketIndex = Number(form.marketIndex!.value)
-      const rootBanks = await group.loadRootBanks(connection.current)
+
       //Mango instruction call and serialize
-      const removePerpMarketIx = makeRemoveSpotMarketInstruction(
+      const addOracleIx = makeRemoveOracleInstruction(
         groupConfig.mangoProgramId,
-        groupConfig.publicKey,
+        new PublicKey(form.mangoGroup!.value),
         new PublicKey(form.adminPk),
-        dustAccountPk,
-        rootBanks[marketIndex]!.publicKey,
-        new PublicKey(form.adminVaultPk),
-        group.signerKey,
-        rootBanks[marketIndex]!.nodeBanks.filter(
-          (x) => x.toBase58() !== emptyPk
-        ),
-        rootBanks[marketIndex]!.nodeBankAccounts.map((x) => x.vault)
+        new PublicKey(form.oraclePk!.value)
       )
 
-      serializedInstruction = serializeInstructionToBase64(removePerpMarketIx)
+      serializedInstruction = serializeInstructionToBase64(addOracleIx)
     }
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
@@ -109,6 +88,12 @@ const MakeRemoveSpotMarket = ({
     }
     return obj
   }
+  useEffect(() => {
+    handleSetForm({
+      propertyName: 'programId',
+      value: programId?.toString(),
+    })
+  }, [realmInfo?.programId])
   const previousProgramGov = usePrevious(
     form.governedAccount?.governance.pubkey.toBase58()
   )
@@ -126,33 +111,32 @@ const MakeRemoveSpotMarket = ({
         value: form.governedAccount?.governance.pubkey.toBase58(),
       })
     }
-  }, [JSON.stringify(form)])
+  }, [form])
   const schema = yup.object().shape({
     mangoGroup: yup.object().nullable().required('Mango group is required'),
-    marketIndex: yup.object().nullable().required('Market index is required'),
     adminPk: yup.string().required('Admin Pk is required'),
-    adminVaultPk: yup.string().required('Admin vault pk is required'),
+    oraclePk: yup.object().nullable().required('Oracle Pk is required'),
     governedAccount: yup
       .object()
       .nullable()
       .required('Program governed account is required'),
   })
-  const getOptionsForMarketIndex = () => {
+  const getOptionsForGroup = () => {
     const currentMangoGroup = IDS.groups.find(
       (x) => x.publicKey === form.mangoGroup?.value
     )!
     return form.mangoGroup
-      ? currentMangoGroup['spotMarkets'].map((x) => {
+      ? currentMangoGroup.oracles.map((x) => {
           return {
-            name: x.name,
-            value: x.marketIndex,
+            name: `${x.symbol}: ${x.publicKey} `,
+            value: x.publicKey,
           }
         })
       : []
   }
   const inputs: InstructionInput[] = [
     {
-      label: 'Program',
+      label: 'Governance',
       initialValue: form.governedAccount,
       name: 'governedAccount',
       type: InstructionInputType.GOVERNED_ACCOUNT,
@@ -170,23 +154,17 @@ const MakeRemoveSpotMarket = ({
       }),
     },
     {
-      label: 'Market',
-      initialValue: form.marketIndex,
+      label: 'Oracle',
+      initialValue: form.oraclePk,
       type: InstructionInputType.SELECT,
-      name: 'marketIndex',
-      options: getOptionsForMarketIndex(),
+      name: 'oraclePk',
+      options: getOptionsForGroup(),
     },
     {
       label: 'Admin PublicKey',
       initialValue: form.adminPk,
       type: InstructionInputType.INPUT,
       name: 'adminPk',
-    },
-    {
-      label: 'Mango DAO token account (ATA with same mint as removed market)',
-      initialValue: form.adminVaultPk,
-      type: InstructionInputType.INPUT,
-      name: 'adminVaultPk',
     },
   ]
 
@@ -205,4 +183,4 @@ const MakeRemoveSpotMarket = ({
   )
 }
 
-export default MakeRemoveSpotMarket
+export default MakeRemoveOracle

@@ -505,6 +505,15 @@
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "97jKDX5Uxh5xSPbmmfhiFodHEajSVdKkknTzzgf8GBAr"
   },
+    {
+    "symbol": "RatioFinance",
+    "displayName": "Ratio Finance",
+    "programId": "HT19EcD68zn7NoCF79b2ucQF8XaMdowyPt5ccS6g1PUx",
+    "realmId": "8HZ4V94dtojrTpdUpWrfstr7bEhRnZZHn8jotfns9L9x",
+    "website": "https://ratio.finance/",
+    "twitter": "@RatioFinance",
+    "ogImage": "/realms/RatioFinance/img/ratiologo.png"
+  },
   {
     "symbol": "PixelBands",
     "displayName": "PixelBands DAO",

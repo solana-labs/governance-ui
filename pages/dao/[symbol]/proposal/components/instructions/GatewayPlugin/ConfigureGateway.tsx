@@ -1,43 +1,55 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import * as yup from 'yup'
 import {
   Governance,
   ProgramAccount,
   serializeInstructionToBase64,
-  SYSTEM_PROGRAM_ID,
 } from '@solana/spl-governance'
 import { validateInstruction } from '@utils/instructionTools'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
 import useWalletStore from 'stores/useWalletStore'
+
 import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NewProposalContext } from '../../../new'
-import InstructionForm, { InstructionInputType } from '../FormCreator'
-import { AssetAccount } from '@utils/uiTypes/assets'
+import InstructionForm, {
+  InstructionInput,
+  InstructionInputType,
+} from '../FormCreator'
+import { PublicKey } from '@solana/web3.js'
+import { getValidatedPublickKey } from '@utils/validations'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getRegistrarPDA } from '@utils/plugin/accounts'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
-interface CreateNftRegistrarForm {
+interface ConfigureGatewayForm {
   governedAccount: AssetAccount | undefined
-  maxCollections: number
+  gatekeeperNetwork: PublicKey // populated by dropdown
+  otherGatekeeperNetwork: PublicKey | undefined // manual entry
+  predecessor: PublicKey | undefined // if part of a chain of plugins
 }
 
-const CreateNftPluginRegistrar = ({
+const ConfigureGatewayPlugin = ({
   index,
   governance,
 }: {
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { realm, realmInfo } = useRealm()
-  const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
+  const { realm } = useRealm()
+  const gatewayClient = useVotePluginsClientStore((s) => s.state.gatewayClient)
   const { assetAccounts } = useGovernanceAssets()
   const wallet = useWalletStore((s) => s.current)
   const shouldBeGoverned = index !== 0 && governance
-  const [form, setForm] = useState<CreateNftRegistrarForm>()
+  const [form, setForm] = useState<ConfigureGatewayForm>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
+
+  const chosenGatekeeperNetwork = useMemo(() => {
+    return form?.otherGatekeeperNetwork || form?.gatekeeperNetwork
+  }, [form])
+
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstruction = ''
@@ -46,33 +58,31 @@ const CreateNftPluginRegistrar = ({
       form!.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
+      const remainingAccounts = form!.predecessor
+        ? [{ pubkey: form!.predecessor, isSigner: false, isWritable: false }]
+        : []
       const { registrar } = await getRegistrarPDA(
         realm!.pubkey,
         realm!.account.communityMint,
-        nftClient!.program.programId
+        gatewayClient!.program.programId
       )
-
-      const createRegistrarIx = await nftClient!.program.methods
-        .createRegistrar(form!.maxCollections)
+      const configureRegistrarTx = await gatewayClient!.program.methods
+        .configureRegistrar(false)
         .accounts({
           registrar,
           realm: realm!.pubkey,
-          governanceProgramId: realmInfo!.programId,
           realmAuthority: realm!.account.authority!,
-          governingTokenMint: realm!.account.communityMint!,
-          payer: wallet.publicKey!,
-          systemProgram: SYSTEM_PROGRAM_ID,
+          gatekeeperNetwork: chosenGatekeeperNetwork,
         })
+        .remainingAccounts(remainingAccounts)
         .instruction()
-      serializedInstruction = serializeInstructionToBase64(createRegistrarIx)
+      serializedInstruction = serializeInstructionToBase64(configureRegistrarTx)
     }
-    const obj: UiInstruction = {
+    return {
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form!.governedAccount?.governance,
-      chunkSplitByDefault: true,
     }
-    return obj
   }
   useEffect(() => {
     handleSetInstructions(
@@ -85,8 +95,30 @@ const CreateNftPluginRegistrar = ({
       .object()
       .nullable()
       .required('Governed account is required'),
+    collection: yup
+      .string()
+      .test(
+        'accountTests',
+        'Collection address validation error',
+        function (val: string) {
+          if (val) {
+            try {
+              return !!getValidatedPublickKey(val)
+            } catch (e) {
+              console.log(e)
+              return this.createError({
+                message: `${e}`,
+              })
+            }
+          } else {
+            return this.createError({
+              message: `Collection address is required`,
+            })
+          }
+        }
+      ),
   })
-  const inputs = [
+  const inputs: InstructionInput[] = [
     {
       label: 'Governance',
       initialValue: null,
@@ -101,14 +133,11 @@ const CreateNftPluginRegistrar = ({
       ),
     },
     {
-      label: 'Max collections',
-      initialValue: 10,
-      name: 'maxCollections',
+      label: 'Gatekeeper Network',
+      initialValue: '',
+      inputType: 'text',
+      name: 'gatekeeperNetwork',
       type: InstructionInputType.INPUT,
-      inputType: 'number',
-      min: 1,
-      validateMinMax: true,
-      hide: true,
     },
   ]
   return (
@@ -124,4 +153,4 @@ const CreateNftPluginRegistrar = ({
   )
 }
 
-export default CreateNftPluginRegistrar
+export default ConfigureGatewayPlugin

@@ -147,7 +147,7 @@ export interface MangoMakeAddOracleForm {
   oracleAccount: string | undefined
 }
 
-type NameValue = {
+export type NameValue = {
   name: string
   value: string
 }
@@ -167,6 +167,13 @@ export interface MangoSwapSpotMarketForm {
   market: NameValue | null
   adminPk: string
   newSpotMarketPk: string
+}
+
+export interface MangoRemoveOracleForm {
+  governedAccount: AssetAccount | null
+  mangoGroup: NameValue | null
+  adminPk: string
+  oraclePk: NameValue | null
 }
 
 export interface MangoRemovePerpMarketForm {
@@ -371,6 +378,7 @@ export enum Instructions {
   MangoRemoveSpotMarket,
   MangoRemovePerpMarket,
   MangoSwapSpotMarket,
+  MangoRemoveOracle,
   Grant,
   Clawback,
   CreateAssociatedTokenAccount,
