@@ -1,30 +1,32 @@
 import * as yup from 'yup';
-import Input from '@components/inputs/Input';
 import Select from '@components/inputs/Select';
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
-import createWithdrawInsuranceFromMangoDepositoryInstruction from '@tools/sdk/uxdProtocol/createWithdrawInsuranceFromMangoDepositoryInstruction';
 import {
   getDepositoryMintSymbols,
   getInsuranceMintSymbols,
 } from '@tools/sdk/uxdProtocol/uxdClient';
 import { GovernedMultiTypeAccount } from '@utils/tokens';
-import { UXDWithdrawInsuranceFromMangoDepositoryForm } from '@utils/uiTypes/proposalCreationTypes';
+import { UXDQuoteMintWithMangoDepositoryForm } from '@utils/uiTypes/proposalCreationTypes';
 import SelectOptionList from '../../SelectOptionList';
+import createQuoteMintWithMangoDepositoryInstruction from '@tools/sdk/uxdProtocol/createQuoteMintWithMangoDepositoryInstruction';
+import Input from '@components/inputs/Input';
+import { PublicKey } from '@solana/web3.js';
 
 const schema = yup.object().shape({
   governedAccount: yup
     .object()
     .nullable()
-    .required('Program governed account is required'),
-  collateralName: yup.string().required('Collateral Name is required'),
-  insuranceName: yup.string().required('Insurance Name is required'),
-  insuranceWithdrawnAmount: yup
+    .required('Governance account is required'),
+  uxdProgram: yup.string().required('UXD Program address is required'),
+  collateralName: yup.string().required('Collateral Name address is required'),
+  insuranceName: yup.string().required('Insurance Name address is required'),
+  uiQuoteAmount: yup
     .number()
-    .moreThan(0, 'Insurance Withdrawn amount should be more than 0')
-    .required('Insurance Withdrawn amount is required'),
+    .moreThan(0, 'Quote amount should be more than 0')
+    .required('Quote Amount is required'),
 });
 
-const WithdrawInsuranceFromMangoDepository = ({
+const UXDQuoteMintWithMangoDepository = ({
   index,
   governedAccount,
 }: {
@@ -36,27 +38,41 @@ const WithdrawInsuranceFromMangoDepository = ({
     form,
     formErrors,
     handleSetForm,
-  } = useInstructionFormBuilder<UXDWithdrawInsuranceFromMangoDepositoryForm>({
+  } = useInstructionFormBuilder<UXDQuoteMintWithMangoDepositoryForm>({
     index,
     initialFormValues: {
       governedAccount,
-      insuranceWithdrawnAmount: 0,
     },
     schema,
-    buildInstruction: async function ({ form, governedAccountPubkey }) {
-      return createWithdrawInsuranceFromMangoDepositoryInstruction({
+    shouldSplitIntoSeparateTxs: true,
+    buildInstruction: async function ({ form, governedAccountPubkey, wallet }) {
+      return createQuoteMintWithMangoDepositoryInstruction({
         connection,
-        uxdProgramId: form.governedAccount!.governance!.account.governedAccount,
+        uxdProgramId: new PublicKey(form.uxdProgram!),
         authority: governedAccountPubkey,
         depositoryMintName: form.collateralName!,
         insuranceMintName: form.insuranceName!,
-        insuranceWithdrawnAmount: form.insuranceWithdrawnAmount,
+        quoteAmount: form.uiQuoteAmount!,
+        payer: wallet.publicKey!,
       });
     },
   });
 
   return (
     <>
+      <Input
+        label="UXD Program"
+        value={form.uxdProgram}
+        type="string"
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'uxdProgram',
+          })
+        }
+        error={formErrors['uxdProgram']}
+      />
+
       <Select
         label="Collateral Name"
         value={form.collateralName}
@@ -82,20 +98,21 @@ const WithdrawInsuranceFromMangoDepository = ({
       </Select>
 
       <Input
-        label="Insurance Withdrawn Amount"
-        value={form.insuranceWithdrawnAmount}
+        label="Quote Amount"
+        value={form.uiQuoteAmount}
         type="number"
         min={0}
+        max={10 ** 12}
         onChange={(evt) =>
           handleSetForm({
             value: evt.target.value,
-            propertyName: 'insuranceWithdrawnAmount',
+            propertyName: 'uiQuoteAmount',
           })
         }
-        error={formErrors['insuranceWithdrawnAmount']}
+        error={formErrors['uiQuoteAmount']}
       />
     </>
   );
 };
 
-export default WithdrawInsuranceFromMangoDepository;
+export default UXDQuoteMintWithMangoDepository;

@@ -3,7 +3,7 @@ import Input from '@components/inputs/Input';
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
 import createInitializeControllerInstruction from '@tools/sdk/uxdProtocol/createInitializeControllerInstruction';
 import { GovernedMultiTypeAccount } from '@utils/tokens';
-import { InitializeControllerForm } from '@utils/uiTypes/proposalCreationTypes';
+import { UXDInitializeControllerForm } from '@utils/uiTypes/proposalCreationTypes';
 
 const schema = yup.object().shape({
   mintDecimals: yup
@@ -28,7 +28,7 @@ const InitializeController = ({
     form,
     formErrors,
     handleSetForm,
-  } = useInstructionFormBuilder<InitializeControllerForm>({
+  } = useInstructionFormBuilder<UXDInitializeControllerForm>({
     index,
     initialFormValues: {
       governedAccount,
@@ -36,12 +36,11 @@ const InitializeController = ({
     },
     schema,
     buildInstruction: async function ({ form, wallet, governedAccountPubkey }) {
-      return createInitializeControllerInstruction(
-        form.governedAccount!.governance!.account.governedAccount,
-        form.mintDecimals,
-        governedAccountPubkey,
-        wallet.publicKey!,
-      );
+      return createInitializeControllerInstruction({
+        uxdProgramId: form.governedAccount!.governance!.account.governedAccount,
+        authority: governedAccountPubkey,
+        payer: wallet.publicKey!,
+      });
     },
   });
 

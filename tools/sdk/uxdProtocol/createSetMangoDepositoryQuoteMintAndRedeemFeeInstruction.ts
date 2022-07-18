@@ -4,30 +4,27 @@ import { Controller, UXD_DECIMALS } from '@uxd-protocol/uxd-client';
 import type { ConnectionContext } from 'utils/connection';
 import {
   uxdClient,
-  initializeMango,
   instantiateMangoDepository,
   getDepositoryMintInfo,
   getInsuranceMintInfo,
 } from './uxdClient';
 
-const createDepositInsuranceToMangoDepositoryInstruction = async ({
+const createSetMangoDepositoryQuoteMintAndRedeemFeeInstruction = async ({
   connection,
   uxdProgramId,
   authority,
   depositoryMintName,
   insuranceMintName,
-  insuranceDepositedAmount,
+  quoteFee,
 }: {
   connection: ConnectionContext;
   uxdProgramId: PublicKey;
   authority: PublicKey;
   depositoryMintName: string;
   insuranceMintName: string;
-  insuranceDepositedAmount: number;
+  quoteFee: number;
 }): Promise<TransactionInstruction> => {
   const client = uxdClient(uxdProgramId);
-
-  const mango = await initializeMango(connection.current, connection.cluster);
 
   const {
     address: depositoryMint,
@@ -49,14 +46,13 @@ const createDepositInsuranceToMangoDepositoryInstruction = async ({
     insuranceDecimals,
   });
 
-  return client.createDepositInsuranceToMangoDepositoryInstruction(
-    insuranceDepositedAmount,
+  return client.createSetMangoDepositoryQuoteMintAndRedeemFeeInstruction(
+    quoteFee,
     new Controller('UXD', UXD_DECIMALS, uxdProgramId),
     depository,
-    mango,
     authority,
     Provider.defaultOptions(),
   );
 };
 
-export default createDepositInsuranceToMangoDepositoryInstruction;
+export default createSetMangoDepositoryQuoteMintAndRedeemFeeInstruction;

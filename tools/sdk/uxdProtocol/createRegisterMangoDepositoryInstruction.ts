@@ -7,37 +7,59 @@ import { Controller, UXD_DECIMALS } from '@uxd-protocol/uxd-client';
 import { findATAAddrSync } from '@utils/ataTools';
 import type { ConnectionContext } from 'utils/connection';
 import {
-  getDepositoryMintKey,
-  getInsuranceMintKey,
+  getDepositoryMintInfo,
+  getInsuranceMintInfo,
   initializeMango,
   instantiateMangoDepository,
   uxdClient,
 } from './uxdClient';
 
-const createRegisterMangoDepositoryInstruction = async (
-  connection: ConnectionContext,
-  uxdProgramId: PublicKey,
-  authority: PublicKey,
-  payer: PublicKey,
-  depositoryMintName: string,
-  insuranceMintName: string,
-): Promise<TransactionInstruction> => {
+const createRegisterMangoDepositoryInstruction = async ({
+  connection,
+  uxdProgramId,
+  authority,
+  payer,
+  depositoryMintName,
+  insuranceMintName,
+}: {
+  connection: ConnectionContext;
+  uxdProgramId: PublicKey;
+  authority: PublicKey;
+  payer: PublicKey;
+  depositoryMintName: string;
+  insuranceMintName: string;
+}): Promise<TransactionInstruction> => {
   const mango = await initializeMango(connection.current, connection.cluster);
 
-  const depositoryMint = getDepositoryMintKey(
-    connection.cluster,
-    depositoryMintName,
-  );
-  const insuranceMint = getInsuranceMintKey(
-    connection.cluster,
-    insuranceMintName,
-  );
+  const {
+    address: depositoryMint,
+    decimals: depositoryDecimals,
+  } = getDepositoryMintInfo(connection.cluster, depositoryMintName);
 
-  const depository = instantiateMangoDepository(
+  const {
+    address: insuranceMint,
+    decimals: insuranceDecimals,
+  } = getInsuranceMintInfo(connection.cluster, insuranceMintName);
+
+  console.log('>>> createRegisterMangoDepositoryInstruction', {
+    depositoryMintName,
+    insuranceMintName,
+  });
+
+  console.log('>>> createRegisterMangoDepositoryInstruction', {
+    depositoryMint: depositoryMint.toBase58(),
+    insuranceMint: insuranceMint.toBase58(),
+  });
+
+  const depository = instantiateMangoDepository({
     uxdProgramId,
     depositoryMint,
     insuranceMint,
-  );
+    depositoryName: depositoryMintName,
+    depositoryDecimals,
+    insuranceName: insuranceMintName,
+    insuranceDecimals,
+  });
 
   const client = uxdClient(uxdProgramId);
   const [authorityInsuranceATA] = findATAAddrSync(authority, insuranceMint);

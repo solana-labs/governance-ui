@@ -1,7 +1,7 @@
 import { Connection } from '@solana/web3.js';
 import { struct, u8, nu64 } from 'buffer-layout';
 import { AccountMetaData } from '@solana/spl-governance';
-import { u128, u64 } from '@project-serum/borsh';
+import { bool, u128, u64 } from '@project-serum/borsh';
 import { INSURANCE_MINTS } from '@tools/sdk/uxdProtocol/uxdClient';
 import { UXD_DECIMALS } from '@uxd-protocol/uxd-client';
 import { nativeAmountToFormattedUiAmount } from '@tools/sdk/units';
@@ -11,6 +11,52 @@ import { ANCHOR_DISCRIMINATOR_LAYOUT } from '@utils/helpers';
 
 export const UXD_PROGRAM_INSTRUCTIONS = {
   UXD8m9cvwk4RcSxnX2HZ9VudQCEeDH6fRnB4CAP57Dr: {
+    136: {
+      name: 'UXD - Disable Depository Regular Minting',
+      accounts: ['Authority', 'Controller', 'Depository'],
+      getDataUI: (
+        _connection: Connection,
+        data: Uint8Array,
+        _accounts: AccountMetaData[],
+      ) => {
+        const dataLayout = struct([
+          u8('instruction'),
+          ...ANCHOR_DISCRIMINATOR_LAYOUT,
+          bool('disable'),
+        ]);
+
+        const { disable } = dataLayout.decode(Buffer.from(data)) as any;
+
+        return (
+          <>
+            <p>{`disable: ${disable}`}</p>
+          </>
+        );
+      },
+    },
+    174: {
+      name: 'UXD - Set Mango Depository Quote Mint and Redeem Fee',
+      accounts: ['Authority', 'Controller', 'Depository'],
+      getDataUI: (
+        _connection: Connection,
+        data: Uint8Array,
+        _accounts: AccountMetaData[],
+      ) => {
+        const dataLayout = struct([
+          u8('instruction'),
+          ...ANCHOR_DISCRIMINATOR_LAYOUT,
+          u8('quoteFee'),
+        ]);
+
+        const { quoteFee } = dataLayout.decode(Buffer.from(data)) as any;
+
+        return (
+          <>
+            <p>{`quote Fee: ${quoteFee} bps`}</p>
+          </>
+        );
+      },
+    },
     137: {
       name: 'UXD - Initialize Controller',
       accounts: [

@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import * as yup from 'yup';
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
 import createSetRedeemableGlobalSupplyCapInstruction from '@tools/sdk/uxdProtocol/createSetRedeemableGlobalSupplyCapInstruction';
-import { SetRedeemableGlobalSupplyCapForm } from '@utils/uiTypes/proposalCreationTypes';
+import { UXDSetRedeemableGlobalSupplyCapForm } from '@utils/uiTypes/proposalCreationTypes';
 import Input from '@components/inputs/Input';
 import { GovernedMultiTypeAccount } from '@utils/tokens';
 
@@ -27,7 +28,7 @@ const SetRedeemGlobalSupplyCap = ({
     form,
     formErrors,
     handleSetForm,
-  } = useInstructionFormBuilder<SetRedeemableGlobalSupplyCapForm>({
+  } = useInstructionFormBuilder<UXDSetRedeemableGlobalSupplyCapForm>({
     index,
     initialFormValues: {
       governedAccount,
@@ -35,11 +36,11 @@ const SetRedeemGlobalSupplyCap = ({
     },
     schema,
     buildInstruction: async function ({ form, governedAccountPubkey }) {
-      return createSetRedeemableGlobalSupplyCapInstruction(
-        form.governedAccount!.governance!.account.governedAccount,
-        form.supplyCap,
-        governedAccountPubkey,
-      );
+      return createSetRedeemableGlobalSupplyCapInstruction({
+        uxdProgramId: form.governedAccount!.governance!.account.governedAccount,
+        supplyCapUiAmount: form.supplyCap,
+        authority: governedAccountPubkey,
+      });
     },
   });
 

@@ -1,25 +1,27 @@
 import * as yup from 'yup';
 import Select from '@components/inputs/Select';
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
-import createRegisterMangoDepositoryInstruction from '@tools/sdk/uxdProtocol/createRegisterMangoDepositoryInstruction';
 import {
   getDepositoryMintSymbols,
   getInsuranceMintSymbols,
 } from '@tools/sdk/uxdProtocol/uxdClient';
 import { GovernedMultiTypeAccount } from '@utils/tokens';
-import { UXDRegisterMangoDepositoryForm } from '@utils/uiTypes/proposalCreationTypes';
+import { UXDDisableDepositoryMintingForm } from '@utils/uiTypes/proposalCreationTypes';
 import SelectOptionList from '../../SelectOptionList';
+import createDisableDepositoryRegularMintingInstruction from '@tools/sdk/uxdProtocol/createDisableDepositoryRegularMintingInstruction';
+import Switch from '@components/Switch';
 
 const schema = yup.object().shape({
   governedAccount: yup
     .object()
     .nullable()
     .required('Governance account is required'),
-  collateralName: yup.string().required('Valid Collateral name is required'),
-  insuranceName: yup.string().required('Valid Insurance name is required'),
+  collateralName: yup.string().required('Collateral Name address is required'),
+  insuranceName: yup.string().required('Insurance Name address is required'),
+  disableMinting: yup.boolean().required('Disable Minting is required'),
 });
 
-const RegisterMangoDepository = ({
+const UXDDisableDepositoryMinting = ({
   index,
   governedAccount,
 }: {
@@ -31,20 +33,22 @@ const RegisterMangoDepository = ({
     form,
     formErrors,
     handleSetForm,
-  } = useInstructionFormBuilder<UXDRegisterMangoDepositoryForm>({
+  } = useInstructionFormBuilder<UXDDisableDepositoryMintingForm>({
     index,
     initialFormValues: {
       governedAccount,
+      disableMinting: true,
     },
     schema,
-    buildInstruction: async function ({ form, wallet, governedAccountPubkey }) {
-      return createRegisterMangoDepositoryInstruction({
+
+    buildInstruction: async function ({ form, governedAccountPubkey }) {
+      return createDisableDepositoryRegularMintingInstruction({
         connection,
         uxdProgramId: form.governedAccount!.governance!.account.governedAccount,
         authority: governedAccountPubkey,
-        payer: wallet.publicKey!,
         depositoryMintName: form.collateralName!,
         insuranceMintName: form.insuranceName!,
+        disableMinting: form.disableMinting,
       });
     },
   });
@@ -74,8 +78,21 @@ const RegisterMangoDepository = ({
       >
         <SelectOptionList list={getInsuranceMintSymbols(connection.cluster)} />
       </Select>
+
+      <div className="flex">
+        <span className="text-sm mr-2">Enable Minting</span>
+
+        <Switch
+          checked={form.disableMinting}
+          onChange={(value) => {
+            handleSetForm({ value, propertyName: 'disableMinting' });
+          }}
+        />
+
+        <span className="text-sm ml-2">Disable Minting</span>
+      </div>
     </>
   );
 };
 
-export default RegisterMangoDepository;
+export default UXDDisableDepositoryMinting;

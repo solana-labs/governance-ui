@@ -539,10 +539,10 @@
   version "0.2.3"
   resolved "https://registry.npmjs.org/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz"
 
-"@blockworks-foundation/mango-client@3.4.4":
-  version "3.4.4"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-client/-/mango-client-3.4.4.tgz#5ccf688432c54c88b513499edde0dcb9af945a8f"
-  integrity sha512-r4qBcPbxgtfpTWO8Z/ChIY8bQKXXEG+4Bzce+IjHWN32g+UP0tVydMvfYi6WNN9JNrKccR58MujUWvEo7HyniQ==
+"@blockworks-foundation/mango-client@3.4.5":
+  version "3.4.5"
+  resolved "https://registry.npmjs.org/@blockworks-foundation/mango-client/-/mango-client-3.4.5.tgz"
+  integrity sha512-RQ8WAcUMKtV72TGZ3qLFqcZW17WbDyDMcnCZrzSHp0rWpuThXcKb17/YBJY7TugVRvc6JnV1aJtlibI/oF15Gw==
   dependencies:
     "@project-serum/anchor" "^0.21.0"
     "@project-serum/serum" "0.13.55"
@@ -557,16 +557,16 @@
     toformat "^2.0.0"
     yargs "^17.0.1"
 
-"@blockworks-foundation/mango-client@3.4.5":
-  version "3.4.5"
-  resolved "https://registry.npmjs.org/@blockworks-foundation/mango-client/-/mango-client-3.4.5.tgz"
-  integrity sha512-RQ8WAcUMKtV72TGZ3qLFqcZW17WbDyDMcnCZrzSHp0rWpuThXcKb17/YBJY7TugVRvc6JnV1aJtlibI/oF15Gw==
+"@blockworks-foundation/mango-client@3.4.7":
+  version "3.4.7"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-client/-/mango-client-3.4.7.tgz#5411ca4aae738bc9a277d88c15f6aa162f47aaf0"
+  integrity sha512-TBbWn+adQdXu+6UUiZqWD+LmZsDy9DhRkSaaxKDwC0q1VDLvXbO6Sj9XpOmw6ZAp7bgC/9uKtn9macJotppn3Q==
   dependencies:
     "@project-serum/anchor" "^0.21.0"
     "@project-serum/serum" "0.13.55"
     "@project-serum/sol-wallet-adapter" "^0.2.0"
     "@solana/spl-token" "^0.1.6"
-    "@solana/web3.js" "^1.31.0"
+    "@solana/web3.js" "^1.37.1"
     big.js "^6.1.1"
     bn.js "^5.1.0"
     buffer-layout "^1.2.1"
@@ -1662,13 +1662,13 @@
     snake-case "^3.0.4"
     toml "^3.0.0"
 
-"@project-serum/anchor@0.22.1", "@project-serum/anchor@^0.22.1":
-  version "0.22.1"
-  resolved "https://registry.yarnpkg.com/@project-serum/anchor/-/anchor-0.22.1.tgz#698a9620f94691de0a12bbc650a5c8380e2f0e8a"
-  integrity sha512-5pHeyvQhzLahIQ8aZymmDMZJAJFklN0joZdI+YIqFkK2uU/mlKr6rBLQjxysf/j1mLLiNG00tdyLfUtTAdQz7w==
+"@project-serum/anchor@0.24.2":
+  version "0.24.2"
+  resolved "https://registry.yarnpkg.com/@project-serum/anchor/-/anchor-0.24.2.tgz#a3c52a99605c80735f446ca9b3a4885034731004"
+  integrity sha512-0/718g8/DnEuwAidUwh5wLYphUYXhUbiClkuRNhvNoa+1Y8a4g2tJyxoae+emV+PG/Gikd/QUBNMkIcimiIRTA==
   dependencies:
     "@project-serum/borsh" "^0.2.5"
-    "@solana/web3.js" "^1.17.0"
+    "@solana/web3.js" "^1.36.0"
     base64-js "^1.5.1"
     bn.js "^5.1.2"
     bs58 "^4.0.1"
@@ -1677,7 +1677,6 @@
     cross-fetch "^3.1.5"
     crypto-hash "^1.3.0"
     eventemitter3 "^4.0.7"
-    find "^0.3.0"
     js-sha256 "^0.9.0"
     pako "^2.0.3"
     snake-case "^3.0.4"
@@ -1749,6 +1748,27 @@
   integrity sha512-flRuW/F+iC8mitNokx82LOXyND7Dyk6n5UUPJpQv/+NfySFrNFlzuQZaBZJ4CG5g9s8HS/uaaIz1nVkDR8V/QA==
   dependencies:
     "@project-serum/borsh" "^0.2.4"
+    "@solana/web3.js" "^1.17.0"
+    base64-js "^1.5.1"
+    bn.js "^5.1.2"
+    bs58 "^4.0.1"
+    buffer-layout "^1.2.2"
+    camelcase "^5.3.1"
+    cross-fetch "^3.1.5"
+    crypto-hash "^1.3.0"
+    eventemitter3 "^4.0.7"
+    find "^0.3.0"
+    js-sha256 "^0.9.0"
+    pako "^2.0.3"
+    snake-case "^3.0.4"
+    toml "^3.0.0"
+
+"@project-serum/anchor@^0.22.1":
+  version "0.22.1"
+  resolved "https://registry.yarnpkg.com/@project-serum/anchor/-/anchor-0.22.1.tgz#698a9620f94691de0a12bbc650a5c8380e2f0e8a"
+  integrity sha512-5pHeyvQhzLahIQ8aZymmDMZJAJFklN0joZdI+YIqFkK2uU/mlKr6rBLQjxysf/j1mLLiNG00tdyLfUtTAdQz7w==
+  dependencies:
+    "@project-serum/borsh" "^0.2.5"
     "@solana/web3.js" "^1.17.0"
     base64-js "^1.5.1"
     bn.js "^5.1.2"
@@ -2429,19 +2449,21 @@
     "@solana/wallet-adapter-base" "^0.9.1"
     "@solana/web3.js" "^1.20.0"
 
-"@solana/web3.js@1.35.1":
-  version "1.35.1"
-  resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.35.1.tgz#777b039a3b51e63c347712a57c7db87c9d1db832"
-  integrity sha512-3bDawFFI0KcvgI8Ae4N4hdQ8+Bg9gu6q+IkhPrYxOF6RYnB3U+9A4u+DhHZWLvTvgoTyesi/m5HzlleKtFEqRQ==
+"@solana/web3.js@1.42.0":
+  version "1.42.0"
+  resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.42.0.tgz#296e4bbab1fbfc198b3e9c3d94016c3876eb6a2c"
+  integrity sha512-QqGh5DWzrgsWRx4sCPDQIm3390b7buPR16tZI61slQaQwJ2ymrSXPQCe4PPTJEIlzGjCV3dkn2vpT2R32BfK2Q==
   dependencies:
     "@babel/runtime" "^7.12.5"
     "@ethersproject/sha2" "^5.5.0"
-    "@solana/buffer-layout" "^3.0.0"
+    "@solana/buffer-layout" "^4.0.0"
+    "@solana/buffer-layout-utils" "^0.2.0"
     bn.js "^5.0.0"
-    borsh "^0.4.0"
+    borsh "^0.7.0"
     bs58 "^4.0.1"
     buffer "6.0.1"
     cross-fetch "^3.1.4"
+    fast-stable-stringify "^1.0.0"
     jayson "^3.4.4"
     js-sha3 "^0.8.0"
     rpc-websockets "^7.4.2"
@@ -2592,6 +2614,29 @@
     jayson "^3.4.4"
     js-sha3 "^0.8.0"
     rpc-websockets "^7.4.2"
+    secp256k1 "^4.0.2"
+    superstruct "^0.14.2"
+    tweetnacl "^1.0.0"
+
+"@solana/web3.js@^1.37.1":
+  version "1.48.0"
+  resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.48.0.tgz#331281b2d80640431fb3b6fdc6b704ec325917aa"
+  integrity sha512-Gb6XvdhGjGI7CdAXLmlMIEvEYvrwqc78JOtwCsSrTqzz7Ek/BhJpZ/Cv89gxRDrWxf6kHegAfaN2FxwuYMmDZQ==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+    "@ethersproject/sha2" "^5.5.0"
+    "@solana/buffer-layout" "^4.0.0"
+    bigint-buffer "^1.1.5"
+    bn.js "^5.0.0"
+    borsh "^0.7.0"
+    bs58 "^4.0.1"
+    buffer "6.0.1"
+    fast-stable-stringify "^1.0.0"
+    jayson "^3.4.4"
+    js-sha3 "^0.8.0"
+    node-fetch "2"
+    react-native-url-polyfill "^1.3.0"
+    rpc-websockets "^7.5.0"
     secp256k1 "^4.0.2"
     superstruct "^0.14.2"
     tweetnacl "^1.0.0"
@@ -3138,15 +3183,15 @@
     toformat "^2.0.0"
     tslib "^2.4.0"
 
-"@uxd-protocol/uxd-client@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@uxd-protocol/uxd-client/-/uxd-client-1.0.0.tgz#93a41fc75724bef84bcf8f03c40fadf7b963ffad"
-  integrity sha512-wI2Zg0xhRzPPDGwKgJfvJdC1fI7x96IVdXWi53u7Mw8OZSRSCS7JjoKFiJ0K5QPE4eSYKXJdQh7ChKtviK1pnQ==
+"@uxd-protocol/uxd-client@2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@uxd-protocol/uxd-client/-/uxd-client-2.0.1.tgz#5a340c97398d1dcad69b06455e23135442eb5092"
+  integrity sha512-3kpfhPe8fD485TKSwjecZrOOhEiJiyrKIBrcp6iCALMIgK3Qvose7QzHRphLhSp0wo6GUKc738ljWQ12d0G/eQ==
   dependencies:
-    "@blockworks-foundation/mango-client" "3.4.4"
-    "@project-serum/anchor" "0.22.1"
+    "@blockworks-foundation/mango-client" "3.4.7"
+    "@project-serum/anchor" "0.24.2"
     "@solana/spl-token" "0.1.8"
-    "@solana/web3.js" "1.35.1"
+    "@solana/web3.js" "1.42.0"
     camelcase "5.3.1"
 
 "@uxdprotocol/uxd-staking-client@2.0.10":
@@ -4009,6 +4054,14 @@ buffer@6.0.3, buffer@^6.0.1, buffer@^6.0.3, buffer@~6.0.3:
   dependencies:
     base64-js "^1.3.1"
     ieee754 "^1.2.1"
+
+buffer@^5.4.3:
+  version "5.7.1"
+  resolved "https://registry.yarnpkg.com/buffer/-/buffer-5.7.1.tgz#ba62e7c13133053582197160851a8f648e99eed0"
+  integrity sha512-EHcyIPBQ4BSGlvjB16k5KgAJ27CIsHY/2JBmCRReo48y9rQ3MaUzWX3KVlBa4U7MyX02HdVj0K7C3WaB3ju7FQ==
+  dependencies:
+    base64-js "^1.3.1"
+    ieee754 "^1.1.13"
 
 bufferutil@^4.0.1:
   version "4.0.6"
@@ -6542,7 +6595,7 @@ iconv-lite@^0.6.2:
   dependencies:
     safer-buffer ">= 2.1.2 < 3.0.0"
 
-ieee754@^1.2.1:
+ieee754@^1.1.13, ieee754@^1.2.1:
   version "1.2.1"
   resolved "https://registry.npmjs.org/ieee754/-/ieee754-1.2.1.tgz"
   integrity sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==
@@ -10433,6 +10486,13 @@ react-markdown@^7.0.0:
     unist-util-visit "^4.0.0"
     vfile "^5.0.0"
 
+react-native-url-polyfill@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/react-native-url-polyfill/-/react-native-url-polyfill-1.3.0.tgz#c1763de0f2a8c22cc3e959b654c8790622b6ef6a"
+  integrity sha512-w9JfSkvpqqlix9UjDvJjm1EjSt652zVQ6iwCIj1cVVkwXf4jQhQgTNXY6EVTwuAmUjg6BC6k9RHCBynoLFo3IQ==
+  dependencies:
+    whatwg-url-without-unicode "8.0.0-3"
+
 react-portal@^4.2.1:
   version "4.2.1"
   resolved "https://registry.npmjs.org/react-portal/-/react-portal-4.2.1.tgz"
@@ -10808,7 +10868,7 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     hash-base "^3.0.0"
     inherits "^2.0.1"
 
-rpc-websockets@^7.4.12:
+rpc-websockets@^7.4.12, rpc-websockets@^7.5.0:
   version "7.5.0"
   resolved "https://registry.yarnpkg.com/rpc-websockets/-/rpc-websockets-7.5.0.tgz#bbeb87572e66703ff151e50af1658f98098e2748"
   integrity sha512-9tIRi1uZGy7YmDjErf1Ax3wtqdSSLIlnmL5OtOzgd5eqPKbsPpwDP5whUDO2LQay3Xp0CcHlcNSGzacNRluBaQ==
@@ -12620,6 +12680,15 @@ whatwg-fetch@^3.4.1:
 whatwg-mimetype@^2.3.0:
   version "2.3.0"
   resolved "https://registry.npmjs.org/whatwg-mimetype/-/whatwg-mimetype-2.3.0.tgz"
+
+whatwg-url-without-unicode@8.0.0-3:
+  version "8.0.0-3"
+  resolved "https://registry.yarnpkg.com/whatwg-url-without-unicode/-/whatwg-url-without-unicode-8.0.0-3.tgz#ab6df4bf6caaa6c85a59f6e82c026151d4bb376b"
+  integrity sha512-HoKuzZrUlgpz35YO27XgD28uh/WJH4B0+3ttFqRo//lmq+9T/mIOJ6kqmINI9HpUpz1imRC/nR/lxKpJiv0uig==
+  dependencies:
+    buffer "^5.4.3"
+    punycode "^2.1.1"
+    webidl-conversions "^5.0.0"
 
 whatwg-url@^5.0.0:
   version "5.0.0"

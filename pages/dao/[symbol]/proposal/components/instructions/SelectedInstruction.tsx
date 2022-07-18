@@ -52,6 +52,11 @@ import UXDRegisterMangoDeposiory from './UXD/RegisterMangoDepository';
 import UXDSetMangoDepositoriesRedeemableSoftCap from './UXD/SetMangoDepositoriesRedeemableSoftCap';
 import UXDSetRedeemableGlobalSupplyCap from './UXD/SetRedeemGlobalSupplyCap';
 import UXDWithdrawInsuranceFromMangoDepository from './UXD/WithdrawInsuranceFromMangoDepository';
+import UXDDisableDepositoryMinting from './UXD/DisableDepositoryMinting';
+import UXDQuoteMintWithMangoDepository from './UXD/QuoteMintWithMangoDepository';
+import UXDQuoteRedeemWithMangoDepository from './UXD/QuoteRedeemWithMangoDepository';
+import UXDSetMangoDepositoryQuoteMintAndRedeemFee from './UXD/SetMangoDepositoryQuoteMintAndRedeemFee';
+import UXDSetMangoDepositoryQuoteMintAndRedeemSoftCap from './UXD/SetMangoDepositoryQuoteMintAndRedeemSoftCap';
 import UXDStakingInitializeStakingCampaign from './UXDStaking/InitializeStakingCampaign';
 import UXDStakingMigrateStakingCampaignFromV1ToV2 from './UXDStaking/MigrateStakingCampaignFromV1ToV2';
 import UXDStakingFinalizeStakingCampaign from './UXDStaking/FinalizeStakingCampaign';
@@ -234,6 +239,41 @@ const SelectedInstruction = ({
     case InstructionEnum.UXDWithdrawInsuranceFromMangoDepository:
       return (
         <UXDWithdrawInsuranceFromMangoDepository
+          index={index}
+          governedAccount={governedAccount}
+        />
+      );
+    case InstructionEnum.UXDDisableDepositoryMinting:
+      return (
+        <UXDDisableDepositoryMinting
+          index={index}
+          governedAccount={governedAccount}
+        />
+      );
+    case InstructionEnum.UXDQuoteMintWithMangoDepository:
+      return (
+        <UXDQuoteMintWithMangoDepository
+          index={index}
+          governedAccount={governedAccount}
+        />
+      );
+    case InstructionEnum.UXDQuoteRedeemWithMangoDepository:
+      return (
+        <UXDQuoteRedeemWithMangoDepository
+          index={index}
+          governedAccount={governedAccount}
+        />
+      );
+    case InstructionEnum.UXDSetMangoDepositoryQuoteMintAndRedeemFee:
+      return (
+        <UXDSetMangoDepositoryQuoteMintAndRedeemFee
+          index={index}
+          governedAccount={governedAccount}
+        />
+      );
+    case InstructionEnum.UXDSetMangoDepositoryQuoteMintAndRedeemSoftCap:
+      return (
+        <UXDSetMangoDepositoryQuoteMintAndRedeemSoftCap
           index={index}
           governedAccount={governedAccount}
         />

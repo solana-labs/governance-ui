@@ -1,29 +1,35 @@
 import { Provider } from '@project-serum/anchor';
 import { TransactionInstruction, PublicKey } from '@solana/web3.js';
-import { Controller, UXD_DECIMALS } from '@uxd-protocol/uxd-client';
+import {
+  Controller,
+  findMultipleATAAddSync,
+  UXD_DECIMALS,
+} from '@uxd-protocol/uxd-client';
 import type { ConnectionContext } from 'utils/connection';
 import {
   uxdClient,
-  initializeMango,
   instantiateMangoDepository,
   getDepositoryMintInfo,
   getInsuranceMintInfo,
+  initializeMango,
 } from './uxdClient';
 
-const createDepositInsuranceToMangoDepositoryInstruction = async ({
+const createQuoteMintWithMangoDepositoryInstruction = async ({
   connection,
   uxdProgramId,
   authority,
   depositoryMintName,
   insuranceMintName,
-  insuranceDepositedAmount,
+  quoteAmount,
+  payer,
 }: {
   connection: ConnectionContext;
   uxdProgramId: PublicKey;
   authority: PublicKey;
   depositoryMintName: string;
   insuranceMintName: string;
-  insuranceDepositedAmount: number;
+  quoteAmount: number;
+  payer: PublicKey;
 }): Promise<TransactionInstruction> => {
   const client = uxdClient(uxdProgramId);
 
@@ -49,14 +55,37 @@ const createDepositInsuranceToMangoDepositoryInstruction = async ({
     insuranceDecimals,
   });
 
-  return client.createDepositInsuranceToMangoDepositoryInstruction(
-    insuranceDepositedAmount,
+  const [
+    [userQuoteATA],
+    [userRedeemableATA],
+  ] = findMultipleATAAddSync(authority, [
+    depository.quoteMint,
+    new Controller('UXD', UXD_DECIMALS, uxdProgramId).redeemableMintPda,
+  ]);
+
+  console.log('USER ATA', {
+    authority: authority.toBase58(),
+    userQuoteATA: userQuoteATA.toBase58(),
+    userRedeemableATA: userRedeemableATA.toBase58(),
+    redeemableMintPda: new Controller(
+      'UXD',
+      UXD_DECIMALS,
+      uxdProgramId,
+    ).redeemableMintPda.toBase58(),
+    quoteMint: depository.quoteMint.toBase58(),
+    insuranceMint: insuranceMint.toBase58(),
+    depositoryMint: depositoryMint.toBase58(),
+  });
+
+  return client.createQuoteMintWithMangoDepositoryInstruction(
+    quoteAmount,
     new Controller('UXD', UXD_DECIMALS, uxdProgramId),
     depository,
     mango,
     authority,
     Provider.defaultOptions(),
+    payer,
   );
 };
 
-export default createDepositInsuranceToMangoDepositoryInstruction;
+export default createQuoteMintWithMangoDepositoryInstruction;

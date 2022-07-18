@@ -1,15 +1,15 @@
 import * as yup from 'yup';
-import Input from '@components/inputs/Input';
 import Select from '@components/inputs/Select';
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
-import createDepositInsuranceToMangoDepositoryInstruction from '@tools/sdk/uxdProtocol/createDepositInsuranceToMangoDepositoryInstruction';
 import {
   getDepositoryMintSymbols,
   getInsuranceMintSymbols,
 } from '@tools/sdk/uxdProtocol/uxdClient';
 import { GovernedMultiTypeAccount } from '@utils/tokens';
-import { UXDDepositInsuranceToMangoDepositoryForm } from '@utils/uiTypes/proposalCreationTypes';
+import { UXDSetMangoDepositoryQuoteMintAndRedeemFeeForm } from '@utils/uiTypes/proposalCreationTypes';
 import SelectOptionList from '../../SelectOptionList';
+import Input from '@components/inputs/Input';
+import createSetMangoDepositoryQuoteMintAndRedeemFeeInstruction from '@tools/sdk/uxdProtocol/createSetMangoDepositoryQuoteMintAndRedeemFeeInstruction';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -18,13 +18,13 @@ const schema = yup.object().shape({
     .required('Governance account is required'),
   collateralName: yup.string().required('Collateral Name address is required'),
   insuranceName: yup.string().required('Insurance Name address is required'),
-  insuranceDepositedAmount: yup
+  uiQuoteMintAndRedeemFee: yup
     .number()
-    .moreThan(0, 'Insurance Deposited amount should be more than 0')
-    .required('Insurance Deposited amount is required'),
+    .moreThan(0, 'Quote Mint and Redeem fee should be more than 0')
+    .required('Quote Mint and Redeem fee is required'),
 });
 
-const UXDDepositInsuranceToMangoDepository = ({
+const UXDSetMangoDepositoryQuoteMintAndRedeemFee = ({
   index,
   governedAccount,
 }: {
@@ -36,25 +36,27 @@ const UXDDepositInsuranceToMangoDepository = ({
     form,
     formErrors,
     handleSetForm,
-  } = useInstructionFormBuilder<UXDDepositInsuranceToMangoDepositoryForm>({
-    index,
-    initialFormValues: {
-      governedAccount,
-      insuranceDepositedAmount: 0,
-    },
-    schema,
+  } = useInstructionFormBuilder<UXDSetMangoDepositoryQuoteMintAndRedeemFeeForm>(
+    {
+      index,
+      initialFormValues: {
+        governedAccount,
+      },
+      schema,
 
-    buildInstruction: async function ({ form, governedAccountPubkey }) {
-      return createDepositInsuranceToMangoDepositoryInstruction({
-        connection,
-        uxdProgramId: form.governedAccount!.governance!.account.governedAccount,
-        authority: governedAccountPubkey,
-        depositoryMintName: form.collateralName!,
-        insuranceMintName: form.insuranceName!,
-        insuranceDepositedAmount: form.insuranceDepositedAmount,
-      });
+      buildInstruction: async function ({ form, governedAccountPubkey }) {
+        return createSetMangoDepositoryQuoteMintAndRedeemFeeInstruction({
+          connection,
+          uxdProgramId: form.governedAccount!.governance!.account
+            .governedAccount,
+          authority: governedAccountPubkey,
+          depositoryMintName: form.collateralName!,
+          insuranceMintName: form.insuranceName!,
+          quoteFee: form.uiQuoteMintAndRedeemFee!,
+        });
+      },
     },
-  });
+  );
 
   return (
     <>
@@ -83,21 +85,21 @@ const UXDDepositInsuranceToMangoDepository = ({
       </Select>
 
       <Input
-        label="Insurance Deposited Amount"
-        value={form.insuranceDepositedAmount}
+        label="Quote Mint and Redeem Fee (bps)"
+        value={form.uiQuoteMintAndRedeemFee}
         type="number"
         min={0}
-        max={10 ** 12}
+        max={255}
         onChange={(evt) =>
           handleSetForm({
             value: evt.target.value,
-            propertyName: 'insuranceDepositedAmount',
+            propertyName: 'uiQuoteMintAndRedeemFee',
           })
         }
-        error={formErrors['insuranceDepositedAmount']}
+        error={formErrors['uiQuoteMintAndRedeemFee']}
       />
     </>
   );
 };
 
-export default UXDDepositInsuranceToMangoDepository;
+export default UXDSetMangoDepositoryQuoteMintAndRedeemFee;
