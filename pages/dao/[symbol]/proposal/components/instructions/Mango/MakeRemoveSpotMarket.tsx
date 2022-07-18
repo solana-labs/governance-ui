@@ -26,7 +26,7 @@ import InstructionForm, {
   InstructionInputType,
 } from '../FormCreator'
 import { usePrevious } from '@hooks/usePrevious'
-import { emptyPk } from 'NftVotePlugin/sdk/accounts'
+import { emptyPk } from '../../../../../../../VoteStakeRegistry/sdk/accounts'
 
 const MakeRemoveSpotMarket = ({
   index,
