@@ -4,11 +4,8 @@ import {
   Program,
 } from '@project-serum/anchor'
 import { Connection, Keypair } from '@solana/web3.js'
-import { MORTAR_PROGRAM_ID } from 'pages/dao/[symbol]/proposal/components/instructions/Solana/SagaPhone/mortar'
-import {
-  IDL,
-  Mortar,
-} from 'pages/dao/[symbol]/proposal/components/instructions/Solana/SagaPhone/schema'
+import { MORTAR_PROGRAM_ID } from '@tools/sagaPhone/mortar'
+import { IDL, Mortar } from '@tools/sagaPhone/schema'
 
 export const SAGA_PHONE = {
   [MORTAR_PROGRAM_ID.toBase58()]: {

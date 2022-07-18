@@ -19,15 +19,15 @@ import InstructionForm, {
   InstructionInput,
   InstructionInputType,
 } from '../../FormCreator'
+import { BN } from '@project-serum/anchor'
+import { USDC_MINT } from 'Strategies/protocols/mango/tools'
+import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
 import {
   DEVNET_ISSUER,
   getPurchaseInstructions,
   MAINNET_ISSUER,
   USDC_DEVNET,
-} from './mortar'
-import { BN } from '@project-serum/anchor'
-import { USDC_MINT } from 'Strategies/protocols/mango/tools'
-import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
+} from '@tools/sagaPhone/mortar'
 
 const SagaPreOrder = ({
   index,
