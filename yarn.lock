@@ -12085,10 +12085,10 @@ purgecss@^4.0.3:
     postcss "^8.3.5"
     postcss-selector-parser "^6.0.6"
 
-pyth-staking-api@^1.2.8:
-  version "1.2.8"
-  resolved "https://registry.yarnpkg.com/pyth-staking-api/-/pyth-staking-api-1.2.8.tgz#09dbc66f17bc1c0cc1c168815b86115c8c022ff1"
-  integrity sha512-majfEGXDNEYeDurJnoEdfy4GXojCnUoWikrArMcBgx9IpKSSnCUpmRv2pRbFC/xzvjOSN5sGXvGLGS5XfA6DMQ==
+pyth-staking-api@^1.2.17:
+  version "1.2.17"
+  resolved "https://registry.yarnpkg.com/pyth-staking-api/-/pyth-staking-api-1.2.17.tgz#c49db878cdd6b074d76ac6bf09f6d7d23b29ae50"
+  integrity sha512-rcjS9aq9NO1oq1/ynbynKSkGDg1dt1GwPdzb5GlchH5gTtZ9ANsdfM5ZdYZ1DMcLVk8kUaj/n/4u4nZ/98KTYw==
   dependencies:
     "@project-serum/anchor" "0.24.2"
     "@solana/spl-governance" "^0.0.34"
