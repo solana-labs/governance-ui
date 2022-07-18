@@ -13,11 +13,11 @@ import {
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { sendTransaction } from '@utils/send'
 import Link from 'next/link'
-import { getNftVoterWeightRecord } from 'NftVotePlugin/sdk/accounts'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { useState, useEffect } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
+import { getVoterWeightRecord } from '@utils/plugin/accounts'
 
 const NftBalanceCard = () => {
   const { fmtUrlWithCluster } = useQueryContext()
@@ -37,7 +37,7 @@ const NftBalanceCard = () => {
     : null
   const handleRegister = async () => {
     const instructions: TransactionInstruction[] = []
-    const { voterWeightPk } = await getNftVoterWeightRecord(
+    const { voterWeightPk } = await getVoterWeightRecord(
       realm!.pubkey,
       realm!.account.communityMint,
       wallet!.publicKey!,

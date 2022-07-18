@@ -148,7 +148,7 @@ export interface MangoMakeAddOracleForm {
   oracleAccount: string | undefined
 }
 
-type NameValue = {
+export type NameValue = {
   name: string
   value: string
 }
