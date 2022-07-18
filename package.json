@@ -95,7 +95,7 @@
     "react-window": "^1.8.7",
     "remark-gfm": "^3.0.1",
     "superstruct": "^0.15.4",
-    "ts-node": "^10.7.0",
+    "ts-node": "^10.9.1",
     "tsconfig-paths": "^3.14.1",
     "yup": "^0.32.11",
     "zustand": "^3.7.2"
