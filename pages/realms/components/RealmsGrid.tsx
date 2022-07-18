@@ -23,10 +23,12 @@ const RealmBox = ({ editing, realm, theme, removeItem, inGrid = false }) => {
         <AiOutlineDrag className="absolute top-1 left-1 rounded-full h-8 w-8" />
       )}
       {editing && inGrid && (
-        <IoIosRemoveCircleOutline
-          className="absolute top-1 right-1 rounded-full h-8 w-8 cursor-pointer hover:opacity-90"
+        <div
           onClick={() => removeItem(realm.realmId.toString())}
-        />
+          className="absolute top-1 right-1 rounded-full cursor-pointer hover:opacity-90"
+        >
+          <IoIosRemoveCircleOutline className="h-8 w-8 z-50" />
+        </div>
       )}
       <div className="pb-5">
         {realm.ogImage ? (
@@ -94,34 +96,30 @@ function RealmsGrid({
       gridRealmIds = localStorage.getItem(STORAGE_IDS)
     }
     if (gridRealmIds) {
-      realms = filteredRealms.filter((item) =>
-        gridRealmIds.includes(item.realmId.toString())
-      )
+      realms = certifiedRealms
+        .concat(unchartedRealms)
+        .filter((item) => gridRealmIds.includes(item.realmId.toString()))
     }
     return realms ?? []
   }
 
   useEffect(() => {
     setGridRealms(getGridRealms())
-  }, [filteredRealms])
+  }, [])
 
   useEffect(() => {
     const cols = width < 800 ? 4 : width < 1000 ? 6 : 10
     if (columns != cols) setLayout(generateLayout(4))
     setColumns(cols)
-    if (gridRealms.length > layout.length) {
-      setLayout(generateLayout(cols))
-    }
+    setLayout(generateLayout(cols))
   }, [width, gridRealms])
 
   const goToRealm = (realmInfo: RealmInfo) => {
-    console.log(realmInfo)
     const symbol =
       realmInfo.isCertified && realmInfo.symbol
         ? realmInfo.symbol
         : realmInfo.realmId.toBase58()
     const url = fmtUrlWithCluster(`/dao/${symbol}`)
-    console.log(realmInfo.displayName ?? realmInfo.symbol, url)
     router.push(url)
   }
 
@@ -149,15 +147,14 @@ function RealmsGrid({
           }
         }
         currX = (currX + 2) % cols
-        return obj
+        return { ...obj, isDraggable: editing }
       })
     )
   }
 
   const updateItem = (newLayout) => {
     setLayout(newLayout)
-    if (newLayout.length >= certifiedRealms.length)
-      localStorage.setItem(STORAGE_GRID + columns, JSON.stringify(newLayout))
+    localStorage.setItem(STORAGE_GRID + columns, JSON.stringify(newLayout))
   }
 
   const removeItem = (id) => {
@@ -218,6 +215,16 @@ function RealmsGrid({
   const resetGrid = () => {
     setGridRealms(getGridRealms())
     clearSearch()
+  }
+
+  const getRealmsOutsideGrid = (realms) => {
+    return (
+      realms &&
+      realms.filter(
+        (realm) =>
+          !layout.map((item) => item.i).includes(realm.realmId.toString())
+      )
+    )
   }
 
   return (
@@ -338,7 +345,7 @@ function RealmsGrid({
         <div>
           <div className="grid grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
             {certifiedRealms &&
-              certifiedRealms.map((realm) => (
+              getRealmsOutsideGrid(certifiedRealms).map((realm) => (
                 <div
                   key={realm?.realmId.toString()}
                   onClick={() => (editing ? null : goToRealm(realm))}
@@ -355,7 +362,7 @@ function RealmsGrid({
           <h2 className="pt-12 mb-4">Uncharted DAOs</h2>
           <div className="grid grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
             {unchartedRealms &&
-              unchartedRealms.map((realm) => (
+              getRealmsOutsideGrid(unchartedRealms).map((realm) => (
                 <div
                   key={realm?.realmId.toString()}
                   onClick={() => (editing ? null : goToRealm(realm))}
