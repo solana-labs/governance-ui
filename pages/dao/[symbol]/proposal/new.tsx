@@ -81,6 +81,7 @@ import GoblinGoldDeposit from './components/instructions/GoblinGold/GoblinGoldDe
 import GoblinGoldWithdraw from './components/instructions/GoblinGold/GoblinGoldWithdraw'
 import MakeSetMarketMode from './components/instructions/Mango/MakeSetMarketMode'
 import CreateGatewayPluginRegistrar from './components/instructions/GatewayPlugin/CreateRegistrar'
+import ConfigureGatewayPlugin from './components/instructions/GatewayPlugin/ConfigureGateway'
 import MakeChangeQuoteParams from './components/instructions/Mango/MakeChangeQuoteParams'
 import TypeaheadSelect from '@components/TypeaheadSelect'
 import { StyledLabel } from '@components/inputs/styles'
@@ -88,6 +89,7 @@ import classNames from 'classnames'
 import MakeRemoveSpotMarket from './components/instructions/Mango/MakeRemoveSpotMarket'
 import MakeRemovePerpMarket from './components/instructions/Mango/MakeRemovePerpMarket'
 import MakeSwapSpotMarket from './components/instructions/Mango/MakeSwapSpotMarket'
+import MakeRemoveOracle from './components/instructions/Mango/MakeRemoveOracle'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -421,6 +423,13 @@ const New = () => {
             governance={governance}
           ></CreateGatewayPluginRegistrar>
         )
+      case Instructions.ConfigureGatewayPlugin:
+        return (
+          <ConfigureGatewayPlugin
+            index={idx}
+            governance={governance}
+          ></ConfigureGatewayPlugin>
+        )
       case Instructions.MangoAddOracle:
         return (
           <MakeAddOracle index={idx} governance={governance}></MakeAddOracle>
@@ -501,6 +510,13 @@ const New = () => {
             index={idx}
             governance={governance}
           ></MakeSwapSpotMarket>
+        )
+      case Instructions.MangoRemoveOracle:
+        return (
+          <MakeRemoveOracle
+            index={idx}
+            governance={governance}
+          ></MakeRemoveOracle>
         )
       case Instructions.ForesightInitMarket:
         return (

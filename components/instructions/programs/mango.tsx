@@ -567,6 +567,22 @@ export const MANGO_INSTRUCTIONS = {
         return <></>
       },
     },
+    71: {
+      name: 'Mango v3: Remove Oracle',
+      accounts: {
+        0: { name: 'Mango Group' },
+        1: { name: 'Admin Pk' },
+        2: { name: 'Oracle' },
+      },
+      getDataUI: async (
+        _connection: Connection,
+        data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
+        console.log(data)
+        return <></>
+      },
+    },
   },
 }
 

@@ -45,11 +45,7 @@ export default function Explore() {
         <div className="py-4">
           <div className="flex items-center justify-between mb-1">
             <h1 className="mr-2">{proposal?.account.name}</h1>
-            <ProposalStateBadge
-              proposalPk={proposal.pubkey}
-              proposal={proposal.account}
-              open={true}
-            />
+            <ProposalStateBadge proposal={proposal.account} />
           </div>
           <h3 className="mb-4 mt-16">Top Voters</h3>
           <div

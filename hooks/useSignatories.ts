@@ -13,7 +13,9 @@ import { getSignatories } from '@models/proposal'
 import useRealm from '@hooks/useRealm'
 import { fromOption } from 'fp-ts/Either'
 
-export default function useSignatories(proposal?: ProgramAccount<Proposal>) {
+export default function useSignatories(
+  proposal?: Pick<ProgramAccount<Proposal>, 'pubkey'>
+) {
   const { getRpcContext } = useRpcContext()
   const [signatories, setSignatories] = useState<
     ProgramAccount<SignatoryRecord>[]
