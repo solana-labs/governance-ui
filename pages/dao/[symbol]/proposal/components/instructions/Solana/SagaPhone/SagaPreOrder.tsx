@@ -85,6 +85,7 @@ const SagaPreOrder = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
+      //size of ata + purchase pda
       const size = 293
       const rent = await connection.current.getMinimumBalanceForRentExemption(
         size
@@ -110,7 +111,7 @@ const SagaPreOrder = ({
       )
     }
     const obj: UiInstruction = {
-      prerequisiteInstructions: [...prequisiteInstructions],
+      prerequisiteInstructions: prequisiteInstructions,
       additionalSerializedInstructions: serializedInstructions,
       serializedInstruction: '',
       isValid,

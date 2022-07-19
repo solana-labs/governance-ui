@@ -242,7 +242,8 @@ const New = () => {
                   ? getTimestampFromDays(instruction.customHoldUpTime)
                   : selectedGovernance?.account?.config
                       .minInstructionHoldUpTime,
-                prerequisiteInstructions: [],
+                prerequisiteInstructions:
+                  instruction.prerequisiteInstructions || [],
                 chunkSplitByDefault: instruction.chunkSplitByDefault || false,
                 signers: instruction.signers,
                 shouldSplitIntoSeparateTxs:
