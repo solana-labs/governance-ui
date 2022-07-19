@@ -86,7 +86,7 @@ const SagaPreOrder = ({
       wallet?.publicKey
     ) {
       //size of ata + purchase pda
-      const size = 293
+      const size = 165
       const rent = await connection.current.getMinimumBalanceForRentExemption(
         size
       )
