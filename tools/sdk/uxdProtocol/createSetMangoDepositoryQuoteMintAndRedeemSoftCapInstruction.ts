@@ -15,14 +15,14 @@ const createSetMangoDepositoryQuoteMintAndRedeemSoftCapInstruction = async ({
   authority,
   depositoryMintName,
   insuranceMintName,
-  softCap,
+  softCapUiAmount,
 }: {
   connection: ConnectionContext;
   uxdProgramId: PublicKey;
   authority: PublicKey;
   depositoryMintName: string;
   insuranceMintName: string;
-  softCap: number;
+  softCapUiAmount: number;
 }): Promise<TransactionInstruction> => {
   const client = uxdClient(uxdProgramId);
 
@@ -47,7 +47,7 @@ const createSetMangoDepositoryQuoteMintAndRedeemSoftCapInstruction = async ({
   });
 
   return client.createSetMangoDepositoryQuoteMintAndRedeemSoftCapInstruction(
-    softCap,
+    softCapUiAmount,
     new Controller('UXD', UXD_DECIMALS, uxdProgramId),
     depository,
     authority,

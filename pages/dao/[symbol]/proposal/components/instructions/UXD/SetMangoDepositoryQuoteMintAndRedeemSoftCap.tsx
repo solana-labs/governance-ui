@@ -3,7 +3,8 @@ import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
 import { GovernedMultiTypeAccount } from '@utils/tokens';
 import { UXDSetMangoDepositoryQuoteMintAndRedeemSoftCapForm } from '@utils/uiTypes/proposalCreationTypes';
 import Input from '@components/inputs/Input';
-import createSetMangoDepositoriesRedeemableSoftCapInstruction from '@tools/sdk/uxdProtocol/createSetMangoDepositoriesRedeemableSoftCapInstruction';
+import createSetMangoDepositoryQuoteMintAndRedeemSoftCapInstruction from '@tools/sdk/uxdProtocol/createSetMangoDepositoryQuoteMintAndRedeemSoftCapInstruction';
+import useWalletStore from 'stores/useWalletStore';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -23,6 +24,8 @@ const UXDSetMangoDepositoryQuoteMintAndRedeemSoftCap = ({
   index: number;
   governedAccount?: GovernedMultiTypeAccount;
 }) => {
+  const connection = useWalletStore((s) => s.connection);
+
   const {
     form,
     formErrors,
@@ -36,10 +39,15 @@ const UXDSetMangoDepositoryQuoteMintAndRedeemSoftCap = ({
       schema,
 
       buildInstruction: async function ({ form, governedAccountPubkey }) {
-        return createSetMangoDepositoriesRedeemableSoftCapInstruction({
+        return createSetMangoDepositoryQuoteMintAndRedeemSoftCapInstruction({
+          connection,
           uxdProgramId: form.governedAccount!.governance!.account
             .governedAccount,
           authority: governedAccountPubkey,
+          // The underlying function just want to extract the quote
+          depositoryMintName: 'SOL',
+          insuranceMintName: 'USDC',
+          // -----
           softCapUiAmount: form.softCapUiAmount!,
         });
       },
