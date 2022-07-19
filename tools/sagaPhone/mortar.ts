@@ -117,7 +117,10 @@ export const getPurchaseInstructions = async (
     )
   }
 
-  if (!quantity.eq(new BN(1)) || !tokenAccount?.account.amount.isZero()) {
+  if (
+    !quantity.eq(new BN(1)) ||
+    (tokenAccount && !tokenAccount?.account.amount.isZero())
+  ) {
     transactionInstructions.push(
       program.instruction.updateQuantity(quantity, {
         accounts: {
