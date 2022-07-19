@@ -11,6 +11,31 @@ import { ANCHOR_DISCRIMINATOR_LAYOUT } from '@utils/helpers';
 
 export const UXD_PROGRAM_INSTRUCTIONS = {
   UXD8m9cvwk4RcSxnX2HZ9VudQCEeDH6fRnB4CAP57Dr: {
+    216: {
+      name: 'UXD - Set Mango Depository Quote Mint and Redeem Soft Cap',
+      accounts: ['Authority', 'Controller'],
+      getDataUI: (
+        _connection: Connection,
+        data: Uint8Array,
+        _accounts: AccountMetaData[],
+      ) => {
+        const dataLayout = struct([
+          u8('instruction'),
+          ...ANCHOR_DISCRIMINATOR_LAYOUT,
+          nu64('quoteMintAndRedeemSoftCap'),
+        ]);
+
+        const { quoteMintAndRedeemSoftCap } = dataLayout.decode(
+          Buffer.from(data),
+        ) as any;
+
+        return (
+          <>
+            <p>{`native quote mint and redeem soft cap: ${quoteMintAndRedeemSoftCap.toLocaleString()}`}</p>
+          </>
+        );
+      },
+    },
     136: {
       name: 'UXD - Disable Depository Regular Minting',
       accounts: ['Authority', 'Controller', 'Depository'],
