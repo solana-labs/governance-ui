@@ -1,7 +1,11 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
 import useRealm from '@hooks/useRealm'
-import { PublicKey } from '@solana/web3.js'
+import {
+  PublicKey,
+  SystemProgram,
+  TransactionInstruction,
+} from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import {
@@ -74,12 +78,23 @@ const SagaPreOrder = ({
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
     let serializedInstructions: string[] = []
+    const prequisiteInstructions: TransactionInstruction[] = []
     if (
       isValid &&
       programId &&
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
+      const size = 293
+      const rent = await connection.current.getMinimumBalanceForRentExemption(
+        size
+      )
+      const transferRentIx = SystemProgram.transfer({
+        fromPubkey: wallet.publicKey!,
+        toPubkey: form.governedAccount.extensions.transferAddress!,
+        lamports: rent,
+      })
+      prequisiteInstructions.push(transferRentIx)
       //Mango instruction call and serialize
       const instructions = await getPurchaseInstructions(
         form.governedAccount.extensions.transferAddress!,
@@ -95,6 +110,7 @@ const SagaPreOrder = ({
       )
     }
     const obj: UiInstruction = {
+      prerequisiteInstructions: [...prequisiteInstructions],
       additionalSerializedInstructions: serializedInstructions,
       serializedInstruction: '',
       isValid,
