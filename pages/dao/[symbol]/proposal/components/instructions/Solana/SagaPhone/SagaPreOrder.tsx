@@ -25,13 +25,13 @@ import InstructionForm, {
 } from '../../FormCreator'
 import { BN } from '@project-serum/anchor'
 import { USDC_MINT } from 'Strategies/protocols/mango/tools'
-import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
 import {
   DEVNET_ISSUER,
   getPurchaseInstructions,
   MAINNET_ISSUER,
   USDC_DEVNET,
 } from '@tools/sagaPhone/mortar'
+import { abbreviateAddress } from '@utils/formatting'
 
 const SagaPreOrder = ({
   index,
@@ -49,13 +49,24 @@ const SagaPreOrder = ({
   const SALE_MINT = isDevnet ? USDC_DEVNET : new PublicKey(USDC_MINT)
   const onePhoneDepositPrice = isDevnet ? 250 : 100
   const governedSolAccounts = assetAccounts.filter(
-    (x) =>
-      x.type === AccountType.SOL &&
+    (solAcc) =>
+      solAcc.type === AccountType.SOL &&
       assetAccounts.find(
-        (j) =>
-          j.extensions.token?.account.owner.toBase58() ===
-            x.extensions.transferAddress?.toBase58() &&
-          j.extensions.mint?.publicKey.toBase58() === SALE_MINT.toBase58()
+        (tokenAcc) =>
+          tokenAcc.extensions.token?.account.owner.toBase58() ===
+            solAcc.extensions.transferAddress?.toBase58() &&
+          tokenAcc.extensions.mint?.publicKey.toBase58() ===
+            SALE_MINT.toBase58()
+      )
+  )
+  const governedUSDCAccounts = assetAccounts.filter(
+    (token) =>
+      token.isToken &&
+      token.extensions.mint?.publicKey.toBase58() === SALE_MINT.toBase58() &&
+      governedSolAccounts.find(
+        (solAcc) =>
+          solAcc.extensions.transferAddress?.toBase58() ===
+          token.extensions.token?.account.owner.toBase58()
       )
   )
   const shouldBeGoverned = index !== 0 && governance
@@ -85,22 +96,22 @@ const SagaPreOrder = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      //size of ata + purchase pda
+      //size of ata
       const size = 165
       const rent = await connection.current.getMinimumBalanceForRentExemption(
         size
       )
       const transferRentIx = SystemProgram.transfer({
         fromPubkey: wallet.publicKey!,
-        toPubkey: form.governedAccount.extensions.transferAddress!,
+        toPubkey: form.governedAccount.extensions.token!.account.owner!,
         lamports: rent,
       })
       prequisiteInstructions.push(transferRentIx)
       //Mango instruction call and serialize
       const instructions = await getPurchaseInstructions(
-        form.governedAccount.extensions.transferAddress!,
+        form.governedAccount.extensions.token!.account.owner!,
         ISSUER,
-        form.governedAccount.extensions.transferAddress!,
+        form.governedAccount.extensions.token!.account.owner!,
         SALE_MINT,
         new BN(form.quantity),
         connection.current
@@ -140,29 +151,21 @@ const SagaPreOrder = ({
   })
   const inputs: InstructionInput[] = [
     {
-      label: 'SOL account with owned USDC token account',
+      label: 'USDC account owned by SOL account',
       initialValue: form.governedAccount,
       name: 'governedAccount',
       type: InstructionInputType.GOVERNED_ACCOUNT,
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governance,
-      options: governedSolAccounts,
-      additionalComponent: form.governedAccount ? (
+      options: governedUSDCAccounts,
+      additionalComponent: form.governedAccount?.extensions.token ? (
         <div>
-          Associated USDC token account balance:{' '}
-          {(() => {
-            const usdcATA = assetAccounts.find(
-              (x) =>
-                x.extensions.token?.account.owner.toBase58() ===
-                form.governedAccount?.extensions.transferAddress?.toBase58()
-            )
-            return assetAccounts
-              ? formatMintNaturalAmountAsDecimal(
-                  usdcATA!.extensions.mint!.account!,
-                  usdcATA!.extensions.token!.account.amount
-                )
-              : null
-          })()}
+          SOL account:{' '}
+          <small>
+            {abbreviateAddress(
+              form.governedAccount?.extensions.token?.account.owner
+            )}
+          </small>
         </div>
       ) : null,
     },
