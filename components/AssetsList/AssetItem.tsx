@@ -41,7 +41,7 @@ const AssetItem = ({
         const slot = await getProgramSlot(connection.current, programId);
         setSlot(slot);
       } catch (e) {
-        console.log(e);
+        console.error(e);
       }
       setLoadSlot(false);
     };

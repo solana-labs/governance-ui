@@ -63,7 +63,7 @@ const DepositCommunityTokensBtn = ({ className = '' }) => {
       await fetchWalletTokenAccounts();
       await fetchRealm(realmInfo!.programId, realmInfo!.realmId);
     } catch (e) {
-      console.log(e);
+      console.error(e);
       notify({ message: `Something went wrong ${e}`, type: 'error' });
     }
     setIsLoading(false);

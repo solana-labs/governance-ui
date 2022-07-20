@@ -243,11 +243,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           connection,
           walletOwner,
         );
-        console.log(
-          'fetchWalletTokenAccounts',
-          connected,
-          ownedTokenAccounts.map((t) => t.account.mint.toBase58()),
-        );
 
         set((state) => {
           state.tokenAccounts = ownedTokenAccounts;
@@ -273,8 +268,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           walletOwner,
         );
 
-        console.log('fetchOwnVoteRecords', connected, ownVoteRecordsByProposal);
-
         set((state) => {
           state.ownVoteRecordsByProposal = ownVoteRecordsByProposal;
         });
@@ -291,8 +284,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       });
     },
     async fetchAllRealms(programId: PublicKey) {
-      console.log('fetchAllRealms', programId.toBase58());
-
       const connection = get().connection.current;
       const set = get().set;
 
@@ -301,8 +292,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       set((s) => {
         s.realms = accountsToPubkeyMap(realms);
       });
-
-      console.log('fetchAllRealms', get().realms);
     },
     async fetchRealm(programId: PublicKey, realmId: PublicKey) {
       const set = get().set;
@@ -357,14 +346,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
       const governancesMap = accountsToPubkeyMap(governances);
 
-      console.log('fetchRealm mint', realmMint);
-      console.log('fetchRealm councilMint', realmCouncilMint);
-      console.log('fetchRealm governances', governancesMap);
-      console.log('fetchRealm tokenRecords', {
-        tokenRecords,
-        councilTokenOwnerRecords,
-      });
-
       set((s) => {
         s.selectedRealm.realm = realm;
         s.selectedRealm.mint = realmMint;
@@ -414,8 +395,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
     },
 
     async fetchProposal(proposalPk: string) {
-      console.log('fetchProposal', proposalPk);
-
       if (HIDDEN_PROPOSALS.has(proposalPk)) {
         return;
       }
@@ -492,18 +471,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       )
         ? GoverningTokenType.Community
         : GoverningTokenType.Council;
-
-      console.log('fetchProposal fetched', {
-        governance,
-        proposal,
-        realm,
-        instructions,
-        voteRecordsByVoter,
-        signatories,
-        chatMessages,
-        tokenType,
-        proposalOwner,
-      });
 
       set((s) => {
         s.selectedProposal.proposal = proposal;

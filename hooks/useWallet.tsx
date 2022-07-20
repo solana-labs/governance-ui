@@ -7,10 +7,7 @@ import {
   getWalletProviderByUrl,
 } from '../utils/wallet-adapters';
 
-import useInterval from './useInterval';
 import useLocalStorageState from './useLocalStorageState';
-
-const SECONDS = 1000;
 
 export default function useWallet() {
   const {
@@ -105,19 +102,6 @@ export default function useWallet() {
       });
     };
   }, [wallet]);
-
-  // fetch on page load
-  useEffect(() => {
-    const pageLoad = async () => {
-      console.log('pageLoad');
-    };
-    pageLoad();
-  }, []);
-
-  // refresh regularly
-  useInterval(async () => {
-    console.log('refresh');
-  }, 10 * SECONDS);
 
   return { connected, wallet };
 }

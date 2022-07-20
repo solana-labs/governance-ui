@@ -46,19 +46,6 @@ export async function purchase({
     findAuctionPool(descendingAuctionProgramId, auction, bondedMint),
   ]);
 
-  console.log('Purchase tx', {
-    auction: auction.toString(),
-    auctionAuthority: auctionAuthority.toString(),
-    auctionPool: auctionPool.toString(),
-    paymentDestination: paymentDestination.toString(),
-    buyer: buyer.toString(),
-    paymentSource: paymentSource.toString(),
-    saleDestination: saleDestination.toString(),
-    purchaseAmount: purchaseAmount.toString(),
-    expectedPayment: expectedPayment.toString(),
-    slippageTolerance: slippageTolerance.toString(),
-  });
-
   return program.instruction.purchase(
     purchaseAmount,
     expectedPayment,

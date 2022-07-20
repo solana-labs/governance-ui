@@ -84,7 +84,7 @@ export function ExecuteInstructionButton({
         type: 'error',
         message: `error executing instruction ${error}`,
       });
-      console.log('error executing instruction', error);
+      console.error('error executing instruction', error);
 
       setPlaying(PlayState.Error);
 

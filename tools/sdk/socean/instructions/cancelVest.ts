@@ -45,17 +45,6 @@ export async function cancelVest({
 
   const [holding] = await findHoldingPDA(bondingProgramId, vesting);
 
-  console.log('Cancel vest', {
-    vault: vault.toString(),
-    vesting: vesting.toString(),
-    user: authority.toString(),
-    userBondedAccount: userBondedAccount.toString(),
-    userTargetAccount: userTargetAccount.toString(),
-    bondPool: bondPool.toString(),
-    bondedMint: bondedMint.toString(),
-    holding: holding.toString(),
-  });
-
   return program.instruction.cancelVest({
     accounts: {
       refundRentTo,

@@ -101,7 +101,7 @@ const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
           try {
             return !!getValidatedPublickKey(val);
           } catch (e) {
-            console.log(e);
+            console.error(e);
             return this.createError({
               message: `${e}`,
             });

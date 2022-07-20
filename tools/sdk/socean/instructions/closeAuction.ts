@@ -35,14 +35,6 @@ export async function closeAuction({
     findAuctionPool(descendingAuctionProgramId, auction, bondedMint),
   ]);
 
-  console.log('closeAuction', {
-    auction: auction.toString(),
-    auctionPool: auctionPool.toString(),
-    auctionAuthority: auctionAuthority.toString(),
-    authority: authority.toString(),
-    destinationAccount: destinationAccount.toString(),
-  });
-
   return program.instruction.closeAuction({
     accounts: {
       auction,

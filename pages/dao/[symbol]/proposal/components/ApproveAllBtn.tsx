@@ -61,8 +61,6 @@ const ApproveAllBtn = () => {
       votingProposals.map(async (proposal) => {
         const ownTokenRecord = tokenRecords[wallet.publicKey!.toBase58()];
 
-        console.log(proposal.pubkey.toBase58(), ownTokenRecord);
-
         const instructions: TransactionInstruction[] = [];
 
         //will run only if plugin is connected with realm

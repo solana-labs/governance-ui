@@ -35,15 +35,6 @@ export async function prepareEpochGaugeVoterInstruction({
     currentRewardsEpoch + 1,
   );
 
-  console.log('Prepare Epoch Gauge', {
-    currentRewardsEpoch,
-    nextEpoch: currentRewardsEpoch + 1,
-    escrow: escrow.toString(),
-    gaugeVoter: gaugeVoter.toString(),
-    epochGaugeVoter: epochGaugeVoter.toString(),
-    gaugemeister: tribecaConfiguration.gaugemeister.toString(),
-  });
-
   return programs.Gauge.instruction.prepareEpochGaugeVoter(bump, {
     accounts: {
       gaugemeister: tribecaConfiguration.gaugemeister,

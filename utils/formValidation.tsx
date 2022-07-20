@@ -19,7 +19,7 @@ export const isFormValid = async (schema, formValues, abortEarly = false) => {
     await schema.validate(formValues, { abortEarly });
     values.isValid = true;
   } catch (err) {
-    console.log('Validation Error', err);
+    console.error('Validation Error', err);
 
     values.isValid = false;
     const fieldName = err.path;

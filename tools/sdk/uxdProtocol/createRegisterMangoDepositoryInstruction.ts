@@ -41,16 +41,6 @@ const createRegisterMangoDepositoryInstruction = async ({
     decimals: insuranceDecimals,
   } = getInsuranceMintInfo(connection.cluster, insuranceMintName);
 
-  console.log('>>> createRegisterMangoDepositoryInstruction', {
-    depositoryMintName,
-    insuranceMintName,
-  });
-
-  console.log('>>> createRegisterMangoDepositoryInstruction', {
-    depositoryMint: depositoryMint.toBase58(),
-    insuranceMint: insuranceMint.toBase58(),
-  });
-
   const depository = instantiateMangoDepository({
     uxdProgramId,
     depositoryMint,
@@ -72,7 +62,7 @@ const createRegisterMangoDepositoryInstruction = async ({
     payer, // payer
   );
 
-  console.log(
+  console.info(
     `Initialize Authority Insurance ATA (${authorityInsuranceATA.toBase58()}) itx:`,
     serializeInstructionToBase64(createAuthorityInsuranceItx),
   );

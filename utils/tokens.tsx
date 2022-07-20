@@ -403,7 +403,7 @@ export const getNfts = async (connection: Connection, ownerPk: PublicKey) => {
         const val = (await axios.get(data[i].data.uri)).data;
         arr.push({ val, mint: data[i].mint });
       } catch (e) {
-        console.log(e);
+        console.error(e);
       }
     }
     return arr;

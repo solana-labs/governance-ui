@@ -52,22 +52,6 @@ export async function vest({
     vesting,
   );
 
-  console.log('vest', {
-    user: authority.toString(),
-    userBondedAccount: userBondedAccount.toString(),
-    vesting: vesting.toString(),
-    holding: holding.toString(),
-    bondedMint: bondedMint.toString(),
-    bondPool: bondPool.toString(),
-    tokenProgram: TOKEN_PROGRAM_ID.toString(),
-    systemProgram: SystemProgram.programId.toString(),
-    rent: SYSVAR_RENT_PUBKEY.toString(),
-    INDEX_MAGIC_NUMBER,
-    vestingBump,
-    holdingBump,
-    amount: amount.toString(),
-  });
-
   return program.instruction.vest(
     INDEX_MAGIC_NUMBER,
     vestingBump,

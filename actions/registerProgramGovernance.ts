@@ -47,7 +47,7 @@ export const registerProgramGovernance = async (
     client,
   );
 
-  console.log('VERSION', programVersion);
+  console.info('Governance Program version:', programVersion);
 
   switch (governanceType) {
     case GovernanceType.Program: {

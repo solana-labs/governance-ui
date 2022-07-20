@@ -25,7 +25,7 @@ const useStrategiesStore = create<StrategiesStore>((set, _get) => ({
         s.strategies = strategies;
       });
     } catch (e) {
-      console.log(e);
+      console.error(e);
       notify({ type: 'error', message: "Can't fetch MNGO strategies" });
     }
     set((s) => {

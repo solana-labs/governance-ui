@@ -31,8 +31,6 @@ export const MARINADE_INSTRUCTIONS = {
           BufferLayout.nu64('lamports'),
         ]).decode(Buffer.from(data), 8);
 
-        console.log(lamports);
-
         const rawAmount = new BN(lamports);
         const tokenAmount = tokenMint
           ? getMintDecimalAmountFromNatural(tokenMint.account, rawAmount)

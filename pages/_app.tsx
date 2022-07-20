@@ -93,9 +93,11 @@ function App({ Component, pageProps }) {
     changeFavicon(faviconUrl);
   }, [faviconUrl]);
   useEffect(() => {
-    console.log(title);
+    console.info(`Title: ${title}`);
+
     document.title = title;
   }, [title]);
+
   return (
     <div className="relative">
       <ErrorBoundary>

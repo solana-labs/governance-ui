@@ -57,8 +57,6 @@ const WithDrawCommunityTokens = () => {
         ownTokenRecord!.account!.governingTokenOwner,
       );
 
-      console.log('Vote Records', voteRecords);
-
       for (const voteRecord of Object.values(voteRecords)) {
         let proposal = proposals[voteRecord.account.proposal.toBase58()];
         if (!proposal) {
@@ -78,22 +76,21 @@ const WithDrawCommunityTokens = () => {
                 type: 'error',
                 message: `Can't withdraw tokens while Proposal ${proposal.account.name} is being voted on. Please withdraw your vote first`,
               });
-              throw new Error(
-                `Can't withdraw tokens while Proposal ${proposal.account.name} is being voted on. Please withdraw your vote first`,
-              );
-            } else {
-              // finalize proposal before withdrawing tokens so we don't stop the vote from succeeding
-              await withFinalizeVote(
-                instructions,
-                realmInfo!.programId,
-                getProgramVersionForRealm(realmInfo!),
-                realm!.pubkey,
-                proposal.account.governance,
-                proposal.pubkey,
-                proposal.account.tokenOwnerRecord,
-                proposal.account.governingTokenMint,
-              );
+
+              return;
             }
+
+            // finalize proposal before withdrawing tokens so we don't stop the vote from succeeding
+            await withFinalizeVote(
+              instructions,
+              realmInfo!.programId,
+              getProgramVersionForRealm(realmInfo!),
+              realm!.pubkey,
+              proposal.account.governance,
+              proposal.pubkey,
+              proposal.account.tokenOwnerRecord,
+              proposal.account.governingTokenMint,
+            );
           }
         }
 

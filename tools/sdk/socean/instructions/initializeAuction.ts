@@ -54,24 +54,6 @@ export async function initializeAuction({
     findAuctionPool(descendingAuctionProgramId, auction, saleMint),
   ]);
 
-  console.log('initializeAuction <<<<', {
-    cluster,
-    auction: auction.toString(),
-    authority: authority.toString(),
-    paymentMint: paymentMint.toString(),
-    paymentDestination: paymentDestination.toString(),
-    saleMint: saleMint.toString(),
-    descendingAuctionProgramId: descendingAuctionProgramId.toString(),
-    startTimestamp,
-    endTimestamp,
-    ceilPrice,
-    floorPrice,
-    auctionAuthority: auctionAuthority.toString(),
-    auctionAuthorityBump,
-    auctionPool: auctionPool.toString(),
-    auctionPoolBump,
-  });
-
   return program.instruction.initializeAuction(
     startTimestamp,
     endTimestamp,

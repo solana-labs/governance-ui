@@ -7,7 +7,7 @@ class Debounce {
   }
   debounceFcn = (callback) => {
     if (!callback) {
-      console.log('missing argument callback');
+      console.error('missing argument callback');
     }
     if (this.typingTimeout) {
       clearTimeout(this.typingTimeout);

@@ -36,17 +36,6 @@ export async function withdrawTokensInstruction({
     provider: augmentedProvider,
   });
 
-  console.log('Withdraw Tokens', {
-    authority: authority.toString(),
-    miner: miner.toString(),
-    quarry: quarry.toString(),
-    minerVault: minerVault.toString(),
-    tokenAccount: destinationAccount.toString(),
-    tokenProgram: TOKEN_PROGRAM_ID.toString(),
-    rewarder: rewarder.toString(),
-    amount: amount.toString(),
-  });
-
   return sdk.programs.Mine.instruction.withdrawTokens(amount, {
     accounts: {
       authority,

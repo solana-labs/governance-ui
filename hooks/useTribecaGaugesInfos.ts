@@ -189,7 +189,7 @@ export default function useTribecaGaugeInfos(
         nextEpochGaugeVoterData,
       };
     } catch (err) {
-      console.log(
+      console.error(
         `Cannot load Gauges infos for escrowOwner ${
           escrowOwner.name
         } / ${escrowOwner.publicKey.toString()}`,
@@ -201,7 +201,20 @@ export default function useTribecaGaugeInfos(
   }, [tribecaConfiguration, programs, escrowOwner, gauges]);
 
   useEffect(() => {
-    loadInfos().then(setInfos);
+    // add a cancel
+    let quit = false;
+
+    loadInfos().then((infos) => {
+      if (quit) {
+        return;
+      }
+
+      setInfos(infos);
+    });
+
+    return () => {
+      quit = true;
+    };
   }, [loadInfos]);
 
   return {

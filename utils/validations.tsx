@@ -245,7 +245,7 @@ export const getTokenTransferSchema = ({ form, connection }) => {
               );
               return true;
             } catch (e) {
-              console.log(e);
+              console.error(e);
               return this.createError({
                 message: `${e}`,
               });

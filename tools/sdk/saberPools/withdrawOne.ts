@@ -44,24 +44,6 @@ export async function withdrawOne({
     adminDestinationAccount = pool.tokenAccountB.adminDestinationAccount;
   }
 
-  console.log('Withdraw One', {
-    config: {
-      authority: pool.swapAccountAuthority.toString(),
-      swapAccount: pool.swapAccount.toString(),
-      swapProgramID: saberPoolsConfiguration.saberStableSwapProgramId.toString(),
-      tokenProgramID: TOKEN_PROGRAM_ID.toString(),
-    },
-    userAuthority: authority.toString(),
-    poolMint: pool.poolToken.mint.toString(),
-    sourceAccount: poolTokenMintATA.toString(),
-    baseTokenAccount: baseTokenAccount.toString(),
-    quoteTokenAccount: quoteTokenAccount.toString(),
-    destinationAccount: destinationAccount.toString(),
-    adminDestinationAccount: adminDestinationAccount.toString(),
-    poolTokenAmount: poolTokenAmount.toString(),
-    minimumTokenAmount: minimumTokenAmount.toString(),
-  });
-
   return withdrawOneInstruction({
     config: {
       authority: pool.swapAccountAuthority,

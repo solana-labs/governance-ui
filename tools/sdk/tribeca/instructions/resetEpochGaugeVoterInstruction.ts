@@ -29,14 +29,6 @@ export async function resetEpochGaugeVoterInstruction({
     votingEpoch,
   );
 
-  console.log('Reset Epoch Gauge Voter', {
-    gaugemeister: tribecaConfiguration.gaugemeister.toString(),
-    locker: tribecaConfiguration.locker.toString(),
-    escrow: escrow.toString(),
-    gaugeVoter: gaugeVoter.toString(),
-    epochGaugeVoter: epochGaugeVoter.toString(),
-  });
-
   return programs.Gauge.instruction.resetEpochGaugeVoter({
     accounts: {
       gaugemeister: tribecaConfiguration.gaugemeister,

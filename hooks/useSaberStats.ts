@@ -42,7 +42,7 @@ const useSaberStats = (hotWalletAccount: HotWalletAccount) => {
   const [saberStats, setSaberStats] = useState<SaberStats[] | null>(null);
 
   const loadInfo = useCallback(async () => {
-    if (!connection.current || !hotWalletAccount) return;
+    if (!connection.current || !hotWalletAccount) return [];
 
     try {
       const {
@@ -91,7 +91,7 @@ const useSaberStats = (hotWalletAccount: HotWalletAccount) => {
       if (!lpMintInfo)
         throw new Error(`Cannot load lp mint info for ${mint.toBase58()}`);
 
-      setSaberStats([
+      return [
         {
           liquidityPoolName: 'Saber UXD-USDC Liquidity Pool',
           balance: minerData.balance,
@@ -102,14 +102,28 @@ const useSaberStats = (hotWalletAccount: HotWalletAccount) => {
           mintName,
           rewardsTokenMintName,
         },
-      ]);
+      ];
     } catch (err) {
-      console.log('error loading saber stats', err);
+      console.error('error loading saber stats', err);
+      return [];
     }
   }, [connection, hotWalletAccount, wallet]);
 
   useEffect(() => {
-    loadInfo();
+    // add a cancel
+    let quit = false;
+
+    loadInfo().then((infos) => {
+      if (quit) {
+        return;
+      }
+
+      setSaberStats(infos);
+    });
+
+    return () => {
+      quit = true;
+    };
   }, [loadInfo]);
 
   return {

@@ -27,7 +27,7 @@ const EscrowDataBloc = ({ escrowData }: { escrowData?: EscrowData }) => {
     );
 
     if (!tokenInfo) {
-      console.log(
+      console.error(
         'Cannot load information about token mint related to escrow data (tribeca gauges)',
         escrowData.tokens,
       );

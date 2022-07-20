@@ -57,12 +57,8 @@ const useHotWalletPluginUXDStaking = (hotWalletAccount: HotWalletAccount) => {
       const programId =
         uxdProtocolStakingConfiguration.programId[connection.cluster];
 
-      if (!programId) {
-        return;
-      }
-
-      if (!sssClient) {
-        return;
+      if (!programId || !sssClient) {
+        return [];
       }
 
       const campaigns =
@@ -81,35 +77,48 @@ const useHotWalletPluginUXDStaking = (hotWalletAccount: HotWalletAccount) => {
         ),
       );
 
-      setStakingCampaignsInfo(
-        stakingCampaigns.map((stakingCampaign, index) => {
-          const uiStakedTokensV1 = uiStakedTokensStakingAccountsV1[index];
+      return stakingCampaigns.map((stakingCampaign, index) => {
+        const uiStakedTokensV1 = uiStakedTokensStakingAccountsV1[index];
 
-          return {
-            ...stakingCampaign,
-            uiStakedTokensV1:
-              uiStakedTokensV1.status === 'rejected'
-                ? 0
-                : uiStakedTokensV1.value,
-            uiStakedTokensV2: Number(
-              nativeAmountToFormattedUiAmount(
-                stakingCampaign.stakedAmount,
-                stakingCampaign.stakedMintDecimals,
-              ),
+        return {
+          ...stakingCampaign,
+          uiStakedTokensV1:
+            uiStakedTokensV1.status === 'rejected' ? 0 : uiStakedTokensV1.value,
+          uiStakedTokensV2: Number(
+            nativeAmountToFormattedUiAmount(
+              stakingCampaign.stakedAmount,
+              stakingCampaign.stakedMintDecimals,
             ),
-            name: campaigns[index].name,
-            pda: campaigns[index].pda,
-          };
-        }),
-      );
+          ),
+          name: campaigns[index].name,
+          pda: campaigns[index].pda,
+        };
+      });
     } catch (e) {
-      console.log(e);
-      setStakingCampaignsInfo([]);
+      console.error(e);
+      return [];
     }
   }, [connection, hotWalletAccount, sssClient]);
 
   useEffect(() => {
     loadUXDStakingCampaignInfo();
+  }, [loadUXDStakingCampaignInfo]);
+
+  useEffect(() => {
+    // add a cancel
+    let quit = false;
+
+    loadUXDStakingCampaignInfo().then((infos) => {
+      if (quit) {
+        return;
+      }
+
+      setStakingCampaignsInfo(infos);
+    });
+
+    return () => {
+      quit = true;
+    };
   }, [loadUXDStakingCampaignInfo]);
 
   return { stakingCampaignsInfo };

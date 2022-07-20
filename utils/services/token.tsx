@@ -20,7 +20,7 @@ class TokenService {
         this._tokenList = tokenList;
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
       notify({
         type: 'error',
         message: 'unable to fetch token list',

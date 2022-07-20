@@ -36,18 +36,6 @@ export async function createMinerInstruction({
     provider: augmentedProvider,
   });
 
-  console.log('Create Miner', {
-    authority: authority.toString(),
-    miner: miner.toString(),
-    quarry: quarry.toString(),
-    rewarder: rewarder.toString(),
-    systemProgram: SystemProgram.programId.toString(),
-    payer: payer.toString(),
-    tokenMint: mint.toString(),
-    minerVault: minerVault.toString(),
-    tokenProgram: TOKEN_PROGRAM_ID.toString(),
-  });
-
   return sdk.programs.Mine.instruction.createMiner(bump, {
     accounts: {
       authority,

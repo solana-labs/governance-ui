@@ -63,6 +63,7 @@ const New = () => {
     fetchRealmGovernance,
     fetchTokenAccountsForSelectedRealmGovernance,
   } = useWalletStore((s) => s.actions);
+  const connected = useWalletStore((s) => s.connected);
   const [voteByCouncil, setVoteByCouncil] = useState(true);
   const [form, setForm] = useState<Form>({
     title: '',
@@ -82,6 +83,12 @@ const New = () => {
   const [instructions, setInstructions] = useState<ComponentInstructionData[]>(
     [],
   );
+
+  useEffect(() => {
+    if (!connected) {
+      router.push(fmtUrlWithCluster(`/dao/${symbol}`));
+    }
+  }, [router, connected]);
 
   const handleSetForm = ({
     propertyName,
@@ -117,13 +124,15 @@ const New = () => {
     setFormErrors({});
 
     if (!realm) {
+      notify({ type: 'error', message: 'No realm selected' });
       handleTurnOffLoaders();
-      throw 'No realm selected';
+      return;
     }
 
     if (!governedAccount) {
+      notify({ type: 'error', message: 'No governance selected' });
       handleTurnOffLoaders();
-      throw Error('No governance selected');
+      return;
     }
 
     if (isDraft) {

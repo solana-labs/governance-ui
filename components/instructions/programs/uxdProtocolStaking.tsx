@@ -28,8 +28,6 @@ const config = {
       data: Uint8Array,
       accounts: AccountMetaData[],
     ) => {
-      console.log('Data length', data.length);
-
       const dataLayout = struct([
         u8('instruction'),
         ...ANCHOR_DISCRIMINATOR_LAYOUT,

@@ -36,25 +36,6 @@ export async function deposit({
   minimumPoolTokenAmount.toBuffer = () =>
     minimumPoolTokenAmount.toArrayLike(Buffer, 'le', 8);
 
-  console.log('deposit', {
-    config: {
-      authority: pool.swapAccountAuthority.toString(),
-      swapAccount: pool.swapAccount.toString(),
-      swapProgramID: saberPoolsConfiguration.saberStableSwapProgramId.toString(),
-      tokenProgramID: TOKEN_PROGRAM_ID.toString(),
-    },
-    userAuthority: authority.toString(),
-    sourceA: sourceA.toString(),
-    sourceB: sourceB.toString(),
-    tokenAccountA: pool.tokenAccountA.mint.toString(),
-    tokenAccountB: pool.tokenAccountB.mint.toString(),
-    poolTokenMint: pool.poolToken.mint.toString(),
-    poolTokenAccount: poolTokenMintATA.toString(),
-    tokenAmountA: tokenAmountA.toString(),
-    tokenAmountB: tokenAmountB.toString(),
-    minimumPoolTokenAmount: minimumPoolTokenAmount.toString(),
-  });
-
   return depositInstruction({
     config: {
       authority: pool.swapAccountAuthority,

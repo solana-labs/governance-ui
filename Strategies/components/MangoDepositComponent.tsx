@@ -229,7 +229,7 @@ const MangoDepositComponent = ({
       );
       router.push(url);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
     setIsDepositing(false);
   };
@@ -247,7 +247,7 @@ const MangoDepositComponent = ({
             try {
               return !!getValidatedPublickKey(val);
             } catch (e) {
-              console.log(e);
+              console.error(e);
               return this.createError({
                 message: `${e}`,
               });

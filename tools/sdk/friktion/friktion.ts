@@ -114,17 +114,7 @@ const fetchVoltRound = async ({
     voltVaultId,
     governancePubkey,
   });
-  const factor = await cVoltSDK.getCurrentEpochInfo();
-  console.log('factor', factor);
   const balances = await cVoltSDK.getBalancesForUser(governancePubkey);
-  console.log(
-    'balances',
-    Object.entries(balances!).reduce(
-      (acc, [key, value]) => ({ ...acc, [key]: value.toString() }),
-      {},
-    ),
-  );
-
   const epochInfo = await cVoltSDK.getCurrentEpochInfo();
 
   return {

@@ -25,14 +25,6 @@ export async function gaugeSetVoteInstruction({
     gauge,
   );
 
-  console.log('Gauge Set Vote', {
-    escrow: escrow.toString(),
-    gauge: gauge.toString(),
-    gaugeVoter: gaugeVoter.toString(),
-    gaugeVote: gaugeVote.toString(),
-    gaugemeister: tribecaConfiguration.gaugemeister.toString(),
-  });
-
   return programs.Gauge.instruction.gaugeSetVote(weight, {
     accounts: {
       escrow,

@@ -47,7 +47,7 @@ const ExecuteInstruction = ({
         message: `Error: Could not execute instruction.`,
       });
 
-      console.log('error executing instruction', error);
+      console.error('error executing instruction', error);
 
       onClose();
     }

@@ -63,18 +63,6 @@ export async function mintBondedTokens({
     })(),
   ]);
 
-  console.log('MindBondedTokens', {
-    owner: authority.toString(),
-    depositFrom: depositFrom.toString(),
-    mintTo: mintTo.toString(),
-    vault: vault.toString(),
-    bondedMint: bondedMint.toString(),
-    bondMintAuthority: bondMintAuthority.toString(),
-    bondPool: bondPool.toString(),
-    tokenProgram: TOKEN_PROGRAM_ID.toString(),
-    amount: amount.toString(),
-  });
-
   return program.instruction.deposit(amount, {
     accounts: {
       owner: authority,

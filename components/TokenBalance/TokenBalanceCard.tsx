@@ -199,12 +199,6 @@ const TokenDeposit = ({
     mint.decimals,
   );
 
-  console.log(
-    'votingPowerOfDelegatedAccounts',
-    votingPowerOfDelegatedAccounts.toString(),
-    fmtTokenAmount(votingPowerOfDelegatedAccounts, mint.decimals).toString(),
-  );
-
   const depositTokenRecord =
     tokenType === GoverningTokenType.Community
       ? ownTokenRecord
@@ -282,8 +276,6 @@ const TokenDeposit = ({
         depositTokenRecord!.account!.governingTokenOwner,
       );
 
-      console.log('Vote Records', voteRecords);
-
       for (const voteRecord of Object.values(voteRecords)) {
         let proposal = proposals[voteRecord.account.proposal.toBase58()];
         if (!proposal) {
@@ -308,22 +300,21 @@ const TokenDeposit = ({
                 type: 'error',
                 message: `Can't withdraw tokens while Proposal ${proposal.account.name} is being voted on. Please withdraw your vote first`,
               });
-              throw new Error(
-                `Can't withdraw tokens while Proposal ${proposal.account.name} is being voted on. Please withdraw your vote first`,
-              );
-            } else {
-              // finalize proposal before withdrawing tokens so we don't stop the vote from succeeding
-              await withFinalizeVote(
-                instructions,
-                realmInfo!.programId,
-                getProgramVersionForRealm(realmInfo!),
-                realm!.pubkey,
-                proposal.account.governance,
-                proposal.pubkey,
-                proposal.account.tokenOwnerRecord,
-                proposal.account.governingTokenMint,
-              );
+
+              return;
             }
+
+            // finalize proposal before withdrawing tokens so we don't stop the vote from succeeding
+            await withFinalizeVote(
+              instructions,
+              realmInfo!.programId,
+              getProgramVersionForRealm(realmInfo!),
+              realm!.pubkey,
+              proposal.account.governance,
+              proposal.pubkey,
+              proposal.account.tokenOwnerRecord,
+              proposal.account.governingTokenMint,
+            );
           }
         }
 
@@ -428,7 +419,7 @@ const TokenDeposit = ({
       <div className="flex space-x-4 items-center">
         <div className="bg-bkg-1 px-4 py-2 rounded-md w-full">
           <p className="text-fgd-3 text-xs">{depositTokenName} Votes</p>
-          <p className="font-bold mb-0 text-fgd-1 text-xl flex">
+          <div className="font-bold mb-0 text-fgd-1 text-xl flex">
             {availableTokens}
             {uiVotingPowerOfDelegatedAccounts > 0 ? (
               <Tooltip content="Voting power of delegated accounts">
@@ -440,7 +431,7 @@ const TokenDeposit = ({
                 </div>
               </Tooltip>
             ) : null}
-          </p>
+          </div>
         </div>
       </div>
 

@@ -83,9 +83,6 @@ const BurnSplTokens = ({
     governedAccountPubkey,
   );
 
-  console.log('ownedTokenAccountsInfo', ownedTokenAccountsInfo);
-  console.log('governedAccountPubkey', governedAccountPubkey?.toBase58());
-
   if (!ownedTokenAccountsInfo) {
     return null;
   }

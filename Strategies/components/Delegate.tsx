@@ -92,7 +92,7 @@ const DelegateForm = ({
       );
       router.push(url);
     } catch (e) {
-      console.log(e);
+      console.error(e);
       notify({ type: 'error', message: "Can't create proposal" });
     }
   };
@@ -107,7 +107,7 @@ const DelegateForm = ({
             try {
               return !!getValidatedPublickKey(val);
             } catch (e) {
-              console.log(e);
+              console.error(e);
               return this.createError({
                 message: `${e}`,
               });

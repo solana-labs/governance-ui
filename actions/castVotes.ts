@@ -70,7 +70,6 @@ export async function castVotes({
   for (const tokenOwnerRecord of tokenOwnerRecordsToVoteWith) {
     // we check that the votes will stop once the proposal passes.
     if (relativeRequiredVote <= 0) {
-      console.log('There is enough votes, do not include the next vote');
       continue;
     }
 

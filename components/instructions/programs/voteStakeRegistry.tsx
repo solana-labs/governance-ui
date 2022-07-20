@@ -87,7 +87,7 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
             </div>
           );
         } catch (e) {
-          console.log(e);
+          console.error(e);
           return <div>{JSON.stringify(data)}</div>;
         }
       },
@@ -168,7 +168,7 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
             </div>
           );
         } catch (e) {
-          console.log(e);
+          console.error(e);
           return <div>{JSON.stringify(data)}</div>;
         }
       },
@@ -267,7 +267,7 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
             </>
           );
         } catch (e) {
-          console.log(e);
+          console.error(e);
           return <div>{JSON.stringify(data)}</div>;
         }
       },

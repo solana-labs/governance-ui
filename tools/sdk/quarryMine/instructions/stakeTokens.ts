@@ -35,17 +35,6 @@ export async function stakeTokensInstruction({
     provider: augmentedProvider,
   });
 
-  console.log('Stake Tokens', {
-    authority: authority.toString(),
-    miner: miner.toString(),
-    quarry: quarry.toString(),
-    minerVault: minerVault.toString(),
-    tokenAccount: sourceAccount.toString(),
-    tokenProgram: TOKEN_PROGRAM_ID.toString(),
-    rewarder: rewarder.toString(),
-    amount: amount.toString(),
-  });
-
   return sdk.programs.Mine.instruction.stakeTokens(amount, {
     accounts: {
       authority,

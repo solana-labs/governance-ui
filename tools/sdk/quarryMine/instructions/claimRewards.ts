@@ -37,23 +37,6 @@ export async function claimRewardsInstruction({
 
   const [rewardsTokenAccount] = findATAAddrSync(authority, rewardsTokenMint);
 
-  console.log('Claim Rewards', {
-    mintWrapper: mintWrapper.toString(),
-    mintWrapperProgram: QuarryMineConfiguration.mintWrapperProgram.toString(),
-    minter: minter.toString(),
-    rewardsTokenMint: rewardsTokenMint.toString(),
-    rewardsTokenAccount: rewardsTokenAccount.toString(),
-    claimFeeTokenAccount: claimFeeTokenAccount.toString(),
-    stake: {
-      authority: authority.toString(),
-      miner: miner.toString(),
-      quarry: quarry.toString(),
-      tokenProgram: TOKEN_PROGRAM_ID.toString(),
-      rewarder: rewarder.toString(),
-      unusedMinerVault: minerVault.toString(),
-    },
-  });
-
   return sdk.programs.Mine.instruction.claimRewards({
     accounts: {
       mintWrapper,

@@ -99,8 +99,6 @@ const MyProposalsBn = () => {
 
       const transactions = await Promise.all(
         proposalsArray.map(async (proposal) => {
-          console.log(proposal.pubkey.toBase58(), ownTokenRecord);
-
           const instructions: TransactionInstruction[] = [];
 
           await withInstruction(instructions, proposal);

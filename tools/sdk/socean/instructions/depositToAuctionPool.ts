@@ -40,15 +40,6 @@ export async function depositToAuctionPool({
     findAuctionPool(descendingAuctionProgramId, auction, bondedMint),
   ]);
 
-  console.log('Deposit to auction pool', {
-    auction: auction.toString(),
-    auctionPool: auctionPool.toString(),
-    auctionAuthority: auctionAuthority.toString(),
-    authority: authority.toString(),
-    sourceAccount: sourceAccount.toString(),
-    depositAmount: depositAmount.toString(),
-  });
-
   return program.instruction.depositToAuctionPool(depositAmount, {
     accounts: {
       auction,

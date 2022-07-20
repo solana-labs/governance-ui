@@ -236,7 +236,7 @@ export const createProposal = async (
     const insertChunks = chunks(insertInstructions, 2);
     const signerChunks = Array(insertChunks.length).fill([]);
 
-    console.log(`Creating proposal using ${insertChunks.length} chunks`);
+    console.info(`Creating proposal using ${insertChunks.length} chunks`);
 
     await sendTransactions(
       connection,

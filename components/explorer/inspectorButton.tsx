@@ -49,7 +49,7 @@ export default function InspectorButton({
           'tx',
         );
       } catch (e) {
-        console.log(e);
+        console.error(e);
       }
     }
     if (inspectUrl) {

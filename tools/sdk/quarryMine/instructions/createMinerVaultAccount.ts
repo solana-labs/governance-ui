@@ -28,7 +28,7 @@ export async function createMinerVaultAccountInstruction({
     mint,
   );
 
-  console.log('Create Miner Vault Account', {
+  console.info('Create Miner Vault Account', {
     authority: authority.toString(),
     payer: payer.toString(),
     mint: mint.toString(),

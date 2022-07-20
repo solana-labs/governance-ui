@@ -48,19 +48,6 @@ export async function gaugeRevertVoteInstruction({
     votingEpoch,
   );
 
-  console.log('Gauge Revert Vote', {
-    gaugemeister: tribecaConfiguration.gaugemeister.toString(),
-    gauge: gauge.toString(),
-    gaugeVoter: gaugeVoter.toString(),
-    gaugeVote: gaugeVote.toString(),
-    epochGauge: epochGauge.toString(),
-    epochGaugeVoter: epochGaugeVoter.toString(),
-    escrow: escrow.toString(),
-    voteDelegate: authority.toString(),
-    epochGaugeVote: epochGaugeVote.toString(),
-    payer: payer.toString(),
-  });
-
   return programs.Gauge.instruction.gaugeRevertVote({
     accounts: {
       gaugemeister: tribecaConfiguration.gaugemeister,

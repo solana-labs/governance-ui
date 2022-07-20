@@ -33,7 +33,7 @@ const useHotWalletPluginTokenAccounts = (
   ] = useState<HotWalletTokenAccounts | null>(null);
 
   const loadTokenAccounts = useCallback(async () => {
-    if (!connection.current) return;
+    if (!connection.current) return [];
 
     const ownedTokenAccounts = await getOwnedTokenAccounts(
       connection.current,
@@ -75,28 +75,26 @@ const useHotWalletPluginTokenAccounts = (
       },
     );
 
-    setTokenAccounts(
-      ownedTokenAccounts
-        .map((tokenAccount) => {
-          const mintInfo = mintInfos[tokenAccount.account.mint.toBase58()];
+    return ownedTokenAccounts
+      .map((tokenAccount) => {
+        const mintInfo = mintInfos[tokenAccount.account.mint.toBase58()];
 
-          return {
-            mint: tokenAccount.account.mint,
-            publicKey: tokenAccount.publicKey,
-            amount: tokenAccount.account.amount,
-            decimals: mintInfo.account.decimals,
-            mintName: mintInfo.name,
-            usdMintValue: mintInfo.usdValue,
-            usdTotalValue: new BN(
-              new BigNumber(tokenAccount.account.amount.toString())
-                .multipliedBy(mintInfo.usdValue)
-                .integerValue()
-                .toString(),
-            ),
-          };
-        })
-        .sort((a, b) => (b.amount.toString() < a.amount.toString() ? -1 : 1)),
-    );
+        return {
+          mint: tokenAccount.account.mint,
+          publicKey: tokenAccount.publicKey,
+          amount: tokenAccount.account.amount,
+          decimals: mintInfo.account.decimals,
+          mintName: mintInfo.name,
+          usdMintValue: mintInfo.usdValue,
+          usdTotalValue: new BN(
+            new BigNumber(tokenAccount.account.amount.toString())
+              .multipliedBy(mintInfo.usdValue)
+              .integerValue()
+              .toString(),
+          ),
+        };
+      })
+      .sort((a, b) => (b.amount.toString() < a.amount.toString() ? -1 : 1));
   }, [
     connection,
     JSON.stringify(tokenService._tokenPriceToUSDlist),
@@ -104,7 +102,20 @@ const useHotWalletPluginTokenAccounts = (
   ]);
 
   useEffect(() => {
-    loadTokenAccounts();
+    // add a cancel
+    let quit = false;
+
+    loadTokenAccounts().then((infos) => {
+      if (quit) {
+        return;
+      }
+
+      setTokenAccounts(infos);
+    });
+
+    return () => {
+      quit = true;
+    };
   }, [loadTokenAccounts]);
 
   return {

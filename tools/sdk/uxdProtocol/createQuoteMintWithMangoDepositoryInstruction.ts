@@ -1,10 +1,6 @@
 import { Provider } from '@project-serum/anchor';
 import { TransactionInstruction, PublicKey } from '@solana/web3.js';
-import {
-  Controller,
-  findMultipleATAAddSync,
-  UXD_DECIMALS,
-} from '@uxd-protocol/uxd-client';
+import { Controller, UXD_DECIMALS } from '@uxd-protocol/uxd-client';
 import type { ConnectionContext } from 'utils/connection';
 import {
   uxdClient,
@@ -53,28 +49,6 @@ const createQuoteMintWithMangoDepositoryInstruction = async ({
     depositoryDecimals,
     insuranceName: insuranceMintName,
     insuranceDecimals,
-  });
-
-  const [
-    [userQuoteATA],
-    [userRedeemableATA],
-  ] = findMultipleATAAddSync(authority, [
-    depository.quoteMint,
-    new Controller('UXD', UXD_DECIMALS, uxdProgramId).redeemableMintPda,
-  ]);
-
-  console.log('USER ATA', {
-    authority: authority.toBase58(),
-    userQuoteATA: userQuoteATA.toBase58(),
-    userRedeemableATA: userRedeemableATA.toBase58(),
-    redeemableMintPda: new Controller(
-      'UXD',
-      UXD_DECIMALS,
-      uxdProgramId,
-    ).redeemableMintPda.toBase58(),
-    quoteMint: depository.quoteMint.toBase58(),
-    insuranceMint: insuranceMint.toBase58(),
-    depositoryMint: depositoryMint.toBase58(),
   });
 
   return client.createQuoteMintWithMangoDepositoryInstruction(

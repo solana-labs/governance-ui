@@ -11,9 +11,11 @@ const MembersItems = ({ activeMembers }: { activeMembers: Member[] }) => {
   const onPageChange = (page) => {
     setMembers(paginateMembers(page));
   };
+
   const paginateMembers = (page) => {
     return activeMembers.slice(page * perPage, (page + 1) * perPage);
   };
+
   useEffect(() => {
     setMembers(paginateMembers(0));
   }, [activeMembers.length]);
