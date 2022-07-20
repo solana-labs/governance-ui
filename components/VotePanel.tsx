@@ -220,7 +220,8 @@ const VotePanel = () => {
     return null;
   }
 
-  const delegatedAccounts = getDelegatedAccounts();
+  const delegatedAccounts =
+    tokenType === GoverningTokenType.Community ? getDelegatedAccounts() : [];
 
   // Holds accounts we can vote for
   const accountsToVoteFor: AccountsToVoteFor = [

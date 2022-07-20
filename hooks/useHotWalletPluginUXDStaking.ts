@@ -58,13 +58,11 @@ const useHotWalletPluginUXDStaking = (hotWalletAccount: HotWalletAccount) => {
         uxdProtocolStakingConfiguration.programId[connection.cluster];
 
       if (!programId) {
-        throw new Error(
-          `Unsupported cluster ${connection.cluster} for UXD Protocol Staking`,
-        );
+        return;
       }
 
       if (!sssClient) {
-        throw new Error('Single side staking client not loaded');
+        return;
       }
 
       const campaigns =

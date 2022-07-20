@@ -94,6 +94,7 @@ const REALM = () => {
     JSON.stringify(nftsGovernedTokenAccounts),
   );
   const connection = useWalletStore((s) => s.connection.current);
+  const connected = useWalletStore((s) => s.connected);
   const { getNfts } = useTreasuryAccountStore();
   const [filters, setFilters] = useState<ProposalState[]>([]);
   const [displayedProposals, setDisplayedProposals] = useState(
@@ -253,7 +254,7 @@ const REALM = () => {
         <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
           {realm && (
             <>
-              <TokenBalanceCardWrapper />
+              {connected && <TokenBalanceCardWrapper />}
 
               <HotWallet />
 
