@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import Input from 'components/inputs/Input'
+import Switch from '@components/Switch'
 
 import {
   Governance,
@@ -35,6 +36,8 @@ import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { getMintMetadata } from '@components/instructions/programs/streamflow'
 import { createUncheckedStreamInstruction } from '@streamflow/stream'
 import Select from '@components/inputs/Select'
+import { StyledLabel } from '@components/inputs/styles'
+// import { ConnectionContext } from '@utils/connection'
 
 const STREAMFLOW_TREASURY_PUBLIC_KEY = new PublicKey(
   '5SEpbdjFK5FxwTvfsGMXVQTD2v4M2c5tyRTxhdsPkgDw'
@@ -72,7 +75,32 @@ async function ata(mint: PublicKey, account: PublicKey) {
     ASSOCIATED_TOKEN_PROGRAM_ID,
     TOKEN_PROGRAM_ID,
     mint,
-    account
+    account,
+    true
+  )
+}
+
+async function checkInitTokenAccount(
+  account: PublicKey,
+  instructions: TransactionInstruction[],
+  connection: any,
+  mint: PublicKey,
+  owner: PublicKey,
+  feePayer: PublicKey
+) {
+  const accountInfo = await connection.current.getAccountInfo(account)
+  if (accountInfo && accountInfo.lamports > 0) {
+    return
+  }
+  instructions.push(
+    Token.createAssociatedTokenAccountInstruction(
+      ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+      TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+      mint, // mint
+      account, // ata
+      owner, // owner of token account
+      feePayer
+    )
   )
 }
 
@@ -100,6 +128,8 @@ const CreateStream = ({
     amountAtCliff: 0,
   })
   const [formErrors, setFormErrors] = useState({})
+  const [cancelable, setCancelable] = useState<boolean>(false)
+  console.log(cancelable)
   const { handleSetInstructions } = useContext(NewProposalContext)
 
   const handleSetForm = ({ propertyName, value }) => {
@@ -210,6 +240,31 @@ const CreateStream = ({
       }),
     ]
 
+    checkInitTokenAccount(
+      recipientTokens,
+      prerequisiteInstructions,
+      connection,
+      tokenMint,
+      recipientPublicKey,
+      wallet?.publicKey
+    )
+    checkInitTokenAccount(
+      partnerTokens,
+      prerequisiteInstructions,
+      connection,
+      tokenMint,
+      partnerPublicKey,
+      wallet?.publicKey
+    )
+    checkInitTokenAccount(
+      streamflowTreasuryTokens,
+      prerequisiteInstructions,
+      connection,
+      tokenMint,
+      STREAMFLOW_TREASURY_PUBLIC_KEY,
+      wallet?.publicKey
+    )
+
     const tokenAccount = form.tokenAccount.pubkey
 
     const period =
@@ -223,7 +278,7 @@ const CreateStream = ({
       amountPerPeriod: new u64(form.releaseAmount * 10 ** decimals),
       name: 'SPL Realms proposal',
       canTopup: false,
-      cancelableBySender: true,
+      cancelableBySender: cancelable,
       cancelableByRecipient: false,
       transferableBySender: true,
       transferableByRecipient: false,
@@ -307,7 +362,7 @@ const CreateStream = ({
         governance={governance}
       />
       <Input
-        label="Recipient"
+        label="Recipient address"
         value={form.recipient}
         type="string"
         onChange={setRecipient}
@@ -318,46 +373,105 @@ const CreateStream = ({
         type="datetime-local"
         onChange={setStart}
       />
-      <Input
-        label="Amount"
-        value={form.depositedAmount}
-        type="number"
-        onChange={setDepositedAmount}
-      />
-      <Input
-        label="Release frequency"
-        value={form.releaseFrequency}
-        type="number"
-        onChange={setReleaseFrequency}
-      />
-      <Select
-        label={'Release unit'}
-        onChange={(unitIdx) => {
-          setReleaseUnitIdx(unitIdx)
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          maxWidth: '512px',
+          alignItems: 'end',
         }}
-        placeholder="Please select..."
-        value={releaseFrequencyUnits[releaseUnitIdx].display}
       >
-        {Object.values(releaseFrequencyUnits).map((unit) => {
-          return (
-            <Select.Option key={unit.idx} value={unit.idx}>
-              {unit.display}
-            </Select.Option>
-          )
-        })}
-      </Select>
+        <div style={{ width: '45%' }}>
+          <Input
+            label="Amount"
+            value={form.depositedAmount}
+            type="number"
+            onChange={setDepositedAmount}
+          />
+        </div>
+        <div style={{ width: '45%' }}>
+          <Input
+            label="Released at start"
+            value={form.amountAtCliff}
+            type="number"
+            onChange={setAmountAtCliff}
+          />
+        </div>
+      </div>
       <Input
         label="Release amount"
         value={form.releaseAmount}
         type="number"
         onChange={setReleaseAmount}
       />
-      <Input
-        label="Cliff amount"
-        value={form.amountAtCliff}
-        type="number"
-        onChange={setAmountAtCliff}
-      />
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          maxWidth: '512px',
+          alignItems: 'end',
+        }}
+      >
+        <div style={{ width: '45%' }}>
+          <Input
+            label="Release frequency"
+            value={form.releaseFrequency}
+            type="number"
+            onChange={setReleaseFrequency}
+          />
+        </div>
+        <div style={{ width: '45%' }}>
+          <Select
+            label={'Release unit'}
+            onChange={(unitIdx) => {
+              setReleaseUnitIdx(unitIdx)
+            }}
+            placeholder="Please select..."
+            value={releaseFrequencyUnits[releaseUnitIdx].display}
+          >
+            {Object.values(releaseFrequencyUnits).map((unit) => {
+              return (
+                <Select.Option key={unit.idx} value={unit.idx}>
+                  {unit.display}
+                </Select.Option>
+              )
+            })}
+          </Select>
+        </div>
+      </div>
+      <div
+        style={{
+          fontSize: '14px',
+          color: 'rgba(164, 172, 183, 1)',
+          marginTop: '18px',
+        }}
+      ></div>
+      <StyledLabel>Is contract cancelable?</StyledLabel>
+      <Switch checked={cancelable} onChange={setCancelable}></Switch>
+      <div
+        style={{
+          fontSize: '14px',
+          color: 'rgba(164, 172, 183, 1)',
+          marginTop: '18px',
+        }}
+      >
+        Vesting contracts have Automatic Withdrawal enabled which is funded by
+        contract creator. That adds additional transaction fees on creation:
+        5000 lamports per release cycle. Additionally, Streamflow by default
+        charges a service fee of 0.25% in tokens being vested.
+      </div>
+      <div
+        style={{
+          fontSize: '14px',
+          color: 'rgba(164, 172, 183, 1)',
+          marginTop: '18px',
+        }}
+      >
+        Please ensure that the SOL treasury account holds enough SOL to cover
+        the transaction costs at the time of execution.
+      </div>
     </>
   )
 }

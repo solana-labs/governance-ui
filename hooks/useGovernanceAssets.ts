@@ -126,7 +126,7 @@ export default function useGovernanceAssets() {
     },
     {
       id: Instructions.CreateStream,
-      name: 'Streamflow: Create Stream',
+      name: 'Streamflow: Create Vesting Contract',
       isVisible: canUseAnyInstruction,
     },
     {
