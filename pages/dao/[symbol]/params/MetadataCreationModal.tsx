@@ -24,7 +24,7 @@ import { AssetAccount } from '@utils/uiTypes/assets'
 import GovernedAccountSelect from '@components/inputs/GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { AccountType } from '@utils/uiTypes/assets'
-import Bundlr from '@bundlr-network/client'
+import { WebBundlr } from '@bundlr-network/client'
 import { LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { deprecated } from '@metaplex-foundation/mpl-token-metadata'
 import { PublicKey } from '@solana/web3.js'
@@ -169,9 +169,38 @@ const MetadataCreationModal = ({
       setCreatingProposal(false)
     }
   }
+  const initBundlr = async () => {
+    const bundlr = new WebBundlr(
+      connection.cluster == 'devnet'
+        ? 'https://devnet.bundlr.network'
+        : 'https://node1.bundlr.network',
+      'solana',
+      wallet,
+      connection.cluster == 'devnet'
+        ? {
+            providerUrl: connection.current.rpcEndpoint,
+          }
+        : undefined
+    )
+    try {
+      await bundlr.utils.getBundlerAddress('solana')
+    } catch {
+      return
+    }
+    try {
+      await bundlr.ready()
+    } catch {
+      return
+    }
+    if (!bundlr.address) {
+      return
+    }
+    return bundlr
+  }
 
   const uploadImage = async () => {
-    const bundlr = new Bundlr('https://node1.bundlr.network', 'solana', wallet)
+    const bundlr = await initBundlr()
+    if (!bundlr) return
     if (imageFile == null) return
     const price = await bundlr.utils.getPrice('solana', imageFile.length)
     const amount = bundlr.utils.unitConverter(price)
@@ -182,7 +211,7 @@ const MetadataCreationModal = ({
     const balanceNum = balance.toNumber()
 
     if (balanceNum < amountNum) {
-      await bundlr.fund((amountNum - balanceNum) * LAMPORTS_PER_SOL)
+      await bundlr.fund(Math.ceil((amountNum - balanceNum) * LAMPORTS_PER_SOL))
     }
 
     const imageResult = await bundlr.uploader.upload(imageFile, [
@@ -202,7 +231,8 @@ const MetadataCreationModal = ({
       image: arweaveImageUrl,
     }
     const tokenMetadataJson = JSON.stringify(tokenMetadata)
-    const bundlr = new Bundlr('https://node1.bundlr.network', 'solana', wallet)
+    const bundlr = await initBundlr()
+    if (!bundlr) return
     if (tokenMetadataJson == null) return
     const price = await bundlr.utils.getPrice(
       'solana',
@@ -216,7 +246,7 @@ const MetadataCreationModal = ({
     const balanceNum = balance.toNumber()
 
     if (balanceNum < amountNum) {
-      await bundlr.fund((amountNum - balanceNum) * LAMPORTS_PER_SOL)
+      await bundlr.fund(Math.ceil((amountNum - balanceNum) * LAMPORTS_PER_SOL))
     }
 
     const metadataResult = await bundlr.uploader.upload(
