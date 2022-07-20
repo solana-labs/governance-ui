@@ -202,13 +202,14 @@ const MetadataCreationModal = ({
     const bundlr = await initBundlr()
     if (!bundlr) return
     if (imageFile == null) return
-    const price = await bundlr.utils.getPrice('solana', imageFile.length)
-    const amount = bundlr.utils.unitConverter(price)
-    const amountNum = amount.toNumber()
 
     const loadedBalance = await bundlr.getLoadedBalance()
     const balance = bundlr.utils.unitConverter(loadedBalance.toNumber())
     const balanceNum = balance.toNumber()
+
+    const price = await bundlr.utils.getPrice('solana', imageFile.length)
+    const amount = bundlr.utils.unitConverter(price)
+    const amountNum = amount.toNumber()
 
     if (balanceNum < amountNum) {
       await bundlr.fund(Math.ceil((amountNum - balanceNum) * LAMPORTS_PER_SOL))
@@ -234,16 +235,17 @@ const MetadataCreationModal = ({
     const bundlr = await initBundlr()
     if (!bundlr) return
     if (tokenMetadataJson == null) return
+
+    const loadedBalance = await bundlr.getLoadedBalance()
+    const balance = bundlr.utils.unitConverter(loadedBalance.toNumber())
+    const balanceNum = balance.toNumber()
+
     const price = await bundlr.utils.getPrice(
       'solana',
       tokenMetadataJson.length
     )
     const amount = bundlr.utils.unitConverter(price)
     const amountNum = amount.toNumber()
-
-    const loadedBalance = await bundlr.getLoadedBalance()
-    const balance = bundlr.utils.unitConverter(loadedBalance.toNumber())
-    const balanceNum = balance.toNumber()
 
     if (balanceNum < amountNum) {
       await bundlr.fund(Math.ceil((amountNum - balanceNum) * LAMPORTS_PER_SOL))
