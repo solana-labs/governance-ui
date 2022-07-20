@@ -231,11 +231,12 @@ const MetadataCreationModal = ({
       description: form.description,
       image: arweaveImageUrl,
     }
-    const tokenMetadataJson = JSON.stringify(tokenMetadata)
+    const tokenMetadataJsonString = JSON.stringify(tokenMetadata)
     const bundlr = await initBundlr()
     if (!bundlr) return
-    if (tokenMetadataJson == null) return
+    if (tokenMetadataJsonString == null) return
 
+    const tokenMetadataJson = Buffer.from(tokenMetadataJsonString)
     const loadedBalance = await bundlr.getLoadedBalance()
     const balance = bundlr.utils.unitConverter(loadedBalance.toNumber())
     const balanceNum = balance.toNumber()
@@ -251,10 +252,9 @@ const MetadataCreationModal = ({
       await bundlr.fund(Math.ceil((amountNum - balanceNum) * LAMPORTS_PER_SOL))
     }
 
-    const metadataResult = await bundlr.uploader.upload(
-      Buffer.from(tokenMetadataJson),
-      [{ name: 'Content-Type', value: 'application/json' }]
-    )
+    const metadataResult = await bundlr.uploader.upload(tokenMetadataJson, [
+      { name: 'Content-Type', value: 'application/json' },
+    ])
 
     const arweaveMetadataUrl = `https://arweave.net/${metadataResult.data.id}`
     return arweaveMetadataUrl
