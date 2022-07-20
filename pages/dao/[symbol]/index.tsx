@@ -433,7 +433,7 @@ const REALM = () => {
                   {realmInfo?.bannerImage ? (
                     <>
                       <img
-                        className="mb-10 h-80"
+                        className="mb-10"
                         src={realmInfo?.bannerImage}
                       ></img>
                       {/* temp. setup for Ukraine.SOL */}
