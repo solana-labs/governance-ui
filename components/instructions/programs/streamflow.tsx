@@ -10,7 +10,6 @@ import {
   getNumberFromBN,
   Stream,
 } from '@streamflow/stream'
-import Button from '@components/Button'
 import { PERIOD } from 'pages/dao/[symbol]/proposal/components/instructions/Streamflow/CreateStream'
 
 export const DEFAULT_DECIMAL_PLACES = 2
@@ -172,7 +171,7 @@ export const STREAMFLOW_INSTRUCTIONS = {
 
           const contract_metadata = accounts[2].pubkey
           const mint = accounts[5].pubkey
-          var stream = await cli.getOne(contract_metadata.toBase58())
+          let stream = await cli.getOne(contract_metadata.toBase58())
           const isExecuted = stream.createdAt > 0
           const mintMetadata = getMintMetadata(mint)
           const decimals = mintMetadata.decimals

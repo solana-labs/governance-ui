@@ -61,15 +61,15 @@ export default function StreamCard({
   accounts: AccountMetaData[]
 }) {
   const router = useRouter()
-  const { realm, mint, realmInfo, symbol } = useRealm()
+  const { realm, symbol } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
 
   const { fmtUrlWithCluster } = useQueryContext()
   const wallet = useWalletStore((s) => s.current)
   const { handleCreateProposal } = useCreateProposal()
-  const [voteByCouncil, setVoteByCouncil] = useState(false)
+  const [voteByCouncil] = useState(false)
   const defaultCancelTitle = 'Cancel streamflow contract'
-  const [creatingProposal, setCreatingProposal] = useState(false)
+  const [_creatingProposal, setCreatingProposal] = useState(false)
 
   const [stream, setStream] = useState<Stream>()
 
