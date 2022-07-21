@@ -69,7 +69,7 @@ export default function StreamCard({
   const { handleCreateProposal } = useCreateProposal()
   const [voteByCouncil] = useState(false)
   const defaultCancelTitle = 'Cancel streamflow contract'
-  const [_creatingProposal, setCreatingProposal] = useState(false)
+  const [creatingProposal, setCreatingProposal] = useState(false)
 
   const [stream, setStream] = useState<Stream>()
 
@@ -125,7 +125,6 @@ export default function StreamCard({
       const governance = assetAccounts.find(
         (account) => account.pubkey.toBase58() === creator_governance.toBase58()
       )?.governance
-      console.log(governance)
       serializedInstruction = serializeInstructionToBase64(instruction)
       const obj: UiInstruction = {
         serializedInstruction: serializedInstruction,
@@ -157,8 +156,11 @@ export default function StreamCard({
 
   return (
     <>
+      {}
       <div>
-        <Button onClick={handleCancel}>Cancel</Button>
+        <Button onClick={handleCancel} disabled={creatingProposal}>
+          Cancel
+        </Button>
       </div>
     </>
   )

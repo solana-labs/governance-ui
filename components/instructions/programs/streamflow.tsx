@@ -171,7 +171,7 @@ export const STREAMFLOW_INSTRUCTIONS = {
 
           const contract_metadata = accounts[2].pubkey
           const mint = accounts[5].pubkey
-          let stream = await cli.getOne(contract_metadata.toBase58())
+          const stream = await cli.getOne(contract_metadata.toBase58())
           const isExecuted = stream.createdAt > 0
           const mintMetadata = getMintMetadata(mint)
           const decimals = mintMetadata.decimals
