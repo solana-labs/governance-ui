@@ -241,6 +241,7 @@ export class VotingClient {
 
       const {
         voterWeightAccount,
+        maxVoterWeightRecord,
       } = await this.client.stakeConnection.withUpdateVoterWeight(
         instructions,
         stakeAccount!,
@@ -250,7 +251,7 @@ export class VotingClient {
 
       return {
         voterWeightPk: voterWeightAccount,
-        maxVoterWeightRecord: undefined,
+        maxVoterWeightRecord,
       }
     }
     if (this.client instanceof SwitchboardQueueVoterClient) {
