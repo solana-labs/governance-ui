@@ -2,8 +2,8 @@
 import Divider from '@components/Divider'
 import Input from '@components/inputs/Input'
 import { StyledLabel } from '@components/inputs/styles'
-import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
 import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
+import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
 import React from 'react'
 import { RealmWizardStepComponentProps } from '../../interfaces/Realm'
 import { getMintSupplyFactorPercent } from './BespokeConfig'
@@ -118,7 +118,7 @@ const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
                 <StyledLabel>Governance Program Id</StyledLabel>
                 <div className="flex align-center">
                   <div
-                    className="bg-gray-700 px-3 py-2 rounded"
+                    className="bg-gray-700 px-3 py-2 rounded text-white"
                     style={{ fontFamily: 'monospace' }}
                   >
                     {form?.governanceProgramId}

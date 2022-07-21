@@ -16,16 +16,18 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import dayjs from 'dayjs'
 import { notify } from '@utils/notifications'
 import Loading from '@components/Loading'
-import { sendSignedTransaction } from '@utils/sendTransactions'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { sleep } from '@project-serum/common'
 import { NftVoterClient } from '@solana/governance-program-library'
 import { chunks } from '@utils/helpers'
+import { sendSignedTransaction } from '@utils/send'
+import { getRegistrarPDA, getVoterWeightRecord } from '@utils/plugin/accounts'
 import {
-  getNftRegistrarPDA,
-  getNftVoterWeightRecord,
-} from 'NftVotePlugin/sdk/accounts'
+  sendTransactionsV2,
+  SequenceType,
+  transactionInstructionsToTypedInstructionsSets,
+} from '@utils/sendTransactions'
 
 const MyProposalsBn = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
@@ -38,9 +40,7 @@ const MyProposalsBn = () => {
     (s) => s.ownVoteRecordsByProposal
   )
   const [ownNftVoteRecords, setOwnNftVoteRecords] = useState<any[]>([])
-  const ownNftVoteRecordsFilterd = ownNftVoteRecords.filter(
-    (x) => !ownVoteRecordsByProposal[x.account.proposal.toBase58()]
-  )
+  const ownNftVoteRecordsFilterd = ownNftVoteRecords
   const maxVoterWeight =
     useNftPluginStore((s) => s.state.maxVoteRecord)?.pubkey || undefined
   const { realm, programId } = useWalletStore((s) => s.selectedRealm)
@@ -228,27 +228,32 @@ const MyProposalsBn = () => {
       withInstruction
     )
   }
-  const releaseNfts = async () => {
+  const releaseNfts = async (count: number | null = null) => {
     setIsLoading(true)
     const instructions: TransactionInstruction[] = []
-    const { registrar } = await getNftRegistrarPDA(
+    const { registrar } = await getRegistrarPDA(
       realm!.pubkey,
       realm!.account.communityMint,
       client.client!.program.programId
     )
-    const { voterWeightPk } = await getNftVoterWeightRecord(
+    const { voterWeightPk } = await getVoterWeightRecord(
       realm!.pubkey,
       realm!.account.communityMint,
       wallet!.publicKey!,
       client.client!.program.programId
     )
-    for (const i of ownNftVoteRecords) {
+    const nfts = ownNftVoteRecordsFilterd.slice(
+      0,
+      count ? count : ownNftVoteRecordsFilterd.length
+    )
+    for (const i of nfts) {
       const relinquishNftVoteIx = await (client.client as NftVoterClient).program.methods
         .relinquishNftVote()
         .accounts({
           registrar,
           voterWeightRecord: voterWeightPk,
-          governance: proposals[i.account.proposal].account.governance,
+          governance:
+            proposals[i.account.proposal.toBase58()].account.governance,
           proposal: i.account.proposal,
           governingTokenOwner: wallet!.publicKey!,
           voteRecord: i.publicKey,
@@ -262,32 +267,19 @@ const MyProposalsBn = () => {
     }
     try {
       const insertChunks = chunks(instructions, 10)
-      const instArray = [...insertChunks]
-      const transactions: Transaction[] = []
-      const {
-        blockhash: recentBlockhash,
-      } = await connection.getLatestBlockhash()
-      for (let i = 0; i < instArray.length; i++) {
-        const instructionsChunk = instArray[i]
-
-        const transaction = new Transaction({
-          recentBlockhash,
-          feePayer: wallet!.publicKey!,
-        })
-        transaction.add(...instructionsChunk)
-        transaction.recentBlockhash = recentBlockhash
-        transaction.setSigners(
-          // fee payed by the wallet owner
-          wallet!.publicKey!
-        )
-        transactions.push(transaction)
-      }
-      const signedTXs = await wallet!.signAllTransactions(transactions)
-      await Promise.all(
-        signedTXs.map((transaction) =>
-          sendSignedTransaction({ signedTransaction: transaction, connection })
-        )
-      )
+      const signerChunks = Array(insertChunks.length).fill([])
+      await sendTransactionsV2({
+        connection,
+        showUiComponent: true,
+        wallet: wallet!,
+        signersSet: [...signerChunks],
+        TransactionInstructions: insertChunks.map((x) =>
+          transactionInstructionsToTypedInstructionsSets(
+            x,
+            SequenceType.Parallel
+          )
+        ),
+      })
       setIsLoading(false)
       getNftsVoteRecord()
     } catch (e) {
@@ -305,7 +297,10 @@ const MyProposalsBn = () => {
         },
       },
     ])
-    const nftVoteRecordsFiltered = nftVoteRecords
+
+    const nftVoteRecordsFiltered = nftVoteRecords.filter(
+      (x) => proposals[x.account.proposal.toBase58()]
+    )
     setOwnNftVoteRecords(nftVoteRecordsFiltered)
   }
   useEffect(() => {
@@ -366,11 +361,20 @@ const MyProposalsBn = () => {
                   <Button
                     isLoading={isLoading}
                     disabled={isLoading || !ownNftVoteRecordsFilterd.length}
-                    onClick={releaseNfts}
+                    onClick={() => releaseNfts()}
                     className="ml-2"
                     small
                   >
                     Release nfts
+                  </Button>
+                  <Button
+                    isLoading={isLoading}
+                    disabled={isLoading || !ownNftVoteRecordsFilterd.length}
+                    onClick={() => releaseNfts(50)}
+                    className="ml-2"
+                    small
+                  >
+                    Release first 50
                   </Button>
                 </h4>
               </div>
@@ -395,13 +399,12 @@ const ProposalList = ({
   proposals: ProgramAccount<Proposal>[]
   isLoading: boolean
 }) => {
-  const { isNftMode } = useRealm()
   return (
     <>
       {' '}
       <h4 className="flex items-center mb-3">
         {title} ({proposals.length})
-        {!isNftMode && btnName && proposals.length !== 0 && (
+        {btnName && proposals.length !== 0 && (
           <div className="ml-auto">
             <Button
               small

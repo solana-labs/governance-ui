@@ -1,0 +1,218 @@
+{
+  "version": "0.1.0",
+  "name": "gameofnodes",
+  "instructions": [
+    {
+      "name": "initialize",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "grantAuthority",
+          "type": "publicKey"
+        },
+        {
+          "name": "revokeAuthority",
+          "type": "publicKey"
+        }
+      ]
+    },
+    {
+      "name": "grantPermission",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "grantAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "switchboardProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "permission",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "revokePermission",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "revokeAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "switchboardProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "permission",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "permissionSetVoterWeight",
+      "accounts": [
+        {
+          "name": "permission",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "permissionAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sbState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "programState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "govProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "daoMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "spawnRecord",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "voterWeight",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenOwnerRecord",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "realm",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "State",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "stateBump",
+            "type": "u8"
+          },
+          {
+            "name": "grantAuthority",
+            "type": "publicKey"
+          },
+          {
+            "name": "revokeAuthority",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RealmSpawnRecordAccountData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "spawner",
+            "type": "publicKey"
+          },
+          {
+            "name": "spawnerPrivilege",
+            "type": "bool"
+          },
+          {
+            "name": "ebuf",
+            "type": {
+              "array": ["u8", 256]
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidGovernanceAccountError",
+      "msg": "Invalid Governance Account"
+    }
+  ],
+  "metadata": {
+    "address": "B4EDDdMh5CmB6B9DeMmZmFvRzEgyHR5zWktf6httcMk6"
+  }
+}

@@ -76,8 +76,8 @@ export const registerProgramGovernance = async (
     wallet,
     connection,
     signers,
-    sendingMessage: 'Creating treasury account',
-    successMessage: 'Treasury account has been created',
+    sendingMessage: 'Creating governance program account',
+    successMessage: 'Governance program account has been created',
   })
 
   return governanceAddress

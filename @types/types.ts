@@ -1,7 +1,8 @@
+import { EndpointTypes } from '@models/types'
 import type { AccountInfo, PublicKey } from '@solana/web3.js'
 
 export interface EndpointInfo {
-  name: string
+  name: EndpointTypes
   url: string
 }
 

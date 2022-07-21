@@ -6,6 +6,7 @@ import {
   ProposalTransaction,
 } from '@solana/spl-governance'
 import {
+  ALL_CASTLE_PROGRAMS,
   getAccountName,
   getInstructionDescriptor,
   InstructionDescriptor,
@@ -20,10 +21,14 @@ import { ExecuteInstructionButton, PlayState } from './ExecuteInstructionButton'
 import { ProgramAccount } from '@solana/spl-governance'
 import InspectorButton from '@components/explorer/inspectorButton'
 import { FlagInstructionErrorButton } from './FlagInstructionErrorButton'
-import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
+import { deprecated } from '@metaplex-foundation/mpl-token-metadata'
 import axios from 'axios'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import tokenService from '@utils/services/token'
+import InstructionOptionInput, {
+  InstructionOption,
+  InstructionOptions,
+} from '@components/InstructionOptions'
 import StreamCard from '@components/StreamCard'
 
 export default function InstructionCard({
@@ -42,6 +47,10 @@ export default function InstructionCard({
   const connection = useWalletStore((s) => s.connection)
   const tokenRecords = useWalletStore((s) => s.selectedRealm)
   const [descriptor, setDescriptor] = useState<InstructionDescriptor>()
+  const [instructionOption, setInstructionOption] = useState<InstructionOption>(
+    InstructionOptions.none
+  )
+
   const [playing, setPlaying] = useState(
     proposalInstruction.account.executedAt
       ? PlayState.Played
@@ -49,6 +58,11 @@ export default function InstructionCard({
   )
   const [nftImgUrl, setNftImgUrl] = useState('')
   const [tokenImgUrl, setTokenImgUrl] = useState('')
+
+  const allProposalPrograms = proposalInstruction.account.instructions
+    ?.map((i) => i.programId.toBase58())
+    .flat()
+
   useEffect(() => {
     getInstructionDescriptor(
       connection,
@@ -75,12 +89,12 @@ export default function InstructionCard({
         const mint = tokenAccount?.account.mint
         if (mint) {
           try {
-            const metadataPDA = await Metadata.getPDA(mint)
-            const tokenMetadata = await Metadata.load(
+            const metadataPDA = await deprecated.Metadata.getPDA(mint)
+            const tokenMetadata = await deprecated.Metadata.load(
               connection.current,
               metadataPDA
             )
-            const url = (await axios.get(tokenMetadata.data.data.uri)).data
+            const url = (await axios.get(tokenMetadata?.data!.data.uri)).data
             setNftImgUrl(url.image)
           } catch (e) {
             console.log(e)
@@ -172,12 +186,26 @@ export default function InstructionCard({
         />
 
         {proposal && (
-          <ExecuteInstructionButton
-            proposal={proposal}
-            proposalInstruction={proposalInstruction}
-            playing={playing}
-            setPlaying={setPlaying}
-          />
+          <React.Fragment>
+            <ExecuteInstructionButton
+              proposal={proposal}
+              proposalInstruction={proposalInstruction}
+              playing={playing}
+              setPlaying={setPlaying}
+              instructionOption={instructionOption}
+            />
+            {/* Show execution option if the proposal contains a specified program id and
+                proposal has not executed already. */}
+            {allProposalPrograms?.filter((a) =>
+              ALL_CASTLE_PROGRAMS.map((a) => a.toBase58()).includes(a)
+            ).length > 0 &&
+              playing != PlayState.Played && (
+                <InstructionOptionInput
+                  value={instructionOption}
+                  setValue={setInstructionOption}
+                />
+              )}
+          </React.Fragment>
         )}
       </div>
     </div>
@@ -197,21 +225,23 @@ export function InstructionProgram({
       <span className="font-bold text-fgd-1 text-sm">Program</span>
       <div className="flex items-center pt-1 lg:pt-0">
         <a
-          className="text-sm hover:brightness-[1.15] focus:outline-none"
+          className="text-sm hover:brightness-[1.15] focus:outline-none flex items-center"
           href={getExplorerUrl(endpoint, programId)}
           target="_blank"
           rel="noopener noreferrer"
         >
-          {programId.toBase58()}
-          {programLabel && (
-            <div className="mt-1 text-fgd-3 lg:text-right text-xs">
-              {programLabel}
-            </div>
-          )}
+          <div>
+            {programId.toBase58()}
+            {programLabel && (
+              <div className="mt-1 text-fgd-3 lg:text-right text-xs">
+                {programLabel}
+              </div>
+            )}
+          </div>
+          <ExternalLinkIcon
+            className={`flex-shrink-0 h-4 w-4 ml-2 text-primary-light`}
+          />
         </a>
-        <ExternalLinkIcon
-          className={`flex-shrink-0 h-4 w-4 ml-2 text-primary-light`}
-        />
       </div>
     </div>
   )
@@ -255,21 +285,23 @@ export function InstructionAccount({
       </div>
       <div className="flex items-center">
         <a
-          className="text-sm hover:brightness-[1.15] focus:outline-none"
+          className="text-sm hover:brightness-[1.15] focus:outline-none flex items-center"
           href={getExplorerUrl(endpoint, accountMeta.pubkey)}
           target="_blank"
           rel="noopener noreferrer"
         >
-          {accountMeta.pubkey.toBase58()}
-          {accountLabel && (
-            <div className="mt-0.5 text-fgd-3 text-right text-xs">
-              {accountLabel}
-            </div>
-          )}
+          <div>
+            {accountMeta.pubkey.toBase58()}
+            {accountLabel && (
+              <div className="mt-0.5 text-fgd-3 text-right text-xs">
+                {accountLabel}
+              </div>
+            )}
+          </div>
+          <ExternalLinkIcon
+            className={`flex-shrink-0 h-4 w-4 ml-2 text-primary-light`}
+          />
         </a>
-        <ExternalLinkIcon
-          className={`flex-shrink-0 h-4 w-4 ml-2 text-primary-light`}
-        />
       </div>
     </div>
   )

@@ -19,13 +19,32 @@ export interface UiInstruction {
   customHoldUpTime?: number
   prerequisiteInstructions?: TransactionInstruction[]
   chunkSplitByDefault?: boolean
+  prerequisiteInstructionsSigners?: Keypair[]
+  chunkBy?: number
   signers?: Keypair[]
   shouldSplitIntoSeparateTxs?: boolean | undefined
 }
+
 export interface SplTokenTransferForm {
   destinationAccount: string
   amount: number | undefined
   governedTokenAccount: AssetAccount | undefined
+  programId: string | undefined
+  mintInfo: MintInfo | undefined
+}
+
+export interface CastleDepositForm {
+  amount: number | undefined
+  governedTokenAccount: AssetAccount | undefined
+  castleVaultId: string
+  programId: string | undefined
+  mintInfo: MintInfo | undefined
+}
+
+export interface CastleWithdrawForm {
+  amount: number | undefined
+  governedTokenAccount: AssetAccount | undefined
+  castleVaultId: string
   programId: string | undefined
   mintInfo: MintInfo | undefined
 }
@@ -42,8 +61,37 @@ export interface FriktionWithdrawForm {
   amount: number | undefined
   governedTokenAccount: AssetAccount | undefined
   voltVaultId: string
-  depositTokenMint: string | undefined
   programId: string | undefined
+  mintInfo: MintInfo | undefined
+}
+
+export interface FriktionClaimPendingDepositForm {
+  governedTokenAccount: AssetAccount | undefined
+  voltVaultId: string
+  programId: string | undefined
+  mintInfo: MintInfo | undefined
+}
+
+export interface FriktionClaimPendingWithdrawForm {
+  governedTokenAccount: AssetAccount | undefined
+  voltVaultId: string
+  programId: string | undefined
+  mintInfo: MintInfo | undefined
+}
+
+export interface GoblinGoldDepositForm {
+  amount: number | undefined
+  governedTokenAccount?: AssetAccount | undefined
+  goblinGoldVaultId: string
+  mintName?: SupportedMintName | undefined
+  mintInfo: MintInfo | undefined
+}
+
+export interface GoblinGoldWithdrawForm {
+  amount: number | undefined
+  governedTokenAccount?: AssetAccount | undefined
+  goblinGoldVaultId?: string
+  mintName?: SupportedMintName
   mintInfo: MintInfo | undefined
 }
 
@@ -111,6 +159,56 @@ export interface MangoMakeAddOracleForm {
   oracleAccount: string | undefined
 }
 
+export type NameValue = {
+  name: string
+  value: string
+}
+
+export interface MangoMakeSetMarketModeForm {
+  governedAccount: AssetAccount | null
+  mangoGroup: NameValue | null
+  marketIndex: NameValue | null
+  marketMode: NameValue | null
+  marketType: NameValue | null
+  adminPk: string
+}
+
+export interface MangoSwapSpotMarketForm {
+  governedAccount: AssetAccount | null
+  mangoGroup: NameValue | null
+  market: NameValue | null
+  adminPk: string
+  newSpotMarketPk: string
+}
+
+export interface MangoRemoveOracleForm {
+  governedAccount: AssetAccount | null
+  mangoGroup: NameValue | null
+  adminPk: string
+  oraclePk: NameValue | null
+}
+
+export interface SagaPhoneForm {
+  governedAccount: AssetAccount | null
+  quantity: number
+}
+
+export interface MangoRemovePerpMarketForm {
+  governedAccount: AssetAccount | null
+  mangoGroup: NameValue | null
+  marketPk: NameValue | null
+  adminPk: string
+  mngoDaoVaultPk: string
+}
+
+export interface MangoRemoveSpotMarketForm {
+  governedAccount: AssetAccount | null
+  mangoGroup: NameValue | null
+  marketIndex: NameValue | null
+  adminPk: string
+  adminVaultPk: string
+}
+
 export interface MangoMakeAddSpotMarketForm {
   governedAccount: AssetAccount | undefined
   programId: string | undefined
@@ -130,9 +228,9 @@ export interface MangoMakeChangeSpotMarketForm {
   programId: string | undefined
   mangoGroup: string | undefined
   baseSymbol: string | undefined
-  maintLeverage: number
-  initLeverage: number
-  liquidationFee: number
+  maintLeverage: number | undefined
+  initLeverage: number | undefined
+  liquidationFee: number | undefined
   optUtil: number
   optRate: number
   maxRate: number
@@ -218,7 +316,7 @@ export interface ForesightMakeResolveMarketParams extends ForesightHasMarketId {
   winner: number
 }
 
-export interface ForesightMakeAddMarketMetadataParams
+export interface ForesightMakeSetMarketMetadataParams
   extends ForesightHasMarketId {
   content: string
   field: foresightConsts.MarketMetadataFieldName
@@ -231,6 +329,16 @@ export interface Base64InstructionForm {
 
 export interface EmptyInstructionForm {
   governedAccount: AssetAccount | undefined
+}
+
+export interface SwitchboardAdmitOracleForm {
+  oraclePubkey: PublicKey | undefined
+  queuePubkey: PublicKey | undefined
+}
+
+export interface SwitchboardRevokeOracleForm {
+  oraclePubkey: PublicKey | undefined
+  queuePubkey: PublicKey | undefined
 }
 
 export interface CreateAssociatedTokenAccountForm {
@@ -269,6 +377,22 @@ export interface RefreshReserveForm {
   mintName?: SupportedMintName
 }
 
+export interface CreateTokenMetadataForm {
+  name: string
+  symbol: string
+  uri: string
+  mintAccount: AssetAccount | undefined
+  programId: string | undefined
+}
+
+export interface UpdateTokenMetadataForm {
+  name: string
+  symbol: string
+  uri: string
+  mintAccount: AssetAccount | undefined
+  programId: string | undefined
+}
+
 export enum Instructions {
   Transfer,
   ProgramUpgrade,
@@ -284,15 +408,29 @@ export enum Instructions {
   MangoCreatePerpMarket,
   CreateStream,
   CancelStream,
+  MangoSetMarketMode,
+  MangoChangeQuoteParams,
+  MangoRemoveSpotMarket,
+  MangoRemovePerpMarket,
+  MangoSwapSpotMarket,
+  MangoRemoveOracle,
   Grant,
   Clawback,
   CreateAssociatedTokenAccount,
   DepositIntoVolt,
   WithdrawFromVolt,
+  ClaimPendingDeposit,
+  ClaimPendingWithdraw,
+  DepositIntoCastle,
+  WithrawFromCastle,
+  DepositIntoGoblinGold,
+  WithdrawFromGoblinGold,
   CreateSolendObligationAccount,
   InitSolendObligationAccount,
   DepositReserveLiquidityAndObligationCollateral,
   WithdrawObligationCollateralAndRedeemReserveLiquidity,
+  SwitchboardAdmitOracle,
+  SwitchboardRevokeOracle,
   RefreshSolendObligation,
   RefreshSolendReserve,
   ForesightInitMarket,
@@ -300,12 +438,20 @@ export enum Instructions {
   ForesightInitCategory,
   ForesightResolveMarket,
   ForesightAddMarketListToCategory,
-  ForesightAddMarketMetadata,
+  ForesightSetMarketMetadata,
   RealmConfig,
   CreateNftPluginRegistrar,
   CreateNftPluginMaxVoterWeight,
   ConfigureNftPluginCollection,
   CloseTokenAccount,
+  VotingMintConfig,
+  CreateVsrRegistrar,
+  CreateGatewayPluginRegistrar,
+  ConfigureGatewayPlugin,
+  ChangeMakeDonation,
+  CreateTokenMetadata,
+  UpdateTokenMetadata,
+  SagaPreOrder,
 }
 
 export type createParams = [
@@ -332,4 +478,30 @@ export interface InstructionsContext {
   handleSetInstructions: (val, index) => void
   governance: ProgramAccount<Governance> | null | undefined
   setGovernance: (val) => void
+}
+
+export interface ChangeNonprofit {
+  name: string
+  description: string
+  ein: string
+  classification: string
+  category: string
+  address_line: string
+  city: string
+  state: string
+  zip_code: string
+  icon_url: string
+  email?: string
+  website: string
+  socials: {
+    facebook?: string
+    instagram?: string
+    tiktok?: string
+    twitter?: string
+    youtube?: string
+  }
+  crypto: {
+    solana_address: string
+    ethereum_address: string
+  }
 }

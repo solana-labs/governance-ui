@@ -1,6 +1,13 @@
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
-import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
-import { NftVoterClient } from '@solana/governance-program-library'
+import { deprecated } from '@metaplex-foundation/mpl-token-metadata'
+import {
+  NftVoterClient,
+  GatewayClient,
+} from '@solana/governance-program-library'
+import {
+  SwitchboardQueueVoterClient,
+  SWITCHBOARD_ADDIN_ID,
+} from '../../SwitchboardVotePlugin/SwitchboardQueueVoterClient'
 import {
   ProgramAccount,
   Realm,
@@ -10,17 +17,22 @@ import {
 } from '@solana/spl-governance'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { chunks } from '@utils/helpers'
-import {
-  getNftRegistrarPDA,
-  getNftVoterWeightRecord,
-  getNftMaxVoterWeightRecord,
-} from 'NftVotePlugin/sdk/accounts'
+import { PythClient } from 'pyth-staking-api'
 import {
   getRegistrarPDA,
   getVoterPDA,
   getVoterWeightPDA,
 } from 'VoteStakeRegistry/sdk/accounts'
 import { NFTWithMint } from './nfts'
+import {
+  getPreviousVotingWeightRecord,
+  getVoteInstruction,
+} from '../../GatewayPlugin/sdk/accounts'
+import {
+  getVoterWeightRecord as getPluginVoterWeightRecord,
+  getRegistrarPDA as getPluginRegistrarPDA,
+  getMaxVoterWeightRecord as getPluginMaxVoterWeightRecord,
+} from '@utils/plugin/accounts'
 
 type UpdateVoterWeightRecordTypes =
   | 'castVote'
@@ -30,19 +42,28 @@ type UpdateVoterWeightRecordTypes =
   | 'signOffProposal'
 
 export interface VotingClientProps {
-  client: VsrClient | NftVoterClient | undefined
+  client:
+    | VsrClient
+    | NftVoterClient
+    | SwitchboardQueueVoterClient
+    | PythClient
+    | GatewayClient
+    | undefined
   realm: ProgramAccount<Realm> | undefined
   walletPk: PublicKey | null | undefined
 }
 
 export interface NFTWithMeta extends NFTWithMint {
-  metadata: Metadata
+  metadata: deprecated.Metadata
 }
 
 enum VotingClientType {
   NoClient,
   VsrClient,
   NftVoterClient,
+  SwitchboardVoterClient,
+  PythClient,
+  GatewayClient,
 }
 
 class AccountData {
@@ -67,10 +88,19 @@ interface ProgramAddresses {
 
 //Abstract for common functions that plugins will implement
 export class VotingClient {
-  client: VsrClient | NftVoterClient | undefined
+  client:
+    | VsrClient
+    | NftVoterClient
+    | SwitchboardQueueVoterClient
+    | PythClient
+    | GatewayClient
+    | undefined
   realm: ProgramAccount<Realm> | undefined
   walletPk: PublicKey | null | undefined
   votingNfts: NFTWithMeta[]
+  gatewayToken: PublicKey
+  oracles: PublicKey[]
+  instructions: TransactionInstruction[]
   clientType: VotingClientType
   noClient: boolean
   constructor({ client, realm, walletPk }: VotingClientProps) {
@@ -78,6 +108,8 @@ export class VotingClient {
     this.realm = realm
     this.walletPk = walletPk
     this.votingNfts = []
+    this.oracles = []
+    this.instructions = []
     this.noClient = true
     this.clientType = VotingClientType.NoClient
     if (this.client instanceof VsrClient) {
@@ -88,11 +120,28 @@ export class VotingClient {
       this.clientType = VotingClientType.NftVoterClient
       this.noClient = false
     }
+    if (this.client instanceof SwitchboardQueueVoterClient) {
+      this.clientType = VotingClientType.SwitchboardVoterClient
+      this.noClient = false
+    }
+    if (this.client instanceof GatewayClient) {
+      this.clientType = VotingClientType.GatewayClient
+      this.noClient = false
+    }
+    if (this.client instanceof GatewayClient) {
+      this.clientType = VotingClientType.GatewayClient
+      this.noClient = false
+    }
+    if (this.client instanceof PythClient) {
+      this.clientType = VotingClientType.PythClient
+      this.noClient = false
+    }
   }
   withUpdateVoterWeightRecord = async (
     instructions: TransactionInstruction[],
     tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>,
-    type: UpdateVoterWeightRecordTypes
+    type: UpdateVoterWeightRecordTypes,
+    voterWeightTarget?: PublicKey
   ): Promise<ProgramAddresses | undefined> => {
     if (this.noClient) {
       return
@@ -132,7 +181,7 @@ export class VotingClient {
     }
 
     if (this.client instanceof NftVoterClient) {
-      const { registrar } = await getNftRegistrarPDA(
+      const { registrar } = await getPluginRegistrarPDA(
         realm.pubkey,
         realm.account.communityMint,
         this.client!.program.programId
@@ -165,6 +214,54 @@ export class VotingClient {
       instructions.push(updateVoterWeightRecordIx)
       return { voterWeightPk, maxVoterWeightRecord }
     }
+    if (this.client instanceof GatewayClient) {
+      const { voterWeightPk } = await this._withHandleGatewayVoterWeight(
+        realm,
+        walletPk,
+        clientProgramId,
+        instructions
+      )
+
+      if (!this.gatewayToken)
+        throw new Error(`Unable to execute transaction: No Civic Pass found`)
+
+      const updateVoterWeightRecordIx = await getVoteInstruction(
+        this.client,
+        this.gatewayToken,
+        realm,
+        walletPk
+      )
+      instructions.push(updateVoterWeightRecordIx)
+      return { voterWeightPk, maxVoterWeightRecord: undefined }
+    }
+    if (this.client instanceof PythClient) {
+      const stakeAccount = await this.client!.stakeConnection.getMainAccount(
+        walletPk
+      )
+
+      const {
+        voterWeightAccount,
+        maxVoterWeightRecord,
+      } = await this.client.stakeConnection.withUpdateVoterWeight(
+        instructions,
+        stakeAccount!,
+        { [type]: {} },
+        voterWeightTarget
+      )
+
+      return {
+        voterWeightPk: voterWeightAccount,
+        maxVoterWeightRecord,
+      }
+    }
+    if (this.client instanceof SwitchboardQueueVoterClient) {
+      instructions.push(this.instructions[0])
+      const [vwr] = await PublicKey.findProgramAddress(
+        [Buffer.from('VoterWeightRecord'), this.oracles[0].toBytes()],
+        SWITCHBOARD_ADDIN_ID
+      )
+      return { voterWeightPk: vwr, maxVoterWeightRecord: undefined }
+    }
   }
   withCastPluginVote = async (
     instructions: TransactionInstruction[],
@@ -185,7 +282,7 @@ export class VotingClient {
     }
 
     if (this.client instanceof NftVoterClient) {
-      const { registrar } = await getNftRegistrarPDA(
+      const { registrar } = await getPluginRegistrarPDA(
         realm.pubkey,
         realm.account.communityMint,
         this.client!.program.programId
@@ -220,7 +317,7 @@ export class VotingClient {
           [
             Buffer.from('nft-vote-record'),
             proposal.pubkey.toBuffer(),
-            new PublicKey(nft.metadata.data.mint).toBuffer(),
+            new PublicKey(nft.metadata.data!.mint).toBuffer(),
           ],
           clientProgramId
         )
@@ -280,6 +377,44 @@ export class VotingClient {
       )
       return props
     }
+    if (this.client instanceof SwitchboardQueueVoterClient) {
+      const props = await this.withUpdateVoterWeightRecord(
+        instructions,
+        tokeOwnerRecord,
+        'castVote'
+      )
+      return props
+    }
+    if (this.client instanceof PythClient) {
+      const props = await this.withUpdateVoterWeightRecord(
+        instructions,
+        tokeOwnerRecord,
+        'castVote',
+        proposal.pubkey
+      )
+      return props
+    }
+
+    if (this.client instanceof GatewayClient) {
+      // get the gateway plugin vote instruction
+      const instruction = await getVoteInstruction(
+        this.client,
+        this.gatewayToken,
+        realm,
+        walletPk
+      )
+
+      instructions.push(instruction)
+
+      const { voterWeightPk } = await this._withHandleGatewayVoterWeight(
+        realm!,
+        walletPk,
+        clientProgramId,
+        instructions
+      )
+
+      return { voterWeightPk, maxVoterWeightRecord: undefined }
+    }
   }
   withRelinquishVote = async (
     instructions,
@@ -300,7 +435,7 @@ export class VotingClient {
     }
 
     if (this.client instanceof NftVoterClient) {
-      const { registrar } = await getNftRegistrarPDA(
+      const { registrar } = await getPluginRegistrarPDA(
         realm.pubkey,
         realm.account.communityMint,
         this.client!.program.programId
@@ -388,7 +523,7 @@ export class VotingClient {
     const {
       voterWeightPk,
       voterWeightRecordBump,
-    } = await getNftVoterWeightRecord(
+    } = await getPluginVoterWeightRecord(
       realm!.pubkey,
       realm!.account.communityMint,
       walletPk!,
@@ -398,7 +533,7 @@ export class VotingClient {
     const {
       maxVoterWeightRecord,
       maxVoterWeightRecordBump,
-    } = await getNftMaxVoterWeightRecord(
+    } = await getPluginMaxVoterWeightRecord(
       realm!.pubkey,
       realm!.account.communityMint,
       clientProgramId
@@ -411,7 +546,49 @@ export class VotingClient {
       maxVoterWeightRecordBump,
     }
   }
+
+  // TODO: this can probably be merged with the nft voter plugin implementation
+  _withHandleGatewayVoterWeight = async (
+    realm: ProgramAccount<Realm>,
+    walletPk: PublicKey,
+    clientProgramId: PublicKey,
+    _instructions
+  ) => {
+    if (!(this.client instanceof GatewayClient)) {
+      throw 'Method only allowed for gateway client'
+    }
+    const {
+      voterWeightPk,
+      voterWeightRecordBump,
+    } = await getPluginVoterWeightRecord(
+      realm.pubkey,
+      realm.account.communityMint,
+      walletPk,
+      clientProgramId
+    )
+
+    const previousVoterWeightPk = await getPreviousVotingWeightRecord(
+      this.client,
+      realm,
+      walletPk
+    )
+
+    return {
+      previousVoterWeightPk,
+      voterWeightPk,
+      voterWeightRecordBump,
+    }
+  }
   _setCurrentVoterNfts = (nfts: NFTWithMeta[]) => {
     this.votingNfts = nfts
+  }
+  _setCurrentVoterGatewayToken = (gatewayToken: PublicKey) => {
+    this.gatewayToken = gatewayToken
+  }
+  _setOracles = (oracles: PublicKey[]) => {
+    this.oracles = oracles
+  }
+  _setInstructions = (instructions: TransactionInstruction[]) => {
+    this.instructions = instructions
   }
 }

@@ -104,9 +104,17 @@ export async function signTransactions({
       transaction.partialSign(...signers)
     }
   })
-  return await wallet.signAllTransactions(
-    transactionsAndSigners.map(({ transaction }) => transaction)
-  )
+
+  let signed
+  try {
+    signed = await wallet.signAllTransactions(
+      transactionsAndSigners.map(({ transaction }) => transaction)
+    )
+  } catch (e) {
+    console.log(e)
+  }
+
+  return signed
 }
 
 export async function sendSignedTransaction({
@@ -170,6 +178,7 @@ export async function sendSignedTransaction({
 
     console.log('sined transaction', signedTransaction)
 
+    // Simulate failed transaction to parse out an error reason
     try {
       console.log('start simulate')
       simulateResult = (
@@ -181,6 +190,7 @@ export async function sendSignedTransaction({
 
     console.log('simulate result', simulateResult)
 
+    // Parse and throw error if simulation fails
     if (simulateResult && simulateResult.err) {
       if (simulateResult.logs) {
         console.log('simulate resultlogs', simulateResult.logs)
@@ -210,6 +220,123 @@ export async function sendSignedTransaction({
 
   console.log('Latency', txid, getUnixTs() - startTime)
   return txid
+}
+
+/**
+ * Send a primary transaction and an adjacent one
+ */
+export async function sendSignedAndAdjacentTransactions({
+  signedTransaction,
+  adjacentTransaction,
+  connection,
+  sendingMessage = 'Sending transaction...',
+  successMessage = 'Transaction confirmed',
+  timeout = DEFAULT_TIMEOUT,
+}: {
+  signedTransaction: Transaction
+  adjacentTransaction: Transaction
+  connection: Connection
+  sendingMessage?: string
+  successMessage?: string
+  timeout?: number
+}): Promise<string> {
+  notify({ message: sendingMessage })
+
+  // Serialize both transactions
+  const rawTransaction = signedTransaction.serialize()
+  const rawAdjTransaction = adjacentTransaction.serialize()
+
+  const proposalTxPromise = connection.sendRawTransaction(rawAdjTransaction, {
+    skipPreflight: true,
+  })
+  await sleep(30)
+  const adjTxPromise = connection.sendRawTransaction(rawTransaction, {
+    skipPreflight: true,
+  })
+
+  const [proposalTxId, adjTxId] = await Promise.all([
+    proposalTxPromise,
+    adjTxPromise,
+  ])
+
+  // Retry mechanism
+  let done = false
+  const startTime = getUnixTs()
+  console.log('Started awaiting confirmation for', proposalTxId)
+  ;(async () => {
+    while (!done && getUnixTs() - startTime < timeout) {
+      console.log('RETRYING')
+      connection.sendRawTransaction(rawTransaction, {
+        skipPreflight: true,
+      })
+      await sleep(3000)
+    }
+  })()
+
+  try {
+    console.log(
+      'calling signatures confirmation',
+      await awaitTransactionSignatureConfirmation(adjTxId, timeout, connection),
+      await awaitTransactionSignatureConfirmation(
+        proposalTxId,
+        timeout,
+        connection
+      )
+    )
+  } catch (err) {
+    if (err.timeout) {
+      throw new Error('Timed out awaiting confirmation on transaction')
+    }
+
+    let simulateResult: SimulatedTransactionResponse | null = null
+
+    console.log('signed transaction', signedTransaction)
+
+    // Simulate failed transaction to parse out an error reason
+    try {
+      console.log('start simulate')
+      simulateResult = (
+        await simulateTransaction(connection, signedTransaction, 'single')
+      ).value
+    } catch (error) {
+      console.log('Error simulating: ', error)
+    }
+
+    console.log('simulate result', simulateResult)
+
+    // Parse and throw error if simulation fails
+    if (simulateResult && simulateResult.err) {
+      if (simulateResult.logs) {
+        console.log('simulate resultlogs', simulateResult.logs)
+
+        for (let i = simulateResult.logs.length - 1; i >= 0; --i) {
+          const line = simulateResult.logs[i]
+
+          if (line.startsWith('Program log: ')) {
+            throw new TransactionError(
+              'Transaction failed: ' + line.slice('Program log: '.length),
+              proposalTxId
+            )
+          }
+        }
+      }
+      throw new TransactionError(
+        JSON.stringify(simulateResult.err),
+        proposalTxId
+      )
+    }
+
+    console.log('transaction error')
+
+    throw new TransactionError('Transaction failed', proposalTxId)
+  } finally {
+    done = true
+  }
+
+  notify({ message: successMessage, type: 'success', txid: proposalTxId })
+
+  console.log('Latency', proposalTxId, getUnixTs() - startTime)
+  return proposalTxId
 }
 
 async function awaitTransactionSignatureConfirmation(

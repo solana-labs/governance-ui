@@ -12,6 +12,7 @@ const AdditionalProposalOptions = ({
   setTitle,
   setDescription,
   defaultTitle,
+  defaultDescription,
   voteByCouncil,
   setVoteByCouncil,
 }: {
@@ -20,6 +21,7 @@ const AdditionalProposalOptions = ({
   setTitle: (evt) => void
   setDescription: (evt) => void
   defaultTitle: string
+  defaultDescription?: string
   voteByCouncil: boolean
   setVoteByCouncil: (val) => void
 }) => {
@@ -52,6 +54,7 @@ const AdditionalProposalOptions = ({
             noMaxWidth={true}
             label="Proposal Description"
             placeholder={
+              defaultDescription ??
               'Description of your proposal or use a github gist link (optional)'
             }
             wrapperClassName="mb-5"

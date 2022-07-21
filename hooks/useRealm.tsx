@@ -3,7 +3,9 @@ import { ProgramAccount, TokenOwnerRecord } from '@solana/spl-governance'
 import { isPublicKey } from '@tools/core/pubkey'
 import { useRouter } from 'next/router'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
-import { useMemo, useState } from 'react'
+import { PythBalance } from 'pyth-staking-api'
+import { useEffect, useMemo, useState } from 'react'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import {
   createUnchartedRealmInfo,
@@ -11,13 +13,24 @@ import {
   RealmInfo,
 } from '../models/registry/api'
 import {
+  PythVoterWeight,
+  SimpleGatedVoterWeight,
   VoteNftWeight,
+  SwitchboardQueueVoteWeight,
   VoteRegistryVoterWeight,
   VoterWeight,
 } from '../models/voteWeights'
-
+import useMembersStore from 'stores/useMembersStore'
 import useWalletStore from '../stores/useWalletStore'
-import { nftPluginsPks, vsrPluginsPks } from './useVotingPlugins'
+import {
+  nftPluginsPks,
+  vsrPluginsPks,
+  switchboardPluginsPks,
+  pythPluginsPks,
+  gatewayPluginsPks,
+} from './useVotingPlugins'
+import useGatewayPluginStore from '../GatewayPlugin/store/gatewayPluginStore'
+import useSwitchboardPluginStore from 'SwitchboardVotePlugin/store/switchboardStore'
 
 export default function useRealm() {
   const router = useRouter()
@@ -39,7 +52,36 @@ export default function useRealm() {
   } = useWalletStore((s) => s.selectedRealm)
   const votingPower = useDepositStore((s) => s.state.votingPower)
   const nftVotingPower = useNftPluginStore((s) => s.state.votingPower)
+  const gatewayVotingPower = useGatewayPluginStore((s) => s.state.votingPower)
+  const sbVotingPower = useSwitchboardPluginStore((s) => s.state.votingPower)
   const [realmInfo, setRealmInfo] = useState<RealmInfo | undefined>(undefined)
+
+  const pythClient = useVotePluginsClientStore((s) => s.state.pythClient)
+  const [pythVoterWeight, setPythVoterWeight] = useState<PythBalance>()
+
+  useEffect(() => {
+    const getPythVoterWeight = async () => {
+      if (connected && wallet?.publicKey && pythClient) {
+        const sa = await pythClient.stakeConnection.getMainAccount(
+          wallet.publicKey
+        )
+        const vw = sa?.getVoterWeight(
+          await pythClient.stakeConnection.getTime()
+        )
+        setPythVoterWeight(vw)
+      }
+    }
+    getPythVoterWeight()
+  }, [connected])
+
+  const delegates = useMembersStore((s) => s.compact.delegates)
+  const selectedCouncilDelegate = useWalletStore(
+    (s) => s.selectedCouncilDelegate
+  )
+  const selectedCommunityDelegate = useWalletStore(
+    (s) => s.selectedCommunityDelegate
+  )
+
   useMemo(async () => {
     let realmInfo = isPublicKey(symbol as string)
       ? realm
@@ -67,13 +109,38 @@ export default function useRealm() {
     [realm, tokenAccounts]
   )
 
-  const ownTokenRecord = useMemo(
-    () =>
-      wallet?.connected && wallet.publicKey
-        ? tokenRecords[wallet.publicKey.toBase58()]
-        : undefined,
-    [tokenRecords, wallet, connected]
-  )
+  const ownTokenRecord = useMemo(() => {
+    if (wallet?.connected && wallet.publicKey) {
+      if (
+        selectedCommunityDelegate &&
+        tokenRecords[selectedCommunityDelegate]
+      ) {
+        return tokenRecords[selectedCommunityDelegate]
+      }
+
+      return tokenRecords[wallet.publicKey.toBase58()]
+    }
+    return undefined
+  }, [tokenRecords, wallet, connected, selectedCommunityDelegate])
+
+  // returns array of community tokenOwnerRecords that connected wallet has been delegated
+  const ownDelegateTokenRecords = useMemo(() => {
+    if (wallet?.connected && wallet.publicKey) {
+      const walletId = wallet.publicKey.toBase58()
+      const delegatedWallets = delegates && delegates[walletId]
+      if (delegatedWallets?.communityMembers) {
+        const communityTokenRecords = delegatedWallets.communityMembers.map(
+          (member) => {
+            return tokenRecords[member.walletAddress]
+          }
+        )
+
+        return communityTokenRecords
+      }
+    }
+
+    return undefined
+  }, [tokenRecords, wallet, connected])
 
   const councilTokenAccount = useMemo(
     () =>
@@ -87,13 +154,37 @@ export default function useRealm() {
     [realm, tokenAccounts]
   )
 
-  const ownCouncilTokenRecord = useMemo(
-    () =>
-      wallet?.connected && councilMint && wallet.publicKey
-        ? councilTokenOwnerRecords[wallet.publicKey.toBase58()]
-        : undefined,
-    [tokenRecords, wallet, connected]
-  )
+  const ownCouncilTokenRecord = useMemo(() => {
+    if (wallet?.connected && councilMint && wallet.publicKey) {
+      if (
+        selectedCouncilDelegate &&
+        councilTokenOwnerRecords[selectedCouncilDelegate]
+      ) {
+        return councilTokenOwnerRecords[selectedCouncilDelegate]
+      }
+
+      return councilTokenOwnerRecords[wallet.publicKey.toBase58()]
+    }
+    return undefined
+  }, [tokenRecords, wallet, connected, selectedCouncilDelegate])
+
+  // returns array of council tokenOwnerRecords that connected wallet has been delegated
+  const ownDelegateCouncilTokenRecords = useMemo(() => {
+    if (wallet?.connected && councilMint && wallet.publicKey) {
+      const walletId = wallet.publicKey.toBase58()
+      const delegatedWallets = delegates && delegates[walletId]
+      if (delegatedWallets?.councilMembers) {
+        const councilTokenRecords = delegatedWallets.councilMembers.map(
+          (member) => {
+            return councilTokenOwnerRecords[member.walletAddress]
+          }
+        )
+
+        return councilTokenRecords
+      }
+    }
+    return undefined
+  }, [tokenRecords, wallet, connected])
 
   const canChooseWhoVote =
     realm?.account.communityMint &&
@@ -119,11 +210,15 @@ export default function useRealm() {
     currentPluginPk && vsrPluginsPks.includes(currentPluginPk?.toBase58())
   const isNftMode =
     currentPluginPk && nftPluginsPks.includes(currentPluginPk?.toBase58())
+  const pythVotingPower = pythVoterWeight?.toBN() || new BN(0)
   const ownVoterWeight = getVoterWeight(
     currentPluginPk,
     ownTokenRecord,
     votingPower,
     nftVotingPower,
+    sbVotingPower,
+    pythVotingPower,
+    gatewayVotingPower,
     ownCouncilTokenRecord
   )
   return {
@@ -145,6 +240,8 @@ export default function useRealm() {
     councilTokenOwnerRecords,
     toManyCouncilOutstandingProposalsForUse,
     toManyCommunityOutstandingProposalsForUser,
+    ownDelegateTokenRecords,
+    ownDelegateCouncilTokenRecords,
     config,
     currentPluginPk,
     isLockTokensMode,
@@ -157,17 +254,37 @@ const getVoterWeight = (
   ownTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,
   votingPower: BN,
   nftVotingPower: BN,
+  sbVotingPower: BN,
+  pythVotingPower: BN,
+  gatewayVotingPower: BN,
   ownCouncilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
 ) => {
   if (currentPluginPk) {
     if (vsrPluginsPks.includes(currentPluginPk.toBase58())) {
-      return new VoteRegistryVoterWeight(ownTokenRecord, votingPower)
+      return new VoteRegistryVoterWeight(
+        ownTokenRecord,
+        ownCouncilTokenRecord,
+        votingPower
+      )
     }
     if (nftPluginsPks.includes(currentPluginPk.toBase58())) {
       return new VoteNftWeight(
         ownTokenRecord,
         ownCouncilTokenRecord,
         nftVotingPower
+      )
+    }
+    if (switchboardPluginsPks.includes(currentPluginPk.toBase58())) {
+      return new SwitchboardQueueVoteWeight(ownTokenRecord, sbVotingPower)
+    }
+    if (pythPluginsPks.includes(currentPluginPk.toBase58())) {
+      return new PythVoterWeight(ownTokenRecord, pythVotingPower)
+    }
+    if (gatewayPluginsPks.includes(currentPluginPk.toBase58())) {
+      return new SimpleGatedVoterWeight(
+        ownTokenRecord,
+        ownCouncilTokenRecord,
+        gatewayVotingPower
       )
     }
   }

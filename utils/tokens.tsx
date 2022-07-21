@@ -26,6 +26,7 @@ import { BN } from '@project-serum/anchor'
 import { abbreviateAddress } from './formatting'
 import BigNumber from 'bignumber.js'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import { I80F48 } from '@blockworks-foundation/mango-client'
 
 export type TokenAccount = AccountInfo
 export type MintAccount = MintInfo
@@ -90,6 +91,10 @@ export async function tryGetMint(
   } catch (ex) {
     console.error(`Can't fetch mint ${publicKey?.toBase58()}`, ex)
   }
+}
+
+export const I80F48OptionalFromNumber = (val: number | undefined) => {
+  return val || val === 0 ? I80F48.fromNumber(val) : undefined
 }
 
 export async function tryGetTokenAccount(
@@ -417,4 +422,12 @@ export const parseMintSupplyFraction = (fraction: string) => {
   return new MintMaxVoteWeightSource({
     value: new BN(fractionValue),
   })
+}
+
+export const SCALED_FACTOR_SHIFT = 9
+
+export function getScaledFactor(amount: number) {
+  return new BN(
+    new BigNumber(amount.toString()).shiftedBy(SCALED_FACTOR_SHIFT).toString()
+  )
 }

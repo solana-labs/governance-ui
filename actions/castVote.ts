@@ -17,7 +17,11 @@ import { Vote } from '@solana/spl-governance'
 import { withCastVote } from '@solana/spl-governance'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
 import { chunks } from '@utils/helpers'
-import { sendTransactions, SequenceType } from '@utils/sendTransactions'
+import {
+  sendTransactionsV2,
+  SequenceType,
+  transactionInstructionsToTypedInstructionsSets,
+} from '@utils/sendTransactions'
 import { sendTransaction } from '@utils/send'
 import { NftVoterClient } from '@solana/governance-program-library'
 
@@ -37,6 +41,7 @@ export async function castVote(
   const payer = walletPubkey
   // Explicitly request the version before making RPC calls to work around race conditions in resolving
   // the version for RealmInfo
+
   const programVersion = await getGovernanceProgramVersion(
     connection,
     programId
@@ -48,6 +53,7 @@ export async function castVote(
     proposal,
     tokeOwnerRecord
   )
+
   await withCastVote(
     instructions,
     programId,
@@ -109,16 +115,23 @@ export async function castVote(
       ? [...signerChunks.slice(0, signerChunks.length - 1), signers]
       : signerChunks
     const instructionsChunks = [
-      ...nftsAccountsChunks,
-      ...splInstructionsWithAccountsChunk,
+      ...nftsAccountsChunks.map((x) =>
+        transactionInstructionsToTypedInstructionsSets(x, SequenceType.Parallel)
+      ),
+      ...splInstructionsWithAccountsChunk.map((x) =>
+        transactionInstructionsToTypedInstructionsSets(
+          x,
+          SequenceType.Sequential
+        )
+      ),
     ]
-    await sendTransactions(
+    await sendTransactionsV2({
       connection,
       wallet,
-      instructionsChunks,
-      singersMap,
-      SequenceType.Sequential
-    )
+      TransactionInstructions: instructionsChunks,
+      signersSet: singersMap,
+      showUiComponent: true,
+    })
   } else {
     const transaction = new Transaction()
     transaction.add(...instructions)

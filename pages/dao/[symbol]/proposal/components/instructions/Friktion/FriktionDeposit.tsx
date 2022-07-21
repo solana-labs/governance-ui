@@ -79,7 +79,6 @@ const FriktionDeposit = ({
       propertyName: 'amount',
     })
   }
-
   async function getInstruction(): Promise<UiInstruction> {
     return getFriktionDepositInstruction({
       schema,

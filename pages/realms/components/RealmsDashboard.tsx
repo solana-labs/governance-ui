@@ -1,8 +1,8 @@
 import useQueryContext from '@hooks/useQueryContext'
 import { RealmInfo } from '@models/registry/api'
+import { useTheme } from 'next-themes'
 import { useRouter } from 'next/router'
 import React, { useMemo } from 'react'
-import { useTheme } from 'next-themes'
 
 export default function RealmsDashboard({
   realms,
@@ -33,26 +33,26 @@ export default function RealmsDashboard({
   ])
 
   return isLoading ? (
-    <div className="grid grid-flow-row grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-      <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-lg" />
-      <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-lg" />
-      <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-lg" />
-      <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-lg" />
-      <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-lg" />
-      <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-lg" />
-      <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-lg" />
-      <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-lg" />
-      <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-lg" />
-      <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-lg" />
+    <div className="grid grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
+      <div className="col-span-1 rounded-lg animate-pulse bg-bkg-2 h-44" />
+      <div className="col-span-1 rounded-lg animate-pulse bg-bkg-2 h-44" />
+      <div className="col-span-1 rounded-lg animate-pulse bg-bkg-2 h-44" />
+      <div className="col-span-1 rounded-lg animate-pulse bg-bkg-2 h-44" />
+      <div className="col-span-1 rounded-lg animate-pulse bg-bkg-2 h-44" />
+      <div className="col-span-1 rounded-lg animate-pulse bg-bkg-2 h-44" />
+      <div className="col-span-1 rounded-lg animate-pulse bg-bkg-2 h-44" />
+      <div className="col-span-1 rounded-lg animate-pulse bg-bkg-2 h-44" />
+      <div className="col-span-1 rounded-lg animate-pulse bg-bkg-2 h-44" />
+      <div className="col-span-1 rounded-lg animate-pulse bg-bkg-2 h-44" />
     </div>
   ) : (
     <>
-      <div className="grid grid-flow-row grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
         {certifiedRealms?.length > 0 ? (
           certifiedRealms.map((realm: RealmInfo) => (
             <div
               onClick={() => goToRealm(realm)}
-              className="bg-bkg-2 cursor-pointer default-transition flex flex-col items-center justify-center p-8 rounded-lg hover:bg-bkg-3"
+              className="flex flex-col items-center justify-center p-8 rounded-lg cursor-pointer bg-bkg-2 default-transition hover:bg-bkg-3"
               key={realm.realmId.toString()}
             >
               <div className="pb-5">
@@ -84,19 +84,19 @@ export default function RealmsDashboard({
             </div>
           ))
         ) : (
-          <div className="bg-bkg-2 col-span-5 p-8 rounded-lg text-center">
+          <div className="col-span-5 p-8 text-center rounded-lg bg-bkg-2">
             <p>No results</p>
           </div>
         )}
       </div>
       <div className="pt-12">
         <h2 className="mb-4">Unchartered DAOs</h2>
-        <div className="grid grid-flow-row grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div className="grid grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
           {unchartedRealms?.length > 0 ? (
             unchartedRealms.map((realm: RealmInfo) => (
               <div
                 onClick={() => goToRealm(realm)}
-                className="bg-bkg-2 cursor-pointer default-transition flex flex-col items-center justify-center p-8 rounded-lg hover:bg-bkg-3"
+                className="flex flex-col items-center justify-center p-8 rounded-lg cursor-pointer bg-bkg-2 default-transition hover:bg-bkg-3"
                 key={realm.realmId.toString()}
               >
                 <div className="pb-5">
@@ -110,13 +110,13 @@ export default function RealmsDashboard({
                     </div>
                   )}
                 </div>
-                <h3 className="text-center ">
+                <h3 className="text-center break-all">
                   {realm.displayName ?? realm.symbol}
                 </h3>
               </div>
             ))
           ) : (
-            <div className="bg-bkg-2 col-span-5 p-8 rounded-lg text-center">
+            <div className="col-span-5 p-8 text-center rounded-lg bg-bkg-2">
               <p>No results</p>
             </div>
           )}

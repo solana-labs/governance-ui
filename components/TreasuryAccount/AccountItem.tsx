@@ -13,7 +13,7 @@ const AccountItem = ({
     displayPrice,
   } = getTreasuryAccountItemInfoV2(governedAccountTokenAccount)
   return (
-    <div className="flex items-center text-fgd-1 border border-fgd-4 p-3 rounded-lg w-full">
+    <div className="flex items-center w-full p-3 border rounded-lg text-fgd-1 border-fgd-4">
       {logo && (
         <img
           className={`flex-shrink-0 h-6 w-6 mr-2.5 mt-0.5 ${
@@ -28,9 +28,9 @@ const AccountItem = ({
       )}
       <div className="w-full">
         <div className="flex items-start justify-between mb-1">
-          <div className="text-xs text-th-fgd-1">{name}</div>
+          <div className="text-sm font-semibold text-th-fgd-1">{name}</div>
         </div>
-        <div className="text-fgd-3 text-xs">
+        <div className="text-xs text-fgd-3">
           {amountFormatted} {symbol}
         </div>
         {displayPrice ? (

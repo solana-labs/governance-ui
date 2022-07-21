@@ -8,7 +8,6 @@ import {
 import {
   getGovernanceProgramVersion,
   getInstructionDataFromBase64,
-  getSignatoryRecordAddress,
   Governance,
   ProgramAccount,
   Realm,
@@ -16,13 +15,16 @@ import {
   VoteType,
   withCreateProposal,
 } from '@solana/spl-governance'
-import { withAddSignatory } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { withInsertTransaction } from '@solana/spl-governance'
 import { InstructionData } from '@solana/spl-governance'
 import { sendTransaction } from 'utils/send'
 import { withSignOffProposal } from '@solana/spl-governance'
-import { sendTransactions, SequenceType } from '@utils/sendTransactions'
+import {
+  sendTransactionsV2,
+  SequenceType,
+  transactionInstructionsToTypedInstructionsSets,
+} from '@utils/sendTransactions'
 import { chunks } from '@utils/helpers'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
@@ -33,8 +35,10 @@ export interface InstructionDataWithHoldUpTime {
   holdUpTime: number | undefined
   prerequisiteInstructions: TransactionInstruction[]
   chunkSplitByDefault?: boolean
+  chunkBy?: number
   signers?: Keypair[]
   shouldSplitIntoSeparateTxs?: boolean | undefined
+  prerequisiteInstructionsSigners?: Keypair[]
 }
 
 export class InstructionDataWithHoldUpTime {
@@ -49,12 +53,14 @@ export class InstructionDataWithHoldUpTime {
       ? getInstructionDataFromBase64(instruction.serializedInstruction)
       : null
     this.holdUpTime =
-      typeof instruction.customHoldUpTime !== undefined
+      typeof instruction.customHoldUpTime !== 'undefined'
         ? instruction.customHoldUpTime
         : governance?.account?.config.minInstructionHoldUpTime
-
     this.prerequisiteInstructions = instruction.prerequisiteInstructions || []
     this.chunkSplitByDefault = instruction.chunkSplitByDefault || false
+    this.chunkBy = instruction.chunkBy || 2
+    this.prerequisiteInstructionsSigners =
+      instruction.prerequisiteInstructionsSigners || []
   }
 }
 
@@ -78,7 +84,7 @@ export const createProposal = async (
   const payer = walletPubkey
   const notificationTitle = isDraft ? 'proposal draft' : 'proposal'
   const prerequisiteInstructions: TransactionInstruction[] = []
-
+  const prerequisiteInstructionsSigners: Keypair[] = []
   // sum up signers
   const signers: Keypair[] = instructionsData.flatMap((x) => x.signers ?? [])
   const shouldSplitIntoSeparateTxs: boolean = instructionsData
@@ -87,6 +93,8 @@ export const createProposal = async (
 
   // Explicitly request the version before making RPC calls to work around race conditions in resolving
   // the version for RealmInfo
+
+  // Changed this because it is misbehaving on my local validator setup.
   const programVersion = await getGovernanceProgramVersion(
     connection,
     programId
@@ -101,7 +109,8 @@ export const createProposal = async (
   const plugin = await client?.withUpdateVoterWeightRecord(
     instructions,
     tokenOwnerRecord,
-    'createProposal'
+    'createProposal',
+    governance
   )
 
   const proposalAddress = await withCreateProposal(
@@ -123,35 +132,25 @@ export const createProposal = async (
     plugin?.voterWeightPk
   )
 
-  await withAddSignatory(
-    instructions,
-    programId,
-    programVersion,
-    proposalAddress,
-    tokenOwnerRecord.pubkey,
-    governanceAuthority,
-    signatory,
-    payer
-  )
-
-  // TODO: Return signatoryRecordAddress from the SDK call
-  const signatoryRecordAddress = await getSignatoryRecordAddress(
-    programId,
-    proposalAddress,
-    signatory
-  )
-
   const insertInstructions: TransactionInstruction[] = []
   const splitToChunkByDefault = instructionsData.filter(
     (x) => x.chunkSplitByDefault
   ).length
-
+  const chunkBys = instructionsData
+    .filter((x) => x.chunkBy)
+    .map((x) => x.chunkBy!)
+  const chunkBy = chunkBys.length ? Math.min(...chunkBys) : 2
   for (const [index, instruction] of instructionsData
     .filter((x) => x.data)
     .entries()) {
     if (instruction.data) {
       if (instruction.prerequisiteInstructions) {
         prerequisiteInstructions.push(...instruction.prerequisiteInstructions)
+      }
+      if (instruction.prerequisiteInstructionsSigners) {
+        prerequisiteInstructionsSigners.push(
+          ...instruction.prerequisiteInstructionsSigners
+        )
       }
       await withInsertTransaction(
         insertInstructions,
@@ -181,8 +180,8 @@ export const createProposal = async (
       governance,
       proposalAddress,
       signatory,
-      signatoryRecordAddress,
-      undefined
+      undefined,
+      tokenOwnerRecord.pubkey
     )
   }
 
@@ -201,7 +200,6 @@ export const createProposal = async (
       sendingMessage: `creating ${notificationTitle}`,
       successMessage: `${notificationTitle} created`,
     })
-
     await sendTransaction({
       transaction: transaction2,
       wallet,
@@ -218,37 +216,49 @@ export const createProposal = async (
     // This is an arbitrary threshold and we assume that up to 2 instructions can be inserted as a single Tx
     // This is conservative setting and we might need to revise it if we have more empirical examples or
     // reliable way to determine Tx size
-    const transaction = new Transaction()
     // We merge instructions with prerequisiteInstructions
     // Prerequisite  instructions can came from instructions as something we need to do before instruction can be executed
     // For example we create ATAs if they don't exist as part of the proposal creation flow
-    transaction.add(
-      ...prerequisiteInstructions,
-      ...instructions,
-      ...insertInstructions
-    )
 
-    await sendTransaction({
-      transaction,
+    await sendTransactionsV2({
       wallet,
       connection,
-      signers,
-      sendingMessage: `creating ${notificationTitle}`,
-      successMessage: `${notificationTitle} created`,
+      signersSet: [[], [], signers],
+      showUiComponent: true,
+      TransactionInstructions: [
+        prerequisiteInstructions,
+        instructions,
+        insertInstructions,
+      ].map((x) =>
+        transactionInstructionsToTypedInstructionsSets(
+          x,
+          SequenceType.Sequential
+        )
+      ),
     })
   } else {
-    const insertChunks = chunks(insertInstructions, 2)
-    const signerChunks = Array(insertChunks.length).fill([])
+    const insertChunks = chunks(insertInstructions, chunkBy)
+    const signerChunks = Array(insertChunks.length)
+    signerChunks.push(...chunks(signers, chunkBy))
+    signerChunks.fill([])
 
     console.log(`Creating proposal using ${insertChunks.length} chunks`)
-
-    await sendTransactions(
-      connection,
+    await sendTransactionsV2({
       wallet,
-      [prerequisiteInstructions, instructions, ...insertChunks],
-      [[], [], ...signerChunks],
-      SequenceType.Sequential
-    )
+      connection,
+      signersSet: [[...prerequisiteInstructionsSigners], [], ...signerChunks],
+      showUiComponent: true,
+      TransactionInstructions: [
+        prerequisiteInstructions,
+        instructions,
+        ...insertChunks,
+      ].map((x) =>
+        transactionInstructionsToTypedInstructionsSets(
+          x,
+          SequenceType.Sequential
+        )
+      ),
+    })
   }
 
   return proposalAddress

@@ -1,3 +1,4 @@
+import { withSentry } from '@sentry/nextjs'
 import {
   getGovernanceAccounts,
   ProgramAccount,
@@ -11,10 +12,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { getAllSplGovernanceProgramIds } from './tools/realms'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const conn = new Connection(
-    'https://explorer-api.mainnet-beta.solana.com',
-    'recent'
-  )
+  const conn = new Connection('https://ssc-dao.genesysgo.net/', 'recent')
 
   console.log('fetching spl-gov instances...')
   // Get all realms
@@ -79,4 +77,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   res.status(200).json(daoStatistics)
 }
 
-export default handler
+export default withSentry(handler)

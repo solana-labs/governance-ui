@@ -19,7 +19,9 @@ export function useTotalTreasuryPrice() {
               new BN(
                 x.isSol
                   ? x.extensions.solAccount!.lamports
-                  : x.extensions.token!.account.amount
+                  : x.isToken
+                  ? x.extensions.token!.account?.amount
+                  : 0
               )
             ).toNumber() *
             tokenService.getUSDTokenPrice(

@@ -161,5 +161,31 @@
     "ogImage": "https://www.foresight.exchange/logo.png",
     "website": "https://www.foresight.exchange/",
     "twitter": "@foresightmkt"
+  },
+  {
+    "symbol": "PYTH",
+    "displayName": "Pyth DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "44xGQELUXXD1TiLEMc73RBnCxeW8XKw27LyJNpt2G8bF",
+    "ogImage": "/realms/PYTH/img/pyth.svg",
+    "website": "https://pyth.network/",
+    "twitter": "@PythNetwork"
+  },
+  {
+    "symbol": "AXY",
+    "displayName": "AXY Network DAO",
+    "programId": "GTesTBiEWE32WHXXE2S4XbZvA5CrEc4xs6ZgRe895dP",
+    "realmId": "Bi65vLgphakAdFTZj6pUWweNaYaviPtSDf5VJ3WD6YL",
+    "ogImage": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/AXY11ExJToaGPKp7BmGjkzitfs1ta7cmjJn58Pn2t3Z1/logo.jpg",
+    "website": "https://axy.network/"
+  },
+  {
+    "symbol": "YMDAO",
+    "displayName": "Yellow Man DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "8PdjmsN5qvSnJtJ7bTQbGkZtuHmSBeQ6ESnrHdUx3bZ",
+    "website": "https://yellowman.vercel.app/",
+    "keywords": "YELLOW MAN",
+    "ogImage": "/realms/YMDAO/img/ymdaologo.png"
   }
 ]

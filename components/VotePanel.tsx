@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-
 import { withFinalizeVote, YesNoVote } from '@solana/spl-governance'
 import { TransactionInstruction } from '@solana/web3.js'
 import { useCallback, useState } from 'react'
@@ -9,6 +8,7 @@ import useRealm from '../hooks/useRealm'
 import { ProposalState } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { GoverningTokenType } from '@solana/spl-governance'
+import { BanIcon, ThumbUpIcon, ThumbDownIcon } from '@heroicons/react/solid'
 
 import useWalletStore from '../stores/useWalletStore'
 import Button, { SecondaryButton } from './Button'
@@ -17,6 +17,9 @@ import { getProgramVersionForRealm } from '@models/registry/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { useRouter } from 'next/router'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
+import { LOCALNET_REALM_ID as PYTH_LOCALNET_REALM_ID } from 'pyth-staking-api'
+import { isYesVote } from '@models/voteRecords'
+import Tooltip from '@components/Tooltip'
 
 const VotePanel = () => {
   const [showVoteModal, setShowVoteModal] = useState(false)
@@ -48,8 +51,18 @@ const VotePanel = () => {
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
   const maxVoterWeight =
     useNftPluginStore((s) => s.state.maxVoteRecord)?.pubkey || undefined
+
+  // Handle state based on if a delegated wallet has already voted or not
   const ownVoteRecord =
-    wallet?.publicKey && voteRecordsByVoter[wallet.publicKey.toBase58()]
+    tokenType === GoverningTokenType.Community && ownTokenRecord
+      ? voteRecordsByVoter[
+          ownTokenRecord.account.governingTokenOwner.toBase58()
+        ]
+      : ownCouncilTokenRecord
+      ? voteRecordsByVoter[
+          ownCouncilTokenRecord.account.governingTokenOwner.toBase58()
+        ]
+      : wallet?.publicKey && voteRecordsByVoter[wallet.publicKey.toBase58()]
 
   const voterTokenRecord =
     tokenType === GoverningTokenType.Community
@@ -60,14 +73,14 @@ const VotePanel = () => {
   const isVoting =
     proposal?.account.state === ProposalState.Voting && !hasVoteTimeExpired
 
-  const isVoteEnabled =
-    connected &&
-    isVoting &&
-    !isVoteCast &&
+  const hasMinAmountToVote =
     voterTokenRecord &&
     ownVoterWeight.hasMinAmountToVote(
       voterTokenRecord.account.governingTokenMint
     )
+
+  const isVoteEnabled =
+    connected && isVoting && !isVoteCast && hasMinAmountToVote
 
   const isWithdrawEnabled =
     connected &&
@@ -143,9 +156,7 @@ const VotePanel = () => {
       ? `Cast your ${
           tokenType === GoverningTokenType.Community ? 'community' : 'council'
         } vote`
-      : isVoting
-      ? 'Withdraw your vote'
-      : 'Release your tokens'
+      : 'Your vote'
 
   const withdrawTooltipContent = !connected
     ? 'You need to connect your wallet'
@@ -181,23 +192,64 @@ const VotePanel = () => {
     : !ownVoteRecord?.account.isRelinquished
 
   const isPanelVisible = (isVoting || isVoteCast) && isVisibleToWallet
+  const didNotVote =
+    !!proposal &&
+    !isVoting &&
+    proposal.account.state !== ProposalState.Cancelled &&
+    proposal.account.state !== ProposalState.Draft &&
+    !isVoteCast &&
+    isVisibleToWallet
+
+  //Todo: move to own components with refactor to dao folder structure
+  const isPyth =
+    realmInfo?.realmId.toBase58() === PYTH_LOCALNET_REALM_ID.toBase58()
+
+  const isRelinquishVotePanelVisible = !(
+    isPyth &&
+    isVoteCast &&
+    connected &&
+    !isVoting
+  )
+
   return (
     <>
-      {isPanelVisible && (
+      {isPanelVisible && isRelinquishVotePanelVisible && (
         <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-4">
-          <h3 className="mb-4 text-center">{actionLabel}</h3>
+          <div className="flex flex-col items-center justify-center">
+            <h3 className="text-center">{actionLabel}</h3>
+            {isVoteCast &&
+              connected &&
+              ownVoteRecord &&
+              (isYesVote(ownVoteRecord.account) ? (
+                <Tooltip content={`You voted "Yes"`}>
+                  <div className="flex flex-row items-center justify-center rounded-full border border-[#8EFFDD] p-2 mt-2">
+                    <ThumbUpIcon className="h-4 w-4 fill-[#8EFFDD]" />
+                  </div>
+                </Tooltip>
+              ) : (
+                <Tooltip content={`You voted "No"`}>
+                  <div className="flex flex-row items-center justify-center rounded-full border border-[#FF7C7C] p-2 mt-2">
+                    <ThumbDownIcon className="h-4 w-4 fill-[#FF7C7C]" />
+                  </div>
+                </Tooltip>
+              ))}
+          </div>
 
           <div className="items-center justify-center flex w-full gap-5">
             {isVoteCast && connected ? (
-              <SecondaryButton
-                isLoading={isLoading}
-                small
-                tooltipMessage={withdrawTooltipContent}
-                onClick={() => submitRelinquishVote()}
-                disabled={!isWithdrawEnabled || isLoading}
-              >
-                {isVoting ? 'Withdraw' : 'Release Tokens'}
-              </SecondaryButton>
+              <div className="flex flex-col gap-6 items-center">
+                {isVoting && (
+                  <SecondaryButton
+                    className="min-w-[200px]"
+                    isLoading={isLoading}
+                    tooltipMessage={withdrawTooltipContent}
+                    onClick={() => submitRelinquishVote()}
+                    disabled={!isWithdrawEnabled || isLoading}
+                  >
+                    Withdraw
+                  </SecondaryButton>
+                )}
+              </div>
             ) : (
               <>
                 {isVoting && (
@@ -208,7 +260,10 @@ const VotePanel = () => {
                       onClick={() => handleShowVoteModal(YesNoVote.Yes)}
                       disabled={!isVoteEnabled}
                     >
-                      Vote Yes
+                      <div className="flex flex-row items-center justify-center">
+                        <ThumbUpIcon className="h-4 w-4 mr-2" />
+                        Vote Yes
+                      </div>
                     </Button>
 
                     <Button
@@ -217,7 +272,10 @@ const VotePanel = () => {
                       onClick={() => handleShowVoteModal(YesNoVote.No)}
                       disabled={!isVoteEnabled}
                     >
-                      Vote No
+                      <div className="flex flex-row items-center justify-center">
+                        <ThumbDownIcon className="h-4 w-4 mr-2" />
+                        Vote No
+                      </div>
                     </Button>
                   </div>
                 )}
@@ -233,6 +291,14 @@ const VotePanel = () => {
               voterTokenRecord={voterTokenRecord!}
             />
           ) : null}
+        </div>
+      )}
+      {didNotVote && (
+        <div className="bg-bkg-2 p-4 md:p-6 rounded-lg flex flex-col items-center justify-center">
+          <h3 className="text-center mb-0">You did not vote</h3>
+          <Tooltip content="You did not vote on this proposal">
+            <BanIcon className="h-[34px] w-[34px] fill-white/50 mt-2" />
+          </Tooltip>
         </div>
       )}
     </>

@@ -1,14 +1,15 @@
 import { ThemeProvider } from 'next-themes'
+import '@dialectlabs/react-ui/index.css'
+// import '../styles/ambit-font.css'
 import '../styles/index.css'
+import '../styles/typography.css'
 import useWallet from '../hooks/useWallet'
-import Notifications from '../components/Notification'
 import NavBar from '../components/NavBar'
 import PageBodyContainer from '../components/PageBodyContainer'
 import useHydrateStore from '../hooks/useHydrateStore'
 import useRealm from '../hooks/useRealm'
 import { getResourcePathPart } from '../tools/core/resources'
 import handleRouterHistory from '@hooks/handleRouterHistory'
-import Footer from '@components/Footer'
 import { useEffect } from 'react'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import useWalletStore from 'stores/useWalletStore'
@@ -23,7 +24,15 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { usePrevious } from '@hooks/usePrevious'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useMembers from '@components/Members/useMembers'
+import TransactionLoader from '@components/TransactionLoader'
 
+import dynamic from 'next/dynamic'
+import Head from 'next/head'
+import { GatewayProvider } from '@components/Gateway/GatewayProvider'
+
+const Notifications = dynamic(() => import('../components/Notification'), {
+  ssr: false,
+})
 function App({ Component, pageProps }) {
   useHydrateStore()
   useWallet()
@@ -49,15 +58,16 @@ function App({ Component, pageProps }) {
   const prevStringifyPossibleNftsAccounts = usePrevious(
     JSON.stringify(possibleNftsAccounts)
   )
-  const title = realmName ? `${realmName}` : 'Solana Governance'
+  const title = realmName ? `${realmName}` : 'Realms'
 
   // Note: ?v==${Date.now()} is added to the url to force favicon refresh.
   // Without it browsers would cache the last used and won't change it for different realms
   // https://stackoverflow.com/questions/2208933/how-do-i-force-a-favicon-refresh
-  const faviconSelector = symbol ?? 'SOLANA'
-  const faviconUrl = `/realms/${getResourcePathPart(
-    faviconSelector as string
-  )}/favicon.ico?v=${Date.now()}`
+  const faviconUrl =
+    symbol &&
+    `/realms/${getResourcePathPart(
+      symbol as string
+    )}/favicon.ico?v=${Date.now()}`
   useEffect(() => {
     if (realm?.pubkey) {
       loadMarket(connection, connection.cluster)
@@ -72,16 +82,17 @@ function App({ Component, pageProps }) {
       ) &&
       realm.pubkey &&
       wallet?.connected &&
+      ownTokenRecord &&
       client
     ) {
       getOwnedDeposits({
         realmPk: realm!.pubkey,
         communityMintPk: realm!.account.communityMint,
-        walletPk: wallet!.publicKey!,
+        walletPk: ownTokenRecord!.account!.governingTokenOwner,
         client: client!,
         connection: connection.current,
       })
-    } else if (!wallet?.connected) {
+    } else if (!wallet?.connected || !ownTokenRecord) {
       resetDepositState()
     }
   }, [
@@ -90,30 +101,7 @@ function App({ Component, pageProps }) {
     wallet?.connected,
     client,
   ])
-  //hack to remove 'Do not add <script> tags using next/head warning'
-  useEffect(() => {
-    const changeFavicon = (link) => {
-      let $favicon = document.querySelector('link[rel="icon"]')
-      // If a <link rel="icon"> element already exists,
-      // change its href to the given link.
-      if ($favicon !== null) {
-        //@ts-ignore
-        $favicon.href = link
-        // Otherwise, create a new element and append it to <head>.
-      } else {
-        $favicon = document.createElement('link')
-        //@ts-ignore
-        $favicon.rel = 'icon'
-        //@ts-ignore
-        $favicon.href = link
-        document.head.appendChild($favicon)
-      }
-    }
-    changeFavicon(faviconUrl)
-  }, [faviconSelector])
-  useEffect(() => {
-    document.title = title
-  }, [title])
+
   useEffect(() => {
     if (
       prevStringifyPossibleNftsAccounts !==
@@ -126,18 +114,101 @@ function App({ Component, pageProps }) {
 
   return (
     <div className="relative">
+      <Head>
+        <meta property="og:title" content={title} />
+        <title>{title}</title>
+        {faviconUrl ? (
+          <>
+            <link rel="icon" href={faviconUrl} />
+          </>
+        ) : (
+          <>
+            <link
+              rel="apple-touch-icon"
+              sizes="57x57"
+              href="/favicons/apple-icon-57x57.png"
+            />
+            <link
+              rel="apple-touch-icon"
+              sizes="60x60"
+              href="/favicons/apple-icon-60x60.png"
+            />
+            <link
+              rel="apple-touch-icon"
+              sizes="72x72"
+              href="/favicons/apple-icon-72x72.png"
+            />
+            <link
+              rel="apple-touch-icon"
+              sizes="76x76"
+              href="/favicons/apple-icon-76x76.png"
+            />
+            <link
+              rel="apple-touch-icon"
+              sizes="114x114"
+              href="/favicons/apple-icon-114x114.png"
+            />
+            <link
+              rel="apple-touch-icon"
+              sizes="120x120"
+              href="/favicons/apple-icon-120x120.png"
+            />
+            <link
+              rel="apple-touch-icon"
+              sizes="144x144"
+              href="/favicons/apple-icon-144x144.png"
+            />
+            <link
+              rel="apple-touch-icon"
+              sizes="152x152"
+              href="/favicons/apple-icon-152x152.png"
+            />
+            <link
+              rel="apple-touch-icon"
+              sizes="180x180"
+              href="/favicons/apple-icon-180x180.png"
+            />
+            <link
+              rel="icon"
+              type="image/png"
+              sizes="192x192"
+              href="/favicons/android-icon-192x192.png"
+            />
+            <link
+              rel="icon"
+              type="image/png"
+              sizes="32x32"
+              href="/favicons/favicon-32x32.png"
+            />
+            <link
+              rel="icon"
+              type="image/png"
+              sizes="96x96"
+              href="/favicons/favicon-96x96.png"
+            />
+            <link
+              rel="icon"
+              type="image/png"
+              sizes="16x16"
+              href="/favicons/favicon-16x16.png"
+            />
+          </>
+        )}
+      </Head>
       <ErrorBoundary>
         <ThemeProvider defaultTheme="Dark">
           <WalletIdentityProvider appName={'Realms'}>
-            <NavBar />
-            <Notifications />
-            <PageBodyContainer>
-              <Component {...pageProps} />
-            </PageBodyContainer>
+            <GatewayProvider>
+              <NavBar />
+              <Notifications />
+              <TransactionLoader></TransactionLoader>
+              <PageBodyContainer>
+                <Component {...pageProps} />
+              </PageBodyContainer>
+            </GatewayProvider>
           </WalletIdentityProvider>
         </ThemeProvider>
       </ErrorBoundary>
-      <Footer />
     </div>
   )
 }

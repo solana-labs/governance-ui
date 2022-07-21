@@ -1,20 +1,34 @@
 import { Keypair, Transaction, TransactionInstruction } from '@solana/web3.js'
 
 import {
-  getGovernanceProgramVersion,
+  sendSignedAndAdjacentTransactions,
+  sendTransaction,
+  signTransactions,
+} from '@utils/send'
+import Wallet from '@project-serum/sol-wallet-adapter'
+import {
+  RpcContext,
   Proposal,
   ProposalTransaction,
+  getGovernanceProgramVersion,
+  withExecuteTransaction,
+  ProgramAccount,
 } from '@solana/spl-governance'
 
-import { withExecuteTransaction } from '@solana/spl-governance'
-import { RpcContext } from '@solana/spl-governance'
-import { ProgramAccount } from '@solana/spl-governance'
-import { sendTransaction } from '@utils/send'
-
+/**
+ * Executes a proposal transaction
+ * @param rpcContext RPC contextual information
+ * @param proposal Metadata about the proposal
+ * @param instruction Instruction that will be executed by the proposal
+ * @param adjacentTransaction Optional transaction that is sent in the same slot as the proposal instruction.
+ * @param preExecutionTransactions Optional tansactions that are executed before the proposal instruction
+ */
 export const executeTransaction = async (
   { connection, wallet, programId }: RpcContext,
   proposal: ProgramAccount<Proposal>,
-  instruction: ProgramAccount<ProposalTransaction>
+  instruction: ProgramAccount<ProposalTransaction>,
+  adjacentTransaction?: Transaction,
+  preExecutionTransactions?: Transaction[]
 ) => {
   const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []
@@ -36,17 +50,52 @@ export const executeTransaction = async (
     [instruction.account.getSingleInstruction()]
   )
 
-  const transaction = new Transaction()
+  // Create proposal transaction
+  const proposalTransaction = new Transaction().add(...instructions)
 
-  transaction.add(...instructions)
+  // Sign and send all pre-execution transactions
+  if (preExecutionTransactions && !preExecutionTransactions?.length) {
+    await Promise.all(
+      preExecutionTransactions.map((transaction) =>
+        sendTransaction({
+          transaction,
+          wallet,
+          connection,
+          sendingMessage: 'Sending pre-execution transaction',
+          successMessage: 'Sent pre-execution transaction',
+        })
+      )
+    )
+    console.log('sent preExecutionTransactions', preExecutionTransactions)
+  }
 
-  const c = await sendTransaction({
-    transaction,
-    wallet,
-    connection,
-    signers,
-    sendingMessage: 'Executing instruction',
-    successMessage: 'Execution finalized',
-  })
-  console.log(c)
+  // Some proposals require additional adjacent transactions due to tx size limits
+  if (adjacentTransaction) {
+    const [signedProposalTx, signedAdjacentTx] = await signTransactions({
+      transactionsAndSigners: [
+        { transaction: proposalTransaction },
+        { transaction: adjacentTransaction },
+      ],
+      wallet: (wallet as unknown) as Wallet,
+      connection,
+    })
+    // Send proposal transaction with prepended adjacent transaction
+    await sendSignedAndAdjacentTransactions({
+      signedTransaction: signedProposalTx,
+      adjacentTransaction: signedAdjacentTx,
+      connection,
+      sendingMessage: 'Executing instruction',
+      successMessage: 'Execution finalized',
+    })
+  } else {
+    // Send the proposal transaction
+    await sendTransaction({
+      transaction: proposalTransaction,
+      wallet,
+      connection,
+      signers,
+      sendingMessage: 'Executing instruction',
+      successMessage: 'Execution finalized',
+    })
+  }
 }

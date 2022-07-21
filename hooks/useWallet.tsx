@@ -27,6 +27,21 @@ export default function useWallet() {
     DEFAULT_PROVIDER.url
   )
 
+  async function flipWalletByTurningOffAndOn() {
+    if (wallet) {
+      try {
+        await wallet.disconnect()
+        await wallet.connect()
+      } catch (error) {
+        const err = error as Error
+        return notify({
+          type: 'error',
+          message: err.message,
+        })
+      }
+    }
+  }
+
   // initialize selection from local storage
   useEffect(() => {
     if (!selectedProviderUrl) {
@@ -87,6 +102,7 @@ export default function useWallet() {
       })
       await actions.fetchWalletTokenAccounts()
       await actions.fetchOwnVoteRecords()
+      await actions.fetchDelegateVoteRecords()
     })
     wallet.on('disconnect', () => {
       setWalletStore((state) => {
@@ -117,7 +133,16 @@ export default function useWallet() {
   // refresh regularly
   useInterval(async () => {
     console.log('refresh')
-  }, 10 * SECONDS)
+    // @ts-ignore
+    const currentAddress = window?.solana?._publicKey?.toBase58()
+    const staleAddress = wallet?.publicKey?.toString()
+    if (staleAddress && currentAddress && staleAddress !== currentAddress) {
+      console.log(
+        `Wallet address changed from ${staleAddress} to ${currentAddress}`
+      )
+      flipWalletByTurningOffAndOn()
+    }
+  }, 3 * SECONDS)
 
   return { connected, wallet }
 }

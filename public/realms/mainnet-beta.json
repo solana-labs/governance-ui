@@ -40,13 +40,43 @@
   },
   {
     "symbol": "MangoLiquidityDAO",
-    "displayName": "Mango Liquidity DAO",
+    "displayName": "Mango Liquidity Council",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "DnWHRVRbA2XGwWth2da7iF3Q81cqRHhqJXSPS8J3G6fo",
     "website": "https://mango.markets",
     "keywords": "Mango Markets, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
     "twitter": "@mangomarkets",
     "ogImage": "https://trade.mango.markets/assets/icons/logo.svg"
+  },
+  {
+    "symbol": "WEZ",
+    "displayName": "Wezesha DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "FEtF7V55LorZmUriVVobubPvLXoS7sfP3smzb5zR4BWz",
+    "website": "https://wezesha.co",
+    "keywords": "Wezesha DAO, Wezesha, Wezesha Coin, The Big Five NFTs Club, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, SPL-TOKEN, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
+    "twitter": "@WezeshaCo",
+    "ogImage": "/realms/WezeshaDAO/img/wezesha_dao_logo.png"
+  },
+  {
+    "symbol": "BFNC",
+    "displayName": "BFNC DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "36YGaNUYtRbaq1fHL4inLvHDxb7W28dBxWSna64v9Tea",
+    "website": "https://bigfivenftclub.com",
+    "keywords": "Big Five NFT Club DAO, BFNC DAO, Big Five Coin, The Big Five NFT Club, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, SPL-TOKEN, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
+    "twitter": "@bigfivenftclub",
+    "ogImage": "/realms/BFNC/img/logo.png"
+  },
+  {
+    "symbol": "Wisdom Enterprising",
+    "displayName": "Wisdom Enterprising",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "4SGq4WekURkhi6Y3JfxN1ockV5qfwuPahFjB4sLe1bZx",
+    "website": "https://wisdomenterprising.com",
+    "keywords": "Wisdom Enterprising, realms.today, Decentralized, Web3, Wezesha",
+    "twitter": "@jakubsimek",
+    "ogImage": "/realms/WisdomEnterprising/img/WE.jpg"
   },
   {
     "symbol": "ORCA",
@@ -124,7 +154,8 @@
     "symbol": "Governance",
     "displayName": "Governance",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "FMEWULPSGR1BKVJK4K7xTjhG23NfYxeAn2bamYgNoUck"
+    "realmId": "FMEWULPSGR1BKVJK4K7xTjhG23NfYxeAn2bamYgNoUck",
+    "ogImage": "/realms/Governance/logo-spl-gov-1024.png"
   },
   {
     "symbol": "Yield Farming",
@@ -249,6 +280,16 @@
     "website": "https://grapes.network/",
     "twitter": "@grapeprotocol",
     "sortRank":3 
+  },
+  {
+    "symbol": "RED",
+    "displayName": "Realms Ecosystem DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "C1tyCAEnbt4d63nbF36PGLc8gCC9DdtRXttXWGZwsAdF",
+    "ogImage": "/realms/RED/RED.png",
+    "website": "https://realms.notion.site/Realms-Ecosystem-DAO-RED-2b82519e797b4696968c5c909812f418",
+    "twitter": "@Realms_DAOs",
+    "sortRank":2
   },
   {
     "symbol": "MonkeDAO",
@@ -463,6 +504,15 @@
     "displayName": "MonkeVentures",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "97jKDX5Uxh5xSPbmmfhiFodHEajSVdKkknTzzgf8GBAr"
+  },
+    {
+    "symbol": "RatioFinance",
+    "displayName": "Ratio Finance",
+    "programId": "HT19EcD68zn7NoCF79b2ucQF8XaMdowyPt5ccS6g1PUx",
+    "realmId": "8HZ4V94dtojrTpdUpWrfstr7bEhRnZZHn8jotfns9L9x",
+    "website": "https://ratio.finance/",
+    "twitter": "@RatioFinance",
+    "ogImage": "/realms/RatioFinance/img/ratiologo.png"
   },
   {
     "symbol": "PixelBands",
@@ -697,5 +747,149 @@
     "ogImage": "https://raw.githubusercontent.com/Exonft/SquatchDAO/main/SquatchDAO.jpg",
     "website": "www.squatchdao.com",
     "twitter": "@Squatch_DAO"
+  },
+  {
+    "symbol": "RRA",
+    "displayName": "RRA DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "4pLWsjAJJmyUL73MyxDVcSB3iTR6Yuyx7S98EqSDqjmH",
+    "ogImage": "/realms/RRADAO/rradao_logo.jpg",
+    "website": "https://www.ruderhinos.club",
+    "twitter": "@RudeRhinosClub"
+  },
+  {
+    "symbol": "PhoenixDAO",
+    "displayName": "Phoenix DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Fvzr2TsUuUZ4HoZumH6ppa1cacWshU1YUZgGYHPHH4rz",
+    "ogImage": "/realms/PhoenixDAO/phoenixdao_logo.png"
+  },
+  {
+    "symbol": "SOLI",
+    "displayName": "Solana Ecosystem Index",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "J5ViB3N7S3YRnrMpy7iSy57yYQaviJJDmrfGVT51z44o",
+    "ogImage": "/realms/SOLI/soli_logo.png",
+    "website": "https://tokens.amun.com/token/SOLI",
+    "twitter": "@Amun"
+  },
+  {
+    "symbol": "SBYC",
+    "displayName": "SBYC DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "BycjQ24kBPhdzBbJanQJ1bydLGqZHf3oseGGLVcb2RWK",
+    "ogImage": "/realms/SBYCDAO/img/logo.png",
+    "website": "https://solboredyachtclub.com",
+    "twitter": "@SolBoredYacht"
+  },
+    {
+    "symbol": "$MasoorDAO",
+    "displayName": "Hari's Realm",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "4PYdZHs2hwZYibkvEnpVCJpU7bD4aFUkWtYxGFU25ZWu",
+    "website": "https://www.linkedin.com/in/harimasoor/",
+    "twitter": "@HariOnChain",
+    "ogImage": "/realms/MasoorDAO/MasoorDAO.PNG"
+  },
+    {
+    "symbol": "ADAO",
+    "displayName": "Astra DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Cwh2E98xcB5qL8yuGvxdaMezRUQXwdCwcCKhYKqUPqFD",
+    "website": "https://www.youtube.com/channel/UCP6jlgRDcs5S68OVjleMGjg",
+    "twitter": "@MannyAstra",
+    "ogImage": "/realms/Astra/AstraPodcastLogo.PNG"
+  },
+    {
+    "symbol": "CreatedBy",
+    "displayName": "CreatedBy DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "BE5wCCi9fg5YxUWos5A9JYACCLTPCKbcbJknTMxz76g4",
+    "website": "https://createdby.io",
+    "twitter": "@CreatedByIO",
+    "ogImage": "/realms/CreatedBy/CreatedBy.png"
+  },
+    {
+    "symbol": "SAMO",
+    "displayName": "SamoDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "GC6GDrJTVEY2ZxQ9NaC7n54tvz2HKM5f29LBzP7SjJ6h",
+    "website": "https://samoyedcoin.com",
+    "twitter": "@Samo_DAO",
+    "ogImage": "/realms/SamoDAO/SamoDAO.png"
+    },
+    {
+      "symbol": "FORE",
+      "displayName": "Foresight DAO",
+      "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+      "realmId": "CZatgrcvaDN9ib1sQeSCJWUnBXc899ydTB9vfAHHBVfP",
+      "ogImage": "https://www.foresight.exchange/logo.png",
+      "website": "https://www.foresight.exchange/",
+      "twitter": "@foresightmkt"
+    },
+    {
+      "symbol": "SLND",
+      "displayName": "Solend DAO",
+      "programId": "A7kmu2kUcnQwAVn8B4znQmGJeUrsJ1WEhYVMtmiBLkEr",
+      "realmId": "7sf3tcWm58vhtkJMwuw2P3T6UBX7UE5VKxPMnXJUZ1Hn",
+      "ogImage": "https://solend-image-assets.s3.us-east-2.amazonaws.com/1280-circle.png",
+      "website": "https://solend.fi/",
+      "twitter": "@solendprotocol",
+      "sortRank": 2
+    },
+    {
+    "symbol": "FSGOV",
+    "displayName": "Flipside Governance",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "81dgxBYogwBPS17aUCY1ScFqSKrehECdFxA8Ywa9CiVb",
+    "website": "https://flipsidecrypto.xyz/",
+    "twitter": "@flipsidecrypto",
+    "ogImage": "/realms/FSLOGO/FLIPSIDE-LOGO-WHITE.png"
+    },
+    {
+    "symbol": "GrapeCCSubDAO",
+    "displayName": "Grape CC SubDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "A9zS9kTuobH3nSyzvhtVqhRA61vXs2wnxrQgMScUBzur",
+    "website": "https://services.grapes.network/",
+    "twitter": "@grapeprotocol",
+    "ogImage": "/realms/GrapeCCSubDAO/GrapeCCSubDAO.png"
+   },
+   {
+    "symbol": "AthensDAO",
+    "displayName": "AthensDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "CErE41LChpKNpRKpcRKkbmYbEs8PiVcoKQpHUqryy7gm",
+    "bannerImage": "/realms/AthensDAO/ATHDAO_Logo.png",
+    "website": "https://athensdao.net/",
+    "twitter": "@GrapeAthensDAO",
+    "ogImage": "/realms/AthensDAO/AthensDAO_Logo.jpg"
+  },
+  {
+    "symbol": "BOOT",
+    "displayName": "Bootstrap DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "9Fr59GhDJ3HZoTovm83JGEBgi8QjzKGyvqVchcp2u1na",
+    "website": "https://www.bootstrapdao.xyz/",
+    "twitter": "@BootstrapDao",
+    "ogImage": "/realms/BootstrapDAO/BootRealms.png"
+  }, 
+  {
+    "symbol": "laptopDAO",
+    "displayName": "laptopDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "6JzsaQYYi4vGTZogASscZsBALWbSbJU9tMDRtq6nbeff",
+    "website": "https://laptop-dao.vercel.app/",
+    "twitter": "@laptopDAO",
+    "ogImage": "/realms/laptopDAO/logo.png"
+  },
+  {
+    "symbol": "HOADAO",
+    "displayName": "HOA DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "CsmD7MZ5aKA26gyvtXMzFNL5krnvHfd6SPUpXj8EgTky",
+    "website": "https://www.hoa.house/",
+    "twitter": "@ParclHOA",
+    "ogImage": "/realms/HOADAO/img/hoa.jpg"
   }
-]
+ ]

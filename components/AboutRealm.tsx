@@ -10,10 +10,12 @@ const AboutRealm = () => {
         <p className="text-xs text-fgd-3">Name</p>
         <p className="text-fgd-1">{realmDisplayName || symbol}</p>
       </div>
-      <div>
-        <p className="text-xs text-fgd-3">Token</p>
-        <p className="text-fgd-1">{symbol}</p>
-      </div>
+      {realmInfo?.isCertified ? (
+        <div>
+          <p className="text-xs text-fgd-3">Token</p>
+          <p className="text-fgd-1">{symbol}</p>
+        </div>
+      ) : null}
       {realmInfo?.website ? (
         <div>
           <p className="text-xs text-fgd-3">Website</p>

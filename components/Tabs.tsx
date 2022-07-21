@@ -19,13 +19,13 @@ const Tabs: FunctionComponent<TabsProps> = ({ activeTab, onChange, tabs }) => {
           width: `${100 / tabs.length}%`,
         }}
       />
-      <nav className="-mb-px flex" aria-label="Tabs">
+      <nav className="flex -mb-px" aria-label="Tabs">
         {tabs.map((tabName) => {
           return (
             <a
               key={tabName}
               onClick={() => onChange(tabName)}
-              className={`cursor-pointer default-transition flex font-bold justify-center pb-3 relative text-sm whitespace-nowrap hover:opacity-100
+              className={`cursor-pointer default-transition flex  justify-center pb-3 relative text-sm whitespace-nowrap hover:opacity-100
                     ${
                       activeTab === tabName
                         ? `text-primary-light`

@@ -24,6 +24,7 @@ function NFTSelector(
     nftHeight = '150px',
     selectable = true,
     predefinedNfts,
+    selectedNft,
   }: {
     ownersPk: PublicKey[]
     onNftSelect: (nfts: NFTWithMint[]) => void
@@ -31,21 +32,20 @@ function NFTSelector(
     nftHeight?: string
     selectable?: boolean
     predefinedNfts?: NFTWithMint[]
+    selectedNft?: NFTWithMint | null
   },
   ref: React.Ref<NftSelectorFunctions>
 ) {
   const isPredefinedMode = typeof predefinedNfts !== 'undefined'
   const [nfts, setNfts] = useState<NFTWithMint[]>([])
-  const [selectedNfts, setSelectedNfts] = useState<NFTWithMint[]>([])
+  const [selected, setSelected] = useState<NFTWithMint | null>(null)
   const connection = useWalletStore((s) => s.connection)
   const [isLoading, setIsLoading] = useState(false)
   const handleSelectNft = (nft: NFTWithMint) => {
-    const isSelected = selectedNfts.find((x) => x.mint === nft.mint)
-    if (isSelected) {
-      setSelectedNfts([...selectedNfts.filter((x) => x.mint !== nft.mint)])
+    if (selected && nft.mint == selected.mint) {
+      setSelected(null)
     } else {
-      //For now only one nft at the time
-      setSelectedNfts([nft])
+      setSelected(nft)
     }
   }
   const handleGetNfts = async () => {
@@ -56,8 +56,6 @@ function NFTSelector(
     const nfts = response.flatMap((x) => x)
     if (nfts.length === 1) {
       handleSelectNft(nfts[0])
-    } else {
-      setSelectedNfts([])
     }
     setNfts(nfts)
     setIsLoading(false)
@@ -67,15 +65,20 @@ function NFTSelector(
   }))
 
   useEffect(() => {
+    if (selectedNft) {
+      setSelected(selectedNft)
+    }
+  }, [])
+  useEffect(() => {
     if (ownersPk.length && !isPredefinedMode) {
       handleGetNfts()
     }
-  }, [ownersPk.length])
+  }, [JSON.stringify(ownersPk.map((x) => x.toBase58()))])
   useEffect(() => {
-    if (!isPredefinedMode) {
-      onNftSelect(selectedNfts)
+    if (!isPredefinedMode && selected) {
+      onNftSelect([selected])
     }
-  }, [selectedNfts])
+  }, [selected])
   useEffect(() => {
     if (predefinedNfts && isPredefinedMode) {
       setNfts(predefinedNfts)
@@ -102,9 +105,7 @@ function NFTSelector(
                     height: nftHeight,
                   }}
                 >
-                  {selectedNfts.find(
-                    (selectedNfts) => selectedNfts.mint === x.mint
-                  ) && (
+                  {selected && x.mint === selected.mint && (
                     <CheckCircleIcon className="w-10 h-10 absolute text-green z-10"></CheckCircleIcon>
                   )}
                   <ImgWithLoader style={{ width: '150px' }} src={x.val.image} />

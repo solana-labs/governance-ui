@@ -22,6 +22,10 @@ import { STREAMFLOW_INSTRUCTIONS } from './programs/streamflow'
 import { governance as foresightGov } from '@foresight-tmp/foresight-sdk'
 import { ConnectionContext } from '@utils/connection'
 import { NFT_VOTER_INSTRUCTIONS } from './programs/nftVotingClient'
+import { PROGRAM_IDS } from '@castlefinance/vault-sdk'
+import { FORESIGHT_INSTRUCTIONS } from './programs/foresight'
+import { SAGA_PHONE } from './programs/SagaPhone'
+import { LIDO_INSTRUCTIONS } from './programs/lido'
 /**
  * Default governance program id instance
  */
@@ -56,6 +60,7 @@ export const ACCOUNT_NAMES = {
   DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE: 'Mango DAO Governance Realm',
   '7Sn4TN4ZkMghVBAhZ88UkyzXoYkMScaE6qtk9eWV3rJz':
     'Mango DAO Governance Program',
+  '8tKwcKM4obpoPmTZNZKDt5cCkAatrwHBNteXNrZRvjWj': 'Mango Liquidity Payout Pool',
   '59BEyxwrFpt3x4sZ7TcXC3bHx3seGfqGkATcDx6siLWy':
     'Mango v3 Insurance Fund Vault',
   '9qFV99WD5TKnpYw8w3xz3mgMBR5anoSZo2BynrGmNZqY': 'Mango v3 Revenue Vault',
@@ -64,8 +69,10 @@ export const ACCOUNT_NAMES = {
     'Mango v3 BTC-PERP Incentive Vault',
   '7Gm5zF6FNJpyhqdwKcEdMQw3r5YzitYUGVDKYMPT1cMy': 'Mango V3 Admin Key',
   MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac: 'MNGO Token Mint',
-  H7uqouPsJkeEiLpCEoC1qYVVquDrZan6ZfdPK2gS44zm: 'FORE Token Mint',
+  H7uqouPsJkeEiLpCEoC1qYVVquDrZan6ZfdPK2gS44zm: 'FORE Devnet Token Mint',
+  '4ahVJVavHM8DZCtjX6YuKSTFx6KJwRPmVCJtjdQYdUU7': 'FORE Mainnet Token Mint',
   [foresightGov.DEVNET_TREASURY.toBase58()]: 'Foresight Devnet Governance',
+  [foresightGov.MAINNET_TREASURY.toBase58()]: 'Foresight Mainnet Governance',
   EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: 'USDC Token Mint',
 
   MyHd6a7HWKTMeJMHBkrbMq4hZwZxwn9x7dxXcopQ4Wd: 'OMH Token',
@@ -183,6 +190,7 @@ const HIDDEN_MNGO_TREASURES = [
   'FTiWWq3cgETfPkYqP36xFUhT7KMoFYyCiPKeYQU1e4U8',
   'FrkLPsCadx4tE4qDobbu2GTD5ffjWBpormHbLLy35PUS',
   'CaoFkVyPJugKMdzDT1NGnsQJ8dWe4kZFaETCbtWz1QBr',
+  'PuXf9LNrmtVDhBTxteNTWS8D2SpzbhYvidkSatjRArt',
 ]
 
 //owner and desired accounts we want to show
@@ -191,6 +199,10 @@ export const MNGO_AUXILIARY_TOKEN_ACCOUNTS = [
     owner: '9BVcYqEQxyccuwznvxXqDkSJFavvTyheiTYk231T1A8S',
     accounts: ['59BEyxwrFpt3x4sZ7TcXC3bHx3seGfqGkATcDx6siLWy'],
   },
+  {
+    owner: 'GHsErpcUbwiw1eci65HCDQzySKwQCxYRi5MrGeGpq5dn',
+    accounts: ['8tKwcKM4obpoPmTZNZKDt5cCkAatrwHBNteXNrZRvjWj'],
+  },
 ]
 
 export const AUXILIARY_TOKEN_ACCOUNTS = {
@@ -198,6 +210,12 @@ export const AUXILIARY_TOKEN_ACCOUNTS = {
 }
 
 export const HIDDEN_TREASURES = [...HIDDEN_MNGO_TREASURES]
+
+export const ALL_CASTLE_PROGRAMS = [
+  PROGRAM_IDS['devnet-parity'],
+  PROGRAM_IDS['devnet-staging'],
+  PROGRAM_IDS['mainnet'],
+]
 
 export interface AccountDescriptor {
   name: string
@@ -227,12 +245,15 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...MANGO_INSTRUCTIONS,
   ...RAYDIUM_INSTRUCTIONS,
   ...MARINADE_INSTRUCTIONS,
+  ...LIDO_INSTRUCTIONS,
   ...SOLEND_PROGRAM_INSTRUCTIONS,
+  ...FORESIGHT_INSTRUCTIONS,
   ...ATA_PROGRAM_INSTRUCTIONS,
   ...SYSTEM_INSTRUCTIONS,
   ...VOTE_STAKE_REGISTRY_INSTRUCTIONS,
   ...NFT_VOTER_INSTRUCTIONS,
   ...STREAMFLOW_INSTRUCTIONS,
+  ...SAGA_PHONE,
 }
 
 export async function getInstructionDescriptor(
@@ -249,7 +270,6 @@ export async function getInstructionDescriptor(
 
   // Make it work for program with one instruction like ATA program
   // and for the one with multiple instructions
-  console.log(descriptors)
   const descriptor = !instruction.data.length
     ? descriptors
     : descriptors && descriptors[instruction.data[0]]

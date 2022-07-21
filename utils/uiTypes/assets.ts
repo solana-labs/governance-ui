@@ -28,6 +28,7 @@ export enum AccountType {
   MINT,
   PROGRAM,
   NFT,
+  GENERIC,
   AuxiliaryToken,
 }
 
@@ -154,5 +155,18 @@ export class AccountTypeSol implements AssetAccount {
       solAccount: solAccount,
     }
     this.isSol = true
+  }
+}
+
+export class AccountTypeGeneric implements AssetAccount {
+  governance: ProgramAccount<Governance>
+  type: AccountType
+  extensions: AccountExtension
+  pubkey: PublicKey
+  constructor(governance: ProgramAccount<Governance>) {
+    this.governance = governance
+    this.pubkey = governance.account.governedAccount
+    this.type = AccountType.GENERIC
+    this.extensions = {}
   }
 }

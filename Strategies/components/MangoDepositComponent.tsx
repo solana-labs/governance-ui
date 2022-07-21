@@ -11,7 +11,6 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import { BN } from '@project-serum/anchor'
 import {
   getNativeTreasuryAddress,
   RpcContext,
@@ -43,10 +42,12 @@ import { validateInstruction } from '@utils/instructionTools'
 import * as yup from 'yup'
 import { getValidatedPublickKey } from '@utils/validations'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import WithdrawModal from './WithdrawModal'
 
 const DEPOSIT = 'Deposit'
 const CREATE_REF_LINK = 'Create Referral Link'
 const DELEGATE_ACCOUNT = 'Delegate'
+const WITHDRAW = 'Withdraw'
 
 const MangoDepositComponent = ({
   handledMint,
@@ -88,9 +89,7 @@ const MangoDepositComponent = ({
   const wallet = useWalletStore((s) => s.current)
   const tokenInfo = tokenService.getTokenInfo(handledMint)
   const { canUseTransferInstruction } = useGovernanceAssets()
-  const treasuryAmount = governedTokenAccount.extensions?.token
-    ? governedTokenAccount.extensions.token.account.amount
-    : new BN(0)
+  const treasuryAmount = governedTokenAccount.extensions.amount!
   const mintInfo = governedTokenAccount.extensions?.mint?.account
   const [form, setForm] = useState({
     title: '',
@@ -124,6 +123,7 @@ const MangoDepositComponent = ({
     { val: DEPOSIT, isVisible: true },
     { val: CREATE_REF_LINK, isVisible: selectedMangoAccount !== null },
     { val: DELEGATE_ACCOUNT, isVisible: selectedMangoAccount !== null },
+    { val: WITHDRAW, isVisible: selectedMangoAccount !== null },
   ]
     .filter((x) => x.isVisible)
     .map((x) => x.val)
@@ -198,11 +198,13 @@ const MangoDepositComponent = ({
         governedTokenAccount.extensions!.mint!.account.decimals
       )
       const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-        governedTokenAccount!.governance!.account.config
+        governedTokenAccount!.governance!.account.config,
+        voteByCouncil
       )
       const defaultProposalMint = voteByCouncil
         ? realm?.account.config.councilMint
-        : !mint?.supply.isZero()
+        : !mint?.supply.isZero() ||
+          realm?.account.config.useMaxCommunityVoterWeightAddin
         ? realm!.account.communityMint
         : !councilMint?.supply.isZero()
         ? realm!.account.config.councilMint
@@ -315,6 +317,13 @@ const MangoDepositComponent = ({
           mint={new PublicKey(handledMint)}
         ></CreateRefForm>
       )}
+      {proposalType === WITHDRAW && (
+        <WithdrawModal
+          market={market}
+          governance={governedTokenAccount!.governance!}
+          selectedMangoAccount={selectedMangoAccount!}
+        ></WithdrawModal>
+      )}
 
       {proposalType === DEPOSIT && (
         <div>
@@ -344,7 +353,6 @@ const MangoDepositComponent = ({
               handleSetForm({ propertyName: 'amount', value: e.target.value })
             }
             step={mintMinAmount}
-            suffix="MNGO"
             onBlur={validateAmountOnBlur}
           />
           {selectedMangoAccount === null && (
@@ -434,7 +442,7 @@ const MangoDepositComponent = ({
                   : ''
               }
             >
-              {!isDepositing ? 'Propose deposit' : <Loading></Loading>}
+              {!isDepositing ? 'Propose' : <Loading></Loading>}
             </Tooltip>
           </Button>
         </div>

@@ -32,13 +32,19 @@ import { notify } from '@utils/notifications'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import { ExclamationIcon } from '@heroicons/react/outline'
 import useQueryContext from '@hooks/useQueryContext'
-import { useEffect, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import Link from 'next/link'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { vsrPluginsPks } from '@hooks/useVotingPlugins'
+import {
+  LOCALNET_REALM_ID as PYTH_LOCALNET_REALM_ID,
+  PythBalance,
+} from 'pyth-staking-api'
+import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 
-const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
+type Props = { proposal?: Option<Proposal> }
+const TokenBalanceCard: FC<Props> = ({ proposal, children }) => {
   const { councilMint, mint, realm, symbol } = useRealm()
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
@@ -84,9 +90,9 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   const hasLoaded = mint || councilMint
 
   return (
-    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
+    <div className="p-4 rounded-lg bg-bkg-2 md:p-6">
       <div className="flex items-center justify-between">
-        <h3 className="mb-0">Your Account</h3>
+        <h3 className="mb-0">Your account</h3>
         <Link
           href={fmtUrlWithCluster(
             `/dao/${symbol}/account/${tokenOwnerRecordPk}`
@@ -100,7 +106,7 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
             }`}
           >
             View
-            <ChevronRightIcon className="flex-shrink-0 h-6 w-6" />
+            <ChevronRightIcon className="flex-shrink-0 w-6 h-6" />
           </a>
         </Link>
       </div>
@@ -120,18 +126,20 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
               councilVote={true}
             />
           )}
+          <DelegateTokenBalanceCard />
         </div>
       ) : (
         <>
-          <div className="animate-pulse bg-bkg-3 h-12 mb-4 rounded-lg" />
-          <div className="animate-pulse bg-bkg-3 h-10 rounded-lg" />
+          <div className="h-12 mb-4 rounded-lg animate-pulse bg-bkg-3" />
+          <div className="h-10 rounded-lg animate-pulse bg-bkg-3" />
         </>
       )}
+      {children}
     </div>
   )
 }
 
-const TokenDeposit = ({
+export const TokenDeposit = ({
   mint,
   tokenType,
   councilVote,
@@ -157,6 +165,7 @@ const TokenDeposit = ({
     realmTokenAccount,
     ownTokenRecord,
     ownCouncilTokenRecord,
+    ownVoterWeight,
     councilTokenAccount,
     proposals,
     governances,
@@ -365,13 +374,18 @@ const TokenDeposit = ({
     ? 'You have to many outstanding proposals to withdraw.'
     : ''
 
-  const availableTokens =
-    depositTokenRecord && mint
-      ? fmtMintAmount(
-          mint,
-          depositTokenRecord.account.governingTokenDepositAmount
-        )
-      : '0'
+  //Todo: move to own components with refactor to dao folder structure
+  const isPyth =
+    realmInfo?.realmId.toBase58() === PYTH_LOCALNET_REALM_ID.toBase58()
+
+  const availableTokens = isPyth
+    ? new PythBalance(ownVoterWeight.votingPower!).toString()
+    : depositTokenRecord && mint
+    ? fmtMintAmount(
+        mint,
+        depositTokenRecord.account.governingTokenDepositAmount
+      )
+    : '0'
 
   const canShowAvailableTokensMessage =
     !hasTokensDeposited && hasTokensInWallet && connected
@@ -386,50 +400,61 @@ const TokenDeposit = ({
 
   return (
     <>
-      <div className="flex space-x-4 items-center mt-4">
-        <div className="bg-bkg-1 px-4 py-2 rounded-md w-full">
-          <p className="text-fgd-3 text-xs">{depositTokenName} Votes</p>
-          <p className="font-bold mb-0 text-fgd-1 text-xl">{availableTokens}</p>
+      <div className="flex items-center mt-4 space-x-4">
+        <div className="w-full px-4 py-2 rounded-md bg-bkg-1 flex flex-row items-center justify-between">
+          <div>
+            <p className="text-xs text-fgd-3">{depositTokenName} Votes</p>
+            <p className="mb-0 text-xl font-bold text-fgd-1 hero-text">
+              {availableTokens}
+            </p>
+          </div>
         </div>
       </div>
 
-      <p
-        className={`mt-2 opacity-70 mb-4 ml-1 text-xs ${
-          canShowAvailableTokensMessage ? 'block' : 'hidden'
-        }`}
-      >
-        You have {tokensToShow} tokens available to {canExecuteAction}.
-      </p>
+      {!isPyth && (
+        <>
+          <p
+            className={`mt-2 opacity-70 mb-4 ml-1 text-xs ${
+              canShowAvailableTokensMessage ? 'block' : 'hidden'
+            }`}
+          >
+            You have {tokensToShow} tokens available to {canExecuteAction}.
+          </p>
 
-      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-6">
-        <Button
-          tooltipMessage={depositTooltipContent}
-          className="sm:w-1/2"
-          disabled={!connected || !hasTokensInWallet}
-          onClick={depositAllTokens}
-        >
-          Deposit
-        </Button>
+          <div className="flex flex-col mt-6 space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
+            <Button
+              tooltipMessage={depositTooltipContent}
+              className="sm:w-1/2"
+              disabled={!connected || !hasTokensInWallet}
+              onClick={depositAllTokens}
+            >
+              Deposit
+            </Button>
 
-        <Button
-          tooltipMessage={withdrawTooltipContent}
-          className="sm:w-1/2"
-          disabled={
-            !connected ||
-            !hasTokensDeposited ||
-            (!councilVote && toManyCommunityOutstandingProposalsForUser) ||
-            toManyCouncilOutstandingProposalsForUse
-          }
-          onClick={withdrawAllTokens}
-        >
-          Withdraw
-        </Button>
-      </div>
+            <Button
+              tooltipMessage={withdrawTooltipContent}
+              className="sm:w-1/2"
+              disabled={
+                !connected ||
+                !hasTokensDeposited ||
+                (!councilVote && toManyCommunityOutstandingProposalsForUser) ||
+                toManyCouncilOutstandingProposalsForUse ||
+                wallet?.publicKey?.toBase58() !==
+                  depositTokenRecord.account.governingTokenOwner.toBase58()
+              }
+              onClick={withdrawAllTokens}
+            >
+              Withdraw
+            </Button>
+          </div>
+        </>
+      )}
       {config?.account.communityVoterWeightAddin &&
         vsrPluginsPks.includes(
           config?.account.communityVoterWeightAddin.toBase58()
-        ) && (
-          <small className="text-xs mt-3 flex items-center">
+        ) &&
+        tokenType === GoverningTokenType.Community && (
+          <small className="flex items-center mt-3 text-xs">
             <ExclamationIcon className="w-5 h-5 mr-2"></ExclamationIcon>
             Please withdraw your tokens and deposit again to get governance
             power

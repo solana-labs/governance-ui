@@ -9,7 +9,7 @@ const ENDPOINTS: EndpointInfo[] = [
   },
   {
     name: 'devnet',
-    url: process.env.DEVNET_RPC || 'https://api.devnet.solana.com',
+    url: process.env.DEVNET_RPC || 'https://api.dao.devnet.solana.com/',
   },
   {
     name: 'localnet',
@@ -32,4 +32,18 @@ export function getConnectionContext(cluster: string): ConnectionContext {
     current: new Connection(ENDPOINT!.url, 'recent'),
     endpoint: ENDPOINT!.url,
   }
+}
+
+/**
+ * Given ConnectionContext, find the network.
+ * @param connectionContext
+ * @returns EndpointType
+ */
+export function getNetworkFromEndpoint(endpoint: string) {
+  const network = ENDPOINTS.find((e) => e.url === endpoint)
+  if (!network) {
+    console.log(endpoint, ENDPOINTS)
+    throw new Error('Network not found')
+  }
+  return network?.name
 }
