@@ -222,6 +222,16 @@ export default function useGovernanceAssets() {
       isVisible: canUseTransferInstruction,
     },
     {
+      id: Instructions.CreateTokenMetadata,
+      name: 'Create Token Metadata',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
+      id: Instructions.UpdateTokenMetadata,
+      name: 'Update Token Metadata',
+      isVisible: canUseAuthorityInstruction,
+     },
+     {
       id: Instructions.SagaPreOrder,
       name: 'Pre-order Saga Phone',
       isVisible: canUseTokenTransferInstruction,

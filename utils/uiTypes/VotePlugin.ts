@@ -1,5 +1,5 @@
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
-import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
+import { deprecated } from '@metaplex-foundation/mpl-token-metadata'
 import {
   NftVoterClient,
   GatewayClient,
@@ -54,7 +54,7 @@ export interface VotingClientProps {
 }
 
 export interface NFTWithMeta extends NFTWithMint {
-  metadata: Metadata
+  metadata: deprecated.Metadata
 }
 
 enum VotingClientType {
@@ -317,7 +317,7 @@ export class VotingClient {
           [
             Buffer.from('nft-vote-record'),
             proposal.pubkey.toBuffer(),
-            new PublicKey(nft.metadata.data.mint).toBuffer(),
+            new PublicKey(nft.metadata.data!.mint).toBuffer(),
           ],
           clientProgramId
         )
