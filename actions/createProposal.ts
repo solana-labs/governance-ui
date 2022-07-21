@@ -14,6 +14,7 @@ import {
   TokenOwnerRecord,
   VoteType,
   withCreateProposal,
+  getSignatoryRecordAddress,
 } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { withInsertTransaction } from '@solana/spl-governance'
@@ -29,6 +30,7 @@ import { chunks } from '@utils/helpers'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
 import { NftVoterClient } from '@solana/governance-program-library'
+import { withAddSignatory } from '@solana/spl-governance'
 
 export interface InstructionDataWithHoldUpTime {
   data: InstructionData | null
@@ -132,6 +134,24 @@ export const createProposal = async (
     plugin?.voterWeightPk
   )
 
+  await withAddSignatory(
+    instructions,
+    programId,
+    programVersion,
+    proposalAddress,
+    tokenOwnerRecord.pubkey,
+    governanceAuthority,
+    signatory,
+    payer
+  )
+
+  // TODO: Return signatoryRecordAddress from the SDK call
+  const signatoryRecordAddress = await getSignatoryRecordAddress(
+    programId,
+    proposalAddress,
+    signatory
+  )
+
   const insertInstructions: TransactionInstruction[] = []
   const splitToChunkByDefault = instructionsData.filter(
     (x) => x.chunkSplitByDefault
@@ -180,8 +200,8 @@ export const createProposal = async (
       governance,
       proposalAddress,
       signatory,
-      undefined,
-      tokenOwnerRecord.pubkey
+      signatoryRecordAddress,
+      undefined
     )
   }
 
