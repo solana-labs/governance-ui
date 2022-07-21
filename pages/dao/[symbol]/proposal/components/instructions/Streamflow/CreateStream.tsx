@@ -126,10 +126,9 @@ const CreateStream = ({
     releaseFrequency: 60,
     releaseAmount: 0,
     amountAtCliff: 0,
+    cancelable: false,
   })
   const [formErrors, setFormErrors] = useState({})
-  const [cancelable, setCancelable] = useState<boolean>(false)
-  console.log(cancelable)
   const { handleSetInstructions } = useContext(NewProposalContext)
 
   const handleSetForm = ({ propertyName, value }) => {
@@ -158,6 +157,13 @@ const CreateStream = ({
     handleSetForm({
       value: value,
       propertyName: 'depositedAmount',
+    })
+  }
+
+  const setCancelable = (value) => {
+    handleSetForm({
+      value,
+      propertyName: 'cancelable',
     })
   }
 
@@ -198,7 +204,7 @@ const CreateStream = ({
       !connection ||
       !isValid ||
       !programId ||
-      !form.governedAccount?.governance?.account ||
+      !form.tokenAccount?.governance?.account ||
       !form.tokenAccount ||
       !form.tokenAccount?.extensions.token ||
       !wallet?.publicKey
@@ -206,7 +212,7 @@ const CreateStream = ({
       return {
         serializedInstruction: '',
         isValid: false,
-        governance: form.governedAccount?.governance,
+        governance: form.tokenAccount?.governance,
       }
     }
     const token = getMintMetadata(
@@ -214,8 +220,8 @@ const CreateStream = ({
     )
     const decimals = token?.decimals ? token.decimals : 0
     const tokenMint = form.tokenAccount.extensions.token?.account.mint
-    const partnerPublicKey = STREAMFLOW_TREASURY_PUBLIC_KEY
-
+    const senderAccount = form.tokenAccount.extensions.token.account.owner
+    const partnerPublicKey = senderAccount
     const partnerTokens = await ata(tokenMint, partnerPublicKey)
     const start = Math.floor(Date.parse(form.start) / 1000)
     const strmMetadata = Keypair.generate()
@@ -266,7 +272,6 @@ const CreateStream = ({
     )
 
     const tokenAccount = form.tokenAccount.pubkey
-
     const period =
       form.releaseFrequency * releaseFrequencyUnits[releaseUnitIdx].value
     const createStreamData = {
@@ -278,12 +283,12 @@ const CreateStream = ({
       amountPerPeriod: new u64(form.releaseAmount * 10 ** decimals),
       name: 'SPL Realms proposal',
       canTopup: false,
-      cancelableBySender: cancelable,
+      cancelableBySender: form.cancelable,
       cancelableByRecipient: false,
       transferableBySender: true,
       transferableByRecipient: false,
-      automaticWithdrawal: false,
-      withdrawFrequency: new u64(form.releaseFrequency),
+      automaticWithdrawal: true,
+      withdrawFrequency: new u64(period),
       recipient: recipientPublicKey,
       recipientTokens: recipientTokens,
       streamflowTreasury: STREAMFLOW_TREASURY_PUBLIC_KEY,
@@ -292,7 +297,7 @@ const CreateStream = ({
       partnerTokens: partnerTokens,
     }
     const createStreamAccounts = {
-      sender: form.governedAccount.pubkey,
+      sender: senderAccount,
       senderTokens: tokenAccount,
       metadata: strmMetadata.publicKey,
       escrowTokens,
@@ -313,7 +318,7 @@ const CreateStream = ({
     return {
       serializedInstruction: serializeInstructionToBase64(tx),
       isValid: true,
-      governance: form.governedAccount.governance,
+      governance: form.tokenAccount.governance,
       prerequisiteInstructions: prerequisiteInstructions,
       shouldSplitIntoSeparateTxs: true,
       signers,
@@ -323,7 +328,7 @@ const CreateStream = ({
   useEffect(() => {
     handleSetInstructions(
       {
-        governedAccount: form.governedAccount?.governance,
+        governedAccount: form.tokenAccount?.governance,
         getInstruction,
       },
       index
@@ -331,25 +336,35 @@ const CreateStream = ({
   }, [form])
 
   const schema = yup.object().shape({
-    governedAccount: yup
-      .object()
+    tokenAccount: yup.object().nullable().required('Token account is required'),
+    recipient: yup.string().required('Recipient address is required'),
+    start: yup.date().nullable().required('Start time is required'),
+    depositedAmount: yup
+      .number()
+      .integer()
       .nullable()
-      .required('Governed account is required'),
+      .min(0, 'Amount must be positive number')
+      .required('Amount is required'),
+    amountAtCliff: yup
+      .number()
+      .integer()
+      .moreThan(0, 'Amount released at start must be positive number')
+      .lessThan(
+        yup.ref('depositedAmount'),
+        'Amount released at start must be less than total amount'
+      ),
+    releaseAmount: yup
+      .number()
+      .integer()
+      .moreThan(0, 'Release amount must be positive number')
+      .lessThan(
+        yup.ref('depositedAmount'),
+        'Release amount must be less than total amount'
+      ),
   })
 
   return (
     <>
-      <GovernedAccountSelect
-        label="Payer governance"
-        governedAccounts={assetAccounts}
-        onChange={(value) => {
-          handleSetForm({ value, propertyName: 'governedAccount' })
-        }}
-        value={form.governedAccount}
-        error={formErrors['governedAccount']}
-        shouldBeGoverned={shouldBeGoverned}
-        governance={governance}
-      />
       <GovernedAccountSelect
         label="Token account"
         governedAccounts={assetAccounts}
@@ -364,12 +379,14 @@ const CreateStream = ({
       <Input
         label="Recipient address"
         value={form.recipient}
+        error={formErrors['recipient']}
         type="string"
         onChange={setRecipient}
       />
       <Input
         label="Start"
         value={form.start}
+        error={formErrors['start']}
         type="datetime-local"
         onChange={setStart}
       />
@@ -386,6 +403,7 @@ const CreateStream = ({
           <Input
             label="Amount"
             value={form.depositedAmount}
+            error={formErrors['amount']}
             type="number"
             onChange={setDepositedAmount}
           />
@@ -394,6 +412,7 @@ const CreateStream = ({
           <Input
             label="Released at start"
             value={form.amountAtCliff}
+            error={formErrors['amountAtCliff']}
             type="number"
             onChange={setAmountAtCliff}
           />
@@ -402,6 +421,7 @@ const CreateStream = ({
       <Input
         label="Release amount"
         value={form.releaseAmount}
+        error={formErrors['releaseAmount']}
         type="number"
         onChange={setReleaseAmount}
       />
@@ -418,6 +438,7 @@ const CreateStream = ({
           <Input
             label="Release frequency"
             value={form.releaseFrequency}
+            error={formErrors['releaseFrequency']}
             type="number"
             onChange={setReleaseFrequency}
           />
@@ -449,7 +470,7 @@ const CreateStream = ({
         }}
       ></div>
       <StyledLabel>Is contract cancelable?</StyledLabel>
-      <Switch checked={cancelable} onChange={setCancelable}></Switch>
+      <Switch checked={form.cancelable} onChange={setCancelable}></Switch>
       <div
         style={{
           fontSize: '14px',

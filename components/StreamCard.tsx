@@ -77,7 +77,7 @@ export default function StreamCard({
     async function fetch() {
       const cli = new StreamClient(
         connection.rpcEndpoint,
-        Cluster.Devnet, //add option to client to attach connection
+        Cluster.Devnet,
         undefined,
         accounts[0].pubkey.toBase58()
       )
@@ -85,7 +85,9 @@ export default function StreamCard({
       const stream = await cli.getOne(contract_metadata.toBase58())
       setStream(stream)
     }
-    fetch()
+    if (!stream) {
+      fetch()
+    }
   })
 
   const contract_metadata = accounts[2].pubkey
@@ -156,7 +158,6 @@ export default function StreamCard({
   return (
     <>
       <div>
-        {/* <Button onClick={}>Cancel</Button> */}
         <Button onClick={handleCancel}>Cancel</Button>
       </div>
     </>

@@ -103,8 +103,7 @@ function deserStream(
     new BN(data.slice(48, 56), 'le'),
     decimals
   )
-
-  const cancelable = Boolean(data.slice(56, 57))
+  const cancelable = Boolean(data.slice(56, 57)[0])
   return {
     start,
     amountDeposited,

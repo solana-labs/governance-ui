@@ -92,7 +92,6 @@ export interface ProgramUpgradeForm {
 }
 
 export interface CreateStreamForm {
-  governedAccount?: AssetAccount
   recipient: string
   tokenAccount?: AssetAccount
   start: string
@@ -100,6 +99,7 @@ export interface CreateStreamForm {
   releaseFrequency: number
   releaseAmount: number
   amountAtCliff: number
+  cancelable: boolean
 }
 
 export const programUpgradeFormNameOf = getNameOf<ProgramUpgradeForm>()
