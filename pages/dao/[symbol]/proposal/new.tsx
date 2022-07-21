@@ -92,6 +92,7 @@ import MakeRemoveSpotMarket from './components/instructions/Mango/MakeRemoveSpot
 import MakeRemovePerpMarket from './components/instructions/Mango/MakeRemovePerpMarket'
 import MakeSwapSpotMarket from './components/instructions/Mango/MakeSwapSpotMarket'
 import MakeRemoveOracle from './components/instructions/Mango/MakeRemoveOracle'
+import SagaPreOrder from './components/instructions/Solana/SagaPhone/SagaPreOrder'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -243,7 +244,8 @@ const New = () => {
                   ? getTimestampFromDays(instruction.customHoldUpTime)
                   : selectedGovernance?.account?.config
                       .minInstructionHoldUpTime,
-                prerequisiteInstructions: [],
+                prerequisiteInstructions:
+                  instruction.prerequisiteInstructions || [],
                 chunkSplitByDefault: instruction.chunkSplitByDefault || false,
                 signers: instruction.signers,
                 shouldSplitIntoSeparateTxs:
@@ -345,6 +347,8 @@ const New = () => {
         )
       case Instructions.Mint:
         return <Mint index={idx} governance={governance}></Mint>
+      case Instructions.SagaPreOrder:
+        return <SagaPreOrder index={idx} governance={governance}></SagaPreOrder>
       case Instructions.Base64:
         return <CustomBase64 index={idx} governance={governance}></CustomBase64>
       case Instructions.None:

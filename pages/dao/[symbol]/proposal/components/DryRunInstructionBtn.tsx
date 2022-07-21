@@ -55,7 +55,9 @@ const DryRunInstructionBtn = ({
       const result = await dryRunInstruction(
         connection.current,
         wallet!,
-        getInstructionDataFromBase64(instructionData?.serializedInstruction),
+        instructionData?.serializedInstruction
+          ? getInstructionDataFromBase64(instructionData?.serializedInstruction)
+          : null,
         prerequisiteInstructionsToRun,
         additionalInstructions?.map((x) => getInstructionDataFromBase64(x))
       )

@@ -24,6 +24,7 @@ export interface UiInstruction {
   signers?: Keypair[]
   shouldSplitIntoSeparateTxs?: boolean | undefined
 }
+
 export interface SplTokenTransferForm {
   destinationAccount: string
   amount: number | undefined
@@ -174,6 +175,11 @@ export interface MangoRemoveOracleForm {
   mangoGroup: NameValue | null
   adminPk: string
   oraclePk: NameValue | null
+}
+
+export interface SagaPhoneForm {
+  governedAccount: AssetAccount | null
+  quantity: number
 }
 
 export interface MangoRemovePerpMarketForm {
@@ -432,6 +438,7 @@ export enum Instructions {
   ChangeMakeDonation,
   CreateTokenMetadata,
   UpdateTokenMetadata,
+  SagaPreOrder,
 }
 
 export type createParams = [
