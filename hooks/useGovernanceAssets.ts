@@ -222,6 +222,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseTransferInstruction,
     },
     {
+      id: Instructions.SagaPreOrder,
+      name: 'Pre-order Saga Phone',
+      isVisible: canUseTokenTransferInstruction,
+    },
+    {
       id: Instructions.None,
       name: 'None',
       isVisible:
