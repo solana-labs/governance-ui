@@ -406,7 +406,6 @@ const fetchNftsFromHolaplexIndexer = async (owner: PublicKey) => {
 export const getNfts = async (ownerPk: PublicKey): Promise<NFTWithMeta[]> => {
   try {
     const data = await fetchNftsFromHolaplexIndexer(ownerPk)
-    console.log('here are the nfts', data.nfts)
     return data.nfts
   } catch (error) {
     notify({
