@@ -48,7 +48,7 @@ const WITHDRAWOR_PUBLIC_KEY = new PublicKey(
 )
 
 export const STREAMFLOW_PROGRAM_ID =
-  'DcAwL38mreGvUyykD2iitqcgu9hpFbtzxfaGpLi72kfY'
+  'strmRqUCoQUgGUan5YhzUZa6KqdzwX5L6FpUxfmKg5m'
 
 export const PERIOD = {
   SECOND: 1,
