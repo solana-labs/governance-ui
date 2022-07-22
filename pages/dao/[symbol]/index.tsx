@@ -17,7 +17,6 @@ import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWr
 import dynamic from 'next/dynamic';
 import Loading from '@components/Loading';
 import PaginationComponent from '@components/Pagination';
-import HotWallet from '@components/HotWallet/HotWallet';
 import SearchInput from '@components/SearchInput';
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper'),
@@ -255,8 +254,6 @@ const REALM = () => {
           {realm && (
             <>
               {connected && <TokenBalanceCardWrapper />}
-
-              <HotWallet />
 
               <NFTSCompactWrapper />
 

@@ -4,9 +4,8 @@ const Index = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const { REALM } = process.env;
-    const mainUrl = REALM ? `/dao/${REALM}` : '/realms';
-    router.replace(mainUrl);
+    // Default page
+    router.replace('/dao/UXP');
   }, []);
 
   return null;
