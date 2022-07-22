@@ -25,4 +25,6 @@ export interface NFTWithMint {
   properties: NFTProperties
   collection: NFTCollectionProperties
   mintAddress: string
+  address: string
+  tokenAccountAddress: string
 }
