@@ -18,10 +18,7 @@ import { chunks } from './helpers'
 import { getAccountName, WSOL_MINT } from '@components/instructions/tools'
 import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
 import tokenService from './services/token'
-import { getParsedNftAccountsByOwner } from '@nfteyez/sol-rayz'
-import axios from 'axios'
 import { notify } from './notifications'
-import { NFTWithMint } from './uiTypes/nfts'
 import { BN } from '@project-serum/anchor'
 import { abbreviateAddress } from './formatting'
 import BigNumber from 'bignumber.js'
@@ -371,18 +368,6 @@ export const deserializeMint = (data: Buffer) => {
   return mintInfo as MintInfo
 }
 
-// creators: (5) [{…}, {…}, {…}, {…}, {…}]
-// name: "Terrarium Tank"
-// sellerFeeBasisPoints: 500
-// symbol: "STNK"
-// uri: "https://d1b6hed00dtfsr.cloudfront.net/tank/4Dt9sfqfUckUbR5vgYiPzDoGUxbGqYp4T5iKZySnesSC.json"
-// [[Prototype]]: Object
-// editionNonce: null
-// isMutable: 1
-// key: 4
-// mint: "Ddxp1xG4szBE8snwVDaREtE61tn2M9TJniAyz6VKLVUr"
-// primarySaleHappened: 1
-// updateAuthority: "37M6hd5KQpYuRJfWPGi75Jp7MzFrnuvfRVXc2K2FBaRQ"
 const fetchNftsFromHolaplexIndexer = async (owner: PublicKey) => {
   const result = await fetch('https://graph.holaplex.com/v1', {
     method: 'POST',
@@ -414,15 +399,11 @@ const fetchNftsFromHolaplexIndexer = async (owner: PublicKey) => {
     }),
   })
 
-  let body = await result.json()
-  console.log({ body })
+  const body = await result.json()
   return body.data
 }
 
-export const getNfts = async (
-  connection: Connection,
-  ownerPk: PublicKey
-): Promise<NFTWithMeta[]> => {
+export const getNfts = async (ownerPk: PublicKey): Promise<NFTWithMeta[]> => {
   try {
     const data = await fetchNftsFromHolaplexIndexer(ownerPk)
     console.log('here are the nfts', data.nfts)

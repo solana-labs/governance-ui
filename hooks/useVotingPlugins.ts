@@ -2,7 +2,6 @@ import { useEffect } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from '@hooks/useRealm'
 import { getNfts } from '@utils/tokens'
-import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import useSwitchboardPluginStore from 'SwitchboardVotePlugin/store/switchboardStore'
@@ -107,7 +106,7 @@ export function useVotingPlugins() {
   const handleGetNfts = async () => {
     setIsLoadingNfts(true)
     try {
-      const nfts = await getNfts(connection.current, wallet!.publicKey!)
+      const nfts = await getNfts(wallet!.publicKey!)
       const votingNfts = nfts.filter((x) => getIsFromCollection(x))
       const nftsWithMeta = votingNfts
       setVotingNfts(nftsWithMeta, currentClient, nftMintRegistrar)
