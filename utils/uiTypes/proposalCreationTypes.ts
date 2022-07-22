@@ -24,6 +24,7 @@ export interface UiInstruction {
   signers?: Keypair[]
   shouldSplitIntoSeparateTxs?: boolean | undefined
 }
+
 export interface SplTokenTransferForm {
   destinationAccount: string
   amount: number | undefined
@@ -147,7 +148,7 @@ export interface MangoMakeAddOracleForm {
   oracleAccount: string | undefined
 }
 
-type NameValue = {
+export type NameValue = {
   name: string
   value: string
 }
@@ -167,6 +168,18 @@ export interface MangoSwapSpotMarketForm {
   market: NameValue | null
   adminPk: string
   newSpotMarketPk: string
+}
+
+export interface MangoRemoveOracleForm {
+  governedAccount: AssetAccount | null
+  mangoGroup: NameValue | null
+  adminPk: string
+  oraclePk: NameValue | null
+}
+
+export interface SagaPhoneForm {
+  governedAccount: AssetAccount | null
+  quantity: number
 }
 
 export interface MangoRemovePerpMarketForm {
@@ -353,6 +366,22 @@ export interface RefreshReserveForm {
   mintName?: SupportedMintName
 }
 
+export interface CreateTokenMetadataForm {
+  name: string
+  symbol: string
+  uri: string
+  mintAccount: AssetAccount | undefined
+  programId: string | undefined
+}
+
+export interface UpdateTokenMetadataForm {
+  name: string
+  symbol: string
+  uri: string
+  mintAccount: AssetAccount | undefined
+  programId: string | undefined
+}
+
 export enum Instructions {
   Transfer,
   ProgramUpgrade,
@@ -371,6 +400,7 @@ export enum Instructions {
   MangoRemoveSpotMarket,
   MangoRemovePerpMarket,
   MangoSwapSpotMarket,
+  MangoRemoveOracle,
   Grant,
   Clawback,
   CreateAssociatedTokenAccount,
@@ -406,6 +436,9 @@ export enum Instructions {
   CreateGatewayPluginRegistrar,
   ConfigureGatewayPlugin,
   ChangeMakeDonation,
+  CreateTokenMetadata,
+  UpdateTokenMetadata,
+  SagaPreOrder,
 }
 
 export type createParams = [

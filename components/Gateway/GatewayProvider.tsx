@@ -1,6 +1,4 @@
 import { FC } from 'react'
-import { Transaction } from '@solana/web3.js'
-import { sendTransaction } from '@utils/send'
 import { GatewayProvider as InternalGatewayProvider } from '@civic/solana-gateway-react'
 import useWalletStore from '../../stores/useWalletStore'
 import useVotePluginsClientStore from '../../stores/useVotePluginsClientStore'
@@ -23,18 +21,6 @@ export const GatewayProvider: FC = ({ children }) => {
   )
   const connection = useWalletStore((s) => s.connection)
 
-  // This signs and sends a transaction returned from the gatekeeper (e.g. the pass issuance transaction)
-  const handleTransaction = async (transaction: Transaction) => {
-    await sendTransaction({
-      transaction,
-      wallet: wallet!,
-      connection: connection.current,
-      signers: [],
-      sendingMessage: 'Creating pass',
-      successMessage: 'Pass created',
-    })
-  }
-
   if (!wallet || !wallet.publicKey || !client || !gatekeeperNetwork)
     return <>{children}</>
 
@@ -47,7 +33,6 @@ export const GatewayProvider: FC = ({ children }) => {
         publicKey: wallet.publicKey,
         signTransaction: wallet.signTransaction.bind(wallet),
       }}
-      handleTransaction={handleTransaction}
     >
       {children}
     </InternalGatewayProvider>

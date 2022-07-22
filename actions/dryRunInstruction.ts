@@ -11,7 +11,7 @@ import { WalletAdapter } from '@solana/wallet-adapter-base'
 export async function dryRunInstruction(
   connection: Connection,
   wallet: WalletAdapter,
-  instructionData: InstructionData,
+  instructionData: InstructionData | null,
   prerequisiteInstructionsToRun?: TransactionInstruction[] | undefined,
   additionalInstructions?: InstructionData[]
 ) {
@@ -29,11 +29,13 @@ export async function dryRunInstruction(
     }
   }
 
-  transaction.add({
-    keys: instructionData.accounts,
-    programId: instructionData.programId,
-    data: Buffer.from(instructionData.data),
-  })
+  if (instructionData) {
+    transaction.add({
+      keys: instructionData.accounts,
+      programId: instructionData.programId,
+      data: Buffer.from(instructionData.data),
+    })
+  }
 
   const result = await simulateTransaction(connection, transaction, 'single')
 

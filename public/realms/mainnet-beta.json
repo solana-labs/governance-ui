@@ -882,5 +882,14 @@
     "website": "https://laptop-dao.vercel.app/",
     "twitter": "@laptopDAO",
     "ogImage": "/realms/laptopDAO/logo.png"
+  },
+  {
+    "symbol": "HOADAO",
+    "displayName": "HOA DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "CsmD7MZ5aKA26gyvtXMzFNL5krnvHfd6SPUpXj8EgTky",
+    "website": "https://www.hoa.house/",
+    "twitter": "@ParclHOA",
+    "ogImage": "/realms/HOADAO/img/hoa.jpg"
   }
  ]

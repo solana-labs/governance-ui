@@ -18,7 +18,7 @@ import InstructionForm, {
   InstructionInput,
   InstructionInputType,
 } from '../FormCreator'
-import { getNftMaxVoterWeightRecord } from 'NftVotePlugin/sdk/accounts'
+import { getMaxVoterWeightRecord } from '@utils/plugin/accounts'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 
@@ -49,7 +49,7 @@ const CreateNftPluginMaxVoterWeightRecord = ({
       form!.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const { maxVoterWeightRecord } = await getNftMaxVoterWeightRecord(
+      const { maxVoterWeightRecord } = await getMaxVoterWeightRecord(
         realm!.pubkey!,
         realm!.account.communityMint,
         nftClient!.program.programId

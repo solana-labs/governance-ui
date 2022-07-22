@@ -1,8 +1,10 @@
 import Input from '@components/inputs/Input'
 import Select from '@components/inputs/Select'
 import AmountSlider from '@components/Slider'
+import Switch from '@components/Switch'
 import useRealm from '@hooks/useRealm'
 import { VoteTipping } from '@solana/spl-governance'
+import { MAX_TOKENS_TO_DISABLE } from '@tools/constants'
 import {
   fmtPercentage,
   getMintMinAmountAsDecimal,
@@ -27,6 +29,9 @@ const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
   const [minTokensPercentage, setMinTokensPercentage] = useState<
     number | undefined
   >()
+  const isMaxMinCommunityNumber =
+    form.minCommunityTokensToCreateProposal === MAX_TOKENS_TO_DISABLE.toString()
+  const [showMinCommunity, setMinCommunity] = useState(!isMaxMinCommunityNumber)
 
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
@@ -40,11 +45,15 @@ const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
     const currentPrecision = new BigNumber(min).decimalPlaces()
 
     handleSetForm({
-      value: parseFloat(
-        Math.max(Number(min), Math.min(Number(max), Number(value))).toFixed(
-          currentPrecision
-        )
-      ),
+      value:
+        e.target.value === MAX_TOKENS_TO_DISABLE.toString()
+          ? MAX_TOKENS_TO_DISABLE.toString()
+          : parseFloat(
+              Math.max(
+                Number(min),
+                Math.min(Number(max), Number(value))
+              ).toFixed(currentPrecision)
+            ),
       propertyName: fieldName,
     })
   }
@@ -94,23 +103,50 @@ const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
 
   return (
     <>
-      <Input
-        label="Min community tokens to create proposal"
-        value={form.minCommunityTokensToCreateProposal}
-        type="number"
-        name="minCommunityTokensToCreateProposal"
-        min={minTokenAmount}
-        step={minTokenStep}
-        onBlur={validateMinMax}
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'minCommunityTokensToCreateProposal',
-          })
-        }
-        error={formErrors['minCommunityTokensToCreateProposal']}
-      />
-      {getSupplyPercent()}
+      <div className="text-sm mb-3">
+        <div className="mb-2">Min community tokens to create proposal</div>
+        <div className="flex flex-row text-xs items-center">
+          <Switch
+            checked={showMinCommunity}
+            onChange={() => {
+              setMinCommunity(!showMinCommunity)
+              if (!showMinCommunity === true) {
+                handleSetForm({
+                  value: 1,
+                  propertyName: 'minCommunityTokensToCreateProposal',
+                })
+              } else {
+                handleSetForm({
+                  value: MAX_TOKENS_TO_DISABLE.toString(),
+                  propertyName: 'minCommunityTokensToCreateProposal',
+                })
+              }
+            }}
+          />{' '}
+          <div className="ml-3">
+            {showMinCommunity ? 'Enabled' : 'Disabled'}
+          </div>
+        </div>
+      </div>
+
+      {showMinCommunity && (
+        <Input
+          value={form.minCommunityTokensToCreateProposal}
+          type="number"
+          name="minCommunityTokensToCreateProposal"
+          min={minTokenAmount}
+          step={minTokenStep}
+          onBlur={validateMinMax}
+          onChange={(evt) =>
+            handleSetForm({
+              value: evt.target.value,
+              propertyName: 'minCommunityTokensToCreateProposal',
+            })
+          }
+          error={formErrors['minCommunityTokensToCreateProposal']}
+        />
+      )}
+      {showMinCommunity && getSupplyPercent()}
       <Input
         label="min instruction hold up time (days)"
         value={form.minInstructionHoldUpTime}

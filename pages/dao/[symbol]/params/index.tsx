@@ -17,12 +17,14 @@ import { tryParsePublicKey } from '@tools/core/pubkey'
 import { getAccountName } from '@components/instructions/tools'
 import useWalletStore from 'stores/useWalletStore'
 import SetRealmAuthorityModal from './SetRealmAuthorityModal'
+import MetadataCreationModal from './MetadataCreationModal'
 
 import ParamsView from './components/ParamsView'
 import AccountsView from './components/AccountsView'
 import StatsView from './components/StatsView'
 import { ExclamationIcon } from '@heroicons/react/outline'
 import Tooltip from '@components/Tooltip'
+import { AccountType } from '@utils/uiTypes/assets'
 
 const Params = () => {
   const { realm, mint } = useRealm()
@@ -33,6 +35,27 @@ const Params = () => {
     auxiliaryTokenAccounts,
   } = useGovernanceAssets()
   const governancesArray = useGovernanceAssetsStore((s) => s.governancesArray)
+  const mintGovernancesWithMintInfo = assetAccounts.filter((x) => {
+    return x.type === AccountType.MINT
+  })
+
+  const hasAuthorityGovernances = governancesArray.filter((governance) => {
+    const filteredMintGovernances = mintGovernancesWithMintInfo.filter(
+      (mintGovernance) =>
+        mintGovernance.governance.pubkey.toString() ===
+        governance.pubkey.toString()
+    )
+
+    if (filteredMintGovernances.length == 0) {
+      return false
+    }
+
+    return (
+      filteredMintGovernances[0].governance.pubkey.toString() ===
+      governance.pubkey.toString()
+    )
+  })
+  const showCreateMetadataButton = !!hasAuthorityGovernances.length
   const loadGovernedAccounts = useGovernanceAssetsStore(
     (s) => s.loadGovernedAccounts
   )
@@ -52,6 +75,10 @@ const Params = () => {
   const [isRealmAuthorityModalOpen, setRealmAuthorityModalIsOpen] = useState(
     false
   )
+  const [
+    isMetadataCreationModalOpen,
+    setIsMetadataCreationModalOpen,
+  ] = useState(false)
   const realmAccount = realm?.account
   const communityMint = realmAccount?.communityMint.toBase58()
   const councilMintPk = realmAccount?.config.councilMint?.toBase58()
@@ -63,6 +90,12 @@ const Params = () => {
   }
   const closeRealmProposalModal = () => {
     setIsRealmProposalModalOpen(false)
+  }
+  const openMetadataCreationModal = () => {
+    setIsMetadataCreationModalOpen(true)
+  }
+  const closeMetadataCreationModal = () => {
+    setIsMetadataCreationModalOpen(false)
   }
   const openGovernanceProposalModal = () => {
     setIsGovernanceProposalModalOpen(true)
@@ -112,6 +145,13 @@ const Params = () => {
           isOpen={isRealmAuthorityModalOpen}
           closeModal={closeSetRealmAuthorityModal}
         ></SetRealmAuthorityModal>
+      )}
+      {isMetadataCreationModalOpen && (
+        <MetadataCreationModal
+          governance={activeGovernance}
+          isOpen={isMetadataCreationModalOpen}
+          closeModal={closeMetadataCreationModal}
+        ></MetadataCreationModal>
       )}
       <div className="col-span-12 p-4 rounded-lg bg-bkg-2 md:p-6">
         <div className="mb-4">
@@ -166,6 +206,26 @@ const Params = () => {
                       className="ml-auto"
                     >
                       Set authority
+                    </Button>
+                  )}
+                </div>
+                <div className="flex">
+                  {showCreateMetadataButton && (
+                    <Button
+                      disabled={
+                        !canUseAuthorityInstruction || !realmAuthorityGovernance
+                      }
+                      tooltipMessage={
+                        !canUseAuthorityInstruction
+                          ? 'Please connect wallet with enough voting power to create realm config proposals'
+                          : !realmAuthorityGovernance
+                          ? 'None of the governances is realm authority'
+                          : ''
+                      }
+                      onClick={openMetadataCreationModal}
+                      className="ml-auto"
+                    >
+                      Create metadata
                     </Button>
                   )}
                 </div>

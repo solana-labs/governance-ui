@@ -40,6 +40,7 @@ import {
   AccountTypeToken,
   AssetAccount,
 } from '@utils/uiTypes/assets'
+import group from '@utils/group'
 
 const tokenAccountOwnerOffset = 32
 
@@ -347,13 +348,22 @@ const getSolAccountObj = async (
         return { publicKey, account }
       }
     )
+    const groups = group(tokenAccountsOwnedBySolAccounts)
+    const results = await Promise.all(
+      groups.map((group) => {
+        if (group.length) {
+          return getMintAccountsInfo(
+            connection,
+            group.map((x) => x.account.mint)
+          )
+        } else {
+          return []
+        }
+      })
+    )
 
-    const mintAccounts = tokenAccountsOwnedBySolAccounts.length
-      ? await getMintAccountsInfo(
-          connection,
-          tokenAccountsOwnedBySolAccounts.map((x) => x.account.mint)
-        )
-      : []
+    const mintAccounts = results.flat()
+
     for (const acc of tokenAccountsOwnedBySolAccounts) {
       const account = await getTokenAccountObj(governance, acc, mintAccounts)
       if (account) {

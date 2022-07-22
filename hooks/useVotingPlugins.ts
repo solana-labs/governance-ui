@@ -16,7 +16,7 @@ import {
   getGovernanceAccount,
   Governance,
 } from '@solana/spl-governance'
-import { getNftMaxVoterWeightRecord } from 'NftVotePlugin/sdk/accounts'
+import { getMaxVoterWeightRecord as getPluginMaxVoterWeightRecord } from '@utils/plugin/accounts'
 import { notify } from '@utils/notifications'
 import * as anchor from '@project-serum/anchor'
 import * as sbv2 from '@switchboard-xyz/switchboard-v2'
@@ -40,6 +40,7 @@ export const nftPluginsPks: string[] = [
 
 export const gatewayPluginsPks: string[] = [
   'Ggatr3wgDLySEwA2qEjt1oiw4BUzp5yMLJyz21919dq6', // v1
+  'GgathUhdrCWRHowoRKACjgWhYHfxCEdBi5ViqYN6HVxk', // v2, supporting composition
 ]
 
 export const switchboardPluginsPks: string[] = [SWITCHBOARD_ADDIN_ID.toBase58()]
@@ -259,7 +260,7 @@ export function useVotingPlugins() {
   }
 
   const handleRegisterGatekeeperNetwork = async () => {
-    if (realm) {
+    if (realm && gatewayClient) {
       setIsLoadingGatewayToken(true)
 
       try {
@@ -279,8 +280,9 @@ export function useVotingPlugins() {
       setIsLoadingGatewayToken(false)
     }
   }
+
   const handleMaxVoterWeight = async () => {
-    const { maxVoterWeightRecord } = await getNftMaxVoterWeightRecord(
+    const { maxVoterWeightRecord } = await getPluginMaxVoterWeightRecord(
       realm!.pubkey,
       realm!.account.communityMint,
       nftClient!.program.programId
@@ -305,12 +307,14 @@ export function useVotingPlugins() {
     )
   }
   useEffect(() => {
-    handleSetVsrClient(wallet, connection)
-    handleSetNftClient(wallet, connection)
-    handleSetSwitchboardClient(wallet, connection)
-    handleSetGatewayClient(wallet, connection)
-    handleSetPythClient(wallet, connection)
-  }, [connection.endpoint])
+    if (wallet) {
+      handleSetVsrClient(wallet, connection)
+      handleSetNftClient(wallet, connection)
+      handleSetSwitchboardClient(wallet, connection)
+      handleSetGatewayClient(wallet, connection)
+      handleSetPythClient(wallet, connection)
+    }
+  }, [connection.endpoint, wallet])
 
   useEffect(() => {
     const handleVsrPlugin = () => {

@@ -51,7 +51,13 @@ import { NFTWithMint } from '@utils/uiTypes/nfts'
 import useCreateProposal from '@hooks/useCreateProposal'
 import NFTAccountSelect from './NFTAccountSelect'
 
-const SendTokens = ({ isNft = false }) => {
+const SendTokens = ({
+  isNft = false,
+  selectedNft,
+}: {
+  isNft?: boolean
+  selectedNft?: NFTWithMint | null
+}) => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const connection = useWalletStore((s) => s.connection)
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
@@ -203,7 +209,6 @@ const SendTokens = ({ isNft = false }) => {
     }
     return gte
   }
-
   useEffect(() => {
     if (currentAccount) {
       handleSetForm({
@@ -294,6 +299,7 @@ const SendTokens = ({ isNft = false }) => {
         )}
         {isNFT ? (
           <NFTSelector
+            selectedNft={selectedNft}
             onNftSelect={(nfts) => setSelectedNfts(nfts)}
             ownersPk={
               currentAccount.isSol

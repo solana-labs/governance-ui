@@ -289,7 +289,7 @@ input[type='range'].with-gradient::-webkit-slider-runnable-track {
   background: transparent;
 }
 
-/* break-words is depricated a tailwind and CSS class, 
+/* break-words is depricated a tailwind and CSS class,
 advised to use overflow-wrap instead - see documentation below
 https://developer.mozilla.org/en-US/docs/Web/CSS/word-break#values */
 .overflow-wrap-anywhere {

@@ -21,11 +21,8 @@ import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { sleep } from '@project-serum/common'
 import { NftVoterClient } from '@solana/governance-program-library'
 import { chunks } from '@utils/helpers'
-import {
-  getNftRegistrarPDA,
-  getNftVoterWeightRecord,
-} from 'NftVotePlugin/sdk/accounts'
 import { sendSignedTransaction } from '@utils/send'
+import { getRegistrarPDA, getVoterWeightRecord } from '@utils/plugin/accounts'
 import {
   sendTransactionsV2,
   SequenceType,
@@ -234,12 +231,12 @@ const MyProposalsBn = () => {
   const releaseNfts = async (count: number | null = null) => {
     setIsLoading(true)
     const instructions: TransactionInstruction[] = []
-    const { registrar } = await getNftRegistrarPDA(
+    const { registrar } = await getRegistrarPDA(
       realm!.pubkey,
       realm!.account.communityMint,
       client.client!.program.programId
     )
-    const { voterWeightPk } = await getNftVoterWeightRecord(
+    const { voterWeightPk } = await getVoterWeightRecord(
       realm!.pubkey,
       realm!.account.communityMint,
       wallet!.publicKey!,

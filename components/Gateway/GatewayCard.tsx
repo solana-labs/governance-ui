@@ -1,7 +1,7 @@
 import Button from '@components/Button'
 import Loading from '@components/Loading'
 import useRealm from '@hooks/useRealm'
-import { NftVoterClient } from '@solana/governance-program-library'
+import { GatewayClient } from '@solana/governance-program-library'
 import {
   getTokenOwnerRecordAddress,
   SYSTEM_PROGRAM_ID,
@@ -9,12 +9,12 @@ import {
 } from '@solana/spl-governance'
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { sendTransaction } from '@utils/send'
-import { getNftVoterWeightRecord } from 'NftVotePlugin/sdk/accounts'
 import { useState, useEffect } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
 import useGatewayPluginStore from '../../GatewayPlugin/store/gatewayPluginStore'
 import { GatewayButton } from '@components/Gateway/GatewayButton'
+import { getRegistrarPDA, getVoterWeightRecord } from '@utils/plugin/accounts'
 
 // TODO lots of overlap with NftBalanceCard here - we need to separate the logic for creating the Token Owner Record
 // from the rest of this logic
@@ -37,19 +37,22 @@ const GatewayCard = () => {
     : null
   const handleRegister = async () => {
     const instructions: TransactionInstruction[] = []
-    const { voterWeightPk } = await getNftVoterWeightRecord(
+    const { voterWeightPk } = await getVoterWeightRecord(
       realm!.pubkey,
       realm!.account.communityMint,
       wallet!.publicKey!,
       client.client!.program.programId
     )
-    const createVoterWeightRecordIx = await (client.client as NftVoterClient).program.methods
+    const { registrar } = await getRegistrarPDA(
+      realm!.pubkey,
+      realm!.account.communityMint,
+      client.client!.program.programId
+    )
+    const createVoterWeightRecordIx = await (client.client as GatewayClient).program.methods
       .createVoterWeightRecord(wallet!.publicKey!)
       .accounts({
         voterWeightRecord: voterWeightPk,
-        governanceProgramId: realm!.owner,
-        realm: realm!.pubkey,
-        realmGoverningTokenMint: realm!.account.communityMint,
+        registrar,
         payer: wallet!.publicKey!,
         systemProgram: SYSTEM_PROGRAM_ID,
       })

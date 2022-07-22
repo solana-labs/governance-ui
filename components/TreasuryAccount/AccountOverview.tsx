@@ -26,6 +26,7 @@ import {
 } from '@heroicons/react/outline'
 import Tooltip from '@components/Tooltip'
 import ConvertToMsol from './ConvertToMsol'
+import ConvertToStSol from './ConvertToStSol'
 import useStrategiesStore from 'Strategies/store/useStrategiesStore'
 import DepositModal from 'Strategies/components/DepositModal'
 import { SolendStrategy, TreasuryStrategy } from 'Strategies/types/types'
@@ -85,6 +86,7 @@ const AccountOverview = () => {
   const [openNftDepositModal, setOpenNftDepositModal] = useState(false)
   const [openCommonSendModal, setOpenCommonSendModal] = useState(false)
   const [openMsolConvertModal, setOpenMsolConvertModal] = useState(false)
+  const [openStSolConvertModal, setOpenStSolConvertModal] = useState(false)
   const [openAtaModal, setOpenAtaModal] = useState(false)
   const accountPublicKey = currentAccount?.extensions.transferAddress
   const strategies = useStrategiesStore((s) => s.strategies)
@@ -306,6 +308,21 @@ const AccountOverview = () => {
       strategyDescription: '',
       createProposalFcn: () => null,
     }
+    const lidoStrategy = {
+      liquidity: 0,
+      protocolSymbol: '',
+      apy: '',
+      protocolName: 'Lido',
+      handledMint: '',
+      handledTokenSymbol: '',
+      handledTokenImgSrc:
+        'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png',
+      protocolLogoSrc:
+        'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/7dHbWXmci3dT8UFYWYZweBLXgycu7Y3iL6trKn1Y7ARj/logo.png',
+      strategyName: 'Stake',
+      strategyDescription: '',
+      createProposalFcn: () => null,
+    }
     const serumStrategy = {
       liquidity: 0,
       protocolSymbol: '',
@@ -327,6 +344,13 @@ const AccountOverview = () => {
             onClick={() => setOpenMsolConvertModal(true)}
             currentDeposits={0}
             strat={marinadeStrategy}
+          ></StrategyCard>
+        )}
+        {isSol && (
+          <StrategyCard
+            onClick={() => setOpenStSolConvertModal(true)}
+            currentDeposits={0}
+            strat={lidoStrategy}
           ></StrategyCard>
         )}
         {isSplToken && (
@@ -588,6 +612,17 @@ const AccountOverview = () => {
           isOpen={openMsolConvertModal}
         >
           <ConvertToMsol />
+        </Modal>
+      )}
+      {openStSolConvertModal && (
+        <Modal
+          sizeClassName="sm:max-w-3xl"
+          onClose={() => {
+            setOpenStSolConvertModal(false)
+          }}
+          isOpen={openStSolConvertModal}
+        >
+          <ConvertToStSol />
         </Modal>
       )}
       {openAtaModal && isSol && (

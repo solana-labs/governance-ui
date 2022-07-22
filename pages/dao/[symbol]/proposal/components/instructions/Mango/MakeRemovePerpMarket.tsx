@@ -109,6 +109,7 @@ const MakeRemovePerpMarket = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
+      chunkSplitByDefault: true,
     }
     return obj
   }

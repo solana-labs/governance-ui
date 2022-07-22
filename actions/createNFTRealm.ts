@@ -23,10 +23,10 @@ import { chunks } from '@utils/helpers'
 import { nftPluginsPks } from '@hooks/useVotingPlugins'
 
 import {
-  getNftVoterWeightRecord,
-  getNftMaxVoterWeightRecord,
-  getNftRegistrarPDA,
-} from 'NftVotePlugin/sdk/accounts'
+  getVoterWeightRecord,
+  getMaxVoterWeightRecord,
+  getRegistrarPDA,
+} from '@utils/plugin/accounts'
 import { NftVoterClient } from '@solana/governance-program-library'
 
 import { prepareRealmCreation } from '@tools/governance/prepareRealmCreation'
@@ -114,7 +114,7 @@ export default async function createNFTRealm({
   })
 
   console.log('NFT REALM realm public-key', realmPk.toBase58())
-  const { registrar } = await getNftRegistrarPDA(
+  const { registrar } = await getRegistrarPDA(
     realmPk,
     communityMintPk,
     nftClient!.program.programId
@@ -139,7 +139,7 @@ export default async function createNFTRealm({
     instructionCR
   )
 
-  const { maxVoterWeightRecord } = await getNftMaxVoterWeightRecord(
+  const { maxVoterWeightRecord } = await getMaxVoterWeightRecord(
     realmPk,
     communityMintPk,
     nftClient!.program.programId
@@ -196,7 +196,7 @@ export default async function createNFTRealm({
     SetRealmAuthorityAction.SetChecked
   )
 
-  const { voterWeightPk } = await getNftVoterWeightRecord(
+  const { voterWeightPk } = await getVoterWeightRecord(
     realmPk,
     communityMintPk,
     walletPk,
