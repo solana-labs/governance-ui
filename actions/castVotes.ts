@@ -16,8 +16,7 @@ import { RpcContext } from '@solana/spl-governance';
 import { Vote } from '@solana/spl-governance';
 import { withCastVote } from '@solana/spl-governance';
 import { sendTransaction } from '../utils/send';
-import { MintInfo } from '@solana/spl-token';
-import { fmtTokenAmount } from '@utils/formatting';
+import { notify } from '@utils/notifications';
 
 export async function castVotes({
   rpcContext: { connection, wallet, programId, walletPubkey },
@@ -27,9 +26,6 @@ export async function castVotes({
   tokenOwnerRecordsToVoteWith,
   message,
   client,
-  mint,
-  yesVotesRequired,
-  noVotesRequired,
 }: {
   rpcContext: RpcContext;
   realm: ProgramAccount<Realm>;
@@ -38,12 +34,9 @@ export async function castVotes({
   vote: YesNoVote;
   message?: ChatMessageBody;
   client?: VsrClient;
-  yesVotesRequired: number;
-  noVotesRequired: number;
-  mint: MintInfo;
 }) {
   const signers: Keypair[] = [];
-  const instructions: TransactionInstruction[] = [];
+  let instructions: TransactionInstruction[] = [];
 
   const governanceAuthority = walletPubkey;
   const payer = walletPubkey;
@@ -63,39 +56,7 @@ export async function castVotes({
     client,
   );
 
-  // +1 because we need 1 more vote than the quorum
-  let relativeRequiredVote =
-    vote === YesNoVote.Yes ? yesVotesRequired + 1 : noVotesRequired + 1;
-
-  for (const tokenOwnerRecord of tokenOwnerRecordsToVoteWith) {
-    // we check that the votes will stop once the proposal passes.
-    if (relativeRequiredVote <= 0) {
-      continue;
-    }
-
-    relativeRequiredVote -= fmtTokenAmount(
-      tokenOwnerRecord.account.governingTokenDepositAmount,
-      mint.decimals,
-    );
-
-    await withCastVote(
-      instructions,
-      programId,
-      programVersion,
-      realm.pubkey,
-      proposal.account.governance,
-      proposal.pubkey,
-      proposal.account.tokenOwnerRecord,
-      tokenOwnerRecord.pubkey,
-      governanceAuthority,
-
-      proposal.account.governingTokenMint,
-      Vote.fromYesNoVote(vote),
-      payer,
-      voterWeight,
-    );
-  }
-
+  // Post the message in the first transaction
   if (message) {
     await withPostChatMessage(
       instructions,
@@ -117,8 +78,46 @@ export async function castVotes({
     );
   }
 
-  const transaction = new Transaction();
-  transaction.add(...instructions);
+  let i = 0;
 
-  await sendTransaction({ transaction, wallet, connection, signers });
+  for (const tokenOwnerRecord of tokenOwnerRecordsToVoteWith) {
+    await withCastVote(
+      instructions,
+      programId,
+      programVersion,
+      realm.pubkey,
+      proposal.account.governance,
+      proposal.pubkey,
+      proposal.account.tokenOwnerRecord,
+      tokenOwnerRecord.pubkey,
+      governanceAuthority,
+      proposal.account.governingTokenMint,
+      Vote.fromYesNoVote(vote),
+      payer,
+      voterWeight,
+    );
+
+    const transaction = new Transaction();
+    transaction.add(...instructions);
+
+    if (tokenOwnerRecordsToVoteWith.length > 1) {
+      notify({
+        type: 'info',
+        message: `Voting ${i + 1}/${tokenOwnerRecordsToVoteWith.length}`,
+      });
+    }
+
+    await sendTransaction({ transaction, wallet, connection, signers });
+
+    instructions = [];
+    i++;
+  }
+
+  // If there is no vote to cast but there is a message, send the transaction
+  if (!tokenOwnerRecordsToVoteWith.length && message) {
+    const transaction = new Transaction();
+    transaction.add(...instructions);
+
+    await sendTransaction({ transaction, wallet, connection, signers });
+  }
 }

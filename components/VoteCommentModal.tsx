@@ -14,14 +14,12 @@ import useRealm from '../hooks/useRealm';
 import { castVotes } from '../actions/castVotes';
 
 import Button, { SecondaryButton } from './Button';
-// import { notify } from '../utils/notifications'
 import Loading from './Loading';
 import Modal from './Modal';
 import Input from './inputs/Input';
 import Tooltip from './Tooltip';
 import { getProgramVersionForRealm } from '@models/registry/api';
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore';
-import useProposalVotes from '@hooks/useProposalVotes';
 
 const VoteCommentModal = ({
   onClose,
@@ -44,10 +42,6 @@ const VoteCommentModal = ({
   const { fetchVoteRecords } = useWalletStore((s) => s.actions);
   const { realm, realmInfo, mint, councilMint } = useRealm();
   const { fetchRealm } = useWalletStore((s) => s.actions);
-
-  const { yesVotesRequired, noVotesRequired } = useProposalVotes(
-    proposal?.account,
-  );
 
   const submitVote = async (vote: YesNoVote) => {
     const programId = realmInfo?.programId;
@@ -83,16 +77,13 @@ const VoteCommentModal = ({
         realm: realm!,
         proposal: proposal!,
         tokenOwnerRecordsToVoteWith,
-        yesVotesRequired,
-        noVotesRequired,
-        mint: usedMint,
         vote,
         message,
         client,
       });
     } catch (ex) {
       //TODO: How do we present transaction errors to users? Just the notification?
-      console.error("Can't cast vote", ex);
+      console.error("Can't cast vote (2)", ex);
       onClose();
     } finally {
       setSubmitting(false);

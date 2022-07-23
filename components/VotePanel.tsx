@@ -23,7 +23,6 @@ import { VoteRegistryVoterWeight, VoterWeight } from '@models/voteWeights';
 import { castVotes } from 'actions/castVotes';
 import { notify } from '@utils/notifications';
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore';
-import useProposalVotes from '@hooks/useProposalVotes';
 import { BN_ZERO } from '@utils/helpers';
 import { fmtTokenAmount } from '@utils/formatting';
 
@@ -174,10 +173,6 @@ const VotePanel = () => {
   const fetchRealm = useWalletStore((s) => s.actions.fetchRealm);
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!);
 
-  const { yesVotesRequired, noVotesRequired } = useProposalVotes(
-    proposal?.account,
-  );
-
   const usedMint =
     tokenType === GoverningTokenType.Community ? mint : councilMint;
 
@@ -316,9 +311,6 @@ const VotePanel = () => {
         rpcContext,
         realm: realm!,
         proposal: proposal!,
-        yesVotesRequired,
-        noVotesRequired,
-        mint: usedMint,
 
         tokenOwnerRecordsToVoteWith: sortedAccounts.accountsReadyToVote.map(
           (account) => account.voterTokenRecord!,
