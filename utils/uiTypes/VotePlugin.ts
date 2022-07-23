@@ -199,8 +199,8 @@ export class VotingClient {
       for (let i = 0; i < this.votingNfts.length; i++) {
         const nft = this.votingNfts[i]
         remainingAccounts.push(
-          new AccountData(nft.tokenAddress),
-          new AccountData(nft.metadata.pubkey)
+          new AccountData(nft.tokenAccountAddress),
+          new AccountData(nft.address)
         )
       }
       const updateVoterWeightRecordIx = await this.client.program.methods
@@ -327,8 +327,8 @@ export class VotingClient {
           )
         )
           remainingAccounts.push(
-            new AccountData(nft.tokenAddress),
-            new AccountData(nft.metadata.pubkey),
+            new AccountData(nft.tokenAccountAddress),
+            new AccountData(nft.address),
             new AccountData(nftVoteRecord, false, true)
           )
       }

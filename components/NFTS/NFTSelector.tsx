@@ -5,7 +5,6 @@ import React, {
   useState,
 } from 'react'
 import { PhotographIcon } from '@heroicons/react/solid'
-import useWalletStore from 'stores/useWalletStore'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
 import { CheckCircleIcon } from '@heroicons/react/solid'
 import { PublicKey } from '@solana/web3.js'
@@ -39,10 +38,9 @@ function NFTSelector(
   const isPredefinedMode = typeof predefinedNfts !== 'undefined'
   const [nfts, setNfts] = useState<NFTWithMint[]>([])
   const [selected, setSelected] = useState<NFTWithMint | null>(null)
-  const connection = useWalletStore((s) => s.connection)
   const [isLoading, setIsLoading] = useState(false)
   const handleSelectNft = (nft: NFTWithMint) => {
-    if (selected && nft.mint == selected.mint) {
+    if (selected && nft.mintAddress == selected.mintAddress) {
       setSelected(null)
     } else {
       setSelected(nft)
@@ -50,9 +48,7 @@ function NFTSelector(
   }
   const handleGetNfts = async () => {
     setIsLoading(true)
-    const response = await Promise.all(
-      ownersPk.map((x) => getNfts(connection.current, x))
-    )
+    const response = await Promise.all(ownersPk.map((x) => getNfts(x)))
     const nfts = response.flatMap((x) => x)
     if (nfts.length === 1) {
       handleSelectNft(nfts[0])
@@ -96,7 +92,7 @@ function NFTSelector(
               {nfts.map((x) => (
                 <div
                   onClick={() => (selectable ? handleSelectNft(x) : null)}
-                  key={x.mint}
+                  key={x.mintAddress}
                   className={`bg-bkg-2 flex items-center justify-center cursor-pointer default-transition rounded-lg border border-transparent ${
                     selectable ? 'hover:border-primary-dark' : ''
                   } relative overflow-hidden`}
@@ -105,10 +101,10 @@ function NFTSelector(
                     height: nftHeight,
                   }}
                 >
-                  {selected && x.mint === selected.mint && (
+                  {selected && x.mintAddress === selected.mintAddress && (
                     <CheckCircleIcon className="w-10 h-10 absolute text-green z-10"></CheckCircleIcon>
                   )}
-                  <ImgWithLoader style={{ width: '150px' }} src={x.val.image} />
+                  <ImgWithLoader style={{ width: '150px' }} src={x.image} />
                 </div>
               ))}
             </div>

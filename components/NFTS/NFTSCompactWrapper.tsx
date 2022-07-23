@@ -51,14 +51,14 @@ const NFTSCompactWrapper = () => {
               <a
                 className="bg-bkg-4 col-span-1 flex items-center justify-center rounded-lg filter drop-shadow-lg"
                 key={idx}
-                href={getExplorerUrl(connection.cluster, x.mint)}
+                href={getExplorerUrl(connection.cluster, x.mintAddress)}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
               >
                 <ImgWithLoader
                   className="bg-bkg-2 cursor-pointer default-transition transform scale-90 hover:scale-95 rounded-md"
-                  src={x.val.image}
+                  src={x.image}
                 />
               </a>
             ))
