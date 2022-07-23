@@ -891,5 +891,14 @@
     "website": "https://www.hoa.house/",
     "twitter": "@ParclHOA",
     "ogImage": "/realms/HOADAO/img/hoa.jpg"
+  },
+  {
+    "symbol": "TelebunniesDAO",
+    "displayName": "Telebunnies",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "2h3UJMWgsDxZJFJ2PhmeA6b27j1ZEmVthEBFMWaUEbZL",
+    "website": "https://www.telebunnies.com/",
+    "twitter": "@TelebunniesO",
+    "ogImage": "/realms/TelebunniesDAO/telebunniesDAO.png"
   }
  ]
