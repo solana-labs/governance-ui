@@ -102,7 +102,6 @@ function RealmsGrid({
         .concat(unchartedRealms)
         .filter((item) => gridRealmIds.includes(item.realmId.toString()))
     }
-    console.log(realms[0])
     return realms ?? []
   }
 
