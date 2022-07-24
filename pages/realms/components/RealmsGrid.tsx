@@ -128,6 +128,7 @@ function RealmsGrid({
 
   function generateLayout(cols) {
     let currX = 0
+    // disabled editing of grid for now
     // let savedGrid
     // if (typeof window !== 'undefined') {
     //   savedGrid = localStorage.getItem(STORAGE_GRID + cols)
@@ -135,6 +136,7 @@ function RealmsGrid({
     return (
       gridRealms &&
       gridRealms.map((realm) => {
+        // disabled editing of grid for now
         // if (savedGrid) {
         //   const grid = JSON.parse(savedGrid)
         //   obj = grid.find((item) => item?.i == realm?.realmId.toString())
