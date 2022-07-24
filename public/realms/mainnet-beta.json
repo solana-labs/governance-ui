@@ -505,6 +505,15 @@
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "97jKDX5Uxh5xSPbmmfhiFodHEajSVdKkknTzzgf8GBAr"
   },
+    {
+    "symbol": "RatioFinance",
+    "displayName": "Ratio Finance",
+    "programId": "HT19EcD68zn7NoCF79b2ucQF8XaMdowyPt5ccS6g1PUx",
+    "realmId": "8HZ4V94dtojrTpdUpWrfstr7bEhRnZZHn8jotfns9L9x",
+    "website": "https://ratio.finance/",
+    "twitter": "@RatioFinance",
+    "ogImage": "/realms/RatioFinance/img/ratiologo.png"
+  },
   {
     "symbol": "PixelBands",
     "displayName": "PixelBands DAO",
@@ -873,5 +882,23 @@
     "website": "https://laptop-dao.vercel.app/",
     "twitter": "@laptopDAO",
     "ogImage": "/realms/laptopDAO/logo.png"
+  },
+  {
+    "symbol": "HOADAO",
+    "displayName": "HOA DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "CsmD7MZ5aKA26gyvtXMzFNL5krnvHfd6SPUpXj8EgTky",
+    "website": "https://www.hoa.house/",
+    "twitter": "@ParclHOA",
+    "ogImage": "/realms/HOADAO/img/hoa.jpg"
+  },
+  {
+    "symbol": "TelebunniesDAO",
+    "displayName": "Telebunnies",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "2h3UJMWgsDxZJFJ2PhmeA6b27j1ZEmVthEBFMWaUEbZL",
+    "website": "https://www.telebunnies.com/",
+    "twitter": "@TelebunniesO",
+    "ogImage": "/realms/TelebunniesDAO/telebunniesDAO.png"
   }
  ]

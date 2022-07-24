@@ -202,6 +202,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseAuthorityInstruction,
     },
     {
+      id: Instructions.ConfigureGatewayPlugin,
+      name: 'Civic: Configure existing Gateway plugin',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
       id: Instructions.RealmConfig,
       name: 'Realm config',
       isVisible: canUseAuthorityInstruction,
@@ -215,6 +220,21 @@ export default function useGovernanceAssets() {
       id: Instructions.CloseTokenAccount,
       name: 'Close token account',
       isVisible: canUseTransferInstruction,
+    },
+    {
+      id: Instructions.CreateTokenMetadata,
+      name: 'Create Token Metadata',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
+      id: Instructions.UpdateTokenMetadata,
+      name: 'Update Token Metadata',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
+      id: Instructions.SagaPreOrder,
+      name: 'Pre-order Saga Phone',
+      isVisible: canUseTokenTransferInstruction,
     },
     {
       id: Instructions.None,
@@ -319,6 +339,11 @@ export default function useGovernanceAssets() {
     {
       id: Instructions.MangoSwapSpotMarket,
       name: 'Mango: Swap Spot Market',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoRemoveOracle,
+      name: 'Mango: Remove Oracle',
       isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
     },
     {

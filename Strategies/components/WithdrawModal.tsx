@@ -51,11 +51,12 @@ import {
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import BigNumber from 'bignumber.js'
 import { useRouter } from 'next/router'
-import { emptyPk } from 'NftVotePlugin/sdk/accounts'
 import { useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { MarketStore } from 'Strategies/store/marketStore'
 import * as yup from 'yup'
+
+const emptyPk = '11111111111111111111111111111111'
 
 const WithdrawModal = ({
   selectedMangoAccount,
@@ -264,7 +265,11 @@ const WithdrawModal = ({
       chunkBy: 1,
     }
     proposalInstructions.push(instructionData)
-    if (wrappedSolAccount) {
+    if (
+      wrappedSolAccount &&
+      (selectedMangoAccount.owner.toBase58() === form.withdrawAddress ||
+        selectedMangoAccount.owner.toBase58() === governance.pubkey.toBase58())
+    ) {
       const closeAobInstruction = closeAccount({
         source: wrappedSolAccount.publicKey,
         destination: new PublicKey(form.withdrawAddress),
