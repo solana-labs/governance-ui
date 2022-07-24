@@ -1,5 +1,9 @@
 import { PublicKey } from '@solana/web3.js'
 import { consts as foresightConsts } from '@foresight-tmp/foresight-sdk/'
+import {
+  LIDO_PROGRAM_ID,
+  LIDO_PROGRAM_ID_DEVNET,
+} from '@components/TreasuryAccount/ConvertToStSol'
 
 export const GOVERNANCE_PROGRAM_NAMES = {
   GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J: 'Mango Governance Program',
@@ -27,6 +31,9 @@ export const PROGRAM_NAMES = {
   EhhTKczWMGQt46ynNeRX1WfeagwwJd7ufHvCDjRxjo5Q: 'Raydium Staking Program',
 
   MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD: 'Marinade Staking Program',
+
+  [LIDO_PROGRAM_ID]: 'Lido Staking Program',
+  [LIDO_PROGRAM_ID_DEVNET]: 'Lido Staking Program',
 
   SysvarRent111111111111111111111111111111111: 'Sysvar: Rent',
   SysvarC1ock11111111111111111111111111111111: 'Sysvar: Clock',
