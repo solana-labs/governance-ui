@@ -7,6 +7,7 @@ import Text from '@components/Text'
 import { FORM_NAME as MULTISIG_FORM } from 'pages/realms/new/multisig'
 import { FORM_NAME as COMMUNITY_TOKEN_FORM } from 'pages/realms/new/community-token'
 import { GenericTokenIcon } from './TokenInfoTable'
+import { NFTCollectionIcon } from '@components/icons'
 
 const TO_BE_GENERATED = '(To be generated)'
 
@@ -107,10 +108,13 @@ function CommunityInfo({
           }
         >
           <div className="flex items-center">
-            <img
-              src={nftInfo.image || '/icons/threshold-icon.svg'}
-              className="w-8"
-            />
+            {nftInfo.image ? (
+              <img src={nftInfo.image} className="w-8" />
+            ) : (
+              <div className="w-8">
+                <NFTCollectionIcon />
+              </div>
+            )}
             <Text level="0" className="ml-3 input-base">
               {nftInfo?.name || '(Collection has no name)'}
             </Text>

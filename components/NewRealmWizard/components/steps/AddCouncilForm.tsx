@@ -8,10 +8,10 @@ import FormField from '@components/NewRealmWizard/components/FormField'
 import FormFooter from '@components/NewRealmWizard/components/FormFooter'
 import { RadioGroup } from '@components/NewRealmWizard/components/Input'
 import AdviceBox from '@components/NewRealmWizard/components/AdviceBox'
-import Text from '@components/Text'
 
 import { updateUserInput, validateSolAddress } from '@utils/formValidation'
 import TokenInput, { TokenWithMintInfo, COUNCIL_TOKEN } from '../TokenInput'
+import { CouncilIcon } from '@components/icons'
 
 export const AddCouncilSchema = {
   addCouncil: yup
@@ -145,10 +145,7 @@ export default function AddCouncilForm({
       />
       <div className="space-y-10 md:space-y-20">
         <div className="mt-10 mb-16 md:my-18">
-          <AdviceBox
-            title="About Councils"
-            icon={<img src="/icons/council-icon.svg" alt="council icon" />}
-          >
+          <AdviceBox title="About Councils" icon={<CouncilIcon />}>
             Council members can supervise and moderate DAO activities. It’s
             recommended to always create the council for DAOs in their
             incubation stage to prevent governance attacks or accidental losses
@@ -170,15 +167,14 @@ export default function AddCouncilForm({
                   { label: 'No, skip this step', value: false },
                 ]}
                 disabled={forceCouncil}
+                warning={
+                  forceCouncil
+                    ? 'A council is required to govern the DAO until the community token is distributed to members.'
+                    : ''
+                }
               />
             )}
           />
-          {forceCouncil && (
-            <Text level="2" className="mt-2 text-fgd-2">
-              A council is required to govern the DAO until the community token
-              is distributed to members.
-            </Text>
-          )}
         </FormField>
 
         {addCouncil && (

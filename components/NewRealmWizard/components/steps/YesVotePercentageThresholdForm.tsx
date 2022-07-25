@@ -12,6 +12,7 @@ import AdviceBox from '@components/NewRealmWizard/components/AdviceBox'
 
 import { updateUserInput } from '@utils/formValidation'
 import { FORM_NAME as MUTISIG_FORM } from 'pages/realms/new/multisig'
+import { ScalesIcon } from '@components/icons'
 
 export const CommunityYesVotePercentageSchema = {
   communityYesVotePercentage: yup
@@ -139,7 +140,7 @@ export default function YesVotePercentageForm({
             ? 'Member percentage'
             : 'Yes vote percentage'
         }
-        icon={<img src="/icons/threshold-icon.svg" alt="voting icon" />}
+        icon={<ScalesIcon />}
       >
         {forCommunity ? (
           <Text level="1">
