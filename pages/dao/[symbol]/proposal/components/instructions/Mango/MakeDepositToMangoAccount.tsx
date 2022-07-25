@@ -62,7 +62,7 @@ const MakeDepositToMangoAccount = ({
       wallet?.publicKey
     ) {
       const mangoAccountPk = new PublicKey(form.mangoAccountPk)
-      const GROUP = connection.cluster === 'devnet' ? 'devnet.3' : 'mainnet.1'
+      const GROUP = connection.cluster === 'devnet' ? 'devnet.2' : 'mainnet.1'
       const mangoConnection =
         connection.cluster === 'localnet'
           ? new Connection(Config.ids().cluster_urls.mainnet)
