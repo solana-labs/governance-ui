@@ -412,6 +412,12 @@ const AccountOverview = () => {
           </a>
         </div>
       </div>
+      {isSplToken && (
+        <p className={`pb-4`}>
+          Owner:
+          {' ' + currentAccount.extensions.token?.account.owner.toBase58()}
+        </p>
+      )}
       <AccountHeader />
       <div
         className={`flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 pb-8 px-4 justify-center`}
