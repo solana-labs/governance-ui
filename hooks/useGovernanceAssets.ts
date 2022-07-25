@@ -347,6 +347,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
     },
     {
+      id: Instructions.DepositToMangoAccount,
+      name: 'Mango: Deposit to mango account',
+      isVisible: canUseTokenTransferInstruction,
+    },
+    {
       id: Instructions.DepositIntoVolt,
       name: 'Friktion: Deposit into Volt',
       isVisible: canUseAnyInstruction,
