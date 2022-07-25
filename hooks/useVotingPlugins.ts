@@ -298,7 +298,7 @@ export function useVotingPlugins() {
       setMaxVoterWeight(null)
     }
   }
-  const getIsFromCollection = async (nft) => {
+  const getIsFromCollection = (nft) => {
     return (
       nft.collection &&
       nft.collection.mintAddress &&
