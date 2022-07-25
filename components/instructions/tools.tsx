@@ -159,6 +159,8 @@ export const HIDDEN_GOVERNANCES = new Map<string, string>([
 // TODO: Add this to on-chain metadata to Proposal account
 export const HIDDEN_PROPOSALS = new Map<string, string>([
   ['E8XgiVpDJgDf4XgBKjZnMs3S1K7cmibtbDqjw5aNobCZ', ''],
+  ['5mU9wQjsq3T74ynKY4RcjUFWBZQGzjfmzMTQqcmcyuTo', ''],
+  ['AwEK3aKWSpDXZPBY5MS9rK2JZ5j8gMgx5KAKsEbRo6ag', ''],
 ])
 
 export const DEFAULT_NATIVE_SOL_MINT =

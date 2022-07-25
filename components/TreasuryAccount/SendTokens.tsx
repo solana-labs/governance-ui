@@ -135,7 +135,7 @@ const SendTokens = ({
     return totalPriceFormatted
   }
 
-  async function getInstruction(x): Promise<UiInstruction> {
+  async function getNftInstruction(x): Promise<UiInstruction> {
     const selectedNftMint = x.mint
     const defaultProps = {
       schema,
@@ -146,19 +146,13 @@ const SendTokens = ({
       currentAccount,
       setFormErrors,
     }
-    if (isNFT) {
-      return getTransferNftInstruction({
-        ...defaultProps,
-        nftMint: selectedNftMint,
-      })
-    }
-    if (isSol) {
-      return getSolTransferInstruction(defaultProps)
-    }
-    return getTransferInstruction(defaultProps)
+    return getTransferNftInstruction({
+      ...defaultProps,
+      nftMint: selectedNftMint,
+    })
   }
 
-  const handlePropose = async () => {
+  const handleProposeNftSend = async () => {
     for (const x of selectedNfts) {
       const nftName = x?.val?.name
       const nftTitle = `Send ${nftName ? nftName : 'NFT'} to ${
@@ -174,7 +168,7 @@ const SendTokens = ({
               : ''
           }`
       setIsLoading(true)
-      const instruction: UiInstruction = await getInstruction(x)
+      const instruction: UiInstruction = await getNftInstruction(x)
       if (instruction.isValid) {
         const governance = currentAccount?.governance
         let proposalAddress: PublicKey | null = null
@@ -211,6 +205,62 @@ const SendTokens = ({
       }
       setIsLoading(false)
     }
+  }
+
+  async function getInstruction(): Promise<UiInstruction> {
+    const defaultProps = {
+      schema,
+      form,
+      programId,
+      connection,
+      wallet,
+      currentAccount,
+      setFormErrors,
+    }
+    if (isSol) {
+      return getSolTransferInstruction(defaultProps)
+    }
+    return getTransferInstruction(defaultProps)
+  }
+
+  const handleProposeTransfer = async () => {
+    setIsLoading(true)
+    const instruction: UiInstruction = await getInstruction()
+    if (instruction.isValid) {
+      const governance = currentAccount?.governance
+      let proposalAddress: PublicKey | null = null
+      if (!realm) {
+        setIsLoading(false)
+        throw 'No realm selected'
+      }
+      const instructionData = {
+        data: instruction.serializedInstruction
+          ? getInstructionDataFromBase64(instruction.serializedInstruction)
+          : null,
+        holdUpTime: governance?.account?.config.minInstructionHoldUpTime,
+        prerequisiteInstructions: instruction.prerequisiteInstructions || [],
+      }
+      try {
+        // Fetch governance to get up to date proposalCount
+        const selectedGovernance = (await fetchRealmGovernance(
+          governance?.pubkey
+        )) as ProgramAccount<Governance>
+        proposalAddress = await handleCreateProposal({
+          title: form.title ? form.title : proposalTitle,
+          description: form.description ? form.description : '',
+          voteByCouncil,
+          instructionsData: [instructionData],
+          governance: selectedGovernance!,
+        })
+        const url = fmtUrlWithCluster(
+          `/dao/${symbol}/proposal/${proposalAddress}`
+        )
+        router.push(url)
+      } catch (ex) {
+        notify({ type: 'error', message: `${ex}` })
+      }
+    }
+    setIsLoading(false)
   }
 
   const IsAmountNotHigherThenBalance = () => {
@@ -427,7 +477,7 @@ const SendTokens = ({
             (isNFT && !selectedNfts.length)
           }
           className="ml-auto"
-          onClick={handlePropose}
+          onClick={isNft ? handleProposeNftSend : handleProposeTransfer}
           isLoading={isLoading}
         >
           <Tooltip
