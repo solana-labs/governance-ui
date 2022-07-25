@@ -9,6 +9,7 @@ interface NFTProperties {
 
 interface NFTCreator {
   verified: boolean
+  address: string
 }
 
 interface NFTCollectionProperties {

@@ -386,6 +386,10 @@ const fetchNftsFromHolaplexIndexer = async (owner: PublicKey) => {
               image
               updateAuthorityAddress
               collection {
+                creators {
+                  verified
+                  address
+                }
                 mintAddress
               }
           

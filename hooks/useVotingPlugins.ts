@@ -303,7 +303,7 @@ export function useVotingPlugins() {
       nft.collection &&
       nft.collection.mintAddress &&
       usedCollectionsPks.includes(nft.collection.mintAddress) &&
-      nft.collection.creators?.includes((x) => x.verified)
+      nft.collection.creators?.filter((x) => x.verified).length > 0
     )
   }
   useEffect(() => {
