@@ -242,8 +242,12 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
   const wallet = useWalletStore((s) => s.current)
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const { handleCreateProposal } = useCreateProposal()
-  const serumRemoteProgramId = getProgramId(connection.cluster)
-  const serumProgramKey = getDexId(connection.cluster)
+  const serumRemoteProgramId = getProgramId(
+    connection.cluster === 'mainnet-hot' ? 'mainnet' : connection.cluster
+  )
+  const serumProgramKey = getDexId(
+    connection.cluster === 'mainnet-hot' ? 'mainnet' : connection.cluster
+  )
   const { canUseTransferInstruction } = useGovernanceAssets()
   const { canChooseWhoVote, symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
@@ -438,7 +442,8 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
           isDraft: false,
         })
         const url = fmtUrlWithCluster(
-          `/dao/${symbol}/proposal/${proposalAddress}`
+          `/dao/${symbol}/proposal/${proposalAddress}`,
+          true
         )
 
         router.push(url)

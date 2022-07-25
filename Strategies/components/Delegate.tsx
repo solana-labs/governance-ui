@@ -88,7 +88,8 @@ const DelegateForm = ({
         voteByCouncil,
       })
       const url = fmtUrlWithCluster(
-        `/dao/${symbol}/proposal/${proposalAddress}`
+        `/dao/${symbol}/proposal/${proposalAddress}`,
+        true
       )
       router.push(url)
     } catch (e) {
