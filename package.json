@@ -85,7 +85,7 @@
     "next-transpile-modules": "^8.0.0",
     "node-fetch": "^2.6.1",
     "pyth-staking-api": "^1.2.17",
-    "rc-slider": "^9.7.5",
+    "rc-slider": "^10.0.1",
     "react": "^18.1.0",
     "react-dom": "^18.0.0",
     "react-dropzone": "^14.2.2",
