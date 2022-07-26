@@ -160,8 +160,8 @@ const gallery = () => {
                   <a
                     key={idx}
                     href={
-                      connection.endpoint && x.mint
-                        ? getExplorerUrl(connection.cluster, x.mint)
+                      connection.endpoint && x.mintAddress
+                        ? getExplorerUrl(connection.cluster, x.mintAddress)
                         : ''
                     }
                     target="_blank"
@@ -170,7 +170,7 @@ const gallery = () => {
                   >
                     <ImgWithLoader
                       className="bg-bkg-2 cursor-pointer default-transition h-full w-full rounded-md border border-transparent transform scale-90 group-hover:scale-95 group-hover:opacity-50"
-                      src={x.val.image}
+                      src={x.image}
                     />
                   </a>
                   <button

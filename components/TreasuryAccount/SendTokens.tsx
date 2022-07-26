@@ -154,7 +154,7 @@ const SendTokens = ({
 
   const handleProposeNftSend = async () => {
     for (const x of selectedNfts) {
-      const nftName = x?.val?.name
+      const nftName = x?.name
       const nftTitle = `Send ${nftName ? nftName : 'NFT'} to ${
         tryParseKey(form.destinationAccount)
           ? abbreviateAddress(new PublicKey(form.destinationAccount))
