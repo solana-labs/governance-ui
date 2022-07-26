@@ -136,6 +136,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseTokenTransferInstruction,
     },
     {
+      id: Instructions.CreateStream,
+      name: 'Streamflow: Create Vesting Contract',
+      isVisible: canUseAnyInstruction,
+    },
+    {
       id: Instructions.Grant,
       name: 'Grant',
       isVisible:

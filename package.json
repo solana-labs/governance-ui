@@ -68,6 +68,7 @@
     "@solana/wallet-adapter-torus": "^0.11.11",
     "@solana/web3.js": "^1.37.1",
     "@solendprotocol/solend-sdk": "^0.5.5",
+    "@streamflow/stream": "3.0.10",
     "@switchboard-xyz/switchboard-v2": "^0.0.110",
     "@tippyjs/react": "^4.2.6",
     "axios": "^0.26.1",
