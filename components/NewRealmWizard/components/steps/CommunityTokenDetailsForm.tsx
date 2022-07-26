@@ -167,7 +167,7 @@ export default function CommunityTokenForm({
                   {...field}
                   options={[
                     { label: 'Yes', value: true },
-                    { label: 'No, make one for me', value: false },
+                    { label: "No, let's create one", value: false },
                   ]}
                 />
               </FormField>
