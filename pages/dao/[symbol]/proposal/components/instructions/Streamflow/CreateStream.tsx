@@ -341,13 +341,12 @@ const CreateStream = ({
     start: yup.date().nullable().required('Start time is required'),
     depositedAmount: yup
       .number()
-      .integer()
       .nullable()
       .min(0, 'Amount must be positive number')
       .required('Amount is required'),
     amountAtCliff: yup
       .number()
-      .integer()
+      .nullable()
       .moreThan(0, 'Amount released at start must be positive number')
       .lessThan(
         yup.ref('depositedAmount'),
@@ -355,7 +354,7 @@ const CreateStream = ({
       ),
     releaseAmount: yup
       .number()
-      .integer()
+      .nullable()
       .moreThan(0, 'Release amount must be positive number')
       .lessThan(
         yup.ref('depositedAmount'),
