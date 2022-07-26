@@ -49,8 +49,6 @@ export async function sendTransaction({
     signers,
     connection,
   })
-  console.log('################')
-  console.log(signedTransaction)
   return await sendSignedTransaction({
     signedTransaction,
     connection,
