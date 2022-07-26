@@ -1,5 +1,5 @@
 import { useTheme } from 'next-themes'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import GridLayout, { Layout } from 'react-grid-layout'
 import '/node_modules/react-grid-layout/css/styles.css'
 import '/node_modules/react-resizable/css/styles.css'
@@ -46,7 +46,7 @@ const RealmBox = ({ editing, realm, theme, removeItem, inGrid = false }) => {
         <h3 className="text-center">{realm.displayName ?? realm.symbol}</h3>
       </div>
       {editing && !inGrid && (
-        <AiOutlineDrag className="absolute cursor-grab active:cursor-grabbing left-0 right-0 top-0 bottom-0 m-auto h-20 w-20" />
+        <AiOutlineDrag className="absolute cursor-grab active:cursor-grabbing left-0 right-0 top-0 bottom-0 m-auto h-20 w-20 opacity-50" />
       )}
       {editing && inGrid && (
         <div
@@ -81,10 +81,12 @@ function RealmsGrid({
   const [gridRealms, setGridRealms] = useState<readonly RealmInfo[]>([])
   const [draggedItem, setDraggedItem] = useState<string>()
   const [layout, setLayout] = useState<Layout>(generateLayout(10))
+  const [top, setTop] = useState(0)
 
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const { theme } = useTheme()
+  const gridRef = useRef<HTMLDivElement>(null)
 
   const { width } = size
   const GAP = 15
@@ -106,12 +108,25 @@ function RealmsGrid({
   }
 
   useEffect(() => {
+    window.addEventListener('scroll', () => {
+      if (!gridRef?.current?.clientHeight || typeof window === undefined) return
+      if (gridRef?.current?.clientHeight >= window.innerHeight / 2 && editing) {
+        setTop(-gridRef?.current?.clientHeight / 2)
+      } else {
+        setTop(0)
+      }
+    })
+  }, [])
+
+  useEffect(() => {
     setGridRealms(getGridRealms())
   }, [])
 
   useEffect(() => {
     const cols = width < 768 ? 4 : width < 1024 ? 6 : 10
-    if (columns != cols) setLayout(generateLayout(4))
+    if (columns != cols) {
+      setLayout(generateLayout(4))
+    }
     setColumns(cols)
     setLayout(generateLayout(cols))
   }, [width, gridRealms])
@@ -143,7 +158,7 @@ function RealmsGrid({
         const obj = {
           i: realm?.realmId.toString(),
           x: currX,
-          y: 0,
+          y: -1,
           w: 2,
           h: 2,
         }
@@ -232,14 +247,15 @@ function RealmsGrid({
   return (
     <>
       {(gridRealms?.length > 0 || editing) && (
-        <h2 className="my-4">Favourites</h2>
-      )}
-      {(gridRealms?.length > 0 || editing) && (
         <div
-          className={`z-50 ${
+          ref={gridRef}
+          className={`${
             editing &&
-            `border-bgk-5 border-dashed border-y-2 bg-bkg-2 sticky top-0 backdrop-blur`
+            `border-bgk-5 border-dashed border-y-2 bg-bkg-2 !sticky backdrop-blur z-50`
           }`}
+          style={{
+            top: `${top}px`,
+          }}
         >
           <GridLayout
             className={`layout relative min-h-[200px]`}
@@ -281,7 +297,7 @@ function RealmsGrid({
                   )
               )}
           </GridLayout>
-          {editing && (
+          {editing && gridRealms?.length === 0 && (
             <div className="text-confirm-green flex items-center -z-50 justify-center left-0 right-0 m-auto absolute top-[50%] -translate-y-[50%] gap-2 w-fit">
               <AiOutlinePlusCircle className="h-10 w-10" />
               <div>Add DAOs to this grid by dragging</div>
@@ -289,10 +305,10 @@ function RealmsGrid({
           )}
         </div>
       )}
+      <hr className="border border-bgk-1 mb-4" />
       {(editing || searching) && (
         <div className="pb-4 mb-4">
-          {(searching || editing) && <h2 className="my-4">All DAOs</h2>}
-          <div className="grid grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
+          <div className="pt-4 grid grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
             {filteredRealms &&
               filteredRealms.map(
                 (realm) =>
@@ -338,7 +354,6 @@ function RealmsGrid({
       )}
       {!searching && !editing && (
         <div>
-          <h2 className="my-4">Certified DAOs</h2>
           <div className="grid grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
             {certifiedRealms &&
               getRealmsOutsideGrid(certifiedRealms).map((realm) => (
