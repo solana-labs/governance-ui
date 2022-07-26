@@ -4611,6 +4611,19 @@
     eventemitter3 "^4.0.7"
     uuid "^8.3.2"
 
+"@streamflow/stream@3.0.10":
+  version "3.0.10"
+  resolved "https://registry.yarnpkg.com/@streamflow/stream/-/stream-3.0.10.tgz#1fb67784079b2b65bf67105a1cb6a9058de728bd"
+  integrity sha512-6ahU0znOLhXOsh3l7pTEIYGgeNJ+IfbYWljugch8rh+QPd4f7SetZ5zh3aOK6nY4BL04VEH7kdhbpXJcCGugvg==
+  dependencies:
+    "@project-serum/anchor" "^0.16.2"
+    "@project-serum/common" "^0.0.1-beta.3"
+    "@solana/spl-token" "^0.1.8"
+    "@solana/wallet-adapter-base" "^0.9.2"
+    "@solana/web3.js" "^1.42.0"
+    bn.js "^5.2.0"
+    buffer-layout "^1.2.1"
+
 "@supercharge/promise-pool@^2.1.0":
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/@supercharge/promise-pool/-/promise-pool-2.3.0.tgz#9528b11d69a63ff2a342d404afb13cd011c9651a"

@@ -49,7 +49,6 @@ export async function sendTransaction({
     signers,
     connection,
   })
-
   return await sendSignedTransaction({
     signedTransaction,
     connection,
