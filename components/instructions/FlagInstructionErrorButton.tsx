@@ -32,11 +32,10 @@ export function FlagInstructionErrorButton({
   const { realmInfo } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
-
   if (
-    playState !== PlayState.Error ||
+    playState !== PlayState.Error &&
     proposalInstruction.account.executionStatus !==
-      InstructionExecutionStatus.Error ||
+      InstructionExecutionStatus.Error &&
     !proposalAuthority
   ) {
     return null
