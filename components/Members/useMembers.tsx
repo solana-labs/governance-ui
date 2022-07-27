@@ -184,8 +184,9 @@ export default function useMembers() {
                       ? curr.council.account.governingTokenDepositAmount
                       : acc.councilVotes,
                   }
+
                   if (curr.community) {
-                    obj['votesCasted'] += curr.community.account.totalVotesCount
+                    obj['votesCasted'] = curr.community.account.totalVotesCount
                     obj['delegateWalletCommunity'] =
                       curr.community.account.governanceDelegate
                   }
