@@ -32,7 +32,7 @@ const useStrategiesStore = create<StrategiesStore>((set, _get) => ({
       })
     } catch (e) {
       console.log(e)
-      notify({ type: 'error', message: "Can't fetch MNGO strategies" })
+      notify({ type: 'error', message: "Can't fetch strategies" })
     }
     set((s) => {
       s.strategiesLoading = false

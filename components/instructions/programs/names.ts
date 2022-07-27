@@ -43,8 +43,9 @@ export const PROGRAM_NAMES = {
   ...GOVERNANCE_PROGRAM_NAMES,
 }
 
-export function getProgramName(programId: PublicKey) {
-  return PROGRAM_NAMES[programId.toBase58()]
+export function getProgramName(programId: PublicKey | string) {
+  const key = typeof programId === 'string' ? programId : programId.toBase58()
+  return PROGRAM_NAMES[key]
 }
 
 export function isGovernanceProgram(programId: PublicKey) {

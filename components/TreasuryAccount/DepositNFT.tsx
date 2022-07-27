@@ -13,14 +13,24 @@ enum DepositState {
   DepositNFTAddress,
 }
 
-const DepositNFT = ({ onClose }) => {
+const DepositNFT = ({
+  ignoreAddress,
+  onClose,
+}: {
+  ignoreAddress?: boolean
+  onClose?(): void
+}) => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const connection = useWalletStore((s) => s.connection)
   const connected = useWalletStore((s) => s.connected)
   const [
     currentDepositView,
     setCurrentDepositView,
-  ] = useState<DepositState | null>(null)
+  ] = useState<DepositState | null>(
+    ignoreAddress ? DepositState.DepositNFTFromWallet : null
+  )
+
+  console.log(ignoreAddress, currentDepositView)
 
   return (
     <>
