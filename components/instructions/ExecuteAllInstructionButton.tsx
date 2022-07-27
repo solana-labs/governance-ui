@@ -31,6 +31,8 @@ export function ExecuteAllInstructionButton({
   setPlaying,
   proposalInstructions,
   small,
+  multiTransactionMode = false,
+  label = 'Execute',
 }: {
   className?: string
   proposal: ProgramAccount<Proposal>
@@ -38,6 +40,8 @@ export function ExecuteAllInstructionButton({
   playing: PlayState
   setPlaying: React.Dispatch<React.SetStateAction<PlayState>>
   small?: boolean
+  multiTransactionMode?: boolean
+  label?: string
 }) {
   const { realmInfo } = useRealm()
   const wallet = useWalletStore((s) => s.current)
@@ -78,7 +82,12 @@ export function ExecuteAllInstructionButton({
     setPlaying(PlayState.Playing)
 
     try {
-      await executeInstructions(rpcContext, proposal, proposalInstructions)
+      await executeInstructions(
+        rpcContext,
+        proposal,
+        proposalInstructions,
+        multiTransactionMode
+      )
       await refetchProposals()
     } catch (error) {
       notify({ type: 'error', message: `error executing instruction ${error}` })
@@ -119,7 +128,7 @@ export function ExecuteAllInstructionButton({
         disabled={!connected}
         onClick={onExecuteInstructions}
       >
-        Execute
+        {label}
         {proposalInstructions.length > 1
           ? ` (${proposalInstructions.length})`
           : ''}

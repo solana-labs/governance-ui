@@ -68,11 +68,8 @@ export function FlagInstructionErrorButton({
   return (
     <Tooltip content="Flag instruction as broken">
       <p className="border-dashed border-fgd-3 text-fgd-3 text-xs hover:cursor-help border-b-0">
-        <Button>
-          <ExclamationCircleIcon
-            className="h-5 text-red w-5"
-            onClick={onFlagError}
-          />
+        <Button onClick={onFlagError}>
+          <ExclamationCircleIcon className="h-5 text-red w-5" />
         </Button>
       </p>
     </Tooltip>
