@@ -50,8 +50,8 @@ export default function NftVotingPower(props: Props) {
           {displayNfts.slice(0, 3).map((nft, index) => (
             <div
               className="h-12 w-12 rounded-sm bg-bkg-2 bg-cover"
-              key={nft.tokenAddress + index}
-              style={{ backgroundImage: `url("${nft.val.image}")` }}
+              key={nft.mintAddress + index}
+              style={{ backgroundImage: `url("${nft.image}")` }}
             />
           ))}
           {!!remainingCount && (
