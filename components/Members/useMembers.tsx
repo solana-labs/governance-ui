@@ -201,7 +201,11 @@ export default function useMembers() {
               ),
           }
         })
-        .filter((x) => x.votesCasted > 0)
+        .filter((x) =>
+          x.hasCouncilTokenOutsideRealm || x.councilVotes.toNumber() > 0
+            ? true
+            : x.votesCasted > 0
+        )
         .sort((a, b) => {
           return a.votesCasted - b.votesCasted
         })
