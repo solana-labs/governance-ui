@@ -74,7 +74,7 @@ const CustomBase64 = ({
     base64: yup
       .string()
       .required('Instruction is required')
-      .test('base64Test', 'Invalid base64', function (val: string) {
+      .test('base64Test', 'Invalid input. Must be base64 encoded governance program InstructionData', function (val: string) {
         if (val) {
           try {
             getInstructionDataFromBase64(val)
