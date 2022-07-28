@@ -7,7 +7,7 @@
     "bannerImage": "/realms/Ukraine/img/Flag_of_Ukraine.svg",
     "ogImage": "/realms/Ukraine/img/Ukraine_Logo.png",
     "sharedWalletId": "66pJhhESDjdeBBDdkKmxYYd7q6GUggYPWjxpMKNX39KV",
-    "sortRank":3 
+    "sortRank": 3
   },
   {
     "symbol": "MNGO",
@@ -18,7 +18,7 @@
     "keywords": "Mango Markets, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
     "twitter": "@mangomarkets",
     "ogImage": "https://trade.mango.markets/assets/icons/logo.svg",
-    "sortRank":3 
+    "sortRank": 3
   },
   {
     "symbol": "DTP",
@@ -279,7 +279,7 @@
     "ogImage": "/realms/Grape/img/grape.png",
     "website": "https://grapes.network/",
     "twitter": "@grapeprotocol",
-    "sortRank":3 
+    "sortRank": 3
   },
   {
     "symbol": "RED",
@@ -289,7 +289,7 @@
     "ogImage": "/realms/RED/RED.png",
     "website": "https://realms.notion.site/Realms-Ecosystem-DAO-RED-2b82519e797b4696968c5c909812f418",
     "twitter": "@Realms_DAOs",
-    "sortRank":2
+    "sortRank": 2
   },
   {
     "symbol": "MonkeDAO",
@@ -505,7 +505,7 @@
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "97jKDX5Uxh5xSPbmmfhiFodHEajSVdKkknTzzgf8GBAr"
   },
-    {
+  {
     "symbol": "RatioFinance",
     "displayName": "Ratio Finance",
     "programId": "HT19EcD68zn7NoCF79b2ucQF8XaMdowyPt5ccS6g1PUx",
@@ -782,7 +782,7 @@
     "website": "https://solboredyachtclub.com",
     "twitter": "@SolBoredYacht"
   },
-    {
+  {
     "symbol": "$MasoorDAO",
     "displayName": "Hari's Realm",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -791,7 +791,7 @@
     "twitter": "@HariOnChain",
     "ogImage": "/realms/MasoorDAO/MasoorDAO.PNG"
   },
-    {
+  {
     "symbol": "ADAO",
     "displayName": "Astra DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -800,7 +800,7 @@
     "twitter": "@MannyAstra",
     "ogImage": "/realms/Astra/AstraPodcastLogo.PNG"
   },
-    {
+  {
     "symbol": "CreatedBy",
     "displayName": "CreatedBy DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -809,7 +809,7 @@
     "twitter": "@CreatedByIO",
     "ogImage": "/realms/CreatedBy/CreatedBy.png"
   },
-    {
+  {
     "symbol": "SAMO",
     "displayName": "SamoDAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -817,27 +817,27 @@
     "website": "https://samoyedcoin.com",
     "twitter": "@Samo_DAO",
     "ogImage": "/realms/SamoDAO/SamoDAO.png"
-    },
-    {
-      "symbol": "FORE",
-      "displayName": "Foresight DAO",
-      "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-      "realmId": "CZatgrcvaDN9ib1sQeSCJWUnBXc899ydTB9vfAHHBVfP",
-      "ogImage": "https://www.foresight.exchange/logo.png",
-      "website": "https://www.foresight.exchange/",
-      "twitter": "@foresightmkt"
-    },
-    {
-      "symbol": "SLND",
-      "displayName": "Solend DAO",
-      "programId": "A7kmu2kUcnQwAVn8B4znQmGJeUrsJ1WEhYVMtmiBLkEr",
-      "realmId": "7sf3tcWm58vhtkJMwuw2P3T6UBX7UE5VKxPMnXJUZ1Hn",
-      "ogImage": "https://solend-image-assets.s3.us-east-2.amazonaws.com/1280-circle.png",
-      "website": "https://solend.fi/",
-      "twitter": "@solendprotocol",
-      "sortRank": 2
-    },
-    {
+  },
+  {
+    "symbol": "FORE",
+    "displayName": "Foresight DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "CZatgrcvaDN9ib1sQeSCJWUnBXc899ydTB9vfAHHBVfP",
+    "ogImage": "https://www.foresight.exchange/logo.png",
+    "website": "https://www.foresight.exchange/",
+    "twitter": "@foresightmkt"
+  },
+  {
+    "symbol": "SLND",
+    "displayName": "Solend DAO",
+    "programId": "A7kmu2kUcnQwAVn8B4znQmGJeUrsJ1WEhYVMtmiBLkEr",
+    "realmId": "7sf3tcWm58vhtkJMwuw2P3T6UBX7UE5VKxPMnXJUZ1Hn",
+    "ogImage": "https://solend-image-assets.s3.us-east-2.amazonaws.com/1280-circle.png",
+    "website": "https://solend.fi/",
+    "twitter": "@solendprotocol",
+    "sortRank": 2
+  },
+  {
     "symbol": "FSGOV",
     "displayName": "Flipside Governance",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -845,8 +845,8 @@
     "website": "https://flipsidecrypto.xyz/",
     "twitter": "@flipsidecrypto",
     "ogImage": "/realms/FSLOGO/FLIPSIDE-LOGO-WHITE.png"
-    },
-    {
+  },
+  {
     "symbol": "GrapeCCSubDAO",
     "displayName": "Grape CC SubDAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -854,8 +854,8 @@
     "website": "https://services.grapes.network/",
     "twitter": "@grapeprotocol",
     "ogImage": "/realms/GrapeCCSubDAO/GrapeCCSubDAO.png"
-   },
-   {
+  },
+  {
     "symbol": "AthensDAO",
     "displayName": "AthensDAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -873,7 +873,7 @@
     "website": "https://www.bootstrapdao.xyz/",
     "twitter": "@BootstrapDao",
     "ogImage": "/realms/BootstrapDAO/BootRealms.png"
-  }, 
+  },
   {
     "symbol": "laptopDAO",
     "displayName": "laptopDAO",
@@ -900,5 +900,15 @@
     "website": "https://www.telebunnies.com/",
     "twitter": "@TelebunniesO",
     "ogImage": "/realms/TelebunniesDAO/telebunniesDAO.png"
+  },
+  {
+    "symbol": "CYG",
+    "displayName": "Cygnus",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "CCbMnmocmd7GMc688ixg2okNFKshJwdqCfMuxng2CAL",
+    "bannerImage": "/realms/Cygnus/cygnus-banner.jpg",
+    "website": "https://cygnusorg.net/",
+    "twitter": "@Cygnusorg",
+    "ogImage": "/realms/Cygnus/cygnus-logo.jpg"
   }
- ]
+]
