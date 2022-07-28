@@ -319,7 +319,6 @@ export const TokenDeposit = ({
       }
     }
     let ata: PublicKey | null = null
-    console.log(depositMint)
     if (!depositTokenAccount) {
       ata = await Token.getAssociatedTokenAddress(
         ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
