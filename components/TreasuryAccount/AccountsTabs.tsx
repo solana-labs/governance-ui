@@ -14,7 +14,7 @@ const AccountsTabs: FunctionComponent<AccountsTabsProps> = ({
   tabs,
 }) => {
   return (
-    <div className={`relative`}>
+    <div className={`relative max-h-[1340px] overflow-auto`}>
       <div
         className={`absolute bg-primary-light top-0 default-transition left-0 w-1 z-10`}
         style={{
