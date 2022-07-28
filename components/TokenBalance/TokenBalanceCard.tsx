@@ -1,4 +1,9 @@
-import { MintInfo } from '@solana/spl-token'
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  MintInfo,
+  Token,
+  TOKEN_PROGRAM_ID,
+} from '@solana/spl-token'
 import {
   Keypair,
   PublicKey,
@@ -313,12 +318,34 @@ export const TokenDeposit = ({
         )
       }
     }
+    let ata: PublicKey | null = null
+    console.log(depositMint)
+    if (!depositTokenAccount) {
+      ata = await Token.getAssociatedTokenAddress(
+        ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+        TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+        depositMint!, // mint
+        wallet!.publicKey!, // owner
+        true
+      )
+      const ataIx = Token.createAssociatedTokenAccountInstruction(
+        ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+        TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+        depositMint!, // mint
+        ata, // ata
+        wallet!.publicKey!, // owner of token account
+        wallet!.publicKey! // fee payer
+      )
+      instructions.push(ataIx)
+    }
 
     await withWithdrawGoverningTokens(
       instructions,
       realmInfo!.programId,
       realm!.pubkey,
-      depositTokenAccount!.publicKey,
+      depositTokenAccount?.publicKey
+        ? depositTokenAccount!.publicKey
+        : new PublicKey(ata!),
       depositTokenRecord!.account.governingTokenMint,
       wallet!.publicKey!
     )
