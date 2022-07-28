@@ -95,6 +95,7 @@ import MakeSwapSpotMarket from './components/instructions/Mango/MakeSwapSpotMark
 import MakeRemoveOracle from './components/instructions/Mango/MakeRemoveOracle'
 import SagaPreOrder from './components/instructions/Solana/SagaPhone/SagaPreOrder'
 import MakeDepositToMangoAccount from './components/instructions/Mango/MakeDepositToMangoAccount'
+import MakeDepositToMangoAccountCsv from './components/instructions/Mango/MakeDepositToMangoAccountCsv'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -534,6 +535,13 @@ const New = () => {
             index={idx}
             governance={governance}
           ></MakeDepositToMangoAccount>
+        )
+      case Instructions.DepositToMangoAccountCsv:
+        return (
+          <MakeDepositToMangoAccountCsv
+            index={idx}
+            governance={governance}
+          ></MakeDepositToMangoAccountCsv>
         )
       case Instructions.ForesightInitMarket:
         return (
