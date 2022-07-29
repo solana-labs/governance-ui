@@ -50,8 +50,7 @@ const useNftPluginStore = create<nftPluginStore>((set, _get) => ({
       .map(
         (x) =>
           nftMintRegistrar?.collectionConfigs?.find(
-            (j) =>
-              j.collection?.toBase58() === x.metadata?.data?.collection?.key
+            (j) => j.collection?.toBase58() === x.collection.mintAddress
           )?.weight || new BN(0)
       )
       .reduce((prev, next) => prev.add(next), new BN(0))
