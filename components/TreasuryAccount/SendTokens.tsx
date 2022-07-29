@@ -135,7 +135,7 @@ const SendTokens = ({
     return totalPriceFormatted
   }
 
-  async function getNftInstruction(x): Promise<UiInstruction> {
+  async function getNftInstruction(x: NFTWithMint): Promise<UiInstruction> {
     const selectedNftMint = x.mintAddress
     const defaultProps = {
       schema,
