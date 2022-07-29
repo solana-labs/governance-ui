@@ -1,5 +1,4 @@
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
-import { deprecated } from '@metaplex-foundation/mpl-token-metadata'
 import {
   NftVoterClient,
   GatewayClient,
@@ -54,11 +53,10 @@ export interface VotingClientProps {
 }
 
 export interface NFTWithMeta extends NFTWithMint {
-  metadata: deprecated.Metadata
   getAssociatedTokenAccount(): Promise<string>
 }
 
-enum VotingClientType {
+export enum VotingClientType {
   NoClient,
   VsrClient,
   NftVoterClient,
