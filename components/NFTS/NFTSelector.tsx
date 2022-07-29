@@ -11,6 +11,8 @@ import { PublicKey } from '@solana/web3.js'
 import Loading from '@components/Loading'
 import { getNfts } from '@utils/tokens'
 import ImgWithLoader from '@components/ImgWithLoader'
+import useWalletStore from 'stores/useWalletStore'
+
 export interface NftSelectorFunctions {
   handleGetNfts: () => void
 }
@@ -38,6 +40,7 @@ function NFTSelector(
   const isPredefinedMode = typeof predefinedNfts !== 'undefined'
   const [nfts, setNfts] = useState<NFTWithMint[]>([])
   const [selected, setSelected] = useState<NFTWithMint[]>([])
+  const connection = useWalletStore((s) => s.connection)
   const [isLoading, setIsLoading] = useState(false)
   const handleSelectNft = (nft: NFTWithMint) => {
     const nftMint: string[] = []
@@ -57,7 +60,9 @@ function NFTSelector(
   }
   const handleGetNfts = async () => {
     setIsLoading(true)
-    const response = await Promise.all(ownersPk.map((x) => getNfts(x)))
+    const response = await Promise.all(
+      ownersPk.map((x) => getNfts(x, connection.current))
+    )
     const nfts = response.flatMap((x) => x)
     if (nfts.length === 1) {
       setSelected([nfts[0]])
