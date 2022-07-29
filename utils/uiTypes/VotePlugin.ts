@@ -199,7 +199,7 @@ export class VotingClient {
       for (let i = 0; i < this.votingNfts.length; i++) {
         const nft = this.votingNfts[i]
         remainingAccounts.push(
-          new AccountData(nft.mintAddress),
+          new AccountData(nft.address), // TODO this needs to be the token's account address
           new AccountData(nft.address)
         )
       }
@@ -327,7 +327,7 @@ export class VotingClient {
           )
         )
           remainingAccounts.push(
-            new AccountData(nft.tokenAccountAddress),
+            new AccountData(nft.address), // TODO this needs to be the token's account address
             new AccountData(nft.address),
             new AccountData(nftVoteRecord, false, true)
           )
