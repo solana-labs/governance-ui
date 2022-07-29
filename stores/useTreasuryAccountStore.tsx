@@ -40,7 +40,7 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
   isLoadingNfts: false,
   isLoadingRecentActivity: false,
   isLoadingTokenAccounts: false,
-  getNfts: async (nftsGovernedTokenAccounts) => {
+  getNfts: async (nftsGovernedTokenAccounts, connection) => {
     set((s) => {
       s.isLoadingNfts = true
     })
@@ -50,11 +50,14 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
       const governance = acc.governance.pubkey.toBase58()
       try {
         const nfts = acc.governance.pubkey
-          ? await getNfts(acc.governance.pubkey)
+          ? await getNfts(acc.governance.pubkey, connection)
           : []
         if (acc.isSol) {
           const solAccountNfts = acc.extensions.transferAddress
-            ? await getNfts(new PublicKey(acc.extensions.transferAddress!))
+            ? await getNfts(
+                new PublicKey(acc.extensions.transferAddress!),
+                connection
+              )
             : []
           realmNfts = [...realmNfts, ...solAccountNfts]
 

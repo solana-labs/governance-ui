@@ -392,9 +392,9 @@ const fetchNftsFromHolaplexIndexer = async (owner: PublicKey) => {
                 }
                 mintAddress
               }
-          
+
             }
-          
+
         }
       `,
       variables: {
@@ -407,10 +407,26 @@ const fetchNftsFromHolaplexIndexer = async (owner: PublicKey) => {
   return body.data
 }
 
-export const getNfts = async (ownerPk: PublicKey): Promise<NFTWithMeta[]> => {
+export const getNfts = async (
+  ownerPk: PublicKey,
+  connection: Connection
+): Promise<NFTWithMeta[]> => {
   try {
     const data = await fetchNftsFromHolaplexIndexer(ownerPk)
-    return data.nfts
+    return data.nfts.map((nft) => ({
+      ...nft,
+      getAssociatedTokenAccount: async () => {
+        const accounts = await getOwnedTokenAccounts(connection, ownerPk)
+
+        for (const account of accounts) {
+          if (account.account.mint.toBase58() === nft.mintAddress) {
+            return account.publicKey.toBase58()
+          }
+        }
+
+        throw new Error('Could not find associated token account')
+      },
+    }))
   } catch (error) {
     notify({
       type: 'error',
