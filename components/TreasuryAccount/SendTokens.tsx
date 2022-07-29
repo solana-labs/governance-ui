@@ -136,7 +136,7 @@ const SendTokens = ({
   }
 
   async function getNftInstruction(x): Promise<UiInstruction> {
-    const selectedNftMint = x.mint
+    const selectedNftMint = x.mintAddress
     const defaultProps = {
       schema,
       form,
