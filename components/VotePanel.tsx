@@ -20,6 +20,7 @@ import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { LOCALNET_REALM_ID as PYTH_LOCALNET_REALM_ID } from 'pyth-staking-api'
 import { isYesVote } from '@models/voteRecords'
 import Tooltip from '@components/Tooltip'
+import { VotingClientType } from '@utils/uiTypes/VotePlugin'
 
 const VotePanel = () => {
   const [showVoteModal, setShowVoteModal] = useState(false)
@@ -170,6 +171,8 @@ const VotePanel = () => {
     ? 'You need to connect your wallet to be able to vote'
     : !isVoting && isVoteCast
     ? 'Proposal is not in a voting state anymore.'
+    : client.clientType === VotingClientType.NftVoterClient && !voterTokenRecord
+    ? 'You must join the Realm to be able to vote'
     : !voterTokenRecord ||
       !ownVoterWeight.hasMinAmountToVote(
         voterTokenRecord.account.governingTokenMint
