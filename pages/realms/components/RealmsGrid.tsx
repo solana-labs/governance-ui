@@ -1,6 +1,6 @@
 import { useTheme } from 'next-themes'
 import React, { useEffect, useState, useRef } from 'react'
-import { Layout } from 'react-grid-layout'
+import GridLayout, { Layout } from 'react-grid-layout'
 import '/node_modules/react-grid-layout/css/styles.css'
 import '/node_modules/react-resizable/css/styles.css'
 import { useRouter } from 'next/router'
@@ -9,84 +9,56 @@ import { RealmInfo } from '@models/registry/api'
 import { withSize } from 'react-sizeme'
 import { AiOutlineDrag, AiOutlinePlusCircle } from 'react-icons/ai'
 import { IoIosRemoveCircleOutline } from 'react-icons/io'
-import {
-  SortableContainer,
-  SortableElement,
-  arrayMove,
-} from 'react-sortable-hoc'
 
-const SortableList = SortableContainer(
-  ({ items, editing, goToRealm, removeItem, theme }) => {
-    return (
-      <ul className="pt-4 grid grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
-        {items.map((realm, index) => (
-          <RealmBox
-            key={realm?.realmId.toString()}
-            onClick={() => (editing ? null : goToRealm(realm))}
-            index={index}
-            realm={realm}
-            editing={editing}
-            theme={theme}
-            removeItem={removeItem}
-            inGrid={true}
-          />
-        ))}
-      </ul>
-    )
-  }
-)
-
-const RealmBox = SortableElement(
-  ({ onClick, editing, realm, theme, removeItem, inGrid = false }) => {
-    return (
-      <div className="relative h-full w-full group" onClick={onClick}>
-        <div
-          className={`flex relative w-full h-full flex-col items-center justify-center overflow-hidden p-8 rounded-lg cursor-pointer default-transition active:cursor-grabbing ${
-            editing
-              ? ` bg-bkg-4 cursor-grab opacity-75 group-hover:opacity-90`
-              : `hover:bg-bkg-3 bg-bkg-2`
-          }`}
-        >
-          <div className="pb-5">
-            {realm.ogImage ? (
-              <div
-                className={`${
-                  theme === 'Dark'
-                    ? 'bg-[rgba(255,255,255,0.06)]'
-                    : 'bg-[rgba(0,0,0,0.06)]'
-                } rounded-full h-16 w-16 flex items-center justify-center`}
-              >
-                <img className="w-10" src={realm.ogImage}></img>
-              </div>
-            ) : (
-              <div
-                className={`${
-                  theme === 'Dark'
-                    ? 'bg-[rgba(255,255,255,0.06)]'
-                    : 'bg-[rgba(0,0,0,0.06)]'
-                } h-16 w-16 flex font-bold items-center justify-center rounded-full text-fgd-3`}
-              >
-                {realm.displayName?.charAt(0)}
-              </div>
-            )}
-          </div>
-          <h3 className="text-center">{realm.displayName ?? realm.symbol}</h3>
+const RealmBox = ({ editing, realm, theme, removeItem, inGrid = false }) => {
+  return (
+    <div className="relative h-full w-full group">
+      <div
+        className={`flex relative w-full h-full flex-col items-center justify-center overflow-hidden p-8 rounded-lg cursor-pointer default-transition active:cursor-grabbing ${
+          editing
+            ? ` bg-bkg-4 cursor-grab opacity-75 group-hover:opacity-90`
+            : `hover:bg-bkg-3 bg-bkg-2`
+        }`}
+      >
+        <div className="pb-5">
+          {realm.ogImage ? (
+            <div
+              className={`${
+                theme === 'Dark'
+                  ? 'bg-[rgba(255,255,255,0.06)]'
+                  : 'bg-[rgba(0,0,0,0.06)]'
+              } rounded-full h-16 w-16 flex items-center justify-center`}
+            >
+              <img className="w-10" src={realm.ogImage}></img>
+            </div>
+          ) : (
+            <div
+              className={`${
+                theme === 'Dark'
+                  ? 'bg-[rgba(255,255,255,0.06)]'
+                  : 'bg-[rgba(0,0,0,0.06)]'
+              } h-16 w-16 flex font-bold items-center justify-center rounded-full text-fgd-3`}
+            >
+              {realm.displayName?.charAt(0)}
+            </div>
+          )}
         </div>
-        {editing && !inGrid && (
-          <AiOutlineDrag className="absolute cursor-grab active:cursor-grabbing left-0 right-0 top-0 bottom-0 m-auto h-20 w-20 opacity-50" />
-        )}
-        {editing && inGrid && (
-          <div
-            onClick={() => removeItem(realm.realmId.toString())}
-            className="absolute top-1 right-1 rounded-full cursor-pointer hover:opacity-50"
-          >
-            <IoIosRemoveCircleOutline className="h-8 w-8 z-50" />
-          </div>
-        )}
+        <h3 className="text-center">{realm.displayName ?? realm.symbol}</h3>
       </div>
-    )
-  }
-)
+      {editing && !inGrid && (
+        <AiOutlineDrag className="absolute cursor-grab active:cursor-grabbing left-0 right-0 top-0 bottom-0 m-auto h-20 w-20 opacity-50" />
+      )}
+      {editing && inGrid && (
+        <div
+          onClick={() => removeItem(realm.realmId.toString())}
+          className="absolute top-1 right-1 rounded-full cursor-pointer hover:opacity-50"
+        >
+          <IoIosRemoveCircleOutline className="h-8 w-8 z-50" />
+        </div>
+      )}
+    </div>
+  )
+}
 
 function RealmsGrid({
   certifiedRealms,
@@ -94,7 +66,7 @@ function RealmsGrid({
   filteredRealms,
   editing,
   searching,
-  // clearSearch,
+  clearSearch,
   size,
 }: {
   certifiedRealms: readonly RealmInfo[]
@@ -105,10 +77,9 @@ function RealmsGrid({
   clearSearch: () => void
   size: { width: number }
 }) {
-  console.log('HI')
   const [columns, setColumns] = useState(10)
-  const [gridRealms, setGridRealms] = useState<RealmInfo[]>([])
-  // const [draggedItem, setDraggedItem] = useState<string>()
+  const [gridRealms, setGridRealms] = useState<readonly RealmInfo[]>([])
+  const [draggedItem, setDraggedItem] = useState<string>()
   const [layout, setLayout] = useState<Layout>(generateLayout(10))
   const [top, setTop] = useState(0)
 
@@ -118,14 +89,10 @@ function RealmsGrid({
   const gridRef = useRef<HTMLDivElement>(null)
 
   const { width } = size
-  // const GAP = 15
-  // const ROW_HEIGHT = 100
+  const GAP = 15
+  const ROW_HEIGHT = 100
   const STORAGE_GRID = 'gridRealms'
   const STORAGE_IDS = 'gridRealmIds'
-
-  const onSortEnd = ({ oldIndex, newIndex }) => {
-    setGridRealms((items) => arrayMove(items, oldIndex, newIndex))
-  }
 
   const getGridRealms = () => {
     let gridRealmIds, realms
@@ -153,7 +120,6 @@ function RealmsGrid({
 
   useEffect(() => {
     setGridRealms(getGridRealms())
-    console.log('realms', certifiedRealms)
   }, [])
 
   useEffect(() => {
@@ -202,10 +168,10 @@ function RealmsGrid({
     )
   }
 
-  // const updateItem = (newLayout) => {
-  //   setLayout(newLayout)
-  //   localStorage.setItem(STORAGE_GRID + columns, JSON.stringify(newLayout))
-  // }
+  const updateItem = (newLayout) => {
+    setLayout(newLayout)
+    localStorage.setItem(STORAGE_GRID + columns, JSON.stringify(newLayout))
+  }
 
   const removeItem = (id) => {
     const newL = layout.filter((item) => item.i !== id)
@@ -223,60 +189,60 @@ function RealmsGrid({
       )
   }
 
-  // const onDrop = (newLayout, layoutItem) => {
-  //   resetGrid()
-  //   if (!layoutItem) {
-  //     return
-  //   }
-  //   const newL = [
-  //     ...newLayout.filter(
-  //       (item) => !item.i.includes('dropping') && item.i != draggedItem
-  //     ),
-  //     { ...layoutItem, w: 2, h: 2, i: draggedItem },
-  //   ]
-  //   if (draggedItem) {
-  //     const newRealm = unchartedRealms
-  //       .concat(certifiedRealms)
-  //       .find((item) => item.realmId.toString() == draggedItem)
-  //     if (
-  //       newRealm &&
-  //       !gridRealms.find(
-  //         (item) => item.realmId.toString() == newRealm.realmId.toString()
-  //       )
-  //     )
-  //       setGridRealms([...gridRealms, newRealm])
-  //   }
-  //   const currentRealms = localStorage.getItem(STORAGE_IDS)
-  //   if (
-  //     currentRealms &&
-  //     draggedItem &&
-  //     !JSON.parse(currentRealms).find((item) => item == draggedItem)
-  //   ) {
-  //     localStorage.setItem(
-  //       STORAGE_IDS,
-  //       JSON.stringify([...JSON.parse(currentRealms), draggedItem])
-  //     )
-  //   } else if (draggedItem) {
-  //     localStorage.setItem(STORAGE_IDS, JSON.stringify([draggedItem]))
-  //   }
-  //   setLayout(newL)
-  //   localStorage.setItem(STORAGE_GRID + columns, JSON.stringify(newL))
-  // }
+  const onDrop = (newLayout, layoutItem) => {
+    resetGrid()
+    if (!layoutItem) {
+      return
+    }
+    const newL = [
+      ...newLayout.filter(
+        (item) => !item.i.includes('dropping') && item.i != draggedItem
+      ),
+      { ...layoutItem, w: 2, h: 2, i: draggedItem },
+    ]
+    if (draggedItem) {
+      const newRealm = unchartedRealms
+        .concat(certifiedRealms)
+        .find((item) => item.realmId.toString() == draggedItem)
+      if (
+        newRealm &&
+        !gridRealms.find(
+          (item) => item.realmId.toString() == newRealm.realmId.toString()
+        )
+      )
+        setGridRealms([...gridRealms, newRealm])
+    }
+    const currentRealms = localStorage.getItem(STORAGE_IDS)
+    if (
+      currentRealms &&
+      draggedItem &&
+      !JSON.parse(currentRealms).find((item) => item == draggedItem)
+    ) {
+      localStorage.setItem(
+        STORAGE_IDS,
+        JSON.stringify([...JSON.parse(currentRealms), draggedItem])
+      )
+    } else if (draggedItem) {
+      localStorage.setItem(STORAGE_IDS, JSON.stringify([draggedItem]))
+    }
+    setLayout(newL)
+    localStorage.setItem(STORAGE_GRID + columns, JSON.stringify(newL))
+  }
 
-  // const resetGrid = () => {
-  //   setGridRealms(getGridRealms())
-  //   clearSearch()
-  // }
+  const resetGrid = () => {
+    setGridRealms(getGridRealms())
+    clearSearch()
+  }
 
-  // const getRealmsOutsideGrid = (realms) => {
-  //   return (
-  //     realms &&
-  //     realms.filter(
-  //       (realm) =>
-  //         !gridRealms.map((item) => item.).includes(realm.realmId.toString())
-  //     )
-  //   )
-  // }
+  const getRealmsOutsideGrid = (realms) => {
+    return (
+      realms &&
+      realms.filter(
+        (realm) =>
+          !layout.map((item) => item.i).includes(realm.realmId.toString())
+      )
+    )
+  }
 
   return (
     <>
@@ -291,14 +257,46 @@ function RealmsGrid({
             top: `${top}px`,
           }}
         >
-          <SortableList
-            onSortEnd={onSortEnd}
-            items={gridRealms}
-            editing={editing}
-            goToRealm={goToRealm}
-            removeItem={removeItem}
-            theme={theme}
-          />
+          <GridLayout
+            className={`layout relative min-h-[200px]`}
+            layout={layout}
+            width={width}
+            cols={columns}
+            rowHeight={ROW_HEIGHT}
+            margin={[GAP, GAP]}
+            containerPadding={[0, GAP]}
+            onDragStop={(layout) => updateItem(layout)}
+            onResizeStop={(layout) => updateItem(layout)}
+            isResizable={false}
+            isDraggable={editing}
+            isDroppable={editing}
+            onDrop={onDrop}
+          >
+            {gridRealms &&
+              gridRealms.map(
+                (realm) =>
+                  layout &&
+                  layout.find(
+                    (item) => item.i == realm?.realmId.toString()
+                  ) && (
+                    <div
+                      key={realm?.realmId.toString()}
+                      onClick={() => (editing ? null : goToRealm(realm))}
+                      data-grid={layout.find(
+                        (item) => item?.i == realm?.realmId.toString()
+                      )}
+                    >
+                      <RealmBox
+                        realm={realm}
+                        editing={editing}
+                        theme={theme}
+                        removeItem={removeItem}
+                        inGrid={true}
+                      />
+                    </div>
+                  )
+              )}
+          </GridLayout>
           {editing && gridRealms?.length === 0 && (
             <div className="text-confirm-green flex items-center -z-50 justify-center left-0 right-0 m-auto absolute top-[50%] -translate-y-[50%] gap-2 w-fit">
               <AiOutlinePlusCircle className="h-10 w-10" />
@@ -312,37 +310,45 @@ function RealmsGrid({
         <div className="pb-4 mb-4">
           <div className="pt-4 grid grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
             {filteredRealms &&
-              filteredRealms.map((realm, index) => (
-                <div
-                  draggable={editing}
-                  unselectable="on"
-                  // onMouseDown={
-                  //   editing
-                  //     ? () => {
-                  //         setDraggedItem(realm?.realmId.toString())
-                  //       }
-                  //     : () => null
-                  // }
-                  // this is a hack for firefox
-                  // Firefox requires some kind of initialization
-                  // which we can do by adding this attribute
-                  // @see https://bugzilla.mozilla.org/show_bug.cgi?id=568313
-                  onDragStart={(e) =>
-                    editing && e.dataTransfer.setData('text/plain', '')
-                  }
-                  key={realm.realmId.toString()}
-                >
-                  <RealmBox
-                    index={index}
-                    onClick={() => (editing ? null : goToRealm(realm))}
-                    realm={realm}
-                    editing={editing}
-                    removeItem={() => null}
-                    theme={theme}
-                    inGrid={false}
-                  />
-                </div>
-              ))}
+              filteredRealms.map(
+                (realm) =>
+                  layout &&
+                  !layout
+                    .map((item) => item.i)
+                    .includes(realm?.realmId.toString()) && (
+                    <div
+                      draggable={editing}
+                      unselectable="on"
+                      onMouseDown={
+                        editing
+                          ? () => {
+                              setDraggedItem(realm?.realmId.toString())
+                            }
+                          : () => null
+                      }
+                      // this is a hack for firefox
+                      // Firefox requires some kind of initialization
+                      // which we can do by adding this attribute
+                      // @see https://bugzilla.mozilla.org/show_bug.cgi?id=568313
+                      onDragStart={(e) =>
+                        editing && e.dataTransfer.setData('text/plain', '')
+                      }
+                      onClick={() => (editing ? null : goToRealm(realm))}
+                      style={{
+                        minWidth: (width / columns) * 2 - GAP + 1,
+                        height: ROW_HEIGHT * 2 + GAP,
+                      }}
+                      key={realm.realmId.toString()}
+                    >
+                      <RealmBox
+                        realm={realm}
+                        editing={editing}
+                        removeItem={() => null}
+                        theme={theme}
+                      />
+                    </div>
+                  )
+              )}
           </div>
         </div>
       )}
@@ -350,11 +356,12 @@ function RealmsGrid({
         <div>
           <div className="grid grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
             {certifiedRealms &&
-              certifiedRealms.map((realm, index) => (
-                <div key={realm?.realmId.toString()}>
+              getRealmsOutsideGrid(certifiedRealms).map((realm) => (
+                <div
+                  key={realm?.realmId.toString()}
+                  onClick={() => (editing ? null : goToRealm(realm))}
+                >
                   <RealmBox
-                    onClick={() => (editing ? null : goToRealm(realm))}
-                    index={index}
                     realm={realm}
                     editing={editing}
                     removeItem={() => null}
@@ -366,12 +373,13 @@ function RealmsGrid({
           <h2 className="pt-12 mb-4">Uncharted DAOs</h2>
           <div className="grid grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
             {unchartedRealms &&
-              unchartedRealms.map((realm, index) => (
-                <div key={realm?.realmId.toString()}>
+              getRealmsOutsideGrid(unchartedRealms).map((realm) => (
+                <div
+                  key={realm?.realmId.toString()}
+                  onClick={() => (editing ? null : goToRealm(realm))}
+                >
                   <RealmBox
                     realm={realm}
-                    onClick={() => (editing ? null : goToRealm(realm))}
-                    index={index}
                     editing={false}
                     removeItem={() => null}
                     theme={theme}
