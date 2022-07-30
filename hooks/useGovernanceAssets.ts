@@ -136,6 +136,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseTokenTransferInstruction,
     },
     {
+      id: Instructions.CreateStream,
+      name: 'Streamflow: Create Vesting Contract',
+      isVisible: canUseAnyInstruction,
+    },
+    {
       id: Instructions.Grant,
       name: 'Grant',
       isVisible:
@@ -345,6 +350,16 @@ export default function useGovernanceAssets() {
       id: Instructions.MangoRemoveOracle,
       name: 'Mango: Remove Oracle',
       isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.DepositToMangoAccount,
+      name: 'Mango: Deposit to mango account',
+      isVisible: canUseTokenTransferInstruction,
+    },
+    {
+      id: Instructions.DepositToMangoAccountCsv,
+      name: 'Mango: Deposit to mango account with CSV',
+      isVisible: canUseTokenTransferInstruction,
     },
     {
       id: Instructions.DepositIntoVolt,

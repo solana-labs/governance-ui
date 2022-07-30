@@ -99,7 +99,7 @@ function App({ Component, pageProps }) {
     realm?.pubkey.toBase58(),
     ownTokenRecord?.pubkey.toBase58(),
     wallet?.connected,
-    client,
+    client?.program.programId.toBase58(),
   ])
 
   useEffect(() => {

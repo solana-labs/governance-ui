@@ -4611,6 +4611,19 @@
     eventemitter3 "^4.0.7"
     uuid "^8.3.2"
 
+"@streamflow/stream@3.0.10":
+  version "3.0.10"
+  resolved "https://registry.yarnpkg.com/@streamflow/stream/-/stream-3.0.10.tgz#1fb67784079b2b65bf67105a1cb6a9058de728bd"
+  integrity sha512-6ahU0znOLhXOsh3l7pTEIYGgeNJ+IfbYWljugch8rh+QPd4f7SetZ5zh3aOK6nY4BL04VEH7kdhbpXJcCGugvg==
+  dependencies:
+    "@project-serum/anchor" "^0.16.2"
+    "@project-serum/common" "^0.0.1-beta.3"
+    "@solana/spl-token" "^0.1.8"
+    "@solana/wallet-adapter-base" "^0.9.2"
+    "@solana/web3.js" "^1.42.0"
+    bn.js "^5.2.0"
+    buffer-layout "^1.2.1"
+
 "@supercharge/promise-pool@^2.1.0":
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/@supercharge/promise-pool/-/promise-pool-2.3.0.tgz#9528b11d69a63ff2a342d404afb13cd011c9651a"
@@ -13217,6 +13230,11 @@ pako@^2.0.3:
   version "2.0.4"
   resolved "https://registry.npmjs.org/pako/-/pako-2.0.4.tgz"
   integrity sha512-v8tweI900AUkZN6heMU/4Uy4cXRc2AYNRggVmTR+dEncawDJgCdLMximOVA2p4qO57WMynangsfGRb5WD6L1Bg==
+
+papaparse@^5.3.2:
+  version "5.3.2"
+  resolved "https://registry.yarnpkg.com/papaparse/-/papaparse-5.3.2.tgz#d1abed498a0ee299f103130a6109720404fbd467"
+  integrity sha512-6dNZu0Ki+gyV0eBsFKJhYr+MdQYAzFUGlBMNj3GNrmHxmz1lfRa24CjFObPXtjcetlOv5Ad299MhIK0znp3afw==
 
 parent-module@^1.0.0:
   version "1.0.1"

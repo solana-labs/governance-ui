@@ -105,7 +105,15 @@ export function InstructionPanel() {
               ))}
 
               {proposal && proposalInstructions.length > 1 && (
-                <div className="flex justify-end">
+                <div className="flex justify-end space-x-4">
+                  <ExecuteAllInstructionButton
+                    proposal={proposal}
+                    proposalInstructions={proposalInstructions}
+                    playing={playing}
+                    setPlaying={setPlaying}
+                    label="Execute in separated transactions"
+                    multiTransactionMode={true}
+                  />
                   <ExecuteAllInstructionButton
                     proposal={proposal}
                     proposalInstructions={proposalInstructions}
