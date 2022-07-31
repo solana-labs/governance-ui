@@ -125,7 +125,10 @@ export function InstructionPanel() {
 
               {proposal && proposalInstructions.length > 1 && (
                 <div className="flex justify-end space-x-4">
-                  <Button onClick={simulate}>Inspect all</Button>
+                  {proposalInstructions.filter((x) => !x.account.executedAt)
+                    .length !== 0 && (
+                    <Button onClick={simulate}>Inspect all</Button>
+                  )}
                   <ExecuteAllInstructionButton
                     proposal={proposal}
                     proposalInstructions={proposalInstructions}

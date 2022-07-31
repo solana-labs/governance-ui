@@ -91,7 +91,7 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
         })
         setSendingSuccess(true)
         nftSelectorRef.current?.handleGetNfts()
-        getNfts(nftsGovernedTokenAccounts, connection.current)
+        getNfts(nftsGovernedTokenAccounts, connection)
       } catch (e) {
         notify({
           type: 'error',

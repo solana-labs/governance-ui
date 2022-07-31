@@ -108,7 +108,7 @@ function App({ Component, pageProps }) {
         JSON.stringify(possibleNftsAccounts) &&
       realm?.pubkey
     ) {
-      getNfts(possibleNftsAccounts, connection.current)
+      getNfts(possibleNftsAccounts, connection)
     }
   }, [JSON.stringify(possibleNftsAccounts), realm?.pubkey.toBase58()])
 
