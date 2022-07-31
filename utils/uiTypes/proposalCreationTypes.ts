@@ -465,6 +465,8 @@ export enum Instructions {
   SagaPreOrder,
   DepositToMangoAccount,
   DepositToMangoAccountCsv,
+  StakeValidator,
+  UnstakeValidator,
 }
 
 export type createParams = [
@@ -517,4 +519,14 @@ export interface ChangeNonprofit {
     solana_address: string
     ethereum_address: string
   }
+}
+
+export interface ValidatorStakingForm {
+  validatorVoteKey: string
+  amount: number | undefined
+}
+
+export interface ValidatorUnstakingForm {
+  validatorVoteKey: string
+  amount: number | undefined
 }

@@ -242,6 +242,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseTokenTransferInstruction,
     },
     {
+      id: Instructions.StakeValidator,
+      name: 'Stake A Validator',
+      isVisible: canUseAnyInstruction,
+    },
+    {
       id: Instructions.None,
       name: 'None',
       isVisible:
