@@ -25,6 +25,9 @@ import BigNumber from 'bignumber.js'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { I80F48 } from '@blockworks-foundation/mango-client'
 import { NFTWithMeta } from './uiTypes/VotePlugin'
+import { getParsedNftAccountsByOwner } from '@nfteyez/sol-rayz'
+import axios from 'axios'
+import { deprecated } from '@metaplex-foundation/mpl-token-metadata'
 
 export type TokenAccount = AccountInfo
 export type MintAccount = MintInfo
@@ -411,22 +414,106 @@ export const getNfts = async (
   ownerPk: PublicKey,
   connection: Connection
 ): Promise<NFTWithMeta[]> => {
+  if (connection.rpcEndpoint.includes('devnet')) {
+    return await getDevnetNfts(ownerPk, connection)
+  } else {
+    return await getMainnetNfts(ownerPk, connection)
+  }
+}
+
+const getDevnetNfts = async (
+  ownerPk: PublicKey,
+  connection: Connection
+): Promise<NFTWithMeta[]> => {
+  const [nfts, tokenAccounts] = await Promise.all([
+    getParsedNftAccountsByOwner({
+      publicAddress: ownerPk.toBase58(),
+      connection: connection,
+    }),
+    getOwnedTokenAccounts(connection, ownerPk),
+  ])
+  const data = Object.keys(nfts).map((key) => nfts[key])
+  const arr: NFTWithMeta[] = []
+  const vals = await Promise.all(data.map((x) => axios.get(x.data.uri)))
+  const metadataAccounts = await Promise.all(
+    data.map((x) => deprecated.Metadata.getPDA(x.mint))
+  )
+  for (let i = 0; i < data.length; i++) {
+    try {
+      const nft = data[i]
+      const val = vals[i].data
+      const tokenAccount = tokenAccounts.find((x) => {
+        return (
+          x.account.mint.toBase58() === data[i].mint &&
+          x.account.amount.cmpn(0) === 1
+        )
+      })
+      const metadataAccount = metadataAccounts[i]
+      const metadata = await deprecated.Metadata.load(
+        connection,
+        metadataAccount
+      )
+      if (tokenAccount) {
+        arr.push({
+          image: val.image,
+          name: val.name,
+          description: val.description,
+          properties: {
+            category: val.properties.category,
+            files: val.properties.files,
+          },
+          collection: {
+            mintAddress: metadata?.data?.collection?.key || '',
+            creators: nft.data.creators,
+          },
+          mintAddress: nft.mint,
+          address: metadata.pubkey.toBase58(),
+          tokenAccountAddress: tokenAccount.publicKey.toBase58(),
+          getAssociatedTokenAccount: async () => {
+            const accounts = await getOwnedTokenAccounts(connection, ownerPk)
+
+            for (const account of accounts) {
+              if (
+                account.account.mint.toBase58() === nft.mint &&
+                account.account.amount.cmpn(0) === 1
+              ) {
+                return account.publicKey.toBase58()
+              }
+            }
+
+            throw new Error('Could not find associated token account')
+          },
+        })
+      }
+    } catch (e) {
+      console.log(e)
+    }
+  }
+  return arr
+}
+
+const getMainnetNfts = async (
+  ownerPk: PublicKey,
+  connection: Connection
+): Promise<NFTWithMeta[]> => {
   try {
     const data = await fetchNftsFromHolaplexIndexer(ownerPk)
-    return data.nfts.map((nft) => ({
-      ...nft,
-      getAssociatedTokenAccount: async () => {
-        const accounts = await getOwnedTokenAccounts(connection, ownerPk)
+    return data.nfts.map((nft) => {
+      return {
+        ...nft,
+        getAssociatedTokenAccount: async () => {
+          const accounts = await getOwnedTokenAccounts(connection, ownerPk)
 
-        for (const account of accounts) {
-          if (account.account.mint.toBase58() === nft.mintAddress) {
-            return account.publicKey.toBase58()
+          for (const account of accounts) {
+            if (account.account.mint.toBase58() === nft.mintAddress) {
+              return account.publicKey.toBase58()
+            }
           }
-        }
 
-        throw new Error('Could not find associated token account')
-      },
-    }))
+          throw new Error('Could not find associated token account')
+        },
+      }
+    })
   } catch (error) {
     notify({
       type: 'error',
