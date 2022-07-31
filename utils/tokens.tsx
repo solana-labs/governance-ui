@@ -28,6 +28,7 @@ import { NFTWithMeta } from './uiTypes/VotePlugin'
 import { getParsedNftAccountsByOwner } from '@nfteyez/sol-rayz'
 import axios from 'axios'
 import { deprecated } from '@metaplex-foundation/mpl-token-metadata'
+import { ConnectionContext } from './connection'
 
 export type TokenAccount = AccountInfo
 export type MintAccount = MintInfo
@@ -412,12 +413,12 @@ const fetchNftsFromHolaplexIndexer = async (owner: PublicKey) => {
 
 export const getNfts = async (
   ownerPk: PublicKey,
-  connection: Connection
+  connection: ConnectionContext
 ): Promise<NFTWithMeta[]> => {
-  if (connection.rpcEndpoint.includes('devnet')) {
-    return await getDevnetNfts(ownerPk, connection)
+  if (connection.cluster === 'devnet') {
+    return await getDevnetNfts(ownerPk, connection.current)
   } else {
-    return await getMainnetNfts(ownerPk, connection)
+    return await getMainnetNfts(ownerPk, connection.current)
   }
 }
 

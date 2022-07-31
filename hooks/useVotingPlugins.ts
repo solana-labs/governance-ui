@@ -107,7 +107,7 @@ export function useVotingPlugins() {
   const handleGetNfts = async () => {
     setIsLoadingNfts(true)
     try {
-      const nfts = await getNfts(wallet!.publicKey!, connection.current)
+      const nfts = await getNfts(wallet!.publicKey!, connection)
       const votingNfts = nfts.filter(getIsFromCollection)
       const nftsWithMeta = votingNfts
       setVotingNfts(nftsWithMeta, currentClient, nftMintRegistrar)

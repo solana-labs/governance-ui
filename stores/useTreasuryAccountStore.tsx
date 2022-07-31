@@ -4,10 +4,10 @@ import tokenService from '@utils/services/token'
 import { ConfirmedSignatureInfo, PublicKey } from '@solana/web3.js'
 import { notify } from '@utils/notifications'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
-import { Connection } from '@solana/web3.js'
 import { TokenInfo } from '@solana/spl-token-registry'
 import { WSOL_MINT } from '@components/instructions/tools'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
+import { ConnectionContext } from '@utils/connection'
 
 interface TreasuryAccountStore extends State {
   currentAccount: AssetAccount | null
@@ -26,7 +26,7 @@ interface TreasuryAccountStore extends State {
   handleFetchRecentActivity: (account: AssetAccount, connection) => void
   getNfts: (
     nftsGovernedTokenAccounts: AssetAccount[],
-    connection: Connection
+    connection: ConnectionContext
   ) => void
 }
 

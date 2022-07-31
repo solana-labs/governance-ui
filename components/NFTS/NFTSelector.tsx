@@ -61,7 +61,7 @@ function NFTSelector(
   const handleGetNfts = async () => {
     setIsLoading(true)
     const response = await Promise.all(
-      ownersPk.map((x) => getNfts(x, connection.current))
+      ownersPk.map((x) => getNfts(x, connection))
     )
     const nfts = response.flatMap((x) => x)
     if (nfts.length === 1) {
