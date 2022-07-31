@@ -34,7 +34,7 @@ export const USDC_DEVNET = new PublicKey(
 )
 
 export const MAINNET_ISSUER = new PublicKey(
-  '6GAsF1NumJfPP3mfkTQYnXKRJAevCrhvGvuvvV2xhV3G'
+  'FjnhLGXvCJzQ7EyTRwFWXz84WSJeTJBDoDzdqEpnt7Qv'
 )
 
 export const DEVNET_ISSUER = new PublicKey(

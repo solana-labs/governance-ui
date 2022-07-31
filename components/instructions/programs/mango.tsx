@@ -373,9 +373,14 @@ export const MANGO_INSTRUCTIONS = {
                   {dayjs(est * 1000).format('h:mma')}
                 </div>
               </div>
+
               <div className="col-span-1 py-3">
                 <p className="mb-0">Period progress</p>
-                <div className="font-bold">{(progress * 100).toFixed(2)}%</div>
+                <div className="font-bold">
+                  {mngoPerPeriod.toNumber() && (
+                    <>{(progress * 100).toFixed(2)}%</>
+                  )}
+                </div>
               </div>
             </>
             {displayAllArgs(args, ['mngoPerPeriod'])}

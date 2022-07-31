@@ -2,7 +2,6 @@ import { useEffect } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from '@hooks/useRealm'
 import { getNfts } from '@utils/tokens'
-import { deprecated } from '@metaplex-foundation/mpl-token-metadata'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import useSwitchboardPluginStore from 'SwitchboardVotePlugin/store/switchboardStore'
@@ -108,24 +107,9 @@ export function useVotingPlugins() {
   const handleGetNfts = async () => {
     setIsLoadingNfts(true)
     try {
-      const nfts = await getNfts(connection.current, wallet!.publicKey!)
-      const votingNfts = (
-        await Promise.all(
-          nfts.map((x) => getIsFromCollection(x.mint, x.tokenAddress))
-        )
-      ).filter((x) => x) as {
-        metadata: deprecated.Metadata
-        tokenAddress: PublicKey
-      }[]
-      const nftsWithMeta = votingNfts.map((x) => {
-        const nft = nfts.find(
-          (nft) => nft.tokenAddress === x.tokenAddress.toBase58()
-        )
-        return {
-          ...nft!,
-          metadata: x.metadata,
-        }
-      })
+      const nfts = await getNfts(wallet!.publicKey!, connection.current)
+      const votingNfts = nfts.filter(getIsFromCollection)
+      const nftsWithMeta = votingNfts
       setVotingNfts(nftsWithMeta, currentClient, nftMintRegistrar)
     } catch (e) {
       console.log(e)
@@ -314,21 +298,12 @@ export function useVotingPlugins() {
       setMaxVoterWeight(null)
     }
   }
-  const getIsFromCollection = async (mint: string, tokenAddress: string) => {
-    const metadataAccount = await deprecated.Metadata.getPDA(mint)
-    const metadata = await deprecated.Metadata.load(
-      connection.current,
-      metadataAccount
-    )
+  const getIsFromCollection = (nft) => {
     return (
-      !!(
-        metadata.data!.collection?.key &&
-        usedCollectionsPks.includes(metadata.data!.collection?.key) &&
-        metadata.data!.collection.verified
-      ) && {
-        tokenAddress: new PublicKey(tokenAddress),
-        metadata: metadata as deprecated.Metadata,
-      }
+      nft.collection &&
+      nft.collection.mintAddress &&
+      usedCollectionsPks.includes(nft.collection.mintAddress) &&
+      nft.collection.creators?.filter((x) => x.verified).length > 0
     )
   }
   useEffect(() => {

@@ -18,15 +18,13 @@ import { chunks } from './helpers'
 import { getAccountName, WSOL_MINT } from '@components/instructions/tools'
 import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
 import tokenService from './services/token'
-import { getParsedNftAccountsByOwner } from '@nfteyez/sol-rayz'
-import axios from 'axios'
 import { notify } from './notifications'
-import { NFTWithMint } from './uiTypes/nfts'
 import { BN } from '@project-serum/anchor'
 import { abbreviateAddress } from './formatting'
 import BigNumber from 'bignumber.js'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { I80F48 } from '@blockworks-foundation/mango-client'
+import { NFTWithMeta } from './uiTypes/VotePlugin'
 
 export type TokenAccount = AccountInfo
 export type MintAccount = MintInfo
@@ -370,37 +368,65 @@ export const deserializeMint = (data: Buffer) => {
   return mintInfo as MintInfo
 }
 
-export const getNfts = async (connection: Connection, ownerPk: PublicKey) => {
-  try {
-    const nfts = await getParsedNftAccountsByOwner({
-      publicAddress: ownerPk.toBase58(),
-      connection: connection,
-    })
-    const tokenAccounts = await getOwnedTokenAccounts(connection, ownerPk)
-    const data = Object.keys(nfts).map((key) => nfts[key])
-    const arr: NFTWithMint[] = []
-    for (let i = 0; i < data.length; i++) {
-      try {
-        const val = (await axios.get(data[i].data.uri)).data
-        const tokenAccount = tokenAccounts.find((x) => {
-          return (
-            x.account.mint.toBase58() === data[i].mint &&
-            x.account.amount.cmpn(0) === 1
-          )
-        })
-        if (tokenAccount) {
-          arr.push({
-            val,
-            mint: data[i].mint,
-            tokenAddress: tokenAccount.publicKey.toBase58(),
-            token: tokenAccount,
-          })
+const fetchNftsFromHolaplexIndexer = async (owner: PublicKey) => {
+  const result = await fetch('https://graph.holaplex.com/v1', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      query: `
+        query nfts($owners: [PublicKey!]) {
+            nfts(
+              owners: $owners,
+               limit: 10000, offset: 0) {
+              name
+              mintAddress
+              address
+              image
+              updateAuthorityAddress
+              collection {
+                creators {
+                  verified
+                  address
+                }
+                mintAddress
+              }
+
+            }
+
         }
-      } catch (e) {
-        console.log(e)
-      }
-    }
-    return arr
+      `,
+      variables: {
+        owners: [owner.toBase58()],
+      },
+    }),
+  })
+
+  const body = await result.json()
+  return body.data
+}
+
+export const getNfts = async (
+  ownerPk: PublicKey,
+  connection: Connection
+): Promise<NFTWithMeta[]> => {
+  try {
+    const data = await fetchNftsFromHolaplexIndexer(ownerPk)
+    return data.nfts.map((nft) => ({
+      ...nft,
+      getAssociatedTokenAccount: async () => {
+        const accounts = await getOwnedTokenAccounts(connection, ownerPk)
+
+        for (const account of accounts) {
+          if (account.account.mint.toBase58() === nft.mintAddress) {
+            return account.publicKey.toBase58()
+          }
+        }
+
+        throw new Error('Could not find associated token account')
+      },
+    }))
   } catch (error) {
     notify({
       type: 'error',

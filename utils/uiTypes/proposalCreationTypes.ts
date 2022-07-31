@@ -207,6 +207,11 @@ export interface MangoDepositToMangoAccountForm {
   mangoAccountPk: string
 }
 
+export interface MangoDepositToMangoAccountFormCsv {
+  governedAccount: AssetAccount | null
+  data: any[]
+}
+
 export interface MangoRemoveSpotMarketForm {
   governedAccount: AssetAccount | null
   mangoGroup: NameValue | null
@@ -459,6 +464,7 @@ export enum Instructions {
   UpdateTokenMetadata,
   SagaPreOrder,
   DepositToMangoAccount,
+  DepositToMangoAccountCsv,
 }
 
 export type createParams = [

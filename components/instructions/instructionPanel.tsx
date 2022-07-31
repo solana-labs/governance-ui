@@ -11,6 +11,9 @@ import {
   ExecuteAllInstructionButton,
   PlayState,
 } from './ExecuteAllInstructionButton'
+import Button from '@components/Button'
+import { dryRunInstruction } from 'actions/dryRunInstruction'
+import { getExplorerInspectorUrl } from '@components/explorer/tools'
 
 export function InstructionPanel() {
   const { instructions, proposal } = useProposal()
@@ -70,6 +73,22 @@ export function InstructionPanel() {
       : PlayState.Unplayed
   )
 
+  const simulate = async () => {
+    const result = await dryRunInstruction(
+      connection.current,
+      wallet!,
+      null,
+      [],
+      proposalInstructions.map((x) => x.account.getSingleInstruction())
+    )
+
+    const inspectUrl = getExplorerInspectorUrl(
+      connection.endpoint,
+      result.transaction
+    )
+    window.open(inspectUrl, '_blank')
+  }
+
   return (
     <div>
       <Disclosure>
@@ -106,6 +125,7 @@ export function InstructionPanel() {
 
               {proposal && proposalInstructions.length > 1 && (
                 <div className="flex justify-end space-x-4">
+                  <Button onClick={simulate}>Inspect all</Button>
                   <ExecuteAllInstructionButton
                     proposal={proposal}
                     proposalInstructions={proposalInstructions}

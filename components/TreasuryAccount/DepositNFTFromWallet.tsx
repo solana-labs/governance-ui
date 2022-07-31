@@ -41,7 +41,7 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
           : currentAccount!.governance!.pubkey
         const ConnectedWalletAddress = wallet?.publicKey
         const selectedNft = i
-        const nftMintPk = new PublicKey(selectedNft.mint)
+        const nftMintPk = new PublicKey(selectedNft.mintAddress)
         const tokenAccountsWithNftMint = await getTokenAccountsByMint(
           connection.current,
           nftMintPk.toBase58()
