@@ -2223,7 +2223,7 @@
     "@ethersproject/properties" "^5.6.0"
     "@ethersproject/strings" "^5.6.1"
 
-"@everlend/common@workspace:^0.0.3":
+"@everlend/common@^0.0.3":
   version "0.0.3"
   resolved "https://registry.yarnpkg.com/@everlend/common/-/common-0.0.3.tgz#b18d7e025592a6f863dc84abf563ca2b25df0ac2"
   integrity sha512-hj729mHUw250kJNKgdhfK/ZLiUJOSze2IquGyNs6qooMe856Au9E/vi3RlkuCzDMe3nkvvC8mpRzjzRmkwpJWw==
@@ -2234,12 +2234,12 @@
     bs58 "^4.0.1"
     buffer "^6.0.3"
 
-"@everlend/general-pool@^0.0.19":
-  version "0.0.19"
-  resolved "https://registry.yarnpkg.com/@everlend/general-pool/-/general-pool-0.0.19.tgz#35c449cee0dfd9f9d3c49f1f3dbbd7cc59927634"
-  integrity sha512-GoEntJ9fchb4QUd/cLF1unpovlaWZEcEMcMiavClQfM49HR9U3VglUYGhQJ/6uRABnr43qH3YfMTccnZ7y/lvw==
+"@everlend/general-pool@^0.0.22":
+  version "0.0.22"
+  resolved "https://registry.yarnpkg.com/@everlend/general-pool/-/general-pool-0.0.22.tgz#428a04f605cc5cf8cebdd8973288fa286756d320"
+  integrity sha512-B6FOC8Zhsm1R4ft7ZOoCLToJWNQHis4ngaIPsiS4IGQEUYUW4eduW3DJzvjIWwkpkZpkcXI+76evyH1Pxp3qcQ==
   dependencies:
-    "@everlend/common" "workspace:^0.0.3"
+    "@everlend/common" "^0.0.3"
     "@solana/spl-token" "^0.1.5"
     "@solana/web3.js" "^1.16.1"
     borsh "^0.6.0"
