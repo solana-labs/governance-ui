@@ -113,7 +113,6 @@ const MakeDepositToMangoAccountCsv = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      console.log('1234')
       const mangoConnection =
         connection.cluster === 'localnet'
           ? new Connection(Config.ids().cluster_urls.mainnet)
