@@ -135,6 +135,7 @@ const Realms = () => {
         editing={editingGrid}
         searching={searchString.length > 0}
         clearSearch={() => filterDaos('')}
+        cluster={cluster}
       ></RealmsDashboard>
     </div>
   )

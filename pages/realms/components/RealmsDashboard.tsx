@@ -9,6 +9,7 @@ export default function RealmsDashboard({
   editing,
   searching,
   clearSearch,
+  cluster,
 }: {
   realms: readonly RealmInfo[]
   filteredRealms: readonly RealmInfo[]
@@ -16,6 +17,7 @@ export default function RealmsDashboard({
   editing: boolean
   searching: boolean
   clearSearch: () => void
+  cluster: string | string[] | undefined
 }) {
   const certifiedRealms = useMemo(() => realms?.filter((r) => r.isCertified), [
     realms,
@@ -46,6 +48,7 @@ export default function RealmsDashboard({
       editing={editing}
       searching={searching}
       clearSearch={clearSearch}
+      cluster={cluster}
     />
   )
 }
