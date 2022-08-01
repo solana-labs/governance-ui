@@ -1,7 +1,5 @@
 import { useTheme } from 'next-themes'
 import React, { useEffect, useState, useRef, useMemo } from 'react'
-import '/node_modules/react-grid-layout/css/styles.css'
-import '/node_modules/react-resizable/css/styles.css'
 import { useRouter } from 'next/router'
 import useQueryContext from '@hooks/useQueryContext'
 import { RealmInfo } from '@models/registry/api'
