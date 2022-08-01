@@ -222,7 +222,14 @@ const New = () => {
       form
     )
 
-    const instructions: UiInstruction[] = await handleGetInstructions()
+    let instructions: UiInstruction[] = []
+    try {
+      instructions = await handleGetInstructions()
+    } catch (e) {
+      handleTurnOffLoaders()
+      notify({ type: 'error', message: `${e}` })
+      throw e
+    }
 
     let proposalAddress: PublicKey | null = null
     if (!realm) {
