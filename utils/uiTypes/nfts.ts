@@ -14,7 +14,7 @@ interface NFTCreator {
 
 interface NFTCollectionProperties {
   mintAddress: string
-  creators: NFTCreator
+  creators: NFTCreator[]
 }
 export interface NFTWithMint {
   image: string
