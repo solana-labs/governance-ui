@@ -17,25 +17,9 @@ import {
 import { NewProposalContext } from '../../../new'
 import { isFormValid } from '@utils/formValidation'
 import useWalletStore from 'stores/useWalletStore'
-import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
 import { web3 } from '@project-serum/anchor'
-import { ConnectionContext } from '@utils/connection'
-
-async function checkAccount(
-  connection: ConnectionContext,
-  account: PublicKey,
-  owner: PublicKey
-): Promise<boolean> {
-  const accountInfo = await connection.current.getAccountInfo(account)
-  if (
-    accountInfo &&
-    accountInfo.lamports > 0 &&
-    accountInfo.owner.equals(owner)
-  ) {
-    return true
-  }
-  return false
-}
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import GovernedAccountSelect from '../../GovernedAccountSelect'
 
 const StakeValidator = ({
   index,
@@ -44,15 +28,17 @@ const StakeValidator = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
+  console.log('test')
   const connection = useWalletStore((s) => s.connection)
   const programId: PublicKey = StakeProgram.programId
-  const governanceAccount = governance?.account
-  const governanceVar = governance
+  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
+  const shouldBeGoverned = index !== 0 && governance
 
   const [form, setForm] = useState<ValidatorStakingForm>({
     validatorVoteKey: '',
     amount: 0,
     seed: '',
+    governedTokenAccount: undefined,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -61,6 +47,10 @@ const StakeValidator = ({
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
+
+  const [governedAccount, setGovernedAccount] = useState<
+    ProgramAccount<Governance> | undefined
+  >(undefined)
 
   const setValidatorVoteKey = (event) => {
     const value = event.target.value
@@ -87,11 +77,8 @@ const StakeValidator = ({
   }
 
   const validateInstruction = async (): Promise<boolean> => {
-    const validatorsStatus = connection.current.getVoteAccounts()
-    const validators: [string] = ['']
-    validatorsStatus.then((x) =>
-      validators.push(...x.current.map((x) => x.votePubkey))
-    )
+    const validatorsStatus = await connection.current.getVoteAccounts()
+    const validators = validatorsStatus.current.map((x) => x.votePubkey)
     //const validator = validatorsStatus.current.map(x => x.votePubkey);
 
     const schema = yup.object().shape({
@@ -112,9 +99,7 @@ const StakeValidator = ({
 
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
-    const governance = governanceVar
     const governancePk = governance?.pubkey
-    const governanceProgramPk = new PublicKey(DEFAULT_GOVERNANCE_PROGRAM_ID)
     const returnInvalid = (): UiInstruction => {
       return {
         serializedInstruction: '',
@@ -122,27 +107,21 @@ const StakeValidator = ({
         governance: undefined,
       }
     }
+    const governanceAccount = governance?.account
 
+    console.log('testing')
     if (
       !connection ||
       !isValid ||
       !programId ||
       !governanceAccount ||
-      !governancePk
+      !governancePk ||
+      !form.governedTokenAccount?.isSol
     ) {
       return returnInvalid()
     }
 
-    const [nativeTreasury] = await PublicKey.findProgramAddress(
-      [Buffer.from('native-treasury'), governancePk.toBuffer()],
-      governanceProgramPk
-    )
-    if (
-      !(await checkAccount(connection, nativeTreasury, governanceProgramPk))
-    ) {
-      return returnInvalid()
-    }
-
+    const nativeTreasury = form.governedTokenAccount.pubkey
     const prerequisiteInstructions: web3.TransactionInstruction[] = []
 
     const [stakeAccountAddress] = await web3.PublicKey.findProgramAddress(
@@ -152,6 +131,7 @@ const StakeValidator = ({
 
     // check if stake account exists, if not create one
     if (!connection.current.getAccountInfo(stakeAccountAddress) == null) {
+      console.log('C')
       return returnInvalid() // stake account already exists
     }
 
@@ -170,10 +150,11 @@ const StakeValidator = ({
       stakePubkey: nativeTreasury,
       votePubkey: new web3.PublicKey(form.validatorVoteKey),
     })
+    console.log('D')
     return {
       serializedInstruction: serializeInstructionToBase64(tx.instructions[0]),
       isValid: true,
-      governance: governance,
+      governance: form.governedTokenAccount.governance,
       prerequisiteInstructions: prerequisiteInstructions,
       shouldSplitIntoSeparateTxs: true,
       signers: [],
@@ -183,15 +164,36 @@ const StakeValidator = ({
   useEffect(() => {
     handleSetInstructions(
       {
-        governedAccount: governanceAccount,
+        governedAccount: governedAccount,
         getInstruction,
       },
       index
     )
   }, [form])
 
+  useEffect(() => {
+    handleSetInstructions(
+      { governedAccount: governedAccount, getInstruction },
+      index
+    )
+  }, [form])
+  useEffect(() => {
+    setGovernedAccount(form.governedTokenAccount?.governance)
+  }, [form.governedTokenAccount])
+
   return (
     <>
+      <GovernedAccountSelect
+        label="Source account"
+        governedAccounts={governedTokenAccountsWithoutNfts}
+        onChange={(value) => {
+          handleSetForm({ value, propertyName: 'governedTokenAccount' })
+        }}
+        value={form.governedTokenAccount}
+        error={formErrors['governedTokenAccount']}
+        shouldBeGoverned={shouldBeGoverned}
+        governance={governance}
+      ></GovernedAccountSelect>
       <Input
         label="Validator Vote Address"
         value={form.validatorVoteKey}

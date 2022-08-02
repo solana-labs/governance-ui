@@ -522,12 +522,14 @@ export interface ChangeNonprofit {
 }
 
 export interface ValidatorStakingForm {
+  governedTokenAccount: AssetAccount | undefined
   validatorVoteKey: string
   amount: number
   seed: string
 }
 
 export interface ValidatorDeactivateStakeForm {
+  governedTokenAccount: AssetAccount | undefined
   validatorVoteKey: string
   amount: number | undefined
 }
