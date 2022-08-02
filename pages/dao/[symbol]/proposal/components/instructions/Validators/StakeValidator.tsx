@@ -82,31 +82,29 @@ const StakeValidator = ({
     const value = event.target.value
     handleSetForm({
       value: value,
-      propertyName: 'depositedAmount',
+      propertyName: 'amount',
     })
   }
 
-  const validatorsStatus = connection.current.getVoteAccounts()
-  const validators: [string] = ['']
-  validatorsStatus.then((x) =>
-    validators.push(...x.current.map((x) => x.votePubkey))
-  )
-  //const validator = validatorsStatus.current.map(x => x.votePubkey);
-
-  const schema = yup.object().shape({
-    tokenAccount: yup.object().nullable().required('Token account is required'),
-    validatorVoteKey: yup
-      .string()
-      .required('Validator vote address is required')
-      .oneOf(validators),
-    amount: yup
-      .number()
-      .min(0, 'Amount must be positive number')
-      .required('Amount is required'),
-    seed: yup.string().required('Validator vote address is required'),
-  })
-
   const validateInstruction = async (): Promise<boolean> => {
+    const validatorsStatus = connection.current.getVoteAccounts()
+    const validators: [string] = ['']
+    validatorsStatus.then((x) =>
+      validators.push(...x.current.map((x) => x.votePubkey))
+    )
+    //const validator = validatorsStatus.current.map(x => x.votePubkey);
+
+    const schema = yup.object().shape({
+      validatorVoteKey: yup
+        .string()
+        .required('Validator vote address is required')
+        .oneOf(validators),
+      amount: yup
+        .number()
+        .min(1, 'Amount must be positive number')
+        .required('Amount is required'),
+      seed: yup.string().required('seed is required'),
+    })
     const { isValid, validationErrors } = await isFormValid(schema, form)
     setFormErrors(validationErrors)
     return isValid
@@ -213,6 +211,7 @@ const StakeValidator = ({
         value={form.amount}
         error={formErrors['amount']}
         type="number"
+        min="1"
         onChange={setAmount}
       />
       <div
