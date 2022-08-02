@@ -12,6 +12,7 @@ import BN from 'bn.js'
 import {
   fmtMintAmount,
   getMintMinAmountAsDecimal,
+  getMintDecimalAmount,
   getMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
 import { RpcContext } from '@solana/spl-governance'
@@ -25,6 +26,9 @@ import { precision } from '@utils/formatting'
 import { validateInstruction } from '@utils/instructionTools'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Loading from '@components/Loading'
+import BigNumber from 'bignumber.js'
+
+const SOL_BUFFER = 0.02
 
 interface IProps {
   proposedInvestment
@@ -84,7 +88,13 @@ const EverlendDeposit = ({
 
   const mintMinAmount = mintInfo ? getMintMinAmountAsDecimal(mintInfo) : 1
   const currentPrecision = precision(mintMinAmount)
-  const maxAmountFormatted = fmtMintAmount(mintInfo, treasuryAmount)
+  let maxAmount = mintInfo
+    ? getMintDecimalAmount(mintInfo, treasuryAmount)
+    : new BigNumber(0)
+  if (governedTokenAccount.isSol) {
+    maxAmount = maxAmount.minus(SOL_BUFFER)
+  }
+  const maxAmountFormatted = maxAmount.toNumber().toFixed(4)
 
   const handleDeposit = async () => {
     const isValid = await validateInstruction({
@@ -198,9 +208,14 @@ const EverlendDeposit = ({
         description={proposalInfo.description}
         defaultTitle={proposalTitle}
         defaultDescription={`Deposit ${tokenSymbol} into Everlend to mint cTokens and earn interest`}
-        setTitle={(evt) => setProposalInfo((prev) => ({ ...prev, title: evt }))}
+        setTitle={(evt) => {
+          setProposalInfo((prev) => ({ ...prev, title: evt.target.value }))
+        }}
         setDescription={(evt) =>
-          setProposalInfo((prev) => ({ ...prev, description: evt }))
+          setProposalInfo((prev) => ({
+            ...prev,
+            description: evt.target.value,
+          }))
         }
         voteByCouncil={voteByCouncil}
         setVoteByCouncil={setVoteByCouncil}
