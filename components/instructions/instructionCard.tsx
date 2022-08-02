@@ -2,6 +2,7 @@ import { Keypair, PublicKey } from '@solana/web3.js';
 import { ExternalLinkIcon } from '@heroicons/react/outline';
 import {
   AccountMetaData,
+  InstructionExecutionStatus,
   Proposal,
   ProposalTransaction,
 } from '@solana/spl-governance';
@@ -199,7 +200,9 @@ export default function InstructionCard({
       {
         // In the very particular case it is about Orca Whirlpool Open Position Instruction
         // We ask the users for the keypair of the position mint
-        isInstructionAboutOrcaWhirlpoolOpenPosition ? (
+        isInstructionAboutOrcaWhirlpoolOpenPosition &&
+        proposalInstruction.account.executionStatus ===
+          InstructionExecutionStatus.Success ? (
           <div className="flex flex-col mt-6 mb-8">
             <strong>
               Provide the <em>positionMint</em> secret key shown during the

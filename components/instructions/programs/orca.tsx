@@ -49,12 +49,32 @@ export const ORCA_PROGRAM_INSTRUCTIONS = {
         'Metadata Update Auth',
       ],
       getDataUI: async (
-        _connection: Connection,
+        connection: Connection,
         _data: Uint8Array,
-        _accounts: AccountMetaData[],
+        accounts: AccountMetaData[],
       ) => {
-        // No useful data to display. Do not use null to avoid having the bytes displayed
-        return <></>;
+        const whirlpoolAddress = accounts[6].pubkey;
+        const whirlpoolClient = buildLocalWhirlpoolClient(connection);
+        const whirlpool = (await whirlpoolClient.getPool(
+          whirlpoolAddress,
+        )) as WhirlpoolImpl;
+
+        if (!whirlpool) {
+          throw new Error(
+            `Cannot load whirlpool ${whirlpoolAddress.toBase58()} data`,
+          );
+        }
+
+        const tokenAName = getSplTokenNameByMint(whirlpool.tokenAInfo.mint);
+        const tokenBName = getSplTokenNameByMint(whirlpool.tokenBInfo.mint);
+
+        return (
+          <>
+            <p>
+              Whirlpool {tokenAName} - {tokenBName}
+            </p>
+          </>
+        );
       },
     },
 
