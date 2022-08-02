@@ -10,7 +10,6 @@ import useWalletStore from 'stores/useWalletStore'
 import tokenService from '@utils/services/token'
 import BN from 'bn.js'
 import {
-  fmtMintAmount,
   getMintMinAmountAsDecimal,
   getMintDecimalAmount,
   getMintNaturalAmountFromDecimalAsBN,
