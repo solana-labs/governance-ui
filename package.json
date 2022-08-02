@@ -90,6 +90,7 @@
     "react": "^18.1.0",
     "react-dom": "^18.0.0",
     "react-dropzone": "^14.2.2",
+    "react-easy-sort": "^1.5.0",
     "react-headless-pagination": "^0.1.0",
     "react-hook-form": "^7.31.3",
     "react-markdown": "^7.0.0",
