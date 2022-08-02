@@ -2,7 +2,11 @@ import React, { useContext, useEffect, useState } from 'react'
 import Input from 'components/inputs/Input'
 import * as yup from 'yup'
 
-import { Governance, ProgramAccount } from '@solana/spl-governance'
+import {
+  Governance,
+  ProgramAccount,
+  serializeInstructionToBase64,
+} from '@solana/spl-governance'
 
 import { PublicKey, StakeProgram } from '@solana/web3.js'
 
@@ -14,9 +18,11 @@ import { NewProposalContext } from '../../../new'
 import { isFormValid } from '@utils/formValidation'
 import useWalletStore from 'stores/useWalletStore'
 import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
+import { web3 } from '@project-serum/anchor'
+import { ConnectionContext } from '@utils/connection'
 
 async function checkAccount(
-  connection: any,
+  connection: ConnectionContext,
   account: PublicKey,
   owner: PublicKey
 ): Promise<boolean> {
@@ -46,6 +52,7 @@ const StakeValidator = ({
   const [form, setForm] = useState<ValidatorStakingForm>({
     validatorVoteKey: '',
     amount: 0,
+    seed: '',
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -63,6 +70,14 @@ const StakeValidator = ({
     })
   }
 
+  const setSeed = (event) => {
+    const value = event.target.value
+    handleSetForm({
+      value: value,
+      propertyName: 'seed',
+    })
+  }
+
   const setAmount = (event) => {
     const value = event.target.value
     handleSetForm({
@@ -71,16 +86,24 @@ const StakeValidator = ({
     })
   }
 
+  const validatorsStatus = connection.current.getVoteAccounts()
+  const validators: [string] = ['']
+  validatorsStatus.then((x) =>
+    validators.push(...x.current.map((x) => x.votePubkey))
+  )
+  //const validator = validatorsStatus.current.map(x => x.votePubkey);
+
   const schema = yup.object().shape({
     tokenAccount: yup.object().nullable().required('Token account is required'),
     validatorVoteKey: yup
       .string()
-      .required('Validator vote address is required'),
+      .required('Validator vote address is required')
+      .oneOf(validators),
     amount: yup
       .number()
-      .nullable()
       .min(0, 'Amount must be positive number')
       .required('Amount is required'),
+    seed: yup.string().required('Validator vote address is required'),
   })
 
   const validateInstruction = async (): Promise<boolean> => {
@@ -121,21 +144,42 @@ const StakeValidator = ({
     ) {
       return returnInvalid()
     }
-    const [nativeTreasuryStakeAccount] = await PublicKey.findProgramAddress(
-      [Buffer.from('native-treasury-stake-account'), governancePk.toBuffer()],
-      governanceProgramPk
+
+    const prerequisiteInstructions: web3.TransactionInstruction[] = []
+
+    const [stakeAccountAddress] = await web3.PublicKey.findProgramAddress(
+      [nativeTreasury.toBuffer(), Buffer.from(form.seed, 'utf8')],
+      web3.StakeProgram.programId
     )
 
     // check if stake account exists, if not create one
-    if (
-      !(await checkAccount(
-        connection,
-        nativeTreasuryStakeAccount,
-        governanceProgramPk
-      ))
-    ) {
+    if (!connection.current.getAccountInfo(stakeAccountAddress) == null) {
+      return returnInvalid() // stake account already exists
     }
-    return returnInvalid()
+
+    let tx = await web3.StakeProgram.createAccountWithSeed({
+      fromPubkey: nativeTreasury,
+      stakePubkey: stakeAccountAddress,
+      basePubkey: nativeTreasury,
+      seed: form.validatorVoteKey + form.seed,
+      lamports: form.amount,
+      authorized: { staker: nativeTreasury, withdrawer: nativeTreasury },
+    })
+    prerequisiteInstructions.push(...tx.instructions) // add instructions
+
+    tx = await web3.StakeProgram.delegate({
+      authorizedPubkey: nativeTreasury,
+      stakePubkey: nativeTreasury,
+      votePubkey: new web3.PublicKey(form.validatorVoteKey),
+    })
+    return {
+      serializedInstruction: serializeInstructionToBase64(tx.instructions[0]),
+      isValid: true,
+      governance: governance,
+      prerequisiteInstructions: prerequisiteInstructions,
+      shouldSplitIntoSeparateTxs: true,
+      signers: [],
+    }
   }
 
   useEffect(() => {
@@ -156,6 +200,13 @@ const StakeValidator = ({
         error={formErrors['validatorVoteKey']}
         type="string"
         onChange={setValidatorVoteKey}
+      />
+      <Input
+        label="Seed for stake address (will be added with validator address)"
+        value={form.seed}
+        error={formErrors['seed']}
+        type="string"
+        onChange={setSeed}
       />
       <Input
         label="Amount"

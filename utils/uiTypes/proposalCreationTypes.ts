@@ -523,10 +523,11 @@ export interface ChangeNonprofit {
 
 export interface ValidatorStakingForm {
   validatorVoteKey: string
-  amount: number | undefined
+  amount: number
+  seed: string
 }
 
-export interface ValidatorUnstakingForm {
+export interface ValidatorDeactivateStakeForm {
   validatorVoteKey: string
   amount: number | undefined
 }
