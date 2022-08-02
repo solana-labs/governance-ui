@@ -40,6 +40,10 @@ export const prepareSolDepositTx = async (
   pool: PublicKey,
   registry: PublicKey,
   amount: BN,
+  rewardPool: PublicKey,
+  rewardAccount: PublicKey,
+  config: PublicKey,
+  rewardProgramId: PublicKey,
   source: PublicKey,
   destination: PublicKey
 ): Promise<ActionResult> => {
@@ -54,12 +58,8 @@ export const prepareSolDepositTx = async (
   const tx = new Transaction()
   const registryPoolConfig = await findRegistryPoolConfigAccount(registry, pool)
 
-  console.log('source (ctoken)', source.toString())
-  console.log('dest (liquidity)', destination.toString())
-
   // Wrapping SOL
   const depositAccountInfo = await connection.getAccountInfo(source)
-  console.log({ depositAccountInfo })
   if (!depositAccountInfo) {
     // generate the instruction for creating the ATA
     const createAtaInst = Token.createAssociatedTokenAccountInstruction(
@@ -126,6 +126,10 @@ export const prepareSolDepositTx = async (
         destination,
         tokenAccount,
         poolMint,
+        rewardPool,
+        rewardAccount,
+        config,
+        rewardProgramId,
         poolMarketAuthority,
         amount,
       }

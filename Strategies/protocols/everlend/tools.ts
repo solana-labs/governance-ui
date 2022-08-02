@@ -35,6 +35,13 @@ const REGISTRY_DEV = '6KCHtgSGR2WDE3aqrqSJppHRGVPgy9fHDX5XD8VZgb61'
 const REGISTRY_MAIN = 'UaqUGgMvVzUZLthLHC9uuuBzgw5Ldesich94Wu5pMJg'
 const ENDPOINT_MAIN = 'https://api.everlend.finance/api/v1/'
 const ENDPOINT_DEV = 'https://dev-api.everlend.finance/api/v1/'
+
+const REWARD_PROGRAM_ID = new PublicKey(
+  'ELDR7M6m1ysPXks53T7da6zkhnhJV44twXLiAgTf2VpM'
+)
+const CONFIG_MAINNET = '69C4Ba9LyQvWHPSSqXWXHnaedrLEuY49rSj23nJdrkkn'
+const CONFIG_DEVNET = 'Hjm8ZVys6828sY9BxzuQhVwdsX1N28dqh3fKqbpGWu25'
+
 export const EVERLEND = 'Everlend'
 
 async function getAPYs(isDev = false) {
@@ -111,9 +118,9 @@ export async function handleEverlendAction(
   const owner = isSol
     ? matchedTreasury!.pubkey
     : matchedTreasury!.extensions!.token!.account.owner
-  const REGISTRY = new PublicKey(
-    connection.cluster === 'mainnet' ? REGISTRY_MAIN : REGISTRY_DEV
-  )
+  const isMainnet = connection.cluster === 'mainnet'
+  const REGISTRY = new PublicKey(isMainnet ? REGISTRY_MAIN : REGISTRY_DEV)
+  const CONFIG = new PublicKey(isMainnet ? CONFIG_MAINNET : CONFIG_DEVNET)
 
   const ctokenATA = await Token.getAssociatedTokenAddress(
     ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -131,6 +138,19 @@ export async function handleEverlendAction(
     true
   )
 
+  const [rewardPool] = PublicKey.findProgramAddressSync(
+    [
+      Buffer.from('reward_pool'),
+      CONFIG.toBuffer(),
+      new PublicKey(form.tokenMint).toBuffer(),
+    ],
+    REWARD_PROGRAM_ID
+  )
+  const [rewardAccount] = PublicKey.findProgramAddressSync(
+    [Buffer.from('mining'), owner.toBuffer(), rewardPool.toBuffer()],
+    REWARD_PROGRAM_ID
+  )
+
   const setupInsts: InstructionDataWithHoldUpTime[] = []
   const cleanupInsts: InstructionDataWithHoldUpTime[] = []
 
@@ -140,6 +160,9 @@ export async function handleEverlendAction(
       connection,
       owner,
       REGISTRY,
+      CONFIG,
+      rewardPool,
+      rewardAccount,
       form.poolPubKey,
       form.bnAmount,
       ctokenATA,
@@ -156,11 +179,14 @@ export async function handleEverlendAction(
       })
     })
   } else if (form.action === 'Withdraw') {
-    const { withdrawTx, closeIx } = await handleEverlendWithdraw(
+    const { withdrawTx } = await handleEverlendWithdraw(
       Boolean(isSol),
       connection,
       owner,
       REGISTRY,
+      CONFIG,
+      rewardPool,
+      rewardAccount,
       form.poolPubKey,
       form.bnAmount,
       liquidityATA,
@@ -178,18 +204,6 @@ export async function handleEverlendAction(
         chunkSplitByDefault: true,
       })
     })
-
-    if (closeIx) {
-      cleanupInsts.push({
-        data: getInstructionDataFromBase64(
-          serializeInstructionToBase64(closeIx)
-        ),
-        holdUpTime: matchedTreasury.governance!.account!.config
-          .minInstructionHoldUpTime,
-        prerequisiteInstructions: [],
-        chunkSplitByDefault: true,
-      })
-    }
   }
 
   const proposalAddress = await createProposal(
@@ -213,6 +227,9 @@ async function handleEverlendDeposit(
   connection: ConnectionContext,
   owner: PublicKey,
   REGISTRY: PublicKey,
+  CONFIG: PublicKey,
+  rewardPool: PublicKey,
+  rewardAccount: PublicKey,
   poolPubKey: string,
   amount: BN,
   source: PublicKey,
@@ -225,6 +242,10 @@ async function handleEverlendDeposit(
       new PublicKey(poolPubKey),
       REGISTRY,
       amount,
+      rewardPool,
+      rewardAccount,
+      CONFIG,
+      REWARD_PROGRAM_ID,
       source,
       destination
     )
@@ -235,6 +256,10 @@ async function handleEverlendDeposit(
       new PublicKey(poolPubKey),
       REGISTRY,
       amount,
+      REWARD_PROGRAM_ID,
+      CONFIG,
+      rewardPool,
+      rewardAccount,
       source
     )
     actionTx = depositTx
@@ -247,6 +272,9 @@ async function handleEverlendWithdraw(
   connection: ConnectionContext,
   owner: PublicKey,
   REGISTRY: PublicKey,
+  CONFIG: PublicKey,
+  rewardPool: PublicKey,
+  rewardAccount: PublicKey,
   poolPubKey: string,
   amount: BN,
   source: PublicKey,
@@ -260,6 +288,10 @@ async function handleEverlendWithdraw(
     new PublicKey(poolPubKey),
     REGISTRY,
     amount,
+    REWARD_PROGRAM_ID,
+    CONFIG,
+    rewardPool,
+    rewardAccount,
     source,
     isSol ? owner : undefined
   )
