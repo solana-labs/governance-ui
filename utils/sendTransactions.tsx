@@ -16,7 +16,7 @@ import { SignerWalletAdapter } from '@project-serum/sol-wallet-adapter';
 // In particular common primitives should be unified with send.tsx and also ensure the same resiliency mechanism
 // is used for monitoring transactions status and timeouts
 
-const sleep = (ttl: number) =>
+export const sleep = (ttl: number) =>
   new Promise((resolve) => setTimeout(() => resolve(true), ttl));
 
 export type WalletSigner = Pick<

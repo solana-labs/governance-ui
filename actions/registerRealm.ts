@@ -38,11 +38,11 @@ import {
 import { withCreateMintGovernance } from '@solana/spl-governance';
 import { withSetRealmAuthority } from '@solana/spl-governance';
 import { AccountInfo, u64 } from '@solana/spl-token';
-import { ProgramAccount } from '@project-serum/common';
 import { tryGetAta } from '@utils/validations';
 import { ConnectionContext } from '@utils/connection';
 import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants';
 import BigNumber from 'bignumber.js';
+import { TokenProgramAccount } from '@utils/tokens';
 
 interface RegisterRealmRpc {
   connection: ConnectionContext;
@@ -106,11 +106,9 @@ async function prepareMintInstructions(
     // then should create mints to them
     if (otherOwners?.length) {
       for (const ownerPk of otherOwners) {
-        const ata: ProgramAccount<AccountInfo> | undefined = await tryGetAta(
-          connection.current,
-          ownerPk,
-          _mintPk,
-        );
+        const ata:
+          | TokenProgramAccount<AccountInfo>
+          | undefined = await tryGetAta(connection.current, ownerPk, _mintPk);
         const shouldMint = !ata?.account.amount.gt(BN_ZERO);
 
         const ataPk =

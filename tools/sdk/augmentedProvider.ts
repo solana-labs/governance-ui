@@ -1,7 +1,7 @@
-import { Wallet } from '@project-serum/common';
 import {
   SolanaAugmentedProvider,
   SolanaProvider,
+  SignerWallet,
 } from '@saberhq/solana-contrib';
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base';
 import { Connection } from '@solana/web3.js';
@@ -13,7 +13,7 @@ export const augmentedProvider = (
   return new SolanaAugmentedProvider(
     SolanaProvider.init({
       connection: connection,
-      wallet: wallet as Wallet,
+      wallet: (wallet as unknown) as SignerWallet,
     }),
   );
 };

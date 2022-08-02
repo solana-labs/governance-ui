@@ -3,8 +3,8 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   SolanaAugmentedProvider,
   SolanaProvider,
+  SignerWallet,
 } from '@saberhq/solana-contrib';
-import { Wallet } from '@project-serum/common';
 import useWalletStore from 'stores/useWalletStore';
 import {
   findMinerAddress,
@@ -63,7 +63,7 @@ const useSaberStats = (hotWalletAccount: HotWalletAccount) => {
           SolanaProvider.load({
             connection: connection.current,
             sendConnection: connection.current,
-            wallet: wallet as Wallet,
+            wallet: (wallet as unknown) as SignerWallet,
           }),
         ),
       });

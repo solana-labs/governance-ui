@@ -9,7 +9,7 @@ import {
   TransactionSignature,
 } from '@solana/web3.js';
 import Wallet from '@project-serum/sol-wallet-adapter';
-import { sleep } from '@project-serum/common';
+import { sleep } from './sendTransactions';
 
 class TransactionError extends Error {
   public txid: string;

@@ -1,8 +1,8 @@
 import * as yup from 'yup';
-import { Wallet } from '@project-serum/common';
 import {
   SolanaAugmentedProvider,
   SolanaProvider,
+  SignerWallet,
 } from '@saberhq/solana-contrib';
 import Select from '@components/inputs/Select';
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
@@ -50,7 +50,7 @@ const RedeemAllTokensFromMintProxy = ({
           augmentedProvider: new SolanaAugmentedProvider(
             SolanaProvider.init({
               connection: connection,
-              wallet: wallet as Wallet,
+              wallet: (wallet as unknown) as SignerWallet,
             }),
           ),
           authority: governedAccountPubkey,
