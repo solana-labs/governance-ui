@@ -52,7 +52,7 @@ const RealmBox = React.forwardRef<HTMLDivElement, IRealmBox>(
         </div>
         <h3 className="text-center">{realm.displayName ?? realm.symbol}</h3>
       </div>
-      {editing && !inGrid && (
+      {editing && (
         <AiOutlineDrag className="absolute cursor-grab active:cursor-grabbing left-0 right-0 top-0 bottom-0 m-auto h-20 w-20 opacity-50" />
       )}
       {editing && inGrid && (
@@ -128,7 +128,7 @@ function RealmsGrid({
         }
       }
     }
-  }, [])
+  })
 
   useEffect(() => {
     // grid inserts random blank space for an empty scroll element, so we dont display it
@@ -184,9 +184,9 @@ function RealmsGrid({
       {(gridRealms?.length > 0 || editing) && (
         <div
           ref={gridRef}
-          className={`${
+          className={`pb-4 ${
             editing &&
-            `border-bgk-5 border-dashed border-y-2 bg-bkg-2 !sticky backdrop-blur z-40 min-h-[200px]`
+            `border-bgk-5 border-dashed border-y-2 bg-bkg-2 !sticky backdrop-blur z-10 min-h-[200px]`
           }`}
           style={{
             top: `${top}px`,
@@ -196,8 +196,8 @@ function RealmsGrid({
         >
           <SortableList
             onSortEnd={onSortEnd}
-            className="z-50 relative py-4 grid grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5 select-none"
-            draggedItemClassName="relative z-50"
+            className="z-10 relative py-4 grid grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5 select-none"
+            draggedItemClassName="relative z-10"
             allowDrag={editing}
           >
             {gridRealms &&
@@ -222,7 +222,6 @@ function RealmsGrid({
           )}
         </div>
       )}
-      <hr className="border border-bgk-1 mb-4" />
       {(editing || searching) && (
         <div className="pb-4 mb-4">
           <div className="pt-4 grid grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
