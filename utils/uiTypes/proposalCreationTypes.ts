@@ -24,6 +24,8 @@ import { SupportedSaberPoolNames } from '@tools/sdk/saberPools/configuration';
 import { PoolName as MapleFinancePoolName } from '@tools/sdk/mapleFinance/configuration';
 import { PoolNames as LifinityPoolNames } from '@tools/sdk/lifinity/poolList';
 import { PoolName as DeltafiPoolName } from '@components/SelectDeltafiPool';
+import { WhirlpoolName as OrcaWhirlpoolName } from '@tools/sdk/orca/configuration';
+import { WhirlpoolPositionInfo as OrcaWhirlpoolPositionInfo } from '@tools/sdk/orca/configuration';
 
 export interface FormInstructionData {
   serializedInstruction: string;
@@ -537,6 +539,55 @@ export interface NativeBurnSplTokensForm {
   source?: string;
 }
 
+export interface OrcaWhirlpoolOpenPositionForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  whirlpoolName?: OrcaWhirlpoolName;
+  uiLowerPrice?: number;
+  uiUpperPrice?: number;
+}
+
+export interface OrcaWhirlpoolIncreaseLiquidityForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  whirlpoolName?: OrcaWhirlpoolName;
+  positionInfo?: OrcaWhirlpoolPositionInfo;
+  uiSlippage?: number;
+  uiAmountTokenA?: number;
+}
+
+export interface OrcaWhirlpoolUpdateFeesAndRewardsForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  whirlpoolName?: OrcaWhirlpoolName;
+  positionInfo?: OrcaWhirlpoolPositionInfo;
+}
+
+export interface OrcaWhirlpoolCollectFeesForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  whirlpoolName?: OrcaWhirlpoolName;
+  positionInfo?: OrcaWhirlpoolPositionInfo;
+}
+
+export interface OrcaWhirlpoolDecreaseLiquidityForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  whirlpoolName?: OrcaWhirlpoolName;
+  positionInfo?: OrcaWhirlpoolPositionInfo;
+  uiSlippage?: number;
+  uiLiquidityAmountToDecrease?: number;
+}
+
+export interface OrcaWhirlpoolClosePositionForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  whirlpoolName?: OrcaWhirlpoolName;
+  positionInfo?: OrcaWhirlpoolPositionInfo;
+}
+
+export interface OrcaWhirlpoolSwapForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  whirlpoolName?: OrcaWhirlpoolName;
+  outputToken?: 'TokenA' | 'TokenB';
+  uiAmount?: number;
+  quoteByOutput?: boolean;
+}
+
 export enum InstructionEnum {
   Transfer,
   ProgramUpgrade,
@@ -612,6 +663,13 @@ export enum InstructionEnum {
   DeltafiFarmDeposit,
   DeltafiFarmWithdraw,
   NativeBurnSplTokens,
+  OrcaWhirlpoolOpenPosition,
+  OrcaWhirlpoolIncreaseLiquidity,
+  OrcaWhirlpoolUpdateFeesAndRewards,
+  OrcaWhirlpoolCollectFees,
+  OrcaWhirlpoolDecreaseLiquidity,
+  OrcaWhirlpoolClosePosition,
+  OrcaWhirlpoolSwap,
 }
 
 export enum PackageEnum {
@@ -629,6 +687,7 @@ export enum PackageEnum {
   Lifinity,
   MapleFinance,
   Deltafi,
+  Orca,
 }
 
 export type createParams = [

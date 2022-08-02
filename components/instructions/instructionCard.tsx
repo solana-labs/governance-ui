@@ -1,4 +1,4 @@
-import { PublicKey } from '@solana/web3.js';
+import { Keypair, PublicKey } from '@solana/web3.js';
 import { ExternalLinkIcon } from '@heroicons/react/outline';
 import {
   AccountMetaData,
@@ -28,6 +28,8 @@ import axios from 'axios';
 import { notify } from '@utils/notifications';
 import useGovernanceAssets from '@hooks/useGovernanceAssets';
 import tokenService from '@utils/services/token';
+import { OrcaConfiguration } from '@tools/sdk/orca/configuration';
+import SecretKeyInput from '@components/SecretKeyInput';
 
 export default function InstructionCard({
   index,
@@ -38,6 +40,9 @@ export default function InstructionCard({
   proposal: ProgramAccount<Proposal>;
   proposalInstruction: ProgramAccount<ProposalTransaction>;
 }) {
+  const [additionalSigner, setAdditionalSigner] = useState<Keypair | null>(
+    null,
+  );
   const {
     nftsGovernedTokenAccounts,
     governedTokenAccountsWithoutNfts,
@@ -112,8 +117,37 @@ export default function InstructionCard({
     getAmountImg();
   }, [proposalInstruction, governedTokenAccountsWithoutNfts.length]);
   const isSol = tokenImgUrl.includes(WSOL_MINT);
-
   const proposalAuthority = tokenRecords[proposal.owner.toBase58()];
+
+  const isInstructionAboutOrcaWhirlpoolOpenPosition = ((): boolean => {
+    if (!proposal) {
+      return false;
+    }
+
+    if (playing !== PlayState.Unplayed) {
+      return false;
+    }
+
+    if (
+      !proposalInstruction.account
+        .getSingleInstruction()
+        .programId.equals(OrcaConfiguration.WhirlpoolProgramId)
+    ) {
+      return false;
+    }
+
+    // Compare the first byte of the anchor discriminator
+    if (
+      Number(
+        proposalInstruction.account.getSingleInstruction().data.slice(0, 1),
+      ) !== OrcaConfiguration.instructionsCode.WhirlpoolOpenPositionWithMetadata
+    ) {
+      return false;
+    }
+
+    return true;
+  })();
+
   return (
     <div className="break-all">
       <h3 className="mb-4 flex">
@@ -161,6 +195,27 @@ export default function InstructionCard({
       ) : (
         <InstructionData descriptor={descriptor}></InstructionData>
       )}
+
+      {
+        // In the very particular case it is about Orca Whirlpool Open Position Instruction
+        // We ask the users for the keypair of the position mint
+        isInstructionAboutOrcaWhirlpoolOpenPosition ? (
+          <div className="flex flex-col mt-6 mb-8">
+            <strong>
+              Provide the <em>positionMint</em> secret key shown during the
+              proposal creation.
+            </strong>
+
+            <SecretKeyInput
+              className="mt-4"
+              value={additionalSigner}
+              onChange={setAdditionalSigner}
+              placeholder="Enter secret key here"
+            />
+          </div>
+        ) : null
+      }
+
       <div className="flex justify-end items-center gap-x-4 mt-6 mb-8">
         <InspectorButton proposalInstruction={proposalInstruction} />
 
@@ -173,10 +228,14 @@ export default function InstructionCard({
 
         {proposal && (
           <ExecuteInstructionButton
+            disabled={
+              isInstructionAboutOrcaWhirlpoolOpenPosition && !additionalSigner
+            }
             proposal={proposal}
             proposalInstruction={proposalInstruction}
             playing={playing}
             setPlaying={setPlaying}
+            additionalSigner={additionalSigner ?? undefined}
           />
         )}
       </div>

@@ -15,6 +15,7 @@ export const executeTransaction = async (
   { connection, wallet, programId }: RpcContext,
   proposal: ProgramAccount<Proposal>,
   instruction: ProgramAccount<ProposalTransaction>,
+  additionalSigner?: Keypair,
 ) => {
   const signers: Keypair[] = [];
   const instructions: TransactionInstruction[] = [];
@@ -39,6 +40,10 @@ export const executeTransaction = async (
   const transaction = new Transaction();
 
   transaction.add(...instructions);
+
+  if (additionalSigner) {
+    signers.push(additionalSigner);
+  }
 
   await sendTransaction({
     transaction,

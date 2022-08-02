@@ -221,6 +221,10 @@ export default function useGovernanceAssets() {
       name: 'Deltafi',
       image: '/img/deltafi.png',
     },
+    [PackageEnum.Orca]: {
+      name: 'Orca',
+      image: '/img/orca.svg',
+    },
   };
 
   const instructions: Instructions = {
@@ -611,6 +615,48 @@ export default function useGovernanceAssets() {
       name: 'Burn SPL Tokens',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.Native,
+      tag: 'beta',
+    },
+    [InstructionEnum.OrcaWhirlpoolOpenPosition]: {
+      name: 'Orca Whirlpool Open Position',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Orca,
+      tag: 'beta',
+    },
+    [InstructionEnum.OrcaWhirlpoolIncreaseLiquidity]: {
+      name: 'Orca Whirlpool Increase Liquidity',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Orca,
+      tag: 'beta',
+    },
+    [InstructionEnum.OrcaWhirlpoolUpdateFeesAndRewards]: {
+      name: 'Orca Whirlpool Update Fees and Rewards',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Orca,
+      tag: 'beta',
+    },
+    [InstructionEnum.OrcaWhirlpoolCollectFees]: {
+      name: 'Orca Whirlpool Collect Fees',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Orca,
+      tag: 'beta',
+    },
+    [InstructionEnum.OrcaWhirlpoolDecreaseLiquidity]: {
+      name: 'Orca Whirlpool Decrease Liquidity',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Orca,
+      tag: 'beta',
+    },
+    [InstructionEnum.OrcaWhirlpoolClosePosition]: {
+      name: 'Orca Whirlpool Close Position',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Orca,
+      tag: 'beta',
+    },
+    [InstructionEnum.OrcaWhirlpoolSwap]: {
+      name: 'Orca Whirlpool Swap',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Orca,
       tag: 'beta',
     },
   };

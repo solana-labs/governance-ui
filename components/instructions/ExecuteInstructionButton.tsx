@@ -14,7 +14,7 @@ import useWalletStore, {
   EnhancedProposalState,
 } from 'stores/useWalletStore';
 import { ProgramAccount } from '@solana/spl-governance';
-import { PublicKey } from '@solana/web3.js';
+import { Keypair, PublicKey } from '@solana/web3.js';
 import Tooltip from '@components/Tooltip';
 import { getProgramVersionForRealm } from '@models/registry/api';
 import useTransactionSignature from '@hooks/useTransactionSignature';
@@ -32,11 +32,15 @@ export function ExecuteInstructionButton({
   playing,
   setPlaying,
   proposalInstruction,
+  additionalSigner,
+  disabled,
 }: {
   proposal: ProgramAccount<EnhancedProposal>;
   proposalInstruction: ProgramAccount<ProposalTransaction>;
   playing: PlayState;
+  additionalSigner?: Keypair;
   setPlaying: React.Dispatch<React.SetStateAction<PlayState>>;
+  disabled?: boolean;
 }) {
   const { realmInfo } = useRealm();
   const wallet = useWalletStore((s) => s.current);
@@ -77,7 +81,12 @@ export function ExecuteInstructionButton({
     setPlaying(PlayState.Playing);
 
     try {
-      await executeTransaction(rpcContext, proposal, proposalInstruction);
+      await executeTransaction(
+        rpcContext,
+        proposal,
+        proposalInstruction,
+        additionalSigner,
+      );
       await fetchRealm(realmInfo?.programId, realmInfo?.realmId);
     } catch (error) {
       notify({
@@ -134,7 +143,11 @@ export function ExecuteInstructionButton({
       InstructionExecutionStatus.Error
   ) {
     return (
-      <Button small disabled={!connected} onClick={onExecuteInstruction}>
+      <Button
+        small
+        disabled={!connected || disabled}
+        onClick={onExecuteInstruction}
+      >
         Execute
       </Button>
     );

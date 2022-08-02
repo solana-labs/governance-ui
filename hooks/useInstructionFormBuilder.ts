@@ -86,7 +86,10 @@ function useInstructionFormBuilder<
         governance: form.governedAccount?.governance,
       };
     }
+
     try {
+      const prerequisiteInstructions: TransactionInstruction[] = [];
+
       const transactionInstructionOrSerializedInstruction = buildInstruction
         ? await buildInstruction({
             form,
@@ -110,10 +113,10 @@ function useInstructionFormBuilder<
 
       return {
         serializedInstruction,
+        prerequisiteInstructions,
         isValid: true,
         governance: form.governedAccount?.governance,
         customHoldUpTime,
-        signers: [],
         shouldSplitIntoSeparateTxs,
       };
     } catch (e) {
