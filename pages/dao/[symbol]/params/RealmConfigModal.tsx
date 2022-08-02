@@ -26,6 +26,8 @@ import RealmConfigFormComponent, {
 } from '../proposal/components/forms/RealmConfigFormComponent'
 import { abbreviateAddress } from '@utils/formatting'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { MAX_TOKENS_TO_DISABLE } from '@tools/constants'
+import { BN } from '@project-serum/anchor'
 
 interface RealmConfigProposal extends RealmConfigForm {
   title: string
@@ -65,10 +67,14 @@ const RealmConfigModal = ({ closeProposalModal, isProposalModalOpen }) => {
     ) {
       setCreatingProposal(true)
       const governance = form!.governedAccount.governance
-      const mintAmount = parseMintNaturalAmountFromDecimalAsBN(
-        form!.minCommunityTokensToCreateGovernance!,
-        mint!.decimals!
+      const mintAmount = MAX_TOKENS_TO_DISABLE.eq(
+        new BN(form!.minCommunityTokensToCreateGovernance)
       )
+        ? MAX_TOKENS_TO_DISABLE
+        : parseMintNaturalAmountFromDecimalAsBN(
+            form!.minCommunityTokensToCreateGovernance!,
+            mint!.decimals!
+          )
       const instruction = await createSetRealmConfig(
         realmInfo!.programId,
         realmInfo!.programVersion!,
