@@ -30,6 +30,7 @@ export const getTreasuryAccountItemInfoV2 = (account: AssetAccount) => {
     ? new BigNumber(totalPrice).toFormat(0)
     : ''
   const info = tokenService.getTokenInfo(mintAddress!)
+
   const symbol =
     account.type === AccountType.NFT
       ? 'NFTS'
