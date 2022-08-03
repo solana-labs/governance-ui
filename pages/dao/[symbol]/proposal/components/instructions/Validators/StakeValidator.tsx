@@ -160,18 +160,21 @@ const StakeValidator = ({
       SOLANA_VALIDATOR_DAO_PROGRAM_ID,
       provider
     )
+    const validatorVotePK = new PublicKey(form.validatorVoteKey)
+
     const [daoStakeAccount] = await web3.PublicKey.findProgramAddress(
       [
         Buffer.from('validator_dao_stake_account'),
         governancePk.toBuffer(),
         nativeTreasury.toBuffer(),
         GOVERNANCE_PROGRAM_ID.toBuffer(),
+        validatorVotePK.toBuffer(),
         seedBuffer,
       ],
       SOLANA_VALIDATOR_DAO_PROGRAM_ID
     )
 
-    const mintAmount = parseMintNaturalAmountFromDecimal(form.amount!, 6)
+    const mintAmount = parseMintNaturalAmountFromDecimal(form.amount!, 9)
 
     const instruction = await program.methods
       .stake(form.seed, new anchor.BN(mintAmount))
@@ -183,25 +186,13 @@ const StakeValidator = ({
         clockProgram: web3.SYSVAR_CLOCK_PUBKEY,
         stakeConfig: web3.STAKE_CONFIG_ID,
         stakeHistory: web3.SYSVAR_STAKE_HISTORY_PUBKEY,
-        validatorVoteKey: new PublicKey(form.validatorVoteKey),
+        validatorVoteKey: validatorVotePK,
         governanceProgram: GOVERNANCE_PROGRAM_ID,
         stakeProgram: web3.StakeProgram.programId,
         systemProgram: web3.SystemProgram.programId,
         rentProgram: web3.SYSVAR_RENT_PUBKEY,
       })
       .instruction()
-    console.log('-------instruction-----------')
-    console.log('programId' + instruction.programId)
-    console.log('data length' + instruction.data.length)
-    console.log(
-      'accounts' +
-        instruction.keys
-          .map(
-            (x) =>
-              ' { ' + x.pubkey + ' ' + x.isSigner + ' ' + x.isWritable + '}'
-          )
-          .join('\n')
-    )
 
     return {
       serializedInstruction: serializeInstructionToBase64(instruction),
