@@ -20,6 +20,16 @@ import useWalletStore from 'stores/useWalletStore'
 import { web3 } from '@project-serum/anchor'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
+import * as anchor from '@project-serum/anchor'
+import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
+
+const SOLANA_VALIDATOR_DAO_PROGRAM_ID = new PublicKey(
+  'AwyKDr1Z5BfdvK3jX1UWopyjsJSV5cq4cuJpoYLofyEn'
+)
+//const SOLANA_VALIDATOR_DAO_IDL_ID = new PublicKey('GnhBKwcWcqUwSLoheNKQLvdu6v3fFR9mUaQnw6Ci8jmP')
+const GOVERNANCE_PROGRAM_ID = new PublicKey(
+  'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
+)
 
 const StakeValidator = ({
   index,
@@ -28,16 +38,16 @@ const StakeValidator = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  console.log('test')
   const connection = useWalletStore((s) => s.connection)
   const programId: PublicKey = StakeProgram.programId
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = index !== 0 && governance
+  const wallet = useWalletStore((s) => s.current)
 
   const [form, setForm] = useState<ValidatorStakingForm>({
     validatorVoteKey: '',
     amount: 0,
-    seed: '',
+    seed: 0,
     governedTokenAccount: undefined,
   })
   const [formErrors, setFormErrors] = useState({})
@@ -90,7 +100,10 @@ const StakeValidator = ({
         .number()
         .min(1, 'Amount must be positive number')
         .required('Amount is required'),
-      seed: yup.string().required('seed is required'),
+      seed: yup
+        .number()
+        .min(0, 'Seed must be positive number')
+        .required('Seed is required'),
     })
     const { isValid, validationErrors } = await isFormValid(schema, form)
     setFormErrors(validationErrors)
@@ -109,55 +122,93 @@ const StakeValidator = ({
     }
     const governanceAccount = governance?.account
 
-    console.log('testing')
     if (
       !connection ||
       !isValid ||
       !programId ||
       !governanceAccount ||
       !governancePk ||
-      !form.governedTokenAccount?.isSol
+      !form.governedTokenAccount?.isSol ||
+      !wallet ||
+      !wallet.publicKey
     ) {
       return returnInvalid()
     }
 
     const nativeTreasury = form.governedTokenAccount.pubkey
     const prerequisiteInstructions: web3.TransactionInstruction[] = []
-
-    const [stakeAccountAddress] = await web3.PublicKey.findProgramAddress(
-      [nativeTreasury.toBuffer(), Buffer.from(form.seed, 'utf8')],
-      web3.StakeProgram.programId
+    const seedBuffer = new Uint8Array([form.seed])
+    const provider = new anchor.AnchorProvider(
+      connection.current,
+      {
+        publicKey: wallet.publicKey,
+        signAllTransactions: wallet.signAllTransactions,
+        signTransaction: wallet.signTransaction,
+      },
+      { commitment: 'confirmed' }
+    )
+    const idl = await anchor.Program.fetchIdl(
+      SOLANA_VALIDATOR_DAO_PROGRAM_ID,
+      provider
+    )
+    if (!idl) {
+      console.log('idl is null')
+      return returnInvalid()
+    }
+    const program = new anchor.Program(
+      idl,
+      SOLANA_VALIDATOR_DAO_PROGRAM_ID,
+      provider
+    )
+    const [daoStakeAccount] = await web3.PublicKey.findProgramAddress(
+      [
+        Buffer.from('validator_dao_stake_account'),
+        governancePk.toBuffer(),
+        nativeTreasury.toBuffer(),
+        GOVERNANCE_PROGRAM_ID.toBuffer(),
+        seedBuffer,
+      ],
+      SOLANA_VALIDATOR_DAO_PROGRAM_ID
     )
 
-    // check if stake account exists, if not create one
-    if (!connection.current.getAccountInfo(stakeAccountAddress) == null) {
-      console.log('C')
-      return returnInvalid() // stake account already exists
-    }
+    const mintAmount = parseMintNaturalAmountFromDecimal(form.amount!, 6)
 
-    let tx = await web3.StakeProgram.createAccountWithSeed({
-      fromPubkey: nativeTreasury,
-      stakePubkey: stakeAccountAddress,
-      basePubkey: nativeTreasury,
-      seed: form.validatorVoteKey + form.seed,
-      lamports: form.amount,
-      authorized: { staker: nativeTreasury, withdrawer: nativeTreasury },
-    })
-    prerequisiteInstructions.push(...tx.instructions) // add instructions
+    const instruction = await program.methods
+      .stake(form.seed, new anchor.BN(mintAmount))
+      .accounts({
+        governanceId: governancePk,
+        governanceNativeTreasuryAccount: nativeTreasury,
+        daoStakeAccount: daoStakeAccount,
+        payer: nativeTreasury,
+        clockProgram: web3.SYSVAR_CLOCK_PUBKEY,
+        stakeConfig: web3.STAKE_CONFIG_ID,
+        stakeHistory: web3.SYSVAR_STAKE_HISTORY_PUBKEY,
+        validatorVoteKey: new PublicKey(form.validatorVoteKey),
+        governanceProgram: GOVERNANCE_PROGRAM_ID,
+        stakeProgram: web3.StakeProgram.programId,
+        systemProgram: web3.SystemProgram.programId,
+        rentProgram: web3.SYSVAR_RENT_PUBKEY,
+      })
+      .instruction()
+    console.log('-------instruction-----------')
+    console.log('programId' + instruction.programId)
+    console.log('data length' + instruction.data.length)
+    console.log(
+      'accounts' +
+        instruction.keys
+          .map(
+            (x) =>
+              ' { ' + x.pubkey + ' ' + x.isSigner + ' ' + x.isWritable + '}'
+          )
+          .join('\n')
+    )
 
-    tx = await web3.StakeProgram.delegate({
-      authorizedPubkey: nativeTreasury,
-      stakePubkey: nativeTreasury,
-      votePubkey: new web3.PublicKey(form.validatorVoteKey),
-    })
-    console.log('D')
     return {
-      serializedInstruction: serializeInstructionToBase64(tx.instructions[0]),
+      serializedInstruction: serializeInstructionToBase64(instruction),
       isValid: true,
       governance: form.governedTokenAccount.governance,
       prerequisiteInstructions: prerequisiteInstructions,
-      shouldSplitIntoSeparateTxs: true,
-      signers: [],
+      shouldSplitIntoSeparateTxs: false,
     }
   }
 
@@ -205,7 +256,9 @@ const StakeValidator = ({
         label="Seed for stake address (will be added with validator address)"
         value={form.seed}
         error={formErrors['seed']}
-        type="string"
+        type="number"
+        min="0"
+        max="255"
         onChange={setSeed}
       />
       <Input

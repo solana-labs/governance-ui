@@ -525,7 +525,7 @@ export interface ValidatorStakingForm {
   governedTokenAccount: AssetAccount | undefined
   validatorVoteKey: string
   amount: number
-  seed: string
+  seed: number
 }
 
 export interface ValidatorDeactivateStakeForm {
