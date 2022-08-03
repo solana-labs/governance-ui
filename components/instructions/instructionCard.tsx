@@ -2,7 +2,6 @@ import { Keypair, PublicKey } from '@solana/web3.js';
 import { ExternalLinkIcon } from '@heroicons/react/outline';
 import {
   AccountMetaData,
-  InstructionExecutionStatus,
   Proposal,
   ProposalTransaction,
 } from '@solana/spl-governance';
@@ -48,6 +47,7 @@ export default function InstructionCard({
     nftsGovernedTokenAccounts,
     governedTokenAccountsWithoutNfts,
   } = useGovernanceAssets();
+  const wallet = useWalletStore((s) => s.current);
   const connection = useWalletStore((s) => s.connection);
   const tokenRecords = useWalletStore((s) => s.selectedRealm);
   const [descriptor, setDescriptor] = useState<InstructionDescriptor>();
@@ -149,6 +149,14 @@ export default function InstructionCard({
     return true;
   })();
 
+  // Say if the connected wallet is the payer of the open position instruction
+  const isPayerOfOrcaWhirlpoolOpenPositionIx =
+    isInstructionAboutOrcaWhirlpoolOpenPosition && wallet?.publicKey
+      ? proposalInstruction.account
+          .getSingleInstruction()
+          .accounts[0].pubkey.equals(wallet.publicKey)
+      : false;
+
   return (
     <div className="break-all">
       <h3 className="mb-4 flex">
@@ -199,10 +207,9 @@ export default function InstructionCard({
 
       {
         // In the very particular case it is about Orca Whirlpool Open Position Instruction
-        // We ask the users for the keypair of the position mint
+        // We ask the users for the secret key of the position mint
         isInstructionAboutOrcaWhirlpoolOpenPosition &&
-        proposalInstruction.account.executionStatus ===
-          InstructionExecutionStatus.Success ? (
+        isPayerOfOrcaWhirlpoolOpenPositionIx ? (
           <div className="flex flex-col mt-6 mb-8">
             <strong>
               Provide the <em>positionMint</em> secret key shown during the
