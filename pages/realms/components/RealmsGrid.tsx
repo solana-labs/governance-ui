@@ -147,7 +147,7 @@ function RealmsGrid({
     const symbol =
       realmInfo.isCertified && realmInfo.symbol
         ? realmInfo.symbol
-        : realmInfo.realmId.toBase58()
+        : realmInfo.realmId.toString()
     const url = fmtUrlWithCluster(`/dao/${symbol}`)
     router.push(url)
   }
@@ -201,18 +201,23 @@ function RealmsGrid({
             allowDrag={editing}
           >
             {gridRealms &&
-              gridRealms.map((realm) => (
-                <SortableItem key={realm?.realmId.toString()}>
-                  <RealmBox
-                    onClick={() => (editing ? null : goToRealm(realm))}
-                    realm={realm}
-                    editing={editing}
-                    removeItem={removeItem}
-                    theme={theme}
-                    inGrid={true}
-                  />
-                </SortableItem>
-              ))}
+              gridRealms.map(
+                (realm) =>
+                  filteredRealms.find(
+                    (r) => r.realmId.toString() === realm.realmId.toString()
+                  ) && (
+                    <SortableItem key={realm?.realmId.toString()}>
+                      <RealmBox
+                        onClick={() => (editing ? null : goToRealm(realm))}
+                        realm={realm}
+                        editing={editing}
+                        removeItem={removeItem}
+                        theme={theme}
+                        inGrid={true}
+                      />
+                    </SortableItem>
+                  )
+              )}
           </SortableList>
           {editing && gridRealms?.length === 0 && (
             <div className="text-confirm-green flex items-center -z-50 justify-center left-0 right-0 m-auto absolute top-[50%] -translate-y-[50%] gap-2 w-fit">
@@ -296,7 +301,7 @@ function RealmsGrid({
                       <RealmBox
                         realm={realm}
                         onClick={() => (editing ? null : goToRealm(realm))}
-                        editing={false}
+                        editing={editing}
                         removeItem={() => null}
                         theme={theme}
                       />
