@@ -35,8 +35,6 @@ const AccountItem = ({
           getConnectionContext(connection.cluster).current,
           tokenMetaPubkey
         )
-        console.log(connection.cluster)
-        console.log({ tokenMeta })
         setLogoFromMeta(tokenMeta.data?.data.uri)
         setSymbolFromMeta(tokenMeta.data?.data.symbol)
       } catch (e) {
