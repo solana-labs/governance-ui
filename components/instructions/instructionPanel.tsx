@@ -4,7 +4,7 @@ import { Disclosure } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/solid'
 import { useEffect, useRef, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
-import { RpcContext } from '@solana/spl-governance'
+import { InstructionExecutionStatus, RpcContext } from '@solana/spl-governance'
 import useRealm from '@hooks/useRealm'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import {
@@ -125,10 +125,17 @@ export function InstructionPanel() {
 
               {proposal && proposalInstructions.length > 1 && (
                 <div className="flex justify-end space-x-4">
-                  <Button onClick={simulate}>Inspect all</Button>
+                  {proposalInstructions.filter((x) => !x.account.executedAt)
+                    .length !== 0 && (
+                    <Button onClick={simulate}>Inspect all</Button>
+                  )}
                   <ExecuteAllInstructionButton
                     proposal={proposal}
-                    proposalInstructions={proposalInstructions}
+                    proposalInstructions={proposalInstructions.filter(
+                      (x) =>
+                        x.account.executionStatus ===
+                        InstructionExecutionStatus.None
+                    )}
                     playing={playing}
                     setPlaying={setPlaying}
                     label="Execute in separated transactions"

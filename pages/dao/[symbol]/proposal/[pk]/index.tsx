@@ -62,6 +62,8 @@ const Proposal = () => {
     }
     if (descriptionLink) {
       handleResolveDescription()
+    } else {
+      setDescription('')
     }
   }, [descriptionLink])
 

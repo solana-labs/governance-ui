@@ -1,4 +1,4 @@
-import { fetchGistFile } from './github'
+import { gistApi } from './github'
 
 export function capitalize(str?: string) {
   return str ? str?.charAt(0).toUpperCase() + str?.slice(1) : str
@@ -22,8 +22,11 @@ export class SanitizedObject {
 
 export async function resolveProposalDescription(descriptionLink: string) {
   try {
+    gistApi.cancel()
     const url = new URL(descriptionLink)
-    return (await fetchGistFile(url.toString())) ?? descriptionLink
+    const desc =
+      (await gistApi.fetchGistFile(url.toString())) ?? descriptionLink
+    return desc
   } catch {
     return descriptionLink
   }
