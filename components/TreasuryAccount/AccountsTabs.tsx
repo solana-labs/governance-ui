@@ -67,9 +67,6 @@ const AccountTab: FunctionComponent<AccountTabProps> = ({
   const [logoFromMeta, setLogoFromMeta] = useState<undefined | string>(
     undefined
   )
-  const [nameFromMeta, setNameFromMeta] = useState<undefined | string>(
-    undefined
-  )
   const [symbolFromMeta, setSymbolFromMeta] = useState<undefined | string>(
     undefined
   )
@@ -85,7 +82,6 @@ const AccountTab: FunctionComponent<AccountTabProps> = ({
           tokenMetaPubkey
         )
         setLogoFromMeta(tokenMeta.data?.data.uri)
-        setNameFromMeta(tokenMeta.data?.data.name)
         setSymbolFromMeta(tokenMeta.data?.data.symbol)
       } catch (e) {
         console.log(e)
@@ -128,7 +124,7 @@ const AccountTab: FunctionComponent<AccountTabProps> = ({
               className="w-5 h-5 mr-2"
             />
           ) : undefined}{' '}
-          {nameFromMeta ? nameFromMeta : name}
+          {name}
         </h3>
         <p className="mb-0 text-xs text-fgd-1">
           {amountFormatted} {symbolFromMeta ? symbolFromMeta : symbol}

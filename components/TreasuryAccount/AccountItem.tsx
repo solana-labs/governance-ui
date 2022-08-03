@@ -21,9 +21,6 @@ const AccountItem = ({
   const [logoFromMeta, setLogoFromMeta] = useState<undefined | string>(
     undefined
   )
-  const [nameFromMeta, setNameFromMeta] = useState<undefined | string>(
-    undefined
-  )
   const [symbolFromMeta, setSymbolFromMeta] = useState<undefined | string>(
     undefined
   )
@@ -38,8 +35,9 @@ const AccountItem = ({
           getConnectionContext(connection.cluster).current,
           tokenMetaPubkey
         )
+        console.log(connection.cluster)
+        console.log({ tokenMeta })
         setLogoFromMeta(tokenMeta.data?.data.uri)
-        setNameFromMeta(tokenMeta.data?.data.name)
         setSymbolFromMeta(tokenMeta.data?.data.symbol)
       } catch (e) {
         console.log(e)
@@ -79,9 +77,7 @@ const AccountItem = ({
       ) : undefined}
       <div className="w-full">
         <div className="flex items-start justify-between mb-1">
-          <div className="text-sm font-semibold text-th-fgd-1">
-            {nameFromMeta ? nameFromMeta : name}
-          </div>
+          <div className="text-sm font-semibold text-th-fgd-1">{name}</div>
         </div>
         <div className="text-xs text-fgd-3">
           {amountFormatted} {symbolFromMeta ? symbolFromMeta : symbol}
