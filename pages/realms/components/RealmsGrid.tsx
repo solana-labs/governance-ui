@@ -147,7 +147,7 @@ function RealmsGrid({
     const symbol =
       realmInfo.isCertified && realmInfo.symbol
         ? realmInfo.symbol
-        : realmInfo.realmId.toBase58()
+        : realmInfo.realmId.toString()
     const url = fmtUrlWithCluster(`/dao/${symbol}`)
     router.push(url)
   }
@@ -301,7 +301,7 @@ function RealmsGrid({
                       <RealmBox
                         realm={realm}
                         onClick={() => (editing ? null : goToRealm(realm))}
-                        editing={false}
+                        editing={editing}
                         removeItem={() => null}
                         theme={theme}
                       />
