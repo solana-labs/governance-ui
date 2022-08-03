@@ -13,7 +13,6 @@ import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore';
 import useWalletStore from 'stores/useWalletStore';
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry';
 import ErrorBoundary from '@components/ErrorBoundary';
-import { WalletIdentityProvider } from '@cardinal/namespaces-components';
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore';
 import useMarketStore from 'Strategies/store/marketStore';
 import handleGovernanceAssetsStore from '@hooks/handleGovernanceAssetsStore';
@@ -102,13 +101,11 @@ function App({ Component, pageProps }) {
     <div className="relative">
       <ErrorBoundary>
         <ThemeProvider defaultTheme="Mango">
-          <WalletIdentityProvider appName={'Realms'}>
-            <NavBar />
-            <Notifications />
-            <PageBodyContainer>
-              <Component {...pageProps} />
-            </PageBodyContainer>
-          </WalletIdentityProvider>
+          <NavBar />
+          <Notifications />
+          <PageBodyContainer>
+            <Component {...pageProps} />
+          </PageBodyContainer>
         </ThemeProvider>
       </ErrorBoundary>
     </div>
