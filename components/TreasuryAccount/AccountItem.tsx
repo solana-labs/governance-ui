@@ -1,9 +1,10 @@
 import { getTreasuryAccountItemInfoV2 } from '@utils/treasuryTools'
 import { AssetAccount } from '@utils/uiTypes/assets'
-import { getConnectionContext } from '@utils/connection'
-import { deprecated } from '@metaplex-foundation/mpl-token-metadata'
+import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
+import { findMetadataPda } from '@metaplex-foundation/js'
+import { PublicKey } from '@solana/web3.js'
 
 const AccountItem = ({
   governedAccountTokenAccount,
@@ -21,9 +22,6 @@ const AccountItem = ({
   const [logoFromMeta, setLogoFromMeta] = useState<undefined | string>(
     undefined
   )
-  const [nameFromMeta, setNameFromMeta] = useState<undefined | string>(
-    undefined
-  )
   const [symbolFromMeta, setSymbolFromMeta] = useState<undefined | string>(
     undefined
   )
@@ -32,15 +30,18 @@ const AccountItem = ({
   useEffect(() => {
     const getTokenMetadata = async (mintAddress: string) => {
       try {
-        const tokenMetaPubkey = await deprecated.Metadata.getPDA(mintAddress)
+        const mintPubkey = new PublicKey(mintAddress)
+        const metadataAccount = findMetadataPda(mintPubkey)
+        const data = await connection.current.getAccountInfo(metadataAccount)
 
-        const tokenMeta = await deprecated.Metadata.load(
-          getConnectionContext(connection.cluster).current,
-          tokenMetaPubkey
+        const state = Metadata.deserialize(data!.data)
+
+        setLogoFromMeta(
+          state[0].data.uri.slice(0, state[0].data.uri.indexOf('\x00'))
         )
-        setLogoFromMeta(tokenMeta.data?.data.uri)
-        setNameFromMeta(tokenMeta.data?.data.name)
-        setSymbolFromMeta(tokenMeta.data?.data.symbol)
+        setSymbolFromMeta(
+          state[0].data.symbol.slice(0, state[0].data.symbol.indexOf('\x00'))
+        )
       } catch (e) {
         console.log(e)
       }
@@ -79,9 +80,7 @@ const AccountItem = ({
       ) : undefined}
       <div className="w-full">
         <div className="flex items-start justify-between mb-1">
-          <div className="text-sm font-semibold text-th-fgd-1">
-            {nameFromMeta ? nameFromMeta : name}
-          </div>
+          <div className="text-sm font-semibold text-th-fgd-1">{name}</div>
         </div>
         <div className="text-xs text-fgd-3">
           {amountFormatted} {symbolFromMeta ? symbolFromMeta : symbol}

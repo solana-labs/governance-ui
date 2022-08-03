@@ -2,8 +2,9 @@ import { TokenInfo } from '@solana/spl-token-registry'
 import React from 'react'
 import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
-import { deprecated } from '@metaplex-foundation/mpl-token-metadata'
-import { getConnectionContext } from '@utils/connection'
+import { findMetadataPda } from '@metaplex-foundation/js'
+import { PublicKey } from '@solana/web3.js'
+import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 
 const BaseAccountHeader: React.FC<{
   isNFT?: boolean
@@ -16,19 +17,20 @@ const BaseAccountHeader: React.FC<{
 
   const [symbol, setSymbol] = useState<undefined | string>(tokenInfo?.symbol)
   const connection = useWalletStore((s) => s.connection)
-  console.log(tokenInfo?.address)
 
   useEffect(() => {
     const getTokenMetadata = async (mintAddress: string) => {
       try {
-        const tokenMetaPubkey = await deprecated.Metadata.getPDA(mintAddress)
+        const mintPubkey = new PublicKey(mintAddress)
+        const metadataAccount = findMetadataPda(mintPubkey)
+        const data = await connection.current.getAccountInfo(metadataAccount)
 
-        const tokenMeta = await deprecated.Metadata.load(
-          getConnectionContext(connection.cluster).current,
-          tokenMetaPubkey
+        const state = Metadata.deserialize(data!.data)
+
+        setLogo(state[0].data.uri.slice(0, state[0].data.uri.indexOf('\x00')))
+        setSymbol(
+          state[0].data.symbol.slice(0, state[0].data.symbol.indexOf('\x00'))
         )
-        setLogo(tokenMeta.data?.data.uri)
-        setSymbol(tokenMeta.data?.data.symbol)
       } catch (e) {
         console.log(e)
       }
