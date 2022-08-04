@@ -247,6 +247,16 @@ export default function useGovernanceAssets() {
       isVisible: canUseAnyInstruction,
     },
     {
+      id: Instructions.DeactivateValidatorStake,
+      name: 'Deactivate validator stake',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.WithdrawValidatorStake,
+      name: 'Withdraw validator stake',
+      isVisible: canUseAnyInstruction,
+    },
+    {
       id: Instructions.None,
       name: 'None',
       isVisible:

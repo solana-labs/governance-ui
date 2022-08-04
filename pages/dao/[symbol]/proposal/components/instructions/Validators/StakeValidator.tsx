@@ -227,7 +227,9 @@ const StakeValidator = ({
     <>
       <GovernedAccountSelect
         label="Source account"
-        governedAccounts={governedTokenAccountsWithoutNfts}
+        governedAccounts={governedTokenAccountsWithoutNfts.filter(
+          (x) => x.isSol
+        )}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedTokenAccount' })
         }}
