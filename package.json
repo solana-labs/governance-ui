@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@blockworks-foundation/mango-client": "^3.6.7",
+    "@blockworks-foundation/mango-v4": "../mango-v4",
     "@blockworks-foundation/voter-stake-registry-client": "^0.2.3",
     "@bundlr-network/client": "^0.7.15",
     "@cardinal/namespaces-components": "^2.5.5",

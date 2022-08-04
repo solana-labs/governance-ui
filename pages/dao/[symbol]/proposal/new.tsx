@@ -96,6 +96,7 @@ import MakeRemoveOracle from './components/instructions/Mango/MakeRemoveOracle'
 import SagaPreOrder from './components/instructions/Solana/SagaPhone/SagaPreOrder'
 import MakeDepositToMangoAccount from './components/instructions/Mango/MakeDepositToMangoAccount'
 import MakeDepositToMangoAccountCsv from './components/instructions/Mango/MakeDepositToMangoAccountCsv'
+import TokenRegister from './components/instructions/Mango/MangoV4/TokenRegister'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -535,6 +536,10 @@ const New = () => {
             index={idx}
             governance={governance}
           ></MakeRemoveOracle>
+        )
+      case Instructions.MangoV4TokenRegister:
+        return (
+          <TokenRegister index={idx} governance={governance}></TokenRegister>
         )
       case Instructions.DepositToMangoAccount:
         return (
