@@ -99,7 +99,7 @@ const EditToken = ({
     ) {
       const client = await getClient(connection, wallet)
       const group = await client.getGroupForCreator(ADMIN_PK, GROUP_NUM)
-      const bank = group.banksMap.get(form.name)!
+      const bank = group.banksMap.get(form.name.toUpperCase())!
       const mintInfo = group.mintInfosMap.get(bank.tokenIndex)!
       //Mango instruction call and serialize
       const ix = await client.program.methods
