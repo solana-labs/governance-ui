@@ -1523,8 +1523,10 @@
     toformat "^2.0.0"
     yargs "^17.0.1"
 
-"@blockworks-foundation/mango-v4@../mango-v4":
-  version "0.0.1"
+"@blockworks-foundation/mango-v4@^0.0.1-beta.1":
+  version "0.0.1-beta.1"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4/-/mango-v4-0.0.1-beta.1.tgz#204ef849d5d8952a4a01ba23f10453780acaba77"
+  integrity sha512-RBW30VedtZTtGTZGU1xFwgvl3Sj0Mw/sR/Hr5e+QzTxCDU9wQTyPRV5HfLkmiOKdWbmiVnswo9zuXGMVvpQiCw==
   dependencies:
     "@project-serum/anchor" "^0.25.0"
     "@project-serum/serum" "^0.13.65"

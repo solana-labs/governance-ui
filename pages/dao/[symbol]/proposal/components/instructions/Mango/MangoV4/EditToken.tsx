@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
 import useRealm from '@hooks/useRealm'
-import { PublicKey, SYSVAR_RENT_PUBKEY } from '@solana/web3.js'
+import { AccountMeta, PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
@@ -11,7 +11,7 @@ import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
-import { I80F48 } from '@blockworks-foundation/mango-client'
+import { BN, I80F48 } from '@blockworks-foundation/mango-client'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, {
   InstructionInput,
@@ -19,9 +19,8 @@ import InstructionForm, {
 } from '../../FormCreator'
 import UseMangoV4 from './useMangoV4'
 
-interface RegisterTokenForm {
+interface EditTokenForm {
   governedAccount: AssetAccount | null
-  mintPk: string
   oraclePk: string
   oracleConfFilter: number
   tokenIndex: number
@@ -41,7 +40,7 @@ interface RegisterTokenForm {
   liquidationFee: number
 }
 
-const TokenRegister = ({
+const EditToken = ({
   index,
   governance,
 }: {
@@ -58,9 +57,8 @@ const TokenRegister = ({
   const { connection } = useWalletStore()
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<RegisterTokenForm>({
+  const [form, setForm] = useState<EditTokenForm>({
     governedAccount: null,
-    mintPk: '',
     oraclePk: '',
     oracleConfFilter: 0,
     tokenIndex: 0,
@@ -101,12 +99,13 @@ const TokenRegister = ({
     ) {
       const client = await getClient(connection, wallet)
       const group = await client.getGroupForCreator(ADMIN_PK, GROUP_NUM)
-      const tokenIndex = group.banksMap.size
+      const bank = group.banksMap.get(form.name)!
+      const mintInfo = group.mintInfosMap.get(bank.tokenIndex)!
       //Mango instruction call and serialize
       const ix = await client.program.methods
-        .tokenRegister(
-          tokenIndex,
-          form.name.toUpperCase(),
+        .tokenEdit(
+          new BN(0),
+          new PublicKey(form.oraclePk),
           {
             confFilter: {
               val: I80F48.fromNumber(Number(form.oracleConfFilter)).getData(),
@@ -131,11 +130,15 @@ const TokenRegister = ({
         .accounts({
           group: group.publicKey,
           admin: ADMIN_PK,
-          mint: new PublicKey(form.mintPk),
-          oracle: new PublicKey(form.oraclePk),
-          payer: wallet.publicKey,
-          rent: SYSVAR_RENT_PUBKEY,
+          mintInfo: mintInfo.publicKey,
         })
+        .remainingAccounts([
+          {
+            pubkey: bank.publicKey,
+            isWritable: true,
+            isSigner: false,
+          } as AccountMeta,
+        ])
         .instruction()
 
       serializedInstruction = serializeInstructionToBase64(ix)
@@ -174,12 +177,6 @@ const TokenRegister = ({
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governance,
       options: governedProgramAccounts,
-    },
-    {
-      label: 'Mint Pk',
-      initialValue: form.mintPk,
-      type: InstructionInputType.INPUT,
-      name: 'mintPk',
     },
     {
       label: 'Oracle Pk',
@@ -308,26 +305,4 @@ const TokenRegister = ({
   )
 }
 
-export default TokenRegister
-
-interface RegisterTokenForm {
-  governedAccount: AssetAccount | null
-  mintPk: string
-  oraclePk: string
-  oracleConfFilter: number
-  tokenIndex: number
-  name: string
-  adjustmentFactor: number
-  util0: number
-  rate0: number
-  util1: number
-  rate1: number
-  maxRate: number
-  loanFeeRate: number
-  loanOriginationFeeRate: number
-  maintAssetWeight: number
-  initAssetWeight: number
-  maintLiabWeight: number
-  initLiabWeight: number
-  liquidationFee: number
-}
+export default EditToken

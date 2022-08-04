@@ -424,6 +424,7 @@ export enum Instructions {
   MangoSwapSpotMarket,
   MangoRemoveOracle,
   MangoV4TokenRegister,
+  MangoV4TokenEdit,
   CreateStream,
   CancelStream,
   Grant,

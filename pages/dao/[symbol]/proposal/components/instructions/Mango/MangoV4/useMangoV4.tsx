@@ -3,9 +3,8 @@
 import { AnchorProvider } from '@project-serum/anchor'
 import { PublicKey } from '@solana/web3.js'
 import { ConnectionContext } from '@utils/connection'
-import { MangoClient } from '@blockworks-foundation/mango-v4/ts/client/src'
-import { MANGO_V4_ID } from '@blockworks-foundation/mango-v4/ts/client/src/constants'
 import { WalletSigner } from '@solana/spl-governance'
+import { MangoClient, MANGO_V4_ID } from '@blockworks-foundation/mango-v4'
 
 export default function UseMangoV4() {
   const DEVNET_SERUM3_MARKETS = new Map([

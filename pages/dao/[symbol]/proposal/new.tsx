@@ -97,6 +97,7 @@ import SagaPreOrder from './components/instructions/Solana/SagaPhone/SagaPreOrde
 import MakeDepositToMangoAccount from './components/instructions/Mango/MakeDepositToMangoAccount'
 import MakeDepositToMangoAccountCsv from './components/instructions/Mango/MakeDepositToMangoAccountCsv'
 import TokenRegister from './components/instructions/Mango/MangoV4/TokenRegister'
+import EditToken from './components/instructions/Mango/MangoV4/EditToken'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -541,6 +542,8 @@ const New = () => {
         return (
           <TokenRegister index={idx} governance={governance}></TokenRegister>
         )
+      case Instructions.MangoV4TokenEdit:
+        return <EditToken index={idx} governance={governance}></EditToken>
       case Instructions.DepositToMangoAccount:
         return (
           <MakeDepositToMangoAccount
