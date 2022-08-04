@@ -19,7 +19,7 @@ import InstructionForm, {
 } from '../../FormCreator'
 import UseMangoV4 from './useMangoV4'
 
-interface RegisterTokenForm {
+interface PerpCreateForm {
   governedAccount: AssetAccount | null
   mintPk: string
   oraclePk: string
@@ -41,7 +41,7 @@ interface RegisterTokenForm {
   liquidationFee: number
 }
 
-const TokenRegister = ({
+const PerpCreate = ({
   index,
   governance,
 }: {
@@ -58,7 +58,7 @@ const TokenRegister = ({
   const { connection } = useWalletStore()
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<RegisterTokenForm>({
+  const [form, setForm] = useState<PerpCreateForm>({
     governedAccount: null,
     mintPk: '',
     oraclePk: '',
@@ -308,4 +308,4 @@ const TokenRegister = ({
   )
 }
 
-export default TokenRegister
+export default PerpCreate
