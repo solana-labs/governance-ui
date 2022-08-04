@@ -3,12 +3,18 @@ import { SolletWalletAdapter } from '@solana/wallet-adapter-sollet'
 import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare'
 import { TorusWalletAdapter } from '@solana/wallet-adapter-torus'
 import { GlowWalletAdapter } from '@solana/wallet-adapter-glow'
+import { BackpackWalletAdapter } from '@solana/wallet-adapter-backpack'
 
 export const WALLET_PROVIDERS = [
   {
     name: 'Phantom',
     url: 'https://phantom.app',
     adapter: new PhantomWalletAdapter(),
+  },
+  {
+    name: 'Backpack',
+    url: 'https://www.backpack.app/',
+    adapter: new BackpackWalletAdapter(),
   },
   {
     name: 'Torus',

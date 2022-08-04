@@ -467,6 +467,7 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
           &nbsp;is open sourced, yet unaudited. Do your own research.
         </h6>
         <AccountLabel
+          mintAddress={mintAccount.publicKey.toBase58()}
           isNFT={false}
           tokenInfo={tokenInfo}
           amountFormatted={fmtTokenInfoWithMint(
