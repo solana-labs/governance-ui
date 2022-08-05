@@ -11,13 +11,11 @@ export class VsrClient {
     public devnet?: boolean
   ) {}
 
-  static async connect(
+  static connect(
     provider: Provider,
     programId?: web3.PublicKey,
     devnet?: boolean
-  ): Promise<VsrClient> {
-    // alternatively we could fetch from chain
-    // const idl = await Program.fetchIdl(VSR_ID, provider);
+  ): VsrClient {
     const idl = IDL
 
     return new VsrClient(

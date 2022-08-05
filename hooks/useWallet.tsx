@@ -1,3 +1,4 @@
+import { AnchorProvider, Wallet } from '@project-serum/anchor'
 import { useEffect, useMemo } from 'react'
 
 import useWalletStore from '../stores/useWalletStore'
@@ -144,5 +145,15 @@ export default function useWallet() {
     }
   }, 3 * SECONDS)
 
-  return { connected, wallet }
+  const anchorProvider = useMemo(() => {
+    const options = AnchorProvider.defaultOptions()
+    console.log('wallet', wallet)
+    return new AnchorProvider(
+      connection.current,
+      (wallet as unknown) as Wallet,
+      options
+    )
+  }, [wallet])
+
+  return { connected, wallet, anchorProvider }
 }
