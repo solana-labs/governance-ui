@@ -922,6 +922,14 @@
     "ogImage": "/realms/Cygnus/cygnus-logo.jpg"
   },
   {
+    "symbol": "BAC",
+    "displayName": "Bulls Army Club DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "7gyTpxaZS8W1oPXFD9vYkZntKNDst4A3LWD25CPJLTRr",
+    "ogImage": "/realms/bacDao/logo_bulls.png",
+    "website": "https://bullsarmyclub.com/"
+  },
+  {
     "symbol": "EPCT",
     "displayName": "Epics",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
