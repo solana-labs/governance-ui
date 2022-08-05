@@ -20,13 +20,10 @@ import { web3 } from '@project-serum/anchor'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { getFilteredProgramAccounts } from '@blockworks-foundation/mango-client'
-import {
-  StakeAccountSelect,
-  StakeAccount,
-  StakeState,
-} from '../../StakeAccountSelect'
+import StakeAccountSelect from '../../StakeAccountSelect'
 import Input from '@components/inputs/Input'
 import { bs58 } from '@project-serum/anchor/dist/cjs/utils/bytes'
+import { StakeAccount, StakeState } from '@utils/uiTypes/assets'
 
 const WithdrawValidatorStake = ({
   index,

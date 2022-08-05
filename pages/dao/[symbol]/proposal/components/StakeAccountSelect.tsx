@@ -2,20 +2,8 @@ import Select from '@components/inputs/Select'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import React, { useEffect } from 'react'
-import { PublicKey } from '@solana/web3.js'
 import { web3 } from '@project-serum/anchor'
-
-export enum StakeState {
-  Active,
-  Inactive,
-}
-
-export interface StakeAccount {
-  stakeAccount: PublicKey
-  state: StakeState
-  delegatedValidator: PublicKey | null
-  amount: number
-}
+import { StakeAccount, StakeState } from '@utils/uiTypes/assets'
 
 export function getStakeAccountLabelInfo(acc: StakeAccount | undefined) {
   let stakeAccount = ''
@@ -25,7 +13,7 @@ export function getStakeAccountLabelInfo(acc: StakeAccount | undefined) {
 
   if (acc?.stakeAccount) {
     stakeAccount = acc.stakeAccount.toString()
-    accountStatus = acc.state == StakeState.Active ? 'Active' : 'Deactive'
+    accountStatus = acc.state == StakeState.Active ? 'Active' : 'Inactive'
     delegatedValidator = acc.delegatedValidator
       ? acc.delegatedValidator.toString()
       : ''
@@ -39,7 +27,7 @@ export function getStakeAccountLabelInfo(acc: StakeAccount | undefined) {
   }
 }
 
-export const StakeAccountSelect = ({
+const StakeAccountSelect = ({
   onChange,
   value,
   error,
@@ -124,3 +112,5 @@ export const StakeAccountSelect = ({
     </Select>
   )
 }
+
+export default StakeAccountSelect
