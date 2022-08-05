@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from 'react'
-import * as yup from 'yup'
 
 import {
   Governance,
@@ -14,7 +13,6 @@ import {
   ValidatorDeactivateStakeForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
-import { isFormValid } from '@utils/formValidation'
 import useWalletStore from 'stores/useWalletStore'
 import { web3 } from '@project-serum/anchor'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -25,6 +23,7 @@ import {
   StakeAccount,
   StakeState,
 } from '../../StakeAccountSelect'
+import { bs58 } from '@project-serum/anchor/dist/cjs/utils/bytes'
 
 const DeactivateValidatorStake = ({
   index,
@@ -54,17 +53,16 @@ const DeactivateValidatorStake = ({
     ProgramAccount<Governance> | undefined
   >(undefined)
 
-  const setStakingAccount = (event) => {
-    const value = event.target.value
+  const setStakingAccount = (value) => {
     handleSetForm({
       value: value,
       propertyName: 'stakingAccount',
     })
   }
 
-  const [stakeAccounts, setStakeAccounts] = useState<StakeAccount[]>([])
+  const getStakeAccounts = async (): Promise<StakeAccount[]> => {
+    if (!form.governedTokenAccount) return []
 
-  const validateInstruction = async (): Promise<boolean> => {
     const stakingAccounts = await getFilteredProgramAccounts(
       connection.current,
       StakeProgram.programId,
@@ -72,44 +70,52 @@ const DeactivateValidatorStake = ({
         {
           memcmp: {
             offset: 0,
-            bytes: new Uint8Array([2, 0, 0, 0]),
+            bytes: bs58.encode([2, 0, 0, 0]),
           },
         },
         {
           memcmp: {
             offset: 44,
-            bytes: form.governedTokenAccount?.pubkey.toBase58(),
+            bytes: form.governedTokenAccount.pubkey.toBase58(),
           },
         },
       ]
     )
-    const stakingPks = stakingAccounts.map((x) => x.publicKey.toString())
-    const stakingAccountsToDisplay: StakeAccount[] = stakingAccounts.map(
-      (x) => {
-        return {
-          stakeAccount: x.publicKey,
-          state: StakeState.Active,
-          delegatedValidator: x.publicKey,
-          amount: 0,
-        }
-      }
-    )
-    setStakeAccounts(stakingAccountsToDisplay)
 
-    const schema = yup.object().shape({
-      stakingAccount: yup
-        .string()
-        .required('Staking account to deactivate required')
-        .oneOf(stakingPks),
+    return stakingAccounts.map((x) => {
+      const validatorPk = web3.PublicKey.decode(
+        x.accountInfo.data.slice(124, 124 + 32)
+      )
+      return {
+        stakeAccount: x.publicKey,
+        state: StakeState.Active,
+        delegatedValidator: validatorPk as web3.PublicKey,
+        amount: x.accountInfo.lamports / web3.LAMPORTS_PER_SOL,
+      }
     })
-    const { isValid, validationErrors } = await isFormValid(schema, form)
-    setFormErrors(validationErrors)
-    return isValid
+  }
+
+  //getStakeAccounts().then(x => setStakeAccounts(x))
+
+  const [stakeAccounts, setStakeAccounts] = useState<StakeAccount[]>([])
+
+  const validateInstruction = async (): Promise<boolean> => {
+    if (!form.governedTokenAccount) return false
+
+    const stakingAccounts = await getStakeAccounts()
+    setStakeAccounts(stakingAccounts)
+
+    if (
+      !form.stakingAccount ||
+      !form.stakingAccount.stakeAccount ||
+      !form.stakingAccount.delegatedValidator
+    )
+      return false
+    return true
   }
 
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
-    const governancePk = governance?.pubkey
     const returnInvalid = (): UiInstruction => {
       return {
         serializedInstruction: '',
@@ -117,17 +123,14 @@ const DeactivateValidatorStake = ({
         governance: undefined,
       }
     }
-    const governanceAccount = governance?.account
-
     if (
       !connection ||
       !isValid ||
       !programId ||
-      !governanceAccount ||
-      !governancePk ||
       !form.governedTokenAccount?.isSol ||
       !form.stakingAccount?.stakeAccount
     ) {
+      console.log('Invalid form')
       return returnInvalid()
     }
     const instruction = web3.StakeProgram.deactivate({
@@ -162,6 +165,9 @@ const DeactivateValidatorStake = ({
   }, [form])
   useEffect(() => {
     setGovernedAccount(form.governedTokenAccount?.governance)
+    if (form.governedTokenAccount) {
+      getStakeAccounts().then((x) => setStakeAccounts(x))
+    }
   }, [form.governedTokenAccount])
 
   return (

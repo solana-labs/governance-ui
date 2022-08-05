@@ -26,6 +26,7 @@ import {
   StakeState,
 } from '../../StakeAccountSelect'
 import Input from '@components/inputs/Input'
+import { bs58 } from '@project-serum/anchor/dist/cjs/utils/bytes'
 
 const WithdrawValidatorStake = ({
   index,
@@ -56,8 +57,7 @@ const WithdrawValidatorStake = ({
     ProgramAccount<Governance> | undefined
   >(undefined)
 
-  const setStakingAccount = (event) => {
-    const value = event.target.value
+  const setStakingAccount = (value) => {
     handleSetForm({
       value: value,
       propertyName: 'stakingAccount',
@@ -72,9 +72,9 @@ const WithdrawValidatorStake = ({
     })
   }
 
-  const [stakeAccounts, setStakeAccounts] = useState<StakeAccount[]>([])
+  const getStakeAccounts = async (): Promise<StakeAccount[]> => {
+    if (!form.governedTokenAccount) return []
 
-  const validateInstruction = async (): Promise<boolean> => {
     const stakingAccounts = await getFilteredProgramAccounts(
       connection.current,
       StakeProgram.programId,
@@ -82,35 +82,42 @@ const WithdrawValidatorStake = ({
         {
           memcmp: {
             offset: 0,
-            bytes: new Uint8Array([2, 0, 0, 0]),
+            bytes: bs58.encode([1, 0, 0, 0]),
           },
         },
         {
           memcmp: {
             offset: 44,
-            bytes: form.governedTokenAccount?.pubkey.toBase58(),
+            bytes: form.governedTokenAccount.pubkey.toBase58(),
           },
         },
       ]
     )
-    const stakingPks = stakingAccounts.map((x) => x.publicKey.toString())
-    const stakingAccountsToDisplay: StakeAccount[] = stakingAccounts.map(
-      (x) => {
-        return {
-          stakeAccount: x.publicKey,
-          state: StakeState.Active,
-          delegatedValidator: x.publicKey,
-          amount: 0,
-        }
+
+    return stakingAccounts.map((x) => {
+      return {
+        stakeAccount: x.publicKey,
+        state: StakeState.Active,
+        delegatedValidator: web3.PublicKey.default,
+        amount: x.accountInfo.lamports / web3.LAMPORTS_PER_SOL,
       }
+    })
+  }
+
+  const [stakeAccounts, setStakeAccounts] = useState<StakeAccount[]>([])
+
+  const validateInstruction = async (): Promise<boolean> => {
+    const stakingAccounts = await getStakeAccounts()
+    setStakeAccounts(stakingAccounts)
+
+    if (
+      !form.stakingAccount ||
+      !form.stakingAccount.stakeAccount ||
+      !form.stakingAccount.delegatedValidator
     )
-    setStakeAccounts(stakingAccountsToDisplay)
+      return false
 
     const schema = yup.object().shape({
-      stakingAccount: yup
-        .string()
-        .required('Staking account to withdraw required')
-        .oneOf(stakingPks),
       amount: yup
         .number()
         .min(1, 'Amount must be positive number')
@@ -178,6 +185,9 @@ const WithdrawValidatorStake = ({
   }, [form])
   useEffect(() => {
     setGovernedAccount(form.governedTokenAccount?.governance)
+    if (form.governedTokenAccount) {
+      getStakeAccounts().then((x) => setStakeAccounts(x))
+    }
   }, [form.governedTokenAccount])
 
   return (

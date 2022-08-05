@@ -3,6 +3,7 @@ import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import React, { useEffect } from 'react'
 import { PublicKey } from '@solana/web3.js'
+import { web3 } from '@project-serum/anchor'
 
 export enum StakeState {
   Active,
@@ -72,18 +73,21 @@ export const StakeAccountSelect = ({
   }) {
     return (
       <div className="break-all text-fgd-1 ">
-        {accountStatus && <div className="mb-0.5">{accountStatus}</div>}
-        <div className="mb-2 text-fgd-3 text-xs">{stakeAccount}</div>
+        {stakeAccount && <div className="mb-0.5">{stakeAccount}</div>}
+        <div className="mb-2 text-fgd-3 text-xs">{accountStatus}</div>
         <div className="flex space-x-3 text-xs text-fgd-3">
-          {delegatedValidator && (
-            <div className="flex items-center">
-              Token:
+          <div className="flex items-center">
+            Amount:
+            <span className="ml-1 text-fgd-1">{amount}</span>
+          </div>
+        </div>
+        <div className="flex space-x-3 text-xs text-fgd-3">
+          {delegatedValidator && delegatedValidator != web3.PublicKey.default && (
+            <div>
+              Vote Key:
               <span className="ml-1 text-fgd-1">{delegatedValidator}</span>
             </div>
           )}
-          <div>
-            Bal:<span className="ml-1 text-fgd-1">{amount}</span>
-          </div>
         </div>
       </div>
     )
