@@ -315,7 +315,7 @@ export function useVotingPlugins() {
       handleSetGatewayClient(wallet, connection)
       handleSetPythClient(wallet, connection)
     }
-  }, [connection.endpoint, wallet])
+  }, [connection.endpoint, wallet, currentPluginPk])
 
   useEffect(() => {
     const handleVsrPlugin = () => {
