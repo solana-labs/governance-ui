@@ -2,11 +2,11 @@ import type { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { ProgramAccount, Realm } from '@solana/spl-governance'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { RpcContext } from '@solana/spl-governance'
-import type { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 
 import { RealmInfo, getProgramVersionForRealm } from '@models/registry/api'
 import { voteRegistryDepositWithoutLockup } from 'VoteStakeRegistry/actions/voteRegistryDepositWithoutLockup'
 import { TokenAccount, TokenProgramAccount } from '@utils/tokens'
+import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 
 interface Args {
   client?: VsrClient

@@ -8,8 +8,8 @@ import { RpcContext } from '@solana/spl-governance'
 import { sendTransaction } from 'utils/send'
 
 import { BN } from '@project-serum/anchor'
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { withCreateNewDeposit } from '../sdk/withCreateNewDeposit'
+import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 
 export const voteRegistryStartUnlock = async ({
   rpcContext,

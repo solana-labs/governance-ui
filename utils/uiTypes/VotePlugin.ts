@@ -1,4 +1,3 @@
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import {
   NftVoterClient,
   GatewayClient,
@@ -32,6 +31,7 @@ import {
   getRegistrarPDA as getPluginRegistrarPDA,
   getMaxVoterWeightRecord as getPluginMaxVoterWeightRecord,
 } from '@utils/plugin/accounts'
+import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 
 type UpdateVoterWeightRecordTypes =
   | 'castVote'

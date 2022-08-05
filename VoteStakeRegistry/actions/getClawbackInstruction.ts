@@ -1,12 +1,12 @@
 import { PublicKey } from '@solana/web3.js'
 
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { getRegistrarPDA, getVoterPDA } from 'VoteStakeRegistry/sdk/accounts'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
+import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 
 export const getClawbackInstruction = async ({
   realmPk,
