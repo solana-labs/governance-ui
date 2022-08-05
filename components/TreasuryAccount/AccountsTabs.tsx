@@ -1,9 +1,10 @@
 import { FunctionComponent, useEffect, useState } from 'react'
 import { getTreasuryAccountItemInfoV2 } from '@utils/treasuryTools'
 import { AssetAccount } from '@utils/uiTypes/assets'
-import { getConnectionContext } from '@utils/connection'
-import { deprecated } from '@metaplex-foundation/mpl-token-metadata'
 import useWalletStore from 'stores/useWalletStore'
+import { findMetadataPda } from '@metaplex-foundation/js'
+import { PublicKey } from '@solana/web3.js'
+import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 
 interface AccountsTabsProps {
   activeTab: AssetAccount | null
@@ -75,14 +76,22 @@ const AccountTab: FunctionComponent<AccountTabProps> = ({
   useEffect(() => {
     const getTokenMetadata = async (mintAddress: string) => {
       try {
-        const tokenMetaPubkey = await deprecated.Metadata.getPDA(mintAddress)
-
-        const tokenMeta = await deprecated.Metadata.load(
-          getConnectionContext(connection.cluster).current,
-          tokenMetaPubkey
+        const mintPubkey = new PublicKey(mintAddress)
+        const metadataAccount = findMetadataPda(mintPubkey)
+        const accountData = await connection.current.getAccountInfo(
+          metadataAccount
         )
-        setLogoFromMeta(tokenMeta.data?.data.uri)
-        setSymbolFromMeta(tokenMeta.data?.data.symbol)
+
+        const state = Metadata.deserialize(accountData!.data)
+        const jsonUri = state[0].data.uri.slice(
+          0,
+          state[0].data.uri.indexOf('\x00')
+        )
+
+        const data = await (await fetch(jsonUri)).json()
+
+        setLogoFromMeta(data.image)
+        setSymbolFromMeta(data.symbol)
       } catch (e) {
         console.log(e)
       }

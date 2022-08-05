@@ -926,9 +926,8 @@
     "displayName": "Epics",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "DCdCsuUjg6MnULfEmBUmvg1heggnLrKSFdp5uTRSKuwR",
-    "bannerImage": "/realms/Epics/Epics-logo.jpg",
     "website": "https://epics.dev/",
     "twitter": "@EpicsDAO",
-    "ogImage": "/realms/Epics/Epics-logo.jpg"
+    "ogImage": "/realms/Epics/Epics-logo.svg"
   }
 ]

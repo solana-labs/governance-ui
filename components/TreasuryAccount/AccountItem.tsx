@@ -32,16 +32,20 @@ const AccountItem = ({
       try {
         const mintPubkey = new PublicKey(mintAddress)
         const metadataAccount = findMetadataPda(mintPubkey)
-        const data = await connection.current.getAccountInfo(metadataAccount)
-
-        const state = Metadata.deserialize(data!.data)
-
-        setLogoFromMeta(
-          state[0].data.uri.slice(0, state[0].data.uri.indexOf('\x00'))
+        const accountData = await connection.current.getAccountInfo(
+          metadataAccount
         )
-        setSymbolFromMeta(
-          state[0].data.symbol.slice(0, state[0].data.symbol.indexOf('\x00'))
+
+        const state = Metadata.deserialize(accountData!.data)
+        const jsonUri = state[0].data.uri.slice(
+          0,
+          state[0].data.uri.indexOf('\x00')
         )
+
+        const data = await (await fetch(jsonUri)).json()
+
+        setLogoFromMeta(data.image)
+        setSymbolFromMeta(data.symbol)
       } catch (e) {
         console.log(e)
       }
