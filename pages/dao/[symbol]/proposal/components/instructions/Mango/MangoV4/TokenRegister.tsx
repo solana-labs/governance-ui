@@ -103,6 +103,7 @@ const TokenRegister = ({
       const group = await client.getGroupForCreator(ADMIN_PK, GROUP_NUM)
       const tokenIndex = group.banksMap.size
       //Mango instruction call and serialize
+      //TODO dao sol account as payer
       const ix = await client.program.methods
         .tokenRegister(
           tokenIndex,

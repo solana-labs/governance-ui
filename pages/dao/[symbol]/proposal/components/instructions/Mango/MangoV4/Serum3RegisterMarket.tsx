@@ -76,6 +76,7 @@ const EditToken = ({
       const client = await getClient(connection, wallet)
       const group = await client.getGroupForCreator(ADMIN_PK, GROUP_NUM)
       const marketIndex = group.serum3MarketsMap.size
+      //TODO dao sol account as payer
       //Mango instruction call and serialize
       const ix = await client.program.methods
         .serum3RegisterMarket(marketIndex, form.name)

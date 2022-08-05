@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
 import useRealm from '@hooks/useRealm'
-import { PublicKey, SYSVAR_RENT_PUBKEY } from '@solana/web3.js'
+import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
@@ -11,34 +11,32 @@ import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
-import { I80F48 } from '@blockworks-foundation/mango-client'
+import { BN, I80F48 } from '@blockworks-foundation/mango-client'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, {
   InstructionInput,
   InstructionInputType,
 } from '../../FormCreator'
 import UseMangoV4 from './useMangoV4'
+import { tryGetMint } from '@utils/tokens'
 
 interface PerpCreateForm {
   governedAccount: AssetAccount | null
-  mintPk: string
-  oraclePk: string
   oracleConfFilter: number
-  tokenIndex: number
+  baseTokenName: string
   name: string
-  adjustmentFactor: number
-  util0: number
-  rate0: number
-  util1: number
-  rate1: number
-  maxRate: number
-  loanFeeRate: number
-  loanOriginationFeeRate: number
+  quoteLotSize: number
+  baseLotSize: number
   maintAssetWeight: number
   initAssetWeight: number
   maintLiabWeight: number
   initLiabWeight: number
   liquidationFee: number
+  makerFee: number
+  takerFee: number
+  minFunding: number
+  maxFunding: number
+  impactQuantity: number
 }
 
 const PerpCreate = ({
@@ -60,24 +58,21 @@ const PerpCreate = ({
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<PerpCreateForm>({
     governedAccount: null,
-    mintPk: '',
-    oraclePk: '',
     oracleConfFilter: 0,
-    tokenIndex: 0,
+    baseTokenName: '',
     name: '',
-    adjustmentFactor: 0,
-    util0: 0,
-    rate0: 0,
-    util1: 0,
-    rate1: 0,
-    maxRate: 0,
-    loanFeeRate: 0,
-    loanOriginationFeeRate: 0,
+    quoteLotSize: 0,
+    baseLotSize: 0,
     maintAssetWeight: 0,
     initAssetWeight: 0,
     maintLiabWeight: 0,
     initLiabWeight: 0,
     liquidationFee: 0,
+    makerFee: 0,
+    takerFee: 0,
+    minFunding: 0,
+    maxFunding: 0,
+    impactQuantity: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -101,41 +96,83 @@ const PerpCreate = ({
     ) {
       const client = await getClient(connection, wallet)
       const group = await client.getGroupForCreator(ADMIN_PK, GROUP_NUM)
-      const tokenIndex = group.banksMap.size
+      const bids = new Keypair()
+      const asks = new Keypair()
+      const eventQueue = new Keypair()
+      const perpMarketIndex = group.perpMarketsMap.size
+      const bank = group.banksMap.get(form.baseTokenName.toUpperCase())!
+      const mintInfo = group.mintInfosMap.get(bank.tokenIndex)!
+      const mint = await tryGetMint(connection.current, mintInfo.mint)
       //Mango instruction call and serialize
+
+      //TODO dao sol account as payer
       const ix = await client.program.methods
-        .tokenRegister(
-          tokenIndex,
-          form.name.toUpperCase(),
+        .perpCreateMarket(
+          perpMarketIndex,
+          form.name,
           {
             confFilter: {
-              val: I80F48.fromNumber(Number(form.oracleConfFilter)).getData(),
+              val: I80F48.fromNumber(form.oracleConfFilter).getData(),
             },
           } as any, // future: nested custom types dont typecheck, fix if possible?
-          {
-            adjustmentFactor: Number(form.adjustmentFactor),
-            util0: Number(form.util0),
-            rate0: Number(form.rate0),
-            util1: Number(form.util1),
-            rate1: Number(form.rate1),
-            maxRate: Number(form.maxRate),
-          },
-          Number(form.loanFeeRate),
-          Number(form.loanOriginationFeeRate),
+          bank.tokenIndex,
+          mint!.account.decimals!,
+          new BN(form.quoteLotSize),
+          new BN(form.baseLotSize),
           Number(form.maintAssetWeight),
           Number(form.initAssetWeight),
           Number(form.maintLiabWeight),
           Number(form.initLiabWeight),
-          Number(form.liquidationFee)
+          Number(form.liquidationFee),
+          Number(form.makerFee),
+          Number(form.takerFee),
+          Number(form.minFunding),
+          Number(form.maxFunding),
+          new BN(form.impactQuantity)
         )
         .accounts({
           group: group.publicKey,
           admin: ADMIN_PK,
-          mint: new PublicKey(form.mintPk),
-          oracle: new PublicKey(form.oraclePk),
+          oracle: mintInfo.oracle,
+          bids: bids.publicKey,
+          asks: asks.publicKey,
+          eventQueue: eventQueue.publicKey,
           payer: wallet.publicKey,
-          rent: SYSVAR_RENT_PUBKEY,
         })
+        .preInstructions([
+          // TODO: try to pick up sizes of bookside and eventqueue from IDL, so we can stay in sync with program
+
+          // book sides
+          SystemProgram.createAccount({
+            programId: this.program.programId,
+            space: 8 + 98584,
+            lamports: await this.program.provider.connection.getMinimumBalanceForRentExemption(
+              8 + 98584
+            ),
+            fromPubkey: wallet.publicKey,
+            newAccountPubkey: bids.publicKey,
+          }),
+          SystemProgram.createAccount({
+            programId: this.program.programId,
+            space: 8 + 98584,
+            lamports: await this.program.provider.connection.getMinimumBalanceForRentExemption(
+              8 + 98584
+            ),
+            fromPubkey: wallet.publicKey,
+            newAccountPubkey: asks.publicKey,
+          }),
+          // event queue
+          SystemProgram.createAccount({
+            programId: this.program.programId,
+            space: 8 + 4 * 2 + 8 + 488 * 208,
+            lamports: await this.program.provider.connection.getMinimumBalanceForRentExemption(
+              8 + 4 * 2 + 8 + 488 * 208
+            ),
+            fromPubkey: wallet.publicKey,
+            newAccountPubkey: eventQueue.publicKey,
+          }),
+        ])
+        .signers([bids, asks, eventQueue])
         .instruction()
 
       serializedInstruction = serializeInstructionToBase64(ix)
@@ -176,85 +213,24 @@ const PerpCreate = ({
       options: governedProgramAccounts,
     },
     {
-      label: 'Mint Pk',
-      initialValue: form.mintPk,
-      type: InstructionInputType.INPUT,
-      name: 'mintPk',
-    },
-    {
-      label: 'Oracle Pk',
-      initialValue: form.oraclePk,
-      type: InstructionInputType.INPUT,
-      name: 'oraclePk',
-    },
-    {
-      label: 'Oracle Configuration Filter',
-      initialValue: form.oracleConfFilter,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'oracleConfFilter',
-    },
-    {
       label: 'Token Name',
       initialValue: form.name,
       type: InstructionInputType.INPUT,
       name: 'name',
     },
     {
-      label: 'Adjustment Factor',
-      initialValue: form.adjustmentFactor,
+      label: 'Base token name',
+      initialValue: form.baseTokenName,
       type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'adjustmentFactor',
+      name: 'baseTokenName',
     },
+
     {
-      label: 'Util 0',
-      initialValue: form.util0,
+      label: 'Oracle Configuration Filter',
+      initialValue: form.oracleConfFilter,
       type: InstructionInputType.INPUT,
       inputType: 'number',
-      name: 'util0',
-    },
-    {
-      label: 'Rate 0',
-      initialValue: form.rate0,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'rate0',
-    },
-    {
-      label: 'Util 1',
-      initialValue: form.util1,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'util1',
-    },
-    {
-      label: 'Rate 1',
-      initialValue: form.rate1,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'rate1',
-    },
-    {
-      label: 'Max Rate',
-      initialValue: form.maxRate,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'maxRate',
-    },
-    {
-      label: 'Loan Fee Rate',
-      initialValue: form.loanFeeRate,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'loanFeeRate',
-    },
-    {
-      label: 'Loan Origination Fee Rate',
-      initialValue: form.loanOriginationFeeRate,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'loanOriginationFeeRate',
+      name: 'oracleConfFilter',
     },
     {
       label: 'Maint Asset Weight',
@@ -291,8 +267,56 @@ const PerpCreate = ({
       inputType: 'number',
       name: 'liquidationFee',
     },
+    {
+      label: 'Quote Lot Size',
+      initialValue: form.quoteLotSize,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'quoteLotSize',
+    },
+    {
+      label: 'Base Lot Size',
+      initialValue: form.baseLotSize,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'baseLotSize',
+    },
+    {
+      label: 'Maker Fee',
+      initialValue: form.makerFee,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'makerFee',
+    },
+    {
+      label: 'Taker Fee',
+      initialValue: form.takerFee,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'takerFee',
+    },
+    {
+      label: 'Min Funding',
+      initialValue: form.minFunding,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'minFunding',
+    },
+    {
+      label: 'Max Funding',
+      initialValue: form.maxFunding,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'maxFunding',
+    },
+    {
+      label: 'Impact Quantity',
+      initialValue: form.impactQuantity,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'impactQuantity',
+    },
   ]
-
   return (
     <>
       {form && (
