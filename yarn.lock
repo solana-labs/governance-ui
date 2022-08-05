@@ -1523,14 +1523,6 @@
     toformat "^2.0.0"
     yargs "^17.0.1"
 
-"@blockworks-foundation/voter-stake-registry-client@^0.2.3":
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/voter-stake-registry-client/-/voter-stake-registry-client-0.2.3.tgz#2d3f537c19635d1bdcf64ba00721dbaf98abc847"
-  integrity sha512-SS2cFXfVHI1dcN3zBE3MkqcXNe+47KVrk3JOiDgw2VbagxllZDAUKZRW8666HwUfmJSogVFyDwJvJD/WSBbXtQ==
-  dependencies:
-    "@project-serum/anchor" "^0.24.2"
-    "@project-serum/serum" "^0.13.61"
-
 "@bonfida/name-offers@^0.0.1":
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/@bonfida/name-offers/-/name-offers-0.0.1.tgz#8a52700eb3031e01dd9314fab55dec0a7275a5bb"
