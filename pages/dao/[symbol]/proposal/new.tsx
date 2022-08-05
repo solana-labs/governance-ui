@@ -98,6 +98,9 @@ import MakeDepositToMangoAccount from './components/instructions/Mango/MakeDepos
 import MakeDepositToMangoAccountCsv from './components/instructions/Mango/MakeDepositToMangoAccountCsv'
 import TokenRegister from './components/instructions/Mango/MangoV4/TokenRegister'
 import EditToken from './components/instructions/Mango/MangoV4/EditToken'
+import PerpEdit from './components/instructions/Mango/MangoV4/PerpEdit'
+import Serum3RegisterMarket from './components/instructions/Mango/MangoV4/Serum3RegisterMarket'
+import PerpCreate from './components/instructions/Mango/MangoV4/PerpCreate'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -550,6 +553,17 @@ const New = () => {
             index={idx}
             governance={governance}
           ></MakeDepositToMangoAccount>
+        )
+      case Instructions.MangoV4PerpEdit:
+        return <PerpEdit index={idx} governance={governance}></PerpEdit>
+      case Instructions.MangoV4PerpCreate:
+        return <PerpCreate index={idx} governance={governance}></PerpCreate>
+      case Instructions.MangoV4Serum3RegisterMarket:
+        return (
+          <Serum3RegisterMarket
+            index={idx}
+            governance={governance}
+          ></Serum3RegisterMarket>
         )
       case Instructions.DepositToMangoAccountCsv:
         return (
