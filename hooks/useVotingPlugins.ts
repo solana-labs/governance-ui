@@ -2,7 +2,6 @@ import { useEffect } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from '@hooks/useRealm'
 import { getNfts } from '@utils/tokens'
-import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import useSwitchboardPluginStore from 'SwitchboardVotePlugin/store/switchboardStore'
@@ -17,7 +16,7 @@ import {
   getGovernanceAccount,
   Governance,
 } from '@solana/spl-governance'
-import { getNftMaxVoterWeightRecord } from 'NftVotePlugin/sdk/accounts'
+import { getMaxVoterWeightRecord as getPluginMaxVoterWeightRecord } from '@utils/plugin/accounts'
 import { notify } from '@utils/notifications'
 import * as anchor from '@project-serum/anchor'
 import * as sbv2 from '@switchboard-xyz/switchboard-v2'
@@ -41,6 +40,7 @@ export const nftPluginsPks: string[] = [
 
 export const gatewayPluginsPks: string[] = [
   'Ggatr3wgDLySEwA2qEjt1oiw4BUzp5yMLJyz21919dq6', // v1
+  'GgathUhdrCWRHowoRKACjgWhYHfxCEdBi5ViqYN6HVxk', // v2, supporting composition
 ]
 
 export const switchboardPluginsPks: string[] = [SWITCHBOARD_ADDIN_ID.toBase58()]
@@ -107,21 +107,9 @@ export function useVotingPlugins() {
   const handleGetNfts = async () => {
     setIsLoadingNfts(true)
     try {
-      const nfts = await getNfts(connection.current, wallet!.publicKey!)
-      const votingNfts = (
-        await Promise.all(
-          nfts.map((x) => getIsFromCollection(x.mint, x.tokenAddress))
-        )
-      ).filter((x) => x) as { metadata: Metadata; tokenAddress: PublicKey }[]
-      const nftsWithMeta = votingNfts.map((x) => {
-        const nft = nfts.find(
-          (nft) => nft.tokenAddress === x.tokenAddress.toBase58()
-        )
-        return {
-          ...nft!,
-          metadata: x.metadata,
-        }
-      })
+      const nfts = await getNfts(wallet!.publicKey!, connection)
+      const votingNfts = nfts.filter(getIsFromCollection)
+      const nftsWithMeta = votingNfts
       setVotingNfts(nftsWithMeta, currentClient, nftMintRegistrar)
     } catch (e) {
       console.log(e)
@@ -272,7 +260,7 @@ export function useVotingPlugins() {
   }
 
   const handleRegisterGatekeeperNetwork = async () => {
-    if (realm) {
+    if (realm && gatewayClient) {
       setIsLoadingGatewayToken(true)
 
       try {
@@ -292,8 +280,9 @@ export function useVotingPlugins() {
       setIsLoadingGatewayToken(false)
     }
   }
+
   const handleMaxVoterWeight = async () => {
-    const { maxVoterWeightRecord } = await getNftMaxVoterWeightRecord(
+    const { maxVoterWeightRecord } = await getPluginMaxVoterWeightRecord(
       realm!.pubkey,
       realm!.account.communityMint,
       nftClient!.program.programId
@@ -309,27 +298,23 @@ export function useVotingPlugins() {
       setMaxVoterWeight(null)
     }
   }
-  const getIsFromCollection = async (mint: string, tokenAddress: string) => {
-    const metadataAccount = await Metadata.getPDA(mint)
-    const metadata = await Metadata.load(connection.current, metadataAccount)
+  const getIsFromCollection = (nft) => {
     return (
-      !!(
-        metadata.data.collection?.key &&
-        usedCollectionsPks.includes(metadata.data.collection?.key) &&
-        metadata.data.collection.verified
-      ) && {
-        tokenAddress: new PublicKey(tokenAddress),
-        metadata: metadata as Metadata,
-      }
+      nft.collection &&
+      nft.collection.mintAddress &&
+      usedCollectionsPks.includes(nft.collection.mintAddress) &&
+      nft.collection.creators?.filter((x) => x.verified).length > 0
     )
   }
   useEffect(() => {
-    handleSetVsrClient(wallet, connection)
-    handleSetNftClient(wallet, connection)
-    handleSetSwitchboardClient(wallet, connection)
-    handleSetGatewayClient(wallet, connection)
-    handleSetPythClient(wallet, connection)
-  }, [connection.endpoint])
+    if (wallet) {
+      handleSetVsrClient(wallet, connection)
+      handleSetNftClient(wallet, connection)
+      handleSetSwitchboardClient(wallet, connection)
+      handleSetGatewayClient(wallet, connection)
+      handleSetPythClient(wallet, connection)
+    }
+  }, [connection.endpoint, wallet])
 
   useEffect(() => {
     const handleVsrPlugin = () => {

@@ -51,11 +51,12 @@ import {
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import BigNumber from 'bignumber.js'
 import { useRouter } from 'next/router'
-import { emptyPk } from 'NftVotePlugin/sdk/accounts'
 import { useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { MarketStore } from 'Strategies/store/marketStore'
 import * as yup from 'yup'
+
+const emptyPk = '11111111111111111111111111111111'
 
 const WithdrawModal = ({
   selectedMangoAccount,
@@ -212,27 +213,28 @@ const WithdrawModal = ({
 
     setIsLoading(true)
     const proposalInstructions: InstructionDataWithHoldUpTime[] = []
-    for (const i in selectedMangoAccount.spotOpenOrders.filter(
-      (x) => x.toBase58() !== emptyPk
-    )) {
-      const closeOpenOrders = makeCloseSpotOpenOrdersInstruction(
-        market.client!.programId,
-        group.publicKey,
-        selectedMangoAccount.publicKey,
-        selectedMangoAccount.owner,
-        group.dexProgramId,
-        selectedMangoAccount.spotOpenOrders[i],
-        group.spotMarkets[i].spotMarket,
-        group.signerKey
-      )
-      const closeInstruction: InstructionDataWithHoldUpTime = {
-        data: getInstructionDataFromBase64(
-          serializeInstructionToBase64(closeOpenOrders)
-        ),
-        holdUpTime: governance!.account!.config.minInstructionHoldUpTime,
-        prerequisiteInstructions: [],
+    for (const i in selectedMangoAccount.spotOpenOrders) {
+      if (selectedMangoAccount.spotOpenOrders[i].toBase58() !== emptyPk) {
+        const closeOpenOrders = makeCloseSpotOpenOrdersInstruction(
+          market.client!.programId,
+          group.publicKey,
+          selectedMangoAccount.publicKey,
+          selectedMangoAccount.owner,
+          group.dexProgramId,
+          selectedMangoAccount.spotOpenOrders[i],
+          group.spotMarkets[i].spotMarket,
+          group.signerKey,
+          true
+        )
+        const closeInstruction: InstructionDataWithHoldUpTime = {
+          data: getInstructionDataFromBase64(
+            serializeInstructionToBase64(closeOpenOrders)
+          ),
+          holdUpTime: governance!.account!.config.minInstructionHoldUpTime,
+          prerequisiteInstructions: [],
+        }
+        proposalInstructions.push(closeInstruction)
       }
-      proposalInstructions.push(closeInstruction)
     }
 
     const instruction = makeWithdraw2Instruction(
@@ -263,7 +265,11 @@ const WithdrawModal = ({
       chunkBy: 1,
     }
     proposalInstructions.push(instructionData)
-    if (wrappedSolAccount) {
+    if (
+      wrappedSolAccount &&
+      (selectedMangoAccount.owner.toBase58() === form.withdrawAddress ||
+        selectedMangoAccount.owner.toBase58() === governance.pubkey.toBase58())
+    ) {
       const closeAobInstruction = closeAccount({
         source: wrappedSolAccount.publicKey,
         destination: new PublicKey(form.withdrawAddress),

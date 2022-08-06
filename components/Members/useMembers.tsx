@@ -151,11 +151,6 @@ export default function useMembers() {
 
   //for community we exclude people who never vote
   const communityAndCouncilTokenRecords = [
-    ...tokenRecordArray.filter(
-      (x) =>
-        x.community?.account.totalVotesCount &&
-        x.community?.account.totalVotesCount > 0
-    ),
     ...tokenRecordArray,
     ...councilRecordArray,
   ]
@@ -184,6 +179,7 @@ export default function useMembers() {
                       ? curr.council.account.governingTokenDepositAmount
                       : acc.councilVotes,
                   }
+
                   if (curr.community) {
                     obj['votesCasted'] += curr.community.account.totalVotesCount
                     obj['delegateWalletCommunity'] =
@@ -205,6 +201,11 @@ export default function useMembers() {
               ),
           }
         })
+        .filter((x) =>
+          x.hasCouncilTokenOutsideRealm || x.councilVotes.toNumber() > 0
+            ? true
+            : x.votesCasted > 0
+        )
         .sort((a, b) => {
           return a.votesCasted - b.votesCasted
         })

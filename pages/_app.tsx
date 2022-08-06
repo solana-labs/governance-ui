@@ -99,7 +99,7 @@ function App({ Component, pageProps }) {
     realm?.pubkey.toBase58(),
     ownTokenRecord?.pubkey.toBase58(),
     wallet?.connected,
-    client,
+    client?.program.programId.toBase58(),
   ])
 
   useEffect(() => {
@@ -108,7 +108,7 @@ function App({ Component, pageProps }) {
         JSON.stringify(possibleNftsAccounts) &&
       realm?.pubkey
     ) {
-      getNfts(possibleNftsAccounts, connection.current)
+      getNfts(possibleNftsAccounts, connection)
     }
   }, [JSON.stringify(possibleNftsAccounts), realm?.pubkey.toBase58()])
 

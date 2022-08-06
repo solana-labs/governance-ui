@@ -184,9 +184,14 @@ const EverlendWithdraw = ({
         description={proposalInfo.description}
         defaultTitle={proposalTitle}
         defaultDescription={`Withdraw ${tokenSymbol} from Everlend`}
-        setTitle={(evt) => setProposalInfo((prev) => ({ ...prev, title: evt }))}
+        setTitle={(evt) =>
+          setProposalInfo((prev) => ({ ...prev, title: evt.target.value }))
+        }
         setDescription={(evt) =>
-          setProposalInfo((prev) => ({ ...prev, description: evt }))
+          setProposalInfo((prev) => ({
+            ...prev,
+            description: evt.target.value,
+          }))
         }
         voteByCouncil={voteByCouncil}
         setVoteByCouncil={setVoteByCouncil}

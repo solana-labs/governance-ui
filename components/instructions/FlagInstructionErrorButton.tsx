@@ -4,7 +4,6 @@ import {
   InstructionExecutionStatus,
   Proposal,
   ProposalTransaction,
-  TokenOwnerRecord,
 } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
@@ -22,22 +21,24 @@ export function FlagInstructionErrorButton({
   proposal,
   proposalInstruction,
   playState,
-  proposalAuthority,
 }: {
   proposal: ProgramAccount<Proposal>
   proposalInstruction: ProgramAccount<ProposalTransaction>
   playState: PlayState
-  proposalAuthority: ProgramAccount<TokenOwnerRecord> | undefined
 }) {
-  const { realmInfo } = useRealm()
+  const { realmInfo, ownTokenRecord, ownCouncilTokenRecord } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
-
+  const isProposalOwner =
+    proposal.account.tokenOwnerRecord.toBase58() ===
+      ownTokenRecord?.pubkey.toBase58() ||
+    proposal.account.tokenOwnerRecord.toBase58() ===
+      ownCouncilTokenRecord?.pubkey.toBase58()
   if (
-    playState !== PlayState.Error ||
-    proposalInstruction.account.executionStatus !==
-      InstructionExecutionStatus.Error ||
-    !proposalAuthority
+    (playState !== PlayState.Error &&
+      proposalInstruction.account.executionStatus !==
+        InstructionExecutionStatus.Error) ||
+    !isProposalOwner
   ) {
     return null
   }
@@ -69,11 +70,8 @@ export function FlagInstructionErrorButton({
   return (
     <Tooltip content="Flag instruction as broken">
       <p className="border-dashed border-fgd-3 text-fgd-3 text-xs hover:cursor-help border-b-0">
-        <Button>
-          <ExclamationCircleIcon
-            className="h-5 text-red w-5"
-            onClick={onFlagError}
-          />
+        <Button onClick={onFlagError}>
+          <ExclamationCircleIcon className="h-5 text-red w-5" />
         </Button>
       </p>
     </Tooltip>

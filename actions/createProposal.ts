@@ -8,15 +8,14 @@ import {
 import {
   getGovernanceProgramVersion,
   getInstructionDataFromBase64,
-  getSignatoryRecordAddress,
   Governance,
   ProgramAccount,
   Realm,
   TokenOwnerRecord,
   VoteType,
   withCreateProposal,
+  getSignatoryRecordAddress,
 } from '@solana/spl-governance'
-import { withAddSignatory } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { withInsertTransaction } from '@solana/spl-governance'
 import { InstructionData } from '@solana/spl-governance'
@@ -31,6 +30,7 @@ import { chunks } from '@utils/helpers'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
 import { NftVoterClient } from '@solana/governance-program-library'
+import { withAddSignatory } from '@solana/spl-governance'
 
 export interface InstructionDataWithHoldUpTime {
   data: InstructionData | null
@@ -111,7 +111,8 @@ export const createProposal = async (
   const plugin = await client?.withUpdateVoterWeightRecord(
     instructions,
     tokenOwnerRecord,
-    'createProposal'
+    'createProposal',
+    governance
   )
 
   const proposalAddress = await withCreateProposal(
@@ -257,7 +258,9 @@ export const createProposal = async (
     })
   } else {
     const insertChunks = chunks(insertInstructions, chunkBy)
-    const signerChunks = Array(insertChunks.length).fill([])
+    const signerChunks = Array(insertChunks.length)
+    signerChunks.push(...chunks(signers, chunkBy))
+    signerChunks.fill([])
 
     console.log(`Creating proposal using ${insertChunks.length} chunks`)
     await sendTransactionsV2({

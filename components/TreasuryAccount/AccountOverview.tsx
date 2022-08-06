@@ -1,6 +1,10 @@
 import Button, { LinkButton } from '@components/Button'
 import { getExplorerUrl } from '@components/explorer/tools'
-import { getAccountName, WSOL_MINT } from '@components/instructions/tools'
+import {
+  getAccountName,
+  WSOL_MINT,
+  WSOL_MINT_PK,
+} from '@components/instructions/tools'
 import Modal from '@components/Modal'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
@@ -22,6 +26,7 @@ import {
 } from '@heroicons/react/outline'
 import Tooltip from '@components/Tooltip'
 import ConvertToMsol from './ConvertToMsol'
+import ConvertToStSol from './ConvertToStSol'
 import useStrategiesStore from 'Strategies/store/useStrategiesStore'
 import DepositModal from 'Strategies/components/DepositModal'
 import { SolendStrategy, TreasuryStrategy } from 'Strategies/types/types'
@@ -81,6 +86,7 @@ const AccountOverview = () => {
   const [openNftDepositModal, setOpenNftDepositModal] = useState(false)
   const [openCommonSendModal, setOpenCommonSendModal] = useState(false)
   const [openMsolConvertModal, setOpenMsolConvertModal] = useState(false)
+  const [openStSolConvertModal, setOpenStSolConvertModal] = useState(false)
   const [openAtaModal, setOpenAtaModal] = useState(false)
   const accountPublicKey = currentAccount?.extensions.transferAddress
   const strategies = useStrategiesStore((s) => s.strategies)
@@ -106,7 +112,6 @@ const AccountOverview = () => {
   const visibleAccounts = accountInvestments.filter(
     (strat) => strat.handledMint === strategyMint
   )
-
   useEffect(() => {
     const getSlndCTokens = async () => {
       const accounts = [
@@ -162,13 +167,14 @@ const AccountOverview = () => {
     }
 
     const handleGetMangoAccounts = async () => {
-      const currentAccountMint = currentAccount?.extensions.token?.account.mint
+      const currentAccountMint = currentAccount?.isSol
+        ? WSOL_MINT_PK
+        : currentAccount?.extensions.token?.account.mint
       const currentPositions = calculateAllDepositsInMangoAccountsForMint(
         mngoAccounts,
         currentAccountMint!,
         market
       )
-
       if (currentPositions > 0) {
         return strategies
           .map((invest) => ({
@@ -177,7 +183,6 @@ const AccountOverview = () => {
           }))
           .filter((x) => x.protocolName === MANGO)
       }
-
       return []
     }
 
@@ -222,15 +227,18 @@ const AccountOverview = () => {
         requests.push(handleEverlendAccounts())
       }
 
-      const results = await Promise.all(requests)
+      const results = (await Promise.allSettled(requests))
+        .filter((x) => x.status === 'fulfilled')
+        //@ts-ignore
+        .map((x) => x.value)
+
       setLoading(false)
 
       setAccountInvestments(results.flatMap((x) => x))
     }
 
     loadData()
-  }, [currentAccount, mngoAccounts])
-
+  }, [currentAccount, mngoAccounts, visibleInvestments.length])
   useEffect(() => {
     const getMangoAcccounts = async () => {
       const accounts = await tryGetMangoAccountsForOwner(
@@ -300,6 +308,21 @@ const AccountOverview = () => {
       strategyDescription: '',
       createProposalFcn: () => null,
     }
+    const lidoStrategy = {
+      liquidity: 0,
+      protocolSymbol: '',
+      apy: '',
+      protocolName: 'Lido',
+      handledMint: '',
+      handledTokenSymbol: '',
+      handledTokenImgSrc:
+        'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png',
+      protocolLogoSrc:
+        'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/7dHbWXmci3dT8UFYWYZweBLXgycu7Y3iL6trKn1Y7ARj/logo.png',
+      strategyName: 'Stake',
+      strategyDescription: '',
+      createProposalFcn: () => null,
+    }
     const serumStrategy = {
       liquidity: 0,
       protocolSymbol: '',
@@ -321,6 +344,13 @@ const AccountOverview = () => {
             onClick={() => setOpenMsolConvertModal(true)}
             currentDeposits={0}
             strat={marinadeStrategy}
+          ></StrategyCard>
+        )}
+        {isSol && (
+          <StrategyCard
+            onClick={() => setOpenStSolConvertModal(true)}
+            currentDeposits={0}
+            strat={lidoStrategy}
           ></StrategyCard>
         )}
         {isSplToken && (
@@ -495,7 +525,6 @@ const AccountOverview = () => {
           )}
         </div>
       )}
-
       <h3 className="mb-4">Recent Activity</h3>
       <div>
         {isLoadingRecentActivity ? (
@@ -583,6 +612,17 @@ const AccountOverview = () => {
           isOpen={openMsolConvertModal}
         >
           <ConvertToMsol />
+        </Modal>
+      )}
+      {openStSolConvertModal && (
+        <Modal
+          sizeClassName="sm:max-w-3xl"
+          onClose={() => {
+            setOpenStSolConvertModal(false)
+          }}
+          isOpen={openStSolConvertModal}
+        >
+          <ConvertToStSol />
         </Modal>
       )}
       {openAtaModal && isSol && (

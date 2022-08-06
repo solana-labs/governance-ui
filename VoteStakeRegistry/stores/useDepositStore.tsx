@@ -10,6 +10,7 @@ interface DepositStore extends State {
     deposits: DepositWithMintAccount[]
     votingPower: BN
     votingPowerFromDeposits: BN
+    isLoading: boolean
   }
   resetDepositState: () => void
   getOwnedDeposits: ({
@@ -33,6 +34,7 @@ const defaultState = {
   deposits: [],
   votingPower: new BN(0),
   votingPowerFromDeposits: new BN(0),
+  isLoading: false,
 }
 
 const useDepositStore = create<DepositStore>((set, _get) => ({
@@ -52,6 +54,10 @@ const useDepositStore = create<DepositStore>((set, _get) => ({
     client,
     connection,
   }) => {
+    set((s) => {
+      s.state.isLoading = true
+    })
+
     const {
       votingPower,
       deposits,
@@ -69,6 +75,7 @@ const useDepositStore = create<DepositStore>((set, _get) => ({
       s.state.votingPower = votingPower
       s.state.deposits = deposits
       s.state.votingPowerFromDeposits = votingPowerFromDeposits
+      s.state.isLoading = false
     })
   },
 }))

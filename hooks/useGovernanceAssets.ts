@@ -136,6 +136,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseTokenTransferInstruction,
     },
     {
+      id: Instructions.CreateStream,
+      name: 'Streamflow: Create Vesting Contract',
+      isVisible: canUseAnyInstruction,
+    },
+    {
       id: Instructions.Grant,
       name: 'Grant',
       isVisible:
@@ -202,6 +207,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseAuthorityInstruction,
     },
     {
+      id: Instructions.ConfigureGatewayPlugin,
+      name: 'Civic: Configure existing Gateway plugin',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
       id: Instructions.RealmConfig,
       name: 'Realm config',
       isVisible: canUseAuthorityInstruction,
@@ -215,6 +225,36 @@ export default function useGovernanceAssets() {
       id: Instructions.CloseTokenAccount,
       name: 'Close token account',
       isVisible: canUseTransferInstruction,
+    },
+    {
+      id: Instructions.CreateTokenMetadata,
+      name: 'Create Token Metadata',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
+      id: Instructions.UpdateTokenMetadata,
+      name: 'Update Token Metadata',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
+      id: Instructions.SagaPreOrder,
+      name: 'Pre-order Saga Phone',
+      isVisible: canUseTokenTransferInstruction,
+    },
+    {
+      id: Instructions.StakeValidator,
+      name: 'Stake A Validator',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.DeactivateValidatorStake,
+      name: 'Deactivate validator stake',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.WithdrawValidatorStake,
+      name: 'Withdraw validator stake',
+      isVisible: canUseAnyInstruction,
     },
     {
       id: Instructions.None,
@@ -315,6 +355,26 @@ export default function useGovernanceAssets() {
       id: Instructions.MangoRemovePerpMarket,
       name: 'Mango: Remove Perp Market',
       isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoSwapSpotMarket,
+      name: 'Mango: Swap Spot Market',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoRemoveOracle,
+      name: 'Mango: Remove Oracle',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.DepositToMangoAccount,
+      name: 'Mango: Deposit to mango account',
+      isVisible: canUseTokenTransferInstruction,
+    },
+    {
+      id: Instructions.DepositToMangoAccountCsv,
+      name: 'Mango: Deposit to mango account with CSV',
+      isVisible: canUseTokenTransferInstruction,
     },
     {
       id: Instructions.DepositIntoVolt,

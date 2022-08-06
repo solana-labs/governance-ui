@@ -9,7 +9,7 @@ import { SplTokenUIName } from '@utils/splTokens'
 import { DepositWithMintAccount, Voter } from 'VoteStakeRegistry/sdk/accounts'
 import { LockupKind } from 'VoteStakeRegistry/tools/types'
 import { consts as foresightConsts } from '@foresight-tmp/foresight-sdk'
-import { AssetAccount } from '@utils/uiTypes/assets'
+import { AssetAccount, StakeAccount } from '@utils/uiTypes/assets'
 
 export interface UiInstruction {
   serializedInstruction: string
@@ -24,6 +24,7 @@ export interface UiInstruction {
   signers?: Keypair[]
   shouldSplitIntoSeparateTxs?: boolean | undefined
 }
+
 export interface SplTokenTransferForm {
   destinationAccount: string
   amount: number | undefined
@@ -138,6 +139,17 @@ export interface ProgramUpgradeForm {
   bufferSpillAddress?: string | undefined
 }
 
+export interface CreateStreamForm {
+  recipient: string
+  tokenAccount?: AssetAccount
+  start: string
+  depositedAmount: number
+  releaseFrequency: number
+  releaseAmount: number
+  amountAtCliff: number
+  cancelable: boolean
+}
+
 export const programUpgradeFormNameOf = getNameOf<ProgramUpgradeForm>()
 
 export interface MangoMakeAddOracleForm {
@@ -147,7 +159,7 @@ export interface MangoMakeAddOracleForm {
   oracleAccount: string | undefined
 }
 
-type NameValue = {
+export type NameValue = {
   name: string
   value: string
 }
@@ -161,12 +173,43 @@ export interface MangoMakeSetMarketModeForm {
   adminPk: string
 }
 
+export interface MangoSwapSpotMarketForm {
+  governedAccount: AssetAccount | null
+  mangoGroup: NameValue | null
+  market: NameValue | null
+  adminPk: string
+  newSpotMarketPk: string
+}
+
+export interface MangoRemoveOracleForm {
+  governedAccount: AssetAccount | null
+  mangoGroup: NameValue | null
+  adminPk: string
+  oraclePk: NameValue | null
+}
+
+export interface SagaPhoneForm {
+  governedAccount: AssetAccount | null
+  quantity: number
+}
+
 export interface MangoRemovePerpMarketForm {
   governedAccount: AssetAccount | null
   mangoGroup: NameValue | null
   marketPk: NameValue | null
   adminPk: string
   mngoDaoVaultPk: string
+}
+
+export interface MangoDepositToMangoAccountForm {
+  governedAccount: AssetAccount | null
+  amount: number
+  mangoAccountPk: string
+}
+
+export interface MangoDepositToMangoAccountFormCsv {
+  governedAccount: AssetAccount | null
+  data: any[]
 }
 
 export interface MangoRemoveSpotMarketForm {
@@ -345,6 +388,22 @@ export interface RefreshReserveForm {
   mintName?: SupportedMintName
 }
 
+export interface CreateTokenMetadataForm {
+  name: string
+  symbol: string
+  uri: string
+  mintAccount: AssetAccount | undefined
+  programId: string | undefined
+}
+
+export interface UpdateTokenMetadataForm {
+  name: string
+  symbol: string
+  uri: string
+  mintAccount: AssetAccount | undefined
+  programId: string | undefined
+}
+
 export enum Instructions {
   Transfer,
   ProgramUpgrade,
@@ -358,10 +417,14 @@ export enum Instructions {
   MangoChangeReferralFeeParams,
   MangoChangeSpotMarket,
   MangoCreatePerpMarket,
+  CreateStream,
+  CancelStream,
   MangoSetMarketMode,
   MangoChangeQuoteParams,
   MangoRemoveSpotMarket,
   MangoRemovePerpMarket,
+  MangoSwapSpotMarket,
+  MangoRemoveOracle,
   Grant,
   Clawback,
   CreateAssociatedTokenAccount,
@@ -397,6 +460,15 @@ export enum Instructions {
   CreateGatewayPluginRegistrar,
   ConfigureGatewayPlugin,
   ChangeMakeDonation,
+  CreateTokenMetadata,
+  UpdateTokenMetadata,
+  SagaPreOrder,
+  DepositToMangoAccount,
+  DepositToMangoAccountCsv,
+  StakeValidator,
+  DeactivateValidatorStake,
+  WithdrawValidatorStake,
+  DifferValidatorStake,
 }
 
 export type createParams = [
@@ -449,4 +521,22 @@ export interface ChangeNonprofit {
     solana_address: string
     ethereum_address: string
   }
+}
+
+export interface ValidatorStakingForm {
+  governedTokenAccount: AssetAccount | undefined
+  validatorVoteKey: string
+  amount: number
+  seed: number
+}
+
+export interface ValidatorDeactivateStakeForm {
+  governedTokenAccount: AssetAccount | undefined
+  stakingAccount: StakeAccount | undefined
+}
+
+export interface ValidatorWithdrawStakeForm {
+  governedTokenAccount: AssetAccount | undefined
+  stakingAccount: StakeAccount | undefined
+  amount: number
 }

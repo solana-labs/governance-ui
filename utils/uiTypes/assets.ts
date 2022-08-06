@@ -170,3 +170,15 @@ export class AccountTypeGeneric implements AssetAccount {
     this.extensions = {}
   }
 }
+
+export enum StakeState {
+  Active,
+  Inactive,
+}
+
+export interface StakeAccount {
+  stakeAccount: PublicKey
+  state: StakeState
+  delegatedValidator: PublicKey | null
+  amount: number
+}

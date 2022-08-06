@@ -12,10 +12,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { getAllSplGovernanceProgramIds } from './tools/realms'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const conn = new Connection(
-    'https://explorer-api.mainnet-beta.solana.com',
-    'recent'
-  )
+  const conn = new Connection('https://ssc-dao.genesysgo.net/', 'recent')
 
   console.log('fetching spl-gov instances...')
   // Get all realms
