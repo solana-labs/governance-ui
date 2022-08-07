@@ -9,7 +9,7 @@ import { SplTokenUIName } from '@utils/splTokens'
 import { DepositWithMintAccount, Voter } from 'VoteStakeRegistry/sdk/accounts'
 import { LockupKind } from 'VoteStakeRegistry/tools/types'
 import { consts as foresightConsts } from '@foresight-tmp/foresight-sdk'
-import { AssetAccount } from '@utils/uiTypes/assets'
+import { AssetAccount, StakeAccount } from '@utils/uiTypes/assets'
 
 export interface UiInstruction {
   serializedInstruction: string
@@ -465,6 +465,10 @@ export enum Instructions {
   SagaPreOrder,
   DepositToMangoAccount,
   DepositToMangoAccountCsv,
+  StakeValidator,
+  DeactivateValidatorStake,
+  WithdrawValidatorStake,
+  DifferValidatorStake,
 }
 
 export type createParams = [
@@ -517,4 +521,22 @@ export interface ChangeNonprofit {
     solana_address: string
     ethereum_address: string
   }
+}
+
+export interface ValidatorStakingForm {
+  governedTokenAccount: AssetAccount | undefined
+  validatorVoteKey: string
+  amount: number
+  seed: number
+}
+
+export interface ValidatorDeactivateStakeForm {
+  governedTokenAccount: AssetAccount | undefined
+  stakingAccount: StakeAccount | undefined
+}
+
+export interface ValidatorWithdrawStakeForm {
+  governedTokenAccount: AssetAccount | undefined
+  stakingAccount: StakeAccount | undefined
+  amount: number
 }

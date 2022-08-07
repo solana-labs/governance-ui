@@ -61,6 +61,9 @@ import MakeChangePerpMarket from './components/instructions/Mango/MakeChangePerp
 import MakeAddOracle from './components/instructions/Mango/MakeAddOracle'
 import MakeAddSpotMarket from './components/instructions/Mango/MakeAddSpotMarket'
 import CreateStream from './components/instructions/Streamflow/CreateStream'
+import StakeValidator from './components/instructions/Validators/StakeValidator'
+import DeactivateValidatorStake from './components/instructions/Validators/DeactivateStake'
+import WithdrawValidatorStake from './components/instructions/Validators/WithdrawStake'
 import MakeChangeSpotMarket from './components/instructions/Mango/MakeChangeSpotMarket'
 import MakeCreatePerpMarket from './components/instructions/Mango/MakeCreatePerpMarket'
 import useCreateProposal from '@hooks/useCreateProposal'
@@ -345,6 +348,24 @@ const New = () => {
         )
       case Instructions.CreateStream:
         return <CreateStream index={idx} governance={governance}></CreateStream>
+      case Instructions.StakeValidator:
+        return (
+          <StakeValidator index={idx} governance={governance}></StakeValidator>
+        )
+      case Instructions.DeactivateValidatorStake:
+        return (
+          <DeactivateValidatorStake
+            index={idx}
+            governance={governance}
+          ></DeactivateValidatorStake>
+        )
+      case Instructions.WithdrawValidatorStake:
+        return (
+          <WithdrawValidatorStake
+            index={idx}
+            governance={governance}
+          ></WithdrawValidatorStake>
+        )
       case Instructions.ChangeMakeDonation:
         return (
           <ChangeDonation index={idx} governance={governance}></ChangeDonation>
