@@ -101,6 +101,7 @@ import EditToken from './components/instructions/Mango/MangoV4/EditToken'
 import PerpEdit from './components/instructions/Mango/MangoV4/PerpEdit'
 import Serum3RegisterMarket from './components/instructions/Mango/MangoV4/Serum3RegisterMarket'
 import PerpCreate from './components/instructions/Mango/MangoV4/PerpCreate'
+import TokenRegisterTrustless from './components/instructions/Mango/MangoV4/TokenRegisterTrustless'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -564,6 +565,13 @@ const New = () => {
             index={idx}
             governance={governance}
           ></Serum3RegisterMarket>
+        )
+      case Instructions.MangoV4TokenRegisterTrustless:
+        return (
+          <TokenRegisterTrustless
+            index={idx}
+            governance={governance}
+          ></TokenRegisterTrustless>
         )
       case Instructions.DepositToMangoAccountCsv:
         return (
