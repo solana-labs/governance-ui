@@ -71,6 +71,7 @@ const TokenRegisterTrustless = ({
       const client = await getClient(connection, wallet)
       const group = await client.getGroupForCreator(ADMIN_PK, GROUP_NUM)
       const tokenIndex = group.banksMap.size
+      await client.groupEdit(group, group.admin, group.admin)
       //Mango instruction call and serialize
       //TODO dao sol account as payer
       const ix = await client.program.methods
