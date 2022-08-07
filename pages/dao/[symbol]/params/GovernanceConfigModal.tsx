@@ -29,7 +29,7 @@ import {
 } from '@tools/sdk/units'
 import { abbreviateAddress } from '@utils/formatting'
 import * as yup from 'yup'
-import { MAX_TOKENS_TO_DISABLE } from '@tools/constants'
+import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 
 interface GovernanceConfigForm extends BaseGovernanceFormFields {
   title: string
@@ -59,8 +59,8 @@ const GovernanceConfigModal = ({
     title: '',
     description: '',
     minCommunityTokensToCreateProposal: mint
-      ? MAX_TOKENS_TO_DISABLE.eq(config?.minCommunityTokensToCreateProposal)
-        ? MAX_TOKENS_TO_DISABLE.toString()
+      ? DISABLED_VOTER_WEIGHT.eq(config?.minCommunityTokensToCreateProposal)
+        ? DISABLED_VOTER_WEIGHT.toString()
         : getMintDecimalAmountFromNatural(
             mint,
             config?.minCommunityTokensToCreateProposal

@@ -4,7 +4,7 @@ import AmountSlider from '@components/Slider'
 import Switch from '@components/Switch'
 import useRealm from '@hooks/useRealm'
 import { VoteTipping } from '@solana/spl-governance'
-import { MAX_TOKENS_TO_DISABLE } from '@tools/constants'
+import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import {
   fmtPercentage,
   getMintMinAmountAsDecimal,
@@ -30,7 +30,7 @@ const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
     number | undefined
   >()
   const isMaxMinCommunityNumber =
-    form.minCommunityTokensToCreateProposal === MAX_TOKENS_TO_DISABLE.toString()
+    form.minCommunityTokensToCreateProposal === DISABLED_VOTER_WEIGHT.toString()
   const [showMinCommunity, setMinCommunity] = useState(!isMaxMinCommunityNumber)
 
   const handleSetForm = ({ propertyName, value }) => {
@@ -46,8 +46,8 @@ const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
 
     handleSetForm({
       value:
-        e.target.value === MAX_TOKENS_TO_DISABLE.toString()
-          ? MAX_TOKENS_TO_DISABLE.toString()
+        e.target.value === DISABLED_VOTER_WEIGHT.toString()
+          ? DISABLED_VOTER_WEIGHT.toString()
           : parseFloat(
               Math.max(
                 Number(min),
@@ -117,7 +117,7 @@ const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
                 })
               } else {
                 handleSetForm({
-                  value: MAX_TOKENS_TO_DISABLE.toString(),
+                  value: DISABLED_VOTER_WEIGHT.toString(),
                   propertyName: 'minCommunityTokensToCreateProposal',
                 })
               }
