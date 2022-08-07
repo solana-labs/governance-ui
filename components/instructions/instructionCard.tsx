@@ -21,7 +21,7 @@ import { ExecuteInstructionButton, PlayState } from './ExecuteInstructionButton'
 import { ProgramAccount } from '@solana/spl-governance'
 import InspectorButton from '@components/explorer/inspectorButton'
 import { FlagInstructionErrorButton } from './FlagInstructionErrorButton'
-import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
+import { deprecated } from '@metaplex-foundation/mpl-token-metadata'
 import axios from 'axios'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import tokenService from '@utils/services/token'
@@ -29,6 +29,7 @@ import InstructionOptionInput, {
   InstructionOption,
   InstructionOptions,
 } from '@components/InstructionOptions'
+import StreamCard from '@components/StreamCard'
 
 export default function InstructionCard({
   index,
@@ -44,7 +45,6 @@ export default function InstructionCard({
     governedTokenAccountsWithoutNfts,
   } = useGovernanceAssets()
   const connection = useWalletStore((s) => s.connection)
-  const tokenRecords = useWalletStore((s) => s.selectedRealm)
   const [descriptor, setDescriptor] = useState<InstructionDescriptor>()
   const [instructionOption, setInstructionOption] = useState<InstructionOption>(
     InstructionOptions.none
@@ -88,12 +88,12 @@ export default function InstructionCard({
         const mint = tokenAccount?.account.mint
         if (mint) {
           try {
-            const metadataPDA = await Metadata.getPDA(mint)
-            const tokenMetadata = await Metadata.load(
+            const metadataPDA = await deprecated.Metadata.getPDA(mint)
+            const tokenMetadata = await deprecated.Metadata.load(
               connection.current,
               metadataPDA
             )
-            const url = (await axios.get(tokenMetadata.data.data.uri)).data
+            const url = (await axios.get(tokenMetadata?.data!.data.uri)).data
             setNftImgUrl(url.image)
           } catch (e) {
             console.log(e)
@@ -120,7 +120,6 @@ export default function InstructionCard({
   }, [proposalInstruction, governedTokenAccountsWithoutNfts.length])
   const isSol = tokenImgUrl.includes(WSOL_MINT)
 
-  const proposalAuthority = tokenRecords[proposal.owner.toBase58()]
   return (
     <div className="break-all">
       <h3 className="mb-4 flex">
@@ -168,13 +167,18 @@ export default function InstructionCard({
       ) : (
         <InstructionData descriptor={descriptor}></InstructionData>
       )}
+      {descriptor?.name == 'Streamflow: Create' && (
+        <StreamCard
+          connection={connection.current}
+          accounts={proposalInstruction.account.getSingleInstruction().accounts}
+        />
+      )}
       <div className="flex justify-end items-center gap-x-4 mt-6 mb-8">
         <InspectorButton proposalInstruction={proposalInstruction} />
 
         <FlagInstructionErrorButton
           playState={playing}
           proposal={proposal}
-          proposalAuthority={proposalAuthority}
           proposalInstruction={proposalInstruction}
         />
 

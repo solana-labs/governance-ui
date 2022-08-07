@@ -19,6 +19,8 @@ import { getRealmCfgSchema } from '@utils/validations'
 import RealmConfigFormComponent from '../forms/RealmConfigFormComponent'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import { MAX_TOKENS_TO_DISABLE } from '@tools/constants'
+import { BN } from '@project-serum/anchor'
 
 export interface RealmConfigForm {
   governedAccount: AssetAccount | undefined
@@ -56,10 +58,14 @@ const RealmConfig = ({
       wallet?.publicKey &&
       realm
     ) {
-      const mintAmount = parseMintNaturalAmountFromDecimalAsBN(
-        form!.minCommunityTokensToCreateGovernance!,
-        mint!.decimals!
+      const mintAmount = MAX_TOKENS_TO_DISABLE.eq(
+        new BN(form!.minCommunityTokensToCreateGovernance)
       )
+        ? MAX_TOKENS_TO_DISABLE
+        : parseMintNaturalAmountFromDecimalAsBN(
+            form!.minCommunityTokensToCreateGovernance!,
+            mint!.decimals!
+          )
       const instruction = await createSetRealmConfig(
         realmInfo!.programId,
         realmInfo!.programVersion!,

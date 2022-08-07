@@ -5,7 +5,11 @@ import { useEffect, useState, useRef } from 'react'
 
 import { ntext } from '@utils/ntext'
 
-const diffTime = (ended: boolean, now: dayjs.Dayjs, end: dayjs.Dayjs) => {
+export const diffTime = (
+  ended: boolean,
+  now: dayjs.Dayjs,
+  end: dayjs.Dayjs
+) => {
   if (ended) {
     return {
       days: 0,
@@ -39,7 +43,11 @@ const Cell = ({
     <div className="text-3xl font-bold">
       {count < 10 &&
         (hideLeadingZeros ? <span className="opacity-30">0</span> : '0')}
-      {count}
+      {hideLeadingZeros && count === 0 ? (
+        <span className="opacity-30">0</span>
+      ) : (
+        count
+      )}
     </div>
     <div className="text-xs text-fgd-3">{ntext(count, label)}</div>
   </div>

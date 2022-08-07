@@ -1,30 +1,17 @@
 import Button from '@components/Button'
 import NotifiIcon from '@components/NotifiIcon'
-import { WalletType } from '@dialectlabs/react'
-import {
-  defaultVariables,
-  IncomingThemeVariables,
-  NotificationsModal,
-} from '@dialectlabs/react-ui'
+import { defaultVariables } from '@dialectlabs/react-ui'
 import styled from '@emotion/styled'
 import { Transition } from '@headlessui/react'
 import { DeviceMobileIcon } from '@heroicons/react/outline'
 import { BellIcon, KeyIcon, MailIcon } from '@heroicons/react/solid'
 
-import * as anchor from '@project-serum/anchor'
-import { useRouter } from 'next/router'
-import { useTheme } from 'next-themes'
 import { useEffect, useRef, useState } from 'react'
-import useNotificationStore from 'stores/useNotificationStore'
-import { ModalStates } from 'stores/useNotificationStore'
-import useWalletStore from 'stores/useWalletStore'
+import useNotificationStore, { ModalStates } from 'stores/useNotificationStore'
 
-import TelegramIcon from './TelegramIcon'
+import DialectNotificationsModal from '@components/DialectNotificationsModal'
 import NotificationCardContainer from '@components/NotificationsCard/NotificationCardContainer'
-
-const REALMS_PUBLIC_KEY = new anchor.web3.PublicKey(
-  'BUxZD6aECR5B5MopyvvYqJxwSKDBhx2jSSo1U32en6mj'
-)
+import TelegramIcon from './TelegramIcon'
 
 export function useOutsideAlerter(
   ref: React.MutableRefObject<Element | null>,
@@ -90,46 +77,10 @@ const NotificationSolutions: NotificationSolutionType[] = [
   },
 ]
 
-const themeVariables: IncomingThemeVariables = {
-  dark: {
-    bellButton:
-      '!bg-bkg-2 !shadow-none text-fgd-1 h-10 rounded-full w-10 hover:bg-bkg-3',
-    button: `${defaultVariables.dark.button} bg-primary-light border-primary-light font-bold rounded-full hover:bg-primary-dark`,
-    buttonLoading: `${defaultVariables.dark.buttonLoading} rounded-full min-h-[40px]`,
-    colors: {
-      bg: 'bg-bkg-1',
-      highlight: 'border border-fgd-4',
-    },
-    disabledButton: `${defaultVariables.dark.disabledButton} border-primary-light font-bold rounded-full border-fgd-3 text-fgd-3 cursor-not-allowed`,
-    modal: `${defaultVariables.dark.modal} bg-bkg-1 sm:border sm:border-fgd-4 shadow-md sm:rounded-md`,
-    modalWrapper: `${defaultVariables.dark.modalWrapper} sm:top-14 rounded-md`,
-    secondaryDangerButton: `${defaultVariables.dark.secondaryDangerButton} rounded-full`,
-  },
-  light: {
-    bellButton:
-      '!bg-bkg-2 !shadow-none text-fgd-1 h-10 rounded-full w-10 hover:bg-bkg-3',
-    button: `${defaultVariables.light.button} bg-primary-light border-primary-light font-bold rounded-full hover:bg-primary-dark`,
-    buttonLoading: `${defaultVariables.light.buttonLoading} rounded-full min-h-[40px]`,
-    colors: {
-      bg: 'bg-bkg-1',
-    },
-    modal: `${defaultVariables.light.modal} sm:border sm:rounded-md sm:border-fgd-4 sm:shadow-md`,
-    modalWrapper: `${defaultVariables.dark.modalWrapper} sm:top-14`,
-    secondaryDangerButton: `${defaultVariables.light.secondaryDangerButton} rounded-full`,
-  },
-}
-
 export default function NotificationsSwitch() {
-  const { theme } = useTheme()
-  const router = useRouter()
-
-  const { cluster } = router.query
-
   const { modalState, set: setNotificationStore } = useNotificationStore(
     (s) => s
   )
-
-  const wallet = useWalletStore((s) => s.current)
 
   const wrapperRef = useRef(null)
   const bellRef = useRef(null)
@@ -227,19 +178,12 @@ export default function NotificationsSwitch() {
         )}
 
         {modalState === ModalStates.Dialect && (
-          <NotificationsModal
-            channels={['web3', 'email', 'sms', 'telegram']}
-            network={cluster as string}
-            notifications={[{ detail: 'Event', name: 'New proposals' }]}
+          <DialectNotificationsModal
             onBackClick={() =>
               setNotificationStore((state) => {
                 state.modalState = ModalStates.Selection
               })
             }
-            publicKey={REALMS_PUBLIC_KEY}
-            theme={theme === 'Dark' ? 'dark' : 'light'}
-            variables={themeVariables}
-            wallet={(wallet as unknown) as WalletType}
           />
         )}
         {modalState === ModalStates.Notifi && (

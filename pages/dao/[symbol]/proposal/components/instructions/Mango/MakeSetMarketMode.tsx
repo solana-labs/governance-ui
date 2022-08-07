@@ -26,6 +26,7 @@ import InstructionForm, {
   InstructionInputType,
 } from '../FormCreator'
 import { ASSET_TYPE, MARKET_MODE } from 'Strategies/protocols/mango/tools'
+import { usePrevious } from '@hooks/usePrevious'
 
 const MakeSetMarketMode = ({
   index,
@@ -98,12 +99,23 @@ const MakeSetMarketMode = ({
       value: programId?.toString(),
     })
   }, [realmInfo?.programId])
-
+  const previousProgramGov = usePrevious(
+    form.governedAccount?.governance.pubkey.toBase58()
+  )
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
+    if (
+      form.governedAccount?.governance.pubkey.toBase58() !== form.adminPk &&
+      previousProgramGov !== form.governedAccount?.governance.pubkey.toBase58()
+    ) {
+      handleSetForm({
+        propertyName: 'adminPk',
+        value: form.governedAccount?.governance.pubkey.toBase58(),
+      })
+    }
   }, [form])
   const schema = yup.object().shape({
     mangoGroup: yup.object().nullable().required('Mango group is required'),

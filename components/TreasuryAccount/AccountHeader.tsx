@@ -30,6 +30,7 @@ const AccountHeader = () => {
   const totalPrice = useTotalTokenValue({ amount, mintAddress })
   return (
     <BaseAccountHeader
+      mintAddress={mintAddress}
       isNFT={isNFT}
       tokenInfo={tokenInfo}
       amountFormatted={isNFT ? nftsCount?.toString() : amountFormatted}
