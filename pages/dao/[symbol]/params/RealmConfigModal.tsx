@@ -67,8 +67,9 @@ const RealmConfigModal = ({ closeProposalModal, isProposalModalOpen }) => {
     ) {
       setCreatingProposal(true)
       const governance = form!.governedAccount.governance
+
       const mintAmount = MAX_TOKENS_TO_DISABLE.eq(
-        new BN(form!.minCommunityTokensToCreateGovernance)
+        new BN(form!.minCommunityTokensToCreateGovernance.toString())
       )
         ? MAX_TOKENS_TO_DISABLE
         : parseMintNaturalAmountFromDecimalAsBN(
