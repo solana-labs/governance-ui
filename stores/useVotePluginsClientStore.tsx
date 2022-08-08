@@ -95,7 +95,6 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
     },
     handleSetVsrClient: async (wallet, connection, programId) => {
       const options = AnchorProvider.defaultOptions()
-      console.log('wallet', wallet)
       const provider = new AnchorProvider(
         connection.current,
         (wallet as unknown) as Wallet,
