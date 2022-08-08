@@ -354,12 +354,32 @@ export default function useGovernanceAssets() {
     {
       id: Instructions.MangoV4TokenRegister,
       name: 'Mango v4: Token Register',
-      isVisible: canUseAnyInstruction,
+      isVisible: canUseAnyInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoV4TokenEdit,
+      name: 'Mango v4: Token Edit',
+      isVisible: canUseAnyInstruction && symbol === 'MNGO',
     },
     {
       id: Instructions.MangoV4TokenRegisterTrustless,
       name: 'Mango v4: Token Register Trustless',
-      isVisible: canUseAnyInstruction,
+      isVisible: canUseAnyInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoV4PerpCreate,
+      name: 'Mango v4: Perp Create',
+      isVisible: canUseAnyInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoV4PerpEdit,
+      name: 'Mango v4: Perp Edit',
+      isVisible: canUseAnyInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoV4Serum3RegisterMarket,
+      name: 'Mango v4: Serum 3 Register Market',
+      isVisible: canUseAnyInstruction && symbol === 'MNGO',
     },
     {
       id: Instructions.DepositToMangoAccount,
