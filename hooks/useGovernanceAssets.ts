@@ -352,6 +352,16 @@ export default function useGovernanceAssets() {
       isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
     },
     {
+      id: Instructions.MangoV4TokenRegister,
+      name: 'Mango v4: Token Register',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.MangoV4TokenRegisterTrustless,
+      name: 'Mango v4: Token Register Trustless',
+      isVisible: canUseAnyInstruction,
+    },
+    {
       id: Instructions.DepositToMangoAccount,
       name: 'Mango: Deposit to mango account',
       isVisible: canUseTokenTransferInstruction,

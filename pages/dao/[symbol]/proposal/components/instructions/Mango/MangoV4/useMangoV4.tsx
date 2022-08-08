@@ -25,7 +25,7 @@ export default function UseMangoV4() {
     ['MNGO', '8k7F9Xb36oFJsjpCKpsXvg4cgBRoZtwNTc3EzG5Ttd2o'],
   ])
   const GROUP_NUM = 0
-  const ADMIN_PK = new PublicKey('FdynL6q7CNJMMiTZpfnYVkqQRYaoiBWgWkFYvvpx9uA8')
+  const ADMIN_PK = new PublicKey('BJFYN2ZbcxRSTFGCAVkUEn4aJF99xaPFuyQj2rq5pFpo')
   const insuranceMint = new PublicKey(DEVNET_MINTS.get('USDC')!)
   const getClient = async (
     connection: ConnectionContext,

@@ -38,6 +38,7 @@ interface EditTokenForm {
   maintLiabWeight: number
   initLiabWeight: number
   liquidationFee: number
+  groupInsuranceFund: boolean
 }
 
 const EditToken = ({
@@ -76,6 +77,7 @@ const EditToken = ({
     maintLiabWeight: 0,
     initLiabWeight: 0,
     liquidationFee: 0,
+    groupInsuranceFund: false,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -111,6 +113,7 @@ const EditToken = ({
               val: I80F48.fromNumber(Number(form.oracleConfFilter)).getData(),
             },
           } as any, // future: nested custom types dont typecheck, fix if possible?
+          form.groupInsuranceFund,
           {
             adjustmentFactor: Number(form.adjustmentFactor),
             util0: Number(form.util0),
@@ -287,6 +290,12 @@ const EditToken = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'liquidationFee',
+    },
+    {
+      label: 'Group Insurance Fund',
+      initialValue: form.groupInsuranceFund,
+      type: InstructionInputType.SWITCH,
+      name: 'groupInsuranceFund',
     },
   ]
 

@@ -33,11 +33,11 @@ const TokenRegisterTrustless = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { getClient, ADMIN_PK, GROUP_NUM } = UseMangoV4()
+  const { getClient, GROUP_NUM, ADMIN_PK } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
-    (x) => x.type === AccountType.PROGRAM
+    (x) => x.type === AccountType.SOL
   )
   const { connection } = useWalletStore()
   const shouldBeGoverned = index !== 0 && governance
@@ -71,14 +71,13 @@ const TokenRegisterTrustless = ({
       const client = await getClient(connection, wallet)
       const group = await client.getGroupForCreator(ADMIN_PK, GROUP_NUM)
       const tokenIndex = group.banksMap.size
-      await client.groupEdit(group, group.admin, group.admin)
       //Mango instruction call and serialize
       //TODO dao sol account as payer
       const ix = await client.program.methods
         .tokenRegisterTrustless(tokenIndex, form.name)
         .accounts({
           group: group.publicKey,
-          fastListingAdmin: ADMIN_PK,
+          fastListingAdmin: form.governedAccount.governance.pubkey,
           mint: new PublicKey(form.mintPk),
           oracle: new PublicKey(form.oraclePk),
           payer: wallet.publicKey,
