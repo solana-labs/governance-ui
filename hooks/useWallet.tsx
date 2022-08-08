@@ -147,7 +147,6 @@ export default function useWallet() {
 
   const anchorProvider = useMemo(() => {
     const options = AnchorProvider.defaultOptions()
-    console.log('wallet', wallet)
     return new AnchorProvider(
       connection.current,
       (wallet as unknown) as Wallet,
