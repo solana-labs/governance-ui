@@ -17,9 +17,9 @@ import {
   getVoterWeightPDA,
   LockupType,
 } from 'VoteStakeRegistry/sdk/accounts'
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { getMintCfgIdx, tryGetVoter } from './api'
 import { getPeriod } from 'VoteStakeRegistry/tools/deposits'
+import { VsrClient } from './client'
 
 export const withCreateNewDeposit = async ({
   instructions,

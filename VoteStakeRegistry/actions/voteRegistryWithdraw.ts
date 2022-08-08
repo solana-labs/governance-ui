@@ -5,10 +5,10 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js'
 import { BN } from '@project-serum/anchor'
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { withVoteRegistryWithdraw } from '../sdk/withVoteRegistryWithdraw'
 import { RpcContext } from '@solana/spl-governance'
 import { sendTransaction } from '@utils/send'
+import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 
 export const voteRegistryWithdraw = async ({
   rpcContext,
