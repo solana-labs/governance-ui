@@ -16,7 +16,7 @@ import InstructionForm, {
   InstructionInput,
   InstructionInputType,
 } from '../../FormCreator'
-import UseMangoV4 from './useMangoV4'
+import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { SERUM3_PROGRAM_ID } from '@blockworks-foundation/mango-v4'
 
 interface Serum3RegisterMarketForm {

@@ -17,7 +17,7 @@ import InstructionForm, {
   InstructionInput,
   InstructionInputType,
 } from '../../FormCreator'
-import UseMangoV4 from './useMangoV4'
+import UseMangoV4 from '@hooks/useMangoV4'
 import { tryGetMint } from '@utils/tokens'
 
 interface PerpCreateForm {

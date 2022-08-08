@@ -16,7 +16,7 @@ import InstructionForm, {
   InstructionInput,
   InstructionInputType,
 } from '../../FormCreator'
-import UseMangoV4 from './useMangoV4'
+import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 
 interface TokenRegisterTrustlessForm {
   governedAccount: AssetAccount | null
