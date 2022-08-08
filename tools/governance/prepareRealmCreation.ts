@@ -31,7 +31,7 @@ import {
 import { withCreateMint } from '@tools/sdk/splToken/withCreateMint'
 import { withCreateAssociatedTokenAccount } from '@tools/sdk/splToken/withCreateAssociatedTokenAccount'
 import { withMintTo } from '@tools/sdk/splToken/withMintTo'
-import { MAX_TOKENS_TO_DISABLE } from '@tools/constants'
+import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 
 import BN from 'bn.js'
 
@@ -222,7 +222,7 @@ export async function prepareRealmCreation({
           tokensToGovernThreshold,
           communityMintDecimals
         )
-      : MAX_TOKENS_TO_DISABLE
+      : DISABLED_VOTER_WEIGHT
 
   const realmPk = await withCreateRealm(
     realmInstructions,

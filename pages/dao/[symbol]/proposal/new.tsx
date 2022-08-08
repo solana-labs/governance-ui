@@ -61,6 +61,9 @@ import MakeChangePerpMarket from './components/instructions/Mango/MakeChangePerp
 import MakeAddOracle from './components/instructions/Mango/MakeAddOracle'
 import MakeAddSpotMarket from './components/instructions/Mango/MakeAddSpotMarket'
 import CreateStream from './components/instructions/Streamflow/CreateStream'
+import StakeValidator from './components/instructions/Validators/StakeValidator'
+import DeactivateValidatorStake from './components/instructions/Validators/DeactivateStake'
+import WithdrawValidatorStake from './components/instructions/Validators/WithdrawStake'
 import MakeChangeSpotMarket from './components/instructions/Mango/MakeChangeSpotMarket'
 import MakeCreatePerpMarket from './components/instructions/Mango/MakeCreatePerpMarket'
 import useCreateProposal from '@hooks/useCreateProposal'
@@ -96,6 +99,12 @@ import MakeRemoveOracle from './components/instructions/Mango/MakeRemoveOracle'
 import SagaPreOrder from './components/instructions/Solana/SagaPhone/SagaPreOrder'
 import MakeDepositToMangoAccount from './components/instructions/Mango/MakeDepositToMangoAccount'
 import MakeDepositToMangoAccountCsv from './components/instructions/Mango/MakeDepositToMangoAccountCsv'
+import TokenRegister from './components/instructions/Mango/MangoV4/TokenRegister'
+import EditToken from './components/instructions/Mango/MangoV4/EditToken'
+import PerpEdit from './components/instructions/Mango/MangoV4/PerpEdit'
+import Serum3RegisterMarket from './components/instructions/Mango/MangoV4/Serum3RegisterMarket'
+import PerpCreate from './components/instructions/Mango/MangoV4/PerpCreate'
+import TokenRegisterTrustless from './components/instructions/Mango/MangoV4/TokenRegisterTrustless'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -345,6 +354,24 @@ const New = () => {
         )
       case Instructions.CreateStream:
         return <CreateStream index={idx} governance={governance}></CreateStream>
+      case Instructions.StakeValidator:
+        return (
+          <StakeValidator index={idx} governance={governance}></StakeValidator>
+        )
+      case Instructions.DeactivateValidatorStake:
+        return (
+          <DeactivateValidatorStake
+            index={idx}
+            governance={governance}
+          ></DeactivateValidatorStake>
+        )
+      case Instructions.WithdrawValidatorStake:
+        return (
+          <WithdrawValidatorStake
+            index={idx}
+            governance={governance}
+          ></WithdrawValidatorStake>
+        )
       case Instructions.ChangeMakeDonation:
         return (
           <ChangeDonation index={idx} governance={governance}></ChangeDonation>
@@ -536,12 +563,36 @@ const New = () => {
             governance={governance}
           ></MakeRemoveOracle>
         )
+      case Instructions.MangoV4TokenRegister:
+        return (
+          <TokenRegister index={idx} governance={governance}></TokenRegister>
+        )
+      case Instructions.MangoV4TokenEdit:
+        return <EditToken index={idx} governance={governance}></EditToken>
       case Instructions.DepositToMangoAccount:
         return (
           <MakeDepositToMangoAccount
             index={idx}
             governance={governance}
           ></MakeDepositToMangoAccount>
+        )
+      case Instructions.MangoV4PerpEdit:
+        return <PerpEdit index={idx} governance={governance}></PerpEdit>
+      case Instructions.MangoV4PerpCreate:
+        return <PerpCreate index={idx} governance={governance}></PerpCreate>
+      case Instructions.MangoV4Serum3RegisterMarket:
+        return (
+          <Serum3RegisterMarket
+            index={idx}
+            governance={governance}
+          ></Serum3RegisterMarket>
+        )
+      case Instructions.MangoV4TokenRegisterTrustless:
+        return (
+          <TokenRegisterTrustless
+            index={idx}
+            governance={governance}
+          ></TokenRegisterTrustless>
         )
       case Instructions.DepositToMangoAccountCsv:
         return (

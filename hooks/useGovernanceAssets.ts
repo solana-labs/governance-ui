@@ -242,6 +242,21 @@ export default function useGovernanceAssets() {
       isVisible: canUseTokenTransferInstruction,
     },
     {
+      id: Instructions.StakeValidator,
+      name: 'Stake A Validator',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.DeactivateValidatorStake,
+      name: 'Deactivate validator stake',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.WithdrawValidatorStake,
+      name: 'Withdraw validator stake',
+      isVisible: canUseAnyInstruction,
+    },
+    {
       id: Instructions.None,
       name: 'None',
       isVisible:
@@ -350,6 +365,36 @@ export default function useGovernanceAssets() {
       id: Instructions.MangoRemoveOracle,
       name: 'Mango: Remove Oracle',
       isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoV4TokenRegister,
+      name: 'Mango v4: Token Register',
+      isVisible: canUseAnyInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoV4TokenEdit,
+      name: 'Mango v4: Token Edit',
+      isVisible: canUseAnyInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoV4TokenRegisterTrustless,
+      name: 'Mango v4: Token Register Trustless',
+      isVisible: canUseAnyInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoV4PerpCreate,
+      name: 'Mango v4: Perp Create',
+      isVisible: canUseAnyInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoV4PerpEdit,
+      name: 'Mango v4: Perp Edit',
+      isVisible: canUseAnyInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoV4Serum3RegisterMarket,
+      name: 'Mango v4: Serum 3 Register Market',
+      isVisible: canUseAnyInstruction && symbol === 'MNGO',
     },
     {
       id: Instructions.DepositToMangoAccount,
