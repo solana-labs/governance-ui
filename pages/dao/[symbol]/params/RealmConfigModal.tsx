@@ -27,7 +27,7 @@ import RealmConfigFormComponent, {
 import { abbreviateAddress } from '@utils/formatting'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
-import { BN } from '@project-serum/anchor'
+import { isDisabledVoterWeight } from '@tools/governance/units'
 
 interface RealmConfigProposal extends RealmConfigForm {
   title: string
@@ -68,8 +68,8 @@ const RealmConfigModal = ({ closeProposalModal, isProposalModalOpen }) => {
       setCreatingProposal(true)
       const governance = form!.governedAccount.governance
 
-      const mintAmount = DISABLED_VOTER_WEIGHT.eq(
-        new BN(form!.minCommunityTokensToCreateGovernance.toString())
+      const mintAmount = isDisabledVoterWeight(
+        form!.minCommunityTokensToCreateGovernance
       )
         ? DISABLED_VOTER_WEIGHT
         : parseMintNaturalAmountFromDecimalAsBN(
