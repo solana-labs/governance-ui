@@ -2287,6 +2287,14 @@
     bs58 "^4.0.1"
     buffer "^6.0.3"
 
+"@everlend/core@^0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@everlend/core/-/core-0.0.6.tgz#2841f4195155d2e9931cdbc16930b05972b64a25"
+  integrity sha512-Af2BqHZr4xYcPdYkUZys53m1ZLbTKB+DHqZXSxP7ML/AE36QOWOitAGxymMgAUzpnvWifI12t0ayVfho6/TnrQ==
+  dependencies:
+    "@project-serum/anchor" "0.24.2"
+    "@solana/spl-token" "^0.2.0"
+
 "@everlend/general-pool@^0.0.22":
   version "0.0.22"
   resolved "https://registry.yarnpkg.com/@everlend/general-pool/-/general-pool-0.0.22.tgz#428a04f605cc5cf8cebdd8973288fa286756d320"

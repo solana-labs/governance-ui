@@ -674,6 +674,13 @@ const New = () => {
         return <CreateTokenMetadata index={idx} governance={governance} />
       case Instructions.UpdateTokenMetadata:
         return <UpdateTokenMetadata index={idx} governance={governance} />
+      case Instructions.EverlendDeposit:
+        return (
+          <DepositReserveLiquidityAndObligationCollateral
+            index={idx}
+            governance={governance}
+          />
+        )
       default:
         null
     }
