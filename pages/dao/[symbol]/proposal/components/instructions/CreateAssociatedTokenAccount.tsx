@@ -21,7 +21,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../new'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import Input from '@components/inputs/Input'
+import TokenMintInput from '@components/inputs/TokenMintInput'
 
 const CreateAssociatedTokenAccount = ({
   index,
@@ -131,18 +131,15 @@ const CreateAssociatedTokenAccount = ({
         governance={governance}
       />
 
-      <Input
+      <TokenMintInput
+        noMaxWidth={false}
         label="SPL Token Mint"
-        type="text"
-        value={form.splTokenMint}
-        placeholder="Please select..."
-        onChange={(event) =>
+        onValidMintChange={(mintAddress, _) => {
           handleSetForm({
-            value: event.target.value,
+            value: mintAddress,
             propertyName: 'splTokenMint',
           })
-        }
-        error={formErrors['splTokenMint']}
+        }}
       />
     </>
   )

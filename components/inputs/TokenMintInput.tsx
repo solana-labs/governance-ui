@@ -1,4 +1,5 @@
-import Input from '@components/inputs/Input'
+import Input from './Input'
+import { inputClasses } from './styles'
 import { useEffect, useState } from 'react'
 import tokenService from '@utils/services/token'
 import { tryParsePublicKey } from '@tools/core/pubkey'
@@ -11,8 +12,16 @@ import { InformationCircleIcon } from '@heroicons/react/outline'
 import { TokenInfo } from '@solana/spl-token-registry'
 
 const TokenMintInput = ({
+  noMaxWidth = true,
+  disabled = false,
+  error = '',
+  label = 'Token',
   onValidMintChange,
 }: {
+  disabled?: boolean
+  error?: string
+  noMaxWidth?: boolean
+  label?: string
   onValidMintChange: (
     mintAddress: string | undefined,
     foundByNameToken: TokenInfo | undefined
@@ -64,9 +73,9 @@ const TokenMintInput = ({
     <>
       <div>
         <Input
-          noMaxWidth={true}
+          noMaxWidth={noMaxWidth}
           className="mb-2"
-          label="Token"
+          label={label}
           placeholder={'Mint, symbol or name'}
           value={query}
           type="text"
@@ -92,7 +101,14 @@ const TokenMintInput = ({
         </div>
         <div className="mt-1">
           <div
-            className="flex items-center text-fgd-1 border border-fgd-4 p-3 rounded-lg w-full"
+            //   "flex items-center text-fgd-1 border border-fgd-4 p-3 rounded-lg max-w-lg"
+            className={inputClasses({
+              noMaxWidth,
+              className:
+                'flex items-center text-fgd-1 border border-fgd-4 p-3 rounded-lg',
+              disabled,
+              error,
+            })}
             style={{ minHeight: '60px' }}
           >
             {!isTyping && foundByNameToken ? (
@@ -119,12 +135,12 @@ const TokenMintInput = ({
                 </div>
               </>
             ) : (
-              <>
+              <div>
                 <span className="text-primary-light text-sm flex items-center">
                   <InformationCircleIcon className="w-5 mr-1"></InformationCircleIcon>{' '}
                   Type exact mint address, token name or symbol
                 </span>
-              </>
+              </div>
             )}
           </div>
         </div>

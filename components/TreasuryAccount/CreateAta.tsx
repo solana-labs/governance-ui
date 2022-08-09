@@ -1,8 +1,4 @@
-import Input from '@components/inputs/Input'
-import { useEffect, useState } from 'react'
-import tokenService from '@utils/services/token'
-import { tryParsePublicKey } from '@tools/core/pubkey'
-import { TokenProgramAccount, tryGetMint } from '@utils/tokens'
+import { useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import {
   Keypair,
@@ -10,8 +6,6 @@ import {
   Transaction,
   TransactionInstruction,
 } from '@solana/web3.js'
-import { MintInfo } from '@solana/spl-token'
-import { debounce } from '@utils/debounce'
 import Button from '@components/Button'
 import { createATA } from '@utils/ataTools'
 import { tryGetAta } from '@utils/validations'
@@ -19,7 +13,6 @@ import { sendTransaction } from '@utils/send'
 import useRealm from '@hooks/useRealm'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import * as serum from '@project-serum/common'
-import { InformationCircleIcon } from '@heroicons/react/outline'
 import TokenMintInput from '@components/inputs/TokenMintInput'
 import { TokenInfo } from '@solana/spl-token-registry'
 
