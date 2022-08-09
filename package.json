@@ -25,6 +25,7 @@
   "dependencies": {
     "@blockworks-foundation/mango-client": "^3.6.7",
     "@blockworks-foundation/mango-v4": "^0.0.2",
+    "@bonfida/spl-name-service": "^0.1.47",
     "@bundlr-network/client": "^0.7.15",
     "@cardinal/namespaces-components": "^2.5.5",
     "@castlefinance/vault-core": "^0.1.3",

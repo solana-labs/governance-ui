@@ -7,6 +7,10 @@ import { vsrPluginsPks } from './useVotingPlugins'
 
 export default function useGovernanceAssets() {
   const { ownVoterWeight, realm, symbol, governances, config } = useRealm()
+  console.log(
+    '🚀 ~ file: useGovernanceAssets.ts ~ line 10 ~ useGovernanceAssets ~ governances',
+    governances
+  )
   const governedTokenAccounts: AssetAccount[] = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
   )
@@ -257,6 +261,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseAnyInstruction,
     },
     {
+      id: Instructions.SnsDomainNameTransfer,
+      name: 'SNS Transfer Out Domain Name',
+      isVisible: canUseAnyInstruction,
+    },
+    {
       id: Instructions.None,
       name: 'None',
       isVisible:
@@ -488,7 +497,16 @@ export default function useGovernanceAssets() {
     },
     ...foresightInstructions,
   ]
+  console.log(
+    'governedTokenAccountsWithoutNfts ',
+    governedTokenAccountsWithoutNfts
+  )
 
+  // Get sol account which could contain a domain
+  console.log(
+    'main sol treasury acc: ',
+    governedTokenAccountsWithoutNfts.filter((account) => account.isSol)
+  )
   return {
     governancesArray,
     getGovernancesByAccountType,

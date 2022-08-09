@@ -105,6 +105,7 @@ import PerpEdit from './components/instructions/Mango/MangoV4/PerpEdit'
 import Serum3RegisterMarket from './components/instructions/Mango/MangoV4/Serum3RegisterMarket'
 import PerpCreate from './components/instructions/Mango/MangoV4/PerpCreate'
 import TokenRegisterTrustless from './components/instructions/Mango/MangoV4/TokenRegisterTrustless'
+import SnsDomainNameTransfer from './components/instructions/DomainNameService/SnsDomainNameTransfer'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -131,6 +132,7 @@ function extractGovernanceAccountFromInstructionsData(
 }
 
 const New = () => {
+  console.log(SnsDomainNameTransfer)
   const router = useRouter()
   const { handleCreateProposal } = useCreateProposal()
   const { fmtUrlWithCluster } = useQueryContext()
@@ -674,6 +676,13 @@ const New = () => {
         return <CreateTokenMetadata index={idx} governance={governance} />
       case Instructions.UpdateTokenMetadata:
         return <UpdateTokenMetadata index={idx} governance={governance} />
+      case Instructions.SnsDomainNameTransfer:
+        return (
+          <SnsDomainNameTransfer
+            index={idx}
+            governance={governance}
+          ></SnsDomainNameTransfer>
+        )
       default:
         null
     }
