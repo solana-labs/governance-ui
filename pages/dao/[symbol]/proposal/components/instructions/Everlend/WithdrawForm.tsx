@@ -19,7 +19,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { handleEverlendDeposit } from 'Strategies/protocols/everlend/depositTools'
+import { handleEverlendWithdraw } from 'Strategies/protocols/everlend/depositTools'
 import { getEverlendStrategies } from 'Strategies/protocols/everlend/tools'
 import {
   CONFIG_MAINNET,
@@ -33,7 +33,7 @@ import {
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
 
-const DepositForm = ({
+const WithdrawForm = ({
   index,
   governance,
 }: {
@@ -145,8 +145,7 @@ const DepositForm = ({
       true
     )
 
-    const { actionTx: tx } = await handleEverlendDeposit(
-      wallet,
+    const { withdrawTx: tx } = await handleEverlendWithdraw(
       Boolean(isSol),
       connection,
       owner,
@@ -229,4 +228,4 @@ const DepositForm = ({
   )
 }
 
-export default DepositForm
+export default WithdrawForm

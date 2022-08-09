@@ -324,7 +324,7 @@ export async function handleEverlendAction(
   return proposalsAdresses
 }
 
-async function handleEverlendDeposit(
+export async function handleEverlendDeposit(
   wallet: SignerWalletAdapter,
   isSol: boolean,
   connection: ConnectionContext,
@@ -345,11 +345,6 @@ async function handleEverlendDeposit(
   const rewardAccountInfo = await connection.current.getAccountInfo(
     rewardAccount
   )
-
-  console.log('rewardPool', rewardPoolInfo)
-  console.log('rewardAccount', rewardAccountInfo)
-
-  console.log('owner', owner.toString())
 
   if (!rewardAccountInfo && rewardPoolInfo?.data) {
     const initTx = await getInitMiningTx(
@@ -396,7 +391,7 @@ async function handleEverlendDeposit(
   return isSol ? { actionTx, initMiningTx } : { actionTx }
 }
 
-async function handleEverlendWithdraw(
+export async function handleEverlendWithdraw(
   isSol: boolean,
   connection: ConnectionContext,
   owner: PublicKey,

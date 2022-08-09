@@ -105,6 +105,8 @@ import PerpEdit from './components/instructions/Mango/MangoV4/PerpEdit'
 import Serum3RegisterMarket from './components/instructions/Mango/MangoV4/Serum3RegisterMarket'
 import PerpCreate from './components/instructions/Mango/MangoV4/PerpCreate'
 import TokenRegisterTrustless from './components/instructions/Mango/MangoV4/TokenRegisterTrustless'
+import DepositForm from './components/instructions/Everlend/DepositForm'
+import WithdrawForm from './components/instructions/Everlend/WithdrawForm'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -675,12 +677,9 @@ const New = () => {
       case Instructions.UpdateTokenMetadata:
         return <UpdateTokenMetadata index={idx} governance={governance} />
       case Instructions.EverlendDeposit:
-        return (
-          <DepositReserveLiquidityAndObligationCollateral
-            index={idx}
-            governance={governance}
-          />
-        )
+        return <DepositForm index={idx} governance={governance} />
+      case Instructions.EverlendWithdraw:
+        return <WithdrawForm index={idx} governance={governance} />
       default:
         null
     }
