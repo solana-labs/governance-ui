@@ -23,12 +23,13 @@ const themeVariables: IncomingThemeVariables = {
   dark: {
     bellButton:
       '!bg-bkg-2 !shadow-none text-fgd-1 h-10 rounded-full w-10 hover:bg-bkg-3',
-    button: `${defaultVariables.dark.button} bg-primary-light border-primary-light font-bold rounded-full hover:bg-primary-dark`,
+    button: `${defaultVariables.dark.button} border-none bg-primary-light border-primary-light font-bold rounded-full hover:bg-fgd-1 hover:opacity-100`,
     buttonLoading: `${defaultVariables.dark.buttonLoading} rounded-full min-h-[40px]`,
     colors: {
       bg: 'bg-bkg-1',
-      highlight: 'border border-fgd-4',
+      toggleBackgroundActive: 'bg-primary-light',
     },
+    addormentButton: `${defaultVariables.dark.addormentButton} text-bkg-2 bg-primary-light`,
     disabledButton: `${defaultVariables.dark.disabledButton} border-primary-light font-bold rounded-full border-fgd-3 text-fgd-3 cursor-not-allowed`,
     modal: `${defaultVariables.dark.modal} bg-bkg-1 sm:border sm:border-fgd-4 shadow-md sm:rounded-md`,
     modalWrapper: `${defaultVariables.dark.modalWrapper} sm:top-14 rounded-md`,
@@ -37,11 +38,16 @@ const themeVariables: IncomingThemeVariables = {
   light: {
     bellButton:
       '!bg-bkg-2 !shadow-none text-fgd-1 h-10 rounded-full w-10 hover:bg-bkg-3',
-    button: `${defaultVariables.light.button} bg-primary-light border-primary-light font-bold rounded-full hover:bg-primary-dark`,
+    button: `${defaultVariables.light.button} border-none bg-primary-light border-primary-light font-bold rounded-full hover:bg-fgd-1 hover:opacity-100`,
     buttonLoading: `${defaultVariables.light.buttonLoading} rounded-full min-h-[40px]`,
     colors: {
       bg: 'bg-bkg-1',
+      toggleBackgroundActive: 'bg-primary-light',
     },
+    textStyles: {
+      input: `${defaultVariables.light.textStyles.input} text-fgd-1 placeholder:text-fgd-3`,
+    },
+    addormentButton: `${defaultVariables.dark.addormentButton} text-bkg-2 bg-primary-light`,
     modal: `${defaultVariables.light.modal} sm:border sm:rounded-md sm:border-fgd-4 sm:shadow-md`,
     modalWrapper: `${defaultVariables.dark.modalWrapper} sm:top-14`,
     secondaryDangerButton: `${defaultVariables.light.secondaryDangerButton} rounded-full`,
@@ -111,7 +117,10 @@ export default function DialectNotificationsModal(
         <DialectUiManagementProvider>
           <NotificationsModal
             dialectId="dialect-notifications"
-            notifications={[{ name: 'New proposals', detail: 'Event' }]}
+            notifications={[
+              { name: 'New proposals', detail: 'Event' },
+              { name: 'Proposal state updates', detail: 'Event' },
+            ]}
             pollingInterval={15000}
             onBackClick={props.onBackClick}
             channels={['web3', 'telegram', 'sms', 'email']}
