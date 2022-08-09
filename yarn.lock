@@ -1523,13 +1523,17 @@
     toformat "^2.0.0"
     yargs "^17.0.1"
 
-"@blockworks-foundation/voter-stake-registry-client@^0.2.3":
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/voter-stake-registry-client/-/voter-stake-registry-client-0.2.3.tgz#2d3f537c19635d1bdcf64ba00721dbaf98abc847"
-  integrity sha512-SS2cFXfVHI1dcN3zBE3MkqcXNe+47KVrk3JOiDgw2VbagxllZDAUKZRW8666HwUfmJSogVFyDwJvJD/WSBbXtQ==
+"@blockworks-foundation/mango-v4@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4/-/mango-v4-0.0.2.tgz#b1d812f9e7bc3d61fffcb722132343e9c700bd9b"
+  integrity sha512-xNyU5Ne/pz6H2u2VOCXGEj4opC2rdK2SrA4MsohfKbiubHtgXcpTDtRqGYrYy/kAw3PbV6w+Yc32mSgWTbNnPA==
   dependencies:
-    "@project-serum/anchor" "^0.24.2"
-    "@project-serum/serum" "^0.13.61"
+    "@project-serum/anchor" "^0.25.0"
+    "@project-serum/serum" "^0.13.65"
+    "@pythnetwork/client" "^2.7.0"
+    "@solana/spl-token" "^0.1.8"
+    big.js "^6.1.1"
+    bs58 "^5.0.0"
 
 "@bonfida/name-offers@^0.0.1":
   version "0.0.1"
@@ -3690,7 +3694,7 @@
     bn.js "^5.1.2"
     buffer-layout "^1.2.0"
 
-"@project-serum/serum@^0.13.60":
+"@project-serum/serum@^0.13.60", "@project-serum/serum@^0.13.65":
   version "0.13.65"
   resolved "https://registry.yarnpkg.com/@project-serum/serum/-/serum-0.13.65.tgz#6d3cf07912f13985765237f053cca716fe84b0b0"
   integrity sha512-BHRqsTqPSfFB5p+MgI2pjvMBAQtO8ibTK2fYY96boIFkCI3TTwXDt2gUmspeChKO2pqHr5aKevmexzAcXxrSRA==
@@ -3776,6 +3780,13 @@
   dependencies:
     "@solana/web3.js" "^1.30.2"
     assert "^2.0.0"
+    buffer "^6.0.1"
+
+"@pythnetwork/client@^2.7.0":
+  version "2.7.3"
+  resolved "https://registry.yarnpkg.com/@pythnetwork/client/-/client-2.7.3.tgz#6075a16dc394d1734e76b04e907a680490a61536"
+  integrity sha512-+2k5JXxv/yUA6WMESSppJlg4T/AP+nZZfBnHmeG3RPCIJx+bargxFLCK4B2KgpQYdeTWb+2z8yRCNF7tHooCFQ==
+  dependencies:
     buffer "^6.0.1"
 
 "@randlabs/communication-bridge@^1.0.0":

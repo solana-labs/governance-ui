@@ -20,7 +20,7 @@ import RealmConfigFormComponent from '../forms/RealmConfigFormComponent'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
-import { BN } from '@project-serum/anchor'
+import { isDisabledVoterWeight } from '@tools/governance/units'
 
 export interface RealmConfigForm {
   governedAccount: AssetAccount | undefined
@@ -58,8 +58,8 @@ const RealmConfig = ({
       wallet?.publicKey &&
       realm
     ) {
-      const mintAmount = DISABLED_VOTER_WEIGHT.eq(
-        new BN(form!.minCommunityTokensToCreateGovernance)
+      const mintAmount = isDisabledVoterWeight(
+        form!.minCommunityTokensToCreateGovernance
       )
         ? DISABLED_VOTER_WEIGHT
         : parseMintNaturalAmountFromDecimalAsBN(
