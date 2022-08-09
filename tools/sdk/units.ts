@@ -17,6 +17,10 @@ export function fmtBnMintDecimals(amount: BN, decimals: number) {
   return new BigNumber(amount.toString()).shiftedBy(-decimals).toFormat()
 }
 
+export function fmtBNAmount(amount: BN | number | string) {
+  return new BigNumber(amount.toString()).toFormat()
+}
+
 /// Formats mint amount (natural units) as a decimal string
 export function fmtMintAmount(mint: MintInfo | undefined, mintAmount: BN) {
   return mint
