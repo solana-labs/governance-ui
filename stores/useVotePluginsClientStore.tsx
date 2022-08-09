@@ -1,5 +1,4 @@
 import create, { State } from 'zustand'
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import {
   NftVoterClient,
   GatewayClient,
@@ -16,6 +15,7 @@ import { VotingClient, VotingClientProps } from '@utils/uiTypes/VotePlugin'
 import { PythClient } from 'pyth-staking-api'
 import { PublicKey } from '@solana/web3.js'
 import { tryGetGatewayRegistrar } from '../GatewayPlugin/sdk/api'
+import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 
 interface UseVotePluginsClientStore extends State {
   state: {
@@ -33,7 +33,8 @@ interface UseVotePluginsClientStore extends State {
   }
   handleSetVsrClient: (
     wallet: SignerWalletAdapter | undefined,
-    connection: ConnectionContext
+    connection: ConnectionContext,
+    programId?: PublicKey
   ) => void
   handleSetNftClient: (
     wallet: SignerWalletAdapter | undefined,
@@ -92,9 +93,8 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
     state: {
       ...defaultState,
     },
-    handleSetVsrClient: async (wallet, connection) => {
+    handleSetVsrClient: async (wallet, connection, programId) => {
       const options = AnchorProvider.defaultOptions()
-      console.log('wallet', wallet)
       const provider = new AnchorProvider(
         connection.current,
         (wallet as unknown) as Wallet,
@@ -102,6 +102,7 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
       )
       const vsrClient = await VsrClient.connect(
         provider,
+        programId,
         connection.cluster === 'devnet'
       )
       set((s) => {

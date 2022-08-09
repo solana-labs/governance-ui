@@ -9,7 +9,7 @@ import {
   getTimestampFromDays,
   parseMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
-import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
+import { isDisabledVoterWeight } from '@tools/governance/units'
 
 export interface GovernanceConfigValues {
   minTokensToCreateProposal: number | string
@@ -31,8 +31,8 @@ export function parseMinTokensToCreate(
 }
 
 export function getGovernanceConfig(values: GovernanceConfigValues) {
-  const minTokensToCreateProposal = new BN(values.minTokensToCreateProposal).eq(
-    DISABLED_VOTER_WEIGHT
+  const minTokensToCreateProposal = isDisabledVoterWeight(
+    values.minTokensToCreateProposal
   )
     ? values.minTokensToCreateProposal
     : parseMinTokensToCreate(

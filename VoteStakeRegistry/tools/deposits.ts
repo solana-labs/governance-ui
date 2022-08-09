@@ -1,4 +1,3 @@
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { BN, EventParser } from '@project-serum/anchor'
 import {
   ProgramAccount,
@@ -16,6 +15,7 @@ import {
   Registrar,
 } from 'VoteStakeRegistry/sdk/accounts'
 import { tryGetVoter, tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
+import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 import { DAYS_PER_MONTH } from './dateTools'
 import { MONTHLY } from './types'
 

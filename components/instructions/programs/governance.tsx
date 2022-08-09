@@ -18,7 +18,12 @@ import {
 import { GOVERNANCE_SCHEMA } from '@solana/spl-governance'
 import { Connection } from '@solana/web3.js'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
-import { fmtMintAmount, getDaysFromTimestamp } from '@tools/sdk/units'
+import { fmtVoterWeightThresholdMintAmount } from '@tools/governance/units'
+import {
+  fmtBNAmount,
+  fmtMintAmount,
+  getDaysFromTimestamp,
+} from '@tools/sdk/units'
 import { deserialize } from 'borsh'
 
 import { tryGetMint } from '../../../utils/tokens'
@@ -166,11 +171,14 @@ export const GOVERNANCE_INSTRUCTIONS = {
           <>
             <p>
               {`minCommunityTokensToCreateGovernance:
-              ${fmtMintAmount(
+              ${fmtVoterWeightThresholdMintAmount(
                 communityMint?.account,
                 args.configArgs.minCommunityTokensToCreateGovernance
               )}`}{' '}
-              ({args.configArgs.minCommunityTokensToCreateGovernance.toNumber()}
+              (
+              {fmtBNAmount(
+                args.configArgs.minCommunityTokensToCreateGovernance
+              )}
               )
             </p>
             <p>
@@ -181,7 +189,9 @@ export const GOVERNANCE_INSTRUCTIONS = {
               {`communityMintMaxVoteWeightSource:
                ${args.configArgs.communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}% supply`}{' '}
               (
-              {args.configArgs.communityMintMaxVoteWeightSource.value.toNumber()}
+              {fmtBNAmount(
+                args.configArgs.communityMintMaxVoteWeightSource.value
+              )}
               )
             </p>
             <p>
