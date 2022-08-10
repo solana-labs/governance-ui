@@ -10,10 +10,14 @@ import { getRealmExplorerHost } from 'tools/routing'
 import useMembersStore from 'stores/useMembersStore'
 import { vsrPluginsPks } from '@hooks/useVotingPlugins'
 import { tryParsePublicKey } from '@tools/core/pubkey'
+import { generateNft } from '@tools/nftMinter'
+import useWalletStore from 'stores/useWalletStore'
+import Button from './Button'
 
 const RealmHeader = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const { realm, realmInfo, realmDisplayName, symbol, config } = useRealm()
+  const { connection, current } = useWalletStore()
   const { REALM } = process.env
   const activeMembers = useMembersStore((s) => s.compact.activeMembers)
   const isLockTokensMode =
@@ -90,7 +94,7 @@ const RealmHeader = () => {
               Params
             </a>
           </Link>
-
+          <Button onClick={() => generateNft(connection, current)}>elo</Button>
           <a
             className="flex items-center text-sm default-transition text-fgd-2 hover:text-fgd-3"
             href={realmUrl}

@@ -29,6 +29,7 @@ import {
 } from 'pyth-staking-api'
 import useGatewayPluginStore from '../GatewayPlugin/store/gatewayPluginStore'
 import { getGatekeeperNetwork } from '../GatewayPlugin/sdk/accounts'
+import { NFTWithMeta } from '@utils/uiTypes/VotePlugin'
 
 export const vsrPluginsPks: string[] = [
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo',
@@ -299,10 +300,12 @@ export function useVotingPlugins() {
       setMaxVoterWeight(null)
     }
   }
-  const getIsFromCollection = (nft) => {
+  const getIsFromCollection = (nft: NFTWithMeta) => {
     return (
       nft.collection &&
       nft.collection.mintAddress &&
+      (nft.collection.verified ||
+        typeof nft.collection.verified === 'undefined') &&
       usedCollectionsPks.includes(nft.collection.mintAddress) &&
       nft.collection.creators?.filter((x) => x.verified).length > 0
     )

@@ -460,12 +460,13 @@ const getDevnetNfts = async (
           name: val.name,
           description: val.description,
           properties: {
-            category: val.properties.category,
-            files: val.properties.files,
+            category: val.properties?.category,
+            files: val.properties?.files,
           },
           collection: {
             mintAddress: metadata?.data?.collection?.key || '',
             creators: nft.data.creators,
+            verified: metadata?.data?.collection?.verified,
           },
           mintAddress: nft.mint,
           address: metadata.pubkey.toBase58(),
