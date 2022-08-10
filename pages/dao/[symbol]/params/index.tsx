@@ -3,7 +3,7 @@ import GovernedAccountsTabs from '@components/GovernedAccountsTabs'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import useRealm from '@hooks/useRealm'
 import { fmtMintAmount } from '@tools/sdk/units'
-import { MAX_TOKENS_TO_DISABLE } from '@tools/constants'
+import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import { capitalize } from '@utils/helpers'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import Tabs from '@components/Tabs'
@@ -114,7 +114,7 @@ const Params = () => {
   }
   const minCommunityTokensToCreateGovernance =
     realmConfig &&
-    MAX_TOKENS_TO_DISABLE.eq(realmConfig.minCommunityTokensToCreateGovernance)
+    DISABLED_VOTER_WEIGHT.eq(realmConfig.minCommunityTokensToCreateGovernance)
       ? 'Disabled'
       : realmConfig?.minCommunityTokensToCreateGovernance &&
         fmtMintAmount(mint, realmConfig.minCommunityTokensToCreateGovernance)

@@ -17,8 +17,13 @@ import {
 } from '@solana/spl-governance'
 import { GOVERNANCE_SCHEMA } from '@solana/spl-governance'
 import { Connection } from '@solana/web3.js'
-import { MAX_TOKENS_TO_DISABLE } from '@tools/constants'
-import { fmtMintAmount, getDaysFromTimestamp } from '@tools/sdk/units'
+import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
+import { fmtVoterWeightThresholdMintAmount } from '@tools/governance/units'
+import {
+  fmtBNAmount,
+  fmtMintAmount,
+  getDaysFromTimestamp,
+} from '@tools/sdk/units'
 import { deserialize } from 'borsh'
 
 import { tryGetMint } from '../../../utils/tokens'
@@ -50,7 +55,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
           : undefined
         const isMaxNumber =
           args.config.minCommunityTokensToCreateProposal.toString() ===
-          MAX_TOKENS_TO_DISABLE.toString()
+          DISABLED_VOTER_WEIGHT.toString()
         return (
           <>
             <p>
@@ -166,11 +171,14 @@ export const GOVERNANCE_INSTRUCTIONS = {
           <>
             <p>
               {`minCommunityTokensToCreateGovernance:
-              ${fmtMintAmount(
+              ${fmtVoterWeightThresholdMintAmount(
                 communityMint?.account,
                 args.configArgs.minCommunityTokensToCreateGovernance
               )}`}{' '}
-              ({args.configArgs.minCommunityTokensToCreateGovernance.toNumber()}
+              (
+              {fmtBNAmount(
+                args.configArgs.minCommunityTokensToCreateGovernance
+              )}
               )
             </p>
             <p>
@@ -181,7 +189,9 @@ export const GOVERNANCE_INSTRUCTIONS = {
               {`communityMintMaxVoteWeightSource:
                ${args.configArgs.communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}% supply`}{' '}
               (
-              {args.configArgs.communityMintMaxVoteWeightSource.value.toNumber()}
+              {fmtBNAmount(
+                args.configArgs.communityMintMaxVoteWeightSource.value
+              )}
               )
             </p>
             <p>

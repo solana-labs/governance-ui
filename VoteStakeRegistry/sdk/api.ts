@@ -1,7 +1,7 @@
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { NftVoterClient } from '@solana/governance-program-library'
 import { PublicKey } from '@solana/web3.js'
 import { Registrar, Voter } from './accounts'
+import { VsrClient } from './client'
 
 export const tryGetVoter = async (voterPk: PublicKey, client: VsrClient) => {
   try {

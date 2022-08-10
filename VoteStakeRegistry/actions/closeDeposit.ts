@@ -4,10 +4,10 @@ import {
   Transaction,
   TransactionInstruction,
 } from '@solana/web3.js'
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { RpcContext } from '@solana/spl-governance'
 import { sendTransaction } from '@utils/send'
 import { getRegistrarPDA, getVoterPDA } from 'VoteStakeRegistry/sdk/accounts'
+import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 
 export const closeDeposit = async ({
   rpcContext,

@@ -9,9 +9,9 @@ import { sendTransaction } from 'utils/send'
 
 import { BN } from '@project-serum/anchor'
 import { LockupType } from 'VoteStakeRegistry/sdk/accounts'
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { withCreateNewDeposit } from '../sdk/withCreateNewDeposit'
 import { getPeriod } from 'VoteStakeRegistry/tools/deposits'
+import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 
 export const voteRegistryLockDeposit = async ({
   rpcContext,

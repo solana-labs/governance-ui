@@ -19,8 +19,8 @@ import { getRealmCfgSchema } from '@utils/validations'
 import RealmConfigFormComponent from '../forms/RealmConfigFormComponent'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { AssetAccount } from '@utils/uiTypes/assets'
-import { MAX_TOKENS_TO_DISABLE } from '@tools/constants'
-import { BN } from '@project-serum/anchor'
+import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
+import { isDisabledVoterWeight } from '@tools/governance/units'
 
 export interface RealmConfigForm {
   governedAccount: AssetAccount | undefined
@@ -58,10 +58,10 @@ const RealmConfig = ({
       wallet?.publicKey &&
       realm
     ) {
-      const mintAmount = MAX_TOKENS_TO_DISABLE.eq(
-        new BN(form!.minCommunityTokensToCreateGovernance)
+      const mintAmount = isDisabledVoterWeight(
+        form!.minCommunityTokensToCreateGovernance
       )
-        ? MAX_TOKENS_TO_DISABLE
+        ? DISABLED_VOTER_WEIGHT
         : parseMintNaturalAmountFromDecimalAsBN(
             form!.minCommunityTokensToCreateGovernance!,
             mint!.decimals!
