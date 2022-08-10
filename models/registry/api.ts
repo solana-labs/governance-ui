@@ -158,7 +158,7 @@ const EXCLUDED_REALMS = new Map<string, string>([
   ['AxuK6ZGEQS2vrLXwJeK5pZFBAAPamEUyQXptfEEnCHuD', ''],
   ['24pZ9VkpRGTH6wHqjSsySYHpxAKbQL1Tczb6b7zytomZ', ''],
   ['2HpvQJNTXgso4HWTXamiRAXshRyGu4ZhJ5esDT3tHPUV', ''], // Epics DAO (Dead because of loosing vote power)
-  ['6JzsaQYYi4vGTZogASscZsBALWbSbJU9tMDRtq6nbeff', ''],
+  ['Hd7hrf1fyZN5ZkuCerpfXs4UCAgoHELyiscE4utaKhSx', ''], 
 ])
 
 // Returns all known realms from all known spl-gov instances which are not certified
