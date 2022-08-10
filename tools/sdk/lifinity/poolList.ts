@@ -36,7 +36,12 @@ export type PoolNames =
   | 'RAY-USDC'
   | 'USDT-USDC'
   | 'UST-USDC'
-  | 'SOL-UXD';
+  | 'SOL-UXD'
+  | 'stSOL-UXD';
+
+// Translation
+// pool coin = token A
+// pool pc = token B
 
 export const PoolList: { [poolLabel in PoolNames]: IPoolInfo } = {
   'SOL-UXD': {
@@ -307,6 +312,35 @@ export const PoolList: { [poolLabel in PoolNames]: IPoolInfo } = {
       ),
       mint: SPL_TOKENS.USDC.mint,
       decimals: SPL_TOKENS.USDC.decimals,
+    },
+  },
+
+  'stSOL-UXD': {
+    amm: new PublicKey('CMu86zkJtcqYTBgKMf1fJWhcowQBVmysNsWthXZNZpYZ'),
+    feeAccount: new PublicKey('tdTP4XEKYyfxTPg3EuRZbrZmm7p882u7BBWPaNahraP'),
+    configAccount: new PublicKey(
+      'GVZZaF3YPRSkG8CB1hC4bGYrg6g7LEiWmPpKH4BE4b2n',
+    ),
+    pythAccount: new PublicKey('H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG'),
+    pythPcAccount: new PublicKey('tRCderESn7r9UARDATUxMesd282QjkpwM9pkmizFbWE'),
+    pythBaseDecimal: 11,
+    lpToken: {
+      mint: new PublicKey('AFBYo7dFZzS18dKg965VVdoiV7cmSj9AX81uwCEYFyvA'),
+      decimals: 9,
+    },
+    tokenA: {
+      tokenAccount: new PublicKey(
+        '4QydTFxiZ4art8Fo67L4UnvGHWJSQAh6a1JXPuxk5aaT',
+      ),
+      mint: new PublicKey('7dHbWXmci3dT8UFYWYZweBLXgycu7Y3iL6trKn1Y7ARj'),
+      decimals: 9,
+    },
+    tokenB: {
+      tokenAccount: new PublicKey(
+        'C92rvQ4zXhYb3pHsN2dNnH5jW35UTFYbuZd1YDWzZhDc',
+      ),
+      mint: new PublicKey('7kbnvuGBxxj8AG9qp8Scn56muWGaRaFqxg1FsRp3PaFT'),
+      decimals: 6,
     },
   },
 };
