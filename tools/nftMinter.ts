@@ -1,8 +1,10 @@
 import Arweave from 'arweave'
 import {
+  CreateNftOutput,
   findMasterEditionV2Pda,
   findMetadataPda,
   Metaplex,
+  Nft,
   walletAdapterIdentity,
 } from '@metaplex-foundation/js'
 import { ConnectionContext } from '@utils/connection'
@@ -14,14 +16,24 @@ import {
   SequenceType,
   transactionInstructionsToTypedInstructionsSets,
 } from '@utils/sendTransactions'
+import { chunks } from '@utils/helpers'
 
+//Just some shity script to generate verified nfts with same pic x times
+//Extracting pure instructions from metaplex to run this with crank was to time consuming so
+//recommended use is autoclicker or keypair wallet to approve all transactions its one tx per 1 nft.
+const nftNumber = 120
+
+//collection key pk of your created collection that you are the owner and can verify new nfts with this key.
 const collectionKeyPk = '3iBYdnzA418tD2o7vm85jBeXgxbdUyXzX9Qfm2XJuKME'
+
+//any img from web.
 const nftImgUrl =
   'https://bafkreialxgkg6evd4hhc2awf4cq77vmtkdb3w76ajy2lsoem4afurptlom.ipfs.dweb.link/?ext=jpeg'
 
-//Do not commit your wallet
+//use your own arweave wallet and do not commit your wallet to repo.
 const arweaveWalletJson: any = {}
 
+//i just place btn with onclick anywhere in ui to use it.
 export const generateNft = async (
   connection: ConnectionContext,
   userWallet: SignerWalletAdapter
@@ -38,6 +50,7 @@ export const generateNft = async (
   metaplex.use(walletAdapterIdentity(userWallet))
 
   const request = new XMLHttpRequest()
+  //read img to blob
   request.open('GET', nftImgUrl, true)
   request.responseType = 'blob'
   request.send()
@@ -47,62 +60,91 @@ export const generateNft = async (
     reader.readAsArrayBuffer(request.response)
 
     reader.onload = async function () {
+      //save img of nft to arweave
       const imageUrl = await uploadToArweave(
         arweave,
         reader.result!,
         'image/png'
       )
 
+      //metadata with img url from arweave
       const metadataRequest = JSON.stringify({
-        name: 'My_bat_nft',
-        description: 'bat',
+        name: 'My_nft',
+        description: 'nft_description',
         image: imageUrl,
         properties: {
           category: '',
         },
       })
+      //save metadata to arweave
       const metadataUrl = await uploadToArweave(
         arweave,
         metadataRequest,
         'application/json'
       )
-      console.log(imageUrl, metadataUrl)
-      const mintNFTResponse = await metaplex
-        .nfts()
-        .create({
-          uri: metadataUrl!,
-          sellerFeeBasisPoints: 500,
-          name: 'batman_nr_1',
-          collection: collectionKeyPk
-            ? {
-                verified: false,
-                key: new PublicKey(collectionKeyPk),
-              }
-            : undefined,
-        })
-        .run()
 
-      const ix = createVerifyCollectionInstruction({
-        metadata: findMetadataPda(mintNFTResponse.nft.mintAddress),
-        collectionAuthority: userWallet.publicKey!,
-        payer: userWallet.publicKey!,
-        collectionMint: mintNFTResponse.nft.collection!.key,
-        collection: findMetadataPda(mintNFTResponse.nft.collection!.key),
-        collectionMasterEditionAccount: findMasterEditionV2Pda(
-          mintNFTResponse.nft.collection!.key
+      const nftsToVerify: (CreateNftOutput & {
+        nft: Nft
+      })[] = []
+
+      for (let i = 0; i < nftNumber; i++) {
+        try {
+          //create nfts
+          const mintNFTResponse = await metaplex
+            .nfts()
+            .create({
+              //if you want mint to someone else then the connected wallet you can set owner here.
+              //   owner: new PublicKey(
+              //     ''
+              //   ),
+              uri: metadataUrl!,
+              sellerFeeBasisPoints: 500,
+              name: `nft_nr_${nftNumber}`,
+              collection: collectionKeyPk
+                ? {
+                    //you can't create verified nft right away so setting this to true will throw error.
+                    verified: false,
+                    key: new PublicKey(collectionKeyPk),
+                  }
+                : undefined,
+            })
+            .run()
+          console.log(mintNFTResponse)
+          nftsToVerify.push(mintNFTResponse)
+        } catch (e) {
+          console.log(e)
+        }
+      }
+
+      const verifyInstructions = [
+        ...nftsToVerify.map((x) =>
+          //to set verified to true you need to run this seperated instruction
+          createVerifyCollectionInstruction({
+            metadata: findMetadataPda(x.nft.mintAddress),
+            collectionAuthority: userWallet.publicKey!,
+            payer: userWallet.publicKey!,
+            collectionMint: x.nft.collection!.key,
+            collection: findMetadataPda(x.nft.collection!.key),
+            collectionMasterEditionAccount: findMasterEditionV2Pda(
+              x.nft.collection!.key
+            ),
+          })
         ),
-      })
+      ]
+      const nftsAccountsChunks = chunks(verifyInstructions, 10)
+      const signerChunks = Array(nftsAccountsChunks.length).fill([])
 
       sendTransactionsV2({
+        showUiComponent: true,
         connection: connection.current,
         wallet: userWallet,
-        TransactionInstructions: [[ix]].map((x) =>
+        TransactionInstructions: [...nftsAccountsChunks].map((x) =>
           transactionInstructionsToTypedInstructionsSets(
             x,
-            SequenceType.Sequential
+            SequenceType.Parallel
           )
         ),
-        signersSet: [[]],
+        signersSet: signerChunks,
       })
     }
   }
