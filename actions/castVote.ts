@@ -1,4 +1,9 @@
-import { Keypair, Transaction, TransactionInstruction } from '@solana/web3.js'
+import {
+  Keypair,
+  LAMPORTS_PER_SOL,
+  Transaction,
+  TransactionInstruction,
+} from '@solana/web3.js'
 import {
   ChatMessageBody,
   getGovernanceProgramVersion,
@@ -24,6 +29,7 @@ import {
 } from '@utils/sendTransactions'
 import { sendTransaction } from '@utils/send'
 import { NftVoterClient } from '@solana/governance-program-library'
+import { notify } from '@utils/notifications'
 
 export async function castVote(
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -95,7 +101,20 @@ export async function castVote(
   }
   const shouldChunk = votingPlugin?.client instanceof NftVoterClient
   const instructionsCountThatMustHaveTheirOwnChunk = message ? 4 : 2
+  const solBefore = await connection.getBalance(wallet.publicKey!)
   if (shouldChunk) {
+    const castVoteAndUpdateVoterWeightCost = 1515320
+    const oneNftCost = 1670400
+    const commentCost = 1673440
+    const commentCharacterCost = 6960
+    const singleTransactionCosts = 5000
+
+    let baseCost = castVoteAndUpdateVoterWeightCost
+    const nftVotesCosts = oneNftCost * votingPlugin.votingNfts.length
+    if (message) {
+      baseCost += commentCost + message.value.length * commentCharacterCost
+    }
+
     const instructionsWithTheirOwnChunk = instructions.slice(
       -instructionsCountThatMustHaveTheirOwnChunk
     )
@@ -108,9 +127,11 @@ export async function castVote(
       2
     )
     const nftsAccountsChunks = chunks(remainingInstructionsToChunk, 2)
+
     const signerChunks = Array(
       splInstructionsWithAccountsChunk.length + nftsAccountsChunks.length
     ).fill([])
+
     const singersMap = message
       ? [...signerChunks.slice(0, signerChunks.length - 1), signers]
       : signerChunks
@@ -125,6 +146,20 @@ export async function castVote(
         )
       ),
     ]
+    const pureTransactionsCosts =
+      instructionsChunks.length * singleTransactionCosts
+    const totalVoteCost = nftVotesCosts + baseCost + pureTransactionsCosts
+    const currentWalletSol = await connection.getBalance(wallet.publicKey!)
+    const hasEnoughSol = currentWalletSol - totalVoteCost > 0
+    if (!hasEnoughSol) {
+      notify({
+        type: 'error',
+        message: `Your wallet don't have enough SOL to vote. You need at least ${
+          totalVoteCost / LAMPORTS_PER_SOL
+        } SOL to vote`,
+      })
+      return
+    }
     await sendTransactionsV2({
       connection,
       wallet,
@@ -138,4 +173,6 @@ export async function castVote(
 
     await sendTransaction({ transaction, wallet, connection, signers })
   }
+  const solAfter = await connection.getBalance(wallet.publicKey!)
+  console.log({ solBefore, solAfter })
 }

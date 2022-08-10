@@ -8,6 +8,7 @@ import {
 import {
   AccountInfo,
   AccountLayout,
+  ASSOCIATED_TOKEN_PROGRAM_ID,
   MintInfo,
   MintLayout,
   Token,
@@ -472,18 +473,15 @@ const getDevnetNfts = async (
           address: metadata.pubkey.toBase58(),
           tokenAccountAddress: tokenAccount.publicKey.toBase58(),
           getAssociatedTokenAccount: async () => {
-            const accounts = await getOwnedTokenAccounts(connection, ownerPk)
+            const ata = await Token.getAssociatedTokenAddress(
+              ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+              TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+              new PublicKey(nft.mint), // mint
+              ownerPk, // owner
+              true
+            )
 
-            for (const account of accounts) {
-              if (
-                account.account.mint.toBase58() === nft.mint &&
-                account.account.amount.cmpn(0) === 1
-              ) {
-                return account.publicKey.toBase58()
-              }
-            }
-
-            throw new Error('Could not find associated token account')
+            return ata.toBase58()
           },
         })
       }
@@ -496,6 +494,7 @@ const getDevnetNfts = async (
 
 const getMainnetNfts = async (
   ownerPk: PublicKey,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   connection: Connection
 ): Promise<NFTWithMeta[]> => {
   try {
@@ -504,15 +503,24 @@ const getMainnetNfts = async (
       return {
         ...nft,
         getAssociatedTokenAccount: async () => {
-          const accounts = await getOwnedTokenAccounts(connection, ownerPk)
+          //   const accounts = await getOwnedTokenAccounts(connection, ownerPk)
 
-          for (const account of accounts) {
-            if (account.account.mint.toBase58() === nft.mintAddress) {
-              return account.publicKey.toBase58()
-            }
-          }
+          //   for (const account of accounts) {
+          //     if (account.account.mint.toBase58() === nft.mintAddress) {
+          //       return account.publicKey.toBase58()
+          //     }
+          //   }
 
-          throw new Error('Could not find associated token account')
+          //   throw new Error('Could not find associated token account')
+          const ata = await Token.getAssociatedTokenAddress(
+            ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+            TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+            new PublicKey(nft.mint), // mint
+            ownerPk, // owner
+            true
+          )
+
+          return ata.toBase58()
         },
       }
     })
