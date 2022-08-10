@@ -135,8 +135,7 @@ const New = () => {
   const { handleCreateProposal } = useCreateProposal()
   const { fmtUrlWithCluster } = useQueryContext()
   const { symbol, realm, realmDisplayName, canChooseWhoVote } = useRealm()
-
-  const { getAvailableInstructions } = useGovernanceAssets()
+  const { getAvailableInstructions, assetAccounts } = useGovernanceAssets()
   const availableInstructions = getAvailableInstructions()
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const [voteByCouncil, setVoteByCouncil] = useState(false)
@@ -151,6 +150,7 @@ const New = () => {
   ] = useState<ProgramAccount<Governance> | null>(null)
   const [isLoadingSignedProposal, setIsLoadingSignedProposal] = useState(false)
   const [isLoadingDraft, setIsLoadingDraft] = useState(false)
+
   const isLoading = isLoadingSignedProposal || isLoadingDraft
   //   const customInstructionFilterForSelectedGovernance = (
   //     instructionType: Instructions
@@ -343,6 +343,23 @@ const New = () => {
     setGovernance(governedAccount)
   }, [instructionsData])
 
+  useEffect(() => {
+    if (
+      typeof router.query['i'] === 'string' &&
+      availableInstructions.length &&
+      instructionsData[0]?.type === undefined
+    ) {
+      const instructionType = parseInt(router.query['i'], 10) as Instructions
+      const instruction = availableInstructions.find(
+        (i) => i.id === instructionType
+      )
+
+      if (instruction) {
+        setInstructionType({ value: instruction, idx: 0 })
+      }
+    }
+  }, [router.query, availableInstructions, instructionsData])
+
   const getCurrentInstruction = ({ typeId, idx }) => {
     switch (typeId) {
       case Instructions.Transfer:
@@ -385,7 +402,19 @@ const New = () => {
           <CreateAssociatedTokenAccount index={idx} governance={governance} />
         )
       case Instructions.Mint:
-        return <Mint index={idx} governance={governance}></Mint>
+        return (
+          <Mint
+            index={idx}
+            governance={governance}
+            initialMintAccount={
+              typeof router.query['m'] === 'string' && assetAccounts.length
+                ? assetAccounts.find(
+                    (acc) => acc.pubkey.toBase58() === router.query['m']
+                  )
+                : undefined
+            }
+          />
+        )
       case Instructions.SagaPreOrder:
         return <SagaPreOrder index={idx} governance={governance}></SagaPreOrder>
       case Instructions.Base64:
