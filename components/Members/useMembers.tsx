@@ -54,11 +54,8 @@ export default function useMembers() {
       const ATAS: PublicKey[] = []
       //we filter out people who never voted and has tokens inside realm
       const communityTokenRecordsWallets = tokenRecordArray
-        .filter(
-          (x) =>
-            x.community?.account.totalVotesCount &&
-            x.community?.account.totalVotesCount > 0 &&
-            x.community.account.governingTokenDepositAmount.isZero()
+        .filter((x) =>
+          x.community?.account.governingTokenDepositAmount.isZero()
         )
         .map((x) => x.walletAddress)
       for (const walletAddress of communityTokenRecordsWallets) {
@@ -201,11 +198,6 @@ export default function useMembers() {
               ),
           }
         })
-        .filter((x) =>
-          x.hasCouncilTokenOutsideRealm || x.councilVotes.toNumber() > 0
-            ? true
-            : x.votesCasted > 0
-        )
         .sort((a, b) => {
           return a.votesCasted - b.votesCasted
         })
