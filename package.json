@@ -39,7 +39,7 @@
     "@headlessui/react": "^1.6.6",
     "@heroicons/react": "^1.0.1",
     "@hookform/resolvers": "^2.8.10",
-    "@marinade.finance/marinade-ts-sdk": "^2.0.9",
+    "@marinade.finance/marinade-ts-sdk": "^3.1.1",
     "@metaplex-foundation/js": "^0.12.0",
     "@metaplex-foundation/mpl-token-metadata": "~2.0",
     "@mithraic-labs/serum-remote": "^0.0.1-rc.16",

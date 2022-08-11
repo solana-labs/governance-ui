@@ -2740,14 +2740,15 @@
   resolved "https://registry.npmjs.org/@ledgerhq/logs/-/logs-6.10.0.tgz"
   integrity sha512-lLseUPEhSFUXYTKj6q7s2O3s2vW2ebgA11vMAlKodXGf5AFw4zUoEbTz9CoFOC9jS6xY4Qr8BmRnxP/odT4Uuw==
 
-"@marinade.finance/marinade-ts-sdk@^2.0.9":
-  version "2.0.9"
-  resolved "https://registry.npmjs.org/@marinade.finance/marinade-ts-sdk/-/marinade-ts-sdk-2.0.9.tgz"
-  integrity sha512-teXINCXLTfspXzwNKDtfluZ/wvKBQmcQH2j7SNcFAbJzK6NYo3RdYALu4IHIXMwLs9hEs7XZU8AsKKh+HSLPLA==
+"@marinade.finance/marinade-ts-sdk@^3.1.1":
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/@marinade.finance/marinade-ts-sdk/-/marinade-ts-sdk-3.1.1.tgz#787de52ad85510677ce89ff2cf5f69946ea191a2"
+  integrity sha512-gQjY/YOPzrRurRdXCZJmIBM8GLwSIXCdbjXfH4SJ7SG32B/M6+X9+j2PKxJhUYUKfiOKv+KvQbHQBYSBdq0l/g==
   dependencies:
     "@project-serum/anchor" "^0.18.2"
     "@solana/spl-token" "^0.1.8"
     borsh "^0.6.0"
+    bs58 "^5.0.0"
 
 "@metaplex-foundation/beet-solana@^0.1.1":
   version "0.1.1"
@@ -3602,31 +3603,10 @@
     snake-case "^3.0.4"
     toml "^3.0.0"
 
-"@project-serum/anchor@^0.25.0":
+"@project-serum/anchor@^0.25.0", "@project-serum/anchor@^0.25.0-beta.1":
   version "0.25.0"
   resolved "https://registry.yarnpkg.com/@project-serum/anchor/-/anchor-0.25.0.tgz#88ee4843336005cf5a64c80636ce626f0996f503"
   integrity sha512-E6A5Y/ijqpfMJ5psJvbw0kVTzLZFUcOFgs6eSM2M2iWE1lVRF18T6hWZVNl6zqZsoz98jgnNHtVGJMs+ds9A7A==
-  dependencies:
-    "@project-serum/borsh" "^0.2.5"
-    "@solana/web3.js" "^1.36.0"
-    base64-js "^1.5.1"
-    bn.js "^5.1.2"
-    bs58 "^4.0.1"
-    buffer-layout "^1.2.2"
-    camelcase "^5.3.1"
-    cross-fetch "^3.1.5"
-    crypto-hash "^1.3.0"
-    eventemitter3 "^4.0.7"
-    js-sha256 "^0.9.0"
-    pako "^2.0.3"
-    snake-case "^3.0.4"
-    superstruct "^0.15.4"
-    toml "^3.0.0"
-
-"@project-serum/anchor@^0.25.0-beta.1":
-  version "0.25.0-beta.1"
-  resolved "https://registry.yarnpkg.com/@project-serum/anchor/-/anchor-0.25.0-beta.1.tgz#7b113fb6604483d6740c8da9c6d86e9a5d5f6cf7"
-  integrity sha512-edesFlclgQzIluD2mC0xrGPnABBllKvbGd6MOtNZMCauUnx1Xbu073um8O6mrCeuZrz4PG9AhwAp1y5cOl3R4A==
   dependencies:
     "@project-serum/borsh" "^0.2.5"
     "@solana/web3.js" "^1.36.0"
