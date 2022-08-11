@@ -11,9 +11,9 @@ import {
 //lamports costs hardcoded for now.
 //TODO figure out better cost handling
 const castVoteIxAndUpdateVoterWeightIxCost = 1515320
-const oneNftCost = 1670400
+const oneAvgNftCost = 1670400
 const commentCostIx = 1673440
-const commentCharacterCost = 6960
+const commentAvgCharacterCost = 6960
 const singleTransactionCosts = 5000
 
 export const calcCostOfNftVote = async (
@@ -49,9 +49,9 @@ export const calcCostOfNftVote = async (
   }
 
   let baseCost = castVoteIxAndUpdateVoterWeightIxCost
-  const nftVotesCosts = oneNftCost * nftToVoteCount
+  const nftVotesCosts = oneAvgNftCost * nftToVoteCount
   if (comment) {
-    baseCost += commentCostIx + comment.value.length * commentCharacterCost
+    baseCost += commentCostIx + comment.value.length * commentAvgCharacterCost
   }
   const pureTransactionsCosts = numberOfTransactions * singleTransactionCosts
   const totalVoteCost = nftVotesCosts + baseCost + pureTransactionsCosts
