@@ -77,7 +77,7 @@
     "classnames": "^2.3.1",
     "d3": "^7.4.4",
     "dayjs": "^1.11.1",
-    "fp-ts": "^2.12.1",
+    "fp-ts": "^2.12.2",
     "goblingold-sdk": "^1.2.35",
     "immer": "^9.0.12",
     "libphonenumber-js": "^1.10.6",
