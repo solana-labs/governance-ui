@@ -57,7 +57,7 @@ export default function MintListItem(props: Props) {
       selected={props.selected}
       thumbnail={
         <div className="h-6 relative w-6">
-          {realmInfo?.ogImage ? (
+          {realmInfo?.ogImage && !!props.tokenType ? (
             <img className="h-6 w-6" src={realmInfo.ogImage} />
           ) : (
             <TokenIcon className="h-6 w-6 fill-fgd-1" />

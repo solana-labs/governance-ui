@@ -49,7 +49,7 @@ export default function Header(props: Props) {
       ? 'Community Token Mint'
       : props.mint.tokenType === 'council'
       ? 'Council Token Mint'
-      : 'Token Mint'
+      : ''
 
   let addNewMemberTooltip: string | undefined
 
@@ -99,7 +99,7 @@ export default function Header(props: Props) {
         <div>
           <div className="grid items-center grid-cols-[40px_1fr] gap-x-4">
             <div className="h-10 relative w-10">
-              {realmInfo?.ogImage ? (
+              {realmInfo?.ogImage && !!props.mint.tokenType ? (
                 <img className="h-10 w-10" src={realmInfo.ogImage} />
               ) : (
                 <TokenIcon className="h-10 w-10 fill-fgd-1" />
@@ -111,7 +111,7 @@ export default function Header(props: Props) {
             <div className="overflow-hidden">
               <div className="text-white/50 text-sm">{subheading}</div>
               <div className="text-fgd-1 font-bold text-2xl whitespace-nowrap text-ellipsis overflow-hidden">
-                {realmInfo?.displayName || props.mint.name}
+                {props.mint.tokenType ? realmInfo?.displayName : 'Token Mint'}
               </div>
             </div>
           </div>
