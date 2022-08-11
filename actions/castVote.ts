@@ -30,6 +30,7 @@ import {
 import { sendTransaction } from '@utils/send'
 import { NftVoterClient } from '@solana/governance-program-library'
 import { notify } from '@utils/notifications'
+import { calcCostOfNftVote } from '@tools/nftVoteCalc'
 
 export async function castVote(
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -103,18 +104,6 @@ export async function castVote(
   const instructionsCountThatMustHaveTheirOwnChunk = message ? 4 : 2
   const solBefore = await connection.getBalance(wallet.publicKey!)
   if (shouldChunk) {
-    const castVoteAndUpdateVoterWeightCost = 1515320
-    const oneNftCost = 1670400
-    const commentCost = 1673440
-    const commentCharacterCost = 6960
-    const singleTransactionCosts = 5000
-
-    let baseCost = castVoteAndUpdateVoterWeightCost
-    const nftVotesCosts = oneNftCost * votingPlugin.votingNfts.length
-    if (message) {
-      baseCost += commentCost + message.value.length * commentCharacterCost
-    }
-
     const instructionsWithTheirOwnChunk = instructions.slice(
       -instructionsCountThatMustHaveTheirOwnChunk
     )
@@ -135,6 +124,7 @@ export async function castVote(
     const singersMap = message
       ? [...signerChunks.slice(0, signerChunks.length - 1), signers]
       : signerChunks
+
     const instructionsChunks = [
       ...nftsAccountsChunks.map((x) =>
         transactionInstructionsToTypedInstructionsSets(x, SequenceType.Parallel)
@@ -146,11 +136,15 @@ export async function castVote(
         )
       ),
     ]
-    const pureTransactionsCosts =
-      instructionsChunks.length * singleTransactionCosts
-    const totalVoteCost = nftVotesCosts + baseCost + pureTransactionsCosts
+    //TODO use only nfts that didn't voted
+    const totalVoteCost = calcCostOfNftVote(
+      votingPlugin.votingNfts.length,
+      message,
+      instructionsChunks.length
+    )
     const currentWalletSol = await connection.getBalance(wallet.publicKey!)
     const hasEnoughSol = currentWalletSol - totalVoteCost > 0
+
     if (!hasEnoughSol) {
       notify({
         type: 'error',
@@ -160,6 +154,7 @@ export async function castVote(
       })
       return
     }
+
     await sendTransactionsV2({
       connection,
       wallet,
