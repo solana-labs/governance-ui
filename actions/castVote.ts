@@ -30,7 +30,7 @@ import {
 import { sendTransaction } from '@utils/send'
 import { NftVoterClient } from '@solana/governance-program-library'
 import { notify } from '@utils/notifications'
-import { calcCostOfNftVote } from '@tools/nftVoteCalc'
+import { calcCostOfNftVote, checkHasEnoughSolToVote } from '@tools/nftVoteCalc'
 
 export async function castVote(
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -142,16 +142,12 @@ export async function castVote(
       message,
       instructionsChunks.length
     )
-    const currentWalletSol = await connection.getBalance(wallet.publicKey!)
-    const hasEnoughSol = currentWalletSol - totalVoteCost > 0
-
+    const hasEnoughSol = checkHasEnoughSolToVote(
+      totalVoteCost,
+      wallet.publicKey!,
+      connection
+    )
     if (!hasEnoughSol) {
-      notify({
-        type: 'error',
-        message: `Your wallet don't have enough SOL to vote. You need at least ${
-          totalVoteCost / LAMPORTS_PER_SOL
-        } SOL to vote`,
-      })
       return
     }
 
