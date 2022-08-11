@@ -1,9 +1,4 @@
-import {
-  Keypair,
-  LAMPORTS_PER_SOL,
-  Transaction,
-  TransactionInstruction,
-} from '@solana/web3.js'
+import { Keypair, Transaction, TransactionInstruction } from '@solana/web3.js'
 import {
   ChatMessageBody,
   getGovernanceProgramVersion,
@@ -29,7 +24,6 @@ import {
 } from '@utils/sendTransactions'
 import { sendTransaction } from '@utils/send'
 import { NftVoterClient } from '@solana/governance-program-library'
-import { notify } from '@utils/notifications'
 import { calcCostOfNftVote, checkHasEnoughSolToVote } from '@tools/nftVoteCalc'
 
 export async function castVote(
@@ -137,12 +131,13 @@ export async function castVote(
       ),
     ]
     //TODO use only nfts that didn't voted
-    const totalVoteCost = calcCostOfNftVote(
-      votingPlugin.votingNfts.length,
+    const totalVoteCost = await calcCostOfNftVote(
       message,
-      instructionsChunks.length
+      instructionsChunks.length,
+      proposal.pubkey,
+      votingPlugin
     )
-    const hasEnoughSol = checkHasEnoughSolToVote(
+    const hasEnoughSol = await checkHasEnoughSolToVote(
       totalVoteCost,
       wallet.publicKey!,
       connection
