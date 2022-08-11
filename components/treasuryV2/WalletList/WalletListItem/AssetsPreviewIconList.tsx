@@ -122,7 +122,7 @@ export default function AssetsPreviewIconList(props: Props) {
         >
           {previewList.map((item, i) =>
             React.cloneElement(item, {
-              className: cx(item.props.className, 'w-6', 'h-6'),
+              className: cx(item.props.className, 'w-4', 'h-4'),
               key: i,
             })
           )}
