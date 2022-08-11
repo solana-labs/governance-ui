@@ -18,8 +18,19 @@ interface Props {
 }
 
 export default function TokenList(props: Props) {
+  const tokens = props.tokens.sort((a, b) => {
+    const aTotal = a.count.multipliedBy(a.value)
+    const bTotal = b.count.multipliedBy(b.value)
+
+    if (aTotal.eq(bTotal)) {
+      return b.count.comparedTo(a.count)
+    }
+
+    return bTotal.comparedTo(aTotal)
+  })
+
   const expandCutoff = Math.max(
-    props.tokens.findIndex((token) =>
+    tokens.findIndex((token) =>
       token.value.multipliedBy(token.count).isEqualTo(0)
     ),
     3
@@ -36,7 +47,7 @@ export default function TokenList(props: Props) {
       title="Tokens"
       onToggleExpand={props.onToggleExpand}
     >
-      {props.tokens.map((token, i) => (
+      {tokens.map((token, i) => (
         <TokenListItem
           amount={token.count}
           key={i}

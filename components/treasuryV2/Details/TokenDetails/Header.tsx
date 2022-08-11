@@ -79,10 +79,9 @@ export default function Header(props: Props) {
           ) : (
             React.cloneElement(props.asset.icon, {
               className: cx(
-                props.asset.icon.props.classname,
+                props.asset.icon.props.className,
                 'h-10',
                 'rounded-full',
-                'stroke-fgd-1',
                 'w-10'
               ),
             })

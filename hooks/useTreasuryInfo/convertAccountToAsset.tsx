@@ -61,7 +61,7 @@ export const convertAccountToAsset = (
         icon: info.info?.logoURI ? (
           <img src={info.info.logoURI} className="rounded-full" />
         ) : (
-          <TokenIcon />
+          <TokenIcon className="fill-fgd-1" />
         ),
         price: account.extensions.mint
           ? new BigNumber(
@@ -83,7 +83,7 @@ export const convertAccountToAsset = (
         icon: info.info?.logoURI ? (
           <img src={info.info.logoURI} className="rounded-full" />
         ) : (
-          <TokenIcon />
+          <TokenIcon className="fill-fgd-1" />
         ),
         logo: info.info?.logoURI,
         mintAddress: account.extensions.token?.account.mint.toBase58(),

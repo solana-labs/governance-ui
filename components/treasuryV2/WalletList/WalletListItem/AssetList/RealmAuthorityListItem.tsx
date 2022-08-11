@@ -29,7 +29,7 @@ export default function RealmAuthorityListItem(props: Props) {
               props.thumbnail.props.className,
               'h-6',
               'rounded-sm',
-              'fill-fgd-1',
+              'stroke-fgd-1',
               'w-6'
             ),
           })}

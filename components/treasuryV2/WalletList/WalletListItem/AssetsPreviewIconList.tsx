@@ -63,24 +63,34 @@ export default function AssetsPreviewIconList(props: Props) {
 
   // Display the tokens next
   if (tokens.length) {
+    const list = tokens.sort((a, b) => {
+      const aTotal = a.count.multipliedBy(a.value)
+      const bTotal = b.count.multipliedBy(b.value)
+
+      if (aTotal.eq(bTotal)) {
+        return b.count.comparedTo(a.count)
+      }
+
+      return bTotal.comparedTo(aTotal)
+    })
     // Show atleast one token
-    previewList.push(tokens[0].icon)
+    previewList.push(list[0].icon)
     remainingCount--
-    summary.push(tokens[0].symbol)
+    summary.push(list[0].symbol)
 
     // If the wallet does not have any Sol, we can show a second token
-    if (!sol.length && tokens[1]) {
-      previewList.push(tokens[1].icon)
+    if (!sol.length && list[1]) {
+      previewList.push(list[1].icon)
       remainingCount--
-      summary.push(tokens[1].symbol)
+      summary.push(list[1].symbol)
     }
 
     // If the wallet does not have any Nfts or any other assets, we can show
     // a third token
-    if (!nfts.length && otherCount <= 0 && tokens[2]) {
-      previewList.push(tokens[2].icon)
+    if (!nfts.length && otherCount <= 0 && list[2]) {
+      previewList.push(list[2].icon)
       remainingCount--
-      summary.push(tokens[2].symbol)
+      summary.push(list[2].symbol)
     }
   }
 
