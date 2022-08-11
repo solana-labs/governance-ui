@@ -69,9 +69,7 @@ const NotificationSolutions: NotificationSolutionType[] = [
   },
   {
     channels: ['Wallet', 'Email', 'Text', 'Telegram'],
-    description: `Dialect is the first protocol for smart messaging -
-    dynamic, composable dapp notifications and
-    wallet-to-wallet chat`,
+    description: `Get notifications when new proposals are created & when proposals are completed or canceled. By wallet, email, Telegram or text message.`,
     modalState: ModalStates.Dialect,
     name: 'Dialect',
   },
@@ -179,6 +177,9 @@ export default function NotificationsSwitch() {
 
         {modalState === ModalStates.Dialect && (
           <DialectNotificationsModal
+            onModalClose={() => {
+              setOpenModal(false)
+            }}
             onBackClick={() =>
               setNotificationStore((state) => {
                 state.modalState = ModalStates.Selection

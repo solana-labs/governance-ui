@@ -4,10 +4,9 @@ import {
   defaultVariables,
   DialectContextProvider,
   DialectThemeProvider,
-  DialectUiManagementProvider,
   DialectWalletAdapter,
   IncomingThemeVariables,
-  NotificationsModal,
+  Notifications,
 } from '@dialectlabs/react-ui'
 import * as anchor from '@project-serum/anchor'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
@@ -29,7 +28,7 @@ const themeVariables: IncomingThemeVariables = {
       bg: 'bg-bkg-1',
       toggleBackgroundActive: 'bg-primary-light',
     },
-    addormentButton: `${defaultVariables.dark.addormentButton} text-bkg-2 bg-primary-light`,
+    addormentButton: `${defaultVariables.dark.addormentButton} text-bkg-2 bg-primary-light hover:bg-fgd-1`,
     disabledButton: `${defaultVariables.dark.disabledButton} border-primary-light font-bold rounded-full border-fgd-3 text-fgd-3 cursor-not-allowed`,
     modal: `${defaultVariables.dark.modal} bg-bkg-1 sm:border sm:border-fgd-4 shadow-md sm:rounded-md`,
     modalWrapper: `${defaultVariables.dark.modalWrapper} sm:top-14 rounded-md`,
@@ -76,6 +75,7 @@ const walletToDialectWallet = (
 
 interface DialectNotificationsModalProps {
   onBackClick?: () => void
+  onModalClose: () => void
 }
 
 export default function DialectNotificationsModal(
@@ -114,18 +114,16 @@ export default function DialectNotificationsModal(
         theme={theme.toLowerCase()}
         variables={themeVariables}
       >
-        <DialectUiManagementProvider>
-          <NotificationsModal
-            dialectId="dialect-notifications"
-            notifications={[
-              { name: 'New proposals', detail: 'Event' },
-              { name: 'Proposal state updates', detail: 'Event' },
-            ]}
-            pollingInterval={15000}
-            onBackClick={props.onBackClick}
-            channels={['web3', 'telegram', 'sms', 'email']}
-          />
-        </DialectUiManagementProvider>
+        <Notifications
+          notifications={[
+            { name: 'New proposals', detail: 'On creation' },
+            { name: 'Finished proposals', detail: 'On execution' },
+          ]}
+          pollingInterval={15000}
+          onModalClose={props.onModalClose}
+          onBackClick={props.onBackClick}
+          channels={['web3', 'telegram', 'sms', 'email']}
+        />
       </DialectThemeProvider>
     </DialectContextProvider>
   )
