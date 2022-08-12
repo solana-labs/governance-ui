@@ -3,6 +3,7 @@ import { flagInstructionError } from 'actions/flagInstructionError';
 import {
   InstructionExecutionStatus,
   Proposal,
+  ProposalState,
   ProposalTransaction,
   TokenOwnerRecord,
 } from '@solana/spl-governance';
@@ -34,6 +35,7 @@ export function FlagInstructionErrorButton({
   const connection = useWalletStore((s) => s.connection);
 
   if (
+    proposal.account.state === ProposalState.ExecutingWithErrors ||
     playState !== PlayState.Error ||
     proposalInstruction.account.executionStatus !==
       InstructionExecutionStatus.Error ||

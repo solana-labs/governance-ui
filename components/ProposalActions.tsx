@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useHasVoteTimeExpired } from '../hooks/useHasVoteTimeExpired';
 import useRealm from '../hooks/useRealm';
-import { getSignatoryRecordAddress } from '@solana/spl-governance';
+import {
+  getSignatoryRecordAddress,
+  InstructionExecutionStatus,
+} from '@solana/spl-governance';
 import useWalletStore, {
   EnhancedProposalState,
 } from '../stores/useWalletStore';
@@ -15,11 +18,14 @@ import { Proposal } from '@solana/spl-governance';
 import { ProgramAccount } from '@solana/spl-governance';
 import { cancelProposal } from 'actions/cancelProposal';
 import { getProgramVersionForRealm } from '@models/registry/api';
+import { flagInstructionError } from 'actions/flagInstructionError';
+import useProposal from '@hooks/useProposal';
 
 const ProposalActionsPanel = () => {
   const { governance, proposal, proposalOwner } = useWalletStore(
     (s) => s.selectedProposal,
   );
+  const { instructions } = useProposal();
   const { realmInfo } = useRealm();
   const wallet = useWalletStore((s) => s.current);
   const connected = useWalletStore((s) => s.connected);
@@ -69,6 +75,20 @@ const ProposalActionsPanel = () => {
       wallet.publicKey,
     );
 
+  const canSetFlagToExecutionError =
+    proposal &&
+    governance &&
+    proposalOwner &&
+    wallet?.publicKey &&
+    proposalOwner?.account.governingTokenOwner.equals(wallet.publicKey) &&
+    (proposal?.account.state === EnhancedProposalState.Succeeded ||
+      proposal?.account.state === EnhancedProposalState.Executing ||
+      proposal?.account.state === EnhancedProposalState.ExecutingWithErrors) &&
+    Object.values(instructions).some(
+      (instruction) =>
+        instruction.account.executionStatus === InstructionExecutionStatus.None,
+    );
+
   const signOffTooltipContent = !connected
     ? 'Connect your wallet to sign off this proposal'
     : !signatoryRecord
@@ -102,6 +122,11 @@ const ProposalActionsPanel = () => {
       !hasVoteTimeExpired
     ? 'Proposal is being voting right now, you need to wait the vote to finish to be able to finalize it.'
     : '';
+
+  const setFlagToExecutionErrorTooltipContent = !connected
+    ? 'Connect your wallet to set the error flag for this proposal.'
+    : 'Set error execution flag for this proposal.';
+
   const handleFinalizeVote = async () => {
     try {
       if (proposal && realmInfo && governance) {
@@ -114,6 +139,51 @@ const ProposalActionsPanel = () => {
         );
 
         await finalizeVote(rpcContext, governance?.account.realm, proposal);
+        await fetchRealm(realmInfo!.programId, realmInfo!.realmId);
+      }
+    } catch (error) {
+      notify({
+        type: 'error',
+        message: `Error: Could not finalize vote.`,
+        description: `${error}`,
+      });
+
+      console.error('error finalizing vote', error);
+    }
+  };
+
+  const handleSetExecutionErrorFlag = async () => {
+    try {
+      if (proposal && realmInfo && governance) {
+        const rpcContext = new RpcContext(
+          proposal.owner,
+          getProgramVersionForRealm(realmInfo),
+          wallet!,
+          connection.current,
+          connection.endpoint,
+        );
+
+        if (Object.keys(instructions).length === 0) {
+          notify({
+            type: 'info',
+            message: 'Cannot set the error flag',
+            description: 'The proposal does not contain any instruction',
+          });
+
+          return;
+        }
+
+        const filteredInstructions = Object.values(instructions).filter(
+          (instruction) =>
+            instruction.account.executionStatus ===
+            InstructionExecutionStatus.None,
+        );
+
+        // Set flag error for one instruction after another until there are no more to set flag to
+        for (const instruction of filteredInstructions) {
+          await flagInstructionError(rpcContext, proposal, instruction.pubkey);
+        }
+
         await fetchRealm(realmInfo!.programId, realmInfo!.realmId);
       }
     } catch (error) {
@@ -157,6 +227,7 @@ const ProposalActionsPanel = () => {
       console.error('error sign off', error);
     }
   };
+
   const handleCancelProposal = async (
     proposal: ProgramAccount<Proposal> | undefined,
   ) => {
@@ -184,51 +255,63 @@ const ProposalActionsPanel = () => {
       console.error('error cancelling proposal', error);
     }
   };
+
+  if (
+    !canCancelProposal &&
+    !canSignOff &&
+    !canFinalizeVote &&
+    !canSetFlagToExecutionError
+  ) {
+    return null;
+  }
+
   return (
-    <>
-      {EnhancedProposalState.Cancelled === proposal?.account.state ||
-      EnhancedProposalState.Succeeded === proposal?.account.state ||
-      EnhancedProposalState.Outdated === proposal?.account.state ||
-      EnhancedProposalState.Defeated === proposal?.account.state ||
-      (!canCancelProposal && !canSignOff && !canFinalizeVote) ? null : (
-        <div>
-          <div className="bg-bkg-2 rounded-lg p-6 space-y-6 flex justify-center items-center text-center flex-col w-full mt-4">
-            {canSignOff && (
-              <Button
-                tooltipMessage={signOffTooltipContent}
-                className="w-1/2"
-                onClick={handleSignOffProposal}
-                disabled={!connected || !canSignOff}
-              >
-                Sign Off
-              </Button>
-            )}
+    <div>
+      <div className="bg-bkg-2 rounded-lg p-6 space-y-6 flex justify-center items-center text-center flex-col w-full mt-4">
+        {canSignOff && (
+          <Button
+            tooltipMessage={signOffTooltipContent}
+            className="w-1/2"
+            onClick={handleSignOffProposal}
+            disabled={!connected || !canSignOff}
+          >
+            Sign Off
+          </Button>
+        )}
 
-            {canCancelProposal && (
-              <SecondaryButton
-                tooltipMessage={cancelTooltipContent}
-                className="w-1/2"
-                onClick={() => handleCancelProposal(proposal)}
-                disabled={!connected}
-              >
-                Cancel
-              </SecondaryButton>
-            )}
+        {canCancelProposal && (
+          <SecondaryButton
+            tooltipMessage={cancelTooltipContent}
+            className="w-1/2"
+            onClick={() => handleCancelProposal(proposal)}
+            disabled={!connected}
+          >
+            Cancel
+          </SecondaryButton>
+        )}
 
-            {canFinalizeVote && (
-              <Button
-                tooltipMessage={finalizeVoteTooltipContent}
-                className="w-1/2"
-                onClick={handleFinalizeVote}
-                disabled={!connected || !canFinalizeVote}
-              >
-                Finalize
-              </Button>
-            )}
-          </div>
-        </div>
-      )}
-    </>
+        {canFinalizeVote && (
+          <Button
+            tooltipMessage={finalizeVoteTooltipContent}
+            className="w-1/2"
+            onClick={handleFinalizeVote}
+            disabled={!connected || !canFinalizeVote}
+          >
+            Finalize
+          </Button>
+        )}
+
+        {canSetFlagToExecutionError && (
+          <Button
+            tooltipMessage={setFlagToExecutionErrorTooltipContent}
+            onClick={handleSetExecutionErrorFlag}
+            disabled={!connected}
+          >
+            Set Execution Error Flag
+          </Button>
+        )}
+      </div>
+    </div>
   );
 };
 

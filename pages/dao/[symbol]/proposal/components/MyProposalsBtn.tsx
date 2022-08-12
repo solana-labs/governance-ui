@@ -74,7 +74,6 @@ const MyProposalsBn = () => {
   const unReleased = myProposals.filter(
     (x) =>
       (x.account.state === EnhancedProposalState.Succeeded ||
-        x.account.state === EnhancedProposalState.Outdated ||
         x.account.state === EnhancedProposalState.Completed) &&
       x.account.isVoteFinalized() &&
       !ownVoteRecordsByProposal[x.pubkey.toBase58()]?.account.isRelinquished,

@@ -19,7 +19,6 @@ const initialFilterSettings: Filters = {
   [EnhancedProposalState.Cancelled]: false,
   [EnhancedProposalState.Defeated]: true,
   [EnhancedProposalState.ExecutingWithErrors]: true,
-  [EnhancedProposalState.Outdated]: false,
 };
 
 const StyledAlertCount = styled.span`
@@ -156,15 +155,6 @@ const ProposalFilter = ({ filters, setFilters }) => {
                   checked={filterSettings[EnhancedProposalState.Succeeded]}
                   onChange={(checked) =>
                     handleFilters(EnhancedProposalState.Succeeded, checked)
-                  }
-                />
-              </div>
-              <div className="flex items-center justify-between pb-2">
-                Outdated
-                <Switch
-                  checked={filterSettings[EnhancedProposalState.Outdated]}
-                  onChange={(checked) =>
-                    handleFilters(EnhancedProposalState.Outdated, checked)
                   }
                 />
               </div>

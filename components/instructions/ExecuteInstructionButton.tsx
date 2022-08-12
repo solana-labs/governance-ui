@@ -127,8 +127,7 @@ export function ExecuteInstructionButton({
   if (
     proposal.account.state !== EnhancedProposalState.Executing &&
     proposal.account.state !== EnhancedProposalState.ExecutingWithErrors &&
-    proposal.account.state !== EnhancedProposalState.Succeeded &&
-    proposal.account.state !== EnhancedProposalState.Outdated
+    proposal.account.state !== EnhancedProposalState.Succeeded
   ) {
     return null;
   }

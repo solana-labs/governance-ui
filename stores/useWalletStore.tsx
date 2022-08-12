@@ -48,17 +48,12 @@ import {
 } from '@models/api';
 import { accountsToPubkeyMap } from '@tools/sdk/accounts';
 import { HIDDEN_PROPOSALS } from '@components/instructions/tools';
-import { BN } from '@project-serum/anchor';
 
 export const EnhancedProposalState = {
   ...ProposalState,
-
-  // Special Enhanced Type
-  // Outdated = Suceeded proposal that did not get executed for a long time
-  Outdated: 42 as const,
 } as const;
 
-export type EnhancedProposalState = ProposalState | 42;
+export type EnhancedProposalState = ProposalState;
 
 export declare type EnhancedProposal = Omit<Proposal, 'state'> & {
   state: EnhancedProposalState;
@@ -130,43 +125,6 @@ const INITIAL_PROPOSAL_STATE: WalletStore['selectedProposal'] = {
   chatMessages: {},
   loading: true,
 };
-
-const TEN_DAYS_IN_MS = 3_600 * 24 * 10 * 1_000;
-
-function isProposalOutdated(
-  proposal: ProgramAccount<EnhancedProposal>,
-): boolean {
-  if (proposal.account.state !== EnhancedProposalState.Succeeded) {
-    return false;
-  }
-
-  if (!proposal.account.votingCompletedAt) {
-    return false;
-  }
-
-  if (
-    Date.now() -
-      proposal.account.votingCompletedAt.mul(new BN(1_000)).toNumber() <=
-    TEN_DAYS_IN_MS
-  ) {
-    return false;
-  }
-
-  return true;
-}
-
-// Set Outdated flag for proposals that succeeded more than 10 days ago
-function setOutdatedStateForProposals(
-  proposals: Record<string, ProgramAccount<EnhancedProposal>>,
-) {
-  Object.values(proposals).forEach((proposal) => {
-    if (!isProposalOutdated(proposal)) {
-      return;
-    }
-
-    proposal.account.state = EnhancedProposalState.Outdated;
-  });
-}
 
 const useWalletStore = create<WalletStore>((set, get) => ({
   connected: false,
@@ -364,8 +322,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           .filter((p) => !HIDDEN_PROPOSALS.has(p.pubkey.toBase58())),
       );
 
-      setOutdatedStateForProposals(proposals);
-
       set((s) => {
         s.selectedRealm.proposals = proposals;
         s.selectedRealm.loading = false;
@@ -406,10 +362,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         proposalPubKey,
         Proposal,
       );
-
-      if (isProposalOutdated(proposal)) {
-        proposal.account.state = EnhancedProposalState.Outdated;
-      }
 
       const proposalMint =
         realmMints[proposal.account.governingTokenMint.toBase58()];

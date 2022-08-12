@@ -95,7 +95,6 @@ export function ExecuteAllInstructionButton({
       EnhancedProposalState.Executing,
       EnhancedProposalState.ExecutingWithErrors,
       EnhancedProposalState.Succeeded,
-      EnhancedProposalState.Outdated,
     ].includes(proposal.account.state)
   ) {
     return null;

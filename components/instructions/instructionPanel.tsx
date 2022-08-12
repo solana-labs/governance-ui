@@ -4,7 +4,7 @@ import { Disclosure } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/solid';
 import { useEffect, useRef, useState } from 'react';
 import useWalletStore from 'stores/useWalletStore';
-import { RpcContext } from '@solana/spl-governance';
+import { ProposalState, RpcContext } from '@solana/spl-governance';
 import useRealm from '@hooks/useRealm';
 import { getProgramVersionForRealm } from '@models/registry/api';
 import {
@@ -104,7 +104,9 @@ export function InstructionPanel() {
                 </div>
               ))}
 
-              {proposal && proposalInstructions.length > 1 && (
+              {proposal &&
+              proposalInstructions.length > 1 &&
+              proposal.account.state !== ProposalState.ExecutingWithErrors ? (
                 <div className="flex justify-end">
                   <ExecuteAllInstructionButton
                     proposal={proposal}
@@ -113,7 +115,7 @@ export function InstructionPanel() {
                     setPlaying={setPlaying}
                   />
                 </div>
-              )}
+              ) : null}
             </Disclosure.Panel>
           </>
         )}

@@ -3,6 +3,7 @@ import { ExternalLinkIcon } from '@heroicons/react/outline';
 import {
   AccountMetaData,
   Proposal,
+  ProposalState,
   ProposalTransaction,
 } from '@solana/spl-governance';
 import {
@@ -169,10 +170,12 @@ export default function InstructionCard({
           ></img>
         )}
       </h3>
+
       <InstructionProgram
         endpoint={connection.endpoint}
         programId={proposalInstruction.account.getSingleInstruction().programId}
-      ></InstructionProgram>
+      />
+
       <div className="border-b border-bkg-4 mb-6">
         {proposalInstruction.account
           .getSingleInstruction()
@@ -202,7 +205,7 @@ export default function InstructionCard({
           <img src={nftImgUrl}></img>
         </div>
       ) : (
-        <InstructionData descriptor={descriptor}></InstructionData>
+        <InstructionData descriptor={descriptor} />
       )}
 
       {
@@ -236,7 +239,8 @@ export default function InstructionCard({
           proposalInstruction={proposalInstruction}
         />
 
-        {proposal && (
+        {proposal &&
+        proposal.account.state !== ProposalState.ExecutingWithErrors ? (
           <ExecuteInstructionButton
             disabled={
               isInstructionAboutOrcaWhirlpoolOpenPosition && !additionalSigner
@@ -247,7 +251,7 @@ export default function InstructionCard({
             setPlaying={setPlaying}
             additionalSigner={additionalSigner ?? undefined}
           />
-        )}
+        ) : null}
       </div>
     </div>
   );

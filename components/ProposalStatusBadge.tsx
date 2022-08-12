@@ -13,8 +13,6 @@ function getProposalStateLabel(
   switch (state) {
     case EnhancedProposalState.ExecutingWithErrors:
       return 'Execution Errors';
-    case EnhancedProposalState.Outdated:
-      return 'Outdated';
     case EnhancedProposalState.Voting:
       // If there is no tipping point and voting period ends then proposal stays in Voting state and needs to be manually finalized
       return hasVoteEnded ? 'Finalizing' : 'Voting';
@@ -45,10 +43,6 @@ function getProposalStateStyle(state: EnhancedProposalState) {
     state === EnhancedProposalState.ExecutingWithErrors
   ) {
     return 'border border-red text-red';
-  }
-
-  if (state === EnhancedProposalState.Outdated) {
-    return 'border border-orange text-orange';
   }
 
   return 'border border-fgd-3 text-fgd-3';
