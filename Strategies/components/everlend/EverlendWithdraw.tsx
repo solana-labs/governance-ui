@@ -129,10 +129,11 @@ const EverlendWithdraw = ({
         governedTokenAccount!.governance!.account!.proposalCount,
         false,
         connection,
+        wallet!,
         client
       )
       const url = fmtUrlWithCluster(
-        `/dao/${symbol}/proposal/${proposalAddress}`
+        `/dao/${symbol}/proposal/${proposalAddress[0]}`
       )
       router.push(url)
     } catch (e) {

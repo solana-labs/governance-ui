@@ -257,6 +257,16 @@ export default function useGovernanceAssets() {
       isVisible: canUseAnyInstruction,
     },
     {
+      id: Instructions.EverlendDeposit,
+      name: 'Everlend Deposit Funds',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.EverlendWithdraw,
+      name: 'Everlend Withdraw Funds',
+      isVisible: canUseAnyInstruction,
+    },
+    {
       id: Instructions.None,
       name: 'None',
       isVisible:
