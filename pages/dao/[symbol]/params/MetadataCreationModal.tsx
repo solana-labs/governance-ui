@@ -40,10 +40,12 @@ const MetadataCreationModal = ({
   closeModal,
   isOpen,
   governance,
+  initialMintAccount,
 }: {
   closeModal: () => void
   isOpen: boolean
   governance: ProgramAccount<Governance>
+  initialMintAccount?: AssetAccount | undefined
 }) => {
   const router = useRouter()
   const { realm, canChooseWhoVote, symbol, realmInfo } = useRealm()
@@ -71,7 +73,7 @@ const MetadataCreationModal = ({
   >(undefined)
   const [shouldMakeSolTreasury, setShouldMakeSolTreasury] = useState(false)
   const [form, setForm] = useState<GovernanceConfigForm>({
-    mintAccount: undefined,
+    mintAccount: initialMintAccount,
     name: '',
     symbol: '',
     description: '',
