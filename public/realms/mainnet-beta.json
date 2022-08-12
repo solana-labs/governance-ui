@@ -948,5 +948,15 @@
     "website": "https://epics.dev/",
     "twitter": "@EpicsDAO",
     "ogImage": "/realms/Epics/Epics-logo.svg"
-  }
+  },
+  {
+    "symbol": "OPANZ",
+    "displayName": "OPANZ",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Gp34fkwEyMhyK1Bjhr4iCdf4CdieUULvDqSrKxyRDu5e",
+    "bannerImage": "/realms/OPANZ/OPANZ_Banner.png",
+    "ogImage": "/realms/OPANZ/OPANZ_Logo.png",
+    "website": "https://auturoa.nz/",
+    "twitter": "@OPANZ999",
+  },
 ]
