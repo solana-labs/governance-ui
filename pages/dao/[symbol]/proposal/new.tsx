@@ -132,7 +132,6 @@ function extractGovernanceAccountFromInstructionsData(
 }
 
 const New = () => {
-  console.log(SnsDomainNameTransfer)
   const router = useRouter()
   const { handleCreateProposal } = useCreateProposal()
   const { fmtUrlWithCluster } = useQueryContext()

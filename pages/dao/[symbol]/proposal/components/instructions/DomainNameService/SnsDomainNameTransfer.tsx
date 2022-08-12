@@ -15,9 +15,13 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
+import { domain } from 'process'
+import { LoadingDots } from '@components/Loading'
+import { values } from 'lodash'
 
 interface ISnsDomainNameTransferForm {
   domain: IDomain
+  targetAddress: string | undefined
 }
 
 interface IDomain {
@@ -35,7 +39,6 @@ const SnsDomainNameTransfer = ({
   const wallet = useWalletStore((s) => s.current)
   const shouldBeGoverned = index !== 0 && governance
   const connection = useWalletStore((s) => s.connection.current)
-
   const { realmInfo, realm } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const [domains, setDomains] = useState<IDomain[]>([])
@@ -44,8 +47,11 @@ const SnsDomainNameTransfer = ({
       name: undefined,
       pubkey: null,
     },
+    targetAddress: undefined,
   })
   const [formErrors, setFormErrors] = useState({})
+
+  const [isLoading, setIsLoading] = useState(true)
 
   const getDomains = async (accounts: AssetAccount[]) => {
     const solAccounts = accounts.filter((acc) => acc.isSol)
@@ -94,11 +100,12 @@ const SnsDomainNameTransfer = ({
               console.log(
                 `🏁 Reverse Lookup Time Elapsed: ${Date.now() - startTime}ms`
               )
+              setIsLoading(false)
               return d
             })
             setDomains((d) => [
               ...d,
-              { name: domainStrings[n], pubkey: domainsForAccount[n].pubkey },
+              { name: domainStrings, pubkey: domainsForAccount[n].pubkey },
             ])
           }
         }
@@ -111,46 +118,17 @@ const SnsDomainNameTransfer = ({
     }
   }
 
-  const handleSetForm = ({ propertyName, value }) => {
+  const handleSetForm = ({ value }) => {
     setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
+    setForm((f) => ({ ...f, domain: { name: value, pubkey: f.domain.pubkey } }))
   }
 
   useEffect(() => {
     //
     ;(async () => {
-      await getDomains(assetAccounts)
+      if (domains.length === 0) await getDomains(assetAccounts)
     })()
   }, [realmInfo])
-
-  const inputs: InstructionInput[] = [
-    {
-      label: 'Governance',
-      initialValue: assetAccounts.filter((x) => x.isSol)[0] ?? null,
-      name: 'governedAccount',
-      type: InstructionInputType.GOVERNED_ACCOUNT,
-      shouldBeGoverned: shouldBeGoverned,
-      governance: governance,
-      options: assetAccounts.filter((x) => x.isSol),
-    },
-    {
-      label: 'Domain',
-      initialValue: 0,
-      name: 'size',
-      type: InstructionInputType.SELECT,
-      min: 1,
-      validateMinMax: true,
-    },
-    // {
-    //   label: 'Collection weight',
-    //   initialValue: 1,
-    //   name: 'weight',
-    //   inputType: 'number',
-    //   type: InstructionInputType.INPUT,
-    //   min: 0,
-    //   validateMinMax: true,
-    // },
-  ]
 
   return (
     <>
@@ -162,16 +140,39 @@ const SnsDomainNameTransfer = ({
         error={formErrors['governedTokenAccount']}
         onChange={handleSetForm}
       ></GovernedAccountSelect>
-      {/* <Select
+      <Input
+        label="Transfer to address"
+        value={form.targetAddress}
+        type="text"
+        onChange={(element) =>
+          setForm((f) => ({ ...f, targetAddress: element.target.value }))
+        }
+        error={formErrors['targetAddress']}
+        // onBlur={validateAmountOnBlur}
+      />
+      {isLoading ? (
+        <div className="mt-5">
+          <div>Looking up domains...</div>
+          <LoadingDots />
+        </div>
+      ) : (
+        <Select
+          className=""
           label="Domain"
-          value={form.domain}
+          value={
+            form.domain.name ? form.domain.name + '.sol' : form.domain.name
+          }
           placeholder="Please select..."
-          onChange={(value) => handleSetForm({ value, propertyName: 'domain' })}
+          onChange={(value) => handleSetForm({ value })}
         >
-          {domains.map((domain) => {
-            return <span key={domain.name}>{domain.name}</span>
-          })}
-        </Select> */}
+          {domains.map((domain) => (
+            <Select.Option key={domain.pubkey?.toString()} value={domain.name}>
+              <div className="text-fgd-1 mb-2">{domain.name}.sol</div>
+              <div className="">{domain.pubkey?.toString()}</div>
+            </Select.Option>
+          ))}
+        </Select>
+      )}
     </>
   )
 }
