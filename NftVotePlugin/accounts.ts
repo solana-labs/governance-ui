@@ -1,11 +1,19 @@
 import { NftVoterClient } from '@solana/governance-program-library'
 import { PublicKey } from '@solana/web3.js'
+export interface NftVoteRecord {
+  account: {
+    governingTokenOwner: PublicKey
+    nftMint: PublicKey
+    proposal: PublicKey
+  }
+  publicKey: PublicKey
+}
 
 export const getUsedNftsForProposal = async (
   client: NftVoterClient,
   proposalPk: PublicKey
 ) => {
-  const nftVoteRecordsFiltered = await client.program.account.nftVoteRecord.all(
+  const nftVoteRecordsFiltered = (await client.program.account.nftVoteRecord.all(
     [
       {
         memcmp: {
@@ -14,7 +22,7 @@ export const getUsedNftsForProposal = async (
         },
       },
     ]
-  )
+  )) as NftVoteRecord[]
   return nftVoteRecordsFiltered
 }
 
