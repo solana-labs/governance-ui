@@ -661,7 +661,7 @@ interface StrategyCardProps {
   currentDeposits: number
 }
 
-const StrategyCard = ({
+export const StrategyCard = ({
   onClick,
   strat,
   currentDeposits,

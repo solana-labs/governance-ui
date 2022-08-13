@@ -36,7 +36,7 @@ const Modal = ({
           {isOpen ? (
             <div
               className={`inline-block bg-bkg-2 ${background}
-              rounded-lg text-left px-8 pt-6 pb-8 shadow-lg transform transition-all 
+              rounded-lg text-left px-8 pt-6 pb-8 shadow-lg transform transition-all
               sm:my-8 align-middle ${sizeClassName} w-full`}
             >
               {!hideClose ? (
