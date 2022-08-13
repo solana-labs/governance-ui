@@ -102,6 +102,11 @@ const LenderDeposit = ({
           }
           error={formErrors['sourceAccount']}
           ownedTokenAccountsInfo={ownedTokenAccountsInfo}
+          filterByMint={
+            form.poolName && MapleFinance.pools[form.poolName]
+              ? [MapleFinance.pools[form.poolName].baseMint.mint]
+              : undefined
+          }
         />
       )}
 

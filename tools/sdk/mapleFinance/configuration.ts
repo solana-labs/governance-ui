@@ -12,7 +12,7 @@ export type MapleFinancePrograms = {
   Syrup: SyrupProgram;
 };
 
-export type PoolName = 'USDC';
+export type PoolName = 'Credora_USDC';
 
 export type Pools = {
   [key in PoolName]: {
@@ -34,7 +34,7 @@ export class MapleFinance {
   );
 
   public static readonly pools: Pools = {
-    USDC: {
+    Credora_USDC: {
       pool: new PublicKey('TamdAwg85s9aZ6mwSeAHoczzAV53rFokL5FVKzaF1Tb'),
       globals: new PublicKey('DtnAPKSHwJaYbFdjYibNcjxihVd6pK1agpT86N5tMVPX'),
       poolLocker: new PublicKey('92oAd9cm4rV4K4Xx9HPRMoFn7GwMaKsjNSPe7QVxywcy'),

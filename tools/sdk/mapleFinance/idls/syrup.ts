@@ -601,11 +601,6 @@ export type USyrupIDL = {
           isSigner: false;
         },
         {
-          name: 'baseMint';
-          isMut: false;
-          isSigner: false;
-        },
-        {
           name: 'poolLocker';
           isMut: true;
           isSigner: false;
@@ -2959,11 +2954,6 @@ export const USyrupJSON: USyrupIDL = {
         },
         {
           name: 'globals',
-          isMut: false,
-          isSigner: false,
-        },
-        {
-          name: 'baseMint',
           isMut: false,
           isSigner: false,
         },
