@@ -14,18 +14,20 @@ export type MapleFinancePrograms = {
 
 export type PoolName = 'Credora_USDC';
 
+export type PoolInfo = {
+  // lender: PublicKey;
+  pool: PublicKey;
+  globals: PublicKey;
+  poolLocker: PublicKey;
+  sharesMint: PublicKey;
+  // lockedShares: PublicKey;
+  // lenderShares: PublicKey;
+  // lenderLocker: PublicKey;
+  baseMint: SplTokenInformation;
+};
+
 export type Pools = {
-  [key in PoolName]: {
-    // lender: PublicKey;
-    pool: PublicKey;
-    globals: PublicKey;
-    poolLocker: PublicKey;
-    sharesMint: PublicKey;
-    // lockedShares: PublicKey;
-    // lenderShares: PublicKey;
-    // lenderLocker: PublicKey;
-    baseMint: SplTokenInformation;
-  };
+  [key in PoolName]: PoolInfo;
 };
 
 export class MapleFinance {
@@ -42,6 +44,14 @@ export class MapleFinance {
       baseMint: SPL_TOKENS.USDC,
     },
   };
+
+  public static getPoolInfoByPoolMint(
+    poolMint: PublicKey,
+  ): PoolInfo | undefined {
+    return Object.values(MapleFinance.pools).find((poolInfo) =>
+      poolInfo.pool.equals(poolMint),
+    );
+  }
 
   public loadPrograms(provider: SolanaAugmentedProvider): MapleFinancePrograms {
     return newProgramMap<MapleFinancePrograms>(

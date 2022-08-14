@@ -2,7 +2,6 @@ import { nu64, struct, u8 } from 'buffer-layout';
 import { AccountMetaData } from '@solana/spl-governance';
 import { Connection } from '@solana/web3.js';
 import { MapleFinance } from '@tools/sdk/mapleFinance/configuration';
-import { tryGetMint } from '@utils/tokens';
 import { ANCHOR_DISCRIMINATOR_LAYOUT } from '@utils/helpers';
 import { nativeAmountToFormattedUiAmount } from '@tools/sdk/units';
 
@@ -15,7 +14,6 @@ export const MAPLE_FINANCE_PROGRAM_INSTRUCTIONS = {
         'Lender User',
         'Pool',
         'Globals',
-        'Base Mint',
         'Pool Locker',
         'Shares Mint',
         'Locked Shares',
@@ -26,11 +24,11 @@ export const MAPLE_FINANCE_PROGRAM_INSTRUCTIONS = {
         'Rent',
       ],
       getDataUI: async (
-        connection: Connection,
+        _connection: Connection,
         data: Uint8Array,
         accounts: AccountMetaData[],
       ) => {
-        const baseMint = accounts[4].pubkey;
+        const poolMint = accounts[2].pubkey;
 
         const dataLayout = struct([
           u8('instruction'),
@@ -40,13 +38,13 @@ export const MAPLE_FINANCE_PROGRAM_INSTRUCTIONS = {
 
         const { depositAmount } = dataLayout.decode(Buffer.from(data)) as any;
 
-        const mintInfo = await tryGetMint(connection, baseMint);
+        const poolInfo = MapleFinance.getPoolInfoByPoolMint(poolMint);
 
-        if (!mintInfo) throw new Error('Cannot load mint info');
+        if (!poolInfo) throw new Error('Cannot load pool info');
 
         const uiAmount = nativeAmountToFormattedUiAmount(
           depositAmount,
-          mintInfo.account.decimals,
+          poolInfo.baseMint.decimals,
         );
 
         return (
