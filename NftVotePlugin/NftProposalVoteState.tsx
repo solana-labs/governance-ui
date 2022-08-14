@@ -5,27 +5,34 @@ import { useEffect } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
 import useNftProposalStore from './NftProposalStore'
-//import useNftPluginStore from './store/nftPluginStore'
+import useNftPluginStore from './store/nftPluginStore'
 
-//show only if voteRecords > 0 and voteRecords < total voting power check if voting is casted
 const NftProposalVoteState = ({
   proposal,
 }: {
   proposal?: ProgramAccount<Proposal>
 }) => {
-  const { config } = useRealm()
+  const { config, ownTokenRecord } = useRealm()
+  const { voteRecordsByVoter } = useWalletStore((s) => s.selectedProposal)
   const plugin = useVotePluginsClientStore((s) => s.state.nftClient)
   const getCountedNfts = useNftProposalStore((s) => s.getCountedNfts)
   const countedNfts = useNftProposalStore((s) => s.countedNftsForProposal)
   const wallet = useWalletStore((s) => s.current)
-  //const votingPower = useNftPluginStore((s) => s.state.votingPower)
+  const votingPower = useNftPluginStore((s) => s.state.votingPower)
   const isNftPlugin =
     config?.account.communityVoterWeightAddin &&
     nftPluginsPks.includes(
       config?.account.communityVoterWeightAddin?.toBase58()
     )
-  const showVoteRecords = countedNfts.length > 0
-  //&& countedNfts.length < votingPower.toNumber()
+
+  const ownVoteRecord = ownTokenRecord
+    ? voteRecordsByVoter[ownTokenRecord.account.governingTokenOwner.toBase58()]
+    : wallet?.publicKey && voteRecordsByVoter[wallet.publicKey.toBase58()]
+  const showVoteRecords =
+    countedNfts.length > 0 &&
+    countedNfts.length < votingPower.toNumber() &&
+    !ownVoteRecord
+
   const useComponent =
     plugin &&
     proposal &&
