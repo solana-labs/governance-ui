@@ -48,8 +48,7 @@ const NftProposalVoteState = ({
           <div>{countedNfts.length}</div>
         </div>
         <div className="text-xs">
-          Vote is not casted yet. You need to count your all nfts too cast vote
-          its done during voting.
+          Vote is not casted yet. You need to count your all nfts too cast vote.
         </div>
       </div>
     </div>
