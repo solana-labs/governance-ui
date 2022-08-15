@@ -1,6 +1,6 @@
 import useRealm from '@hooks/useRealm'
 import { nftPluginsPks } from '@hooks/useVotingPlugins'
-import { ProgramAccount, Proposal } from '@solana/spl-governance'
+import { ProgramAccount, Proposal, ProposalState } from '@solana/spl-governance'
 import { useEffect } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
@@ -38,7 +38,8 @@ const NftProposalVoteState = ({
     proposal &&
     wallet?.connected &&
     isNftPlugin &&
-    wallet.publicKey?.toBase58()
+    wallet.publicKey?.toBase58() &&
+    proposal.account.state === ProposalState.Voting
 
   useEffect(() => {
     if (useComponent) {
@@ -55,7 +56,8 @@ const NftProposalVoteState = ({
           <div>{countedNfts.length}</div>
         </div>
         <div className="text-xs">
-          Vote is not casted yet. You need to count your all nfts too cast vote.
+          Your vote was interrupted and is not cast yet. Please vote again to
+          continue.
         </div>
       </div>
     </div>

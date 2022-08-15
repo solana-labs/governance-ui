@@ -1,4 +1,5 @@
 import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
+import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import useTransactionsStore from 'stores/useTransactionStore'
 import Modal from './Modal'
 
@@ -8,8 +9,17 @@ const NftVotingCountingModal = () => {
     closeNftVotingCountingModal,
     countedNftsForProposal,
   } = useNftProposalStore()
-  const votedNfts = countedNftsForProposal.length
+  const { votingNfts } = useNftPluginStore((s) => s.state)
   const votingInProgress = useNftProposalStore((s) => s.votingInProgress)
+
+  const usedNfts = countedNftsForProposal.length
+  const totalVotingPower = votingNfts.length
+  const remainingVotingPower = totalVotingPower - usedNfts
+  const lastTransactionNftsCount = 5
+  const nftsPerTx = 8
+
+  const countedNfts = usedNfts
+
   return votingInProgress ? (
     <Modal
       bgBlack={false}
@@ -18,7 +28,7 @@ const NftVotingCountingModal = () => {
       isOpen={votingInProgress}
     >
       <h2>Voting NFT stats</h2>
-      <div>votedNfts: {votedNfts}</div>
+      <div>Counted NFTS: {votedNfts}</div>
       <div>transactionsCount: {transactionsCount}</div>
       <div>processedTransactions: {processedTransactions}</div>
     </Modal>
