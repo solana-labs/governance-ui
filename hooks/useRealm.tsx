@@ -67,7 +67,6 @@ export default function useRealm() {
   useEffect(() => {
     const getPythVoterWeight = async () => {
       if (connected && wallet?.publicKey && pythClient && isPythclientMode) {
-        console.log('@@@@@@@@@@@')
         const sa = await pythClient.stakeConnection.getMainAccount(
           wallet.publicKey
         )
