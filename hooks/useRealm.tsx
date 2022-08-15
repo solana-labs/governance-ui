@@ -55,13 +55,18 @@ export default function useRealm() {
   const gatewayVotingPower = useGatewayPluginStore((s) => s.state.votingPower)
   const sbVotingPower = useSwitchboardPluginStore((s) => s.state.votingPower)
   const [realmInfo, setRealmInfo] = useState<RealmInfo | undefined>(undefined)
-
+  const currentPluginPk = config?.account?.communityVoterWeightAddin
   const pythClient = useVotePluginsClientStore((s) => s.state.pythClient)
   const [pythVoterWeight, setPythVoterWeight] = useState<PythBalance>()
+  const isPythclientMode =
+    currentPluginPk && pythPluginsPks.includes(currentPluginPk?.toBase58())
 
+  //Move to store + move useEffect to main app index,
+  //useRealm is used very often across application
+  //and in every instance of useRealm it will shot with getMainAccount spamming rpc.
   useEffect(() => {
     const getPythVoterWeight = async () => {
-      if (connected && wallet?.publicKey && pythClient) {
+      if (connected && wallet?.publicKey && pythClient && isPythclientMode) {
         const sa = await pythClient.stakeConnection.getMainAccount(
           wallet.publicKey
         )
@@ -72,7 +77,7 @@ export default function useRealm() {
       }
     }
     getPythVoterWeight()
-  }, [connected])
+  }, [wallet?.publicKey])
 
   const delegates = useMembersStore((s) => s.compact.delegates)
   const selectedCouncilDelegate = useWalletStore(
@@ -203,8 +208,6 @@ export default function useRealm() {
     ownCouncilTokenRecord &&
     ownCouncilTokenRecord?.account.outstandingProposalCount >=
       realmCfgMaxOutstandingProposalCount
-
-  const currentPluginPk = config?.account?.communityVoterWeightAddin
   //based on realm config it will provide proper tokenBalanceCardComponent
   const isLockTokensMode =
     currentPluginPk && vsrPluginsPks.includes(currentPluginPk?.toBase58())
