@@ -1,0 +1,755 @@
+{
+  "version": "0.1.0",
+  "name": "serum_gov",
+  "instructions": [
+    {
+      "name": "init",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "NOTE: Could add constraint to restrict authorized payer, but this ix can't be called twice anyway."
+          ]
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "gsrmMint",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "NOTE: Decimals have been kept same as SRM."
+          ]
+        },
+        {
+          "name": "srmMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "srmVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "msrmMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "msrmVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initUser",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "userAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "owner",
+          "type": "publicKey"
+        }
+      ]
+    },
+    {
+      "name": "depositLockedSrm",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "userAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "srmMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ownerSrmAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "srmVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lockedAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "claimTicket",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "depositLockedMsrm",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "userAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "msrmMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ownerMsrmAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "msrmVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lockedAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "claimTicket",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "claim",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "claimTicket",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "gsrmMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ownerGsrmAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "burnLockedGsrm",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "gsrmMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ownerGsrmAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lockedAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "redeemTicket",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "lockIndex",
+          "type": "u64"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "redeemSrm",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "redeemTicket",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "srmMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "srmVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ownerSrmAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "redeemMsrm",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "redeemTicket",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "msrmMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "msrmVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ownerMsrmAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "depositVestSrm",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ownerUserAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vestAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "claimTicket",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "srmMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "payerSrmAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "srmVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "burnVestGsrm",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "gsrmMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ownerGsrmAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vestAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "redeemTicket",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "vestIndex",
+          "type": "u64"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "User",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "lockIndex",
+            "type": "u64"
+          },
+          {
+            "name": "vestIndex",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LockedAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "lockIndex",
+            "type": "u64"
+          },
+          {
+            "name": "isMsrm",
+            "type": "bool"
+          },
+          {
+            "name": "totalGsrmAmount",
+            "type": "u64"
+          },
+          {
+            "name": "gsrmBurned",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ClaimTicket",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "createdAt",
+            "type": "i64"
+          },
+          {
+            "name": "claimDelay",
+            "type": "i64"
+          },
+          {
+            "name": "gsrmAmount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RedeemTicket",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "isMsrm",
+            "type": "bool"
+          },
+          {
+            "name": "createdAt",
+            "type": "i64"
+          },
+          {
+            "name": "redeemDelay",
+            "type": "i64"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VestAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "vestIndex",
+            "type": "u64"
+          },
+          {
+            "name": "createdAt",
+            "type": "i64"
+          },
+          {
+            "name": "cliffPeriod",
+            "type": "i64"
+          },
+          {
+            "name": "linearVestingPeriod",
+            "type": "i64"
+          },
+          {
+            "name": "totalGsrmAmount",
+            "type": "u64"
+          },
+          {
+            "name": "gsrmBurned",
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "TicketNotClaimable",
+      "msg": "Ticket is not currently claimable."
+    },
+    {
+      "code": 6001,
+      "name": "InvalidMSRMAmount",
+      "msg": "Invalid amount for redeeming MSRM."
+    },
+    {
+      "code": 6002,
+      "name": "InvalidRedeemTicket",
+      "msg": "Invalid RedeemTicket"
+    },
+    {
+      "code": 6003,
+      "name": "InvalidTicketOwner",
+      "msg": "Invalid owner for ticket."
+    },
+    {
+      "code": 6004,
+      "name": "InvalidGSRMAmount",
+      "msg": "Invalid amount for burning gSRM."
+    },
+    {
+      "code": 6005,
+      "name": "TooEarlyToVest",
+      "msg": "Too early to vest."
+    },
+    {
+      "code": 6006,
+      "name": "AlreadyRedeemed",
+      "msg": "Already redeemed account."
+    }
+  ],
+  "metadata": {
+    "address": "6titGTyVcdPo8GfHhJi3fhgLGkSHuhaEPiDpiUqK45v4"
+  }
+}

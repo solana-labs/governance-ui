@@ -47,6 +47,7 @@ import {
   PythBalance,
 } from 'pyth-staking-api'
 import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
+import SerumGovernanceTokenWrapper from './SerumGovernanceTokenWrapper'
 
 type Props = { proposal?: Option<Proposal> }
 const TokenBalanceCard: FC<Props> = ({ proposal, children }) => {
@@ -73,6 +74,7 @@ const TokenBalanceCard: FC<Props> = ({ proposal, children }) => {
     councilMint,
     realm?.account.config.councilMint
   )
+
   useEffect(() => {
     const getTokenOwnerRecord = async () => {
       const defaultMint = !mint?.supply.isZero()
@@ -139,6 +141,7 @@ const TokenBalanceCard: FC<Props> = ({ proposal, children }) => {
           <div className="h-10 rounded-lg animate-pulse bg-bkg-3" />
         </>
       )}
+      <SerumGovernanceTokenWrapper />
       {children}
     </div>
   )
