@@ -7,16 +7,20 @@ import { PublicKey } from '@solana/web3.js'
 interface NftProposalStore extends State {
   proposal: ProgramAccount<Proposal> | null
   countedNftsForProposal: NftVoteRecord[]
+  votingInProgress: boolean
   getCountedNfts: (
     client: NftVoterClient,
     proposal: ProgramAccount<Proposal>,
     connectedWallet: PublicKey
   ) => void
+  openNftVotingCountingModal: () => void
+  closeNftVotingCountingModal: () => void
 }
 
 const compactDefaultState = {
   proposal: null,
   countedNftsForProposal: [],
+  votingInProgress: false,
 }
 
 const useNftProposalStore = create<NftProposalStore>((set, _get) => ({
@@ -30,6 +34,16 @@ const useNftProposalStore = create<NftProposalStore>((set, _get) => ({
           x.account.governingTokenOwner.toBase58() ===
           connectedWallet.toBase58()
       )
+    })
+  },
+  openNftVotingCountingModal: () => {
+    set((s) => {
+      s.votingInProgress = true
+    })
+  },
+  closeNftVotingCountingModal: () => {
+    set((s) => {
+      s.votingInProgress = false
     })
   },
 }))

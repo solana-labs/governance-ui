@@ -8,10 +8,22 @@ const Modal = ({
   hideClose = false,
   sizeClassName = 'sm:max-w-md',
   background = 'bg-bkg-2',
+  wrapperStyle,
+  bgBlack = true,
+}: {
+  isOpen?: boolean
+  onClose?: any
+  children?: any
+  hideClose?: boolean
+  sizeClassName?: string
+  background?: string
+  wrapperStyle?: any
+  bgBlack?: boolean
 }) => {
   return (
     <Portal>
       <div
+        style={wrapperStyle}
         className="fixed inset-0 z-30 overflow-y-auto"
         aria-labelledby="modal-title"
         role="dialog"
@@ -20,7 +32,9 @@ const Modal = ({
         <div className="flex items-center min-h-screen px-4 pb-20 text-center sm:block sm:p-0">
           {isOpen ? (
             <div
-              className="fixed inset-0 transition-opacity bg-black bg-opacity-70"
+              className={`fixed inset-0 transition-opacity ${
+                bgBlack ? 'bg-black' : ''
+              } bg-opacity-70`}
               aria-hidden="true"
               onClick={onClose}
             ></div>
