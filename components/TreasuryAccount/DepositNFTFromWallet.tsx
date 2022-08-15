@@ -31,6 +31,7 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [sendingSuccess, setSendingSuccess] = useState(false)
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
+
   const handleDeposit = async () => {
     for (const i of selectedNfts) {
       setIsLoading(true)
