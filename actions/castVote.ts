@@ -24,6 +24,8 @@ import {
 } from '@utils/sendTransactions'
 import { sendTransaction } from '@utils/send'
 import { NftVoterClient } from '@solana/governance-program-library'
+import { calcCostOfNftVote, checkHasEnoughSolToVote } from '@tools/nftVoteCalc'
+import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
 
 export async function castVote(
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -96,6 +98,11 @@ export async function castVote(
   const shouldChunk = votingPlugin?.client instanceof NftVoterClient
   const instructionsCountThatMustHaveTheirOwnChunk = message ? 4 : 2
   if (shouldChunk) {
+    const {
+      openNftVotingCountingModal,
+      closeNftVotingCountingModal,
+    } = useNftProposalStore.getState()
+    //update voter weight + cast vote from spl gov need to be in one transaction
     const instructionsWithTheirOwnChunk = instructions.slice(
       -instructionsCountThatMustHaveTheirOwnChunk
     )
@@ -103,17 +110,21 @@ export async function castVote(
       0,
       instructions.length - instructionsCountThatMustHaveTheirOwnChunk
     )
+
     const splInstructionsWithAccountsChunk = chunks(
       instructionsWithTheirOwnChunk,
       2
     )
     const nftsAccountsChunks = chunks(remainingInstructionsToChunk, 2)
+
     const signerChunks = Array(
       splInstructionsWithAccountsChunk.length + nftsAccountsChunks.length
     ).fill([])
+
     const singersMap = message
       ? [...signerChunks.slice(0, signerChunks.length - 1), signers]
       : signerChunks
+
     const instructionsChunks = [
       ...nftsAccountsChunks.map((x) =>
         transactionInstructionsToTypedInstructionsSets(x, SequenceType.Parallel)
@@ -125,6 +136,22 @@ export async function castVote(
         )
       ),
     ]
+    const totalVoteCost = await calcCostOfNftVote(
+      message,
+      instructionsChunks.length,
+      proposal.pubkey,
+      votingPlugin
+    )
+    const hasEnoughSol = await checkHasEnoughSolToVote(
+      totalVoteCost,
+      wallet.publicKey!,
+      connection
+    )
+    if (!hasEnoughSol) {
+      return
+    }
+
+    openNftVotingCountingModal()
     await sendTransactionsV2({
       connection,
       wallet,
@@ -132,6 +159,7 @@ export async function castVote(
       signersSet: singersMap,
       showUiComponent: true,
     })
+    closeNftVotingCountingModal()
   } else {
     const transaction = new Transaction()
     transaction.add(...instructions)
