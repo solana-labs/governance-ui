@@ -22,9 +22,7 @@
           "name": "gsrmMint",
           "isMut": true,
           "isSigner": false,
-          "docs": [
-            "NOTE: Decimals have been kept same as SRM."
-          ]
+          "docs": ["NOTE: Decimals have been kept same as SRM."]
         },
         {
           "name": "srmMint",

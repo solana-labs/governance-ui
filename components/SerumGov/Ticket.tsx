@@ -1,9 +1,12 @@
+import useWallet from '@hooks/useWallet'
 import { fmtMintAmount } from '@tools/sdk/units'
+import { notify } from '@utils/notifications'
 import { FC, useEffect, useState } from 'react'
 import useSerumGovStore, {
   ClaimTicketType,
   RedeemTicketType,
 } from 'stores/useSerumGovStore'
+import useWalletStore from 'stores/useWalletStore'
 
 type TicketType = ClaimTicketType | RedeemTicketType
 
@@ -20,6 +23,9 @@ type Props = {
   ticket: ClaimTicketType
 }
 const Ticket: FC<Props> = ({ ticket }) => {
+  const connection = useWalletStore((s) => s.connection.current)
+  const { anchorProvider, wallet } = useWallet()
+  const actions = useSerumGovStore((s) => s.actions)
   const gsrmMint = useSerumGovStore((s) => s.gsrmMint)
   const [currentTimestamp, setCurrentTimestamp] = useState(0)
 
@@ -34,6 +40,16 @@ const Ticket: FC<Props> = ({ ticket }) => {
     console.log(gsrmMint)
   }, [gsrmMint])
 
+  const handleClaim = async (ticket: TicketType) => {
+    if (wallet && wallet.publicKey) {
+      if (isClaimTicket(ticket)) {
+        await actions.claim(connection, anchorProvider, ticket, wallet)
+      }
+    } else {
+      notify({ type: 'error', message: 'Wallet not connected.' })
+    }
+  }
+
   return (
     <div className="p-3 text-xs rounded-md bg-bkg-3">
       <p className="text-xs text-fgd-3 mb-1">
@@ -47,11 +63,9 @@ const Ticket: FC<Props> = ({ ticket }) => {
         )}
 
         <button
-          className={`py-2 px-4 rounded-md ${
-            ticket.createdAt + ticket.claimDelay > currentTimestamp
-              ? 'bg-fgd-4 text-gray-500'
-              : 'bg-green text-fgd-4'
-          }`}
+          className={`py-2 px-4 rounded-md bg-green text-fgd-4 disabled:bg-fgd-4 disabled:text-gray-500`}
+          onClick={async () => await handleClaim(ticket)}
+          disabled={ticket.createdAt + ticket.claimDelay > currentTimestamp}
         >
           Claim
         </button>
