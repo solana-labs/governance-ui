@@ -4,27 +4,27 @@ import Ticket from '@components/SerumGov/Ticket'
 import useSerumGovStore from 'stores/useSerumGovStore'
 import useWalletStore from 'stores/useWalletStore'
 import useWallet from '@hooks/useWallet'
+import LockedAccount from '@components/SerumGov/LockedAccount'
 
 const SerumGovernanceTokenWrapper: FC = () => {
   const { anchorProvider, wallet } = useWallet()
   const connection = useWalletStore((s) => s.connection.current)
   const actions = useSerumGovStore((s) => s.actions)
   const claimTickets = useSerumGovStore((s) => s.claimTickets)
+  const redeemTickets = useSerumGovStore((s) => s.redeemTickets)
+  const lockedAccounts = useSerumGovStore((s) => s.lockedAccounts)
   const gsrmBalance = useSerumGovStore((s) => s.gsrmBalance)
-  const isLoading = useSerumGovStore((s) => s.isLoading)
 
   useEffect(() => {
     actions.load(connection)
   }, [])
 
   useEffect(() => {
+    actions.getLockedAccounts(anchorProvider, wallet?.publicKey)
     actions.getClaimTickets(anchorProvider, wallet?.publicKey)
     actions.getGsrmBalance(connection, wallet?.publicKey)
+    actions.getRedeemTickets(anchorProvider, wallet?.publicKey)
   }, [wallet?.publicKey])
-
-  if (isLoading) {
-    return <h3>Loading</h3>
-  }
 
   return (
     <div>
@@ -40,10 +40,23 @@ const SerumGovernanceTokenWrapper: FC = () => {
         </div>
       </div>
       <div className="py-2">
-        {claimTickets &&
-          claimTickets.map((ticket) => (
-            <Ticket key={ticket.createdAt} ticket={ticket} />
+        {lockedAccounts &&
+          lockedAccounts.map((account) => (
+            <LockedAccount key={account.address.toBase58()} account={account} />
           ))}
+        {claimTickets.length > 0 || redeemTickets.length > 0 ? (
+          <div className="flex flex-col space-y-2 mt-2">
+            <p className="text-md text-fgd-2">Tickets</p>
+            {claimTickets &&
+              claimTickets.map((ticket) => (
+                <Ticket key={ticket.createdAt} ticket={ticket} />
+              ))}
+            {redeemTickets &&
+              redeemTickets.map((ticket) => (
+                <Ticket key={ticket.createdAt} ticket={ticket} />
+              ))}
+          </div>
+        ) : null}
       </div>
     </div>
   )

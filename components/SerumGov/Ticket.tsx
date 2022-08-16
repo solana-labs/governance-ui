@@ -20,7 +20,7 @@ function isClaimTicket(
 }
 
 type Props = {
-  ticket: ClaimTicketType
+  ticket: TicketType
 }
 const Ticket: FC<Props> = ({ ticket }) => {
   const connection = useWalletStore((s) => s.connection.current)
@@ -36,14 +36,12 @@ const Ticket: FC<Props> = ({ ticket }) => {
     return () => clearInterval(timestampInterval)
   })
 
-  useEffect(() => {
-    console.log(gsrmMint)
-  }, [gsrmMint])
-
-  const handleClaim = async (ticket: TicketType) => {
+  const handleButton = async (ticket: TicketType) => {
     if (wallet && wallet.publicKey) {
       if (isClaimTicket(ticket)) {
         await actions.claim(connection, anchorProvider, ticket, wallet)
+      } else {
+        await actions.redeem(connection, anchorProvider, ticket, wallet)
       }
     } else {
       notify({ type: 'error', message: 'Wallet not connected.' })
@@ -58,16 +56,23 @@ const Ticket: FC<Props> = ({ ticket }) => {
       <div className="w-full flex items-center justify-between">
         {gsrmMint && (
           <p className="text-fgd-1 text-xl font-semibold">
-            {fmtMintAmount(gsrmMint, ticket.gsrmAmount)} gSRM
+            {fmtMintAmount(
+              gsrmMint,
+              isClaimTicket(ticket) ? ticket.gsrmAmount : ticket.amount
+            )}{' '}
+            {isClaimTicket(ticket) ? 'gSRM' : ticket.isMsrm ? 'MSRM' : 'SRM'}
           </p>
         )}
-
         <button
           className={`py-2 px-4 rounded-md bg-green text-fgd-4 disabled:bg-fgd-4 disabled:text-gray-500`}
-          onClick={async () => await handleClaim(ticket)}
-          disabled={ticket.createdAt + ticket.claimDelay > currentTimestamp}
+          onClick={async () => await handleButton(ticket)}
+          disabled={
+            ticket.createdAt +
+              (isClaimTicket(ticket) ? ticket.claimDelay : ticket.redeemDelay) >
+            currentTimestamp
+          }
         >
-          Claim
+          {isClaimTicket(ticket) ? 'Claim' : 'Redeem'}
         </button>
       </div>
     </div>
