@@ -25,6 +25,7 @@ import {
 import { sendTransaction } from '@utils/send'
 import { NftVoterClient } from '@solana/governance-program-library'
 import { calcCostOfNftVote, checkHasEnoughSolToVote } from '@tools/nftVoteCalc'
+import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
 
 export async function castVote(
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -96,8 +97,12 @@ export async function castVote(
   }
   const shouldChunk = votingPlugin?.client instanceof NftVoterClient
   const instructionsCountThatMustHaveTheirOwnChunk = message ? 4 : 2
-  const solBefore = await connection.getBalance(wallet.publicKey!)
   if (shouldChunk) {
+    const {
+      openNftVotingCountingModal,
+      closeNftVotingCountingModal,
+    } = useNftProposalStore.getState()
+    //update voter weight + cast vote from spl gov need to be in one transaction
     const instructionsWithTheirOwnChunk = instructions.slice(
       -instructionsCountThatMustHaveTheirOwnChunk
     )
@@ -105,6 +110,7 @@ export async function castVote(
       0,
       instructions.length - instructionsCountThatMustHaveTheirOwnChunk
     )
+
     const splInstructionsWithAccountsChunk = chunks(
       instructionsWithTheirOwnChunk,
       2
@@ -130,7 +136,6 @@ export async function castVote(
         )
       ),
     ]
-    //TODO use only nfts that didn't voted
     const totalVoteCost = await calcCostOfNftVote(
       message,
       instructionsChunks.length,
@@ -146,6 +151,7 @@ export async function castVote(
       return
     }
 
+    openNftVotingCountingModal()
     await sendTransactionsV2({
       connection,
       wallet,
@@ -153,12 +159,11 @@ export async function castVote(
       signersSet: singersMap,
       showUiComponent: true,
     })
+    closeNftVotingCountingModal()
   } else {
     const transaction = new Transaction()
     transaction.add(...instructions)
 
     await sendTransaction({ transaction, wallet, connection, signers })
   }
-  const solAfter = await connection.getBalance(wallet.publicKey!)
-  console.log({ solBefore, solAfter })
 }

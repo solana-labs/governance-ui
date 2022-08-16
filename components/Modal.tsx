@@ -8,6 +8,7 @@ const Modal = ({
   hideClose = false,
   sizeClassName = 'sm:max-w-md',
   background = 'bg-bkg-2',
+  zIndex = 'z-30',
   wrapperStyle,
   bgBlack = true,
 }: {
@@ -19,12 +20,13 @@ const Modal = ({
   background?: string
   wrapperStyle?: any
   bgBlack?: boolean
+  zIndex?: string
 }) => {
   return (
     <Portal>
       <div
         style={wrapperStyle}
-        className="fixed inset-0 z-30 overflow-y-auto"
+        className={`fixed inset-0 ${zIndex} overflow-y-auto`}
         aria-labelledby="modal-title"
         role="dialog"
         aria-modal="true"
