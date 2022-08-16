@@ -4616,6 +4616,13 @@
     "@solana/web3.js" "^1.20.0"
     eventemitter3 "^4.0.0"
 
+"@solana/wallet-adapter-base@^0.9.12":
+  version "0.9.12"
+  resolved "https://registry.yarnpkg.com/@solana/wallet-adapter-base/-/wallet-adapter-base-0.9.12.tgz#2a2e7944ea2f8803296b4460cc863a1c76511394"
+  integrity sha512-4pwhvCLlGNHV8WmrG/2OYI145zp2ZFKUmyBJj+ID54D1xA7wJI+oHCdiqhtp3m2OrEu0AKWhhgy8R3Dns7UF7A==
+  dependencies:
+    eventemitter3 "^4.0.0"
+
 "@solana/wallet-adapter-base@^0.9.3", "@solana/wallet-adapter-base@^0.9.4", "@solana/wallet-adapter-base@^0.9.5":
   version "0.9.5"
   resolved "https://registry.yarnpkg.com/@solana/wallet-adapter-base/-/wallet-adapter-base-0.9.5.tgz#6780dd096d30f0e1ffc9c7869029ec37b2a2fc9e"
@@ -4648,6 +4655,13 @@
     "@solana/web3.js" "^1.20.0"
     "@types/bs58" "^4.0.1"
     bs58 "^4.0.0"
+
+"@solana/wallet-adapter-exodus@^0.1.8":
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/@solana/wallet-adapter-exodus/-/wallet-adapter-exodus-0.1.8.tgz#62591c073a0f371427b4a3127d684460451c544d"
+  integrity sha512-81Tk4aBVKkhfWOTdhTkuGHJsBGkVP/x/INJZDdjo0uHRcH6x4xGBPRfbFSxg+2XFHqnpwesJ3S8PJn332S7cDA==
+  dependencies:
+    "@solana/wallet-adapter-base" "^0.9.12"
 
 "@solana/wallet-adapter-glow@^0.1.1":
   version "0.1.1"
