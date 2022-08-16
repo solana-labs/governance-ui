@@ -20,6 +20,8 @@ import { TokenOwnerRecord } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import { nftPluginsPks } from '@hooks/useVotingPlugins'
+import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
 
 interface VoteCommentModalProps {
   onClose: () => void
@@ -43,9 +45,14 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   const connection = useWalletStore((s) => s.connection)
   const { proposal } = useWalletStore((s) => s.selectedProposal)
   const { fetchChatMessages } = useWalletStore((s) => s.actions)
-  const { realm, realmInfo } = useRealm()
+  const { realm, realmInfo, config } = useRealm()
   const { refetchProposals } = useWalletStore((s) => s.actions)
-
+  const isNftPlugin =
+    config?.account.communityVoterWeightAddin &&
+    nftPluginsPks.includes(
+      config?.account.communityVoterWeightAddin?.toBase58()
+    )
+  const { closeNftVotingCountingModal } = useNftProposalStore.getState()
   const submitVote = async (vote: YesNoVote) => {
     setSubmitting(true)
     const rpcContext = new RpcContext(
@@ -75,6 +82,9 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
       )
       await refetchProposals()
     } catch (ex) {
+      if (isNftPlugin) {
+        closeNftVotingCountingModal()
+      }
       //TODO: How do we present transaction errors to users? Just the notification?
       console.error("Can't cast vote", ex)
       onClose()

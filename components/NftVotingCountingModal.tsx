@@ -35,24 +35,26 @@ const NftVotingCountingModal = () => {
 
   useEffect(() => {
     const multiplier = processedTransactions - prevProcessedTransactions
-    if (remainingVotingPower <= lastTransactionNftsCount) {
-      handleCalcCountedNfts(remainingVotingPower)
-    }
-    if (
-      remainingVotingPower > lastTransactionNftsCount &&
-      remainingVotingPower < lastTransactionNftsCount + maxNftsPerTransaction
-    ) {
-      handleCalcCountedNfts(remainingVotingPower - lastTransactionNftsCount)
-    }
-    if (
-      remainingVotingPower >=
-      lastTransactionNftsCount + maxNftsPerTransaction
-    ) {
-      handleCalcCountedNfts(
-        multiplier > 0
-          ? multiplier * maxNftsPerTransaction
-          : maxNftsPerTransaction
-      )
+    if (processedTransactions !== 0) {
+      if (remainingVotingPower <= lastTransactionNftsCount) {
+        handleCalcCountedNfts(remainingVotingPower)
+      }
+      if (
+        remainingVotingPower > lastTransactionNftsCount &&
+        remainingVotingPower < lastTransactionNftsCount + maxNftsPerTransaction
+      ) {
+        handleCalcCountedNfts(remainingVotingPower - lastTransactionNftsCount)
+      }
+      if (
+        remainingVotingPower >=
+        lastTransactionNftsCount + maxNftsPerTransaction
+      ) {
+        handleCalcCountedNfts(
+          multiplier > 0
+            ? multiplier * maxNftsPerTransaction
+            : maxNftsPerTransaction
+        )
+      }
     }
   }, [processedTransactions])
 
