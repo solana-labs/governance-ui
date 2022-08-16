@@ -61,17 +61,17 @@ interface NotificationSolutionType {
 
 const NotificationSolutions: NotificationSolutionType[] = [
   {
+    channels: ['Wallet', 'Email', 'Text', 'Telegram'],
+    description: `Get notifications when new proposals are created & when proposals are completed or canceled. By wallet, email, Telegram or text message.`,
+    modalState: ModalStates.Dialect,
+    name: 'Dialect',
+  },
+  {
     channels: ['Email', 'Text', 'Telegram', 'Notifi Center'],
     description: `
     Get notifications for proposals, voting, and results. Add your email address, phone number, and/or Telegram.`,
     modalState: ModalStates.Notifi,
     name: 'notifi',
-  },
-  {
-    channels: ['Wallet', 'Email', 'Text', 'Telegram'],
-    description: `Get notifications when new proposals are created & when proposals are completed or canceled. By wallet, email, Telegram or text message.`,
-    modalState: ModalStates.Dialect,
-    name: 'Dialect',
   },
 ]
 
