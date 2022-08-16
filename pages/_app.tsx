@@ -202,8 +202,8 @@ function App({ Component, pageProps }) {
             <GatewayProvider>
               <NavBar />
               <Notifications />
-              <NftVotingCountingModal></NftVotingCountingModal>
               <TransactionLoader></TransactionLoader>
+              <NftVotingCountingModal></NftVotingCountingModal>
               <PageBodyContainer>
                 <Component {...pageProps} />
               </PageBodyContainer>

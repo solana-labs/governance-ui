@@ -4,7 +4,7 @@ import useTransactionsStore from 'stores/useTransactionStore'
 import Modal from './Modal'
 
 const NftVotingCountingModal = () => {
-  const { transactionsCount, processedTransactions } = useTransactionsStore()
+  const { processedTransactions } = useTransactionsStore()
   const {
     closeNftVotingCountingModal,
     countedNftsForProposal,
@@ -15,10 +15,34 @@ const NftVotingCountingModal = () => {
   const usedNfts = countedNftsForProposal.length
   const totalVotingPower = votingNfts.length
   const remainingVotingPower = totalVotingPower - usedNfts
+  //in last tx there is max of 5 nfts
   const lastTransactionNftsCount = 5
   const nftsPerTx = 8
-
-  const countedNfts = usedNfts
+  const calcTransactions = (nftsCount: number) => {
+    let toAdd = 0
+    if (processedTransactions === 0) {
+      return nftsCount
+    }
+    if (nftsCount <= lastTransactionNftsCount) {
+      toAdd = remainingVotingPower
+    }
+    if (
+      nftsCount > lastTransactionNftsCount &&
+      nftsCount < lastTransactionNftsCount + nftsPerTx
+    ) {
+      if (processedTransactions === 1) {
+        toAdd = remainingVotingPower - lastTransactionNftsCount
+      } else {
+        toAdd = lastTransactionNftsCount
+      }
+    }
+    toAdd = processedTransactions * nftsPerTx
+    if (nftsCount + toAdd > totalVotingPower) {
+      return totalVotingPower
+    }
+    return nftsCount + toAdd
+  }
+  const countedNfts = calcTransactions(usedNfts)
 
   return votingInProgress ? (
     <Modal
@@ -28,9 +52,9 @@ const NftVotingCountingModal = () => {
       isOpen={votingInProgress}
     >
       <h2>Voting NFT stats</h2>
-      <div>Counted NFTS: {votedNfts}</div>
-      <div>transactionsCount: {transactionsCount}</div>
-      <div>processedTransactions: {processedTransactions}</div>
+      <div>
+        Counted NFTS: {countedNfts} of {totalVotingPower}
+      </div>
     </Modal>
   ) : null
 }
