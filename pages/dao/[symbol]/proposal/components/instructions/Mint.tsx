@@ -18,14 +18,16 @@ import useGovernanceAssets from 'hooks/useGovernanceAssets'
 import { getMintSchema } from 'utils/validations'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { getMintInstruction } from 'utils/instructionTools'
-import { AccountType } from '@utils/uiTypes/assets'
+import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 
 const Mint = ({
   index,
   governance,
+  initialMintAccount,
 }: {
   index: number
   governance: ProgramAccount<Governance> | null
+  initialMintAccount?: AssetAccount | undefined
 }) => {
   const connection = useWalletStore((s) => s.connection)
   const { realmInfo } = useRealm()
@@ -39,7 +41,7 @@ const Mint = ({
     destinationAccount: '',
     // No default mint amount
     amount: undefined,
-    mintAccount: undefined,
+    mintAccount: initialMintAccount,
     programId: programId?.toString(),
   })
   const wallet = useWalletStore((s) => s.current)

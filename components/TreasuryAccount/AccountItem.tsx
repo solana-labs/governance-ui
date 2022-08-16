@@ -50,12 +50,15 @@ const AccountItem = ({
         console.log(e)
       }
     }
-    if (!logo) {
+    if (
+      !logo &&
+      governedAccountTokenAccount.extensions.mint?.publicKey.toBase58()
+    ) {
       getTokenMetadata(
-        governedAccountTokenAccount.extensions.mint?.publicKey.toBase58() ?? ''
+        governedAccountTokenAccount.extensions.mint?.publicKey.toBase58()
       )
     }
-  })
+  }, [governedAccountTokenAccount.extensions.mint?.publicKey.toBase58()])
 
   return (
     <div className="flex items-center w-full p-3 border rounded-lg text-fgd-1 border-fgd-4">

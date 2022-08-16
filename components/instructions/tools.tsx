@@ -170,8 +170,9 @@ export const DEFAULT_NATIVE_SOL_MINT =
 export const DEFAULT_NFT_TREASURY_MINT =
   'GNFTm5rz1Kzvq94G7DJkcrEUnCypeQYf7Ya8arPoHWvw'
 
-export function getAccountName(accountPk: PublicKey) {
-  return ACCOUNT_NAMES[accountPk.toBase58()] ?? getProgramName(accountPk)
+export function getAccountName(accountPk: PublicKey | string) {
+  const key = typeof accountPk === 'string' ? accountPk : accountPk.toBase58()
+  return ACCOUNT_NAMES[key] ?? getProgramName(accountPk)
 }
 
 export const CHAT_PROGRAM_ID = new PublicKey(
