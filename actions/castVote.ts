@@ -151,7 +151,9 @@ export async function castVote(
       return
     }
 
-    openNftVotingCountingModal()
+    if (instructionsChunks.length > 2) {
+      openNftVotingCountingModal()
+    }
     await sendTransactionsV2({
       connection,
       wallet,
@@ -159,7 +161,11 @@ export async function castVote(
       signersSet: singersMap,
       showUiComponent: true,
     })
-    closeNftVotingCountingModal()
+    closeNftVotingCountingModal(
+      votingPlugin.client as NftVoterClient,
+      proposal,
+      wallet.publicKey!
+    )
   } else {
     const transaction = new Transaction()
     transaction.add(...instructions)

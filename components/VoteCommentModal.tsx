@@ -22,6 +22,7 @@ import { getProgramVersionForRealm } from '@models/registry/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { nftPluginsPks } from '@hooks/useVotingPlugins'
 import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
+import { NftVoterClient } from '@solana/governance-program-library'
 
 interface VoteCommentModalProps {
   onClose: () => void
@@ -83,7 +84,11 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
       await refetchProposals()
     } catch (ex) {
       if (isNftPlugin) {
-        closeNftVotingCountingModal()
+        closeNftVotingCountingModal(
+          client.client as NftVoterClient,
+          proposal!,
+          wallet!.publicKey!
+        )
       }
       //TODO: How do we present transaction errors to users? Just the notification?
       console.error("Can't cast vote", ex)

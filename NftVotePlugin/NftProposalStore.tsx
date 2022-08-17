@@ -14,7 +14,11 @@ interface NftProposalStore extends State {
     connectedWallet: PublicKey
   ) => void
   openNftVotingCountingModal: () => void
-  closeNftVotingCountingModal: () => void
+  closeNftVotingCountingModal: (
+    client: NftVoterClient,
+    proposal: ProgramAccount<Proposal>,
+    connectedWallet: PublicKey
+  ) => void
 }
 
 const compactDefaultState = {
@@ -41,10 +45,11 @@ const useNftProposalStore = create<NftProposalStore>((set, _get) => ({
       s.votingInProgress = true
     })
   },
-  closeNftVotingCountingModal: () => {
+  closeNftVotingCountingModal: (client, proposal, connectedWallet) => {
     set((s) => {
       s.votingInProgress = false
     })
+    _get().getCountedNfts(client, proposal, connectedWallet)
   },
 }))
 
