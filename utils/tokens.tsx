@@ -515,7 +515,7 @@ const getMainnetNfts = async (
           const ata = await Token.getAssociatedTokenAddress(
             ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
             TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-            new PublicKey(nft.mint), // mint
+            new PublicKey(nft.mintAddress), // mint
             ownerPk, // owner
             true
           )
