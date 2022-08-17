@@ -49,11 +49,27 @@ export type LockedAccountType = {
   gsrmBurned: anchor.BN
 }
 
-const PROGRAM_ID = new PublicKey('6titGTyVcdPo8GfHhJi3fhgLGkSHuhaEPiDpiUqK45v4')
+export type VestAccountType = {
+  address: PublicKey
+  owner: PublicKey
+  isMsrm: PublicKey
+  vestIndex: number
+  createdAt: number
+  cliffPeriod: number
+  linearVestingPeriod: number
+  totalGsrmAmount: anchor.BN
+  gsrmBurned: anchor.BN
+}
 
-const SRM_MINT = new PublicKey('6pJxsghghEcgpwmukyhtaFEjibAPdQyXQQb69Jn7CdST')
-const MSRM_MINT = new PublicKey('5Y51LyyackBZPvzLWwjB9mTpGP5Y8Tz9EXdr6w2k4SgZ')
-const GSRM_MINT = new PublicKey('AjLzmnzpfBQUwX3rE9kjrVAxmL1xM2Q5xZFX3a9TfhdC')
+const PROGRAM_ID = new PublicKey('GaokYbJFjAVJ23wodF5ttRLudaJMudHSv7esDt1d4J1k')
+
+const SRM_MINT = new PublicKey('GcC7Duycsid99yEZBvPM8A67bGR9PSLQaNK9rqDqVcR3')
+const MSRM_MINT = new PublicKey('FdyZJPngPQm5ZDwgTCiNLXCmuSmrYrR2EyhgVpoK35gE')
+const [GSRM_MINT] = findProgramAddressSync([Buffer.from('gSRM')], PROGRAM_ID)
+
+export const SRM_DECIMALS = 6
+export const MSRM_DECIMALS = 0
+export const MSRM_MULTIPLIER = 1_000_000_000_000
 
 interface SerumGovStore extends State {
   isLoading: boolean
@@ -65,6 +81,7 @@ interface SerumGovStore extends State {
   claimTickets: ClaimTicketType[]
   redeemTickets: RedeemTicketType[]
   lockedAccounts: LockedAccountType[]
+  vestAccounts: VestAccountType[]
   authority: PublicKey
 
   set: (x: any) => void
@@ -81,6 +98,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
   claimTickets: [],
   redeemTickets: [],
   lockedAccounts: [],
+  vestAccounts: [],
   authority: findProgramAddressSync([Buffer.from('authority')], PROGRAM_ID)[0],
 
   set: (fn) => set(produce(fn)),
@@ -416,6 +434,99 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
           console.error(e)
           notify({ type: 'error', message: 'Failed to redeem ticket.' })
         }
+      } else {
+        notify({ type: 'error', message: 'Please connect wallet to claim.' })
+      }
+    },
+
+    async getVestAccounts(
+      provider: anchor.AnchorProvider,
+      owner?: PublicKey | null
+    ) {
+      const set = get().set
+      if (owner) {
+        const program = new anchor.Program(
+          IDL as anchor.Idl,
+          get().programId,
+          provider
+        )
+
+        const accounts = await program.account.vestAccount.all([
+          {
+            memcmp: {
+              offset: 8,
+              bytes: owner.toBase58(),
+            },
+          },
+        ])
+        accounts.forEach((a) => {
+          console.log(a.publicKey.toBase58())
+          console.log((a.account.totalGsrmAmount as any).toNumber())
+        })
+        set((s) => {
+          s.vestAccounts = accounts.map((a) => ({
+            address: a.publicKey,
+            owner: (a.account as any).owner,
+            isMsrm: (a.account as any).isMsrm,
+            vestIndex: (a.account as any).vestIndex.toNumber(),
+            cliffPeriod: (a.account as any).cliffPeriod.toNumber(),
+            linearVestingPeriod: (a.account as any).linearVestingPeriod.toNumber(),
+            createdAt: (a.account as any).createdAt.toNumber(),
+            totalGsrmAmount: (a.account as any).totalGsrmAmount,
+            gsrmBurned: (a.account as any).gsrmBurned,
+          }))
+        })
+      } else {
+        set((s) => {
+          s.vestAccounts = []
+        })
+      }
+    },
+
+    async burnVestGsrm(
+      connection: Connection,
+      provider: anchor.AnchorProvider,
+      vestAccount: VestAccountType,
+      amount: anchor.BN,
+      owner?: WalletSigner | null
+    ) {
+      if (owner && owner.publicKey) {
+        const program = new anchor.Program(
+          IDL as anchor.Idl,
+          get().programId,
+          provider
+        )
+
+        const ownerGsrmAccount = await getAssociatedTokenAddress(
+          GSRM_MINT,
+          owner.publicKey,
+          true
+        )
+
+        const redeemTicket = Keypair.generate()
+        const tx = await program.methods
+          .burnVestGsrm(new anchor.BN(vestAccount.vestIndex), amount)
+          .accounts({
+            owner: owner.publicKey,
+            authority: get().authority,
+            gsrmMint: GSRM_MINT,
+            ownerGsrmAccount,
+            vestAccount: vestAccount.address,
+            redeemTicket: redeemTicket.publicKey,
+            clock: SYSVAR_CLOCK_PUBKEY,
+            tokenProgram: TOKEN_PROGRAM_ID,
+            systemProgram: SystemProgram.programId,
+          })
+          .transaction()
+
+        await sendTransaction({
+          transaction: tx,
+          wallet: owner,
+          signers: [redeemTicket],
+          connection,
+        })
+        await get().actions.getVestAccounts(provider, owner.publicKey)
+        await get().actions.getRedeemTickets(provider, owner.publicKey)
       } else {
         notify({ type: 'error', message: 'Please connect wallet to claim.' })
       }

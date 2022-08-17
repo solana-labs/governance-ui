@@ -5,6 +5,7 @@ import useSerumGovStore from 'stores/useSerumGovStore'
 import useWalletStore from 'stores/useWalletStore'
 import useWallet from '@hooks/useWallet'
 import LockedAccount from '@components/SerumGov/LockedAccount'
+import VestAccount from '@components/SerumGov/VestAccount'
 
 const SerumGovernanceTokenWrapper: FC = () => {
   const { anchorProvider, wallet } = useWallet()
@@ -13,6 +14,7 @@ const SerumGovernanceTokenWrapper: FC = () => {
   const claimTickets = useSerumGovStore((s) => s.claimTickets)
   const redeemTickets = useSerumGovStore((s) => s.redeemTickets)
   const lockedAccounts = useSerumGovStore((s) => s.lockedAccounts)
+  const vestAccounts = useSerumGovStore((s) => s.vestAccounts)
   const gsrmBalance = useSerumGovStore((s) => s.gsrmBalance)
 
   useEffect(() => {
@@ -20,9 +22,10 @@ const SerumGovernanceTokenWrapper: FC = () => {
   }, [])
 
   useEffect(() => {
-    actions.getLockedAccounts(anchorProvider, wallet?.publicKey)
-    actions.getClaimTickets(anchorProvider, wallet?.publicKey)
     actions.getGsrmBalance(connection, wallet?.publicKey)
+    actions.getLockedAccounts(anchorProvider, wallet?.publicKey)
+    actions.getVestAccounts(anchorProvider, wallet?.publicKey)
+    actions.getClaimTickets(anchorProvider, wallet?.publicKey)
     actions.getRedeemTickets(anchorProvider, wallet?.publicKey)
   }, [wallet?.publicKey])
 
@@ -40,10 +43,20 @@ const SerumGovernanceTokenWrapper: FC = () => {
         </div>
       </div>
       <div className="py-2">
-        {lockedAccounts &&
-          lockedAccounts.map((account) => (
-            <LockedAccount key={account.address.toBase58()} account={account} />
-          ))}
+        <div className="flex flex-col space-y-2 mt-2">
+          {vestAccounts &&
+            vestAccounts.map((account) => (
+              <VestAccount key={account.address.toBase58()} account={account} />
+            ))}
+          {lockedAccounts &&
+            lockedAccounts.map((account) => (
+              <LockedAccount
+                key={account.address.toBase58()}
+                account={account}
+              />
+            ))}
+        </div>
+
         {claimTickets.length > 0 || redeemTickets.length > 0 ? (
           <div className="flex flex-col space-y-2 mt-2">
             <p className="text-md text-fgd-2">Tickets</p>

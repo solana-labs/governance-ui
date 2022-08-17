@@ -1,10 +1,13 @@
 import useWallet from '@hooks/useWallet'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { notify } from '@utils/notifications'
+import { BigNumber } from 'bignumber.js'
 import { FC, useEffect, useState } from 'react'
 import useSerumGovStore, {
   ClaimTicketType,
+  MSRM_DECIMALS,
   RedeemTicketType,
+  SRM_DECIMALS,
 } from 'stores/useSerumGovStore'
 import useWalletStore from 'stores/useWalletStore'
 
@@ -56,10 +59,13 @@ const Ticket: FC<Props> = ({ ticket }) => {
       <div className="w-full flex items-center justify-between">
         {gsrmMint && (
           <p className="text-fgd-1 text-xl font-semibold">
-            {fmtMintAmount(
-              gsrmMint,
-              isClaimTicket(ticket) ? ticket.gsrmAmount : ticket.amount
-            )}{' '}
+            {isClaimTicket(ticket)
+              ? `${fmtMintAmount(gsrmMint, ticket.gsrmAmount)}`
+              : `${new BigNumber(ticket.amount.toString())
+                  .shiftedBy(
+                    -1 * (ticket.isMsrm ? MSRM_DECIMALS : SRM_DECIMALS)
+                  )
+                  .toFormat()}`}{' '}
             {isClaimTicket(ticket) ? 'gSRM' : ticket.isMsrm ? 'MSRM' : 'SRM'}
           </p>
         )}

@@ -22,7 +22,9 @@
           "name": "gsrmMint",
           "isMut": true,
           "isSigner": false,
-          "docs": ["NOTE: Decimals have been kept same as SRM."]
+          "docs": [
+            "NOTE: Decimals have been kept same as SRM."
+          ]
         },
         {
           "name": "srmMint",
@@ -92,9 +94,14 @@
       "name": "depositLockedSrm",
       "accounts": [
         {
-          "name": "owner",
+          "name": "payer",
           "isMut": true,
           "isSigner": true
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "userAccount",
@@ -107,7 +114,7 @@
           "isSigner": false
         },
         {
-          "name": "ownerSrmAccount",
+          "name": "payerSrmAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -158,9 +165,14 @@
       "name": "depositLockedMsrm",
       "accounts": [
         {
-          "name": "owner",
+          "name": "payer",
           "isMut": true,
           "isSigner": true
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "userAccount",
@@ -173,7 +185,7 @@
           "isSigner": false
         },
         {
-          "name": "ownerMsrmAccount",
+          "name": "payerMsrmAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -500,6 +512,77 @@
       ]
     },
     {
+      "name": "depositVestMsrm",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ownerUserAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vestAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "claimTicket",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "msrmMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "payerMsrmAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "msrmVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "burnVestGsrm",
       "accounts": [
         {
@@ -679,6 +762,10 @@
             "type": "publicKey"
           },
           {
+            "name": "isMsrm",
+            "type": "bool"
+          },
+          {
             "name": "bump",
             "type": "u8"
           },
@@ -748,6 +835,6 @@
     }
   ],
   "metadata": {
-    "address": "6titGTyVcdPo8GfHhJi3fhgLGkSHuhaEPiDpiUqK45v4"
+    "address": "GaokYbJFjAVJ23wodF5ttRLudaJMudHSv7esDt1d4J1k"
   }
 }

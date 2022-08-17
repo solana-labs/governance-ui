@@ -45,14 +45,9 @@ const LockedAccount: FC<Props> = ({ account }) => {
     },
   })
 
-  useEffect(() => {
-    console.log(errors)
-  }, [errors])
-
   const handleBurn: SubmitHandler<BurnLockedAccountFormValues> = async ({
     amount,
   }) => {
-    console.log(parseFloat(amount.toString()))
     if (!gsrmMint || !gsrmBalance || isNaN(parseFloat(amount.toString()))) {
       return
     }
@@ -75,7 +70,6 @@ const LockedAccount: FC<Props> = ({ account }) => {
         )} gSRM can be burned`,
       })
     }
-    console.log(amountAsBN.toNumber())
     await actions.burnLockedGsrm(
       connection,
       anchorProvider,
@@ -87,30 +81,50 @@ const LockedAccount: FC<Props> = ({ account }) => {
 
   return (
     <div className="p-3 rounded-md border-2 border-bkg-4">
-      <div
-        className={classNames(
-          'border',
-          'inline-flex',
-          'min-w-max',
-          'items-center',
-          'px-2',
-          'py-1',
-          'rounded-full',
-          'text-xs',
-          'border-1',
-          'border-fgd-3',
-          'text-fgd-3',
-          'font-medium'
-        )}
-      >
-        Locked Account
+      <div className="flex items-center space-x-2">
+        <div
+          className={classNames(
+            'border',
+            'inline-flex',
+            'min-w-max',
+            'items-center',
+            'px-2',
+            'py-1',
+            'rounded-full',
+            'text-xs',
+            'border-1',
+            'border-blue',
+            'text-blue',
+            'font-medium'
+          )}
+        >
+          Locked Account
+        </div>
+        <div
+          className={classNames(
+            'border',
+            'inline-flex',
+            'min-w-max',
+            'items-center',
+            'px-2',
+            'py-1',
+            'rounded-full',
+            'text-xs',
+            'border-1',
+            'border-fgd-2',
+            'text-fgd-2',
+            'font-medium'
+          )}
+        >
+          {account.isMsrm ? 'MSRM' : 'SRM'}
+        </div>
       </div>
-      <div className="mt-3 flex items-end space-x-1">
-        <p className="text-2xl font-semibold">
+      <div className="mt-3 flex flex-col space-y-1 flex-1">
+        <p className="text-xs">gSRM burned</p>
+        <p className="text-lg font-semibold">
           {fmtMintAmount(gsrmMint, account.gsrmBurned)}/
           {fmtMintAmount(gsrmMint, account.totalGsrmAmount)}
         </p>
-        <p className="text-xs mb-1">gSRM redeemed</p>
       </div>
       <form
         onSubmit={handleSubmit(handleBurn)}

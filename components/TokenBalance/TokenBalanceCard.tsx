@@ -53,6 +53,7 @@ type Props = { proposal?: Option<Proposal> }
 const TokenBalanceCard: FC<Props> = ({ proposal, children }) => {
   const { councilMint, mint, realm, symbol } = useRealm()
   const connected = useWalletStore((s) => s.connected)
+  const cluster = useWalletStore((s) => s.connection.cluster)
   const wallet = useWalletStore((s) => s.current)
   const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
   const { fmtUrlWithCluster } = useQueryContext()
@@ -141,7 +142,7 @@ const TokenBalanceCard: FC<Props> = ({ proposal, children }) => {
           <div className="h-10 rounded-lg animate-pulse bg-bkg-3" />
         </>
       )}
-      <SerumGovernanceTokenWrapper />
+      {cluster === 'devnet' ? <SerumGovernanceTokenWrapper /> : null}
       {children}
     </div>
   )
