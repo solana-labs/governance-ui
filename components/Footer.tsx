@@ -2,7 +2,6 @@ import Link from 'next/link'
 import cx from 'classnames'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 
-import Logo from '@components/Logo'
 import SocialIcons from '@components/SocialIcons'
 
 const Footer = () => {
@@ -29,9 +28,7 @@ const Footer = () => {
         'md:gap-y-0'
       )}
     >
-      <div className="pl-14 w-80">
-        <Logo />
-      </div>
+      <div className="pl-14 w-80" />
 
       <div
         className={cx(
