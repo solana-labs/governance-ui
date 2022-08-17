@@ -303,6 +303,17 @@ export interface MangoMakeChangeReferralFeeParams {
   refMngoRequired: number
 }
 
+export interface MangoMakeChangeReferralFeeParams2 {
+  governedAccount: AssetAccount | undefined
+  programId: string | undefined
+  mangoGroup: string | undefined
+  refSurchargeCentibps: number
+  refShareCentibps: number
+  refMngoRequired: number
+  refSurchargeCentibps2: number
+  refShareCentibps2: number
+}
+
 export interface ForesightHasGovernedAccount {
   governedAccount: AssetAccount
 }
@@ -415,6 +426,7 @@ export enum Instructions {
   MangoChangeMaxAccounts,
   MangoChangePerpMarket,
   MangoChangeReferralFeeParams,
+  MangoChangeReferralFeeParams2,
   MangoChangeSpotMarket,
   MangoCreatePerpMarket,
   MangoSetMarketMode,

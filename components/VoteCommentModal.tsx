@@ -79,9 +79,12 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
         voterTokenRecord,
         vote,
         msg,
-        client
+        client,
+        refetchProposals
       )
-      await refetchProposals()
+      if (!isNftPlugin) {
+        await refetchProposals()
+      }
     } catch (ex) {
       if (isNftPlugin) {
         closeNftVotingCountingModal(
