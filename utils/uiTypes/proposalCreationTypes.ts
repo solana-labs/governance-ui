@@ -5,7 +5,6 @@ import { MintInfo } from '@solana/spl-token'
 import { PublicKey, Keypair, TransactionInstruction } from '@solana/web3.js'
 import { getNameOf } from '@tools/core/script'
 import { SupportedMintName } from '@tools/sdk/solend/configuration'
-import { SplTokenUIName } from '@utils/splTokens'
 import { DepositWithMintAccount, Voter } from 'VoteStakeRegistry/sdk/accounts'
 import { LockupKind } from 'VoteStakeRegistry/tools/types'
 import { consts as foresightConsts } from '@foresight-tmp/foresight-sdk'
@@ -365,7 +364,7 @@ export interface SwitchboardRevokeOracleForm {
 
 export interface CreateAssociatedTokenAccountForm {
   governedAccount?: AssetAccount
-  splTokenMintUIName?: SplTokenUIName
+  splTokenMint?: string
 }
 
 export interface CreateSolendObligationAccountForm {
