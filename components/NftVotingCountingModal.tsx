@@ -66,9 +66,9 @@ const NftVotingCountingModal = () => {
       onClose={closeNftVotingCountingModal}
       isOpen={votingInProgress}
     >
-      <h2>Voting NFT stats</h2>
+      <h2>NFT voting progress</h2>
       <div>
-        Counted NFTS: {usedNftsCount} out of {totalVotingPower}
+        {usedNftsCount} counted out of {totalVotingPower}
       </div>
       <div className="pb-5 pt-2">
         <div className="w-full h-4 bg-gray-200 rounded-full dark:bg-gray-700">
@@ -81,8 +81,7 @@ const NftVotingCountingModal = () => {
         </div>
       </div>
       <div className="text-xs">
-        Vote will be cast at the end of NFTS count. All NFTS need to be counted
-        in order to cast vote.
+        Vote will be cast once all the NFTs are counted
       </div>
     </Modal>
   ) : null
