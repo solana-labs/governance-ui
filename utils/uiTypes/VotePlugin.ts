@@ -45,13 +45,7 @@ type UpdateVoterWeightRecordTypes =
   | 'signOffProposal'
 
 export interface VotingClientProps {
-  client:
-    | VsrClient
-    | NftVoterClient
-    | SwitchboardQueueVoterClient
-    | PythClient
-    | GatewayClient
-    | undefined
+  client: Client | undefined
   realm: ProgramAccount<Realm> | undefined
   walletPk: PublicKey | null | undefined
 }
@@ -89,15 +83,16 @@ interface ProgramAddresses {
   maxVoterWeightRecord: PublicKey | undefined
 }
 
+export type Client =
+  | VsrClient
+  | NftVoterClient
+  | SwitchboardQueueVoterClient
+  | PythClient
+  | GatewayClient
+
 //Abstract for common functions that plugins will implement
 export class VotingClient {
-  client:
-    | VsrClient
-    | NftVoterClient
-    | SwitchboardQueueVoterClient
-    | PythClient
-    | GatewayClient
-    | undefined
+  client: Client | undefined
   realm: ProgramAccount<Realm> | undefined
   walletPk: PublicKey | null | undefined
   votingNfts: NFTWithMeta[]
