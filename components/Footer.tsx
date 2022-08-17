@@ -30,7 +30,9 @@ const Footer = () => {
         'md:gap-y-0'
       )}
     >
-      <Logo />
+      <div className="w-80">
+        <Logo />
+      </div>
 
       <div
         className={cx(
@@ -59,24 +61,16 @@ const Footer = () => {
         >
           <SocialIcons className="mb-5" />
           <div className="flex justify-center space-x-2 text-sm opacity-70">
-            <div className="whitespace-nowrap">
+            <div className="flex-shrink-0 whitespace-nowrap">
               © 2022 Solana Technology Services LLC
             </div>
             <span>|</span>
-            <Link
-              className="whitespace-nowrap"
-              href="https://realms.today/terms"
-              passHref
-            >
-              <a>Terms</a>
+            <Link href="https://realms.today/terms" passHref>
+              <a className="flex-shrink-0 whitespace-nowrap">Terms</a>
             </Link>
             <span>|</span>
-            <Link
-              className="whitespace-nowrap"
-              href="https://realms.today/privacy-policy"
-              passHref
-            >
-              <a>Privacy Policy</a>
+            <Link href="https://realms.today/privacy-policy" passHref>
+              <a className="flex-shrink-0 whitespace-nowrap">Privacy Policy</a>
             </Link>
           </div>
         </div>
@@ -85,24 +79,26 @@ const Footer = () => {
         </div>
       </div>
 
-      <a
-        className={cx(
-          'flex',
-          'items-center',
-          'group',
-          '-mr-11',
-          'px-11',
-          'py-5',
-          'opacity-70',
-          'active:opacity-50',
-          'focus:opacity-[.80]',
-          'hover:opacity-[.80]'
-        )}
-        href="https://docs.realms.today/"
-      >
-        <ExternalLinkIcon className="w-4 h-4 mr-2 stroke-current" />
-        <div>Read the Docs</div>
-      </a>
+      <div className="w-80 flex items-center justify-end">
+        <a
+          className={cx(
+            'flex',
+            'items-center',
+            'group',
+            '-mr-11',
+            'px-11',
+            'py-5',
+            'opacity-70',
+            'active:opacity-50',
+            'focus:opacity-[.80]',
+            'hover:opacity-[.80]'
+          )}
+          href="https://docs.realms.today/"
+        >
+          <ExternalLinkIcon className="w-4 h-4 mr-2 stroke-current" />
+          <div>Read the Docs</div>
+        </a>
+      </div>
     </div>
   )
 }
