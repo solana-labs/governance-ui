@@ -34,7 +34,8 @@ export async function castVote(
   tokeOwnerRecord: ProgramAccount<TokenOwnerRecord>,
   yesNoVote: YesNoVote,
   message?: ChatMessageBody | undefined,
-  votingPlugin?: VotingClient
+  votingPlugin?: VotingClient,
+  runAfterConfirmation?: (() => void) | null
 ) {
   const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []
@@ -159,12 +160,16 @@ export async function castVote(
       showUiComponent: true,
       runAfterApproval:
         instructionsChunks.length > 2 ? openNftVotingCountingModal : null,
-      runAfterTransactionConfirmation: () =>
+      runAfterTransactionConfirmation: () => {
+        if (runAfterConfirmation) {
+          runAfterConfirmation()
+        }
         closeNftVotingCountingModal(
           votingPlugin.client as NftVoterClient,
           proposal,
           wallet.publicKey!
-        ),
+        )
+      },
     })
   } else {
     const transaction = new Transaction()

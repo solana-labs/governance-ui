@@ -1505,13 +1505,13 @@
     toformat "^2.0.0"
     yargs "^17.0.1"
 
-"@blockworks-foundation/mango-client@^3.6.7":
-  version "3.6.7"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-client/-/mango-client-3.6.7.tgz#ecc59bfc41af20cb0699f588e5477634b40cbbd7"
-  integrity sha512-AKPFzkDArQ4w1eO9xYQPwXoxuzpKNKWyryDmtNLm3YSgzpNQbKAfD6VH9Hxw3m3Kcq5YzYH9pIHSae+qFgOTvw==
+"@blockworks-foundation/mango-client@^3.6.13":
+  version "3.6.13"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-client/-/mango-client-3.6.13.tgz#021099432facdf89a2de34bb6a87d7b647facf9f"
+  integrity sha512-bgR2jT4SHL25CWTRbH9MNovvTmhSTqKwu0XcetRtapJrYTydEP3fI3ne8xqwUHMEuwhLZEcmLYBZpssBytmq4Q==
   dependencies:
     "@project-serum/anchor" "^0.21.0"
-    "@project-serum/serum" "0.13.55"
+    "@project-serum/serum" "^0.13.65"
     "@project-serum/sol-wallet-adapter" "^0.2.0"
     "@solana/spl-token" "^0.1.6"
     "@solana/web3.js" "^1.43.5"

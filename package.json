@@ -23,7 +23,7 @@
     ]
   },
   "dependencies": {
-    "@blockworks-foundation/mango-client": "^3.6.7",
+    "@blockworks-foundation/mango-client": "^3.6.13",
     "@blockworks-foundation/mango-v4": "^0.0.2",
     "@bundlr-network/client": "^0.7.15",
     "@cardinal/namespaces-components": "^2.5.5",
