@@ -6,7 +6,7 @@ import {
   parseMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
 import classNames from 'classnames'
-import { FC, useEffect } from 'react'
+import { FC } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import useSerumGovStore, { LockedAccountType } from 'stores/useSerumGovStore'
 import { notify } from '@utils/notifications'
