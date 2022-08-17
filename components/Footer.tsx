@@ -25,12 +25,11 @@ const Footer = () => {
         'w-full',
         'h-20',
         'pb-24',
-        'px-12',
         'gap-y-8',
         'md:gap-y-0'
       )}
     >
-      <div className="w-80">
+      <div className="pl-14 w-80">
         <Logo />
       </div>
 
@@ -79,7 +78,7 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="w-80 flex items-center justify-end">
+      <div className="pr-14 w-80 flex items-center justify-end">
         <a
           className={cx(
             'flex',
