@@ -1,17 +1,30 @@
 import { usePrevious } from '@hooks/usePrevious'
+import { NftVoterClient } from '@solana/governance-program-library'
 import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { useEffect, useState } from 'react'
 import useTransactionsStore from 'stores/useTransactionStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import useWalletStore from 'stores/useWalletStore'
 import Modal from './Modal'
 
 const NftVotingCountingModal = () => {
+  const votingInProgress = useNftProposalStore((s) => s.votingInProgress)
+  return votingInProgress ? <NftVotingComponent></NftVotingComponent> : null
+}
+
+const NftVotingComponent = () => {
   const { processedTransactions } = useTransactionsStore()
   const prevProcessedTransactions = usePrevious(processedTransactions)
   const {
     closeNftVotingCountingModal,
     countedNftsForProposal,
+    proposal,
   } = useNftProposalStore()
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
+  const wallet = useWalletStore((s) => s.current)
   const { votingNfts } = useNftPluginStore((s) => s.state)
   const votingInProgress = useNftProposalStore((s) => s.votingInProgress)
   const usedNfts = countedNftsForProposal.length
@@ -60,10 +73,17 @@ const NftVotingCountingModal = () => {
 
   return votingInProgress ? (
     <Modal
+      bgClickClose={false}
       bgBlack={false}
       zIndex={'z-[31]'}
       wrapperStyle={{ top: '-350px' }}
-      onClose={closeNftVotingCountingModal}
+      onClose={() =>
+        closeNftVotingCountingModal(
+          client.client as NftVoterClient,
+          proposal!,
+          wallet!.publicKey!
+        )
+      }
       isOpen={votingInProgress}
     >
       <h2>NFT voting progress</h2>

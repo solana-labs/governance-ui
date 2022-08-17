@@ -11,16 +11,18 @@ const Modal = ({
   zIndex = 'z-30',
   wrapperStyle,
   bgBlack = true,
+  bgClickClose = true,
 }: {
-  isOpen?: boolean
-  onClose?: any
-  children?: any
+  isOpen: boolean
+  onClose: any
+  children: any
   hideClose?: boolean
   sizeClassName?: string
   background?: string
   wrapperStyle?: any
   bgBlack?: boolean
   zIndex?: string
+  bgClickClose?: boolean
 }) => {
   return (
     <Portal>
@@ -38,7 +40,7 @@ const Modal = ({
                 bgBlack ? 'bg-black' : ''
               } bg-opacity-70`}
               aria-hidden="true"
-              onClick={onClose}
+              onClick={bgClickClose ? onClose : null}
             ></div>
           ) : null}
 
