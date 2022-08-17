@@ -35,7 +35,6 @@ const Proposal = () => {
     proposal?.account
   )
   const currentWallet = useWalletStore((s) => s.current)
-
   const showResults =
     proposal &&
     proposal.account.state !== ProposalState.Cancelled &&
