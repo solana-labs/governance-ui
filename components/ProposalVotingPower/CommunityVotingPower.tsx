@@ -74,7 +74,7 @@ export default function CommunityVotingPower(props: Props) {
     wallet,
   ])
 
-  if (!(realm && realmInfo && ownTokenRecord)) {
+  if (!(realm && realmInfo)) {
     return (
       <div
         className={classNames(props.className, 'rounded-md bg-bkg-1 h-[76px]')}

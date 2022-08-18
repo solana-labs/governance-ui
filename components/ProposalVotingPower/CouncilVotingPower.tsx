@@ -79,7 +79,7 @@ export default function CouncilVotingPower(props: Props) {
     wallet,
   ])
 
-  if (!(realm && realmInfo && ownCouncilTokenRecord)) {
+  if (!(realm && realmInfo)) {
     return (
       <div
         className={classNames(props.className, 'rounded-md bg-bkg-1 h-[76px]')}
