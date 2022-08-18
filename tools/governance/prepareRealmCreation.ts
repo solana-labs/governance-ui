@@ -8,6 +8,7 @@ import {
 import {
   getGovernanceProgramVersion,
   GovernanceConfig,
+  GoverningTokenConfigAccountArgs,
   SetRealmAuthorityAction,
   VoteTipping,
   WalletSigner,
@@ -55,7 +56,7 @@ interface RealmCreation {
   transferCouncilMintAuthority: boolean
   councilWalletPks: PublicKey[]
 
-  additionalRealmPlugins?: PublicKey[]
+  communityTokenConfig?: GoverningTokenConfigAccountArgs
 }
 
 export async function prepareRealmCreation({
@@ -78,7 +79,7 @@ export async function prepareRealmCreation({
   transferCouncilMintAuthority,
   councilWalletPks,
 
-  additionalRealmPlugins = [],
+  communityTokenConfig = undefined,
 }: RealmCreation) {
   const realmInstructions: TransactionInstruction[] = []
   const realmSigners: Keypair[] = []
@@ -234,11 +235,9 @@ export async function prepareRealmCreation({
     walletPk,
     councilMintPk,
     communityMintSupplyFactor,
-    minCommunityTokensToCreateAsMintValue
-    // ...additionalRealmPlugins
+    minCommunityTokensToCreateAsMintValue,
+    communityTokenConfig
   )
-
-  console.log('TODO: setup plugins', additionalRealmPlugins)
 
   // If the current wallet is in the team then deposit the council token
   if (walletAtaPk) {

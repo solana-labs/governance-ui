@@ -3,7 +3,7 @@ import Button from '../Button'
 import Input from '../inputs/Input'
 import useWalletStore from '../../stores/useWalletStore'
 import useRealm from '../../hooks/useRealm'
-import { RpcContext, GovernananceTokenKind } from '@solana/spl-governance'
+import { RpcContext, GovernanceTokenKind } from '@solana/spl-governance'
 import { ChatMessageBody, ChatMessageBodyType } from '@solana/spl-governance'
 import { postChatMessage } from '../../actions/chat/postMessage'
 import Loading from '../Loading'
@@ -32,7 +32,7 @@ const DiscussionForm = () => {
   const { fetchChatMessages } = useWalletStore((s) => s.actions)
   const { tokenType } = useWalletStore((s) => s.selectedProposal)
   const commenterVoterTokenRecord =
-    tokenType === GovernananceTokenKind.Community
+    tokenType === GovernanceTokenKind.Community
       ? ownTokenRecord
       : ownCouncilTokenRecord
 

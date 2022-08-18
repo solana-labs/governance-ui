@@ -5,7 +5,7 @@ import useRealm from '@hooks/useRealm'
 import { getTokenOwnerRecordAddress, Proposal } from '@solana/spl-governance'
 import useWalletStore from '../../../stores/useWalletStore'
 import { Option } from '@tools/core/option'
-import { GovernananceTokenKind } from '@solana/spl-governance'
+import { GovernanceTokenKind } from '@solana/spl-governance'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import useQueryContext from '@hooks/useQueryContext'
@@ -98,7 +98,7 @@ const LockPluginTokenBalanceCard = ({
           {communityDepositVisible && (
             <TokenDepositLock
               mint={mint}
-              tokenType={GovernananceTokenKind.Community}
+              tokenType={GovernanceTokenKind.Community}
               councilVote={false}
             />
           )}
@@ -106,7 +106,7 @@ const LockPluginTokenBalanceCard = ({
             <div className="mt-4">
               <TokenDeposit
                 mint={councilMint}
-                tokenType={GovernananceTokenKind.Council}
+                tokenType={GovernanceTokenKind.Council}
                 councilVote={true}
               />
             </div>
@@ -128,7 +128,7 @@ const TokenDepositLock = ({
   tokenType,
 }: {
   mint: MintInfo | undefined
-  tokenType: GovernananceTokenKind
+  tokenType: GovernanceTokenKind
   councilVote?: boolean
 }) => {
   const { realm, realmTokenAccount, councilTokenAccount } = useRealm()
@@ -157,19 +157,19 @@ const TokenDepositLock = ({
   }
 
   const depositTokenAccount =
-    tokenType === GovernananceTokenKind.Community
+    tokenType === GovernanceTokenKind.Community
       ? realmTokenAccount
       : councilTokenAccount
 
   const depositMint =
-    tokenType === GovernananceTokenKind.Community
+    tokenType === GovernanceTokenKind.Community
       ? realm?.account.communityMint
       : realm?.account.config.councilMint
 
   const tokenName = getMintMetadata(depositMint)?.name ?? realm?.account.name
 
   const depositTokenName = `${tokenName} ${
-    tokenType === GovernananceTokenKind.Community ? '' : 'Council'
+    tokenType === GovernanceTokenKind.Community ? '' : 'Council'
   }`
 
   const hasTokensInWallet =

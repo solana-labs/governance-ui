@@ -7,7 +7,7 @@ import { useHasVoteTimeExpired } from '../hooks/useHasVoteTimeExpired'
 import useRealm from '../hooks/useRealm'
 import { ProposalState } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
-import { GovernananceTokenKind } from '@solana/spl-governance'
+import { GovernanceTokenKind } from '@solana/spl-governance'
 import { BanIcon, ThumbUpIcon, ThumbDownIcon } from '@heroicons/react/solid'
 
 import useWalletStore from '../stores/useWalletStore'
@@ -55,7 +55,7 @@ const VotePanel = () => {
 
   // Handle state based on if a delegated wallet has already voted or not
   const ownVoteRecord =
-    tokenType === GovernananceTokenKind.Community && ownTokenRecord
+    tokenType === GovernanceTokenKind.Community && ownTokenRecord
       ? voteRecordsByVoter[
           ownTokenRecord.account.governingTokenOwner.toBase58()
         ]
@@ -66,7 +66,7 @@ const VotePanel = () => {
       : wallet?.publicKey && voteRecordsByVoter[wallet.publicKey.toBase58()]
 
   const voterTokenRecord =
-    tokenType === GovernananceTokenKind.Community
+    tokenType === GovernanceTokenKind.Community
       ? ownTokenRecord
       : ownCouncilTokenRecord
 
@@ -156,9 +156,7 @@ const VotePanel = () => {
   const actionLabel =
     !isVoteCast || !connected
       ? `Cast your ${
-          tokenType === GovernananceTokenKind.Community
-            ? 'community'
-            : 'council'
+          tokenType === GovernanceTokenKind.Community ? 'community' : 'council'
         } vote`
       : 'Your vote'
 
