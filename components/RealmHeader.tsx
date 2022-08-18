@@ -19,7 +19,7 @@ const RealmHeader = () => {
   const isLockTokensMode =
     config?.account.communityTokenConfig.voterWeightAddin &&
     vsrPluginsPks.includes(
-      config?.account.communityVoterWeightAddin?.toBase58()
+      config?.account.communityTokenConfig.voterWeightAddin?.toBase58()
     )
   const isBackNavVisible = realmInfo?.symbol !== REALM // hide backnav for the default realm
 
