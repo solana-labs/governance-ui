@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import BaseGovernanceForm, {
   BaseGovernanceFormFields,
 } from 'components/AssetsList/BaseGovernanceForm'
@@ -151,7 +152,10 @@ const NewAccountForm = () => {
           voteTipping: form.voteTipping,
         }
 
-        const governanceConfig = getGovernanceConfig(governanceConfigValues)
+        const governanceConfig = getGovernanceConfig(
+          realmInfo?.programVersion!,
+          governanceConfigValues
+        )
 
         await createTreasuryAccount(
           rpcContext,

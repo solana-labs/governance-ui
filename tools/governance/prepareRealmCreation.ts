@@ -9,7 +9,6 @@ import {
   getGovernanceProgramVersion,
   GovernanceConfig,
   SetRealmAuthorityAction,
-  VoteThresholdPercentage,
   VoteTipping,
   WalletSigner,
   withCreateGovernance,
@@ -34,6 +33,7 @@ import { withMintTo } from '@tools/sdk/splToken/withMintTo'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 
 import BN from 'bn.js'
+import { createGovernanceThresholds } from './configs'
 
 interface RealmCreation {
   connection: Connection
@@ -234,9 +234,11 @@ export async function prepareRealmCreation({
     walletPk,
     councilMintPk,
     communityMintSupplyFactor,
-    minCommunityTokensToCreateAsMintValue,
-    ...additionalRealmPlugins
+    minCommunityTokensToCreateAsMintValue
+    // ...additionalRealmPlugins
   )
+
+  console.log('TODO: setup plugins', additionalRealmPlugins)
 
   // If the current wallet is in the team then deposit the council token
   if (walletAtaPk) {
@@ -254,19 +256,24 @@ export async function prepareRealmCreation({
     )
   }
 
+  const {
+    communityVoteThreshold,
+    councilVoteThreshold,
+    councilVetoVoteThreshold,
+  } = createGovernanceThresholds(programVersion, communityYesVotePercentage)
+
   // Put community and council mints under the realm governance with default config
   const config = new GovernanceConfig({
-    voteThresholdPercentage: new VoteThresholdPercentage({
-      value: communityYesVotePercentage,
-    }),
+    communityVoteThreshold: communityVoteThreshold,
     minCommunityTokensToCreateProposal: minCommunityTokensToCreateAsMintValue,
     // Do not use instruction hold up time
     minInstructionHoldUpTime: 0,
     // max voting time 3 days
     maxVotingTime: getTimestampFromDays(maxVotingTimeInDays),
     voteTipping: VoteTipping.Strict,
-    proposalCoolOffTime: 0,
     minCouncilTokensToCreateProposal: new BN(initialCouncilTokenAmount),
+    councilVoteThreshold: councilVoteThreshold,
+    councilVetoVoteThreshold: councilVetoVoteThreshold,
   })
 
   const communityMintGovPk = createCommunityMintGovernance

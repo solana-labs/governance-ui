@@ -1,5 +1,6 @@
 import {
   AccountMetaData,
+  deserializeBorsh,
   getGovernance,
   getGovernanceProgramVersion,
   getGovernanceSchema,
@@ -15,7 +16,6 @@ import {
   SetGovernanceConfigArgs,
   SetRealmConfigArgs,
 } from '@solana/spl-governance'
-import { GOVERNANCE_SCHEMA } from '@solana/spl-governance'
 import { Connection } from '@solana/web3.js'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import { fmtVoterWeightThresholdMintAmount } from '@tools/governance/units'
@@ -24,7 +24,6 @@ import {
   fmtMintAmount,
   getDaysFromTimestamp,
 } from '@tools/sdk/units'
-import { deserialize } from 'borsh'
 
 import { tryGetMint } from '../../../utils/tokens'
 
@@ -38,14 +37,20 @@ export const GOVERNANCE_INSTRUCTIONS = {
         data: Uint8Array,
         accounts: AccountMetaData[]
       ) => {
-        const args = deserialize(
-          GOVERNANCE_SCHEMA,
+        const governance = await getGovernance(connection, accounts[0].pubkey)
+        const realm = await getRealm(connection, governance.account.realm)
+
+        const programVersion = await getGovernanceProgramVersion(
+          connection,
+          realm.owner
+        )
+
+        const args = deserializeBorsh(
+          getGovernanceSchema(programVersion),
           SetGovernanceConfigArgs,
           Buffer.from(data)
         ) as SetGovernanceConfigArgs
 
-        const governance = await getGovernance(connection, accounts[0].pubkey)
-        const realm = await getRealm(connection, governance.account.realm)
         const communityMint = await tryGetMint(
           connection,
           realm.account.communityMint
@@ -60,7 +65,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
           <>
             <p>
               {`voteThresholdPercentage:
-              ${args.config.voteThresholdPercentage.value.toLocaleString()}%`}
+              ${args.config.communityVoteThreshold.value?.toLocaleString()}%`}
             </p>
             {isMaxNumber ? (
               <p>minCommunityTokensToCreateProposal: Disabled</p>
@@ -95,10 +100,6 @@ export const GOVERNANCE_INSTRUCTIONS = {
               {`voteTipping:
               ${VoteTipping[args.config.voteTipping]}`}
             </p>
-            <p>
-              {`proposalCoolOffTime:
-              ${getDaysFromTimestamp(args.config.proposalCoolOffTime)} days(s)`}
-            </p>
           </>
         )
       },
@@ -121,7 +122,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
           realm.owner
         )
 
-        const args = deserialize(
+        const args = deserializeBorsh(
           getGovernanceSchema(programVersion),
           SetRealmAuthorityArgs,
           Buffer.from(data)
@@ -145,13 +146,18 @@ export const GOVERNANCE_INSTRUCTIONS = {
         data: Uint8Array,
         accounts: AccountMetaData[]
       ) => {
-        const args = deserialize(
-          GOVERNANCE_SCHEMA,
+        const realm = await getRealm(connection, accounts[0].pubkey)
+        const programVersion = await getGovernanceProgramVersion(
+          connection,
+          realm.owner
+        )
+
+        const args = deserializeBorsh(
+          getGovernanceSchema(programVersion),
           SetRealmConfigArgs,
           Buffer.from(data)
         ) as SetRealmConfigArgs
 
-        const realm = await getRealm(connection, accounts[0].pubkey)
         const communityMint = await tryGetMint(
           connection,
           realm.account.communityMint
@@ -202,16 +208,16 @@ export const GOVERNANCE_INSTRUCTIONS = {
               {`useMaxCommunityVoterWeightAddin:
                ${!!args.configArgs.useMaxCommunityVoterWeightAddin}`}
             </p>
-            {config?.account.communityVoterWeightAddin && (
+            {config?.account.communityTokenConfig.voterWeightAddin && (
               <p>
                 {`communityVoterWeightAddin :
-               ${config?.account.communityVoterWeightAddin?.toBase58()}`}
+               ${config?.account.communityTokenConfig.voterWeightAddin?.toBase58()}`}
               </p>
             )}
-            {config?.account.maxCommunityVoterWeightAddin && (
+            {config?.account.communityTokenConfig.maxVoterWeightAddin && (
               <p>
                 {`maxCommunityVoterWeightAddin:
-               ${config?.account.maxCommunityVoterWeightAddin?.toBase58()}`}
+               ${config?.account.communityTokenConfig.maxVoterWeightAddin?.toBase58()}`}
               </p>
             )}
           </>

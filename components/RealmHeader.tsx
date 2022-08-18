@@ -17,7 +17,7 @@ const RealmHeader = () => {
   const { REALM } = process.env
   const activeMembers = useMembersStore((s) => s.compact.activeMembers)
   const isLockTokensMode =
-    config?.account.communityVoterWeightAddin &&
+    config?.account.communityTokenConfig.voterWeightAddin &&
     vsrPluginsPks.includes(
       config?.account.communityVoterWeightAddin?.toBase58()
     )

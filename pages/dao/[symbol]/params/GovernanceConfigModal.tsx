@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import Modal from '@components/Modal'
 import Input from '@components/inputs/Input'
 import VoteBySwitch from '../proposal/components/VoteBySwitch'
@@ -46,7 +47,7 @@ const GovernanceConfigModal = ({
   governance: ProgramAccount<Governance>
 }) => {
   const router = useRouter()
-  const { realm, canChooseWhoVote, symbol, mint } = useRealm()
+  const { realm, canChooseWhoVote, symbol, mint, realmInfo } = useRealm()
   const config = governance?.account.config
   const { fmtUrlWithCluster } = useQueryContext()
   const wallet = useWalletStore((s) => s.current)
@@ -70,7 +71,7 @@ const GovernanceConfigModal = ({
       config?.minInstructionHoldUpTime
     ),
     maxVotingTime: getDaysFromTimestamp(config?.maxVotingTime),
-    voteThreshold: config?.voteThresholdPercentage.value,
+    voteThreshold: config?.communityVoteThreshold.value!,
     voteTipping: config?.voteTipping,
   })
   const handleSetForm = ({ propertyName, value }) => {
@@ -91,7 +92,10 @@ const GovernanceConfigModal = ({
         mintDecimals: mint!.decimals,
         voteTipping: form.voteTipping,
       }
-      const governanceConfig = getGovernanceConfig(governanceConfigValues)
+      const governanceConfig = getGovernanceConfig(
+        realmInfo?.programVersion!,
+        governanceConfigValues
+      )
       const instruction = await createSetGovernanceConfig(
         realm.owner,
         governance?.pubkey,
