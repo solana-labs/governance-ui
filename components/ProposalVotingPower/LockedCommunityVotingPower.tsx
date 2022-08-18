@@ -162,9 +162,7 @@ export default function LockedCommunityVotingPower(props: Props) {
     <div className={props.className}>
       {amount.isZero() ? (
         <div className={'text-xs text-white/50'}>
-          You do not have any voting power
-          <br />
-          in this realm.
+          You do not have any voting power in this realm.
         </div>
       ) : (
         <>
