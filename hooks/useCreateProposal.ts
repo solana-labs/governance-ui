@@ -21,6 +21,7 @@ export default function useCreateProposal() {
     mint,
     councilMint,
     canChooseWhoVote,
+    config,
   } = useRealm()
   const { getRpcContext } = useRpcContext()
   const handleCreateProposal = async ({
@@ -45,7 +46,7 @@ export default function useCreateProposal() {
 
     const defaultProposalMint =
       !mint?.supply.isZero() ||
-      realm?.account.config.useCommunityVoterWeightAddin
+      config?.account.communityTokenConfig.voterWeightAddin
         ? realm!.account.communityMint
         : !councilMint?.supply.isZero()
         ? realm!.account.config.councilMint

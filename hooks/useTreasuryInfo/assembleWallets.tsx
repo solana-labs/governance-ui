@@ -5,6 +5,7 @@ import {
   getProgramDataAccount,
   ProgramAccount,
   Realm,
+  RealmConfigAccount,
 } from '@solana/spl-governance'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { SparklesIcon } from '@heroicons/react/outline'
@@ -41,6 +42,7 @@ export const assembleWallets = async (
   councilMint?: MintInfo,
   communityMint?: MintInfo,
   realm?: ProgramAccount<Realm>,
+  realmConfig?: ProgramAccount<RealmConfigAccount>,
   realmInfo?: RealmInfo
 ) => {
   const walletMap: { [address: string]: Wallet } = {}
@@ -277,9 +279,10 @@ export const assembleWallets = async (
             minCommunityTokensToCreateGovernance: new BigNumber(
               config.minCommunityTokensToCreateGovernance.toString()
             ).shiftedBy(communityMint ? -communityMint.decimals : 0),
-            useCommunityVoterWeightAddin: config.useCommunityVoterWeightAddin,
-            useMaxCommunityVoterWeightAddin:
-              config.useMaxCommunityVoterWeightAddin,
+            useCommunityVoterWeightAddin: !!realmConfig?.account
+              .communityTokenConfig.voterWeightAddin,
+            useMaxCommunityVoterWeightAddin: !!realmConfig?.account
+              .communityTokenConfig.maxVoterWeightAddin,
           },
           icon: realmInfo?.ogImage ? (
             <img src={realmInfo.ogImage} />

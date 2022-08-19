@@ -194,7 +194,7 @@ export default function useRealm() {
   const canChooseWhoVote =
     realm?.account.communityMint &&
     (!mint?.supply.isZero() ||
-      realm.account.config.useCommunityVoterWeightAddin) &&
+      config?.account.communityTokenConfig.voterWeightAddin) &&
     realm.account.config.councilMint &&
     !councilMint?.supply.isZero()
 
