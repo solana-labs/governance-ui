@@ -5,7 +5,7 @@ import * as yup from 'yup'
 import { deprecated } from '@metaplex-foundation/mpl-token-metadata'
 import axios from 'axios'
 
-import { updateUserInput, validateSolAddress } from '@utils/formValidation'
+import { updateUserInput, validatePubkey } from '@utils/formValidation'
 import { notify } from '@utils/notifications'
 import { abbreviateAddress } from '@utils/formatting'
 
@@ -286,7 +286,7 @@ export default function AddNFTCollectionForm({
   async function handleAdd(collectionInput) {
     clearErrors()
 
-    if (validateSolAddress(collectionInput)) {
+    if (validatePubkey(collectionInput)) {
       handleClearSelectedNFT(false)
       setRequestPending(true)
       try {
