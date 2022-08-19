@@ -32,6 +32,10 @@ import {
   getMaxVoterWeightRecord as getPluginMaxVoterWeightRecord,
 } from '@utils/plugin/accounts'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
+import {
+  getNftVoteRecordProgramAddress,
+  getUsedNftsForProposal,
+} from 'NftVotePlugin/accounts'
 
 type UpdateVoterWeightRecordTypes =
   | 'castVote'
@@ -41,13 +45,7 @@ type UpdateVoterWeightRecordTypes =
   | 'signOffProposal'
 
 export interface VotingClientProps {
-  client:
-    | VsrClient
-    | NftVoterClient
-    | SwitchboardQueueVoterClient
-    | PythClient
-    | GatewayClient
-    | undefined
+  client: Client | undefined
   realm: ProgramAccount<Realm> | undefined
   walletPk: PublicKey | null | undefined
 }
@@ -85,15 +83,16 @@ interface ProgramAddresses {
   maxVoterWeightRecord: PublicKey | undefined
 }
 
+export type Client =
+  | VsrClient
+  | NftVoterClient
+  | SwitchboardQueueVoterClient
+  | PythClient
+  | GatewayClient
+
 //Abstract for common functions that plugins will implement
 export class VotingClient {
-  client:
-    | VsrClient
-    | NftVoterClient
-    | SwitchboardQueueVoterClient
-    | PythClient
-    | GatewayClient
-    | undefined
+  client: Client | undefined
   realm: ProgramAccount<Realm> | undefined
   walletPk: PublicKey | null | undefined
   votingNfts: NFTWithMeta[]
@@ -302,25 +301,16 @@ export class VotingClient {
         isSigner: boolean
         isWritable: boolean
       }[] = []
-      const nftVoteRecordsFiltered = await this.client.program.account.nftVoteRecord.all(
-        [
-          {
-            memcmp: {
-              offset: 8,
-              bytes: proposal.pubkey.toBase58(),
-            },
-          },
-        ]
+      const nftVoteRecordsFiltered = await getUsedNftsForProposal(
+        this.client,
+        proposal.pubkey
       )
       for (let i = 0; i < this.votingNfts.length; i++) {
         const nft = this.votingNfts[i]
         const tokenAccount = await nft.getAssociatedTokenAccount()
-        const [nftVoteRecord] = await PublicKey.findProgramAddress(
-          [
-            Buffer.from('nft-vote-record'),
-            proposal.pubkey.toBuffer(),
-            new PublicKey(nft.mintAddress).toBuffer(),
-          ],
+        const { nftVoteRecord } = await getNftVoteRecordProgramAddress(
+          proposal.pubkey,
+          nft.mintAddress,
           clientProgramId
         )
         if (
@@ -457,14 +447,7 @@ export class VotingClient {
         isWritable: boolean
       }[] = []
       const nftVoteRecordsFiltered = (
-        await this.client.program.account.nftVoteRecord.all([
-          {
-            memcmp: {
-              offset: 8,
-              bytes: proposal.pubkey.toBase58(),
-            },
-          },
-        ])
+        await getUsedNftsForProposal(this.client, proposal.pubkey)
       ).filter(
         (x) => x.account.governingTokenOwner.toBase58() === walletPk.toBase58()
       )

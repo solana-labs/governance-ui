@@ -8,4 +8,4 @@ updates:
       - dependency-type: 'direct'
     commit-message:
       prefix: 'npm'
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 0

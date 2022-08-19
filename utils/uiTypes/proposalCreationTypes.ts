@@ -5,7 +5,6 @@ import { MintInfo } from '@solana/spl-token'
 import { PublicKey, Keypair, TransactionInstruction } from '@solana/web3.js'
 import { getNameOf } from '@tools/core/script'
 import { SupportedMintName } from '@tools/sdk/solend/configuration'
-import { SplTokenUIName } from '@utils/splTokens'
 import { DepositWithMintAccount, Voter } from 'VoteStakeRegistry/sdk/accounts'
 import { LockupKind } from 'VoteStakeRegistry/tools/types'
 import { consts as foresightConsts } from '@foresight-tmp/foresight-sdk'
@@ -303,6 +302,17 @@ export interface MangoMakeChangeReferralFeeParams {
   refMngoRequired: number
 }
 
+export interface MangoMakeChangeReferralFeeParams2 {
+  governedAccount: AssetAccount | undefined
+  programId: string | undefined
+  mangoGroup: string | undefined
+  refSurchargeCentibps: number
+  refShareCentibps: number
+  refMngoRequired: number
+  refSurchargeCentibps2: number
+  refShareCentibps2: number
+}
+
 export interface ForesightHasGovernedAccount {
   governedAccount: AssetAccount
 }
@@ -354,7 +364,7 @@ export interface SwitchboardRevokeOracleForm {
 
 export interface CreateAssociatedTokenAccountForm {
   governedAccount?: AssetAccount
-  splTokenMintUIName?: SplTokenUIName
+  splTokenMint?: string
 }
 
 export interface CreateSolendObligationAccountForm {
@@ -415,6 +425,7 @@ export enum Instructions {
   MangoChangeMaxAccounts,
   MangoChangePerpMarket,
   MangoChangeReferralFeeParams,
+  MangoChangeReferralFeeParams2,
   MangoChangeSpotMarket,
   MangoCreatePerpMarket,
   MangoSetMarketMode,
@@ -475,6 +486,8 @@ export enum Instructions {
   DeactivateValidatorStake,
   WithdrawValidatorStake,
   DifferValidatorStake,
+  EverlendDeposit,
+  EverlendWithdraw,
 }
 
 export type createParams = [

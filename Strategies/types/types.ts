@@ -44,6 +44,10 @@ export type SolendStrategy = TreasuryStrategy & {
   createProposalFcn: CreateSolendStrategyParams
 }
 
+export type EverlendStrategy = TreasuryStrategy & {
+  poolMint: string
+}
+
 export type HandleCreateProposalWithStrategy = (
   { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
   handledMint: string,

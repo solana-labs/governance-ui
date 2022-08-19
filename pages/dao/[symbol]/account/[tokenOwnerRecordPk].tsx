@@ -9,9 +9,9 @@ const account = () => {
   const { config } = useRealm()
   const tokenOwnerRecordPk = router?.query?.tokenOwnerRecordPk
   const isLockTokensMode =
-    config?.account.communityVoterWeightAddin &&
+    config?.account.communityTokenConfig.voterWeightAddin &&
     vsrPluginsPks.includes(
-      config?.account.communityVoterWeightAddin?.toBase58()
+      config?.account.communityTokenConfig.voterWeightAddin?.toBase58()
     )
 
   const getAccountView = () => {

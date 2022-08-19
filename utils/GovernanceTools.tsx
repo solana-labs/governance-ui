@@ -1,8 +1,4 @@
-import {
-  GovernanceConfig,
-  VoteThresholdPercentage,
-  VoteTipping,
-} from '@solana/spl-governance'
+import { GovernanceConfig, VoteTipping } from '@solana/spl-governance'
 import { BN } from '@project-serum/anchor'
 import {
   getMintNaturalAmountFromDecimal,
@@ -10,6 +6,7 @@ import {
   parseMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
 import { isDisabledVoterWeight } from '@tools/governance/units'
+import { createGovernanceThresholds } from '@tools/governance/configs'
 
 export interface GovernanceConfigValues {
   minTokensToCreateProposal: number | string
@@ -30,7 +27,16 @@ export function parseMinTokensToCreate(
     : getMintNaturalAmountFromDecimal(value, mintDecimals)
 }
 
-export function getGovernanceConfig(values: GovernanceConfigValues) {
+export function getGovernanceConfig(
+  programVersion: number,
+  values: GovernanceConfigValues
+) {
+  const {
+    communityVoteThreshold,
+    councilVoteThreshold,
+    councilVetoVoteThreshold,
+  } = createGovernanceThresholds(programVersion, values.voteThresholdPercentage)
+
   const minTokensToCreateProposal = isDisabledVoterWeight(
     values.minTokensToCreateProposal
   )
@@ -39,10 +45,9 @@ export function getGovernanceConfig(values: GovernanceConfigValues) {
         values.minTokensToCreateProposal,
         values.mintDecimals
       )
+
   return new GovernanceConfig({
-    voteThresholdPercentage: new VoteThresholdPercentage({
-      value: values.voteThresholdPercentage,
-    }),
+    communityVoteThreshold: communityVoteThreshold,
     minCommunityTokensToCreateProposal: new BN(
       minTokensToCreateProposal.toString()
     ),
@@ -55,5 +60,7 @@ export function getGovernanceConfig(values: GovernanceConfigValues) {
     // If it turns to be a wrong assumption then it should be exposed in the UI
     minCouncilTokensToCreateProposal: new BN(1),
     voteTipping: values.voteTipping || 0,
+    councilVoteThreshold: councilVoteThreshold,
+    councilVetoVoteThreshold: councilVetoVoteThreshold,
   })
 }

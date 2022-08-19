@@ -131,6 +131,17 @@ const CreateGatewayPluginRegistrar = ({
         <Tooltip content="The type of Civic Pass to add to the DAO. Visit civic.com for details">
           <span>
             <InformationCircleIcon className="w-4 h-4 ml-1"></InformationCircleIcon>
+            <p className="ml-1">
+              By installing or integrating the{' '}
+              <a href="https://www.civic.com">Civic Pass</a> plugin, you agree
+              to the{' '}
+              <a
+                className="underline"
+                href="https://www.civic.com/legal/terms-of-service-civic-pass-v1/"
+              >
+                Civic Pass Terms of Service
+              </a>
+            </p>
           </span>
         </Tooltip>
       ),

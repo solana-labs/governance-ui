@@ -66,7 +66,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (realm.account.config.useCommunityVoterWeightAddin) {
       const realmConfig = await tryGetRealmConfig(conn, programId, realm.pubkey)
       if (
-        realmConfig.account.communityVoterWeightAddin?.equals(
+        realmConfig.account.communityTokenConfig.voterWeightAddin?.equals(
           new PublicKey('GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw')
         )
       ) {

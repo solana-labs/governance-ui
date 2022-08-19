@@ -8,8 +8,8 @@ import {
 import {
   getGovernanceProgramVersion,
   GovernanceConfig,
+  GoverningTokenConfigAccountArgs,
   SetRealmAuthorityAction,
-  VoteThresholdPercentage,
   VoteTipping,
   WalletSigner,
   withCreateGovernance,
@@ -34,6 +34,7 @@ import { withMintTo } from '@tools/sdk/splToken/withMintTo'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 
 import BN from 'bn.js'
+import { createGovernanceThresholds } from './configs'
 
 interface RealmCreation {
   connection: Connection
@@ -55,7 +56,7 @@ interface RealmCreation {
   transferCouncilMintAuthority: boolean
   councilWalletPks: PublicKey[]
 
-  additionalRealmPlugins?: PublicKey[]
+  communityTokenConfig?: GoverningTokenConfigAccountArgs
 }
 
 export async function prepareRealmCreation({
@@ -78,7 +79,7 @@ export async function prepareRealmCreation({
   transferCouncilMintAuthority,
   councilWalletPks,
 
-  additionalRealmPlugins = [],
+  communityTokenConfig = undefined,
 }: RealmCreation) {
   const realmInstructions: TransactionInstruction[] = []
   const realmSigners: Keypair[] = []
@@ -235,7 +236,7 @@ export async function prepareRealmCreation({
     councilMintPk,
     communityMintSupplyFactor,
     minCommunityTokensToCreateAsMintValue,
-    ...additionalRealmPlugins
+    communityTokenConfig
   )
 
   // If the current wallet is in the team then deposit the council token
@@ -254,19 +255,24 @@ export async function prepareRealmCreation({
     )
   }
 
+  const {
+    communityVoteThreshold,
+    councilVoteThreshold,
+    councilVetoVoteThreshold,
+  } = createGovernanceThresholds(programVersion, communityYesVotePercentage)
+
   // Put community and council mints under the realm governance with default config
   const config = new GovernanceConfig({
-    voteThresholdPercentage: new VoteThresholdPercentage({
-      value: communityYesVotePercentage,
-    }),
+    communityVoteThreshold: communityVoteThreshold,
     minCommunityTokensToCreateProposal: minCommunityTokensToCreateAsMintValue,
     // Do not use instruction hold up time
     minInstructionHoldUpTime: 0,
     // max voting time 3 days
     maxVotingTime: getTimestampFromDays(maxVotingTimeInDays),
     voteTipping: VoteTipping.Strict,
-    proposalCoolOffTime: 0,
     minCouncilTokensToCreateProposal: new BN(initialCouncilTokenAmount),
+    councilVoteThreshold: councilVoteThreshold,
+    councilVetoVoteThreshold: councilVetoVoteThreshold,
   })
 
   const communityMintGovPk = createCommunityMintGovernance

@@ -16,7 +16,7 @@ export default function useGovernanceAssets() {
   const auxiliaryTokenAccounts = useGovernanceAssetsStore(
     (s) => s.assetAccounts
   ).filter((x) => x.type === AccountType.AuxiliaryToken)
-  const currentPluginPk = config?.account.communityVoterWeightAddin
+  const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
   const governancesArray = useGovernanceAssetsStore((s) => s.governancesArray)
 
   const getGovernancesByAccountType = (type: GovernanceAccountType) => {
@@ -257,6 +257,16 @@ export default function useGovernanceAssets() {
       isVisible: canUseAnyInstruction,
     },
     {
+      id: Instructions.EverlendDeposit,
+      name: 'Everlend Deposit Funds',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.EverlendWithdraw,
+      name: 'Everlend Withdraw Funds',
+      isVisible: canUseAnyInstruction,
+    },
+    {
       id: Instructions.None,
       name: 'None',
       isVisible:
@@ -319,6 +329,11 @@ export default function useGovernanceAssets() {
     {
       id: Instructions.MangoChangeReferralFeeParams,
       name: 'Mango: Change Referral Fee Params',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoChangeReferralFeeParams2,
+      name: 'Mango: Change Referral Fee Params V2',
       isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
     },
     {

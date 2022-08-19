@@ -79,7 +79,7 @@ export default function CouncilVotingPower(props: Props) {
     wallet,
   ])
 
-  if (!(realm && realmInfo && ownCouncilTokenRecord)) {
+  if (!(realm && realmInfo)) {
     return (
       <div
         className={classNames(props.className, 'rounded-md bg-bkg-1 h-[76px]')}
@@ -91,9 +91,7 @@ export default function CouncilVotingPower(props: Props) {
     <div className={props.className}>
       {amount.isZero() ? (
         <div className={'text-xs text-white/50'}>
-          You do not have any voting power
-          <br />
-          in this realm.
+          You do not have any voting power in this realm.
         </div>
       ) : (
         <div className={'p-3 rounded-md bg-bkg-1'}>

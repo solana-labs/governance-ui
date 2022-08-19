@@ -20,7 +20,8 @@ import {
 import { NftVoterClient } from '@solana/governance-program-library'
 
 export const relinquishVote = async (
-  { connection, wallet, programId, walletPubkey }: RpcContext,
+  { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
+  realm: PublicKey,
   proposal: ProgramAccount<Proposal>,
   tokenOwnerRecord: PublicKey,
   voteRecord: PublicKey,
@@ -34,6 +35,8 @@ export const relinquishVote = async (
   await withRelinquishVote(
     instructions,
     programId,
+    programVersion,
+    realm,
     proposal.account.governance,
     proposal.pubkey,
     tokenOwnerRecord,
