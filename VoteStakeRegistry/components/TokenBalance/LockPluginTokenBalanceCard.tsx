@@ -26,7 +26,7 @@ const LockPluginTokenBalanceCard = ({
   proposal?: Option<Proposal>
 }) => {
   const { fmtUrlWithCluster } = useQueryContext()
-  const { councilMint, mint, realm, symbol } = useRealm()
+  const { councilMint, mint, realm, symbol, config } = useRealm()
   const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
@@ -53,7 +53,7 @@ const LockPluginTokenBalanceCard = ({
     const getTokenOwnerRecord = async () => {
       const defaultMint =
         !mint?.supply.isZero() ||
-        realm?.account.config.useMaxCommunityVoterWeightAddin
+        config?.account.communityTokenConfig.maxVoterWeightAddin
           ? realm!.account.communityMint
           : !councilMint?.supply.isZero()
           ? realm!.account.config.councilMint

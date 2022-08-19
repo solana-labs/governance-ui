@@ -25,7 +25,7 @@ interface Data {
 }
 
 export default function useTreasuryInfo(): Result<Data> {
-  const { realmInfo, realm, mint, councilMint } = useRealm()
+  const { realmInfo, realm, mint, councilMint, config } = useRealm()
   const connection = useWalletStore((s) => s.connection.current)
   const accounts = useGovernanceAssetsStore((s) => s.assetAccounts)
   const loadingGovernedAccounts = useGovernanceAssetsStore(
@@ -79,6 +79,7 @@ export default function useTreasuryInfo(): Result<Data> {
         councilMint,
         mint,
         realm,
+        config,
         realmInfo
       )
     }

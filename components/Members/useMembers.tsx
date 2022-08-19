@@ -21,7 +21,7 @@ import { usePrevious } from '@hooks/usePrevious'
 import { capitalize } from '@utils/helpers'
 import useMembersStore from 'stores/useMembersStore'
 export default function useMembers() {
-  const { tokenRecords, councilTokenOwnerRecords, realm } = useRealm()
+  const { tokenRecords, councilTokenOwnerRecords, realm, config } = useRealm()
   const connection = useWalletStore((s) => s.connection)
   const previousRealmPubKey = usePrevious(realm?.pubkey.toBase58()) as string
   const setMembers = useMembersStore((s) => s.setMembers)
@@ -285,14 +285,14 @@ export default function useMembers() {
     if (
       realm?.pubkey &&
       previousRealmPubKey !== realm?.pubkey.toBase58() &&
-      !realm?.account.config.useCommunityVoterWeightAddin
+      !config?.account.communityTokenConfig.voterWeightAddin
     ) {
       handleSetMembers()
       getDelegates()
     }
     if (
       !realm?.pubkey ||
-      (realm.pubkey && realm?.account.config.useCommunityVoterWeightAddin)
+      (realm.pubkey && config?.account.communityTokenConfig.voterWeightAddin)
     ) {
       getDelegates()
       setMembers([])

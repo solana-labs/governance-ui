@@ -65,7 +65,7 @@ const RealmHeader = () => {
           <div className="w-40 h-10 rounded-md animate-pulse bg-bkg-3" />
         )}
         <div className="flex items-center space-x-4">
-          {!realm?.account.config.useCommunityVoterWeightAddin && (
+          {!config?.account.communityTokenConfig.voterWeightAddin && (
             <Link href={fmtUrlWithCluster(`/dao/${symbol}/members`)}>
               <a className="flex items-center text-sm cursor-pointer default-transition text-fgd-2 hover:text-fgd-3">
                 <UsersIcon className="flex-shrink-0 w-5 h-5 mr-1" />

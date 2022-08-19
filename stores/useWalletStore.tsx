@@ -22,7 +22,6 @@ import {
   RealmConfigAccount,
   SignatoryRecord,
   TokenOwnerRecord,
-  tryGetRealmConfig,
   VoteRecord,
 } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
@@ -43,6 +42,7 @@ import {
 import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 import { HIDDEN_PROPOSALS } from '@components/instructions/tools'
 import { sleep } from '@blockworks-foundation/mango-client'
+import { getRealmConfigAccountOrDefault } from '@tools/governance/configs'
 
 interface WalletStore extends State {
   connected: boolean
@@ -363,7 +363,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           realmId,
           realmCouncilMintPk
         ),
-        getRealmConfig(connection, programId, realmId),
+        getRealmConfigAccountOrDefault(connection, programId, realmId),
       ])
 
       const governancesMap = accountsToPubkeyMap(governances)
@@ -569,11 +569,3 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 }))
 
 export default useWalletStore
-
-const getRealmConfig = async (connection, programId, realmId) => {
-  try {
-    return await tryGetRealmConfig(connection, programId, realmId)
-  } catch (e) {
-    return null
-  }
-}
