@@ -8,6 +8,7 @@ import {
   GoverningTokenConfigAccountArgs,
   GoverningTokenType,
   serializeInstructionToBase64,
+  tryGetRealmConfig,
 } from '@solana/spl-governance'
 import { validateInstruction } from '@utils/instructionTools'
 import { getRealmCfgSchema } from '@utils/validations'
@@ -47,6 +48,7 @@ const RealmConfigModal = ({ closeProposalModal, isProposalModalOpen }) => {
   )
   const { fmtUrlWithCluster } = useQueryContext()
   const wallet = useWalletStore((s) => s.current)
+  const connection = useWalletStore((s) => s.connection)
   const { handleCreateProposal } = useCreateProposal()
   const defaultCfgTitle = 'Change realm config'
   const [formErrors, setFormErrors] = useState({})
@@ -78,6 +80,13 @@ const RealmConfigModal = ({ closeProposalModal, isProposalModalOpen }) => {
             form!.minCommunityTokensToCreateGovernance!,
             mint!.decimals!
           )
+
+      const realmConfig = await tryGetRealmConfig(
+        connection.current,
+        realmInfo!.programId,
+        realm.pubkey
+      )
+
       const instruction = await createSetRealmConfig(
         realmInfo!.programId,
         realmInfo!.programVersion!,
@@ -96,7 +105,10 @@ const RealmConfigModal = ({ closeProposalModal, isProposalModalOpen }) => {
           tokenType: GoverningTokenType.Liquid,
         }),
         undefined,
-        wallet.publicKey
+        // Pass the payer only if RealmConfigAccount doens't exist and needs to be created
+        // TODO: If payer is passed then only the payer can execute the proposal
+        //       We should use the DAO Wallet instead, and top it up if there is not enough SOL there
+        !realmConfig ? wallet.publicKey : undefined
       )
       serializedInstruction = serializeInstructionToBase64(instruction)
       const obj: UiInstruction = {
