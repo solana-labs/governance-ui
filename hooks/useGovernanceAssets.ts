@@ -496,6 +496,11 @@ export default function useGovernanceAssets() {
       name: 'Solend: Withdraw Funds',
       isVisible: canUseAnyInstruction,
     },
+    {
+      id: Instructions.SerumInitUser,
+      name: 'Serum: Init User Account',
+      isVisible: canUseAnyInstruction,
+    },
     ...foresightInstructions,
   ]
 

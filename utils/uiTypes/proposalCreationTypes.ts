@@ -477,6 +477,7 @@ export enum Instructions {
   DifferValidatorStake,
   EverlendDeposit,
   EverlendWithdraw,
+  SerumInitUser,
 }
 
 export type createParams = [

@@ -107,6 +107,7 @@ import PerpCreate from './components/instructions/Mango/MangoV4/PerpCreate'
 import TokenRegisterTrustless from './components/instructions/Mango/MangoV4/TokenRegisterTrustless'
 import DepositForm from './components/instructions/Everlend/DepositForm'
 import WithdrawForm from './components/instructions/Everlend/WithdrawForm'
+import InitUser from './components/instructions/Serum/InitUser'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -709,6 +710,8 @@ const New = () => {
         return <DepositForm index={idx} governance={governance} />
       case Instructions.EverlendWithdraw:
         return <WithdrawForm index={idx} governance={governance} />
+      case Instructions.SerumInitUser:
+        return <InitUser />
       default:
         null
     }
