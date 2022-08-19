@@ -519,8 +519,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         ? GoverningTokenRole.Community
         : GoverningTokenRole.Council
 
-      console.log('TOKEN TYPE', tokenType)
-
       set((s) => {
         s.selectedProposal.proposal = proposal
         s.selectedProposal.descriptionLink = proposal.account.descriptionLink
