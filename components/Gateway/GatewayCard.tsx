@@ -9,12 +9,13 @@ import {
 } from '@solana/spl-governance'
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { sendTransaction } from '@utils/send'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
 import useGatewayPluginStore from '../../GatewayPlugin/store/gatewayPluginStore'
 import { GatewayButton } from '@components/Gateway/GatewayButton'
 import { getRegistrarPDA, getVoterWeightRecord } from '@utils/plugin/accounts'
+import { useRecords } from '@components/Gateway/useRecords'
 
 // TODO lots of overlap with NftBalanceCard here - we need to separate the logic for creating the Token Owner Record
 // from the rest of this logic
@@ -30,11 +31,20 @@ const GatewayCard = () => {
   const isLoading = useGatewayPluginStore((s) => s.state.isLoadingGatewayToken)
   const connection = useWalletStore((s) => s.connection)
   const [, setTokenOwneRecordPk] = useState('')
-  const { tokenRecords, realm, mint, councilMint } = useRealm()
+  const { realm, mint, councilMint } = useRealm()
   const { fetchRealm } = useWalletStore((s) => s.actions)
-  const ownTokenRecord = wallet?.publicKey
-    ? tokenRecords[wallet.publicKey!.toBase58()]
-    : null
+  const records = useRecords()
+
+  // show the join button if any of the records required by the chain of plugins are not yet created
+  const showJoinButton = useMemo(() => {
+    return (
+      (!records.tokenOwnerRecord.accountExists &&
+        records.tokenOwnerRecord.accountRequired) ||
+      (!records.voteWeightRecord.accountExists &&
+        records.voteWeightRecord.accountRequired)
+    )
+  }, [records, client])
+
   const handleRegister = async () => {
     const instructions: TransactionInstruction[] = []
     const { voterWeightPk } = await getVoterWeightRecord(
@@ -48,24 +58,40 @@ const GatewayCard = () => {
       realm!.account.communityMint,
       client.client!.program.programId
     )
-    const createVoterWeightRecordIx = await (client.client as GatewayClient).program.methods
-      .createVoterWeightRecord(wallet!.publicKey!)
-      .accounts({
-        voterWeightRecord: voterWeightPk,
-        registrar,
-        payer: wallet!.publicKey!,
-        systemProgram: SYSTEM_PROGRAM_ID,
-      })
-      .instruction()
-    instructions.push(createVoterWeightRecordIx)
-    await withCreateTokenOwnerRecord(
-      instructions,
-      realm!.owner!,
-      realm!.pubkey,
-      wallet!.publicKey!,
-      realm!.account.communityMint,
-      wallet!.publicKey!
-    )
+    // If a vote weight record is needed (i.e. the realm has a voter weight plugin)
+    // but doesn't exist yet, add the instruction to create it to the list
+    if (
+      !records.voteWeightRecord.accountExists &&
+      records.voteWeightRecord.accountRequired
+    ) {
+      const createVoterWeightRecordIx = await (client.client as GatewayClient).program.methods
+        .createVoterWeightRecord(wallet!.publicKey!)
+        .accounts({
+          voterWeightRecord: voterWeightPk,
+          registrar,
+          payer: wallet!.publicKey!,
+          systemProgram: SYSTEM_PROGRAM_ID,
+        })
+        .instruction()
+
+      instructions.push(createVoterWeightRecordIx)
+    }
+
+    // If a token owner record doesn't exist yet,
+    // add the instruction to create it to the list
+    if (
+      !records.tokenOwnerRecord.accountExists &&
+      records.tokenOwnerRecord.accountRequired
+    ) {
+      await withCreateTokenOwnerRecord(
+        instructions,
+        realm!.owner!,
+        realm!.pubkey,
+        wallet!.publicKey!,
+        realm!.account.communityMint,
+        wallet!.publicKey!
+      )
+    }
     const transaction = new Transaction()
     transaction.add(...instructions)
 
@@ -113,7 +139,7 @@ const GatewayCard = () => {
           wallet.publicKey &&
           gatekeeperNetwork && <GatewayButton />}
       </div>
-      {connected && !ownTokenRecord && (
+      {connected && showJoinButton && (
         <Button className="w-full" onClick={handleRegister}>
           Join
         </Button>

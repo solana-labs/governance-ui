@@ -90,7 +90,6 @@ const RealmHeader = () => {
               Params
             </a>
           </Link>
-
           <a
             className="flex items-center text-sm default-transition text-fgd-2 hover:text-fgd-3"
             href={realmUrl}

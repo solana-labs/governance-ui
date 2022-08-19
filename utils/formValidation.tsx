@@ -45,6 +45,15 @@ export const isFormValid = async (schema, formValues, abortEarly = false) => {
   return values
 }
 
+export function validatePubkey(address: string) {
+  try {
+    new PublicKey(address)
+    return true
+  } catch (err) {
+    return false
+  }
+}
+
 export function validateSolAddress(address: string) {
   try {
     const pubkey = new PublicKey(address)

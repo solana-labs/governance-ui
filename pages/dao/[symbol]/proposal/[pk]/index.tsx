@@ -25,6 +25,7 @@ import ProposalExecutionCard from '@components/ProposalExecutionCard'
 import useWalletStore from 'stores/useWalletStore'
 import ProposalVotingPower from '@components/ProposalVotingPower'
 import { useMediaQuery } from 'react-responsive'
+import NftProposalVoteState from 'NftVotePlugin/NftProposalVoteState'
 
 const Proposal = () => {
   const { realmInfo, symbol } = useRealm()
@@ -34,7 +35,6 @@ const Proposal = () => {
     proposal?.account
   )
   const currentWallet = useWalletStore((s) => s.current)
-
   const showResults =
     proposal &&
     proposal.account.state !== ProposalState.Cancelled &&
@@ -183,6 +183,7 @@ const Proposal = () => {
           </div>
         ) : null}
         <VotePanel />
+        <NftProposalVoteState proposal={proposal}></NftProposalVoteState>
         {proposal && currentWallet && showProposalExecution && (
           <ProposalExecutionCard />
         )}

@@ -332,6 +332,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
     },
     {
+      id: Instructions.MangoChangeReferralFeeParams2,
+      name: 'Mango: Change Referral Fee Params V2',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
       id: Instructions.MangoChangeMaxAccounts,
       name: 'Mango: Change Max Accounts',
       isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',

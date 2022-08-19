@@ -4,6 +4,7 @@ import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare'
 import { TorusWalletAdapter } from '@solana/wallet-adapter-torus'
 import { GlowWalletAdapter } from '@solana/wallet-adapter-glow'
 import { BackpackWalletAdapter } from '@solana/wallet-adapter-backpack'
+import { ExodusWalletAdapter } from '@solana/wallet-adapter-exodus'
 
 export const WALLET_PROVIDERS = [
   {
@@ -35,6 +36,11 @@ export const WALLET_PROVIDERS = [
     name: 'Sollet.io',
     url: 'https://www.sollet.io',
     adapter: new SolletWalletAdapter({ provider: 'https://www.sollet.io' }),
+  },
+  {
+    name: 'Exodus',
+    url: 'https://www.exodus.com/',
+    adapter: new ExodusWalletAdapter(),
   },
 ]
 

@@ -15,6 +15,7 @@ interface NFTCreator {
 interface NFTCollectionProperties {
   mintAddress: string
   creators: NFTCreator[]
+  verified?: boolean
 }
 export interface NFTWithMint {
   image: string
