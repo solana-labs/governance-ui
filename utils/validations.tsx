@@ -583,7 +583,7 @@ export const getRealmCfgSchema = ({ form }) => {
         'communityVoterWeightAddinTest',
         'communityVoterWeightAddin validation error',
         function (val: string) {
-          if (!form?.communityTokenConfig.voterWeightAddin) {
+          if (!form?.communityVoterWeightAddin) {
             return true
           }
           if (val) {
