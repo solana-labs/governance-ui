@@ -258,7 +258,7 @@ export default function useGovernanceAssets() {
       isVisible: canUseAnyInstruction,
     },
     {
-      id: Instructions.SnsDomainNameTransfer,
+      id: Instructions.TransferDomainName,
       name: 'SNS Transfer Out Domain Name',
       isVisible: canUseAnyInstruction,
     },

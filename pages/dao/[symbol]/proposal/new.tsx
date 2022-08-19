@@ -105,7 +105,7 @@ import PerpEdit from './components/instructions/Mango/MangoV4/PerpEdit'
 import Serum3RegisterMarket from './components/instructions/Mango/MangoV4/Serum3RegisterMarket'
 import PerpCreate from './components/instructions/Mango/MangoV4/PerpCreate'
 import TokenRegisterTrustless from './components/instructions/Mango/MangoV4/TokenRegisterTrustless'
-import SnsDomainNameTransfer from './components/instructions/DomainNameService/SnsDomainNameTransfer'
+import TransferDomainName from './components/TransferDomainName'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -675,12 +675,12 @@ const New = () => {
         return <CreateTokenMetadata index={idx} governance={governance} />
       case Instructions.UpdateTokenMetadata:
         return <UpdateTokenMetadata index={idx} governance={governance} />
-      case Instructions.SnsDomainNameTransfer:
+      case Instructions.TransferDomainName:
         return (
-          <SnsDomainNameTransfer
+          <TransferDomainName
             index={idx}
             governance={governance}
-          ></SnsDomainNameTransfer>
+          ></TransferDomainName>
         )
       default:
         null
