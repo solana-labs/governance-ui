@@ -1730,25 +1730,25 @@
   version "1.4.0"
   resolved "https://registry.npmjs.org/@csstools/convert-colors/-/convert-colors-1.4.0.tgz"
 
-"@dialectlabs/react-sdk@^1.0.0-beta.17":
-  version "1.0.0-beta.17"
-  resolved "https://registry.yarnpkg.com/@dialectlabs/react-sdk/-/react-sdk-1.0.0-beta.17.tgz#2edd5e20ed4aaa71fed08f79cdc3ffabdb2bf933"
-  integrity sha512-UQHHz75rX92g0xuxYQbOOZo/5EorvIHWENkIPz57JbqoDsQan731Or9b0L8bGwoxepTIxMy1mr2yg7m9mzE9Rg==
+"@dialectlabs/react-sdk@^1.0.0-beta.23":
+  version "1.0.0-beta.23"
+  resolved "https://registry.yarnpkg.com/@dialectlabs/react-sdk/-/react-sdk-1.0.0-beta.23.tgz#350bd98b48b4a649b2e329f5b8beda0e27ec66c6"
+  integrity sha512-WE/KzqFqJaeLyUywmbXaejdGF3AYOTVH8o+A6AiyexJsCfS3rxVdnbho4KfkwvVno6fTrTJ2yX1gM7KC1by7dA==
   dependencies:
-    "@dialectlabs/sdk" "^0.5.1"
+    "@dialectlabs/sdk" "^0.6.4"
     nanoid "^4.0.0"
     swr "^1.3.0"
 
-"@dialectlabs/react-ui@^1.0.0-beta.26":
-  version "1.0.0-beta.26"
-  resolved "https://registry.yarnpkg.com/@dialectlabs/react-ui/-/react-ui-1.0.0-beta.26.tgz#a254b8ba5e76d9b5de8514a485eb30767af54bcc"
-  integrity sha512-JC7jnWRcuTevOglrj39zqA+pqhsWzomy33OZB0D8IWnlPuL/c8yXdYi5x8KmWULyT5E8DJL0nblm/sTGTfU/8g==
+"@dialectlabs/react-ui@^1.0.0-beta.43":
+  version "1.0.0-beta.43"
+  resolved "https://registry.yarnpkg.com/@dialectlabs/react-ui/-/react-ui-1.0.0-beta.43.tgz#9de23ee4228f8a2ed61c1d38ccdcd5a82438900f"
+  integrity sha512-5qX3bcqPAUDUe/SJeo0NtGwQOykBEVMwcsxtUE89kQIk3v+5nGoxKIEadtcb/tZRYJtKmj3tgKlJWUw0uYD8dA==
   dependencies:
     "@bonfida/name-offers" "^0.0.1"
     "@bonfida/spl-name-service" "^0.1.31"
     "@cardinal/namespaces" "3.1.0"
     "@cardinal/namespaces-components" "3.1.0"
-    "@dialectlabs/react-sdk" "^1.0.0-beta.17"
+    "@dialectlabs/react-sdk" "^1.0.0-beta.23"
     "@dialectlabs/web3" "^0.3.2"
     "@headlessui/react" "^1.2.0"
     "@project-serum/anchor" "^0.23.0"
@@ -1760,10 +1760,10 @@
     react-transition-group "^4.4.2"
     swr "^1.3.0"
 
-"@dialectlabs/sdk@^0.5.1":
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/@dialectlabs/sdk/-/sdk-0.5.1.tgz#32dc66c1ec807c1642035ff49d11e800e8ffa744"
-  integrity sha512-mMY+R7z2uY8/o/e0fyv1kv4nRFzXl1ixVpRUYpy46Fp04fEFKAzDoxntQoPUNlQePbf4ewKf9sNZMnTYez8aTA==
+"@dialectlabs/sdk@^0.6.4":
+  version "0.6.4"
+  resolved "https://registry.yarnpkg.com/@dialectlabs/sdk/-/sdk-0.6.4.tgz#d1fc39e9c53f1efb8e2b1de00cbcc13aeeedbc10"
+  integrity sha512-VwZIQA+Xp7qciJhtvhuVF/MFFI2OSAeItzmDvH5TeCo/pB9L/KDFs7oenYi6GkkZHvlLOuiNRsInG05JhiouXg==
   dependencies:
     "@dialectlabs/web3" "^0.3.2"
     "@project-serum/anchor" "0.23.0"
