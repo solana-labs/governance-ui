@@ -95,9 +95,9 @@ const CreateAta = ({
       <h3 className="mb-4 flex items-center">Create token account</h3>
       <TokenMintInput
         onValidMintChange={(mintAddress, tokenInfo) => {
-          // TODO: Set the validated typedMint
+          // Set the validated typedMint
           setValidatedTypedMint(mintAddress)
-          // TODO: set the foundByNameToken
+          // set the foundByNameToken
           setFoundByNameToken(tokenInfo)
         }}
       />
