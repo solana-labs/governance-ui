@@ -162,7 +162,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
     const getTokenOwnerRecord = async () => {
       const defaultMint =
         !mint?.supply.isZero() ||
-        realm?.account.config.useMaxCommunityVoterWeightAddin
+        config?.account.communityTokenConfig.maxVoterWeightAddin
           ? realm!.account.communityMint
           : !councilMint?.supply.isZero()
           ? realm!.account.config.councilMint

@@ -255,7 +255,7 @@ const Params = () => {
                   padding
                   label="Use max community voter weight add-in"
                   val={getYesNoString(
-                    realmConfig?.useMaxCommunityVoterWeightAddin
+                    config?.account.communityTokenConfig.maxVoterWeightAddin
                   )}
                 />
                 <div className="flex">
