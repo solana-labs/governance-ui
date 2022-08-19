@@ -27,7 +27,7 @@ import { sendTransaction } from '@utils/send'
 import { approveTokenTransfer } from '@utils/tokens'
 import Button from '../Button'
 import { Option } from '@tools/core/option'
-import { GovernanceTokenKind } from '@solana/spl-governance'
+import { GoverningTokenRole } from '@solana/spl-governance'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { getMintMetadata } from '../instructions/programs/splToken'
 import { withFinalizeVote } from '@solana/spl-governance'
@@ -120,14 +120,14 @@ const TokenBalanceCard: FC<Props> = ({ proposal, children }) => {
           {communityDepositVisible && (
             <TokenDeposit
               mint={mint}
-              tokenType={GovernanceTokenKind.Community}
+              tokenType={GoverningTokenRole.Community}
               councilVote={false}
             />
           )}
           {councilDepositVisible && (
             <TokenDeposit
               mint={councilMint}
-              tokenType={GovernanceTokenKind.Council}
+              tokenType={GoverningTokenRole.Council}
               councilVote={true}
             />
           )}
@@ -150,7 +150,7 @@ export const TokenDeposit = ({
   councilVote,
 }: {
   mint: MintInfo | undefined
-  tokenType: GovernanceTokenKind
+  tokenType: GoverningTokenRole
   councilVote?: boolean
 }) => {
   const wallet = useWalletStore((s) => s.current)
@@ -184,24 +184,24 @@ export const TokenDeposit = ({
   }
 
   const depositTokenRecord =
-    tokenType === GovernanceTokenKind.Community
+    tokenType === GoverningTokenRole.Community
       ? ownTokenRecord
       : ownCouncilTokenRecord
 
   const depositTokenAccount =
-    tokenType === GovernanceTokenKind.Community
+    tokenType === GoverningTokenRole.Community
       ? realmTokenAccount
       : councilTokenAccount
 
   const depositMint =
-    tokenType === GovernanceTokenKind.Community
+    tokenType === GoverningTokenRole.Community
       ? realm?.account.communityMint
       : realm?.account.config.councilMint
 
   const tokenName = getMintMetadata(depositMint)?.name ?? realm?.account.name
 
   const depositTokenName = `${tokenName} ${
-    tokenType === GovernanceTokenKind.Community ? '' : 'Council'
+    tokenType === GoverningTokenRole.Community ? '' : 'Council'
   }`
 
   const depositTokens = async function (amount: BN) {
@@ -482,7 +482,7 @@ export const TokenDeposit = ({
         vsrPluginsPks.includes(
           config?.account.communityTokenConfig.voterWeightAddin.toBase58()
         ) &&
-        tokenType === GovernanceTokenKind.Community && (
+        tokenType === GoverningTokenRole.Community && (
           <small className="flex items-center mt-3 text-xs">
             <ExclamationIcon className="w-5 h-5 mr-2"></ExclamationIcon>
             Please withdraw your tokens and deposit again to get governance

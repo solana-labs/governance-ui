@@ -8,7 +8,7 @@ import {
 } from '@solana/spl-governance'
 import { AccountInfo, MintInfo } from '@solana/spl-token'
 import type { PublicKey } from '@solana/web3.js'
-import { GovernanceTokenKind } from '@solana/spl-governance'
+import { GoverningTokenRole } from '@solana/spl-governance'
 
 import { TokenProgramAccount } from '@utils/tokens'
 import useRealm from '@hooks/useRealm'
@@ -39,7 +39,7 @@ function getTypes(
   ownTokenRecord?: ProgramAccount<TokenOwnerRecord>,
   proposal?: ProgramAccount<Proposal>,
   realm?: ProgramAccount<Realm>,
-  tokenType?: GovernanceTokenKind
+  tokenType?: GoverningTokenRole
 ) {
   const types: Type[] = []
 
@@ -48,7 +48,7 @@ function getTypes(
   if (
     currentPluginPk &&
     nftPluginsPks.includes(currentPluginPk.toBase58()) &&
-    tokenType === GovernanceTokenKind.Community
+    tokenType === GoverningTokenRole.Community
   ) {
     types.push(Type.NFT)
   } else if (
@@ -67,18 +67,18 @@ function getTypes(
     if (
       (!realm?.account.config.councilMint ||
         isDepositVisible(mint, realm?.account.communityMint)) &&
-      tokenType === GovernanceTokenKind.Community
+      tokenType === GoverningTokenRole.Community
     ) {
       types.push(Type.LockedCommunity)
     } else if (
       isDepositVisible(councilMint, realm?.account.config.councilMint) &&
-      tokenType === GovernanceTokenKind.Council
+      tokenType === GoverningTokenRole.Council
     ) {
       types.push(Type.LockedCouncil)
     }
-  } else if (tokenType === GovernanceTokenKind.Council) {
+  } else if (tokenType === GoverningTokenRole.Council) {
     types.push(Type.Council)
-  } else if (tokenType === GovernanceTokenKind.Community) {
+  } else if (tokenType === GoverningTokenRole.Community) {
     types.push(Type.Community)
   }
 
