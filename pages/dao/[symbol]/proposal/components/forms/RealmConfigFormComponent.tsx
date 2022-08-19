@@ -136,7 +136,8 @@ const RealmConfigFormComponent = ({
     {
       label: 'Community voter weight addin',
       initialValue:
-        config?.account?.communityVoterWeightAddin?.toBase58() || '',
+        config?.account?.communityTokenConfig.voterWeightAddin?.toBase58() ||
+        '',
       name: 'communityVoterWeightAddin',
       type: InstructionInputType.INPUT,
       inputType: 'text',
@@ -145,7 +146,8 @@ const RealmConfigFormComponent = ({
     {
       label: 'Community max voter weight addin',
       initialValue:
-        config?.account?.maxCommunityVoterWeightAddin?.toBase58() || '',
+        config?.account?.communityTokenConfig.maxVoterWeightAddin?.toBase58() ||
+        '',
       name: 'maxCommunityVoterWeightAddin',
       type: InstructionInputType.INPUT,
       inputType: 'text',

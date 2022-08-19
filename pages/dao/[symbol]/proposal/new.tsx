@@ -108,6 +108,7 @@ import TokenRegisterTrustless from './components/instructions/Mango/MangoV4/Toke
 import DepositForm from './components/instructions/Everlend/DepositForm'
 import WithdrawForm from './components/instructions/Everlend/WithdrawForm'
 import InitUser from './components/instructions/Serum/InitUser'
+import MakeChangeReferralFeeParams2 from './components/instructions/Mango/MakeChangeReferralFeeParams2'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -538,6 +539,13 @@ const New = () => {
             index={idx}
             governance={governance}
           ></MakeChangeReferralFeeParams>
+        )
+      case Instructions.MangoChangeReferralFeeParams2:
+        return (
+          <MakeChangeReferralFeeParams2
+            index={idx}
+            governance={governance}
+          ></MakeChangeReferralFeeParams2>
         )
       case Instructions.MangoChangeSpotMarket:
         return (

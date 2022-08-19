@@ -17,9 +17,9 @@ const RealmHeader = () => {
   const { REALM } = process.env
   const activeMembers = useMembersStore((s) => s.compact.activeMembers)
   const isLockTokensMode =
-    config?.account.communityVoterWeightAddin &&
+    config?.account.communityTokenConfig.voterWeightAddin &&
     vsrPluginsPks.includes(
-      config?.account.communityVoterWeightAddin?.toBase58()
+      config?.account.communityTokenConfig.voterWeightAddin?.toBase58()
     )
   const isBackNavVisible = realmInfo?.symbol !== REALM // hide backnav for the default realm
 
@@ -65,7 +65,7 @@ const RealmHeader = () => {
           <div className="w-40 h-10 rounded-md animate-pulse bg-bkg-3" />
         )}
         <div className="flex items-center space-x-4">
-          {!realm?.account.config.useCommunityVoterWeightAddin && (
+          {!config?.account.communityTokenConfig.voterWeightAddin && (
             <Link href={fmtUrlWithCluster(`/dao/${symbol}/members`)}>
               <a className="flex items-center text-sm cursor-pointer default-transition text-fgd-2 hover:text-fgd-3">
                 <UsersIcon className="flex-shrink-0 w-5 h-5 mr-1" />
@@ -90,7 +90,6 @@ const RealmHeader = () => {
               Params
             </a>
           </Link>
-
           <a
             className="flex items-center text-sm default-transition text-fgd-2 hover:text-fgd-3"
             href={realmUrl}

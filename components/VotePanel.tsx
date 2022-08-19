@@ -7,7 +7,7 @@ import { useHasVoteTimeExpired } from '../hooks/useHasVoteTimeExpired'
 import useRealm from '../hooks/useRealm'
 import { ProposalState } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
-import { GoverningTokenType } from '@solana/spl-governance'
+import { GoverningTokenRole } from '@solana/spl-governance'
 import { BanIcon, ThumbUpIcon, ThumbDownIcon } from '@heroicons/react/solid'
 
 import useWalletStore from '../stores/useWalletStore'
@@ -55,7 +55,7 @@ const VotePanel = () => {
 
   // Handle state based on if a delegated wallet has already voted or not
   const ownVoteRecord =
-    tokenType === GoverningTokenType.Community && ownTokenRecord
+    tokenType === GoverningTokenRole.Community && ownTokenRecord
       ? voteRecordsByVoter[
           ownTokenRecord.account.governingTokenOwner.toBase58()
         ]
@@ -66,7 +66,7 @@ const VotePanel = () => {
       : wallet?.publicKey && voteRecordsByVoter[wallet.publicKey.toBase58()]
 
   const voterTokenRecord =
-    tokenType === GoverningTokenType.Community
+    tokenType === GoverningTokenRole.Community
       ? ownTokenRecord
       : ownCouncilTokenRecord
 
@@ -126,6 +126,7 @@ const VotePanel = () => {
 
       await relinquishVote(
         rpcContext,
+        realm!.pubkey,
         proposal!,
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         voterTokenRecord!.pubkey,
@@ -155,7 +156,7 @@ const VotePanel = () => {
   const actionLabel =
     !isVoteCast || !connected
       ? `Cast your ${
-          tokenType === GoverningTokenType.Community ? 'community' : 'council'
+          tokenType === GoverningTokenRole.Community ? 'community' : 'council'
         } vote`
       : 'Your vote'
 

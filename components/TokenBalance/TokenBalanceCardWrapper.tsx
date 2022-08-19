@@ -33,7 +33,7 @@ const TokenBalanceCardWrapper = ({
     ownCouncilTokenRecord,
     councilTokenAccount,
   } = useRealm()
-  const currentPluginPk = config?.account?.communityVoterWeightAddin
+  const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin
   const getTokenBalanceCard = () => {
     //based on realm config it will provide proper tokenBalanceCardComponent
     const isLockTokensMode =

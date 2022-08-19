@@ -21,7 +21,7 @@ export default function ProposalVotingPower(props: Props) {
   const { config } = useRealm()
   const { proposal } = useProposal()
 
-  const currentPluginPk = config?.account?.communityVoterWeightAddin
+  const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin
 
   const isUsingGatewayPlugin =
     currentPluginPk && gatewayPluginsPks.includes(currentPluginPk.toBase58())

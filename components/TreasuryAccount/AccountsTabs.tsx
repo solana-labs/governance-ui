@@ -96,10 +96,10 @@ const AccountTab: FunctionComponent<AccountTabProps> = ({
         console.log(e)
       }
     }
-    if (!logo) {
-      getTokenMetadata(assetAccount.extensions.mint?.publicKey.toBase58() ?? '')
+    if (!logo && assetAccount.extensions.mint?.publicKey.toBase58()) {
+      getTokenMetadata(assetAccount.extensions.mint?.publicKey.toBase58())
     }
-  })
+  }, [assetAccount.extensions.mint?.publicKey.toBase58()])
   return (
     <button
       key={assetAccount.extensions.transferAddress?.toBase58()}

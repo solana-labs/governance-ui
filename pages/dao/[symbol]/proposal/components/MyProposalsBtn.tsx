@@ -186,6 +186,8 @@ const MyProposalsBn = () => {
       const inst = await withRelinquishVote(
         instructions,
         realm!.owner,
+        realmInfo!.programVersion!,
+        realm!.pubkey,
         proposal.account.governance,
         proposal.pubkey,
         voterTokenRecord!.pubkey,
@@ -299,7 +301,12 @@ const MyProposalsBn = () => {
     ])
 
     const nftVoteRecordsFiltered = nftVoteRecords.filter(
-      (x) => proposals[x.account.proposal.toBase58()]
+      (x) =>
+        proposals[x.account.proposal.toBase58()] &&
+        proposals[
+          x.account.proposal.toBase58()
+        ].account.governingTokenMint.toBase58() ===
+          realm?.account.communityMint.toBase58()
     )
     setOwnNftVoteRecords(nftVoteRecordsFiltered)
   }
