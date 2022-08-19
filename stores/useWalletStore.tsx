@@ -28,7 +28,7 @@ import {
 import { ProgramAccount } from '@solana/spl-governance'
 import { getGovernanceChatMessages } from '@solana/spl-governance'
 import { ChatMessage } from '@solana/spl-governance'
-import { GoverningTokenType } from '@solana/spl-governance'
+import { GoverningTokenRole } from '@solana/spl-governance'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { getCertifiedRealmInfo } from '@models/registry/api'
 import { tryParsePublicKey } from '@tools/core/pubkey'
@@ -79,7 +79,7 @@ interface WalletStore extends State {
     descriptionLink?: string
     proposalMint?: MintAccount
     loading: boolean
-    tokenType?: GoverningTokenType
+    tokenType?: GoverningTokenRole
     proposalOwner: ProgramAccount<TokenOwnerRecord> | undefined
   }
   providerUrl: string | undefined
@@ -516,8 +516,8 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const tokenType = realm.account.communityMint.equals(
         proposal.account.governingTokenMint
       )
-        ? GoverningTokenType.Community
-        : GoverningTokenType.Council
+        ? GoverningTokenRole.Community
+        : GoverningTokenRole.Council
 
       set((s) => {
         s.selectedProposal.proposal = proposal

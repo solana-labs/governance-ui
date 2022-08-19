@@ -95,7 +95,7 @@ export function useVotingPlugins() {
   const currentClient = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
-  const currentPluginPk = config?.account.communityVoterWeightAddin
+  const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
   const nftMintRegistrar = useVotePluginsClientStore(
     (s) => s.state.nftMintRegistrar
   )

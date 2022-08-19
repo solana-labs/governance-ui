@@ -49,9 +49,9 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   const { realm, realmInfo, config } = useRealm()
   const { refetchProposals } = useWalletStore((s) => s.actions)
   const isNftPlugin =
-    config?.account.communityVoterWeightAddin &&
+    config?.account.communityTokenConfig.voterWeightAddin &&
     nftPluginsPks.includes(
-      config?.account.communityVoterWeightAddin?.toBase58()
+      config?.account.communityTokenConfig.voterWeightAddin?.toBase58()
     )
   const { closeNftVotingCountingModal } = useNftProposalStore.getState()
   const submitVote = async (vote: YesNoVote) => {

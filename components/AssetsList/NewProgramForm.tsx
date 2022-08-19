@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import Button from 'components/Button'
 import Input from 'components/inputs/Input'
 import PreviousRouteBtn from 'components/PreviousRouteBtn'
@@ -106,7 +107,10 @@ const NewProgramForm = () => {
           mintDecimals: realmMint.decimals,
           voteTipping: form.voteTipping,
         }
-        const governanceConfig = getGovernanceConfig(governanceConfigValues)
+        const governanceConfig = getGovernanceConfig(
+          realmInfo?.programVersion!,
+          governanceConfigValues
+        )
         await registerProgramGovernance(
           rpcContext,
           GovernanceType.Program,

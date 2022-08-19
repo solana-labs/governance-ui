@@ -5,6 +5,8 @@ import VoteBySwitch from '../proposal/components/VoteBySwitch'
 import Textarea from '@components/inputs/Textarea'
 import {
   createSetRealmConfig,
+  GoverningTokenConfigAccountArgs,
+  GoverningTokenType,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
 import { validateInstruction } from '@utils/instructionTools'
@@ -84,12 +86,16 @@ const RealmConfigModal = ({ closeProposalModal, isProposalModalOpen }) => {
         form?.removeCouncil ? undefined : realm?.account.config.councilMint,
         parseMintSupplyFraction(form!.communityMintSupplyFactor.toString()),
         mintAmount,
-        form!.communityVoterWeightAddin
-          ? new PublicKey(form!.communityVoterWeightAddin)
-          : undefined,
-        form?.maxCommunityVoterWeightAddin
-          ? new PublicKey(form.maxCommunityVoterWeightAddin)
-          : undefined,
+        new GoverningTokenConfigAccountArgs({
+          voterWeightAddin: form!.communityVoterWeightAddin
+            ? new PublicKey(form!.communityVoterWeightAddin)
+            : undefined,
+          maxVoterWeightAddin: form?.maxCommunityVoterWeightAddin
+            ? new PublicKey(form.maxCommunityVoterWeightAddin)
+            : undefined,
+          tokenType: GoverningTokenType.Liquid,
+        }),
+        undefined,
         wallet.publicKey
       )
       serializedInstruction = serializeInstructionToBase64(instruction)
