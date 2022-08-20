@@ -8,6 +8,7 @@ import {
   PublicKey,
   SystemProgram,
   SYSVAR_CLOCK_PUBKEY,
+  TransactionInstruction,
 } from '@solana/web3.js'
 import { notify } from '@utils/notifications'
 import { sendTransaction } from '@utils/send'
@@ -63,8 +64,12 @@ export type VestAccountType = {
 
 const PROGRAM_ID = new PublicKey('GaokYbJFjAVJ23wodF5ttRLudaJMudHSv7esDt1d4J1k')
 
-const SRM_MINT = new PublicKey('GcC7Duycsid99yEZBvPM8A67bGR9PSLQaNK9rqDqVcR3')
-const MSRM_MINT = new PublicKey('FdyZJPngPQm5ZDwgTCiNLXCmuSmrYrR2EyhgVpoK35gE')
+export const SRM_MINT = new PublicKey(
+  'GcC7Duycsid99yEZBvPM8A67bGR9PSLQaNK9rqDqVcR3'
+)
+export const MSRM_MINT = new PublicKey(
+  'FdyZJPngPQm5ZDwgTCiNLXCmuSmrYrR2EyhgVpoK35gE'
+)
 const [GSRM_MINT] = findProgramAddressSync([Buffer.from('gSRM')], PROGRAM_ID)
 
 export const SRM_DECIMALS = 6
@@ -149,6 +154,24 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
         set((s) => {
           s.gsrmBalance = undefined
         })
+      }
+    },
+
+    async getUserAccount(provider: anchor.AnchorProvider, owner: PublicKey) {
+      const program = new anchor.Program(
+        IDL as anchor.Idl,
+        get().programId,
+        provider
+      )
+      const [account] = findProgramAddressSync(
+        [Buffer.from('user'), owner.toBuffer()],
+        get().programId
+      )
+      const userAccount = await program.account.user.fetch(account)
+      return {
+        address: account,
+        lockIndex: (userAccount.lockIndex as anchor.BN).toNumber(),
+        vestIndex: (userAccount.vestIndex as anchor.BN).toNumber(),
       }
     },
 
@@ -376,7 +399,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
               owner.publicKey,
               true
             )
-            const [srmVault] = await findProgramAddressSync(
+            const [srmVault] = findProgramAddressSync(
               [Buffer.from('vault'), SRM_MINT.toBuffer()],
               program.programId
             )
@@ -405,7 +428,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
               owner.publicKey,
               true
             )
-            const [msrmVault] = await findProgramAddressSync(
+            const [msrmVault] = findProgramAddressSync(
               [Buffer.from('vault'), MSRM_MINT.toBuffer()],
               program.programId
             )
@@ -545,7 +568,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
 
       const [ownerUserAccount] = findProgramAddressSync(
         [Buffer.from('user'), owner.toBuffer()],
-        get().programId
+        program.programId
       )
 
       const ix = await program.methods
@@ -556,6 +579,83 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
           systemProgram: SystemProgram.programId,
         })
         .instruction()
+
+      return ix
+    },
+
+    async getGrantLockedInstruction(
+      owner: PublicKey,
+      payer: PublicKey,
+      payerTokenAccount: PublicKey,
+      provider: anchor.AnchorProvider,
+      amount: anchor.BN,
+      isMsrm: boolean
+    ) {
+      const program = new anchor.Program(
+        IDL as anchor.Idl,
+        get().programId,
+        provider
+      )
+
+      const userAccount = await get().actions.getUserAccount(provider, owner)
+
+      const claimTicket = Keypair.generate()
+
+      const [lockedAccount] = findProgramAddressSync(
+        [
+          Buffer.from('locked_account'),
+          owner.toBuffer(),
+          new anchor.BN(userAccount.lockIndex).toArrayLike(Buffer, 'le', 8),
+        ],
+        program.programId
+      )
+
+      let ix: TransactionInstruction
+      if (!isMsrm) {
+        const [srmVault] = findProgramAddressSync(
+          [Buffer.from('vault'), SRM_MINT.toBuffer()],
+          program.programId
+        )
+        ix = await program.methods
+          .depositLockedSrm(amount)
+          .accounts({
+            payer,
+            owner,
+            userAccount: userAccount.address,
+            srmMint: SRM_MINT,
+            payerSrmAccount: payerTokenAccount,
+            authority: get().authority,
+            srmVault,
+            lockedAccount,
+            claimTicket: claimTicket.publicKey,
+            clock: SYSVAR_CLOCK_PUBKEY,
+            tokenProgram: TOKEN_PROGRAM_ID,
+            systemProgram: SystemProgram.programId,
+          })
+          .instruction()
+      } else {
+        const [msrmVault] = findProgramAddressSync(
+          [Buffer.from('vault'), MSRM_MINT.toBuffer()],
+          program.programId
+        )
+        ix = await program.methods
+          .depositLockedMsrm(amount)
+          .accounts({
+            payer,
+            owner,
+            userAccount: userAccount.address,
+            msrmMint: MSRM_MINT,
+            payerMsrmAccount: payerTokenAccount,
+            authority: get().authority,
+            msrmVault,
+            lockedAccount,
+            claimTicket: claimTicket.publicKey,
+            clock: SYSVAR_CLOCK_PUBKEY,
+            tokenProgram: TOKEN_PROGRAM_ID,
+            systemProgram: SystemProgram.programId,
+          })
+          .instruction()
+      }
 
       return ix
     },

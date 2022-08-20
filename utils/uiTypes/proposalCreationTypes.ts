@@ -420,6 +420,14 @@ export interface SerumInitUserForm {
   programId: string
 }
 
+export interface SerumGrantLockedForm {
+  governedTokenAccount?: AssetAccount
+  owner: string
+  mintInfo: MintInfo | undefined
+  amount: number | undefined
+  programId: string
+}
+
 export enum Instructions {
   Transfer,
   ProgramUpgrade,
@@ -495,6 +503,7 @@ export enum Instructions {
   EverlendDeposit,
   EverlendWithdraw,
   SerumInitUser,
+  SerumGrantLockedSRM,
 }
 
 export type createParams = [

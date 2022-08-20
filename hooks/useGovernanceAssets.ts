@@ -509,6 +509,11 @@ export default function useGovernanceAssets() {
       name: 'Serum: Init User Account',
       isVisible: canUseAnyInstruction,
     },
+    {
+      id: Instructions.SerumGrantLockedSRM,
+      name: 'Serum: Grant Locked SRM',
+      isVisible: canUseAnyInstruction,
+    },
     ...foresightInstructions,
   ]
 
