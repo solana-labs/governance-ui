@@ -16,7 +16,7 @@ export default function useGovernanceAssets() {
   const auxiliaryTokenAccounts = useGovernanceAssetsStore(
     (s) => s.assetAccounts
   ).filter((x) => x.type === AccountType.AuxiliaryToken)
-  const currentPluginPk = config?.account.communityVoterWeightAddin
+  const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
   const governancesArray = useGovernanceAssetsStore((s) => s.governancesArray)
 
   const getGovernancesByAccountType = (type: GovernanceAccountType) => {

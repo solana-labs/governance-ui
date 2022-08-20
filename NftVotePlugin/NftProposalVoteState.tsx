@@ -20,9 +20,9 @@ const NftProposalVoteState = ({
   const wallet = useWalletStore((s) => s.current)
   const votingPower = useNftPluginStore((s) => s.state.votingPower)
   const isNftPlugin =
-    config?.account.communityVoterWeightAddin &&
+    config?.account.communityTokenConfig.voterWeightAddin &&
     nftPluginsPks.includes(
-      config?.account.communityVoterWeightAddin?.toBase58()
+      config?.account.communityTokenConfig.voterWeightAddin?.toBase58()
     )
 
   const ownVoteRecord = ownTokenRecord

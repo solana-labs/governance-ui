@@ -74,7 +74,7 @@ const ParamsView = ({ activeGovernance, openGovernanceProposalModal }) => {
           <AddressField
             label="Vote Threshold Percentage"
             padding
-            val={`${activeGovernance.account.config.voteThresholdPercentage.value}%`}
+            val={`${activeGovernance.account.config.communityVoteThreshold.value}%`}
           />
           <AddressField
             label="Vote Tipping"

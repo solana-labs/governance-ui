@@ -77,9 +77,9 @@ function App({ Component, pageProps }) {
   useEffect(() => {
     if (
       realm &&
-      config?.account.communityVoterWeightAddin &&
+      config?.account.communityTokenConfig.voterWeightAddin &&
       vsrPluginsPks.includes(
-        config.account.communityVoterWeightAddin.toBase58()
+        config.account.communityTokenConfig.voterWeightAddin.toBase58()
       ) &&
       realm.pubkey &&
       wallet?.connected &&

@@ -22,13 +22,12 @@ import {
   RealmConfigAccount,
   SignatoryRecord,
   TokenOwnerRecord,
-  tryGetRealmConfig,
   VoteRecord,
 } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { getGovernanceChatMessages } from '@solana/spl-governance'
 import { ChatMessage } from '@solana/spl-governance'
-import { GoverningTokenType } from '@solana/spl-governance'
+import { GoverningTokenRole } from '@solana/spl-governance'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { getCertifiedRealmInfo } from '@models/registry/api'
 import { tryParsePublicKey } from '@tools/core/pubkey'
@@ -43,6 +42,7 @@ import {
 import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 import { HIDDEN_PROPOSALS } from '@components/instructions/tools'
 import { sleep } from '@blockworks-foundation/mango-client'
+import { getRealmConfigAccountOrDefault } from '@tools/governance/configs'
 
 interface WalletStore extends State {
   connected: boolean
@@ -79,7 +79,7 @@ interface WalletStore extends State {
     descriptionLink?: string
     proposalMint?: MintAccount
     loading: boolean
-    tokenType?: GoverningTokenType
+    tokenType?: GoverningTokenRole
     proposalOwner: ProgramAccount<TokenOwnerRecord> | undefined
   }
   providerUrl: string | undefined
@@ -363,7 +363,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           realmId,
           realmCouncilMintPk
         ),
-        getRealmConfig(connection, programId, realmId),
+        getRealmConfigAccountOrDefault(connection, programId, realmId),
       ])
 
       const governancesMap = accountsToPubkeyMap(governances)
@@ -516,8 +516,8 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const tokenType = realm.account.communityMint.equals(
         proposal.account.governingTokenMint
       )
-        ? GoverningTokenType.Community
-        : GoverningTokenType.Council
+        ? GoverningTokenRole.Community
+        : GoverningTokenRole.Council
 
       set((s) => {
         s.selectedProposal.proposal = proposal
@@ -569,11 +569,3 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 }))
 
 export default useWalletStore
-
-const getRealmConfig = async (connection, programId, realmId) => {
-  try {
-    return await tryGetRealmConfig(connection, programId, realmId)
-  } catch (e) {
-    return null
-  }
-}

@@ -55,7 +55,7 @@ export default function useRealm() {
   const gatewayVotingPower = useGatewayPluginStore((s) => s.state.votingPower)
   const sbVotingPower = useSwitchboardPluginStore((s) => s.state.votingPower)
   const [realmInfo, setRealmInfo] = useState<RealmInfo | undefined>(undefined)
-  const currentPluginPk = config?.account?.communityVoterWeightAddin
+  const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin
   const pythClient = useVotePluginsClientStore((s) => s.state.pythClient)
   const [pythVoterWeight, setPythVoterWeight] = useState<PythBalance>()
   const isPythclientMode =
@@ -194,7 +194,7 @@ export default function useRealm() {
   const canChooseWhoVote =
     realm?.account.communityMint &&
     (!mint?.supply.isZero() ||
-      realm.account.config.useCommunityVoterWeightAddin) &&
+      config?.account.communityTokenConfig.voterWeightAddin) &&
     realm.account.config.councilMint &&
     !councilMint?.supply.isZero()
 

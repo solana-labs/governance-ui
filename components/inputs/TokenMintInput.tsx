@@ -56,6 +56,8 @@ const TokenMintInput = ({
     }
     if (typedMint) {
       validateMint()
+    } else if (foundByNameToken) {
+      onValidMintChange(undefined, foundByNameToken)
     } else {
       setMintInfo(undefined)
       onValidMintChange(undefined, undefined)

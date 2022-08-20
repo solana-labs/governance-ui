@@ -186,6 +186,8 @@ const MyProposalsBn = () => {
       const inst = await withRelinquishVote(
         instructions,
         realm!.owner,
+        realmInfo!.programVersion!,
+        realm!.pubkey,
         proposal.account.governance,
         proposal.pubkey,
         voterTokenRecord!.pubkey,

@@ -105,6 +105,8 @@ const WithDrawCommunityTokens = () => {
         await withRelinquishVote(
           instructions,
           realmInfo!.programId,
+          getProgramVersionForRealm(realmInfo!),
+          realmInfo!.realmId,
           proposal.account.governance,
           proposal.pubkey,
           ownTokenRecord!.pubkey,

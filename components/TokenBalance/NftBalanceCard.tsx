@@ -30,7 +30,7 @@ const NftBalanceCard = () => {
   const isLoading = useNftPluginStore((s) => s.state.isLoadingNfts)
   const connection = useWalletStore((s) => s.connection)
   const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
-  const { tokenRecords, realm, symbol, mint, councilMint } = useRealm()
+  const { tokenRecords, realm, symbol, mint, councilMint, config } = useRealm()
   const { fetchRealm } = useWalletStore((s) => s.actions)
   const ownTokenRecord = wallet?.publicKey
     ? tokenRecords[wallet.publicKey!.toBase58()]
@@ -81,7 +81,7 @@ const NftBalanceCard = () => {
     const getTokenOwnerRecord = async () => {
       const defaultMint =
         !mint?.supply.isZero() ||
-        realm?.account.config.useMaxCommunityVoterWeightAddin
+        config?.account.communityTokenConfig.maxVoterWeightAddin
           ? realm!.account.communityMint
           : !councilMint?.supply.isZero()
           ? realm!.account.config.councilMint

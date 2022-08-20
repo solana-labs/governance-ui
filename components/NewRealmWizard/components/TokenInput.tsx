@@ -6,7 +6,7 @@ import { PublicKey } from '@solana/web3.js'
 import { getMintSupplyAsDecimal } from '@tools/sdk/units'
 import useWalletStore from 'stores/useWalletStore'
 import { tryGetMint } from '@utils/tokens'
-import { validateSolAddress } from '@utils/formValidation'
+import { validatePubkey } from '@utils/formValidation'
 import { preventNegativeNumberInput } from '@utils/helpers'
 
 import { Controller } from 'react-hook-form'
@@ -114,7 +114,7 @@ export default function TokenInput({
       }
     }
 
-    if (tokenMintAddress && validateSolAddress(tokenMintAddress)) {
+    if (tokenMintAddress && validatePubkey(tokenMintAddress)) {
       getTokenInfo(tokenMintAddress)
     } else {
       setTokenInfo(undefined)

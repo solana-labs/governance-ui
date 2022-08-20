@@ -59,6 +59,7 @@ const SolendWithdraw = ({
     mint,
     councilMint,
     symbol,
+    config,
   } = useRealm()
   const [isWithdrawing, setIsWithdrawing] = useState(false)
   const [voteByCouncil, setVoteByCouncil] = useState(false)
@@ -198,7 +199,7 @@ const SolendWithdraw = ({
       const defaultProposalMint = voteByCouncil
         ? realm?.account.config.councilMint
         : !mint?.supply.isZero() ||
-          realm?.account.config.useMaxCommunityVoterWeightAddin
+          config?.account.communityTokenConfig.maxVoterWeightAddin
         ? realm!.account.communityMint
         : !councilMint?.supply.isZero()
         ? realm!.account.config.councilMint

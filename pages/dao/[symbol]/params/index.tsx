@@ -27,7 +27,7 @@ import Tooltip from '@components/Tooltip'
 import { AccountType } from '@utils/uiTypes/assets'
 
 const Params = () => {
-  const { realm, mint } = useRealm()
+  const { realm, mint, config } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const {
     canUseAuthorityInstruction,
@@ -248,14 +248,14 @@ const Params = () => {
                   padding
                   label="Use community voter weight add-in"
                   val={getYesNoString(
-                    realmConfig?.useCommunityVoterWeightAddin
+                    config?.account.communityTokenConfig.voterWeightAddin
                   )}
                 />
                 <AddressField
                   padding
                   label="Use max community voter weight add-in"
                   val={getYesNoString(
-                    realmConfig?.useMaxCommunityVoterWeightAddin
+                    config?.account.communityTokenConfig.maxVoterWeightAddin
                   )}
                 />
                 <div className="flex">

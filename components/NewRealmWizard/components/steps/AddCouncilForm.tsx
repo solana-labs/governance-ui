@@ -10,7 +10,7 @@ import { RadioGroup } from '@components/NewRealmWizard/components/Input'
 import AdviceBox from '@components/NewRealmWizard/components/AdviceBox'
 import Text from '@components/Text'
 
-import { updateUserInput, validateSolAddress } from '@utils/formValidation'
+import { updateUserInput, validatePubkey } from '@utils/formValidation'
 import TokenInput, { TokenWithMintInfo, COUNCIL_TOKEN } from '../TokenInput'
 
 export const AddCouncilSchema = {
@@ -37,7 +37,7 @@ export const AddCouncilSchema = {
       otherwise: yup.string().optional(),
     })
     .test('is-valid-address', 'Please enter a valid Solana address', (value) =>
-      value ? validateSolAddress(value) : true
+      value ? validatePubkey(value) : true
     ),
   transferCouncilMintAuthority: yup
     .boolean()

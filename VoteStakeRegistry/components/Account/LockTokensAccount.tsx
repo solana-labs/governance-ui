@@ -41,7 +41,14 @@ interface DepositBox {
 const unlockedTypes = ['none']
 
 const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
-  const { realm, realmInfo, mint, tokenRecords, councilMint } = useRealm()
+  const {
+    realm,
+    realmInfo,
+    mint,
+    tokenRecords,
+    councilMint,
+    config,
+  } = useRealm()
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const [reducedDeposits, setReducedDeposits] = useState<DepositBox[]>([])
@@ -74,8 +81,8 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
     setIsLoading(true)
     try {
       if (
-        realm?.account.config.useCommunityVoterWeightAddin &&
-        realm.pubkey &&
+        config?.account.communityTokenConfig.voterWeightAddin &&
+        realm!.pubkey &&
         wallet?.publicKey &&
         client
       ) {
@@ -155,7 +162,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
     const getTokenOwnerRecord = async () => {
       const defaultMint =
         !mint?.supply.isZero() ||
-        realm?.account.config.useMaxCommunityVoterWeightAddin
+        config?.account.communityTokenConfig.maxVoterWeightAddin
           ? realm!.account.communityMint
           : !councilMint?.supply.isZero()
           ? realm!.account.config.councilMint
