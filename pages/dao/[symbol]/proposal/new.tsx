@@ -719,7 +719,7 @@ const New = () => {
       case Instructions.EverlendWithdraw:
         return <WithdrawForm index={idx} governance={governance} />
       case Instructions.SerumInitUser:
-        return <InitUser />
+        return <InitUser index={idx} governance={governance} />
       default:
         null
     }

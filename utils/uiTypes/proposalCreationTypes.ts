@@ -414,6 +414,12 @@ export interface UpdateTokenMetadataForm {
   programId: string | undefined
 }
 
+export interface SerumInitUserForm {
+  payerGovernedAccount?: AssetAccount
+  owner: string
+  programId: string
+}
+
 export enum Instructions {
   Transfer,
   ProgramUpgrade,

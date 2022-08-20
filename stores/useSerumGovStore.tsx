@@ -531,6 +531,34 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
         notify({ type: 'error', message: 'Please connect wallet to claim.' })
       }
     },
+
+    async getInitUserInstruction(
+      owner: PublicKey,
+      payer: PublicKey,
+      provider: anchor.AnchorProvider
+    ) {
+      const program = new anchor.Program(
+        IDL as anchor.Idl,
+        get().programId,
+        provider
+      )
+
+      const [ownerUserAccount] = findProgramAddressSync(
+        [Buffer.from('user'), owner.toBuffer()],
+        get().programId
+      )
+
+      const ix = await program.methods
+        .initUser(owner)
+        .accounts({
+          payer,
+          userAccount: ownerUserAccount,
+          systemProgram: SystemProgram.programId,
+        })
+        .instruction()
+
+      return ix
+    },
   },
 }))
 
