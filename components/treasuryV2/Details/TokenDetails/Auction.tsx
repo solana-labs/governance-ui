@@ -1,9 +1,11 @@
 import Button from '@components/Button'
+import { Sol, Token } from '@models/treasury/Asset'
 import { useState } from 'react'
 import SellModal from '../Auction/SellModal'
 
 interface Props {
   className: string | undefined
+  asset: Token | Sol
 }
 
 export default function Auction(props: Props) {
@@ -21,7 +23,11 @@ export default function Auction(props: Props) {
       </header>
       <section className="overflow-y-auto flex-grow space-y-4">
         <Button onClick={openSellModal}>Sell</Button>
-        <SellModal isOpen={sellModalOpen} onClose={closeSellModal}></SellModal>
+        <SellModal
+          asset={props.asset}
+          isOpen={sellModalOpen}
+          onClose={closeSellModal}
+        ></SellModal>
       </section>
     </div>
   )

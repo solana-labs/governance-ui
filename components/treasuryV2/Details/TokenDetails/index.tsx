@@ -34,7 +34,7 @@ export default function TokenDetails(props: Props) {
               governanceAddress={props.governanceAddress}
             />
           )}
-          <Auction className="mb-10" />
+          <Auction asset={props.asset} className="mb-10" />
           <Activity assets={[props.asset]} />
         </section>
       </StickyScrolledContainer>
