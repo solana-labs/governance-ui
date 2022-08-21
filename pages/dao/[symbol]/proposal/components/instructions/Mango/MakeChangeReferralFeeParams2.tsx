@@ -19,7 +19,7 @@ import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { tryGetMint } from '@utils/tokens'
 import { makeChangeReferralFeeParams2Instruction } from '@blockworks-foundation/mango-client'
 import { BN } from '@project-serum/anchor'
-import { MANGO_MINT } from 'Strategies/protocols/mango/tools'
+import { MANGO_MINT, MANGO_MINT_DEVNET } from 'Strategies/protocols/mango/tools'
 import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
 import { AccountType } from '@utils/uiTypes/assets'
 
@@ -48,6 +48,7 @@ const MakeChangeReferralFeeParams2 = ({
     refSurchargeCentibps2: 0,
     refShareCentibps2: 0,
     refMngoRequired: 0,
+    refMngoRequired2: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -72,10 +73,16 @@ const MakeChangeReferralFeeParams2 = ({
       //Mango instruction call and serialize
       const mint = await tryGetMint(
         connection.current,
-        new PublicKey(MANGO_MINT)
+        new PublicKey(
+          connection.endpoint === 'devnet' ? MANGO_MINT_DEVNET : MANGO_MINT
+        )
       )
       const refMngoRequiredMintAmount = parseMintNaturalAmountFromDecimal(
         form.refMngoRequired!,
+        mint!.account.decimals
+      )
+      const refMngoRequiredMintAmount2 = parseMintNaturalAmountFromDecimal(
+        form.refMngoRequired2!,
         mint!.account.decimals
       )
       const setMaxMangoAccountsInstr = makeChangeReferralFeeParams2Instruction(
@@ -86,7 +93,8 @@ const MakeChangeReferralFeeParams2 = ({
         new BN(form.refShareCentibps),
         new BN(form.refSurchargeCentibps2),
         new BN(form.refShareCentibps2),
-        new BN(refMngoRequiredMintAmount)
+        new BN(refMngoRequiredMintAmount),
+        new BN(refMngoRequiredMintAmount2)
       )
 
       serializedInstruction = serializeInstructionToBase64(
@@ -215,6 +223,19 @@ const MakeChangeReferralFeeParams2 = ({
           })
         }
         error={formErrors['refMngoRequired']}
+      />
+      <Input
+        label="Ref mango required tier 2"
+        value={form.refMngoRequired2}
+        type="number"
+        min={0}
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'refMngoRequired2',
+          })
+        }
+        error={formErrors['refMngoRequired2']}
       />
     </>
   )
