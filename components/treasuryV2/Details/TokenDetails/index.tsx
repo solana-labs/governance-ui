@@ -8,6 +8,7 @@ import Header from './Header'
 import Investments from './Investments'
 import Activity from './Activity'
 import StickyScrolledContainer from '../StickyScrolledContainer'
+import Auction from './Auction'
 
 interface Props {
   asset: Token | Sol
@@ -33,6 +34,7 @@ export default function TokenDetails(props: Props) {
               governanceAddress={props.governanceAddress}
             />
           )}
+          <Auction className="mb-10" />
           <Activity assets={[props.asset]} />
         </section>
       </StickyScrolledContainer>
