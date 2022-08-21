@@ -81,6 +81,10 @@ const MakeChangeReferralFeeParams2 = ({
         form.refMngoRequired!,
         mint!.account.decimals
       )
+      const refMngoRequiredMintAmount2 = parseMintNaturalAmountFromDecimal(
+        form.refMngoRequired2!,
+        mint!.account.decimals
+      )
       const setMaxMangoAccountsInstr = makeChangeReferralFeeParams2Instruction(
         form.governedAccount.governance.account.governedAccount,
         new PublicKey(form.mangoGroup!),
@@ -90,7 +94,7 @@ const MakeChangeReferralFeeParams2 = ({
         new BN(form.refSurchargeCentibps2),
         new BN(form.refShareCentibps2),
         new BN(refMngoRequiredMintAmount),
-        new BN(refMngoRequiredMintAmount)
+        new BN(refMngoRequiredMintAmount2)
       )
 
       serializedInstruction = serializeInstructionToBase64(
