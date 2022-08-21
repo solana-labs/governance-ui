@@ -41,7 +41,7 @@ export default function Sell({ className, asset }: Props) {
     setForm({ ...form, [propertyName]: value })
   }
   const sizeBtnClass = (size: number) => {
-    const classnames = `w-1/3 text-xs ${size === auctionSize ? 'bg-fgd-1' : ''}`
+    const classnames = `w-1/2 text-xs ${size === auctionSize ? 'bg-fgd-1' : ''}`
     return classnames
   }
 
@@ -71,78 +71,80 @@ export default function Sell({ className, asset }: Props) {
             ))}
         </div>
         <AdvancedOptionsDropdown className="my-5">
-          <Input
-            label="Min Base Order Size"
-            value={form.minBaseOrderSize}
-            type="text"
-            onChange={(evt) =>
-              handleSetForm({
-                value: evt.target.value,
-                propertyName: 'minBaseOrderSize',
-              })
-            }
-            error={formErrors['minBaseOrderSize']}
-          />
-          <Input
-            label="Tick Size"
-            value={form.tickSize}
-            type="text"
-            onChange={(evt) =>
-              handleSetForm({
-                value: evt.target.value,
-                propertyName: 'tickSize',
-              })
-            }
-            error={formErrors['tickSize']}
-          />
-          <Input
-            label="Decryption Phase Length"
-            value={form.decryptionPhaseLength}
-            type="text"
-            onChange={(evt) =>
-              handleSetForm({
-                value: evt.target.value,
-                propertyName: 'decryptionPhaseLength',
-              })
-            }
-            error={formErrors['decryptionPhaseLength']}
-          />
-          <Input
-            label="Event Queue Bytes"
-            value={form.eventQueueBytes}
-            type="text"
-            onChange={(evt) =>
-              handleSetForm({
-                value: evt.target.value,
-                propertyName: 'eventQueueBytes',
-              })
-            }
-            error={formErrors['eventQueueBytes']}
-          />
-          <Input
-            label="Bids Bytes"
-            value={form.bidsBytes}
-            type="text"
-            onChange={(evt) =>
-              handleSetForm({
-                value: evt.target.value,
-                propertyName: 'bidsBytes',
-              })
-            }
-            error={formErrors['bidsBytes']}
-          />
-          <Input
-            label="Asks Bytes"
-            value={form.asksBytes}
-            type="text"
-            onChange={(evt) =>
-              handleSetForm({
-                value: evt.target.value,
-                propertyName: 'asksBytes',
-              })
-            }
-            error={formErrors['asksBytes']}
-          />
+          <div className="space-y-3">
+            <Input
+              label="Min Base Order Size"
+              value={form.minBaseOrderSize}
+              type="text"
+              onChange={(evt) =>
+                handleSetForm({
+                  value: evt.target.value,
+                  propertyName: 'minBaseOrderSize',
+                })
+              }
+              error={formErrors['minBaseOrderSize']}
+            />
+            <Input
+              label="Tick Size"
+              value={form.tickSize}
+              type="text"
+              onChange={(evt) =>
+                handleSetForm({
+                  value: evt.target.value,
+                  propertyName: 'tickSize',
+                })
+              }
+              error={formErrors['tickSize']}
+            />
+            <Input
+              label="Decryption Phase Length"
+              value={form.decryptionPhaseLength}
+              type="text"
+              onChange={(evt) =>
+                handleSetForm({
+                  value: evt.target.value,
+                  propertyName: 'decryptionPhaseLength',
+                })
+              }
+              error={formErrors['decryptionPhaseLength']}
+            />
+            <Input
+              label="Event Queue Bytes"
+              value={form.eventQueueBytes}
+              type="text"
+              onChange={(evt) =>
+                handleSetForm({
+                  value: evt.target.value,
+                  propertyName: 'eventQueueBytes',
+                })
+              }
+              error={formErrors['eventQueueBytes']}
+            />
+            <Input
+              label="Bids Bytes"
+              value={form.bidsBytes}
+              type="text"
+              onChange={(evt) =>
+                handleSetForm({
+                  value: evt.target.value,
+                  propertyName: 'bidsBytes',
+                })
+              }
+              error={formErrors['bidsBytes']}
+            />
+            <Input
+              label="Asks Bytes"
+              value={form.asksBytes}
+              type="text"
+              onChange={(evt) =>
+                handleSetForm({
+                  value: evt.target.value,
+                  propertyName: 'asksBytes',
+                })
+              }
+              error={formErrors['asksBytes']}
+            />
+          </div>
         </AdvancedOptionsDropdown>
       </section>
       <section className={className}>
