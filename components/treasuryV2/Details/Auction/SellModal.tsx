@@ -11,7 +11,7 @@ interface Props {
 
 export default function SellModal({ onClose, isOpen, asset }: Props) {
   return isOpen ? (
-    <Modal sizeClassName="max-w-4xl" onClose={onClose} isOpen={isOpen}>
+    <Modal onClose={onClose} isOpen={isOpen}>
       <>
         <h3 className="mb-4 flex items-center">Create token sale auction</h3>
         <Sell asset={asset}></Sell>
