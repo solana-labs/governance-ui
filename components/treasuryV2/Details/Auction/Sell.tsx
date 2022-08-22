@@ -7,6 +7,7 @@ import Checkbox from '@components/inputs/Checkbox'
 import { ParticipantPreset, SellForm } from './models'
 import { paramsForTokenSale } from './tools'
 import TokenMintInput from '@components/inputs/TokenMintInput'
+import AdditionalProposalOptions from '@components/AdditionalProposalOptions'
 interface Props {
   className?: string
   asset: Token | Sol
@@ -18,6 +19,11 @@ const DEFAULT_MIN_PRICE = 1
 export default function Sell({ className, asset }: Props) {
   const formatter = Intl.NumberFormat('en', {
     notation: 'compact',
+  })
+  const [proposalInfo, setProposalInfo] = useState({
+    title: '',
+    description: '',
+    voteByCouncil: false,
   })
   const [auctionSize, setAuctionSize] = useState<number>(ParticipantPreset.M)
   const [form, setForm] = useState<SellForm>({
@@ -222,6 +228,29 @@ export default function Sell({ className, asset }: Props) {
               />
             </div>
           </AdvancedOptionsDropdown>
+
+          <AdditionalProposalOptions
+            title={proposalInfo.title}
+            description={proposalInfo.description}
+            defaultTitle={''}
+            defaultDescription={''}
+            setTitle={(evt) =>
+              setProposalInfo((prev) => ({ ...prev, title: evt.target.value }))
+            }
+            setDescription={(evt) =>
+              setProposalInfo((prev) => ({
+                ...prev,
+                description: evt.target.value,
+              }))
+            }
+            voteByCouncil={proposalInfo.voteByCouncil}
+            setVoteByCouncil={(val) =>
+              setProposalInfo((prev) => ({
+                ...prev,
+                voteByCouncil: val,
+              }))
+            }
+          />
           <div className="flex justify-end">
             <Button>Propose</Button>
           </div>
