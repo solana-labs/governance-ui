@@ -20,11 +20,6 @@ export default function Sell({ className, asset }: Props) {
   const formatter = Intl.NumberFormat('en', {
     notation: 'compact',
   })
-  const [proposalInfo, setProposalInfo] = useState({
-    title: '',
-    description: '',
-    voteByCouncil: false,
-  })
   const [auctionSize, setAuctionSize] = useState<number>(ParticipantPreset.M)
   const [form, setForm] = useState<SellForm>({
     baseMint: asset.raw.extensions.mint!.publicKey.toBase58(),
@@ -40,6 +35,13 @@ export default function Sell({ className, asset }: Props) {
       DEFAULT_TOKENS_FOR_SALE,
       DEFAULT_MIN_PRICE
     ),
+  })
+  const DEFAULT_TITLE = `Sell ${form.tokensForSale} ${asset.id}`
+  const DEFAULT_DESCRIPTION = ''
+  const [proposalInfo, setProposalInfo] = useState({
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+    voteByCouncil: false,
   })
   const [formErrors, setFormErrors] = useState({})
   const handleSetForm = ({ propertyName, value }) => {
@@ -232,8 +234,8 @@ export default function Sell({ className, asset }: Props) {
           <AdditionalProposalOptions
             title={proposalInfo.title}
             description={proposalInfo.description}
-            defaultTitle={''}
-            defaultDescription={''}
+            defaultTitle={DEFAULT_TITLE}
+            defaultDescription={DEFAULT_DESCRIPTION}
             setTitle={(evt) =>
               setProposalInfo((prev) => ({ ...prev, title: evt.target.value }))
             }
