@@ -5,8 +5,6 @@ import {
   getGovernanceProgramVersion,
   getGovernanceSchema,
   getRealm,
-  ProgramAccount,
-  RealmConfigAccount,
   SetRealmAuthorityAction,
   SetRealmAuthorityArgs,
   tryGetRealmConfig,
@@ -162,16 +160,11 @@ export const GOVERNANCE_INSTRUCTIONS = {
           connection,
           realm.account.communityMint
         )
-        let config: ProgramAccount<RealmConfigAccount> | null = null
-        try {
-          config = await tryGetRealmConfig(
-            connection,
-            realm.owner,
-            realm.pubkey
-          )
-        } catch (e) {
-          console.log(e)
-        }
+        const realmConfig = await tryGetRealmConfig(
+          connection,
+          realm.owner,
+          realm.pubkey
+        )
 
         return (
           <>
@@ -208,16 +201,16 @@ export const GOVERNANCE_INSTRUCTIONS = {
               {`useMaxCommunityVoterWeightAddin:
                ${!!args.configArgs.useMaxCommunityVoterWeightAddin}`}
             </p>
-            {config?.account.communityTokenConfig.voterWeightAddin && (
+            {realmConfig?.account.communityTokenConfig.voterWeightAddin && (
               <p>
                 {`communityVoterWeightAddin :
-               ${config?.account.communityTokenConfig.voterWeightAddin?.toBase58()}`}
+               ${realmConfig?.account.communityTokenConfig.voterWeightAddin?.toBase58()}`}
               </p>
             )}
-            {config?.account.communityTokenConfig.maxVoterWeightAddin && (
+            {realmConfig?.account.communityTokenConfig.maxVoterWeightAddin && (
               <p>
                 {`maxCommunityVoterWeightAddin:
-               ${config?.account.communityTokenConfig.maxVoterWeightAddin?.toBase58()}`}
+               ${realmConfig?.account.communityTokenConfig.maxVoterWeightAddin?.toBase58()}`}
               </p>
             )}
           </>
