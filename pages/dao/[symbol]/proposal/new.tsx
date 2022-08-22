@@ -725,6 +725,8 @@ const New = () => {
         return (
           <GrantLocked isMsrm={false} index={idx} governance={governance} />
         )
+      case Instructions.SerumGrantLockedMSRM:
+        return <GrantLocked isMsrm={true} index={idx} governance={governance} />
       default:
         null
     }

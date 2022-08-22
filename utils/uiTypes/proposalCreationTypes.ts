@@ -504,6 +504,7 @@ export enum Instructions {
   EverlendWithdraw,
   SerumInitUser,
   SerumGrantLockedSRM,
+  SerumGrantLockedMSRM,
 }
 
 export type createParams = [
