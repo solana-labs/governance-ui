@@ -519,6 +519,16 @@ export default function useGovernanceAssets() {
       name: 'Serum: Grant Locked MSRM',
       isVisible: canUseAnyInstruction,
     },
+    {
+      id: Instructions.SerumGrantVestSRM,
+      name: 'Serum: Grant Vested SRM',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.SerumGrantVestMSRM,
+      name: 'Serum: Grant Vested MSRM',
+      isVisible: canUseAnyInstruction,
+    },
     ...foresightInstructions,
   ]
 

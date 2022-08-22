@@ -505,6 +505,8 @@ export enum Instructions {
   SerumInitUser,
   SerumGrantLockedSRM,
   SerumGrantLockedMSRM,
+  SerumGrantVestSRM,
+  SerumGrantVestMSRM,
 }
 
 export type createParams = [

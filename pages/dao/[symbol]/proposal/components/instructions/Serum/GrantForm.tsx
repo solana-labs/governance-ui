@@ -7,7 +7,7 @@ import {
   ProgramAccount,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import {
   getMintMinAmountAsDecimal,
   parseMintNaturalAmountFromDecimalAsBN,
@@ -16,17 +16,20 @@ import { tryParseKey } from '@tools/validators/pubkey'
 import { debounce } from '@utils/debounce'
 import { precision } from '@utils/formatting'
 import { validatePubkey } from '@utils/formValidation'
+import { notify } from '@utils/notifications'
 import { SerumGrantLockedForm } from '@utils/uiTypes/proposalCreationTypes'
 import { useContext, useEffect, useState } from 'react'
 import useSerumGovStore, { MSRM_MINT, SRM_MINT } from 'stores/useSerumGovStore'
 import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
 
-const GrantLocked = ({
+const GrantForm = ({
+  isLocked,
   isMsrm,
   index,
   governance,
 }: {
+  isLocked: boolean
   isMsrm: boolean
   index: number
   governance: ProgramAccount<Governance> | null
@@ -108,19 +111,36 @@ const GrantLocked = ({
       }
     }
 
-    const ix = await actions.getGrantLockedInstruction(
-      new PublicKey(form.owner),
-      form.governedTokenAccount.extensions.token.account.owner,
-      form.governedTokenAccount.pubkey,
-      anchorProvider,
-      parseMintNaturalAmountFromDecimalAsBN(
-        form.amount,
-        form.mintInfo.decimals
-      ),
-      false
-    )
+    let ix: TransactionInstruction
+    if (isLocked) {
+      ix = await actions.getGrantLockedInstruction(
+        new PublicKey(form.owner),
+        form.governedTokenAccount.extensions.token.account.owner,
+        form.governedTokenAccount.pubkey,
+        anchorProvider,
+        parseMintNaturalAmountFromDecimalAsBN(
+          form.amount,
+          form.mintInfo.decimals
+        ),
+        isMsrm
+      )
+    } else {
+      ix = await actions.getGrantVestInstruction(
+        new PublicKey(form.owner),
+        form.governedTokenAccount.extensions.token.account.owner,
+        form.governedTokenAccount.pubkey,
+        anchorProvider,
+        parseMintNaturalAmountFromDecimalAsBN(
+          form.amount,
+          form.mintInfo.decimals
+        ),
+        isMsrm
+      )
+    }
 
-    console.log(ix)
+    if (!ix) {
+      notify({ type: 'error', message: 'Could not create instruction.' })
+    }
 
     return {
       serializedInstruction: serializeInstructionToBase64(ix),
@@ -196,8 +216,17 @@ const GrantLocked = ({
         <div>
           <div className="pb-0.5 text-fgd-3 text-xs">User Account</div>
           <div className="text-xs pb-1">{userAccount.address.toString()}</div>
-          <div className="pb-0.5 text-fgd-3 text-xs">Lock Index</div>
-          <div className="text-xs">{userAccount.lockIndex}</div>
+          {isLocked ? (
+            <>
+              <div className="pb-0.5 text-fgd-3 text-xs">Lock Index</div>
+              <div className="text-xs">{userAccount.lockIndex}</div>
+            </>
+          ) : (
+            <>
+              <div className="pb-0.5 text-fgd-3 text-xs">Vest Index</div>
+              <div className="text-xs">{userAccount.vestIndex}</div>
+            </>
+          )}
         </div>
       )}
       <Input
@@ -214,4 +243,4 @@ const GrantLocked = ({
   )
 }
 
-export default GrantLocked
+export default GrantForm

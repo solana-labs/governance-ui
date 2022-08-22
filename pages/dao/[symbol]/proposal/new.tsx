@@ -109,7 +109,7 @@ import DepositForm from './components/instructions/Everlend/DepositForm'
 import WithdrawForm from './components/instructions/Everlend/WithdrawForm'
 import InitUser from './components/instructions/Serum/InitUser'
 import MakeChangeReferralFeeParams2 from './components/instructions/Mango/MakeChangeReferralFeeParams2'
-import GrantLocked from './components/instructions/Serum/GrantLocked'
+import GrantForm from './components/instructions/Serum/GrantForm'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -723,10 +723,40 @@ const New = () => {
         return <InitUser index={idx} governance={governance} />
       case Instructions.SerumGrantLockedSRM:
         return (
-          <GrantLocked isMsrm={false} index={idx} governance={governance} />
+          <GrantForm
+            isLocked={true}
+            isMsrm={false}
+            index={idx}
+            governance={governance}
+          />
         )
       case Instructions.SerumGrantLockedMSRM:
-        return <GrantLocked isMsrm={true} index={idx} governance={governance} />
+        return (
+          <GrantForm
+            isLocked={true}
+            isMsrm={true}
+            index={idx}
+            governance={governance}
+          />
+        )
+      case Instructions.SerumGrantVestSRM:
+        return (
+          <GrantForm
+            isLocked={false}
+            isMsrm={false}
+            index={idx}
+            governance={governance}
+          />
+        )
+      case Instructions.SerumGrantVestMSRM:
+        return (
+          <GrantForm
+            isLocked={false}
+            isMsrm={true}
+            index={idx}
+            governance={governance}
+          />
+        )
       default:
         null
     }

@@ -659,6 +659,85 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
 
       return ix
     },
+
+    async getGrantVestInstruction(
+      owner: PublicKey,
+      payer: PublicKey,
+      payerTokenAccount: PublicKey,
+      provider: anchor.AnchorProvider,
+      amount: anchor.BN,
+      isMsrm: boolean
+    ) {
+      const program = new anchor.Program(
+        IDL as anchor.Idl,
+        get().programId,
+        provider
+      )
+
+      const userAccount = await get().actions.getUserAccount(provider, owner)
+
+      const claimTicket = Keypair.generate()
+
+      const [vestAccount] = findProgramAddressSync(
+        [
+          Buffer.from('vest_account'),
+          owner.toBuffer(),
+          new anchor.BN(userAccount.vestIndex).toArrayLike(Buffer, 'le', 8),
+        ],
+        program.programId
+      )
+
+      let ix: TransactionInstruction
+
+      if (!isMsrm) {
+        const [srmVault] = findProgramAddressSync(
+          [Buffer.from('vault'), SRM_MINT.toBuffer()],
+          program.programId
+        )
+
+        ix = await program.methods
+          .depositVestSrm(amount)
+          .accounts({
+            payer,
+            owner,
+            ownerUserAccount: userAccount.address,
+            vestAccount,
+            claimTicket: claimTicket.publicKey,
+            srmMint: SRM_MINT,
+            payerSrmAccount: payerTokenAccount,
+            authority: get().authority,
+            srmVault,
+            clock: SYSVAR_CLOCK_PUBKEY,
+            tokenProgram: TOKEN_PROGRAM_ID,
+            systemProgram: SystemProgram.programId,
+          })
+          .instruction()
+      } else {
+        const [msrmVault] = findProgramAddressSync(
+          [Buffer.from('vault'), MSRM_MINT.toBuffer()],
+          program.programId
+        )
+        ix = await program.methods
+          .depositVestMsrm(amount)
+          .accounts({
+            payer,
+            owner,
+            userAccount: userAccount.address,
+            msrmMint: MSRM_MINT,
+            payerMsrmAccount: payerTokenAccount,
+            authority: get().authority,
+            msrmVault,
+            vestAccount,
+            claimTicket: claimTicket.publicKey,
+            clock: SYSVAR_CLOCK_PUBKEY,
+            tokenProgram: TOKEN_PROGRAM_ID,
+            systemProgram: SystemProgram.programId,
+          })
+          .instruction()
+      }
+
+      return ix
+    },
   },
 }))
 
