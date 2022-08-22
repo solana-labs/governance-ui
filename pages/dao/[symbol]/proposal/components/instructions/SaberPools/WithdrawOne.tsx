@@ -59,7 +59,7 @@ const WithdrawOne = ({
         destinationAccount: new PublicKey(form.destinationAccount!),
         baseTokenName: form.baseTokenName!,
         poolTokenAmount: uiAmountToNativeBN(
-          form.uiMinimumTokenAmount!.toString(),
+          form.uiPoolTokenAmount!.toString(),
           pool.poolToken.decimals,
         ),
         minimumTokenAmount: uiAmountToNativeBN(
