@@ -72,7 +72,7 @@ const GovernanceConfigModal = ({
     ),
     maxVotingTime: getDaysFromTimestamp(config?.maxVotingTime),
     voteThreshold: config?.communityVoteThreshold.value!,
-    voteTipping: config?.voteTipping,
+    voteTipping: config?.communityVoteTipping,
   })
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})

@@ -96,7 +96,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
             </p>
             <p>
               {`voteTipping:
-              ${VoteTipping[args.config.voteTipping]}`}
+              ${VoteTipping[args.config.communityVoteTipping]}`}
             </p>
           </>
         )

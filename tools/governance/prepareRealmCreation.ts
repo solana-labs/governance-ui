@@ -259,6 +259,7 @@ export async function prepareRealmCreation({
     communityVoteThreshold,
     councilVoteThreshold,
     councilVetoVoteThreshold,
+    communityVetoVoteThreshold,
   } = createGovernanceThresholds(programVersion, communityYesVotePercentage)
 
   // Put community and council mints under the realm governance with default config
@@ -269,10 +270,12 @@ export async function prepareRealmCreation({
     minInstructionHoldUpTime: 0,
     // max voting time 3 days
     maxVotingTime: getTimestampFromDays(maxVotingTimeInDays),
-    voteTipping: VoteTipping.Strict,
+    communityVoteTipping: VoteTipping.Strict,
+    councilVoteTipping: VoteTipping.Strict,
     minCouncilTokensToCreateProposal: new BN(initialCouncilTokenAmount),
     councilVoteThreshold: councilVoteThreshold,
     councilVetoVoteThreshold: councilVetoVoteThreshold,
+    communityVetoVoteThreshold: communityVetoVoteThreshold,
   })
 
   const communityMintGovPk = createCommunityMintGovernance
