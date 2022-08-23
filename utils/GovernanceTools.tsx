@@ -35,6 +35,7 @@ export function getGovernanceConfig(
     communityVoteThreshold,
     councilVoteThreshold,
     councilVetoVoteThreshold,
+    communityVetoVoteThreshold,
   } = createGovernanceThresholds(programVersion, values.voteThresholdPercentage)
 
   const minTokensToCreateProposal = isDisabledVoterWeight(
@@ -45,6 +46,8 @@ export function getGovernanceConfig(
         values.minTokensToCreateProposal,
         values.mintDecimals
       )
+
+  const voteTippig = values.voteTipping || 0
 
   return new GovernanceConfig({
     communityVoteThreshold: communityVoteThreshold,
@@ -59,8 +62,10 @@ export function getGovernanceConfig(
     // Council tokens are rare and possession of any amount of council tokens should be sufficient to be allowed to create proposals
     // If it turns to be a wrong assumption then it should be exposed in the UI
     minCouncilTokensToCreateProposal: new BN(1),
-    voteTipping: values.voteTipping || 0,
+    communityVoteTipping: voteTippig,
+    councilVoteTipping: voteTippig,
     councilVoteThreshold: councilVoteThreshold,
     councilVetoVoteThreshold: councilVetoVoteThreshold,
+    communityVetoVoteThreshold: communityVetoVoteThreshold,
   })
 }

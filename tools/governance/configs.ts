@@ -41,10 +41,18 @@ export function createGovernanceThresholds(
       ? communityVoteThreshold
       : undefinedThreshold
 
+  // TODO: For spl-gov v3 add suport for seperate Community Veto vote threshold in the UI
+  // Until it's supported we default it to disabled Community vote threshold
+  const communityVetoVoteThreshold =
+    programVersion >= PROGRAM_VERSION_V3
+      ? new VoteThreshold({ type: VoteThresholdType.Disabled })
+      : undefinedThreshold
+
   return {
     communityVoteThreshold,
     councilVoteThreshold,
     councilVetoVoteThreshold,
+    communityVetoVoteThreshold,
   }
 }
 
