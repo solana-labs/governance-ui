@@ -33,7 +33,7 @@ const AdditionalProposalOptions = ({
         className="flex items-center text-primary-light my-5"
         onClick={() => setShowOptions(!showOptions)}
       >
-        {showOptions ? 'Less Options' : 'More Proposal Options'}
+        {showOptions ? 'Less Proposal Options' : 'More Proposal Options'}
         <ChevronDownIcon
           className={`default-transition h-5 w-5 ml-1 ${
             showOptions ? 'transform rotate-180' : 'transform rotate-360'

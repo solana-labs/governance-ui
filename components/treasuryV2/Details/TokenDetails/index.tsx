@@ -1,7 +1,7 @@
 import React from 'react'
 import cx from 'classnames'
 
-import { Token, Sol } from '@models/treasury/Asset'
+import { Token, Sol, AssetType } from '@models/treasury/Asset'
 import { Wallet } from '@models/treasury/Wallet'
 
 import Header from './Header'
@@ -34,7 +34,9 @@ export default function TokenDetails(props: Props) {
               governanceAddress={props.governanceAddress}
             />
           )}
-          <Auction asset={props.asset} className="mb-10" />
+          {props.asset.type === AssetType.Token && (
+            <Auction asset={props.asset} className="mb-10" />
+          )}
           <Activity assets={[props.asset]} />
         </section>
       </StickyScrolledContainer>
