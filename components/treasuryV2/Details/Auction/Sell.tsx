@@ -11,7 +11,10 @@ import AdditionalProposalOptions from '@components/AdditionalProposalOptions'
 import { abbreviateAddress } from '@utils/formatting'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
-import { createAuctionInstructions } from 'auction-house-sdk/auction'
+import {
+  createAuctionInstructions,
+  AuctionObj,
+} from 'auction-house/sdk/auction'
 import useWalletStore from 'stores/useWalletStore'
 import Modal from '@components/Modal'
 import dayjs from 'dayjs'
@@ -31,7 +34,7 @@ export default function Sell({ className, asset }: Props) {
     notation: 'compact',
   })
   const [openSaveBackupKeyModal, setOpenSaveBackupKeyModal] = useState(false)
-  const [auctionObj, setAuctionObj] = useState<any | null>(null)
+  const [auctionObj, setAuctionObj] = useState<AuctionObj | null>(null)
   const [fileDownloaded, setFileDownloaded] = useState(false)
   const [auctionSize, setAuctionSize] = useState<number>(ParticipantPreset.M)
   const [form, setForm] = useState<SellForm>({

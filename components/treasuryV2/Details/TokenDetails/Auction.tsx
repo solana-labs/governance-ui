@@ -1,11 +1,11 @@
 import Button from '@components/Button'
-import { Sol, Token } from '@models/treasury/Asset'
+import { Token } from '@models/treasury/Asset'
 import { useState } from 'react'
 import SellModal from '../Auction/SellModal'
 
 interface Props {
   className: string | undefined
-  asset: Token | Sol
+  asset: Token
 }
 
 export default function Auction(props: Props) {

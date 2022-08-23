@@ -1,11 +1,11 @@
 import Modal from '@components/Modal'
-import { Token, Sol } from '@models/treasury/Asset'
+import { Token } from '@models/treasury/Asset'
 import Sell from './Sell'
 //import { createAuctionInstructions } from 'auction-house/sdk/auction'
 
 interface Props {
   isOpen: boolean
-  asset: Token | Sol
+  asset: Token
   onClose: () => void
 }
 
