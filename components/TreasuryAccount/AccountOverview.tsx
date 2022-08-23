@@ -87,6 +87,7 @@ const AccountOverview = () => {
   const [openCommonSendModal, setOpenCommonSendModal] = useState(false)
   const [openMsolConvertModal, setOpenMsolConvertModal] = useState(false)
   const [openStSolConvertModal, setOpenStSolConvertModal] = useState(false)
+  const [openDaoSolConvertModal, setOpenDaoSolConvertModal] = useState(false)
   const [openAtaModal, setOpenAtaModal] = useState(false)
   const accountPublicKey = currentAccount?.extensions.transferAddress
   const strategies = useStrategiesStore((s) => s.strategies)
@@ -323,6 +324,21 @@ const AccountOverview = () => {
       strategyDescription: '',
       createProposalFcn: () => null,
     }
+    const daopoolStrategy = {
+      liquidity: 0,
+      protocolSymbol: '',
+      apy: '',
+      protocolName: 'DAOPool',
+      handledMint: '',
+      handledTokenSymbol: '',
+      handledTokenImgSrc:
+        'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png',
+      protocolLogoSrc:
+        'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/GEJpt3Wjmr628FqXxTgxMce1pLntcPV4uFi8ksxMyPQh/logo.png',
+      strategyName: 'Stake',
+      strategyDescription: '',
+      createProposalFcn: () => null,
+    }
     const serumStrategy = {
       liquidity: 0,
       protocolSymbol: '',
@@ -351,6 +367,13 @@ const AccountOverview = () => {
             onClick={() => setOpenStSolConvertModal(true)}
             currentDeposits={0}
             strat={lidoStrategy}
+          ></StrategyCard>
+        )}
+        {isSol && (
+          <StrategyCard
+            onClick={() => setOpenDaoSolConvertModal(true)}
+            currentDeposits={0}
+            strat={daopoolStrategy}
           ></StrategyCard>
         )}
         {isSplToken && (
@@ -621,6 +644,17 @@ const AccountOverview = () => {
             setOpenStSolConvertModal(false)
           }}
           isOpen={openStSolConvertModal}
+        >
+          <ConvertToStSol />
+        </Modal>
+      )}
+      {openDaoSolConvertModal && (
+        <Modal
+          sizeClassName="sm:max-w-3xl"
+          onClose={() => {
+            setOpenDaoSolConvertModal(false)
+          }}
+          isOpen={openDaoSolConvertModal}
         >
           <ConvertToStSol />
         </Modal>
