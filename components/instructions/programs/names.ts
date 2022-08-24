@@ -4,6 +4,7 @@ import {
   LIDO_PROGRAM_ID,
   LIDO_PROGRAM_ID_DEVNET,
 } from '@components/TreasuryAccount/ConvertToStSol'
+import { NAME_PROGRAM_ID } from '@bonfida/spl-name-service'
 
 export const GOVERNANCE_PROGRAM_NAMES = {
   GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J: 'Mango Governance Program',
@@ -42,6 +43,7 @@ export const PROGRAM_NAMES = {
   VotEn9AWwTFtJPJSMV5F9jsMY6QwWM5qn3XP9PATGW7:
     'PsyDO Voter Stake Registry Program',
   [foresightConsts.PROGRAM_ID]: 'Foresight Dex',
+  [NAME_PROGRAM_ID.toBase58()]: 'Solana Name Service program',
   ...GOVERNANCE_PROGRAM_NAMES,
 }
 
