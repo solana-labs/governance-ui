@@ -246,6 +246,7 @@ export default function Sell({ className, asset }: Props) {
         governance,
         prerequisiteInstructions: idx === 0 ? perquisiteInstructions : [],
         prerequisiteInstructionsSigners: idx === 0 ? perquisiteSingers : [],
+        chunkBy: 1,
       }
       return new InstructionDataWithHoldUpTime({
         instruction: obj,
@@ -364,9 +365,9 @@ export default function Sell({ className, asset }: Props) {
         </div>
         <TokenMintInput
           label={'Quote mint'}
-          onValidMintChange={(mintAddress, tokenInfo) => {
+          onValidMintChange={(mintAddress) => {
             handleSetForm({
-              value: tokenInfo?.address,
+              value: mintAddress,
               propertyName: 'quoteMint',
             })
           }}
