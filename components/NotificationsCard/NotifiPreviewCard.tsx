@@ -123,7 +123,7 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
       return (
         <div
           key={source.id}
-          className="w-full flex flex-row text-[14px] tracking-tight"
+          className="max-h-16 flex flex-row text-[14px] tracking-tight py-2"
         >
           <div className="font-rota text-opacity-75 font-thin break-words w-3/4 inline-block">
             {source.name} Notifications On
