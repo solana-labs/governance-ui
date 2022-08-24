@@ -10,7 +10,7 @@ import TokenMintInput from '@components/inputs/TokenMintInput'
 import AdditionalProposalOptions from '@components/AdditionalProposalOptions'
 import { abbreviateAddress } from '@utils/formatting'
 import { tryParsePublicKey } from '@tools/core/pubkey'
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js'
 import {
   createAuctionInstructions,
   AuctionObj,
@@ -18,12 +18,37 @@ import {
 import useWalletStore from 'stores/useWalletStore'
 import Modal from '@components/Modal'
 import dayjs from 'dayjs'
+import {
+  getOpenOrdersPk,
+  getOrderHistoryPk,
+} from 'auction-house/sdk/tools/findProgramAddress'
+import { getCreateDefaultFeeAtas } from 'auction-house/sdk/tools/tools'
+import {
+  createInitOpenOrdersInstructions,
+  createNewOrderInstructions,
+} from 'auction-house/sdk/order'
+import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  Token as SPL_TOKEN,
+  TOKEN_PROGRAM_ID,
+} from '@solana/spl-token'
+import useCreateProposal from '@hooks/useCreateProposal'
+import useQueryContext from '@hooks/useQueryContext'
+import useRealm from '@hooks/useRealm'
+import { useRouter } from 'next/router'
+import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
+import { serializeInstructionToBase64 } from '@solana/spl-governance'
+import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
+import { notify } from '@utils/notifications'
 interface Props {
   className?: string
   asset: Token
 }
 
-const MANGO_AUCTION_PROGRAM_ID = 'AReGQtE8e1WC1ztXXq5edtBBPngicGLfLnWeMP7E5WXq'
+const MANGO_AUCTION_PROGRAM_ID = new PublicKey(
+  'AReGQtE8e1WC1ztXXq5edtBBPngicGLfLnWeMP7E5WXq'
+)
 const DEFAULT_TOKENS_FOR_SALE = 1
 const DEFAULT_MIN_PRICE = 1
 
@@ -33,6 +58,10 @@ export default function Sell({ className, asset }: Props) {
   const formatter = Intl.NumberFormat('en', {
     notation: 'compact',
   })
+  const { symbol } = useRealm()
+  const router = useRouter()
+  const { handleCreateProposal } = useCreateProposal()
+  const { fmtUrlWithCluster } = useQueryContext()
   const [openSaveBackupKeyModal, setOpenSaveBackupKeyModal] = useState(false)
   const [auctionObj, setAuctionObj] = useState<AuctionObj | null>(null)
   const [fileDownloaded, setFileDownloaded] = useState(false)
@@ -114,7 +143,7 @@ export default function Sell({ className, asset }: Props) {
       ...data,
       connection: connection.current,
       wallet: wallet!.publicKey!,
-      programId: new PublicKey(MANGO_AUCTION_PROGRAM_ID),
+      programId: MANGO_AUCTION_PROGRAM_ID,
       baseMint: new PublicKey(data.baseMint),
       quoteMint: new PublicKey(data.quoteMint),
     })
@@ -122,9 +151,122 @@ export default function Sell({ className, asset }: Props) {
     setAuctionObj(auctionObj)
     setOpenSaveBackupKeyModal(true)
   }
-  const handlePropose = async (auctionObj: any) => {
-    console.log(auctionObj)
-    closeSaveKeyPrompt()
+  const handlePropose = async (auctionObj: AuctionObj) => {
+    const perquisiteInstructions: TransactionInstruction[] = [
+      ...auctionObj.transactionInstructions,
+    ]
+    const perquisiteSingers: Keypair[] = [...auctionObj.signers]
+
+    const transactionInstructions: TransactionInstruction[] = []
+
+    const assetExtenstions = asset.raw.extensions
+    const authority = assetExtenstions.token!.account.owner
+    const auctionPk = auctionObj.auctionPk
+    const auctionArgs = auctionObj.auctionParams.args
+    const auctionAccounts = auctionObj.auctionParams.accounts
+    const governance = asset.raw.governance
+
+    const openOrdersPk = await getOpenOrdersPk(
+      authority!,
+      auctionArgs.auctionId,
+      auctionAccounts.authority,
+      MANGO_AUCTION_PROGRAM_ID
+    )
+
+    const {
+      quoteFeeAta,
+      baseFeeAta,
+      instructions,
+    } = await getCreateDefaultFeeAtas({
+      wallet: wallet!,
+      connection: connection.current,
+      baseMint: new PublicKey(form.baseMint),
+      quoteMint: new PublicKey(form.quoteMint),
+      cluster: connection.cluster,
+    })
+    perquisiteInstructions.push(...instructions)
+    const orderHistoryPk = await getOrderHistoryPk(
+      assetExtenstions.token!.account.owner,
+      auctionArgs.auctionId,
+      auctionAccounts.authority,
+      MANGO_AUCTION_PROGRAM_ID
+    )
+    transactionInstructions.push(
+      ...createInitOpenOrdersInstructions({
+        authority: authority,
+        auctionPk: auctionPk,
+        openOrdersPk: openOrdersPk,
+        orderHistoryPk: orderHistoryPk,
+        baseFeePk: baseFeeAta,
+        quoteFeePk: quoteFeeAta,
+        side: 'Ask',
+      })
+    )
+    const quoteAta = await getAssociatedTokenAddress(
+      auctionAccounts.quoteMint, // mint
+      assetExtenstions.token!.account.owner, // owner
+      true
+    )
+    const quoteAtaAcc = await connection.current.getParsedAccountInfo(quoteAta)
+    if (!quoteAtaAcc?.value) {
+      const ataCreateionIx = SPL_TOKEN.createAssociatedTokenAccountInstruction(
+        ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+        TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+        auctionAccounts.quoteMint, // mint
+        quoteAta, // ata
+        assetExtenstions.token!.account.owner, // owner of token account
+        wallet!.publicKey! // fee payer
+      )
+      perquisiteInstructions.push(ataCreateionIx)
+    }
+    transactionInstructions.push(
+      ...createNewOrderInstructions({
+        price: form.minPrice,
+        amount: form.tokensForSale,
+        baseDecimals: assetExtenstions.mint!.account.decimals,
+        authority: authority,
+        auctionPk: auctionPk,
+        openOrdersPk: openOrdersPk,
+        quoteToken: quoteAta,
+        baseToken: assetExtenstions.token!.publicKey,
+        tickSize: auctionArgs.tickSize,
+        quoteMint: auctionAccounts.quoteMint,
+        quoteVault: auctionAccounts.quoteVault,
+        eventQueue: auctionAccounts.eventQueue,
+        bids: auctionAccounts.asks,
+        asks: auctionAccounts.bids,
+        baseMint: auctionAccounts.baseMint,
+        baseVault: auctionAccounts.baseVault,
+      })
+    )
+    const instructionsData = transactionInstructions.map((x, idx) => {
+      const obj: UiInstruction = {
+        serializedInstruction: serializeInstructionToBase64(x),
+        isValid: true,
+        governance,
+        prerequisiteInstructions: idx === 0 ? perquisiteInstructions : [],
+        prerequisiteInstructionsSigners: idx === 0 ? perquisiteSingers : [],
+      }
+      return new InstructionDataWithHoldUpTime({
+        instruction: obj,
+        governance,
+      })
+    })
+    try {
+      const proposalAddress = await handleCreateProposal({
+        title: proposalInfo.title,
+        description: proposalInfo.description,
+        voteByCouncil: proposalInfo.voteByCouncil,
+        instructionsData: instructionsData,
+        governance: governance,
+      })
+      const url = fmtUrlWithCluster(
+        `/dao/${symbol}/proposal/${proposalAddress}`
+      )
+      router.push(url)
+    } catch (ex) {
+      notify({ type: 'error', message: `${ex}` })
+    }
   }
   useEffect(() => {
     setFormErrors({})
