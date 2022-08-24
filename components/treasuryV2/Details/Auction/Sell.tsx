@@ -14,19 +14,19 @@ import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js'
 import {
   createAuctionInstructions,
   AuctionObj,
-} from 'auction-house/sdk/auction'
+} from 'auction-house-sdk/sdk/auction'
 import useWalletStore from 'stores/useWalletStore'
 import Modal from '@components/Modal'
 import dayjs from 'dayjs'
 import {
   getOpenOrdersPk,
   getOrderHistoryPk,
-} from 'auction-house/sdk/tools/findProgramAddress'
-import { getCreateDefaultFeeAtas } from 'auction-house/sdk/tools/tools'
+} from 'auction-house-sdk/sdk/tools/findProgramAddress'
+import { getCreateDefaultFeeAtas } from 'auction-house-sdk/sdk/tools/tools'
 import {
   createInitOpenOrdersInstructions,
   createNewOrderInstructions,
-} from 'auction-house/sdk/order'
+} from 'auction-house-sdk/sdk/order'
 import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
