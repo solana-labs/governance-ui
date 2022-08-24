@@ -223,15 +223,27 @@ const getTokenAssetAccounts = async (
   )
   const govNativeSolAddress = nativeSolAddresses.map((x, index) => {
     return {
+      governanceAcc: governances[index],
       governancePk: governances[index].pubkey,
       nativeSolAddress: x,
     }
   })
   const solAccs = await getSolAccountsInfo(connection, govNativeSolAddress)
+
   for (const tokenAccount of tokenAccounts) {
-    const governance = governances.find(
+    let governance = governances.find(
       (x) => x.pubkey.toBase58() === tokenAccount.account.owner.toBase58()
     )
+    const nativeSolAddress = nativeSolAddresses.find((x) =>
+      x.equals(tokenAccount.account.owner)
+    )
+
+    if (!governance && nativeSolAddress) {
+      governance = govNativeSolAddress.find((x) =>
+        x.nativeSolAddress.equals(nativeSolAddress)
+      )?.governanceAcc
+    }
+
     if (governance) {
       const account = await getTokenAccountObj(
         governance!,
@@ -265,7 +277,19 @@ const getTokenAssetAccounts = async (
   if (solAccounts.length) {
     accounts.push(...solAccounts)
   }
-  return accounts
+
+  // remove potential duplicates
+  const existing = new Set<string>()
+  const deduped: AssetAccount[] = []
+
+  for (const account of accounts) {
+    if (!existing.has(account.pubkey.toBase58())) {
+      existing.add(account.pubkey.toBase58())
+      deduped.push(account)
+    }
+  }
+
+  return deduped
 }
 
 const getMintAccounts = (
@@ -415,6 +439,12 @@ const getAccountsForGovernances = async (
     ? AUXILIARY_TOKEN_ACCOUNTS[realm.account.name]
     : []
 
+  const nativeAccountAddresses = await Promise.all(
+    governancesArray.map((governance) =>
+      getNativeTreasuryAddress(governance.owner, governance.pubkey)
+    )
+  )
+
   const ownedByGovernancesTokenAccounts = await axios.request({
     url: connection.endpoint,
     method: 'POST',
@@ -422,6 +452,31 @@ const getAccountsForGovernances = async (
       'Content-Type': 'application/json',
     },
     data: JSON.stringify([
+      ...nativeAccountAddresses.map((x) => {
+        return {
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'getProgramAccounts',
+          params: [
+            TOKEN_PROGRAM_ID.toBase58(),
+            {
+              commitment: connection.current.commitment,
+              encoding: 'base64',
+              filters: [
+                {
+                  dataSize: TokenAccountLayout.span, // number of bytes
+                },
+                {
+                  memcmp: {
+                    offset: tokenAccountOwnerOffset, // number of bytes
+                    bytes: x.toBase58(), // base58 encoded string
+                  },
+                },
+              ],
+            },
+          ],
+        }
+      }),
       ...governancesArray.map((x) => {
         return {
           jsonrpc: '2.0',
@@ -500,6 +555,7 @@ const getAccountsForGovernances = async (
     realm,
     connection
   )
+
   const governedTokenAccounts = tokenAssetAccounts
   await tokenService.fetchTokenPrices(
     governedTokenAccounts
