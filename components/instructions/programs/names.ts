@@ -43,7 +43,7 @@ export const PROGRAM_NAMES = {
   VotEn9AWwTFtJPJSMV5F9jsMY6QwWM5qn3XP9PATGW7:
     'PsyDO Voter Stake Registry Program',
   [foresightConsts.PROGRAM_ID]: 'Foresight Dex',
-  [NAME_PROGRAM_ID.toBase58()]: 'Solana Name Service program',
+  [NAME_PROGRAM_ID.toBase58()]: 'Solana Name Service Program',
   ...GOVERNANCE_PROGRAM_NAMES,
 }
 
