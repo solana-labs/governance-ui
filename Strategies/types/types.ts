@@ -19,6 +19,7 @@ export interface TreasuryStrategy {
   liquidity: number
   protocolSymbol: string
   apy: string
+  apyHeader?: string
   protocolName: string
   strategySubtext?: string
   handledMint: string

@@ -64,6 +64,7 @@ export const convertVaultInfoToStrategy = async (
     liquidity: vaultInfo.deposits.current,
     protocolSymbol: 'PSY',
     apy: `Estimated ${apyPercentage}%`,
+    apyHeader: `Projected Yield`,
     protocolName: 'PsyFi',
     handledMint,
     handledTokenSymbol: tokenInfo.symbol,
