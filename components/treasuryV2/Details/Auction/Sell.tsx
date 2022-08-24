@@ -365,11 +365,19 @@ export default function Sell({ className, asset }: Props) {
         </div>
         <TokenMintInput
           label={'Quote mint'}
-          onValidMintChange={(mintAddress) => {
-            handleSetForm({
-              value: mintAddress,
-              propertyName: 'quoteMint',
-            })
+          onValidMintChange={(mintAddress, tokenInfo) => {
+            if (mintAddress) {
+              handleSetForm({
+                value: mintAddress,
+                propertyName: 'quoteMint',
+              })
+            }
+            if (tokenInfo) {
+              handleSetForm({
+                value: tokenInfo.address,
+                propertyName: 'quoteMint',
+              })
+            }
           }}
         />
         <div>
