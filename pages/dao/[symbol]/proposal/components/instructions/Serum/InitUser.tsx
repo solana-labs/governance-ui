@@ -39,7 +39,7 @@ const InitUser = ({
   const { handleSetInstructions } = useContext(NewProposalContext)
 
   const [form, setForm] = useState<SerumInitUserForm>({
-    payerGovernedAccount: undefined,
+    governedAccount: undefined,
     owner: '',
     programId: programId.toString(),
   })
@@ -78,33 +78,33 @@ const InitUser = ({
       !connection ||
       !programId ||
       !validatePubkey(form.owner) ||
-      !form.payerGovernedAccount?.governance.account ||
+      !form.governedAccount?.governance.account ||
       !wallet?.publicKey
     ) {
       return {
         serializedInstruction: '',
         isValid: false,
-        governance: form.payerGovernedAccount?.governance,
+        governance: form.governedAccount?.governance,
       }
     }
 
     const ix = await actions.getInitUserInstruction(
       new PublicKey(form.owner),
-      form.payerGovernedAccount.pubkey,
+      form.governedAccount.pubkey,
       anchorProvider
     )
 
     return {
       serializedInstruction: serializeInstructionToBase64(ix),
       isValid: true,
-      governance: form.payerGovernedAccount.governance,
+      governance: form.governedAccount.governance,
     }
   }
 
   useEffect(() => {
     handleSetInstructions(
       {
-        payerGovernedAccount: form.payerGovernedAccount?.governance,
+        governedAccount: form.governedAccount?.governance,
         getInstruction,
       },
       index
@@ -117,10 +117,10 @@ const InitUser = ({
         label="Payer"
         governedAccounts={governedNativeAccounts}
         onChange={(value) => {
-          handleSetForm({ value, propertyName: 'payerGovernedAccount' })
+          handleSetForm({ value, propertyName: 'governedAccount' })
         }}
-        value={form.payerGovernedAccount}
-        error={formErrors['payerGovernedAccount']}
+        value={form.governedAccount}
+        error={formErrors['governedAccount']}
         shouldBeGoverned={!!governance}
         governance={governance}
       />

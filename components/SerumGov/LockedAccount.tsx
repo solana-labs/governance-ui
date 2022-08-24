@@ -141,9 +141,9 @@ const LockedAccount: FC<Props> = ({ account }) => {
 
         <button
           type="submit"
-          className="bg-bkg-4 p-2 px-4 text-xs text-fgd-3 font-semibold rounded-md"
+          className="bg-bkg-4 p-2 px-3 text-xs text-fgd-3 font-semibold rounded-md self-stretch"
         >
-          Burn
+          Redeem
         </button>
       </form>
       {errors.amount ? <p>{errors.amount.message}</p> : null}

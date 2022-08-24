@@ -415,13 +415,13 @@ export interface UpdateTokenMetadataForm {
 }
 
 export interface SerumInitUserForm {
-  payerGovernedAccount?: AssetAccount
+  governedAccount?: AssetAccount
   owner: string
   programId: string
 }
 
 export interface SerumGrantLockedForm {
-  governedTokenAccount?: AssetAccount
+  governedAccount?: AssetAccount
   owner: string
   mintInfo: MintInfo | undefined
   amount: number | undefined

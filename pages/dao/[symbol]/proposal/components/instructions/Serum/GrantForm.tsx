@@ -48,7 +48,7 @@ const GrantForm = ({
   const { handleSetInstructions } = useContext(NewProposalContext)
 
   const [form, setForm] = useState<SerumGrantLockedForm>({
-    governedTokenAccount: undefined,
+    governedAccount: undefined,
     owner: '',
     mintInfo: undefined,
     amount: undefined,
@@ -99,15 +99,15 @@ const GrantForm = ({
       !form.mintInfo ||
       !form.amount ||
       !validatePubkey(form.owner) ||
-      !form.governedTokenAccount?.governance.account ||
-      !form.governedTokenAccount.extensions.mint ||
-      !form.governedTokenAccount.extensions.token ||
+      !form.governedAccount?.governance.account ||
+      !form.governedAccount.extensions.mint ||
+      !form.governedAccount.extensions.token ||
       !wallet?.publicKey
     ) {
       return {
         serializedInstruction: '',
         isValid: false,
-        governance: form.governedTokenAccount?.governance,
+        governance: form.governedAccount?.governance,
       }
     }
 
@@ -115,8 +115,8 @@ const GrantForm = ({
     if (isLocked) {
       ix = await actions.getGrantLockedInstruction(
         new PublicKey(form.owner),
-        form.governedTokenAccount.extensions.token.account.owner,
-        form.governedTokenAccount.pubkey,
+        form.governedAccount.extensions.token.account.owner,
+        form.governedAccount.pubkey,
         anchorProvider,
         parseMintNaturalAmountFromDecimalAsBN(
           form.amount,
@@ -127,8 +127,8 @@ const GrantForm = ({
     } else {
       ix = await actions.getGrantVestInstruction(
         new PublicKey(form.owner),
-        form.governedTokenAccount.extensions.token.account.owner,
-        form.governedTokenAccount.pubkey,
+        form.governedAccount.extensions.token.account.owner,
+        form.governedAccount.pubkey,
         anchorProvider,
         parseMintNaturalAmountFromDecimalAsBN(
           form.amount,
@@ -145,7 +145,7 @@ const GrantForm = ({
     return {
       serializedInstruction: serializeInstructionToBase64(ix),
       isValid: true,
-      governance: form.governedTokenAccount.governance,
+      governance: form.governedAccount.governance,
     }
   }
 
@@ -172,7 +172,7 @@ const GrantForm = ({
   useEffect(() => {
     handleSetInstructions(
       {
-        governedTokenAccount: form.governedTokenAccount?.governance,
+        governedAccount: form.governedAccount?.governance,
         getInstruction,
       },
       index
@@ -180,8 +180,8 @@ const GrantForm = ({
   }, [form])
 
   useEffect(() => {
-    setMintInfo(form.governedTokenAccount?.extensions.mint?.account)
-  }, [form.governedTokenAccount])
+    setMintInfo(form.governedAccount?.extensions.mint?.account)
+  }, [form.governedAccount])
 
   return (
     <>
@@ -193,10 +193,10 @@ const GrantForm = ({
             (!isMsrm ? SRM_MINT.toBase58() : MSRM_MINT.toBase58())
         )}
         onChange={(value) => {
-          handleSetForm({ propertyName: 'governedTokenAccount', value })
+          handleSetForm({ propertyName: 'governedAccount', value })
         }}
-        value={form.governedTokenAccount}
-        error={formErrors['governedTokenAccount']}
+        value={form.governedAccount}
+        error={formErrors['governedAccount']}
         shouldBeGoverned={!!governance}
         governance={governance}
       />
