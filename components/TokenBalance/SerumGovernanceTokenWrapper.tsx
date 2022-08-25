@@ -18,10 +18,6 @@ const SerumGovernanceTokenWrapper: FC = () => {
   const gsrmBalance = useSerumGovStore((s) => s.gsrmBalance)
 
   useEffect(() => {
-    actions.load(connection)
-  }, [])
-
-  useEffect(() => {
     actions.getGsrmBalance(connection, wallet?.publicKey)
     actions.getLockedAccounts(anchorProvider, wallet?.publicKey)
     actions.getVestAccounts(anchorProvider, wallet?.publicKey)

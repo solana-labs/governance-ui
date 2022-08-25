@@ -30,6 +30,7 @@ import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import { GatewayProvider } from '@components/Gateway/GatewayProvider'
 import NftVotingCountingModal from '@components/NftVotingCountingModal'
+import useSerumGovStore from 'stores/useSerumGovStore'
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -59,6 +60,7 @@ function App({ Component, pageProps }) {
   const prevStringifyPossibleNftsAccounts = usePrevious(
     JSON.stringify(possibleNftsAccounts)
   )
+  const actions = useSerumGovStore((s) => s.actions)
   const title = realmName ? `${realmName}` : 'Realms'
 
   // Note: ?v==${Date.now()} is added to the url to force favicon refresh.
@@ -69,6 +71,11 @@ function App({ Component, pageProps }) {
     `/realms/${getResourcePathPart(
       symbol as string
     )}/favicon.ico?v=${Date.now()}`
+
+  useEffect(() => {
+    actions.load(connection.current)
+  }, [connection.current])
+
   useEffect(() => {
     if (realm?.pubkey) {
       loadMarket(connection, connection.cluster)
