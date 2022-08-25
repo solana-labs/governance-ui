@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import {
   MangoAccount,
   MangoAccountLayout,
@@ -157,6 +158,7 @@ const MangoDepositComponent = ({
       await withCreateNativeTreasury(
         instructions,
         realm!.owner,
+        realmInfo?.programVersion!,
         governedTokenAccount!.governance!.pubkey,
         wallet!.publicKey!
       )

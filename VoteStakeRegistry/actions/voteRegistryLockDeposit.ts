@@ -18,6 +18,7 @@ export const voteRegistryLockDeposit = async ({
   mintPk,
   realmPk,
   programId,
+  programVersion,
   amountFromVoteRegistryDeposit,
   totalTransferAmount,
   lockUpPeriodInDays,
@@ -33,6 +34,7 @@ export const voteRegistryLockDeposit = async ({
   mintPk: PublicKey
   realmPk: PublicKey
   programId: PublicKey
+  programVersion: number
   //amount that will be taken from vote registry deposit
   amountFromVoteRegistryDeposit: BN
   totalTransferAmount: BN
@@ -68,6 +70,7 @@ export const voteRegistryLockDeposit = async ({
     mintPk,
     realmPk,
     programId,
+    programVersion,
     tokenOwnerRecordPk,
     lockUpPeriodInDays,
     lockupKind,

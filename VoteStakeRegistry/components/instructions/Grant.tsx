@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import React, { useContext, useEffect, useState } from 'react'
 import Input from '@components/inputs/Input'
 import useRealm from '@hooks/useRealm'
@@ -48,7 +49,7 @@ const Grant = ({
   const dateNow = dayjs().unix()
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
-  const { realm, tokenRecords } = useRealm()
+  const { realm, tokenRecords, realmInfo } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = index !== 0 && governance
   const [startDate, setStartDate] = useState(dayjs().format('DD-MM-YYYY'))
@@ -127,6 +128,7 @@ const Grant = ({
         await withCreateTokenOwnerRecord(
           prerequisiteInstructions,
           realm!.owner,
+          realmInfo?.programVersion!,
           realm!.pubkey,
           destinationAccount,
           realm!.account.communityMint,

@@ -307,6 +307,7 @@ export async function prepareRealmCreation({
   await withCreateNativeTreasury(
     realmInstructions,
     programIdPk,
+    programVersion,
     communityMintGovPk,
     walletPk
   )

@@ -98,6 +98,7 @@ const GovernanceConfigModal = ({
       )
       const instruction = await createSetGovernanceConfig(
         realm.owner,
+        realmInfo?.programVersion!,
         governance?.pubkey,
         governanceConfig
       )

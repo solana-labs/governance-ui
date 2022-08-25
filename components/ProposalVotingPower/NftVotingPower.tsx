@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import classNames from 'classnames'
 import { BigNumber } from 'bignumber.js'
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
@@ -30,7 +31,7 @@ export default function NftVotingPower(props: Props) {
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
-  const { ownTokenRecord, realm } = useRealm()
+  const { ownTokenRecord, realm, realmInfo } = useRealm()
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
@@ -65,6 +66,7 @@ export default function NftVotingPower(props: Props) {
     await withCreateTokenOwnerRecord(
       instructions,
       realm!.owner!,
+      realmInfo?.programVersion!,
       realm!.pubkey,
       wallet!.publicKey!,
       realm!.account.communityMint,

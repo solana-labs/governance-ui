@@ -4534,10 +4534,10 @@
     bs58 "^4.0.1"
     superstruct "^0.15.2"
 
-"@solana/spl-governance@^0.3.12":
-  version "0.3.12"
-  resolved "https://registry.yarnpkg.com/@solana/spl-governance/-/spl-governance-0.3.12.tgz#7e7157544537a053a66755ea0db9e2561d87b331"
-  integrity sha512-L1a4B1en9jS4s3kau4mzRFGD0ge3Uw7ZT/FwZ52mkUz8We2YAb+CojDvzVLeZ5dC3QxznYgBGrn1X/KaKOJqoQ==
+"@solana/spl-governance@^0.3.13":
+  version "0.3.13"
+  resolved "https://registry.yarnpkg.com/@solana/spl-governance/-/spl-governance-0.3.13.tgz#8262b9c0439321e5041530b3b832579371f8ad9c"
+  integrity sha512-qoLSXMqHmR99yvMrqLZ/FIlin0wHibMG+lHUqfFFzBLtuaoABSesXplsneSglz2Fx6AAu/LgBRkqca5M8Fc9hA==
   dependencies:
     "@solana/web3.js" "^1.22.0"
     bignumber.js "^9.0.1"
