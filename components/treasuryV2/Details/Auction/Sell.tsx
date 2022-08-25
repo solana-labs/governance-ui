@@ -247,6 +247,7 @@ export default function Sell({ className, asset }: Props) {
         prerequisiteInstructions: idx === 0 ? perquisiteInstructions : [],
         prerequisiteInstructionsSigners: idx === 0 ? perquisiteSingers : [],
         chunkBy: 1,
+        chunkSplitByDefault: true,
       }
       return new InstructionDataWithHoldUpTime({
         instruction: obj,
