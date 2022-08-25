@@ -411,6 +411,41 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
       }
     },
 
+    async getBurnLockedGsrmInstruction(
+      provider: anchor.AnchorProvider,
+      lockedAccount: LockedAccountType,
+      amount: anchor.BN,
+      owner: PublicKey
+    ) {
+      const program = new anchor.Program(
+        IDL as anchor.Idl,
+        get().programId,
+        provider
+      )
+      const ownerGsrmAccount = await getAssociatedTokenAddress(
+        GSRM_MINT,
+        owner,
+        true
+      )
+      const redeemTicket = Keypair.generate()
+      const ix = await program.methods
+        .burnLockedGsrm(new anchor.BN(lockedAccount.lockIndex), amount)
+        .accounts({
+          owner: owner,
+          authority: get().authority,
+          gsrmMint: GSRM_MINT,
+          ownerGsrmAccount: ownerGsrmAccount,
+          lockedAccount: lockedAccount.address,
+          redeemTicket: redeemTicket.publicKey,
+          clock: SYSVAR_CLOCK_PUBKEY,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          systemProgram: SystemProgram.programId,
+        })
+        .instruction()
+
+      return ix
+    },
+
     async redeem(
       connection: Connection,
       provider: anchor.AnchorProvider,
@@ -644,6 +679,43 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
       } else {
         notify({ type: 'error', message: 'Please connect wallet to claim.' })
       }
+    },
+
+    async getBurnVestGsrmInstruction(
+      provider: anchor.AnchorProvider,
+      vestAccount: VestAccountType,
+      amount: anchor.BN,
+      owner: PublicKey
+    ) {
+      const program = new anchor.Program(
+        IDL as anchor.Idl,
+        get().programId,
+        provider
+      )
+
+      const ownerGsrmAccount = await getAssociatedTokenAddress(
+        GSRM_MINT,
+        owner,
+        true
+      )
+
+      const redeemTicket = Keypair.generate()
+      const ix = await program.methods
+        .burnVestGsrm(new anchor.BN(vestAccount.vestIndex), amount)
+        .accounts({
+          owner: owner,
+          authority: get().authority,
+          gsrmMint: GSRM_MINT,
+          ownerGsrmAccount,
+          vestAccount: vestAccount.address,
+          redeemTicket: redeemTicket.publicKey,
+          clock: SYSVAR_CLOCK_PUBKEY,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          systemProgram: SystemProgram.programId,
+        })
+        .instruction()
+
+      return ix
     },
 
     async getInitUserInstruction(

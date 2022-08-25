@@ -18,8 +18,18 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { notify } from '@utils/notifications'
 import { MSRM_DECIMALS } from '@project-serum/serum/lib/token-instructions'
 import { BigNumber } from 'bignumber.js'
-import { Governance, ProgramAccount } from '@solana/spl-governance'
+import {
+  getInstructionDataFromBase64,
+  Governance,
+  ProgramAccount,
+  serializeInstructionToBase64,
+} from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
+import useCreateProposal from '@hooks/useCreateProposal'
+import { useRouter } from 'next/router'
+import useRealm from '@hooks/useRealm'
+import useQueryContext from '@hooks/useQueryContext'
+import Loading from '@components/Loading'
 
 const BurnVestAccountSchema = {
   amount: yup.string().required(),
@@ -36,7 +46,11 @@ type Props = {
     owner: PublicKey
   }
 }
-const VestAccount: FC<Props> = ({ account }) => {
+const VestAccount: FC<Props> = ({ account, createProposal }) => {
+  const router = useRouter()
+  const { symbol } = useRealm()
+  const { fmtUrlWithCluster } = useQueryContext()
+
   const gsrmBalance = useSerumGovStore((s) => s.gsrmBalance)
   const gsrmMint = useSerumGovStore((s) => s.gsrmMint)
   const actions = useSerumGovStore((s) => s.actions)
@@ -44,7 +58,10 @@ const VestAccount: FC<Props> = ({ account }) => {
   const { anchorProvider, wallet } = useWallet()
   const connection = useWalletStore((s) => s.connection.current)
 
+  const [isBurning, setIsBurning] = useState(false)
   const [currentTimestamp, setCurrentTimestamp] = useState(0)
+
+  const { handleCreateProposal } = useCreateProposal()
 
   useEffect(() => {
     const timestampInterval = setInterval(() => {
@@ -96,6 +113,7 @@ const VestAccount: FC<Props> = ({ account }) => {
     if (!gsrmMint || !gsrmBalance || isNaN(parseFloat(amount.toString()))) {
       return
     }
+    setIsBurning(true)
     let amountAsBN = parseMintNaturalAmountFromDecimalAsBN(
       amount,
       account.isMsrm ? MSRM_DECIMALS : SRM_DECIMALS
@@ -106,6 +124,7 @@ const VestAccount: FC<Props> = ({ account }) => {
     // Check if amount > balance
     if (amountAsBN.gt(new anchor.BN(gsrmBalance.amount))) {
       notify({ type: 'error', message: 'You do not have enough gSRM to burn' })
+      setIsBurning(false)
       return
     }
     // Check if amount > (total - burned)
@@ -117,15 +136,48 @@ const VestAccount: FC<Props> = ({ account }) => {
           account.totalGsrmAmount.sub(account.gsrmBurned)
         )} gSRM can be burned`,
       })
+      setIsBurning(false)
       return
     }
-    await actions.burnVestGsrm(
-      connection,
-      anchorProvider,
-      account,
-      amountAsBN,
-      wallet
-    )
+    if (!createProposal) {
+      await actions.burnVestGsrm(
+        connection,
+        anchorProvider,
+        account,
+        amountAsBN,
+        wallet
+      )
+    } else {
+      const ix = await actions.getBurnVestGsrmInstruction(
+        anchorProvider,
+        account,
+        amountAsBN,
+        createProposal.owner
+      )
+
+      const serializedIx = serializeInstructionToBase64(ix)
+
+      const instructionData = {
+        data: getInstructionDataFromBase64(serializedIx),
+        holdUpTime:
+          createProposal.governance?.account.config.minInstructionHoldUpTime,
+        prerequisiteInstructions: [],
+        shouldSplitIntoSeparateTxs: false,
+      }
+      const proposalAddress = await handleCreateProposal({
+        title: `Serum DAO: Burning ${amount} gSRM`,
+        description: `Burning ${amount} gSRM to redeem vested ${
+          account.isMsrm ? 'MSRM' : 'SRM'
+        }.`,
+        instructionsData: [instructionData],
+        governance: createProposal.governance!,
+      })
+      const url = fmtUrlWithCluster(
+        `/dao/${symbol}/proposal/${proposalAddress}`
+      )
+      await router.push(url)
+    }
+    setIsBurning(false)
   }
   return (
     <div className="p-3 rounded-md border-2 border-bkg-4 w-full">
@@ -196,8 +248,9 @@ const VestAccount: FC<Props> = ({ account }) => {
           <button
             type="submit"
             className="bg-bkg-4 p-2 px-3 text-xs text-fgd-3 font-semibold rounded-md self-stretch"
+            disabled={isBurning}
           >
-            Redeem
+            {!isBurning ? 'Burn' : <Loading />}
           </button>
         </div>
       </form>
