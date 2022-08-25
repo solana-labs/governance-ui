@@ -74,7 +74,7 @@ function App({ Component, pageProps }) {
 
   useEffect(() => {
     actions.load(connection.current)
-  }, [connection.current])
+  }, [connection.current.rpcEndpoint])
 
   useEffect(() => {
     if (realm?.pubkey) {

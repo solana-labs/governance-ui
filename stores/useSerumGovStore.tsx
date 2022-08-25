@@ -134,6 +134,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
     },
 
     async getGsrmBalance(connection: Connection, owner?: PublicKey | null) {
+      const set = get().set
       if (owner) {
         const ata = await getAssociatedTokenAddress(GSRM_MINT, owner)
         try {
@@ -490,6 +491,70 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
       } else {
         notify({ type: 'error', message: 'Please connect wallet to claim.' })
       }
+    },
+
+    async getRedeemInstruction(
+      provider: anchor.AnchorProvider,
+      redeemTicket: RedeemTicketType,
+      owner: PublicKey
+    ) {
+      const program = new anchor.Program(
+        IDL as anchor.Idl,
+        get().programId,
+        provider
+      )
+      let ix: TransactionInstruction
+      if (!redeemTicket.isMsrm) {
+        const ownerSrmAccount = await getAssociatedTokenAddress(
+          SRM_MINT,
+          owner,
+          true
+        )
+        const [srmVault] = findProgramAddressSync(
+          [Buffer.from('vault'), SRM_MINT.toBuffer()],
+          program.programId
+        )
+        ix = await program.methods
+          .redeemSrm()
+          .accounts({
+            owner: owner,
+            authority: get().authority,
+            redeemTicket: redeemTicket.address,
+            srmMint: SRM_MINT,
+            srmVault,
+            ownerSrmAccount,
+            clock: SYSVAR_CLOCK_PUBKEY,
+            tokenProgram: TOKEN_PROGRAM_ID,
+            systemProgram: SystemProgram.programId,
+          })
+          .instruction()
+      } else {
+        const ownerMsrmAccount = await getAssociatedTokenAddress(
+          MSRM_MINT,
+          owner,
+          true
+        )
+        const [msrmVault] = findProgramAddressSync(
+          [Buffer.from('vault'), MSRM_MINT.toBuffer()],
+          program.programId
+        )
+        ix = await program.methods
+          .redeemMsrm()
+          .accounts({
+            owner: owner,
+            authority: get().authority,
+            redeemTicket: redeemTicket.address,
+            msrmMint: MSRM_MINT,
+            msrmVault,
+            ownerMsrmAccount,
+            clock: SYSVAR_CLOCK_PUBKEY,
+            tokenProgram: TOKEN_PROGRAM_ID,
+            systemProgram: SystemProgram.programId,
+          })
+          .instruction()
+      }
+
+      return ix
     },
 
     async getVestAccounts(

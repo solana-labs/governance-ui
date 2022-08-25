@@ -1,3 +1,4 @@
+import Loading from '@components/Loading'
 import useCreateProposal from '@hooks/useCreateProposal'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
@@ -51,6 +52,7 @@ const Ticket: FC<Props> = ({ ticket, createProposal }) => {
   const actions = useSerumGovStore((s) => s.actions)
   const gsrmMint = useSerumGovStore((s) => s.gsrmMint)
 
+  const [isClaiming, setIsClaiming] = useState(false)
   const [currentTimestamp, setCurrentTimestamp] = useState(0)
 
   const { handleCreateProposal } = useCreateProposal()
@@ -64,10 +66,14 @@ const Ticket: FC<Props> = ({ ticket, createProposal }) => {
 
   const handleButton = async (ticket: TicketType) => {
     if (wallet && wallet.publicKey) {
+      setIsClaiming(true)
+      // If claim ticket
       if (isClaimTicket(ticket)) {
         if (!createProposal) {
+          // If sendTransaction (for user wallets)
           await actions.claim(connection, anchorProvider, ticket, wallet)
         } else {
+          // else create proposal (for DAO wallets);
           try {
             const ix = await actions.getClaimInstruction(
               anchorProvider,
@@ -85,23 +91,62 @@ const Ticket: FC<Props> = ({ ticket, createProposal }) => {
               shouldSplitIntoSeparateTxs: false,
             }
             const proposalAddress = await handleCreateProposal({
-              title: 'Claim',
-              description: 'Claiming haha',
-              voteByCouncil: false,
+              title: `Serum DAO: Claim ${fmtMintAmount(
+                gsrmMint,
+                ticket.gsrmAmount
+              )} gSRM`,
+              description: `Claiming ticketId: ${ticket.address.toBase58()}`,
               instructionsData: [instructionData],
               governance: createProposal.governance!,
             })
             const url = fmtUrlWithCluster(
               `/dao/${symbol}/proposal/${proposalAddress}`
             )
-            router.push(url)
+            await router.push(url)
           } catch (ex) {
             notify({ type: 'error', message: `${ex}` })
           }
         }
       } else {
-        await actions.redeem(connection, anchorProvider, ticket, wallet)
+        if (!createProposal) {
+          await actions.redeem(connection, anchorProvider, ticket, wallet)
+        } else {
+          try {
+            const ix = await actions.getRedeemInstruction(
+              anchorProvider,
+              ticket,
+              createProposal.owner
+            )
+            const serializedIx = serializeInstructionToBase64(ix)
+
+            const instructionData = {
+              data: getInstructionDataFromBase64(serializedIx),
+              holdUpTime:
+                createProposal.governance?.account.config
+                  .minInstructionHoldUpTime,
+              prerequisiteInstructions: [],
+              shouldSplitIntoSeparateTxs: false,
+            }
+            const proposalAddress = await handleCreateProposal({
+              title: `Serum DAO: Redeem ${new BigNumber(
+                ticket.amount.toString()
+              )
+                .shiftedBy(-1 * (ticket.isMsrm ? MSRM_DECIMALS : SRM_DECIMALS))
+                .toFormat()} ${ticket.isMsrm ? 'MSRM' : 'SRM'}`,
+              description: `Redeeming ticketId: ${ticket.address.toBase58()}`,
+              instructionsData: [instructionData],
+              governance: createProposal.governance!,
+            })
+            const url = fmtUrlWithCluster(
+              `/dao/${symbol}/proposal/${proposalAddress}`
+            )
+            await router.push(url)
+          } catch (ex) {
+            notify({ type: 'error', message: `${ex}` })
+          }
+        }
       }
+      setIsClaiming(false)
     } else {
       notify({ type: 'error', message: 'Wallet not connected.' })
     }
@@ -111,7 +156,7 @@ const Ticket: FC<Props> = ({ ticket, createProposal }) => {
     <div
       className={classNames(
         'p-3 text-xs rounded-md',
-        createProposal ? 'bg-bkg-4' : 'bg-bkg-3'
+        createProposal ? 'bg-bkg-2' : 'bg-bkg-3'
       )}
     >
       <p className="text-xs text-fgd-3 mb-1">
@@ -136,10 +181,20 @@ const Ticket: FC<Props> = ({ ticket, createProposal }) => {
           disabled={
             ticket.createdAt +
               (isClaimTicket(ticket) ? ticket.claimDelay : ticket.redeemDelay) >
-            currentTimestamp
+              currentTimestamp ||
+            isClaiming ||
+            !wallet?.publicKey
           }
         >
-          {isClaimTicket(ticket) ? 'Claim' : 'Redeem'}
+          {!isClaiming ? (
+            isClaimTicket(ticket) ? (
+              'Claim'
+            ) : (
+              'Redeem'
+            )
+          ) : (
+            <Loading />
+          )}
         </button>
       </div>
     </div>
