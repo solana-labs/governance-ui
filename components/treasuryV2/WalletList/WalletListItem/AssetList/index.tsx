@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import cx from 'classnames'
 
 import {
@@ -9,6 +9,7 @@ import {
   Programs,
   RealmAuthority,
   Unknown,
+  AssetType,
 } from '@models/treasury/Asset'
 
 import TokenList from './TokenList'
@@ -24,6 +25,11 @@ import {
   isRealmAuthority,
   isUnknown,
 } from '../typeGuards'
+
+import { PublicKey } from '@solana/web3.js'
+import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
+import { findMetadataPda } from '@metaplex-foundation/js'
+import useWalletStore from 'stores/useWalletStore'
 
 export type Section = 'tokens' | 'nfts' | 'others'
 
@@ -52,9 +58,70 @@ interface Props {
 }
 
 export default function AssetList(props: Props) {
-  const tokens = props.assets
-    .filter(isTokenLike)
-    .sort((a, b) => b.value.comparedTo(a.value))
+  const tokensFromProps = useMemo(() => {
+    return props.assets
+      .filter(isTokenLike)
+      .sort((a, b) => b.value.comparedTo(a.value))
+  }, [])
+
+  const [tokens, setTokens] = useState<(Token | Sol)[]>(tokensFromProps)
+  const connection = useWalletStore((s) => s.connection)
+
+  useEffect(() => {
+    const getTokenMetadata = async (mintAddress: string) => {
+      try {
+        const mintPubkey = new PublicKey(mintAddress)
+        const metadataAccount = findMetadataPda(mintPubkey)
+        const accountData = await connection.current.getAccountInfo(
+          metadataAccount
+        )
+
+        const state = Metadata.deserialize(accountData!.data)
+        const jsonUri = state[0].data.uri.slice(
+          0,
+          state[0].data.uri.indexOf('\x00')
+        )
+
+        const data = await (await fetch(jsonUri)).json()
+        return {
+          image: data.image,
+          symbol: data.symbol,
+          name: data.name,
+        }
+      } catch (e) {
+        console.log(e)
+      }
+    }
+
+    const getTokenData = async () => {
+      const newTokens: (Token | Sol)[] = []
+      for await (const token of tokensFromProps) {
+        if (
+          token.type != AssetType.Sol &&
+          token.logo == undefined &&
+          token.mintAddress
+        ) {
+          const newTokenData = await getTokenMetadata(token.mintAddress)
+
+          if (!newTokenData) {
+            newTokens.push(token)
+            continue
+          }
+
+          newTokens.push({
+            ...token,
+            icon: <img src={newTokenData.image} className="rounded-full" />,
+            name: newTokenData.name,
+            symbol: newTokenData.symbol,
+          })
+        } else {
+          newTokens.push(token)
+        }
+      }
+      setTokens(newTokens)
+    }
+    getTokenData()
+  }, [tokensFromProps])
 
   const nfts = props.assets.filter(isNFTCollection).sort((a, b) => {
     if (b.name && !a.name) {
@@ -66,7 +133,62 @@ export default function AssetList(props: Props) {
     }
   })
 
-  const others = props.assets.filter(isOther)
+  const othersFromProps = useMemo(() => props.assets.filter(isOther), [])
+
+  const [others, setOthers] = useState<
+    (Mint | Programs | Unknown | RealmAuthority)[]
+  >(othersFromProps)
+
+  useEffect(() => {
+    const getTokenMetadata = async (mintAddress: string) => {
+      try {
+        const mintPubkey = new PublicKey(mintAddress)
+        const metadataAccount = findMetadataPda(mintPubkey)
+        const accountData = await connection.current.getAccountInfo(
+          metadataAccount
+        )
+
+        const state = Metadata.deserialize(accountData!.data)
+        const jsonUri = state[0].data.uri.slice(
+          0,
+          state[0].data.uri.indexOf('\x00')
+        )
+
+        const data = await (await fetch(jsonUri)).json()
+        return {
+          image: data.image,
+          symbol: data.symbol,
+          name: data.name,
+        }
+      } catch (e) {
+        console.log(e)
+      }
+    }
+
+    const getTokenData = async () => {
+      const newTokens: (Mint | Programs | Unknown | RealmAuthority)[] = []
+      for await (const token of othersFromProps) {
+        if (isMint(token)) {
+          const newTokenData = await getTokenMetadata(token.address)
+
+          if (!newTokenData) {
+            newTokens.push(token)
+            continue
+          }
+
+          newTokens.push({
+            ...token,
+            name: newTokenData.name,
+            symbol: newTokenData.symbol,
+          })
+        } else {
+          newTokens.push(token)
+        }
+      }
+      setOthers(newTokens)
+    }
+    getTokenData()
+  }, [othersFromProps])
 
   const diplayingMultipleAssetTypes =
     (tokens.length > 0 ? 1 : 0) +
