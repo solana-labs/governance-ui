@@ -11,22 +11,18 @@ import AdditionalProposalOptions from '@components/AdditionalProposalOptions'
 import { abbreviateAddress } from '@utils/formatting'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js'
-import {
-  createAuctionInstructions,
-  AuctionObj,
-} from 'auction-house-sdk/sdk/auction'
 import useWalletStore from 'stores/useWalletStore'
 import Modal from '@components/Modal'
 import dayjs from 'dayjs'
 import {
-  getOpenOrdersPk,
-  getOrderHistoryPk,
-} from 'auction-house-sdk/sdk/tools/findProgramAddress'
-import { getCreateDefaultFeeAtas } from 'auction-house-sdk/sdk/tools/tools'
-import {
   createInitOpenOrdersInstructions,
   createNewOrderInstructions,
-} from 'auction-house-sdk/sdk/order'
+  getOpenOrdersPk,
+  getOrderHistoryPk,
+  getCreateDefaultFeeAtas,
+  createAuctionInstructions,
+  AuctionObj,
+} from 'auction-house-sdk/sdk'
 import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -160,14 +156,14 @@ export default function Sell({ className, asset }: Props) {
     const transactionInstructions: TransactionInstruction[] = []
 
     const assetExtenstions = asset.raw.extensions
-    const authority = assetExtenstions.token!.account.owner
     const auctionPk = auctionObj.auctionPk
     const auctionArgs = auctionObj.auctionParams.args
     const auctionAccounts = auctionObj.auctionParams.accounts
     const governance = asset.raw.governance
+    const governancePk = governance.pubkey
 
     const openOrdersPk = await getOpenOrdersPk(
-      authority!,
+      governancePk!,
       auctionArgs.auctionId,
       auctionAccounts.authority,
       MANGO_AUCTION_PROGRAM_ID
@@ -193,7 +189,7 @@ export default function Sell({ className, asset }: Props) {
     )
     transactionInstructions.push(
       ...createInitOpenOrdersInstructions({
-        authority: authority,
+        authority: governancePk,
         auctionPk: auctionPk,
         openOrdersPk: openOrdersPk,
         orderHistoryPk: orderHistoryPk,
@@ -224,7 +220,7 @@ export default function Sell({ className, asset }: Props) {
         price: form.minPrice,
         amount: form.tokensForSale,
         baseDecimals: assetExtenstions.mint!.account.decimals,
-        authority: authority,
+        authority: governancePk,
         auctionPk: auctionPk,
         openOrdersPk: openOrdersPk,
         quoteToken: quoteAta,

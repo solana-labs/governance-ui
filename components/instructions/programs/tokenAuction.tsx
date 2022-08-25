@@ -1,13 +1,4 @@
-import { BN } from '@project-serum/anchor'
 import { Connection } from '@solana/web3.js'
-
-export interface GrantInstruction {
-  periods: number
-  kind: object
-  amount: BN
-  startTs: BN
-  allowClawback: boolean
-}
 
 const common_instructions = () => ({
   230: {
