@@ -16,10 +16,9 @@ import {
 import {
   performReverseLookup,
   transferInstruction,
-  SOL_TLD_AUTHORITY,
 } from '@bonfida/spl-name-service'
-import { NewProposalContext } from '../new'
-import GovernedAccountSelect from './GovernedAccountSelect'
+import { NewProposalContext } from '../../new'
+import GovernedAccountSelect from '../GovernedAccountSelect'
 import useRealm from '@hooks/useRealm'
 
 import { LoadingDots } from '@components/Loading'
@@ -74,15 +73,6 @@ const TransferDomainName = ({
       form.destinationAccount &&
       form.domainAddress
     ) {
-      /* transferInstruction(
-        nameProgramId: PublicKey
-        nameAccountKey: PublicKey, 
-        newOwnerKey: PublicKey, 
-        currentNameOwnerKey: PublicKey, 
-        nameClassKey?: PublicKey, 
-        nameParent?: PublicKey, 
-        parentOwner?: PublicKey
-        ) */
       const nameProgramId = new PublicKey(
         'namesLPneVptA9Z5rqUDD9tMTWEJwofgaYwp8cawRkX'
       )
@@ -104,6 +94,7 @@ const TransferDomainName = ({
 
   const getDomains = async (accounts: AssetAccount[]) => {
     if (fetchedDomains) return
+    setIsLoading(true)
     const solAccounts = accounts.filter((acc) => acc.isSol)
     for (let i = 0; i < solAccounts.length; i++) {
       try {
@@ -134,11 +125,10 @@ const TransferDomainName = ({
             console.log(
               `🚨 Get All Domains Time Elapsed: ${Date.now() - startTime}ms`
             )
+            setIsLoading(false)
             return d
           })
           .catch((e) => console.log(e))
-
-        // {"method":"getProgramAccounts","jsonrpc":"2.0","params":["namesLPneVptA9Z5rqUDD9tMTWEJwofgaYwp8cawRkX",{"encoding":"base64","commitment":"confirmed","filters":[{"memcmp":{"offset":0,"bytes":"58PwtjSDuFHuUkYjH9BYnnQKHfwo9reZhC2zMJv9JPkx"}},{"memcmp":{"offset":32,"bytes":"BHyNLKxKKKqjQV21Z6CTJCRS1YKSLgbKRqoQGzoGo5mo"}}]}],"id":"97ae5717-dc81-470b-be45-8229ee146fb0"}
 
         if (domainsForAccount && domainsForAccount.length > 0) {
           for (let n = 0; n < domainsForAccount.length; n++) {

@@ -105,7 +105,7 @@ import PerpEdit from './components/instructions/Mango/MangoV4/PerpEdit'
 import Serum3RegisterMarket from './components/instructions/Mango/MangoV4/Serum3RegisterMarket'
 import PerpCreate from './components/instructions/Mango/MangoV4/PerpCreate'
 import TokenRegisterTrustless from './components/instructions/Mango/MangoV4/TokenRegisterTrustless'
-import TransferDomainName from './components/TransferDomainName'
+import TransferDomainName from './components/instructions/TransferDomainName'
 
 const TITLE_LENGTH_LIMIT = 130
 
