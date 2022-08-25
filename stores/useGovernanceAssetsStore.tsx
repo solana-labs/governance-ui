@@ -278,18 +278,7 @@ const getTokenAssetAccounts = async (
     accounts.push(...solAccounts)
   }
 
-  // remove potential duplicates
-  const existing = new Set<string>()
-  const deduped: AssetAccount[] = []
-
-  for (const account of accounts) {
-    if (!existing.has(account.pubkey.toBase58())) {
-      existing.add(account.pubkey.toBase58())
-      deduped.push(account)
-    }
-  }
-
-  return deduped
+  return accounts
 }
 
 const getMintAccounts = (
@@ -517,8 +506,20 @@ const getAccountsForGovernances = async (
       }
     })
   )
+  const allResults = results.flat()
 
-  const tokenAssetAccounts = results.flat()
+  // remove potential duplicates
+  const existing = new Set<string>()
+  const deduped: AssetAccount[] = []
+
+  for (const account of allResults) {
+    if (!existing.has(account.pubkey.toBase58())) {
+      existing.add(account.pubkey.toBase58())
+      deduped.push(account)
+    }
+  }
+
+  const tokenAssetAccounts = deduped
 
   const governedTokenAccounts = tokenAssetAccounts
   await tokenService.fetchTokenPrices(
