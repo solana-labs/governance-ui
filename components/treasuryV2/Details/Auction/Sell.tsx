@@ -84,8 +84,8 @@ export default function Sell({ className, asset }: Props) {
     asset.name ? asset.name : abbreviateAddress(asset.id)
   } on auction for min price: ${form.minPrice}`
   const [proposalInfo, setProposalInfo] = useState({
-    title: DEFAULT_TITLE,
-    description: DEFAULT_DESCRIPTION,
+    title: '',
+    description: '',
     voteByCouncil: false,
   })
   const [formErrors, setFormErrors] = useState({})
@@ -252,8 +252,10 @@ export default function Sell({ className, asset }: Props) {
     })
     try {
       const proposalAddress = await handleCreateProposal({
-        title: proposalInfo.title,
-        description: proposalInfo.description,
+        title: proposalInfo.title ? proposalInfo.title : DEFAULT_TITLE,
+        description: proposalInfo.description
+          ? proposalInfo.description
+          : DEFAULT_DESCRIPTION,
         voteByCouncil: proposalInfo.voteByCouncil,
         instructionsData: instructionsData,
         governance: governance,
