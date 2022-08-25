@@ -18,6 +18,8 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { notify } from '@utils/notifications'
 import { MSRM_DECIMALS } from '@project-serum/serum/lib/token-instructions'
 import { BigNumber } from 'bignumber.js'
+import { Governance, ProgramAccount } from '@solana/spl-governance'
+import { PublicKey } from '@solana/web3.js'
 
 const BurnVestAccountSchema = {
   amount: yup.string().required(),
@@ -29,6 +31,10 @@ type BurnVestAccountFormValues = {
 
 type Props = {
   account: VestAccountType
+  createProposal?: {
+    governance?: ProgramAccount<Governance>
+    owner: PublicKey
+  }
 }
 const VestAccount: FC<Props> = ({ account }) => {
   const gsrmBalance = useSerumGovStore((s) => s.gsrmBalance)
@@ -180,7 +186,7 @@ const VestAccount: FC<Props> = ({ account }) => {
         <div className="mt-2 flex space-x-2 items-stretch justify-between w-full">
           <input
             type="text"
-            className="p-2 bg-bkg-3 rounded-md focus:outline-none flex-1"
+            className="p-2 bg-bkg-3 rounded-md focus:outline-none flex-1 border-2 border-bkg-4"
             {...register('amount', {
               required: 'This field is required.',
               valueAsNumber: true,

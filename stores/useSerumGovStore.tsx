@@ -125,7 +125,6 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
       const set = get().set
       try {
         const mint = await tryGetMint(connection, GSRM_MINT)
-        console.log(mint)
         set((s) => {
           s.gsrmMint = mint?.account
         })
@@ -329,6 +328,37 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
       }
     },
 
+    async getClaimInstruction(
+      provider: anchor.AnchorProvider,
+      claimTicket: ClaimTicketType,
+      owner: PublicKey
+    ) {
+      const program = new anchor.Program(
+        IDL as anchor.Idl,
+        get().programId,
+        provider
+      )
+      const ownerGsrmAccount = await getAssociatedTokenAddress(
+        GSRM_MINT,
+        owner,
+        true
+      )
+      const ix = await program.methods
+        .claim()
+        .accounts({
+          owner: owner,
+          claimTicket: claimTicket.address,
+          authority: get().authority,
+          gsrmMint: GSRM_MINT,
+          ownerGsrmAccount: ownerGsrmAccount,
+          clock: SYSVAR_CLOCK_PUBKEY,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          systemProgram: SystemProgram.programId,
+        })
+        .instruction()
+      return ix
+    },
+
     async burnLockedGsrm(
       connection: Connection,
       provider: anchor.AnchorProvider,
@@ -482,10 +512,6 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
             },
           },
         ])
-        accounts.forEach((a) => {
-          console.log(a.publicKey.toBase58())
-          console.log((a.account.totalGsrmAmount as any).toNumber())
-        })
         set((s) => {
           s.vestAccounts = accounts.map((a) => ({
             address: a.publicKey,

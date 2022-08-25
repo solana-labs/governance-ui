@@ -8,6 +8,8 @@ import { AuxiliaryWallet, Wallet } from '@models/treasury/Wallet'
 import AuxiliaryWalletListItem from './AuxiliaryWalletListItem'
 import NewWalletButton from './NewWalletButton'
 import WalletListItem from './WalletListItem'
+import useSerumGovStore from 'stores/useSerumGovStore'
+import useWalletStore from 'stores/useWalletStore'
 
 interface Props {
   className?: string
@@ -22,6 +24,9 @@ interface Props {
 }
 
 export default function WalletList(props: Props) {
+  const connection = useWalletStore((s) => s.connection.current)
+  const actions = useSerumGovStore((s) => s.actions)
+
   const [expanded, setExpanded] = useState<string[]>([])
 
   useEffect(() => {
@@ -42,6 +47,10 @@ export default function WalletList(props: Props) {
       })
     }
   }, [props.data.status])
+
+  useEffect(() => {
+    actions.load(connection)
+  }, [])
 
   switch (props.data.status) {
     case Status.Failed:

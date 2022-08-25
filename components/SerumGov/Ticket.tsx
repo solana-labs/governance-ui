@@ -1,7 +1,19 @@
+import useCreateProposal from '@hooks/useCreateProposal'
+import useQueryContext from '@hooks/useQueryContext'
+import useRealm from '@hooks/useRealm'
 import useWallet from '@hooks/useWallet'
+import {
+  getInstructionDataFromBase64,
+  Governance,
+  ProgramAccount,
+  serializeInstructionToBase64,
+} from '@solana/spl-governance'
+import { PublicKey } from '@solana/web3.js'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { notify } from '@utils/notifications'
 import { BigNumber } from 'bignumber.js'
+import classNames from 'classnames'
+import { useRouter } from 'next/router'
 import { FC, useEffect, useState } from 'react'
 import useSerumGovStore, {
   ClaimTicketType,
@@ -24,13 +36,24 @@ function isClaimTicket(
 
 type Props = {
   ticket: TicketType
+  createProposal?: {
+    governance?: ProgramAccount<Governance>
+    owner: PublicKey
+  }
 }
-const Ticket: FC<Props> = ({ ticket }) => {
+const Ticket: FC<Props> = ({ ticket, createProposal }) => {
+  const router = useRouter()
+  const { symbol } = useRealm()
+  const { fmtUrlWithCluster } = useQueryContext()
+
   const connection = useWalletStore((s) => s.connection.current)
   const { anchorProvider, wallet } = useWallet()
   const actions = useSerumGovStore((s) => s.actions)
   const gsrmMint = useSerumGovStore((s) => s.gsrmMint)
+
   const [currentTimestamp, setCurrentTimestamp] = useState(0)
+
+  const { handleCreateProposal } = useCreateProposal()
 
   useEffect(() => {
     const timestampInterval = setInterval(() => {
@@ -42,7 +65,40 @@ const Ticket: FC<Props> = ({ ticket }) => {
   const handleButton = async (ticket: TicketType) => {
     if (wallet && wallet.publicKey) {
       if (isClaimTicket(ticket)) {
-        await actions.claim(connection, anchorProvider, ticket, wallet)
+        if (!createProposal) {
+          await actions.claim(connection, anchorProvider, ticket, wallet)
+        } else {
+          try {
+            const ix = await actions.getClaimInstruction(
+              anchorProvider,
+              ticket,
+              createProposal.owner
+            )
+            const serializedIx = serializeInstructionToBase64(ix)
+
+            const instructionData = {
+              data: getInstructionDataFromBase64(serializedIx),
+              holdUpTime:
+                createProposal.governance?.account.config
+                  .minInstructionHoldUpTime,
+              prerequisiteInstructions: [],
+              shouldSplitIntoSeparateTxs: false,
+            }
+            const proposalAddress = await handleCreateProposal({
+              title: 'Claim',
+              description: 'Claiming haha',
+              voteByCouncil: false,
+              instructionsData: [instructionData],
+              governance: createProposal.governance!,
+            })
+            const url = fmtUrlWithCluster(
+              `/dao/${symbol}/proposal/${proposalAddress}`
+            )
+            router.push(url)
+          } catch (ex) {
+            notify({ type: 'error', message: `${ex}` })
+          }
+        }
       } else {
         await actions.redeem(connection, anchorProvider, ticket, wallet)
       }
@@ -52,7 +108,12 @@ const Ticket: FC<Props> = ({ ticket }) => {
   }
 
   return (
-    <div className="p-3 text-xs rounded-md bg-bkg-3">
+    <div
+      className={classNames(
+        'p-3 text-xs rounded-md',
+        createProposal ? 'bg-bkg-4' : 'bg-bkg-3'
+      )}
+    >
       <p className="text-xs text-fgd-3 mb-1">
         {isClaimTicket(ticket) ? 'Claim Ticket' : 'Redeem Ticket'}
       </p>

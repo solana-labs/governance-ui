@@ -6,6 +6,7 @@ import { Wallet } from '@models/treasury/Wallet'
 
 import AssetList, { Section } from './AssetList'
 import SummaryButton from './SummaryButton'
+import SerumGovWallet from './SerumGovWallet'
 
 interface Props {
   className?: string
@@ -85,6 +86,7 @@ export default function WalletListItem(props: Props) {
               })
             }
           />
+          <SerumGovWallet wallet={props.wallet} isOpen={isOpen} />
         </div>
       )}
     </div>
