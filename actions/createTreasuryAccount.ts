@@ -90,6 +90,7 @@ export const createTreasuryAccount = async (
     await withCreateNativeTreasury(
       instructions,
       programId,
+      programVersion,
       governanceAddress,
       walletPubkey
     )

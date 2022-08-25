@@ -2,8 +2,8 @@ import {
   AccountMetaData,
   deserializeBorsh,
   getGovernance,
+  getGovernanceInstructionSchema,
   getGovernanceProgramVersion,
-  getGovernanceSchema,
   getRealm,
   SetRealmAuthorityAction,
   SetRealmAuthorityArgs,
@@ -44,7 +44,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
         )
 
         const args = deserializeBorsh(
-          getGovernanceSchema(programVersion),
+          getGovernanceInstructionSchema(programVersion),
           SetGovernanceConfigArgs,
           Buffer.from(data)
         ) as SetGovernanceConfigArgs
@@ -121,7 +121,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
         )
 
         const args = deserializeBorsh(
-          getGovernanceSchema(programVersion),
+          getGovernanceInstructionSchema(programVersion),
           SetRealmAuthorityArgs,
           Buffer.from(data)
         ) as SetRealmAuthorityArgs
@@ -151,7 +151,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
         )
 
         const args = deserializeBorsh(
-          getGovernanceSchema(programVersion),
+          getGovernanceInstructionSchema(programVersion),
           SetRealmConfigArgs,
           Buffer.from(data)
         ) as SetRealmConfigArgs

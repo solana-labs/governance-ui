@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import Button from '@components/Button'
 import Loading from '@components/Loading'
 import useRealm from '@hooks/useRealm'
@@ -31,7 +32,7 @@ const GatewayCard = () => {
   const isLoading = useGatewayPluginStore((s) => s.state.isLoadingGatewayToken)
   const connection = useWalletStore((s) => s.connection)
   const [, setTokenOwneRecordPk] = useState('')
-  const { realm, mint, councilMint } = useRealm()
+  const { realm, mint, councilMint, realmInfo } = useRealm()
   const { fetchRealm } = useWalletStore((s) => s.actions)
   const records = useRecords()
 
@@ -86,6 +87,7 @@ const GatewayCard = () => {
       await withCreateTokenOwnerRecord(
         instructions,
         realm!.owner!,
+        realmInfo?.programVersion!,
         realm!.pubkey,
         wallet!.publicKey!,
         realm!.account.communityMint,
