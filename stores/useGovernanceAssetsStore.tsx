@@ -445,15 +445,15 @@ const getAccountsForGovernances = async (
     )
   )
 
-  const ownedByGovernancesTokenAccounts = await axios.request({
-    url: connection.endpoint,
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: JSON.stringify([
-      ...nativeAccountAddresses.map((x) => {
-        return {
+  const fetchTokenAccounts = (addresses: string[]) =>
+    axios.request({
+      url: connection.endpoint,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: JSON.stringify(
+        addresses.map((address) => ({
           jsonrpc: '2.0',
           id: 1,
           method: 'getProgramAccounts',
@@ -469,67 +469,25 @@ const getAccountsForGovernances = async (
                 {
                   memcmp: {
                     offset: tokenAccountOwnerOffset, // number of bytes
-                    bytes: x.toBase58(), // base58 encoded string
+                    bytes: address, // base58 encoded string
                   },
                 },
               ],
             },
           ],
-        }
-      }),
-      ...governancesArray.map((x) => {
-        return {
-          jsonrpc: '2.0',
-          id: 1,
-          method: 'getProgramAccounts',
-          params: [
-            TOKEN_PROGRAM_ID.toBase58(),
-            {
-              commitment: connection.current.commitment,
-              encoding: 'base64',
-              filters: [
-                {
-                  dataSize: TokenAccountLayout.span, // number of bytes
-                },
-                {
-                  memcmp: {
-                    offset: tokenAccountOwnerOffset, // number of bytes
-                    bytes: x.pubkey.toBase58(), // base58 encoded string
-                  },
-                },
-              ],
-            },
-          ],
-        }
-      }),
-      ...auxiliaryTokenAccounts.map((x) => {
-        return {
-          jsonrpc: '2.0',
-          id: x.owner,
-          method: 'getProgramAccounts',
-          params: [
-            TOKEN_PROGRAM_ID.toBase58(),
-            {
-              commitment: connection.current.commitment,
-              encoding: 'base64',
-              filters: [
-                {
-                  dataSize: TokenAccountLayout.span, // number of bytes
-                },
-                {
-                  memcmp: {
-                    offset: tokenAccountOwnerOffset, // number of bytes
-                    bytes: x.owner, // base58 encoded string
-                  },
-                },
-              ],
-            },
-          ],
-        }
-      }),
-    ]),
-  })
-  const tokenAccountsJson = ownedByGovernancesTokenAccounts.data.map((x) => {
+        }))
+      ),
+    })
+
+  const ownedByGovernancesTokenAccounts = await Promise.all([
+    fetchTokenAccounts(nativeAccountAddresses.map((a) => a.toBase58())),
+    fetchTokenAccounts(governancesArray.map((g) => g.pubkey.toBase58())),
+    auxiliaryTokenAccounts?.length
+      ? fetchTokenAccounts(auxiliaryTokenAccounts.map((x) => x.owner))
+      : Promise.resolve({ data: [] }),
+  ]).then(([x, y, z]) => x.data.concat(y.data).concat(z.data))
+
+  const tokenAccountsJson = ownedByGovernancesTokenAccounts.map((x) => {
     const auxiliaryMatch = auxiliaryTokenAccounts.find(
       (auxAcc) => auxAcc.owner === x.id
     )
@@ -549,12 +507,18 @@ const getAccountsForGovernances = async (
       })
     : []
 
-  const tokenAssetAccounts = await getTokenAssetAccounts(
-    tokenAccountsParsed,
-    governancesArray,
-    realm,
-    connection
+  const groups = group(tokenAccountsParsed)
+  const results = await Promise.all(
+    groups.map((group) => {
+      if (group.length) {
+        return getTokenAssetAccounts(group, governancesArray, realm, connection)
+      } else {
+        return []
+      }
+    })
   )
+
+  const tokenAssetAccounts = results.flat()
 
   const governedTokenAccounts = tokenAssetAccounts
   await tokenService.fetchTokenPrices(
