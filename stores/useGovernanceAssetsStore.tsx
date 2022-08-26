@@ -499,11 +499,7 @@ const getAccountsForGovernances = async (
   const groups = group(tokenAccountsParsed)
   const results = await Promise.all(
     groups.map((group) => {
-      if (group.length) {
-        return getTokenAssetAccounts(group, governancesArray, realm, connection)
-      } else {
-        return []
-      }
+      return getTokenAssetAccounts(group, governancesArray, realm, connection)
     })
   )
   const allResults = results.flat()
