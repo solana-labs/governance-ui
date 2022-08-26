@@ -8,23 +8,20 @@ import {
 } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { validateInstruction } from '@utils/instructionTools'
-import { AssetAccount } from '@utils/uiTypes/assets'
 import {
   DomainNameTransferForm,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
-import {
-  performReverseLookup,
-  transferInstruction,
-} from '@bonfida/spl-name-service'
+import { transferInstruction, NAME_PROGRAM_ID } from '@bonfida/spl-name-service'
 import { NewProposalContext } from '../../new'
 import GovernedAccountSelect from '../GovernedAccountSelect'
-import useRealm from '@hooks/useRealm'
 
 import { LoadingDots } from '@components/Loading'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Select from '@components/inputs/Select'
 import Input from '@components/inputs/Input'
+import { useDomainsForAccount } from '@hooks/useDomainNames'
+import { isPublicKey } from '@tools/core/pubkey'
 
 const TransferDomainName = ({
   index,
@@ -33,33 +30,36 @@ const TransferDomainName = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { realmInfo } = useRealm()
   const connection = useWalletStore((s) => s.connection.current)
-  const { assetAccounts } = useGovernanceAssets()
   const shouldBeGoverned = index !== 0 && governance
-  const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
-  const [domains, setDomains] = useState<
-    { domainName: string; domainAddress: PublicKey | undefined }[]
-  >([{ domainName: '', domainAddress: undefined }])
-  const [isLoading, setIsLoading] = useState(false)
-  const [fetchedDomains, setFetchedDomains] = useState(false)
+
+  const { assetAccounts } = useGovernanceAssets()
+  const governedAccount = assetAccounts.filter((acc) => acc.isSol)[0]
+  const { accountDomains, isLoading } = useDomainsForAccount(
+    connection,
+    governedAccount
+  )
+
+  const [formErrors, setFormErrors] = useState({})
   const [form, setForm] = useState<DomainNameTransferForm>({
     destinationAccount: '',
     governedAccount: undefined,
-
     domainAddress: undefined,
-    programId: 'namesLPneVptA9Z5rqUDD9tMTWEJwofgaYwp8cawRkX',
   })
-  const governedAccount = assetAccounts.filter((acc) => acc.isSol)[0]
+
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
-    console.log({ propertyName, value })
-
     setForm({ ...form, [propertyName]: value })
   }
+
   async function getInstruction(): Promise<UiInstruction> {
-    const isValid = await validateInstruction({ schema, form, setFormErrors })
+    const isValid = await validateInstruction({
+      schema,
+      form,
+      setFormErrors,
+    })
+
     const obj: UiInstruction = {
       serializedInstruction: '',
       isValid,
@@ -68,17 +68,14 @@ const TransferDomainName = ({
 
     if (
       isValid &&
-      form.programId &&
-      form.governedAccount &&
       form.destinationAccount &&
-      form.domainAddress
+      form.domainAddress &&
+      form.governedAccount
     ) {
-      const nameProgramId = new PublicKey(
-        'namesLPneVptA9Z5rqUDD9tMTWEJwofgaYwp8cawRkX'
-      )
+      const nameProgramId = new PublicKey(NAME_PROGRAM_ID)
       const nameAccountKey = new PublicKey(form.domainAddress)
-      const nameOwner = governedAccount.pubkey
       const newOwnerKey = new PublicKey(form.destinationAccount)
+      const nameOwner = governedAccount.pubkey
 
       const transferIx = transferInstruction(
         nameProgramId,
@@ -92,95 +89,12 @@ const TransferDomainName = ({
     return obj
   }
 
-  const getDomains = async (accounts: AssetAccount[]) => {
-    if (fetchedDomains) return
-    setIsLoading(true)
-    const solAccounts = accounts.filter((acc) => acc.isSol)
-    for (let i = 0; i < solAccounts.length; i++) {
-      try {
-        const startTime = Date.now()
-        const domainsForAccount = await connection
-          .getProgramAccounts(
-            new PublicKey('namesLPneVptA9Z5rqUDD9tMTWEJwofgaYwp8cawRkX'),
-            {
-              encoding: 'base64',
-              commitment: 'confirmed',
-              filters: [
-                {
-                  memcmp: {
-                    offset: 0,
-                    bytes: '58PwtjSDuFHuUkYjH9BYnnQKHfwo9reZhC2zMJv9JPkx',
-                  },
-                },
-                {
-                  memcmp: {
-                    offset: 32,
-                    bytes: 'BHyNLKxKKKqjQV21Z6CTJCRS1YKSLgbKRqoQGzoGo5mo',
-                  },
-                },
-              ],
-            }
-          )
-          .then((d) => {
-            console.log(
-              `🚨 Get All Domains Time Elapsed: ${Date.now() - startTime}ms`
-            )
-            setIsLoading(false)
-            return d
-          })
-          .catch((e) => console.log(e))
-
-        if (domainsForAccount && domainsForAccount.length > 0) {
-          for (let n = 0; n < domainsForAccount.length; n++) {
-            const startTime = Date.now()
-            const domainAsString = await performReverseLookup(
-              connection,
-              domainsForAccount[n].pubkey
-            ).then((d) => {
-              console.log(
-                `🏁 Reverse Lookup Time Elapsed: ${Date.now() - startTime}ms`
-              )
-              setIsLoading(false)
-              return d
-            })
-
-            setDomains((d) => [
-              ...d,
-              {
-                domainName: domainAsString.toString(),
-                domainAddress: domainsForAccount[n].pubkey,
-              },
-            ])
-          }
-        }
-        setFetchedDomains(true)
-      } catch (e) {
-        console.log(
-          '🚀 ~ file: SnsDomainNameTransfer.tsx ~ line 44 ~ getDomains ~ e',
-          e
-        )
-      }
-    }
-  }
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: governedAccount?.governance, getInstruction },
       index
     )
   }, [form])
-
-  useEffect(() => {
-    handleSetForm({
-      propertyName: 'programId',
-      value: realmInfo?.programId?.toString(),
-    })
-  }, [])
-
-  // useEffect(() => {
-  //   ;(async () => {
-  //     if (domains.length < 1) return await getDomains(assetAccounts)
-  //   })()
-  // }, [])
 
   const schema = yup.object().shape({
     governedAccount: yup
@@ -189,20 +103,27 @@ const TransferDomainName = ({
       .required('Governed account is required'),
     destinationAccount: yup
       .string()
-      .required('Please provide a destination account'),
-    domainAddress: yup.object(),
-    // domainAddress: yup
-    //   .string()
-    //   .required('Please provide a destination account'),
-    programId: yup.string().required('ProgramId is not defined'),
+      .required('Please provide a valid destination account')
+      .test({
+        name: 'is-valid-account',
+        test(val, ctx) {
+          if (!val || !isPublicKey(val)) {
+            return ctx.createError({
+              message: 'Please verify the account address',
+            })
+          }
+          return true
+        },
+      }),
+    domainAddress: yup.string().required('Please select a domain name'),
   })
+
   return (
     <>
       <GovernedAccountSelect
         label="Governance"
         governedAccounts={[governedAccount]}
         onChange={(value) => {
-          getDomains(assetAccounts)
           handleSetForm({ value, propertyName: 'governedAccount' })
         }}
         value={governedAccount}
@@ -221,11 +142,10 @@ const TransferDomainName = ({
           })
         }
         error={formErrors['destinationAccount']}
-        // onBlur={validateAmountOnBlur}
       />
       {isLoading ? (
         <div className="mt-5">
-          <div>Looking up domains...</div>
+          <div>Looking up accountDomains...</div>
           <LoadingDots />
         </div>
       ) : (
@@ -234,25 +154,26 @@ const TransferDomainName = ({
           label="Domain"
           value={
             form.domainAddress
-              ? domains.find((d) => d.domainAddress === form.domainAddress)
-                  ?.domainName + '.sol'
+              ? accountDomains.find(
+                  (d) => d.domainAddress === form.domainAddress
+                )?.domainName + '.sol'
               : ''
           }
           placeholder="Please select..."
           error={formErrors['domainAddress']}
           onChange={(value) => {
             handleSetForm({
-              value: domains.find((d) => d.domainName === value)?.domainAddress,
+              value: accountDomains.find((d) => d.domainName === value)
+                ?.domainAddress,
               propertyName: 'domainAddress',
             })
           }}
         >
-          {domains.map(
+          {accountDomains?.map(
             (domain, index) =>
-              // dont render default value
               domain.domainAddress && (
                 <Select.Option
-                  key={domain.domainName + index}
+                  key={domain.domainName! + index}
                   value={domain.domainName}
                 >
                   <div className="text-fgd-1 mb-2">{domain.domainName}.sol</div>

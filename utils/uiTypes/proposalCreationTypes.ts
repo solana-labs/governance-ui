@@ -37,7 +37,6 @@ export interface DomainNameTransferForm {
   destinationAccount: string
   governedAccount: AssetAccount | undefined
   domainAddress: string | undefined
-  programId: string | undefined
 }
 
 export interface CastleDepositForm {
