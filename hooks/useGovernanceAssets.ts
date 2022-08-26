@@ -262,6 +262,7 @@ export default function useGovernanceAssets() {
       name: 'SNS Transfer Out Domain Name',
       isVisible: canUseAnyInstruction,
     },
+    {
       id: Instructions.EverlendDeposit,
       name: 'Everlend Deposit Funds',
       isVisible: canUseAnyInstruction,

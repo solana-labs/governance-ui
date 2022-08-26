@@ -410,14 +410,6 @@ export interface UpdateTokenMetadataForm {
   programId: string | undefined
 }
 
-export interface UpdateTokenMetadataForm {
-  name_service_program_id: Pubkey
-  new_owner: Pubkey
-  name_account_key: Pubkey
-  name_owner_key: Pubkey
-  name_class_opt: Option<Pubkey>
-}
-
 export enum Instructions {
   Transfer,
   ProgramUpgrade,
