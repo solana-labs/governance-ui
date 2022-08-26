@@ -490,6 +490,8 @@ export enum Instructions {
   WithdrawValidatorStake,
   DifferValidatorStake,
   TransferDomainName,
+  EverlendDeposit,
+  EverlendWithdraw,
 }
 
 export type createParams = [

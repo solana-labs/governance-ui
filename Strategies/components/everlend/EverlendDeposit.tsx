@@ -8,10 +8,9 @@ import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
 import tokenService from '@utils/services/token'
-import BN from 'bn.js'
+
 import {
   getMintMinAmountAsDecimal,
-  getMintDecimalAmount,
   getMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
 import { RpcContext } from '@solana/spl-governance'
@@ -25,9 +24,6 @@ import { precision } from '@utils/formatting'
 import { validateInstruction } from '@utils/instructionTools'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Loading from '@components/Loading'
-import BigNumber from 'bignumber.js'
-
-const SOL_BUFFER = 0.02
 
 interface IProps {
   proposedInvestment
@@ -35,6 +31,7 @@ interface IProps {
   createProposalFcn: CreateEverlendProposal
   governedTokenAccount: AssetAccount
   depositedAmount: number
+  maxDepositAmount: number
 }
 
 const EverlendDeposit = ({
@@ -42,6 +39,7 @@ const EverlendDeposit = ({
   createProposalFcn,
   governedTokenAccount,
   depositedAmount,
+  maxDepositAmount,
 }: IProps) => {
   const [amount, setAmount] = useState(0)
   const tokenSymbol = tokenService.getTokenInfo(
@@ -77,23 +75,11 @@ const EverlendDeposit = ({
 
   const { canUseTransferInstruction } = useGovernanceAssets()
 
-  const treasuryAmount = new BN(
-    governedTokenAccount.isSol
-      ? governedTokenAccount.extensions.amount!.toNumber()
-      : governedTokenAccount.extensions.token!.account.amount
-  )
-
   const mintInfo = governedTokenAccount.extensions?.mint?.account
 
   const mintMinAmount = mintInfo ? getMintMinAmountAsDecimal(mintInfo) : 1
   const currentPrecision = precision(mintMinAmount)
-  let maxAmount = mintInfo
-    ? getMintDecimalAmount(mintInfo, treasuryAmount)
-    : new BigNumber(0)
-  if (governedTokenAccount.isSol) {
-    maxAmount = maxAmount.minus(SOL_BUFFER)
-  }
-  const maxAmountFormatted = maxAmount.toNumber().toFixed(4)
+  const maxAmountFormatted = maxDepositAmount.toFixed(4)
 
   const handleDeposit = async () => {
     const isValid = await validateInstruction({
@@ -148,10 +134,11 @@ const EverlendDeposit = ({
         governedTokenAccount!.governance!.account!.proposalCount,
         false,
         connection,
+        wallet!,
         client
       )
       const url = fmtUrlWithCluster(
-        `/dao/${symbol}/proposal/${proposalAddress}`
+        `/dao/${symbol}/proposal/${proposalAddress[0]}`
       )
       router.push(url)
     } catch (e) {

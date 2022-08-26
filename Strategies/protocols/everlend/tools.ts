@@ -1,47 +1,27 @@
-import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
+import { LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js'
 import {
-  getInstructionDataFromBase64,
   ProgramAccount,
   Realm,
   RpcContext,
-  serializeInstructionToBase64,
   TokenOwnerRecord,
 } from '@solana/spl-governance'
 import { BN } from '@project-serum/anchor'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { ConnectionContext } from '@utils/connection'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
-import {
-  createProposal,
-  InstructionDataWithHoldUpTime,
-} from 'actions/createProposal'
+
 import tokenService from '@utils/services/token'
-import {
-  prepareDepositTx,
-  prepareWithdrawalRequestTx,
-  Pool,
-} from '@everlend/general-pool'
+import { Pool } from '@everlend/general-pool'
 import axios from 'axios'
+
 import {
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  Token,
-  TOKEN_PROGRAM_ID,
-} from '@solana/spl-token'
-import { prepareSolDepositTx } from './preparedSolDepositTx'
-
-const MARKET_MAIN = 'DzGDoJHdzUANM7P7V25t5nxqbvzRcHDmdhY51V6WNiXC'
-const MARKET_DEV = '4yC3cUWXQmoyyybfnENpxo33hiNxUNa1YAmmuxz93WAJ'
-const REGISTRY_DEV = '6KCHtgSGR2WDE3aqrqSJppHRGVPgy9fHDX5XD8VZgb61'
-const REGISTRY_MAIN = 'UaqUGgMvVzUZLthLHC9uuuBzgw5Ldesich94Wu5pMJg'
-const ENDPOINT_MAIN = 'https://api.everlend.finance/api/v1/'
-const ENDPOINT_DEV = 'https://dev-api.everlend.finance/api/v1/'
-
-const REWARD_PROGRAM_ID = new PublicKey(
-  'ELDR7M6m1ysPXks53T7da6zkhnhJV44twXLiAgTf2VpM'
-)
-const CONFIG_MAINNET = '69C4Ba9LyQvWHPSSqXWXHnaedrLEuY49rSj23nJdrkkn'
-const CONFIG_DEVNET = 'Hjm8ZVys6828sY9BxzuQhVwdsX1N28dqh3fKqbpGWu25'
-
+  MARKET_MAIN,
+  MARKET_DEV,
+  ENDPOINT_MAIN,
+  ENDPOINT_DEV,
+} from './constants'
+import { handleEverlendAction } from './depositTools'
+import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 export const EVERLEND = 'Everlend'
 
 async function getAPYs(isDev = false) {
@@ -93,233 +73,16 @@ async function getStrategies(connection: ConnectionContext) {
   }
 }
 
-export async function handleEverlendAction(
-  rpcContext: RpcContext,
-  form: {
-    action: 'Deposit' | 'Withdraw'
-    title: string
-    description: string
-    bnAmount: BN
-    poolPubKey: string
-    tokenMint: string
-    poolMint: string
-  },
-  realm: ProgramAccount<Realm>,
-  matchedTreasury: AssetAccount,
-  tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>,
-  governingTokenMint: PublicKey,
-  proposalIndex: number,
-  isDraft: boolean,
-  connection: ConnectionContext,
-  client?: VotingClient
-) {
-  const isSol = matchedTreasury.isSol
-  const insts: InstructionDataWithHoldUpTime[] = []
-  const owner = isSol
-    ? matchedTreasury!.pubkey
-    : matchedTreasury!.extensions!.token!.account.owner
-  const isMainnet = connection.cluster === 'mainnet'
-  const REGISTRY = new PublicKey(isMainnet ? REGISTRY_MAIN : REGISTRY_DEV)
-  const CONFIG = new PublicKey(isMainnet ? CONFIG_MAINNET : CONFIG_DEVNET)
-
-  const ctokenATA = await Token.getAssociatedTokenAddress(
-    ASSOCIATED_TOKEN_PROGRAM_ID,
-    TOKEN_PROGRAM_ID,
-    new PublicKey(form.tokenMint),
-    owner,
-    true
-  )
-
-  const liquidityATA = await Token.getAssociatedTokenAddress(
-    ASSOCIATED_TOKEN_PROGRAM_ID,
-    TOKEN_PROGRAM_ID,
-    new PublicKey(form.poolMint),
-    owner,
-    true
-  )
-
-  const [rewardPool] = PublicKey.findProgramAddressSync(
-    [
-      Buffer.from('reward_pool'),
-      CONFIG.toBuffer(),
-      new PublicKey(form.tokenMint).toBuffer(),
-    ],
-    REWARD_PROGRAM_ID
-  )
-  const [rewardAccount] = PublicKey.findProgramAddressSync(
-    [Buffer.from('mining'), owner.toBuffer(), rewardPool.toBuffer()],
-    REWARD_PROGRAM_ID
-  )
-
-  const setupInsts: InstructionDataWithHoldUpTime[] = []
-  const cleanupInsts: InstructionDataWithHoldUpTime[] = []
-
-  if (form.action === 'Deposit') {
-    const actionTx = await handleEverlendDeposit(
-      Boolean(isSol),
-      connection,
-      owner,
-      REGISTRY,
-      CONFIG,
-      rewardPool,
-      rewardAccount,
-      form.poolPubKey,
-      form.bnAmount,
-      ctokenATA,
-      liquidityATA
-    )
-    actionTx.instructions.map((instruction) => {
-      insts.push({
-        data: getInstructionDataFromBase64(
-          serializeInstructionToBase64(instruction)
-        ),
-        holdUpTime: matchedTreasury.governance!.account!.config
-          .minInstructionHoldUpTime,
-        prerequisiteInstructions: [],
-      })
-    })
-  } else if (form.action === 'Withdraw') {
-    const { withdrawTx } = await handleEverlendWithdraw(
-      Boolean(isSol),
-      connection,
-      owner,
-      REGISTRY,
-      CONFIG,
-      rewardPool,
-      rewardAccount,
-      form.poolPubKey,
-      form.bnAmount,
-      liquidityATA,
-      ctokenATA
-    )
-
-    withdrawTx.instructions.map((instruction) => {
-      insts.push({
-        data: getInstructionDataFromBase64(
-          serializeInstructionToBase64(instruction)
-        ),
-        holdUpTime: matchedTreasury.governance!.account!.config
-          .minInstructionHoldUpTime,
-        prerequisiteInstructions: [],
-        chunkSplitByDefault: true,
-      })
-    })
-  }
-
-  const proposalAddress = await createProposal(
-    rpcContext,
-    realm,
-    matchedTreasury.governance!.pubkey,
-    tokenOwnerRecord,
-    form.title,
-    form.description,
-    governingTokenMint,
-    proposalIndex,
-    [...setupInsts, ...insts, ...cleanupInsts],
-    isDraft,
-    client
-  )
-  return proposalAddress
-}
-
-async function handleEverlendDeposit(
-  isSol: boolean,
-  connection: ConnectionContext,
-  owner: PublicKey,
-  REGISTRY: PublicKey,
-  CONFIG: PublicKey,
-  rewardPool: PublicKey,
-  rewardAccount: PublicKey,
-  poolPubKey: string,
-  amount: BN,
-  source: PublicKey,
-  destination: PublicKey
-) {
-  let actionTx: Transaction
-  if (isSol) {
-    const { tx: depositTx } = await prepareSolDepositTx(
-      { connection: connection.current, payerPublicKey: owner },
-      new PublicKey(poolPubKey),
-      REGISTRY,
-      amount,
-      rewardPool,
-      rewardAccount,
-      CONFIG,
-      REWARD_PROGRAM_ID,
-      source,
-      destination
-    )
-    actionTx = depositTx
-  } else {
-    const { tx: depositTx } = await prepareDepositTx(
-      { connection: connection.current, payerPublicKey: owner },
-      new PublicKey(poolPubKey),
-      REGISTRY,
-      amount,
-      REWARD_PROGRAM_ID,
-      CONFIG,
-      rewardPool,
-      rewardAccount,
-      source
-    )
-    actionTx = depositTx
-  }
-  return actionTx
-}
-
-async function handleEverlendWithdraw(
-  isSol: boolean,
-  connection: ConnectionContext,
-  owner: PublicKey,
-  REGISTRY: PublicKey,
-  CONFIG: PublicKey,
-  rewardPool: PublicKey,
-  rewardAccount: PublicKey,
-  poolPubKey: string,
-  amount: BN,
-  source: PublicKey,
-  destination: PublicKey
-) {
-  const { tx: withdrawslTx } = await prepareWithdrawalRequestTx(
-    {
-      connection: connection.current,
-      payerPublicKey: owner,
-    },
-    new PublicKey(poolPubKey),
-    REGISTRY,
-    amount,
-    REWARD_PROGRAM_ID,
-    CONFIG,
-    rewardPool,
-    rewardAccount,
-    source,
-    isSol ? owner : undefined
-  )
-  const withdrawTx = withdrawslTx
-  let closeIx: TransactionInstruction | undefined
-  if (isSol) {
-    const closeWSOLAccountIx = Token.createCloseAccountInstruction(
-      TOKEN_PROGRAM_ID,
-      destination,
-      owner,
-      owner,
-      []
-    )
-    closeIx = closeWSOLAccountIx
-  }
-
-  return {
-    withdrawTx,
-    closeIx: closeIx ?? null,
-  }
-}
-
 export async function getEverlendStrategies(
   connection: ConnectionContext
 ): Promise<any> {
   const strategies = await getStrategies(connection)
 
   return strategies
+}
+
+export const lamportsToSol = (value: number): number => {
+  return value / LAMPORTS_PER_SOL
 }
 
 export type CreateEverlendProposal = (
@@ -341,5 +104,6 @@ export type CreateEverlendProposal = (
   proposalIndex: number,
   isDraft: boolean,
   connection: ConnectionContext,
+  wallet: SignerWalletAdapter,
   client?: VotingClient
 ) => Promise<PublicKey>

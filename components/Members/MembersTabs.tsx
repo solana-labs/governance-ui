@@ -1,6 +1,6 @@
 import { FunctionComponent, useMemo } from 'react'
 import useWalletStore from 'stores/useWalletStore'
-import { UserCircleIcon } from '@heroicons/react/outline'
+import { LogoutIcon, UserCircleIcon } from '@heroicons/react/outline'
 import useRealm from '@hooks/useRealm'
 import tokenService from '@utils/services/token'
 import { fmtMintAmount } from '@tools/sdk/units'
@@ -75,7 +75,14 @@ const MemberItems = ({
   tokenName: string
   onChange: (member: Member) => void
 }) => {
-  const { walletAddress, councilVotes, communityVotes, votesCasted } = member
+  const {
+    walletAddress,
+    councilVotes,
+    communityVotes,
+    votesCasted,
+    hasCommunityTokenOutsideRealm,
+    hasCouncilTokenOutsideRealm,
+  } = member
   const communityAmount =
     communityVotes && !communityVotes.isZero()
       ? fmtMintAmount(mint, communityVotes)
@@ -132,11 +139,17 @@ const MemberItems = ({
             {(communityAmount || !councilAmount) && (
               <span className="flex items-center">
                 {tokenName} Votes {communityAmount || 0}
+                {hasCommunityTokenOutsideRealm && (
+                  <LogoutIcon className="w-4 h-4 ml-1"></LogoutIcon>
+                )}
               </span>
             )}
             {councilAmount && (
               <span className="flex items-center">
                 Council Votes {councilAmount}{' '}
+                {hasCouncilTokenOutsideRealm && (
+                  <LogoutIcon className="w-4 h-4 ml-1"></LogoutIcon>
+                )}
               </span>
             )}
           </span>

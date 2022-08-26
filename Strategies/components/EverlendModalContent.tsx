@@ -1,7 +1,10 @@
 import ButtonGroup from '@components/ButtonGroup'
 import { useEffect, useState } from 'react'
 import { TreasuryStrategy } from 'Strategies/types/types'
-import { CreateEverlendProposal } from 'Strategies/protocols/everlend/tools'
+import {
+  CreateEverlendProposal,
+  lamportsToSol,
+} from 'Strategies/protocols/everlend/tools'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import EverlendDeposit from './everlend/EverlendDeposit'
 import EverlendWithdraw from './everlend/EverlendWithdraw'
@@ -29,6 +32,7 @@ const EverlendModalContent = ({
 }: IProps) => {
   const [selectedTab, setSelectedTab] = useState(Tabs.DEPOSIT)
   const [depositedAmount, setDepositedAmount] = useState(0)
+  const [maxDepositAmount, setMaxDepositAmount] = useState(0)
   const tabs = Object.values(Tabs)
   const connection = useWalletStore((s) => s.connection)
 
@@ -37,16 +41,40 @@ const EverlendModalContent = ({
     ? governedTokenAccount!.pubkey
     : governedTokenAccount!.extensions!.token!.account.owner
 
+  console.log('proposed', governedTokenAccount!.pubkey.toString())
+
   useEffect(() => {
     const loadMaxAmount = async () => {
       const tokenMintATA = await findAssociatedTokenAccount(
         owner,
         new PublicKey(proposedInvestment.poolMint)
       )
-      const tokenMintATABalance = await connection.current.getTokenAccountBalance(
-        tokenMintATA
-      )
-      setDepositedAmount(Number(tokenMintATABalance.value.uiAmount))
+      let poolMintATABalance = 0
+      let tokenMintATABalance = 0
+      try {
+        const fetchedTokenMintATABalance = await connection.current.getTokenAccountBalance(
+          tokenMintATA
+        )
+        tokenMintATABalance = Number(fetchedTokenMintATABalance.value.uiAmount)
+      } catch (e) {
+        console.log(e)
+      }
+      try {
+        if (isSol) {
+          const fetchedBalance = await connection.current.getBalance(owner)
+          poolMintATABalance = lamportsToSol(fetchedBalance)
+          console.log(owner.toString())
+        } else {
+          const fetchedBalance = await connection.current.getTokenAccountBalance(
+            governedTokenAccount!.pubkey
+          )
+          poolMintATABalance = Number(fetchedBalance.value.uiAmount)
+        }
+      } catch (e) {
+        console.log(e)
+      }
+      setDepositedAmount(tokenMintATABalance)
+      setMaxDepositAmount(poolMintATABalance)
     }
     loadMaxAmount()
   }, [proposedInvestment, handledMint])
@@ -67,6 +95,7 @@ const EverlendModalContent = ({
           governedTokenAccount={governedTokenAccount}
           handledMint={handledMint}
           depositedAmount={depositedAmount}
+          maxDepositAmount={maxDepositAmount}
         />
       )}
       {selectedTab === Tabs.WITHDRAW && (
