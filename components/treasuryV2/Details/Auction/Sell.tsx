@@ -37,6 +37,7 @@ import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { notify } from '@utils/notifications'
+import Switch from '@components/Switch'
 interface Props {
   className?: string
   asset: Token
@@ -62,13 +63,14 @@ export default function Sell({ className, asset }: Props) {
   const [auctionObj, setAuctionObj] = useState<AuctionObj | null>(null)
   const [fileDownloaded, setFileDownloaded] = useState(false)
   const [auctionSize, setAuctionSize] = useState<number>(ParticipantPreset.M)
+  const [withCreateAuction, setWithCreateAuction] = useState(true)
   const [form, setForm] = useState<SellForm>({
     baseMint: asset.raw.extensions.mint!.publicKey.toBase58(),
     quoteMint: '',
     areAsksEncrypted: false,
     areBidsEncrypted: true,
     maxOrders: 4,
-    orderPhaseLength: 24 * 60 * 60,
+    orderPhaseLength: 900, //24 * 60 * 60,
     tokensForSale: DEFAULT_TOKENS_FOR_SALE,
     minPrice: DEFAULT_MIN_PRICE,
     ...paramsForTokenSale(
@@ -142,6 +144,7 @@ export default function Sell({ className, asset }: Props) {
       programId: MANGO_AUCTION_PROGRAM_ID,
       baseMint: new PublicKey(data.baseMint),
       quoteMint: new PublicKey(data.quoteMint),
+      baseDecimals: asset.raw.extensions.mint!.account.decimals,
     })
     auctionObj.transactionInstructions.unshift(...transactionInstructions)
     setAuctionObj(auctionObj)
@@ -160,10 +163,10 @@ export default function Sell({ className, asset }: Props) {
     const auctionArgs = auctionObj.auctionParams.args
     const auctionAccounts = auctionObj.auctionParams.accounts
     const governance = asset.raw.governance
-    const governancePk = governance.pubkey
+    const authority = assetExtenstions.token?.account.owner
 
     const openOrdersPk = await getOpenOrdersPk(
-      governancePk!,
+      authority!,
       auctionArgs.auctionId,
       auctionAccounts.authority,
       MANGO_AUCTION_PROGRAM_ID
@@ -189,7 +192,7 @@ export default function Sell({ className, asset }: Props) {
     )
     transactionInstructions.push(
       ...createInitOpenOrdersInstructions({
-        authority: governancePk,
+        authority: authority!,
         auctionPk: auctionPk,
         openOrdersPk: openOrdersPk,
         orderHistoryPk: orderHistoryPk,
@@ -220,7 +223,7 @@ export default function Sell({ className, asset }: Props) {
         price: form.minPrice,
         amount: form.tokensForSale,
         baseDecimals: assetExtenstions.mint!.account.decimals,
-        authority: governancePk,
+        authority: authority!,
         auctionPk: auctionPk,
         openOrdersPk: openOrdersPk,
         quoteToken: quoteAta,
@@ -229,8 +232,8 @@ export default function Sell({ className, asset }: Props) {
         quoteMint: auctionAccounts.quoteMint,
         quoteVault: auctionAccounts.quoteVault,
         eventQueue: auctionAccounts.eventQueue,
-        bids: auctionAccounts.asks,
-        asks: auctionAccounts.bids,
+        bids: auctionAccounts.bids,
+        asks: auctionAccounts.asks,
         baseMint: auctionAccounts.baseMint,
         baseVault: auctionAccounts.baseVault,
       })
@@ -250,6 +253,7 @@ export default function Sell({ className, asset }: Props) {
         governance,
       })
     })
+
     try {
       const proposalAddress = await handleCreateProposal({
         title: proposalInfo.title ? proposalInfo.title : DEFAULT_TITLE,
@@ -286,20 +290,31 @@ export default function Sell({ className, asset }: Props) {
   return (
     <>
       <section className={`${className} space-y-3`}>
-        <h4>Size based on number of participants</h4>
-        <div className="grid gap-4 grid-cols-2">
-          {Object.values(ParticipantPreset)
-            .filter((x) => typeof x === 'string')
-            .map((key) => (
-              <Button
-                key={key}
-                onClick={() => setAuctionSize(ParticipantPreset[key])}
-                className={sizeBtnClass(ParticipantPreset[key])}
-              >
-                {key} Auction {formatter.format(ParticipantPreset[key])}
-              </Button>
-            ))}
+        <h4>Witch create auction</h4>
+        <div className="flex flex-row text-xs items-center">
+          <Switch
+            checked={withCreateAuction}
+            onChange={(checked) => setWithCreateAuction(checked)}
+          />
         </div>
+        {withCreateAuction && (
+          <>
+            <h4>Size based on number of participants</h4>
+            <div className="grid gap-4 grid-cols-2">
+              {Object.values(ParticipantPreset)
+                .filter((x) => typeof x === 'string')
+                .map((key) => (
+                  <Button
+                    key={key}
+                    onClick={() => setAuctionSize(ParticipantPreset[key])}
+                    className={sizeBtnClass(ParticipantPreset[key])}
+                  >
+                    {key} Auction {formatter.format(ParticipantPreset[key])}
+                  </Button>
+                ))}
+            </div>
+          </>
+        )}
         <h4>Details</h4>
         <Input
           label="Tokens for sale"
@@ -325,166 +340,169 @@ export default function Sell({ className, asset }: Props) {
           }
           error={formErrors['minPrice']}
         />
-        <Input
-          label="Max orders per users"
-          value={form.maxOrders}
-          type="text"
-          onChange={(evt) =>
-            handleSetForm({
-              value: evt.target.value,
-              propertyName: 'maxOrders',
-            })
-          }
-          error={formErrors['maxOrders']}
-        />
-        <Input
-          label="Order phase length (sec)"
-          value={form.orderPhaseLength}
-          type="text"
-          onChange={(evt) =>
-            handleSetForm({
-              value: evt.target.value,
-              propertyName: 'orderPhaseLength',
-            })
-          }
-          error={formErrors['orderPhaseLength']}
-        />
-        <div className="mt-3 py-3">
-          <Checkbox
-            checked={form.areBidsEncrypted}
-            label="Encrypt bids"
-            onChange={(evt) =>
-              handleSetForm({
-                value: evt.target.checked,
-                propertyName: 'areBidsEncrypted',
-              })
-            }
-            error={formErrors['areBidsEncrypted']}
-          />
-        </div>
-        <TokenMintInput
-          label={'Quote mint'}
-          onValidMintChange={(mintAddress, tokenInfo) => {
-            if (mintAddress) {
-              handleSetForm({
-                value: mintAddress,
-                propertyName: 'quoteMint',
-              })
-            }
-            if (tokenInfo) {
-              handleSetForm({
-                value: tokenInfo.address,
-                propertyName: 'quoteMint',
-              })
-            }
-          }}
-        />
-        <div>
-          <AdvancedOptionsDropdown
-            title="Advanced auction options"
-            className="my-5"
-          >
-            <div className="space-y-3">
-              <Input
-                label="Min Base Order Size"
-                value={form.minBaseOrderSize}
-                type="text"
+        {withCreateAuction && (
+          <>
+            <Input
+              label="Max orders per users"
+              value={form.maxOrders}
+              type="text"
+              onChange={(evt) =>
+                handleSetForm({
+                  value: evt.target.value,
+                  propertyName: 'maxOrders',
+                })
+              }
+              error={formErrors['maxOrders']}
+            />
+            <Input
+              label="Order phase length (sec)"
+              value={form.orderPhaseLength}
+              type="text"
+              onChange={(evt) =>
+                handleSetForm({
+                  value: evt.target.value,
+                  propertyName: 'orderPhaseLength',
+                })
+              }
+              error={formErrors['orderPhaseLength']}
+            />
+            <div className="mt-3 py-3">
+              <Checkbox
+                checked={form.areBidsEncrypted}
+                label="Encrypt bids"
                 onChange={(evt) =>
                   handleSetForm({
-                    value: evt.target.value,
-                    propertyName: 'minBaseOrderSize',
+                    value: evt.target.checked,
+                    propertyName: 'areBidsEncrypted',
                   })
                 }
-                error={formErrors['minBaseOrderSize']}
-              />
-              <Input
-                label="Tick Size"
-                value={form.tickSize}
-                type="text"
-                onChange={(evt) =>
-                  handleSetForm({
-                    value: evt.target.value,
-                    propertyName: 'tickSize',
-                  })
-                }
-                error={formErrors['tickSize']}
-              />
-              <Input
-                label="Decryption Phase Length"
-                value={form.decryptionPhaseLength}
-                type="text"
-                onChange={(evt) =>
-                  handleSetForm({
-                    value: evt.target.value,
-                    propertyName: 'decryptionPhaseLength',
-                  })
-                }
-                error={formErrors['decryptionPhaseLength']}
-              />
-              <Input
-                label="Event Queue Bytes"
-                value={form.eventQueueBytes}
-                type="text"
-                onChange={(evt) =>
-                  handleSetForm({
-                    value: evt.target.value,
-                    propertyName: 'eventQueueBytes',
-                  })
-                }
-                error={formErrors['eventQueueBytes']}
-              />
-              <Input
-                label="Bids Bytes"
-                value={form.bidsBytes}
-                type="text"
-                onChange={(evt) =>
-                  handleSetForm({
-                    value: evt.target.value,
-                    propertyName: 'bidsBytes',
-                  })
-                }
-                error={formErrors['bidsBytes']}
-              />
-              <Input
-                label="Asks Bytes"
-                value={form.asksBytes}
-                type="text"
-                onChange={(evt) =>
-                  handleSetForm({
-                    value: evt.target.value,
-                    propertyName: 'asksBytes',
-                  })
-                }
-                error={formErrors['asksBytes']}
+                error={formErrors['areBidsEncrypted']}
               />
             </div>
-          </AdvancedOptionsDropdown>
-
-          <AdditionalProposalOptions
-            title={proposalInfo.title}
-            description={proposalInfo.description}
-            defaultTitle={DEFAULT_TITLE}
-            defaultDescription={DEFAULT_DESCRIPTION}
-            setTitle={(evt) =>
-              setProposalInfo((prev) => ({ ...prev, title: evt.target.value }))
-            }
-            setDescription={(evt) =>
-              setProposalInfo((prev) => ({
-                ...prev,
-                description: evt.target.value,
-              }))
-            }
-            voteByCouncil={proposalInfo.voteByCouncil}
-            setVoteByCouncil={(val) =>
-              setProposalInfo((prev) => ({
-                ...prev,
-                voteByCouncil: val,
-              }))
-            }
-          />
-          <div className="flex justify-end">
-            <Button onClick={() => promptSaveKey(form)}>Propose</Button>
-          </div>
+            <TokenMintInput
+              label={'Quote mint'}
+              onValidMintChange={(mintAddress, tokenInfo) => {
+                if (mintAddress) {
+                  handleSetForm({
+                    value: mintAddress,
+                    propertyName: 'quoteMint',
+                  })
+                }
+                if (tokenInfo) {
+                  handleSetForm({
+                    value: tokenInfo.address,
+                    propertyName: 'quoteMint',
+                  })
+                }
+              }}
+            />
+            <div>
+              <AdvancedOptionsDropdown
+                title="Advanced auction options"
+                className="my-5"
+              >
+                <div className="space-y-3">
+                  <Input
+                    label="Min Base Order Size"
+                    value={form.minBaseOrderSize}
+                    type="text"
+                    onChange={(evt) =>
+                      handleSetForm({
+                        value: evt.target.value,
+                        propertyName: 'minBaseOrderSize',
+                      })
+                    }
+                    error={formErrors['minBaseOrderSize']}
+                  />
+                  <Input
+                    label="Tick Size"
+                    value={form.tickSize}
+                    type="text"
+                    onChange={(evt) =>
+                      handleSetForm({
+                        value: evt.target.value,
+                        propertyName: 'tickSize',
+                      })
+                    }
+                    error={formErrors['tickSize']}
+                  />
+                  <Input
+                    label="Decryption Phase Length"
+                    value={form.decryptionPhaseLength}
+                    type="text"
+                    onChange={(evt) =>
+                      handleSetForm({
+                        value: evt.target.value,
+                        propertyName: 'decryptionPhaseLength',
+                      })
+                    }
+                    error={formErrors['decryptionPhaseLength']}
+                  />
+                  <Input
+                    label="Event Queue Bytes"
+                    value={form.eventQueueBytes}
+                    type="text"
+                    onChange={(evt) =>
+                      handleSetForm({
+                        value: evt.target.value,
+                        propertyName: 'eventQueueBytes',
+                      })
+                    }
+                    error={formErrors['eventQueueBytes']}
+                  />
+                  <Input
+                    label="Bids Bytes"
+                    value={form.bidsBytes}
+                    type="text"
+                    onChange={(evt) =>
+                      handleSetForm({
+                        value: evt.target.value,
+                        propertyName: 'bidsBytes',
+                      })
+                    }
+                    error={formErrors['bidsBytes']}
+                  />
+                  <Input
+                    label="Asks Bytes"
+                    value={form.asksBytes}
+                    type="text"
+                    onChange={(evt) =>
+                      handleSetForm({
+                        value: evt.target.value,
+                        propertyName: 'asksBytes',
+                      })
+                    }
+                    error={formErrors['asksBytes']}
+                  />
+                </div>
+              </AdvancedOptionsDropdown>
+            </div>
+          </>
+        )}
+        <AdditionalProposalOptions
+          title={proposalInfo.title}
+          description={proposalInfo.description}
+          defaultTitle={DEFAULT_TITLE}
+          defaultDescription={DEFAULT_DESCRIPTION}
+          setTitle={(evt) =>
+            setProposalInfo((prev) => ({ ...prev, title: evt.target.value }))
+          }
+          setDescription={(evt) =>
+            setProposalInfo((prev) => ({
+              ...prev,
+              description: evt.target.value,
+            }))
+          }
+          voteByCouncil={proposalInfo.voteByCouncil}
+          setVoteByCouncil={(val) =>
+            setProposalInfo((prev) => ({
+              ...prev,
+              voteByCouncil: val,
+            }))
+          }
+        />
+        <div className="flex justify-end">
+          <Button onClick={() => promptSaveKey(form)}>Propose</Button>
         </div>
       </section>
       {openSaveBackupKeyModal && (

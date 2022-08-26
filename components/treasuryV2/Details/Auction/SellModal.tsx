@@ -13,7 +13,7 @@ export default function SellModal({ onClose, isOpen, asset }: Props) {
   return isOpen ? (
     <Modal onClose={onClose} isOpen={isOpen}>
       <>
-        <h3 className="mb-4 flex items-center">Create token sale auction</h3>
+        <h3 className="mb-4 flex items-center">Sell tokens</h3>
         <Sell asset={asset}></Sell>
       </>
     </Modal>
