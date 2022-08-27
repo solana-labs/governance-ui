@@ -24,12 +24,13 @@ import {
   ProgramAccount,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey, TokenAmount } from '@solana/web3.js'
 import useCreateProposal from '@hooks/useCreateProposal'
 import { useRouter } from 'next/router'
 import useRealm from '@hooks/useRealm'
 import useQueryContext from '@hooks/useQueryContext'
 import Loading from '@components/Loading'
+import { dryRunInstruction } from 'actions/dryRunInstruction'
 
 const BurnVestAccountSchema = {
   amount: yup.string().required(),
@@ -41,17 +42,23 @@ type BurnVestAccountFormValues = {
 
 type Props = {
   account: VestAccountType
+  gsrmBalance: TokenAmount | null
+  callback?: () => Promise<void>
   createProposal?: {
     governance?: ProgramAccount<Governance>
     owner: PublicKey
   }
 }
-const VestAccount: FC<Props> = ({ account, createProposal }) => {
+const VestAccount: FC<Props> = ({
+  account,
+  gsrmBalance,
+  callback,
+  createProposal,
+}) => {
   const router = useRouter()
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
 
-  const gsrmBalance = useSerumGovStore((s) => s.gsrmBalance)
   const gsrmMint = useSerumGovStore((s) => s.gsrmMint)
   const actions = useSerumGovStore((s) => s.actions)
 
@@ -106,14 +113,25 @@ const VestAccount: FC<Props> = ({ account, createProposal }) => {
       .toFormat()
   }, [account, currentTimestamp])
 
-  // TODO:  handle amount for MSRM
   const handleBurn: SubmitHandler<BurnVestAccountFormValues> = async ({
     amount,
   }) => {
-    if (!gsrmMint || !gsrmBalance || isNaN(parseFloat(amount.toString()))) {
+    if (
+      !gsrmMint ||
+      !gsrmBalance ||
+      isNaN(parseFloat(amount.toString())) ||
+      !wallet ||
+      !wallet.publicKey
+    ) {
+      notify({
+        type: 'error',
+        message: 'Something went wrong. Please try refreshing.',
+      })
       return
     }
+
     setIsBurning(true)
+
     let amountAsBN = parseMintNaturalAmountFromDecimalAsBN(
       amount,
       account.isMsrm ? MSRM_DECIMALS : SRM_DECIMALS
@@ -147,6 +165,7 @@ const VestAccount: FC<Props> = ({ account, createProposal }) => {
         amountAsBN,
         wallet
       )
+      if (callback) await callback()
     } else {
       const ix = await actions.getBurnVestGsrmInstruction(
         anchorProvider,
@@ -164,6 +183,18 @@ const VestAccount: FC<Props> = ({ account, createProposal }) => {
         prerequisiteInstructions: [],
         shouldSplitIntoSeparateTxs: false,
       }
+
+      const { response: dryRunResponse } = await dryRunInstruction(
+        connection,
+        wallet!,
+        instructionData.data
+      )
+      if (dryRunResponse.err) {
+        notify({ type: 'error', message: 'Transaction Simulation Failed' })
+        setIsBurning(false)
+        return
+      }
+
       const proposalAddress = await handleCreateProposal({
         title: `Serum DAO: Burning ${amount} gSRM`,
         description: `Burning ${amount} gSRM to redeem vested ${
@@ -247,8 +278,8 @@ const VestAccount: FC<Props> = ({ account, createProposal }) => {
 
           <button
             type="submit"
-            className="bg-bkg-4 p-2 px-3 text-xs text-fgd-3 font-semibold rounded-md self-stretch"
-            disabled={isBurning}
+            className="bg-bkg-4 py-2 px-4 text-xs text-fgd-3 font-semibold rounded-md self-stretch disabled:text-fgd-4"
+            disabled={isBurning || !wallet?.publicKey}
           >
             {!isBurning ? 'Burn' : <Loading />}
           </button>

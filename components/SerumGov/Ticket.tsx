@@ -12,6 +12,7 @@ import {
 import { PublicKey } from '@solana/web3.js'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { notify } from '@utils/notifications'
+import { dryRunInstruction } from 'actions/dryRunInstruction'
 import { BigNumber } from 'bignumber.js'
 import classNames from 'classnames'
 import { useRouter } from 'next/router'
@@ -37,18 +38,20 @@ function isClaimTicket(
 
 type Props = {
   ticket: TicketType
+  callback?: () => Promise<void>
   createProposal?: {
     governance?: ProgramAccount<Governance>
     owner: PublicKey
   }
 }
-const Ticket: FC<Props> = ({ ticket, createProposal }) => {
+const Ticket: FC<Props> = ({ ticket, createProposal, callback }) => {
   const router = useRouter()
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
 
   const connection = useWalletStore((s) => s.connection.current)
   const { anchorProvider, wallet } = useWallet()
+
   const actions = useSerumGovStore((s) => s.actions)
   const gsrmMint = useSerumGovStore((s) => s.gsrmMint)
 
@@ -72,6 +75,7 @@ const Ticket: FC<Props> = ({ ticket, createProposal }) => {
         if (!createProposal) {
           // If sendTransaction (for user wallets)
           await actions.claim(connection, anchorProvider, ticket, wallet)
+          if (callback) await callback()
         } else {
           // else create proposal (for DAO wallets);
           try {
@@ -110,6 +114,7 @@ const Ticket: FC<Props> = ({ ticket, createProposal }) => {
       } else {
         if (!createProposal) {
           await actions.redeem(connection, anchorProvider, ticket, wallet)
+          if (callback) await callback()
         } else {
           try {
             const ix = await actions.getRedeemInstruction(
@@ -127,6 +132,21 @@ const Ticket: FC<Props> = ({ ticket, createProposal }) => {
               prerequisiteInstructions: [],
               shouldSplitIntoSeparateTxs: false,
             }
+
+            const { response: dryRunResponse } = await dryRunInstruction(
+              connection,
+              wallet!,
+              instructionData.data
+            )
+            if (dryRunResponse.err) {
+              notify({
+                type: 'error',
+                message: 'Transaction Simulation Failed',
+              })
+              setIsClaiming(false)
+              return
+            }
+
             const proposalAddress = await handleCreateProposal({
               title: `Serum DAO: Redeem ${new BigNumber(
                 ticket.amount.toString()

@@ -86,7 +86,7 @@ export default function WalletListItem(props: Props) {
               })
             }
           />
-          <SerumGovWallet wallet={props.wallet} isOpen={isOpen} />
+          <SerumGovWallet wallet={props.wallet} />
         </div>
       )}
     </div>

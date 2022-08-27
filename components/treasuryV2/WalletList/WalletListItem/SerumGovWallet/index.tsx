@@ -1,35 +1,18 @@
 import LockedAccount from '@components/SerumGov/LockedAccount'
 import Ticket from '@components/SerumGov/Ticket'
 import VestAccount from '@components/SerumGov/VestAccount'
-import useWallet from '@hooks/useWallet'
+import useSerumGov from '@hooks/useSerumGov'
 import { Wallet } from '@models/treasury/Wallet'
 import { PublicKey } from '@solana/web3.js'
-import { useEffect } from 'react'
-import useSerumGovStore from 'stores/useSerumGovStore'
 
-export default function SerumGovWallet({
-  wallet,
-  isOpen,
-}: {
-  wallet: Wallet
-  isOpen: boolean
-}) {
-  const { anchorProvider } = useWallet()
-  const actions = useSerumGovStore((s) => s.actions)
-  const claimTickets = useSerumGovStore((s) => s.claimTickets)
-  const redeemTickets = useSerumGovStore((s) => s.redeemTickets)
-  const lockedAccounts = useSerumGovStore((s) => s.lockedAccounts)
-  const vestAccounts = useSerumGovStore((s) => s.vestAccounts)
-  // const gsrmBalance = useSerumGovStore((s) => s.gsrmBalance)
-
-  useEffect(() => {
-    if (isOpen) {
-      actions.getLockedAccounts(anchorProvider, new PublicKey(wallet.address))
-      actions.getVestAccounts(anchorProvider, new PublicKey(wallet.address))
-      actions.getClaimTickets(anchorProvider, new PublicKey(wallet.address))
-      actions.getRedeemTickets(anchorProvider, new PublicKey(wallet.address))
-    }
-  }, [wallet.address])
+export default function SerumGovWallet({ wallet }: { wallet: Wallet }) {
+  const {
+    claimTickets,
+    redeemTickets,
+    vestAccounts,
+    lockedAccounts,
+    gsrmBalance,
+  } = useSerumGov(wallet.address)
 
   return (
     <div className="">
@@ -39,6 +22,7 @@ export default function SerumGovWallet({
             <VestAccount
               key={account.address.toBase58()}
               account={account}
+              gsrmBalance={gsrmBalance}
               createProposal={{
                 governance: wallet.governanceAccount,
                 owner: new PublicKey(wallet.address),
@@ -47,7 +31,15 @@ export default function SerumGovWallet({
           ))}
         {lockedAccounts &&
           lockedAccounts.map((account) => (
-            <LockedAccount key={account.address.toBase58()} account={account} />
+            <LockedAccount
+              key={account.address.toBase58()}
+              account={account}
+              gsrmBalance={gsrmBalance}
+              createProposal={{
+                governance: wallet.governanceAccount,
+                owner: new PublicKey(wallet.address),
+              }}
+            />
           ))}
       </div>
       <div>

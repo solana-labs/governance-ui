@@ -73,7 +73,7 @@ function App({ Component, pageProps }) {
     )}/favicon.ico?v=${Date.now()}`
 
   useEffect(() => {
-    actions.load(connection.current)
+    actions.loadGsrmMint(connection.current)
   }, [connection.current.rpcEndpoint])
 
   useEffect(() => {

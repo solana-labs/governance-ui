@@ -22,8 +22,9 @@ import {
   ProgramAccount,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey, TokenAmount } from '@solana/web3.js'
 import Loading from '@components/Loading'
+import { dryRunInstruction } from 'actions/dryRunInstruction'
 
 const BurnLockedAccountSchema = {
   amount: yup.string().required(),
@@ -35,17 +36,23 @@ type BurnLockedAccountFormValues = {
 
 type Props = {
   account: LockedAccountType
+  gsrmBalance: TokenAmount | null
+  callback?: () => Promise<void>
   createProposal?: {
     governance?: ProgramAccount<Governance>
     owner: PublicKey
   }
 }
-const LockedAccount: FC<Props> = ({ account, createProposal }) => {
+const LockedAccount: FC<Props> = ({
+  account,
+  createProposal,
+  gsrmBalance,
+  callback,
+}) => {
   const router = useRouter()
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
 
-  const gsrmBalance = useSerumGovStore((s) => s.gsrmBalance)
   const gsrmMint = useSerumGovStore((s) => s.gsrmMint)
   const actions = useSerumGovStore((s) => s.actions)
 
@@ -72,7 +79,17 @@ const LockedAccount: FC<Props> = ({ account, createProposal }) => {
   const handleBurn: SubmitHandler<BurnLockedAccountFormValues> = async ({
     amount,
   }) => {
-    if (!gsrmMint || !gsrmBalance || isNaN(parseFloat(amount.toString()))) {
+    if (
+      !gsrmMint ||
+      !gsrmBalance ||
+      isNaN(parseFloat(amount.toString())) ||
+      !wallet ||
+      wallet.publicKey
+    ) {
+      notify({
+        type: 'error',
+        message: 'Something went wrong. Please try refreshing.',
+      })
       return
     }
     setIsBurning(true)
@@ -106,6 +123,7 @@ const LockedAccount: FC<Props> = ({ account, createProposal }) => {
         amountAsBN,
         wallet
       )
+      if (callback) await callback()
     } else {
       const ix = await actions.getBurnLockedGsrmInstruction(
         anchorProvider,
@@ -123,6 +141,18 @@ const LockedAccount: FC<Props> = ({ account, createProposal }) => {
         prerequisiteInstructions: [],
         shouldSplitIntoSeparateTxs: false,
       }
+
+      const { response: dryRunResponse } = await dryRunInstruction(
+        connection,
+        wallet!,
+        instructionData.data
+      )
+      if (dryRunResponse.err) {
+        notify({ type: 'error', message: 'Transaction Simulation Failed' })
+        setIsBurning(false)
+        return
+      }
+
       const proposalAddress = await handleCreateProposal({
         title: `Serum DAO: Burning ${amount} gSRM`,
         description: `Burning ${amount} gSRM to redeem vested ${
@@ -192,7 +222,7 @@ const LockedAccount: FC<Props> = ({ account, createProposal }) => {
       >
         <input
           type="text"
-          className="p-2 bg-bkg-3 rounded-md flex-1 focus:outline-none"
+          className="p-2 bg-bkg-3 rounded-md flex-1 focus:outline-none border-2 border-bkg-4"
           {...register('amount', {
             required: 'This field is required.',
             valueAsNumber: true,
@@ -202,7 +232,7 @@ const LockedAccount: FC<Props> = ({ account, createProposal }) => {
         <button
           type="submit"
           className="bg-bkg-4 p-2 px-3 text-xs text-fgd-3 font-semibold rounded-md self-stretch"
-          disabled={isBurning}
+          disabled={isBurning || !wallet?.publicKey}
         >
           {!isBurning ? 'Burn' : <Loading />}
         </button>

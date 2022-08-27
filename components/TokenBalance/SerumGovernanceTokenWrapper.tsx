@@ -1,33 +1,29 @@
-import { FC, useEffect } from 'react'
+import { FC } from 'react'
 
 import Ticket from '@components/SerumGov/Ticket'
-import useSerumGovStore from 'stores/useSerumGovStore'
-import useWalletStore from 'stores/useWalletStore'
 import useWallet from '@hooks/useWallet'
 import LockedAccount from '@components/SerumGov/LockedAccount'
 import VestAccount from '@components/SerumGov/VestAccount'
+import useSerumGov from '@hooks/useSerumGov'
 
 const SerumGovernanceTokenWrapper: FC = () => {
-  const { anchorProvider, wallet } = useWallet()
-  const connection = useWalletStore((s) => s.connection.current)
-  const actions = useSerumGovStore((s) => s.actions)
-  const claimTickets = useSerumGovStore((s) => s.claimTickets)
-  const redeemTickets = useSerumGovStore((s) => s.redeemTickets)
-  const lockedAccounts = useSerumGovStore((s) => s.lockedAccounts)
-  const vestAccounts = useSerumGovStore((s) => s.vestAccounts)
-  const gsrmBalance = useSerumGovStore((s) => s.gsrmBalance)
+  const { wallet } = useWallet()
 
-  useEffect(() => {
-    actions.getGsrmBalance(connection, wallet?.publicKey)
-    actions.getLockedAccounts(anchorProvider, wallet?.publicKey)
-    actions.getVestAccounts(anchorProvider, wallet?.publicKey)
-    actions.getClaimTickets(anchorProvider, wallet?.publicKey)
-    actions.getRedeemTickets(anchorProvider, wallet?.publicKey)
-  }, [wallet?.publicKey])
+  const {
+    claimTickets,
+    redeemTickets,
+    lockedAccounts,
+    vestAccounts,
+    gsrmBalance,
+    refreshRedeemTickets,
+    refreshVestAccounts,
+    refreshLockedAccounts,
+    refreshClaimTickets,
+    refreshGsrmBalance,
+  } = useSerumGov(wallet?.publicKey)
 
   return (
     <div>
-      {/* <p>{wallet?.publicKey?.toBase58()}</p> */}
       <div className="flex items-center mt-4 space-x-4">
         <div className="w-full px-4 py-2 rounded-md bg-bkg-1 flex flex-row items-center justify-between">
           <div>
@@ -42,13 +38,28 @@ const SerumGovernanceTokenWrapper: FC = () => {
         <div className="flex flex-col space-y-2 mt-2">
           {vestAccounts &&
             vestAccounts.map((account) => (
-              <VestAccount key={account.address.toBase58()} account={account} />
+              <VestAccount
+                key={account.address.toBase58()}
+                account={account}
+                gsrmBalance={gsrmBalance}
+                callback={async () => {
+                  await refreshGsrmBalance()
+                  await refreshVestAccounts()
+                  await refreshRedeemTickets()
+                }}
+              />
             ))}
           {lockedAccounts &&
             lockedAccounts.map((account) => (
               <LockedAccount
                 key={account.address.toBase58()}
                 account={account}
+                gsrmBalance={gsrmBalance}
+                callback={async () => {
+                  await refreshGsrmBalance()
+                  await refreshLockedAccounts()
+                  await refreshRedeemTickets()
+                }}
               />
             ))}
         </div>
@@ -58,11 +69,22 @@ const SerumGovernanceTokenWrapper: FC = () => {
             <p className="text-md text-fgd-2">Tickets</p>
             {claimTickets &&
               claimTickets.map((ticket) => (
-                <Ticket key={ticket.createdAt} ticket={ticket} />
+                <Ticket
+                  key={ticket.createdAt}
+                  ticket={ticket}
+                  callback={async () => {
+                    await refreshGsrmBalance()
+                    await refreshClaimTickets()
+                  }}
+                />
               ))}
             {redeemTickets &&
               redeemTickets.map((ticket) => (
-                <Ticket key={ticket.createdAt} ticket={ticket} />
+                <Ticket
+                  key={ticket.createdAt}
+                  ticket={ticket}
+                  callback={refreshRedeemTickets}
+                />
               ))}
           </div>
         ) : null}
