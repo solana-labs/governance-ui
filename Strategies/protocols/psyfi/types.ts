@@ -97,3 +97,5 @@ export type VaultHistory = {
   startDate: number
   epochHistoryKey: string
 }
+
+export type TokenGroupedVaults = Record<string, VaultInfo[]>

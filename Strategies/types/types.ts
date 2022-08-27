@@ -45,6 +45,10 @@ export type SolendStrategy = TreasuryStrategy & {
   createProposalFcn: CreateSolendStrategyParams
 }
 
+export type PsyFiStrategy = TreasuryStrategy & {
+  otherStrategies: Array<TreasuryStrategy>
+}
+
 export type EverlendStrategy = TreasuryStrategy & {
   poolMint: string
   decimals: number
