@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import Button from '@components/Button'
 import Loading from '@components/Loading'
 import useRealm from '@hooks/useRealm'
@@ -48,6 +49,7 @@ const DepositCommunityTokensBtn = ({ className = '' }) => {
         mintPk: realm.account.communityMint!,
         realmPk: realm.pubkey,
         programId: realm.owner,
+        programVersion: realmInfo?.programVersion!,
         amount: realmTokenAccount!.account.amount,
         tokenOwnerRecordPk,
         client: client,

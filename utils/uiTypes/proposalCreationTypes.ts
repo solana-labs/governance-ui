@@ -311,6 +311,7 @@ export interface MangoMakeChangeReferralFeeParams2 {
   refMngoRequired: number
   refSurchargeCentibps2: number
   refShareCentibps2: number
+  refMngoRequired2: number
 }
 
 export interface ForesightHasGovernedAccount {

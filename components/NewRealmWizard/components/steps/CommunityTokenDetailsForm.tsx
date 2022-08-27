@@ -4,7 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 
 import { preventNegativeNumberInput } from '@utils/helpers'
-import { updateUserInput, validateSolAddress } from '@utils/formValidation'
+import { updateUserInput, validatePubkey } from '@utils/formValidation'
 
 import FormHeader from '@components/NewRealmWizard/components/FormHeader'
 import FormField from '@components/NewRealmWizard/components/FormField'
@@ -27,7 +27,7 @@ export const CommunityTokenSchema = {
       otherwise: yup.string().optional(),
     })
     .test('is-valid-address', 'Please enter a valid Solana address', (value) =>
-      value ? validateSolAddress(value) : true
+      value ? validatePubkey(value) : true
     ),
   transferCommunityMintAuthority: yup
     .boolean()
