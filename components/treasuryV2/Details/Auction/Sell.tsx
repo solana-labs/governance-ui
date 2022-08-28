@@ -162,18 +162,11 @@ export default function Sell({ className, asset }: Props) {
       ? await fetchAuction(connection.current, auctionPk)
       : null
 
-    const perquisiteInstructions: TransactionInstruction[] = newAuctionObj
-      ? [...newAuctionObj.transactionInstructions]
-      : []
-    const perquisiteSingers: Keypair[] = newAuctionObj
-      ? [...newAuctionObj.signers]
-      : []
-
-    const transactionInstructions: TransactionInstruction[] = []
-
     const assetExtenstions = asset.raw.extensions
     const newAuctionArgs = newAuctionObj?.auctionParams.args
     const newAuctionAccounts = newAuctionObj?.auctionParams.accounts
+    const governance = asset.raw.governance
+    const authority = assetExtenstions.token?.account.owner
 
     const auctionId = newAuctionArgs?.auctionId || existingAuction!.auctionId
     const auctionAuthroity =
@@ -191,8 +184,14 @@ export default function Sell({ className, asset }: Props) {
     const baseVault =
       newAuctionAccounts?.baseVault || existingAuction!.baseVault
 
-    const governance = asset.raw.governance
-    const authority = assetExtenstions.token?.account.owner
+    const perquisiteInstructions: TransactionInstruction[] = newAuctionObj
+      ? [...newAuctionObj.transactionInstructions]
+      : []
+    const perquisiteSingers: Keypair[] = newAuctionObj
+      ? [...newAuctionObj.signers]
+      : []
+
+    const transactionInstructions: TransactionInstruction[] = []
 
     const openOrdersPk = await getOpenOrdersPk(
       authority!,
