@@ -3,6 +3,15 @@ export enum Strategy {
   Put = 1,
 }
 
+export type StrategyInfo = {
+  currentDeposits: number
+}
+
+export enum Action {
+  Deposit = 0,
+  Withdraw = 1,
+}
+
 export enum VaultVisibility {
   Development,
   Staging,

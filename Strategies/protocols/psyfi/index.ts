@@ -2,7 +2,7 @@ import { ConnectionContext } from '@utils/connection'
 import { PsyFiStrategy } from 'Strategies/types/types'
 import axios from 'axios'
 
-import { Strategy, TokenGroupedVaults, VaultInfo } from './types'
+import { Action, Strategy, TokenGroupedVaults, VaultInfo } from './types'
 import tokenService from '@utils/services/token'
 import {
   ProgramAccount,
@@ -27,7 +27,7 @@ export const getVaultInfos = async (): Promise<VaultInfo[]> => {
 const handleVaultAction = async (
   rpcContext: RpcContext,
   form: {
-    action: 'Deposit' | 'Withdraw'
+    action: Action
     title: string
     description: string
     bnAmount: BN
@@ -110,7 +110,7 @@ const psyFiVestingStrategies = async (
   const res = await Promise.all(
     Object.keys(groupedVaults).map(async (collateralTokenAddress) => {
       const strategies = groupedVaults[collateralTokenAddress]
-      const topVault = strategies.splice(0, 1)[0]
+      const topVault = strategies[0]
       if (!topVault) {
         // This should be unreachable
         throw new Error(`No vault found for ${collateralTokenAddress}`)
