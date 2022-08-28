@@ -1,3 +1,40 @@
+import { BN } from '@project-serum/anchor'
+import {
+  ProgramAccount,
+  Realm,
+  RpcContext,
+  TokenOwnerRecord,
+} from '@solana/spl-governance'
+import { PublicKey } from '@solana/web3.js'
+import { ConnectionContext } from '@utils/connection'
+import { AssetAccount } from '@utils/uiTypes/assets'
+import { VotingClient } from '@utils/uiTypes/VotePlugin'
+import { PsyFiStrategy } from 'Strategies/types/types'
+
+export type CreatePsyFiStrategy = (
+  rpcContext: RpcContext,
+  form: {
+    title: string
+    description: string
+    action: Action
+    bnAmount: BN
+    strategy: PsyFiStrategy
+  },
+  psyFiStrategyInfo: PsyFiStrategyInfo,
+  realm: ProgramAccount<Realm>,
+  treasuaryAccount: AssetAccount,
+  tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>,
+  governingTokenMint: PublicKey,
+  proposalIndex: number,
+  isDraft: boolean,
+  connection: ConnectionContext,
+  client?: VotingClient
+) => Promise<PublicKey>
+
+export type PsyFiStrategyInfo = {
+  ownedStrategyTokenAccount: AssetAccount | undefined
+}
+
 export enum Strategy {
   Call = 0,
   Put = 1,

@@ -46,6 +46,11 @@ export type SolendStrategy = TreasuryStrategy & {
 }
 
 export type PsyFiStrategy = TreasuryStrategy & {
+  vaultAccounts: {
+    pubkey: PublicKey
+    lpTokenMint: PublicKey
+    collateralAccountKey: PublicKey
+  }
   otherStrategies: Array<TreasuryStrategy>
 }
 
