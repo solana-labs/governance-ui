@@ -22,6 +22,7 @@ import {
   getCreateDefaultFeeAtas,
   createAuctionInstructions,
   AuctionObj,
+  fetchAuction,
 } from 'auction-house-sdk/sdk'
 import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
 import {
@@ -38,6 +39,7 @@ import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { notify } from '@utils/notifications'
 import Switch from '@components/Switch'
+import { OpenOrders } from 'auction-house-sdk/generated/accounts'
 interface Props {
   className?: string
   asset: Token
@@ -65,12 +67,13 @@ export default function Sell({ className, asset }: Props) {
   const [auctionSize, setAuctionSize] = useState<number>(ParticipantPreset.M)
   const [withCreateAuction, setWithCreateAuction] = useState(true)
   const [form, setForm] = useState<SellForm>({
+    auctionPk: '',
     baseMint: asset.raw.extensions.mint!.publicKey.toBase58(),
     quoteMint: '',
     areAsksEncrypted: false,
     areBidsEncrypted: true,
     maxOrders: 4,
-    orderPhaseLength: 900, //24 * 60 * 60,
+    orderPhaseLength: 24 * 60 * 60,
     tokensForSale: DEFAULT_TOKENS_FOR_SALE,
     minPrice: DEFAULT_MIN_PRICE,
     ...paramsForTokenSale(
@@ -150,59 +153,89 @@ export default function Sell({ className, asset }: Props) {
     setAuctionObj(auctionObj)
     setOpenSaveBackupKeyModal(true)
   }
-  const handlePropose = async (auctionObj: AuctionObj) => {
-    const perquisiteInstructions: TransactionInstruction[] = [
-      ...auctionObj.transactionInstructions,
-    ]
-    const perquisiteSingers: Keypair[] = [...auctionObj.signers]
+  const handlePropose = async (newAuctionObj: AuctionObj | null) => {
+    const auctionPk = newAuctionObj
+      ? newAuctionObj.auctionPk
+      : new PublicKey(form.auctionPk)
+
+    const existingAuction = !newAuctionObj
+      ? await fetchAuction(connection.current, auctionPk)
+      : null
+
+    const perquisiteInstructions: TransactionInstruction[] = newAuctionObj
+      ? [...newAuctionObj.transactionInstructions]
+      : []
+    const perquisiteSingers: Keypair[] = newAuctionObj
+      ? [...newAuctionObj.signers]
+      : []
 
     const transactionInstructions: TransactionInstruction[] = []
 
     const assetExtenstions = asset.raw.extensions
-    const auctionPk = auctionObj.auctionPk
-    const auctionArgs = auctionObj.auctionParams.args
-    const auctionAccounts = auctionObj.auctionParams.accounts
+    const newAuctionArgs = newAuctionObj?.auctionParams.args
+    const newAuctionAccounts = newAuctionObj?.auctionParams.accounts
+
+    const auctionId = newAuctionArgs?.auctionId || existingAuction!.auctionId
+    const auctionAuthroity =
+      newAuctionAccounts?.authority || existingAuction!.authority
+    const quoteMint =
+      newAuctionAccounts?.quoteMint || existingAuction!.quoteMint
+    const tickSize = newAuctionArgs?.tickSize || existingAuction!.tickSize
+    const quoteVault =
+      newAuctionAccounts?.quoteVault || existingAuction!.quoteVault
+    const eventQueue =
+      newAuctionAccounts?.eventQueue || existingAuction!.eventQueue
+    const bids = newAuctionAccounts?.bids || existingAuction!.bids
+    const asks = newAuctionAccounts?.asks || existingAuction!.asks
+    const baseMint = newAuctionAccounts?.baseMint || existingAuction!.baseMint
+    const baseVault =
+      newAuctionAccounts?.baseVault || existingAuction!.baseVault
+
     const governance = asset.raw.governance
     const authority = assetExtenstions.token?.account.owner
 
     const openOrdersPk = await getOpenOrdersPk(
       authority!,
-      auctionArgs.auctionId,
-      auctionAccounts.authority,
+      auctionId,
+      auctionAuthroity,
       MANGO_AUCTION_PROGRAM_ID
     )
 
-    const {
-      quoteFeeAta,
-      baseFeeAta,
-      instructions,
-    } = await getCreateDefaultFeeAtas({
-      wallet: wallet!,
-      connection: connection.current,
-      baseMint: new PublicKey(form.baseMint),
-      quoteMint: new PublicKey(form.quoteMint),
-      cluster: connection.cluster,
-    })
-    perquisiteInstructions.push(...instructions)
-    const orderHistoryPk = await getOrderHistoryPk(
-      assetExtenstions.token!.account.owner,
-      auctionArgs.auctionId,
-      auctionAccounts.authority,
-      MANGO_AUCTION_PROGRAM_ID
-    )
-    transactionInstructions.push(
-      ...createInitOpenOrdersInstructions({
-        authority: authority!,
-        auctionPk: auctionPk,
-        openOrdersPk: openOrdersPk,
-        orderHistoryPk: orderHistoryPk,
-        baseFeePk: baseFeeAta,
-        quoteFeePk: quoteFeeAta,
-        side: 'Ask',
+    const openOrders = await OpenOrders.fetch(connection.current, openOrdersPk)
+    if (!openOrders) {
+      const {
+        quoteFeeAta,
+        baseFeeAta,
+        instructions,
+      } = await getCreateDefaultFeeAtas({
+        wallet: wallet!,
+        connection: connection.current,
+        baseMint: new PublicKey(form.baseMint),
+        quoteMint: new PublicKey(form.quoteMint),
+        cluster: connection.cluster,
       })
-    )
+      perquisiteInstructions.push(...instructions)
+      const orderHistoryPk = await getOrderHistoryPk(
+        assetExtenstions.token!.account.owner,
+        auctionId,
+        auctionAuthroity,
+        MANGO_AUCTION_PROGRAM_ID
+      )
+      transactionInstructions.push(
+        ...createInitOpenOrdersInstructions({
+          authority: authority!,
+          auctionPk: auctionPk,
+          openOrdersPk: openOrdersPk,
+          orderHistoryPk: orderHistoryPk,
+          baseFeePk: baseFeeAta,
+          quoteFeePk: quoteFeeAta,
+          side: 'Ask',
+        })
+      )
+    }
+
     const quoteAta = await getAssociatedTokenAddress(
-      auctionAccounts.quoteMint, // mint
+      quoteMint, // mint
       assetExtenstions.token!.account.owner, // owner
       true
     )
@@ -211,7 +244,7 @@ export default function Sell({ className, asset }: Props) {
       const ataCreateionIx = SPL_TOKEN.createAssociatedTokenAccountInstruction(
         ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
         TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-        auctionAccounts.quoteMint, // mint
+        quoteMint, // mint
         quoteAta, // ata
         assetExtenstions.token!.account.owner, // owner of token account
         wallet!.publicKey! // fee payer
@@ -228,14 +261,14 @@ export default function Sell({ className, asset }: Props) {
         openOrdersPk: openOrdersPk,
         quoteToken: quoteAta,
         baseToken: assetExtenstions.token!.publicKey,
-        tickSize: auctionArgs.tickSize,
-        quoteMint: auctionAccounts.quoteMint,
-        quoteVault: auctionAccounts.quoteVault,
-        eventQueue: auctionAccounts.eventQueue,
-        bids: auctionAccounts.bids,
-        asks: auctionAccounts.asks,
-        baseMint: auctionAccounts.baseMint,
-        baseVault: auctionAccounts.baseVault,
+        tickSize: tickSize,
+        quoteMint: quoteMint,
+        quoteVault: quoteVault,
+        eventQueue: eventQueue,
+        bids: bids,
+        asks: asks,
+        baseMint: baseMint,
+        baseVault: baseVault,
       })
     )
     const instructionsData = transactionInstructions.map((x, idx) => {
@@ -287,6 +320,14 @@ export default function Sell({ className, asset }: Props) {
       ...newFormValues,
     })
   }, [form.areBidsEncrypted, form.tokensForSale, form.minPrice, auctionSize])
+  useEffect(() => {
+    setFormErrors({})
+    setForm({
+      ...form,
+      auctionPk: '',
+    })
+  }, [withCreateAuction])
+
   return (
     <>
       <section className={`${className} space-y-3`}>
@@ -316,6 +357,20 @@ export default function Sell({ className, asset }: Props) {
           </>
         )}
         <h4>Details</h4>
+        {!withCreateAuction && (
+          <Input
+            label="Auction Pk"
+            value={form.auctionPk}
+            type="text"
+            onChange={(evt) =>
+              handleSetForm({
+                value: evt.target.value,
+                propertyName: 'auctionPk',
+              })
+            }
+            error={formErrors['auctionPk']}
+          />
+        )}
         <Input
           label="Tokens for sale"
           value={form.tokensForSale}
@@ -502,7 +557,13 @@ export default function Sell({ className, asset }: Props) {
           }
         />
         <div className="flex justify-end">
-          <Button onClick={() => promptSaveKey(form)}>Propose</Button>
+          <Button
+            onClick={() =>
+              withCreateAuction ? promptSaveKey(form) : handlePropose(null)
+            }
+          >
+            Propose
+          </Button>
         </div>
       </section>
       {openSaveBackupKeyModal && (

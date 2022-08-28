@@ -20,4 +20,5 @@ export interface SellForm {
   maxOrders: number
   tokensForSale: number
   minPrice: number
+  auctionPk: string
 }
