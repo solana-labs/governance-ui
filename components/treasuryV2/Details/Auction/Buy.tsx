@@ -81,6 +81,7 @@ export default function Buy({ className, asset }: Props) {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
+
   const handlePropose = async (newAuctionObj: AuctionObj | null) => {
     const auctionPk = new PublicKey(form.auctionPk)
     const auction = await fetchAuction(connection.current, auctionPk)
@@ -115,7 +116,7 @@ export default function Buy({ className, asset }: Props) {
       auctionAuthroity,
       MANGO_AUCTION_PROGRAM_ID
     )
-    console.log(assetExtenstions.token!.publicKey.toBase58())
+
     const openOrders = await OpenOrders.fetch(connection.current, openOrdersPk)
     if (!openOrders) {
       const {
