@@ -115,7 +115,7 @@ export default function Buy({ className, asset }: Props) {
       auctionAuthroity,
       MANGO_AUCTION_PROGRAM_ID
     )
-
+    console.log(assetExtenstions.token!.publicKey.toBase58())
     const openOrders = await OpenOrders.fetch(connection.current, openOrdersPk)
     if (!openOrders) {
       const {
@@ -167,9 +167,9 @@ export default function Buy({ className, asset }: Props) {
       perquisiteInstructions.push(ataCreateionIx)
     }
     const localOrderKey = nacl.box.keyPair()
-    const quoteMintAcc = await tryGetMint(
+    const baseMintAcc = await tryGetMint(
       connection.current,
-      currentAuction!.quoteMint
+      currentAuction!.baseMint
     )
     transactionInstructions.push(
       ...(!currentAuction?.areBidsEncrypted
@@ -194,8 +194,8 @@ export default function Buy({ className, asset }: Props) {
         : createNewEncryptedOrderInstructions({
             price: Number(form.price),
             amount: Number(form.amount),
-            baseDecimals: assetExtenstions.mint!.account.decimals,
-            quoteDecimals: quoteMintAcc!.account.decimals,
+            baseDecimals: baseMintAcc!.account.decimals,
+            quoteDecimals: assetExtenstions.mint!.account.decimals,
             deposit: form.deposit,
             openOrdersPk: openOrdersPk,
             authority: authority!,
