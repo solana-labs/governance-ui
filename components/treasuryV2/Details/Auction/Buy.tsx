@@ -1,28 +1,22 @@
 import Button from '@components/Button'
 import Input from '@components/inputs/Input'
-import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
 import { useEffect, useState } from 'react'
 import { Token } from '@models/treasury/Asset'
-import Checkbox from '@components/inputs/Checkbox'
-import { ParticipantPreset, SellForm } from './models'
-import { paramsForTokenSale } from './tools'
-import TokenMintInput from '@components/inputs/TokenMintInput'
+import { BuyForm } from './models'
+import { MANGO_AUCTION_PROGRAM_ID } from './tools'
 import AdditionalProposalOptions from '@components/AdditionalProposalOptions'
-import { abbreviateAddress } from '@utils/formatting'
-import { tryParsePublicKey } from '@tools/core/pubkey'
 import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js'
 import useWalletStore from 'stores/useWalletStore'
-import Modal from '@components/Modal'
-import dayjs from 'dayjs'
 import {
   createInitOpenOrdersInstructions,
   createNewOrderInstructions,
   getOpenOrdersPk,
   getOrderHistoryPk,
   getCreateDefaultFeeAtas,
-  createAuctionInstructions,
   AuctionObj,
   fetchAuction,
+  toNumberFromFp32,
+  createNewEncryptedOrderInstructions,
 } from 'auction-house-sdk/sdk'
 import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
 import {
@@ -38,151 +32,73 @@ import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { notify } from '@utils/notifications'
-import Switch from '@components/Switch'
-import { OpenOrders } from 'auction-house-sdk/generated/accounts'
+import { Auction, OpenOrders } from 'auction-house-sdk/generated/accounts'
+import { tryParseKey } from '@tools/validators/pubkey'
+import Slider from '@components/Slider'
+import { tryGetMint } from '@utils/tokens'
+import * as nacl from 'tweetnacl'
 interface Props {
   className?: string
   asset: Token
 }
 
-const MANGO_AUCTION_PROGRAM_ID = new PublicKey(
-  'AReGQtE8e1WC1ztXXq5edtBBPngicGLfLnWeMP7E5WXq'
-)
-const DEFAULT_TOKENS_FOR_SALE = 1
-const DEFAULT_MIN_PRICE = 1
-
 export default function Buy({ className, asset }: Props) {
+  const DEFAULT_TITLE = `Buy tokens on auction`
+  const DEFAULT_DESCRIPTION = `Buy tokens on auction`
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
-  const formatter = Intl.NumberFormat('en', {
-    notation: 'compact',
-  })
   const { symbol } = useRealm()
   const router = useRouter()
   const { handleCreateProposal } = useCreateProposal()
   const { fmtUrlWithCluster } = useQueryContext()
-  const [openSaveBackupKeyModal, setOpenSaveBackupKeyModal] = useState(false)
-  const [auctionObj, setAuctionObj] = useState<AuctionObj | null>(null)
-  const [fileDownloaded, setFileDownloaded] = useState(false)
-  const [auctionSize, setAuctionSize] = useState<number>(ParticipantPreset.M)
-  const [withCreateAuction, setWithCreateAuction] = useState(true)
-  const [form, setForm] = useState<SellForm>({
+  const [currentAuction, setCurrentAuction] = useState<Auction | null>()
+  const [form, setForm] = useState<BuyForm>({
+    amount: 0,
+    deposit: 0,
+    price: 0,
     auctionPk: '',
-    baseMint: asset.raw.extensions.mint!.publicKey.toBase58(),
-    quoteMint: '',
-    areAsksEncrypted: false,
-    areBidsEncrypted: true,
-    maxOrders: 4,
-    orderPhaseLength: 24 * 60 * 60,
-    tokensForSale: DEFAULT_TOKENS_FOR_SALE,
-    minPrice: DEFAULT_MIN_PRICE,
-    ...paramsForTokenSale(
-      ParticipantPreset.M,
-      DEFAULT_TOKENS_FOR_SALE,
-      DEFAULT_MIN_PRICE
-    ),
   })
-  const DEFAULT_TITLE = `Sell ${form.tokensForSale} ${
-    asset.name ? asset.name : abbreviateAddress(asset.id)
-  } on auction`
-  const DEFAULT_DESCRIPTION = `Sell ${form.tokensForSale} ${
-    asset.name ? asset.name : abbreviateAddress(asset.id)
-  } on auction for min price: ${form.minPrice}`
+  const [formErrors, setFormErrors] = useState({})
   const [proposalInfo, setProposalInfo] = useState({
     title: '',
     description: '',
     voteByCouncil: false,
   })
-  const [formErrors, setFormErrors] = useState({})
+  useEffect(() => {
+    const pubkey = tryParseKey(form.auctionPk)
+    const getAuction = async () => {
+      const auction = await fetchAuction(connection.current, pubkey!)
+      setCurrentAuction(auction)
+    }
+    if (pubkey) {
+      getAuction()
+    } else {
+      setCurrentAuction(null)
+    }
+  }, [form.auctionPk])
+
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-  const sizeBtnClass = (size: number) => {
-    const classnames = `text-xs ${size === auctionSize ? 'bg-fgd-1' : ''}`
-    return classnames
-  }
-  const closeSaveKeyPrompt = () => {
-    setOpenSaveBackupKeyModal(false)
-    setAuctionObj(null)
-    setFileDownloaded(false)
-  }
-  const downloadBackupFile = async () => {
-    // Create blob link to download
-    const url = window.URL.createObjectURL(
-      new Blob([JSON.stringify(auctionObj!.localAuctionKey)])
-    )
-    const link = document.createElement('a')
-    link.href = url
-    const timestamp = dayjs().unix()
-    link.setAttribute(
-      'download',
-      `keypair-backup-${auctionObj?.auctionPk.toBase58()}-${timestamp}.json`
-    )
-
-    // Append to html link element page
-    document.body.appendChild(link)
-
-    // Start download
-    link.click()
-
-    // Clean up and remove the link
-    link.parentNode!.removeChild(link)
-    setFileDownloaded(true)
-  }
-  const promptSaveKey = async (data: SellForm) => {
-    const baseMintPk = tryParsePublicKey(data.baseMint)
-    const quoteMintPk = tryParsePublicKey(data.quoteMint)
-    if (!baseMintPk) {
-      throw 'No baseMintPk'
-    }
-    if (!quoteMintPk) {
-      throw 'No quoteMintPk'
-    }
-    const transactionInstructions: TransactionInstruction[] = []
-    const auctionObj = await createAuctionInstructions({
-      ...data,
-      connection: connection.current,
-      wallet: wallet!.publicKey!,
-      programId: MANGO_AUCTION_PROGRAM_ID,
-      baseMint: new PublicKey(data.baseMint),
-      quoteMint: new PublicKey(data.quoteMint),
-      baseDecimals: asset.raw.extensions.mint!.account.decimals,
-    })
-    auctionObj.transactionInstructions.unshift(...transactionInstructions)
-    setAuctionObj(auctionObj)
-    setOpenSaveBackupKeyModal(true)
-  }
   const handlePropose = async (newAuctionObj: AuctionObj | null) => {
-    const auctionPk = newAuctionObj
-      ? newAuctionObj.auctionPk
-      : new PublicKey(form.auctionPk)
-
-    const existingAuction = !newAuctionObj
-      ? await fetchAuction(connection.current, auctionPk)
-      : null
+    const auctionPk = new PublicKey(form.auctionPk)
+    const auction = await fetchAuction(connection.current, auctionPk)
 
     const assetExtenstions = asset.raw.extensions
-    const newAuctionArgs = newAuctionObj?.auctionParams.args
-    const newAuctionAccounts = newAuctionObj?.auctionParams.accounts
     const governance = asset.raw.governance
     const authority = assetExtenstions.token?.account.owner
 
-    const auctionId = newAuctionArgs?.auctionId || existingAuction!.auctionId
-    const auctionAuthroity =
-      newAuctionAccounts?.authority || existingAuction!.authority
-    const quoteMint =
-      newAuctionAccounts?.quoteMint || existingAuction!.quoteMint
-    const tickSize = newAuctionArgs?.tickSize || existingAuction!.tickSize
-    const quoteVault =
-      newAuctionAccounts?.quoteVault || existingAuction!.quoteVault
-    const eventQueue =
-      newAuctionAccounts?.eventQueue || existingAuction!.eventQueue
-    const bids = newAuctionAccounts?.bids || existingAuction!.bids
-    const asks = newAuctionAccounts?.asks || existingAuction!.asks
-    const baseMint = newAuctionAccounts?.baseMint || existingAuction!.baseMint
-    const baseVault =
-      newAuctionAccounts?.baseVault || existingAuction!.baseVault
+    const auctionId = auction!.auctionId
+    const auctionAuthroity = auction!.authority
+    const quoteMint = auction!.quoteMint
+    const tickSize = auction!.tickSize
+    const quoteVault = auction!.quoteVault
+    const eventQueue = auction!.eventQueue
+    const bids = auction!.bids
+    const asks = auction!.asks
+    const baseMint = auction!.baseMint
+    const baseVault = auction!.baseVault
 
     const perquisiteInstructions: TransactionInstruction[] = newAuctionObj
       ? [...newAuctionObj.transactionInstructions]
@@ -209,8 +125,8 @@ export default function Buy({ className, asset }: Props) {
       } = await getCreateDefaultFeeAtas({
         wallet: wallet!,
         connection: connection.current,
-        baseMint: new PublicKey(form.baseMint),
-        quoteMint: new PublicKey(form.quoteMint),
+        baseMint: auction.baseMint,
+        quoteMint: auction.quoteMint,
         cluster: connection.cluster,
       })
       perquisiteInstructions.push(...instructions)
@@ -228,47 +144,72 @@ export default function Buy({ className, asset }: Props) {
           orderHistoryPk: orderHistoryPk,
           baseFeePk: baseFeeAta,
           quoteFeePk: quoteFeeAta,
-          side: 'Ask',
+          side: 'Bid',
         })
       )
     }
 
-    const quoteAta = await getAssociatedTokenAddress(
-      quoteMint, // mint
+    const baseAta = await getAssociatedTokenAddress(
+      baseMint, // mint
       assetExtenstions.token!.account.owner, // owner
       true
     )
-    const quoteAtaAcc = await connection.current.getParsedAccountInfo(quoteAta)
-    if (!quoteAtaAcc?.value) {
+    const baseAtaAcc = await connection.current.getParsedAccountInfo(baseAta)
+    if (!baseAtaAcc?.value) {
       const ataCreateionIx = SPL_TOKEN.createAssociatedTokenAccountInstruction(
         ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
         TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-        quoteMint, // mint
-        quoteAta, // ata
+        baseMint, // mint
+        baseAta, // ata
         assetExtenstions.token!.account.owner, // owner of token account
         wallet!.publicKey! // fee payer
       )
       perquisiteInstructions.push(ataCreateionIx)
     }
+    const localOrderKey = nacl.box.keyPair()
+    const quoteMintAcc = await tryGetMint(
+      connection.current,
+      currentAuction!.quoteMint
+    )
     transactionInstructions.push(
-      ...createNewOrderInstructions({
-        price: form.minPrice,
-        amount: form.tokensForSale,
-        baseDecimals: assetExtenstions.mint!.account.decimals,
-        authority: authority!,
-        auctionPk: auctionPk,
-        openOrdersPk: openOrdersPk,
-        quoteToken: quoteAta,
-        baseToken: assetExtenstions.token!.publicKey,
-        tickSize: tickSize,
-        quoteMint: quoteMint,
-        quoteVault: quoteVault,
-        eventQueue: eventQueue,
-        bids: bids,
-        asks: asks,
-        baseMint: baseMint,
-        baseVault: baseVault,
-      })
+      ...(!currentAuction?.areBidsEncrypted
+        ? createNewOrderInstructions({
+            price: Number(form.price),
+            amount: Number(form.amount),
+            baseDecimals: assetExtenstions.mint!.account.decimals,
+            authority: authority!,
+            auctionPk: auctionPk,
+            openOrdersPk: openOrdersPk,
+            quoteToken: assetExtenstions.token!.publicKey,
+            baseToken: baseAta,
+            tickSize: tickSize,
+            quoteMint: quoteMint,
+            quoteVault: quoteVault,
+            eventQueue: eventQueue,
+            bids: bids,
+            asks: asks,
+            baseMint: baseMint,
+            baseVault: baseVault,
+          })
+        : createNewEncryptedOrderInstructions({
+            price: Number(form.price),
+            amount: Number(form.amount),
+            baseDecimals: assetExtenstions.mint!.account.decimals,
+            quoteDecimals: quoteMintAcc!.account.decimals,
+            deposit: form.deposit,
+            openOrdersPk: openOrdersPk,
+            authority: authority!,
+            localOrderKey: localOrderKey,
+            quoteToken: assetExtenstions.token!.publicKey,
+            baseToken: baseAta,
+            auctionPk,
+            tickSize,
+            naclPubkey: currentAuction.naclPubkey,
+            quoteMint,
+            quoteVault,
+            baseMint,
+            baseVault,
+          }))
     )
     const instructionsData = transactionInstructions.map((x, idx) => {
       const obj: UiInstruction = {
@@ -304,234 +245,64 @@ export default function Buy({ className, asset }: Props) {
       notify({ type: 'error', message: `${ex}` })
     }
   }
-  useEffect(() => {
-    setFormErrors({})
-    const newFormValues = form.areBidsEncrypted
-      ? {
-          ...paramsForTokenSale(auctionSize, form.tokensForSale, form.minPrice),
-        }
-      : {
-          ...paramsForTokenSale(auctionSize, form.tokensForSale, form.minPrice),
-          decryptionPhaseLength: 0,
-        }
-    setForm({
-      ...form,
-      ...newFormValues,
-    })
-  }, [form.areBidsEncrypted, form.tokensForSale, form.minPrice, auctionSize])
-  useEffect(() => {
-    setFormErrors({})
-    setForm({
-      ...form,
-      auctionPk: '',
-    })
-  }, [withCreateAuction])
 
   return (
     <>
       <section className={`${className} space-y-3`}>
-        <h4>Witch create auction</h4>
-        <div className="flex flex-row text-xs items-center">
-          <Switch
-            checked={withCreateAuction}
-            onChange={(checked) => setWithCreateAuction(checked)}
-          />
-        </div>
-        {withCreateAuction && (
-          <>
-            <h4>Size based on number of participants</h4>
-            <div className="grid gap-4 grid-cols-2">
-              {Object.values(ParticipantPreset)
-                .filter((x) => typeof x === 'string')
-                .map((key) => (
-                  <Button
-                    key={key}
-                    onClick={() => setAuctionSize(ParticipantPreset[key])}
-                    className={sizeBtnClass(ParticipantPreset[key])}
-                  >
-                    {key} Auction {formatter.format(ParticipantPreset[key])}
-                  </Button>
-                ))}
-            </div>
-          </>
-        )}
         <h4>Details</h4>
-        {!withCreateAuction && (
-          <Input
-            label="Auction Pk"
-            value={form.auctionPk}
-            type="text"
-            onChange={(evt) =>
+        <Input
+          label="Auction Pk"
+          value={form.auctionPk}
+          type="text"
+          onChange={(evt) =>
+            handleSetForm({
+              value: evt.target.value,
+              propertyName: 'auctionPk',
+            })
+          }
+          error={formErrors['auctionPk']}
+        />
+        <Input
+          label="Amount"
+          value={form.amount}
+          type="text"
+          onChange={(evt) =>
+            handleSetForm({
+              value: evt.target.value,
+              propertyName: 'amount',
+            })
+          }
+          error={formErrors['amount']}
+        />
+        <Input
+          label="Price"
+          value={form.price}
+          type="text"
+          onChange={(evt) =>
+            handleSetForm({
+              value: evt.target.value,
+              propertyName: 'price',
+            })
+          }
+          error={formErrors['price']}
+        />
+        {currentAuction?.areBidsEncrypted && (
+          <Slider
+            disabled={false}
+            step={toNumberFromFp32(currentAuction.tickSize)}
+            min={Number(form.amount) * Number(form.price)}
+            max={
+              Number(asset.raw.extensions.amount?.toNumber()) /
+              10 ** asset.raw.extensions.mint!.account.decimals
+            }
+            value={form.deposit}
+            onChange={(d) =>
               handleSetForm({
-                value: evt.target.value,
-                propertyName: 'auctionPk',
+                value: Number(d),
+                propertyName: 'deposit',
               })
             }
-            error={formErrors['auctionPk']}
           />
-        )}
-        <Input
-          label="Tokens for sale"
-          value={form.tokensForSale}
-          type="text"
-          onChange={(evt) =>
-            handleSetForm({
-              value: evt.target.value,
-              propertyName: 'tokensForSale',
-            })
-          }
-          error={formErrors['tokensForSale']}
-        />
-        <Input
-          label="Min price"
-          value={form.minPrice}
-          type="text"
-          onChange={(evt) =>
-            handleSetForm({
-              value: evt.target.value,
-              propertyName: 'minPrice',
-            })
-          }
-          error={formErrors['minPrice']}
-        />
-        {withCreateAuction && (
-          <>
-            <Input
-              label="Max orders per users"
-              value={form.maxOrders}
-              type="text"
-              onChange={(evt) =>
-                handleSetForm({
-                  value: evt.target.value,
-                  propertyName: 'maxOrders',
-                })
-              }
-              error={formErrors['maxOrders']}
-            />
-            <Input
-              label="Order phase length (sec)"
-              value={form.orderPhaseLength}
-              type="text"
-              onChange={(evt) =>
-                handleSetForm({
-                  value: evt.target.value,
-                  propertyName: 'orderPhaseLength',
-                })
-              }
-              error={formErrors['orderPhaseLength']}
-            />
-            <div className="mt-3 py-3">
-              <Checkbox
-                checked={form.areBidsEncrypted}
-                label="Encrypt bids"
-                onChange={(evt) =>
-                  handleSetForm({
-                    value: evt.target.checked,
-                    propertyName: 'areBidsEncrypted',
-                  })
-                }
-                error={formErrors['areBidsEncrypted']}
-              />
-            </div>
-            <TokenMintInput
-              label={'Quote mint'}
-              onValidMintChange={(mintAddress, tokenInfo) => {
-                if (mintAddress) {
-                  handleSetForm({
-                    value: mintAddress,
-                    propertyName: 'quoteMint',
-                  })
-                }
-                if (tokenInfo) {
-                  handleSetForm({
-                    value: tokenInfo.address,
-                    propertyName: 'quoteMint',
-                  })
-                }
-              }}
-            />
-            <div>
-              <AdvancedOptionsDropdown
-                title="Advanced auction options"
-                className="my-5"
-              >
-                <div className="space-y-3">
-                  <Input
-                    label="Min Base Order Size"
-                    value={form.minBaseOrderSize}
-                    type="text"
-                    onChange={(evt) =>
-                      handleSetForm({
-                        value: evt.target.value,
-                        propertyName: 'minBaseOrderSize',
-                      })
-                    }
-                    error={formErrors['minBaseOrderSize']}
-                  />
-                  <Input
-                    label="Tick Size"
-                    value={form.tickSize}
-                    type="text"
-                    onChange={(evt) =>
-                      handleSetForm({
-                        value: evt.target.value,
-                        propertyName: 'tickSize',
-                      })
-                    }
-                    error={formErrors['tickSize']}
-                  />
-                  <Input
-                    label="Decryption Phase Length"
-                    value={form.decryptionPhaseLength}
-                    type="text"
-                    onChange={(evt) =>
-                      handleSetForm({
-                        value: evt.target.value,
-                        propertyName: 'decryptionPhaseLength',
-                      })
-                    }
-                    error={formErrors['decryptionPhaseLength']}
-                  />
-                  <Input
-                    label="Event Queue Bytes"
-                    value={form.eventQueueBytes}
-                    type="text"
-                    onChange={(evt) =>
-                      handleSetForm({
-                        value: evt.target.value,
-                        propertyName: 'eventQueueBytes',
-                      })
-                    }
-                    error={formErrors['eventQueueBytes']}
-                  />
-                  <Input
-                    label="Bids Bytes"
-                    value={form.bidsBytes}
-                    type="text"
-                    onChange={(evt) =>
-                      handleSetForm({
-                        value: evt.target.value,
-                        propertyName: 'bidsBytes',
-                      })
-                    }
-                    error={formErrors['bidsBytes']}
-                  />
-                  <Input
-                    label="Asks Bytes"
-                    value={form.asksBytes}
-                    type="text"
-                    onChange={(evt) =>
-                      handleSetForm({
-                        value: evt.target.value,
-                        propertyName: 'asksBytes',
-                      })
-                    }
-                    error={formErrors['asksBytes']}
-                  />
-                </div>
-              </AdvancedOptionsDropdown>
-            </div>
-          </>
         )}
         <AdditionalProposalOptions
           title={proposalInfo.title}
@@ -556,40 +327,9 @@ export default function Buy({ className, asset }: Props) {
           }
         />
         <div className="flex justify-end">
-          <Button
-            onClick={() =>
-              withCreateAuction ? promptSaveKey(form) : handlePropose(null)
-            }
-          >
-            Propose
-          </Button>
+          <Button onClick={() => handlePropose(null)}>Propose</Button>
         </div>
       </section>
-      {openSaveBackupKeyModal && (
-        <Modal onClose={closeSaveKeyPrompt} isOpen={openSaveBackupKeyModal}>
-          <div className="mb-1.5 flex flex-col text-th-fgd-2 items-center">
-            <div className="mb-3">
-              Please save your keypair backup file and do not share it with
-              anyone it will be needed to finish the auction
-            </div>
-            <div>
-              <Button className="mb-5" onClick={downloadBackupFile}>
-                Download backup file
-              </Button>
-            </div>
-
-            <Button
-              disabled={!fileDownloaded}
-              tooltipMessage={
-                !fileDownloaded ? 'Download file to start auction' : ''
-              }
-              onClick={() => handlePropose(auctionObj!)}
-            >
-              Create auction
-            </Button>
-          </div>
-        </Modal>
-      )}
     </>
   )
 }

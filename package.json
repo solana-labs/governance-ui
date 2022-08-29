@@ -112,6 +112,7 @@
     "superstruct": "^0.15.4",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^3.14.1",
+    "tweetnacl": "^1.0.3",
     "yup": "^0.32.11",
     "zustand": "^3.7.2"
   },

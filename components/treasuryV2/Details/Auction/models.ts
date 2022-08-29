@@ -22,3 +22,10 @@ export interface SellForm {
   minPrice: number
   auctionPk: string
 }
+
+export interface BuyForm {
+  amount: number
+  price: number
+  deposit: number
+  auctionPk: string
+}
