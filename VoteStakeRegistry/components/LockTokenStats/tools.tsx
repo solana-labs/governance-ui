@@ -1,4 +1,5 @@
 import { BN } from '@project-serum/anchor'
+import { bs58 } from '@project-serum/anchor/dist/cjs/utils/bytes'
 import {
   ProposalTransaction,
   getGovernanceSchemaForAccount,
@@ -6,6 +7,7 @@ import {
   GovernanceAccountClass,
   deserializeBorsh,
   ProgramAccount,
+  GovernanceAccountType,
 } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { ConnectionContext } from '@utils/connection'
@@ -50,7 +52,11 @@ export const getProposalsTransactions = async (
                 {
                   memcmp: {
                     offset: 0, // number of bytes
-                    bytes: 'E', // base58 encoded string
+                    bytes: bs58.encode(
+                      Uint8Array.from([
+                        GovernanceAccountType.ProposalTransactionV2,
+                      ])
+                    ), // base58 encoded string
                   },
                 },
                 {
