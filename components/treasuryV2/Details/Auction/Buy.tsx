@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { Token } from '@models/treasury/Asset'
 import Checkbox from '@components/inputs/Checkbox'
 import { ParticipantPreset, SellForm } from './models'
-import { MANGO_AUCTION_PROGRAM_ID, paramsForTokenSale } from './tools'
+import { paramsForTokenSale } from './tools'
 import TokenMintInput from '@components/inputs/TokenMintInput'
 import AdditionalProposalOptions from '@components/AdditionalProposalOptions'
 import { abbreviateAddress } from '@utils/formatting'
@@ -45,10 +45,13 @@ interface Props {
   asset: Token
 }
 
+const MANGO_AUCTION_PROGRAM_ID = new PublicKey(
+  'AReGQtE8e1WC1ztXXq5edtBBPngicGLfLnWeMP7E5WXq'
+)
 const DEFAULT_TOKENS_FOR_SALE = 1
 const DEFAULT_MIN_PRICE = 1
 
-export default function Sell({ className, asset }: Props) {
+export default function Buy({ className, asset }: Props) {
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const formatter = Intl.NumberFormat('en', {

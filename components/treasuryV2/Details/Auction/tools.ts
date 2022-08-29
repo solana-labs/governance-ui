@@ -1,3 +1,5 @@
+import { PublicKey } from '@blockworks-foundation/mango-client'
+
 export const paramsForTokenSale = function (
   participants: number,
   tokensForSale: number,
@@ -12,3 +14,7 @@ export const paramsForTokenSale = function (
     asksBytes: 64 * 16, // allow 64 asks for selling side
   }
 }
+
+export const MANGO_AUCTION_PROGRAM_ID = new PublicKey(
+  'AReGQtE8e1WC1ztXXq5edtBBPngicGLfLnWeMP7E5WXq'
+)
