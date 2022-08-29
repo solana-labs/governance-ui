@@ -96,6 +96,8 @@ module.exports = {
         'confirm-green': '#8effdd',
         'bkg-grey': '#292833',
         'night-grey': '#201F27',
+        'bkg-black': '#212429',
+        'secondary-grey': '#D5D4D7',
       },
       animation: {
         'connect-wallet-ping':
@@ -127,6 +129,10 @@ module.exports = {
             transform: 'translate3d(0, 0, 0)',
           },
         },
+      },
+      fontFamily: {
+        rota: ['Rota', 'sans-serif'],
+        roboto: ['Roboto', 'sans-serif'],
       },
     },
   },

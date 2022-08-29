@@ -18,7 +18,7 @@ export function getRulesFromAccount(
       maxVotingTime: govConfig.maxVotingTime,
       minInstructionHoldupTime: govConfig.minInstructionHoldUpTime,
       voteThresholdPercentage: govConfig.communityVoteThreshold.value!,
-      voteTipping: govConfig.voteTipping,
+      voteTipping: govConfig.communityVoteTipping,
     }
   }
 

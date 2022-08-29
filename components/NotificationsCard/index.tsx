@@ -289,32 +289,15 @@ const NotificationsCard = ({
     setUnsavedChanges(true)
   }
 
-  const isSame =
-    email === localEmail &&
-    phoneNumber === localPhoneNumber &&
-    telegram === localTelegram
-
   const disabled =
     (isAuthenticated && !hasUnsavedChanges) ||
     (localEmail === '' && localTelegram === '' && localPhoneNumber === '') ||
     errorMessage !== ''
 
-  const handleBackClick = useCallback(() => {
-    if (isSame && !disabled) {
-      setPreview(true)
-      return
-    }
-    if (disabled) {
-      onBackClick()
-    } else {
-      setPreview(false)
-    }
-  }, [disabled, isSame, onBackClick, setPreview])
-
   return (
     <div className="bg-bkg-5 w-full p-4 md:p-6 rounded-lg">
       <div className="flex flex-row items-center align-center">
-        <Button className="bg-transparent" onClick={handleBackClick}>
+        <Button className="bg-transparent" onClick={onBackClick}>
           <ArrowLeftIcon className="w-6 h-6" fill="grey" />
         </Button>
         <NotifiFullLogo />

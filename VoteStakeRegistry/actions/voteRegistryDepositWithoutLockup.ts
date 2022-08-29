@@ -18,6 +18,7 @@ export const voteRegistryDepositWithoutLockup = async ({
   realmPk,
   communityMintPk,
   programId,
+  programVersion,
   amount,
   tokenOwnerRecordPk,
   client,
@@ -29,6 +30,7 @@ export const voteRegistryDepositWithoutLockup = async ({
   communityMintPk: PublicKey
   realmPk: PublicKey
   programId: PublicKey
+  programVersion: number
   amount: BN
   tokenOwnerRecordPk: PublicKey | null
   client?: VsrClient
@@ -45,6 +47,7 @@ export const voteRegistryDepositWithoutLockup = async ({
     mintPk,
     realmPk,
     programId,
+    programVersion,
     amount,
     tokenOwnerRecordPk,
     lockUpPeriodInDays,

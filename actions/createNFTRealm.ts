@@ -225,6 +225,7 @@ export default async function createNFTRealm({
   await withCreateTokenOwnerRecord(
     nftConfigurationInstructions,
     programIdPk,
+    programVersion,
     realmPk,
     walletPk,
     communityMintPk,

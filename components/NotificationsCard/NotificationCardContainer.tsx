@@ -12,10 +12,14 @@ import { useCallback, useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 
 type Props = {
+  onClose: () => void
   onBackClick: () => void
 }
 
-const NotificationCardContainer: React.FC<Props> = ({ onBackClick }) => {
+const NotificationCardContainer: React.FC<Props> = ({
+  onClose,
+  onBackClick,
+}) => {
   const [showPreview, setPreview] = useState(true)
   const router = useRouter()
 
@@ -138,11 +142,11 @@ const NotificationCardContainer: React.FC<Props> = ({ onBackClick }) => {
   )
 
   return (
-    <div className="h-[507px] w-[446px] absolute -top-4 right-0">
-      <div className="bg-bkg-5 w-full h-full rounded-lg">
+    <div className="h-full absolute -top-4 right-0">
+      <div className="flex flex-col w-full justify-between bg-black rounded-lg">
         <div className="flex flex-row w-full items-center align-center">
           {!isInitialized && (
-            <div className="h-[576px] pt-10 w-full px-4">
+            <div className="pt-10 w-full px-4">
               <div className="space-y-2 align-center items-center w-full mb-2">
                 <div className="animate-pulse bg-bkg-4 w-full h-12 rounded-md" />
                 <div className="animate-pulse bg-bkg-4 w-full h-12 rounded-md" />
@@ -166,7 +170,7 @@ const NotificationCardContainer: React.FC<Props> = ({ onBackClick }) => {
               phoneNumber={phoneNumber}
               telegram={telegram}
               telegramEnabled={telegramEnabled}
-              onBackClick={onBackClick}
+              onClose={onClose}
               onClick={() => setPreview(false)}
             />
           )}

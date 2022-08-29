@@ -17,6 +17,7 @@ export const voteRegistryStartUnlock = async ({
   realmPk,
   communityMintPk,
   programId,
+  programVersion,
   transferAmount,
   amountAfterOperation,
   lockUpPeriodInDays,
@@ -28,6 +29,7 @@ export const voteRegistryStartUnlock = async ({
   mintPk: PublicKey
   realmPk: PublicKey
   programId: PublicKey
+  programVersion: number
   communityMintPk: PublicKey
   transferAmount: BN
   //amount left in deposit after operation
@@ -56,6 +58,7 @@ export const voteRegistryStartUnlock = async ({
     mintPk,
     realmPk,
     programId,
+    programVersion,
     tokenOwnerRecordPk,
     lockUpPeriodInDays: period,
     lockupKind,
