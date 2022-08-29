@@ -1,6 +1,7 @@
 import {
   deserializeBorsh,
   getGovernanceSchemaForAccount,
+  GovernanceAccountType,
   GovernanceConfig,
   ProgramAccount,
   Proposal,
@@ -17,6 +18,7 @@ import { createGovernanceThresholds } from '@tools/governance/configs'
 import { PublicKey } from '@blockworks-foundation/mango-client'
 import { ConnectionContext } from './connection'
 import axios from 'axios'
+import { bs58 } from '@project-serum/anchor/dist/cjs/utils/bytes'
 
 export interface GovernanceConfigValues {
   minTokensToCreateProposal: number | string
@@ -93,10 +95,20 @@ export const getProposals = async (
     },
     data: JSON.stringify([
       ...pubkeys.map((x) => {
-        return getProposalsFilter(programId, connection, '6', x)
+        return getProposalsFilter(
+          programId,
+          connection,
+          bs58.encode(Uint8Array.from([GovernanceAccountType.ProposalV1])),
+          x
+        )
       }),
       ...pubkeys.map((x) => {
-        return getProposalsFilter(programId, connection, 'F', x)
+        return getProposalsFilter(
+          programId,
+          connection,
+          bs58.encode(Uint8Array.from([GovernanceAccountType.ProposalV2])),
+          x
+        )
       }),
     ]),
   })
