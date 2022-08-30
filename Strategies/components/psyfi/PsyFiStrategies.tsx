@@ -6,6 +6,7 @@ import Select from '@components/inputs/Select'
 import Loading from '@components/Loading'
 import Tooltip from '@components/Tooltip'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { AnchorProvider, BN, Program } from '@project-serum/anchor'
@@ -21,6 +22,7 @@ import { precision } from '@utils/formatting'
 import tokenService from '@utils/services/token'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import BigNumber from 'bignumber.js'
+import { useRouter } from 'next/router'
 import { pdas, PsyFiEuros, PsyFiIdl } from 'psyfi-euros-test'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
@@ -54,6 +56,8 @@ export const PsyFiStrategies: React.FC<{
   proposedInvestment,
   governedTokenAccount,
 }) => {
+  const router = useRouter()
+  const { fmtUrlWithCluster } = useQueryContext()
   const {
     realmInfo,
     realm,
@@ -61,6 +65,7 @@ export const PsyFiStrategies: React.FC<{
     mint,
     councilMint,
     config,
+    symbol,
   } = useRealm()
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
@@ -104,13 +109,15 @@ export const PsyFiStrategies: React.FC<{
     )
   }, [connection.current, wallet])
 
+  const handleSetForm = useCallback(
+    ({ propertyName, value }) => {
+      setFormErrors({})
+      setForm({ ...form, [propertyName]: value })
+    },
+    [setForm, setFormErrors]
+  )
+
   const tokenInfo = tokenService.getTokenInfo(handledMint)
-
-  const handleSetForm = ({ propertyName, value }) => {
-    setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
-  }
-
   const tokenSymbol = tokenService.getTokenInfo(
     governedTokenAccount.extensions.mint!.publicKey.toBase58()
   )?.symbol
@@ -164,7 +171,6 @@ export const PsyFiStrategies: React.FC<{
       )) as unknown) as DepositReceipt | undefined
       setDepositReceipt(currentDepositReceipt)
     })()
-    // TODO: Load the DepositReceipt
   }, [form.strategy, psyFiProgram])
 
   // Find the owned strategy token account, if one exists
@@ -211,7 +217,7 @@ export const PsyFiStrategies: React.FC<{
     })()
   }, [form.strategy, governedTokenAccount, governedTokenAccountsWithoutNfts])
 
-  const handleDeposit = useCallback(() => {
+  const handleDeposit = useCallback(async () => {
     setIsDepositing(true)
     const rpcContext = new RpcContext(
       new PublicKey(realm!.owner.toString()),
@@ -242,7 +248,7 @@ export const PsyFiStrategies: React.FC<{
       depositReceiptPubkey,
       ownedStrategyTokenAccount: ownedStrategyTokenAccount,
     }
-    createProposalFcn(
+    const proposalAddress = await createProposalFcn(
       rpcContext,
       {
         ...form,
@@ -263,6 +269,8 @@ export const PsyFiStrategies: React.FC<{
       connection,
       client
     )
+    const url = fmtUrlWithCluster(`/dao/${symbol}/proposal/${proposalAddress}`)
+    router.push(url)
     setIsDepositing(false)
   }, [
     client,
@@ -271,6 +279,7 @@ export const PsyFiStrategies: React.FC<{
     councilMint,
     depositReceipt,
     depositReceiptPubkey,
+    fmtUrlWithCluster,
     form,
     governedTokenAccount,
     mint,
@@ -279,15 +288,33 @@ export const PsyFiStrategies: React.FC<{
     psyFiProgram,
     realm,
     realmInfo,
+    router,
+    symbol,
     voteByCouncil,
     wallet,
   ])
+
+  useEffect(() => {
+    if (form.title === '' || form.description === '') {
+      setForm({
+        ...form,
+        title:
+          form.title === ''
+            ? `Deposit ${tokenSymbol} into ${form.strategy.strategyName} strategy`
+            : form.title,
+        description:
+          form.description === ''
+            ? `Deposit ${tokenSymbol} into ${form.strategy.strategyName} strategy`
+            : form.description,
+      })
+    }
+  }, [form, setForm, tokenSymbol])
 
   return (
     <div>
       {/* 
             TODO: Add a higher level selector that determines the action (Deposit, 
-            Withdraw, Cancel pending deposit, etc) 
+            Withdraw, Cancel pending deposit, etc) and separate out the action components.
         */}
       <Select
         className="mb-3"
@@ -300,8 +327,8 @@ export const PsyFiStrategies: React.FC<{
       >
         {proposedInvestment.otherStrategies.map((strategy) => (
           <Select.Option
-            key={strategy.strategyName}
-            value={strategy.strategyName}
+            key={strategy.vaultAccounts.pubkey.toString()}
+            value={strategy}
           >
             <div className="d-flex">
               <div>
@@ -343,8 +370,8 @@ export const PsyFiStrategies: React.FC<{
       <AdditionalProposalOptions
         title={form.title}
         description={form.description}
-        defaultTitle={`Deposit ${tokenSymbol} into ${form.strategy.strategyName}`}
-        defaultDescription={`Deposit ${tokenSymbol} into strategy: ${form.strategy.strategyName}`}
+        defaultTitle={form.title}
+        defaultDescription={form.description}
         setTitle={(evt) =>
           handleSetForm({
             value: evt.target.value,
@@ -361,7 +388,6 @@ export const PsyFiStrategies: React.FC<{
         setVoteByCouncil={setVoteByCouncil}
       />
 
-      {/* TODO: Add useful pending deposits, current deposits, etc information */}
       <div className="border border-fgd-4 p-4 rounded-md mb-6 mt-4 space-y-1 text-sm">
         <div className="flex justify-between">
           <span className="text-fgd-3">Pending Deposits</span>

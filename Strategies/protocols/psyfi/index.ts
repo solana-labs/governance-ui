@@ -180,10 +180,7 @@ const handleVaultAction: CreatePsyFiStrategy = async (
       instruction: uiInstruction,
     })
     instructions.push(fullPropInstruction)
-
-    console.log('*** prerequisiteInstructions', prerequisiteInstructions)
   }
-  console.log('*** instructions', instructions)
 
   const proposalAddress = await createProposal(
     rpcContext,
@@ -207,9 +204,9 @@ export const convertVaultInfoToStrategy = async (
 ): Promise<PsyFiStrategy | undefined> => {
   let strategyName = ''
   if (vaultInfo.strategyType === Strategy.Call) {
-    strategyName = `Sell Calls`
+    strategyName = vaultInfo.name
   } else if (vaultInfo.strategyType === Strategy.Put) {
-    strategyName = `Sell Puts`
+    strategyName = vaultInfo.name
   }
   const handledMint = vaultInfo.accounts.collateralAssetMint
   const tokenInfo = await tokenService.getTokenInfo(handledMint)

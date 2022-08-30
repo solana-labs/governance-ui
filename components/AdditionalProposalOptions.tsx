@@ -6,16 +6,7 @@ import { LinkButton } from './Button'
 import Input from './inputs/Input'
 import Textarea from './inputs/Textarea'
 
-const AdditionalProposalOptions = ({
-  title,
-  description,
-  setTitle,
-  setDescription,
-  defaultTitle,
-  defaultDescription,
-  voteByCouncil,
-  setVoteByCouncil,
-}: {
+const AdditionalProposalOptions: React.FC<{
   title: string
   description: string
   setTitle: (evt) => void
@@ -24,6 +15,15 @@ const AdditionalProposalOptions = ({
   defaultDescription?: string
   voteByCouncil: boolean
   setVoteByCouncil: (val) => void
+}> = ({
+  title,
+  description,
+  setTitle,
+  setDescription,
+  defaultTitle,
+  defaultDescription,
+  voteByCouncil,
+  setVoteByCouncil,
 }) => {
   const [showOptions, setShowOptions] = useState(false)
   const { canChooseWhoVote } = useRealm()

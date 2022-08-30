@@ -53,7 +53,7 @@ export type PsyFiStrategy = TreasuryStrategy & {
     collateralAccountKey: PublicKey
   }
   vaultInfo: VaultInfo
-  otherStrategies: Array<TreasuryStrategy>
+  otherStrategies: Array<PsyFiStrategy>
 }
 
 export type EverlendStrategy = TreasuryStrategy & {

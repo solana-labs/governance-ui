@@ -36,8 +36,6 @@ const useStrategiesStore = create<StrategiesStore>((set, _get) => ({
         ...psyfi,
       ]
 
-      console.log('*** strategies', strategies)
-
       set((s) => {
         s.strategies = strategies
       })
