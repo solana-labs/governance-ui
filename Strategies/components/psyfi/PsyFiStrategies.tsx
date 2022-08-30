@@ -338,6 +338,16 @@ export const PsyFiStrategies: React.FC<{
           </Select.Option>
         ))}
       </Select>
+      <div className="flex mb-1.5 text-sm">
+        <a
+          className="text-red"
+          href={`https://www.psyfi.io/vaults/${form.strategy.vaultInfo.id}/risk`}
+          target="_blank"
+          rel="noreferrer"
+        >
+          Read about the risks
+        </a>
+      </div>
 
       <div className="flex mb-1.5 text-sm">
         Amount
