@@ -109,6 +109,9 @@ export default function useGovernanceAssets() {
     }
     return toBeFiltered.filter((itx) => itx.isVisible)
   }
+  const governedSPLTokenAccounts = governedTokenAccounts.filter(
+    (x) => x.type === AccountType.TOKEN
+  )
   const governedTokenAccountsWithoutNfts = governedTokenAccounts.filter(
     (x) => x.type !== AccountType.NFT
   )
@@ -167,6 +170,11 @@ export default function useGovernanceAssets() {
     {
       id: Instructions.CreateAssociatedTokenAccount,
       name: 'Create Associated Token Account',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.JoinDAO,
+      name: 'Join a DAO',
       isVisible: canUseAnyInstruction,
     },
     {
@@ -546,6 +554,7 @@ export default function useGovernanceAssets() {
     canUseProgramUpgradeInstruction,
     governedTokenAccountsWithoutNfts,
     governedNativeAccounts,
+    governedSPLTokenAccounts,
     nftsGovernedTokenAccounts,
     canUseAuthorityInstruction,
     assetAccounts,

@@ -9,6 +9,7 @@ import { DepositWithMintAccount, Voter } from 'VoteStakeRegistry/sdk/accounts'
 import { LockupKind } from 'VoteStakeRegistry/tools/types'
 import { consts as foresightConsts } from '@foresight-tmp/foresight-sdk'
 import { AssetAccount, StakeAccount } from '@utils/uiTypes/assets'
+import { RealmInfo } from '@models/registry/api'
 
 export interface UiInstruction {
   serializedInstruction: string
@@ -429,6 +430,13 @@ export interface SerumGrantLockedForm {
   programId: string
 }
 
+export interface JoinDAOForm {
+  governedAccount?: AssetAccount
+  mintInfo: MintInfo | undefined
+  realm: RealmInfo | null
+  amount?: number
+}
+
 export enum Instructions {
   Transfer,
   ProgramUpgrade,
@@ -508,6 +516,7 @@ export enum Instructions {
   SerumGrantLockedMSRM,
   SerumGrantVestSRM,
   SerumGrantVestMSRM,
+  JoinDAO,
 }
 
 export type createParams = [
