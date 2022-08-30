@@ -68,6 +68,12 @@ export default function Buy({ className, asset }: Props) {
     const pubkey = tryParseKey(form.auctionPk)
     const getAuction = async () => {
       const auction = await fetchAuction(connection.current, pubkey!)
+      if (auction.quoteMint.toBase58() !== asset.mintAddress) {
+        notify({
+          type: 'error',
+          message: 'Selected token does not match auction quote token',
+        })
+      }
       setCurrentAuction(auction)
     }
     if (pubkey) {
@@ -288,22 +294,27 @@ export default function Buy({ className, asset }: Props) {
           error={formErrors['price']}
         />
         {currentAuction?.areBidsEncrypted && (
-          <Slider
-            disabled={false}
-            step={toNumberFromFp32(currentAuction.tickSize)}
-            min={Number(form.amount) * Number(form.price)}
-            max={
-              Number(asset.raw.extensions.amount?.toNumber()) /
-              10 ** asset.raw.extensions.mint!.account.decimals
-            }
-            value={form.deposit}
-            onChange={(d) =>
-              handleSetForm({
-                value: Number(d),
-                propertyName: 'deposit',
-              })
-            }
-          />
+          <div className="pb-6 pt-3">
+            <div className="text-xs">
+              Deposit more to hide your actual bid: {form.deposit}
+            </div>
+            <Slider
+              disabled={false}
+              step={toNumberFromFp32(currentAuction.tickSize)}
+              min={Number(form.amount) * Number(form.price)}
+              max={
+                Number(asset.raw.extensions.amount?.toNumber()) /
+                10 ** asset.raw.extensions.mint!.account.decimals
+              }
+              value={form.deposit}
+              onChange={(d) =>
+                handleSetForm({
+                  value: Number(d),
+                  propertyName: 'deposit',
+                })
+              }
+            />
+          </div>
         )}
         <AdditionalProposalOptions
           title={proposalInfo.title}
