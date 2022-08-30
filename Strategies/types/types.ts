@@ -13,6 +13,7 @@ import {
   CreateSolendStrategyParams,
   SolendSubStrategy,
 } from 'Strategies/protocols/solend'
+import { VaultInfo } from 'Strategies/protocols/psyfi/types'
 
 export interface TreasuryStrategy {
   //liquidity in $
@@ -51,6 +52,7 @@ export type PsyFiStrategy = TreasuryStrategy & {
     lpTokenMint: PublicKey
     collateralAccountKey: PublicKey
   }
+  vaultInfo: VaultInfo
   otherStrategies: Array<TreasuryStrategy>
 }
 

@@ -8,7 +8,7 @@ import Tooltip from '@components/Tooltip'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useRealm from '@hooks/useRealm'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import { BN } from '@project-serum/anchor'
+import { AnchorProvider, BN, Program } from '@project-serum/anchor'
 import { RpcContext } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import {
@@ -21,15 +21,18 @@ import { precision } from '@utils/formatting'
 import tokenService from '@utils/services/token'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import BigNumber from 'bignumber.js'
-import { useCallback, useEffect, useState } from 'react'
+import { pdas, PsyFiEuros, PsyFiIdl } from 'psyfi-euros-test'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
 import {
   Action,
   CreatePsyFiStrategy,
+  DepositReceipt,
   PsyFiStrategyInfo,
 } from 'Strategies/protocols/psyfi/types'
 import { PsyFiStrategy } from 'Strategies/types/types'
+import { MAINNET_PROGRAM_KEYS } from './programIds'
 
 type PsyFiStrategyForm = {
   strategy: PsyFiStrategy
@@ -70,6 +73,10 @@ export const PsyFiStrategies: React.FC<{
   const [underlyingDeposited, setUnderlyingDeposited] = useState<
     number | undefined
   >()
+  const [depositReceipt, setDepositReceipt] = useState<
+    DepositReceipt | undefined
+  >()
+  const [depositReceiptPubkey, setDepositReceiptPubkey] = useState<PublicKey>()
   const [isDepositing, setIsDepositing] = useState(false)
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [form, setForm] = useState<PsyFiStrategyForm>({
@@ -82,6 +89,20 @@ export const PsyFiStrategies: React.FC<{
     canUseTransferInstruction,
     governedTokenAccountsWithoutNfts,
   } = useGovernanceAssets()
+
+  // construct the PsyFi program. This could be pulled into a hook
+  const psyFiProgram = useMemo(() => {
+    const anchorProvider = new AnchorProvider(
+      connection.current,
+      wallet as any,
+      {}
+    )
+    return new Program<PsyFiEuros>(
+      PsyFiIdl,
+      MAINNET_PROGRAM_KEYS.PSYFI_V2,
+      anchorProvider
+    )
+  }, [connection.current, wallet])
 
   const tokenInfo = tokenService.getTokenInfo(handledMint)
 
@@ -120,6 +141,31 @@ export const PsyFiStrategies: React.FC<{
       ),
     })
   }, [handleSetForm, mintMinAmount, form.amount, currentPrecision])
+
+  useEffect(() => {
+    ;(async () => {
+      // TODO: Dry this up with the other areas of the code that use the owner
+      const owner = governedTokenAccount.isSol
+        ? governedTokenAccount!.pubkey
+        : governedTokenAccount!.extensions!.token!.account.owner
+      // Derive the deposit receipt address
+      const [address] = await pdas.deriveDepositReceipt(
+        // @ts-ignore: Anchor version difference
+        psyFiProgram,
+        owner,
+        form.strategy.vaultAccounts.pubkey,
+        form.strategy.vaultInfo.status.currentEpoch
+      )
+      setDepositReceiptPubkey(address)
+
+      // @ts-ignore: More anchor type stuff
+      const currentDepositReceipt = ((await psyFiProgram.account.depositReceipt.fetchNullable(
+        address
+      )) as unknown) as DepositReceipt | undefined
+      setDepositReceipt(currentDepositReceipt)
+    })()
+    // TODO: Load the DepositReceipt
+  }, [form.strategy, psyFiProgram])
 
   // Find the owned strategy token account, if one exists
   useEffect(() => {
@@ -186,7 +232,14 @@ export const PsyFiStrategies: React.FC<{
       : !councilMint?.supply.isZero()
       ? realm!.account.config.councilMint
       : undefined
+
+    if (!depositReceiptPubkey) {
+      // This should be unreachable
+      throw new Error('Deposit receipt key must be derived first')
+    }
     const strategyInfo: PsyFiStrategyInfo = {
+      depositReceipt,
+      depositReceiptPubkey,
       ownedStrategyTokenAccount: ownedStrategyTokenAccount,
     }
     createProposalFcn(
@@ -199,6 +252,7 @@ export const PsyFiStrategies: React.FC<{
           governedTokenAccount.extensions.mint!.account.decimals
         ),
       },
+      psyFiProgram,
       strategyInfo,
       realm!,
       governedTokenAccount!,
@@ -215,11 +269,14 @@ export const PsyFiStrategies: React.FC<{
     config,
     connection,
     councilMint,
+    depositReceipt,
+    depositReceiptPubkey,
     form,
     governedTokenAccount,
     mint,
     ownedStrategyTokenAccount,
     ownVoterWeight,
+    psyFiProgram,
     realm,
     realmInfo,
     voteByCouncil,
@@ -309,7 +366,12 @@ export const PsyFiStrategies: React.FC<{
         <div className="flex justify-between">
           <span className="text-fgd-3">Pending Deposits</span>
           <span className="font-bold text-fgd-1">
-            ToDo{' '}
+            {depositReceipt
+              ? getMintDecimalAmountFromNatural(
+                  governedTokenAccount.extensions.mint!.account,
+                  depositReceipt.depositAmount
+                ).toNumber()
+              : 0}{' '}
             <span className="font-normal text-fgd-3">{tokenInfo?.symbol}</span>
           </span>
         </div>

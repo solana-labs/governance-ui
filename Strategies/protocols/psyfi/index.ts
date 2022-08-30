@@ -15,15 +15,26 @@ import {
   ProgramAccount,
   Realm,
   RpcContext,
+  serializeInstructionToBase64,
   TokenOwnerRecord,
 } from '@solana/spl-governance'
-import { BN } from '@project-serum/anchor'
+import { BN, Program } from '@project-serum/anchor'
 import { AssetAccount } from '@utils/uiTypes/assets'
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
-import { createProposal } from 'actions/createProposal'
+import {
+  createProposal,
+  InstructionDataWithHoldUpTime,
+} from 'actions/createProposal'
 import { deriveVaultCollateralAccount } from 'Strategies/components/psyfi/pdas'
 import { MAINNET_PROGRAM_KEYS } from 'Strategies/components/psyfi/programIds'
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  Token,
+  TOKEN_PROGRAM_ID,
+} from '@solana/spl-token'
+import { instructions as psyFiInstructions, PsyFiEuros } from 'psyfi-euros-test'
+import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
 export const getVaultInfos = async (): Promise<VaultInfo[]> => {
   const res = await axios.get(
@@ -43,9 +54,10 @@ const handleVaultAction: CreatePsyFiStrategy = async (
     bnAmount: BN
     amountFmt: string
   },
+  psyFiProgram: Program<PsyFiEuros>,
   psyFiStrategyInfo: PsyFiStrategyInfo,
   realm: ProgramAccount<Realm>,
-  matchedTreasury: AssetAccount,
+  treasuryAssetAccount: AssetAccount,
   tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>,
   governingTokenMint: PublicKey,
   proposalIndex: number,
@@ -59,7 +71,7 @@ const handleVaultAction: CreatePsyFiStrategy = async (
     rpcContext,
     form,
     realm,
-    matchedTreasury,
+    treasuryAssetAccount,
     tokenOwnerRecord,
     governingTokenMint,
     proposalIndex,
@@ -67,24 +79,107 @@ const handleVaultAction: CreatePsyFiStrategy = async (
     connection,
     client
   )
+  const owner = treasuryAssetAccount.isSol
+    ? treasuryAssetAccount!.pubkey
+    : treasuryAssetAccount!.extensions!.token!.account.owner
+  const transferAddress = treasuryAssetAccount.extensions.transferAddress!
+
   // TODO: Handle native SOL deposits
 
-  // TODO: Check if vault token account exists (this should already be passed in if current deposits must be known). Create prerequisiteInstructions if not.
+  const instructions: InstructionDataWithHoldUpTime[] = []
 
-  // TODO: Anything needed for pending deposit receipt??
+  if (form.action === Action.Deposit) {
+    let vaultOwnershipAccount: PublicKey | undefined =
+      psyFiStrategyInfo.ownedStrategyTokenAccount?.pubkey
+    const prerequisiteInstructions: TransactionInstruction[] = []
+    let coreDepositInstruction: TransactionInstruction
+    // If the lp token account does not exist, add it to the pre-requisite instructions
+    if (!vaultOwnershipAccount) {
+      const address = await Token.getAssociatedTokenAddress(
+        ASSOCIATED_TOKEN_PROGRAM_ID,
+        TOKEN_PROGRAM_ID,
+        form.strategy.vaultAccounts.lpTokenMint,
+        owner,
+        true
+      )
+      const createAtaIx = Token.createAssociatedTokenAccountInstruction(
+        ASSOCIATED_TOKEN_PROGRAM_ID,
+        TOKEN_PROGRAM_ID,
+        form.strategy.vaultAccounts.lpTokenMint,
+        address,
+        owner,
+        rpcContext.walletPubkey
+      )
+      prerequisiteInstructions.push(createAtaIx)
+      vaultOwnershipAccount = address
+    }
 
-  // TODO: Create the actual deposit instruction
+    // Check if the vault requires a deposit receipt
+    if (form.strategy.vaultInfo.status.optionsActive) {
+      if (!psyFiStrategyInfo.depositReceipt) {
+        // Add init deposit receipt instruction
+        const initReceiptIx = await psyFiInstructions.initializeDepositReceiptInstruction(
+          // @ts-ignore: Anchor version differences.
+          psyFiProgram,
+          form.strategy.vaultInfo.status.currentEpoch,
+          owner,
+          form.strategy.vaultAccounts.pubkey
+        )
+        prerequisiteInstructions.push(initReceiptIx)
+      }
+
+      // Create transfer to deposit receipt instruction
+      coreDepositInstruction = await psyFiInstructions.transferToDepositReceiptInstruction(
+        // @ts-ignore: Anchor version differences.
+        psyFiProgram,
+        form.bnAmount,
+        form.strategy.vaultInfo.status.currentEpoch,
+        owner,
+        form.strategy.vaultAccounts.pubkey,
+        transferAddress
+      )
+    } else {
+      // Create the actual deposit instruction
+      coreDepositInstruction = await psyFiInstructions.depositInstruction(
+        // @ts-ignore: Anchor version differences.
+        psyFiProgram,
+        form.bnAmount,
+        owner,
+        form.strategy.vaultAccounts.pubkey,
+        // TODO: !! REVIEW !! is this the correct address???
+        transferAddress,
+        vaultOwnershipAccount
+      )
+    }
+    // Create the InstructionDataWithHoldUpTime
+    const uiInstruction: UiInstruction = {
+      governance: treasuryAssetAccount.governance,
+      serializedInstruction: serializeInstructionToBase64(
+        coreDepositInstruction
+      ),
+      prerequisiteInstructions,
+      chunkSplitByDefault: true,
+      isValid: true,
+    }
+    const fullPropInstruction = new InstructionDataWithHoldUpTime({
+      instruction: uiInstruction,
+    })
+    instructions.push(fullPropInstruction)
+
+    console.log('*** prerequisiteInstructions', prerequisiteInstructions)
+  }
+  console.log('*** instructions', instructions)
 
   const proposalAddress = await createProposal(
     rpcContext,
     realm,
-    matchedTreasury.governance!.pubkey,
+    treasuryAssetAccount.governance!.pubkey,
     tokenOwnerRecord,
     form.title,
     form.description,
     governingTokenMint,
     proposalIndex,
-    [],
+    instructions,
     isDraft,
     client
   )
@@ -128,6 +223,7 @@ export const convertVaultInfoToStrategy = async (
     isGenericItem: false,
     createProposalFcn: handleVaultAction,
     otherStrategies: otherStrategies ?? [],
+    vaultInfo: vaultInfo,
     vaultAccounts: {
       pubkey: vaultPubkey,
       lpTokenMint: new PublicKey(vaultInfo.accounts.vaultOwnershipTokenMint),

@@ -1,4 +1,4 @@
-import { BN } from '@project-serum/anchor'
+import { BN, Program } from '@project-serum/anchor'
 import {
   ProgramAccount,
   Realm,
@@ -9,6 +9,7 @@ import { PublicKey } from '@solana/web3.js'
 import { ConnectionContext } from '@utils/connection'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
+import { PsyFiEuros } from 'psyfi-euros-test'
 import { PsyFiStrategy } from 'Strategies/types/types'
 
 export type CreatePsyFiStrategy = (
@@ -20,6 +21,7 @@ export type CreatePsyFiStrategy = (
     bnAmount: BN
     strategy: PsyFiStrategy
   },
+  psyFiProgram: Program<PsyFiEuros>,
   psyFiStrategyInfo: PsyFiStrategyInfo,
   realm: ProgramAccount<Realm>,
   treasuaryAccount: AssetAccount,
@@ -32,7 +34,20 @@ export type CreatePsyFiStrategy = (
 ) => Promise<PublicKey>
 
 export type PsyFiStrategyInfo = {
+  depositReceipt: DepositReceipt | undefined
+  depositReceiptPubkey: PublicKey
   ownedStrategyTokenAccount: AssetAccount | undefined
+}
+
+export type DepositReceipt = {
+  vaultAccount: PublicKey
+  epochHistory: PublicKey
+  receiptOwner: PublicKey // Owner of funds deposited.
+  depositAmount: BN // In collateral asset
+  bump: number
+  lockupPeriod: number // Lockup period if vault tokens are staked.
+  forStaking: boolean // If vault tokens should be staked.
+  stakingRecord: PublicKey // Destination of vault tokens, if staking.
 }
 
 export enum Strategy {
