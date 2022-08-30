@@ -187,10 +187,13 @@ export const STREAMFLOW_INSTRUCTIONS = {
               <div>
                 <div>
                   <span>Start:</span>
-                  <span>
-                    {' '}
-                    {new Date(streamData.start * 1000).toISOString()} UTC
-                  </span>
+                  {streamData.start == 0 && ' On approval '}
+                  {streamData.start > 0 && (
+                    <span>
+                      {' '}
+                      {new Date(streamData.start * 1000).toISOString()} UTC
+                    </span>
+                  )}
                 </div>
 
                 <div>

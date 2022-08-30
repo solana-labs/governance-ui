@@ -143,7 +143,6 @@ export interface CreateStreamForm {
   tokenAccount?: AssetAccount
   start: string
   depositedAmount: number
-  releaseFrequency: number
   releaseAmount: number
   amountAtCliff: number
   cancelable: boolean
