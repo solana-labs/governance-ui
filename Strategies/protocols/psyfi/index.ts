@@ -125,7 +125,20 @@ const handleVaultAction: CreatePsyFiStrategy = async (
           owner,
           form.strategy.vaultAccounts.pubkey
         )
-        prerequisiteInstructions.push(initReceiptIx)
+        const uiInstruction: UiInstruction = {
+          governance: treasuryAssetAccount.governance,
+          serializedInstruction: serializeInstructionToBase64(initReceiptIx),
+          prerequisiteInstructions: [],
+          chunkSplitByDefault: true,
+          isValid: true,
+          customHoldUpTime:
+            treasuryAssetAccount.governance.account.config
+              .minInstructionHoldUpTime,
+        }
+        const initReceiptFullPropIx = new InstructionDataWithHoldUpTime({
+          instruction: uiInstruction,
+        })
+        instructions.push(initReceiptFullPropIx)
       }
 
       // Create transfer to deposit receipt instruction
@@ -160,6 +173,8 @@ const handleVaultAction: CreatePsyFiStrategy = async (
       prerequisiteInstructions,
       chunkSplitByDefault: true,
       isValid: true,
+      customHoldUpTime:
+        treasuryAssetAccount.governance.account.config.minInstructionHoldUpTime,
     }
     const fullPropInstruction = new InstructionDataWithHoldUpTime({
       instruction: uiInstruction,
