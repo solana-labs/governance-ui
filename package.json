@@ -47,6 +47,7 @@
     "@next/bundle-analyzer": "^12.1.5",
     "@nfteyez/sol-rayz": "^0.10.2",
     "@nivo/bar": "^0.79.1",
+    "numbro": "^2.3.6",
     "@nivo/core": "^0.79.0",
     "@notifi-network/notifi-react-hooks": "0.18.2",
     "@project-serum/anchor": "^0.24.2",
