@@ -61,13 +61,13 @@ export const PERIOD = {
 }
 
 const releaseFrequencyUnits = {
-  0: { idx: 0, display: 'seconds', value: PERIOD.SECOND },
-  1: { idx: 1, display: 'minutes', value: PERIOD.MINUTE },
-  2: { idx: 2, display: 'hours', value: PERIOD.HOUR },
-  3: { idx: 3, display: 'days', value: PERIOD.DAY },
-  4: { idx: 4, display: 'weeks', value: PERIOD.WEEK },
-  5: { idx: 5, display: 'months', value: PERIOD.MONTH },
-  6: { idx: 6, display: 'years', value: PERIOD.YEAR },
+  0: { idx: 0, display: 'second', value: PERIOD.SECOND },
+  1: { idx: 1, display: 'minute', value: PERIOD.MINUTE },
+  2: { idx: 2, display: 'hour', value: PERIOD.HOUR },
+  3: { idx: 3, display: 'day', value: PERIOD.DAY },
+  4: { idx: 4, display: 'week', value: PERIOD.WEEK },
+  5: { idx: 5, display: 'month', value: PERIOD.MONTH },
+  6: { idx: 6, display: 'year', value: PERIOD.YEAR },
 }
 
 async function ata(mint: PublicKey, account: PublicKey) {
@@ -119,11 +119,11 @@ const CreateStream = ({
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = strmProgram
   const [releaseUnitIdx, setReleaseUnitIdx] = useState<number>(0)
+  const [startOnApproval, setStartOnApproval] = useState<boolean>(true)
   const [form, setForm] = useState<CreateStreamForm>({
     recipient: '',
-    start: '',
+    start: new Date().toISOString(),
     depositedAmount: 0,
-    releaseFrequency: 60,
     releaseAmount: 0,
     amountAtCliff: 0,
     cancelable: false,
@@ -164,14 +164,6 @@ const CreateStream = ({
     handleSetForm({
       value,
       propertyName: 'cancelable',
-    })
-  }
-
-  const setReleaseFrequency = (event) => {
-    const value = event.target.value
-    handleSetForm({
-      value: value,
-      propertyName: 'releaseFrequency',
     })
   }
 
@@ -223,7 +215,10 @@ const CreateStream = ({
     const senderAccount = form.tokenAccount.extensions.token.account.owner
     const partnerPublicKey = senderAccount
     const partnerTokens = await ata(tokenMint, partnerPublicKey)
-    const start = Math.floor(Date.parse(form.start) / 1000)
+    let start
+    if (!startOnApproval) {
+      start = new u64(Math.floor(Date.parse(form.start) / 1000))
+    } else [(start = new u64(0))]
     const strmMetadata = Keypair.generate()
 
     const [escrowTokens] = await PublicKey.findProgramAddress(
@@ -272,13 +267,12 @@ const CreateStream = ({
     )
 
     const tokenAccount = form.tokenAccount.pubkey
-    const period =
-      form.releaseFrequency * releaseFrequencyUnits[releaseUnitIdx].value
+    const period = releaseFrequencyUnits[releaseUnitIdx].value
     const createStreamData = {
-      start: new u64(start),
+      start,
       depositedAmount: new u64(form.depositedAmount * 10 ** decimals),
       period: new u64(period),
-      cliff: new u64(start),
+      cliff: start,
       cliffAmount: new u64(form.amountAtCliff * 10 ** decimals),
       amountPerPeriod: new u64(form.releaseAmount * 10 ** decimals),
       name: 'SPL Realms proposal',
@@ -347,7 +341,7 @@ const CreateStream = ({
     amountAtCliff: yup
       .number()
       .nullable()
-      .moreThan(0, 'Amount released at start must be positive number')
+      .min(0, 'Amount released at start must be positive number')
       .lessThan(
         yup.ref('depositedAmount'),
         'Amount released at start must be less than total amount'
@@ -382,13 +376,17 @@ const CreateStream = ({
         type="string"
         onChange={setRecipient}
       />
-      <Input
-        label="Start"
-        value={form.start}
-        error={formErrors['start']}
-        type="datetime-local"
-        onChange={setStart}
-      />
+      <StyledLabel>Start stream on approval?</StyledLabel>
+      <Switch checked={startOnApproval} onChange={setStartOnApproval}></Switch>
+      {!startOnApproval && (
+        <Input
+          label="Start date"
+          value={form.start}
+          error={formErrors['start']}
+          type="datetime-local"
+          onChange={setStart}
+        />
+      )}
       <div
         style={{
           display: 'flex',
@@ -400,7 +398,7 @@ const CreateStream = ({
       >
         <div style={{ width: '45%' }}>
           <Input
-            label="Amount"
+            label="Total amount"
             value={form.depositedAmount}
             error={formErrors['amount']}
             type="number"
@@ -418,7 +416,7 @@ const CreateStream = ({
         </div>
       </div>
       <Input
-        label="Release amount"
+        label="Amount per release"
         value={form.releaseAmount}
         error={formErrors['releaseAmount']}
         type="number"
@@ -433,15 +431,6 @@ const CreateStream = ({
           alignItems: 'end',
         }}
       >
-        <div style={{ width: '45%' }}>
-          <Input
-            label="Release frequency"
-            value={form.releaseFrequency}
-            error={formErrors['releaseFrequency']}
-            type="number"
-            onChange={setReleaseFrequency}
-          />
-        </div>
         <div style={{ width: '45%' }}>
           <Select
             label={'Release unit'}
@@ -468,7 +457,7 @@ const CreateStream = ({
           marginTop: '18px',
         }}
       ></div>
-      <StyledLabel>Is contract cancelable?</StyledLabel>
+      <StyledLabel>Can contract be cancelled?</StyledLabel>
       <Switch checked={form.cancelable} onChange={setCancelable}></Switch>
       <div
         style={{
@@ -478,8 +467,8 @@ const CreateStream = ({
         }}
       >
         Vesting contracts have Automatic Withdrawal enabled which is funded by
-        contract creator. That adds additional transaction fees on creation:
-        5000 lamports per release cycle. Additionally, Streamflow by default
+        contract creator. That adds additional transaction fees on creation
+        (5000 lamports per release cycle). Additionally, Streamflow by default
         charges a service fee of 0.25% in tokens being vested.
       </div>
       <div
