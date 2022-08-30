@@ -105,6 +105,7 @@ import PerpEdit from './components/instructions/Mango/MangoV4/PerpEdit'
 import Serum3RegisterMarket from './components/instructions/Mango/MangoV4/Serum3RegisterMarket'
 import PerpCreate from './components/instructions/Mango/MangoV4/PerpCreate'
 import TokenRegisterTrustless from './components/instructions/Mango/MangoV4/TokenRegisterTrustless'
+import TransferDomainName from './components/instructions/TransferDomainName'
 import DepositForm from './components/instructions/Everlend/DepositForm'
 import WithdrawForm from './components/instructions/Everlend/WithdrawForm'
 import MakeChangeReferralFeeParams2 from './components/instructions/Mango/MakeChangeReferralFeeParams2'
@@ -713,10 +714,13 @@ const New = () => {
         return <CreateTokenMetadata index={idx} governance={governance} />
       case Instructions.UpdateTokenMetadata:
         return <UpdateTokenMetadata index={idx} governance={governance} />
+      case Instructions.TransferDomainName:
+        return <TransferDomainName index={idx} governance={governance}></TransferDomainName>
       case Instructions.EverlendDeposit:
         return <DepositForm index={idx} governance={governance} />
       case Instructions.EverlendWithdraw:
         return <WithdrawForm index={idx} governance={governance} />
+
       default:
         null
     }
