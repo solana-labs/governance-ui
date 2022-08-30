@@ -120,7 +120,7 @@ const EverlendDeposit = ({
           description: proposalInfo.description,
           amountFmt: String(amount),
           bnAmount: getMintNaturalAmountFromDecimalAsBN(
-            amount as number,
+            amount,
             governedTokenAccount.extensions.mint!.account.decimals
           ),
           action: 'Deposit',
