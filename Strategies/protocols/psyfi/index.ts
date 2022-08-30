@@ -5,6 +5,7 @@ import axios from 'axios'
 import {
   Action,
   CreatePsyFiStrategy,
+  PsyFiActionForm,
   PsyFiStrategyInfo,
   Strategy,
   TokenGroupedVaults,
@@ -15,12 +16,11 @@ import {
   ProgramAccount,
   Realm,
   RpcContext,
-  serializeInstructionToBase64,
   TokenOwnerRecord,
 } from '@solana/spl-governance'
-import { BN, Program } from '@project-serum/anchor'
+import { Program } from '@project-serum/anchor'
 import { AssetAccount } from '@utils/uiTypes/assets'
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
 import {
   createProposal,
@@ -28,13 +28,9 @@ import {
 } from 'actions/createProposal'
 import { deriveVaultCollateralAccount } from 'Strategies/components/psyfi/pdas'
 import { MAINNET_PROGRAM_KEYS } from 'Strategies/components/psyfi/programIds'
-import {
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  Token,
-  TOKEN_PROGRAM_ID,
-} from '@solana/spl-token'
-import { instructions as psyFiInstructions, PsyFiEuros } from 'psyfi-euros-test'
-import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
+
+import { PsyFiEuros } from 'psyfi-euros-test'
+import { deposit } from './actions/deposit'
 
 export const getVaultInfos = async (): Promise<VaultInfo[]> => {
   const res = await axios.get(
@@ -46,14 +42,7 @@ export const getVaultInfos = async (): Promise<VaultInfo[]> => {
 
 const handleVaultAction: CreatePsyFiStrategy = async (
   rpcContext: RpcContext,
-  form: {
-    action: Action
-    strategy: PsyFiStrategy
-    title: string
-    description: string
-    bnAmount: BN
-    amountFmt: string
-  },
+  form: PsyFiActionForm,
   psyFiProgram: Program<PsyFiEuros>,
   psyFiStrategyInfo: PsyFiStrategyInfo,
   realm: ProgramAccount<Realm>,
@@ -65,122 +54,26 @@ const handleVaultAction: CreatePsyFiStrategy = async (
   connection: ConnectionContext,
   client?: VotingClient
 ) => {
-  console.log(
-    'args',
-    psyFiStrategyInfo,
-    rpcContext,
-    form,
-    realm,
-    treasuryAssetAccount,
-    tokenOwnerRecord,
-    governingTokenMint,
-    proposalIndex,
-    isDraft,
-    connection,
-    client
-  )
   const owner = treasuryAssetAccount.isSol
     ? treasuryAssetAccount!.pubkey
     : treasuryAssetAccount!.extensions!.token!.account.owner
   const transferAddress = treasuryAssetAccount.extensions.transferAddress!
 
-  // TODO: Handle native SOL deposits
-
-  const instructions: InstructionDataWithHoldUpTime[] = []
+  let instructions: InstructionDataWithHoldUpTime[] = []
 
   if (form.action === Action.Deposit) {
-    let vaultOwnershipAccount: PublicKey | undefined =
-      psyFiStrategyInfo.ownedStrategyTokenAccount?.pubkey
-    const prerequisiteInstructions: TransactionInstruction[] = []
-    let coreDepositInstruction: TransactionInstruction
-    // If the lp token account does not exist, add it to the pre-requisite instructions
-    if (!vaultOwnershipAccount) {
-      const address = await Token.getAssociatedTokenAddress(
-        ASSOCIATED_TOKEN_PROGRAM_ID,
-        TOKEN_PROGRAM_ID,
-        form.strategy.vaultAccounts.lpTokenMint,
-        owner,
-        true
-      )
-      const createAtaIx = Token.createAssociatedTokenAccountInstruction(
-        ASSOCIATED_TOKEN_PROGRAM_ID,
-        TOKEN_PROGRAM_ID,
-        form.strategy.vaultAccounts.lpTokenMint,
-        address,
-        owner,
-        rpcContext.walletPubkey
-      )
-      prerequisiteInstructions.push(createAtaIx)
-      vaultOwnershipAccount = address
-    }
-
-    // Check if the vault requires a deposit receipt
-    if (form.strategy.vaultInfo.status.optionsActive) {
-      if (!psyFiStrategyInfo.depositReceipt) {
-        // Add init deposit receipt instruction
-        const initReceiptIx = await psyFiInstructions.initializeDepositReceiptInstruction(
-          // @ts-ignore: Anchor version differences.
-          psyFiProgram,
-          form.strategy.vaultInfo.status.currentEpoch,
-          owner,
-          form.strategy.vaultAccounts.pubkey
-        )
-        const uiInstruction: UiInstruction = {
-          governance: treasuryAssetAccount.governance,
-          serializedInstruction: serializeInstructionToBase64(initReceiptIx),
-          prerequisiteInstructions: [],
-          chunkSplitByDefault: true,
-          isValid: true,
-          customHoldUpTime:
-            treasuryAssetAccount.governance.account.config
-              .minInstructionHoldUpTime,
-        }
-        const initReceiptFullPropIx = new InstructionDataWithHoldUpTime({
-          instruction: uiInstruction,
-        })
-        instructions.push(initReceiptFullPropIx)
-      }
-
-      // Create transfer to deposit receipt instruction
-      coreDepositInstruction = await psyFiInstructions.transferToDepositReceiptInstruction(
-        // @ts-ignore: Anchor version differences.
-        psyFiProgram,
-        form.bnAmount,
-        form.strategy.vaultInfo.status.currentEpoch,
-        owner,
-        form.strategy.vaultAccounts.pubkey,
-        transferAddress
-      )
-    } else {
-      // Create the actual deposit instruction
-      coreDepositInstruction = await psyFiInstructions.depositInstruction(
-        // @ts-ignore: Anchor version differences.
-        psyFiProgram,
-        form.bnAmount,
-        owner,
-        form.strategy.vaultAccounts.pubkey,
-        // TODO: !! REVIEW !! is this the correct address???
-        transferAddress,
-        vaultOwnershipAccount
-      )
-    }
-    // Create the InstructionDataWithHoldUpTime
-    const uiInstruction: UiInstruction = {
-      governance: treasuryAssetAccount.governance,
-      serializedInstruction: serializeInstructionToBase64(
-        coreDepositInstruction
-      ),
-      prerequisiteInstructions,
-      chunkSplitByDefault: true,
-      isValid: true,
-      customHoldUpTime:
-        treasuryAssetAccount.governance.account.config.minInstructionHoldUpTime,
-    }
-    const fullPropInstruction = new InstructionDataWithHoldUpTime({
-      instruction: uiInstruction,
-    })
-    instructions.push(fullPropInstruction)
+    instructions = await deposit(
+      rpcContext,
+      treasuryAssetAccount,
+      psyFiProgram,
+      psyFiStrategyInfo,
+      form,
+      owner,
+      transferAddress
+    )
   }
+
+  console.log('*** instructions', instructions)
 
   const proposalAddress = await createProposal(
     rpcContext,

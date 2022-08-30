@@ -12,6 +12,18 @@ import { VotingClient } from '@utils/uiTypes/VotePlugin'
 import { PsyFiEuros } from 'psyfi-euros-test'
 import { PsyFiStrategy } from 'Strategies/types/types'
 
+export type PsyFiStrategyForm = {
+  strategy: PsyFiStrategy
+  title: string
+  description: string
+  amount?: number
+}
+
+export type PsyFiActionForm = PsyFiStrategyForm & {
+  action: Action
+  bnAmount: BN
+}
+
 export type CreatePsyFiStrategy = (
   rpcContext: RpcContext,
   form: {
