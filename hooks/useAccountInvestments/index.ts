@@ -60,7 +60,7 @@ export function useAccountInvestments(args: Args) {
     args.asset.type === AssetType.Sol
       ? new PublicKey(tokenAddress)
       : // @ts-ignore
-        args.asset!.raw?.extensions?.token!.account!.owner
+        args.asset?.raw?.extensions?.token?.account?.owner
 
   const strategyMintAddress =
     args.asset.type === AssetType.Sol ? WSOL_MINT : args.asset.mintAddress
