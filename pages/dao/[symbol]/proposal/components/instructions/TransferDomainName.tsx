@@ -122,7 +122,7 @@ const TransferDomainName = ({
     <>
       <GovernedAccountSelect
         label="Governance"
-        governedAccounts={[governedAccount]}
+        governedAccounts={assetAccounts.filter((acc) => acc.isSol)}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedAccount' })
         }}
