@@ -43,6 +43,10 @@ export const PROGRAM_NAMES = {
   VotEn9AWwTFtJPJSMV5F9jsMY6QwWM5qn3XP9PATGW7:
     'PsyDO Voter Stake Registry Program',
   [foresightConsts.PROGRAM_ID]: 'Foresight Dex',
+  AwyKDr1Z5BfdvK3jX1UWopyjsJSV5cq4cuJpoYLofyEn: 'Validator Dao',
+  Stake11111111111111111111111111111111111111: 'Stake Program',
+  StakeConfig11111111111111111111111111111111: 'Stake Config',
+  SysvarStakeHistory1111111111111111111111111: 'Sysvar: Stake History',
   ...GOVERNANCE_PROGRAM_NAMES,
 }
 
