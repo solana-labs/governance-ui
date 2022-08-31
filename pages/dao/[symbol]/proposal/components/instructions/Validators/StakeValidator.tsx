@@ -23,10 +23,7 @@ import GovernedAccountSelect from '../../GovernedAccountSelect'
 import * as anchor from '@project-serum/anchor'
 import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
 import useRealm from '@hooks/useRealm'
-
-const SOLANA_VALIDATOR_DAO_PROGRAM_ID = new PublicKey(
-  'AwyKDr1Z5BfdvK3jX1UWopyjsJSV5cq4cuJpoYLofyEn'
-)
+import { SOLANA_VALIDATOR_DAO_PROGRAM_ID } from '@components/instructions/programs/validatordao'
 
 const StakeValidator = ({
   index,
@@ -177,10 +174,10 @@ const StakeValidator = ({
       SOLANA_VALIDATOR_DAO_PROGRAM_ID
     )
 
-    const mintAmount = parseMintNaturalAmountFromDecimal(form.amount!, 9)
+    const stakeAmount = parseMintNaturalAmountFromDecimal(form.amount!, 9)
 
     const instruction = await program.methods
-      .stake(form.seed, new anchor.BN(mintAmount))
+      .stake(form.seed, new anchor.BN(stakeAmount))
       .accounts({
         governanceId: governancePk,
         governanceNativeTreasuryAccount: nativeTreasury,

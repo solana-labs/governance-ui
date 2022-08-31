@@ -7,7 +7,7 @@ import {
   SYSVAR_RENT_PUBKEY,
   Transaction,
 } from '@solana/web3.js'
-import { CONFIG_MAINNET as CONFIG, REWARD_PROGRAM_ID } from './constants'
+import { REWARD_PROGRAM_ID } from './constants'
 import { ConnectionContext } from '@utils/connection'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 
@@ -17,7 +17,8 @@ const getInitMiningTx = async (
   walletPubKey: PublicKey,
   owner: PublicKey,
   connection: ConnectionContext,
-  wallet: SignerWalletAdapter
+  wallet: SignerWalletAdapter,
+  CONFIG: PublicKey
 ): Promise<Transaction> => {
   const provider = new anchor.AnchorProvider(
     connection.current,
@@ -41,7 +42,7 @@ const getInitMiningTx = async (
         rewardPool,
         mining: rewardAccount,
         user: owner,
-        payer: walletPubKey,
+        payer: owner,
         systemProgram: SystemProgram.programId,
         rent: SYSVAR_RENT_PUBKEY,
       },
