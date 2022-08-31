@@ -22,14 +22,8 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import * as anchor from '@project-serum/anchor'
 import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
-
-const SOLANA_VALIDATOR_DAO_PROGRAM_ID = new PublicKey(
-  'AwyKDr1Z5BfdvK3jX1UWopyjsJSV5cq4cuJpoYLofyEn'
-)
-//const SOLANA_VALIDATOR_DAO_IDL_ID = new PublicKey('GnhBKwcWcqUwSLoheNKQLvdu6v3fFR9mUaQnw6Ci8jmP')
-const GOVERNANCE_PROGRAM_ID = new PublicKey(
-  'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
-)
+import useRealm from '@hooks/useRealm'
+import { SOLANA_VALIDATOR_DAO_PROGRAM_ID } from '@components/instructions/programs/validatordao'
 
 const StakeValidator = ({
   index,
@@ -110,6 +104,8 @@ const StakeValidator = ({
     return isValid
   }
 
+  const { realmInfo } = useRealm()
+
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
     const governancePk = governance?.pubkey
@@ -130,7 +126,8 @@ const StakeValidator = ({
       !governancePk ||
       !form.governedTokenAccount?.isSol ||
       !wallet ||
-      !wallet.publicKey
+      !wallet.publicKey ||
+      !realmInfo
     ) {
       return returnInvalid()
     }
@@ -161,23 +158,26 @@ const StakeValidator = ({
       provider
     )
     const validatorVotePK = new PublicKey(form.validatorVoteKey)
+    const governanceProgramId = realmInfo.programId
+
+    console.log('program id : ' + governanceProgramId)
 
     const [daoStakeAccount] = await web3.PublicKey.findProgramAddress(
       [
         Buffer.from('validator_dao_stake_account'),
         governancePk.toBuffer(),
         nativeTreasury.toBuffer(),
-        GOVERNANCE_PROGRAM_ID.toBuffer(),
+        governanceProgramId.toBuffer(),
         validatorVotePK.toBuffer(),
         seedBuffer,
       ],
       SOLANA_VALIDATOR_DAO_PROGRAM_ID
     )
 
-    const mintAmount = parseMintNaturalAmountFromDecimal(form.amount!, 9)
+    const stakeAmount = parseMintNaturalAmountFromDecimal(form.amount!, 9)
 
     const instruction = await program.methods
-      .stake(form.seed, new anchor.BN(mintAmount))
+      .stake(form.seed, new anchor.BN(stakeAmount))
       .accounts({
         governanceId: governancePk,
         governanceNativeTreasuryAccount: nativeTreasury,
@@ -187,7 +187,7 @@ const StakeValidator = ({
         stakeConfig: web3.STAKE_CONFIG_ID,
         stakeHistory: web3.SYSVAR_STAKE_HISTORY_PUBKEY,
         validatorVoteKey: validatorVotePK,
-        governanceProgram: GOVERNANCE_PROGRAM_ID,
+        governanceProgram: governanceProgramId,
         stakeProgram: web3.StakeProgram.programId,
         systemProgram: web3.SystemProgram.programId,
         rentProgram: web3.SYSVAR_RENT_PUBKEY,

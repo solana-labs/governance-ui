@@ -28,6 +28,7 @@ export const withCreateNewDeposit = async ({
   communityMintPk,
   realmPk,
   programId,
+  programVersion,
   tokenOwnerRecordPk,
   lockUpPeriodInDays,
   lockupKind,
@@ -40,6 +41,7 @@ export const withCreateNewDeposit = async ({
   communityMintPk: PublicKey
   realmPk: PublicKey
   programId: PublicKey
+  programVersion: number
   tokenOwnerRecordPk: PublicKey | null
   lockUpPeriodInDays: number
   lockupKind: LockupType
@@ -83,6 +85,7 @@ export const withCreateNewDeposit = async ({
     tokenOwnerRecordPubKey = await withCreateTokenOwnerRecord(
       instructions,
       programId,
+      programVersion,
       realmPk,
       walletPk,
       mintPk,

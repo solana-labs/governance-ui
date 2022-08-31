@@ -56,6 +56,12 @@ export function useAccountInvestments(args: Args) {
   const tokenAmount = args.asset.count
   const governanceAddress = args.governanceAddress
 
+  const owner =
+    args.asset.type === AssetType.Sol
+      ? new PublicKey(tokenAddress)
+      : // @ts-ignore
+        args.asset?.raw?.extensions?.token?.account?.owner
+
   const strategyMintAddress =
     args.asset.type === AssetType.Sol ? WSOL_MINT : args.asset.mintAddress
 
@@ -105,6 +111,7 @@ export function useAccountInvestments(args: Args) {
             (x) => x.protocolName === SOLEND
           ).length,
           mangoAccounts: mangoAccounts || [],
+          owner,
         })
           .then((activeInvestments) => {
             const result = {

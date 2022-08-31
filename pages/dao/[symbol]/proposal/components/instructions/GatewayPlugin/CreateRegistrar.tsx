@@ -48,9 +48,10 @@ const CreateGatewayPluginRegistrar = ({
   const { handleSetInstructions } = useContext(NewProposalContext)
 
   const chosenGatekeeperNetwork = useMemo(() => {
-    const chosenEntry = form?.otherGatekeeperNetwork || form?.gatekeeperNetwork
-    if (chosenEntry) {
-      return new PublicKey(chosenEntry.value)
+    const chosenEntry =
+      form?.otherGatekeeperNetwork || form?.gatekeeperNetwork?.value
+    if (chosenEntry && chosenEntry !== '') {
+      return new PublicKey(chosenEntry)
     }
   }, [form])
 

@@ -143,7 +143,6 @@ export interface CreateStreamForm {
   tokenAccount?: AssetAccount
   start: string
   depositedAmount: number
-  releaseFrequency: number
   releaseAmount: number
   amountAtCliff: number
   cancelable: boolean
@@ -311,6 +310,7 @@ export interface MangoMakeChangeReferralFeeParams2 {
   refMngoRequired: number
   refSurchargeCentibps2: number
   refShareCentibps2: number
+  refMngoRequired2: number
 }
 
 export interface ForesightHasGovernedAccount {

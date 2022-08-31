@@ -46,6 +46,7 @@ export default async function depositTokensVSR({
     fromPk: realmTokenAccount.publicKey,
     mintPk: realm.account.communityMint,
     programId: realm.owner,
+    programVersion: realmInfo.programVersion!,
     realmPk: realm.pubkey,
   })
 }

@@ -9,6 +9,7 @@ import { formatPercentage } from '@utils/formatPercentage'
 import { VoterDisplayData, VoteType } from '@models/proposal'
 import { abbreviateAddress } from '@utils/formatting'
 import { getExplorerUrl } from '@components/explorer/tools'
+import { ProfilePopup } from '@components/Profile'
 
 const ROW_STYLES =
   'absolute top-0 bottom-0 text-ellipsis overflow-hidden leading-[35px] px-2'
@@ -197,9 +198,12 @@ export default function ProposalTopVotersList(props: Props) {
                       className={classNames(
                         COL_1_STYLES,
                         'opacity-80',
-                        'text-sm'
+                        'text-sm',
+                        'inline-flex',
+                        'items-center'
                       )}
                     >
+                      <ProfilePopup publicKey={rowData.name} expanded={true} />
                       {abbreviateAddress(rowData.name)}
                     </div>
                     <div

@@ -189,6 +189,7 @@ export default function NotificationsSwitch() {
         )}
         {modalState === ModalStates.Notifi && (
           <NotificationCardContainer
+            onClose={() => setOpenModal(!openModal)}
             onBackClick={() =>
               setNotificationStore((state) => {
                 state.modalState = ModalStates.Selection

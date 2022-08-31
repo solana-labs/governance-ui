@@ -1,6 +1,5 @@
-import Button from '../Button'
-import Switch from '@components/Switch'
-import { ArrowLeftIcon } from '@heroicons/react/solid'
+import Switch from './NotifiSwitch'
+import { XIcon } from '@heroicons/react/solid'
 import { Source, useNotifiClient } from '@notifi-network/notifi-react-hooks'
 import React, {
   FunctionComponent,
@@ -15,7 +14,7 @@ type NotifiClientReturnType = ReturnType<typeof useNotifiClient>
 
 type NotifiPreviewCardProps = {
   onClick: () => void
-  onBackClick: () => void
+  onClose: () => void
   telegramEnabled: boolean
   email: string
   phoneNumber: string
@@ -23,16 +22,12 @@ type NotifiPreviewCardProps = {
   handleDelete: (source: Source) => Promise<void>
 } & Pick<NotifiClientReturnType, 'createAlert' | 'data' | 'isAuthenticated'>
 
-const Line = () => (
-  <div className="border-b-2 border-white-800 opacity-20 col-span-12 py-3" />
-)
-
 const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
   createAlert,
   data,
   email,
   handleDelete,
-  onBackClick,
+  onClose,
   onClick,
   phoneNumber,
   telegram,
@@ -127,13 +122,15 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
 
       return (
         <div
-          className="items-center snap-center w-full col-span-12 pt-4 flex flex-row justify-between"
           key={source.id}
+          className="max-h-16 flex flex-row text-[14px] tracking-tight py-2"
         >
-          <div className="text-xs align-items-center">
+          <div className="font-rota text-opacity-75 font-thin break-words w-3/4 inline-block">
             {source.name} Notifications On
           </div>
-          <Switch checked={isChecked} onChange={() => handleClick(source)} />
+          <div className="inline-block w-1/4">
+            <Switch checked={isChecked} onChange={() => handleClick(source)} />
+          </div>
         </div>
       )
     },
@@ -154,48 +151,41 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
   )
 
   return (
-    <div className="bg-bkg-5 p-4 h-full w-full md:p-6 rounded-lg">
-      <div className="flex flex-row items-center align-center">
-        <Button className="bg-transparent" onClick={onBackClick}>
-          <ArrowLeftIcon className="w-6 h-6" fill="#80829D" />
-        </Button>
-      </div>
-      <h2 className="mb-2 font-light text-center">Realms Notifications</h2>
-      <div className="grid grid-cols-12 bg-bkg-5 px-6 py-3 text-sm w-full">
-        <div className="col-span-12">
-          <p className="py-0.5">{email}</p>
-          <p className="py-0.5">{phoneNumber}</p>
-          {telegramEnabled && <p className="py-0.5 pb-2">{telegram}</p>}
-          <a
-            className="text-sm text-blue cursor-pointer pb-2 font-medium underline color=00E4FF"
-            onClick={handleEdit}
-          >
-            Edit Information
-          </a>
+    <div className="w-80 flex flex-col divide-y-[1px] divide-slate-700 justify-between w-full rounded-lg">
+      <div className="flex flex-col text-[16px] w-full py-4 px-6">
+        <div className="flex flex-row justify-between font-roboto">
+          <h2 className="flex font-bold text-left">Notifications</h2>
+          <XIcon
+            className="flex cursor-pointer w-6 h-6"
+            fill="#80829D"
+            onClick={onClose}
+          />
         </div>
-
-        {notificationsToggle && notificationsToggle.length >= 1 && (
-          <>
-            <Line />
-            <div className="min-h-[200px] w-full snap-y col-span-12 overflow-scroll">
-              {notificationsToggle}
-            </div>
-            <Line />
-          </>
-        )}
+        <p className="text-md py-0.5">{email}</p>
+        <p className="text-md py-0.5">{phoneNumber}</p>
+        {telegramEnabled && <p className="py-0.5 pb-2">{telegram}</p>}
+        <div
+          className="text-primary-light cursor-pointer mb-4 font-medium"
+          onClick={handleEdit}
+        >
+          Edit Information
+        </div>
       </div>
-      <div className="w-full">
-        <div className="flex px-6 justify-between flex-row">
-          <div className=" flex flex-row">
-            <p className="text-white text-[10px] font-light whitespace-nowrap flex-start">
-              Powered by
-            </p>
-            <span>
-              <NotifiFullLogo height="12" width="60" />
-            </span>
-          </div>
+      {notificationsToggle && notificationsToggle.length >= 1 ? (
+        <div className="w-full max-h-96 text-secondary-grey flex flex-col overflow-y-auto px-6 py-4">
+          {notificationsToggle}
+        </div>
+      ) : null}
+      <div className="flex flex-row justify-between bottom-0 text-secondary-grey text-[10px] py-4 px-6 font-rota font-thin">
+        <div className="flex">
+          <p className="whitespace-nowrap text-[10px] flex-start">Powered by</p>
+          <span className="flex">
+            <NotifiFullLogo height="12" width="60" />
+          </span>
+        </div>
+        <div className="-mt-1 flex">
           <a
-            className="text-xs text-[10px] underline cursor-pointer text-blue col-span-3 relative "
+            className="underline cursor-pointer"
             href="https://www.notifi.network/faqs"
           >
             Learn More

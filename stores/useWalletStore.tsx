@@ -43,6 +43,7 @@ import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 import { HIDDEN_PROPOSALS } from '@components/instructions/tools'
 import { sleep } from '@blockworks-foundation/mango-client'
 import { getRealmConfigAccountOrDefault } from '@tools/governance/configs'
+import { getProposals } from '@utils/GovernanceTools'
 
 interface WalletStore extends State {
   connected: boolean
@@ -315,6 +316,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
     async fetchRealm(programId: PublicKey, realmId: PublicKey) {
       const set = get().set
       const connection = get().connection.current
+      const connectionContext = get().connection
       const realms = get().realms
       const realm = realms[realmId.toBase58()]
       const mintsArray = (
@@ -380,12 +382,10 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       })
       get().actions.fetchOwnVoteRecords()
 
-      const proposalsByGovernance = await Promise.all(
-        governances.map((g) =>
-          getGovernanceAccounts(connection, programId, Proposal, [
-            pubkeyFilter(1, g.pubkey)!,
-          ])
-        )
+      const proposalsByGovernance = await getProposals(
+        governances.map((x) => x.pubkey),
+        connectionContext,
+        programId
       )
 
       const proposals = accountsToPubkeyMap(
@@ -405,6 +405,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       await sleep(200)
       const set = get().set
       const connection = get().connection.current
+      const connectionContext = get().connection
       const realmId = get().selectedRealm.realm?.pubkey
       const programId = get().selectedRealm.programId
       const governances = await getGovernanceAccounts(
@@ -413,12 +414,10 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         Governance,
         [pubkeyFilter(1, realmId)!]
       )
-      const proposalsByGovernance = await Promise.all(
-        governances.map((g) =>
-          getGovernanceAccounts(connection, programId!, Proposal, [
-            pubkeyFilter(1, g.pubkey)!,
-          ])
-        )
+      const proposalsByGovernance = await getProposals(
+        governances.map((x) => x.pubkey),
+        connectionContext,
+        programId!
       )
       const proposals = accountsToPubkeyMap(
         proposalsByGovernance

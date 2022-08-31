@@ -76,6 +76,12 @@ const DeactivateValidatorStake = ({
             bytes: form.governedTokenAccount.pubkey.toBase58(),
           },
         },
+        {
+          memcmp: {
+            offset: 172,
+            bytes: bs58.encode([255, 255, 255, 255, 255, 255, 255, 255]), // equivalent to u64::max for deactivation epoch / not deactivated yet
+          },
+        },
       ]
     )
 
