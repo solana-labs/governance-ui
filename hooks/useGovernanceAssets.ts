@@ -225,6 +225,10 @@ export default function useGovernanceAssets() {
       name: 'Orca',
       image: '/img/orca.svg',
     },
+    [PackageEnum.Mercurial]: {
+      name: 'Mercurial',
+      image: '/img/mercurial.png',
+    },
   };
 
   const instructions: Instructions = {
@@ -657,6 +661,24 @@ export default function useGovernanceAssets() {
       name: 'Orca Whirlpool Swap',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.Orca,
+      tag: 'beta',
+    },
+    [InstructionEnum.MercurialPoolDeposit]: {
+      name: 'Mercurial Pool Deposit',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Mercurial,
+      tag: 'beta',
+    },
+    [InstructionEnum.MercurialPoolWithdraw]: {
+      name: 'Mercurial Pool Withdraw',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Mercurial,
+      tag: 'beta',
+    },
+    [InstructionEnum.NativeIncreaseComputingBudget]: {
+      name: 'Increase Computing Budget',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Native,
       tag: 'beta',
     },
   };

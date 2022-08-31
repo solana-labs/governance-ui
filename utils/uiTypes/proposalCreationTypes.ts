@@ -588,6 +588,26 @@ export interface OrcaWhirlpoolSwapForm {
   quoteByOutput?: boolean;
 }
 
+export interface MercurialPoolDepositForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  poolName?: SupportedSaberPoolNames;
+  uiTokenAmountA?: number;
+  uiTokenAmountB?: number;
+  slippage?: number;
+}
+
+export interface MercurialPoolWithdrawForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  poolName?: SupportedSaberPoolNames;
+  uiLpTokenAmount?: number;
+  slippage?: number;
+}
+
+export interface NativeIncreaseComputingBudgetForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  computingBudget?: number;
+}
+
 export enum InstructionEnum {
   Transfer,
   ProgramUpgrade,
@@ -670,6 +690,9 @@ export enum InstructionEnum {
   OrcaWhirlpoolDecreaseLiquidity,
   OrcaWhirlpoolClosePosition,
   OrcaWhirlpoolSwap,
+  MercurialPoolDeposit,
+  MercurialPoolWithdraw,
+  NativeIncreaseComputingBudget,
 }
 
 export enum PackageEnum {
@@ -688,6 +711,7 @@ export enum PackageEnum {
   MapleFinance,
   Deltafi,
   Orca,
+  Mercurial,
 }
 
 export type createParams = [

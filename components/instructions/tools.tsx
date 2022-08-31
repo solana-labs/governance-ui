@@ -29,6 +29,9 @@ import { MAPLE_FINANCE_PROGRAM_INSTRUCTIONS } from './programs/mapleFinance';
 import { FRIKTION_PROGRAM_INSTRUCTIONS } from './programs/friktion';
 import { DELTAFI_PROGRAM_INSTRUCTIONS } from './programs/deltafi';
 import { ORCA_PROGRAM_INSTRUCTIONS } from './programs/orca';
+import { COMPUTE_BUDGET_INSTRUCTIONS } from './programs/computeBudgetProgram';
+import { MERCURIAL_PROGRAM_INSTRUCTIONS } from './programs/mercurial';
+
 /**
  * Default governance program id instance
  */
@@ -132,6 +135,8 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...FRIKTION_PROGRAM_INSTRUCTIONS,
   ...DELTAFI_PROGRAM_INSTRUCTIONS,
   ...ORCA_PROGRAM_INSTRUCTIONS,
+  ...COMPUTE_BUDGET_INSTRUCTIONS,
+  ...MERCURIAL_PROGRAM_INSTRUCTIONS,
 };
 
 export async function getInstructionDescriptor(

@@ -67,8 +67,15 @@ export default function InstructionCard({
     ).then((d) => setDescriptor(d));
 
     const getAmountImg = async () => {
-      const sourcePk = proposalInstruction.account.getSingleInstruction()
-        .accounts[0].pubkey;
+      const ix = proposalInstruction.account.getSingleInstruction();
+
+      // Handle the specific case where there are no account in the instruction
+      // like the ComputeBudgetProgram.requestUnits instruction
+      if (ix.accounts.length === 0) {
+        return;
+      }
+
+      const sourcePk = ix.accounts[0].pubkey;
       const tokenAccount = await tryGetTokenAccount(
         connection.current,
         sourcePk,

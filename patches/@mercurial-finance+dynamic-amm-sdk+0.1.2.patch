@@ -1,0 +1,131 @@
+diff --git a/node_modules/@mercurial-finance/dynamic-amm-sdk/src/pool.ts b/node_modules/@mercurial-finance/dynamic-amm-sdk/src/pool.ts
+index 9e595f8..8279489 100644
+--- a/node_modules/@mercurial-finance/dynamic-amm-sdk/src/pool.ts
++++ b/node_modules/@mercurial-finance/dynamic-amm-sdk/src/pool.ts
+@@ -151,13 +151,13 @@ export class Pool {
+   getTokensBalance() {
+     const totalAAmount = this.vaultA.getAmountByShare(
+       this.onChainTime,
+-      this.poolSpl.vaultALpBalance.toNumber(),
+-      this.vaultASpl.totalLpSupply.toNumber()
++      this.poolSpl.vaultALpBalance,
++      this.vaultASpl.totalLpSupply
+     );
+     const totalBAmount = this.vaultB.getAmountByShare(
+       this.onChainTime,
+-      this.poolSpl.vaultBLpBalance.toNumber(),
+-      this.vaultBSpl.totalLpSupply.toNumber()
++      this.poolSpl.vaultBLpBalance,
++      this.vaultBSpl.totalLpSupply
+     );
+     return [new BN(totalAAmount), new BN(totalBAmount)];
+   }
+@@ -171,7 +171,7 @@ export class Pool {
+     // Get maximum in amount by swapping maximum withdrawable amount of tokenMint in the pool
+     invariant(
+       tokenMint.equals(this.state.tokenAMint) ||
+-        tokenMint.equals(this.state.tokenBMint),
++      tokenMint.equals(this.state.tokenBMint),
+       ERROR.INVALID_MINT
+     );
+     let [tokenAAmount, tokenBAmount] = this.getTokensBalance();
+@@ -179,15 +179,15 @@ export class Pool {
+       this.state.tokenAMint
+     )
+       ? [
+-          this.state.tokenBMint,
+-          this.normalizeTokenA(tokenAAmount),
+-          this.normalizeTokenB(tokenBAmount),
+-        ]
++        this.state.tokenBMint,
++        this.normalizeTokenA(tokenAAmount),
++        this.normalizeTokenB(tokenBAmount),
++      ]
+       : [
+-          this.state.tokenAMint,
+-          this.normalizeTokenB(tokenBAmount),
+-          this.normalizeTokenA(tokenAAmount),
+-        ];
++        this.state.tokenAMint,
++        this.normalizeTokenB(tokenBAmount),
++        this.normalizeTokenA(tokenAAmount),
++      ];
+ 
+     let maxOutAmount = this.getMaxSwappableOutAmount(outTokenMint);
+     maxOutAmount = tokenMint.equals(this.state.tokenAMint)
+@@ -217,7 +217,7 @@ export class Pool {
+   getMaxSwappableOutAmount(tokenMint: PublicKey) {
+     invariant(
+       tokenMint.equals(this.state.tokenAMint) ||
+-        tokenMint.equals(this.state.tokenBMint),
++      tokenMint.equals(this.state.tokenBMint),
+       ERROR.INVALID_MINT
+     );
+ 
+@@ -300,7 +300,7 @@ export class Pool {
+   getOutAmount(inTokenMint: PublicKey, inAmount: BN) {
+     invariant(
+       inTokenMint.equals(this.state.tokenAMint) ||
+-        inTokenMint.equals(this.state.tokenBMint),
++      inTokenMint.equals(this.state.tokenBMint),
+       ERROR.INVALID_MINT
+     );
+ 
+@@ -315,7 +315,7 @@ export class Pool {
+       swapSourceVaultSpl,
+       swapDestinationVaultSpl,
+     ] = inTokenMint.equals(this.state.tokenAMint)
+-      ? [
++        ? [
+           this.normalizeTokenA(inAmount),
+           this.normalizeTokenA(tokenAAmount),
+           this.normalizeTokenB(tokenBAmount),
+@@ -324,7 +324,7 @@ export class Pool {
+           this.vaultASpl,
+           this.vaultBSpl,
+         ]
+-      : [
++        : [
+           this.normalizeTokenB(inAmount),
+           this.normalizeTokenB(tokenBAmount),
+           this.normalizeTokenA(tokenAAmount),
+@@ -340,15 +340,15 @@ export class Pool {
+     // Get vault lp minted when deposit to the vault
+     const sourceVaultLp = swapSourceVault.getUnmintAmount(
+       this.onChainTime,
+-      sourceAmount.sub(adminFee).toNumber(),
+-      swapSourceVaultSpl.totalLpSupply.toNumber()
++      sourceAmount.sub(adminFee),
++      swapSourceVaultSpl.totalLpSupply
+     );
+ 
+     const actualSourceAmount = new BN(
+       swapSourceVault.getAmountByShare(
+         this.onChainTime,
+         sourceVaultLp,
+-        swapSourceVaultSpl.totalLpSupply.toNumber()
++        swapSourceVaultSpl.totalLpSupply
+       )
+     );
+ 
+@@ -364,16 +364,16 @@ export class Pool {
+     const destinationVaultLp = new BN(
+       swapDestinationVault.getUnmintAmount(
+         this.onChainTime,
+-        destinationAmount.toNumber(),
+-        swapDestinationVaultSpl.totalLpSupply.toNumber()
++        destinationAmount,
++        swapDestinationVaultSpl.totalLpSupply
+       )
+     );
+ 
+     let actualDestinationAmount = new BN(
+       swapDestinationVault.getAmountByShare(
+         this.onChainTime,
+-        destinationVaultLp.toNumber(),
+-        swapDestinationVaultSpl.totalLpSupply.toNumber()
++        destinationVaultLp,
++        swapDestinationVaultSpl.totalLpSupply
+       )
+     );
+ 
