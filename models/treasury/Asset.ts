@@ -14,6 +14,7 @@ export enum AssetType {
   Sol,
   Token,
   Unknown,
+  TokenOwnerAsset,
 }
 
 export interface Mint {
@@ -94,6 +95,22 @@ export interface Unknown {
   name: string
 }
 
+export interface TokenOwnerAsset {
+  type: AssetType.TokenOwnerAsset
+  id: string
+  address: string
+  owner: string
+  realmId: string
+  realmSymbol: string
+  programId: string
+  realmIcon: JSX.Element
+  mintAddress: string
+  governingTokensDeposited: BigNumber
+  unrelinquishedVotes: number
+  totalVotes: number
+  outstandingProposalCount: number
+}
+
 export type Asset =
   | Mint
   | NFTCollection
@@ -102,3 +119,4 @@ export type Asset =
   | Sol
   | Token
   | Unknown
+  | TokenOwnerAsset

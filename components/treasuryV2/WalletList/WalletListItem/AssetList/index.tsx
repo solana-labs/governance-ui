@@ -24,12 +24,14 @@ import {
   isPrograms,
   isRealmAuthority,
   isUnknown,
+  isTokenOwnerRecord,
 } from '../typeGuards'
 
 import { PublicKey } from '@solana/web3.js'
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 import { findMetadataPda } from '@metaplex-foundation/js'
 import useWalletStore from 'stores/useWalletStore'
+import TokenOwnerRecordsList from './TokenOwnerRecordsList'
 
 export type Section = 'tokens' | 'nfts' | 'others'
 
@@ -135,6 +137,11 @@ export default function AssetList(props: Props) {
 
   const othersFromProps = useMemo(() => props.assets.filter(isOther), [])
 
+  const tokenOwnerRecordsFromProps = useMemo(
+    () => props.assets.filter(isTokenOwnerRecord),
+    []
+  )
+
   const [others, setOthers] = useState<
     (Mint | Programs | Unknown | RealmAuthority)[]
   >(othersFromProps)
@@ -228,6 +235,16 @@ export default function AssetList(props: Props) {
           disableCollapse={!diplayingMultipleAssetTypes}
           expanded={props.expandedSections?.includes('others')}
           assets={others}
+          selectedAssetId={props.selectedAssetId}
+          onSelect={props.onSelectAsset}
+          onToggleExpand={() => props.onToggleExpandSection?.('others')}
+        />
+      )}
+      {tokenOwnerRecordsFromProps.length > 0 && (
+        <TokenOwnerRecordsList
+          disableCollapse={false}
+          expanded={true}
+          assets={tokenOwnerRecordsFromProps}
           selectedAssetId={props.selectedAssetId}
           onSelect={props.onSelectAsset}
           onToggleExpand={() => props.onToggleExpandSection?.('others')}
