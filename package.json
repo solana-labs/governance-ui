@@ -36,7 +36,7 @@
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
     "@everlend/core": "^0.0.6",
-    "@everlend/general-pool": "^0.0.22",
+    "@everlend/general-pool": "^0.0.23",
     "@foresight-tmp/foresight-sdk": "^0.1.46",
     "@friktion-labs/friktion-sdk": "^1.1.118",
     "@headlessui/react": "^1.6.6",

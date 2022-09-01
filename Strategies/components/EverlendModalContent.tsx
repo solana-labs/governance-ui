@@ -49,12 +49,10 @@ const EverlendModalContent = ({
 
   useEffect(() => {
     const loadMaxAmount = async () => {
-      console.log('owner', owner.toString())
       const poolMintATA = await findAssociatedTokenAccount(
         owner,
         new PublicKey(proposedInvestment.poolMint)
       )
-      console.log('tokenmintata', poolMintATA.toString())
       let poolMintATABalance = 0
       let tokenMintATABalance = 0
       try {
