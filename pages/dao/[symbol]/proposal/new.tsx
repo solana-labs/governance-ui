@@ -715,7 +715,12 @@ const New = () => {
       case Instructions.UpdateTokenMetadata:
         return <UpdateTokenMetadata index={idx} governance={governance} />
       case Instructions.TransferDomainName:
-        return <TransferDomainName index={idx} governance={governance}></TransferDomainName>
+        return (
+          <TransferDomainName
+            index={idx}
+            governance={governance}
+          ></TransferDomainName>
+        )
       case Instructions.EverlendDeposit:
         return <DepositForm index={idx} governance={governance} />
       case Instructions.EverlendWithdraw:
