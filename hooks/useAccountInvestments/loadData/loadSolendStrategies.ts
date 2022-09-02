@@ -42,14 +42,6 @@ export default async function loadSolendStrategies(args: {
           (ass: Token) => ass.mintAddress === res.collateralMintAddress
         ) as Token)?.count.toNumber() ?? 0
 
-      const a = {
-        ...solendStrategy,
-        apy: `${res.supplyApy.toFixed(2)}%`,
-        protocolName: solendStrategy.protocolName,
-        strategySubtext: `${res.marketName} Pool`,
-        investedAmount: cTokenBalance * cTokenExchangeRate(stat),
-      }
-
       return {
         ...solendStrategy,
         apy: `${res.supplyApy.toFixed(2)}%`,

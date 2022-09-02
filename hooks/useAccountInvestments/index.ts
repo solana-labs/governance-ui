@@ -15,7 +15,6 @@ import {
 } from 'Strategies/protocols/mango/tools'
 import { SOLEND } from 'Strategies/protocols/solend'
 import { TreasuryStrategy } from 'Strategies/types/types'
-import useTreasuryInfo from '@hooks/useTreasuryInfo'
 import loadData from './loadData'
 import * as staticInvestments from './staticInvestments'
 
