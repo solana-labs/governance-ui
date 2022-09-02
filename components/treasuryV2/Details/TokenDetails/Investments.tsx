@@ -6,6 +6,7 @@ import {
   useAccountInvestments,
   ActiveInvestment,
 } from '@hooks/useAccountInvestments'
+import { Wallet } from '@models/treasury/Wallet'
 import { Status } from '@utils/uiTypes/Result'
 import { StrategyCard } from '@components/TreasuryAccount/AccountOverview'
 import DepositModal from 'Strategies/components/DepositModal'
@@ -17,6 +18,7 @@ import TradeOnSerum from '@components/TreasuryAccount/TradeOnSerum'
 interface Props {
   className?: string
   asset: Token | Sol
+  wallet?: Wallet
   governanceAddress?: string
 }
 
@@ -35,6 +37,7 @@ export default function Investments(props: Props) {
   >(null)
 
   const investments = useAccountInvestments({
+    wallet: props.wallet,
     asset: props.asset,
     governanceAddress: props.governanceAddress,
   })

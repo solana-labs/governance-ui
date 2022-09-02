@@ -1,11 +1,12 @@
 import type { BigNumber } from 'bignumber.js'
-
 import {
   cTokenExchangeRate,
   getReserveData,
   SOLEND,
 } from 'Strategies/protocols/solend'
 import { TreasuryStrategy, SolendStrategy } from 'Strategies/types/types'
+import { Wallet } from '@models/treasury/Wallet'
+import { Token } from '@models/treasury/Asset'
 
 function isSolendStrategy(
   strategy: TreasuryStrategy
@@ -17,41 +18,45 @@ export default async function loadSolendStrategies(args: {
   strategies: TreasuryStrategy[]
   strategyMintAddress: string
   tokenAmount: BigNumber
+  wallet?: Wallet
 }): Promise<(TreasuryStrategy & { investedAmount: number })[]> {
   const solendStrategy: SolendStrategy | undefined = args.strategies.filter(
-    isSolendStrategy
-  )[0]
-  const reserve = solendStrategy
-    ? solendStrategy.reserves.find(
-        (reserve) =>
-          reserve.mintAddress === args.strategyMintAddress &&
-          reserve.collateralMintAddress === args.strategyMintAddress
-      )
-    : undefined
+    (arg) =>
+      isSolendStrategy(arg) && arg.handledMint === args.strategyMintAddress
+  )[0] as SolendStrategy
 
-  const reserveStats = reserve
-    ? await getReserveData([reserve.reserveAddress])
+  const reserveStats = solendStrategy
+    ? await getReserveData(
+        solendStrategy.reserves.map((strat) => strat.reserveAddress) ?? []
+      )
     : []
 
-  if (solendStrategy && reserve && reserveStats.length) {
-    const stat = reserveStats.find(
-      (stat) => stat.reserve.lendingMarket === reserve.marketAddress
-    )
+  return (
+    solendStrategy?.reserves.map((res) => {
+      const stat = reserveStats.find(
+        (stat) => stat.reserve.lendingMarket === res.marketAddress
+      )!
 
-    if (stat) {
-      return [
-        {
-          ...solendStrategy,
-          apy: `${reserve.supplyApy.toFixed(2)}%`,
-          protocolName: solendStrategy.protocolName,
-          strategySubtext: `${reserve.marketName} Pool`,
-          investedAmount:
-            (args.tokenAmount.toNumber() * cTokenExchangeRate(stat)) /
-            10 ** reserve.decimals,
-        },
-      ]
-    }
-  }
+      const cTokenBalance =
+        (args.wallet?.assets.find(
+          (ass: Token) => ass.mintAddress === res.collateralMintAddress
+        ) as Token)?.count.toNumber() ?? 0
 
-  return []
+      const a = {
+        ...solendStrategy,
+        apy: `${res.supplyApy.toFixed(2)}%`,
+        protocolName: solendStrategy.protocolName,
+        strategySubtext: `${res.marketName} Pool`,
+        investedAmount: cTokenBalance * cTokenExchangeRate(stat),
+      }
+
+      return {
+        ...solendStrategy,
+        apy: `${res.supplyApy.toFixed(2)}%`,
+        protocolName: solendStrategy.protocolName,
+        strategySubtext: `${res.marketName} Pool`,
+        investedAmount: cTokenBalance * cTokenExchangeRate(stat),
+      }
+    }) ?? []
+  )
 }
