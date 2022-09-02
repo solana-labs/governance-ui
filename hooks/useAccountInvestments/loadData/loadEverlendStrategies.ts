@@ -40,7 +40,6 @@ export default async function loadEverlendStrategies(args: {
           : undefined
 
       let tokenMintATABalance = 0
-      console.log(args)
 
       try {
         const tokenMintATABalanceFetched = tokenMintAta

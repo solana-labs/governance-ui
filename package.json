@@ -25,6 +25,7 @@
   "dependencies": {
     "@blockworks-foundation/mango-client": "^3.6.14",
     "@blockworks-foundation/mango-v4": "^0.0.2",
+    "@bonfida/spl-name-service": "^0.1.47",
     "@bundlr-network/client": "^0.7.15",
     "@cardinal/namespaces-components": "^2.5.5",
     "@castlefinance/vault-core": "^0.1.3",
@@ -35,7 +36,7 @@
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
     "@everlend/core": "^0.0.6",
-    "@everlend/general-pool": "^0.0.22",
+    "@everlend/general-pool": "^0.0.23",
     "@foresight-tmp/foresight-sdk": "^0.1.46",
     "@friktion-labs/friktion-sdk": "^1.1.118",
     "@headlessui/react": "^1.6.6",

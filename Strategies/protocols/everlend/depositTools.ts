@@ -137,8 +137,7 @@ export const prepareSolDepositTx = async (
     new DepositTx(
       { feePayer: payerPublicKey },
       {
-        registryPoolConfig,
-        registry,
+        poolConfig: registryPoolConfig,
         poolMarket,
         pool,
         source,
@@ -367,7 +366,6 @@ export async function handleEverlendDeposit(
     const { tx: depositTx } = await prepareDepositTx(
       { connection: connection.current, payerPublicKey: owner },
       new PublicKey(poolPubKey),
-      REGISTRY,
       amount,
       REWARD_PROGRAM_ID,
       CONFIG,
@@ -400,7 +398,6 @@ export async function handleEverlendWithdraw(
       payerPublicKey: owner,
     },
     new PublicKey(poolPubKey),
-    REGISTRY,
     amount,
     REWARD_PROGRAM_ID,
     CONFIG,

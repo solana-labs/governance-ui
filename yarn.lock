@@ -1566,6 +1566,7 @@
     "@bonfida/name-offers" "^0.0.1"
     "@ethersproject/sha2" "^5.5.0"
 
+
 "@bonfida/spl-name-service@^0.1.50":
   version "0.1.50"
   resolved "https://registry.yarnpkg.com/@bonfida/spl-name-service/-/spl-name-service-0.1.50.tgz#462560199f6869fd97c8a19a8a09851ac15191db"
@@ -2356,10 +2357,10 @@
     "@project-serum/anchor" "0.24.2"
     "@solana/spl-token" "^0.2.0"
 
-"@everlend/general-pool@^0.0.22":
-  version "0.0.22"
-  resolved "https://registry.yarnpkg.com/@everlend/general-pool/-/general-pool-0.0.22.tgz#428a04f605cc5cf8cebdd8973288fa286756d320"
-  integrity sha512-B6FOC8Zhsm1R4ft7ZOoCLToJWNQHis4ngaIPsiS4IGQEUYUW4eduW3DJzvjIWwkpkZpkcXI+76evyH1Pxp3qcQ==
+"@everlend/general-pool@^0.0.23":
+  version "0.0.23"
+  resolved "https://registry.yarnpkg.com/@everlend/general-pool/-/general-pool-0.0.23.tgz#8f52bd28150f73bda021e4e6c286fe96f0f7061b"
+  integrity sha512-eIa/pGXHwJ72jJOiRFrHbQZ2y4wY0Z1ynmBpyC9FXY8O3YPHLtLPaRdXxGzO2uLEKJAxVLVmYHWlcKOL9DSGQQ==
   dependencies:
     "@everlend/common" "^0.0.3"
     "@solana/spl-token" "^0.1.5"
@@ -4933,7 +4934,7 @@
     superstruct "^0.14.2"
     tweetnacl "^1.0.0"
 
-"@solana/web3.js@^1.15.0", "@solana/web3.js@^1.37.0":
+"@solana/web3.js@^1.15.0", "@solana/web3.js@^1.37.0", "@solana/web3.js@^1.48.0":
   version "1.55.0"
   resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.55.0.tgz#9d7ceb7f71a7316b1e5dbd4434ef82f6537de5d9"
   integrity sha512-hXEc5CtA/5tZMvwEy0Cv6iynBpWoSLk6ud2PmoiGfWrZXZqkrfgTPkgd4yBw+VNZJRBRMKVbs/P7kT1sBwZUrw==
@@ -5089,28 +5090,6 @@
     superstruct "^0.14.2"
     tweetnacl "^1.0.0"
 
-"@solana/web3.js@^1.48.0":
-  version "1.55.0"
-  resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.55.0.tgz#9d7ceb7f71a7316b1e5dbd4434ef82f6537de5d9"
-  integrity sha512-hXEc5CtA/5tZMvwEy0Cv6iynBpWoSLk6ud2PmoiGfWrZXZqkrfgTPkgd4yBw+VNZJRBRMKVbs/P7kT1sBwZUrw==
-  dependencies:
-    "@babel/runtime" "^7.12.5"
-    "@noble/ed25519" "^1.7.0"
-    "@noble/hashes" "^1.1.2"
-    "@noble/secp256k1" "^1.6.3"
-    "@solana/buffer-layout" "^4.0.0"
-    bigint-buffer "^1.1.5"
-    bn.js "^5.0.0"
-    borsh "^0.7.0"
-    bs58 "^4.0.1"
-    buffer "6.0.1"
-    fast-stable-stringify "^1.0.0"
-    jayson "^3.4.4"
-    js-sha3 "^0.8.0"
-    node-fetch "2"
-    rpc-websockets "^7.5.0"
-    superstruct "^0.14.2"
-
 "@solendprotocol/solend-sdk@^0.4.4":
   version "0.4.9"
   resolved "https://registry.yarnpkg.com/@solendprotocol/solend-sdk/-/solend-sdk-0.4.9.tgz#c0e3f24148c4951bf0cfdf16c884bc4ffbb42b7b"
@@ -5191,9 +5170,6 @@
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@stablelib/chacha/-/chacha-1.0.1.tgz#deccfac95083e30600c3f92803a3a1a4fa761371"
   integrity sha512-Pmlrswzr0pBzDofdFuVe1q7KdsHKhhU24e8gkEwnTGOmlC7PADzLVxGdn2PoNVBBabdg0l/IfLKg6sHAbTQugg==
-  dependencies:
-    "@stablelib/binary" "^1.0.1"
-    "@stablelib/wipe" "^1.0.1"
 
 "@stablelib/constant-time@^1.0.1":
   version "1.0.1"
@@ -8760,9 +8736,9 @@ dezalgo@1.0.3, dezalgo@^1.0.0:
     asap "^2.0.0"
     wrappy "1"
 
-"did-jwt@git+https://github.com/civicteam/did-jwt.git":
+"did-jwt@git+https://github.com/civicteam/did-jwt":
   version "6.1.0"
-  resolved "git+https://github.com/civicteam/did-jwt.git#d4e318df78bd88e3127e62784915c7a334881eb6"
+  resolved "git+https://github.com/civicteam/did-jwt#d4e318df78bd88e3127e62784915c7a334881eb6"
   dependencies:
     "@stablelib/ed25519" "^1.0.2"
     "@stablelib/random" "^1.0.1"
