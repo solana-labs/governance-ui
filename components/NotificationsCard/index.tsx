@@ -74,7 +74,9 @@ const NotificationsCard = ({
   const connected = useWalletStore((s) => s.connected)
 
   const alerts = data?.alerts
+  console.log('alerts', alerts)
   const sources = data?.sources
+  console.log('sources', sources)
 
   const [localEmail, setLocalEmail] = useState<string>('')
   const [localPhoneNumber, setLocalPhone] = useState<string>('')
@@ -166,90 +168,92 @@ const NotificationsCard = ({
           handleError([e])
         }
         setLoading(false)
+      } else {
+        setPreview(true)
       }
       setLoading(false)
     },
     [setLoading, isAuthenticated, wallet, setErrorMessage, logIn]
   )
 
+  const handleUpdate = async () => {
+    if (alerts && alerts.length >= 1) {
+      const results: Alert[] = []
+
+      for (const alert of alerts) {
+        const alertRes = await updateAlert({
+          alertId: alert.id ?? '',
+          emailAddress: localEmail === '' ? null : localEmail,
+          phoneNumber: isValidPhoneNumber(localPhoneNumber)
+            ? localPhoneNumber
+            : null,
+          telegramId: localTelegram === '' ? null : localTelegram,
+        })
+        if (alertRes) {
+          results.push(alertRes)
+        }
+      }
+      if (results) {
+        setEmail(results[0].targetGroup?.emailTargets[0]?.emailAddress ?? '')
+        setPhone(results[0].targetGroup?.smsTargets[0]?.phoneNumber ?? '')
+        setTelegram(
+          results[0].targetGroup?.telegramTargets[0]?.telegramId ?? ''
+        )
+      }
+      checkTelegramUnconfirmed(results)
+    } else {
+      const results: Alert[] = []
+      if (sources && sources.length >= 1) {
+        for (const source of sources) {
+          const filterId = source.applicableFilters[0].id
+          const alertRes = await createAlert({
+            emailAddress: localEmail === '' ? null : localEmail,
+            filterId: filterId ?? '',
+            name: `${source.name} notification`,
+            phoneNumber: isValidPhoneNumber(localPhoneNumber)
+              ? localPhoneNumber
+              : null,
+            sourceId: source?.id ?? '',
+            telegramId: localTelegram === '' ? null : localTelegram,
+          })
+          if (alertRes) {
+            results.push(alertRes)
+          }
+        }
+      }
+      if (telegram) {
+        checkTelegramUnconfirmed(results)
+      }
+      if (results && results.length >= 1) {
+        setEmail(results[0].targetGroup?.emailTargets[0]?.emailAddress ?? '')
+        setPhone(results[0].targetGroup?.smsTargets[0]?.phoneNumber ?? '')
+        setTelegram(
+          results[0].targetGroup?.telegramTargets[0]?.telegramId ?? ''
+        )
+      }
+    }
+  }
+
   const handleSave = useCallback(async () => {
     setLoading(true)
     if (!isAuthenticated && wallet && wallet.publicKey) {
       try {
         await logIn((wallet as unknown) as MessageSigner)
-        setUnsavedChanges(true)
+        await handleUpdate
+        setPreview(true)
+        setUnsavedChanges(false)
       } catch (e) {
+        setPreview(false)
         handleError([e])
       }
     }
     if (connected && isAuthenticated) {
       try {
-        if (alerts && alerts.length >= 1) {
-          const results: Alert[] = []
-
-          for (const alert of alerts) {
-            const alertRes = await updateAlert({
-              alertId: alert.id ?? '',
-              emailAddress: localEmail === '' ? null : localEmail,
-              phoneNumber: isValidPhoneNumber(localPhoneNumber)
-                ? localPhoneNumber
-                : null,
-              telegramId: localTelegram === '' ? null : localTelegram,
-            })
-            if (alertRes) {
-              results.push(alertRes)
-            }
-          }
-          if (results) {
-            setEmail(
-              results[0].targetGroup?.emailTargets[0]?.emailAddress ?? ''
-            )
-            setPhone(results[0].targetGroup?.smsTargets[0]?.phoneNumber ?? '')
-            setTelegram(
-              results[0].targetGroup?.telegramTargets[0]?.telegramId ?? ''
-            )
-            setPreview(true)
-          }
-          checkTelegramUnconfirmed(results)
-          if (results) {
-            setPreview(true)
-          }
-        } else {
-          const results: Alert[] = []
-          if (sources && sources.length >= 1) {
-            for (const source of sources) {
-              const filterId = source.applicableFilters[0].id
-              const alertRes = await createAlert({
-                emailAddress: localEmail === '' ? null : localEmail,
-                filterId: filterId ?? '',
-                name: `${source.name} notification`,
-                phoneNumber: isValidPhoneNumber(localPhoneNumber)
-                  ? localPhoneNumber
-                  : null,
-                sourceId: source?.id ?? '',
-                telegramId: localTelegram === '' ? null : localTelegram,
-              })
-              if (alertRes) {
-                results.push(alertRes)
-              }
-            }
-          }
-          if (telegram) {
-            checkTelegramUnconfirmed(results)
-          }
-          if (results && results.length >= 1) {
-            setPreview(true)
-            setEmail(
-              results[0].targetGroup?.emailTargets[0]?.emailAddress ?? ''
-            )
-            setPhone(results[0].targetGroup?.smsTargets[0]?.phoneNumber ?? '')
-            setTelegram(
-              results[0].targetGroup?.telegramTargets[0]?.telegramId ?? ''
-            )
-          }
-        }
+        await handleUpdate
+        setPreview(true)
         setUnsavedChanges(false)
       } catch (e) {
+        setPreview(false)
         handleError([e])
       }
     }
