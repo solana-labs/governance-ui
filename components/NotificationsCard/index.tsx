@@ -31,7 +31,6 @@ type NotifiClientReturnType = ReturnType<typeof useNotifiClient>
 type NotificationCardProps = {
   onBackClick: () => void
   email: string
-
   phoneNumber: string
   telegram: string
   setPreview: Dispatch<SetStateAction<boolean>>
@@ -74,9 +73,7 @@ const NotificationsCard = ({
   const connected = useWalletStore((s) => s.connected)
 
   const alerts = data?.alerts
-  console.log('alerts', alerts)
   const sources = data?.sources
-  console.log('sources', sources)
 
   const [localEmail, setLocalEmail] = useState<string>('')
   const [localPhoneNumber, setLocalPhone] = useState<string>('')
@@ -194,6 +191,7 @@ const NotificationsCard = ({
         }
       }
       if (results) {
+        setPreview(true)
         setEmail(results[0].targetGroup?.emailTargets[0]?.emailAddress ?? '')
         setPhone(results[0].targetGroup?.smsTargets[0]?.phoneNumber ?? '')
         setTelegram(
@@ -225,6 +223,7 @@ const NotificationsCard = ({
         checkTelegramUnconfirmed(results)
       }
       if (results && results.length >= 1) {
+        setPreview(true)
         setEmail(results[0].targetGroup?.emailTargets[0]?.emailAddress ?? '')
         setPhone(results[0].targetGroup?.smsTargets[0]?.phoneNumber ?? '')
         setTelegram(
@@ -239,8 +238,7 @@ const NotificationsCard = ({
     if (!isAuthenticated && wallet && wallet.publicKey) {
       try {
         await logIn((wallet as unknown) as MessageSigner)
-        await handleUpdate
-        setPreview(true)
+        await handleUpdate()
         setUnsavedChanges(false)
       } catch (e) {
         setPreview(false)
@@ -249,8 +247,7 @@ const NotificationsCard = ({
     }
     if (connected && isAuthenticated) {
       try {
-        await handleUpdate
-        setPreview(true)
+        await handleUpdate()
         setUnsavedChanges(false)
       } catch (e) {
         setPreview(false)
