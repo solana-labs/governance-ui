@@ -86,7 +86,7 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
         if (alertResult) {
           if (alertResult.targetGroup?.telegramTargets?.length > 0) {
             const target = alertResult.targetGroup?.telegramTargets[0]
-            if (target && !target.isConfirmed) {
+            if (target && target.isConfirmed === false) {
               if (target.confirmationUrl) {
                 window.open(target.confirmationUrl)
               }
