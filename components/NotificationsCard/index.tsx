@@ -175,13 +175,10 @@ const NotificationsCard = ({
   )
 
   const handleUpdate = async () => {
-    console.log('ran handle update')
     if (alerts && alerts.length >= 1) {
-      console.log('alerts')
       const results: Alert[] = []
 
       for (const alert of alerts) {
-        console.log('alerts')
         const alertRes = await updateAlert({
           alertId: alert.id ?? '',
           emailAddress: localEmail === '' ? null : localEmail,
@@ -209,7 +206,6 @@ const NotificationsCard = ({
     } else {
       const results: Alert[] = []
       if (sources && sources.length >= 1) {
-        console.log('executed handle update under sources')
         for (const source of sources) {
           const filterId = source.applicableFilters[0].id
           const alertRes = await createAlert({
@@ -253,11 +249,9 @@ const NotificationsCard = ({
     }
 
     if (firstTimeUser) {
-      console.log('firstTimeUser')
       handleLogIn()
     }
-    if (sources) {
-      console.log('sources')
+    if (firstTimeUser && sources) {
       anotherhandleUpdate()
     }
   }, [firstTimeUser, sources])
@@ -274,6 +268,7 @@ const NotificationsCard = ({
     }
     if (connected && isAuthenticated) {
       try {
+        setFirstTimeUser(false)
         await handleUpdate()
         setUnsavedChanges(false)
       } catch (e) {
