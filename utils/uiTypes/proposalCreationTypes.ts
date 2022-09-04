@@ -608,6 +608,16 @@ export interface NativeIncreaseComputingBudgetForm {
   computingBudget?: number;
 }
 
+export interface CredixDepositForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  uiAmount?: number;
+}
+
+export interface CredixWithdrawForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  uiAmount?: number;
+}
+
 export enum InstructionEnum {
   Transfer,
   ProgramUpgrade,
@@ -693,6 +703,8 @@ export enum InstructionEnum {
   MercurialPoolDeposit,
   MercurialPoolWithdraw,
   NativeIncreaseComputingBudget,
+  CredixDeposit,
+  CredixWithdraw,
 }
 
 export enum PackageEnum {
@@ -712,6 +724,7 @@ export enum PackageEnum {
   Deltafi,
   Orca,
   Mercurial,
+  Credix,
 }
 
 export type createParams = [

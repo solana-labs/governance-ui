@@ -31,6 +31,7 @@ import { DELTAFI_PROGRAM_INSTRUCTIONS } from './programs/deltafi';
 import { ORCA_PROGRAM_INSTRUCTIONS } from './programs/orca';
 import { COMPUTE_BUDGET_INSTRUCTIONS } from './programs/computeBudgetProgram';
 import { MERCURIAL_PROGRAM_INSTRUCTIONS } from './programs/mercurial';
+import { CREDIX_PROGRAM_INSTRUCTIONS } from './programs/credix';
 
 /**
  * Default governance program id instance
@@ -137,6 +138,7 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...ORCA_PROGRAM_INSTRUCTIONS,
   ...COMPUTE_BUDGET_INSTRUCTIONS,
   ...MERCURIAL_PROGRAM_INSTRUCTIONS,
+  ...CREDIX_PROGRAM_INSTRUCTIONS,
 };
 
 export async function getInstructionDescriptor(

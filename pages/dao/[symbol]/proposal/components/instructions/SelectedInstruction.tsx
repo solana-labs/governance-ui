@@ -82,6 +82,8 @@ import OrcaWhirlpoolSwap from './Orca/WhirlpoolSwap';
 import MercurialPoolDeposit from './Mercurial/PoolDeposit';
 import MercurialPoolWithdraw from './Mercurial/PoolWithdraw';
 import NativeIncreaseComputingBudget from './Native/IncreaseComputingBudget';
+import CredixDeposit from './Credix/Deposit';
+import CredixWithdraw from './Credix/Withdraw';
 
 const SelectedInstruction = ({
   itxType,
@@ -564,6 +566,10 @@ const SelectedInstruction = ({
           governedAccount={governedAccount}
         />
       );
+    case InstructionEnum.CredixDeposit:
+      return <CredixDeposit index={index} governedAccount={governedAccount} />;
+    case InstructionEnum.CredixWithdraw:
+      return <CredixWithdraw index={index} governedAccount={governedAccount} />;
     default:
       return null;
   }

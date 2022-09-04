@@ -229,6 +229,10 @@ export default function useGovernanceAssets() {
       name: 'Mercurial',
       image: '/img/mercurial.png',
     },
+    [PackageEnum.Credix]: {
+      name: 'Credix',
+      image: '/img/credix.jpeg',
+    },
   };
 
   const instructions: Instructions = {
@@ -679,6 +683,18 @@ export default function useGovernanceAssets() {
       name: 'Increase Computing Budget',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.Native,
+      tag: 'beta',
+    },
+    [InstructionEnum.CredixDeposit]: {
+      name: 'Deposit',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Credix,
+      tag: 'beta',
+    },
+    [InstructionEnum.CredixWithdraw]: {
+      name: 'Withdraw',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Credix,
       tag: 'beta',
     },
   };
