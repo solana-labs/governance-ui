@@ -68,6 +68,7 @@ const NotificationsCard = ({
   const [hasUnsavedChanges, setUnsavedChanges] = useState<boolean>(false)
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [telegramEnabled, setTelegramEnabled] = useState<boolean>(false)
+  const [firstTimeUser, setFirstTimeUser] = useState<boolean>(false)
 
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
@@ -174,10 +175,13 @@ const NotificationsCard = ({
   )
 
   const handleUpdate = async () => {
+    console.log('ran handle update')
     if (alerts && alerts.length >= 1) {
+      console.log('alerts')
       const results: Alert[] = []
 
       for (const alert of alerts) {
+        console.log('alerts')
         const alertRes = await updateAlert({
           alertId: alert.id ?? '',
           emailAddress: localEmail === '' ? null : localEmail,
@@ -191,17 +195,21 @@ const NotificationsCard = ({
         }
       }
       if (results) {
-        setPreview(true)
         setEmail(results[0].targetGroup?.emailTargets[0]?.emailAddress ?? '')
         setPhone(results[0].targetGroup?.smsTargets[0]?.phoneNumber ?? '')
         setTelegram(
           results[0].targetGroup?.telegramTargets[0]?.telegramId ?? ''
         )
+        setPreview(true)
       }
       checkTelegramUnconfirmed(results)
+      if (results) {
+        setPreview(true)
+      }
     } else {
       const results: Alert[] = []
       if (sources && sources.length >= 1) {
+        console.log('executed handle update under sources')
         for (const source of sources) {
           const filterId = source.applicableFilters[0].id
           const alertRes = await createAlert({
@@ -215,6 +223,7 @@ const NotificationsCard = ({
             telegramId: localTelegram === '' ? null : localTelegram,
           })
           if (alertRes) {
+            console.log('alert res')
             results.push(alertRes)
           }
         }
@@ -231,15 +240,33 @@ const NotificationsCard = ({
         )
       }
     }
+    setUnsavedChanges(false)
   }
+
+  useEffect(() => {
+    const handleLogIn = async () => {
+      await logIn((wallet as unknown) as MessageSigner)
+    }
+
+    const anotherhandleUpdate = async () => {
+      await handleUpdate()
+    }
+
+    if (firstTimeUser) {
+      console.log('firstTimeUser')
+      handleLogIn()
+    }
+    if (sources) {
+      console.log('sources')
+      anotherhandleUpdate()
+    }
+  }, [firstTimeUser, sources])
 
   const handleSave = useCallback(async () => {
     setLoading(true)
     if (!isAuthenticated && wallet && wallet.publicKey) {
       try {
-        await logIn((wallet as unknown) as MessageSigner)
-        await handleUpdate()
-        setUnsavedChanges(false)
+        setFirstTimeUser(true)
       } catch (e) {
         setPreview(false)
         handleError([e])
