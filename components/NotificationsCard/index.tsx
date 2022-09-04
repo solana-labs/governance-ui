@@ -248,7 +248,7 @@ const NotificationsCard = ({
       await handleUpdate()
     }
 
-    if (firstTimeUser) {
+    if (firstTimeUser && sources === undefined) {
       handleLogIn()
     }
     if (firstTimeUser && sources) {
