@@ -1,7 +1,10 @@
 import { Connection, PublicKey } from '@solana/web3.js'
 import { findAssociatedTokenAccount } from '@everlend/common'
 
-import { EVERLEND } from 'Strategies/protocols/everlend/tools'
+import {
+  calcUserTokenBalanceByPoolToken,
+  EVERLEND,
+} from 'Strategies/protocols/everlend/tools'
 import { TreasuryStrategy, EverlendStrategy } from 'Strategies/types/types'
 
 function isEverlendStrategy(
@@ -10,33 +13,56 @@ function isEverlendStrategy(
   return strategy.protocolName === EVERLEND
 }
 
+const notNull = <TValue>(value: TValue | null): value is TValue => {
+  return value !== null
+}
+
 export default async function loadEverlendStrategies(args: {
   connection: Connection
   strategies: TreasuryStrategy[]
   tokenAddress: string
-}): Promise<(TreasuryStrategy & { investedAmount: number })[]> {
-  const strategy: EverlendStrategy | undefined = args.strategies.filter(
+  owner?: PublicKey
+}): Promise<(EverlendStrategy & { investedAmount: number })[]> {
+  const strategys: (EverlendStrategy | undefined)[] = args.strategies.filter(
     isEverlendStrategy
-  )[0]
-  const tokenMintAta = strategy
-    ? await findAssociatedTokenAccount(
-        new PublicKey(args.tokenAddress),
-        new PublicKey(strategy.poolMint)
-      )
-    : undefined
+  )
 
-  const tokenMintATABalance = tokenMintAta
-    ? await args.connection.getTokenAccountBalance(tokenMintAta)
-    : undefined
+  if (!strategys) return []
 
-  if (tokenMintATABalance?.value.uiAmount) {
-    return [
-      {
-        ...strategy,
-        investedAmount: Number(tokenMintATABalance.value.uiAmount),
-      },
-    ]
-  }
+  const loadedStratagies = await Promise.all(
+    strategys.map(async (strategy) => {
+      const tokenMintAta =
+        strategy && args.owner
+          ? await findAssociatedTokenAccount(
+              args.owner,
+              new PublicKey(strategy.poolMint)
+            )
+          : undefined
 
-  return []
+      let tokenMintATABalance = 0
+
+      try {
+        const tokenMintATABalanceFetched = tokenMintAta
+          ? await args.connection.getTokenAccountBalance(tokenMintAta)
+          : 0
+        if (tokenMintATABalanceFetched) {
+          tokenMintATABalance = calcUserTokenBalanceByPoolToken(
+            Number(tokenMintATABalanceFetched.value.uiAmount),
+            strategy?.decimals,
+            Number(strategy?.rateEToken),
+            false
+          )
+        }
+      } catch (e) {
+        tokenMintATABalance = 0
+      }
+
+      return tokenMintATABalance
+        ? { ...strategy, investedAmount: tokenMintATABalance }
+        : null
+    })
+  )
+
+  // @ts-ignore
+  return loadedStratagies.filter(notNull)
 }

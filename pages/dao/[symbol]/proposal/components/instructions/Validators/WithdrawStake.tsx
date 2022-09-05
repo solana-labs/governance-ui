@@ -24,6 +24,7 @@ import StakeAccountSelect from '../../StakeAccountSelect'
 import Input from '@components/inputs/Input'
 import { bs58 } from '@project-serum/anchor/dist/cjs/utils/bytes'
 import { StakeAccount, StakeState } from '@utils/uiTypes/assets'
+import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
 
 const WithdrawValidatorStake = ({
   index,
@@ -72,7 +73,7 @@ const WithdrawValidatorStake = ({
   const getStakeAccounts = async (): Promise<StakeAccount[]> => {
     if (!form.governedTokenAccount) return []
 
-    const stakingAccounts = await getFilteredProgramAccounts(
+    const accountsNotYetStaked = await getFilteredProgramAccounts(
       connection.current,
       StakeProgram.programId,
       [
@@ -91,10 +92,39 @@ const WithdrawValidatorStake = ({
       ]
     )
 
+    const accountsStaked = await getFilteredProgramAccounts(
+      connection.current,
+      StakeProgram.programId,
+      [
+        {
+          memcmp: {
+            offset: 0,
+            bytes: bs58.encode([2, 0, 0, 0]),
+          },
+        },
+        {
+          memcmp: {
+            offset: 44,
+            bytes: form.governedTokenAccount.pubkey.toBase58(),
+          },
+        },
+      ]
+    )
+
+    const stakingAccounts = accountsNotYetStaked.concat(
+      accountsStaked.filter((x) => {
+        // filter all accounts which are not yet deactivated
+        const data = x.accountInfo.data.slice(172, 172 + 8)
+        return !data.equals(
+          Buffer.from([255, 255, 255, 255, 255, 255, 255, 255])
+        )
+      })
+    )
+
     return stakingAccounts.map((x) => {
       return {
         stakeAccount: x.publicKey,
-        state: StakeState.Active,
+        state: StakeState.Inactive,
         delegatedValidator: web3.PublicKey.default,
         amount: x.accountInfo.lamports / web3.LAMPORTS_PER_SOL,
       }
@@ -148,10 +178,11 @@ const WithdrawValidatorStake = ({
     ) {
       return returnInvalid()
     }
+    const realAmount = parseMintNaturalAmountFromDecimal(form.amount!, 9)
     const instruction = web3.StakeProgram.withdraw({
-      stakePubkey: new PublicKey(form.stakingAccount),
+      stakePubkey: new PublicKey(form.stakingAccount.stakeAccount),
       authorizedPubkey: form.governedTokenAccount.pubkey,
-      lamports: form.amount,
+      lamports: realAmount,
       toPubkey: form.governedTokenAccount.pubkey,
     })
     return {

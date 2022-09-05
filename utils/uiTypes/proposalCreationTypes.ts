@@ -33,6 +33,12 @@ export interface SplTokenTransferForm {
   mintInfo: MintInfo | undefined
 }
 
+export interface DomainNameTransferForm {
+  destinationAccount: string
+  governedAccount: AssetAccount | undefined
+  domainAddress: string | undefined
+}
+
 export interface CastleDepositForm {
   amount: number | undefined
   governedTokenAccount: AssetAccount | undefined
@@ -144,7 +150,6 @@ export interface CreateStreamForm {
   tokenAccount?: AssetAccount
   start: string
   depositedAmount: number
-  releaseFrequency: number
   releaseAmount: number
   amountAtCliff: number
   cancelable: boolean
@@ -509,6 +514,7 @@ export enum Instructions {
   DeactivateValidatorStake,
   WithdrawValidatorStake,
   DifferValidatorStake,
+  TransferDomainName,
   EverlendDeposit,
   EverlendWithdraw,
   SerumInitUser,

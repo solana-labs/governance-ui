@@ -26,6 +26,10 @@ import { PROGRAM_IDS } from '@castlefinance/vault-sdk'
 import { FORESIGHT_INSTRUCTIONS } from './programs/foresight'
 import { SAGA_PHONE } from './programs/SagaPhone'
 import { LIDO_INSTRUCTIONS } from './programs/lido'
+import { NAME_SERVICE_INSTRUCTIONS } from './programs/nameService'
+import { TOKEN_AUCTION_INSTRUCTIONS } from './programs/tokenAuction'
+import { VALIDATORDAO_INSTRUCTIONS } from './programs/validatordao'
+
 /**
  * Default governance program id instance
  */
@@ -256,7 +260,10 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...VOTE_STAKE_REGISTRY_INSTRUCTIONS,
   ...NFT_VOTER_INSTRUCTIONS,
   ...STREAMFLOW_INSTRUCTIONS,
+  ...NAME_SERVICE_INSTRUCTIONS,
   ...SAGA_PHONE,
+  ...TOKEN_AUCTION_INSTRUCTIONS,
+  ...VALIDATORDAO_INSTRUCTIONS,
 }
 
 export async function getInstructionDescriptor(

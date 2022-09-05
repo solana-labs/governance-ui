@@ -46,6 +46,8 @@ export type SolendStrategy = TreasuryStrategy & {
 
 export type EverlendStrategy = TreasuryStrategy & {
   poolMint: string
+  decimals: number
+  rateEToken: number
 }
 
 export type HandleCreateProposalWithStrategy = (

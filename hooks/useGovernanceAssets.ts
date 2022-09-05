@@ -7,6 +7,7 @@ import { vsrPluginsPks } from './useVotingPlugins'
 
 export default function useGovernanceAssets() {
   const { ownVoterWeight, realm, symbol, governances, config } = useRealm()
+
   const governedTokenAccounts: AssetAccount[] = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
   )
@@ -265,6 +266,11 @@ export default function useGovernanceAssets() {
     {
       id: Instructions.WithdrawValidatorStake,
       name: 'Withdraw validator stake',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.TransferDomainName,
+      name: 'SNS Transfer Out Domain Name',
       isVisible: canUseAnyInstruction,
     },
     {
@@ -539,7 +545,6 @@ export default function useGovernanceAssets() {
     },
     ...foresightInstructions,
   ]
-
   return {
     governancesArray,
     getGovernancesByAccountType,
