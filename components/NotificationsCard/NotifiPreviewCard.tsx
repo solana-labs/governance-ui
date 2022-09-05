@@ -155,15 +155,27 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
             onClick={onClose}
           />
         </div>
-        <p className="text-md py-0.5">{email}</p>
-        <p className="text-md py-0.5">{phoneNumber}</p>
-        {telegramEnabled && <p className="py-0.5 pb-2">{telegram}</p>}
-        <div
-          className="text-primary-light cursor-pointer mb-4 font-medium"
-          onClick={handleEdit}
-        >
-          Edit Information
-        </div>
+        {console.log('data', data?.sources)}
+        {data && data?.sources?.length > 0 ? (
+          <div className="flex">
+            <p className="text-md py-0.5">{email}</p>
+            <p className="text-md py-0.5">{phoneNumber}</p>
+            {telegramEnabled && <p className="py-0.5 pb-2">{telegram}</p>}
+            <div
+              className="text-primary-light cursor-pointer mb-4 font-medium"
+              onClick={handleEdit}
+            >
+              Edit Information
+            </div>
+          </div>
+        ) : (
+          <div className="flex">
+            <p className="text-md">
+              You are not eligible to subscribe to any DAO alerts. Acquire
+              tokens of DAOs to enable alert signup.
+            </p>
+          </div>
+        )}
       </div>
       {notificationsToggle && notificationsToggle.length >= 1 ? (
         <div className="w-full max-h-96 text-secondary-grey flex flex-col overflow-y-auto px-6 py-4">
