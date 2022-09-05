@@ -412,7 +412,7 @@ const NotificationsCard = ({
                   ? 'No unsaved changes!'
                   : isAuthenticated
                   ? 'Save settings for notifications'
-                  : 'Fetch stored values for existing accounts'
+                  : 'Subscribe for notifications'
               }
             >
               {alerts && alerts.length > 0 ? 'Update' : 'Subscribe'}
