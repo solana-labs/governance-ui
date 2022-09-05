@@ -156,7 +156,7 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
           />
         </div>
         {data && data?.sources?.length > 0 ? (
-          <div className="flex">
+          <div className="flex flex-col">
             <p className="text-md py-0.5">{email}</p>
             <p className="text-md py-0.5">{phoneNumber}</p>
             {telegramEnabled && <p className="py-0.5 pb-2">{telegram}</p>}
