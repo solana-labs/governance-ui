@@ -420,7 +420,7 @@ const NotificationsCard = ({
 
             <div className="h-3 grid text-xs w-full place-items-center">
               <a
-                className="text-xs text-blue "
+                className="text-xs text-blue"
                 href="https://www.notifi.network/faqs"
                 rel="noreferrer"
                 target="_blank"

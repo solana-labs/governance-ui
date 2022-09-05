@@ -155,7 +155,6 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
             onClick={onClose}
           />
         </div>
-        {console.log('data', data?.sources)}
         {data && data?.sources?.length > 0 ? (
           <div className="flex">
             <p className="text-md py-0.5">{email}</p>
