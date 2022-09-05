@@ -1,5 +1,5 @@
 import { getCertifiedRealmInfos } from '@models/registry/api'
-import { AssetType, TokenOwnerAsset } from '@models/treasury/Asset'
+import { AssetType, TokenOwnerRecordAsset } from '@models/treasury/Asset'
 import {
   getRealm,
   getTokenOwnerRecord,
@@ -7,13 +7,12 @@ import {
 } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { ConnectionContext } from '@utils/connection'
-import BigNumber from 'bignumber.js'
-import { UserGroupIcon } from '@heroicons/react/solid'
+import { tryGetMint } from '@utils/tokens'
 
 const getTokenOwnerRecordsForWallet = async (
   connection: ConnectionContext,
   walletAddress?: PublicKey | null
-): Promise<TokenOwnerAsset[]> => {
+): Promise<TokenOwnerRecordAsset[]> => {
   if (!walletAddress) return []
 
   const realmInfos = getCertifiedRealmInfos(connection)
@@ -32,26 +31,23 @@ const getTokenOwnerRecordsForWallet = async (
           connection.current,
           recordAddress
         )
+        const communityMint = await tryGetMint(
+          connection.current,
+          realmData.account.communityMint
+        )
         return {
-          type: AssetType.TokenOwnerAsset,
+          type: AssetType.TokenOwnerRecordAsset,
           id: recordAddress.toBase58(),
-          address: recordAddress.toBase58(),
-          owner: walletAddress.toBase58(),
-          realmId: realmData.pubkey.toBase58(),
-          realmSymbol: r.symbol,
+          address: recordAddress,
+          owner: walletAddress,
           programId: r.programId.toBase58(),
-          mintAddress: realmData.account.communityMint.toBase58(),
-          governingTokensDeposited: new BigNumber(
-            recordData.account.governingTokenDepositAmount.toString()
-          ),
-          unrelinquishedVotes: recordData.account.unrelinquishedVotesCount,
-          totalVotes: recordData.account.totalVotesCount,
-          outstandingProposalCount: recordData.account.outstandingProposalCount,
-          realmIcon: r.ogImage ? (
-            <img src={r.ogImage} className="rounded-full h-6 w-auto" />
-          ) : (
-            <UserGroupIcon className="fill-fgd-1 h-6 w-6" />
-          ),
+          realmId: realmData.pubkey.toBase58(),
+          displayName: r.displayName ? r.displayName : 'Unnamed DAO',
+          realmSymbol: r.symbol,
+          realmImage: r.ogImage ? r.ogImage : undefined,
+          communityMint: communityMint,
+          realmAccount: realmData,
+          tokenOwnerRecordAccount: recordData,
         }
       } catch (e) {
         return null
@@ -60,7 +56,7 @@ const getTokenOwnerRecordsForWallet = async (
   )
   tokenOwnerRecords = tokenOwnerRecords.filter((r) => r !== null)
 
-  return tokenOwnerRecords as TokenOwnerAsset[]
+  return tokenOwnerRecords as TokenOwnerRecordAsset[]
 }
 
 export default getTokenOwnerRecordsForWallet

@@ -8,7 +8,7 @@ import {
   RealmAuthority,
   Sol,
   Unknown,
-  TokenOwnerAsset,
+  TokenOwnerRecordAsset,
 } from '@models/treasury/Asset'
 
 export function isToken(asset: Asset): asset is Token {
@@ -39,6 +39,8 @@ export function isUnknown(asset: Asset): asset is Unknown {
   return asset.type === AssetType.Unknown
 }
 
-export function isTokenOwnerRecord(asset: Asset): asset is TokenOwnerAsset {
-  return asset.type === AssetType.TokenOwnerAsset
+export function isTokenOwnerRecord(
+  asset: Asset
+): asset is TokenOwnerRecordAsset {
+  return asset.type === AssetType.TokenOwnerRecordAsset
 }

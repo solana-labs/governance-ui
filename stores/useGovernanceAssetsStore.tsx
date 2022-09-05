@@ -415,6 +415,13 @@ const getAccountsForGovernances = async (
     GovernanceAccountType.ProgramGovernanceV2,
   ])
 
+  const tokenGovernances = getGovernancesByAccountTypes(governancesArray, [
+    GovernanceAccountType.GovernanceV1,
+    GovernanceAccountType.GovernanceV2,
+    GovernanceAccountType.TokenGovernanceV2,
+    GovernanceAccountType.TokenGovernanceV2,
+  ])
+
   const genericGovernances = getGenericAssetAccounts(governancesArray)
 
   const mintGovernancesMintInfo = await getMultipleAccountInfoChunked(
@@ -500,9 +507,12 @@ const getAccountsForGovernances = async (
   const results = await Promise.all(
     groups.map((group) => {
       if (group.length) {
-        return getTokenAssetAccounts(group, governancesArray, realm, connection)
+        return getTokenAssetAccounts(group, tokenGovernances, realm, connection)
       } else {
-        return []
+        // This is done because in the case where a Realm has one wallet with a Mint governance, and another wallet with nothing but SOL
+        // Then, groups will be empty, but we still want to return the SOL account
+        // Could've removed if/else, but wanted to make explanation explicit
+        return getTokenAssetAccounts(group, tokenGovernances, realm, connection)
       }
     })
   )

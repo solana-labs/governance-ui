@@ -1,6 +1,5 @@
 import Input from '@components/inputs/Input'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { findProgramAddressSync } from '@project-serum/anchor/dist/cjs/utils/pubkey'
 import {
   Governance,
   ProgramAccount,
@@ -20,6 +19,7 @@ import useWalletStore from 'stores/useWalletStore'
 import useSerumGovStore from 'stores/useSerumGovStore'
 import useWallet from '@hooks/useWallet'
 import { NewProposalContext } from '../../../new'
+import { findProgramAddressSync } from '@project-serum/anchor/dist/cjs/utils/pubkey'
 
 const InitUser = ({
   index,

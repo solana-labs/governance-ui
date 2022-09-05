@@ -96,6 +96,7 @@ export async function tryGetMint(
       `Can't fetch mint ${publicKey?.toBase58()} @ ${connection.rpcEndpoint}`,
       ex
     )
+    return undefined
   }
 }
 

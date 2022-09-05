@@ -61,7 +61,6 @@ export const assembleWallets = async (
   const governanceToWallet: { [address: string]: string } = {}
 
   for (const account of accounts) {
-    console.log(`account: ${account.pubkey.toBase58()}`)
     let walletAddress = ''
 
     if (account.isSol && account.extensions.transferAddress) {
@@ -73,7 +72,6 @@ export const assembleWallets = async (
     }
 
     if (!walletAddress) {
-      console.log('UNGOVERNED: ', account.pubkey.toBase58())
       ungovernedAssets.push(account)
       continue
     }

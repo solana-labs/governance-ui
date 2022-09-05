@@ -1,5 +1,5 @@
-import { UserGroupIcon } from '@heroicons/react/outline'
-import { TokenOwnerAsset } from '@models/treasury/Asset'
+import { UserGroupIcon } from '@heroicons/react/solid'
+import { TokenOwnerRecordAsset } from '@models/treasury/Asset'
 import Collapsible from './Collapsible'
 import TokenOwnerRecordListItem from './TokenOwnerRecordListItem'
 
@@ -7,9 +7,9 @@ interface Props {
   className?: string
   disableCollapse?: boolean
   expanded?: boolean
-  assets: TokenOwnerAsset[]
+  assets: TokenOwnerRecordAsset[]
   selectedAssetId?: string | null
-  onSelect?(asset: TokenOwnerAsset): void
+  onSelect?(asset: TokenOwnerRecordAsset): void
   onToggleExpand?(): void
 }
 export default function TokenOwnerRecordsList(props: Props) {
@@ -25,10 +25,20 @@ export default function TokenOwnerRecordsList(props: Props) {
     >
       {props.assets.map((a) => (
         <TokenOwnerRecordListItem
-          key={a.address}
+          key={a.address.toBase58()}
           onSelect={() => props.onSelect?.(a)}
           name={a.realmSymbol}
-          thumbnail={a.realmIcon}
+          thumbnail={
+            a.realmImage ? (
+              <img
+                src={a.realmImage}
+                alt={a.realmSymbol}
+                className="h-6 w-auto"
+              />
+            ) : (
+              <UserGroupIcon className="h-6 w-6" />
+            )
+          }
         />
       ))}
     </Collapsible>
