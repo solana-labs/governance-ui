@@ -86,7 +86,7 @@ const TokenBalanceCard: FC<Props> = ({ proposal, children }) => {
       const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
         realm!.owner,
         realm!.pubkey,
-        defaultMint!,
+        defaultMint || PublicKey.default,
         wallet!.publicKey!
       )
       setTokenOwneRecordPk(tokenOwnerRecordAddress.toBase58())

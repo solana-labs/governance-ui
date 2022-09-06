@@ -24,16 +24,6 @@ const SerumGovernanceTokenWrapper: FC = () => {
 
   return (
     <div>
-      <div className="flex items-center mt-4 space-x-4">
-        <div className="w-full px-4 py-2 rounded-md bg-bkg-1 flex flex-row items-center justify-between">
-          <div>
-            <p className="text-xs text-fgd-3">gSRM Tokens</p>
-            <p className="mb-0 text-xl font-bold text-fgd-1 hero-text">
-              {gsrmBalance && gsrmBalance.uiAmount ? gsrmBalance?.uiAmount : 0}
-            </p>
-          </div>
-        </div>
-      </div>
       <div className="py-2">
         <div className="flex flex-col space-y-2 mt-2">
           {vestAccounts &&
