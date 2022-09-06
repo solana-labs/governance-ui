@@ -55,7 +55,9 @@ const Comment = ({
                   className={`flex-shrink-0 h-4 w-4 ml-1.5 text-primary-light`}
                 />
               </a>
-              <ProfilePopup publicKey={author} expanded={true} />
+              {profile?.exists && (
+                <ProfilePopup publicKey={author} expanded={true} />
+              )}
             </div>
             <div className="text-fgd-3 text-xs">{fromNow}</div>
           </div>

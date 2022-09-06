@@ -1,17 +1,24 @@
 import { useEffect, useState } from 'react'
 import { Connection, PublicKey } from '@solana/web3.js'
-import { CivicProfile, Profile } from '@civic/profile'
+import { CivicProfile, Profile as BaseProfile } from '@civic/profile'
 import useWalletStore from 'stores/useWalletStore'
+
+type Profile = BaseProfile & {
+  exists: boolean
+}
 
 const getProfile = async (
   publicKey: PublicKey,
   connection?: Connection
-): Promise<Profile> =>
+): Promise<BaseProfile> =>
   CivicProfile.get(publicKey.toBase58(), {
     solana: {
       connection,
     },
   })
+
+const profileIsSet = (profile: BaseProfile): boolean =>
+  !!profile.name || !!profile.image || !!profile.headline
 
 export const useProfile = (
   publicKey?: PublicKey
@@ -27,7 +34,10 @@ export const useProfile = (
     if (profileWalletPublicKey) {
       getProfile(profileWalletPublicKey, connection?.current).then(
         (profile) => {
-          setProfile(profile)
+          setProfile({
+            ...profile,
+            exists: profileIsSet(profile),
+          })
           setLoading(false)
         }
       )

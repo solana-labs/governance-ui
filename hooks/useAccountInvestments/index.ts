@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { MangoAccount } from '@blockworks-foundation/mango-client'
 import { PublicKey } from '@solana/web3.js'
-
+import { Wallet } from '@models/treasury/Wallet'
 import { WSOL_MINT } from '@components/instructions/tools'
 import useStrategiesStore from 'Strategies/store/useStrategiesStore'
 import { AssetType, Sol, Token } from '@models/treasury/Asset'
@@ -15,7 +15,6 @@ import {
 } from 'Strategies/protocols/mango/tools'
 import { SOLEND } from 'Strategies/protocols/solend'
 import { TreasuryStrategy } from 'Strategies/types/types'
-
 import loadData from './loadData'
 import * as staticInvestments from './staticInvestments'
 
@@ -27,6 +26,7 @@ type Asset =
 
 interface Args {
   asset: Asset
+  wallet?: Wallet
   governanceAddress?: string
 }
 
@@ -100,6 +100,7 @@ export function useAccountInvestments(args: Args) {
           strategyMintAddress,
           tokenAddress,
           tokenAmount,
+          wallet: args.wallet,
           connection: connection.current,
           loadEverlend: !!visibleInvestments.filter(
             (x) => x.protocolName === EVERLEND
