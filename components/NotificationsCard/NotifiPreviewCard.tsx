@@ -169,10 +169,7 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
           </div>
         ) : (
           <div className="flex">
-            <p className="text-md">
-              You are not eligible to subscribe to any DAO alerts. Acquire
-              tokens of DAOs to enable alert signup.
-            </p>
+            <p className="text-md">No governance memberships found</p>
           </div>
         )}
       </div>
