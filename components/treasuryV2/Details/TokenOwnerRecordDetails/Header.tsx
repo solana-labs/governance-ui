@@ -42,7 +42,7 @@ export default function Header(props: Props) {
           </p>
           <p className="text-2xl font-bold text-fgd-1">{asset.displayName}</p>
           <p className="text-fgd-3">
-            Voter Weight:{' '}
+            Community Votes:{' '}
             {fmtMintAmount(
               asset.communityMint.account,
               new BN(

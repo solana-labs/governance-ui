@@ -3,6 +3,7 @@ import * as anchor from '@project-serum/anchor'
 import { yupResolver } from '@hookform/resolvers/yup'
 import useWallet from '@hooks/useWallet'
 import {
+  fmtBnMintDecimals,
   fmtMintAmount,
   parseMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
@@ -260,8 +261,17 @@ const VestAccount: FC<Props> = ({
         <div className="mt-3 flex flex-col space-y-1 flex-1">
           <p className="text-xs">gSRM burned</p>
           <p className="text-lg font-semibold">
-            {fmtMintAmount(gsrmMint, account.gsrmBurned)}/
-            {fmtMintAmount(gsrmMint, account.totalGsrmAmount)}
+            {gsrmMint ? (
+              <>
+                {fmtMintAmount(gsrmMint, account.gsrmBurned)}/
+                {fmtMintAmount(gsrmMint, account.totalGsrmAmount)}
+              </>
+            ) : (
+              <>
+                {fmtBnMintDecimals(account.gsrmBurned, SRM_DECIMALS)}/
+                {fmtBnMintDecimals(account.totalGsrmAmount, SRM_DECIMALS)}
+              </>
+            )}
           </p>
         </div>
       </div>

@@ -5,6 +5,7 @@ import useWallet from '@hooks/useWallet'
 import LockedAccount from '@components/SerumGov/LockedAccount'
 import VestAccount from '@components/SerumGov/VestAccount'
 import useSerumGov from '@hooks/useSerumGov'
+import DepositCard from '@components/SerumGov/DepositCard'
 
 const SerumGovernanceTokenWrapper: FC = () => {
   const { wallet } = useWallet()
@@ -25,6 +26,22 @@ const SerumGovernanceTokenWrapper: FC = () => {
   return (
     <div>
       <div className="py-2">
+        <div className="space-y-2">
+          <DepositCard
+            mint="SRM"
+            callback={async () => {
+              await refreshClaimTickets()
+              await refreshLockedAccounts()
+            }}
+          />
+          <DepositCard
+            mint="MSRM"
+            callback={async () => {
+              await refreshClaimTickets()
+              await refreshLockedAccounts()
+            }}
+          />
+        </div>
         <div className="flex flex-col space-y-2 mt-2">
           {vestAccounts &&
             vestAccounts.map((account) => (

@@ -9,8 +9,13 @@ import useSerumGovStore, {
 } from 'stores/useSerumGovStore'
 import useWallet from './useWallet'
 import useWalletStore from 'stores/useWalletStore'
+import { useRouter } from 'next/router'
 
 export default function useSerumGov(ownerAddress?: PublicKey | string | null) {
+  const router = useRouter()
+  const routeHasClusterInPath = router.asPath.includes('cluster')
+  const { cluster } = router.query
+
   const connection = useWalletStore((s) => s.connection.current)
   const { anchorProvider } = useWallet()
 
@@ -84,9 +89,16 @@ export default function useSerumGov(ownerAddress?: PublicKey | string | null) {
       refreshGsrmBalance()
       refreshUserAccount()
     }
-    console.log('Loading Serum Gov data..')
-    getAllAccounts()
-  }, [ownerAddress, connection.rpcEndpoint])
+
+    //Small hack to prevent race conditions with cluster change until we remove connection from store and move it to global dep.
+    if (
+      connection &&
+      ((routeHasClusterInPath && cluster) || !routeHasClusterInPath)
+    ) {
+      console.log('Loading Serum Gov data..')
+      getAllAccounts()
+    }
+  }, [ownerAddress, connection])
 
   return {
     gsrmBalance,

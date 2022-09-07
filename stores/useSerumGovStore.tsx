@@ -9,8 +9,10 @@ import {
   SystemProgram,
   SYSVAR_CLOCK_PUBKEY,
   TokenAmount,
+  Transaction,
   TransactionInstruction,
 } from '@solana/web3.js'
+import { createAssociatedTokenAccount } from '@utils/associated'
 import { notify } from '@utils/notifications'
 import { sendTransaction } from '@utils/send'
 import { WalletSigner } from '@utils/sendTransactions'
@@ -190,6 +192,13 @@ interface SerumGovStore extends State {
       amount: anchor.BN,
       isMsrm: boolean
     ) => Promise<TransactionInstruction>
+    depositLocked: (
+      connection: Connection,
+      provider: anchor.AnchorProvider,
+      amount: anchor.BN,
+      isMsrm: boolean,
+      owner?: WalletSigner | null
+    ) => Promise<void>
   }
 }
 
@@ -395,7 +404,21 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
             owner.publicKey,
             true
           )
-          const tx = await program.methods
+          const instructions: TransactionInstruction[] = []
+          try {
+            await connection.getTokenAccountBalance(
+              ownerGsrmAccount,
+              'confirmed'
+            )
+          } catch (e) {
+            const [ix] = await createAssociatedTokenAccount(
+              owner.publicKey,
+              owner.publicKey,
+              GSRM_MINT
+            )
+            instructions.push(ix)
+          }
+          const ix = await program.methods
             .claim()
             .accounts({
               owner: owner.publicKey,
@@ -407,7 +430,11 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
               tokenProgram: TOKEN_PROGRAM_ID,
               systemProgram: SystemProgram.programId,
             })
-            .transaction()
+            .instruction()
+          instructions.push(ix)
+
+          const tx = new Transaction().add(...instructions.map((i) => i))
+
           await sendTransaction({
             transaction: tx,
             wallet: owner,
@@ -950,6 +977,136 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
       }
 
       return ix
+    },
+
+    async depositLocked(
+      connection,
+      provider,
+      amount,
+      isMsrm,
+      owner?
+    ): Promise<void> {
+      if (!owner || !owner.publicKey) {
+        notify({ type: 'error', message: 'Please connect your wallet.' })
+        return
+      }
+      try {
+        const program = new anchor.Program(
+          IDL as anchor.Idl,
+          get().programId,
+          provider
+        )
+
+        const instructions: TransactionInstruction[] = []
+
+        const ownerAta = await getAssociatedTokenAddress(
+          !isMsrm ? SRM_MINT : MSRM_MINT,
+          owner.publicKey
+        )
+
+        const [vault] = findProgramAddressSync(
+          [
+            Buffer.from('vault'),
+            !isMsrm ? SRM_MINT.toBuffer() : MSRM_MINT.toBuffer(),
+          ],
+          program.programId
+        )
+        const [authority] = findProgramAddressSync(
+          [Buffer.from('authority')],
+          program.programId
+        )
+        const [userAccountAddress] = findProgramAddressSync(
+          [Buffer.from('user'), owner.publicKey.toBuffer()],
+          program.programId
+        )
+        const userAccount = await get().actions.getUserAccount(
+          provider,
+          owner?.publicKey
+        )
+
+        if (!userAccount) {
+          const ix = await program.methods
+            .initUser(owner.publicKey)
+            .accounts({
+              payer: owner.publicKey,
+              userAccount: userAccountAddress,
+              systemProgram: SystemProgram.programId,
+            })
+            .instruction()
+          instructions.push(ix)
+        }
+
+        const lockedIndex = userAccount
+          ? new anchor.BN(userAccount.lockIndex).toArrayLike(Buffer, 'le', 8)
+          : new anchor.BN('0').toArrayLike(Buffer, 'le', 8)
+
+        const [aliceLockedAccount] = findProgramAddressSync(
+          [
+            Buffer.from('locked_account'),
+            owner.publicKey.toBuffer(),
+            lockedIndex,
+          ],
+          program.programId
+        )
+
+        const claimTicket = Keypair.generate()
+
+        if (!isMsrm) {
+          const ix = await program.methods
+            .depositLockedSrm(amount)
+            .accounts({
+              payer: owner.publicKey,
+              owner: owner.publicKey,
+              userAccount: userAccount
+                ? userAccount.address
+                : userAccountAddress,
+              srmMint: SRM_MINT,
+              payerSrmAccount: ownerAta,
+              authority,
+              srmVault: vault,
+              lockedAccount: aliceLockedAccount,
+              claimTicket: claimTicket.publicKey,
+              clock: SYSVAR_CLOCK_PUBKEY,
+              tokenProgram: TOKEN_PROGRAM_ID,
+              systemProgram: SystemProgram.programId,
+            })
+            .instruction()
+          instructions.push(ix)
+        } else {
+          const ix = await program.methods
+            .depositLockedMsrm(amount)
+            .accounts({
+              payer: owner.publicKey,
+              owner: owner.publicKey,
+              userAccount: userAccount
+                ? userAccount.address
+                : userAccountAddress,
+              msrmMint: MSRM_MINT,
+              payerMsrmAccount: ownerAta,
+              authority,
+              msrmVault: vault,
+              lockedAccount: aliceLockedAccount,
+              claimTicket: claimTicket.publicKey,
+              clock: SYSVAR_CLOCK_PUBKEY,
+              tokenProgram: TOKEN_PROGRAM_ID,
+              systemProgram: SystemProgram.programId,
+            })
+            .instruction()
+          instructions.push(ix)
+        }
+
+        const tx = new Transaction().add(...instructions)
+
+        await sendTransaction({
+          transaction: tx,
+          wallet: owner,
+          connection,
+          signers: [claimTicket],
+        })
+      } catch (e) {
+        console.error(e)
+        notify({ type: 'error', message: 'Failed to lock tokens' })
+      }
     },
   },
 }))

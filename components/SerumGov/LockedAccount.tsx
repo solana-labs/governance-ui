@@ -2,13 +2,17 @@ import * as yup from 'yup'
 import * as anchor from '@project-serum/anchor'
 import { yupResolver } from '@hookform/resolvers/yup'
 import {
+  fmtBnMintDecimals,
   fmtMintAmount,
   parseMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
 import classNames from 'classnames'
 import { FC, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import useSerumGovStore, { LockedAccountType } from 'stores/useSerumGovStore'
+import useSerumGovStore, {
+  LockedAccountType,
+  SRM_DECIMALS,
+} from 'stores/useSerumGovStore'
 import { notify } from '@utils/notifications'
 import useWallet from '@hooks/useWallet'
 import useWalletStore from 'stores/useWalletStore'
@@ -212,8 +216,17 @@ const LockedAccount: FC<Props> = ({
       <div className="mt-3 flex flex-col space-y-1 flex-1">
         <p className="text-xs">gSRM burned</p>
         <p className="text-lg font-semibold">
-          {fmtMintAmount(gsrmMint, account.gsrmBurned)}/
-          {fmtMintAmount(gsrmMint, account.totalGsrmAmount)}
+          {gsrmMint ? (
+            <>
+              {fmtMintAmount(gsrmMint, account.gsrmBurned)}/
+              {fmtMintAmount(gsrmMint, account.totalGsrmAmount)}
+            </>
+          ) : (
+            <>
+              {fmtBnMintDecimals(account.gsrmBurned, SRM_DECIMALS)}/
+              {fmtBnMintDecimals(account.totalGsrmAmount, SRM_DECIMALS)}
+            </>
+          )}
         </p>
       </div>
       <form
