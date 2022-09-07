@@ -42,6 +42,7 @@ export default function TokenDetails(props: Props) {
           {props.governanceAddress && (
             <Investments
               asset={props.asset}
+              wallet={props.wallet}
               className="mb-10"
               governanceAddress={props.governanceAddress}
             />

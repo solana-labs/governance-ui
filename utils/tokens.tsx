@@ -389,6 +389,7 @@ const fetchNftsFromHolaplexIndexer = async (owner: PublicKey) => {
               mintAddress
               address
               image
+              tokenAccountAddress
               updateAuthorityAddress
               collection {
                 creators {
@@ -503,24 +504,7 @@ const getMainnetNfts = async (
       return {
         ...nft,
         getAssociatedTokenAccount: async () => {
-          //   const accounts = await getOwnedTokenAccounts(connection, ownerPk)
-
-          //   for (const account of accounts) {
-          //     if (account.account.mint.toBase58() === nft.mintAddress) {
-          //       return account.publicKey.toBase58()
-          //     }
-          //   }
-
-          //   throw new Error('Could not find associated token account')
-          const ata = await Token.getAssociatedTokenAddress(
-            ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-            TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-            new PublicKey(nft.mintAddress), // mint
-            ownerPk, // owner
-            true
-          )
-
-          return ata.toBase58()
+          return nft.tokenAccountAddress
         },
       }
     })

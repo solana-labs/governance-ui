@@ -7,6 +7,7 @@ import loadMangoStrategies from './loadMangoStrategies'
 import loadSolendStrategies from './loadSolendStrategies'
 import loadEverlendStrategies from './loadEverlendStrategies'
 import { PublicKey } from '@solana/web3.js'
+import { Wallet } from '@models/treasury/Wallet'
 
 export default function loadData(args: {
   connection: Connection
@@ -19,6 +20,7 @@ export default function loadData(args: {
   strategyMintAddress: string
   tokenAddress: string
   owner?: PublicKey
+  wallet?: Wallet
   tokenAmount: BigNumber
 }): Promise<(TreasuryStrategy & { investedAmount?: number })[]> {
   return Promise.all([
