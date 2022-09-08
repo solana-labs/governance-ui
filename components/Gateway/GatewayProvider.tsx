@@ -20,6 +20,8 @@ export const GatewayProvider: FC = ({ children }) => {
     (s) => s.state.gatekeeperNetwork
   )
   const connection = useWalletStore((s) => s.connection)
+  const cluster =
+    connection.cluster === 'mainnet' ? 'mainnet-beta' : connection.cluster
 
   if (!wallet || !wallet.publicKey || !client || !gatekeeperNetwork)
     return <>{children}</>
@@ -27,7 +29,7 @@ export const GatewayProvider: FC = ({ children }) => {
   return (
     <InternalGatewayProvider
       clusterUrl={connection.endpoint}
-      cluster={connection.cluster}
+      cluster={cluster}
       gatekeeperNetwork={gatekeeperNetwork}
       wallet={{
         publicKey: wallet.publicKey,
