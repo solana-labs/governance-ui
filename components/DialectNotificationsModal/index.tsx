@@ -86,8 +86,10 @@ export default function DialectNotificationsModal(
   const { theme } = useTheme()
   const wallet = useWalletStore((s) => s.current)
 
-  const [dialectWalletAdapter, setDialectWalletAdapter] =
-    useState<DialectWalletAdapter>(() => walletToDialectWallet(wallet))
+  const [
+    dialectWalletAdapter,
+    setDialectWalletAdapter,
+  ] = useState<DialectWalletAdapter>(() => walletToDialectWallet(wallet))
 
   useEffect(() => {
     setDialectWalletAdapter(walletToDialectWallet(wallet))

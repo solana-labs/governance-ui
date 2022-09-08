@@ -130,7 +130,7 @@ export async function getFriktionDepositInstruction({
           connection.current,
           governedTokenAccount.extensions.mint.publicKey,
           TOKEN_PROGRAM_ID,
-          null as unknown as Account
+          (null as unknown) as Account
         ).getMintInfo()
         decimals = underlyingAssetMintInfo.decimals
       }
@@ -241,13 +241,15 @@ export async function getFriktionWithdrawInstruction({
       let depositTokenDest: PublicKey | null
 
       if (governedTokenAccount.isSol) {
-        const { currentAddress: receiverAddress, needToCreateAta } =
-          await getATA({
-            connection: connection,
-            receiverAddress: governedTokenAccount.governance.pubkey,
-            mintPK: new PublicKey(WSOL_MINT),
-            wallet,
-          })
+        const {
+          currentAddress: receiverAddress,
+          needToCreateAta,
+        } = await getATA({
+          connection: connection,
+          receiverAddress: governedTokenAccount.governance.pubkey,
+          mintPK: new PublicKey(WSOL_MINT),
+          wallet,
+        })
         if (needToCreateAta) {
           prerequisiteInstructions.push(
             Token.createAssociatedTokenAccountInstruction(
@@ -384,8 +386,9 @@ export async function getFriktionClaimPendingDepositInstruction({
           cVoltSDK.sdk.programs.Volt.programId
         )
       )[0]
-      const acct =
-        await cVoltSDK.sdk.programs.Volt.account.pendingDeposit.fetch(key)
+      const acct = await cVoltSDK.sdk.programs.Volt.account.pendingDeposit.fetch(
+        key
+      )
       const pendingDepositInfo = {
         ...acct,
         key: key,
@@ -466,13 +469,15 @@ export async function getFriktionClaimPendingWithdrawInstruction({
       let depositTokenDest: PublicKey | null
 
       if (governedTokenAccount.isSol) {
-        const { currentAddress: receiverAddress, needToCreateAta } =
-          await getATA({
-            connection: connection,
-            receiverAddress: governedTokenAccount.governance.pubkey,
-            mintPK: new PublicKey(WSOL_MINT),
-            wallet,
-          })
+        const {
+          currentAddress: receiverAddress,
+          needToCreateAta,
+        } = await getATA({
+          connection: connection,
+          receiverAddress: governedTokenAccount.governance.pubkey,
+          mintPK: new PublicKey(WSOL_MINT),
+          wallet,
+        })
         if (needToCreateAta) {
           prerequisiteInstructions.push(
             Token.createAssociatedTokenAccountInstruction(
