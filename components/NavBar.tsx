@@ -9,7 +9,7 @@ const NavBar = () => {
   const { fmtUrlWithCluster } = useQueryContext()
 
   return (
-    <div className="flex flex-col sm:grid sm:grid-cols-12">
+    <div className="flex flex-col sm:grid sm:grid-cols-12 relative z-[2]">
       <div className="flex items-center justify-between h-20 col-span-12 px-4 xl:col-start-2 xl:col-span-10 md:px-8 xl:px-4">
         <Link href={fmtUrlWithCluster('/realms')}>
           <div className="flex cursor-pointer sm:items-center min-w-[36px]">

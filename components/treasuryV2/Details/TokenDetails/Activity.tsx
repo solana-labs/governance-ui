@@ -19,7 +19,7 @@ export default function Activity(props: Props) {
   const activity = useAccountActivity(props.assets.map((a) => a.address))
   const cluster = useWalletStore((s) => s.connection.cluster)
 
-  switch (activity.status) {
+  switch (activity._tag) {
     case Status.Failed:
       return (
         <div className={props.className}>

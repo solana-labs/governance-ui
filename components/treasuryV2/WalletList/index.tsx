@@ -25,7 +25,7 @@ export default function WalletList(props: Props) {
   const [expanded, setExpanded] = useState<string[]>([])
 
   useEffect(() => {
-    if (props.data.status === Status.Ok) {
+    if (props.data._tag === Status.Ok) {
       const expanded = props.data.data.wallets[0]
       const expandedKey = expanded
         ? 'address' in expanded
@@ -41,9 +41,9 @@ export default function WalletList(props: Props) {
         }
       })
     }
-  }, [props.data.status])
+  }, [props.data._tag])
 
-  switch (props.data.status) {
+  switch (props.data._tag) {
     case Status.Failed:
       return (
         <div className={cx(props.className, 'h-full')}>
