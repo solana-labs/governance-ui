@@ -94,7 +94,9 @@ export default function BasicDetailsForm({
                     : 'e.g. Realms DAO'
                 }
                 data-testid="dao-name-input"
-                error={errors.name?.message || ''}
+                // This had a type error, complaining that message could be a `FieldError`, which would be confusing if so.
+                // I think it's a bug in the typescript definitions for react-hook-form.
+                error={(errors.name?.message as string | undefined) || ''}
                 {...field}
               />
             </FormField>
@@ -114,7 +116,10 @@ export default function BasicDetailsForm({
                 <Input
                   placeholder={`e.g. ${DEFAULT_GOVERNANCE_PROGRAM_ID}`}
                   data-testid="programId-input"
-                  error={errors.programId?.message || ''}
+                  error={
+                    // This had a type error, complaining that message could be a `FieldError`, which would be confusing if so.
+                    (errors.programId?.message as string | undefined) || ''
+                  }
                   autoComplete="on"
                   {...field}
                 />

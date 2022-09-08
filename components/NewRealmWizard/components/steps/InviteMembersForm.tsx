@@ -264,7 +264,7 @@ export default function InviteMembersForm({
   }
 
   const error =
-    errors.daoName?.message ||
+    (errors.daoName?.message as string | undefined) ||
     (invalidAddresses.length > 0
       ? 'Invalid and duplicate addresses will not be included'
       : '')

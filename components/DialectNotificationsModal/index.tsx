@@ -29,7 +29,7 @@ const themeVariables: IncomingThemeVariables = {
       toggleBackgroundActive: 'bg-primary-light',
     },
     outlinedInput: `${defaultVariables.light.outlinedInput} focus-within:bg-bkg-3 focus-within:border-primary-light`,
-    addormentButton: `${defaultVariables.dark.addormentButton} text-bkg-2 bg-primary-light hover:bg-fgd-1`,
+    adornmentButton: `${defaultVariables.dark.adornmentButton} text-bkg-2 bg-primary-light hover:bg-fgd-1`,
     disabledButton: `${defaultVariables.dark.disabledButton} border-primary-light font-bold rounded-full border-fgd-3 text-fgd-3 cursor-not-allowed`,
     modal: `${defaultVariables.dark.modal} bg-bkg-1 sm:border sm:border-fgd-4 shadow-md sm:rounded-md`,
     modalWrapper: `${defaultVariables.dark.modalWrapper} sm:top-14 rounded-md`,
@@ -48,7 +48,7 @@ const themeVariables: IncomingThemeVariables = {
       input: `${defaultVariables.light.textStyles.input} text-fgd-1 placeholder:text-fgd-3`,
     },
     outlinedInput: `${defaultVariables.light.outlinedInput} focus-within:bg-bkg-3 focus-within:border-primary-light`,
-    addormentButton: `${defaultVariables.dark.addormentButton} text-bkg-2 bg-primary-light`,
+    adornmentButton: `${defaultVariables.dark.adornmentButton} text-bkg-2 bg-primary-light`,
     modal: `${defaultVariables.light.modal} sm:border sm:rounded-md sm:border-fgd-4 sm:shadow-md`,
     modalWrapper: `${defaultVariables.dark.modalWrapper} sm:top-14`,
     secondaryDangerButton: `${defaultVariables.light.secondaryDangerButton} rounded-full`,
@@ -86,10 +86,8 @@ export default function DialectNotificationsModal(
   const { theme } = useTheme()
   const wallet = useWalletStore((s) => s.current)
 
-  const [
-    dialectWalletAdapter,
-    setDialectWalletAdapter,
-  ] = useState<DialectWalletAdapter>(() => walletToDialectWallet(wallet))
+  const [dialectWalletAdapter, setDialectWalletAdapter] =
+    useState<DialectWalletAdapter>(() => walletToDialectWallet(wallet))
 
   useEffect(() => {
     setDialectWalletAdapter(walletToDialectWallet(wallet))

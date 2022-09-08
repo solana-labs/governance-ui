@@ -6,7 +6,6 @@ import {
 } from '@castlefinance/vault-core'
 import { VaultClient } from '@castlefinance/vault-sdk'
 import { Provider } from '@castlefinance/vault-sdk/node_modules/@project-serum/anchor'
-import { AnchorWallet } from '@friktion-labs/friktion-sdk/dist/cjs/src/miscUtils'
 import {
   serializeInstructionToBase64,
   ProposalTransaction,
@@ -303,14 +302,10 @@ const getCastleVaultClientFromForm = async (
   form: CastleDepositForm | CastleWithdrawForm
 ) => {
   // Create a new provider
-  const provider = new Provider(
-    connection.current,
-    (wallet as unknown) as AnchorWallet,
-    {
-      preflightCommitment: 'confirmed',
-      commitment: 'confirmed',
-    }
-  )
+  const provider = new Provider(connection.current, wallet as any, {
+    preflightCommitment: 'confirmed',
+    commitment: 'confirmed',
+  })
 
   const vaults = (await getCastleVaults()).filter((v) =>
     connection.cluster == 'mainnet'
@@ -350,14 +345,10 @@ const getCastleVaultClientFromProposal = async (
   instruction: ProgramAccount<ProposalTransaction>
 ) => {
   // Create a new provider
-  const provider = new Provider(
-    connection,
-    (wallet as unknown) as AnchorWallet,
-    {
-      preflightCommitment: 'confirmed',
-      commitment: 'confirmed',
-    }
-  )
+  const provider = new Provider(connection, wallet as any, {
+    preflightCommitment: 'confirmed',
+    commitment: 'confirmed',
+  })
 
   const network = getNetworkFromEndpoint(connection.rpcEndpoint)
   const vaults = await getCastleVaults()

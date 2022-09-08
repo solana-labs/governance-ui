@@ -52,7 +52,7 @@ const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
               Math.max(
                 Number(min),
                 Math.min(Number(max), Number(value))
-              ).toFixed(currentPrecision)
+              ).toFixed(currentPrecision ?? undefined)
             ),
       propertyName: fieldName,
     })

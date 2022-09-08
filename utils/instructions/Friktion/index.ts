@@ -4,7 +4,6 @@ import {
   PendingDepositWithKey,
   VoltSDK,
 } from '@friktion-labs/friktion-sdk'
-import { AnchorWallet } from '@friktion-labs/friktion-sdk/dist/cjs/src/miscUtils'
 import { WSOL_MINT } from '@components/instructions/tools'
 import Decimal from 'decimal.js'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
@@ -61,7 +60,7 @@ export async function getFriktionDepositInstruction({
     const sdk = new FriktionSDK({
       provider: {
         connection: connection.current,
-        wallet: (wallet as unknown) as AnchorWallet,
+        wallet: wallet as any,
       },
     })
     const cVoltSDK = new ConnectedVoltSDK(
@@ -131,7 +130,7 @@ export async function getFriktionDepositInstruction({
           connection.current,
           governedTokenAccount.extensions.mint.publicKey,
           TOKEN_PROGRAM_ID,
-          (null as unknown) as Account
+          null as unknown as Account
         ).getMintInfo()
         decimals = underlyingAssetMintInfo.decimals
       }
@@ -226,7 +225,7 @@ export async function getFriktionWithdrawInstruction({
     const sdk = new FriktionSDK({
       provider: {
         connection: connection.current,
-        wallet: (wallet as unknown) as AnchorWallet,
+        wallet: wallet as any,
       },
     })
     const cVoltSDK = new ConnectedVoltSDK(
@@ -242,15 +241,13 @@ export async function getFriktionWithdrawInstruction({
       let depositTokenDest: PublicKey | null
 
       if (governedTokenAccount.isSol) {
-        const {
-          currentAddress: receiverAddress,
-          needToCreateAta,
-        } = await getATA({
-          connection: connection,
-          receiverAddress: governedTokenAccount.governance.pubkey,
-          mintPK: new PublicKey(WSOL_MINT),
-          wallet,
-        })
+        const { currentAddress: receiverAddress, needToCreateAta } =
+          await getATA({
+            connection: connection,
+            receiverAddress: governedTokenAccount.governance.pubkey,
+            mintPK: new PublicKey(WSOL_MINT),
+            wallet,
+          })
         if (needToCreateAta) {
           prerequisiteInstructions.push(
             Token.createAssociatedTokenAccountInstruction(
@@ -342,7 +339,7 @@ export async function getFriktionClaimPendingDepositInstruction({
     const sdk = new FriktionSDK({
       provider: {
         connection: connection.current,
-        wallet: (wallet as unknown) as AnchorWallet,
+        wallet: wallet as any,
       },
     })
     const cVoltSDK = new ConnectedVoltSDK(
@@ -387,9 +384,8 @@ export async function getFriktionClaimPendingDepositInstruction({
           cVoltSDK.sdk.programs.Volt.programId
         )
       )[0]
-      const acct = await cVoltSDK.sdk.programs.Volt.account.pendingDeposit.fetch(
-        key
-      )
+      const acct =
+        await cVoltSDK.sdk.programs.Volt.account.pendingDeposit.fetch(key)
       const pendingDepositInfo = {
         ...acct,
         key: key,
@@ -454,7 +450,7 @@ export async function getFriktionClaimPendingWithdrawInstruction({
     const sdk = new FriktionSDK({
       provider: {
         connection: connection.current,
-        wallet: (wallet as unknown) as AnchorWallet,
+        wallet: wallet as any,
       },
     })
     const cVoltSDK = new ConnectedVoltSDK(
@@ -470,15 +466,13 @@ export async function getFriktionClaimPendingWithdrawInstruction({
       let depositTokenDest: PublicKey | null
 
       if (governedTokenAccount.isSol) {
-        const {
-          currentAddress: receiverAddress,
-          needToCreateAta,
-        } = await getATA({
-          connection: connection,
-          receiverAddress: governedTokenAccount.governance.pubkey,
-          mintPK: new PublicKey(WSOL_MINT),
-          wallet,
-        })
+        const { currentAddress: receiverAddress, needToCreateAta } =
+          await getATA({
+            connection: connection,
+            receiverAddress: governedTokenAccount.governance.pubkey,
+            mintPK: new PublicKey(WSOL_MINT),
+            wallet,
+          })
         if (needToCreateAta) {
           prerequisiteInstructions.push(
             Token.createAssociatedTokenAccountInstruction(
