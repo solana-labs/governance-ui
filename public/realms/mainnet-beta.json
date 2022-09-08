@@ -856,8 +856,8 @@
     "website": "https://flipsidecrypto.xyz/",
     "twitter": "@flipsidecrypto",
     "ogImage": "/realms/FSLOGO/FLIPSIDE-LOGO-WHITE.png"
-    },
-    {
+  },
+  {
     "symbol": "Dean's List",
     "displayName": "Dean's List",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -875,8 +875,8 @@
     "website": "https://services.grapes.network/",
     "twitter": "@grapeprotocol",
     "ogImage": "/realms/GrapeCCSubDAO/GrapeCCSubDAO.png"
-   },
-   {
+  },
+  {
     "symbol": "AthensDAO",
     "displayName": "AthensDAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -958,5 +958,14 @@
     "ogImage": "/realms/OPANZ/OPANZ_Logo.png",
     "website": "https://auturoa.nz/",
     "twitter": "@OPANZ999"
+  },
+  {
+    "symbol": "MEAN",
+    "displayName": "MEAN DAO",
+    "programId": "MGovW65tDhMMcpEmsegpsdgvzb6zUwGsNjhXFxRAnjd",
+    "realmId": "GkR6JMPU1b2bFj7j9Db8VAmQdisCCqoTQFfzWi2siwcB",
+    "website": "https://www.meanfi.com",
+    "twitter": "@meanfinance",
+    "ogImage": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/MEANeD3XDdUmNMsRGjASkSWdC8prLYsoRJ61pPeHctD/logo.svg"
   }
 ]
