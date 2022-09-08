@@ -17,6 +17,7 @@ export const GOVERNANCE_PROGRAM_NAMES = {
     'Strangemood Foundation Governance Program',
   GovHgfDPyQ1GwazJTDY2avSVY8GGcpmCapmmCsymRaGe: 'PSY DO Governance Program',
   '7e75Nwsz8i5i4NiDa43CNzKJ4AeQGyRimha46VKTM1Ls': 'spl-governance v3 test',
+  'MGovW65tDhMMcpEmsegpsdgvzb6zUwGsNjhXFxRAnjd': 'MEAN DAO Governance Program',
 }
 
 // Well known program names displayed on the instruction card
