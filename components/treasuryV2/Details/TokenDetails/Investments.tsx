@@ -14,6 +14,8 @@ import Modal from '@components/Modal'
 import ConvertToMsol from '@components/TreasuryAccount/ConvertToMsol'
 import ConvertToStSol from '@components/TreasuryAccount/ConvertToStSol'
 import TradeOnSerum from '@components/TreasuryAccount/TradeOnSerum'
+import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
+import useWalletStore from 'stores/useWalletStore'
 
 interface Props {
   className?: string
@@ -23,6 +25,8 @@ interface Props {
 }
 
 export default function Investments(props: Props) {
+  const { currentAccount, setCurrentAccount } = useTreasuryAccountStore()
+  const connection = useWalletStore((s) => s.connection)
   const [showAvailableInvestments, setShowAvailableInvestments] = useState(
     false
   )
@@ -47,6 +51,12 @@ export default function Investments(props: Props) {
       setShowAvailableInvestments(!investments.data.activeInvestments.length)
     }
   }, [investments])
+
+  useEffect(() => {
+    if (!currentAccount) {
+      setCurrentAccount(props.asset.raw, connection)
+    }
+  }, [connection, props])
 
   switch (investments.status) {
     case Status.Failed:
