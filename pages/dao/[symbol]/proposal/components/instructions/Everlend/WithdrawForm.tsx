@@ -22,7 +22,9 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { handleEverlendWithdraw } from 'Strategies/protocols/everlend/depositTools'
 import { getEverlendStrategies } from 'Strategies/protocols/everlend/tools'
 import {
+  CONFIG_DEVNET,
   CONFIG_MAINNET,
+  REGISTRY_DEV,
   REGISTRY_MAIN,
   REWARD_PROGRAM_ID,
 } from 'Strategies/protocols/everlend/constants'
@@ -46,10 +48,6 @@ const WithdrawForm = ({
   const [stratagies, setStratagies] = useState<any>([])
 
   const { assetAccounts } = useGovernanceAssets()
-  // Hardcoded gate used to be clear about what cluster is supported for now
-  if (connection.cluster !== 'mainnet') {
-    return <>This instruction does not support {connection.cluster}</>
-  }
 
   useEffect(() => {
     const fetchStratagies = async () => {
@@ -99,14 +97,15 @@ const WithdrawForm = ({
         governance: form.governedAccount?.governance,
       }
     }
-
-    const owner = form.governedAccount.governance.owner
     const isSol = form.governedAccount.isSol
+    const owner = isSol
+      ? form.governedAccount.pubkey
+      : form.governedAccount.extensions!.token!.account.owner
 
-    const REGISTRY = new PublicKey(REGISTRY_MAIN)
-    const CONFIG = new PublicKey(CONFIG_MAINNET)
+    const isDev = connection.cluster === 'devnet'
 
-    console.log(stratagies)
+    const REGISTRY = new PublicKey(isDev ? REGISTRY_DEV : REGISTRY_MAIN)
+    const CONFIG = new PublicKey(isDev ? CONFIG_DEVNET : CONFIG_MAINNET)
 
     const matchedStratagie = stratagies.find(
       (el) =>
@@ -129,20 +128,28 @@ const WithdrawForm = ({
       REWARD_PROGRAM_ID
     )
 
-    const ctokenATA = await Token.getAssociatedTokenAddress(
-      ASSOCIATED_TOKEN_PROGRAM_ID,
-      TOKEN_PROGRAM_ID,
-      new PublicKey(matchedStratagie.handledMint),
-      owner,
-      true
-    )
+    const liquidityATA = isSol
+      ? await Token.getAssociatedTokenAddress(
+          ASSOCIATED_TOKEN_PROGRAM_ID,
+          TOKEN_PROGRAM_ID,
+          new PublicKey(matchedStratagie.handledMint),
+          owner,
+          true
+        )
+      : form.governedAccount.extensions!.token!.account.address
 
-    const liquidityATA = await Token.getAssociatedTokenAddress(
+    const ctokenATA = await Token.getAssociatedTokenAddress(
       ASSOCIATED_TOKEN_PROGRAM_ID,
       TOKEN_PROGRAM_ID,
       new PublicKey(matchedStratagie.poolMint),
       owner,
       true
+    )
+
+    const amountToRate = Number(
+      (Number(form.uiAmount) * matchedStratagie.rateEToken).toFixed(
+        matchedStratagie.decimals
+      )
     )
 
     const { withdrawTx: tx } = await handleEverlendWithdraw(
@@ -155,7 +162,7 @@ const WithdrawForm = ({
       rewardAccount,
       matchedStratagie.poolPubKey,
       getMintNaturalAmountFromDecimalAsBN(
-        +form.uiAmount as number,
+        amountToRate,
         form.governedAccount.extensions.mint!.account.decimals
       ),
       ctokenATA,
@@ -163,9 +170,12 @@ const WithdrawForm = ({
     )
 
     return {
-      serializedInstruction: serializeInstructionToBase64(tx.instructions[0]),
+      serializedInstruction: serializeInstructionToBase64(
+        tx.instructions[tx.instructions.length - 1]
+      ),
       isValid: true,
       governance: form.governedAccount.governance,
+      shouldSplitIntoSeparateTxs: true,
     }
   }
 
@@ -212,7 +222,7 @@ const WithdrawForm = ({
       />
 
       <Input
-        label="Amount to deposit"
+        label="Amount to withdraw"
         value={form.uiAmount}
         type="string"
         min="0"
