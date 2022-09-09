@@ -292,6 +292,8 @@ const New = () => {
             prerequisiteInstructions: x.prerequisiteInstructions || [],
             chunkSplitByDefault: x.chunkSplitByDefault || false,
             signers: x.signers,
+            prerequisiteInstructionsSigners:
+              x.prerequisiteInstructionsSigners || [],
             shouldSplitIntoSeparateTxs: x.shouldSplitIntoSeparateTxs,
           }
         }),

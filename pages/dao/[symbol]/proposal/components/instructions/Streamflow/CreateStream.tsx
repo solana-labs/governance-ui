@@ -315,6 +315,7 @@ const CreateStream = ({
       governance: form.tokenAccount.governance,
       prerequisiteInstructions: prerequisiteInstructions,
       shouldSplitIntoSeparateTxs: true,
+      prerequisiteInstructionsSigners: signers,
       signers,
     }
   }
