@@ -1,25 +1,29 @@
 import BookIcon from '@carbon/icons-react/lib/Book';
 import ChevronDownIcon from '@carbon/icons-react/lib/ChevronDown';
-import FaceCoolIcon from '@carbon/icons-react/lib/FaceCool';
 import LogoutIcon from '@carbon/icons-react/lib/Logout';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { PublicKey } from '@solana/web3.js';
 
+import { AuthorAvatar } from '@hub/components/AuthorAvatar';
 import { useJWT } from '@hub/hooks/useJWT';
 import { abbreviateAddress } from '@hub/lib/abbreviateAddress';
 import cx from '@hub/lib/cx';
 
 import { DropdownButton } from './DropdownButton';
+import { User as UserModel } from './gql';
 
 interface Props {
   className?: string;
-  publicKey: PublicKey;
+  user: UserModel;
 }
 
 export function User(props: Props) {
   const [, setJwt] = useJWT();
   const { wallet } = useWallet();
+
+  const username = props.user.twitterInfo?.handle
+    ? props.user.twitterInfo.handle
+    : abbreviateAddress(props.user.publicKey);
 
   return (
     <NavigationMenu.Item>
@@ -40,8 +44,8 @@ export function User(props: Props) {
           'hover:bg-neutral-200',
         )}
       >
-        <FaceCoolIcon className="h-6 w-6 fill-cyan-500" />
-        <div>{abbreviateAddress(props.publicKey)}</div>
+        <AuthorAvatar author={props.user} className="h-6 w-6 text-xs" />
+        <div>{username}</div>
         <ChevronDownIcon className="h-4 w-4 fill-neutral-900" />
       </NavigationMenu.Trigger>
       <NavigationMenu.Content

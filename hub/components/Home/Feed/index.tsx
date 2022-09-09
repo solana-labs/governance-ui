@@ -90,14 +90,19 @@ export function Content(props: Props) {
                   'items-center',
                   'justify-center',
                   'overflow-hidden',
-                  'text-3xl',
-                  'text-neutral-900',
+                  'text-xs',
+                  'text-neutral-500',
                   'transition-all',
                   'w-full',
                   isStale ? 'pt-8 mb-6' : 'pt-0 mb-0',
                 )}
               >
-                {isStale && <LoadingDots />}
+                {isStale && (
+                  <div className="flex items-center">
+                    <div className="mr-2">Refreshing the feed</div>
+                    <LoadingDots style="pulse" />
+                  </div>
+                )}
               </div>
               {feed.edges.length ? (
                 <InitialPage.Content

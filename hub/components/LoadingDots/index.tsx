@@ -3,6 +3,7 @@ import cx from '@hub/lib/cx';
 interface Props {
   className?: string;
   numDots: number;
+  style: 'bounce' | 'pulse';
 }
 
 export function LoadingDots(props: Props) {
@@ -19,11 +20,12 @@ export function LoadingDots(props: Props) {
       {Array.from({ length: props.numDots }).map((_, i) => (
         <div
           className={cx(
-            'animate-staggered-bounce',
+            props.style === 'bounce'
+              ? 'animate-staggered-bounce'
+              : 'animate-pulse',
             'bg-current',
             'flex-shrink-0',
             'h-[0.33em]',
-            'opacity-60',
             'rounded-full',
             'w-[0.33em]',
           )}
@@ -39,4 +41,5 @@ export function LoadingDots(props: Props) {
 
 LoadingDots.defaultProps = {
   numDots: 3,
+  style: 'bounce',
 };

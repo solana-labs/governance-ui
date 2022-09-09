@@ -1,12 +1,11 @@
-import FaceSatisfiedIcon from '@carbon/icons-react/lib/FaceSatisfied';
 import type { PublicKey } from '@solana/web3.js';
 import { useRouter } from 'next/router';
 
 import { FeedItem } from '../gql';
+import { AuthorAvatar } from '@hub/components/AuthorAvatar';
 import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay';
 import cx from '@hub/lib/cx';
 import { FeedItemType } from '@hub/types/FeedItemType';
-
 import { ProposalState } from '@hub/types/ProposalState';
 
 import { Controls } from './Controls';
@@ -46,14 +45,10 @@ export function Content(props: Props) {
         'gap-x-3',
       )}
     >
-      {props.feedItem.author?.twitterInfo?.avatarUrl ? (
-        <img
-          className="h-12 w-12 rounded-full border border-neutral-400"
-          src={props.feedItem.author.twitterInfo.avatarUrl}
-        />
-      ) : (
-        <FaceSatisfiedIcon className="h-12 w-12 fill-neutral-400" />
-      )}
+      <AuthorAvatar
+        author={props.feedItem.author}
+        className="h-12 w-12 text-lg"
+      />
       <div
         className="text-left w-full overflow-hidden cursor-pointer"
         onClick={() => {
@@ -97,10 +92,10 @@ export function Content(props: Props) {
         />
         {props.feedItem.type === FeedItemType.Proposal &&
           props.feedItem.proposal.state === ProposalState.Voting && (
-            <Proposal className="mt-4" proposal={props.feedItem} />
+            <Proposal className="mt-4 max-w-xl" proposal={props.feedItem} />
           )}
         <Controls
-          className="mt-4"
+          className="mt-4 max-w-xl"
           feedItemId={props.feedItem.id}
           realm={props.realm}
           score={props.feedItem.score}
