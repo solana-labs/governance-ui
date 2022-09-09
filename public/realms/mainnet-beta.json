@@ -968,4 +968,13 @@
     "twitter": "@meanfinance",
     "ogImage": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/MEANeD3XDdUmNMsRGjASkSWdC8prLYsoRJ61pPeHctD/logo.svg"
   }
+ {
+    "symbol": "ANTLERDAO",
+    "displayName": "AntlerDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "DLxgBgdwUzpvoJH4bhJmLonFymSejKUiMBGAQE6XwopU",
+    "website": "https://www.majesticdeers.com",
+    "twitter": "@MajesticDeers",
+    "ogImage": "https://raw.githubusercontent.com/MajesticDeers/governance-ui/main/public/realms/AntlerDAO/Logo.jpg"
+  }
 ]
