@@ -34,7 +34,6 @@ import { NFTWithMeta } from '@utils/uiTypes/VotePlugin'
 export const vsrPluginsPks: string[] = [
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo',
   'VotEn9AWwTFtJPJSMV5F9jsMY6QwWM5qn3XP9PATGW7',
-  'MVSRXSGsDxcmKWMFQyufxJh3NWmpmgZmT9YHTr4MioB',
 ]
 
 export const nftPluginsPks: string[] = [
@@ -419,7 +418,7 @@ export function useVotingPlugins() {
       currentClient.realm?.pubkey.toBase58() !== realm?.pubkey.toBase58() ||
       currentClient.walletPk?.toBase58() !== wallet?.publicKey?.toBase58() ||
       currentClient.walletPk?.toBase58() !==
-        ownTokenRecord?.account?.governingTokenOwner.toBase58()
+      ownTokenRecord?.account?.governingTokenOwner.toBase58()
     ) {
       handleNftplugin()
       handleGatewayPlugin()
