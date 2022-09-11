@@ -968,7 +968,7 @@
     "twitter": "@meanfinance",
     "ogImage": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/MEANeD3XDdUmNMsRGjASkSWdC8prLYsoRJ61pPeHctD/logo.svg"
   },
-  "symbol": "OCD",
+  "symbol": "OPCD",
     "displayName": "OPANZ COMMUNITY DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "D2dphGE7euTcC576skADhqQ8rwZ9dPMq6pmoDhdbdsYX",
@@ -976,5 +976,5 @@
     "ogImage": "/realms/OPANZ/OCDLO.png",
     "website": "https://auturoa.nz/",
     "twitter": "@OPANZ999"
-  },
+  }
 ]
