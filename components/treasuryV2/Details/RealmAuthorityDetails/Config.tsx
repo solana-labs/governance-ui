@@ -5,6 +5,7 @@ import {
   ScaleIcon,
   DocumentAddIcon,
   BeakerIcon,
+  CogIcon,
 } from '@heroicons/react/outline'
 import { BigNumber } from 'bignumber.js'
 
@@ -73,7 +74,9 @@ export default function Config(props: Props) {
   return (
     <div className={props.className}>
       <div className="flex items-center justify-between">
-        <div className="text-xl text-fgd-1 font-bold">Configuration</div>
+        <div className="text-xl text-fgd-1 font-bold flex items-center space-x-2">
+          <CogIcon className="h-5 w-5" /> <span>Configuration</span>
+        </div>
         <Tooltip
           content={
             !canUseAuthorityInstruction
