@@ -224,6 +224,8 @@ const InstructionInput = ({
             </div>
           </div>
         )
+
+      // SWITCHED_INPUT is for concealing ugly numbers; it uses a toggle to disable the setting (by setting it to u64::max)
       case InstructionInputType.SWITCHED_INPUT: {
         const validateAmountOnBlur = () => {
           const value = form[input.name]
