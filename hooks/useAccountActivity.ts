@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Connection, PublicKey, ConfirmedSignatureInfo } from '@solana/web3.js'
 
 import useWalletStore from 'stores/useWalletStore'
-import { Result, Status, Ok, Failed } from '@utils/uiTypes/Result'
+import { Result, Status, Ok, isFailed, isOk } from '@utils/uiTypes/Result'
 
 const TEN_MINUTES = 1000 * 60 * 10
 
@@ -13,16 +13,6 @@ interface CachedData {
 
 const cache: Map<string, CachedData> = new Map()
 
-function isOk<A>(result: Result<A>): result is Ok<A> {
-  return result.status === Status.Ok
-}
-
-function isFailed<E extends Error>(
-  result: Result<any, E>
-): result is Failed<E> {
-  return result.status === Status.Failed
-}
-
 async function getInfo(
   address: string,
   connection: Connection
@@ -30,7 +20,7 @@ async function getInfo(
   const cachedValue = cache.get(address)
 
   if (cachedValue && cachedValue.time + TEN_MINUTES > Date.now()) {
-    return { status: Status.Ok, data: cachedValue.values }
+    return { _tag: Status.Ok, data: cachedValue.values }
   }
 
   return connection
@@ -43,17 +33,17 @@ async function getInfo(
     )
     .then((values) => {
       cache.set(address, { values, time: Date.now() })
-      return { status: Status.Ok, data: values } as Ok<ConfirmedSignatureInfo[]>
+      return { _tag: Status.Ok, data: values } as Ok<ConfirmedSignatureInfo[]>
     })
     .catch((e) => ({
-      status: Status.Failed,
+      _tag: Status.Failed,
       error: e instanceof Error ? e : new Error(e),
     }))
 }
 
 export default function useAccountActivity(accountAddress: string | string[]) {
   const [result, setResult] = useState<Result<ConfirmedSignatureInfo[]>>({
-    status: Status.Pending,
+    _tag: Status.Pending,
   })
   const connection = useWalletStore((s) => s.connection.current)
   const addresses = Array.isArray(accountAddress)
@@ -61,7 +51,7 @@ export default function useAccountActivity(accountAddress: string | string[]) {
     : [accountAddress]
 
   useEffect(() => {
-    setResult({ status: Status.Pending })
+    setResult({ _tag: Status.Pending })
 
     Promise.all(addresses.map((address) => getInfo(address, connection))).then(
       (results) => {
@@ -76,17 +66,17 @@ export default function useAccountActivity(accountAddress: string | string[]) {
             .slice(0, 10)
 
           setResult({
-            status: Status.Ok,
+            _tag: Status.Ok,
             data: values,
           })
         } else if (fails.length) {
           setResult({
-            status: Status.Failed,
+            _tag: Status.Failed,
             error: fails[0].error,
           })
         } else {
           setResult({
-            status: Status.Failed,
+            _tag: Status.Failed,
             error: new Error('Unknown Error'),
           })
         }

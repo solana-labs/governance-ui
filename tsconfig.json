@@ -17,6 +17,7 @@
     "paths": {
       "@components/*": ["components/*"],
       "@hooks/*": ["hooks/*"],
+      "@hub/*": ["hub/*"],
       "@tools/*": ["tools/*"],
       "@models/*": ["models/*"],
       "@utils/*": ["utils/*"]

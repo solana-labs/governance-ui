@@ -30,7 +30,7 @@ interface Props {
 }
 
 const Details = forwardRef<HTMLDivElement, Props>((props, ref) => {
-  switch (props.data.status) {
+  switch (props.data._tag) {
     case Status.Failed:
       return (
         <div className={props.className} ref={ref}>
