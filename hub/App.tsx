@@ -1,8 +1,29 @@
 import Head from 'next/head';
+import Script from 'next/script';
 import React from 'react';
 
 import { GlobalHeader } from '@hub/components/GlobalHeader';
 import { RootProvider } from '@hub/providers/Root';
+
+const GoogleTag = React.memo(
+  function GoogleTag() {
+    return (
+      <React.Fragment>
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-TG90SK6TGB"
+        />
+        <Script>{`
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-TG90SK6TGB');
+      `}</Script>
+      </React.Fragment>
+    );
+  },
+  () => true,
+);
 
 interface Props {
   children?: React.ReactNode;
@@ -88,6 +109,7 @@ export function App(props: Props) {
           }
         `}</style>
       </Head>
+      <GoogleTag />
       <GlobalHeader className="fixed h-14 top-0 left-0 right-0 z-30" />
       {props.children}
     </RootProvider>

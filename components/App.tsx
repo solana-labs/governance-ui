@@ -3,6 +3,7 @@ import { WalletIdentityProvider } from '@cardinal/namespaces-components'
 import dynamic from 'next/dynamic'
 import React, { useEffect } from 'react'
 import Head from 'next/head'
+import Script from 'next/script'
 
 import { GatewayProvider } from '@components/Gateway/GatewayProvider'
 import { usePrevious } from '@hooks/usePrevious'
@@ -30,6 +31,26 @@ import { getResourcePathPart } from '@tools/core/resources'
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
 })
+
+const GoogleTag = React.memo(
+  function GoogleTag() {
+    return (
+      <React.Fragment>
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-TG90SK6TGB"
+        />
+        <Script>{`
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-TG90SK6TGB');
+      `}</Script>
+      </React.Fragment>
+    )
+  },
+  () => true
+)
 
 interface Props {
   children: React.ReactNode
@@ -203,6 +224,7 @@ export function App(props: Props) {
           </>
         )}
       </Head>
+      <GoogleTag />
       <ErrorBoundary>
         <ThemeProvider defaultTheme="Dark">
           <WalletIdentityProvider appName={'Realms'}>
