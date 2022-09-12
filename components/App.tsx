@@ -40,12 +40,12 @@ const GoogleTag = React.memo(
           async
           src="https://www.googletagmanager.com/gtag/js?id=G-TG90SK6TGB"
         />
-        <Script>{`
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-TG90SK6TGB');
-      `}</Script>
+        <Script id="gta-main">{`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-TG90SK6TGB');
+        `}</Script>
       </React.Fragment>
     )
   },
