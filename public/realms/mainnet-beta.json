@@ -760,5 +760,14 @@
     "website": "https://www.linkedin.com/in/harimasoor/",
     "twitter": "@HariOnChain",
     "ogImage": "/realms/MasoorDAO/MasoorDAO.PNG"
+  },
+  {
+    "symbol": "AGXT",
+    "displayName": "Agrichainx Tribe Dao",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "BXBwS8Q7YRc7iHcGcmU1fSVPk9go3TwoB256YfjDBrwc",
+    "website": "https://tribe.agrichainx.com/",
+    "twitter": "@agrichainx2022",
+    "ogImage": "/realms/AgrichainxTribeDao/AgrichainxTribeDao.jpeg"
   }
 ]
