@@ -142,6 +142,7 @@ const TokenBalanceCard: FC<Props> = ({ proposal, children }) => {
           <div className="h-10 rounded-lg animate-pulse bg-bkg-3" />
         </>
       )}
+      {/* TODO: Restrict to Serum DAO */}
       {cluster === 'devnet' ? <SerumGovernanceTokenWrapper /> : null}
       {children}
     </div>

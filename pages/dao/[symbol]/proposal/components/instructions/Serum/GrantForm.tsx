@@ -212,7 +212,7 @@ const GrantForm = ({
         }
         error={formErrors['owner']}
       />
-      {userAccount && (
+      {userAccount ? (
         <div>
           <div className="pb-0.5 text-fgd-3 text-xs">User Account</div>
           <div className="text-xs pb-1">{userAccount.address.toString()}</div>
@@ -228,6 +228,11 @@ const GrantForm = ({
             </>
           )}
         </div>
+      ) : (
+        <p className="text-fgd-3 text-xs">
+          User account not found. Please add a{' '}
+          <span className="font-bold">Init User</span> instruction before this.
+        </p>
       )}
       <Input
         min={mintMinAmount}

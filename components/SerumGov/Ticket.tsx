@@ -1,3 +1,4 @@
+import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
 import Loading from '@components/Loading'
 import useCreateProposal from '@hooks/useCreateProposal'
 import useQueryContext from '@hooks/useQueryContext'
@@ -9,16 +10,19 @@ import {
   ProgramAccount,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 import { fmtMintAmount } from '@tools/sdk/units'
+import { createAssociatedTokenAccount } from '@utils/associated'
 import { notify } from '@utils/notifications'
-import { dryRunInstruction } from 'actions/dryRunInstruction'
+import { simulateTransaction } from '@utils/send'
+import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import { BigNumber } from 'bignumber.js'
 import classNames from 'classnames'
 import { useRouter } from 'next/router'
 import { FC, useEffect, useState } from 'react'
 import useSerumGovStore, {
   ClaimTicketType,
+  GSRM_MINT,
   MSRM_DECIMALS,
   RedeemTicketType,
   SRM_DECIMALS,
@@ -79,20 +83,62 @@ const Ticket: FC<Props> = ({ ticket, createProposal, callback }) => {
         } else {
           // else create proposal (for DAO wallets);
           try {
+            const instructions: TransactionInstruction[] = []
+            const { owner } = createProposal
+            const ownerAta = await getAssociatedTokenAddress(
+              GSRM_MINT,
+              owner,
+              true
+            )
+            // Adding createATA if not already exists
+            try {
+              await connection.getTokenAccountBalance(ownerAta, 'confirmed')
+            } catch (e) {
+              const [ix] = await createAssociatedTokenAccount(
+                owner,
+                owner,
+                GSRM_MINT
+              )
+              instructions.push(ix)
+            }
             const ix = await actions.getClaimInstruction(
               anchorProvider,
               ticket,
               createProposal.owner
             )
-            const serializedIx = serializeInstructionToBase64(ix)
+            instructions.push(ix)
 
-            const instructionData = {
-              data: getInstructionDataFromBase64(serializedIx),
-              holdUpTime:
-                createProposal.governance?.account.config
-                  .minInstructionHoldUpTime,
-              prerequisiteInstructions: [],
-              shouldSplitIntoSeparateTxs: false,
+            const instructionsData: InstructionDataWithHoldUpTime[] = []
+
+            instructions.forEach(async (ix) => {
+              const serializedIx = serializeInstructionToBase64(ix)
+
+              const ixData = {
+                data: getInstructionDataFromBase64(serializedIx),
+                holdUpTime:
+                  createProposal.governance?.account.config
+                    .minInstructionHoldUpTime,
+                prerequisiteInstructions: [],
+                shouldSplitIntoSeparateTxs: false,
+              }
+
+              instructionsData.push(ixData)
+            })
+
+            const tx = new Transaction().add(...instructions.map((i) => i))
+            const simulationResult = await simulateTransaction(
+              connection,
+              tx,
+              'single'
+            )
+
+            if (simulationResult.value.err) {
+              notify({
+                type: 'error',
+                message: 'Transaction simulation failed.',
+              })
+              // setIsBurning(false)
+              return
             }
             const proposalAddress = await handleCreateProposal({
               title: `Serum DAO: Claim ${fmtMintAmount(
@@ -100,7 +146,7 @@ const Ticket: FC<Props> = ({ ticket, createProposal, callback }) => {
                 ticket.gsrmAmount
               )} gSRM`,
               description: `Claiming ticketId: ${ticket.address.toBase58()}`,
-              instructionsData: [instructionData],
+              instructionsData,
               governance: createProposal.governance!,
             })
             const url = fmtUrlWithCluster(
@@ -108,7 +154,11 @@ const Ticket: FC<Props> = ({ ticket, createProposal, callback }) => {
             )
             await router.push(url)
           } catch (ex) {
-            notify({ type: 'error', message: `${ex}` })
+            console.error('Failed to add Claim Proposal', ex)
+            notify({
+              type: 'error',
+              message: `Something went wrong. Please check console.`,
+            })
           }
         }
       } else {
@@ -117,33 +167,62 @@ const Ticket: FC<Props> = ({ ticket, createProposal, callback }) => {
           if (callback) await callback()
         } else {
           try {
+            const instructions: TransactionInstruction[] = []
+            const { owner } = createProposal
+            const ownerAta = await getAssociatedTokenAddress(
+              GSRM_MINT,
+              owner,
+              true
+            )
+            // Adding createATA if not already exists
+            try {
+              await connection.getTokenAccountBalance(ownerAta, 'confirmed')
+            } catch (e) {
+              const [ix] = await createAssociatedTokenAccount(
+                owner,
+                owner,
+                GSRM_MINT
+              )
+              instructions.push(ix)
+            }
+
             const ix = await actions.getRedeemInstruction(
               anchorProvider,
               ticket,
               createProposal.owner
             )
-            const serializedIx = serializeInstructionToBase64(ix)
+            instructions.push(ix)
 
-            const instructionData = {
-              data: getInstructionDataFromBase64(serializedIx),
-              holdUpTime:
-                createProposal.governance?.account.config
-                  .minInstructionHoldUpTime,
-              prerequisiteInstructions: [],
-              shouldSplitIntoSeparateTxs: false,
-            }
+            const instructionsData: InstructionDataWithHoldUpTime[] = []
 
-            const { response: dryRunResponse } = await dryRunInstruction(
+            instructions.forEach(async (ix) => {
+              const serializedIx = serializeInstructionToBase64(ix)
+
+              const ixData = {
+                data: getInstructionDataFromBase64(serializedIx),
+                holdUpTime:
+                  createProposal.governance?.account.config
+                    .minInstructionHoldUpTime,
+                prerequisiteInstructions: [],
+                shouldSplitIntoSeparateTxs: false,
+              }
+
+              instructionsData.push(ixData)
+            })
+
+            const tx = new Transaction().add(...instructions.map((i) => i))
+            const simulationResult = await simulateTransaction(
               connection,
-              wallet!,
-              instructionData.data
+              tx,
+              'single'
             )
-            if (dryRunResponse.err) {
+
+            if (simulationResult.value.err) {
               notify({
                 type: 'error',
-                message: 'Transaction Simulation Failed',
+                message: 'Transaction simulation failed.',
               })
-              setIsClaiming(false)
+              // setIsBurning(false)
               return
             }
 
@@ -154,7 +233,7 @@ const Ticket: FC<Props> = ({ ticket, createProposal, callback }) => {
                 .shiftedBy(-1 * (ticket.isMsrm ? MSRM_DECIMALS : SRM_DECIMALS))
                 .toFormat()} ${ticket.isMsrm ? 'MSRM' : 'SRM'}`,
               description: `Redeeming ticketId: ${ticket.address.toBase58()}`,
-              instructionsData: [instructionData],
+              instructionsData,
               governance: createProposal.governance!,
             })
             const url = fmtUrlWithCluster(
@@ -162,7 +241,11 @@ const Ticket: FC<Props> = ({ ticket, createProposal, callback }) => {
             )
             await router.push(url)
           } catch (ex) {
-            notify({ type: 'error', message: `${ex}` })
+            console.error('Failed to add Claim Proposal', ex)
+            notify({
+              type: 'error',
+              message: `Something went wrong. Please check console.`,
+            })
           }
         }
       }

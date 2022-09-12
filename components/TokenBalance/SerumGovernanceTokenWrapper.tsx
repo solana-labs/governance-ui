@@ -30,15 +30,19 @@ const SerumGovernanceTokenWrapper: FC = () => {
           <DepositCard
             mint="SRM"
             callback={async () => {
-              await refreshClaimTickets()
-              await refreshLockedAccounts()
+              await Promise.all([
+                refreshClaimTickets(),
+                refreshLockedAccounts(),
+              ])
             }}
           />
           <DepositCard
             mint="MSRM"
             callback={async () => {
-              await refreshClaimTickets()
-              await refreshLockedAccounts()
+              await Promise.all([
+                refreshClaimTickets(),
+                refreshLockedAccounts(),
+              ])
             }}
           />
         </div>
@@ -50,9 +54,11 @@ const SerumGovernanceTokenWrapper: FC = () => {
                 account={account}
                 gsrmBalance={gsrmBalance}
                 callback={async () => {
-                  await refreshGsrmBalance()
-                  await refreshVestAccounts()
-                  await refreshRedeemTickets()
+                  await Promise.all([
+                    refreshGsrmBalance(),
+                    refreshVestAccounts(),
+                    refreshRedeemTickets(),
+                  ])
                 }}
               />
             ))}
@@ -63,9 +69,11 @@ const SerumGovernanceTokenWrapper: FC = () => {
                 account={account}
                 gsrmBalance={gsrmBalance}
                 callback={async () => {
-                  await refreshGsrmBalance()
-                  await refreshLockedAccounts()
-                  await refreshRedeemTickets()
+                  await Promise.all([
+                    refreshGsrmBalance(),
+                    refreshLockedAccounts(),
+                    refreshRedeemTickets(),
+                  ])
                 }}
               />
             ))}
@@ -80,8 +88,10 @@ const SerumGovernanceTokenWrapper: FC = () => {
                   key={ticket.createdAt}
                   ticket={ticket}
                   callback={async () => {
-                    await refreshGsrmBalance()
-                    await refreshClaimTickets()
+                    await Promise.all([
+                      refreshGsrmBalance(),
+                      refreshClaimTickets(),
+                    ])
                   }}
                 />
               ))}
