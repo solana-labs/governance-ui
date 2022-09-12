@@ -198,60 +198,67 @@ export const Deposit: React.FC<{
   }, [form.strategy, governedTokenAccount, governedTokenAccountsWithoutNfts])
 
   const handleDeposit = useCallback(async () => {
-    setIsDepositing(true)
-    const rpcContext = new RpcContext(
-      new PublicKey(realm!.owner.toString()),
-      getProgramVersionForRealm(realmInfo!),
-      wallet!,
-      connection.current,
-      connection.endpoint
-    )
-    const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-      governedTokenAccount!.governance!.account.config,
-      voteByCouncil
-    )
-    const defaultProposalMint = voteByCouncil
-      ? realm?.account.config.councilMint
-      : !mint?.supply.isZero() ||
-        config?.account.communityTokenConfig.maxVoterWeightAddin
-      ? realm!.account.communityMint
-      : !councilMint?.supply.isZero()
-      ? realm!.account.config.councilMint
-      : undefined
+    try {
+      setIsDepositing(true)
+      const rpcContext = new RpcContext(
+        new PublicKey(realm!.owner.toString()),
+        getProgramVersionForRealm(realmInfo!),
+        wallet!,
+        connection.current,
+        connection.endpoint
+      )
+      const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
+        governedTokenAccount!.governance!.account.config,
+        voteByCouncil
+      )
+      const defaultProposalMint = voteByCouncil
+        ? realm?.account.config.councilMint
+        : !mint?.supply.isZero() ||
+          config?.account.communityTokenConfig.maxVoterWeightAddin
+        ? realm!.account.communityMint
+        : !councilMint?.supply.isZero()
+        ? realm!.account.config.councilMint
+        : undefined
 
-    if (!depositReceiptPubkey) {
-      // This should be unreachable
-      throw new Error('Deposit receipt key must be derived first')
+      if (!depositReceiptPubkey) {
+        // This should be unreachable
+        throw new Error('Deposit receipt key must be derived first')
+      }
+      const strategyInfo: PsyFiStrategyInfo = {
+        depositReceipt,
+        depositReceiptPubkey,
+        ownedStrategyTokenAccount: ownedStrategyTokenAccount,
+      }
+      const proposalAddress = await createProposalFcn(
+        rpcContext,
+        {
+          ...form,
+          action: Action.Deposit,
+          bnAmount: getMintNaturalAmountFromDecimalAsBN(
+            form.amount as number,
+            governedTokenAccount.extensions.mint!.account.decimals
+          ),
+        },
+        psyFiProgram,
+        strategyInfo,
+        realm!,
+        governedTokenAccount!,
+        ownTokenRecord,
+        defaultProposalMint!,
+        governedTokenAccount!.governance!.account!.proposalCount,
+        false,
+        connection,
+        client
+      )
+      const url = fmtUrlWithCluster(
+        `/dao/${symbol}/proposal/${proposalAddress}`
+      )
+      router.push(url)
+      setIsDepositing(false)
+    } catch (error) {
+      console.error(error)
+      setIsDepositing(false)
     }
-    const strategyInfo: PsyFiStrategyInfo = {
-      depositReceipt,
-      depositReceiptPubkey,
-      ownedStrategyTokenAccount: ownedStrategyTokenAccount,
-    }
-    const proposalAddress = await createProposalFcn(
-      rpcContext,
-      {
-        ...form,
-        action: Action.Deposit,
-        bnAmount: getMintNaturalAmountFromDecimalAsBN(
-          form.amount as number,
-          governedTokenAccount.extensions.mint!.account.decimals
-        ),
-      },
-      psyFiProgram,
-      strategyInfo,
-      realm!,
-      governedTokenAccount!,
-      ownTokenRecord,
-      defaultProposalMint!,
-      governedTokenAccount!.governance!.account!.proposalCount,
-      false,
-      connection,
-      client
-    )
-    const url = fmtUrlWithCluster(`/dao/${symbol}/proposal/${proposalAddress}`)
-    router.push(url)
-    setIsDepositing(false)
   }, [
     client,
     config,
