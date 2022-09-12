@@ -158,11 +158,14 @@ export default function InstructionCard({
       </div>
 
       {nftImgUrl ? (
-        <div
-          style={{ width: '150px', height: '150px' }}
-          className="flex items-center overflow-hidden"
-        >
-          <img src={nftImgUrl}></img>
+        <div className="flex justify-between mb-2">
+          <div
+            style={{ width: '150px', height: '150px' }}
+            className="flex items-center overflow-hidden"
+          >
+            <img src={nftImgUrl}></img>
+          </div>
+          <InstructionData descriptor={descriptor}></InstructionData>
         </div>
       ) : (
         <InstructionData descriptor={descriptor}></InstructionData>
