@@ -1,6 +1,11 @@
 import React, { useState } from 'react'
 import cx from 'classnames'
-import { PencilIcon } from '@heroicons/react/outline'
+import {
+  PencilIcon,
+  ScaleIcon,
+  DocumentAddIcon,
+  BeakerIcon,
+} from '@heroicons/react/outline'
 import { BigNumber } from 'bignumber.js'
 
 import RealmConfigModal from 'pages/dao/[symbol]/params/RealmConfigModal'
@@ -10,6 +15,7 @@ import Tooltip from '@components/Tooltip'
 import { formatNumber } from '@utils/formatNumber'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import useRealm from '@hooks/useRealm'
+import Section from '../Section'
 
 const DISABLED = new BigNumber(DISABLED_VOTER_WEIGHT.toString())
 
@@ -29,10 +35,12 @@ export default function Config(props: Props) {
           {
             title: 'Community mint max vote weight source',
             value: props.realmAuthority.config.communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage(),
+            icon: <ScaleIcon />,
           },
         ]
       : []),
     {
+      icon: <DocumentAddIcon />,
       title: 'Min community tokens to create governance',
       value: DISABLED.shiftedBy(
         -(mint ? mint.decimals : 0)
@@ -47,12 +55,14 @@ export default function Config(props: Props) {
           ),
     },
     {
+      icon: <BeakerIcon />,
       title: 'Use community voter weight add-in',
       value: props.realmAuthority.config.useCommunityVoterWeightAddin
         ? 'Yes'
         : 'No',
     },
     {
+      icon: <BeakerIcon />,
       title: 'Use max community voter weight add-in',
       value: props.realmAuthority.config.useMaxCommunityVoterWeightAddin
         ? 'Yes'
@@ -91,11 +101,8 @@ export default function Config(props: Props) {
         </Tooltip>
       </div>
       <div className="grid grid-cols-2 gap-8 mt-12">
-        {config.map(({ title, value }) => (
-          <div key={title}>
-            <div className="text-xs text-white/50">{title}</div>
-            <div className="mt-1 text-sm text-fgd-1">{value}</div>
-          </div>
+        {config.map(({ title, value, icon }) => (
+          <Section key={title} value={value} name={title} icon={icon} />
         ))}
       </div>
       {editRealmOpen && (
