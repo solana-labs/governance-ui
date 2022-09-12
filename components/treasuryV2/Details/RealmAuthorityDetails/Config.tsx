@@ -23,41 +23,42 @@ export default function Config(props: Props) {
   const { mint } = useRealm()
   const [editRealmOpen, setEditRealmOpen] = useState(false)
 
-  const config: { title: string; value: string }[] = []
-
-  if (props.realmAuthority.config.communityMintMaxVoteWeightSource) {
-    config.push({
-      title: 'Community mint max vote weight source',
-      value: props.realmAuthority.config.communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage(),
-    })
-  }
-
-  config.push({
-    title: 'Min community tokens to create governance',
-    value: DISABLED.shiftedBy(-(mint ? mint.decimals : 0)).isLessThanOrEqualTo(
-      props.realmAuthority.config.minCommunityTokensToCreateGovernance
-    )
-      ? 'Disabled'
-      : formatNumber(
-          props.realmAuthority.config.minCommunityTokensToCreateGovernance,
-          undefined,
-          { maximumFractionDigits: 2 }
-        ),
-  })
-
-  config.push({
-    title: 'Use community voter weight add-in',
-    value: props.realmAuthority.config.useCommunityVoterWeightAddin
-      ? 'Yes'
-      : 'No',
-  })
-
-  config.push({
-    title: 'Use max community voter weight add-in',
-    value: props.realmAuthority.config.useMaxCommunityVoterWeightAddin
-      ? 'Yes'
-      : 'No',
-  })
+  const config = [
+    ...(props.realmAuthority.config.communityMintMaxVoteWeightSource
+      ? [
+          {
+            title: 'Community mint max vote weight source',
+            value: props.realmAuthority.config.communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage(),
+          },
+        ]
+      : []),
+    {
+      title: 'Min community tokens to create governance',
+      value: DISABLED.shiftedBy(
+        -(mint ? mint.decimals : 0)
+      ).isLessThanOrEqualTo(
+        props.realmAuthority.config.minCommunityTokensToCreateGovernance
+      )
+        ? 'Disabled'
+        : formatNumber(
+            props.realmAuthority.config.minCommunityTokensToCreateGovernance,
+            undefined,
+            { maximumFractionDigits: 2 }
+          ),
+    },
+    {
+      title: 'Use community voter weight add-in',
+      value: props.realmAuthority.config.useCommunityVoterWeightAddin
+        ? 'Yes'
+        : 'No',
+    },
+    {
+      title: 'Use max community voter weight add-in',
+      value: props.realmAuthority.config.useMaxCommunityVoterWeightAddin
+        ? 'Yes'
+        : 'No',
+    },
+  ]
 
   return (
     <div className={props.className}>
