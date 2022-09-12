@@ -4,16 +4,24 @@ import {
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
 import {
+  AccountLayout,
   ASSOCIATED_TOKEN_PROGRAM_ID,
+  NATIVE_MINT,
   Token,
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
+import {
+  PublicKey,
+  SystemProgram,
+  TransactionInstruction,
+  LAMPORTS_PER_SOL,
+} from '@solana/web3.js'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import { instructions as psyFiInstructions, PsyFiEuros } from 'psyfi-euros-test'
 import { PsyFiActionForm, PsyFiStrategyInfo } from '../types'
+import { syncNative } from '@solendprotocol/solend-sdk'
 
 // TODO: Handle native SOL deposits
 
@@ -27,10 +35,13 @@ export const deposit = async (
   transferAddress: PublicKey
 ) => {
   const instructions: InstructionDataWithHoldUpTime[] = []
+
   let vaultOwnershipAccount: PublicKey | undefined =
     psyFiStrategyInfo.ownedStrategyTokenAccount?.pubkey
   const prerequisiteInstructions: TransactionInstruction[] = []
-  let coreDepositInstruction: TransactionInstruction
+
+  const additionalTokenInstructions: string[] = []
+  let tokenInstruction: TransactionInstruction
   // If the lp token account does not exist, add it to the pre-requisite instructions
   if (!vaultOwnershipAccount) {
     const address = await Token.getAssociatedTokenAddress(
@@ -50,6 +61,53 @@ export const deposit = async (
     )
     prerequisiteInstructions.push(createAtaIx)
     vaultOwnershipAccount = address
+  }
+
+  let poolMintATA
+  // Native SOL deposits
+  if (treasuryAssetAccount.isSol) {
+    poolMintATA = await Token.getAssociatedTokenAddress(
+      ASSOCIATED_TOKEN_PROGRAM_ID,
+      TOKEN_PROGRAM_ID,
+      NATIVE_MINT,
+      owner,
+      true
+    )
+
+    if (
+      (await psyFiProgram.provider.connection.getAccountInfo(poolMintATA)) ===
+      null
+    ) {
+      prerequisiteInstructions.push(
+        Token.createAssociatedTokenAccountInstruction(
+          ASSOCIATED_TOKEN_PROGRAM_ID,
+          TOKEN_PROGRAM_ID,
+          NATIVE_MINT,
+          poolMintATA,
+          owner,
+          rpcContext.walletPubkey
+        )
+      )
+    }
+
+    const mintRentExempt = await psyFiProgram.provider.connection.getMinimumBalanceForRentExemption(
+      AccountLayout.span
+    )
+
+    if (form.amount) {
+      const transferInx = SystemProgram.transfer({
+        fromPubkey: owner,
+        toPubkey: poolMintATA,
+        lamports: mintRentExempt * 3 + form.amount * LAMPORTS_PER_SOL,
+      })
+
+      additionalTokenInstructions.push(
+        serializeInstructionToBase64(transferInx)
+      )
+      additionalTokenInstructions.push(
+        serializeInstructionToBase64(syncNative(poolMintATA))
+      )
+    }
   }
 
   // Check if the vault requires a deposit receipt
@@ -80,7 +138,7 @@ export const deposit = async (
     }
 
     // Create transfer to deposit receipt instruction
-    coreDepositInstruction = await psyFiInstructions.transferToDepositReceiptInstruction(
+    tokenInstruction = await psyFiInstructions.transferToDepositReceiptInstruction(
       // @ts-ignore: Anchor version differences.
       psyFiProgram,
       form.bnAmount,
@@ -89,9 +147,13 @@ export const deposit = async (
       form.strategy.vaultAccounts.pubkey,
       transferAddress
     )
+
+    additionalTokenInstructions.push(
+      serializeInstructionToBase64(tokenInstruction)
+    )
   } else {
     // Create the actual deposit instruction
-    coreDepositInstruction = await psyFiInstructions.depositInstruction(
+    tokenInstruction = await psyFiInstructions.depositInstruction(
       // @ts-ignore: Anchor version differences.
       psyFiProgram,
       form.bnAmount,
@@ -101,11 +163,28 @@ export const deposit = async (
       transferAddress,
       vaultOwnershipAccount
     )
+    additionalTokenInstructions.push(
+      serializeInstructionToBase64(tokenInstruction)
+    )
+  }
+
+  if (treasuryAssetAccount.isSol) {
+    const closeIx = Token.createCloseAccountInstruction(
+      TOKEN_PROGRAM_ID,
+      poolMintATA,
+      owner,
+      owner,
+      []
+    )
+    additionalTokenInstructions.push(serializeInstructionToBase64(closeIx))
   }
   // Create the InstructionDataWithHoldUpTime
   const uiInstruction: UiInstruction = {
     governance: treasuryAssetAccount.governance,
-    serializedInstruction: serializeInstructionToBase64(coreDepositInstruction),
+    serializedInstruction: additionalTokenInstructions[0],
+    additionalSerializedInstructions: treasuryAssetAccount.isSol
+      ? additionalTokenInstructions.slice(1)
+      : [],
     prerequisiteInstructions,
     chunkSplitByDefault: true,
     isValid: true,
