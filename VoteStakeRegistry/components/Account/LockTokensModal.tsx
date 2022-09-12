@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import Button, { LinkButton, SecondaryButton } from '@components/Button'
 import Input from '@components/inputs/Input'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
@@ -241,6 +242,7 @@ const LockTokensModal = ({
       communityMintPk: realm!.account.communityMint!,
       realmPk: realm!.pubkey!,
       programId: realm!.owner,
+      programVersion: realmInfo?.programVersion!,
       amountFromVoteRegistryDeposit: amountFromDeposit,
       totalTransferAmount: totalAmountToLock,
       lockUpPeriodInDays: lockupPeriodDays,
@@ -292,6 +294,7 @@ const LockTokensModal = ({
       mintPk: depositToUnlock!.mint.publicKey,
       realmPk: realm!.pubkey!,
       programId: realm!.owner,
+      programVersion: realmInfo?.programVersion!,
       transferAmount: totalAmountToUnlock,
       amountAfterOperation: whatWillBeLeftInsideDeposit,
       lockUpPeriodInDays: lockupPeriodDays,

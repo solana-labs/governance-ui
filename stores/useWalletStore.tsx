@@ -22,13 +22,12 @@ import {
   RealmConfigAccount,
   SignatoryRecord,
   TokenOwnerRecord,
-  tryGetRealmConfig,
   VoteRecord,
 } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { getGovernanceChatMessages } from '@solana/spl-governance'
 import { ChatMessage } from '@solana/spl-governance'
-import { GoverningTokenType } from '@solana/spl-governance'
+import { GoverningTokenRole } from '@solana/spl-governance'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { getCertifiedRealmInfo } from '@models/registry/api'
 import { tryParsePublicKey } from '@tools/core/pubkey'
@@ -43,6 +42,8 @@ import {
 import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 import { HIDDEN_PROPOSALS } from '@components/instructions/tools'
 import { sleep } from '@blockworks-foundation/mango-client'
+import { getRealmConfigAccountOrDefault } from '@tools/governance/configs'
+import { getProposals } from '@utils/GovernanceTools'
 
 interface WalletStore extends State {
   connected: boolean
@@ -79,7 +80,7 @@ interface WalletStore extends State {
     descriptionLink?: string
     proposalMint?: MintAccount
     loading: boolean
-    tokenType?: GoverningTokenType
+    tokenType?: GoverningTokenRole
     proposalOwner: ProgramAccount<TokenOwnerRecord> | undefined
   }
   providerUrl: string | undefined
@@ -135,11 +136,11 @@ const useWalletStore = create<WalletStore>((set, get) => ({
   selectedProposal: INITIAL_PROPOSAL_STATE,
   providerUrl: undefined,
   tokenAccounts: [],
+  switchboardProgram: undefined,
   selectedCouncilDelegate: undefined,
   selectedCommunityDelegate: undefined,
   councilDelegateVoteRecordsByProposal: {},
   communityDelegateVoteRecordsByProposal: {},
-
   set: (fn) => set(produce(fn)),
   actions: {
     async fetchRealmBySymbol(cluster: string, symbol: string) {
@@ -315,6 +316,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
     async fetchRealm(programId: PublicKey, realmId: PublicKey) {
       const set = get().set
       const connection = get().connection.current
+      const connectionContext = get().connection
       const realms = get().realms
       const realm = realms[realmId.toBase58()]
       const mintsArray = (
@@ -363,7 +365,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           realmId,
           realmCouncilMintPk
         ),
-        getRealmConfig(connection, programId, realmId),
+        getRealmConfigAccountOrDefault(connection, programId, realmId),
       ])
 
       const governancesMap = accountsToPubkeyMap(governances)
@@ -380,12 +382,10 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       })
       get().actions.fetchOwnVoteRecords()
 
-      const proposalsByGovernance = await Promise.all(
-        governances.map((g) =>
-          getGovernanceAccounts(connection, programId, Proposal, [
-            pubkeyFilter(1, g.pubkey)!,
-          ])
-        )
+      const proposalsByGovernance = await getProposals(
+        governances.map((x) => x.pubkey),
+        connectionContext,
+        programId
       )
 
       const proposals = accountsToPubkeyMap(
@@ -405,6 +405,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       await sleep(200)
       const set = get().set
       const connection = get().connection.current
+      const connectionContext = get().connection
       const realmId = get().selectedRealm.realm?.pubkey
       const programId = get().selectedRealm.programId
       const governances = await getGovernanceAccounts(
@@ -413,12 +414,10 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         Governance,
         [pubkeyFilter(1, realmId)!]
       )
-      const proposalsByGovernance = await Promise.all(
-        governances.map((g) =>
-          getGovernanceAccounts(connection, programId!, Proposal, [
-            pubkeyFilter(1, g.pubkey)!,
-          ])
-        )
+      const proposalsByGovernance = await getProposals(
+        governances.map((x) => x.pubkey),
+        connectionContext,
+        programId!
       )
       const proposals = accountsToPubkeyMap(
         proposalsByGovernance
@@ -516,8 +515,8 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const tokenType = realm.account.communityMint.equals(
         proposal.account.governingTokenMint
       )
-        ? GoverningTokenType.Community
-        : GoverningTokenType.Council
+        ? GoverningTokenRole.Community
+        : GoverningTokenRole.Council
 
       set((s) => {
         s.selectedProposal.proposal = proposal
@@ -569,11 +568,3 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 }))
 
 export default useWalletStore
-
-const getRealmConfig = async (connection, programId, realmId) => {
-  try {
-    return await tryGetRealmConfig(connection, programId, realmId)
-  } catch (e) {
-    return null
-  }
-}

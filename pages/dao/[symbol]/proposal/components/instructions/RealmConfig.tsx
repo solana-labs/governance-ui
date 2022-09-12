@@ -2,6 +2,8 @@ import React, { useContext, useEffect, useState } from 'react'
 import {
   createSetRealmConfig,
   Governance,
+  GoverningTokenConfigAccountArgs,
+  GoverningTokenType,
   ProgramAccount,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
@@ -19,6 +21,8 @@ import { getRealmCfgSchema } from '@utils/validations'
 import RealmConfigFormComponent from '../forms/RealmConfigFormComponent'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
+import { isDisabledVoterWeight } from '@tools/governance/units'
 
 export interface RealmConfigForm {
   governedAccount: AssetAccount | undefined
@@ -56,10 +60,14 @@ const RealmConfig = ({
       wallet?.publicKey &&
       realm
     ) {
-      const mintAmount = parseMintNaturalAmountFromDecimalAsBN(
-        form!.minCommunityTokensToCreateGovernance!,
-        mint!.decimals!
+      const mintAmount = isDisabledVoterWeight(
+        form!.minCommunityTokensToCreateGovernance
       )
+        ? DISABLED_VOTER_WEIGHT
+        : parseMintNaturalAmountFromDecimalAsBN(
+            form!.minCommunityTokensToCreateGovernance!,
+            mint!.decimals!
+          )
       const instruction = await createSetRealmConfig(
         realmInfo!.programId,
         realmInfo!.programVersion!,
@@ -68,12 +76,16 @@ const RealmConfig = ({
         form?.removeCouncil ? undefined : realm?.account.config.councilMint,
         parseMintSupplyFraction(form!.communityMintSupplyFactor.toString()),
         mintAmount,
-        form!.communityVoterWeightAddin
-          ? new PublicKey(form!.communityVoterWeightAddin)
-          : undefined,
-        form?.maxCommunityVoterWeightAddin
-          ? new PublicKey(form.maxCommunityVoterWeightAddin)
-          : undefined,
+        new GoverningTokenConfigAccountArgs({
+          voterWeightAddin: form!.communityVoterWeightAddin
+            ? new PublicKey(form!.communityVoterWeightAddin)
+            : undefined,
+          maxVoterWeightAddin: form?.maxCommunityVoterWeightAddin
+            ? new PublicKey(form.maxCommunityVoterWeightAddin)
+            : undefined,
+          tokenType: GoverningTokenType.Liquid,
+        }),
+        undefined,
         wallet.publicKey
       )
       serializedInstruction = serializeInstructionToBase64(instruction)

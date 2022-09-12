@@ -2,8 +2,8 @@ import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { BN } from '@project-serum/anchor'
 import { LockupType } from 'VoteStakeRegistry/sdk/accounts'
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { withCreateNewDeposit } from './withCreateNewDeposit'
+import { VsrClient } from './client'
 
 export const withVoteRegistryDeposit = async ({
   instructions,
@@ -12,6 +12,7 @@ export const withVoteRegistryDeposit = async ({
   mintPk,
   realmPk,
   programId,
+  programVersion,
   amount,
   tokenOwnerRecordPk,
   lockUpPeriodInDays,
@@ -26,6 +27,7 @@ export const withVoteRegistryDeposit = async ({
   mintPk: PublicKey
   realmPk: PublicKey
   programId: PublicKey
+  programVersion: number
   amount: BN
   communityMintPk: PublicKey
   tokenOwnerRecordPk: PublicKey | null
@@ -48,6 +50,7 @@ export const withVoteRegistryDeposit = async ({
     mintPk,
     realmPk,
     programId,
+    programVersion,
     tokenOwnerRecordPk,
     lockUpPeriodInDays,
     lockupKind,

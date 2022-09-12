@@ -105,6 +105,7 @@ type SliderProps = {
   value: number
   disabled: boolean
   max?: number
+  min?: number
   maxButtonTransition?: boolean
 }
 
@@ -114,6 +115,7 @@ const AmountSlider: FunctionComponent<SliderProps> = ({
   value,
   disabled,
   max,
+  min = 0,
   maxButtonTransition,
 }) => {
   const [enableTransition, setEnableTransition] = useState(false)
@@ -141,7 +143,7 @@ const AmountSlider: FunctionComponent<SliderProps> = ({
   return (
     <div className="relative">
       <StyledSlider
-        min={0}
+        min={min}
         max={max}
         value={value || 0}
         onChange={onChange}

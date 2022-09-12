@@ -51,7 +51,13 @@ import { NFTWithMint } from '@utils/uiTypes/nfts'
 import useCreateProposal from '@hooks/useCreateProposal'
 import NFTAccountSelect from './NFTAccountSelect'
 
-const SendTokens = ({ isNft = false }) => {
+const SendTokens = ({
+  isNft = false,
+  selectedNft,
+}: {
+  isNft?: boolean
+  selectedNft?: NFTWithMint | null
+}) => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const connection = useWalletStore((s) => s.connection)
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
@@ -129,8 +135,8 @@ const SendTokens = ({ isNft = false }) => {
     return totalPriceFormatted
   }
 
-  async function getInstruction(): Promise<UiInstruction> {
-    const selectedNftMint = selectedNfts[0]?.mint
+  async function getNftInstruction(x: NFTWithMint): Promise<UiInstruction> {
+    const selectedNftMint = x.mintAddress
     const defaultProps = {
       schema,
       form,
@@ -140,18 +146,84 @@ const SendTokens = ({ isNft = false }) => {
       currentAccount,
       setFormErrors,
     }
-    if (isNFT) {
-      return getTransferNftInstruction({
-        ...defaultProps,
-        nftMint: selectedNftMint,
-      })
+    return getTransferNftInstruction({
+      ...defaultProps,
+      nftMint: selectedNftMint,
+    })
+  }
+
+  const handleProposeNftSend = async () => {
+    for (const x of selectedNfts) {
+      const nftName = x?.name
+      const nftTitle = `Send ${nftName ? nftName : 'NFT'} to ${
+        tryParseKey(form.destinationAccount)
+          ? abbreviateAddress(new PublicKey(form.destinationAccount))
+          : ''
+      }`
+      const proposalTitle = isNFT
+        ? nftTitle
+        : `Pay ${form.amount}${tokenInfo ? ` ${tokenInfo?.symbol} ` : ' '}to ${
+            tryParseKey(form.destinationAccount)
+              ? abbreviateAddress(new PublicKey(form.destinationAccount))
+              : ''
+          }`
+      setIsLoading(true)
+      const instruction: UiInstruction = await getNftInstruction(x)
+      if (instruction.isValid) {
+        const governance = currentAccount?.governance
+        let proposalAddress: PublicKey | null = null
+        if (!realm) {
+          setIsLoading(false)
+          throw 'No realm selected'
+        }
+        const instructionData = {
+          data: instruction.serializedInstruction
+            ? getInstructionDataFromBase64(instruction.serializedInstruction)
+            : null,
+          holdUpTime: governance?.account?.config.minInstructionHoldUpTime,
+          prerequisiteInstructions: instruction.prerequisiteInstructions || [],
+        }
+        try {
+          // Fetch governance to get up to date proposalCount
+          const selectedGovernance = (await fetchRealmGovernance(
+            governance?.pubkey
+          )) as ProgramAccount<Governance>
+          proposalAddress = await handleCreateProposal({
+            title: form.title ? form.title : proposalTitle,
+            description: form.description ? form.description : '',
+            voteByCouncil,
+            instructionsData: [instructionData],
+            governance: selectedGovernance!,
+          })
+          const url = fmtUrlWithCluster(
+            `/dao/${symbol}/proposal/${proposalAddress}`
+          )
+          router.push(url)
+        } catch (ex) {
+          notify({ type: 'error', message: `${ex}` })
+        }
+      }
+      setIsLoading(false)
+    }
+  }
+
+  async function getInstruction(): Promise<UiInstruction> {
+    const defaultProps = {
+      schema,
+      form,
+      programId,
+      connection,
+      wallet,
+      currentAccount,
+      setFormErrors,
     }
     if (isSol) {
       return getSolTransferInstruction(defaultProps)
     }
     return getTransferInstruction(defaultProps)
   }
-  const handlePropose = async () => {
+
+  const handleProposeTransfer = async () => {
     setIsLoading(true)
     const instruction: UiInstruction = await getInstruction()
     if (instruction.isValid) {
@@ -190,6 +262,7 @@ const SendTokens = ({ isNft = false }) => {
     }
     setIsLoading(false)
   }
+
   const IsAmountNotHigherThenBalance = () => {
     const mintValue = getMintNaturalAmountFromDecimalAsBN(
       form.amount!,
@@ -203,7 +276,6 @@ const SendTokens = ({ isNft = false }) => {
     }
     return gte
   }
-
   useEffect(() => {
     if (currentAccount) {
       handleSetForm({
@@ -230,7 +302,7 @@ const SendTokens = ({ isNft = false }) => {
 
   const schema = getTokenTransferSchema({ form, connection, nftMode: isNft })
   const transactionDolarAmount = calcTransactionDolarAmount(form.amount)
-  const nftName = selectedNfts[0]?.val?.name
+  const nftName: string | undefined = undefined
   const nftTitle = `Send ${nftName ? nftName : 'NFT'} to ${
     tryParseKey(form.destinationAccount)
       ? abbreviateAddress(new PublicKey(form.destinationAccount))
@@ -293,17 +365,20 @@ const SendTokens = ({ isNft = false }) => {
           </div>
         )}
         {isNFT ? (
-          <NFTSelector
-            onNftSelect={(nfts) => setSelectedNfts(nfts)}
-            ownersPk={
-              currentAccount.isSol
-                ? [
-                    currentAccount.extensions.transferAddress!,
-                    currentAccount.governance.pubkey,
-                  ]
-                : [currentAccount.governance.pubkey]
-            }
-          ></NFTSelector>
+          <>
+            <NFTSelector
+              selectedNft={selectedNft}
+              onNftSelect={(nfts) => setSelectedNfts(nfts)}
+              ownersPk={
+                currentAccount.isSol
+                  ? [
+                      currentAccount.extensions.transferAddress!,
+                      currentAccount.governance.pubkey,
+                    ]
+                  : [currentAccount.governance.pubkey]
+              }
+            ></NFTSelector>
+          </>
         ) : (
           <Input
             min={mintMinAmount}
@@ -402,7 +477,7 @@ const SendTokens = ({ isNft = false }) => {
             (isNFT && !selectedNfts.length)
           }
           className="ml-auto"
-          onClick={handlePropose}
+          onClick={isNft ? handleProposeNftSend : handleProposeTransfer}
           isLoading={isLoading}
         >
           <Tooltip

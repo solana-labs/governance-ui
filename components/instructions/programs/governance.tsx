@@ -1,11 +1,10 @@
 import {
   AccountMetaData,
+  deserializeBorsh,
   getGovernance,
+  getGovernanceInstructionSchema,
   getGovernanceProgramVersion,
-  getGovernanceSchema,
   getRealm,
-  ProgramAccount,
-  RealmConfigAccount,
   SetRealmAuthorityAction,
   SetRealmAuthorityArgs,
   tryGetRealmConfig,
@@ -15,10 +14,14 @@ import {
   SetGovernanceConfigArgs,
   SetRealmConfigArgs,
 } from '@solana/spl-governance'
-import { GOVERNANCE_SCHEMA } from '@solana/spl-governance'
 import { Connection } from '@solana/web3.js'
-import { fmtMintAmount, getDaysFromTimestamp } from '@tools/sdk/units'
-import { deserialize } from 'borsh'
+import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
+import { fmtVoterWeightThresholdMintAmount } from '@tools/governance/units'
+import {
+  fmtBNAmount,
+  fmtMintAmount,
+  getDaysFromTimestamp,
+} from '@tools/sdk/units'
 
 import { tryGetMint } from '../../../utils/tokens'
 
@@ -32,14 +35,20 @@ export const GOVERNANCE_INSTRUCTIONS = {
         data: Uint8Array,
         accounts: AccountMetaData[]
       ) => {
-        const args = deserialize(
-          GOVERNANCE_SCHEMA,
+        const governance = await getGovernance(connection, accounts[0].pubkey)
+        const realm = await getRealm(connection, governance.account.realm)
+
+        const programVersion = await getGovernanceProgramVersion(
+          connection,
+          realm.owner
+        )
+
+        const args = deserializeBorsh(
+          getGovernanceInstructionSchema(programVersion),
           SetGovernanceConfigArgs,
           Buffer.from(data)
         ) as SetGovernanceConfigArgs
 
-        const governance = await getGovernance(connection, accounts[0].pubkey)
-        const realm = await getRealm(connection, governance.account.realm)
         const communityMint = await tryGetMint(
           connection,
           realm.account.communityMint
@@ -47,21 +56,27 @@ export const GOVERNANCE_INSTRUCTIONS = {
         const councilMint = realm.account.config.councilMint
           ? await tryGetMint(connection, realm.account.config.councilMint)
           : undefined
-
+        const isMaxNumber =
+          args.config.minCommunityTokensToCreateProposal.toString() ===
+          DISABLED_VOTER_WEIGHT.toString()
         return (
           <>
             <p>
               {`voteThresholdPercentage:
-              ${args.config.voteThresholdPercentage.value.toLocaleString()}%`}
+              ${args.config.communityVoteThreshold.value?.toLocaleString()}%`}
             </p>
-            <p>
-              {`minCommunityTokensToCreateProposal:
+            {isMaxNumber ? (
+              <p>minCommunityTokensToCreateProposal: Disabled</p>
+            ) : (
+              <p>
+                {`minCommunityTokensToCreateProposal:
               ${fmtMintAmount(
                 communityMint?.account,
                 args.config.minCommunityTokensToCreateProposal
               )}`}{' '}
-              ({args.config.minCommunityTokensToCreateProposal.toNumber()})
-            </p>
+                ({args.config.minCommunityTokensToCreateProposal.toNumber()})
+              </p>
+            )}
             <p>
               {`minCouncilTokensToCreateProposal:
               ${fmtMintAmount(
@@ -81,11 +96,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
             </p>
             <p>
               {`voteTipping:
-              ${VoteTipping[args.config.voteTipping]}`}
-            </p>
-            <p>
-              {`proposalCoolOffTime:
-              ${getDaysFromTimestamp(args.config.proposalCoolOffTime)} days(s)`}
+              ${VoteTipping[args.config.communityVoteTipping]}`}
             </p>
           </>
         )
@@ -109,8 +120,8 @@ export const GOVERNANCE_INSTRUCTIONS = {
           realm.owner
         )
 
-        const args = deserialize(
-          getGovernanceSchema(programVersion),
+        const args = deserializeBorsh(
+          getGovernanceInstructionSchema(programVersion),
           SetRealmAuthorityArgs,
           Buffer.from(data)
         ) as SetRealmAuthorityArgs
@@ -133,37 +144,40 @@ export const GOVERNANCE_INSTRUCTIONS = {
         data: Uint8Array,
         accounts: AccountMetaData[]
       ) => {
-        const args = deserialize(
-          GOVERNANCE_SCHEMA,
+        const realm = await getRealm(connection, accounts[0].pubkey)
+        const programVersion = await getGovernanceProgramVersion(
+          connection,
+          realm.owner
+        )
+
+        const args = deserializeBorsh(
+          getGovernanceInstructionSchema(programVersion),
           SetRealmConfigArgs,
           Buffer.from(data)
         ) as SetRealmConfigArgs
 
-        const realm = await getRealm(connection, accounts[0].pubkey)
         const communityMint = await tryGetMint(
           connection,
           realm.account.communityMint
         )
-        let config: ProgramAccount<RealmConfigAccount> | null = null
-        try {
-          config = await tryGetRealmConfig(
-            connection,
-            realm.owner,
-            realm.pubkey
-          )
-        } catch (e) {
-          console.log(e)
-        }
+        const realmConfig = await tryGetRealmConfig(
+          connection,
+          realm.owner,
+          realm.pubkey
+        )
 
         return (
           <>
             <p>
               {`minCommunityTokensToCreateGovernance:
-              ${fmtMintAmount(
+              ${fmtVoterWeightThresholdMintAmount(
                 communityMint?.account,
                 args.configArgs.minCommunityTokensToCreateGovernance
               )}`}{' '}
-              ({args.configArgs.minCommunityTokensToCreateGovernance.toNumber()}
+              (
+              {fmtBNAmount(
+                args.configArgs.minCommunityTokensToCreateGovernance
+              )}
               )
             </p>
             <p>
@@ -174,7 +188,9 @@ export const GOVERNANCE_INSTRUCTIONS = {
               {`communityMintMaxVoteWeightSource:
                ${args.configArgs.communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}% supply`}{' '}
               (
-              {args.configArgs.communityMintMaxVoteWeightSource.value.toNumber()}
+              {fmtBNAmount(
+                args.configArgs.communityMintMaxVoteWeightSource.value
+              )}
               )
             </p>
             <p>
@@ -185,16 +201,16 @@ export const GOVERNANCE_INSTRUCTIONS = {
               {`useMaxCommunityVoterWeightAddin:
                ${!!args.configArgs.useMaxCommunityVoterWeightAddin}`}
             </p>
-            {config?.account.communityVoterWeightAddin && (
+            {realmConfig?.account.communityTokenConfig.voterWeightAddin && (
               <p>
                 {`communityVoterWeightAddin :
-               ${config?.account.communityVoterWeightAddin?.toBase58()}`}
+               ${realmConfig?.account.communityTokenConfig.voterWeightAddin?.toBase58()}`}
               </p>
             )}
-            {config?.account.maxCommunityVoterWeightAddin && (
+            {realmConfig?.account.communityTokenConfig.maxVoterWeightAddin && (
               <p>
                 {`maxCommunityVoterWeightAddin:
-               ${config?.account.maxCommunityVoterWeightAddin?.toBase58()}`}
+               ${realmConfig?.account.communityTokenConfig.maxVoterWeightAddin?.toBase58()}`}
               </p>
             )}
           </>

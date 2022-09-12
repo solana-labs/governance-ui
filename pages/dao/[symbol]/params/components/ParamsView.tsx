@@ -1,5 +1,6 @@
 import useRealm from '@hooks/useRealm'
 import { fmtMintAmount } from '@tools/sdk/units'
+import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import {
   getFormattedStringFromDays,
   SECS_PER_DAY,
@@ -13,6 +14,19 @@ const ParamsView = ({ activeGovernance, openGovernanceProposalModal }) => {
 
   const realmAccount = realm?.account
   const communityMint = realmAccount?.communityMint.toBase58()
+
+  const minCommunityTokensToCreateProposal = activeGovernance?.account?.config
+    ?.minCommunityTokensToCreateProposal
+    ? mint &&
+      DISABLED_VOTER_WEIGHT.eq(
+        activeGovernance.account.config.minCommunityTokensToCreateProposal
+      )
+      ? 'Disabled'
+      : fmtMintAmount(
+          mint,
+          activeGovernance?.account?.config?.minCommunityTokensToCreateProposal
+        )
+    : 'calculating...'
 
   return (
     <>
@@ -33,11 +47,7 @@ const ParamsView = ({ activeGovernance, openGovernanceProposalModal }) => {
             <AddressField
               label="Min community tokens to create a proposal"
               padding
-              val={fmtMintAmount(
-                mint,
-                activeGovernance.account.config
-                  .minCommunityTokensToCreateProposal
-              )}
+              val={minCommunityTokensToCreateProposal}
             />
           )}
           {councilMint && (
@@ -64,7 +74,7 @@ const ParamsView = ({ activeGovernance, openGovernanceProposalModal }) => {
           <AddressField
             label="Vote Threshold Percentage"
             padding
-            val={`${activeGovernance.account.config.voteThresholdPercentage.value}%`}
+            val={`${activeGovernance.account.config.communityVoteThreshold.value}%`}
           />
           <AddressField
             label="Vote Tipping"

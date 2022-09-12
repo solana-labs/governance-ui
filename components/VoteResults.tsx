@@ -15,7 +15,7 @@ const VoteResults = ({ isListView, proposal }: VoteResultsProps) => {
     relativeYesVotes,
   } = useProposalVotes(proposal)
   return (
-    <div className="flex space-x-4 items-center">
+    <div className="flex items-center space-x-4">
       {proposal ? (
         <div
           className={`${!isListView ? 'bg-bkg-1 p-3' : ''} rounded-md w-full`}
@@ -25,38 +25,38 @@ const VoteResults = ({ isListView, proposal }: VoteResultsProps) => {
               <p>Yes Votes</p>
               <p
                 className={`font-bold text-fgd-1 ${
-                  !isListView ? 'text-lg' : ''
+                  !isListView ? 'hero-text' : ''
                 }`}
               >
                 {yesVoteCount.toLocaleString()}
                 {isListView ? (
-                  <span className="font-normal ml-1 text-fgd-3 text-xs">
+                  <span className="ml-1 text-xs font-normal text-fgd-3">
                     {relativeYesVotes?.toFixed(1)}%
                   </span>
                 ) : null}
               </p>
               {!isListView ? (
-                <div className="text-fgd-1 text-sm">
+                <div className="text-sm text-fgd-1">
                   {relativeYesVotes?.toFixed(1)}%
                 </div>
               ) : null}
             </div>
-            <div className="text-right w-1/2">
+            <div className="w-1/2 text-right">
               <p>No Votes</p>
               <p
                 className={`font-bold text-fgd-1 ${
-                  !isListView ? 'text-lg' : ''
+                  !isListView ? 'hero-text' : ''
                 }`}
               >
                 {noVoteCount.toLocaleString()}
                 {isListView ? (
-                  <span className="font-normal ml-1 text-fgd-3 text-xs">
+                  <span className="ml-1 text-xs font-normal text-fgd-3">
                     {relativeNoVotes?.toFixed(1)}%
                   </span>
                 ) : null}
               </p>
               {!isListView ? (
-                <div className="text-fgd-1 text-sm">
+                <div className="text-sm text-fgd-1">
                   {relativeNoVotes?.toFixed(1)}%
                 </div>
               ) : null}
@@ -69,7 +69,7 @@ const VoteResults = ({ isListView, proposal }: VoteResultsProps) => {
         </div>
       ) : (
         <>
-          <div className="animate-pulse bg-bkg-3 h-12 rounded w-full" />
+          <div className="w-full h-12 rounded animate-pulse bg-bkg-3" />
         </>
       )}
     </div>

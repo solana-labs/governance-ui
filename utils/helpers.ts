@@ -1,4 +1,4 @@
-import { fetchGistFile } from './github'
+import { gistApi } from './github'
 
 export function capitalize(str?: string) {
   return str ? str?.charAt(0).toUpperCase() + str?.slice(1) : str
@@ -22,9 +22,30 @@ export class SanitizedObject {
 
 export async function resolveProposalDescription(descriptionLink: string) {
   try {
+    gistApi.cancel()
     const url = new URL(descriptionLink)
-    return (await fetchGistFile(url.toString())) ?? descriptionLink
+    const desc =
+      (await gistApi.fetchGistFile(url.toString())) ?? descriptionLink
+    return desc
   } catch {
     return descriptionLink
   }
+}
+
+export function preventNegativeNumberInput(ev) {
+  const value = ev.target.value
+  if (!isNaN(value) && value < 0) {
+    ev.target.value = 0
+  } else if (isNaN(value)) {
+    ev.target.value = value.slice(0, value.length - 1)
+  }
+}
+
+export const firstOrNull = <T>(
+  arr: ReadonlyArray<T> | null | undefined
+): T | null => {
+  if (arr !== null && arr !== undefined) {
+    return arr[0] ?? null
+  }
+  return null
 }

@@ -433,6 +433,8 @@ export const sendTransactionsV2 = async ({
   signersSet,
   block,
   showUiComponent = false,
+  runAfterApproval,
+  runAfterTransactionConfirmation,
 }: {
   connection: Connection
   wallet: WalletSigner
@@ -440,14 +442,21 @@ export const sendTransactionsV2 = async ({
   signersSet: Keypair[][]
   block?: Block
   showUiComponent?: boolean
+  runAfterApproval?: (() => void) | null
+  runAfterTransactionConfirmation?: (() => void) | null
 }) => {
   if (!wallet.publicKey) throw new Error('Wallet not connected!')
   //block will be used for timeout calculation
   if (!block) {
     block = await connection.getLatestBlockhash('confirmed')
   }
-  //max usable transactions per one sign is 40
-  const maxTransactionsInBath = 40
+
+  const maxTransactionsInBath =
+    TransactionInstructions.filter(
+      (x) => x.sequenceType === SequenceType.Sequential
+    ).length > 0
+      ? 20
+      : 30
   const currentTransactions = TransactionInstructions.slice(
     0,
     maxTransactionsInBath
@@ -500,6 +509,9 @@ export const sendTransactionsV2 = async ({
   const signedTxns = await wallet.signAllTransactions(unsignedTxns)
   if (showUiComponent) {
     showTransactionsProcessUi(signedTxns.length)
+  }
+  if (runAfterApproval) {
+    runAfterApproval()
   }
   console.log(
     'Transactions play type order',
@@ -572,6 +584,9 @@ export const sendTransactionsV2 = async ({
     if (showUiComponent) {
       closeTransactionProcessUi()
     }
+    if (runAfterTransactionConfirmation) {
+      runAfterTransactionConfirmation()
+    }
   } catch (e) {
     if (showUiComponent) {
       const idx = e?.txInstructionIdx
@@ -589,6 +604,8 @@ export const sendTransactionsV2 = async ({
               TransactionInstructions: txInstructionForRetry,
               signersSet: signersForRetry,
               showUiComponent,
+              runAfterApproval: runAfterApproval,
+              runAfterTransactionConfirmation: runAfterTransactionConfirmation,
             }),
           e.error ? e.error : `${e}`,
           e.txid

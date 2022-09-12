@@ -1,4 +1,10 @@
 import { PublicKey } from '@solana/web3.js'
+import { consts as foresightConsts } from '@foresight-tmp/foresight-sdk/'
+import {
+  LIDO_PROGRAM_ID,
+  LIDO_PROGRAM_ID_DEVNET,
+} from '@components/TreasuryAccount/ConvertToStSol'
+import { NAME_PROGRAM_ID } from '@bonfida/spl-name-service'
 
 export const GOVERNANCE_PROGRAM_NAMES = {
   GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J: 'Mango Governance Program',
@@ -9,6 +15,9 @@ export const GOVERNANCE_PROGRAM_NAMES = {
     'Phantasia Governance Program',
   smfjietFKFJ4Sbw1cqESBTpPhF4CwbMwN8kBEC1e5ui:
     'Strangemood Foundation Governance Program',
+  GovHgfDPyQ1GwazJTDY2avSVY8GGcpmCapmmCsymRaGe: 'PSY DO Governance Program',
+  '7e75Nwsz8i5i4NiDa43CNzKJ4AeQGyRimha46VKTM1Ls': 'spl-governance v3 test',
+  'MGovW65tDhMMcpEmsegpsdgvzb6zUwGsNjhXFxRAnjd': 'MEAN DAO Governance Program',
 }
 
 // Well known program names displayed on the instruction card
@@ -26,15 +35,27 @@ export const PROGRAM_NAMES = {
 
   MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD: 'Marinade Staking Program',
 
+  [LIDO_PROGRAM_ID]: 'Lido Staking Program',
+  [LIDO_PROGRAM_ID_DEVNET]: 'Lido Staking Program',
+
   SysvarRent111111111111111111111111111111111: 'Sysvar: Rent',
   SysvarC1ock11111111111111111111111111111111: 'Sysvar: Clock',
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo':
     'Mango Voter Stake Registry Program',
+  VotEn9AWwTFtJPJSMV5F9jsMY6QwWM5qn3XP9PATGW7:
+    'PsyDO Voter Stake Registry Program',
+  [foresightConsts.PROGRAM_ID]: 'Foresight Dex',
+  [NAME_PROGRAM_ID.toBase58()]: 'Solana Name Service Program',
+  AwyKDr1Z5BfdvK3jX1UWopyjsJSV5cq4cuJpoYLofyEn: 'Validator Dao',
+  Stake11111111111111111111111111111111111111: 'Stake Program',
+  StakeConfig11111111111111111111111111111111: 'Stake Config',
+  SysvarStakeHistory1111111111111111111111111: 'Sysvar: Stake History',
   ...GOVERNANCE_PROGRAM_NAMES,
 }
 
-export function getProgramName(programId: PublicKey) {
-  return PROGRAM_NAMES[programId.toBase58()]
+export function getProgramName(programId: PublicKey | string) {
+  const key = typeof programId === 'string' ? programId : programId.toBase58()
+  return PROGRAM_NAMES[key]
 }
 
 export function isGovernanceProgram(programId: PublicKey) {

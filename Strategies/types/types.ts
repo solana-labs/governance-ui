@@ -9,6 +9,10 @@ import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { MarketStore } from 'Strategies/store/marketStore'
+import {
+  CreateSolendStrategyParams,
+  SolendSubStrategy,
+} from 'Strategies/protocols/solend'
 
 export interface TreasuryStrategy {
   //liquidity in $
@@ -16,6 +20,7 @@ export interface TreasuryStrategy {
   protocolSymbol: string
   apy: string
   protocolName: string
+  strategySubtext?: string
   handledMint: string
   handledTokenSymbol: string
   handledTokenImgSrc: string
@@ -25,9 +30,24 @@ export interface TreasuryStrategy {
   //if you want to use custom component set this to false and add your custom
   //item and modal to strategywrapper component based on generic components
   isGenericItem?: boolean
+  createProposalFcn: any
+}
+
+export type MangoStrategy = TreasuryStrategy & {
   //async function that pass all props needed to create proposal
   // if promise is successfully resolved it will automatically redirect to created proposal
   createProposalFcn: HandleCreateProposalWithStrategy
+}
+
+export type SolendStrategy = TreasuryStrategy & {
+  reserves: Array<SolendSubStrategy>
+  createProposalFcn: CreateSolendStrategyParams
+}
+
+export type EverlendStrategy = TreasuryStrategy & {
+  poolMint: string
+  decimals: number
+  rateEToken: number
 }
 
 export type HandleCreateProposalWithStrategy = (

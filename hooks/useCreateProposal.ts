@@ -21,6 +21,7 @@ export default function useCreateProposal() {
     mint,
     councilMint,
     canChooseWhoVote,
+    config,
   } = useRealm()
   const { getRpcContext } = useRpcContext()
   const handleCreateProposal = async ({
@@ -39,12 +40,13 @@ export default function useCreateProposal() {
     isDraft?: boolean
   }) => {
     const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-      governance!.account.config
+      governance!.account.config,
+      voteByCouncil
     )
 
     const defaultProposalMint =
       !mint?.supply.isZero() ||
-      realm?.account.config.useMaxCommunityVoterWeightAddin
+      config?.account.communityTokenConfig.voterWeightAddin
         ? realm!.account.communityMint
         : !councilMint?.supply.isZero()
         ? realm!.account.config.councilMint
@@ -63,6 +65,7 @@ export default function useCreateProposal() {
     const selectedGovernance = (await fetchRealmGovernance(
       governance?.pubkey
     )) as ProgramAccount<Governance>
+
     const proposalAddress = await createProposal(
       rpcContext,
       realm!,

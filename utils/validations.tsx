@@ -18,8 +18,19 @@ import {
 } from '@solana/spl-token'
 import { Connection } from '@solana/web3.js'
 import { BN } from '@project-serum/anchor'
-import { nftPluginsPks, vsrPluginsPks } from '@hooks/useVotingPlugins'
+import {
+  nftPluginsPks,
+  vsrPluginsPks,
+  gatewayPluginsPks,
+} from '@hooks/useVotingPlugins'
 import { AssetAccount } from '@utils/uiTypes/assets'
+
+// Plugins supported by Realms
+const supportedPlugins = [
+  ...nftPluginsPks,
+  ...vsrPluginsPks,
+  ...gatewayPluginsPks,
+]
 
 export const getValidateAccount = async (
   connection: Connection,
@@ -293,6 +304,69 @@ export const getFriktionWithdrawSchema = () => {
   })
 }
 
+export const getGoblinGoldDepositSchema = ({ form }) => {
+  const governedTokenAccount = form.governedTokenAccount as AssetAccount
+  return yup.object().shape({
+    governedTokenAccount: yup.object().required('Source account is required'),
+    goblinGoldVaultId: yup.string().required('Vault ID is required'),
+    amount: yup
+      .number()
+      .typeError('Amount is required')
+      .test(
+        'amount',
+        'Transfer amount must be less than the source account available amount',
+        async function (val: number) {
+          if (val && !form.governedTokenAccount) {
+            return this.createError({
+              message: `Please select source account to validate the amount`,
+            })
+          }
+          if (
+            val &&
+            governedTokenAccount &&
+            governedTokenAccount.extensions.mint
+          ) {
+            const mintValue = getMintNaturalAmountFromDecimalAsBN(
+              val,
+              governedTokenAccount?.extensions.mint.account.decimals
+            )
+            return !!(governedTokenAccount?.extensions.token?.publicKey &&
+            !governedTokenAccount.isSol
+              ? governedTokenAccount.extensions.token.account.amount.gte(
+                  mintValue
+                )
+              : new BN(
+                  governedTokenAccount.extensions.solAccount!.lamports
+                ).gte(mintValue))
+          }
+          return this.createError({
+            message: `Amount is required`,
+          })
+        }
+      ),
+  })
+}
+
+export const getGoblinGoldWithdrawSchema = () => {
+  return yup.object().shape({
+    governedTokenAccount: yup.object().required('Source account is required'),
+    goblinGoldVaultId: yup.string().required('Vault ID is required'),
+    amount: yup.number().typeError('Amount is required'),
+  })
+}
+
+export const getFriktionClaimPendingDepositSchema = () => {
+  return yup.object().shape({
+    governedTokenAccount: yup.object().required('Source account is required'),
+  })
+}
+
+export const getFriktionClaimPendingWithdrawSchema = () => {
+  return yup.object().shape({
+    governedTokenAccount: yup.object().required('Source account is required'),
+  })
+}
+
 export const getTokenTransferSchema = ({
   form,
   connection,
@@ -515,7 +589,7 @@ export const getRealmCfgSchema = ({ form }) => {
           if (val) {
             try {
               getValidatedPublickKey(val)
-              if ([...nftPluginsPks, ...vsrPluginsPks].includes(val)) {
+              if (supportedPlugins.includes(val)) {
                 return true
               } else {
                 return this.createError({
@@ -567,5 +641,23 @@ export const getRealmCfgSchema = ({ form }) => {
           }
         }
       ),
+  })
+}
+
+export const getCreateTokenMetadataSchema = () => {
+  return yup.object().shape({
+    name: yup.string().required('Name is required'),
+    symbol: yup.string().required('Symbol is required'),
+    uri: yup.string().required('URI is required'),
+    mintAccount: yup.object().nullable().required('Mint is required'),
+  })
+}
+
+export const getUpdateTokenMetadataSchema = () => {
+  return yup.object().shape({
+    name: yup.string().required('Name is required'),
+    symbol: yup.string().required('Symbol is required'),
+    uri: yup.string().required('URI is required'),
+    mintAccount: yup.object().nullable().required('Mint is required'),
   })
 }

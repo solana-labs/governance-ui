@@ -8,11 +8,27 @@ const Modal = ({
   hideClose = false,
   sizeClassName = 'sm:max-w-md',
   background = 'bg-bkg-2',
+  zIndex = 'z-30',
+  wrapperStyle,
+  bgBlack = true,
+  bgClickClose = true,
+}: {
+  isOpen: boolean
+  onClose: any
+  children: any
+  hideClose?: boolean
+  sizeClassName?: string
+  background?: string
+  wrapperStyle?: any
+  bgBlack?: boolean
+  zIndex?: string
+  bgClickClose?: boolean
 }) => {
   return (
     <Portal>
       <div
-        className="fixed z-30 inset-0 overflow-y-auto"
+        style={wrapperStyle}
+        className={`fixed inset-0 ${zIndex} overflow-y-auto`}
         aria-labelledby="modal-title"
         role="dialog"
         aria-modal="true"
@@ -20,9 +36,11 @@ const Modal = ({
         <div className="flex items-center min-h-screen px-4 pb-20 text-center sm:block sm:p-0">
           {isOpen ? (
             <div
-              className="fixed inset-0 bg-black bg-opacity-70 transition-opacity"
+              className={`fixed inset-0 transition-opacity ${
+                bgBlack ? 'bg-black' : ''
+              } bg-opacity-70`}
               aria-hidden="true"
-              onClick={onClose}
+              onClick={bgClickClose ? onClose : null}
             ></div>
           ) : null}
 
@@ -36,7 +54,7 @@ const Modal = ({
           {isOpen ? (
             <div
               className={`inline-block bg-bkg-2 ${background}
-              rounded-lg text-left px-8 pt-6 pb-8 shadow-lg transform transition-all 
+              rounded-lg text-left px-8 pt-6 pb-8 shadow-lg transform transition-all
               sm:my-8 align-middle ${sizeClassName} w-full`}
             >
               {!hideClose ? (

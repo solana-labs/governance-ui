@@ -24,7 +24,7 @@ export const ATA_PROGRAM_INSTRUCTIONS = {
           Object.keys(SPL_TOKENS).find(
             (name) => SPL_TOKENS[name].mint?.toString() === tokenMint
           )!
-        ].name ?? 'unknown'
+        ]?.name ?? 'unknown'
 
       return (
         <div className="flex flex-col">

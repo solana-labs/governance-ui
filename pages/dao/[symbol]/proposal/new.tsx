@@ -15,7 +15,6 @@ import {
 import { PublicKey } from '@solana/web3.js'
 import Button, { LinkButton, SecondaryButton } from '@components/Button'
 import Input from '@components/inputs/Input'
-import Select from '@components/inputs/Select'
 import Textarea from '@components/inputs/Textarea'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -53,10 +52,18 @@ import FriktionDeposit from './components/instructions/Friktion/FriktionDeposit'
 import CreateNftPluginRegistrar from './components/instructions/NftVotingPlugin/CreateRegistrar'
 import CreateNftPluginMaxVoterWeightRecord from './components/instructions/NftVotingPlugin/CreateMaxVoterWeightRecord'
 import ConfigureNftPluginCollection from './components/instructions/NftVotingPlugin/ConfigureCollection'
+import SwitchboardAdmitOracle from './components/instructions/Switchboard/AdmitOracle'
+import SwitchboardRevokeOracle from './components/instructions/Switchboard/RevokeOracle'
 import FriktionWithdraw from './components/instructions/Friktion/FriktionWithdraw'
+import FriktionClaimPendingDeposit from './components/instructions/Friktion/FriktionClaimPendingDeposit'
+import FriktionClaimPendingWithdraw from './components/instructions/Friktion/FriktionClaimPendingWithdraw'
 import MakeChangePerpMarket from './components/instructions/Mango/MakeChangePerpMarket'
 import MakeAddOracle from './components/instructions/Mango/MakeAddOracle'
 import MakeAddSpotMarket from './components/instructions/Mango/MakeAddSpotMarket'
+import CreateStream from './components/instructions/Streamflow/CreateStream'
+import StakeValidator from './components/instructions/Validators/StakeValidator'
+import DeactivateValidatorStake from './components/instructions/Validators/DeactivateStake'
+import WithdrawValidatorStake from './components/instructions/Validators/WithdrawStake'
 import MakeChangeSpotMarket from './components/instructions/Mango/MakeChangeSpotMarket'
 import MakeCreatePerpMarket from './components/instructions/Mango/MakeCreatePerpMarket'
 import useCreateProposal from '@hooks/useCreateProposal'
@@ -67,13 +74,43 @@ import MakeInitCategoryParams from './components/instructions/Foresight/MakeInit
 import MakeResolveMarketParams from './components/instructions/Foresight/MakeResolveMarketParams'
 import MakeAddMarketListToCategoryParams from './components/instructions/Foresight/MakeAddMarketListToCategoryParams'
 import RealmConfig from './components/instructions/RealmConfig'
-import MakeAddMarketMetadataParams from './components/instructions/Foresight/MakeAddMarketMetadataParams'
+import MakeSetMarketMetadataParams from './components/instructions/Foresight/MakeSetMarketMetadataParams'
 import CloseTokenAccount from './components/instructions/CloseTokenAccount'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import CastleWithdraw from './components/instructions/Castle/CastleWithdraw'
 import ChangeDonation from './components/instructions/Change/ChangeDonation'
 import VotingMintConfig from './components/instructions/Vsr/VotingMintConfig'
 import CreateVsrRegistrar from './components/instructions/Vsr/CreateRegistrar'
+import GoblinGoldDeposit from './components/instructions/GoblinGold/GoblinGoldDeposit'
+import GoblinGoldWithdraw from './components/instructions/GoblinGold/GoblinGoldWithdraw'
+import MakeSetMarketMode from './components/instructions/Mango/MakeSetMarketMode'
+import CreateGatewayPluginRegistrar from './components/instructions/GatewayPlugin/CreateRegistrar'
+import ConfigureGatewayPlugin from './components/instructions/GatewayPlugin/ConfigureGateway'
+import MakeChangeQuoteParams from './components/instructions/Mango/MakeChangeQuoteParams'
+import CreateTokenMetadata from './components/instructions/CreateTokenMetadata'
+import UpdateTokenMetadata from './components/instructions/UpdateTokenMetadata'
+import TypeaheadSelect from '@components/TypeaheadSelect'
+import { StyledLabel } from '@components/inputs/styles'
+import classNames from 'classnames'
+import MakeRemoveSpotMarket from './components/instructions/Mango/MakeRemoveSpotMarket'
+import MakeRemovePerpMarket from './components/instructions/Mango/MakeRemovePerpMarket'
+import MakeSwapSpotMarket from './components/instructions/Mango/MakeSwapSpotMarket'
+import MakeRemoveOracle from './components/instructions/Mango/MakeRemoveOracle'
+import SagaPreOrder from './components/instructions/Solana/SagaPhone/SagaPreOrder'
+import MakeDepositToMangoAccount from './components/instructions/Mango/MakeDepositToMangoAccount'
+import MakeDepositToMangoAccountCsv from './components/instructions/Mango/MakeDepositToMangoAccountCsv'
+import TokenRegister from './components/instructions/Mango/MangoV4/TokenRegister'
+import EditToken from './components/instructions/Mango/MangoV4/EditToken'
+import PerpEdit from './components/instructions/Mango/MangoV4/PerpEdit'
+import Serum3RegisterMarket from './components/instructions/Mango/MangoV4/Serum3RegisterMarket'
+import PerpCreate from './components/instructions/Mango/MangoV4/PerpCreate'
+import TokenRegisterTrustless from './components/instructions/Mango/MangoV4/TokenRegisterTrustless'
+import TransferDomainName from './components/instructions/TransferDomainName'
+import DepositForm from './components/instructions/Everlend/DepositForm'
+import WithdrawForm from './components/instructions/Everlend/WithdrawForm'
+import MakeChangeReferralFeeParams2 from './components/instructions/Mango/MakeChangeReferralFeeParams2'
+
+const TITLE_LENGTH_LIMIT = 130
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -102,8 +139,7 @@ const New = () => {
   const { handleCreateProposal } = useCreateProposal()
   const { fmtUrlWithCluster } = useQueryContext()
   const { symbol, realm, realmDisplayName, canChooseWhoVote } = useRealm()
-
-  const { getAvailableInstructions } = useGovernanceAssets()
+  const { getAvailableInstructions, assetAccounts } = useGovernanceAssets()
   const availableInstructions = getAvailableInstructions()
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const [voteByCouncil, setVoteByCouncil] = useState(false)
@@ -118,6 +154,7 @@ const New = () => {
   ] = useState<ProgramAccount<Governance> | null>(null)
   const [isLoadingSignedProposal, setIsLoadingSignedProposal] = useState(false)
   const [isLoadingDraft, setIsLoadingDraft] = useState(false)
+
   const isLoading = isLoadingSignedProposal || isLoadingDraft
   //   const customInstructionFilterForSelectedGovernance = (
   //     instructionType: Instructions
@@ -148,7 +185,7 @@ const New = () => {
   }
   const [instructionsData, setInstructions] = useState<
     ComponentInstructionData[]
-  >([{ type: availableInstructions[0] }])
+  >([{ type: undefined }])
   const handleSetInstructions = (val: any, index) => {
     const newInstructions = [...instructionsData]
     newInstructions[index] = { ...instructionsData[index], ...val }
@@ -184,6 +221,7 @@ const New = () => {
     setIsLoadingSignedProposal(false)
     setIsLoadingDraft(false)
   }
+
   const handleCreate = async (isDraft) => {
     setFormErrors({})
     if (isDraft) {
@@ -197,7 +235,14 @@ const New = () => {
       form
     )
 
-    const instructions: UiInstruction[] = await handleGetInstructions()
+    let instructions: UiInstruction[] = []
+    try {
+      instructions = await handleGetInstructions()
+    } catch (e) {
+      handleTurnOffLoaders()
+      notify({ type: 'error', message: `${e}` })
+      throw e
+    }
 
     let proposalAddress: PublicKey | null = null
     if (!realm) {
@@ -222,7 +267,8 @@ const New = () => {
                   ? getTimestampFromDays(instruction.customHoldUpTime)
                   : selectedGovernance?.account?.config
                       .minInstructionHoldUpTime,
-                prerequisiteInstructions: [],
+                prerequisiteInstructions:
+                  instruction.prerequisiteInstructions || [],
                 chunkSplitByDefault: instruction.chunkSplitByDefault || false,
                 signers: instruction.signers,
                 shouldSplitIntoSeparateTxs:
@@ -246,6 +292,8 @@ const New = () => {
             prerequisiteInstructions: x.prerequisiteInstructions || [],
             chunkSplitByDefault: x.chunkSplitByDefault || false,
             signers: x.signers,
+            prerequisiteInstructionsSigners:
+              x.prerequisiteInstructionsSigners || [],
             shouldSplitIntoSeparateTxs: x.shouldSplitIntoSeparateTxs,
           }
         }),
@@ -253,10 +301,16 @@ const New = () => {
 
       try {
         // Fetch governance to get up to date proposalCount
-        selectedGovernance = (await fetchRealmGovernance(
-          governance.pubkey
-        )) as ProgramAccount<Governance>
 
+        if (governance.pubkey != undefined) {
+          selectedGovernance = (await fetchRealmGovernance(
+            governance.pubkey
+          )) as ProgramAccount<Governance>
+        } else {
+          selectedGovernance = (await fetchRealmGovernance(
+            governance
+          )) as ProgramAccount<Governance>
+        }
         proposalAddress = await handleCreateProposal({
           title: form.title,
           description: form.description,
@@ -272,6 +326,7 @@ const New = () => {
 
         router.push(url)
       } catch (ex) {
+        console.log(ex)
         notify({ type: 'error', message: `${ex}` })
       }
     } else {
@@ -279,9 +334,12 @@ const New = () => {
     }
     handleTurnOffLoaders()
   }
+
   useEffect(() => {
-    setInstructions([instructionsData[0]])
-  }, [instructionsData[0].governedAccount?.pubkey])
+    if (instructionsData?.length) {
+      setInstructions([instructionsData[0]])
+    }
+  }, [instructionsData[0]?.governedAccount?.pubkey])
 
   useEffect(() => {
     const governedAccount = extractGovernanceAccountFromInstructionsData(
@@ -291,6 +349,23 @@ const New = () => {
     setGovernance(governedAccount)
   }, [instructionsData])
 
+  useEffect(() => {
+    if (
+      typeof router.query['i'] === 'string' &&
+      availableInstructions.length &&
+      instructionsData[0]?.type === undefined
+    ) {
+      const instructionType = parseInt(router.query['i'], 10) as Instructions
+      const instruction = availableInstructions.find(
+        (i) => i.id === instructionType
+      )
+
+      if (instruction) {
+        setInstructionType({ value: instruction, idx: 0 })
+      }
+    }
+  }, [router.query, availableInstructions, instructionsData])
+
   const getCurrentInstruction = ({ typeId, idx }) => {
     switch (typeId) {
       case Instructions.Transfer:
@@ -299,6 +374,26 @@ const New = () => {
             index={idx}
             governance={governance}
           ></SplTokenTransfer>
+        )
+      case Instructions.CreateStream:
+        return <CreateStream index={idx} governance={governance}></CreateStream>
+      case Instructions.StakeValidator:
+        return (
+          <StakeValidator index={idx} governance={governance}></StakeValidator>
+        )
+      case Instructions.DeactivateValidatorStake:
+        return (
+          <DeactivateValidatorStake
+            index={idx}
+            governance={governance}
+          ></DeactivateValidatorStake>
+        )
+      case Instructions.WithdrawValidatorStake:
+        return (
+          <WithdrawValidatorStake
+            index={idx}
+            governance={governance}
+          ></WithdrawValidatorStake>
         )
       case Instructions.ChangeMakeDonation:
         return (
@@ -313,19 +408,51 @@ const New = () => {
           <CreateAssociatedTokenAccount index={idx} governance={governance} />
         )
       case Instructions.Mint:
-        return <Mint index={idx} governance={governance}></Mint>
+        return (
+          <Mint
+            index={idx}
+            governance={governance}
+            initialMintAccount={
+              typeof router.query['m'] === 'string' && assetAccounts.length
+                ? assetAccounts.find(
+                    (acc) => acc.pubkey.toBase58() === router.query['m']
+                  )
+                : undefined
+            }
+          />
+        )
+      case Instructions.SagaPreOrder:
+        return <SagaPreOrder index={idx} governance={governance}></SagaPreOrder>
       case Instructions.Base64:
         return <CustomBase64 index={idx} governance={governance}></CustomBase64>
       case Instructions.None:
         return <Empty index={idx} governance={governance}></Empty>
-      case Instructions.DepositIntoCastle:
-        return <CastleDeposit index={idx} governance={governance} />
-      case Instructions.WithrawFromCastle:
-        return <CastleWithdraw index={idx} governance={governance} />
       case Instructions.DepositIntoVolt:
         return <FriktionDeposit index={idx} governance={governance} />
       case Instructions.WithdrawFromVolt:
         return <FriktionWithdraw index={idx} governance={governance} />
+      case Instructions.ClaimPendingDeposit:
+        return (
+          <FriktionClaimPendingDeposit index={idx} governance={governance} />
+        )
+      case Instructions.ClaimPendingWithdraw:
+        return (
+          <FriktionClaimPendingWithdraw index={idx} governance={governance} />
+        )
+      case Instructions.DepositIntoCastle:
+        return <CastleDeposit index={idx} governance={governance} />
+      case Instructions.WithrawFromCastle:
+        return <CastleWithdraw index={idx} governance={governance} />
+      case Instructions.DepositIntoGoblinGold:
+        return <GoblinGoldDeposit index={idx} governance={governance} />
+      case Instructions.WithdrawFromGoblinGold:
+        return <GoblinGoldWithdraw index={idx} governance={governance} />
+
+      case Instructions.SwitchboardAdmitOracle:
+        return <SwitchboardAdmitOracle index={idx} _governance={governance} />
+      case Instructions.SwitchboardRevokeOracle:
+        return <SwitchboardRevokeOracle index={idx} _governance={governance} />
+
       case Instructions.CreateSolendObligationAccount:
         return <CreateObligationAccount index={idx} governance={governance} />
       case Instructions.InitSolendObligationAccount:
@@ -369,6 +496,20 @@ const New = () => {
             governance={governance}
           ></CreateNftPluginMaxVoterWeightRecord>
         )
+      case Instructions.CreateGatewayPluginRegistrar:
+        return (
+          <CreateGatewayPluginRegistrar
+            index={idx}
+            governance={governance}
+          ></CreateGatewayPluginRegistrar>
+        )
+      case Instructions.ConfigureGatewayPlugin:
+        return (
+          <ConfigureGatewayPlugin
+            index={idx}
+            governance={governance}
+          ></ConfigureGatewayPlugin>
+        )
       case Instructions.MangoAddOracle:
         return (
           <MakeAddOracle index={idx} governance={governance}></MakeAddOracle>
@@ -401,6 +542,13 @@ const New = () => {
             governance={governance}
           ></MakeChangeReferralFeeParams>
         )
+      case Instructions.MangoChangeReferralFeeParams2:
+        return (
+          <MakeChangeReferralFeeParams2
+            index={idx}
+            governance={governance}
+          ></MakeChangeReferralFeeParams2>
+        )
       case Instructions.MangoChangeSpotMarket:
         return (
           <MakeChangeSpotMarket
@@ -408,12 +556,92 @@ const New = () => {
             governance={governance}
           ></MakeChangeSpotMarket>
         )
+      case Instructions.MangoChangeQuoteParams:
+        return (
+          <MakeChangeQuoteParams
+            index={idx}
+            governance={governance}
+          ></MakeChangeQuoteParams>
+        )
       case Instructions.MangoCreatePerpMarket:
         return (
           <MakeCreatePerpMarket
             index={idx}
             governance={governance}
           ></MakeCreatePerpMarket>
+        )
+      case Instructions.MangoSetMarketMode:
+        return (
+          <MakeSetMarketMode
+            index={idx}
+            governance={governance}
+          ></MakeSetMarketMode>
+        )
+      case Instructions.MangoRemoveSpotMarket:
+        return (
+          <MakeRemoveSpotMarket
+            index={idx}
+            governance={governance}
+          ></MakeRemoveSpotMarket>
+        )
+      case Instructions.MangoRemovePerpMarket:
+        return (
+          <MakeRemovePerpMarket
+            index={idx}
+            governance={governance}
+          ></MakeRemovePerpMarket>
+        )
+      case Instructions.MangoSwapSpotMarket:
+        return (
+          <MakeSwapSpotMarket
+            index={idx}
+            governance={governance}
+          ></MakeSwapSpotMarket>
+        )
+      case Instructions.MangoRemoveOracle:
+        return (
+          <MakeRemoveOracle
+            index={idx}
+            governance={governance}
+          ></MakeRemoveOracle>
+        )
+      case Instructions.MangoV4TokenRegister:
+        return (
+          <TokenRegister index={idx} governance={governance}></TokenRegister>
+        )
+      case Instructions.MangoV4TokenEdit:
+        return <EditToken index={idx} governance={governance}></EditToken>
+      case Instructions.DepositToMangoAccount:
+        return (
+          <MakeDepositToMangoAccount
+            index={idx}
+            governance={governance}
+          ></MakeDepositToMangoAccount>
+        )
+      case Instructions.MangoV4PerpEdit:
+        return <PerpEdit index={idx} governance={governance}></PerpEdit>
+      case Instructions.MangoV4PerpCreate:
+        return <PerpCreate index={idx} governance={governance}></PerpCreate>
+      case Instructions.MangoV4Serum3RegisterMarket:
+        return (
+          <Serum3RegisterMarket
+            index={idx}
+            governance={governance}
+          ></Serum3RegisterMarket>
+        )
+      case Instructions.MangoV4TokenRegisterTrustless:
+        return (
+          <TokenRegisterTrustless
+            index={idx}
+            governance={governance}
+          ></TokenRegisterTrustless>
+        )
+      case Instructions.DepositToMangoAccountCsv:
+        return (
+          <MakeDepositToMangoAccountCsv
+            index={idx}
+            governance={governance}
+          ></MakeDepositToMangoAccountCsv>
         )
       case Instructions.ForesightInitMarket:
         return (
@@ -450,12 +678,12 @@ const New = () => {
             governance={governance}
           ></MakeAddMarketListToCategoryParams>
         )
-      case Instructions.ForesightAddMarketMetadata:
+      case Instructions.ForesightSetMarketMetadata:
         return (
-          <MakeAddMarketMetadataParams
+          <MakeSetMarketMetadataParams
             index={idx}
             governance={governance}
-          ></MakeAddMarketMetadataParams>
+          ></MakeSetMarketMetadataParams>
         )
       case Instructions.RealmConfig:
         return <RealmConfig index={idx} governance={governance}></RealmConfig>
@@ -484,10 +712,28 @@ const New = () => {
             governance={governance}
           ></CreateVsrRegistrar>
         )
+      case Instructions.CreateTokenMetadata:
+        return <CreateTokenMetadata index={idx} governance={governance} />
+      case Instructions.UpdateTokenMetadata:
+        return <UpdateTokenMetadata index={idx} governance={governance} />
+      case Instructions.TransferDomainName:
+        return (
+          <TransferDomainName
+            index={idx}
+            governance={governance}
+          ></TransferDomainName>
+        )
+      case Instructions.EverlendDeposit:
+        return <DepositForm index={idx} governance={governance} />
+      case Instructions.EverlendWithdraw:
+        return <WithdrawForm index={idx} governance={governance} />
+
       default:
         null
     }
   }
+
+  const titleTooLong = form.title.length > TITLE_LENGTH_LIMIT
 
   return (
     <div className="grid grid-cols-12 gap-4">
@@ -512,13 +758,14 @@ const New = () => {
             </div>
           </div>
           <div className="pt-2">
-            <div className="pb-4">
+            <div className="pb-4 relative min-h-[100px]">
               <Input
                 label="Title"
                 placeholder="Title of your proposal"
                 value={form.title}
                 type="text"
                 error={formErrors['title']}
+                showErrorState={titleTooLong}
                 onChange={(evt) =>
                   handleSetForm({
                     value: evt.target.value,
@@ -526,6 +773,19 @@ const New = () => {
                   })
                 }
               />
+              <div className="max-w-lg w-full absolute bottom-4 left-0">
+                <div
+                  className={classNames(
+                    'absolute',
+                    'bottom-0',
+                    'right-0',
+                    'text-xs',
+                    titleTooLong ? 'text-error-red' : 'text-white/50'
+                  )}
+                >
+                  {form.title.length} / {TITLE_LENGTH_LIMIT}
+                </div>
+              </div>
             </div>
             <Textarea
               className="mb-3"
@@ -565,24 +825,28 @@ const New = () => {
                     key={idx}
                     className="mb-3 border border-fgd-4 p-4 md:p-6 rounded-lg"
                   >
-                    <Select
-                      className="h-12"
-                      disabled={!getAvailableInstructionsForIndex.length}
-                      placeholder={`${
-                        availableInstructionsForIdx.length
-                          ? 'Select instruction'
-                          : 'No available instructions'
-                      }`}
-                      label={`Transaction ${idx + 1}`}
-                      onChange={(value) => setInstructionType({ value, idx })}
-                      value={instruction.type?.name}
-                    >
-                      {availableInstructionsForIdx.map((inst) => (
-                        <Select.Option key={inst.id} value={inst}>
-                          <span>{inst.name}</span>
-                        </Select.Option>
-                      ))}
-                    </Select>
+                    <StyledLabel>Transaction {idx + 1}</StyledLabel>
+                    <TypeaheadSelect
+                      className="max-w-lg"
+                      options={availableInstructionsForIdx.map(
+                        (availableInstruction) => ({
+                          data: availableInstruction,
+                          key: availableInstruction.id.toString(),
+                          text: availableInstruction.name,
+                        })
+                      )}
+                      placeholder="Add a transaction"
+                      selected={
+                        instruction.type
+                          ? {
+                              key: instruction.type.id.toString(),
+                            }
+                          : undefined
+                      }
+                      onSelect={(option) => {
+                        setInstructionType({ value: option?.data, idx })
+                      }}
+                    />
                     <div className="flex items-end pt-4">
                       <InstructionContentContainer
                         idx={idx}

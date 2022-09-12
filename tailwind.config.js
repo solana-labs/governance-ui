@@ -1,5 +1,4 @@
 module.exports = {
-  mode: 'jit',
   content: [
     './pages/**/*.{js,ts,jsx,tsx}',
     './components/**/*.{js,ts,jsx,tsx}',
@@ -12,6 +11,8 @@ module.exports = {
   },
   theme: {
     fontFamily: {
+      serif: ['p22-mackinac-pro, ui-serif, serif'],
+      sans: ['Ambit, sans-serif'],
       display: ['PT Mono, monospace'],
       body: ['Inter, sans-serif'],
     },
@@ -21,24 +22,25 @@ module.exports = {
       },
       colors: {
         'dark-theme': {
-          primary: { light: '#E1CE7A', dark: '#D2B537' },
+          primary: { light: '#5DC9EB', dark: '#cecece' },
           'secondary-1': { light: '#AFD803', dark: '#6CBF00' },
           'secondary-2': { light: '#FFCB1B', dark: '#F48F25' },
-          'bkg-1': '#121417',
-          'bkg-2': '#202429',
-          'bkg-3': '#2F343B',
+          'bkg-1': '#17161c',
+          'bkg-2': '#201F27',
+          'bkg-3': '#292833',
           'bkg-4': '#363D44',
+          'bkg-5': '#2A2D34',
           'fgd-1': '#F6F5F3',
           'fgd-2': '#D1D6DB',
           'fgd-3': '#A4ACB7',
           'fgd-4': '#40474F',
           orange: '#F7A531',
-          red: '#cb676f',
-          green: '#78C46C',
-          blue: '#8AACEB',
+          red: '#FF7C7C',
+          green: '#30C89A',
+          blue: '#00e4ff',
         },
         'light-theme': {
-          primary: { light: '#292929', dark: '#101010' },
+          primary: { light: '#5DC9EB', dark: '#101010' },
           'secondary-1': { light: '#AFD803', dark: '#6CBF00' },
           'secondary-2': { light: '#E54033', dark: '#C7251A' },
           'fgd-1': '#3d3d3d',
@@ -75,6 +77,7 @@ module.exports = {
         'bkg-2': 'var(--bkg-2)',
         'bkg-3': 'var(--bkg-3)',
         'bkg-4': 'var(--bkg-4)',
+        'bkg-5': 'var(--bkg-5)',
         'fgd-1': 'var(--fgd-1)',
         'fgd-2': 'var(--fgd-2)',
         'fgd-3': 'var(--fgd-3)',
@@ -89,11 +92,18 @@ module.exports = {
         green: 'var(--green)',
         orange: 'var(--orange)',
         blue: 'var(--blue)',
+        'error-red': '#ff7c7c',
+        'confirm-green': '#8effdd',
+        'bkg-grey': '#292833',
+        'night-grey': '#201F27',
+        'bkg-black': '#212429',
+        'secondary-grey': '#D5D4D7',
       },
       animation: {
         'connect-wallet-ping':
           'connect-wallet-ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite',
         gradient: 'gradient 4s ease-in-out infinite',
+        loader: 'loader 0.6s infinite alternate',
       },
       keyframes: {
         'connect-wallet-ping': {
@@ -113,16 +123,17 @@ module.exports = {
             'background-position': '15% 0%',
           },
         },
+        loader: {
+          to: {
+            opacity: 0.1,
+            transform: 'translate3d(0, 0, 0)',
+          },
+        },
       },
-    },
-  },
-  variants: {
-    extend: {
-      cursor: ['hover', 'focus', 'disabled'],
-      opacity: ['disabled'],
-      backgroundColor: ['disabled'],
-      textColor: ['disabled'],
-      borderWidth: ['last'],
+      fontFamily: {
+        rota: ['Rota', 'sans-serif'],
+        roboto: ['Roboto', 'sans-serif'],
+      },
     },
   },
   plugins: [],

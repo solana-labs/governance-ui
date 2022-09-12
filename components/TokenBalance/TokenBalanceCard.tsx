@@ -1,4 +1,9 @@
-import { MintInfo } from '@solana/spl-token'
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  MintInfo,
+  Token,
+  TOKEN_PROGRAM_ID,
+} from '@solana/spl-token'
 import {
   Keypair,
   PublicKey,
@@ -22,7 +27,7 @@ import { sendTransaction } from '@utils/send'
 import { approveTokenTransfer } from '@utils/tokens'
 import Button from '../Button'
 import { Option } from '@tools/core/option'
-import { GoverningTokenType } from '@solana/spl-governance'
+import { GoverningTokenRole } from '@solana/spl-governance'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { getMintMetadata } from '../instructions/programs/splToken'
 import { withFinalizeVote } from '@solana/spl-governance'
@@ -32,7 +37,7 @@ import { notify } from '@utils/notifications'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import { ExclamationIcon } from '@heroicons/react/outline'
 import useQueryContext from '@hooks/useQueryContext'
-import { useEffect, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import Link from 'next/link'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
@@ -43,7 +48,8 @@ import {
 } from 'pyth-staking-api'
 import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 
-const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
+type Props = { proposal?: Option<Proposal> }
+const TokenBalanceCard: FC<Props> = ({ proposal, children }) => {
   const { councilMint, mint, realm, symbol } = useRealm()
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
@@ -69,13 +75,11 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   )
   useEffect(() => {
     const getTokenOwnerRecord = async () => {
-      const defaultMint =
-        !mint?.supply.isZero() ||
-        realm?.account.config.useMaxCommunityVoterWeightAddin
-          ? realm!.account.communityMint
-          : !councilMint?.supply.isZero()
-          ? realm!.account.config.councilMint
-          : undefined
+      const defaultMint = !mint?.supply.isZero()
+        ? realm!.account.communityMint
+        : !councilMint?.supply.isZero()
+        ? realm!.account.config.councilMint
+        : undefined
       const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
         realm!.owner,
         realm!.pubkey,
@@ -91,9 +95,9 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   const hasLoaded = mint || councilMint
 
   return (
-    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
+    <div className="p-4 rounded-lg bg-bkg-2 md:p-6">
       <div className="flex items-center justify-between">
-        <h3 className="mb-0">Your Account</h3>
+        <h3 className="mb-0">Your account</h3>
         <Link
           href={fmtUrlWithCluster(
             `/dao/${symbol}/account/${tokenOwnerRecordPk}`
@@ -107,7 +111,7 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
             }`}
           >
             View
-            <ChevronRightIcon className="flex-shrink-0 h-6 w-6" />
+            <ChevronRightIcon className="flex-shrink-0 w-6 h-6" />
           </a>
         </Link>
       </div>
@@ -116,14 +120,14 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
           {communityDepositVisible && (
             <TokenDeposit
               mint={mint}
-              tokenType={GoverningTokenType.Community}
+              tokenType={GoverningTokenRole.Community}
               councilVote={false}
             />
           )}
           {councilDepositVisible && (
             <TokenDeposit
               mint={councilMint}
-              tokenType={GoverningTokenType.Council}
+              tokenType={GoverningTokenRole.Council}
               councilVote={true}
             />
           )}
@@ -131,10 +135,11 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
         </div>
       ) : (
         <>
-          <div className="animate-pulse bg-bkg-3 h-12 mb-4 rounded-lg" />
-          <div className="animate-pulse bg-bkg-3 h-10 rounded-lg" />
+          <div className="h-12 mb-4 rounded-lg animate-pulse bg-bkg-3" />
+          <div className="h-10 rounded-lg animate-pulse bg-bkg-3" />
         </>
       )}
+      {children}
     </div>
   )
 }
@@ -145,7 +150,7 @@ export const TokenDeposit = ({
   councilVote,
 }: {
   mint: MintInfo | undefined
-  tokenType: GoverningTokenType
+  tokenType: GoverningTokenRole
   councilVote?: boolean
 }) => {
   const wallet = useWalletStore((s) => s.current)
@@ -179,24 +184,24 @@ export const TokenDeposit = ({
   }
 
   const depositTokenRecord =
-    tokenType === GoverningTokenType.Community
+    tokenType === GoverningTokenRole.Community
       ? ownTokenRecord
       : ownCouncilTokenRecord
 
   const depositTokenAccount =
-    tokenType === GoverningTokenType.Community
+    tokenType === GoverningTokenRole.Community
       ? realmTokenAccount
       : councilTokenAccount
 
   const depositMint =
-    tokenType === GoverningTokenType.Community
+    tokenType === GoverningTokenRole.Community
       ? realm?.account.communityMint
       : realm?.account.config.councilMint
 
   const tokenName = getMintMetadata(depositMint)?.name ?? realm?.account.name
 
   const depositTokenName = `${tokenName} ${
-    tokenType === GoverningTokenType.Community ? '' : 'Council'
+    tokenType === GoverningTokenRole.Community ? '' : 'Council'
   }`
 
   const depositTokens = async function (amount: BN) {
@@ -298,6 +303,8 @@ export const TokenDeposit = ({
         await withRelinquishVote(
           instructions,
           realmInfo!.programId,
+          realmInfo!.programVersion!,
+          realmInfo!.realmId,
           proposal.account.governance,
           proposal.pubkey,
           depositTokenRecord!.pubkey,
@@ -313,12 +320,34 @@ export const TokenDeposit = ({
         )
       }
     }
+    let ata: PublicKey | null = null
+    if (!depositTokenAccount) {
+      ata = await Token.getAssociatedTokenAddress(
+        ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+        TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+        depositMint!, // mint
+        wallet!.publicKey!, // owner
+        true
+      )
+      const ataIx = Token.createAssociatedTokenAccountInstruction(
+        ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+        TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+        depositMint!, // mint
+        ata, // ata
+        wallet!.publicKey!, // owner of token account
+        wallet!.publicKey! // fee payer
+      )
+      instructions.push(ataIx)
+    }
 
     await withWithdrawGoverningTokens(
       instructions,
       realmInfo!.programId,
+      realmInfo!.programVersion!,
       realm!.pubkey,
-      depositTokenAccount!.publicKey,
+      depositTokenAccount?.publicKey
+        ? depositTokenAccount!.publicKey
+        : new PublicKey(ata!),
       depositTokenRecord!.account.governingTokenMint,
       wallet!.publicKey!
     )
@@ -400,10 +429,14 @@ export const TokenDeposit = ({
 
   return (
     <>
-      <div className="flex space-x-4 items-center mt-4">
-        <div className="bg-bkg-1 px-4 py-2 rounded-md w-full">
-          <p className="text-fgd-3 text-xs">{depositTokenName} Votes</p>
-          <p className="font-bold mb-0 text-fgd-1 text-xl">{availableTokens}</p>
+      <div className="flex items-center mt-4 space-x-4">
+        <div className="w-full px-4 py-2 rounded-md bg-bkg-1 flex flex-row items-center justify-between">
+          <div>
+            <p className="text-xs text-fgd-3">{depositTokenName} Votes</p>
+            <p className="mb-0 text-xl font-bold text-fgd-1 hero-text">
+              {availableTokens}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -417,7 +450,7 @@ export const TokenDeposit = ({
             You have {tokensToShow} tokens available to {canExecuteAction}.
           </p>
 
-          <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-6">
+          <div className="flex flex-col mt-6 space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
             <Button
               tooltipMessage={depositTooltipContent}
               className="sm:w-1/2"
@@ -445,12 +478,12 @@ export const TokenDeposit = ({
           </div>
         </>
       )}
-      {config?.account.communityVoterWeightAddin &&
+      {config?.account.communityTokenConfig.voterWeightAddin &&
         vsrPluginsPks.includes(
-          config?.account.communityVoterWeightAddin.toBase58()
+          config?.account.communityTokenConfig.voterWeightAddin.toBase58()
         ) &&
-        tokenType === GoverningTokenType.Community && (
-          <small className="text-xs mt-3 flex items-center">
+        tokenType === GoverningTokenRole.Community && (
+          <small className="flex items-center mt-3 text-xs">
             <ExclamationIcon className="w-5 h-5 mr-2"></ExclamationIcon>
             Please withdraw your tokens and deposit again to get governance
             power

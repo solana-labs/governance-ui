@@ -1,16 +1,19 @@
 import Input from '@components/inputs/Input'
 import Textarea from '@components/inputs/Textarea'
 import { ProgramAccount, Governance } from '@solana/spl-governance'
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { precision } from '@utils/formatting'
 import Switch from '@components/Switch'
+import Select from '@components/inputs/Select'
+import { usePrevious } from '@hooks/usePrevious'
 
 export enum InstructionInputType {
   GOVERNED_ACCOUNT,
   INPUT,
   TEXTAREA,
   SWITCH,
+  SELECT,
 }
 
 export interface InstructionInput {
@@ -27,10 +30,10 @@ export interface InstructionInput {
   shouldBeGoverned?: false | ProgramAccount<Governance> | null
   governance?: ProgramAccount<Governance> | null
   options?: any[]
-  hide?: boolean
+  hide?: boolean | (() => boolean)
   validateMinMax?: boolean
   precision?: number
-  additionalComponent?: JSX.Element
+  additionalComponent?: JSX.Element | null
 }
 
 const InstructionForm = ({
@@ -51,18 +54,23 @@ const InstructionForm = ({
     setFormErrors({})
     setInnerForm({ ...outerForm, [propertyName]: value })
   }
+  const previousInitialValue = usePrevious(
+    JSON.stringify(inputs.map((x) => x.initialValue))
+  )
   useEffect(() => {
     setForm(form)
-  }, [form])
+  }, [JSON.stringify(form)])
   useEffect(() => {
     setInnerForm({
       ...inputs.reduce((a, v) => ({ ...a, [v.name]: v.initialValue }), {}),
     })
-  }, [JSON.stringify(inputs.map((x) => x.initialValue))])
+  }, [
+    previousInitialValue !== JSON.stringify(inputs.map((x) => x.initialValue)),
+  ])
   return (
     <>
       {inputs
-        .filter((x) => !x.hide)
+        .filter((x) => !(typeof x.hide === 'function' ? x.hide() : x.hide))
         .map((x) => (
           <InstructionInput
             key={x.name}
@@ -109,6 +117,26 @@ const InstructionInput = ({
             shouldBeGoverned={input.shouldBeGoverned}
             governance={input.governance}
           />
+        )
+      case InstructionInputType.SELECT:
+        return (
+          <Select
+            label={input.label}
+            value={form[input.name]?.name}
+            placeholder="Please select..."
+            onChange={(value) => {
+              handleSetForm({ value, propertyName: input.name })
+            }}
+            error={formErrors[input.name]}
+          >
+            {input.options?.map((x, idx) => (
+              <Select.Option key={idx} value={x}>
+                <div className="flex flex-col">
+                  <span>{x.name}</span>
+                </div>
+              </Select.Option>
+            ))}
+          </Select>
         )
       case InstructionInputType.INPUT: {
         const validateAmountOnBlur = () => {
@@ -161,7 +189,6 @@ const InstructionInput = ({
           />
         )
       }
-
       case InstructionInputType.TEXTAREA:
         return (
           <Textarea

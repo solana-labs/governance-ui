@@ -10,8 +10,8 @@ import {
   getVoterPDA,
   getVoterWeightPDA,
 } from 'VoteStakeRegistry/sdk/accounts'
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { tryGetTokenAccount } from '@utils/tokens'
+import { VsrClient } from './client'
 
 export const withVoteRegistryWithdraw = async ({
   instructions,

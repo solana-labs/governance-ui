@@ -4,7 +4,6 @@ import {
   getRealms,
   ProgramAccount,
   Realm,
-  tryGetRealmConfig,
 } from '@solana/spl-governance'
 import { Connection, PublicKey } from '@solana/web3.js'
 import tokenService from '@utils/services/token'
@@ -15,10 +14,11 @@ import BigNumber from 'bignumber.js'
 import BN from 'bn.js'
 import { WSOL_MINT_PK } from '@components/instructions/tools'
 import { withSentry } from '@sentry/nextjs'
+import { getRealmConfigAccountOrDefault } from '@tools/governance/configs'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const conn = new Connection(
-    'https://explorer-api.mainnet-beta.solana.com',
+    'https://rpc.theindex.io/mainnet-beta/f23b4435-a2bf-4c52-8fe3-8be1d49f885c',
     'recent'
   )
 
@@ -61,17 +61,20 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     )
 
     const programId = realm.owner
+    const realmConfig = await getRealmConfigAccountOrDefault(
+      conn,
+      programId,
+      realm.pubkey
+    )
 
     // Get NFT DAOs
-    if (realm.account.config.useCommunityVoterWeightAddin) {
-      const realmConfig = await tryGetRealmConfig(conn, programId, realm.pubkey)
-      if (
-        realmConfig.account.communityVoterWeightAddin?.equals(
-          new PublicKey('GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw')
-        )
-      ) {
-        nftRealms.push(realm)
-      }
+
+    if (
+      realmConfig.account.communityTokenConfig.voterWeightAddin?.equals(
+        new PublicKey('GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw')
+      )
+    ) {
+      nftRealms.push(realm)
     }
 
     // Get Governances

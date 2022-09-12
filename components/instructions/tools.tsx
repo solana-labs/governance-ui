@@ -18,10 +18,18 @@ import { VOTE_STAKE_REGISTRY_INSTRUCTIONS } from './programs/voteStakeRegistry'
 import { MARINADE_INSTRUCTIONS } from './programs/marinade'
 import { SOLEND_PROGRAM_INSTRUCTIONS } from './programs/solend'
 import { ATA_PROGRAM_INSTRUCTIONS } from './programs/associatedTokenAccount'
+import { STREAMFLOW_INSTRUCTIONS } from './programs/streamflow'
 import { governance as foresightGov } from '@foresight-tmp/foresight-sdk'
 import { ConnectionContext } from '@utils/connection'
 import { NFT_VOTER_INSTRUCTIONS } from './programs/nftVotingClient'
 import { PROGRAM_IDS } from '@castlefinance/vault-sdk'
+import { FORESIGHT_INSTRUCTIONS } from './programs/foresight'
+import { SAGA_PHONE } from './programs/SagaPhone'
+import { LIDO_INSTRUCTIONS } from './programs/lido'
+import { NAME_SERVICE_INSTRUCTIONS } from './programs/nameService'
+import { TOKEN_AUCTION_INSTRUCTIONS } from './programs/tokenAuction'
+import { VALIDATORDAO_INSTRUCTIONS } from './programs/validatordao'
+
 /**
  * Default governance program id instance
  */
@@ -65,8 +73,10 @@ export const ACCOUNT_NAMES = {
     'Mango v3 BTC-PERP Incentive Vault',
   '7Gm5zF6FNJpyhqdwKcEdMQw3r5YzitYUGVDKYMPT1cMy': 'Mango V3 Admin Key',
   MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac: 'MNGO Token Mint',
-  H7uqouPsJkeEiLpCEoC1qYVVquDrZan6ZfdPK2gS44zm: 'FORE Token Mint',
+  H7uqouPsJkeEiLpCEoC1qYVVquDrZan6ZfdPK2gS44zm: 'FORE Devnet Token Mint',
+  '4ahVJVavHM8DZCtjX6YuKSTFx6KJwRPmVCJtjdQYdUU7': 'FORE Mainnet Token Mint',
   [foresightGov.DEVNET_TREASURY.toBase58()]: 'Foresight Devnet Governance',
+  [foresightGov.MAINNET_TREASURY.toBase58()]: 'Foresight Mainnet Governance',
   EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: 'USDC Token Mint',
 
   MyHd6a7HWKTMeJMHBkrbMq4hZwZxwn9x7dxXcopQ4Wd: 'OMH Token',
@@ -154,6 +164,8 @@ export const HIDDEN_GOVERNANCES = new Map<string, string>([
 // TODO: Add this to on-chain metadata to Proposal account
 export const HIDDEN_PROPOSALS = new Map<string, string>([
   ['E8XgiVpDJgDf4XgBKjZnMs3S1K7cmibtbDqjw5aNobCZ', ''],
+  ['DrhhwYXaY4fvTBoQdNtgwEoTjuQswvDQLfVcgUXgP1Mx', ''],
+  ['CfbCUF7cn6UdWRsGPUUtj4CKMBL7qNCdF1WunED4gYA4', ''],
 ])
 
 export const DEFAULT_NATIVE_SOL_MINT =
@@ -162,8 +174,9 @@ export const DEFAULT_NATIVE_SOL_MINT =
 export const DEFAULT_NFT_TREASURY_MINT =
   'GNFTm5rz1Kzvq94G7DJkcrEUnCypeQYf7Ya8arPoHWvw'
 
-export function getAccountName(accountPk: PublicKey) {
-  return ACCOUNT_NAMES[accountPk.toBase58()] ?? getProgramName(accountPk)
+export function getAccountName(accountPk: PublicKey | string) {
+  const key = typeof accountPk === 'string' ? accountPk : accountPk.toBase58()
+  return ACCOUNT_NAMES[key] ?? getProgramName(accountPk)
 }
 
 export const CHAT_PROGRAM_ID = new PublicKey(
@@ -239,11 +252,18 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...MANGO_INSTRUCTIONS,
   ...RAYDIUM_INSTRUCTIONS,
   ...MARINADE_INSTRUCTIONS,
+  ...LIDO_INSTRUCTIONS,
   ...SOLEND_PROGRAM_INSTRUCTIONS,
+  ...FORESIGHT_INSTRUCTIONS,
   ...ATA_PROGRAM_INSTRUCTIONS,
   ...SYSTEM_INSTRUCTIONS,
   ...VOTE_STAKE_REGISTRY_INSTRUCTIONS,
   ...NFT_VOTER_INSTRUCTIONS,
+  ...STREAMFLOW_INSTRUCTIONS,
+  ...NAME_SERVICE_INSTRUCTIONS,
+  ...SAGA_PHONE,
+  ...TOKEN_AUCTION_INSTRUCTIONS,
+  ...VALIDATORDAO_INSTRUCTIONS,
 }
 
 export async function getInstructionDescriptor(

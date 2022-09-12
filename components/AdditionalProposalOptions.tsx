@@ -12,6 +12,7 @@ const AdditionalProposalOptions = ({
   setTitle,
   setDescription,
   defaultTitle,
+  defaultDescription,
   voteByCouncil,
   setVoteByCouncil,
 }: {
@@ -20,6 +21,7 @@ const AdditionalProposalOptions = ({
   setTitle: (evt) => void
   setDescription: (evt) => void
   defaultTitle: string
+  defaultDescription?: string
   voteByCouncil: boolean
   setVoteByCouncil: (val) => void
 }) => {
@@ -31,7 +33,7 @@ const AdditionalProposalOptions = ({
         className="flex items-center text-primary-light my-5"
         onClick={() => setShowOptions(!showOptions)}
       >
-        {showOptions ? 'Less Options' : 'More Options'}
+        {showOptions ? 'Less Proposal Options' : 'More Proposal Options'}
         <ChevronDownIcon
           className={`default-transition h-5 w-5 ml-1 ${
             showOptions ? 'transform rotate-180' : 'transform rotate-360'
@@ -52,6 +54,7 @@ const AdditionalProposalOptions = ({
             noMaxWidth={true}
             label="Proposal Description"
             placeholder={
+              defaultDescription ??
               'Description of your proposal or use a github gist link (optional)'
             }
             wrapperClassName="mb-5"

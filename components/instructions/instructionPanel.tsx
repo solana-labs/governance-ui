@@ -4,13 +4,16 @@ import { Disclosure } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/solid'
 import { useEffect, useRef, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
-import { RpcContext } from '@solana/spl-governance'
+import { InstructionExecutionStatus, RpcContext } from '@solana/spl-governance'
 import useRealm from '@hooks/useRealm'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import {
   ExecuteAllInstructionButton,
   PlayState,
 } from './ExecuteAllInstructionButton'
+import Button from '@components/Button'
+import { dryRunInstruction } from 'actions/dryRunInstruction'
+import { getExplorerInspectorUrl } from '@components/explorer/tools'
 
 export function InstructionPanel() {
   const { instructions, proposal } = useProposal()
@@ -28,7 +31,7 @@ export function InstructionPanel() {
 
   const [currentSlot, setCurrentSlot] = useState(0)
 
-  const canExecuteAt = proposal!.account.votingCompletedAt
+  const canExecuteAt = proposal?.account.votingCompletedAt
     ? proposal!.account.votingCompletedAt.toNumber() + 1
     : 0
 
@@ -70,6 +73,22 @@ export function InstructionPanel() {
       : PlayState.Unplayed
   )
 
+  const simulate = async () => {
+    const result = await dryRunInstruction(
+      connection.current,
+      wallet!,
+      null,
+      [],
+      proposalInstructions.map((x) => x.account.getSingleInstruction())
+    )
+
+    const inspectUrl = getExplorerInspectorUrl(
+      connection.endpoint,
+      result.transaction
+    )
+    window.open(inspectUrl, '_blank')
+  }
+
   return (
     <div>
       <Disclosure>
@@ -105,7 +124,23 @@ export function InstructionPanel() {
               ))}
 
               {proposal && proposalInstructions.length > 1 && (
-                <div className="flex justify-end">
+                <div className="flex justify-end space-x-4">
+                  {proposalInstructions.filter((x) => !x.account.executedAt)
+                    .length !== 0 && (
+                    <Button onClick={simulate}>Inspect all</Button>
+                  )}
+                  <ExecuteAllInstructionButton
+                    proposal={proposal}
+                    proposalInstructions={proposalInstructions.filter(
+                      (x) =>
+                        x.account.executionStatus ===
+                        InstructionExecutionStatus.None
+                    )}
+                    playing={playing}
+                    setPlaying={setPlaying}
+                    label="Execute in separated transactions"
+                    multiTransactionMode={true}
+                  />
                   <ExecuteAllInstructionButton
                     proposal={proposal}
                     proposalInstructions={proposalInstructions}

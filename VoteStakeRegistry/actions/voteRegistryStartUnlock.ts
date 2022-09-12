@@ -8,8 +8,8 @@ import { RpcContext } from '@solana/spl-governance'
 import { sendTransaction } from 'utils/send'
 
 import { BN } from '@project-serum/anchor'
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { withCreateNewDeposit } from '../sdk/withCreateNewDeposit'
+import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 
 export const voteRegistryStartUnlock = async ({
   rpcContext,
@@ -17,6 +17,7 @@ export const voteRegistryStartUnlock = async ({
   realmPk,
   communityMintPk,
   programId,
+  programVersion,
   transferAmount,
   amountAfterOperation,
   lockUpPeriodInDays,
@@ -28,6 +29,7 @@ export const voteRegistryStartUnlock = async ({
   mintPk: PublicKey
   realmPk: PublicKey
   programId: PublicKey
+  programVersion: number
   communityMintPk: PublicKey
   transferAmount: BN
   //amount left in deposit after operation
@@ -56,6 +58,7 @@ export const voteRegistryStartUnlock = async ({
     mintPk,
     realmPk,
     programId,
+    programVersion,
     tokenOwnerRecordPk,
     lockUpPeriodInDays: period,
     lockupKind,

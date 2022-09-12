@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import {
   MangoAccount,
   MangoAccountLayout,
@@ -11,7 +12,6 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import { BN } from '@project-serum/anchor'
 import {
   getNativeTreasuryAddress,
   RpcContext,
@@ -73,6 +73,7 @@ const MangoDepositComponent = ({
     mint,
     councilMint,
     symbol,
+    config,
   } = useRealm()
   const [isDepositing, setIsDepositing] = useState(false)
   const [
@@ -90,9 +91,7 @@ const MangoDepositComponent = ({
   const wallet = useWalletStore((s) => s.current)
   const tokenInfo = tokenService.getTokenInfo(handledMint)
   const { canUseTransferInstruction } = useGovernanceAssets()
-  const treasuryAmount = governedTokenAccount.extensions?.token
-    ? governedTokenAccount.extensions.token.account.amount
-    : new BN(0)
+  const treasuryAmount = governedTokenAccount.extensions.amount!
   const mintInfo = governedTokenAccount.extensions?.mint?.account
   const [form, setForm] = useState({
     title: '',
@@ -159,6 +158,7 @@ const MangoDepositComponent = ({
       await withCreateNativeTreasury(
         instructions,
         realm!.owner,
+        realmInfo?.programVersion!,
         governedTokenAccount!.governance!.pubkey,
         wallet!.publicKey!
       )
@@ -201,12 +201,13 @@ const MangoDepositComponent = ({
         governedTokenAccount.extensions!.mint!.account.decimals
       )
       const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-        governedTokenAccount!.governance!.account.config
+        governedTokenAccount!.governance!.account.config,
+        voteByCouncil
       )
       const defaultProposalMint = voteByCouncil
         ? realm?.account.config.councilMint
         : !mint?.supply.isZero() ||
-          realm?.account.config.useMaxCommunityVoterWeightAddin
+          config?.account.communityTokenConfig.maxVoterWeightAddin
         ? realm!.account.communityMint
         : !councilMint?.supply.isZero()
         ? realm!.account.config.councilMint

@@ -1,13 +1,14 @@
 import {
   BN,
   makeCloseSpotOpenOrdersInstruction,
-  makeWithdrawInstruction,
+  makeWithdraw2Instruction,
   MangoAccount,
   PublicKey,
 } from '@blockworks-foundation/mango-client'
 import AdditionalProposalOptions from '@components/AdditionalProposalOptions'
 import Button from '@components/Button'
 import Input from '@components/inputs/Input'
+import { WSOL_MINT_PK } from '@components/instructions/tools'
 import Loading from '@components/Loading'
 import Tooltip from '@components/Tooltip'
 import { CheckCircleIcon } from '@heroicons/react/outline'
@@ -16,6 +17,11 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import {
+  closeAccount,
+  initializeAccount,
+  WRAPPED_SOL_MINT,
+} from '@project-serum/serum/lib/token-instructions'
+import {
   getInstructionDataFromBase64,
   Governance,
   ProgramAccount,
@@ -23,7 +29,12 @@ import {
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-governance'
 import { ASSOCIATED_TOKEN_PROGRAM_ID, Token } from '@solana/spl-token'
-import { TransactionInstruction } from '@solana/web3.js'
+import {
+  Keypair,
+  LAMPORTS_PER_SOL,
+  SystemProgram,
+  TransactionInstruction,
+} from '@solana/web3.js'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
 import { getATA } from '@utils/ataTools'
@@ -40,11 +51,12 @@ import {
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import BigNumber from 'bignumber.js'
 import { useRouter } from 'next/router'
-import { emptyPk } from 'NftVotePlugin/sdk/accounts'
 import { useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { MarketStore } from 'Strategies/store/marketStore'
 import * as yup from 'yup'
+
+const emptyPk = '11111111111111111111111111111111'
 
 const WithdrawModal = ({
   selectedMangoAccount,
@@ -69,7 +81,9 @@ const WithdrawModal = ({
     amount: '',
   })
   const [voteByCouncil, setVoteByCouncil] = useState(false)
-  const [depositIdx, setDepositIdx] = useState<number>(0)
+  const [depositIdx, setDepositIdx] = useState<number>(
+    selectedMangoAccount.deposits.findIndex((x) => !x.isZero()) || 0
+  )
   const [formErrors, setFormErrors] = useState({})
   const selectedDepositMInt = group?.tokens[depositIdx]?.mint
   const handleSetForm = ({ propertyName, value }) => {
@@ -126,70 +140,104 @@ const WithdrawModal = ({
       ),
     amount: yup.string().required('Amount is required'),
   })
-  console.log(selectedMangoAccount.spotOpenOrders.map((x) => x.toBase58()))
   const handlePropose = async (idx: number) => {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     if (!isValid) {
       return
     }
     const mintPk = group?.tokens[idx].mint
+    const isWSolMint = mintPk.toBase58() === WSOL_MINT_PK.toBase58()
     const tokenIndex = group.getTokenIndex(mintPk)
     const publicKey =
       group?.rootBankAccounts?.[tokenIndex]?.nodeBankAccounts[0].publicKey
     const vault =
       group?.rootBankAccounts?.[tokenIndex]?.nodeBankAccounts[0].vault
-    const address = new PublicKey(form.withdrawAddress)
+    //address from form can be changed to ata during code run if needed
+    //or wsol address if we withdraw sol
+    let address = new PublicKey(form.withdrawAddress)
     const mintInfo = await tryGetMint(connection.current, mintPk)
-    const mintAmount = parseMintNaturalAmountFromDecimal(
+    //can be changed if WSol mint winch will be transformed to SOL
+    let mintAmount = parseMintNaturalAmountFromDecimal(
       form.amount!,
       mintInfo!.account.decimals!
     )
+    let wrappedSolAccount: null | Keypair = null
     const prerequisiteInstructions: TransactionInstruction[] = []
-    //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
-    const { currentAddress: receiverAddress, needToCreateAta } = await getATA({
-      connection: connection,
-      receiverAddress: address,
-      mintPK: mintPk,
-      wallet: wallet!,
-    })
-    if (needToCreateAta) {
+    if (isWSolMint) {
+      mintAmount = Number(form.amount) * LAMPORTS_PER_SOL
+      wrappedSolAccount = new Keypair()
+      address = wrappedSolAccount.publicKey
+      const space = 165
+      const rent = await connection.current.getMinimumBalanceForRentExemption(
+        space,
+        'processed'
+      )
       prerequisiteInstructions.push(
-        Token.createAssociatedTokenAccountInstruction(
-          ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-          TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-          mintPk, // mint
-          receiverAddress, // ata
-          address, // owner of token account
-          wallet!.publicKey! // fee payer
+        SystemProgram.createAccount({
+          fromPubkey: wallet!.publicKey!,
+          newAccountPubkey: wrappedSolAccount?.publicKey,
+          lamports: rent,
+          space: space,
+          programId: TOKEN_PROGRAM_ID,
+        }),
+        initializeAccount({
+          account: wrappedSolAccount?.publicKey,
+          mint: WRAPPED_SOL_MINT,
+          owner: new PublicKey(form.withdrawAddress),
+        })
+      )
+    } else {
+      //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
+      const { currentAddress: receiverAddress, needToCreateAta } = await getATA(
+        {
+          connection: connection,
+          receiverAddress: address,
+          mintPK: mintPk,
+          wallet: wallet!,
+        }
+      )
+      address = receiverAddress
+      if (needToCreateAta) {
+        prerequisiteInstructions.push(
+          Token.createAssociatedTokenAccountInstruction(
+            ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+            TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+            mintPk, // mint
+            receiverAddress, // ata
+            new PublicKey(form.withdrawAddress), // owner of token account
+            wallet!.publicKey! // fee payer
+          )
         )
-      )
-    }
-    setIsLoading(true)
-    const proposalInstructions: InstructionDataWithHoldUpTime[] = []
-    for (const i in selectedMangoAccount.spotOpenOrders.filter(
-      (x) => x.toBase58() !== emptyPk
-    )) {
-      const closeOpenOrders = makeCloseSpotOpenOrdersInstruction(
-        market.client!.programId,
-        group.publicKey,
-        selectedMangoAccount.publicKey,
-        selectedMangoAccount.owner,
-        group.dexProgramId,
-        selectedMangoAccount.spotOpenOrders[i],
-        group.spotMarkets[i].spotMarket,
-        group.signerKey
-      )
-      const closeInstruction: InstructionDataWithHoldUpTime = {
-        data: getInstructionDataFromBase64(
-          serializeInstructionToBase64(closeOpenOrders)
-        ),
-        holdUpTime: governance!.account!.config.minInstructionHoldUpTime,
-        prerequisiteInstructions: [],
       }
-      proposalInstructions.push(closeInstruction)
     }
 
-    const instruction = makeWithdrawInstruction(
+    setIsLoading(true)
+    const proposalInstructions: InstructionDataWithHoldUpTime[] = []
+    for (const i in selectedMangoAccount.spotOpenOrders) {
+      if (selectedMangoAccount.spotOpenOrders[i].toBase58() !== emptyPk) {
+        const closeOpenOrders = makeCloseSpotOpenOrdersInstruction(
+          market.client!.programId,
+          group.publicKey,
+          selectedMangoAccount.publicKey,
+          selectedMangoAccount.owner,
+          group.dexProgramId,
+          selectedMangoAccount.spotOpenOrders[i],
+          group.spotMarkets[i].spotMarket,
+          group.signerKey,
+          true
+        )
+        const closeInstruction: InstructionDataWithHoldUpTime = {
+          data: getInstructionDataFromBase64(
+            serializeInstructionToBase64(closeOpenOrders)
+          ),
+          holdUpTime: governance!.account!.config.minInstructionHoldUpTime,
+          prerequisiteInstructions: [],
+        }
+        proposalInstructions.push(closeInstruction)
+      }
+    }
+
+    const instruction = makeWithdraw2Instruction(
       market.client!.programId,
       group.publicKey,
       selectedMangoAccount.publicKey,
@@ -198,7 +246,7 @@ const WithdrawModal = ({
       group.tokens[tokenIndex].rootBank,
       publicKey!,
       vault!,
-      receiverAddress,
+      address,
       group.signerKey,
       [],
       new BN(mintAmount),
@@ -210,10 +258,36 @@ const WithdrawModal = ({
       ),
       holdUpTime: governance!.account!.config.minInstructionHoldUpTime,
       prerequisiteInstructions: prerequisiteInstructions,
+      prerequisiteInstructionsSigners: wrappedSolAccount
+        ? [wrappedSolAccount]
+        : [],
       chunkSplitByDefault: true,
       chunkBy: 1,
     }
     proposalInstructions.push(instructionData)
+    if (
+      wrappedSolAccount &&
+      (selectedMangoAccount.owner.toBase58() === form.withdrawAddress ||
+        selectedMangoAccount.owner.toBase58() === governance.pubkey.toBase58())
+    ) {
+      const closeAobInstruction = closeAccount({
+        source: wrappedSolAccount.publicKey,
+        destination: new PublicKey(form.withdrawAddress),
+        owner: new PublicKey(form.withdrawAddress),
+      })
+      const closeAobInstructionData: InstructionDataWithHoldUpTime = {
+        data: getInstructionDataFromBase64(
+          serializeInstructionToBase64(closeAobInstruction)
+        ),
+        holdUpTime: governance!.account!.config.minInstructionHoldUpTime,
+        prerequisiteInstructions: [],
+        prerequisiteInstructionsSigners: [],
+        chunkSplitByDefault: true,
+        chunkBy: 1,
+      }
+      proposalInstructions.push(closeAobInstructionData)
+    }
+
     try {
       const proposalAddress = await handleCreateProposal({
         title: form.title || proposalTitle,

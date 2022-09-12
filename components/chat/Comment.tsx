@@ -1,10 +1,6 @@
 import React from 'react'
 import { VoteRecord } from '@solana/spl-governance'
-import {
-  CheckCircleIcon,
-  UserCircleIcon,
-  XCircleIcon,
-} from '@heroicons/react/solid'
+import { ThumbUpIcon, ThumbDownIcon } from '@heroicons/react/solid'
 import { ExternalLinkIcon } from '@heroicons/react/solid'
 import { ChatMessage } from '@solana/spl-governance'
 import { abbreviateAddress, fmtTokenAmount } from '../../utils/formatting'
@@ -13,6 +9,7 @@ import { MintInfo } from '@solana/spl-token'
 import { isPublicKey } from '@tools/core/pubkey'
 import { getVoteWeight, isYesVote } from '@models/voteRecords'
 import dayjs from 'dayjs'
+import { ProfilePopup, ProfileImage, useProfile } from '@components/Profile'
 const relativeTime = require('dayjs/plugin/relativeTime')
 const Comment = ({
   chatMessage,
@@ -26,6 +23,7 @@ const Comment = ({
   dayjs.extend(relativeTime)
   const { author, postedAt, body } = chatMessage
   const { realmInfo } = useRealm()
+  const { profile } = useProfile(author)
   const voteSymbol = !realmInfo
     ? ''
     : isPublicKey(realmInfo.symbol)
@@ -38,22 +36,29 @@ const Comment = ({
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center">
           <div className="bg-bkg-4 flex flex-shrink-0 items-center justify-center h-10 rounded-full w-10">
-            <UserCircleIcon className="h-8 text-fgd-3 w-8" />
+            <ProfilePopup publicKey={author} expanded={true}>
+              <ProfileImage publicKey={author} className="h-8 text-fgd-3 w-8" />
+            </ProfilePopup>
           </div>
           <div className="mx-3">
-            <a
-              className="flex items-center hover:brightness-[1.15] focus:outline-none"
-              href={`https://explorer.solana.com/address/${author.toString()}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <span className="whitespace-nowrap">
-                {abbreviateAddress(author)}
-              </span>
-              <ExternalLinkIcon
-                className={`flex-shrink-0 h-4 w-4 ml-1.5 text-primary-light`}
-              />
-            </a>
+            <div className="flex items-center hover:brightness-[1.15] focus:outline-none">
+              <a
+                className="flex items-center hover:brightness-[1.15] focus:outline-none"
+                href={`https://explorer.solana.com/address/${author.toString()}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span className="whitespace-nowrap">
+                  {profile?.name?.value || abbreviateAddress(author)}
+                </span>
+                <ExternalLinkIcon
+                  className={`flex-shrink-0 h-4 w-4 ml-1.5 text-primary-light`}
+                />
+              </a>
+              {profile?.exists && (
+                <ProfilePopup publicKey={author} expanded={true} />
+              )}
+            </div>
             <div className="text-fgd-3 text-xs">{fromNow}</div>
           </div>
         </div>
@@ -61,11 +66,11 @@ const Comment = ({
           <div className="bg-bkg-3 hidden lg:flex lg:items-center px-4 py-2 rounded-full">
             <div className="flex items-center pr-2 text-fgd-1 text-xs">
               {isYesVote(voteRecord) ? (
-                <CheckCircleIcon className="h-5 mr-1 text-green w-5" />
+                <ThumbUpIcon className="h-4 mr-2 fill-[#8EFFDD] w-4" />
               ) : (
-                <XCircleIcon className="h-5 mr-1 text-red w-5" />
+                <ThumbDownIcon className="h-4 mr-2 fill-[#FF7C7C] w-4" />
               )}
-              {isYesVote(voteRecord) ? 'Approve' : 'Deny'}
+              {isYesVote(voteRecord) ? 'Yes' : 'No'}
             </div>
             <span className="text-fgd-4">|</span>
             <span className="pl-2 text-xs">

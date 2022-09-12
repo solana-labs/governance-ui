@@ -5,7 +5,10 @@ import VoteBySwitch from '../proposal/components/VoteBySwitch'
 import Textarea from '@components/inputs/Textarea'
 import {
   createSetRealmConfig,
+  GoverningTokenConfigAccountArgs,
+  GoverningTokenType,
   serializeInstructionToBase64,
+  tryGetRealmConfig,
 } from '@solana/spl-governance'
 import { validateInstruction } from '@utils/instructionTools'
 import { getRealmCfgSchema } from '@utils/validations'
@@ -26,6 +29,8 @@ import RealmConfigFormComponent, {
 } from '../proposal/components/forms/RealmConfigFormComponent'
 import { abbreviateAddress } from '@utils/formatting'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
+import { isDisabledVoterWeight } from '@tools/governance/units'
 
 interface RealmConfigProposal extends RealmConfigForm {
   title: string
@@ -43,6 +48,7 @@ const RealmConfigModal = ({ closeProposalModal, isProposalModalOpen }) => {
   )
   const { fmtUrlWithCluster } = useQueryContext()
   const wallet = useWalletStore((s) => s.current)
+  const connection = useWalletStore((s) => s.connection)
   const { handleCreateProposal } = useCreateProposal()
   const defaultCfgTitle = 'Change realm config'
   const [formErrors, setFormErrors] = useState({})
@@ -65,10 +71,22 @@ const RealmConfigModal = ({ closeProposalModal, isProposalModalOpen }) => {
     ) {
       setCreatingProposal(true)
       const governance = form!.governedAccount.governance
-      const mintAmount = parseMintNaturalAmountFromDecimalAsBN(
-        form!.minCommunityTokensToCreateGovernance!,
-        mint!.decimals!
+
+      const mintAmount = isDisabledVoterWeight(
+        form!.minCommunityTokensToCreateGovernance
       )
+        ? DISABLED_VOTER_WEIGHT
+        : parseMintNaturalAmountFromDecimalAsBN(
+            form!.minCommunityTokensToCreateGovernance!,
+            mint!.decimals!
+          )
+
+      const realmConfig = await tryGetRealmConfig(
+        connection.current,
+        realmInfo!.programId,
+        realm.pubkey
+      )
+
       const instruction = await createSetRealmConfig(
         realmInfo!.programId,
         realmInfo!.programVersion!,
@@ -77,13 +95,20 @@ const RealmConfigModal = ({ closeProposalModal, isProposalModalOpen }) => {
         form?.removeCouncil ? undefined : realm?.account.config.councilMint,
         parseMintSupplyFraction(form!.communityMintSupplyFactor.toString()),
         mintAmount,
-        form!.communityVoterWeightAddin
-          ? new PublicKey(form!.communityVoterWeightAddin)
-          : undefined,
-        form?.maxCommunityVoterWeightAddin
-          ? new PublicKey(form.maxCommunityVoterWeightAddin)
-          : undefined,
-        wallet.publicKey
+        new GoverningTokenConfigAccountArgs({
+          voterWeightAddin: form!.communityVoterWeightAddin
+            ? new PublicKey(form!.communityVoterWeightAddin)
+            : undefined,
+          maxVoterWeightAddin: form?.maxCommunityVoterWeightAddin
+            ? new PublicKey(form.maxCommunityVoterWeightAddin)
+            : undefined,
+          tokenType: GoverningTokenType.Liquid,
+        }),
+        undefined,
+        // Pass the payer only if RealmConfigAccount doens't exist and needs to be created
+        // TODO: If payer is passed then only the payer can execute the proposal
+        //       We should use the DAO Wallet instead, and top it up if there is not enough SOL there
+        !realmConfig ? wallet.publicKey : undefined
       )
       serializedInstruction = serializeInstructionToBase64(instruction)
       const obj: UiInstruction = {

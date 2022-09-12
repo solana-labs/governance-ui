@@ -1,4 +1,3 @@
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { BN, EventParser } from '@project-serum/anchor'
 import {
   ProgramAccount,
@@ -16,6 +15,7 @@ import {
   Registrar,
 } from 'VoteStakeRegistry/sdk/accounts'
 import { tryGetVoter, tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
+import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 import { DAYS_PER_MONTH } from './dateTools'
 import { MONTHLY } from './types'
 
@@ -68,6 +68,7 @@ export const getDeposits = async ({
     const usedDeposits = deposits.filter((x) => x.isUsed)
     const areThereAnyUsedDeposits = usedDeposits.length
     if (areThereAnyUsedDeposits) {
+      console.log({ client, usedDeposits, connection, registrar, voter })
       const events = await getDepositsAdditionalInfoEvents(
         client,
         usedDeposits,

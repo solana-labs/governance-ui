@@ -19,6 +19,7 @@
   --bkg-2: theme('colors.dark-theme.bkg-2');
   --bkg-3: theme('colors.dark-theme.bkg-3');
   --bkg-4: theme('colors.dark-theme.bkg-4');
+  --bkg-5: theme('colors.dark-theme.bkg-5');
   --fgd-1: theme('colors.dark-theme.fgd-1');
   --fgd-2: theme('colors.dark-theme.fgd-2');
   --fgd-3: theme('colors.dark-theme.fgd-3');
@@ -40,6 +41,7 @@
   --bkg-2: theme('colors.light-theme.bkg-2');
   --bkg-3: theme('colors.light-theme.bkg-3');
   --bkg-4: theme('colors.light-theme.bkg-4');
+  --bkg-5: theme('colors.light-theme.bkg-4');
   --fgd-1: theme('colors.light-theme.fgd-1');
   --fgd-2: theme('colors.light-theme.fgd-2');
   --fgd-3: theme('colors.light-theme.fgd-3');
@@ -49,11 +51,11 @@
 /* base */
 
 * {
-  @apply m-0 p-0;
+  @apply p-0 m-0;
 }
 
 body {
-  @apply bg-bkg-1 text-fgd-1 text-base font-body tracking-wide;
+  @apply text-base tracking-wide bg-bkg-1 text-fgd-1 font-body;
 }
 
 h1 {
@@ -61,19 +63,19 @@ h1 {
 }
 
 h2 {
-  @apply text-xl mb-2 font-bold;
+  @apply mb-2 text-xl font-bold;
 }
 
 h3 {
-  @apply text-lg mb-1 font-bold;
+  @apply mb-1 text-lg font-bold;
 }
 
 h4 {
-  @apply text-sm mb-1 font-bold;
+  @apply mb-1 text-sm font-bold;
 }
 
 p {
-  @apply break-words leading-normal text-fgd-2 text-sm;
+  @apply text-sm leading-normal break-words text-fgd-2;
 }
 
 tbody {
@@ -101,7 +103,7 @@ button {
 }
 
 .markdown > p {
-  @apply mb-2;
+  @apply mb-2 text-fgd-1;
 }
 
 .markdown ul {
@@ -109,11 +111,11 @@ button {
 }
 
 .markdown a {
-  @apply text-fgd-2 transition-all duration-300 underline hover:text-fgd-3 hover:no-underline;
+  @apply underline break-all transition-all duration-300 text-fgd-1 hover:text-fgd-2 hover:no-underline;
 }
 
 .markdown li {
-  @apply font-normal mb-2 ml-6 list-disc text-fgd-3;
+  @apply mb-2 ml-6 font-normal list-disc text-fgd-2;
 }
 
 .markdown pre {
@@ -175,4 +177,140 @@ body::-webkit-scrollbar-corner {
 
 ::-webkit-calendar-picker-indicator {
   filter: invert(1);
+}
+
+.border-brand-gradient {
+  border-image-slice: 1;
+  border-image-source: linear-gradient(
+    93deg,
+    #00c2ff 3%,
+    #00e4ff 50%,
+    #87f2ff 98%
+  );
+}
+
+.bg-brand-gradient {
+  @apply bg-gradient-to-r from-[#00C2FF] via-[#00E4FF] to-[#87F2FF];
+}
+
+.transition-from-gradient-background::before {
+  position: absolute;
+  content: '';
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 0;
+  opacity: 0;
+  transition: all 0.3s linear;
+  border-radius: 999px;
+  @apply border bg-gradient-to-r from-fgd-1 to-fgd-1;
+}
+
+.transition-from-gradient-background:hover::before {
+  opacity: 1;
+}
+
+.transition-from-gradient-background:active::before {
+  opacity: 1;
+  @apply border-fgd-3 bg-gradient-to-r from-fgd-3 to-fgd-3;
+}
+
+.transition-from-gradient-background:disabled {
+  background-image: none;
+}
+
+.transition-from-gradient-background:disabled::before {
+  opacity: 1;
+  @apply border border-fgd-4 bg-gradient-to-r from-fgd-4 to-fgd-4;
+}
+
+.border-gradient {
+  border: 1px solid transparent;
+  background-origin: border-box;
+  background-clip: content-box, border-box;
+}
+.border-gradient.transparent-fill {
+  background-image: linear-gradient(var(--bkg-2), var(--bkg-2)),
+    linear-gradient(93deg, #00c2ff 3%, #00e4ff 50%, #87f2ff 98%);
+}
+
+input[type='range'].with-gradient {
+  -webkit-appearance: none;
+  height: 16px;
+  border-radius: 5px;
+  background-image: linear-gradient(
+    to right,
+    #00c2ff 0%,
+    #00e4ff 50%,
+    #87f2ff 100%
+  );
+  background-size: 50% 100%;
+  background-repeat: no-repeat;
+  @apply bg-bkg-3;
+}
+
+input[type='range'].with-gradient::-moz-range-thumb {
+  -webkit-appearance: none;
+  cursor: ew-resize;
+  width: 32px;
+  height: 32px;
+  flex-grow: 0;
+  border-radius: 25px;
+  box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.2);
+  background-color: #fff;
+  transition: background 0.3s ease-in-out;
+}
+
+input[type='range'].with-gradient:disabled::-moz-range-thumb {
+  background-color: #1f1f20;
+}
+
+input[type='range'].with-gradient:disabled::-webkit-slider-thumb {
+  background-color: #1f1f20;
+}
+
+input[type='range'].with-gradient::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  cursor: ew-resize;
+  width: 32px;
+  height: 32px;
+  flex-grow: 0;
+  border-radius: 25px;
+  box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.2);
+  background-color: #fff;
+  transition: background 0.3s ease-in-out;
+}
+input[type='range'].with-gradient::-moz-range-track,
+input[type='range'].with-gradient::-webkit-slider-runnable-track {
+  -webkit-appearance: none;
+  box-shadow: none;
+  border: none;
+  background: transparent;
+}
+
+/* break-words is depricated a tailwind and CSS class,
+advised to use overflow-wrap instead - see documentation below
+https://developer.mozilla.org/en-US/docs/Web/CSS/word-break#values */
+.overflow-wrap-anywhere {
+  overflow-wrap: anywhere;
+}
+
+.gatewayButton > span {
+  @apply !text-bkg-2 !pl-0 !text-sm;
+}
+
+.react-grid-item.react-grid-placeholder {
+  background: none !important;
+  z-index: 2;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+.react-resizable-handle::after,
+.react-resizable-handle-se::after {
+  border-color: white !important;
 }

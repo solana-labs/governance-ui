@@ -16,6 +16,7 @@ interface NotificationStore extends State {
 export enum ModalStates {
   Selection = 1,
   Dialect = 2,
+  Notifi = 3,
 }
 
 const useNotificationStore = create<NotificationStore>(
