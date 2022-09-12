@@ -1,6 +1,10 @@
-import { getIntrospectionQuery } from 'graphql';
+import { getIntrospectionQuery, IntrospectionQuery } from 'graphql';
 
 export function getGraphqlJsonSchema() {
+  if (!process.env.NEXT_PUBLIC_API_ENDPOINT) {
+    return Promise.resolve(null);
+  }
+
   return fetch(process.env.NEXT_PUBLIC_API_ENDPOINT || '', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -10,6 +14,6 @@ export function getGraphqlJsonSchema() {
     }),
   })
     .then((result) => result.json())
-    .then((schema) => schema.data)
+    .then((schema) => schema.data as IntrospectionQuery)
     .catch(() => null);
 }
