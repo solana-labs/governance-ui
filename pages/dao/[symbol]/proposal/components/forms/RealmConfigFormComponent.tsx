@@ -108,7 +108,7 @@ const RealmConfigFormComponent = ({
       label: 'Min community tokens to create governance',
       initialValue: minCommunityTokensToCreateProposal,
       name: 'minCommunityTokensToCreateGovernance',
-      type: InstructionInputType.SWITCHED_INPUT,
+      type: InstructionInputType.DISABLEABLE_INPUT,
       inputType: 'number',
       min: minCommunity,
       step: minCommunity,

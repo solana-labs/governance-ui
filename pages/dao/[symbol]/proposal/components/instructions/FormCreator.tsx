@@ -15,7 +15,7 @@ export enum InstructionInputType {
   TEXTAREA,
   SWITCH,
   SELECT,
-  SWITCHED_INPUT,
+  DISABLEABLE_INPUT,
 }
 
 export interface InstructionInput {
@@ -225,8 +225,8 @@ const InstructionInput = ({
           </div>
         )
 
-      // SWITCHED_INPUT is for concealing ugly numbers; it uses a toggle to disable the setting (by setting it to u64::max)
-      case InstructionInputType.SWITCHED_INPUT: {
+      // DISABLEABLE_INPUT is for concealing ugly numbers; it uses a toggle to disable the setting (by setting it to u64::max)
+      case InstructionInputType.DISABLEABLE_INPUT: {
         const validateAmountOnBlur = () => {
           const value = form[input.name]
           const precisionFromMin = input.min ? precision(input.min) : 1
