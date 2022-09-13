@@ -24,7 +24,7 @@ export interface Mint {
   name: string
   raw: AssetAccount
   symbol: string
-  tokenType?: 'council' | 'community'
+  tokenRole?: 'council' | 'community'
   totalSupply?: BigNumber
 }
 
