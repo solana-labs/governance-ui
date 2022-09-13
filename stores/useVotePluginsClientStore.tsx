@@ -30,6 +30,7 @@ interface UseVotePluginsClientStore extends State {
     gatewayRegistrar: any
     currentRealmVotingClient: VotingClient
     voteStakeRegistryRegistrarPk: PublicKey | null
+    maxVoterWeight: PublicKey | undefined
   }
   handleSetVsrClient: (
     wallet: SignerWalletAdapter | undefined,
@@ -86,6 +87,7 @@ const defaultState = {
     realm: undefined,
     walletPk: undefined,
   }),
+  maxVoterWeight: undefined,
 }
 
 const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
@@ -192,8 +194,16 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
             provider,
             connection.cluster
           )
+
+          const maxVoterWeight = (
+            await pythClient.stakeConnection.program.methods
+              .updateMaxVoterWeight()
+              .pubkeys()
+          ).maxVoterRecord
+
           set((s) => {
             s.state.pythClient = pythClient
+            s.state.maxVoterWeight = maxVoterWeight
           })
         } catch (e) {
           console.error(e)
