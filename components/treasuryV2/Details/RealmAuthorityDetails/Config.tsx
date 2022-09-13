@@ -17,6 +17,7 @@ import { formatNumber } from '@utils/formatNumber'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import useRealm from '@hooks/useRealm'
 import Section from '../Section'
+import Address from '@components/Address'
 
 const DISABLED = new BigNumber(DISABLED_VOTER_WEIGHT.toString())
 
@@ -58,16 +59,40 @@ export default function Config(props: Props) {
     {
       icon: <BeakerIcon />,
       title: 'Use community voter weight add-in',
-      value: props.realmAuthority.config.useCommunityVoterWeightAddin
-        ? 'Yes'
-        : 'No',
+      value: props.realmAuthority.config.useCommunityVoterWeightAddin ? (
+        <div className="flex gap-x-2">
+          Yes
+          <span className="text-white/50 flex-nowrap flex">
+            (
+            <Address
+              address={props.realmAuthority.config.useCommunityVoterWeightAddin}
+            />
+            )
+          </span>
+        </div>
+      ) : (
+        'No'
+      ),
     },
     {
       icon: <BeakerIcon />,
       title: 'Use max community voter weight add-in',
-      value: props.realmAuthority.config.useMaxCommunityVoterWeightAddin
-        ? 'Yes'
-        : 'No',
+      value: props.realmAuthority.config.useMaxCommunityVoterWeightAddin ? (
+        <div className="flex gap-x-2">
+          Yes
+          <span className="text-white/50 flex-nowrap flex">
+            (
+            <Address
+              address={
+                props.realmAuthority.config.useMaxCommunityVoterWeightAddin
+              }
+            />
+            )
+          </span>
+        </div>
+      ) : (
+        'No'
+      ),
     },
   ]
 
