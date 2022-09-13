@@ -36,6 +36,7 @@ import {
 } from 'Strategies/protocols/psyfi/types'
 import { PsyFiStrategy } from 'Strategies/types/types'
 import { usePsyFiProgram } from './hooks/usePsyFiProgram'
+import { notify } from '@utils/notifications'
 
 const SOL_BUFFER = 0.02
 
@@ -256,7 +257,8 @@ export const Deposit: React.FC<{
       router.push(url)
       setIsDepositing(false)
     } catch (error) {
-      console.error(error)
+      console.log('ERROR', error)
+      notify({ type: 'error', message: `Error ${error}` })
       setIsDepositing(false)
     }
   }, [
