@@ -17,7 +17,7 @@ interface Props {
 }
 
 export default function TotalValueTitle(props: Props) {
-  switch (props.data.status) {
+  switch (props.data._tag) {
     case Status.Failed:
       return (
         <div className={cx(props.className, 'space-y-1')}>

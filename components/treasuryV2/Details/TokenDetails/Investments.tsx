@@ -47,7 +47,7 @@ export default function Investments(props: Props) {
   })
 
   useEffect(() => {
-    if (investments.status === Status.Ok) {
+    if (investments._tag === Status.Ok) {
       setShowAvailableInvestments(!investments.data.activeInvestments.length)
     }
   }, [investments])
@@ -58,7 +58,7 @@ export default function Investments(props: Props) {
     }
   }, [connection, props])
 
-  switch (investments.status) {
+  switch (investments._tag) {
     case Status.Failed:
       return (
         <div className={props.className}>

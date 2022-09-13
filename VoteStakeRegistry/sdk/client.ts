@@ -2,7 +2,7 @@ import { Program, Provider, web3 } from '@project-serum/anchor'
 import { IDL, VoterStakeRegistry } from './voter_stake_registry'
 
 export const DEFAULT_VSR_ID = new web3.PublicKey(
-  '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo'
+  'vsr2nfGVNHmSY8uxoBGqq8AQbwz3JwaEaHqGbsTPXqQ'
 )
 
 export class VsrClient {

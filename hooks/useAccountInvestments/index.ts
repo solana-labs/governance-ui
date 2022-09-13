@@ -42,7 +42,7 @@ interface Data {
 
 export function useAccountInvestments(args: Args) {
   const [result, setResult] = useState<Result<Data>>({
-    status: Status.Pending,
+    _tag: Status.Pending,
   })
   const [calledGetStrategies, setCalledGetStrategies] = useState(false)
 
@@ -84,7 +84,7 @@ export function useAccountInvestments(args: Args) {
     }
 
     if (strategyMintAddress && calledGetStrategies && !strategiesLoading) {
-      setResult({ status: Status.Pending })
+      setResult({ _tag: Status.Pending })
 
       const fetchMangoAccounts = governanceAddress
         ? tryGetMangoAccountsForOwner(
@@ -116,7 +116,7 @@ export function useAccountInvestments(args: Args) {
         })
           .then((activeInvestments) => {
             const result = {
-              status: Status.Ok,
+              _tag: Status.Ok,
               data: {
                 activeInvestments: activeInvestments.filter(
                   (i) => !!i.investedAmount
@@ -142,7 +142,7 @@ export function useAccountInvestments(args: Args) {
           })
           .catch((e) =>
             setResult({
-              status: Status.Failed,
+              _tag: Status.Failed,
               error: e instanceof Error ? e : new Error(e),
             })
           )
