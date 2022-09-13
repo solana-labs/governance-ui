@@ -20,14 +20,9 @@ export const executeInstructions = async (
   multiTransactionMode = false
 ) => {
   const instructions: TransactionInstruction[] = []
-  const copyOfProposalInstructions = [...proposalInstructions]
-  // Sort instructions by order
-  copyOfProposalInstructions.sort(
-    (a, b) => a.account.instructionIndex - b.account.instructionIndex
-  )
 
   await Promise.all(
-    copyOfProposalInstructions.map((instruction) =>
+    proposalInstructions.map((instruction) =>
       // withExecuteTransaction function mutate the given 'instructions' parameter
       withExecuteTransaction(
         instructions,
@@ -64,8 +59,6 @@ export const executeInstructions = async (
       connection,
       signers: [],
     })
-
-    console.log('signedTransaction:', signedTransaction)
 
     await sendSignedTransaction({
       signedTransaction,
