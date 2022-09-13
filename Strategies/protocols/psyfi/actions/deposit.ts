@@ -22,8 +22,6 @@ import { instructions as psyFiInstructions, PsyFiEuros } from 'psyfi-euros-test'
 import { PsyFiActionForm, PsyFiStrategyInfo } from '../types'
 import { syncNative } from '@solendprotocol/solend-sdk'
 
-// TODO: Handle native SOL deposits
-
 export const deposit = async (
   rpcContext: RpcContext,
   treasuryAssetAccount: AssetAccount,
@@ -66,11 +64,14 @@ export const deposit = async (
   const poolMintATA = await Token.getAssociatedTokenAddress(
     ASSOCIATED_TOKEN_PROGRAM_ID,
     TOKEN_PROGRAM_ID,
-    NATIVE_MINT,
+    treasuryAssetAccount.isSol
+      ? NATIVE_MINT
+      : form.strategy.vaultAccounts.lpTokenMint,
     owner,
     true
   )
 
+  // If the pool mint associated token account does not exist, add it to the pre-requisite instructions
   if (
     (await psyFiProgram.provider.connection.getAccountInfo(poolMintATA)) ===
     null
@@ -79,7 +80,9 @@ export const deposit = async (
       Token.createAssociatedTokenAccountInstruction(
         ASSOCIATED_TOKEN_PROGRAM_ID,
         TOKEN_PROGRAM_ID,
-        NATIVE_MINT,
+        treasuryAssetAccount.isSol
+          ? NATIVE_MINT
+          : form.strategy.vaultAccounts.lpTokenMint,
         poolMintATA,
         owner,
         rpcContext.walletPubkey
@@ -88,14 +91,14 @@ export const deposit = async (
   }
 
   if (form.amount && treasuryAssetAccount.isSol) {
-    const transferInx = SystemProgram.transfer({
+    const wsolTransferIx = SystemProgram.transfer({
       fromPubkey: owner,
       toPubkey: poolMintATA,
       lamports: form.amount * LAMPORTS_PER_SOL,
     })
 
     serializedTransferToReceiptIxs.push(
-      serializeInstructionToBase64(transferInx)
+      serializeInstructionToBase64(wsolTransferIx)
     )
     serializedTransferToReceiptIxs.push(
       serializeInstructionToBase64(syncNative(poolMintATA))
@@ -151,7 +154,6 @@ export const deposit = async (
       form.bnAmount,
       owner,
       form.strategy.vaultAccounts.pubkey,
-      // TODO: !! REVIEW !! is this the correct address???
       transferAddress,
       vaultOwnershipAccount
     )
