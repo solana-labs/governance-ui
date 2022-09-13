@@ -39,7 +39,15 @@ function parseTransactions(
     }
   }
 
-  return { executed, ready, notReady, minHoldUpTime }
+  // Order instructions by instruction index
+  return {
+    executed,
+    ready: ready.sort(
+      (a, b) => a.account.instructionIndex - b.account.instructionIndex
+    ),
+    notReady,
+    minHoldUpTime,
+  }
 }
 
 interface Props {
