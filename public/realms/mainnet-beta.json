@@ -975,8 +975,17 @@
     "realmId": "5o6gEoeJBpuXT1H1ijFTq3KcSGx7ayabdG2hji7cB3FG",
     "website": "https://www.meanfi.com",
     "twitter": "@meanfinance",
-    "ogImage": "/realms/MEAN/logo.svg"
+    "ogImage": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/MEANeD3XDdUmNMsRGjASkSWdC8prLYsoRJ61pPeHctD/logo.svg"
   },
+  "symbol": "OPCD",
+    "displayName": "OPANZ COMMUNITY DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "D2dphGE7euTcC576skADhqQ8rwZ9dPMq6pmoDhdbdsYX",
+    "bannerImage": "/realms/OPCD/OCDC.png",
+    "ogImage": "/realms/OPCD/OCDLO.png",
+    "website": "https://auturoa.nz/",
+    "twitter": "@OPANZ999"
+   },
   {
     "symbol": "ANTLERDAO",
     "displayName": "AntlerDAO",
