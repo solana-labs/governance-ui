@@ -7,6 +7,7 @@ import { precision } from '@utils/formatting'
 import Switch from '@components/Switch'
 import Select from '@components/inputs/Select'
 import { usePrevious } from '@hooks/usePrevious'
+import { DISABLED_VALUE } from '@tools/constants'
 
 export enum InstructionInputType {
   GOVERNED_ACCOUNT,
@@ -14,6 +15,7 @@ export enum InstructionInputType {
   TEXTAREA,
   SWITCH,
   SELECT,
+  DISABLEABLE_INPUT,
 }
 
 export interface InstructionInput {
@@ -222,6 +224,84 @@ const InstructionInput = ({
             </div>
           </div>
         )
+
+      // DISABLEABLE_INPUT is for concealing ugly numbers; it uses a toggle to disable the setting (by setting it to u64::max)
+      case InstructionInputType.DISABLEABLE_INPUT: {
+        const validateAmountOnBlur = () => {
+          const value = form[input.name]
+          const precisionFromMin = input.min ? precision(input.min) : 1
+          handleSetForm({
+            value: parseFloat(
+              Math.max(
+                Number(input.min ? input.min : 0),
+                Math.min(
+                  Number(
+                    typeof input.max !== 'undefined'
+                      ? input.max
+                      : Number.MAX_SAFE_INTEGER
+                  ),
+                  Number(value)
+                )
+              ).toFixed(
+                input.precision
+                  ? input.precision
+                  : precisionFromMin
+                  ? precisionFromMin
+                  : 0
+              )
+            ),
+            propertyName: input.name,
+          })
+        }
+        return (
+          <div className="max-w-lg">
+            <div className="text-sm mb-3">
+              <div className="mb-2">{input.label}</div>
+              <div className="flex flex-row text-xs items-center">
+                <Switch
+                  checked={
+                    form[input.name]?.toString() !== DISABLED_VALUE.toString()
+                  }
+                  onChange={(checked) =>
+                    handleSetForm({
+                      value: checked ? 1 : DISABLED_VALUE,
+                      propertyName: input.name,
+                    })
+                  }
+                />
+                <div className="ml-3 grow">
+                  {form[input.name]?.toString() !==
+                  DISABLED_VALUE.toString() ? (
+                    <Input
+                      className="ml-1"
+                      min={input.min}
+                      value={form[input.name]}
+                      type={input.inputType!}
+                      onChange={(event) => {
+                        handleSetForm({
+                          value: event.target.value,
+                          propertyName: input.name,
+                        })
+                      }}
+                      step={input.step}
+                      error={formErrors[input.name]}
+                      onBlur={
+                        input.onBlur
+                          ? input.onBlur
+                          : input.validateMinMax
+                          ? validateAmountOnBlur
+                          : null
+                      }
+                    />
+                  ) : (
+                    'Disabled'
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+      }
     }
   }
   return (
