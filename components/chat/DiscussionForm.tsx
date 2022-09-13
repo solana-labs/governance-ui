@@ -30,9 +30,9 @@ const DiscussionForm = () => {
   const connection = useWalletStore((s) => s.connection)
   const { proposal } = useWalletStore((s) => s.selectedProposal)
   const { fetchChatMessages } = useWalletStore((s) => s.actions)
-  const { tokenType } = useWalletStore((s) => s.selectedProposal)
+  const { tokenRole } = useWalletStore((s) => s.selectedProposal)
   const commenterVoterTokenRecord =
-    tokenType === GoverningTokenRole.Community
+    tokenRole === GoverningTokenRole.Community
       ? ownTokenRecord
       : ownCouncilTokenRecord
 
