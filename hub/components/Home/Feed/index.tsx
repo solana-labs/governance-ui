@@ -115,7 +115,7 @@ export function Content(props: Props) {
                   realmUrlId={props.realmUrlId}
                 />
               ) : (
-                <Empty />
+                <Empty className="mt-24" />
               )}
               {additionalPageCursors.map((cursor) => (
                 <AdditionalPage
@@ -133,7 +133,9 @@ export function Content(props: Props) {
                   onNoAdditionalPages={() => setReachedEndOfFeed(true)}
                 />
               ))}
-              {reachedEndOfFeed && <EndOfFeed className="py-16" />}
+              {!!feed.edges.length && reachedEndOfFeed && (
+                <EndOfFeed className="py-16" />
+              )}
             </div>
           ),
         ),
