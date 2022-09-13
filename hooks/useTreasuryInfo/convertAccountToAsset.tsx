@@ -36,7 +36,7 @@ export const convertAccountToAsset = (
             : abbreviateAddress(account.pubkey.toBase58())),
         raw: account,
         symbol: info.symbol,
-        tokenType:
+        tokenRole:
           councilMintAddress &&
           account.extensions.mint?.publicKey.toBase58() === councilMintAddress
             ? 'council'

@@ -5,7 +5,7 @@ interface Props {
   className?: string
   icon: JSX.Element
   name: string
-  value: string
+  value: JSX.Element | string
 }
 
 export default function Section(props: Props) {

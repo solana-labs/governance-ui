@@ -120,14 +120,14 @@ const TokenBalanceCard: FC<Props> = ({ proposal, children }) => {
           {communityDepositVisible && (
             <TokenDeposit
               mint={mint}
-              tokenType={GoverningTokenRole.Community}
+              tokenRole={GoverningTokenRole.Community}
               councilVote={false}
             />
           )}
           {councilDepositVisible && (
             <TokenDeposit
               mint={councilMint}
-              tokenType={GoverningTokenRole.Council}
+              tokenRole={GoverningTokenRole.Council}
               councilVote={true}
             />
           )}
@@ -146,11 +146,11 @@ const TokenBalanceCard: FC<Props> = ({ proposal, children }) => {
 
 export const TokenDeposit = ({
   mint,
-  tokenType,
+  tokenRole,
   councilVote,
 }: {
   mint: MintInfo | undefined
-  tokenType: GoverningTokenRole
+  tokenRole: GoverningTokenRole
   councilVote?: boolean
 }) => {
   const wallet = useWalletStore((s) => s.current)
@@ -184,24 +184,24 @@ export const TokenDeposit = ({
   }
 
   const depositTokenRecord =
-    tokenType === GoverningTokenRole.Community
+    tokenRole === GoverningTokenRole.Community
       ? ownTokenRecord
       : ownCouncilTokenRecord
 
   const depositTokenAccount =
-    tokenType === GoverningTokenRole.Community
+    tokenRole === GoverningTokenRole.Community
       ? realmTokenAccount
       : councilTokenAccount
 
   const depositMint =
-    tokenType === GoverningTokenRole.Community
+    tokenRole === GoverningTokenRole.Community
       ? realm?.account.communityMint
       : realm?.account.config.councilMint
 
   const tokenName = getMintMetadata(depositMint)?.name ?? realm?.account.name
 
   const depositTokenName = `${tokenName} ${
-    tokenType === GoverningTokenRole.Community ? '' : 'Council'
+    tokenRole === GoverningTokenRole.Community ? '' : 'Council'
   }`
 
   const depositTokens = async function (amount: BN) {
@@ -482,7 +482,7 @@ export const TokenDeposit = ({
         vsrPluginsPks.includes(
           config?.account.communityTokenConfig.voterWeightAddin.toBase58()
         ) &&
-        tokenType === GoverningTokenRole.Community && (
+        tokenRole === GoverningTokenRole.Community && (
           <small className="flex items-center mt-3 text-xs">
             <ExclamationIcon className="w-5 h-5 mr-2"></ExclamationIcon>
             Please withdraw your tokens and deposit again to get governance

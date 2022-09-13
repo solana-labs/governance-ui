@@ -5,6 +5,7 @@ import type { AssetAccount } from '@utils/uiTypes/assets'
 
 import { NFT } from './NFT'
 import { Program } from './Program'
+import { PublicKey } from '@solana/web3.js'
 
 export enum AssetType {
   Mint,
@@ -23,7 +24,7 @@ export interface Mint {
   name: string
   raw: AssetAccount
   symbol: string
-  tokenType?: 'council' | 'community'
+  tokenRole?: 'council' | 'community'
   totalSupply?: BigNumber
 }
 
@@ -52,8 +53,8 @@ export interface RealmAuthority {
   config: {
     communityMintMaxVoteWeightSource?: MintMaxVoteWeightSource
     minCommunityTokensToCreateGovernance: BigNumber
-    useCommunityVoterWeightAddin?: boolean
-    useMaxCommunityVoterWeightAddin?: boolean
+    useCommunityVoterWeightAddin?: PublicKey | false
+    useMaxCommunityVoterWeightAddin?: PublicKey | false
   }
   icon: JSX.Element
   name: string
