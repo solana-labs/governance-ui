@@ -37,7 +37,7 @@ export default function MintListItem(props: Props) {
               <div className="text-xs text-fgd-1 font-bold">
                 {formatNumber(props.mint.totalSupply, undefined, {})}
               </div>
-              <div className="text-xs text-fgd-1">{props.mint.totalSupply}</div>
+              <div className="text-xs text-fgd-1">{props.mint.symbol}</div>
             </div>
           )}
           <div className="text-xs text-white/50 flex items-center space-x-1">
