@@ -100,7 +100,7 @@ export default function Config(props: Props) {
     <div className={props.className}>
       <div className="flex items-center justify-between">
         <div className="text-xl text-fgd-1 font-bold flex items-center space-x-2">
-          <CogIcon className="h-5 w-5" /> <span>Configuration</span>
+          <CogIcon className="h-5 w-5" /> <span>DAO Rules</span>
         </div>
         <Tooltip
           content={
@@ -124,7 +124,7 @@ export default function Config(props: Props) {
             onClick={() => setEditRealmOpen(true)}
           >
             <PencilIcon className="h-4 w-4" />
-            <div>Change config</div>
+            <div>Edit Rules</div>
           </button>
         </Tooltip>
       </div>
