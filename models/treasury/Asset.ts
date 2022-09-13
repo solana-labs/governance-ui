@@ -1,5 +1,8 @@
 import type { BigNumber } from 'bignumber.js'
-import type { MintMaxVoteWeightSource } from '@solana/spl-governance'
+import type {
+  GoverningTokenType,
+  MintMaxVoteWeightSource,
+} from '@solana/spl-governance'
 
 import type { AssetAccount } from '@utils/uiTypes/assets'
 
@@ -25,6 +28,7 @@ export interface Mint {
   raw: AssetAccount
   symbol: string
   tokenRole?: 'council' | 'community'
+  tokenType?: GoverningTokenType
   totalSupply?: BigNumber
 }
 

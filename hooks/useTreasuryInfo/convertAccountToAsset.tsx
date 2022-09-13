@@ -10,11 +10,13 @@ import { abbreviateAddress } from '@utils/formatting'
 
 import { getAccountAssetCount } from './getAccountAssetCount'
 import { getAccountValue } from './getAccountValue'
+import type { ProgramAccount, RealmConfigAccount } from '@solana/spl-governance'
 
 export const convertAccountToAsset = (
   account: AssetAccount,
   councilMintAddress?: string,
-  communityMintAddress?: string
+  communityMintAddress?: string,
+  realmConfig?: ProgramAccount<RealmConfigAccount>
 ): Asset | null => {
   const info = getTreasuryAccountItemInfoV2(account)
 
@@ -24,7 +26,26 @@ export const convertAccountToAsset = (
       return null
     }
 
-    case AccountType.MINT:
+    case AccountType.MINT: {
+      const tokenRole =
+        councilMintAddress &&
+        account.extensions.mint?.publicKey.toBase58() === councilMintAddress
+          ? 'council'
+          : communityMintAddress &&
+            account.extensions.mint?.publicKey.toBase58() ===
+              communityMintAddress
+          ? 'community'
+          : undefined
+
+      const tokenType =
+        realmConfig === undefined
+          ? undefined
+          : tokenRole === 'council'
+          ? realmConfig.account.councilTokenConfig.tokenType
+          : tokenRole === 'community'
+          ? realmConfig.account.communityTokenConfig.tokenType
+          : undefined
+
       return {
         type: AssetType.Mint,
         address: account.pubkey.toBase58(),
@@ -36,22 +57,15 @@ export const convertAccountToAsset = (
             : abbreviateAddress(account.pubkey.toBase58())),
         raw: account,
         symbol: info.symbol,
-        tokenRole:
-          councilMintAddress &&
-          account.extensions.mint?.publicKey.toBase58() === councilMintAddress
-            ? 'council'
-            : communityMintAddress &&
-              account.extensions.mint?.publicKey.toBase58() ===
-                communityMintAddress
-            ? 'community'
-            : undefined,
+        tokenRole,
         totalSupply: account.extensions.mint
           ? new BigNumber(
               account.extensions.mint.account.supply.toString()
             ).shiftedBy(-account.extensions.mint.account.decimals)
           : undefined,
+        tokenType,
       }
-
+    }
     case AccountType.SOL:
       return {
         type: AssetType.Sol,
