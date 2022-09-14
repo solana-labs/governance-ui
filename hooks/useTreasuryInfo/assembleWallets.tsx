@@ -116,7 +116,8 @@ export const assembleWallets = async (
       const asset = convertAccountToAsset(
         account,
         councilMintAddress,
-        communityMintAddress
+        communityMintAddress,
+        realmConfig
       )
 
       if (asset) {

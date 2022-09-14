@@ -9,6 +9,7 @@ import CommunityMintIcon from '../../../icons/CommunityMintIcon'
 import TokenIcon from '../../../icons/TokenIcon'
 import ListItem from './ListItem'
 import { Mint } from '@models/treasury/Asset'
+import { GoverningTokenType } from '@solana/spl-governance'
 
 interface Props {
   className?: string
@@ -24,11 +25,14 @@ export default function MintListItem(props: Props) {
     <ListItem
       className={props.className}
       name={
-        props.mint.tokenRole === 'council'
+        (props.mint.tokenRole === 'council'
           ? 'Council Token Mint'
           : props.mint.tokenRole === 'community'
           ? 'Community Token Mint'
-          : props.mint.name + ' Mint'
+          : props.mint.name + ' Mint') +
+        (props.mint.tokenType === GoverningTokenType.Dormant
+          ? ' (Dormant)'
+          : '')
       }
       rhs={
         <div className="flex flex-col items-end">
