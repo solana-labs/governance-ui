@@ -97,6 +97,7 @@ export function Content(props: Props) {
         <Controls
           className="mt-4 max-w-xl"
           feedItemId={props.feedItem.id}
+          numReplies={props.feedItem.numComments}
           realm={props.realm}
           score={props.feedItem.score}
           totalProposalVotes={
