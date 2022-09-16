@@ -58,11 +58,11 @@ export function RichTextEditor(props: Props) {
   return (
     <div
       className={props.className}
-      onClick={(e) => {
+      onClick={() => {
         if (ref.current) {
           ref.current.focus();
         }
-        props.onClick?.(e);
+        props.onClick?.();
       }}
     >
       {EditorComponent && state && utilities && (
