@@ -127,6 +127,7 @@ export function Content(props: Props) {
           </div>
           <div className="pb-4">
             <ReplyBox.Content
+              autoFocus
               feedItemId={props.feedItemId}
               parentCommentId={props.comment.id}
               realm={props.realm}

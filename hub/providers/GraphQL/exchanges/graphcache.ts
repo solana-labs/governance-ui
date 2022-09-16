@@ -55,6 +55,7 @@ export const graphcache = async (
       RealmMember: (member) => member.publicKey as string,
       RealmPost: (post) => post.id as string,
       RealmProposal: (proposal) => proposal.publicKey as string,
+      RealmProposalUserVote: () => null,
       RealmProposalVoteBreakdown: () => null,
       RealmTreasury: (treasury) => treasury.belongsTo as string,
       User: (user) => user.publicKey as string,

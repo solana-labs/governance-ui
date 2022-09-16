@@ -22,6 +22,7 @@ interface BaseProps {
 }
 
 interface Props extends BaseProps {
+  autoFocus?: boolean;
   feedItemId: string;
   parentCommentId?: string;
   realm: PublicKey;
@@ -84,6 +85,8 @@ export function Content(props: Props) {
           )}
         >
           <RichTextEditor
+            autoFocus={props.autoFocus}
+            className="min-h-full"
             placeholder="Add a comment"
             key={documentKey}
             onChange={setRichTextDocument}
