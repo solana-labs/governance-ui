@@ -2,13 +2,13 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { PublicKey } from '@solana/web3.js'
 
-import { FeedItem } from '@hub/components/FeedItem'
 import mainnetList from 'public/realms/mainnet-beta.json'
 import devnetList from 'public/realms/devnet.json'
+import { FeedItemComment } from '@hub/components/FeedItemComment'
 
-export default function RealmFeedItem() {
+export default function RealmFeedItemComment() {
   const router = useRouter()
-  const { id, feedItemId } = router.query
+  const { id, feedItemId, commentId } = router.query
 
   let publicKey: PublicKey | null = null
 
@@ -40,10 +40,11 @@ export default function RealmFeedItem() {
         <title>Realm</title>
         <meta property="og:title" content="Realm" key="title" />
       </Head>
-      <FeedItem
-        feedItemId={feedItemId as string}
+      <FeedItemComment
+        commentId={commentId}
+        feedItemId={feedItemId}
         realm={publicKey}
-        realmUrlId={id as string}
+        realmUrlId={id}
       />
     </div>
   )

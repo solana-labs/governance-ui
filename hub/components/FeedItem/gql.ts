@@ -10,6 +10,10 @@ export const feedItemComment = `
   fragment Comment on RealmFeedItemComment {
     author {
       publicKey
+      twitterInfo {
+        avatarUrl
+        handle
+      }
     }
     created
     document
@@ -36,6 +40,9 @@ export const getComments = gql`
             ...Comment
             replies {
               ...Comment
+              replies {
+                ...Comment
+              }
             }
           }
         }
@@ -63,6 +70,9 @@ export const getMoreComments = gql`
             ...Comment
             replies {
               ...Comment
+              replies {
+                ...Comment
+              }
             }
           }
         }

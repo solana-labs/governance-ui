@@ -12,6 +12,7 @@ interface Props {
   feedItemId: string;
   cursor: string;
   realm: PublicKey;
+  realmUrlId: string;
   onLoadMore?(cursor: string): void;
 }
 
@@ -37,7 +38,9 @@ export function AdditionalCommentTree(props: Props) {
           />
           <CommentTree.Content
             comments={feedItemCommentTree.edges.map((edge) => edge.node)}
+            feedItemId={props.feedItemId}
             realm={props.realm}
+            realmUrlId={props.realmUrlId}
           />
         </div>
       ),

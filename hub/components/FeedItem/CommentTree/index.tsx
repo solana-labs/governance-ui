@@ -2,20 +2,67 @@ import type { PublicKey } from '@solana/web3.js';
 
 import { FeedItemComment } from '../gql';
 import cx from '@hub/lib/cx';
+import { useUserCreatedTopLevelFeedItemRepliesStore } from '@hub/stores/userCreatedTopLevelFeedItemRepliesStore';
 
-import { Comment } from './Comment';
+import * as Comment from './Comment';
 
-interface Props {
+interface BaseProps {
   className?: string;
+}
+
+interface Props extends BaseProps {
   comments: FeedItemComment[];
+  feedItemId: string;
   realm: PublicKey;
+  realmUrlId: string;
 }
 
 export function Content(props: Props) {
+  const userCreatedReplies = useUserCreatedTopLevelFeedItemRepliesStore(
+    (state) => state.comments[props.feedItemId],
+  );
+
   return (
     <div className={cx(props.className, 'space-y-9')}>
+      {userCreatedReplies &&
+        !!userCreatedReplies.length &&
+        userCreatedReplies.map((comment) => (
+          <Comment.Content
+            comment={comment}
+            feedItemId={props.feedItemId}
+            key={comment.id}
+            realm={props.realm}
+            realmUrlId={props.realmUrlId}
+          />
+        ))}
       {props.comments.map((comment) => (
-        <Comment comment={comment} key={comment.id} realm={props.realm} />
+        <Comment.Content
+          comment={comment}
+          feedItemId={props.feedItemId}
+          key={comment.id}
+          realm={props.realm}
+          realmUrlId={props.realmUrlId}
+        />
+      ))}
+    </div>
+  );
+}
+
+export function Error(props: BaseProps) {
+  return (
+    <div className={cx(props.className, 'space-y-9')}>
+      {Array.from({ length: 3 }).map((_, i) => (
+        <Comment.Error key={i} />
+      ))}
+    </div>
+  );
+}
+
+export function Loading(props: BaseProps) {
+  return (
+    <div className={cx(props.className, 'space-y-9')}>
+      {Array.from({ length: 3 }).map((_, i) => (
+        <Comment.Loading key={i} />
       ))}
     </div>
   );

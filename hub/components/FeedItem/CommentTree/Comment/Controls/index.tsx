@@ -19,6 +19,7 @@ interface Props {
   realm: PublicKey;
   score: number;
   userVote?: FeedItemCommentVoteType | null;
+  onReply?(): void;
 }
 
 export function Controls(props: Props) {
@@ -73,7 +74,10 @@ export function Controls(props: Props) {
           {formatNumber(props.score, undefined, { maximumFractionDigits: 0 })}
         </div>
       </button>
-      <button className="flex items-center space-x-1.5 text-neutral-500 hover:text-cyan-500">
+      <button
+        className="flex items-center space-x-1.5 text-neutral-500 hover:text-cyan-500"
+        onClick={props.onReply}
+      >
         <ReplyIcon className="fill-current-500 h-4 w-4 transition-colors" />
         <div className="text-xs transition-colors">Reply</div>
       </button>

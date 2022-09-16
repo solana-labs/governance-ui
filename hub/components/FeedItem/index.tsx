@@ -131,6 +131,9 @@ export function FeedItem(props: Props) {
                           <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
                           <Footer.Error className="mt-5" />
                           <ReplyBox.Error className="mt-8 mb-4" />
+                          <div className="pt-8">
+                            <CommentTree.Error />
+                          </div>
                         </div>
                       ),
                       () => (
@@ -143,6 +146,9 @@ export function FeedItem(props: Props) {
                           <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
                           <Footer.Loading className="mt-5" />
                           <ReplyBox.Loading className="mt-8 mb-4" />
+                          <div className="pt-8">
+                            <CommentTree.Loading />
+                          </div>
                         </div>
                       ),
                       ({ feedItem }) => (
@@ -172,19 +178,33 @@ export function FeedItem(props: Props) {
                             score={feedItem.score}
                             userVote={feedItem.myVote}
                           />
-                          <ReplyBox.Content className="mt-8 mb-4" />
+                          <ReplyBox.Content
+                            className="mt-8 mb-4"
+                            feedItemId={props.feedItemId}
+                            realm={props.realm}
+                          />
                           {pipe(
                             commentsResult,
                             RE.match(
-                              () => <div className="pt-8" />,
-                              () => <div className="pt-8" />,
+                              () => (
+                                <div className="pt-8">
+                                  <CommentTree.Error />
+                                </div>
+                              ),
+                              () => (
+                                <div className="pt-8">
+                                  <CommentTree.Loading />
+                                </div>
+                              ),
                               ({ feedItemCommentTree }) => (
                                 <div className="pt-8 pb-16">
                                   <CommentTree.Content
                                     comments={feedItemCommentTree.edges.map(
                                       (edge) => edge.node,
                                     )}
+                                    feedItemId={props.feedItemId}
                                     realm={props.realm}
+                                    realmUrlId={props.realmUrlId}
                                   />
                                   {additionalPageCursors.map((cursor) => (
                                     <AdditionalCommentTree
@@ -193,6 +213,7 @@ export function FeedItem(props: Props) {
                                       feedItemId={props.feedItemId}
                                       key={cursor}
                                       realm={props.realm}
+                                      realmUrlId={props.realmUrlId}
                                       onLoadMore={(newCursor) =>
                                         setAdditionalPageCursors((cursors) =>
                                           cursors.concat(newCursor),
