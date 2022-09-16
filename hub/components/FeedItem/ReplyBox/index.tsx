@@ -62,13 +62,27 @@ export function Content(props: Props) {
             () => (
               <div className="rounded-full w-8 h-8 bg-neutral-200 animate-pulse" />
             ),
-            () => <AuthorAvatar className="h-8 w-8" />,
-            ({ me }) => <AuthorAvatar className="h-8 w-8" author={me} />,
+            () => <AuthorAvatar className="h-8 w-8 text-sm" />,
+            ({ me }) => (
+              <AuthorAvatar className="h-8 w-8 text-sm" author={me} />
+            ),
           ),
         )}
       </div>
       <div className="flex flex-col items-end">
-        <div className="bg-zinc-50 border border-zinc-300 rounded min-h-[80px] w-full py-2 px-3">
+        <div
+          className={cx(
+            'bg-zinc-50',
+            'border-zinc-300',
+            'border',
+            'min-h-[80px]',
+            'px-3',
+            'py-2',
+            'rounded',
+            'text-sm',
+            'w-full',
+          )}
+        >
           <RichTextEditor
             placeholder="Add a comment"
             key={documentKey}

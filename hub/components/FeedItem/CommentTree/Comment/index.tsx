@@ -42,7 +42,10 @@ export function Content(props: Props) {
     <article className={cx(props.className, 'w-full')}>
       <div className={cx('grid', 'grid-cols-[32px,1fr]', 'gap-x-3')}>
         <div className="relative">
-          <AuthorAvatar author={props.comment.author} className="h-8 w-8" />
+          <AuthorAvatar
+            author={props.comment.author}
+            className="h-8 w-8 text-sm"
+          />
           {(!!replies.length ||
             !!props.comment.repliesCount ||
             replyBoxOpen) && (
@@ -78,7 +81,7 @@ export function Content(props: Props) {
             </Link>
           </header>
           <RichTextDocumentDisplay
-            className="mt-2.5"
+            className="mt-2.5 text-sm"
             document={props.comment.document}
           />
           <Controls
