@@ -15,7 +15,7 @@ export const Primary = forwardRef<HTMLButtonElement, Props>(function Primary(
 
   return (
     <button
-      {...props}
+      {...rest}
       ref={ref}
       className={cx(
         rest.className,

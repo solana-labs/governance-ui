@@ -1,18 +1,23 @@
 import * as Separator from '@radix-ui/react-separator';
 import type { PublicKey } from '@solana/web3.js';
 import { pipe } from 'fp-ts/function';
+import { useEffect, useState } from 'react';
 
 import * as Sidebar from '../Home/Sidebar';
 import { HomeLayout } from '@hub/components/HomeLayout';
 import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay';
+import { useJWT } from '@hub/hooks/useJWT';
 import { useQuery } from '@hub/hooks/useQuery';
 import { getDefaultBannerUrl } from '@hub/lib/getDefaultBannerUrl';
 import * as RE from '@hub/types/Result';
 
+import { AdditionalCommentTree } from './AdditionalCommentTree';
 import * as Back from './Back';
+import * as CommentTree from './CommentTree';
 import * as Footer from './Footer';
 import * as gql from './gql';
 import * as Header from './Header';
+import * as ReplyBox from './ReplyBox';
 import * as Title from './Title';
 
 interface Props {
@@ -30,10 +35,32 @@ export function FeedItem(props: Props) {
       feedItemId: props.feedItemId,
     },
   });
+
   const [realmResult] = useQuery(gql.getRealmResp, {
     query: gql.getRealm,
     variables: { realm: props.realm },
   });
+
+  const [commentsResult] = useQuery(gql.getCommentsResp, {
+    query: gql.getComments,
+    variables: { feedItemId: props.feedItemId },
+  });
+
+  const [jwt] = useJWT();
+
+  const [additionalPageCursors, setAdditionalPageCursors] = useState<string[]>(
+    [],
+  );
+
+  const firstPageEndCursor = RE.isOk(commentsResult)
+    ? commentsResult.data.feedItemCommentTree.pageInfo.endCursor
+    : null;
+
+  useEffect(() => {
+    if (firstPageEndCursor) {
+      setAdditionalPageCursors([firstPageEndCursor]);
+    }
+  }, [firstPageEndCursor]);
 
   return (
     <main className={props.className}>
@@ -53,6 +80,10 @@ export function FeedItem(props: Props) {
                   <div className="mb-16 rounded w-full h-20 bg-neutral-200" />
                   <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
                   <Footer.Error className="mt-5" />
+                  {jwt && <ReplyBox.Error className="mt-8 mb-4" />}
+                  <div className="pt-8">
+                    <CommentTree.Error />
+                  </div>
                 </div>
               )}
             />
@@ -70,6 +101,10 @@ export function FeedItem(props: Props) {
                   <div className="mb-16 rounded w-full h-20 bg-neutral-200 animate-pulse" />
                   <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
                   <Footer.Loading className="mt-5" />
+                  {jwt && <ReplyBox.Loading className="mt-8 mb-4" />}
+                  <div className="pt-8">
+                    <CommentTree.Loading />
+                  </div>
                 </div>
               )}
             />
@@ -106,6 +141,10 @@ export function FeedItem(props: Props) {
                           <div className="mb-16 rounded w-full h-20 bg-neutral-200" />
                           <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
                           <Footer.Error className="mt-5" />
+                          {jwt && <ReplyBox.Error className="mt-8 mb-4" />}
+                          <div className="pt-8">
+                            <CommentTree.Error />
+                          </div>
                         </div>
                       ),
                       () => (
@@ -117,6 +156,10 @@ export function FeedItem(props: Props) {
                           <div className="mb-16 rounded w-full h-20 bg-neutral-200 animate-pulse" />
                           <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
                           <Footer.Loading className="mt-5" />
+                          {jwt && <ReplyBox.Loading className="mt-8 mb-4" />}
+                          <div className="pt-8">
+                            <CommentTree.Loading />
+                          </div>
                         </div>
                       ),
                       ({ feedItem }) => (
@@ -141,10 +184,61 @@ export function FeedItem(props: Props) {
                           <Footer.Content
                             className="mt-5"
                             feedItemId={feedItem.id}
+                            numReplies={feedItem.numComments}
                             realm={props.realm}
                             score={feedItem.score}
                             userVote={feedItem.myVote}
                           />
+                          {jwt && (
+                            <ReplyBox.Content
+                              className="mt-8 mb-4"
+                              feedItemId={props.feedItemId}
+                              realm={props.realm}
+                            />
+                          )}
+                          {pipe(
+                            commentsResult,
+                            RE.match(
+                              () => (
+                                <div className="pt-8">
+                                  <CommentTree.Error />
+                                </div>
+                              ),
+                              () => (
+                                <div className="pt-8">
+                                  <CommentTree.Loading />
+                                </div>
+                              ),
+                              ({ feedItemCommentTree }) => (
+                                <div className="pt-8 pb-16">
+                                  <CommentTree.Content
+                                    showClientSideComments
+                                    comments={feedItemCommentTree.edges.map(
+                                      (edge) => edge.node,
+                                    )}
+                                    feedItemId={props.feedItemId}
+                                    realm={props.realm}
+                                    realmUrlId={props.realmUrlId}
+                                  />
+                                  {additionalPageCursors.map((cursor) => (
+                                    <AdditionalCommentTree
+                                      className="mt-9"
+                                      cursor={cursor}
+                                      feedItemId={props.feedItemId}
+                                      key={cursor}
+                                      realm={props.realm}
+                                      realmUrlId={props.realmUrlId}
+                                      onLoadMore={(newCursor) =>
+                                        setAdditionalPageCursors((cursors) =>
+                                          cursors.concat(newCursor),
+                                        )
+                                      }
+                                    />
+                                  ))}
+                                </div>
+                              ),
+                            ),
+                          )}
                         </div>
                       ),
                     ),

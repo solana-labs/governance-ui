@@ -1,6 +1,6 @@
 // @ts-ignore
 import type { Editor, EditorState } from 'draft-js';
-import React, { forwardRef, useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import type { fromEditorState, toEditorState } from '@hub/lib/richText';
 import { RichTextDocument } from '@hub/types/RichTextDocument';
@@ -12,6 +12,7 @@ interface Utilities {
 
 interface Props {
   className?: string;
+  autoFocus?: boolean;
   defaultDocument?: RichTextDocument;
   placeholder?: string;
   onBlur?(): void;
@@ -20,13 +21,11 @@ interface Props {
   onFocus?(): void;
 }
 
-export const RichTextEditor = forwardRef<Editor, Props>(function RichTextEditor(
-  props: Props,
-  ref,
-) {
+export function RichTextEditor(props: Props) {
   const [EditorComponent, setEditor] = useState<typeof Editor | null>(null);
   const [state, setState] = useState<EditorState | null>(null);
   const [utilities, setUtilities] = useState<Utilities | null>(null);
+  const ref = useRef<Editor>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -50,10 +49,25 @@ export const RichTextEditor = forwardRef<Editor, Props>(function RichTextEditor(
     }
   }, [setEditor]);
 
+  useEffect(() => {
+    if (EditorComponent && ref.current && props.autoFocus) {
+      ref.current.focus();
+    }
+  }, [props.autoFocus, ref, EditorComponent]);
+
   return (
-    <div className={props.className} onClick={props.onClick}>
+    <div
+      className={props.className}
+      onClick={() => {
+        if (ref.current) {
+          ref.current.focus();
+        }
+        props.onClick?.();
+      }}
+    >
       {EditorComponent && state && utilities && (
         <EditorComponent
+          autoFocus={props.autoFocus}
           editorState={state}
           placeholder={props.placeholder}
           ref={ref}
@@ -68,4 +82,4 @@ export const RichTextEditor = forwardRef<Editor, Props>(function RichTextEditor(
       )}
     </div>
   );
-});
+}

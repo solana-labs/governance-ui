@@ -29,7 +29,8 @@ export function Header(props: Props) {
     : 'unknown author';
 
   const isEdited =
-    differenceInMinutes(props.updated, props.created) > EDIT_GRACE_PERIOD;
+    Math.abs(differenceInMinutes(props.updated, props.created)) >
+    EDIT_GRACE_PERIOD;
 
   const date = isEdited && props.proposal ? props.updated : props.created;
 

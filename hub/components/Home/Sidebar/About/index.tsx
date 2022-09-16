@@ -1,12 +1,12 @@
 import EarthIcon from '@carbon/icons-react/lib/Earth';
-import EventsIcon from '@carbon/icons-react/lib/Events';
+// import EventsIcon from '@carbon/icons-react/lib/Events';
 import IdeaIcon from '@carbon/icons-react/lib/Idea';
 import LogoTwitterIcon from '@carbon/icons-react/lib/LogoTwitter';
 import { useState } from 'react';
 
 import cx from '@hub/lib/cx';
-import { formatNumber } from '@hub/lib/formatNumber';
-import { ntext } from '@hub/lib/ntext';
+// import { formatNumber } from '@hub/lib/formatNumber';
+// import { ntext } from '@hub/lib/ntext';
 
 interface BaseProps {
   className?: string;
@@ -49,13 +49,13 @@ export function Content(props: Props) {
           </button>
         )}
       </div>
-      <div className="flex items-center space-x-2 mt-3">
+      {/* <div className="flex items-center space-x-2 mt-3">
         <EventsIcon className="h-4 w-4 fill-neutral-500" />
         <div className="text-sm text-neutral-700">
           {formatNumber(props.membersCount, undefined, {})}{' '}
           {ntext(props.membersCount, 'member')}
         </div>
-      </div>
+      </div> */}
       {props.websiteUrl && (
         <a
           className="flex group items-center space-x-2 mt-3"

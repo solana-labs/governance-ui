@@ -2,11 +2,13 @@ import { offlineExchange, StorageAdapter } from '@urql/exchange-graphcache';
 import { IntrospectionData } from '@urql/exchange-graphcache/dist/types/ast';
 import { gql } from 'urql';
 
+import { feedItemComment } from '@hub/components/FeedItem/gql';
 import {
   feedItemPostParts,
   feedItemProposalParts,
 } from '@hub/components/Home/Feed/gql';
 import * as gqlStores from '@hub/lib/gqlCacheStorage';
+import { FeedItemCommentVoteType } from '@hub/types/FeedItemCommentVoteType';
 import { FeedItemSort } from '@hub/types/FeedItemSort';
 import { FeedItemVoteType } from '@hub/types/FeedItemVoteType';
 
@@ -53,6 +55,7 @@ export const graphcache = async (
       RealmMember: (member) => member.publicKey as string,
       RealmPost: (post) => post.id as string,
       RealmProposal: (proposal) => proposal.publicKey as string,
+      RealmProposalUserVote: () => null,
       RealmProposalVoteBreakdown: () => null,
       RealmTreasury: (treasury) => treasury.belongsTo as string,
       User: (user) => user.publicKey as string,
@@ -149,6 +152,57 @@ export const graphcache = async (
               score: score,
             };
           }
+        }
+
+        return null;
+      },
+      voteOnFeedItemComment(args, cache) {
+        const commentFragment = gql`
+          ${feedItemComment}
+        `;
+
+        const comment = cache.readFragment(commentFragment, {
+          id: args.commentId,
+        });
+
+        if (comment) {
+          let newVote: null | FeedItemCommentVoteType =
+            FeedItemCommentVoteType.Approve;
+          let score = comment.score;
+
+          if (comment.myVote === args.vote) {
+            newVote = null;
+
+            if (args.vote === FeedItemCommentVoteType.Approve) {
+              score -= 1;
+            } else {
+              score += 1;
+            }
+          } else {
+            newVote = args.vote as FeedItemCommentVoteType;
+
+            if (!comment.myVote) {
+              if (args.vote === FeedItemCommentVoteType.Approve) {
+                score += 1;
+              } else {
+                score -= 1;
+              }
+            } else {
+              if (args.vote === FeedItemCommentVoteType.Approve) {
+                score += 2;
+              } else {
+                score -= 2;
+              }
+            }
+          }
+
+          return {
+            __typename: 'RealmFeedItemComment',
+            ...comment,
+            id: args.commentId,
+            myVote: newVote,
+            score: score,
+          };
         }
 
         return null;

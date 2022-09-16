@@ -21,6 +21,7 @@ export const feedItemPostParts = `
   score
   title
   document
+  numComments
   author {
     publicKey
     twitterInfo {
@@ -43,6 +44,7 @@ export const feedItemProposalParts = `
   score
   title
   document
+  numComments
   author {
     publicKey
     twitterInfo {
@@ -162,6 +164,7 @@ export const FeedItemPost = IT.type({
   document: RichTextDocument,
   id: IT.string,
   myVote: IT.union([IT.null, FeedItemVoteType]),
+  numComments: IT.number,
   score: IT.number,
   title: IT.string,
   updated: IT.number,
@@ -177,6 +180,7 @@ export const FeedItemProposal = IT.type({
   document: RichTextDocument,
   id: IT.string,
   myVote: IT.union([IT.null, FeedItemVoteType]),
+  numComments: IT.number,
   score: IT.number,
   title: IT.string,
   updated: IT.number,
