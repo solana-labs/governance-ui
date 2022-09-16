@@ -61,36 +61,35 @@ export const deposit = async (
     vaultOwnershipAccount = address
   }
 
-  const poolMintATA = await Token.getAssociatedTokenAddress(
-    ASSOCIATED_TOKEN_PROGRAM_ID,
-    TOKEN_PROGRAM_ID,
-    treasuryAssetAccount.isSol
-      ? NATIVE_MINT
-      : form.strategy.vaultAccounts.lpTokenMint,
-    owner,
-    true
-  )
+  let poolMintATA
 
   // If the pool mint associated token account does not exist, add it to the pre-requisite instructions
-  if (
-    (await psyFiProgram.provider.connection.getAccountInfo(poolMintATA)) ===
-    null
-  ) {
-    prerequisiteInstructions.push(
-      Token.createAssociatedTokenAccountInstruction(
-        ASSOCIATED_TOKEN_PROGRAM_ID,
-        TOKEN_PROGRAM_ID,
-        treasuryAssetAccount.isSol
-          ? NATIVE_MINT
-          : form.strategy.vaultAccounts.lpTokenMint,
-        poolMintATA,
-        owner,
-        rpcContext.walletPubkey
-      )
-    )
-  }
 
   if (form.amount && treasuryAssetAccount.isSol) {
+    poolMintATA = await Token.getAssociatedTokenAddress(
+      ASSOCIATED_TOKEN_PROGRAM_ID,
+      TOKEN_PROGRAM_ID,
+      NATIVE_MINT,
+      owner,
+      true
+    )
+
+    if (
+      (await psyFiProgram.provider.connection.getAccountInfo(poolMintATA)) ===
+      null
+    ) {
+      prerequisiteInstructions.push(
+        Token.createAssociatedTokenAccountInstruction(
+          ASSOCIATED_TOKEN_PROGRAM_ID,
+          TOKEN_PROGRAM_ID,
+          NATIVE_MINT,
+          poolMintATA,
+          owner,
+          rpcContext.walletPubkey
+        )
+      )
+    }
+
     const wsolTransferIx = SystemProgram.transfer({
       fromPubkey: owner,
       toPubkey: poolMintATA,
@@ -140,7 +139,7 @@ export const deposit = async (
       form.strategy.vaultInfo.status.currentEpoch,
       owner,
       form.strategy.vaultAccounts.pubkey,
-      transferAddress
+      treasuryAssetAccount.isSol ? poolMintATA : transferAddress
     )
 
     serializedTransferToReceiptIxs.push(
