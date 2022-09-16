@@ -10,7 +10,7 @@ export const getComments = gql`
     $commentId: RealmFeedItemCommentID!
     $feedItemId: RealmFeedItemID!
   ) {
-    feedItemComment(commentId: $commentId, feedItemId: $feedItemId) {
+    feedItemComment(commentId: $commentId, feedItemId: $feedItemId, depth: 6) {
       ...Comment
       replies {
         ...Comment
@@ -18,6 +18,18 @@ export const getComments = gql`
           ...Comment
           replies {
             ...Comment
+            replies {
+              ...Comment
+              replies {
+                ...Comment
+                replies {
+                  ...Comment
+                  replies {
+                    ...Comment
+                  }
+                }
+              }
+            }
           }
         }
       }

@@ -8,6 +8,8 @@ import { useMutation } from '@hub/hooks/useMutation';
 import { useToast, ToastType } from '@hub/hooks/useToast';
 import cx from '@hub/lib/cx';
 import { formatNumber } from '@hub/lib/formatNumber';
+import { useUserCreatedFeedItemCommentRepliesStore } from '@hub/stores/userCreatedFeedItemCommentReplies';
+import { useUserCreatedTopLevelFeedItemRepliesStore } from '@hub/stores/userCreatedTopLevelFeedItemRepliesStore';
 import { FeedItemCommentVoteType } from '@hub/types/FeedItemCommentVoteType';
 import * as RE from '@hub/types/Result';
 
@@ -29,6 +31,12 @@ export function Controls(props: Props) {
     gql.toggleApproval,
   );
   const { publish } = useToast();
+  const updateTopLevelComment = useUserCreatedTopLevelFeedItemRepliesStore(
+    (state) => state.updateComment,
+  );
+  const updateComment = useUserCreatedFeedItemCommentRepliesStore(
+    (state) => state.updateComment,
+  );
 
   return (
     <footer
@@ -56,6 +64,20 @@ export function Controls(props: Props) {
               commentId: props.commentId,
               realm: props.realm.toBase58(),
             }).then((result) => {
+              if (RE.isOk(result) || RE.isStale(result)) {
+                if (result.data.voteOnFeedItemComment.parentCommentId) {
+                  updateComment(
+                    result.data.voteOnFeedItemComment.parentCommentId,
+                    result.data.voteOnFeedItemComment,
+                  );
+                } else {
+                  updateTopLevelComment(
+                    result.data.voteOnFeedItemComment.feedItemId,
+                    result.data.voteOnFeedItemComment,
+                  );
+                }
+              }
+
               if (RE.isFailed(result)) {
                 publish({
                   type: ToastType.Error,

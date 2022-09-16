@@ -212,6 +212,7 @@ export function FeedItem(props: Props) {
                               ({ feedItemCommentTree }) => (
                                 <div className="pt-8 pb-16">
                                   <CommentTree.Content
+                                    showClientSideComments
                                     comments={feedItemCommentTree.edges.map(
                                       (edge) => edge.node,
                                     )}

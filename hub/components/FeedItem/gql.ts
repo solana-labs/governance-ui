@@ -31,7 +31,7 @@ export const getComments = gql`
   ${feedItemComment}
 
   query getCommentTree($feedItemId: RealmFeedItemID!) {
-    feedItemCommentTree(first: 10, feedItemId: $feedItemId, depth: 3) {
+    feedItemCommentTree(first: 10, feedItemId: $feedItemId, depth: 6) {
       edges {
         cursor
         node {
@@ -42,6 +42,18 @@ export const getComments = gql`
               ...Comment
               replies {
                 ...Comment
+                replies {
+                  ...Comment
+                  replies {
+                    ...Comment
+                    replies {
+                      ...Comment
+                      replies {
+                        ...Comment
+                      }
+                    }
+                  }
+                }
               }
             }
           }
@@ -61,7 +73,7 @@ export const getMoreComments = gql`
   ${feedItemComment}
 
   query getMoreComments($feedItemId: RealmFeedItemID!, $after: Cursor!) {
-    feedItemCommentTree(feedItemId: $feedItemId, depth: 3, after: $after) {
+    feedItemCommentTree(feedItemId: $feedItemId, depth: 6, after: $after) {
       edges {
         cursor
         node {
@@ -72,6 +84,18 @@ export const getMoreComments = gql`
               ...Comment
               replies {
                 ...Comment
+                replies {
+                  ...Comment
+                  replies {
+                    ...Comment
+                    replies {
+                      ...Comment
+                      replies {
+                        ...Comment
+                      }
+                    }
+                  }
+                }
               }
             }
           }

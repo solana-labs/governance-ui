@@ -15,6 +15,7 @@ interface Props extends BaseProps {
   feedItemId: string;
   realm: PublicKey;
   realmUrlId: string;
+  showClientSideComments?: boolean;
 }
 
 export function Content(props: Props) {
@@ -26,6 +27,7 @@ export function Content(props: Props) {
     <div className={cx(props.className, 'space-y-9')}>
       {userCreatedReplies &&
         !!userCreatedReplies.length &&
+        props.showClientSideComments &&
         userCreatedReplies.map((comment) => (
           <Comment.Content
             comment={comment}
