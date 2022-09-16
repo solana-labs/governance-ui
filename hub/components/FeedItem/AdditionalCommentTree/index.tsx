@@ -25,8 +25,16 @@ export function AdditionalCommentTree(props: Props) {
   return pipe(
     commentsResult,
     RE.match(
-      () => <div className={props.className} />,
-      () => <div className={props.className} />,
+      () => (
+        <div className={props.className}>
+          <CommentTree.Error />
+        </div>
+      ),
+      () => (
+        <div className={props.className}>
+          <CommentTree.Loading />
+        </div>
+      ),
       ({ feedItemCommentTree }) => (
         <div className={props.className}>
           <EnteredViewport
