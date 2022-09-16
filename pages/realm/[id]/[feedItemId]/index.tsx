@@ -24,6 +24,8 @@ export default function RealmFeedItem() {
         publicKey = new PublicKey(item.realmId)
       }
     }
+  } else {
+    throw new Error('Not a valid realm')
   }
 
   if (!publicKey) {
@@ -34,17 +36,17 @@ export default function RealmFeedItem() {
     }
   }
 
+  if (typeof feedItemId !== 'string') {
+    throw new Error('Not a valid feed')
+  }
+
   return (
     <div>
       <Head>
         <title>Realm</title>
         <meta property="og:title" content="Realm" key="title" />
       </Head>
-      <FeedItem
-        feedItemId={feedItemId as string}
-        realm={publicKey}
-        realmUrlId={id as string}
-      />
+      <FeedItem feedItemId={feedItemId} realm={publicKey} realmUrlId={id} />
     </div>
   )
 }

@@ -24,6 +24,8 @@ export default function RealmFeedItemComment() {
         publicKey = new PublicKey(item.realmId)
       }
     }
+  } else {
+    throw new Error('Not a valid realm')
   }
 
   if (!publicKey) {
@@ -32,6 +34,14 @@ export default function RealmFeedItemComment() {
     } catch {
       throw new Error('Not a valid realm')
     }
+  }
+
+  if (typeof commentId !== 'string') {
+    throw new Error('Not a valid comment')
+  }
+
+  if (typeof feedItemId !== 'string') {
+    throw new Error('Not a valid feed')
   }
 
   return (

@@ -11,6 +11,7 @@ interface BaseProps {
 
 interface Props extends BaseProps {
   feedItemId: string;
+  numReplies?: number;
   realm: PublicKey;
   score: number;
   totalProposalVotes?: BigNumber | null;
