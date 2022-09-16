@@ -42,10 +42,12 @@ export function Controls(props: Props) {
           props.userVote === FeedItemCommentVoteType.Approve
             ? 'text-cyan-500'
             : 'text-neutral-500',
-          props.userVote === FeedItemCommentVoteType.Approve && jwt
-            ? 'hover:text-cyan-400'
-            : 'hover:text-cyan-500',
+          jwt &&
+            (props.userVote === FeedItemCommentVoteType.Approve
+              ? 'hover:text-cyan-400'
+              : 'hover:text-cyan-500'),
         )}
+        disabled={!jwt}
         onClick={(e) => {
           e.stopPropagation();
 
@@ -75,7 +77,16 @@ export function Controls(props: Props) {
         </div>
       </button>
       <button
-        className="flex items-center space-x-1.5 text-neutral-500 hover:text-cyan-500"
+        className={cx(
+          'flex',
+          'items-center',
+          'space-x-1.5',
+          'text-neutral-500',
+          'hover:text-cyan-500',
+          'disabled:cursor-not-allowed',
+          'disabled:text-neutral-300',
+        )}
+        disabled={!jwt}
         onClick={props.onReply}
       >
         <ReplyIcon className="fill-current-500 h-4 w-4 transition-colors" />

@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import * as Sidebar from '../Home/Sidebar';
 import { HomeLayout } from '@hub/components/HomeLayout';
 import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay';
+import { useJWT } from '@hub/hooks/useJWT';
 import { useQuery } from '@hub/hooks/useQuery';
 import { getDefaultBannerUrl } from '@hub/lib/getDefaultBannerUrl';
 import * as RE from '@hub/types/Result';
@@ -45,6 +46,8 @@ export function FeedItem(props: Props) {
     variables: { feedItemId: props.feedItemId },
   });
 
+  const [jwt] = useJWT();
+
   const [additionalPageCursors, setAdditionalPageCursors] = useState<string[]>(
     [],
   );
@@ -77,6 +80,10 @@ export function FeedItem(props: Props) {
                   <div className="mb-16 rounded w-full h-20 bg-neutral-200" />
                   <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
                   <Footer.Error className="mt-5" />
+                  {jwt && <ReplyBox.Error className="mt-8 mb-4" />}
+                  <div className="pt-8">
+                    <CommentTree.Error />
+                  </div>
                 </div>
               )}
             />
@@ -94,6 +101,10 @@ export function FeedItem(props: Props) {
                   <div className="mb-16 rounded w-full h-20 bg-neutral-200 animate-pulse" />
                   <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
                   <Footer.Loading className="mt-5" />
+                  {jwt && <ReplyBox.Loading className="mt-8 mb-4" />}
+                  <div className="pt-8">
+                    <CommentTree.Loading />
+                  </div>
                 </div>
               )}
             />
@@ -130,7 +141,7 @@ export function FeedItem(props: Props) {
                           <div className="mb-16 rounded w-full h-20 bg-neutral-200" />
                           <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
                           <Footer.Error className="mt-5" />
-                          <ReplyBox.Error className="mt-8 mb-4" />
+                          {jwt && <ReplyBox.Error className="mt-8 mb-4" />}
                           <div className="pt-8">
                             <CommentTree.Error />
                           </div>
@@ -145,7 +156,7 @@ export function FeedItem(props: Props) {
                           <div className="mb-16 rounded w-full h-20 bg-neutral-200 animate-pulse" />
                           <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
                           <Footer.Loading className="mt-5" />
-                          <ReplyBox.Loading className="mt-8 mb-4" />
+                          {jwt && <ReplyBox.Loading className="mt-8 mb-4" />}
                           <div className="pt-8">
                             <CommentTree.Loading />
                           </div>
@@ -178,11 +189,13 @@ export function FeedItem(props: Props) {
                             score={feedItem.score}
                             userVote={feedItem.myVote}
                           />
-                          <ReplyBox.Content
-                            className="mt-8 mb-4"
-                            feedItemId={props.feedItemId}
-                            realm={props.realm}
-                          />
+                          {jwt && (
+                            <ReplyBox.Content
+                              className="mt-8 mb-4"
+                              feedItemId={props.feedItemId}
+                              realm={props.realm}
+                            />
+                          )}
                           {pipe(
                             commentsResult,
                             RE.match(
