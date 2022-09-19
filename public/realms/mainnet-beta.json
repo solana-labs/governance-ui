@@ -985,5 +985,15 @@
     "website": "https://www.majesticdeers.com",
     "twitter": "@MajesticDeers",
     "ogImage": "https://raw.githubusercontent.com/MajesticDeers/governance-ui/main/public/realms/AntlerDAO/Logo.jpg"
+  }, 
+  {
+    "symbol": "OPCD",
+    "displayName": "OPANZ COMMUNITY DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "D2dphGE7euTcC576skADhqQ8rwZ9dPMq6pmoDhdbdsYX",
+    "bannerImage": "/realms/ODCO/OCDC.png.png",
+    "ogImage": "/realms/ODCO/OCDLO.png",
+    "website": "https://auturoa.nz/",
+    "twitter": "@OPANZ999"
   }
 ]
