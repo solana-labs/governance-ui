@@ -1,3 +1,4 @@
+import { BigNumber } from 'bignumber.js'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   MintInfo,
@@ -25,7 +26,7 @@ import { withWithdrawGoverningTokens } from '@solana/spl-governance'
 import useWalletStore from '../../stores/useWalletStore'
 import { sendTransaction } from '@utils/send'
 import { approveTokenTransfer } from '@utils/tokens'
-import Button from '../Button'
+import Button, { SecondaryButton } from '../Button'
 import { Option } from '@tools/core/option'
 import { GoverningTokenRole } from '@solana/spl-governance'
 import { fmtMintAmount } from '@tools/sdk/units'
@@ -48,8 +49,12 @@ import {
 } from 'pyth-staking-api'
 import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 
-type Props = { proposal?: Option<Proposal> }
-const TokenBalanceCard: FC<Props> = ({ proposal, children }) => {
+type Props = { proposal?: Option<Proposal>; inAccountDetails?: boolean }
+const TokenBalanceCard: FC<Props> = ({
+  proposal,
+  inAccountDetails = false,
+  children,
+}) => {
   const { councilMint, mint, realm, symbol } = useRealm()
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
@@ -95,33 +100,45 @@ const TokenBalanceCard: FC<Props> = ({ proposal, children }) => {
   const hasLoaded = mint || councilMint
 
   return (
-    <div className="p-4 rounded-lg bg-bkg-2 md:p-6">
-      <div className="flex items-center justify-between">
-        <h3 className="mb-0">Your account</h3>
-        <Link
-          href={fmtUrlWithCluster(
-            `/dao/${symbol}/account/${tokenOwnerRecordPk}`
-          )}
-        >
-          <a
-            className={`default-transition flex items-center text-fgd-2 text-sm transition-all hover:text-fgd-3 ${
-              !connected || !tokenOwnerRecordPk
-                ? 'opacity-50 pointer-events-none'
-                : ''
-            }`}
+    // <div className="p-4 rounded-lg bg-bkg-2 md:p-6">
+    <div
+      className={`rounded-lg bg-bkg-2 + ${
+        !inAccountDetails ? 'p-4 md:p-6' : ''
+      }`}
+    >
+      {!inAccountDetails && (
+        <div className="flex items-center justify-between">
+          <h3 className="mb-0">Your account</h3>
+          <Link
+            href={fmtUrlWithCluster(
+              `/dao/${symbol}/account/${tokenOwnerRecordPk}`
+            )}
           >
-            View
-            <ChevronRightIcon className="flex-shrink-0 w-6 h-6" />
-          </a>
-        </Link>
-      </div>
+            <a
+              className={`default-transition flex items-center text-fgd-2 text-sm transition-all hover:text-fgd-3 ${
+                !connected || !tokenOwnerRecordPk
+                  ? 'opacity-50 pointer-events-none'
+                  : ''
+              }`}
+            >
+              View
+              <ChevronRightIcon className="flex-shrink-0 w-6 h-6" />
+            </a>
+          </Link>
+        </div>
+      )}
       {hasLoaded ? (
-        <div className="space-y-4">
+        <div
+          className={`${
+            inAccountDetails ? `flex w-full gap-8 md:gap-12` : `space-y-4`
+          }`}
+        >
           {communityDepositVisible && (
             <TokenDeposit
               mint={mint}
               tokenRole={GoverningTokenRole.Community}
               councilVote={false}
+              inAccountDetails={inAccountDetails}
             />
           )}
           {councilDepositVisible && (
@@ -129,6 +146,7 @@ const TokenBalanceCard: FC<Props> = ({ proposal, children }) => {
               mint={councilMint}
               tokenRole={GoverningTokenRole.Council}
               councilVote={true}
+              inAccountDetails={inAccountDetails}
             />
           )}
           <DelegateTokenBalanceCard />
@@ -148,10 +166,12 @@ export const TokenDeposit = ({
   mint,
   tokenRole,
   councilVote,
+  inAccountDetails,
 }: {
   mint: MintInfo | undefined
   tokenRole: GoverningTokenRole
   councilVote?: boolean
+  inAccountDetails?: boolean
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
@@ -182,6 +202,10 @@ export const TokenDeposit = ({
   if (!mint || mint.supply.isZero()) {
     return null
   }
+
+  const depositAmount = realmTokenAccount
+    ? new BigNumber(realmTokenAccount.account.amount.toString())
+    : new BigNumber(0)
 
   const depositTokenRecord =
     tokenRole === GoverningTokenRole.Community
@@ -428,7 +452,12 @@ export const TokenDeposit = ({
       : 0
 
   return (
-    <>
+    <TokenDepositWrapper inAccountDetails={inAccountDetails}>
+      {inAccountDetails && (
+        <h4>
+          {tokenRole === GoverningTokenRole.Community ? `Community` : `Council`}
+        </h4>
+      )}
       <div className="flex items-center mt-4 space-x-4">
         <div className="w-full px-4 py-2 rounded-md bg-bkg-1 flex flex-row items-center justify-between">
           <div>
@@ -451,30 +480,50 @@ export const TokenDeposit = ({
           </p>
 
           <div className="flex flex-col mt-6 space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
-            <Button
-              tooltipMessage={depositTooltipContent}
-              className="sm:w-1/2"
-              disabled={!connected || !hasTokensInWallet}
-              onClick={depositAllTokens}
-            >
-              Deposit
-            </Button>
+            {depositAmount.isGreaterThan(0) && (
+              <Button
+                tooltipMessage={depositTooltipContent}
+                className="sm:w-1/2"
+                disabled={!connected || !hasTokensInWallet}
+                onClick={depositAllTokens}
+              >
+                Deposit
+              </Button>
+            )}
+            {/* //       {depositAmount.isGreaterThan(0) && (
+      //   <>
+      //     <div className="mt-3 text-xs text-white/50">
+      //       You have{' '}
+      //       {mint
+      //         ? depositAmount.shiftedBy(-mint.decimals).toFormat()
+      //         : depositAmount.toFormat()}{' '}
+      //       more {tokenName} votes in your wallet. Do you want to deposit them
+      //       to increase your voting power in this Realm?
+      //     </div>
+      //     <SecondaryButton className="mt-4 w-48" onClick={deposit}>
+      //       Deposit
+      //     </SecondaryButton>
+      //   </>
+      // )} */}
 
-            <Button
-              tooltipMessage={withdrawTooltipContent}
-              className="sm:w-1/2"
-              disabled={
-                !connected ||
-                !hasTokensDeposited ||
-                (!councilVote && toManyCommunityOutstandingProposalsForUser) ||
-                toManyCouncilOutstandingProposalsForUse ||
-                wallet?.publicKey?.toBase58() !==
-                  depositTokenRecord.account.governingTokenOwner.toBase58()
-              }
-              onClick={withdrawAllTokens}
-            >
-              Withdraw
-            </Button>
+            {inAccountDetails && (
+              <SecondaryButton
+                tooltipMessage={withdrawTooltipContent}
+                className="sm:w-1/2"
+                disabled={
+                  !connected ||
+                  !hasTokensDeposited ||
+                  (!councilVote &&
+                    toManyCommunityOutstandingProposalsForUser) ||
+                  toManyCouncilOutstandingProposalsForUse ||
+                  wallet?.publicKey?.toBase58() !==
+                    depositTokenRecord.account.governingTokenOwner.toBase58()
+                }
+                onClick={withdrawAllTokens}
+              >
+                Withdraw
+              </SecondaryButton>
+            )}
           </div>
         </>
       )}
@@ -489,8 +538,22 @@ export const TokenDeposit = ({
             power
           </small>
         )}
-    </>
+    </TokenDepositWrapper>
   )
+}
+
+const TokenDepositWrapper = ({
+  inAccountDetails,
+  children,
+}: {
+  inAccountDetails?: boolean
+  children: React.ReactNode
+}) => {
+  if (inAccountDetails) {
+    return <div className="space-y-4 w-1/2">{children}</div>
+  } else {
+    return <>{children}</>
+  }
 }
 
 export default TokenBalanceCard

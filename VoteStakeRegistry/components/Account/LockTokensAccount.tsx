@@ -372,7 +372,9 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
           ></LockTokensModal>
         )}
       </div>
-      {connected && <Account withHeader={false}></Account>}
+      {connected && (
+        <Account realmInfo={realmInfo} withHeader={false}></Account>
+      )}
     </div>
   )
 }
