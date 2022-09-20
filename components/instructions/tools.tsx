@@ -34,7 +34,7 @@ import { VALIDATORDAO_INSTRUCTIONS } from './programs/validatordao'
  * Default governance program id instance
  */
 export const DEFAULT_GOVERNANCE_PROGRAM_ID =
-  'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
+  '7e75Nwsz8i5i4NiDa43CNzKJ4AeQGyRimha46VKTM1Ls'
 
 /**
  * Default TEST governance program id instance
