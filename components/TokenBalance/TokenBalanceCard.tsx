@@ -48,6 +48,9 @@ import {
   PythBalance,
 } from 'pyth-staking-api'
 import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
+import getNumTokens from '@components/ProposalVotingPower/getNumTokens'
+import VotingPowerPct from '@components/ProposalVotingPower/VotingPowerPct'
+//import { calculateMaxVoteScore } from '@models/proposal/calulateMaxVoteScore'
 
 type Props = { proposal?: Option<Proposal>; inAccountDetails?: boolean }
 const TokenBalanceCard: FC<Props> = ({
@@ -108,7 +111,7 @@ const TokenBalanceCard: FC<Props> = ({
     >
       {!inAccountDetails && (
         <div className="flex items-center justify-between">
-          <h3 className="mb-0">Your account</h3>
+          <h3 className="mb-0">My governance power</h3>
           <Link
             href={fmtUrlWithCluster(
               `/dao/${symbol}/account/${tokenOwnerRecordPk}`
@@ -191,6 +194,7 @@ export const TokenDeposit = ({
     ownTokenRecord,
     ownCouncilTokenRecord,
     ownVoterWeight,
+    councilMint,
     councilTokenAccount,
     proposals,
     governances,
@@ -202,6 +206,34 @@ export const TokenDeposit = ({
   if (!mint || mint.supply.isZero()) {
     return null
   }
+
+  const amount =
+    councilMint && tokenRole === GoverningTokenRole.Council
+      ? getNumTokens(
+          ownVoterWeight,
+          ownCouncilTokenRecord,
+          councilMint,
+          realmInfo
+        )
+      : getNumTokens(ownVoterWeight, ownCouncilTokenRecord, mint, realmInfo)
+
+  const max: BigNumber =
+    councilMint && tokenRole === GoverningTokenRole.Council
+      ? new BigNumber(councilMint.supply.toString())
+      : new BigNumber(mint.supply.toString())
+
+  // const depositTokenAccount =
+  // tokenRole === GoverningTokenRole.Community
+  //   ? realmTokenAccount
+  //   : councilTokenAccount
+
+  //const amount = getNumTokens(ownVoterWeight, ownTokenRecord, mint, realmInfo)
+  // const max =
+  //   realm && proposal && councilMint
+  //     ? new BigNumber(
+  //         calculateMaxVoteScore(realm, proposal, councilMint).toString()
+  //       ).shiftedBy(-councilMint.decimals)
+  //     : null
 
   const depositAmount = realmTokenAccount
     ? new BigNumber(realmTokenAccount.account.amount.toString())
@@ -462,10 +494,16 @@ export const TokenDeposit = ({
         <div className="w-full px-4 py-2 rounded-md bg-bkg-1 flex flex-row items-center justify-between">
           <div>
             <p className="text-xs text-fgd-3">{depositTokenName} Votes</p>
-            <p className="mb-0 text-xl font-bold text-fgd-1 hero-text">
-              {availableTokens}
-            </p>
+            <div className="flex items-center w-full justify-between mt-1">
+              <p className="mb-0 text-xl font-bold text-fgd-1 hero-text">
+                {availableTokens}
+              </p>
+            </div>
           </div>
+          {Number(availableTokens) > 0
+            ? max &&
+              !max.isZero() && <VotingPowerPct amount={amount} total={max} />
+            : null}
         </div>
       </div>
 
@@ -480,6 +518,23 @@ export const TokenDeposit = ({
           </p>
 
           <div className="flex flex-col mt-6 space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
+            {/* {amount.isZero() ? (
+              <div className={'text-xs text-white/50'}>
+                You do not have any voting power in this realm.
+              </div>
+            ) : (
+              <div className={'p-3 rounded-md bg-bkg-1'}>
+                <div className="text-white/50 text-xs">{tokenName} Votes</div>
+                <div className="flex items-center justify-between mt-1">
+                  <div className="text-white font-bold text-2xl">
+                    {amount.toFormat()}
+                  </div>
+                  {max && !max.isZero() && (
+                    <VotingPowerPct amount={amount} total={max} />
+                  )}
+                </div>
+              </div>
+            )} */}
             {depositAmount.isGreaterThan(0) && (
               <Button
                 tooltipMessage={depositTooltipContent}
