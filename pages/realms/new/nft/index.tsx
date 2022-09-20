@@ -85,7 +85,9 @@ export default function NFTWizard() {
 
         // COUNCIL INFO
         createCouncil: formData.addCouncil,
-        // councilVotePercentage: formData.communityYesVotePercentage,
+
+        // TODO add ui to make this separate
+        councilYesVotePercentage: formData.communityYesVotePercentage,
         existingCouncilMintPk: formData.councilTokenMintAddress
           ? new PublicKey(formData.councilTokenMintAddress)
           : undefined,

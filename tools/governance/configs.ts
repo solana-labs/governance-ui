@@ -13,14 +13,10 @@ import { Connection, PublicKey } from '@solana/web3.js'
 
 export function createGovernanceThresholds(
   programVersion: number,
-  communityYesVotePercentage: number,
-  councilYesVotePercentage?: number
+  communityYesVotePercentage: 'disabled' | number,
+  // @asktree: only optional due to touching code I don't understand
+  councilYesVotePercentage?: 'disabled' | number
 ) {
-  const communityVoteThreshold = new VoteThreshold({
-    value: communityYesVotePercentage,
-    type: VoteThresholdType.YesVotePercentage,
-  })
-
   // For backward compatybility with spl-gov versions <= 2
   // for Council vote and Veto vote thresholds we have to pass YesVotePerentage(0)
   const undefinedThreshold = new VoteThreshold({
@@ -28,9 +24,20 @@ export function createGovernanceThresholds(
     value: 0,
   })
 
+  const communityVoteThreshold =
+    programVersion >= PROGRAM_VERSION_V3
+      ? communityYesVotePercentage !== 'disabled'
+        ? new VoteThreshold({
+            value: communityYesVotePercentage,
+            type: VoteThresholdType.YesVotePercentage,
+          })
+        : new VoteThreshold({ type: VoteThresholdType.Disabled })
+      : undefinedThreshold
+
   const councilVoteThreshold =
     programVersion >= PROGRAM_VERSION_V3
-      ? councilYesVotePercentage !== undefined
+      ? councilYesVotePercentage !== 'disabled' &&
+        councilYesVotePercentage !== undefined
         ? new VoteThreshold({
             value: councilYesVotePercentage,
             type: VoteThresholdType.YesVotePercentage,

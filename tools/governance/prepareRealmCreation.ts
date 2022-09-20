@@ -48,14 +48,14 @@ interface RealmCreation {
   nftCollectionCount?: number
   existingCommunityMintPk: PublicKey | undefined
   communityMintSupplyFactor: number | undefined
-  communityYesVotePercentage: number
+  communityYesVotePercentage: 'disabled' | number
   transferCommunityMintAuthority: boolean
 
   createCouncil: boolean
   existingCouncilMintPk: PublicKey | undefined
   transferCouncilMintAuthority: boolean
   councilWalletPks: PublicKey[]
-  councilYesVotePercentage?: number
+  councilYesVotePercentage: 'disabled' | number
 
   communityTokenConfig?: GoverningTokenConfigAccountArgs
   councilTokenConfig?: GoverningTokenConfigAccountArgs

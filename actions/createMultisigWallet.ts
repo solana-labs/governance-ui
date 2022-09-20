@@ -9,6 +9,10 @@ import {
 import { chunks } from '@utils/helpers'
 
 import { prepareRealmCreation } from '@tools/governance/prepareRealmCreation'
+import {
+  GoverningTokenConfigAccountArgs,
+  GoverningTokenType,
+} from '@solana/spl-governance'
 
 /// Creates multisig realm with community mint with 0 supply
 /// and council mint used as multisig token
@@ -51,12 +55,24 @@ export default async function createMultisigWallet({
     existingCommunityMintPk: undefined,
     communityMintSupplyFactor: undefined,
     transferCommunityMintAuthority: true,
-    communityYesVotePercentage: councilYesVotePercentage,
+    communityYesVotePercentage: 'disabled',
 
     createCouncil: true,
     existingCouncilMintPk: undefined,
     transferCouncilMintAuthority: true,
     councilWalletPks,
+    councilYesVotePercentage,
+
+    communityTokenConfig: new GoverningTokenConfigAccountArgs({
+      tokenType: GoverningTokenType.Dormant,
+      voterWeightAddin: undefined,
+      maxVoterWeightAddin: undefined,
+    }),
+    councilTokenConfig: new GoverningTokenConfigAccountArgs({
+      tokenType: GoverningTokenType.Membership,
+      voterWeightAddin: undefined,
+      maxVoterWeightAddin: undefined,
+    }),
   })
 
   try {

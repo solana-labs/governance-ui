@@ -50,6 +50,7 @@ interface NFTRealm {
   existingCouncilMintPk: PublicKey | undefined
   transferCouncilMintAuthority: boolean | undefined
   councilWalletPks: PublicKey[]
+  councilYesVotePercentage: 'disabled' | number
 }
 
 export default async function createNFTRealm({
@@ -71,6 +72,7 @@ export default async function createNFTRealm({
   transferCouncilMintAuthority = true,
   // councilYesVotePercentage,
   councilWalletPks,
+  councilYesVotePercentage,
 }: NFTRealm) {
   const options = AnchorProvider.defaultOptions()
   const provider = new AnchorProvider(connection, wallet as Wallet, options)
@@ -108,12 +110,24 @@ export default async function createNFTRealm({
     existingCouncilMintPk,
     transferCouncilMintAuthority,
     councilWalletPks,
-
+    councilYesVotePercentage,
     communityTokenConfig: new GoverningTokenConfigAccountArgs({
       voterWeightAddin: new PublicKey(nftPluginsPks[0]),
       maxVoterWeightAddin: new PublicKey(nftPluginsPks[0]),
       tokenType: GoverningTokenType.Liquid,
     }),
+    councilTokenConfig:
+      createCouncil || existingCouncilMintPk
+        ? new GoverningTokenConfigAccountArgs({
+            tokenType: GoverningTokenType.Membership,
+            voterWeightAddin: undefined,
+            maxVoterWeightAddin: undefined,
+          })
+        : new GoverningTokenConfigAccountArgs({
+            tokenType: GoverningTokenType.Dormant,
+            voterWeightAddin: undefined,
+            maxVoterWeightAddin: undefined,
+          }),
   })
 
   console.log('NFT REALM realm public-key', realmPk.toBase58())

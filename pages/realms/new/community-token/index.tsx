@@ -103,7 +103,8 @@ export default function CommunityTokenWizard() {
         transferCommunityMintAuthority: formData.transferCommunityMintAuthority,
         // COUNCIL INFO
         createCouncil: formData.addCouncil,
-        // councilVotePercentage: formData.communityYesVotePercentage,
+        // TODO add ui for setting this to something else
+        councilYesVotePercentage: formData.communityYesVotePercentage,
         existingCouncilMintPk: formData.councilTokenMintAddress
           ? new PublicKey(formData.councilTokenMintAddress)
           : undefined,

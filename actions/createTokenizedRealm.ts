@@ -9,6 +9,10 @@ import {
 import { chunks } from '@utils/helpers'
 
 import { prepareRealmCreation } from '@tools/governance/prepareRealmCreation'
+import {
+  GoverningTokenConfigAccountArgs,
+  GoverningTokenType,
+} from '@solana/spl-governance'
 
 interface TokenizedRealm {
   connection: Connection
@@ -27,6 +31,7 @@ interface TokenizedRealm {
   existingCouncilMintPk: PublicKey | undefined
   transferCouncilMintAuthority: boolean | undefined
   councilWalletPks: PublicKey[]
+  councilYesVotePercentage: 'disabled' | number
 }
 
 export default async function createTokenizedRealm({
@@ -42,6 +47,7 @@ export default async function createTokenizedRealm({
   communityMintSupplyFactor: rawCMSF,
 
   createCouncil = false,
+  councilYesVotePercentage = 'disabled',
   existingCouncilMintPk,
   transferCouncilMintAuthority = true,
   // councilYesVotePercentage,
@@ -70,9 +76,22 @@ export default async function createTokenizedRealm({
     communityYesVotePercentage,
 
     createCouncil,
+    councilYesVotePercentage,
     existingCouncilMintPk,
     transferCouncilMintAuthority,
     councilWalletPks,
+    councilTokenConfig:
+      createCouncil || existingCouncilMintPk
+        ? new GoverningTokenConfigAccountArgs({
+            tokenType: GoverningTokenType.Membership,
+            voterWeightAddin: undefined,
+            maxVoterWeightAddin: undefined,
+          })
+        : new GoverningTokenConfigAccountArgs({
+            tokenType: GoverningTokenType.Dormant,
+            voterWeightAddin: undefined,
+            maxVoterWeightAddin: undefined,
+          }),
   })
 
   try {
