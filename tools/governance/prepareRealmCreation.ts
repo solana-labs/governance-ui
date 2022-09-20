@@ -55,8 +55,10 @@ interface RealmCreation {
   existingCouncilMintPk: PublicKey | undefined
   transferCouncilMintAuthority: boolean
   councilWalletPks: PublicKey[]
+  councilYesVotePercentage?: number
 
   communityTokenConfig?: GoverningTokenConfigAccountArgs
+  councilTokenConfig?: GoverningTokenConfigAccountArgs
 }
 
 export async function prepareRealmCreation({
@@ -78,8 +80,10 @@ export async function prepareRealmCreation({
   existingCouncilMintPk,
   transferCouncilMintAuthority,
   councilWalletPks,
+  councilYesVotePercentage,
 
   communityTokenConfig = undefined,
+  councilTokenConfig = undefined,
 }: RealmCreation) {
   const realmInstructions: TransactionInstruction[] = []
   const realmSigners: Keypair[] = []
@@ -236,7 +240,8 @@ export async function prepareRealmCreation({
     councilMintPk,
     communityMintSupplyFactor,
     minCommunityTokensToCreateAsMintValue,
-    communityTokenConfig
+    communityTokenConfig,
+    councilTokenConfig
   )
 
   // If the current wallet is in the team then deposit the council token
@@ -260,7 +265,11 @@ export async function prepareRealmCreation({
     councilVoteThreshold,
     councilVetoVoteThreshold,
     communityVetoVoteThreshold,
-  } = createGovernanceThresholds(programVersion, communityYesVotePercentage)
+  } = createGovernanceThresholds(
+    programVersion,
+    communityYesVotePercentage,
+    councilYesVotePercentage
+  )
 
   // Put community and council mints under the realm governance with default config
   const config = new GovernanceConfig({
