@@ -1,6 +1,5 @@
 import { Connection, PublicKey } from '@solana/web3.js';
 import { deltafiDexV2 } from './idl/deltafi';
-
 import { newProgram } from '@saberhq/anchor-contrib';
 import { SolanaAugmentedProvider } from '@saberhq/solana-contrib';
 import { DeltafiProgram } from './program/deltafi';
@@ -65,6 +64,14 @@ export type UserStakeInfo = {
 export class DeltafiDexV2 {
   public static readonly DeltafiProgramId = new PublicKey(
     'GNExJhNUhc9LN2DauuQAUJnXoy6DJ6zey3t9kT9A2PF3',
+  );
+
+  public static readonly deltafiMint = new PublicKey(
+    'de1QJkP1qDCk5JYCCXCeq27bQQUdCaiv7xVKFrhPSzF',
+  );
+
+  public static readonly deltafiToken = new PublicKey(
+    '7Xay86NUjUp8Lzv7kAYp8TqVG8eoWf8qzwbYt6tYoPCP',
   );
 
   public static readonly instructionsCode = {

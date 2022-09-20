@@ -533,6 +533,11 @@ export interface DeltafiCreateFarmUserForm {
   poolName?: DeltafiPoolName;
 }
 
+export interface DeltafiClaimFarmRewardsForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  poolName?: DeltafiPoolName;
+}
+
 export interface NativeBurnSplTokensForm {
   governedAccount?: GovernedMultiTypeAccount;
   uiAmount?: number;
@@ -692,6 +697,7 @@ export enum InstructionEnum {
   DeltafiCreateFarmUser,
   DeltafiFarmDeposit,
   DeltafiFarmWithdraw,
+  DeltafiClaimFarmRewards,
   NativeBurnSplTokens,
   OrcaWhirlpoolOpenPosition,
   OrcaWhirlpoolIncreaseLiquidity,
