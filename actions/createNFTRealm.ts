@@ -70,7 +70,6 @@ export default async function createNFTRealm({
   createCouncil = false,
   existingCouncilMintPk,
   transferCouncilMintAuthority = true,
-  // councilYesVotePercentage,
   councilWalletPks,
   councilYesVotePercentage,
 }: NFTRealm) {

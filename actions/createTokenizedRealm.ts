@@ -47,10 +47,9 @@ export default async function createTokenizedRealm({
   communityMintSupplyFactor: rawCMSF,
 
   createCouncil = false,
-  councilYesVotePercentage = 'disabled',
+  councilYesVotePercentage,
   existingCouncilMintPk,
   transferCouncilMintAuthority = true,
-  // councilYesVotePercentage,
   councilWalletPks,
 }: TokenizedRealm) {
   const {
