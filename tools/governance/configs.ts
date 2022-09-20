@@ -13,7 +13,8 @@ import { Connection, PublicKey } from '@solana/web3.js'
 
 export function createGovernanceThresholds(
   programVersion: number,
-  communityYesVotePercentage: number
+  communityYesVotePercentage: number,
+  councilYesVotePercentage?: number
 ) {
   const communityVoteThreshold = new VoteThreshold({
     value: communityYesVotePercentage,
@@ -27,11 +28,14 @@ export function createGovernanceThresholds(
     value: 0,
   })
 
-  // TODO: For spl-gov v3 add suport for seperate council vote threshold in the UI
-  // Until it's supported we default it to community vote threshold
   const councilVoteThreshold =
     programVersion >= PROGRAM_VERSION_V3
-      ? communityVoteThreshold
+      ? councilYesVotePercentage !== undefined
+        ? new VoteThreshold({
+            value: councilYesVotePercentage,
+            type: VoteThresholdType.YesVotePercentage,
+          })
+        : new VoteThreshold({ type: VoteThresholdType.Disabled })
       : undefinedThreshold
 
   // TODO: For spl-gov v3 add suport for seperate council Veto vote threshold in the UI
