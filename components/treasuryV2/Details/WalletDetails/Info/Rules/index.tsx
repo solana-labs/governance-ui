@@ -240,6 +240,17 @@ export default function Rules(props: Props) {
                         : 'Disabled'
                     }
                   />
+                  <Section
+                    icon={<ScaleIcon />}
+                    name="Veto Threshold"
+                    value={
+                      props.wallet.rules.community
+                        ?.vetoVoteThresholdPercentage !== 'disabled'
+                        ? props.wallet.rules.community
+                            ?.vetoVoteThresholdPercentage + '%'
+                        : 'Disabled'
+                    }
+                  />
                 </div>
               </div>
               <div className="border-t border-white/10 pt-6">
@@ -274,6 +285,17 @@ export default function Rules(props: Props) {
                       'disabled'
                         ? props.wallet.rules.council?.voteThresholdPercentage +
                           '%'
+                        : 'Disabled'
+                    }
+                  />
+                  <Section
+                    icon={<ScaleIcon />}
+                    name="Veto Threshold"
+                    value={
+                      props.wallet.rules.council
+                        ?.vetoVoteThresholdPercentage !== 'disabled'
+                        ? props.wallet.rules.council
+                            ?.vetoVoteThresholdPercentage + '%'
                         : 'Disabled'
                     }
                   />
