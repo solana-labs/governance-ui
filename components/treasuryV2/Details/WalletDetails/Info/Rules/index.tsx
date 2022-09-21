@@ -150,17 +150,7 @@ export default function Rules(props: Props) {
                   name="Vote Tipping"
                   value={voteTippingText(props.wallet.rules.common.voteTipping)}
                 />
-                <Section
-                  icon={<ScaleIcon />}
-                  name="Approval Quorum"
-                  value={
-                    props.wallet.rules.community?.voteThresholdPercentage !==
-                    undefined
-                      ? props.wallet.rules.community?.voteThresholdPercentage +
-                        '%'
-                      : 'Disabled'
-                  }
-                />
+
                 {!(
                   props.wallet.rules.community && props.wallet.rules.council
                 ) &&
@@ -239,6 +229,17 @@ export default function Rules(props: Props) {
                           )
                     }
                   />
+                  <Section
+                    icon={<ScaleIcon />}
+                    name="Approval Quorum"
+                    value={
+                      props.wallet.rules.community?.voteThresholdPercentage !==
+                      'disabled'
+                        ? props.wallet.rules.community
+                            ?.voteThresholdPercentage + '%'
+                        : 'Disabled'
+                    }
+                  />
                 </div>
               </div>
               <div className="border-t border-white/10 pt-6">
@@ -263,6 +264,17 @@ export default function Rules(props: Props) {
                             undefined,
                             { maximumFractionDigits: 0 }
                           )
+                    }
+                  />
+                  <Section
+                    icon={<ScaleIcon />}
+                    name="Approval Quorum"
+                    value={
+                      props.wallet.rules.council?.voteThresholdPercentage !==
+                      'disabled'
+                        ? props.wallet.rules.council?.voteThresholdPercentage +
+                          '%'
+                        : 'Disabled'
                     }
                   />
                 </div>
