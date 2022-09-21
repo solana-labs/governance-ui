@@ -82,8 +82,8 @@ export async function prepareRealmCreation({
   councilWalletPks,
   councilYesVotePercentage,
 
-  communityTokenConfig = undefined,
-  councilTokenConfig = undefined,
+  communityTokenConfig,
+  councilTokenConfig,
 }: RealmCreation) {
   const realmInstructions: TransactionInstruction[] = []
   const realmSigners: Keypair[] = []
@@ -164,6 +164,8 @@ export async function prepareRealmCreation({
   console.log('Prepare realm - council mint address', existingCouncilMintPk)
   // Create council mint
   let councilMintPk
+
+  // TODO explain the circumstances under which this set of conditions would be true
   if (
     zeroCommunityTokenSupply &&
     zeroCouncilTokenSupply &&

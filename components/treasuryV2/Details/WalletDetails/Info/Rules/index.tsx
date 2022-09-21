@@ -154,7 +154,10 @@ export default function Rules(props: Props) {
                   icon={<ScaleIcon />}
                   name="Approval Quorum"
                   value={
-                    props.wallet.rules.common.voteThresholdPercentage + '%'
+                    props.wallet.rules.common.voteThresholdPercentage !==
+                    undefined
+                      ? props.wallet.rules.common.voteThresholdPercentage + '%'
+                      : 'Disabled'
                   }
                 />
                 {!(
