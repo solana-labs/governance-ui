@@ -3,23 +3,16 @@ import { LinkIcon } from '@heroicons/react/outline'
 import MyProposalsBtn from 'pages/dao/[symbol]/proposal/components/MyProposalsBtn'
 import useWalletStore from 'stores/useWalletStore'
 import DelegateCard from '@components/DelegateCard'
-// import { RealmInfo } from '@models/registry/api'
-// import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import { useEffect } from 'react'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
-import { RealmInfo } from '@models/registry/api'
+import useRealm from '@hooks/useRealm'
 
-const AccountInner = ({
-  realmInfo,
-  withHeader = true,
-}: {
-  realmInfo?: RealmInfo
-  withHeader?: boolean
-}) => {
+const AccountInner = ({ withHeader = true }: { withHeader?: boolean }) => {
   const connected = useWalletStore((s) => s.connected)
+  const { realmInfo } = useRealm()
   useEffect(() => {
     console.log(realmInfo)
-  })
+  }, [realmInfo])
   return (
     <div className="bg-bkg-2 col-span-12 p-4 md:p-6 rounded-lg">
       {withHeader && (
@@ -29,8 +22,11 @@ const AccountInner = ({
           </div>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center justify-center">
-              {/* <img src={realmInfo?.ogImage} className="mr-2 rounded-full" /> */}
-              <h1 className="leading-none mb-0">Your Account</h1>
+              <img
+                src={realmInfo?.ogImage}
+                className="mr-2 rouninded-full w-8 h-8"
+              />
+              <h1 className="leading-none mb-0">My governance power</h1>
             </div>
             {connected && <MyProposalsBtn></MyProposalsBtn>}
           </div>
@@ -51,17 +47,11 @@ const AccountInner = ({
   )
 }
 
-const Account = ({
-  realmInfo,
-  withHeader = true,
-}: {
-  realmInfo?: RealmInfo
-  withHeader?: boolean
-}) => {
+const Account = ({ withHeader = true }: { withHeader?: boolean }) => {
   if (withHeader) {
     return (
       <div className="grid grid-cols-12 gap-4">
-        <AccountInner realmInfo={realmInfo} withHeader={withHeader} />
+        <AccountInner withHeader={withHeader} />
         <div className="md:w-1/2 col-span-12">
           <DelegateCard />
         </div>
@@ -70,7 +60,7 @@ const Account = ({
   } else {
     return (
       <>
-        <AccountInner realmInfo={realmInfo} withHeader={withHeader} />
+        <AccountInner withHeader={withHeader} />
         <div className="md:w-1/2 col-span-12">
           <DelegateCard />
         </div>

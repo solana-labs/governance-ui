@@ -53,7 +53,11 @@ const TokenBalanceCardWrapper = ({
       (!ownTokenRecord ||
         ownTokenRecord.account.governingTokenDepositAmount.isZero())
     ) {
-      return <LockPluginTokenBalanceCard></LockPluginTokenBalanceCard>
+      return (
+        <LockPluginTokenBalanceCard
+          inAccountDetails={inAccountDetails}
+        ></LockPluginTokenBalanceCard>
+      )
     }
     if (
       isNftMode &&

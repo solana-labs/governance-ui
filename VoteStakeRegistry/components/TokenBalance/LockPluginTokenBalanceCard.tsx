@@ -22,8 +22,10 @@ import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
 
 const LockPluginTokenBalanceCard = ({
   proposal,
+  inAccountDetails,
 }: {
   proposal?: Option<Proposal>
+  inAccountDetails?: boolean
 }) => {
   const { fmtUrlWithCluster } = useQueryContext()
   const { councilMint, mint, realm, symbol, config } = useRealm()
@@ -97,6 +99,7 @@ const LockPluginTokenBalanceCard = ({
         <>
           {communityDepositVisible && (
             <TokenDepositLock
+              inAccountDetails={inAccountDetails}
               mint={mint}
               tokenRole={GoverningTokenRole.Community}
               councilVote={false}
@@ -126,10 +129,12 @@ const LockPluginTokenBalanceCard = ({
 const TokenDepositLock = ({
   mint,
   tokenRole,
+  inAccountDetails,
 }: {
   mint: MintInfo | undefined
   tokenRole: GoverningTokenRole
   councilVote?: boolean
+  inAccountDetails?: boolean
 }) => {
   const { realm, realmTokenAccount, councilTokenAccount } = useRealm()
   const connected = useWalletStore((s) => s.connected)
@@ -237,7 +242,9 @@ const TokenDepositLock = ({
 
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
         <DepositCommunityTokensBtn></DepositCommunityTokensBtn>
-        <WithDrawCommunityTokens></WithDrawCommunityTokens>
+        {inAccountDetails && (
+          <WithDrawCommunityTokens></WithDrawCommunityTokens>
+        )}
       </div>
     </>
   )
