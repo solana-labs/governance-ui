@@ -518,7 +518,7 @@ export const TokenDeposit = ({
           </p>
 
           <div className="flex flex-col mt-6 space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
-            {depositAmount.isGreaterThan(0) && !inAccountDetails ? (
+            {depositAmount.isGreaterThan(-1) && !inAccountDetails ? (
               <SecondaryButton
                 tooltipMessage={depositTooltipContent}
                 className="sm:w-1/2"
