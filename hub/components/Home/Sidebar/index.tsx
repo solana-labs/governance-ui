@@ -44,7 +44,7 @@ export function Content(props: Props) {
         realmName={props.realmName}
       />
       <h1 className="flex items-center text-neutral-900 text-xl font-bold mb-5 mt-0 pt-24">
-        {props.iconUrl && (
+        {iconUrl && (
           <img
             className={cx(
               'rounded-full',
@@ -52,7 +52,7 @@ export function Content(props: Props) {
               props.compressed ? 'h-8 w-8' : 'h-0 w-0',
               props.compressed ? 'mr-2' : 'mr-0',
             )}
-            src={props.iconUrl}
+            src={iconUrl}
           />
         )}
         {props.realmName}
