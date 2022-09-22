@@ -13,12 +13,14 @@ import {
   CreateSolendStrategyParams,
   SolendSubStrategy,
 } from 'Strategies/protocols/solend'
+import { VaultInfo } from 'Strategies/protocols/psyfi/types'
 
 export interface TreasuryStrategy {
   //liquidity in $
   liquidity: number
   protocolSymbol: string
   apy: string
+  apyHeader?: string
   protocolName: string
   strategySubtext?: string
   handledMint: string
@@ -42,6 +44,16 @@ export type MangoStrategy = TreasuryStrategy & {
 export type SolendStrategy = TreasuryStrategy & {
   reserves: Array<SolendSubStrategy>
   createProposalFcn: CreateSolendStrategyParams
+}
+
+export type PsyFiStrategy = TreasuryStrategy & {
+  vaultAccounts: {
+    pubkey: PublicKey
+    lpTokenMint: PublicKey
+    collateralAccountKey: PublicKey
+  }
+  vaultInfo: VaultInfo
+  otherStrategies: Array<PsyFiStrategy>
 }
 
 export type EverlendStrategy = TreasuryStrategy & {

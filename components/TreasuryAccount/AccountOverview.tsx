@@ -673,6 +673,7 @@ export const StrategyCard = ({
     strategySubtext,
     handledTokenSymbol,
     apy,
+    apyHeader,
   } = strat
   const currentPositionFtm = new BigNumber(
     currentDeposits.toFixed(2)
@@ -708,7 +709,7 @@ export const StrategyCard = ({
       </div>
       <div className="flex items-center space-x-4">
         <div className="text-right">
-          {apy && <p className="text-xs">Interest Rate</p>}
+          {apy && <p className="text-xs">{apyHeader ?? 'Interest Rate'}</p>}
           <p className="font-bold text-green">{apy}</p>
         </div>
         {onClick ? <Button onClick={onClick}>{`Propose`}</Button> : null}
