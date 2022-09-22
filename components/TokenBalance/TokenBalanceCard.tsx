@@ -222,19 +222,6 @@ export const TokenDeposit = ({
       ? new BigNumber(councilMint.supply.toString())
       : new BigNumber(mint.supply.toString())
 
-  // const depositTokenAccount =
-  // tokenRole === GoverningTokenRole.Community
-  //   ? realmTokenAccount
-  //   : councilTokenAccount
-
-  //const amount = getNumTokens(ownVoterWeight, ownTokenRecord, mint, realmInfo)
-  // const max =
-  //   realm && proposal && councilMint
-  //     ? new BigNumber(
-  //         calculateMaxVoteScore(realm, proposal, councilMint).toString()
-  //       ).shiftedBy(-councilMint.decimals)
-  //     : null
-
   const depositAmount = realmTokenAccount
     ? new BigNumber(realmTokenAccount.account.amount.toString())
     : new BigNumber(0)
@@ -518,7 +505,7 @@ export const TokenDeposit = ({
           </p>
 
           <div className="flex flex-col mt-6 space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
-            {depositAmount.isGreaterThan(0) && !inAccountDetails ? (
+            {tokensToShow && !inAccountDetails ? (
               <SecondaryButton
                 tooltipMessage={depositTooltipContent}
                 className="sm:w-1/2"
