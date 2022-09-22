@@ -222,10 +222,6 @@ export const TokenDeposit = ({
       ? new BigNumber(councilMint.supply.toString())
       : new BigNumber(mint.supply.toString())
 
-  const depositAmount = realmTokenAccount
-    ? new BigNumber(realmTokenAccount.account.amount.toString())
-    : new BigNumber(0)
-
   const depositTokenRecord =
     tokenRole === GoverningTokenRole.Community
       ? ownTokenRecord
@@ -508,7 +504,7 @@ export const TokenDeposit = ({
             {tokensToShow && !inAccountDetails ? (
               <SecondaryButton
                 tooltipMessage={depositTooltipContent}
-                className="sm:w-1/2"
+                className="sm:w-1/2 max-w-[200px]"
                 disabled={!connected || !hasTokensInWallet}
                 onClick={depositAllTokens}
               >
@@ -517,7 +513,7 @@ export const TokenDeposit = ({
             ) : inAccountDetails ? (
               <Button
                 tooltipMessage={depositTooltipContent}
-                className="sm:w-1/2"
+                className="sm:w-1/2 max-w-[200px]"
                 disabled={!connected || !hasTokensInWallet}
                 onClick={depositAllTokens}
               >
@@ -527,7 +523,7 @@ export const TokenDeposit = ({
             {inAccountDetails && (
               <SecondaryButton
                 tooltipMessage={withdrawTooltipContent}
-                className="sm:w-1/2"
+                className="sm:w-1/2 max-w-[200px]"
                 disabled={
                   !connected ||
                   !hasTokensDeposited ||
