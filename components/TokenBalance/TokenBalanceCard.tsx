@@ -50,7 +50,6 @@ import {
 import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 import getNumTokens from '@components/ProposalVotingPower/getNumTokens'
 import VotingPowerPct from '@components/ProposalVotingPower/VotingPowerPct'
-//import { calculateMaxVoteScore } from '@models/proposal/calulateMaxVoteScore'
 
 type Props = { proposal?: Option<Proposal>; inAccountDetails?: boolean }
 const TokenBalanceCard: FC<Props> = ({
@@ -103,7 +102,6 @@ const TokenBalanceCard: FC<Props> = ({
   const hasLoaded = mint || councilMint
 
   return (
-    // <div className="p-4 rounded-lg bg-bkg-2 md:p-6">
     <div
       className={`rounded-lg bg-bkg-2 + ${
         !inAccountDetails ? 'p-4 md:p-6' : ''
