@@ -518,24 +518,16 @@ export const TokenDeposit = ({
           </p>
 
           <div className="flex flex-col mt-6 space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
-            {/* {amount.isZero() ? (
-              <div className={'text-xs text-white/50'}>
-                You do not have any voting power in this realm.
-              </div>
-            ) : (
-              <div className={'p-3 rounded-md bg-bkg-1'}>
-                <div className="text-white/50 text-xs">{tokenName} Votes</div>
-                <div className="flex items-center justify-between mt-1">
-                  <div className="text-white font-bold text-2xl">
-                    {amount.toFormat()}
-                  </div>
-                  {max && !max.isZero() && (
-                    <VotingPowerPct amount={amount} total={max} />
-                  )}
-                </div>
-              </div>
-            )} */}
-            {depositAmount.isGreaterThan(0) && (
+            {depositAmount.isGreaterThan(0) && !inAccountDetails ? (
+              <SecondaryButton
+                tooltipMessage={depositTooltipContent}
+                className="sm:w-1/2"
+                disabled={!connected || !hasTokensInWallet}
+                onClick={depositAllTokens}
+              >
+                Deposit
+              </SecondaryButton>
+            ) : inAccountDetails ? (
               <Button
                 tooltipMessage={depositTooltipContent}
                 className="sm:w-1/2"
@@ -544,23 +536,7 @@ export const TokenDeposit = ({
               >
                 Deposit
               </Button>
-            )}
-            {/* //       {depositAmount.isGreaterThan(0) && (
-      //   <>
-      //     <div className="mt-3 text-xs text-white/50">
-      //       You have{' '}
-      //       {mint
-      //         ? depositAmount.shiftedBy(-mint.decimals).toFormat()
-      //         : depositAmount.toFormat()}{' '}
-      //       more {tokenName} votes in your wallet. Do you want to deposit them
-      //       to increase your voting power in this Realm?
-      //     </div>
-      //     <SecondaryButton className="mt-4 w-48" onClick={deposit}>
-      //       Deposit
-      //     </SecondaryButton>
-      //   </>
-      // )} */}
-
+            ) : null}
             {inAccountDetails && (
               <SecondaryButton
                 tooltipMessage={withdrawTooltipContent}

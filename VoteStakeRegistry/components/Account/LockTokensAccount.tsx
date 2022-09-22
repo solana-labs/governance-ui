@@ -213,10 +213,12 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
           <PreviousRouteBtn />
         </div>
         <div className="flex items-center justify-between mb-4">
-          <img
-            src={realmInfo?.ogImage}
-            className="mr-2 rouninded-full w-8 h-8"
-          />
+          {realmInfo?.ogImage && (
+            <img
+              src={realmInfo?.ogImage}
+              className="mr-2 rouninded-full w-8 h-8"
+            />
+          )}
           <h1 className="leading-none flex flex-col mb-0">
             <span className="font-normal text-fgd-2 text-xs mb-2">
               {realmInfo?.displayName}
@@ -376,7 +378,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
           ></LockTokensModal>
         )}
       </div>
-      {connected && <Account withHeader={false}></Account>}
+      {connected && <Account withHeader={false} displayPanel={false}></Account>}
     </div>
   )
 }
