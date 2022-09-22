@@ -603,7 +603,7 @@ export const MANGO_INSTRUCTIONS = {
         _accounts: AccountMetaData[]
       ) => {
         const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
-          .ChangeReferralFeeParams
+          .ChangeReferralFeeParams2
         return <>{displayAllArgs(args)}</>
       },
     },
