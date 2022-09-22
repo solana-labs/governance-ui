@@ -501,7 +501,7 @@ export const TokenDeposit = ({
           </p>
 
           <div className="flex flex-col mt-6 space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
-            {tokensToShow && !inAccountDetails ? (
+            {hasTokensInWallet && !inAccountDetails ? (
               <SecondaryButton
                 tooltipMessage={depositTooltipContent}
                 className="sm:w-1/2 max-w-[200px]"
