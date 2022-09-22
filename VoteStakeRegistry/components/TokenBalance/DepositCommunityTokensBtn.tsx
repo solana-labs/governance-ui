@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-import Button from '@components/Button'
+import { SecondaryButton } from '@components/Button'
 import Loading from '@components/Loading'
 import useRealm from '@hooks/useRealm'
 import { getProgramVersionForRealm } from '@models/registry/api'
@@ -81,14 +81,14 @@ const DepositCommunityTokensBtn = ({ className = '' }) => {
     : ''
 
   return (
-    <Button
+    <SecondaryButton
       tooltipMessage={depositTooltipContent}
       className={`sm:w-1/2 ${className}`}
       disabled={!connected || !hasTokensInWallet || isLoading}
       onClick={depositAllTokens}
     >
       {isLoading ? <Loading></Loading> : 'Deposit'}
-    </Button>
+    </SecondaryButton>
   )
 }
 

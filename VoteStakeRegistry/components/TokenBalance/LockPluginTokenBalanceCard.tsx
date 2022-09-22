@@ -232,14 +232,6 @@ const TokenDepositLock = ({
           <span className="font-bold ml-auto text-fgd-1">{lockTokensFmt}</span>
         </p>
       </div>
-      {/* <p
-        className={`mt-2 opacity-70 mb-4 text-xs ${
-          canShowAvailableTokensMessage ? 'block' : 'hidden'
-        }`}
-      >
-        You have {tokensToShow} tokens available to {canExecuteAction}.
-      </p> */}
-
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
         <DepositCommunityTokensBtn></DepositCommunityTokensBtn>
         {inAccountDetails && (
