@@ -223,7 +223,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
             <span className="font-normal text-fgd-2 text-xs mb-2">
               {realmInfo?.displayName}
             </span>
-            Your Account{' '}
+            My governance power{' '}
           </h1>
 
           <div className="ml-auto flex flex-row">
