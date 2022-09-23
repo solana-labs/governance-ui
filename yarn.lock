@@ -1771,15 +1771,17 @@
     ed2curve-esm "^0.3.0-alpha-1"
     tweetnacl "^1.0.3"
 
-"@civic/profile@0.0.3-alpha.1":
-  version "0.0.3-alpha.1"
-  resolved "https://registry.yarnpkg.com/@civic/profile/-/profile-0.0.3-alpha.1.tgz#b6c62d98c3214d4e9ca0366ac4cff98556f2ff03"
-  integrity sha512-vyoZdqQT4wLpZf9KfQETlNG/SAUozQmG5hnPrmcITrSWtZR7AkYZBMLBb7cgGVYIaK0j1G3dzHyLa3jwb/KVjA==
+"@civic/profile@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@civic/profile/-/profile-0.1.2.tgz#a529a2fb7205098c4137efdc8ef4aaa3e0dd19c8"
+  integrity sha512-gtP5rseTKXOtnhSVoObp2w5ZyVGiFvyjrgnjgA8OZWa8ul0YEfwPi2NQgIHQZvWLR1zexmzPpVF7VlRFJg2nYA==
   dependencies:
     "@bonfida/spl-name-service" "^0.1.50"
-    "@civic/storage" "^0.1.12-alpha.1"
-    "@identity.com/sol-did-client" "^2.0.0"
+    "@civic/storage" "^0.1.14"
+    "@identity.com/sol-did-client" "^3.1.2"
+    "@identity.com/solana-gateway-ts" "^0.9.0-beta.1"
     "@solana/web3.js" "^1.48.0"
+    did-resolver "^3.2.0"
     ramda "^0.28.0"
 
 "@civic/solana-gateway-react@0.9.2":
@@ -1792,15 +1794,16 @@
     "@identity.com/solana-gateway-ts" "^0.7.0"
     "@solana/web3.js" "1.39.0"
 
-"@civic/storage@^0.1.12-alpha.1":
-  version "0.1.12-alpha.1"
-  resolved "https://registry.yarnpkg.com/@civic/storage/-/storage-0.1.12-alpha.1.tgz#02393d4d020686ae5b0aa4124c4cd63b0a7666d7"
-  integrity sha512-5KA/AvuhFCLKKhKSKqMjO3/qszqfY9tPzQEmzHlyQojXCSc6tBJE8xVz1Qv6ZHvhpUf0TYcomGTcU7nUMOarcw==
+"@civic/storage@^0.1.14":
+  version "0.1.14"
+  resolved "https://registry.yarnpkg.com/@civic/storage/-/storage-0.1.14.tgz#d221575776a2b5d7cf1b7f6706bd81914409fae5"
+  integrity sha512-42g0OTzweeqc9P+NElJ7XQ8L5vW9nD1kF1LDGfiagw3vYca+wMTDP9GU7UhROewBL0s/P2QbsMgFeEHb0JdXvA==
   dependencies:
     "@civic/lexi" "0.0.10"
-    "@identity.com/sol-did-client" "^2.0.1"
+    "@identity.com/sol-did-client" "^3.1.2"
     "@solana/web3.js" "^1.30.2"
     axios "^0.26.1"
+    did-resolver "^3.2.2"
     graceful-fs "^4.2.10"
     jsonpath "^1.1.1"
     jsonschema "^1.4.0"
@@ -2059,6 +2062,17 @@
     "@ethersproject/logger" "^5.6.0"
     "@ethersproject/rlp" "^5.6.1"
 
+"@ethersproject/address@^5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@ethersproject/address/-/address-5.7.0.tgz#19b56c4d74a3b0a46bfdbb6cfcc0a153fc697f37"
+  integrity sha512-9wYhYt7aghVGo758POM5nqcOMaE168Q6aRLJZwUmiqSrAungkG74gSSeKEIR7ukixesdRZGPgVqme6vmxs1fkA==
+  dependencies:
+    "@ethersproject/bignumber" "^5.7.0"
+    "@ethersproject/bytes" "^5.7.0"
+    "@ethersproject/keccak256" "^5.7.0"
+    "@ethersproject/logger" "^5.7.0"
+    "@ethersproject/rlp" "^5.7.0"
+
 "@ethersproject/base64@5.6.1", "@ethersproject/base64@^5.6.1":
   version "5.6.1"
   resolved "https://registry.yarnpkg.com/@ethersproject/base64/-/base64-5.6.1.tgz#2c40d8a0310c9d1606c2c37ae3092634b41d87cb"
@@ -2083,6 +2097,15 @@
     "@ethersproject/logger" "^5.6.0"
     bn.js "^5.2.1"
 
+"@ethersproject/bignumber@^5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@ethersproject/bignumber/-/bignumber-5.7.0.tgz#e2f03837f268ba655ffba03a57853e18a18dc9c2"
+  integrity sha512-n1CAdIHRWjSucQO3MC1zPSVgV/6dy/fjL9pMrPP9peL+QxEg9wOsVqwD4+818B6LUEtaXzVHQiuivzRoxPxUGw==
+  dependencies:
+    "@ethersproject/bytes" "^5.7.0"
+    "@ethersproject/logger" "^5.7.0"
+    bn.js "^5.2.1"
+
 "@ethersproject/bytes@5.6.1", "@ethersproject/bytes@^5.6.1":
   version "5.6.1"
   resolved "https://registry.yarnpkg.com/@ethersproject/bytes/-/bytes-5.6.1.tgz#24f916e411f82a8a60412344bf4a813b917eefe7"
@@ -2096,6 +2119,13 @@
   integrity sha512-ABvc7BHWhZU9PNM/tANm/Qx4ostPGadAuQzWTr3doklZOhDlmcBqclrQe/ZXUIj3K8wC28oYeuRa+A37tX9kog==
   dependencies:
     "@ethersproject/logger" "^5.5.0"
+
+"@ethersproject/bytes@^5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@ethersproject/bytes/-/bytes-5.7.0.tgz#a00f6ea8d7e7534d6d87f47188af1148d71f155d"
+  integrity sha512-nsbxwgFXWh9NyYWo+U8atvmMsSdKJprTcICAkvbBffT75qDocbuggBU0SJiVK2MuTrp0q+xvLkTnGMPK1+uA9A==
+  dependencies:
+    "@ethersproject/logger" "^5.7.0"
 
 "@ethersproject/constants@5.6.1", "@ethersproject/constants@^5.6.1":
   version "5.6.1"
@@ -2179,6 +2209,14 @@
     "@ethersproject/bytes" "^5.6.1"
     js-sha3 "0.8.0"
 
+"@ethersproject/keccak256@^5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@ethersproject/keccak256/-/keccak256-5.7.0.tgz#3186350c6e1cd6aba7940384ec7d6d9db01f335a"
+  integrity sha512-2UcPboeL/iW+pSg6vZ6ydF8tCnv3Iu/8tUmLLzWWGzxWKFFqOBQFLo6uLUv6BDrLgCDfN28RJ/wtByx+jZ4KBg==
+  dependencies:
+    "@ethersproject/bytes" "^5.7.0"
+    js-sha3 "0.8.0"
+
 "@ethersproject/logger@5.6.0", "@ethersproject/logger@^5.6.0":
   version "5.6.0"
   resolved "https://registry.yarnpkg.com/@ethersproject/logger/-/logger-5.6.0.tgz#d7db1bfcc22fd2e4ab574cba0bb6ad779a9a3e7a"
@@ -2188,6 +2226,11 @@
   version "5.5.0"
   resolved "https://registry.npmjs.org/@ethersproject/logger/-/logger-5.5.0.tgz"
   integrity sha512-rIY/6WPm7T8n3qS2vuHTUBPdXHl+rGxWxW5okDfo9J4Z0+gRRZT0msvUdIJkE4/HS29GUMziwGaaKO2bWONBrg==
+
+"@ethersproject/logger@^5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@ethersproject/logger/-/logger-5.7.0.tgz#6ce9ae168e74fecf287be17062b590852c311892"
+  integrity sha512-0odtFdXu/XHtjQXJYA3u9G0G8btm0ND5Cu8M7i5vhEcE8/HmF4Lbdqanwyv4uQTr2tx6b7fQRmgLrsnpQlmnig==
 
 "@ethersproject/networks@5.6.4", "@ethersproject/networks@^5.6.3":
   version "5.6.4"
@@ -2252,6 +2295,14 @@
   dependencies:
     "@ethersproject/bytes" "^5.6.1"
     "@ethersproject/logger" "^5.6.0"
+
+"@ethersproject/rlp@^5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@ethersproject/rlp/-/rlp-5.7.0.tgz#de39e4d5918b9d74d46de93af80b7685a9c21304"
+  integrity sha512-rBxzX2vK8mVF7b0Tol44t5Tb8gomOHkj5guL+HhzQ1yBh/ydjGnpw6at+X6Iw0Kp3OzzzkcKp8N9r0W4kYSs9w==
+  dependencies:
+    "@ethersproject/bytes" "^5.7.0"
+    "@ethersproject/logger" "^5.7.0"
 
 "@ethersproject/sha2@5.6.1", "@ethersproject/sha2@^5.6.1":
   version "5.6.1"
@@ -2567,10 +2618,10 @@
     "@solana/web3.js" "1.39.0"
     bs58 "^4.0.1"
 
-"@identity.com/sol-did-client@^2.0.0", "@identity.com/sol-did-client@^2.0.1":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@identity.com/sol-did-client/-/sol-did-client-2.0.2.tgz#001aa84f8975f149852da45b50c8f8b769ea6891"
-  integrity sha512-1JP5JGGCB2z18/gEMVUpkZKHv2RZ8DCktr2WAiUZ4gUMMyfuDzu1JOeL1XDZl9BE8BSzyKIY0PRvWxubykt7Mw==
+"@identity.com/sol-did-client-legacy@^2.0.3":
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/@identity.com/sol-did-client-legacy/-/sol-did-client-legacy-2.0.4.tgz#95b7be01f0022cd34abaee37cc11750f423f1b54"
+  integrity sha512-+LrYg0g3UriEMLpOrzFFZ17eeCA3Ynuyg5cbaAFnoV5bmMCOKr8Y03DERQWrtagfvVJBsWBtz6h6v/ZQSzxnlQ==
   dependencies:
     "@solana/web3.js" "^1.21.0"
     bn.js "^4.12.0"
@@ -2578,6 +2629,25 @@
     bs58 "^4.0.1"
     did-resolver "^3.0.1"
     ramda "^0.27.1"
+
+"@identity.com/sol-did-client@^3.1.2":
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/@identity.com/sol-did-client/-/sol-did-client-3.1.2.tgz#47b15f6f5acba798a6ceff943345045b68422147"
+  integrity sha512-DyIykIadVPqy+8BjjwS0UTtI03dF+SurYi2vdXDeg02hzHYYQCwP4KJzRAj34XQKeK93TeB3ahRbKfiA0DJ2Jg==
+  dependencies:
+    "@ethersproject/address" "^5.7.0"
+    "@ethersproject/bytes" "^5.7.0"
+    "@identity.com/sol-did-client-legacy" "^2.0.3"
+    "@identity.com/sol-did-idl" "^3.1.0"
+    "@project-serum/anchor" "0.25.0"
+    "@solana/web3.js" "^1.59.1"
+    bs58 "^5.0.0"
+    did-resolver "^3.2.2"
+
+"@identity.com/sol-did-idl@^3.1.0":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@identity.com/sol-did-idl/-/sol-did-idl-3.1.0.tgz#dfd00b0f80aeed25ff898a7bd95320df3abc337d"
+  integrity sha512-umy6Adt9d7v50iduN02L5hzxK9742va0yZxFDsTopXcYAgTW/jQ/xsR5Q4VTuqJXtn6szhIO1q0hbNHScq22Cg==
 
 "@identity.com/solana-gateway-ts@^0.7.0":
   version "0.7.0"
@@ -2588,6 +2658,18 @@
     async-retry "^1.3.3"
     bn.js "^5.2.0"
     borsh "^0.4.0"
+    ramda "^0.27.1"
+
+"@identity.com/solana-gateway-ts@^0.9.0-beta.1":
+  version "0.9.0-beta.2"
+  resolved "https://registry.yarnpkg.com/@identity.com/solana-gateway-ts/-/solana-gateway-ts-0.9.0-beta.2.tgz#79cda04a0e5e9ff9b8af8be991c5da78af22e276"
+  integrity sha512-SXmN97kLS9WhMJTn5Mop51QI9JV3Zahv6qUxNBh8kYenbt7dLIcpj/sDMbtAjk9Tim0dC9rzZniHBH+NUDl8Zg==
+  dependencies:
+    "@solana/web3.js" "^1.50.1"
+    async-retry "^1.3.3"
+    bn.js "^5.2.0"
+    borsh "^0.4.0"
+    bs58 "^5.0.0"
     ramda "^0.27.1"
 
 "@isaacs/string-locale-compare@^1.0.1", "@isaacs/string-locale-compare@^1.1.0":
@@ -3866,6 +3948,27 @@
     snake-case "^3.0.4"
     toml "^3.0.0"
 
+"@project-serum/anchor@0.25.0", "@project-serum/anchor@^0.25.0":
+  version "0.25.0"
+  resolved "https://registry.yarnpkg.com/@project-serum/anchor/-/anchor-0.25.0.tgz#88ee4843336005cf5a64c80636ce626f0996f503"
+  integrity sha512-E6A5Y/ijqpfMJ5psJvbw0kVTzLZFUcOFgs6eSM2M2iWE1lVRF18T6hWZVNl6zqZsoz98jgnNHtVGJMs+ds9A7A==
+  dependencies:
+    "@project-serum/borsh" "^0.2.5"
+    "@solana/web3.js" "^1.36.0"
+    base64-js "^1.5.1"
+    bn.js "^5.1.2"
+    bs58 "^4.0.1"
+    buffer-layout "^1.2.2"
+    camelcase "^5.3.1"
+    cross-fetch "^3.1.5"
+    crypto-hash "^1.3.0"
+    eventemitter3 "^4.0.7"
+    js-sha256 "^0.9.0"
+    pako "^2.0.3"
+    snake-case "^3.0.4"
+    superstruct "^0.15.4"
+    toml "^3.0.0"
+
 "@project-serum/anchor@^0.11.1":
   version "0.11.1"
   resolved "https://registry.npmjs.org/@project-serum/anchor/-/anchor-0.11.1.tgz"
@@ -3946,27 +4049,6 @@
     js-sha256 "^0.9.0"
     pako "^2.0.3"
     snake-case "^3.0.4"
-    toml "^3.0.0"
-
-"@project-serum/anchor@^0.25.0":
-  version "0.25.0"
-  resolved "https://registry.yarnpkg.com/@project-serum/anchor/-/anchor-0.25.0.tgz#88ee4843336005cf5a64c80636ce626f0996f503"
-  integrity sha512-E6A5Y/ijqpfMJ5psJvbw0kVTzLZFUcOFgs6eSM2M2iWE1lVRF18T6hWZVNl6zqZsoz98jgnNHtVGJMs+ds9A7A==
-  dependencies:
-    "@project-serum/borsh" "^0.2.5"
-    "@solana/web3.js" "^1.36.0"
-    base64-js "^1.5.1"
-    bn.js "^5.1.2"
-    bs58 "^4.0.1"
-    buffer-layout "^1.2.2"
-    camelcase "^5.3.1"
-    cross-fetch "^3.1.5"
-    crypto-hash "^1.3.0"
-    eventemitter3 "^4.0.7"
-    js-sha256 "^0.9.0"
-    pako "^2.0.3"
-    snake-case "^3.0.4"
-    superstruct "^0.15.4"
     toml "^3.0.0"
 
 "@project-serum/anchor@^0.25.0-beta.1":
@@ -5853,6 +5935,27 @@
   version "1.59.1"
   resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.59.1.tgz#05ac572f11663cb8a718546e14b16aa4578cbc0b"
   integrity sha512-8oviL9tRFZW3k/11rcIv4noBSKe8zCHcZApFNs4W6suA7umCmRBgrFtuf5/nMVTRrf0JNuXjDyWRAFAu92ZsUQ==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+    "@noble/ed25519" "^1.7.0"
+    "@noble/hashes" "^1.1.2"
+    "@noble/secp256k1" "^1.6.3"
+    "@solana/buffer-layout" "^4.0.0"
+    bigint-buffer "^1.1.5"
+    bn.js "^5.0.0"
+    borsh "^0.7.0"
+    bs58 "^4.0.1"
+    buffer "6.0.1"
+    fast-stable-stringify "^1.0.0"
+    jayson "^3.4.4"
+    node-fetch "2"
+    rpc-websockets "^7.5.0"
+    superstruct "^0.14.2"
+
+"@solana/web3.js@^1.50.1", "@solana/web3.js@^1.59.1":
+  version "1.63.0"
+  resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.63.0.tgz#2e247d89785bd79c994bbc79040f0d146ee117a5"
+  integrity sha512-qmDmfLPDjzhTAfN3jbtVI8YaIIIDN9q4p6gCiIhWwzKs8299rq8B+tkmCgiU6tAtIm3uqHl3wduhJMKmqdToBA==
   dependencies:
     "@babel/runtime" "^7.12.5"
     "@noble/ed25519" "^1.7.0"
@@ -10131,7 +10234,7 @@ dezalgo@1.0.3, dezalgo@^1.0.0:
     multiformats "^9.6.4"
     uint8arrays "^3.0.0"
 
-did-resolver@^3.0.1, did-resolver@^3.1.5, did-resolver@^3.2.0:
+did-resolver@^3.0.1, did-resolver@^3.1.5, did-resolver@^3.2.0, did-resolver@^3.2.2:
   version "3.2.2"
   resolved "https://registry.yarnpkg.com/did-resolver/-/did-resolver-3.2.2.tgz#6f4e252a810f785d1b28a10265fad6dffee25158"
   integrity sha512-Eeo2F524VM5N3W4GwglZrnul2y6TLTwMQP3In62JdG34NZoqihYyOZLk+5wUW8sSgvIYIcJM8Dlt3xsdKZZ3tg==
