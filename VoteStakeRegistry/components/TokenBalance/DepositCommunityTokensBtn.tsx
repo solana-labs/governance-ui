@@ -12,7 +12,7 @@ import { voteRegistryDepositWithoutLockup } from 'VoteStakeRegistry/actions/vote
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 
-const DepositCommunityTokensBtn = ({ className = '' }) => {
+const DepositCommunityTokensBtn = ({ className = '', inAccountDetails }) => {
   const { getOwnedDeposits } = useDepositStore()
   const { realm, realmInfo, realmTokenAccount, tokenRecords } = useRealm()
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
@@ -80,7 +80,7 @@ const DepositCommunityTokensBtn = ({ className = '' }) => {
     ? "You don't have any governance tokens in your wallet to deposit."
     : ''
 
-  return (
+  return hasTokensInWallet && !inAccountDetails ? (
     <SecondaryButton
       tooltipMessage={depositTooltipContent}
       className={`sm:w-1/2 ${className}`}
@@ -89,7 +89,16 @@ const DepositCommunityTokensBtn = ({ className = '' }) => {
     >
       {isLoading ? <Loading></Loading> : 'Deposit'}
     </SecondaryButton>
-  )
+  ) : inAccountDetails ? (
+    <SecondaryButton
+      tooltipMessage={depositTooltipContent}
+      className={`sm:w-1/2 ${className}`}
+      disabled={!connected || !hasTokensInWallet || isLoading}
+      onClick={depositAllTokens}
+    >
+      {isLoading ? <Loading></Loading> : 'Deposit'}
+    </SecondaryButton>
+  ) : null
 }
 
 export default DepositCommunityTokensBtn

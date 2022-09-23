@@ -57,6 +57,7 @@ const TokenBalanceCard: FC<Props> = ({
   inAccountDetails = false,
   children,
 }) => {
+  const [hasGovPower, setHasGovPower] = useState<boolean | undefined>(false)
   const { councilMint, mint, realm, symbol } = useRealm()
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
@@ -134,12 +135,18 @@ const TokenBalanceCard: FC<Props> = ({
             inAccountDetails ? `flex w-full gap-8 md:gap-12` : `space-y-4`
           }`}
         >
+          {!hasGovPower && !inAccountDetails && (
+            <div className={'text-xs text-white/50 mt-8'}>
+              You do not have any governance power in this realm
+            </div>
+          )}
           {communityDepositVisible && (
             <TokenDeposit
               mint={mint}
               tokenRole={GoverningTokenRole.Community}
               councilVote={false}
               inAccountDetails={inAccountDetails}
+              setHasGovPower={setHasGovPower}
             />
           )}
           {councilDepositVisible && (
@@ -148,6 +155,7 @@ const TokenBalanceCard: FC<Props> = ({
               tokenRole={GoverningTokenRole.Council}
               councilVote={true}
               inAccountDetails={inAccountDetails}
+              setHasGovPower={setHasGovPower}
             />
           )}
           <DelegateTokenBalanceCard />
@@ -168,11 +176,13 @@ export const TokenDeposit = ({
   tokenRole,
   councilVote,
   inAccountDetails,
+  setHasGovPower,
 }: {
   mint: MintInfo | undefined
   tokenRole: GoverningTokenRole
   councilVote?: boolean
   inAccountDetails?: boolean
+  setHasGovPower: (hasGovPower: boolean) => void
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
@@ -453,6 +463,18 @@ export const TokenDeposit = ({
       )
     : '0'
 
+  useEffect(() => {
+    if (
+      Number(availableTokens) > 0 ||
+      hasTokensDeposited ||
+      hasTokensInWallet
+    ) {
+      setHasGovPower(true)
+    } else {
+      setHasGovPower(false)
+    }
+  }, [availableTokens, hasTokensDeposited, hasTokensInWallet])
+
   const canShowAvailableTokensMessage =
     !hasTokensDeposited && hasTokensInWallet && connected
   const canExecuteAction = !hasTokensDeposited ? 'deposit' : 'withdraw'
@@ -471,22 +493,25 @@ export const TokenDeposit = ({
           {tokenRole === GoverningTokenRole.Community ? `Community` : `Council`}
         </h4>
       )}
-      <div className="flex items-center mt-4 space-x-4">
-        <div className="w-full px-4 py-2 rounded-md bg-bkg-1 flex flex-row items-center justify-between">
-          <div>
-            <p className="text-xs text-fgd-3">{depositTokenName} Votes</p>
-            <div className="flex items-center w-full justify-between mt-1">
-              <p className="mb-0 text-xl font-bold text-fgd-1 hero-text">
-                {availableTokens}
-              </p>
+
+      {(Number(availableTokens) > 0 || inAccountDetails) && (
+        <div className="flex items-center mt-4 space-x-4">
+          <div className="w-full px-4 py-2 rounded-md bg-bkg-1 flex flex-row items-center justify-between">
+            <div>
+              <p className="text-xs text-fgd-3">{depositTokenName} Votes</p>
+              <div className="flex items-center w-full justify-between mt-1">
+                <p className="mb-0 text-xl font-bold text-fgd-1 hero-text">
+                  {availableTokens}
+                </p>
+              </div>
             </div>
+            {Number(availableTokens) > 0
+              ? max &&
+                !max.isZero() && <VotingPowerPct amount={amount} total={max} />
+              : null}
           </div>
-          {Number(availableTokens) > 0
-            ? max &&
-              !max.isZero() && <VotingPowerPct amount={amount} total={max} />
-            : null}
         </div>
-      </div>
+      )}
 
       {!isPyth && (
         <>
