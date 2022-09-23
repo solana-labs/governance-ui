@@ -469,11 +469,7 @@ export const TokenDeposit = ({
     : '0'
 
   useEffect(() => {
-    if (
-      Number(availableTokens) > 0 ||
-      hasTokensDeposited ||
-      hasTokensInWallet
-    ) {
+    if (availableTokens != '0' || hasTokensDeposited || hasTokensInWallet) {
       setHasGovPower(true)
     }
   }, [availableTokens, hasTokensDeposited, hasTokensInWallet])
@@ -497,7 +493,7 @@ export const TokenDeposit = ({
         </h4>
       )}
 
-      {(Number(availableTokens) > 0 || inAccountDetails) && (
+      {(availableTokens != '0' || inAccountDetails) && (
         <div className="flex items-center mt-4 space-x-4">
           <div className="w-full px-4 py-2 rounded-md bg-bkg-1 flex flex-row items-center justify-between">
             <div>

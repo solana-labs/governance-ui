@@ -208,11 +208,7 @@ const TokenDepositLock = ({
       : '0'
 
   useEffect(() => {
-    if (
-      Number(availableTokens) > 0 ||
-      hasTokensDeposited ||
-      hasTokensInWallet
-    ) {
+    if (availableTokens != '0' || hasTokensDeposited || hasTokensInWallet) {
       setHasGovPower(true)
     }
   }, [availableTokens, hasTokensDeposited, hasTokensInWallet])
@@ -248,9 +244,9 @@ const TokenDepositLock = ({
           ></VotingPowerBox>
         </div>
       )}
-      {(Number(availableTokens) > 0 || Number(lockTokensFmt) > 0) && (
+      {(availableTokens != '0' || lockTokensFmt != '0') && (
         <div className="pt-4 px-4">
-          {Number(availableTokens) > 0 && (
+          {availableTokens != '0' && (
             <p className="flex mb-1.5 text-xs">
               <span>{depositTokenName} Deposited</span>
               <span className="font-bold ml-auto text-fgd-1">
@@ -258,7 +254,7 @@ const TokenDepositLock = ({
               </span>
             </p>
           )}
-          {Number(lockTokensFmt) > 0 && (
+          {availableTokens != '0' && (
             <p className="flex text-xs">
               <span>{depositTokenName} Locked</span>
               <span className="font-bold ml-auto text-fgd-1">
