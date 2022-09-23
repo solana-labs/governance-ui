@@ -137,7 +137,7 @@ const TokenBalanceCard: FC<Props> = ({
         >
           {!hasGovPower && !inAccountDetails && connected && (
             <div className={'text-xs text-white/50 mt-8'}>
-              You do not have any governance power in this realm
+              You do not have any governance power in this dao
             </div>
           )}
           {!connected && (
