@@ -57,7 +57,7 @@ const TokenBalanceCard: FC<Props> = ({
   inAccountDetails = false,
   children,
 }) => {
-  const [hasGovPower, setHasGovPower] = useState<boolean | undefined>(false)
+  const [hasGovPower, setHasGovPower] = useState<boolean>(false)
   const { councilMint, mint, realm, symbol } = useRealm()
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
@@ -135,9 +135,14 @@ const TokenBalanceCard: FC<Props> = ({
             inAccountDetails ? `flex w-full gap-8 md:gap-12` : `space-y-4`
           }`}
         >
-          {!hasGovPower && !inAccountDetails && (
+          {!hasGovPower && !inAccountDetails && connected && (
             <div className={'text-xs text-white/50 mt-8'}>
               You do not have any governance power in this realm
+            </div>
+          )}
+          {!connected && (
+            <div className={'text-xs text-white/50 mt-8'}>
+              Connect your wallet to see governance power
             </div>
           )}
           {communityDepositVisible && (
@@ -470,8 +475,6 @@ export const TokenDeposit = ({
       hasTokensInWallet
     ) {
       setHasGovPower(true)
-    } else {
-      setHasGovPower(false)
     }
   }, [availableTokens, hasTokensDeposited, hasTokensInWallet])
 

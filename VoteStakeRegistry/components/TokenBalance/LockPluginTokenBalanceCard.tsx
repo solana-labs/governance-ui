@@ -99,9 +99,14 @@ const LockPluginTokenBalanceCard = ({
       </div>
       {hasLoaded ? (
         <>
-          {!hasGovPower && (
+          {!hasGovPower && !inAccountDetails && connected && (
             <div className={'text-xs text-white/50 mt-8'}>
               You do not have any governance power in this realm
+            </div>
+          )}
+          {!connected && (
+            <div className={'text-xs text-white/50 mt-8'}>
+              Connect your wallet to see governance power
             </div>
           )}
           {communityDepositVisible && (
@@ -209,8 +214,6 @@ const TokenDepositLock = ({
       hasTokensInWallet
     ) {
       setHasGovPower(true)
-    } else {
-      setHasGovPower(false)
     }
   }, [availableTokens, hasTokensDeposited, hasTokensInWallet])
 
