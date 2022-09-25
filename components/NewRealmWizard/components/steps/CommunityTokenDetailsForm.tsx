@@ -76,7 +76,7 @@ export interface CommunityToken {
   transferCommunityMintAuthority?: boolean
   minimumNumberOfCommunityTokensToGovern?: number
   communityMintSupplyFactor?: number
-  useSupplyFactor?: boolean
+  useSupplyFactor: boolean
   communityAbsoluteMaxVoteWeight?: number
 }
 

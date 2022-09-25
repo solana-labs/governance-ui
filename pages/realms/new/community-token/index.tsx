@@ -95,6 +95,8 @@ export default function CommunityTokenWizard() {
         // COMMUNITY INFO
         tokensToGovernThreshold:
           formData.minimumNumberOfCommunityTokensToGovern,
+        useSupplyFactor: formData.useSupplyFactor,
+        communityAbsoluteMaxVoteWeight: formData.communityAbsoluteMaxVoteWeight,
         communityMintSupplyFactor: formData.communityMintSupplyFactor,
         communityYesVotePercentage: formData.communityYesVotePercentage,
         existingCommunityMintPk: formData.communityTokenMintAddress

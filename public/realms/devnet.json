@@ -7,6 +7,13 @@
     "ogImage": "/realms/UNQ/img/UNQ-logo.png"
   },
   {
+    "symbol": "SERUMV3",
+    "displayName": "Serum-V3",
+    "programId": "EceDyAyTXQyAKxHzFSvSW1i9Dq5Ha1gBiwYbfE41zmdJ",
+    "realmId": "HKzjA8M4WFLrNN7SgZxSbzoqkH87HSa7Y9jkcV4oHgLJ",
+    "ogImage": "/realms/UNQ/img/UNQ-logo.png"
+  },
+  {
     "symbol": "MNGO",
     "displayName": "Mango DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",

@@ -21,7 +21,10 @@ interface TokenizedRealm {
   communityYesVotePercentage: number
   existingCommunityMintPk: PublicKey | undefined
   transferCommunityMintAuthority: boolean | undefined
+
+  useSupplyFactor: boolean
   communityMintSupplyFactor: number | undefined
+  communityAbsoluteMaxVoteWeight: number | undefined
 
   createCouncil: boolean
   existingCouncilMintPk: PublicKey | undefined
@@ -36,10 +39,13 @@ export default async function createTokenizedRealm({
   realmName,
   tokensToGovernThreshold,
 
+  communityYesVotePercentage,
   existingCommunityMintPk,
   transferCommunityMintAuthority = true,
-  communityYesVotePercentage,
+
+  useSupplyFactor,
   communityMintSupplyFactor: rawCMSF,
+  communityAbsoluteMaxVoteWeight,
 
   createCouncil = false,
   existingCouncilMintPk,
@@ -65,9 +71,12 @@ export default async function createTokenizedRealm({
     tokensToGovernThreshold,
 
     existingCommunityMintPk,
-    communityMintSupplyFactor: rawCMSF,
     transferCommunityMintAuthority,
     communityYesVotePercentage,
+
+    useSupplyFactor,
+    communityMintSupplyFactor: rawCMSF,
+    communityAbsoluteMaxVoteWeight,
 
     createCouncil,
     existingCouncilMintPk,

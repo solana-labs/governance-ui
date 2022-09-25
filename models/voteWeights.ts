@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js'
 import {
   GovernanceConfig,
   MintMaxVoteWeightSource,
+  MintMaxVoteWeightSourceType,
   Proposal,
   Realm,
   TokenOwnerRecord,
@@ -356,34 +357,15 @@ export class SwitchboardQueueVoteWeight implements VoterWeightInterface {
   }
   canCreateGovernanceUsingCommunityTokens(realm: ProgramAccount<Realm>) {
     return true
-    return this.hasMinCommunityWeight(
-      realm.account.config.minCommunityTokensToCreateGovernance
-    )
   }
   canCreateGovernanceUsingCouncilTokens() {
     return false
   }
   canCreateGovernance(realm: ProgramAccount<Realm>) {
     return true
-    return (
-      this.canCreateGovernanceUsingCommunityTokens(realm) ||
-      this.canCreateGovernanceUsingCouncilTokens()
-    )
   }
   hasMinAmountToVote(mintPk: PublicKey) {
     return true
-    const isCommunity =
-      this.communityTokenRecord?.account.governingTokenMint.toBase58() ===
-      mintPk.toBase58()
-    const isCouncil =
-      this.councilTokenRecord?.account.governingTokenMint.toBase58() ===
-      mintPk.toBase58()
-    if (isCouncil) {
-      return !this.councilTokenRecord?.account.governingTokenDepositAmount.isZero()
-    }
-    if (isCommunity) {
-      return !this.votingPower.isZero()
-    }
   }
 
   getTokenRecordToCreateProposal(_config: GovernanceConfig) {
@@ -559,13 +541,18 @@ export function getMintMaxVoteWeight(
     return mint.supply
   }
 
-  const supplyFraction = maxVoteWeightSource.getSupplyFraction()
+  if (maxVoteWeightSource.type === MintMaxVoteWeightSourceType.SupplyFraction) {
+    const supplyFraction = maxVoteWeightSource.getSupplyFraction()
 
-  const maxVoteWeight = new BigNumber(supplyFraction.toString())
-    .multipliedBy(mint.supply.toString())
-    .shiftedBy(-MintMaxVoteWeightSource.SUPPLY_FRACTION_DECIMALS)
+    const maxVoteWeight = new BigNumber(supplyFraction.toString())
+      .multipliedBy(mint.supply.toString())
+      .shiftedBy(-MintMaxVoteWeightSource.SUPPLY_FRACTION_DECIMALS)
 
-  return new BN(maxVoteWeight.dp(0, BigNumber.ROUND_DOWN).toString())
+    return new BN(maxVoteWeight.dp(0, BigNumber.ROUND_DOWN).toString())
+  } else {
+    // absolute value
+    return maxVoteWeightSource.value
+  }
 }
 
 /// Returns max vote weight for a proposal
