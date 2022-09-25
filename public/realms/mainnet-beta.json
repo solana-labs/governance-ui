@@ -21,6 +21,26 @@
     "sortRank": 3
   },
   {
+    "symbol": "Metaplex",
+    "displayName": "Metaplex DAO",
+    "programId": "AEauWRrpn9Cs6GXujzdp1YhMmv2288kBt3SdEcPYEerr",
+    "realmId": "DA5G7QQbFioZ6K33wQcH8fVdgFcnaDjLD7DLQkapZg5X",
+    "website": "https://www.metaplex.com/",
+    "twitter": "@metaplex",
+    "ogImage": "/realms/metaplex/img/black-circle.png",
+    "sortRank": 3
+  },
+  {
+    "symbol": "GRAPE",
+    "displayName": "GRAPE",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "By2sVGZXwfQq6rAiAM3rNPJ9iQfb5e2QhnF4YjJ4Bip",
+    "ogImage": "/realms/Grape/img/grape.png",
+    "website": "https://grapes.network/",
+    "twitter": "@grapeprotocol",
+    "sortRank": 3
+  },
+  {
     "symbol": "PSY",
     "displayName": "Psy Finance",
     "programId": "GovHgfDPyQ1GwazJTDY2avSVY8GGcpmCapmmCsymRaGe",
@@ -281,16 +301,6 @@
     "realmId": "Dmn5q2SwkjZBKJGwULEWzK8zeZ2ES6JQvHKB297tAHXY",
     "ogImage": "/realms/strangemood/img/logo.svg",
     "website": "https://strangemood.org"
-  },
-  {
-    "symbol": "GRAPE",
-    "displayName": "GRAPE",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "By2sVGZXwfQq6rAiAM3rNPJ9iQfb5e2QhnF4YjJ4Bip",
-    "ogImage": "/realms/Grape/img/grape.png",
-    "website": "https://grapes.network/",
-    "twitter": "@grapeprotocol",
-    "sortRank": 3
   },
   {
     "symbol": "RED",
@@ -985,5 +995,15 @@
     "website": "https://www.majesticdeers.com",
     "twitter": "@MajesticDeers",
     "ogImage": "https://raw.githubusercontent.com/MajesticDeers/governance-ui/main/public/realms/AntlerDAO/Logo.jpg"
+  },
+    {
+    "symbol": "OPCD",
+    "displayName": "OPANZ COMMUNITY DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "D2dphGE7euTcC576skADhqQ8rwZ9dPMq6pmoDhdbdsYX",
+    "bannerImage": "/realms/ODCO/OCDC.png",
+    "ogImage": "/realms/ODCO/OCDLO.png",
+    "website": "https://auturoa.nz/",
+    "twitter": "@OPANZ999"
   }
 ]

@@ -367,10 +367,14 @@ export const MANGO_INSTRUCTIONS = {
               <div className="col-span-1 py-3">
                 <p className="mb-0">Est period end</p>
                 <div className="font-bold">
-                  {dayjs(est * 1000).format('DD MMM YYYY')}
+                  {dayjs(est * 1000).isValid()
+                    ? dayjs(est * 1000).format('DD MMM YYYY')
+                    : ''}
                 </div>
                 <div className="text-xs text-th-fgd-3">
-                  {dayjs(est * 1000).format('h:mma')}
+                  {dayjs(est * 1000).isValid()
+                    ? dayjs(est * 1000).format('h:mma')
+                    : ''}
                 </div>
               </div>
 
@@ -586,6 +590,21 @@ export const MANGO_INSTRUCTIONS = {
       ) => {
         console.log(data)
         return <></>
+      },
+    },
+    74: {
+      name: 'Mango v3: Change Referral Fee Params v2',
+      accounts: {
+        0: { name: 'Mango Group' },
+      },
+      getDataUI: (
+        _connection: Connection,
+        data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
+        const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
+          .ChangeReferralFeeParams2
+        return <>{displayAllArgs(args)}</>
       },
     },
   },

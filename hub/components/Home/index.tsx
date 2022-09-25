@@ -45,7 +45,11 @@ export function Home(props: Props) {
           ({ realm }) => (
             <HomeLayout
               bannerUrl={
-                realm.bannerImageUrl || getDefaultBannerUrl(realm.publicKey)
+                realm.bannerImageUrl ||
+                (realm.publicKey.toBase58() ===
+                'DA5G7QQbFioZ6K33wQcH8fVdgFcnaDjLD7DLQkapZg5X'
+                  ? 'https://dao.metaplex.com/img/bg-metaplex.svg'
+                  : getDefaultBannerUrl(realm.publicKey))
               }
               sidebar={(isStickied) => (
                 <Sidebar.Content

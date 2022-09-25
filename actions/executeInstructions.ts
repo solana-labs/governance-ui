@@ -53,7 +53,6 @@ export const executeInstructions = async (
     const transaction = new Transaction()
 
     transaction.add(...instructions)
-
     const signedTransaction = await signTransaction({
       transaction,
       wallet,
