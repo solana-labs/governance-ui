@@ -820,8 +820,8 @@
     "website": "https://tribe.agrichainx.com/",
     "twitter": "@agrichainx2022",
     "ogImage": "/realms/AgrichainxTribeDao/AgrichainxTribeDao.jpeg"
-    },
-    {
+  },
+  {
     "symbol": "ADAO",
     "displayName": "Astra DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -996,7 +996,7 @@
     "twitter": "@MajesticDeers",
     "ogImage": "https://raw.githubusercontent.com/MajesticDeers/governance-ui/main/public/realms/AntlerDAO/Logo.jpg"
   },
-    {
+  {
     "symbol": "OPCD",
     "displayName": "OPANZ COMMUNITY DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1005,5 +1005,14 @@
     "ogImage": "/realms/ODCO/OCDLO.png",
     "website": "https://auturoa.nz/",
     "twitter": "@OPANZ999"
+  }
+  {
+    "symbol": "eleusance",
+    "displayName": "eleusance DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "376quXDrSmhd5655Z7aNVKHfDQR3SNi4pEDxmA7TES5V",
+    "ogImage": "/realms/eleusance/eleusance_logo_spl.png",
+    "website": "https://eleusance.io/",
+    "twitter": "@eleusanceIO"
   }
 ]
