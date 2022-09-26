@@ -1,4 +1,31 @@
 [
+   
+  {
+    "symbol": "UNQ",
+    "displayName": "UNQ Universe",
+    "programId": "GTesTBiEWE32WHXXE2S4XbZvA5CrEc4xs6ZgRe895dP",
+    "realmId": "HVywtno57PwcgWQzRaf3Pv8RKWWrF1zoqLZGULNC2jGm",
+    "ogImage": "/realms/UNQ/img/UNQ-logo.png"
+  },
+
+  {
+    "symbol": "MNGO",
+    "displayName": "Mango DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "H2iny4dUP2ngt9p4niUWVX4TKvr1h9eSWGNdP1zvwzNQ",
+    "website": "https://mango.markets",
+    "keywords": "Mango Markets, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
+    "twitter": "@mangomarkets",
+    "ogImage": "https://trade.mango.markets/assets/icons/logo.svg",
+    "notificationsEnabled": true
+  },
+  {
+    "symbol": "SERUM",
+    "displayName": "Serum DAO - Devnet",
+    "programId": "EceDyAyTXQyAKxHzFSvSW1i9Dq5Ha1gBiwYbfE41zmdJ",
+    "realmId": "2cnnJo5f2TNwNn76Nu3QLoL9YV4FJmZner9r1DQRz9Wm",
+    "ogImage": "https://assets.website-files.com/61284dcff241c2f0729af9f3/61285237ce2e301255d09108_logo-serum.png"
+  },
   {
     "symbol": "DAO-1",
     "displayName": "DAO-1",
@@ -12,38 +39,6 @@
     "programId": "GTesTBiEWE32WHXXE2S4XbZvA5CrEc4xs6ZgRe895dP",
     "realmId": "G1ZnwPJGnRt35nadw33df7hxKHkVu13juMjuE4Pp5FWN",
     "ogImage": "https://assets.website-files.com/61284dcff241c2f0729af9f3/61285237ce2e301255d09108_logo-serum.png"
-  },
-  {
-    "symbol": "SERUM",
-    "displayName": "Serum Test DAO",
-    "programId": "GTesTBiEWE32WHXXE2S4XbZvA5CrEc4xs6ZgRe895dP",
-    "realmId": "Cs9n5iAck9jXSz3R9pvU2m7DkNeL4TzB4VaoAkfAP4wG",
-    "ogImage": "https://assets.website-files.com/61284dcff241c2f0729af9f3/61285237ce2e301255d09108_logo-serum.png"
-  },
-  {
-    "symbol": "UNQ",
-    "displayName": "UNQ Universe",
-    "programId": "GTesTBiEWE32WHXXE2S4XbZvA5CrEc4xs6ZgRe895dP",
-    "realmId": "HVywtno57PwcgWQzRaf3Pv8RKWWrF1zoqLZGULNC2jGm",
-    "ogImage": "/realms/UNQ/img/UNQ-logo.png"
-  },
-  {
-    "symbol": "SERUM",
-    "displayName": "Serum DAO - Devnet",
-    "programId": "EceDyAyTXQyAKxHzFSvSW1i9Dq5Ha1gBiwYbfE41zmdJ",
-    "realmId": "BGWMranxN948q1i2v62of2KNHB2Qs5wNrebrg5WTzgm1",
-    "ogImage": "https://assets.website-files.com/61284dcff241c2f0729af9f3/61285237ce2e301255d09108_logo-serum.png"
-  },
-  {
-    "symbol": "MNGO",
-    "displayName": "Mango DAO",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "H2iny4dUP2ngt9p4niUWVX4TKvr1h9eSWGNdP1zvwzNQ",
-    "website": "https://mango.markets",
-    "keywords": "Mango Markets, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
-    "twitter": "@mangomarkets",
-    "ogImage": "https://trade.mango.markets/assets/icons/logo.svg",
-    "notificationsEnabled": true
   },
   {
     "symbol": "SOCEAN",

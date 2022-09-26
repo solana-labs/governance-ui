@@ -71,13 +71,13 @@ export type VestAccountType = {
   gsrmBurned: anchor.BN
 }
 
-const PROGRAM_ID = new PublicKey('G1aFYDgwp7zYcP9SyYskTP4d2C5WqKdweT3ajusiuUjJ')
+const PROGRAM_ID = new PublicKey('GmsZzX2UTWrpjMnEBHDkrSNADCSfHfr8sTjVGKHFYTaW')
 
 export const SRM_MINT = new PublicKey(
-  '6LDZM4GLSC6rA4hbt6XZVqfY9KQGWXfrSjsYyoDTFm8B'
+  'EJUJgLnqdeCaUJ6vmTeTCEcyPFX3GD91D3yoM8cNEqzK'
 )
 export const MSRM_MINT = new PublicKey(
-  '9Ag8AMqnjgc5qjTFiwafEpkZVRjRhqdGhHev4y1Dn2aS'
+  'C3MnUAQYh8Qg6FiTD1x13EsJrFSz1QzuuhzFfhvMjpG7'
 )
 export const [GSRM_MINT] = findProgramAddressSync(
   [Buffer.from('gSRM')],
