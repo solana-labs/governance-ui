@@ -21,7 +21,9 @@ export function Content(props: Props) {
   const author = props.author;
 
   const authorName = author
-    ? author.twitterInfo?.handle || abbreviateAddress(author.publicKey)
+    ? author.civicInfo?.handle ||
+      author.twitterInfo?.handle ||
+      abbreviateAddress(author.publicKey)
     : 'unknown author';
 
   const isEdited =

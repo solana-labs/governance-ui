@@ -10,6 +10,11 @@ export const feedItemComment = `
   fragment Comment on RealmFeedItemComment {
     author {
       publicKey
+      civicInfo {
+        avatarUrl
+        handle
+        isVerified
+      }
       twitterInfo {
         avatarUrl
         handle

@@ -24,7 +24,8 @@ interface Props {
 
 export function Header(props: Props) {
   const authorName = props.author
-    ? props.author.twitterInfo?.handle ||
+    ? props.author.civicInfo?.handle ||
+      props.author.twitterInfo?.handle ||
       abbreviateAddress(props.author.publicKey)
     : 'unknown author';
 
