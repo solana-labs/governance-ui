@@ -20,7 +20,7 @@ import {
   governedAccountToWallet,
   instructionInputs,
   SchemaComponents,
-} from './util'
+} from '@utils/instructions/Identity/util'
 
 interface RemoveKeyFromDIDForm {
   governedAccount: AssetAccount | undefined

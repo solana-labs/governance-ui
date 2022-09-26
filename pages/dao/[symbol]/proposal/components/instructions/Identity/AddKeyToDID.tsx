@@ -26,7 +26,7 @@ import {
   governedAccountToWallet,
   instructionInputs,
   SchemaComponents,
-} from './util'
+} from '@utils/instructions/Identity/util'
 
 interface AddKeyToDIDForm {
   governedAccount: AssetAccount | undefined
