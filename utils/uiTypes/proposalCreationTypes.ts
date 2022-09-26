@@ -495,6 +495,8 @@ export enum Instructions {
   TransferDomainName,
   EverlendDeposit,
   EverlendWithdraw,
+  AddKeyToDID,
+  RemoveKeyFromDID,
 }
 
 export type createParams = [

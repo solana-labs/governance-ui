@@ -109,6 +109,8 @@ import TransferDomainName from './components/instructions/TransferDomainName'
 import DepositForm from './components/instructions/Everlend/DepositForm'
 import WithdrawForm from './components/instructions/Everlend/WithdrawForm'
 import MakeChangeReferralFeeParams2 from './components/instructions/Mango/MakeChangeReferralFeeParams2'
+import AddKeyToDID from './components/instructions/Identity/AddKeyToDID'
+import RemoveKeyFromDID from './components/instructions/Identity/RemoveKeyFromDID'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -727,7 +729,10 @@ const New = () => {
         return <DepositForm index={idx} governance={governance} />
       case Instructions.EverlendWithdraw:
         return <WithdrawForm index={idx} governance={governance} />
-
+      case Instructions.AddKeyToDID:
+        return <AddKeyToDID index={idx} governance={governance} />
+      case Instructions.RemoveKeyFromDID:
+        return <RemoveKeyFromDID index={idx} governance={governance} />
       default:
         null
     }

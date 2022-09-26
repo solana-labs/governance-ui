@@ -273,6 +273,16 @@ export default function useGovernanceAssets() {
       isVisible: canUseAnyInstruction,
     },
     {
+      id: Instructions.AddKeyToDID,
+      name: 'Add Key to DID',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.RemoveKeyFromDID,
+      name: 'Remove Key from DID',
+      isVisible: canUseAnyInstruction,
+    },
+    {
       id: Instructions.None,
       name: 'None',
       isVisible:
