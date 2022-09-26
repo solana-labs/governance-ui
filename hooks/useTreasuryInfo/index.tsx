@@ -100,12 +100,12 @@ export default function useTreasuryInfo(): Result<Data> {
 
   if (!realmInfo || loadingGovernedAccounts || nftsLoading || buildingWallets) {
     return {
-      status: Status.Pending,
+      _tag: Status.Pending,
     }
   }
 
   return {
-    status: Status.Ok,
+    _tag: Status.Ok,
     data: {
       wallets,
       auxiliaryWallets: auxWallets,

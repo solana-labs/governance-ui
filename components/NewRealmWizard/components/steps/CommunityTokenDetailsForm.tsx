@@ -57,6 +57,17 @@ export const CommunityTokenSchema = {
     .positive('Must be greater than 0')
     .max(1, 'Must not be greater than 1')
     .transform((value) => (isNaN(value) ? undefined : value)),
+  useSupplyFactor: yup
+    .boolean()
+    .oneOf(
+      [true, false],
+      'You must specify what type of max vote weight source you want to use.'
+    )
+    .required('Required'),
+  communityAbsoluteMaxVoteWeight: yup
+    .number()
+    .positive('Must be greater than 0')
+    .transform((value) => (isNaN(value) ? undefined : value)),
 }
 
 export interface CommunityToken {
@@ -65,6 +76,8 @@ export interface CommunityToken {
   transferCommunityMintAuthority?: boolean
   minimumNumberOfCommunityTokensToGovern?: number
   communityMintSupplyFactor?: number
+  useSupplyFactor: boolean
+  communityAbsoluteMaxVoteWeight?: number
 }
 
 export default function CommunityTokenForm({
@@ -87,6 +100,7 @@ export default function CommunityTokenForm({
     resolver: yupResolver(schema),
   })
   const useExistingCommunityToken = watch('useExistingCommunityToken')
+  const useSupplyFactor = watch('useSupplyFactor')
   const [communityTokenInfo, setCommunityTokenInfo] = useState<
     TokenWithMintInfo | undefined
   >()
@@ -105,6 +119,12 @@ export default function CommunityTokenForm({
       })
     }
   }, [useExistingCommunityToken])
+
+  useEffect(() => {
+    if (useSupplyFactor) {
+      setValue('communityAbsoluteMaxVoteWeight', undefined)
+    } else setValue('communityMintSupplyFactor', undefined)
+  }, [useSupplyFactor])
 
   function handleTokenInput({ suggestedMinTokenAmount, tokenInfo }) {
     setCommunityTokenInfo(tokenInfo)
@@ -126,7 +146,7 @@ export default function CommunityTokenForm({
     const data = {
       transferCommunityMintAuthority: null,
       minimumNumberOfCommunityTokensToGovern: null,
-      communityMintSupplyFactor: null,
+      // communityMintSupplyFactor: null,
       ...values,
     }
     if (values.useExistingCommunityToken) {
@@ -136,6 +156,17 @@ export default function CommunityTokenForm({
       data.transferCommunityMintAuthority = null
       data.communityTokenInfo = null
     }
+
+    if (useSupplyFactor) {
+      data.communityMintSupplyFactor =
+        values.communityMintSupplyFactor === undefined
+          ? null
+          : values.communityMintSupplyFactor
+    } else
+      data.communityAbsoluteMaxVoteWeight =
+        values.communityAbsoluteMaxVoteWeight === undefined
+          ? null
+          : values.communityAbsoluteMaxVoteWeight
 
     onSubmit({ step: currentStep, data })
   }
@@ -181,9 +212,7 @@ export default function CommunityTokenForm({
             onValidation={handleTokenInput}
           />
         )}
-      </div>
-      {useExistingCommunityToken === false && (
-        <AdvancedOptionsDropdown>
+        {useExistingCommunityToken === false && (
           <Controller
             name="minimumNumberOfCommunityTokensToGovern"
             control={control}
@@ -192,7 +221,7 @@ export default function CommunityTokenForm({
               <FormField
                 title="What is the minimum number of community tokens needed to manage this DAO?"
                 description="A user will need at least this many community token to edit the DAO"
-                advancedOption
+                // advancedOption
               >
                 <Input
                   type="tel"
@@ -209,19 +238,44 @@ export default function CommunityTokenForm({
               </FormField>
             )}
           />
-        </AdvancedOptionsDropdown>
-      )}
-      {useExistingCommunityToken && (
-        <AdvancedOptionsDropdown>
+        )}
+      </div>
+
+      <AdvancedOptionsDropdown>
+        <Controller
+          name="useSupplyFactor"
+          control={control}
+          defaultValue={true}
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          render={({ field: { ref, ...field } }) => (
+            <div className="pt-3">
+              <FormField
+                title="What type of Max Vote Weight Source do you want to use?"
+                description="This value determines the max vote weight used to determine the voting threshold."
+                advancedOption
+              >
+                <RadioGroup
+                  {...field}
+                  options={[
+                    { label: 'Supply Fraction', value: true },
+                    { label: 'Absolute', value: false },
+                  ]}
+                />
+              </FormField>
+            </div>
+          )}
+        />
+        {useSupplyFactor === false && (
           <Controller
-            name="communityMintSupplyFactor"
+            name="communityAbsoluteMaxVoteWeight"
             defaultValue=""
             control={control}
             render={({ field, fieldState: { error } }) => (
               <FormField
-                title="Circulation supply factor"
-                description="This determines the votes needed to pass a proposal by calculating the number of tokens in circulation (instead of using the total Mint supply)."
+                title="Absolute Max Vote Weight"
+                description="This determines the votes needed to pass a proposal by calculating the vote threshold percentage."
                 advancedOption
+                className="mt-6"
               >
                 <Input
                   type="tel"
@@ -238,8 +292,36 @@ export default function CommunityTokenForm({
               </FormField>
             )}
           />
-        </AdvancedOptionsDropdown>
-      )}
+        )}
+        {useSupplyFactor && (
+          <Controller
+            name="communityMintSupplyFactor"
+            defaultValue=""
+            control={control}
+            render={({ field, fieldState: { error } }) => (
+              <FormField
+                title="Circulation Supply Factor"
+                description="This determines the votes needed to pass a proposal by calculating the number of tokens in circulation (instead of using the total Mint supply)."
+                advancedOption
+                className="mt-6"
+              >
+                <Input
+                  type="tel"
+                  placeholder={`1`}
+                  Icon={<GenericTokenIcon />}
+                  data-testid="programId-input"
+                  error={error?.message || ''}
+                  {...field}
+                  onChange={(ev) => {
+                    preventNegativeNumberInput(ev)
+                    field.onChange(ev)
+                  }}
+                />
+              </FormField>
+            )}
+          />
+        )}
+      </AdvancedOptionsDropdown>
 
       <FormFooter
         isValid={isValid}

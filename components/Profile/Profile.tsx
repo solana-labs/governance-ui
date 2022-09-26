@@ -16,14 +16,17 @@ const VisitLink: FC<{ address: PublicKey }> = ({ address }) => (
   </a>
 )
 
-const ClaimLink: FC<{ address: PublicKey }> = ({ address }) => (
+const ClaimLink: FC<{ address: PublicKey; expanded }> = ({
+  address,
+  expanded,
+}) => (
   <a
     className="underline"
     target="_blank"
     href={'https://civic.me/' + address}
     rel="noreferrer"
   >
-    Claim your profile at civic.me
+    Claim your profile{expanded && ' at civic.me'}
   </a>
 )
 
@@ -55,7 +58,7 @@ export const Profile: FC<Props> = ({ publicKey, expanded }) => {
         </div>
         {!profileSet && isLoggedInUser && (
           <div className="text-lg text-fgd-3 mt-2">
-            <ClaimLink address={address} />
+            <ClaimLink address={address} expanded={expanded} />
           </div>
         )}
         {(profileSet || !isLoggedInUser) && (
@@ -78,7 +81,7 @@ export const Profile: FC<Props> = ({ publicKey, expanded }) => {
         </div>
         {!profileSet && isLoggedInUser && (
           <div className="text-xs text-fgd-3 mt-2">
-            <ClaimLink address={address} />
+            <ClaimLink address={address} expanded={expanded} />
           </div>
         )}
       </div>

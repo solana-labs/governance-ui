@@ -1,8 +1,9 @@
 import BN from 'bn.js'
-import { PublicKey } from '@solana/web3.js'
 import dayjs from 'dayjs'
 import type { BigNumber } from 'bignumber.js'
 const relativeTime = require('dayjs/plugin/relativeTime')
+
+import { abbreviateAddress } from '@hub/lib/abbreviateAddress'
 
 const votePrecision = 10000
 export const calculatePct = (c: BN, total?: BN) => {
@@ -27,11 +28,6 @@ export const fmtUnixTime = (d: BN | BigNumber | number) =>
   //@ts-ignore
   dayjs(typeof d === 'number' ? d * 1000 : d.toNumber() * 1000).fromNow()
 
-export function abbreviateAddress(address: PublicKey | string, size = 5) {
-  const base58 = typeof address === 'string' ? address : address.toBase58()
-  return base58.slice(0, size) + '…' + base58.slice(-size)
-}
-
 export function precision(a) {
   if (!isFinite(a)) return 0
   let e = 1,
@@ -42,3 +38,5 @@ export function precision(a) {
   }
   return p
 }
+
+export { abbreviateAddress }

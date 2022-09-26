@@ -98,7 +98,7 @@ const LockPluginTokenBalanceCard = ({
           {communityDepositVisible && (
             <TokenDepositLock
               mint={mint}
-              tokenType={GoverningTokenRole.Community}
+              tokenRole={GoverningTokenRole.Community}
               councilVote={false}
             />
           )}
@@ -106,7 +106,7 @@ const LockPluginTokenBalanceCard = ({
             <div className="mt-4">
               <TokenDeposit
                 mint={councilMint}
-                tokenType={GoverningTokenRole.Council}
+                tokenRole={GoverningTokenRole.Council}
                 councilVote={true}
               />
             </div>
@@ -125,10 +125,10 @@ const LockPluginTokenBalanceCard = ({
 
 const TokenDepositLock = ({
   mint,
-  tokenType,
+  tokenRole,
 }: {
   mint: MintInfo | undefined
-  tokenType: GoverningTokenRole
+  tokenRole: GoverningTokenRole
   councilVote?: boolean
 }) => {
   const { realm, realmTokenAccount, councilTokenAccount } = useRealm()
@@ -157,19 +157,19 @@ const TokenDepositLock = ({
   }
 
   const depositTokenAccount =
-    tokenType === GoverningTokenRole.Community
+    tokenRole === GoverningTokenRole.Community
       ? realmTokenAccount
       : councilTokenAccount
 
   const depositMint =
-    tokenType === GoverningTokenRole.Community
+    tokenRole === GoverningTokenRole.Community
       ? realm?.account.communityMint
       : realm?.account.config.councilMint
 
   const tokenName = getMintMetadata(depositMint)?.name ?? realm?.account.name
 
   const depositTokenName = `${tokenName} ${
-    tokenType === GoverningTokenRole.Community ? '' : 'Council'
+    tokenRole === GoverningTokenRole.Community ? '' : 'Council'
   }`
 
   const hasTokensInWallet =

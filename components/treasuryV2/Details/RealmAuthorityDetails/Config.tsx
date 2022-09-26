@@ -1,6 +1,12 @@
 import React, { useState } from 'react'
 import cx from 'classnames'
-import { PencilIcon } from '@heroicons/react/outline'
+import {
+  PencilIcon,
+  ScaleIcon,
+  DocumentAddIcon,
+  BeakerIcon,
+  CogIcon,
+} from '@heroicons/react/outline'
 import { BigNumber } from 'bignumber.js'
 
 import RealmConfigModal from 'pages/dao/[symbol]/params/RealmConfigModal'
@@ -10,6 +16,8 @@ import Tooltip from '@components/Tooltip'
 import { formatNumber } from '@utils/formatNumber'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import useRealm from '@hooks/useRealm'
+import Section from '../Section'
+import Address from '@components/Address'
 
 const DISABLED = new BigNumber(DISABLED_VOTER_WEIGHT.toString())
 
@@ -23,46 +31,77 @@ export default function Config(props: Props) {
   const { mint } = useRealm()
   const [editRealmOpen, setEditRealmOpen] = useState(false)
 
-  const config: { title: string; value: string }[] = []
-
-  if (props.realmAuthority.config.communityMintMaxVoteWeightSource) {
-    config.push({
-      title: 'Community mint max vote weight source',
-      value: props.realmAuthority.config.communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage(),
-    })
-  }
-
-  config.push({
-    title: 'Min community tokens to create governance',
-    value: DISABLED.shiftedBy(-(mint ? mint.decimals : 0)).isLessThanOrEqualTo(
-      props.realmAuthority.config.minCommunityTokensToCreateGovernance
-    )
-      ? 'Disabled'
-      : formatNumber(
-          props.realmAuthority.config.minCommunityTokensToCreateGovernance,
-          undefined,
-          { maximumFractionDigits: 2 }
-        ),
-  })
-
-  config.push({
-    title: 'Use community voter weight add-in',
-    value: props.realmAuthority.config.useCommunityVoterWeightAddin
-      ? 'Yes'
-      : 'No',
-  })
-
-  config.push({
-    title: 'Use max community voter weight add-in',
-    value: props.realmAuthority.config.useMaxCommunityVoterWeightAddin
-      ? 'Yes'
-      : 'No',
-  })
+  const config = [
+    ...(props.realmAuthority.config.communityMintMaxVoteWeightSource
+      ? [
+          {
+            title: 'Community mint max vote weight source',
+            value: props.realmAuthority.config.communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage(),
+            icon: <ScaleIcon />,
+          },
+        ]
+      : []),
+    {
+      icon: <DocumentAddIcon />,
+      title: 'Min community tokens to create governance',
+      value: DISABLED.shiftedBy(
+        -(mint ? mint.decimals : 0)
+      ).isLessThanOrEqualTo(
+        props.realmAuthority.config.minCommunityTokensToCreateGovernance
+      )
+        ? 'Disabled'
+        : formatNumber(
+            props.realmAuthority.config.minCommunityTokensToCreateGovernance,
+            undefined,
+            { maximumFractionDigits: 2 }
+          ),
+    },
+    {
+      icon: <BeakerIcon />,
+      title: 'Use community voter weight add-in',
+      value: props.realmAuthority.config.useCommunityVoterWeightAddin ? (
+        <div className="flex gap-x-2">
+          Yes
+          <span className="text-white/50 flex-nowrap flex">
+            (
+            <Address
+              address={props.realmAuthority.config.useCommunityVoterWeightAddin}
+            />
+            )
+          </span>
+        </div>
+      ) : (
+        'No'
+      ),
+    },
+    {
+      icon: <BeakerIcon />,
+      title: 'Use max community voter weight add-in',
+      value: props.realmAuthority.config.useMaxCommunityVoterWeightAddin ? (
+        <div className="flex gap-x-2">
+          Yes
+          <span className="text-white/50 flex-nowrap flex">
+            (
+            <Address
+              address={
+                props.realmAuthority.config.useMaxCommunityVoterWeightAddin
+              }
+            />
+            )
+          </span>
+        </div>
+      ) : (
+        'No'
+      ),
+    },
+  ]
 
   return (
     <div className={props.className}>
       <div className="flex items-center justify-between">
-        <div className="text-xl text-fgd-1 font-bold">Configuration</div>
+        <div className="text-xl text-fgd-1 font-bold flex items-center space-x-2">
+          <CogIcon className="h-5 w-5" /> <span>DAO Rules</span>
+        </div>
         <Tooltip
           content={
             !canUseAuthorityInstruction
@@ -85,16 +124,13 @@ export default function Config(props: Props) {
             onClick={() => setEditRealmOpen(true)}
           >
             <PencilIcon className="h-4 w-4" />
-            <div>Change config</div>
+            <div>Edit Rules</div>
           </button>
         </Tooltip>
       </div>
       <div className="grid grid-cols-2 gap-8 mt-12">
-        {config.map(({ title, value }) => (
-          <div key={title}>
-            <div className="text-xs text-white/50">{title}</div>
-            <div className="mt-1 text-sm text-fgd-1">{value}</div>
-          </div>
+        {config.map(({ title, value, icon }) => (
+          <Section key={title} value={value} name={title} icon={icon} />
         ))}
       </div>
       {editRealmOpen && (

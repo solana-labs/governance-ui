@@ -39,7 +39,7 @@ function getTypes(
   ownTokenRecord?: ProgramAccount<TokenOwnerRecord>,
   proposal?: ProgramAccount<Proposal>,
   realm?: ProgramAccount<Realm>,
-  tokenType?: GoverningTokenRole
+  tokenRole?: GoverningTokenRole
 ) {
   const types: Type[] = []
 
@@ -48,7 +48,7 @@ function getTypes(
   if (
     currentPluginPk &&
     nftPluginsPks.includes(currentPluginPk.toBase58()) &&
-    tokenType === GoverningTokenRole.Community
+    tokenRole === GoverningTokenRole.Community
   ) {
     types.push(Type.NFT)
   } else if (
@@ -67,18 +67,18 @@ function getTypes(
     if (
       (!realm?.account.config.councilMint ||
         isDepositVisible(mint, realm?.account.communityMint)) &&
-      tokenType === GoverningTokenRole.Community
+      tokenRole === GoverningTokenRole.Community
     ) {
       types.push(Type.LockedCommunity)
     } else if (
       isDepositVisible(councilMint, realm?.account.config.councilMint) &&
-      tokenType === GoverningTokenRole.Council
+      tokenRole === GoverningTokenRole.Council
     ) {
       types.push(Type.LockedCouncil)
     }
-  } else if (tokenType === GoverningTokenRole.Council) {
+  } else if (tokenRole === GoverningTokenRole.Council) {
     types.push(Type.Council)
-  } else if (tokenType === GoverningTokenRole.Community) {
+  } else if (tokenRole === GoverningTokenRole.Community) {
     types.push(Type.Community)
   }
 
@@ -101,7 +101,7 @@ export default function VotingPower(props: Props) {
     realm,
   } = useRealm()
   const connected = useWalletStore((s) => s.connected)
-  const tokenType = useWalletStore((s) => s.selectedProposal.tokenType)
+  const tokenRole = useWalletStore((s) => s.selectedProposal.tokenRole)
 
   const types = getTypes(
     config,
@@ -112,7 +112,7 @@ export default function VotingPower(props: Props) {
     ownTokenRecord,
     proposal,
     realm,
-    tokenType
+    tokenRole
   )
 
   if (!connected || !proposal) {

@@ -11,7 +11,7 @@ import { BN } from '@project-serum/anchor'
 import { RpcContext } from '@solana/spl-governance'
 import {
   getMintMinAmountAsDecimal,
-  getMintNaturalAmountFromDecimalAsBN,
+  getMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
 import { precision } from '@utils/formatting'
 import tokenService from '@utils/services/token'
@@ -119,6 +119,20 @@ const SolendWithdraw = ({
       ]
 
       const relevantAccs = accounts
+        .filter((acc) => {
+          if (governedTokenAccount.isSol) {
+            return (
+              acc.extensions.token?.account.owner.toBase58() ===
+              governedTokenAccount.pubkey.toBase58()
+            )
+          } else {
+            return (
+              acc.extensions.token?.account.owner.toBase58() &&
+              acc.extensions.token.account.owner.toBase58() ===
+                governedTokenAccount.extensions.token?.account.owner.toBase58()
+            )
+          }
+        })
         .map((acc) => {
           const reserve = (proposedInvestment as SolendStrategy)?.reserves.find(
             (reserve) =>
@@ -213,9 +227,14 @@ const SolendWithdraw = ({
           ...form,
           bnAmount: form.max
             ? new BN(deposits[form.reserve.reserveAddress].amountExact)
-            : getMintNaturalAmountFromDecimalAsBN(
-                (form.amount as number) / cTokenExchangeRate(reserveStat[0]),
-                governedTokenAccount.extensions.mint!.account.decimals
+            : new BN(
+                Math.floor(
+                  getMintNaturalAmountFromDecimal(
+                    (form.amount as number) /
+                      cTokenExchangeRate(reserveStat[0]),
+                    governedTokenAccount.extensions.mint!.account.decimals
+                  )
+                ).toString()
               ),
           amountFmt: (
             (form.amount as number) / cTokenExchangeRate(reserveStat[0])
@@ -285,9 +304,6 @@ const SolendWithdraw = ({
             </div>
           </Select.Option>
         ))}
-        <Select.Option key={null} value={null}>
-          <div>Create new account</div>
-        </Select.Option>
       </Select>
       <div className="flex mb-1.5 text-sm">
         Amount

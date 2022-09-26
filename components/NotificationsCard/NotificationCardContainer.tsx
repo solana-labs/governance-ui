@@ -46,13 +46,7 @@ const NotificationCardContainer: React.FC<Props> = ({
     walletPublicKey: wallet?.publicKey?.toString() ?? '',
   })
 
-  const {
-    data,
-    isAuthenticated,
-    getConfiguration,
-    deleteAlert,
-    isInitialized,
-  } = notifiClient
+  const { data, getConfiguration, deleteAlert, isInitialized } = notifiClient
 
   const [email, setEmail] = useState<string>('')
   const [phoneNumber, setPhone] = useState<string>('')
@@ -87,7 +81,7 @@ const NotificationCardContainer: React.FC<Props> = ({
   }, [updateTelegramSupported])
 
   useEffect(() => {
-    if (isAuthenticated && connected && isInitialized) {
+    if (connected && isInitialized) {
       const targetGroup = firstOrNull(data?.targetGroups)
 
       if (targetGroup) {
@@ -101,22 +95,12 @@ const NotificationCardContainer: React.FC<Props> = ({
       }
     }
 
-    // Handles when the alerts.length is the same as sources
-    if (data?.alerts && data.alerts.length === data?.sources.length) {
+    if (data && data?.sources.length > 0) {
       if (email || phoneNumber || telegram) {
         setPreview(true)
       }
     }
-  }, [
-    connected,
-    data,
-    email,
-    isAuthenticated,
-    setPreview,
-    isInitialized,
-    phoneNumber,
-    telegram,
-  ])
+  }, [connected, data, email, setPreview, isInitialized, phoneNumber, telegram])
 
   const handleDelete = useCallback(
     async (source: Source) => {

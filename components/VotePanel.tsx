@@ -35,7 +35,7 @@ const VotePanel = () => {
     governance,
     proposal,
     voteRecordsByVoter,
-    tokenType,
+    tokenRole,
   } = useWalletStore((s) => s.selectedProposal)
   const {
     ownTokenRecord,
@@ -55,7 +55,7 @@ const VotePanel = () => {
 
   // Handle state based on if a delegated wallet has already voted or not
   const ownVoteRecord =
-    tokenType === GoverningTokenRole.Community && ownTokenRecord
+    tokenRole === GoverningTokenRole.Community && ownTokenRecord
       ? voteRecordsByVoter[
           ownTokenRecord.account.governingTokenOwner.toBase58()
         ]
@@ -66,7 +66,7 @@ const VotePanel = () => {
       : wallet?.publicKey && voteRecordsByVoter[wallet.publicKey.toBase58()]
 
   const voterTokenRecord =
-    tokenType === GoverningTokenRole.Community
+    tokenRole === GoverningTokenRole.Community
       ? ownTokenRecord
       : ownCouncilTokenRecord
 
@@ -156,7 +156,7 @@ const VotePanel = () => {
   const actionLabel =
     !isVoteCast || !connected
       ? `Cast your ${
-          tokenType === GoverningTokenRole.Community ? 'community' : 'council'
+          tokenRole === GoverningTokenRole.Community ? 'community' : 'council'
         } vote`
       : 'Your vote'
 

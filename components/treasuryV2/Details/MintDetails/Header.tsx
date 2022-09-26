@@ -45,15 +45,15 @@ export default function Header(props: Props) {
   const { fmtUrlWithCluster } = useQueryContext()
 
   const subheading =
-    props.mint.tokenType === 'community'
+    props.mint.tokenRole === 'community'
       ? 'Community Token Mint'
-      : props.mint.tokenType === 'council'
+      : props.mint.tokenRole === 'council'
       ? 'Council Token Mint'
       : ''
 
   let addNewMemberTooltip: string | undefined
 
-  if (props.mint.tokenType === 'council') {
+  if (props.mint.tokenRole === 'council') {
     if (!connected) {
       addNewMemberTooltip = 'Connect your wallet to add new council member'
     } else if (!canMintRealmCouncilToken()) {
@@ -99,7 +99,7 @@ export default function Header(props: Props) {
         <div>
           <div className="grid items-center grid-cols-[40px_1fr] gap-x-4">
             <div className="h-10 relative w-10">
-              {realmInfo?.ogImage && !!props.mint.tokenType ? (
+              {realmInfo?.ogImage && !!props.mint.tokenRole ? (
                 <img className="h-10 w-10" src={realmInfo.ogImage} />
               ) : (
                 <TokenIcon className="h-10 w-10 fill-fgd-1" />
@@ -111,7 +111,7 @@ export default function Header(props: Props) {
             <div className="overflow-hidden">
               <div className="text-white/50 text-sm">{subheading}</div>
               <div className="text-fgd-1 font-bold text-2xl whitespace-nowrap text-ellipsis overflow-hidden">
-                {props.mint.tokenType ? realmInfo?.displayName : 'Token Mint'}
+                {props.mint.tokenRole ? realmInfo?.displayName : 'Token Mint'}
               </div>
             </div>
           </div>
@@ -120,8 +120,8 @@ export default function Header(props: Props) {
         {props.mint.totalSupply && (
           <div className="pl-14">
             <div className="text-sm text-white/50 flex items-center space-x-1">
-              {props.mint.tokenType &&
-                (props.mint.tokenType === 'community' ? (
+              {props.mint.tokenRole &&
+                (props.mint.tokenRole === 'community' ? (
                   <CommunityMintIcon className="h-4 w-4 stroke-white/50" />
                 ) : (
                   <CouncilMintIcon className="h-4 w-4 stroke-white/50" />
@@ -143,7 +143,7 @@ export default function Header(props: Props) {
           disabled={!!addNewMemberTooltip}
           tooltipMessage={addNewMemberTooltip}
           onClick={() => {
-            if (props.mint.tokenType === 'council') {
+            if (props.mint.tokenRole === 'council') {
               setAddMemberModalOpen(true)
             } else {
               router.push(
@@ -156,7 +156,7 @@ export default function Header(props: Props) {
         >
           <div className="flex items-center justify-center">
             <PlusCircleIcon className="h-4 w-4 mr-1" />
-            {props.mint.tokenType === 'council' ? 'Add Member' : 'Mint Tokens'}
+            {props.mint.tokenRole === 'council' ? 'Add Member' : 'Mint Tokens'}
           </div>
         </SecondaryButton>
         <SecondaryButton

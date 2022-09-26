@@ -28,7 +28,7 @@ const Modal = ({
     <Portal>
       <div
         style={wrapperStyle}
-        className={`fixed inset-0 ${zIndex} overflow-y-auto`}
+        className={`fixed inset-0 ${zIndex} overflow-y-auto text-fgd-1`}
         aria-labelledby="modal-title"
         role="dialog"
         aria-modal="true"
