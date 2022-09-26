@@ -24,8 +24,10 @@ const SwitchboardPermissionCard = dynamic(
 
 const TokenBalanceCardWrapper = ({
   proposal,
+  inAccountDetails,
 }: {
   proposal?: Option<Proposal>
+  inAccountDetails?: boolean
 }) => {
   const {
     ownTokenRecord,
@@ -51,7 +53,11 @@ const TokenBalanceCardWrapper = ({
       (!ownTokenRecord ||
         ownTokenRecord.account.governingTokenDepositAmount.isZero())
     ) {
-      return <LockPluginTokenBalanceCard></LockPluginTokenBalanceCard>
+      return (
+        <LockPluginTokenBalanceCard
+          inAccountDetails={inAccountDetails}
+        ></LockPluginTokenBalanceCard>
+      )
     }
     if (
       isNftMode &&
@@ -65,7 +71,10 @@ const TokenBalanceCardWrapper = ({
             !ownCouncilTokenRecord?.account.governingTokenDepositAmount.isZero()) ||
             (councilTokenAccount &&
               !councilTokenAccount?.account.amount.isZero())) && (
-            <TokenBalanceCard proposal={proposal}></TokenBalanceCard>
+            <TokenBalanceCard
+              proposal={proposal}
+              inAccountDetails={inAccountDetails}
+            ></TokenBalanceCard>
           )}
         </>
       )
@@ -79,7 +88,7 @@ const TokenBalanceCardWrapper = ({
     }
     //Default
     return (
-      <TokenBalanceCard proposal={proposal}>
+      <TokenBalanceCard proposal={proposal} inAccountDetails={inAccountDetails}>
         {/*Add the gateway card if this is a gated DAO*/}
         {isGatewayMode && <GatewayCard></GatewayCard>}
       </TokenBalanceCard>
