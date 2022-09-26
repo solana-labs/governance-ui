@@ -100,9 +100,13 @@ export default async function createNFTRealm({
 
     existingCommunityMintPk,
     nftCollectionCount: collectionCount,
-    communityMintSupplyFactor: undefined,
     transferCommunityMintAuthority: false, // delay this until we have created NFT instructions
     communityYesVotePercentage,
+
+    // (useSupplyFactor = true && communityMintSupplyFactor = undefined) => FULL_SUPPLY_FRACTION
+    useSupplyFactor: true,
+    communityMintSupplyFactor: undefined,
+    communityAbsoluteMaxVoteWeight: undefined,
 
     createCouncil,
     existingCouncilMintPk,
