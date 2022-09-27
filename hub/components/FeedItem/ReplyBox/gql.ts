@@ -8,6 +8,11 @@ export const getUser = gql`
   query {
     me {
       publicKey
+      civicInfo {
+        avatarUrl
+        handle
+        isVerified
+      }
       twitterInfo {
         avatarUrl
         handle
