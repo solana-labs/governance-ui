@@ -61,7 +61,7 @@ export const CommunityTokenSchema = {
     .boolean()
     .oneOf(
       [true, false],
-      'You must specify what type of max vote weight source you want to use.'
+      'You must specify what type of max voter weight you want to use.'
     )
     .required('Required'),
   communityAbsoluteMaxVoteWeight: yup
@@ -250,8 +250,8 @@ export default function CommunityTokenForm({
           render={({ field: { ref, ...field } }) => (
             <div className="pt-3">
               <FormField
-                title="What type of Max Vote Weight Source do you want to use?"
-                description="This value determines the max vote weight used to determine the voting threshold."
+                title="What type of max voter weight do you want to use?"
+                description="This value determines the max voter weight used to calculate voting thresholds."
                 advancedOption
               >
                 <RadioGroup
@@ -272,8 +272,8 @@ export default function CommunityTokenForm({
             control={control}
             render={({ field, fieldState: { error } }) => (
               <FormField
-                title="Absolute Max Vote Weight"
-                description="This determines the votes needed to pass a proposal by calculating the vote threshold percentage."
+                title="Absolute max voter weight"
+                description="This option use the provided absolute value as max voter weight Irrespectively of the governance token supply."
                 advancedOption
                 className="mt-6"
               >
@@ -300,8 +300,8 @@ export default function CommunityTokenForm({
             control={control}
             render={({ field, fieldState: { error } }) => (
               <FormField
-                title="Circulation Supply Factor"
-                description="This determines the votes needed to pass a proposal by calculating the number of tokens in circulation (instead of using the total Mint supply)."
+                title="Circulating supply factor"
+                description="This option determines the max voter weight as a fraction of the total circulating supply of the governance token."
                 advancedOption
                 className="mt-6"
               >

@@ -1,4 +1,4 @@
-import Button from '@components/Button'
+import { SecondaryButton } from '@components/Button'
 import useRealm from '@hooks/useRealm'
 import { getUnrelinquishedVoteRecords } from '@models/api'
 import { BN } from '@project-serum/anchor'
@@ -180,7 +180,7 @@ const WithDrawCommunityTokens = () => {
     ? "You don't have any governance tokens to withdraw."
     : ''
   return (
-    <Button
+    <SecondaryButton
       tooltipMessage={withdrawTooltipContent}
       className="sm:w-1/2"
       disabled={
@@ -195,7 +195,7 @@ const WithDrawCommunityTokens = () => {
       onClick={withdrawAllTokens}
     >
       {isLoading ? <Loading></Loading> : 'Withdraw'}
-    </Button>
+    </SecondaryButton>
   )
 }
 

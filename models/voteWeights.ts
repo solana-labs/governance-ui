@@ -357,15 +357,34 @@ export class SwitchboardQueueVoteWeight implements VoterWeightInterface {
   }
   canCreateGovernanceUsingCommunityTokens(realm: ProgramAccount<Realm>) {
     return true
+    return this.hasMinCommunityWeight(
+      realm.account.config.minCommunityTokensToCreateGovernance
+    )
   }
   canCreateGovernanceUsingCouncilTokens() {
     return false
   }
   canCreateGovernance(realm: ProgramAccount<Realm>) {
     return true
+    return (
+      this.canCreateGovernanceUsingCommunityTokens(realm) ||
+      this.canCreateGovernanceUsingCouncilTokens()
+    )
   }
   hasMinAmountToVote(mintPk: PublicKey) {
     return true
+    const isCommunity =
+      this.communityTokenRecord?.account.governingTokenMint.toBase58() ===
+      mintPk.toBase58()
+    const isCouncil =
+      this.councilTokenRecord?.account.governingTokenMint.toBase58() ===
+      mintPk.toBase58()
+    if (isCouncil) {
+      return !this.councilTokenRecord?.account.governingTokenDepositAmount.isZero()
+    }
+    if (isCommunity) {
+      return !this.votingPower.isZero()
+    }
   }
 
   getTokenRecordToCreateProposal(_config: GovernanceConfig) {
