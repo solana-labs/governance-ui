@@ -43,6 +43,16 @@
     "sortRank": 3
   },
   {
+    "symbol": "MDLH",
+    "displayName": "The Mysterious Death of Lord Harrington",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "6Fiy6ZrCKBfcMieNq3S6qSzfpgRTYKn5zPW78VL9FwjL",
+    "ogImage": "/realms/MDLH/img/MDLH.png",
+    "bannerImage": "/realms/MDLH/img/banner.jpeg",
+    "sharedWalletId": "7ifeCFVFsxoQNfqiSBF9qFfHcNSQAyoQU63GV2RmJoUi",
+    "sortRank": 3
+  },
+  {
     "symbol": "PSY",
     "displayName": "Psy Finance",
     "programId": "GovHgfDPyQ1GwazJTDY2avSVY8GGcpmCapmmCsymRaGe",
