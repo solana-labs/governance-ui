@@ -45,7 +45,7 @@ export function HomeLayout(props: Props) {
             ? 'bg-neutral-200 animate-pulse'
             : props.error
             ? 'bg-neutral-200'
-            : 'bg-sky-400',
+            : 'bg-black',
         )}
         style={{
           backgroundImage: props.bannerUrl
