@@ -49,9 +49,13 @@ export default async function createMultisigWallet({
     tokensToGovernThreshold: undefined,
 
     existingCommunityMintPk: undefined,
-    communityMintSupplyFactor: undefined,
     transferCommunityMintAuthority: true,
     communityYesVotePercentage: councilYesVotePercentage,
+
+    // (useSupplyFactor = true && communityMintSupplyFactor = undefined) => FULL_SUPPLY_FRACTION
+    useSupplyFactor: true,
+    communityMintSupplyFactor: undefined,
+    communityAbsoluteMaxVoteWeight: undefined,
 
     createCouncil: true,
     existingCouncilMintPk: undefined,
