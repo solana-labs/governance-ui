@@ -152,7 +152,7 @@ function CommunityInfo({
           </SummaryModule>
         )}
         {communityAbsoluteMaxVoteWeight && (
-          <SummaryModule title="Absolute Max Vote Weight">
+          <SummaryModule title="Absolute max voter weight">
             <Text level="0" className="input-base">
               {communityAbsoluteMaxVoteWeight}
             </Text>
