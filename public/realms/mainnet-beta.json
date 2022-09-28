@@ -22,12 +22,14 @@
   },
   {
     "symbol": "Metaplex",
+    "bannerImage": "https://dao.metaplex.com/img/bg-metaplex.svg",
     "displayName": "Metaplex DAO",
     "programId": "AEauWRrpn9Cs6GXujzdp1YhMmv2288kBt3SdEcPYEerr",
     "realmId": "DA5G7QQbFioZ6K33wQcH8fVdgFcnaDjLD7DLQkapZg5X",
     "website": "https://www.metaplex.com/",
     "twitter": "@metaplex",
     "ogImage": "/realms/metaplex/img/black-circle.png",
+    "shortDescription": "Metaplex makes it easy to build your project in minutes and grow your community in the world’s largest NFT ecosystem.",
     "sortRank": 3
   },
   {
@@ -60,7 +62,8 @@
     "ogImage": "/realms/Dialect/img/avatar-dialect.png",
     "website": "https://www.dialect.to/",
     "twitter": "@saydialect",
-    "sortRank": 3
+    "sortRank": 3,
+    "shortDescription": "Dialect is the first protocol for smart messaging — dynamic, composable dapp notifications and wallet-to-wallet chat"
   },
   {
     "symbol": "MangoLiquidityDAO",
