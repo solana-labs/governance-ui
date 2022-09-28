@@ -273,7 +273,7 @@ export default function CommunityTokenForm({
             render={({ field, fieldState: { error } }) => (
               <FormField
                 title="Absolute Max Vote Weight"
-                description="This determines the votes needed to pass a proposal by calculating the vote threshold percentage."
+                description="This option use the provided absolute value as max voter weight Irrespectively of the governance token supply."
                 advancedOption
                 className="mt-6"
               >
