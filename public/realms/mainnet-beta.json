@@ -52,6 +52,17 @@
     "sortRank": 3
   },
   {
+    "symbol": "Dialect",
+    "displayName": "Dialect",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "7s5QZmpit4uu1y2bkByXerE2mv3XBHtiNQ4JkDdmKRiQ",
+    "bannerImage": "/realms/Dialect/img/banner-dialect.png",
+    "ogImage": "/realms/Dialect/img/avatar-dialect.png",
+    "website": "https://www.dialect.to/",
+    "twitter": "@saydialect",
+    "sortRank": 3
+  },
+  {
     "symbol": "MangoLiquidityDAO",
     "displayName": "Mango Liquidity Council",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
