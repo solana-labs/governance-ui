@@ -10,7 +10,6 @@ import { Asset, Token } from './Asset'
 export interface CommonRules {
   maxVotingTime: number
   minInstructionHoldupTime: number
-  voteTipping: VoteTipping
 }
 
 export interface Rules {
@@ -18,6 +17,7 @@ export interface Rules {
   minTokensToCreateProposal: BigNumber
   voteThresholdPercentage: number | 'disabled'
   vetoVoteThresholdPercentage: number | 'disabled'
+  voteTipping: VoteTipping
 }
 
 export interface Wallet {

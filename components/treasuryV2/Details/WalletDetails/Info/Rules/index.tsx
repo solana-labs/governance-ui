@@ -148,11 +148,16 @@ export default function Rules(props: Props) {
                     props.wallet.rules.common.minInstructionHoldupTime
                   )}
                 />
-                <Section
-                  icon={<HandIcon />}
-                  name="Vote Tipping"
-                  value={voteTippingText(props.wallet.rules.common.voteTipping)}
-                />
+                {/** Under versions < 3, vote tipping is just one field for both **/}
+                {programVersion <= 2 && (
+                  <Section
+                    icon={<HandIcon />}
+                    name="Vote Tipping"
+                    value={voteTippingText(
+                      props.wallet.rules.community!.voteTipping
+                    )}
+                  />
+                )}
                 {/** Under versions < 3, approval quorum is just one field for both **/}
                 {programVersion <= 2 && (
                   <Section
@@ -218,6 +223,13 @@ export default function Rules(props: Props) {
                             )
                       }
                     />
+                    {programVersion >= 3 && (
+                      <Section
+                        icon={<HandIcon />}
+                        name="Vote Tipping"
+                        value={voteTippingText(rules.voteTipping)}
+                      />
+                    )}
                     {/** Under versions < 3, approval quorum is just one field for both **/}
                     {programVersion >= 3 && (
                       <Section

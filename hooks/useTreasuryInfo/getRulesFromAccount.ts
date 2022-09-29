@@ -3,7 +3,6 @@ import { MintInfo } from '@solana/spl-token'
 
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { Wallet } from '@models/treasury/Wallet'
-import { VoteThresholdType } from '@solana/spl-governance'
 
 export function getRulesFromAccount(
   account: AssetAccount,
@@ -18,7 +17,6 @@ export function getRulesFromAccount(
     rules.common = {
       maxVotingTime: govConfig.maxVotingTime,
       minInstructionHoldupTime: govConfig.minInstructionHoldUpTime,
-      voteTipping: govConfig.communityVoteTipping,
     }
   }
 
@@ -28,6 +26,7 @@ export function getRulesFromAccount(
     !rules.community
   ) {
     rules.community = {
+      voteTipping: govConfig.communityVoteTipping,
       decimals: communityMint?.decimals,
       voteThresholdPercentage:
         govConfig.communityVoteThreshold.value ?? 'disabled',
@@ -45,6 +44,7 @@ export function getRulesFromAccount(
     !rules.council
   ) {
     rules.council = {
+      voteTipping: govConfig.councilVoteTipping,
       decimals: councilMint?.decimals,
       voteThresholdPercentage:
         govConfig.councilVoteThreshold.value ?? 'disabled',
