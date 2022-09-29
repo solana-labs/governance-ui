@@ -1,5 +1,8 @@
 import type { BigNumber } from 'bignumber.js'
-import type { MintMaxVoteWeightSource } from '@solana/spl-governance'
+import type {
+  GoverningTokenConfig,
+  MintMaxVoteWeightSource,
+} from '@solana/spl-governance'
 
 import type { AssetAccount } from '@utils/uiTypes/assets'
 
@@ -53,8 +56,8 @@ export interface RealmAuthority {
   config: {
     communityMintMaxVoteWeightSource?: MintMaxVoteWeightSource
     minCommunityTokensToCreateGovernance: BigNumber
-    useCommunityVoterWeightAddin?: PublicKey | false
-    useMaxCommunityVoterWeightAddin?: PublicKey | false
+    communityTokenConfig?: GoverningTokenConfig
+    councilTokenConfig?: GoverningTokenConfig
   }
   icon: JSX.Element
   name: string

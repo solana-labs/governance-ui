@@ -99,6 +99,7 @@
     "bignumber.js": "^9.0.2",
     "buffer-layout": "^1.2.2",
     "classnames": "^2.3.1",
+    "clsx": "^1.2.1",
     "d3": "^7.4.4",
     "date-fns": "^2.29.2",
     "dayjs": "^1.11.1",

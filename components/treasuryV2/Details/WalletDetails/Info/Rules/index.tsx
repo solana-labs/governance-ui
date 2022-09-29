@@ -194,7 +194,15 @@ export default function Rules(props: Props) {
                       {govpop === 'community' ? 'Community' : 'Council'} Rules
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 gap-8">
+                  <div
+                    className={
+                      'grid grid-cols-1 gap-8 ' +
+                      (props.wallet.rules.community &&
+                      props.wallet.rules.council
+                        ? 'grid-cols-1'
+                        : 'grid-cols-2')
+                    }
+                  >
                     <Section
                       icon={<TokenIcon />}
                       name="Min Governance Power to Create a Proposal"
