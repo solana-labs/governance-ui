@@ -8,6 +8,7 @@ import {
   CogIcon,
   UserGroupIcon,
   OfficeBuildingIcon,
+  QuestionMarkCircleIcon,
 } from '@heroicons/react/outline'
 import { BigNumber } from 'bignumber.js'
 
@@ -22,6 +23,7 @@ import Section from '../Section'
 import Address from '@components/Address'
 import useProgramVersion from '@hooks/useProgramVersion'
 import clsx from 'clsx'
+import TokenIcon from '@components/treasuryV2/icons/TokenIcon'
 
 const DISABLED = new BigNumber(DISABLED_VOTER_WEIGHT.toString())
 
@@ -70,6 +72,31 @@ export default function Config(props: Props) {
           </button>
         </Tooltip>
       </div>
+      <div className={clsx('grid gap-8 mt-12 grid-cols-2')}>
+        {props.realmAuthority.config.communityMintMaxVoteWeightSource && (
+          <Section
+            icon={<ScaleIcon />}
+            name="Community mint max vote weight source"
+            value={props.realmAuthority.config.communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}
+          />
+        )}
+        <Section
+          name="Min community tokens to create governance"
+          icon={<DocumentAddIcon />}
+          value={
+            DISABLED.shiftedBy(-(mint ? mint.decimals : 0)).isLessThanOrEqualTo(
+              props.realmAuthority.config.minCommunityTokensToCreateGovernance
+            )
+              ? 'Disabled'
+              : formatNumber(
+                  props.realmAuthority.config
+                    .minCommunityTokensToCreateGovernance,
+                  undefined,
+                  { maximumFractionDigits: 2 }
+                )
+          }
+        />
+      </div>
       <div
         className={clsx(
           'grid gap-8 mt-12',
@@ -90,32 +117,18 @@ export default function Config(props: Props) {
               councilRulesSupported ? 'grid-cols-1' : 'grid-cols-2'
             )}
           >
-            {props.realmAuthority.config.communityMintMaxVoteWeightSource && (
+            {programVersion >= 3 && (
               <Section
-                icon={<ScaleIcon />}
-                name="Community mint max vote weight source"
-                value={props.realmAuthority.config.communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}
+                icon={<TokenIcon />}
+                name={'Token type'}
+                value={
+                  { 0: 'Liquid', 1: 'Membership', 2: 'Disabled' }[
+                    props.realmAuthority.config.communityTokenConfig!.tokenType
+                  ]
+                }
               />
             )}
-            <Section
-              name="Min community tokens to create governance"
-              icon={<DocumentAddIcon />}
-              value={
-                DISABLED.shiftedBy(
-                  -(mint ? mint.decimals : 0)
-                ).isLessThanOrEqualTo(
-                  props.realmAuthority.config
-                    .minCommunityTokensToCreateGovernance
-                )
-                  ? 'Disabled'
-                  : formatNumber(
-                      props.realmAuthority.config
-                        .minCommunityTokensToCreateGovernance,
-                      undefined,
-                      { maximumFractionDigits: 2 }
-                    )
-              }
-            />
+
             <Section
               icon={<BeakerIcon />}
               name={'Use community voter weight add-in'}
@@ -173,6 +186,15 @@ export default function Config(props: Props) {
               <div className="font-bold">Council Rules</div>
             </div>
             <div className="grid grid-cols-1 gap-8">
+              <Section
+                icon={<TokenIcon />}
+                name={'Token type'}
+                value={
+                  { 0: 'Liquid', 1: 'Membership', 2: 'Disabled' }[
+                    props.realmAuthority.config.councilTokenConfig!.tokenType
+                  ]
+                }
+              />
               <Section
                 icon={<BeakerIcon />}
                 name={'Use council voter weight add-in'}
