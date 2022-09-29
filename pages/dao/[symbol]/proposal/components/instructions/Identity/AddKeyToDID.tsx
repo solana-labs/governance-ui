@@ -58,7 +58,7 @@ const AddKeyToDID = ({
 
     if (
       isValid &&
-      form!.governedAccount?.governance?.account &&
+      form!.governedAccount?.governance?.pubkey &&
       connection?.current
     ) {
       const service = DidSolService.build(DidSolIdentifier.parse(form!.did), {
@@ -74,7 +74,7 @@ const AddKeyToDID = ({
           // TODO support eth keys too
           methodType: VerificationMethodType.Ed25519VerificationKey2018,
         })
-        .withAutomaticAlloc(form!.governedAccount.pubkey)
+        .withAutomaticAlloc(form!.governedAccount.governance.pubkey)
         .instructions()
 
       serializedInstructions = addKeyIxs.map(serializeInstructionToBase64)

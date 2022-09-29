@@ -130,7 +130,7 @@ export const instructionInputs: Record<string, InstructionInput> = {
 export const governedAccountToWallet = (
   governedAccount: AssetAccount
 ): Wallet => ({
-  publicKey: governedAccount.pubkey,
+  publicKey: governedAccount.governance.pubkey,
   // noop signers, as we use this just to pass the public key
   signTransaction: async (tx) => tx,
   signAllTransactions: async (txs) => txs,

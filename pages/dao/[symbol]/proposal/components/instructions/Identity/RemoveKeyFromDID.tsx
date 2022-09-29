@@ -61,7 +61,7 @@ const RemoveKeyFromDID = ({
 
       const removeKeyIxs = await service
         .removeVerificationMethod(form!.alias)
-        .withAutomaticAlloc(form!.governedAccount.pubkey)
+        .withAutomaticAlloc(form!.governedAccount.governance.pubkey)
         .instructions()
 
       serializedInstructions = removeKeyIxs.map(serializeInstructionToBase64)
