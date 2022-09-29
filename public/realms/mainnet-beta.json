@@ -1039,13 +1039,13 @@
     "website": "https://eleusance.io/",
     "twitter": "@eleusanceIO"
   },
-   {
+  {
     "symbol": "J-JFI",
     "displayName": "Jungle DeFi Community DAO",
     "programId": "jdaoDN37BrVRvxuXSeyR7xE5Z9CAoQApexGrQJbnj6V",
     "realmId": "5g94Ver64ruf9CGBL3k2oQGdKCUt4QKjN7NQojSrHAwH",
     "ogImage": "/realms/jungle-defi/jungle.png",
     "website": "https://jungledefi.io",
-    "twitter": "@jungledefi",
-  },
+    "twitter": "@jungledefi"
+  }
 ]
