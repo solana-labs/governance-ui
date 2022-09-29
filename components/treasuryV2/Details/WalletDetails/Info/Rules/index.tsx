@@ -170,78 +170,75 @@ export default function Rules(props: Props) {
               </div>
             </div>
           )}
-          {
-            <div
-              className={
-                'mt-12 grid gap-x-8 ' +
-                (props.wallet.rules.community && props.wallet.rules.council
-                  ? 'grid-cols-2'
-                  : 'grid-cols-1')
-              }
-            >
-              {(['community', 'council'] as const).map((govpop) => {
-                const rules = props.wallet.rules[govpop]
-                if (!rules) return null
-                return (
-                  <div key={govpop} className="border-t border-white/10 pt-6">
-                    <div className="flex items-center space-x-2 text-fgd-1 mb-4">
-                      {govpop === 'community' ? (
-                        <UserGroupIcon className="h-5 w-5" />
-                      ) : (
-                        <OfficeBuildingIcon className="h-5 w-5" />
-                      )}
-                      <div className="font-bold">
-                        {govpop === 'community' ? 'Community' : 'Council'} Rules
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-1 gap-8">
-                      <Section
-                        icon={<TokenIcon />}
-                        name="Min Governance Power to Create a Proposal"
-                        value={
-                          new BigNumber(DISABLED_VOTER_WEIGHT.toString())
-                            .shiftedBy(-(rules.decimals || 0))
-                            .isLessThanOrEqualTo(
-                              rules.minTokensToCreateProposal
-                            )
-                            ? 'Disabled'
-                            : formatNumber(
-                                rules.minTokensToCreateProposal,
-                                undefined,
-                                { maximumFractionDigits: 0 }
-                              )
-                        }
-                      />
-                      {/** Under versions < 3, approval quorum is just one field for both **/}
-                      {programVersion >= 3 && (
-                        <Section
-                          icon={<ScaleIcon />}
-                          name="Approval Quorum"
-                          value={
-                            rules.voteThresholdPercentage !== 'disabled'
-                              ? rules?.voteThresholdPercentage + '%'
-                              : 'Disabled'
-                          }
-                        />
-                      )}
-                      {/** Under versions < 3, vetos dont exist **/}
-                      {programVersion >= 3 && (
-                        <Section
-                          icon={<ScaleIcon />}
-                          name="Veto Quorum"
-                          value={
-                            rules.vetoVoteThresholdPercentage !== 'disabled'
-                              ? rules.vetoVoteThresholdPercentage + '%'
-                              : 'Disabled'
-                          }
-                        />
-                      )}
+
+          <div
+            className={
+              'mt-12 grid gap-x-8 ' +
+              (props.wallet.rules.community && props.wallet.rules.council
+                ? 'grid-cols-2'
+                : 'grid-cols-1')
+            }
+          >
+            {(['community', 'council'] as const).map((govpop) => {
+              const rules = props.wallet.rules[govpop]
+              if (!rules) return null
+              return (
+                <div key={govpop} className="border-t border-white/10 pt-6">
+                  <div className="flex items-center space-x-2 text-fgd-1 mb-4">
+                    {govpop === 'community' ? (
+                      <UserGroupIcon className="h-5 w-5" />
+                    ) : (
+                      <OfficeBuildingIcon className="h-5 w-5" />
+                    )}
+                    <div className="font-bold">
+                      {govpop === 'community' ? 'Community' : 'Council'} Rules
                     </div>
                   </div>
-                )
-              })}
-            </div>
-          }
+                  <div className="grid grid-cols-1 gap-8">
+                    <Section
+                      icon={<TokenIcon />}
+                      name="Min Governance Power to Create a Proposal"
+                      value={
+                        new BigNumber(DISABLED_VOTER_WEIGHT.toString())
+                          .shiftedBy(-(rules.decimals || 0))
+                          .isLessThanOrEqualTo(rules.minTokensToCreateProposal)
+                          ? 'Disabled'
+                          : formatNumber(
+                              rules.minTokensToCreateProposal,
+                              undefined,
+                              { maximumFractionDigits: 0 }
+                            )
+                      }
+                    />
+                    {/** Under versions < 3, approval quorum is just one field for both **/}
+                    {programVersion >= 3 && (
+                      <Section
+                        icon={<ScaleIcon />}
+                        name="Approval Quorum"
+                        value={
+                          rules.voteThresholdPercentage !== 'disabled'
+                            ? rules?.voteThresholdPercentage + '%'
+                            : 'Disabled'
+                        }
+                      />
+                    )}
+                    {/** Under versions < 3, vetos dont exist **/}
+                    {programVersion >= 3 && (
+                      <Section
+                        icon={<ScaleIcon />}
+                        name="Veto Quorum"
+                        value={
+                          rules.vetoVoteThresholdPercentage !== 'disabled'
+                            ? rules.vetoVoteThresholdPercentage + '%'
+                            : 'Disabled'
+                        }
+                      />
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         </div>
       ) : (
         <div>This Wallet has no rules</div>
