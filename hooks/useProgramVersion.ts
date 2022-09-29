@@ -1,10 +1,14 @@
+import {
+  V2_DEFAULT_GOVERNANCE_PROGRAM_ID,
+  V3_DEFAULT_GOVERNANCE_PROGRAM_ID,
+} from '@components/instructions/tools'
 import { useRouter } from 'next/router'
 import useWalletStore from 'stores/useWalletStore'
 
 const CACHE = {
-  '7e75Nwsz8i5i4NiDa43CNzKJ4AeQGyRimha46VKTM1Ls': 3,
+  [V3_DEFAULT_GOVERNANCE_PROGRAM_ID]: 3,
   GTesTBiEWE32WHXXE2S4XbZvA5CrEc4xs6ZgRe895dP: 2,
-  GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw: 2,
+  [V2_DEFAULT_GOVERNANCE_PROGRAM_ID]: 2,
 } as const
 
 const useProgramVersion = () => {
