@@ -1038,5 +1038,13 @@
     "ogImage": "/realms/eleusance/eleusance_logo_spl.png",
     "website": "https://eleusance.io/",
     "twitter": "@eleusanceIO"
-  }
-]
+  },
+  {
+    "symbol": "ACRW",
+    "displayName": "The Accrew DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "3rrQ9NjxiNExfaoCuvDEabww6ViYzYeNXgu9tufvCoQR",
+    "website": "https://www.accrewmoney.com/",
+    "keywords": "Accrew DAO, The Accrew DAO, Accrew, Member-Owned Mobile Bank, Fintech, ACRW, Mobile App, crypto",
+    "twitter": "@AccrewApp",
+    "ogImage": "/realms/Accrew DAO Governance UI/Accrew Graphic Only Gradient.png" 
