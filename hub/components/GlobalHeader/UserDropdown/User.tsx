@@ -21,9 +21,10 @@ export function User(props: Props) {
   const [, setJwt] = useJWT();
   const { wallet } = useWallet();
 
-  const username = props.user.twitterInfo?.handle
-    ? props.user.twitterInfo.handle
-    : abbreviateAddress(props.user.publicKey);
+  const username =
+    props.user.civicInfo?.handle ||
+    props.user.twitterInfo?.handle ||
+    abbreviateAddress(props.user.publicKey);
 
   return (
     <NavigationMenu.Item>
@@ -32,11 +33,12 @@ export function User(props: Props) {
           props.className,
           'cursor-pointer',
           'flex',
+          'gap-x-1',
           'items-center',
-          'justify-center',
+          'justify-between',
           'py-2',
+          'px-3',
           'rounded',
-          'space-x-2',
           'text-neutral-900',
           'transition-colors',
           'w-48',
@@ -44,9 +46,11 @@ export function User(props: Props) {
           'hover:bg-neutral-200',
         )}
       >
-        <AuthorAvatar author={props.user} className="h-6 w-6 text-xs" />
-        <div>{username}</div>
-        <ChevronDownIcon className="h-4 w-4 fill-neutral-900" />
+        <div className="flex items-center space-x-2 flex-shrink truncate">
+          <AuthorAvatar author={props.user} className="h-6 w-6 text-xs" />
+          <div className="truncate flex-shrink">{username}</div>
+        </div>
+        <ChevronDownIcon className="h-4 w-4 fill-neutral-900 flex-shrink-0" />
       </NavigationMenu.Trigger>
       <NavigationMenu.Content
         className={cx(

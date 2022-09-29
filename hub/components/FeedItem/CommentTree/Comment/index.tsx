@@ -31,7 +31,8 @@ export function Content(props: Props) {
   );
 
   const authorName = props.comment.author
-    ? props.comment.author.twitterInfo?.handle ||
+    ? props.comment.author.civicInfo?.handle ||
+      props.comment.author.twitterInfo?.handle ||
       abbreviateAddress(props.comment.author.publicKey)
     : 'unknown author';
 

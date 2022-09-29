@@ -22,12 +22,14 @@
   },
   {
     "symbol": "Metaplex",
+    "bannerImage": "https://dao.metaplex.com/img/bg-metaplex.svg",
     "displayName": "Metaplex DAO",
     "programId": "AEauWRrpn9Cs6GXujzdp1YhMmv2288kBt3SdEcPYEerr",
     "realmId": "DA5G7QQbFioZ6K33wQcH8fVdgFcnaDjLD7DLQkapZg5X",
     "website": "https://www.metaplex.com/",
     "twitter": "@metaplex",
     "ogImage": "/realms/metaplex/img/black-circle.png",
+    "shortDescription": "Metaplex makes it easy to build your project in minutes and grow your community in the world’s largest NFT ecosystem.",
     "sortRank": 3
   },
   {
@@ -41,6 +43,16 @@
     "sortRank": 3
   },
   {
+    "symbol": "MDLH",
+    "displayName": "The Mysterious Death of Lord Harrington",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "6Fiy6ZrCKBfcMieNq3S6qSzfpgRTYKn5zPW78VL9FwjL",
+    "ogImage": "/realms/MDLH/img/MDLH.png",
+    "bannerImage": "/realms/MDLH/img/banner.jpeg",
+    "sharedWalletId": "7ifeCFVFsxoQNfqiSBF9qFfHcNSQAyoQU63GV2RmJoUi",
+    "sortRank": 3
+  },
+  {
     "symbol": "PSY",
     "displayName": "Psy Finance",
     "programId": "GovHgfDPyQ1GwazJTDY2avSVY8GGcpmCapmmCsymRaGe",
@@ -50,6 +62,18 @@
     "twitter": "@PsyOptions",
     "ogImage": "https://user-images.githubusercontent.com/32071703/149460918-3694084f-2a37-4c95-93d3-b5aaf078d444.png",
     "sortRank": 3
+  },
+  {
+    "symbol": "Dialect",
+    "displayName": "Dialect",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "7s5QZmpit4uu1y2bkByXerE2mv3XBHtiNQ4JkDdmKRiQ",
+    "bannerImage": "/realms/Dialect/img/banner-dialect.png",
+    "ogImage": "/realms/Dialect/img/avatar-dialect.png",
+    "website": "https://www.dialect.to/",
+    "twitter": "@saydialect",
+    "sortRank": 3,
+    "shortDescription": "Dialect is the first protocol for smart messaging — dynamic, composable dapp notifications and wallet-to-wallet chat"
   },
   {
     "symbol": "MangoLiquidityDAO",

@@ -24,16 +24,8 @@ interface Props extends BaseProps {
 }
 
 export function Content(props: Props) {
-  const description =
-    props.description ||
-    (props.realm.toBase58() === 'DA5G7QQbFioZ6K33wQcH8fVdgFcnaDjLD7DLQkapZg5X'
-      ? 'Metaplex makes it easy to build your project in minutes and grow your community in the world’s largest NFT ecosystem.'
-      : 'No description available.');
-
-  const iconUrl =
-    props.realm.toBase58() === 'DA5G7QQbFioZ6K33wQcH8fVdgFcnaDjLD7DLQkapZg5X'
-      ? '/realms/metaplex/img/black-circle.png'
-      : props.iconUrl;
+  const description = props.description || 'No description available.';
+  const iconUrl = props.iconUrl;
 
   return (
     <div className={cx(props.className, 'h-full', 'relative')}>
