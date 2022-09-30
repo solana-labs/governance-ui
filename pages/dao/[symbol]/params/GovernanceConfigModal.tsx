@@ -22,6 +22,7 @@ import { useState } from 'react'
 import Button from '@components/Button'
 import BaseGovernanceForm, {
   BaseGovernanceFormFieldsV2,
+  BaseGovernanceFormFieldsV3,
 } from '@components/AssetsList/BaseGovernanceForm'
 import { getGovernanceConfig } from '@utils/GovernanceTools'
 import {
@@ -32,7 +33,10 @@ import { abbreviateAddress } from '@utils/formatting'
 import * as yup from 'yup'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 
-interface GovernanceConfigForm extends BaseGovernanceFormFieldsV2 {
+type GovernanceConfigForm = (
+  | BaseGovernanceFormFieldsV2
+  | BaseGovernanceFormFieldsV3
+) & {
   title: string
   description: string
 }
@@ -57,6 +61,7 @@ const GovernanceConfigModal = ({
   const [creatingProposal, setCreatingProposal] = useState(false)
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [form, setForm] = useState<GovernanceConfigForm>({
+    _programVersion: 2,
     title: '',
     description: '',
     minCommunityTokensToCreateProposal: mint
@@ -84,14 +89,26 @@ const GovernanceConfigModal = ({
     let serializedInstruction = ''
     if (isValid && governance?.account && wallet?.publicKey && realm) {
       setCreatingProposal(true)
-      const governanceConfigValues = {
-        minTokensToCreateProposal: form!.minCommunityTokensToCreateProposal,
-        minInstructionHoldUpTime: form!.minInstructionHoldUpTime,
-        maxVotingTime: form!.maxVotingTime,
-        voteThresholdPercentage: form!.voteThreshold,
-        mintDecimals: mint!.decimals,
-        voteTipping: form.voteTipping,
+      const governanceConfigValues =
+        form._programVersion == 2
+          ? ({
+              _programVersion: 2,
+              minTokensToCreateProposal: form!
+                .minCommunityTokensToCreateProposal,
+              minInstructionHoldUpTime: form!.minInstructionHoldUpTime,
+              maxVotingTime: form!.maxVotingTime,
+              voteThresholdPercentage: form!.voteThreshold,
+              mintDecimals: mint!.decimals,
+              voteTipping: form.voteTipping,
+            } as const)
+          : ({
+              ...form,
+            } as const)
+      //TODO
+      if (governanceConfigValues._programVersion === 3) {
+        throw new Error('V3 not implemented')
       }
+
       const governanceConfig = getGovernanceConfig(
         realmInfo?.programVersion!,
         governanceConfigValues

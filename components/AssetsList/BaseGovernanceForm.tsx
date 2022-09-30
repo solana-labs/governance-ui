@@ -17,6 +17,7 @@ import BigNumber from 'bignumber.js'
 import React, { useEffect, useState } from 'react'
 
 export interface BaseGovernanceFormFieldsV2 {
+  _programVersion: 2
   minCommunityTokensToCreateProposal: number | string
   minInstructionHoldUpTime: number
   maxVotingTime: number
@@ -25,6 +26,7 @@ export interface BaseGovernanceFormFieldsV2 {
 }
 
 export interface BaseGovernanceFormFieldsV3 {
+  _programVersion: 3
   communityVoteThreshold: number
   minCommunityTokensToCreateProposal: number
   minInstructionHoldUpTime: number

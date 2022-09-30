@@ -37,13 +37,15 @@ interface NewTreasuryAccountForm extends BaseGovernanceFormFieldsV2 {
   mintAddress: string
 }
 const defaultFormValues = {
+  // TODO support v3
+  _programVersion: 2,
   mintAddress: '',
   minCommunityTokensToCreateProposal: MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
   minInstructionHoldUpTime: 0,
   maxVotingTime: 3,
   voteThreshold: 60,
   voteTipping: VoteTipping.Strict,
-}
+} as const
 
 const SOL = 'SOL'
 const OTHER = 'OTHER'

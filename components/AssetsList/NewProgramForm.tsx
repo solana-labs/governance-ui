@@ -37,12 +37,15 @@ const defaultFormValues = {
   // This should be dynamic and set to 1% of the community mint supply or
   // MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY when supply is 0
   minCommunityTokensToCreateProposal: MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
+  // TODO support v3
+  _programVersion: 2,
   minInstructionHoldUpTime: 0,
   maxVotingTime: 3,
   voteThreshold: 60,
   transferAuthority: true,
   voteTipping: VoteTipping.Strict,
-}
+} as const
+
 const NewProgramForm = () => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
