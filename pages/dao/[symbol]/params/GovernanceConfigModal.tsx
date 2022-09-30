@@ -21,7 +21,7 @@ import useRealm from '@hooks/useRealm'
 import { useState } from 'react'
 import Button from '@components/Button'
 import BaseGovernanceForm, {
-  BaseGovernanceFormFields,
+  BaseGovernanceFormFieldsV2,
 } from '@components/AssetsList/BaseGovernanceForm'
 import { getGovernanceConfig } from '@utils/GovernanceTools'
 import {
@@ -32,7 +32,7 @@ import { abbreviateAddress } from '@utils/formatting'
 import * as yup from 'yup'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 
-interface GovernanceConfigForm extends BaseGovernanceFormFields {
+interface GovernanceConfigForm extends BaseGovernanceFormFieldsV2 {
   title: string
   description: string
 }

@@ -16,7 +16,7 @@ import React, { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import * as yup from 'yup'
 import BaseGovernanceForm, {
-  BaseGovernanceFormFields,
+  BaseGovernanceFormFieldsV2,
 } from './BaseGovernanceForm'
 import { registerProgramGovernance } from 'actions/registerProgramGovernance'
 import { GovernanceType } from '@solana/spl-governance'
@@ -26,7 +26,7 @@ import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { getMintDecimalAmount } from '@tools/sdk/units'
-interface NewProgramForm extends BaseGovernanceFormFields {
+interface NewProgramForm extends BaseGovernanceFormFieldsV2 {
   programId: string
   transferAuthority: boolean
 }

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import BaseGovernanceForm, {
-  BaseGovernanceFormFields,
+  BaseGovernanceFormFieldsV2,
 } from 'components/AssetsList/BaseGovernanceForm'
 import Button from 'components/Button'
 import Input from 'components/inputs/Input'
@@ -33,7 +33,7 @@ import { TokenInfo } from '@solana/spl-token-registry'
 import Select from '@components/inputs/Select'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { getMintDecimalAmount } from '@tools/sdk/units'
-interface NewTreasuryAccountForm extends BaseGovernanceFormFields {
+interface NewTreasuryAccountForm extends BaseGovernanceFormFieldsV2 {
   mintAddress: string
 }
 const defaultFormValues = {

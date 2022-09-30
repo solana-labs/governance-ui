@@ -16,12 +16,25 @@ import {
 import BigNumber from 'bignumber.js'
 import React, { useEffect, useState } from 'react'
 
-export interface BaseGovernanceFormFields {
+export interface BaseGovernanceFormFieldsV2 {
   minCommunityTokensToCreateProposal: number | string
   minInstructionHoldUpTime: number
   maxVotingTime: number
   voteThreshold: number
   voteTipping: VoteTipping
+}
+
+export interface BaseGovernanceFormFieldsV3 {
+  communityVoteThreshold: number
+  minCommunityTokensToCreateProposal: number
+  minInstructionHoldUpTime: number
+  maxVotingTime: number
+  communityVoteTipping: VoteTipping
+  minCouncilTokensToCreateProposal: number
+  councilVoteThreshold: number
+  councilVetoVoteThreshold: number
+  communityVetoVoteThreshold: number
+  councilVoteTipping: VoteTipping
 }
 
 const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
