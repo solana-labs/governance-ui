@@ -1,5 +1,6 @@
 import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
 import * as anchor from '@project-serum/anchor'
+import { findProgramAddressSync } from '@project-serum/anchor/dist/cjs/utils/pubkey'
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import {
   Connection,
@@ -18,7 +19,6 @@ import { MintAccount, tryGetMint } from '@utils/tokens'
 import produce from 'immer'
 import create, { State } from 'zustand'
 import IDL from '../idls/serum_gov.json'
-import { findProgramAddressSync } from '@project-serum/anchor/dist/cjs/utils/pubkey'
 
 export type ClaimTicketType = {
   address: PublicKey
@@ -71,13 +71,13 @@ export type VestAccountType = {
   gsrmBurned: anchor.BN
 }
 
-const PROGRAM_ID = new PublicKey('GmsZzX2UTWrpjMnEBHDkrSNADCSfHfr8sTjVGKHFYTaW')
+const PROGRAM_ID = new PublicKey('3Xqru7FkP2BACJgxtPTP34HpbQkSkgjFPViuwTv98Lg3')
 
 export const SRM_MINT = new PublicKey(
-  'EJUJgLnqdeCaUJ6vmTeTCEcyPFX3GD91D3yoM8cNEqzK'
+  '9C6YDzG8EjttWMsH7cyDp3aRJG5j4Uti5SMV46f53GYP'
 )
 export const MSRM_MINT = new PublicKey(
-  'C3MnUAQYh8Qg6FiTD1x13EsJrFSz1QzuuhzFfhvMjpG7'
+  '4yLDuw3yYC3ncVzthLesTb6ALJsdTzLabcESo3Kvup79'
 )
 export const [GSRM_MINT] = findProgramAddressSync(
   [Buffer.from('gSRM')],
@@ -204,6 +204,12 @@ interface SerumGovStore extends State {
       isMsrm: boolean,
       owner?: WalletSigner | null
     ) => Promise<void>
+    getDepositLockedInstruction: (
+      owner: PublicKey,
+      amount: anchor.BN,
+      isMsrm: boolean,
+      provider: anchor.AnchorProvider
+    ) => Promise<TransactionInstruction>
   }
 }
 
@@ -1084,6 +1090,101 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
       }
 
       return ix
+    },
+
+    async getDepositLockedInstruction(
+      owner: PublicKey,
+      amount: anchor.BN,
+      isMsrm: boolean,
+      provider: anchor.AnchorProvider
+    ) {
+      const program = new anchor.Program(
+        IDL as anchor.Idl,
+        get().programId,
+        provider
+      )
+
+      const userAccount = await get().actions.getUserAccount(provider, owner)
+
+      const [userAccountAddress] = findProgramAddressSync(
+        [Buffer.from('user'), owner.toBuffer()],
+        get().programId
+      )
+
+      const ownerAta = await getAssociatedTokenAddress(
+        !isMsrm ? SRM_MINT : MSRM_MINT,
+        owner,
+        true
+      )
+      const [vault] = findProgramAddressSync(
+        [
+          Buffer.from('vault'),
+          !isMsrm ? SRM_MINT.toBuffer() : MSRM_MINT.toBuffer(),
+        ],
+        program.programId
+      )
+
+      const [lockedAccount] = findProgramAddressSync(
+        [
+          Buffer.from('locked_account'),
+          owner.toBuffer(),
+          new anchor.BN(userAccount ? userAccount.lockIndex : 0).toArrayLike(
+            Buffer,
+            'le',
+            8
+          ),
+        ],
+        program.programId
+      )
+
+      const [claimTicket] = findProgramAddressSync(
+        [Buffer.from('claim_ticket'), lockedAccount.toBuffer()],
+        program.programId
+      )
+
+      if (!isMsrm) {
+        const ix = await program.methods
+          .depositLockedSrm(amount)
+          .accounts({
+            payer: owner,
+            owner: owner,
+            ownerUserAccount: userAccount
+              ? userAccount.address
+              : userAccountAddress,
+            srmMint: SRM_MINT,
+            payerSrmAccount: ownerAta,
+            authority: get().authority,
+            srmVault: vault,
+            lockedAccount,
+            claimTicket,
+            clock: SYSVAR_CLOCK_PUBKEY,
+            tokenProgram: TOKEN_PROGRAM_ID,
+            systemProgram: SystemProgram.programId,
+          })
+          .instruction()
+        return ix
+      } else {
+        const ix = await program.methods
+          .depositLockedMsrm(amount)
+          .accounts({
+            payer: owner,
+            owner: owner,
+            ownerUserAccount: userAccount
+              ? userAccount.address
+              : userAccountAddress,
+            msrmMint: MSRM_MINT,
+            payerMsrmAccount: ownerAta,
+            authority: get().authority,
+            msrmVault: vault,
+            lockedAccount,
+            claimTicket,
+            clock: SYSVAR_CLOCK_PUBKEY,
+            tokenProgram: TOKEN_PROGRAM_ID,
+            systemProgram: SystemProgram.programId,
+          })
+          .instruction()
+        return ix
+      }
     },
 
     async depositLocked(

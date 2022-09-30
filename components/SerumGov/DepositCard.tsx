@@ -11,14 +11,34 @@ import useSerumGovStore, {
 } from 'stores/useSerumGovStore'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { notify } from '@utils/notifications'
-import { parseMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
+import {
+  fmtBnMintDecimals,
+  parseMintNaturalAmountFromDecimalAsBN,
+} from '@tools/sdk/units'
 import { useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import Loading from '@components/Loading'
+import {
+  getInstructionDataFromBase64,
+  Governance,
+  ProgramAccount,
+  serializeInstructionToBase64,
+} from '@solana/spl-governance'
+import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
+import useCreateProposal from '@hooks/useCreateProposal'
+import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
+import { simulateTransaction } from '@utils/send'
+import useQueryContext from '@hooks/useQueryContext'
+import useRealm from '@hooks/useRealm'
+import { useRouter } from 'next/router'
 
 type DepositCardProps = {
   mint: 'SRM' | 'MSRM'
   callback?: () => Promise<void>
+  createProposal?: {
+    governance?: ProgramAccount<Governance>
+    owner: PublicKey
+  }
 }
 
 const MINT_MAP = {
@@ -34,10 +54,14 @@ type DepositLockedSRMFormValues = {
   amount: number
 }
 
-const DepositCard = ({ mint, callback }: DepositCardProps) => {
+const DepositCard = ({ mint, callback, createProposal }: DepositCardProps) => {
+  const router = useRouter()
+  const { symbol } = useRealm()
+  const { fmtUrlWithCluster } = useQueryContext()
+
   const { wallet, anchorProvider } = useWallet()
   const { balance, isLoading, refetch } = useTokenAccountBalance(
-    wallet?.publicKey,
+    createProposal?.owner,
     MINT_MAP[mint].pubkey
   )
 
@@ -45,6 +69,8 @@ const DepositCard = ({ mint, callback }: DepositCardProps) => {
   const actions = useSerumGovStore((s) => s.actions)
 
   const [isDepositing, setIsDepositing] = useState(false)
+
+  const { handleCreateProposal } = useCreateProposal()
 
   const schema = yup.object(DepositLockedSRMSchema).required()
   const { register, handleSubmit } = useForm<DepositLockedSRMFormValues>({
@@ -72,7 +98,6 @@ const DepositCard = ({ mint, callback }: DepositCardProps) => {
       amount,
       MINT_MAP[mint].decimals
     )
-
     if (amountAsBN.gt(new anchor.BN(balance.amount))) {
       notify({
         type: 'error',
@@ -82,16 +107,99 @@ const DepositCard = ({ mint, callback }: DepositCardProps) => {
       return
     }
 
-    await actions.depositLocked(
-      connection.current,
-      anchorProvider,
-      amountAsBN,
-      mint === 'MSRM',
-      wallet
-    )
+    if (!createProposal) {
+      await actions.depositLocked(
+        connection.current,
+        anchorProvider,
+        amountAsBN,
+        mint === 'MSRM',
+        wallet
+      )
 
-    await refetch()
-    if (callback) await callback()
+      await refetch()
+      if (callback) await callback()
+    } else {
+      try {
+        const instructions: TransactionInstruction[] = []
+        const { owner } = createProposal
+
+        const userAccount = await actions.getUserAccount(anchorProvider, owner)
+
+        if (!userAccount) {
+          const initIx = await actions.getInitUserInstruction(
+            owner,
+            owner,
+            anchorProvider
+          )
+          instructions.push(initIx)
+        }
+
+        const depositIx = await actions.getDepositLockedInstruction(
+          owner,
+          amountAsBN,
+          MINT_MAP[mint].pubkey === MSRM_MINT,
+          anchorProvider
+        )
+        instructions.push(depositIx)
+
+        const instructionsData: InstructionDataWithHoldUpTime[] = []
+
+        instructions.forEach(async (ix) => {
+          const serializedIx = serializeInstructionToBase64(ix)
+
+          const ixData = {
+            data: getInstructionDataFromBase64(serializedIx),
+            holdUpTime:
+              createProposal.governance?.account.config
+                .minInstructionHoldUpTime,
+            prerequisiteInstructions: [],
+            shouldSplitIntoSeparateTxs: false,
+          }
+
+          instructionsData.push(ixData)
+        })
+
+        const tx = new Transaction({ feePayer: createProposal.owner }).add(
+          ...instructions.map((i) => i)
+        )
+        const simulationResult = await simulateTransaction(
+          connection.current,
+          tx,
+          'single'
+        )
+
+        if (simulationResult.value.err) {
+          notify({
+            type: 'error',
+            message: 'Transaction simulation failed.',
+          })
+          // setIsBurning(false)
+          return
+        }
+        const proposalAddress = await handleCreateProposal({
+          title: `Serum DAO: Lock ${fmtBnMintDecimals(
+            amountAsBN,
+            MINT_MAP[mint].decimals
+          )} ${mint}`,
+          description: `Locking ${fmtBnMintDecimals(
+            amountAsBN,
+            MINT_MAP[mint].decimals
+          )} ${mint}.`,
+          instructionsData,
+          governance: createProposal.governance!,
+        })
+        const url = fmtUrlWithCluster(
+          `/dao/${symbol}/proposal/${proposalAddress}`
+        )
+        await router.push(url)
+      } catch (e) {
+        console.error('Failed to add Lock Proposal', e)
+        notify({
+          type: 'error',
+          message: `Something went wrong. Please check console.`,
+        })
+      }
+    }
 
     setIsDepositing(false)
   }
@@ -119,8 +227,8 @@ const DepositCard = ({ mint, callback }: DepositCardProps) => {
         />
         <button
           type="submit"
-          className="bg-bkg-4 p-2 px-3 text-xs text-fgd-3 font-semibold rounded-md self-stretch"
-          disabled={isDepositing}
+          className="bg-bkg-4 p-2 px-3 text-xs text-fgd-3 font-semibold rounded-md self-stretch  disabled:text-fgd-4"
+          disabled={isDepositing || !wallet?.publicKey}
         >
           {!isDepositing ? 'Deposit' : <Loading />}
         </button>

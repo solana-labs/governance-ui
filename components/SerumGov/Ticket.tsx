@@ -125,7 +125,9 @@ const Ticket: FC<Props> = ({ ticket, createProposal, callback }) => {
               instructionsData.push(ixData)
             })
 
-            const tx = new Transaction().add(...instructions.map((i) => i))
+            const tx = new Transaction({ feePayer: owner }).add(
+              ...instructions.map((i) => i)
+            )
             const simulationResult = await simulateTransaction(
               connection,
               tx,
