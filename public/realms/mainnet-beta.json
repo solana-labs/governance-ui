@@ -1038,5 +1038,12 @@
     "ogImage": "/realms/eleusance/eleusance_logo_spl.png",
     "website": "https://eleusance.io/",
     "twitter": "@eleusanceIO"
-  }
-]
+  },
+  {
+    "symbol": "ACRW",
+    "displayName": "The Accrew DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "3rrQ9NjxiNExfaoCuvDEabww6ViYzYeNXgu9tufvCoQR",
+    "website": "https://www.accrewmoney.com/",
+    "twitter": "@AccrewApp",
+    "ogImage": "/realms/AccrewDAO/accrewdao_pic.png"
