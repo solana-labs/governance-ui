@@ -100,6 +100,7 @@ interface SerumGovStore extends State {
   programId: PublicKey
   gsrmMint?: MintAccount
   authority: PublicKey
+  config: PublicKey
 
   set: (x: any) => void
   actions: {
@@ -204,12 +205,6 @@ interface SerumGovStore extends State {
       isMsrm: boolean,
       owner?: WalletSigner | null
     ) => Promise<void>
-    getDepositLockedInstruction: (
-      owner: PublicKey,
-      amount: anchor.BN,
-      isMsrm: boolean,
-      provider: anchor.AnchorProvider
-    ) => Promise<TransactionInstruction>
   }
 }
 
@@ -217,6 +212,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
   programId: PROGRAM_ID,
   gsrmMint: DEFAULT_GSRM_MINT_INFO,
   authority: findProgramAddressSync([Buffer.from('authority')], PROGRAM_ID)[0],
+  config: findProgramAddressSync([Buffer.from('config')], PROGRAM_ID)[0],
 
   set: (fn) => set(produce(fn)),
   actions: {
@@ -508,6 +504,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
               .accounts({
                 owner: owner.publicKey,
                 authority: get().authority,
+                config: get().config,
                 redeemTicket: redeemTicket.address,
                 srmMint: SRM_MINT,
                 srmVault,
@@ -555,6 +552,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
               .accounts({
                 owner: owner.publicKey,
                 authority: get().authority,
+                config: get().config,
                 redeemTicket: redeemTicket.address,
                 msrmMint: MSRM_MINT,
                 msrmVault,
@@ -640,6 +638,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
           .accounts({
             owner: owner,
             authority: get().authority,
+            config: get().config,
             redeemTicket: redeemTicket.address,
             srmMint: SRM_MINT,
             srmVault,
@@ -664,6 +663,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
           .accounts({
             owner: owner,
             authority: get().authority,
+            config: get().config,
             redeemTicket: redeemTicket.address,
             msrmMint: MSRM_MINT,
             msrmVault,
@@ -714,6 +714,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
             .accounts({
               owner: owner.publicKey,
               authority: get().authority,
+              config: get().config,
               gsrmMint: GSRM_MINT,
               ownerGsrmAccount: ownerGsrmAccount,
               lockedAccount: lockedAccount.address,
@@ -766,6 +767,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
         .accounts({
           owner: owner,
           authority: get().authority,
+          config: get().config,
           gsrmMint: GSRM_MINT,
           ownerGsrmAccount: ownerGsrmAccount,
           lockedAccount: lockedAccount.address,
@@ -810,6 +812,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
           .accounts({
             owner: owner.publicKey,
             authority: get().authority,
+            config: get().config,
             gsrmMint: GSRM_MINT,
             ownerGsrmAccount,
             vestAccount: vestAccount.address,
@@ -862,6 +865,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
         .accounts({
           owner: owner,
           authority: get().authority,
+          config: get().config,
           gsrmMint: GSRM_MINT,
           ownerGsrmAccount,
           vestAccount: vestAccount.address,
@@ -960,6 +964,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
             srmMint: SRM_MINT,
             payerSrmAccount: payerTokenAccount,
             authority: get().authority,
+            config: get().config,
             srmVault,
             lockedAccount,
             claimTicket: claimTicket,
@@ -984,6 +989,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
             msrmMint: MSRM_MINT,
             payerMsrmAccount: payerTokenAccount,
             authority: get().authority,
+            config: get().config,
             msrmVault,
             lockedAccount,
             claimTicket: claimTicket,
@@ -1057,6 +1063,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
             srmMint: SRM_MINT,
             payerSrmAccount: payerTokenAccount,
             authority: get().authority,
+            config: get().config,
             srmVault,
             clock: SYSVAR_CLOCK_PUBKEY,
             tokenProgram: TOKEN_PROGRAM_ID,
@@ -1079,6 +1086,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
             msrmMint: MSRM_MINT,
             payerMsrmAccount: payerTokenAccount,
             authority: get().authority,
+            config: get().config,
             msrmVault,
             vestAccount,
             claimTicket: claimTicket,
@@ -1090,101 +1098,6 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
       }
 
       return ix
-    },
-
-    async getDepositLockedInstruction(
-      owner: PublicKey,
-      amount: anchor.BN,
-      isMsrm: boolean,
-      provider: anchor.AnchorProvider
-    ) {
-      const program = new anchor.Program(
-        IDL as anchor.Idl,
-        get().programId,
-        provider
-      )
-
-      const userAccount = await get().actions.getUserAccount(provider, owner)
-
-      const [userAccountAddress] = findProgramAddressSync(
-        [Buffer.from('user'), owner.toBuffer()],
-        get().programId
-      )
-
-      const ownerAta = await getAssociatedTokenAddress(
-        !isMsrm ? SRM_MINT : MSRM_MINT,
-        owner,
-        true
-      )
-      const [vault] = findProgramAddressSync(
-        [
-          Buffer.from('vault'),
-          !isMsrm ? SRM_MINT.toBuffer() : MSRM_MINT.toBuffer(),
-        ],
-        program.programId
-      )
-
-      const [lockedAccount] = findProgramAddressSync(
-        [
-          Buffer.from('locked_account'),
-          owner.toBuffer(),
-          new anchor.BN(userAccount ? userAccount.lockIndex : 0).toArrayLike(
-            Buffer,
-            'le',
-            8
-          ),
-        ],
-        program.programId
-      )
-
-      const [claimTicket] = findProgramAddressSync(
-        [Buffer.from('claim_ticket'), lockedAccount.toBuffer()],
-        program.programId
-      )
-
-      if (!isMsrm) {
-        const ix = await program.methods
-          .depositLockedSrm(amount)
-          .accounts({
-            payer: owner,
-            owner: owner,
-            ownerUserAccount: userAccount
-              ? userAccount.address
-              : userAccountAddress,
-            srmMint: SRM_MINT,
-            payerSrmAccount: ownerAta,
-            authority: get().authority,
-            srmVault: vault,
-            lockedAccount,
-            claimTicket,
-            clock: SYSVAR_CLOCK_PUBKEY,
-            tokenProgram: TOKEN_PROGRAM_ID,
-            systemProgram: SystemProgram.programId,
-          })
-          .instruction()
-        return ix
-      } else {
-        const ix = await program.methods
-          .depositLockedMsrm(amount)
-          .accounts({
-            payer: owner,
-            owner: owner,
-            ownerUserAccount: userAccount
-              ? userAccount.address
-              : userAccountAddress,
-            msrmMint: MSRM_MINT,
-            payerMsrmAccount: ownerAta,
-            authority: get().authority,
-            msrmVault: vault,
-            lockedAccount,
-            claimTicket,
-            clock: SYSVAR_CLOCK_PUBKEY,
-            tokenProgram: TOKEN_PROGRAM_ID,
-            systemProgram: SystemProgram.programId,
-          })
-          .instruction()
-        return ix
-      }
     },
 
     async depositLocked(

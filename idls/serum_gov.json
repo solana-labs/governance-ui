@@ -19,6 +19,11 @@
           "isSigner": false
         },
         {
+          "name": "config",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "gsrmMint",
           "isMut": true,
           "isSigner": false,
@@ -78,6 +83,76 @@
         {
           "name": "symbol",
           "type": "string"
+        },
+        {
+          "name": "claimDelay",
+          "type": "i64"
+        },
+        {
+          "name": "redeemDelay",
+          "type": "i64"
+        },
+        {
+          "name": "cliffPeriod",
+          "type": "i64"
+        },
+        {
+          "name": "linearVestingPeriod",
+          "type": "i64"
+        }
+      ]
+    },
+    {
+      "name": "updateConfigAuthority",
+      "accounts": [
+        {
+          "name": "configAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "config",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "newConfigAuthority",
+          "type": "publicKey"
+        }
+      ]
+    },
+    {
+      "name": "updateConfigParams",
+      "accounts": [
+        {
+          "name": "configAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "config",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "claimDelay",
+          "type": "i64"
+        },
+        {
+          "name": "redeemDelay",
+          "type": "i64"
+        },
+        {
+          "name": "cliffPeriod",
+          "type": "i64"
+        },
+        {
+          "name": "linearVestingPeriod",
+          "type": "i64"
         }
       ]
     },
@@ -117,6 +192,11 @@
         },
         {
           "name": "owner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "config",
           "isMut": false,
           "isSigner": false
         },
@@ -188,6 +268,11 @@
         },
         {
           "name": "owner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "config",
           "isMut": false,
           "isSigner": false
         },
@@ -309,6 +394,11 @@
           "isSigner": false
         },
         {
+          "name": "config",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "gsrmMint",
           "isMut": true,
           "isSigner": false
@@ -365,6 +455,11 @@
           "isSigner": false
         },
         {
+          "name": "config",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "redeemTicket",
           "isMut": true,
           "isSigner": false
@@ -416,6 +511,11 @@
           "isSigner": false
         },
         {
+          "name": "config",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "redeemTicket",
           "isMut": true,
           "isSigner": false
@@ -463,6 +563,11 @@
         },
         {
           "name": "owner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "config",
           "isMut": false,
           "isSigner": false
         },
@@ -538,6 +643,11 @@
           "isSigner": false
         },
         {
+          "name": "config",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "ownerUserAccount",
           "isMut": true,
           "isSigner": false
@@ -609,6 +719,11 @@
           "isSigner": false
         },
         {
+          "name": "config",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "gsrmMint",
           "isMut": true,
           "isSigner": false
@@ -653,6 +768,42 @@
     }
   ],
   "accounts": [
+    {
+      "name": "Config",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "configAuthority",
+            "type": "publicKey"
+          },
+          {
+            "name": "srmMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "msrmMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "claimDelay",
+            "type": "i64"
+          },
+          {
+            "name": "redeemDelay",
+            "type": "i64"
+          },
+          {
+            "name": "cliffPeriod",
+            "type": "i64"
+          },
+          {
+            "name": "linearVestingPeriod",
+            "type": "i64"
+          }
+        ]
+      }
+    },
     {
       "name": "User",
       "type": {
@@ -874,5 +1025,8 @@
       "name": "AlreadyRedeemed",
       "msg": "Already redeemed account."
     }
-  ]
+  ],
+  "metadata": {
+    "address": "RE3xgnnxDjhXoPMqEzeKLj8ThrdXwdDa168GCEGoY6Y"
+  }
 }

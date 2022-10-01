@@ -31,6 +31,7 @@ import { simulateTransaction } from '@utils/send'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import { useRouter } from 'next/router'
+import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
 
 type DepositCardProps = {
   mint: 'SRM' | 'MSRM'
@@ -134,11 +135,19 @@ const DepositCard = ({ mint, callback, createProposal }: DepositCardProps) => {
           instructions.push(initIx)
         }
 
-        const depositIx = await actions.getDepositLockedInstruction(
+        const ownerAta = await getAssociatedTokenAddress(
+          MINT_MAP[mint].pubkey,
           owner,
+          true
+        )
+
+        const depositIx = await actions.getGrantLockedInstruction(
+          owner,
+          owner,
+          ownerAta,
+          anchorProvider,
           amountAsBN,
-          MINT_MAP[mint].pubkey === MSRM_MINT,
-          anchorProvider
+          MINT_MAP[mint].pubkey === MSRM_MINT
         )
         instructions.push(depositIx)
 
