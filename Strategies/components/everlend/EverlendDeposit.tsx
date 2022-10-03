@@ -185,7 +185,7 @@ const EverlendDeposit = ({
       </div>
       <Input
         type="number"
-        onChange={(e) => setAmount(e.target.value)}
+        onChange={(e) => setAmount(e.target.value as any)}
         value={amount}
         onBlur={validateAmountOnBlur}
         error={formErrors['amount']}
