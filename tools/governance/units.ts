@@ -1,22 +1,43 @@
-import { MintMaxVoteWeightSource } from '@solana/spl-governance'
+import {
+  MintMaxVoteWeightSource,
+  MintMaxVoteWeightSourceType,
+} from '@solana/spl-governance'
 import BN from 'bn.js'
 import { BigNumber } from 'bignumber.js'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import { MintInfo } from '@solana/spl-token'
-import { fmtMintAmount } from '@tools/sdk/units'
+import {
+  fmtMintAmount,
+  parseMintNaturalAmountFromDecimalAsBN,
+} from '@tools/sdk/units'
 
-export const parseMintMaxVoteWeight = (mintMaxVoteWeight) => {
-  let value = MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION.value
-  if (mintMaxVoteWeight) {
-    const fraction = new BigNumber(mintMaxVoteWeight)
-      .shiftedBy(MintMaxVoteWeightSource.SUPPLY_FRACTION_DECIMALS)
-      .toString()
-    value = new BN(fraction)
-  }
-
-  return new MintMaxVoteWeightSource({
-    value,
-  })
+export const parseMintMaxVoteWeight = (
+  useSupplyFactor: boolean,
+  communityMintDecimals: number,
+  supplyFactor?: number,
+  absoluteValue?: number
+) => {
+  if (useSupplyFactor) {
+    return supplyFactor
+      ? new MintMaxVoteWeightSource({
+          type: MintMaxVoteWeightSourceType.SupplyFraction,
+          value: new BN(
+            new BigNumber(supplyFactor.toString())
+              .shiftedBy(MintMaxVoteWeightSource.SUPPLY_FRACTION_DECIMALS)
+              .toString()
+          ),
+        })
+      : MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION
+  } else
+    return new MintMaxVoteWeightSource({
+      type: MintMaxVoteWeightSourceType.Absolute,
+      value: absoluteValue
+        ? parseMintNaturalAmountFromDecimalAsBN(
+            absoluteValue,
+            communityMintDecimals
+          )
+        : new BN(1000),
+    })
 }
 
 /// Chekcs if the given voter_weight is the disabled weight threshold

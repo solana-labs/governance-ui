@@ -24,6 +24,11 @@ export const feedItemPostParts = `
   numComments
   author {
     publicKey
+    civicInfo {
+      avatarUrl
+      handle
+      isVerified
+    }
     twitterInfo {
       avatarUrl
       handle
@@ -47,6 +52,11 @@ export const feedItemProposalParts = `
   numComments
   author {
     publicKey
+    civicInfo {
+      avatarUrl
+      handle
+      isVerified
+    }
     twitterInfo {
       avatarUrl
       handle
@@ -138,7 +148,17 @@ export const getAdditionalPage = gql`
 
 export const FeedItemAuthor = IT.type({
   publicKey: PublicKey,
+  civicInfo: IT.union([
+    IT.undefined,
+    IT.null,
+    IT.type({
+      avatarUrl: IT.union([IT.null, IT.string]),
+      handle: IT.string,
+      isVerified: IT.boolean,
+    }),
+  ]),
   twitterInfo: IT.union([
+    IT.undefined,
     IT.null,
     IT.type({
       avatarUrl: IT.union([IT.null, IT.string]),

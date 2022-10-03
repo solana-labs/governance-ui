@@ -11,6 +11,7 @@ export const getRealm = gql`
       membersCount
       name
       publicKey
+      shortDescription
       symbol
       twitterHandle
       websiteUrl
@@ -25,6 +26,7 @@ export const getRealmResp = IT.type({
     membersCount: IT.number,
     name: IT.string,
     publicKey: PublicKey,
+    shortDescription: IT.union([IT.null, IT.string, IT.undefined]),
     symbol: IT.union([IT.null, IT.string]),
     twitterHandle: IT.union([IT.null, IT.string]),
     websiteUrl: IT.union([IT.null, IT.string]),

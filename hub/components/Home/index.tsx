@@ -50,7 +50,7 @@ export function Home(props: Props) {
               sidebar={(isStickied) => (
                 <Sidebar.Content
                   compressed={isStickied}
-                  description={null}
+                  description={realm.shortDescription}
                   iconUrl={realm.iconUrl}
                   membersCount={realm.membersCount}
                   realm={realm.publicKey}

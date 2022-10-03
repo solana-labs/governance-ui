@@ -50,7 +50,19 @@ interface Props {
 }
 
 export function AuthorAvatar(props: Props) {
-  if (props.author?.twitterInfo?.avatarUrl) {
+  if (props.author?.civicInfo?.avatarUrl) {
+    return (
+      <img
+        className={cx(
+          'rounded-full',
+          'border',
+          'border-neutral-400',
+          props.className,
+        )}
+        src={props.author.civicInfo.avatarUrl}
+      />
+    );
+  } else if (props.author?.twitterInfo?.avatarUrl) {
     return (
       <img
         className={cx(
