@@ -315,7 +315,7 @@ const BaseGovernanceFormV3 = ({
       hasMinTokensPercentage && minCommunityTokensPercentage
         ? fmtPercentage(minCommunityTokensPercentage)
         : ''
-    return hasMinTokensPercentage && <div>{`${percent} of token supply`}</div>
+    return hasMinTokensPercentage && <>{`${percent} of token supply`}</>
   }
 
   const minCommunityTokensPercentage = useMemo(() => {
@@ -337,107 +337,94 @@ const BaseGovernanceFormV3 = ({
 
   return (
     <>
-      <div className="text-sm mb-3">
-        <div className="mb-2">Min community tokens to create proposal</div>
-        <div className="flex flex-row text-xs items-center">
-          <Switch
-            checked={showMinCommunity}
-            onChange={() => {
-              setMinCommunity(!showMinCommunity)
-              if (!showMinCommunity === true) {
-                handleSetForm({
-                  value: 1,
-                  propertyName: 'minCommunityTokensToCreateProposal',
-                })
-              } else {
-                handleSetForm({
-                  value: DISABLED_VOTER_WEIGHT.toString(),
-                  propertyName: 'minCommunityTokensToCreateProposal',
-                })
-              }
-            }}
-          />{' '}
-          <div className="ml-3">
-            {showMinCommunity ? 'Enabled' : 'Disabled'}
-          </div>
-        </div>
-      </div>
-
-      {showMinCommunity && (
+      <div className="text-sm mb-3 flex flex-col gap-4">
         <Input
-          value={form.minCommunityTokensToCreateProposal}
+          label="min instruction hold up time (days)"
+          value={getDaysFromTimestamp(form.minInstructionHoldUpTime)}
           type="number"
-          name="minCommunityTokensToCreateProposal"
-          min={minTokenAmount}
-          step={minTokenStep}
+          min={0}
+          name="minInstructionHoldUpTime"
           onBlur={validateMinMax}
           onChange={(evt) =>
             handleSetForm({
-              value: evt.target.value,
-              propertyName: 'minCommunityTokensToCreateProposal',
+              value: getTimestampFromDays(parseInt(evt.target.value)),
+              propertyName: 'minInstructionHoldUpTime',
             })
           }
-          error={formErrors['minCommunityTokensToCreateProposal']}
+          error={formErrors['minInstructionHoldUpTime']}
         />
-      )}
-      {showMinCommunity && getSupplyPercent()}
-      <Input
-        label="min instruction hold up time (days)"
-        value={getDaysFromTimestamp(form.minInstructionHoldUpTime)}
-        type="number"
-        min={0}
-        name="minInstructionHoldUpTime"
-        onBlur={validateMinMax}
-        onChange={(evt) =>
-          handleSetForm({
-            value: getTimestampFromDays(parseInt(evt.target.value)),
-            propertyName: 'minInstructionHoldUpTime',
-          })
-        }
-        error={formErrors['minInstructionHoldUpTime']}
-      />
-      <Input
-        label="Max voting time (days)"
-        value={getDaysFromTimestamp(form.maxVotingTime)}
-        name="maxVotingTime"
-        type="number"
-        min={0.01}
-        onBlur={validateMinMax}
-        onChange={(evt) =>
-          handleSetForm({
-            value: getTimestampFromDays(parseInt(evt.target.value)),
-            propertyName: 'maxVotingTime',
-          })
-        }
-        error={formErrors['maxVotingTime']}
-      />
-      <Input
-        label="Community yes vote threshold (%)"
-        // TODO handle disabled case
-        value={form.communityVoteThreshold.value}
-        max={100}
-        min={1}
-        name="voteThreshold"
-        type="number"
-        onChange={(evt) => {
-          const x = parseInt(evt.target.value)
-          setForm((prev) => ({
-            ...prev,
-            communityVoteThreshold: new VoteThreshold({
-              type: VoteThresholdType.YesVotePercentage,
-              value: Math.max(0, Math.min(100, x)),
-            }),
-          }))
-        }}
-        error={formErrors['communityVoteThreshold']}
-      />
-      <div className="max-w-lg pb-5">
-        <AmountSlider
-          step={1}
+        <Input
+          label="Max voting time (days)"
+          value={getDaysFromTimestamp(form.maxVotingTime)}
+          name="maxVotingTime"
+          type="number"
+          min={0.01}
+          onBlur={validateMinMax}
+          onChange={(evt) =>
+            handleSetForm({
+              value: getTimestampFromDays(parseInt(evt.target.value)),
+              propertyName: 'maxVotingTime',
+            })
+          }
+          error={formErrors['maxVotingTime']}
+        />
+        <div>
+          <div className="mb-2">Min community tokens to create proposal</div>
+          <div className="flex flex-row text-xs items-center">
+            <Switch
+              checked={showMinCommunity}
+              onChange={() => {
+                setMinCommunity(!showMinCommunity)
+                if (!showMinCommunity === true) {
+                  handleSetForm({
+                    value: 1,
+                    propertyName: 'minCommunityTokensToCreateProposal',
+                  })
+                } else {
+                  handleSetForm({
+                    value: DISABLED_VOTER_WEIGHT.toString(),
+                    propertyName: 'minCommunityTokensToCreateProposal',
+                  })
+                }
+              }}
+            />{' '}
+            <div className="ml-3">
+              {showMinCommunity ? 'Enabled' : 'Disabled'}
+            </div>
+          </div>
+          <div className="mt-2">
+            {showMinCommunity && (
+              <Input
+                value={form.minCommunityTokensToCreateProposal}
+                type="number"
+                name="minCommunityTokensToCreateProposal"
+                min={minTokenAmount}
+                step={minTokenStep}
+                onBlur={validateMinMax}
+                onChange={(evt) =>
+                  handleSetForm({
+                    value: evt.target.value,
+                    propertyName: 'minCommunityTokensToCreateProposal',
+                  })
+                }
+                error={formErrors['minCommunityTokensToCreateProposal']}
+              />
+            )}
+            <span className="text-gray-200 whitespace-nowrap">
+              ({showMinCommunity && getSupplyPercent()})
+            </span>
+          </div>
+        </div>
+        <Input
+          label="Community yes vote threshold (%)"
           // TODO handle disabled case
-          value={form.communityVoteThreshold.value!}
-          disabled={false}
-          onChange={(x) => {
+          value={form.communityVoteThreshold.value}
+          max={100}
+          min={1}
+          name="voteThreshold"
+          type="number"
+          onChange={(evt) => {
+            const x = parseInt(evt.target.value)
             setForm((prev) => ({
               ...prev,
               communityVoteThreshold: new VoteThreshold({
@@ -446,26 +433,44 @@ const BaseGovernanceFormV3 = ({
               }),
             }))
           }}
+          error={formErrors['communityVoteThreshold']}
         />
+        <div className="max-w-lg pb-5">
+          <AmountSlider
+            step={1}
+            // TODO handle disabled case
+            value={form.communityVoteThreshold.value!}
+            disabled={false}
+            onChange={(x) => {
+              setForm((prev) => ({
+                ...prev,
+                communityVoteThreshold: new VoteThreshold({
+                  type: VoteThresholdType.YesVotePercentage,
+                  value: Math.max(0, Math.min(100, x)),
+                }),
+              }))
+            }}
+          />
+        </div>
+        <Select
+          label="Community vote tipping"
+          value={VoteTipping[form.communityVoteTipping]}
+          onChange={(selected) =>
+            handleSetForm({
+              value: selected,
+              propertyName: 'communityVoteTipping',
+            })
+          }
+        >
+          {Object.keys(VoteTipping)
+            .filter((vt) => typeof VoteTipping[vt as any] === 'string')
+            .map((vt) => (
+              <Select.Option key={vt} value={vt}>
+                {VoteTipping[vt as any]}{' '}
+              </Select.Option>
+            ))}
+        </Select>{' '}
       </div>
-      <Select
-        label="Community vote tipping"
-        value={VoteTipping[form.communityVoteTipping]}
-        onChange={(selected) =>
-          handleSetForm({
-            value: selected,
-            propertyName: 'communityVoteTipping',
-          })
-        }
-      >
-        {Object.keys(VoteTipping)
-          .filter((vt) => typeof VoteTipping[vt as any] === 'string')
-          .map((vt) => (
-            <Select.Option key={vt} value={vt}>
-              {VoteTipping[vt as any]}{' '}
-            </Select.Option>
-          ))}
-      </Select>
     </>
   )
 }
