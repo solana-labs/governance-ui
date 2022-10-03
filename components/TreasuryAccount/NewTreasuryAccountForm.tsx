@@ -17,7 +17,7 @@ import { PublicKey } from '@solana/web3.js'
 import { tryParseKey } from 'tools/validators/pubkey'
 import { debounce } from 'utils/debounce'
 import { isFormValid } from 'utils/formValidation'
-import { getGovernanceConfig } from '@utils/GovernanceTools'
+import { getGovernanceConfigFromV2Form } from '@utils/GovernanceTools'
 import { notify } from 'utils/notifications'
 import tokenService from 'utils/services/token'
 import { TokenProgramAccount, tryGetMint } from 'utils/tokens'
@@ -154,7 +154,7 @@ const NewAccountForm = () => {
           voteTipping: form.voteTipping,
         }
 
-        const governanceConfig = getGovernanceConfig(
+        const governanceConfig = getGovernanceConfigFromV2Form(
           realmInfo?.programVersion!,
           governanceConfigValues
         )

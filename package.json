@@ -108,7 +108,7 @@
     "goblingold-sdk": "^1.2.35",
     "graphql": "^16.5.0",
     "graphql-request": "^4.3.0",
-    "immer": "^9.0.12",
+    "immer": "^9.0.15",
     "io-ts": "^2.2.18",
     "io-ts-types": "^0.5.16",
     "js-cookie": "^3.0.1",

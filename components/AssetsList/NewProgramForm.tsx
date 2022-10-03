@@ -9,7 +9,7 @@ import { RpcContext, VoteTipping } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { tryParseKey } from 'tools/validators/pubkey'
 import { isFormValid } from 'utils/formValidation'
-import { getGovernanceConfig } from 'utils/GovernanceTools'
+import { getGovernanceConfigFromV2Form } from 'utils/GovernanceTools'
 import { notify } from 'utils/notifications'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
@@ -110,7 +110,7 @@ const NewProgramForm = () => {
           mintDecimals: realmMint.decimals,
           voteTipping: form.voteTipping,
         }
-        const governanceConfig = getGovernanceConfig(
+        const governanceConfig = getGovernanceConfigFromV2Form(
           realmInfo?.programVersion!,
           governanceConfigValues
         )

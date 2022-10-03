@@ -39,7 +39,7 @@ export function parseMinTokensToCreate(
     : getMintNaturalAmountFromDecimal(value, mintDecimals)
 }
 
-export function getGovernanceConfig(
+export function getGovernanceConfigFromV2Form(
   programVersion: number,
   values: GovernanceConfigValues
 ) {
