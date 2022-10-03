@@ -1,0 +1,128 @@
+{
+  "DA5G7QQbFioZ6K33wQcH8fVdgFcnaDjLD7DLQkapZg5X": {
+    "symbol": "Metaplex",
+    "token": "METAewgxyPbgwsseH8T16a39CQ5VyVxZi9zXiDPY18m",
+    "heading": "Metaplex makes it easy to build your project in minutes and grow your community in the world’s largest NFT ecosystem.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Metaplex Studios, ecosystem, and community have been moving quickly to support the thousands of developer teams and creators looking to launch their NFT projects on Solana. In response to feedback, we've created tools like our Candy Machine v2™, to help mint and sell thousands of NFTs for NFT collections and/or common profile picture projects you all know and love. We've also been hard at work creating primitives, recipes, and extensible storefronts that developers and creators alike can use."
+        ]
+      },
+      {
+        "heading": "What's next for Metaplex?",
+        "content": [
+          "More power to you, and no gatekeepers. With over 17M NFTs minted, Metaplex has fueled of one of the fastest-growing markets in history with over $3B+ in commerce and $1B+ in revenue generated directly for creators through Metaplex smart contracts."
+        ]
+      },
+      {
+        "heading": "The World’s Fastest Growing Web3 Creator Platform",
+        "content": [
+          "The Candy Machine is a distribution program and in order to use it to mint NFTs, it needs to be loaded up with your project's artwork and metadata.",
+          "There are a multitude of unique ways to generate images and metadata, and in most scenarios, you will automate this process. A good example of an image generation tool is HashLips. In this guide we will cover the creation of a simple collection to illustrate the metadata requirements and Candy Machine distribution. You should familiarize yourself with the Token Metadata Standard."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.metaplex.com/"
+    },
+    "resources": [
+      {
+        "title": "Metaplex Foundation Closes $46M Funding Round",
+        "content": [
+          "The raise was co-led by Multicoin Capital and Jump Crypto, with participation from Alameda Research, Solana Ventures and Animoca Brands…"
+        ],
+        "url": "https://blockworks.co/metaplex-foundation-closes-46m-funding-round/"
+      },
+      {
+        "title": "Metaplex Set to Airdrop MPLX Tokens to Solana NFT Creators",
+        "content": [
+          "Metaplex will launch a DAO to enable community governance, with non-U.S. creators set to reap the reward of MPLX tokens."
+        ],
+        "url": "https://decrypt.co/110099/metaplex-airdrop-mplx-token-solana-nft-creators"
+      },
+      {
+        "title": "NFT collection y00ts pushes Solana trading volume to highest since May",
+        "content": [
+          "Adoption “really happens” when a person “figures out how to generate a key and store it securely, and then sign transactions. That’s a really slow process,”…"
+        ],
+        "url": "https://fortune.com/2022/09/12/solana-nft-trading-volume-highest-since-may-crypto-web3/"
+      }
+    ],
+    "team": [
+      {
+        "name": "Stephen Hess",
+        "avatar": "https://s.yimg.com/ny/api/res/1.2/_LZuGyNQkzaHgTqFIRLeRA--/YXBwaWQ9aGlnaGxhbmRlcjt3PTk2MDtoPTY0MTtjZj13ZWJw/https://s.yimg.com/uu/api/res/1.2/XZ.BQoe4WGFgYHj2SiEekw--~B/aD00NzU7dz03MTE7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/coin_rivet_596/0ca8a7254a0c6cab2cca6796efe519fa",
+        "description": [
+          "With tertiary degrees in graphic design, art history and branding, Kais brings his strategic experience in building and leading design projects for many global brands including Unicef, United Nations, Unilever, Greenpeace, Ford, Dell and Olympus."
+        ],
+        "role": "Chief Executive Officer",
+        "twitter": "@meta_hess"
+      }
+    ],
+    "roadmap": {
+      "description": null,
+      "items": [
+        {
+          "title": "Launch Metaplex",
+          "date": "2021-08-30T15:42:21.109Z",
+          "status": "completed",
+          "resource": {
+            "title": "Metaplex Foundation Closes $46M Funding Round",
+            "url": "https://blockworks.co/metaplex-foundation-closes-46m-funding-round/"
+          }
+        },
+        {
+          "title": "Candy Machine v2",
+          "date": "2022-09-30T15:45:01.159Z",
+          "status": null,
+          "resource": null
+        },
+        {
+          "title": "Launch Metaplex DAO",
+          "date": "2022-10-30T15:46:07.387Z",
+          "status": "inprogress",
+          "resource": null
+        },
+        {
+          "title": "Launch Governance Token",
+          "date": "2023-02-28T16:47:34.797Z",
+          "status": null,
+          "resource": null
+        }
+      ]
+    },
+    "faq": [
+      {
+        "question": "What is Metaplex?",
+        "answer": [
+          "Metaplex is a collection of tools, smart contracts, and more designed to make the process of creating and launching NFTs easier. While initially focused on supporting the needs of the arts and entertainment industry our plans extend far beyond that to all use cases where an NFT may add value.",
+          "",
+          "Currently, our three major projects are:",
+          "",
+          "Token Metadata - the NFT standard for Solana",
+          "The Candy Machine v2™ - a Profile Picture (PFP) focused tool that works like the gumball-style candy machines of old",
+          "Auction House - a decentralized sales protocol for NFT marketplaces"
+        ]
+      },
+      {
+        "question": "What is Auction House?",
+        "answer": ["Auction House is a protocol for marketplaces to implement a decentralized sales contract. It is simple, fast and very cheap. Auction House is a Solana program available on Mainnet Beta and Devnet. Anyone can create an Auction House."]
+      },
+      {
+        "question": "How do I mint NFTs on Solana?",
+        "answer": ["While the Candy Machine is ready to mint after being deployed, in most cases you will want to provide a front end experience to allow your community the chance to mint, too."]
+      },
+      {
+        "question": "How do I implement a decentralized sales contract?",
+        "answer": ["For the NFT Seller the NFT doesn't leave their wallet until the sale completes. This is due to the use of Solana Token Delegates, and it allows them to list their NFT on other Marketplaces that implement the Auction House protocol."]
+      },
+      {
+        "question": "Do you have an SDK?",
+        "answer": ["Yes we have three."]
+      }
+    ]
+  }
+}

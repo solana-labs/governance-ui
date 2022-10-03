@@ -19,8 +19,7 @@ const voteTypeDomain = (type: VoteType) => {
 
 const loadD3 = () => import('d3')
 
-type Unpromise<P> = P extends Promise<infer T> ? T : never
-type D3 = Unpromise<ReturnType<typeof loadD3>>
+type D3 = Awaited<ReturnType<typeof loadD3>>
 
 interface Props {
   className?: string

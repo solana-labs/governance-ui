@@ -3,12 +3,10 @@ import type { PublicKey } from '@solana/web3.js';
 import { pipe } from 'fp-ts/function';
 import { useEffect, useState } from 'react';
 
-import * as Sidebar from '../Home/Sidebar';
-import { HomeLayout } from '@hub/components/HomeLayout';
+import * as RealmHeader from '@hub/components/RealmHeader';
 import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay';
 import { useJWT } from '@hub/hooks/useJWT';
 import { useQuery } from '@hub/hooks/useQuery';
-import { getDefaultBannerUrl } from '@hub/lib/getDefaultBannerUrl';
 import * as RE from '@hub/types/Result';
 
 import { AdditionalCommentTree } from './AdditionalCommentTree';
@@ -68,183 +66,170 @@ export function FeedItem(props: Props) {
         realmResult,
         RE.match(
           () => (
-            <HomeLayout
-              error
-              sidebar={() => <Sidebar.Error />}
-              content={() => (
+            <div>
+              <RealmHeader.Error />
+              <div className="max-w-3xl mx-auto pt-8 w-full">
+                <Back.Error className="mb-8 mt-4" />
+                <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
+                <Header.Error className="mt-6" />
+                <Title.Error className="mt-5 mb-11" />
+                <div className="mb-16 rounded w-full h-20 bg-neutral-200" />
+                <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
+                <Footer.Error className="mt-5" />
+                {jwt && <ReplyBox.Error className="mt-8 mb-4" />}
                 <div className="pt-8">
-                  <Back.Error className="mb-8 mt-4" />
-                  <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
-                  <Header.Error className="mt-6" />
-                  <Title.Error className="mt-5 mb-11" />
-                  <div className="mb-16 rounded w-full h-20 bg-neutral-200" />
-                  <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
-                  <Footer.Error className="mt-5" />
-                  {jwt && <ReplyBox.Error className="mt-8 mb-4" />}
-                  <div className="pt-8">
-                    <CommentTree.Error />
-                  </div>
+                  <CommentTree.Error />
                 </div>
-              )}
-            />
+              </div>
+            </div>
           ),
           () => (
-            <HomeLayout
-              loading
-              sidebar={() => <Sidebar.Loading />}
-              content={() => (
+            <div>
+              <RealmHeader.Loading />
+              <div className="max-w-3xl mx-auto pt-8 w-full">
+                <Back.Loading className="mb-8 mt-4" />
+                <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
+                <Header.Loading className="mt-6" />
+                <Title.Loading className="mt-5 mb-11" />
+                <div className="mb-16 rounded w-full h-20 bg-neutral-200 animate-pulse" />
+                <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
+                <Footer.Loading className="mt-5" />
+                {jwt && <ReplyBox.Loading className="mt-8 mb-4" />}
                 <div className="pt-8">
-                  <Back.Loading className="mb-8 mt-4" />
-                  <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
-                  <Header.Loading className="mt-6" />
-                  <Title.Loading className="mt-5 mb-11" />
-                  <div className="mb-16 rounded w-full h-20 bg-neutral-200 animate-pulse" />
-                  <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
-                  <Footer.Loading className="mt-5" />
-                  {jwt && <ReplyBox.Loading className="mt-8 mb-4" />}
-                  <div className="pt-8">
-                    <CommentTree.Loading />
-                  </div>
+                  <CommentTree.Loading />
                 </div>
-              )}
-            />
+              </div>
+            </div>
           ),
-          ({ realm }) => {
+          ({ hub, realm }) => {
             return (
-              <HomeLayout
-                bannerUrl={
-                  realm.bannerImageUrl || getDefaultBannerUrl(realm.publicKey)
-                }
-                sidebar={(isStickied) => (
-                  <Sidebar.Content
-                    compressed={isStickied}
-                    description={null}
-                    iconUrl={realm.iconUrl}
-                    membersCount={realm.membersCount}
-                    realm={realm.publicKey}
-                    realmName={realm.name}
-                    realmUrlId={props.realmUrlId}
-                    twitterHandle={realm.twitterHandle}
-                    websiteUrl={realm.websiteUrl}
-                  />
-                )}
-                content={() =>
-                  pipe(
-                    feedItemResult,
-                    RE.match(
-                      () => (
+              <div>
+                <RealmHeader.Content
+                  bannerUrl={realm.bannerImageUrl}
+                  iconUrl={realm.iconUrl}
+                  name={realm.name}
+                  realm={realm.publicKey}
+                  realmUrlId={props.realmUrlId}
+                  selectedTab="feed"
+                  token={hub.info.token}
+                  twitterHandle={realm.twitterHandle}
+                  websiteUrl={realm.websiteUrl}
+                />
+                {pipe(
+                  feedItemResult,
+                  RE.match(
+                    () => (
+                      <div className="max-w-3xl mx-auto pt-8 w-full">
+                        <Back.Error className="mb-8 mt-4" />
+                        <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
+                        <Header.Error className="mt-6" />
+                        <Title.Error className="mt-5 mb-11" />
+                        <div className="mb-16 rounded w-full h-20 bg-neutral-200" />
+                        <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
+                        <Footer.Error className="mt-5" />
+                        {jwt && <ReplyBox.Error className="mt-8 mb-4" />}
                         <div className="pt-8">
-                          <Back.Error className="mb-8 mt-4" />
-                          <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
-                          <Header.Error className="mt-6" />
-                          <Title.Error className="mt-5 mb-11" />
-                          <div className="mb-16 rounded w-full h-20 bg-neutral-200" />
-                          <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
-                          <Footer.Error className="mt-5" />
-                          {jwt && <ReplyBox.Error className="mt-8 mb-4" />}
-                          <div className="pt-8">
-                            <CommentTree.Error />
-                          </div>
+                          <CommentTree.Error />
                         </div>
-                      ),
-                      () => (
+                      </div>
+                    ),
+                    () => (
+                      <div className="max-w-3xl mx-auto pt-8 w-full">
+                        <Back.Loading className="mb-8 mt-4" />
+                        <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
+                        <Header.Loading className="mt-6" />
+                        <Title.Loading className="mt-5 mb-11" />
+                        <div className="mb-16 rounded w-full h-20 bg-neutral-200 animate-pulse" />
+                        <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
+                        <Footer.Loading className="mt-5" />
+                        {jwt && <ReplyBox.Loading className="mt-8 mb-4" />}
                         <div className="pt-8">
-                          <Back.Loading className="mb-8 mt-4" />
-                          <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
-                          <Header.Loading className="mt-6" />
-                          <Title.Loading className="mt-5 mb-11" />
-                          <div className="mb-16 rounded w-full h-20 bg-neutral-200 animate-pulse" />
-                          <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
-                          <Footer.Loading className="mt-5" />
-                          {jwt && <ReplyBox.Loading className="mt-8 mb-4" />}
-                          <div className="pt-8">
-                            <CommentTree.Loading />
-                          </div>
+                          <CommentTree.Loading />
                         </div>
-                      ),
-                      ({ feedItem }) => (
-                        <div className="pt-8">
-                          <Back.Content className="mb-7 mt-4" />
-                          <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
-                          <Header.Content
-                            className="mt-6"
-                            author={feedItem.author}
-                            created={feedItem.created}
-                            updated={feedItem.updated}
-                          />
-                          <Title.Content
-                            className="mt-5 mb-11"
-                            title={feedItem.title}
-                          />
-                          <RichTextDocumentDisplay
-                            className="mb-16"
-                            document={feedItem.document}
-                          />
-                          <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
-                          <Footer.Content
-                            className="mt-5"
-                            feedItemId={feedItem.id}
-                            numReplies={feedItem.numComments}
+                      </div>
+                    ),
+                    ({ feedItem }) => (
+                      <div className="max-w-3xl mx-auto pt-8 w-full">
+                        <Back.Content className="mb-7 mt-4" />
+                        <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
+                        <Header.Content
+                          className="mt-6"
+                          author={feedItem.author}
+                          created={feedItem.created}
+                          updated={feedItem.updated}
+                        />
+                        <Title.Content
+                          className="mt-5 mb-11"
+                          title={feedItem.title}
+                        />
+                        <RichTextDocumentDisplay
+                          className="mb-16"
+                          document={feedItem.document}
+                        />
+                        <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
+                        <Footer.Content
+                          className="mt-5"
+                          feedItemId={feedItem.id}
+                          numReplies={feedItem.numComments}
+                          realm={props.realm}
+                          score={feedItem.score}
+                          userVote={feedItem.myVote}
+                        />
+                        {jwt && (
+                          <ReplyBox.Content
+                            className="mt-8 mb-4"
+                            feedItemId={props.feedItemId}
                             realm={props.realm}
-                            score={feedItem.score}
-                            userVote={feedItem.myVote}
                           />
-                          {jwt && (
-                            <ReplyBox.Content
-                              className="mt-8 mb-4"
-                              feedItemId={props.feedItemId}
-                              realm={props.realm}
-                            />
-                          )}
-                          {pipe(
-                            commentsResult,
-                            RE.match(
-                              () => (
-                                <div className="pt-8">
-                                  <CommentTree.Error />
-                                </div>
-                              ),
-                              () => (
-                                <div className="pt-8">
-                                  <CommentTree.Loading />
-                                </div>
-                              ),
-                              ({ feedItemCommentTree }) => (
-                                <div className="pt-8 pb-16">
-                                  <CommentTree.Content
-                                    showClientSideComments
-                                    comments={feedItemCommentTree.edges.map(
-                                      (edge) => edge.node,
-                                    )}
+                        )}
+                        {pipe(
+                          commentsResult,
+                          RE.match(
+                            () => (
+                              <div className="pt-8">
+                                <CommentTree.Error />
+                              </div>
+                            ),
+                            () => (
+                              <div className="pt-8">
+                                <CommentTree.Loading />
+                              </div>
+                            ),
+                            ({ feedItemCommentTree }) => (
+                              <div className="pt-8 pb-16">
+                                <CommentTree.Content
+                                  showClientSideComments
+                                  comments={feedItemCommentTree.edges.map(
+                                    (edge) => edge.node,
+                                  )}
+                                  feedItemId={props.feedItemId}
+                                  realm={props.realm}
+                                  realmUrlId={props.realmUrlId}
+                                />
+                                {additionalPageCursors.map((cursor) => (
+                                  <AdditionalCommentTree
+                                    className="mt-9"
+                                    cursor={cursor}
                                     feedItemId={props.feedItemId}
+                                    key={cursor}
                                     realm={props.realm}
                                     realmUrlId={props.realmUrlId}
+                                    onLoadMore={(newCursor) =>
+                                      setAdditionalPageCursors((cursors) =>
+                                        cursors.concat(newCursor),
+                                      )
+                                    }
                                   />
-                                  {additionalPageCursors.map((cursor) => (
-                                    <AdditionalCommentTree
-                                      className="mt-9"
-                                      cursor={cursor}
-                                      feedItemId={props.feedItemId}
-                                      key={cursor}
-                                      realm={props.realm}
-                                      realmUrlId={props.realmUrlId}
-                                      onLoadMore={(newCursor) =>
-                                        setAdditionalPageCursors((cursors) =>
-                                          cursors.concat(newCursor),
-                                        )
-                                      }
-                                    />
-                                  ))}
-                                </div>
-                              ),
+                                ))}
+                              </div>
                             ),
-                          )}
-                        </div>
-                      ),
+                          ),
+                        )}
+                      </div>
                     ),
-                  )
-                }
-              />
+                  ),
+                )}
+              </div>
             );
           },
         ),

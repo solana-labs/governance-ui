@@ -2,12 +2,11 @@ import type { PublicKey } from '@solana/web3.js';
 import { pipe } from 'fp-ts/function';
 
 import * as RealmHeader from '@hub/components/RealmHeader';
+import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay';
 import { useQuery } from '@hub/hooks/useQuery';
-import cx from '@hub/lib/cx';
 import * as RE from '@hub/types/Result';
 
-import * as Feed from './Feed';
-import { getRealm, getRealmResp } from './gql';
+import * as gql from './gql';
 
 interface Props {
   className?: string;
@@ -15,25 +14,29 @@ interface Props {
   realmUrlId: string;
 }
 
-export function Home(props: Props) {
-  const [result] = useQuery(getRealmResp, {
-    query: getRealm,
+export function Hub(props: Props) {
+  const [result] = useQuery(gql.getHubResp, {
+    query: gql.getHub,
     variables: { realm: props.realm.toBase58() },
   });
 
+  console.log(result);
+
   return (
-    <main className={cx(props.className)}>
+    <main className={props.className}>
       {pipe(
         result,
         RE.match(
           () => (
             <div>
               <RealmHeader.Error />
+              <div className="mt-8 text-3xl font-medium w-96">&nbsp;</div>
             </div>
           ),
           () => (
             <div>
               <RealmHeader.Loading />
+              <div className="mt-8 text-3xl font-medium w-96">&nbsp;</div>
             </div>
           ),
           ({ hub, realm }) => (
@@ -44,18 +47,19 @@ export function Home(props: Props) {
                 name={realm.name}
                 realm={realm.publicKey}
                 realmUrlId={props.realmUrlId}
-                selectedTab="feed"
+                selectedTab="hub"
                 token={hub.info.token}
                 twitterHandle={realm.twitterHandle}
                 websiteUrl={realm.websiteUrl}
               />
-              <Feed.Content
-                className="max-w-3xl mx-auto pt-8 w-full"
-                realm={realm.publicKey}
-                realmIconUrl={realm.iconUrl}
-                realmName={realm.name}
-                realmUrlId={props.realmUrlId}
-              />
+              <div className="max-w-7xl mx-auto px-8 relative w-full">
+                {hub.info.heading && (
+                  <RichTextDocumentDisplay
+                    className="mt-8 text-3xl font-medium text-neutral-500"
+                    document={hub.info.heading}
+                  />
+                )}
+              </div>
             </div>
           ),
         ),
