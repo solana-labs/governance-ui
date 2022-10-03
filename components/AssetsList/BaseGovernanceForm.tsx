@@ -3,7 +3,7 @@ import Select from '@components/inputs/Select'
 import AmountSlider from '@components/Slider'
 import Switch from '@components/Switch'
 import useRealm from '@hooks/useRealm'
-import { VoteTipping } from '@solana/spl-governance'
+import { GovernanceConfig, VoteTipping } from '@solana/spl-governance'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import {
   fmtPercentage,
@@ -25,18 +25,9 @@ export interface BaseGovernanceFormFieldsV2 {
   voteTipping: VoteTipping
 }
 
-export interface BaseGovernanceFormFieldsV3 {
+// If GovernanceConfig updates in the future in an unversioned way, I suggest using Omit to exclude non-V3 fields
+export type BaseGovernanceFormFieldsV3 = Omit<GovernanceConfig, 'reserved'> & {
   _programVersion: 3
-  communityVoteThreshold: number
-  minCommunityTokensToCreateProposal: number
-  minInstructionHoldUpTime: number
-  maxVotingTime: number
-  communityVoteTipping: VoteTipping
-  minCouncilTokensToCreateProposal: number
-  councilVoteThreshold: number
-  councilVetoVoteThreshold: number
-  communityVetoVoteThreshold: number
-  councilVoteTipping: VoteTipping
 }
 
 const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {

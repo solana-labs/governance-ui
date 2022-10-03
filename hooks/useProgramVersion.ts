@@ -14,9 +14,11 @@ const CACHE = {
 const useProgramVersion = () => {
   const router = useRouter()
   const { symbol } = router.query
-  const cachedVersion = CACHE[symbol as string]
+  const cachedVersion = CACHE[symbol as string] as 2 | 3 | undefined
 
-  const queriedVersion = useWalletStore((s) => s.selectedRealm.programVersion)
+  const queriedVersion = useWalletStore(
+    (s) => s.selectedRealm.programVersion as 1 | 2 | 3
+  )
   return cachedVersion ?? queriedVersion
 }
 
