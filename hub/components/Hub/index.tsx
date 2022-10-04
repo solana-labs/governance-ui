@@ -6,7 +6,10 @@ import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay
 import { useQuery } from '@hub/hooks/useQuery';
 import * as RE from '@hub/types/Result';
 
+import { About } from './About';
 import * as gql from './gql';
+import { SideCard } from './SideCard';
+import { Stats } from './Stats';
 
 interface Props {
   className?: string;
@@ -19,8 +22,6 @@ export function Hub(props: Props) {
     query: gql.getHub,
     variables: { realm: props.realm.toBase58() },
   });
-
-  console.log(result);
 
   return (
     <main className={props.className}>
@@ -59,6 +60,25 @@ export function Hub(props: Props) {
                     document={hub.info.heading}
                   />
                 )}
+                <Stats
+                  className="mt-8"
+                  documentation={hub.info.documentation}
+                  numMembers={realm.membersCount}
+                  realm={props.realm}
+                  realmUrlId={props.realmUrlId}
+                  twitterFollowers={hub.twitterFollowerCount}
+                />
+                <div className="grid grid-cols-[1fr,450px] gap-x-12 mt-16">
+                  <div>
+                    <About sections={hub.info.about} />
+                  </div>
+                  <div>
+                    <SideCard
+                      realm={props.realm}
+                      realmUrlId={props.realmUrlId}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           ),

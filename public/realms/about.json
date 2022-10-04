@@ -19,7 +19,11 @@
       {
         "heading": "The World’s Fastest Growing Web3 Creator Platform",
         "content": [
-          "The Candy Machine is a distribution program and in order to use it to mint NFTs, it needs to be loaded up with your project's artwork and metadata.",
+          "The Candy Machine is a distribution program and in order to use it to mint NFTs, it needs to be loaded up with your project's artwork and metadata."
+        ]
+      },
+      {
+        "content": [
           "There are a multitude of unique ways to generate images and metadata, and in most scenarios, you will automate this process. A good example of an image generation tool is HashLips. In this guide we will cover the creation of a simple collection to illustrate the metadata requirements and Candy Machine distribution. You should familiarize yourself with the Token Metadata Standard."
         ]
       }

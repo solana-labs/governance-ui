@@ -198,7 +198,6 @@ export const getRealm = gql`
     realm(publicKey: $realm) {
       bannerImageUrl
       iconUrl
-      membersCount
       name
       publicKey
       symbol
@@ -225,7 +224,6 @@ export const getRealmResp = IT.type({
   realm: IT.type({
     bannerImageUrl: IT.union([IT.null, IT.string]),
     iconUrl: IT.union([IT.null, IT.string]),
-    membersCount: IT.number,
     name: IT.string,
     publicKey: PublicKey,
     symbol: IT.union([IT.null, IT.string]),

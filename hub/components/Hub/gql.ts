@@ -9,6 +9,7 @@ export const getHub = gql`
   query getHub($realm: PublicKey!) {
     hub(realm: $realm) {
       realm
+      twitterFollowerCount
       info {
         about {
           content
@@ -48,11 +49,11 @@ export const getHub = gql`
           role
           twitter
         }
-        token {
-          mint
-          price
-          symbol
-        }
+        # token {
+        #   mint
+        #   price
+        #   symbol
+        # }
       }
     }
     realm(publicKey: $realm) {
@@ -71,6 +72,7 @@ export const getHub = gql`
 export const getHubResp = IT.type({
   hub: IT.type({
     realm: PublicKey,
+    twitterFollowerCount: IT.number,
     info: IT.type({
       about: IT.array(
         IT.type({
@@ -126,14 +128,14 @@ export const getHubResp = IT.type({
           twitter: IT.union([IT.null, IT.string]),
         }),
       ),
-      token: IT.union([
-        IT.null,
-        IT.type({
-          mint: PublicKey,
-          price: IT.number,
-          symbol: IT.string,
-        }),
-      ]),
+      // token: IT.union([
+      //   IT.null,
+      //   IT.type({
+      //     mint: PublicKey,
+      //     price: IT.number,
+      //     symbol: IT.string,
+      //   }),
+      // ]),
     }),
   }),
   realm: IT.type({
