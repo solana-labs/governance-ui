@@ -7,9 +7,12 @@ import { useQuery } from '@hub/hooks/useQuery';
 import * as RE from '@hub/types/Result';
 
 import { About } from './About';
+import { Divider } from './Divider';
 import * as gql from './gql';
+import { ResourceList } from './ResourceList';
 import { SideCard } from './SideCard';
 import { Stats } from './Stats';
+import { Team } from './Team';
 
 interface Props {
   className?: string;
@@ -71,6 +74,16 @@ export function Hub(props: Props) {
                 <div className="grid grid-cols-[1fr,450px] gap-x-12 mt-16">
                   <div>
                     <About sections={hub.info.about} />
+                    {hub.info.resources.length > 0 && (
+                      <>
+                        <Divider
+                          className="mt-14 mb-10"
+                          iconUrl={realm.iconUrl}
+                          name={realm.name}
+                        />
+                        <ResourceList resources={hub.info.resources} />
+                      </>
+                    )}
                   </div>
                   <div>
                     <SideCard
@@ -79,6 +92,9 @@ export function Hub(props: Props) {
                     />
                   </div>
                 </div>
+                {hub.info.team.length > 0 && (
+                  <Team className="mt-14" teamMembers={hub.info.team} />
+                )}
               </div>
             </div>
           ),

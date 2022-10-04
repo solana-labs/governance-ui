@@ -28,15 +28,91 @@ export function Trending(props: Props) {
     variables: { realm: props.realm.toBase58() },
   });
 
-  console.log(result);
-
   return (
     <div className={props.className}>
       {pipe(
         result,
         RE.match(
-          () => <div />,
-          () => <div />,
+          () => (
+            <div className="space-y-5">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div
+                  className="grid grid-cols-[24px,1fr] gap-x-6 group"
+                  key={i}
+                >
+                  <div
+                    className={cx(
+                      'bg-neutral-200',
+                      'font-medium',
+                      'h-5',
+                      'leading-5',
+                      'rounded',
+                      'text-xs',
+                      'w-4',
+                    )}
+                  >
+                    &nbsp;
+                  </div>
+                  <div>
+                    <div
+                      className={cx(
+                        'bg-neutral-200',
+                        'font-bold',
+                        'rounded',
+                        'text-sm',
+                        'w-32',
+                      )}
+                    >
+                      &nbsp;
+                    </div>
+                    <div className="text-sm h-8 mt-2 w-full rounded bg-neutral-200" />
+                    <div className="mt-2 h-4 w-20 rounded bg-neutral-200" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ),
+          () => (
+            <div className="space-y-5">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div
+                  className="grid grid-cols-[24px,1fr] gap-x-6 group"
+                  key={i}
+                >
+                  <div
+                    className={cx(
+                      'text-xs',
+                      'leading-5',
+                      'font-medium',
+                      'w-4',
+                      'rounded',
+                      'bg-neutral-200',
+                      'h-5',
+                      'animate-pulse',
+                    )}
+                  >
+                    &nbsp;
+                  </div>
+                  <div>
+                    <div
+                      className={cx(
+                        'animate-pulse',
+                        'bg-neutral-200',
+                        'font-bold',
+                        'rounded',
+                        'text-sm',
+                        'w-32',
+                      )}
+                    >
+                      &nbsp;
+                    </div>
+                    <div className="text-sm h-8 mt-2 w-full rounded bg-neutral-200 animate-pulse" />
+                    <div className="mt-2 h-4 w-20 rounded bg-neutral-200 animate-pulse" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ),
           ({ feed }) => {
             const edges = feed.edges
               .filter((edge) => {
@@ -65,8 +141,9 @@ export function Trending(props: Props) {
                     <Link
                       passHref
                       href={`/realm/${props.realmUrlId}/${edge.node.id}`}
+                      key={edge.node.id}
                     >
-                      <a className="px-4 grid grid-cols-[24px,1fr] gap-x-6 group">
+                      <a className="grid grid-cols-[24px,1fr] gap-x-6 group">
                         <div className="text-xs leading-5 text-neutral-900 font-medium">
                           {(i + 1).toString().padStart(2, '0')}
                         </div>
@@ -91,9 +168,9 @@ export function Trending(props: Props) {
                           )}
                           <div className="flex items-center mt-2">
                             {edge.node.myVote === FeedItemVoteType.Approve ? (
-                              <FavoriteFilledIcon className="fill-sky-500" />
+                              <FavoriteFilledIcon className="fill-sky-500 h-4 w-4" />
                             ) : (
-                              <FavoriteIcon className="fill-neutral-500" />
+                              <FavoriteIcon className="fill-neutral-500 h-4 w-4" />
                             )}
                             <div
                               className={cx(

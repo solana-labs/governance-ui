@@ -19,7 +19,7 @@ const Inner = forwardRef<HTMLButtonElement, Props>(
         {...rest}
         className={cx(
           'flex',
-          'h-12',
+          'h-14',
           'items-center',
           'justify-center',
           'space-x-1',

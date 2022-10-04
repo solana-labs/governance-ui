@@ -32,7 +32,7 @@ export function SideCard(props: Props) {
           Trending Posts
         </Tab>
       </Tabs.List>
-      <Tabs.Content className="p-4 bg-white" value={Options.Trending}>
+      <Tabs.Content className="py-4 px-8 bg-white" value={Options.Trending}>
         <Trending realm={props.realm} realmUrlId={props.realmUrlId} />
       </Tabs.Content>
     </Tabs.Root>
