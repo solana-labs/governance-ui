@@ -147,6 +147,27 @@ export const ACCOUNT_NAMES = {
   '2fEL6au59KfmtarX5cJD4a6EaxRr6gLBvFkE65uEPJ4U': 'DAOJONES',
   FboFh3DkwmAeH4GyM5Ttd8ismd2wq6c8MrRkSsmr5nQW: 'LUNA',
   GnfeSuTwbXcxVnuXJTzx172174PJAHUfXpNgsBdGCncd: 'Solend Holdings',
+  
+  // Jungle DeFi Community DAO
+  Ebuwy24prHRL3QEAT911wWD8aa493ikZeH7LfYzMQxS1: 'Incoming Protocol Fees/Assets',
+  '8jEtEwEYrFyNnHkvEC4xn2GeMKz5rpCtaxovdnD335xD': 'RAY Fee Wallet',
+  Gf6zQBC5nYs53KcuTsvPUx6i39eTDt5GoALuvJged6Wt: 'USDC Fee Wallet',
+  '2yCZaxgH1Y5P1aXRhe4XfKaL2roRzdDn5dJE67UgJx72': 'stSOL Fee Wallet',
+  Crq4ztCBzga78n1KusfiE2HsExGoPUGoHCgXkVSwwsrG: 'I-JFI-Q4/USDC POL',
+  '893e6nmHcgrf3wyxhKGMy8wGNBNLU9Eev7yVRapo7jcP': 'JFI/USDC POL',
+  '9BJQmMEke66pNEgwNB7M8s7WkMwLJFidUPujc1Xjdwjj': 'I-RAY-Q4/USDC POL',
+  '2dFDdEow6sX6jeJKdVoBfiPWjcMDUAYxCsHmk64JZGuy': 'JFI Fee Wallet',
+  '5HfKKTngUFzbdRJufnjZJnBpRsWqRj1jJgwouxgQituB': 'BTC Fee Wallet',
+  HEpRCwvshWL4zUo35SEPRxYy2ZCEACHLzdHbuv9Q9Gtg: 'USH Fee Wallet',
+  HEw5YMeF9ogZDSeRtz7btvE5BF9x53Pq9Cya83GZHR2D: 'mSOL Fee Wallet',
+  F9uzuZ46wMxxYZmg4baegfocoSWBX8YDNhqM5HrG6t87: 'USDH Fee Wallet',
+  '9uYzWw9rT9EMANe5yHKAsQfCKZP7Hjj46Pp1vmGz1K5s': 'USDT Fee Wallet',
+  gE8dBQZJze8zzCxb7iRiiHAvwv68t4vzBJsUMrWUPtx: 'ETH Fee Wallet',
+  CP8CMdBczN4GYjm3ygrVGhfU1HwnPxxcmWjPCkwihM74: 'Emission and Expense Reserves',
+  Hd65UxhS8sagMyQP3gU1E7N8xsTcQYM7Vpi2gZAMTDE7: 'JFI Reserves',
+  '4R1emrnFsWzgawRSN6QFKUTEGG5ZPmE2qDLXgZYMsCMv': 'USDC Reserves',
+  '3AtD8oiBUWttbnNCpKk1enRoquN9V88Nv6Rn7ESHPWHa': 'DAO Instance Authority Governance',
+  jdaoDN37BrVRvxuXSeyR7xE5Z9CAoQApexGrQJbnj6V: 'Jungle DeFi Governance Program',
 }
 
 // Blacklisted governances which should not be displayed in the UI
