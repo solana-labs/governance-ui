@@ -177,10 +177,10 @@ const GovernanceConfigModal = ({
       {form === undefined ? null : (
         <>
           <div className="w-full space-y-4">
-            <h3 className="flex flex-col mb-4">
+            <h2 className="flex flex-col mb-4">
               Change Governance Config:{' '}
               {governance && abbreviateAddress(governance.pubkey)}
-            </h3>
+            </h2>
             <Input
               label="Title"
               placeholder={DEFAULT_PROPOSAL_TITLE}

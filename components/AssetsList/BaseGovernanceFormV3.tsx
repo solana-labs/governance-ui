@@ -123,6 +123,9 @@ export const BaseGovernanceFormV3 = ({
 
           return (
             <>
+              <div className="border-t border-white/10 pt-3">
+                <h3>{capitalized} settings</h3>
+              </div>
               <div>
                 <div className="mb-2">
                   Min {govPop} tokens to create proposal
