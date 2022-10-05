@@ -175,6 +175,7 @@ const REALM = () => {
     tokenRecords,
     ownVoterWeight,
     ownTokenRecord,
+    councilTokenOwnerRecords,
     isNftMode,
   } = useRealm()
   const proposalsPerPage = 20
@@ -304,7 +305,11 @@ const REALM = () => {
       const transactions: Transaction[] = []
       for (let i = 0; i < selectedProposals.length; i++) {
         const selectedProposal = selectedProposals[i]
-        const ownTokenRecord = tokenRecords[wallet.publicKey!.toBase58()]
+        const ownTokenRecord =
+          selectedProposal.proposal.governingTokenMint.toBase58() ===
+          realm.account.communityMint.toBase58()
+            ? tokenRecords[wallet.publicKey!.toBase58()]
+            : councilTokenOwnerRecords[wallet.publicKey!.toBase58()]
 
         const instructions: TransactionInstruction[] = []
 
