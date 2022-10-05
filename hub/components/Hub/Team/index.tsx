@@ -1,4 +1,4 @@
-import FlagIcon from '@carbon/icons-react/lib/Flag';
+import FlagFilledIcon from '@carbon/icons-react/lib/FlagFilled';
 import TwitterIcon from '@carbon/icons-react/lib/LogoTwitter';
 
 import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay';
@@ -29,7 +29,7 @@ export function Team(props: Props) {
       )}
     >
       <header className="flex items-center text-neutral-900">
-        <FlagIcon className="fill-current h-6 mr-5 w-6" />
+        <FlagFilledIcon className="fill-neutral-300 h-6 mr-5 w-6" />
         <div className="text-4xl font-semibold">The Team</div>
       </header>
       <div className="mt-12 w-full">

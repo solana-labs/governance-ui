@@ -23,6 +23,12 @@ export const getHub = gql`
           answer
           question
         }
+        gallery {
+          caption
+          height
+          width
+          url
+        }
         heading
         resources {
           content
@@ -49,11 +55,11 @@ export const getHub = gql`
           role
           twitter
         }
-        # token {
-        #   mint
-        #   price
-        #   symbol
-        # }
+        token {
+          mint
+          price
+          symbol
+        }
       }
     }
     realm(publicKey: $realm) {
@@ -93,6 +99,14 @@ export const getHubResp = IT.type({
           question: IT.string,
         }),
       ),
+      gallery: IT.array(
+        IT.type({
+          caption: IT.union([IT.null, IT.string]),
+          url: IT.string,
+          height: IT.number,
+          width: IT.number,
+        }),
+      ),
       heading: IT.union([IT.null, RichTextDocument]),
       resources: IT.array(
         IT.type({
@@ -128,14 +142,14 @@ export const getHubResp = IT.type({
           twitter: IT.union([IT.null, IT.string]),
         }),
       ),
-      // token: IT.union([
-      //   IT.null,
-      //   IT.type({
-      //     mint: PublicKey,
-      //     price: IT.number,
-      //     symbol: IT.string,
-      //   }),
-      // ]),
+      token: IT.union([
+        IT.null,
+        IT.type({
+          mint: PublicKey,
+          price: IT.number,
+          symbol: IT.string,
+        }),
+      ]),
     }),
   }),
   realm: IT.type({

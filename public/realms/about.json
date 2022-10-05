@@ -32,6 +32,36 @@
       "title": "Docs",
       "url": "https://docs.metaplex.com/"
     },
+    "gallery": [
+      {
+        "url": "https://www.youtube.com/watch?v=AygobJL_yAU",
+        "height": 448,
+        "width": 800
+      },
+      {
+        "caption": "The first official Metaplex wallpaper, designed by the Metaplex Studios team",
+        "url": "https://pbs.twimg.com/media/FdSnSbjXkAEcm7d?format=jpg&name=4096x4096",
+        "height": 448,
+        "width": 800
+      },
+      {
+        "caption": "Our Head of Partnerships: this is culture driving technology.",
+        "url": "https://pbs.twimg.com/media/FV-i2JYXwAI0MgM?format=jpg&name=large",
+        "height": 600,
+        "width": 800
+      },
+      {
+        "url": "https://pbs.twimg.com/media/FN0qydiXIAAhoR7?format=jpg&name=large",
+        "height": 600,
+        "width": 800
+      },
+      {
+        "caption": "Caption: Metaplex Office Hours in Paris",
+        "url": "https://pbs.twimg.com/media/FX1t3u8XEAA6-AC?format=jpg&name=medium",
+        "height": 532,
+        "width": 800
+      }
+    ],
     "resources": [
       {
         "title": "Metaplex Foundation Closes $46M Funding Round",
@@ -67,7 +97,9 @@
       }
     ],
     "roadmap": {
-      "description": null,
+      "description": [
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud."
+      ],
       "items": [
         {
           "title": "Launch Metaplex",

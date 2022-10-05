@@ -57,6 +57,7 @@ export const graphcache = async (
       RealmHubInfoAboutSection: () => null,
       RealmHubInfoDocumentation: () => null,
       RealmHubInfoFaqItem: () => null,
+      RealmHubInfoGalleryItem: () => null,
       RealmHubInfoResource: () => null,
       RealmHubInfoRoadmap: () => null,
       RealmHubInfoRoadmapItem: () => null,
