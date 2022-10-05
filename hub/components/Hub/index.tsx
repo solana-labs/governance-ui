@@ -28,8 +28,6 @@ export function Hub(props: Props) {
     variables: { realm: props.realm.toBase58() },
   });
 
-  console.log(result);
-
   return (
     <main className={props.className}>
       {pipe(
