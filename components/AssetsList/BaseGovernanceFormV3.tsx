@@ -1,3 +1,4 @@
+import DisableableNumericInput from '@components/DisableableNumericInput'
 import Input from '@components/inputs/Input'
 import Select from '@components/inputs/Select'
 import AmountSlider from '@components/Slider'
@@ -21,6 +22,8 @@ import {
 import BN from 'bn.js'
 import React, { useEffect, useMemo } from 'react'
 import { BaseGovernanceFormFieldsV3 } from './BaseGovernanceForm'
+
+//TODO validate bricking via disabling both yes vote thresholds
 
 export const BaseGovernanceFormV3 = ({
   formErrors,
@@ -121,6 +124,11 @@ export const BaseGovernanceFormV3 = ({
                 : 'minCouncilTokensToCreateProposal'
             ].toString() !== DISABLED_VOTER_WEIGHT.toString()
 
+          const yesVoteThreshold =
+            govPop === 'community'
+              ? form.communityVoteThreshold
+              : form.councilVoteThreshold
+
           return (
             <>
               <div className="border-t border-white/10 pt-3">
@@ -204,62 +212,96 @@ export const BaseGovernanceFormV3 = ({
                   </span>
                 </div>
               </div>
-              <Input
-                label={`${capitalized} yes vote threshold (%)`}
-                // TODO handle disabled case
-                value={
-                  govPop === 'community'
-                    ? form.communityVoteThreshold.value
-                    : form.councilVoteThreshold.value
-                }
-                max={100}
-                min={1}
-                name={govPop + 'Threshold'}
-                type="number"
-                onChange={(evt) => {
-                  const x = parseInt(evt.target.value)
 
-                  // TODO make type safe
-                  const y =
-                    govPop === 'community'
-                      ? 'communityVoteThreshold'
-                      : 'councilVoteThreshold'
+              {(['yes', 'veto'] as const).map((vote) => {
+                const setValue = (x: typeof form.communityVoteThreshold) =>
                   setForm((prev) => ({
                     ...prev,
-                    [y]: new VoteThreshold({
-                      type: VoteThresholdType.YesVotePercentage,
-                      value: Math.max(0, Math.min(100, x)),
-                    }),
+                    ...(govPop === 'community'
+                      ? vote === 'yes'
+                        ? {
+                            communityVoteThreshold: x,
+                          }
+                        : {
+                            communityVetoVoteThreshold: x,
+                          }
+                      : vote === 'yes'
+                      ? {
+                          councilVoteThreshold: x,
+                        }
+                      : {
+                          councilVetoVoteThreshold: x,
+                        }),
                   }))
-                }}
-                error={formErrors[govPop + 'VoteThreshold']}
-              />
-              <div className="max-w-lg pb-5">
-                <AmountSlider
-                  step={1}
-                  // TODO handle disabled case
-                  value={
-                    govPop === 'community'
-                      ? form.communityVoteThreshold.value!
-                      : form.councilVoteThreshold.value!
-                  }
-                  disabled={false}
-                  onChange={(x) => {
-                    // this is in fact type-safe!
-                    const y =
-                      govPop === 'community'
-                        ? 'communityVoteThreshold'
-                        : 'councilVoteThreshold'
-                    setForm((prev) => ({
-                      ...prev,
-                      [y]: new VoteThreshold({
-                        type: VoteThresholdType.YesVotePercentage,
-                        value: Math.max(0, Math.min(100, x)),
-                      }),
-                    }))
-                  }}
-                />
-              </div>
+
+                const voteThreshold =
+                  govPop === 'community'
+                    ? vote === 'yes'
+                      ? form.communityVoteThreshold
+                      : form.communityVetoVoteThreshold
+                    : vote === 'yes'
+                    ? form.councilVoteThreshold
+                    : form.councilVetoVoteThreshold
+
+                return (
+                  <div key={vote} className="max-w-lg">
+                    <div className="mb-2">{`${capitalized} ${vote} vote threshold (%)`}</div>
+                    <div className="flex flex-row text-xs items-center">
+                      <Switch
+                        checked={
+                          voteThreshold.type !== VoteThresholdType.Disabled
+                        }
+                        onChange={(checked) => {
+                          const newValue = checked
+                            ? new VoteThreshold({
+                                type: VoteThresholdType.YesVotePercentage,
+                                value: 1,
+                              })
+                            : new VoteThreshold({
+                                type: VoteThresholdType.Disabled,
+                                value: undefined,
+                              })
+                          setValue(newValue)
+                        }}
+                      />
+
+                      <div className="ml-3 grow">
+                        {voteThreshold.type === VoteThresholdType.Disabled ? (
+                          'Disabled'
+                        ) : (
+                          <>
+                            <Input
+                              min={1}
+                              value={voteThreshold.value!.toString()}
+                              type="number"
+                              onChange={(evt) => {
+                                const x = parseInt(evt.target.value)
+                                const clamped = Math.max(1, Math.min(100, x))
+                                const newValue = new VoteThreshold({
+                                  type: VoteThresholdType.YesVotePercentage,
+                                  value: clamped,
+                                })
+
+                                setValue(newValue)
+                              }}
+                              error={formErrors[govPop + 'VoteThreshold']}
+                            />
+                            <div className="pb-4">
+                              <AmountSlider
+                                step={1}
+                                value={voteThreshold.value!}
+                                disabled={false}
+                                onChange={(x) => setValue(x)}
+                              />
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+
               <Select
                 label={`${capitalized} vote tipping`}
                 value={
