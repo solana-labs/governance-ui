@@ -9,6 +9,7 @@ import {
   switchboardPluginsPks,
 } from '@hooks/useVotingPlugins'
 import GatewayCard from '@components/Gateway/GatewayCard'
+import ClaimUnreleasedNFTs from './ClaimUnreleasedNFTs'
 
 const LockPluginTokenBalanceCard = dynamic(
   () =>
@@ -65,6 +66,7 @@ const TokenBalanceCardWrapper = ({
           inAccountDetails={inAccountDetails}
         >
           <NftBalanceCard></NftBalanceCard>
+          <ClaimUnreleasedNFTs />
         </TokenBalanceCard>
       )
     }
