@@ -5,10 +5,19 @@ import { PublicKey } from '@hub/types/decoders/PublicKey';
 
 export const getRealm = gql`
   query getRealm($realm: PublicKey!) {
+    hub(realm: $realm) {
+      realm
+      info {
+        token {
+          mint
+          price
+          symbol
+        }
+      }
+    }
     realm(publicKey: $realm) {
       bannerImageUrl
       iconUrl
-      membersCount
       name
       publicKey
       shortDescription
@@ -20,10 +29,22 @@ export const getRealm = gql`
 `;
 
 export const getRealmResp = IT.type({
+  hub: IT.type({
+    realm: PublicKey,
+    info: IT.type({
+      token: IT.union([
+        IT.null,
+        IT.type({
+          mint: PublicKey,
+          price: IT.number,
+          symbol: IT.string,
+        }),
+      ]),
+    }),
+  }),
   realm: IT.type({
     bannerImageUrl: IT.union([IT.null, IT.string]),
     iconUrl: IT.union([IT.null, IT.string]),
-    membersCount: IT.number,
     name: IT.string,
     publicKey: PublicKey,
     shortDescription: IT.union([IT.null, IT.string, IT.undefined]),
