@@ -115,8 +115,8 @@ const ClaimUnreleasedNFTs = () => {
     <>
       {isNftMode && ownNftVoteRecordsFilterd.length !== 0 && (
         <div>
-          <h4 className="flex items-center mb-3">
-            Unreleased nfts ({ownNftVoteRecordsFilterd.length})
+          <h4 className="flex items-center">
+            Claim ({ownNftVoteRecordsFilterd.length}) SOL
             <Button
               isLoading={isLoading}
               disabled={isLoading || !ownNftVoteRecordsFilterd.length}
@@ -124,16 +124,7 @@ const ClaimUnreleasedNFTs = () => {
               className="ml-2"
               small
             >
-              Release nfts
-            </Button>
-            <Button
-              isLoading={isLoading}
-              disabled={isLoading || !ownNftVoteRecordsFilterd.length}
-              onClick={() => releaseNfts(50)}
-              className="ml-2"
-              small
-            >
-              Release first 50
+              Claim
             </Button>
           </h4>
         </div>
