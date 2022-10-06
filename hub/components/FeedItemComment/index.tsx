@@ -53,6 +53,7 @@ export function FeedItemComment(props: Props) {
           () => (
             <HomeLayout
               error
+              realm={props.realm}
               sidebar={() => <Sidebar.Error />}
               content={() => (
                 <div className="pt-8">
@@ -70,6 +71,7 @@ export function FeedItemComment(props: Props) {
           () => (
             <HomeLayout
               loading
+              realm={props.realm}
               sidebar={() => <Sidebar.Loading />}
               content={() => (
                 <div className="pt-8">
@@ -89,6 +91,7 @@ export function FeedItemComment(props: Props) {
               bannerUrl={
                 realm.bannerImageUrl || getDefaultBannerUrl(realm.publicKey)
               }
+              realm={props.realm}
               sidebar={(isStickied) => (
                 <Sidebar.Content
                   compressed={isStickied}

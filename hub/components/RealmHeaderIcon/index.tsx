@@ -16,7 +16,7 @@ export function Content(props: Props) {
     <div
       className={cx(
         props.className,
-        'bg-neutral-100',
+        'bg-white',
         'flex',
         'h-44',
         'items-center',
@@ -69,7 +69,7 @@ export function Loading(props: BaseProps) {
     <div
       className={cx(
         props.className,
-        'bg-neutral-100',
+        'bg-white',
         'flex',
         'h-44',
         'items-center',
@@ -101,7 +101,7 @@ export function Error(props: BaseProps) {
     <div
       className={cx(
         props.className,
-        'bg-neutral-100',
+        'bg-white',
         'flex',
         'h-44',
         'items-center',
