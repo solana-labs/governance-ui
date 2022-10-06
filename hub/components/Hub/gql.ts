@@ -21,6 +21,10 @@ export const getHub = gql`
         }
         faq {
           answer
+          clippedAnswer(charLimit: 200) {
+            document
+            isClipped
+          }
           question
         }
         gallery {
@@ -96,6 +100,10 @@ export const getHubResp = IT.type({
       faq: IT.array(
         IT.type({
           answer: RichTextDocument,
+          clippedAnswer: IT.type({
+            document: RichTextDocument,
+            isClipped: IT.boolean,
+          }),
           question: IT.string,
         }),
       ),

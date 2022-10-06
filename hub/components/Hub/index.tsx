@@ -8,6 +8,7 @@ import * as RE from '@hub/types/Result';
 
 import { About } from './About';
 import { Divider } from './Divider';
+import { Faq } from './Faq';
 import { Gallery } from './Gallery';
 import * as gql from './gql';
 import { ResourceList } from './ResourceList';
@@ -46,7 +47,7 @@ export function Hub(props: Props) {
             </div>
           ),
           ({ hub, realm }) => (
-            <div>
+            <div className="pb-28">
               <RealmHeader.Content
                 bannerUrl={realm.bannerImageUrl}
                 iconUrl={realm.iconUrl}
@@ -95,9 +96,11 @@ export function Hub(props: Props) {
                     />
                   </div>
                 </div>
-                {hub.info.gallery.length > 0 && (
-                  <Gallery className="mt-20" items={hub.info.gallery} />
-                )}
+              </div>
+              {hub.info.gallery.length > 0 && (
+                <Gallery className="mt-20" items={hub.info.gallery} />
+              )}
+              <div className="max-w-7xl mx-auto relative w-full">
                 {hub.info.team.length > 0 && (
                   <Team className="mt-14 px-8" teamMembers={hub.info.team} />
                 )}
@@ -108,6 +111,12 @@ export function Hub(props: Props) {
                     icon={realm.iconUrl}
                     items={hub.info.roadmap.items}
                     name={realm.name}
+                  />
+                )}
+                {hub.info.faq.length > 0 && (
+                  <Faq
+                    className="mt-24 max-w-6xl mx-auto"
+                    items={hub.info.faq}
                   />
                 )}
               </div>
