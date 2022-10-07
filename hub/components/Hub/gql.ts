@@ -58,6 +58,7 @@ export const getHub = gql`
           name
           role
           twitter
+          twitterFollowerCount
         }
         token {
           mint
@@ -148,6 +149,7 @@ export const getHubResp = IT.type({
           name: IT.string,
           role: IT.union([IT.null, IT.string]),
           twitter: IT.union([IT.null, IT.string]),
+          twitterFollowerCount: IT.number,
         }),
       ),
       token: IT.union([

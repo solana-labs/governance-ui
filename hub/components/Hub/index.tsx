@@ -62,7 +62,7 @@ export function Hub(props: Props) {
               <div className="max-w-7xl mx-auto relative w-full">
                 {hub.info.heading && (
                   <RichTextDocumentDisplay
-                    className="mt-8 text-3xl font-medium text-neutral-500 px-8"
+                    className="mt-8 text-3xl font-medium text-neutral-500 px-8 max-w-5xl"
                     document={hub.info.heading}
                   />
                 )}
@@ -91,6 +91,7 @@ export function Hub(props: Props) {
                   </div>
                   <div>
                     <SideCard
+                      className="sticky top-16"
                       realm={props.realm}
                       realmUrlId={props.realmUrlId}
                     />

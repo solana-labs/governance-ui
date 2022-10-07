@@ -37,7 +37,7 @@ export function Trending(props: Props) {
             <div className="space-y-5">
               {Array.from({ length: 3 }).map((_, i) => (
                 <div
-                  className="grid grid-cols-[24px,1fr] gap-x-6 group"
+                  className="grid grid-cols-[20px,1fr] gap-x-3 group"
                   key={i}
                 >
                   <div
@@ -59,7 +59,6 @@ export function Trending(props: Props) {
                         'bg-neutral-200',
                         'font-bold',
                         'rounded',
-                        'text-sm',
                         'w-32',
                       )}
                     >
@@ -76,7 +75,7 @@ export function Trending(props: Props) {
             <div className="space-y-5">
               {Array.from({ length: 3 }).map((_, i) => (
                 <div
-                  className="grid grid-cols-[24px,1fr] gap-x-6 group"
+                  className="grid grid-cols-[20px,1fr] gap-x-3 group"
                   key={i}
                 >
                   <div
@@ -100,7 +99,6 @@ export function Trending(props: Props) {
                         'bg-neutral-200',
                         'font-bold',
                         'rounded',
-                        'text-sm',
                         'w-32',
                       )}
                     >
@@ -143,7 +141,7 @@ export function Trending(props: Props) {
                       href={`/realm/${props.realmUrlId}/${edge.node.id}`}
                       key={edge.node.id}
                     >
-                      <a className="grid grid-cols-[24px,1fr] gap-x-6 group">
+                      <a className="grid grid-cols-[20px,1fr] gap-x-3 group">
                         <div className="text-xs leading-5 text-neutral-900 font-medium">
                           {(i + 1).toString().padStart(2, '0')}
                         </div>
@@ -152,7 +150,6 @@ export function Trending(props: Props) {
                             className={cx(
                               'font-bold',
                               'text-neutral-900',
-                              'text-sm',
                               'transition-colors',
                               'group-hover:text-sky-500',
                             )}
