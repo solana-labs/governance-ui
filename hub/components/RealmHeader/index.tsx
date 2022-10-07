@@ -1,11 +1,11 @@
 import AssemblyClusterIcon from '@carbon/icons-react/lib/AssemblyCluster';
 import EarthIcon from '@carbon/icons-react/lib/Earth';
 import ListDropdownIcon from '@carbon/icons-react/lib/ListDropdown';
-import LogoTwitterIcon from '@carbon/icons-react/lib/LogoTwitter';
 import WalletIcon from '@carbon/icons-react/lib/Wallet';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import type { PublicKey } from '@solana/web3.js';
 
+import { Twitter } from '@hub/components/icons/Twitter';
 import * as RealmBanner from '@hub/components/RealmBanner';
 import * as RealmHeaderIcon from '@hub/components/RealmHeaderIcon';
 import cx from '@hub/lib/cx';
@@ -87,7 +87,7 @@ export function Content(props: Props) {
                 <ExternalLinkIcon
                   href={`https://www.twitter.com/${props.twitterHandle}`}
                 >
-                  <LogoTwitterIcon />
+                  <Twitter />
                 </ExternalLinkIcon>
               )}
             </NavigationMenu.List>

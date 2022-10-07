@@ -44,7 +44,9 @@ export function Tab(props: Props) {
               icon.props.className,
             ),
           })}
-          <div className="text-xs transition-colors">{children}</div>
+          <div className="text-xs transition-colors tracking-wide">
+            {children}
+          </div>
         </NavigationMenu.Link>
       </Link>
       {selected && (

@@ -52,6 +52,7 @@ export function Faq(props: Props) {
                   'grid',
                   'items-center',
                   'text-left',
+                  'tracking-normal',
                   'w-full',
                   !item.clippedAnswer.isClipped && 'cursor-default',
                 )}

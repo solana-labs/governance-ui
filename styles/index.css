@@ -171,6 +171,10 @@ body::-webkit-scrollbar-corner {
   background: var(--bkg-4);
 }
 
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 .pointer {
   cursor: pointer;
 }
