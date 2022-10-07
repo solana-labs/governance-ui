@@ -68,7 +68,7 @@ export function Stats(props: Props) {
         )}
       </Stat>
       {props.documentation && (
-        <Stat className="w-[25%]" icon={<BookIcon />} label="Documentation">
+        <Stat className="w-[25%]" icon={<BookIcon />} label="More Learning">
           <a
             className="flex items-center"
             href={props.documentation.url}
