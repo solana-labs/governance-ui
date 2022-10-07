@@ -103,11 +103,7 @@ const TokenBalanceCard: FC<Props> = ({
   const hasLoaded = mint || councilMint
 
   return (
-    <div
-      className={`rounded-lg bg-bkg-2 + ${
-        !inAccountDetails ? 'p-4 md:p-6' : ''
-      }`}
-    >
+    <>
       {!inAccountDetails && (
         <div className="flex items-center justify-between">
           <h3 className="mb-0">My governance power</h3>
@@ -172,7 +168,7 @@ const TokenBalanceCard: FC<Props> = ({
         </>
       )}
       {children}
-    </div>
+    </>
   )
 }
 

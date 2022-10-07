@@ -5,6 +5,7 @@ import NFTSelector from '@components/NFTS/NFTSelector'
 import useRealm from '@hooks/useRealm'
 import { NftVoterClient } from '@solana/governance-program-library'
 import {
+  getTokenOwnerRecordAddress,
   SYSTEM_PROGRAM_ID,
   withCreateTokenOwnerRecord,
 } from '@solana/spl-governance'
@@ -14,8 +15,13 @@ import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
 import { getVoterWeightRecord } from '@utils/plugin/accounts'
+import { useEffect, useState } from 'react'
+import useQueryContext from '@hooks/useQueryContext'
+import Link from 'next/link'
+import { ChevronRightIcon } from '@heroicons/react/outline'
 
-const NftBalanceCard = () => {
+const NftBalanceCard = ({ showView }: { showView?: boolean }) => {
+  const { fmtUrlWithCluster } = useQueryContext()
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
   const client = useVotePluginsClientStore(
@@ -24,7 +30,16 @@ const NftBalanceCard = () => {
   const nfts = useNftPluginStore((s) => s.state.votingNfts)
   const isLoading = useNftPluginStore((s) => s.state.isLoadingNfts)
   const connection = useWalletStore((s) => s.connection)
-  const { tokenRecords, realm, realmInfo } = useRealm()
+  const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
+  const {
+    tokenRecords,
+    realm,
+    symbol,
+    mint,
+    councilMint,
+    config,
+    realmInfo,
+  } = useRealm()
   const { fetchRealm } = useWalletStore((s) => s.actions)
   const ownTokenRecord = wallet?.publicKey
     ? tokenRecords[wallet.publicKey!.toBase58()]
@@ -72,10 +87,50 @@ const NftBalanceCard = () => {
     await fetchRealm(realm?.owner, realm?.pubkey)
   }
 
+  useEffect(() => {
+    const getTokenOwnerRecord = async () => {
+      const defaultMint =
+        !mint?.supply.isZero() ||
+        config?.account.communityTokenConfig.maxVoterWeightAddin
+          ? realm!.account.communityMint
+          : !councilMint?.supply.isZero()
+          ? realm!.account.config.councilMint
+          : undefined
+      const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
+        realm!.owner,
+        realm!.pubkey,
+        defaultMint!,
+        wallet!.publicKey!
+      )
+      setTokenOwneRecordPk(tokenOwnerRecordAddress.toBase58())
+    }
+    if (realm && wallet?.connected) {
+      getTokenOwnerRecord()
+    }
+  }, [realm?.pubkey.toBase58(), wallet?.connected])
+
   return (
-    <div className="py-4 md:py-6">
+    <>
       <div className="flex items-center justify-between mb-4">
         <h3 className="mb-0">Your NFTS</h3>
+        {showView && (
+          <Link
+            href={fmtUrlWithCluster(
+              `/dao/${symbol}/account/${tokenOwnerRecordPk}`
+            )}
+          >
+            <a
+              className={`default-transition flex items-center text-fgd-2 text-sm transition-all hover:text-fgd-3 ${
+                !connected || !tokenOwnerRecordPk
+                  ? 'opacity-50 pointer-events-none'
+                  : ''
+              }`}
+            >
+              View
+              <ChevronRightIcon className="flex-shrink-0 w-6 h-6" />
+            </a>
+          </Link>
+        )}
       </div>
       <div className="space-y-4">
         {!connected ? (
@@ -100,7 +155,7 @@ const NftBalanceCard = () => {
           Join
         </Button>
       )}
-    </div>
+    </>
   )
 }
 export default NftBalanceCard

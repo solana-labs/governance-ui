@@ -77,7 +77,7 @@ const LockPluginTokenBalanceCard = ({
 
   const hasLoaded = mint || councilMint
   return (
-    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
+    <>
       <div className="flex items-center justify-between">
         <h3 className="mb-0">My governance power</h3>
         <Link
@@ -136,7 +136,7 @@ const LockPluginTokenBalanceCard = ({
           <div className="animate-pulse bg-bkg-3 h-10 rounded-lg" />
         </>
       )}
-    </div>
+    </>
   )
 }
 
