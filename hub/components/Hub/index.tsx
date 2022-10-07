@@ -91,7 +91,7 @@ export function Hub(props: Props) {
                   </div>
                   <div>
                     <SideCard
-                      className="sticky top-16"
+                      className="sticky top-24"
                       realm={props.realm}
                       realmUrlId={props.realmUrlId}
                     />

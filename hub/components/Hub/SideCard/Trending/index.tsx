@@ -142,7 +142,7 @@ export function Trending(props: Props) {
                       key={edge.node.id}
                     >
                       <a className="grid grid-cols-[20px,1fr] gap-x-3 group">
-                        <div className="text-xs leading-5 text-neutral-900 font-medium">
+                        <div className="text-xs leading-6 text-neutral-900 font-medium">
                           {(i + 1).toString().padStart(2, '0')}
                         </div>
                         <div>
