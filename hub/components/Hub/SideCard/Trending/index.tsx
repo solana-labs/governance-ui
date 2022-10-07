@@ -158,12 +158,12 @@ export function Trending(props: Props) {
                           </div>
                           {!isEmpty(edge.node.clippedDocument.document) && (
                             <RichTextDocumentDisplay
-                              className="text-sm text-neutral-500 mt-2"
+                              className="text-sm text-neutral-500"
                               document={edge.node.clippedDocument.document}
                               isClipped={edge.node.clippedDocument.isClipped}
                             />
                           )}
-                          <div className="flex items-center mt-2">
+                          <div className="flex items-center mt-1">
                             {edge.node.myVote === FeedItemVoteType.Approve ? (
                               <FavoriteFilledIcon className="fill-sky-500 h-4 w-4" />
                             ) : (
