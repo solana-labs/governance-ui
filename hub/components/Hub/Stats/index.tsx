@@ -1,13 +1,13 @@
 import ArrowRightIcon from '@carbon/icons-react/lib/ArrowRight';
 import BookIcon from '@carbon/icons-react/lib/Book';
-import LaunchIcon from '@carbon/icons-react/lib/Launch';
-import TwitterIcon from '@carbon/icons-react/lib/LogoTwitter';
 import WalletIcon from '@carbon/icons-react/lib/Wallet';
 import type { PublicKey } from '@solana/web3.js';
 import { pipe } from 'fp-ts/function';
 import Link from 'next/link';
 
+import { ExternalLink } from '@hub/components/icons/ExternalLink';
 import { RealmsLogo } from '@hub/components/icons/RealmsLogo';
+import { Twitter } from '@hub/components/icons/Twitter';
 import { useQuery } from '@hub/hooks/useQuery';
 import { abbreviateNumber } from '@hub/lib/abbreviateNumber';
 import cx from '@hub/lib/cx';
@@ -40,7 +40,7 @@ export function Stats(props: Props) {
         {props.numMembers}
       </Stat>
       {props.twitterFollowers && (
-        <Stat className="w-[25%]" icon={<TwitterIcon />} label="Followers">
+        <Stat className="w-[25%]" icon={<Twitter />} label="Followers">
           {abbreviateNumber(props.twitterFollowers, undefined, {
             maximumFractionDigits: 1,
           })}
@@ -76,7 +76,7 @@ export function Stats(props: Props) {
             rel="noreferrer"
           >
             {props.documentation.title || 'Docs'}
-            <LaunchIcon className="h-4 w-4 fill-neutral-500 ml-2" />
+            <ExternalLink className="h-4 w-4 fill-neutral-500 ml-2" />
           </a>
         </Stat>
       )}

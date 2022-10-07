@@ -33,7 +33,20 @@ export function Gallery(props: Props) {
           Gallery
         </div>
       </header>
-      <div className="flex items-center space-x-16 pb-20 mt-16 overflow-y-hidden overflow-x-auto snap-x snap-mandatory">
+      <div
+        className={cx(
+          'flex',
+          'items-center',
+          'mt-16',
+          'no-scrollbar',
+          'overflow-x-auto',
+          'overflow-y-hidden',
+          'pb-20',
+          'snap-mandatory',
+          'snap-x',
+          'space-x-16',
+        )}
+      >
         <div
           className="shrink-0 h-2"
           style={{
