@@ -884,8 +884,17 @@
     "website": "https://athensdao.net/",
     "twitter": "@GrapeAthensDAO",
     "ogImage": "/realms/AthensDAO/AthensDAO_Logo.jpg"
-  },
-  {
+   },
+   {
+    "symbol": "Wen DAO",
+    "displayName": "Wen DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "3GoWL2uR7qx9NLGuZydTuyoxaYSwAQ3HVqCF3Kz6D7F3",
+    "website": "https://services.grapes.network/",
+    "twitter": "@grapeprotocol",
+    "ogImage": "/realms/Wen DAO/Wen DAO.png"
+   }, 
+   { 
     "symbol": "BOOT",
     "displayName": "Bootstrap DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
