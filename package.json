@@ -63,7 +63,7 @@
     "@solendprotocol/solend-sdk": "^0.4.9",
     "@tippyjs/react": "^4.2.5",
     "@uxd-protocol/uxd-client": "2.0.1",
-    "@uxdprotocol/uxd-staking-client": "2.0.10",
+    "@uxdprotocol/uxd-staking-client": "3.1.0",
     "axios": "^0.21.1",
     "bignumber.js": "^9.0.1",
     "buffer-layout": "^1.2.2",

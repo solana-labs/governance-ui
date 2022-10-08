@@ -2017,23 +2017,23 @@
     lodash "^4.17.21"
     toformat "^2.0.0"
 
-"@saberhq/anchor-contrib@1.12.48":
-  version "1.12.48"
-  resolved "https://registry.yarnpkg.com/@saberhq/anchor-contrib/-/anchor-contrib-1.12.48.tgz#76f577df2fd3405086c80f2b9d7b30ca91e2ace0"
-  integrity sha512-UPITsnMazZXfCv4rI3Zx5aAxXZc2wPX09j2Bf5M6zVT1wYTbTEGp0yNLY4f926LBda+EngMkc19SrOYu94ODfw==
-  dependencies:
-    "@saberhq/solana-contrib" "^1.12.48"
-    eventemitter3 "^4.0.7"
-    lodash.camelcase "^4.3.0"
-    lodash.mapvalues "^4.6.0"
-    tslib "^2.3.1"
-
 "@saberhq/anchor-contrib@1.13.0":
   version "1.13.0"
   resolved "https://registry.yarnpkg.com/@saberhq/anchor-contrib/-/anchor-contrib-1.13.0.tgz#f057d3b3ed6b2a6173b4e19b40b19f56c60b91e9"
   integrity sha512-EHOJizlPMQsHYtaVlJBompEnJx3keGjZ0Nyio8wPHjAJ044RAK83ib96+LK5s4pb+6l4pVHyjkpRWyZG8Z152w==
   dependencies:
     "@saberhq/solana-contrib" "^1.13.0"
+    eventemitter3 "^4.0.7"
+    lodash.camelcase "^4.3.0"
+    lodash.mapvalues "^4.6.0"
+    tslib "^2.4.0"
+
+"@saberhq/anchor-contrib@1.13.32":
+  version "1.13.32"
+  resolved "https://registry.yarnpkg.com/@saberhq/anchor-contrib/-/anchor-contrib-1.13.32.tgz#99c7da5030c92a073a6b934dd11cee3c2893bc9d"
+  integrity sha512-coU3mFuwJCM5hdNkMSxse+WyJskDer6OzAAXCE5bxe8Lm2bQFN1P3uohrBmV6r+eQlK+im+oozne7CyCSmR1lw==
+  dependencies:
+    "@saberhq/solana-contrib" "^1.13.32"
     eventemitter3 "^4.0.7"
     lodash.camelcase "^4.3.0"
     lodash.mapvalues "^4.6.0"
@@ -2090,18 +2090,6 @@
     tiny-invariant "^1.2.0"
     tslib "^2.3.1"
 
-"@saberhq/solana-contrib@1.12.48":
-  version "1.12.48"
-  resolved "https://registry.yarnpkg.com/@saberhq/solana-contrib/-/solana-contrib-1.12.48.tgz#313df4afbd6903997b15a551b99b5186a5f8ba9d"
-  integrity sha512-aI6KjByqJK7/rzB8joIqpCMxQ554vQcDN3jX5iyd6HncNj03I6hyGoniOWGySxvftgwcZQC2x4/NmiIvxJ460g==
-  dependencies:
-    "@types/promise-retry" "^1.1.3"
-    "@types/retry" "^0.12.1"
-    promise-retry "^2.0.1"
-    retry "^0.13.1"
-    tiny-invariant "^1.2.0"
-    tslib "^2.3.1"
-
 "@saberhq/solana-contrib@1.13.0":
   version "1.13.0"
   resolved "https://registry.yarnpkg.com/@saberhq/solana-contrib/-/solana-contrib-1.13.0.tgz#0e5f360cfbed90e9786d0e89db6589f8c5299bab"
@@ -2115,7 +2103,7 @@
     tiny-invariant "^1.2.0"
     tslib "^2.4.0"
 
-"@saberhq/solana-contrib@^1.12.48":
+"@saberhq/solana-contrib@1.13.32":
   version "1.13.32"
   resolved "https://registry.yarnpkg.com/@saberhq/solana-contrib/-/solana-contrib-1.13.32.tgz#ace608df953c1e92b8cad388835dce5d1729f7a7"
   integrity sha512-W0F5W1CJjk2ACuAYjGxr/nB+pDHsmg2A6F+d+XRM6/EES/9ZoIINHCA1dnPsTa0p4PnC1S7BtCrv9aERzwRKhg==
@@ -3304,14 +3292,14 @@
     "@solana/web3.js" "1.42.0"
     camelcase "5.3.1"
 
-"@uxdprotocol/uxd-staking-client@2.0.10":
-  version "2.0.10"
-  resolved "https://npm.pkg.github.com/download/@uxdprotocol/uxd-staking-client/2.0.10/085cd18030a30e39de11e55a4e405ca7d1dfc9e04d6945b612d33d691605d61c#608b2e982bd490ecdb51525cd29449bc5fd08a9d"
-  integrity sha512-+/O/BRf13HnhjgAOXTXaID6DbXLVHmbP6jojPfO0viCcvz2Mx4aSR/liuIcEA/lr0F6/ZV048xSY7HElYlDUQQ==
+"@uxdprotocol/uxd-staking-client@3.1.0":
+  version "3.1.0"
+  resolved "https://npm.pkg.github.com/download/@UXDProtocol/uxd-staking-client/3.1.0/5f73823a7d9cc7828c8c054e464cf5f5be34d857#5f73823a7d9cc7828c8c054e464cf5f5be34d857"
+  integrity sha512-5J2iXG0qmLwORiZG6vHJIh5PragSUEdkppEXhPm/bE3Cu4xsx4U9Ze2qQKOD055u8VGGDjtzNMC5uNnq1/GYPg==
   dependencies:
-    "@saberhq/anchor-contrib" "1.12.48"
-    "@saberhq/solana-contrib" "1.12.48"
-    borsh "0.3.1"
+    "@saberhq/anchor-contrib" "1.13.32"
+    "@saberhq/solana-contrib" "1.13.32"
+    borsh "0.7.0"
 
 "@yarnpkg/lockfile@^1.1.0":
   version "1.1.0"
@@ -4041,7 +4029,16 @@ boolbase@~1.0.0:
   resolved "https://registry.yarnpkg.com/boolbase/-/boolbase-1.0.0.tgz#68dff5fbe60c51eb37725ea9e3ed310dcc1e776e"
   integrity sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==
 
-borsh@0.3.1, borsh@^0.3.1:
+borsh@0.7.0, borsh@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.npmjs.org/borsh/-/borsh-0.7.0.tgz"
+  integrity sha512-CLCsZGIBCFnPtkNnieW/a8wmreDmfUtjU2m9yHrzPXIlNbqVs0AQrSatSG6vdNYUqdc83tkQi2eHfF98ubzQLA==
+  dependencies:
+    bn.js "^5.2.0"
+    bs58 "^4.0.0"
+    text-encoding-utf-8 "^1.0.2"
+
+borsh@^0.3.1:
   version "0.3.1"
   resolved "https://registry.npmjs.org/borsh/-/borsh-0.3.1.tgz"
   integrity sha512-gJoSTnhwLxN/i2+15Y7uprU8h3CKI+Co4YKZKvrGYUy0FwHWM20x5Sx7eU8Xv4HQqV+7rb4r3P7K1cBIQe3q8A==
@@ -4065,15 +4062,6 @@ borsh@^0.6.0:
   version "0.6.0"
   resolved "https://registry.npmjs.org/borsh/-/borsh-0.6.0.tgz"
   integrity sha512-sl5k89ViqsThXQpYa9XDtz1sBl3l1lI313cFUY1HKr+wvMILnb+58xpkqTNrYbelh99dY7K8usxoCusQmqix9Q==
-  dependencies:
-    bn.js "^5.2.0"
-    bs58 "^4.0.0"
-    text-encoding-utf-8 "^1.0.2"
-
-borsh@^0.7.0:
-  version "0.7.0"
-  resolved "https://registry.npmjs.org/borsh/-/borsh-0.7.0.tgz"
-  integrity sha512-CLCsZGIBCFnPtkNnieW/a8wmreDmfUtjU2m9yHrzPXIlNbqVs0AQrSatSG6vdNYUqdc83tkQi2eHfF98ubzQLA==
   dependencies:
     bn.js "^5.2.0"
     bs58 "^4.0.0"
