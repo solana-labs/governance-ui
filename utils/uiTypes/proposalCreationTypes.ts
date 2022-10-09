@@ -435,6 +435,19 @@ export interface SerumGrantLockedForm {
   programId: string
 }
 
+export interface SerumUpdateConfigParam {
+  governedAccount?: AssetAccount // Config Authority
+  claimDelay?: number
+  redeemDelay?: number
+  cliffPeriod?: number
+  linearVestingPeriod?: number
+}
+
+export interface SerumUpdateConfigAuthority {
+  governedAccount?: AssetAccount // Config Authority
+  newAuthority?: string
+}
+
 export interface JoinDAOForm {
   governedAccount?: AssetAccount
   mintInfo: MintInfo | undefined
@@ -522,6 +535,8 @@ export enum Instructions {
   SerumGrantLockedMSRM,
   SerumGrantVestSRM,
   SerumGrantVestMSRM,
+  SerumUpdateGovConfigParams,
+  SerumUpdateGovConfigAuthority,
   JoinDAO,
 }
 

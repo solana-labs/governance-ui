@@ -20,6 +20,14 @@ import produce from 'immer'
 import create, { State } from 'zustand'
 import IDL from '../idls/serum_gov.json'
 
+export type ConfigAccountType = {
+  configAuthority: PublicKey
+  claimDelay: anchor.BN
+  redeemDelay: anchor.BN
+  cliffPeriod: anchor.BN
+  linearVestingPeriod: anchor.BN
+}
+
 export type ClaimTicketType = {
   address: PublicKey
   owner: PublicKey
@@ -71,13 +79,13 @@ export type VestAccountType = {
   gsrmBurned: anchor.BN
 }
 
-const PROGRAM_ID = new PublicKey('3Xqru7FkP2BACJgxtPTP34HpbQkSkgjFPViuwTv98Lg3')
+const PROGRAM_ID = new PublicKey('13CrEWENBbH8LUspPGoh8bLQ5xVLAWVQuKJcq8ovz7Ls')
 
 export const SRM_MINT = new PublicKey(
-  '9C6YDzG8EjttWMsH7cyDp3aRJG5j4Uti5SMV46f53GYP'
+  '2xKASju8WCUK6zC54TP4h6WhHdqdcWMNoFpqAdvXvHV6'
 )
 export const MSRM_MINT = new PublicKey(
-  '4yLDuw3yYC3ncVzthLesTb6ALJsdTzLabcESo3Kvup79'
+  'BoFBTKtdMXC4YALXtNV5tmw1xNWtjxTrR17PvZGmKhmP'
 )
 export const [GSRM_MINT] = findProgramAddressSync(
   [Buffer.from('gSRM')],
@@ -109,6 +117,9 @@ interface SerumGovStore extends State {
       connection: Connection,
       owner?: PublicKey | null
     ) => Promise<TokenAmount | null>
+    getConfigAccount: (
+      provider: anchor.AnchorProvider
+    ) => Promise<ConfigAccountType | null>
     getUserAccount: (
       provider: anchor.AnchorProvider,
       owner?: PublicKey | null
@@ -205,6 +216,19 @@ interface SerumGovStore extends State {
       isMsrm: boolean,
       owner?: WalletSigner | null
     ) => Promise<void>
+    getUpdateConfigParamInstruction: (
+      provider: anchor.AnchorProvider,
+      configAuthority: PublicKey,
+      claimDelay: anchor.BN,
+      redeemDelay: anchor.BN,
+      cliffPeriod: anchor.BN,
+      linearVestingPeriod: anchor.BN
+    ) => Promise<TransactionInstruction>
+    getUpdateConfigAuthorityInstruction: (
+      provider: anchor.AnchorProvider,
+      configAuthority: PublicKey,
+      newAuthority: PublicKey
+    ) => Promise<TransactionInstruction>
   }
 }
 
@@ -240,6 +264,33 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
         return tokenBalance.value
       } catch (e) {
         console.error('Failed to get gSRM balance.', e)
+        return null
+      }
+    },
+
+    async getConfigAccount(
+      provider: anchor.AnchorProvider
+    ): Promise<ConfigAccountType | null> {
+      const [config] = findProgramAddressSync(
+        [Buffer.from('config')],
+        get().programId
+      )
+      const program = new anchor.Program(
+        IDL as anchor.Idl,
+        get().programId,
+        provider
+      )
+      try {
+        const configAccount = await program.account.config.fetch(config)
+        return {
+          configAuthority: configAccount.configAuthority as PublicKey,
+          claimDelay: configAccount.claimDelay as anchor.BN,
+          redeemDelay: configAccount.redeemDelay as anchor.BN,
+          cliffPeriod: configAccount.cliffPeriod as anchor.BN,
+          linearVestingPeriod: configAccount.linearVestingPeriod as anchor.BN,
+        }
+      } catch (e) {
+        console.log('Config account not found')
         return null
       }
     },
@@ -1227,6 +1278,58 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
         console.error(e)
         notify({ type: 'error', message: 'Failed to lock tokens' })
       }
+    },
+
+    async getUpdateConfigParamInstruction(
+      provider: anchor.AnchorProvider,
+      configAuthority: PublicKey,
+      claimDelay: anchor.BN,
+      redeemDelay: anchor.BN,
+      cliffPeriod: anchor.BN,
+      linearVestingPeriod: anchor.BN
+    ): Promise<TransactionInstruction> {
+      const program = new anchor.Program(
+        IDL as anchor.Idl,
+        get().programId,
+        provider
+      )
+
+      const ix = await program.methods
+        .updateConfigParams(
+          claimDelay,
+          redeemDelay,
+          cliffPeriod,
+          linearVestingPeriod
+        )
+        .accounts({
+          config: get().config,
+          configAuthority,
+        })
+        .instruction()
+
+      return ix
+    },
+
+    async getUpdateConfigAuthorityInstruction(
+      provider: anchor.AnchorProvider,
+      configAuthority: PublicKey,
+      newAuthority: PublicKey
+    ): Promise<TransactionInstruction> {
+      const program = new anchor.Program(
+        IDL as anchor.Idl,
+        get().programId,
+        provider
+      )
+
+      const ix = await program.methods
+        .updateConfigAuthority(newAuthority)
+        .accounts({
+          config: get().config,
+          configAuthority,
+        })
+        .instruction()
+
+      return ix
     },
   },
 }))

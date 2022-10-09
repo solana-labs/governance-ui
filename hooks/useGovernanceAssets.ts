@@ -543,6 +543,16 @@ export default function useGovernanceAssets() {
       name: 'Serum: Grant Vested MSRM',
       isVisible: canUseAnyInstruction,
     },
+    {
+      id: Instructions.SerumUpdateGovConfigParams,
+      name: 'Serum: Update Governance Config Params',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.SerumUpdateGovConfigAuthority,
+      name: 'Serum: Update Governance Config Authority',
+      isVisible: canUseAnyInstruction,
+    },
     ...foresightInstructions,
   ]
   return {

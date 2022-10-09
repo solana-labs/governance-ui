@@ -112,6 +112,8 @@ import InitUser from './components/instructions/Serum/InitUser'
 import MakeChangeReferralFeeParams2 from './components/instructions/Mango/MakeChangeReferralFeeParams2'
 import GrantForm from './components/instructions/Serum/GrantForm'
 import JoinDAO from './components/instructions/JoinDAO'
+import UpdateConfigAuthority from './components/instructions/Serum/UpdateConfigAuthority'
+import UpdateConfigParams from './components/instructions/Serum/UpdateConfigParams'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -770,6 +772,11 @@ const New = () => {
         )
       case Instructions.JoinDAO:
         return <JoinDAO index={idx} governance={governance} />
+
+      case Instructions.SerumUpdateGovConfigAuthority:
+        return <UpdateConfigAuthority index={idx} governance={governance} />
+      case Instructions.SerumUpdateGovConfigParams:
+        return <UpdateConfigParams index={idx} governance={governance} />
       default:
         null
     }
