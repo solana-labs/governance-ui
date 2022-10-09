@@ -1047,5 +1047,13 @@
     "ogImage": "/realms/jungle-defi/jungle.png",
     "website": "https://jungledefi.io",
     "twitter": "@jungledefi"
+  },
+  {
+    "symbol": "Blockgame",
+    "displayName": "Blockgame",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "3EPsh3Nm2sivjjh3pcR4qmFzsMgJ3cDGjwiJeDARuQNR",
+    "ogImage": "/realms/Blockgame/Blockgame.png",
+    "website": "https://blockgame.cz"
   }
 ]
