@@ -1,8 +1,7 @@
-import LaunchIcon from '@carbon/icons-react/lib/Launch';
 import LinkIcon from '@carbon/icons-react/lib/Link';
 
+import { ExternalLink } from '@hub/components/icons/ExternalLink';
 import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay';
-import cx from '@hub/lib/cx';
 import { RichTextDocument } from '@hub/types/RichTextDocument';
 
 interface Props {
@@ -55,7 +54,7 @@ export function ResourceList(props: Props) {
               <div className="text-sm text-neutral-700 mb-1">{domain}</div>
               <div className="flex items-center">
                 <div className="font-bold text-sky-600">{resource.title}</div>
-                <LaunchIcon className="h-4 fill-neutral-500 ml-3 w-4" />
+                <ExternalLink className="h-4 fill-neutral-500 ml-3 w-4" />
               </div>
               {resource.content && (
                 <RichTextDocumentDisplay

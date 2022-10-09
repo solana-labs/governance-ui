@@ -33,48 +33,72 @@ export function Gallery(props: Props) {
           Gallery
         </div>
       </header>
-      <div className="mt-16 overflow-y-hidden overflow-x-auto">
-        <div className="flex items-center space-x-16 pb-20">
-          <div className="w-4 shrink-0 h-2" />
-          {props.items.map((item, i) => (
-            <div className="flex flex-col items-center shrink-0" key={i}>
-              {item.url.includes('www.youtube.com') ? (
-                <div
-                  className="rounded overflow-hidden shrink-0"
-                  style={{
-                    height: item.height,
-                    width: item.width,
-                  }}
-                >
-                  <iframe
-                    allowFullScreen
-                    allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
-                    frameBorder="0"
-                    height={item.height}
-                    src={getYoutubeEmbedUrl(item.url)}
-                    width={item.width}
-                  />
-                </div>
-              ) : (
-                <img
-                  className="rounded"
-                  src={item.url}
-                  style={{
-                    height: item.height,
-                    width: item.width,
-                  }}
+      <div
+        className={cx(
+          'flex',
+          'items-center',
+          'mt-16',
+          'no-scrollbar',
+          'overflow-x-auto',
+          'overflow-y-hidden',
+          'pb-20',
+          'snap-mandatory',
+          'snap-x',
+          'space-x-16',
+        )}
+      >
+        <div
+          className="shrink-0 h-2"
+          style={{
+            width: props.items[0].width / 2,
+          }}
+        />
+        {props.items.map((item, i) => (
+          <div
+            className="flex flex-col items-center shrink-0 snap-center"
+            key={i}
+          >
+            {item.url.includes('www.youtube.com') ? (
+              <div
+                className="rounded overflow-hidden shrink-0"
+                style={{
+                  height: item.height,
+                  width: item.width,
+                }}
+              >
+                <iframe
+                  allowFullScreen
+                  allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
+                  frameBorder="0"
+                  height={item.height}
+                  src={getYoutubeEmbedUrl(item.url)}
+                  width={item.width}
                 />
-              )}
-              {item.caption && (
-                <div className="max-w-[80%] h-0 text-xs text-center text-neutral-700">
-                  <div className="h-2 w-full" />
-                  {item.caption}
-                </div>
-              )}
-            </div>
-          ))}
-          <div className="w-4 shrink-0 h-2" />
-        </div>
+              </div>
+            ) : (
+              <img
+                className="rounded"
+                src={item.url}
+                style={{
+                  height: item.height,
+                  width: item.width,
+                }}
+              />
+            )}
+            {item.caption && (
+              <div className="max-w-[80%] h-0 text-xs text-center text-neutral-700">
+                <div className="h-2 w-full" />
+                {item.caption}
+              </div>
+            )}
+          </div>
+        ))}
+        <div
+          className="shrink-0 h-2"
+          style={{
+            width: props.items[props.items.length - 1].width / 2,
+          }}
+        />
       </div>
     </article>
   );

@@ -30,7 +30,7 @@ export function Content(props: Props) {
       {props.iconUrl ? (
         <img
           className={cx(
-            'bg-white',
+            'bg-neutral-100',
             'h-40',
             'rounded-full',
             'transition-opacity',

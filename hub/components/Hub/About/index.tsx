@@ -45,6 +45,7 @@ export function About(props: Props) {
             'rounded',
             'space-x-1.5',
             'text-neutral-900',
+            'tracking-normal',
             'transition-colors',
             'w-44',
             'hover:bg-neutral-200',

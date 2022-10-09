@@ -1,10 +1,10 @@
 import CheckmarkOutlineIcon from '@carbon/icons-react/lib/CheckmarkOutline';
 import CrossroadsIcon from '@carbon/icons-react/lib/Crossroads';
 import InProgressIcon from '@carbon/icons-react/lib/InProgress';
-import LaunchIcon from '@carbon/icons-react/lib/Launch';
 import WarningOtherIcon from '@carbon/icons-react/lib/WarningOther';
 import { format } from 'date-fns';
 
+import { ExternalLink } from '@hub/components/icons/ExternalLink';
 import cx from '@hub/lib/cx';
 import { HubInfoRoadmapItemStatus } from '@hub/types/HubInfoRoadmapItemStatus';
 import { RichTextDocument } from '@hub/types/RichTextDocument';
@@ -141,7 +141,7 @@ export function Item(props: Props) {
           <div className="text-sm font-bold text-sky-600">
             {props.resource.title}
           </div>
-          <LaunchIcon className="h-4 w-4 ml-2 fill-neutral-500" />
+          <ExternalLink className="h-4 w-4 ml-2 fill-neutral-500" />
         </a>
       )}
       {!props.last && (
