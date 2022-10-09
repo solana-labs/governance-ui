@@ -15,6 +15,15 @@ export default function SerumGovWallet({ wallet }: { wallet: Wallet }) {
     gsrmBalance,
   } = useSerumGov(wallet.address)
 
+  if (
+    !claimTickets.length ||
+    !redeemTickets.length ||
+    !vestAccounts.length ||
+    !lockedAccounts.length ||
+    !gsrmBalance
+  )
+    return null
+
   return (
     <div className="mt-3">
       <div className="text-white/50 text-xs ml-1 mb-1">

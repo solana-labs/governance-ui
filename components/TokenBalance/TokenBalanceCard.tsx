@@ -58,10 +58,10 @@ const TokenBalanceCard: FC<Props> = ({
   inAccountDetails = false,
   children,
 }) => {
+  const realmProgramId = useWalletStore((s) => s.selectedRealm.programId)
   const [hasGovPower, setHasGovPower] = useState<boolean>(false)
   const { councilMint, mint, realm, symbol } = useRealm()
   const connected = useWalletStore((s) => s.connected)
-  const cluster = useWalletStore((s) => s.connection.cluster)
   const wallet = useWalletStore((s) => s.current)
   const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
   const { fmtUrlWithCluster } = useQueryContext()
@@ -175,7 +175,10 @@ const TokenBalanceCard: FC<Props> = ({
         </>
       )}
       {/* TODO: Restrict to Serum DAO */}
-      {cluster === 'devnet' ? <SerumGovernanceTokenWrapper /> : null}
+      {realmProgramId?.toBase58() ===
+      'G41fmJzd29v7Qmdi8ZyTBBYa98ghh3cwHBTexqCG1PQJ' ? (
+        <SerumGovernanceTokenWrapper />
+      ) : null}
       {children}
     </div>
   )

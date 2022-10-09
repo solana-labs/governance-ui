@@ -62,7 +62,7 @@ const DepositCard = ({ mint, callback, createProposal }: DepositCardProps) => {
 
   const { wallet, anchorProvider } = useWallet()
   const { balance, isLoading, refetch } = useTokenAccountBalance(
-    createProposal?.owner,
+    createProposal ? createProposal.owner : wallet?.publicKey,
     MINT_MAP[mint].pubkey
   )
 
@@ -213,7 +213,7 @@ const DepositCard = ({ mint, callback, createProposal }: DepositCardProps) => {
     setIsDepositing(false)
   }
 
-  if (!wallet || !balance || isLoading) return null
+  if (!wallet || !balance || !balance.uiAmount || isLoading) return null
 
   return (
     <div className="p-3 rounded-md border-2 border-bkg-4">

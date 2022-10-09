@@ -43,6 +43,13 @@
     "sortRank": 3
   },
   {
+    "symbol": "SERUM",
+    "displayName": "SerumDAO - Test",
+    "programId": "G41fmJzd29v7Qmdi8ZyTBBYa98ghh3cwHBTexqCG1PQJ",
+    "realmId": "3pFLtCJzoewv9aB4JZDhGdRb4xQeJRtVpd66QgpNTDwP",
+    "ogImage": "https://assets.website-files.com/61284dcff241c2f0729af9f3/61285237ce2e301255d09108_logo-serum.png"
+  },
+  {
     "symbol": "MDLH",
     "displayName": "The Mysterious Death of Lord Harrington",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",

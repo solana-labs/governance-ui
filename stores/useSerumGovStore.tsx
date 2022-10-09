@@ -79,7 +79,7 @@ export type VestAccountType = {
   gsrmBurned: anchor.BN
 }
 
-const PROGRAM_ID = new PublicKey('13CrEWENBbH8LUspPGoh8bLQ5xVLAWVQuKJcq8ovz7Ls')
+const PROGRAM_ID = new PublicKey('EDV6BNBY6pLb4aCJCc5LnELdA9xTywnDZ2m3cWfCbpwZ')
 
 export const SRM_MINT = new PublicKey(
   '2xKASju8WCUK6zC54TP4h6WhHdqdcWMNoFpqAdvXvHV6'
@@ -1235,6 +1235,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
               srmMint: SRM_MINT,
               payerSrmAccount: ownerAta,
               authority: get().authority,
+              config: get().config,
               srmVault: vault,
               lockedAccount,
               claimTicket,
@@ -1256,6 +1257,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
               msrmMint: MSRM_MINT,
               payerMsrmAccount: ownerAta,
               authority: get().authority,
+              config: get().config,
               msrmVault: vault,
               lockedAccount,
               claimTicket,
