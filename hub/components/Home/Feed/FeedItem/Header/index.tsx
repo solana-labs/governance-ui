@@ -73,7 +73,7 @@ export function Header(props: Props) {
         )}
         {props.proposal ? (
           <a
-            className="flex items-center space-x-1 text-neutral-500 text-xs"
+            className="flex items-center space-x-1 text-neutral-500 text-xs hover:underline"
             href={props.url}
             target="_blank"
             rel="noreferrer"
@@ -86,7 +86,7 @@ export function Header(props: Props) {
           </a>
         ) : (
           <Link href={props.url} passHref>
-            <a className="flex items-center space-x-1 text-neutral-500 text-xs">
+            <a className="flex items-center space-x-1 text-neutral-500 text-xs hover:underline">
               <div>
                 {formatDistanceToNowStrict(date)} ago
                 {isEdited && !props.proposal ? '*' : ''}

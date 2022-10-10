@@ -79,7 +79,7 @@ export function Controls(props: Props) {
           </div>
         </button>
         {Number.isInteger(props.numReplies) && (
-          <div className="flex items-center ml-6 text-neutral-500 hover:text-sky-500">
+          <div className="flex items-center ml-6 text-neutral-500 hover:text-neutral-900">
             <ChatIcon className="fill-current h-4 w-4 mr-1 transition-colors" />
             <div className="text-xs transition-colors">
               {props.numReplies} {ntext(props.numReplies || 0, 'Comment')}

@@ -104,7 +104,7 @@ export function Controls(props: Props) {
           'items-center',
           'space-x-1.5',
           'text-neutral-500',
-          'hover:text-sky-500',
+          'hover:text-neutral-900',
           'disabled:cursor-not-allowed',
           'disabled:text-neutral-300',
         )}

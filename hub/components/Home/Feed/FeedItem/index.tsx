@@ -96,7 +96,7 @@ export function Content(props: Props) {
             {props.feedItem.title}
           </div>
           <RichTextDocumentDisplay
-            className="mt-4 text-neutral-700 text-sm"
+            className="mt-4 text-neutral-900 text-sm"
             isClipped={isClipped}
             document={document}
             onExpand={() => {
