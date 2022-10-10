@@ -1,6 +1,10 @@
 import AssemblyClusterIcon from '@carbon/icons-react/lib/AssemblyCluster';
 import EarthIcon from '@carbon/icons-react/lib/Earth';
 import ListDropdownIcon from '@carbon/icons-react/lib/ListDropdown';
+import LogoDiscord from '@carbon/icons-react/lib/LogoDiscord';
+import LogoGithub from '@carbon/icons-react/lib/LogoGithub';
+import LogoInstagram from '@carbon/icons-react/lib/LogoInstagram';
+import LogoLinkedin from '@carbon/icons-react/lib/LogoLinkedin';
 import WalletIcon from '@carbon/icons-react/lib/Wallet';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import type { PublicKey } from '@solana/web3.js';
@@ -29,6 +33,11 @@ interface Props extends BaseProps {
     price: number;
     symbol: string;
   };
+  // external links
+  discordUrl?: string | null;
+  githubUrl?: string | null;
+  instagramUrl?: string | null;
+  linkedInUrl?: string | null;
   twitterHandle?: string | null;
   websiteUrl?: string | null;
 }
@@ -88,6 +97,26 @@ export function Content(props: Props) {
                   href={`https://www.twitter.com/${props.twitterHandle}`}
                 >
                   <Twitter />
+                </ExternalLinkIcon>
+              )}
+              {props.instagramUrl && (
+                <ExternalLinkIcon href={props.instagramUrl}>
+                  <LogoInstagram />
+                </ExternalLinkIcon>
+              )}
+              {props.discordUrl && (
+                <ExternalLinkIcon href={props.discordUrl}>
+                  <LogoDiscord />
+                </ExternalLinkIcon>
+              )}
+              {props.linkedInUrl && (
+                <ExternalLinkIcon href={props.linkedInUrl}>
+                  <LogoLinkedin />
+                </ExternalLinkIcon>
+              )}
+              {props.githubUrl && (
+                <ExternalLinkIcon href={props.githubUrl}>
+                  <LogoGithub />
                 </ExternalLinkIcon>
               )}
             </NavigationMenu.List>

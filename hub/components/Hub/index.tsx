@@ -58,6 +58,10 @@ export function Hub(props: Props) {
                 token={hub.info.token}
                 twitterHandle={realm.twitterHandle}
                 websiteUrl={realm.websiteUrl}
+                discordUrl={realm.discordUrl}
+                githubUrl={realm.githubUrl}
+                instagramUrl={realm.instagramUrl}
+                linkedInUrl={realm.linkedInUrl}
               />
               <div className="max-w-7xl mx-auto relative w-full">
                 {hub.info.heading && (
