@@ -7,24 +7,24 @@
       {
         "heading": "Introduction",
         "content": [
-          "Metaplex Studios, ecosystem, and community have been moving quickly to support the thousands of developer teams and creators looking to launch their NFT projects on Solana. In response to feedback, we've created tools like our Candy Machine v2™, to help mint and sell thousands of NFTs for NFT collections and/or common profile picture projects you all know and love. We've also been hard at work creating primitives, recipes, and extensible storefronts that developers and creators alike can use."
-        ]
-      },
-      {
-        "heading": "What's next for Metaplex?",
-        "content": [
-          "More power to you, and no gatekeepers. With over 17M NFTs minted, Metaplex has fueled of one of the fastest-growing markets in history with over $3B+ in commerce and $1B+ in revenue generated directly for creators through Metaplex smart contracts."
+          "Metaplex is a permissionless on-chain protocol for creators to launch their own non-fungible token (NFT) storefront to connect directly with their audiences, natively on the Solana blockchain. The protocol offers an open-source framework to manage independent NFT storefronts, which can be fully customized and self-hosted without passing through a centralized authority — all with significantly lower minting and transaction fees. Metaplex is a collection of tools, smart contracts, and more designed to make the process of creating and launching NFTs easier."
         ]
       },
       {
         "heading": "The World’s Fastest Growing Web3 Creator Platform",
         "content": [
-          "The Candy Machine is a distribution program and in order to use it to mint NFTs, it needs to be loaded up with your project's artwork and metadata."
+          "Metaplex Studios, ecosystem, and community have been moving quickly to support the thousands of developer teams and creators looking to launch their NFT projects on Solana. In response to feedback, we've created tools like our Candy Machine v2™, to help mint and sell thousands of NFTs for NFT collections and/or common profile picture projects you all know and love."
+        ]
+      },
+      {
+        "heading": "Built on Solana",
+        "content": [
+          "Metaplex is built on Solana not only because of scalability, but also because Solana has many other great features, including \"Proof of History\". Solana has a great reputation around launching NFTs in part because of the work of the Metaplex team. Initially a Solana initiative, we were spun out in order to achieve our goal of creating a best-in-class NFT creator experience."
         ]
       },
       {
         "content": [
-          "There are a multitude of unique ways to generate images and metadata, and in most scenarios, you will automate this process. A good example of an image generation tool is HashLips. In this guide we will cover the creation of a simple collection to illustrate the metadata requirements and Candy Machine distribution. You should familiarize yourself with the Token Metadata Standard."
+          "We believe anyone can be a creator with our Creator Studio, which offers artists web-based user interfaces atop robust no-code tools, making it easy to create, sell and manage NFTs on Solana without writing a single line of code. Not a dev? No problem. Simply provide the art and some basic information about your project, and you’ll be launching NFTs powered by the fastest growing web3 creator platform in the world."
         ]
       }
     ],
@@ -90,7 +90,7 @@
         "name": "Stephen Hess",
         "avatar": "https://s.yimg.com/ny/api/res/1.2/_LZuGyNQkzaHgTqFIRLeRA--/YXBwaWQ9aGlnaGxhbmRlcjt3PTk2MDtoPTY0MTtjZj13ZWJw/https://s.yimg.com/uu/api/res/1.2/XZ.BQoe4WGFgYHj2SiEekw--~B/aD00NzU7dz03MTE7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/coin_rivet_596/0ca8a7254a0c6cab2cca6796efe519fa",
         "description": [
-          "With tertiary degrees in graphic design, art history and branding, Kais brings his strategic experience in building and leading design projects for many global brands including Unicef, United Nations, Unilever, Greenpeace, Ford, Dell and Olympus."
+          "Stephen became Metaplex's Chief Executive Officer in February 2022 after serving as Head of Product at Solana Labs and Director at the Metaplex Foundation. Prior to joining Solana Labs, Stephen held product leadership roles at a variety of technology startups, most recently as a Product Director at Omada Health. Since the Metaplex protocol launched last July, creators have used it to mint 5.7 million NFTs with over 600,000 unique wallets holding one. Metaplex’s Candy Machine is responsible for virtually every generative collection in the ecosystem, and its commerce program Auction House is quickly gaining adoption from projects like Fractal that value open protocols, global price discovery, and decentralization."
         ],
         "role": "Chief Executive Officer",
         "twitter": "@meta_hess"
@@ -98,7 +98,7 @@
     ],
     "roadmap": {
       "description": [
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud."
+        "Our roadmap is dynamic, and we try to release features and fixes as they are ready but this list will give you a general sense of where we are heading with Metaplex."
       ],
       "items": [
         {
@@ -106,26 +106,44 @@
           "date": "2021-08-30T15:42:21.109Z",
           "status": "completed",
           "resource": {
-            "title": "Metaplex Foundation Closes $46M Funding Round",
-            "url": "https://blockworks.co/metaplex-foundation-closes-46m-funding-round/"
+            "title": "Solana Metaplex Studios Launches to Grow NFTs Outside of Ethereum",
+            "url": "https://decrypt.co/82170/solana-launches-metaplex-studios-grow-nfts-outside-ethereum"
           }
         },
         {
-          "title": "Candy Machine v2",
+          "title": "Launch $MPLX token",
           "date": "2022-09-30T15:45:01.159Z",
+          "status": "completed",
+          "resource": {
+            "title": "The Metaplex Foundation Announces the Metaplex Token (MPLX)",
+            "url": "https://www.metaplex.com/posts/mplx"
+          }
+        },
+        {
+          "title": "Launch Creator Studio",
+          "date": "2022-10-30T15:46:07.387Z",
+          "status": "completed",
+          "resource": {
+            "title": "Early Access: Going No-Code with Metaplex Creator Studio",
+            "url": "https://www.metaplex.com/posts/announcing-metaplex-creator-studio"
+          }
+        },
+        {
+          "title": "Launch Candy Machine, v3",
+          "date": "2023-01-28T16:47:34.797Z",
           "status": "delayed",
           "resource": null
         },
         {
-          "title": "Launch Metaplex DAO",
-          "date": "2022-10-30T15:46:07.387Z",
+          "title": "Support for web3 games",
+          "date": "2023-03-28T16:47:34.797Z",
           "status": "inprogress",
           "resource": null
         },
         {
-          "title": "Launch Governance Token",
-          "date": "2023-02-28T16:47:34.797Z",
-          "status": null,
+          "title": "Launch Whitepaper NFT",
+          "date": "2023-07-28T16:47:34.797Z",
+          "status": "upcoming",
           "resource": null
         }
       ]

@@ -43,7 +43,6 @@ export function Team(props: Props) {
               'gap-x-12',
               'grid-cols-[160px,1fr]',
               'grid',
-              'items-center',
               'pb-10',
             )}
             key={i}
@@ -72,45 +71,49 @@ export function Team(props: Props) {
                 </div>
               )}
             </div>
-            <div>
-              <div className="text-2xl text-neutral-900 font-medium">
-                {teamMember.name}
-              </div>
-              {teamMember.role && (
-                <div className="text-neutral-500 mt-0.5">{teamMember.role}</div>
-              )}
-
-              {teamMember.twitter && (
-                <div className="flex items-center mt-0.5">
-                  <a
-                    className="flex items-center hover:underline"
-                    href={`https://www.twitter.com/${teamMember.twitter}`}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <TwitterIcon className="h-6 fill-blue-400 mr-0.5 w-6" />
-                    <div className="text-sm text-neutral-900">
-                      {teamMember.twitter}
-                    </div>
-                  </a>
-                  {teamMember.twitterFollowerCount > 0 && (
-                    <div className="text-sm text-neutral-500 ml-1.5">
-                      {formatNumber(
-                        teamMember.twitterFollowerCount,
-                        undefined,
-                        { maximumFractionDigits: 0 },
-                      )}{' '}
-                      followers
-                    </div>
-                  )}
+            <div className="min-h-[160px] flex items-center">
+              <div>
+                <div className="text-2xl text-neutral-900 font-medium">
+                  {teamMember.name}
                 </div>
-              )}
-              {teamMember.description && !isEmpty(teamMember.description) && (
-                <RichTextDocumentDisplay
-                  className="text-neutral-700 leading-7 mt-1"
-                  document={teamMember.description}
-                />
-              )}
+                {teamMember.role && (
+                  <div className="text-neutral-500 mt-0.5">
+                    {teamMember.role}
+                  </div>
+                )}
+
+                {teamMember.twitter && (
+                  <div className="flex items-center mt-0.5">
+                    <a
+                      className="flex items-center hover:underline"
+                      href={`https://www.twitter.com/${teamMember.twitter}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <TwitterIcon className="h-6 fill-blue-400 mr-0.5 w-6" />
+                      <div className="text-sm text-neutral-900">
+                        {teamMember.twitter}
+                      </div>
+                    </a>
+                    {teamMember.twitterFollowerCount > 0 && (
+                      <div className="text-sm text-neutral-500 ml-1.5">
+                        {formatNumber(
+                          teamMember.twitterFollowerCount,
+                          undefined,
+                          { maximumFractionDigits: 0 },
+                        )}{' '}
+                        followers
+                      </div>
+                    )}
+                  </div>
+                )}
+                {teamMember.description && !isEmpty(teamMember.description) && (
+                  <RichTextDocumentDisplay
+                    className="text-neutral-700 leading-7 mt-1"
+                    document={teamMember.description}
+                  />
+                )}
+              </div>
             </div>
           </div>
         ))}
