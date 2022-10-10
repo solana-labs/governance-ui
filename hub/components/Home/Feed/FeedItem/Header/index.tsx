@@ -56,10 +56,20 @@ export function Header(props: Props) {
             twitterAvatar={props.author?.twitterInfo?.avatarUrl}
             twitterHandle={props.author?.twitterInfo?.handle}
           >
-            <div className="text-sm text-neutral-900">{authorName}</div>
+            <div
+              className="text-sm text-neutral-900 cursor-default"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {authorName}
+            </div>
           </AuthorHovercard>
         ) : (
-          <div className="text-sm text-neutral-900">{authorName}</div>
+          <div
+            className="text-sm text-neutral-900 cursor-default"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {authorName}
+          </div>
         )}
         {props.proposal ? (
           <a
