@@ -48,6 +48,10 @@ export function Home(props: Props) {
                 token={hub.info.token}
                 twitterHandle={realm.twitterHandle}
                 websiteUrl={realm.websiteUrl}
+                discordUrl={realm.discordUrl}
+                githubUrl={realm.githubUrl}
+                instagramUrl={realm.instagramUrl}
+                linkedInUrl={realm.linkedInUrl}
               />
               <Feed.Content
                 className="max-w-3xl mx-auto pt-8 w-full"
