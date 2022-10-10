@@ -3,6 +3,7 @@ import { differenceInMinutes, formatDistanceToNowStrict } from 'date-fns';
 import Link from 'next/link';
 
 import { FeedItemAuthor } from '../../gql';
+import { AuthorHovercard } from '@hub/components/AuthorHovercard';
 import { ProposalStateBadge } from '@hub/components/ProposalStateBadge';
 import { abbreviateAddress } from '@hub/lib/abbreviateAddress';
 import cx from '@hub/lib/cx';
@@ -45,8 +46,21 @@ export function Header(props: Props) {
         'w-full',
       )}
     >
-      <div className="flex items-center space-x-2">
-        <div className="text-sm text-neutral-900">{authorName}</div>
+      <div className="flex items-baseline space-x-2">
+        {props.author ? (
+          <AuthorHovercard
+            asChild
+            civicAvatar={props.author?.civicInfo?.avatarUrl}
+            civicHandle={props.author?.civicInfo?.handle}
+            publicKey={props.author?.publicKey}
+            twitterAvatar={props.author?.twitterInfo?.avatarUrl}
+            twitterHandle={props.author?.twitterInfo?.handle}
+          >
+            <div className="text-sm text-neutral-900">{authorName}</div>
+          </AuthorHovercard>
+        ) : (
+          <div className="text-sm text-neutral-900">{authorName}</div>
+        )}
         {props.proposal ? (
           <a
             className="flex items-center space-x-1 text-neutral-500 text-xs"

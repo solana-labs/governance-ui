@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { FeedItemComment } from '../../gql';
 import * as ReplyBox from '../../ReplyBox';
 import { AuthorAvatar } from '@hub/components/AuthorAvatar';
+import { AuthorHovercard } from '@hub/components/AuthorHovercard';
 import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay';
 import { abbreviateAddress } from '@hub/lib/abbreviateAddress';
 import cx from '@hub/lib/cx';
@@ -70,8 +71,21 @@ export function Content(props: Props) {
             (!!replies.length || replyBoxOpen) && 'pb-8',
           )}
         >
-          <header className="flex items-center">
-            <div className="text-xs text-neutral-900">{authorName}</div>
+          <header className="flex items-baseline">
+            {props.comment.author ? (
+              <AuthorHovercard
+                asChild
+                civicAvatar={props.comment.author?.civicInfo?.avatarUrl}
+                civicHandle={props.comment.author?.civicInfo?.handle}
+                publicKey={props.comment.author?.publicKey}
+                twitterAvatar={props.comment.author?.twitterInfo?.avatarUrl}
+                twitterHandle={props.comment.author?.twitterInfo?.handle}
+              >
+                <div className="text-xs text-neutral-900">{authorName}</div>
+              </AuthorHovercard>
+            ) : (
+              <div className="text-xs text-neutral-900">{authorName}</div>
+            )}
             <Link
               passHref
               href={`/realm/${props.realmUrlId}/${props.feedItemId}/${props.comment.id}`}

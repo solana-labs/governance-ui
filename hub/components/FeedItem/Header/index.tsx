@@ -2,6 +2,7 @@ import { differenceInMinutes, formatDistanceToNowStrict } from 'date-fns';
 
 import { FeedItemAuthor } from '../../Home/Feed/gql';
 import { AuthorAvatar } from '@hub/components/AuthorAvatar';
+import { AuthorHovercard } from '@hub/components/AuthorHovercard';
 import { abbreviateAddress } from '@hub/lib/abbreviateAddress';
 import cx from '@hub/lib/cx';
 
@@ -32,10 +33,25 @@ export function Content(props: Props) {
   return (
     <header className={cx(props.className, 'flex', 'items-center')}>
       <AuthorAvatar author={author} className="h-8 w-8 text-sm" />
-      <div className="ml-3 text-sm text-zinc-800">{authorName}</div>
-      <div className="ml-2 text-xs text-zinc-500">
-        {formatDistanceToNowStrict(props.created)} ago
-        {isEdited ? ' *' : ''}
+      <div className="flex items-baseline">
+        {author ? (
+          <AuthorHovercard
+            asChild
+            civicAvatar={author?.civicInfo?.avatarUrl}
+            civicHandle={author?.civicInfo?.handle}
+            publicKey={author?.publicKey}
+            twitterAvatar={author?.twitterInfo?.avatarUrl}
+            twitterHandle={author?.twitterInfo?.handle}
+          >
+            <div className="ml-3 text-sm text-zinc-800">{authorName}</div>
+          </AuthorHovercard>
+        ) : (
+          <div className="ml-3 text-sm text-zinc-800">{authorName}</div>
+        )}
+        <div className="ml-2 text-xs text-zinc-500">
+          {formatDistanceToNowStrict(props.created)} ago
+          {isEdited ? ' *' : ''}
+        </div>
       </div>
     </header>
   );
