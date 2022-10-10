@@ -26,11 +26,15 @@
     "displayName": "Metaplex DAO",
     "programId": "AEauWRrpn9Cs6GXujzdp1YhMmv2288kBt3SdEcPYEerr",
     "realmId": "DA5G7QQbFioZ6K33wQcH8fVdgFcnaDjLD7DLQkapZg5X",
-    "website": "https://www.metaplex.com/",
-    "twitter": "@metaplex",
     "ogImage": "/realms/metaplex/img/black-circle.png",
     "shortDescription": "Metaplex makes it easy to build your project in minutes and grow your community in the world’s largest NFT ecosystem.",
-    "sortRank": 3
+    "sortRank": 3,
+    "website": "https://www.metaplex.com/",
+    "twitter": "@metaplex",
+    "linkedin": "https://www.linkedin.com/company/metaplex-studios/",
+    "instagram": "https://www.instagram.com/metaplex/",
+    "discord": "https://discord.gg/metaplex",
+    "github": "https://github.com/metaplex-foundation/metaplex"
   },
   {
     "symbol": "GRAPE",

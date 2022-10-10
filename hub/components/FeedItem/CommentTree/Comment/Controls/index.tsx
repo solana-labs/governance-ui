@@ -48,12 +48,12 @@ export function Controls(props: Props) {
           'items-center',
           'space-x-1.5',
           props.userVote === FeedItemCommentVoteType.Approve
-            ? 'text-cyan-500'
+            ? 'text-sky-500'
             : 'text-neutral-500',
           jwt &&
             (props.userVote === FeedItemCommentVoteType.Approve
-              ? 'hover:text-cyan-400'
-              : 'hover:text-cyan-500'),
+              ? 'hover:text-sky-400'
+              : 'hover:text-sky-500'),
         )}
         disabled={!jwt}
         onClick={(e) => {
@@ -104,7 +104,7 @@ export function Controls(props: Props) {
           'items-center',
           'space-x-1.5',
           'text-neutral-500',
-          'hover:text-cyan-500',
+          'hover:text-neutral-900',
           'disabled:cursor-not-allowed',
           'disabled:text-neutral-300',
         )}

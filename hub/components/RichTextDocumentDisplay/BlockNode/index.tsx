@@ -78,10 +78,10 @@ export function BlockNode(props: Props) {
           'inline-block',
           'leading-[1.75em]',
           'ml-2',
-          'text-cyan-500',
+          'text-sky-500',
           'text-[1em]',
           'transition-colors',
-          'hover:text-cyan-400',
+          'hover:text-sky-400',
         )}
         onClick={(e) => {
           e.stopPropagation();
