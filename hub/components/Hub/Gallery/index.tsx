@@ -86,7 +86,7 @@ export function Gallery(props: Props) {
               />
             )}
             {item.caption && (
-              <div className="max-w-[80%] h-0 text-xs text-center text-neutral-700">
+              <div className="max-w-[95%] h-0 text-xs text-center text-neutral-700">
                 <div className="h-2 w-full" />
                 {item.caption}
               </div>
