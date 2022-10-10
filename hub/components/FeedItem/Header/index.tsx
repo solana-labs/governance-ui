@@ -32,7 +32,19 @@ export function Content(props: Props) {
 
   return (
     <header className={cx(props.className, 'flex', 'items-center')}>
-      <AuthorAvatar author={author} className="h-8 w-8 text-sm" />
+      {author ? (
+        <AuthorHovercard
+          civicAvatar={author?.civicInfo?.avatarUrl}
+          civicHandle={author?.civicInfo?.handle}
+          publicKey={author?.publicKey}
+          twitterAvatar={author?.twitterInfo?.avatarUrl}
+          twitterHandle={author?.twitterInfo?.handle}
+        >
+          <AuthorAvatar author={author} className="h-8 w-8 text-sm" />
+        </AuthorHovercard>
+      ) : (
+        <AuthorAvatar author={author} className="h-8 w-8 text-sm" />
+      )}
       <div className="flex items-baseline">
         {author ? (
           <AuthorHovercard

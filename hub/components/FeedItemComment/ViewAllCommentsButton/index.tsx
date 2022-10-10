@@ -24,8 +24,8 @@ export function Content(props: Props) {
           'space-x-2',
         )}
       >
-        <ArrowLeftIcon className="h-4 w-4 fill-zinc-800 transition-colors group-hover:fill-cyan-500" />
-        <div className="text-neutral-700 text-xs transition-colors group-hover:text-cyan-500">
+        <ArrowLeftIcon className="h-4 w-4 fill-zinc-800 transition-colors group-hover:fill-sky-500" />
+        <div className="text-neutral-700 text-xs transition-colors group-hover:text-sky-500">
           View all comments
         </div>
       </a>

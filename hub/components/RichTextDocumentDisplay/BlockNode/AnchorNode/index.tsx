@@ -12,11 +12,11 @@ export function AnchorNode(props: Props) {
     <a
       className={cx(
         props.className,
-        'text-cyan-500',
+        'text-sky-500',
         'cursor-pointer',
         'transition-colors',
         'truncate',
-        'hover:text-cyan-400',
+        'hover:text-sky-400',
       )}
       href={props.anchor.u}
       target="_blank"

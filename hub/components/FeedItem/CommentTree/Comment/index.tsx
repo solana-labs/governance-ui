@@ -44,10 +44,25 @@ export function Content(props: Props) {
     <article className={cx(props.className, 'w-full')}>
       <div className={cx('grid', 'grid-cols-[32px,1fr]', 'gap-x-3')}>
         <div className="relative">
-          <AuthorAvatar
-            author={props.comment.author}
-            className="h-8 w-8 text-sm"
-          />
+          {props.comment.author ? (
+            <AuthorHovercard
+              civicAvatar={props.comment.author?.civicInfo?.avatarUrl}
+              civicHandle={props.comment.author?.civicInfo?.handle}
+              publicKey={props.comment.author?.publicKey}
+              twitterAvatar={props.comment.author?.twitterInfo?.avatarUrl}
+              twitterHandle={props.comment.author?.twitterInfo?.handle}
+            >
+              <AuthorAvatar
+                author={props.comment.author}
+                className="h-8 w-8 text-sm"
+              />
+            </AuthorHovercard>
+          ) : (
+            <AuthorAvatar
+              author={props.comment.author}
+              className="h-8 w-8 text-sm"
+            />
+          )}
           {(!!replies.length ||
             !!props.comment.repliesCount ||
             replyBoxOpen) && (
@@ -222,7 +237,7 @@ export function Content(props: Props) {
               passHref
               href={`/realm/${props.realmUrlId}/${props.feedItemId}/${props.comment.id}`}
             >
-              <a className="inline-block py-4 text-xs text-neutral-500 hover:text-cyan-500">
+              <a className="inline-block py-4 text-xs text-neutral-500 hover:text-sky-500">
                 View replies
               </a>
             </Link>

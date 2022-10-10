@@ -69,6 +69,7 @@ export function AuthorHovercard(props: Props) {
             'z-40',
           )}
           side="top"
+          sideOffset={8}
           onClick={(e) => {
             e.stopPropagation();
           }}

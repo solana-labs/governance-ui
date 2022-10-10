@@ -63,14 +63,14 @@ export function Content(props: Props) {
           target="_blank"
           rel="noreferrer"
         >
-          <EarthIcon className="h-4 w-4 fill-cyan-500 flex-shrink-0" />
+          <EarthIcon className="h-4 w-4 fill-sky-500 flex-shrink-0" />
           <div
             className={cx(
               'text-sm',
               'text-neutral-900',
               'truncate',
               'transition-colors',
-              'group-hover:text-cyan-500',
+              'group-hover:text-sky-500',
             )}
           >
             {props.websiteUrl}

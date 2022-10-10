@@ -44,11 +44,11 @@ export function Controls(props: Props) {
             'items-center',
             'space-x-1.5',
             props.userVote === FeedItemVoteType.Approve
-              ? 'text-cyan-500'
+              ? 'text-sky-500'
               : 'text-neutral-500',
             props.userVote === FeedItemVoteType.Approve && jwt
-              ? 'hover:text-cyan-400'
-              : 'hover:text-cyan-500',
+              ? 'hover:text-sky-400'
+              : 'hover:text-sky-500',
           )}
           onClick={(e) => {
             e.stopPropagation();
@@ -79,9 +79,9 @@ export function Controls(props: Props) {
           </div>
         </button>
         {Number.isInteger(props.numReplies) && (
-          <div className="flex items-center ml-6 text-neutral-500">
-            <ChatIcon className="fill-current h-4 w-4 mr-1" />
-            <div className="text-xs">
+          <div className="flex items-center ml-6 text-neutral-500 hover:text-sky-500">
+            <ChatIcon className="fill-current h-4 w-4 mr-1 transition-colors" />
+            <div className="text-xs transition-colors">
               {props.numReplies} {ntext(props.numReplies || 0, 'Comment')}
             </div>
           </div>
