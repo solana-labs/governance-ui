@@ -66,6 +66,7 @@ export function AuthorHovercard(props: Props) {
             'p-4',
             'rounded',
             'w-64',
+            'z-40',
           )}
           side="top"
           onClick={(e) => {
