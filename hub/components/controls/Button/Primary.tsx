@@ -19,7 +19,7 @@ export const Primary = forwardRef<HTMLButtonElement, Props>(function Primary(
       ref={ref}
       className={cx(
         rest.className,
-        'bg-cyan-400',
+        'bg-sky-400',
         'border',
         'flex',
         'group',
@@ -32,10 +32,10 @@ export const Primary = forwardRef<HTMLButtonElement, Props>(function Primary(
         'text-neutral-900',
         'tracking-normal',
         'transition-colors',
-        !pending && 'active:bg-cyan-400',
+        !pending && 'active:bg-sky-400',
         'disabled:bg-zinc-300',
         'disabled:cursor-not-allowed',
-        !pending && 'hover:bg-cyan-300',
+        !pending && 'hover:bg-sky-300',
         pending && 'cursor-not-allowed',
       )}
       onClick={(e) => {
