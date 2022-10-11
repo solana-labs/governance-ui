@@ -134,7 +134,7 @@ export const BaseGovernanceFormV3 = ({
               <div className="border-t border-white/10 pt-3">
                 <h3>{capitalized} settings</h3>
               </div>
-              <div>
+              <div className="max-w-lg">
                 <div className="mb-2">
                   Min {govPop} tokens to create proposal
                 </div>
@@ -170,46 +170,51 @@ export const BaseGovernanceFormV3 = ({
                       )
                     }}
                   />{' '}
-                  <div className="ml-3">
-                    {minProposalTokensEnabled ? 'Enabled' : 'Disabled'}
+                  <div className="ml-3 grow">
+                    {!minProposalTokensEnabled ? (
+                      'Disabled'
+                    ) : (
+                      <>
+                        {minProposalTokensEnabled && (
+                          <Input
+                            value={
+                              govPop === 'community'
+                                ? form.minCommunityTokensToCreateProposal
+                                : form.minCouncilTokensToCreateProposal
+                            }
+                            type="number"
+                            name="minCommunityTokensToCreateProposal"
+                            min={minTokenAmount}
+                            step={minTokenStep}
+                            onChange={(evt) =>
+                              setForm((prev) => ({
+                                ...prev,
+                                ...(govPop === 'community'
+                                  ? {
+                                      minCommunityTokensToCreateProposal: new BN(
+                                        evt.target.value
+                                      ),
+                                    }
+                                  : {
+                                      minCouncilTokensToCreateProposal: new BN(
+                                        evt.target.value
+                                      ),
+                                    }),
+                              }))
+                            }
+                            error={
+                              formErrors[
+                                `min${capitalized}TokensToCreateProposal`
+                              ]
+                            }
+                          />
+                        )}
+                        <span className="text-gray-200 whitespace-nowrap">
+                          {minProposalTokensEnabled && getSupplyPercent()}
+                        </span>
+                      </>
+                    )}
                   </div>
-                </div>
-                <div className="mt-2">
-                  {minProposalTokensEnabled && (
-                    <Input
-                      value={
-                        govPop === 'community'
-                          ? form.minCommunityTokensToCreateProposal
-                          : form.minCouncilTokensToCreateProposal
-                      }
-                      type="number"
-                      name="minCommunityTokensToCreateProposal"
-                      min={minTokenAmount}
-                      step={minTokenStep}
-                      onChange={(evt) =>
-                        setForm((prev) => ({
-                          ...prev,
-                          ...(govPop === 'community'
-                            ? {
-                                minCommunityTokensToCreateProposal: new BN(
-                                  evt.target.value
-                                ),
-                              }
-                            : {
-                                minCouncilTokensToCreateProposal: new BN(
-                                  evt.target.value
-                                ),
-                              }),
-                        }))
-                      }
-                      error={
-                        formErrors[`min${capitalized}TokensToCreateProposal`]
-                      }
-                    />
-                  )}
-                  <span className="text-gray-200 whitespace-nowrap">
-                    {minProposalTokensEnabled && getSupplyPercent()}
-                  </span>
                 </div>
               </div>
 
