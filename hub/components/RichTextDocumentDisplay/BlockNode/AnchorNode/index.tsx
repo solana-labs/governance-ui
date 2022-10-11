@@ -1,6 +1,11 @@
 import { InlineNode } from '../InlineNode';
+import { PublicKeyNode } from '../PublicKeyNode';
+import { ExternalLink } from '@hub/components/icons/ExternalLink';
 import cx from '@hub/lib/cx';
-import { AnchorNode as AnchorNodeModel } from '@hub/types/RichTextDocument';
+import {
+  AnchorNode as AnchorNodeModel,
+  InlineNodeType,
+} from '@hub/types/RichTextDocument';
 
 interface Props {
   className?: string;
@@ -14,7 +19,9 @@ export function AnchorNode(props: Props) {
         props.className,
         'text-sky-500',
         'cursor-pointer',
-        'transition-colors',
+        'inline-flex',
+        'items-center',
+        'align-baseline',
         'truncate',
         'hover:text-sky-400',
       )}
@@ -25,9 +32,22 @@ export function AnchorNode(props: Props) {
         e.stopPropagation();
       }}
     >
-      {props.anchor.c.map((child, i) => (
-        <InlineNode node={child} key={i} />
-      ))}
+      {props.anchor.c.map((child, i) =>
+        child.t === InlineNodeType.Inline ? (
+          <InlineNode className="transition-colors" node={child} key={i} />
+        ) : (
+          <PublicKeyNode className="transition-colors" node={child} key={i} />
+        ),
+      )}
+      <ExternalLink
+        className={cx(
+          'fill-current',
+          'h-[1em]',
+          'ml-0.5',
+          'transition-colors',
+          'w-[1em]',
+        )}
+      />
     </a>
   );
 }

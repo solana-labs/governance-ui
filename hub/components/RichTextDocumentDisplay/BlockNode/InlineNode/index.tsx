@@ -4,7 +4,7 @@ import {
   InlineStyle,
 } from '@hub/types/RichTextDocument';
 
-function getStyle(style: InlineStyle) {
+export function getStyle(style: InlineStyle) {
   switch (style) {
     case InlineStyle.Bold:
       return 'font-bold';

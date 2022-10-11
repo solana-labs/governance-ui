@@ -3,19 +3,30 @@ import { BlockNodeType, RichTextDocument } from '@hub/types/RichTextDocument';
 
 import { BlockNode } from './BlockNode';
 import { ImageNode } from './ImageNode';
+import { TwitterEmbedAttachment } from './TwitterEmbedAttachment';
+import { TwitterEmbedNode } from './TwitterEmbedNode';
 
 interface Props {
   className?: string;
   document: RichTextDocument;
+  excludeBlocks?: BlockNodeType[];
   isClipped?: boolean;
   showExpand?: boolean;
   onExpand?(): void;
 }
 
 export function RichTextDocumentDisplay(props: Props) {
+  const blocks = props.document.content.filter((block) => {
+    if (props.excludeBlocks) {
+      return !props.excludeBlocks.includes(block.t);
+    }
+
+    return true;
+  });
+
   return (
     <div className={cx(props.className, 'space-y-2')}>
-      {props.document.content.map((node, i) => {
+      {blocks.map((node, i) => {
         switch (node.t) {
           case BlockNodeType.Block:
             return (
@@ -23,7 +34,7 @@ export function RichTextDocumentDisplay(props: Props) {
                 block={node}
                 key={i}
                 isClipped={props.isClipped}
-                isLast={i === props.document.content.length - 1}
+                isLast={i === blocks.length - 1}
                 showExpand={props.showExpand}
                 onExpand={props.onExpand}
               />
@@ -34,13 +45,29 @@ export function RichTextDocumentDisplay(props: Props) {
                 image={node}
                 key={i}
                 isClipped={props.isClipped}
-                isLast={i === props.document.content.length - 1}
+                isLast={i === blocks.length - 1}
+                showExpand={props.showExpand}
+                onExpand={props.onExpand}
+              />
+            );
+          case BlockNodeType.TwitterEmbed:
+            return (
+              <TwitterEmbedNode
+                embed={node}
+                key={i}
+                isClipped={props.isClipped}
+                isLast={i === blocks.length - 1}
                 showExpand={props.showExpand}
                 onExpand={props.onExpand}
               />
             );
         }
       })}
+      <div>
+        {props.document.attachments.map((attachment, i) => (
+          <TwitterEmbedAttachment attachment={attachment} key={i} />
+        ))}
+      </div>
     </div>
   );
 }
