@@ -147,7 +147,7 @@ export const ACCOUNT_NAMES = {
   '2fEL6au59KfmtarX5cJD4a6EaxRr6gLBvFkE65uEPJ4U': 'DAOJONES',
   FboFh3DkwmAeH4GyM5Ttd8ismd2wq6c8MrRkSsmr5nQW: 'LUNA',
   GnfeSuTwbXcxVnuXJTzx172174PJAHUfXpNgsBdGCncd: 'Solend Holdings',
-  
+
   // Jungle DeFi Community DAO
   Ebuwy24prHRL3QEAT911wWD8aa493ikZeH7LfYzMQxS1: 'Incoming Protocol Fees/Assets',
   '8jEtEwEYrFyNnHkvEC4xn2GeMKz5rpCtaxovdnD335xD': 'RAY Fee Wallet',
@@ -166,7 +166,8 @@ export const ACCOUNT_NAMES = {
   CP8CMdBczN4GYjm3ygrVGhfU1HwnPxxcmWjPCkwihM74: 'Emission and Expense Reserves',
   Hd65UxhS8sagMyQP3gU1E7N8xsTcQYM7Vpi2gZAMTDE7: 'JFI Reserves',
   '4R1emrnFsWzgawRSN6QFKUTEGG5ZPmE2qDLXgZYMsCMv': 'USDC Reserves',
-  '3AtD8oiBUWttbnNCpKk1enRoquN9V88Nv6Rn7ESHPWHa': 'DAO Instance Authority Governance',
+  '3AtD8oiBUWttbnNCpKk1enRoquN9V88Nv6Rn7ESHPWHa':
+    'DAO Instance Authority Governance',
   jdaoDN37BrVRvxuXSeyR7xE5Z9CAoQApexGrQJbnj6V: 'Jungle DeFi Governance Program',
 }
 

@@ -138,7 +138,7 @@ const MakeDepositToMangoAccountCsv = ({
           : null
         if (mangoAccountPk) {
           const mintAmount = parseMintNaturalAmountFromDecimal(
-            deposit.srm_payout!,
+            deposit.token_amount!,
             form.governedAccount.extensions.mint!.account.decimals
           )
           //Mango instruction call and serialize
