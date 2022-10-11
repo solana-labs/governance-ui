@@ -219,7 +219,7 @@ export const BaseGovernanceFormV3 = ({
               </div>
 
               {(['yes', 'veto'] as const).map((vote) => {
-                const setValue = (x: typeof form.communityVoteThreshold) =>
+                const setThreshold = (x: typeof form.communityVoteThreshold) =>
                   setForm((prev) => ({
                     ...prev,
                     ...(govPop === 'community'
@@ -266,7 +266,7 @@ export const BaseGovernanceFormV3 = ({
                                 type: VoteThresholdType.Disabled,
                                 value: undefined,
                               })
-                          setValue(newValue)
+                          setThreshold(newValue)
                         }}
                       />
 
@@ -287,7 +287,7 @@ export const BaseGovernanceFormV3 = ({
                                   value: clamped,
                                 })
 
-                                setValue(newValue)
+                                setThreshold(newValue)
                               }}
                               error={formErrors[govPop + 'VoteThreshold']}
                             />
@@ -296,7 +296,14 @@ export const BaseGovernanceFormV3 = ({
                                 step={1}
                                 value={voteThreshold.value!}
                                 disabled={false}
-                                onChange={(x) => setValue(x)}
+                                onChange={(x) =>
+                                  setThreshold(
+                                    new VoteThreshold({
+                                      type: VoteThresholdType.YesVotePercentage,
+                                      value: x,
+                                    })
+                                  )
+                                }
                               />
                             </div>
                           </>
