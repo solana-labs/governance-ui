@@ -60,6 +60,7 @@ const ClaimUnreleasedNFTs = () => {
           { pubkey: i.publicKey, isSigner: false, isWritable: true },
         ])
         .instruction()
+      //MULTIPLY HERE... rough_amount += 0.001...
       instructions.push(relinquishNftVoteIx)
     }
     try {
