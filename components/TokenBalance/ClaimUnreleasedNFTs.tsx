@@ -13,11 +13,18 @@ import {
   transactionInstructionsToTypedInstructionsSets,
 } from '@utils/sendTransactions'
 
-const ClaimUnreleasedNFTs = () => {
+const NFT_SOL_BALANCE = 0.0014616
+
+const ClaimUnreleasedNFTs = ({
+  inAccountDetails,
+}: {
+  inAccountDetails?: boolean
+}) => {
   const wallet = useWalletStore((s) => s.current)
   const [isLoading, setIsLoading] = useState(false)
   const { current: connection } = useWalletStore((s) => s.connection)
   const [ownNftVoteRecords, setOwnNftVoteRecords] = useState<any[]>([])
+  const [solToBeClaimed, setSolToBeClaimed] = useState(0)
   const ownNftVoteRecordsFilterd = ownNftVoteRecords
   const { realm } = useWalletStore((s) => s.selectedRealm)
   const client = useVotePluginsClientStore(
@@ -60,7 +67,6 @@ const ClaimUnreleasedNFTs = () => {
           { pubkey: i.publicKey, isSigner: false, isWritable: true },
         ])
         .instruction()
-      //MULTIPLY HERE... rough_amount += 0.001...
       instructions.push(relinquishNftVoteIx)
     }
     try {
@@ -105,6 +111,7 @@ const ClaimUnreleasedNFTs = () => {
           realm?.account.communityMint.toBase58()
     )
     setOwnNftVoteRecords(nftVoteRecordsFiltered)
+    setSolToBeClaimed(nftVoteRecordsFiltered.length * NFT_SOL_BALANCE)
   }
   useEffect(() => {
     if (wallet?.publicKey && isNftMode && client.client) {
@@ -112,26 +119,30 @@ const ClaimUnreleasedNFTs = () => {
     }
   }, [client.clientType, isNftMode, wallet?.publicKey?.toBase58()])
 
-  return (
-    <>
-      {isNftMode && ownNftVoteRecordsFilterd.length !== 0 && (
-        <div>
-          <h4 className="flex items-center">
-            Claim ({ownNftVoteRecordsFilterd.length}) SOL
-            <Button
-              isLoading={isLoading}
-              disabled={isLoading || !ownNftVoteRecordsFilterd.length}
-              onClick={() => releaseNfts()}
-              className="ml-2"
-              small
-            >
-              Claim
-            </Button>
-          </h4>
-        </div>
-      )}
-    </>
-  )
+  if (isNftMode) {
+    return (
+      <>
+        {((!inAccountDetails && solToBeClaimed > 1) || inAccountDetails) && (
+          <div className="my-4 md:my-6">
+            <h4 className="flex items-center">
+              Claim ({solToBeClaimed}) SOL
+              <Button
+                isLoading={isLoading}
+                disabled={isLoading || !ownNftVoteRecordsFilterd.length}
+                onClick={() => releaseNfts()}
+                className="ml-2"
+                small
+              >
+                Claim
+              </Button>
+            </h4>
+          </div>
+        )}
+      </>
+    )
+  } else {
+    return null
+  }
 }
 
 export default ClaimUnreleasedNFTs

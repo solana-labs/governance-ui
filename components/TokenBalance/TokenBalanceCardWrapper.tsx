@@ -81,7 +81,7 @@ const TokenBalanceCardWrapper = ({
           ) : (
             <>
               <NftBalanceCard showView={!inAccountDetails} />
-              <ClaimUnreleasedNFTs />
+              <ClaimUnreleasedNFTs inAccountDetails={inAccountDetails} />
             </>
           )}
         </>
