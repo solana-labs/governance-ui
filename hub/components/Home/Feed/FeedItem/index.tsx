@@ -91,23 +91,21 @@ export function Content(props: Props) {
             url={url}
           />
         </div>
-        <div className="mt-3 group">
-          <div className="text-neutral-900 font-bold transition-colors group-hover:text-sky-500">
-            {props.feedItem.title}
-          </div>
-          <RichTextDocumentDisplay
-            className="mt-4 text-neutral-900 text-sm"
-            isClipped={isClipped}
-            document={document}
-            onExpand={() => {
-              if (props.feedItem.type === FeedItemType.Post) {
-                router.push(url);
-              } else {
-                window.open(url, '_blank');
-              }
-            }}
-          />
+        <div className="mt-3 text-neutral-900 font-bold transition-colors hover:text-sky-500">
+          {props.feedItem.title}
         </div>
+        <RichTextDocumentDisplay
+          className="mt-4 text-neutral-900 text-sm"
+          isClipped={isClipped}
+          document={document}
+          onExpand={() => {
+            if (props.feedItem.type === FeedItemType.Post) {
+              router.push(url);
+            } else {
+              window.open(url, '_blank');
+            }
+          }}
+        />
         {props.feedItem.type === FeedItemType.Proposal &&
           props.feedItem.proposal.state === ProposalState.Voting && (
             <Proposal className="mt-4 max-w-xl" proposal={props.feedItem} />

@@ -18,6 +18,7 @@ import {
   InlineNodeType,
   InlineStyle,
   BlockStyle,
+  PublicKeyNode,
   AnchorNode,
 } from '@hub/types/RichTextDocument';
 
@@ -316,7 +317,7 @@ function nodeToBlock(node: BlockNode, entityKeyIdx = 0) {
 
   const keys = Object.keys(styleIndexStart) as InlineStyle[];
 
-  function handleInlineNode(inlineNode: InlineNode) {
+  function handleInlineNode(inlineNode: InlineNode | PublicKeyNode) {
     // For every possible inline style, if that specific style no longer
     // applies to the node we're looking at, we need to close out its
     // applicable range.

@@ -11,6 +11,7 @@ import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay
 import { abbreviateAddress } from '@hub/lib/abbreviateAddress';
 import cx from '@hub/lib/cx';
 import { useUserCreatedFeedItemCommentRepliesStore } from '@hub/stores/userCreatedFeedItemCommentReplies';
+import { BlockNodeType } from '@hub/types/RichTextDocument';
 
 import { Controls } from './Controls';
 
@@ -113,6 +114,7 @@ export function Content(props: Props) {
           <RichTextDocumentDisplay
             className="mt-2.5 text-sm"
             document={props.comment.document}
+            excludeBlocks={[BlockNodeType.TwitterEmbed, BlockNodeType.Image]}
           />
           <Controls
             className="mt-4"
