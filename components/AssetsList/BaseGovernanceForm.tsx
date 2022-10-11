@@ -14,8 +14,6 @@ import {
   parseMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
 import BigNumber from 'bignumber.js'
-import { max, min } from 'bn.js'
-import produce from 'immer'
 import React, { useEffect, useState } from 'react'
 import { BaseGovernanceFormV3 } from './BaseGovernanceFormV3'
 
@@ -29,6 +27,9 @@ export interface BaseGovernanceFormFieldsV2 {
 }
 
 // @asktree: If GovernanceConfig updates in the future in an unversioned way, I suggest using Omit to exclude non-V3 fields
+// I chose to make the data stored in the exact same data model we use for the sdk to reduce data model bloat.
+// There are reasons not to do this, but I think it works for this usecase. If I didnt do this, I would make a recursive type
+// where all leaf nodes are strings. I would not invent a new type that is similar but lacks any direct mapping to GovernanceConfig.
 export type BaseGovernanceFormFieldsV3 = Omit<GovernanceConfig, 'reserved'> & {
   _programVersion: 3
 }
