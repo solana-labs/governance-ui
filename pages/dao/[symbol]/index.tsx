@@ -176,6 +176,7 @@ const REALM = () => {
     ownVoterWeight,
     ownTokenRecord,
     councilTokenOwnerRecords,
+    ownCouncilTokenRecord,
     isNftMode,
   } = useRealm()
   const proposalsPerPage = 20
@@ -274,8 +275,16 @@ const REALM = () => {
   const hasCommunityVoteWeight =
     ownTokenRecord &&
     ownVoterWeight.hasMinAmountToVote(ownTokenRecord.account.governingTokenMint)
+  const hasCouncilVoteWeight =
+    ownCouncilTokenRecord &&
+    ownVoterWeight.hasMinAmountToVote(
+      ownCouncilTokenRecord.account.governingTokenMint
+    )
+
   const cantMultiVote =
-    selectedProposals.length === 0 || isMultiVoting || !hasCommunityVoteWeight
+    selectedProposals.length === 0 ||
+    isMultiVoting ||
+    (!hasCommunityVoteWeight && !hasCouncilVoteWeight)
 
   const toggleSelectAll = () => {
     if (allVotingProposalsSelected) {
@@ -405,7 +414,9 @@ const REALM = () => {
               className="whitespace-nowrap"
               disabled={cantMultiVote}
               tooltipMessage={
-                !hasCommunityVoteWeight ? "You don't have voting power" : ''
+                !hasCommunityVoteWeight && !hasCouncilVoteWeight
+                  ? "You don't have voting power"
+                  : ''
               }
               onClick={() => voteOnSelected(YesNoVote.Yes)}
               isLoading={isMultiVoting}
@@ -416,7 +427,9 @@ const REALM = () => {
               className="whitespace-nowrap"
               disabled={cantMultiVote}
               tooltipMessage={
-                !hasCommunityVoteWeight ? "You don't have voting power" : ''
+                !hasCommunityVoteWeight && !hasCouncilVoteWeight
+                  ? "You don't have voting power"
+                  : ''
               }
               onClick={() => voteOnSelected(YesNoVote.No)}
               isLoading={isMultiVoting}
