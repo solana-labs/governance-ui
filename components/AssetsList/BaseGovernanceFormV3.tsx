@@ -280,14 +280,23 @@ export const BaseGovernanceFormV3 = ({
                               value={voteThreshold.value!.toString()}
                               type="number"
                               onChange={(evt) => {
+                                if (evt.target.value === '') {
+                                  return setThreshold(
+                                    new VoteThreshold({
+                                      type: VoteThresholdType.YesVotePercentage,
+                                      value: 0,
+                                    })
+                                  )
+                                }
+
                                 const x = parseInt(evt.target.value)
-                                const clamped = Math.max(1, Math.min(100, x))
+                                const clamped = Math.max(0, Math.min(100, x))
                                 const newValue = new VoteThreshold({
                                   type: VoteThresholdType.YesVotePercentage,
                                   value: clamped,
                                 })
 
-                                setThreshold(newValue)
+                                return setThreshold(newValue)
                               }}
                               error={formErrors[govPop + 'VoteThreshold']}
                             />
