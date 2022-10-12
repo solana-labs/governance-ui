@@ -105,6 +105,7 @@ export function Content(props: Props) {
                 hub
               </Tab>
               <Tab
+                external
                 href={`/dao/${props.realmUrlId}/treasury/v2`}
                 icon={<WalletIcon />}
                 selected={props.selectedTab === 'treasury'}

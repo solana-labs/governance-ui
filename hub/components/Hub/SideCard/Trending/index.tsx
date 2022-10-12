@@ -5,6 +5,7 @@ import type { PublicKey } from '@solana/web3.js';
 import { differenceInMinutes, formatDistanceToNowStrict } from 'date-fns';
 import { pipe } from 'fp-ts/function';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay';
 import { useQuery } from '@hub/hooks/useQuery';
@@ -27,6 +28,7 @@ export function Trending(props: Props) {
     query: gql.getTrending,
     variables: { realm: props.realm.toBase58() },
   });
+  const router = useRouter();
 
   return (
     <div className={props.className}>
@@ -136,61 +138,62 @@ export function Trending(props: Props) {
                     ) < 1;
 
                   return (
-                    <Link
-                      passHref
-                      href={`/realm/${props.realmUrlId}/${edge.node.id}`}
+                    <button
+                      className="grid grid-cols-[20px,1fr] gap-x-3 group tracking-normal text-left w-full"
                       key={edge.node.id}
+                      onClick={() => {
+                        const url = `/realm/${props.realmUrlId}/${edge.node.id}`;
+                        router.push(url);
+                      }}
                     >
-                      <a className="grid grid-cols-[20px,1fr] gap-x-3 group">
-                        <div className="text-xs leading-6 text-neutral-900 font-medium">
-                          {(i + 1).toString().padStart(2, '0')}
+                      <div className="text-xs leading-6 text-neutral-900 font-medium">
+                        {(i + 1).toString().padStart(2, '0')}
+                      </div>
+                      <div>
+                        <div
+                          className={cx(
+                            'font-bold',
+                            'text-neutral-900',
+                            'transition-colors',
+                            'group-hover:text-sky-500',
+                          )}
+                        >
+                          {edge.node.title}
                         </div>
-                        <div>
+                        {!isEmpty(edge.node.clippedDocument.document) && (
+                          <RichTextDocumentDisplay
+                            className="text-sm text-neutral-500"
+                            document={edge.node.clippedDocument.document}
+                            isClipped={edge.node.clippedDocument.isClipped}
+                          />
+                        )}
+                        <div className="flex items-center mt-1">
+                          {edge.node.myVote === FeedItemVoteType.Approve ? (
+                            <FavoriteFilledIcon className="fill-sky-500 h-4 w-4" />
+                          ) : (
+                            <FavoriteIcon className="fill-neutral-500 h-4 w-4" />
+                          )}
                           <div
                             className={cx(
-                              'font-bold',
-                              'text-neutral-900',
-                              'transition-colors',
-                              'group-hover:text-sky-500',
+                              'ml-1',
+                              'text-xs',
+                              edge.node.myVote === FeedItemVoteType.Approve
+                                ? 'text-sky-500'
+                                : 'text-neutral-500',
                             )}
                           >
-                            {edge.node.title}
+                            {edge.node.score}
                           </div>
-                          {!isEmpty(edge.node.clippedDocument.document) && (
-                            <RichTextDocumentDisplay
-                              className="text-sm text-neutral-500"
-                              document={edge.node.clippedDocument.document}
-                              isClipped={edge.node.clippedDocument.isClipped}
-                            />
-                          )}
-                          <div className="flex items-center mt-1">
-                            {edge.node.myVote === FeedItemVoteType.Approve ? (
-                              <FavoriteFilledIcon className="fill-sky-500 h-4 w-4" />
-                            ) : (
-                              <FavoriteIcon className="fill-neutral-500 h-4 w-4" />
-                            )}
-                            <div
-                              className={cx(
-                                'ml-1',
-                                'text-xs',
-                                edge.node.myVote === FeedItemVoteType.Approve
-                                  ? 'text-sky-500'
-                                  : 'text-neutral-500',
-                              )}
-                            >
-                              {edge.node.score}
-                            </div>
-                            <div className="text-xs text-neutral-500 ml-3">
-                              {isNew
-                                ? 'New!'
-                                : `${formatDistanceToNowStrict(
-                                    edge.node.updated,
-                                  )} ago`}
-                            </div>
+                          <div className="text-xs text-neutral-500 ml-3">
+                            {isNew
+                              ? 'New!'
+                              : `${formatDistanceToNowStrict(
+                                  edge.node.updated,
+                                )} ago`}
                           </div>
                         </div>
-                      </a>
-                    </Link>
+                      </div>
+                    </button>
                   );
                 })}
                 <Link passHref href={`/realm/${props.realmUrlId}`}>
