@@ -3,7 +3,6 @@ import BookIcon from '@carbon/icons-react/lib/Book';
 import WalletIcon from '@carbon/icons-react/lib/Wallet';
 import type { PublicKey } from '@solana/web3.js';
 import { pipe } from 'fp-ts/function';
-import Link from 'next/link';
 
 import { ExternalLink } from '@hub/components/icons/ExternalLink';
 import { RealmsLogo } from '@hub/components/icons/RealmsLogo';
@@ -57,12 +56,15 @@ export function Stats(props: Props) {
               </div>
             ),
             ({ realmTreasury }) => (
-              <Link passHref href={`/dao/${props.realmUrlId}/treasury/v2`}>
-                <a className="flex items-center">
-                  <div>${abbreviateNumber(realmTreasury.totalValue)}</div>
-                  <ArrowRightIcon className="h-4 w-4 fill-neutral-500 ml-2" />
-                </a>
-              </Link>
+              <a
+                className="flex items-center"
+                href={`/dao/${props.realmUrlId}/treasury/v2`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <div>${abbreviateNumber(realmTreasury.totalValue)}</div>
+                <ArrowRightIcon className="h-4 w-4 fill-neutral-500 ml-2" />
+              </a>
             ),
           ),
         )}
