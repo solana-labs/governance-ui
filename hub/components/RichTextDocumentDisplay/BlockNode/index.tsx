@@ -56,6 +56,10 @@ function doesNotEndWithEllipsis(
     return !node.endsWith('…');
   }
 
+  if (!node.c.length) {
+    return true;
+  }
+
   const last = node.c[node.c.length - 1];
   return doesNotEndWithEllipsis(last);
 }

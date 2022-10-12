@@ -62,7 +62,6 @@ export const getHub = gql`
         }
         token {
           mint
-          price
           symbol
         }
       }
@@ -160,7 +159,6 @@ export const getHubResp = IT.type({
         IT.null,
         IT.type({
           mint: PublicKey,
-          price: IT.number,
           symbol: IT.string,
         }),
       ]),
