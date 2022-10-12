@@ -35,6 +35,7 @@ export function TwitterEmbedNode(props: Props) {
       className={cx(
         props.className,
         'transition-opacity',
+        'max-w-md',
         loaded ? 'opacity-100' : 'opacity-0',
       )}
       dangerouslySetInnerHTML={{ __html: props.embed.c.h }}

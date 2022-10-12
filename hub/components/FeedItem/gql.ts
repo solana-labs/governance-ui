@@ -190,7 +190,6 @@ export const getRealm = gql`
       info {
         token {
           mint
-          price
           symbol
         }
       }
@@ -219,7 +218,6 @@ export const getRealmResp = IT.type({
         IT.null,
         IT.type({
           mint: PublicKey,
-          price: IT.number,
           symbol: IT.string,
         }),
       ]),
