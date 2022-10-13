@@ -29,6 +29,9 @@ import {
 import { PublicKey, TokenAmount } from '@solana/web3.js'
 import Loading from '@components/Loading'
 import { dryRunInstruction } from 'actions/dryRunInstruction'
+import Link from 'next/link'
+import { getExplorerUrl } from '@components/explorer/tools'
+import { ExternalLinkIcon } from '@heroicons/react/outline'
 
 const BurnLockedAccountSchema = {
   amount: yup.string().required(),
@@ -54,6 +57,8 @@ const LockedAccount: FC<Props> = ({
   callback,
 }) => {
   const router = useRouter()
+  const { cluster } = router.query
+
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
 
@@ -88,7 +93,7 @@ const LockedAccount: FC<Props> = ({
       !gsrmBalance ||
       isNaN(parseFloat(amount.toString())) ||
       !wallet ||
-      wallet.publicKey
+      !wallet.publicKey
     ) {
       notify({
         type: 'error',
@@ -103,7 +108,10 @@ const LockedAccount: FC<Props> = ({
     )
     // Check if amount > balance
     if (amountAsBN.gt(new anchor.BN(gsrmBalance.amount))) {
-      notify({ type: 'error', message: 'You do not have enough gSRM to burn' })
+      notify({
+        type: 'error',
+        message: 'You do not have enough gSRM to redeem',
+      })
       setIsBurning(false)
       return
     }
@@ -114,7 +122,7 @@ const LockedAccount: FC<Props> = ({
         message: `Only ${fmtMintAmount(
           gsrmMint,
           account.totalGsrmAmount.sub(account.gsrmBurned)
-        )} gSRM can be burned`,
+        )} gSRM can be redeemed`,
       })
       setIsBurning(false)
       return
@@ -158,8 +166,8 @@ const LockedAccount: FC<Props> = ({
       }
 
       const proposalAddress = await handleCreateProposal({
-        title: `Serum DAO: Burning ${amount} gSRM`,
-        description: `Burning ${amount} gSRM to redeem vested ${
+        title: `Serum DAO: Redeeming ${amount} gSRM`,
+        description: `Redeeming ${amount} gSRM to redeem vested ${
           account.isMsrm ? 'MSRM' : 'SRM'
         }.`,
         instructionsData: [instructionData],
@@ -180,19 +188,26 @@ const LockedAccount: FC<Props> = ({
           className={classNames(
             'border',
             'inline-flex',
+            'items-center space-x-1',
             'min-w-max',
             'items-center',
             'px-2',
             'py-1',
             'rounded-full',
-            'text-xs',
             'border-1',
             'border-blue',
-            'text-blue',
             'font-medium'
           )}
         >
-          Locked Account
+          <p className="text-xs text-blue">Locked</p>
+          <Link
+            href={getExplorerUrl(cluster as string, account.address)}
+            passHref
+          >
+            <a target="_blank" rel="noopener noreferrer">
+              <ExternalLinkIcon className="h-4 w-4 text-blue" />
+            </a>
+          </Link>
         </div>
         <div
           className={classNames(
@@ -214,17 +229,23 @@ const LockedAccount: FC<Props> = ({
         </div>
       </div>
       <div className="mt-3 flex flex-col space-y-1 flex-1">
-        <p className="text-xs">gSRM burned</p>
+        <p className="text-xs">Redeemable gSRM</p>
         <p className="text-lg font-semibold">
           {gsrmMint ? (
             <>
-              {fmtMintAmount(gsrmMint, account.gsrmBurned)}/
-              {fmtMintAmount(gsrmMint, account.totalGsrmAmount)}
+              {fmtMintAmount(
+                gsrmMint,
+                account.totalGsrmAmount.sub(account.gsrmBurned)
+              )}
+              /{fmtMintAmount(gsrmMint, account.totalGsrmAmount)}
             </>
           ) : (
             <>
-              {fmtBnMintDecimals(account.gsrmBurned, SRM_DECIMALS)}/
-              {fmtBnMintDecimals(account.totalGsrmAmount, SRM_DECIMALS)}
+              {fmtBnMintDecimals(
+                account.totalGsrmAmount.sub(account.gsrmBurned),
+                SRM_DECIMALS
+              )}
+              /{fmtBnMintDecimals(account.totalGsrmAmount, SRM_DECIMALS)}
             </>
           )}
         </p>
@@ -247,7 +268,7 @@ const LockedAccount: FC<Props> = ({
           className="bg-bkg-4 p-2 px-3 text-xs text-fgd-3 font-semibold rounded-md self-stretch"
           disabled={isBurning || !wallet?.publicKey}
         >
-          {!isBurning ? 'Burn' : <Loading />}
+          {!isBurning ? 'Redeem' : <Loading />}
         </button>
       </form>
       {errors.amount ? <p>{errors.amount.message}</p> : null}

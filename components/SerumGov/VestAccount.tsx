@@ -32,6 +32,9 @@ import useRealm from '@hooks/useRealm'
 import useQueryContext from '@hooks/useQueryContext'
 import Loading from '@components/Loading'
 import { dryRunInstruction } from 'actions/dryRunInstruction'
+import { ExternalLinkIcon } from '@heroicons/react/outline'
+import Link from 'next/link'
+import { getExplorerUrl } from '@components/explorer/tools'
 
 const BurnVestAccountSchema = {
   amount: yup.string().required(),
@@ -57,6 +60,8 @@ const VestAccount: FC<Props> = ({
   createProposal,
 }) => {
   const router = useRouter()
+  const { cluster } = router.query
+
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
 
@@ -142,7 +147,10 @@ const VestAccount: FC<Props> = ({
 
     // Check if amount > balance
     if (amountAsBN.gt(new anchor.BN(gsrmBalance.amount))) {
-      notify({ type: 'error', message: 'You do not have enough gSRM to burn' })
+      notify({
+        type: 'error',
+        message: 'You do not have enough gSRM to redeem',
+      })
       setIsBurning(false)
       return
     }
@@ -153,7 +161,7 @@ const VestAccount: FC<Props> = ({
         message: `Only ${fmtMintAmount(
           gsrmMint,
           account.totalGsrmAmount.sub(account.gsrmBurned)
-        )} gSRM can be burned`,
+        )} gSRM can be redeemed`,
       })
       setIsBurning(false)
       return
@@ -197,8 +205,8 @@ const VestAccount: FC<Props> = ({
       }
 
       const proposalAddress = await handleCreateProposal({
-        title: `Serum DAO: Burning ${amount} gSRM`,
-        description: `Burning ${amount} gSRM to redeem vested ${
+        title: `Serum DAO: Redeeming ${amount} gSRM`,
+        description: `Redeeming ${amount} gSRM to redeem vested ${
           account.isMsrm ? 'MSRM' : 'SRM'
         }.`,
         instructionsData: [instructionData],
@@ -218,19 +226,26 @@ const VestAccount: FC<Props> = ({
           className={classNames(
             'border',
             'inline-flex',
+            'items-center space-x-1',
             'min-w-max',
             'items-center',
             'px-2',
             'py-1',
             'rounded-full',
-            'text-xs',
             'border-1',
             'border-orange',
-            'text-orange',
             'font-medium'
           )}
         >
-          Vest Account
+          <p className="text-xs text-orange">Vested</p>
+          <Link
+            href={getExplorerUrl(cluster as string, account.address)}
+            passHref
+          >
+            <a target="_blank" rel="noopener noreferrer">
+              <ExternalLinkIcon className="h-4 w-4 text-orange" />
+            </a>
+          </Link>
         </div>
         <div
           className={classNames(
@@ -253,25 +268,12 @@ const VestAccount: FC<Props> = ({
       </div>
       <div className="flex items-stretch justify-between">
         <div className="mt-3 flex flex-col space-y-1 flex-1">
-          <p className="text-xs">
-            Redeemable {account.isMsrm ? 'MSRM' : 'SRM'}
-          </p>
-          <p className="text-lg font-semibold">{redeemableAmount || 0}</p>
-        </div>
-        <div className="mt-3 flex flex-col space-y-1 flex-1">
-          <p className="text-xs">gSRM burned</p>
+          <p className="text-xs">Redeemable gSRM</p>
           <p className="text-lg font-semibold">
-            {gsrmMint ? (
-              <>
-                {fmtMintAmount(gsrmMint, account.gsrmBurned)}/
-                {fmtMintAmount(gsrmMint, account.totalGsrmAmount)}
-              </>
-            ) : (
-              <>
-                {fmtBnMintDecimals(account.gsrmBurned, SRM_DECIMALS)}/
-                {fmtBnMintDecimals(account.totalGsrmAmount, SRM_DECIMALS)}
-              </>
-            )}
+            {redeemableAmount || 0}/
+            {gsrmMint
+              ? fmtMintAmount(gsrmMint, account.totalGsrmAmount)
+              : fmtBnMintDecimals(account.totalGsrmAmount, SRM_DECIMALS)}
           </p>
         </div>
       </div>
@@ -291,7 +293,7 @@ const VestAccount: FC<Props> = ({
             className="bg-bkg-4 py-2 px-4 text-xs text-fgd-3 font-semibold rounded-md self-stretch disabled:text-fgd-4"
             disabled={isBurning || !wallet?.publicKey}
           >
-            {!isBurning ? 'Burn' : <Loading />}
+            {!isBurning ? 'Redeem' : <Loading />}
           </button>
         </div>
       </form>

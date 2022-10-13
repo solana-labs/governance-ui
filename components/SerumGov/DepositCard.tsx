@@ -102,7 +102,7 @@ const DepositCard = ({ mint, callback, createProposal }: DepositCardProps) => {
     if (amountAsBN.gt(new anchor.BN(balance.amount))) {
       notify({
         type: 'error',
-        message: `You do not have enough ${mint} to deposit`,
+        message: `You do not have enough ${mint} to lock`,
       })
       setIsDepositing(false)
       return
@@ -218,7 +218,7 @@ const DepositCard = ({ mint, callback, createProposal }: DepositCardProps) => {
   return (
     <div className="p-3 rounded-md border-2 border-bkg-4">
       <div className="flex items-center justify-between">
-        <p className="font-bold lg:text-md text-fgd-2">Deposit SRM</p>
+        <p className="font-bold lg:text-md text-fgd-2">Lock SRM</p>
         <p className="text-xs text-fgd-3">Balance: {balance.uiAmount}</p>
       </div>
       <form
@@ -239,7 +239,7 @@ const DepositCard = ({ mint, callback, createProposal }: DepositCardProps) => {
           className="bg-bkg-4 p-2 px-3 text-xs text-fgd-3 font-semibold rounded-md self-stretch  disabled:text-fgd-4"
           disabled={isDepositing || !wallet?.publicKey}
         >
-          {!isDepositing ? 'Deposit' : <Loading />}
+          {!isDepositing ? 'Lock' : <Loading />}
         </button>
       </form>
     </div>
