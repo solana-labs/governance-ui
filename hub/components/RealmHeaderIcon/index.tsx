@@ -45,7 +45,7 @@ export function Content(props: Props) {
             'h-40',
             'w-40',
             'rounded-full',
-            'bg-sky-400',
+            'bg-neutral-100',
             'flex',
             'items-center',
             'justify-center',

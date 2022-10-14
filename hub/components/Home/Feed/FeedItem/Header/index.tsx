@@ -1,11 +1,14 @@
 import ChevronRightIcon from '@carbon/icons-react/lib/ChevronRight';
+import type { PublicKey } from '@solana/web3.js';
 import { differenceInMinutes, formatDistanceToNowStrict } from 'date-fns';
 import Link from 'next/link';
 
 import { FeedItemAuthor } from '../../gql';
+import { AuthorAvatar } from '@hub/components/AuthorAvatar';
 import { AuthorHovercard } from '@hub/components/AuthorHovercard';
 import { ProposalStateBadge } from '@hub/components/ProposalStateBadge';
 import { abbreviateAddress } from '@hub/lib/abbreviateAddress';
+import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
 import cx from '@hub/lib/cx';
 import { ProposalState } from '@hub/types/ProposalState';
 
@@ -18,6 +21,11 @@ interface Props {
   proposal?: {
     state: ProposalState;
     votingEnds?: number | null;
+  };
+  realmPublicKey: PublicKey;
+  realm?: null | {
+    name: string;
+    symbol?: null | string;
   };
   updated: number;
   url: string;
@@ -47,6 +55,31 @@ export function Header(props: Props) {
       )}
     >
       <div className="flex items-baseline space-x-2">
+        {props.realm &&
+          (props.realmPublicKey.equals(ECOSYSTEM_PAGE) ? (
+            <div
+              className="font-medium text-sm text-neutral-900 mr-2 cursor-default"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {props.realm.name}
+            </div>
+          ) : (
+            <Link
+              passHref
+              href={
+                props.realm.symbol
+                  ? `/realm/${props.realm.symbol}`
+                  : `/realm/${props.realmPublicKey.toBase58()}`
+              }
+            >
+              <a
+                className="font-medium text-sm text-neutral-900 mr-2 hover:underline"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {props.realm.name}
+              </a>
+            </Link>
+          ))}
         {props.author ? (
           <AuthorHovercard
             asChild
@@ -57,10 +90,16 @@ export function Header(props: Props) {
             twitterHandle={props.author?.twitterInfo?.handle}
           >
             <div
-              className="text-sm text-neutral-900 cursor-default"
+              className="text-sm text-neutral-900 cursor-default flex items-baseline"
               onClick={(e) => e.stopPropagation()}
             >
-              {authorName}
+              {props.realm && (
+                <AuthorAvatar
+                  className="h-4 w-4 mr-1 text-[8px] self-center"
+                  author={props.author}
+                />
+              )}
+              <div>{authorName}</div>
             </div>
           </AuthorHovercard>
         ) : (

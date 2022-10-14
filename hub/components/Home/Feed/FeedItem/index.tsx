@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { FeedItem } from '../gql';
 import { AuthorAvatar } from '@hub/components/AuthorAvatar';
 import { AuthorHovercard } from '@hub/components/AuthorHovercard';
+import { RealmIcon } from '@hub/components/RealmIcon';
 import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay';
 import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
 import cx from '@hub/lib/cx';
@@ -21,6 +22,10 @@ interface BaseProps {
 interface Props extends BaseProps {
   feedItem: FeedItem;
   realm: PublicKey;
+  realmInfo?: {
+    iconUrl?: null | string;
+    name: string;
+  };
   realmUrlId: string;
 }
 
@@ -48,7 +53,13 @@ export function Content(props: Props) {
         'gap-x-3',
       )}
     >
-      {props.feedItem.author ? (
+      {props.realmInfo ? (
+        <RealmIcon
+          className="h-12 w-12 text-lg"
+          iconUrl={props.realmInfo.iconUrl}
+          name={props.realmInfo.name}
+        />
+      ) : props.feedItem.author ? (
         <AuthorHovercard
           civicAvatar={props.feedItem.author?.civicInfo?.avatarUrl}
           civicHandle={props.feedItem.author?.civicInfo?.handle}
@@ -89,6 +100,8 @@ export function Content(props: Props) {
                   }
                 : undefined
             }
+            realmPublicKey={props.realm}
+            realm={props.realmInfo}
             updated={props.feedItem.updated}
             url={url}
           />
