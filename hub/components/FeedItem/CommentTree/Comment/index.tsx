@@ -9,6 +9,7 @@ import { AuthorAvatar } from '@hub/components/AuthorAvatar';
 import { AuthorHovercard } from '@hub/components/AuthorHovercard';
 import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay';
 import { abbreviateAddress } from '@hub/lib/abbreviateAddress';
+import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
 import cx from '@hub/lib/cx';
 import { useUserCreatedFeedItemCommentRepliesStore } from '@hub/stores/userCreatedFeedItemCommentReplies';
 import { BlockNodeType } from '@hub/types/RichTextDocument';
@@ -40,6 +41,9 @@ export function Content(props: Props) {
 
   const replies = (userReplies || []).concat(props.comment.replies || []);
   const originalRepliesCount = props.comment.replies?.length || 0;
+  const url = props.realm.equals(ECOSYSTEM_PAGE)
+    ? `/ecosystem/${props.feedItemId}/${props.comment.id}`
+    : `/realm/${props.realmUrlId}/${props.feedItemId}/${props.comment.id}`;
 
   return (
     <article className={cx(props.className, 'w-full')}>
@@ -102,10 +106,7 @@ export function Content(props: Props) {
             ) : (
               <div className="text-xs text-neutral-900">{authorName}</div>
             )}
-            <Link
-              passHref
-              href={`/realm/${props.realmUrlId}/${props.feedItemId}/${props.comment.id}`}
-            >
+            <Link passHref href={url}>
               <a className="ml-4 text-xs text-neutral-500 hover:underline">
                 {formatDistanceToNowStrict(props.comment.created)} ago
               </a>
@@ -235,10 +236,7 @@ export function Content(props: Props) {
             </div>
           </div>
           <div>
-            <Link
-              passHref
-              href={`/realm/${props.realmUrlId}/${props.feedItemId}/${props.comment.id}`}
-            >
+            <Link passHref href={url}>
               <a className="inline-block py-4 text-xs text-neutral-500 hover:text-sky-500">
                 View replies
               </a>

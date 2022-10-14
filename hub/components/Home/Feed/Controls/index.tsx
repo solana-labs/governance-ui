@@ -75,7 +75,11 @@ export function Content(props: Props) {
                   realmIconUrl={props.realmIconUrl}
                   realmName={props.realmName}
                   onPostCreated={(post) => {
-                    router.push(`/realm/${props.realmUrlId}/${post.id}`);
+                    if (props.realm.equals(ECOSYSTEM_PAGE)) {
+                      router.push(`/ecosystem/${post.id}`);
+                    } else {
+                      router.push(`/realm/${props.realmUrlId}/${post.id}`);
+                    }
                   }}
                 />
               </Dialog.Content>

@@ -3,7 +3,7 @@ import Head from 'next/head'
 import { Home } from '@hub/components/Home'
 import { ECOSYSTEM_PAGE } from '@hub/lib/constants'
 
-export default function Realm() {
+export default function Ecosystem() {
   return (
     <div>
       <Head>

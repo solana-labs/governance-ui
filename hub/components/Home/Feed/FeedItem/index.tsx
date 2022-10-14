@@ -5,6 +5,7 @@ import { FeedItem } from '../gql';
 import { AuthorAvatar } from '@hub/components/AuthorAvatar';
 import { AuthorHovercard } from '@hub/components/AuthorHovercard';
 import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay';
+import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
 import cx from '@hub/lib/cx';
 import { FeedItemType } from '@hub/types/FeedItemType';
 import { ProposalState } from '@hub/types/ProposalState';
@@ -29,12 +30,13 @@ export function Content(props: Props) {
   const document = props.feedItem.clippedDocument.document;
   const isClipped = props.feedItem.clippedDocument.isClipped;
 
-  const url =
-    props.feedItem.type === FeedItemType.Post
-      ? `/realm/${props.realmUrlId}/${props.feedItem.id}`
-      : `/dao/${
-          props.realmUrlId
-        }/proposal/${props.feedItem.proposal.publicKey.toBase58()}`;
+  const url = props.realm.equals(ECOSYSTEM_PAGE)
+    ? `/ecosystem/${props.feedItem.id}`
+    : props.feedItem.type === FeedItemType.Post
+    ? `/realm/${props.realmUrlId}/${props.feedItem.id}`
+    : `/dao/${
+        props.realmUrlId
+      }/proposal/${props.feedItem.proposal.publicKey.toBase58()}`;
 
   return (
     <article
