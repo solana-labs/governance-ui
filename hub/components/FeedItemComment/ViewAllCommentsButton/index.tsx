@@ -14,7 +14,14 @@ interface Props extends BaseProps {
 
 export function Content(props: Props) {
   return (
-    <Link passHref href={`/realm/${props.realmUrlId}/${props.feedItemId}`}>
+    <Link
+      passHref
+      href={
+        props.realmUrlId === 'ecosystem'
+          ? `/ecosystem/${props.feedItemId}`
+          : `/realm/${props.realmUrlId}/${props.feedItemId}`
+      }
+    >
       <a
         className={cx(
           props.className,
