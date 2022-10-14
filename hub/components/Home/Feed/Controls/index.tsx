@@ -11,6 +11,7 @@ import * as Dialog from '@hub/components/controls/Dialog';
 import { Select } from '@hub/components/controls/Select';
 import { NewPostEditor } from '@hub/components/NewPostEditor';
 import { useJWT } from '@hub/hooks/useJWT';
+import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
 import cx from '@hub/lib/cx';
 import { FeedItemSort } from '@hub/types/FeedItemSort';
 
@@ -104,40 +105,43 @@ export function Content(props: Props) {
           </HoverCard.Portal>
         </HoverCard.Root>
       )}
-      {jwt ? (
-        <Toolbar.Button asChild>
-          <Button.Secondary
-            className="w-32"
-            disabled={!jwt}
-            onClick={() => router.push(`/dao/${props.realmUrlId}/proposal/new`)}
-          >
-            <DocumentAddIcon className="h-4 w-4 mr-1.5" />
-            <div>Proposal</div>
-          </Button.Secondary>
-        </Toolbar.Button>
-      ) : (
-        <HoverCard.Root>
+      {!props.realm.equals(ECOSYSTEM_PAGE) &&
+        (jwt ? (
           <Toolbar.Button asChild>
-            <HoverCard.Trigger asChild>
-              <Button.Secondary className="w-32" disabled>
-                <DocumentAddIcon className="h-4 w-4 mr-1.5" />
-                <div>Proposal</div>
-              </Button.Secondary>
-            </HoverCard.Trigger>
-          </Toolbar.Button>
-          <HoverCard.Portal>
-            <HoverCard.Content
-              className="p-3 bg-white rounded shadow-xl w-72 text-center"
-              side="top"
+            <Button.Secondary
+              className="w-32"
+              disabled={!jwt}
+              onClick={() =>
+                router.push(`/dao/${props.realmUrlId}/proposal/new`)
+              }
             >
-              <HoverCard.Arrow className="fill-white" />
-              <div className="text-neutral-700 text-xs">
-                You must be logged in to create a proposal
-              </div>
-            </HoverCard.Content>
-          </HoverCard.Portal>
-        </HoverCard.Root>
-      )}
+              <DocumentAddIcon className="h-4 w-4 mr-1.5" />
+              <div>Proposal</div>
+            </Button.Secondary>
+          </Toolbar.Button>
+        ) : (
+          <HoverCard.Root>
+            <Toolbar.Button asChild>
+              <HoverCard.Trigger asChild>
+                <Button.Secondary className="w-32" disabled>
+                  <DocumentAddIcon className="h-4 w-4 mr-1.5" />
+                  <div>Proposal</div>
+                </Button.Secondary>
+              </HoverCard.Trigger>
+            </Toolbar.Button>
+            <HoverCard.Portal>
+              <HoverCard.Content
+                className="p-3 bg-white rounded shadow-xl w-72 text-center"
+                side="top"
+              >
+                <HoverCard.Arrow className="fill-white" />
+                <div className="text-neutral-700 text-xs">
+                  You must be logged in to create a proposal
+                </div>
+              </HoverCard.Content>
+            </HoverCard.Portal>
+          </HoverCard.Root>
+        ))}
     </Toolbar.Root>
   );
 }

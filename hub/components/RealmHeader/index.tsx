@@ -16,6 +16,7 @@ import * as Button from '@hub/components/controls/Button';
 import { Twitter } from '@hub/components/icons/Twitter';
 import * as RealmBanner from '@hub/components/RealmBanner';
 import * as RealmHeaderIcon from '@hub/components/RealmHeaderIcon';
+import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
 import cx from '@hub/lib/cx';
 
 import { ExternalLinkIcon } from './ExternalLinkIcon';
@@ -97,21 +98,25 @@ export function Content(props: Props) {
               >
                 feed
               </Tab>
-              <Tab
-                href={`/realm/${props.realmUrlId}/hub`}
-                icon={<AssemblyClusterIcon />}
-                selected={props.selectedTab === 'hub'}
-              >
-                hub
-              </Tab>
-              <Tab
-                external
-                href={`/dao/${props.realmUrlId}/treasury/v2`}
-                icon={<WalletIcon />}
-                selected={props.selectedTab === 'treasury'}
-              >
-                treasury
-              </Tab>
+              {!props.realm.equals(ECOSYSTEM_PAGE) && (
+                <Tab
+                  href={`/realm/${props.realmUrlId}/hub`}
+                  icon={<AssemblyClusterIcon />}
+                  selected={props.selectedTab === 'hub'}
+                >
+                  hub
+                </Tab>
+              )}
+              {!props.realm.equals(ECOSYSTEM_PAGE) && (
+                <Tab
+                  external
+                  href={`/dao/${props.realmUrlId}/treasury/v2`}
+                  icon={<WalletIcon />}
+                  selected={props.selectedTab === 'treasury'}
+                >
+                  treasury
+                </Tab>
+              )}
             </NavigationMenu.List>
           </NavigationMenu.Root>
           <NavigationMenu.Root className="flex items-center">
