@@ -9,7 +9,11 @@ import '../styles/typography.css'
 import '@hub/components/controls/RichTextEditor/index.css'
 
 export default function App({ Component, pageProps, router }: AppProps) {
-  if (router.pathname.startsWith('/realm/[id]')) {
+  if (
+    router.pathname.startsWith('/realm/[id]') ||
+    router.pathname.startsWith('/ecosystem') ||
+    router.pathname.startsWith('/discover')
+  ) {
     return (
       <HubApp>
         <Component {...pageProps} />

@@ -38,7 +38,7 @@ export function Stats(props: Props) {
       <Stat className="w-[25%]" icon={<RealmsLogo />} label="Org Members">
         {props.numMembers}
       </Stat>
-      {props.twitterFollowers && (
+      {!!props.twitterFollowers && (
         <Stat className="w-[25%]" icon={<Twitter />} label="Followers">
           {abbreviateNumber(props.twitterFollowers, undefined, {
             maximumFractionDigits: 1,
