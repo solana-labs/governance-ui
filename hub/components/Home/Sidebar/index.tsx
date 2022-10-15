@@ -1,10 +1,10 @@
 import * as Separator from '@radix-ui/react-separator';
 import type { PublicKey } from '@solana/web3.js';
 
+import * as RealmHeaderIcon from '@hub/components/RealmHeaderIcon';
 import cx from '@hub/lib/cx';
 
 import * as About from './About';
-import * as Icon from './Icon';
 import * as Treasury from './Treasury';
 
 interface BaseProps {
@@ -24,16 +24,19 @@ interface Props extends BaseProps {
 }
 
 export function Content(props: Props) {
+  const description = props.description || 'No description available.';
+  const iconUrl = props.iconUrl;
+
   return (
     <div className={cx(props.className, 'h-full', 'relative')}>
-      <Icon.Content
+      <RealmHeaderIcon.Content
         className={cx('-translate-y-1/2', 'absolute', 'top-0')}
-        iconUrl={props.iconUrl}
+        iconUrl={iconUrl}
         isStickied={props.compressed}
         realmName={props.realmName}
       />
       <h1 className="flex items-center text-neutral-900 text-xl font-bold mb-5 mt-0 pt-24">
-        {props.iconUrl && (
+        {iconUrl && (
           <img
             className={cx(
               'rounded-full',
@@ -41,7 +44,7 @@ export function Content(props: Props) {
               props.compressed ? 'h-8 w-8' : 'h-0 w-0',
               props.compressed ? 'mr-2' : 'mr-0',
             )}
-            src={props.iconUrl}
+            src={iconUrl}
           />
         )}
         {props.realmName}
@@ -49,7 +52,7 @@ export function Content(props: Props) {
       <Separator.Root className="bg-neutral-300 h-[1px]" />
       <About.Content
         className="pt-5 pb-7"
-        description={props.description}
+        description={description}
         membersCount={props.membersCount}
         twitterHandle={props.twitterHandle}
         websiteUrl={props.websiteUrl}
@@ -67,7 +70,9 @@ export function Content(props: Props) {
 export function Loading(props: BaseProps) {
   return (
     <div className={cx(props.className, 'h-full', 'relative')}>
-      <Icon.Loading className={cx('-translate-y-1/2', 'absolute', 'top-0')} />
+      <RealmHeaderIcon.Loading
+        className={cx('-translate-y-1/2', 'absolute', 'top-0')}
+      />
       <div className="h-24" />
       <h1 className="bg-neutral-200 rounded animate-pulse mb-5 mt-0 w-40">
         &nbsp;
@@ -83,7 +88,9 @@ export function Loading(props: BaseProps) {
 export function Error(props: BaseProps) {
   return (
     <div className={cx(props.className, 'h-full', 'relative')}>
-      <Icon.Error className={cx('-translate-y-1/2', 'absolute', 'top-0')} />
+      <RealmHeaderIcon.Error
+        className={cx('-translate-y-1/2', 'absolute', 'top-0')}
+      />
       <div className="h-24" />
       <h1 className="bg-neutral-200 rounded mb-5 mt-0 w-40">&nbsp;</h1>
       <Separator.Root className="bg-neutral-300 h-[1px]" />

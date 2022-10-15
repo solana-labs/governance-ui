@@ -4,7 +4,7 @@ import {
   InlineStyle,
 } from '@hub/types/RichTextDocument';
 
-function getStyle(style: InlineStyle) {
+export function getStyle(style: InlineStyle) {
   switch (style) {
     case InlineStyle.Bold:
       return 'font-bold';
@@ -31,7 +31,6 @@ export function InlineNode(props: Props) {
     <span
       className={cx(
         props.className,
-        'text-sm',
         props.node.s && props.node.s.map(getStyle).join(' '),
       )}
     >

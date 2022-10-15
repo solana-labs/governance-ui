@@ -213,15 +213,24 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
           <PreviousRouteBtn />
         </div>
         <div className="flex items-center justify-between mb-4">
-          <h1 className="leading-none mb-0">
-            Your Account{' '}
-            <span className="font-normal text-fgd-2 text-xs">
-              ({realmInfo?.displayName})
+          {realmInfo?.ogImage && (
+            <img
+              src={realmInfo?.ogImage}
+              className="mr-2 rouninded-full w-8 h-8"
+            />
+          )}
+          <h1 className="leading-none flex flex-col mb-0">
+            <span className="font-normal text-fgd-2 text-xs mb-2">
+              {realmInfo?.displayName}
             </span>
+            My governance power{' '}
           </h1>
 
           <div className="ml-auto flex flex-row">
-            <DepositCommunityTokensBtn className="mr-3" />
+            <DepositCommunityTokensBtn
+              inAccountDetails={true}
+              className="mr-3"
+            />
             <WithDrawCommunityTokens />
           </div>
         </div>
@@ -372,7 +381,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
           ></LockTokensModal>
         )}
       </div>
-      {connected && <Account withHeader={false}></Account>}
+      {connected && <Account withHeader={false} displayPanel={false}></Account>}
     </div>
   )
 }

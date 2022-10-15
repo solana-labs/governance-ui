@@ -47,9 +47,12 @@ interface RealmCreation {
 
   nftCollectionCount?: number
   existingCommunityMintPk: PublicKey | undefined
-  communityMintSupplyFactor: number | undefined
   communityYesVotePercentage: 'disabled' | number
   transferCommunityMintAuthority: boolean
+
+  useSupplyFactor: boolean
+  communityMintSupplyFactor: number | undefined
+  communityAbsoluteMaxVoteWeight: number | undefined
 
   createCouncil: boolean
   existingCouncilMintPk: PublicKey | undefined
@@ -73,8 +76,11 @@ export async function prepareRealmCreation({
   nftCollectionCount = 0,
   existingCommunityMintPk,
   communityYesVotePercentage,
-  communityMintSupplyFactor: rawCMSF,
   transferCommunityMintAuthority,
+
+  useSupplyFactor,
+  communityMintSupplyFactor,
+  communityAbsoluteMaxVoteWeight,
 
   createCouncil,
   existingCouncilMintPk,
@@ -94,7 +100,6 @@ export async function prepareRealmCreation({
   const mintsSetupSigners: Keypair[] = []
   const initialCouncilTokenAmount = 1
 
-  const communityMintSupplyFactor = parseMintMaxVoteWeight(rawCMSF)
   const walletPk = getWalletPublicKey(wallet)
   const programIdPk = new PublicKey(programIdAddress)
   const programVersion = await getGovernanceProgramVersion(
@@ -114,6 +119,13 @@ export async function prepareRealmCreation({
     ? communityMintAccount?.account.supply.isZero()
     : true
   const communityMintDecimals = communityMintAccount?.account?.decimals || 6
+
+  const communityMaxVoteWeightSource = parseMintMaxVoteWeight(
+    useSupplyFactor,
+    communityMintDecimals,
+    communityMintSupplyFactor,
+    communityAbsoluteMaxVoteWeight
+  )
 
   // If we're using an existing community mint check if we can create a governance for it
   // 1) The mint must have mintAuthority
@@ -240,7 +252,7 @@ export async function prepareRealmCreation({
     communityMintPk,
     walletPk,
     councilMintPk,
-    communityMintSupplyFactor,
+    communityMaxVoteWeightSource,
     minCommunityTokensToCreateAsMintValue,
     communityTokenConfig,
     councilTokenConfig

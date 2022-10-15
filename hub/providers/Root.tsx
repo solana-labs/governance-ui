@@ -1,3 +1,4 @@
+import * as Tooltip from '@radix-ui/react-tooltip';
 import React from 'react';
 
 import cx from '@hub/lib/cx';
@@ -31,7 +32,9 @@ export function RootProvider(props: Props) {
         <ClusterProvider>
           <WalletProvider>
             <GraphQLProvider>
-              <UserPrefsProvider>{props.children}</UserPrefsProvider>
+              <UserPrefsProvider>
+                <Tooltip.Provider>{props.children}</Tooltip.Provider>
+              </UserPrefsProvider>
             </GraphQLProvider>
           </WalletProvider>
         </ClusterProvider>

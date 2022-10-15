@@ -50,7 +50,7 @@ export function Content(props: Props) {
           <div>WALLETS & ASSETS</div>
         </div>
         <a
-          className="flex items-center space-x-1 text-sm transition-colors text-neutral-500 hover:text-cyan-500"
+          className="flex items-center space-x-1 text-sm transition-colors text-neutral-500 hover:text-sky-500"
           href={`/dao/${props.realmUrlId}/treasury/v2`}
         >
           <div>View</div>

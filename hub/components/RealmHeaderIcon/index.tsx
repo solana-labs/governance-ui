@@ -16,7 +16,7 @@ export function Content(props: Props) {
     <div
       className={cx(
         props.className,
-        'bg-neutral-100',
+        'bg-white',
         'flex',
         'h-44',
         'items-center',
@@ -30,7 +30,7 @@ export function Content(props: Props) {
       {props.iconUrl ? (
         <img
           className={cx(
-            'bg-white',
+            'bg-neutral-100',
             'h-40',
             'rounded-full',
             'transition-opacity',
@@ -69,7 +69,7 @@ export function Loading(props: BaseProps) {
     <div
       className={cx(
         props.className,
-        'bg-neutral-100',
+        'bg-white',
         'flex',
         'h-44',
         'items-center',
@@ -101,7 +101,7 @@ export function Error(props: BaseProps) {
     <div
       className={cx(
         props.className,
-        'bg-neutral-100',
+        'bg-white',
         'flex',
         'h-44',
         'items-center',

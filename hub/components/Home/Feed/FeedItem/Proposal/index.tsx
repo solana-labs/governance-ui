@@ -31,7 +31,9 @@ export function Proposal(props: Props) {
   const quorumRemainder = quorumReached
     ? new BigNumber(0)
     : voteBreakdown.threshold
-    ? voteBreakdown.threshold.minus(voteBreakdown.totalYesWeight)
+    ? voteBreakdown.threshold
+        .minus(voteBreakdown.totalYesWeight)
+        .decimalPlaces(0, BigNumber.ROUND_UP)
     : new BigNumber(0);
   const myVote = props.proposal.proposal.myVote;
 

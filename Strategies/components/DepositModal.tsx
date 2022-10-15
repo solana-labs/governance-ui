@@ -5,6 +5,9 @@ import MangoDeposit from './MangoDepositComponent'
 import BigNumber from 'bignumber.js'
 import { SolendStrategy } from 'Strategies/types/types'
 import EverlendModalContent from './EverlendModalContent'
+import { PsyFiStrategies } from './psyfi'
+import { AssetAccount } from '@utils/uiTypes/assets'
+import { MangoAccount } from '@blockworks-foundation/mango-client'
 
 const DepositModal = ({
   onClose,
@@ -19,6 +22,19 @@ const DepositModal = ({
   createProposalFcn,
   mangoAccounts,
   governedTokenAccount,
+}: {
+  onClose: () => void
+  proposedInvestment: any
+  handledMint: string
+  apy: string
+  protocolName: string
+  protocolLogoSrc: string
+  handledTokenName: string
+  strategyName: string
+  currentPosition: number
+  createProposalFcn: any
+  mangoAccounts: MangoAccount[]
+  governedTokenAccount: AssetAccount
 }) => {
   const currentPositionFtm = new BigNumber(
     currentPosition.toFixed(0)
@@ -52,6 +68,15 @@ const DepositModal = ({
       ) : null}
       {protocolName === 'Everlend' ? (
         <EverlendModalContent
+          proposedInvestment={proposedInvestment}
+          governedTokenAccount={governedTokenAccount}
+          handledMint={handledMint}
+          createProposalFcn={createProposalFcn}
+        />
+      ) : null}
+      {/* TODO: Add the PsyFi modal */}
+      {protocolName === 'PsyFi' ? (
+        <PsyFiStrategies
           proposedInvestment={proposedInvestment}
           governedTokenAccount={governedTokenAccount}
           handledMint={handledMint}
