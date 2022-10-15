@@ -3,7 +3,7 @@ import Select from '@components/inputs/Select'
 import AmountSlider from '@components/Slider'
 import Switch from '@components/Switch'
 import useRealm from '@hooks/useRealm'
-import { GovernanceConfig, VoteTipping } from '@solana/spl-governance'
+import { VoteTipping } from '@solana/spl-governance'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import {
   fmtPercentage,
@@ -24,14 +24,6 @@ export interface BaseGovernanceFormFieldsV2 {
   maxVotingTime: number
   voteThreshold: number
   voteTipping: VoteTipping
-}
-
-// @asktree: If GovernanceConfig updates in the future in an unversioned way, I suggest using Omit to exclude non-V3 fields
-// I chose to make the data stored in the exact same data model we use for the sdk to reduce data model bloat.
-// There are reasons not to do this, but I think it works for this usecase. If I didnt do this, I would make a recursive type
-// where all leaf nodes are strings. I would not invent a new type that is similar but lacks any direct mapping to GovernanceConfig.
-export type BaseGovernanceFormFieldsV3 = Omit<GovernanceConfig, 'reserved'> & {
-  _programVersion: 3
 }
 
 const BaseGovernanceFormV2 = ({

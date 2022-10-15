@@ -22,7 +22,6 @@ import { useEffect, useState } from 'react'
 import Button from '@components/Button'
 import BaseGovernanceForm, {
   BaseGovernanceFormFieldsV2,
-  BaseGovernanceFormFieldsV3,
 } from '@components/AssetsList/BaseGovernanceForm'
 import { getGovernanceConfigFromV2Form } from '@utils/GovernanceTools'
 import {
@@ -33,6 +32,12 @@ import { abbreviateAddress } from '@utils/formatting'
 import * as yup from 'yup'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import useProgramVersion from '@hooks/useProgramVersion'
+import {
+  BaseGovernanceFormFieldsV3,
+  transformerGovernanceConfig_2_BaseGovernanceFormFieldsV3,
+  transform,
+  transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig,
+} from '@components/AssetsList/BaseGovernanceForm-data'
 
 type ProposalInfo = {
   title: string
@@ -77,6 +82,7 @@ const GovernanceConfigModal = ({
   // (which in this cause they certainly can, its a network query)
   useEffect(() => {
     if (config === undefined) return
+    if (mint === undefined) return
 
     if (programVersion <= 2) {
       setForm({
@@ -99,11 +105,14 @@ const GovernanceConfigModal = ({
         voteTipping: config.communityVoteTipping,
       })
     } else {
+      const baseForm = transform(
+        transformerGovernanceConfig_2_BaseGovernanceFormFieldsV3(mint),
+        { ...config, _programVersion: 3 }
+      )[0]
       setForm({
-        _programVersion: 3,
         title: '',
         description: '',
-        ...config,
+        ...baseForm,
       })
     }
   }, [config, mint])
@@ -116,6 +125,7 @@ const GovernanceConfigModal = ({
   const schema = yup.object().shape({})
   const handleCreate = async () => {
     if (form === undefined) return
+    if (mint === undefined) return
 
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     if (isValid && governance?.account && wallet?.publicKey && realm) {
@@ -132,7 +142,12 @@ const GovernanceConfigModal = ({
               mintDecimals: mint!.decimals,
               voteTipping: form.voteTipping,
             })
-          : new GovernanceConfig(form)
+          : new GovernanceConfig(
+              transform(
+                transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig(mint),
+                form
+              )[0]
+            )
 
       const instruction = createSetGovernanceConfig(
         realm.owner,
