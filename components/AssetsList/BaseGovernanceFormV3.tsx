@@ -198,7 +198,9 @@ export const BaseGovernanceFormV3 = ({
                           />
                         )}
                         <span className="text-gray-200 whitespace-nowrap">
-                          {minProposalTokensEnabled && getSupplyPercent()}
+                          {minProposalTokensEnabled &&
+                            govPop === 'community' &&
+                            getSupplyPercent()}
                         </span>
                       </>
                     )}
