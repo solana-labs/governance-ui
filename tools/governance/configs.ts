@@ -32,7 +32,10 @@ export function createGovernanceThresholds(
             type: VoteThresholdType.YesVotePercentage,
           })
         : new VoteThreshold({ type: VoteThresholdType.Disabled })
-      : undefinedThreshold
+      : new VoteThreshold({
+          value: communityYesVotePercentage as number,
+          type: VoteThresholdType.YesVotePercentage,
+        })
 
   const councilVoteThreshold =
     programVersion >= PROGRAM_VERSION_V3
