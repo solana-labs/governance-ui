@@ -15,7 +15,6 @@ import { createAssociatedTokenAccount } from '@utils/associated'
 import { notify } from '@utils/notifications'
 import { sendTransaction } from '@utils/send'
 import { WalletSigner } from '@utils/sendTransactions'
-import { MintAccount, tryGetMint } from '@utils/tokens'
 import produce from 'immer'
 import create, { State } from 'zustand'
 import IDL from '../idls/serum_gov.json'
@@ -79,40 +78,46 @@ export type VestAccountType = {
   gsrmBurned: anchor.BN
 }
 
-const PROGRAM_ID = new PublicKey('EDV6BNBY6pLb4aCJCc5LnELdA9xTywnDZ2m3cWfCbpwZ')
+export const DEV_PROGRAM_ID = new PublicKey(
+  'EDV6BNBY6pLb4aCJCc5LnELdA9xTywnDZ2m3cWfCbpwZ'
+)
+export const MAIN_PROGRAM_ID = new PublicKey(
+  'FBcTbv5rLy7MQkkAU2uDzAEjjZDeu2BVLVRJGxyz6hnV'
+)
 
-export const SRM_MINT = new PublicKey(
+export const DEV_SRM_MINT = new PublicKey(
   '2xKASju8WCUK6zC54TP4h6WhHdqdcWMNoFpqAdvXvHV6'
 )
-export const MSRM_MINT = new PublicKey(
+export const DEV_MSRM_MINT = new PublicKey(
   'BoFBTKtdMXC4YALXtNV5tmw1xNWtjxTrR17PvZGmKhmP'
 )
-export const [GSRM_MINT] = findProgramAddressSync(
+
+export const MAIN_SRM_MINT = new PublicKey(
+  'SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt'
+)
+export const MAIN_MSRM_MINT = new PublicKey(
+  'MSRMcoVyrFxnSgo5uXwone5SKcGhT1KEJMFEkMEWf9L'
+)
+export const [DEV_GSRM_MINT] = findProgramAddressSync(
   [Buffer.from('gSRM')],
-  PROGRAM_ID
+  DEV_PROGRAM_ID
 )
 
 export const SRM_DECIMALS = 6
 export const MSRM_DECIMALS = 0
 export const MSRM_MULTIPLIER = 1_000_000_000_000
 
-const DEFAULT_GSRM_MINT_INFO = {
-  mintAuthority: null,
-  supply: new anchor.BN(0),
-  decimals: SRM_DECIMALS,
-  isInitialized: true,
-  freezeAuthority: null,
-}
-
 interface SerumGovStore extends State {
   programId: PublicKey
-  gsrmMint?: MintAccount
+  gsrmMint: PublicKey
   authority: PublicKey
   config: PublicKey
+  srmMint: PublicKey
+  msrmMint: PublicKey
 
   set: (x: any) => void
   actions: {
-    loadGsrmMint: (connection: Connection) => Promise<void>
+    updateSerumGovAccounts: (cluster?: string) => void
     getGsrmBalance: (
       connection: Connection,
       owner?: PublicKey | null
@@ -233,29 +238,63 @@ interface SerumGovStore extends State {
 }
 
 const useSerumGovStore = create<SerumGovStore>((set, get) => ({
-  programId: PROGRAM_ID,
-  gsrmMint: DEFAULT_GSRM_MINT_INFO,
-  authority: findProgramAddressSync([Buffer.from('authority')], PROGRAM_ID)[0],
-  config: findProgramAddressSync([Buffer.from('config')], PROGRAM_ID)[0],
+  programId: DEV_PROGRAM_ID,
+  gsrmMint: DEV_GSRM_MINT,
+  authority: findProgramAddressSync(
+    [Buffer.from('authority')],
+    DEV_PROGRAM_ID
+  )[0],
+  config: findProgramAddressSync([Buffer.from('config')], DEV_PROGRAM_ID)[0],
+  srmMint: DEV_SRM_MINT,
+  msrmMint: DEV_MSRM_MINT,
 
   set: (fn) => set(produce(fn)),
   actions: {
-    async loadGsrmMint(connection: Connection) {
+    updateSerumGovAccounts: (cluster?: string) => {
+      const programId = cluster === 'devnet' ? DEV_PROGRAM_ID : MAIN_PROGRAM_ID
+
+      const [gsrmMint] = PublicKey.findProgramAddressSync(
+        [Buffer.from('gSRM')],
+        programId
+      )
+      const [config] = PublicKey.findProgramAddressSync(
+        [Buffer.from('config')],
+        programId
+      )
+      const [authority] = PublicKey.findProgramAddressSync(
+        [Buffer.from('authority')],
+        programId
+      )
+
       const set = get().set
-      const mint = await tryGetMint(connection, GSRM_MINT)
-
-      // This is done because, for eg, on loading devnet treasury page directly, the mint is fetched from mainnet and not devnet, and thus messes up the decimals.
       set((s) => {
-        s.gsrmMint = mint ? mint.account : DEFAULT_GSRM_MINT_INFO
+        s.programId = programId
+        s.gsrmMint = gsrmMint
+        s.config = config
+        s.authority = authority
+        s.srmMintAddress = cluster === 'devnet' ? DEV_SRM_MINT : MAIN_SRM_MINT
+        s.msrmMintAddress =
+          cluster === 'devnet' ? DEV_MSRM_MINT : MAIN_MSRM_MINT
       })
-    },
 
+      console.log(`[SERUM_GOV] Setting programId to ${programId.toBase58()}`)
+      console.log(`[SERUM_GOV] Setting gsrmMint to `, gsrmMint.toBase58())
+      console.log(
+        `[SERUM_GOV] Setting srmMinAddress to `,
+        cluster === 'devnet'
+          ? DEV_SRM_MINT.toBase58()
+          : MAIN_SRM_MINT.toBase58()
+      )
+    },
     async getGsrmBalance(
       connection: Connection,
       owner?: PublicKey | null
     ): Promise<TokenAmount | null> {
       if (!owner) return null
-      const ata = await getAssociatedTokenAddress(GSRM_MINT, owner, true)
+
+      const gsrmMint = get().gsrmMint
+
+      const ata = await getAssociatedTokenAddress(gsrmMint, owner, true)
       try {
         const tokenBalance = await connection.getTokenAccountBalance(
           ata,
@@ -271,10 +310,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
     async getConfigAccount(
       provider: anchor.AnchorProvider
     ): Promise<ConfigAccountType | null> {
-      const [config] = findProgramAddressSync(
-        [Buffer.from('config')],
-        get().programId
-      )
+      const config = get().config
       const program = new anchor.Program(
         IDL as anchor.Idl,
         get().programId,
@@ -456,6 +492,8 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
       claimTicket: ClaimTicketType,
       owner?: WalletSigner | null
     ): Promise<void> {
+      const gsrmMint = get().gsrmMint
+
       if (owner && owner.publicKey) {
         try {
           const program = new anchor.Program(
@@ -464,7 +502,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
             provider
           )
           const ownerGsrmAccount = await getAssociatedTokenAddress(
-            GSRM_MINT,
+            gsrmMint,
             owner.publicKey,
             true
           )
@@ -478,7 +516,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
             const [ix] = await createAssociatedTokenAccount(
               owner.publicKey,
               owner.publicKey,
-              GSRM_MINT
+              gsrmMint
             )
             instructions.push(ix)
           }
@@ -488,7 +526,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
               owner: owner.publicKey,
               claimTicket: claimTicket.address,
               authority: get().authority,
-              gsrmMint: GSRM_MINT,
+              gsrmMint: gsrmMint,
               ownerGsrmAccount: ownerGsrmAccount,
               clock: SYSVAR_CLOCK_PUBKEY,
               tokenProgram: TOKEN_PROGRAM_ID,
@@ -528,7 +566,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
         try {
           if (!redeemTicket.isMsrm) {
             const ownerSrmAccount = await getAssociatedTokenAddress(
-              SRM_MINT,
+              get().srmMint,
               owner.publicKey,
               true
             )
@@ -542,12 +580,12 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
               const [ix] = await createAssociatedTokenAccount(
                 owner.publicKey,
                 owner.publicKey,
-                SRM_MINT
+                get().srmMint
               )
               instructions.push(ix)
             }
             const [srmVault] = findProgramAddressSync(
-              [Buffer.from('vault'), SRM_MINT.toBuffer()],
+              [Buffer.from('vault'), get().srmMint.toBuffer()],
               program.programId
             )
             const ix = await program.methods
@@ -557,7 +595,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
                 authority: get().authority,
                 config: get().config,
                 redeemTicket: redeemTicket.address,
-                srmMint: SRM_MINT,
+                srmMint: get().srmMint,
                 srmVault,
                 ownerSrmAccount,
                 clock: SYSVAR_CLOCK_PUBKEY,
@@ -576,7 +614,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
             })
           } else {
             const ownerMsrmAccount = await getAssociatedTokenAddress(
-              MSRM_MINT,
+              get().msrmMint,
               owner.publicKey,
               true
             )
@@ -590,12 +628,12 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
               const [ix] = await createAssociatedTokenAccount(
                 owner.publicKey,
                 owner.publicKey,
-                SRM_MINT
+                get().msrmMint
               )
               instructions.push(ix)
             }
             const [msrmVault] = findProgramAddressSync(
-              [Buffer.from('vault'), MSRM_MINT.toBuffer()],
+              [Buffer.from('vault'), get().msrmMint.toBuffer()],
               program.programId
             )
             const ix = await program.methods
@@ -605,7 +643,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
                 authority: get().authority,
                 config: get().config,
                 redeemTicket: redeemTicket.address,
-                msrmMint: MSRM_MINT,
+                msrmMint: get().msrmMint,
                 msrmVault,
                 ownerMsrmAccount,
                 clock: SYSVAR_CLOCK_PUBKEY,
@@ -642,8 +680,11 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
         get().programId,
         provider
       )
+
+      const gsrmMint = get().gsrmMint
+
       const ownerGsrmAccount = await getAssociatedTokenAddress(
-        GSRM_MINT,
+        gsrmMint,
         owner,
         true
       )
@@ -653,7 +694,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
           owner: owner,
           claimTicket: claimTicket.address,
           authority: get().authority,
-          gsrmMint: GSRM_MINT,
+          gsrmMint: gsrmMint,
           ownerGsrmAccount: ownerGsrmAccount,
           clock: SYSVAR_CLOCK_PUBKEY,
           tokenProgram: TOKEN_PROGRAM_ID,
@@ -676,12 +717,12 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
       let ix: TransactionInstruction
       if (!redeemTicket.isMsrm) {
         const ownerSrmAccount = await getAssociatedTokenAddress(
-          SRM_MINT,
+          get().srmMint,
           owner,
           true
         )
         const [srmVault] = findProgramAddressSync(
-          [Buffer.from('vault'), SRM_MINT.toBuffer()],
+          [Buffer.from('vault'), get().srmMint.toBuffer()],
           program.programId
         )
         ix = await program.methods
@@ -691,7 +732,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
             authority: get().authority,
             config: get().config,
             redeemTicket: redeemTicket.address,
-            srmMint: SRM_MINT,
+            srmMint: get().srmMint,
             srmVault,
             ownerSrmAccount,
             clock: SYSVAR_CLOCK_PUBKEY,
@@ -701,12 +742,12 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
           .instruction()
       } else {
         const ownerMsrmAccount = await getAssociatedTokenAddress(
-          MSRM_MINT,
+          get().msrmMint,
           owner,
           true
         )
         const [msrmVault] = findProgramAddressSync(
-          [Buffer.from('vault'), MSRM_MINT.toBuffer()],
+          [Buffer.from('vault'), get().msrmMint.toBuffer()],
           program.programId
         )
         ix = await program.methods
@@ -716,7 +757,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
             authority: get().authority,
             config: get().config,
             redeemTicket: redeemTicket.address,
-            msrmMint: MSRM_MINT,
+            msrmMint: get().msrmMint,
             msrmVault,
             ownerMsrmAccount,
             clock: SYSVAR_CLOCK_PUBKEY,
@@ -736,6 +777,8 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
       amount: anchor.BN,
       owner?: WalletSigner | null
     ): Promise<void> {
+      const gsrmMint = get().gsrmMint
+
       if (owner && owner.publicKey) {
         try {
           const program = new anchor.Program(
@@ -744,7 +787,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
             provider
           )
           const ownerGsrmAccount = await getAssociatedTokenAddress(
-            GSRM_MINT,
+            gsrmMint,
             owner.publicKey,
             true
           )
@@ -766,7 +809,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
               owner: owner.publicKey,
               authority: get().authority,
               config: get().config,
-              gsrmMint: GSRM_MINT,
+              gsrmMint: gsrmMint,
               ownerGsrmAccount: ownerGsrmAccount,
               lockedAccount: lockedAccount.address,
               redeemTicket: redeemTicket,
@@ -795,13 +838,15 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
       amount: anchor.BN,
       owner: PublicKey
     ): Promise<TransactionInstruction> {
+      const gsrmMint = get().gsrmMint
+
       const program = new anchor.Program(
         IDL as anchor.Idl,
         get().programId,
         provider
       )
       const ownerGsrmAccount = await getAssociatedTokenAddress(
-        GSRM_MINT,
+        gsrmMint,
         owner,
         true
       )
@@ -819,7 +864,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
           owner: owner,
           authority: get().authority,
           config: get().config,
-          gsrmMint: GSRM_MINT,
+          gsrmMint: gsrmMint,
           ownerGsrmAccount: ownerGsrmAccount,
           lockedAccount: lockedAccount.address,
           redeemTicket: redeemTicket,
@@ -839,6 +884,8 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
       amount: anchor.BN,
       owner?: WalletSigner | null
     ): Promise<void> {
+      const gsrmMint = get().gsrmMint
+
       if (owner && owner.publicKey) {
         const program = new anchor.Program(
           IDL as anchor.Idl,
@@ -846,7 +893,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
           provider
         )
         const ownerGsrmAccount = await getAssociatedTokenAddress(
-          GSRM_MINT,
+          gsrmMint,
           owner.publicKey,
           true
         )
@@ -864,7 +911,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
             owner: owner.publicKey,
             authority: get().authority,
             config: get().config,
-            gsrmMint: GSRM_MINT,
+            gsrmMint: gsrmMint,
             ownerGsrmAccount,
             vestAccount: vestAccount.address,
             redeemTicket: redeemTicket,
@@ -890,6 +937,8 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
       amount: anchor.BN,
       owner: PublicKey
     ): Promise<TransactionInstruction> {
+      const gsrmMint = get().gsrmMint
+
       const program = new anchor.Program(
         IDL as anchor.Idl,
         get().programId,
@@ -897,7 +946,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
       )
 
       const ownerGsrmAccount = await getAssociatedTokenAddress(
-        GSRM_MINT,
+        gsrmMint,
         owner,
         true
       )
@@ -917,7 +966,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
           owner: owner,
           authority: get().authority,
           config: get().config,
-          gsrmMint: GSRM_MINT,
+          gsrmMint: gsrmMint,
           ownerGsrmAccount,
           vestAccount: vestAccount.address,
           redeemTicket: redeemTicket,
@@ -1001,7 +1050,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
       let ix: TransactionInstruction
       if (!isMsrm) {
         const [srmVault] = findProgramAddressSync(
-          [Buffer.from('vault'), SRM_MINT.toBuffer()],
+          [Buffer.from('vault'), get().srmMint.toBuffer()],
           program.programId
         )
         ix = await program.methods
@@ -1012,7 +1061,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
             ownerUserAccount: userAccount
               ? userAccount.address
               : userAccountAddress,
-            srmMint: SRM_MINT,
+            srmMint: get().srmMint,
             payerSrmAccount: payerTokenAccount,
             authority: get().authority,
             config: get().config,
@@ -1026,7 +1075,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
           .instruction()
       } else {
         const [msrmVault] = findProgramAddressSync(
-          [Buffer.from('vault'), MSRM_MINT.toBuffer()],
+          [Buffer.from('vault'), get().msrmMint.toBuffer()],
           program.programId
         )
         ix = await program.methods
@@ -1037,7 +1086,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
             ownerUserAccount: userAccount
               ? userAccount.address
               : userAccountAddress,
-            msrmMint: MSRM_MINT,
+            msrmMint: get().msrmMint,
             payerMsrmAccount: payerTokenAccount,
             authority: get().authority,
             config: get().config,
@@ -1097,7 +1146,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
 
       if (!isMsrm) {
         const [srmVault] = findProgramAddressSync(
-          [Buffer.from('vault'), SRM_MINT.toBuffer()],
+          [Buffer.from('vault'), get().srmMint.toBuffer()],
           program.programId
         )
 
@@ -1111,7 +1160,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
               : userAccountAddress,
             vestAccount,
             claimTicket: claimTicket,
-            srmMint: SRM_MINT,
+            srmMint: get().srmMint,
             payerSrmAccount: payerTokenAccount,
             authority: get().authority,
             config: get().config,
@@ -1123,7 +1172,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
           .instruction()
       } else {
         const [msrmVault] = findProgramAddressSync(
-          [Buffer.from('vault'), MSRM_MINT.toBuffer()],
+          [Buffer.from('vault'), get().srmMint.toBuffer()],
           program.programId
         )
         ix = await program.methods
@@ -1134,7 +1183,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
             ownerUserAccount: userAccount
               ? userAccount.address
               : userAccountAddress,
-            msrmMint: MSRM_MINT,
+            msrmMint: get().srmMint,
             payerMsrmAccount: payerTokenAccount,
             authority: get().authority,
             config: get().config,
@@ -1172,14 +1221,14 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
         const instructions: TransactionInstruction[] = []
 
         const ownerAta = await getAssociatedTokenAddress(
-          !isMsrm ? SRM_MINT : MSRM_MINT,
+          !isMsrm ? get().srmMint : get().msrmMint,
           owner.publicKey
         )
 
         const [vault] = findProgramAddressSync(
           [
             Buffer.from('vault'),
-            !isMsrm ? SRM_MINT.toBuffer() : MSRM_MINT.toBuffer(),
+            !isMsrm ? get().srmMint.toBuffer() : get().srmMint.toBuffer(),
           ],
           program.programId
         )
@@ -1232,7 +1281,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
               ownerUserAccount: userAccount
                 ? userAccount.address
                 : userAccountAddress,
-              srmMint: SRM_MINT,
+              srmMint: get().srmMint,
               payerSrmAccount: ownerAta,
               authority: get().authority,
               config: get().config,
@@ -1254,7 +1303,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
               ownerUserAccount: userAccount
                 ? userAccount.address
                 : userAccountAddress,
-              msrmMint: MSRM_MINT,
+              msrmMint: get().msrmMint,
               payerMsrmAccount: ownerAta,
               authority: get().authority,
               config: get().config,

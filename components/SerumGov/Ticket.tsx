@@ -13,7 +13,7 @@ import {
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
 import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
-import { fmtMintAmount } from '@tools/sdk/units'
+import { fmtBnMintDecimals } from '@tools/sdk/units'
 import { createAssociatedTokenAccount } from '@utils/associated'
 import { fmtSecsToTime, fmtTimeToString } from '@utils/formatting'
 import { notify } from '@utils/notifications'
@@ -26,7 +26,6 @@ import { useRouter } from 'next/router'
 import { FC, useEffect, useState } from 'react'
 import useSerumGovStore, {
   ClaimTicketType,
-  GSRM_MINT,
   MSRM_DECIMALS,
   RedeemTicketType,
   SRM_DECIMALS,
@@ -99,7 +98,7 @@ const Ticket: FC<Props> = ({ ticket, createProposal, callback }) => {
             const instructions: TransactionInstruction[] = []
             const { owner } = createProposal
             const ownerAta = await getAssociatedTokenAddress(
-              GSRM_MINT,
+              gsrmMint,
               owner,
               true
             )
@@ -110,7 +109,7 @@ const Ticket: FC<Props> = ({ ticket, createProposal, callback }) => {
               const [ix] = await createAssociatedTokenAccount(
                 owner,
                 owner,
-                GSRM_MINT
+                gsrmMint
               )
               instructions.push(ix)
             }
@@ -156,9 +155,9 @@ const Ticket: FC<Props> = ({ ticket, createProposal, callback }) => {
               return
             }
             const proposalAddress = await handleCreateProposal({
-              title: `Serum DAO: Claim ${fmtMintAmount(
-                gsrmMint,
-                ticket.gsrmAmount
+              title: `Serum DAO: Claim ${fmtBnMintDecimals(
+                ticket.gsrmAmount,
+                SRM_DECIMALS
               )} gSRM`,
               description: `Claiming ticketId: ${ticket.address.toBase58()}`,
               instructionsData,
@@ -185,7 +184,7 @@ const Ticket: FC<Props> = ({ ticket, createProposal, callback }) => {
             const instructions: TransactionInstruction[] = []
             const { owner } = createProposal
             const ownerAta = await getAssociatedTokenAddress(
-              GSRM_MINT,
+              gsrmMint,
               owner,
               true
             )
@@ -196,7 +195,7 @@ const Ticket: FC<Props> = ({ ticket, createProposal, callback }) => {
               const [ix] = await createAssociatedTokenAccount(
                 owner,
                 owner,
-                GSRM_MINT
+                gsrmMint
               )
               instructions.push(ix)
             }
@@ -291,7 +290,7 @@ const Ticket: FC<Props> = ({ ticket, createProposal, callback }) => {
         {gsrmMint && (
           <p className="text-fgd-1 text-xl font-semibold">
             {isClaimTicket(ticket)
-              ? `${fmtMintAmount(gsrmMint, ticket.gsrmAmount)}`
+              ? `${fmtBnMintDecimals(ticket.gsrmAmount, SRM_DECIMALS)}`
               : `${new BigNumber(ticket.amount.toString())
                   .shiftedBy(
                     -1 * (ticket.isMsrm ? MSRM_DECIMALS : SRM_DECIMALS)

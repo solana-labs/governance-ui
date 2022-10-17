@@ -5,9 +5,7 @@ import { useTokenAccountBalance } from '@hooks/useTokenAccountBalance'
 import useWallet from '@hooks/useWallet'
 import useSerumGovStore, {
   MSRM_DECIMALS,
-  MSRM_MINT,
   SRM_DECIMALS,
-  SRM_MINT,
 } from 'stores/useSerumGovStore'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { notify } from '@utils/notifications'
@@ -15,7 +13,7 @@ import {
   fmtBnMintDecimals,
   parseMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import Loading from '@components/Loading'
 import {
@@ -42,11 +40,6 @@ type DepositCardProps = {
   }
 }
 
-const MINT_MAP = {
-  SRM: { pubkey: SRM_MINT, decimals: SRM_DECIMALS },
-  MSRM: { pubkey: MSRM_MINT, decimals: MSRM_DECIMALS },
-}
-
 const DepositLockedSRMSchema = {
   amount: yup.string().required(),
 }
@@ -61,13 +54,26 @@ const DepositCard = ({ mint, callback, createProposal }: DepositCardProps) => {
   const { fmtUrlWithCluster } = useQueryContext()
 
   const { wallet, anchorProvider } = useWallet()
+
+  const connection = useWalletStore((s) => s.connection)
+  const actions = useSerumGovStore((s) => s.actions)
+  const { srmMint, msrmMint } = useSerumGovStore((s) => ({
+    srmMint: s.srmMint,
+    msrmMint: s.msrmMint,
+  }))
+
+  const MINT_MAP = useMemo(
+    () => ({
+      SRM: { pubkey: srmMint, decimals: SRM_DECIMALS },
+      MSRM: { pubkey: msrmMint, decimals: MSRM_DECIMALS },
+    }),
+    [srmMint, msrmMint]
+  )
+
   const { balance, isLoading, refetch } = useTokenAccountBalance(
     createProposal ? createProposal.owner : wallet?.publicKey,
     MINT_MAP[mint].pubkey
   )
-
-  const connection = useWalletStore((s) => s.connection)
-  const actions = useSerumGovStore((s) => s.actions)
 
   const [isDepositing, setIsDepositing] = useState(false)
 
@@ -147,7 +153,8 @@ const DepositCard = ({ mint, callback, createProposal }: DepositCardProps) => {
           ownerAta,
           anchorProvider,
           amountAsBN,
-          MINT_MAP[mint].pubkey === MSRM_MINT
+          MINT_MAP[mint].pubkey.toBase58() ===
+            MINT_MAP['MSRM'].pubkey.toBase58()
         )
         instructions.push(depositIx)
 

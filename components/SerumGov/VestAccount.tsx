@@ -4,7 +4,6 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import useWallet from '@hooks/useWallet'
 import {
   fmtBnMintDecimals,
-  fmtMintAmount,
   parseMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
 import classNames from 'classnames'
@@ -158,9 +157,9 @@ const VestAccount: FC<Props> = ({
     if (amountAsBN.gt(account.totalGsrmAmount.sub(account.gsrmBurned))) {
       notify({
         type: 'error',
-        message: `Only ${fmtMintAmount(
-          gsrmMint,
-          account.totalGsrmAmount.sub(account.gsrmBurned)
+        message: `Only ${fmtBnMintDecimals(
+          account.totalGsrmAmount.sub(account.gsrmBurned),
+          SRM_DECIMALS
         )} gSRM can be redeemed`,
       })
       setIsBurning(false)
@@ -271,9 +270,7 @@ const VestAccount: FC<Props> = ({
           <p className="text-xs">Redeemable gSRM</p>
           <p className="text-lg font-semibold">
             {redeemableAmount || 0}/
-            {gsrmMint
-              ? fmtMintAmount(gsrmMint, account.totalGsrmAmount)
-              : fmtBnMintDecimals(account.totalGsrmAmount, SRM_DECIMALS)}
+            {fmtBnMintDecimals(account.totalGsrmAmount, SRM_DECIMALS)}
           </p>
         </div>
       </div>

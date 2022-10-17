@@ -19,7 +19,7 @@ import { validatePubkey } from '@utils/formValidation'
 import { notify } from '@utils/notifications'
 import { SerumGrantLockedForm } from '@utils/uiTypes/proposalCreationTypes'
 import { useContext, useEffect, useState } from 'react'
-import useSerumGovStore, { MSRM_MINT, SRM_MINT } from 'stores/useSerumGovStore'
+import useSerumGovStore from 'stores/useSerumGovStore'
 import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
 
@@ -44,6 +44,10 @@ const GrantForm = ({
   const { anchorProvider, wallet } = useWallet()
   const actions = useSerumGovStore((s) => s.actions)
   const programId = useSerumGovStore((s) => s.programId)
+  const { srmMint, msrmMint } = useSerumGovStore((s) => ({
+    srmMint: s.srmMint,
+    msrmMint: s.msrmMint,
+  }))
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const { handleSetInstructions } = useContext(NewProposalContext)
 
@@ -190,7 +194,7 @@ const GrantForm = ({
         governedAccounts={governedTokenAccountsWithoutNfts.filter(
           (acc) =>
             acc.extensions.token?.account.mint.toBase58() ===
-            (!isMsrm ? SRM_MINT.toBase58() : MSRM_MINT.toBase58())
+            (!isMsrm ? srmMint.toBase58() : msrmMint.toBase58())
         )}
         onChange={(value) => {
           handleSetForm({ propertyName: 'governedAccount', value })

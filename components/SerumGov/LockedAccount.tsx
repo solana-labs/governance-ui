@@ -3,7 +3,6 @@ import * as anchor from '@project-serum/anchor'
 import { yupResolver } from '@hookform/resolvers/yup'
 import {
   fmtBnMintDecimals,
-  fmtMintAmount,
   parseMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
 import classNames from 'classnames'
@@ -62,7 +61,6 @@ const LockedAccount: FC<Props> = ({
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
 
-  const gsrmMint = useSerumGovStore((s) => s.gsrmMint)
   const actions = useSerumGovStore((s) => s.actions)
 
   const { anchorProvider, wallet } = useWallet()
@@ -89,7 +87,6 @@ const LockedAccount: FC<Props> = ({
     amount,
   }) => {
     if (
-      !gsrmMint ||
       !gsrmBalance ||
       isNaN(parseFloat(amount.toString())) ||
       !wallet ||
@@ -104,7 +101,7 @@ const LockedAccount: FC<Props> = ({
     setIsBurning(true)
     const amountAsBN = parseMintNaturalAmountFromDecimalAsBN(
       amount,
-      gsrmMint.decimals
+      SRM_DECIMALS
     )
     // Check if amount > balance
     if (amountAsBN.gt(new anchor.BN(gsrmBalance.amount))) {
@@ -119,9 +116,9 @@ const LockedAccount: FC<Props> = ({
     if (amountAsBN.gt(account.totalGsrmAmount.sub(account.gsrmBurned))) {
       notify({
         type: 'error',
-        message: `Only ${fmtMintAmount(
-          gsrmMint,
-          account.totalGsrmAmount.sub(account.gsrmBurned)
+        message: `Only ${fmtBnMintDecimals(
+          account.totalGsrmAmount.sub(account.gsrmBurned),
+          SRM_DECIMALS
         )} gSRM can be redeemed`,
       })
       setIsBurning(false)
@@ -231,23 +228,13 @@ const LockedAccount: FC<Props> = ({
       <div className="mt-3 flex flex-col space-y-1 flex-1">
         <p className="text-xs">Redeemable gSRM</p>
         <p className="text-lg font-semibold">
-          {gsrmMint ? (
-            <>
-              {fmtMintAmount(
-                gsrmMint,
-                account.totalGsrmAmount.sub(account.gsrmBurned)
-              )}
-              /{fmtMintAmount(gsrmMint, account.totalGsrmAmount)}
-            </>
-          ) : (
-            <>
-              {fmtBnMintDecimals(
-                account.totalGsrmAmount.sub(account.gsrmBurned),
-                SRM_DECIMALS
-              )}
-              /{fmtBnMintDecimals(account.totalGsrmAmount, SRM_DECIMALS)}
-            </>
-          )}
+          <>
+            {fmtBnMintDecimals(
+              account.totalGsrmAmount.sub(account.gsrmBurned),
+              SRM_DECIMALS
+            )}
+            /{fmtBnMintDecimals(account.totalGsrmAmount, SRM_DECIMALS)}
+          </>
         </p>
       </div>
       <form
