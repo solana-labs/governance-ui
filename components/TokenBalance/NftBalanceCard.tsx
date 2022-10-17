@@ -20,7 +20,13 @@ import useQueryContext from '@hooks/useQueryContext'
 import Link from 'next/link'
 import { ChevronRightIcon } from '@heroicons/react/outline'
 
-const NftBalanceCard = ({ showView }: { showView?: boolean }) => {
+const NftBalanceCard = ({
+  inAccountDetails,
+  showView,
+}: {
+  inAccountDetails?: boolean
+  showView?: boolean
+}) => {
   const { fmtUrlWithCluster } = useQueryContext()
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
@@ -110,7 +116,7 @@ const NftBalanceCard = ({ showView }: { showView?: boolean }) => {
   }, [realm?.pubkey.toBase58(), wallet?.connected])
 
   return (
-    <>
+    <Wrapper inAccountDetails={inAccountDetails}>
       <div className="flex items-center justify-between mb-4">
         <h3 className="mb-0">Your NFTS</h3>
         {showView && (
@@ -134,7 +140,9 @@ const NftBalanceCard = ({ showView }: { showView?: boolean }) => {
       </div>
       <div className="space-y-4">
         {!connected ? (
-          <div className="p-3 text-xs bg-bkg-3">Please connect your wallet</div>
+          <div className={'text-xs text-white/50 mt-4'}>
+            Connect your wallet to see your NFTs
+          </div>
         ) : !isLoading ? (
           <NFTSelector
             onNftSelect={() => {
@@ -155,7 +163,22 @@ const NftBalanceCard = ({ showView }: { showView?: boolean }) => {
           Join
         </Button>
       )}
-    </>
+    </Wrapper>
   )
 }
+
+const Wrapper = ({
+  inAccountDetails,
+  children,
+}: {
+  inAccountDetails?: boolean
+  children: React.ReactNode
+}) => {
+  if (inAccountDetails) {
+    return <div className="space-y-4 w-1/2">{children}</div>
+  } else {
+    return <>{children}</>
+  }
+}
+
 export default NftBalanceCard

@@ -75,12 +75,19 @@ const TokenBalanceCardWrapper = ({
               proposal={proposal}
               inAccountDetails={inAccountDetails}
             >
-              <NftBalanceCard />
-              <ClaimUnreleasedNFTs />
+              <div className="mb-4" />
+              <NftBalanceCard
+                inAccountDetails={inAccountDetails}
+                showView={false}
+              />
+              <ClaimUnreleasedNFTs inAccountDetails={inAccountDetails} />
             </TokenBalanceCard>
           ) : (
             <>
-              <NftBalanceCard showView={!inAccountDetails} />
+              <NftBalanceCard
+                inAccountDetails={inAccountDetails}
+                showView={!inAccountDetails}
+              />
               <ClaimUnreleasedNFTs inAccountDetails={inAccountDetails} />
             </>
           )}

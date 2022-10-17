@@ -123,9 +123,9 @@ const ClaimUnreleasedNFTs = ({
     return (
       <>
         {((!inAccountDetails && solToBeClaimed > 1) || inAccountDetails) && (
-          <div className="my-4 md:my-6">
+          <div className="mt-4 md:mt-6">
             <h4 className="flex items-center">
-              Claim ({solToBeClaimed}) SOL
+              Claim {solToBeClaimed} SOL
               <Button
                 isLoading={isLoading}
                 disabled={isLoading || !ownNftVoteRecordsFilterd.length}
