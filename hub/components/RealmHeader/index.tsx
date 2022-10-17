@@ -5,14 +5,15 @@ import LogoDiscord from '@carbon/icons-react/lib/LogoDiscord';
 import LogoGithub from '@carbon/icons-react/lib/LogoGithub';
 import LogoInstagram from '@carbon/icons-react/lib/LogoInstagram';
 import LogoLinkedin from '@carbon/icons-react/lib/LogoLinkedin';
-// import ProgressBarRound from '@carbon/icons-react/lib/ProgressBarRound';
+import ProgressBarRound from '@carbon/icons-react/lib/ProgressBarRound';
 // import UserFollow from '@carbon/icons-react/lib/UserFollow';
 import WalletIcon from '@carbon/icons-react/lib/Wallet';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import type { PublicKey } from '@solana/web3.js';
+import { useMemo } from 'react';
 
 import * as Button from '@hub/components/controls/Button';
-// import { HeaderTokenPrice } from '@hub/components/HeaderTokenPrice';
+import { HeaderTokenPrice } from '@hub/components/HeaderTokenPrice';
 import { Twitter } from '@hub/components/icons/Twitter';
 import * as RealmBanner from '@hub/components/RealmBanner';
 import * as RealmHeaderIcon from '@hub/components/RealmHeaderIcon';
@@ -47,6 +48,13 @@ interface Props extends BaseProps {
 }
 
 export function Content(props: Props) {
+  const jupiterDirectLink = useMemo(() => {
+    if (props.token?.mint) {
+      return `https://jup.ag/swap/USDC-${props.token?.mint.toString()}?inAmount=1`;
+    }
+    return 'https://jup.ag';
+  }, [props.token]);
+
   return (
     <header className={cx(props.className, 'bg-white')}>
       <RealmBanner.Content bannerUrl={props.bannerUrl} realm={props.realm} />
@@ -63,29 +71,26 @@ export function Content(props: Props) {
             </div>
           </div>
           <div className="flex items-center">
-            {/* {props.token && (
+            {props.token && (
               <div className="mr-8">
                 <HeaderTokenPrice
                   mint={props.token.mint}
                   symbol={props.token.symbol}
                 />
               </div>
-            )} */}
+            )}
             {/* <Button.Secondary className="w-36">
               <UserFollow className="h-4 w-4 mr-1.5" />
               Follow
             </Button.Secondary> */}
-            {/* {props.token && (
-              <Button.Primary
-                className="w-36 text-white ml-2"
-                onClick={() => {
-                  const { mint, symbol } = props.token;
-                }}
-              >
-                <ProgressBarRound className="h-4 w-4 mr-1.5" />
-                Buy #{props.token.symbol}
-              </Button.Primary>
-            )} */}
+            {props.token && (
+              <a href={jupiterDirectLink} target="_blank">
+                <Button.Primary className="w-36 text-white ml-2">
+                  <ProgressBarRound className="h-4 w-4 mr-1.5" />
+                  Buy #{props.token.symbol}
+                </Button.Primary>
+              </a>
+            )}
           </div>
         </div>
         <div className="mt-6 flex items-center justify-between px-2">
