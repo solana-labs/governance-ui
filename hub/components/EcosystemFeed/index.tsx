@@ -1,17 +1,11 @@
 import ListDropdownIcon from '@carbon/icons-react/lib/ListDropdown';
-import { pipe } from 'fp-ts/function';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { EcosystemHeader } from '@hub/components/EcosystemHeader';
 import * as Controls from '@hub/components/Home/Feed/Controls';
 import { EndOfFeed } from '@hub/components/Home/Feed/EndOfFeed';
-import { LoadingDots } from '@hub/components/LoadingDots';
-import { useQuery } from '@hub/hooks/useQuery';
 import { useUserPrefs } from '@hub/hooks/useUserPrefs';
 import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
-import cx from '@hub/lib/cx';
-import { FeedItemSort } from '@hub/types/FeedItemSort';
-import * as RE from '@hub/types/Result';
 
 import { Page } from './Page';
 
@@ -50,6 +44,7 @@ export function EcosystemFeed(props: Props) {
         </header>
         <div className="mt-9">
           <Page
+            isFirstPage
             sort={sort}
             onLoadMore={(cursor) =>
               setAdditionalPageCursors((cursors) => cursors.concat(cursor))

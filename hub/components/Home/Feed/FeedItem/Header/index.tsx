@@ -61,7 +61,7 @@ export function Header(props: Props) {
               className="font-medium text-sm text-neutral-900 mr-2 cursor-default"
               onClick={(e) => e.stopPropagation()}
             >
-              {props.realm.name}
+              Solana Ecosystem
             </div>
           ) : (
             <Link
