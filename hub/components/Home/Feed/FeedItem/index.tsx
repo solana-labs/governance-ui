@@ -3,7 +3,9 @@ import { useRouter } from 'next/router';
 
 import { FeedItem } from '../gql';
 import { AuthorAvatar } from '@hub/components/AuthorAvatar';
+import { AuthorHovercard } from '@hub/components/AuthorHovercard';
 import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay';
+import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
 import cx from '@hub/lib/cx';
 import { FeedItemType } from '@hub/types/FeedItemType';
 import { ProposalState } from '@hub/types/ProposalState';
@@ -28,12 +30,13 @@ export function Content(props: Props) {
   const document = props.feedItem.clippedDocument.document;
   const isClipped = props.feedItem.clippedDocument.isClipped;
 
-  const url =
-    props.feedItem.type === FeedItemType.Post
-      ? `/realm/${props.realmUrlId}/${props.feedItem.id}`
-      : `/dao/${
-          props.realmUrlId
-        }/proposal/${props.feedItem.proposal.publicKey.toBase58()}`;
+  const url = props.realm.equals(ECOSYSTEM_PAGE)
+    ? `/ecosystem/${props.feedItem.id}`
+    : props.feedItem.type === FeedItemType.Post
+    ? `/realm/${props.realmUrlId}/${props.feedItem.id}`
+    : `/dao/${
+        props.realmUrlId
+      }/proposal/${props.feedItem.proposal.publicKey.toBase58()}`;
 
   return (
     <article
@@ -45,10 +48,25 @@ export function Content(props: Props) {
         'gap-x-3',
       )}
     >
-      <AuthorAvatar
-        author={props.feedItem.author}
-        className="h-12 w-12 text-lg"
-      />
+      {props.feedItem.author ? (
+        <AuthorHovercard
+          civicAvatar={props.feedItem.author?.civicInfo?.avatarUrl}
+          civicHandle={props.feedItem.author?.civicInfo?.handle}
+          publicKey={props.feedItem.author?.publicKey}
+          twitterAvatar={props.feedItem.author?.twitterInfo?.avatarUrl}
+          twitterHandle={props.feedItem.author?.twitterInfo?.handle}
+        >
+          <AuthorAvatar
+            author={props.feedItem.author}
+            className="h-12 w-12 text-lg"
+          />
+        </AuthorHovercard>
+      ) : (
+        <AuthorAvatar
+          author={props.feedItem.author}
+          className="h-12 w-12 text-lg"
+        />
+      )}
       <div
         className="text-left w-full overflow-hidden cursor-pointer"
         onClick={() => {
@@ -75,11 +93,11 @@ export function Content(props: Props) {
             url={url}
           />
         </div>
-        <div className="mt-3 text-neutral-900 font-bold">
+        <div className="mt-3 text-neutral-900 font-bold transition-colors hover:text-sky-500">
           {props.feedItem.title}
         </div>
         <RichTextDocumentDisplay
-          className="mt-4 text-neutral-700 text-sm"
+          className="mt-4 text-neutral-900 text-sm"
           isClipped={isClipped}
           document={document}
           onExpand={() => {

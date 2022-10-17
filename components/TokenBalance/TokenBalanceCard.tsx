@@ -480,7 +480,12 @@ export const TokenDeposit = ({
       : canDepositToken
       ? availableTokens
       : 0
-
+  const isVsr =
+    config?.account.communityTokenConfig.voterWeightAddin &&
+    vsrPluginsPks.includes(
+      config?.account.communityTokenConfig.voterWeightAddin.toBase58()
+    ) &&
+    tokenRole === GoverningTokenRole.Community
   return (
     <TokenDepositWrapper inAccountDetails={inAccountDetails}>
       {inAccountDetails && (
@@ -538,7 +543,7 @@ export const TokenDeposit = ({
                 Deposit
               </Button>
             ) : null}
-            {inAccountDetails && (
+            {(inAccountDetails || isVsr) && (
               <SecondaryButton
                 tooltipMessage={withdrawTooltipContent}
                 className="sm:w-1/2 max-w-[200px]"
@@ -559,17 +564,12 @@ export const TokenDeposit = ({
           </div>
         </>
       )}
-      {config?.account.communityTokenConfig.voterWeightAddin &&
-        vsrPluginsPks.includes(
-          config?.account.communityTokenConfig.voterWeightAddin.toBase58()
-        ) &&
-        tokenRole === GoverningTokenRole.Community && (
-          <small className="flex items-center mt-3 text-xs">
-            <ExclamationIcon className="w-5 h-5 mr-2"></ExclamationIcon>
-            Please withdraw your tokens and deposit again to get governance
-            power
-          </small>
-        )}
+      {isVsr && (
+        <small className="flex items-center mt-3 text-xs">
+          <ExclamationIcon className="w-5 h-5 mr-2"></ExclamationIcon>
+          Please withdraw your tokens and deposit again to get governance power
+        </small>
+      )}
     </TokenDepositWrapper>
   )
 }

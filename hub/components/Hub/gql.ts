@@ -62,7 +62,6 @@ export const getHub = gql`
         }
         token {
           mint
-          price
           symbol
         }
       }
@@ -76,6 +75,10 @@ export const getHub = gql`
       symbol
       twitterHandle
       websiteUrl
+      githubUrl
+      linkedInUrl
+      discordUrl
+      instagramUrl
     }
   }
 `;
@@ -156,7 +159,6 @@ export const getHubResp = IT.type({
         IT.null,
         IT.type({
           mint: PublicKey,
-          price: IT.number,
           symbol: IT.string,
         }),
       ]),
@@ -171,5 +173,9 @@ export const getHubResp = IT.type({
     symbol: IT.union([IT.null, IT.string]),
     twitterHandle: IT.union([IT.null, IT.string]),
     websiteUrl: IT.union([IT.null, IT.string]),
+    githubUrl: IT.union([IT.null, IT.string]),
+    linkedInUrl: IT.union([IT.null, IT.string]),
+    discordUrl: IT.union([IT.null, IT.string]),
+    instagramUrl: IT.union([IT.null, IT.string]),
   }),
 });

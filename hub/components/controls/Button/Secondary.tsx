@@ -16,7 +16,6 @@ export const Secondary = forwardRef<HTMLButtonElement, Props>(
         {...rest}
         ref={ref}
         className={cx(
-          rest.className,
           'border-neutral-500',
           'border',
           'flex',
@@ -27,8 +26,10 @@ export const Secondary = forwardRef<HTMLButtonElement, Props>(
           'p-3',
           'relative',
           'rounded',
+          'text-neutral-500',
           'tracking-normal',
           'transition-colors',
+          rest.className,
           !pending && 'active:border-neutral-900',
           'disabled:border-neutral-300',
           'disabled:cursor-not-allowed',
@@ -46,7 +47,7 @@ export const Secondary = forwardRef<HTMLButtonElement, Props>(
             'flex',
             'items-center',
             'justify-center',
-            'text-neutral-500',
+            'text-current',
             'text-sm',
             'transition-all',
             !pending && 'group-active:text-neutral-900',

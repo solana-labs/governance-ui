@@ -16,7 +16,7 @@ interface Props {
 export function About(props: Props) {
   const [expanded, setExpanded] = useState(false);
 
-  const sections = expanded ? props.sections : props.sections.slice(0, 3);
+  const sections = expanded ? props.sections : props.sections.slice(0, 2);
 
   return (
     <article className={cx('space-y-10', props.className)}>

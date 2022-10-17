@@ -114,6 +114,10 @@ export function FeedItem(props: Props) {
                   token={hub.info.token}
                   twitterHandle={realm.twitterHandle}
                   websiteUrl={realm.websiteUrl}
+                  discordUrl={realm.discordUrl}
+                  githubUrl={realm.githubUrl}
+                  instagramUrl={realm.instagramUrl}
+                  linkedInUrl={realm.linkedInUrl}
                 />
                 {pipe(
                   feedItemResult,

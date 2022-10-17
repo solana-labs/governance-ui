@@ -5,10 +5,14 @@ import {
   BlockNode as BlockNodeModel,
   BlockStyle,
   InlineNodeType,
+  AnchorNode as AnchorNodeModel,
+  InlineNode as InlineNodeModel,
+  PublicKeyNode as PublicKeyNodeModel,
 } from '@hub/types/RichTextDocument';
 
 import { AnchorNode } from './AnchorNode';
 import { InlineNode } from './InlineNode';
+import { PublicKeyNode } from './PublicKeyNode';
 
 function getTag(style: BlockStyle) {
   switch (style) {
@@ -45,6 +49,21 @@ function getTag(style: BlockStyle) {
   }
 }
 
+function doesNotEndWithEllipsis(
+  node: string | AnchorNodeModel | InlineNodeModel | PublicKeyNodeModel,
+): boolean {
+  if (typeof node === 'string') {
+    return !node.endsWith('…');
+  }
+
+  if (!node.c.length) {
+    return true;
+  }
+
+  const last = node.c[node.c.length - 1];
+  return doesNotEndWithEllipsis(last);
+}
+
 interface Props {
   className?: string;
   block: BlockNodeModel;
@@ -62,10 +81,19 @@ export function BlockNode(props: Props) {
         return <AnchorNode anchor={child} key={i} />;
       case InlineNodeType.Inline:
         return <InlineNode node={child} key={i} />;
+      case InlineNodeType.PublicKey:
+        return <PublicKeyNode node={child} key={i} />;
     }
   });
 
-  if (props.isClipped && props.isLast) {
+  const lastChild = props.block.c[props.block.c.length - 1];
+
+  if (
+    props.isClipped &&
+    props.isLast &&
+    lastChild &&
+    doesNotEndWithEllipsis(lastChild)
+  ) {
     children.push(<span key="ellipsis">&#8230;</span>);
   }
 
@@ -78,10 +106,10 @@ export function BlockNode(props: Props) {
           'inline-block',
           'leading-[1.75em]',
           'ml-2',
-          'text-cyan-500',
+          'text-sky-500',
           'text-[1em]',
           'transition-colors',
-          'hover:text-cyan-400',
+          'hover:text-sky-400',
         )}
         onClick={(e) => {
           e.stopPropagation();

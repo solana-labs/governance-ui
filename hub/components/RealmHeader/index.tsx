@@ -1,13 +1,22 @@
 import AssemblyClusterIcon from '@carbon/icons-react/lib/AssemblyCluster';
 import EarthIcon from '@carbon/icons-react/lib/Earth';
 import ListDropdownIcon from '@carbon/icons-react/lib/ListDropdown';
+import LogoDiscord from '@carbon/icons-react/lib/LogoDiscord';
+import LogoGithub from '@carbon/icons-react/lib/LogoGithub';
+import LogoInstagram from '@carbon/icons-react/lib/LogoInstagram';
+import LogoLinkedin from '@carbon/icons-react/lib/LogoLinkedin';
+// import ProgressBarRound from '@carbon/icons-react/lib/ProgressBarRound';
+// import UserFollow from '@carbon/icons-react/lib/UserFollow';
 import WalletIcon from '@carbon/icons-react/lib/Wallet';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import type { PublicKey } from '@solana/web3.js';
 
+import * as Button from '@hub/components/controls/Button';
+// import { HeaderTokenPrice } from '@hub/components/HeaderTokenPrice';
 import { Twitter } from '@hub/components/icons/Twitter';
 import * as RealmBanner from '@hub/components/RealmBanner';
 import * as RealmHeaderIcon from '@hub/components/RealmHeaderIcon';
+import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
 import cx from '@hub/lib/cx';
 
 import { ExternalLinkIcon } from './ExternalLinkIcon';
@@ -26,9 +35,13 @@ interface Props extends BaseProps {
   selectedTab?: 'feed' | 'hub' | 'treasury';
   token?: null | {
     mint: PublicKey;
-    price: number;
     symbol: string;
   };
+  // external links
+  discordUrl?: string | null;
+  githubUrl?: string | null;
+  instagramUrl?: string | null;
+  linkedInUrl?: string | null;
   twitterHandle?: string | null;
   websiteUrl?: string | null;
 }
@@ -43,11 +56,36 @@ export function Content(props: Props) {
           iconUrl={props.iconUrl}
           realmName={props.name}
         />
-        <div className="pl-48 pt-4 pb-8 pr-4 flex items-center">
+        <div className="pl-48 pt-4 pb-8 pr-4 flex items-center justify-between">
           <div className="-mx-2">
             <div className="font-semibold text-neutral-900 text-3xl">
               {props.name}
             </div>
+          </div>
+          <div className="flex items-center">
+            {/* {props.token && (
+              <div className="mr-8">
+                <HeaderTokenPrice
+                  mint={props.token.mint}
+                  symbol={props.token.symbol}
+                />
+              </div>
+            )} */}
+            {/* <Button.Secondary className="w-36">
+              <UserFollow className="h-4 w-4 mr-1.5" />
+              Follow
+            </Button.Secondary> */}
+            {/* {props.token && (
+              <Button.Primary
+                className="w-36 text-white ml-2"
+                onClick={() => {
+                  const { mint, symbol } = props.token;
+                }}
+              >
+                <ProgressBarRound className="h-4 w-4 mr-1.5" />
+                Buy #{props.token.symbol}
+              </Button.Primary>
+            )} */}
           </div>
         </div>
         <div className="mt-6 flex items-center justify-between px-2">
@@ -60,20 +98,25 @@ export function Content(props: Props) {
               >
                 feed
               </Tab>
-              <Tab
-                href={`/realm/${props.realmUrlId}/hub`}
-                icon={<AssemblyClusterIcon />}
-                selected={props.selectedTab === 'hub'}
-              >
-                hub
-              </Tab>
-              <Tab
-                href={`/dao/${props.realmUrlId}/treasury/v2`}
-                icon={<WalletIcon />}
-                selected={props.selectedTab === 'treasury'}
-              >
-                treasury
-              </Tab>
+              {!props.realm.equals(ECOSYSTEM_PAGE) && (
+                <Tab
+                  href={`/realm/${props.realmUrlId}/hub`}
+                  icon={<AssemblyClusterIcon />}
+                  selected={props.selectedTab === 'hub'}
+                >
+                  hub
+                </Tab>
+              )}
+              {!props.realm.equals(ECOSYSTEM_PAGE) && (
+                <Tab
+                  external
+                  href={`/dao/${props.realmUrlId}/treasury/v2`}
+                  icon={<WalletIcon />}
+                  selected={props.selectedTab === 'treasury'}
+                >
+                  treasury
+                </Tab>
+              )}
             </NavigationMenu.List>
           </NavigationMenu.Root>
           <NavigationMenu.Root className="flex items-center">
@@ -88,6 +131,26 @@ export function Content(props: Props) {
                   href={`https://www.twitter.com/${props.twitterHandle}`}
                 >
                   <Twitter />
+                </ExternalLinkIcon>
+              )}
+              {props.instagramUrl && (
+                <ExternalLinkIcon href={props.instagramUrl}>
+                  <LogoInstagram />
+                </ExternalLinkIcon>
+              )}
+              {props.discordUrl && (
+                <ExternalLinkIcon href={props.discordUrl}>
+                  <LogoDiscord />
+                </ExternalLinkIcon>
+              )}
+              {props.linkedInUrl && (
+                <ExternalLinkIcon href={props.linkedInUrl}>
+                  <LogoLinkedin />
+                </ExternalLinkIcon>
+              )}
+              {props.githubUrl && (
+                <ExternalLinkIcon href={props.githubUrl}>
+                  <LogoGithub />
                 </ExternalLinkIcon>
               )}
             </NavigationMenu.List>

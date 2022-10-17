@@ -34,7 +34,7 @@ export const feedItemPostParts = `
       handle
     }
   }
-  clippedDocument(charLimit: 400) {
+  clippedDocument(charLimit: 400, attachmentLimit: 1) {
     document
     isClipped
   }
@@ -62,7 +62,7 @@ export const feedItemProposalParts = `
       handle
     }
   }
-  clippedDocument(charLimit: 400) {
+  clippedDocument(charLimit: 400, attachmentLimit: 1) {
     document
     isClipped
   }

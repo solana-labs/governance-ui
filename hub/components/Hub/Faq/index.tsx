@@ -1,8 +1,8 @@
 import AddIcon from '@carbon/icons-react/lib/Add';
-import ChatIcon from '@carbon/icons-react/lib/Chat';
 import * as Accordion from '@radix-ui/react-accordion';
 import { useState } from 'react';
 
+import { Faq as FaqIcon } from '@hub/components/icons/Faq';
 import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay';
 import cx from '@hub/lib/cx';
 import { RichTextDocument } from '@hub/types/RichTextDocument';
@@ -26,8 +26,8 @@ export function Faq(props: Props) {
     <article
       className={cx('p-16', 'pb-8', 'rounded', 'bg-white', props.className)}
     >
-      <div className="flex items-center justify-center">
-        <ChatIcon className="h-8 fill-neutral-300 w-8" />
+      <div className="flex items-center justify-center mb-10">
+        <FaqIcon className="h-8 fill-neutral-300 w-8" />
         <div className="text-4xl text-neutral-900 font-semibold ml-5">
           Frequently Asked Questions
         </div>

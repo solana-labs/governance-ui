@@ -5,6 +5,7 @@ import type { PublicKey } from '@solana/web3.js';
 import { Tooltip } from '@hub/components/controls/Tooltip';
 import cx from '@hub/lib/cx';
 
+import { Bounties } from './Bounties';
 import { Tab } from './Tab';
 import { Trending } from './Trending';
 
@@ -53,8 +54,7 @@ export function SideCard(props: Props) {
         <Trending realm={props.realm} realmUrlId={props.realmUrlId} />
       </Tabs.Content>
       <Tabs.Content className="py-4 px-5 bg-white" value={Options.Bounties}>
-        {/* Bounties */}
-        <div />
+        <Bounties />
       </Tabs.Content>
     </Tabs.Root>
   );
