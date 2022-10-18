@@ -2,7 +2,7 @@ import useRealm from '@hooks/useRealm'
 import React, { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { TransactionInstruction } from '@solana/web3.js'
-import Button from '@components/Button'
+import { SecondaryButton } from '@components/Button'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NftVoterClient } from '@solana/governance-program-library'
 import { chunks } from '@utils/helpers'
@@ -122,11 +122,13 @@ const ClaimUnreleasedNFTs = ({
   if (isNftMode) {
     return (
       <>
-        {((!inAccountDetails && solToBeClaimed > 1) || inAccountDetails) && (
+        {((!inAccountDetails && solToBeClaimed > 1) ||
+          (inAccountDetails && solToBeClaimed != 0)) && (
           <div className="mt-4 md:mt-6">
             <h4 className="flex items-center">
-              Claim {solToBeClaimed} SOL
-              <Button
+              You have {solToBeClaimed.toFixed(4)} SOL to reclaim from proposal
+              voting costs
+              <SecondaryButton
                 isLoading={isLoading}
                 disabled={isLoading || !ownNftVoteRecordsFilterd.length}
                 onClick={() => releaseNfts()}
@@ -134,7 +136,7 @@ const ClaimUnreleasedNFTs = ({
                 small
               >
                 Claim
-              </Button>
+              </SecondaryButton>
             </h4>
           </div>
         )}
