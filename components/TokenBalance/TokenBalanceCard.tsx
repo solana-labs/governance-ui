@@ -128,6 +128,7 @@ const TokenBalanceCard = ({
           </Link>
         </div>
       )}
+      {children}
       {hasLoaded ? (
         <div
           className={`${
@@ -170,7 +171,6 @@ const TokenBalanceCard = ({
           <div className="h-10 rounded-lg animate-pulse bg-bkg-3" />
         </>
       )}
-      {children}
     </>
   )
 }
