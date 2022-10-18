@@ -37,6 +37,22 @@
     "github": "https://github.com/metaplex-foundation/metaplex"
   },
   {
+    "symbol": "TSD",
+    "bannerImage": "https://i.imgur.com/CuyBXIT.png",
+    "displayName": "Token Solutions DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "CMWHa4rLaCuur88SyAdTf2FSjvBq7y5GqguLzw7QaLBQ",
+    "ogImage": "/realms/TokenSolutionsDAO/img/image2.png",
+    "shortDescription": "A non-custodial, liquidity provider, price sensor bidirectional Token",
+    "website": "https://www.web3tokensolutions.io/",
+    "twitter": "@tokensolutions",
+    "linkedin": "https://www.linkedin.com/in/pablo-f-acebedo/",
+    "instagram": "https://www.instagram.com/pablofacebedo/",
+    "github": "https://github.com/pablofelipe01"
+   
+    
+  },
+  {
     "symbol": "GRAPE",
     "displayName": "GRAPE",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
