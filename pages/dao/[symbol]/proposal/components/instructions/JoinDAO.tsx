@@ -19,7 +19,7 @@ import {
 import { precision } from '@utils/formatting'
 import { JoinDAOForm } from '@utils/uiTypes/proposalCreationTypes'
 import { useRouter } from 'next/router'
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { notify } from '@utils/notifications'
@@ -66,6 +66,16 @@ const JoinDAO = ({
   >([])
 
   const selectedRealm = useRealmAccount(form.realm?.realmId)
+
+  const validTokenAccounts = useMemo(() => {
+    if (selectedRealm) {
+      return governedSPLTokenAccounts.filter(
+        (t) =>
+          t.extensions.mint?.publicKey.toBase58() ===
+          selectedRealm.account.communityMint.toBase58()
+      )
+    } else return []
+  }, [governedSPLTokenAccounts, selectedRealm])
 
   const setAmount = (event) => {
     const value = event.target.value
@@ -144,6 +154,15 @@ const JoinDAO = ({
     }
   }
 
+  useEffect(() => {
+    if (selectedRealm) {
+      console.log(
+        '[SERUM_GOV] SELECTED REALM: ',
+        selectedRealm.account.communityMint.toBase58()
+      )
+    } else console.log('[SERUM_GOV] SELECTED REALM: ', selectedRealm)
+  }, [selectedRealm])
+
   // Fetch realms to join
   useEffect(() => {
     if (
@@ -192,34 +211,34 @@ const JoinDAO = ({
           </Select.Option>
         ))}
       </Select>
-      {selectedRealm && (
-        <GovernedAccountSelect
-          label="Token Account"
-          governedAccounts={governedSPLTokenAccounts.filter(
-            (t) =>
-              t.extensions.mint?.publicKey.toBase58() ===
-              selectedRealm.account.communityMint.toBase58()
+      {validTokenAccounts.length && selectedRealm ? (
+        <>
+          <GovernedAccountSelect
+            label="Token Account"
+            governedAccounts={validTokenAccounts}
+            onChange={(value) => {
+              handleSetForm({ value, propertyName: 'governedAccount' })
+            }}
+            value={form.governedAccount}
+            error={formErrors['governedAccount']}
+            shouldBeGoverned={!!governance}
+            governance={governance}
+          />
+          {form.governedAccount && (
+            <Input
+              min={mintMinAmount}
+              label="Amount"
+              value={form.amount}
+              type="number"
+              onChange={setAmount}
+              step={mintMinAmount}
+              error={formErrors['amount']}
+              onBlur={validateAmountOnBlur}
+            />
           )}
-          onChange={(value) => {
-            handleSetForm({ value, propertyName: 'governedAccount' })
-          }}
-          value={form.governedAccount}
-          error={formErrors['governedAccount']}
-          shouldBeGoverned={!!governance}
-          governance={governance}
-        />
-      )}
-      {form.governedAccount && (
-        <Input
-          min={mintMinAmount}
-          label="Amount"
-          value={form.amount}
-          type="number"
-          onChange={setAmount}
-          step={mintMinAmount}
-          error={formErrors['amount']}
-          onBlur={validateAmountOnBlur}
-        />
+        </>
+      ) : (
+        <h4>This DAO cannot join {selectedRealm?.account.name}</h4>
       )}
     </>
   )

@@ -16,10 +16,10 @@ export default function SerumGovWallet({ wallet }: { wallet: Wallet }) {
   } = useSerumGov(wallet.address)
 
   if (
-    !claimTickets.length ||
-    !redeemTickets.length ||
-    !vestAccounts.length ||
-    !lockedAccounts.length ||
+    !claimTickets.length &&
+    !redeemTickets.length &&
+    !vestAccounts.length &&
+    !lockedAccounts.length &&
     !gsrmBalance
   )
     return null

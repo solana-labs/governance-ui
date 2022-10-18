@@ -252,7 +252,7 @@ const LockedAccount: FC<Props> = ({
 
         <button
           type="submit"
-          className="bg-bkg-4 p-2 px-3 text-xs text-fgd-3 font-semibold rounded-md self-stretch"
+          className="bg-bkg-4 py-2 px-4 text-xs text-fgd-3 font-semibold rounded-md self-stretch disabled:text-fgd-4"
           disabled={isBurning || !wallet?.publicKey}
         >
           {!isBurning ? 'Redeem' : <Loading />}
