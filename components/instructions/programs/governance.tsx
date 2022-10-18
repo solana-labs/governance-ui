@@ -56,34 +56,111 @@ export const GOVERNANCE_INSTRUCTIONS = {
         const councilMint = realm.account.config.councilMint
           ? await tryGetMint(connection, realm.account.config.councilMint)
           : undefined
-        const isMaxNumber =
-          args.config.minCommunityTokensToCreateProposal.toString() ===
-          DISABLED_VOTER_WEIGHT.toString()
-        return (
+
+        return programVersion >= 3 ? (
+          <>
+            <p>
+              communityVoteThreshold:{' '}
+              {args.config.communityVoteThreshold.value
+                ? args.config.communityVoteThreshold.value?.toLocaleString() +
+                  '%'
+                : 'Disabled'}
+            </p>
+            <p>
+              councilVoteThreshold:{' '}
+              {args.config.councilVoteThreshold.value
+                ? args.config.councilVoteThreshold.value?.toLocaleString() + '%'
+                : 'Disabled'}
+            </p>
+            <p>
+              communityVetoVoteThreshold:{' '}
+              {args.config.communityVetoVoteThreshold.value
+                ? args.config.communityVetoVoteThreshold.value?.toLocaleString() +
+                  '%'
+                : 'Disabled'}
+            </p>
+            <p>
+              councilVetoVoteThreshold:{' '}
+              {args.config.councilVetoVoteThreshold.value
+                ? args.config.councilVetoVoteThreshold.value?.toLocaleString() +
+                  '%'
+                : 'Disabled'}
+            </p>
+            {args.config.minCommunityTokensToCreateProposal.toString() ===
+            DISABLED_VOTER_WEIGHT.toString() ? (
+              <p>minCommunityTokensToCreateProposal: Disabled</p>
+            ) : (
+              <p>
+                minCommunityTokensToCreateProposal:{' '}
+                {fmtMintAmount(
+                  communityMint?.account,
+                  args.config.minCommunityTokensToCreateProposal
+                )}{' '}
+                ({args.config.minCommunityTokensToCreateProposal.toString()})
+              </p>
+            )}
+            {args.config.minCouncilTokensToCreateProposal.toString() ===
+            DISABLED_VOTER_WEIGHT.toString() ? (
+              <p>minCouncilTokensToCreateProposal: Disabled</p>
+            ) : (
+              <p>
+                minCouncilTokensToCreateProposal:{' '}
+                {fmtMintAmount(
+                  councilMint?.account,
+                  args.config.minCouncilTokensToCreateProposal
+                )}{' '}
+                ({args.config.minCouncilTokensToCreateProposal.toString()})
+              </p>
+            )}
+            <p>
+              {`minInstructionHoldUpTime:
+          ${getDaysFromTimestamp(args.config.minInstructionHoldUpTime)} day(s)`}
+            </p>
+            <p>
+              {`maxVotingTime:
+          ${getDaysFromTimestamp(args.config.maxVotingTime)} days(s)`}
+            </p>
+            <p>
+              {`communityVoteTipping:
+          ${VoteTipping[args.config.communityVoteTipping]}`}
+            </p>
+            <p>
+              {`councilVoteTipping:
+          ${VoteTipping[args.config.councilVoteTipping]}`}
+            </p>
+          </>
+        ) : (
           <>
             <p>
               {`voteThresholdPercentage:
               ${args.config.communityVoteThreshold.value?.toLocaleString()}%`}
             </p>
-            {isMaxNumber ? (
+            {args.config.minCommunityTokensToCreateProposal.toString() ===
+            DISABLED_VOTER_WEIGHT.toString() ? (
               <p>minCommunityTokensToCreateProposal: Disabled</p>
             ) : (
               <p>
-                {`minCommunityTokensToCreateProposal:
-              ${fmtMintAmount(
-                communityMint?.account,
-                args.config.minCommunityTokensToCreateProposal
-              )}`}{' '}
-                ({args.config.minCommunityTokensToCreateProposal.toNumber()})
+                minCommunityTokensToCreateProposal:{' '}
+                {fmtMintAmount(
+                  communityMint?.account,
+                  args.config.minCommunityTokensToCreateProposal
+                )}{' '}
+                ({args.config.minCommunityTokensToCreateProposal.toString()})
               </p>
             )}
-            <p>
-              {`minCouncilTokensToCreateProposal:
-              ${fmtMintAmount(
-                councilMint?.account,
-                args.config.minCouncilTokensToCreateProposal
-              )}`}
-            </p>
+            {args.config.minCouncilTokensToCreateProposal.toString() ===
+            DISABLED_VOTER_WEIGHT.toString() ? (
+              <p>minCouncilTokensToCreateProposal: Disabled</p>
+            ) : (
+              <p>
+                minCouncilTokensToCreateProposal:{' '}
+                {fmtMintAmount(
+                  councilMint?.account,
+                  args.config.minCouncilTokensToCreateProposal
+                )}{' '}
+                ({args.config.minCouncilTokensToCreateProposal.toString()})
+              </p>
+            )}
             <p>
               {`minInstructionHoldUpTime:
               ${getDaysFromTimestamp(
