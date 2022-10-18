@@ -132,7 +132,7 @@ const ClaimUnreleasedNFTs = ({
                 isLoading={isLoading}
                 disabled={isLoading || !ownNftVoteRecordsFilterd.length}
                 onClick={() => releaseNfts()}
-                className="ml-2"
+                className="ml-2 py-2"
                 small
               >
                 Claim
