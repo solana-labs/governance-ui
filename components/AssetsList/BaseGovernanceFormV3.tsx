@@ -28,23 +28,25 @@ export const BaseGovernanceFormV3 = ({
   setFormErrors: any
   form: BaseGovernanceFormFieldsV3
 }) => {
-  const { realmInfo, mint: realmMint, councilMint } = useRealm()
+  const { mint: realmMint, councilMint } = useRealm()
 
   // @asktree: unclear that this should not just be an effect in the parent, I am just replicating the behavior of previous components
   useEffect(() => {
     setFormErrors({})
   }, [form])
 
-  // TODO @asktree: all this stuff should really just wait on realmInfo instead of having weird defaults
-  // Use 1% of mint supply as the default value for minTokensToCreateProposal and the default increment step in the input editor
-  const mintSupply1Percent = realmMint
-    ? getMintSupplyPercentageAsDecimal(realmMint, 1)
-    : 100
-  const minTokenAmount = realmMint
-    ? getMintMinAmountAsDecimal(realmMint)
-    : 0.0001
-  // If the supply is small and 1% is below the minimum mint amount then coerce to the minimum value
-  const minTokenStep = Math.max(mintSupply1Percent ?? 0, minTokenAmount)
+  const [communityTokenHelpers, councilTokenHelpers] = useMemo(() => {
+    return [realmMint, councilMint].map((mint) => {
+      if (mint === undefined) return undefined
+
+      const mintSupply1Percent = getMintSupplyPercentageAsDecimal(mint, 1)
+
+      const minTokenAmount = getMintMinAmountAsDecimal(mint)
+      // If the supply is small and 1% is below the minimum mint amount then coerce to the minimum value
+      const minTokenStep = Math.max(mintSupply1Percent, minTokenAmount)
+      return { minTokenAmount, minTokenStep }
+    })
+  }, [realmMint, councilMint])
 
   const minCommunityTokensPercentage = useMemo(() => {
     if (form.minCommunityTokensToCreateProposal === undefined) return undefined
@@ -120,6 +122,9 @@ export const BaseGovernanceFormV3 = ({
               ? minCommunityTokensPercentage
               : minCouncilTokensPercentage
 
+          const tokenHelpers =
+            govPop === 'community' ? communityTokenHelpers : councilTokenHelpers
+
           return (
             <React.Fragment key={govPop}>
               <div className="border-t border-white/10 pt-3">
@@ -175,8 +180,8 @@ export const BaseGovernanceFormV3 = ({
                             }
                             type="number"
                             name="minCommunityTokensToCreateProposal"
-                            min={minTokenAmount}
-                            step={minTokenStep}
+                            min={tokenHelpers?.minTokenAmount}
+                            step={tokenHelpers?.minTokenStep}
                             onChange={(evt) =>
                               setForm((prev) => ({
                                 ...prev,
