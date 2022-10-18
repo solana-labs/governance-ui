@@ -28,7 +28,7 @@ export const BaseGovernanceFormV3 = ({
   setFormErrors: any
   form: BaseGovernanceFormFieldsV3
 }) => {
-  const { realmInfo, mint: realmMint } = useRealm()
+  const { realmInfo, mint: realmMint, councilMint } = useRealm()
 
   // @asktree: unclear that this should not just be an effect in the parent, I am just replicating the behavior of previous components
   useEffect(() => {
@@ -46,33 +46,33 @@ export const BaseGovernanceFormV3 = ({
   // If the supply is small and 1% is below the minimum mint amount then coerce to the minimum value
   const minTokenStep = Math.max(mintSupply1Percent ?? 0, minTokenAmount)
 
-  // TODO figure out what to do for council too if anything
-  const getSupplyPercent = () => {
-    const hasMinTokensPercentage =
-      !!minCommunityTokensPercentage && !isNaN(minCommunityTokensPercentage)
-    const percent =
-      hasMinTokensPercentage && minCommunityTokensPercentage
-        ? fmtPercentage(minCommunityTokensPercentage)
-        : ''
-    return hasMinTokensPercentage && <>{`(${percent} of token supply)`}</>
-  }
-
   const minCommunityTokensPercentage = useMemo(() => {
     if (form.minCommunityTokensToCreateProposal === undefined) return undefined
     if (realmMint === undefined) return undefined
 
-    const communityMinTokens = realmMint
+    const minTokens = realmMint
       ? parseMintNaturalAmountFromDecimal(
           form.minCommunityTokensToCreateProposal.toString(),
           realmMint.decimals
         )
       : 0
 
-    return getMintSupplyFractionAsDecimalPercentage(
-      realmMint,
-      communityMinTokens
-    )
-  }, [form.minCommunityTokensToCreateProposal, realmInfo?.symbol])
+    return getMintSupplyFractionAsDecimalPercentage(realmMint, minTokens)
+  }, [form.minCommunityTokensToCreateProposal, realmMint])
+
+  const minCouncilTokensPercentage = useMemo(() => {
+    if (form.minCouncilTokensToCreateProposal === undefined) return undefined
+    if (councilMint === undefined) return undefined
+
+    const minTokens = councilMint
+      ? parseMintNaturalAmountFromDecimal(
+          form.minCouncilTokensToCreateProposal.toString(),
+          councilMint.decimals
+        )
+      : 0
+
+    return getMintSupplyFractionAsDecimalPercentage(councilMint, minTokens)
+  }, [form.minCouncilTokensToCreateProposal, councilMint])
 
   return (
     <>
@@ -114,6 +114,11 @@ export const BaseGovernanceFormV3 = ({
                 ? 'minCommunityTokensToCreateProposal'
                 : 'minCouncilTokensToCreateProposal'
             ] !== 'disabled'
+
+          const minTokensPercentage =
+            govPop === 'community'
+              ? minCommunityTokensPercentage
+              : minCouncilTokensPercentage
 
           return (
             <React.Fragment key={govPop}>
@@ -198,9 +203,14 @@ export const BaseGovernanceFormV3 = ({
                           />
                         )}
                         <span className="text-gray-200 whitespace-nowrap">
-                          {minProposalTokensEnabled &&
-                            govPop === 'community' &&
-                            getSupplyPercent()}
+                          {minTokensPercentage !== undefined &&
+                          !isNaN(minTokensPercentage) ? (
+                            <>{`(${fmtPercentage(
+                              minTokensPercentage
+                            )} of token supply)`}</>
+                          ) : (
+                            ''
+                          )}
                         </span>
                       </>
                     )}
