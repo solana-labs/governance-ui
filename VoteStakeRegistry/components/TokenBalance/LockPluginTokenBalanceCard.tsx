@@ -213,14 +213,11 @@ const TokenDepositLock = ({
     }
   }, [availableTokens, hasTokensDeposited, hasTokensInWallet])
 
-  const canShowAvailableTokensMessage =
-    !hasTokensDeposited && hasTokensInWallet && connected
-  const canExecuteAction = !hasTokensDeposited ? 'deposit' : 'withdraw'
-  const canDepositToken = !hasTokensDeposited && hasTokensInWallet
+  const canShowAvailableTokensMessage = hasTokensInWallet && connected
   const tokensToShow =
-    canDepositToken && depositTokenAccount
+    hasTokensInWallet && depositTokenAccount
       ? fmtMintAmount(mint, depositTokenAccount.account.amount)
-      : canDepositToken
+      : hasTokensInWallet
       ? availableTokens
       : 0
 
@@ -229,7 +226,9 @@ const TokenDepositLock = ({
       {canShowAvailableTokensMessage ? (
         <div className="pt-2">
           <InlineNotification
-            desc={`You have ${tokensToShow} tokens available to ${canExecuteAction}`}
+            desc={`You have ${tokensToShow} ${
+              hasTokensDeposited ? `more` : ``
+            } ${depositTokenName} available to deposit.`}
             type="info"
           />
         </div>

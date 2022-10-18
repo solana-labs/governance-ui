@@ -15,18 +15,17 @@ import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
 import { getVoterWeightRecord } from '@utils/plugin/accounts'
-import { useEffect, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import useQueryContext from '@hooks/useQueryContext'
 import Link from 'next/link'
 import { ChevronRightIcon } from '@heroicons/react/outline'
 
-const NftBalanceCard = ({
-  inAccountDetails,
-  showView,
-}: {
+interface Props {
   inAccountDetails?: boolean
   showView?: boolean
-}) => {
+}
+
+const NftBalanceCard = ({ inAccountDetails, showView }: Props) => {
   const { fmtUrlWithCluster } = useQueryContext()
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
@@ -167,13 +166,7 @@ const NftBalanceCard = ({
   )
 }
 
-const Wrapper = ({
-  inAccountDetails,
-  children,
-}: {
-  inAccountDetails?: boolean
-  children: React.ReactNode
-}) => {
+const Wrapper: FC<Props> = ({ children, inAccountDetails }) => {
   if (inAccountDetails) {
     return <div className="space-y-4 w-1/2">{children}</div>
   } else {

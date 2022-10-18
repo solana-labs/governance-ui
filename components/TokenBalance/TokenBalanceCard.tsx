@@ -38,7 +38,7 @@ import { notify } from '@utils/notifications'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import { ExclamationIcon } from '@heroicons/react/outline'
 import useQueryContext from '@hooks/useQueryContext'
-import { FC, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import Link from 'next/link'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
@@ -51,11 +51,14 @@ import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBala
 import getNumTokens from '@components/ProposalVotingPower/getNumTokens'
 import VotingPowerPct from '@components/ProposalVotingPower/VotingPowerPct'
 
-type Props = { proposal?: Option<Proposal>; inAccountDetails?: boolean }
-const TokenBalanceCard: FC<Props> = ({
+const TokenBalanceCard = ({
+  children,
   proposal,
   inAccountDetails = false,
-  children,
+}: {
+  proposal?: Option<Proposal>
+  inAccountDetails?: boolean
+  children?: React.ReactNode
 }) => {
   const [hasGovPower, setHasGovPower] = useState<boolean>(false)
   const { councilMint, mint, realm, symbol } = useRealm()
@@ -470,14 +473,11 @@ export const TokenDeposit = ({
     }
   }, [availableTokens, hasTokensDeposited, hasTokensInWallet])
 
-  const canShowAvailableTokensMessage =
-    !hasTokensDeposited && hasTokensInWallet && connected
-  const canExecuteAction = !hasTokensDeposited ? 'deposit' : 'withdraw'
-  const canDepositToken = !hasTokensDeposited && hasTokensInWallet
+  const canShowAvailableTokensMessage = hasTokensInWallet && connected
   const tokensToShow =
-    canDepositToken && depositTokenAccount
+    hasTokensInWallet && depositTokenAccount
       ? fmtMintAmount(mint, depositTokenAccount.account.amount)
-      : canDepositToken
+      : hasTokensInWallet
       ? availableTokens
       : 0
   const isVsr =
@@ -515,13 +515,14 @@ export const TokenDeposit = ({
 
       {!isPyth && (
         <>
-          <p
-            className={`mt-2 opacity-70 mb-4 ml-1 text-xs ${
+          <div
+            className={`my-4 opacity-70 text-xs  ${
               canShowAvailableTokensMessage ? 'block' : 'hidden'
             }`}
           >
-            You have {tokensToShow} tokens available to {canExecuteAction}.
-          </p>
+            You have {tokensToShow} {hasTokensDeposited ? `more ` : ``}
+            {depositTokenName} tokens available to deposit.
+          </div>
 
           <div className="flex flex-col mt-6 space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
             {hasTokensInWallet && !inAccountDetails ? (
@@ -575,8 +576,8 @@ export const TokenDeposit = ({
 }
 
 const TokenDepositWrapper = ({
-  inAccountDetails,
   children,
+  inAccountDetails,
 }: {
   inAccountDetails?: boolean
   children: React.ReactNode
@@ -584,7 +585,7 @@ const TokenDepositWrapper = ({
   if (inAccountDetails) {
     return <div className="space-y-4 w-1/2">{children}</div>
   } else {
-    return <>{children}</>
+    return <div>{children}</div>
   }
 }
 
