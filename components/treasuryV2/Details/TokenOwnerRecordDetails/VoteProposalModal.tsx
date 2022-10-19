@@ -75,7 +75,6 @@ export default function VoteProposalModal({
       const instructions: TransactionInstruction[] = []
 
       const governanceAuthority = voterTokenRecord.account.governingTokenOwner
-      const payer = wallet.publicKey
 
       const programVersion = await getGovernanceProgramVersion(
         connection.current,
@@ -94,7 +93,7 @@ export default function VoteProposalModal({
         governanceAuthority,
         proposal.account.governingTokenMint,
         Vote.fromYesNoVote(vote),
-        payer
+        governanceAuthority
       )
 
       // if (comment.length > 0) {
