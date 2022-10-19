@@ -10,6 +10,7 @@ import { ProposalStateBadge } from '@hub/components/ProposalStateBadge';
 import { abbreviateAddress } from '@hub/lib/abbreviateAddress';
 import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
 import cx from '@hub/lib/cx';
+import { estimateRealmUrlId } from '@hub/lib/estimateRealmUrlId';
 import { ProposalState } from '@hub/types/ProposalState';
 
 const EDIT_GRACE_PERIOD = 3; // minutes
@@ -18,6 +19,12 @@ interface Props {
   className?: string;
   author?: FeedItemAuthor | null;
   created: number;
+  feedItemRealmPublicKey?: null | PublicKey;
+  feedItemRealm?: null | {
+    iconUrl?: null | string;
+    name: string;
+    symbol?: null | string;
+  };
   proposal?: {
     state: ProposalState;
     votingEnds?: number | null;
@@ -43,6 +50,10 @@ export function Header(props: Props) {
     EDIT_GRACE_PERIOD;
 
   const date = isEdited && props.proposal ? props.updated : props.created;
+  const isCrosspost =
+    !props.realmPublicKey.equals(ECOSYSTEM_PAGE) &&
+    !!props.feedItemRealmPublicKey &&
+    !props.realmPublicKey.equals(props.feedItemRealmPublicKey);
 
   return (
     <header
@@ -55,6 +66,27 @@ export function Header(props: Props) {
       )}
     >
       <div className="flex items-baseline space-x-2">
+        {isCrosspost && props.feedItemRealm && props.feedItemRealmPublicKey && (
+          <div
+            className="flex items-center text-xs bg-white py-1 px-2 rounded-full cursor-default"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="text-neutral-500">Crosspost from&nbsp;</div>
+            <Link
+              passHref
+              href={`/realm/${estimateRealmUrlId(
+                props.feedItemRealmPublicKey,
+              )}`}
+            >
+              <a
+                className="font-medium text-neutral-900 hover:underline"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {props.feedItemRealm.name}
+              </a>
+            </Link>
+          </div>
+        )}
         {props.realm &&
           (props.realmPublicKey.equals(ECOSYSTEM_PAGE) ? (
             <div

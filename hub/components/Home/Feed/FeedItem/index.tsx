@@ -8,6 +8,7 @@ import { RealmIcon } from '@hub/components/RealmIcon';
 import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay';
 import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
 import cx from '@hub/lib/cx';
+import { estimateRealmUrlId } from '@hub/lib/estimateRealmUrlId';
 import { FeedItemType } from '@hub/types/FeedItemType';
 import { ProposalState } from '@hub/types/ProposalState';
 
@@ -29,19 +30,32 @@ interface Props extends BaseProps {
   realmUrlId: string;
 }
 
+function getUrl(props: Props) {
+  if (props.realm.equals(ECOSYSTEM_PAGE)) {
+    return `/ecosystem/${props.feedItem.id}`;
+  }
+
+  if (props.feedItem.type === FeedItemType.Post) {
+    if (!props.feedItem.realmPublicKey.equals(props.realm)) {
+      return `/realm/${estimateRealmUrlId(props.feedItem.realmPublicKey)}/${
+        props.feedItem.id
+      }`;
+    }
+
+    return `/realm/${props.realmUrlId}/${props.feedItem.id}`;
+  }
+
+  return `/dao/${
+    props.realmUrlId
+  }/proposal/${props.feedItem.proposal.publicKey.toBase58()}`;
+}
+
 export function Content(props: Props) {
   const router = useRouter();
 
   const document = props.feedItem.clippedDocument.document;
   const isClipped = props.feedItem.clippedDocument.isClipped;
-
-  const url = props.realm.equals(ECOSYSTEM_PAGE)
-    ? `/ecosystem/${props.feedItem.id}`
-    : props.feedItem.type === FeedItemType.Post
-    ? `/realm/${props.realmUrlId}/${props.feedItem.id}`
-    : `/dao/${
-        props.realmUrlId
-      }/proposal/${props.feedItem.proposal.publicKey.toBase58()}`;
+  const url = getUrl(props);
 
   return (
     <article
@@ -92,6 +106,8 @@ export function Content(props: Props) {
           <Header
             author={props.feedItem.author}
             created={props.feedItem.created}
+            feedItemRealmPublicKey={props.feedItem.realmPublicKey}
+            feedItemRealm={props.feedItem.realm}
             proposal={
               props.feedItem.type === FeedItemType.Proposal
                 ? {
@@ -110,6 +126,7 @@ export function Content(props: Props) {
           {props.feedItem.title}
         </div>
         <RichTextDocumentDisplay
+          isPreview
           className="mt-4 text-neutral-900 text-sm"
           isClipped={isClipped}
           document={document}

@@ -2,12 +2,11 @@ import DocumentTasksIcon from '@carbon/icons-react/lib/DocumentTasks';
 import * as Separator from '@radix-ui/react-separator';
 import { PublicKey } from '@solana/web3.js';
 import { TypeOf } from 'io-ts';
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { CombinedError } from 'urql';
 
 import * as Button from '@hub/components/controls/Button';
 import { RichTextEditor } from '@hub/components/controls/RichTextEditor';
-import { Tooltip } from '@hub/components/controls/Tooltip';
 import { RealmSelector } from '@hub/components/RealmSelector';
 import { useMutation } from '@hub/hooks/useMutation';
 import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
@@ -87,34 +86,37 @@ export function NewPostEditor(props: Props) {
         )}
         {!realm.equals(ECOSYSTEM_PAGE) &&
           crosspostTo.map((crosspostRealm, i) => (
-            <RealmSelector
-              removable
-              defaultSelected={crosspostRealm}
-              exclude={[realm, ECOSYSTEM_PAGE].concat(
-                crosspostTo.filter((c) => !c.equals(crosspostRealm)),
-              )}
-              key={crosspostRealm.toBase58() + i}
-              onChange={(realm) =>
-                setCrosspostTo((currentList) => {
-                  const newList = [...currentList];
-                  const currentIndex = newList.findIndex((v) =>
-                    v.equals(crosspostRealm),
-                  );
-                  newList[currentIndex] = realm.publicKey;
-                  return newList;
-                })
-              }
-              onRemove={() =>
-                setCrosspostTo((currentList) => {
-                  const newList = [...currentList];
-                  const currentIndex = newList.findIndex((v) =>
-                    v.equals(crosspostRealm),
-                  );
-                  newList.splice(currentIndex, 1);
-                  return newList;
-                })
-              }
-            />
+            <Fragment key={crosspostRealm.toBase58() + i}>
+              <div className="text-sm text-neutral-500 mx-1">&</div>
+              <RealmSelector
+                removable
+                defaultSelected={crosspostRealm}
+                exclude={[realm, ECOSYSTEM_PAGE].concat(
+                  crosspostTo.filter((c) => !c.equals(crosspostRealm)),
+                )}
+                key={crosspostRealm.toBase58() + i}
+                onChange={(realm) =>
+                  setCrosspostTo((currentList) => {
+                    const newList = [...currentList];
+                    const currentIndex = newList.findIndex((v) =>
+                      v.equals(crosspostRealm),
+                    );
+                    newList[currentIndex] = realm.publicKey;
+                    return newList;
+                  })
+                }
+                onRemove={() =>
+                  setCrosspostTo((currentList) => {
+                    const newList = [...currentList];
+                    const currentIndex = newList.findIndex((v) =>
+                      v.equals(crosspostRealm),
+                    );
+                    newList.splice(currentIndex, 1);
+                    return newList;
+                  })
+                }
+              />
+            </Fragment>
           ))}
         {!realm.equals(ECOSYSTEM_PAGE) &&
           crosspostTo.length < MAX_NUM_CROSSPOSTS && (

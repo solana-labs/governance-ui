@@ -108,7 +108,7 @@ export function RealmSelector(props: Props) {
                   'grid',
                   'items-center',
                   'pl-2',
-                  'pr-4',
+                  'pr-2',
                   'py-3',
                 )}
               >
@@ -128,7 +128,7 @@ export function RealmSelector(props: Props) {
                   'group',
                   'items-center',
                   choice && 'pl-2',
-                  choice && 'pr-4',
+                  choice && 'pr-2',
                   choice && 'py-3',
                   choice && 'max-w-[192px]',
                   choice && 'gap-x-2',

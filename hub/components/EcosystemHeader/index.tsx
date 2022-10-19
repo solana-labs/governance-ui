@@ -1,6 +1,9 @@
 import * as RealmHeaderIcon from '@hub/components/RealmHeaderIcon';
 import cx from '@hub/lib/cx';
 
+import bannerUrl from './banner.png';
+import iconUrl from './icon.png';
+
 interface Props {
   className?: string;
 }
@@ -17,12 +20,12 @@ export function EcosystemHeader(props: Props) {
           'bg-black',
           props.className,
         )}
-        style={{ backgroundImage: `url("")` }}
+        style={{ backgroundImage: `url("${bannerUrl.src}")` }}
       />
       <div className="max-w-7xl mx-auto px-8 relative w-full">
         <RealmHeaderIcon.Content
           className={cx('-translate-y-1/2', 'absolute', 'top-0')}
-          // iconUrl={props.iconUrl}
+          iconUrl={iconUrl.src}
           realmName="Ecosystem"
         />
         <div className="pl-48 pt-4 pb-8 pr-4 flex items-center justify-between">

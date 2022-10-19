@@ -22,21 +22,9 @@ export const feedItemParts = `
   fragment FeedItemParts on RealmFeedItem {
     ... on RealmFeedItemPost {
       ${feedItemPostParts}
-      realmPublicKey
-      realm {
-        iconUrl
-        name
-        symbol
-      }
     }
     ... on RealmFeedItemProposal {
       ${feedItemProposalParts}
-      realmPublicKey
-      realm {
-        iconUrl
-        name
-        symbol
-      }
     }
   }
 `;
