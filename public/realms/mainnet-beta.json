@@ -68,6 +68,15 @@
     "sortRank": 3
   },
   {
+    "symbol": "PYTH",
+    "displayName": "Pyth Network",
+    "programId": "GovFUVGZWWwyoLq8rhnoVWknRFkhDSbQiSoREJ5LiZCV",
+    "realmId": "A1f6LNEymJSSJsEVCL1FSgtS1jA9dNTC4ni8SkmbwQjG",
+    "ogImage": "/realms/PYTH/img/pyth.svg",
+    "website": "https://pyth.network/",
+    "twitter": "@PythNetwork"
+  },
+  {
     "symbol": "Dialect",
     "displayName": "Dialect",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
