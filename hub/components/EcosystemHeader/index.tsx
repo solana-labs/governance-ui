@@ -34,7 +34,7 @@ export function EcosystemHeader(props: Props) {
               Solana Ecosystem
             </div>
             <div className="mt-1.5 text-sm text-neutral-700">
-              All the best updates from accross the Solana ecosystem
+              All the updates from across the Solana ecosystem
             </div>
           </div>
         </div>
