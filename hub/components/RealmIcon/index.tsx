@@ -1,4 +1,5 @@
 import { pickDefaultBg } from '@hub/components/AuthorAvatar';
+import ecosystemIcon from '@hub/components/EcosystemHeader/icon.png';
 import cx from '@hub/lib/cx';
 
 interface Props {
@@ -18,6 +19,18 @@ export function RealmIcon(props: Props) {
           props.className,
         )}
         src={props.iconUrl}
+      />
+    );
+  } else if (props.name.toLocaleLowerCase() === 'ecosystem hub') {
+    return (
+      <img
+        className={cx(
+          'rounded-full',
+          'border',
+          'border-neutral-400',
+          props.className,
+        )}
+        src={ecosystemIcon.src}
       />
     );
   } else {
