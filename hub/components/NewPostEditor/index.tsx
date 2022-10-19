@@ -1,8 +1,9 @@
+import CloseIcon from '@carbon/icons-react/lib/Close';
 import DocumentTasksIcon from '@carbon/icons-react/lib/DocumentTasks';
 import * as Separator from '@radix-ui/react-separator';
 import { PublicKey } from '@solana/web3.js';
 import { TypeOf } from 'io-ts';
-import { Fragment, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CombinedError } from 'urql';
 
 import * as Button from '@hub/components/controls/Button';
@@ -86,10 +87,12 @@ export function NewPostEditor(props: Props) {
         )}
         {!realm.equals(ECOSYSTEM_PAGE) &&
           crosspostTo.map((crosspostRealm, i) => (
-            <Fragment key={crosspostRealm.toBase58() + i}>
-              <div className="text-sm text-neutral-500 mx-1">&</div>
+            <div
+              className="flex items-center mr-2"
+              key={crosspostRealm.toBase58() + i}
+            >
+              <div className="text-sm text-neutral-500 mr-2">&</div>
               <RealmSelector
-                removable
                 defaultSelected={crosspostRealm}
                 exclude={[realm, ECOSYSTEM_PAGE].concat(
                   crosspostTo.filter((c) => !c.equals(crosspostRealm)),
@@ -105,7 +108,20 @@ export function NewPostEditor(props: Props) {
                     return newList;
                   })
                 }
-                onRemove={() =>
+              />
+              <button
+                className={cx(
+                  'text-neutral-700',
+                  'flex',
+                  'h-8',
+                  'items-center',
+                  'justify-center',
+                  'rounded-full',
+                  'transition-colors',
+                  'w-8',
+                  'hover:bg-neutral-200',
+                )}
+                onClick={() =>
                   setCrosspostTo((currentList) => {
                     const newList = [...currentList];
                     const currentIndex = newList.findIndex((v) =>
@@ -115,8 +131,10 @@ export function NewPostEditor(props: Props) {
                     return newList;
                   })
                 }
-              />
-            </Fragment>
+              >
+                <CloseIcon className="fill-current h-4 w-4" />
+              </button>
+            </div>
           ))}
         {!realm.equals(ECOSYSTEM_PAGE) &&
           crosspostTo.length < MAX_NUM_CROSSPOSTS && (

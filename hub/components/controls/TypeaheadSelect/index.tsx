@@ -21,6 +21,7 @@ interface Props<T> {
   className?: string;
   choices: Choice<T>[];
   selected?: string;
+  sideOffset?: number;
   filter(text: string, choice: Choice<T>): boolean;
   renderItem(option: Choice<T>): JSX.Element;
   renderTrigger?(option: Choice<T> | undefined, isOpen: boolean): JSX.Element;
@@ -81,6 +82,7 @@ export const TypeaheadSelect: TypeaheadSelect = forwardRef(
         <Dropdown.Portal>
           <Dropdown.Content
             align="start"
+            sideOffset={props.sideOffset}
             className={cx(
               'drop-shadow-lg',
               'bg-white',

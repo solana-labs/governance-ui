@@ -1,6 +1,5 @@
 import AddIcon from '@carbon/icons-react/lib/Add';
 import ChevronDownIcon from '@carbon/icons-react/lib/ChevronDown';
-import CloseIcon from '@carbon/icons-react/lib/Close';
 import { PublicKey } from '@solana/web3.js';
 import { pipe } from 'fp-ts/lib/function';
 import { TypeOf } from 'io-ts';
@@ -21,9 +20,7 @@ interface Props {
   className?: string;
   exclude?: PublicKey[];
   defaultSelected?: null | PublicKey;
-  removable?: boolean;
   onChange?(realm: Realm): void;
-  onRemove?(): void;
 }
 
 export function RealmSelector(props: Props) {
@@ -83,6 +80,9 @@ export function RealmSelector(props: Props) {
             return !exclusions.includes(choice.value.publicKey.toBase58());
           });
 
+        const selectedItem =
+          selected?.publicKey.toBase58() || props.defaultSelected?.toBase58();
+
         return (
           <TypeaheadSelect
             className={props.className}
@@ -96,10 +96,8 @@ export function RealmSelector(props: Props) {
                 .toLocaleLowerCase()
                 .includes(text.toLocaleLowerCase());
             }}
-            selected={
-              selected?.publicKey.toBase58() ||
-              props.defaultSelected?.toBase58()
-            }
+            sideOffset={selectedItem ? undefined : 8}
+            selected={selectedItem}
             renderItem={(choice) => (
               <div
                 className={cx(
@@ -158,8 +156,6 @@ export function RealmSelector(props: Props) {
                         'flex',
                         'items-center',
                         'justify-center',
-                        props.removable && 'group-hover:hidden',
-                        props.removable && 'group-hover:pointer-events-none',
                       )}
                     >
                       <ChevronDownIcon
@@ -171,29 +167,6 @@ export function RealmSelector(props: Props) {
                           isOpen && '-rotate-180',
                         )}
                       />
-                    </div>
-                    <div
-                      className={cx(
-                        'fill-neutral-700',
-                        'h-4',
-                        'hidden',
-                        'items-center',
-                        'justify-center',
-                        'rounded-full',
-                        'transition-colors',
-                        'w-4',
-                        'hover:bg-white',
-                        'hover:fill-rose-500',
-                        props.removable && 'group-hover:flex',
-                      )}
-                      onClick={(e) => {
-                        console.log('hererere');
-                        e.stopPropagation();
-                        e.preventDefault();
-                        props.onRemove?.();
-                      }}
-                    >
-                      <CloseIcon className={cx('fill-inherit', 'h-3', 'w-3')} />
                     </div>
                   </>
                 ) : (
