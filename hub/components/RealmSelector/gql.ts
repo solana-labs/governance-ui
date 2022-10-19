@@ -1,21 +1,7 @@
 import * as IT from 'io-ts';
 import { gql } from 'urql';
 
-import { feedItemPostParts, FeedItemPost } from '@hub/components/Home/Feed/gql';
 import { PublicKey } from '@hub/types/decoders/PublicKey';
-
-export const createPost = gql`
-  mutation submitPost(
-    $realm: PublicKey!
-    $title: String!
-    $document: RichTextDocument!
-    $crosspostTo: [PublicKey!]
-  ) {
-    createPost(document: $document, realm: $realm, title: $title, crosspostTo: $crosspostTo) {
-      ${feedItemPostParts}
-    }
-  }
-`;
 
 export const getRealmsList = gql`
   query realmDropdownList {
@@ -26,10 +12,6 @@ export const getRealmsList = gql`
     }
   }
 `;
-
-export const createPostResp = IT.type({
-  createPost: FeedItemPost,
-});
 
 export const getRealmsListResp = IT.type({
   realmDropdownList: IT.array(

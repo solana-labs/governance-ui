@@ -13,6 +13,7 @@ import { NewPostEditor } from '@hub/components/NewPostEditor';
 import { useJWT } from '@hub/hooks/useJWT';
 import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
 import cx from '@hub/lib/cx';
+import { estimateRealmUrlId } from '@hub/lib/estimateRealmUrlId';
 import { FeedItemSort } from '@hub/types/FeedItemSort';
 
 interface BaseProps {
@@ -70,15 +71,18 @@ export function Content(props: Props) {
               <Dialog.Content>
                 <Dialog.Close className="top-8 right-16" />
                 <NewPostEditor
-                  className="w-[840px] min-h-[675px] max-h-[calc(100vh-80px)] py-8 px-16 h-full"
+                  className="w-[840px] min-h-[675px] max-h-[calc(100vh-80px)] py-6 px-16 h-full"
                   realm={props.realm}
                   realmIconUrl={props.realmIconUrl}
                   realmName={props.realmName}
-                  onPostCreated={(post) => {
-                    if (props.realm.equals(ECOSYSTEM_PAGE)) {
+                  onPostCreated={(post, realm) => {
+                    if (realm.equals(ECOSYSTEM_PAGE)) {
                       router.push(`/ecosystem/${post.id}`);
-                    } else {
+                    } else if (realm.equals(props.realm)) {
                       router.push(`/realm/${props.realmUrlId}/${post.id}`);
+                    } else {
+                      const urlId = estimateRealmUrlId(realm);
+                      router.push(`/realm/${urlId}/${post.id}`);
                     }
                   }}
                 />

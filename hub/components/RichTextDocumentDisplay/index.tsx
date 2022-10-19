@@ -11,6 +11,7 @@ interface Props {
   document: RichTextDocument;
   excludeBlocks?: BlockNodeType[];
   isClipped?: boolean;
+  isPreview?: boolean;
   showExpand?: boolean;
   onExpand?(): void;
 }
@@ -65,7 +66,11 @@ export function RichTextDocumentDisplay(props: Props) {
       })}
       <div>
         {props.document.attachments.map((attachment, i) => (
-          <TwitterEmbedAttachment attachment={attachment} key={i} />
+          <TwitterEmbedAttachment
+            attachment={attachment}
+            isPreview={props.isPreview}
+            key={i}
+          />
         ))}
       </div>
     </div>

@@ -1,3 +1,4 @@
+import { pickDefaultBg } from '@hub/components/AuthorAvatar';
 import { RealmCircle } from '@hub/components/branding/RealmCircle';
 import cx from '@hub/lib/cx';
 
@@ -45,10 +46,10 @@ export function Content(props: Props) {
             'h-40',
             'w-40',
             'rounded-full',
-            'bg-sky-400',
             'flex',
             'items-center',
             'justify-center',
+            props.realmName ? pickDefaultBg(props.realmName) : 'bg-neutral-100',
           )}
         >
           {props.realmName ? (

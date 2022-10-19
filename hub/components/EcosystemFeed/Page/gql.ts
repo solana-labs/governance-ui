@@ -1,6 +1,12 @@
 import * as IT from 'io-ts';
 import { gql } from 'urql';
 
+import {
+  feedItemPostParts,
+  feedItemProposalParts,
+  FeedItemAuthor,
+  FeedItemClippedDocument,
+} from '@hub/components/Home/Feed/gql';
 import { BigNumber } from '@hub/types/decoders/BigNumber';
 import {
   FeedItemTypePost,
@@ -11,91 +17,6 @@ import { ProposalState } from '@hub/types/decoders/ProposalState';
 import { ProposalUserVoteType } from '@hub/types/decoders/ProposalUserVoteType';
 import { PublicKey } from '@hub/types/decoders/PublicKey';
 import { RichTextDocument } from '@hub/types/decoders/RichTextDocument';
-
-export const feedItemPostParts = `
-  created
-  updated
-  id
-  myVote
-  type
-  score
-  title
-  document
-  numComments
-  author {
-    publicKey
-    civicInfo {
-      avatarUrl
-      handle
-      isVerified
-    }
-    twitterInfo {
-      avatarUrl
-      handle
-    }
-  }
-  clippedDocument(charLimit: 400, attachmentLimit: 1) {
-    document
-    isClipped
-  }
-  realmPublicKey
-  realm {
-    iconUrl
-    name
-    symbol
-  }
-`;
-
-export const feedItemProposalParts = `
-  created
-  updated
-  id
-  myVote
-  type
-  score
-  title
-  document
-  numComments
-  author {
-    publicKey
-    civicInfo {
-      avatarUrl
-      handle
-      isVerified
-    }
-    twitterInfo {
-      avatarUrl
-      handle
-    }
-  }
-  clippedDocument(charLimit: 400, attachmentLimit: 1) {
-    document
-    isClipped
-  }
-  proposal {
-    publicKey
-    state
-    myVote {
-      type
-      weight
-    }
-    voteBreakdown {
-      percentThresholdMet
-      threshold
-      totalNoWeight
-      totalPossibleWeight
-      totalYesWeight
-      voteThresholdPercentage
-      votingEnd
-    }
-  }
-  realmPublicKey
-  realm {
-    iconUrl
-    name
-    symbol
-  }
-`;
 
 export const feedItemParts = `
   fragment FeedItemParts on RealmFeedItem {
@@ -111,8 +32,8 @@ export const feedItemParts = `
 export const getFeed = gql`
   ${feedItemParts}
 
-  query getFeed($realm: PublicKey!, $sort: RealmFeedItemSort!) {
-    feed(first: 10, sort: $sort, realm: $realm) {
+  query getFeed($sort: RealmFeedItemSort!) {
+    ecosystemFeed(first: 10, sort: $sort) {
       pageInfo {
         endCursor
         hasNextPage
@@ -125,10 +46,6 @@ export const getFeed = gql`
           ...FeedItemParts
         }
       }
-    }
-
-    pinnedFeedItems(realm: $realm) {
-      ...FeedItemParts
     }
   }
 `;
@@ -136,12 +53,8 @@ export const getFeed = gql`
 export const getAdditionalPage = gql`
   ${feedItemParts}
 
-  query getFeed(
-    $realm: PublicKey!
-    $sort: RealmFeedItemSort!
-    $after: Cursor!
-  ) {
-    feed(after: $after, sort: $sort, realm: $realm) {
+  query getFeed($sort: RealmFeedItemSort!, $after: Cursor!) {
+    ecosystemFeed(after: $after, sort: $sort) {
       pageInfo {
         endCursor
         hasNextPage
@@ -157,36 +70,6 @@ export const getAdditionalPage = gql`
     }
   }
 `;
-
-export const FeedItemAuthor = IT.type({
-  publicKey: PublicKey,
-  civicInfo: IT.union([
-    IT.undefined,
-    IT.null,
-    IT.type({
-      avatarUrl: IT.union([IT.null, IT.string]),
-      handle: IT.string,
-      isVerified: IT.boolean,
-    }),
-  ]),
-  twitterInfo: IT.union([
-    IT.undefined,
-    IT.null,
-    IT.type({
-      avatarUrl: IT.union([IT.null, IT.string]),
-      handle: IT.string,
-    }),
-  ]),
-});
-
-export type FeedItemAuthor = IT.TypeOf<typeof FeedItemAuthor>;
-
-export const FeedItemClippedDocument = IT.type({
-  document: RichTextDocument,
-  isClipped: IT.boolean,
-});
-
-export type FeedItemClippedDocument = IT.TypeOf<typeof FeedItemClippedDocument>;
 
 export const RealmInfo = IT.type({
   iconUrl: IT.union([IT.null, IT.string]),
@@ -249,7 +132,6 @@ export const FeedItemProposal = IT.type({
     }),
   }),
 });
-
 export type FeedItemProposal = IT.TypeOf<typeof FeedItemProposal>;
 
 export const FeedItem = IT.union([FeedItemPost, FeedItemProposal]);
@@ -274,10 +156,5 @@ export const Page = IT.type({
 export type Page = IT.TypeOf<typeof Page>;
 
 export const getFeedResp = IT.type({
-  feed: Page,
-  pinnedFeedItems: IT.array(FeedItem),
-});
-
-export const getAdditionalPageResp = IT.type({
-  feed: Page,
+  ecosystemFeed: Page,
 });
