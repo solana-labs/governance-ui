@@ -98,7 +98,7 @@ const ClaimUnreleasedNFTs = ({
   }
   const getNftsVoteRecord = async () => {
     const nftClient = client.client as NftVoterClient
-    const nftVoteRecords = await nftClient.program.account.nftVoteRecord.all([
+    const nftVoteRecords = await nftClient.program.account.nftVoteRecord?.all([
       {
         memcmp: {
           offset: 72,

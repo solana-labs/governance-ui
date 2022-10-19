@@ -13,12 +13,7 @@ import {
 } from '@solana/web3.js'
 import BN from 'bn.js'
 import useRealm from '@hooks/useRealm'
-import {
-  getProposal,
-  getTokenOwnerRecordAddress,
-  Proposal,
-  ProposalState,
-} from '@solana/spl-governance'
+import { getProposal, Proposal, ProposalState } from '@solana/spl-governance'
 import { getUnrelinquishedVoteRecords } from '@models/api'
 import { withDepositGoverningTokens } from '@solana/spl-governance'
 import { withRelinquishVote } from '@solana/spl-governance'
@@ -35,12 +30,9 @@ import { withFinalizeVote } from '@solana/spl-governance'
 import { chunks } from '@utils/helpers'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { notify } from '@utils/notifications'
-import { ChevronRightIcon } from '@heroicons/react/solid'
 import { ExclamationIcon } from '@heroicons/react/outline'
-import useQueryContext from '@hooks/useQueryContext'
 import { useEffect, useState } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import Link from 'next/link'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { vsrPluginsPks } from '@hooks/useVotingPlugins'
 import {
@@ -50,22 +42,19 @@ import {
 import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 import getNumTokens from '@components/ProposalVotingPower/getNumTokens'
 import VotingPowerPct from '@components/ProposalVotingPower/VotingPowerPct'
-import NftVotingPower from '@components/ProposalVotingPower/NftVotingPower'
-import ClaimUnreleasedNFTs from './ClaimUnreleasedNFTs'
 
 const TokenBalanceCard = ({
   proposal,
   inAccountDetails = false,
+  children,
 }: {
   proposal?: Option<Proposal>
   inAccountDetails?: boolean
+  children?: React.ReactNode
 }) => {
   const [hasGovPower, setHasGovPower] = useState<boolean>(false)
-  const { councilMint, mint, realm, symbol } = useRealm()
+  const { councilMint, mint, realm } = useRealm()
   const connected = useWalletStore((s) => s.connected)
-  const wallet = useWalletStore((s) => s.current)
-  const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
-  const { fmtUrlWithCluster } = useQueryContext()
   const isDepositVisible = (
     depositMint: MintInfo | undefined,
     realmMint: PublicKey | undefined
@@ -84,51 +73,10 @@ const TokenBalanceCard = ({
     councilMint,
     realm?.account.config.councilMint
   )
-  useEffect(() => {
-    const getTokenOwnerRecord = async () => {
-      const defaultMint = !mint?.supply.isZero()
-        ? realm!.account.communityMint
-        : !councilMint?.supply.isZero()
-        ? realm!.account.config.councilMint
-        : undefined
-      const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
-        realm!.owner,
-        realm!.pubkey,
-        defaultMint!,
-        wallet!.publicKey!
-      )
-      setTokenOwneRecordPk(tokenOwnerRecordAddress.toBase58())
-    }
-    if (realm && wallet?.connected) {
-      getTokenOwnerRecord()
-    }
-  }, [realm?.pubkey.toBase58(), wallet?.connected])
   const hasLoaded = mint || councilMint
 
   return (
     <>
-      {!inAccountDetails && (
-        <div className="flex items-center justify-between">
-          <h3 className="mb-0">My governance power</h3>
-          <Link
-            href={fmtUrlWithCluster(
-              `/dao/${symbol}/account/${tokenOwnerRecordPk}`
-            )}
-          >
-            <a
-              className={`default-transition flex items-center text-fgd-2 text-sm transition-all hover:text-fgd-3 ${
-                !connected || !tokenOwnerRecordPk
-                  ? 'opacity-50 pointer-events-none'
-                  : ''
-              }`}
-            >
-              View
-              <ChevronRightIcon className="flex-shrink-0 w-6 h-6" />
-            </a>
-          </Link>
-        </div>
-      )}
-      <NftVotingPower inAccountDetails={inAccountDetails} showView={false} />
       {hasLoaded ? (
         <div
           className={`${
@@ -171,7 +119,7 @@ const TokenBalanceCard = ({
           <div className="h-10 rounded-lg animate-pulse bg-bkg-3" />
         </>
       )}
-      <ClaimUnreleasedNFTs inAccountDetails={inAccountDetails} />
+      {children}
     </>
   )
 }

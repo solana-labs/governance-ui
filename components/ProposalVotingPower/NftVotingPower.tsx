@@ -21,7 +21,6 @@ import VotingPowerPct from './VotingPowerPct'
 interface Props {
   className?: string
   inAccountDetails?: boolean
-  showView?: boolean
   children?: React.ReactNode
 }
 
