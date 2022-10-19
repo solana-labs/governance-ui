@@ -50,15 +50,15 @@ import {
 import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 import getNumTokens from '@components/ProposalVotingPower/getNumTokens'
 import VotingPowerPct from '@components/ProposalVotingPower/VotingPowerPct'
+import NftVotingPower from '@components/ProposalVotingPower/NftVotingPower'
+import ClaimUnreleasedNFTs from './ClaimUnreleasedNFTs'
 
 const TokenBalanceCard = ({
-  children,
   proposal,
   inAccountDetails = false,
 }: {
   proposal?: Option<Proposal>
   inAccountDetails?: boolean
-  children?: React.ReactNode
 }) => {
   const [hasGovPower, setHasGovPower] = useState<boolean>(false)
   const { councilMint, mint, realm, symbol } = useRealm()
@@ -128,7 +128,7 @@ const TokenBalanceCard = ({
           </Link>
         </div>
       )}
-      {children}
+      <NftVotingPower inAccountDetails={inAccountDetails} showView={false} />
       {hasLoaded ? (
         <div
           className={`${
@@ -171,6 +171,7 @@ const TokenBalanceCard = ({
           <div className="h-10 rounded-lg animate-pulse bg-bkg-3" />
         </>
       )}
+      <ClaimUnreleasedNFTs inAccountDetails={inAccountDetails} />
     </>
   )
 }

@@ -12,6 +12,7 @@ import {
   SequenceType,
   transactionInstructionsToTypedInstructionsSets,
 } from '@utils/sendTransactions'
+import { ProposalState } from '@solana/spl-governance'
 
 const NFT_SOL_BALANCE = 0.0014616
 
@@ -51,13 +52,17 @@ const ClaimUnreleasedNFTs = ({
       count ? count : ownNftVoteRecordsFilterd.length
     )
     for (const i of nfts) {
+      const proposal = proposals[i.account.proposal.toBase58()]
+      if (proposal.account.state === ProposalState.Voting) {
+        // ignore this one as it's still in voting
+        continue
+      }
       const relinquishNftVoteIx = await (client.client as NftVoterClient).program.methods
         .relinquishNftVote()
         .accounts({
           registrar,
           voterWeightRecord: voterWeightPk,
-          governance:
-            proposals[i.account.proposal.toBase58()].account.governance,
+          governance: proposal.account.governance,
           proposal: i.account.proposal,
           governingTokenOwner: wallet!.publicKey!,
           voteRecord: i.publicKey,
@@ -108,7 +113,9 @@ const ClaimUnreleasedNFTs = ({
         proposals[
           x.account.proposal.toBase58()
         ].account.governingTokenMint.toBase58() ===
-          realm?.account.communityMint.toBase58()
+          realm?.account.communityMint.toBase58() &&
+        proposals[x.account.proposal.toBase58()].account.state !==
+          ProposalState.Voting
     )
     setOwnNftVoteRecords(nftVoteRecordsFiltered)
     setSolToBeClaimed(nftVoteRecordsFiltered.length * NFT_SOL_BALANCE)
@@ -125,19 +132,20 @@ const ClaimUnreleasedNFTs = ({
         {((!inAccountDetails && solToBeClaimed > 1) ||
           (inAccountDetails && solToBeClaimed != 0)) && (
           <div className="mt-4 md:mt-6">
-            <h4 className="flex items-center">
-              You have {solToBeClaimed.toFixed(4)} SOL to reclaim from proposal
-              voting costs
+            <div className="flex flex-col w-aut gap-2">
+              <div className="mt-3 text-xs text-white/50">
+                You have {solToBeClaimed.toFixed(4)} SOL to reclaim from
+                proposal voting costs
+              </div>
               <SecondaryButton
                 isLoading={isLoading}
                 disabled={isLoading || !ownNftVoteRecordsFilterd.length}
                 onClick={() => releaseNfts()}
-                className="ml-2 py-2"
-                small
+                className="sm:w-1/2 max-w-[200px]"
               >
                 Claim
               </SecondaryButton>
-            </h4>
+            </div>
           </div>
         )}
       </>

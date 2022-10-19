@@ -18,7 +18,10 @@ const LockPluginTokenBalanceCard = dynamic(
     )
 )
 const TokenBalanceCard = dynamic(() => import('./TokenBalanceCard'))
-const NftBalanceCard = dynamic(() => import('./NftBalanceCard'))
+const NftVotingPower = dynamic(
+  () => import('../ProposalVotingPower/NftVotingPower')
+)
+// const NftBalanceCard = dynamic(() => import('./NftBalanceCard'))
 const SwitchboardPermissionCard = dynamic(
   () => import('./SwitchboardPermissionCard')
 )
@@ -74,19 +77,16 @@ const TokenBalanceCardWrapper = ({
             <TokenBalanceCard
               proposal={proposal}
               inAccountDetails={inAccountDetails}
-            >
-              <div className="mb-4" />
-              <NftBalanceCard
-                inAccountDetails={inAccountDetails}
-                showView={false}
-              />
-              <ClaimUnreleasedNFTs inAccountDetails={inAccountDetails} />
-            </TokenBalanceCard>
+            />
           ) : (
             <>
-              <NftBalanceCard
+              {/* <NftBalanceCard
                 inAccountDetails={inAccountDetails}
-                showView={!inAccountDetails}
+                showView={false}
+              /> */}
+              <NftVotingPower
+                inAccountDetails={inAccountDetails}
+                showView={false}
               />
               <ClaimUnreleasedNFTs inAccountDetails={inAccountDetails} />
             </>
