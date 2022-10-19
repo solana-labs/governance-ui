@@ -1,5 +1,7 @@
 import { UserGroupIcon } from '@heroicons/react/solid'
 import { TokenOwnerRecordAsset } from '@models/treasury/Asset'
+import { BN_ZERO } from '@solana/spl-governance'
+import { useMemo } from 'react'
 import Collapsible from './Collapsible'
 import TokenOwnerRecordListItem from './TokenOwnerRecordListItem'
 
@@ -13,17 +15,25 @@ interface Props {
   onToggleExpand?(): void
 }
 export default function TokenOwnerRecordsList(props: Props) {
+  const validTokenOwnerRecords = useMemo(() => {
+    return props.assets.filter((a) =>
+      a.tokenOwnerRecordAccount.account.governingTokenDepositAmount.gt(BN_ZERO)
+    )
+  }, [props.assets])
+
+  if (!validTokenOwnerRecords.length) return null
+
   return (
     <Collapsible
       className={props.className}
-      count={props.assets.length}
+      count={validTokenOwnerRecords.length}
       disableCollapse={props.disableCollapse}
       expanded={props.expanded}
       icon={<UserGroupIcon className="stroke-white/50" />}
       title="DAO Memberships"
       onToggleExpand={props.onToggleExpand}
     >
-      {props.assets.map((a) => (
+      {validTokenOwnerRecords.map((a) => (
         <TokenOwnerRecordListItem
           key={a.address.toBase58()}
           onSelect={() => props.onSelect?.(a)}

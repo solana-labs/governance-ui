@@ -10,6 +10,7 @@ interface Props {
   tokenOwnerRecordAsset: TokenOwnerRecordAsset
   realmAccount: ProgramAccount<Realm>
   programId?: PublicKey | null
+  realmSymbol: string
 }
 export default function RealmDetails(props: Props) {
   const { votingProposals, governances, voteRecords } = useRealmProposals(
@@ -30,6 +31,7 @@ export default function RealmDetails(props: Props) {
           currentGovernance={props.currentGovernance}
           tokenOwnerRecord={props.tokenOwnerRecordAsset.tokenOwnerRecordAccount}
           programId={props.programId}
+          realmSymbol={props.realmSymbol}
         />
       ))}
       {votingProposals.length <= 0 && (

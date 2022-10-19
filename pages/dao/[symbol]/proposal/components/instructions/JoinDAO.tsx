@@ -154,15 +154,6 @@ const JoinDAO = ({
     }
   }
 
-  useEffect(() => {
-    if (selectedRealm) {
-      console.log(
-        '[SERUM_GOV] SELECTED REALM: ',
-        selectedRealm.account.communityMint.toBase58()
-      )
-    } else console.log('[SERUM_GOV] SELECTED REALM: ', selectedRealm)
-  }, [selectedRealm])
-
   // Fetch realms to join
   useEffect(() => {
     if (

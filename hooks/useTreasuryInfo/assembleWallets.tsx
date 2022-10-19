@@ -130,6 +130,7 @@ export const assembleWallets = async (
     if (account.type === AccountType.SOL) {
       const tokenOwnerRecords = await getTokenOwnerRecordsForWallet(
         connection,
+        account.governance,
         tryParseKey(walletAddress)
       )
 

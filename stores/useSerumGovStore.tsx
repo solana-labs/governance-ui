@@ -276,15 +276,6 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
         s.msrmMintAddress =
           cluster === 'devnet' ? DEV_MSRM_MINT : MAIN_MSRM_MINT
       })
-
-      console.log(`[SERUM_GOV] Setting programId to ${programId.toBase58()}`)
-      console.log(`[SERUM_GOV] Setting gsrmMint to `, gsrmMint.toBase58())
-      console.log(
-        `[SERUM_GOV] Setting srmMinAddress to `,
-        cluster === 'devnet'
-          ? DEV_SRM_MINT.toBase58()
-          : MAIN_SRM_MINT.toBase58()
-      )
     },
     async getGsrmBalance(
       connection: Connection,

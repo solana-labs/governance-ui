@@ -4,6 +4,8 @@ import {
   getRealm,
   getTokenOwnerRecord,
   getTokenOwnerRecordAddress,
+  Governance,
+  ProgramAccount,
 } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { ConnectionContext } from '@utils/connection'
@@ -11,6 +13,7 @@ import { tryGetMint } from '@utils/tokens'
 
 const getTokenOwnerRecordsForWallet = async (
   connection: ConnectionContext,
+  governanceAccount: ProgramAccount<Governance>,
   walletAddress?: PublicKey | null
 ): Promise<TokenOwnerRecordAsset[]> => {
   if (!walletAddress) return []
@@ -48,6 +51,7 @@ const getTokenOwnerRecordsForWallet = async (
           communityMint: communityMint,
           realmAccount: realmData,
           tokenOwnerRecordAccount: recordData,
+          governanceOwner: governanceAccount,
         }
       } catch (e) {
         return null

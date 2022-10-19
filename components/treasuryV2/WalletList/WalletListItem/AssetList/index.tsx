@@ -139,7 +139,7 @@ export default function AssetList(props: Props) {
 
   const tokenOwnerRecordsFromProps = useMemo(
     () => props.assets.filter(isTokenOwnerRecord),
-    []
+    [props.assets]
   )
 
   const [others, setOthers] = useState<

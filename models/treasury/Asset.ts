@@ -1,5 +1,6 @@
 import type { BigNumber } from 'bignumber.js'
 import type {
+  Governance,
   MintMaxVoteWeightSource,
   ProgramAccount,
   Realm,
@@ -116,6 +117,7 @@ export interface TokenOwnerRecordAsset {
   communityMint: TokenProgramAccount<MintInfo>
   realmAccount: ProgramAccount<Realm>
   tokenOwnerRecordAccount: ProgramAccount<TokenOwnerRecord>
+  governanceOwner: ProgramAccount<Governance>
 }
 
 export type Asset =

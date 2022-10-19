@@ -26,6 +26,7 @@ export default function TokenOwnerRecordDetails(props: Props) {
             tokenOwnerRecordAsset={props.tokenOwnerRecordAsset}
             realmAccount={props.tokenOwnerRecordAsset.realmAccount}
             programId={tryParseKey(props.tokenOwnerRecordAsset.programId)}
+            realmSymbol={props.tokenOwnerRecordAsset.realmSymbol}
           />
         </section>
       </StickyScrolledContainer>
