@@ -6,6 +6,7 @@ import { TypeOf } from 'io-ts';
 import { useEffect, useState } from 'react';
 
 import { TypeaheadSelect } from '@hub/components/controls/TypeaheadSelect';
+import ecosystemIcon from '@hub/components/EcosystemHeader/icon.png';
 import { RealmIcon } from '@hub/components/RealmIcon';
 import { useQuery } from '@hub/hooks/useQuery';
 import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
@@ -59,7 +60,7 @@ export function RealmSelector(props: Props) {
           {
             key: ECOSYSTEM_PAGE.toBase58(),
             value: {
-              iconUrl: null,
+              iconUrl: ecosystemIcon.src,
               name: 'Solana Ecosystem',
               publicKey: ECOSYSTEM_PAGE,
             } as Realm,

@@ -1,3 +1,4 @@
+import MilestoneIcon from '@carbon/icons-react/lib/Milestone';
 import type { PublicKey } from '@solana/web3.js';
 import { useRouter } from 'next/router';
 
@@ -56,6 +57,9 @@ export function Content(props: Props) {
   const document = props.feedItem.clippedDocument.document;
   const isClipped = props.feedItem.clippedDocument.isClipped;
   const url = getUrl(props);
+  const isCrosspost =
+    !props.realm.equals(ECOSYSTEM_PAGE) &&
+    !props.realm.equals(props.feedItem.realmPublicKey);
 
   return (
     <article
@@ -67,31 +71,40 @@ export function Content(props: Props) {
         'gap-x-3',
       )}
     >
-      {props.realmInfo ? (
-        <RealmIcon
-          className="h-12 w-12 text-lg"
-          iconUrl={props.realmInfo.iconUrl}
-          name={props.realmInfo.name}
-        />
-      ) : props.feedItem.author ? (
-        <AuthorHovercard
-          civicAvatar={props.feedItem.author?.civicInfo?.avatarUrl}
-          civicHandle={props.feedItem.author?.civicInfo?.handle}
-          publicKey={props.feedItem.author?.publicKey}
-          twitterAvatar={props.feedItem.author?.twitterInfo?.avatarUrl}
-          twitterHandle={props.feedItem.author?.twitterInfo?.handle}
-        >
+      <div className="relative">
+        {isCrosspost && (
+          <div className="absolute -top-1 -left-1 w-6 h-6 rounded-full bg-white p-[1px]">
+            <div className="bg-sky-500 h-full w-full flex items-center justify-center rounded-full">
+              <MilestoneIcon className="h-4 w-4 fill-white" />
+            </div>
+          </div>
+        )}
+        {props.realmInfo ? (
+          <RealmIcon
+            className="h-12 w-12 text-lg"
+            iconUrl={props.realmInfo.iconUrl}
+            name={props.realmInfo.name}
+          />
+        ) : props.feedItem.author ? (
+          <AuthorHovercard
+            civicAvatar={props.feedItem.author?.civicInfo?.avatarUrl}
+            civicHandle={props.feedItem.author?.civicInfo?.handle}
+            publicKey={props.feedItem.author?.publicKey}
+            twitterAvatar={props.feedItem.author?.twitterInfo?.avatarUrl}
+            twitterHandle={props.feedItem.author?.twitterInfo?.handle}
+          >
+            <AuthorAvatar
+              author={props.feedItem.author}
+              className="h-12 w-12 text-lg"
+            />
+          </AuthorHovercard>
+        ) : (
           <AuthorAvatar
             author={props.feedItem.author}
             className="h-12 w-12 text-lg"
           />
-        </AuthorHovercard>
-      ) : (
-        <AuthorAvatar
-          author={props.feedItem.author}
-          className="h-12 w-12 text-lg"
-        />
-      )}
+        )}
+      </div>
       <div
         className="text-left w-full overflow-hidden cursor-pointer"
         onClick={() => {

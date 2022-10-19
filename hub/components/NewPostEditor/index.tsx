@@ -3,11 +3,12 @@ import DocumentTasksIcon from '@carbon/icons-react/lib/DocumentTasks';
 import * as Separator from '@radix-ui/react-separator';
 import { PublicKey } from '@solana/web3.js';
 import { TypeOf } from 'io-ts';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { CombinedError } from 'urql';
 
 import * as Button from '@hub/components/controls/Button';
 import { RichTextEditor } from '@hub/components/controls/RichTextEditor';
+import { RealmIcon } from '@hub/components/RealmIcon';
 import { RealmSelector } from '@hub/components/RealmSelector';
 import { useMutation } from '@hub/hooks/useMutation';
 import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
@@ -40,13 +41,9 @@ export function NewPostEditor(props: Props) {
   const [, createPost] = useMutation(gql.createPostResp, gql.createPost);
   const [error, setError] = useState<CombinedError | null>(null);
   const [realm, setRealm] = useState(props.realm);
-  const [crosspostTo, setCrosspostTo] = useState<PublicKey[]>([]);
-
-  useEffect(() => {
-    if (realm.equals(ECOSYSTEM_PAGE)) {
-      setCrosspostTo([]);
-    }
-  }, [realm]);
+  const [crosspostTo, setCrosspostTo] = useState<
+    { name: string; publicKey: PublicKey; iconUrl?: null | string }[]
+  >([]);
 
   return (
     <div
@@ -73,7 +70,7 @@ export function NewPostEditor(props: Props) {
         <div className="text-sm text-neutral-500 mr-1">Post in:</div>
         {props.realm.equals(ECOSYSTEM_PAGE) ? (
           <RealmSelector
-            exclude={crosspostTo}
+            exclude={crosspostTo.map((r) => r.publicKey)}
             defaultSelected={realm}
             onChange={(realm) => setRealm(realm.publicKey)}
           />
@@ -85,71 +82,67 @@ export function NewPostEditor(props: Props) {
             <div className="text-sm text-zinc-500">{props.realmName}</div>
           </div>
         )}
-        {!realm.equals(ECOSYSTEM_PAGE) &&
-          crosspostTo.map((crosspostRealm, i) => (
-            <div
-              className="flex items-center mr-2"
-              key={crosspostRealm.toBase58() + i}
-            >
-              <div className="text-sm text-neutral-500 mr-2">&</div>
-              <RealmSelector
-                defaultSelected={crosspostRealm}
-                exclude={[realm, ECOSYSTEM_PAGE].concat(
-                  crosspostTo.filter((c) => !c.equals(crosspostRealm)),
-                )}
-                key={crosspostRealm.toBase58() + i}
-                onChange={(realm) =>
-                  setCrosspostTo((currentList) => {
-                    const newList = [...currentList];
-                    const currentIndex = newList.findIndex((v) =>
-                      v.equals(crosspostRealm),
-                    );
-                    newList[currentIndex] = realm.publicKey;
-                    return newList;
-                  })
-                }
-              />
-              <button
-                className={cx(
-                  'text-neutral-700',
-                  'flex',
-                  'h-8',
-                  'items-center',
-                  'justify-center',
-                  'rounded-full',
-                  'transition-colors',
-                  'w-8',
-                  'hover:bg-neutral-200',
-                )}
-                onClick={() =>
-                  setCrosspostTo((currentList) => {
-                    const newList = [...currentList];
-                    const currentIndex = newList.findIndex((v) =>
-                      v.equals(crosspostRealm),
-                    );
-                    newList.splice(currentIndex, 1);
-                    return newList;
-                  })
-                }
-              >
-                <CloseIcon className="fill-current h-4 w-4" />
-              </button>
-            </div>
-          ))}
-        {!realm.equals(ECOSYSTEM_PAGE) &&
-          crosspostTo.length < MAX_NUM_CROSSPOSTS && (
-            <RealmSelector
-              key={crosspostTo.map((i) => i.toBase58()).join('-')}
-              exclude={[realm, ECOSYSTEM_PAGE].concat(crosspostTo)}
-              onChange={(realm) =>
-                setCrosspostTo((currentList) => {
-                  const newList = [...currentList];
-                  newList.push(realm.publicKey);
-                  return newList;
-                })
-              }
+        {crosspostTo.map((crosspostRealm) => (
+          <button
+            className={cx(
+              'flex',
+              'gap-x-2',
+              'grid-cols-[16px,1fr,16px]',
+              'grid',
+              'group',
+              'items-center',
+              'px-2',
+              'py-3',
+              'rounded',
+              'transition-colors',
+              'hover:bg-neutral-200',
+            )}
+            key={crosspostRealm.publicKey.toBase58()}
+            onClick={() => {
+              setCrosspostTo((currentList) => {
+                const newList = [...currentList];
+                const currentIndex = newList.findIndex((v) =>
+                  v.publicKey.equals(crosspostRealm.publicKey),
+                );
+                newList.splice(currentIndex, 1);
+                return newList;
+              });
+            }}
+          >
+            <RealmIcon
+              className="h-4 w-4 text-[8px]"
+              iconUrl={crosspostRealm.iconUrl}
+              name={crosspostRealm.name}
             />
-          )}
+            <div className="text-sm text-neutral-900">
+              {crosspostRealm.name}
+            </div>
+            <CloseIcon
+              className={cx(
+                'fill-neutral-700',
+                'h-4',
+                'transition-colors',
+                'w-4',
+                'group-hover:fill-rose-500',
+              )}
+            />
+          </button>
+        ))}
+        {crosspostTo.length < MAX_NUM_CROSSPOSTS && (
+          <RealmSelector
+            key={crosspostTo.map((i) => i.publicKey.toBase58()).join('-')}
+            exclude={[realm, ECOSYSTEM_PAGE].concat(
+              crosspostTo.map((c) => c.publicKey),
+            )}
+            onChange={(realm) =>
+              setCrosspostTo((currentList) => {
+                const newList = [...currentList];
+                newList.push(realm);
+                return newList;
+              })
+            }
+          />
+        )}
       </header>
       <input
         autoFocus
@@ -192,9 +185,9 @@ export function NewPostEditor(props: Props) {
               setSubmitting(true);
 
               const result = await createPost({
-                crosspostTo,
                 document,
                 title,
+                crosspostTo: crosspostTo.map((c) => c.publicKey),
                 realm: realm.toBase58(),
               });
 
