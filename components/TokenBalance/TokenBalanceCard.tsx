@@ -135,7 +135,7 @@ export const TokenDeposit = ({
   tokenRole: GoverningTokenRole
   councilVote?: boolean
   inAccountDetails?: boolean
-  setHasGovPower: (hasGovPower: boolean) => void
+  setHasGovPower?: (hasGovPower: boolean) => void
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
