@@ -180,7 +180,12 @@ export default function ProposalDetails({
       </div>
       <div className="flex flex-col lg:flex-row space-y-1 lg:space-y-0 lg:space-x-3">
         <div className="flex-1">
-          <VoteResults isListView proposal={proposal.account} />
+          <VoteResults
+            isListView
+            proposal={proposal}
+            realm={realm}
+            governance={proposalGovernance}
+          />
         </div>
         <div className="hidden lg:block self-stretch w-0.5 bg-fgd-4" />
         <div className="flex-1">

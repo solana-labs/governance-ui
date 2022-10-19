@@ -84,6 +84,7 @@ export default function useRealmProposals(
           governances.map((g) =>
             getGovernanceAccounts(connection.current, programId, Proposal, [
               pubkeyFilter(1, g.pubkey)!,
+              pubkeyFilter(33, tokenOwnerRecordAsset.communityMint.publicKey)!,
             ])
           )
         )
