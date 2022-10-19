@@ -22,21 +22,14 @@
     "symbol": "SERUM",
     "displayName": "SerumDAO - Devnet",
     "programId": "G41fmJzd29v7Qmdi8ZyTBBYa98ghh3cwHBTexqCG1PQJ",
-    "realmId": "439YMWzq623G6EMowVjTFcHnn4y13tBa876NKdzvjcEr",
+    "realmId": "8rTohXsU2L3xaf3KeHiS55DNninzCjDZT8zkpwikHSQt",
     "ogImage": "https://assets.website-files.com/61284dcff241c2f0729af9f3/61285237ce2e301255d09108_logo-serum.png"
   },
   {
-    "symbol": "DAO-1",
-    "displayName": "DAO-1",
+    "symbol": "DAO2DAO",
+    "displayName": "DAO-to-DAO",
     "programId": "GTesTBiEWE32WHXXE2S4XbZvA5CrEc4xs6ZgRe895dP",
-    "realmId": "9swGPEahsux9RrH9gptepkSqP4DC1KAtRBszoxbu3xfo",
-    "ogImage": "https://assets.website-files.com/61284dcff241c2f0729af9f3/61285237ce2e301255d09108_logo-serum.png"
-  },
-  {
-    "symbol": "DAO-2",
-    "displayName": "DAO-2",
-    "programId": "GTesTBiEWE32WHXXE2S4XbZvA5CrEc4xs6ZgRe895dP",
-    "realmId": "G1ZnwPJGnRt35nadw33df7hxKHkVu13juMjuE4Pp5FWN",
+    "realmId": "3SXQuce59HJMy1udz9UaQJKjWrRw2s6q2rEK1S9Ep7cv",
     "ogImage": "https://assets.website-files.com/61284dcff241c2f0729af9f3/61285237ce2e301255d09108_logo-serum.png"
   },
   {
