@@ -37,7 +37,7 @@ const defaultProposalVotes: ProposalVotesInfoType = {
 
 export default function useProposalVotesForRealm(
   realm: ProgramAccount<Realm>,
-  proposal: ProgramAccount<Proposal>,
+  proposal: Proposal,
   governance?: ProgramAccount<Governance>
 ) {
   const connection = useWalletStore((s) => s.connection.current)
@@ -48,7 +48,7 @@ export default function useProposalVotesForRealm(
 
   const proposalMintKey = useMemo(
     () =>
-      proposal.account.governingTokenMint.toBase58() ===
+      proposal.governingTokenMint.toBase58() ===
       realm.account.communityMint.toBase58()
         ? realm.account.communityMint
         : realm.account.config.councilMint,
@@ -73,35 +73,25 @@ export default function useProposalVotesForRealm(
 
       const maxVoteWeight = getProposalMaxVoteWeight(
         realm.account,
-        proposal.account,
+        proposal,
         proposalMint
       )
       const voteThresholdPct =
-        (proposal.account.isVoteFinalized() &&
-          proposal.account.voteThreshold?.value) ||
+        (proposal.isVoteFinalized() && proposal.voteThreshold?.value) ||
         governance.account.config.communityVoteThreshold.value!
 
       const minimumYesVotes =
         fmtTokenAmount(maxVoteWeight, proposalMint.decimals) *
         (voteThresholdPct / 100)
 
-      const yesVotePct = calculatePct(
-        proposal.account.getYesVoteCount(),
-        maxVoteWeight
-      )
+      const yesVotePct = calculatePct(proposal.getYesVoteCount(), maxVoteWeight)
       const yesVoteProgress = (yesVotePct / voteThresholdPct) * 100
-      const isMultiProposal = proposal.account.options?.length > 1
+      const isMultiProposal = proposal.options?.length > 1
       const yesVoteCount = !isMultiProposal
-        ? fmtTokenAmount(
-            proposal.account.getYesVoteCount(),
-            proposalMint.decimals
-          )
+        ? fmtTokenAmount(proposal.getYesVoteCount(), proposalMint.decimals)
         : 0
       const noVoteCount = !isMultiProposal
-        ? fmtTokenAmount(
-            proposal.account.getNoVoteCount(),
-            proposalMint.decimals
-          )
+        ? fmtTokenAmount(proposal.getNoVoteCount(), proposalMint.decimals)
         : 0
 
       const totalVoteCount = yesVoteCount + noVoteCount

@@ -1,6 +1,6 @@
 import ApprovalQuorum from '@components/ApprovalQuorum'
 import Button from '@components/Button'
-import VoteResults from '@components/VoteResults'
+import VoteResultsForRealmProposal from '@components/VoteResultsForRealmProposal'
 import { ThumbUpIcon } from '@heroicons/react/solid'
 import { useHasVoteTimeExpired } from '@hooks/useHasVoteTimeExpired'
 import useRealmProposalVotes from '@hooks/useRealmProposalVotes'
@@ -180,9 +180,9 @@ export default function ProposalDetails({
       </div>
       <div className="flex flex-col lg:flex-row space-y-1 lg:space-y-0 lg:space-x-3">
         <div className="flex-1">
-          <VoteResults
+          <VoteResultsForRealmProposal
             isListView
-            proposal={proposal}
+            proposal={proposal.account}
             realm={realm}
             governance={proposalGovernance}
           />
