@@ -1,6 +1,7 @@
 import { BN, PublicKey } from '@blockworks-foundation/mango-client'
 import { MangoV3ReimbursementClient } from '@blockworks-foundation/mango-v3-reimbursement-lib/dist'
 import { CheckIcon } from '@heroicons/react/solid'
+import tokenService from '@utils/services/token'
 import { useEffect, useState } from 'react'
 
 function toDecimalAmount(amount: BN, decimals: number) {
@@ -67,14 +68,12 @@ const ClaimMangoTokensTableRow = ({
     reimbursementClient !== null,
     reimbursementAccount && JSON.stringify(reimbursementAccount),
   ])
+  const tokenInfo = tokenService.getTokenInfo(item.mintPubKey.toBase58())
   return (
     <div className="grid grid-cols-12 items-center gap-3 rounded-md border border-th-bkg-3 p-4">
       <div className="col-span-5 flex flex-col overflow-hidden">
         <div className="flex items-center text-sm text-th-fgd-1">
-          <img
-            className="mr-2 w-5"
-            src={`assets/icons/${symbol.toLocaleLowerCase()}.svg`}
-          ></img>
+          <img className="mr-2 w-5" src={tokenInfo?.logoURI}></img>
           {symbol}
         </div>
       </div>

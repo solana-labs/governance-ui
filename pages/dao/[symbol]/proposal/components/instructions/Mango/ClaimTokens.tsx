@@ -1,28 +1,17 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
 import useRealm from '@hooks/useRealm'
-import { Connection, PublicKey } from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
-import {
-  UiInstruction,
-  MangoDepositToMangoAccountFormCsv,
-} from '@utils/uiTypes/proposalCreationTypes'
+import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
-import { serializeInstructionToBase64 } from '@solana/spl-governance'
-import {
-  Config,
-  MangoClient,
-  makeDepositInstruction,
-  BN,
-} from '@blockworks-foundation/mango-client'
-import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
+import { Config } from '@blockworks-foundation/mango-client'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-import { tryParseKey } from '@tools/validators/pubkey'
 import { MangoV3ReimbursementClient } from '@blockworks-foundation/mango-v3-reimbursement-lib/dist'
 import { AnchorProvider } from '@project-serum/anchor'
 import { NodeWallet } from '@project-serum/common'
@@ -33,6 +22,8 @@ import ClaimMangoTokensTableRow, {
   TableInfo,
 } from '@components/ClaimMangoTokenTableRow'
 import { ExclamationCircleIcon } from '@heroicons/react/solid'
+import { AssetAccount } from '@utils/uiTypes/assets'
+import Button from '@components/Button'
 
 const GROUP_NUM = 1
 
@@ -60,6 +51,11 @@ async function tryGetReimbursedAccounts(
   }
 }
 
+export interface MangoClaimTokens {
+  governedAccount: AssetAccount | null
+  tokensDestination: AssetAccount | null
+}
+
 const MangoClaimTokens = ({
   index,
   governance,
@@ -69,16 +65,16 @@ const MangoClaimTokens = ({
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
-  const { governedTokenAccounts } = useGovernanceAssets()
+  const { governedTokenAccounts, assetAccounts } = useGovernanceAssets()
   const tokenAccounts = governedTokenAccounts.filter((x) => x.isToken)
   const [table, setTable] = useState<TableInfo[]>([])
   const connection = useWalletStore((s) => s.connection)
   const groupName = connection.cluster === 'devnet' ? 'devnet.2' : 'mainnet.1'
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<MangoDepositToMangoAccountFormCsv>({
+  const [form, setForm] = useState<MangoClaimTokens>({
     governedAccount: null,
-    data: [],
+    tokensDestination: null,
   })
   const [mintsForAvailableAmounts, setMintsForAvailableAmounts] = useState<{
     [key: string]: MintInfo
@@ -191,50 +187,7 @@ const MangoClaimTokens = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const mangoConnection =
-        connection.cluster === 'localnet'
-          ? new Connection(Config.ids().cluster_urls.mainnet)
-          : connection.current
-      const GROUP = connection.cluster === 'devnet' ? 'devnet.2' : 'mainnet.1'
-      const groupConfig = Config.ids().getGroupWithName(GROUP)!
-      const client = new MangoClient(
-        connection.current,
-        groupConfig.mangoProgramId
-      )
-      const group = await client.getMangoGroup(groupConfig.publicKey)
-      const rootBanks = await group.loadRootBanks(mangoConnection)
-      const rootBank = group.tokens.find(
-        (x) =>
-          x.mint.toBase58() ===
-          form.governedAccount?.extensions.mint?.publicKey.toBase58()
-      )?.rootBank
-      const quoteRootBank = rootBanks[group.getRootBankIndex(rootBank!)]
-      const quoteNodeBank = quoteRootBank?.nodeBankAccounts[0]
-      for (const deposit of form.data) {
-        const mangoAccountPk = tryParseKey(deposit.mango_account)
-          ? new PublicKey(deposit.mango_account)
-          : null
-        if (mangoAccountPk) {
-          const mintAmount = parseMintNaturalAmountFromDecimal(
-            deposit.token_amount!,
-            form.governedAccount.extensions.mint!.account.decimals
-          )
-          //Mango instruction call and serialize
-          const depositIx = makeDepositInstruction(
-            groupConfig.mangoProgramId,
-            groupConfig.publicKey,
-            form.governedAccount.extensions.token!.account.owner,
-            group.mangoCache,
-            mangoAccountPk,
-            quoteRootBank!.publicKey,
-            quoteNodeBank!.publicKey,
-            quoteNodeBank!.vault,
-            form.governedAccount.extensions.transferAddress!,
-            new BN(mintAmount)
-          )
-          serializedInstructions.push(serializeInstructionToBase64(depositIx))
-        }
-      }
+      console.log('ok')
     }
     const obj: UiInstruction = {
       serializedInstruction: '',
@@ -282,11 +235,34 @@ const MangoClaimTokens = ({
       .object()
       .nullable()
       .required('Governed account is required'),
+    tokensDestination: yup
+      .object()
+      .nullable()
+      .required('Tokens destination is required'),
   })
+  const claimText = `By recovering funds, [_____] Decentralized Autonomous Entity (DAO)
+  represents and agrees that it, and any of its contributors, agents,
+  affiliates, officers, employees, and principals hereby irrevocably sell,
+  convey, transfer and assign to Mango Labs, LLC all of its right, title
+  and interest in, to and under all claims arising out of or related to
+  the October 2022 incident, including, without limitation, all of its
+  causes of action or other rights with respect to such claims, all rights
+  to receive any amounts or property or other distribution in respect of
+  or in connection with such claims, and any and all proceeds of any of
+  the foregoing (including proceeds of proceeds). [_____] DAO further
+  irrevocably and unconditionally releases all claims it may have against
+  Mango Labs, LLC, the Mango DAO, its core contributors, and any of their
+  agents, affiliates, officers, employees, or principals related to this
+  matter. This release constitutes an express, informed, knowing and
+  voluntary waiver and relinquishment to the fullest extent permitted by
+  law.`
+  const copyClaimText = () => {
+    copy(claimText)
+  }
   return (
     <>
       <GovernedAccountSelect
-        label="Token account"
+        label="Mango account owner"
         governedAccounts={tokenAccounts}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedAccount' })
@@ -296,7 +272,7 @@ const MangoClaimTokens = ({
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
       ></GovernedAccountSelect>
-      <div>
+      <div className="max-w-lg">
         <div className="mb-2 grid grid-cols-12 gap-3 px-4 text-xs text-th-fgd-3">
           <div className="col-span-5">Token</div>
           <div className="col-span-4 text-right">Amount</div>
@@ -322,8 +298,39 @@ const MangoClaimTokens = ({
           </div>
         )}
       </div>
+      <GovernedAccountSelect
+        label="Tokens destination (SOL wallet)"
+        governedAccounts={assetAccounts.filter((x) => x.isSol)}
+        onChange={(value) => {
+          handleSetForm({ value, propertyName: 'tokensDestination' })
+        }}
+        value={form.tokensDestination}
+        error={formErrors['tokensDestination']}
+      ></GovernedAccountSelect>
+      <div>
+        While reimbursing, transfer of end-user claims to mango dao is
+        mandatory, in case you are reclaiming DAO funds, we would ask you to
+        pass a DAO proposal including waiver together with the executable
+        instruction.
+      </div>
+      <div className="border p-4 border-fgd-4">
+        {claimText}
+        <div className="pt-4 flex justify-end">
+          <Button onClick={copyClaimText}>Copy</Button>
+        </div>
+      </div>
     </>
   )
 }
 
 export default MangoClaimTokens
+
+function copy(text) {
+  const input = document.createElement('input')
+  input.setAttribute('value', text)
+  document.body.appendChild(input)
+  input.select()
+  const result = document.execCommand('copy')
+  document.body.removeChild(input)
+  return result
+}
