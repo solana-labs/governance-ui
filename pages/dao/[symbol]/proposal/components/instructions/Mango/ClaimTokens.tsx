@@ -27,7 +27,6 @@ import ClaimMangoTokensTableRow, {
 import { ExclamationCircleIcon } from '@heroicons/react/solid'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import Button from '@components/Button'
-import { WSOL_MINT_PK } from '@components/instructions/tools'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
@@ -211,7 +210,6 @@ const MangoClaimTokens = ({
           .instruction()
         preqTransactions.push(instruction)
       }
-      const owner = form.governedAccount!.governance!.pubkey!
       const table = await tryDecodeTable(reimbursementClient, group)
       const reimbursementAccountPk = (
         await PublicKey.findProgramAddress(
@@ -229,7 +227,6 @@ const MangoClaimTokens = ({
         )
         const mintPk = group?.account.mints[mintIndex!]
         const claimMintPk = group?.account.claimMints[mintIndex!]
-        const isWSolMint = mintPk!.toBase58() === WSOL_MINT_PK.toBase58()
         const tableIndex = table.findIndex((row) =>
           row.owner.equals(form.governedAccount!.governance!.pubkey!)
         )
@@ -246,7 +243,7 @@ const MangoClaimTokens = ({
               ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
               TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
               mintPk!, // mint
-              owner, // owner
+              form.tokensDestination!.extensions.transferAddress!, // owner
               true
             ),
             Token.getAssociatedTokenAddress(
@@ -266,7 +263,7 @@ const MangoClaimTokens = ({
                 TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
                 mintPk!, // mint
                 ataPk, // ata
-                owner, // owner of token account
+                form.tokensDestination!.extensions.transferAddress!, // owner of token account
                 wallet.publicKey // fee payer
               )
             )
@@ -285,18 +282,6 @@ const MangoClaimTokens = ({
             })
             .instruction()
           serializedInstructions.push(serializeInstructionToBase64(ix))
-          if (isWSolMint) {
-            const unwrapAllSol = Token.createCloseAccountInstruction(
-              TOKEN_PROGRAM_ID,
-              ataPk!,
-              form.governedAccount!.governance!.pubkey!,
-              form.governedAccount!.governance!.pubkey!,
-              []
-            )
-            serializedInstructions.push(
-              serializeInstructionToBase64(unwrapAllSol)
-            )
-          }
         }
       }
     }
