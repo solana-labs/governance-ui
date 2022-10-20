@@ -265,16 +265,14 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
         [Buffer.from('authority')],
         programId
       )
-
       const set = get().set
       set((s) => {
         s.programId = programId
         s.gsrmMint = gsrmMint
         s.config = config
         s.authority = authority
-        s.srmMintAddress = cluster === 'devnet' ? DEV_SRM_MINT : MAIN_SRM_MINT
-        s.msrmMintAddress =
-          cluster === 'devnet' ? DEV_MSRM_MINT : MAIN_MSRM_MINT
+        s.srmMint = cluster === 'devnet' ? DEV_SRM_MINT : MAIN_SRM_MINT
+        s.msrmMint = cluster === 'devnet' ? DEV_MSRM_MINT : MAIN_MSRM_MINT
       })
     },
     async getGsrmBalance(
