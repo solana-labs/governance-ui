@@ -495,6 +495,7 @@ export enum Instructions {
   TransferDomainName,
   EverlendDeposit,
   EverlendWithdraw,
+  ClaimMangoTokens,
 }
 
 export type createParams = [
