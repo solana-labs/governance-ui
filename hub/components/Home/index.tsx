@@ -1,15 +1,13 @@
 import type { PublicKey } from '@solana/web3.js';
 import { pipe } from 'fp-ts/function';
 
-import { HomeLayout } from '@hub/components/HomeLayout';
+import * as RealmHeader from '@hub/components/RealmHeader';
 import { useQuery } from '@hub/hooks/useQuery';
 import cx from '@hub/lib/cx';
-import { getDefaultBannerUrl } from '@hub/lib/getDefaultBannerUrl';
 import * as RE from '@hub/types/Result';
 
 import * as Feed from './Feed';
 import { getRealm, getRealmResp } from './gql';
-import * as Sidebar from './Sidebar';
 
 interface Props {
   className?: string;
@@ -29,47 +27,40 @@ export function Home(props: Props) {
         result,
         RE.match(
           () => (
-            <HomeLayout
-              error
-              sidebar={() => <Sidebar.Error />}
-              content={() => <div />}
-            />
+            <div>
+              <RealmHeader.Error />
+            </div>
           ),
           () => (
-            <HomeLayout
-              loading
-              sidebar={() => <Sidebar.Loading />}
-              content={() => <div />}
-            />
+            <div>
+              <RealmHeader.Loading />
+            </div>
           ),
-          ({ realm }) => (
-            <HomeLayout
-              bannerUrl={
-                realm.bannerImageUrl || getDefaultBannerUrl(realm.publicKey)
-              }
-              sidebar={(isStickied) => (
-                <Sidebar.Content
-                  compressed={isStickied}
-                  description={realm.shortDescription}
-                  iconUrl={realm.iconUrl}
-                  membersCount={realm.membersCount}
-                  realm={realm.publicKey}
-                  realmName={realm.name}
-                  realmUrlId={props.realmUrlId}
-                  twitterHandle={realm.twitterHandle}
-                  websiteUrl={realm.websiteUrl}
-                />
-              )}
-              content={() => (
-                <Feed.Content
-                  className="pt-8"
-                  realm={realm.publicKey}
-                  realmIconUrl={realm.iconUrl}
-                  realmName={realm.name}
-                  realmUrlId={props.realmUrlId}
-                />
-              )}
-            />
+          ({ hub, realm }) => (
+            <div>
+              <RealmHeader.Content
+                bannerUrl={realm.bannerImageUrl}
+                iconUrl={realm.iconUrl}
+                name={realm.name}
+                realm={realm.publicKey}
+                realmUrlId={props.realmUrlId}
+                selectedTab="feed"
+                token={hub.info.token}
+                twitterHandle={realm.twitterHandle}
+                websiteUrl={realm.websiteUrl}
+                discordUrl={realm.discordUrl}
+                githubUrl={realm.githubUrl}
+                instagramUrl={realm.instagramUrl}
+                linkedInUrl={realm.linkedInUrl}
+              />
+              <Feed.Content
+                className="max-w-3xl mx-auto pt-8 w-full"
+                realm={realm.publicKey}
+                realmIconUrl={realm.iconUrl}
+                realmName={realm.name}
+                realmUrlId={props.realmUrlId}
+              />
+            </div>
           ),
         ),
       )}

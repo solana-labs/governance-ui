@@ -1,3 +1,4 @@
+import { pickDefaultBg } from '@hub/components/AuthorAvatar';
 import { RealmCircle } from '@hub/components/branding/RealmCircle';
 import cx from '@hub/lib/cx';
 
@@ -16,7 +17,7 @@ export function Content(props: Props) {
     <div
       className={cx(
         props.className,
-        'bg-neutral-100',
+        'bg-white',
         'flex',
         'h-44',
         'items-center',
@@ -30,7 +31,7 @@ export function Content(props: Props) {
       {props.iconUrl ? (
         <img
           className={cx(
-            'bg-white',
+            'bg-neutral-100',
             'h-40',
             'rounded-full',
             'transition-opacity',
@@ -45,10 +46,10 @@ export function Content(props: Props) {
             'h-40',
             'w-40',
             'rounded-full',
-            'bg-sky-400',
             'flex',
             'items-center',
             'justify-center',
+            props.realmName ? pickDefaultBg(props.realmName) : 'bg-neutral-100',
           )}
         >
           {props.realmName ? (
@@ -69,7 +70,7 @@ export function Loading(props: BaseProps) {
     <div
       className={cx(
         props.className,
-        'bg-neutral-100',
+        'bg-white',
         'flex',
         'h-44',
         'items-center',
@@ -101,7 +102,7 @@ export function Error(props: BaseProps) {
     <div
       className={cx(
         props.className,
-        'bg-neutral-100',
+        'bg-white',
         'flex',
         'h-44',
         'items-center',

@@ -58,6 +58,8 @@ const REALM = () => {
     tokenRecords,
     ownVoterWeight,
     ownTokenRecord,
+    councilTokenOwnerRecords,
+    ownCouncilTokenRecord,
     isNftMode,
   } = useRealm()
   const proposalsPerPage = 20
@@ -156,8 +158,16 @@ const REALM = () => {
   const hasCommunityVoteWeight =
     ownTokenRecord &&
     ownVoterWeight.hasMinAmountToVote(ownTokenRecord.account.governingTokenMint)
+  const hasCouncilVoteWeight =
+    ownCouncilTokenRecord &&
+    ownVoterWeight.hasMinAmountToVote(
+      ownCouncilTokenRecord.account.governingTokenMint
+    )
+
   const cantMultiVote =
-    selectedProposals.length === 0 || isMultiVoting || !hasCommunityVoteWeight
+    selectedProposals.length === 0 ||
+    isMultiVoting ||
+    (!hasCommunityVoteWeight && !hasCouncilVoteWeight)
 
   const toggleSelectAll = () => {
     if (allVotingProposalsSelected) {
@@ -187,7 +197,11 @@ const REALM = () => {
       const transactions: Transaction[] = []
       for (let i = 0; i < selectedProposals.length; i++) {
         const selectedProposal = selectedProposals[i]
-        const ownTokenRecord = tokenRecords[wallet.publicKey!.toBase58()]
+        const ownTokenRecord =
+          selectedProposal.proposal.governingTokenMint.toBase58() ===
+          realm.account.communityMint.toBase58()
+            ? tokenRecords[wallet.publicKey!.toBase58()]
+            : councilTokenOwnerRecords[wallet.publicKey!.toBase58()]
 
         const instructions: TransactionInstruction[] = []
 
@@ -283,7 +297,9 @@ const REALM = () => {
               className="whitespace-nowrap"
               disabled={cantMultiVote}
               tooltipMessage={
-                !hasCommunityVoteWeight ? "You don't have voting power" : ''
+                !hasCommunityVoteWeight && !hasCouncilVoteWeight
+                  ? "You don't have voting power"
+                  : ''
               }
               onClick={() => voteOnSelected(YesNoVote.Yes)}
               isLoading={isMultiVoting}
@@ -294,7 +310,9 @@ const REALM = () => {
               className="whitespace-nowrap"
               disabled={cantMultiVote}
               tooltipMessage={
-                !hasCommunityVoteWeight ? "You don't have voting power" : ''
+                !hasCommunityVoteWeight && !hasCouncilVoteWeight
+                  ? "You don't have voting power"
+                  : ''
               }
               onClick={() => voteOnSelected(YesNoVote.No)}
               isLoading={isMultiVoting}

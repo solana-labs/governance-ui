@@ -26,11 +26,31 @@
     "displayName": "Metaplex DAO",
     "programId": "AEauWRrpn9Cs6GXujzdp1YhMmv2288kBt3SdEcPYEerr",
     "realmId": "DA5G7QQbFioZ6K33wQcH8fVdgFcnaDjLD7DLQkapZg5X",
-    "website": "https://www.metaplex.com/",
-    "twitter": "@metaplex",
     "ogImage": "/realms/metaplex/img/black-circle.png",
     "shortDescription": "Metaplex makes it easy to build your project in minutes and grow your community in the world’s largest NFT ecosystem.",
-    "sortRank": 3
+    "sortRank": 3,
+    "website": "https://www.metaplex.com/",
+    "twitter": "@metaplex",
+    "linkedin": "https://www.linkedin.com/company/metaplex-studios/",
+    "instagram": "https://www.instagram.com/metaplex/",
+    "discord": "https://discord.gg/metaplex",
+    "github": "https://github.com/metaplex-foundation/metaplex"
+  },
+  {
+    "symbol": "TSD",
+    "bannerImage": "https://i.imgur.com/CuyBXIT.png",
+    "displayName": "Token Solutions DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "CMWHa4rLaCuur88SyAdTf2FSjvBq7y5GqguLzw7QaLBQ",
+    "ogImage": "/realms/TokenSolutionsDAO/img/image2.png",
+    "shortDescription": "A non-custodial, liquidity provider, price sensor bidirectional Token",
+    "website": "https://www.web3tokensolutions.io/",
+    "twitter": "@tokensolutions",
+    "linkedin": "https://www.linkedin.com/in/pablo-f-acebedo/",
+    "instagram": "https://www.instagram.com/pablofacebedo/",
+    "github": "https://github.com/pablofelipe01"
+   
+    
   },
   {
     "symbol": "GRAPE",
@@ -78,6 +98,15 @@
     "twitter": "@PsyOptions",
     "ogImage": "https://user-images.githubusercontent.com/32071703/149460918-3694084f-2a37-4c95-93d3-b5aaf078d444.png",
     "sortRank": 3
+  },
+  {
+    "symbol": "PYTH",
+    "displayName": "Pyth Network",
+    "programId": "GovFUVGZWWwyoLq8rhnoVWknRFkhDSbQiSoREJ5LiZCV",
+    "realmId": "A1f6LNEymJSSJsEVCL1FSgtS1jA9dNTC4ni8SkmbwQjG",
+    "ogImage": "/realms/PYTH/img/pyth.svg",
+    "website": "https://pyth.network/",
+    "twitter": "@PythNetwork"
   },
   {
     "symbol": "Dialect",
@@ -1047,5 +1076,32 @@
     "ogImage": "/realms/eleusance/eleusance_logo_spl.png",
     "website": "https://eleusance.io/",
     "twitter": "@eleusanceIO"
+  },
+  {
+    "symbol": "J-JFI",
+    "displayName": "Jungle DeFi Community DAO",
+    "programId": "jdaoDN37BrVRvxuXSeyR7xE5Z9CAoQApexGrQJbnj6V",
+    "realmId": "5g94Ver64ruf9CGBL3k2oQGdKCUt4QKjN7NQojSrHAwH",
+    "ogImage": "/realms/jungle-defi/jungle.png",
+    "website": "https://jungledefi.io",
+    "twitter": "@jungledefi"
+  },
+  {
+    "symbol": "Blockgame",
+    "displayName": "Blockgame",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "3EPsh3Nm2sivjjh3pcR4qmFzsMgJ3cDGjwiJeDARuQNR",
+    "ogImage": "/realms/Blockgame/Blockgame.png",
+    "website": "https://blockgame.cz"
+  },
+  {
+    "symbol": "ALLIE",
+    "displayName": "Allie Coin DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "BZE9AiJrMxUXXjwy9iBPzj34Wh5Zf1wLEFAM4oSSMRLi",
+    "bannerImage": "/realms/Allie Coin DAO/Allie Coin Particle Logo Compressed.png",
+    "ogImage": "/realms/Allie Coin DAO/Allie Coin Logo.png",
+    "website": "https://alliecoin.io",
+    "twitter": "@allie_coin"
   }
 ]

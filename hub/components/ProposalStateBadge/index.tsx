@@ -27,7 +27,7 @@ function getBackground(state: ProposalState, voteSubmitted?: boolean) {
     case ProposalState.Draft:
       return 'bg-transparent';
     case ProposalState.Executable:
-      return 'bg-cyan-500';
+      return 'bg-sky-500';
     case ProposalState.ExecutingWithErrors:
       return 'bg-red-500';
     case ProposalState.Finalizing:
@@ -77,7 +77,7 @@ function getColor(state: ProposalState) {
     case ProposalState.ExecutingWithErrors:
       return 'text-neutral-50';
     case ProposalState.Finalizing:
-      return 'text-cyan-500';
+      return 'text-sky-500';
     case ProposalState.SigningOff:
       return 'text-orange-500';
     case ProposalState.Voting:

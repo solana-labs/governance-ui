@@ -424,10 +424,10 @@ export const getNfts = async (
   ownerPk: PublicKey,
   connection: ConnectionContext
 ): Promise<NFTWithMeta[]> => {
-  if (connection.cluster === 'devnet') {
-    return await getDevnetNfts(ownerPk, connection.current)
-  } else {
+  if (connection.cluster === 'mainnet') {
     return await getMainnetNfts(ownerPk, connection.current)
+  } else {
+    return await getDevnetNfts(ownerPk, connection.current)
   }
 }
 

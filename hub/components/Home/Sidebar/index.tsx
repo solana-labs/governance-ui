@@ -1,10 +1,10 @@
 import * as Separator from '@radix-ui/react-separator';
 import type { PublicKey } from '@solana/web3.js';
 
+import * as RealmHeaderIcon from '@hub/components/RealmHeaderIcon';
 import cx from '@hub/lib/cx';
 
 import * as About from './About';
-import * as Icon from './Icon';
 import * as Treasury from './Treasury';
 
 interface BaseProps {
@@ -29,7 +29,7 @@ export function Content(props: Props) {
 
   return (
     <div className={cx(props.className, 'h-full', 'relative')}>
-      <Icon.Content
+      <RealmHeaderIcon.Content
         className={cx('-translate-y-1/2', 'absolute', 'top-0')}
         iconUrl={iconUrl}
         isStickied={props.compressed}
@@ -70,7 +70,9 @@ export function Content(props: Props) {
 export function Loading(props: BaseProps) {
   return (
     <div className={cx(props.className, 'h-full', 'relative')}>
-      <Icon.Loading className={cx('-translate-y-1/2', 'absolute', 'top-0')} />
+      <RealmHeaderIcon.Loading
+        className={cx('-translate-y-1/2', 'absolute', 'top-0')}
+      />
       <div className="h-24" />
       <h1 className="bg-neutral-200 rounded animate-pulse mb-5 mt-0 w-40">
         &nbsp;
@@ -86,7 +88,9 @@ export function Loading(props: BaseProps) {
 export function Error(props: BaseProps) {
   return (
     <div className={cx(props.className, 'h-full', 'relative')}>
-      <Icon.Error className={cx('-translate-y-1/2', 'absolute', 'top-0')} />
+      <RealmHeaderIcon.Error
+        className={cx('-translate-y-1/2', 'absolute', 'top-0')}
+      />
       <div className="h-24" />
       <h1 className="bg-neutral-200 rounded mb-5 mt-0 w-40">&nbsp;</h1>
       <Separator.Root className="bg-neutral-300 h-[1px]" />

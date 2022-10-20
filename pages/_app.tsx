@@ -7,8 +7,8 @@ import { App as HubApp } from '@hub/App'
 import '../styles/index.css'
 import '../styles/typography.css'
 import '@hub/components/controls/RichTextEditor/index.css'
-import useSerumGovStore from 'stores/useSerumGovStore'
 import { useEffect } from 'react'
+import useSerumGovStore from 'stores/useSerumGovStore'
 
 export default function App({ Component, pageProps, router }: AppProps) {
   const { cluster } = router.query
@@ -20,7 +20,11 @@ export default function App({ Component, pageProps, router }: AppProps) {
     updateSerumGovAccounts(cluster as string | undefined)
   }, [cluster])
 
-  if (router.pathname.startsWith('/realm/[id]')) {
+  if (
+    router.pathname.startsWith('/realm/[id]') ||
+    router.pathname.startsWith('/ecosystem') ||
+    router.pathname.startsWith('/discover')
+  ) {
     return (
       <HubApp>
         <Component {...pageProps} />

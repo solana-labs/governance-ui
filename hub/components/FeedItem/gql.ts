@@ -185,28 +185,55 @@ export const getFeedItemResp = IT.type({
 
 export const getRealm = gql`
   query getRealm($realm: PublicKey!) {
+    hub(realm: $realm) {
+      realm
+      info {
+        token {
+          mint
+          symbol
+        }
+      }
+    }
     realm(publicKey: $realm) {
       bannerImageUrl
       iconUrl
-      membersCount
       name
       publicKey
       symbol
       twitterHandle
       websiteUrl
+      githubUrl
+      linkedInUrl
+      discordUrl
+      instagramUrl
     }
   }
 `;
 
 export const getRealmResp = IT.type({
+  hub: IT.type({
+    realm: PublicKey,
+    info: IT.type({
+      token: IT.union([
+        IT.null,
+        IT.type({
+          mint: PublicKey,
+          symbol: IT.string,
+        }),
+      ]),
+    }),
+  }),
   realm: IT.type({
     bannerImageUrl: IT.union([IT.null, IT.string]),
     iconUrl: IT.union([IT.null, IT.string]),
-    membersCount: IT.number,
     name: IT.string,
     publicKey: PublicKey,
     symbol: IT.union([IT.null, IT.string]),
     twitterHandle: IT.union([IT.null, IT.string]),
     websiteUrl: IT.union([IT.null, IT.string]),
+    githubUrl: IT.union([IT.null, IT.string]),
+    linkedInUrl: IT.union([IT.null, IT.string]),
+    discordUrl: IT.union([IT.null, IT.string]),
+    instagramUrl: IT.union([IT.null, IT.string]),
   }),
 });
