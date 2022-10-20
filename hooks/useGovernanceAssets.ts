@@ -430,7 +430,7 @@ export default function useGovernanceAssets() {
     {
       id: Instructions.ClaimMangoTokens,
       name: 'Mango: Claim Tokens',
-      isVisible: true,
+      isVisible: canUseTokenTransferInstruction,
     },
     {
       id: Instructions.DepositIntoVolt,
