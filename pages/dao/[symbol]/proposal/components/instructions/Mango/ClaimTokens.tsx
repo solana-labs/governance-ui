@@ -1,19 +1,22 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
 import useRealm from '@hooks/useRealm'
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { Governance } from '@solana/spl-governance'
+import {
+  Governance,
+  serializeInstructionToBase64,
+} from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
 import { Config } from '@blockworks-foundation/mango-client'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { MangoV3ReimbursementClient } from '@blockworks-foundation/mango-v3-reimbursement-lib/dist'
-import { AnchorProvider } from '@project-serum/anchor'
+import { AnchorProvider, BN } from '@project-serum/anchor'
 import { NodeWallet } from '@project-serum/common'
 import { notify } from '@utils/notifications'
 import ClaimMangoTokensTableRow, {
@@ -24,6 +27,13 @@ import ClaimMangoTokensTableRow, {
 import { ExclamationCircleIcon } from '@heroicons/react/solid'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import Button from '@components/Button'
+import { WSOL_MINT_PK } from '@components/instructions/tools'
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  Token,
+  TOKEN_PROGRAM_ID,
+} from '@solana/spl-token'
+import { isExistingTokenAccount } from '@utils/validations'
 
 const GROUP_NUM = 1
 
@@ -100,7 +110,7 @@ const MangoClaimTokens = ({
         [
           Buffer.from('ReimbursementAccount'),
           group!.publicKey.toBuffer()!,
-          wallet!.publicKey!.toBuffer(),
+          form.governedAccount?.governance!.pubkey!.toBuffer(),
         ],
         reimbursementClient!.program.programId
       )
@@ -187,11 +197,113 @@ const MangoClaimTokens = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      console.log('ok')
+      const preqTransactions: TransactionInstruction[] = []
+      const group = await getCurrentGroup()
+      const isExistingReimbursementAccount = reimbursementAccount
+      if (!isExistingReimbursementAccount) {
+        const instruction = await reimbursementClient!.program.methods
+          .createReimbursementAccount()
+          .accounts({
+            group: (group as any).publicKey,
+            mangoAccountOwner: form.governedAccount!.governance!.pubkey!,
+            payer: wallet.publicKey!,
+          })
+          .instruction()
+        preqTransactions.push(instruction)
+      }
+      const owner = form.governedAccount!.governance!.pubkey!
+      const table = await tryDecodeTable(reimbursementClient, group)
+      const reimbursementAccountPk = (
+        await PublicKey.findProgramAddress(
+          [
+            Buffer.from('ReimbursementAccount'),
+            group!.publicKey.toBuffer()!,
+            form.governedAccount!.governance!.pubkey!.toBuffer(),
+          ],
+          reimbursementClient!.program.programId
+        )
+      )[0]
+      for (const availableMintPk of Object.keys(mintsForAvailableAmounts)) {
+        const mintIndex = group?.account.mints.findIndex(
+          (x) => x.toBase58() === availableMintPk
+        )
+        const mintPk = group?.account.mints[mintIndex!]
+        const claimMintPk = group?.account.claimMints[mintIndex!]
+        const isWSolMint = mintPk!.toBase58() === WSOL_MINT_PK.toBase58()
+        const tableIndex = table.findIndex((row) =>
+          row.owner.equals(form.governedAccount!.governance!.pubkey!)
+        )
+        const isTokenClaimed = reimbursementAccount
+          ? await reimbursementClient!.reimbursed(
+              reimbursementAccount,
+              mintIndex
+            )
+          : false
+
+        if (!isTokenClaimed) {
+          const [ataPk, daoAtaPk] = await Promise.all([
+            Token.getAssociatedTokenAddress(
+              ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+              TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+              mintPk!, // mint
+              owner, // owner
+              true
+            ),
+            Token.getAssociatedTokenAddress(
+              ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+              TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+              claimMintPk!,
+              group!.account.claimTransferDestination!,
+              true
+            ),
+          ])
+
+          const isExistingAta = await isExistingTokenAccount(connection, ataPk)
+          if (!isExistingAta) {
+            preqTransactions.push(
+              Token.createAssociatedTokenAccountInstruction(
+                ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+                TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+                mintPk!, // mint
+                ataPk, // ata
+                owner, // owner of token account
+                wallet.publicKey // fee payer
+              )
+            )
+          }
+          const ix = await reimbursementClient!.program.methods
+            .reimburse(new BN(mintIndex!), new BN(tableIndex), true)
+            .accounts({
+              group: (group as any).publicKey,
+              vault: group?.account.vaults[mintIndex!],
+              tokenAccount: ataPk,
+              claimMint: claimMintPk,
+              claimMintTokenAccount: daoAtaPk,
+              reimbursementAccount: reimbursementAccountPk!,
+              mangoAccountOwner: form.governedAccount!.governance!.pubkey!,
+              table: group?.account.table,
+            })
+            .instruction()
+          serializedInstructions.push(serializeInstructionToBase64(ix))
+          if (isWSolMint) {
+            const unwrapAllSol = Token.createCloseAccountInstruction(
+              TOKEN_PROGRAM_ID,
+              ataPk!,
+              form.governedAccount!.governance!.pubkey!,
+              form.governedAccount!.governance!.pubkey!,
+              []
+            )
+            serializedInstructions.push(
+              serializeInstructionToBase64(unwrapAllSol)
+            )
+          }
+        }
+      }
     }
     const obj: UiInstruction = {
       serializedInstruction: '',
       additionalSerializedInstructions: serializedInstructions,
+      prerequisiteInstructions: [],
       isValid,
       governance: form.governedAccount?.governance,
       chunkSplitByDefault: true,
