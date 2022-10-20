@@ -56,6 +56,7 @@ export const ACCOUNT_NAMES = {
   '5tgfd6XgwiXB9otEnzFpXK11m7Q7yZUaAJzWK4oT5UGF':
     'Mango DAO SOL Treasury Vault',
   '9RGoboEjmaAjSCXsKi6p6zJucnwF3Eg5NUN9jPS6ziL3': 'Mango DAO MNGO Treasury',
+  '3r1tQ2qaR5teYPEyGoHwZeZfMU1zxD5FAAmtAJPbj9xX': 'Mango DAO Opinion voting',
   '4PdEyhrV3gaUj4ffwjKGXBLo42jF2CQCCBoXenwCRWXf':
     'Mango DAO USDC Treasury Vault',
   '65u1A86RC2U6whcHeD2mRG1tXCSmH2GsiktmEFQmzZgq': 'Mango DAO USDC Treasury',
@@ -180,6 +181,7 @@ export const HIDDEN_GOVERNANCES = new Map<string, string>([
   ['56yqzBEr9BqDGjYPJz9G8LVQrbXsQM2t2Yq3Gk8S56d1', ''],
   ['4styeLGsBRpV4xKsCNMRPb94U7JN8ZXoXJTLZA5hdjo9', ''],
   ['CKWNNwtn5nbsGMkvtRwHDv4QTyoHMByKVd7Ypo2deNpc', ''],
+  ['G8JgCHfca7PehBwRp1Q91smJ9CXAd8K9e9CpfVjyD2MP', ''],
 ])
 
 // Blacklisted proposals which should not be displayed in the UI
