@@ -418,7 +418,7 @@ export const TokenDeposit = ({
 
   useEffect(() => {
     if (availableTokens != '0' || hasTokensDeposited || hasTokensInWallet) {
-      setHasGovPower(true)
+      if (setHasGovPower) setHasGovPower(true)
     }
   }, [availableTokens, hasTokensDeposited, hasTokensInWallet])
 
