@@ -439,6 +439,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseTokenTransferInstruction,
     },
     {
+      id: Instructions.ClaimMangoTokens,
+      name: 'Mango: Claim Tokens',
+      isVisible: canUseTokenTransferInstruction,
+    },
+    {
       id: Instructions.DepositIntoVolt,
       name: 'Friktion: Deposit into Volt',
       isVisible: canUseAnyInstruction,

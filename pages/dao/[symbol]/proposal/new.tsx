@@ -114,6 +114,7 @@ import GrantForm from './components/instructions/Serum/GrantForm'
 import JoinDAO from './components/instructions/JoinDAO'
 import UpdateConfigAuthority from './components/instructions/Serum/UpdateConfigAuthority'
 import UpdateConfigParams from './components/instructions/Serum/UpdateConfigParams'
+import ClaimMangoTokens from './components/instructions/Mango/ClaimTokens'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -647,6 +648,13 @@ const New = () => {
             index={idx}
             governance={governance}
           ></MakeDepositToMangoAccountCsv>
+        )
+      case Instructions.ClaimMangoTokens:
+        return (
+          <ClaimMangoTokens
+            index={idx}
+            governance={governance}
+          ></ClaimMangoTokens>
         )
       case Instructions.ForesightInitMarket:
         return (

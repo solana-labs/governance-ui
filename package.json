@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@blockworks-foundation/mango-client": "^3.6.14",
+    "@blockworks-foundation/mango-v3-reimbursement-lib": "^1.0.8",
     "@blockworks-foundation/mango-v4": "^0.0.2",
     "@bonfida/spl-name-service": "^0.1.47",
     "@bundlr-network/client": "^0.7.15",
