@@ -74,7 +74,7 @@ const MangoClaimTokens = ({
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
-  const { governedTokenAccounts, assetAccounts } = useGovernanceAssets()
+  const { governedTokenAccounts } = useGovernanceAssets()
   const tokenAccounts = governedTokenAccounts.filter((x) => x.isToken)
   const [table, setTable] = useState<TableInfo[]>([])
   const connection = useWalletStore((s) => s.connection)
@@ -190,13 +190,13 @@ const MangoClaimTokens = ({
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
     const serializedInstructions: string[] = []
+    const preqTransactions: TransactionInstruction[] = []
     if (
       isValid &&
       programId &&
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const preqTransactions: TransactionInstruction[] = []
       const group = await getCurrentGroup()
       const isExistingReimbursementAccount = reimbursementAccount
       if (!isExistingReimbursementAccount) {
@@ -221,6 +221,7 @@ const MangoClaimTokens = ({
           reimbursementClient!.program.programId
         )
       )[0]
+
       for (const availableMintPk of Object.keys(mintsForAvailableAmounts)) {
         const mintIndex = group?.account.mints.findIndex(
           (x) => x.toBase58() === availableMintPk
@@ -236,14 +237,13 @@ const MangoClaimTokens = ({
               mintIndex
             )
           : false
-
         if (!isTokenClaimed) {
           const [ataPk, daoAtaPk] = await Promise.all([
             Token.getAssociatedTokenAddress(
               ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
               TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
               mintPk!, // mint
-              form.tokensDestination!.extensions.transferAddress!, // owner
+              form.governedAccount!.governance!.pubkey!, // owner
               true
             ),
             Token.getAssociatedTokenAddress(
@@ -263,11 +263,12 @@ const MangoClaimTokens = ({
                 TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
                 mintPk!, // mint
                 ataPk, // ata
-                form.tokensDestination!.extensions.transferAddress!, // owner of token account
+                form.governedAccount!.governance!.pubkey!, // owner of token account
                 wallet.publicKey // fee payer
               )
             )
           }
+
           const ix = await reimbursementClient!.program.methods
             .reimburse(new BN(mintIndex!), new BN(tableIndex), true)
             .accounts({
@@ -279,6 +280,7 @@ const MangoClaimTokens = ({
               reimbursementAccount: reimbursementAccountPk!,
               mangoAccountOwner: form.governedAccount!.governance!.pubkey!,
               table: group?.account.table,
+              signer: form.governedAccount!.governance!.pubkey!,
             })
             .instruction()
           serializedInstructions.push(serializeInstructionToBase64(ix))
@@ -288,9 +290,10 @@ const MangoClaimTokens = ({
     const obj: UiInstruction = {
       serializedInstruction: '',
       additionalSerializedInstructions: serializedInstructions,
-      prerequisiteInstructions: [],
+      prerequisiteInstructions: preqTransactions,
       isValid,
       governance: form.governedAccount?.governance,
+      chunkBy: 1,
       chunkSplitByDefault: true,
     }
     return obj
@@ -300,7 +303,12 @@ const MangoClaimTokens = ({
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
-  }, [JSON.stringify(form)])
+  }, [
+    JSON.stringify(form),
+    Object.keys(mintsForAvailableAmounts).toString(),
+    table.length,
+    reimbursementAccount !== null,
+  ])
   useEffect(() => {
     const govPk = form?.governedAccount?.governance?.pubkey
     if (govPk) {
@@ -308,8 +316,6 @@ const MangoClaimTokens = ({
     }
   }, [form.governedAccount])
   useEffect(() => {
-    console.log('connection', connection.current)
-
     if (wallet?.connected && wallet?.publicKey?.toBase58()) {
       const options = AnchorProvider.defaultOptions()
       const provider = new AnchorProvider(
@@ -332,10 +338,6 @@ const MangoClaimTokens = ({
       .object()
       .nullable()
       .required('Governed account is required'),
-    tokensDestination: yup
-      .object()
-      .nullable()
-      .required('Tokens destination is required'),
   })
   const claimText = `By recovering funds, [_____] Decentralized Autonomous Entity (DAO)
   represents and agrees that it, and any of its contributors, agents,
@@ -395,7 +397,11 @@ const MangoClaimTokens = ({
           </div>
         )}
       </div>
-      <GovernedAccountSelect
+      <div>
+        Token will be withdrawn to tokens accounts owned by governance owning
+        mango account
+      </div>
+      {/* <GovernedAccountSelect
         label="Tokens destination (SOL wallet)"
         governedAccounts={assetAccounts.filter((x) => x.isSol)}
         onChange={(value) => {
@@ -403,7 +409,7 @@ const MangoClaimTokens = ({
         }}
         value={form.tokensDestination}
         error={formErrors['tokensDestination']}
-      ></GovernedAccountSelect>
+      ></GovernedAccountSelect> */}
       <div>
         While reimbursing, transfer of end-user claims to mango dao is
         mandatory, in case you are reclaiming DAO funds, we would ask you to

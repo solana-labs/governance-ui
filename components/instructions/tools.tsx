@@ -190,6 +190,16 @@ export const HIDDEN_PROPOSALS = new Map<string, string>([
   ['E8XgiVpDJgDf4XgBKjZnMs3S1K7cmibtbDqjw5aNobCZ', ''],
   ['DrhhwYXaY4fvTBoQdNtgwEoTjuQswvDQLfVcgUXgP1Mx', ''],
   ['CfbCUF7cn6UdWRsGPUUtj4CKMBL7qNCdF1WunED4gYA4', ''],
+  ['Hzv3N2KtVikNoXz6nH9AWvt7Y9Smn8bRQ2gnAeJDkhm1', ''],
+  ['FeFaHN8c3yokUxyJw3F475uegMUoYsYtr4J2DMaS6JZh', ''],
+  ['GqoMraqhfK7ezFiKexRVkbYwvCegs9dgFpXn2f7aeePT', ''],
+  ['CZnFphcs2UmbqppTEP5PkAAF4DqeyFr7fPQ2bunCey2J', ''],
+  ['8ptWWXgb2nLVuMgJ1ZgXJfRaBesBDkyzYarJvWNLECbG', ''],
+  ['7P3dtUTSvcQcjtJpZHZKEzrGvvHQdQGJrtKFLNAYHvpv', ''],
+  ['EVzN1pfZwniGuyp45ZASHo6rU4Z8xx5kWevzDauR8sWp', ''],
+  ['7P3dtUTSvcQcjtJpZHZKEzrGvvHQdQGJrtKFLNAYHvpv', ''],
+  ['H5TnbSBNFKJJwKea8tUj7ETcmhRHXQ1N9XCXBSD6Q9P1', ''],
+  ['GeMQWvFTasBoui11RqRzMtDPQ9b2BkMK8NzepWzvuXw3', ''],
 ])
 
 export const DEFAULT_NATIVE_SOL_MINT =
