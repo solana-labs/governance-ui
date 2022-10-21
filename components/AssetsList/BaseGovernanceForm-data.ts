@@ -11,6 +11,7 @@ import {
   getTimestampFromDays,
   getDaysFromTimestamp,
   parseMintNaturalAmountFromDecimalAsBN,
+  fmtBnMintDecimals,
 } from '@tools/sdk/units'
 
 type FormErrors<T> = {
@@ -44,9 +45,10 @@ type Transformer<T extends Record<keyof U, any>, U> = {
   [K in keyof U]: (x: T[K]) => U[K]
 }
 
-// @agrippa I use this pattern instead of referencing values directly when transforming, so as to reduce surface area for typos
+// @agrippa I use this functional pattern instead of referencing values directly when transforming, so as to reduce surface area for typos
 export const transformerGovernanceConfig_2_BaseGovernanceFormFieldsV3 = (
-  mintInfo: MintInfo
+  communityMintDecimals: number,
+  councilMintDecimals: number
 ): Transformer<
   GovernanceConfig & { _programVersion: 3 },
   BaseGovernanceFormFieldsV3
@@ -56,11 +58,11 @@ export const transformerGovernanceConfig_2_BaseGovernanceFormFieldsV3 = (
   minCommunityTokensToCreateProposal: (x) =>
     isDisabledVoterWeight(x)
       ? 'disabled'
-      : formatMintNaturalAmountAsDecimal(mintInfo, x),
+      : fmtBnMintDecimals(x, communityMintDecimals),
   minCouncilTokensToCreateProposal: (x) =>
     isDisabledVoterWeight(x)
       ? 'disabled'
-      : formatMintNaturalAmountAsDecimal(mintInfo, x),
+      : fmtBnMintDecimals(x, councilMintDecimals),
   communityVoteThreshold: (x) =>
     x.type === VoteThresholdType.Disabled ? 'disabled' : x.value!.toString(),
   communityVetoVoteThreshold: (x) =>
@@ -75,7 +77,8 @@ export const transformerGovernanceConfig_2_BaseGovernanceFormFieldsV3 = (
 })
 
 export const transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig = (
-  mintInfo: MintInfo
+  communityMintDecimals: number,
+  councilMintDecimals: number
 ): Transformer<
   BaseGovernanceFormFieldsV3,
   Omit<GovernanceConfig & { _programVersion: 3 }, 'reserved'>
@@ -85,11 +88,11 @@ export const transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig = (
   minCommunityTokensToCreateProposal: (x) =>
     x === 'disabled'
       ? DISABLED_VOTER_WEIGHT
-      : parseMintNaturalAmountFromDecimalAsBN(x, mintInfo.decimals),
+      : parseMintNaturalAmountFromDecimalAsBN(x, communityMintDecimals),
   minCouncilTokensToCreateProposal: (x) =>
     x === 'disabled'
       ? DISABLED_VOTER_WEIGHT
-      : parseMintNaturalAmountFromDecimalAsBN(x, mintInfo.decimals),
+      : parseMintNaturalAmountFromDecimalAsBN(x, councilMintDecimals),
   communityVoteThreshold: (x) =>
     x === 'disabled'
       ? { type: VoteThresholdType.Disabled, value: undefined }

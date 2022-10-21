@@ -4,7 +4,6 @@ import AmountSlider from '@components/Slider'
 import Switch from '@components/Switch'
 import useRealm from '@hooks/useRealm'
 import { VoteTipping } from '@solana/spl-governance'
-import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import {
   fmtPercentage,
   getMintMinAmountAsDecimal,

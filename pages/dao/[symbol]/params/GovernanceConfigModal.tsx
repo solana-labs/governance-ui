@@ -64,7 +64,14 @@ const GovernanceConfigModal = ({
   governance,
 }: Props) => {
   const router = useRouter()
-  const { realm, canChooseWhoVote, symbol, mint, realmInfo } = useRealm()
+  const {
+    realm,
+    canChooseWhoVote,
+    symbol,
+    mint,
+    realmInfo,
+    councilMint,
+  } = useRealm()
   const config = governance?.account.config
   const { fmtUrlWithCluster } = useQueryContext()
   const wallet = useWalletStore((s) => s.current)
@@ -81,8 +88,17 @@ const GovernanceConfigModal = ({
   // We should use effects to write default state, not props, if those props can change.
   // (which in this cause they certainly can, its a network query)
   useEffect(() => {
+    if (realm === undefined) return
     if (config === undefined) return
     if (mint === undefined) return
+    // We don't want to transform data if we are missing councilMint, iff there is one to retrieve
+    if (
+      realm.account.config.councilMint !== undefined &&
+      councilMint === undefined
+    )
+      return
+
+    if (form !== undefined) return
 
     if (programVersion <= 2) {
       setForm({
@@ -106,7 +122,10 @@ const GovernanceConfigModal = ({
       })
     } else {
       const baseForm = transform(
-        transformerGovernanceConfig_2_BaseGovernanceFormFieldsV3(mint),
+        transformerGovernanceConfig_2_BaseGovernanceFormFieldsV3(
+          mint.decimals,
+          councilMint?.decimals ?? 0
+        ),
         { ...config, _programVersion: 3 }
       )[0]
       setForm({
@@ -115,7 +134,7 @@ const GovernanceConfigModal = ({
         ...baseForm,
       })
     }
-  }, [config, mint])
+  }, [config, mint, councilMint, realm])
 
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
@@ -124,8 +143,16 @@ const GovernanceConfigModal = ({
   // @asktree: I am not really sure of the purpose of this schema.
   const schema = yup.object().shape({})
   const handleCreate = async () => {
+    if (realm === undefined) return
     if (form === undefined) return
     if (mint === undefined) return
+
+    // We don't want to transform data if we are missing councilMint, iff there is one to retrieve
+    if (
+      realm.account.config.councilMint !== undefined &&
+      councilMint === undefined
+    )
+      return
 
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     if (isValid && governance?.account && wallet?.publicKey && realm) {
@@ -144,7 +171,10 @@ const GovernanceConfigModal = ({
             })
           : new GovernanceConfig(
               transform(
-                transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig(mint),
+                transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig(
+                  mint.decimals,
+                  councilMint?.decimals ?? 0
+                ),
                 form
               )[0]
             )
