@@ -23,10 +23,7 @@ import * as sbv2 from '@switchboard-xyz/switchboard-v2'
 import sbIdl from 'SwitchboardVotePlugin/switchboard_v2.json'
 import gonIdl from 'SwitchboardVotePlugin/gameofnodes.json'
 
-import {
-  LOCALNET_STAKING_ADDRESS as PYTH_LOCALNET_STAKING_ADDRESS,
-  DEVNET_STAKING_ADDRESS as PYTH_DEVNET_STAKING_ADDRESS,
-} from 'pyth-staking-api'
+import { STAKING_ADDRESS as PYTH_STAKING_ADDRESS } from 'pyth-staking-api'
 import useGatewayPluginStore from '../GatewayPlugin/store/gatewayPluginStore'
 import { getGatekeeperNetwork } from '../GatewayPlugin/sdk/accounts'
 import { NFTWithMeta } from '@utils/uiTypes/VotePlugin'
@@ -49,8 +46,8 @@ export const gatewayPluginsPks: string[] = [
 export const switchboardPluginsPks: string[] = [SWITCHBOARD_ADDIN_ID.toBase58()]
 
 export const pythPluginsPks: string[] = [
-  PYTH_LOCALNET_STAKING_ADDRESS.toBase58(),
-  PYTH_DEVNET_STAKING_ADDRESS.toBase58(),
+  PYTH_STAKING_ADDRESS.toBase58(),
+  PYTH_STAKING_ADDRESS.toBase58(),
 ]
 
 export function useVotingPlugins() {
