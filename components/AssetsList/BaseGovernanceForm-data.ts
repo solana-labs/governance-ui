@@ -81,7 +81,7 @@ export const transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig = (
   Omit<GovernanceConfig & { _programVersion: 3 }, 'reserved'>
 > => ({
   minInstructionHoldUpTime: (x) => getTimestampFromDays(parseFloat(x)),
-  maxVotingTime: (x) => getDaysFromTimestamp(parseFloat(x)),
+  maxVotingTime: (x) => getTimestampFromDays(parseFloat(x)),
   minCommunityTokensToCreateProposal: (x) =>
     x === 'disabled'
       ? DISABLED_VOTER_WEIGHT
