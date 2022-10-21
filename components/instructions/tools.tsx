@@ -173,6 +173,10 @@ export const ACCOUNT_NAMES = {
 
   //Serum DAO
   '5xinfvkvL5NZ6BG3cDtFdTbVuMutqGXkDBuhncfmzPr2': 'Serum SRM Grant Treasury',
+  G41fmJzd29v7Qmdi8ZyTBBYa98ghh3cwHBTexqCG1PQJ:
+    "Serum's spl-governance Program",
+  FBcTbv5rLy7MQkkAU2uDzAEjjZDeu2BVLVRJGxyz6hnV:
+    'Serum Governance Token Program',
 }
 
 // Blacklisted governances which should not be displayed in the UI
