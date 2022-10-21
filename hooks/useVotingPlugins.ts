@@ -45,10 +45,7 @@ export const gatewayPluginsPks: string[] = [
 
 export const switchboardPluginsPks: string[] = [SWITCHBOARD_ADDIN_ID.toBase58()]
 
-export const pythPluginsPks: string[] = [
-  PYTH_STAKING_ADDRESS.toBase58(),
-  PYTH_STAKING_ADDRESS.toBase58(),
-]
+export const pythPluginsPks: string[] = [PYTH_STAKING_ADDRESS.toBase58()]
 
 export function useVotingPlugins() {
   const { realm, config, ownTokenRecord } = useRealm()
