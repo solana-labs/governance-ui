@@ -196,5 +196,14 @@
     "website": "https://www.meanfi.com",
     "twitter": "@meanfinance",
     "ogImage": "/realms/MEAN/logo.svg"
+  },
+  {
+    "symbol": "SAP",
+    "displayName": "SAP DAO",
+    "programId": "MGovW65tDhMMcpEmsegpsdgvzb6zUwGsNjhXFxRAnjd",
+    "realmId": "7HHEADbEF77yAtJ58CYhy93SbcAeGjtixQ7gsHxuamyU",
+    "website": "",
+    "twitter": "",
+    "ogImage": "/realms/SAPDAO/img//SAPDAO.png"
   }
 ]
