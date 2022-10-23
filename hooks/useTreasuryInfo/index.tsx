@@ -1,6 +1,7 @@
 import { BigNumber } from 'bignumber.js'
 import { useEffect, useMemo, useState } from 'react'
 
+import { Domain } from '@models/treasury/Domain'
 import { NFT } from '@models/treasury/NFT'
 import { Status, Result } from '@utils/uiTypes/Result'
 import { AuxiliaryWallet, Wallet } from '@models/treasury/Wallet'
@@ -11,6 +12,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { assembleWallets } from './assembleWallets'
 import { calculateTokenCountAndValue } from './calculateTokenCountAndValue'
 import { getNfts } from './getNfts'
+import { getDomains } from './getDomains'
 
 interface Data {
   auxiliaryWallets: AuxiliaryWallet[]
@@ -35,6 +37,7 @@ export default function useTreasuryInfo(): Result<Data> {
   const [nftsLoading, setNftsLoading] = useState(true)
   const [auxWallets, setAuxWallets] = useState<AuxiliaryWallet[]>([])
   const [wallets, setWallets] = useState<Wallet[]>([])
+  const [domains, setDomains] = useState<Domain[]>([])
   const [buildingWallets, setBuildingWallets] = useState(true)
 
   const { counts, values } = useMemo(
@@ -46,6 +49,15 @@ export default function useTreasuryInfo(): Result<Data> {
     if (!loadingGovernedAccounts && accounts.length) {
       setNftsLoading(true)
       setBuildingWallets(true)
+
+      getDomains(
+        accounts.filter((acc) => acc.isSol),
+        connection
+      )
+        .then((domainNames) => {
+          setDomains(domainNames)
+        })
+        .catch(console.log)
 
       getNfts(
         accounts
