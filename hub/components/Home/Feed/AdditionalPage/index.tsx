@@ -88,8 +88,8 @@ export function AdditionalPage(props: BaseProps) {
   return pipe(
     result,
     RE.match(
-      () => <Loading className={props.className} />,
       () => <Error className={props.className} />,
+      () => <Loading className={props.className} />,
       ({ feed }) => (
         <Content
           className={props.className}

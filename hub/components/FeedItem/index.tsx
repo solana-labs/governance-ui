@@ -3,10 +3,12 @@ import type { PublicKey } from '@solana/web3.js';
 import { pipe } from 'fp-ts/function';
 import { useEffect, useState } from 'react';
 
+import { EcosystemHeader } from '@hub/components/EcosystemHeader';
 import * as RealmHeader from '@hub/components/RealmHeader';
 import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay';
 import { useJWT } from '@hub/hooks/useJWT';
 import { useQuery } from '@hub/hooks/useQuery';
+import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
 import * as RE from '@hub/types/Result';
 
 import { AdditionalCommentTree } from './AdditionalCommentTree';
@@ -104,21 +106,25 @@ export function FeedItem(props: Props) {
           ({ hub, realm }) => {
             return (
               <div>
-                <RealmHeader.Content
-                  bannerUrl={realm.bannerImageUrl}
-                  iconUrl={realm.iconUrl}
-                  name={realm.name}
-                  realm={realm.publicKey}
-                  realmUrlId={props.realmUrlId}
-                  selectedTab="feed"
-                  token={hub.info.token}
-                  twitterHandle={realm.twitterHandle}
-                  websiteUrl={realm.websiteUrl}
-                  discordUrl={realm.discordUrl}
-                  githubUrl={realm.githubUrl}
-                  instagramUrl={realm.instagramUrl}
-                  linkedInUrl={realm.linkedInUrl}
-                />
+                {props.realm.equals(ECOSYSTEM_PAGE) ? (
+                  <EcosystemHeader />
+                ) : (
+                  <RealmHeader.Content
+                    bannerUrl={realm.bannerImageUrl}
+                    iconUrl={realm.iconUrl}
+                    name={realm.name}
+                    realm={realm.publicKey}
+                    realmUrlId={props.realmUrlId}
+                    selectedTab="feed"
+                    token={hub.info.token}
+                    twitterHandle={realm.twitterHandle}
+                    websiteUrl={realm.websiteUrl}
+                    discordUrl={realm.discordUrl}
+                    githubUrl={realm.githubUrl}
+                    instagramUrl={realm.instagramUrl}
+                    linkedInUrl={realm.linkedInUrl}
+                  />
+                )}
                 {pipe(
                   feedItemResult,
                   RE.match(

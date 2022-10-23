@@ -6,6 +6,7 @@ import { TwitterEmbedAttachment as TwitterEmbedAttachmentModel } from '@hub/type
 interface Props {
   className?: string;
   attachment: TwitterEmbedAttachmentModel;
+  isPreview?: boolean;
 }
 
 export function TwitterEmbedAttachment(props: Props) {
@@ -33,9 +34,18 @@ export function TwitterEmbedAttachment(props: Props) {
         'transition-opacity',
         'max-w-md',
         loaded ? 'opacity-100' : 'opacity-0',
+        props.isPreview && 'max-h-40',
       )}
       dangerouslySetInnerHTML={{ __html: props.attachment.c.h }}
       ref={container}
+      style={
+        props.isPreview
+          ? {
+              WebkitMaskImage: `linear-gradient(to bottom, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%)`,
+              maskImage: `linear-gradient(to bottom, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%)`,
+            }
+          : undefined
+      }
     />
   );
 }

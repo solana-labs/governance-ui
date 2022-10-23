@@ -37,6 +37,22 @@
     "github": "https://github.com/metaplex-foundation/metaplex"
   },
   {
+    "symbol": "TSD",
+    "bannerImage": "https://i.imgur.com/CuyBXIT.png",
+    "displayName": "Token Solutions DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "CMWHa4rLaCuur88SyAdTf2FSjvBq7y5GqguLzw7QaLBQ",
+    "ogImage": "/realms/TokenSolutionsDAO/img/image2.png",
+    "shortDescription": "A non-custodial, liquidity provider, price sensor bidirectional Token",
+    "website": "https://www.web3tokensolutions.io/",
+    "twitter": "@tokensolutions",
+    "linkedin": "https://www.linkedin.com/in/pablo-f-acebedo/",
+    "instagram": "https://www.instagram.com/pablofacebedo/",
+    "github": "https://github.com/pablofelipe01"
+   
+    
+  },
+  {
     "symbol": "GRAPE",
     "displayName": "GRAPE",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -66,6 +82,15 @@
     "twitter": "@PsyOptions",
     "ogImage": "https://user-images.githubusercontent.com/32071703/149460918-3694084f-2a37-4c95-93d3-b5aaf078d444.png",
     "sortRank": 3
+  },
+  {
+    "symbol": "PYTH",
+    "displayName": "Pyth Network",
+    "programId": "GovFUVGZWWwyoLq8rhnoVWknRFkhDSbQiSoREJ5LiZCV",
+    "realmId": "A1f6LNEymJSSJsEVCL1FSgtS1jA9dNTC4ni8SkmbwQjG",
+    "ogImage": "/realms/PYTH/img/pyth.svg",
+    "website": "https://pyth.network/",
+    "twitter": "@PythNetwork"
   },
   {
     "symbol": "Dialect",
@@ -1059,5 +1084,15 @@
     "realmId": "3EPsh3Nm2sivjjh3pcR4qmFzsMgJ3cDGjwiJeDARuQNR",
     "ogImage": "/realms/Blockgame/Blockgame.png",
     "website": "https://blockgame.cz"
+  },
+  {
+    "symbol": "ALLIE",
+    "displayName": "Allie Coin DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "BZE9AiJrMxUXXjwy9iBPzj34Wh5Zf1wLEFAM4oSSMRLi",
+    "bannerImage": "/realms/Allie Coin DAO/Allie Coin Particle Logo Compressed.png",
+    "ogImage": "/realms/Allie Coin DAO/Allie Coin Logo.png",
+    "website": "https://alliecoin.io",
+    "twitter": "@allie_coin"
   }
 ]
