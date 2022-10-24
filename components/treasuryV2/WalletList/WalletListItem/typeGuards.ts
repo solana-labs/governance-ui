@@ -18,6 +18,10 @@ export function isMint(asset: Asset): asset is Mint {
   return asset.type === AssetType.Mint
 }
 
+export function isDomain(asset: Asset): asset is Mint {
+  return asset.type === AssetType.Domain
+}
+
 export function isNFTCollection(asset: Asset): asset is NFTCollection {
   return asset.type === AssetType.NFTCollection
 }
