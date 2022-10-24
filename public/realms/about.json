@@ -178,5 +178,21 @@
         "answer": ["Yes we have three."]
       }
     ]
+  },
+    "BzGL6wbCvBisQ7s1cNQvDGZwDRWwKK6bhrV93RYdetzJ": {
+    "symbol": "Squads",
+    "heading": "The multisig standard you were looking for on Solana",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Squads Protocol is the multi-signature wallet standard of Solana, providing critical infrastructure for teams, DAOs and institutions looking to securely manage their treasuries, programs, tokens and workflows."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.squads.so/squads-v3-docs/"
+    }
   }
 }
