@@ -27,6 +27,7 @@ interface Props extends BaseProps {
   realmInfo?: {
     iconUrl?: null | string;
     name: string;
+    urlId: string;
   };
   realmUrlId: string;
 }
@@ -38,9 +39,11 @@ function getUrl(props: Props) {
 
   if (props.feedItem.type === FeedItemType.Post) {
     if (!props.feedItem.realmPublicKey.equals(props.realm)) {
-      return `/realm/${estimateRealmUrlId(props.feedItem.realmPublicKey)}/${
-        props.feedItem.id
-      }`;
+      const urlId = props.realmInfo
+        ? props.realmInfo.urlId
+        : estimateRealmUrlId(props.feedItem.realmPublicKey);
+
+      return `/realm/${urlId}/${props.feedItem.id}`;
     }
 
     return `/realm/${props.realmUrlId}/${props.feedItem.id}`;

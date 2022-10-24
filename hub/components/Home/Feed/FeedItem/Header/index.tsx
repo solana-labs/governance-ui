@@ -11,7 +11,6 @@ import { RealmIcon } from '@hub/components/RealmIcon';
 import { abbreviateAddress } from '@hub/lib/abbreviateAddress';
 import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
 import cx from '@hub/lib/cx';
-import { estimateRealmUrlId } from '@hub/lib/estimateRealmUrlId';
 import { ProposalState } from '@hub/types/ProposalState';
 
 const EDIT_GRACE_PERIOD = 3; // minutes
@@ -25,6 +24,7 @@ interface Props {
     iconUrl?: null | string;
     name: string;
     symbol?: null | string;
+    urlId: string;
   };
   proposal?: {
     state: ProposalState;
@@ -141,12 +141,7 @@ export function Header(props: Props) {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="text-neutral-500">posted in</div>
-              <Link
-                passHref
-                href={`/realm/${estimateRealmUrlId(
-                  props.feedItemRealmPublicKey,
-                )}`}
-              >
+              <Link passHref href={`/realm/${props.feedItemRealm.urlId}`}>
                 <a
                   className={cx(
                     'bg-white',
