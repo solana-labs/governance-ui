@@ -35,10 +35,7 @@ import { useEffect, useState } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { vsrPluginsPks } from '@hooks/useVotingPlugins'
-import {
-  LOCALNET_REALM_ID as PYTH_LOCALNET_REALM_ID,
-  PythBalance,
-} from 'pyth-staking-api'
+import { REALM_ID as PYTH_REALM_ID, PythBalance } from 'pyth-staking-api'
 import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 import getNumTokens from '@components/ProposalVotingPower/getNumTokens'
 import VotingPowerPct from '@components/ProposalVotingPower/VotingPowerPct'
@@ -404,8 +401,7 @@ export const TokenDeposit = ({
     : ''
 
   //Todo: move to own components with refactor to dao folder structure
-  const isPyth =
-    realmInfo?.realmId.toBase58() === PYTH_LOCALNET_REALM_ID.toBase58()
+  const isPyth = realmInfo?.realmId.toBase58() === PYTH_REALM_ID.toBase58()
 
   const availableTokens = isPyth
     ? new PythBalance(ownVoterWeight.votingPower!).toString()
