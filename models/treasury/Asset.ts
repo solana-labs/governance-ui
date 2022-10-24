@@ -10,6 +10,7 @@ import { PublicKey } from '@solana/web3.js'
 export enum AssetType {
   Mint,
   NFTCollection,
+  Domain,
   Programs,
   RealmAuthority,
   Sol,
@@ -95,9 +96,18 @@ export interface Unknown {
   name: string
 }
 
+export interface Domain {
+  type: AssetType.Domain
+  address: string
+  icon?: JSX.Element
+  id: string
+  name: string
+}
+
 export type Asset =
   | Mint
   | NFTCollection
+  | Domain
   | Programs
   | RealmAuthority
   | Sol

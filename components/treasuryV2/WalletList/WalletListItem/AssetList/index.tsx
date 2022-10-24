@@ -10,6 +10,7 @@ import {
   RealmAuthority,
   Unknown,
   AssetType,
+  Domain,
 } from '@models/treasury/Asset'
 
 import TokenList from './TokenList'
@@ -24,6 +25,7 @@ import {
   isPrograms,
   isRealmAuthority,
   isUnknown,
+  isDomain,
 } from '../typeGuards'
 
 import { PublicKey } from '@solana/web3.js'
@@ -39,12 +41,13 @@ function isTokenLike(asset: Asset): asset is Token | Sol {
 
 function isOther(
   asset: Asset
-): asset is Mint | Programs | Unknown | RealmAuthority {
+): asset is Mint | Programs | Unknown | Domain | RealmAuthority {
   return (
     isMint(asset) ||
     isPrograms(asset) ||
     isUnknown(asset) ||
-    isRealmAuthority(asset)
+    isRealmAuthority(asset) ||
+    isDomain(asset)
   )
 }
 
@@ -136,7 +139,7 @@ export default function AssetList(props: Props) {
   const othersFromProps = useMemo(() => props.assets.filter(isOther), [])
 
   const [others, setOthers] = useState<
-    (Mint | Programs | Unknown | RealmAuthority)[]
+    (Mint | Programs | Unknown | Domain | RealmAuthority)[]
   >(othersFromProps)
 
   useEffect(() => {
@@ -166,7 +169,13 @@ export default function AssetList(props: Props) {
     }
 
     const getTokenData = async () => {
-      const newTokens: (Mint | Programs | Unknown | RealmAuthority)[] = []
+      const newTokens: (
+        | Mint
+        | Programs
+        | Unknown
+        | Domain
+        | RealmAuthority
+      )[] = []
       for await (const token of othersFromProps) {
         if (isMint(token)) {
           const newTokenData = await getTokenMetadata(token.address)
