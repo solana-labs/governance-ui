@@ -10,7 +10,7 @@ export const getDomains = async (
   accounts: AssetAccount[],
   connection: Connection
 ) => {
-  const domainsArr: any[] = []
+  const domainsArr: Domain[] = []
   for (const account of accounts) {
     const domains = await getAllDomains(connection, account.pubkey)
 
@@ -20,8 +20,8 @@ export const getDomains = async (
 
     for (const [index, domain] of domains.entries()) {
       domainsArr.push({
-        domainName: reverse[index],
-        domainPubKey: domain.toBase58(),
+        name: reverse[index],
+        address: domain.toBase58(),
         owner: account.pubkey.toBase58(),
       })
     }
