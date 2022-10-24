@@ -178,7 +178,7 @@ const VotePanel = () => {
       !ownVoterWeight.hasMinAmountToVote(
         voterTokenRecord.account.governingTokenMint
       )
-    ? 'You don’t have governance power to vote in this realm'
+    ? 'You don’t have governance power to vote in this dao'
     : ''
 
   const notVisibleStatesForNotConnectedWallet = [
