@@ -1086,6 +1086,20 @@
     "website": "https://blockgame.cz"
   },
   {
+    "symbol": "Squads",
+    "bannerImage": "https://drive.google.com/file/d/1Ddat-GiKhdgrh-gIFedI--WSqg_StNGB/view",
+    "displayName": "Squads",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "BzGL6wbCvBisQ7s1cNQvDGZwDRWwKK6bhrV93RYdetzJ",
+    "ogImage": "https://drive.google.com/file/d/1qlaGzsYkmSqVgJd1PFl2y9KFMaoPHLV8/view",
+    "shortDescription": "The multisig standard you were looking for on Solana",
+    "sortRank": 3,
+    "website": "https://squads.so/",
+    "twitter": "@squadsprotocol",
+    "discord": "https://discord.com/invite/YPXz64TrKs",
+    "github": "https://github.com/squads-dapp/squads-mpl"
+  }, 
+  {
     "symbol": "ALLIE",
     "displayName": "Allie Coin DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
