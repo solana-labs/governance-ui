@@ -149,6 +149,7 @@ export const createProposal = async (
   const splitToChunkByDefault = instructionsData.filter(
     (x) => x.chunkSplitByDefault
   ).length
+
   const chunkBys = instructionsData
     .filter((x) => x.chunkBy)
     .map((x) => x.chunkBy!)
@@ -230,7 +231,24 @@ export const createProposal = async (
     const signerChunks = Array(insertChunks.length)
     signerChunks.push(...chunks(signers, chunkBy))
     signerChunks.fill([])
-
+    const deduplicatedPrerequisiteInstructions = prerequisiteInstructions.filter(
+      (value, index, self) =>
+        index ===
+        self.findIndex(
+          (t) =>
+            t.data.toString() === value.data.toString() &&
+            t.keys.every((x) =>
+              value.keys.find(
+                (key) => key.pubkey.toBase58() === x.pubkey.toBase58()
+              )
+            )
+        )
+    )
+    console.log(
+      [deduplicatedPrerequisiteInstructions, instructions, ...insertChunks],
+      '@@@',
+      prerequisiteInstructionsSigners
+    )
     console.log(`Creating proposal using ${insertChunks.length} chunks`)
     await sendTransactionsV2({
       wallet,
@@ -238,15 +256,17 @@ export const createProposal = async (
       signersSet: [[...prerequisiteInstructionsSigners], [], ...signerChunks],
       showUiComponent: true,
       TransactionInstructions: [
-        prerequisiteInstructions,
+        deduplicatedPrerequisiteInstructions,
         instructions,
         ...insertChunks,
-      ].map((x) =>
-        transactionInstructionsToTypedInstructionsSets(
-          x,
-          SequenceType.Sequential
-        )
-      ),
+      ]
+        .filter((x) => x.length)
+        .map((x) =>
+          transactionInstructionsToTypedInstructionsSets(
+            x,
+            SequenceType.Sequential
+          )
+        ),
     })
   }
 

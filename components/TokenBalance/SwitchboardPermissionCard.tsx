@@ -43,7 +43,7 @@ const SwitchboardPermissionCard = () => {
     }
   }, [realm?.pubkey.toBase58(), wallet?.connected])
   return (
-    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
+    <>
       <div className="flex items-center justify-between mb-4">
         <h3 className="mb-0">Your Queue Voting Rights:</h3>
         <Link
@@ -80,7 +80,7 @@ const SwitchboardPermissionCard = () => {
       >
         Refresh Voting Rights
       </Button>
-    </div>
+    </>
   )
 }
 export default SwitchboardPermissionCard

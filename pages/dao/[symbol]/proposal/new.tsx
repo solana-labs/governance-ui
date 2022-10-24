@@ -279,6 +279,7 @@ const New = () => {
                 signers: instruction.signers,
                 shouldSplitIntoSeparateTxs:
                   instruction.shouldSplitIntoSeparateTxs,
+                chunkBy: instruction.chunkBy || 2,
               }
             })
           })
@@ -301,6 +302,7 @@ const New = () => {
             prerequisiteInstructionsSigners:
               x.prerequisiteInstructionsSigners || [],
             shouldSplitIntoSeparateTxs: x.shouldSplitIntoSeparateTxs,
+            chunkBy: x.chunkBy || 2,
           }
         }),
       ]
