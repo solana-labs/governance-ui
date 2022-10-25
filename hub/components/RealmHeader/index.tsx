@@ -8,10 +8,12 @@ import LogoLinkedin from '@carbon/icons-react/lib/LogoLinkedin';
 import ProgressBarRound from '@carbon/icons-react/lib/ProgressBarRound';
 // import UserFollow from '@carbon/icons-react/lib/UserFollow';
 import WalletIcon from '@carbon/icons-react/lib/Wallet';
+import Modal from '@components/Modal';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import type { PublicKey } from '@solana/web3.js';
-import { useMemo } from 'react';
+import { useState } from 'react';
 
+import JupiterApp from '../Hub/Jupiter';
 import * as Button from '@hub/components/controls/Button';
 import { HeaderTokenPrice } from '@hub/components/HeaderTokenPrice';
 import { Twitter } from '@hub/components/icons/Twitter';
@@ -48,121 +50,132 @@ interface Props extends BaseProps {
 }
 
 export function Content(props: Props) {
-  const jupiterDirectLink = useMemo(() => {
-    if (props.token?.mint) {
-      return `https://jup.ag/swap/USDC-${props.token?.mint.toString()}?inAmount=1`;
-    }
-    return 'https://jup.ag';
-  }, [props.token]);
+  const [showJupiter, setShowJupiter] = useState(false);
 
   return (
-    <header className={cx(props.className, 'bg-white')}>
-      <RealmBanner.Content bannerUrl={props.bannerUrl} realm={props.realm} />
-      <div className="max-w-7xl mx-auto px-8 relative w-full">
-        <RealmHeaderIcon.Content
-          className={cx('-translate-y-1/2', 'absolute', 'top-0')}
-          iconUrl={props.iconUrl}
-          realmName={props.name}
-        />
-        <div className="pl-48 pt-4 pb-8 pr-4 flex items-center justify-between">
-          <div className="-mx-2">
-            <div className="font-semibold text-neutral-900 text-3xl">
-              {props.name}
-            </div>
-          </div>
-          <div className="flex items-center">
-            {props.token && (
-              <div className="mr-8">
-                <HeaderTokenPrice
-                  mint={props.token.mint}
-                  symbol={props.token.symbol}
-                />
+    <>
+      {showJupiter && (
+        <Modal
+          sizeClassName="sm:max-w-md bg-[#F8FAFD] !p-0"
+          onClose={(e: any) => {
+            e.preventDefault();
+            setShowJupiter(false);
+          }}
+          isOpen={showJupiter}
+        >
+          <JupiterApp mint={props.token?.mint} />
+        </Modal>
+      )}
+
+      <header className={cx(props.className, 'bg-white')}>
+        <RealmBanner.Content bannerUrl={props.bannerUrl} realm={props.realm} />
+        <div className="max-w-7xl mx-auto px-8 relative w-full">
+          <RealmHeaderIcon.Content
+            className={cx('-translate-y-1/2', 'absolute', 'top-0')}
+            iconUrl={props.iconUrl}
+            realmName={props.name}
+          />
+          <div className="pl-48 pt-4 pb-8 pr-4 flex items-center justify-between">
+            <div className="-mx-2">
+              <div className="font-semibold text-neutral-900 text-3xl">
+                {props.name}
               </div>
-            )}
-            {/* <Button.Secondary className="w-36">
+            </div>
+            <div className="flex items-center">
+              {props.token && (
+                <div className="mr-8">
+                  <HeaderTokenPrice
+                    mint={props.token.mint}
+                    symbol={props.token.symbol}
+                  />
+                </div>
+              )}
+              {/* <Button.Secondary className="w-36">
               <UserFollow className="h-4 w-4 mr-1.5" />
               Follow
             </Button.Secondary> */}
-            {props.token && (
-              <a href={jupiterDirectLink} target="_blank">
-                <Button.Primary className="w-36 text-white ml-2">
+              {props.token && (
+                <Button.Primary
+                  className="w-36 text-white ml-2"
+                  onClick={() => setShowJupiter(true)}
+                >
                   <ProgressBarRound className="h-4 w-4 mr-1.5" />
                   Buy #{props.token.symbol}
                 </Button.Primary>
-              </a>
-            )}
+              )}
+            </div>
+          </div>
+          <div className="mt-6 flex items-center justify-between px-2">
+            <NavigationMenu.Root>
+              <NavigationMenu.List className="flex items-center space-x-3">
+                <Tab
+                  href={`/realm/${props.realmUrlId}`}
+                  icon={<ListDropdownIcon />}
+                  selected={props.selectedTab === 'feed'}
+                >
+                  feed
+                </Tab>
+                {!props.realm.equals(ECOSYSTEM_PAGE) && (
+                  <Tab
+                    href={`/realm/${props.realmUrlId}/hub`}
+                    icon={<AssemblyClusterIcon />}
+                    selected={props.selectedTab === 'hub'}
+                  >
+                    hub
+                  </Tab>
+                )}
+                {!props.realm.equals(ECOSYSTEM_PAGE) && (
+                  <Tab
+                    external
+                    href={`/dao/${props.realmUrlId}/treasury/v2`}
+                    icon={<WalletIcon />}
+                    selected={props.selectedTab === 'treasury'}
+                  >
+                    treasury
+                  </Tab>
+                )}
+              </NavigationMenu.List>
+            </NavigationMenu.Root>
+            <NavigationMenu.Root className="flex items-center">
+              <NavigationMenu.List className="flex items-center space-x-6">
+                {props.websiteUrl && (
+                  <ExternalLinkIcon href={props.websiteUrl}>
+                    <EarthIcon />
+                  </ExternalLinkIcon>
+                )}
+                {props.twitterHandle && (
+                  <ExternalLinkIcon
+                    href={`https://www.twitter.com/${props.twitterHandle}`}
+                  >
+                    <Twitter />
+                  </ExternalLinkIcon>
+                )}
+                {props.instagramUrl && (
+                  <ExternalLinkIcon href={props.instagramUrl}>
+                    <LogoInstagram />
+                  </ExternalLinkIcon>
+                )}
+                {props.discordUrl && (
+                  <ExternalLinkIcon href={props.discordUrl}>
+                    <LogoDiscord />
+                  </ExternalLinkIcon>
+                )}
+                {props.linkedInUrl && (
+                  <ExternalLinkIcon href={props.linkedInUrl}>
+                    <LogoLinkedin />
+                  </ExternalLinkIcon>
+                )}
+                {props.githubUrl && (
+                  <ExternalLinkIcon href={props.githubUrl}>
+                    <LogoGithub />
+                  </ExternalLinkIcon>
+                )}
+              </NavigationMenu.List>
+            </NavigationMenu.Root>
           </div>
         </div>
-        <div className="mt-6 flex items-center justify-between px-2">
-          <NavigationMenu.Root>
-            <NavigationMenu.List className="flex items-center space-x-3">
-              <Tab
-                href={`/realm/${props.realmUrlId}`}
-                icon={<ListDropdownIcon />}
-                selected={props.selectedTab === 'feed'}
-              >
-                feed
-              </Tab>
-              {!props.realm.equals(ECOSYSTEM_PAGE) && (
-                <Tab
-                  href={`/realm/${props.realmUrlId}/hub`}
-                  icon={<AssemblyClusterIcon />}
-                  selected={props.selectedTab === 'hub'}
-                >
-                  hub
-                </Tab>
-              )}
-              {!props.realm.equals(ECOSYSTEM_PAGE) && (
-                <Tab
-                  external
-                  href={`/dao/${props.realmUrlId}/treasury/v2`}
-                  icon={<WalletIcon />}
-                  selected={props.selectedTab === 'treasury'}
-                >
-                  treasury
-                </Tab>
-              )}
-            </NavigationMenu.List>
-          </NavigationMenu.Root>
-          <NavigationMenu.Root className="flex items-center">
-            <NavigationMenu.List className="flex items-center space-x-6">
-              {props.websiteUrl && (
-                <ExternalLinkIcon href={props.websiteUrl}>
-                  <EarthIcon />
-                </ExternalLinkIcon>
-              )}
-              {props.twitterHandle && (
-                <ExternalLinkIcon
-                  href={`https://www.twitter.com/${props.twitterHandle}`}
-                >
-                  <Twitter />
-                </ExternalLinkIcon>
-              )}
-              {props.instagramUrl && (
-                <ExternalLinkIcon href={props.instagramUrl}>
-                  <LogoInstagram />
-                </ExternalLinkIcon>
-              )}
-              {props.discordUrl && (
-                <ExternalLinkIcon href={props.discordUrl}>
-                  <LogoDiscord />
-                </ExternalLinkIcon>
-              )}
-              {props.linkedInUrl && (
-                <ExternalLinkIcon href={props.linkedInUrl}>
-                  <LogoLinkedin />
-                </ExternalLinkIcon>
-              )}
-              {props.githubUrl && (
-                <ExternalLinkIcon href={props.githubUrl}>
-                  <LogoGithub />
-                </ExternalLinkIcon>
-              )}
-            </NavigationMenu.List>
-          </NavigationMenu.Root>
-        </div>
-      </div>
-    </header>
+      </header>
+    </>
   );
 }
 
