@@ -1,10 +1,14 @@
 import useQueryContext from '@hooks/useQueryContext'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 
-import ConnectWalletButton from './ConnectWalletButton'
 import NotificationsSwitch from './NotificationsSwitch'
 import ThemeSwitch from './ThemeSwitch'
 
+const ConnectWalletButtonDynamic = dynamic(
+  async () => await import('./ConnectWalletButton'),
+  { ssr: false }
+)
 const NavBar = () => {
   const { fmtUrlWithCluster } = useQueryContext()
 
@@ -25,7 +29,7 @@ const NavBar = () => {
         <div className="flex items-center justify-end space-x-2 md:space-x-4">
           <ThemeSwitch />
           <NotificationsSwitch />
-          <ConnectWalletButton />
+          <ConnectWalletButtonDynamic />
         </div>
       </div>
     </div>
