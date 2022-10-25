@@ -1,9 +1,8 @@
 import { Connection, PublicKey } from '@solana/web3.js'
 
 import {
-  sendTransactionsV2,
+  sendTransactionsV3,
   SequenceType,
-  transactionInstructionsToTypedInstructionsSets,
   WalletSigner,
 } from 'utils/sendTransactions'
 import { chunks } from '@utils/helpers'
@@ -69,26 +68,30 @@ export default async function createMultisigWallet({
     const councilMembersSignersChunks = Array(councilMembersChunks.length).fill(
       []
     )
+    const signers = [
+      mintsSetupSigners,
+      ...councilMembersSignersChunks,
+      realmSigners,
+    ]
     console.log('CREATE MULTISIG WALLET: sending transactions')
-    const tx = await sendTransactionsV2({
+    const tx = await sendTransactionsV3({
       connection,
-      showUiComponent: true,
       wallet,
-      signersSet: [
-        mintsSetupSigners,
-        ...councilMembersSignersChunks,
-        realmSigners,
-      ],
-      TransactionInstructions: [
+      transactionInstructions: [
         mintsSetupInstructions,
         ...councilMembersChunks,
         realmInstructions,
-      ].map((x) =>
-        transactionInstructionsToTypedInstructionsSets(
-          x,
-          SequenceType.Sequential
-        )
-      ),
+      ].map((txBatch, batchIdx) => {
+        return {
+          instructionsSet: txBatch.map((tx, txIdx) => {
+            return {
+              transactionInstruction: tx,
+              signers: signers[batchIdx][txIdx] || [],
+            }
+          }),
+          sequenceType: SequenceType.Sequential,
+        }
+      }),
     })
 
     return {

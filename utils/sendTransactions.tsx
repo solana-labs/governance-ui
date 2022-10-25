@@ -429,6 +429,9 @@ export const sendTransactions = async (
   return signedTxns.length
 }
 
+/**
+ * @deprecated The method should not be used use sendTransactionsV3
+ */
 /////////////////////////////////////////
 export const sendTransactionsV2 = async ({
   connection,
