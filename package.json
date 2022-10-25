@@ -72,6 +72,7 @@
     "@radix-ui/react-toolbar": "^1.0.0",
     "@radix-ui/react-tooltip": "^1.0.0",
     "@sentry/nextjs": "^6.19.7",
+    "@solana-mobile/wallet-adapter-mobile": "^0.9.7",
     "@solana/buffer-layout": "^4.0.0",
     "@solana/governance-program-library": "npm:@civic/governance-program-library@0.16.9-beta.2",
     "@solana/spl-governance": "^0.3.15",
