@@ -17,6 +17,10 @@ import {
   showTransactionError,
   showTransactionsProcessUi,
 } from './transactionsLoader'
+import {
+  sendSignAndConfirmTransactions,
+  sendSignAndConfirmTransactionsProps,
+} from '@blockworks-foundation/mangolana/lib/transactions'
 
 interface TransactionInstructionWithType {
   instructionsSet: TransactionInstruction[]
@@ -624,4 +628,69 @@ export const transactionInstructionsToTypedInstructionsSets = (
     instructionsSet: instructionsSet,
     sequenceType: type,
   }
+}
+
+export const sendTransactionsV3 = ({
+  connection,
+  wallet,
+  transactionInstructions,
+  timeoutStrategy,
+  callbacks,
+  config,
+}: sendSignAndConfirmTransactionsProps) => {
+  const callbacksWithUiComponent = {
+    afterFirstBatchSign: (signedTxnsCount) => {
+      if (callbacks?.afterFirstBatchSign) {
+        callbacks?.afterFirstBatchSign(signedTxnsCount)
+      }
+      showTransactionsProcessUi(signedTxnsCount)
+    },
+    afterAllTxConfirmed: () => {
+      if (callbacks?.afterAllTxConfirmed) {
+        callbacks?.afterAllTxConfirmed()
+      }
+      closeTransactionProcessUi()
+    },
+    afterEveryTxConfirmation: () => {
+      if (callbacks?.afterEveryTxConfirmation) {
+        callbacks?.afterEveryTxConfirmation()
+      }
+      incrementProcessedTransactions()
+    },
+    onError: (e, notProcessedTransactions, originalProps) => {
+      if (callbacks?.onError) {
+        callbacks?.onError(e, notProcessedTransactions, originalProps)
+      }
+      showTransactionError(
+        () =>
+          sendTransactionsV3({
+            ...originalProps,
+            transactionInstructions: notProcessedTransactions,
+          }),
+        e.error ? e.error : `${e}`,
+        e.txid
+      )
+    },
+  }
+
+  const cfg = {
+    maxTxesInBatch:
+      transactionInstructions.filter(
+        (x) => x.sequenceType === SequenceType.Sequential
+      ).length > 0
+        ? 20
+        : 30,
+    autoRetry: false,
+    maxRetries: 5,
+    retried: 0,
+    ...config,
+  }
+  return sendSignAndConfirmTransactions({
+    connection,
+    wallet,
+    transactionInstructions,
+    timeoutStrategy,
+    callbacks: callbacksWithUiComponent,
+    config: cfg,
+  })
 }
