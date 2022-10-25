@@ -238,6 +238,7 @@ function RealmsGrid({
                   ) && (
                     <div
                       draggable={editing}
+                      // eslint-disable-next-line react/no-unknown-property
                       unselectable="on"
                       onMouseDown={
                         editing
