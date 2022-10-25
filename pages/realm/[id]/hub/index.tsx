@@ -8,23 +8,29 @@ import devnetList from 'public/realms/devnet.json'
 
 import { Hub } from '@hub/components/Hub'
 import { ECOSYSTEM_PAGE } from '@hub/lib/constants'
+import useWalletStore from 'stores/useWalletStore'
 
 export default function RealmAbout() {
   const router = useRouter()
+  const { connection } = useWalletStore()
   const { id } = router.query
 
   let publicKey: PublicKey | null = null
 
   if (typeof id === 'string') {
-    for (const item of mainnetList) {
-      if (item.symbol.toLowerCase() === id.toLowerCase()) {
-        publicKey = new PublicKey(item.realmId)
+    if (connection.cluster === 'mainnet') {
+      for (const item of mainnetList) {
+        if (item.symbol.toLowerCase() === id.toLowerCase()) {
+          publicKey = new PublicKey(item.realmId)
+        }
       }
     }
 
-    for (const item of devnetList) {
-      if (item.symbol.toLowerCase() === id.toLowerCase()) {
-        publicKey = new PublicKey(item.realmId)
+    if (connection.cluster === 'devnet') {
+      for (const item of devnetList) {
+        if (item.symbol.toLowerCase() === id.toLowerCase()) {
+          publicKey = new PublicKey(item.realmId)
+        }
       }
     }
 

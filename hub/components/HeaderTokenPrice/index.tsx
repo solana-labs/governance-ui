@@ -20,15 +20,20 @@ function useTokenPrice(symbol: string, mint: PublicKey) {
     if (typeof window !== 'undefined') {
       setResult(RE.pending());
 
-      setTimeout(() => {
-        setResult(
-          RE.ok({
-            direction: 'up',
-            percentChange: 59.8,
-            price: 0.345132,
-          }),
-        );
-      }, 1000);
+      const mintAddress = mint.toString();
+      fetch(`https://price.jup.ag/v3/price?ids=${mintAddress}`)
+        .then((resp) => resp.json())
+        .then((result) => {
+          const price = result.data[mintAddress].price || 0;
+
+          setResult(
+            RE.ok({
+              direction: 'up',
+              percentChange: 0,
+              price,
+            }),
+          );
+        });
     }
   }, [symbol]);
 
@@ -81,25 +86,30 @@ export function HeaderTokenPrice(props: Props) {
             <div className="text-xs text-neutral-600">
               #{props.symbol} Price
             </div>
-            <CautionIcon
-              className={cx(
-                'h-2',
-                'mx-[1px]',
-                'w-2',
-                direction === 'up' && 'fill-emerald-500',
-                direction === 'down' && 'fill-rose-500',
-                direction === 'down' && 'rotate-180',
-              )}
-            />
-            <div
-              className={cx(
-                'text-xs',
-                direction === 'up' && 'text-emerald-500',
-                direction === 'down' && 'text-rose-500',
-              )}
-            >
-              {percentChange}%
-            </div>
+            {percentChange !== 0 ? (
+              <CautionIcon
+                className={cx(
+                  'h-2',
+                  'mx-[1px]',
+                  'w-2',
+                  direction === 'up' && 'fill-emerald-500',
+                  direction === 'down' && 'fill-rose-500',
+                  direction === 'down' && 'rotate-180',
+                )}
+              />
+            ) : null}
+
+            {percentChange !== 0 ? (
+              <div
+                className={cx(
+                  'text-xs',
+                  direction === 'up' && 'text-emerald-500',
+                  direction === 'down' && 'text-rose-500',
+                )}
+              >
+                {percentChange}%
+              </div>
+            ) : null}
           </div>
           <div className="text-lg text-neutral-900">${price}</div>
         </div>
