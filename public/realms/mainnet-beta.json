@@ -49,8 +49,8 @@
     "linkedin": "https://www.linkedin.com/in/pablo-f-acebedo/",
     "instagram": "https://www.instagram.com/pablofacebedo/",
     "github": "https://github.com/pablofelipe01"
-   
-    
+
+
   },
   {
     "symbol": "GRAPE",
@@ -1107,7 +1107,7 @@
     "twitter": "@squadsprotocol",
     "discord": "https://discord.com/invite/YPXz64TrKs",
     "github": "https://github.com/squads-dapp/squads-mpl"
-  }, 
+  },
   {
     "symbol": "ALLIE",
     "displayName": "Allie Coin DAO",
@@ -1117,5 +1117,17 @@
     "ogImage": "/realms/Allie Coin DAO/Allie Coin Logo.png",
     "website": "https://alliecoin.io",
     "twitter": "@allie_coin"
+  },
+  {
+    "symbol": "RCH",
+    "bannerImage": "/realms/RCH/banner.png",
+    "displayName": "Realms Community Hub",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e",
+    "ogImage": "/realms/RCH/icon.png",
+    "shortDescription": "The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.",
+    "sortRank": 3,
+    "twitter": "@Realms_DAOs",
+    "github": "https://github.com/solana-labs/governance-ui"
   }
 ]
