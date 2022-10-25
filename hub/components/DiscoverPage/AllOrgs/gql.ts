@@ -18,6 +18,7 @@ export const getRealmsList = gql`
           info {
             heading
           }
+          twitterFollowerCount
         }
       }
     }
@@ -38,6 +39,7 @@ export const getRealmsListResp = IT.type({
           info: IT.type({
             heading: IT.union([IT.null, RichTextDocument]),
           }),
+          twitterFollowerCount: IT.number,
         }),
       }),
     }),

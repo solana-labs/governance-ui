@@ -34,7 +34,6 @@ export function AllOrgs(props: Props) {
       () => [],
       () => [],
       ({ realmDropdownList }) => {
-        console.log(Array.from(ALREADY_DISPLAYED.values()));
         return realmDropdownList
           .map((item) => ({
             bannerImgSrc: item.realm.bannerImageUrl,
@@ -42,6 +41,7 @@ export function AllOrgs(props: Props) {
             iconImgSrc: item.iconUrl,
             name: item.name,
             publicKey: item.publicKey,
+            twitterFollowerCount: item.realm.hub.twitterFollowerCount,
             urlId: item.urlId,
           }))
           .filter((item) => {
@@ -50,6 +50,29 @@ export function AllOrgs(props: Props) {
             }
 
             return true;
+          })
+          .sort((a, b) => {
+            let aScore = 0;
+            let bScore = 0;
+
+            if (a.description) {
+              aScore += 100000;
+            }
+
+            if (b.description) {
+              bScore += 100000;
+            }
+
+            aScore += a.twitterFollowerCount;
+            bScore += b.twitterFollowerCount;
+
+            if (aScore === bScore) {
+              return a.name
+                .toLocaleLowerCase()
+                .localeCompare(b.name.toLocaleLowerCase());
+            } else {
+              return bScore - aScore;
+            }
           });
       },
     ),
@@ -64,7 +87,7 @@ export function AllOrgs(props: Props) {
         </div>
       </div>
       <div className="text-neutral-500">
-        All the project and organizations on Solana
+        All the projects and organizations on Solana
       </div>
       <div
         className={cx('grid', 'grid-cols-4', 'mt-6', 'gap-3', 'items-center')}

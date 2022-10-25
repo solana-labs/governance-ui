@@ -46,6 +46,7 @@ export function Popular(props: Props) {
           'overflow-x-auto',
           'overflow-y-hidden',
           'pt-6',
+          'pr-10',
           'snap-mandatory',
           'snap-x',
           'w-full',

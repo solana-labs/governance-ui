@@ -29,6 +29,7 @@ interface Props {
   iconImgSrc: null | string;
   name: string;
   publicKey: PublicKey;
+  twitterFollowerCount?: null | number;
   urlId: string;
 }
 
@@ -36,6 +37,7 @@ export function SmallCard(props: Props) {
   const [result] = useQuery(gql.getRealmResp, {
     query: gql.getRealm,
     variables: { realm: props.publicKey },
+    pause: typeof props.twitterFollowerCount === 'number',
   });
 
   return (
@@ -64,21 +66,32 @@ export function SmallCard(props: Props) {
             <div className="font-bold text-neutral-900 truncate flex-shrink">
               {props.name}
             </div>
-            {pipe(
-              result,
-              RE.match(
-                () => null,
-                () => null,
-                ({ hub }) =>
-                  hub.twitterFollowerCount ? (
-                    <div className="flex items-center">
-                      <TwitterIcon className="fill-sky-500 h-3 w-3" />
-                      <div className="text-xs text-neutral-700">
-                        {abbreviateNumber(hub.twitterFollowerCount)}
+            {typeof props.twitterFollowerCount === 'number' ? (
+              !!props.twitterFollowerCount ? (
+                <div className="flex items-center">
+                  <TwitterIcon className="fill-sky-500 h-3 w-3" />
+                  <div className="text-xs text-neutral-700">
+                    {abbreviateNumber(props.twitterFollowerCount)}
+                  </div>
+                </div>
+              ) : null
+            ) : (
+              pipe(
+                result,
+                RE.match(
+                  () => null,
+                  () => null,
+                  ({ hub }) =>
+                    hub.twitterFollowerCount ? (
+                      <div className="flex items-center">
+                        <TwitterIcon className="fill-sky-500 h-3 w-3" />
+                        <div className="text-xs text-neutral-700">
+                          {abbreviateNumber(hub.twitterFollowerCount)}
+                        </div>
                       </div>
-                    </div>
-                  ) : null,
-              ),
+                    ) : null,
+                ),
+              )
             )}
           </header>
           {props.category && (
