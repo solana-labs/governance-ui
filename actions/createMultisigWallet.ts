@@ -73,25 +73,27 @@ export default async function createMultisigWallet({
       ...councilMembersSignersChunks,
       realmSigners,
     ]
+    const txes = [
+      mintsSetupInstructions,
+      ...councilMembersChunks,
+      realmInstructions,
+    ].map((txBatch, batchIdx) => {
+      return {
+        instructionsSet: txBatch.map((tx, txIdx) => {
+          return {
+            transactionInstruction: tx,
+            signers: signers[batchIdx][txIdx] ? [signers[batchIdx][txIdx]] : [],
+          }
+        }),
+        sequenceType: SequenceType.Sequential,
+      }
+    })
+
     console.log('CREATE MULTISIG WALLET: sending transactions')
     const tx = await sendTransactionsV3({
       connection,
       wallet,
-      transactionInstructions: [
-        mintsSetupInstructions,
-        ...councilMembersChunks,
-        realmInstructions,
-      ].map((txBatch, batchIdx) => {
-        return {
-          instructionsSet: txBatch.map((tx, txIdx) => {
-            return {
-              transactionInstruction: tx,
-              signers: signers[batchIdx][txIdx] || [],
-            }
-          }),
-          sequenceType: SequenceType.Sequential,
-        }
-      }),
+      transactionInstructions: txes,
     })
 
     return {

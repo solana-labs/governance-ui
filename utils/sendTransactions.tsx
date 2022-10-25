@@ -670,7 +670,7 @@ export const sendTransactionsV3 = ({
             ...originalProps,
             transactionInstructions: notProcessedTransactions,
           }),
-        e.error ? e.error : `${e}`,
+        getErrorMsg(e),
         e.txid
       )
     },
@@ -686,6 +686,7 @@ export const sendTransactionsV3 = ({
     autoRetry: false,
     maxRetries: 5,
     retried: 0,
+    logFlowInfo: true,
     ...config,
   }
   return sendSignAndConfirmTransactions({
@@ -696,4 +697,25 @@ export const sendTransactionsV3 = ({
     callbacks: callbacksWithUiComponent,
     config: cfg,
   })
+}
+
+const getErrorMsg = (e) => {
+  if (e.error) {
+    return e.error
+  }
+  if (e.message) {
+    return e.message
+  }
+  if (typeof e === 'object') {
+    return tryStringify(e)
+  }
+  return `${e}`
+}
+
+const tryStringify = (obj) => {
+  try {
+    return JSON.stringify(obj)
+  } catch {
+    return null
+  }
 }
