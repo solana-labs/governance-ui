@@ -194,5 +194,152 @@
       "title": "Docs",
       "url": "https://docs.squads.so/squads-v3-docs/"
     }
+  },
+  "9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e": {
+    "symbol": "Realms",
+    "heading": "The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Realms is the hub for community activity in web3. It's a space where users can engage with the projects and teams they care about, perform meaningful web3 actions, track their assets, and participate in the workstreams they’re interested in."
+        ]
+      },
+      {
+        "content": [
+          "The fundamental building block for this vision is the project. Web3 is made up of the projects that are being built within it, and by extension, a hub for web3 needs to comprise these projects.  Realms is built to help the casual crypto follower learn and contribute to projects, consume the conversations on the biggest topics of the day, and make more informed decisions related to participating in organizations."
+        ]
+      },
+      {
+        "content": [
+          "For on-chain organizations, Realms enables DAO creation, voting, and treasury management, all in one fully on-chain product. Whether managing a multisig or a billion dollar protocol, Realms has the tools to enable your community to reach its full potential."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.realms.today/"
+    },
+    "gallery": [
+      {
+        "caption": "The Realms team at the inaugural AthensDAO Conference",
+        "url": "https://pbs.twimg.com/media/FT_4VAqXsAQCFBp?format=jpg&name=large",
+        "height": 600,
+        "width": 450
+      },
+      {
+        "caption": "Realms making a cameo in the Solana Summer Camp Hackathon trailer",
+        "url": "https://pbs.twimg.com/media/FXbJmCzWQAA41TF?format=jpg&name=large",
+        "height": 288,
+        "width": 600
+      },
+      {
+        "caption": "Sebastian talking about the future of DAOs on Solana",
+        "url": "https://pbs.twimg.com/media/Fbo8AAWX0AIpZvJ?format=jpg&name=4096x4096",
+        "height": 328,
+        "width": 600
+      },
+      {
+        "caption": "The Realms team gathering in Paris, July 2022",
+        "url": "https://lh3.googleusercontent.com/drive-viewer/AJc5JmS0E2aMJRNlmo1wHDqvhVyvYbbRg94B-ljQKX4RaSOMiJubLbeEaTbquDiytRXgTQBFoWgbEfY=w3456-h588",
+        "height": 450,
+        "width": 600
+      }
+    ],
+    "resources": [
+      {
+        "title": "The Realms Roadmap, with Product Manager Emon Motamedi",
+        "content": [
+          "Emon Motamedi from Solana Labs presents the roadmap of Realms & SPL Governance. The goal is to use DAOs to drive activity to Solana & that can be done through awareness and enhancement of adoption within Web3 as well as from Web2."
+        ],
+        "url": "https://youtu.be/YGYSrmYhFQ0"
+      },
+      {
+        "title": "Realms.Today - Seamless DAO Tools for Solana communities!",
+        "content": [
+          "Realms.Today is the top tier Community Token DAO, Multi-Signature Wallet Management and NFT Community DAO creation Tool. It will help you along the way and is entirely customizable to suit all your DAO needs."
+        ],
+        "url": "https://www.solananews.xyz/realms-today/"
+      },
+      {
+        "title": "Where DAOs Excel — And Where They Must Improve",
+        "content": [
+          "DAOs, DAOs, DAOs. Civic Identity is excited about where DAOs are headed, and particularly excited about our integration with Realms."
+        ],
+        "url": "https://twitter.com/civickey/status/1570164818191208448?s=20&t=dKgTwPIdQN8zKfK9x2bikQ"
+      }
+    ],
+    "roadmap": {
+      "items": [
+        {
+          "title": "Launch Realms",
+          "date": "2021-11-01T15:42:21.109Z",
+          "status": "completed",
+          "resource": {
+            "title": "SPL Governance launches with Realms.today",
+            "url": "https://twitter.com/Sebastian_Bor/status/1459241354958098449?s=20&t=rmk-mpoG0WnVAoEoo_Cc6g"
+          }
+        },
+        {
+          "title": "Launch Wallets & Assets View",
+          "date": "2022-08-12T15:45:01.159Z",
+          "status": "completed",
+          "resource": {
+            "title": "Introducing DAO wallets, making it simpler for DAOs to own and manage any type of digital asset",
+            "url": "https://twitter.com/Realms_DAOs/status/1558148559513452546"
+          }
+        },
+        {
+          "title": "Launch SPL Gov V3 Contract",
+          "date": "2022-09-08T15:46:07.387Z",
+          "status": "completed",
+          "resource": null
+        },
+        {
+          "title": "Launch Organization Hub & Feed",
+          "date": "2023-11-04T16:47:34.797Z",
+          "status": "inprogress",
+          "resource": null
+        },
+        {
+          "title": "Launch Discovery Experience",
+          "date": "2023-11-04T16:47:34.797Z",
+          "status": "inprogress",
+          "resource": null
+        },
+        {
+          "title": "Launch Personal Feed & Org Following",
+          "date": "2022-12-31T16:47:34.797Z",
+          "status": "upcoming",
+          "resource": null
+        }
+      ]
+    },
+    "faq": [
+      {
+        "question": "How do I create a hub for my organization?",
+        "answer": [
+          "You may fill out our form which outlines the critical information displayed within Realms hubs. You can start here: https://forms.gle/g4kfwtgz5RK9NsLh7"
+        ]
+      },
+      {
+        "question": "What types of content should I post on my organization’s feed?",
+        "answer": [
+          "Your organization’s feed belongs to you and the Realms community. Once connected via Solana, anyone may post relevant team updates, interesting insights, explainers, and other pertinent content. You may also add to the conversation by threading your comments and upvoting posts and comments."
+        ]
+      },
+      {
+        "question": "Who do I reach out to with questions?",
+        "answer": [
+          "You can post a question to the Realms Community Hub and start a conversation there. You may also email Emon, our project manager at emon.motamedi@solana.com."
+        ]
+      },
+      {
+        "question": "What types of projects should be made into hubs?",
+        "answer": [
+          "The Solana ecosystem is brimming with activity and groundbreaking innovation, and we encourage all projects building on Solana to create hubs to contribute to and grow their communities."
+        ]
+      }
+    ]
   }
 }
