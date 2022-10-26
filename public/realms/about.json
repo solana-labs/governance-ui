@@ -96,58 +96,6 @@
         "twitter": "@meta_hess"
       }
     ],
-    "roadmap": {
-      "description": [
-        "Our roadmap is dynamic, and we try to release features and fixes as they are ready but this list will give you a general sense of where we are heading with Metaplex."
-      ],
-      "items": [
-        {
-          "title": "Launch Metaplex",
-          "date": "2021-08-30T15:42:21.109Z",
-          "status": "completed",
-          "resource": {
-            "title": "Solana Metaplex Studios Launches to Grow NFTs Outside of Ethereum",
-            "url": "https://decrypt.co/82170/solana-launches-metaplex-studios-grow-nfts-outside-ethereum"
-          }
-        },
-        {
-          "title": "Launch $MPLX token",
-          "date": "2022-09-30T15:45:01.159Z",
-          "status": "completed",
-          "resource": {
-            "title": "The Metaplex Foundation Announces the Metaplex Token (MPLX)",
-            "url": "https://www.metaplex.com/posts/mplx"
-          }
-        },
-        {
-          "title": "Launch Creator Studio",
-          "date": "2022-10-30T15:46:07.387Z",
-          "status": "completed",
-          "resource": {
-            "title": "Early Access: Going No-Code with Metaplex Creator Studio",
-            "url": "https://www.metaplex.com/posts/announcing-metaplex-creator-studio"
-          }
-        },
-        {
-          "title": "Launch Candy Machine, v3",
-          "date": "2023-01-28T16:47:34.797Z",
-          "status": "delayed",
-          "resource": null
-        },
-        {
-          "title": "Support for web3 games",
-          "date": "2023-03-28T16:47:34.797Z",
-          "status": "inprogress",
-          "resource": null
-        },
-        {
-          "title": "Launch Whitepaper NFT",
-          "date": "2023-07-28T16:47:34.797Z",
-          "status": "upcoming",
-          "resource": null
-        }
-      ]
-    },
     "faq": [
       {
         "question": "What is Metaplex?",
