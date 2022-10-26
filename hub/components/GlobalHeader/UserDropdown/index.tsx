@@ -1,6 +1,7 @@
 import { pipe } from 'fp-ts/function';
 
 import { useQuery } from '@hub/hooks/useQuery';
+import cx from '@hub/lib/cx';
 import * as RE from '@hub/types/Result';
 
 import { Connect } from './Connect';
@@ -22,7 +23,11 @@ export function UserDropdown(props: Props) {
         <Connect className={props.className} onConnected={() => refetch({})} />
       ),
       () => <Loading className={props.className} />,
-      ({ me }) => <User className={props.className} user={me} />,
+      ({ me }) => (
+        <div className={cx(props.className, 'flex', 'items-center')}>
+          <User user={me} />
+        </div>
+      ),
     ),
   );
 }

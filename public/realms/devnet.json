@@ -164,9 +164,9 @@
   },
   {
     "symbol": "PYTH",
-    "displayName": "Pyth DAO",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "44xGQELUXXD1TiLEMc73RBnCxeW8XKw27LyJNpt2G8bF",
+    "displayName": "Pyth Network",
+    "programId": "GovFUVGZWWwyoLq8rhnoVWknRFkhDSbQiSoREJ5LiZCV",
+    "realmId": "A1f6LNEymJSSJsEVCL1FSgtS1jA9dNTC4ni8SkmbwQjG",
     "ogImage": "/realms/PYTH/img/pyth.svg",
     "website": "https://pyth.network/",
     "twitter": "@PythNetwork"
@@ -196,5 +196,14 @@
     "website": "https://www.meanfi.com",
     "twitter": "@meanfinance",
     "ogImage": "/realms/MEAN/logo.svg"
+  },
+  {
+    "symbol": "SAP",
+    "displayName": "SAP DAO",
+    "programId": "MGovW65tDhMMcpEmsegpsdgvzb6zUwGsNjhXFxRAnjd",
+    "realmId": "7HHEADbEF77yAtJ58CYhy93SbcAeGjtixQ7gsHxuamyU",
+    "website": "",
+    "twitter": "",
+    "ogImage": "/realms/SAPDAO/img//SAPDAO.png"
   }
 ]

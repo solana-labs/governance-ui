@@ -25,8 +25,8 @@ const POSSIBLE_COLORS = [
 
 const computedColors = new Map<string, string>();
 
-function pickDefaultBg(publicKey: PublicKey) {
-  const pk = publicKey.toBase58();
+export function pickDefaultBg(id: PublicKey | string) {
+  const pk = typeof id === 'string' ? id : id.toBase58();
 
   if (computedColors.has(pk)) {
     return computedColors.get(pk);
