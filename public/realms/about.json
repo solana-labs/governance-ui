@@ -222,6 +222,12 @@
     },
     "gallery": [
       {
+        "caption": "Discussing the Realms Roadmap",
+        "url": "https://youtu.be/YGYSrmYhFQ0",
+        "height": 600,
+        "width": 338
+      },
+      {
         "caption": "The Realms team at the inaugural AthensDAO Conference",
         "url": "https://pbs.twimg.com/media/FT_4VAqXsAQCFBp?format=jpg&name=large",
         "height": 600,
@@ -269,6 +275,44 @@
         "url": "https://twitter.com/civickey/status/1570164818191208448?s=20&t=dKgTwPIdQN8zKfK9x2bikQ"
       }
     ],
+        "team": [
+      {
+        "name": "Sebastian Bor",
+        "avatar": "https://pbs.twimg.com/profile_images/1427584976221089792/wzCRED_r_400x400.jpg",
+        "description": [
+          "Sebastian is responsible for developing Solana’s governance program as well as the backend infrastructure for Realms. Prior to Solana Labs, he spent his career in the finance and gaming industries."
+        ],
+        "role": "Contract Engineering",
+        "twitter": "@Sebastian_Bor"
+      },
+                {
+        "name": "Emon Motamedi",
+        "avatar": "https://pbs.twimg.com/profile_images/1146682718849159168/v7O-oZAf_400x400.jpg",
+        "description": [
+          "Emon leads the product development for the Realms team, overseeing its vision as well as its day to day needs. Before joining Solana Labs, Emon was a product manager at Reddit and Olympus DAO."
+        ],
+        "role": "Product Management",
+        "twitter": "@EmonMotamedi"
+      },
+                          {
+        "name": "Niranjan Ramadas",
+        "avatar": "https://drive.google.com/uc?id=12ASbqu9gHLRnlIN7itZnorJZDBFYBqFv",
+        "description": [
+          "Niranjan serves as the front end engineer on the Realms team. Prior to Solana Labs, he worked at Reddit and co-founded a startup building software for remote teams."
+        ],
+        "role": "Front End Engineering",
+        "twitter": "@asdf"
+      },
+                          {
+        "name": "Dan Madden",
+        "avatar": "https://lh3.googleusercontent.com/fife/AAbDypDM_C4DZ8cfEwJwR4TIYv8vwqvswITfNdFrHKwwTtRkpOt0Jka2tH4-as80lBFu_jeAIHwgspUGhTvJXLva_zoXU-inc6slPlY_vO8s7jDDH7jNtC7QLHn4B5ylgjAzIDvQXIzoi20b-saDJCjHjnDQzKG8DDc86qIFpSSNr8GavInf7Cp02iTTcrUgXQgvDMhJvL9rHRkkgGf1dcmk4V7Xf_ZPHn5TJqAH87c8ldPLdRX-8NHUvre6igL8o2HC1wjObAVU2nJczcbTOwwgHZCJxDP5zA8McSd_Nqv2USxRr5iR7C4GCRGPsI6lzkCXNCdpuZQwWJ7LyDKvTk6REIzZA71a9-ylblOEhoYZ0O-KtRm322hee2xxHi9GYisjr5-oZe1n2Z1iikVhq7uH59nW4xPTSoRgYKLU8V1Yei4tFR2CEEkMw_3lwlBlpc1NBurBTItmWKE0KAY3cJV3QQEj2OYqGEYLNDvOANuixocngD7TQFwVrmEU_BBBdR0ViPwpw00N58FF5WDu_S3sF-oLVl4z1g6KVkpxWvISupWRx5CqTG7U3eFIY0LB5ADFEAt7Mc8n2ZZzNpBXOHBb2255eTKwAxrHc0QglkRoxSuPZffEOJQRCdzJl3qByTQ0IQkI9YWbDgXT2Y739jjCKoFO5aO65H-0U8RARIIgTvTYvCbeKpWyedoNQld_bTyQVjW1jLyLLyKkraCPyCZKOAo63yWi9KuSOsuy2nMKwdQbcXQsMJywVDTiAdKOzFgkhrilLmSZh3VC_iCHjMCnjqFqcO8dUDcNC47cDc-viP3n5twhCdTey6MKrXnB7jqVky-XwbKDBivOgOV5R8xMB7FJkcP3mEXqkjLwRILKr39k1vWqXHfzE-i-b-x-aCO76iEwNEcFhJp_Vj0tEcaLCWfBlVxcPGq-i3ug6plqxDlmLoShHavS0wM1A-yTvwgORBDr7aW64uHzODXDejT0Pvzon1JFPGkhAEtD65wOgL1klsH5QAk7wO645I0jYw5pBshMjmD-wUu_04Vn4jOb4Y2QN9wuLUMslATmINvQ7mwdq3XULpoqJTSDC1DhEjRgxf58AgC2S4uIGkSW7ONqBtCDVcFQbWtVNLylSljHavV3P08qTb4as9H--94e-V-aMzwEAyup-KJbONWkrKV7Ru5pftlbHtSZ305_5xQLzYJ8uiW_uEQzf4-rsZdEwQPiwsJ6YHczcS95xI4W3F3JBIGSo0QAWBkWVnS1dTTxrB91y4mNTPNpPtXZnhpMtC1Gx794S8m3Y5kp8tXC4iX_N5iXUO2CxDk36uyijAmXk29OhAueyk760UwpgJgiFkZKGgLE8bOqyABCEms5ufk-sweN9RQyRGm8HXWJPtespRDs811R-owGohcdTnPGXqI--SxZvQQT7pwvUa79MqCnsoOY-nNxuZBjT0QElPIIMQvyLJ8Gy72-H1sPCIvTcs85WbiPkA9jB83s3Y6Py1Jzjz4rmK0jxXhk7TOy9dadlB-eKyvkSulRxm6RnWHR5p06_N-4GcUIHI-qKRWGewywgKricp-F0DNGdbU=w600-k-nu",
+        "description": [
+          "Dan is responsible for the design direction and implementation of Realms. Prior to Solana Labs, he led the design discipline at several product development agencies."
+        ],
+        "role": "Design",
+        "twitter": "@maddendan"
+      }
+    ],
     "roadmap": {
       "items": [
         {
@@ -285,7 +329,7 @@
           "date": "2022-08-12T15:45:01.159Z",
           "status": "completed",
           "resource": {
-            "title": "Introducing DAO wallets, making it simpler for DAOs to own and manage any type of digital asset",
+            "title": "DAO wallets make it simple for DAOs to own any digital asset",
             "url": "https://twitter.com/Realms_DAOs/status/1558148559513452546"
           }
         },
@@ -297,13 +341,13 @@
         },
         {
           "title": "Launch Organization Hub & Feed",
-          "date": "2023-11-04T16:47:34.797Z",
+          "date": "2022-11-04T16:47:34.797Z",
           "status": "inprogress",
           "resource": null
         },
         {
           "title": "Launch Discovery Experience",
-          "date": "2023-11-04T16:47:34.797Z",
+          "date": "2022-11-04T16:47:34.797Z",
           "status": "inprogress",
           "resource": null
         },
