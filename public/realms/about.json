@@ -172,8 +172,8 @@
       {
         "caption": "Discussing the Realms Roadmap",
         "url": "https://www.youtube.com/watch?v=YGYSrmYhFQ0",
-        "height": 600,
-        "width": 338
+        "height": 338,
+        "width": 600
       },
       {
         "caption": "The Realms team at the inaugural AthensDAO Conference",
@@ -246,14 +246,14 @@
         "name": "Niranjan Ramadas",
         "avatar": "https://drive.google.com/uc?id=12ASbqu9gHLRnlIN7itZnorJZDBFYBqFv",
         "description": [
-          "Niranjan serves as the front end and api engineer on the Realms team. Prior to Solana Labs, he worked at Reddit and co-founded a startup building software for remote teams."
+          "Niranjan serves as the frontend and api engineer on the Realms team. Prior to Solana Labs, he worked at Reddit and co-founded a startup building software for remote teams."
         ],
         "role": "Frontend Development",
-        "twitter": "@asdf"
+        "twitter": "@RamadasNiranjan"
       },
-                          {
+      {
         "name": "Dan Madden",
-        "avatar": "https://lh3.googleusercontent.com/fife/AAbDypDM_C4DZ8cfEwJwR4TIYv8vwqvswITfNdFrHKwwTtRkpOt0Jka2tH4-as80lBFu_jeAIHwgspUGhTvJXLva_zoXU-inc6slPlY_vO8s7jDDH7jNtC7QLHn4B5ylgjAzIDvQXIzoi20b-saDJCjHjnDQzKG8DDc86qIFpSSNr8GavInf7Cp02iTTcrUgXQgvDMhJvL9rHRkkgGf1dcmk4V7Xf_ZPHn5TJqAH87c8ldPLdRX-8NHUvre6igL8o2HC1wjObAVU2nJczcbTOwwgHZCJxDP5zA8McSd_Nqv2USxRr5iR7C4GCRGPsI6lzkCXNCdpuZQwWJ7LyDKvTk6REIzZA71a9-ylblOEhoYZ0O-KtRm322hee2xxHi9GYisjr5-oZe1n2Z1iikVhq7uH59nW4xPTSoRgYKLU8V1Yei4tFR2CEEkMw_3lwlBlpc1NBurBTItmWKE0KAY3cJV3QQEj2OYqGEYLNDvOANuixocngD7TQFwVrmEU_BBBdR0ViPwpw00N58FF5WDu_S3sF-oLVl4z1g6KVkpxWvISupWRx5CqTG7U3eFIY0LB5ADFEAt7Mc8n2ZZzNpBXOHBb2255eTKwAxrHc0QglkRoxSuPZffEOJQRCdzJl3qByTQ0IQkI9YWbDgXT2Y739jjCKoFO5aO65H-0U8RARIIgTvTYvCbeKpWyedoNQld_bTyQVjW1jLyLLyKkraCPyCZKOAo63yWi9KuSOsuy2nMKwdQbcXQsMJywVDTiAdKOzFgkhrilLmSZh3VC_iCHjMCnjqFqcO8dUDcNC47cDc-viP3n5twhCdTey6MKrXnB7jqVky-XwbKDBivOgOV5R8xMB7FJkcP3mEXqkjLwRILKr39k1vWqXHfzE-i-b-x-aCO76iEwNEcFhJp_Vj0tEcaLCWfBlVxcPGq-i3ug6plqxDlmLoShHavS0wM1A-yTvwgORBDr7aW64uHzODXDejT0Pvzon1JFPGkhAEtD65wOgL1klsH5QAk7wO645I0jYw5pBshMjmD-wUu_04Vn4jOb4Y2QN9wuLUMslATmINvQ7mwdq3XULpoqJTSDC1DhEjRgxf58AgC2S4uIGkSW7ONqBtCDVcFQbWtVNLylSljHavV3P08qTb4as9H--94e-V-aMzwEAyup-KJbONWkrKV7Ru5pftlbHtSZ305_5xQLzYJ8uiW_uEQzf4-rsZdEwQPiwsJ6YHczcS95xI4W3F3JBIGSo0QAWBkWVnS1dTTxrB91y4mNTPNpPtXZnhpMtC1Gx794S8m3Y5kp8tXC4iX_N5iXUO2CxDk36uyijAmXk29OhAueyk760UwpgJgiFkZKGgLE8bOqyABCEms5ufk-sweN9RQyRGm8HXWJPtespRDs811R-owGohcdTnPGXqI--SxZvQQT7pwvUa79MqCnsoOY-nNxuZBjT0QElPIIMQvyLJ8Gy72-H1sPCIvTcs85WbiPkA9jB83s3Y6Py1Jzjz4rmK0jxXhk7TOy9dadlB-eKyvkSulRxm6RnWHR5p06_N-4GcUIHI-qKRWGewywgKricp-F0DNGdbU=w600-k-nu",
+        "avatar": "https://drive.google.com/uc?id=1bt92ZpMPzq5sRYCMLMxJOuyKFJjrkU8b",
         "description": [
           "Dan is responsible for the design direction and implementation of Realms. Prior to Solana Labs, he led the design discipline at several product development agencies."
         ],
