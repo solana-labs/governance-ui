@@ -275,7 +275,7 @@
         "url": "https://twitter.com/civickey/status/1570164818191208448?s=20&t=dKgTwPIdQN8zKfK9x2bikQ"
       }
     ],
-        "team": [
+    "team": [
       {
         "name": "Sebastian Bor",
         "avatar": "https://pbs.twimg.com/profile_images/1427584976221089792/wzCRED_r_400x400.jpg",
@@ -285,7 +285,7 @@
         "role": "Contract Development",
         "twitter": "@Sebastian_Bor"
       },
-                {
+      {
         "name": "Emon Motamedi",
         "avatar": "https://pbs.twimg.com/profile_images/1146682718849159168/v7O-oZAf_400x400.jpg",
         "description": [
@@ -294,7 +294,7 @@
         "role": "Product",
         "twitter": "@EmonMotamedi"
       },
-                          {
+      {
         "name": "Niranjan Ramadas",
         "avatar": "https://drive.google.com/uc?id=12ASbqu9gHLRnlIN7itZnorJZDBFYBqFv",
         "description": [
