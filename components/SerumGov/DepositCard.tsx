@@ -1,7 +1,7 @@
 import * as yup from 'yup'
 import * as anchor from '@project-serum/anchor'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useTokenAccountBalance } from '@hooks/useTokenAccountBalance'
+import useTokenAccountBalance from '@hooks/useTokenAccountBalance'
 import useWallet from '@hooks/useWallet'
 import useSerumGovStore, {
   MSRM_DECIMALS,
@@ -70,7 +70,11 @@ const DepositCard = ({ mint, callback, createProposal }: DepositCardProps) => {
     [srmMint, msrmMint]
   )
 
-  const { balance, isLoading, refetch } = useTokenAccountBalance(
+  const {
+    balance,
+    loading: isLoading,
+    mutate: mutateBalance,
+  } = useTokenAccountBalance(
     createProposal ? createProposal.owner : wallet?.publicKey,
     MINT_MAP[mint].pubkey
   )
@@ -123,7 +127,7 @@ const DepositCard = ({ mint, callback, createProposal }: DepositCardProps) => {
         wallet
       )
 
-      await refetch()
+      await mutateBalance()
       if (callback) await callback()
     } else {
       try {

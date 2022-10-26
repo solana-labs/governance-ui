@@ -42,7 +42,7 @@ type BurnLockedAccountFormValues = {
 
 type Props = {
   account: LockedAccountType
-  gsrmBalance: TokenAmount | null
+  gsrmBalance?: TokenAmount | null
   callback?: () => Promise<void>
   createProposal?: {
     governance?: ProgramAccount<Governance>

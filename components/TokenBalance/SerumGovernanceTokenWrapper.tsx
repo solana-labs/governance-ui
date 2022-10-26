@@ -79,7 +79,8 @@ const SerumGovernanceTokenWrapper: FC = () => {
             ))}
         </div>
 
-        {claimTickets.length > 0 || redeemTickets.length > 0 ? (
+        {(claimTickets && claimTickets.length > 0) ||
+        (redeemTickets && redeemTickets.length > 0) ? (
           <div className="flex flex-col space-y-2 mt-2">
             <p className="text-md text-fgd-2">Tickets</p>
             {claimTickets &&
@@ -100,7 +101,9 @@ const SerumGovernanceTokenWrapper: FC = () => {
                 <Ticket
                   key={ticket.createdAt}
                   ticket={ticket}
-                  callback={refreshRedeemTickets}
+                  callback={async () => {
+                    await refreshRedeemTickets()
+                  }}
                 />
               ))}
           </div>

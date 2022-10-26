@@ -28,8 +28,8 @@ import { getRulesFromAccount } from './getRulesFromAccount'
 import { abbreviateAddress } from '@utils/formatting'
 import { ConnectionContext } from '@utils/connection'
 import { PublicKey } from '@solana/web3.js'
-import { tryParseKey } from '@tools/validators/pubkey'
 import getTokenOwnerRecordsForWallet from './getTokenOwnerRecordsForWallet'
+import { tryParseKey } from '@tools/validators/pubkey'
 
 function isNotNull<T>(x: T | null): x is T {
   return x !== null
@@ -133,7 +133,6 @@ export const assembleWallets = async (
         account.governance,
         tryParseKey(walletAddress)
       )
-
       walletMap[walletAddress].assets.push(...tokenOwnerRecords)
     }
   }

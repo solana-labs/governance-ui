@@ -39,6 +39,8 @@ export interface RealmInfo {
   // The default shared wallet of the DAO displayed on the home page
   // It's used for crowdfunding DAOs like  Ukraine.SOL or #Unchain_Ukraine
   sharedWalletId?: PublicKey
+
+  communityMint?: PublicKey
 }
 
 export function getProgramVersionForRealm(realmInfo: RealmInfo) {
@@ -49,12 +51,13 @@ export function getProgramVersionForRealm(realmInfo: RealmInfo) {
 interface RealmInfoAsJSON
   extends Omit<
     RealmInfo,
-    'programId' | 'realmId' | 'isCertified' | 'sharedWalletId'
+    'programId' | 'realmId' | 'isCertified' | 'sharedWalletId' | 'communityMint'
   > {
   enableNotifi?: boolean
   programId: string
   realmId: string
   sharedWalletId?: string
+  communityMint?: string
 }
 
 // TODO: Once governance program clones registry program and governance
@@ -71,6 +74,7 @@ function parseCertifiedRealms(realms: RealmInfoAsJSON[]) {
     isCertified: true,
     programVersion: realm.programVersion,
     enableNotifi: realm.enableNotifi ?? true, // enable by default
+    communityMint: realm.communityMint && new PublicKey(realm.communityMint),
   })) as ReadonlyArray<RealmInfo>
 }
 

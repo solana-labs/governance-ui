@@ -16,10 +16,10 @@ export default function SerumGovWallet({ wallet }: { wallet: Wallet }) {
   } = useSerumGov(wallet.address)
 
   if (
-    !claimTickets.length &&
-    !redeemTickets.length &&
-    !vestAccounts.length &&
-    !lockedAccounts.length &&
+    !claimTickets?.length &&
+    !redeemTickets?.length &&
+    !vestAccounts?.length &&
+    !lockedAccounts?.length &&
     !gsrmBalance
   )
     return null
@@ -72,7 +72,8 @@ export default function SerumGovWallet({ wallet }: { wallet: Wallet }) {
           ))}
       </div>
       <div>
-        {claimTickets.length > 0 || redeemTickets.length > 0 ? (
+        {(claimTickets && claimTickets.length > 0) ||
+        (redeemTickets && redeemTickets.length > 0) ? (
           <div className="flex flex-col space-y-2 mt-2">
             {claimTickets &&
               claimTickets.map((ticket) => (

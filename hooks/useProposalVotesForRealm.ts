@@ -64,8 +64,9 @@ export default function useProposalVotesForRealm(
         if (mintInfo) setProposalMint(mintInfo.account)
       } else setProposalMint(null)
     }
+    console.log("[serum_gov]: fetching proposal's mint")
     fetchProposalMint()
-  }, [proposalMint])
+  }, [proposalMintKey?.toBase58()])
 
   useEffect(() => {
     function calculateProposalVotes() {

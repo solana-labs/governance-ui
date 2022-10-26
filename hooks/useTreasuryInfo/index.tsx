@@ -83,7 +83,7 @@ export default function useTreasuryInfo(): Result<Data> {
         realmInfo
       )
     }
-  }, [accounts, nfts, nftsLoading, realmInfo, connection])
+  }, [accounts, nfts, nftsLoading, realmInfo, connection.current.rpcEndpoint])
 
   useEffect(() => {
     setBuildingWallets(true)

@@ -14,6 +14,7 @@
     "displayName": "Mango DAO",
     "programId": "GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J",
     "realmId": "DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE",
+    "communityMint": "MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac",
     "website": "https://mango.markets",
     "keywords": "Mango Markets, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
     "twitter": "@mangomarkets",
@@ -26,6 +27,7 @@
     "displayName": "Metaplex DAO",
     "programId": "AEauWRrpn9Cs6GXujzdp1YhMmv2288kBt3SdEcPYEerr",
     "realmId": "DA5G7QQbFioZ6K33wQcH8fVdgFcnaDjLD7DLQkapZg5X",
+    "communityMint": "METAewgxyPbgwsseH8T16a39CQ5VyVxZi9zXiDPY18m",
     "ogImage": "/realms/metaplex/img/black-circle.png",
     "shortDescription": "Metaplex makes it easy to build your project in minutes and grow your community in the world’s largest NFT ecosystem.",
     "sortRank": 3,
@@ -75,6 +77,7 @@
     "displayName": "Serum DAO (NEW)",
     "programId": "G41fmJzd29v7Qmdi8ZyTBBYa98ghh3cwHBTexqCG1PQJ",
     "realmId": "G3FBDbsRiJjcjYuazrH6mRShFMjr9RQn4SxVVxocJavA",
+    "communityMint": "G6DyPo5NjpW5kAvZwvM7hx1KeTUgGmuykPMdKuwWRvER",
     "website": "https://www.projectserum.com/",
     "ogImage": "https://assets.website-files.com/61284dcff241c2f0729af9f3/61285237ce2e301255d09108_logo-serum.png"
   },

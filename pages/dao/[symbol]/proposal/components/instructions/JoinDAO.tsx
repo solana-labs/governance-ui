@@ -65,7 +65,7 @@ const JoinDAO = ({
     ReadonlyArray<RealmInfo>
   >([])
 
-  const selectedRealm = useRealmAccount(form.realm?.realmId)
+  const { realmAccount: selectedRealm } = useRealmAccount(form.realm?.realmId)
 
   const validTokenAccounts = useMemo(() => {
     if (selectedRealm) {
@@ -161,9 +161,9 @@ const JoinDAO = ({
       ((routeHasClusterInPath && cluster) || !routeHasClusterInPath)
     ) {
       const realms = getCertifiedRealmInfos(connection)
-      setCertifiedRealms(realms)
+      setCertifiedRealms(realms.filter((r) => !!r.communityMint))
     } else setCertifiedRealms([])
-  }, [connection])
+  }, [connection.current.rpcEndpoint])
 
   // Update mint info when selected token account changes.
   useEffect(() => {

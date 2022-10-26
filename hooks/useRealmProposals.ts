@@ -74,6 +74,8 @@ export default function useRealmProposals(
         ((routeHasClusterInPath && cluster) || !routeHasClusterInPath) &&
         programId
       ) {
+        console.log('[serum_gov]: fetching realm proposals')
+
         const governances = await getGovernanceAccounts(
           connection.current,
           programId,
@@ -136,7 +138,7 @@ export default function useRealmProposals(
         setVoteRecords(voteRecords)
       }
     }
-  }, [connection, realmId])
+  }, [connection.current.rpcEndpoint, realmId.toBase58()])
 
   return { governances, allProposals, votingProposals, voteRecords }
 }

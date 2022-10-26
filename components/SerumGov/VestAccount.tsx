@@ -45,7 +45,7 @@ type BurnVestAccountFormValues = {
 
 type Props = {
   account: VestAccountType
-  gsrmBalance: TokenAmount | null
+  gsrmBalance?: TokenAmount | null
   callback?: () => Promise<void>
   createProposal?: {
     governance?: ProgramAccount<Governance>
