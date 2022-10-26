@@ -282,7 +282,7 @@
         "description": [
           "Sebastian is responsible for developing Solana’s governance program as well as the backend infrastructure for Realms. Prior to Solana Labs, he spent his career in the finance and gaming industries."
         ],
-        "role": "Contract Engineering",
+        "role": "Contract Development",
         "twitter": "@Sebastian_Bor"
       },
                 {
@@ -291,7 +291,7 @@
         "description": [
           "Emon leads the product development for the Realms team, overseeing its vision as well as its day to day needs. Before joining Solana Labs, Emon was a product manager at Reddit and Olympus DAO."
         ],
-        "role": "Product Management",
+        "role": "Product",
         "twitter": "@EmonMotamedi"
       },
                           {
@@ -300,7 +300,7 @@
         "description": [
           "Niranjan serves as the front end engineer on the Realms team. Prior to Solana Labs, he worked at Reddit and co-founded a startup building software for remote teams."
         ],
-        "role": "Front End Engineering",
+        "role": "Frontend Development",
         "twitter": "@asdf"
       },
                           {
