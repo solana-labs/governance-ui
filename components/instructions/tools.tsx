@@ -170,9 +170,6 @@ export const ACCOUNT_NAMES = {
   '3AtD8oiBUWttbnNCpKk1enRoquN9V88Nv6Rn7ESHPWHa':
     'DAO Instance Authority Governance',
   jdaoDN37BrVRvxuXSeyR7xE5Z9CAoQApexGrQJbnj6V: 'Jungle DeFi Governance Program',
-
-  //Serum DAO
-  '5xinfvkvL5NZ6BG3cDtFdTbVuMutqGXkDBuhncfmzPr2': 'Serum SRM Grant Treasury',
 }
 
 // Blacklisted governances which should not be displayed in the UI

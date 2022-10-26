@@ -63,22 +63,6 @@
     "sortRank": 3
   },
   {
-    "symbol": "SERUM",
-    "displayName": "Serum DAO (CURRENT)",
-    "programId": "AVoAYTs36yB5izAaBkxRG67wL1AMwG3vo41hKtUSb8is",
-    "realmId": "3MMDxjv1SzEFQDKryT7csAvaydYtrgMAc3L9xL9CVLCg",
-    "website": "https://www.projectserum.com/",
-    "ogImage": "https://assets.website-files.com/61284dcff241c2f0729af9f3/61285237ce2e301255d09108_logo-serum.png"
-  },
-  {
-    "symbol": "SERUM2",
-    "displayName": "Serum DAO (NEW)",
-    "programId": "G41fmJzd29v7Qmdi8ZyTBBYa98ghh3cwHBTexqCG1PQJ",
-    "realmId": "G3FBDbsRiJjcjYuazrH6mRShFMjr9RQn4SxVVxocJavA",
-    "website": "https://www.projectserum.com/",
-    "ogImage": "https://assets.website-files.com/61284dcff241c2f0729af9f3/61285237ce2e301255d09108_logo-serum.png"
-  },
-  {
     "symbol": "MDLH",
     "displayName": "The Mysterious Death of Lord Harrington",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -268,6 +252,13 @@
     "programId": "gSF1T5PdLc2EutzwAyeExvdW27ySDtFp88ri5Aymah6",
     "realmId": "EtZWAeFFRC5k6uesap1F1gkHFimsL2HqttVTNAeN86o8",
     "ogImage": "/realms/SCTF1/img/sctf1.svg"
+  },
+  {
+    "symbol": "SERUM",
+    "programId": "AVoAYTs36yB5izAaBkxRG67wL1AMwG3vo41hKtUSb8is",
+    "realmId": "3MMDxjv1SzEFQDKryT7csAvaydYtrgMAc3L9xL9CVLCg",
+    "website": "https://www.projectserum.com/",
+    "ogImage": "https://assets.website-files.com/61284dcff241c2f0729af9f3/61285237ce2e301255d09108_logo-serum.png"
   },
   {
     "symbol": "OMH",
