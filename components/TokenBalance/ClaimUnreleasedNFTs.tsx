@@ -8,9 +8,9 @@ import { NftVoterClient } from '@solana/governance-program-library'
 import { chunks } from '@utils/helpers'
 import { getRegistrarPDA, getVoterWeightRecord } from '@utils/plugin/accounts'
 import {
-  sendTransactionsV2,
+  sendTransactionsV3,
   SequenceType,
-  transactionInstructionsToTypedInstructionsSets,
+  txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
 import { ProposalState } from '@solana/spl-governance'
 
@@ -75,19 +75,20 @@ const ClaimUnreleasedNFTs = ({
       instructions.push(relinquishNftVoteIx)
     }
     try {
-      const insertChunks = chunks(instructions, 10)
-      const signerChunks = Array(insertChunks.length).fill([])
-      await sendTransactionsV2({
+      const insertChunks = chunks(instructions, 10).map((txBatch, batchIdx) => {
+        return {
+          instructionsSet: txBatchesToInstructionSetWithSigners(
+            txBatch,
+            [],
+            batchIdx
+          ),
+          sequenceType: SequenceType.Parallel,
+        }
+      })
+      await sendTransactionsV3({
         connection,
-        showUiComponent: true,
         wallet: wallet!,
-        signersSet: [...signerChunks],
-        TransactionInstructions: insertChunks.map((x) =>
-          transactionInstructionsToTypedInstructionsSets(
-            x,
-            SequenceType.Parallel
-          )
-        ),
+        transactionInstructions: insertChunks,
       })
       setIsLoading(false)
       getNftsVoteRecord()
