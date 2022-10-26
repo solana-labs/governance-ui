@@ -280,7 +280,7 @@
         "name": "Sebastian Bor",
         "avatar": "https://pbs.twimg.com/profile_images/1427584976221089792/wzCRED_r_400x400.jpg",
         "description": [
-          "Sebastian is responsible for developing Solana’s governance program as well as the backend infrastructure for Realms. Prior to Solana Labs, he spent his career in the finance and gaming industries."
+          "Sebastian is responsible for developing SPL Governance as well as the backend infrastructure for Realms. Prior to Solana Labs, he spent his career in the finance and gaming industries."
         ],
         "role": "Contract Development",
         "twitter": "@Sebastian_Bor"
@@ -289,7 +289,7 @@
         "name": "Emon Motamedi",
         "avatar": "https://pbs.twimg.com/profile_images/1146682718849159168/v7O-oZAf_400x400.jpg",
         "description": [
-          "Emon leads the product development for the Realms team, overseeing its vision as well as its day to day needs. Before joining Solana Labs, Emon was a product manager at Reddit and Olympus DAO."
+          "Emon leads the product development for the Realms team, overseeing its vision as well as its day to day needs. Before joining Solana Labs, Emon ran product teams for Reddit and founded a fintech startup called Florian."
         ],
         "role": "Product",
         "twitter": "@EmonMotamedi"
@@ -298,7 +298,7 @@
         "name": "Niranjan Ramadas",
         "avatar": "https://drive.google.com/uc?id=12ASbqu9gHLRnlIN7itZnorJZDBFYBqFv",
         "description": [
-          "Niranjan serves as the front end engineer on the Realms team. Prior to Solana Labs, he worked at Reddit and co-founded a startup building software for remote teams."
+          "Niranjan serves as the front end and api engineer on the Realms team. Prior to Solana Labs, he worked at Reddit and co-founded a startup building software for remote teams."
         ],
         "role": "Frontend Development",
         "twitter": "@asdf"
