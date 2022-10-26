@@ -110,14 +110,8 @@ export default function useGovernanceAssets() {
     }
     return toBeFiltered.filter((itx) => itx.isVisible)
   }
-  const governedSPLTokenAccounts = governedTokenAccounts.filter(
-    (x) => x.type === AccountType.TOKEN
-  )
   const governedTokenAccountsWithoutNfts = governedTokenAccounts.filter(
     (x) => x.type !== AccountType.NFT
-  )
-  const governedNativeAccounts = governedTokenAccounts.filter(
-    (x) => x.type === AccountType.SOL
   )
   const nftsGovernedTokenAccounts = governedTokenAccounts.filter(
     (govTokenAcc) =>
@@ -171,11 +165,6 @@ export default function useGovernanceAssets() {
     {
       id: Instructions.CreateAssociatedTokenAccount,
       name: 'Create Associated Token Account',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.JoinDAO,
-      name: 'Join a DAO',
       isVisible: canUseAnyInstruction,
     },
     {
@@ -523,41 +512,6 @@ export default function useGovernanceAssets() {
       name: 'Solend: Withdraw Funds',
       isVisible: canUseAnyInstruction,
     },
-    {
-      id: Instructions.SerumInitUser,
-      name: 'Serum: Init User Account',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.SerumGrantLockedSRM,
-      name: 'Serum: Grant Locked SRM',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.SerumGrantLockedMSRM,
-      name: 'Serum: Grant Locked MSRM',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.SerumGrantVestSRM,
-      name: 'Serum: Grant Vested SRM',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.SerumGrantVestMSRM,
-      name: 'Serum: Grant Vested MSRM',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.SerumUpdateGovConfigParams,
-      name: 'Serum: Update Governance Config Params',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.SerumUpdateGovConfigAuthority,
-      name: 'Serum: Update Governance Config Authority',
-      isVisible: canUseAnyInstruction,
-    },
     ...foresightInstructions,
   ]
   return {
@@ -573,8 +527,6 @@ export default function useGovernanceAssets() {
     canMintRealmCouncilToken,
     canUseProgramUpgradeInstruction,
     governedTokenAccountsWithoutNfts,
-    governedNativeAccounts,
-    governedSPLTokenAccounts,
     nftsGovernedTokenAccounts,
     canUseAuthorityInstruction,
     assetAccounts,

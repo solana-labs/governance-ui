@@ -76,7 +76,7 @@ export default function Activity(props: Props) {
                 No activity
               </div>
             )}
-            {activity.data.map((item, i) => (
+            {activity.data.map((item) => (
               <a
                 className={cx(
                   'border-white/30',
@@ -88,7 +88,7 @@ export default function Activity(props: Props) {
                   'px-4',
                   'rounded-md'
                 )}
-                key={item.signature + i}
+                key={item.signature}
                 href={
                   item.signature
                     ? getExplorerUrl(cluster, item.signature, 'tx')

@@ -70,7 +70,7 @@ export const useRecords = (): AvailableRecordAccounts => {
   )
 
   useEffect(() => {
-    const func = async () => {
+    ;(async () => {
       // tokenOwnerRecord
       if (ownTokenRecord) {
         setTokenOwnerRecord({
@@ -102,8 +102,7 @@ export const useRecords = (): AvailableRecordAccounts => {
           accountRequired: true,
         })
       }
-    }
-    func()
+    })()
   }, [client, wallet])
 
   return {
