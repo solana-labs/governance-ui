@@ -117,7 +117,7 @@ export async function castVote(
       2
     )
     const nftsAccountsChunks = chunks(remainingInstructionsToChunk, 2)
-
+    console.log(splInstructionsWithAccountsChunk, '@@@@@')
     const instructionsChunks = [
       ...nftsAccountsChunks.map((txBatch, batchIdx) => {
         return {
@@ -133,7 +133,7 @@ export async function castVote(
         return {
           instructionsSet: txBatchesToInstructionSetWithSigners(
             txBatch,
-            message ? [signers] : [],
+            message ? [[], signers] : [],
             batchIdx
           ),
           sequenceType: SequenceType.Sequential,
@@ -160,7 +160,7 @@ export async function castVote(
       wallet,
       transactionInstructions: instructionsChunks,
       callbacks: {
-        afterBatchSign: () => {
+        afterFirstBatchSign: () => {
           instructionsChunks.length > 2 ? openNftVotingCountingModal() : null
         },
         afterAllTxConfirmed: () => {

@@ -642,9 +642,9 @@ export const sendTransactionsV3 = ({
   config,
 }: sendSignAndConfirmTransactionsProps) => {
   const callbacksWithUiComponent = {
-    afterFirstBatchSign: (signedTxnsCount) => {
-      if (callbacks?.afterFirstBatchSign) {
-        callbacks?.afterFirstBatchSign(signedTxnsCount)
+    afterBatchSign: (signedTxnsCount) => {
+      if (callbacks?.afterBatchSign) {
+        callbacks?.afterBatchSign(signedTxnsCount)
       }
       showTransactionsProcessUi(signedTxnsCount)
     },
@@ -723,12 +723,13 @@ const tryStringify = (obj) => {
 export const txBatchesToInstructionSetWithSigners = (
   txBatch: TransactionInstruction[],
   signerBatches: Keypair[][],
-  batchIdx: number
+  batchIdx?: number
 ) => {
   return txBatch.map((tx, txIdx) => {
     return {
       transactionInstruction: tx,
       signers:
+        typeof batchIdx !== 'undefined' &&
         signerBatches.length &&
         signerBatches[batchIdx] &&
         signerBatches[batchIdx][txIdx]
