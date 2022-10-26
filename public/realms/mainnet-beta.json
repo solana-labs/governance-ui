@@ -1127,7 +1127,9 @@
     "ogImage": "/realms/RCH/icon.png",
     "shortDescription": "The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.",
     "sortRank": 3,
+    "website": "https://realms.today/",
     "twitter": "@Realms_DAOs",
+    "discord": "https://discord.gg/zfxTA762",
     "github": "https://github.com/solana-labs/governance-ui"
   }
 ]
