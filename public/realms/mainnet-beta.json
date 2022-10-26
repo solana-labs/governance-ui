@@ -49,8 +49,8 @@
     "linkedin": "https://www.linkedin.com/in/pablo-f-acebedo/",
     "instagram": "https://www.instagram.com/pablofacebedo/",
     "github": "https://github.com/pablofelipe01"
-   
-    
+
+
   },
   {
     "symbol": "GRAPE",
@@ -1086,6 +1086,20 @@
     "website": "https://blockgame.cz"
   },
   {
+    "symbol": "Squads",
+    "bannerImage": "https://lh3.googleusercontent.com/drive-viewer/AJc5JmSZjHWqSlOb7HTAqdcO7ryP46g2oZRyj2CRAvnMpKM9npHgS9ER20eTJPfC8xR-dK1N9AwvnOI=w3456-h1822",
+    "displayName": "Squads",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "BzGL6wbCvBisQ7s1cNQvDGZwDRWwKK6bhrV93RYdetzJ",
+    "ogImage": "https://drive.google.com/uc?id=1qlaGzsYkmSqVgJd1PFl2y9KFMaoPHLV8",
+    "shortDescription": "The multisig standard you were looking for on Solana",
+    "sortRank": 3,
+    "website": "https://squads.so/",
+    "twitter": "@squadsprotocol",
+    "discord": "https://discord.com/invite/YPXz64TrKs",
+    "github": "https://github.com/squads-dapp/squads-mpl"
+  },
+  {
     "symbol": "ALLIE",
     "displayName": "Allie Coin DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1094,5 +1108,19 @@
     "ogImage": "/realms/Allie Coin DAO/Allie Coin Logo.png",
     "website": "https://alliecoin.io",
     "twitter": "@allie_coin"
+  },
+  {
+    "symbol": "RCH",
+    "bannerImage": "/realms/RCH/banner.png",
+    "displayName": "Realms Community Hub",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e",
+    "ogImage": "/realms/RCH/icon.png",
+    "shortDescription": "The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.",
+    "sortRank": 3,
+    "website": "https://realms.today/",
+    "twitter": "@Realms_DAOs",
+    "discord": "https://discord.gg/zfxTA762",
+    "github": "https://github.com/solana-labs/governance-ui"
   }
 ]

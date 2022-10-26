@@ -109,6 +109,7 @@ import TransferDomainName from './components/instructions/TransferDomainName'
 import DepositForm from './components/instructions/Everlend/DepositForm'
 import WithdrawForm from './components/instructions/Everlend/WithdrawForm'
 import MakeChangeReferralFeeParams2 from './components/instructions/Mango/MakeChangeReferralFeeParams2'
+import ClaimMangoTokens from './components/instructions/Mango/ClaimTokens'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -273,6 +274,7 @@ const New = () => {
                 signers: instruction.signers,
                 shouldSplitIntoSeparateTxs:
                   instruction.shouldSplitIntoSeparateTxs,
+                chunkBy: instruction.chunkBy || 2,
               }
             })
           })
@@ -295,6 +297,7 @@ const New = () => {
             prerequisiteInstructionsSigners:
               x.prerequisiteInstructionsSigners || [],
             shouldSplitIntoSeparateTxs: x.shouldSplitIntoSeparateTxs,
+            chunkBy: x.chunkBy || 2,
           }
         }),
       ]
@@ -642,6 +645,13 @@ const New = () => {
             index={idx}
             governance={governance}
           ></MakeDepositToMangoAccountCsv>
+        )
+      case Instructions.ClaimMangoTokens:
+        return (
+          <ClaimMangoTokens
+            index={idx}
+            governance={governance}
+          ></ClaimMangoTokens>
         )
       case Instructions.ForesightInitMarket:
         return (

@@ -13,12 +13,7 @@ import {
 } from '@solana/web3.js'
 import BN from 'bn.js'
 import useRealm from '@hooks/useRealm'
-import {
-  getProposal,
-  getTokenOwnerRecordAddress,
-  Proposal,
-  ProposalState,
-} from '@solana/spl-governance'
+import { getProposal, Proposal, ProposalState } from '@solana/spl-governance'
 import { getUnrelinquishedVoteRecords } from '@models/api'
 import { withDepositGoverningTokens } from '@solana/spl-governance'
 import { withRelinquishVote } from '@solana/spl-governance'
@@ -35,34 +30,28 @@ import { withFinalizeVote } from '@solana/spl-governance'
 import { chunks } from '@utils/helpers'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { notify } from '@utils/notifications'
-import { ChevronRightIcon } from '@heroicons/react/solid'
 import { ExclamationIcon } from '@heroicons/react/outline'
-import useQueryContext from '@hooks/useQueryContext'
-import { FC, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import Link from 'next/link'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { vsrPluginsPks } from '@hooks/useVotingPlugins'
-import {
-  LOCALNET_REALM_ID as PYTH_LOCALNET_REALM_ID,
-  PythBalance,
-} from 'pyth-staking-api'
+import { REALM_ID as PYTH_REALM_ID, PythBalance } from 'pyth-staking-api'
 import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 import getNumTokens from '@components/ProposalVotingPower/getNumTokens'
 import VotingPowerPct from '@components/ProposalVotingPower/VotingPowerPct'
 
-type Props = { proposal?: Option<Proposal>; inAccountDetails?: boolean }
-const TokenBalanceCard: FC<Props> = ({
+const TokenBalanceCard = ({
   proposal,
   inAccountDetails = false,
   children,
+}: {
+  proposal?: Option<Proposal>
+  inAccountDetails?: boolean
+  children?: React.ReactNode
 }) => {
   const [hasGovPower, setHasGovPower] = useState<boolean>(false)
-  const { councilMint, mint, realm, symbol } = useRealm()
+  const { councilMint, mint, realm } = useRealm()
   const connected = useWalletStore((s) => s.connected)
-  const wallet = useWalletStore((s) => s.current)
-  const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
-  const { fmtUrlWithCluster } = useQueryContext()
   const isDepositVisible = (
     depositMint: MintInfo | undefined,
     realmMint: PublicKey | undefined
@@ -81,54 +70,10 @@ const TokenBalanceCard: FC<Props> = ({
     councilMint,
     realm?.account.config.councilMint
   )
-  useEffect(() => {
-    const getTokenOwnerRecord = async () => {
-      const defaultMint = !mint?.supply.isZero()
-        ? realm!.account.communityMint
-        : !councilMint?.supply.isZero()
-        ? realm!.account.config.councilMint
-        : undefined
-      const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
-        realm!.owner,
-        realm!.pubkey,
-        defaultMint!,
-        wallet!.publicKey!
-      )
-      setTokenOwneRecordPk(tokenOwnerRecordAddress.toBase58())
-    }
-    if (realm && wallet?.connected) {
-      getTokenOwnerRecord()
-    }
-  }, [realm?.pubkey.toBase58(), wallet?.connected])
   const hasLoaded = mint || councilMint
 
   return (
-    <div
-      className={`rounded-lg bg-bkg-2 + ${
-        !inAccountDetails ? 'p-4 md:p-6' : ''
-      }`}
-    >
-      {!inAccountDetails && (
-        <div className="flex items-center justify-between">
-          <h3 className="mb-0">My governance power</h3>
-          <Link
-            href={fmtUrlWithCluster(
-              `/dao/${symbol}/account/${tokenOwnerRecordPk}`
-            )}
-          >
-            <a
-              className={`default-transition flex items-center text-fgd-2 text-sm transition-all hover:text-fgd-3 ${
-                !connected || !tokenOwnerRecordPk
-                  ? 'opacity-50 pointer-events-none'
-                  : ''
-              }`}
-            >
-              View
-              <ChevronRightIcon className="flex-shrink-0 w-6 h-6" />
-            </a>
-          </Link>
-        </div>
-      )}
+    <>
       {hasLoaded ? (
         <div
           className={`${
@@ -172,7 +117,7 @@ const TokenBalanceCard: FC<Props> = ({
         </>
       )}
       {children}
-    </div>
+    </>
   )
 }
 
@@ -187,7 +132,7 @@ export const TokenDeposit = ({
   tokenRole: GoverningTokenRole
   councilVote?: boolean
   inAccountDetails?: boolean
-  setHasGovPower: (hasGovPower: boolean) => void
+  setHasGovPower?: (hasGovPower: boolean) => void
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
@@ -456,8 +401,7 @@ export const TokenDeposit = ({
     : ''
 
   //Todo: move to own components with refactor to dao folder structure
-  const isPyth =
-    realmInfo?.realmId.toBase58() === PYTH_LOCALNET_REALM_ID.toBase58()
+  const isPyth = realmInfo?.realmId.toBase58() === PYTH_REALM_ID.toBase58()
 
   const availableTokens = isPyth
     ? new PythBalance(ownVoterWeight.votingPower!).toString()
@@ -470,18 +414,15 @@ export const TokenDeposit = ({
 
   useEffect(() => {
     if (availableTokens != '0' || hasTokensDeposited || hasTokensInWallet) {
-      setHasGovPower(true)
+      if (setHasGovPower) setHasGovPower(true)
     }
   }, [availableTokens, hasTokensDeposited, hasTokensInWallet])
 
-  const canShowAvailableTokensMessage =
-    !hasTokensDeposited && hasTokensInWallet && connected
-  const canExecuteAction = !hasTokensDeposited ? 'deposit' : 'withdraw'
-  const canDepositToken = !hasTokensDeposited && hasTokensInWallet
+  const canShowAvailableTokensMessage = hasTokensInWallet && connected
   const tokensToShow =
-    canDepositToken && depositTokenAccount
+    hasTokensInWallet && depositTokenAccount
       ? fmtMintAmount(mint, depositTokenAccount.account.amount)
-      : canDepositToken
+      : hasTokensInWallet
       ? availableTokens
       : 0
   const isVsr =
@@ -519,13 +460,14 @@ export const TokenDeposit = ({
 
       {!isPyth && (
         <>
-          <p
-            className={`mt-2 opacity-70 mb-4 ml-1 text-xs ${
+          <div
+            className={`my-4 opacity-70 text-xs  ${
               canShowAvailableTokensMessage ? 'block' : 'hidden'
             }`}
           >
-            You have {tokensToShow} tokens available to {canExecuteAction}.
-          </p>
+            You have {tokensToShow} {hasTokensDeposited ? `more ` : ``}
+            {depositTokenName} tokens available to deposit.
+          </div>
 
           <div className="flex flex-col mt-6 space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
             {hasTokensInWallet && !inAccountDetails ? (
@@ -579,8 +521,8 @@ export const TokenDeposit = ({
 }
 
 const TokenDepositWrapper = ({
-  inAccountDetails,
   children,
+  inAccountDetails,
 }: {
   inAccountDetails?: boolean
   children: React.ReactNode
@@ -588,7 +530,7 @@ const TokenDepositWrapper = ({
   if (inAccountDetails) {
     return <div className="space-y-4 w-1/2">{children}</div>
   } else {
-    return <>{children}</>
+    return <div>{children}</div>
   }
 }
 
