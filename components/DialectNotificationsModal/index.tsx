@@ -1,13 +1,16 @@
 import {
-  Backend,
-  Config,
+  ConfigProps,
   defaultVariables,
-  DialectContextProvider,
   DialectThemeProvider,
-  DialectWalletAdapter,
+  DialectUiManagementProvider,
   IncomingThemeVariables,
   Notifications,
 } from '@dialectlabs/react-ui'
+import {
+  DialectSolanaSdk,
+  DialectSolanaWalletAdapter,
+  SolanaConfigProps,
+} from '@dialectlabs/react-sdk-blockchain-solana'
 import * as anchor from '@project-serum/anchor'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { useTheme } from 'next-themes'
@@ -29,7 +32,6 @@ const themeVariables: IncomingThemeVariables = {
       toggleBackgroundActive: 'bg-primary-light',
     },
     outlinedInput: `${defaultVariables.light.outlinedInput} focus-within:bg-bkg-3 focus-within:border-primary-light`,
-    addormentButton: `${defaultVariables.dark.addormentButton} text-bkg-2 bg-primary-light hover:bg-fgd-1`,
     disabledButton: `${defaultVariables.dark.disabledButton} border-primary-light font-bold rounded-full border-fgd-3 text-fgd-3 cursor-not-allowed`,
     modal: `${defaultVariables.dark.modal} bg-bkg-1 sm:border sm:border-fgd-4 shadow-md sm:rounded-md`,
     modalWrapper: `${defaultVariables.dark.modalWrapper} sm:top-14 rounded-md`,
@@ -48,32 +50,40 @@ const themeVariables: IncomingThemeVariables = {
       input: `${defaultVariables.light.textStyles.input} text-fgd-1 placeholder:text-fgd-3`,
     },
     outlinedInput: `${defaultVariables.light.outlinedInput} focus-within:bg-bkg-3 focus-within:border-primary-light`,
-    addormentButton: `${defaultVariables.dark.addormentButton} text-bkg-2 bg-primary-light`,
     modal: `${defaultVariables.light.modal} sm:border sm:rounded-md sm:border-fgd-4 sm:shadow-md`,
     modalWrapper: `${defaultVariables.dark.modalWrapper} sm:top-14`,
     secondaryDangerButton: `${defaultVariables.light.secondaryDangerButton} rounded-full`,
   },
 }
 
-const walletToDialectWallet = (
+const solanaWalletToDialectWallet = (
   wallet?: SignerWalletAdapter
-): DialectWalletAdapter => ({
-  publicKey: wallet?.publicKey || undefined,
-  connected:
-    (wallet?.connected && !wallet?.connecting && Boolean(wallet?.publicKey)) ||
-    false,
-  // @ts-ignore
-  signMessage: wallet?.signMessage
-    ? // @ts-ignore
-      (msg) => wallet.signMessage(msg)
-    : undefined,
-  signTransaction: wallet?.signTransaction
-    ? (tx) => wallet.signTransaction(tx)
-    : undefined,
-  signAllTransactions: wallet?.signAllTransactions
-    ? (txs) => wallet.signAllTransactions(txs)
-    : undefined,
-})
+): DialectSolanaWalletAdapter | null => {
+  if (!wallet || !wallet.connected || wallet.connecting || !wallet.publicKey) {
+    return null
+  }
+
+  return {
+    publicKey: wallet.publicKey!,
+    // @ts-ignore
+    signMessage: wallet?.signMessage
+      ? // @ts-ignore
+        (msg) => wallet.signMessage(msg)
+      : undefined,
+
+    signTransaction: wallet.signTransaction,
+    signAllTransactions: wallet.signAllTransactions,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    diffieHellman: wallet.wallet?.adapter?._wallet?.diffieHellman
+      ? async (pubKey: any) => {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          return wallet.wallet?.adapter?._wallet?.diffieHellman(pubKey)
+        }
+      : undefined,
+  }
+}
 
 interface DialectNotificationsModalProps {
   onBackClick?: () => void
@@ -84,20 +94,21 @@ export default function DialectNotificationsModal(
   props: DialectNotificationsModalProps
 ) {
   const { theme } = useTheme()
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletStore((store) => store.current)
 
   const [
-    dialectWalletAdapter,
-    setDialectWalletAdapter,
-  ] = useState<DialectWalletAdapter>(() => walletToDialectWallet(wallet))
+    dialectSolanaWalletAdapter,
+    setDialectSolanaWalletAdapter,
+  ] = useState<DialectSolanaWalletAdapter | null>(() =>
+    solanaWalletToDialectWallet(wallet)
+  )
 
   useEffect(() => {
-    setDialectWalletAdapter(walletToDialectWallet(wallet))
+    setDialectSolanaWalletAdapter(solanaWalletToDialectWallet(wallet))
   }, [wallet])
 
   const dialectConfig = useMemo(
-    (): Config => ({
-      backends: [Backend.DialectCloud],
+    (): ConfigProps => ({
       environment: 'production',
       dialectCloud: {
         tokenStore: 'local-storage',
@@ -106,27 +117,33 @@ export default function DialectNotificationsModal(
     []
   )
 
+  const solanaConfig: SolanaConfigProps = useMemo(
+    () => ({
+      wallet: dialectSolanaWalletAdapter,
+    }),
+    [dialectSolanaWalletAdapter]
+  )
+
   return (
-    <DialectContextProvider
-      wallet={dialectWalletAdapter}
-      config={dialectConfig}
-      dapp={REALMS_PUBLIC_KEY}
-    >
+    <DialectSolanaSdk solanaConfig={solanaConfig} config={dialectConfig}>
       <DialectThemeProvider
         theme={theme.toLowerCase()}
         variables={themeVariables}
       >
-        <Notifications
-          notifications={[
-            { name: 'New proposals', detail: 'On creation' },
-            { name: 'Finished proposals', detail: 'On execution' },
-          ]}
-          pollingInterval={15000}
-          onModalClose={props.onModalClose}
-          onBackClick={props.onBackClick}
-          channels={['web3', 'telegram', 'sms', 'email']}
-        />
+        <DialectUiManagementProvider>
+          <Notifications
+            dappAddress={REALMS_PUBLIC_KEY.toBase58()}
+            notifications={[
+              { name: 'New proposals', detail: 'On creation' },
+              { name: 'Finished proposals', detail: 'On execution' },
+            ]}
+            pollingInterval={15000}
+            onModalClose={props.onModalClose}
+            onBackClick={props.onBackClick}
+            channels={['web3', 'telegram', 'sms', 'email']}
+          />
+        </DialectUiManagementProvider>
       </DialectThemeProvider>
-    </DialectContextProvider>
+    </DialectSolanaSdk>
   )
 }
