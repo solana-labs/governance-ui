@@ -719,3 +719,21 @@ const tryStringify = (obj) => {
     return null
   }
 }
+
+export const txBatchesToInstructionSetWithSigners = (
+  txBatch: TransactionInstruction[],
+  signerBatches: Keypair[][],
+  batchIdx: number
+) => {
+  return txBatch.map((tx, txIdx) => {
+    return {
+      transactionInstruction: tx,
+      signers:
+        signerBatches.length &&
+        signerBatches[batchIdx] &&
+        signerBatches[batchIdx][txIdx]
+          ? [signerBatches[batchIdx][txIdx]]
+          : [],
+    }
+  })
+}

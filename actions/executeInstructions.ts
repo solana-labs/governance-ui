@@ -8,9 +8,9 @@ import {
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { sendSignedTransaction, signTransaction } from '@utils/send'
 import {
-  sendTransactionsV2,
+  sendTransactionsV3,
   SequenceType,
-  transactionInstructionsToTypedInstructionsSets,
+  txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
 
 export const executeInstructions = async (
@@ -37,17 +37,21 @@ export const executeInstructions = async (
   )
 
   if (multiTransactionMode) {
-    await sendTransactionsV2({
+    const txes = [...instructions.map((x) => [x])].map((txBatch, batchIdx) => {
+      return {
+        instructionsSet: txBatchesToInstructionSetWithSigners(
+          txBatch,
+          [],
+          batchIdx
+        ),
+        sequenceType: SequenceType.Sequential,
+      }
+    })
+
+    await sendTransactionsV3({
       connection,
-      showUiComponent: true,
-      wallet: wallet!,
-      signersSet: Array(instructions.length).fill([]),
-      TransactionInstructions: instructions.map((x) =>
-        transactionInstructionsToTypedInstructionsSets(
-          [x],
-          SequenceType.Parallel
-        )
-      ),
+      wallet,
+      transactionInstructions: txes,
     })
   } else {
     const transaction = new Transaction()

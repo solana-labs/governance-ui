@@ -3,6 +3,7 @@ import { Connection, PublicKey } from '@solana/web3.js'
 import {
   sendTransactionsV3,
   SequenceType,
+  txBatchesToInstructionSetWithSigners,
   WalletSigner,
 } from 'utils/sendTransactions'
 import { chunks } from '@utils/helpers'
@@ -79,12 +80,11 @@ export default async function createMultisigWallet({
       realmInstructions,
     ].map((txBatch, batchIdx) => {
       return {
-        instructionsSet: txBatch.map((tx, txIdx) => {
-          return {
-            transactionInstruction: tx,
-            signers: signers[batchIdx][txIdx] ? [signers[batchIdx][txIdx]] : [],
-          }
-        }),
+        instructionsSet: txBatchesToInstructionSetWithSigners(
+          txBatch,
+          signers,
+          batchIdx
+        ),
         sequenceType: SequenceType.Sequential,
       }
     })
