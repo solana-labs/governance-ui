@@ -12,9 +12,9 @@ import { PublicKey } from '@solana/web3.js'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { createVerifyCollectionInstruction } from '@metaplex-foundation/mpl-token-metadata'
 import {
-  sendTransactionsV2,
+  sendTransactionsV3,
   SequenceType,
-  transactionInstructionsToTypedInstructionsSets,
+  txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
 import { chunks } from '@utils/helpers'
 
@@ -131,20 +131,23 @@ export const generateNft = async (
           })
         ),
       ]
-      const nftsAccountsChunks = chunks(verifyInstructions, 10)
-      const signerChunks = Array(nftsAccountsChunks.length).fill([])
+      const nftsAccountsChunks = chunks(verifyInstructions, 10).map(
+        (txBatch, batchIdx) => {
+          return {
+            instructionsSet: txBatchesToInstructionSetWithSigners(
+              txBatch,
+              [],
+              batchIdx
+            ),
+            sequenceType: SequenceType.Parallel,
+          }
+        }
+      )
 
-      sendTransactionsV2({
-        showUiComponent: true,
+      await sendTransactionsV3({
         connection: connection.current,
-        wallet: userWallet,
-        TransactionInstructions: [...nftsAccountsChunks].map((x) =>
-          transactionInstructionsToTypedInstructionsSets(
-            x,
-            SequenceType.Parallel
-          )
-        ),
-        signersSet: signerChunks,
+        wallet: userWallet!,
+        transactionInstructions: nftsAccountsChunks,
       })
     }
   }

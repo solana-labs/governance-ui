@@ -96,58 +96,6 @@
         "twitter": "@meta_hess"
       }
     ],
-    "roadmap": {
-      "description": [
-        "Our roadmap is dynamic, and we try to release features and fixes as they are ready but this list will give you a general sense of where we are heading with Metaplex."
-      ],
-      "items": [
-        {
-          "title": "Launch Metaplex",
-          "date": "2021-08-30T15:42:21.109Z",
-          "status": "completed",
-          "resource": {
-            "title": "Solana Metaplex Studios Launches to Grow NFTs Outside of Ethereum",
-            "url": "https://decrypt.co/82170/solana-launches-metaplex-studios-grow-nfts-outside-ethereum"
-          }
-        },
-        {
-          "title": "Launch $MPLX token",
-          "date": "2022-09-30T15:45:01.159Z",
-          "status": "completed",
-          "resource": {
-            "title": "The Metaplex Foundation Announces the Metaplex Token (MPLX)",
-            "url": "https://www.metaplex.com/posts/mplx"
-          }
-        },
-        {
-          "title": "Launch Creator Studio",
-          "date": "2022-10-30T15:46:07.387Z",
-          "status": "completed",
-          "resource": {
-            "title": "Early Access: Going No-Code with Metaplex Creator Studio",
-            "url": "https://www.metaplex.com/posts/announcing-metaplex-creator-studio"
-          }
-        },
-        {
-          "title": "Launch Candy Machine, v3",
-          "date": "2023-01-28T16:47:34.797Z",
-          "status": "delayed",
-          "resource": null
-        },
-        {
-          "title": "Support for web3 games",
-          "date": "2023-03-28T16:47:34.797Z",
-          "status": "inprogress",
-          "resource": null
-        },
-        {
-          "title": "Launch Whitepaper NFT",
-          "date": "2023-07-28T16:47:34.797Z",
-          "status": "upcoming",
-          "resource": null
-        }
-      ]
-    },
     "faq": [
       {
         "question": "What is Metaplex?",
@@ -222,6 +170,12 @@
     },
     "gallery": [
       {
+        "caption": "Discussing the Realms Roadmap",
+        "url": "https://www.youtube.com/watch?v=YGYSrmYhFQ0",
+        "height": 338,
+        "width": 600
+      },
+      {
         "caption": "The Realms team at the inaugural AthensDAO Conference",
         "url": "https://pbs.twimg.com/media/FT_4VAqXsAQCFBp?format=jpg&name=large",
         "height": 600,
@@ -269,6 +223,44 @@
         "url": "https://twitter.com/civickey/status/1570164818191208448?s=20&t=dKgTwPIdQN8zKfK9x2bikQ"
       }
     ],
+    "team": [
+      {
+        "name": "Sebastian Bor",
+        "avatar": "https://pbs.twimg.com/profile_images/1427584976221089792/wzCRED_r_400x400.jpg",
+        "description": [
+          "Sebastian is responsible for developing SPL Governance as well as the backend infrastructure for Realms. Prior to Solana Labs, he spent his career in the finance and gaming industries."
+        ],
+        "role": "Contract Development",
+        "twitter": "@Sebastian_Bor"
+      },
+      {
+        "name": "Emon Motamedi",
+        "avatar": "https://pbs.twimg.com/profile_images/1146682718849159168/v7O-oZAf_400x400.jpg",
+        "description": [
+          "Emon leads the product development for the Realms team, overseeing its vision as well as its day to day needs. Before joining Solana Labs, Emon ran product teams for Reddit and founded a fintech startup called Florian."
+        ],
+        "role": "Product",
+        "twitter": "@EmonMotamedi"
+      },
+      {
+        "name": "Niranjan Ramadas",
+        "avatar": "https://drive.google.com/uc?id=12ASbqu9gHLRnlIN7itZnorJZDBFYBqFv",
+        "description": [
+          "Niranjan serves as the frontend and api engineer on the Realms team. Prior to Solana Labs, he worked at Reddit and co-founded a startup building software for remote teams."
+        ],
+        "role": "Frontend Development",
+        "twitter": "@RamadasNiranjan"
+      },
+      {
+        "name": "Dan Madden",
+        "avatar": "https://drive.google.com/uc?id=1bt92ZpMPzq5sRYCMLMxJOuyKFJjrkU8b",
+        "description": [
+          "Dan is responsible for the design direction and implementation of Realms. Prior to Solana Labs, he led the design discipline at several product development agencies."
+        ],
+        "role": "Design",
+        "twitter": "@maddendan"
+      }
+    ],
     "roadmap": {
       "items": [
         {
@@ -285,7 +277,7 @@
           "date": "2022-08-12T15:45:01.159Z",
           "status": "completed",
           "resource": {
-            "title": "Introducing DAO wallets, making it simpler for DAOs to own and manage any type of digital asset",
+            "title": "DAO wallets make it simple for DAOs to own any digital asset",
             "url": "https://twitter.com/Realms_DAOs/status/1558148559513452546"
           }
         },
@@ -297,13 +289,13 @@
         },
         {
           "title": "Launch Organization Hub & Feed",
-          "date": "2023-11-04T16:47:34.797Z",
+          "date": "2022-11-04T16:47:34.797Z",
           "status": "inprogress",
           "resource": null
         },
         {
           "title": "Launch Discovery Experience",
-          "date": "2023-11-04T16:47:34.797Z",
+          "date": "2022-11-04T16:47:34.797Z",
           "status": "inprogress",
           "resource": null
         },

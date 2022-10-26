@@ -34,7 +34,7 @@ export function Team(props: Props) {
         <FlagFilledIcon className="fill-neutral-300 h-6 mr-5 w-6" />
         <div className="text-4xl font-semibold">The Team</div>
       </header>
-      <div className="mt-12 w-full">
+      <div className="mt-12 w-full space-y-10">
         {props.teamMembers.map((teamMember, i) => (
           <div
             className={cx(

@@ -1568,6 +1568,15 @@
     big.js "^6.1.1"
     bs58 "^5.0.0"
 
+"@blockworks-foundation/mangolana@0.0.1-beta.8":
+  version "0.0.1-beta.8"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mangolana/-/mangolana-0.0.1-beta.8.tgz#9c70df1c0f9b37bd0bdd528749085633859c9376"
+  integrity sha512-2c4nI4zbNnLGkNvajaanogdar/r5OfMkFrwGaGq4y3UVO1OJ8WAwKm2TkhQwhU6xWghpyRGYfcFMDVtbe4iNcQ==
+  dependencies:
+    "@solana/web3.js" "^1.63.1"
+    bs58 "^5.0.0"
+    node-fetch "^3.2.10"
+
 "@blocto/sdk@^0.2.21":
   version "0.2.22"
   resolved "https://registry.yarnpkg.com/@blocto/sdk/-/sdk-0.2.22.tgz#c7fe62809de0640a0a3f7a043c5bbceb8be17e38"
@@ -15351,6 +15360,15 @@ node-fetch@2.6.1:
   version "2.6.1"
   resolved "https://registry.npmjs.org/node-fetch/-/node-fetch-2.6.1.tgz"
   integrity sha512-V4aYg89jEoVRxRb2fJdAg8FHvI7cEyYdVAh94HH0UIK8oJxUfkjlDQN9RbMx+bEjP7+ggMiFRprSti032Oipxw==
+
+node-fetch@^3.2.10:
+  version "3.2.10"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-3.2.10.tgz#e8347f94b54ae18b57c9c049ef641cef398a85c8"
+  integrity sha512-MhuzNwdURnZ1Cp4XTazr69K0BTizsBroX7Zx3UgDSVcZYKF/6p0CBe4EUb/hLqmzVhl0UpYfgRljQ4yxE+iCxA==
+  dependencies:
+    data-uri-to-buffer "^4.0.0"
+    fetch-blob "^3.1.4"
+    formdata-polyfill "^4.0.10"
 
 node-fetch@^3.2.3:
   version "3.2.6"
