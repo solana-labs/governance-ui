@@ -2,26 +2,126 @@ import ThumbUpIcon from '@carbon/icons-react/lib/ThumbsUp';
 import { PublicKey } from '@solana/web3.js';
 
 import { LargeCard } from '@hub/components/DiscoverPage/LargeCard';
+import { Category } from '@hub/components/OrgCategory';
 import cx from '@hub/lib/cx';
+
+import imgAudius from './audius.png';
+import imgMonkedao from './monkedao.png';
+import imgSms from './sms.png';
+import imgStaratlas from './staratlas.png';
 
 export const ITEMS = [
   {
-    imgSrc: '',
-    content: <div />,
-    publicKey: new PublicKey('2sEcHwzsNBwNoTM1yAXjtF1HTMQKUAXf8ivtdpSpo9Fv'),
+    imgSrc: imgAudius.src,
+    category: Category.Web3,
+    content: (
+      <div>
+        Audius isn’t just building a competitive music streaming platform. They
+        are at the forefront of the conversation surrounding ownership rights by
+        artists and fans.
+      </div>
+    ),
+    publicKey: new PublicKey('H3e67AJqEx3yiWcSdP7g6qVkrAeCrpJSkQtxAKy7QYGK'),
+    stats: [
+      {
+        top: '7.2M',
+        bottom: 'Active Listeners',
+      },
+      {
+        top: '250.7K',
+        bottom: 'Artists',
+      },
+      {
+        top: '1.1M',
+        bottom: 'Songs Served',
+      },
+    ],
+    title: 'Audius',
     urlId: 'metaplex',
   },
   {
-    imgSrc: '',
-    content: <div />,
-    publicKey: new PublicKey('2sEcHwzsNBwNoTM1yAXjtF1HTMQKUAXf8ivtdpSpo9Fv'),
+    imgSrc: imgStaratlas.src,
+    category: Category.Gaming,
+    content: (
+      <div>
+        Star Atlas is a grand strategy game of space exploration, territorial
+        conquest, political domination, and living among the stars—all being
+        built as a native Web3 experience.
+      </div>
+    ),
+    publicKey: new PublicKey('H3e67AJqEx3yiWcSdP7g6qVkrAeCrpJSkQtxAKy7QYGK'),
+    stats: [
+      {
+        top: '100%',
+        bottom: 'Asset Ownership',
+      },
+      {
+        top: 'Tokens',
+        bottom: 'Dictate Game Rules',
+      },
+      {
+        top: 'NFTs',
+        bottom: 'Broad Uses',
+      },
+    ],
+    title: 'Star Atlas',
     urlId: 'metaplex',
   },
   {
-    imgSrc: '',
-    content: <div />,
-    publicKey: new PublicKey('2sEcHwzsNBwNoTM1yAXjtF1HTMQKUAXf8ivtdpSpo9Fv'),
+    imgSrc: imgSms.src,
+    category: Category.Web3,
+    content: (
+      <div>
+        The Solana Mobile Stack and accompanying mobile Phone provides Web3
+        natives native crypto experience on their phone. This new frontier
+        features several opportunities including:
+      </div>
+    ),
+    publicKey: new PublicKey('H3e67AJqEx3yiWcSdP7g6qVkrAeCrpJSkQtxAKy7QYGK'),
+    stats: [
+      {
+        top: 'Seed Vault',
+        bottom: 'Wallet Hardware',
+      },
+      {
+        top: 'Low Fees',
+        bottom: 'dApp Transactions',
+      },
+      {
+        top: 'OSOM',
+        bottom: 'Premium Hardware',
+      },
+    ],
+    title: 'Solana Mobile / SMS',
     urlId: 'metaplex',
+  },
+  {
+    imgSrc: imgMonkedao.src,
+    category: Category.Web3,
+    content: (
+      <div>
+        Monkedao is Community of Solana Monkey Business NFT owners operating a
+        validator to increase the value of the DAO treasury. Virtual community
+        events and IRL gatherings.
+      </div>
+    ),
+    publicKey: new PublicKey('B1CxhV1khhj7n5mi5hebbivesqH9mvXr5Hfh2nD2UCh6'),
+    stats: [
+      {
+        top: '43.3K SOL',
+        bottom: 'In Stake Pool',
+      },
+      {
+        top: 'Up to 7%',
+        bottom: 'Staking w/ DAOPool',
+      },
+      {
+        top: '1st DAO',
+        bottom: 'To Operate Validator',
+      },
+    ],
+    title: 'Monke Dao',
+    urlId: 'MonkeDAO',
   },
 ];
 
@@ -57,7 +157,6 @@ export function Popular(props: Props) {
             <LargeCard className="bg-white" {...item} />
           </div>
         ))}
-        <div className="w-6" />
       </div>
     </section>
   );

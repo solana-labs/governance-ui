@@ -62,14 +62,14 @@ export function SmallCard(props: Props) {
           }}
         />
         <div className="pt-5 px-6 pb-7">
-          <header className="flex items-center justify-between gap-x-1">
+          <header className="flex items-center justify-between gap-x-2">
             <div className="font-bold text-neutral-900 truncate flex-shrink">
               {props.name}
             </div>
             {typeof props.twitterFollowerCount === 'number' ? (
               !!props.twitterFollowerCount ? (
                 <div className="flex items-center">
-                  <TwitterIcon className="fill-sky-500 h-3 w-3" />
+                  <TwitterIcon className="fill-sky-500 h-3 w-3 mr-1" />
                   <div className="text-xs text-neutral-700">
                     {abbreviateNumber(props.twitterFollowerCount)}
                   </div>
@@ -84,7 +84,7 @@ export function SmallCard(props: Props) {
                   ({ hub }) =>
                     hub.twitterFollowerCount ? (
                       <div className="flex items-center">
-                        <TwitterIcon className="fill-sky-500 h-3 w-3" />
+                        <TwitterIcon className="fill-sky-500 h-3 w-3 mr-1" />
                         <div className="text-xs text-neutral-700">
                           {abbreviateNumber(hub.twitterFollowerCount)}
                         </div>

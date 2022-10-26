@@ -51,7 +51,7 @@ export function NotableNFTs(props: Props) {
   return (
     <section className={props.className}>
       <div className="flex items-center space-x-2">
-        <NFTIcon className="stroke-neutral-700 h-4 w-4" />
+        <NFTIcon className="fill-neutral-700 h-4 w-4" />
         <div className="text-sm text-neutral-700 uppercase font-semibold">
           notable nft collections
         </div>

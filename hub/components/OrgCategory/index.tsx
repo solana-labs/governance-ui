@@ -1,4 +1,9 @@
+import ChartCandlestickIcon from '@carbon/icons-react/lib/ChartCandlestick';
 import CubeIcon from '@carbon/icons-react/lib/Cube';
+import GameConsoleIcon from '@carbon/icons-react/lib/GameConsole';
+import IdeaIcon from '@carbon/icons-react/lib/Idea';
+
+import { NFT } from '@hub/components/icons/NFT';
 
 export enum Category {
   Defi,
@@ -10,10 +15,16 @@ export enum Category {
 
 export function getCategoryIcon(category: Category) {
   switch (category) {
+    case Category.Defi:
+      return <ChartCandlestickIcon />;
+    case Category.Gaming:
+      return <GameConsoleIcon />;
+    case Category.Nft:
+      return <NFT />;
     case Category.Web3:
       return <CubeIcon />;
     default:
-      return <CubeIcon />;
+      return <IdeaIcon />;
   }
 }
 

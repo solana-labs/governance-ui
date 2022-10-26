@@ -19,6 +19,8 @@ export function DiscoverPage(props: Props) {
         'gap-x-12',
         'grid-cols-[418px,1fr]',
         'grid',
+        '2xl:ml-[calc((100vw-1536px)/2)]',
+        'overflow-x-visible',
         props.className,
       )}
     >

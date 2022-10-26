@@ -57,7 +57,12 @@ export function Post(props: Props) {
       ),
       ({ feedItem }) => (
         <button
-          className={cx('text-left', props.className)}
+          className={cx(
+            'text-left',
+            'w-full',
+            'overflow-hidden',
+            props.className,
+          )}
           onClick={() => {
             router.push(`/realm/${feedItem.realm.urlId}/${props.postId}`);
           }}
@@ -68,6 +73,7 @@ export function Post(props: Props) {
           >
             <a
               className={cx(
+                'block',
                 'font-bold',
                 'text-neutral-900',
                 'transition-colors',

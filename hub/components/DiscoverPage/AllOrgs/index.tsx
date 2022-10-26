@@ -6,6 +6,7 @@ import { ITEMS as NFT_ITEMS } from '@hub/components/DiscoverPage/NotableNFTs';
 import { ITEMS as PROJECT_ITEMS } from '@hub/components/DiscoverPage/NotableProjects';
 import { ITEMS as POPULAR_ITEMS } from '@hub/components/DiscoverPage/Popular';
 import { SmallCard } from '@hub/components/DiscoverPage/SmallCard';
+import { LoadingDots } from '@hub/components/LoadingDots';
 import { useQuery } from '@hub/hooks/useQuery';
 import cx from '@hub/lib/cx';
 import * as RE from '@hub/types/Result';
@@ -28,13 +29,33 @@ export function AllOrgs(props: Props) {
     query: gql.getRealmsList,
   });
 
-  const items = pipe(
+  return pipe(
     result,
     RE.match(
-      () => [],
-      () => [],
+      () => null,
+      () => (
+        <section className={props.className}>
+          <div className="flex items-center space-x-2">
+            <RealmCircle className=" h-4 w-4" />
+            <div className="text-sm text-neutral-700 uppercase font-semibold">
+              all organizations building on solana
+            </div>
+          </div>
+          <div className="text-neutral-500">
+            All the projects and organizations on Solana
+          </div>
+          <div className={cx('flex', 'justify-center', 'items-center', 'mt-6')}>
+            <div className="flex items-center">
+              <div className="text-xs text-neutral-500 mr-2">
+                Fetching all orgs
+              </div>
+              <LoadingDots style="pulse" />
+            </div>
+          </div>
+        </section>
+      ),
       ({ realmDropdownList }) => {
-        return realmDropdownList
+        const items = realmDropdownList
           .map((item) => ({
             bannerImgSrc: item.realm.bannerImageUrl,
             description: item.realm.shortDescription,
@@ -74,30 +95,36 @@ export function AllOrgs(props: Props) {
               return bScore - aScore;
             }
           });
+
+        return (
+          <section className={props.className}>
+            <div className="flex items-center space-x-2">
+              <RealmCircle className=" h-4 w-4" />
+              <div className="text-sm text-neutral-700 uppercase font-semibold">
+                all organizations building on solana
+              </div>
+            </div>
+            <div className="text-neutral-500">
+              All the projects and organizations on Solana
+            </div>
+            <div
+              className={cx(
+                'grid',
+                'grid-cols-4',
+                'mt-6',
+                'gap-3',
+                'items-center',
+              )}
+            >
+              {items.map((item, i) => (
+                <div className="flex-shrink-0 max-w-[290px] h-56" key={i}>
+                  <SmallCard {...item} />
+                </div>
+              ))}
+            </div>
+          </section>
+        );
       },
     ),
-  );
-
-  return (
-    <section className={props.className}>
-      <div className="flex items-center space-x-2">
-        <RealmCircle className=" h-4 w-4" />
-        <div className="text-sm text-neutral-700 uppercase font-semibold">
-          all organizations building on solana
-        </div>
-      </div>
-      <div className="text-neutral-500">
-        All the projects and organizations on Solana
-      </div>
-      <div
-        className={cx('grid', 'grid-cols-4', 'mt-6', 'gap-3', 'items-center')}
-      >
-        {items.map((item, i) => (
-          <div className="flex-shrink-0 max-w-[290px] h-56" key={i}>
-            <SmallCard {...item} />
-          </div>
-        ))}
-      </div>
-    </section>
   );
 }
