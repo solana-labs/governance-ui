@@ -222,19 +222,19 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
           ...ANCHOR_DISCRIMINATOR_LAYOUT,
           u8('mintingFeeInBps'),
           u8('redeemingFeeInBps'),
-          u8('redeemableDepositorySupplyCap'),
+          u128('redeemableAmountUnderManagementCap'),
         ]);
         const {
           mintingFeeInBps,
           redeemingFeeInBps,
-          redeemableDepositorySupplyCap,
+          redeemableAmountUnderManagementCap,
         } = dataLayout.decode(Buffer.from(data)) as any;
 
         return (
           <>
             <p>{`Minting fee in bps: ${mintingFeeInBps.toString()}`}</p>
             <p>{`Redeeming fee in bps: ${redeemingFeeInBps.toString()}`}</p>
-            <p>{`Native redeemable depository supply cap: ${redeemableDepositorySupplyCap.toString()}`}</p>
+            <p>{`Native redeemable amount under management cap: ${redeemableAmountUnderManagementCap.toString()}`}</p>
           </>
         );
       },
