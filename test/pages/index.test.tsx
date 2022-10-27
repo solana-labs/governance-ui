@@ -5,7 +5,6 @@ import React from 'react'
 import Home from '../../pages/index'
 import { render, waitFor } from '@testing-library/react'
 import singletonRouter from 'next/router'
-import { createRoot } from 'react-dom/client'
 
 const originalRealm = process.env.REALM
 
