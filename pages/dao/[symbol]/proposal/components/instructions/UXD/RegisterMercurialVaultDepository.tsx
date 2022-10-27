@@ -1,15 +1,12 @@
 import * as yup from 'yup';
 import Select from '@components/inputs/Select';
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
-import createRegisterMangoDepositoryInstruction from '@tools/sdk/uxdProtocol/createRegisterMangoDepositoryInstruction';
-import {
-  getDepositoryMintSymbols,
-  getInsuranceMintSymbols,
-} from '@tools/sdk/uxdProtocol/uxdClient';
+import { getDepositoryMintSymbols } from '@tools/sdk/uxdProtocol/uxdClient';
 import { GovernedMultiTypeAccount } from '@utils/tokens';
-import { UXDRegisterMangoDepositoryForm } from '@utils/uiTypes/proposalCreationTypes';
+import { UXDRegisterMercurialVaultDepositoryForm } from '@utils/uiTypes/proposalCreationTypes';
 import SelectOptionList from '../../SelectOptionList';
 import Input from '@components/inputs/Input';
+import createRegisterMercurialVaultDepositoryInstruction from '@tools/sdk/uxdProtocol/createRegisterMercurialVaultDepositoryInstruction';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -17,14 +14,23 @@ const schema = yup.object().shape({
     .nullable()
     .required('Governance account is required'),
   collateralName: yup.string().required('Valid Collateral name is required'),
-  insuranceName: yup.string().required('Valid Insurance name is required'),
+  mintingFeeInBps: yup
+    .number()
+    .min(0, 'Minting fee in bps should be min 0')
+    .max(255, 'Minting fee in bps should be max 255')
+    .required('Minting fee in bps is required'),
+  redeemingFeeInBps: yup
+    .number()
+    .min(0, 'Redeeming fee in bps should be min 0')
+    .max(255, 'Redeeming fee in bps should be max 255')
+    .required('Redeeming fee in bps is required'),
   uiRedeemableDepositorySupplyCap: yup
     .number()
     .min(0, 'Redeemable depository supply cap should be min 0')
     .required('Redeemable depository supply cap is required'),
 });
 
-const RegisterMangoDepository = ({
+const RegisterMercurialVaultDepository = ({
   index,
   governedAccount,
 }: {
@@ -36,20 +42,29 @@ const RegisterMangoDepository = ({
     form,
     formErrors,
     handleSetForm,
-  } = useInstructionFormBuilder<UXDRegisterMangoDepositoryForm>({
+  } = useInstructionFormBuilder<UXDRegisterMercurialVaultDepositoryForm>({
     index,
     initialFormValues: {
       governedAccount,
     },
     schema,
     buildInstruction: async function ({ form, wallet, governedAccountPubkey }) {
-      return createRegisterMangoDepositoryInstruction({
+      return createRegisterMercurialVaultDepositoryInstruction({
         connection,
         uxdProgramId: form.governedAccount!.governance!.account.governedAccount,
         authority: governedAccountPubkey,
+
+        // TODO
+        // Temporary authority override for tests with mainnet test program
+        // authority: new PublicKey(
+        //  '8cJ5KH2ExX2rrY6DbzAqrBMDkQxYZfyedB1C4L4osc5N',
+        // ),
+        // ================
+
         payer: wallet.publicKey!,
         depositoryMintName: form.collateralName!,
-        insuranceMintName: form.insuranceName!,
+        mintingFeeInBps: form.mintingFeeInBps!,
+        redeemingFeeInBps: form.redeemingFeeInBps!,
         redeemableDepositorySupplyCap: form.uiRedeemableDepositorySupplyCap!,
       });
     },
@@ -69,17 +84,35 @@ const RegisterMangoDepository = ({
         <SelectOptionList list={getDepositoryMintSymbols(connection.cluster)} />
       </Select>
 
-      <Select
-        label="Insurance Name"
-        value={form.insuranceName}
-        placeholder="Please select..."
-        onChange={(value) =>
-          handleSetForm({ value, propertyName: 'insuranceName' })
+      <Input
+        label="Minting Fees in BPS"
+        value={form.mintingFeeInBps}
+        type="number"
+        min={0}
+        max={255}
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'mintingFeeInBps',
+          })
         }
-        error={formErrors['insuranceName']}
-      >
-        <SelectOptionList list={getInsuranceMintSymbols(connection.cluster)} />
-      </Select>
+        error={formErrors['mintingFeeInBps']}
+      />
+
+      <Input
+        label="Redeeming Fees in BPS"
+        value={form.redeemingFeeInBps}
+        type="number"
+        min={0}
+        max={255}
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'redeemingFeeInBps',
+          })
+        }
+        error={formErrors['redeemingFeeInBps']}
+      />
 
       <Input
         label="Redeemable Depository Supply Cap"
@@ -99,4 +132,4 @@ const RegisterMangoDepository = ({
   );
 };
 
-export default RegisterMangoDepository;
+export default RegisterMercurialVaultDepository;

@@ -128,7 +128,7 @@ export default function InstructionCard({
   const isSol = tokenImgUrl.includes(WSOL_MINT);
   const proposalAuthority = tokenRecords[proposal.owner.toBase58()];
 
-  const isInstructionAboutOrcaWhirlpoolOpenPosition = ((): boolean => {
+  const isInstructionRequireAdditionalSigner = ((): boolean => {
     if (!proposal) {
       return false;
     }
@@ -137,33 +137,73 @@ export default function InstructionCard({
       return false;
     }
 
+    // Orca open position transaction
     if (
-      !proposalInstruction.account
+      proposalInstruction.account
         .getSingleInstruction()
-        .programId.equals(OrcaConfiguration.WhirlpoolProgramId)
-    ) {
-      return false;
-    }
-
-    // Compare the first byte of the anchor discriminator
-    if (
+        .programId.equals(OrcaConfiguration.WhirlpoolProgramId) &&
+      // Compare the first byte of the anchor discriminator
       Number(
         proposalInstruction.account.getSingleInstruction().data.slice(0, 1),
-      ) !== OrcaConfiguration.instructionsCode.WhirlpoolOpenPositionWithMetadata
+      ) === OrcaConfiguration.instructionsCode.WhirlpoolOpenPositionWithMetadata
     ) {
-      return false;
+      return true;
     }
 
-    return true;
+    // ===================
+    // SPECIAL CASE FOR MAINNET TEST PROGRAM
+    if (
+      proposalInstruction.account
+        .getSingleInstruction()
+        .programId.equals(
+          new PublicKey('EmXCGBmeZ7vTZu1NcuR5Cod8438aQdghhVa69zcBVF23'),
+        ) /*&&
+      // Compare the first byte of the anchor discriminator
+      Number(
+        proposalInstruction.account.getSingleInstruction().data.slice(0, 1),
+      ) === OrcaConfiguration.instructionsCode.WhirlpoolOpenPositionWithMetadata*/
+    ) {
+      return true;
+    }
+    // ====================
+
+    return false;
   })();
 
   // Say if the connected wallet is the payer of the open position instruction
-  const isPayerOfOrcaWhirlpoolOpenPositionIx =
-    isInstructionAboutOrcaWhirlpoolOpenPosition && wallet?.publicKey
-      ? proposalInstruction.account
-          .getSingleInstruction()
-          .accounts[0].pubkey.equals(wallet.publicKey)
-      : false;
+  const isPayerTheProposalCreator = (() => {
+    if (!wallet?.publicKey) {
+      return false;
+    }
+
+    // Orca open position transaction
+    if (
+      proposalInstruction.account
+        .getSingleInstruction()
+        .programId.equals(OrcaConfiguration.WhirlpoolProgramId) &&
+      // Compare the first byte of the anchor discriminator
+      proposalInstruction.account
+        .getSingleInstruction()
+        .accounts[0].pubkey.equals(wallet.publicKey)
+    ) {
+      return true;
+    }
+
+    // ====================
+    // Special case for mainnet test program, show the field to anyone
+    if (
+      proposalInstruction.account
+        .getSingleInstruction()
+        .programId.equals(
+          new PublicKey('EmXCGBmeZ7vTZu1NcuR5Cod8438aQdghhVa69zcBVF23'),
+        )
+    ) {
+      return true;
+    }
+    // ====================
+
+    return false;
+  })();
 
   return (
     <div className="break-all">
@@ -216,14 +256,13 @@ export default function InstructionCard({
       )}
 
       {
-        // In the very particular case it is about Orca Whirlpool Open Position Instruction
-        // We ask the users for the secret key of the position mint
-        isInstructionAboutOrcaWhirlpoolOpenPosition &&
-        isPayerOfOrcaWhirlpoolOpenPositionIx ? (
+        // In very particular cases, we need to sign with additional wallets, for that
+        // we need to provide extra Keypair at execution time
+        // Example: with Orca Whirlpool Open Position Instruction, we ask the users for the secret key of the position mint
+        isInstructionRequireAdditionalSigner && isPayerTheProposalCreator ? (
           <div className="flex flex-col mt-6 mb-8">
             <strong>
-              Provide the <em>positionMint</em> secret key shown during the
-              proposal creation.
+              Provide the secret key shown during the proposal creation.
             </strong>
 
             <SecretKeyInput
@@ -249,9 +288,7 @@ export default function InstructionCard({
         {proposal &&
         proposal.account.state !== ProposalState.ExecutingWithErrors ? (
           <ExecuteInstructionButton
-            disabled={
-              isInstructionAboutOrcaWhirlpoolOpenPosition && !additionalSigner
-            }
+            disabled={isInstructionRequireAdditionalSigner && !additionalSigner}
             proposal={proposal}
             proposalInstruction={proposalInstruction}
             playing={playing}

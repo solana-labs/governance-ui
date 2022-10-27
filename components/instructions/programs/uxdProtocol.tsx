@@ -1,5 +1,5 @@
 import { Connection } from '@solana/web3.js';
-import { struct, u8, nu64 } from 'buffer-layout';
+import { struct, u8, nu64, Layout } from 'buffer-layout';
 import { AccountMetaData } from '@solana/spl-governance';
 import { bool, u128, u64 } from '@project-serum/borsh';
 import { INSURANCE_MINTS } from '@tools/sdk/uxdProtocol/uxdClient';
@@ -98,22 +98,20 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
         data: Uint8Array,
         _accounts: AccountMetaData[],
       ) => {
+        console.log('data', data);
+
         const dataLayout = struct([
           u8('instruction'),
           ...ANCHOR_DISCRIMINATOR_LAYOUT,
-          u8('bump'),
-          u8('redeemableBump'),
           u8('redeemableMintDecimals'),
         ]);
 
-        const args = dataLayout.decode(Buffer.from(data)) as any;
+        const { redeemableMintDecimals } = dataLayout.decode(
+          Buffer.from(data),
+        ) as any;
 
         return (
-          <>
-            <p>{`bump: ${args.bump}`}</p>
-            <p>{`redeemable bump: ${args.redeemableBump}`}</p>
-            <p>{`redeemable mint decimals: ${args.redeemableMintDecimals.toString()}`}</p>
-          </>
+          <p>{`redeemable mint decimals: ${redeemableMintDecimals.toString()}`}</p>
         );
       },
     },
@@ -134,12 +132,10 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
         const args = dataLayout.decode(Buffer.from(data)) as any;
 
         return (
-          <>
-            <p>{`Redeemable Global Supply Cap: ${nativeAmountToFormattedUiAmount(
-              new BN(args.redeemableGlobalSupplyCap.toString()),
-              UXD_DECIMALS,
-            )}`}</p>
-          </>
+          <p>{`Redeemable Global Supply Cap: ${nativeAmountToFormattedUiAmount(
+            new BN(args.redeemableGlobalSupplyCap.toString()),
+            UXD_DECIMALS,
+          )}`}</p>
         );
       },
     },
@@ -159,12 +155,10 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
         const args = dataLayout.decode(Buffer.from(data)) as any;
 
         return (
-          <>
-            <p>{`Redeemable Supply Soft Cap: ${nativeAmountToFormattedUiAmount(
-              new BN(args.softCap.toString()),
-              UXD_DECIMALS,
-            )}`}</p>
-          </>
+          <p>{`Redeemable Supply Soft Cap: ${nativeAmountToFormattedUiAmount(
+            new BN(args.softCap.toString()),
+            UXD_DECIMALS,
+          )}`}</p>
         );
       },
     },
@@ -176,15 +170,13 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
         'Controller',
         'Depository',
         'Collateral Mint', // BTC/ WSOL.....
-        'Insurance Mint', // USDC
-        'Depository Collateral Passthrough Account',
-        'Depository Insurance Passthrough Account',
-        'Depository Mango Account',
+        'Quote Mint', // USDC
+        'Mango Account',
         'Mango Group',
-        'Rent',
         'System Program',
         'Token Program',
         'Mango Program',
+        'Rent',
       ],
       getDataUI: (
         _connection: Connection,
@@ -194,19 +186,271 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
         const dataLayout = struct([
           u8('instruction'),
           ...ANCHOR_DISCRIMINATOR_LAYOUT,
-          u8('bump'),
-          u8('collateralPassthroughBump'),
-          u8('insurancePassthroughBump'),
-          u8('mangoAccountBump'),
+          u128('redeemableDepositorySupplyCap'),
         ]);
-        const args = dataLayout.decode(Buffer.from(data)) as any;
+        const { redeemableDepositorySupplyCap } = dataLayout.decode(
+          Buffer.from(data),
+        ) as any;
+
+        return (
+          <p>{`Native redeemable depository supply cap: ${redeemableDepositorySupplyCap.toString()}`}</p>
+        );
+      },
+    },
+    21: {
+      name: 'UXD - Register Mercurial Vault Depository',
+      accounts: [
+        'Authority',
+        'Payer',
+        'Controller',
+        'Depository',
+        'Collateral Mint',
+        'Mercurial Vault',
+        'Mercurial Vault LP Mint',
+        'Depository LP Token Vault',
+        'System Program',
+        'Token Program',
+        'Rent',
+      ],
+      getDataUI: (
+        _connection: Connection,
+        data: Uint8Array,
+        _accounts: AccountMetaData[],
+      ) => {
+        const dataLayout = struct([
+          u8('instruction'),
+          ...ANCHOR_DISCRIMINATOR_LAYOUT,
+          u8('mintingFeeInBps'),
+          u8('redeemingFeeInBps'),
+          u8('redeemableDepositorySupplyCap'),
+        ]);
+        const {
+          mintingFeeInBps,
+          redeemingFeeInBps,
+          redeemableDepositorySupplyCap,
+        } = dataLayout.decode(Buffer.from(data)) as any;
 
         return (
           <>
-            <p>{`bump: ${args.bump.toString()}`}</p>
-            <p>{`collateralPassthroughBump: ${args.collateralPassthroughBump.toString()}`}</p>
-            <p>{`insurancePassthroughBump: ${args.insurancePassthroughBump.toString()}`}</p>
-            <p>{`mangoAccountBump: ${args.mangoAccountBump.toString()}`}</p>
+            <p>{`Minting fee in bps: ${mintingFeeInBps.toString()}`}</p>
+            <p>{`Redeeming fee in bps: ${redeemingFeeInBps.toString()}`}</p>
+            <p>{`Native redeemable depository supply cap: ${redeemableDepositorySupplyCap.toString()}`}</p>
+          </>
+        );
+      },
+    },
+    29: {
+      name: 'UXD - Edit Mercurial Vault Depository',
+      accounts: ['Authority', 'Controller', 'Depository'],
+      getDataUI: (
+        _connection: Connection,
+        data: Uint8Array,
+        _accounts: AccountMetaData[],
+      ) => {
+        let redeemableDepositorySupplyCapOption = false;
+        let mintingFeeInBpsOption = false;
+        let redeemingFeeInBpsOption = false;
+
+        // Check if options are used or not
+        if (data[8] == 1) {
+          redeemableDepositorySupplyCapOption = true;
+        }
+
+        console.log('data', data);
+
+        if (data[9 + (redeemableDepositorySupplyCapOption ? 16 : 0)] == 1) {
+          mintingFeeInBpsOption = true;
+        }
+
+        if (
+          data[
+            10 +
+              (redeemableDepositorySupplyCapOption ? 16 : 0) +
+              (mintingFeeInBpsOption ? 1 : 0)
+          ] == 1
+        ) {
+          redeemingFeeInBpsOption = true;
+        }
+
+        const layout: Layout<any>[] = [
+          u8('instruction'),
+          ...ANCHOR_DISCRIMINATOR_LAYOUT,
+        ];
+
+        layout.push(u8('redeemableDepositorySupplyCapOption'));
+        if (redeemableDepositorySupplyCapOption) {
+          layout.push(u128('redeemableDepositorySupplyCap'));
+        }
+
+        layout.push(u8('mintingFeeInBpsOption'));
+        if (mintingFeeInBpsOption) {
+          layout.push(u8('mintingFeeInBps'));
+        }
+
+        layout.push(u8('redeemingFeeInBpsOption'));
+        if (redeemingFeeInBpsOption) {
+          layout.push(u8('redeemingFeeInBps'));
+        }
+
+        const dataLayout = struct(layout);
+
+        const {
+          redeemableDepositorySupplyCap,
+          mintingFeeInBps,
+          redeemingFeeInBps,
+        } = dataLayout.decode(Buffer.from(data)) as any;
+
+        return (
+          <>
+            <p>{`Native redeemable depository supply cap: ${
+              redeemableDepositorySupplyCapOption
+                ? redeemableDepositorySupplyCap.toString()
+                : 'Not used'
+            }`}</p>
+            <p>{`Minting fee in bps: ${
+              mintingFeeInBpsOption ? mintingFeeInBps.toString() : 'Not used'
+            }`}</p>
+            <p>{`Redeeming fee in bps: ${
+              redeemingFeeInBpsOption
+                ? redeemingFeeInBps.toString()
+                : 'Not used'
+            }`}</p>
+          </>
+        );
+      },
+    },
+    7: {
+      name: 'UXD - Edit Mango Depository',
+      accounts: ['Authority', 'Controller', 'Depository'],
+      getDataUI: (
+        _connection: Connection,
+        data: Uint8Array,
+        _accounts: AccountMetaData[],
+      ) => {
+        let quoteMintAndRedeemFeeOption = false;
+        let redeemableDepositorySupplyCapOption = false;
+
+        // Check if options are used or not
+        if (data[8] == 1) {
+          quoteMintAndRedeemFeeOption = true;
+        }
+
+        if (data[9 + (quoteMintAndRedeemFeeOption ? 1 : 0)] == 1) {
+          redeemableDepositorySupplyCapOption = true;
+        }
+
+        const layout: Layout<any>[] = [
+          u8('instruction'),
+          ...ANCHOR_DISCRIMINATOR_LAYOUT,
+        ];
+
+        layout.push(u8('quoteMintAndRedeemFeeOption'));
+        if (quoteMintAndRedeemFeeOption) {
+          layout.push(u8('quoteMintAndRedeemFee'));
+        }
+
+        layout.push(u8('redeemableDepositorySupplyCapOption'));
+        if (redeemableDepositorySupplyCapOption) {
+          layout.push(u128('redeemableDepositorySupplyCap'));
+        }
+
+        const dataLayout = struct(layout);
+
+        const {
+          quoteMintAndRedeemFee,
+          redeemableDepositorySupplyCap,
+        } = dataLayout.decode(Buffer.from(data)) as any;
+
+        return (
+          <>
+            <p>{`Quote mint and redeem fee: ${
+              quoteMintAndRedeemFeeOption
+                ? quoteMintAndRedeemFee.toString()
+                : 'Not used'
+            }`}</p>
+            <p>{`native redeemable depository supply cap: ${
+              redeemableDepositorySupplyCapOption
+                ? redeemableDepositorySupplyCap.toString()
+                : 'Not used'
+            }`}</p>
+          </>
+        );
+      },
+    },
+    132: {
+      name: 'UXD - Edit Controller',
+      accounts: ['Authority', 'Controller'],
+      getDataUI: (
+        _connection: Connection,
+        data: Uint8Array,
+        _accounts: AccountMetaData[],
+      ) => {
+        let quoteMintAndRedeemSoftCapOption = false;
+        let redeemableSoftCapOption = false;
+        let redeemableGlobalSupplyCapOption = false;
+
+        // Check if options are used or not
+        if (data[8] == 1) {
+          quoteMintAndRedeemSoftCapOption = true;
+        }
+
+        if (data[9 + (quoteMintAndRedeemSoftCapOption ? 8 : 0)] == 1) {
+          redeemableSoftCapOption = true;
+        }
+
+        if (
+          data[
+            10 +
+              (quoteMintAndRedeemSoftCapOption ? 8 : 0) +
+              (redeemableSoftCapOption ? 8 : 0)
+          ] == 1
+        ) {
+          redeemableGlobalSupplyCapOption = true;
+        }
+
+        const layout: Layout<any>[] = [
+          u8('instruction'),
+          ...ANCHOR_DISCRIMINATOR_LAYOUT,
+        ];
+
+        layout.push(u8('quoteMintAndRedeemSoftCapOption'));
+        if (quoteMintAndRedeemSoftCapOption) {
+          layout.push(u64('quoteMintAndRedeemSoftCap'));
+        }
+
+        layout.push(u8('redeemableSoftCapOption'));
+        if (redeemableSoftCapOption) {
+          layout.push(u64('redeemableSoftCap'));
+        }
+
+        layout.push(u8('redeemableGlobalSupplyCapOption'));
+        if (redeemableGlobalSupplyCapOption) {
+          layout.push(u128('redeemableGlobalSupplyCap'));
+        }
+
+        const dataLayout = struct(layout);
+
+        const {
+          quoteMintAndRedeemSoftCap,
+          redeemableSoftCap,
+          redeemableGlobalSupplyCap,
+        } = dataLayout.decode(Buffer.from(data)) as any;
+
+        return (
+          <>
+            <p>{`Native quote mint and redeem soft cap: ${
+              quoteMintAndRedeemSoftCap
+                ? quoteMintAndRedeemSoftCap.toString()
+                : 'Not used'
+            }`}</p>
+            <p>{`Native redeemable soft cap: ${
+              redeemableSoftCap ? redeemableSoftCap.toString() : 'Not used'
+            }`}</p>
+            <p>{`Native redeemable global supply cap: ${
+              redeemableGlobalSupplyCap
+                ? redeemableGlobalSupplyCap.toString()
+                : 'Not used'
+            }`}</p>
           </>
         );
       },
