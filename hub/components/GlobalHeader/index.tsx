@@ -53,10 +53,10 @@ export function GlobalHeader(props: Props) {
                   href: '/ecosystem',
                   title: 'Ecosystem Feed',
                 },
-                {
-                  href: '/discover',
-                  title: 'Discover',
-                },
+                // {
+                //   href: '/discover',
+                //   title: 'Discover',
+                // },
               ]}
             />
           </div>
