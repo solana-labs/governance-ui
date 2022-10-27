@@ -71,7 +71,9 @@ export function SmallCard(props: Props) {
                 <div className="flex items-center">
                   <TwitterIcon className="fill-sky-500 h-3 w-3 mr-1" />
                   <div className="text-xs text-neutral-700">
-                    {abbreviateNumber(props.twitterFollowerCount)}
+                    {abbreviateNumber(props.twitterFollowerCount, undefined, {
+                      maximumFractionDigits: 0,
+                    })}
                   </div>
                 </div>
               ) : null
@@ -86,7 +88,13 @@ export function SmallCard(props: Props) {
                       <div className="flex items-center">
                         <TwitterIcon className="fill-sky-500 h-3 w-3 mr-1" />
                         <div className="text-xs text-neutral-700">
-                          {abbreviateNumber(hub.twitterFollowerCount)}
+                          {abbreviateNumber(
+                            hub.twitterFollowerCount,
+                            undefined,
+                            {
+                              maximumFractionDigits: 0,
+                            },
+                          )}
                         </div>
                       </div>
                     ) : null,
