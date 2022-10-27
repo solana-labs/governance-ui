@@ -25,12 +25,32 @@ interface Props {
   bannerImgSrc?: null | string;
   category?: Category;
   description?: null | string;
-  heading?: null | RichTextDocument;
+  heading?: null | {
+    document: RichTextDocument;
+    isClipped: boolean;
+  };
   iconImgSrc: null | string;
   name: string;
   publicKey: PublicKey;
   twitterFollowerCount?: null | number;
   urlId: string;
+}
+
+function getDescription(props: Props) {
+  if (props.description) {
+    return <div className="line-clamp-4">{props.description}</div>;
+  }
+
+  if (props.heading) {
+    return (
+      <RichTextDocumentDisplay
+        document={props.heading.document}
+        isClipped={props.heading.isClipped}
+      />
+    );
+  }
+
+  return 'No description provided';
 }
 
 export function SmallCard(props: Props) {
@@ -41,7 +61,7 @@ export function SmallCard(props: Props) {
   });
 
   return (
-    <Link passHref href={`/realm/${props.urlId}`}>
+    <Link passHref href={`/realm/${props.urlId}/hub`}>
       <a
         className={cx(
           'block',
@@ -54,7 +74,7 @@ export function SmallCard(props: Props) {
         )}
       >
         <div
-          className="h-16 bg-center bg-cover bg-black"
+          className="h-16 bg-center bg-cover bg-white"
           style={{
             backgroundImage: `url(${
               props.bannerImgSrc || getDefaultBannerUrl(props.publicKey)
@@ -117,11 +137,7 @@ export function SmallCard(props: Props) {
               props.category ? 'mt-3' : 'mt-2',
             )}
           >
-            {props.heading ? (
-              <RichTextDocumentDisplay document={props.heading} />
-            ) : (
-              props.description || 'No description provided'
-            )}
+            {getDescription(props)}
           </div>
         </div>
         <RealmIcon

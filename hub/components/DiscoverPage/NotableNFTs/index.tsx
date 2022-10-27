@@ -6,40 +6,40 @@ import cx from '@hub/lib/cx';
 
 export const ITEMS = [
   {
-    bannerImgSrc: '',
+    bannerImgSrc: '/realms/RCH/banner.png',
     description:
-      'Lorem ipsum doler sit amet. This is some sample description text.',
-    iconImgSrc: '',
-    name: 'Test org',
-    publicKey: new PublicKey('2sEcHwzsNBwNoTM1yAXjtF1HTMQKUAXf8ivtdpSpo9Fv'),
-    urlId: 'metaplex',
+      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
+    iconImgSrc: '/realms/RCH/icon.png',
+    name: 'Realms Community Hub',
+    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
+    urlId: 'RCH',
   },
   {
-    bannerImgSrc: '',
+    bannerImgSrc: '/realms/RCH/banner.png',
     description:
-      'Lorem ipsum doler sit amet. This is some sample description text.',
-    iconImgSrc: '',
-    name: 'Test org',
-    publicKey: new PublicKey('2sEcHwzsNBwNoTM1yAXjtF1HTMQKUAXf8ivtdpSpo9Fv'),
-    urlId: 'metaplex',
+      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
+    iconImgSrc: '/realms/RCH/icon.png',
+    name: 'Realms Community Hub',
+    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
+    urlId: 'RCH',
   },
   {
-    bannerImgSrc: '',
+    bannerImgSrc: '/realms/RCH/banner.png',
     description:
-      'Lorem ipsum doler sit amet. This is some sample description text.',
-    iconImgSrc: '',
-    name: 'Test org',
-    publicKey: new PublicKey('2sEcHwzsNBwNoTM1yAXjtF1HTMQKUAXf8ivtdpSpo9Fv'),
-    urlId: 'metaplex',
+      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
+    iconImgSrc: '/realms/RCH/icon.png',
+    name: 'Realms Community Hub',
+    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
+    urlId: 'RCH',
   },
   {
-    bannerImgSrc: '',
+    bannerImgSrc: '/realms/RCH/banner.png',
     description:
-      'Lorem ipsum doler sit amet. This is some sample description text.',
-    iconImgSrc: '',
-    name: 'Test org',
-    publicKey: new PublicKey('2sEcHwzsNBwNoTM1yAXjtF1HTMQKUAXf8ivtdpSpo9Fv'),
-    urlId: 'metaplex',
+      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
+    iconImgSrc: '/realms/RCH/icon.png',
+    name: 'Realms Community Hub',
+    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
+    urlId: 'RCH',
   },
 ];
 
@@ -58,7 +58,7 @@ export function NotableNFTs(props: Props) {
       </div>
       <div className="text-neutral-500">
         Solana has minted 2B NFTs through Metaplex, and currently has more NFTs
-        in its ecosystem than Ethereum
+        in its ecosystem than any other chain
       </div>
       <div
         className={cx('grid', 'grid-cols-4', 'mt-6', 'gap-3', 'items-center')}

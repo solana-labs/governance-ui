@@ -93,6 +93,7 @@
     "@solendprotocol/solend-sdk": "^0.5.5",
     "@streamflow/stream": "3.0.10",
     "@switchboard-xyz/switchboard-v2": "^0.0.110",
+    "@tailwindcss/line-clamp": "^0.4.2",
     "@tippyjs/react": "^4.2.6",
     "@types/ramda": "^0.28.15",
     "@urql/exchange-auth": "^1.0.0",

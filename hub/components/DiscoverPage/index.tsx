@@ -2,8 +2,10 @@ import cx from '@hub/lib/cx';
 
 import { AllOrgs } from './AllOrgs';
 import { Hackathon } from './Hackathon';
+import { NotableDefi } from './NotableDefi';
+import { NotableGames } from './NotableGames';
 import { NotableNFTs } from './NotableNFTs';
-import { NotableProjects } from './NotableProjects';
+import { NotableWeb3 } from './NotableWeb3';
 import { Popular } from './Popular';
 import { Sidebar } from './Sidebar';
 import { Title } from './Title';
@@ -34,8 +36,10 @@ export function DiscoverPage(props: Props) {
         <Popular className="mt-16 w-full" />
         <div className="mt-16 pr-16 max-w-[1188px]">
           <Hackathon />
-          <NotableProjects className="mt-16" />
+          <NotableDefi className="mt-16" />
           <NotableNFTs className="mt-16" />
+          <NotableGames className="mt-16" />
+          <NotableWeb3 className="mt-16" />
           <AllOrgs className="mt-16" />
         </div>
       </div>

@@ -16,7 +16,10 @@ export const getRealmsList = gql`
         shortDescription
         hub {
           info {
-            heading
+            clippedHeading(charLimit: 100) {
+              document
+              isClipped
+            }
           }
           twitterFollowerCount
         }
@@ -37,7 +40,13 @@ export const getRealmsListResp = IT.type({
         shortDescription: IT.union([IT.null, IT.string]),
         hub: IT.type({
           info: IT.type({
-            heading: IT.union([IT.null, RichTextDocument]),
+            clippedHeading: IT.union([
+              IT.null,
+              IT.type({
+                document: RichTextDocument,
+                isClipped: IT.boolean,
+              }),
+            ]),
           }),
           twitterFollowerCount: IT.number,
         }),

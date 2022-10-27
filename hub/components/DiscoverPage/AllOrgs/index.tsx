@@ -2,8 +2,10 @@ import { pipe } from 'fp-ts/lib/function';
 
 import { RealmCircle } from '@hub/components/branding/RealmCircle';
 import { ITEMS as HACKATHON_ITEMS } from '@hub/components/DiscoverPage/Hackathon';
+import { ITEMS as DEFI_ITEMS } from '@hub/components/DiscoverPage/NotableDefi';
+import { ITEMS as GAME_ITEMS } from '@hub/components/DiscoverPage/NotableGames';
 import { ITEMS as NFT_ITEMS } from '@hub/components/DiscoverPage/NotableNFTs';
-import { ITEMS as PROJECT_ITEMS } from '@hub/components/DiscoverPage/NotableProjects';
+import { ITEMS as WEB3_ITEMS } from '@hub/components/DiscoverPage/NotableWeb3';
 import { ITEMS as POPULAR_ITEMS } from '@hub/components/DiscoverPage/Popular';
 import { SmallCard } from '@hub/components/DiscoverPage/SmallCard';
 import { LoadingDots } from '@hub/components/LoadingDots';
@@ -14,9 +16,11 @@ import * as RE from '@hub/types/Result';
 import * as gql from './gql';
 
 const ALREADY_DISPLAYED = new Set([
+  ...DEFI_ITEMS.map((item) => item.publicKey.toBase58()),
+  ...GAME_ITEMS.map((item) => item.publicKey.toBase58()),
   ...HACKATHON_ITEMS.map((item) => item.publicKey.toBase58()),
   ...NFT_ITEMS.map((item) => item.publicKey.toBase58()),
-  ...PROJECT_ITEMS.map((item) => item.publicKey.toBase58()),
+  ...WEB3_ITEMS.map((item) => item.publicKey.toBase58()),
   ...POPULAR_ITEMS.map((item) => item.publicKey.toBase58()),
 ]);
 
@@ -59,6 +63,7 @@ export function AllOrgs(props: Props) {
           .map((item) => ({
             bannerImgSrc: item.realm.bannerImageUrl,
             description: item.realm.shortDescription,
+            heading: item.realm.hub.info.clippedHeading,
             iconImgSrc: item.iconUrl,
             name: item.name,
             publicKey: item.publicKey,
@@ -76,11 +81,11 @@ export function AllOrgs(props: Props) {
             let aScore = 0;
             let bScore = 0;
 
-            if (a.description) {
+            if (a.description || a.heading) {
               aScore += 100000;
             }
 
-            if (b.description) {
+            if (b.description || b.heading) {
               bScore += 100000;
             }
 
