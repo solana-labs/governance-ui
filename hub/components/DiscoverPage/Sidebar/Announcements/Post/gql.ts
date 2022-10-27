@@ -1,6 +1,7 @@
 import * as IT from 'io-ts';
 import { gql } from 'urql';
 
+import { PublicKey } from '@hub/types/decoders/PublicKey';
 import { RichTextDocument } from '@hub/types/decoders/RichTextDocument';
 
 export const getPost = gql`
@@ -16,6 +17,7 @@ export const getPost = gql`
         realm {
           iconUrl
           name
+          publicKey
           urlId
         }
         title
@@ -35,6 +37,7 @@ export const getPostResp = IT.type({
     realm: IT.type({
       iconUrl: IT.union([IT.null, IT.string]),
       name: IT.string,
+      publicKey: PublicKey,
       urlId: IT.string,
     }),
     title: IT.string,

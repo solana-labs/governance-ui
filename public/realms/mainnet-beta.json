@@ -934,10 +934,10 @@
     "displayName": "Dean's List",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "9mS8GuMx2MkZGMSwa2k87HNLTFZ1ssa9mJ1RkGFKcGyQ",
-    "bannerImage": "/realms/Dean's List Grape/deans list logo.png",
+    "bannerImage": "/realms/Deans-List-Grape/deans-list-logo.png",
     "website": "https://deans-list.strataprotocol.com/",
     "twitter": "@GrapeDeanslist",
-    "ogImage": "/realms/Dean's List Grape/deans list logo.png"
+    "ogImage": "/realms/Deans-List-Grape/deans-list-logo.png"
   },
   {
     "symbol": "GrapeCCSubDAO",
@@ -1087,7 +1087,7 @@
   },
   {
     "symbol": "Squads",
-    "bannerImage": "/realms/squads/banner.png",
+    "bannerImage": "/realms/Squads/banner.png",
     "displayName": "Squads",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "BzGL6wbCvBisQ7s1cNQvDGZwDRWwKK6bhrV93RYdetzJ",
@@ -1104,8 +1104,8 @@
     "displayName": "Allie Coin DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "BZE9AiJrMxUXXjwy9iBPzj34Wh5Zf1wLEFAM4oSSMRLi",
-    "bannerImage": "/realms/Allie Coin DAO/Allie Coin Particle Logo Compressed.png",
-    "ogImage": "/realms/Allie Coin DAO/Allie Coin Logo.png",
+    "bannerImage": "/realms/Allie-Coin-DAO/Allie-Coin-Particle-Logo-Compressed.png",
+    "ogImage": "/realms/Allie-Coin-DAO/Allie-Coin-Logo.png",
     "website": "https://alliecoin.io",
     "twitter": "@allie_coin"
   },
