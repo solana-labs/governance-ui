@@ -19,7 +19,6 @@ export const Primary = forwardRef<HTMLButtonElement, Props>(function Primary(
       ref={ref}
       className={cx(
         'bg-sky-500',
-        'border',
         'flex',
         'group',
         'h-10',

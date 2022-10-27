@@ -78,6 +78,7 @@ export function Post(props: Props) {
                 'block',
                 'font-bold',
                 'text-neutral-900',
+                'text-sm',
                 'transition-colors',
                 'truncate',
                 'hover:text-sky-500',
