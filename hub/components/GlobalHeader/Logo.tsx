@@ -10,7 +10,7 @@ interface Props {
 export function Logo(props: Props) {
   return (
     <NavigationMenu.Item className={props.className}>
-      <Link passHref href="/">
+      <Link passHref href="/discover">
         <NavigationMenu.Link>
           <RealmsLogo className="h-8" />
         </NavigationMenu.Link>

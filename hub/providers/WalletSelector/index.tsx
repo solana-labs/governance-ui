@@ -1,4 +1,4 @@
-import { Adapter, WalletReadyState } from '@solana/wallet-adapter-base';
+import { WalletReadyState } from '@solana/wallet-adapter-base';
 import {
   ConnectionProvider,
   WalletProvider as _WalletProvider,
