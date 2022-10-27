@@ -1,8 +1,11 @@
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import React from 'react';
 
+import { RealmSearchNavigation } from '@hub/components/RealmSearchNavigation';
 import cx from '@hub/lib/cx';
 
+import { CreateHub } from './CreateHub';
+import { Links } from './Links';
 import { Logo } from './Logo';
 import { UserDropdown } from './UserDropdown';
 
@@ -38,8 +41,29 @@ export function GlobalHeader(props: Props) {
             'w-full',
           )}
         >
-          <Logo />
-          <UserDropdown />
+          <div className={cx('flex', 'items-center')}>
+            <Logo />
+            <NavigationMenu.Item asChild>
+              <RealmSearchNavigation className="ml-4" />
+            </NavigationMenu.Item>
+            <Links
+              className="ml-16"
+              links={[
+                {
+                  href: '/ecosystem',
+                  title: 'Ecosystem Feed',
+                },
+                {
+                  href: '/discover',
+                  title: 'Discover',
+                },
+              ]}
+            />
+          </div>
+          <div className="flex items-center">
+            <CreateHub className="mr-8" />
+            <UserDropdown />
+          </div>
         </NavigationMenu.List>
       </div>
     </NavigationMenu.Root>

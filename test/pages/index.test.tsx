@@ -13,6 +13,23 @@ describe('Home page redirects to', () => {
     process.env.REALM = originalRealm
   })
 
+  const originalError = console.error
+  beforeAll(() => {
+    console.error = (...args) => {
+      if (
+        /Warning: ReactDOM.render is no longer supported in React 18./.test(
+          args[0]
+        )
+      ) {
+        return
+      }
+      originalError.call(console, ...args)
+    }
+  })
+
+  afterAll(() => {
+    console.error = originalError
+  })
   test('/realms when process.env.REALM is not set', async () => {
     delete process.env.REALM
     render(<Home />)

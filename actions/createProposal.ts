@@ -16,9 +16,9 @@ import { withInsertTransaction } from '@solana/spl-governance'
 import { InstructionData } from '@solana/spl-governance'
 import { withSignOffProposal } from '@solana/spl-governance'
 import {
-  sendTransactionsV2,
+  sendTransactionsV3,
   SequenceType,
-  transactionInstructionsToTypedInstructionsSets,
+  txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
 import { chunks } from '@utils/helpers'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
@@ -210,21 +210,26 @@ export const createProposal = async (
     // We merge instructions with prerequisiteInstructions
     // Prerequisite  instructions can came from instructions as something we need to do before instruction can be executed
     // For example we create ATAs if they don't exist as part of the proposal creation flow
-    await sendTransactionsV2({
-      wallet,
+    const signersSet = [[], [], signers]
+    const txes = [
+      prerequisiteInstructions,
+      instructions,
+      insertInstructions,
+    ].map((txBatch, batchIdx) => {
+      return {
+        instructionsSet: txBatchesToInstructionSetWithSigners(
+          txBatch,
+          signersSet,
+          batchIdx
+        ),
+        sequenceType: SequenceType.Sequential,
+      }
+    })
+
+    await sendTransactionsV3({
       connection,
-      signersSet: [[], [], signers],
-      showUiComponent: true,
-      TransactionInstructions: [
-        prerequisiteInstructions,
-        instructions,
-        insertInstructions,
-      ].map((x) =>
-        transactionInstructionsToTypedInstructionsSets(
-          x,
-          SequenceType.Sequential
-        )
-      ),
+      wallet,
+      transactionInstructions: txes,
     })
   } else {
     const insertChunks = chunks(insertInstructions, chunkBy)
@@ -244,29 +249,31 @@ export const createProposal = async (
             )
         )
     )
-    console.log(
-      [deduplicatedPrerequisiteInstructions, instructions, ...insertChunks],
-      '@@@',
-      prerequisiteInstructionsSigners
-    )
-    console.log(`Creating proposal using ${insertChunks.length} chunks`)
-    await sendTransactionsV2({
-      wallet,
-      connection,
-      signersSet: [[...prerequisiteInstructionsSigners], [], ...signerChunks],
-      showUiComponent: true,
-      TransactionInstructions: [
-        deduplicatedPrerequisiteInstructions,
-        instructions,
-        ...insertChunks,
-      ]
-        .filter((x) => x.length)
-        .map((x) =>
-          transactionInstructionsToTypedInstructionsSets(
-            x,
-            SequenceType.Sequential
-          )
+
+    const signersSet = [
+      [...prerequisiteInstructionsSigners],
+      [],
+      ...signerChunks,
+    ]
+    const txes = [
+      deduplicatedPrerequisiteInstructions,
+      instructions,
+      ...insertChunks,
+    ].map((txBatch, batchIdx) => {
+      return {
+        instructionsSet: txBatchesToInstructionSetWithSigners(
+          txBatch,
+          signersSet,
+          batchIdx
         ),
+        sequenceType: SequenceType.Sequential,
+      }
+    })
+
+    await sendTransactionsV3({
+      connection,
+      wallet,
+      transactionInstructions: txes,
     })
   }
 

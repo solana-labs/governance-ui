@@ -17,6 +17,10 @@ import {
   showTransactionError,
   showTransactionsProcessUi,
 } from './transactionsLoader'
+import {
+  sendSignAndConfirmTransactions,
+  sendSignAndConfirmTransactionsProps,
+} from '@blockworks-foundation/mangolana/lib/transactions'
 
 interface TransactionInstructionWithType {
   instructionsSet: TransactionInstruction[]
@@ -425,6 +429,9 @@ export const sendTransactions = async (
   return signedTxns.length
 }
 
+/**
+ * @deprecated The method should not be used use sendTransactionsV3
+ */
 /////////////////////////////////////////
 export const sendTransactionsV2 = async ({
   connection,
@@ -624,4 +631,110 @@ export const transactionInstructionsToTypedInstructionsSets = (
     instructionsSet: instructionsSet,
     sequenceType: type,
   }
+}
+
+export const sendTransactionsV3 = ({
+  connection,
+  wallet,
+  transactionInstructions,
+  timeoutStrategy,
+  callbacks,
+  config,
+}: sendSignAndConfirmTransactionsProps) => {
+  const callbacksWithUiComponent = {
+    afterBatchSign: (signedTxnsCount) => {
+      if (callbacks?.afterBatchSign) {
+        callbacks?.afterBatchSign(signedTxnsCount)
+      }
+      showTransactionsProcessUi(signedTxnsCount)
+    },
+    afterAllTxConfirmed: () => {
+      if (callbacks?.afterAllTxConfirmed) {
+        callbacks?.afterAllTxConfirmed()
+      }
+      closeTransactionProcessUi()
+    },
+    afterEveryTxConfirmation: () => {
+      if (callbacks?.afterEveryTxConfirmation) {
+        callbacks?.afterEveryTxConfirmation()
+      }
+      incrementProcessedTransactions()
+    },
+    onError: (e, notProcessedTransactions, originalProps) => {
+      if (callbacks?.onError) {
+        callbacks?.onError(e, notProcessedTransactions, originalProps)
+      }
+      showTransactionError(
+        () =>
+          sendTransactionsV3({
+            ...originalProps,
+            transactionInstructions: notProcessedTransactions,
+          }),
+        getErrorMsg(e),
+        e.txid
+      )
+    },
+  }
+
+  const cfg = {
+    maxTxesInBatch:
+      transactionInstructions.filter(
+        (x) => x.sequenceType === SequenceType.Sequential
+      ).length > 0
+        ? 20
+        : 30,
+    autoRetry: false,
+    maxRetries: 5,
+    retried: 0,
+    logFlowInfo: true,
+    ...config,
+  }
+  return sendSignAndConfirmTransactions({
+    connection,
+    wallet,
+    transactionInstructions,
+    timeoutStrategy,
+    callbacks: callbacksWithUiComponent,
+    config: cfg,
+  })
+}
+
+const getErrorMsg = (e) => {
+  if (e.error) {
+    return e.error
+  }
+  if (e.message) {
+    return e.message
+  }
+  if (typeof e === 'object') {
+    return tryStringify(e)
+  }
+  return `${e}`
+}
+
+const tryStringify = (obj) => {
+  try {
+    return JSON.stringify(obj)
+  } catch {
+    return null
+  }
+}
+
+export const txBatchesToInstructionSetWithSigners = (
+  txBatch: TransactionInstruction[],
+  signerBatches: Keypair[][],
+  batchIdx?: number
+) => {
+  return txBatch.map((tx, txIdx) => {
+    return {
+      transactionInstruction: tx,
+      signers:
+        typeof batchIdx !== 'undefined' &&
+        signerBatches.length &&
+        signerBatches[batchIdx] &&
+        signerBatches[batchIdx][txIdx]
+          ? [signerBatches[batchIdx][txIdx]]
+          : [],
+    }
+  })
 }

@@ -198,12 +198,12 @@
     "ogImage": "/realms/MEAN/logo.svg"
   },
   {
-    "symbol": "SAP",
-    "displayName": "SAP DAO",
-    "programId": "MGovW65tDhMMcpEmsegpsdgvzb6zUwGsNjhXFxRAnjd",
-    "realmId": "7HHEADbEF77yAtJ58CYhy93SbcAeGjtixQ7gsHxuamyU",
-    "website": "",
-    "twitter": "",
-    "ogImage": "/realms/SAPDAO/img//SAPDAO.png"
+    "symbol": "SOLDC",
+    "displayName": "SOLANA DOTA CLUB",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "5aNk7Zig6p3GwQgP4XnxGFg6DgC3jzmM9FURwabjnGTa",
+    "website": "https://soldc.us",
+    "twitter": "https://twitter.com/deniz_safak",
+    "ogImage": "/realms/SOLDCDAO/img/NEWSOLDCDAO.png"
   }
 ]

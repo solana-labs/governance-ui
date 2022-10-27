@@ -13,7 +13,6 @@ import { NewPostEditor } from '@hub/components/NewPostEditor';
 import { useJWT } from '@hub/hooks/useJWT';
 import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
 import cx from '@hub/lib/cx';
-import { estimateRealmUrlId } from '@hub/lib/estimateRealmUrlId';
 import { FeedItemSort } from '@hub/types/FeedItemSort';
 
 interface BaseProps {
@@ -81,7 +80,7 @@ export function Content(props: Props) {
                     } else if (realm.equals(props.realm)) {
                       router.push(`/realm/${props.realmUrlId}/${post.id}`);
                     } else {
-                      const urlId = estimateRealmUrlId(realm);
+                      const urlId = post.realm.urlId;
                       router.push(`/realm/${urlId}/${post.id}`);
                     }
                   }}
