@@ -21,7 +21,7 @@ export const ITEMS = [
         artists and fans.
       </div>
     ),
-    publicKey: new PublicKey('H3e67AJqEx3yiWcSdP7g6qVkrAeCrpJSkQtxAKy7QYGK'),
+    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
     stats: [
       {
         top: '7.2M',
@@ -37,7 +37,7 @@ export const ITEMS = [
       },
     ],
     title: 'Audius',
-    urlId: 'metaplex',
+    urlId: 'RCH',
   },
   {
     imgSrc: imgStaratlas.src,
@@ -49,7 +49,7 @@ export const ITEMS = [
         built as a native Web3 experience.
       </div>
     ),
-    publicKey: new PublicKey('H3e67AJqEx3yiWcSdP7g6qVkrAeCrpJSkQtxAKy7QYGK'),
+    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
     stats: [
       {
         top: '100%',
@@ -65,7 +65,7 @@ export const ITEMS = [
       },
     ],
     title: 'Star Atlas',
-    urlId: 'metaplex',
+    urlId: 'RCH',
   },
   {
     imgSrc: imgSms.src,
@@ -77,7 +77,7 @@ export const ITEMS = [
         features several opportunities including:
       </div>
     ),
-    publicKey: new PublicKey('H3e67AJqEx3yiWcSdP7g6qVkrAeCrpJSkQtxAKy7QYGK'),
+    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
     stats: [
       {
         top: 'Seed Vault',
@@ -93,7 +93,7 @@ export const ITEMS = [
       },
     ],
     title: 'Solana Mobile / SMS',
-    urlId: 'metaplex',
+    urlId: 'RCH',
   },
   {
     imgSrc: imgMonkedao.src,

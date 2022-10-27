@@ -32,7 +32,7 @@ export function LargeCard(props: Props) {
   });
 
   return (
-    <Link passHref href={`/realm/${props.urlId}`}>
+    <Link passHref href={`/realm/${props.urlId}/hub`}>
       <a
         className={cx(
           'block',
