@@ -25,7 +25,6 @@ import Switch from './Switch'
 import { TwitterIcon } from './icons'
 import { notify } from '@utils/notifications'
 import { Profile } from '@components/Profile'
-import { WalletReadyState } from '@solana/wallet-adapter-base'
 
 const StyledWalletProviderLabel = styled.p`
   font-size: 0.65rem;
@@ -186,10 +185,7 @@ const ConnectWalletButton = (props) => {
               </Menu.Button>
               <Menu.Items className="absolute right-0 z-20 w-48 p-2 border rounded-md shadow-md outline-none bg-bkg-1 border-fgd-4 top-14">
                 <>
-                  {WALLET_PROVIDERS.filter(
-                    ({ adapter }) =>
-                      adapter.readyState !== WalletReadyState.Unsupported
-                  ).map(({ name, url, adapter: { icon } }) => (
+                  {WALLET_PROVIDERS.map(({ name, url, adapter: { icon } }) => (
                     <Menu.Item key={name}>
                       <button
                         className="flex items-center w-full p-2 font-normal default-transition h-9 hover:bg-bkg-3 hover:cursor-pointer hover:rounded focus:outline-none"
