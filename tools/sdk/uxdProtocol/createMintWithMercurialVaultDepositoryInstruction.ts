@@ -6,26 +6,22 @@ import {
   UXD_DECIMALS,
 } from '@uxd-protocol/uxd-client';
 import type { ConnectionContext } from 'utils/connection';
-import { getDepositoryMintInfo, uxdClient } from './uxdClient';
+import { uxdClient, getDepositoryMintInfo } from './uxdClient';
 
-const createRegisterMercurialVaultDepositoryInstruction = async ({
+const createMintWithMercurialVaultDepositoryInstruction = async ({
   connection,
   uxdProgramId,
   authority,
-  payer,
   depositoryMintName,
-  mintingFeeInBps,
-  redeemingFeeInBps,
-  redeemableDepositorySupplyCap,
+  collateralAmount,
+  payer,
 }: {
   connection: ConnectionContext;
   uxdProgramId: PublicKey;
   authority: PublicKey;
-  payer: PublicKey;
   depositoryMintName: string;
-  mintingFeeInBps: number;
-  redeemingFeeInBps: number;
-  redeemableDepositorySupplyCap: number;
+  collateralAmount: number;
+  payer: PublicKey;
 }): Promise<TransactionInstruction> => {
   const {
     address: collateralMint,
@@ -45,16 +41,14 @@ const createRegisterMercurialVaultDepositoryInstruction = async ({
     uxdProgramId,
   });
 
-  return client.createRegisterMercurialVaultDepositoryInstruction(
+  return client.createMintWithMercurialVaultDepositoryInstruction(
     new Controller('UXD', UXD_DECIMALS, uxdProgramId),
     depository,
     authority,
-    mintingFeeInBps,
-    redeemingFeeInBps,
-    redeemableDepositorySupplyCap,
+    collateralAmount,
     Provider.defaultOptions(),
     payer,
   );
 };
 
-export default createRegisterMercurialVaultDepositoryInstruction;
+export default createMintWithMercurialVaultDepositoryInstruction;

@@ -484,6 +484,12 @@ export default function useGovernanceAssets() {
       packageId: PackageEnum.UXD,
       tag: 'beta',
     },
+    [InstructionEnum.UXDMintWithMercurialVaultDepository]: {
+      name: 'Mint with Mercurial Vault Depository',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.UXD,
+      tag: 'beta',
+    },
     [InstructionEnum.UXDSetMangoDepositoryQuoteMintAndRedeemFee]: {
       name: 'Set Mango Depository Quote Mint And Redeem Fee',
       isVisible: canUseAnyInstruction,

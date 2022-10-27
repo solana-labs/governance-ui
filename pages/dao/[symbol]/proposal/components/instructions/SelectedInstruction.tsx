@@ -56,6 +56,7 @@ import UXDRegisterMercurialVaultDepository from './UXD/RegisterMercurialVaultDep
 import UXDEditMercurialVaultDepository from './UXD/EditMercurialVaultDepository';
 import UXDEditController from './UXD/EditController';
 import UXDEditMangoDepository from './UXD/EditMangoDepository';
+import UXDMintWithMercurialVaultDepository from './UXD/MintWithMercurialVaultDepository';
 import UXDDisableDepositoryMinting from './UXD/DisableDepositoryMinting';
 import UXDQuoteMintWithMangoDepository from './UXD/QuoteMintWithMangoDepository';
 import UXDQuoteRedeemWithMangoDepository from './UXD/QuoteRedeemWithMangoDepository';
@@ -291,6 +292,13 @@ const SelectedInstruction = ({
     case InstructionEnum.UXDEditMercurialVaultDepository:
       return (
         <UXDEditMercurialVaultDepository
+          index={index}
+          governedAccount={governedAccount}
+        />
+      );
+    case InstructionEnum.UXDMintWithMercurialVaultDepository:
+      return (
+        <UXDMintWithMercurialVaultDepository
           index={index}
           governedAccount={governedAccount}
         />

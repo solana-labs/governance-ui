@@ -3,14 +3,62 @@ import { struct, u8, nu64, Layout } from 'buffer-layout';
 import { AccountMetaData } from '@solana/spl-governance';
 import { bool, u128, u64 } from '@project-serum/borsh';
 import { INSURANCE_MINTS } from '@tools/sdk/uxdProtocol/uxdClient';
-import { UXD_DECIMALS } from '@uxd-protocol/uxd-client';
+import { nativeToUi, UXD_DECIMALS } from '@uxd-protocol/uxd-client';
 import { nativeAmountToFormattedUiAmount } from '@tools/sdk/units';
 import { BN } from '@project-serum/anchor';
 import { tryGetTokenMint } from '@utils/tokens';
 import { ANCHOR_DISCRIMINATOR_LAYOUT } from '@utils/helpers';
+import { getSplTokenNameByMint } from '@utils/splTokens';
 
 export const UXD_PROGRAM_INSTRUCTIONS = {
   UXD8m9cvwk4RcSxnX2HZ9VudQCEeDH6fRnB4CAP57Dr: {
+    228: {
+      name: 'UXD - Mint with Mercurial Vault Depository',
+      accounts: [
+        'User',
+        'Payer',
+        'Controller',
+        'Depository',
+        'Redeemable mint',
+        'User redeemable',
+        'Collateral mint',
+        'User collateral',
+        'Depository LP token vault',
+        'Mercurial vault',
+        'Mercurial vault lp mint',
+        'Mercurial vault collateral token_safe',
+        'Mercurial vault program',
+        'System program',
+        'Token program',
+      ],
+      getDataUI: (
+        _connection: Connection,
+        data: Uint8Array,
+        accounts: AccountMetaData[],
+      ) => {
+        const dataLayout = struct([
+          u8('instruction'),
+          ...ANCHOR_DISCRIMINATOR_LAYOUT,
+          nu64('collateralAmount'),
+        ]);
+
+        const { collateralAmount } = dataLayout.decode(
+          Buffer.from(data),
+        ) as any;
+
+        const collateralMintName = getSplTokenNameByMint(accounts[6].pubkey);
+
+        return (
+          <>
+            <p>{`native collateral amount: ${nativeToUi(
+              collateralAmount,
+              6,
+            ).toLocaleString()}`}</p>
+            <p>Collateral mint: {collateralMintName}</p>
+          </>
+        );
+      },
+    },
     216: {
       name: 'UXD - Set Mango Depository Quote Mint and Redeem Soft Cap',
       accounts: ['Authority', 'Controller'],

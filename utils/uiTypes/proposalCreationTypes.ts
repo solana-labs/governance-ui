@@ -266,6 +266,13 @@ export interface UXDWithdrawInsuranceFromMangoDepositoryForm {
   insuranceWithdrawnAmount: number;
 }
 
+export interface UXDMintWithMercurialVaultDepositoryForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  uxdProgram?: string;
+  collateralName?: string;
+  uiCollateralAmount?: number;
+}
+
 export interface UXDDisableDepositoryMintingForm {
   governedAccount?: GovernedMultiTypeAccount;
   collateralName?: string;
@@ -719,6 +726,7 @@ export enum InstructionEnum {
   UXDEditMercurialVaultDepository,
   UXDEditController,
   UXDEditMangoDepository,
+  UXDMintWithMercurialVaultDepository,
   UXDSetMangoDepositoryQuoteMintAndRedeemFee,
   UXDSetMangoDepositoryQuoteMintAndRedeemSoftCap,
   UXDStakingInitializeStakingCampaign,
