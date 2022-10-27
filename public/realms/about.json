@@ -143,6 +143,538 @@
       "url": "https://docs.squads.so/squads-v3-docs/"
     }
   },
+  "5NNv1oJ4PFhE2416kTNDzrR9axoHjBTw2CNABqcYpXXL" : {
+    "symbol": "Superteam",
+    "heading": "Superteam is a community dedicated to helping Solana projects launch and grow. ",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "We help the most promising Solana projects in the ascending world (India, South East Asia, Eastern Europe, and Africa) launch and grow. We are organized as a co-operative of creatives, developers, and operators who are experienced in launching and growing technology businesses.",
+          "We value the sovereignty that comes with founding a company, the skin in the game that comes with investing, and the joy that comes with getting sh*t done. In a pre-crypto world, we had to fit into broiler categories — founder, investor, or employee. Crypto allows us to be free-range and be all 3 at the same time."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": ""
+    },
+    "resources": [
+      {
+        "title": "The Superteam Newsletter",
+        "content": [
+          "We help the most promising projects in the Solana ecosystem in the ascending world launch and grow"
+        ],
+        "https://superteam.substack.com/"
+      },
+      {
+        "title": "The Superteam Podcast",
+        "content": [
+          "Superteam is the podcast that explores the web3 ecosystem in India. "
+        ],
+        "https://www.youtube.com/channel/UCi-pkXLbm7sqXFhV1NBLUfQ"
+      }
+    ]
+  },
+  "G4CR3KUvqPZWmHbuvWhBPqL4vBBBujviyeTVynN2rhKB" : {
+    "symbol": "Hello Moon",
+    "heading": "Hello Moon provides innovative datasets on Solana to empower NFT & DeFi investors & traders.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Hello Moon provides innovative datasets on Solana to empower NFT & DeFi investors & traders. Explore & track top NFT projects, monitor wash trading & social (influencers and whales) activity, and swap DeFi tokens for free on HelloMoon.io."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": ""
+    }
+  },
+  "uywFFJL6JFGwbSXgU95C6v8f4L4DqBXV2Z3KZaJSxy1" : {
+    "symbol": "Orbis Protocol",
+    "heading": "Orbis Protocol makes it easy to build fast and decentralized social experiences",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Orbis Protocol is the web3 social protocol built for developers. Our solutions make it easy to build fast and decentralized social experiences; from messaging and feeds to full social platforms. Many developers use Orbis Protocol to add social features to existing applications, praising its frictionless UX, speed and composability.",
+          "Orbis Protocol works by combining social data standards with a powerful decentralized infrastructure, often known as a “decentralized social layer”. Developers can use the protocol’s advanced SDK and flexible modules to integrate web3 social features in just a few lines of code.",
+          "Orbis Protocol is fully open-source and multi-chain, with current support for Solana, Ethereum and Polygon. Data storage is achieved with the Ceramic decentralized data network and encryption via Lit Protocol.",
+          "Orbis Protocol is the foundation for a composable web3 ecosystem of applications and social features. This ecosystem is growing fast, with live integrations across categories including governance, creator economy and NFT communities. For more information, visit orbis.club."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://orbis.club/documentation"
+    }
+  },
+  "2Z5BXuRCJPqYUCBGyQTwAXHeJoFAnbtvoXja19aZFLKY" : {
+    "symbol": "Jupiter Aggregator",
+    "heading": "The best swap aggregator & infrastructure for Solana -  powering best price, token selection and UX for all users and devs.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Jupiter combines all the liquidity sources across Solana into a single endpoint, providing best-in-class swap aggregation, pricing data, and payment features for all users and developers alike.",
+          "Jupiter aggregates more than 20 DEXes and AMMs and is integrated with more than 60 top protocols in the Solana platform."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.jup.ag/"
+    },
+    "resources": [
+      {
+        "title": "Writings From Planet Jupiter",
+        "content": [
+          ""
+        ],
+        "https://blog.jup.ag/"
+      },
+      {
+        "title": "Exploring Solana with Jupiter",
+        "content": [
+          "Ben Chow, the co-founder of Jupiter, talks with key crypto folks in the Solana ecosystem, from founder to investor, builder to community, or marketer."
+        ],
+        "https://podcast.jup.ag/"
+      }
+    ]
+  },
+  "HP1Y12FPbWMAqqVTpKMXKVk6yK3zJaNSxwUEqLzzzuqc" : {
+    "symbol": "SolanaFM",
+    "heading": "Friendlist Web3 Explorer ",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "SolanaFM aims to bridge the gaps of data accessibility via our indexer, APIs and explorer tools on Solana "
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "docs.solana.fm"
+    },
+    "resources": [
+      {
+        "title": "SolanaFM Insights",
+        "content": [
+          "Navigate through the SOL ecosystem with SolanaFM Insights - a weekly series that uncovers intricate, data-driven concepts in Solana."
+        ],
+        "https://solanafm.substack.com/"
+      }
+    ]
+  },
+  "5Dj3fuNLYxd1tzpPnXiPo88V8JNVHhrDScTLMJpupoXf" : {
+    "symbol": "Unique Venture Clubs",
+    "heading": "Explore a web3 native way to raise, invest and govern assets. Your partner for every stage of your venture.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Ultimate platform for\nInvestors:\n- Invest early in world-changing start-ups and digital assets!\n- Power your group investments with advanced governance capabilities\n- Invest in projects directly\n- Create or join an investment club (Syndicate or VC)\n- Secondary trading of NFTs and crypto",
+
+          "Communities:\n- Elevate from Discord, turn Unique!\n- Enable your community to participate in financial decisions\n- Investment Clubs - Create an on-chain investment vehicle for your community\n- Community Clubs - involve your community in treasury spending decisions",
+
+          "Founders:\n- Create a fundraising-ready start-up!\n- Raise funds for your idea and bridge the early credibility gap with a secure and automated setup\n- Fundraising vehicle\n- Legal entity\n- Access to investors\n- Cap table management",
+
+          "What makes us unique?\nOn-chain governance: Participate in the decision-making process and have a clear overview of everything going on in your on-chain entity. Make use of the deposit- or role-based governance models and custom features to manage your activities and assets.\nAnti-rug protection: Control how money is being spent during every phase of the investment and project’s development.  Vote on fund allocation proposals and have the ability to pull back the remaining funds if the project does not advance.\nNon-custodial platform: You’re the one who owns the keys and makes the decisions. Your assets are safe and secure on the Solana blockchain. Smart contracts ensure the funds are used for the right purposes.\nAutomated financial execution: The execution of your governance decisions is automated. Propose, vote on, and execute in a matter of seconds - all within one platform.\nIntegrated compliance tools: Get support with various legal wrappers in multiple jurisdictions and KYC or AML procedures. Keep your on-chain entity secure and compliant so that you can focus fully on your entity’s activities."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://drive.google.com/file/d/1ZJWk2J87gC1uNzwvQT3KlSjUwyrw-nSn/view"
+    },
+    "resources": [
+      {
+        "title": "Announcing winners of the Solana Season Hackathon",
+        "content": [
+          "To accelerate the already rapid growth of the ecosystem, the Solana Foundation teamed up with leading crypto projects to host one of the largest online hackathons ever."
+        ],
+        "https://solana.com/news/announcing-winners-of-the-solana-season-hackathon"
+      },
+      {
+        "title": "Unique Venture Clubs Passes Zokyo’s Comprehensive Security Audit",
+        "content": [
+          "Zokyo is pleased to announce that the collective investment and asset management platform Unique Venture Clubs passed our comprehensive security audit. "
+        ],
+        "https://medium.com/@zokyo.io/unique-venture-clubs-passes-zokyos-comprehensive-security-audit-291504fa92e9"
+      },
+      {
+        "title": "Platforme za DAO još su retkost, na jednoj rade i naši stručnjaci",
+        "content": [
+          "Iako tradicionalni biznisi i dalje stidljivo prilaze blokčejn tehnologiji, čini se da ona polako ali sigurno krči svoj put do njih."
+        ],
+        "https://rs.bloombergadria.com/tehnologija/blockchain/5582/platforme-za-dao-jos-su-retkost-na-jednoj-rade-i-nasi-strucnjaci/news"
+      }
+    ]
+  },
+  "uWg5gaTsBnXc5qiVMB8XxBUPYqLAb5bzzgkkpxi6UAY" : {
+    "symbol": "GARI Network",
+    "heading": "GARI Network enables everyone to monetize their social media time and activities by leveraging web3 technologies.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "GARI Network enables everyone to monetize their social media time and activities by leveraging web3 technologies.",
+          "Chingari and GARI Network is the leading short video app and web3 social network. Content creators and Content consumers are incentivized with smart money for their contributions. Smart money incentives that creators and consumers receive are in the form of a cryptocurrency, namely the GARI Token.",
+          "Similar to other social networks, Chingari app users contribute by publishing or engaging in content such as likes, sharing comment, following, being followed, tipping favourite creators, and 20 other in-app activities.",
+          "With over 40 million monthly active users, 170 million app downloads, and 1.47 million token holders, it's the largest web3 social network and community.",
+          "Create your Chingari profile now! Publish, engage and earn smart money from an inclusive creator economy. The Chingari app is available globally on all app stores. Join us today in our mission to onboard 1 billion web3 users in the next 5 years!",
+          "Linktree, join our community: https://linktr.ee/garinetwork"
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": ""
+    },
+    "resources": [
+      {
+        "title": "Top #1 Web3 Mobile App Globally Chingari",
+        "content": [
+          "Chingari is the largest on-chain social graph on Web3–powered by crypto."
+        ],
+        "https://youtu.be/zH1dMYqgzCg"
+      },
+      {
+        "title": "Highlights From GARI Network x Bitrue “Ask Me Anything” Sessions",
+        "content": [
+          "GARI, World’s biggest Social Utility Token announced its listing on one of world’s leading cryptocurrency exchanges, Bitrue on 12th Aug 2022."
+        ],
+        "https://bitrue.medium.com/highlights-from-gari-network-x-bitrue-ask-me-anything-sessions-b324b392860"
+      },
+      {
+        "title": "EBC22 | NFT: The Next Generation Tool for Content Creators",
+        "content": [
+          "Listen to our panelists during the 7th European Blockchain Convention debating how NFTs can be a useful tool for the next generation content creators."
+        ],
+        "https://youtu.be/3XfSTR9ywp4"
+      }
+    ]
+  },
+  "HnLuYmBxDxK1MCihHJVFnNudUTpLPc2km6xNcRQ8KPdj" : {
+    "symbol": "Dual Finance",
+    "heading": "Sustainable Incentive Liquidity Infrastructure for Web3 Communities",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Dual Finance gives token communities sustainable ways to earn yield & generate value from their treasuries. Through liquid option based incentives, Dual Finance unlocks value & unleashes participation in decentralized communities. Goodbye inflationary token rewards. Hello sustainable Staking Options."
+          "Dual Finance has designed itself upon this breakthrough token incentive mechanism to gain allegiance & prevent token dumping. DUAL token distribution is being conducted fully & fairly through the use of Staking Options."
+          "Partner projects can use Staking Options themselves via Dual Finance to better incentivize their own communities. When designed through Dual Finance, Staking Options serve to bolster their token's option & spot liquidity by utilizing a DAO owned AMM (Risk Manager) and capitally efficient lending product (Rehypothecated Lending Pools)."
+          "Completing the offering are Dual Investment Pools (DIPs), an upgrade to conventional option vaults (DOVs) that offer streaming executable yield strategies. Customize strategies based on your risk appetite and earn yield immediately."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://medium.com/@dualfinance"
+    },
+    "resources": [
+      {
+        "title": "Dual Finance's Youtube Channel",
+        "content": [
+          "Providing educational videos that give token communities sustainable ways to earn yield & generate value from their treasuries"
+        ],
+        "https://www.youtube.com/channel/UCMyYJ7GUzk7GCgyb9AgOU6w"
+      }
+    ]
+  },
+  "9nUyxzVL2FUMuWUiVZG66gwK15CJiM3PoLkfrnGfkvt6" : {
+    "symbol": "Drift Protocol",
+    "heading": "A lightning-fast and scalable perpetual futures DEX.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Drift is a full service DEX that offers a product offering of perpetual futures, spot trading, borrow and lend, passive liquidity provision (LP) and Insurance Fund staking."
+          "Our mission is to build the best decentralised exchange. In the six months since initial main net, Drift powered over $10b in cumulative volume and hosted over 15,000 unique traders."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.drift.trade/"
+    }
+  },
+  "HoSfB5xCk8oXRgmspugAx3yRgii8MezimDMfMVK4krBS" : {
+    "symbol": "Zeta Markets",
+    "heading": "Zeta is the number one decentralised access layer for on chain optionality and perpetual contracts",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Zeta's flagship product is a capital efficient decentralised exchange offering perpetual contracts, European cash settled options and dated futures. The entire program has been built on Solana, including its risk engine and order book, making it the most composable full stack decentralised exchange in the world. The Zeta DEX has been live on Solana since January 2022, bootstrapped by some of the most experienced experts in cryptocurrency trading and decentralized finance, including Jump Crypto, Alameda Research, Wintermute, Pattern Research, and LedgerPrime.",
+          "Generalised Options Infrastructure for Solana\nIn addition to the Zeta DEX, our expertise in options and financial technology have enabled us to build a range of exotic tokenised option structures on chain, used by some of the biggest brands in DeFi including Ribbon Finance for on chain structured products. Our tools and infrastructure make it easy for developers to build on chain agreements between counter-parties, allowing them to create defi products that are enforced entirely on chain."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://zetamarkets.gitbook.io/zeta/"
+    },
+    "resources": [
+      {
+        "title": "Zeta Markets: The Premier Under-Collateralized DeFi Options and Futures Trading Platform Built on Solana",
+        "content": [
+          "We dive into Zeta’s under-collateralization mechanism, CeFi options versus DeFi options, the future of DeFi, and much more."
+        ],
+        "https://members.delphidigital.io/media/zeta-markets-the-premier-under-collateralized-defi-options-and-futures-trading-platform-built-on-solana"
+      },
+      {
+        "title": "Zeta Markets — From Uni Friends to Hackathon Winners — Serum Stories #1",
+        "content": [
+          "Innovative projects and ambitious, talented people continue to emerge and push the boundaries of what was originally thought possible through their integrations with Serum DEX."
+        ],
+        "https://medium.com/serum-stories/serum-stories-1-zeta-markets-from-uni-friends-to-hackathon-winners-634bfbf95ec0"
+      },
+      {
+        "title": "Solana Derivatives Platform Zeta Markets to Go Live on Solana Mainnet",
+        "content": [
+          "Zeta Markets, a cutting-edge decentralized finance (DeFi) derivatives exchange offering features found in traditional finance, today announced that it will go live on the Solana Mainnet on Monday, January 17, 2022."
+        ],
+        "https://au.news.yahoo.com/solana-derivatives-platform-zeta-markets-130000885.html?guccounter=1&guce_referrer=aHR0cHM6Ly93d3cuZ29vZ2xlLmNvbS8&guce_referrer_sig=AQAAAGc3mnCrnKCJkrikiW_qpsQR6CTibb7pFWZWfMXV_uv1AiUVCSXxMFFqs94-VZfOxQf9cAEZa3W-yc_Eb40hptcvJJwgJAApwNuOhh7N6RkKjPDAzYYogUL6w0Ixv46cds4HtUIbeQJ9l55zXRImOJkJUFN83Bg0KR2iiIMxo_C3"
+      }
+    ]
+  },
+  "22nDweMdSCCDoCMFUoS8Zgv7jnZxpLuqGrkL3cmSwuU3" : {
+    "symbol": "IntoTheVerse ",
+    "heading": "Building #Games4Good powered by Blockchain Technology on Solana and Celo",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "IntoTheVerse is an NFT utility-driven game-fi metaverse that is based in two worlds, the real world, and the unreal world. The real world is a pixel replication of the cities we live in, reimagining the possibilities where people owning avatars can own virtual lands, visit museums, schools, and banks, travel, and engage in recreational activities. Think of a virtual experience where most of our partner Defi, ReFi, and NFT projects would come out alive inside the city. Think about playing a world builder like SimCity Social, but inside a crypto-native city with a purpose.",
+          "The unreal world lies in the dark dungeons infested with demons and otherworldly creatures and filled with ancient secrets and treasure, where avatars transform into warriors and encounter the enemies to fight for treasure, forge, level-up and upgrade in a compelling MMORPG adventure!",      
+          "We’re building for mobile and desktop to facilitate user onboarding, education, and fun game/social experience for the masses through web3 and also exploring how we might enable a global redistribution of value and strengthen social and regenerative economics by introducing Play, Own, Earn, Preserve and Learn mechanics."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://solana.com/summercamp/voting/solana-rpg-dungeon-quest-metaplex-multicharacter-integration"
+    },
+    "resources": [
+      {
+        "title": "Solana RPG Dungeon Quest—Metaplex Multi-character Integration",
+        "content": [
+          "A lightweight pixel multicharacter, Play To Earn dungeon game built on the Solana Devnet Blockchain, built with Phaser, powered by Metaplex NFT Marketplace Protocol."
+        ],
+        "https://solana.com/summercamp/voting/solana-rpg-dungeon-quest-metaplex-multicharacter-integration"
+      }
+    ]
+  },
+  "Bwjrnh5dGZ2tHZKjLtMNwwhtk8sCGfR1ZM8ZxcVCe87m" : {
+    "symbol": "Streamflow",
+    "heading": "Streamflow is the #1 token vesting and streaming platform on Solana. ",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Token vesting with Streamflow offers powerful features like: cliff dates, optionally transfer and cancel active streams, automatic withdrawals to recipient wallet and much more.",
+          "Streaming payments using Streamflow offer a great opportunity for payroll. The recipient can withdraw their salary as they earn it, or wait and have it automatically sent to their wallet at the end of the payment period.",
+          "Streamflow offers a powerful and secure multisig wallet for teams to manage their payments and vesting with confidence including a clear summary of their open streams, signers and more."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.streamflow.finance/"
+    }
+  },
+  "2dZAfmpEVMa18ESGiMHQxTWpQvdzEdhNdT7Ai6wdNkZ1" : {
+    "symbol": "Irreverent Labs",
+    "heading": "Irreverent Labs is creating hilarious automated entertainment from the future. ",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Irreverent Labs is building the future of automated entertainment.  We are the creators of MechaFightClub.",
+          "We combine machine learning with 3D graphics automation to breathe life into characters that players own, train, breed, and share experiences with.",
+          "We're building a world where players build emotional connections with the characters and entities they own in the game.",
+          "We’re combining beautiful art, rich story-telling, and deep technology to build the future of entertainment.",
+          "Our team is diverse, and incredibly talented.  We’re hiring top talent from machine learning, computer vision, computational biology, art and design, and gaming and entertainment.",
+          "Our founders worked together at Microsoft, they started Microsoft Ventures together.",
+          "The team was able to come together quickly because many of us have worked together in the past in various capacities."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://www.mechafightclub.com/boktoshi"
+    },
+    "resources": [
+      {
+        "title": "Rahul Sood’s Irreverent Labs unveils MechaFight Club NFT game",
+        "content": [
+          "Born from the mind of Voodoo PC founder Rahul Sood, the Seattle-based blockchain game company has unveiled its first game: MechaFightClub."
+        ],
+        "https://venturebeat.com/games/rahul-soods-irreverent-labs-unveils-mechafight-club-nft-game/"
+      },
+      {
+        "title": "Microsoft vets reveal first game from new blockchain startup backed by Andreessen Horowitz",
+        "content": [
+          " Irreverent Labs, a new Seattle startup led by Microsoft veterans that recently raised a $5 million seed round, just revealed its first game."
+        ],
+        "https://www.geekwire.com/2022/microsoft-vets-reveal-first-game-from-new-blockchain-startup-backed-by-andreessen-horowitz/"
+      },
+      {
+        "title": "MechaFightClub: Irreverent Labs is Using Humor & Advanced AI to Evolve NFT Fighting Games",
+        "content": [
+          "Irreverant Labs’ first game, MechaFightClub, is Mortal Kombat meets Gundam Wing with a dash of South Park humor, all on the Solana blockchain."
+        ],
+        "https://esports.gg/news/fgc/mechafightclub-irreverent-labs-solana-blockchain/"
+      }
+    ]
+  },
+  "7fhfRApHt9N15v6Xccfd8iGnWZ3xvpUgHA8kieT2egBA" : {
+    "symbol": "Shakudo",
+    "heading": "All data tools integrated into a fully-managed platform allowing data teams to remove DevOps and accelerate development cycles.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Shakudo is one of the fastest-growing companies that crosses over Web2 and Web3 data at scale. Our fully-managed end-to-end platform specializes in solving these 3 simple problems:\n1. Easily extract data from a range of blockchains such as Ethereum, Bitcoin and Solana\n2. Deposit the extracted data into a standard database such as Postgres or MongoDB (many others are supported)\n3. And last but not least, develop and run end-to-end analytics at scale while removing DevOps support and accelerating development cycles",
+          "We help great companies like Kin, MonkeDAO and Degenerate Ape Academy to achieve extreme cost reduction and substantial increases in speed and efficiency.",
+          "Spin up the RPC node, run your own validator, monitor wallets and smart contracts, read unlimited on-chain data and run analysis at scale - all in one Shakudo platform!"
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.shakudo.io/home/"
+    },
+    "resources": [
+      {
+        "title": "Vector Institute welcomes three new partners to its AI ecosystem",
+        "content": [
+          "Toronto-based non-profit Vector Institute has welcomed three new partners to its Artificial Intelligence (AI) ecosystem to further research and innovation and bolster the economy."
+        ],
+        "https://www.itworldcanada.com/article/vector-institute-welcomes-three-new-partners-to-its-ai-ecosystem/495151"
+      },
+      {
+        "title": "Rebranded Shakudo Secures $4.2 Million CAD to Help Data Science Teams Get AI Solutions to Market",
+        "content": [
+          "Toronto-based software startup Shakudo has rebranded from DevSentient and raised $4.2 million CAD ($3.4 million USD) in seed funding to expand the reach of its artificial intelligence (AI) platform for data science and machine learning (ML) teams."
+        ],
+        "https://betakit.com/rebranded-shakudo-secures-4-2-million-cad-to-help-data-science-teams-get-products-to-market/"
+      },
+      {
+        "title": "Certified MLOps Software for NVIDIA DGX Systems",
+        "content": [
+          "Explore enterprise-grade solutions for workflow, cluster management, and scheduling and orchestration."
+        ],
+        "https://www.nvidia.com/en-us/data-center/dgx-ready-software/#shakudo"
+      }
+    ]
+  },
+  "aoBhePkPBCvrSZrK1ioEz6duUY211jfeBPzMzeGAqT8" : {
+    "symbol": "Panzerdogs",
+    "heading": "Panzerdogs is a Solana NFT gaming project where players can own all of their in-game assets and use them for P2E and P2P battles.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Panzerdogs is a Solana NFT gaming project where players can own all of their in-game assets and use them for P2E and P2P battles. The game is built to play directly on mobile and desktop browsers.",
+          "Pixel-art NFT collection on the Solana Blockchain. Holders got free airdrops to build their first tanks. Play to earn in the PVP arena.",
+          "Made by Lucky Kat Studios. A game studio from the Netherlands with a track record of having over 200 million downloads on the App Store and Google Play. We truly believe in the transition of games to web3 and that users should own each in-game asset."
+        ]
+      }
+    ]
+  },
+  "AxPJNe69VrdqWV1VkgDoRcM6Utizje6HdUqE5paJopap" : {
+    "symbol": "DeFi Land",
+    "heading": "DeFi Land is a unique agriculture-simulation game created to gamify all aspects of decentralized finance and web3.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "DeFi Land is a unique, multi-chain agriculture-simulation game created to gamify all aspects of decentralized finance. The main goal of the game is to make it easier and simpler for individuals to take part in the exciting world of DeFi and crypto, while also having the opportunity to have fun.",
+          "DeFi Land offers all the features that traditional platforms have, but everything is gathered in one place. The game offers players the opportunity to start playing for free, grind their way up to the Play and Earn tier (or simply purchase a Gen-0 NFT), compete with other players, craft, trade, and dive into DeFi in a fun and exciting way.",
+          "The native utility token is called DFL, and it can be used for:\n- Trading in-game assets and NFTs\n- Staking and LP incentives\n- Game mechanics\n - Governance votes, giving players the opportunity to determine how the network resources are allocated",
+          "The Play and Earn model introduced by DeFi Land allows users to earn income for completing tasks or reaching certain milestones. The game has something for everyone - whether you are looking for something laid-back and fun or something active and exciting, you can find it on DeFi Land."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": ""
+    },
+    "resources": [
+      {
+        "title": "DeFi Land Youtube Channel",
+        "content": [
+          "Providing videos giving our community insights in our game"
+        ],
+        "https://www.youtube.com/channel/UCNMyY22SCeknZWo2Lza9a4A"
+      }
+    ]
+  },
+  "8sMzPkk6TBM943XRXzScqrcZFfmK1pw62gUPdwtVckCJ" : {
+    "symbol": "BetDEX Labs",
+    "heading": "BetDEX Labs will launch the BetDEX Exchange in Nov 2022 for Web3 sports betting and is a key contributor to the Monaco Protocol.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "BetDEX Labs is a web3 company building open source technology for global prediction markets. The BetDEX Exchange is a sports betting exchange built on the Monaco Protocol allowing for peer-to-peer wagering.",
+          "BetDEX is a key contributor to the Monaco Protocol, a permissionless, decentralized and open-sourced protocol built on the Solana blockchain, supporting prediction and betting markets. It serves as crucial infrastructure upon which third-party front-end applications for wagering on binary outcome events can be built while accessing a shared liquidity pool."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": ""
+    },
+    "resources": [
+      {
+        "title": "Solana-Based Sports Betting Protocol BetDEX Closes $21M Seed Funding Round",
+        "content": [
+          "In the announcement Wednesday, the Edinburgh-based BetDEX called the raise the “largest-ever seed investment round by a U.K. startup.”"
+        ],
+        "https://www.yahoo.com/video/solana-based-sports-betting-protocol-223712339.html"
+      },
+      {
+        "title": "Ex-FanDuel Execs Bet Crypto Can Disrupt Sports Gambling",
+        "content": [
+          "BetDEX CEO hopes the Solana blockchain can help improve the sports wagering industry’s counterparty risk and high fees"
+        ],
+        "https://blockworks.co/fanduel-execs-bitdex-bet-crypto-can-disrupt-sports-gambing/"
+      }
+    ]
+  },
+  "2PBLG1LGAQYUd38KjJhyACksZH9S361XunVbD3EGxfJf" : {
+    "symbol": "Aleph.im",
+    "heading": "Decentralized, open source, web3 cloud infrastructure (Storage, computing) and indexing solution. Decentralize your entire stack!",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Aleph.im is a distributed web3 cloud platform that provides serverless trusted computing services, file storage, and indexing solutions to replace traditional centralized cloud computing. It provides dApps of any chain instant access to database solutions thanks to its scalable peer-to-peer network and programming language-agnostic interface. Explore our decentralized indexing solution.",
+          "Follow us on Twitter: @aleph_im or check out our https://linktr.ee/alephim"
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://aleph-im.gitbook.io/aleph-docs/introduction/welcome-to-your-dev-hub"
+    },
+    "resources": [
+      {
+        "title": "What does Aleph.im do and what does it stand for?",
+        "content": [
+          "Well, we do a lot! See for yourself! #decentralized #storage #databases #computing #dID #Solana #indexing"
+        ],
+        "https://youtu.be/TH-d3ZgJYpk"
+      }
+    ]
+  },  
   "9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e": {
     "symbol": "Realms",
     "heading": "The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.",
