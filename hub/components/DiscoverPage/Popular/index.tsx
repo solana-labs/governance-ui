@@ -6,13 +6,13 @@ import cx from '@hub/lib/cx';
 
 export const ITEMS = [
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
+    bannerImgSrc: 'https://i.imgur.com/VfFjhk5.jpeg',
     description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+      'GARI Network enables everyone to monetize their social media time and activities by leveraging web3 technologies.',
+    iconImgSrc: 'https://i.imgur.com/t5hzoBV.jpg',
+    name: 'GARI Network',
+    publicKey: new PublicKey('uWg5gaTsBnXc5qiVMB8XxBUPYqLAb5bzzgkkpxi6UAY'),
+    urlId: 'GARI%20Network',
   },
   {
     bannerImgSrc: '/realms/RCH/banner.png',
