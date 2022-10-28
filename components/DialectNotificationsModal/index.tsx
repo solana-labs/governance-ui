@@ -25,13 +25,15 @@ const themeVariables: IncomingThemeVariables = {
   dark: {
     bellButton:
       '!bg-bkg-2 !shadow-none text-fgd-1 h-10 rounded-full w-10 hover:bg-bkg-3',
-    button: `${defaultVariables.dark.button} border-none bg-primary-light border-primary-light font-bold rounded-full hover:bg-fgd-1 hover:opacity-100`,
+    iconButton: `${defaultVariables.dark.iconButton} hover:opacity-100`,
     buttonLoading: `${defaultVariables.dark.buttonLoading} rounded-full min-h-[40px]`,
+    adornmentButton: `${defaultVariables.dark.adornmentButton} !text-bkg-1 bg-primary-light border-primary-light font-bold rounded-full hover:bg-fgd-1 hover:opacity-100`,
     colors: {
+      ...defaultVariables.dark.colors,
       bg: 'bg-bkg-1',
       toggleBackgroundActive: 'bg-primary-light',
     },
-    outlinedInput: `${defaultVariables.light.outlinedInput} focus-within:bg-bkg-3 focus-within:border-primary-light`,
+    outlinedInput: `${defaultVariables.dark.outlinedInput} focus-within:border-primary-light`,
     disabledButton: `${defaultVariables.dark.disabledButton} border-primary-light font-bold rounded-full border-fgd-3 text-fgd-3 cursor-not-allowed`,
     modal: `${defaultVariables.dark.modal} bg-bkg-1 sm:border sm:border-fgd-4 shadow-md sm:rounded-md`,
     modalWrapper: `${defaultVariables.dark.modalWrapper} sm:top-14 rounded-md`,
@@ -40,16 +42,18 @@ const themeVariables: IncomingThemeVariables = {
   light: {
     bellButton:
       '!bg-bkg-2 !shadow-none text-fgd-1 h-10 rounded-full w-10 hover:bg-bkg-3',
-    button: `${defaultVariables.light.button} border-none bg-primary-light border-primary-light font-bold rounded-full hover:bg-fgd-1 hover:opacity-100`,
-    buttonLoading: `${defaultVariables.light.buttonLoading} rounded-full min-h-[40px]`,
+    iconButton: `${defaultVariables.light.iconButton} hover:opacity-100`,
+    buttonLoading: `${defaultVariables.dark.buttonLoading} rounded-full min-h-[40px]`,
+    adornmentButton: `${defaultVariables.light.adornmentButton} bg-primary-light border-primary-light font-bold rounded-full hover:bg-fgd-1 hover:opacity-100`,
     colors: {
-      bg: 'bg-bkg-1',
+      ...defaultVariables.light.colors,
       toggleBackgroundActive: 'bg-primary-light',
     },
     textStyles: {
       input: `${defaultVariables.light.textStyles.input} text-fgd-1 placeholder:text-fgd-3`,
+      body: `${defaultVariables.light.textStyles.body} text-fgd-1`,
     },
-    outlinedInput: `${defaultVariables.light.outlinedInput} focus-within:bg-bkg-3 focus-within:border-primary-light`,
+    outlinedInput: `${defaultVariables.light.outlinedInput} focus-within:border-primary-light`,
     modal: `${defaultVariables.light.modal} sm:border sm:rounded-md sm:border-fgd-4 sm:shadow-md`,
     modalWrapper: `${defaultVariables.dark.modalWrapper} sm:top-14`,
     secondaryDangerButton: `${defaultVariables.light.secondaryDangerButton} rounded-full`,
