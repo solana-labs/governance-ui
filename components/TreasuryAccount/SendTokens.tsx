@@ -178,12 +178,14 @@ const SendTokens = ({
           setIsLoading(false)
           throw 'No realm selected'
         }
-        const instructionData = {
+        const instructionData: InstructionDataWithHoldUpTime = {
           data: instruction.serializedInstruction
             ? getInstructionDataFromBase64(instruction.serializedInstruction)
             : null,
           holdUpTime: governance?.account?.config.minInstructionHoldUpTime,
           prerequisiteInstructions: instruction.prerequisiteInstructions || [],
+          chunkSplitByDefault: true,
+          chunkBy: 4,
         }
         instructions.push(instructionData)
       }

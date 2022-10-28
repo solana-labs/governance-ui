@@ -82,8 +82,8 @@ export function InstructionPanel() {
       proposalInstructions.map((x) => x.account.getSingleInstruction())
     )
 
-    const inspectUrl = getExplorerInspectorUrl(
-      connection.endpoint,
+    const inspectUrl = await getExplorerInspectorUrl(
+      connection,
       result.transaction
     )
     window.open(inspectUrl, '_blank')

@@ -14,7 +14,7 @@ import {
   ChevronDownIcon,
 } from '@heroicons/react/solid'
 import { abbreviateAddress } from '@utils/formatting'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import useLocalStorageState from '../hooks/useLocalStorageState'
 import useWalletStore from '../stores/useWalletStore'
 import {
@@ -25,6 +25,7 @@ import Switch from './Switch'
 import { TwitterIcon } from './icons'
 import { notify } from '@utils/notifications'
 import { Profile } from '@components/Profile'
+import Loading from './Loading'
 
 const StyledWalletProviderLabel = styled.p`
   font-size: 0.65rem;
@@ -33,6 +34,7 @@ const StyledWalletProviderLabel = styled.p`
 
 const ConnectWalletButton = (props) => {
   const { pathname, query, replace } = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
   const [currentCluster, setCurrentCluster] = useLocalStorageState(
     'cluster',
     'mainnet'
@@ -74,6 +76,7 @@ const ConnectWalletButton = (props) => {
   }
 
   const handleConnectDisconnect = async () => {
+    setIsLoading(true)
     try {
       if (connected) {
         await current?.disconnect()
@@ -89,6 +92,7 @@ const ConnectWalletButton = (props) => {
       }
       console.warn('handleConnectDisconnect', e)
     }
+    setIsLoading(false)
   }
 
   const { show } = useWalletIdentity()
@@ -160,7 +164,7 @@ const ConnectWalletButton = (props) => {
               </>
             ) : (
               <>
-                Connect
+                {isLoading ? <Loading></Loading> : 'Connect'}
                 <StyledWalletProviderLabel className="font-normal text-fgd-3">
                   {provider?.name}
                 </StyledWalletProviderLabel>
