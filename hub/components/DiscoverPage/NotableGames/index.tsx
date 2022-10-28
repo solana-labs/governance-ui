@@ -56,8 +56,10 @@ export function NotableGames(props: Props) {
           notable games
         </div>
       </div>
-      <div className="text-neutral-500">
-        Solana takes games to the next level with real ownership and rewards
+      <div className="text-neutral-500 max-w-3xl">
+        Following massive investment in AAA games, games built on Solana have
+        ushered in a new era in digital ownership, social coordination, and
+        token value.
       </div>
       <div
         className={cx('grid', 'grid-cols-4', 'mt-6', 'gap-3', 'items-center')}

@@ -139,7 +139,16 @@ export function Trending(props: Props) {
 
                   return (
                     <button
-                      className="grid grid-cols-[20px,1fr] gap-x-3 group tracking-normal text-left w-full"
+                      className={cx(
+                        'gap-x-3',
+                        'grid-cols-[20px,1fr]',
+                        'grid',
+                        'group',
+                        'overflow-hidden',
+                        'text-left',
+                        'tracking-normal',
+                        'w-full',
+                      )}
                       key={edge.node.id}
                       onClick={() => {
                         const url = `/realm/${props.realmUrlId}/${edge.node.id}`;
@@ -155,6 +164,7 @@ export function Trending(props: Props) {
                             'font-bold',
                             'text-neutral-900',
                             'transition-colors',
+                            'truncate',
                             'group-hover:text-sky-500',
                           )}
                         >

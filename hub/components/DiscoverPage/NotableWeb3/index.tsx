@@ -56,8 +56,9 @@ export function NotableWeb3(props: Props) {
           notable web3 projects
         </div>
       </div>
-      <div className="text-neutral-500">
-        Solana bring equal access to everyone with a strong set of Web3 projects
+      <div className="text-neutral-500 max-w-3xl">
+        With 16.3 million monthly users, decentralized technology built on
+        Solana is quickly becoming the economic engine for many industries.
       </div>
       <div
         className={cx('grid', 'grid-cols-4', 'mt-6', 'gap-3', 'items-center')}

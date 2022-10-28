@@ -56,9 +56,9 @@ export function NotableNFTs(props: Props) {
           notable nft collections
         </div>
       </div>
-      <div className="text-neutral-500">
-        Solana has minted 2B NFTs through Metaplex, and currently has more NFTs
-        in its ecosystem than any other chain
+      <div className="text-neutral-500 max-w-3xl">
+        With more than 20.2 million minted, Solana NFTs have generated more than
+        $2.5 Billion in sales to more than 5.8 million wallets.
       </div>
       <div
         className={cx('grid', 'grid-cols-4', 'mt-6', 'gap-3', 'items-center')}

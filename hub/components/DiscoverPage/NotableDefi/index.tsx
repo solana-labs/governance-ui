@@ -56,9 +56,10 @@ export function NotableDefi(props: Props) {
           notable defi projects
         </div>
       </div>
-      <div className="text-neutral-500">
-        Over $11 Billion in total value locked and transaction fees under a
-        penny on Solana
+      <div className="text-neutral-500 max-w-3xl">
+        The rapidly evolving Solana DeFi industry has generated over $11 Billion
+        in total value locked while boasting blazing transaction speeds and
+        ultra low fees.
       </div>
       <div
         className={cx('grid', 'grid-cols-4', 'mt-6', 'gap-3', 'items-center')}

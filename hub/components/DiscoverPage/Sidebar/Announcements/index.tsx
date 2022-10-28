@@ -1,32 +1,30 @@
 import Bullhorn from '@carbon/icons-react/lib/Bullhorn';
 import ChevronRightIcon from '@carbon/icons-react/lib/ChevronRight';
-import { PublicKey } from '@solana/web3.js';
+import { pipe } from 'fp-ts/lib/function';
 import Link from 'next/link';
 
+import { useQuery } from '@hub/hooks/useQuery';
 import cx from '@hub/lib/cx';
+import * as RE from '@hub/types/Result';
 
+import * as gql from './gql';
 import { Post } from './Post';
 
 const CONFIG = [
   {
     postId: '1h9',
-    realm: new PublicKey('H3e67AJqEx3yiWcSdP7g6qVkrAeCrpJSkQtxAKy7QYGK'),
   },
   {
     postId: '1h6',
-    realm: new PublicKey('BzGL6wbCvBisQ7s1cNQvDGZwDRWwKK6bhrV93RYdetzJ'),
   },
   {
     postId: '1ha',
-    realm: new PublicKey('DA5G7QQbFioZ6K33wQcH8fVdgFcnaDjLD7DLQkapZg5X'),
   },
   {
     postId: '1hd',
-    realm: new PublicKey('B1CxhV1khhj7n5mi5hebbivesqH9mvXr5Hfh2nD2UCh6'),
   },
   {
     postId: '1h7',
-    realm: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
   },
 ];
 
@@ -35,6 +33,11 @@ interface Props {
 }
 
 export function Announcements(props: Props) {
+  const [result] = useQuery(gql.getPostResp, {
+    query: gql.getPost,
+    variables: { ids: CONFIG.map((item) => item.postId) },
+  });
+
   return (
     <article className={props.className}>
       <header className="flex items-center space-x-2.5">
@@ -44,31 +47,57 @@ export function Announcements(props: Props) {
         </div>
       </header>
       <div className="mt-6 space-y-5">
-        {CONFIG.map((item, i) => (
-          <div
-            className={cx(
-              'gap-x-3',
-              'grid-cols-[22px,1fr]',
-              'grid',
-              'items-center',
-              'px-2',
-            )}
-            key={item.postId}
-          >
-            <div
-              className={cx(
-                'font-medium',
-                'text-center',
-                'text-neutral-900',
-                'text-xs',
-                'w-full',
-              )}
-            >
-              {(i + 1).toFixed(0).padStart(2, '0')}
-            </div>
-            <Post {...item} />
-          </div>
-        ))}
+        {pipe(
+          result,
+          RE.match(
+            () =>
+              CONFIG.map((item) => (
+                <div
+                  className={cx('bg-neutral-200', 'h-8', 'rounded', 'w-full')}
+                  key={item.postId}
+                />
+              )),
+            () =>
+              CONFIG.map((item) => (
+                <div
+                  className={cx(
+                    'animate-pulse',
+                    'bg-neutral-200',
+                    'h-8',
+                    'rounded',
+                    'w-full',
+                  )}
+                  key={item.postId}
+                />
+              )),
+            ({ feedItems }) =>
+              feedItems.map((item, i) => (
+                <div
+                  className={cx(
+                    'gap-x-3',
+                    'grid-cols-[22px,1fr]',
+                    'grid',
+                    'items-center',
+                    'px-2',
+                  )}
+                  key={item.id}
+                >
+                  <div
+                    className={cx(
+                      'font-medium',
+                      'text-center',
+                      'text-neutral-900',
+                      'text-xs',
+                      'w-full',
+                    )}
+                  >
+                    {(i + 1).toFixed(0).padStart(2, '0')}
+                  </div>
+                  <Post post={item} />
+                </div>
+              )),
+          ),
+        )}
       </div>
       <Link passHref href="/ecosystem">
         <a
