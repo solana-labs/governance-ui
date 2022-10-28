@@ -29,7 +29,9 @@ export function CategorySelector(props: Props) {
             'items-center',
             'justify-center',
             'rounded',
+            'transition-colors',
             'w-10',
+            'hover:bg-neutral-200',
           )}
         >
           <FilterIcon
