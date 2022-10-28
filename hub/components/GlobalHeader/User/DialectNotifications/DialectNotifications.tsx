@@ -68,25 +68,12 @@ export const DialectNotifications = () => {
 
   return (
     <NavigationMenu.Item>
-      <DialectSolanaSdk
-        config={dialectConfig}
-        solanaConfig={solanaConfig}
-        gate={() =>
-          new Promise((resolve) => setTimeout(() => resolve(true), 3000))
-        }
-      >
+      <DialectSolanaSdk config={dialectConfig} solanaConfig={solanaConfig}>
         <DialectThemeProvider theme="light" variables={themeVariables}>
           <DialectUiManagementProvider>
             <NotificationsButton
               dialectId="dialect-notifications"
               dappAddress={REALMS_PUBLIC_KEY.toBase58()}
-              notifications={[
-                {
-                  name: 'Example notification',
-                  detail:
-                    'This is an example notification that is never sent. More examples coming soon',
-                },
-              ]}
               pollingInterval={15000}
               channels={['web3', 'email', 'sms', 'telegram']}
             />
