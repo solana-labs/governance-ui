@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { RealmIcon } from '@hub/components/RealmIcon';
 import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay';
 import { useQuery } from '@hub/hooks/useQuery';
+import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
 import cx from '@hub/lib/cx';
 import * as RE from '@hub/types/Result';
 
@@ -61,6 +62,7 @@ export function Post(props: Props) {
             'text-left',
             'w-full',
             'overflow-hidden',
+            'tracking-normal',
             props.className,
           )}
           onClick={() => {
@@ -76,6 +78,7 @@ export function Post(props: Props) {
                 'block',
                 'font-bold',
                 'text-neutral-900',
+                'text-sm',
                 'transition-colors',
                 'truncate',
                 'hover:text-sky-500',
@@ -96,7 +99,9 @@ export function Post(props: Props) {
               name={feedItem.realm.name}
             />
             <div className="text-xs font-medium text-neutral-900">
-              {feedItem.realm.name}
+              {feedItem.realm.publicKey.equals(ECOSYSTEM_PAGE)
+                ? 'Solana Ecosystem'
+                : feedItem.realm.name}
             </div>
             <div className="text-xs text-neutral-500 ml-3">
               {formatDistanceToNowStrict(feedItem.created)} ago

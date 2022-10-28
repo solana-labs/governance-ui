@@ -75,7 +75,7 @@ export const RealmSearchNavigation = forwardRef<HTMLInputElement, Props>(
     return (
       <Popover.Root>
         <Popover.Anchor asChild ref={ref}>
-          <div className={cx('relative', 'w-80', props.className)}>
+          <div className={cx('relative', 'w-[270px]', props.className)}>
             <input
               className={cx(
                 'bg-neutral-100',
@@ -150,7 +150,7 @@ export const RealmSearchNavigation = forwardRef<HTMLInputElement, Props>(
                 'bg-white',
                 'overflow-hidden',
                 'rounded',
-                'w-80',
+                'w-[270px]',
                 'z-50',
               )}
               onOpenAutoFocus={(e) => e.preventDefault()}

@@ -1,3 +1,4 @@
+import CalibrateIcon from '@carbon/icons-react/lib/Calibrate';
 import ChartCandlestickIcon from '@carbon/icons-react/lib/ChartCandlestick';
 import CubeIcon from '@carbon/icons-react/lib/Cube';
 import GameConsoleIcon from '@carbon/icons-react/lib/GameConsole';
@@ -6,6 +7,7 @@ import IdeaIcon from '@carbon/icons-react/lib/Idea';
 import { NFT } from '@hub/components/icons/NFT';
 
 export enum Category {
+  DAOTools,
   Defi,
   Gaming,
   Nft,
@@ -15,6 +17,8 @@ export enum Category {
 
 export function getCategoryIcon(category: Category) {
   switch (category) {
+    case Category.DAOTools:
+      return <CalibrateIcon />;
     case Category.Defi:
       return <ChartCandlestickIcon />;
     case Category.Gaming:
@@ -30,6 +34,8 @@ export function getCategoryIcon(category: Category) {
 
 export function getCategoryName(category: Category) {
   switch (category) {
+    case Category.DAOTools:
+      return 'DAO Tooling';
     case Category.Defi:
       return 'DeFi';
     case Category.Gaming:

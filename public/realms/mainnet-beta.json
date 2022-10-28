@@ -93,18 +93,6 @@
     "twitter": "@PythNetwork"
   },
   {
-    "symbol": "Dialect",
-    "displayName": "Dialect",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "7s5QZmpit4uu1y2bkByXerE2mv3XBHtiNQ4JkDdmKRiQ",
-    "bannerImage": "/realms/Dialect/img/banner-dialect.png",
-    "ogImage": "/realms/Dialect/img/avatar-dialect.png",
-    "website": "https://www.dialect.to/",
-    "twitter": "@saydialect",
-    "sortRank": 3,
-    "shortDescription": "Dialect is the first protocol for smart messaging — dynamic, composable dapp notifications and wallet-to-wallet chat"
-  },
-  {
     "symbol": "MangoLiquidityDAO",
     "displayName": "Mango Liquidity Council",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -364,15 +352,6 @@
     "website": "https://realms.notion.site/Realms-Ecosystem-DAO-RED-2b82519e797b4696968c5c909812f418",
     "twitter": "@Realms_DAOs",
     "sortRank": 2
-  },
-  {
-    "symbol": "MonkeDAO",
-    "displayName": "MonkeDAO",
-    "programId": "GMnke6kxYvqoAXgbFGnu84QzvNHoqqTnijWSXYYTFQbB",
-    "realmId": "B1CxhV1khhj7n5mi5hebbivesqH9mvXr5Hfh2nD2UCh6",
-    "ogImage": "/realms/MonkeDAO/img/MonkeDAO_logo.png",
-    "website": "https://monkedao.io/",
-    "twitter": "@MonkeDAO"
   },
   {
     "symbol": "MonkeDAOVote",
@@ -934,10 +913,10 @@
     "displayName": "Dean's List",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "9mS8GuMx2MkZGMSwa2k87HNLTFZ1ssa9mJ1RkGFKcGyQ",
-    "bannerImage": "/realms/Dean's List Grape/deans list logo.png",
+    "bannerImage": "/realms/Deans-List-Grape/deans-list-logo.png",
     "website": "https://deans-list.strataprotocol.com/",
     "twitter": "@GrapeDeanslist",
-    "ogImage": "/realms/Dean's List Grape/deans list logo.png"
+    "ogImage": "/realms/Deans-List-Grape/deans-list-logo.png"
   },
   {
     "symbol": "GrapeCCSubDAO",
@@ -1087,7 +1066,7 @@
   },
   {
     "symbol": "Squads",
-    "bannerImage": "/realms/squads/banner.png",
+    "bannerImage": "/realms/Squads/banner.png",
     "displayName": "Squads",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "BzGL6wbCvBisQ7s1cNQvDGZwDRWwKK6bhrV93RYdetzJ",
@@ -1104,8 +1083,8 @@
     "displayName": "Allie Coin DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "BZE9AiJrMxUXXjwy9iBPzj34Wh5Zf1wLEFAM4oSSMRLi",
-    "bannerImage": "/realms/Allie Coin DAO/Allie Coin Particle Logo Compressed.png",
-    "ogImage": "/realms/Allie Coin DAO/Allie Coin Logo.png",
+    "bannerImage": "/realms/Allie-Coin-DAO/Allie-Coin-Particle-Logo-Compressed.png",
+    "ogImage": "/realms/Allie-Coin-DAO/Allie-Coin-Logo.png",
     "website": "https://alliecoin.io",
     "twitter": "@allie_coin"
   },
@@ -1148,20 +1127,6 @@
     "website": "https://orbis.club",
     "twitter": "@OrbisClub",
     "github": "https://github.com/OrbisWeb3/"
-  },
-  {
-    "symbol": "Jupiter Aggregator",
-    "bannerImage": "https://i.imgur.com/2Z17uYm.jpg",
-    "displayName": "Jupiter Aggregator",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "2Z5BXuRCJPqYUCBGyQTwAXHeJoFAnbtvoXja19aZFLKY",
-    "ogImage": "https://jup.ag/svg/jupiter-logo.svg",
-    "shortDescription": "The best swap aggregator & infrastructure for Solana -  powering best price, token selection and UX for all users and devs.",
-    "sortRank": 3,
-    "website": "https://jup.ag/",
-    "twitter": "@JupiterExchange",
-    "discord": "https://discord.gg/jup",
-    "github": "https://github.com/jup-ag"
   },
   {
     "symbol": "SolanaFM",
@@ -1275,19 +1240,6 @@
     "github": "https://github.com/streamflow-finance"
   },
   {
-    "symbol": "Irreverent Labs",
-    "bannerImage": "https://i.imgur.com/Db2CIvO.png",
-    "displayName": "Irreverent Labs",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "2dZAfmpEVMa18ESGiMHQxTWpQvdzEdhNdT7Ai6wdNkZ1",
-    "ogImage": "https://i.imgur.com/P4RC19y.png",
-    "shortDescription": "Irreverent Labs is creating hilarious automated entertainment from the future. ",
-    "sortRank": 3,
-    "website": "https://www.mechafightclub.com",
-    "twitter": "@mechafightclub",
-    "discord": "https://discord.gg/mechafightclub"
-  },
-  {
     "symbol": "Shakudo",
     "bannerImage": "https://i.imgur.com/tVUlRsv.jpg",
     "displayName": "Shakudo",
@@ -1312,19 +1264,6 @@
     "website": "https://www.panzerdogs.io/",
     "twitter": "@panzerdogs",
     "discord": "https://discord.gg/panzerdogs"
-  },
-  {
-    "symbol": "DeFi Land",
-    "bannerImage": "https://i.imgur.com/NL7yjoC.png",
-    "displayName": "DeFi Land",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "AxPJNe69VrdqWV1VkgDoRcM6Utizje6HdUqE5paJopap",
-    "ogImage": "https://i.imgur.com/fxd7mT2.png",
-    "shortDescription": "DeFi Land is a unique agriculture-simulation game created to gamify all aspects of decentralized finance and web3.",
-    "sortRank": 3,
-    "website": "https://defiland.app/",
-    "twitter": "@DeFi_Land",
-    "discord": "https://discord.gg/defiland"
   },
   {
     "symbol": "BetDEX Labs",
@@ -1354,7 +1293,74 @@
     "github": "https://github.com/aleph-im"
   },
   {
+    "symbol": "Dialect",
+    "category": "web3",
+    "displayName": "Dialect",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "7s5QZmpit4uu1y2bkByXerE2mv3XBHtiNQ4JkDdmKRiQ",
+    "bannerImage": "/realms/Dialect/img/banner-dialect.png",
+    "ogImage": "/realms/Dialect/img/avatar-dialect.png",
+    "website": "https://www.dialect.to/",
+    "twitter": "@saydialect",
+    "sortRank": 3,
+    "shortDescription": "Dialect is the first protocol for smart messaging — dynamic, composable dapp notifications and wallet-to-wallet chat"
+  },
+  {
+    "symbol": "MonkeDAO",
+    "category": "nft",
+    "displayName": "MonkeDAO",
+    "programId": "GMnke6kxYvqoAXgbFGnu84QzvNHoqqTnijWSXYYTFQbB",
+    "realmId": "B1CxhV1khhj7n5mi5hebbivesqH9mvXr5Hfh2nD2UCh6",
+    "ogImage": "/realms/MonkeDAO/img/MonkeDAO_logo.png",
+    "website": "https://monkedao.io/",
+    "twitter": "@MonkeDAO"
+  },
+  {
+    "symbol": "Jupiter Aggregator",
+    "category": "defi",
+    "bannerImage": "https://i.imgur.com/2Z17uYm.jpg",
+    "displayName": "Jupiter Aggregator",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "2Z5BXuRCJPqYUCBGyQTwAXHeJoFAnbtvoXja19aZFLKY",
+    "ogImage": "https://jup.ag/svg/jupiter-logo.svg",
+    "shortDescription": "The best swap aggregator & infrastructure for Solana -  powering best price, token selection and UX for all users and devs.",
+    "sortRank": 3,
+    "website": "https://jup.ag/",
+    "twitter": "@JupiterExchange",
+    "discord": "https://discord.gg/jup",
+    "github": "https://github.com/jup-ag"
+  },
+  {
+    "symbol": "Irreverent Labs",
+    "category": "other",
+    "bannerImage": "https://i.imgur.com/Db2CIvO.png",
+    "displayName": "Irreverent Labs",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "2dZAfmpEVMa18ESGiMHQxTWpQvdzEdhNdT7Ai6wdNkZ1",
+    "ogImage": "https://i.imgur.com/P4RC19y.png",
+    "shortDescription": "Irreverent Labs is creating hilarious automated entertainment from the future. ",
+    "sortRank": 3,
+    "website": "https://www.mechafightclub.com",
+    "twitter": "@mechafightclub",
+    "discord": "https://discord.gg/mechafightclub"
+  },
+  {
+    "symbol": "DeFi Land",
+    "category": "gaming",
+    "bannerImage": "https://i.imgur.com/NL7yjoC.png",
+    "displayName": "DeFi Land",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "AxPJNe69VrdqWV1VkgDoRcM6Utizje6HdUqE5paJopap",
+    "ogImage": "https://i.imgur.com/fxd7mT2.png",
+    "shortDescription": "DeFi Land is a unique agriculture-simulation game created to gamify all aspects of decentralized finance and web3.",
+    "sortRank": 3,
+    "website": "https://defiland.app/",
+    "twitter": "@DeFi_Land",
+    "discord": "https://discord.gg/defiland"
+  },
+  {
     "symbol": "RCH",
+    "category": "daotools",
     "bannerImage": "/realms/RCH/banner.png",
     "displayName": "Realms Community Hub",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",

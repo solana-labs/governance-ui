@@ -45,6 +45,7 @@ export function Org(props: Props) {
         'group',
         'items-center',
         'text-left',
+        'tracking-normal',
         'w-full',
         props.className,
       )}

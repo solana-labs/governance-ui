@@ -28,7 +28,9 @@ export function DiscoverPage(props: Props) {
     >
       <div className="p-4">
         <div className="top-[72px] sticky">
-          <Sidebar />
+          <Sidebar
+            className={cx('max-h-[calc(100vh-88px)]', 'overflow-y-auto')}
+          />
         </div>
       </div>
       <div className="py-8 w-full overflow-hidden">

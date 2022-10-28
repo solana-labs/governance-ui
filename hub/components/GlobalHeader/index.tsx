@@ -18,8 +18,7 @@ export function GlobalHeader(props: Props) {
     <NavigationMenu.Root
       className={cx(
         props.className,
-        'backdrop-blur-2xl',
-        'bg-white/80',
+        'bg-white',
         'flex',
         'items-center',
         'justify-center',
