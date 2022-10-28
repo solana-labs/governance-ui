@@ -373,6 +373,437 @@
       }
     ]
   },
+  "By2sVGZXwfQq6rAiAM3rNPJ9iQfb5e2QhnF4YjJ4Bip" : {
+    "symbol": "GRAPE",
+    "heading": "GRAPE DAO is a power user community for digital governance primitives & tooling",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Connecting members social accounts to unique cryptographic keys is at the core of our Dynamic Balance-Based Membership solution.",
+          "Users gain permission and access rights based on their wallets balances, providing direct proof of ""Skin in the Game"" for every community member."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.grapes.network/what-is-grape/overview"
+    },
+    "resources": [
+      {
+        "title": "Grape's Youtube Channel",
+        "content": [
+          "Providing educational videos related to building, using, investing and supporting the Solana ecosystem"
+        ],
+        "url": "https://www.youtube.com/c/GrapeProtocol"
+      },
+      {
+        "title": "The Grape DAO Times",
+        "content": [
+          "Our Weekly Newsletter is a great way to learn about the Grape community and its partners"
+        ],
+        "url": "https://medium.com/great-ape"
+      }
+    ]
+  },
+  "B1CxhV1khhj7n5mi5hebbivesqH9mvXr5Hfh2nD2UCh6" : {
+    "symbol": "MonkeDAO",
+    "heading": "",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "We’re working to become the premier decentralized community of Web3, by providing unparalleled value to our members and the Solana ecosystem through community-led projects, connections and innovations."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://monkedao.gitbook.io/welcome-to-monkedao/"
+    },
+    "resources": [
+      {
+        "title": "MonkeBrains.com",
+        "content": [
+          "A knowledge base for the Solana Blockchain Ecosystem hosted by MonkeDAO"
+        ],
+        "url": "https://monkebrains.com/"
+      },
+      {
+        "title": "Monke Country Club 🎉",
+        "content": [
+          "An exclusive, 24/7 club that will only allow witty bantering, jokes that are too clever, and expressions of love for one another."
+        ],
+        "url": "https://monkedao.notion.site/monkedao/Calling-all-Monkes-19eb9ff4a6434eef8e709dfd40ff9cd0"
+      }
+    ]
+  },
+  "7s5QZmpit4uu1y2bkByXerE2mv3XBHtiNQ4JkDdmKRiQ" : {
+    "symbol": "Dialect",
+    "heading": "Dialect is building an open source protocol for Smart Messaging — dynamic, composable dapp notifications and wallet-to-wallet chat",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Dialect makes web3 messaging magical. We are building an open-source protocol, a suite of developer tools, and a mobile messaging app to bring interactive, composable wallet-to-wallet messaging and notifications to users and projects across the ecosystem. Dialect is powering messaging and notifications on 30 of the biggest and best known projects on Solana have integrated Dialect's messaging and notifications."
+          "Smart Messaging: This new interaction mode for messaging uses a primitive we call Smart Messaging. With Smart Messages, users can take action within their messages and notifications. Send and receive tokens, bid on auctions, like or follow content, stake or re-stake assets, execute trades, all right from your inbox.",
+          "The Smart Messaging Standard will be available soon for builders and projects to create their own interactive messaging experiences.",
+          "The Dialect App (coming soon): Dialect has also created a mobile messaging app for users and projects to send and receive wallet-to-wallet messages and notifications. The Dialect App allows you to connect with other web3 users directly and is the best place to receive, send, and interact with Smart Messages. Dialect App users can also enable and manage notifications from the over 30+ projects that have integrated Dialect. Lastly, there will be some crypto native delight embedded into your messaging experience. You'll want to be early...waitlist coming soon.",
+          "Building with Dialect: We'd love to build with you and we're here to help! Please visit our documentation (docs.dialect.to), open source repositories on GitHub (github.com/dialectlabs), Discord (discord.gg/dialect), or reach out to us directly on Twitter (twitter.com/saydialect) to learn more."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "docs.dialect.to"
+    },
+    "resources": [
+      {
+        "title": "Dialect Raises $4.1M to Bring ‘Smart Messaging’ to Solana",
+        "content": [
+          "The project wants Solana-based DeFi apps to have actionable alerts and wallet-to-wallet chat."
+        ],
+        "url": "https://www.coindesk.com/business/2022/03/02/dialect-raises-41m-to-bring-smart-messaging-to-solana/"
+      }
+    ]
+  },
+  "6jydyMWSqV2bFHjCHydEQxa9XfXQWDwjVqAdjBEA1BXx" : {
+    "symbol": "Gilder",
+    "heading": "Gilder makes interacting and staying connected to your decentralized internet community easy on mobile. ",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "On Gilder you can view and keep up to date with any SPL-governance dao. You'll be able to get notifications directly as they are created, vote and create proposals all from your Android or IOS device. "
+        ]
+      }
+    ]
+  },
+  "9PmmctkHPN5Br8V4gmjNuUdccrD7TtzfJ7U8mcpoBGXd" : {
+    "symbol": "Neo Fairies DAO",
+    "heading": "A fantasy-punk shared world that’s shaped and owned by community.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Neo Fairies is a fantasy-punk shared world designed from the ground up to be co-created, owned, and governed by a creator-led DAO. The Neo Fairies DAO is a new kind of entertainment DAO which could also be considered an IP (Intellectual Property) DAO. "
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.neofairies.com"
+    },
+    "resources": [
+      {
+        "title": "PlayStation, Google Vets to Co-Create New Franchises Via Solana DAOs",
+        "content": [
+          "Web3 startup Luda is focused on “create-to-own” experiences through new IP shaped by DAO communities, starting with Neo Fairies."
+        ],
+        "url": "https://decrypt.co/103302/playstation-google-vets-to-co-create-new-franchises-via-solana-daos"
+      },
+      {
+        "title": "Reimagining NFT's - The Metacast by Naavik",
+        "content": [
+          "On this week’s Crypto Corner, Luda CEO and Cofounder Vijay Sundaram joins your host Nico Vereecke for a conversation"
+        ],
+        "url": "https://youtu.be/RpjY3nkPymA"
+      },
+      {
+        "title": "The Neo Fairies Project",
+        "content": [
+          "We are Luda, the creators of Neo Fairies. In this post, we introduce our first create-to-own project: Neo Fairies."
+        ],
+        "url": "https://mirror.xyz/luda.eth/k5tIEGvz6RXkr18WPzVuLCJFpYWHScgq2bGuvBWu3RE"
+      }
+    ]
+  },
+  "GXw7esYZ42nRZBFZTnAXa5fkdDgkvdZh7xeVuCEXoJZP" : {
+    "symbol": "Lighthouse",
+    "heading": "Lighthouse enables communities to design reputation, rewards and membership systems by attesting to member contributions on-chain.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Lighthouse is a proof-of-contribution protocol that enables communities to capture on-chain and off-chain contributions and attest to them on as on-chain transactions.",
+          "As a building block for intra-community trust, Lighthouse promises to bring a non-financial component to Solana that enables communities to build sustainable, long-term models of cooperation based on affinity with a community instead of upside.",
+          "Today, communities use Lighthouse to build to define credentials or criteria for accessing a wide range of benefits including rewards, reputation, membership, governance power and even undercollateralized loans."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://lighthouse-docs.gitbook.io/lighthouse/"
+    }
+  },
+  "DCdCsuUjg6MnULfEmBUmvg1heggnLrKSFdp5uTRSKuwR" : {
+    "symbol": "Epics DAO",
+    "heading": "Buidl to Earn. Epics is a decentralized crowdsourcing platform for incentivizing open-source software development.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Epics is a decentralized crowdsourcing platform for incentivizing open source software development.",
+          "Clients can set up a GitHub issue as a Quest (Smart Contract).",
+          "Developers can receive token prizes by solving GitHub issues (Quests).",
+          "This ecosystem makes developers focus on problems in their expertise. Also, clients will be able to solve more advanced problems.",
+          "The more token prizes, the more attention to be solved issues. As a result, open source software grows faster in quality.",
+          "Epics solves resource imbalances in software development."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://epics.dev/en/what-is-epics/"
+    },
+    "resources": [
+      {
+        "title": "Meet the winners of the Solana Summer Camp Hackathon",
+        "content": [
+          "The Solana Foundation is pleased to announce the results of the Solana Summer Camp Hackathon, a global competition focused on bringing the next wave of high-impact projects into the Solana ecosystem."
+        ],
+        "url": "https://solana.com/news/solana-summer-camp-winners"
+      },
+      {
+        "title": "Solana Foundation Becomes Epics DAO Partner",
+        "content": [
+          "The Solana Foundation has partnered with the Epics DAO after placing fifth in the Solana Summer Camp Hackathon DAOs Track."
+        ],
+        "url": "https://news.infoseek.co.jp/article/prtimes_000000009_000105962"
+      },
+      {
+        "title": "Zebec Protocol Becomes Epics DAO Partner",
+        "content": [
+          "Epics DAO's Solana Summer Camp Hackathon DAOs track 5th place, Zebec Protocol has partnered with Epics DAO."
+        ],
+        "url": "https://prtimes.jp/main/html/rd/p/000000010.000105962.html"
+      }
+    ]
+  },
+  "A1f6LNEymJSSJsEVCL1FSgtS1jA9dNTC4ni8SkmbwQjG" : {
+    "symbol": "Pyth Network",
+    "heading": "The Pyth network aims to bring valuable financial market data to DeFi applications and the general public",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "The Pyth network is a first-party financial oracle network designed to publish continuous real-world data on-chain in a tamper-resistant, decentralized, and self-sustainable environment.",
+          "The network incentivizes market participants — exchanges, market makers, and financial services providers — to share directly on-chain the price data collected as part of their existing operations. The network then aggregates this first-party price data (still on-chain) and makes it available for free to either on- or off-chain applications.",
+          "Pyth has been publishing live prices for US equities, FX, metals, and of course, crypto since our deployment on Solana mainnet in August last year.",
+          "With over [80 price feeds](https://pyth.network/price-feeds) supported by more than [70 best-in-class data providers](https://pyth.network/publishers) across traditional and decentralized finance, we’ve grown considerably since our humble devnet days. And with Pyth now securing over half a billion in TVL and garnering over [550K client downloads](https://github.com/pyth-network), it’s safe to say that developers have taken a liking to what Pyth offers.",
+          "You’ll recognize many **#PoweredByPyth** applications: [Solend](https://solend.fi/), [Mango Markets](https://mango.markets/), [Friktion](https://friktion.fi/), [Zeta Markets](https://zeta.markets/), [Drift](https://drift.trade/), [Backpack](https://www.backpack.app/), [Jet](https://jetprotocol.io/), and many more. Off-chain solutions, like [OpenBB](https://openbb.co/) and [SHIFT Search](https://shiftsearch.com/), and institutions like [QCP](https://qcp.capital/) and [Geneva Trading](https://geneva-trading.com/), are also tapping into Pyth’s data.",
+          "As of October 2022, Pyth data has been available on other blockchains such as BNB Chain, Aptos, Ethereum and Optimism with more to come thanks to Wormhole"
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.pyth.network/"
+    }
+  },
+  "AgR2tq1xcbqwmgDcNRaV1BEP5J3kfJfswP5vn6WWe6uC" : {
+    "symbol": "Hubble Protocol",
+    "heading": "Hubble Protocol is the issuer of USDH, the Solana-native stablecoin that anyone can mint by depositing their crypto assets.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Hubble is a stablecoin borrowing platform that enables users to unlock the liquidity of their assets by borrowing USDH. When borrowing USDH, users retain exposure to the price movements of their assets, while having the freedom to deploy USDH to earn yield across Solana. On Hubble, borrowers maintain full ownership of their loans and the assets within them, and have total control of managing their positions. Hubble is built to facilitate user liquidity, while establishing USDH as the primary stablecoin on Solana.",
+          "An Inclusive Financial System: Hubble aligns itself with the vision of decentralized finance to establish a new, inclusive financial system. In accordance with this, both tokens in the Hubble ecosystem, USDH and Hubble's native token, HBB, can be staked on the protocol to receive rewards generated by borrowing activity.",
+          "Stability and Security: Hubble assigns immense importance to the stability of USDH, and the safety of Hubble users. To this end, the protocol maintains flexible borrowing rates and safe loan ratios, ensuring that USDH is always overcollateralized by crypto assets. The USDH stablecoin itself has a robust pegging infrastructure, aimed at ensuring peg stability in any market conditions."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.hubbleprotocol.io"
+    },
+    "resources": [
+      {
+        "title": "Hubble Protocol Raises $5M to Expand Solana-Based DeFi Protocol",
+        "content": [
+          "The protocol aims to create a Solana-based equivalent of MakerDao: a DeFi protocol with a U.S. dollar denominated stablecoin."
+        ],
+        "url": "https://www.coindesk.com/business/2022/09/08/hubble-protocol-raises-5m-to-expand-solana-based-defi-protocol/"
+      },
+      {
+        "title": "Hubble Protocol Revamps dApp As USDH Gains Wider Adoption in Solana DeFi",
+        "content": [
+          "Hubble Protocol, a decentralized finance (DeFi) project built on the Solana blockchain, has made some serious changes to its decentralized application (dApp). "
+        ],
+        "url": "https://www.nasdaq.com/press-release/hubble-protocol-revamps-dapp-as-usdh-gains-wider-adoption-in-solana-defi-2022-05-04"
+      },
+      {
+        "title": "Hubble Protocol Launches Kamino Finance to Optimize Yields for Liquidity Providers on Solana",
+        "content": [
+          "Hubble Protocol, home of the USDH stablecoin, has launched Kamino Finance: the first concentrated liquidity market maker (CLMM) optimizer of its kind on the Solana blockchain."
+        ],
+        "url": "https://news.bitcoin.com/hubble-protocol-launches-kamino-finance-to-optimize-yields-for-liquidity-providers-on-solana/"
+      }
+    ]
+  },
+  "759qyfKDMMuo9v36tW7fbGanL63mZFPNbhU7zjPrkuGK" : {
+    "symbol": "Socean",
+    "heading": "Socean Stake Pool gives you the best risk-free yields on Solana.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Socean Stake Pool is an algorithmic stake pool. A stake pool helps stake SOL on the user’s behalf. We issue depositors a token (scnSOL) that can be redeemed for SOL anytime. scnSOL can be used in DeFi to earn extra yield by lending, borrowing, providing liquidity and purchasing structured products.",
+          "Why should I stake with Socean Stake?: We are the top performing stake pool by APR over the past year. Over the past year, we outperformed every single stake pool, delivering the best APR for stakers.  Our strong delegation strategy and low fees allow us to offer high returns for stakers.",
+          "Our delegation strategy not only maximises APY for stakers, but also promotes network health. Unlike other stake pools, we don't make backroom deals, or have a preferred set of validators: any validator can and will be selected by our delegation algorithm as long as it demonstrates good performance.",
+          "The Socean Team actively contribute to core development in the Solana runtime and participate in a variety of Solana ecosystem projects. We've worked with the Solana Foundation for many months, helping to develop the Foundation's stake pool program. We've also received multiple grants from the Foundation to develop the stake pool ecosystem.",
+          "Unlike some stake pools which run their own code, we use the Solana Foundation's open-source reference implementation. This ensures that our stake pool has been audited for safety, and receives timely fixes and updates. The program can be built from source and verified against the on-chain version.",
+          "Socean  have partnered with most of the best DeFi Protocols on Solana like Orca, Raydium and Solend, so that you can maximise your yield with scnSOL."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://www.notion.so/soceanfi/Socean-Finance-c0dfcb8ae6224fd8b1b87a5355ce774f"
+    }
+  },
+  "FiG6YoqWnVzUmxFNukcRVXZC51HvLr6mts8nxcm7ScR8" : {
+    "symbol": "Psy DAO",
+    "heading": "An ecosystem of financial products governed by PSY token holders. ",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "The Psy DAO mission is to democratize the existing derivatives based crypto infrastructure, build awesome products, and develop exceptional user experiences. The DAO is fully governed by its $PSY token holders and has three core product lines:",
+          "PsyFinance, a structured products protocol that delivers best in class transparent returns tailored for each users risk tolerance.",
+          "PsyOptions, a permissionless open-source options protocol that serves as a public good for anyone to create crypto options products.",
+          "Fusion, an option airdrop and liquidity mining platform that allows teams to raise funds and align incentives between their communities and protocols."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.psyoptions.io/"
+    }
+  },
+  "6Yj8shsZrjqYQuPkEzcvkmdFq5Nn7RSVQ4EsNqLx7DJQ" : {
+    "symbol": "Duck Punkz",
+    "heading": "Crypto Duck Punkz: The Great Quekening ",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Crypto Duck Punkz is the definition of a Solana NFT pixel project. It embodies everything we know and love about the Solana NFT community. We look forward to building a community of degenerates and memes that value beautifully curated pixel animals."
+        ]
+      }
+    ]
+  },
+  "BZE9AiJrMxUXXjwy9iBPzj34Wh5Zf1wLEFAM4oSSMRLi" : {
+    "symbol": "Allie Coin",
+    "heading": "Allie Coin unlocks a new world of gaming.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Introduction: Allie Coin is a Web3 gaming community founded by Twitch streamer Alliestrasza. Allie has been producing gaming content for more than six years, primarily on Twitch and YouTube, where she has amassed a following of over 200,000 fans. In 2017, she decided to create Allie Coin to combine her loves for gaming and content creation within the emerging Web3 universe. The Allie Coin gaming community is designed to unlock fun and competitive gaming experiences for a global community.",
+          "$ALLIE: $ALLIE is a Rally-backed social token you can earn, buy, and trade to support the Allie Coin ecosystem, unlock valuable gaming assets, and vote in our Allie Coin DAO. $ALLIE is on the Solana blockchain, making all transactions energy efficient and secure.",
+          "Play-to-earn Games: Our Allie Coin community was born from a love for competitive gaming. By collaborating with the newest and greatest play-to-earn games, we offer our $ALLIE holders the in-game resources, education, and exclusive tournament play opportunities they need to leap ahead of the competition.",
+          "Allie Coin DAO: We believe the best way to provide ongoing value to our Allie Coin community is to offer true ownership of the Allieverse. Part of all $sRLY rewards earned with $ALLIE go to our community treasury. All $ALLIE holders have voting power to decide how we spend those treasury assets and what we build next for our ecosystem.",
+          "NFTs: Use your $ALLIE to buy NFTs! Own Allie history with Allie Ross animations, unlock special access with tiered Badges, and establish your creative identity with Allie Cats.",
+          "YT Channel: For gamers new to the web3 world, we produce public educational content on our Allie Coin YouTube channel about play-to-earn games, social tokens, NFTs, the creator economy, and more.",
+          "Discord: Everyone, regardless of whether you hold $ALLIE or not, is welcome to join our Allie fam in the Allie Coin Discord server. Hang out in exclusive chats with Allie, develop new friendships with likeminded gamers, and compete for prizes."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://smooth-exception-37e.notion.site/Allie-Coin-DAO-Charter-2551dc1f4fe24068b783ff365c80f0f8"
+    },
+    "resources": [
+      {
+        "title": "Major YouTube Gaming Streamer Joins Forces with Leading Blockchain Game",
+        "content": [
+          "Today the world’s leading blockchain game, Splinterlands, announced a new tournament collaboration with major YouTube Streamer, Alliestrasza and CEO of Allie Coin."
+        ],
+        "url": "https://www.yahoo.com/now/major-youtube-gaming-streamer-joins-160000079.html?guccounter=1&guce_referrer=aHR0cHM6Ly90LmNvLw&guce_referrer_sig=AQAAACaiQoZ16LrGeP2PFK2untiV1k23PuNcBy_VovWYQLZERfHt-6yO2jR59VbbNRegpXG6hVpV1XebeEmegUxlD3nnrhRUQBWmuhI0tteYK167dcedsRCUJQR9cxhkSxz_R_SbOYvSGi5nxJQUgW6ErLdVyBPKzbtxKWCIl0lVsC7r"
+      }
+    ]
+  },
+  "G43QB1csngJDWBhrBCba5tbVcxcPHhGNtGkqfntfP6fg" : {
+    "symbol": "BlockLive",
+    "heading": "BlockLive is fast, easy, transparent way to buy and sell live event tickets that you can hold onto for a lifetime.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "BlockLive ticketing infrastructure uses smart contracts to promote royalties on primary and secondary event ticket sales. The BlockLive event management and ticketing platform takes advantage of the blockchain to prove ownership, create price transparency, and increase the collectibility and community engagement features around our digital tickets and merchandise."
+        ]
+      }
+    ]
+  },
+  "CXGN5H84vXjoQg7jkAKdAbMtEv3S2K4t8kptwzPzfQLQ" : {
+    "symbol": "Friktion",
+    "heading": "Smarter returns on your crypto",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Friktion offers full-stack portfolio management built to perform across market cycles.",
+          "Risk-adjusted return strategies for DAOs, individuals, and Institutions."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.friktion.fi/"
+    },
+    "resources": [
+      {
+        "title": "Messari x Friktion",
+        "content": [
+          ""
+        ],
+        "url": "https://messari.io/protocol/friktion"
+      },
+      {
+        "title": "Delphi Digital Podcast",
+        "content": [
+          "In this episode, we sit down with Friktion Labs’ Co-founders, Uddhav Marwaha (CEO) and Alex Wlezien (CTO)."
+        ],
+        "url": "https://youtu.be/NzBHEhcJksY"
+      },
+      {
+        "title": "The Defiant - DeFi, Web3 & NFT Insights",
+        "content": [
+          "Volatility's Best Friend: VOLT #05"
+        ],
+        "url": "https://www.youtube.com/watch?v=M6lmTW3Xdcw"
+      }
+    ]
+  },
+  "8HZ4V94dtojrTpdUpWrfstr7bEhRnZZHn8jotfns9L9x" : {
+    "symbol": "Ratio Finance",
+    "heading": "Our mission at Ratio Finance is to De-Risk DeFi for all.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Ratio Finance is a Quantitative Risk Assessment Protocol. Its first use case is allowing investors in the Solana ecosystem to extend the capabilities of their liquidity provisioning efforts by minting our stablecoin (USDr), using their LP tokens as collateral.",
+          "Our mission is to De-risk DeFi using quantitative and qualitative risk metrics, and credit risk modeling to build cutting edge financial products that allow retail and institutional investors alike to understand and mitigate the risks associated with this new, unique asset class.",
+          "Our long-term vision is to be the Risk Rating Agency for all of Decentralized Finance."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.ratio.finance/"
+    },
+    "resources": [
+      {
+        "title": "Ratio Finance Raises $2.25 Million to Unlock Liquidity on Solana with Collateralized Debt Positions",
+        "content": [
+          "Ratio Finance is helping to unlock and provide additional liquidity to the Solana ecosystem by allowing Solana users to earn yield, take out collateralized loans, and realize the full potential of their capital, all from a user-friendly interface."
+        ],
+        "url": "https://www.bloomberg.com/press-releases/2021-07-16/ratio-finance-raises-2-25-million-to-unlock-liquidity-on-solana-with-collateralized-debt-positions"
+      }
+    ]
+  },  
   "HnLuYmBxDxK1MCihHJVFnNudUTpLPc2km6xNcRQ8KPdj" : {
     "symbol": "Dual Finance",
     "heading": "Sustainable Incentive Liquidity Infrastructure for Web3 Communities",
