@@ -111,15 +111,21 @@
       },
       {
         "question": "What is Auction House?",
-        "answer": ["Auction House is a protocol for marketplaces to implement a decentralized sales contract. It is simple, fast and very cheap. Auction House is a Solana program available on Mainnet Beta and Devnet. Anyone can create an Auction House."]
+        "answer": [
+          "Auction House is a protocol for marketplaces to implement a decentralized sales contract. It is simple, fast and very cheap. Auction House is a Solana program available on Mainnet Beta and Devnet. Anyone can create an Auction House."
+        ]
       },
       {
         "question": "How do I mint NFTs on Solana?",
-        "answer": ["While the Candy Machine is ready to mint after being deployed, in most cases you will want to provide a front end experience to allow your community the chance to mint, too."]
+        "answer": [
+          "While the Candy Machine is ready to mint after being deployed, in most cases you will want to provide a front end experience to allow your community the chance to mint, too."
+        ]
       },
       {
         "question": "How do I implement a decentralized sales contract?",
-        "answer": ["For the NFT Seller the NFT doesn't leave their wallet until the sale completes. This is due to the use of Solana Token Delegates, and it allows them to list their NFT on other Marketplaces that implement the Auction House protocol."]
+        "answer": [
+          "For the NFT Seller the NFT doesn't leave their wallet until the sale completes. This is due to the use of Solana Token Delegates, and it allows them to list their NFT on other Marketplaces that implement the Auction House protocol."
+        ]
       },
       {
         "question": "Do you have an SDK?",
@@ -143,7 +149,7 @@
       "url": "https://docs.squads.so/squads-v3-docs/"
     }
   },
-  "5NNv1oJ4PFhE2416kTNDzrR9axoHjBTw2CNABqcYpXXL" : {
+  "5NNv1oJ4PFhE2416kTNDzrR9axoHjBTw2CNABqcYpXXL": {
     "symbol": "Superteam",
     "heading": "Superteam is a community dedicated to helping Solana projects launch and grow. ",
     "about": [
@@ -176,7 +182,7 @@
       }
     ]
   },
-  "G4CR3KUvqPZWmHbuvWhBPqL4vBBBujviyeTVynN2rhKB" : {
+  "G4CR3KUvqPZWmHbuvWhBPqL4vBBBujviyeTVynN2rhKB": {
     "symbol": "Hello Moon",
     "heading": "Hello Moon provides innovative datasets on Solana to empower NFT & DeFi investors & traders.",
     "about": [
@@ -192,7 +198,7 @@
       "url": ""
     }
   },
-  "uywFFJL6JFGwbSXgU95C6v8f4L4DqBXV2Z3KZaJSxy1" : {
+  "uywFFJL6JFGwbSXgU95C6v8f4L4DqBXV2Z3KZaJSxy1": {
     "symbol": "Orbis Protocol",
     "heading": "Orbis Protocol makes it easy to build fast and decentralized social experiences",
     "about": [
@@ -211,7 +217,7 @@
       "url": "https://orbis.club/documentation"
     }
   },
-  "2Z5BXuRCJPqYUCBGyQTwAXHeJoFAnbtvoXja19aZFLKY" : {
+  "2Z5BXuRCJPqYUCBGyQTwAXHeJoFAnbtvoXja19aZFLKY": {
     "symbol": "Jupiter Aggregator",
     "heading": "The best swap aggregator & infrastructure for Solana -  powering best price, token selection and UX for all users and devs.",
     "about": [
@@ -230,9 +236,7 @@
     "resources": [
       {
         "title": "Writings From Planet Jupiter",
-        "content": [
-          ""
-        ],
+        "content": [""],
         "url": "https://blog.jup.ag/"
       },
       {
@@ -244,7 +248,7 @@
       }
     ]
   },
-  "HP1Y12FPbWMAqqVTpKMXKVk6yK3zJaNSxwUEqLzzzuqc" : {
+  "HP1Y12FPbWMAqqVTpKMXKVk6yK3zJaNSxwUEqLzzzuqc": {
     "symbol": "SolanaFM",
     "heading": "Friendlist Web3 Explorer ",
     "about": [
@@ -269,15 +273,13 @@
       }
     ]
   },
-  "5Dj3fuNLYxd1tzpPnXiPo88V8JNVHhrDScTLMJpupoXf" : {
+  "5Dj3fuNLYxd1tzpPnXiPo88V8JNVHhrDScTLMJpupoXf": {
     "symbol": "Unique Venture Clubs",
     "heading": "Explore a web3 native way to raise, invest and govern assets. Your partner for every stage of your venture.",
     "about": [
       {
         "heading": "Introduction",
-        "content": [
-          "Unique VC is the ultimate platform for:"
-        ]
+        "content": ["Unique VC is the ultimate platform for:"]
       },
       {
         "content": [
@@ -329,7 +331,7 @@
       }
     ]
   },
-  "uWg5gaTsBnXc5qiVMB8XxBUPYqLAb5bzzgkkpxi6UAY" : {
+  "uWg5gaTsBnXc5qiVMB8XxBUPYqLAb5bzzgkkpxi6UAY": {
     "symbol": "GARI Network",
     "heading": "GARI Network enables everyone to monetize their social media time and activities by leveraging web3 technologies.",
     "about": [
@@ -373,7 +375,7 @@
       }
     ]
   },
-  "HnLuYmBxDxK1MCihHJVFnNudUTpLPc2km6xNcRQ8KPdj" : {
+  "HnLuYmBxDxK1MCihHJVFnNudUTpLPc2km6xNcRQ8KPdj": {
     "symbol": "Dual Finance",
     "heading": "Sustainable Incentive Liquidity Infrastructure for Web3 Communities",
     "about": [
@@ -401,7 +403,7 @@
       }
     ]
   },
-  "9nUyxzVL2FUMuWUiVZG66gwK15CJiM3PoLkfrnGfkvt6" : {
+  "9nUyxzVL2FUMuWUiVZG66gwK15CJiM3PoLkfrnGfkvt6": {
     "symbol": "Drift Protocol",
     "heading": "A lightning-fast and scalable perpetual futures DEX.",
     "about": [
@@ -418,7 +420,7 @@
       "url": "https://docs.drift.trade/"
     }
   },
-  "HoSfB5xCk8oXRgmspugAx3yRgii8MezimDMfMVK4krBS" : {
+  "HoSfB5xCk8oXRgmspugAx3yRgii8MezimDMfMVK4krBS": {
     "symbol": "Zeta Markets",
     "heading": "Zeta is the number one decentralised access layer for on chain optionality and perpetual contracts",
     "about": [
@@ -458,7 +460,7 @@
       }
     ]
   },
-  "22nDweMdSCCDoCMFUoS8Zgv7jnZxpLuqGrkL3cmSwuU3" : {
+  "22nDweMdSCCDoCMFUoS8Zgv7jnZxpLuqGrkL3cmSwuU3": {
     "symbol": "IntoTheVerse ",
     "heading": "Building #Games4Good powered by Blockchain Technology on Solana and Celo",
     "about": [
@@ -485,7 +487,7 @@
       }
     ]
   },
-  "Bwjrnh5dGZ2tHZKjLtMNwwhtk8sCGfR1ZM8ZxcVCe87m" : {
+  "Bwjrnh5dGZ2tHZKjLtMNwwhtk8sCGfR1ZM8ZxcVCe87m": {
     "symbol": "Streamflow",
     "heading": "Streamflow is the #1 token vesting and streaming platform on Solana. ",
     "about": [
@@ -503,7 +505,7 @@
       "url": "https://docs.streamflow.finance/"
     }
   },
-  "2dZAfmpEVMa18ESGiMHQxTWpQvdzEdhNdT7Ai6wdNkZ1" : {
+  "2dZAfmpEVMa18ESGiMHQxTWpQvdzEdhNdT7Ai6wdNkZ1": {
     "symbol": "Irreverent Labs",
     "heading": "Irreverent Labs is creating hilarious automated entertainment from the future. ",
     "about": [
@@ -548,7 +550,7 @@
       }
     ]
   },
-  "7fhfRApHt9N15v6Xccfd8iGnWZ3xvpUgHA8kieT2egBA" : {
+  "7fhfRApHt9N15v6Xccfd8iGnWZ3xvpUgHA8kieT2egBA": {
     "symbol": "Shakudo",
     "heading": "All data tools integrated into a fully-managed platform allowing data teams to remove DevOps and accelerate development cycles.",
     "about": [
@@ -589,7 +591,7 @@
       }
     ]
   },
-  "aoBhePkPBCvrSZrK1ioEz6duUY211jfeBPzMzeGAqT8" : {
+  "aoBhePkPBCvrSZrK1ioEz6duUY211jfeBPzMzeGAqT8": {
     "symbol": "Panzerdogs",
     "heading": "Panzerdogs is a Solana NFT gaming project where players can own all of their in-game assets and use them for P2E and P2P battles.",
     "about": [
@@ -603,7 +605,7 @@
       }
     ]
   },
-  "AxPJNe69VrdqWV1VkgDoRcM6Utizje6HdUqE5paJopap" : {
+  "AxPJNe69VrdqWV1VkgDoRcM6Utizje6HdUqE5paJopap": {
     "symbol": "DeFi Land",
     "heading": "DeFi Land is a unique agriculture-simulation game created to gamify all aspects of decentralized finance and web3.",
     "about": [
@@ -631,7 +633,7 @@
       }
     ]
   },
-  "8sMzPkk6TBM943XRXzScqrcZFfmK1pw62gUPdwtVckCJ" : {
+  "8sMzPkk6TBM943XRXzScqrcZFfmK1pw62gUPdwtVckCJ": {
     "symbol": "BetDEX Labs",
     "heading": "BetDEX Labs will launch the BetDEX Exchange in Nov 2022 for Web3 sports betting and is a key contributor to the Monaco Protocol.",
     "about": [
@@ -664,7 +666,7 @@
       }
     ]
   },
-  "2PBLG1LGAQYUd38KjJhyACksZH9S361XunVbD3EGxfJf" : {
+  "2PBLG1LGAQYUd38KjJhyACksZH9S361XunVbD3EGxfJf": {
     "symbol": "Aleph.im",
     "heading": "Decentralized, open source, web3 cloud infrastructure (Storage, computing) and indexing solution. Decentralize your entire stack!",
     "about": [
@@ -880,5 +882,103 @@
         ]
       }
     ]
+  },
+  "96VSxgcsxhh8qcFXdT7nMzxA1CMrUBxrxcetqYFqdV5V": {
+    "symbol": "GenesysGo",
+    "heading": "The Shadow Platform is the first Web3 cloud services platform built for speed, scale, and stability. Web3 without compromises!",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "The Shadow Platform, built by GenesysGo and powered by Shadow Operators, is a stable high-performance cloud platform powered by a decentralized network of operators. Unlike traditional cloud platforms, all network-generated revenues are sent to Shadow Operators. Shadow is the only commodity cloud network designed to democratize the hundreds of billions earned each year by traditional cloud platforms without sacrificing performance."
+        ]
+      },
+      {
+        "content": [
+          "The Shadow RPC Network provides high-performance RPC access for Solana builders for minimal cost. Powered by a network of independent operators, Shadow’s Solana RPCs truly decentralize your back-end API with payments going directly to ecosystem operators. Upgrade your back-end API to fit a Web3 ethos while still benefiting from resiliency, performance, and affordability."
+        ]
+      },
+      {
+        "content": [
+          "Shadow Drive is the first Solana native decentralized, performant, and scalable storage solution built for Web3 developers. Integrate blockchain tech into your business or project with a storage solution that's resilient, secure, and built to scale."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://genesysgo.com"
+    },
+    "team": [
+      {
+        "name": "Frank",
+        "avatar": "https://media-exp1.licdn.com/dms/image/C5603AQHhsAAH5TC2hg/profile-displayphoto-shrink_800_800/0/1624316377490?e=1672272000&v=beta&t=C7ULngIGY6DSbQWh3Qr6eKdlNTgz6yAaTD7Uk-FMhSc",
+        "role": "Co-Founder, CEO",
+        "linkedin": "https://www.linkedin.com/in/frankgenesysgo/"
+      },
+      {
+        "name": "Knox",
+        "avatar": "https://pbs.twimg.com/profile_images/1584366672751763456/aqejCPfC_400x400.jpg",
+        "role": "Developer Relations - Dev Tamer",
+        "twitter": "@knox_trades"
+      },
+      {
+        "name": "Tracy",
+        "avatar": "https://pbs.twimg.com/profile_images/1447400220162101249/tUmZFtrH_400x400.jpg",
+        "role": "Dev God",
+        "twitter": "@tracy_codes"
+      },
+      {
+        "name": "Cavey",
+        "avatar": "https://pbs.twimg.com/profile_images/1532361682449641477/RG3yU4dt_400x400.jpg",
+        "role": "Giga-brain monster dev",
+        "twitter": "@CavemanLoverBoy"
+      }
+    ],
+    "roadmap": {
+      "items": [
+        {
+          "title": "Launch a Solana validator and achieve profitability",
+          "date": "2021-04-15T15:42:21.109Z",
+          "status": "completed",
+          "resource": {
+            "title": "Shadowy Super Coder DAO on Stakewiz.com",
+            "url": "https://stakewiz.com/validator/AKoVXpZmi8wSz3sGvCYEygbpdHvSRysWsh36b97iPvKh"
+          }
+        },
+        {
+          "title": "Deploy Centralized Solana RPC Network as a first step towards full decentralization",
+          "date": "2021-05-17T15:45:01.159Z",
+          "status": "completed",
+          "resource": null
+        },
+        {
+          "title": "Create and Deploy Shadow Drive, the Solana ecosystem's first and only native decentralize storage data platform.",
+          "date": "2022-06-01T15:46:07.387Z",
+          "status": "inprogress",
+          "resource": {
+            "title": "Shadow Drive: Introducing Decentralized Storage on Solana",
+            "url": "https://docs.genesysgo.com/shadow/shadow-drive"
+          }
+        },
+        {
+          "title": "Deploy the Shadow RPC Network - Solana's most performant and most decentralized RPC network powered by independent operators",
+          "date": "2022-10-04T16:47:34.797Z",
+          "status": "completed",
+          "resource": {
+            "title": "The $SHDW Premium RPC Network has been deployed for all of Solana!",
+            "url": "https://twitter.com/GenesysGo/status/1581074282960261120?s=20&t=cDgUHfI3DBvSa_a5M2secQ"
+          }
+        },
+        {
+          "title": "Launch the Shadow.Cloud testnet environment at Solana Breakpoint 2022 and debut/showcase the D.A.G.G.E.R. network!",
+          "date": "2022-11-04T16:47:34.797Z",
+          "status": "inprogress",
+          "resource": {
+            "title": "shadow.cloud is live on Solana fam!",
+            "url": "https://twitter.com/GenesysGo/status/1584754443853398016?s=20&t=cDgUHfI3DBvSa_a5M2secQ"
+          }
+        }
+      ]
+    }
   }
 }
