@@ -197,5 +197,6 @@
     "firefox >= 68",
     "opera >= 54",
     "safari >= 14"
+    
   ]
 }
