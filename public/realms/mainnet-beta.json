@@ -1376,5 +1376,11 @@
     "twitter": "@WiseEldersDAO",
     "ogImage": "/realms/WisdomDAO/og.jpg",
     "bannerImage": "/realms/WisdomDAO/banner.jpg"
+  },
+  {
+    "symbol": "wdmdao",
+    "displayName": "wdmdao",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Hx1vKARnpS8nV8qxzqK9DG1kFXbAy49HJtPQKq6UEHa1"
   }
 ]
