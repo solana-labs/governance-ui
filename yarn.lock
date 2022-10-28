@@ -3108,6 +3108,17 @@
     "@solana/spl-token" "^0.1.8"
     borsh "^0.6.0"
 
+"@mean-dao/msp@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@mean-dao/msp/-/msp-3.0.0.tgz#ffcad38c21555d4053b791bf5f33a82465cce704"
+  integrity sha512-wjzDhsvabln4MM2pUW6hkX5D6ZDSjg7oTVUwUi4JA3/pZktq05NhlbFqn7Uh68CtMcgqJtCye/bIS7L8A2ikzA==
+  dependencies:
+    "@project-serum/anchor" "^0.24.2"
+    "@solana/spl-token" "^0.1.8"
+    "@solana/web3.js" "1.56.0"
+    bignumber.js "^9.1.0"
+    bn.js "^5.2.0"
+
 "@metaplex-foundation/beet-solana@^0.1.1":
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/@metaplex-foundation/beet-solana/-/beet-solana-0.1.1.tgz#85deec5d3354ee1da868bd6bb0de5ae1ea92d209"
@@ -5804,6 +5815,28 @@
     superstruct "^0.14.2"
     tweetnacl "^1.0.0"
 
+"@solana/web3.js@1.56.0":
+  version "1.56.0"
+  resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.56.0.tgz#312bccde0ddeeffa7a48af16a945cc4d1f863395"
+  integrity sha512-YfQAIvsllVP3Y5QSs/TdJJFwTgFQuXybg+ouwyNE8cmq3+r2Nmvsj69DGWGbN41jy0is8foZf0yruuLQfWxOmQ==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+    "@noble/ed25519" "^1.7.0"
+    "@noble/hashes" "^1.1.2"
+    "@noble/secp256k1" "^1.6.3"
+    "@solana/buffer-layout" "^4.0.0"
+    bigint-buffer "^1.1.5"
+    bn.js "^5.0.0"
+    borsh "^0.7.0"
+    bs58 "^4.0.1"
+    buffer "6.0.1"
+    fast-stable-stringify "^1.0.0"
+    jayson "^3.4.4"
+    js-sha3 "^0.8.0"
+    node-fetch "2"
+    rpc-websockets "^7.5.0"
+    superstruct "^0.14.2"
+
 "@solana/web3.js@^1.12.0", "@solana/web3.js@^1.17.0", "@solana/web3.js@^1.20.0", "@solana/web3.js@^1.21.0", "@solana/web3.js@^1.22.0", "@solana/web3.js@^1.29.2", "@solana/web3.js@^1.30.2", "@solana/web3.js@^1.31.0", "@solana/web3.js@^1.36.0", "@solana/web3.js@^1.37.1":
   version "1.41.0"
   resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.41.0.tgz#f83af98d4ead2b45aa064036d8bdb006a83d1bae"
@@ -8342,6 +8375,11 @@ bignumber.js@^9.0.0, bignumber.js@^9.0.1, bignumber.js@^9.0.2:
   version "9.0.2"
   resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-9.0.2.tgz#71c6c6bed38de64e24a65ebe16cfcf23ae693673"
   integrity sha512-GAcQvbpsM0pUb0zw1EI0KhQEZ+lRwR5fYaAp3vPOYuP7aDvGy6cVN6XHLauvF8SOga2y0dcLcjt3iQDTSEliyw==
+
+bignumber.js@^9.1.0:
+  version "9.1.0"
+  resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-9.1.0.tgz#8d340146107fe3a6cb8d40699643c302e8773b62"
+  integrity sha512-4LwHK4nfDOraBCtst+wOWIHbu1vhvAPJK8g8nROd4iuc3PSEjWif/qwbkh8jwCJz6yDBvtU4KPynETgrfh7y3A==
 
 bin-links@^2.2.1:
   version "2.3.0"

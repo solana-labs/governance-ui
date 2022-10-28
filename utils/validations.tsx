@@ -297,6 +297,264 @@ export const getCastleWithdrawSchema = () => {
   })
 }
 
+export const getMeanCreateAccountSchema = ({ form }) => {
+  const governedTokenAccount = form.governedTokenAccount as
+    | AssetAccount
+    | undefined
+
+  return yup.object().shape({
+    governedTokenAccount: yup.object().required('Source of funds is required'),
+    label: yup.string().required('Name is required'),
+    amount: yup
+      .number()
+      .typeError('Amount is required')
+      .test(
+        'amount',
+        'Transfer amount must be less than the source of funds available amount',
+        async function (val: number) {
+          if (val && !form.governedTokenAccount) {
+            return this.createError({
+              message: `Please select source of funds to validate the amount`,
+            })
+          }
+          if (
+            val &&
+            governedTokenAccount &&
+            governedTokenAccount.extensions.mint
+          ) {
+            const mintValue = getMintNaturalAmountFromDecimalAsBN(
+              val,
+              governedTokenAccount?.extensions.mint.account.decimals
+            )
+            return !!(governedTokenAccount?.extensions.token?.publicKey &&
+            !governedTokenAccount.isSol
+              ? governedTokenAccount.extensions.token.account.amount.gte(
+                  mintValue
+                )
+              : new BN(
+                  governedTokenAccount.extensions.solAccount!.lamports
+                ).gte(mintValue))
+          }
+          return this.createError({
+            message: `Amount is required`,
+          })
+        }
+      ),
+  })
+}
+
+export const getMeanFundAccountSchema = ({ form }) => {
+  const governedTokenAccount = form.governedTokenAccount as
+    | AssetAccount
+    | undefined
+
+  return yup.object().shape({
+    governedTokenAccount: yup.object().required('Source of funds is required'),
+    treasury: yup
+      .object()
+      .required('Streaming account destination is required'),
+    amount: yup
+      .number()
+      .typeError('Amount is required')
+      .test(
+        'amount',
+        'Transfer amount must be less than the source of funds available amount',
+        async function (val: number) {
+          if (val && !form.governedTokenAccount) {
+            return this.createError({
+              message: `Please select source of funds to validate the amount`,
+            })
+          }
+          if (
+            val &&
+            governedTokenAccount &&
+            governedTokenAccount.extensions.mint
+          ) {
+            const mintValue = getMintNaturalAmountFromDecimalAsBN(
+              val,
+              governedTokenAccount?.extensions.mint.account.decimals
+            )
+            return !!(governedTokenAccount?.extensions.token?.publicKey &&
+            !governedTokenAccount.isSol
+              ? governedTokenAccount.extensions.token.account.amount.gte(
+                  mintValue
+                )
+              : new BN(
+                  governedTokenAccount.extensions.solAccount!.lamports
+                ).gte(mintValue))
+          }
+          return this.createError({
+            message: `Amount is required`,
+          })
+        }
+      ),
+  })
+}
+export const getMeanWithdrawFromAccountSchema = ({
+  form,
+  connection,
+  mintInfo,
+}: {
+  form: any
+  connection: ConnectionContext
+  mintInfo: any
+}) => {
+  return yup.object().shape({
+    governedTokenAccount: yup.object().required('Governance is required'),
+    treasury: yup.object().required('Streaming account source is required'),
+
+    destination: yup
+      .string()
+      .test(
+        'destination',
+        'Account validation error',
+        async function (val: string) {
+          if (val) {
+            try {
+              if (form.treasury?.id.toString() == val) {
+                return this.createError({
+                  message: `Destination account address can't be same as source account`,
+                })
+              }
+              await validateDestinationAccAddress(
+                connection,
+                val,
+                new PublicKey(form.treasury?.id)
+              )
+              return true
+            } catch (e) {
+              console.log(e)
+              return this.createError({
+                message: `${e}`,
+              })
+            }
+          } else {
+            return this.createError({
+              message: `Destination account is required`,
+            })
+          }
+        }
+      ),
+    amount: yup
+      .number()
+      .typeError('Amount is required')
+      .test(
+        'amount',
+        'Transfer amount must be less than the source of funds available amount',
+        async function (val: number) {
+          if (val && !form.treasury && !mintInfo) {
+            return this.createError({
+              message: `Please select source of funds to validate the amount`,
+            })
+          }
+          if (val && form.treasury) {
+            const mintValue = getMintNaturalAmountFromDecimalAsBN(
+              val,
+              mintInfo.decimals
+            )
+            return new BN(form.treasury.balance).gte(mintValue)
+            /*
+            return !!(governedTokenAccount?.extensions.token?.publicKey &&
+            !governedTokenAccount.isSol
+              ? governedTokenAccount.extensions.token.account.amount.gte(
+                  mintValue
+                )
+              : new BN(
+                  governedTokenAccount.extensions.solAccount!.lamports
+                ).gte(mintValue))
+                */
+          }
+          return this.createError({
+            message: `Amount is required`,
+          })
+        }
+      ),
+  })
+}
+
+export const getMeanCreateStreamSchema = ({ form, connection, mintInfo }) => {
+  return yup.object().shape({
+    governedTokenAccount: yup.object().required('Governance is required'),
+    treasury: yup.object().required('Streaming account source is required'),
+    streamName: yup.string().required('Stream name is required'),
+    destination: yup
+      .string()
+      .test(
+        'destination',
+        'Account validation error',
+        async function (val: string) {
+          if (val) {
+            try {
+              if (form.treasury?.id.toString() == val) {
+                return this.createError({
+                  message: `Destination account address can't be same as source account`,
+                })
+              }
+              await validateDestinationAccAddress(
+                connection,
+                val,
+                new PublicKey(form.treasury?.id)
+              )
+              return true
+            } catch (e) {
+              console.log(e)
+              return this.createError({
+                message: `${e}`,
+              })
+            }
+          } else {
+            return this.createError({
+              message: `Destination account is required`,
+            })
+          }
+        }
+      ),
+    allocationAssigned: yup
+      .number()
+      .typeError('Amount is required')
+      .test(
+        'amount',
+        'Transfer amount must be less than the source of funds available amount',
+        async function (val: number) {
+          if (val && !form.treasury && !mintInfo) {
+            return this.createError({
+              message: `Please select source of funds to validate the amount`,
+            })
+          }
+          if (val && form.treasury) {
+            const mintValue = getMintNaturalAmountFromDecimalAsBN(
+              val,
+              mintInfo.decimals
+            )
+            return new BN(form.treasury.balance).gte(mintValue)
+            /*
+            return !!(governedTokenAccount?.extensions.token?.publicKey &&
+            !governedTokenAccount.isSol
+              ? governedTokenAccount.extensions.token.account.amount.gte(
+                  mintValue
+                )
+              : new BN(
+                  governedTokenAccount.extensions.solAccount!.lamports
+                ).gte(mintValue))
+                */
+          }
+          return this.createError({
+            message: `Amount is required`,
+          })
+        }
+      ),
+    rateAmount: yup.number().required('Rate amount is required'),
+  })
+}
+
+export const getMeanTransferStreamSchema = () => {
+  return yup.object().shape({
+    governedTokenAccount: yup.object().required('Governance is required'),
+    stream: yup.object().required('Stream source is required'),
+    destination: yup.string().required('New stream owner is required'),
+  })
+}
+
 export const getFriktionWithdrawSchema = () => {
   return yup.object().shape({
     governedTokenAccount: yup.object().required('Source account is required'),

@@ -78,6 +78,11 @@ import MakeSetMarketMetadataParams from './components/instructions/Foresight/Mak
 import CloseTokenAccount from './components/instructions/CloseTokenAccount'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import CastleWithdraw from './components/instructions/Castle/CastleWithdraw'
+import MeanCreateAccount from './components/instructions/Mean/MeanCreateAccount'
+import MeanFundAccount from './components/instructions/Mean/MeanFundAccount'
+import MeanWithdrawFromAccount from './components/instructions/Mean/MeanWithdrawFromAccount'
+import MeanCreateStream from './components/instructions/Mean/MeanCreateStream'
+import MeanTransferStream from './components/instructions/Mean/MeanTransferStream'
 import ChangeDonation from './components/instructions/Change/ChangeDonation'
 import VotingMintConfig from './components/instructions/Vsr/VotingMintConfig'
 import CreateVsrRegistrar from './components/instructions/Vsr/CreateRegistrar'
@@ -443,6 +448,16 @@ const New = () => {
         return <CastleDeposit index={idx} governance={governance} />
       case Instructions.WithrawFromCastle:
         return <CastleWithdraw index={idx} governance={governance} />
+      case Instructions.MeanCreateAccount:
+        return <MeanCreateAccount index={idx} governance={governance} />
+      case Instructions.MeanFundAccount:
+        return <MeanFundAccount index={idx} governance={governance} />
+      case Instructions.MeanWithdrawFromAccount:
+        return <MeanWithdrawFromAccount index={idx} governance={governance} />
+      case Instructions.MeanCreateStream:
+        return <MeanCreateStream index={idx} governance={governance} />
+      case Instructions.MeanTransferStream:
+        return <MeanTransferStream index={idx} governance={governance} />
       case Instructions.DepositIntoGoblinGold:
         return <GoblinGoldDeposit index={idx} governance={governance} />
       case Instructions.WithdrawFromGoblinGold:

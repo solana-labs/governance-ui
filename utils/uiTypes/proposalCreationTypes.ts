@@ -54,6 +54,47 @@ export interface CastleWithdrawForm {
   mintInfo: MintInfo | undefined
 }
 
+export interface MeanCreateAccount {
+  governedTokenAccount: AssetAccount | undefined
+  label: string | undefined
+  mintInfo: MintInfo | undefined
+  amount: number | undefined
+  type: 0 | 1
+}
+
+export interface MeanFundAccount {
+  governedTokenAccount: AssetAccount | undefined
+  mintInfo: MintInfo | undefined
+  amount: number | undefined
+  treasury: any | undefined
+}
+
+export interface MeanWithdrawFromAccount {
+  governedTokenAccount: AssetAccount | undefined
+  mintInfo: MintInfo | undefined
+  amount: number | undefined
+  treasury: any | undefined
+  destination: string | undefined
+}
+
+export interface MeanCreateStream {
+  governedTokenAccount: AssetAccount | undefined
+  treasury: any | undefined
+  streamName: string | undefined
+  destination: string | undefined
+  mintInfo: MintInfo | undefined
+  allocationAssigned: number | undefined
+  rateAmount: number | undefined
+  rateInterval: 0 | 1 | 2 | 3 | 4 | 5
+  startDate: string
+}
+
+export interface MeanTransferStream {
+  governedTokenAccount: AssetAccount | undefined
+  stream: any | undefined
+  destination: string | undefined
+}
+
 export interface FriktionDepositForm {
   amount: number | undefined
   governedTokenAccount: AssetAccount | undefined
@@ -457,6 +498,11 @@ export enum Instructions {
   ClaimPendingWithdraw,
   DepositIntoCastle,
   WithrawFromCastle,
+  MeanCreateAccount,
+  MeanFundAccount,
+  MeanWithdrawFromAccount,
+  MeanCreateStream,
+  MeanTransferStream,
   DepositIntoGoblinGold,
   WithdrawFromGoblinGold,
   CreateSolendObligationAccount,
