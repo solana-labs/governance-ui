@@ -93,18 +93,6 @@
     "twitter": "@PythNetwork"
   },
   {
-    "symbol": "Dialect",
-    "displayName": "Dialect",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "7s5QZmpit4uu1y2bkByXerE2mv3XBHtiNQ4JkDdmKRiQ",
-    "bannerImage": "/realms/Dialect/img/banner-dialect.png",
-    "ogImage": "/realms/Dialect/img/avatar-dialect.png",
-    "website": "https://www.dialect.to/",
-    "twitter": "@saydialect",
-    "sortRank": 3,
-    "shortDescription": "Dialect is the first protocol for smart messaging — dynamic, composable dapp notifications and wallet-to-wallet chat"
-  },
-  {
     "symbol": "MangoLiquidityDAO",
     "displayName": "Mango Liquidity Council",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1305,6 +1293,19 @@
     "github": "https://github.com/aleph-im"
   },
   {
+    "symbol": "Dialect",
+    "category": "web3",
+    "displayName": "Dialect",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "7s5QZmpit4uu1y2bkByXerE2mv3XBHtiNQ4JkDdmKRiQ",
+    "bannerImage": "/realms/Dialect/img/banner-dialect.png",
+    "ogImage": "/realms/Dialect/img/avatar-dialect.png",
+    "website": "https://www.dialect.to/",
+    "twitter": "@saydialect",
+    "sortRank": 3,
+    "shortDescription": "Dialect is the first protocol for smart messaging — dynamic, composable dapp notifications and wallet-to-wallet chat"
+  },
+  {
     "symbol": "MonkeDAO",
     "category": "nft",
     "displayName": "MonkeDAO",
@@ -1359,7 +1360,7 @@
   },
   {
     "symbol": "RCH",
-    "category": "web3",
+    "category": "daotools",
     "bannerImage": "/realms/RCH/banner.png",
     "displayName": "Realms Community Hub",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
