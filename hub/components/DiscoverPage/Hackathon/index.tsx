@@ -1,15 +1,15 @@
 import { PublicKey } from '@solana/web3.js';
 
 import { SmallCard } from '@hub/components/DiscoverPage/SmallCard';
-import { Category } from '@hub/components/OrgCategory';
 import cx from '@hub/lib/cx';
+import { RealmCategory } from '@hub/types/RealmCategory';
 
 import { Trophy } from './Trophy';
 
 export const ITEMS = [
   {
     bannerImgSrc: '/realms/RCH/banner.png',
-    category: Category.Web3,
+    category: RealmCategory.Web3,
     description:
       'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
     iconImgSrc: '/realms/RCH/icon.png',
@@ -19,7 +19,7 @@ export const ITEMS = [
   },
   {
     bannerImgSrc: '/realms/RCH/banner.png',
-    category: Category.Web3,
+    category: RealmCategory.Web3,
     description:
       'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
     iconImgSrc: '/realms/RCH/icon.png',
@@ -29,7 +29,7 @@ export const ITEMS = [
   },
   {
     bannerImgSrc: '/realms/RCH/banner.png',
-    category: Category.Web3,
+    category: RealmCategory.Web3,
     description:
       'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
     iconImgSrc: '/realms/RCH/icon.png',
@@ -39,7 +39,7 @@ export const ITEMS = [
   },
   {
     bannerImgSrc: '/realms/RCH/banner.png',
-    category: Category.Web3,
+    category: RealmCategory.Web3,
     description:
       'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
     iconImgSrc: '/realms/RCH/icon.png',
@@ -49,7 +49,7 @@ export const ITEMS = [
   },
   {
     bannerImgSrc: '/realms/RCH/banner.png',
-    category: Category.Web3,
+    category: RealmCategory.Web3,
     description:
       'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
     iconImgSrc: '/realms/RCH/icon.png',
@@ -59,7 +59,7 @@ export const ITEMS = [
   },
   {
     bannerImgSrc: '/realms/RCH/banner.png',
-    category: Category.Web3,
+    category: RealmCategory.Web3,
     description:
       'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
     iconImgSrc: '/realms/RCH/icon.png',
@@ -87,7 +87,7 @@ export function Hackathon(props: Props) {
       </div>
       <div className={cx('grid', 'grid-cols-3', 'mt-6', 'gap-4')}>
         {ITEMS.map((item, i) => (
-          <div className="flex-shrink-0 max-w-[388px] h-56" key={i}>
+          <div className="flex-shrink-0 max-w-[388px] h-60" key={i}>
             <SmallCard {...item} />
           </div>
         ))}

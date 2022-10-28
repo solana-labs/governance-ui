@@ -62,6 +62,7 @@ export function AllOrgs(props: Props) {
         const items = realmDropdownList
           .map((item) => ({
             bannerImgSrc: item.realm.bannerImageUrl,
+            category: item.realm.category,
             description: item.realm.shortDescription,
             heading: item.realm.hub.info.clippedHeading,
             iconImgSrc: item.iconUrl,
@@ -104,7 +105,7 @@ export function AllOrgs(props: Props) {
         return (
           <section className={props.className}>
             <div className="flex items-center space-x-2">
-              <RealmCircle className=" h-4 w-4" />
+              <RealmCircle className="h-4 w-4" />
               <div className="text-sm text-neutral-700 uppercase font-semibold">
                 all organizations building on solana
               </div>
@@ -122,7 +123,7 @@ export function AllOrgs(props: Props) {
               )}
             >
               {items.map((item, i) => (
-                <div className="flex-shrink-0 max-w-[290px] h-56" key={i}>
+                <div className="flex-shrink-0 max-w-[290px] h-60" key={i}>
                   <SmallCard {...item} />
                 </div>
               ))}

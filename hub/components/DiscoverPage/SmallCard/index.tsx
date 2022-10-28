@@ -4,17 +4,14 @@ import Link from 'next/link';
 import { cloneElement } from 'react';
 
 import { Twitter as TwitterIcon } from '@hub/components/icons/Twitter';
-import {
-  Category,
-  getCategoryIcon,
-  getCategoryName,
-} from '@hub/components/OrgCategory';
+import { getCategoryIcon, getCategoryName } from '@hub/components/OrgCategory';
 import { RealmIcon } from '@hub/components/RealmIcon';
 import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay';
 import { useQuery } from '@hub/hooks/useQuery';
 import { abbreviateNumber } from '@hub/lib/abbreviateNumber';
 import cx from '@hub/lib/cx';
 import { getDefaultBannerUrl } from '@hub/lib/getDefaultBannerUrl';
+import { RealmCategory } from '@hub/types/RealmCategory';
 import * as RE from '@hub/types/Result';
 import { RichTextDocument } from '@hub/types/RichTextDocument';
 
@@ -23,7 +20,7 @@ import * as gql from './gql';
 interface Props {
   className?: string;
   bannerImgSrc?: null | string;
-  category?: Category;
+  category?: RealmCategory;
   description?: null | string;
   heading?: null | {
     document: RichTextDocument;

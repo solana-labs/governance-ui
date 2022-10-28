@@ -2,6 +2,7 @@ import * as IT from 'io-ts';
 import { gql } from 'urql';
 
 import { PublicKey } from '@hub/types/decoders/PublicKey';
+import { RealmCategory } from '@hub/types/decoders/RealmCategory';
 import { RichTextDocument } from '@hub/types/decoders/RichTextDocument';
 
 export const getRealmsList = gql`
@@ -13,6 +14,7 @@ export const getRealmsList = gql`
       urlId
       realm {
         bannerImageUrl
+        category
         shortDescription
         hub {
           info {
@@ -37,6 +39,7 @@ export const getRealmsListResp = IT.type({
       urlId: IT.string,
       realm: IT.type({
         bannerImageUrl: IT.union([IT.null, IT.string]),
+        category: RealmCategory,
         shortDescription: IT.union([IT.null, IT.string]),
         hub: IT.type({
           info: IT.type({

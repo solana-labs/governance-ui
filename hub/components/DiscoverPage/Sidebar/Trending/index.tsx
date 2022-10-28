@@ -1,19 +1,21 @@
 import SignalStrengthIcon from '@carbon/icons-react/lib/SignalStrength';
 import { PublicKey } from '@solana/web3.js';
 
-import { Org, Category } from './Org';
+import { RealmCategory } from '@hub/types/RealmCategory';
+
+import { Org } from './Org';
 
 const CONFIG = [
   {
     name: 'Dialect',
-    category: Category.Web3,
+    category: RealmCategory.Web3,
     logo: '/realms/Dialect/img/avatar-dialect.png',
     publicKey: new PublicKey('7s5QZmpit4uu1y2bkByXerE2mv3XBHtiNQ4JkDdmKRiQ'),
     url: '/realm/Dialect',
   },
   {
     name: 'Solend',
-    category: Category.Web3,
+    category: RealmCategory.Web3,
     logo:
       'https://solend-image-assets.s3.us-east-2.amazonaws.com/1280-circle.png',
     publicKey: new PublicKey('7sf3tcWm58vhtkJMwuw2P3T6UBX7UE5VKxPMnXJUZ1Hn'),
@@ -21,21 +23,21 @@ const CONFIG = [
   },
   {
     name: 'The Imperium of Rain',
-    category: Category.Web3,
+    category: RealmCategory.Web3,
     logo: '/realms/RAIN/img/rain_logo.png',
     publicKey: new PublicKey('6orGiJYGXYk9GT2NFoTv2ZMYpA6asMieAqdek4YRH2Dn'),
     url: '/realm/DTP',
   },
   {
     name: 'The Mysterious Death of Lord Harrington',
-    category: Category.Web3,
+    category: RealmCategory.Web3,
     logo: '/realms/MDLH/img/MDLH.png',
     publicKey: new PublicKey('6Fiy6ZrCKBfcMieNq3S6qSzfpgRTYKn5zPW78VL9FwjL'),
     url: '/realm/MDLH',
   },
   {
     name: 'Metaplex',
-    category: Category.Web3,
+    category: RealmCategory.Web3,
     logo: '/realms/metaplex/img/black-circle.png',
     publicKey: new PublicKey('DA5G7QQbFioZ6K33wQcH8fVdgFcnaDjLD7DLQkapZg5X'),
     url: '/realm/Metaplex',
