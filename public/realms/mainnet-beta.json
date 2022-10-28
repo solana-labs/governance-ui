@@ -1372,5 +1372,19 @@
     "twitter": "@Realms_DAOs",
     "discord": "https://discord.gg/zfxTA762",
     "github": "https://github.com/solana-labs/governance-ui"
+  },
+  {
+    "symbol": "GenesysGo",
+    "bannerImage": " https://drive.google.com/file/d/1MpKSXHowGknDBPZB_vd-PO3ulz_cuaK-/view?usp=sharing ",
+    "displayName": "GenesysGo",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "96VSxgcsxhh8qcFXdT7nMzxA1CMrUBxrxcetqYFqdV5V",
+    "ogImage": "https://drive.google.com/file/d/1ZGjZp7D7IctKRtRi4DIkEvUH5zdimKD3/view?usp=sharing",
+    "shortDescription": "The Shadow Platform is the first Web3 cloud services platform built for speed, scale, and stability. Web3 without compromises!",
+    "sortRank": 3,
+    "website": "https://shadow.cloud",
+    "twitter": "@genesysgo",
+    "discord": "https://discord.gg/genesysgo",
+    "github": "https://github.com/GenesysGo"
   }
 ]
