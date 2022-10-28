@@ -1,4 +1,8 @@
-import { getRealms, PROGRAM_VERSION_V1, Realm } from '@solana/spl-governance'
+import {
+  PROGRAM_VERSION_V1,
+  Realm,
+  getBatchedRealms,
+} from '@solana/spl-governance'
 
 import { ProgramAccount } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
@@ -168,17 +172,15 @@ const EXCLUDED_REALMS = new Map<string, string>([
 // Returns all known realms from all known spl-gov instances which are not certified
 export async function getUnchartedRealmInfos(connection: ConnectionContext) {
   const certifiedRealms = getCertifiedRealmInfos(connection)
-
+  const programIds = arrayToUnique(certifiedRealms, (r) =>
+    r.programId.toBase58()
+  ).map((p) => {
+    return p.programId
+  })
+  getBatchedRealms(connection.current, connection.endpoint, programIds)
   const allRealms = (
-    await Promise.all(
-      // Assuming all the known spl-gov instances are already included in the certified realms list
-      arrayToUnique(certifiedRealms, (r) => r.programId.toBase58()).map((p) => {
-        return getRealms(connection.current, p.programId)
-      })
-    )
-  )
-    .flatMap((r) => Object.values(r))
-    .sort((r1, r2) => r1.account.name.localeCompare(r2.account.name))
+    await getBatchedRealms(connection.current, connection.endpoint, programIds)
+  ).sort((r1, r2) => r1.account.name.localeCompare(r2.account.name))
 
   const excludedRealms = arrayToMap(certifiedRealms, (r) =>
     r.realmId.toBase58()
