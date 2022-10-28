@@ -1366,5 +1366,15 @@
     "twitter": "@Realms_DAOs",
     "discord": "https://discord.gg/zfxTA762",
     "github": "https://github.com/solana-labs/governance-ui"
+  },
+  {
+    "symbol": "WisdomDAO",
+    "displayName": "WisdomDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "8Jx7cvj32DJP8bsMQ3pZvDdx2qfynrkovgVQG8DBmY9P",
+    "website": "https://www.wisdom-dao.com/",
+    "twitter": "@WiseEldersDAO",
+    "ogImage": "/realms/WisdomDAO/og.jpg",
+    "bannerImage": "/realms/WisdomDAO/banner.jpg"
   }
 ]
