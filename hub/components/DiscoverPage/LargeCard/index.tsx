@@ -3,17 +3,17 @@ import { pipe } from 'fp-ts/lib/function';
 import Link from 'next/link';
 
 import { Twitter as TwitterIcon } from '@hub/components/icons/Twitter';
-import { Category } from '@hub/components/OrgCategory';
 import { useQuery } from '@hub/hooks/useQuery';
 import { abbreviateNumber } from '@hub/lib/abbreviateNumber';
 import cx from '@hub/lib/cx';
+import { RealmCategory } from '@hub/types/RealmCategory';
 import * as RE from '@hub/types/Result';
 
 import * as gql from './gql';
 
 interface Props {
   className?: string;
-  category: Category;
+  category: RealmCategory;
   content: React.ReactNode;
   imgSrc: string;
   publicKey: PublicKey;

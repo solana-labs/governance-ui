@@ -3,7 +3,6 @@ import SearchIcon from '@carbon/icons-react/lib/Search';
 import * as Popover from '@radix-ui/react-popover';
 import type { PublicKey } from '@solana/web3.js';
 import { pipe } from 'fp-ts/lib/function';
-import { TypeOf } from 'io-ts';
 import Link from 'next/link';
 import { forwardRef, useState, useRef } from 'react';
 
