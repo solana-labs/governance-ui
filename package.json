@@ -26,7 +26,7 @@
   "dependencies": {
     "@blockworks-foundation/mango-client": "^3.3.16",
     "@blockworks-foundation/voter-stake-registry-client": "^0.2.0",
-    "@credix/credix-client": "1.0.0",
+    "@credix/credix-client": "2.0.0",
     "@emotion/react": "^11.1.5",
     "@emotion/styled": "^11.3.0",
     "@friktion-labs/friktion-sdk": "1.1.113",

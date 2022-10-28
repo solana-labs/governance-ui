@@ -638,12 +638,11 @@
   resolved "https://registry.yarnpkg.com/@colors/colors/-/colors-1.5.0.tgz#bb504579c1cae923e6576a4f5da43d25f97bdbd9"
   integrity sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==
 
-"@credix/credix-client@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@credix/credix-client/-/credix-client-1.0.0.tgz#5275f2f6cf9719a081dc5edc909646ab62ea4ab0"
-  integrity sha512-QZ58Y2YdP4fWdXkIK9qvWngX87pEcbqe1hCcHLPfrLpQlWOXj58HOAf+971tcW7f6GyA5+Z4TtcPi00jIkZQ5w==
+"@credix/credix-client@2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@credix/credix-client/-/credix-client-2.0.0.tgz#e2483985e5e6364f24ec1ad8fac7638fc949b19e"
+  integrity sha512-po3RhHfoQnnRb8ABWSca7YtPM+L3lxAb/01EO07ipZfTjk8hSRkDXCmxjQotUipZA9loqlA14/sa4TpOZ7GqHQ==
   dependencies:
-    "@identity.com/solana-gateway-ts" "^0.8.2"
     "@project-serum/anchor" "^0.24.2"
     "@saberhq/anchor-contrib" "^1.13.32"
     "@solana/spl-token" "^0.1.8"
@@ -918,17 +917,6 @@
   version "1.2.1"
   resolved "https://registry.npmjs.org/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz"
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
-
-"@identity.com/solana-gateway-ts@^0.8.2":
-  version "0.8.2"
-  resolved "https://registry.yarnpkg.com/@identity.com/solana-gateway-ts/-/solana-gateway-ts-0.8.2.tgz#a8de5929e94a98b64cbdc38b4745f3fb20ae58aa"
-  integrity sha512-xFFoZtlF9XLHZ/ZS59QdVTDAtG7GJU2CqpXzwHwG7bPhhhXJ2zTHqlJ9oax2Faf9UKjyzp7F7TWfMScpTeOkEQ==
-  dependencies:
-    "@solana/web3.js" "^1.22.0"
-    async-retry "^1.3.3"
-    bn.js "^5.2.0"
-    borsh "^0.4.0"
-    ramda "^0.27.1"
 
 "@isaacs/string-locale-compare@^1.0.1", "@isaacs/string-locale-compare@^1.1.0":
   version "1.1.0"
@@ -3682,13 +3670,6 @@ async-limiter@~1.0.0:
   version "1.0.1"
   resolved "https://registry.npmjs.org/async-limiter/-/async-limiter-1.0.1.tgz"
   integrity sha512-csOlWGAcRFJaI6m+F2WKdnMKr4HhdhFVBk0H/QbJFMCr+uO2kwohwXQPxw/9OCxp05r5ghVBFSyioixx3gfkNQ==
-
-async-retry@^1.3.3:
-  version "1.3.3"
-  resolved "https://registry.yarnpkg.com/async-retry/-/async-retry-1.3.3.tgz#0e7f36c04d8478e7a58bdbed80cedf977785f280"
-  integrity sha512-wfr/jstw9xNi/0teMHrRW7dsz3Lt5ARhYNZ2ewpadnhaIp5mbALhOAP+EAdsC7t4Z6wqsDVv9+W6gm1Dk9mEyw==
-  dependencies:
-    retry "0.13.1"
 
 async@^2.6.2:
   version "2.6.3"
@@ -10841,11 +10822,6 @@ quick-lru@^5.1.1:
   resolved "https://registry.npmjs.org/quick-lru/-/quick-lru-5.1.1.tgz"
   integrity sha512-WuyALRjWPDGtt/wzJiadO5AXY+8hZ80hVpe6MyivgraREW751X3SbhRvG3eLKOYN+8VEvqLcf3wdnt44Z4S4SA==
 
-ramda@^0.27.1:
-  version "0.27.2"
-  resolved "https://registry.yarnpkg.com/ramda/-/ramda-0.27.2.tgz#84463226f7f36dc33592f6f4ed6374c48306c3f1"
-  integrity sha512-SbiLPU40JuJniHexQSAgad32hfwd+DRUdwF2PlVuI5RZD0/vahUco7R8vD86J/tcEKKF9vZrUVwgtmGCqlCKyA==
-
 range-parser@^1.2.1, range-parser@~1.2.1:
   version "1.2.1"
   resolved "https://registry.npmjs.org/range-parser/-/range-parser-1.2.1.tgz"
@@ -11285,15 +11261,15 @@ retry-axios@^2.6.0:
   resolved "https://registry.yarnpkg.com/retry-axios/-/retry-axios-2.6.0.tgz#d4dc5c8a8e73982e26a705e46a33df99a28723e0"
   integrity sha512-pOLi+Gdll3JekwuFjXO3fTq+L9lzMQGcSq7M5gIjExcl3Gu1hd4XXuf5o3+LuSBsaULQH7DiNbsqPd1chVpQGQ==
 
-retry@0.13.1, retry@^0.13.1:
-  version "0.13.1"
-  resolved "https://registry.npmjs.org/retry/-/retry-0.13.1.tgz"
-  integrity sha512-XQBQ3I8W1Cge0Seh+6gjj03LbmRFWuoszgK9ooCpwYIrhhoO80pfq4cUkU5DkknwfOfFteRwlZ56PYOGYyFWdg==
-
 retry@^0.12.0:
   version "0.12.0"
   resolved "https://registry.npmjs.org/retry/-/retry-0.12.0.tgz"
   integrity sha1-G0KmJmoh8HQh0bC1S33BZ7AcATs=
+
+retry@^0.13.1:
+  version "0.13.1"
+  resolved "https://registry.npmjs.org/retry/-/retry-0.13.1.tgz"
+  integrity sha512-XQBQ3I8W1Cge0Seh+6gjj03LbmRFWuoszgK9ooCpwYIrhhoO80pfq4cUkU5DkknwfOfFteRwlZ56PYOGYyFWdg==
 
 reusify@^1.0.4:
   version "1.0.4"
