@@ -17,7 +17,7 @@ export function EcosystemHeader(props: Props) {
           'bg-cover',
           'h-60',
           'w-full',
-          'bg-black',
+          'bg-white',
           props.className,
         )}
         style={{ backgroundImage: `url("${bannerUrl.src}")` }}

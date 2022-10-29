@@ -5,23 +5,18 @@ import { useRouter } from 'next/router';
 import { cloneElement } from 'react';
 
 import { Twitter as TwitterIcon } from '@hub/components/icons/Twitter';
-import {
-  Category,
-  getCategoryIcon,
-  getCategoryName,
-} from '@hub/components/OrgCategory';
+import { getCategoryIcon, getCategoryName } from '@hub/components/OrgCategory';
 import { RealmIcon } from '@hub/components/RealmIcon';
 import { useQuery } from '@hub/hooks/useQuery';
 import { abbreviateNumber } from '@hub/lib/abbreviateNumber';
 import cx from '@hub/lib/cx';
+import { RealmCategory } from '@hub/types/RealmCategory';
 import * as RE from '@hub/types/Result';
 
 import * as gql from './gql';
 
-export { Category };
-
 interface Props {
-  category: Category;
+  category: RealmCategory;
   className?: string;
   logo: string;
   name: string;
@@ -45,6 +40,7 @@ export function Org(props: Props) {
         'group',
         'items-center',
         'text-left',
+        'tracking-normal',
         'w-full',
         props.className,
       )}

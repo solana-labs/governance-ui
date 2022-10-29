@@ -54,13 +54,18 @@
   },
   {
     "symbol": "GRAPE",
+    "category": "daotools",
+    "bannerImage": "https://pbs.twimg.com/profile_banners/1387427286362861570/1657283618/1500x500",
     "displayName": "GRAPE",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "By2sVGZXwfQq6rAiAM3rNPJ9iQfb5e2QhnF4YjJ4Bip",
     "ogImage": "/realms/Grape/img/grape.png",
+    "shortDescription": "GRAPE DAO is a power user community for digital governance primitives & tooling",
+    "sortRank": 3,
     "website": "https://grapes.network/",
     "twitter": "@grapeprotocol",
-    "sortRank": 3
+    "discord": "https://discord.com/invite/greatape",
+    "github": "https://github.com/Grape-Labs"
   },
   {
     "symbol": "MDLH",
@@ -73,36 +78,62 @@
     "sortRank": 3
   },
   {
+    "symbol": "Duck Punkz",
+    "category": "nft",
+    "displayName": "Duck Punkz",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "6Yj8shsZrjqYQuPkEzcvkmdFq5Nn7RSVQ4EsNqLx7DJQ",
+    "ogImage": "https://pbs.twimg.com/profile_images/1563167507476713473/ZDruLZv7_400x400.jpg",
+    "shortDescription": "Crypto Duck Punkz: The Great Quekening ",
+    "sortRank": 3,
+    "twitter": "@cryptoduckpunkz",
+    "discord": "http://discord.gg/EYh3j6VQ6J"
+  },
+  {
     "symbol": "PSY",
     "displayName": "Psy Finance",
+    "category": "defi",
+    "bannerImage": "https://1532366083-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F86y9tCw3TORp3IO5op2u%2Fuploads%2FQ9Qn4X7XXC0QOrKfYW0K%2FInlinePsy.png?alt=media&token=8780e4b2-c339-4b9d-8f53-e27726daa92a",
     "programId": "GovHgfDPyQ1GwazJTDY2avSVY8GGcpmCapmmCsymRaGe",
     "realmId": "FiG6YoqWnVzUmxFNukcRVXZC51HvLr6mts8nxcm7ScR8",
-    "website": "https://psyoptions.io",
-    "keywords": "PsyOptions, PsyFi, PsyFinance, REALM, Governance, Serum, SRM, DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, Tokens, Options, Vaults",
-    "twitter": "@PsyOptions",
     "ogImage": "https://user-images.githubusercontent.com/32071703/149460918-3694084f-2a37-4c95-93d3-b5aaf078d444.png",
-    "sortRank": 3
+    "shortDescription": "An ecosystem of financial products governed by PSY token holders. ",
+    "sortRank": 3,
+    "website": "https://www.psyoptions.io/",
+    "twitter": "@PsyOptions",
+    "discord": "https://discord.com/invite/MgDdJKgZJc",
+    "github": "",
+    "keywords": "PsyOptions, PsyFi, PsyFinance, REALM, Governance, Serum, SRM, DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, Tokens, Options, Vaults"
   },
   {
     "symbol": "PYTH",
+    "category": "defi",
+    "bannerImage": "https://pbs.twimg.com/profile_banners/1376553581508059144/1665013565/1500x500",
     "displayName": "Pyth Network",
     "programId": "GovFUVGZWWwyoLq8rhnoVWknRFkhDSbQiSoREJ5LiZCV",
     "realmId": "A1f6LNEymJSSJsEVCL1FSgtS1jA9dNTC4ni8SkmbwQjG",
     "ogImage": "/realms/PYTH/img/pyth.svg",
+    "shortDescription": "The Pyth network aims to bring valuable financial market data to DeFi applications and the general public",
+    "sortRank": 3,
     "website": "https://pyth.network/",
-    "twitter": "@PythNetwork"
+    "twitter": "@pythnetwork",
+    "discord": "https://t.co/RhxhlyMfN2",
+    "github": "https://github.com/pyth-network/"
   },
   {
-    "symbol": "Dialect",
-    "displayName": "Dialect",
+    "symbol": "Hubble Protocol",
+    "category": "defi",
+    "bannerImage": "https://i.imgur.com/0BbQe2n.png",
+    "displayName": "Hubble Protocol",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "7s5QZmpit4uu1y2bkByXerE2mv3XBHtiNQ4JkDdmKRiQ",
-    "bannerImage": "/realms/Dialect/img/banner-dialect.png",
-    "ogImage": "/realms/Dialect/img/avatar-dialect.png",
-    "website": "https://www.dialect.to/",
-    "twitter": "@saydialect",
+    "realmId": "AgR2tq1xcbqwmgDcNRaV1BEP5J3kfJfswP5vn6WWe6uC",
+    "ogImage": "https://hubbleprotocol.io/static/media/main-logo.e5b4adb3.svg",
+    "shortDescription": "Hubble Protocol is the issuer of USDH, the Solana-native stablecoin that anyone can mint by depositing their crypto assets.",
     "sortRank": 3,
-    "shortDescription": "Dialect is the first protocol for smart messaging — dynamic, composable dapp notifications and wallet-to-wallet chat"
+    "website": "https://hubbleprotocol.io",
+    "twitter": "@hubbleprotocol",
+    "discord": "https://discord.gg/hubbleprotocol",
+    "github": "https://github.com/hubbleprotocol"
   },
   {
     "symbol": "MangoLiquidityDAO",
@@ -229,10 +260,18 @@
   },
   {
     "symbol": "SOCEAN",
+    "category": "defi",
+    "bannerImage": "https://i.imgur.com/uSHuzrx.png",
+    "displayName": "Socean",
     "programId": "5hAykmD4YGcQ7Am3N7nC9kyELq6CThAkU82nhNKDJiCy",
     "realmId": "759qyfKDMMuo9v36tW7fbGanL63mZFPNbhU7zjPrkuGK",
-    "website": "https://www.socean.fi",
-    "ogImage": "https://socean-git-enhancement-orca-price-feed-lieuzhenghong.vercel.app/static/media/socnRound.c466b499.png"
+    "ogImage": "https://socean-git-enhancement-orca-price-feed-lieuzhenghong.vercel.app/static/media/socnRound.c466b499.png",
+    "shortDescription": "Socean Stake Pool gives you the best risk-free yields on Solana.",
+    "sortRank": 3,
+    "website": "https://socean.fi",
+    "twitter": "@soceanfinance",
+    "discord": "https://discord.gg/socean",
+    "github": "https://github.com/igneous-labs"
   },
   {
     "symbol": "Governance",
@@ -364,15 +403,6 @@
     "website": "https://realms.notion.site/Realms-Ecosystem-DAO-RED-2b82519e797b4696968c5c909812f418",
     "twitter": "@Realms_DAOs",
     "sortRank": 2
-  },
-  {
-    "symbol": "MonkeDAO",
-    "displayName": "MonkeDAO",
-    "programId": "GMnke6kxYvqoAXgbFGnu84QzvNHoqqTnijWSXYYTFQbB",
-    "realmId": "B1CxhV1khhj7n5mi5hebbivesqH9mvXr5Hfh2nD2UCh6",
-    "ogImage": "/realms/MonkeDAO/img/MonkeDAO_logo.png",
-    "website": "https://monkedao.io/",
-    "twitter": "@MonkeDAO"
   },
   {
     "symbol": "MonkeDAOVote",
@@ -581,12 +611,17 @@
   },
   {
     "symbol": "RatioFinance",
+    "category": "defi",
+    "bannerImage": "https://i.imgur.com/WBGCF35.jpg",
     "displayName": "Ratio Finance",
     "programId": "HT19EcD68zn7NoCF79b2ucQF8XaMdowyPt5ccS6g1PUx",
     "realmId": "8HZ4V94dtojrTpdUpWrfstr7bEhRnZZHn8jotfns9L9x",
+    "ogImage": "/realms/RatioFinance/img/ratiologo.png",
+    "shortDescription": "Our mission at Ratio Finance is to De-Risk DeFi for all.",
+    "sortRank": 3,
     "website": "https://ratio.finance/",
     "twitter": "@RatioFinance",
-    "ogImage": "/realms/RatioFinance/img/ratiologo.png"
+    "discord": "https://discord.com/invite/5v8AYva8nU"
   },
   {
     "symbol": "PixelBands",
@@ -722,13 +757,18 @@
   },
   {
     "symbol": "NEOFAIRIES",
+    "category": "gaming",
+    "bannerImage": "https://pbs.twimg.com/profile_banners/1441459504311193602/1644861689/1500x500",
     "displayName": "Neo Fairies",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "9PmmctkHPN5Br8V4gmjNuUdccrD7TtzfJ7U8mcpoBGXd",
-    "website": "https://neofairies.com",
+    "ogImage": "/realms/NeoFairies/img/logo.png",
+    "shortDescription": "A fantasy-punk shared world that’s shaped and owned by community.",
+    "sortRank": 3,
+    "website": "http://neofairies.com/",
     "twitter": "@neofairies",
-    "keywords": "Neo Fairies, Fairies, Fairy, Fantasy, Punk, Create-To-Own, DAO, Governance, Decentralized Entertainment, Decentralised Entertainment, DeEnt, UOC, User-Owned Content, UGC, IP, Intellectual Property, Creative Development, NFT, Tokens, Crypto",
-    "ogImage": "/realms/NeoFairies/img/logo.png"
+    "discord": "https://discord.gg/neofairies",
+    "keywords": "Neo Fairies, Fairies, Fairy, Fantasy, Punk, Create-To-Own, DAO, Governance, Decentralized Entertainment, Decentralised Entertainment, DeEnt, UOC, User-Owned Content, UGC, IP, Intellectual Property, Creative Development, NFT, Tokens, Crypto"
   },
   {
     "symbol": "$RRDG",
@@ -934,10 +974,10 @@
     "displayName": "Dean's List",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "9mS8GuMx2MkZGMSwa2k87HNLTFZ1ssa9mJ1RkGFKcGyQ",
-    "bannerImage": "/realms/Dean's List Grape/deans list logo.png",
+    "bannerImage": "/realms/Deans-List-Grape/deans-list-logo.png",
     "website": "https://deans-list.strataprotocol.com/",
     "twitter": "@GrapeDeanslist",
-    "ogImage": "/realms/Dean's List Grape/deans list logo.png"
+    "ogImage": "/realms/Deans-List-Grape/deans-list-logo.png"
   },
   {
     "symbol": "GrapeCCSubDAO",
@@ -1014,12 +1054,18 @@
   },
   {
     "symbol": "EPCT",
+    "category": "web3",
+    "bannerImage": "https://bafybeib4syqxnch4sf3rw6tuh62sun4cfu3ix4fprb7gff65v6zx74auv4.ipfs.w3s.link/BuidlersCollectiveSamples.jpg",
     "displayName": "Epics",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "DCdCsuUjg6MnULfEmBUmvg1heggnLrKSFdp5uTRSKuwR",
-    "website": "https://epics.dev/",
-    "twitter": "@EpicsDAO",
-    "ogImage": "/realms/Epics/Epics-logo.svg"
+    "ogImage": "/realms/Epics/Epics-logo.svg",
+    "shortDescription": "Buidl to Earn. Epics is a decentralized crowdsourcing platform for incentivizing open-source software development.",
+    "sortRank": 3,
+    "website": "https://epics.dev",
+    "twitter": "@EpicsDAO2",
+    "discord": "https://discord.gg/GmHYfyRamx",
+    "github": "https://github.com/epicsdao"
   },
   {
     "symbol": "OPANZ",
@@ -1086,8 +1132,38 @@
     "website": "https://blockgame.cz"
   },
   {
+    "symbol": "BlockLive",
+    "category": "web3",
+    "bannerImage": "https://worldtop.mypinata.cloud/ipfs/QmfA63uoZe8Dh5drYS7haQXJAMETovkoVCxS2MjcMHPPSA",
+    "displayName": "BlockLive",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "G43QB1csngJDWBhrBCba5tbVcxcPHhGNtGkqfntfP6fg",
+    "ogImage": "https://worldtop.mypinata.cloud/ipfs/QmXbMPq3Js6iJx6guEZsB8PaAPX6vB1Fr5wMRQnLavoUQk",
+    "shortDescription": "BlockLive is fast, easy, transparent way to buy and sell live event tickets that you can hold onto for a lifetime.",
+    "sortRank": 3,
+    "website": "https://blocklive.io/",
+    "twitter": "@blocklive_",
+    "discord": "https://discord.gg/pNdYQzwZ",
+    "github": "https://github.com/BlockLive"
+  },
+  {
+    "symbol": "Friktion",
+    "category": "defi",
+    "bannerImage": "https://i.imgur.com/phXF3sh.png",
+    "displayName": "Friktion",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "CXGN5H84vXjoQg7jkAKdAbMtEv3S2K4t8kptwzPzfQLQ",
+    "ogImage": "https://i.imgur.com/Tt8n8qE.png",
+    "shortDescription": "Smarter returns on your crypto",
+    "sortRank": 3,
+    "website": "https://friktion.fi/",
+    "twitter": "@friktion_labs",
+    "discord": "https://discord.gg/friktion",
+    "github": "https://github.com/Friktion-Labs"
+  },
+  {
     "symbol": "Squads",
-    "bannerImage": "/realms/squads/banner.png",
+    "bannerImage": "/realms/Squads/banner.png",
     "displayName": "Squads",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "BzGL6wbCvBisQ7s1cNQvDGZwDRWwKK6bhrV93RYdetzJ",
@@ -1102,12 +1178,16 @@
   {
     "symbol": "ALLIE",
     "displayName": "Allie Coin DAO",
+    "category": "gaming",
+    "bannerImage": "/realms/Allie-Coin-DAO/Allie-Coin-Particle-Logo-Compressed.png",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "BZE9AiJrMxUXXjwy9iBPzj34Wh5Zf1wLEFAM4oSSMRLi",
-    "bannerImage": "/realms/Allie Coin DAO/Allie Coin Particle Logo Compressed.png",
-    "ogImage": "/realms/Allie Coin DAO/Allie Coin Logo.png",
-    "website": "https://alliecoin.io",
-    "twitter": "@allie_coin"
+    "ogImage": "/realms/Allie-Coin-DAO/Allie-Coin-Logo.png",
+    "shortDescription": "Allie Coin unlocks a new world of gaming.",
+    "sortRank": 3,
+    "website": "https://alliecoin.io/",
+    "twitter": "@allie_coin",
+    "discord": "https://discord.gg/wAzwpQCNF2"
   },
   {
     "symbol": "Superteam",
@@ -1148,20 +1228,6 @@
     "website": "https://orbis.club",
     "twitter": "@OrbisClub",
     "github": "https://github.com/OrbisWeb3/"
-  },
-  {
-    "symbol": "Jupiter Aggregator",
-    "bannerImage": "https://i.imgur.com/2Z17uYm.jpg",
-    "displayName": "Jupiter Aggregator",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "2Z5BXuRCJPqYUCBGyQTwAXHeJoFAnbtvoXja19aZFLKY",
-    "ogImage": "https://jup.ag/svg/jupiter-logo.svg",
-    "shortDescription": "The best swap aggregator & infrastructure for Solana -  powering best price, token selection and UX for all users and devs.",
-    "sortRank": 3,
-    "website": "https://jup.ag/",
-    "twitter": "@JupiterExchange",
-    "discord": "https://discord.gg/jup",
-    "github": "https://github.com/jup-ag"
   },
   {
     "symbol": "SolanaFM",
@@ -1217,6 +1283,20 @@
     "twitter": "@DualFinance",
     "discord": "https://discord.com/invite/P3uH9AvEp5",
     "github": "https://github.com/Dual-Finance"
+  },
+  {
+    "symbol": "Lighthouse",
+    "category": "daotools",
+    "displayName": "Lighthouse",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "GXw7esYZ42nRZBFZTnAXa5fkdDgkvdZh7xeVuCEXoJZP",
+    "ogImage": "https://i.imgur.com/1NzLRGM.png",
+    "shortDescription": "Lighthouse enables communities to design reputation, rewards and membership systems by attesting to member contributions on-chain.",
+    "sortRank": 3,
+    "website": "lighthouse.xyz",
+    "twitter": "@lighthouse_dao",
+    "discord": "https://discord.gg/Bv8JhaPF",
+    "github": "https://github.com/sher9n/Lighthouse"
   },
   {
     "symbol": "Drift Protocol",
@@ -1275,19 +1355,6 @@
     "github": "https://github.com/streamflow-finance"
   },
   {
-    "symbol": "Irreverent Labs",
-    "bannerImage": "https://i.imgur.com/Db2CIvO.png",
-    "displayName": "Irreverent Labs",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "2dZAfmpEVMa18ESGiMHQxTWpQvdzEdhNdT7Ai6wdNkZ1",
-    "ogImage": "https://i.imgur.com/P4RC19y.png",
-    "shortDescription": "Irreverent Labs is creating hilarious automated entertainment from the future. ",
-    "sortRank": 3,
-    "website": "https://www.mechafightclub.com",
-    "twitter": "@mechafightclub",
-    "discord": "https://discord.gg/mechafightclub"
-  },
-  {
     "symbol": "Shakudo",
     "bannerImage": "https://i.imgur.com/tVUlRsv.jpg",
     "displayName": "Shakudo",
@@ -1312,19 +1379,6 @@
     "website": "https://www.panzerdogs.io/",
     "twitter": "@panzerdogs",
     "discord": "https://discord.gg/panzerdogs"
-  },
-  {
-    "symbol": "DeFi Land",
-    "bannerImage": "https://i.imgur.com/NL7yjoC.png",
-    "displayName": "DeFi Land",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "AxPJNe69VrdqWV1VkgDoRcM6Utizje6HdUqE5paJopap",
-    "ogImage": "https://i.imgur.com/fxd7mT2.png",
-    "shortDescription": "DeFi Land is a unique agriculture-simulation game created to gamify all aspects of decentralized finance and web3.",
-    "sortRank": 3,
-    "website": "https://defiland.app/",
-    "twitter": "@DeFi_Land",
-    "discord": "https://discord.gg/defiland"
   },
   {
     "symbol": "BetDEX Labs",
@@ -1354,7 +1408,93 @@
     "github": "https://github.com/aleph-im"
   },
   {
+    "symbol": "Dialect",
+    "category": "web3",
+    "bannerImage": "/realms/Dialect/img/banner-dialect.png",
+    "displayName": "Dialect",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "7s5QZmpit4uu1y2bkByXerE2mv3XBHtiNQ4JkDdmKRiQ",
+    "ogImage": "/realms/Dialect/img/avatar-dialect.png",
+    "shortDescription": "Dialect is building an open source protocol for Smart Messaging — dynamic, composable dapp notifications and wallet-to-wallet chat",
+    "sortRank": 3,
+    "website": "dialect.to",
+    "twitter": "@saydialect",
+    "discord": "https://discord.gg/dialect",
+    "github": "GitHub.com/dialectlabs"
+  },
+  {
+    "symbol": "MonkeDAO",
+    "category": "nft",
+    "displayName": "MonkeDAO",
+    "programId": "GMnke6kxYvqoAXgbFGnu84QzvNHoqqTnijWSXYYTFQbB",
+    "realmId": "B1CxhV1khhj7n5mi5hebbivesqH9mvXr5Hfh2nD2UCh6",
+    "ogImage": "/realms/MonkeDAO/img/MonkeDAO_logo.png",
+    "sortRank": 3,
+    "website": "https://monkedao.io/",
+    "twitter": "@MonkeDAO",
+    "discord": "discord.gg/monkedao",
+    "github": "https://monkedao.gitbook.io/welcome-to-monkedao/"
+  },
+  {
+    "symbol": "Jupiter Aggregator",
+    "category": "defi",
+    "bannerImage": "https://i.imgur.com/2Z17uYm.jpg",
+    "displayName": "Jupiter Aggregator",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "2Z5BXuRCJPqYUCBGyQTwAXHeJoFAnbtvoXja19aZFLKY",
+    "ogImage": "https://jup.ag/svg/jupiter-logo.svg",
+    "shortDescription": "The best swap aggregator & infrastructure for Solana -  powering best price, token selection and UX for all users and devs.",
+    "sortRank": 3,
+    "website": "https://jup.ag/",
+    "twitter": "@JupiterExchange",
+    "discord": "https://discord.gg/jup",
+    "github": "https://github.com/jup-ag"
+  },
+  {
+    "symbol": "Irreverent Labs",
+    "category": "other",
+    "bannerImage": "https://i.imgur.com/Db2CIvO.png",
+    "displayName": "Irreverent Labs",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "2dZAfmpEVMa18ESGiMHQxTWpQvdzEdhNdT7Ai6wdNkZ1",
+    "ogImage": "https://i.imgur.com/P4RC19y.png",
+    "shortDescription": "Irreverent Labs is creating hilarious automated entertainment from the future. ",
+    "sortRank": 3,
+    "website": "https://www.mechafightclub.com",
+    "twitter": "@mechafightclub",
+    "discord": "https://discord.gg/mechafightclub"
+  },
+  {
+    "symbol": "DeFi Land",
+    "category": "gaming",
+    "bannerImage": "https://i.imgur.com/NL7yjoC.png",
+    "displayName": "DeFi Land",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "AxPJNe69VrdqWV1VkgDoRcM6Utizje6HdUqE5paJopap",
+    "ogImage": "https://i.imgur.com/fxd7mT2.png",
+    "shortDescription": "DeFi Land is a unique agriculture-simulation game created to gamify all aspects of decentralized finance and web3.",
+    "sortRank": 3,
+    "website": "https://defiland.app/",
+    "twitter": "@DeFi_Land",
+    "discord": "https://discord.gg/defiland"
+  },
+  {
+    "symbol": "Gilder",
+    "category": "daotools",
+    "bannerImage": "https://pbs.twimg.com/profile_banners/1443288033025937411/1633010666/1500x500",
+    "displayName": "Gilder",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "6jydyMWSqV2bFHjCHydEQxa9XfXQWDwjVqAdjBEA1BXx",
+    "ogImage": "https://pbs.twimg.com/profile_images/1458164179244765184/lqJUjPYh_400x400.jpg",
+    "shortDescription": "Gilder makes interacting and staying connected to your decentralized internet community easy on mobile. ",
+    "sortRank": 3,
+    "twitter": "@gilderxyz",
+    "discord": "discord.gg/u7zuwaAb7Z",
+    "github": "https://github.com/Gilder-Labs/gilder-app"
+  },
+  {
     "symbol": "RCH",
+    "category": "daotools",
     "bannerImage": "/realms/RCH/banner.png",
     "displayName": "Realms Community Hub",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1366,5 +1506,20 @@
     "twitter": "@Realms_DAOs",
     "discord": "https://discord.gg/zfxTA762",
     "github": "https://github.com/solana-labs/governance-ui"
+  },
+  {
+    "symbol": "GenesysGo",
+    "category": "web3",
+    "bannerImage": "https://i.imgur.com/S2ACWLv.jpg",
+    "displayName": "GenesysGo",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "96VSxgcsxhh8qcFXdT7nMzxA1CMrUBxrxcetqYFqdV5V",
+    "ogImage": "https://i.imgur.com/topNFE2.jpg",
+    "shortDescription": "The Shadow Platform is the first Web3 cloud services platform built for speed, scale, and stability. Web3 without compromises!",
+    "sortRank": 3,
+    "website": "https://shadow.cloud",
+    "twitter": "@genesysgo",
+    "discord": "https://discord.gg/genesysgo",
+    "github": "https://github.com/GenesysGo"
   }
 ]

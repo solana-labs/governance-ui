@@ -1,127 +1,45 @@
-import ThumbUpIcon from '@carbon/icons-react/lib/ThumbsUp';
+import FireIcon from '@carbon/icons-react/lib/Fire';
 import { PublicKey } from '@solana/web3.js';
 
-import { LargeCard } from '@hub/components/DiscoverPage/LargeCard';
-import { Category } from '@hub/components/OrgCategory';
+import { SmallCard } from '@hub/components/DiscoverPage/SmallCard';
 import cx from '@hub/lib/cx';
-
-import imgAudius from './audius.png';
-import imgMonkedao from './monkedao.png';
-import imgSms from './sms.png';
-import imgStaratlas from './staratlas.png';
 
 export const ITEMS = [
   {
-    imgSrc: imgAudius.src,
-    category: Category.Web3,
-    content: (
-      <div>
-        Audius isn’t just building a competitive music streaming platform. They
-        are at the forefront of the conversation surrounding ownership rights by
-        artists and fans.
-      </div>
-    ),
+    bannerImgSrc: 'https://i.imgur.com/VfFjhk5.jpeg',
+    description:
+      'GARI Network enables everyone to monetize their social media time and activities by leveraging web3 technologies.',
+    iconImgSrc: 'https://i.imgur.com/t5hzoBV.jpg',
+    name: 'GARI Network',
+    publicKey: new PublicKey('uWg5gaTsBnXc5qiVMB8XxBUPYqLAb5bzzgkkpxi6UAY'),
+    urlId: 'GARI%20Network',
+  },
+  {
+    bannerImgSrc: '/realms/RCH/banner.png',
+    description:
+      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
+    iconImgSrc: '/realms/RCH/icon.png',
+    name: 'Realms Community Hub',
     publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    stats: [
-      {
-        top: '7.2M',
-        bottom: 'Active Listeners',
-      },
-      {
-        top: '250.7K',
-        bottom: 'Artists',
-      },
-      {
-        top: '1.1M',
-        bottom: 'Songs Served',
-      },
-    ],
-    title: 'Audius',
     urlId: 'RCH',
   },
   {
-    imgSrc: imgStaratlas.src,
-    category: Category.Gaming,
-    content: (
-      <div>
-        Star Atlas is a grand strategy game of space exploration, territorial
-        conquest, political domination, and living among the stars—all being
-        built as a native Web3 experience.
-      </div>
-    ),
+    bannerImgSrc: '/realms/RCH/banner.png',
+    description:
+      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
+    iconImgSrc: '/realms/RCH/icon.png',
+    name: 'Realms Community Hub',
     publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    stats: [
-      {
-        top: '100%',
-        bottom: 'Asset Ownership',
-      },
-      {
-        top: 'Tokens',
-        bottom: 'Dictate Game Rules',
-      },
-      {
-        top: 'NFTs',
-        bottom: 'Broad Uses',
-      },
-    ],
-    title: 'Star Atlas',
     urlId: 'RCH',
   },
   {
-    imgSrc: imgSms.src,
-    category: Category.Web3,
-    content: (
-      <div>
-        The Solana Mobile Stack and accompanying mobile Phone provides Web3
-        natives native crypto experience on their phone. This new frontier
-        features several opportunities including:
-      </div>
-    ),
+    bannerImgSrc: '/realms/RCH/banner.png',
+    description:
+      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
+    iconImgSrc: '/realms/RCH/icon.png',
+    name: 'Realms Community Hub',
     publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    stats: [
-      {
-        top: 'Seed Vault',
-        bottom: 'Wallet Hardware',
-      },
-      {
-        top: 'Low Fees',
-        bottom: 'dApp Transactions',
-      },
-      {
-        top: 'OSOM',
-        bottom: 'Premium Hardware',
-      },
-    ],
-    title: 'Solana Mobile / SMS',
     urlId: 'RCH',
-  },
-  {
-    imgSrc: imgMonkedao.src,
-    category: Category.Web3,
-    content: (
-      <div>
-        Monkedao is Community of Solana Monkey Business NFT owners operating a
-        validator to increase the value of the DAO treasury. Virtual community
-        events and IRL gatherings.
-      </div>
-    ),
-    publicKey: new PublicKey('B1CxhV1khhj7n5mi5hebbivesqH9mvXr5Hfh2nD2UCh6'),
-    stats: [
-      {
-        top: '43.3K SOL',
-        bottom: 'In Stake Pool',
-      },
-      {
-        top: 'Up to 7%',
-        bottom: 'Staking w/ DAOPool',
-      },
-      {
-        top: '1st DAO',
-        bottom: 'To Operate Validator',
-      },
-    ],
-    title: 'Monke Dao',
-    urlId: 'MonkeDAO',
   },
 ];
 
@@ -133,28 +51,18 @@ export function Popular(props: Props) {
   return (
     <section className={props.className}>
       <div className="flex items-center space-x-2">
-        <ThumbUpIcon className="fill-neutral-700 h-4 w-4" />
+        <FireIcon className="fill-neutral-700 h-4 w-4" />
         <div className="text-sm text-neutral-700 uppercase font-semibold">
-          popular on realms
+          popular projects
         </div>
       </div>
+      <div className="text-neutral-500">Solana projects gaining momentum</div>
       <div
-        className={cx(
-          'flex',
-          'items-center',
-          'no-scrollbar',
-          'overflow-x-auto',
-          'overflow-y-hidden',
-          'pt-6',
-          'pr-10',
-          'snap-mandatory',
-          'snap-x',
-          'w-full',
-        )}
+        className={cx('grid', 'grid-cols-4', 'mt-6', 'gap-3', 'items-center')}
       >
         {ITEMS.map((item, i) => (
-          <div className="flex-shrink-0 snap-start pr-6" key={i}>
-            <LargeCard className="bg-white" {...item} />
+          <div className="flex-shrink-0 max-w-[290px] h-56" key={i}>
+            <SmallCard {...item} />
           </div>
         ))}
       </div>
