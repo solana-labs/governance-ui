@@ -50,6 +50,7 @@ const GovernancePowerTitle = ({
   const connected = useWalletStore((s) => s.connected)
 
   useEffect(() => {
+    console.log(realm)
     const getTokenOwnerRecord = async () => {
       const defaultMint = !mint?.supply.isZero()
         ? realm!.account.communityMint
