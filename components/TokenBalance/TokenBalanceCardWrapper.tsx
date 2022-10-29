@@ -27,13 +27,23 @@ const TokenBalanceCard = dynamic(() => import('./TokenBalanceCard'))
 const NftVotingPower = dynamic(
   () => import('../ProposalVotingPower/NftVotingPower')
 )
-// const NftBalanceCard = dynamic(() => import('./NftBalanceCard'))
 const SwitchboardPermissionCard = dynamic(
   () => import('./SwitchboardPermissionCard')
 )
 
-const GovernancePowerTitle = () => {
-  const { councilMint, mint, realm, symbol } = useRealm()
+const GovernancePowerTitle = ({
+  inAccountDetails,
+  mint,
+  councilMint,
+  realm,
+  symbol,
+}: {
+  inAccountDetails?: boolean
+  mint: any
+  councilMint: any
+  realm: any
+  symbol?: string | string[]
+}) => {
   const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
   const { fmtUrlWithCluster } = useQueryContext()
   const wallet = useWalletStore((s) => s.current)
@@ -58,7 +68,8 @@ const GovernancePowerTitle = () => {
       getTokenOwnerRecord()
     }
   }, [realm?.pubkey.toBase58(), wallet?.connected])
-  return (
+
+  return !inAccountDetails ? (
     <div className="flex items-center justify-between mb-4">
       <h3 className="mb-0">My governance power</h3>
       <Link
@@ -76,7 +87,7 @@ const GovernancePowerTitle = () => {
         </a>
       </Link>
     </div>
-  )
+  ) : null
 }
 
 const TokenBalanceCardWrapper = ({
@@ -91,6 +102,10 @@ const TokenBalanceCardWrapper = ({
     config,
     ownCouncilTokenRecord,
     councilTokenAccount,
+    councilMint,
+    mint,
+    realm,
+    symbol,
   } = useRealm()
   const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin
   const getTokenBalanceCard = () => {
@@ -128,7 +143,13 @@ const TokenBalanceCardWrapper = ({
           (councilTokenAccount &&
             !councilTokenAccount?.account.amount.isZero()) ? (
             <>
-              {!inAccountDetails && <GovernancePowerTitle />}
+              <GovernancePowerTitle
+                inAccountDetails={inAccountDetails}
+                mint={mint}
+                councilMint={councilMint}
+                symbol={symbol}
+                realm={realm}
+              />
               <NftVotingPower inAccountDetails={inAccountDetails} />
               <TokenBalanceCard
                 proposal={proposal}
@@ -138,7 +159,13 @@ const TokenBalanceCardWrapper = ({
             </>
           ) : (
             <>
-              {!inAccountDetails && <GovernancePowerTitle />}
+              <GovernancePowerTitle
+                inAccountDetails={inAccountDetails}
+                mint={mint}
+                councilMint={councilMint}
+                symbol={symbol}
+                realm={realm}
+              />
               <NftVotingPower inAccountDetails={inAccountDetails} />
               <ClaimUnreleasedNFTs inAccountDetails={inAccountDetails} />
             </>
@@ -156,7 +183,13 @@ const TokenBalanceCardWrapper = ({
     //Default
     return (
       <>
-        {!inAccountDetails && <GovernancePowerTitle />}
+        <GovernancePowerTitle
+          inAccountDetails={inAccountDetails}
+          mint={mint}
+          councilMint={councilMint}
+          symbol={symbol}
+          realm={realm}
+        />
         <TokenBalanceCard
           proposal={proposal}
           inAccountDetails={inAccountDetails}
