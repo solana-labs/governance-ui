@@ -238,7 +238,6 @@ function RealmsGrid({
                   ) && (
                     <div
                       draggable={editing}
-                      unselectable="on"
                       onMouseDown={
                         editing
                           ? () => {
