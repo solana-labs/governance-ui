@@ -18,7 +18,6 @@ import useWalletStore from 'stores/useWalletStore'
 import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
 import { createAssociatedTokenAccount } from '@utils/associated'
 import useCreateProposal from '@hooks/useCreateProposal'
-import { simulateTransaction } from '@utils/send'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import { tryGetMint } from '@utils/tokens'
 import useRealm from '@hooks/useRealm'
@@ -92,11 +91,7 @@ export default function Header(props: Props) {
       const tx = new Transaction({ feePayer: wallet.publicKey }).add(
         ...instructions
       )
-      const simulated = await simulateTransaction(
-        connection.current,
-        tx,
-        'single'
-      )
+      const simulated = await connection.current.simulateTransaction(tx)
 
       if (simulated.value.err) {
         console.log('[SPL_GOV] simulated logs ', simulated.value.logs)
