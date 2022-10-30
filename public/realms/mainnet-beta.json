@@ -1175,6 +1175,7 @@
   },
   {
     "symbol": "Squads",
+    "category": "daotools",
     "bannerImage": "/realms/Squads/banner.png",
     "displayName": "Squads",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1203,6 +1204,7 @@
   },
   {
     "symbol": "Superteam",
+    "category": "other",
     "bannerImage": "https://i.imgur.com/uTjEbh7.png",
     "displayName": "Superteam",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1217,6 +1219,7 @@
   },
   {
     "symbol": "Hello Moon",
+    "category": "other",
     "bannerImage": "https://i.imgur.com/ZiHW6ho.png",
     "displayName": "Hello Moon",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1230,6 +1233,7 @@
   },
   {
     "symbol": "Orbis Protocol",
+    "category": "web3",
     "bannerImage": "https://pbs.twimg.com/profile_banners/1460531965581578244/1664471587/1500x500",
     "displayName": "Orbis Protocol",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1243,6 +1247,7 @@
   },
   {
     "symbol": "SolanaFM",
+    "category": "web3",
     "bannerImage": "https://digitalpress.fra1.cdn.digitaloceanspaces.com/2wt57me/2021/12/Publication-Logo.png",
     "displayName": "SolanaFM",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1257,6 +1262,7 @@
   },
   {
     "symbol": "Unique Venture Clubs",
+    "category": "daotools",
     "bannerImage": "https://snipboard.io/I2pMe5.jpg",
     "displayName": "Unique Venture Clubs",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1271,6 +1277,7 @@
   },
   {
     "symbol": "GARI Network",
+    "category": "web3",
     "bannerImage": "https://i.imgur.com/VfFjhk5.jpeg",
     "displayName": "GARI Network",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1284,6 +1291,7 @@
   },
   {
     "symbol": "Dual Finance",
+    "category": "defi",
     "bannerImage": "https://pbs.twimg.com/profile_banners/1488237042068819971/1652495773/1500x500",
     "displayName": "Dual Finance",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1312,6 +1320,7 @@
   },
   {
     "symbol": "Drift Protocol",
+    "category": "defi",
     "bannerImage": "https://i.imgur.com/b9pPf3S.png",
     "displayName": "Drift Protocol",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1326,6 +1335,7 @@
   },
   {
     "symbol": "Zeta Markets",
+    "category": "defi",
     "bannerImage": "https://i.imgur.com/W90Xqer.jpg",
     "displayName": "Zeta Markets",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1340,6 +1350,7 @@
   },
   {
     "symbol": "IntoTheVerse ",
+    "category": "gaming",
     "bannerImage": "https://drive.google.com/drive/folders/1bebnlUD5myJWqCMrv8hPQJsiaSt9Ese3",
     "displayName": "IntoTheVerse ",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1354,6 +1365,7 @@
   },
   {
     "symbol": "Streamflow",
+    "category": "web3",
     "bannerImage": "https://streamflow.finance/imgs/streamflow-logo-desktop.PNG",
     "displayName": "Streamflow",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1368,6 +1380,7 @@
   },
   {
     "symbol": "Shakudo",
+    "category": "web3",
     "bannerImage": "https://i.imgur.com/tVUlRsv.jpg",
     "displayName": "Shakudo",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1381,6 +1394,7 @@
   },
   {
     "symbol": "Panzerdogs",
+    "category": "gaming",
     "bannerImage": "",
     "displayName": "Panzerdogs",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1394,6 +1408,7 @@
   },
   {
     "symbol": "BetDEX Labs",
+    "category": "web3",
     "bannerImage": "https://pbs.twimg.com/profile_banners/1438537652282724356/1636452537/1500x500",
     "displayName": "BetDEX Labs",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1408,6 +1423,7 @@
   },
   {
     "symbol": "Aleph.im",
+    "category": "web3",
     "bannerImage": "",
     "displayName": "Aleph.im",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1464,7 +1480,7 @@
   },
   {
     "symbol": "Irreverent Labs",
-    "category": "other",
+    "category": "gaming",
     "bannerImage": "https://i.imgur.com/Db2CIvO.png",
     "displayName": "Irreverent Labs",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
