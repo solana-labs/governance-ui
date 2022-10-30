@@ -1,8 +1,4 @@
-import {
-  PROGRAM_VERSION_V1,
-  Realm,
-  getBatchedRealms,
-} from '@solana/spl-governance'
+import { PROGRAM_VERSION_V1, Realm, getRealms } from '@solana/spl-governance'
 
 import { ProgramAccount } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
@@ -177,9 +173,9 @@ export async function getUnchartedRealmInfos(connection: ConnectionContext) {
   ).map((p) => {
     return p.programId
   })
-  getBatchedRealms(connection.current, connection.endpoint, programIds)
+  getRealms(connection.current, programIds)
   const allRealms = (
-    await getBatchedRealms(connection.current, connection.endpoint, programIds)
+    await getRealms(connection.current, programIds)
   ).sort((r1, r2) => r1.account.name.localeCompare(r2.account.name))
 
   const excludedRealms = arrayToMap(certifiedRealms, (r) =>

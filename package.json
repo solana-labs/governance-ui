@@ -73,7 +73,7 @@
     "@sentry/nextjs": "^6.19.7",
     "@solana/buffer-layout": "^4.0.0",
     "@solana/governance-program-library": "npm:@civic/governance-program-library@0.16.9-beta.2",
-    "@solana/spl-governance": "^0.3.16",
+    "@solana/spl-governance": "^0.3.17",
     "@solana/spl-token": "0.1.8",
     "@solana/spl-token-registry": "^0.2.3775",
     "@solana/wallet-adapter-backpack": "^0.1.0",
