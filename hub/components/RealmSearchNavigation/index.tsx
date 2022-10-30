@@ -3,7 +3,6 @@ import SearchIcon from '@carbon/icons-react/lib/Search';
 import * as Popover from '@radix-ui/react-popover';
 import type { PublicKey } from '@solana/web3.js';
 import { pipe } from 'fp-ts/lib/function';
-import { TypeOf } from 'io-ts';
 import Link from 'next/link';
 import { forwardRef, useState, useRef } from 'react';
 
@@ -75,7 +74,7 @@ export const RealmSearchNavigation = forwardRef<HTMLInputElement, Props>(
     return (
       <Popover.Root>
         <Popover.Anchor asChild ref={ref}>
-          <div className={cx('relative', 'w-80', props.className)}>
+          <div className={cx('relative', 'w-[270px]', props.className)}>
             <input
               className={cx(
                 'bg-neutral-100',
@@ -150,7 +149,7 @@ export const RealmSearchNavigation = forwardRef<HTMLInputElement, Props>(
                 'bg-white',
                 'overflow-hidden',
                 'rounded',
-                'w-80',
+                'w-[270px]',
                 'z-50',
               )}
               onOpenAutoFocus={(e) => e.preventDefault()}

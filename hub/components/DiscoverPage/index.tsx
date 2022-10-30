@@ -6,6 +6,7 @@ import { NotableDefi } from './NotableDefi';
 import { NotableGames } from './NotableGames';
 import { NotableNFTs } from './NotableNFTs';
 import { NotableWeb3 } from './NotableWeb3';
+import { Noteworthy } from './Noteworthy';
 import { Popular } from './Popular';
 import { Sidebar } from './Sidebar';
 import { Title } from './Title';
@@ -28,14 +29,17 @@ export function DiscoverPage(props: Props) {
     >
       <div className="p-4">
         <div className="top-[72px] sticky">
-          <Sidebar />
+          <Sidebar
+            className={cx('max-h-[calc(100vh-88px)]', 'overflow-y-auto')}
+          />
         </div>
       </div>
       <div className="py-8 w-full overflow-hidden">
         <Title />
-        <Popular className="mt-16 w-full" />
+        <Noteworthy className="mt-16 w-full" />
         <div className="mt-16 pr-16 max-w-[1188px]">
           <Hackathon />
+          <Popular className="mt-16" />
           <NotableDefi className="mt-16" />
           <NotableNFTs className="mt-16" />
           <NotableGames className="mt-16" />
