@@ -18,8 +18,7 @@ export function GlobalHeader(props: Props) {
     <NavigationMenu.Root
       className={cx(
         props.className,
-        'backdrop-blur-2xl',
-        'bg-white/80',
+        'bg-white',
         'flex',
         'items-center',
         'justify-center',
@@ -53,10 +52,10 @@ export function GlobalHeader(props: Props) {
                   href: '/ecosystem',
                   title: 'Ecosystem Feed',
                 },
-                {
-                  href: '/discover',
-                  title: 'Discover',
-                },
+                // {
+                //   href: '/discover',
+                //   title: 'Discover',
+                // },
               ]}
             />
           </div>

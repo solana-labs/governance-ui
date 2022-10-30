@@ -5,7 +5,6 @@ import * as IT from 'io-ts';
 import { gql } from 'urql';
 
 import { useQuery } from '@hub/hooks/useQuery';
-import cx from '@hub/lib/cx';
 import { formatNumber } from '@hub/lib/formatNumber';
 import { BigNumber } from '@hub/types/decoders/BigNumber';
 import { PublicKey } from '@hub/types/decoders/PublicKey';
