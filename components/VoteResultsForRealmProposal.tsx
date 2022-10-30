@@ -1,19 +1,31 @@
 import VoteResultsBar from './VoteResultsBar'
-import { Proposal } from '@solana/spl-governance'
-import useProposalVotes from '@hooks/useProposalVotes'
+import {
+  Governance,
+  ProgramAccount,
+  Proposal,
+  Realm,
+} from '@solana/spl-governance'
+import useProposalVotesForRealm from '@hooks/useProposalVotesForRealm'
 
-type VoteResultsProps = {
+type VoteResultsForRealmProps = {
   isListView?: boolean
   proposal: Proposal
+  realm: ProgramAccount<Realm>
+  governance?: ProgramAccount<Governance>
 }
 
-const VoteResults = ({ isListView, proposal }: VoteResultsProps) => {
+const VoteResultsForRealmProposal = ({
+  isListView,
+  proposal,
+  realm,
+  governance,
+}: VoteResultsForRealmProps) => {
   const {
     yesVoteCount,
     noVoteCount,
     relativeNoVotes,
     relativeYesVotes,
-  } = useProposalVotes(proposal)
+  } = useProposalVotesForRealm(realm, proposal, governance)
 
   return (
     <div className="flex items-center space-x-4">
@@ -77,4 +89,4 @@ const VoteResults = ({ isListView, proposal }: VoteResultsProps) => {
   )
 }
 
-export default VoteResults
+export default VoteResultsForRealmProposal

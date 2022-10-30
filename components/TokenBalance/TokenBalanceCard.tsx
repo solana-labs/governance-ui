@@ -37,6 +37,7 @@ import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { vsrPluginsPks } from '@hooks/useVotingPlugins'
 import { REALM_ID as PYTH_REALM_ID, PythBalance } from 'pyth-staking-api'
 import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
+import SerumGovernanceTokenWrapper from './SerumGovernanceTokenWrapper'
 import getNumTokens from '@components/ProposalVotingPower/getNumTokens'
 import VotingPowerPct from '@components/ProposalVotingPower/VotingPowerPct'
 
@@ -49,6 +50,7 @@ const TokenBalanceCard = ({
   inAccountDetails?: boolean
   children?: React.ReactNode
 }) => {
+  const realmProgramId = useWalletStore((s) => s.selectedRealm.programId)
   const [hasGovPower, setHasGovPower] = useState<boolean>(false)
   const { councilMint, mint, realm } = useRealm()
   const connected = useWalletStore((s) => s.connected)
@@ -116,6 +118,11 @@ const TokenBalanceCard = ({
           <div className="h-10 rounded-lg animate-pulse bg-bkg-3" />
         </>
       )}
+      {/* TODO: Restrict to Serum DAO */}
+      {realmProgramId?.toBase58() ===
+      'G41fmJzd29v7Qmdi8ZyTBBYa98ghh3cwHBTexqCG1PQJ' ? (
+        <SerumGovernanceTokenWrapper />
+      ) : null}
       {children}
     </>
   )

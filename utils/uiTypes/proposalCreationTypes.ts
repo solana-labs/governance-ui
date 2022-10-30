@@ -9,6 +9,7 @@ import { DepositWithMintAccount, Voter } from 'VoteStakeRegistry/sdk/accounts'
 import { LockupKind } from 'VoteStakeRegistry/tools/types'
 import { consts as foresightConsts } from '@foresight-tmp/foresight-sdk'
 import { AssetAccount, StakeAccount } from '@utils/uiTypes/assets'
+import { RealmInfo } from '@models/registry/api'
 
 export interface UiInstruction {
   serializedInstruction: string
@@ -420,6 +421,40 @@ export interface UpdateTokenMetadataForm {
   programId: string | undefined
 }
 
+export interface SerumInitUserForm {
+  governedAccount?: AssetAccount
+  owner: string
+  programId: string
+}
+
+export interface SerumGrantLockedForm {
+  governedAccount?: AssetAccount
+  owner: string
+  mintInfo: MintInfo | undefined
+  amount: number | undefined
+  programId: string
+}
+
+export interface SerumUpdateConfigParam {
+  governedAccount?: AssetAccount // Config Authority
+  claimDelay?: number
+  redeemDelay?: number
+  cliffPeriod?: number
+  linearVestingPeriod?: number
+}
+
+export interface SerumUpdateConfigAuthority {
+  governedAccount?: AssetAccount // Config Authority
+  newAuthority?: string
+}
+
+export interface JoinDAOForm {
+  governedAccount?: AssetAccount
+  mintInfo: MintInfo | undefined
+  realm: RealmInfo | null
+  amount?: number
+}
+
 export enum Instructions {
   Transfer,
   ProgramUpgrade,
@@ -495,6 +530,14 @@ export enum Instructions {
   TransferDomainName,
   EverlendDeposit,
   EverlendWithdraw,
+  SerumInitUser,
+  SerumGrantLockedSRM,
+  SerumGrantLockedMSRM,
+  SerumGrantVestSRM,
+  SerumGrantVestMSRM,
+  SerumUpdateGovConfigParams,
+  SerumUpdateGovConfigAuthority,
+  JoinDAO,
   ClaimMangoTokens,
 }
 

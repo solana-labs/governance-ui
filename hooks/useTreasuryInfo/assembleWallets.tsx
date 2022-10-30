@@ -7,7 +7,6 @@ import {
   Realm,
   RealmConfigAccount,
 } from '@solana/spl-governance'
-import { Connection, PublicKey } from '@solana/web3.js'
 import { SparklesIcon } from '@heroicons/react/outline'
 
 import { AssetAccount, AccountType } from '@utils/uiTypes/assets'
@@ -27,13 +26,17 @@ import {
 } from './groupProgramsByWallet'
 import { getRulesFromAccount } from './getRulesFromAccount'
 import { abbreviateAddress } from '@utils/formatting'
+import { ConnectionContext } from '@utils/connection'
+import { PublicKey } from '@solana/web3.js'
+import getTokenOwnerRecordsForWallet from './getTokenOwnerRecordsForWallet'
+import { tryParseKey } from '@tools/validators/pubkey'
 
 function isNotNull<T>(x: T | null): x is T {
   return x !== null
 }
 
 export const assembleWallets = async (
-  connection: Connection,
+  connection: ConnectionContext,
   accounts: AssetAccount[],
   nfts: NFT[],
   programId: PublicKey,
@@ -123,6 +126,15 @@ export const assembleWallets = async (
         walletMap[walletAddress].assets.push(asset)
       }
     }
+
+    if (account.type === AccountType.SOL) {
+      const tokenOwnerRecords = await getTokenOwnerRecordsForWallet(
+        connection,
+        account.governance,
+        tryParseKey(walletAddress)
+      )
+      walletMap[walletAddress].assets.push(...tokenOwnerRecords)
+    }
   }
 
   for (const [walletAddress, programList] of Object.entries(
@@ -140,7 +152,7 @@ export const assembleWallets = async (
 
     const dataAccounts = await Promise.all(
       programList.map((p) =>
-        getProgramDataAccount(connection, p.pubkey).then((account) => ({
+        getProgramDataAccount(connection.current, p.pubkey).then((account) => ({
           address: p.pubkey.toBase58(),
           lastDeployedSlot: account.slot,
           upgradeAuthority: account.authority?.toBase58(),
