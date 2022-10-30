@@ -1521,5 +1521,34 @@
     "twitter": "@genesysgo",
     "discord": "https://discord.gg/genesysgo",
     "github": "https://github.com/GenesysGo"
+  },
+  {
+    "symbol": "Hubble Protocol",
+    "category": "defi",
+    "bannerImage": "https://i.imgur.com/rXz3mnF.png",
+    "displayName": "Hubble Protocol",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "AgR2tq1xcbqwmgDcNRaV1BEP5J3kfJfswP5vn6WWe6uC",
+    "ogImage": "https://i.imgur.com/B5SNT8F.png",
+    "shortDescription": "Hubble Protocol is the issuer of USDH, a Solana native crypto-backed stablecoin that anyone can mint by depositing their crypto.",
+    "sortRank": 3,
+    "website": "https://hubbleprotocol.io/",
+    "twitter": "@hubbleprotocol",
+    "discord": "https://discord.gg/hubbleprotocol",
+    "github": "https://github.com/hubbleprotocol"
+  },
+  {
+    "symbol": "Mini Royale: Nations",
+    "category": "gaming",
+    "bannerImage": "https://i.imgur.com/sach4X3.png",
+    "displayName": "Mini Royale: Nations",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "JDAa2nFhyaRsESqYqWoZp6aw8egtcSV2UvKRDgfvgNLY",
+    "ogImage": "https://i.imgur.com/5ISruUM.png",
+    "shortDescription": "Mini Royale: Nations is a community-owned skill-based shooter set on top of an ever-evolving social strategy game.",
+    "sortRank": 3,
+    "website": "https://miniroyale.io/",
+    "twitter": "@MiniNations",
+    "discord": "https://discord.gg/miniroyale"
   }
 ]
