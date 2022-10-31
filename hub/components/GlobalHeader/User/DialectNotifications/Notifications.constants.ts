@@ -2,9 +2,9 @@ import {
   defaultVariables,
   IncomingThemeVariables,
 } from '@dialectlabs/react-ui';
-import * as anchor from '@project-serum/anchor';
+import { web3 } from '@project-serum/anchor';
 
-export const REALMS_PUBLIC_KEY = new anchor.web3.PublicKey(
+export const REALMS_PUBLIC_KEY = new web3.PublicKey(
   'BUxZD6aECR5B5MopyvvYqJxwSKDBhx2jSSo1U32en6mj',
 );
 
