@@ -70,7 +70,7 @@ export function FeedItem(props: Props) {
           () => (
             <div>
               <RealmHeader.Error />
-              <div className="max-w-3xl mx-auto pt-8 w-full">
+              <div className="max-w-3xl mx-auto pt-8 w-full px-4">
                 <Back.Error className="mb-8 mt-4" />
                 <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
                 <Header.Error className="mt-6" />
@@ -88,7 +88,7 @@ export function FeedItem(props: Props) {
           () => (
             <div>
               <RealmHeader.Loading />
-              <div className="max-w-3xl mx-auto pt-8 w-full">
+              <div className="max-w-3xl mx-auto pt-8 w-full px-4">
                 <Back.Loading className="mb-8 mt-4" />
                 <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
                 <Header.Loading className="mt-6" />
@@ -129,7 +129,7 @@ export function FeedItem(props: Props) {
                   feedItemResult,
                   RE.match(
                     () => (
-                      <div className="max-w-3xl mx-auto pt-8 w-full">
+                      <div className="max-w-3xl mx-auto pt-8 w-full px-4">
                         <Back.Error className="mb-8 mt-4" />
                         <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
                         <Header.Error className="mt-6" />
@@ -144,7 +144,7 @@ export function FeedItem(props: Props) {
                       </div>
                     ),
                     () => (
-                      <div className="max-w-3xl mx-auto pt-8 w-full">
+                      <div className="max-w-3xl mx-auto pt-8 w-full px-4">
                         <Back.Loading className="mb-8 mt-4" />
                         <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
                         <Header.Loading className="mt-6" />
@@ -159,7 +159,7 @@ export function FeedItem(props: Props) {
                       </div>
                     ),
                     ({ feedItem }) => (
-                      <div className="max-w-3xl mx-auto pt-8 w-full">
+                      <div className="max-w-3xl mx-auto pt-8 w-full px-4">
                         <Back.Content className="mb-7 mt-4" />
                         <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
                         <Header.Content

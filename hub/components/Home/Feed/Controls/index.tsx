@@ -59,9 +59,9 @@ export function Content(props: Props) {
         <Dialog.Root open={dialogOpen} onOpenChange={setDialogOpen}>
           <Toolbar.Button asChild>
             <Dialog.Trigger asChild>
-              <Button.Primary className="w-32" disabled={!jwt}>
-                <LicenseDraftIcon className="h-4 w-4 mr-1.5" />
-                <div>Post</div>
+              <Button.Primary className="w-10 sm:w-32" disabled={!jwt}>
+                <LicenseDraftIcon className="h-4 w-4 sm:mr-1.5" />
+                <div className="hidden sm:block">Post</div>
               </Button.Primary>
             </Dialog.Trigger>
           </Toolbar.Button>
@@ -93,9 +93,9 @@ export function Content(props: Props) {
         <HoverCard.Root>
           <Toolbar.Button asChild>
             <HoverCard.Trigger asChild>
-              <Button.Primary className="w-32" disabled>
-                <LicenseDraftIcon className="h-4 w-4 mr-1.5" />
-                <div>Post</div>
+              <Button.Primary className="w-10 sm:w-32" disabled>
+                <LicenseDraftIcon className="h-4 w-4 sm:mr-1.5" />
+                <div className="hidden sm:block">Post</div>
               </Button.Primary>
             </HoverCard.Trigger>
           </Toolbar.Button>
@@ -116,23 +116,23 @@ export function Content(props: Props) {
         (jwt ? (
           <Toolbar.Button asChild>
             <Button.Secondary
-              className="w-32"
+              className="w-10 sm:w-32"
               disabled={!jwt}
               onClick={() =>
                 router.push(`/dao/${props.realmUrlId}/proposal/new`)
               }
             >
-              <DocumentAddIcon className="h-4 w-4 mr-1.5" />
-              <div>Proposal</div>
+              <DocumentAddIcon className="h-4 w-4 sm:mr-1.5" />
+              <div className="hidden sm:block">Proposal</div>
             </Button.Secondary>
           </Toolbar.Button>
         ) : (
           <HoverCard.Root>
             <Toolbar.Button asChild>
               <HoverCard.Trigger asChild>
-                <Button.Secondary className="w-32" disabled>
-                  <DocumentAddIcon className="h-4 w-4 mr-1.5" />
-                  <div>Proposal</div>
+                <Button.Secondary className="w-10 sm:w-32" disabled>
+                  <DocumentAddIcon className="h-4 w-4 sm:mr-1.5" />
+                  <div className="hidden sm:block">Proposal</div>
                 </Button.Secondary>
               </HoverCard.Trigger>
             </Toolbar.Button>

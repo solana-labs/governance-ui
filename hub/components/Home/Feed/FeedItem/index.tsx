@@ -1,5 +1,6 @@
 import MilestoneIcon from '@carbon/icons-react/lib/Milestone';
 import type { PublicKey } from '@solana/web3.js';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import { FeedItem } from '../gql';
@@ -83,11 +84,15 @@ export function Content(props: Props) {
           </div>
         )}
         {props.realmInfo ? (
-          <RealmIcon
-            className="h-12 w-12 text-lg"
-            iconUrl={props.realmInfo.iconUrl}
-            name={props.realmInfo.name}
-          />
+          <Link passHref href={`/realm/${props.realmInfo.urlId}`}>
+            <a className="block">
+              <RealmIcon
+                className="h-12 w-12 text-lg"
+                iconUrl={props.realmInfo.iconUrl}
+                name={props.realmInfo.name}
+              />
+            </a>
+          </Link>
         ) : props.feedItem.author ? (
           <AuthorHovercard
             civicAvatar={props.feedItem.author?.civicInfo?.avatarUrl}
