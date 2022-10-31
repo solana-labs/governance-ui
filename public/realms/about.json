@@ -1613,6 +1613,119 @@
       }
     ]
   },
+  "JDAa2nFhyaRsESqYqWoZp6aw8egtcSV2UvKRDgfvgNLY": {
+    "symbol": "Mini Royale: Nations",
+    "heading": "Mini Royale: Nations is a community-owned skill-based shooter set on top of an ever-evolving social strategy game",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Mini Royale: Nations is a browser-based FPS + social strategy game. The core shooter game is set on top of a land control-oriented, social strategy game with a deep emphasis on clans, alliances and social mechanics. It is the first live multiplayer game to be powered by the Solana blockchain and boasts over 2 million registered players."
+        ]
+      },
+      {
+        "content": [
+          "Faraway is the studio behind Mini Royale: Nations and is proud to be supported by some of the best web3 investors including Lightspeed Venture Partners, a16z, Sequoia, FTX, Pantera Capital, among others. Faraway was founded by a team of game industry veterans passionate about open and player-driven economies. The team has served in leadership roles at Scopely, Glu Mobile, Wargaming, Mail.ru, Amazon, and other top game studios."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://whitepaper.miniroyale.io/"
+    },
+    "gallery": [
+      {
+        "caption": "Mini Royale: Nations - Season 3",
+        "url": "https://i.imgur.com/Hl9FMJL.jpg",
+        "height": 338,
+        "width": 600
+      },
+      {
+        "caption": "Mini Royale: Nations - Gameplay",
+        "url": "https://i.imgur.com/gZLI8Jt.png",
+        "height": 320,
+        "width": 600
+      },
+      {
+        "caption": "Mini Royale: Nations - Fusion Character",
+        "url": "https://i.imgur.com/Hu7jWLD.jpg",
+        "height": 338,
+        "width": 600
+      }
+    ],
+    "resources": [
+      {
+        "title": "Solana Game Mini Royale: Nations Hits 2M Players After NFT Launch",
+        "content": [
+          "The web-based online shooter is Solana’s first live multiplayer game, and it has hit a new milestone after activating NFT avatars."
+        ],
+        "url": "https://decrypt.co/88757/solana-game-mini-royale-nations-hits-2m-players-nft-launch"
+      },
+      {
+        "title": "Faraway raises $21M to make social games with player-driven economies",
+        "content": [
+          "Faraway has raised $21 million to enable blockchain games with player-driven economies. Not bad for a company that started in June."
+        ],
+        "url": "https://venturebeat.com/games/faraway-raises-21m-to-make-social-games-with-player-driven-economies/"
+      }
+    ],
+    "team": [
+      {
+        "name": "Alex Paley",
+        "avatar": "image.png",
+        "description": [
+          "Alex Paley is a co-founder of Faraway, a web3 gaming studio specializing in hyper-social games with player-driven economies. Prior to founding Faraway with his long-time co-founder, Dennis Zdonov, he was VP of Product at Scopely and Head of Studio at Glu Mobile."
+        ],
+        "role": "Co-Founder",
+        "twitter": "@apaley13"
+      },
+      {
+        "name": "Dennis Zdonov",
+        "avatar": "https://media-exp1.licdn.com/dms/image/C4E03AQE4acqoOhvkGg/profile-displayphoto-shrink_800_800/0/1529192513215?e=1672876800&v=beta&t=OHx0X4thfZsRVzXcVm-zT28MoePVmaosevanjIWeBqk",
+        "description": [
+          "Dennis Zdonov is a co-founder of Faraway, a web3 gaming studio specializing in hyper-social games with player-driven economies. Prior to founding Faraway with his long-time co-founder, Alex Paley, he was VP of Product at Scopely and Head of Studio at Glu Mobile."
+        ],
+        "role": "Co-Founder"
+      }
+    ],
+    "roadmap": {
+      "items": [
+        {
+          "title": "Season 1 - Game Launch",
+          "date": "2021-12-09T15:42:21.109Z",
+          "status": "completed",
+          "resource": {
+            "title": "The Mini Royale: Nations Whitepaper",
+            "url": "https://whitepaper.miniroyale.io/"
+          }
+        },
+        {
+            "title": "Season 2 Launch",
+            "date": "2022-04-07T15:42:21.109Z",
+            "status": "completed"
+        },
+        {
+            "title": "Season 3 Launch",
+            "date": "2022-09-01T15:42:21.109Z",
+            "status": "completed"
+        }
+      ]
+    },
+    "faq": [
+      {
+        "question": "Where can I see FAQs about the game?",
+        "answer": [
+          "https://faq.miniroyale.io/"
+        ]
+      },
+      {
+        "question": "asWhere can I play the game?df",
+        "answer": [
+          "https://miniroyale.io/"
+        ]
+      }
+    ]
+  },
     "AgR2tq1xcbqwmgDcNRaV1BEP5J3kfJfswP5vn6WWe6uC": {
       "symbol": "Hubble Protocol",
       "heading": "Hubble Protocol",
