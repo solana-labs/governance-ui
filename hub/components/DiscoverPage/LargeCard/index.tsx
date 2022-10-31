@@ -59,7 +59,9 @@ export function LargeCard(props: Props) {
               ),
             )}
           </header>
-          <div className="mt-2 text-sm text-neutral-700">{props.content}</div>
+          <div className="mt-2 text-sm text-neutral-700 line-clamp-3">
+            {props.content}
+          </div>
           <div className="mt-6 grid grid-cols-3 items-center">
             {props.stats.map((stat, i) => (
               <div

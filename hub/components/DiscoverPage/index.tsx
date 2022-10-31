@@ -37,7 +37,7 @@ export function DiscoverPage(props: Props) {
       <div className="py-8 w-full overflow-hidden pl-3 md:pl-16 xl:pl-0">
         <Title />
         <Noteworthy className="mt-16 w-full" />
-        <div className="mt-16 pr-3 md:pr-16 max-w-[1188px]">
+        <div className="mt-16 md:pr-16 max-w-[1188px]">
           <Hackathon />
           <Popular className="mt-16" />
           <NotableDefi className="mt-16" />

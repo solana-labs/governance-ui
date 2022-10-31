@@ -41,7 +41,7 @@ export function ResourceList(props: Props) {
 
               return true;
             })
-            ?.replace('www', '');
+            ?.replace('www.', '');
 
           return (
             <a
@@ -54,7 +54,7 @@ export function ResourceList(props: Props) {
               <div className="text-sm text-neutral-700 mb-1">{domain}</div>
               <div className="flex items-center">
                 <div className="font-bold text-sky-600">{resource.title}</div>
-                <ExternalLink className="h-4 fill-neutral-500 ml-3 w-4" />
+                <ExternalLink className="h-4 fill-neutral-500 flex-shrink-0 ml-3 w-4" />
               </div>
               {resource.content && (
                 <RichTextDocumentDisplay
