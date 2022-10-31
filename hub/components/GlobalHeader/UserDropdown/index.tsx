@@ -11,6 +11,7 @@ import { User } from './User';
 
 interface Props {
   className?: string;
+  compressed?: boolean;
 }
 
 export function UserDropdown(props: Props) {
@@ -20,12 +21,16 @@ export function UserDropdown(props: Props) {
     result,
     RE.match(
       () => (
-        <Connect className={props.className} onConnected={() => refetch({})} />
+        <Connect
+          className={props.className}
+          compressed={props.compressed}
+          onConnected={() => refetch({})}
+        />
       ),
       () => <Loading className={props.className} />,
       ({ me }) => (
         <div className={cx(props.className, 'flex', 'items-center')}>
-          <User user={me} />
+          <User compressed={props.compressed} user={me} />
         </div>
       ),
     ),

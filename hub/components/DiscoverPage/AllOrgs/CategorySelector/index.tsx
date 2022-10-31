@@ -20,7 +20,16 @@ interface Props {
 export function CategorySelector(props: Props) {
   return (
     <Popover.Root>
-      <div className={cx('flex', 'items-center', 'space-x-4', props.className)}>
+      <div
+        className={cx(
+          'flex-wrap',
+          'flex',
+          'gap-y-1',
+          'items-center',
+          'space-x-4',
+          props.className,
+        )}
+      >
         <Popover.Trigger
           className={cx(
             'bg-white',

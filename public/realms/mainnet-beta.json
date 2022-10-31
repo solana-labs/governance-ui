@@ -112,7 +112,7 @@
     "symbol": "PSY",
     "displayName": "Psy Finance",
     "category": "defi",
-    "bannerImage": "https://1532366083-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F86y9tCw3TORp3IO5op2u%2Fuploads%2FQ9Qn4X7XXC0QOrKfYW0K%2FInlinePsy.png?alt=media&token=8780e4b2-c339-4b9d-8f53-e27726daa92a",
+    "bannerImage": "https://i.imgur.com/o90sJuC.jpg",
     "programId": "GovHgfDPyQ1GwazJTDY2avSVY8GGcpmCapmmCsymRaGe",
     "realmId": "FiG6YoqWnVzUmxFNukcRVXZC51HvLr6mts8nxcm7ScR8",
     "ogImage": "https://user-images.githubusercontent.com/32071703/149460918-3694084f-2a37-4c95-93d3-b5aaf078d444.png",
@@ -142,14 +142,14 @@
   {
     "symbol": "Hubble Protocol",
     "category": "defi",
-    "bannerImage": "https://i.imgur.com/0BbQe2n.png",
+    "bannerImage": "https://i.imgur.com/rXz3mnF.png",
     "displayName": "Hubble Protocol",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "AgR2tq1xcbqwmgDcNRaV1BEP5J3kfJfswP5vn6WWe6uC",
-    "ogImage": "https://hubbleprotocol.io/static/media/main-logo.e5b4adb3.svg",
-    "shortDescription": "Hubble Protocol is the issuer of USDH, the Solana-native stablecoin that anyone can mint by depositing their crypto assets.",
+    "ogImage": "https://i.imgur.com/B5SNT8F.png",
+    "shortDescription": "Hubble Protocol is the issuer of USDH, a Solana native crypto-backed stablecoin that anyone can mint by depositing their crypto.",
     "sortRank": 3,
-    "website": "https://hubbleprotocol.io",
+    "website": "https://hubbleprotocol.io/",
     "twitter": "@hubbleprotocol",
     "discord": "https://discord.gg/hubbleprotocol",
     "github": "https://github.com/hubbleprotocol"
@@ -774,7 +774,7 @@
     "displayName": "Neo Fairies",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "9PmmctkHPN5Br8V4gmjNuUdccrD7TtzfJ7U8mcpoBGXd",
-    "ogImage": "/realms/NeoFairies/img/logo.png",
+    "ogImage": "https://pbs.twimg.com/profile_images/1493280200288735234/C8zpit6a_400x400.jpg",
     "shortDescription": "A fantasy-punk shared world that’s shaped and owned by community.",
     "sortRank": 3,
     "website": "http://neofairies.com/",
@@ -1175,6 +1175,7 @@
   },
   {
     "symbol": "Squads",
+    "category": "daotools",
     "bannerImage": "/realms/Squads/banner.png",
     "displayName": "Squads",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1203,6 +1204,7 @@
   },
   {
     "symbol": "Superteam",
+    "category": "other",
     "bannerImage": "https://i.imgur.com/uTjEbh7.png",
     "displayName": "Superteam",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1217,6 +1219,7 @@
   },
   {
     "symbol": "Hello Moon",
+    "category": "other",
     "bannerImage": "https://i.imgur.com/ZiHW6ho.png",
     "displayName": "Hello Moon",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1230,6 +1233,7 @@
   },
   {
     "symbol": "Orbis Protocol",
+    "category": "web3",
     "bannerImage": "https://pbs.twimg.com/profile_banners/1460531965581578244/1664471587/1500x500",
     "displayName": "Orbis Protocol",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1257,6 +1261,7 @@
   },
   {
     "symbol": "Unique Venture Clubs",
+    "category": "daotools",
     "bannerImage": "https://snipboard.io/I2pMe5.jpg",
     "displayName": "Unique Venture Clubs",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1271,6 +1276,7 @@
   },
   {
     "symbol": "GARI Network",
+    "category": "web3",
     "bannerImage": "https://i.imgur.com/VfFjhk5.jpeg",
     "displayName": "GARI Network",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1284,6 +1290,7 @@
   },
   {
     "symbol": "Dual Finance",
+    "category": "defi",
     "bannerImage": "https://pbs.twimg.com/profile_banners/1488237042068819971/1652495773/1500x500",
     "displayName": "Dual Finance",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1298,6 +1305,7 @@
   },
   {
     "symbol": "Lighthouse",
+    "bannerImage": "https://i.imgur.com/OKIFPm6.jpg",
     "category": "daotools",
     "displayName": "Lighthouse",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1326,6 +1334,7 @@
   },
   {
     "symbol": "Zeta Markets",
+    "category": "defi",
     "bannerImage": "https://i.imgur.com/W90Xqer.jpg",
     "displayName": "Zeta Markets",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1340,7 +1349,8 @@
   },
   {
     "symbol": "IntoTheVerse ",
-    "bannerImage": "https://drive.google.com/drive/folders/1bebnlUD5myJWqCMrv8hPQJsiaSt9Ese3",
+    "category": "gaming",
+    "bannerImage": "https://i.imgur.com/PwBA2It.png",
     "displayName": "IntoTheVerse ",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "22nDweMdSCCDoCMFUoS8Zgv7jnZxpLuqGrkL3cmSwuU3",
@@ -1354,6 +1364,7 @@
   },
   {
     "symbol": "Streamflow",
+    "category": "web3",
     "bannerImage": "https://streamflow.finance/imgs/streamflow-logo-desktop.PNG",
     "displayName": "Streamflow",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1368,6 +1379,7 @@
   },
   {
     "symbol": "Shakudo",
+    "category": "web3",
     "bannerImage": "https://i.imgur.com/tVUlRsv.jpg",
     "displayName": "Shakudo",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1381,7 +1393,7 @@
   },
   {
     "symbol": "Panzerdogs",
-    "bannerImage": "",
+    "category": "gaming",
     "displayName": "Panzerdogs",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "aoBhePkPBCvrSZrK1ioEz6duUY211jfeBPzMzeGAqT8",
@@ -1394,6 +1406,7 @@
   },
   {
     "symbol": "BetDEX Labs",
+    "category": "web3",
     "bannerImage": "https://pbs.twimg.com/profile_banners/1438537652282724356/1636452537/1500x500",
     "displayName": "BetDEX Labs",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1408,7 +1421,7 @@
   },
   {
     "symbol": "Aleph.im",
-    "bannerImage": "",
+    "category": "web3",
     "displayName": "Aleph.im",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "2PBLG1LGAQYUd38KjJhyACksZH9S361XunVbD3EGxfJf",
@@ -1464,7 +1477,7 @@
   },
   {
     "symbol": "Irreverent Labs",
-    "category": "other",
+    "category": "gaming",
     "bannerImage": "https://i.imgur.com/Db2CIvO.png",
     "displayName": "Irreverent Labs",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1533,5 +1546,19 @@
     "twitter": "@genesysgo",
     "discord": "https://discord.gg/genesysgo",
     "github": "https://github.com/GenesysGo"
+  },
+  {
+    "symbol": "Mini Royale: Nations",
+    "category": "gaming",
+    "bannerImage": "https://i.imgur.com/sach4X3.png",
+    "displayName": "Mini Royale: Nations",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "JDAa2nFhyaRsESqYqWoZp6aw8egtcSV2UvKRDgfvgNLY",
+    "ogImage": "https://i.imgur.com/5ISruUM.png",
+    "shortDescription": "Mini Royale: Nations is a community-owned skill-based shooter set on top of an ever-evolving social strategy game.",
+    "sortRank": 3,
+    "website": "https://miniroyale.io/",
+    "twitter": "@MiniNations",
+    "discord": "https://discord.gg/miniroyale"
   }
 ]

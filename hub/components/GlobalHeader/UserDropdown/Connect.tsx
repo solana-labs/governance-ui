@@ -37,6 +37,7 @@ const getTokenResp = IT.type({
 
 interface Props {
   className?: string;
+  compressed?: boolean;
   onConnected?(): void;
 }
 
@@ -57,7 +58,7 @@ export function Connect(props: Props) {
           'items-center',
           'justify-center',
           'px-2',
-          'py-1',
+          'py-2',
           'rounded',
           'space-x-1',
           'text-neutral-900',
@@ -104,7 +105,7 @@ export function Connect(props: Props) {
         }}
       >
         <SolanaLogo className="h-4 w-4" />
-        <div>Sign in with Solana</div>
+        <div>{props.compressed ? 'Sign in' : 'Sign in with Solana'}</div>
       </button>
     </NavigationMenu.Item>
   );

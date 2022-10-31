@@ -35,9 +35,11 @@ export function Stats(props: Props) {
 
   return (
     <div className={cx('flex', 'items-center', props.className)}>
-      <Stat className="w-[25%]" icon={<RealmsLogo />} label="Org Members">
-        {props.numMembers}
-      </Stat>
+      {props.numMembers > 0 && (
+        <Stat className="w-[25%]" icon={<RealmsLogo />} label="Org Members">
+          {props.numMembers}
+        </Stat>
+      )}
       {!!props.twitterFollowers && (
         <Stat className="w-[25%]" icon={<Twitter />} label="Followers">
           {abbreviateNumber(props.twitterFollowers, undefined, {
@@ -45,30 +47,50 @@ export function Stats(props: Props) {
           })}
         </Stat>
       )}
-      <Stat className="w-[25%]" icon={<WalletIcon />} label="Treasury Value">
-        {pipe(
-          treasuryResult,
-          RE.match(
-            () => <div className="w-24 bg-neutral-200 rounded">&nbsp;</div>,
-            () => (
+
+      {pipe(
+        treasuryResult,
+        RE.match(
+          () => (
+            <Stat
+              className="w-[25%]"
+              icon={<WalletIcon />}
+              label="Treasury Value"
+            >
+              <div className="w-24 bg-neutral-200 rounded">&nbsp;</div>
+            </Stat>
+          ),
+          () => (
+            <Stat
+              className="w-[25%]"
+              icon={<WalletIcon />}
+              label="Treasury Value"
+            >
               <div className="w-24 bg-neutral-200 rounded animate-pulse">
                 &nbsp;
               </div>
-            ),
-            ({ realmTreasury }) => (
-              <a
-                className="flex items-center"
-                href={`/dao/${props.realmUrlId}/treasury/v2`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <div>${abbreviateNumber(realmTreasury.totalValue)}</div>
-                <ArrowRightIcon className="h-4 w-4 fill-neutral-500 ml-2" />
-              </a>
-            ),
+            </Stat>
           ),
-        )}
-      </Stat>
+          ({ realmTreasury }) =>
+            realmTreasury.totalValue.isLessThan(1) ? null : (
+              <Stat
+                className="w-[25%]"
+                icon={<WalletIcon />}
+                label="Treasury Value"
+              >
+                <a
+                  className="flex items-center"
+                  href={`/dao/${props.realmUrlId}/treasury/v2`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <div>${abbreviateNumber(realmTreasury.totalValue)}</div>
+                  <ArrowRightIcon className="h-4 w-4 fill-neutral-500 ml-2" />
+                </a>
+              </Stat>
+            ),
+        ),
+      )}
       {props.documentation && (
         <Stat className="w-[25%]" icon={<BookIcon />} label="More Learning">
           <a

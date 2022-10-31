@@ -153,7 +153,16 @@ export function Noteworthy(props: Props) {
         )}
       >
         {ITEMS.map((item, i) => (
-          <div className="flex-shrink-0 snap-start pr-6" key={i}>
+          <div
+            className={cx(
+              'flex-shrink-0',
+              'snap-start',
+              'pr-6',
+              'w-[100vw]',
+              'md:max-w-[496px]',
+            )}
+            key={i}
+          >
             <LargeCard className="bg-white" {...item} />
           </div>
         ))}
