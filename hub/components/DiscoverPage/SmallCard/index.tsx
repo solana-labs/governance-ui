@@ -21,6 +21,7 @@ interface Props {
   className?: string;
   bannerImgSrc?: null | string;
   category?: RealmCategory;
+  compressable?: boolean;
   description?: null | string;
   heading?: null | {
     document: RichTextDocument;
@@ -85,7 +86,13 @@ export function SmallCard(props: Props) {
             </div>
             {typeof props.twitterFollowerCount === 'number' ? (
               !!props.twitterFollowerCount ? (
-                <div className="flex items-center">
+                <div
+                  className={cx(
+                    'flex',
+                    'items-center',
+                    props.compressable && 'hidden md:flex',
+                  )}
+                >
                   <TwitterIcon className="fill-sky-500 h-3 w-3 mr-1" />
                   <div className="text-xs text-neutral-700">
                     {abbreviateNumber(props.twitterFollowerCount, undefined, {
@@ -102,7 +109,13 @@ export function SmallCard(props: Props) {
                   () => null,
                   ({ hub }) =>
                     hub.twitterFollowerCount ? (
-                      <div className="flex items-center">
+                      <div
+                        className={cx(
+                          'flex',
+                          'items-center',
+                          props.compressable && 'hidden md:flex',
+                        )}
+                      >
                         <TwitterIcon className="fill-sky-500 h-3 w-3 mr-1" />
                         <div className="text-xs text-neutral-700">
                           {abbreviateNumber(

@@ -13,7 +13,8 @@ export function Stat(props: Props) {
   return (
     <div
       className={cx(
-        'h-[86px]',
+        'h-[46px]',
+        'md:h-[86px]',
         'border-l',
         'border-neutral-300',
         'px-4',
@@ -23,7 +24,7 @@ export function Stat(props: Props) {
       )}
     >
       <div>
-        <div className="text-3xl text-neutral-900 font-medium">
+        <div className="text-neutral-900 font-medium text:xl md:text-3xl">
           {props.children}
         </div>
         <div className="flex items-center text-neutral-500 space-x-1 mt-1">

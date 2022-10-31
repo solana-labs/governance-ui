@@ -94,7 +94,9 @@ export function Org(props: Props) {
                 >
                   <TwitterIcon className="fill-sky-500 h-3 w-3" />
                   <div className="text-xs text-neutral-700">
-                    {abbreviateNumber(hub.twitterFollowerCount)}
+                    {abbreviateNumber(hub.twitterFollowerCount, undefined, {
+                      maximumFractionDigits: 0,
+                    })}
                   </div>
                 </a>
               ) : (

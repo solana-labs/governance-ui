@@ -33,15 +33,7 @@ export function LargeCard(props: Props) {
 
   return (
     <Link passHref href={`/realm/${props.urlId}/hub`}>
-      <a
-        className={cx(
-          'block',
-          'overflow-hidden',
-          'rounded',
-          'w-[496px]',
-          props.className,
-        )}
-      >
+      <a className={cx('block', 'overflow-hidden', 'rounded', props.className)}>
         <img className="w-full" src={props.imgSrc} />
         <div className="pt-3 px-6 pb-8">
           <header className="flex items-center justify-between">
@@ -56,7 +48,9 @@ export function LargeCard(props: Props) {
                     <div className="flex items-center">
                       <TwitterIcon className="fill-sky-500 h-4 w-4 mr-1" />
                       <div className="text-sm text-neutral-700">
-                        {abbreviateNumber(hub.twitterFollowerCount)}
+                        {abbreviateNumber(hub.twitterFollowerCount, undefined, {
+                          maximumFractionDigits: 0,
+                        })}
                       </div>
                     </div>
                   ) : (
@@ -65,7 +59,9 @@ export function LargeCard(props: Props) {
               ),
             )}
           </header>
-          <div className="mt-2 text-sm text-neutral-700">{props.content}</div>
+          <div className="mt-2 text-sm text-neutral-700 line-clamp-3">
+            {props.content}
+          </div>
           <div className="mt-6 grid grid-cols-3 items-center">
             {props.stats.map((stat, i) => (
               <div

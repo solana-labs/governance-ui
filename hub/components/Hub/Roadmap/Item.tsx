@@ -92,7 +92,7 @@ export function Item(props: Props) {
             )}
           />
         )}
-        <div className="text-2xl font-semibold text-netural-900">
+        <div className="font-semibold text-netural-900 text-xl md:text-2xl">
           {props.title}
         </div>
         {props.date && (

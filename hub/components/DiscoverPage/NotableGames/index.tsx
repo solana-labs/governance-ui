@@ -62,10 +62,19 @@ export function NotableGames(props: Props) {
         token value.
       </div>
       <div
-        className={cx('grid', 'grid-cols-4', 'mt-6', 'gap-3', 'items-center')}
+        className={cx(
+          'grid',
+          'mt-6',
+          'gap-3',
+          'items-center',
+          'md:grid-cols-2',
+          'lg:grid-cols-4',
+          'xl:grid-cols-2',
+          '2xl:grid-cols-4',
+        )}
       >
         {ITEMS.map((item, i) => (
-          <div className="flex-shrink-0 max-w-[290px] h-56" key={i}>
+          <div className="flex-shrink-0 w-full 2xl:max-w-[290px] h-56" key={i}>
             <SmallCard {...item} />
           </div>
         ))}

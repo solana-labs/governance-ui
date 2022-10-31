@@ -20,24 +20,35 @@ export function DiscoverPage(props: Props) {
     <div
       className={cx(
         'gap-x-12',
-        'grid-cols-[418px,1fr]',
+        'xl:grid-cols-[418px,1fr]',
         'grid',
         '2xl:ml-[calc((100vw-1536px)/2)]',
         'overflow-x-visible',
         props.className,
       )}
     >
-      <div className="p-4">
+      <div className="hidden p-4 xl:block">
         <div className="top-[72px] sticky">
           <Sidebar
             className={cx('max-h-[calc(100vh-88px)]', 'overflow-y-auto')}
           />
         </div>
       </div>
-      <div className="py-8 w-full overflow-hidden">
+      <div
+        className={cx(
+          'overflow-hidden',
+          'pl-3',
+          'pr-3',
+          'py-8',
+          'w-full',
+          'md:pl-16',
+          'md:pr-0',
+          'xl:pl-0',
+        )}
+      >
         <Title />
         <Noteworthy className="mt-16 w-full" />
-        <div className="mt-16 pr-16 max-w-[1188px]">
+        <div className="mt-16 md:pr-16 max-w-[1188px]">
           <Hackathon />
           <Popular className="mt-16" />
           <NotableDefi className="mt-16" />
