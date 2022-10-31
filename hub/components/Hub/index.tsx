@@ -105,7 +105,7 @@ export function Hub(props: Props) {
                   {!isTwoColLayout && (
                     <div>
                       <SideCard
-                        className="mb-14"
+                        className="mb-14 max-w-lg mx-auto"
                         realm={props.realm}
                         realmUrlId={props.realmUrlId}
                       />

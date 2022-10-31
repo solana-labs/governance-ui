@@ -87,6 +87,17 @@ export function Gallery(props: Props) {
                   />
                 </AspectRatio.Root>
               </div>
+            ) : item.url.endsWith('.mp4') ? (
+              <div
+                className="rounded max-w-[85vw] md:max-w-xl overflow-hidden"
+                style={{ width: item.width }}
+              >
+                <AspectRatio.Root ratio={item.width / item.height}>
+                  <video controls>
+                    <source src={item.url} type="video/mp4" />
+                  </video>
+                </AspectRatio.Root>
+              </div>
             ) : (
               <div
                 className="rounded max-w-[85vw] md:max-w-xl overflow-hidden"
