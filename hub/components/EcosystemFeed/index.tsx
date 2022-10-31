@@ -25,7 +25,7 @@ export function EcosystemFeed(props: Props) {
   return (
     <section className={props.className}>
       <EcosystemHeader />
-      <div className="max-w-3xl mx-auto py-8 w-full">
+      <div className="max-w-3xl mx-auto py-8 w-full px-4">
         <header className="flex items-center justify-between">
           <div className="flex items-center space-x-3 text-neutral-900">
             <ListDropdownIcon className="h-5 w-5 fill-current" />

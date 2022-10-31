@@ -11,7 +11,13 @@ interface Props extends BaseProps {
 export function Content(props: Props) {
   return (
     <h1
-      className={cx(props.className, 'text-4xl', 'text-zinc-900', 'font-bold')}
+      className={cx(
+        props.className,
+        'text-2xl',
+        'sm:text-4xl',
+        'text-zinc-900',
+        'font-bold',
+      )}
     >
       {props.title}
     </h1>
@@ -23,7 +29,8 @@ export function Error(props: BaseProps) {
     <div
       className={cx(
         props.className,
-        'text-4xl',
+        'text-2xl',
+        'sm:text-4xl',
         'w-96',
         'rounded',
         'bg-neutral-200',
@@ -39,7 +46,8 @@ export function Loading(props: BaseProps) {
     <div
       className={cx(
         props.className,
-        'text-4xl',
+        'text-2xl',
+        'sm:text-4xl',
         'w-96',
         'rounded',
         'bg-neutral-200',

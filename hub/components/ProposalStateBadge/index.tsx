@@ -188,7 +188,7 @@ export function ProposalStateBadge(props: Props) {
   return (
     <div className={cx(props.className, 'flex', 'items-center', 'space-x-2')}>
       {props.state === ProposalState.Voting && props.votingEnds && (
-        <div className="flex items-center text-xs text-neutral-500 space-x-1">
+        <div className="items-center text-xs text-neutral-500 space-x-1 hidden sm:flex">
           <TimerIcon className="fill-current h-4 w-4" />
           <div>{duration}</div>
         </div>
@@ -210,11 +210,11 @@ export function ProposalStateBadge(props: Props) {
             icon.props.className,
             'fill-current',
             'h-4',
-            'mr-1',
             'w-4',
+            'sm:mr-1',
           ),
         })}
-        <div className="text-xs">
+        <div className="hidden text-xs sm:block">
           {getLabel(props.state, props.voteSubmitted)}
         </div>
       </div>
