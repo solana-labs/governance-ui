@@ -34,7 +34,18 @@ export function DiscoverPage(props: Props) {
           />
         </div>
       </div>
-      <div className="py-8 w-full overflow-hidden pl-3 md:pl-16 xl:pl-0">
+      <div
+        className={cx(
+          'overflow-hidden',
+          'pl-3',
+          'pr-3',
+          'py-8',
+          'w-full',
+          'md:pl-16',
+          'md:pr-0',
+          'xl:pl-0',
+        )}
+      >
         <Title />
         <Noteworthy className="mt-16 w-full" />
         <div className="mt-16 md:pr-16 max-w-[1188px]">

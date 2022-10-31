@@ -15,9 +15,9 @@ export function Logo(props: Props) {
       <Link passHref href="/discover">
         <NavigationMenu.Link>
           {props.compressed ? (
-            <RealmCircle className="h-8" />
+            <RealmCircle className="h-8 flex-shrink-0 z-10" />
           ) : (
-            <RealmsLogo className="h-8" />
+            <RealmsLogo className="h-8 flex-shrink-0 z-10" />
           )}
         </NavigationMenu.Link>
       </Link>
