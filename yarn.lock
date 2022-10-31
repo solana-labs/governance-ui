@@ -6594,11 +6594,6 @@
     wait-for-event "^2.0.1"
     ws "^7.4.6"
 
-"@tailwindcss/container-queries@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@tailwindcss/container-queries/-/container-queries-0.1.0.tgz#f3f0409893774f046ab2da1efd8a13105d21ec01"
-  integrity sha512-t1GeJ9P8ual160BvKy6Y1sG7bjChArMaK6iRXm3ZYjZGN2FTzmqb5ztsTDb9AsTSJD4NMHtsnaI2ielrXEk+hw==
-
 "@tailwindcss/line-clamp@^0.4.2":
   version "0.4.2"
   resolved "https://registry.yarnpkg.com/@tailwindcss/line-clamp/-/line-clamp-0.4.2.tgz#f353c5a8ab2c939c6267ac5b907f012e5ee130f9"
