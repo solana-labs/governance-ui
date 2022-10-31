@@ -251,12 +251,12 @@ export const createProposal = async (
     )
 
     const signersSet = [
-      [...prerequisiteInstructionsSigners],
+      ...chunks([...prerequisiteInstructionsSigners], 5),
       [],
       ...signerChunks,
     ]
     const txes = [
-      deduplicatedPrerequisiteInstructions,
+      ...chunks(deduplicatedPrerequisiteInstructions, 5),
       instructions,
       ...insertChunks,
     ].map((txBatch, batchIdx) => {
