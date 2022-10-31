@@ -1,4 +1,3 @@
-const containerQueries = require('@tailwindcss/container-queries')
 const lineClamp = require('@tailwindcss/line-clamp')
 
 module.exports = {
@@ -191,5 +190,5 @@ module.exports = {
       },
     },
   },
-  plugins: [containerQueries, lineClamp],
+  plugins: [lineClamp],
 }

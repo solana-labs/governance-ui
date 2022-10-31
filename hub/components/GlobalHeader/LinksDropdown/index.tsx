@@ -19,7 +19,6 @@ export function LinksDropdown(props: Props) {
   const currentPath = router.pathname;
 
   const selected = props.links.find((link) => link.href === currentPath);
-  console.log(selected);
 
   return (
     <Select.Root
