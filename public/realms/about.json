@@ -1385,6 +1385,255 @@
       }
     ]
   },
+  "6Ffasv4dQ8ZeRbZXZx2tiHcgJh5Y5VELmxnA7Qh1RWRg" : {
+    "symbol": "EmpireDAO ",
+    "heading": "Web3’s Global Home ",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "EmpireDAO is a value network of blockchain developers, entrepreneurs, creatives, and venture investors all focused on web3 adoption and community cultivation. "
+        ]
+      }
+    ]
+  },
+  "4H282CCFjstxBd651gdhAydnXcjGk956Dk7p25MqxmfN" : {
+    "symbol": "Holaplex",
+    "heading": "Holaplex provides a suite of web3 and NFT commerce solutions for businesses.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Holaplex provides a suite of blockchain and NFT products and services to power brands building new business opportunities in Web3. Holaplex makes the process of creating, selling and managing digital assets, both simple to execute and valuable for your business. Our robust suite of tools for enterprises building in Web3, are supported by a community of developers who contribute to critical open source projects we initiate."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.holaplex.com/"
+    }
+  },
+  "HsU14rpiBDC33hBsDPFQdZWaeykmKr67x3D2hA5RJRJD" : {
+    "symbol": "Metaverse Game Studios - Angelic ",
+    "heading": "",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Angelic is a dark science fiction-themed narrative strategy role-playing game with turn-based combat, taking place in a collaborative universe, enhanced with blockchain elements. It has a huge story behind it and deep characters. As you play you get to know their backgrounds and love their personalities. The setting is dark sci-fi, meaning there are no good or bad people, they all have good and bad sides. Also, you don't control one character, you control a team, and each has a different part to play for you to succeed in the game. You need to learn to play with all characters to master the game.",
+          "Through blockchain implementation, Angelic players will be able to securely trade hero skin nonfungible tokens, ships, and other items with other players. The decentralized autonomous organization mechanism will facilitate true ownership, autonomy, and voting rights to shape the outcome of Angelic’s evolving story and even the game’s development. They can contribute to the Angelic universe by creating content and even earn money along the way if they choose, all without affecting game balance."
+        ]
+      }
+    ]
+  },
+  "AvpoeRXmbfrtkF9NQvWkcN4LbWmQHy3ntWnYudEUdU3N" : {
+    "symbol": "Blockasset",
+    "heading": "Licensed athlete token, NFT & social platform.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "WHAT IS BLOCKASSET?\nBlockasset is an Athlete Social Token platform, built on Solana.",
+          "Blockasset athlete tokens are a shared asset controlled by fans and athletes alike. They allow fans direct access to the athlete’s experience with features that incentivize athletes to grow and reward their fanbase.",
+          "Blockasset has a number of world-famous athletes on board, including sporting Legends Wayne Rooney, Michael Bisping and Alex Ovechkin all of whom are partners & investors, and superstars like Khamzat Chimaev of the UFC and Heavyweight Boxing Champion Oleksandr Usyk, plus over 30 more athletes that are yet to be announced.",
+          "WHAT IS THE BLOCK TOKEN?\nBlockasset allows fans to invest directly into their favourite athletes through the BLOCK token, the main trading pair for all athlete tokens. Additionally, fans can use BLOCK token to access athlete IDOs via the Athlete Launchpad, think DAO Maker or Binance Launchpad, but for Athlete Social Tokens.",
+          "HOW DOES IT WORK?\nUsing an intuitive and interactive social platform, seasoned crypto investors and first-timers alike can easily buy, sell and trade athlete tokens, attaching their investments directly to athlete experiences, NFTs, media and governance. BLOCK acts as the gateway to all athlete tokens.",
+          "Fans can stake their tokens to access unique perks, including athlete governance voting, exclusive content and bonus rewards when their athlete celebrates a specific victory or milestone in their career. Meaning fans and athletes can mutually benefit from an athlete’s success.",
+          "Fans will be able to spend their athlete tokens on the athlete’s own ‘Experience Store’, where fans can purchase priceless experiences and items directly from the athlete, from Facetimes to sporting event watch parties with the athlete and other fans, training videos, signed memorabilia, real-life meetups and so much more. Via the governance system, fans can even vote on what they want to see in the experience store.",
+          "When a fan purchases an experience, a percentage goes directly to the athlete, and the remainder is burned, removed from the circulating supply. As a result, the more experiences the athletes offer, and the more fans engage, the more tokens are burned, and with this comes more demand, creating a healthy token economy for all involved.",
+          "Blockasset puts an athlete’s brand back in control of the two most interested parties—the athlete and their fans."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://blockasset.gitbook.io/whitepaper/blockasset-whitepaper"
+    }
+  },
+  "FxccMsauuC2KSsWMvrTytm2eP18oRr1HC1VLCaWEysAR" : {
+    "symbol": "Aten",
+    "heading": "A Solana native eCommerce platform!",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Aten is an eCommerce marketplace on Solana. We offer a seamless, no-code onboarding experience, with countless features for you to grow your business in the Web3 space.",
+          "Some of our key features are:\n- Crypto payments via Solana Pay\n- Fiat (credit card) payments via Stripe\n- SPL token support such as $USDC, $SAMO, $DUST, $STEP, $mSOL\n- Real-time pricing\n- NFT gating\n- Redeemable items via NFT\n- Web2 and Web3 platform integrations to offer the best of both worlds to our merchants"
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://aten-solana.gitbook.io/aten/"
+    }
+  },
+  "4pAWUQBEvSo5sAeKt2bT8htJXy55J4inJDQhzwDcHWv3" : {
+    "symbol": "Virtual Basketball Association (VBA)",
+    "heading": "Own and manage a virtual basketball team. Build your roster of players and compete to win cash rewards in live basketball games.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "In the VBA you instantly take ownership of your very own virtual basketball franchise. VBA combines the best aspects of strategic manager games and fantasy sports into a new basketball experience. You get to build your roster, improve your team and compete to win cash rewards. In the VBA, it’s always game-day, 365 days a year - welcome to Instant Fantasy Basketball."
+        ]
+      }
+    ]
+  },
+  "GL54h53j3KAJZ8AqihMo4H48DgRR8nmSwXxSz1ALTGXg" : {
+    "symbol": "Ostium",
+    "heading": "A decentralized synthetic asset protocol bringing commodity markets on-chain.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Ostium is a decentralized synthetic asset protocol bringing commodities and other real-world assets on-chain. "
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://ostium-defi.notion.site/Ostium-Documentation-2a6dba08e90d4c41b4118a8af7632579"
+    }
+  },
+  "EVsSaLkZbnekEnVeMsYEKtj2gYxcuaVYjGLUhVXzKTA9" : {
+    "symbol": "01 Exchange",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Most powerful decentralized digital assets exchange, with perpetual futures, and power perpetuals."
+        ]
+      }
+    ]
+  },
+  "EAyrTrS4fEkCCXtbn3qFEtv4LzocYMqeVGYKW7syPt6Y" : {
+    "symbol": "Drippieverse",
+    "heading": "Bridging fashion and Web3 through a collection of vibey creatures",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Drippies™ is a vibey collection of NFTs on Solana that combine beautiful art with a passion for community, fashion, culture, utility & education. Aiming to educate people about the Web 3.0 space and fostering a community of likeminded people. Drippies™ aims to provide long term value combining digital & physical experiences.",
+          "Each Drippies™ NFT is a unique combination of beautiful handcrafted traits and comes with full commercial IP rights for the owner. Offering a wholesome and supportive community where people can learn and grow together. Exclusive workshops from industry professionals, regular giveaways & airdrops as well as physical items offer unparalleled utility & value."
+        ]
+      }
+    ]
+  },
+  "8PaQWLgqMyF6oxhteahuhvKag2RcbedsRuy2jMFJoLzU" : {
+    "symbol": "Degen Legends ",
+    "heading": "Degen Legends is esports & investment gaming organization, born in the heart of the web3 gaming revolution. ",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Degen Legends, previously known as 3D Gamers Guild, was formed by a collective of web2 pro gamers & content creators, crypto & NFT degens here to build a new era of Web 3 gaming culture.",
+          "Our mission at Degen Legends is our movement. We’re building a brand that proudly represents the crypto community & web2 gamers to the gaming world.",
+          "Our community is a group of gamers, poker players, traders & builders in the gaming ecosystem, which powers our content, esports & investment brand, linked to our project with our NFT & Token ecosystem.",
+          "Our front facing brand is a content & esports organization focused on building out web3 gaming.",
+          "Our backend is powered by our  venture capital arm, which we invest into games at highly discounted prices (seed round), and build out games exposure through our community, content & esports. We then provide the assets to our community through our token, which can be earned by staking your NFT or completing missions for us through our gamified mission ecosystem."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://twitter.com/DegenLegends/status/1578460492560941056?s=20&t=_LU0jrtzc-4pZ9jhPRPE0A"
+    }
+  },
+  "GMpWmXc3sKejmAcAFpcQ4NgCL9Fx3gFR2FeepNUtK5Mh" : {
+    "symbol": "Francium",
+    "heading": "Francium is a DeFi yield strategy Platform on Solana. Granted by Solana & Serum.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Francium is a DeFi yield strategy platform built on Solana. Francium offers a variety of strategies for both users and strategy builders. We offer automated strategies including Leveraged Farming / Hedge Farming, DeFi Combination Strategies, and Smart Trading Strategies to the users. For strategy builders, Francium will offer DeFi automation toolset which comprises of DeFi Automation Framework, Strategy Dev Toolset, and Standard SDK."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.francium.io/"
+    }
+  },
+  "9dvvWxLNRv2HWRkc1FJdgpXuF9fDRZMsCbw6vTdHbp5" : {
+    "symbol": "Ora",
+    "heading": "The Search Engine for Blockchains",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Ora is the search engine for blockchain data. Users can easily traverse on-chain transactions with natural language and attribute filters. Our vision is to make querying a blockchain as easy as a Google search."
+        ]
+      }
+    ]
+  },
+  "DdNEw88N8VTeYfvxdLBwQ9aR4trejTUapGZRGdaMqyNY" : {
+    "symbol": "Contribute",
+    "heading": "Connect your Solana wallet to join a gated-access group chat with other, verified NFT collection holders.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Contribute is building an ecosystem that gives NFT collection owners full control of their community while eliminating manual processes to verify NFT ownership through Solana wallet gated-access.",
+          "Through hosting the NFT community chats on Contribute, the NFT collection owners require NFT holders to login using their SOL wallet in order to join NFT community chats. NFT collection owners are required to claim ownership, which Contribute shall verify through cross-checking their wallet addresses.",
+          "In doing so, NFT collection owners can avoid administrative hustles in verifying the authenticity of NFT holders.",
+          "In addition, hosting a NFT community on Contribute will avoid spamming accounts from accessing your community and all of its chatrooms within, while limiting security challenges."
+        ]
+      }
+    ]
+  },
+  "2XsZGq4GJoaQ7dC91yWuneq4U9VK3wE6XJ185a4D7fwe" : {
+    "symbol": "Artivive",
+    "heading": "Artivive is the AR art platform onboarding 200.000 artists to WEB3",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Artivive is defining the art form of the 21st century by building the community around creative augmented reality. With 200k creators from 190 countries, we have the 3rd biggest creator community after Facebook and Snapchat."
+        ]
+      }
+    ]
+  },
+  "AH4qTqRFcoNqmYEi7p8heAGVSPHfJrNUPa8DvjDnBsf3" : {
+    "symbol": "Carpool",
+    "heading": "Backend as a Service for Solana Developers",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Your team needs to focus on creating the best product for your users, not wiring up backend infrastructure for your basic needs. Carpool is Firebase for Solana developers. Our backend as a service will have you building better dapps faster and cheaper. We provide custom data APIs, automated alerting and PagerDuty integrations, metrics, and more. Onboard your contracts in 30 seconds, get the tools you need, and just build."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://carpool-dev.notion.site/carpool-dev/Carpool-Documentation-76d152f84e004371b18470f4382bd40d"
+    }
+  },
+  "58axqgJSAEK3adKL5hx5dYoRqkYMEiEXQZqk9FFFpa7f" : {
+    "symbol": "Solana Spaces",
+    "heading": "Experience the World of Solana. IRL.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Welcome to the first immersive Web3 learning space, where you can explore the ecosystem of Solana and learn about blockchains. All while earning rewards."
+        ]
+      }
+    ]
+  },
+  "54owXqUwmzR18h4NY6VEp45SNp6qtJUfByDeQuHenhgK" : {
+    "symbol": "Portals",
+    "heading": "Build your space in the Metaverse",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "A browser-based metaverse, Portals is an immersive social space where you can explore, make your own, and gather with others."
+        ]
+      }
+    ]
+  },  
   "8HZ4V94dtojrTpdUpWrfstr7bEhRnZZHn8jotfns9L9x" : {
     "symbol": "Ratio Finance",
     "heading": "Our mission at Ratio Finance is to De-Risk DeFi for all.",
