@@ -52,7 +52,7 @@ const Realms = () => {
     if (selectedRealm.realm) {
       actions.deselectRealm()
     }
-  }, [connection])
+  }, [connection.cluster, connection.endpoint, connection.current.commitment])
 
   const handleCreateRealmButtonClick = async () => {
     if (!connected) {

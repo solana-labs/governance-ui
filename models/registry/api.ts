@@ -173,7 +173,7 @@ export async function getUnchartedRealmInfos(connection: ConnectionContext) {
   ).map((p) => {
     return p.programId
   })
-  getRealms(connection.current, programIds)
+
   const allRealms = (
     await getRealms(connection.current, programIds)
   ).sort((r1, r2) => r1.account.name.localeCompare(r2.account.name))
