@@ -88,6 +88,8 @@ Args): Promise<UiInstruction> {
       treasury,
       mint,
       amount,
+      instructions1: transaction1.instructions,
+      instructions2: transaction2.instructions,
     })
     transaction1.instructions.map((i) =>
       additionalSerializedInstructions.push(serializeInstructionToBase64(i))
@@ -100,7 +102,8 @@ Args): Promise<UiInstruction> {
       isValid: true,
       governance: governedTokenAccount?.governance,
       additionalSerializedInstructions,
-      shouldSplitIntoSeparateTxs: false,
+      chunkSplitByDefault: true,
+      chunkBy: 1,
     }
     return obj
   }
@@ -110,8 +113,8 @@ Args): Promise<UiInstruction> {
     isValid,
     governance: governedTokenAccount?.governance,
     additionalSerializedInstructions,
-    shouldSplitIntoSeparateTxs: true,
+    chunkSplitByDefault: true,
+    chunkBy: 1,
   }
-
   return obj
 }
