@@ -158,7 +158,7 @@ export function Noteworthy(props: Props) {
               'flex-shrink-0',
               'snap-start',
               'pr-6',
-              'w-[93vw]',
+              'w-[90vw]',
               'md:max-w-[496px]',
             )}
             key={i}
