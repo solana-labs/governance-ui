@@ -428,7 +428,11 @@
     "about": [
       {
         "heading": "Introduction",
-        "content": ["Unique VC is the ultimate platform for:"]
+        "content": [
+          "Unique Venture Clubs (Unique.vc) is a platform that allows web3 investors, communities, and founders to raise funds, manage assets, and execute their investments on-chain.",
+          "We believe that blockchain technology can make the governance of your entity and funds more efficient and transparent."/
+          "Unique VC is the ultimate platform for:"
+        ]
       },
       {
         "content": [
