@@ -31,9 +31,7 @@ export default function getNumTokens(
   const isPyth = realmInfo?.realmId.toBase58() === PYTH_REALM_ID.toBase58()
 
   if (isPyth && ownVoterWeight.votingPower) {
-    return new BigNumber(
-      new PythBalance(ownVoterWeight.votingPower).toBN().toString()
-    )
+    return new BigNumber(new PythBalance(ownVoterWeight.votingPower).toString())
   }
 
   if (depositTokenRecord && mint) {

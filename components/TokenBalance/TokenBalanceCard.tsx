@@ -24,7 +24,7 @@ import { approveTokenTransfer } from '@utils/tokens'
 import Button, { SecondaryButton } from '../Button'
 import { Option } from '@tools/core/option'
 import { GoverningTokenRole } from '@solana/spl-governance'
-import { fmtMintAmount } from '@tools/sdk/units'
+import { fmtMintAmount, getMintDecimalAmount } from '@tools/sdk/units'
 import { getMintMetadata } from '../instructions/programs/splToken'
 import { withFinalizeVote } from '@solana/spl-governance'
 import { chunks } from '@utils/helpers'
@@ -35,7 +35,7 @@ import { useEffect, useState } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { vsrPluginsPks } from '@hooks/useVotingPlugins'
-import { REALM_ID as PYTH_REALM_ID, PythBalance } from 'pyth-staking-api'
+import { REALM_ID as PYTH_REALM_ID } from 'pyth-staking-api'
 import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 import SerumGovernanceTokenWrapper from './SerumGovernanceTokenWrapper'
 import getNumTokens from '@components/ProposalVotingPower/getNumTokens'
@@ -184,8 +184,8 @@ export const TokenDeposit = ({
 
   const max: BigNumber =
     councilMint && tokenRole === GoverningTokenRole.Council
-      ? new BigNumber(councilMint.supply.toString())
-      : new BigNumber(mint.supply.toString())
+      ? getMintDecimalAmount(councilMint, councilMint.supply)
+      : getMintDecimalAmount(mint, mint.supply)
 
   const depositTokenRecord =
     tokenRole === GoverningTokenRole.Community
@@ -411,7 +411,7 @@ export const TokenDeposit = ({
   const isPyth = realmInfo?.realmId.toBase58() === PYTH_REALM_ID.toBase58()
 
   const availableTokens = isPyth
-    ? new PythBalance(ownVoterWeight.votingPower!).toString()
+    ? fmtMintAmount(mint, ownVoterWeight.votingPower!)
     : depositTokenRecord && mint
     ? fmtMintAmount(
         mint,
@@ -438,6 +438,7 @@ export const TokenDeposit = ({
       config?.account.communityTokenConfig.voterWeightAddin.toBase58()
     ) &&
     tokenRole === GoverningTokenRole.Community
+
   return (
     <TokenDepositWrapper inAccountDetails={inAccountDetails}>
       {inAccountDetails && (
@@ -457,7 +458,7 @@ export const TokenDeposit = ({
                 </p>
               </div>
             </div>
-            {Number(availableTokens) > 0
+            {amount > new BigNumber(0)
               ? max &&
                 !max.isZero() && <VotingPowerPct amount={amount} total={max} />
               : null}
