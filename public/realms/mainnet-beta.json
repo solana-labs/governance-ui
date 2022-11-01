@@ -8,7 +8,7 @@
     "ogImage": "/realms/Ukraine/img/Ukraine_Logo.png",
     "sharedWalletId": "66pJhhESDjdeBBDdkKmxYYd7q6GUggYPWjxpMKNX39KV",
     "sortRank": 3
-  },
+  },  
   {
     "symbol": "MNGO",
     "displayName": "Mango DAO",
@@ -71,12 +71,19 @@
   },
   {
     "symbol": "SERUM",
-    "displayName": "Serum DAO (CURRENT)",
+    "category": "defi",
+    "bannerImage": "https://ibb.co/CVsJcdd",
+    "displayName": "Project Serum",
     "programId": "AVoAYTs36yB5izAaBkxRG67wL1AMwG3vo41hKtUSb8is",
     "realmId": "3MMDxjv1SzEFQDKryT7csAvaydYtrgMAc3L9xL9CVLCg",
-    "website": "https://www.projectserum.com/",
-    "ogImage": "https://assets.website-files.com/61284dcff241c2f0729af9f3/61285237ce2e301255d09108_logo-serum.png"
-  },
+    "ogImage": "https://ibb.co/xSLWtPW",
+    "shortDescription": "Faster, Cheaper and more Powerful DeFi",
+    "sortRank": 3,
+    "website": "https://projectserum.com",
+    "twitter": "@ProjectSerum",
+    "discord": "https://discord.gg/KGZS5HRAfF",
+    "github": "https://github.com/project-serum"
+  },   
   {
     "symbol": "SERUM2",
     "displayName": "Serum DAO (NEW)",
@@ -86,6 +93,36 @@
     "website": "https://www.projectserum.com/",
     "ogImage": "https://assets.website-files.com/61284dcff241c2f0729af9f3/61285237ce2e301255d09108_logo-serum.png"
   },
+  {
+    "symbol": "Eternal Dragons",
+    "category": "gaming",
+    "bannerImage": "https://drive.google.com/drive/folders/10d8BSI134sKoUurmx49Eq48zq7YBt3pi",
+    "displayName": "Eternal Dragons",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "9pLvqBe2CxC4HXQD5UQ7YLpQUqC5A9SqU4kNqw9inbNQ",
+    "ogImage": "https://drive.google.com/drive/folders/10d8BSI134sKoUurmx49Eq48zq7YBt3pi",
+    "shortDescription": "Eternal Dragons is a Web3 gaming series brought to you by Trailblazer Games, telling the story of the long-lost Eternal Dragons.",
+    "sortRank": 3,
+    "website": "Eternaldragons.com",
+    "twitter": "@EternalDragons_",
+    "discord": "https://discord.com/invite/eternaldragons",
+    "github": "https://github.com/trailblazer-games/"
+  }, 
+  {
+    "symbol": "Tulip",
+    "category": "defi",
+    "bannerImage": "https://tulipprotocol.notion.site/Banner-09b31f16649f4c3ea33351aea0a2ee93",
+    "displayName": "Tulip",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "413KSeuFUBSWDzfjU9BBqBAWYKmoR8mncrhV84WcGNAk",
+    "ogImage": "https://www.notion.so/tulipprotocol/Logo-with-Dark-BG-900ea3bb50f54bf399d9d5ce28f6c6d1",
+    "shortDescription": "Solana's Yield Aggregation Homestead",
+    "sortRank": 3,
+    "website": "https://tulip.garden/",
+    "twitter": "@TulipProtocol",
+    "discord": "https://discord.com/invite/tulip",
+    "github": "https://github.com/sol-farm"
+  }, 
   {
     "symbol": "MDLH",
     "displayName": "The Mysterious Death of Lord Harrington",
@@ -444,13 +481,19 @@
   },
   {
     "symbol": "MNDE",
+    "category": "defi",
+    "bannerImage": "https://drive.google.com/file/d/1uY0NrzQMs2lpjhzOpukg5K_lhHvf9Bzj/view",
     "displayName": "Marinade.Finance",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "3gmcbygQUUDgmtDtx41R7xSf3K4oFXrH9icPNijyq9pS",
-    "ogImage": "/realms/MNDE/img/mnde_logo.png",
+    "ogImage": "https://drive.google.com/file/d/11kyGgaLWLI-UR0JGmmSYlVJTAylvrg0G/view",
+    "shortDescription": "Secure Solana and earn rewards without your funds locked in.",
+    "sortRank": 3,
     "website": "https://marinade.finance/",
-    "twitter": "@marinadefinance"
-  },
+    "twitter": "@marinadefinance",
+    "discord": "https://discord.com/invite/6EtUf4Euu6",
+    "github": "https://github.com/marinade-finance"
+  },   
   {
     "symbol": "COCK",
     "displayName": "Chicken Tribe",
@@ -540,14 +583,20 @@
   },
   {
     "symbol": "FIDA",
+    "category": "web3",
+    "bannerImage": "https://drive.google.com/file/d/12uXUOmakVuWT0jcbWLjhBv8DdPyxJydb/view?usp=sharing",
     "displayName": "Bonfida DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "6NzVDMfEBJvkFDnjPx53K7mLGW3yQdSjLhsamS8go4cn",
-    "website": "https://bonfida.org",
-    "keywords": "Bonfida, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
+    "ogImage": "https://drive.google.com/file/d/176VtW0oUDCbcEV9aRysd_am2HYr7O93K/view?usp=sharing",
+    "shortDescription": "Bonfida has a simple, yet realistic goal of providing products and services that will enhance the Solana blockchain experience. ",
+    "sortRank": 3,
+    "website": "https://bonfida.org/",
     "twitter": "@bonfida",
-    "ogImage": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTYiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA1NiA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTI4IDRMMjguMDE1NCAxNy4xMDAzIiBzdHJva2U9IndoaXRlIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CjxwYXRoIGQ9Ik01Mi40NjAzIDQ2LjAxMDNMNDEuMzIzMSAzOS40NTUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPHBhdGggZD0iTTQuMDk4OTQgNDYuMDEwM0wxNS4yMzYxIDM5LjQ1NSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8cGF0aCBkPSJNMjguMDA4NyAzMi4wMTA5TDE1IDI0LjQ4OThMMjguMDA4NyAxNi45NzE5TDQxIDI0LjUyMDZMMjguMDA4NyAzMi4wMTA5WiIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPHBhdGggZD0iTTI4LjAyMDcgNDYuOTY5TDE1LjAxNjcgMzkuNTA1N0wxNSAyNC40ODk4TDI4LjAyMDcgMzIuMDEwOVY0Ni45NjlaIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPHBhdGggZD0iTTI4IDQ2Ljk2OUw0MS4wMDMzIDM5LjUzOTFWMjQuNTIwNkwyOCAzMi4wMTA5VjQ2Ljk2OVoiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8cGF0aCBkPSJNNTIgNDYuMDEwMlYxOC4wMzIxTDI3Ljk5OTcgNC4wNDIzNkw0IDE4LjAzMjFWNDYuMDEwMkwyNy45OTk3IDU5Ljk5OTlMNTIgNDYuMDEwMloiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLW1pdGVybGltaXQ9IjEwIi8+CjxwYXRoIGQ9Ik0yOC4wMDAxIDMyLjA0NTZMMjcuMjQzOCAzMy4zNDFMMjcuOTk4OCAzMy43ODE4TDI4Ljc1NDUgMzMuMzQyMUwyOC4wMDAxIDMyLjA0NTZaTTMuMjgyODkgMTkuMzUxOEwyNy4yNDM4IDMzLjM0MUwyOC43NTY0IDMwLjc1MDJMNC43OTU0OCAxNi43NjExTDMuMjgyODkgMTkuMzUxOFpNMjguNzU0NSAzMy4zNDIxTDUyLjc5MzYgMTkuMzUyOUw1MS4yODQ3IDE2Ljc2TDI3LjI0NTYgMzAuNzQ5MkwyOC43NTQ1IDMzLjM0MjFaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMjggMzIuMDQ1N1Y1OS45OTk5IiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1taXRlcmxpbWl0PSIxMCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+Cjwvc3ZnPgo="
-  },
+    "keywords": "Bonfida, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",    
+    "discord": "discord.gg/tusXFZXGTV ",
+    "github": "https://github.com/Bonfida"
+  },     
   {
     "symbol": "N&F",
     "displayName": "Nick & Family",
@@ -964,14 +1013,19 @@
   },
   {
     "symbol": "SLND",
+    "category": "defi",
+    "bannerImage": "",
     "displayName": "Solend DAO",
     "programId": "A7kmu2kUcnQwAVn8B4znQmGJeUrsJ1WEhYVMtmiBLkEr",
     "realmId": "7sf3tcWm58vhtkJMwuw2P3T6UBX7UE5VKxPMnXJUZ1Hn",
-    "ogImage": "https://solend-image-assets.s3.us-east-2.amazonaws.com/1280-circle.png",
-    "website": "https://solend.fi/",
+    "ogImage": "https://drive.google.com/file/d/1fmDai8W7NaWkiH1SxIdicufN0ctxTN5x/view?usp=sharing",
+    "shortDescription": "Solend is the autonomous interest rate machine for lending on Solana",
+    "sortRank": 2,
+    "website": "https://solend.fi",
     "twitter": "@solendprotocol",
-    "sortRank": 2
-  },
+    "discord": "https://discord.gg/solend",
+    "github": "https://github.com/solendprotocol"
+  },  
   {
     "symbol": "FSGOV",
     "displayName": "Flipside Governance",
@@ -1091,13 +1145,19 @@
   },
   {
     "symbol": "MEAN",
+    "category": "daotools",
+    "bannerImage": "https://drive.google.com/drive/folders/1zm8v8cB3k3yITJI2ZsPkbt4--Mz0q7DY?usp=sharing",
     "displayName": "MEAN DAO",
     "programId": "MGovW65tDhMMcpEmsegpsdgvzb6zUwGsNjhXFxRAnjd",
     "realmId": "5o6gEoeJBpuXT1H1ijFTq3KcSGx7ayabdG2hji7cB3FG",
-    "website": "https://www.meanfi.com",
+    "ogImage": "https://drive.google.com/drive/folders/1zm8v8cB3k3yITJI2ZsPkbt4--Mz0q7DY?usp=sharing",
+    "shortDescription": "Mean DAO is a protocol DAO offering Real-time payment infrastructure and Multisig to retail and businesses.",
+    "sortRank": 3,
+    "website": "www.meanfi.com",
     "twitter": "@meanfinance",
-    "ogImage": "/realms/MEAN/logo.svg"
-  },
+    "discord": "https://discord.com/invite/8P4vK6SWz3",
+    "github": "https://github.com/mean-dao"
+  },   
   {
     "symbol": "ANTLERDAO",
     "displayName": "AntlerDAO",
