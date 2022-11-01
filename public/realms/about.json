@@ -2131,5 +2131,72 @@
         ]
       }
     ]
+  },
+  "2pJND9oPC1F4yWrBsxTDpmMcg6BbFSwvcu1kExBkbVDU": {
+    "symbol": "Bridgesplit",
+    "heading": "Bridgesplit is tokenization infrastructure for complex on & off-chain assets, powering indexes, tranching, lending and more.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Bridgesplit provides tokenization and financial infrastructure for complex assets, powering indexes, tranching, fractionalization, lending, and more. Bridgesplit facilitates $10M/month in digital asset volume and has expanded to support off-chain assets, working with institutions originating assets like commercial loans and climate credits."
+        ]
+      },
+      {
+        "content": [
+          "This infrastructure is a network of engines that enabling assets to be pooled, tranched, and fractionalized to create liquidity and composability for otherwise difficult to financialize assets. The network also includes plug-and-play financial products, like money-market lending and derivatives that leverage the global settlement layer of these tokenized assets."
+        ]
+      },
+      {
+        "content": [
+          "One of the larger applications on Bridgesplit is Elixir (https://app.elixirnft.io), a leading marketplace on Solana. Elixir allows users to trade NFTs as if it were a traditional marketplace, but all listings are powered by Bridgesplit pools. This liquidity enables new functionality like instant sales, partial ownership and dollar-cost-averaging, and margin purchases of NFTs."
+        ]
+      },
+      {
+        "content": [
+          "Beyond the native on-chain uses, the infrastructure supports off-chain assets compliantly, working with institutions and firms originating cash-flow or equity assets. Projects building on Bridgesplit include a commercial loan syndication protocol and an energy credit marketplace. To learn more about projects building on Bridgesplit in the off-chain asset space, visit https://turnpool.com."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.bridgesplit.com"
+    },
+    "resources": [
+      {
+        "title": "NFT Financialization Platform Bridgesplit Announces $4.25M Raise Led by CoinFund and Jump Capital",
+        "content": [
+          "Bridgesplit, the first non-fungible token (NFT) financialization platform built on the Solana blockchain, today announced a $4.5 million seed round led by CoinFund and Jump Capital."
+        ],
+        "url": "https://finance.yahoo.com/news/nft-financialization-platform-bridgesplit-announces-140000134.html"
+      },
+      {
+        "title": "Introducing Bridgesplit",
+        "content": [
+          "Gm. Welcome to the era of financial, artistic, and functional derivatives for NFTs."
+        ],
+        "url": "https://medium.com/bridgesplit/introducing-bridgesplit-e505b08a6f47"
+      }
+    ],
+    "team": [
+      {
+        "name": "Luke Truitt",
+        "avatar": "https://pbs.twimg.com/profile_images/1583244835263234051/mIv58r5f_400x400.jpg",
+        "description": [
+          "Luke is a Duke University Computer Engineering and Economics graduate with a professional background in Quant Trading and Software Engineering. Before Bridgesplit, he co-founded and sold a defense contracting business and spent time at Cruise as an ML engineer and Optiver as a Quantitative Trader."
+        ],
+        "role": "Co-Founder",
+        "twitter": "@TruittLuke"
+      },
+      {
+        "name": "Mary Gooneratne",
+        "avatar": "https://pbs.twimg.com/profile_images/1580344716440248322/kd0fXv5U_400x400.jpg",
+        "description": [
+          "Mary is a Duke University Computer Engineering graduate with a professional background in Product and Machine Learning. Before Bridgesplit, she co-founded and sold a defense contracting business and spent time at Salesforce as a product manager and Google as an AI researcher."
+        ],
+        "role": "Co-Founder",
+        "twitter": "@marygooneratne"
+      }
+    ]
   }
 }
