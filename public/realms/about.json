@@ -422,13 +422,18 @@
   },
   "HoSfB5xCk8oXRgmspugAx3yRgii8MezimDMfMVK4krBS": {
     "symbol": "Zeta Markets",
-    "heading": "Zeta is the number one decentralised access layer for on chain optionality and perpetual contracts",
+    "heading": "Zeta is the number one decentralized universal access derivatives layer for web3.",
     "about": [
       {
         "heading": "Introduction",
         "content": [
-          "Zeta's flagship product is a capital efficient decentralised exchange offering perpetual contracts, European cash settled options and dated futures. The entire program has been built on Solana, including its risk engine and order book, making it the most composable full stack decentralised exchange in the world. The Zeta DEX has been live on Solana since January 2022, bootstrapped by some of the most experienced experts in cryptocurrency trading and decentralized finance, including Jump Crypto, Alameda Research, Wintermute, Pattern Research, and LedgerPrime.",
-          "Generalised Options Infrastructure for Solana\nIn addition to the Zeta DEX, our expertise in options and financial technology have enabled us to build a range of exotic tokenised option structures on chain, used by some of the biggest brands in DeFi including Ribbon Finance for on chain structured products. Our tools and infrastructure make it easy for developers to build on chain agreements between counter-parties, allowing them to create defi products that are enforced entirely on chain."
+          "Zeta's flagship product is a capital efficient decentralised exchange offering perpetual contracts, European cash settled options and dated futures. The entire program has been built on Solana, including its risk engine and order book, making it the most composable full stack decentralised exchange in the world. The Zeta DEX has been live on Solana since January 2022, bootstrapped by some of the most experienced experts in cryptocurrency trading and decentralized finance, including Jump Crypto, Alameda Research, Wintermute, Pattern Research, and LedgerPrime."
+        ]
+      },
+      {
+        "heading": "Generalised Options Infrastructure for Solana",
+        "content": [
+          "In addition to the Zeta DEX, our expertise in options and financial technology have enabled us to build a range of exotic tokenised option structures on chain, used by some of the biggest brands in DeFi including Ribbon Finance for on chain structured products. Our tools and infrastructure make it easy for developers to build on chain agreements between counter-parties, allowing them to create defi products that are enforced entirely on chain."
         ]
       }
     ],
