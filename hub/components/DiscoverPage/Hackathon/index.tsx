@@ -20,34 +20,36 @@ export const ITEMS = [
     urlId: 'Dual%20Finance',
   },
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
+    bannerImgSrc:
+      'https://worldtop.mypinata.cloud/ipfs/QmfA63uoZe8Dh5drYS7haQXJAMETovkoVCxS2MjcMHPPSA',
     category: RealmCategory.Web3,
     description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+      'BlockLive is fast, easy, transparent way to buy and sell live event tickets that you can hold onto for a lifetime.',
+    iconImgSrc:
+      'https://worldtop.mypinata.cloud/ipfs/QmXbMPq3Js6iJx6guEZsB8PaAPX6vB1Fr5wMRQnLavoUQk',
+    name: 'BlockLive',
+    publicKey: new PublicKey('G43QB1csngJDWBhrBCba5tbVcxcPHhGNtGkqfntfP6fg'),
+    urlId: 'BlockLive',
   },
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
+    bannerImgSrc: 'https://i.imgur.com/Nk2lRMv.jpg',
     category: RealmCategory.Web3,
-    description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+    description: 'The Search Engine for Blockchains',
+    iconImgSrc: 'https://i.imgur.com/dwuDf3u.jpg',
+    name: 'Ora',
+    publicKey: new PublicKey('9dvvWxLNRv2HWRkc1FJdgpXuF9fDRZMsCbw6vTdHbp5'),
+    urlId: 'Ora',
   },
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
-    category: RealmCategory.Web3,
+    bannerImgSrc: 'https://i.imgur.com/PwBA2It.png',
+    category: RealmCategory.Gaming,
     description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+      'Building #Games4Good powered by Blockchain Technology on Solana and Celo',
+    iconImgSrc:
+      'https://intotheverse.xyz/static/media/logo.f2cbbe9e72f20f3706c979e20e711a96.svg',
+    name: 'IntoTheVerse',
+    publicKey: new PublicKey('22nDweMdSCCDoCMFUoS8Zgv7jnZxpLuqGrkL3cmSwuU3'),
+    urlId: 'IntoTheVerse',
   },
   {
     bannerImgSrc: '/realms/RCH/banner.png',

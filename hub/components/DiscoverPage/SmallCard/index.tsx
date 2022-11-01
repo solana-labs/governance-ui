@@ -68,6 +68,8 @@ export function SmallCard(props: Props) {
           'overflow-hidden',
           'relative',
           'h-full',
+          'transition-transform',
+          'active:scale-95',
           props.className,
         )}
       >
@@ -133,11 +135,71 @@ export function SmallCard(props: Props) {
             )}
           </header>
           {props.category && (
-            <div className="flex items-center text-neutral-500">
-              {cloneElement(getCategoryIcon(props.category), {
-                className: cx('h-3', 'w-3', 'fill-current', 'mr-1'),
-              })}
-              <div className="text-xs">{getCategoryName(props.category)}</div>
+            <div className="grid items-center grid-cols-[1fr,max-content] gap-x-2">
+              <div className="flex items-center text-neutral-500 w-full">
+                {cloneElement(getCategoryIcon(props.category), {
+                  className: cx(
+                    'h-3',
+                    'w-3',
+                    'fill-current',
+                    'flex-shrink-0',
+                    'mr-1',
+                  ),
+                })}
+                <div className="text-xs truncate">
+                  {getCategoryName(props.category)}
+                </div>
+              </div>
+              {props.compressable &&
+                (typeof props.twitterFollowerCount === 'number' ? (
+                  !!props.twitterFollowerCount ? (
+                    <div
+                      className={cx(
+                        'items-center',
+                        props.compressable && 'flex md:hidden',
+                      )}
+                    >
+                      <TwitterIcon className="fill-sky-500 h-3 w-3 mr-1" />
+                      <div className="text-xs text-neutral-700">
+                        {abbreviateNumber(
+                          props.twitterFollowerCount,
+                          undefined,
+                          {
+                            maximumFractionDigits: 0,
+                          },
+                        )}
+                      </div>
+                    </div>
+                  ) : null
+                ) : (
+                  pipe(
+                    result,
+                    RE.match(
+                      () => null,
+                      () => null,
+                      ({ hub }) =>
+                        hub.twitterFollowerCount ? (
+                          <div
+                            className={cx(
+                              'items-center',
+                              props.compressable && 'flex md:hidden',
+                            )}
+                          >
+                            <TwitterIcon className="fill-sky-500 h-3 w-3 mr-1" />
+                            <div className="text-xs text-neutral-700">
+                              {abbreviateNumber(
+                                hub.twitterFollowerCount,
+                                undefined,
+                                {
+                                  maximumFractionDigits: 0,
+                                },
+                              )}
+                            </div>
+                          </div>
+                        ) : null,
+                    ),
+                  )
+                ))}
             </div>
           )}
           <div

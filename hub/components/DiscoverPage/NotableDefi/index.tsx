@@ -6,31 +6,33 @@ import cx from '@hub/lib/cx';
 
 export const ITEMS = [
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
-    description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+    // bannerImgSrc: '/realms/RCH/banner.png',
+    // description:
+    //   'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
+    iconImgSrc:
+      'https://solend-image-assets.s3.us-east-2.amazonaws.com/1280-circle.png',
+    name: 'Solend DAO',
+    publicKey: new PublicKey('7sf3tcWm58vhtkJMwuw2P3T6UBX7UE5VKxPMnXJUZ1Hn'),
+    urlId: 'SLND',
   },
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
-    description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+    // bannerImgSrc: '/realms/RCH/banner.png',
+    // description:
+    //   'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
+    iconImgSrc: 'https://trade.mango.markets/assets/icons/logo.svg',
+    name: 'Mango DAO',
+    publicKey: new PublicKey('DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE'),
+    urlId: 'MNGO',
   },
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
-    description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+    // bannerImgSrc: '/realms/RCH/banner.png',
+    // description:
+    //   'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
+    iconImgSrc:
+      'https://miro.medium.com/fit/c/176/176/1*-mdTTAgsSuBYSfDqG6Fd1w.png',
+    name: 'Orca DAO',
+    publicKey: new PublicKey('66Du7mXgS2KMQBUk6m9h3TszMjqZqdWhsG3Duuf69VNW'),
+    urlId: 'ORCA',
   },
   {
     bannerImgSrc: '/realms/RCH/banner.png',

@@ -33,7 +33,16 @@ export function LargeCard(props: Props) {
 
   return (
     <Link passHref href={`/realm/${props.urlId}/hub`}>
-      <a className={cx('block', 'overflow-hidden', 'rounded', props.className)}>
+      <a
+        className={cx(
+          'block',
+          'overflow-hidden',
+          'rounded',
+          'transition-transform',
+          'active:scale-95',
+          props.className,
+        )}
+      >
         <img className="w-full" src={props.imgSrc} />
         <div className="pt-3 px-6 pb-8">
           <header className="flex items-center justify-between">

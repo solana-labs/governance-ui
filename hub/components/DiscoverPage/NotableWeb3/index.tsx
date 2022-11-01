@@ -6,31 +6,33 @@ import cx from '@hub/lib/cx';
 
 export const ITEMS = [
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
+    bannerImgSrc:
+      'https://pbs.twimg.com/profile_banners/1387427286362861570/1657283618/1500x500',
     description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+      'GRAPE DAO is a power user community for digital governance primitives & tooling',
+    iconImgSrc: '/realms/Grape/img/grape.png',
+    name: 'GRAPE',
+    publicKey: new PublicKey('By2sVGZXwfQq6rAiAM3rNPJ9iQfb5e2QhnF4YjJ4Bip'),
+    urlId: 'GRAPE',
   },
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
+    bannerImgSrc: 'https://i.imgur.com/uW2laRX.png',
     description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+      'Holaplex provides a suite of web3 and NFT commerce solutions for businesses.',
+    iconImgSrc: 'https://i.imgur.com/v9GE74q.png',
+    name: 'Holaplex',
+    publicKey: new PublicKey('4H282CCFjstxBd651gdhAydnXcjGk956Dk7p25MqxmfN'),
+    urlId: 'Holaplex',
   },
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
+    bannerImgSrc: 'https://streamflow.finance/imgs/streamflow-logo-desktop.PNG',
     description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+      'Streamflow is the #1 token vesting and streaming platform on Solana.',
+    iconImgSrc:
+      'https://pbs.twimg.com/profile_images/1396561843146080259/VJNtxnX0_400x400.jpg',
+    name: 'Streamflow',
+    publicKey: new PublicKey('Bwjrnh5dGZ2tHZKjLtMNwwhtk8sCGfR1ZM8ZxcVCe87m'),
+    urlId: 'Streamflow',
   },
   {
     bannerImgSrc: '/realms/RCH/banner.png',
