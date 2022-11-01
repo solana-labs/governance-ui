@@ -15,31 +15,32 @@ export const ITEMS = [
     urlId: 'GARI%20Network',
   },
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
-    description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+    bannerImgSrc:
+      'https://pbs.twimg.com/profile_banners/1512518742051237893/1666295049/1500x500',
+    description: 'Experience the World of Solana. IRL.',
+    iconImgSrc:
+      'https://pbs.twimg.com/profile_images/1583182250581102623/AOrgeepS_400x400.jpg',
+    name: 'Solana Spaces',
+    publicKey: new PublicKey('58axqgJSAEK3adKL5hx5dYoRqkYMEiEXQZqk9FFFpa7f'),
+    urlId: 'Solana%20Spaces',
   },
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
-    description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+    bannerImgSrc: 'https://i.ibb.co/bNRH0hh/1500x500.jpg',
+    description: 'Faster, Cheaper and more Powerful DeFi',
+    iconImgSrc: 'https://i.ibb.co/0j2TR8T/serum.jpg',
+    name: 'Project Serum',
+    publicKey: new PublicKey('3MMDxjv1SzEFQDKryT7csAvaydYtrgMAc3L9xL9CVLCg'),
+    urlId: 'SERUM',
   },
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
-    description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+    bannerImgSrc:
+      'https://pbs.twimg.com/profile_banners/2408321/1665595450/1500x500',
+    description: 'The easiest way to add checkout and shopping data to any app',
+    iconImgSrc:
+      'https://pbs.twimg.com/profile_images/1571859763121758208/32YgNnii_400x400.png',
+    name: 'Rye',
+    publicKey: new PublicKey('7KsnMMyrF8wsxsLZNBZ8hRkGe13MdjAT9ko1qDEvkEWQ'),
+    urlId: 'Rye',
   },
 ];
 

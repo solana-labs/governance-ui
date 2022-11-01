@@ -2,6 +2,7 @@ import cx from '@hub/lib/cx';
 
 import { AllOrgs } from './AllOrgs';
 import { Hackathon } from './Hackathon';
+import { NotableDAOTooling } from './NotableDAOTooling';
 import { NotableDefi } from './NotableDefi';
 import { NotableGames } from './NotableGames';
 import { NotableNFTs } from './NotableNFTs';
@@ -54,6 +55,7 @@ export function DiscoverPage(props: Props) {
           <NotableDefi className="mt-16" />
           <NotableNFTs className="mt-16" />
           <NotableGames className="mt-16" />
+          <NotableDAOTooling className="mt-16" />
           <NotableWeb3 className="mt-16" />
           <AllOrgs className="mt-16" />
         </div>

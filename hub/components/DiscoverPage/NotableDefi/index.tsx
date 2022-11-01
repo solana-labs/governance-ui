@@ -6,40 +6,42 @@ import cx from '@hub/lib/cx';
 
 export const ITEMS = [
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
+    bannerImgSrc: 'https://i.imgur.com/mN0eY0k.png',
     description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+      'Raydium is an Automated Market Maker (AMM) built on the Solana blockchain for the Serum Decentralized Exchange (DEX).',
+    iconImgSrc:
+      'https://raw.githubusercontent.com/raydium-io/media-assets/ac2e46c4d8fc72d935cab0878992ce9a99b88589/logo.svg',
+    name: 'Raydium',
+    publicKey: new PublicKey('GDBJ3qv4tJXiCbz5ASkSMYq6Xfb35MdXsMzgVaMnr9Q7'),
+    urlId: 'Raydium',
   },
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
+    // bannerImgSrc: '/realms/RCH/banner.png',
     description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+      'Solend is the autonomous interest rate machine for lending on Solana',
+    iconImgSrc: 'https://i.imgur.com/knGCZ5f.png',
+    name: 'Solend DAO',
+    publicKey: new PublicKey('7sf3tcWm58vhtkJMwuw2P3T6UBX7UE5VKxPMnXJUZ1Hn'),
+    urlId: 'SLND',
   },
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
-    description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+    // bannerImgSrc: '/realms/RCH/banner.png',
+    // description:
+    //   'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
+    iconImgSrc: 'https://trade.mango.markets/assets/icons/logo.svg',
+    name: 'Mango DAO',
+    publicKey: new PublicKey('DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE'),
+    urlId: 'MNGO',
   },
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
-    description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+    // bannerImgSrc: '/realms/RCH/banner.png',
+    // description:
+    //   'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
+    iconImgSrc:
+      'https://miro.medium.com/fit/c/176/176/1*-mdTTAgsSuBYSfDqG6Fd1w.png',
+    name: 'Orca DAO',
+    publicKey: new PublicKey('66Du7mXgS2KMQBUk6m9h3TszMjqZqdWhsG3Duuf69VNW'),
+    urlId: 'ORCA',
   },
 ];
 
@@ -57,9 +59,9 @@ export function NotableDefi(props: Props) {
         </div>
       </div>
       <div className="text-neutral-500 max-w-3xl">
-        The rapidly evolving Solana DeFi industry has generated over $11 Billion
-        in total value locked while boasting blazing transaction speeds and
-        ultra low fees.
+        The rapidly evolving Solana DeFi industry features multiple innovations
+        in FinTech allowing for maximal financial inclusion while boasting
+        blazing fast transaction speeds and ultra low fees
       </div>
       <div
         className={cx(

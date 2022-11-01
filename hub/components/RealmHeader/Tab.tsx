@@ -35,7 +35,7 @@ export function Tab(props: Props) {
         'relative',
         'text-neutral-500',
         'uppercase',
-        'w-28',
+        'w-[118px]',
         'md:w-36',
         'hover:text-sky-500',
         selected && 'text-sky-500',

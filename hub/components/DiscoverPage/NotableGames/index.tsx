@@ -6,13 +6,15 @@ import cx from '@hub/lib/cx';
 
 export const ITEMS = [
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
+    bannerImgSrc:
+      'https://i.seadn.io/gae/9qqR3x65Uu5YmBTQ75hqy_NCVoEmkixVHQl7XcvnPF2yeWEiLpbN3B-zf1IlqwxFQh4TGg85wU_EKtbYAG2P_4nAFQTXyJ5QXmu_8A?auto=format&w=2048',
     description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+      'Aurory Project is a AAA studio building the web3 gaming platform of the future.',
+    iconImgSrc:
+      'https://i.seadn.io/gae/Qzl6u460tNyzWFrlaLQIa2VMBc1HBX5X7IDfEYBbKV3q1p_BDVkqC-A7-DS5RA-IKagzD0m7J-LDpmr_XnY2ocsTcXGM01DXM7lqUg?auto=format&w=2048',
+    name: 'Aurory',
+    publicKey: new PublicKey('C98yb8FSshG7oH5pCMf41ghg199YjsoUozxQ4VdCpwmM'),
+    urlId: 'Aurory',
   },
   {
     bannerImgSrc: '/realms/RCH/banner.png',
