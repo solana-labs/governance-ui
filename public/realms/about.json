@@ -2048,5 +2048,88 @@
         ]
       }
     ]
+  },
+  "uywFFJL6JFGwbSXgU95C6v8f4L4DqBXV2Z3KZaJSxy1": {
+    "symbol": "Orbis Protocol",
+    "heading": "Orbis Protocol makes it easy to build fast and decentralized social experiences",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Orbis Protocol is the web3 social protocol built for developers. Our solutions make it easy to build fast and decentralized social experiences; from messaging and feeds to full social platforms. Many developers use Orbis Protocol to add social features to existing applications, praising its frictionless user experience, speed and composability."
+        ]
+      },
+      {
+        "content": [
+          "Orbis Protocol works by combining social data standards with a powerful decentralized infrastructure, often known as a “decentralized social layer”. Developers can use the protocol’s advanced SDK and flexible modules to integrate web3 social features in just a few lines of code."
+        ]
+      },
+      {
+        "content": [
+          "Orbis Protocol is fully open-source and multi-chain, with current support for Ethereum, Polygon and Solana. Data storage is achieved with the Ceramic decentralized data network and encryption via Lit Protocol."
+        ]
+      },
+      {
+        "content": [
+          "Orbis Protocol is the foundation for a composable web3 ecosystem of applications and social features. This ecosystem is growing fast, with live integrations across categories including governance, creator economy and NFT communities."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://orbis.club/documentation/"
+    },
+    "team": [
+      {
+        "name": "Baptiste Grève",
+        "avatar": "https://media-exp1.licdn.com/dms/image/C4D03AQGLfQjyy-OkTA/profile-displayphoto-shrink_800_800/0/1632417740582?e=1672876800&v=beta&t=5MMoDXRM13oC2HV7F3aYFRbDXhOMyNuxpixJfYtN_RY",
+        "description": [
+          "Orbis was founded by Baptiste who has been part of the crypto ecosystem for many years now.  He founded MyDeFi, one of the first DeFi aggregators, in 2019, which ended up being acquired by Zerion. He also worked with Edge & Node, the team behind The Graph, as a Product Manager."
+        ],
+        "role": "Orbis' Founder",
+        "twitter": "@BaptisteGreve"
+      },
+      {
+        "name": "Charles Levecque",
+        "avatar": "https://pbs.twimg.com/profile_images/1585656000048205827/onWxFjEX_400x400.jpg",
+        "description": [
+          "Charles is bringing more than 8 years of experience at Meta & TikTok as business development leader and will support our growth within the web2 & web3 ecosystem."
+        ],
+        "role": "Head of Partnerships",
+        "twitter": "@chrlslev"
+      }
+    ],
+    "faq": [
+      {
+        "question": "What is Orbis?",
+        "answer": [
+          "Orbis Protocol is a set of social data models combined with a powerful decentralized infrastructure. Our advanced SDK and flexible modules make it easy to build fully composable social experiences."
+        ]
+      },
+      {
+        "question": "Where is Orbis data stored?",
+        "answer": [
+          "Orbis content is stored on a decentralized data network called Ceramic (off-chain). This ensures that the data shared by your users is open and publicly accessible."
+        ]
+      },
+      {
+        "question": "Is Orbis available on Solana?",
+        "answer": [
+          "Yes. A user’s decentralized identity can be created using wallets from Solana as well as other blockchains such any EVM chain (Ethereum Mainnet, Polygon, Optimism, Arbitrum) or Tezos (coming soon)."
+        ]
+      },
+      {
+        "question": "Can I take my data from one application to another one?",
+        "answer": [
+          "Yes if the experience is built on the Orbis Protocol. Applications share a common social graph and userbase. This enables a seamless social experience for users, who can take their exisiting data to new applications."
+        ]
+      },
+      {
+        "question": "Do you enable any privacy capabilities?",
+        "answer": [
+          "Yes. In the Orbis SDK you’ll find many options to build encrypted experiences like private conversations and token-gated content. Offer the benefits of decentralized social while ensuring the data privacy of your users."
+        ]
+      }
+    ]
   }
 }
