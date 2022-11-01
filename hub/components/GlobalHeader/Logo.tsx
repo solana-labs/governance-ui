@@ -1,7 +1,7 @@
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import Link from 'next/link';
 
-import { RealmCircle } from '@hub/components/branding/RealmCircle';
+import { RealmCircleImage } from '@hub/components/branding/RealmCircleImage';
 import { RealmsLogo } from '@hub/components/branding/RealmsLogo';
 
 interface Props {
@@ -15,7 +15,7 @@ export function Logo(props: Props) {
       <Link passHref href="/discover">
         <NavigationMenu.Link>
           {props.compressed ? (
-            <RealmCircle className="h-8 flex-shrink-0 relative z-10" />
+            <RealmCircleImage className="h-8 flex-shrink-0 relative z-10" />
           ) : (
             <RealmsLogo className="h-8 flex-shrink-0 relative z-10" />
           )}

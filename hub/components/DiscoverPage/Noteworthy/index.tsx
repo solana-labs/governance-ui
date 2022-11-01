@@ -16,9 +16,10 @@ export const ITEMS = [
     category: RealmCategory.Web3,
     content: (
       <div>
-        Audius isn’t just building a competitive music streaming platform. They
-        are at the forefront of the conversation surrounding ownership rights by
-        artists and fans.
+        Audius is a music community and discovery platform that puts the artist
+        in control. It does this by being fully decentralized: Audius is owned
+        and run by a vibrant, open-source community of artists, fans, and
+        developers all around the world.
       </div>
     ),
     publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),

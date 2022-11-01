@@ -131,6 +131,11 @@ export function Trending(props: Props) {
 
             return (
               <div className="space-y-5">
+                {!edges.length && (
+                  <div className="my-4 text-center text-neutral-500 text-sm">
+                    There are no trending posts
+                  </div>
+                )}
                 {edges.map((edge, i) => {
                   const isNew =
                     Math.abs(

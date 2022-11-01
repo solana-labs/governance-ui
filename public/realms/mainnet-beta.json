@@ -1742,7 +1742,7 @@
     "displayName": "Contribute",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "DdNEw88N8VTeYfvxdLBwQ9aR4trejTUapGZRGdaMqyNY",
-    "ogImage": "https://we.tl/t-bNK7fnhWWn",
+    "ogImage": "https://i.imgur.com/1mOsSeP.png",
     "shortDescription": "Connect your Solana wallet to join a gated-access group chat with other, verified NFT collection holders.",
     "sortRank": 3,
     "website": "Contribute.xyz",
@@ -1800,5 +1800,20 @@
     "website": "https://theportal.to/",
     "twitter": "@_portals_",
     "discord": "https://discord.gg/portals"
+  },
+  {
+    "symbol": "Bridgesplit",
+    "category": "defi",
+    "bannerImage": "https://pbs.twimg.com/profile_banners/1359961837576597506/1664761776/1500x500",
+    "displayName": "Bridgesplit",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "2pJND9oPC1F4yWrBsxTDpmMcg6BbFSwvcu1kExBkbVDU",
+    "ogImage": "https://pbs.twimg.com/profile_images/1576678407366213632/dNd2-caG_400x400.jpg",
+    "shortDescription": "Bridgesplit is tokenization infrastructure for complex on & off-chain assets, powering indexes, tranching, lending and more.",
+    "sortRank": 3,
+    "website": "https://bridgesplit.com",
+    "twitter": "@bridgesplit",
+    "discord": "https://discord.gg/bridgesplit",
+    "github": "https://github.com/bridgesplit"
   }
 ]

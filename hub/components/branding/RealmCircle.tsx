@@ -16,17 +16,18 @@ export function RealmCircle(props: Props) {
       />
       <path
         d="M34.1084 12.5378C34.2058 12.7593 33.8966 12.9819 33.701 12.8394C32.7897 12.1756 31.1741 11.25 29.25 11.25C25.5 11.25 20.25 15.75 20.25 24C20.25 32.25 24 36.75 28.5 36.75C30.9238 36.75 32.7209 35.81 33.6889 35.1452C33.8884 35.0082 34.2058 35.2407 34.1084 35.4622C31.6838 40.9747 26.7235 45 21 45C11.8873 45 3 35.598 3 24C3 12.402 11.8873 3 21 3C26.7235 3 31.6838 7.02527 34.1084 12.5378Z"
-        fill="url(#paint0_radial_372_12106)"
+        fill="url(#paintradientrealms)"
       />
       <defs>
         <radialGradient
-          id="paint0_radial_372_12106"
+          id="paintradientrealms"
           cx="0"
           cy="0"
           r="1"
           gradientUnits="userSpaceOnUse"
           gradientTransform="translate(28.5 24) rotate(180) scale(22.66 30.2134)"
         >
+          <stop offset="0" stopOpacity="0" />
           <stop offset="0.156146" stopColor="#006585" />
           <stop offset="1" stopColor="#00C2FF" />
         </radialGradient>

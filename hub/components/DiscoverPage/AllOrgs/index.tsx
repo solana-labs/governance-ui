@@ -163,8 +163,6 @@ export function AllOrgs(props: Props) {
                 'items-center',
                 'grid-cols-2',
                 'lg:grid-cols-4',
-                'xl:grid-cols-2',
-                'lg:grid-cols-4',
               )}
             >
               {items.map((item, i) => (

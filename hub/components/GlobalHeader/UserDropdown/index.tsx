@@ -15,7 +15,9 @@ interface Props {
 }
 
 export function UserDropdown(props: Props) {
-  const [result, refetch] = useQuery(gql.getUserResp, { query: gql.getUser });
+  const [result, refetch] = useQuery(gql.getUserResp, {
+    query: gql.getUser,
+  });
 
   return pipe(
     result,
@@ -27,7 +29,9 @@ export function UserDropdown(props: Props) {
           onConnected={() => refetch({})}
         />
       ),
-      () => <Loading className={props.className} />,
+      () => (
+        <Loading compressed={props.compressed} className={props.className} />
+      ),
       ({ me }) => (
         <div className={cx(props.className, 'flex', 'items-center')}>
           <User compressed={props.compressed} user={me} />
