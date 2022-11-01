@@ -1875,5 +1875,20 @@
     "twitter": "@bridgesplit",
     "discord": "https://discord.gg/bridgesplit",
     "github": "https://github.com/bridgesplit"
-  }
+  },
+  {
+  "symbol": "Amulet",
+  "category": "defi",
+  "bannerImage": "https://pbs.twimg.com/profile_banners/1471061535652986880/1667288086/1500x500",
+  "displayName": "Amulet",
+  "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+  "realmId": "3HC3mCQkpAAHQZa3aJjQJFpFNwoLp3ZWnkCYuWzoymo9",
+  "ogImage": "https://pbs.twimg.com/profile_images/1587347395507113984/_Y2HV3ye_400x400.jpg",
+  "shortDescription": "Simple, Reliable Cover For Everyone in Web3.Maximum protection and yield, fully protected through Protocol Controlled Reserves",
+  "sortRank": 3,
+  "website": "https://amulet.org/",
+  "twitter": "@AmuletProtocol",
+  "discord": "https://discord.com/invite/AmuletProtocol",
+  "github": "https://github.com/Amulet-Protocol"
+}
 ]
