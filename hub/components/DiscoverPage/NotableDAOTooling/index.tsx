@@ -58,7 +58,8 @@ export function NotableDAOTooling(props: Props) {
         </div>
       </div>
       <div className="text-neutral-500 max-w-3xl">
-        Incredible projects driving the decentralized organization vision
+        With over 1,500 DAOs, Solana is seeing massive growth in on-chain
+        communities across DeFi, NFTs, and real world assets.
       </div>
       <div
         className={cx(

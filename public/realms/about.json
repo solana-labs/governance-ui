@@ -260,7 +260,11 @@
     "about": [
       {
         "heading": "Introduction",
-        "content": ["Unique VC is the ultimate platform for:"]
+        "content": [
+          "Unique Venture Clubs (Unique.vc) is a platform that allows web3 investors, communities, and founders to raise funds, manage assets, and execute their investments on-chain.",
+          "We believe that blockchain technology can make the governance of your entity and funds more efficient and transparent.",
+          "Unique VC is the ultimate platform for:"
+        ]
       },
       {
         "content": [
@@ -2184,5 +2188,1491 @@
         "twitter": "@marygooneratne"
       }
     ]
+  },
+  "H3A8YM1ggR7GggD9qX4CEWkvPmkQUXuhGq2AGpbgqM6J" : {
+    "symbol": "Garbles",
+    "heading": "The blockchain mobile game that cleans up the planet",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Garbles is a mobile game that cleans up the planet. Explore the physical world to collect trash items as NFT. Combine garbage to generate myriads of combinations of Garbles - every time you create a Garble with trash resources, you are removing real C02 from the environment! Use your favourite species to play minigames and missions around the world and embark on a journey to populate the planet... while saving it!"
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.garbles.fun/"
+    },
+    "resources": [
+      {
+        "title": "Garbles joins the Crypto-Guilds Alliance",
+        "content": [
+          "Garbles are cute, clumsy monsters that originate from garbage. Help them dove into our dumpsters and gobble up every plastic bottle they can find!"
+        ],
+        "url": "https://medium.com/@Crypto-Guilds/garbles-joins-the-crypto-guilds-alliance-4c5ae00cb8ac"
+      }
+    ]
+  },
+  "52KrHUxbakN1rq9XoXQtSUmhdYyUZyp3YkWZQihZMTPu" : {
+    "symbol": "Star Atlas",
+    "heading": "Next-gen gaming metaverse with triple-A UE5 graphics for creating, playing & learning with others worldwide. Power to the People!",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Star Atlas is a next-gen gaming metaverse emerging from the confluence of state-of-the-art blockchain, real-time graphics, multiplayer video games, and decentralized financial technologies.",
+          "Using Unreal Engine 5’s Nanite, real-time graphics technology allows for cinematic quality video game visuals. In addition, blockchain technology using the Solana protocol establishes a largely serverless and secured gameplay experience. Galactic items and resources obtained and traded within Star Atlas create an economy that replicates tangible world assets and ownership. To learn more, visit StarAtlas.com, download the UE5 Showroom on Store.EpicGames.com, join a faction at Play.StarAtlas.com and log in to view your spaceship fleet!"
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://build.staratlas.com/"
+    },
+    "resources": [
+      {
+        "title": "Star Atlas on Epic Games",
+        "content": [
+          "Test a high-fidelity, immersive space adventure and grand strategy MMO built in Unreal Engine 5 and sustained by a real galactic economy."
+        ],
+        "url": "https://store.epicgames.com/en-US/p/star-atlas-bead34"
+      },
+      {
+        "title": "Star Atlas launches pre-alpha Unreal Engine 5 showroom",
+        "content": [
+          "ATMTA is making a quarterly progress report on its blockchain-based sci-fi game, and today it said it has launched a pre-alpha playable Unreal Engine 5 experience in its Star Atlas universe."
+        ],
+        "url": "https://venturebeat.com/games/star-atlas-launches-pre-alpha-unreal-engine-5-showroom/"
+      },
+      {
+        "title": "Balthazar Research Report: The Astronomical Weight of Star Atlas",
+        "content": [
+          "Star Atlas takes GameFi to new heights through what we consider the boldest project in the entire space."
+        ],
+        "url": "https://bltzr.gg/balthazar-research-report-the-astronomical-weight-of-star-atlas/"
+      }
+    ]
+  },
+  "7nLVPup5xx5dWWVcDfjyHXHSr4juFM9wn1XaGQYxcYN1" : {
+    "symbol": "Notifi",
+    "heading": "Notifi allows Web3 teams to manage user communication under a unified platform.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Today communication tools in Web3 are highly fragmented, with each project often having to custom build their own solutions due to the limitations of alternatives available in the market.",
+          "This takes away time and resources from the core product and tech building and often yields low ROI for the team. Additionally, after Web3 teams build their own custom solutions, they need to dedicate ongoing resources to maintain and improve the communication tools.",
+          "This is akin to if every startup built their own CRM tool or social media management platform in-house.",
+          "At Notifi we believe in a better world where founders/project managers can focus on building what they build best and leave the communication to us."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.notifi.network/"
+    },
+    "resources": [
+      {
+        "title": "Notifi Is Latest Startup Trying to Crack Web 3’s Push Notification Problem",
+        "content": [
+          "With $2.5 million in funding from Race Capital and others, CEO Paul Kim wants to give DeFi degens better tools for minding their bags."
+        ],
+        "url": "https://www.coindesk.com/business/2022/03/03/notifi-is-latest-startup-trying-to-crack-web-3s-push-notification-problem/"
+      },
+      {
+        "title": "Solana DAOs can now bug you to vote with phone calls and texts",
+        "content": [
+          "Notifi Network has integrated with the Solana Realms DAO platform to help increase governance participation rates by expanding notification services."
+        ],
+        "url": "https://cointelegraph.com/news/solana-daos-can-now-bug-you-to-vote-with-phone-calls-and-texts"
+      }
+    ]
+  },
+  "VAf2xnozMTWeytjUU4GtoyqrGj63owBENr754Y3bzL5" : {
+    "symbol": "Helius",
+    "heading": "Making Solana development easier, faster, and more accessible. Webhooks, enhanced APIs, and RPCs.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Helius helps you build Solana applications cheaper and faster. We parse on-chain data to extract important content (was this transaction a DAO vote? was it an NFT listing?) and make this data available via easy-to-use, low-latency webhooks, enhanced Solana APIs, and the most powerful (and affordable) RPCs in the ecosystem.",
+          "You can learn more at https://helius.xyz or read our docs at https://docs.helius.xyz"
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.helius.xyz"
+    },
+    "resources": [
+      {
+        "title": "Helius Raises $3.1M to Make Solana App Building 'Faster and Cheaper'",
+        "content": [
+          "Solana infrastructure startup Helius today announced that it raised a $3.1 million seed round co-led by Reciprocal Ventures and Chapter One"
+        ],
+        "url": "https://finance.yahoo.com/news/helius-raises-3-1m-solana-160002666.html?guccounter=1"
+      },
+      {
+        "title": "The All-in-one Developer Tooling for Solana: A look at Helius",
+        "content": [
+          ""
+        ],
+        "url": "https://mondaymunday.substack.com/p/the-all-in-one-developer-tooling"
+      }
+    ]
+  },
+  "EhDvEUsxDSzU49jnyQ9iTheqQTPtG43gFvwbbrgye8t7" : {
+    "symbol": "Zebec ",
+    "heading": "Zebec is a continuous settlement protocol on Solana. We are revolutionizing payroll by introducing streaming finance technology.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Zebec is a continuous settlement protocol that currently runs on Solana and supports over 300 projects. It allows for payments to be turned into continuous streams, allowing workers to leverage the time value of their wages, and its payroll application is tax-compliant. Zebec also provides Token Distribution and Vesting solutions for projects in the Solana Ecosystem.",
+          "Zebec is backed by some of the biggest VC’s in the industry including: Solana Ventures, Coinbase Ventures, Circle, Gemini, Alameda, Shima Capital raising over $40M in different Series rounds.",
+          "Zebec Protocol is currently the largest business-facing project in the Solana Ecosystem despite only being launched a little over six months ago. It has a TVL of over $200 million with over 300,000 community members."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.zebec.io/"
+    },
+    "resources": [
+      {
+        "title": "Explaining the Zebec Card",
+        "content": [
+          "A payroll solution that gets you paid by the minute"
+        ],
+        "url": "https://i.imgur.com/W6d2eUk.mp4"
+      },
+      {
+        "title": "Zebec to Launch its Rollup Chain via Eclipse to Bring Frictionless Global Payment Standards",
+        "content": [
+          "The Solana-Based Protocol Allows Employees to Be Paid in USDC or Other Stablecoins by the Second"
+        ],
+        "url": "https://www.yahoo.com/now/zebec-launch-rollup-chain-via-030000590.html"
+      },
+      {
+        "title": "Zebec launches real-time, streaming USDC payments, with support from Circle Ventures+",
+        "content": [
+          "New payments innovation pushes treasury management forward"
+        ],
+        "url": "https://www.circle.com/en/customer-stories/zebec"
+      }
+    ]
+  },
+  "GZyALQBvdBswSpMLabKEBVgKykkZMgnYcJgFk5dGU4aV" : {
+    "symbol": "Snowflake",
+    "heading": "The most trusted multisig platform on Solana with native automation & a rich app store built for every team's needs.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Snowflake is an institutional-grade multisig platform on Solana that incorporates native automation and a rich app store.  We're multiple audited from the leading security firms and peer reviewed by a number of key teams in Solana. Snowflake is among protocols with the highest TVLs in the space.",
+          "Snowflake battle-tested multisig is one of the most secure ways to store crypto assets and avoid a single point of failure. We have secured the entire treasury for some of the largest teams in Solana.",
+          "Our native automation enables teams to schedule transactions securely and automate all aspects of asset management.",
+          "Snowflake app store has everything you need to run your team operations. You can schedule payrolls, manage token vestings, secure Solana program deployments, stake SOL, interact with other protocols, schedule DCA, purchase NFTs, automate custom transactions and many more."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.snowflake.so"
+    },
+    "resources": [
+      {
+        "title": "Partnership Announcement: Snowflake integrates Marinade Finance’s mSOL liquid staking",
+        "content": [
+          "Today Marinade Finance and Snowflake are thrilled to announce a partnership that gives users and teams the ability to stake SOL directly from a secure multisig and receive mSOL"
+        ],
+        "url": "https://marinade.finance/blog/partnership-announcement-snowflake-integrates-marinade-msol-liquid-staking"
+      },
+      {
+        "title": "Friktion enables secure multi-signature access with Snowflake",
+        "content": [
+          "Friktion is proud to announce our partnership with Snowflake, a full-featured and institutional-grade multi-signature wallet."
+        ],
+        "url": "https://friktionlabs.medium.com/friktion-enables-secure-multi-signature-access-with-snowflake-93be63d6804c"
+      },
+      {
+        "title": "Zeta Flex integration with Snowflake Safe Multisig",
+        "content": [
+          "Working together to bring options trading to an institutional custody store."
+        ],
+        "url": "https://zetamarkets.medium.com/zeta-flex-integration-with-snowflake-safe-multisig-e5cd931e2cc1"
+      }
+    ]
+  },
+  "H2wGwADHWze2yZRurayzutPnDeKxpvf6WhVJpzixM121" : {
+    "symbol": "Hedge",
+    "heading": "Low-cost leverage of your crypto assets by minting USH, a decentralized overcollateralized stablecoin that is fully composable. ",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Hedge is a protocol that enables the minting of USH, a stablecoin soft-pegged to the US dollar. USH is backed by crypto collateral deposited by users, who can mint and borrow USH against their collateral at cost-effective rates, as low as 0% interest.",
+          "The borrowed USH can be used for multiple purposes, including exchanging it for other stablecoins or leveraging your crypto exposure by buying more crypto with USH and adding this to your collateral. You can also deposit the USH in the stability pool to earn HDG token rewards and rewards from liquidations."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.hedge.so"
+    },
+    "resources": [
+      {
+        "title": "Pantera Joins $3.7M Round for Solana Lending Protocol Hedge",
+        "content": [
+          "Race Capital led the round for the interest-free lending protocol ahead of its public launch."
+        ],
+        "url": "https://www.coindesk.com/business/2022/04/19/pantera-joins-37m-round-for-solana-lending-protocol-hedge/"
+      }
+    ]
+  },
+  "DVDoxbAiYv8oyScU1TUL7ZSsVMpU7zARaFTqwqdw5p5R" : {
+    "symbol": "Solcial",
+    "heading": "web3 social network",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Solcial is a permissionless social network allowing users to be rewarded fairly for their work, and promoting freedom of speech by allowing users to interact without fearing ban or censorship.",
+          "Solcial is a mobile app (iOS and Android), a desktop app, and a website. On Solcial each user has their own token, allowing you to invest directly in them. You get minted 1 millions coins when you signup, that supply is fixed and the same for everyone. To begin with every user will have their token price set to $1 with 10,000 of their tokens put in a liquidity pool. This helps insure that tokens are tradeable and users can compare token prices knowing they began at the same price. Otherwise, these coins are yours, you can keep them or sell them (or send them to friends).",
+          "To follow people on Solcial we have 3 subscription levels: you can follow someone for free (Tier 1) to access their public content (similar to Twitter or Instagram), and to access their private content (what we call Tier 2 and 3 subscriptions) you need to own their token, to be an investor in them. That’s what we called the “invest-for-subscription” model.",
+          "You can also display your NFTs on your user profile, either just to show-off, or to buy & sell your NFTs with your friends.",
+          "All user content is stored on IPFS and accessed through a P2P layer that we developed. Therefore Solcial doesn't rely on censorable servers or gateways. And the token related operations (minting, trading etc) are all on the Solana blockchain."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://wiki.solcial.io/"
+    },
+    "resources": [
+      {
+        "title": "‘Solcial’ Raises $2.9M to Build Censorship-Free Social Media on Solana",
+        "content": [
+          "The site will place a heavy focus on monetization opportunities for content creators."
+        ],
+        "url": "https://www.coindesk.com/business/2021/09/27/solcial-raises-29m-to-build-censorship-free-social-media-on-solana/"
+      }
+    ]
+  },
+  "8V5BthCyL5LFDsWDKhfmAHqEgudSw1pXMC2PmWKAAr3D" : {
+    "symbol": "Crossmint",
+    "heading": "Crossmint builds infrastructure to make NFTs accessible to everyone: minting APIs, fiat on-ramp, wallets, and more",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Crossmint is the leading provider of infrastructure to create and distribute NFTs at scale. Our product suite is comprised of:\n- Creation: mint NFTs and send them to any wallet or email address with one line of code. If the recipient doesn't have a wallet, we'll create one for them instantly\n- Payments: Crossmint is the leading fiat on-ramp for NFTs, powering 5,000+ enterprises and developers, like Magic Eden, David Guetta, and the Sacramento Kings. We also offer products like cross-chain payments, and accesslists with payment functionality\n- Wallets: custodial wallets-as-a-service"
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.crossmint.io"
+    },
+    "resources": [
+      {
+        "title": "The Most Promising Crypto Startups of 2022, According to VCs",
+        "content": [
+          ""
+        ],
+        "url": "https://www.businessinsider.com/most-promising-crypto-web3-startups-of-2022-2022-9"
+      },
+      {
+        "title": "Announcing Crossmint’s NFT Minting API!",
+        "content": [
+          "Announcing the Crossmint Minting API. "
+        ],
+        "url": "https://medium.com/crossmint-tech/announcing-crossmints-nft-minting-api-53020c866d7d"
+      },
+      {
+        "title": "Web3 development is siloed. QuickNode wants to change that",
+        "content": [
+          "Crossmint allows developers to mint NFTs and add them to a broader collection through a single request."
+        ],
+        "url": "https://fortune.com/crypto/2022/09/21/web3-development-is-siloed-quicknode/"
+      }
+    ]
+  },
+  "FiKdbhsKRMTzSfyTDRqBY3cy5GjAqCSXYJYRe2wQQ8Ly" : {
+    "symbol": "Unloc",
+    "heading": "Financial Products & Services for NFT Owners. Initially launching with a fully customizable NFT-collateralized loans platform.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Our goal is to become the preeminent Financial Products and Consumer Services platform on Solana; to provide NFT holders with better rights & more opportunities in Web3 than are afforded to owners of art, collectibles, & property in Web2 or “the real world”. We are working to empower NFT ownership. Our first product will be our fully customizable NFT-collateralized loans platform.",
+          "Unloc lets the Borrower set their own terms; select SOL or USDC as the loan currency, set your own loan-to-value (LTV) ratios (i.e. interest rate, loan amount, and duration), set multiple sub-offers allowing Lenders to find the perfect terms for their risk profiles, all while at the same time empowering Borrowers to unlock the full potential of their NFTs.",
+          "Both borrowers and lenders earn $UNLOC simply by engaging in a loan contract, “mining” tokens for the duration of the time the loan is active (not-repaid).",
+          "Staking Accounts on the Unloc platform have the ability to vote on specific collections’ $UNLOC token emission rates. This creates opportunities for NFT projects to add more utility to their NFT-holding communities.",
+          "We are also developing Unloc Score, based on locked staking amounts and total lock-up durations, which will determine voting power on the platform."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "unloc.xyz"
+    },
+    "resources": [
+      {
+        "title": "The Unloc Blog",
+        "content": [
+          ""
+        ],
+        "url": "https://blog.unloc.xyz/"
+      },
+      {
+        "title": "Unloc on LinkedIn",
+        "content": [
+          ""
+        ],
+        "url": "https://www.linkedin.com/company/unlocnft/"
+      }
+    ]
+  },
+  "2m2HfiYwMdbwVQ2BsSdqzQihdK2c2JymVy7aREDa9Lzu" : {
+    "symbol": "Credix",
+    "heading": "Credit investing made global ",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Credix is rethinking and rebuilding how debt capital markets should work. It combines the most scalable web3 infrastructure including proprietary, highly scalable algorithms and innovative smart contract logic to provide institutional investors the experience and opportunities they’ve been looking for. Credix enables high quality loan originators around the world to access previously untapped capital in a matter of days, in a digital and regulatory compliant platform."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.credix.finance"
+    },
+    "resources": [
+      {
+        "title": "DeFi Platform Credix Raises $11.25M to Connect Institutional Lenders With Emerging Market Fintechs",
+        "content": [
+          "The decentralized credit marketplace will use the capital to expand beyond Brazil."
+        ],
+        "url": "https://www.coindesk.com/business/2022/09/06/defi-platform-credix-raises-1125m-to-connect-institutional-lenders-with-emerging-market-fintechs/"
+      },
+      {
+        "title": "What Is DeFi Credit? The Evolution of On-Chain Lending",
+        "content": [
+          "Organizations such as Credix are working to bring real-world asset lending on-chain"
+        ],
+        "url": "https://blockworks.co/what-is-defi-credit-the-evolution-of-on-chain-lending/"
+      }
+    ]
+  },
+  "6iMVHPfcBebctV5bvSY23d2nuDuKvzTLP9HNCwWV2gGe" : {
+    "symbol": "Diaspora DAO",
+    "heading": "4,444 Ancestors to guide you on your Journey into Web3",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "4,444 Ancestors to guide you on your Journey into Web3. Connecting the Diaspora on the Solana Blockchain with History, Lineage, Up-skilling & Digital Art. With a goal to inspire ‘Decentralized Powernomics’ across the culture, summon your Sol & Mint an Ancestor. Your key-to-access, collectible & guide.",
+          "Diaspora is a community centric DAO powered by the Solana blockchain. Leveraging blockchain technology, Diaspora’s members will empower economic opportunity, education, and equality. Projects under Diaspora will be funded initially by the launch of a unique NFT collection that showcases historic people, moments, and iconography of the diaspora. It will serve as a digital historical treasure, reimagined through a futuristic lens."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://www.ourdiaspora.xyz/DiasporaWhitePaper.pdf"
+    },
+    "resources": [
+      {
+        "title": "The Diaspora DAO Wordcel Page",
+        "content": [
+          ""
+        ],
+        "url": "https://www.wordcelclub.com/diaspora.sol"
+      }
+    ]
+  },
+  "DXezSkchMaYZTa3WM5xVU1SDQhMsFspMLuyyMuWk2YK9" : {
+    "symbol": "Rage Effect",
+    "heading": "The First AAA-Quality Free-to-Play NFT MMO Shooter on Solana!",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Rage Effect is a community-driven PvP and PvE FPS based on the Solana blockchain that introduces a new gaming genre and a Play-and-Earn system. The genre is a cross between Shooter, Survival and Exploration, with a Counter Strike-like feel and dynamic gameplay by Guilds that encourages teamwork to help players survive and win rewards.",
+          "We have created a fast-paced combat battle game where players may choose among four maps, with none showing mercy. Players can discover their secrets, join forces with friends, devise plans, and emerge victorious. Create your own guild, invite their friends, and rise through the ranks together!"
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.rageeffect.io"
+    },
+    "resources": [
+      {
+        "title": "The Rage Effect Medium Page",
+        "content": [
+          ""
+        ],
+        "url": "https://rageeffect.medium.com/"
+      },
+      {
+        "title": "The Rage Effect Youtube Channel",
+        "content": [
+          ""
+        ],
+        "url": "https://www.youtube.com/channel/UCcNw733l1hEpO19Mln9Gf5A"
+      }
+    ]
+  },
+  "3DLKv41oFs8DiHBkUEdm3MwiyJ9Sp4E6sb8QCAqynnbA" : {
+    "symbol": "Satellite IM",
+    "heading": "A fully decentralized peer-to-peer communications platform",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Satellite IM is a Web3 fully decentralized peer-to-peer voice, video, and text communication platform. It is built as an EVM-compatible evolving protocol for simple sovereign storage and peer-to-peer communication, leveraging the interplanetary filesystem (IPFS). The platform allows users to sign, encrypt, broadcast, search, and store documents or messages with decentralized identifiers (DIDs), all while making the need for an existing wallet or on-chain data completely optional."
+        ]
+      }
+    ]
+  },
+  "7Ad1wQdytLHSFxnUyEHVPUYrNKMect4Qs5pQtYgFCrr3" : {
+    "symbol": "Block Tackle Inc",
+    "heading": "SkateX is a free-to-play extreme sports video game that uses blockchain technology so players can truly own their digital gear.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "SkateX is a new web3 game that combines extreme sports action, a massively social multiplayer experience, and collectible NFTs from today's hottest street artists.",
+          "At its heart, SkateX is an action game, allowing players to perform tricks, complete challenges, and compete with others. Or, just relax with friends and skate around town showing off your swag. SkateX empowers you to carve your own online path.",
+          "SkateX skateboard decks come in the form of NFTs that players can own, upgrade and interact with. Ride your board across our meta-city and skate parks, display your boards to show the works of art they are, or sell them when you're ready for a different look. NFT skateboards are just the beginning, we'll be adding other clothing and gear as NFTs that players can own and equip to fully embrace their digital identities.",
+          "SkateX is being built by a team of gaming industry veterans who helped create hit titles for EA, Kabam, Lucasfilm, Roblox, Supercell and more. We grew up playing extreme sports games like Tony Hawk's Pro Skater, 1080 Snowboarding and Kelly Slater Pro Surfing. With SkateX we plan to bring that standard of fun and addictiveness to entirely new levels thanks to blockchain technology.",
+          "The world of SkateX will always be evolving with new art, new challenges, and new friends to ride around with. By giving gamers more control over their digital assets, our goal is to create a more exciting and enjoyable game experience for everyone."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://block-tackle.gitbook.io/skatex-litepaper/"
+    },
+    "resources": [
+      {
+        "title": "Block Tackle raises $5M and launches skateboard NFTs",
+        "content": [
+          "Block Tackle, a new game studio making the SkateX blockchain game, is starting the sale of its collection of animated skateboard nonfungible tokens (NFTs)."
+        ],
+        "url": "https://venturebeat.com/games/block-tackle-raises-5m-and-launches-drop-of-skateboard-nfts/"
+      },
+      {
+        "title": "Block Tackle Raises $5M to Develop Solana NFT Skateboarding Game",
+        "content": [
+          "Coinbase Ventures, Solana Ventures, and Animoca back a new studio of game industry veterans building NFT games on Solana."
+        ],
+        "url": "https://decrypt.co/95627/block-tackle-solana-nft-skateboarding-game-skatex-coinbase-animoca"
+      }
+    ]
+  },
+  "7KsnMMyrF8wsxsLZNBZ8hRkGe13MdjAT9ko1qDEvkEWQ" : {
+    "symbol": "Rye",
+    "heading": "The easiest way to add checkout and shopping data to any app",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Rye is an open protocol for eCommerce that allows merchants, stores, and customers to transact openly and with minimal fees, controlled by the community.",
+          "The core of the protocol is the Rye eCommerce API which has three core products:\n1. Rye Checkout - Programmatic checkout that you can add anywhere.\n2. Rye Earn - Earn by setting your own custom margin or through affiliate commissions for any product.\n3. Rye Inventory - Get product data from any Amazon or Shopify store.",
+          "Affiliate links and ads do not work well. Rye Checkout and Affiliates lets developers add checkout to their native experience, eliminating conversion drop-off and streamlining the purchase experience. Rye inventory gives developers access to an inventory of 350 million products to power their checkout/affiliate experiences."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.rye.com/start-here/readme"
+    },
+    "resources": [
+      {
+        "title": "A16z Crypto Leads $14 Million Bet On Rye, New Web3 Commerce Startup From Justin Kan",
+        "content": [
+          "Twitch cofounder Justin Kan is launching a new startup in the world of web3."
+        ],
+        "url": "https://www.forbes.com/sites/alexkonrad/2022/10/11/a16z-crypto-web3-commerce-rye-justin-kan/"
+      },
+      {
+        "title": "A16z Leads $14M Funding Round for New E-Commerce Platform From Twitch Co-Founder",
+        "content": [
+          "Rye plans to become fully decentralized on the Solana blockchain"
+        ],
+        "url": "https://www.coindesk.com/business/2022/10/11/a16z-leads-14m-funding-round-for-new-e-commerce-platform-from-twitch-co-founder/"
+      },
+      {
+        "title": "Rye on Crunchbase",
+        "content": [
+          ""
+        ],
+        "url": "https://www.crunchbase.com/funding_round/rye-series-a--e6df4b79"
+      }
+    ]
+  },
+  "HJ4YUJFSa1xX5wfbrPQKMTcTTnyT2eMxBk2eyBFGVmR7" : {
+    "symbol": "Ludex.gg",
+    "heading": "APIs & SDKs for video game developers to easily implement smart contracts into games with no blockchain knowledge required.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Ludex is building a dev-toolkit to help game developers build and implement all sort of blockchain transactions into their games (FTs, SFTs & NFTs) with no blockchain experience required.",
+          "With 2.7 billion gamers in the world, Ludex is an avid believer that the mass adoption of web3 will be heavily led by the videogaming industry. However, building a good/popular game is in itself a huge challenge and a very competitive space to be in. Hence, game developers should fully focus on making the best games possible, not on the technicalities of blockchain development and integrations.",
+          "Game devs take care of making awesome games, Ludex takes care of making it happen on chain."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.ludex.gg/"
+    },
+    "resources": [
+      {
+        "title": "Unity wallet integration & in-game signing Demo",
+        "content": [
+          "We show how you can login with a wallet to a native unity mobile game via web2 socials."
+        ],
+        "url": "https://www.youtube.com/watch?v=Q8Vp1YAIShE"
+      },
+      {
+        "title": "1V1 Wager Demo",
+        "content": [
+          "All amounts and UI can be changed depending on the needs of the video game providers/devs."
+        ],
+        "url": "https://www.youtube.com/watch?v=ks2kurSSNgo"
+      },
+      {
+        "title": "Dashboard Demo",
+        "content": [
+          "Implement smart contracts easily into your game with the Ludex Dasboard."
+        ],
+        "url": "https://www.youtube.com/watch?v=hwvT3iyCZNc"
+      }
+    ]
+  },
+  "DntR8BU5tYVhQUNfARFG5VxKrpdRaKY2qKC3v8cYJirm" : {
+    "symbol": "Okay Bears",
+    "heading": "Okay Bears has the highest trade volume of any NFT collection on Solana and is an emerging global icon of clean, positive cool. ",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Okay Bears represent a seismic shift in online culture. Breaking NFT records at launch, the brand quickly transcended from a virtuous Web3 community to a unique place in mainstream popular culture.",
+          "It is the first Web3 brand to be signed by IMG, the world’s leading brand licensing company representing global icons such as Angry Birds, Fortnite and Pepsi. Bruno Maglione, President of Licensing, IMG, said: “Okay Bears has shown that NFTs can be a powerful tool of mobilization and empowerment, creating a global community that exudes positivity and support. Their brand message and values have resonated with people across the world, and we plan to ensure these are celebrated and reflected in a range of creative collaborations and products as we work with Okay Bears towards elevating online and offline cultures together.",
+          "The Okay Bears NFT collection features 10,000 diverse bears, reaching over $150 million in total trade volume since its launch in April 2022. The brand has also collaborated with NBA athletes and Wilson (via HEIR) and organically attracted a wide range of celebrities from Game of Thrones, FaZe Clan, Olympians, athletes, actors and models.",
+          "Co-Founder Kais shares, “Together with our community, we inspire hope through our online activity every single day. We spread the message that you are enough just the way you are; that it is okay to just be okay."
+        ]
+      }
+    ],
+    "resources": [
+      {
+        "title": "IMG & Okay Bears",
+        "content": [
+          ""
+        ],
+        "url": "https://imglicensing.com/clients/okay-bears/"
+      }
+    ]
+  },
+  "wij7YqAPCYtPk4isjY5TpoMpbYC7xupwuKVzpbnZHp7" : {
+    "symbol": "HEIR Labs, Inc.",
+    "heading": "HEIR - the best sports culture community for athletes and fans with exclusive content, experience, merchandise, and digital assets",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "We are building a community and a platform for athletes and other culture creators to expand, enhance, and deepen their relationships with their supporters around the world through membership-based access to:\n- a vibrant online community chatting about sports and culture all day\n- athletes' exclusive digital content such as introspective videos, inviting you to be part of their growth journey\n- unique digital assets that make you the envy of the crowd\n- intimate first-person experiences that make you part of an athlete's crew and part of the HEIR family\n- exclusive merchandise in partnerships with and from athletes and culture creators\nand more!",
+          "The platform is designed for culture leaders, creators, shapers, and consumers who love sports."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": ""
+    },
+    "resources": [
+      {
+        "title": "Exclusive Q&A: Jeffrey Jordan on the inspiration for inaugural 'NFT JAM' Tournament",
+        "content": [
+          "Michael Jordan’s son Jeffrey is following in his footsteps by redefining the fine art of the business of basketball."
+        ],
+        "url": "https://usatodayhss.com/2022/michael-jordan-son-jeffrey-jordan-on-nft-jam-tournament-web3"
+      },
+      {
+        "title": "HEIR to launch Lonzo Ball NFT",
+        "content": [
+          "HEIR, a Web3 platform co-founded by Michael Jordan's son, Jeffrey, is launching its first athlete membership NFT with Bulls star Lonzo Ball."
+        ],
+        "url": "https://www.axios.com/2022/06/02/michael-jordan-nft-with-lonzo-ball"
+      }
+    ]
+  },
+  "GDBJ3qv4tJXiCbz5ASkSMYq6Xfb35MdXsMzgVaMnr9Q7" : {
+    "symbol": "Raydium",
+    "heading": "Raydium is an Automated Market Maker (AMM) built on the Solana blockchain for the Serum Decentralized Exchange (DEX). ",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Raydium is an automated market maker (AMM) and decentralized exchange (DEX) built on Solana. Raydium users can swap in liquidity pools, trade using an order book, participate in liquidity mining, or stake RAY to participate in IDOs through the Raydium AcceleRaytor launchpad.",
+          "Unlike other AMM DEXs where liquidity is siloed off from other platforms, Raydium leverages its pool liquidity to place orders on Serum's central limit order book, providing a free market making service to token pairs. Raydium features permissionless creation of constant product pools, yield farms and concentrated liquidity pools, allowing any project team or user to create a market, list a token, and automatically market make on Serum's central limit order book."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://raydium.gitbook.io/raydium/"
+    },
+    "resources": [
+      {
+        "title": "What Is Raydium (RAY)?",
+        "content": [
+          "Raydium is an automated market maker (AMM) built on the Solana blockchain that shares liquidity with the Serum decentralized exchange."
+        ],
+        "url": "https://www.kraken.com/learn/what-is-raydium-ray"
+      },
+      {
+        "title": "Raydium on Coinbase",
+        "content": [
+          ""
+        ],
+        "url": "https://www.coinbase.com/price/raydium"
+      },
+      {
+        "title": "Raydium on Coindesk",
+        "content": [
+          ""
+        ],
+        "url": "https://www.coindesk.com/price/raydium/"
+      }
+    ]
+  },
+  "DP2wpegQpLFYq9ntSZewi8XR6AoTdw31dbvinSekZKjr" : {
+    "symbol": "Wordcel Club",
+    "heading": "Building the Layer0 of Social Connections and Information Sharing on Solana.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Wordcel is a Decentralised Publishing Stack on Solana to enable writers to publish and monetize their work on-chain and manage their distribution while truly owning every single piece of the puzzle.",
+          "It is our first step in bootstrapping a Decentralised Social Networking ecosystem built on top of Wordcel and Solana by enabling glass eaters in the ecosystem to build applications on top of our protocol.",
+          "We want to enable Social Sovereignty online for all forms of content via an ecosystem of tools under our protocol in the future, thereby forming the Layer0 of Social Connections and Online Information Sharing in the future."
+        ]
+      }
+    ],
+    "resources": [
+      {
+        "title": "An invitation to build on Wordcel",
+        "content": [
+          "A deep-dive on why you should build on Wordcel, along with 3 fundable RFPs"
+        ],
+        "url": "https://superteam.substack.com/p/an-invitation-to-build-on-wordcel"
+      }
+    ]
+  },
+  "8mrcnaGgMVKsYzWRDzSe47n2hTQjkuhYeXHGgSR1xkHP" : {
+    "symbol": "Primitives",
+    "heading": "primitives is the most joyful place to interact with blockchains :)",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Primitives exist to make crypto products fun, easy to use, and accessible to everybody. We believe we've created the easiest onboard into a crypto wallet, and an intuitive minting experience, tied together by ephemeral chatrooms all in one place.",
+          "Create a profile NFT and send it to close friends through Primitives to begin bringing your social graph on-chain."
+        ]
+      }
+    ],
+    "resources": [
+      {
+        "title": "Primitives wants to turn your crypto wallet into a social network",
+        "content": [
+          "DJ Gabeau, one of Snapchat Stories’ earliest engineers and founder of web3 social network Primitives, told TechCrunch that he thinks NFTs can be a genuinely enjoyable way for people to connect with one another digitally and make memories."
+        ],
+        "url": "https://techcrunch.com/2022/05/25/primitives-crypto-wallet-social-network-snapchat-startup/"
+      }
+    ]
+  },
+  "HWYGhNLKUrrE8RmVkitDZrgsb68Ye8sp5P2pVLb2FyNf" : {
+    "symbol": "Gangbusters Ltd",
+    "heading": "Community-driven Social Web3 Gaming - Building Everlasting IPs Togehter with Our Fans! ",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "At Gangbusters, we are building community-driven, social cross-platform web3 games that are embedded into the way people spend time online. Our first game BattleTabs has had over 1.4m installs with an active community of over 15k fans on Discord. Inspired by our community activities, player-hosted tournaments, and fan content, we are leveraging composable, player-owned crypto assets to super-charge our community to create strong IPs with a rich ecosystem."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://www.gangbusters.io/blog"
+    },
+    "resources": [
+      {
+        "title": "An Interview with Justin Kan",
+        "content": [
+          ""
+        ],
+        "url": "https://www.youtube.com/watch?v=nRbUc9N9hGY"
+      },
+      {
+        "title": "BattleTabs Fleet Brawl x Fractal",
+        "content": [
+          "Welcome to the BattleTabs x Fractal Tournament! Shoot down enemy battleships to win free mint tokens."
+        ],
+        "url": "https://fractal.medium.com/battletabs-fleet-brawl-x-fractal-d7e83852fc7e"
+      },
+      {
+        "title": "Bandai Namco Investment Press",
+        "content": [
+          ""
+        ],
+        "url": "https://www.bandainamcoent.co.jp/corporate/press/top/single.html?q=040SzIrxF6"
+      }
+    ]
+  },
+  "8msNFq5VBectsGAv66zYx5QRve1p3m6ZEz49xaWX3tbd" : {
+    "symbol": "Parcl",
+    "heading": "Parcl is an investment protocol that allows users to trade the price movements of real estate markets around the world. ",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "The Parcl Protocol is a DeFi investment platform that allows users to trade the price movements of real estate markets around the world. Users can discover global real estate markets, gain detailed insights, and have the opportunity to either buy or short real estate markets based on whether they think real world property values will increase or decrease. To provide users with the most accurate and reliable data to trade on, Parcl prices are powered by the Parcl Price Feed, which represents the median price per square foot/meter, aggregated at either the city or neighborhood level, and updated daily.",
+          "We're on a mission to deliver real estate to everyone."
+        ]
+      }
+    ],
+    "resources": [
+      {
+        "title": "Blockchain Real Estate Startup Raises Round To Expand Digitized Property Investments",
+        "content": [
+          "The capital will go toward staff expansion and marketing, co-founder and CEO Trevor Bacon told Blockworks"
+        ],
+        "url": "https://blockworks.co/blockchain-real-estate-startup-raises-round-to-expand-digitized-property-investments/"
+      },
+      {
+        "title": "Housing Markets Are Tanking, But Can Blockchain Solve Real Estate Volatility? Interview With Parcl CEO Trevor Bacon",
+        "content": [
+          "Benzinga sat down with Trevor Bacon, CEO and co-founder of Parcl, to gain insight on how to monetize current real estate market volatility through cutting-edge blockchain solutions."
+        ],
+        "url": "https://www.benzinga.com/markets/cryptocurrency/22/10/29279270/housing-markets-are-tanking-but-can-blockchain-solve-real-estate-volatility-interview-with"
+      },
+      {
+        "title": "How Blockchain Is Enabling The Next-Generation Of Real Estate Investors",
+        "content": [
+          "How Blockchain Is Enabling The Next-Generation Of Real Estate Investors"
+        ],
+        "url": "https://cryptonews.com/news/how-blockchain-is-enabling-the-next-generation-of-real-estate-investors.htm"
+      }
+    ]
+  },
+  "5jHwG4CWkZhJD75M9kiZybGtzr4GC32NwvEq6dmSKefm" : {
+    "symbol": "Enthusiast Gaming",
+    "heading": "Ev.io is a competitive first person shooter on Solana in which you can earn SOL for getting kills. ",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Ev.io is a play to earn blockchain FPS - equip an NFT character skin, weapon or sword to start earning e (which converts to SOL) for every kill. Equip all 3 to unlock maximum earning potential. Earn bonuses for bonuses e.g. sword kills, trip mine kills and killing sprees."
+        ]
+      }
+    ],
+    "resources": [
+      {
+        "title": "A Glimpse into the Future of Gaming",
+        "content": [
+          "EV.io is a Solana NFT-enabled game developed by a small team from Enthusiast Gaming, exemplifying a “game first, crypto second” approach to game development."
+        ],
+        "url": "https://www.vaneck.com/us/en/blogs/digital-assets/a-glimpse-into-the-future-of-gaming/"
+      }
+    ]
+  },
+  "27tbVohNkTpWiKtz1oGJQPhb3gPSGJfc4e2MtqFcuSuW" : {
+    "symbol": "Glass",
+    "heading": "Glass is the first video NFT marketplace for video creators, collectors, and traders built on the solana blockchain. ",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Glass is the first video NFT marketplace for video creators, collectors, and traders built on the solana blockchain. Glass helps creators by turning their videos into collectibles on the solana blockchain and allowing them to sell those video NFTs directly to their superfans. Our mission is to demonstrate the true value of video content with an ecosystem that accelerates investment, inspiration, creation & community. In the past year, the seven-person company has generated around $1 million in revenue for its creators, and the company itself has brought in about $100,000 in revenue from NFT revenue splits. It has worked with artists like Timbaland and Kygo."
+        ]
+      }
+    ],
+    "resources": [
+      {
+        "title": "Exclusive: NFT video platform Glass raises $5M, led by TCG, 1kx",
+        "content": [
+          "Glass, a video platform that allows creators to monetize their videos as NFTs, has raised a $5 million seed round."
+        ],
+        "url": "https://www.axios.com/2022/09/27/exclusive-nft-video-platform-glass-raises-5m-led-by-tcg"
+      }
+    ]
+  },
+  "99vU7SHYJ4tSEqRNjY352Fx7gMSYfgcqxmjBMDyx3q8j" : {
+    "symbol": "Vyper Protocol",
+    "heading": "A DeFi primitive to create, trade, and settle, on-chain derivatives",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Vyper is a primitive for permissionless derivatives. It allows anyone to participate in derivatives trading. Our unique architecture brings scalability and modularity to derivatives, bridging TradFi to DeFi"
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.vyperprotocol.io/"
+    },
+    "resources": [
+      {
+        "title": "The Vyper Protocol Medium Page",
+        "content": [
+          ""
+        ],
+        "url": "https://medium.com/@vyperprotocol"
+      }
+    ]
+  },
+  "G2jq991DwNM1irZFwhPtCmzquXwBNQvAg5Sj8tBnqA2H" : {
+    "symbol": "Hyperspace",
+    "heading": "Solana’s most powerful NFT trading platform. Explore and collect NFTs aggregated across all marketplaces.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Hyperspace.xyz is an all-in-one NFT platform built on Solana. Built by the original Solanalysis team.",
+          "Our Mission: To enable the best NFT trading and commerce experience for everyone - while protecting the openness and composability of web3.",
+          "Core Products:\nMarketplace - we've built the most powerful NFT trading experience on Solana. Not only can you trade on our native marketplace contract with low fees, but you can also trade across all other Solana marketplaces - all from a single UI\nLaunchpad - we work closely with project creators to launch new NFT projects\nAnalytics - quickly track and analyze trends across different NFT projects\nUpcoming Drops - monitor new NFT projects launching everyday on Solana"
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.hyperspace.xyz/hype/"
+    },
+    "resources": [
+      {
+        "title": "Hyperspace raises $4.5m for aggregation of Solana NFTs",
+        "content": [
+          "With this round of financing, Hyperspace said it plans to focus on product development and ramping up marketing efforts"
+        ],
+        "url": "https://coinrivet.com/hyperspace-raises-4-5m-for-aggregation-of-solana-nfts/"
+      }
+    ]
+  },
+  "HivVP77n6hsrgsaJUoHkYRMzgjjfmgWdcRrdrYSm6LLg" : {
+    "symbol": "CAMPUS",
+    "heading": "The First & Fastest-Growing Officially-Licensed Token Marketplace for College Sports",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "With widespread fandom but traditional infrastructure, the sports industry is a prime candidate for a tech disruption. CAMPUS aims to be the vehicle for that transformation.",
+          "A college sports-focused NFT platform co-founded by Tim Tebow and led by co-founder Christine Menedis, CAMPUS is the exclusive NFT partner of the Heisman Trophy Trust and Nissan Heisman House and boasts 25+ university partners, including UNC, LSU, Michigan State and Cal. Athletes from partner schools help to create their own NFTs with utility that features access and ownership that's unprecedented in sports.",
+          "Blockchain will become the standard in the sports industry over the next decade and CAMPUS is helping college athletics get there. Visit CAMPUS today to get in early."
+        ]
+      }
+    ],
+    "resources": [
+      {
+        "title": "The Campus Medium Page",
+        "content": [
+          ""
+        ],
+        "url": "https://medium.com/@campus.io"
+      },
+      {
+        "title": "The Campus Youtube Channel",
+        "content": [
+          ""
+        ],
+        "url": "https://link.campus.io/youtube"
+      },
+      {
+        "title": "Tim Tebow and Nissan CMO Talk NFTs and NIL at Ad Age Event",
+        "content": [
+          "The former college football star joins brand leaders from Macy's, Liberty Mutual, Abercrombie & Fitch and others"
+        ],
+        "url": "https://adage.com/article/ad-age-events/ad-age-next-cmo-dec-7-2022-tim-tebow-nissan-abercrombie-fitch-macys-liberty-mutual/2442136"
+      }
+    ]
+  },
+  "FneznCHADXLsDjkvq51UmhZMropsXkSbkzJ5qXBMw1RF" : {
+    "symbol": "Port Finance",
+    "heading": "",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Port Finance is a suite of interest rate products including variable rate lending, fixed rate lending and interest rate swap with peak TVL 300 Million. We have raised a total of 6.3 million of funding from investors such as Spartan Capital, Alameda Research, Brevan Howards, Jump Capital, Defi Alliance and many others.",
+          "We are one of the first protocols to bring variable rate lending to Solana mainnet and also the first protocol to introduce fixed rate lending. Both of the protocols, plus an open source SDKs to interact with them, a liquidator are all open-sourced to the wider Solana community."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.port.finance/"
+    },
+    "resources": [
+      {
+        "title": "Port Finance raises a $5.3M strategic round to offer fixed rate lending on Solana",
+        "content": [
+          "Port Finance, the Solana based lending protocol with the vision of bringing a whole suite of interest rate products to DeFi users, has raised $5.3M in its latest strategic funding round."
+        ],
+        "url": "https://www.globenewswire.com/news-release/2021/12/23/2357516/0/en/Port-Finance-raises-a-5-3M-strategic-round-to-offer-fixed-rate-lending-on-Solana.html"
+      }
+    ]
+  },
+  "J7deUothQNZ2momjrDwetv9RjL714h8U8cSz6oVd3s1m" : {
+    "symbol": "Elusiv",
+    "heading": "Elusiv combines privacy with safety by offering compliance in mind next-generation privacy solutions for a better Web3.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Elusiv is a compliance-in-mind Zero-Knowledge protocol for privately sending and receiving SOL or SPL tokens on the Solana blockchain. Furthermore, we propose Elusiv VMs, an extension of Elusiv, to enable more rapid development of solutions leveraging more general ZK circuits."
+        ]
+      }
+    ]
+  },
+  "C98yb8FSshG7oH5pCMf41ghg199YjsoUozxQ4VdCpwmM" : {
+    "symbol": "Aurory",
+    "heading": "Aurory Project is a AAA studio building the web3 gaming platform of the future.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "In Aurory, players can complete quests, discover lost relics, defeat enemies, and compete against other players in a variety of immersive game modes using magical creatures called Nefties!",
+          "The single-player Aurory Adventure mode (PvE), features an epic storyline with parallels to the crypto-universe, told through aesthetically colorful art and delivered with high quality production value. Players are taught all about crypto, blockchain, NFTs, and more through an engaging story about the adventures of our heroes, Sam and Helios.",
+          "In the multiplayer Tactics Mode (PvP), players will learn how to best use their assets and rise to the top of the leaderboard, competing against other players.",
+          "Aurory bridges the gap between traditional pfp projects and AAA gaming. In October, 2021, Aurory launched it’s own 10K pfp NFT project called “Aurorians”. The team then had 10,000 unique 3D models created and in May 2022, they launched their first playable NFT experience. This allows Aurorian holders to play with their unique NFT avatar as the protagonist in the game’s Adventure Mode."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://aurory.substack.com/"
+    },
+    "resources": [
+      {
+        "title": "Aurory Launches New Patch with New Energy System and Reward Loop",
+        "content": [
+          "Aurory Project outlined the new rewards system, new Nefty, big UI improvements, and other notable changes, such as the nerfing of specific functions."
+        ],
+        "url": "https://www.investing.com/news/cryptocurrency-news/aurory-launches-new-patch-with-new-energy-system-and-reward-loop-2924168"
+      },
+      {
+        "title": "Esports Giant TSM FTX Teams Up With Solana 'Blue Chip' NFT Game Aurory",
+        "content": [
+          "Aurory aims to be the “Axie Infinity” of Solana. It’s backed by some of the same investors, and now it’s mixing it up with one of biggest esports teams around."
+        ],
+        "url": "https://decrypt.co/82404/tsm-ftx-aurory-nfts-solana"
+      },
+      {
+        "title": "Aurory set to release SyncSpace feature",
+        "content": [
+          "The new feature for the Solana-based play-and-earn JRPG is a gamified inventory system that mixes on-chain and off-chain interaction in order to minimize the number of transactions, providing a more seamless experience."
+        ],
+        "url": "https://playtoearn.net/news/aurory-set-to-release-syncspace-feature"
+      }
+    ]
+  },
+  "5KvezmjkfTshcWZ56jt6xj88Nu5Lbgy4gigHenhH8HPb" : {
+    "symbol": "Chillchat",
+    "heading": "Chillchat is the collaborative platform to build virtual worlds.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Your home on the internet: Find an escape while exploring tons of unique worlds.",
+          "Find your party: A place where you belong, with people just as weird as you.",
+          "Create your wildest dreams: Go at it alone or drag your frens along and build something epic. Don’t worry, it’s easy!",
+          "Virtual worlds make everything more fun: There's one for every occasion, whether for playing games, running events, working remotely, or just chilling out  It's all up to how you use them.",
+          "Powered by $CHILL: Use it to mint your creations as NFTs or buy, sell, and trade with other creators on our community marketplace. Got extra $CHILL? Stake it to earn more passively."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": ""
+    },
+    "resources": [
+      {
+        "title": "Solana Ventures leads $1.9m round of NFT gaming platform",
+        "content": [
+          "Southeast Asian blockchain company Chillchat has raised US$1.9 million in a seed round led by Solana Ventures, with participation from FTX Ventures, Animoca Brands, and Yield Guild Games Southeast Asia."
+        ],
+        "url": "https://www.techinasia.com/chillchat-seed-funding-solana-ventures"
+      },
+      {
+        "title": "Chillchat Raises US$8.35M in Seed Rounds for a Social 'Create-to-Earn' Metaverse",
+        "content": [
+          "Chillchat has raised US$6.5 million through a seed token round to build out its \"Create2Earn\" 2D pixel art social metaverse that fosters interpersonal connections and collaboration."
+        ],
+        "url": "https://www.globenewswire.com/en/news-release/2022/06/07/2457772/0/en/Chillchat-Raises-US-8-35M-in-Seed-Rounds-for-a-Social-Create-to-Earn-Metaverse.html"
+      }
+    ]
+  },
+  "2hzSGHCfkAaGWedSc3Bh9CrmxGaQNCu8wjZPUfvbkYm7" : {
+    "symbol": "Grim Syndicate",
+    "heading": "Global storytelling brand anchored in lore, gaming, and unique NFT experiences.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "The Grim Syndicate is  collection of 10,000 unique, generative reaper agent NFTs minted on the Solana Blockchain. These Grims are both a pass into the community, as well as, a transportive ticket into a new infinitum of experiences.",
+          "The Lore: Whether you call us logistic supervisors or ferrymen for the non-corporeal, transporting Souls to the Ethereal Plane is quite literally our job at the Ethereal Transit Authority. We take pride in our work; shepherding Souls of each and every world, universe, and planar dimension to their next great adventure!",
+          "But while most newly untethered  Souls easily make their way quickly and easily to our Phantom Phreights (patent pending), some Souls need a little extra ...encouragement!",
+          "That’s where the Agents of the Grim Syndicate come in – an elite collective responsible for ferrying some of those fickle Souls from across the dimensional spectrum (even those hard-to-reach pocket universes) to arrive at their final destination. At the Ethereal Transit Authority death doesn't have to mean a dead-end.",
+          "The Upcoming: Abysswalkers, our card and tile game, is the connective tissue that ties all of the Grim Syndicate experiences together in what will be a competitive gaming scene for Grim holders and others outside of the traditional NFT ecosystem."
+        ]
+      }
+    ],
+    "resources": [
+      {
+        "title": "Grim Syndicate on Magic Eden",
+        "content": [
+          ""
+        ],
+        "url": "https://magiceden.io/creators/grim_syndicate"
+      }
+    ]
+  },
+  "7f47FkSAJqJLNY5p3jKxp7CLbEYbQDhhmKuYDJKrNJEq" : {
+    "symbol": "Degenerate Ape Academy ",
+    "heading": "",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Our mission here at the academy is simple: Take 10,000 of the smoothest brained apes, put them all in one location and let the mayhem ensue. The academy was founded on the principles of friendship making, crayon eating and absolute, unregulated, deplorable, degenerate behaviour. Welcome fellow apes, to the Degenerate Ape Academy."
+        ]
+      }
+    ]
+  },
+  "5Mt6EghNJHaPbNtHxH7tbbrMdwSP3sXcPRCqwPCbTVN4" : {
+    "symbol": "Audius",
+    "heading": "Audius is a fully decentralized music platform. Own the masters & the platform.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Audius is a music community and discovery platform that puts the artist in control.",
+          "It does this by being fully decentralized: Audius is owned and run by a vibrant, open-source community of artists, fans, and developers all around the world. Audius gives artists the power to share never-before-heard music and monetize streams directly. Developers can build their own apps on top of Audius, giving them access to one of the most unique audio catalogs in existence.",
+          "Backed by an all-star team of investors, Audius was founded in 2018 and serves millions of users every month, making it one of the largest crypto applications ever built.",
+          "Learn more at https://audius.co"
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.audius.org/"
+    },
+    "resources": [
+      {
+        "title": "And the First Streaming Service to Partner With TikTok Is…",
+        "content": [
+          "It's the blockchain-powered Audius, rather than Spotify or Apple Music, that will let artists upload songs into TikTok's Sound Kit in one click"
+        ],
+        "url": "https://www.rollingstone.com/pro/news/tiktok-sounds-streaming-crypto-blockchain-nfts-audius-1211699/"
+      },
+      {
+        "title": "What is Audius? The Decentralized Music Sharing and Streaming Service",
+        "content": [
+          "It’s like Spotify or SoundCloud, but on the blockchain: Audius is a crypto-powered music streaming app that’s giving power back to artists."
+        ],
+        "url": "https://decrypt.co/resources/what-is-audius-the-decentralized-music-sharing-and-streaming-service"
+      }
+    ]
+  },
+  "23DjgMdE4vCCNckzy8F4NvRFMxH6X2LVU6DrC75btVR8" : {
+    "symbol": "Cega",
+    "heading": "Cega is the #1 options protocol on Solana building exotic options structured products offering the best risk-adjusted yield.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Cega builds exotic options structured products for retail investors that generate superior yield and offer built-in protection against market downturns. Cega is developing new capabilities in tech, token contracts, and data modeling that will enable the next evolution of defi derivatives.",
+          "Cega's inaugural product is the fixed coupon note (FCN) which is a type of exotic option structured product that has both equity option and bond-like characteristics. Investors earn high, daily yield payments on their deposited capital until the FCN expires/matures",
+          "At expiry, the initial deposit is returned to investors in full if the price of the FCN's linked crypto assets have not fallen by a significant amount (e.g. 50% or more)."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://cega.gitbook.io/cega/"
+    },
+    "resources": [
+      {
+        "title": "Cega Mainnet Launch",
+        "content": [
+          ""
+        ],
+        "url": "https://www.youtube.com/watch?v=3cI1z1sgpes"
+      }
+    ]
+  },
+  "4vXAFpUSfRzxbtriRe7tH6u2Uwbm2SmBsD8EKnWow5qh" : {
+    "symbol": "Cogni",
+    "heading": "Your crypto, paycheck, and debit card – all in one sleek app.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Cogni is a super wallet that lets you hold your crypto, paycheck, and debit card in the same app. Plus, powerful lifestyle features designed for the next generation of money and asset management. We’re a financial technology platform bringing banking and crypto services created for the 1% to the 99%. "
+        ]
+      }
+    ]
+  },
+  "BqLWTZv8xfJiCtu9gm87T1EqtAnL2cCJ1PS9JoKn3oBy" : {
+    "symbol": "Backpack",
+    "heading": "Backpack is a home for your xNFTs.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Today, wallets are the gatekeepers of blockchain ecosystems. They’re permissioned, closed, and closer to \"Web 2\" than they are to \"Web 3\". If you want to build a new protocol, you need to lobby for integration, but there are so many protocols on so many blockchains that no one can expect to be included. It’s a product management nightmare, and it’s holding back innovation. Wallets are more like blackberries than they are like iPhones—token specific asset management tools—but imagine a wallet that used all of your crypto assets. Imagine if you could manage your Mango margin accounts, stake your DeGods, or view your Magic Eden listings not in a web view, but natively in a single interface. Imagine if you wanted to create your own token protocol with your own twist without having to convince everyone to implement it. xNFTs are the standard breaking standard making all of this possible. And for the first chapter in this story, we’re building not a wallet, but something different, an xNFT operating system we call Backpack.",
+          "Like a wallet, Backpack manages your private keys and connects to apps. But unlike anything else, it’s asset and protocol agnostic. Everything in the wallet is an xNFT. This is a big deal. Most wallets only show your tokens. Some don’t even show your precious JPEGs. Backpack, however, is a home for everything. It’s an open, programmable system built for Web3. And like any other application operating system, has a set of developer frameworks and APIs associated with it, allowing anyone to build their own xNFT apps for any protocol on any blockchain—without permission.",
+          "Backpack and xNFTs give developers the ability to create more immersive and customized user experiences."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.xnft.gg"
+    },
+    "resources": [
+      {
+        "title": "An ‘iPhone launch moment for Web3’? Coral raises $20M from FTX Ventures and Jump Crypto to build Backpack",
+        "content": [
+          "Coral wants to create the Web3 version of the Apple app store. To do so, it’s launching a different kind of wallet platform called Backpack."
+        ],
+        "url": "https://fortune.com/crypto/2022/09/28/coral-raises-20-million-ftx-ventures-jump-crypto-backpack-wallet/"
+      },
+      {
+        "title": "Solana developer platform Coral raises $20M led by FTX, Jump Crypto to build web3’s iPhone",
+        "content": [
+          "The company announced today that it has raised a $20 million strategic round led by FTX Ventures and Jump Crypto, with participation from Multicoin Capital, Anagram, K5 Global and others."
+        ],
+        "url": "https://techcrunch.com/2022/09/28/solana-coral-ftx-jump-crypto-iphone-web3-apps-xnfts/"
+      },
+      {
+        "title": "FTX Ventures, Jump Crypto Lead $20M Fundraise for Executable NFT Wallet",
+        "content": [
+          "The wallet, a forthcoming project from Solana developer Coral, will give users ownership of application code."
+        ],
+        "url": "https://www.coindesk.com/business/2022/09/28/ftx-ventures-jump-crypto-lead-20m-fundraise-for-executable-nft-wallet/"
+      }
+    ]
+  },
+  "G1RWjNmizVM6vR8pEsHta4iRYcTa7jWM1mQErz4phpRy" : {
+    "symbol": "Bastion",
+    "heading": "Bastion, leveling up the DAO experience both for the voter and for the DAO!",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Winners of the DAO category in the Solana Summer Camp Hackathon 2022 and built on top of Realms; Bastion provides a comprehensive DAO tool that helps DAOs on Solana to truly access DeFi and help it's voters become more involved. "
+        ]
+      }
+    ],
+    "resources": [
+      {
+        "title": "Meet the winners of the Solana Summer Camp Hackathon",
+        "content": [
+          "For the DAOs track, first place went to Bastion, which allows a DAO to become a wallet that transacts across Solana dApps and signs governance proposals, which secured a prize of $50,000 in USDC."
+        ],
+        "url": "https://solana.com/news/solana-summer-camp-winners"
+      },
+      {
+        "title": "First place in the #SolanaSummerCamp DAOs Track goes to Bastion, which allows a DAO to become a wallet that transacts across Solana dApps and signs governance proposals",
+        "content": [
+          ""
+        ],
+        "url": "https://twitter.com/solana/status/1570081447435997187"
+      }
+    ]
+  },
+  "9MwbgfEkV8ZaeycfciBqytcxwfdYHqD2NYjsTZkH4GxA" : {
+    "symbol": "Magic Eden",
+    "heading": "Magic Eden is the leading NFT platform for discovery, expression, and ownership across digital cultures. ",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Magic Eden is the leading community-centric NFT marketplace driving the next billion users to Web3. Led by product focused leaders, Magic Eden is building a user-friendly platform powered by market-leading minting and trading solutions.",
+          "Magic Eden brings dynamic cultural moments onto the blockchain, empowering users across thousands of digital communities to create, discover and collect unique NFTs.",
+          "MagicDAO is the platform and community in which people can engage with each other and product features supporting the future of our marketplace can be explored and tested together."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": ""
+    },
+    "resources": [
+      {
+        "title": "Magic Eden raises $130M, hitting unicorn status at $1.6B valuation",
+        "content": [
+          "NFT marketplace Magic Eden, launched just nine months ago, has raised $130 million in a Series B round co-led by Electric Capital and Greylock Partners, bringing its valuation to $1.6 billion."
+        ],
+        "url": "https://techcrunch.com/2022/06/21/magic-eden-raises-130m-hitting-unicorn-status-at-1-6b-valuation/"
+      },
+      {
+        "title": "Magic Eden CEO: ‘Very Natural’ to Expand From Solana to Ethereum NFTs",
+        "content": [
+          "Jack Lu tells Decrypt about the top Solana marketplace’s embrace of Ethereum—and why Magic Eden was “worried” about the reaction."
+        ],
+        "url": "https://decrypt.co/110185/magic-eden-ceo-very-natural-to-expand-from-solana-to-ethereum-nfts"
+      },
+      {
+        "title": "Magic Eden launches Magic Ventures fund for Web3 games",
+        "content": [
+          "Magic Eden has launched Magic Ventures, a new venture capital fund that will focus on investments in Web3 games."
+        ],
+        "url": "https://venturebeat.com/games/magic-eden-launches-magic-ventures-fund-for-web3-games/"
+      }
+    ]
+  },
+  "wx9R4TZLgL4VaVK89uW9D9DpMKMUCSm16nABeahk9Ex" : {
+    "symbol": "DeGods",
+    "heading": "Degods is on a mission to build the best communities on the internet. ",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Degods are a collection of degenerates, punks, and misfits. Gods of the metaverse & masters of our own universe. DeGods can be converted to DeadGods with DUST.",
+          "Known for their countless experiments and unique experiences, this community often leads the direction of the Solana NFT market."
+        ]
+      }
+    ]
+  },
+  "ALzXvpmcmqmpNcFTbPzZ8ykSxHGqta85gTANfi8YPkPW" : {
+    "symbol": "Solana Mobile",
+    "heading": "Solana Mobile is bringing web3 to mobile through the Solana Mobile Stack (SMS) and Saga, a flagship Android smartphone.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Solana Mobile is set out to provide the best web3 experience on mobile for Solana users. We're doing so through two efforts: First, the Solana Mobile Stack (SMS) provides a new set of libraries for wallets and apps, allowing developers to create rich mobile experiences on Solana, the world’s most performant blockchain, and is built to run alongside Android. The SDK provides libraries and programming interfaces for Android apps and secure key private storage, simplifying the developer experience to build and extend dApps functionality for Solana.",
+          "In addition to the Solana Mobile Stack, we're releasing Saga. Saga is a flagship Android mobile phone with unique functionality and features tightly integrated with the Solana blockchain making it easy and secure to transact in web3 and manage digital assets, such as tokens and NFTs. Saga will be the first device to include Seed Vault, which protects user private keys via secure hardware and AES encryption.",
+          "Finally, Solana Mobile is introducing the Solana dApp Store, a new distribution channel for native mobile dApps built on Solana. With no fees on in-app purchases, dApp sales, or subscriptions, the dApp Store will be the home to the next wave of great web3 experiences."
+        ]
+      }
+    ]
+  },
+  "DgWc4yWcqDnG62ZH6bHMeHfZUhBf5y7HZ9uqvgMs8JQW" : {
+    "symbol": "Taki",
+    "heading": "Own your token-powered social network with TAKI.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Taki is a token powered global social network that enables creators and fans to own their influence. Anyone can create their own User Coin. Users and  can earn social crypto tokens simply by participating within the community. Users can earn $TAKI, the basic social crypto token on the Taki App, by engaging and creating content - such as writing posts or commenting.  $TAKI can then be used to buy User Coins which represent the value and influence creators bring to Taki.  Use $TAKI and User Coins to reward others, grow your audience and share in the ownership of Taki."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://wiki.taki.app/key-concepts/taki-app"
+    },
+    "resources": [
+      {
+        "title": "Taki raises $3.45 mn in seed funding from CoinDXC, Coinbase Ventures, others",
+        "content": [
+          "Taki brings a unique engagement platform for creators, users, and crypto enthusiasts, who can earn a daily income by posting content and chatting with others about things that interest them."
+        ],
+        "url": "https://www.livemint.com/companies/start-ups/taki-raises-3-45-mn-in-seed-funding-from-coindxc-coinbase-ventures-others-11649329623365.html"
+      },
+      {
+        "title": "Taki is a social network that brings the old ‘engage to earn’ model in a new package, with crypto tokens as rewards",
+        "content": [
+          "The Taki social network rewards its users to engage on the social network, giving them crypto tokens in exchange."
+        ],
+        "url": "https://www.businessinsider.in/cryptocurrency/news/taki-is-a-social-network-that-brings-the-old-engage-to-earn-model-in-a-new-package-with-crypto-tokens-as-rewards/articleshow/90561223.cms"
+      },
+      {
+        "title": "Web3 Will Make Or Break Social Media",
+        "content": [
+          ""
+        ],
+        "url": "https://www.forbes.com/sites/lawrencewintermeyer/2022/08/25/web3-will-make-or-break-social-media/?sh=13022ea55f38"
+      }
+    ]
+  },
+  "7sf3tcWm58vhtkJMwuw2P3T6UBX7UE5VKxPMnXJUZ1Hn" : {
+    "symbol": "Solend",
+    "heading": "Solend is the autonomous interest rate machine for lending on Solana",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Solend is a permissionless money market on Solana. Deposit over 70 assets to earn yields or use as collateral. Users can access deep liquidity pools of blue-chip assets in Main pool, or governance tokens in Isolated pools. Additionally, users may also create their own permissionless pools with any token of their choice. "
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.solend.fi"
+    }
+  },
+  "3gmcbygQUUDgmtDtx41R7xSf3K4oFXrH9icPNijyq9pS" : {
+    "symbol": "Marinade",
+    "heading": "Secure Solana and earn rewards without your funds locked in.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Marinade is a DAO that helps Solana to become ever more censorship-resistant, performant, and capital efficient through liquid staking. It allows SOL holders to stake their SOL without locking their funds, so they can get both staking rewards and participate in DeFi using the staked SOL token called mSOL. With mSOL accepted in more than 40 projects on Solana, you can use it as collateral for borrows, provide liquidity, trade, pay for NFTs, or unstake immediately back to SOL without waiting days. Marinade stakes the delegated SOL through an open algorithmic delegation strategy, now supporting operations of over 400 validators on Solana."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.marinade.finance/"
+    },
+    "resources": [
+      {
+        "title": "Marinade DAO Executes Token Exchange Program to Align with Leading Solana Builders",
+        "content": [
+          "Marinade is pleased to officially announce the next chapter of the DAO through the execution of the Token Exchange Program. "
+        ],
+        "url": "https://finance.yahoo.com/news/marinade-dao-executes-token-exchange-153500316.html"
+      }
+    ]
+  },
+  "6NzVDMfEBJvkFDnjPx53K7mLGW3yQdSjLhsamS8go4cn" : {
+    "symbol": "Bonfida",
+    "heading": "Bonfida has a simple, yet realistic goal of providing products and services that will enhance the Solana blockchain experience. ",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Bonfida is known as the top infrastructure developer on Solana. This accolade has been earned from our contributions to the ecosystem by providing services and products that allow for the wider ecosystem to flourish.",
+          "Bonfida’s primary product is the Solana Name Service (SNS). SNS has a straightforward mission of providing users with a Web3 ID. One of the clear benefits of the name service is a human-readable name that maps to a SOL address. Wallet address formats can be a barrier to entry, and therefore having an identifiable address can facilitate payments, efficiency, and overall user experience in our sphere. A name, not a number.",
+          "Besides SNS, Bonfida’s contributions to the ecosystem include; (1) creating a new Serum Core engine, the Asset Agnostic Orderbook (AOB), (2) xMS, the cross-messaging service, to name a few.  As a result of these contributions, our developers are highly respected and sought after within the Solana ecosystem."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.bonfida.org/collection/overview"
+    }
+  },
+  "3MMDxjv1SzEFQDKryT7csAvaydYtrgMAc3L9xL9CVLCg" : {
+    "symbol": "Project Serum",
+    "heading": "Faster, Cheaper and more Powerful DeFi",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Serum brings the speed and convenience of centralized exchanges to DeFi while remaining fully trustless and transparent."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.projectserum.com"
+    },
+    "resources": [
+      {
+        "title": "The Project Serum Youtube Channel",
+        "content": [
+          ""
+        ],
+        "url": "https://www.youtube.com/channel/UCQ-jrhf6mt2PWa8cqF1-6Mw"
+      }
+    ]
+  },
+  "9pLvqBe2CxC4HXQD5UQ7YLpQUqC5A9SqU4kNqw9inbNQ" : {
+    "symbol": "Eternal Dragons",
+    "heading": "Eternal Dragons is a Web3 gaming series brought to you by Trailblazer Games, telling the story of the long-lost Eternal Dragons.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "The epic new gaming series Eternal Dragons is brought to you by Trailblazer Games. Trailblazer Games is a Web3-native gaming studio formed by a team consisting of three serial entrepreneurs and veteran gaming industry leaders from the likes of King, EA, and Microsoft, who have experience in building large-scale and sustainable free-to-play economies. A shared passion unites them for creating engaging and entertaining gaming experiences.",
+          "In parallel with the development of games, Trailblazer is developing a platform that will power a new global economy where guilds can efficiently access capital, trade assets, and hire talent to compete, grow and succeed. This platform is being integrated into the game experience to provide value directly to the players and the community by delivering a full vertical slice at each stage of development.",
+          "Our goal is that the Eternal Dragons IP will transcend the original game series, powered by the blockchain, to provide future value and experiences within other media and entertainment formats and in the decentralized finance space. To achieve that, we are laser-focused on, first and foremost, creating fun gameplay with mass market potential, packaged in an exciting fantasy universe of dragons and magic where anything is possible and where the players write the actual history."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://builder.eternaldragons.com/"
+    },
+    "resources": [
+      {
+        "title": "Trailblazer Games raises $8.2M for Eternal Dragons blockchain game",
+        "content": [
+          "Trailblazer Games has raised $8.2 million to develop a fantasy blockchain game and universe dubbed Eternal Dragons."
+        ],
+        "url": "https://venturebeat.com/games/trailblazers-raises-8-2m-for-eternal-dragons-blockchain-game/"
+      },
+      {
+        "title": "Episode 29 of the Right Click, Save NFT Podcast",
+        "content": [
+          "In this week's episode we chat with Alex one of the founders of the Eternal Dragons project."
+        ],
+        "url": "https://www.youtube.com/watch?v=TlX4puABZyQ"
+      },
+      {
+        "title": "Trailblazer Games on Crunchbase",
+        "content": [
+          ""
+        ],
+        "url": "https://www.crunchbase.com/organization/trailblazergames"
+      }
+    ]
+  },
+  "413KSeuFUBSWDzfjU9BBqBAWYKmoR8mncrhV84WcGNAk" : {
+    "symbol": "Tulip",
+    "heading": "Solana's Yield Aggregation Homestead",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Tulip Protocol is the first yield aggregation platform built on Solana with auto-compounding vault strategies.",
+          "The dApp (decentralized application) is designed to take advantage of Solana's low cost, high efficiency blockchain; allowing the vault strategies to compound frequently. This benefits farmers with higher APYs, not requiring active management, and lower gas fees.",
+          "The protocol offers 4 main products: auto vaults, leveraged yield farming, lending, and strategy vaults."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://tulip-protocol.gitbook.io/tulip-protocol/"
+    },
+    "resources": [
+      {
+        "title": "The Tulip Protocol Medium Page",
+        "content": [
+          ""
+        ],
+        "url": "https://medium.com/tulipprotocol"
+      }
+    ]
+  },
+  "5o6gEoeJBpuXT1H1ijFTq3KcSGx7ayabdG2hji7cB3FG" : {
+    "symbol": "Mean DAO ",
+    "heading": "Mean DAO is a protocol DAO offering Real-time payment infrastructure and Multisig to retail and businesses.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "As a protocol DAO, our philosophy is product quality and community first. Projects and people from across the DeFi space can come together to collaborate and vote to build the best products for the future of finance. Being a DAO means builders, investors, and users all have an aligned economic incentive to move us forward fast while benefiting all parties fairly."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.meandao.org/mean/products/mean-protocol"
+    }
   }
 }

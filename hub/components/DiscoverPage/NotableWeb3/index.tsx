@@ -35,13 +35,15 @@ export const ITEMS = [
     urlId: 'Streamflow',
   },
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
+    bannerImgSrc:
+      'https://www.wordcelclub.com/_next/static/media/user-default-banner.29900c53.png',
     description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+      'Building the Layer0 of Social Connections and Information Sharing on Solana.',
+    iconImgSrc:
+      'https://pbs.twimg.com/profile_images/1497183193061277697/eaH0ns0y_400x400.png',
+    name: 'Wordcel Club',
+    publicKey: new PublicKey('DP2wpegQpLFYq9ntSZewi8XR6AoTdw31dbvinSekZKjr'),
+    urlId: 'Wordcel%20Club',
   },
 ];
 

@@ -21,7 +21,7 @@ export const ITEMS = [
         developers around the world.
       </div>
     ),
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
+    publicKey: new PublicKey('5Mt6EghNJHaPbNtHxH7tbbrMdwSP3sXcPRCqwPCbTVN4'),
     stats: [
       {
         top: '7.2M',
@@ -49,7 +49,7 @@ export const ITEMS = [
         built as a native Web3 experience.
       </div>
     ),
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
+    publicKey: new PublicKey('52KrHUxbakN1rq9XoXQtSUmhdYyUZyp3YkWZQihZMTPu'),
     stats: [
       {
         top: '100%',
@@ -77,7 +77,7 @@ export const ITEMS = [
         features several opportunities including:
       </div>
     ),
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
+    publicKey: new PublicKey('ALzXvpmcmqmpNcFTbPzZ8ykSxHGqta85gTANfi8YPkPW'),
     stats: [
       {
         top: 'Seed Vault',

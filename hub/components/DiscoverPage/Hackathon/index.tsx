@@ -52,14 +52,14 @@ export const ITEMS = [
     urlId: 'IntoTheVerse',
   },
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
-    category: RealmCategory.Web3,
+    bannerImgSrc: 'https://i.imgur.com/Gwq0ZLa.png',
+    category: RealmCategory.DAOTools,
     description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+      'Bastion, leveling up the DAO experience both for the voter and for the DAO!',
+    iconImgSrc: 'https://i.imgur.com/AnlE3V1.png',
+    name: 'Bastion',
+    publicKey: new PublicKey('G1RWjNmizVM6vR8pEsHta4iRYcTa7jWM1mQErz4phpRy'),
+    urlId: 'Bastion',
   },
   {
     bannerImgSrc: '/realms/RCH/banner.png',

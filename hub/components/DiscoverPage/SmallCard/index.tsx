@@ -27,7 +27,7 @@ interface Props {
     document: RichTextDocument;
     isClipped: boolean;
   };
-  iconImgSrc: null | string;
+  iconImgSrc?: null | string;
   name: string;
   publicKey: PublicKey;
   twitterFollowerCount?: null | number;
