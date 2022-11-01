@@ -7,7 +7,7 @@ import { WSOL_MINT } from '@components/instructions/tools'
 import { MANGO_MINT } from 'Strategies/protocols/mango/tools'
 import overrides from 'public/realms/token-overrides.json'
 
-const endpoint = 'https://price.jup.ag/v1/price'
+const endpoint = 'https://price.jup.ag/v3/price'
 
 type Price = {
   id: string
@@ -57,13 +57,15 @@ class TokenService {
       )
       const symbols = tokenListRecords.map((x) => x.symbol).join(',')
       try {
-        const response = await axios.get(`${endpoint}?id=${symbols}`)
-        const priceToUsd: Price[] =
-          response?.data?.data?.filter((x) => x.id) || []
+        const response = await axios.get(`${endpoint}?ids=${symbols}`)
+        const priceToUsd: Price[] = response?.data?.data
+          ? Object.values(response.data.data)
+          : []
         const keyValue = Object.fromEntries(
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           Object.entries(priceToUsd).map(([key, val]) => [val.id, val])
         )
+        console.log(keyValue)
         this._tokenPriceToUSDlist = {
           ...this._tokenPriceToUSDlist,
           ...keyValue,
