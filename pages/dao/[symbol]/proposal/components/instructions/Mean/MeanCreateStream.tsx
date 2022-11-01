@@ -7,7 +7,7 @@ import Select from '@components/inputs/Select'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import { precision } from '@utils/formatting'
-import { getMeanCreateStreamInstruction } from '@utils/instructions/Mean'
+import getMeanCreateStreamInstruction from '@utils/instructions/Mean/getMeanCreateStreamInstruction'
 import {
   MeanCreateStream,
   UiInstruction,

@@ -97,6 +97,8 @@ Args): Promise<UiInstruction> {
     transaction2.instructions.map((i) =>
       additionalSerializedInstructions.push(serializeInstructionToBase64(i))
     )
+    console.log(additionalSerializedInstructions.map((e) => e.length))
+
     const obj: UiInstruction = {
       serializedInstruction,
       isValid: true,
@@ -107,7 +109,6 @@ Args): Promise<UiInstruction> {
     }
     return obj
   }
-
   const obj: UiInstruction = {
     serializedInstruction,
     isValid,
