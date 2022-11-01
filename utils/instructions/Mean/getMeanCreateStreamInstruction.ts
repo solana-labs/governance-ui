@@ -51,7 +51,6 @@ export default async function getMeanCreateStreamInstruction({
   setFormErrors,
 }: //setFormErrors
 Args): Promise<UiInstruction> {
-  console.log('!!!!!')
   const isValid = await validateInstruction({ schema, form, setFormErrors })
 
   const serializedInstruction = ''
@@ -59,25 +58,17 @@ Args): Promise<UiInstruction> {
   const additionalSerializedInstructions = [] as string[]
 
   const formTreasury = form.treasury as Treasury | undefined
-  console.log({
-    isValid,
-    governedTokenAccount: governedTokenAccount,
-    formTreasury: formTreasury,
-    'form.destination': form.destination,
-    'form.streamName': form.streamName,
-    'governedTokenAccount.extensions.mint':
-      governedTokenAccount?.extensions.mint,
-    'form.allocationAssigned': form.allocationAssigned,
-    'form.rateAmount ': form.rateAmount,
-  })
+
   if (
+    isValid &&
     governedTokenAccount &&
     formTreasury &&
     form.destination &&
     form.streamName &&
     governedTokenAccount.extensions.mint &&
     form.allocationAssigned &&
-    form.rateAmount
+    form.rateAmount &&
+    form.mintInfo
   ) {
     const msp = createMsp(connection)
 
@@ -88,11 +79,11 @@ Args): Promise<UiInstruction> {
     const streamName = form.streamName
     const allocationAssigned = parseMintNaturalAmountFromDecimal(
       form.allocationAssigned,
-      governedTokenAccount.extensions.mint.account.decimals
+      form.mintInfo.decimals
     )
     const rateAmount = parseMintNaturalAmountFromDecimal(
       form.rateAmount,
-      governedTokenAccount.extensions.mint.account.decimals
+      form.mintInfo.decimals
     )
     const rateIntervalInSeconds = getRateIntervalInSeconds(form.rateInterval)
     const startUtc = new Date(form.startDate)
@@ -113,26 +104,24 @@ Args): Promise<UiInstruction> {
       undefined,
       usePda
     )
-    console.log({
-      payer,
-      treasurer,
-      treasury,
-      beneficiary,
-      streamName,
-      allocationAssigned,
-      rateAmount,
-      rateIntervalInSeconds,
-      startUtc,
-      usePda,
-    })
+
     transaction.instructions.map((i) =>
       additionalSerializedInstructions.push(serializeInstructionToBase64(i))
     )
+
+    const obj: UiInstruction = {
+      serializedInstruction,
+      isValid: true,
+      governance: governedTokenAccount?.governance,
+      additionalSerializedInstructions,
+      shouldSplitIntoSeparateTxs: true,
+    }
+    return obj
   }
 
   const obj: UiInstruction = {
     serializedInstruction,
-    isValid,
+    isValid: false,
     governance: governedTokenAccount?.governance,
     additionalSerializedInstructions,
     shouldSplitIntoSeparateTxs: true,

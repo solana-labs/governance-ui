@@ -40,6 +40,7 @@ export default async function getMeanWithdrawFromAccountInstruction({
   const formTreasury = form.treasury as Treasury | undefined
 
   if (
+    isValid &&
     governedTokenAccount &&
     formTreasury &&
     form.amount &&
@@ -66,11 +67,20 @@ export default async function getMeanWithdrawFromAccountInstruction({
     transaction.instructions.map((i) =>
       additionalSerializedInstructions.push(serializeInstructionToBase64(i))
     )
+
+    const obj: UiInstruction = {
+      serializedInstruction,
+      isValid: true,
+      governance: governedTokenAccount?.governance,
+      additionalSerializedInstructions,
+      shouldSplitIntoSeparateTxs: true,
+    }
+    return obj
   }
 
   const obj: UiInstruction = {
     serializedInstruction,
-    isValid,
+    isValid: false,
     governance: governedTokenAccount?.governance,
     additionalSerializedInstructions,
     shouldSplitIntoSeparateTxs: true,

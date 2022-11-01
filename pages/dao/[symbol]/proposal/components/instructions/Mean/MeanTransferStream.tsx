@@ -74,8 +74,8 @@ const MeanTransferStreamComponent = ({ index, governance }: Props) => {
       formStream &&
       governedTokenAccountsWithoutNfts.find(
         (acc) =>
-          acc.governance.pubkey.toBase58() ===
-            formStream.treasurer.toString() && acc.isSol
+          acc.extensions?.transferAddress?.toBase58() ===
+            formStream.beneficiary.toString() && acc.isSol
       )
     setForm((prevForm) => ({
       ...prevForm,

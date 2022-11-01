@@ -37,10 +37,11 @@ export default async function getMeanWithdrawFromAccountInstruction({
   const additionalSerializedInstructions = [] as string[]
   const formStream = form.stream as Stream | undefined
 
-  if (governedTokenAccount && formStream && form.destination) {
+  if (isValid && governedTokenAccount && formStream && form.destination) {
     const msp = createMsp(connection)
 
     const beneficiary = getGovernedAccountPk(governedTokenAccount)
+
     const stream = new PublicKey(formStream.id)
     const newBeneficiary = new PublicKey(form.destination)
 
@@ -52,11 +53,20 @@ export default async function getMeanWithdrawFromAccountInstruction({
     transaction.instructions.map((i) =>
       additionalSerializedInstructions.push(serializeInstructionToBase64(i))
     )
+
+    const obj: UiInstruction = {
+      serializedInstruction,
+      isValid: true,
+      governance: governedTokenAccount?.governance,
+      additionalSerializedInstructions,
+      shouldSplitIntoSeparateTxs: true,
+    }
+    return obj
   }
 
   const obj: UiInstruction = {
     serializedInstruction,
-    isValid,
+    isValid: false,
     governance: governedTokenAccount?.governance,
     additionalSerializedInstructions,
     shouldSplitIntoSeparateTxs: true,

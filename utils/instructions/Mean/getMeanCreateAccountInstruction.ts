@@ -3,8 +3,8 @@ import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 
 import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
-import { validateInstruction } from '@utils/instructionTools'
 import { ConnectionContext } from '@utils/connection'
+import { validateInstruction } from '@utils/instructionTools'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import {
   MeanCreateAccount,
@@ -30,14 +30,15 @@ export default async function getMeanCreateAccountInstruction({
   form,
   schema,
   setFormErrors,
-}: //setFormErrors
-Args): Promise<UiInstruction> {
+}: Args): Promise<UiInstruction> {
   const isValid = await validateInstruction({ schema, form, setFormErrors })
 
   const serializedInstruction = ''
   const governedTokenAccount = form.governedTokenAccount
   const additionalSerializedInstructions = [] as string[]
+
   if (
+    isValid &&
     governedTokenAccount &&
     form.label &&
     form.amount &&
@@ -59,15 +60,6 @@ Args): Promise<UiInstruction> {
       type
     )
 
-    console.log({
-      payer,
-      treasurer,
-      mint,
-      label,
-      type,
-      transaction1,
-      treasuryPublicKey,
-    })
     const contributor = payer
     const treasury = treasuryPublicKey
 
@@ -82,22 +74,13 @@ Args): Promise<UiInstruction> {
       mint,
       amount
     )
-    console.log({
-      payer,
-      contributor,
-      treasury,
-      mint,
-      amount,
-      instructions1: transaction1.instructions,
-      instructions2: transaction2.instructions,
-    })
+
     transaction1.instructions.map((i) =>
       additionalSerializedInstructions.push(serializeInstructionToBase64(i))
     )
     transaction2.instructions.map((i) =>
       additionalSerializedInstructions.push(serializeInstructionToBase64(i))
     )
-    console.log(additionalSerializedInstructions.map((e) => e.length))
 
     const obj: UiInstruction = {
       serializedInstruction,
@@ -109,9 +92,10 @@ Args): Promise<UiInstruction> {
     }
     return obj
   }
+
   const obj: UiInstruction = {
     serializedInstruction,
-    isValid,
+    isValid: false,
     governance: governedTokenAccount?.governance,
     additionalSerializedInstructions,
     chunkSplitByDefault: true,
