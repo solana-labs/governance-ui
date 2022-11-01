@@ -40,6 +40,7 @@ export function LargeCard(props: Props) {
           'rounded',
           'transition-transform',
           'active:scale-95',
+          'md:active:scale-[.98]',
           props.className,
         )}
       >

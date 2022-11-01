@@ -70,6 +70,7 @@ export function SmallCard(props: Props) {
           'h-full',
           'transition-transform',
           'active:scale-95',
+          'md:active:scale-[.98]',
           props.className,
         )}
       >
