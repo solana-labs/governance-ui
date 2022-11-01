@@ -37,7 +37,7 @@ export const ITEMS = [
       },
     ],
     title: 'Audius',
-    urlId: 'RCH',
+    urlId: 'Audius',
   },
   {
     imgSrc: imgStaratlas.src,
@@ -65,7 +65,7 @@ export const ITEMS = [
       },
     ],
     title: 'Star Atlas',
-    urlId: 'RCH',
+    urlId: 'Star%20Atlas',
   },
   {
     imgSrc: imgSms.src,
@@ -93,7 +93,7 @@ export const ITEMS = [
       },
     ],
     title: 'Solana Mobile / SMS',
-    urlId: 'RCH',
+    urlId: 'Solana%20Mobile',
   },
   {
     imgSrc: imgMonkedao.src,
