@@ -135,6 +135,8 @@ export function Content(props: Props) {
             'space-x-0',
             'justify-between',
             'mt-16',
+            '-ml-2',
+            'sm:ml-0',
             'sm:space-x-2',
             'sm:justify-start',
             'sm:px-2',
