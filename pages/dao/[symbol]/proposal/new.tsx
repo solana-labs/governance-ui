@@ -113,7 +113,13 @@ import TokenRegisterTrustless from './components/instructions/Mango/MangoV4/Toke
 import TransferDomainName from './components/instructions/TransferDomainName'
 import DepositForm from './components/instructions/Everlend/DepositForm'
 import WithdrawForm from './components/instructions/Everlend/WithdrawForm'
+import InitUser from './components/instructions/Serum/InitUser'
 import MakeChangeReferralFeeParams2 from './components/instructions/Mango/MakeChangeReferralFeeParams2'
+import GrantForm from './components/instructions/Serum/GrantForm'
+import JoinDAO from './components/instructions/JoinDAO'
+import UpdateConfigAuthority from './components/instructions/Serum/UpdateConfigAuthority'
+import UpdateConfigParams from './components/instructions/Serum/UpdateConfigParams'
+import ClaimMangoTokens from './components/instructions/Mango/ClaimTokens'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -278,6 +284,7 @@ const New = () => {
                 signers: instruction.signers,
                 shouldSplitIntoSeparateTxs:
                   instruction.shouldSplitIntoSeparateTxs,
+                chunkBy: instruction.chunkBy || 2,
               }
             })
           })
@@ -300,6 +307,7 @@ const New = () => {
             prerequisiteInstructionsSigners:
               x.prerequisiteInstructionsSigners || [],
             shouldSplitIntoSeparateTxs: x.shouldSplitIntoSeparateTxs,
+            chunkBy: x.chunkBy || 2,
           }
         }),
       ]
@@ -658,6 +666,13 @@ const New = () => {
             governance={governance}
           ></MakeDepositToMangoAccountCsv>
         )
+      case Instructions.ClaimMangoTokens:
+        return (
+          <ClaimMangoTokens
+            index={idx}
+            governance={governance}
+          ></ClaimMangoTokens>
+        )
       case Instructions.ForesightInitMarket:
         return (
           <MakeInitMarketParams
@@ -742,7 +757,51 @@ const New = () => {
         return <DepositForm index={idx} governance={governance} />
       case Instructions.EverlendWithdraw:
         return <WithdrawForm index={idx} governance={governance} />
+      case Instructions.SerumInitUser:
+        return <InitUser index={idx} governance={governance} />
+      case Instructions.SerumGrantLockedSRM:
+        return (
+          <GrantForm
+            isLocked={true}
+            isMsrm={false}
+            index={idx}
+            governance={governance}
+          />
+        )
+      case Instructions.SerumGrantLockedMSRM:
+        return (
+          <GrantForm
+            isLocked={true}
+            isMsrm={true}
+            index={idx}
+            governance={governance}
+          />
+        )
+      case Instructions.SerumGrantVestSRM:
+        return (
+          <GrantForm
+            isLocked={false}
+            isMsrm={false}
+            index={idx}
+            governance={governance}
+          />
+        )
+      case Instructions.SerumGrantVestMSRM:
+        return (
+          <GrantForm
+            isLocked={false}
+            isMsrm={true}
+            index={idx}
+            governance={governance}
+          />
+        )
+      case Instructions.JoinDAO:
+        return <JoinDAO index={idx} governance={governance} />
 
+      case Instructions.SerumUpdateGovConfigAuthority:
+        return <UpdateConfigAuthority index={idx} governance={governance} />
+      case Instructions.SerumUpdateGovConfigParams:
+        return <UpdateConfigParams index={idx} governance={governance} />
       default:
         null
     }

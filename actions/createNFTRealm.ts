@@ -16,10 +16,10 @@ import {
 import { AnchorProvider, Wallet } from '@project-serum/anchor'
 
 import {
-  sendTransactionsV2,
   SequenceType,
   WalletSigner,
-  transactionInstructionsToTypedInstructionsSets,
+  sendTransactionsV3,
+  txBatchesToInstructionSetWithSigners,
 } from 'utils/sendTransactions'
 import { chunks } from '@utils/helpers'
 import { nftPluginsPks } from '@hooks/useVotingPlugins'
@@ -244,27 +244,32 @@ export default async function createNFTRealm({
     )
     const nftSigners: Keypair[] = []
     console.log('CREATE NFT REALM: sending transactions')
-    const tx = await sendTransactionsV2({
+    const signers = [
+      mintsSetupSigners,
+      ...councilMembersSignersChunks,
+      realmSigners,
+      nftSigners,
+    ]
+    const txes = [
+      mintsSetupInstructions,
+      ...councilMembersChunks,
+      realmInstructions,
+      nftConfigurationInstructions,
+    ].map((txBatch, batchIdx) => {
+      return {
+        instructionsSet: txBatchesToInstructionSetWithSigners(
+          txBatch,
+          signers,
+          batchIdx
+        ),
+        sequenceType: SequenceType.Sequential,
+      }
+    })
+
+    const tx = await sendTransactionsV3({
       connection,
-      showUiComponent: true,
       wallet,
-      signersSet: [
-        mintsSetupSigners,
-        ...councilMembersSignersChunks,
-        realmSigners,
-        nftSigners,
-      ],
-      TransactionInstructions: [
-        mintsSetupInstructions,
-        ...councilMembersChunks,
-        realmInstructions,
-        nftConfigurationInstructions,
-      ].map((x) =>
-        transactionInstructionsToTypedInstructionsSets(
-          x,
-          SequenceType.Sequential
-        )
-      ),
+      transactionInstructions: txes,
     })
 
     return {

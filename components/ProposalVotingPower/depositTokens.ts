@@ -11,7 +11,6 @@ import {
   Transaction,
   TransactionInstruction,
 } from '@solana/web3.js'
-import BN from 'bn.js'
 
 import { RealmInfo, getProgramVersionForRealm } from '@models/registry/api'
 import {
@@ -20,6 +19,7 @@ import {
   TokenProgramAccount,
 } from '@utils/tokens'
 import { sendTransaction } from '@utils/send'
+import BN from 'bn.js'
 
 interface Args {
   amount: BigNumber

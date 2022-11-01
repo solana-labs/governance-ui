@@ -92,7 +92,7 @@ export function Item(props: Props) {
             )}
           />
         )}
-        <div className="text-2xl font-semibold text-netural-900">
+        <div className="font-semibold text-netural-900 text-xl md:text-2xl">
           {props.title}
         </div>
         {props.date && (
@@ -131,6 +131,7 @@ export function Item(props: Props) {
             'justify-center',
             'mt-0.5',
             'py-3',
+            'px-4',
             'rounded',
             'w-full',
           )}
@@ -138,7 +139,7 @@ export function Item(props: Props) {
           target="_blank"
           rel="noreferrer"
         >
-          <div className="text-sm font-bold text-sky-600">
+          <div className="text-sm font-bold text-sky-600 truncate">
             {props.resource.title}
           </div>
           <ExternalLink className="h-4 w-4 ml-2 fill-neutral-500" />

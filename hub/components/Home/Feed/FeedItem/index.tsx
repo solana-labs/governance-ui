@@ -1,12 +1,16 @@
+import MilestoneIcon from '@carbon/icons-react/lib/Milestone';
 import type { PublicKey } from '@solana/web3.js';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import { FeedItem } from '../gql';
 import { AuthorAvatar } from '@hub/components/AuthorAvatar';
 import { AuthorHovercard } from '@hub/components/AuthorHovercard';
+import { RealmIcon } from '@hub/components/RealmIcon';
 import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay';
 import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
 import cx from '@hub/lib/cx';
+import { estimateRealmUrlId } from '@hub/lib/estimateRealmUrlId';
 import { FeedItemType } from '@hub/types/FeedItemType';
 import { ProposalState } from '@hub/types/ProposalState';
 
@@ -21,7 +25,34 @@ interface BaseProps {
 interface Props extends BaseProps {
   feedItem: FeedItem;
   realm: PublicKey;
+  realmInfo?: {
+    iconUrl?: null | string;
+    name: string;
+    urlId: string;
+  };
   realmUrlId: string;
+}
+
+function getUrl(props: Props) {
+  if (props.realm.equals(ECOSYSTEM_PAGE)) {
+    return `/ecosystem/${props.feedItem.id}`;
+  }
+
+  if (props.feedItem.type === FeedItemType.Post) {
+    if (!props.feedItem.realmPublicKey.equals(props.realm)) {
+      const urlId = props.realmInfo
+        ? props.realmInfo.urlId
+        : estimateRealmUrlId(props.feedItem.realmPublicKey);
+
+      return `/realm/${urlId}/${props.feedItem.id}`;
+    }
+
+    return `/realm/${props.realmUrlId}/${props.feedItem.id}`;
+  }
+
+  return `/dao/${
+    props.realmUrlId
+  }/proposal/${props.feedItem.proposal.publicKey.toBase58()}`;
 }
 
 export function Content(props: Props) {
@@ -29,14 +60,10 @@ export function Content(props: Props) {
 
   const document = props.feedItem.clippedDocument.document;
   const isClipped = props.feedItem.clippedDocument.isClipped;
-
-  const url = props.realm.equals(ECOSYSTEM_PAGE)
-    ? `/ecosystem/${props.feedItem.id}`
-    : props.feedItem.type === FeedItemType.Post
-    ? `/realm/${props.realmUrlId}/${props.feedItem.id}`
-    : `/dao/${
-        props.realmUrlId
-      }/proposal/${props.feedItem.proposal.publicKey.toBase58()}`;
+  const url = getUrl(props);
+  const isCrosspost =
+    !props.realm.equals(ECOSYSTEM_PAGE) &&
+    !props.realm.equals(props.feedItem.realmPublicKey);
 
   return (
     <article
@@ -48,25 +75,44 @@ export function Content(props: Props) {
         'gap-x-3',
       )}
     >
-      {props.feedItem.author ? (
-        <AuthorHovercard
-          civicAvatar={props.feedItem.author?.civicInfo?.avatarUrl}
-          civicHandle={props.feedItem.author?.civicInfo?.handle}
-          publicKey={props.feedItem.author?.publicKey}
-          twitterAvatar={props.feedItem.author?.twitterInfo?.avatarUrl}
-          twitterHandle={props.feedItem.author?.twitterInfo?.handle}
-        >
+      <div className="relative">
+        {isCrosspost && (
+          <div className="absolute -top-1 -left-1 w-6 h-6 rounded-full bg-white p-[1px]">
+            <div className="bg-sky-500 h-full w-full flex items-center justify-center rounded-full">
+              <MilestoneIcon className="h-4 w-4 fill-white" />
+            </div>
+          </div>
+        )}
+        {props.realmInfo ? (
+          <Link passHref href={`/realm/${props.realmInfo.urlId}`}>
+            <a className="block">
+              <RealmIcon
+                className="h-12 w-12 text-lg"
+                iconUrl={props.realmInfo.iconUrl}
+                name={props.realmInfo.name}
+              />
+            </a>
+          </Link>
+        ) : props.feedItem.author ? (
+          <AuthorHovercard
+            civicAvatar={props.feedItem.author?.civicInfo?.avatarUrl}
+            civicHandle={props.feedItem.author?.civicInfo?.handle}
+            publicKey={props.feedItem.author?.publicKey}
+            twitterAvatar={props.feedItem.author?.twitterInfo?.avatarUrl}
+            twitterHandle={props.feedItem.author?.twitterInfo?.handle}
+          >
+            <AuthorAvatar
+              author={props.feedItem.author}
+              className="h-12 w-12 text-lg"
+            />
+          </AuthorHovercard>
+        ) : (
           <AuthorAvatar
             author={props.feedItem.author}
             className="h-12 w-12 text-lg"
           />
-        </AuthorHovercard>
-      ) : (
-        <AuthorAvatar
-          author={props.feedItem.author}
-          className="h-12 w-12 text-lg"
-        />
-      )}
+        )}
+      </div>
       <div
         className="text-left w-full overflow-hidden cursor-pointer"
         onClick={() => {
@@ -81,6 +127,8 @@ export function Content(props: Props) {
           <Header
             author={props.feedItem.author}
             created={props.feedItem.created}
+            feedItemRealmPublicKey={props.feedItem.realmPublicKey}
+            feedItemRealm={props.feedItem.realm}
             proposal={
               props.feedItem.type === FeedItemType.Proposal
                 ? {
@@ -89,6 +137,8 @@ export function Content(props: Props) {
                   }
                 : undefined
             }
+            realmPublicKey={props.realm}
+            realm={props.realmInfo}
             updated={props.feedItem.updated}
             url={url}
           />
@@ -97,6 +147,7 @@ export function Content(props: Props) {
           {props.feedItem.title}
         </div>
         <RichTextDocumentDisplay
+          isPreview
           className="mt-4 text-neutral-900 text-sm"
           isClipped={isClipped}
           document={document}

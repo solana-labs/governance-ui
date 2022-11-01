@@ -1,6 +1,7 @@
 import BookIcon from '@carbon/icons-react/lib/Book';
 import ChevronDownIcon from '@carbon/icons-react/lib/ChevronDown';
 import LogoutIcon from '@carbon/icons-react/lib/Logout';
+import RecentlyViewedIcon from '@carbon/icons-react/lib/RecentlyViewed';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import { useWallet } from '@solana/wallet-adapter-react';
 
@@ -14,6 +15,7 @@ import { User as UserModel } from './gql';
 
 interface Props {
   className?: string;
+  compressed?: boolean;
   user: UserModel;
 }
 
@@ -41,14 +43,16 @@ export function User(props: Props) {
           'rounded',
           'text-neutral-900',
           'transition-colors',
-          'w-48',
           'active:bg-neutral-300',
           'hover:bg-neutral-200',
+          !props.compressed && 'w-48',
         )}
       >
         <div className="flex items-center space-x-2 flex-shrink truncate">
           <AuthorAvatar author={props.user} className="h-6 w-6 text-xs" />
-          <div className="truncate flex-shrink">{username}</div>
+          {!props.compressed && (
+            <div className="truncate flex-shrink">{username}</div>
+          )}
         </div>
         <ChevronDownIcon className="h-4 w-4 fill-neutral-900 flex-shrink-0" />
       </NavigationMenu.Trigger>
@@ -60,6 +64,7 @@ export function User(props: Props) {
           'overflow-hidden',
           'rounded',
           'w-48',
+          !!props.compressed && 'right-3',
         )}
       >
         <NavigationMenu.Sub>
@@ -71,6 +76,14 @@ export function User(props: Props) {
             >
               <BookIcon />
               <div>Realms Docs</div>
+            </DropdownButton>
+            <DropdownButton
+              onClick={() => {
+                window.open('https://app.realms.today/realms', '_blank');
+              }}
+            >
+              <RecentlyViewedIcon />
+              <div>View DAOs</div>
             </DropdownButton>
             <DropdownButton onClick={() => setJwt(null)}>
               <LogoutIcon />

@@ -2,6 +2,7 @@ import cx from '@hub/lib/cx';
 
 interface Props {
   className?: string;
+  compressed?: boolean;
 }
 
 export function Loading(props: Props) {
@@ -10,15 +11,15 @@ export function Loading(props: Props) {
       className={cx(
         props.className,
         'animate-pulse',
-        'bg-white/10',
+        'bg-neutral-200',
         'cursor-pointer',
         'flex',
         'items-center',
         'justify-center',
-        'py-1',
+        'py-2',
         'rounded',
         'transition-colors',
-        'w-48',
+        props.compressed ? 'w-[68px]' : 'w-48',
       )}
     >
       &nbsp;

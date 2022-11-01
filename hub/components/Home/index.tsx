@@ -54,7 +54,7 @@ export function Home(props: Props) {
                 linkedInUrl={realm.linkedInUrl}
               />
               <Feed.Content
-                className="max-w-3xl mx-auto pt-8 w-full"
+                className="max-w-3xl mx-auto pt-8 w-full px-4"
                 realm={realm.publicKey}
                 realmIconUrl={realm.iconUrl}
                 realmName={realm.name}

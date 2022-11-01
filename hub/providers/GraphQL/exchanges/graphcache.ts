@@ -52,6 +52,7 @@ export const graphcache = async (
     keys: {
       ClippedRichTextDocument: () => null,
       Realm: (realm) => realm.publicKey as string,
+      RealmDropdownListItem: (item) => item.publicKey as string,
       RealmHub: (hub) => hub.realm as string,
       RealmHubInfo: () => null,
       RealmHubInfoAboutSection: () => null,

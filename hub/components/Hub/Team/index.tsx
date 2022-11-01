@@ -25,25 +25,26 @@ export function Team(props: Props) {
       className={cx(
         'flex',
         'flex-col',
-        'items-center',
         'w-full',
+        'items-start',
+        'md:items-center',
         props.className,
       )}
     >
       <header className="flex items-center text-neutral-900">
-        <FlagFilledIcon className="fill-neutral-300 h-6 mr-5 w-6" />
-        <div className="text-4xl font-semibold">The Team</div>
+        <FlagFilledIcon className="fill-neutral-300 mr-5 h-5 w-5 md:h-6 md:w-6" />
+        <div className="font-semibold text-2xl md:text-4xl">The Team</div>
       </header>
-      <div className="mt-12 w-full">
+      <div className="mt-12 w-full space-y-10">
         {props.teamMembers.map((teamMember, i) => (
           <div
             className={cx(
               'border-b',
               'border-neutral-300',
               'gap-x-12',
-              'grid-cols-[160px,1fr]',
-              'grid',
               'pb-10',
+              'md:grid',
+              'md:grid-cols-[160px,1fr]',
             )}
             key={i}
           >
@@ -66,18 +67,18 @@ export function Team(props: Props) {
               }}
             >
               {!teamMember.avatar && (
-                <div className="text-7xl text-white">
+                <div className="text-white text-7xl">
                   {teamMember.name[0].toUpperCase()}
                 </div>
               )}
             </div>
-            <div className="min-h-[160px] flex items-center">
+            <div className="mt-4 md:mt-0 md:min-h-[160px] flex items-center">
               <div>
-                <div className="text-2xl text-neutral-900 font-medium">
+                <div className="text-neutral-900 font-medium text-xl md:text-2xl">
                   {teamMember.name}
                 </div>
                 {teamMember.role && (
-                  <div className="text-neutral-500 mt-0.5">
+                  <div className="text-neutral-500 mt-0.5 text-sm md:text-base">
                     {teamMember.role}
                   </div>
                 )}
@@ -109,7 +110,7 @@ export function Team(props: Props) {
                 )}
                 {teamMember.description && !isEmpty(teamMember.description) && (
                   <RichTextDocumentDisplay
-                    className="text-neutral-700 leading-7 mt-1"
+                    className="text-neutral-700 leading-7 mt-1 text-sm md:text-base"
                     document={teamMember.description}
                   />
                 )}

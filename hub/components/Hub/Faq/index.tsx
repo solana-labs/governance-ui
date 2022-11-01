@@ -24,11 +24,20 @@ export function Faq(props: Props) {
 
   return (
     <article
-      className={cx('p-16', 'pb-8', 'rounded', 'bg-white', props.className)}
+      className={cx(
+        'bg-white',
+        'pb-8',
+        'rounded',
+        'px-4',
+        'py-10',
+        'md:py-16',
+        'md:px-16',
+        props.className,
+      )}
     >
-      <div className="flex items-center justify-center mb-10">
-        <FaqIcon className="h-8 fill-neutral-300 w-8" />
-        <div className="text-4xl text-neutral-900 font-semibold ml-5">
+      <div className="flex items-center md:justify-center mb-2 md:mb-10">
+        <FaqIcon className="fill-neutral-300 h-5 w-5 md:h-8 md:w-8" />
+        <div className="text-2xl md:text-4xl text-neutral-900 font-semibold ml-2 md:ml-5">
           Frequently Asked Questions
         </div>
       </div>
@@ -57,7 +66,7 @@ export function Faq(props: Props) {
                   !item.clippedAnswer.isClipped && 'cursor-default',
                 )}
               >
-                <Accordion.Header className="text-2xl font-medium text-neutral-900">
+                <Accordion.Header className="font-medium text-neutral-900 text-xl md:text-2xl">
                   {item.question}
                 </Accordion.Header>
                 {item.clippedAnswer.isClipped && (
@@ -72,7 +81,7 @@ export function Faq(props: Props) {
                   />
                 )}
               </Accordion.Trigger>
-              <div className="mt-1 text-neutral-700">
+              <div className="mt-1 text-neutral-700 text-sm md:text-base">
                 {isOpen ? (
                   <Accordion.Content>
                     <RichTextDocumentDisplay document={item.answer} />

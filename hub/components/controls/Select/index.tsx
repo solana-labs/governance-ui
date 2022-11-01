@@ -87,7 +87,6 @@ export const Select: Select = forwardRef(function Select<T>(
       <_Select.Portal>
         <_Select.Content
           className={cx(
-            props.className,
             'bg-white',
             'rounded',
             'overflow-hidden',

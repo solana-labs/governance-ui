@@ -1,16 +1,15 @@
 import Head from 'next/head'
 
-import { Home } from '@hub/components/Home'
-import { ECOSYSTEM_PAGE } from '@hub/lib/constants'
+import { EcosystemFeed } from '@hub/components/EcosystemFeed'
 
 export default function Ecosystem() {
   return (
     <div>
       <Head>
-        <title>Realm</title>
-        <meta property="og:title" content="Realm Ecosystem" key="title" />
+        <title>Ecosystem</title>
+        <meta property="og:title" content="Solana Ecosystem" key="title" />
       </Head>
-      <Home realm={ECOSYSTEM_PAGE} realmUrlId="ecosystem" />
+      <EcosystemFeed />
     </div>
   )
 }

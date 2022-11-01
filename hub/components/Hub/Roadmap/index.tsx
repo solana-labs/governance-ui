@@ -75,12 +75,12 @@ export function Roadmap(props: Props) {
           </div>
         )}
       </div>
-      <div className="text-4xl font-semibold my-1">
+      <div className="font-semibold my-1 text-2xl md:text-4xl">
         The {props.name} Roadmap
       </div>
       {props.description && (
         <RichTextDocumentDisplay
-          className="mt-2 mb-1 text-neutral-700 max-w-2xl text-center"
+          className="mt-2 mb-1 text-neutral-700 max-w-2xl text-center text-sm md:text-base"
           document={props.description}
         />
       )}
