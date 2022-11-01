@@ -11,7 +11,7 @@ export function Loading(props: Props) {
       className={cx(
         props.className,
         'animate-pulse',
-        'bg-white/10',
+        'bg-neutral-200',
         'cursor-pointer',
         'flex',
         'items-center',
@@ -19,7 +19,7 @@ export function Loading(props: Props) {
         'py-2',
         'rounded',
         'transition-colors',
-        props.compressed ? 'w-20' : 'w-48',
+        props.compressed ? 'w-[68px]' : 'w-48',
       )}
     >
       &nbsp;
