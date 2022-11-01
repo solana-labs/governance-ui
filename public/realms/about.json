@@ -133,6 +133,174 @@
       }
     ]
   },
+  "7sf3tcWm58vhtkJMwuw2P3T6UBX7UE5VKxPMnXJUZ1Hn" : {
+    "symbol": "Solend",
+    "heading": "Solend is the autonomous interest rate machine for lending on Solana",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Solend is a permissionless money market on Solana. Deposit over 70 assets to earn yields or use as collateral. Users can access deep liquidity pools of blue-chip assets in Main pool, or governance tokens in Isolated pools. Additionally, users may also create their own permissionless pools with any token of their choice. "
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.solend.fi"
+    }
+  },
+  "3gmcbygQUUDgmtDtx41R7xSf3K4oFXrH9icPNijyq9pS" : {
+    "symbol": "Marinade",
+    "heading": "Secure Solana and earn rewards without your funds locked in.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Marinade is a DAO that helps Solana to become ever more censorship-resistant, performant, and capital efficient through liquid staking. It allows SOL holders to stake their SOL without locking their funds, so they can get both staking rewards and participate in DeFi using the staked SOL token called mSOL. With mSOL accepted in more than 40 projects on Solana, you can use it as collateral for borrows, provide liquidity, trade, pay for NFTs, or unstake immediately back to SOL without waiting days. Marinade stakes the delegated SOL through an open algorithmic delegation strategy, now supporting operations of over 400 validators on Solana."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.marinade.finance/"
+    },
+    "resources": [
+      {
+        "title": "Marinade DAO Executes Token Exchange Program to Align with Leading Solana Builders",
+        "content": [
+          "Marinade is pleased to officially announce the next chapter of the DAO through the execution of the Token Exchange Program. "
+        ],
+        "url": "https://finance.yahoo.com/news/marinade-dao-executes-token-exchange-153500316.html"
+      }
+    ]
+  },
+  "6NzVDMfEBJvkFDnjPx53K7mLGW3yQdSjLhsamS8go4cn" : {
+    "symbol": "Bonfida",
+    "heading": "Bonfida has a simple, yet realistic goal of providing products and services that will enhance the Solana blockchain experience. ",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Bonfida is known as the top infrastructure developer on Solana. This accolade has been earned from our contributions to the ecosystem by providing services and products that allow for the wider ecosystem to flourish.",
+          "Bonfida’s primary product is the Solana Name Service (SNS). SNS has a straightforward mission of providing users with a Web3 ID. One of the clear benefits of the name service is a human-readable name that maps to a SOL address. Wallet address formats can be a barrier to entry, and therefore having an identifiable address can facilitate payments, efficiency, and overall user experience in our sphere. A name, not a number.",
+          "Besides SNS, Bonfida’s contributions to the ecosystem include; (1) creating a new Serum Core engine, the Asset Agnostic Orderbook (AOB), (2) xMS, the cross-messaging service, to name a few.  As a result of these contributions, our developers are highly respected and sought after within the Solana ecosystem."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.bonfida.org/collection/overview"
+    }
+  },
+  "3MMDxjv1SzEFQDKryT7csAvaydYtrgMAc3L9xL9CVLCg" : {
+    "symbol": "Project Serum",
+    "heading": "Faster, Cheaper and more Powerful DeFi",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Serum brings the speed and convenience of centralized exchanges to DeFi while remaining fully trustless and transparent."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.projectserum.com"
+    },
+    "resources": [
+      {
+        "title": "The Project Serum Youtube Channel",
+        "content": [
+          ""
+        ],
+        "url": "https://www.youtube.com/channel/UCQ-jrhf6mt2PWa8cqF1-6Mw"
+      }
+    ]
+  },
+  "9pLvqBe2CxC4HXQD5UQ7YLpQUqC5A9SqU4kNqw9inbNQ" : {
+    "symbol": "Eternal Dragons",
+    "heading": "Eternal Dragons is a Web3 gaming series brought to you by Trailblazer Games, telling the story of the long-lost Eternal Dragons.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "The epic new gaming series Eternal Dragons is brought to you by Trailblazer Games. Trailblazer Games is a Web3-native gaming studio formed by a team consisting of three serial entrepreneurs and veteran gaming industry leaders from the likes of King, EA, and Microsoft, who have experience in building large-scale and sustainable free-to-play economies. A shared passion unites them for creating engaging and entertaining gaming experiences.",
+          "In parallel with the development of games, Trailblazer is developing a platform that will power a new global economy where guilds can efficiently access capital, trade assets, and hire talent to compete, grow and succeed. This platform is being integrated into the game experience to provide value directly to the players and the community by delivering a full vertical slice at each stage of development.",
+          "Our goal is that the Eternal Dragons IP will transcend the original game series, powered by the blockchain, to provide future value and experiences within other media and entertainment formats and in the decentralized finance space. To achieve that, we are laser-focused on, first and foremost, creating fun gameplay with mass market potential, packaged in an exciting fantasy universe of dragons and magic where anything is possible and where the players write the actual history."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://builder.eternaldragons.com/"
+    },
+    "resources": [
+      {
+        "title": "Trailblazer Games raises $8.2M for Eternal Dragons blockchain game",
+        "content": [
+          "Trailblazer Games has raised $8.2 million to develop a fantasy blockchain game and universe dubbed Eternal Dragons."
+        ],
+        "url": "https://venturebeat.com/games/trailblazers-raises-8-2m-for-eternal-dragons-blockchain-game/"
+      },
+      {
+        "title": "Episode 29 of the Right Click, Save NFT Podcast",
+        "content": [
+          "In this week's episode we chat with Alex one of the founders of the Eternal Dragons project."
+        ],
+        "url": "https://www.youtube.com/watch?v=TlX4puABZyQ"
+      },
+      {
+        "title": "Trailblazer Games on Crunchbase",
+        "content": [
+          ""
+        ],
+        "url": "https://www.crunchbase.com/organization/trailblazergames"
+      }
+    ]
+  },
+  "413KSeuFUBSWDzfjU9BBqBAWYKmoR8mncrhV84WcGNAk" : {
+    "symbol": "Tulip",
+    "heading": "Solana's Yield Aggregation Homestead",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Tulip Protocol is the first yield aggregation platform built on Solana with auto-compounding vault strategies.",
+          "The dApp (decentralized application) is designed to take advantage of Solana's low cost, high efficiency blockchain; allowing the vault strategies to compound frequently. This benefits farmers with higher APYs, not requiring active management, and lower gas fees.",
+          "The protocol offers 4 main products: auto vaults, leveraged yield farming, lending, and strategy vaults."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://tulip-protocol.gitbook.io/tulip-protocol/"
+    },
+    "resources": [
+      {
+        "title": "The Tulip Protocol Medium Page",
+        "content": [
+          ""
+        ],
+        "url": "https://medium.com/tulipprotocol"
+      }
+    ]
+  },
+  "5o6gEoeJBpuXT1H1ijFTq3KcSGx7ayabdG2hji7cB3FG" : {
+    "symbol": "Mean DAO ",
+    "heading": "Mean DAO is a protocol DAO offering Real-time payment infrastructure and Multisig to retail and businesses.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "As a protocol DAO, our philosophy is product quality and community first. Projects and people from across the DeFi space can come together to collaborate and vote to build the best products for the future of finance. Being a DAO means builders, investors, and users all have an aligned economic incentive to move us forward fast while benefiting all parties fairly."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.meandao.org/mean/products/mean-protocol"
+    }
+  },  
   "BzGL6wbCvBisQ7s1cNQvDGZwDRWwKK6bhrV93RYdetzJ": {
     "symbol": "Squads",
     "heading": "The multisig standard you were looking for on Solana",
