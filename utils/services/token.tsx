@@ -65,7 +65,7 @@ class TokenService {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           Object.entries(priceToUsd).map(([key, val]) => [val.id, val])
         )
-        console.log(keyValue)
+
         this._tokenPriceToUSDlist = {
           ...this._tokenPriceToUSDlist,
           ...keyValue,
