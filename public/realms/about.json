@@ -3675,4 +3675,126 @@
       "url": "https://docs.meandao.org/mean/products/mean-protocol"
     }
   }
+  "3HC3mCQkpAAHQZa3aJjQJFpFNwoLp3ZWnkCYuWzoymo9": {
+    "symbol": "Amulet",
+    "heading": "Simple, Reliable Cover For Everyone in Web3.Maximum protection and yield, fully protected through Protocol Controlled Reserves",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Amulet Protocol (\"Amulet\") is a decentralized risk protection protocol (\"RPP\") built for Rust-based ecosystems, starting with the Solana blockchain. Amulet has designed an innovative and open risk protection model which not only effectively addresses the common challenges of existing decentralized RPPs, but also creates a new paradigm shift for the whole risk protection sector."
+        ]
+      },
+      {
+        "content": [
+          "Amulet's vision is to offer Simple, Reliable Cover for everyone in Web3. With the addition of Amulet, users in the entire Rust-based ecosystem will gain access to a new way to hedge various risks with cover product offerings."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.amulet.org/"
+    },
+    "resources": [
+      {
+        "title": "Staking capabilities with high APY percentages now available on Amulet",
+        "content": [
+          "As Amulet has now been launched, the crypto community will be delighted to know that the platform has officially added staking capabilities with considerably high APY percentages."
+        ],
+        "url": "https://cointelegraph.com/press-releases/staking-capabilities-with-high-apy-percentages-now-available-on-amulet"
+      },
+      {
+        "title": "TOKEN2049 Singapore 2022: \"I Love Hacks\"",
+        "content": [
+          "Keynote Speaker: Rupert Barksfield, CEO"
+        ],
+        "url": "https://www.youtube.com/watch?v=phDloVO1RCQ"
+      },
+      {
+        "title": "Preparations For Amulet Mainnet Launch Underway As Launch Date Gets Announced",
+        "url": "https://ripplecoinnews.com/preparations-for-amulet-mainnet-launch-underway-as-launch-date-gets-announced/"
+      }
+    ],
+    "team": [
+      {
+        "name": "Martin",
+        "avatar": "https://i.imgur.com/DFM7lk6.png",
+        "role": "Community Manager"
+      },
+      {
+        "name": "Rob",
+        "avatar": "https://pbs.twimg.com/profile_images/1489011796576985094/KVBYfVRB_400x400.jpg",
+        "description": [
+          "Marketer | 2022 is the year of DeFi cover "
+        ],
+        "role": "Marketing Manager",
+        "twitter": "@overcryptocal"
+      },
+      {
+        "name": "Rupert",
+        "avatar": "https://pbs.twimg.com/profile_images/1480953683173158916/W4Ux0IRD_400x400.jpg",
+        "role": "Project Lead ",
+        "twitter": "@MET4BE4R"
+      },
+      {
+        "name": "Hakon",
+        "avatar": "https://pbs.twimg.com/profile_images/1567440707412967427/xYWCNFS8_400x400.jpg",
+        "role": "BD & Marketing",
+        "twitter": "@DeFi_hawk"
+      }
+    ],
+    "roadmap": {
+      "items": [
+        {
+          "title": "MainNet Launch",
+          "date": "2021-09-22T15:42:21.109Z",
+          "status": "completed",
+          "resource": {
+            "title": "Amulet’s 2022–2023 Roadmap",
+            "url": "https://amulet.org/blog/introducing-amulets-2022-2023-roadmap/"
+          }
+        }
+      ]
+    },
+    "faq": [
+      {
+        "question": "What is Amulet Protocol?",
+        "answer": [
+          "Amulet is a decentralized risk protection protocol for the Rust-based ecosystem initially deployed on Solana."
+        ]
+      },
+      {
+        "question": "What is decentralized risk protection protocol?",
+        "answer": [
+          "Decentralized risk protection protocols provide a financial safety net for all users interacting with Web3 financial products. They generally encompasse smart contract risk, stablecoin de-peg risk, slashing risk, oracle failures, economic exploits, etc. Risk of smart contract exploits is particularly significant with over $3B lost to smart contract hacks in 2021. By offering protection against these more common DeFi risk types along with NFT and metaverse-related offerings, users and developers alike can enjoy a safer Web3 through Amulet."
+        ]
+      },
+      {
+        "question": "What is unique about Amulet?",
+        "answer": [
+          "Existing DeFi risk protection protocols rely on external underwriters to provide capital for claim payouts and cover capacity, which introduces unique and difficult challenges over business sustainability. Amulet is creating the risk protection industry's first Protocol-Controlled Underwriting (\"PCU\") approach. This is a significant change from the incumbent model of renting underwriting capital."
+        ]
+      },
+      {
+        "question": "What kind of risk does Amulet cover?",
+        "answer": [
+          "Smart contract exploits, stablecoin de-pegs, slashing, and more to come (NFT, Metaverse, and wallet protection currently in development)."
+        ]
+      },
+      {
+        "question": "Why did we build Amulet on Solana?",
+        "answer": [
+          "DeFi has experienced exponential growth since the summer of 2020 with the influx of hundreds of billions in capital and the emergence of multibillion-dollar protocols in just a little over two years. Riding along this wave of explosive growth is a rapidly increasing demand for risk hedging.",
+          "Rust-based public chains have been maturing rapidly with growth spearheaded in particular by Solana. According to Amulet's research, TVL on Solana has grown 5x faster than on Ethereum, and this growth is expected to continue given the distinctive strengths of Solana centered around its lower cost and higher throughput.",
+          "At the moment, risk management solutions are still relatively scarce or non-existent on Solana and the Rust-based ecosystems at large, presenting Amulet with an incredible and unique market opportunity. Amulet expects major demand for its cover products and other risk management solutions along with Solana's continued growth and adoption."
+        ]
+      },
+      {
+        "question": "What is PCU?",
+        "answer": [
+          "Amulet aims to build reserves that are controlled by the protocol with PCU, rather than renting capital from stakers as its primary underwriting source. Amulet believes this new model has the potential to scale sustainably."
+        ]
+      }
+    ]
+  }
 }
