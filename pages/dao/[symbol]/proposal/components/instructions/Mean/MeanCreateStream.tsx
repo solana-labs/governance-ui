@@ -32,6 +32,12 @@ interface Props {
   governance: ProgramAccount<Governance> | null
 }
 
+const getInitialStartDate = () => {
+  const now = new Date()
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset())
+  return now.toISOString().slice(0, 16)
+}
+
 const MeanCreateStreamComponent = ({ index, governance }: Props) => {
   // form
   const [form, setForm] = useState<MeanCreateStream>({
@@ -43,7 +49,7 @@ const MeanCreateStreamComponent = ({ index, governance }: Props) => {
     allocationAssigned: undefined,
     rateAmount: undefined,
     rateInterval: 0,
-    startDate: new Date().toISOString().replace(/\..*/, ''),
+    startDate: getInitialStartDate(),
   })
 
   const [formErrors, setFormErrors] = useState({})
