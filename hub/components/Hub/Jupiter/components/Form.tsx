@@ -1,14 +1,23 @@
-import { useWalletSelector } from '@hub/hooks/useWalletSelector';
+import Tooltip from '@components/Tooltip';
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  InformationCircleIcon,
+} from '@heroicons/react/solid';
+import { RouteInfo } from '@jup-ag/react-hook';
 import { WRAPPED_SOL_MINT } from '@project-serum/serum/lib/token-instructions';
+import { TokenInfo } from '@solana/spl-token-registry';
 import { useWallet } from '@solana/wallet-adapter-react';
-import tokenService from '@utils/services/token';
 
+import { PublicKey } from '@solana/web3.js';
+import JSBI from 'jsbi';
 import {
   ChangeEvent,
   Dispatch,
   SetStateAction,
   useCallback,
   useMemo,
+  useState,
 } from 'react';
 
 import { IForm } from '..';
@@ -16,36 +25,44 @@ import { IForm } from '..';
 import { useAccounts } from '../contexts/accounts';
 
 import { MINIMUM_SOL_BALANCE } from '../misc/constants';
+import { toLamports } from '../misc/utils';
+import { useWalletSelector } from '@hub/hooks/useWalletSelector';
 
 import CoinBalance from './Coinbalance';
+import ExchangeRate, { IRateParams } from './ExchangeRate';
 import FormError from './FormError';
 import JupButton from './JupButton';
 
 import OpenJupiterButton from './OpenJupiterButton';
+import SwapRoute from './SwapRoute';
 import TokenIcon from './TokenIcon';
 
+import Collapse from '.';
+
 const Form: React.FC<{
-  fromMint?: string;
-  toMint?: string;
+  fromTokenInfo?: TokenInfo | null;
+  toTokenInfo?: TokenInfo | null;
   form: IForm;
   errors: Record<string, { title: string; message: string }>;
   setForm: Dispatch<SetStateAction<IForm>>;
   onSubmit: () => void;
   isDisabled: boolean;
   setIsFormPairSelectorOpen: Dispatch<SetStateAction<boolean>>;
+  outputRoute?: RouteInfo;
 }> = ({
-  fromMint,
-  toMint,
+  fromTokenInfo,
+  toTokenInfo,
   form,
   errors,
   setForm,
   onSubmit,
   isDisabled,
   setIsFormPairSelectorOpen,
+  outputRoute,
 }) => {
   const { connect, wallet } = useWallet();
   const { getAdapter } = useWalletSelector();
-  const { accounts, tokenServiceReady } = useAccounts();
+  const { accounts } = useAccounts();
 
   const onConnectWallet = () => {
     if (wallet) connect();
@@ -58,22 +75,13 @@ const Form: React.FC<{
     wallet?.adapter.publicKey,
   ]);
 
-  const fromTokenInfo = useMemo(() => {
-    const tokenInfo = fromMint ? tokenService.getTokenInfo(fromMint) : null;
-    return tokenInfo;
-  }, [fromMint, tokenServiceReady]);
-
-  const toTokenInfo = useMemo(() => {
-    const tokenInfo = toMint ? tokenService.getTokenInfo(toMint) : null;
-    return tokenInfo;
-  }, [toMint, tokenServiceReady]);
-
   const jupiterDirectLink = useMemo(() => {
     if (fromTokenInfo && toTokenInfo) {
-      return `https://jup.ag/swap/${fromTokenInfo.address}-${toTokenInfo.address}?inAmount=1`;
+      const inAmount = form.fromValue ? form.fromValue : '1';
+      return `https://jup.ag/swap/${fromTokenInfo.address}-${toTokenInfo.address}?inAmount=${inAmount}`;
     }
     return 'https://jup.ag';
-  }, [fromTokenInfo, toTokenInfo]);
+  }, [fromTokenInfo, toTokenInfo, form.fromValue]);
 
   const onChangeFromValue = (e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -84,14 +92,14 @@ const Form: React.FC<{
   };
 
   const balance = useMemo(() => {
-    return fromMint ? accounts[fromMint]?.balance : 0;
-  }, [accounts, fromMint]);
+    return fromTokenInfo ? accounts[fromTokenInfo.address]?.balance : 0;
+  }, [accounts, fromTokenInfo]);
 
   const onClickMax = useCallback(
     (e: React.MouseEvent<HTMLElement>) => {
       e.preventDefault();
 
-      if (fromMint === WRAPPED_SOL_MINT.toBase58()) {
+      if (fromTokenInfo?.address === WRAPPED_SOL_MINT.toBase58()) {
         setForm((prev) => ({
           ...prev,
           fromValue: String(
@@ -105,12 +113,21 @@ const Form: React.FC<{
         }));
       }
     },
-    [balance, fromMint],
+    [balance, fromTokenInfo],
   );
 
+  const [shouldDisplay, setShouldDisplay] = useState(false);
+  const onToggleExpand = () => {
+    if (shouldDisplay) {
+      setShouldDisplay(false);
+    } else {
+      setShouldDisplay(true);
+    }
+  };
+
   return (
-    <div className="h-full mt-6 mx-5 flex flex-col items-center justify-center">
-      <div className="w-full rounded-xl bg-white/75 dark:bg-white dark:bg-opacity-5 shadow-lg flex flex-col p-4">
+    <div className="h-full mt-4 mx-5 flex flex-col items-center justify-center">
+      <div className="w-full rounded-xl bg-white/75 dark:bg-white dark:bg-opacity-5 shadow-lg flex flex-col p-4 pb-2">
         <div className="flex-col">
           <div className="flex justify-between items-end pb-3 text-xs text-gray-400">
             <div className="text-sm font-semibold text-black dark:text-white">
@@ -191,7 +208,7 @@ const Form: React.FC<{
             ) : null}
           </div>
 
-          <div className="py-3 flex justify-between items-center">
+          <div className="pt-3 flex justify-between items-center">
             <button
               type="button"
               className="py-2 px-2 rounded-lg flex items-center cursor-default"
@@ -214,6 +231,55 @@ const Form: React.FC<{
               ) : null}
             </div>
           </div>
+
+          {outputRoute && toTokenInfo ? (
+            <Tooltip
+              content={
+                <div>
+                  Jupiter's route discovery determines this is the best priced
+                  route.
+                </div>
+              }
+            >
+              <div
+                className="flex flex-col w-full items-center cursor-pointer mt-4"
+                onClick={onToggleExpand}
+              >
+                <div className="flex flex-row justify-center text-black-75 dark:text-white-50 font-semibold">
+                  <span className="text-xs text-black/50">
+                    Best route selected
+                  </span>
+
+                  <div className="h-4 w-4 ml-2 flex">
+                    <InformationCircleIcon className="text-black/50" />
+                  </div>
+                </div>
+
+                <div className="h-4 w-4 -mb-2">
+                  {shouldDisplay ? (
+                    <ChevronUpIcon className="text-black/50" />
+                  ) : (
+                    <ChevronDownIcon className="text-black/50" />
+                  )}
+                </div>
+              </div>
+            </Tooltip>
+          ) : null}
+
+          <Collapse
+            className="mt-2"
+            height={0}
+            maxHeight={'auto'}
+            expanded={shouldDisplay}
+          >
+            {outputRoute && toTokenInfo ? (
+              <SwapRoute
+                route={outputRoute}
+                toValue={form.toValue}
+                toTokenInfo={toTokenInfo}
+              />
+            ) : null}
+          </Collapse>
         </div>
       </div>
 

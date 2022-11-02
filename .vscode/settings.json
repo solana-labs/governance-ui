@@ -1,5 +1,11 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
-  "cSpell.words": ["Addin", "blockworks", "lamports", "solana", "VERCEL"],
-  "editor.formatOnSave": true
+  "cSpell.words": [
+    "Addin",
+    "blockworks",
+    "lamports",
+    "solana",
+    "VERCEL"
+  ],
+  "editor.formatOnSave": false
 }

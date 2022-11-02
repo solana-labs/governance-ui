@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js';
+import JSBI from 'jsbi';
 
 const userLocale =
   typeof window !== 'undefined'
@@ -30,14 +31,19 @@ export function shortenAddress(address: string, chars = 4): string {
 }
 
 export function fromLamports(
-  lamportsAmount?: number,
-  decimals?: number,
+  lamportsAmount: number | string | JSBI,
+  decimals: number,
 ): number {
-  if (!lamportsAmount) {
-    return 0;
-  }
-
   return new BigNumber(lamportsAmount.toString())
-    .shiftedBy(-(decimals || 0))
+    .shiftedBy(-decimals)
     .toNumber();
+}
+
+export function toLamports(
+  amount: number | string,
+  decimals: number,
+): BigNumber {
+  return new BigNumber(
+    new BigNumber(amount.toString()).shiftedBy(decimals).toFixed(0),
+  );
 }

@@ -29,7 +29,7 @@ const useNativeAccount = (): IAccountsBalance => {
   }, [publicKey]);
 
   return {
-    balance: fromLamports(nativeAccount?.lamports, 9),
+    balance: fromLamports(nativeAccount?.lamports || 0, 9),
     balanceLamports: new BN(nativeAccount?.lamports || 0),
     hasBalance: nativeAccount?.lamports ? nativeAccount?.lamports > 0 : false,
     decimals: 9,
