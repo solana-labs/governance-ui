@@ -1944,7 +1944,7 @@
       "url": "https://twitter.com/DegenLegends/status/1578460492560941056?s=20&t=_LU0jrtzc-4pZ9jhPRPE0A"
     }
   },
-  "GMpWmXc3sKejmAcAFpcQ4NgCL9Fx3gFR2FeepNUtK5Mh" : {
+  "GMpWmXc3sKejmAcAFpcQ4NgCL9Fx3gFR2FeepNUtK5Mh": {
     "symbol": "Francium",
     "heading": "Francium is a DeFi yield strategy Platform on Solana. Granted by Solana & Serum.",
     "about": [
@@ -1958,9 +1958,80 @@
     "documentation": {
       "title": "Docs",
       "url": "https://docs.francium.io/"
-    }
+    },
+    "team": [
+      {
+        "name": "Icy",
+        "avatar": "https://pbs.twimg.com/profile_images/1506936505679319040/PgrlYQgT_400x400.jpg",
+        "description": [
+          "Community Manager of Francium, Francium Supporter"
+        ],
+        "role": "Community Manager",
+        "twitter": "@Icy_Awake"
+      }
+    ],
+    "roadmap": {
+      "items": [
+        {
+          "title": "Stop-Loss, Take-Profit, Hedge, Margin + Yield Farming",
+          "date": "2021-10-02T15:42:21.109Z",
+          "status": "completed",
+          "resource": {
+            "title": "Docs: Stop Loss",
+            "url": "https://docs.francium.io/product/stop-loss"
+          }
+        },
+        {
+          "title": "Oracle cooperation and robot automation+ Well-known strategies",
+          "date": "2022-10-15T15:42:21.109Z",
+          "status": "completed",
+          "resource": {
+            "title": "Francium is now #PoweredByPyth",
+            "url": "https://twitter.com/Francium_Defi/status/1581086372211089410?s=20"
+          }
+        }
+      ]
+    },
+    "faq": [
+      {
+        "question": "What is Francium?",
+        "answer": [
+          "Francium is a DeFi yield strategy platform built on Solana. Francium offers a variety of strategies for both users and strategy builders. We offer automated strategies including Leveraged Farming / Hedge Farming, DeFi Combination Strategies, and Smart Trading Strategies to the users. For strategy builders, Francium will offer DeFi automation toolset which comprises of DeFi Automation Framework, Strategy Dev Toolset, and Standard SDK."
+        ]
+      },
+      {
+        "question": "Does Francium possess a native token?",
+        "answer": [
+          "We haven't generated a native token, news will be announced through our official channels."
+        ]
+      },
+      {
+        "question": "Has Francium been Audited?",
+        "answer": [
+          "Yes, Francium's smart contract has been audited by two prominent firms, CertiK and SlowMist: https://docs.francium.io/resources/audits"
+        ]
+      },
+      {
+        "question": "How to use Francium?",
+        "answer": [
+          "Step-by-step instructions are available at https://docs.francium.io/product/how-to-participate."
+        ]
+      },
+      {
+        "question": "How to do leveraged yield farming on Francium?",
+        "answer": [
+          "Francium is very easy to use. For example, if you want to farm a pool, all you need to do is deposit a token, such as USDC. Francium's on-chain smart contract will automatically convert half of the deposited USDC into another token (e.g. SOL), then add these tokens to the relevant Dex to get the LP, and then stake the LP to the farming pools. In addition, Auto-compounding is an important way to generate high profits. Francium helps users automatically take out their earnings and reinvest them into relevant positions. This allows profits to be generated quickly, thus maximizing earnings."
+        ]
+      },
+      {
+        "question": "Why is Francium built on Solana?",
+        "answer": [
+          "Francium team explained 3 reasons why we have decided to build on Solana: https://francium-defi.medium.com/why-build-defi-on-solana-cc8bc90afdec"
+        ]
+      }
+    ]
   },
-  "9dvvWxLNRv2HWRkc1FJdgpXuF9fDRZMsCbw6vTdHbp5" : {
+    "9dvvWxLNRv2HWRkc1FJdgpXuF9fDRZMsCbw6vTdHbp5" : {
     "symbol": "Ora",
     "heading": "The Search Engine for Blockchains",
     "about": [
@@ -3284,6 +3355,13 @@
         "url": "https://www.rollingstone.com/pro/news/tiktok-sounds-streaming-crypto-blockchain-nfts-audius-1211699/"
       },
       {
+        "title": "Audius Acquires Virtual Music Experience Platform SoundStage.fm",
+        "content": [
+          "Audius is already rolling out an \"ambitious product roadmap\" in the wake of the deal, which expands the company's efforts in the music metaverse."
+        ],
+        "url": "https://edm.com/industry/audius-acquires-soundstagefm"
+      },
+      {
         "title": "What is Audius? The Decentralized Music Sharing and Streaming Service",
         "content": [
           "It’s like Spotify or SoundCloud, but on the blockchain: Audius is a crypto-powered music streaming app that’s giving power back to artists."
@@ -3674,5 +3752,490 @@
       "title": "Docs",
       "url": "https://docs.meandao.org/mean/products/mean-protocol"
     }
+  },
+  "HnLuYmBxDxK1MCihHJVFnNudUTpLPc2km6xNcRQ8KPdj": {
+    "symbol": "Dual Finance",
+    "heading": "Sustainable Incentive Liquidity Infrastructure for Web3 Communities",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Dual Finance gives token communities sustainable ways to earn yield & generate value from their treasuries. Through liquid option based incentives, Dual Finance unlocks value & unleashes participation in decentralized communities. Goodbye inflationary token rewards. Hello sustainable Staking Options.",
+          "Dual Finance has designed itself upon this breakthrough token incentive mechanism to gain allegiance & prevent token dumping. DUAL token distribution is being conducted fully & fairly through the use of Staking Options.",
+          "Partner projects can use Staking Options themselves via Dual Finance to better incentivize their own communities. When designed through Dual Finance, Staking Options serve to bolster their token's option & spot liquidity by utilizing a DAO owned AMM (Risk Manager) and capitally efficient lending product (Rehypothecated Lending Pools).",
+          "Completing the offering are Dual Investment Pools (DIPs), an upgrade to conventional option vaults (DOVs) that offer streaming executable yield strategies. Customize strategies based on your risk appetite and earn yield immediately."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://medium.com/@dualfinance"
+    },
+    "resources": [
+      {
+        "title": "Dual Finance's Youtube Channel",
+        "content": [
+          "Providing educational videos that give token communities sustainable ways to earn yield & generate value from their treasuries"
+        ],
+        "url": "https://www.youtube.com/channel/UCMyYJ7GUzk7GCgyb9AgOU6w"
+      }
+    ],
+    "gallery": [
+      {
+        "caption": "Dual Investment Pools (DIP)",
+        "url": "https://i.imgur.com/punX3y0.png",
+        "height": 157,
+        "width": 600
+      },
+      {
+        "caption": "Staking Options Studio (SOS)",
+        "url": "https://i.imgur.com/t8h5dFa.png",
+        "height": 233,
+        "width": 600
+      }
+    ],
+    "team": [
+      {
+        "name": "Britt Cyr",
+        "avatar": "https://pbs.twimg.com/profile_images/1507165603240591367/hQDLyFw4_400x400.jpg",
+        "description": [
+          "MIT Masters & MIT B.Sc in Computer Science, concentration in Theoretical Computer Science (Cryptography)",
+          "Lead developer at YouTube. Over 7 years launched multiple live streaming projects & scaled the system from 100s of broadcasts to over 100K concurrent broadcasts with over 10M viewers. Managed live streaming ingestion & transcoding on projects, including webrtc mobile live streaming & ultra low latency, reducing latency from 45 seconds to < 1 second. Ex-Google, Ex-Facebook"
+        ],
+        "role": "Co-Founder",
+        "twitter": "@cyrzorhands"
+      },
+      {
+        "name": "John Kramer",
+        "avatar": "https://pbs.twimg.com/profile_images/1432394328387858432/YbfgF5gL_400x400.jpg",
+        "description": [
+          "MIT Masters in Finance & MIT B.Sc Aerospace Engineering",
+          "Prior Head of OTC & DeFi Trading at GSR. Led buildout of options trading capabilities, market making deal structures, and global team of traders & operations. Specialty in illiquid crypto derivatives trading, structured products, bespoke margining & lending. Crypto’s first-ever trades across altcoin options, variance swaps, accumulators, average price options, onchain derivatives/DOVs. Risk managed a portfolio of 300+ illiquid token derivatives with a multi-billion $ AUM."
+        ],
+        "role": "Co-Founder",
+        "twitter": "@jktrader16"
+      }
+    ],
+    "roadmap": {
+      "items": [
+        {
+          "title": "Dual Token Launch",
+          "date": "2022-12-01T15:42:21.109Z",
+          "status": "upcoming",
+          "resource": {
+            "title": "Staking Option Fair Launch",
+            "url": "https://medium.com/@dualfinance/staking-option-fair-launch-f08a2ba958e8"
+          }
+        }
+      ]
+    },
+    "faq": [
+      {
+        "question": "What are DIPs?",
+        "answer": [
+          "Dual Investment Pools, similar in structure to more commonly known Decentralized Option Vaults (DOVs) but with real-time pricing and customizable yields. They are also physically settled, meaning you will end up with either your staked asset or stablecoins upon withdrawing after expiration. Premiums are also paid immediately upon staking so you can put your funds to work for longer."
+        ]
+      },
+      {
+        "question": "Will there be a DUAL DAO?",
+        "answer": [
+          "Yes the plan is to fully decentralize every aspect of the project. DUAL token holders will provide the governance function and steward the treasury assets."
+        ]
+      },
+      {
+        "question": "What is the mission of the project?",
+        "answer": [
+          "To fix crypto’s broken tokenomic incentive structures through sustainable option based pathways. For a broader understanding of what is meant by that, please review our Whitepaper and other articles on Medium."
+        ]
+      },
+      {
+        "question": "How is the premium provided?",
+        "answer": [
+          "Premiums are quoted via an API directly from Option Market Makers or via the Dual Finance Backstop Volatility Model. This premium updates in real-time so you can better time the market."
+        ]
+      },
+      {
+        "question": "What are Staking Options?",
+        "answer": [
+          "Staking Options (SOs) are DUAL's incentive for staking funds into a DIP and for usage by other token projects to incentivize their communities. SOs allow users to acquire the DUAL token by exercising their right to buy it at the strike price up until expiration."
+        ]
+      },
+      {
+        "question": "What are Rehypothecated Lending Pools?",
+        "answer": [
+          "Rehypothecated Lending Pools (RLPs), a pool of capital that permits uncollateralized borrowing only from counterparties who have unbounded risk exposure to the pool. Dual Finance's RLPs allow market makers of DIPs capped by their long exposure to borrow to support hedging, providing greater capital efficiency and further positive return to Stakers. Users get paid this interest to generate additional yield!"
+        ]
+      }
+    ]
+  },
+  "A3WX4QKcioruP71f4yweusv9jqU9R4LtGfJEHtZhs3Rx": {
+    "symbol": "MixMob",
+    "heading": "Remix the world! A new card strategy racing game from a team that worked on HALO, FIFA, Battlefield & PokerStars. Mask Up!",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Remix the world! MixMob: Racer 1 is a new card strategy robot racing game – picture Mario Kart meets Clash Royale – from a team that worked on HALO, FIFA, Battlefield & PokerStars. Grab your Mask and MixBots to start your journey."
+        ]
+      },
+      {
+        "content": [
+          "MixMob is for players who want to play and earn, have fun, collect, strategize, compete, and create influence. MixMob offers a competitive game inside a remix gaming world with community co-creation at its core."
+        ]
+      },
+      {
+        "content": [
+          "MixMob is backed by leading crypto investors and guilds such as DeFiance, Solana Ventures, Merit Circle, YGG SEA, Arthur Hayes, and Lau Brothers, amongst others."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://www.notion.so/mixmob/Litepaper-88a413da744a4b1793d5934fb1195e0d"
+    },
+    "gallery": [
+      {
+        "caption": "MixMob: Racer 1",
+        "url": "https://i.imgur.com/OrB5eTE.png",
+        "height": 390,
+        "width": 600
+      },
+      {
+        "caption": "Multiplayer Arenas",
+        "url": "https://i.imgur.com/GqQuGeA.png",
+        "height": 354,
+        "width": 600
+      },
+      {
+        "caption": "Compete for tokens and glory",
+        "url": "https://i.imgur.com/4YcLNjI.png",
+        "height": 337,
+        "width": 600
+      },
+      {
+        "caption": "Deploy cards and race your bots for glory and rewards!s are made by racing.",
+        "url": "https://i.imgur.com/oPgmoIA.png",
+        "height": 354,
+        "width": 600
+      },
+      {
+        "caption": "Compete against friends in the leaderboards.",
+        "url": "https://i.imgur.com/FK0j1Px.png",
+        "height": 356,
+        "width": 600
+      }
+    ],
+    "resources": [
+      {
+        "title": "MixMob Alpha V2 Trailer",
+        "url": "https://vimeo.com/750807146"
+      },
+      {
+        "title": "MixMob: Uprising Project Teaser",
+        "url": "https://vimeo.com/677351566"
+      },
+      {
+        "title": "Play-to-earn game MixMob receives round of funding",
+        "content": [
+          "“This appreciable injection of capital will allow us to achieve our strategic objectives over the coming months and years,” said the platform’s CEO and Game Director Simon Vieira."
+        ],
+        "url": "https://venturebeat.com/games/play-to-earn-game-mixmob-receives-round-of-funding/"
+      }
+    ],
+    "team": [
+      {
+        "name": "Simon Vieira",
+        "avatar": "https://pbs.twimg.com/profile_images/1557082559556640770/0k73yu5x_400x400.jpg",
+        "description": [
+          "Simon has managed multimillion-dollar projects in the video game industry and successfully shipped over 100 games and apps for EA, Pokerstars, Microsoft, and Disney. He has 15 years of experience in the game industry."
+        ],
+        "role": "Co-founder & CEO",
+        "twitter": "@simonvieira"
+      },
+      {
+        "name": "Pavel Bains",
+        "avatar": "https://pbs.twimg.com/profile_images/1577549554823536645/q0h9-6r6_400x400.jpg",
+        "description": [
+          "Pavel founded Bluzelle and is an investor in gaming, Esports, and crypto. He has managed studios with Disney Interactive and worked with EA, Xbox, and Nintendo."
+        ],
+        "role": "Co-founder & EP",
+        "twitter": "@pavelbains"
+      }
+    ],
+    "roadmap": {
+      "items": [
+        {
+          "title": "MixBots NFT Drop",
+          "date": "2022-12-07T15:42:21.109Z",
+          "status": "inprogress",
+        },
+        {
+          "title": "Upgrade MixMob:Racer 1 to take it mainstream – first freemium crypto mobile esports game.",
+          "date": "2023-01-28T15:42:21.109Z",
+          "status": "inprogress",
+        },
+        {
+          "title": "Build UGC items and game editor – creative economy",
+          "date": "2023-06-28T15:42:21.109Z",
+          "status": "upcoming",
+        },
+        {
+          "title": "Build MixMob World MMO",
+          "date": "2023-12-28T15:42:21.109Z",
+          "status": "completed",
+        }
+      ]
+    },
+    "faq": [
+      {
+        "question": "What are the key highlights of your project?",
+        "answer": [
+          "• We launched our first 5,000 NFT drop in December 2021, which sold out in less than a day.\n• Raised our seed round of 7.5M in Jan.\n• Our team grew to 40 people, including contractors and part-time talent, we have a vibrant community of around 30,000 members across social media channels, with ~2,000 unique NFT holders.\n• Over 60% of NFT holders participated in our alphas, averaging around 21 min of gameplay per session."
+        ]
+      },
+      {
+        "question": "Can you please tell us more about the MixMob Masks and their utility?",
+        "answer": [
+          "MixMob Gen0 masks are one-of-a-kind identities in the game. Mutable NFTs that evolve as players level up on their journey. MixMob masks combine 2D, 3D, sketches, stickers, candy, pop culture, art, music, science... Masks have the following power and utility in the game:\n• Unlock your avatar/identity in the game\n• Exclusive access to our game before anyone else\n• Participate in our staking program\n• Allowlist to all future collection that tide to the game, including MixBots, and cards.\n• Allocation to future token sale\n• In-game currency bonuses\n• Unlock exclusive arenas\n• Access to our gated community and live events"
+        ]
+      },
+      {
+        "question": "How is your game sustainable and fun?",
+        "answer": [
+          "Below are the key points on how our game cultivates fun and sustainability.\n• We have created a multiplayer, synchronous, fast-paced, twitch-able skill-based game.\n• Our game has free (no monetary rewards) and low-cost entry modes to play our game for fun.\n• We have built tournament-based arenas with different tiers for players to join for a fee, with a significant percentage of that fee going to the total prize pool – a sustainable and transparent economy based on skill.\n• MixMob offers external sponsored tournament-based arenas with extra prizes (tokens or NFTs) for players to participate in a more competitive environment.\n• UGC modes like our Remix Editor allow players to create and sell content."
+        ]
+      }
+    ]
+  },
+  "53pMaU2DXieGxwXZLMN1rgDECwFrxuYw5u9QgEFCx4Rd": {
+    "symbol": "Kamino Finance",
+    "heading": "Kamino is an active liquidity management layer that fully automates concentrated liquidity DEX positions across Solana.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Kamino is built to be Solana's liquidity destination. Kamino vaults automatically manage DEX concentrated liquidity positions, using quantitative models to set & rebalance ranges, while auto-compounding fees & rewards. In essence, Kamino Vaults are one-click strategies that are built to automate the liquidity provision process."
+        ]
+      },
+      {
+        "heading": "A Use Case for Every User",
+        "content": [
+          "For liquidity providers and institutionals, Kamino facilitates set-and-forget portfolio growth. For projects, Kamino facilitates deep and optimized liquidity for native tokens. With a wide range of strategies available on the platform, Kamino empowers liquidity to providers to deploy their assets according to their outlook on the market."
+        ]
+      },
+      {
+        "heading": "Leverage and composability",
+        "content": [
+          "Every Kamino position is tokenized as a kToken, representing a user's deposit into a certain vault. kTokens are fully fungible SPL tokens that can be used across DeFi to leverage positions, while the kToken itself continues to accumulate yield via auto-compounding. Ultimately, Kamino fuels both liquidity and composability for the Solana DeFi ecosystem."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.kamino.finance"
+    },
+    "gallery": [
+      {
+        "caption": "Kamino Finance Vaults Landing Page",
+        "url": "https://i.imgur.com/UUvccOv.png",
+        "height": 345,
+        "width": 600
+      },
+      {
+        "caption": "Kamino Finance Vault Deposit Page",
+        "url": "https://i.imgur.com/VRoNbmr.png",
+        "height": 345,
+        "width": 600
+      },
+      {
+        "caption": "Kamino Finance Portfolio and Rewards Page",
+        "url": "https://i.imgur.com/q5vanAB.png",
+        "height": 345,
+        "width": 600
+      }
+    ],
+    "resources": [
+      {
+        "title": "Hubble Protocol Launches Kamino Finance to Optimize Yields for Liquidity Providers on Solana",
+        "content": [
+          "Hubble Protocol, home of the USDH stablecoin, has launched Kamino Finance: the first concentrated liquidity market maker (CLMM) optimizer of its kind on the Solana blockchain."
+        ],
+        "url": "https://cryptonews.com/news/hubble-protocol-launches-kamino-finance-optimize-yields-for-liquidity-providers-solana.htm"
+      },
+      {
+        "title": "Kamino Finance: A Solana-Based DeFi Platform Offering Real Yield",
+        "content": [
+          "The project aims to revolutionize the way liquidity providers (LPs) can provide concentrated liquidity by making it as easy as pressing a button."
+        ],
+        "url": "https://crypto.news/kamino-finance-a-solana-based-defi-platform-offering-real-yields-to-users/"
+      },
+      {
+        "title": "Solana DeFi Protocols Solend and Kamino Finance Partner for Unique Borrowing Opportunities",
+        "content": [
+          "Solend and Kamino Finance have announced a partnership to create new liquidity solutions for decentralized finance (DeFi) on Solana."
+        ],
+        "url": "https://www.einnews.com/pr_news/597514062/solana-defi-protocols-solend-and-kamino-finance-partner-for-unique-borrowing-opportunities"
+      }
+    ],
+    "roadmap": {
+      "items": [
+        {
+          "title": "Mainnet Launch",
+          "date": "2022-08-31T15:42:21.109Z",
+          "status": "completed",
+          "resource": {
+            "title": "Introducing Kamino",
+            "url": "https://bit.ly/Kamino-Launch"
+          }
+        },
+        {
+          "title": "kTokens Integrated into Hubble Protocol",
+          "date": "2022-09-22T15:42:21.109Z",
+          "status": "completed",
+          "resource": {
+            "title": "How to Borrow USDH with Kamino kTokens",
+            "url": "https://bit.ly/kTokens-on-Hubble"
+          }
+        },
+        {
+          "title": "$5M TVL",
+          "date": "2022-10-24T15:42:21.109Z",
+          "status": "completed",
+        },
+        {
+          "title": "kTokens Integrated into Solend",
+          "date": "2022-10-31T15:42:21.109Z",
+          "status": "completed",
+          "resource": {
+            "title": "Borrow on Solend with Kamino kTokens as Collateral",
+            "url": "https://bit.ly/kTokens-on-Solend"
+          }
+        },
+        {
+          "title": "Automated SOL staking via Lido",
+          "date": "2022-10-27T15:42:21.109Z",
+          "status": "completed",
+          "resource": {
+            "title": "Stake SOL with Lido Finance on Kamino",
+            "url": "https://bit.ly/minting-stsol-lido"
+          }
+        }
+      ]
+    },
+    "faq": [
+      {
+        "question": "Why use Kamino?",
+        "answer": [
+          "For users: Save time and maximize yields. You could sit at your computer 24/7, adjusting your concentrated liquidity positions and compounding your rewards, but you can’t beat Kamino’s efficiency.",
+          "For projects: Deep liquidity quick. Incentivize users to provide liquidity or provide it yourself. With Kamino managing your position, less capital is needed to negate slippage when swapping your tokens."
+        ]
+      },
+      {
+        "question": "How do I use Kamino?",
+        "answer": [
+          "Set it and forget it. Choose a vault and deposit the tokens you want to LP. Kamino will automatically manage the strategy of your position, and auto-compound your rewards. Withdraw your funds whenever you want."
+        ]
+      },
+      {
+        "question": "Where does Kamino's yield come from?",
+        "answer": [
+          "Kamino automates concentrated liquidity positions, and auto-compounds all the rewards a user earns, right back into your position. This means you never has to touch their deposit, and it will continue to accrue in value as time goes on. This value is also reflected in the value of the kTokens you receive upon deposit."
+        ]
+      },
+      {
+        "question": "What are kTokens?",
+        "answer": [
+          "kTokens are receipt tokens, representing the value deposited in Kamino vaults. Each Kamino vault has its own distinct kToken, which you will receive in your wallet the moment you deposit into a vault. kTokens also reflect the value of auto-compounding in Kamino vaults, making them Solana's first yield bearing asset that accrues yield from concentrated liquidity positions."
+        ]
+      },
+      {
+        "question": "Where can I use kTokens?",
+        "answer": [
+          "kTokens are standard, fungible SPL tokens, and there are a range of use-cases in the ecosystem; from minting USDH against them on Hubble Protocol, to depositing them in Solend to borrow a range of assets from the Kamino USDH Pool."
+        ]
+      },
+      {
+        "question": "Has Kamino been audited?",
+        "answer": [
+          "Yes, Kamino's audits are available in the documentation."
+        ]
+      }
+    ]
+  },
+  "DKDkC6km37NcExxgBFW1nToSiybPvbu5RwhSSnRWwXYo": {
+    "symbol": "Moonlit",
+    "heading": "Find and reward the SUPERSTARS in your Discord with Moonlit.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Moonlit is a collaboration and rewards platform specifically for Discord communities. It's a fun way to engage your community in the serious business of running and growing your DAO."
+        ]
+      },
+      {
+        "content": [
+          "- Build out your members database automatically\n-Assign and reward teams for working on different projects\n- Advertise for help / ideas within the DAO\n- Easily move tokens between DAO members for rewards, permissions, tips and entry fees"
+        ]
+      },
+      {
+        "content": [
+          "Use any SPL token (or for pre-mint DAOs use a virtual points system) and watch as your community engages more deeply and more often with everything the DAO is doing.",
+          "The team behind Moonlit has years of experience building apps that encourage and motivate people to change their behavior. Using this deep understanding of human psychology, Moonlit will make operating your DAO not only easier but also more fun and more engaging for the entire community."
+        ]
+      }
+      {
+        "content": [
+          "\"Using Moonlit is the only way any of this works\" Nom, MonkeDAO"
+        ]
+      }
+    ],
+    "team": [
+      {
+        "name": "Anders Murphy",
+        "avatar": "https://media.licdn.com/dms/image/C5603AQHHnvBThTM0Aw/profile-displayphoto-shrink_800_800/0/1516848243663?e=1672876800&v=beta&t=3YCLoTqhdSFgRRtLkJDzurUVEa7kFtpFpsZvpuyjdVM",
+        "description": [
+          "Full stack software engineer and lean product development practitioner. Previously at FanDuel and HelloRelish. Deep experience in designing for behavioral change. 10 years experience of building mobile apps and excited to bring the masses to crypto via beautifully designed, practical products."
+        ],
+        "role": "Co-Founder"
+      }
+    ],
+    "faq": [
+      {
+        "question": "Do we need to have launched a token to use Moonlit?",
+        "answer": [
+          "No. If you're pre-token launch you can use an in-app currency and set an exchange rate in the future for any new token."
+        ]
+      },
+      {
+        "question": "Is this just for simple bounties?",
+        "answer": [
+          "No. Moonlit will create an internal economy for your token - earn tokens through contributions to your community and use them to get other community members to help you on projects."
+        ]
+      },
+      {
+        "question": "How easy is this to set up?",
+        "answer": [
+          "Super simple! Install a bot in your Discord and you're all set to go. We will provide all the support you need to get your team onboarded and successful right out of the gate. "
+        ]
+      },
+      {
+        "question": "Does this add an admin layer to running my community?",
+        "answer": [
+          "No. One of our principles that we have built Moonlit on is that it must make life easier, not harder, for everyone. Moonlit is a way for your members to understand how they can help, and to be recognized by the community for their contribution. It does this in a decentralized but controlled manner using a scale permissions based on contribution."
+        ]
+      },
+      {
+        "question": "Is this integrated into Discord?",
+        "answer": [
+          "Absolutely! Members can follow along on Discord, or dive into the details in the Moonlit web app."
+        ]
+      },
+      {
+        "question": "Can I use Moonlit on my phone?",
+        "answer": [
+          "Yes! It's designed for phone or desktop. Simple, beautiful and really easy to use."
+        ]
+      }
+    ]
   }
 }
