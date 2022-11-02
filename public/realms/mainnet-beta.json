@@ -1890,5 +1890,18 @@
   "twitter": "@AmuletProtocol",
   "discord": "https://discord.com/invite/AmuletProtocol",
   "github": "https://github.com/Amulet-Protocol"
+},
+{
+  "symbol": "Faraway",
+  "category": "gaming",
+  "bannerImage": "https://i.imgur.com/d6EMCqs.png",
+  "displayName": "Faraway",
+  "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+  "realmId": "4X8PMiLabGjdAHdrKL9SLu1HAMMp9xNcn3DY2mAciT8N",
+  "ogImage": "https://i.imgur.com/aodmVfC.jpg",
+  "shortDescription": "Faraway makes fun and social games with player-driven economies",
+  "sortRank": 3,
+  "website": "https://faraway.gg/",
+  "twitter": "@farawaygg"
 }
 ]
