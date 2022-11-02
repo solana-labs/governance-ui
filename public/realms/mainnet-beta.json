@@ -1741,10 +1741,11 @@
   {
     "symbol": "Francium",
     "category": "defi",
+    "bannerImage": "https://pbs.twimg.com/profile_banners/1389827735166414849/1640064489/1500x500",
     "displayName": "Francium",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "GMpWmXc3sKejmAcAFpcQ4NgCL9Fx3gFR2FeepNUtK5Mh",
-    "ogImage": "https://raw.githubusercontent.com/Francium-DeFi/materials/main/francium_logo_black_background.png.png",
+    "ogImage": "https://raw.githubusercontent.com/Francium-DeFi/materials/main/francium_logo_white_background_with_ring.png.png",
     "shortDescription": "Francium is a DeFi yield strategy Platform on Solana. Granted by Solana & Serum.",
     "sortRank": 3,
     "website": "https://francium.io/",
@@ -2540,5 +2541,49 @@
     "twitter": "@AmuletProtocol",
     "discord": "https://discord.com/invite/AmuletProtocol",
     "github": "https://github.com/Amulet-Protocol"
+  },
+  {
+    "symbol": "MixMob",
+    "category": "gaming",
+    "bannerImage": "https://i.imgur.com/M57B2Xb.jpg",
+    "displayName": "MixMob",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "A3WX4QKcioruP71f4yweusv9jqU9R4LtGfJEHtZhs3Rx",
+    "ogImage": "https://i.imgur.com/PHo3WRt.jpg",
+    "shortDescription": "Remix the world! A new card strategy racing game from a team that worked on HALO, FIFA, Battlefield & PokerStars. Mask Up!",
+    "sortRank": 3,
+    "website": "https://www.mixmob.io/",
+    "twitter": "@MixMobOrigin",
+    "discord": "discord.gg/mixmob",
+    "github": "https://github.com/MixMobOrigin"
+  },
+  {
+    "symbol": "Kamino Finance",
+    "category": "defi",
+    "bannerImage": "https://i.imgur.com/wHEZDPh.png",
+    "displayName": "Kamino Finance",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "53pMaU2DXieGxwXZLMN1rgDECwFrxuYw5u9QgEFCx4Rd",
+    "ogImage": "https://pbs.twimg.com/profile_images/1563154884718985216/MPPps3IA_400x400.jpg",
+    "shortDescription": "Kamino is an active liquidity management layer that fully automates concentrated liquidity DEX positions across Solana.",
+    "sortRank": 3,
+    "website": "https://bit.ly/Kamino-Site",
+    "twitter": "@kamino_finance",
+    "discord": "https://discord.gg/kaminofinance",
+    "github": "https://github.com/hubbleprotocol/kamino-webapp"
+  },
+  {
+    "symbol": "Moonlit",
+    "category": "web3",
+    "bannerImage": "https://cdn.discordapp.com/attachments/953968357579837441/1034573854581993473/Frame_328.jpg",
+    "displayName": "Moonlit",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "DKDkC6km37NcExxgBFW1nToSiybPvbu5RwhSSnRWwXYo",
+    "ogImage": "https://cdn.discordapp.com/attachments/953968357579837441/1034573854338715688/Frame_327.jpg",
+    "shortDescription": "Find and reward the SUPERSTARS in your Discord with Moonlit.",
+    "sortRank": 3,
+    "website": "https://www.moonlit.team/",
+    "twitter": "@moonlit_team",
+    "discord": "https://discord.gg/ESXqmPy6wV"
   }
 ]
