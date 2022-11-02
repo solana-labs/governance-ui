@@ -137,10 +137,6 @@ export default function DialectNotificationsModal(
         <DialectUiManagementProvider>
           <Notifications
             dappAddress={REALMS_PUBLIC_KEY.toBase58()}
-            notifications={[
-              { name: 'New proposals', detail: 'On creation' },
-              { name: 'Finished proposals', detail: 'On execution' },
-            ]}
             pollingInterval={15000}
             onModalClose={props.onModalClose}
             onBackClick={props.onBackClick}
