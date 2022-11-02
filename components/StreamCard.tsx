@@ -73,6 +73,9 @@ export default function StreamCard({
 
   const [stream, setStream] = useState<Stream>()
 
+  const hasExplicitPayer = accounts.length === 12
+  const metadataIndex = hasExplicitPayer ? 3 : 2
+
   useEffect(() => {
     async function fetch() {
       const cli = new StreamClient(
@@ -81,7 +84,7 @@ export default function StreamCard({
         undefined,
         accounts[0].pubkey.toBase58()
       )
-      const contract_metadata = accounts[2].pubkey
+      const contract_metadata = accounts[metadataIndex].pubkey
       const stream = await cli.getOne(contract_metadata.toBase58())
       setStream(stream)
     }
@@ -90,7 +93,7 @@ export default function StreamCard({
     }
   })
 
-  const contract_metadata = accounts[2].pubkey
+  const contract_metadata = accounts[metadataIndex].pubkey
   if (stream?.createdAt == 0 || !stream?.cancelableBySender) {
     return <></>
   }
