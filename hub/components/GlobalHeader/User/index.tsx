@@ -33,7 +33,7 @@ export function User(props: Props) {
       ),
       ({ me }) => (
         <div className={cx(props.className, 'flex', 'items-center')}>
-          <DialectNotifications />
+          <DialectNotifications className="mx-2" />
           <UserDropdown user={me} compressed={props.compressed} />
         </div>
       ),

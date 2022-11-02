@@ -51,13 +51,11 @@
     "linkedin": "https://www.linkedin.com/in/pablo-f-acebedo/",
     "instagram": "https://www.instagram.com/pablofacebedo/",
     "github": "https://github.com/pablofelipe01"
-
-
   },
   {
     "symbol": "GRAPE",
     "category": "daotools",
-    "bannerImage": "https://pbs.twimg.com/profile_banners/1387427286362861570/1657283618/1500x500",
+    "bannerImage": "https://i.imgur.com/OJNVFxE.jpg",
     "displayName": "GRAPE",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "By2sVGZXwfQq6rAiAM3rNPJ9iQfb5e2QhnF4YjJ4Bip",
@@ -128,7 +126,6 @@
     "website": "https://www.psyoptions.io/",
     "twitter": "@PsyOptions",
     "discord": "https://discord.com/invite/MgDdJKgZJc",
-    "github": "",
     "keywords": "PsyOptions, PsyFi, PsyFinance, REALM, Governance, Serum, SRM, DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, Tokens, Options, Vaults"
   },
   {
@@ -934,7 +931,7 @@
     "realmId": "4PYdZHs2hwZYibkvEnpVCJpU7bD4aFUkWtYxGFU25ZWu",
     "website": "https://www.linkedin.com/in/harimasoor/",
     "twitter": "@HariOnChain",
-    "ogImage": "/realms/MasoorDAO/MasoorDAO.PNG"
+    "ogImage": "/realms/MasoorDAO/MasoorDAO.png"
   },
   {
     "symbol": "AGXT",
@@ -952,7 +949,7 @@
     "realmId": "Cwh2E98xcB5qL8yuGvxdaMezRUQXwdCwcCKhYKqUPqFD",
     "website": "https://www.youtube.com/channel/UCP6jlgRDcs5S68OVjleMGjg",
     "twitter": "@MannyAstra",
-    "ogImage": "/realms/Astra/AstraPodcastLogo.PNG"
+    "ogImage": "/realms/Astra/AstraPodcastLogo.png"
   },
   {
     "symbol": "CreatedBy",
@@ -1394,7 +1391,7 @@
   {
     "symbol": "Streamflow",
     "category": "web3",
-    "bannerImage": "https://streamflow.finance/imgs/streamflow-logo-desktop.PNG",
+    "bannerImage": "https://streamflow.finance/imgs/streamflow-logo-desktop.png",
     "displayName": "Streamflow",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "Bwjrnh5dGZ2tHZKjLtMNwwhtk8sCGfR1ZM8ZxcVCe87m",
@@ -1588,7 +1585,7 @@
     "sortRank": 3,
     "website": "https://www.plantoids.io",
     "twitter": "@PlantoidsNFT",
-    "discord": "https://www.plantoids.io"
+    "discord": "https://discord.gg/twGScVXwty"
   },
   {
     "symbol": "Mini Royale Nations",
@@ -1607,7 +1604,6 @@
   {
     "symbol": "EmpireDAO",
     "category": "web3",
-    "bannerImage": "",
     "displayName": "EmpireDAO ",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "6Ffasv4dQ8ZeRbZXZx2tiHcgJh5Y5VELmxnA7Qh1RWRg",
@@ -1631,9 +1627,9 @@
     "github": "https://github.com/holaplex"
   },
   {
-    "symbol": "Metaverse Game Studios Angelic",
+    "symbol": "Angelic",
     "category": "gaming",
-    "displayName": "Metaverse Game Studios - Angelic ",
+    "displayName": "Angelic ",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "HsU14rpiBDC33hBsDPFQdZWaeykmKr67x3D2hA5RJRJD",
     "sortRank": 3,
@@ -1741,10 +1737,11 @@
   {
     "symbol": "Francium",
     "category": "defi",
+    "bannerImage": "https://i.imgur.com/6Vfu1ur.jpg",
     "displayName": "Francium",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "GMpWmXc3sKejmAcAFpcQ4NgCL9Fx3gFR2FeepNUtK5Mh",
-    "ogImage": "https://raw.githubusercontent.com/Francium-DeFi/materials/main/francium_logo_black_background.png.png",
+    "ogImage": "https://raw.githubusercontent.com/Francium-DeFi/materials/main/francium_logo_white_background_with_ring.png.png",
     "shortDescription": "Francium is a DeFi yield strategy Platform on Solana. Granted by Solana & Serum.",
     "sortRank": 3,
     "website": "https://francium.io/",
@@ -1863,11 +1860,11 @@
   {
     "symbol": "Star Atlas",
     "category": "gaming",
-    "bannerImage": "https://uc5d02be8ff87e26f11d222db77d.previews.dropboxusercontent.com/p/thumb/ABtjGFX4q-_Gl_fq7JaJG5RidkJygmkhYzDqsRqxhDiFxJF6p8lKmfxf_Bcdhg3OszKZ8y5S50jhwTAxAe-dKVKGZ2qCH3KAn0F-9P49Av9T9HZSymx6gVhJzKDFP0IIaNeTDBLaP_YgC63sUwsjonGWExjo4YXmvcVRjG5b_vi4NE3aMqFrThfEahURzWWlRlxyt_epQqMdILowE1lOsWq15S1Y1LTzR5ERHCXxRYTzduWxWKtxVlqEmpOjhiXNRb8wQDGZxCkvNAz4Sm8tl49Sgy4AOEo1AwnN6nMJaxWAKEzyIgVfnl0SZLX5nA789mlvCGA5cYAmFoATP25XiDUwrU9rdE63BabEHA0-6mwwcv9s8mKwfAooavTAqj-zCktzCqRSw87e_GpH5sTP2QjGBYnzZ7mJYv0CGLpqt4FJLA/p.jpeg",
+    "bannerImage": "https://i.imgur.com/j9CAVdy.jpg",
     "displayName": "Star Atlas",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "52KrHUxbakN1rq9XoXQtSUmhdYyUZyp3YkWZQihZMTPu",
-    "ogImage": "https://ucab3db4d88c2be607d280ee1f81.previews.dropboxusercontent.com/p/thumb/ABsJ9KAuSrsXyYu-hGi1pI2EjhNNeFrwuu3MS2v4GLmn7w9Jq7-ymivEWv9BQELT7scOqA4Vzlg-9AzudpVEP2gEV0w9cBRXMSjMAwO472s7xanPDHdzs0ABpoEU8NHpERRRJY3F7ct8YDq8beW5Q5TD3xpgrqBCva1REU2Q9f34ecFQ2q2T5HcGLtAxgco0-ggXANfezPYYO9IO0hXll4IBZyJxhJ3RI69_phx4QZ2aC5jDzEHO9cuhPONYUQ1T8BMPkuFfCgkf_EyjxdrAPItI_k_RGaecK4TW5VMewhkN_EMFJ-2z3ym7Vy86e1jCjS2DevCt443XhqefJGOjYL9u6qMmpliquNuBNpFhx17u4zR-PtyWNM3d6DVGuJJ_HqZwWgw9DjE5Wk0UkiyQF51V9pV5M2c14bubvGkiU0GFTw/p.png",
+    "ogImage": "https://i.imgur.com/krF2nOO.png",
     "shortDescription": "Next-gen gaming metaverse with triple-A UE5 graphics for creating, playing & learning with others worldwide. Power to the People!",
     "sortRank": 3,
     "website": "https://staratlas.com/",
@@ -1902,8 +1899,7 @@
     "sortRank": 3,
     "website": "https://helius.xyz",
     "twitter": "@heliuslabs",
-    "discord": "http://discord.gg/6GXdee3gBj",
-    "github": ""
+    "discord": "http://discord.gg/6GXdee3gBj"
   },
   {
     "symbol": "Zebec ",
@@ -1915,7 +1911,6 @@
     "ogImage": "https://pbs.twimg.com/profile_images/1580267930666749952/xRSHqD0N_400x400.jpg",
     "shortDescription": "Zebec is a continuous settlement protocol on Solana. We are revolutionizing payroll by introducing streaming finance technology.",
     "sortRank": 3,
-    "website": "",
     "twitter": "@Zebec_HQ",
     "discord": "https://t.co/kwC1Plza41",
     "github": "https://github.com/Zebec-protocol/"
@@ -1923,7 +1918,6 @@
   {
     "symbol": "Snowflake",
     "category": "daotools",
-    "bannerImage": "",
     "displayName": "Snowflake",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "GZyALQBvdBswSpMLabKEBVgKykkZMgnYcJgFk5dGU4aV",
@@ -1968,7 +1962,6 @@
   {
     "symbol": "Crossmint",
     "category": "web3",
-    "bannerImage": "",
     "displayName": "Crossmint",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "8V5BthCyL5LFDsWDKhfmAHqEgudSw1pXMC2PmWKAAr3D",
@@ -1977,8 +1970,7 @@
     "sortRank": 3,
     "website": "http://crossmint.com",
     "twitter": "@crossmint",
-    "discord": "https://discord.gg/crossmint",
-    "github": ""
+    "discord": "https://discord.gg/crossmint"
   },
   {
     "symbol": "Unloc",
@@ -2020,7 +2012,6 @@
     "sortRank": 3,
     "website": "https://www.ourdiaspora.xyz/",
     "twitter": "https://twitter.com/OurDiaspora",
-    "discord": "",
     "github": "https://github.com/diaspora-labs"
   },
   {
@@ -2035,23 +2026,18 @@
     "sortRank": 3,
     "website": "https://rageeffect.io",
     "twitter": "@RageEffect_",
-    "discord": "https://discord.gg/rCCpKpUxb4",
-    "github": ""
+    "discord": "https://discord.gg/rCCpKpUxb4"
   },
   {
     "symbol": "Satellite IM",
     "category": "web3",
-    "bannerImage": "",
     "displayName": "Satellite IM",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "3DLKv41oFs8DiHBkUEdm3MwiyJ9Sp4E6sb8QCAqynnbA",
-    "ogImage": "",
     "shortDescription": "A fully decentralized peer-to-peer communications platform",
     "sortRank": 3,
     "website": "www.satellite.im",
-    "twitter": "@Satellite_im",
-    "discord": "",
-    "github": ""
+    "twitter": "@Satellite_im"
   },
   {
     "symbol": "Block Tackle Inc",
@@ -2065,8 +2051,7 @@
     "sortRank": 3,
     "website": "https://www.skatex.io/",
     "twitter": "@PlaySkateX",
-    "discord": "discord.gg/skatex",
-    "github": ""
+    "discord": "discord.gg/skatex"
   },
   {
     "symbol": "Rye",
@@ -2110,8 +2095,7 @@
     "sortRank": 3,
     "website": "https://okaybears.com",
     "twitter": "@okaybears",
-    "discord": "https://discord.com/invite/okaybears",
-    "github": ""
+    "discord": "https://discord.com/invite/okaybears"
   },
   {
     "symbol": "HEIR Labs Inc",
@@ -2168,9 +2152,7 @@
     "shortDescription": "primitives is the most joyful place to interact with blockchains :)",
     "sortRank": 3,
     "website": "primitives.xyz",
-    "twitter": "@primitives_xyz",
-    "discord": "",
-    "github": ""
+    "twitter": "@primitives_xyz"
   },
   {
     "symbol": "Gangbusters Ltd",
@@ -2184,8 +2166,7 @@
     "sortRank": 3,
     "website": "https://gangbusters.io/",
     "twitter": "@gangbusters_io",
-    "discord": "https://discord.gg/battletabs",
-    "github": ""
+    "discord": "https://discord.gg/battletabs"
   },
   {
     "symbol": "Parcl",
@@ -2214,8 +2195,7 @@
     "sortRank": 3,
     "website": "https://ev.io",
     "twitter": "@play_evio",
-    "discord": "http://discord.gg/evio",
-    "github": ""
+    "discord": "http://discord.gg/evio"
   },
   {
     "symbol": "Glass",
@@ -2272,9 +2252,7 @@
     "shortDescription": "The First & Fastest-Growing Officially-Licensed Token Marketplace for College Sports",
     "sortRank": 3,
     "website": "https://campus.io/",
-    "twitter": "@campusunlocks",
-    "discord": "",
-    "github": ""
+    "twitter": "@campusunlocks"
   },
   {
     "symbol": "Port Finance",
@@ -2284,7 +2262,6 @@
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "FneznCHADXLsDjkvq51UmhZMropsXkSbkzJ5qXBMw1RF",
     "ogImage": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/PoRTjZMPXb9T7dyU7tpLEZRQj7e6ssfAE62j2oQuc6y/PORT.png",
-    "shortDescription": "",
     "sortRank": 3,
     "website": "https://port.finance/",
     "twitter": "@port_finance",
@@ -2404,8 +2381,7 @@
     "sortRank": 3,
     "website": "getcogni.com",
     "twitter": "@getcogni",
-    "discord": "https://twitter.com/getcogni",
-    "github": ""
+    "discord": "https://twitter.com/getcogni"
   },
   {
     "symbol": "Backpack",
@@ -2464,8 +2440,7 @@
     "sortRank": 3,
     "website": "https://www.degods.com/",
     "twitter": "@DeGodsNFT",
-    "discord": "https://t.co/JoIrKmQjvY",
-    "github": ""
+    "discord": "https://t.co/JoIrKmQjvY"
   },
   {
     "symbol": "Solana Mobile",
@@ -2540,5 +2515,62 @@
     "twitter": "@AmuletProtocol",
     "discord": "https://discord.com/invite/AmuletProtocol",
     "github": "https://github.com/Amulet-Protocol"
+  },
+  {
+    "symbol": "Faraway",
+    "category": "gaming",
+    "bannerImage": "https://i.imgur.com/d6EMCqs.png",
+    "displayName": "Faraway",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "4X8PMiLabGjdAHdrKL9SLu1HAMMp9xNcn3DY2mAciT8N",
+    "ogImage": "https://i.imgur.com/aodmVfC.jpg",
+    "shortDescription": "Faraway makes fun and social games with player-driven economies",
+    "sortRank": 3,
+    "website": "https://faraway.gg/",
+    "twitter": "@farawaygg"
+  },
+  {
+    "symbol": "MixMob",
+    "category": "gaming",
+    "bannerImage": "https://i.imgur.com/M57B2Xb.jpg",
+    "displayName": "MixMob",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "A3WX4QKcioruP71f4yweusv9jqU9R4LtGfJEHtZhs3Rx",
+    "ogImage": "https://i.imgur.com/PHo3WRt.jpg",
+    "shortDescription": "Remix the world! A new card strategy racing game from a team that worked on HALO, FIFA, Battlefield & PokerStars. Mask Up!",
+    "sortRank": 3,
+    "website": "https://www.mixmob.io/",
+    "twitter": "@MixMobOrigin",
+    "discord": "discord.gg/mixmob",
+    "github": "https://github.com/MixMobOrigin"
+  },
+  {
+    "symbol": "Kamino Finance",
+    "category": "defi",
+    "bannerImage": "https://i.imgur.com/wHEZDPh.png",
+    "displayName": "Kamino Finance",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "53pMaU2DXieGxwXZLMN1rgDECwFrxuYw5u9QgEFCx4Rd",
+    "ogImage": "https://pbs.twimg.com/profile_images/1563154884718985216/MPPps3IA_400x400.jpg",
+    "shortDescription": "Kamino is an active liquidity management layer that fully automates concentrated liquidity DEX positions across Solana.",
+    "sortRank": 3,
+    "website": "https://bit.ly/Kamino-Site",
+    "twitter": "@kamino_finance",
+    "discord": "https://discord.gg/kaminofinance",
+    "github": "https://github.com/hubbleprotocol/kamino-webapp"
+  },
+  {
+    "symbol": "Moonlit",
+    "category": "web3",
+    "bannerImage": "https://cdn.discordapp.com/attachments/953968357579837441/1034573854581993473/Frame_328.jpg",
+    "displayName": "Moonlit",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "DKDkC6km37NcExxgBFW1nToSiybPvbu5RwhSSnRWwXYo",
+    "ogImage": "https://cdn.discordapp.com/attachments/953968357579837441/1034573854338715688/Frame_327.jpg",
+    "shortDescription": "Find and reward the SUPERSTARS in your Discord with Moonlit.",
+    "sortRank": 3,
+    "website": "https://www.moonlit.team/",
+    "twitter": "@moonlit_team",
+    "discord": "https://discord.gg/ESXqmPy6wV"
   }
 ]

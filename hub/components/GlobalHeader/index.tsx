@@ -93,7 +93,7 @@ export function GlobalHeader(props: Props) {
             )}
           </div>
           <div className="flex items-center">
-            {showCreateHub && <CreateHub className="mr-8" />}
+            {showCreateHub && <CreateHub className="mr-4" />}
             {!showDesktopRealmSelector && (
               <NavigationMenu.Item asChild>
                 <MobileRealmSearchNavigation />

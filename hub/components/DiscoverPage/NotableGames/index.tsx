@@ -17,32 +17,32 @@ export const ITEMS = [
     urlId: 'Aurory',
   },
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
+    bannerImgSrc: 'https://i.imgur.com/M57B2Xb.jpg',
     description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+      'Remix the world! A new card strategy racing game from a team that worked on HALO, FIFA, Battlefield & PokerStars. Mask Up!',
+    iconImgSrc: 'https://i.imgur.com/PHo3WRt.jpg',
+    name: 'MixMob',
+    publicKey: new PublicKey('A3WX4QKcioruP71f4yweusv9jqU9R4LtGfJEHtZhs3Rx'),
+    urlId: 'MixMob',
   },
-  {
-    bannerImgSrc: '/realms/RCH/banner.png',
-    description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
-  },
-  {
-    bannerImgSrc: '/realms/RCH/banner.png',
-    description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
-  },
+  // {
+  //   bannerImgSrc: '/realms/RCH/banner.png',
+  //   description:
+  //     'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
+  //   iconImgSrc: '/realms/RCH/icon.png',
+  //   name: 'Realms Community Hub',
+  //   publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
+  //   urlId: 'RCH',
+  // },
+  // {
+  //   bannerImgSrc: '/realms/RCH/banner.png',
+  //   description:
+  //     'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
+  //   iconImgSrc: '/realms/RCH/icon.png',
+  //   name: 'Realms Community Hub',
+  //   publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
+  //   urlId: 'RCH',
+  // },
 ];
 
 interface Props {
