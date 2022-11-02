@@ -15,10 +15,11 @@ import BN from 'bn.js'
 import { WSOL_MINT_PK } from '@components/instructions/tools'
 import { withSentry } from '@sentry/nextjs'
 import { getRealmConfigAccountOrDefault } from '@tools/governance/configs'
+import { chunks } from '@utils/helpers'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const conn = new Connection(
-    'https://rpc.theindex.io/mainnet-beta/f23b4435-a2bf-4c52-8fe3-8be1d49f885c',
+    'http://realms-realms-c335.mainnet.rpcpool.com/258d3727-bb96-409d-abea-0b1b4c48af29/',
     'recent'
   )
 
@@ -118,9 +119,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   console.log('fetching tokens and prices...')
+  console.log('token count', tokenAmountMap.size)
 
   await tokenService.fetchSolanaTokenList()
-  await tokenService.fetchTokenPrices([...tokenAmountMap.keys()])
+
+  for (const chunk of chunks([...tokenAmountMap.keys()], 100)) {
+    await tokenService.fetchTokenPrices(chunk)
+  }
 
   let totalUsdAmount = 0
 
