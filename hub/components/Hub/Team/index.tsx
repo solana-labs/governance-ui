@@ -7,6 +7,8 @@ import { formatNumber } from '@hub/lib/formatNumber';
 import { isEmpty } from '@hub/lib/richText';
 import { RichTextDocument } from '@hub/types/RichTextDocument';
 
+import defaultimage from './avatar-default.jpg';
+
 interface Props {
   className?: string;
   teamMembers: {
@@ -63,15 +65,9 @@ export function Team(props: Props) {
               style={{
                 backgroundImage: teamMember.avatar
                   ? `url(${teamMember.avatar})`
-                  : undefined,
+                  : `url(${defaultimage.src})`,
               }}
-            >
-              {!teamMember.avatar && (
-                <div className="text-white text-7xl">
-                  {teamMember.name[0].toUpperCase()}
-                </div>
-              )}
-            </div>
+            />
             <div className="mt-4 md:mt-0 md:min-h-[160px] flex items-center">
               <div>
                 <div className="text-neutral-900 font-medium text-xl md:text-2xl">

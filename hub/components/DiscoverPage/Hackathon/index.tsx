@@ -61,16 +61,16 @@ export const ITEMS = [
     publicKey: new PublicKey('G1RWjNmizVM6vR8pEsHta4iRYcTa7jWM1mQErz4phpRy'),
     urlId: 'Bastion',
   },
-  {
-    bannerImgSrc: '/realms/RCH/banner.png',
-    category: RealmCategory.Web3,
-    description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
-  },
+  // {
+  //   bannerImgSrc: '/realms/RCH/banner.png',
+  //   category: RealmCategory.Web3,
+  //   description:
+  //     'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
+  //   iconImgSrc: '/realms/RCH/icon.png',
+  //   name: 'Realms Community Hub',
+  //   publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
+  //   urlId: 'RCH',
+  // },
 ];
 
 interface Props {

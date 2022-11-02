@@ -360,34 +360,6 @@
       }
     ]
   },
-  "HnLuYmBxDxK1MCihHJVFnNudUTpLPc2km6xNcRQ8KPdj": {
-    "symbol": "Dual Finance",
-    "heading": "Sustainable Incentive Liquidity Infrastructure for Web3 Communities",
-    "about": [
-      {
-        "heading": "Introduction",
-        "content": [
-          "Dual Finance gives token communities sustainable ways to earn yield & generate value from their treasuries. Through liquid option based incentives, Dual Finance unlocks value & unleashes participation in decentralized communities. Goodbye inflationary token rewards. Hello sustainable Staking Options.",
-          "Dual Finance has designed itself upon this breakthrough token incentive mechanism to gain allegiance & prevent token dumping. DUAL token distribution is being conducted fully & fairly through the use of Staking Options.",
-          "Partner projects can use Staking Options themselves via Dual Finance to better incentivize their own communities. When designed through Dual Finance, Staking Options serve to bolster their token's option & spot liquidity by utilizing a DAO owned AMM (Risk Manager) and capitally efficient lending product (Rehypothecated Lending Pools).",
-          "Completing the offering are Dual Investment Pools (DIPs), an upgrade to conventional option vaults (DOVs) that offer streaming executable yield strategies. Customize strategies based on your risk appetite and earn yield immediately."
-        ]
-      }
-    ],
-    "documentation": {
-      "title": "Docs",
-      "url": "https://medium.com/@dualfinance"
-    },
-    "resources": [
-      {
-        "title": "Dual Finance's Youtube Channel",
-        "content": [
-          "Providing educational videos that give token communities sustainable ways to earn yield & generate value from their treasuries"
-        ],
-        "url": "https://www.youtube.com/channel/UCMyYJ7GUzk7GCgyb9AgOU6w"
-      }
-    ]
-  },
   "9nUyxzVL2FUMuWUiVZG66gwK15CJiM3PoLkfrnGfkvt6": {
     "symbol": "Drift Protocol",
     "heading": "A lightning-fast and scalable perpetual futures DEX.",
@@ -971,7 +943,7 @@
       ]
     }
   },
-  "By2sVGZXwfQq6rAiAM3rNPJ9iQfb5e2QhnF4YjJ4Bip" : {
+  "By2sVGZXwfQq6rAiAM3rNPJ9iQfb5e2QhnF4YjJ4Bip": {
     "symbol": "GRAPE",
     "heading": "GRAPE DAO is a power user community for digital governance primitives & tooling",
     "about": [
@@ -1004,7 +976,7 @@
       }
     ]
   },
-  "B1CxhV1khhj7n5mi5hebbivesqH9mvXr5Hfh2nD2UCh6" : {
+  "B1CxhV1khhj7n5mi5hebbivesqH9mvXr5Hfh2nD2UCh6": {
     "symbol": "MonkeDAO",
     "heading": "",
     "about": [
@@ -1036,7 +1008,7 @@
       }
     ]
   },
-  "7s5QZmpit4uu1y2bkByXerE2mv3XBHtiNQ4JkDdmKRiQ" : {
+  "7s5QZmpit4uu1y2bkByXerE2mv3XBHtiNQ4JkDdmKRiQ": {
     "symbol": "Dialect",
     "heading": "Dialect is building an open source protocol for Smart Messaging — dynamic, composable dapp notifications and wallet-to-wallet chat",
     "about": [
@@ -1080,7 +1052,7 @@
       }
     ]
   },
-  "6jydyMWSqV2bFHjCHydEQxa9XfXQWDwjVqAdjBEA1BXx" : {
+  "6jydyMWSqV2bFHjCHydEQxa9XfXQWDwjVqAdjBEA1BXx": {
     "symbol": "Gilder",
     "heading": "Gilder makes interacting and staying connected to your decentralized internet community easy on mobile. ",
     "about": [
@@ -1092,7 +1064,7 @@
       }
     ]
   },
-  "9PmmctkHPN5Br8V4gmjNuUdccrD7TtzfJ7U8mcpoBGXd" : {
+  "9PmmctkHPN5Br8V4gmjNuUdccrD7TtzfJ7U8mcpoBGXd": {
     "symbol": "Neo Fairies DAO",
     "heading": "A fantasy-punk shared world that’s shaped and owned by community.",
     "about": [
@@ -1131,7 +1103,7 @@
       }
     ]
   },
-  "GXw7esYZ42nRZBFZTnAXa5fkdDgkvdZh7xeVuCEXoJZP" : {
+  "GXw7esYZ42nRZBFZTnAXa5fkdDgkvdZh7xeVuCEXoJZP": {
     "symbol": "Lighthouse",
     "heading": "Lighthouse enables communities to design reputation, rewards and membership systems by attesting to member contributions on-chain.",
     "about": [
@@ -1149,7 +1121,7 @@
       "url": "https://lighthouse-docs.gitbook.io/lighthouse/"
     }
   },
-  "DCdCsuUjg6MnULfEmBUmvg1heggnLrKSFdp5uTRSKuwR" : {
+  "DCdCsuUjg6MnULfEmBUmvg1heggnLrKSFdp5uTRSKuwR": {
     "symbol": "Epics DAO",
     "heading": "Buidl to Earn. Epics is a decentralized crowdsourcing platform for incentivizing open-source software development.",
     "about": [
@@ -1193,7 +1165,7 @@
       }
     ]
   },
-  "A1f6LNEymJSSJsEVCL1FSgtS1jA9dNTC4ni8SkmbwQjG" : {
+  "A1f6LNEymJSSJsEVCL1FSgtS1jA9dNTC4ni8SkmbwQjG": {
     "symbol": "Pyth Network",
     "heading": "The Pyth network aims to bring valuable financial market data to DeFi applications and the general public",
     "about": [
@@ -1394,7 +1366,7 @@
       }
     ]
   },
-  "759qyfKDMMuo9v36tW7fbGanL63mZFPNbhU7zjPrkuGK" : {
+  "759qyfKDMMuo9v36tW7fbGanL63mZFPNbhU7zjPrkuGK": {
     "symbol": "Socean",
     "heading": "Socean Stake Pool gives you the best risk-free yields on Solana.",
     "about": [
@@ -1415,7 +1387,7 @@
       "url": "https://www.notion.so/soceanfi/Socean-Finance-c0dfcb8ae6224fd8b1b87a5355ce774f"
     }
   },
-  "FiG6YoqWnVzUmxFNukcRVXZC51HvLr6mts8nxcm7ScR8" : {
+  "FiG6YoqWnVzUmxFNukcRVXZC51HvLr6mts8nxcm7ScR8": {
     "symbol": "Psy DAO",
     "heading": "An ecosystem of financial products governed by PSY token holders. ",
     "about": [
@@ -1434,7 +1406,7 @@
       "url": "https://docs.psyoptions.io/"
     }
   },
-  "6Yj8shsZrjqYQuPkEzcvkmdFq5Nn7RSVQ4EsNqLx7DJQ" : {
+  "6Yj8shsZrjqYQuPkEzcvkmdFq5Nn7RSVQ4EsNqLx7DJQ": {
     "symbol": "Duck Punkz",
     "heading": "Crypto Duck Punkz: The Great Quekening ",
     "about": [
@@ -1467,17 +1439,160 @@
       "title": "Docs",
       "url": "https://smooth-exception-37e.notion.site/Allie-Coin-DAO-Charter-2551dc1f4fe24068b783ff365c80f0f8"
     },
+    "gallery": [
+      {
+        "caption": "Welcome to Allie Coin!",
+        "url": "https://www.youtube.com/watch?v=5sW5WIfiFD0",
+        "height": 338,
+        "width": 600
+      },
+      {
+        "url": "https://pbs.twimg.com/media/Ffi7BVIVsAE5R3M?format=jpg&name=large",
+        "height": 338,
+        "width": 600
+      },
+      {
+        "caption": "IRL Allie Coins given to holders at TwitchCon 2022",
+        "url": "https://pbs.twimg.com/media/FfDbRhnUoAEcoNs?format=jpg&name=4096x4096",
+        "height": 600,
+        "width": 552
+      },
+      {
+        "caption": "The Allie Coin team in Joshua Tree",
+        "url": "https://pbs.twimg.com/media/FbWGr3pUcAAqhLw?format=jpg&name=large",
+        "height": 400,
+        "width": 600
+      },
+      {
+        "caption": "The Allie Cats unveil a new Realm...",
+        "url": "https://pbs.twimg.com/media/Fa87rJvUsAAym2o?format=jpg&name=large",
+        "height": 338,
+        "width": 600
+      }
+    ],
     "resources": [
       {
         "title": "Major YouTube Gaming Streamer Joins Forces with Leading Blockchain Game",
         "content": [
-          "Today the world’s leading blockchain game, Splinterlands, announced a new tournament collaboration with major YouTube Streamer, Alliestrasza and CEO of Allie Coin."
+          "Today the world's leading blockchain game, Splinterlands, announced a new tournament collaboration with major YouTube Streamer, Alliestrasza and CEO of Allie Coin."
         ],
         "url": "https://www.yahoo.com/now/major-youtube-gaming-streamer-joins-160000079.html?guccounter=1&guce_referrer=aHR0cHM6Ly90LmNvLw&guce_referrer_sig=AQAAACaiQoZ16LrGeP2PFK2untiV1k23PuNcBy_VovWYQLZERfHt-6yO2jR59VbbNRegpXG6hVpV1XebeEmegUxlD3nnrhRUQBWmuhI0tteYK167dcedsRCUJQR9cxhkSxz_R_SbOYvSGi5nxJQUgW6ErLdVyBPKzbtxKWCIl0lVsC7r"
       }
+    ],
+    "team": [
+      {
+        "name": "Allie Macpherson",
+        "avatar": "https://pbs.twimg.com/profile_images/1542942640332689410/hpoaZqUe_400x400.jpg",
+        "description": [
+          "Allie is a content creator, gamer, and web3 enthusiast. She started streaming card games on Twitch six years ago under the gaming persona \"Alliestrasza\". She was also one of the first people to launch her social token on the Rally platform! Allie is passionate about innovating in the creator economy through new verticals in web3. She loves to chat about music and concerts, camera gear, strategy games, existentialism, and of course... cats!"
+        ],
+        "role": "Founder",
+        "twitter": "@Alliestrasza"
+      },
+      {
+        "name": "Mason Geyser",
+        "avatar": "https://pbs.twimg.com/profile_images/1486148938906226689/y4_ysscW_400x400.png",
+        "description": [
+          "Mason has been in crypto for six years doing everything including investing, trading, mining, DeFi, and social token management. For Allie Coin, he helps plan events, admin tournaments, develop games, research videos, and all sorts of other things that help make Allie Coin one of the best communities in web3. Outside of crypto, Mason loves to play video games, go to music festivals, travel the world, and eat delicious food. He also spends copious amounts of time cuddling with the IRL Allie Cats (and maybe some of the digital ones too)."
+        ],
+        "role": "Product Lead",
+        "twitter": "@Masongos_"
+      },
+      {
+        "name": "Alex Finden",
+        "avatar": "https://pbs.twimg.com/profile_images/1560737021970198528/XQnN0fld_400x400.jpg",
+        "description": [
+          "In addition to his career intersecting the creator economy with web3, Alex lives for role-playing games, electronic and metal music, and outdoor adventure sports. He has been advising and assisting creators for over five years and is now building communities for the innovators of web3."
+        ],
+        "role": "Community Lead",
+        "twitter": "@alexfinden"
+      }
+    ],
+    "roadmap": {
+      "items": [
+        {
+          "title": "Migrate $ALLIE to Solana from Rally.io",
+          "date": "2022-07-25T15:42:21.109Z",
+          "status": "completed",
+          "resource": {
+            "title": "Allie Coin on Solscan",
+            "url": "https://solscan.io/token/EqTT2V7gcuGAz8croNJLVa63QqC8ZzGn6iwBiCfiFj8h#analysis"
+          }
+        },
+        {
+          "title": "Splinterlands collaboration: tournaments + guild",
+          "date": "2022-09-27T15:42:21.109Z",
+          "status": "completed",
+          "resource": {
+            "title": "Major YouTube Gaming Streamer Joins Forces with Leading Blockchain Game",
+            "url": "https://www.yahoo.com/now/major-youtube-gaming-streamer-joins-160000079.html?guccounter=1&guce_referrer=aHR0cHM6Ly90LmNvLw&guce_referrer_sig=AQAAACaiQoZ16LrGeP2PFK2untiV1k23PuNcBy_VovWYQLZERfHt-6yO2jR59VbbNRegpXG6hVpV1XebeEmegUxlD3nnrhRUQBWmuhI0tteYK167dcedsRCUJQR9cxhkSxz_R_SbOYvSGi5nxJQUgW6ErLdVyBPKzbtxKWCIl0lVsC7r"
+          }
+        },
+        {
+          "title": "Launch and Charter Allie Coin DAO",
+          "date": "2022-10-17T15:42:21.109Z",
+          "status": "completed",
+          "resource": {
+            "title": "Allie Coin DAO on Realms",
+            "url": "https://app.realms.today/dao/ALLIE"
+          }
+        },
+        {
+          "title": "Migrate Allie Coin NFT collections to Solana",
+          "date": "2022-11-20T15:42:21.109Z",
+          "status": "upcoming",
+          "resource": {
+            "title": "Allie cats on Rally.io",
+            "url": "https://nft.rally.io/alliestrasza/collections/allie-cats"
+          }
+        },
+        {
+          "title": "Develop $ALLIE Marketplace",
+          "date": "2022-01-30T15:42:21.109Z",
+          "status": "upcoming"
+        },
+        {
+          "title": "Launch original play-to-earn game(s)",
+          "date": "2023-02-15T15:42:21.109Z",
+          "status": "inprogress"
+        }
+      ]
+    },
+    "faq": [
+      {
+        "question": "What can I do with Allie Coin ($ALLIE)?",
+        "answer": [
+          "Allie Coin unlocks a new world of gaming. By holding $ALLIE, you can:",
+          "🏆 Get priority access to our sponsored tournaments\n🎉 Access giveaways of gaming assets, gift cards, and more\n🍻 Attend in-person and virtual events, such as our TwitchCon party or community game nights\n🕹 Unlock special access to our own play-to-earn games, under development now\n🔥 Purchase Allie Coin NFTs, giving you an even more elite status\n❤️ Support Alliestrasza and our community of likeminded gamers, all while retaining token ownership",
+          "Perhaps best of all, the future of Allie Coin is in the hands of our holders. By holding $ALLIE, you unlock voting power in our DAO, where you can propose new ideas for our community, vote on others, and help spend our treasury assets the way you think is most exciting."
+        ]
+      },
+      {
+        "question": "How can I get some $ALLIE?",
+        "answer": [
+          "$ALLIE is just like any other cryptocurrency on the Solana blockchain. To hold it and unlock its perks, you'll just need a Phantom wallet.",
+          "$ALLIE can be earned or purchased. By completing quests in Discord or participating in our gaming events and tournaments, you can earn $ALLIE without having to buy it!",
+          "Buying $ALLIE is also easy. You can either swap for $ALLIE from $sRLY on Solana using our website at https://alliecoin.io/swaps, or you can use PayPal to buy $ALLIE directly."
+        ]
+      },
+      {
+        "question": "As a web3 game, how can I collaborate with Allie Coin?",
+        "answer": [
+          "Allie Coin acts as both a growth solution and a gaming event producer for your web3 game. With her reach to over 300,000 followers on Twitch and YouTube, founder Allie (Alliestrasza) can help you reach new gamers in highly impactful ways. And with the Allie Coin treasury, we can co-produce tournaments and other gaming events to help introduce our community to yours. For our holders, Allie Coin unlocks a new world of gaming, and as a web3 game developer, you direct their adventures.",
+          "Take, for example, our collaboration with Splinterlands. Throughout September of 2022, we co-hosted two open tournaments with over $1,500 in prizes, launched a guild for Allie Coin holders, introduced over 200 new players to Splinterlands, and streamed hours of gameplay content from Allie to tens of thousands of live viewers.",
+          "For sponsorship inquiries: https://alliecoin.io/contact"
+        ]
+      },
+      {
+        "question": "Why Solana?",
+        "answer": [
+          "We chose to migrate $ALLIE and our NFTs from the Rally side chain of Ethereum to the Solana blockchain for three primary reasons:",
+          "1) To make $ALLIE and our NFTs easier to earn, buy, and trade\n2) To grow our treasury with $sRLY rewards and grants directly from the Rally Network Association\n3) To improve our ability to collaborate with likeminded communities"
+        ]
+      }
     ]
   },
-  "G43QB1csngJDWBhrBCba5tbVcxcPHhGNtGkqfntfP6fg" : {
+  "G43QB1csngJDWBhrBCba5tbVcxcPHhGNtGkqfntfP6fg": {
     "symbol": "BlockLive",
     "heading": "BlockLive is fast, easy, transparent way to buy and sell live event tickets that you can hold onto for a lifetime.",
     "about": [
@@ -1489,7 +1604,7 @@
       }
     ]
   },
-  "CXGN5H84vXjoQg7jkAKdAbMtEv3S2K4t8kptwzPzfQLQ" : {
+  "CXGN5H84vXjoQg7jkAKdAbMtEv3S2K4t8kptwzPzfQLQ": {
     "symbol": "Friktion",
     "heading": "Smarter returns on your crypto",
     "about": [
@@ -1529,7 +1644,7 @@
       }
     ]
   },
-  "8HZ4V94dtojrTpdUpWrfstr7bEhRnZZHn8jotfns9L9x" : {
+  "8HZ4V94dtojrTpdUpWrfstr7bEhRnZZHn8jotfns9L9x": {
     "symbol": "Ratio Finance",
     "heading": "Our mission at Ratio Finance is to De-Risk DeFi for all.",
     "about": [
@@ -1790,7 +1905,7 @@
       }
     ]
   },
-  "6Ffasv4dQ8ZeRbZXZx2tiHcgJh5Y5VELmxnA7Qh1RWRg" : {
+  "6Ffasv4dQ8ZeRbZXZx2tiHcgJh5Y5VELmxnA7Qh1RWRg": {
     "symbol": "EmpireDAO ",
     "heading": "Web3’s Global Home ",
     "about": [
@@ -1802,7 +1917,7 @@
       }
     ]
   },
-  "4H282CCFjstxBd651gdhAydnXcjGk956Dk7p25MqxmfN" : {
+  "4H282CCFjstxBd651gdhAydnXcjGk956Dk7p25MqxmfN": {
     "symbol": "Holaplex",
     "heading": "Holaplex provides a suite of web3 and NFT commerce solutions for businesses.",
     "about": [
@@ -1818,20 +1933,7 @@
       "url": "https://docs.holaplex.com/"
     }
   },
-  "HsU14rpiBDC33hBsDPFQdZWaeykmKr67x3D2hA5RJRJD" : {
-    "symbol": "Metaverse Game Studios - Angelic ",
-    "heading": "",
-    "about": [
-      {
-        "heading": "Introduction",
-        "content": [
-          "Angelic is a dark science fiction-themed narrative strategy role-playing game with turn-based combat, taking place in a collaborative universe, enhanced with blockchain elements. It has a huge story behind it and deep characters. As you play you get to know their backgrounds and love their personalities. The setting is dark sci-fi, meaning there are no good or bad people, they all have good and bad sides. Also, you don't control one character, you control a team, and each has a different part to play for you to succeed in the game. You need to learn to play with all characters to master the game.",
-          "Through blockchain implementation, Angelic players will be able to securely trade hero skin nonfungible tokens, ships, and other items with other players. The decentralized autonomous organization mechanism will facilitate true ownership, autonomy, and voting rights to shape the outcome of Angelic’s evolving story and even the game’s development. They can contribute to the Angelic universe by creating content and even earn money along the way if they choose, all without affecting game balance."
-        ]
-      }
-    ]
-  },
-  "AvpoeRXmbfrtkF9NQvWkcN4LbWmQHy3ntWnYudEUdU3N" : {
+  "AvpoeRXmbfrtkF9NQvWkcN4LbWmQHy3ntWnYudEUdU3N": {
     "symbol": "Blockasset",
     "heading": "Licensed athlete token, NFT & social platform.",
     "about": [
@@ -1855,7 +1957,7 @@
       "url": "https://blockasset.gitbook.io/whitepaper/blockasset-whitepaper"
     }
   },
-  "FxccMsauuC2KSsWMvrTytm2eP18oRr1HC1VLCaWEysAR" : {
+  "FxccMsauuC2KSsWMvrTytm2eP18oRr1HC1VLCaWEysAR": {
     "symbol": "Aten",
     "heading": "A Solana native eCommerce platform!",
     "about": [
@@ -1872,7 +1974,7 @@
       "url": "https://aten-solana.gitbook.io/aten/"
     }
   },
-  "4pAWUQBEvSo5sAeKt2bT8htJXy55J4inJDQhzwDcHWv3" : {
+  "4pAWUQBEvSo5sAeKt2bT8htJXy55J4inJDQhzwDcHWv3": {
     "symbol": "Virtual Basketball Association (VBA)",
     "heading": "Own and manage a virtual basketball team. Build your roster of players and compete to win cash rewards in live basketball games.",
     "about": [
@@ -1884,7 +1986,7 @@
       }
     ]
   },
-  "GL54h53j3KAJZ8AqihMo4H48DgRR8nmSwXxSz1ALTGXg" : {
+  "GL54h53j3KAJZ8AqihMo4H48DgRR8nmSwXxSz1ALTGXg": {
     "symbol": "Ostium",
     "heading": "A decentralized synthetic asset protocol bringing commodity markets on-chain.",
     "about": [
@@ -1900,7 +2002,7 @@
       "url": "https://ostium-defi.notion.site/Ostium-Documentation-2a6dba08e90d4c41b4118a8af7632579"
     }
   },
-  "EVsSaLkZbnekEnVeMsYEKtj2gYxcuaVYjGLUhVXzKTA9" : {
+  "EVsSaLkZbnekEnVeMsYEKtj2gYxcuaVYjGLUhVXzKTA9": {
     "symbol": "01 Exchange",
     "about": [
       {
@@ -1911,7 +2013,7 @@
       }
     ]
   },
-  "EAyrTrS4fEkCCXtbn3qFEtv4LzocYMqeVGYKW7syPt6Y" : {
+  "EAyrTrS4fEkCCXtbn3qFEtv4LzocYMqeVGYKW7syPt6Y": {
     "symbol": "Drippieverse",
     "heading": "Bridging fashion and Web3 through a collection of vibey creatures",
     "about": [
@@ -1924,7 +2026,7 @@
       }
     ]
   },
-  "8PaQWLgqMyF6oxhteahuhvKag2RcbedsRuy2jMFJoLzU" : {
+  "8PaQWLgqMyF6oxhteahuhvKag2RcbedsRuy2jMFJoLzU": {
     "symbol": "Degen Legends ",
     "heading": "Degen Legends is esports & investment gaming organization, born in the heart of the web3 gaming revolution. ",
     "about": [
@@ -1944,7 +2046,7 @@
       "url": "https://twitter.com/DegenLegends/status/1578460492560941056?s=20&t=_LU0jrtzc-4pZ9jhPRPE0A"
     }
   },
-  "GMpWmXc3sKejmAcAFpcQ4NgCL9Fx3gFR2FeepNUtK5Mh" : {
+  "GMpWmXc3sKejmAcAFpcQ4NgCL9Fx3gFR2FeepNUtK5Mh": {
     "symbol": "Francium",
     "heading": "Francium is a DeFi yield strategy Platform on Solana. Granted by Solana & Serum.",
     "about": [
@@ -1958,9 +2060,80 @@
     "documentation": {
       "title": "Docs",
       "url": "https://docs.francium.io/"
-    }
+    },
+    "team": [
+      {
+        "name": "Icy",
+        "avatar": "https://pbs.twimg.com/profile_images/1506936505679319040/PgrlYQgT_400x400.jpg",
+        "description": [
+          "Community Manager of Francium, Francium Supporter"
+        ],
+        "role": "Community Manager",
+        "twitter": "@Icy_Awake"
+      }
+    ],
+    "roadmap": {
+      "items": [
+        {
+          "title": "Stop-Loss, Take-Profit, Hedge, Margin + Yield Farming",
+          "date": "2021-10-02T15:42:21.109Z",
+          "status": "completed",
+          "resource": {
+            "title": "Docs: Stop Loss",
+            "url": "https://docs.francium.io/product/stop-loss"
+          }
+        },
+        {
+          "title": "Oracle cooperation and robot automation+ Well-known strategies",
+          "date": "2022-10-15T15:42:21.109Z",
+          "status": "completed",
+          "resource": {
+            "title": "Francium is now #PoweredByPyth",
+            "url": "https://twitter.com/Francium_Defi/status/1581086372211089410?s=20"
+          }
+        }
+      ]
+    },
+    "faq": [
+      {
+        "question": "What is Francium?",
+        "answer": [
+          "Francium is a DeFi yield strategy platform built on Solana. Francium offers a variety of strategies for both users and strategy builders. We offer automated strategies including Leveraged Farming / Hedge Farming, DeFi Combination Strategies, and Smart Trading Strategies to the users. For strategy builders, Francium will offer DeFi automation toolset which comprises of DeFi Automation Framework, Strategy Dev Toolset, and Standard SDK."
+        ]
+      },
+      {
+        "question": "Does Francium possess a native token?",
+        "answer": [
+          "We haven't generated a native token, news will be announced through our official channels."
+        ]
+      },
+      {
+        "question": "Has Francium been Audited?",
+        "answer": [
+          "Yes, Francium's smart contract has been audited by two prominent firms, CertiK and SlowMist: https://docs.francium.io/resources/audits"
+        ]
+      },
+      {
+        "question": "How to use Francium?",
+        "answer": [
+          "Step-by-step instructions are available at https://docs.francium.io/product/how-to-participate."
+        ]
+      },
+      {
+        "question": "How to do leveraged yield farming on Francium?",
+        "answer": [
+          "Francium is very easy to use. For example, if you want to farm a pool, all you need to do is deposit a token, such as USDC. Francium's on-chain smart contract will automatically convert half of the deposited USDC into another token (e.g. SOL), then add these tokens to the relevant Dex to get the LP, and then stake the LP to the farming pools. In addition, Auto-compounding is an important way to generate high profits. Francium helps users automatically take out their earnings and reinvest them into relevant positions. This allows profits to be generated quickly, thus maximizing earnings."
+        ]
+      },
+      {
+        "question": "Why is Francium built on Solana?",
+        "answer": [
+          "Francium team explained 3 reasons why we have decided to build on Solana: https://francium-defi.medium.com/why-build-defi-on-solana-cc8bc90afdec"
+        ]
+      }
+    ]
   },
-  "9dvvWxLNRv2HWRkc1FJdgpXuF9fDRZMsCbw6vTdHbp5" : {
+  "9dvvWxLNRv2HWRkc1FJdgpXuF9fDRZMsCbw6vTdHbp5": {
     "symbol": "Ora",
     "heading": "The Search Engine for Blockchains",
     "about": [
@@ -1972,7 +2145,7 @@
       }
     ]
   },
-  "DdNEw88N8VTeYfvxdLBwQ9aR4trejTUapGZRGdaMqyNY" : {
+  "DdNEw88N8VTeYfvxdLBwQ9aR4trejTUapGZRGdaMqyNY": {
     "symbol": "Contribute",
     "heading": "Connect your Solana wallet to join a gated-access group chat with other, verified NFT collection holders.",
     "about": [
@@ -1987,7 +2160,7 @@
       }
     ]
   },
-  "2XsZGq4GJoaQ7dC91yWuneq4U9VK3wE6XJ185a4D7fwe" : {
+  "2XsZGq4GJoaQ7dC91yWuneq4U9VK3wE6XJ185a4D7fwe": {
     "symbol": "Artivive",
     "heading": "Artivive is the AR art platform onboarding 200.000 artists to WEB3",
     "about": [
@@ -1999,7 +2172,7 @@
       }
     ]
   },
-  "AH4qTqRFcoNqmYEi7p8heAGVSPHfJrNUPa8DvjDnBsf3" : {
+  "AH4qTqRFcoNqmYEi7p8heAGVSPHfJrNUPa8DvjDnBsf3": {
     "symbol": "Carpool",
     "heading": "Backend as a Service for Solana Developers",
     "about": [
@@ -2015,7 +2188,7 @@
       "url": "https://carpool-dev.notion.site/carpool-dev/Carpool-Documentation-76d152f84e004371b18470f4382bd40d"
     }
   },
-  "58axqgJSAEK3adKL5hx5dYoRqkYMEiEXQZqk9FFFpa7f" : {
+  "58axqgJSAEK3adKL5hx5dYoRqkYMEiEXQZqk9FFFpa7f": {
     "symbol": "Solana Spaces",
     "heading": "Experience the World of Solana. IRL.",
     "about": [
@@ -2027,7 +2200,7 @@
       }
     ]
   },
-  "54owXqUwmzR18h4NY6VEp45SNp6qtJUfByDeQuHenhgK" : {
+  "54owXqUwmzR18h4NY6VEp45SNp6qtJUfByDeQuHenhgK": {
     "symbol": "Portals",
     "heading": "Build your space in the Metaverse",
     "about": [
@@ -2189,7 +2362,7 @@
       }
     ]
   },
-  "H3A8YM1ggR7GggD9qX4CEWkvPmkQUXuhGq2AGpbgqM6J" : {
+  "H3A8YM1ggR7GggD9qX4CEWkvPmkQUXuhGq2AGpbgqM6J": {
     "symbol": "Garbles",
     "heading": "The blockchain mobile game that cleans up the planet",
     "about": [
@@ -2214,7 +2387,7 @@
       }
     ]
   },
-  "52KrHUxbakN1rq9XoXQtSUmhdYyUZyp3YkWZQihZMTPu" : {
+  "52KrHUxbakN1rq9XoXQtSUmhdYyUZyp3YkWZQihZMTPu": {
     "symbol": "Star Atlas",
     "heading": "Next-gen gaming metaverse with triple-A UE5 graphics for creating, playing & learning with others worldwide. Power to the People!",
     "about": [
@@ -2254,7 +2427,7 @@
       }
     ]
   },
-  "7nLVPup5xx5dWWVcDfjyHXHSr4juFM9wn1XaGQYxcYN1" : {
+  "7nLVPup5xx5dWWVcDfjyHXHSr4juFM9wn1XaGQYxcYN1": {
     "symbol": "Notifi",
     "heading": "Notifi allows Web3 teams to manage user communication under a unified platform.",
     "about": [
@@ -2289,7 +2462,7 @@
       }
     ]
   },
-  "VAf2xnozMTWeytjUU4GtoyqrGj63owBENr754Y3bzL5" : {
+  "VAf2xnozMTWeytjUU4GtoyqrGj63owBENr754Y3bzL5": {
     "symbol": "Helius",
     "heading": "Making Solana development easier, faster, and more accessible. Webhooks, enhanced APIs, and RPCs.",
     "about": [
@@ -2322,7 +2495,7 @@
       }
     ]
   },
-  "EhDvEUsxDSzU49jnyQ9iTheqQTPtG43gFvwbbrgye8t7" : {
+  "EhDvEUsxDSzU49jnyQ9iTheqQTPtG43gFvwbbrgye8t7": {
     "symbol": "Zebec ",
     "heading": "Zebec is a continuous settlement protocol on Solana. We are revolutionizing payroll by introducing streaming finance technology.",
     "about": [
@@ -2345,7 +2518,7 @@
         "content": [
           "A payroll solution that gets you paid by the minute"
         ],
-        "url": "https://i.imgur.com/W6d2eUk.mp4"
+        "url": "https://www.tiktok.com/t/ZTR9nXXeV/"
       },
       {
         "title": "Zebec to Launch its Rollup Chain via Eclipse to Bring Frictionless Global Payment Standards",
@@ -2363,7 +2536,7 @@
       }
     ]
   },
-  "GZyALQBvdBswSpMLabKEBVgKykkZMgnYcJgFk5dGU4aV" : {
+  "GZyALQBvdBswSpMLabKEBVgKykkZMgnYcJgFk5dGU4aV": {
     "symbol": "Snowflake",
     "heading": "The most trusted multisig platform on Solana with native automation & a rich app store built for every team's needs.",
     "about": [
@@ -2405,7 +2578,7 @@
       }
     ]
   },
-  "H2wGwADHWze2yZRurayzutPnDeKxpvf6WhVJpzixM121" : {
+  "H2wGwADHWze2yZRurayzutPnDeKxpvf6WhVJpzixM121": {
     "symbol": "Hedge",
     "heading": "Low-cost leverage of your crypto assets by minting USH, a decentralized overcollateralized stablecoin that is fully composable. ",
     "about": [
@@ -2431,7 +2604,7 @@
       }
     ]
   },
-  "DVDoxbAiYv8oyScU1TUL7ZSsVMpU7zARaFTqwqdw5p5R" : {
+  "DVDoxbAiYv8oyScU1TUL7ZSsVMpU7zARaFTqwqdw5p5R": {
     "symbol": "Solcial",
     "heading": "web3 social network",
     "about": [
@@ -2460,7 +2633,7 @@
       }
     ]
   },
-  "8V5BthCyL5LFDsWDKhfmAHqEgudSw1pXMC2PmWKAAr3D" : {
+  "8V5BthCyL5LFDsWDKhfmAHqEgudSw1pXMC2PmWKAAr3D": {
     "symbol": "Crossmint",
     "heading": "Crossmint builds infrastructure to make NFTs accessible to everyone: minting APIs, fiat on-ramp, wallets, and more",
     "about": [
@@ -2499,7 +2672,7 @@
       }
     ]
   },
-  "FiKdbhsKRMTzSfyTDRqBY3cy5GjAqCSXYJYRe2wQQ8Ly" : {
+  "FiKdbhsKRMTzSfyTDRqBY3cy5GjAqCSXYJYRe2wQQ8Ly": {
     "symbol": "Unloc",
     "heading": "Financial Products & Services for NFT Owners. Initially launching with a fully customizable NFT-collateralized loans platform.",
     "about": [
@@ -2535,7 +2708,7 @@
       }
     ]
   },
-  "2m2HfiYwMdbwVQ2BsSdqzQihdK2c2JymVy7aREDa9Lzu" : {
+  "2m2HfiYwMdbwVQ2BsSdqzQihdK2c2JymVy7aREDa9Lzu": {
     "symbol": "Credix",
     "heading": "Credit investing made global ",
     "about": [
@@ -2567,7 +2740,7 @@
       }
     ]
   },
-  "6iMVHPfcBebctV5bvSY23d2nuDuKvzTLP9HNCwWV2gGe" : {
+  "6iMVHPfcBebctV5bvSY23d2nuDuKvzTLP9HNCwWV2gGe": {
     "symbol": "Diaspora DAO",
     "heading": "4,444 Ancestors to guide you on your Journey into Web3",
     "about": [
@@ -2593,7 +2766,7 @@
       }
     ]
   },
-  "DXezSkchMaYZTa3WM5xVU1SDQhMsFspMLuyyMuWk2YK9" : {
+  "DXezSkchMaYZTa3WM5xVU1SDQhMsFspMLuyyMuWk2YK9": {
     "symbol": "Rage Effect",
     "heading": "The First AAA-Quality Free-to-Play NFT MMO Shooter on Solana!",
     "about": [
@@ -2626,7 +2799,7 @@
       }
     ]
   },
-  "3DLKv41oFs8DiHBkUEdm3MwiyJ9Sp4E6sb8QCAqynnbA" : {
+  "3DLKv41oFs8DiHBkUEdm3MwiyJ9Sp4E6sb8QCAqynnbA": {
     "symbol": "Satellite IM",
     "heading": "A fully decentralized peer-to-peer communications platform",
     "about": [
@@ -2638,7 +2811,7 @@
       }
     ]
   },
-  "7Ad1wQdytLHSFxnUyEHVPUYrNKMect4Qs5pQtYgFCrr3" : {
+  "7Ad1wQdytLHSFxnUyEHVPUYrNKMect4Qs5pQtYgFCrr3": {
     "symbol": "Block Tackle Inc",
     "heading": "SkateX is a free-to-play extreme sports video game that uses blockchain technology so players can truly own their digital gear.",
     "about": [
@@ -2674,7 +2847,7 @@
       }
     ]
   },
-  "7KsnMMyrF8wsxsLZNBZ8hRkGe13MdjAT9ko1qDEvkEWQ" : {
+  "7KsnMMyrF8wsxsLZNBZ8hRkGe13MdjAT9ko1qDEvkEWQ": {
     "symbol": "Rye",
     "heading": "The easiest way to add checkout and shopping data to any app",
     "about": [
@@ -2715,7 +2888,7 @@
       }
     ]
   },
-  "HJ4YUJFSa1xX5wfbrPQKMTcTTnyT2eMxBk2eyBFGVmR7" : {
+  "HJ4YUJFSa1xX5wfbrPQKMTcTTnyT2eMxBk2eyBFGVmR7": {
     "symbol": "Ludex.gg",
     "heading": "APIs & SDKs for video game developers to easily implement smart contracts into games with no blockchain knowledge required.",
     "about": [
@@ -2756,7 +2929,7 @@
       }
     ]
   },
-  "DntR8BU5tYVhQUNfARFG5VxKrpdRaKY2qKC3v8cYJirm" : {
+  "DntR8BU5tYVhQUNfARFG5VxKrpdRaKY2qKC3v8cYJirm": {
     "symbol": "Okay Bears",
     "heading": "Okay Bears has the highest trade volume of any NFT collection on Solana and is an emerging global icon of clean, positive cool. ",
     "about": [
@@ -2780,7 +2953,7 @@
       }
     ]
   },
-  "wij7YqAPCYtPk4isjY5TpoMpbYC7xupwuKVzpbnZHp7" : {
+  "wij7YqAPCYtPk4isjY5TpoMpbYC7xupwuKVzpbnZHp7": {
     "symbol": "HEIR Labs, Inc.",
     "heading": "HEIR - the best sports culture community for athletes and fans with exclusive content, experience, merchandise, and digital assets",
     "about": [
@@ -2813,7 +2986,7 @@
       }
     ]
   },
-  "GDBJ3qv4tJXiCbz5ASkSMYq6Xfb35MdXsMzgVaMnr9Q7" : {
+  "GDBJ3qv4tJXiCbz5ASkSMYq6Xfb35MdXsMzgVaMnr9Q7": {
     "symbol": "Raydium",
     "heading": "Raydium is an Automated Market Maker (AMM) built on the Solana blockchain for the Serum Decentralized Exchange (DEX). ",
     "about": [
@@ -2853,7 +3026,7 @@
       }
     ]
   },
-  "DP2wpegQpLFYq9ntSZewi8XR6AoTdw31dbvinSekZKjr" : {
+  "DP2wpegQpLFYq9ntSZewi8XR6AoTdw31dbvinSekZKjr": {
     "symbol": "Wordcel Club",
     "heading": "Building the Layer0 of Social Connections and Information Sharing on Solana.",
     "about": [
@@ -2876,7 +3049,7 @@
       }
     ]
   },
-  "8mrcnaGgMVKsYzWRDzSe47n2hTQjkuhYeXHGgSR1xkHP" : {
+  "8mrcnaGgMVKsYzWRDzSe47n2hTQjkuhYeXHGgSR1xkHP": {
     "symbol": "Primitives",
     "heading": "primitives is the most joyful place to interact with blockchains :)",
     "about": [
@@ -2898,7 +3071,7 @@
       }
     ]
   },
-  "HWYGhNLKUrrE8RmVkitDZrgsb68Ye8sp5P2pVLb2FyNf" : {
+  "HWYGhNLKUrrE8RmVkitDZrgsb68Ye8sp5P2pVLb2FyNf": {
     "symbol": "Gangbusters Ltd",
     "heading": "Community-driven Social Web3 Gaming - Building Everlasting IPs Togehter with Our Fans! ",
     "about": [
@@ -2937,7 +3110,7 @@
       }
     ]
   },
-  "8msNFq5VBectsGAv66zYx5QRve1p3m6ZEz49xaWX3tbd" : {
+  "8msNFq5VBectsGAv66zYx5QRve1p3m6ZEz49xaWX3tbd": {
     "symbol": "Parcl",
     "heading": "Parcl is an investment protocol that allows users to trade the price movements of real estate markets around the world. ",
     "about": [
@@ -2973,7 +3146,7 @@
       }
     ]
   },
-  "5jHwG4CWkZhJD75M9kiZybGtzr4GC32NwvEq6dmSKefm" : {
+  "5jHwG4CWkZhJD75M9kiZybGtzr4GC32NwvEq6dmSKefm": {
     "symbol": "Enthusiast Gaming",
     "heading": "Ev.io is a competitive first person shooter on Solana in which you can earn SOL for getting kills. ",
     "about": [
@@ -2994,7 +3167,7 @@
       }
     ]
   },
-  "27tbVohNkTpWiKtz1oGJQPhb3gPSGJfc4e2MtqFcuSuW" : {
+  "27tbVohNkTpWiKtz1oGJQPhb3gPSGJfc4e2MtqFcuSuW": {
     "symbol": "Glass",
     "heading": "Glass is the first video NFT marketplace for video creators, collectors, and traders built on the solana blockchain. ",
     "about": [
@@ -3015,7 +3188,7 @@
       }
     ]
   },
-  "99vU7SHYJ4tSEqRNjY352Fx7gMSYfgcqxmjBMDyx3q8j" : {
+  "99vU7SHYJ4tSEqRNjY352Fx7gMSYfgcqxmjBMDyx3q8j": {
     "symbol": "Vyper Protocol",
     "heading": "A DeFi primitive to create, trade, and settle, on-chain derivatives",
     "about": [
@@ -3040,7 +3213,7 @@
       }
     ]
   },
-  "G2jq991DwNM1irZFwhPtCmzquXwBNQvAg5Sj8tBnqA2H" : {
+  "G2jq991DwNM1irZFwhPtCmzquXwBNQvAg5Sj8tBnqA2H": {
     "symbol": "Hyperspace",
     "heading": "Solana’s most powerful NFT trading platform. Explore and collect NFTs aggregated across all marketplaces.",
     "about": [
@@ -3067,7 +3240,7 @@
       }
     ]
   },
-  "HivVP77n6hsrgsaJUoHkYRMzgjjfmgWdcRrdrYSm6LLg" : {
+  "HivVP77n6hsrgsaJUoHkYRMzgjjfmgWdcRrdrYSm6LLg": {
     "symbol": "CAMPUS",
     "heading": "The First & Fastest-Growing Officially-Licensed Token Marketplace for College Sports",
     "about": [
@@ -3104,7 +3277,7 @@
       }
     ]
   },
-  "FneznCHADXLsDjkvq51UmhZMropsXkSbkzJ5qXBMw1RF" : {
+  "FneznCHADXLsDjkvq51UmhZMropsXkSbkzJ5qXBMw1RF": {
     "symbol": "Port Finance",
     "heading": "",
     "about": [
@@ -3130,7 +3303,7 @@
       }
     ]
   },
-  "J7deUothQNZ2momjrDwetv9RjL714h8U8cSz6oVd3s1m" : {
+  "J7deUothQNZ2momjrDwetv9RjL714h8U8cSz6oVd3s1m": {
     "symbol": "Elusiv",
     "heading": "Elusiv combines privacy with safety by offering compliance in mind next-generation privacy solutions for a better Web3.",
     "about": [
@@ -3142,7 +3315,7 @@
       }
     ]
   },
-  "C98yb8FSshG7oH5pCMf41ghg199YjsoUozxQ4VdCpwmM" : {
+  "C98yb8FSshG7oH5pCMf41ghg199YjsoUozxQ4VdCpwmM": {
     "symbol": "Aurory",
     "heading": "Aurory Project is a AAA studio building the web3 gaming platform of the future.",
     "about": [
@@ -3184,7 +3357,7 @@
       }
     ]
   },
-  "5KvezmjkfTshcWZ56jt6xj88Nu5Lbgy4gigHenhH8HPb" : {
+  "5KvezmjkfTshcWZ56jt6xj88Nu5Lbgy4gigHenhH8HPb": {
     "symbol": "Chillchat",
     "heading": "Chillchat is the collaborative platform to build virtual worlds.",
     "about": [
@@ -3220,7 +3393,7 @@
       }
     ]
   },
-  "2hzSGHCfkAaGWedSc3Bh9CrmxGaQNCu8wjZPUfvbkYm7" : {
+  "2hzSGHCfkAaGWedSc3Bh9CrmxGaQNCu8wjZPUfvbkYm7": {
     "symbol": "Grim Syndicate",
     "heading": "Global storytelling brand anchored in lore, gaming, and unique NFT experiences.",
     "about": [
@@ -3245,7 +3418,7 @@
       }
     ]
   },
-  "7f47FkSAJqJLNY5p3jKxp7CLbEYbQDhhmKuYDJKrNJEq" : {
+  "7f47FkSAJqJLNY5p3jKxp7CLbEYbQDhhmKuYDJKrNJEq": {
     "symbol": "Degenerate Ape Academy ",
     "heading": "",
     "about": [
@@ -3257,7 +3430,7 @@
       }
     ]
   },
-  "5Mt6EghNJHaPbNtHxH7tbbrMdwSP3sXcPRCqwPCbTVN4" : {
+  "5Mt6EghNJHaPbNtHxH7tbbrMdwSP3sXcPRCqwPCbTVN4": {
     "symbol": "Audius",
     "heading": "Audius is a fully decentralized music platform. Own the masters & the platform.",
     "about": [
@@ -3284,6 +3457,13 @@
         "url": "https://www.rollingstone.com/pro/news/tiktok-sounds-streaming-crypto-blockchain-nfts-audius-1211699/"
       },
       {
+        "title": "Audius Acquires Virtual Music Experience Platform SoundStage.fm",
+        "content": [
+          "Audius is already rolling out an \"ambitious product roadmap\" in the wake of the deal, which expands the company's efforts in the music metaverse."
+        ],
+        "url": "https://edm.com/industry/audius-acquires-soundstagefm"
+      },
+      {
         "title": "What is Audius? The Decentralized Music Sharing and Streaming Service",
         "content": [
           "It’s like Spotify or SoundCloud, but on the blockchain: Audius is a crypto-powered music streaming app that’s giving power back to artists."
@@ -3292,7 +3472,7 @@
       }
     ]
   },
-  "23DjgMdE4vCCNckzy8F4NvRFMxH6X2LVU6DrC75btVR8" : {
+  "23DjgMdE4vCCNckzy8F4NvRFMxH6X2LVU6DrC75btVR8": {
     "symbol": "Cega",
     "heading": "Cega is the #1 options protocol on Solana building exotic options structured products offering the best risk-adjusted yield.",
     "about": [
@@ -3319,7 +3499,7 @@
       }
     ]
   },
-  "4vXAFpUSfRzxbtriRe7tH6u2Uwbm2SmBsD8EKnWow5qh" : {
+  "4vXAFpUSfRzxbtriRe7tH6u2Uwbm2SmBsD8EKnWow5qh": {
     "symbol": "Cogni",
     "heading": "Your crypto, paycheck, and debit card – all in one sleek app.",
     "about": [
@@ -3331,7 +3511,7 @@
       }
     ]
   },
-  "BqLWTZv8xfJiCtu9gm87T1EqtAnL2cCJ1PS9JoKn3oBy" : {
+  "BqLWTZv8xfJiCtu9gm87T1EqtAnL2cCJ1PS9JoKn3oBy": {
     "symbol": "Backpack",
     "heading": "Backpack is a home for your xNFTs.",
     "about": [
@@ -3372,7 +3552,7 @@
       }
     ]
   },
-  "G1RWjNmizVM6vR8pEsHta4iRYcTa7jWM1mQErz4phpRy" : {
+  "G1RWjNmizVM6vR8pEsHta4iRYcTa7jWM1mQErz4phpRy": {
     "symbol": "Bastion",
     "heading": "Bastion, leveling up the DAO experience both for the voter and for the DAO!",
     "about": [
@@ -3400,7 +3580,7 @@
       }
     ]
   },
-  "9MwbgfEkV8ZaeycfciBqytcxwfdYHqD2NYjsTZkH4GxA" : {
+  "9MwbgfEkV8ZaeycfciBqytcxwfdYHqD2NYjsTZkH4GxA": {
     "symbol": "Magic Eden",
     "heading": "Magic Eden is the leading NFT platform for discovery, expression, and ownership across digital cultures. ",
     "about": [
@@ -3441,7 +3621,7 @@
       }
     ]
   },
-  "wx9R4TZLgL4VaVK89uW9D9DpMKMUCSm16nABeahk9Ex" : {
+  "wx9R4TZLgL4VaVK89uW9D9DpMKMUCSm16nABeahk9Ex": {
     "symbol": "DeGods",
     "heading": "Degods is on a mission to build the best communities on the internet. ",
     "about": [
@@ -3454,7 +3634,7 @@
       }
     ]
   },
-  "ALzXvpmcmqmpNcFTbPzZ8ykSxHGqta85gTANfi8YPkPW" : {
+  "ALzXvpmcmqmpNcFTbPzZ8ykSxHGqta85gTANfi8YPkPW": {
     "symbol": "Solana Mobile",
     "heading": "Solana Mobile is bringing web3 to mobile through the Solana Mobile Stack (SMS) and Saga, a flagship Android smartphone.",
     "about": [
@@ -3468,7 +3648,7 @@
       }
     ]
   },
-  "DgWc4yWcqDnG62ZH6bHMeHfZUhBf5y7HZ9uqvgMs8JQW" : {
+  "DgWc4yWcqDnG62ZH6bHMeHfZUhBf5y7HZ9uqvgMs8JQW": {
     "symbol": "Taki",
     "heading": "Own your token-powered social network with TAKI.",
     "about": [
@@ -3507,7 +3687,7 @@
       }
     ]
   },
-  "7sf3tcWm58vhtkJMwuw2P3T6UBX7UE5VKxPMnXJUZ1Hn" : {
+  "7sf3tcWm58vhtkJMwuw2P3T6UBX7UE5VKxPMnXJUZ1Hn": {
     "symbol": "Solend",
     "heading": "Solend is the autonomous interest rate machine for lending on Solana",
     "about": [
@@ -3523,7 +3703,7 @@
       "url": "https://docs.solend.fi"
     }
   },
-  "3gmcbygQUUDgmtDtx41R7xSf3K4oFXrH9icPNijyq9pS" : {
+  "3gmcbygQUUDgmtDtx41R7xSf3K4oFXrH9icPNijyq9pS": {
     "symbol": "Marinade",
     "heading": "Secure Solana and earn rewards without your funds locked in.",
     "about": [
@@ -3548,7 +3728,7 @@
       }
     ]
   },
-  "6NzVDMfEBJvkFDnjPx53K7mLGW3yQdSjLhsamS8go4cn" : {
+  "6NzVDMfEBJvkFDnjPx53K7mLGW3yQdSjLhsamS8go4cn": {
     "symbol": "Bonfida",
     "heading": "Bonfida has a simple, yet realistic goal of providing products and services that will enhance the Solana blockchain experience. ",
     "about": [
@@ -3566,7 +3746,7 @@
       "url": "https://docs.bonfida.org/collection/overview"
     }
   },
-  "3MMDxjv1SzEFQDKryT7csAvaydYtrgMAc3L9xL9CVLCg" : {
+  "3MMDxjv1SzEFQDKryT7csAvaydYtrgMAc3L9xL9CVLCg": {
     "symbol": "Project Serum",
     "heading": "Faster, Cheaper and more Powerful DeFi",
     "about": [
@@ -3591,7 +3771,7 @@
       }
     ]
   },
-  "9pLvqBe2CxC4HXQD5UQ7YLpQUqC5A9SqU4kNqw9inbNQ" : {
+  "9pLvqBe2CxC4HXQD5UQ7YLpQUqC5A9SqU4kNqw9inbNQ": {
     "symbol": "Eternal Dragons",
     "heading": "Eternal Dragons is a Web3 gaming series brought to you by Trailblazer Games, telling the story of the long-lost Eternal Dragons.",
     "about": [
@@ -3632,7 +3812,7 @@
       }
     ]
   },
-  "413KSeuFUBSWDzfjU9BBqBAWYKmoR8mncrhV84WcGNAk" : {
+  "413KSeuFUBSWDzfjU9BBqBAWYKmoR8mncrhV84WcGNAk": {
     "symbol": "Tulip",
     "heading": "Solana's Yield Aggregation Homestead",
     "about": [
@@ -3659,7 +3839,7 @@
       }
     ]
   },
-  "5o6gEoeJBpuXT1H1ijFTq3KcSGx7ayabdG2hji7cB3FG" : {
+  "5o6gEoeJBpuXT1H1ijFTq3KcSGx7ayabdG2hji7cB3FG": {
     "symbol": "Mean DAO ",
     "heading": "Mean DAO is a protocol DAO offering Real-time payment infrastructure and Multisig to retail and businesses.",
     "about": [
@@ -3674,5 +3854,842 @@
       "title": "Docs",
       "url": "https://docs.meandao.org/mean/products/mean-protocol"
     }
+  },
+  "3HC3mCQkpAAHQZa3aJjQJFpFNwoLp3ZWnkCYuWzoymo9": {
+    "symbol": "Amulet",
+    "heading": "Simple, Reliable Cover For Everyone in Web3.Maximum protection and yield, fully protected through Protocol Controlled Reserves",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Amulet Protocol (\"Amulet\") is a decentralized risk protection protocol (\"RPP\") built for Rust-based ecosystems, starting with the Solana blockchain. Amulet has designed an innovative and open risk protection model which not only effectively addresses the common challenges of existing decentralized RPPs, but also creates a new paradigm shift for the whole risk protection sector."
+        ]
+      },
+      {
+        "content": [
+          "Amulet's vision is to offer Simple, Reliable Cover for everyone in Web3. With the addition of Amulet, users in the entire Rust-based ecosystem will gain access to a new way to hedge various risks with cover product offerings."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.amulet.org/"
+    },
+    "resources": [
+      {
+        "title": "Staking capabilities with high APY percentages now available on Amulet",
+        "content": [
+          "As Amulet has now been launched, the crypto community will be delighted to know that the platform has officially added staking capabilities with considerably high APY percentages."
+        ],
+        "url": "https://cointelegraph.com/press-releases/staking-capabilities-with-high-apy-percentages-now-available-on-amulet"
+      },
+      {
+        "title": "TOKEN2049 Singapore 2022: \"I Love Hacks\"",
+        "content": [
+          "Keynote Speaker: Rupert Barksfield, CEO"
+        ],
+        "url": "https://www.youtube.com/watch?v=phDloVO1RCQ"
+      },
+      {
+        "title": "Preparations For Amulet Mainnet Launch Underway As Launch Date Gets Announced",
+        "url": "https://ripplecoinnews.com/preparations-for-amulet-mainnet-launch-underway-as-launch-date-gets-announced/"
+      }
+    ],
+    "team": [
+      {
+        "name": "Martin",
+        "avatar": "https://i.imgur.com/DFM7lk6.png",
+        "role": "Community Manager"
+      },
+      {
+        "name": "Rob",
+        "avatar": "https://pbs.twimg.com/profile_images/1489011796576985094/KVBYfVRB_400x400.jpg",
+        "description": [
+          "Marketer | 2022 is the year of DeFi cover "
+        ],
+        "role": "Marketing Manager",
+        "twitter": "@overcryptocal"
+      },
+      {
+        "name": "Rupert",
+        "avatar": "https://pbs.twimg.com/profile_images/1480953683173158916/W4Ux0IRD_400x400.jpg",
+        "role": "Project Lead ",
+        "twitter": "@MET4BE4R"
+      },
+      {
+        "name": "Hakon",
+        "avatar": "https://pbs.twimg.com/profile_images/1567440707412967427/xYWCNFS8_400x400.jpg",
+        "role": "BD & Marketing",
+        "twitter": "@DeFi_hawk"
+      }
+    ],
+    "roadmap": {
+      "items": [
+        {
+          "title": "MainNet Launch",
+          "date": "2021-09-22T15:42:21.109Z",
+          "status": "completed",
+          "resource": {
+            "title": "Amulet’s 2022–2023 Roadmap",
+            "url": "https://amulet.org/blog/introducing-amulets-2022-2023-roadmap/"
+          }
+        }
+      ]
+    },
+    "faq": [
+      {
+        "question": "What is Amulet Protocol?",
+        "answer": [
+          "Amulet is a decentralized risk protection protocol for the Rust-based ecosystem initially deployed on Solana."
+        ]
+      },
+      {
+        "question": "What is decentralized risk protection protocol?",
+        "answer": [
+          "Decentralized risk protection protocols provide a financial safety net for all users interacting with Web3 financial products. They generally encompasse smart contract risk, stablecoin de-peg risk, slashing risk, oracle failures, economic exploits, etc. Risk of smart contract exploits is particularly significant with over $3B lost to smart contract hacks in 2021. By offering protection against these more common DeFi risk types along with NFT and metaverse-related offerings, users and developers alike can enjoy a safer Web3 through Amulet."
+        ]
+      },
+      {
+        "question": "What is unique about Amulet?",
+        "answer": [
+          "Existing DeFi risk protection protocols rely on external underwriters to provide capital for claim payouts and cover capacity, which introduces unique and difficult challenges over business sustainability. Amulet is creating the risk protection industry's first Protocol-Controlled Underwriting (\"PCU\") approach. This is a significant change from the incumbent model of renting underwriting capital."
+        ]
+      },
+      {
+        "question": "What kind of risk does Amulet cover?",
+        "answer": [
+          "Smart contract exploits, stablecoin de-pegs, slashing, and more to come (NFT, Metaverse, and wallet protection currently in development)."
+        ]
+      },
+      {
+        "question": "Why did we build Amulet on Solana?",
+        "answer": [
+          "DeFi has experienced exponential growth since the summer of 2020 with the influx of hundreds of billions in capital and the emergence of multibillion-dollar protocols in just a little over two years. Riding along this wave of explosive growth is a rapidly increasing demand for risk hedging.",
+          "Rust-based public chains have been maturing rapidly with growth spearheaded in particular by Solana. According to Amulet's research, TVL on Solana has grown 5x faster than on Ethereum, and this growth is expected to continue given the distinctive strengths of Solana centered around its lower cost and higher throughput.",
+          "At the moment, risk management solutions are still relatively scarce or non-existent on Solana and the Rust-based ecosystems at large, presenting Amulet with an incredible and unique market opportunity. Amulet expects major demand for its cover products and other risk management solutions along with Solana's continued growth and adoption."
+        ]
+      },
+      {
+        "question": "What is PCU?",
+        "answer": [
+          "Amulet aims to build reserves that are controlled by the protocol with PCU, rather than renting capital from stakers as its primary underwriting source. Amulet believes this new model has the potential to scale sustainably."
+        ]
+      }
+    ]
+  },
+  "HsU14rpiBDC33hBsDPFQdZWaeykmKr67x3D2hA5RJRJD": {
+    "symbol": "Angelic",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Angelic is a dark science fiction-themed narrative strategy role-playing game with turn-based combat, taking place in a collaborative universe, enhanced with blockchain elements. It has a huge story behind it and deep characters. As you play you get to know their backgrounds and love their personalities. The setting is dark sci-fi, meaning there are no good or bad people, they all have good and bad sides. Also, you don't control one character, you control a team, and each has a different part to play for you to succeed in the game. You need to learn to play with all characters to master the game."
+        ]
+      },
+      {
+        "content": [
+          "Through blockchain implementation, Angelic players will be able to securely trade hero skin nonfungible tokens, ships, and other items with other players. The decentralized autonomous organization mechanism will facilitate true ownership, autonomy, and voting rights to shape the outcome of Angelic's evolving story and even the game's development. They can contribute to the Angelic universe by creating content and even earn money along the way if they choose, all without affecting game balance."
+        ]
+      }
+    ],
+    "resources": [
+      {
+        "title": "The Angelic Roadmap",
+        "url": "https://www.angelicthegame.com/roadmap/"
+      }
+    ],
+    "team": [
+      {
+        "name": "Erkan Bayol",
+        "avatar": "https://pbs.twimg.com/profile_images/1571499039744561152/nTUEXchn_400x400.jpg",
+        "role": "Founder",
+        "twitter": "@erkanbayol_7"
+      },
+      {
+        "name": "Anastasia Volgemut",
+        "avatar": "https://pbs.twimg.com/profile_images/1566360695809122308/oJy0g09O_400x400.jpg",
+        "role": "Director of Operations",
+        "twitter": "@Ana_Volgemut"
+      },
+      {
+        "name": "Emek Ozben",
+        "role": "Art Director"
+      },
+      {
+        "name": "Petar Kotevski",
+        "avatar": "https://media.licdn.com/dms/image/C4D03AQFzrEheVBHykA/profile-displayphoto-shrink_800_800/0/1516241932178?e=1672876800&v=beta&t=xvvCBeR2nmjo_jOJkFNezgEPGIVljFzJESsjdsKkl2U",
+        "role": "Tech Director"
+      }
+    ]
+  },
+  "4X8PMiLabGjdAHdrKL9SLu1HAMMp9xNcn3DY2mAciT8N": {
+    "symbol": "Faraway",
+    "heading": "Faraway makes fun and social games with player-driven economies",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Faraway is the studio behind Mini Royale: Nations, a browser-based first person shooter built on Solana. Mini Royale is the first live multiplayer game on Solana and boasts over 2 million registered players. Faraway is proud to be supported by some of the best web3 investors including Lightspeed Venture Partners, a16z, Sequoia, FTX, Pantera Capital, among others. Prior to founding Faraway, the two co-founders, Alex Paley and Dennis Zdonov, were VPs of Product at Scopely and Heads of Studio at Glu Mobile."
+        ]
+      },
+      {
+        "content": [
+          "In addition to making games, Faraway is also the creator of the Faraway Platform, a web3 gaming platform used by multiple external studios to easily introduce a web3 economy to their games through production-tested smart contracts, a blockchain analytics suite, and tools to run a game economy."
+        ]
+      }
+    ],
+    "gallery": [
+      {
+        "caption": "Mini Royale: Nations",
+        "url": "https://i.imgur.com/i9Blrl9.png",
+        "height": 338,
+        "width": 600
+      }
+    ],
+    "team": [
+      {
+        "name": "Alex Paley",
+        "avatar": "https://pbs.twimg.com/profile_images/1562890934265815040/rT-Ye3-s_400x400.jpg",
+        "description": [
+          "Alex Paley is a co-founder of Faraway, a web3 gaming studio specializing in hyper-social games with player-driven economies. Prior to founding Faraway with his long-time co-founder, Dennis Zdonov, he was VP of Product at Scopely and Head of Studio at Glu Mobile."
+        ],
+        "role": "Co-Founder",
+        "twitter": "@apaley13"
+      },
+      {
+        "name": "Dennis Zdonov",
+        "description": [
+          "Dennis Zdonov is a co-founder of Faraway, a web3 gaming studio specializing in hyper-social games with player-driven economies. Prior to founding Faraway with his long-time co-founder, Alex Paley, he was VP of Product at Scopely and Head of Studio at Glu Mobile."
+        ],
+        "role": "Co-Founder"
+      }
+    ]
+  },
+  "HnLuYmBxDxK1MCihHJVFnNudUTpLPc2km6xNcRQ8KPdj": {
+    "symbol": "Dual Finance",
+    "heading": "Sustainable Incentive Liquidity Infrastructure for Web3 Communities",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Dual Finance gives token communities sustainable ways to earn yield & generate value from their treasuries. Through liquid option based incentives, Dual Finance unlocks value & unleashes participation in decentralized communities. Goodbye inflationary token rewards. Hello sustainable Staking Options.",
+          "Dual Finance has designed itself upon this breakthrough token incentive mechanism to gain allegiance & prevent token dumping. DUAL token distribution is being conducted fully & fairly through the use of Staking Options.",
+          "Partner projects can use Staking Options themselves via Dual Finance to better incentivize their own communities. When designed through Dual Finance, Staking Options serve to bolster their token's option & spot liquidity by utilizing a DAO owned AMM (Risk Manager) and capitally efficient lending product (Rehypothecated Lending Pools).",
+          "Completing the offering are Dual Investment Pools (DIPs), an upgrade to conventional option vaults (DOVs) that offer streaming executable yield strategies. Customize strategies based on your risk appetite and earn yield immediately."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://medium.com/@dualfinance"
+    },
+    "resources": [
+      {
+        "title": "Dual Finance's Youtube Channel",
+        "content": [
+          "Providing educational videos that give token communities sustainable ways to earn yield & generate value from their treasuries"
+        ],
+        "url": "https://www.youtube.com/channel/UCMyYJ7GUzk7GCgyb9AgOU6w"
+      }
+    ],
+    "gallery": [
+      {
+        "caption": "Dual Investment Pools (DIP)",
+        "url": "https://i.imgur.com/punX3y0.png",
+        "height": 157,
+        "width": 600
+      },
+      {
+        "caption": "Staking Options Studio (SOS)",
+        "url": "https://i.imgur.com/t8h5dFa.png",
+        "height": 233,
+        "width": 600
+      }
+    ],
+    "team": [
+      {
+        "name": "Britt Cyr",
+        "avatar": "https://pbs.twimg.com/profile_images/1507165603240591367/hQDLyFw4_400x400.jpg",
+        "description": [
+          "MIT Masters & MIT B.Sc in Computer Science, concentration in Theoretical Computer Science (Cryptography)",
+          "Lead developer at YouTube. Over 7 years launched multiple live streaming projects & scaled the system from 100s of broadcasts to over 100K concurrent broadcasts with over 10M viewers. Managed live streaming ingestion & transcoding on projects, including webrtc mobile live streaming & ultra low latency, reducing latency from 45 seconds to < 1 second. Ex-Google, Ex-Facebook"
+        ],
+        "role": "Co-Founder",
+        "twitter": "@cyrzorhands"
+      },
+      {
+        "name": "John Kramer",
+        "avatar": "https://pbs.twimg.com/profile_images/1432394328387858432/YbfgF5gL_400x400.jpg",
+        "description": [
+          "MIT Masters in Finance & MIT B.Sc Aerospace Engineering",
+          "Prior Head of OTC & DeFi Trading at GSR. Led buildout of options trading capabilities, market making deal structures, and global team of traders & operations. Specialty in illiquid crypto derivatives trading, structured products, bespoke margining & lending. Crypto’s first-ever trades across altcoin options, variance swaps, accumulators, average price options, onchain derivatives/DOVs. Risk managed a portfolio of 300+ illiquid token derivatives with a multi-billion $ AUM."
+        ],
+        "role": "Co-Founder",
+        "twitter": "@jktrader16"
+      }
+    ],
+    "roadmap": {
+      "items": [
+        {
+          "title": "Dual Token Launch",
+          "date": "2022-12-01T15:42:21.109Z",
+          "status": "upcoming",
+          "resource": {
+            "title": "Staking Option Fair Launch",
+            "url": "https://medium.com/@dualfinance/staking-option-fair-launch-f08a2ba958e8"
+          }
+        }
+      ]
+    },
+    "faq": [
+      {
+        "question": "What are DIPs?",
+        "answer": [
+          "Dual Investment Pools, similar in structure to more commonly known Decentralized Option Vaults (DOVs) but with real-time pricing and customizable yields. They are also physically settled, meaning you will end up with either your staked asset or stablecoins upon withdrawing after expiration. Premiums are also paid immediately upon staking so you can put your funds to work for longer."
+        ]
+      },
+      {
+        "question": "Will there be a DUAL DAO?",
+        "answer": [
+          "Yes the plan is to fully decentralize every aspect of the project. DUAL token holders will provide the governance function and steward the treasury assets."
+        ]
+      },
+      {
+        "question": "What is the mission of the project?",
+        "answer": [
+          "To fix crypto’s broken tokenomic incentive structures through sustainable option based pathways. For a broader understanding of what is meant by that, please review our Whitepaper and other articles on Medium."
+        ]
+      },
+      {
+        "question": "How is the premium provided?",
+        "answer": [
+          "Premiums are quoted via an API directly from Option Market Makers or via the Dual Finance Backstop Volatility Model. This premium updates in real-time so you can better time the market."
+        ]
+      },
+      {
+        "question": "What are Staking Options?",
+        "answer": [
+          "Staking Options (SOs) are DUAL's incentive for staking funds into a DIP and for usage by other token projects to incentivize their communities. SOs allow users to acquire the DUAL token by exercising their right to buy it at the strike price up until expiration."
+        ]
+      },
+      {
+        "question": "What are Rehypothecated Lending Pools?",
+        "answer": [
+          "Rehypothecated Lending Pools (RLPs), a pool of capital that permits uncollateralized borrowing only from counterparties who have unbounded risk exposure to the pool. Dual Finance's RLPs allow market makers of DIPs capped by their long exposure to borrow to support hedging, providing greater capital efficiency and further positive return to Stakers. Users get paid this interest to generate additional yield!"
+        ]
+      }
+    ]
+  },
+  "A3WX4QKcioruP71f4yweusv9jqU9R4LtGfJEHtZhs3Rx": {
+    "symbol": "MixMob",
+    "heading": "Remix the world! A new card strategy racing game from a team that worked on HALO, FIFA, Battlefield & PokerStars. Mask Up!",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Remix the world! MixMob: Racer 1 is a new card strategy robot racing game – picture Mario Kart meets Clash Royale – from a team that worked on HALO, FIFA, Battlefield & PokerStars. Grab your Mask and MixBots to start your journey."
+        ]
+      },
+      {
+        "content": [
+          "MixMob is for players who want to play and earn, have fun, collect, strategize, compete, and create influence. MixMob offers a competitive game inside a remix gaming world with community co-creation at its core."
+        ]
+      },
+      {
+        "content": [
+          "MixMob is backed by leading crypto investors and guilds such as DeFiance, Solana Ventures, Merit Circle, YGG SEA, Arthur Hayes, and Lau Brothers, amongst others."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://www.notion.so/mixmob/Litepaper-88a413da744a4b1793d5934fb1195e0d"
+    },
+    "gallery": [
+      {
+        "caption": "MixMob: Racer 1",
+        "url": "https://i.imgur.com/OrB5eTE.png",
+        "height": 390,
+        "width": 600
+      },
+      {
+        "caption": "Multiplayer Arenas",
+        "url": "https://i.imgur.com/GqQuGeA.png",
+        "height": 354,
+        "width": 600
+      },
+      {
+        "caption": "Compete for tokens and glory",
+        "url": "https://i.imgur.com/4YcLNjI.png",
+        "height": 337,
+        "width": 600
+      },
+      {
+        "caption": "Deploy cards and race your bots for glory and rewards!s are made by racing.",
+        "url": "https://i.imgur.com/oPgmoIA.png",
+        "height": 354,
+        "width": 600
+      },
+      {
+        "caption": "Compete against friends in the leaderboards.",
+        "url": "https://i.imgur.com/FK0j1Px.png",
+        "height": 356,
+        "width": 600
+      }
+    ],
+    "resources": [
+      {
+        "title": "MixMob Alpha V2 Trailer",
+        "url": "https://vimeo.com/750807146"
+      },
+      {
+        "title": "MixMob: Uprising Project Teaser",
+        "url": "https://vimeo.com/677351566"
+      },
+      {
+        "title": "Play-to-earn game MixMob receives round of funding",
+        "content": [
+          "“This appreciable injection of capital will allow us to achieve our strategic objectives over the coming months and years,” said the platform’s CEO and Game Director Simon Vieira."
+        ],
+        "url": "https://venturebeat.com/games/play-to-earn-game-mixmob-receives-round-of-funding/"
+      }
+    ],
+    "team": [
+      {
+        "name": "Simon Vieira",
+        "avatar": "https://pbs.twimg.com/profile_images/1557082559556640770/0k73yu5x_400x400.jpg",
+        "description": [
+          "Simon has managed multimillion-dollar projects in the video game industry and successfully shipped over 100 games and apps for EA, Pokerstars, Microsoft, and Disney. He has 15 years of experience in the game industry."
+        ],
+        "role": "Co-founder & CEO",
+        "twitter": "@simonvieira"
+      },
+      {
+        "name": "Pavel Bains",
+        "avatar": "https://pbs.twimg.com/profile_images/1577549554823536645/q0h9-6r6_400x400.jpg",
+        "description": [
+          "Pavel founded Bluzelle and is an investor in gaming, Esports, and crypto. He has managed studios with Disney Interactive and worked with EA, Xbox, and Nintendo."
+        ],
+        "role": "Co-founder & EP",
+        "twitter": "@pavelbains"
+      }
+    ],
+    "roadmap": {
+      "items": [
+        {
+          "title": "MixBots NFT Drop",
+          "date": "2022-12-07T15:42:21.109Z",
+          "status": "inprogress"
+        },
+        {
+          "title": "Upgrade MixMob:Racer 1 to take it mainstream – first freemium crypto mobile esports game.",
+          "date": "2023-01-28T15:42:21.109Z",
+          "status": "inprogress"
+        },
+        {
+          "title": "Build UGC items and game editor – creative economy",
+          "date": "2023-06-28T15:42:21.109Z",
+          "status": "upcoming"
+        },
+        {
+          "title": "Build MixMob World MMO",
+          "date": "2023-12-28T15:42:21.109Z",
+          "status": "completed"
+        }
+      ]
+    },
+    "faq": [
+      {
+        "question": "What are the key highlights of your project?",
+        "answer": [
+          "• We launched our first 5,000 NFT drop in December 2021, which sold out in less than a day.\n• Raised our seed round of 7.5M in Jan.\n• Our team grew to 40 people, including contractors and part-time talent, we have a vibrant community of around 30,000 members across social media channels, with ~2,000 unique NFT holders.\n• Over 60% of NFT holders participated in our alphas, averaging around 21 min of gameplay per session."
+        ]
+      },
+      {
+        "question": "Can you please tell us more about the MixMob Masks and their utility?",
+        "answer": [
+          "MixMob Gen0 masks are one-of-a-kind identities in the game. Mutable NFTs that evolve as players level up on their journey. MixMob masks combine 2D, 3D, sketches, stickers, candy, pop culture, art, music, science... Masks have the following power and utility in the game:\n• Unlock your avatar/identity in the game\n• Exclusive access to our game before anyone else\n• Participate in our staking program\n• Allowlist to all future collection that tide to the game, including MixBots, and cards.\n• Allocation to future token sale\n• In-game currency bonuses\n• Unlock exclusive arenas\n• Access to our gated community and live events"
+        ]
+      },
+      {
+        "question": "How is your game sustainable and fun?",
+        "answer": [
+          "Below are the key points on how our game cultivates fun and sustainability.\n• We have created a multiplayer, synchronous, fast-paced, twitch-able skill-based game.\n• Our game has free (no monetary rewards) and low-cost entry modes to play our game for fun.\n• We have built tournament-based arenas with different tiers for players to join for a fee, with a significant percentage of that fee going to the total prize pool – a sustainable and transparent economy based on skill.\n• MixMob offers external sponsored tournament-based arenas with extra prizes (tokens or NFTs) for players to participate in a more competitive environment.\n• UGC modes like our Remix Editor allow players to create and sell content."
+        ]
+      }
+    ]
+  },
+  "53pMaU2DXieGxwXZLMN1rgDECwFrxuYw5u9QgEFCx4Rd": {
+    "symbol": "Kamino Finance",
+    "heading": "Kamino is an active liquidity management layer that fully automates concentrated liquidity DEX positions across Solana.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Kamino is built to be Solana's liquidity destination. Kamino vaults automatically manage DEX concentrated liquidity positions, using quantitative models to set & rebalance ranges, while auto-compounding fees & rewards. In essence, Kamino Vaults are one-click strategies that are built to automate the liquidity provision process."
+        ]
+      },
+      {
+        "heading": "A Use Case for Every User",
+        "content": [
+          "For liquidity providers and institutionals, Kamino facilitates set-and-forget portfolio growth. For projects, Kamino facilitates deep and optimized liquidity for native tokens. With a wide range of strategies available on the platform, Kamino empowers liquidity to providers to deploy their assets according to their outlook on the market."
+        ]
+      },
+      {
+        "heading": "Leverage and composability",
+        "content": [
+          "Every Kamino position is tokenized as a kToken, representing a user's deposit into a certain vault. kTokens are fully fungible SPL tokens that can be used across DeFi to leverage positions, while the kToken itself continues to accumulate yield via auto-compounding. Ultimately, Kamino fuels both liquidity and composability for the Solana DeFi ecosystem."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.kamino.finance"
+    },
+    "gallery": [
+      {
+        "caption": "Kamino Finance Vaults Landing Page",
+        "url": "https://i.imgur.com/UUvccOv.png",
+        "height": 345,
+        "width": 600
+      },
+      {
+        "caption": "Kamino Finance Vault Deposit Page",
+        "url": "https://i.imgur.com/VRoNbmr.png",
+        "height": 345,
+        "width": 600
+      },
+      {
+        "caption": "Kamino Finance Portfolio and Rewards Page",
+        "url": "https://i.imgur.com/q5vanAB.png",
+        "height": 345,
+        "width": 600
+      }
+    ],
+    "resources": [
+      {
+        "title": "Hubble Protocol Launches Kamino Finance to Optimize Yields for Liquidity Providers on Solana",
+        "content": [
+          "Hubble Protocol, home of the USDH stablecoin, has launched Kamino Finance: the first concentrated liquidity market maker (CLMM) optimizer of its kind on the Solana blockchain."
+        ],
+        "url": "https://cryptonews.com/news/hubble-protocol-launches-kamino-finance-optimize-yields-for-liquidity-providers-solana.htm"
+      },
+      {
+        "title": "Kamino Finance: A Solana-Based DeFi Platform Offering Real Yield",
+        "content": [
+          "The project aims to revolutionize the way liquidity providers (LPs) can provide concentrated liquidity by making it as easy as pressing a button."
+        ],
+        "url": "https://crypto.news/kamino-finance-a-solana-based-defi-platform-offering-real-yields-to-users/"
+      },
+      {
+        "title": "Solana DeFi Protocols Solend and Kamino Finance Partner for Unique Borrowing Opportunities",
+        "content": [
+          "Solend and Kamino Finance have announced a partnership to create new liquidity solutions for decentralized finance (DeFi) on Solana."
+        ],
+        "url": "https://www.einnews.com/pr_news/597514062/solana-defi-protocols-solend-and-kamino-finance-partner-for-unique-borrowing-opportunities"
+      }
+    ],
+    "roadmap": {
+      "items": [
+        {
+          "title": "Mainnet Launch",
+          "date": "2022-08-31T15:42:21.109Z",
+          "status": "completed",
+          "resource": {
+            "title": "Introducing Kamino",
+            "url": "https://bit.ly/Kamino-Launch"
+          }
+        },
+        {
+          "title": "kTokens Integrated into Hubble Protocol",
+          "date": "2022-09-22T15:42:21.109Z",
+          "status": "completed",
+          "resource": {
+            "title": "How to Borrow USDH with Kamino kTokens",
+            "url": "https://bit.ly/kTokens-on-Hubble"
+          }
+        },
+        {
+          "title": "$5M TVL",
+          "date": "2022-10-24T15:42:21.109Z",
+          "status": "completed"
+        },
+        {
+          "title": "kTokens Integrated into Solend",
+          "date": "2022-10-31T15:42:21.109Z",
+          "status": "completed",
+          "resource": {
+            "title": "Borrow on Solend with Kamino kTokens as Collateral",
+            "url": "https://bit.ly/kTokens-on-Solend"
+          }
+        },
+        {
+          "title": "Automated SOL staking via Lido",
+          "date": "2022-10-27T15:42:21.109Z",
+          "status": "completed",
+          "resource": {
+            "title": "Stake SOL with Lido Finance on Kamino",
+            "url": "https://bit.ly/minting-stsol-lido"
+          }
+        }
+      ]
+    },
+    "faq": [
+      {
+        "question": "Why use Kamino?",
+        "answer": [
+          "For users: Save time and maximize yields. You could sit at your computer 24/7, adjusting your concentrated liquidity positions and compounding your rewards, but you can’t beat Kamino’s efficiency.",
+          "For projects: Deep liquidity quick. Incentivize users to provide liquidity or provide it yourself. With Kamino managing your position, less capital is needed to negate slippage when swapping your tokens."
+        ]
+      },
+      {
+        "question": "How do I use Kamino?",
+        "answer": [
+          "Set it and forget it. Choose a vault and deposit the tokens you want to LP. Kamino will automatically manage the strategy of your position, and auto-compound your rewards. Withdraw your funds whenever you want."
+        ]
+      },
+      {
+        "question": "Where does Kamino's yield come from?",
+        "answer": [
+          "Kamino automates concentrated liquidity positions, and auto-compounds all the rewards a user earns, right back into your position. This means you never has to touch their deposit, and it will continue to accrue in value as time goes on. This value is also reflected in the value of the kTokens you receive upon deposit."
+        ]
+      },
+      {
+        "question": "What are kTokens?",
+        "answer": [
+          "kTokens are receipt tokens, representing the value deposited in Kamino vaults. Each Kamino vault has its own distinct kToken, which you will receive in your wallet the moment you deposit into a vault. kTokens also reflect the value of auto-compounding in Kamino vaults, making them Solana's first yield bearing asset that accrues yield from concentrated liquidity positions."
+        ]
+      },
+      {
+        "question": "Where can I use kTokens?",
+        "answer": [
+          "kTokens are standard, fungible SPL tokens, and there are a range of use-cases in the ecosystem; from minting USDH against them on Hubble Protocol, to depositing them in Solend to borrow a range of assets from the Kamino USDH Pool."
+        ]
+      },
+      {
+        "question": "Has Kamino been audited?",
+        "answer": [
+          "Yes, Kamino's audits are available in the documentation."
+        ]
+      }
+    ]
+  },
+  "DKDkC6km37NcExxgBFW1nToSiybPvbu5RwhSSnRWwXYo": {
+    "symbol": "Moonlit",
+    "heading": "Find and reward the SUPERSTARS in your Discord with Moonlit.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Moonlit is a collaboration and rewards platform specifically for Discord communities. It's a fun way to engage your community in the serious business of running and growing your DAO."
+        ]
+      },
+      {
+        "content": [
+          "- Build out your members database automatically\n-Assign and reward teams for working on different projects\n- Advertise for help / ideas within the DAO\n- Easily move tokens between DAO members for rewards, permissions, tips and entry fees"
+        ]
+      },
+      {
+        "content": [
+          "Use any SPL token (or for pre-mint DAOs use a virtual points system) and watch as your community engages more deeply and more often with everything the DAO is doing.",
+          "The team behind Moonlit has years of experience building apps that encourage and motivate people to change their behavior. Using this deep understanding of human psychology, Moonlit will make operating your DAO not only easier but also more fun and more engaging for the entire community."
+        ]
+      },
+      {
+        "content": [
+          "\"Using Moonlit is the only way any of this works\" Nom, MonkeDAO"
+        ]
+      }
+    ],
+    "team": [
+      {
+        "name": "Anders Murphy",
+        "avatar": "https://media.licdn.com/dms/image/C5603AQHHnvBThTM0Aw/profile-displayphoto-shrink_800_800/0/1516848243663?e=1672876800&v=beta&t=3YCLoTqhdSFgRRtLkJDzurUVEa7kFtpFpsZvpuyjdVM",
+        "description": [
+          "Full stack software engineer and lean product development practitioner. Previously at FanDuel and HelloRelish. Deep experience in designing for behavioral change. 10 years experience of building mobile apps and excited to bring the masses to crypto via beautifully designed, practical products."
+        ],
+        "role": "Co-Founder"
+      }
+    ],
+    "faq": [
+      {
+        "question": "Do we need to have launched a token to use Moonlit?",
+        "answer": [
+          "No. If you're pre-token launch you can use an in-app currency and set an exchange rate in the future for any new token."
+        ]
+      },
+      {
+        "question": "Is this just for simple bounties?",
+        "answer": [
+          "No. Moonlit will create an internal economy for your token - earn tokens through contributions to your community and use them to get other community members to help you on projects."
+        ]
+      },
+      {
+        "question": "How easy is this to set up?",
+        "answer": [
+          "Super simple! Install a bot in your Discord and you're all set to go. We will provide all the support you need to get your team onboarded and successful right out of the gate. "
+        ]
+      },
+      {
+        "question": "Does this add an admin layer to running my community?",
+        "answer": [
+          "No. One of our principles that we have built Moonlit on is that it must make life easier, not harder, for everyone. Moonlit is a way for your members to understand how they can help, and to be recognized by the community for their contribution. It does this in a decentralized but controlled manner using a scale permissions based on contribution."
+        ]
+      },
+      {
+        "question": "Is this integrated into Discord?",
+        "answer": [
+          "Absolutely! Members can follow along on Discord, or dive into the details in the Moonlit web app."
+        ]
+      },
+      {
+        "question": "Can I use Moonlit on my phone?",
+        "answer": [
+          "Yes! It's designed for phone or desktop. Simple, beautiful and really easy to use."
+        ]
+      }
+    ]
+  },
+  "4pzwicnneaxCL4XVms2gJApfj7jpiFvDMzCWEHYw2rMV" : {
+    "symbol": "Coin98",
+    "heading": "Your Crypto Everything App.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Coin98 is the #1 crypto super app designed to seamlessly connect a billion users to the crypto world safely and securely. We offer users a comprehensive and trusted ecosystem of essential services across the globe, including a non-custodial, multi-chain NFT & cryptocurrency wallet, built-in DEXs, Cross-chain Bridge & DApp Browser, a powerful Terminal, attractive Earn, Gift & Campaign, and Others. "
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.coin98.com/"
+    },
+    "resources": [
+      {
+        "title": "Coin98's Linktree",
+        "url": "https://linktr.ee/coin98"
+      }
+    ]
+  },
+  "8gqpog28H6UvefDu7wMbwaRQX7a7rbVtw7z3yX9xjJQa" : {
+    "symbol": "Genopets",
+    "heading": "The Free-to-Play, Move-to-Earn NFT mobile game. Steps you take every day fuel your journey in the Genoverse. Move. Play. Create. ",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Genopets is a Free-to-Play, Move-to-Earn NFT mobile game that makes it fun and rewarding to live an active lifestyle. A Genopet is your digital pet whose evolution and growth is inextricably linked to your own. The steps you take every day power your journey through the Genoverse as you explore, battle, and evolve — earning crypto while you play.",
+          "Genopets is the gamification of an active lifestyle. Walking around the mall? Jogging at the gym? Running between meetings in your office? No matter how you stay active, your Genopet is always by your side, counting the steps you’ll use to fuel your gameplay.",
+          "Genopets is a move-to-earn game that does more than count your steps and reward you for how much you walk. The game is predicated on you building a bond with your digital companion and taking care of it every day by taking care of yourself.",
+          "Paying homage to the nostalgia of taking care of our Tamagotchi, evolving and battling our Pokémon, or even raising our first real-world pet, the emotional connection between one's self and their pet is a powerful force. That emotional force is the premise of Genopets and ultimately what will help motivate you to live a more active lifestyle."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://whitepaper.genopets.me/"
+    },
+    "resources": [
+      {
+        "title": "Genopets wants you and your digital pets to improve together",
+        "content": [
+          "One of Samsung’s latest investments through its Samsung Next arm is Genopets."
+        ],
+        "url": "https://venturebeat.com/games/genopets-ben-tse-wants-to-own-his-time/"
+      },
+      {
+        "title": "Magic Eden introduces semi-fungible tokens (SFTs) marketplace with Genopets",
+        "content": [
+          "Magic Eden has introduced its “semi-fungible token” (SFT) marketplace with the blockchain game Genopets."
+        ],
+        "url": "https://venturebeat.com/games/magic-eden-introduces-semi-fungible-tokens-sfts-marketplace-with-genopets/"
+      }
+    ]
+  },
+  "5K4VVEeYpANxL79r7rM3heyXqYZkzu2KkD4kFkt1gGpG" : {
+    "symbol": "Multiverse (Earth From Another Sun)",
+    "heading": "Earth From Another Sun is an open-world MMO sandbox FPS game where you can command massive armies to fight & conquer the Galaxy.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "FEATURES: Earth From Another Sun is a science fiction action-oriented strategy role-playing game featuring an ever-expanding galaxy with unique locations to explore packed with carefully designed NPCs and quests as well as player-created content. Conquer the galaxy fighting alongside the armies you command in exhilarating, meticulously crafted first-person shooter combat. Hundreds of unique weapons, weapon mods, abilities, and enemies that provide a fresh combat experience, a lot of replayability, and lots of different builds to fight alongside your teammates.",
+          "MULTIPLAYER CO-OP: Play the whole game with up to 3 other friends or strangers and challenge a variety of lairs and battlefields across the galaxy. We're also preparing 10-person co-op strongholds and Xeno lair raids.",
+          "AN OPEN WORLD OF GALACTIC PROPORTIONS: You will encounter many people, creatures, love interests, treasures, calamities, and other events that will test your strength and resolve. Make allies, pledge service to another faction, or create your own independent nation. Who knows, you might even get married and have genetically altered children along the way!",
+          "COMBAT VEHICLES, MECHS & DRONES: What would be the Battle of Naboo without the tanks and energy catapults? Plus, hoverbikes are really cool too! Vehicles types we are working on: Hoverbikes, tanks, rovers, mechs, fighter crafts, assault vessels, and space fortresses.",
+          "FRESH FPS COMBAT: There are many great FPS games out there. So, to make things fresh and interesting, we made sure that you have hundreds of gun mods, powers, gadgets, and passives. Enemies also have a large amount of variety and abilities.",
+          "LARGE-SCALE SCI-FI BATTLES: Ever wanted to experience what it's like to be a soldier or battlefield commander in the middle of iconic battles from your favorite sci-fi movies? With support for up to 1000 individual units on a battlefield, this is now possible.",
+          "PLAYERS COME FIRST: We listen to the community intensely and engage in conversations daily. While we do internal QA, it can happen that an update will release with an annoying bug. We will, however, make it our priority and fix it within 24 to 48 hours after discovery, that's the EFAS guarantee. We always make decisions that favor players, and we also regularly implement features requested by the community."
+        ]
+      }
+    ]
+  },
+  "2AgaUrJeZYxQgipGa8s5opQBPRqJBjKwWqv3hwinnefJ" : {
+    "symbol": "Helio",
+    "heading": "The Web3 payments API",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Helio will accelerate the adoption of Web3 payments & drive the cost of online payments to zero. We want to displace traditional online payment systems.",
+          "Why? In the US alone, merchants hand over $138B in TX fees each year. We will reduce the cost of an online payment to near zero. Web3 projects waste tons of time building their own payment tooling. 1st-gen crypto pay gateways are weak products with poor UX. We need an alternative that is optimised for Web3 users.",
+          "What? A complete Web3 payments platform. We make it simple to accept crypto payments. No fees, no logins, no code.",
+          "How? E-commerce: simple integration options for merchants.",
+          "Web3 economy: NFT sales with our Pay Links, Discord Subscriptions, Token Utility & dAPP integrations."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.hel.io/introduction/welcome-to-helio"
+    }
+  },
+  "E5yobpBits2Wm8LbtGSPS6KhKzU3oZRTcbx2XTM6Q1fF" : {
+    "symbol": "Kaizen Corps",
+    "heading": "Creators of the strategy game: Domination, which drives our gaming/metaverse infrastructure and ecosystem development for Solana.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Domination is massive collaborative strategy game similar to the board game Risk. We're currently in alpha but hosting new games on a weekly basis. Grab one of our NFTs off Magic Eden at https://magiceden.io/marketplace/kaizen_corps to join the revolution at https://domination.gg.",
+          "Kaizen Corps is our umbrella organization, whose purpose is to help develop the nacent gaming and metaverse ecosystem for Solana. Many projects are building in silos and building their own components to solve the same sets of problems. Our strategy is to extract the solutions we build for Domination into reusable components (which we're calling NFT legos) to make available to the greater Solana ecosystem for other projects to use and extend."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.domination.gg"
+    },
+    "resources": [
+      {
+        "title": "The Kaizen Corps Medium Page",
+        "url": "https://kaizencorps.medium.com/"
+      }
+    ]
+  },
+  "4xXbWdJbTdvmNNb2ZE1MEk7wtYWj3MJm8SqQ8u3TErvh" : {
+    "symbol": "YGG SEA",
+    "heading": "The first subDAO of YGG, with the mission of creating the biggest and most sustainable virtual economy in Southeast Asia!",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Yield Guild Games (YGG) is a DAO that invests in non-fungible tokens (NFTs) used in virtual worlds and blockchain-based games.",
+          "YGG is primarily a community of play-to-earn gamers that act as a guild across many games. Within such games, it collects yield-generating NFTs and loans them to the guild's player base.",
+          "Yield Guild Game's first regional subDAO is YGG SEA. With the help and advice from its parent DAO - YGG, YGG SEA is dedicated to building the play-to-earn ecosystem in these countries, bringing together gamers from Indonesia, Malaysia, Vietnam, Singapore, and Thailand."
+        ]
+      }
+    ],
+    "resources": [
+      {
+        "title": "The YGG SEA Medium Page",
+        "url": "https://medium.com/@yggsea"
+      },
+      {
+        "title": "The YGG SEA Youtube Channel",
+        "url": "https://www.youtube.com/c/YGGSEA"
+      }
+    ]
   }
 }

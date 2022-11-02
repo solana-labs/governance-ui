@@ -20,6 +20,10 @@ export default function App({ Component, pageProps, router }: AppProps) {
     updateSerumGovAccounts(cluster as string | undefined)
   }, [cluster])
 
+  if (router.pathname.startsWith('/code')) {
+    return <Component {...pageProps} />
+  }
+
   if (
     router.pathname.startsWith('/realm/[id]') ||
     router.pathname.startsWith('/ecosystem') ||

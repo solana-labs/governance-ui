@@ -18,7 +18,11 @@ import { solanaWalletToDialectWallet } from './solanaWalletToDialectWallet';
 
 type ThemeType = 'light' | 'dark' | undefined;
 
-export const DialectNotifications = () => {
+interface Props {
+  className?: string;
+}
+
+export const DialectNotifications = (props: Props) => {
   const wallet = useWallet();
 
   const [
@@ -67,7 +71,14 @@ export const DialectNotifications = () => {
   // }, []);
 
   return (
-    <NavigationMenu.Item>
+    <NavigationMenu.Item
+      className={props.className}
+      onClick={() => {
+        if (!wallet.connected) {
+          wallet.connect();
+        }
+      }}
+    >
       <DialectSolanaSdk config={dialectConfig} solanaConfig={solanaConfig}>
         <DialectThemeProvider theme="light" variables={themeVariables}>
           <DialectUiManagementProvider>
