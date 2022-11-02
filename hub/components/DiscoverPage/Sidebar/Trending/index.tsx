@@ -7,33 +7,34 @@ import { Org } from './Org';
 
 const CONFIG = [
   {
-    name: 'Dialect',
-    category: RealmCategory.Web3,
-    logo: '/realms/Dialect/img/avatar-dialect.png',
-    publicKey: new PublicKey('7s5QZmpit4uu1y2bkByXerE2mv3XBHtiNQ4JkDdmKRiQ'),
-    url: '/realm/Dialect',
+    name: 'Magic Eden',
+    category: RealmCategory.Other,
+    logo: 'https://i.imgur.com/DGcchtX.png',
+    publicKey: new PublicKey('9MwbgfEkV8ZaeycfciBqytcxwfdYHqD2NYjsTZkH4GxA'),
+    url: '/realm/Magic%20Eden',
   },
   {
-    name: 'Solend',
+    name: 'Backpack',
     category: RealmCategory.Web3,
     logo:
-      'https://solend-image-assets.s3.us-east-2.amazonaws.com/1280-circle.png',
-    publicKey: new PublicKey('7sf3tcWm58vhtkJMwuw2P3T6UBX7UE5VKxPMnXJUZ1Hn'),
-    url: '/realm/SLND',
+      'https://static.ftx.com/nfts/e814aeb2-a599-4697-a199-abf077b8cd5f.jpeg',
+    publicKey: new PublicKey('BqLWTZv8xfJiCtu9gm87T1EqtAnL2cCJ1PS9JoKn3oBy'),
+    url: '/realm/Backpack',
   },
   {
-    name: 'The Imperium of Rain',
-    category: RealmCategory.Web3,
-    logo: '/realms/RAIN/img/rain_logo.png',
-    publicKey: new PublicKey('6orGiJYGXYk9GT2NFoTv2ZMYpA6asMieAqdek4YRH2Dn'),
-    url: '/realm/DTP',
+    name: 'Hubble Protocol',
+    category: RealmCategory.Defi,
+    logo: 'https://i.imgur.com/B5SNT8F.png',
+    publicKey: new PublicKey('AgR2tq1xcbqwmgDcNRaV1BEP5J3kfJfswP5vn6WWe6uC'),
+    url: '/realm/Hubble%20Protocol',
   },
   {
-    name: 'The Mysterious Death of Lord Harrington',
-    category: RealmCategory.Web3,
-    logo: '/realms/MDLH/img/MDLH.png',
-    publicKey: new PublicKey('6Fiy6ZrCKBfcMieNq3S6qSzfpgRTYKn5zPW78VL9FwjL'),
-    url: '/realm/MDLH',
+    name: 'Dual Finance',
+    category: RealmCategory.Defi,
+    logo:
+      'https://pbs.twimg.com/profile_images/1525300156551274497/FMlM80mn_400x400.jpg',
+    publicKey: new PublicKey('HnLuYmBxDxK1MCihHJVFnNudUTpLPc2km6xNcRQ8KPdj'),
+    url: '/realm/Dual%20Finance',
   },
   {
     name: 'Metaplex',

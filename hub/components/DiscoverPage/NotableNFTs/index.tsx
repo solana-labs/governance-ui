@@ -6,40 +6,40 @@ import cx from '@hub/lib/cx';
 
 export const ITEMS = [
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
+    bannerImgSrc: 'https://i.imgur.com/NfXLoSZ.jpg',
     description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+      'Okay Bears has the highest trade volume of any NFT collection on Solana and is an emerging global icon of clean, positive cool.',
+    iconImgSrc: 'https://i.imgur.com/eKF74mG.png',
+    name: 'Okay Bears',
+    publicKey: new PublicKey('DntR8BU5tYVhQUNfARFG5VxKrpdRaKY2qKC3v8cYJirm'),
+    urlId: 'Okay Bears',
   },
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
-    description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+    bannerImgSrc: 'https://i.imgur.com/wgLWNen.png',
+    // description:
+    //   'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
+    iconImgSrc: 'https://i.imgur.com/j6VhuZJ.png',
+    name: 'Degenerate Ape Academy',
+    publicKey: new PublicKey('7f47FkSAJqJLNY5p3jKxp7CLbEYbQDhhmKuYDJKrNJEq'),
+    urlId: 'Degenerate Ape Academy',
   },
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
+    // bannerImgSrc: '/realms/RCH/banner.png',
     description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+      'Degods is on a mission to build the best communities on the internet.',
+    // iconImgSrc: '/realms/RCH/icon.png',
+    name: 'DeGods',
+    publicKey: new PublicKey('wx9R4TZLgL4VaVK89uW9D9DpMKMUCSm16nABeahk9Ex'),
+    urlId: 'DeGods',
   },
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
-    description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+    // bannerImgSrc: '/realms/RCH/banner.png',
+    // description:
+    //   'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
+    iconImgSrc: '/realms/RAIN/img/rain_logo.png',
+    name: 'The Imperium of Rain',
+    publicKey: new PublicKey('6orGiJYGXYk9GT2NFoTv2ZMYpA6asMieAqdek4YRH2Dn'),
+    urlId: 'DTP',
   },
 ];
 
@@ -57,8 +57,8 @@ export function NotableNFTs(props: Props) {
         </div>
       </div>
       <div className="text-neutral-500 max-w-3xl">
-        With more than 20.2 million minted, Solana NFTs have generated more than
-        $2.5 Billion in sales to more than 5.8 million wallets.
+        With nearly 22 million minted, Solana NFTs have generated more than $3.6
+        Billion in sales to more than 2.5 million collectors.
       </div>
       <div
         className={cx(

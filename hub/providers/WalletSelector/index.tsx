@@ -249,7 +249,7 @@ export function WalletSelector(props: Props) {
 
   return (
     <ConnectionProvider endpoint={cluster.endpoint}>
-      <_WalletProvider wallets={supportedWallets}>
+      <_WalletProvider wallets={supportedWallets} autoConnect>
         <WalletSelectorInner>{props.children}</WalletSelectorInner>
       </_WalletProvider>
     </ConnectionProvider>

@@ -10,7 +10,7 @@ import { CreateHub } from './CreateHub';
 import { Links } from './Links';
 import { LinksDropdown } from './LinksDropdown';
 import { Logo } from './Logo';
-import { UserDropdown } from './UserDropdown';
+import { User } from './User';
 
 interface Props {
   className?: string;
@@ -99,7 +99,7 @@ export function GlobalHeader(props: Props) {
                 <MobileRealmSearchNavigation />
               </NavigationMenu.Item>
             )}
-            <UserDropdown compressed={!showExpandedUserDropdown} />
+            <User compressed={!showExpandedUserDropdown} />
           </div>
         </NavigationMenu.List>
       </div>
