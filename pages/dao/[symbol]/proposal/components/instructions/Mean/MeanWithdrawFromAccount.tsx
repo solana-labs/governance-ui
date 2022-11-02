@@ -13,11 +13,10 @@ import getMeanWithdrawFromAccountInstruction from '@utils/instructions/Mean/getM
 import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import { precision } from '@utils/formatting'
 import { getMeanWithdrawFromAccountSchema } from '@utils/validations'
+import getMint from '@utils/instructions/Mean/getMint'
 
 import { NewProposalContext } from '../../../new'
 import SelectStreamingAccount from './SelectStreamingAccount'
-import { AssetAccount } from '@utils/uiTypes/assets'
-import getMint from './getMint'
 
 interface Props {
   index: number

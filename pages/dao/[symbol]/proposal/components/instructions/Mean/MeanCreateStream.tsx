@@ -8,6 +8,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import { precision } from '@utils/formatting'
 import getMeanCreateStreamInstruction from '@utils/instructions/Mean/getMeanCreateStreamInstruction'
+import getMint from '@utils/instructions/Mean/getMint'
 import {
   MeanCreateStream,
   UiInstruction,
@@ -16,7 +17,6 @@ import { getMeanCreateStreamSchema } from '@utils/validations'
 
 import { NewProposalContext } from '../../../new'
 import SelectStreamingAccount from './SelectStreamingAccount'
-import getMint from './getMint'
 
 const rateIntervalOptions = {
   0: { idx: 0, display: 'Per minute', value: 0 },

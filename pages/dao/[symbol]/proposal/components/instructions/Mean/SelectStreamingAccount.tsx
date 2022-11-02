@@ -9,9 +9,9 @@ import Select from '@components/inputs/Select'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
 import createMsp from '@utils/instructions/Mean/createMsp'
+import getMint from '@utils/instructions/Mean/getMint'
 import { abbreviateAddress } from '@utils/formatting'
 import { AssetAccount } from '@utils/uiTypes/assets'
-import getMint from './getMint'
 
 const getLabel = (treasury: Treasury | undefined, accounts: AssetAccount[]) => {
   if (!treasury) return undefined
