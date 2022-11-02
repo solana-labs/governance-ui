@@ -1868,7 +1868,7 @@
     "shortDescription": "Next-gen gaming metaverse with triple-A UE5 graphics for creating, playing & learning with others worldwide. Power to the People!",
     "sortRank": 3,
     "website": "https://staratlas.com/",
-    "twitter": "@StarAtlas/",
+    "twitter": "@StarAtlas",
     "discord": "https://discord.gg/StarAtlas",
     "github": "https://github.com/staratlasmeta/"
   },
@@ -2011,7 +2011,7 @@
     "shortDescription": "4,444 Ancestors to guide you on your Journey into Web3",
     "sortRank": 3,
     "website": "https://www.ourdiaspora.xyz/",
-    "twitter": "https://twitter.com/OurDiaspora",
+    "twitter": "@OurDiaspora",
     "github": "https://github.com/diaspora-labs"
   },
   {
@@ -2208,8 +2208,7 @@
     "sortRank": 3,
     "website": "https://glass.xyz/",
     "twitter": "@glassprotocol",
-    "discord": "https://discord.gg/xn79hkqRFD",
-    "github": ""
+    "discord": "https://discord.gg/xn79hkqRFD"
   },
   {
     "symbol": "Vyper Protocol",
@@ -2337,7 +2336,7 @@
     "ogImage": "https://i.imgur.com/j6VhuZJ.png",
     "sortRank": 3,
     "website": "https://www.degenape.academy/",
-    "twitter": "@degenapeacademy?s=21&t=Pag5X3Od7kgKsClbaKbyLg"
+    "twitter": "@degenapeacademy"
   },
   {
     "symbol": "Audius",
