@@ -9,7 +9,7 @@ const CONFIG = [
   {
     name: 'Magic Eden',
     category: RealmCategory.Other,
-    logo: 'https://i.imgur.com/DGcchtX.png',
+    logo: 'https://i.imgur.com/p9Ludt4.png',
     publicKey: new PublicKey('9MwbgfEkV8ZaeycfciBqytcxwfdYHqD2NYjsTZkH4GxA'),
     url: '/realm/Magic%20Eden',
   },
