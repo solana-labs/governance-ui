@@ -1418,7 +1418,7 @@
       }
     ]
   },
-  "BZE9AiJrMxUXXjwy9iBPzj34Wh5Zf1wLEFAM4oSSMRLi": {
+  "BZE9AiJrMxUXXjwy9iBPzj34Wh5Zf1wLEFAM4oSSMRLi" : {
     "symbol": "Allie Coin",
     "heading": "Allie Coin unlocks a new world of gaming.",
     "about": [
@@ -1439,13 +1439,156 @@
       "title": "Docs",
       "url": "https://smooth-exception-37e.notion.site/Allie-Coin-DAO-Charter-2551dc1f4fe24068b783ff365c80f0f8"
     },
+    "gallery": [
+      {
+        "caption": "Welcome to Allie Coin!",
+        "url": "https://www.youtube.com/watch?v=5sW5WIfiFD0",
+        "height": 338,
+        "width": 600
+      },
+      {
+        "url": "https://pbs.twimg.com/media/Ffi7BVIVsAE5R3M?format=jpg&name=large",
+        "height": 338,
+        "width": 600
+      },
+      {
+        "caption": "IRL Allie Coins given to holders at TwitchCon 2022",
+        "url": "https://pbs.twimg.com/media/FfDbRhnUoAEcoNs?format=jpg&name=4096x4096",
+        "height": 600,
+        "width": 552
+      },
+      {
+        "caption": "The Allie Coin team in Joshua Tree",
+        "url": "https://pbs.twimg.com/media/FbWGr3pUcAAqhLw?format=jpg&name=large",
+        "height": 400,
+        "width": 600
+      },
+      {
+        "caption": "The Allie Cats unveil a new Realm...",
+        "url": "https://pbs.twimg.com/media/Fa87rJvUsAAym2o?format=jpg&name=large",
+        "height": 338,
+        "width": 600
+      }
+    ],
     "resources": [
       {
         "title": "Major YouTube Gaming Streamer Joins Forces with Leading Blockchain Game",
         "content": [
-          "Today the world’s leading blockchain game, Splinterlands, announced a new tournament collaboration with major YouTube Streamer, Alliestrasza and CEO of Allie Coin."
+          "Today the world's leading blockchain game, Splinterlands, announced a new tournament collaboration with major YouTube Streamer, Alliestrasza and CEO of Allie Coin."
         ],
         "url": "https://www.yahoo.com/now/major-youtube-gaming-streamer-joins-160000079.html?guccounter=1&guce_referrer=aHR0cHM6Ly90LmNvLw&guce_referrer_sig=AQAAACaiQoZ16LrGeP2PFK2untiV1k23PuNcBy_VovWYQLZERfHt-6yO2jR59VbbNRegpXG6hVpV1XebeEmegUxlD3nnrhRUQBWmuhI0tteYK167dcedsRCUJQR9cxhkSxz_R_SbOYvSGi5nxJQUgW6ErLdVyBPKzbtxKWCIl0lVsC7r"
+      }
+    ],
+    "team": [
+      {
+        "name": "Allie Macpherson",
+        "avatar": "https://pbs.twimg.com/profile_images/1542942640332689410/hpoaZqUe_400x400.jpg",
+        "description": [
+          "Allie is a content creator, gamer, and web3 enthusiast. She started streaming card games on Twitch six years ago under the gaming persona \"Alliestrasza\". She was also one of the first people to launch her social token on the Rally platform! Allie is passionate about innovating in the creator economy through new verticals in web3. She loves to chat about music and concerts, camera gear, strategy games, existentialism, and of course... cats!"
+        ],
+        "role": "Founder",
+        "twitter": "@Alliestrasza"
+      },
+      {
+        "name": "Mason Geyser",
+        "avatar": "https://pbs.twimg.com/profile_images/1486148938906226689/y4_ysscW_400x400.png",
+        "description": [
+          "Mason has been in crypto for six years doing everything including investing, trading, mining, DeFi, and social token management. For Allie Coin, he helps plan events, admin tournaments, develop games, research videos, and all sorts of other things that help make Allie Coin one of the best communities in web3. Outside of crypto, Mason loves to play video games, go to music festivals, travel the world, and eat delicious food. He also spends copious amounts of time cuddling with the IRL Allie Cats (and maybe some of the digital ones too)."
+        ],
+        "role": "Product Lead",
+        "twitter": "@Masongos_"
+      },
+      {
+        "name": "Alex Finden",
+        "avatar": "https://pbs.twimg.com/profile_images/1560737021970198528/XQnN0fld_400x400.jpg",
+        "description": [
+          "In addition to his career intersecting the creator economy with web3, Alex lives for role-playing games, electronic and metal music, and outdoor adventure sports. He has been advising and assisting creators for over five years and is now building communities for the innovators of web3."
+        ],
+        "role": "Community Lead",
+        "twitter": "@alexfinden"
+      }
+    ],
+    "roadmap": {
+      "items": [
+        {
+          "title": "Migrate $ALLIE to Solana from Rally.io",
+          "date": "2022-07-25T15:42:21.109Z",
+          "status": "completed",
+          "resource": {
+            "title": "Allie Coin on Solscan",
+            "url": "https://solscan.io/token/EqTT2V7gcuGAz8croNJLVa63QqC8ZzGn6iwBiCfiFj8h#analysis"
+          }
+        },
+        {
+          "title": "Splinterlands collaboration: tournaments + guild",
+          "date": "2022-09-27T15:42:21.109Z",
+          "status": "completed",
+          "resource": {
+            "title": "Major YouTube Gaming Streamer Joins Forces with Leading Blockchain Game",
+            "url": "https://www.yahoo.com/now/major-youtube-gaming-streamer-joins-160000079.html?guccounter=1&guce_referrer=aHR0cHM6Ly90LmNvLw&guce_referrer_sig=AQAAACaiQoZ16LrGeP2PFK2untiV1k23PuNcBy_VovWYQLZERfHt-6yO2jR59VbbNRegpXG6hVpV1XebeEmegUxlD3nnrhRUQBWmuhI0tteYK167dcedsRCUJQR9cxhkSxz_R_SbOYvSGi5nxJQUgW6ErLdVyBPKzbtxKWCIl0lVsC7r"
+          }
+        },
+        {
+          "title": "Launch and Charter Allie Coin DAO",
+          "date": "2022-10-17T15:42:21.109Z",
+          "status": "completed",
+          "resource": {
+            "title": "Allie Coin DAO on Realms",
+            "url": "https://app.realms.today/dao/ALLIE"
+          }
+        },
+        {
+          "title": "Migrate Allie Coin NFT collections to Solana",
+          "date": "2022-11-20T15:42:21.109Z",
+          "status": "upcoming",
+          "resource": {
+            "title": "Allie cats on Rally.io",
+            "url": "https://nft.rally.io/alliestrasza/collections/allie-cats"
+          }
+        },
+        {
+          "title": "Develop $ALLIE Marketplace",
+          "date": "2022-01-30T15:42:21.109Z",
+          "status": "upcoming"
+        },
+        {
+          "title": "Launch original play-to-earn game(s)",
+          "date": "2023-02-15T15:42:21.109Z",
+          "status": "inprogress"
+        }
+      ]
+    },
+    "faq": [
+      {
+        "question": "What can I do with Allie Coin ($ALLIE)?",
+        "answer": [
+          "Allie Coin unlocks a new world of gaming. By holding $ALLIE, you can:",
+          "🏆 Get priority access to our sponsored tournaments\n🎉 Access giveaways of gaming assets, gift cards, and more\n🍻 Attend in-person and virtual events, such as our TwitchCon party or community game nights\n🕹 Unlock special access to our own play-to-earn games, under development now\n🔥 Purchase Allie Coin NFTs, giving you an even more elite status\n❤️ Support Alliestrasza and our community of likeminded gamers, all while retaining token ownership",
+          "Perhaps best of all, the future of Allie Coin is in the hands of our holders. By holding $ALLIE, you unlock voting power in our DAO, where you can propose new ideas for our community, vote on others, and help spend our treasury assets the way you think is most exciting."
+        ]
+      },
+      {
+        "question": "How can I get some $ALLIE?",
+        "answer": [
+          "$ALLIE is just like any other cryptocurrency on the Solana blockchain. To hold it and unlock its perks, you'll just need a Phantom wallet.",
+          "$ALLIE can be earned or purchased. By completing quests in Discord or participating in our gaming events and tournaments, you can earn $ALLIE without having to buy it!",
+          "Buying $ALLIE is also easy. You can either swap for $ALLIE from $sRLY on Solana using our website at https://alliecoin.io/swaps, or you can use PayPal to buy $ALLIE directly."
+        ]
+      },
+      {
+        "question": "As a web3 game, how can I collaborate with Allie Coin?",
+        "answer": [
+          "Allie Coin acts as both a growth solution and a gaming event producer for your web3 game. With her reach to over 300,000 followers on Twitch and YouTube, founder Allie (Alliestrasza) can help you reach new gamers in highly impactful ways. And with the Allie Coin treasury, we can co-produce tournaments and other gaming events to help introduce our community to yours. For our holders, Allie Coin unlocks a new world of gaming, and as a web3 game developer, you direct their adventures.",
+          "Take, for example, our collaboration with Splinterlands. Throughout September of 2022, we co-hosted two open tournaments with over $1,500 in prizes, launched a guild for Allie Coin holders, introduced over 200 new players to Splinterlands, and streamed hours of gameplay content from Allie to tens of thousands of live viewers.",
+          "For sponsorship inquiries: https://alliecoin.io/contact"
+        ]
+      },
+      {
+        "question": "Why Solana?",
+        "answer": [
+          "We chose to migrate $ALLIE and our NFTs from the Rally side chain of Ethereum to the Solana blockchain for three primary reasons:",
+          "1) To make $ALLIE and our NFTs easier to earn, buy, and trade\n2) To grow our treasury with $sRLY rewards and grants directly from the Rally Network Association\n3) To improve our ability to collaborate with likeminded communities"
+        ]
       }
     ]
   },
