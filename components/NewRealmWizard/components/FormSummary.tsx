@@ -76,6 +76,7 @@ function CommunityInfo({
   mintAddress,
   transferMintAuthority,
   mintSupplyFactor,
+  communityAbsoluteMaxVoteWeight,
   yesVotePercentage,
   minimumNumberOfTokensToGovern,
   nftInfo,
@@ -90,7 +91,7 @@ function CommunityInfo({
     <>
       <div>
         <Text level="1" className="mt-6">
-          Community info
+          Community Info
         </Text>
       </div>
       {nftIsCommunityToken ? (
@@ -147,6 +148,13 @@ function CommunityInfo({
           <SummaryModule title="Circulation supply factor">
             <Text level="0" className="input-base">
               {mintSupplyFactor}
+            </Text>
+          </SummaryModule>
+        )}
+        {communityAbsoluteMaxVoteWeight && (
+          <SummaryModule title="Absolute max voter weight">
+            <Text level="0" className="input-base">
+              {communityAbsoluteMaxVoteWeight}
             </Text>
           </SummaryModule>
         )}
@@ -250,6 +258,9 @@ export default function WizardSummary({
               tokenInfo={formData.communityTokenInfo}
               transferMintAuthority={formData.transferCommunityMintAuthority}
               mintSupplyFactor={formData.communityMintSupplyFactor}
+              communityAbsoluteMaxVoteWeight={
+                formData.communityAbsoluteMaxVoteWeight
+              }
               yesVotePercentage={formData.communityYesVotePercentage}
               minimumNumberOfTokensToGovern={
                 formData.minimumNumberOfCommunityTokensToGovern

@@ -5,7 +5,6 @@ import ProposalFilter, {
   Filters,
 } from 'components/ProposalFilter'
 import {
-  Governance,
   ProgramAccount,
   Proposal,
   ProposalState,
@@ -31,8 +30,8 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NftVoterClient } from '@solana/governance-program-library'
 import { notify } from '@utils/notifications'
 import { sendSignedTransaction } from '@utils/send'
-import { LOCALNET_REALM_ID as PYTH_LOCALNET_REALM_ID } from 'pyth-staking-api'
-import { hasInstructions } from '@components/ProposalStatusBadge'
+import { compareProposals, filterProposals } from '@utils/proposals'
+import { REALM_ID as PYTH_REALM_ID } from 'pyth-staking-api'
 
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
@@ -49,122 +48,6 @@ const DepositLabel = dynamic(
   () => import('@components/TreasuryAccount/DepositLabel')
 )
 
-const filterProposals = (
-  proposals: [string, ProgramAccount<Proposal>][],
-  filters: Filters
-) => {
-  return proposals.filter(([, proposal]) => {
-    if (
-      !filters.Cancelled &&
-      proposal.account.state === ProposalState.Cancelled
-    ) {
-      return false
-    }
-
-    if (!filters.Completed) {
-      if (proposal.account.state === ProposalState.Completed) {
-        return false
-      }
-
-      if (
-        proposal.account.state === ProposalState.Succeeded &&
-        !hasInstructions(proposal.account)
-      ) {
-        return false
-      }
-    }
-
-    if (
-      !filters.Defeated &&
-      proposal.account.state === ProposalState.Defeated
-    ) {
-      return false
-    }
-
-    if (!filters.Draft && proposal.account.state === ProposalState.Draft) {
-      return false
-    }
-
-    if (!filters.Executable) {
-      if (proposal.account.state === ProposalState.Executing) {
-        return false
-      }
-
-      if (
-        proposal.account.state === ProposalState.Succeeded &&
-        hasInstructions(proposal.account)
-      ) {
-        return false
-      }
-    }
-
-    if (
-      !filters.ExecutingWithErrors &&
-      proposal.account.state === ProposalState.ExecutingWithErrors
-    ) {
-      return false
-    }
-
-    if (
-      !filters.SigningOff &&
-      proposal.account.state === ProposalState.SigningOff
-    ) {
-      return false
-    }
-
-    if (!filters.Voting && proposal.account.state === ProposalState.Voting) {
-      return false
-    }
-
-    return true
-  })
-}
-
-const compareProposals = (
-  p1: Proposal,
-  p2: Proposal,
-  governances: {
-    [governance: string]: ProgramAccount<Governance>
-  }
-) => {
-  const p1Rank = p1.getStateSortRank()
-  const p2Rank = p2.getStateSortRank()
-
-  if (p1Rank > p2Rank) {
-    return 1
-  } else if (p1Rank < p2Rank) {
-    return -1
-  }
-
-  if (p1.state === ProposalState.Voting && p2.state === ProposalState.Voting) {
-    const p1VotingRank = getVotingStateRank(p1, governances)
-    const p2VotingRank = getVotingStateRank(p2, governances)
-
-    if (p1VotingRank > p2VotingRank) {
-      return 1
-    } else if (p1VotingRank < p2VotingRank) {
-      return -1
-    }
-
-    // Show the proposals in voting state expiring earlier at the top
-    return p2.getStateTimestamp() - p1.getStateTimestamp()
-  }
-
-  return p1.getStateTimestamp() - p2.getStateTimestamp()
-}
-
-/// Compares proposals in voting state to distinguish between Voting and Finalizing states
-function getVotingStateRank(
-  proposal: Proposal,
-  governances: {
-    [governance: string]: ProgramAccount<Governance>
-  }
-) {
-  // Show proposals in Voting state before proposals in Finalizing state
-  const governance = governances[proposal.governance.toBase58()].account
-  return proposal.hasVoteTimeEnded(governance) ? 0 : 1
-}
-
 const REALM = () => {
   const pagination = useRef<{ setPage: (val) => void }>(null)
   const {
@@ -175,6 +58,8 @@ const REALM = () => {
     tokenRecords,
     ownVoterWeight,
     ownTokenRecord,
+    councilTokenOwnerRecords,
+    ownCouncilTokenRecord,
     isNftMode,
   } = useRealm()
   const proposalsPerPage = 20
@@ -273,8 +158,16 @@ const REALM = () => {
   const hasCommunityVoteWeight =
     ownTokenRecord &&
     ownVoterWeight.hasMinAmountToVote(ownTokenRecord.account.governingTokenMint)
+  const hasCouncilVoteWeight =
+    ownCouncilTokenRecord &&
+    ownVoterWeight.hasMinAmountToVote(
+      ownCouncilTokenRecord.account.governingTokenMint
+    )
+
   const cantMultiVote =
-    selectedProposals.length === 0 || isMultiVoting || !hasCommunityVoteWeight
+    selectedProposals.length === 0 ||
+    isMultiVoting ||
+    (!hasCommunityVoteWeight && !hasCouncilVoteWeight)
 
   const toggleSelectAll = () => {
     if (allVotingProposalsSelected) {
@@ -304,7 +197,11 @@ const REALM = () => {
       const transactions: Transaction[] = []
       for (let i = 0; i < selectedProposals.length; i++) {
         const selectedProposal = selectedProposals[i]
-        const ownTokenRecord = tokenRecords[wallet.publicKey!.toBase58()]
+        const ownTokenRecord =
+          selectedProposal.proposal.governingTokenMint.toBase58() ===
+          realm.account.communityMint.toBase58()
+            ? tokenRecords[wallet.publicKey!.toBase58()]
+            : councilTokenOwnerRecords[wallet.publicKey!.toBase58()]
 
         const instructions: TransactionInstruction[] = []
 
@@ -372,8 +269,7 @@ const REALM = () => {
     [realm, connected]
   )
   //Todo: move to own components with refactor to dao folder structure
-  const isPyth =
-    realmInfo?.realmId.toBase58() === PYTH_LOCALNET_REALM_ID.toBase58()
+  const isPyth = realmInfo?.realmId.toBase58() === PYTH_REALM_ID.toBase58()
 
   return (
     <>
@@ -400,7 +296,9 @@ const REALM = () => {
               className="whitespace-nowrap"
               disabled={cantMultiVote}
               tooltipMessage={
-                !hasCommunityVoteWeight ? "You don't have voting power" : ''
+                !hasCommunityVoteWeight && !hasCouncilVoteWeight
+                  ? "You don't have voting power"
+                  : ''
               }
               onClick={() => voteOnSelected(YesNoVote.Yes)}
               isLoading={isMultiVoting}
@@ -411,7 +309,9 @@ const REALM = () => {
               className="whitespace-nowrap"
               disabled={cantMultiVote}
               tooltipMessage={
-                !hasCommunityVoteWeight ? "You don't have voting power" : ''
+                !hasCommunityVoteWeight && !hasCouncilVoteWeight
+                  ? "You don't have voting power"
+                  : ''
               }
               onClick={() => voteOnSelected(YesNoVote.No)}
               isLoading={isMultiVoting}

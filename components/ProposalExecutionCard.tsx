@@ -1,4 +1,3 @@
-import { ProgramAccount, ProposalTransaction } from '@solana/spl-governance'
 import classNames from 'classnames'
 import { useEffect, useState, useRef } from 'react'
 import dayjs from 'dayjs'
@@ -12,35 +11,7 @@ import useProposal from '@hooks/useProposal'
 import { ntext } from '@utils/ntext'
 import Button from '@components/Button'
 import { diffTime } from '@components/ProposalRemainingVotingTime'
-
-function parseTransactions(
-  transactions: ProgramAccount<ProposalTransaction>[]
-) {
-  const executed: ProgramAccount<ProposalTransaction>[] = []
-  const ready: ProgramAccount<ProposalTransaction>[] = []
-  const notReady: ProgramAccount<ProposalTransaction>[] = []
-  let minHoldUpTime: number | null = null
-
-  for (const transaction of transactions) {
-    const holdUpTime = transaction.account.holdUpTime
-
-    if (transaction.account.executedAt) {
-      executed.push(transaction)
-    } else if (!holdUpTime || holdUpTime <= 0) {
-      ready.push(transaction)
-    } else {
-      notReady.push(transaction)
-
-      if (holdUpTime) {
-        if (minHoldUpTime === null || holdUpTime < minHoldUpTime) {
-          minHoldUpTime = holdUpTime
-        }
-      }
-    }
-  }
-
-  return { executed, ready, notReady, minHoldUpTime }
-}
+import useProposalTransactions from '@hooks/useProposalTransactions'
 
 interface Props {
   className?: string
@@ -55,28 +26,37 @@ export default function ProposalExecutionCard(props: Props) {
   const timer = useRef<undefined | number>()
 
   const allTransactions = Object.values(instructions)
-  const { executed, ready, notReady, minHoldUpTime } = parseTransactions(
-    allTransactions
+
+  const proposalTransactions = useProposalTransactions(
+    allTransactions,
+    proposal
   )
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && minHoldUpTime) {
+    if (
+      typeof window !== 'undefined' &&
+      proposalTransactions &&
+      proposalTransactions.nextExecuteAt
+    ) {
       timer.current = window.setInterval(() => {
-        const end = dayjs(1000 * (dayjs().unix() + minHoldUpTime))
+        const end = dayjs(1000 * proposalTransactions.nextExecuteAt!)
         setTimeLeft(diffTime(false, dayjs(), end))
       }, 1000)
     }
 
     return () => clearInterval(timer.current)
-  }, [minHoldUpTime])
+  }, [proposalTransactions?.nextExecuteAt])
 
   if (
     allTransactions.length === 0 ||
     !proposal ||
-    allTransactions.length === executed.length
+    !proposalTransactions ||
+    allTransactions.length === proposalTransactions.executed.length
   ) {
     return null
   }
+
+  const { ready, notReady, executed, nextExecuteAt } = proposalTransactions
 
   return (
     <div
@@ -90,7 +70,7 @@ export default function ProposalExecutionCard(props: Props) {
     >
       <div className="flex items-center flex-col">
         <h3 className="mb-0">
-          {minHoldUpTime !== null
+          {nextExecuteAt !== null
             ? 'Execution Hold Up Time'
             : 'Execute Proposal'}
         </h3>

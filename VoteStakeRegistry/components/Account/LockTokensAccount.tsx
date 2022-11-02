@@ -21,7 +21,10 @@ import { DepositWithMintAccount } from 'VoteStakeRegistry/sdk/accounts'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { notify } from '@utils/notifications'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { getTokenOwnerRecordAddress } from '@solana/spl-governance'
+import {
+  getTokenOwnerRecordAddress,
+  GoverningTokenRole,
+} from '@solana/spl-governance'
 import InlineNotification from '@components/InlineNotification'
 import {
   LightningBoltIcon,
@@ -31,6 +34,7 @@ import {
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import Account from './Account'
 import { abbreviateAddress } from '@utils/formatting'
+import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
 
 interface DepositBox {
   mintPk: PublicKey
@@ -213,15 +217,24 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
           <PreviousRouteBtn />
         </div>
         <div className="flex items-center justify-between mb-4">
-          <h1 className="leading-none mb-0">
-            Your Account{' '}
-            <span className="font-normal text-fgd-2 text-xs">
-              ({realmInfo?.displayName})
+          {realmInfo?.ogImage && (
+            <img
+              src={realmInfo?.ogImage}
+              className="mr-2 rouninded-full w-8 h-8"
+            />
+          )}
+          <h1 className="leading-none flex flex-col mb-0">
+            <span className="font-normal text-fgd-2 text-xs mb-2">
+              {realmInfo?.displayName}
             </span>
+            My governance power{' '}
           </h1>
 
           <div className="ml-auto flex flex-row">
-            <DepositCommunityTokensBtn className="mr-3" />
+            <DepositCommunityTokensBtn
+              inAccountDetails={true}
+              className="mr-3"
+            />
             <WithDrawCommunityTokens />
           </div>
         </div>
@@ -371,8 +384,16 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
             onClose={() => setIsLockModalOpen(false)}
           ></LockTokensModal>
         )}
+        <div className="mt-4">
+          <TokenDeposit
+            mint={councilMint}
+            tokenRole={GoverningTokenRole.Council}
+            councilVote={true}
+            inAccountDetails={true}
+          />
+        </div>
       </div>
-      {connected && <Account withHeader={false}></Account>}
+      {connected && <Account withHeader={false} displayPanel={false}></Account>}
     </div>
   )
 }

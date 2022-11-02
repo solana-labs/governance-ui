@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import GovernedAccountsTabs from '@components/GovernedAccountsTabs'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import useRealm from '@hooks/useRealm'
-import { fmtMintAmount } from '@tools/sdk/units'
+import { fmtBNAmount, fmtMintAmount } from '@tools/sdk/units'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import { capitalize } from '@utils/helpers'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
@@ -25,6 +25,7 @@ import StatsView from './components/StatsView'
 import { ExclamationIcon } from '@heroicons/react/outline'
 import Tooltip from '@components/Tooltip'
 import { AccountType } from '@utils/uiTypes/assets'
+import { MintMaxVoteWeightSourceType } from '@solana/spl-governance'
 
 const Params = () => {
   const { realm, mint, config } = useRealm()
@@ -236,7 +237,12 @@ const Params = () => {
                   <AddressField
                     padding
                     label="Community mint max vote weight source"
-                    val={`${communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}%`}
+                    val={`${
+                      communityMintMaxVoteWeightSource.type ===
+                      MintMaxVoteWeightSourceType.SupplyFraction
+                        ? `${communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}%`
+                        : fmtBNAmount(communityMintMaxVoteWeightSource.value)
+                    }`}
                   />
                 )}
                 <AddressField

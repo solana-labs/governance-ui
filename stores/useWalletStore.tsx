@@ -80,7 +80,7 @@ interface WalletStore extends State {
     descriptionLink?: string
     proposalMint?: MintAccount
     loading: boolean
-    tokenType?: GoverningTokenRole
+    tokenRole?: GoverningTokenRole
     proposalOwner: ProgramAccount<TokenOwnerRecord> | undefined
   }
   providerUrl: string | undefined
@@ -512,7 +512,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         Realm
       )
 
-      const tokenType = realm.account.communityMint.equals(
+      const tokenRole = realm.account.communityMint.equals(
         proposal.account.governingTokenMint
       )
         ? GoverningTokenRole.Community
@@ -529,7 +529,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedProposal.chatMessages = accountsToPubkeyMap(chatMessages)
         s.selectedProposal.proposalMint = proposalMint
         s.selectedProposal.loading = false
-        s.selectedProposal.tokenType = tokenType
+        s.selectedProposal.tokenRole = tokenRole
         s.selectedProposal.proposalOwner = proposalOwner
       })
     },

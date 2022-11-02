@@ -2,8 +2,6 @@
 import Button from '@components/Button'
 import Loading from '@components/Loading'
 import NFTSelector from '@components/NFTS/NFTSelector'
-import { ChevronRightIcon } from '@heroicons/react/outline'
-import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import { NftVoterClient } from '@solana/governance-program-library'
 import {
@@ -13,14 +11,21 @@ import {
 } from '@solana/spl-governance'
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { sendTransaction } from '@utils/send'
-import Link from 'next/link'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
-import { useState, useEffect } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
 import { getVoterWeightRecord } from '@utils/plugin/accounts'
+import { FC, useEffect, useState } from 'react'
+import useQueryContext from '@hooks/useQueryContext'
+import Link from 'next/link'
+import { ChevronRightIcon } from '@heroicons/react/outline'
 
-const NftBalanceCard = () => {
+interface Props {
+  inAccountDetails?: boolean
+  showView?: boolean
+}
+
+const NftBalanceCard = ({ inAccountDetails, showView }: Props) => {
   const { fmtUrlWithCluster } = useQueryContext()
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
@@ -108,30 +113,35 @@ const NftBalanceCard = () => {
       getTokenOwnerRecord()
     }
   }, [realm?.pubkey.toBase58(), wallet?.connected])
+
   return (
-    <div className="p-4 rounded-lg bg-bkg-2 md:p-6">
+    <Wrapper inAccountDetails={inAccountDetails}>
       <div className="flex items-center justify-between mb-4">
         <h3 className="mb-0">Your NFTS</h3>
-        <Link
-          href={fmtUrlWithCluster(
-            `/dao/${symbol}/account/${tokenOwnerRecordPk}`
-          )}
-        >
-          <a
-            className={`default-transition flex items-center text-fgd-2 text-sm transition-all hover:text-fgd-3 ${
-              !connected || !tokenOwnerRecordPk
-                ? 'opacity-50 pointer-events-none'
-                : ''
-            }`}
+        {showView && (
+          <Link
+            href={fmtUrlWithCluster(
+              `/dao/${symbol}/account/${tokenOwnerRecordPk}`
+            )}
           >
-            View
-            <ChevronRightIcon className="flex-shrink-0 w-6 h-6" />
-          </a>
-        </Link>
+            <a
+              className={`default-transition flex items-center text-fgd-2 text-sm transition-all hover:text-fgd-3 ${
+                !connected || !tokenOwnerRecordPk
+                  ? 'opacity-50 pointer-events-none'
+                  : ''
+              }`}
+            >
+              View
+              <ChevronRightIcon className="flex-shrink-0 w-6 h-6" />
+            </a>
+          </Link>
+        )}
       </div>
       <div className="space-y-4">
         {!connected ? (
-          <div className="p-3 text-xs bg-bkg-3">Please connect your wallet</div>
+          <div className={'text-xs text-white/50 mt-4'}>
+            Connect your wallet to see your NFTs
+          </div>
         ) : !isLoading ? (
           <NFTSelector
             onNftSelect={() => {
@@ -152,7 +162,16 @@ const NftBalanceCard = () => {
           Join
         </Button>
       )}
-    </div>
+    </Wrapper>
   )
 }
+
+const Wrapper: FC<Props> = ({ children, inAccountDetails }) => {
+  if (inAccountDetails) {
+    return <div className="space-y-4 w-1/2">{children}</div>
+  } else {
+    return <>{children}</>
+  }
+}
+
 export default NftBalanceCard

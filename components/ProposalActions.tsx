@@ -18,6 +18,7 @@ import { ProgramAccount } from '@solana/spl-governance'
 import { cancelProposal } from 'actions/cancelProposal'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 
 const ProposalActionsPanel = () => {
   const { governance, proposal, proposalOwner } = useWalletStore(
@@ -31,8 +32,12 @@ const ProposalActionsPanel = () => {
   const connection = useWalletStore((s) => s.connection)
   const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
   const [signatoryRecord, setSignatoryRecord] = useState<any>(undefined)
-  const maxVoterWeight =
-    useNftPluginStore((s) => s.state.maxVoteRecord)?.pubkey || undefined
+  const nftMaxVoterWeight = useNftPluginStore((s) => s.state.maxVoteRecord)
+    ?.pubkey
+  const votePLuginsClientMaxVoterWeight = useVotePluginsClientStore(
+    (s) => s.state.maxVoterWeight
+  )
+  const maxVoterWeight = nftMaxVoterWeight || votePLuginsClientMaxVoterWeight
   const canFinalizeVote =
     hasVoteTimeExpired && proposal?.account.state === ProposalState.Voting
 
@@ -54,7 +59,7 @@ const ProposalActionsPanel = () => {
     }
 
     setup()
-  }, [proposal, realmInfo, walletPk])
+  }, [proposal?.pubkey.toBase58(), realmInfo?.symbol, walletPk?.toBase58()])
 
   const canSignOff =
     signatoryRecord &&

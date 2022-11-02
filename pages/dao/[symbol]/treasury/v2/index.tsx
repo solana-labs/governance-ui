@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { pipe } from 'fp-ts/function'
 
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import TotalValueTitle from '@components/treasuryV2/TotalValueTitle'
@@ -20,10 +21,10 @@ export default function Treasury() {
   const observer = useRef<IntersectionObserver | null>(null)
 
   useEffect(() => {
-    if (data.status === Status.Ok && !selectedWallet) {
+    if (data._tag === Status.Ok && !selectedWallet) {
       setSelectedWallet(data.data.wallets[0])
     }
-  }, [data.status])
+  }, [data._tag])
 
   useEffect(() => {
     if (stickyTracker.current) {
@@ -46,22 +47,28 @@ export default function Treasury() {
       <header className="space-y-6 border-b border-white/10 pb-4">
         <PreviousRouteBtn />
         <TotalValueTitle
-          data={map(data, (data) => ({
-            realm: {
-              icon: data.icon,
-              name: data.name,
-            },
-            value: data.totalValue,
-          }))}
+          data={pipe(
+            data,
+            map((data) => ({
+              realm: {
+                icon: data.icon,
+                name: data.name,
+              },
+              value: data.totalValue,
+            }))
+          )}
         />
       </header>
       <article className="grid grid-cols-[458px_1fr] flex-grow gap-x-4">
         <WalletList
           className="w-full pt-9"
-          data={map(data, (data) => ({
-            auxiliaryWallets: data.auxiliaryWallets,
-            wallets: data.wallets,
-          }))}
+          data={pipe(
+            data,
+            map((data) => ({
+              auxiliaryWallets: data.auxiliaryWallets,
+              wallets: data.wallets,
+            }))
+          )}
           selectedAsset={selectedAsset}
           selectedWallet={selectedWallet}
           onSelectAsset={(asset, wallet) => {
@@ -82,10 +89,10 @@ export default function Treasury() {
             />
             <Details
               className="pt-4"
-              data={map(data, () => ({
+              data={map(() => ({
                 asset: selectedAsset,
                 wallet: selectedWallet,
-              }))}
+              }))(data)}
               isStickied={isStickied}
             />
           </div>

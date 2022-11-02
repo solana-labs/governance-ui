@@ -26,7 +26,7 @@ interface Data {
 
 export default function useTreasuryInfo(): Result<Data> {
   const { realmInfo, realm, mint, councilMint, config } = useRealm()
-  const connection = useWalletStore((s) => s.connection.current)
+  const connection = useWalletStore((s) => s.connection)
   const accounts = useGovernanceAssetsStore((s) => s.assetAccounts)
   const loadingGovernedAccounts = useGovernanceAssetsStore(
     (s) => s.loadGovernedAccounts
@@ -83,7 +83,7 @@ export default function useTreasuryInfo(): Result<Data> {
         realmInfo
       )
     }
-  }, [accounts, nfts, nftsLoading, realmInfo])
+  }, [accounts, nfts, nftsLoading, realmInfo, connection.current.rpcEndpoint])
 
   useEffect(() => {
     setBuildingWallets(true)
@@ -100,12 +100,12 @@ export default function useTreasuryInfo(): Result<Data> {
 
   if (!realmInfo || loadingGovernedAccounts || nftsLoading || buildingWallets) {
     return {
-      status: Status.Pending,
+      _tag: Status.Pending,
     }
   }
 
   return {
-    status: Status.Ok,
+    _tag: Status.Ok,
     data: {
       wallets,
       auxiliaryWallets: auxWallets,

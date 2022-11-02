@@ -19,7 +19,7 @@ export default function Activity(props: Props) {
   const activity = useAccountActivity(props.assets.map((a) => a.address))
   const cluster = useWalletStore((s) => s.connection.cluster)
 
-  switch (activity.status) {
+  switch (activity._tag) {
     case Status.Failed:
       return (
         <div className={props.className}>
@@ -76,7 +76,7 @@ export default function Activity(props: Props) {
                 No activity
               </div>
             )}
-            {activity.data.map((item) => (
+            {activity.data.map((item, i) => (
               <a
                 className={cx(
                   'border-white/30',
@@ -88,7 +88,7 @@ export default function Activity(props: Props) {
                   'px-4',
                   'rounded-md'
                 )}
-                key={item.signature}
+                key={item.signature + i}
                 href={
                   item.signature
                     ? getExplorerUrl(cluster, item.signature, 'tx')

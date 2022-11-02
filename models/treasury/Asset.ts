@@ -1,10 +1,19 @@
 import type { BigNumber } from 'bignumber.js'
-import type { MintMaxVoteWeightSource } from '@solana/spl-governance'
+import type {
+  Governance,
+  MintMaxVoteWeightSource,
+  ProgramAccount,
+  Realm,
+  TokenOwnerRecord,
+} from '@solana/spl-governance'
 
 import type { AssetAccount } from '@utils/uiTypes/assets'
 
 import { NFT } from './NFT'
 import { Program } from './Program'
+import { TokenProgramAccount } from '@utils/tokens'
+import { MintInfo } from '@solana/spl-token'
+import { PublicKey } from '@solana/web3.js'
 
 export enum AssetType {
   Mint,
@@ -14,6 +23,7 @@ export enum AssetType {
   Sol,
   Token,
   Unknown,
+  TokenOwnerRecordAsset,
 }
 
 export interface Mint {
@@ -23,7 +33,7 @@ export interface Mint {
   name: string
   raw: AssetAccount
   symbol: string
-  tokenType?: 'council' | 'community'
+  tokenRole?: 'council' | 'community'
   totalSupply?: BigNumber
 }
 
@@ -52,8 +62,8 @@ export interface RealmAuthority {
   config: {
     communityMintMaxVoteWeightSource?: MintMaxVoteWeightSource
     minCommunityTokensToCreateGovernance: BigNumber
-    useCommunityVoterWeightAddin?: boolean
-    useMaxCommunityVoterWeightAddin?: boolean
+    useCommunityVoterWeightAddin?: PublicKey | false
+    useMaxCommunityVoterWeightAddin?: PublicKey | false
   }
   icon: JSX.Element
   name: string
@@ -94,6 +104,22 @@ export interface Unknown {
   name: string
 }
 
+export interface TokenOwnerRecordAsset {
+  type: AssetType.TokenOwnerRecordAsset
+  id: string
+  address: PublicKey
+  owner: PublicKey
+  realmId: string
+  realmSymbol: string
+  displayName: string
+  programId: string
+  realmImage?: string
+  communityMint: TokenProgramAccount<MintInfo>
+  realmAccount: ProgramAccount<Realm>
+  tokenOwnerRecordAccount: ProgramAccount<TokenOwnerRecord>
+  governanceOwner: ProgramAccount<Governance>
+}
+
 export type Asset =
   | Mint
   | NFTCollection
@@ -102,3 +128,4 @@ export type Asset =
   | Sol
   | Token
   | Unknown
+  | TokenOwnerRecordAsset

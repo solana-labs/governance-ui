@@ -1,9 +1,4 @@
-import {
-  Keypair,
-  PublicKey,
-  Transaction,
-  TransactionInstruction,
-} from '@solana/web3.js'
+import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js'
 
 import {
   getGovernanceProgramVersion,
@@ -19,12 +14,11 @@ import {
 import { RpcContext } from '@solana/spl-governance'
 import { withInsertTransaction } from '@solana/spl-governance'
 import { InstructionData } from '@solana/spl-governance'
-import { sendTransaction } from 'utils/send'
 import { withSignOffProposal } from '@solana/spl-governance'
 import {
-  sendTransactionsV2,
+  sendTransactionsV3,
   SequenceType,
-  transactionInstructionsToTypedInstructionsSets,
+  txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
 import { chunks } from '@utils/helpers'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
@@ -84,7 +78,6 @@ export const createProposal = async (
   const governanceAuthority = walletPubkey
   const signatory = walletPubkey
   const payer = walletPubkey
-  const notificationTitle = isDraft ? 'proposal draft' : 'proposal'
   const prerequisiteInstructions: TransactionInstruction[] = []
   const prerequisiteInstructionsSigners: Keypair[] = []
   // sum up signers
@@ -156,6 +149,7 @@ export const createProposal = async (
   const splitToChunkByDefault = instructionsData.filter(
     (x) => x.chunkSplitByDefault
   ).length
+
   const chunkBys = instructionsData
     .filter((x) => x.chunkBy)
     .map((x) => x.chunkBy!)
@@ -204,32 +198,9 @@ export const createProposal = async (
       undefined
     )
   }
-
-  if (shouldSplitIntoSeparateTxs) {
-    const transaction1 = new Transaction()
-    const transaction2 = new Transaction()
-
-    transaction1.add(...prerequisiteInstructions, ...instructions)
-    transaction2.add(...insertInstructions)
-
-    await sendTransaction({
-      transaction: transaction1,
-      wallet,
-      connection,
-      signers,
-      sendingMessage: `creating ${notificationTitle}`,
-      successMessage: `${notificationTitle} created`,
-    })
-    await sendTransaction({
-      transaction: transaction2,
-      wallet,
-      connection,
-      signers: undefined,
-      sendingMessage: `inserting into ${notificationTitle}`,
-      successMessage: `inserted into ${notificationTitle}`,
-    })
-  } else if (
+  if (
     insertInstructionCount <= 2 &&
+    !shouldSplitIntoSeparateTxs &&
     !splitToChunkByDefault &&
     !(client?.client instanceof NftVoterClient)
   ) {
@@ -239,45 +210,70 @@ export const createProposal = async (
     // We merge instructions with prerequisiteInstructions
     // Prerequisite  instructions can came from instructions as something we need to do before instruction can be executed
     // For example we create ATAs if they don't exist as part of the proposal creation flow
+    const signersSet = [[], [], signers]
+    const txes = [
+      prerequisiteInstructions,
+      instructions,
+      insertInstructions,
+    ].map((txBatch, batchIdx) => {
+      return {
+        instructionsSet: txBatchesToInstructionSetWithSigners(
+          txBatch,
+          signersSet,
+          batchIdx
+        ),
+        sequenceType: SequenceType.Sequential,
+      }
+    })
 
-    await sendTransactionsV2({
-      wallet,
+    await sendTransactionsV3({
       connection,
-      signersSet: [[], [], signers],
-      showUiComponent: true,
-      TransactionInstructions: [
-        prerequisiteInstructions,
-        instructions,
-        insertInstructions,
-      ].map((x) =>
-        transactionInstructionsToTypedInstructionsSets(
-          x,
-          SequenceType.Sequential
-        )
-      ),
+      wallet,
+      transactionInstructions: txes,
     })
   } else {
     const insertChunks = chunks(insertInstructions, chunkBy)
     const signerChunks = Array(insertChunks.length)
     signerChunks.push(...chunks(signers, chunkBy))
     signerChunks.fill([])
-
-    console.log(`Creating proposal using ${insertChunks.length} chunks`)
-    await sendTransactionsV2({
-      wallet,
-      connection,
-      signersSet: [[...prerequisiteInstructionsSigners], [], ...signerChunks],
-      showUiComponent: true,
-      TransactionInstructions: [
-        prerequisiteInstructions,
-        instructions,
-        ...insertChunks,
-      ].map((x) =>
-        transactionInstructionsToTypedInstructionsSets(
-          x,
-          SequenceType.Sequential
+    const deduplicatedPrerequisiteInstructions = prerequisiteInstructions.filter(
+      (value, index, self) =>
+        index ===
+        self.findIndex(
+          (t) =>
+            t.data.toString() === value.data.toString() &&
+            t.keys.every((x) =>
+              value.keys.find(
+                (key) => key.pubkey.toBase58() === x.pubkey.toBase58()
+              )
+            )
         )
-      ),
+    )
+
+    const signersSet = [
+      ...chunks([...prerequisiteInstructionsSigners], 5),
+      [],
+      ...signerChunks,
+    ]
+    const txes = [
+      ...chunks(deduplicatedPrerequisiteInstructions, 5),
+      instructions,
+      ...insertChunks,
+    ].map((txBatch, batchIdx) => {
+      return {
+        instructionsSet: txBatchesToInstructionSetWithSigners(
+          txBatch,
+          signersSet,
+          batchIdx
+        ),
+        sequenceType: SequenceType.Sequential,
+      }
+    })
+
+    await sendTransactionsV3({
+      connection,
+      wallet,
+      transactionInstructions: txes,
     })
   }
 

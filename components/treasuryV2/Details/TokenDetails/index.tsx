@@ -8,6 +8,8 @@ import Header from './Header'
 import Investments from './Investments'
 import Activity from './Activity'
 import StickyScrolledContainer from '../StickyScrolledContainer'
+//import Auction from './Auction'
+//import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 
 interface Props {
   asset: Token | Sol
@@ -18,6 +20,17 @@ interface Props {
 }
 
 export default function TokenDetails(props: Props) {
+  {
+    /* Do not remove hidden until release */
+  }
+  //const assetAccounts = useGovernanceAssetsStore((s) => s.assetAccounts)
+  //   const isOwnedBySolAccounts = assetAccounts
+  //     .filter((x) => x.isSol)
+  //     .find(
+  //       (x) =>
+  //         x.extensions.transferAddress?.toBase58() ===
+  //         props.asset.raw.extensions.token?.account.owner.toBase58()
+  //     )
   return (
     <div className={cx(props.className, 'rounded', 'overflow-hidden')}>
       <StickyScrolledContainer
@@ -29,10 +42,15 @@ export default function TokenDetails(props: Props) {
           {props.governanceAddress && (
             <Investments
               asset={props.asset}
+              wallet={props.wallet}
               className="mb-10"
               governanceAddress={props.governanceAddress}
             />
           )}
+          {/* Do not remove hidden until release */}
+          {/* {props.asset.type === AssetType.Token && isOwnedBySolAccounts && (
+            <Auction asset={props.asset} className="mb-10" />
+          )} */}
           <Activity assets={[props.asset]} />
         </section>
       </StickyScrolledContainer>

@@ -24,6 +24,7 @@ import {
 import Switch from './Switch'
 import { TwitterIcon } from './icons'
 import { notify } from '@utils/notifications'
+import { Profile } from '@components/Profile'
 
 const StyledWalletProviderLabel = styled.p`
   font-size: 0.65rem;
@@ -216,6 +217,14 @@ const ConnectWalletButton = (props) => {
                   </Menu.Item>
                   {current && current.publicKey && (
                     <>
+                      <hr
+                        className={`border border-fgd-3 opacity-50 mt-2 mb-2`}
+                      ></hr>
+                      <Menu.Item key={'profile'}>
+                        <div className="p-2">
+                          <Profile />
+                        </div>
+                      </Menu.Item>
                       <hr
                         className={`border border-fgd-3 opacity-50 mt-2 mb-2`}
                       ></hr>

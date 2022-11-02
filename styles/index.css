@@ -55,7 +55,7 @@
 }
 
 body {
-  @apply text-base tracking-wide bg-bkg-1 text-fgd-1 font-body;
+  @apply text-base tracking-wide font-body;
 }
 
 h1 {
@@ -169,6 +169,10 @@ body::-webkit-scrollbar-corner {
 }
 .thin-scroll::-webkit-scrollbar-thumb:window-inactive {
   background: var(--bkg-4);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 .pointer {

@@ -1,13 +1,13 @@
 import type { BigNumber } from 'bignumber.js'
 import type { Connection } from '@solana/web3.js'
 import type { MangoAccount } from '@blockworks-foundation/mango-client'
-
 import { MarketStore } from 'Strategies/store/marketStore'
 import { TreasuryStrategy } from 'Strategies/types/types'
-
 import loadMangoStrategies from './loadMangoStrategies'
 import loadSolendStrategies from './loadSolendStrategies'
 import loadEverlendStrategies from './loadEverlendStrategies'
+import { PublicKey } from '@solana/web3.js'
+import { Wallet } from '@models/treasury/Wallet'
 
 export default function loadData(args: {
   connection: Connection
@@ -19,6 +19,8 @@ export default function loadData(args: {
   strategies: TreasuryStrategy[]
   strategyMintAddress: string
   tokenAddress: string
+  owner?: PublicKey
+  wallet?: Wallet
   tokenAmount: BigNumber
 }): Promise<(TreasuryStrategy & { investedAmount?: number })[]> {
   return Promise.all([

@@ -1,7 +1,10 @@
 import { MintInfo } from '@solana/spl-token'
 import BN from 'bn.js'
 import { BigNumber } from 'bignumber.js'
-import { MintMaxVoteWeightSource } from '@solana/spl-governance'
+import {
+  MintMaxVoteWeightSource,
+  MintMaxVoteWeightSourceType,
+} from '@solana/spl-governance'
 
 export function calculateMintMaxVoteWeight(
   mint: MintInfo,
@@ -11,11 +14,16 @@ export function calculateMintMaxVoteWeight(
     return mint.supply as BN
   }
 
-  const supplyFraction = maxVoteWeightSource.getSupplyFraction()
+  if (maxVoteWeightSource.type === MintMaxVoteWeightSourceType.SupplyFraction) {
+    const supplyFraction = maxVoteWeightSource.getSupplyFraction()
 
-  const maxVoteWeight = new BigNumber(supplyFraction.toString())
-    .multipliedBy(mint.supply.toString())
-    .shiftedBy(-MintMaxVoteWeightSource.SUPPLY_FRACTION_DECIMALS)
+    const maxVoteWeight = new BigNumber(supplyFraction.toString())
+      .multipliedBy(mint.supply.toString())
+      .shiftedBy(-MintMaxVoteWeightSource.SUPPLY_FRACTION_DECIMALS)
 
-  return new BN(maxVoteWeight.dp(0, BigNumber.ROUND_DOWN).toString())
+    return new BN(maxVoteWeight.dp(0, BigNumber.ROUND_DOWN).toString())
+  } else {
+    // absolute value
+    return maxVoteWeightSource.value
+  }
 }

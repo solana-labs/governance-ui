@@ -22,7 +22,7 @@ import Tooltip from '@components/Tooltip'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import Address from '@components/Address'
 
-import Section from './Section'
+import Section from '../../../Section'
 import TokenIcon from '../../../../icons/TokenIcon'
 
 const UNIX_SECOND = 1

@@ -282,7 +282,7 @@ const DelegateCard = () => {
       ) : (
         <div className="text-sm text-th-fgd-1 flex flex-row items-center justify-between mt-4">
           {wallet && wallet.publicKey
-            ? 'Gain a governance token for this realm to delegate'
+            ? 'Gain a governance token for this dao to delegate'
             : 'Connect wallet to delegate'}
         </div>
       )}

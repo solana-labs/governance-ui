@@ -42,10 +42,7 @@ export default function OtherAssetsList(props: Props) {
             return (
               <MintListItem
                 key={i}
-                tokenName={asset.name}
-                tokenSymbol={asset.symbol}
-                tokenType={asset.tokenType}
-                totalSupply={asset.totalSupply}
+                mint={asset}
                 selected={props.selectedAssetId === asset.id}
                 onSelect={() => props.onSelect?.(asset)}
               />

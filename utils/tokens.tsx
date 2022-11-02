@@ -14,7 +14,10 @@ import {
   Token,
   u64,
 } from '@solana/spl-token'
-import { MintMaxVoteWeightSource } from '@solana/spl-governance'
+import {
+  MintMaxVoteWeightSource,
+  MintMaxVoteWeightSourceType,
+} from '@solana/spl-governance'
 import { chunks } from './helpers'
 import { getAccountName, WSOL_MINT } from '@components/instructions/tools'
 import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
@@ -92,7 +95,11 @@ export async function tryGetMint(
       account,
     }
   } catch (ex) {
-    console.error(`Can't fetch mint ${publicKey?.toBase58()}`, ex)
+    console.error(
+      `Can't fetch mint ${publicKey?.toBase58()} @ ${connection.rpcEndpoint}`,
+      ex
+    )
+    return undefined
   }
 }
 
@@ -389,6 +396,7 @@ const fetchNftsFromHolaplexIndexer = async (owner: PublicKey) => {
               mintAddress
               address
               image
+              tokenAccountAddress
               updateAuthorityAddress
               collection {
                 creators {
@@ -416,10 +424,10 @@ export const getNfts = async (
   ownerPk: PublicKey,
   connection: ConnectionContext
 ): Promise<NFTWithMeta[]> => {
-  if (connection.cluster === 'devnet') {
-    return await getDevnetNfts(ownerPk, connection.current)
-  } else {
+  if (connection.cluster === 'mainnet') {
     return await getMainnetNfts(ownerPk, connection.current)
+  } else {
+    return await getDevnetNfts(ownerPk, connection.current)
   }
 }
 
@@ -503,24 +511,7 @@ const getMainnetNfts = async (
       return {
         ...nft,
         getAssociatedTokenAccount: async () => {
-          //   const accounts = await getOwnedTokenAccounts(connection, ownerPk)
-
-          //   for (const account of accounts) {
-          //     if (account.account.mint.toBase58() === nft.mintAddress) {
-          //       return account.publicKey.toBase58()
-          //     }
-          //   }
-
-          //   throw new Error('Could not find associated token account')
-          const ata = await Token.getAssociatedTokenAddress(
-            ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-            TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-            new PublicKey(nft.mintAddress), // mint
-            ownerPk, // owner
-            true
-          )
-
-          return ata.toBase58()
+          return nft.tokenAccountAddress
         },
       }
     })
@@ -543,6 +534,7 @@ export const parseMintSupplyFraction = (fraction: string) => {
     .toNumber()
 
   return new MintMaxVoteWeightSource({
+    type: MintMaxVoteWeightSourceType.SupplyFraction,
     value: new BN(fractionValue),
   })
 }

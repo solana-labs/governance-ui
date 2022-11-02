@@ -42,12 +42,6 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
     onClick()
   }, [onClick])
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      onClick()
-    }
-  }, [isAuthenticated])
-
   const handleUnsubscribe = useCallback(
     async (source: Source) => {
       if (isLoading) {
@@ -92,7 +86,7 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
         if (alertResult) {
           if (alertResult.targetGroup?.telegramTargets?.length > 0) {
             const target = alertResult.targetGroup?.telegramTargets[0]
-            if (target && !target.isConfirmed) {
+            if (target && target.isConfirmed === false) {
               if (target.confirmationUrl) {
                 window.open(target.confirmationUrl)
               }
@@ -161,15 +155,23 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
             onClick={onClose}
           />
         </div>
-        <p className="text-md py-0.5">{email}</p>
-        <p className="text-md py-0.5">{phoneNumber}</p>
-        {telegramEnabled && <p className="py-0.5 pb-2">{telegram}</p>}
-        <div
-          className="text-primary-light cursor-pointer mb-4 font-medium"
-          onClick={handleEdit}
-        >
-          Edit Information
-        </div>
+        {data && data?.sources?.length > 0 ? (
+          <div className="flex flex-col">
+            <p className="text-md py-0.5">{email}</p>
+            <p className="text-md py-0.5">{phoneNumber}</p>
+            {telegramEnabled && <p className="py-0.5 pb-2">{telegram}</p>}
+            <div
+              className="text-primary-light cursor-pointer mb-4 font-medium"
+              onClick={handleEdit}
+            >
+              Edit Information
+            </div>
+          </div>
+        ) : (
+          <div className="flex">
+            <p className="text-md">No governance memberships found</p>
+          </div>
+        )}
       </div>
       {notificationsToggle && notificationsToggle.length >= 1 ? (
         <div className="w-full max-h-96 text-secondary-grey flex flex-col overflow-y-auto px-6 py-4">

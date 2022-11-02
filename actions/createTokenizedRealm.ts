@@ -1,10 +1,10 @@
 import { Connection, PublicKey } from '@solana/web3.js'
 
 import {
-  sendTransactionsV2,
-  transactionInstructionsToTypedInstructionsSets,
   SequenceType,
   WalletSigner,
+  txBatchesToInstructionSetWithSigners,
+  sendTransactionsV3,
 } from 'utils/sendTransactions'
 import { chunks } from '@utils/helpers'
 
@@ -21,7 +21,10 @@ interface TokenizedRealm {
   communityYesVotePercentage: number
   existingCommunityMintPk: PublicKey | undefined
   transferCommunityMintAuthority: boolean | undefined
+
+  useSupplyFactor: boolean
   communityMintSupplyFactor: number | undefined
+  communityAbsoluteMaxVoteWeight: number | undefined
 
   createCouncil: boolean
   existingCouncilMintPk: PublicKey | undefined
@@ -36,10 +39,13 @@ export default async function createTokenizedRealm({
   realmName,
   tokensToGovernThreshold,
 
+  communityYesVotePercentage,
   existingCommunityMintPk,
   transferCommunityMintAuthority = true,
-  communityYesVotePercentage,
+
+  useSupplyFactor,
   communityMintSupplyFactor: rawCMSF,
+  communityAbsoluteMaxVoteWeight,
 
   createCouncil = false,
   existingCouncilMintPk,
@@ -65,9 +71,12 @@ export default async function createTokenizedRealm({
     tokensToGovernThreshold,
 
     existingCommunityMintPk,
-    communityMintSupplyFactor: rawCMSF,
     transferCommunityMintAuthority,
     communityYesVotePercentage,
+
+    useSupplyFactor,
+    communityMintSupplyFactor: rawCMSF,
+    communityAbsoluteMaxVoteWeight,
 
     createCouncil,
     existingCouncilMintPk,
@@ -82,25 +91,31 @@ export default async function createTokenizedRealm({
       []
     )
     console.log('CREATE GOV TOKEN REALM: sending transactions')
-    const tx = await sendTransactionsV2({
+
+    const signers = [
+      mintsSetupSigners,
+      ...councilMembersSignersChunks,
+      realmSigners,
+    ]
+    const txes = [
+      mintsSetupInstructions,
+      ...councilMembersChunks,
+      realmInstructions,
+    ].map((txBatch, batchIdx) => {
+      return {
+        instructionsSet: txBatchesToInstructionSetWithSigners(
+          txBatch,
+          signers,
+          batchIdx
+        ),
+        sequenceType: SequenceType.Sequential,
+      }
+    })
+
+    const tx = await sendTransactionsV3({
       connection,
-      showUiComponent: true,
       wallet,
-      signersSet: [
-        mintsSetupSigners,
-        ...councilMembersSignersChunks,
-        realmSigners,
-      ],
-      TransactionInstructions: [
-        mintsSetupInstructions,
-        ...councilMembersChunks,
-        realmInstructions,
-      ].map((x) =>
-        transactionInstructionsToTypedInstructionsSets(
-          x,
-          SequenceType.Sequential
-        )
-      ),
+      transactionInstructions: txes,
     })
 
     return {

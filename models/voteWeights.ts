@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js'
 import {
   GovernanceConfig,
   MintMaxVoteWeightSource,
+  MintMaxVoteWeightSourceType,
   Proposal,
   Realm,
   TokenOwnerRecord,
@@ -559,13 +560,18 @@ export function getMintMaxVoteWeight(
     return mint.supply
   }
 
-  const supplyFraction = maxVoteWeightSource.getSupplyFraction()
+  if (maxVoteWeightSource.type === MintMaxVoteWeightSourceType.SupplyFraction) {
+    const supplyFraction = maxVoteWeightSource.getSupplyFraction()
 
-  const maxVoteWeight = new BigNumber(supplyFraction.toString())
-    .multipliedBy(mint.supply.toString())
-    .shiftedBy(-MintMaxVoteWeightSource.SUPPLY_FRACTION_DECIMALS)
+    const maxVoteWeight = new BigNumber(supplyFraction.toString())
+      .multipliedBy(mint.supply.toString())
+      .shiftedBy(-MintMaxVoteWeightSource.SUPPLY_FRACTION_DECIMALS)
 
-  return new BN(maxVoteWeight.dp(0, BigNumber.ROUND_DOWN).toString())
+    return new BN(maxVoteWeight.dp(0, BigNumber.ROUND_DOWN).toString())
+  } else {
+    // absolute value
+    return maxVoteWeightSource.value
+  }
 }
 
 /// Returns max vote weight for a proposal

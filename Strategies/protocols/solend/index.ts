@@ -141,15 +141,23 @@ export async function getReserveData(
   reserveIds: Array<string>
 ): Promise<Array<ReserveStat>> {
   if (!reserveIds.length) return []
-  const stats = (
-    await (
-      await axios.get(
-        `${SOLEND_ENDPOINT}/v1/reserves?ids=${reserveIds.join(',')}`
-      )
-    ).data
-  ).results as Array<ReserveStat>
 
-  return stats
+  const res = reserveIds.flat().reduce((acc, _curr, i) => {
+    if (!(i % 50)) {
+      acc.push(reserveIds.flat().slice(i, i + 50))
+    }
+    return acc
+  }, [] as string[][])
+
+  const stats = await Promise.all(
+    res.map((reserveIds) =>
+      axios.get(`${SOLEND_ENDPOINT}/v1/reserves?ids=${reserveIds.join(',')}`)
+    )
+  )
+
+  return (await Promise.all(stats.map((stat) => stat.data))).flatMap(
+    (stat) => stat.results
+  )
 }
 
 export function cTokenExchangeRate(reserve: ReserveStat) {
@@ -163,18 +171,12 @@ export function cTokenExchangeRate(reserve: ReserveStat) {
 
 export async function getReserve(): Promise<Config> {
   return await (
-    await axios.get(`${SOLEND_ENDPOINT}/v1/markets/configs?scope=solend`)
-  ).data
-}
-
-export async function getConfig(): Promise<Config> {
-  return await (
-    await axios.get(`${SOLEND_ENDPOINT}/v1/markets/configs?scope=solend`)
+    await axios.get(`${SOLEND_ENDPOINT}/v1/markets/configs?scope=all`)
   ).data
 }
 
 export async function getReserves(): Promise<Config[0]['reserves']> {
-  const config = await getConfig()
+  const config = await getReserve()
   const reserves = config.flatMap((market) =>
     market.reserves.map((reserve) => ({
       marketName: market.name,
@@ -193,7 +195,7 @@ export async function getSolendStrategies() {
   const strats: SolendStrategy[] = []
 
   // method to fetch solend strategies
-  const config = await getConfig()
+  const config = await getReserve()
   const reserves = config.flatMap((market) =>
     market.reserves.map((reserve) => ({
       marketName: market.name,
@@ -334,7 +336,7 @@ async function handleSolendAction(
     const withdrawAccountInfo = await connection.current.getAccountInfo(
       liquidityATA
     )
-    if (!withdrawAccountInfo) {
+    if (!withdrawAccountInfo && !isSol) {
       // generate the instruction for creating the ATA
       createAtaInst = Token.createAssociatedTokenAccountInstruction(
         ASSOCIATED_TOKEN_PROGRAM_ID,

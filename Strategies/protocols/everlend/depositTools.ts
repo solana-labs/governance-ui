@@ -17,7 +17,6 @@ import { GeneralPoolsProgram } from '@everlend/general-pool'
 import {
   CreateAssociatedTokenAccount,
   findAssociatedTokenAccount,
-  findRegistryPoolConfigAccount,
 } from '@everlend/common'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -46,8 +45,9 @@ import {
   REGISTRY_MAIN,
   REWARD_PROGRAM_ID,
 } from './constants'
-import { getInitMiningTx } from './useRewardProgram'
+import { getInitMiningTx } from './useInitMining'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
+import { syncNative } from '@solendprotocol/solend-sdk'
 
 export type ActionOptions = {
   /** the JSON RPC connection instance. */
@@ -59,6 +59,7 @@ export type ActionOptions = {
 export type ActionResult = {
   /** the prepared transaction, ready for signing and sending. */
   tx: Transaction
+  setupIxs: TransactionInstruction[]
   /** the additional key pairs which may be needed for signing and sending transactions. */
   keypairs?: Record<string, Keypair>
 }
@@ -84,7 +85,11 @@ export const prepareSolDepositTx = async (
   ])
 
   const tx = new Transaction()
-  const registryPoolConfig = await findRegistryPoolConfigAccount(registry, pool)
+  const setupIxs: TransactionInstruction[] = []
+  const poolConfig = await GeneralPoolsProgram.findProgramAddress([
+    Buffer.from('config'),
+    pool.toBuffer(),
+  ])
 
   // Wrapping SOL
   const depositAccountInfo = await connection.getAccountInfo(source)
@@ -98,7 +103,7 @@ export const prepareSolDepositTx = async (
       payerPublicKey,
       payerPublicKey
     )
-    tx.add(createAtaInst)
+    setupIxs.push(createAtaInst)
   }
 
   const userWSOLAccountInfo = await connection.getAccountInfo(destination)
@@ -111,31 +116,30 @@ export const prepareSolDepositTx = async (
     lamports: (userWSOLAccountInfo ? 0 : rentExempt) + amount.toNumber(),
   })
 
-  tx.add(transferLamportsIx)
+  setupIxs.push(transferLamportsIx)
 
-  // const syncIx = syncNative(source)
-  // tx.add(syncIx)
+  const syncIx = syncNative(source)
+  tx.add(syncIx)
 
   // Create destination account for pool mint if doesn't exist
   destination =
     destination ?? (await findAssociatedTokenAccount(payerPublicKey, poolMint))
   !(await connection.getAccountInfo(destination)) &&
-    tx.add(
+    setupIxs.push(
       new CreateAssociatedTokenAccount(
         { feePayer: payerPublicKey },
         {
           associatedTokenAddress: destination,
           tokenMint: poolMint,
         }
-      )
+      ).instructions[0]
     )
 
   tx.add(
     new DepositTx(
       { feePayer: payerPublicKey },
       {
-        registryPoolConfig,
-        registry,
+        poolConfig,
         poolMarket,
         pool,
         source,
@@ -144,15 +148,13 @@ export const prepareSolDepositTx = async (
         poolMint,
         rewardPool,
         rewardAccount,
-        config,
-        rewardProgramId,
         poolMarketAuthority,
         amount,
       }
     )
   )
 
-  return { tx }
+  return { tx, setupIxs }
 }
 
 export async function handleEverlendAction(
@@ -185,7 +187,7 @@ export async function handleEverlendAction(
   const REGISTRY = new PublicKey(isMainnet ? REGISTRY_MAIN : REGISTRY_DEV)
   const CONFIG = new PublicKey(isMainnet ? CONFIG_MAINNET : CONFIG_DEVNET)
 
-  const ctokenATA = isSol
+  const liquidityATA = isSol
     ? await Token.getAssociatedTokenAddress(
         ASSOCIATED_TOKEN_PROGRAM_ID,
         TOKEN_PROGRAM_ID,
@@ -195,7 +197,7 @@ export async function handleEverlendAction(
       )
     : matchedTreasury.pubkey
 
-  const liquidityATA = await Token.getAssociatedTokenAddress(
+  const ctokenATA = await Token.getAssociatedTokenAddress(
     ASSOCIATED_TOKEN_PROGRAM_ID,
     TOKEN_PROGRAM_ID,
     new PublicKey(form.poolMint),
@@ -220,7 +222,7 @@ export async function handleEverlendAction(
   const cleanupInsts: InstructionDataWithHoldUpTime[] = []
 
   if (form.action === 'Deposit') {
-    const { actionTx, initMiningTx } = await handleEverlendDeposit(
+    const { actionTx, prerequisiteInstructions } = await handleEverlendDeposit(
       wallet!,
       Boolean(isSol),
       connection,
@@ -231,8 +233,8 @@ export async function handleEverlendAction(
       rewardAccount,
       form.poolPubKey,
       form.bnAmount,
-      ctokenATA,
-      liquidityATA
+      liquidityATA,
+      ctokenATA
     )
     actionTx.instructions.map((instruction) => {
       insts.push({
@@ -246,8 +248,8 @@ export async function handleEverlendAction(
       })
     })
 
-    if (isSol && initMiningTx) {
-      initMiningTx.instructions.map((instruction) => {
+    if (prerequisiteInstructions) {
+      prerequisiteInstructions.map((instruction) => {
         setupInsts.push({
           data: getInstructionDataFromBase64(
             serializeInstructionToBase64(instruction)
@@ -270,8 +272,8 @@ export async function handleEverlendAction(
       rewardAccount,
       form.poolPubKey,
       form.bnAmount,
-      liquidityATA,
-      ctokenATA
+      ctokenATA,
+      liquidityATA
     )
 
     withdrawTx.instructions.map((instruction) => {
@@ -289,37 +291,20 @@ export async function handleEverlendAction(
 
   const proposalsAdresses: PublicKey[] = []
 
-  if (setupInsts.length) {
-    const setupProposalAddress = await createProposal(
-      rpcContext,
-      realm,
-      matchedTreasury.governance!.pubkey,
-      tokenOwnerRecord,
-      'Setup init mining for Everlend SOL pool',
-      'You need to sign init mining tx before you create deposit proposal',
-      governingTokenMint,
-      proposalIndex,
-      [...setupInsts],
-      isDraft,
-      client
-    )
-    proposalsAdresses.push(setupProposalAddress)
-  } else {
-    const proposalAddress = await createProposal(
-      rpcContext,
-      realm,
-      matchedTreasury.governance!.pubkey,
-      tokenOwnerRecord,
-      form.title,
-      form.description,
-      governingTokenMint,
-      proposalIndex,
-      [...insts, ...cleanupInsts],
-      isDraft,
-      client
-    )
-    proposalsAdresses.push(proposalAddress)
-  }
+  const proposalAddress = await createProposal(
+    rpcContext,
+    realm,
+    matchedTreasury.governance!.pubkey,
+    tokenOwnerRecord,
+    form.title,
+    form.description,
+    governingTokenMint,
+    proposalIndex,
+    [...setupInsts, ...insts, ...cleanupInsts],
+    isDraft,
+    client
+  )
+  proposalsAdresses.push(proposalAddress)
 
   return proposalsAdresses
 }
@@ -340,26 +325,19 @@ export async function handleEverlendDeposit(
 ) {
   const actionTx = new Transaction()
   const initMiningTx = new Transaction()
-
+  const prerequisiteInstructions: TransactionInstruction[] = []
   const rewardPoolInfo = await connection.current.getAccountInfo(rewardPool)
   const rewardAccountInfo = await connection.current.getAccountInfo(
     rewardAccount
   )
 
-  if (!rewardAccountInfo && rewardPoolInfo?.data) {
-    const initTx = await getInitMiningTx(
-      rewardPool,
-      rewardAccount,
-      wallet.publicKey!,
-      owner,
-      connection,
-      wallet
-    )
-
+  if (!rewardAccountInfo && rewardPoolInfo?.data && wallet.publicKey) {
+    const initTx = await getInitMiningTx(owner, connection.current, rewardPool)
     initMiningTx.add(initTx)
+    prerequisiteInstructions.push(...initTx.instructions)
   }
   if (isSol) {
-    const { tx: depositTx } = await prepareSolDepositTx(
+    const { tx: depositTx, setupIxs } = await prepareSolDepositTx(
       { connection: connection.current, payerPublicKey: owner },
       new PublicKey(poolPubKey),
       REGISTRY,
@@ -372,23 +350,20 @@ export async function handleEverlendDeposit(
       destination
     )
     actionTx.add(depositTx)
+    prerequisiteInstructions.push(...setupIxs)
   } else {
     const { tx: depositTx } = await prepareDepositTx(
       { connection: connection.current, payerPublicKey: owner },
       new PublicKey(poolPubKey),
-      REGISTRY,
       amount,
-      REWARD_PROGRAM_ID,
-      CONFIG,
       rewardPool,
       rewardAccount,
       source
     )
-    actionTx.add(initMiningTx)
     actionTx.add(depositTx)
   }
 
-  return isSol ? { actionTx, initMiningTx } : { actionTx }
+  return { actionTx, initMiningTx, prerequisiteInstructions }
 }
 
 export async function handleEverlendWithdraw(
@@ -410,14 +385,11 @@ export async function handleEverlendWithdraw(
       payerPublicKey: owner,
     },
     new PublicKey(poolPubKey),
-    REGISTRY,
     amount,
-    REWARD_PROGRAM_ID,
-    CONFIG,
     rewardPool,
     rewardAccount,
     source,
-    isSol ? owner : undefined
+    isSol ? owner : destination
   )
   const withdrawTx = withdrawslTx
   let closeIx: TransactionInstruction | undefined
