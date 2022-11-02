@@ -19,7 +19,7 @@ interface Props {
   user: UserModel;
 }
 
-export function User(props: Props) {
+export function UserDropdown(props: Props) {
   const [, setJwt] = useJWT();
   const { wallet } = useWallet();
 
