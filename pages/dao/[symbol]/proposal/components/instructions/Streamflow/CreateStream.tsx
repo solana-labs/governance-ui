@@ -27,6 +27,7 @@ import {
   CreateStreamForm,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
+import useTreasuryInfo from '@hooks/useTreasuryInfo'
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import useWalletStore from 'stores/useWalletStore'
@@ -116,6 +117,7 @@ const CreateStream = ({
   const strmProgram = new PublicKey(STREAMFLOW_PROGRAM_ID)
 
   const { assetAccounts } = useGovernanceAssets()
+  const treasuryInfo = useTreasuryInfo()
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = strmProgram
   const [releaseUnitIdx, setReleaseUnitIdx] = useState<number>(0)
@@ -221,6 +223,17 @@ const CreateStream = ({
     } else [(start = new u64(0))]
     const strmMetadata = Keypair.generate()
 
+    const payerAccountStr:
+      | string
+      | undefined = (treasuryInfo as any).data.wallets.find(
+      (wallet) =>
+        wallet.governanceAddress ===
+        form.tokenAccount?.extensions?.token?.account.owner.toBase58()
+    )?.address
+    const payerAccount = payerAccountStr
+      ? new PublicKey(payerAccountStr)
+      : senderAccount
+
     const [escrowTokens] = await PublicKey.findProgramAddress(
       [Buffer.from('strm'), strmMetadata.publicKey.toBuffer()],
       new PublicKey(STREAMFLOW_PROGRAM_ID)
@@ -291,6 +304,7 @@ const CreateStream = ({
       partnerTokens: partnerTokens,
     }
     const createStreamAccounts = {
+      payer: payerAccount,
       sender: senderAccount,
       senderTokens: tokenAccount,
       metadata: strmMetadata.publicKey,
