@@ -25,24 +25,24 @@ export const ITEMS = [
     publicKey: new PublicKey('A3WX4QKcioruP71f4yweusv9jqU9R4LtGfJEHtZhs3Rx'),
     urlId: 'MixMob',
   },
-  // {
-  //   bannerImgSrc: '/realms/RCH/banner.png',
-  //   description:
-  //     'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-  //   iconImgSrc: '/realms/RCH/icon.png',
-  //   name: 'Realms Community Hub',
-  //   publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-  //   urlId: 'RCH',
-  // },
-  // {
-  //   bannerImgSrc: '/realms/RCH/banner.png',
-  //   description:
-  //     'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-  //   iconImgSrc: '/realms/RCH/icon.png',
-  //   name: 'Realms Community Hub',
-  //   publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-  //   urlId: 'RCH',
-  // },
+  {
+    bannerImgSrc: 'https://i.imgur.com/6Qmfw0l.png',
+    description:
+      'The Free-to-Play, Move-to-Earn NFT mobile game. Steps you take every day fuel your journey in the Genoverse. Move. Play. Create.',
+    iconImgSrc: 'https://i.imgur.com/mEUafGW.png',
+    name: 'Genopets',
+    publicKey: new PublicKey('8gqpog28H6UvefDu7wMbwaRQX7a7rbVtw7z3yX9xjJQa'),
+    urlId: 'Genopets',
+  },
+  {
+    // bannerImgSrc: '/realms/RCH/banner.png',
+    description:
+      'Earth From Another Sun is an open-world MMO sandbox FPS game where you can command massive armies to fight & conquer the Galaxy.',
+    iconImgSrc: 'https://i.imgur.com/2d1aeHo.png',
+    name: 'Multiverse (Earth From Another Sun)',
+    publicKey: new PublicKey('5K4VVEeYpANxL79r7rM3heyXqYZkzu2KkD4kFkt1gGpG'),
+    urlId: 'Multiverse',
+  },
 ];
 
 interface Props {

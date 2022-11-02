@@ -11,15 +11,20 @@
   },
   {
     "symbol": "MNGO",
+    "category": "defi",
+    "bannerImage": "https://i.imgur.com/i1gGoIw.jpg",
     "displayName": "Mango DAO",
     "programId": "GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J",
     "realmId": "DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE",
     "communityMint": "MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac",
+    "ogImage": "https://i.imgur.com/448n6bC.jpg",
+    "shortDescription": "Every market, all the power, none of the fuss. Simplifying decentralized finance through easy-to-use products and developer tools.",
+    "sortRank": 3,
     "website": "https://mango.markets",
     "keywords": "Mango Markets, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
     "twitter": "@mangomarkets",
-    "ogImage": "https://trade.mango.markets/assets/icons/logo.svg",
-    "sortRank": 3
+    "discord": "https://discord.com/invite/2uwjsBc5yw",
+    "github": "https://github.com/blockworks-foundation/"
   },
   {
     "symbol": "Metaplex",
@@ -180,10 +185,14 @@
   },
   {
     "symbol": "DTP",
+    "category": "web3",
     "displayName": "The Imperium of Rain",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "6orGiJYGXYk9GT2NFoTv2ZMYpA6asMieAqdek4YRH2Dn",
-    "ogImage": "/realms/RAIN/img/rain_logo.png"
+    "ogImage": "/realms/RAIN/img/rain_logo.png",
+    "website": "https://raindrops.xyz",
+    "twitter": "@only_raindrops",
+    "github": "https://github.com/raindrops-protocol/raindrops"
   },
   {
     "symbol": "UkraineUnchained",
@@ -2571,5 +2580,92 @@
     "website": "https://www.moonlit.team/",
     "twitter": "@moonlit_team",
     "discord": "https://discord.gg/ESXqmPy6wV"
+  },
+  {
+    "symbol": "Coin98",
+    "category": "other",
+    "bannerImage": "https://i.imgur.com/3VA0BSX.jpg",
+    "displayName": "Coin98",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "4pzwicnneaxCL4XVms2gJApfj7jpiFvDMzCWEHYw2rMV",
+    "ogImage": "https://i.imgur.com/cF4oQK7.png",
+    "shortDescription": "Your Crypto Everything App.",
+    "sortRank": 3,
+    "website": "https://coin98.com/",
+    "twitter": "@coin98_wallet",
+    "discord": "https://c98.link/discord",
+    "github": "https://github.com/coin98/"
+  },
+  {
+    "symbol": "Genopets",
+    "category": "gaming",
+    "bannerImage": "https://i.imgur.com/6Qmfw0l.png",
+    "displayName": "Genopets",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "8gqpog28H6UvefDu7wMbwaRQX7a7rbVtw7z3yX9xjJQa",
+    "ogImage": "https://i.imgur.com/mEUafGW.png",
+    "shortDescription": "The Free-to-Play, Move-to-Earn NFT mobile game. Steps you take every day fuel your journey in the Genoverse. Move. Play. Create.",
+    "sortRank": 3,
+    "website": "https://www.genopets.me/",
+    "twitter": "@genopets",
+    "discord": "https://discord.gg/genopets"
+  },
+  {
+    "symbol": "Multiverse",
+    "category": "gaming",
+    "displayName": "Multiverse (Earth From Another Sun)",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "5K4VVEeYpANxL79r7rM3heyXqYZkzu2KkD4kFkt1gGpG",
+    "ogImage": "https://i.imgur.com/2d1aeHo.png",
+    "shortDescription": "Earth From Another Sun is an open-world MMO sandbox FPS game where you can command massive armies to fight & conquer the Galaxy.",
+    "sortRank": 3,
+    "website": "https://efas.io/",
+    "twitter": "@PlayEFAS/",
+    "discord": "https://discord.gg/EFAS"
+  },
+  {
+    "symbol": "Helio",
+    "category": "web3",
+    "bannerImage": "https://i.imgur.com/NjvYAjs.png",
+    "displayName": "Helio",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "2AgaUrJeZYxQgipGa8s5opQBPRqJBjKwWqv3hwinnefJ",
+    "ogImage": "https://i.imgur.com/4mcImE9.png",
+    "shortDescription": "The Web3 payments API",
+    "sortRank": 3,
+    "website": "https://www.hel.io/",
+    "twitter": "@helio_pay",
+    "discord": "https://discord.gg/helio",
+    "github": "https://github.com/heliofi"
+  },
+  {
+    "symbol": "Kaizen Corps",
+    "category": "gaming",
+    "bannerImage": "https://kaizen.nyc3.cdn.digitaloceanspaces.com/assets/kc-domination-alpha-banner.png",
+    "displayName": "Kaizen Corps",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "E5yobpBits2Wm8LbtGSPS6KhKzU3oZRTcbx2XTM6Q1fF",
+    "ogImage": "https://kaizen.nyc3.cdn.digitaloceanspaces.com/assets/kc-logo-square.png",
+    "shortDescription": "Creators of the strategy game: Domination, which drives our gaming/metaverse infrastructure and ecosystem development for Solana.",
+    "sortRank": 3,
+    "website": "https://domination.gg",
+    "twitter": "@KaizenCorpsNFT",
+    "discord": "https://discord.gg/dominationgg",
+    "github": "https://github.com/kaizencorps"
+  },
+  {
+    "symbol": "YGG SEA",
+    "category": "other",
+    "bannerImage": "https://i.imgur.com/UzcjaFG.png",
+    "displayName": "YGG SEA",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "4xXbWdJbTdvmNNb2ZE1MEk7wtYWj3MJm8SqQ8u3TErvh",
+    "ogImage": "https://i.imgur.com/Sm74WKk.jpg",
+    "shortDescription": "The first subDAO of YGG, with the mission of creating the biggest and most sustainable virtual economy in Southeast Asia!",
+    "sortRank": 3,
+    "website": "https://yggsea.io/",
+    "twitter": "@yggsea",
+    "discord": "https://discord.gg/yggsea",
+    "github": ""
   }
 ]

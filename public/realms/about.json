@@ -4549,5 +4549,147 @@
         ]
       }
     ]
+  },
+  "4pzwicnneaxCL4XVms2gJApfj7jpiFvDMzCWEHYw2rMV" : {
+    "symbol": "Coin98",
+    "heading": "Your Crypto Everything App.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Coin98 is the #1 crypto super app designed to seamlessly connect a billion users to the crypto world safely and securely. We offer users a comprehensive and trusted ecosystem of essential services across the globe, including a non-custodial, multi-chain NFT & cryptocurrency wallet, built-in DEXs, Cross-chain Bridge & DApp Browser, a powerful Terminal, attractive Earn, Gift & Campaign, and Others. "
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.coin98.com/"
+    },
+    "resources": [
+      {
+        "title": "Coin98's Linktree",
+        "url": "https://linktr.ee/coin98"
+      }
+    ]
+  },
+  "8gqpog28H6UvefDu7wMbwaRQX7a7rbVtw7z3yX9xjJQa" : {
+    "symbol": "Genopets",
+    "heading": "The Free-to-Play, Move-to-Earn NFT mobile game. Steps you take every day fuel your journey in the Genoverse. Move. Play. Create. ",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Genopets is a Free-to-Play, Move-to-Earn NFT mobile game that makes it fun and rewarding to live an active lifestyle. A Genopet is your digital pet whose evolution and growth is inextricably linked to your own. The steps you take every day power your journey through the Genoverse as you explore, battle, and evolve — earning crypto while you play.",
+          "Genopets is the gamification of an active lifestyle. Walking around the mall? Jogging at the gym? Running between meetings in your office? No matter how you stay active, your Genopet is always by your side, counting the steps you’ll use to fuel your gameplay.",
+          "Genopets is a move-to-earn game that does more than count your steps and reward you for how much you walk. The game is predicated on you building a bond with your digital companion and taking care of it every day by taking care of yourself.",
+          "Paying homage to the nostalgia of taking care of our Tamagotchi, evolving and battling our Pokémon, or even raising our first real-world pet, the emotional connection between one's self and their pet is a powerful force. That emotional force is the premise of Genopets and ultimately what will help motivate you to live a more active lifestyle."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://whitepaper.genopets.me/"
+    },
+    "resources": [
+      {
+        "title": "Genopets wants you and your digital pets to improve together",
+        "content": [
+          "One of Samsung’s latest investments through its Samsung Next arm is Genopets."
+        ],
+        "url": "https://venturebeat.com/games/genopets-ben-tse-wants-to-own-his-time/"
+      },
+      {
+        "title": "Magic Eden introduces semi-fungible tokens (SFTs) marketplace with Genopets",
+        "content": [
+          "Magic Eden has introduced its “semi-fungible token” (SFT) marketplace with the blockchain game Genopets."
+        ],
+        "url": "https://venturebeat.com/games/magic-eden-introduces-semi-fungible-tokens-sfts-marketplace-with-genopets/"
+      }
+    ]
+  },
+  "5K4VVEeYpANxL79r7rM3heyXqYZkzu2KkD4kFkt1gGpG" : {
+    "symbol": "Multiverse (Earth From Another Sun)",
+    "heading": "Earth From Another Sun is an open-world MMO sandbox FPS game where you can command massive armies to fight & conquer the Galaxy.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "FEATURES: Earth From Another Sun is a science fiction action-oriented strategy role-playing game featuring an ever-expanding galaxy with unique locations to explore packed with carefully designed NPCs and quests as well as player-created content. Conquer the galaxy fighting alongside the armies you command in exhilarating, meticulously crafted first-person shooter combat. Hundreds of unique weapons, weapon mods, abilities, and enemies that provide a fresh combat experience, a lot of replayability, and lots of different builds to fight alongside your teammates.",
+          "MULTIPLAYER CO-OP: Play the whole game with up to 3 other friends or strangers and challenge a variety of lairs and battlefields across the galaxy. We're also preparing 10-person co-op strongholds and Xeno lair raids.",
+          "AN OPEN WORLD OF GALACTIC PROPORTIONS: You will encounter many people, creatures, love interests, treasures, calamities, and other events that will test your strength and resolve. Make allies, pledge service to another faction, or create your own independent nation. Who knows, you might even get married and have genetically altered children along the way!",
+          "COMBAT VEHICLES, MECHS & DRONES: What would be the Battle of Naboo without the tanks and energy catapults? Plus, hoverbikes are really cool too! Vehicles types we are working on: Hoverbikes, tanks, rovers, mechs, fighter crafts, assault vessels, and space fortresses.",
+          "FRESH FPS COMBAT: There are many great FPS games out there. So, to make things fresh and interesting, we made sure that you have hundreds of gun mods, powers, gadgets, and passives. Enemies also have a large amount of variety and abilities.",
+          "LARGE-SCALE SCI-FI BATTLES: Ever wanted to experience what it's like to be a soldier or battlefield commander in the middle of iconic battles from your favorite sci-fi movies? With support for up to 1000 individual units on a battlefield, this is now possible.",
+          "PLAYERS COME FIRST: We listen to the community intensely and engage in conversations daily. While we do internal QA, it can happen that an update will release with an annoying bug. We will, however, make it our priority and fix it within 24 to 48 hours after discovery, that's the EFAS guarantee. We always make decisions that favor players, and we also regularly implement features requested by the community."
+        ]
+      }
+    ]
+  },
+  "2AgaUrJeZYxQgipGa8s5opQBPRqJBjKwWqv3hwinnefJ" : {
+    "symbol": "Helio",
+    "heading": "The Web3 payments API",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Helio will accelerate the adoption of Web3 payments & drive the cost of online payments to zero. We want to displace traditional online payment systems.",
+          "Why? In the US alone, merchants hand over $138B in TX fees each year. We will reduce the cost of an online payment to near zero. Web3 projects waste tons of time building their own payment tooling. 1st-gen crypto pay gateways are weak products with poor UX. We need an alternative that is optimised for Web3 users.",
+          "What? A complete Web3 payments platform. We make it simple to accept crypto payments. No fees, no logins, no code.",
+          "How? E-commerce: simple integration options for merchants.",
+          "Web3 economy: NFT sales with our Pay Links, Discord Subscriptions, Token Utility & dAPP integrations."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.hel.io/introduction/welcome-to-helio"
+    }
+  },
+  "E5yobpBits2Wm8LbtGSPS6KhKzU3oZRTcbx2XTM6Q1fF" : {
+    "symbol": "Kaizen Corps",
+    "heading": "Creators of the strategy game: Domination, which drives our gaming/metaverse infrastructure and ecosystem development for Solana.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Domination is massive collaborative strategy game similar to the board game Risk. We're currently in alpha but hosting new games on a weekly basis. Grab one of our NFTs off Magic Eden at https://magiceden.io/marketplace/kaizen_corps to join the revolution at https://domination.gg.",
+          "Kaizen Corps is our umbrella organization, whose purpose is to help develop the nacent gaming and metaverse ecosystem for Solana. Many projects are building in silos and building their own components to solve the same sets of problems. Our strategy is to extract the solutions we build for Domination into reusable components (which we're calling NFT legos) to make available to the greater Solana ecosystem for other projects to use and extend."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.domination.gg"
+    },
+    "resources": [
+      {
+        "title": "The Kaizen Corps Medium Page",
+        "url": "https://kaizencorps.medium.com/"
+      }
+    ]
+  },
+  "4xXbWdJbTdvmNNb2ZE1MEk7wtYWj3MJm8SqQ8u3TErvh" : {
+    "symbol": "YGG SEA",
+    "heading": "The first subDAO of YGG, with the mission of creating the biggest and most sustainable virtual economy in Southeast Asia!",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Yield Guild Games (YGG) is a DAO that invests in non-fungible tokens (NFTs) used in virtual worlds and blockchain-based games.",
+          "YGG is primarily a community of play-to-earn gamers that act as a guild across many games. Within such games, it collects yield-generating NFTs and loans them to the guild's player base.",
+          "Yield Guild Game's first regional subDAO is YGG SEA. With the help and advice from its parent DAO - YGG, YGG SEA is dedicated to building the play-to-earn ecosystem in these countries, bringing together gamers from Indonesia, Malaysia, Vietnam, Singapore, and Thailand."
+        ]
+      }
+    ],
+    "resources": [
+      {
+        "title": "The YGG SEA Medium Page",
+        "url": "https://medium.com/@yggsea"
+      },
+      {
+        "title": "The YGG SEA Youtube Channel",
+        "url": "https://www.youtube.com/c/YGGSEA"
+      }
+    ]
   }
 }
