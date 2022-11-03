@@ -190,6 +190,7 @@
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "6orGiJYGXYk9GT2NFoTv2ZMYpA6asMieAqdek4YRH2Dn",
     "ogImage": "/realms/RAIN/img/rain_logo.png",
+    "shortDescription": "Raindrops Protocol, standardizing gaming across Solana",
     "website": "https://raindrops.xyz",
     "twitter": "@only_raindrops",
     "github": "https://github.com/raindrops-protocol/raindrops"
@@ -2061,7 +2062,7 @@
     "sortRank": 3,
     "website": "https://www.skatex.io/",
     "twitter": "@PlaySkateX",
-    "discord": "discord.gg/skatex"
+    "discord": "https://discord.gg/skatex"
   },
   {
     "symbol": "Rye",
@@ -2408,21 +2409,6 @@
     "github": "https://github.com/coral-xyz/backpack"
   },
   {
-    "symbol": "Bastion",
-    "category": "daotools",
-    "bannerImage": "https://i.imgur.com/Gwq0ZLa.png",
-    "displayName": "Bastion",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "G1RWjNmizVM6vR8pEsHta4iRYcTa7jWM1mQErz4phpRy",
-    "ogImage": "https://i.imgur.com/AnlE3V1.png",
-    "shortDescription": "Bastion, leveling up the DAO experience both for the voter and for the DAO!",
-    "sortRank": 3,
-    "website": "",
-    "twitter": "",
-    "discord": "https://discord.com/invite/u7zuwaAb7Z",
-    "github": ""
-  },
-  {
     "symbol": "Magic Eden",
     "category": "other",
     "bannerImage": "https://i.imgur.com/hDJj3dL.png",
@@ -2668,5 +2654,49 @@
     "twitter": "@yggsea",
     "discord": "https://discord.gg/yggsea",
     "github": ""
+  },
+  {
+    "symbol": "CandyPay",
+    "category": "other",
+    "bannerImage": "https://raw.githubusercontent.com/candypay/brand-assets/main/assets/header/dark.png",
+    "displayName": "CandyPay",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "DReG8cfj6XA73u82AGFnytxGm3XZ3saetGwapRrRkoty",
+    "ogImage": "https://res.cloudinary.com/dnfor6ngq/image/upload/v1659720459/2_cdaoyi.png",
+    "shortDescription": "Powering seamless, mobile native NFT and Payments experiences on Solana",
+    "sortRank": 3,
+    "website": "https://candypay.fun",
+    "twitter": "@candypayfun",
+    "discord": "https://discord.gg/VGjPXWUHGT",
+    "github": "https://github.com/candypay"
+  },
+  {
+    "symbol": "Sphere",
+    "category": "web3",
+    "bannerImage": "https://i.imgur.com/j4xkSPp.jpeg",
+    "displayName": "Sphere",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "GHVYhVLqSfqsuNXkKrALXDEX8xq76WGMAtJka5zr3jqw",
+    "ogImage": "https://i.imgur.com/j9HOqJ5.png",
+    "shortDescription": "Payments Infrastructure for web3",
+    "sortRank": 3,
+    "website": "https://sphere.engineer",
+    "twitter": "@sphere_labs",
+    "discord": "https://discord.gg/spherelabs",
+    "github": "https://github.com/Sphere-Laboratories/"
+  },
+  {
+    "symbol": "Dispatch Protocol",
+    "category": "web3",
+    "bannerImage": "https://i.imgur.com/Phypzxt.jpg",
+    "displayName": "Dispatch Protocol",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "9jebQmDLbYRa4vo8rCQpPJu9VxRxWMp1cNTU1nzmrNLY",
+    "ogImage": "https://i.imgur.com/6Os7NYz.jpg",
+    "shortDescription": "Decentralized, censorship resistant, on-chain forums protocol. Reddit for Solana.",
+    "sortRank": 3,
+    "website": "https://www.dispatch.forum",
+    "twitter": "@usedispatch",
+    "github": "github.com/usedispatch"
   }
 ]

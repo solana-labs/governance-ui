@@ -22,11 +22,11 @@ const CONFIG = [
     url: '/realm/Backpack',
   },
   {
-    name: 'Hubble Protocol',
-    category: RealmCategory.Defi,
-    logo: 'https://i.imgur.com/B5SNT8F.png',
-    publicKey: new PublicKey('AgR2tq1xcbqwmgDcNRaV1BEP5J3kfJfswP5vn6WWe6uC'),
-    url: '/realm/Hubble%20Protocol',
+    name: 'GenesysGo',
+    category: RealmCategory.Web3,
+    logo: 'https://i.imgur.com/topNFE2.jpg',
+    publicKey: new PublicKey('96VSxgcsxhh8qcFXdT7nMzxA1CMrUBxrxcetqYFqdV5V'),
+    url: '/realm/GenesysGo',
   },
   {
     name: 'Dual Finance',
