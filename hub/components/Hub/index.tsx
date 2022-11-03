@@ -1,5 +1,6 @@
 import type { PublicKey } from '@solana/web3.js';
 import { pipe } from 'fp-ts/function';
+import Head from 'next/head';
 import { useMediaQuery } from 'react-responsive';
 
 import * as RealmHeader from '@hub/components/RealmHeader';
@@ -51,6 +52,10 @@ export function Hub(props: Props) {
           ),
           ({ hub, realm }) => (
             <div className="pb-28">
+              <Head>
+                <title>{realm.name}</title>
+                <meta property="og:title" content={realm.name} key="title" />
+              </Head>
               <RealmHeader.Content
                 bannerUrl={realm.bannerImageUrl}
                 iconUrl={realm.iconUrl}

@@ -1,6 +1,7 @@
 import * as Separator from '@radix-ui/react-separator';
 import type { PublicKey } from '@solana/web3.js';
 import { pipe } from 'fp-ts/function';
+import Head from 'next/head';
 
 import { EcosystemHeader } from '@hub/components/EcosystemHeader';
 import * as Back from '@hub/components/FeedItem/Back';
@@ -140,6 +141,16 @@ export function FeedItemComment(props: Props) {
                 ),
                 ({ feedItem }) => (
                   <div>
+                    <Head>
+                      <title>
+                        {feedItem.title} - {realm.name}
+                      </title>
+                      <meta
+                        property="og:title"
+                        content={`${feedItem.title} - ${realm.name}`}
+                        key="title"
+                      />
+                    </Head>
                     {props.realm.equals(ECOSYSTEM_PAGE) ? (
                       <EcosystemHeader />
                     ) : (
