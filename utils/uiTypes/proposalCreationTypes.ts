@@ -153,6 +153,7 @@ export interface CreateStreamForm {
   releaseAmount: number
   amountAtCliff: number
   cancelable: boolean
+  period: number
 }
 
 export const programUpgradeFormNameOf = getNameOf<ProgramUpgradeForm>()
