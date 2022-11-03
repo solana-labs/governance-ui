@@ -6,6 +6,15 @@ import cx from '@hub/lib/cx';
 
 export const ITEMS = [
   {
+    bannerImgSrc: 'https://i.imgur.com/rXz3mnF.png',
+    description:
+      'Hubble Protocol is the issuer of USDH, a Solana native crypto-backed stablecoin that anyone can mint by depositing their crypto.',
+    iconImgSrc: 'https://i.imgur.com/rk827nw.png',
+    name: 'Hubble Protocol',
+    publicKey: new PublicKey('AgR2tq1xcbqwmgDcNRaV1BEP5J3kfJfswP5vn6WWe6uC'),
+    urlId: 'Hubble Protocol',
+  },
+  {
     bannerImgSrc: 'https://i.imgur.com/mN0eY0k.png',
     description:
       'Raydium is an Automated Market Maker (AMM) built on the Solana blockchain for the Serum Decentralized Exchange (DEX).',
@@ -32,16 +41,6 @@ export const ITEMS = [
     name: 'Mango DAO',
     publicKey: new PublicKey('DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE'),
     urlId: 'MNGO',
-  },
-  {
-    // bannerImgSrc: '/realms/RCH/banner.png',
-    // description:
-    //   'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc:
-      'https://miro.medium.com/fit/c/176/176/1*-mdTTAgsSuBYSfDqG6Fd1w.png',
-    name: 'Orca DAO',
-    publicKey: new PublicKey('66Du7mXgS2KMQBUk6m9h3TszMjqZqdWhsG3Duuf69VNW'),
-    urlId: 'ORCA',
   },
 ];
 

@@ -1059,7 +1059,7 @@
       {
         "heading": "Introduction",
         "content": [
-          "On Gilder you can view and keep up to date with any SPL-governance dao. You'll be able to get notifications directly as they are created, vote and create proposals all from your Android or IOS device. "
+          "On Gilder you can view and keep up to date with any SPL-governance dao. You'll be able to get notifications directly as they are created, vote and create proposals all from your Android or IOS device. Gilder recently merged with the Bastion team, the winners of the DAO category in the Solana Summer Camp Hackathon 2022 and built on top of Realms; Bastion provides a comprehensive DAO tool that helps DAOs on Solana to truly access DeFi and help it's voters become more involved. With the new team consisting of the Bastion and Gilder team, DAOs will become first class citizens on Solana."
         ]
       }
     ]
@@ -1890,7 +1890,7 @@
       },
       {
         "name": "Dennis Zdonov",
-        "avatar": "https://media-exp1.licdn.com/dms/image/C4E03AQE4acqoOhvkGg/profile-displayphoto-shrink_800_800/0/1529192513215?e=1672876800&v=beta&t=OHx0X4thfZsRVzXcVm-zT28MoePVmaosevanjIWeBqk",
+        "avatar": "https://media.licdn.com/dms/image/C4E03AQE4acqoOhvkGg/profile-displayphoto-shrink_800_800/0/1529192513215?e=1672876800&v=beta&t=OHx0X4thfZsRVzXcVm-zT28MoePVmaosevanjIWeBqk",
         "description": [
           "Dennis Zdonov is a co-founder of Faraway, a web3 gaming studio specializing in hyper-social games with player-driven economies. Prior to founding Faraway with his long-time co-founder, Alex Paley, he was VP of Product at Scopely and Head of Studio at Glu Mobile."
         ],
@@ -1928,7 +1928,7 @@
         ]
       },
       {
-        "question": "asWhere can I play the game?df",
+        "question": "Where can I play the game?",
         "answer": [
           "https://miniroyale.io/"
         ]
@@ -4753,6 +4753,54 @@
     "documentation": {
       "title": "Docs",
       "url": "https://docs.mango.markets/"
+    }
+  },
+  "DReG8cfj6XA73u82AGFnytxGm3XZ3saetGwapRrRkoty" : {
+    "symbol": "CandyPay",
+    "heading": "Powering seamless, mobile native NFT and Payments experiences on Solana",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "CandyPay is powering seamless, mobile native NFT and Payments experiences on Solana! We are building the best in class payments infra for web3 native businesses to accept SOL and SPL payments painlessly, while users can pay in a seamless and fast experience, from the device of their confort and token they love the most!"
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.candypay.fun"
+    }
+  },
+  "9jebQmDLbYRa4vo8rCQpPJu9VxRxWMp1cNTU1nzmrNLY" : {
+    "symbol": "Dispatch Protocol",
+    "heading": "Decentralized, censorship resistant, on-chain forums protocol. Reddit for Solana. ",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Dispatch Protocol is excited to introduce Dispatch Forums! For the first time in blockchain history, communities can launch censorship resistant, on-chain forums where users can earn tokens, gift NFTs, up-vote ideas, and participate in token-gated conversations."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.dispatch.forum"
+    }
+  },
+  "GHVYhVLqSfqsuNXkKrALXDEX8xq76WGMAtJka5zr3jqw" : {
+    "symbol": "Sphere",
+    "heading": "Payments Infrastructure for web3",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Sphere is an API and web platform that allows developers and businesses to seamlessly accept and manage their crypto payments. We offer a complete payments stack, including products such as subscriptions, invoicing, checkouts, and more. Developers can import our SDK and get started with beautiful components and simple endpoints to create their payment rails out of the box and focus on their core logic. Merchants will be able to use our custodial accounts, dashboard, and no-code solutions to expand the currencies they accept and drive customer engagement through best-in-class compliance, accounting, and insights. "
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.sphere.engineer/"
     }
   }
 }
