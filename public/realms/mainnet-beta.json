@@ -155,7 +155,7 @@
     "displayName": "Hubble Protocol",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "AgR2tq1xcbqwmgDcNRaV1BEP5J3kfJfswP5vn6WWe6uC",
-    "ogImage": "https://i.imgur.com/B5SNT8F.png",
+    "ogImage": "https://i.imgur.com/rk827nw.png",
     "shortDescription": "Hubble Protocol is the issuer of USDH, a Solana native crypto-backed stablecoin that anyone can mint by depositing their crypto.",
     "sortRank": 3,
     "website": "https://hubbleprotocol.io/",
@@ -1269,7 +1269,7 @@
   {
     "symbol": "Orbis Protocol",
     "category": "web3",
-    "bannerImage": "https://pbs.twimg.com/profile_banners/1460531965581578244/1664471587/1500x500",
+    "bannerImage": "https://i.imgur.com/m5nTsTB.png",
     "displayName": "Orbis Protocol",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "uywFFJL6JFGwbSXgU95C6v8f4L4DqBXV2Z3KZaJSxy1",
@@ -1597,9 +1597,9 @@
     "discord": "https://discord.gg/twGScVXwty"
   },
   {
-    "symbol": "Mini Royale Nations",
+    "symbol": "MiniRoyale",
     "category": "gaming",
-    "bannerImage": "https://i.imgur.com/sach4X3.png",
+    "bannerImage": "https://i.imgur.com/tDweQEX.png",
     "displayName": "Mini Royale: Nations",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "JDAa2nFhyaRsESqYqWoZp6aw8egtcSV2UvKRDgfvgNLY",
@@ -1755,7 +1755,7 @@
     "sortRank": 3,
     "website": "https://francium.io/",
     "twitter": "@Francium_Defi",
-    "discord": "discord.gg/francium",
+    "discord": "https://discord.com/invite/francium",
     "github": "https://github.com/Francium-DeFi/francium-sdk"
   },
   {
@@ -1774,15 +1774,16 @@
   {
     "symbol": "Contribute",
     "category": "web3",
+    "bannerImage": "https://i.imgur.com/IMiMXl8.png",
     "displayName": "Contribute",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "DdNEw88N8VTeYfvxdLBwQ9aR4trejTUapGZRGdaMqyNY",
-    "ogImage": "https://i.imgur.com/1mOsSeP.png",
+    "ogImage": "https://i.imgur.com/pWJFEOj.png",
     "shortDescription": "Connect your Solana wallet to join a gated-access group chat with other, verified NFT collection holders.",
     "sortRank": 3,
-    "website": "Contribute.xyz",
+    "website": "https://Contribute.xyz",
     "twitter": "@Contribute_xyz",
-    "github": "github.com/ContributeDAO/contribute"
+    "github": "https://github.com/ContributeDAO/contribute"
   },
   {
     "symbol": "Artivive",
@@ -2416,10 +2417,10 @@
     "ogImage": "https://i.imgur.com/AnlE3V1.png",
     "shortDescription": "Bastion, leveling up the DAO experience both for the voter and for the DAO!",
     "sortRank": 3,
-    "website": "gilder.xyz",
-    "twitter": "@gilderxyz",
+    "website": "",
+    "twitter": "",
     "discord": "https://discord.com/invite/u7zuwaAb7Z",
-    "github": "https://github.com/ndrabins/gilder-app"
+    "github": ""
   },
   {
     "symbol": "Magic Eden",
@@ -2527,11 +2528,11 @@
   {
     "symbol": "Faraway",
     "category": "gaming",
-    "bannerImage": "https://i.imgur.com/d6EMCqs.png",
+    "bannerImage": "https://i.imgur.com/JHiKjpG.png",
     "displayName": "Faraway",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "4X8PMiLabGjdAHdrKL9SLu1HAMMp9xNcn3DY2mAciT8N",
-    "ogImage": "https://i.imgur.com/aodmVfC.jpg",
+    "ogImage": "https://i.imgur.com/Bn9n7sF.png",
     "shortDescription": "Faraway makes fun and social games with player-driven economies",
     "sortRank": 3,
     "website": "https://faraway.gg/",

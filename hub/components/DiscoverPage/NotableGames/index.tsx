@@ -59,9 +59,9 @@ export function NotableGames(props: Props) {
         </div>
       </div>
       <div className="text-neutral-500 max-w-3xl">
-        Following massive investment in AAA games, games built on Solana have
-        ushered in a new era in digital ownership, social coordination, and
-        token value.
+        Solana has enabled massive commercial success of numerous web3 games
+        while developing resources for builders to create an even more vibrant
+        ecosystem of services.
       </div>
       <div
         className={cx(

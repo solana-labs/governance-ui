@@ -100,16 +100,16 @@ export const ITEMS = [
     category: RealmCategory.Web3,
     content: (
       <div>
-        Monkedao is Community of Solana Monkey Business NFT owners operating a
-        validator to increase the value of the DAO treasury. Virtual community
-        events and IRL gatherings.
+        Monkedao is the community of Solana Monke Business owners, operating a
+        validator to help secure Solana and fund the community both online and
+        IRL.
       </div>
     ),
     publicKey: new PublicKey('B1CxhV1khhj7n5mi5hebbivesqH9mvXr5Hfh2nD2UCh6'),
     stats: [
       {
-        top: '43.3K SOL',
-        bottom: 'In Stake Pool',
+        top: '2,750',
+        bottom: 'MonkeDAO Members',
       },
       {
         top: 'Up to 7%',

@@ -1425,13 +1425,43 @@
       {
         "heading": "Introduction",
         "content": [
-          "Introduction: Allie Coin is a Web3 gaming community founded by Twitch streamer Alliestrasza. Allie has been producing gaming content for more than six years, primarily on Twitch and YouTube, where she has amassed a following of over 200,000 fans. In 2017, she decided to create Allie Coin to combine her loves for gaming and content creation within the emerging Web3 universe. The Allie Coin gaming community is designed to unlock fun and competitive gaming experiences for a global community.",
-          "$ALLIE: $ALLIE is a Rally-backed social token you can earn, buy, and trade to support the Allie Coin ecosystem, unlock valuable gaming assets, and vote in our Allie Coin DAO. $ALLIE is on the Solana blockchain, making all transactions energy efficient and secure.",
-          "Play-to-earn Games: Our Allie Coin community was born from a love for competitive gaming. By collaborating with the newest and greatest play-to-earn games, we offer our $ALLIE holders the in-game resources, education, and exclusive tournament play opportunities they need to leap ahead of the competition.",
-          "Allie Coin DAO: We believe the best way to provide ongoing value to our Allie Coin community is to offer true ownership of the Allieverse. Part of all $sRLY rewards earned with $ALLIE go to our community treasury. All $ALLIE holders have voting power to decide how we spend those treasury assets and what we build next for our ecosystem.",
-          "NFTs: Use your $ALLIE to buy NFTs! Own Allie history with Allie Ross animations, unlock special access with tiered Badges, and establish your creative identity with Allie Cats.",
-          "YT Channel: For gamers new to the web3 world, we produce public educational content on our Allie Coin YouTube channel about play-to-earn games, social tokens, NFTs, the creator economy, and more.",
-          "Discord: Everyone, regardless of whether you hold $ALLIE or not, is welcome to join our Allie fam in the Allie Coin Discord server. Hang out in exclusive chats with Allie, develop new friendships with likeminded gamers, and compete for prizes."
+          "Allie Coin is a Web3 gaming community founded by Twitch streamer Alliestrasza. Allie has been producing gaming content for more than six years, primarily on Twitch and YouTube, where she has amassed a following of over 200,000 fans. In 2017, she decided to create Allie Coin to combine her loves for gaming and content creation within the emerging Web3 universe. The Allie Coin gaming community is designed to unlock fun and competitive gaming experiences for a global community."
+        ]
+      },
+      {
+        "heading": "$ALLIE",
+        "content": [
+          "$ALLIE is a Rally-backed social token you can earn, buy, and trade to support the Allie Coin ecosystem, unlock valuable gaming assets, and vote in our Allie Coin DAO. $ALLIE is on the Solana blockchain, making all transactions energy efficient and secure."
+        ]
+      },
+      {
+        "heading": "Play-to-earn Games",
+        "content": [
+          "Our Allie Coin community was born from a love for competitive gaming. By collaborating with the newest and greatest play-to-earn games, we offer our $ALLIE holders the in-game resources, education, and exclusive tournament play opportunities they need to leap ahead of the competition."
+        ]
+      },
+      {
+        "heading": "Allie Coin DAO",
+        "content": [
+          "We believe the best way to provide ongoing value to our Allie Coin community is to offer true ownership of the Allieverse. Part of all $sRLY rewards earned with $ALLIE go to our community treasury. All $ALLIE holders have voting power to decide how we spend those treasury assets and what we build next for our ecosystem."
+        ]
+      },
+      {
+        "heading": "NFTs",
+        "content": [
+          "Use your $ALLIE to buy NFTs! Own Allie history with Allie Ross animations, unlock special access with tiered Badges, and establish your creative identity with Allie Cats."
+        ]
+      },
+      {
+        "heading": "YT Channel",
+        "content": [
+          "For gamers new to the web3 world, we produce public educational content on our Allie Coin YouTube channel about play-to-earn games, social tokens, NFTs, the creator economy, and more."
+        ]
+      },
+      {
+        "heading": "Discord",
+        "content": [
+          "Everyone, regardless of whether you hold $ALLIE or not, is welcome to join our Allie fam in the Allie Coin Discord server. Hang out in exclusive chats with Allie, develop new friendships with likeminded gamers, and compete for prizes."
         ]
       }
     ],
@@ -3898,7 +3928,6 @@
     "team": [
       {
         "name": "Martin",
-        "avatar": "https://i.imgur.com/DFM7lk6.png",
         "role": "Community Manager"
       },
       {
@@ -4257,7 +4286,7 @@
     "team": [
       {
         "name": "Simon Vieira",
-        "avatar": "https://pbs.twimg.com/profile_images/1557082559556640770/0k73yu5x_400x400.jpg",
+        "avatar": "https://assets.website-files.com/6204753c4ec43e140960751e/62a3d757ddad950f88b2fb0f_Edit-Studio-Portraits-190704-1077%202%205.png",
         "description": [
           "Simon has managed multimillion-dollar projects in the video game industry and successfully shipped over 100 games and apps for EA, Pokerstars, Microsoft, and Disney. He has 15 years of experience in the game industry."
         ],
@@ -4266,7 +4295,7 @@
       },
       {
         "name": "Pavel Bains",
-        "avatar": "https://pbs.twimg.com/profile_images/1577549554823536645/q0h9-6r6_400x400.jpg",
+        "avatar": "https://assets.website-files.com/6204753c4ec43e140960751e/62a3d7ccebc0aef27741a677_Untitled-3%201.png",
         "description": [
           "Pavel founded Bluzelle and is an investor in gaming, Esports, and crypto. He has managed studios with Disney Interactive and worked with EA, Xbox, and Nintendo."
         ],
@@ -4691,5 +4720,39 @@
         "url": "https://www.youtube.com/c/YGGSEA"
       }
     ]
+  },
+  "6orGiJYGXYk9GT2NFoTv2ZMYpA6asMieAqdek4YRH2Dn" : {
+    "symbol": "The Imperium of Rain DAO",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "The Raindrops Protocol is a series of six a la carte contracts that govern on-chain or proof-on-chain data specifically for gamification, allowing any player or item to be interchangeable with any game client that can process them.",
+          "The protocol lives on top of the Metaplex Protocol, further decorating existing NFTs with new metadata about whether they are a Player, an Item, or both! All contracts within the Protocol are designed to be composed with other Solana contracts enforcing game-specific rules.",
+          "The Imperium of Rain is the DAO that controls 51% of the $RAIN token. Proposals can be submitted and voted on to dispense token grants or make protocol modifications. Holders of the Degenerate Trash Panda NFT collection have 1 vote per each NFT held."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.raindrops.xyz"
+    }
+  },
+  "DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE" : {
+    "symbol": "Mango ",
+    "heading": "Every market, all the power, none of the fuss. Simplifying decentralized finance through easy-to-use products and developer tools.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Mango is a decentralized permissionless protocol driven by a committed developer community focused on building decentralized financial products and open-source developer tooling for the Solana blockchain.",
+          "Trade spot markets with margin, leveraged perpetual futures, and participate in decentralized money markets, all from one easy-to-use hub."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.mango.markets/"
+    }
   }
 }
