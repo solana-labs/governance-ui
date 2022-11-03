@@ -24,10 +24,9 @@ import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
 const SwitchboardAdmitOracle = ({
   index,
-  _governance,
 }: {
   index: number
-  _governance: ProgramAccount<Governance> | null
+  governance: ProgramAccount<Governance> | null
 }) => {
   const [form, setForm] = useState<SwitchboardAdmitOracleForm>({
     oraclePubkey: undefined,
