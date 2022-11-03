@@ -156,6 +156,12 @@ export interface CreateStreamForm {
   period: number
 }
 
+export interface CancelStreamForm {
+  recipient: string
+  strmMetadata: string
+  tokenAccount?: AssetAccount
+}
+
 export const programUpgradeFormNameOf = getNameOf<ProgramUpgradeForm>()
 
 export interface MangoMakeAddOracleForm {
