@@ -58,7 +58,7 @@ const SelectInstructionType = ({
   const getInstructionDisplayName = (
     instruction?: InstructionType
   ): string | JSX.Element => {
-    if (!instruction) {
+    if (!instruction || typeof instruction.packageId === 'undefined') {
       return ''
     }
 
