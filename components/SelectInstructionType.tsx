@@ -6,6 +6,20 @@ import { PackageEnum } from '@utils/uiTypes/proposalCreationTypes'
 import { useCallback, useEffect, useState } from 'react'
 import ImageTextSelection from './ImageTextSelection'
 
+function sortInstructionTypes(
+  instructionTypes: InstructionType[]
+): InstructionType[] {
+  return instructionTypes.sort((instructionTypeA, instructionTypeB) => {
+    // Sort by package id
+    if (instructionTypeA.packageId !== instructionTypeB.packageId) {
+      return instructionTypeA.packageId - instructionTypeB.packageId
+    }
+
+    // Then sort by instruction name
+    return instructionTypeA.name < instructionTypeB.name ? -1 : 1
+  })
+}
+
 const SelectInstructionType = ({
   instructionTypes,
   selectedInstruction,
@@ -18,13 +32,15 @@ const SelectInstructionType = ({
   const [packageId, setPackageId] = useState<PackageEnum | null>(null)
   const { availablePackages, getPackageTypeById } = useGovernanceAssets()
 
-  const [filteredInstructionTypes, setFilteredInstructionTypes] = useState<
-    InstructionType[]
-  >([])
+  const [
+    filteredAndSortedInstructionTypes,
+    setFilteredAndSortedInstructionTypes,
+  ] = useState<InstructionType[]>([])
 
-  const computeFilteredInstructionsTypes = useCallback(() => {
+  const computeFilteredAndSortedInstructionsTypes = useCallback(() => {
     if (packageId === null) {
-      setFilteredInstructionTypes(instructionTypes)
+      const sortedInstructionTypes = sortInstructionTypes(instructionTypes)
+      setFilteredAndSortedInstructionTypes(sortedInstructionTypes)
 
       // Select first instruction by default
       if (instructionTypes.length && !selectedInstruction) {
@@ -38,21 +54,23 @@ const SelectInstructionType = ({
       onChange(null)
     }
 
-    const filteredInstructionTypes = instructionTypes.filter(
-      (instructionType) => instructionType.packageId === packageId
+    const filteredAndSortedInstructionTypes = sortInstructionTypes(
+      instructionTypes.filter(
+        (instructionType) => instructionType.packageId === packageId
+      )
     )
 
     // Select first instruction by default
-    if (filteredInstructionTypes.length && !selectedInstruction) {
-      onChange(filteredInstructionTypes[0])
+    if (filteredAndSortedInstructionTypes.length && !selectedInstruction) {
+      onChange(filteredAndSortedInstructionTypes[0])
     }
 
-    setFilteredInstructionTypes(filteredInstructionTypes)
+    setFilteredAndSortedInstructionTypes(filteredAndSortedInstructionTypes)
   }, [packageId, instructionTypes])
 
   useEffect(() => {
-    computeFilteredInstructionsTypes()
-  }, [computeFilteredInstructionsTypes])
+    computeFilteredAndSortedInstructionsTypes()
+  }, [computeFilteredAndSortedInstructionsTypes])
 
   // Only display the package name is a no package is selected
   const getInstructionDisplayName = (
@@ -120,9 +138,9 @@ const SelectInstructionType = ({
 
         <Select
           className="p-2 w-full text-sm"
-          disabled={!filteredInstructionTypes.length}
+          disabled={!filteredAndSortedInstructionTypes.length}
           placeholder={`${
-            filteredInstructionTypes.length
+            filteredAndSortedInstructionTypes.length
               ? 'Select instruction'
               : 'No available instructions'
           }`}
@@ -132,7 +150,7 @@ const SelectInstructionType = ({
           value={getInstructionDisplayName(selectedInstruction)}
           useDefaultStyle={false}
         >
-          {filteredInstructionTypes.map((instructionType) => (
+          {filteredAndSortedInstructionTypes.map((instructionType) => (
             <Select.Option key={instructionType.id} value={instructionType}>
               <span>{getInstructionDisplayName(instructionType)}</span>
             </Select.Option>
