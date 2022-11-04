@@ -12,23 +12,22 @@ import { AssetAccount, StakeAccount } from '@utils/uiTypes/assets'
 import { RealmInfo } from '@models/registry/api'
 import * as Msp from '@mean-dao/msp'
 
+// Alphabetical order
 export enum PackageEnum {
-  Native = 1,
-  Solend,
-  Raydium,
-  UXD,
-  UXDStaking,
+  Castle = 1,
+  Civic,
+  Common,
+  Everlend,
+  Foresight,
   Friktion,
-  Tribeca,
-  Socean,
-  Saber,
-  Quarry,
-  Lifinity,
-  MapleFinance,
-  Deltafi,
-  Orca,
-  Mercurial,
-  Credix,
+  GoblinGold,
+  MangoMarketV3,
+  MangoMarketV4,
+  MeanFinance,
+  Serum,
+  Solend,
+  Streamflow,
+  Switchboard,
 }
 
 export interface UiInstruction {
@@ -406,7 +405,7 @@ export interface ForesightHasCategoryId extends ForesightHasGovernedAccount {
 
 export interface ForesightMakeAddMarketListToCategoryParams
   extends ForesightHasCategoryId,
-    ForesightHasMarketListId {}
+  ForesightHasMarketListId { }
 
 export interface ForesightMakeResolveMarketParams extends ForesightHasMarketId {
   winner: number

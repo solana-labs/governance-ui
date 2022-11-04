@@ -7,22 +7,14 @@ import { useCallback, useEffect, useState } from 'react'
 import ImageTextSelection from './ImageTextSelection'
 
 const SelectInstructionType = ({
-  idx,
   instructionTypes,
   selectedInstruction,
   onChange,
 }: {
-  idx: number
   selectedInstruction?: InstructionType
   instructionTypes: InstructionType[]
 
-  onChange: ({
-    instructionType,
-    idx,
-  }: {
-    instructionType: InstructionType | null
-    idx: number
-  }) => void
+  onChange: (instructionType: InstructionType | null) => void
 }) => {
   const [packageId, setPackageId] = useState<PackageEnum | null>(null)
   const { availablePackages, getPackageTypeById } = useGovernanceAssets()
@@ -37,14 +29,14 @@ const SelectInstructionType = ({
 
       // Select first instruction by default
       if (instructionTypes.length && !selectedInstruction) {
-        onChange({ instructionType: instructionTypes[0], idx })
+        onChange(instructionTypes[0])
       }
 
       return
     }
 
     if (selectedInstruction && selectedInstruction.packageId !== packageId) {
-      onChange({ instructionType: null, idx })
+      onChange(null)
     }
 
     const filteredInstructionTypes = instructionTypes.filter(
@@ -53,7 +45,7 @@ const SelectInstructionType = ({
 
     // Select first instruction by default
     if (filteredInstructionTypes.length && !selectedInstruction) {
-      onChange({ instructionType: filteredInstructionTypes[0], idx })
+      onChange(filteredInstructionTypes[0])
     }
 
     setFilteredInstructionTypes(filteredInstructionTypes)
@@ -80,12 +72,6 @@ const SelectInstructionType = ({
         ) : null}
 
         <span>{instruction.name}</span>
-
-        {instruction.tag ? (
-          <span className="ml-3 text-primary-light font-bold">
-            {instruction.tag}
-          </span>
-        ) : null}
       </>
     )
   }
@@ -95,13 +81,36 @@ const SelectInstructionType = ({
       id: null,
       name: 'All',
     },
-    ...availablePackages,
+
+    // Sort the packages in the following order:
+    // Common always first
+    // Then packages without images
+    // Then by alphabetical order (id are sorted by alphabetical order already)
+    ...availablePackages.sort((packageA, packageB): number => {
+      if (packageA.id === PackageEnum.Common) {
+        return -1
+      }
+
+      if (
+        typeof packageA.image === 'undefined' &&
+        typeof packageB.image !== 'undefined'
+      ) {
+        return -1
+      }
+
+      if (
+        typeof packageA.image !== 'undefined' &&
+        typeof packageB.image === 'undefined'
+      ) {
+        return 1
+      }
+
+      return packageA.id - packageB.id
+    }),
   ]
 
   return (
     <div className="flex flex-col">
-      <span className="mb-2">Instruction {idx + 1}</span>
-
       <div className="flex flex-col bg-bkg-1 w-full max-w-lg border border-fgd-3 default-transition rounded-md h-auto">
         <ImageTextSelection
           className="pl-4 pr-4 w-full"
@@ -119,13 +128,13 @@ const SelectInstructionType = ({
               : 'No available instructions'
           }`}
           onChange={(instructionType: InstructionType) =>
-            onChange({ instructionType, idx })
+            onChange(instructionType)
           }
           value={getInstructionDisplayName(selectedInstruction)}
           useDefaultStyle={false}
         >
           {filteredInstructionTypes.map((instructionType) => (
-            <Select.Option key={instructionType.name} value={instructionType}>
+            <Select.Option key={instructionType.id} value={instructionType}>
               <span>{getInstructionDisplayName(instructionType)}</span>
             </Select.Option>
           ))}
