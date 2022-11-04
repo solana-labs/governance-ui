@@ -755,16 +755,6 @@ export default function useGovernanceAssets() {
     },
   }
 
-  const availableInstructions = Object.entries(instructionsMap)
-    .filter(([, { isVisible }]) =>
-      typeof isVisible === 'undefined' ? canUseAnyInstruction : isVisible
-    )
-    .map(([id, { name, packageId }]) => ({
-      id: Number(id) as Instructions,
-      name,
-      packageId,
-    }))
-
   const availablePackages: PackageType[] = Object.entries(packages)
     .filter(([, { isVisible }]) =>
       typeof isVisible === 'undefined' ? true : isVisible
@@ -772,6 +762,21 @@ export default function useGovernanceAssets() {
     .map(([id, infos]) => ({
       id: Number(id) as PackageEnum,
       ...infos,
+    }))
+
+  const availableInstructions = Object.entries(instructionsMap)
+    .filter(([, { isVisible, packageId }]) => {
+      // do not display if the instruction's package is not visible
+      if (!availablePackages.some(({ id }) => id === packageId)) {
+        return false
+      }
+
+      return typeof isVisible === 'undefined' ? canUseAnyInstruction : isVisible
+    })
+    .map(([id, { name, packageId }]) => ({
+      id: Number(id) as Instructions,
+      name,
+      packageId,
     }))
 
   const getPackageTypeById = (packageId: PackageEnum) => {
