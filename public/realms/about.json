@@ -2841,42 +2841,6 @@
       }
     ]
   },
-  "7Ad1wQdytLHSFxnUyEHVPUYrNKMect4Qs5pQtYgFCrr3": {
-    "symbol": "Block Tackle Inc",
-    "heading": "SkateX is a free-to-play extreme sports video game that uses blockchain technology so players can truly own their digital gear.",
-    "about": [
-      {
-        "heading": "Introduction",
-        "content": [
-          "SkateX is a new web3 game that combines extreme sports action, a massively social multiplayer experience, and collectible NFTs from today's hottest street artists.",
-          "At its heart, SkateX is an action game, allowing players to perform tricks, complete challenges, and compete with others. Or, just relax with friends and skate around town showing off your swag. SkateX empowers you to carve your own online path.",
-          "SkateX skateboard decks come in the form of NFTs that players can own, upgrade and interact with. Ride your board across our meta-city and skate parks, display your boards to show the works of art they are, or sell them when you're ready for a different look. NFT skateboards are just the beginning, we'll be adding other clothing and gear as NFTs that players can own and equip to fully embrace their digital identities.",
-          "SkateX is being built by a team of gaming industry veterans who helped create hit titles for EA, Kabam, Lucasfilm, Roblox, Supercell and more. We grew up playing extreme sports games like Tony Hawk's Pro Skater, 1080 Snowboarding and Kelly Slater Pro Surfing. With SkateX we plan to bring that standard of fun and addictiveness to entirely new levels thanks to blockchain technology.",
-          "The world of SkateX will always be evolving with new art, new challenges, and new friends to ride around with. By giving gamers more control over their digital assets, our goal is to create a more exciting and enjoyable game experience for everyone."
-        ]
-      }
-    ],
-    "documentation": {
-      "title": "Docs",
-      "url": "https://block-tackle.gitbook.io/skatex-litepaper/"
-    },
-    "resources": [
-      {
-        "title": "Block Tackle raises $5M and launches skateboard NFTs",
-        "content": [
-          "Block Tackle, a new game studio making the SkateX blockchain game, is starting the sale of its collection of animated skateboard nonfungible tokens (NFTs)."
-        ],
-        "url": "https://venturebeat.com/games/block-tackle-raises-5m-and-launches-drop-of-skateboard-nfts/"
-      },
-      {
-        "title": "Block Tackle Raises $5M to Develop Solana NFT Skateboarding Game",
-        "content": [
-          "Coinbase Ventures, Solana Ventures, and Animoca back a new studio of game industry veterans building NFT games on Solana."
-        ],
-        "url": "https://decrypt.co/95627/block-tackle-solana-nft-skateboarding-game-skatex-coinbase-animoca"
-      }
-    ]
-  },
   "7KsnMMyrF8wsxsLZNBZ8hRkGe13MdjAT9ko1qDEvkEWQ": {
     "symbol": "Rye",
     "heading": "The easiest way to add checkout and shopping data to any app",
@@ -3272,14 +3236,14 @@
   },
   "HivVP77n6hsrgsaJUoHkYRMzgjjfmgWdcRrdrYSm6LLg": {
     "symbol": "CAMPUS",
-    "heading": "The First & Fastest-Growing Officially-Licensed Token Marketplace for College Sports",
+    "heading": "Helping brands, influencers, and their fans thrive in the new tokenized economy.",
     "about": [
       {
         "heading": "Introduction",
         "content": [
-          "With widespread fandom but traditional infrastructure, the sports industry is a prime candidate for a tech disruption. CAMPUS aims to be the vehicle for that transformation.",
-          "A college sports-focused NFT platform co-founded by Tim Tebow and led by co-founder Christine Menedis, CAMPUS is the exclusive NFT partner of the Heisman Trophy Trust and Nissan Heisman House and boasts 25+ university partners, including UNC, LSU, Michigan State and Cal. Athletes from partner schools help to create their own NFTs with utility that features access and ownership that's unprecedented in sports.",
-          "Blockchain will become the standard in the sports industry over the next decade and CAMPUS is helping college athletics get there. Visit CAMPUS today to get in early."
+          "Backed by Solana Ventures and co-Founded by Tim Tebow, Christine Menedis, and Ricky Caplin, CAMPUS helps brands, influencers and their fans thrive in the new tokenized economy.  Among those who trust CAMPUS with their on-chain brand are Nissan, dozens of top universities, the prestigious Heisman Trophy Trust, and hundreds of elite athletes and influencers.",
+          "CAMPUS has three verticals: media and marketing, college sports, and white-label solutions.  The group takes standout, turnkey content creation, delivery, and analytics alongside web3 solutions that can all be skinned to different versions for any market and back it with custom, leading-edge tech built to facilitate ownership and transference of tokens.  And, in the case of NFTs, the utility they unlock.",
+          "CAMPUS' officially-licensed college sports marketplace - https://campus.io - is the first and fastest growing within the sector. Join today to get in early."
         ]
       }
     ],
@@ -3340,7 +3304,7 @@
       {
         "heading": "Introduction",
         "content": [
-          "Elusiv is a compliance-in-mind Zero-Knowledge protocol for privately sending and receiving SOL or SPL tokens on the Solana blockchain. Furthermore, we propose Elusiv VMs, an extension of Elusiv, to enable more rapid development of solutions leveraging more general ZK circuits."
+          "Elusiv is a Zero-Knowledge privacy protocol for privately sending and receiving funds on-chain with a big focus on compliance. Elusiv both provides privacy to the users (even when interacting with normal non-private wallets on the blockchain) and safety by keeping malicious actors out of the privacy protocol. Furthermore, Elusiv VMs, an extension of Elusiv, enable rapid development of solutions leveraging more general ZK circuits."
         ]
       }
     ]
@@ -4323,7 +4287,7 @@
         {
           "title": "Build MixMob World MMO",
           "date": "2023-12-28T15:42:21.109Z",
-          "status": "completed"
+          "status": "upcoming"
         }
       ]
     },
@@ -4802,5 +4766,102 @@
       "title": "Docs",
       "url": "https://docs.sphere.engineer/"
     }
+  },
+  "7Ad1wQdytLHSFxnUyEHVPUYrNKMect4Qs5pQtYgFCrr3": {
+    "symbol": "Block Tackle Inc",
+    "heading": "SkateX is a free-to-play extreme sports video game that uses blockchain technology so players can truly own their digital gear.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "SkateX is a new web3 game that combines extreme sports action, a massively social multiplayer experience, and collectible NFTs from today's hottest street artists.",
+          "At its heart, SkateX is an action game, allowing players to perform tricks, complete challenges, and compete with others. Or, just relax with friends and skate around town showing off your swag. SkateX empowers you to carve your own online path.",
+          "SkateX skateboard decks come in the form of NFTs that players can own, upgrade and interact with. Ride your board across our meta-city and skate parks, display your boards to show the works of art they are, or sell them when you're ready for a different look. NFT skateboards are just the beginning, we'll be adding other clothing and gear as NFTs that players can own and equip to fully embrace their digital identities.",
+          "SkateX is being built by a team of gaming industry veterans who helped create hit titles for EA, Kabam, Lucasfilm, Roblox, Supercell and more. We grew up playing extreme sports games like Tony Hawk's Pro Skater, 1080 Snowboarding and Kelly Slater Pro Surfing. With SkateX we plan to bring that standard of fun and addictiveness to entirely new levels thanks to blockchain technology.",
+          "The world of SkateX will always be evolving with new art, new challenges, and new friends to ride around with. By giving gamers more control over their digital assets, our goal is to create a more exciting and enjoyable game experience for everyone."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://block-tackle.gitbook.io/skatex-litepaper/"
+    },
+    "resources": [
+      {
+        "title": "Block Tackle raises $5M and launches skateboard NFTs",
+        "content": [
+          "Block Tackle, a new game studio making the SkateX blockchain game, is starting the sale of its collection of animated skateboard nonfungible tokens (NFTs)."
+        ],
+        "url": "https://venturebeat.com/games/block-tackle-raises-5m-and-launches-drop-of-skateboard-nfts/"
+      },
+      {
+        "title": "Block Tackle Raises $5M to Develop Solana NFT Skateboarding Game",
+        "content": [
+          "Coinbase Ventures, Solana Ventures, and Animoca back a new studio of game industry veterans building NFT games on Solana."
+        ],
+        "url": "https://decrypt.co/95627/block-tackle-solana-nft-skateboarding-game-skatex-coinbase-animoca"
+      }
+    ],
+    "team": [
+      {
+        "name": "Ben Topkins",
+        "avatar": "https://media.licdn.com/dms/image/C5603AQFD2EHojGO46w/profile-displayphoto-shrink_800_800/0/1575934183705?e=1672876800&v=beta&t=-wNdzhjHyNcKEq2lcm22j2J6nih-V9s7PHr3szC42j0",
+        "description": [
+          "Ben Topkins is the Co-Founder of Block Tackle, heading up operations. Ben is a game industry veteran who has worked at Kabam, Supercell, Roblox, Elex, and the Drone Racing League."
+        ],
+        "role": "Co-Founder, Operations",
+        "twitter": "@bentopkins"
+      },
+      {
+        "name": "Rob Oshima",
+        "avatar": "https://venturebeat.com/wp-content/uploads/2022/04/skatex-Rob-Oshima-co-founder-portrait.jpeg?w=400&resize=400%2C400&strip=all",
+        "description": [
+          "Rob Oshima is a Co-Founder of Block Tackle and heads up corporate development efforts. Rob has extensive experience having worked at Kabam, 20th Century Fox, Forte, Apple, and Solana Labs."
+        ],
+        "role": "Co-Founder, Corporate Development",
+        "twitter": "@roboshima"
+      },
+      {
+        "name": "Curtis Chiu",
+        "avatar": "https://media-exp1.licdn.com/dms/image/C5603AQHA5xP6UAQY9A/profile-displayphoto-shrink_800_800/0/1649549823708?e=2147483647&v=beta&t=UXZ1eiy8TD2_8VNaLiEfYjLsrnzWc3Dazi_ZA0YYcU0",
+        "description": [
+          "Curtis Chiu is a Co-Founder of Block Tackle and heads up game development efforts. He comes from a work background that includes Konami, Sega, Naver, Kabam, and consulted at Roblox."
+        ],
+        "role": "Co-Founder, Head of Studio",
+        "twitter": "@curtischiu5"
+      }
+    ],
+    "faq": [
+      {
+        "question": "What is SkateX?",
+        "answer": [
+          "SkateX is a free-to-play extreme sports MMO video game that uses blockchain so players can truly own their digital gear. SkateX boards, streetwear and more are NFTs that are actually used in the game. Ride your board, deck it out with stickers, wear whatever truly expresses your digital identity. And most of all – have fun!"
+        ]
+      },
+      {
+        "question": "How does the game leverage Web3 technology?",
+        "answer": [
+          "SkateX skateboard decks come in the form of NFTs that players can own, upgrade and interact with. Ride your board across our meta-city and skate parks, display your boards to show the works of art they are, or sell them when you're ready for a different look. NFT skateboards are just the beginning, we'll be adding other clothing and gear as NFTs that players can own and equip to fully embrace their digital identities."
+        ]
+      },
+      {
+        "question": "What makes SkateX unique?",
+        "answer": [
+          "SkateX is being built by a team of gaming industry veterans who helped create hit titles for EA, Kabam, Lucasfilm, Roblox, Supercell and more. We grew up playing extreme sports games like Tony Hawk's Pro Skater, 1080 Snowboarding and Kelly Slater Pro Surfing."
+        ]
+      },
+      {
+        "question": "What will the SkateX game be like?",
+        "answer": [
+          "SkateX is a skill-based skateboarding game set in an open-world metaverse. Build an avatar and drop in the lobby to skate, join a crew and socialize with friends. Bring your NFT skateboard, upgrade and master new tricks across a variety of PvE and PvP gameplay modes."
+        ]
+      },
+      {
+        "question": "How can I get an NFT skateboard?",
+        "answer": [
+          "You can purchase a skateboard from: https://magiceden.io/creators/skatex"
+        ]
+      }
+    ]
   }
 }

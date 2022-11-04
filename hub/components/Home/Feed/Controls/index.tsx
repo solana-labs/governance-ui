@@ -39,6 +39,7 @@ export function Content(props: Props) {
     >
       <Toolbar.Button asChild>
         <Select
+          dropdownClassName="drop-shadow-xl"
           choices={[
             {
               key: FeedItemSort.Relevance,
@@ -49,6 +50,11 @@ export function Content(props: Props) {
               key: FeedItemSort.New,
               label: 'Latest',
               value: FeedItemSort.New,
+            },
+            {
+              key: FeedItemSort.TopAllTime,
+              label: 'Top',
+              value: FeedItemSort.TopAllTime,
             },
           ]}
           selected={props.sort}

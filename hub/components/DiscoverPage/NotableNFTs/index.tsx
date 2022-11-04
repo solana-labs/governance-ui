@@ -34,8 +34,7 @@ export const ITEMS = [
   },
   {
     // bannerImgSrc: '/realms/RCH/banner.png',
-    // description:
-    //   'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
+    description: 'Raindrops Protocol, standardizing gaming across Solana',
     iconImgSrc: '/realms/RAIN/img/rain_logo.png',
     name: 'The Imperium of Rain',
     publicKey: new PublicKey('6orGiJYGXYk9GT2NFoTv2ZMYpA6asMieAqdek4YRH2Dn'),

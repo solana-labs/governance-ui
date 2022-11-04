@@ -1557,7 +1557,7 @@
     "symbol": "RCH",
     "category": "daotools",
     "bannerImage": "/realms/RCH/banner.png",
-    "displayName": "Realms Community Hub",
+    "displayName": "Realms / SPL Governance",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e",
     "ogImage": "/realms/RCH/icon.png",
@@ -1747,7 +1747,7 @@
   {
     "symbol": "Francium",
     "category": "defi",
-    "bannerImage": "https://i.imgur.com/6Vfu1ur.jpg",
+    "bannerImage": "https://i.imgur.com/bsgHzty.png",
     "displayName": "Francium",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "GMpWmXc3sKejmAcAFpcQ4NgCL9Fx3gFR2FeepNUtK5Mh",
@@ -1784,7 +1784,7 @@
     "sortRank": 3,
     "website": "https://Contribute.xyz",
     "twitter": "@Contribute_xyz",
-    "github": "https://github.com/ContributeDAO/contribute"
+    "github": "https://github.com/ContributeDAO/"
   },
   {
     "symbol": "Artivive",
@@ -2014,7 +2014,7 @@
   {
     "symbol": "Diaspora DAO",
     "category": "nft",
-    "bannerImage": "https://i.imgur.com/HIPhTSE.png",
+    "bannerImage": "https://i.imgur.com/ratcY61.jpg",
     "displayName": "Diaspora DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "6iMVHPfcBebctV5bvSY23d2nuDuKvzTLP9HNCwWV2gGe",
@@ -2042,9 +2042,11 @@
   {
     "symbol": "Satellite IM",
     "category": "web3",
+    "bannerImage": "https://i.imgur.com/Fe9kDmp.png",
     "displayName": "Satellite IM",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "3DLKv41oFs8DiHBkUEdm3MwiyJ9Sp4E6sb8QCAqynnbA",
+    "ogImage": "https://i.imgur.com/4T6fjCz.png",
     "shortDescription": "A fully decentralized peer-to-peer communications platform",
     "sortRank": 3,
     "website": "www.satellite.im",
@@ -2253,13 +2255,13 @@
   },
   {
     "symbol": "CAMPUS",
-    "category": "other",
+    "category": "web3",
     "bannerImage": "https://ipfs.io/ipfs/bafkreieivbbl7rpvi6qtzde3mfp7khru5f23otwnjuntwl7fnm5ywz5pje",
     "displayName": "CAMPUS",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "HivVP77n6hsrgsaJUoHkYRMzgjjfmgWdcRrdrYSm6LLg",
     "ogImage": "https://ipfs.io/ipfs/bafkreieiumjwp6dt6xckxvineeqowt6m565c3i25fn2b3hz4wodeirfn5q",
-    "shortDescription": "The First & Fastest-Growing Officially-Licensed Token Marketplace for College Sports",
+    "shortDescription": "Helping brands, influencers, and their fans thrive in the new tokenized economy.",
     "sortRank": 3,
     "website": "https://campus.io/",
     "twitter": "@campusunlocks"
@@ -2281,7 +2283,7 @@
   {
     "symbol": "Elusiv",
     "category": "other",
-    "bannerImage": "https://i.imgur.com/kkg5xOP.png",
+    "bannerImage": "https://i.imgur.com/AFMGnkE.png",
     "displayName": "Elusiv",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "J7deUothQNZ2momjrDwetv9RjL714h8U8cSz6oVd3s1m",
@@ -2426,11 +2428,10 @@
   {
     "symbol": "DeGods",
     "category": "nft",
-    "bannerImage": "https://drive.google.com/drive/u/5/my-drive",
     "displayName": "DeGods",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "wx9R4TZLgL4VaVK89uW9D9DpMKMUCSm16nABeahk9Ex",
-    "ogImage": "https://drive.google.com/file/d/1zrnol6I1JYB7oWxuTHs5DG9cFhVJykp2/view",
+    "ogImage": "https://i.imgur.com/wnyQRln.jpg",
     "shortDescription": "Degods is on a mission to build the best communities on the internet.",
     "sortRank": 3,
     "website": "https://www.degods.com/",

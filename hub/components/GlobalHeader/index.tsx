@@ -67,10 +67,10 @@ export function GlobalHeader(props: Props) {
                     href: '/ecosystem',
                     title: 'Ecosystem Feed',
                   },
-                  // {
-                  //   href: '/discover',
-                  //   title: 'Discover',
-                  // },
+                  {
+                    href: '/discover',
+                    title: 'Discover',
+                  },
                 ]}
               />
             ) : (
@@ -84,10 +84,10 @@ export function GlobalHeader(props: Props) {
                     href: '/ecosystem',
                     title: 'Feed',
                   },
-                  // {
-                  //   href: '/discover',
-                  //   title: 'Discover',
-                  // },
+                  {
+                    href: '/discover',
+                    title: 'Discover',
+                  },
                 ]}
               />
             )}

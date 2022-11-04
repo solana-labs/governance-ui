@@ -54,7 +54,7 @@ export const MobileRealmSearchNavigation = forwardRef<HTMLButtonElement, Props>(
                 iconUrl: item.iconUrl,
                 name: item.name,
                 publicKey: item.publicKey,
-                url: `/realm/${item.urlId}`,
+                url: `/realm/${item.urlId}/hub`,
               })),
             )
             .filter((choice) => {
