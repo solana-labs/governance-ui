@@ -1,25 +1,26 @@
-import { TokenRecordsWithWalletAddress } from './types'
-import useRealm from '@hooks/useRealm'
 import { useEffect, useMemo } from 'react'
-import useWalletStore from 'stores/useWalletStore'
-import {
-  getMultipleAccountInfoChunked,
-  getTokenAccountsByMint,
-  parseTokenAccountData,
-  TokenProgramAccount,
-} from '@utils/tokens'
 import {
   AccountInfo,
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
-import { Member, Delegates } from 'utils/uiTypes/members'
-import { BN } from '@project-serum/anchor'
 import { PublicKey } from '@solana/web3.js'
-import { usePrevious } from '@hooks/usePrevious'
+import { BN_ZERO } from '@solana/spl-governance'
+import {
+  getMultipleAccountInfoChunked,
+  getTokenAccountsByMint,
+  parseTokenAccountData,
+  TokenProgramAccount,
+} from '@utils/tokens'
 import { capitalize } from '@utils/helpers'
+import { TokenRecordsWithWalletAddress } from './types'
+import { Member, Delegates } from 'utils/uiTypes/members'
+import useRealm from '@hooks/useRealm'
+import { usePrevious } from '@hooks/usePrevious'
 import useMembersStore from 'stores/useMembersStore'
+import useWalletStore from 'stores/useWalletStore'
+
 export default function useMembers() {
   const { tokenRecords, councilTokenOwnerRecords, realm, config } = useRealm()
   const connection = useWalletStore((s) => s.connection)
@@ -37,8 +38,8 @@ export default function useMembers() {
       for (const acc of tokenAccounts) {
         tokenAccountsInfo.push(acc)
       }
-      //we filter out people who dont have any tokens and we filter out accounts owned by realm e.g.
-      //accounts that holds deposited tokens inside realm.
+      // we filter out people who dont have any tokens and we filter out accounts owned by realm e.g.
+      // accounts that holds deposited tokens inside realm.
       return tokenAccountsInfo.filter(
         (x) =>
           !x.account.amount.isZero() &&
@@ -48,11 +49,11 @@ export default function useMembers() {
     return []
   }
 
-  //This will need to be rewritten for better performance if some realm hits more then +-5k+ members
+  // This will need to be rewritten for better performance if some realm hits more then +-5k+ members
   const fetchCommunityMembersATAS = async () => {
     if (realm?.account.communityMint) {
       const ATAS: PublicKey[] = []
-      //we filter out people who never voted and has tokens inside realm
+      // we filter out people who never voted and has tokens inside realm
       const communityTokenRecordsWallets = tokenRecordArray
         .filter((x) =>
           x.community?.account.governingTokenDepositAmount.isZero()
@@ -95,7 +96,7 @@ export default function useMembers() {
     const hasVotesOutsidePropName = `has${capitalize(type)}TokenOutsideRealm`
     const members = [...membersArray]
     for (const memberToMatch of membersToMatch) {
-      //We match members that had deposited tokens at least once
+      // We match members that had deposited tokens at least once
       const member = members.find(
         (x) => x.walletAddress === memberToMatch.account.owner.toBase58()
       )
@@ -107,12 +108,12 @@ export default function useMembers() {
           member[hasVotesOutsidePropName] = true
         }
       } else if (pushNonExisting) {
-        //we add members who never deposited tokens inside realm
+        // we add members who never deposited tokens inside realm
         members.push({
           walletAddress: memberToMatch.account.owner.toBase58(),
           votesCasted: 0,
           [votesPropoName]: memberToMatch.account.amount,
-          communityVotes: new BN(0),
+          communityVotes: BN_ZERO,
           [hasVotesOutsidePropName]: true,
         })
       }
@@ -146,20 +147,20 @@ export default function useMembers() {
     [JSON.stringify(councilTokenOwnerRecords)]
   )
 
-  //for community we exclude people who never vote
+  // for community we exclude people who never vote
   const communityAndCouncilTokenRecords = [
     ...tokenRecordArray,
     ...councilRecordArray,
   ]
-  //merge community and council vote records to one big array of members
-  //sort them by totalVotes sum of community and council votes
+  // merge community and council vote records to one big array of members
+  // sort them by totalVotes sum of community and council votes
   const membersWithTokensDeposited = useMemo(
     () =>
-      //remove duplicated walletAddresses
+      // remove duplicated walletAddresses
       Array.from(
         new Set(communityAndCouncilTokenRecords.map((s) => s.walletAddress))
       )
-        //deduplication
+        // deduplication
         .map((walletAddress) => {
           return {
             ...communityAndCouncilTokenRecords
@@ -176,15 +177,14 @@ export default function useMembers() {
                       ? curr.council.account.governingTokenDepositAmount
                       : acc.councilVotes,
                   }
-
                   if (curr.community) {
-                    obj['votesCasted'] += curr.community.account.totalVotesCount
-                    obj['delegateWalletCommunity'] =
+                    obj.votesCasted += curr.community.account.totalVotesCount
+                    obj.delegateWalletCommunity =
                       curr.community.account.governanceDelegate
                   }
                   if (curr.council) {
-                    obj['votesCasted'] += curr.council.account.totalVotesCount
-                    obj['delegateWalletCouncil'] =
+                    obj.votesCasted += curr.council.account.totalVotesCount
+                    obj.delegateWalletCouncil =
                       curr.council.account.governanceDelegate
                   }
                   return obj
@@ -192,15 +192,13 @@ export default function useMembers() {
                 {
                   walletAddress: '',
                   votesCasted: 0,
-                  councilVotes: new BN(0),
-                  communityVotes: new BN(0),
+                  councilVotes: BN_ZERO,
+                  communityVotes: BN_ZERO,
                 }
               ),
           }
         })
-        .sort((a, b) => {
-          return a.votesCasted - b.votesCasted
-        })
+        .sort((a, b) => a.votesCasted - b.votesCasted)
         .reverse(),
 
     [
@@ -223,16 +221,16 @@ export default function useMembers() {
           delegateMap[walletId] = {
             ...delegateMap[walletId],
             councilMembers: [...oldCouncilRecords, member],
-            councilTokenCount:
-              (delegateMap[walletId]?.councilTokenCount || 0) +
-              member.councilVotes.toNumber(),
+            councilTokenCount: (
+              delegateMap[walletId]?.councilTokenCount ?? BN_ZERO
+            ).add(member.councilVotes),
           }
         } else {
           delegateMap[walletId] = {
             councilMembers: [member],
             councilTokenCount: member.councilVotes
-              ? member.councilVotes.toNumber()
-              : 0,
+              ? member.councilVotes
+              : BN_ZERO,
           }
         }
       }
@@ -246,16 +244,16 @@ export default function useMembers() {
           delegateMap[walletId] = {
             ...delegateMap[walletId],
             communityMembers: [...oldCommunityRecords, member],
-            communityTokenCount:
-              (delegateMap[walletId]?.communityTokenCount || 0) +
-              member.communityVotes.toNumber(),
+            communityTokenCount: (
+              delegateMap[walletId]?.communityTokenCount ?? BN_ZERO
+            ).add(member.communityVotes),
           }
         } else {
           delegateMap[walletId] = {
             communityMembers: [member],
             communityTokenCount: member.communityVotes
-              ? member.communityVotes.toNumber()
-              : 0,
+              ? member.communityVotes
+              : BN_ZERO,
           }
         }
       }
@@ -264,18 +262,22 @@ export default function useMembers() {
     return delegateMap
   }
 
-  //Move to store if will be used more across application
+  // Move to store if will be used more across application
   useEffect(() => {
     const handleSetMembers = async () => {
       let members = [...membersWithTokensDeposited]
 
-      const councilMembers = await fetchCouncilMembersWithTokensOutsideRealm()
-      const communityMembers = await fetchCommunityMembersATAS()
+      const [councilMembers, communityMembers] = await Promise.all([
+        fetchCouncilMembersWithTokensOutsideRealm(),
+        fetchCommunityMembersATAS(),
+      ])
+
       members = matchMembers(members, councilMembers, 'council', true)
       members = matchMembers(members, communityMembers, 'community')
 
       setMembers(members)
     }
+
     const getDelegates = async () => {
       const members = [...membersWithTokensDeposited]
       const delegateMap = getDelegateWalletMap(members)
