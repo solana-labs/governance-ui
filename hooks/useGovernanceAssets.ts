@@ -415,7 +415,7 @@ export default function useGovernanceAssets() {
       packageId: PackageEnum.Everlend,
     },
     [Instructions.EverlendWithdraw]: {
-      name: 'Everlend Withdraw Funds',
+      name: 'Withdraw Funds',
       packageId: PackageEnum.Everlend,
     },
 
@@ -428,7 +428,7 @@ export default function useGovernanceAssets() {
     */
 
     [Instructions.ForesightAddMarketListToCategory]: {
-      name: 'Foresight: Add Market List To Category',
+      name: 'Add Market List To Category',
       packageId: PackageEnum.Foresight,
     },
     [Instructions.ForesightInitCategory]: {
@@ -448,7 +448,7 @@ export default function useGovernanceAssets() {
       packageId: PackageEnum.Foresight,
     },
     [Instructions.ForesightSetMarketMetadata]: {
-      name: 'Foresight: Set Market Metadata',
+      name: 'Set Market Metadata',
       packageId: PackageEnum.Foresight,
     },
 
@@ -486,11 +486,11 @@ export default function useGovernanceAssets() {
     */
 
     [Instructions.DepositIntoGoblinGold]: {
-      name: 'Deposit into GoblinGold',
+      name: 'Deposit',
       packageId: PackageEnum.GoblinGold,
     },
     [Instructions.WithdrawFromGoblinGold]: {
-      name: 'Withdraw from GoblinGold',
+      name: 'Withdraw',
       packageId: PackageEnum.GoblinGold,
     },
 
@@ -503,7 +503,7 @@ export default function useGovernanceAssets() {
     */
 
     [Instructions.ClaimMangoTokens]: {
-      name: 'Mango: Claim Tokens',
+      name: 'Claim Tokens',
       isVisible: canUseTokenTransferInstruction,
       packageId: PackageEnum.MangoMarketV3,
     },
@@ -513,7 +513,7 @@ export default function useGovernanceAssets() {
       packageId: PackageEnum.MangoMarketV3,
     },
     [Instructions.DepositToMangoAccountCsv]: {
-      name: 'Mango: Deposit to mango account with CSV',
+      name: 'Deposit to mango account with CSV',
       isVisible: canUseTokenTransferInstruction,
       packageId: PackageEnum.MangoMarketV3,
     },
@@ -568,7 +568,7 @@ export default function useGovernanceAssets() {
       packageId: PackageEnum.MangoMarketV3,
     },
     [Instructions.MangoRemovePerpMarket]: {
-      name: 'Mango: Remove Perp Market',
+      name: 'Remove Perp Market',
       isVisible: canUseProgramUpgradeInstruction,
       packageId: PackageEnum.MangoMarketV3,
     },
@@ -712,7 +712,7 @@ export default function useGovernanceAssets() {
       packageId: PackageEnum.Solend,
     },
     [Instructions.RefreshSolendReserve]: {
-      name: 'Solend: Refresh Reserve',
+      name: 'Refresh Reserve',
       packageId: PackageEnum.Solend,
     },
     [Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity]: {
@@ -750,7 +750,7 @@ export default function useGovernanceAssets() {
       packageId: PackageEnum.Switchboard,
     },
     [Instructions.SwitchboardRevokeOracle]: {
-      name: 'Switchboard: Remove Oracle from Queue',
+      name: 'Remove Oracle from Queue',
       packageId: PackageEnum.Switchboard,
     },
   }
