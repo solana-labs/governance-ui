@@ -148,6 +148,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseAnyInstruction,
     },
     {
+      id: Instructions.CancelStream,
+      name: 'Streamflow: Cancel Vesting Contract',
+      isVisible: canUseAnyInstruction,
+    },
+    {
       id: Instructions.Grant,
       name: 'Grant',
       isVisible:

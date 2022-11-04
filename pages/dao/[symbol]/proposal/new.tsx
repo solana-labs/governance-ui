@@ -67,6 +67,7 @@ import MakeChangePerpMarket from './components/instructions/Mango/MakeChangePerp
 import MakeAddOracle from './components/instructions/Mango/MakeAddOracle'
 import MakeAddSpotMarket from './components/instructions/Mango/MakeAddSpotMarket'
 import CreateStream from './components/instructions/Streamflow/CreateStream'
+import CancelStream from './components/instructions/Streamflow/CancelStream'
 import StakeValidator from './components/instructions/Validators/StakeValidator'
 import DeactivateValidatorStake from './components/instructions/Validators/DeactivateStake'
 import WithdrawValidatorStake from './components/instructions/Validators/WithdrawStake'
@@ -425,6 +426,7 @@ const New = () => {
       [Instructions.MangoV4PerpCreate]: PerpCreate,
       [Instructions.MangoV4TokenRegisterTrustless]: TokenRegisterTrustless,
       [Instructions.CreateStream]: CreateStream,
+      [Instructions.CancelStream]: CancelStream,
       [Instructions.CancelStream]: null,
       [Instructions.Grant]: Grant,
       [Instructions.Clawback]: Clawback,
