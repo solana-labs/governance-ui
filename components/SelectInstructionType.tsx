@@ -11,7 +11,16 @@ function sortInstructionTypes(
 ): InstructionType[] {
   return instructionTypes.sort((instructionTypeA, instructionTypeB) => {
     // Sort by package id
+    // Common package always first
     if (instructionTypeA.packageId !== instructionTypeB.packageId) {
+      if (instructionTypeA.packageId === PackageEnum.Common) {
+        return -1
+      }
+
+      if (instructionTypeB.packageId === PackageEnum.Common) {
+        return 1
+      }
+
       return instructionTypeA.packageId - instructionTypeB.packageId
     }
 
