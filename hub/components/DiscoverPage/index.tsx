@@ -1,3 +1,4 @@
+import { GlobalFooter } from '@hub/components/GlobalFooter';
 import cx from '@hub/lib/cx';
 
 import { AllOrgs } from './AllOrgs';
@@ -59,6 +60,7 @@ export function DiscoverPage(props: Props) {
           <NotableWeb3 className="mt-16" />
           <AllOrgs className="mt-16" />
         </div>
+        <GlobalFooter className="max-w-3xl mx-auto mt-12" />
       </div>
     </div>
   );

@@ -571,7 +571,7 @@
     "website": "https://bonfida.org/",
     "twitter": "@bonfida",
     "keywords": "Bonfida, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
-    "discord": "discord.gg/tusXFZXGTV ",
+    "discord": "https://discord.gg/tusXFZXGTV",
     "github": "https://github.com/Bonfida"
   },
   {
@@ -1129,7 +1129,7 @@
     "ogImage": "/realms/MEAN/logo.svg",
     "shortDescription": "Mean DAO is a protocol DAO offering Real-time payment infrastructure and Multisig to retail and businesses.",
     "sortRank": 3,
-    "website": "www.meanfi.com",
+    "website": "https://www.meanfi.com/",
     "twitter": "@meanfinance",
     "discord": "https://discord.com/invite/8P4vK6SWz3",
     "github": "https://github.com/mean-dao"
@@ -1248,7 +1248,7 @@
     "ogImage": "https://superteam.fun/_next/image?url=https%3A%2F%2Fsuper-static-assets.s3.amazonaws.com%2F75e99297-73de-4946-ba6b-0ac603638793%2Fimages%2F259d92ba-12da-42d7-be75-4c9b8b0796dd.png&w=3840&q=80",
     "shortDescription": "Superteam is a community dedicated to helping Solana projects launch and grow. ",
     "sortRank": 3,
-    "website": "superteam.fun",
+    "website": "https://superteam.fun/",
     "twitter": "@SuperteamDAO",
     "discord": "https://discord.com/invite/Mq3ReaekgG ",
     "github": "https://github.com/SuperteamDAO"
@@ -1265,7 +1265,7 @@
     "sortRank": 3,
     "website": "https://www.hellomoon.io/",
     "twitter": "@HelloMoon_io",
-    "discord": "discord.gg/hellomoon"
+    "discord": "https://discord.gg/hellomoon"
   },
   {
     "symbol": "Orbis Protocol",
@@ -1349,7 +1349,7 @@
     "ogImage": "https://i.imgur.com/1NzLRGM.png",
     "shortDescription": "Lighthouse enables communities to design reputation, rewards and membership systems by attesting to member contributions on-chain.",
     "sortRank": 3,
-    "website": "lighthouse.xyz",
+    "website": "https://lighthouse.xyz/",
     "twitter": "@lighthouse_dao",
     "discord": "https://discord.gg/Bv8JhaPF",
     "github": "https://github.com/sher9n/Lighthouse"
@@ -1478,7 +1478,7 @@
     "ogImage": "/realms/Dialect/img/avatar-dialect.png",
     "shortDescription": "Dialect is building an open source protocol for Smart Messaging — dynamic, composable dapp notifications and wallet-to-wallet chat",
     "sortRank": 3,
-    "website": "dialect.to",
+    "website": "https://dialect.to/",
     "twitter": "@saydialect",
     "discord": "https://discord.gg/dialect",
     "github": "https://github.com/dialectlabs"
@@ -1493,7 +1493,7 @@
     "sortRank": 3,
     "website": "https://monkedao.io/",
     "twitter": "@MonkeDAO",
-    "discord": "discord.gg/monkedao",
+    "discord": "https://discord.gg/monkedao",
     "github": "https://monkedao.gitbook.io/welcome-to-monkedao/"
   },
   {
@@ -1549,8 +1549,9 @@
     "ogImage": "https://pbs.twimg.com/profile_images/1458164179244765184/lqJUjPYh_400x400.jpg",
     "shortDescription": "Gilder makes interacting and staying connected to your decentralized internet community easy on mobile.",
     "sortRank": 3,
+    "website": "https://gilder.xyz/",
     "twitter": "@gilderxyz",
-    "discord": "discord.gg/u7zuwaAb7Z",
+    "discord": "https://discord.gg/u7zuwaAb7Z",
     "github": "https://github.com/Gilder-Labs/gilder-app"
   },
   {
@@ -1657,9 +1658,9 @@
     "ogImage": "https://i.imgur.com/MGcybjN.jpg",
     "shortDescription": "Licensed athlete token, NFT & social platform.",
     "sortRank": 3,
-    "website": "www.blocksset.co",
+    "website": "https://www.blocksset.co/",
     "twitter": "@blockassetco",
-    "discord": "www.discord.gg/blockasset"
+    "discord": "https://www.discord.gg/blockasset"
   },
   {
     "symbol": "Aten",
@@ -1673,7 +1674,7 @@
     "sortRank": 3,
     "website": "https://aten.app/",
     "twitter": "@AtenSolana",
-    "discord": "http://discord.gg/pUn8uTj8Kv"
+    "discord": "https://discord.gg/pUn8uTj8Kv"
   },
   {
     "symbol": "Virtual Basketball Association",
@@ -1712,7 +1713,7 @@
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "EVsSaLkZbnekEnVeMsYEKtj2gYxcuaVYjGLUhVXzKTA9",
     "sortRank": 3,
-    "website": "01.xyz",
+    "website": "https://01.xyz/",
     "twitter": "@01_exchange"
   },
   {
@@ -1727,7 +1728,7 @@
     "sortRank": 3,
     "website": "https://www.drippies.space/",
     "twitter": "@drippieverse",
-    "discord": "discord.gg/drippieverse"
+    "discord": "https://discord.gg/drippieverse"
   },
   {
     "symbol": "Degen Legends",
@@ -1893,7 +1894,7 @@
     "ogImage": "https://notifi.network/logo.png",
     "shortDescription": "Notifi allows Web3 teams to manage user communication under a unified platform.",
     "sortRank": 3,
-    "website": "notifi.network",
+    "website": "https://notifi.network/",
     "twitter": "@NotifiNetwork",
     "discord": "https://discord.gg/notifi",
     "github": "https://github.com/notifi-network"
@@ -2049,7 +2050,7 @@
     "ogImage": "https://i.imgur.com/4T6fjCz.png",
     "shortDescription": "A fully decentralized peer-to-peer communications platform",
     "sortRank": 3,
-    "website": "www.satellite.im",
+    "website": "https://www.satellite.im/",
     "twitter": "@Satellite_im"
   },
   {
@@ -2164,7 +2165,7 @@
     "ogImage": "https://pbs.twimg.com/profile_images/1582121955448209409/r3gbjCkP_400x400.png",
     "shortDescription": "primitives is the most joyful place to interact with blockchains :)",
     "sortRank": 3,
-    "website": "primitives.xyz",
+    "website": "https://primitives.xyz/",
     "twitter": "@primitives_xyz"
   },
   {
@@ -2305,7 +2306,7 @@
     "ogImage": "https://i.seadn.io/gae/Qzl6u460tNyzWFrlaLQIa2VMBc1HBX5X7IDfEYBbKV3q1p_BDVkqC-A7-DS5RA-IKagzD0m7J-LDpmr_XnY2ocsTcXGM01DXM7lqUg?auto=format&w=2048",
     "shortDescription": "Aurory Project is a AAA studio building the web3 gaming platform of the future.",
     "sortRank": 3,
-    "website": "aurory.io",
+    "website": "https://aurory.io/",
     "twitter": "@AuroryProject",
     "discord": "https://discord.gg/aurory"
   },
@@ -2421,7 +2422,7 @@
     "ogImage": "https://i.imgur.com/p9Ludt4.png",
     "shortDescription": "Magic Eden is the leading NFT platform for discovery, expression, and ownership across digital cultures.",
     "sortRank": 3,
-    "website": "magiceden.io",
+    "website": "https://magiceden.io/",
     "twitter": "@MagicEden",
     "discord": "https://discord.gg/magiceden",
     "github": "https://github.com/magiceden"
@@ -2479,7 +2480,7 @@
     "ogImage": "https://i.imgur.com/tSTSdAh.png",
     "shortDescription": "Eternal Dragons is a Web3 gaming series brought to you by Trailblazer Games, telling the story of the long-lost Eternal Dragons.",
     "sortRank": 3,
-    "website": "Eternaldragons.com",
+    "website": "https://eternaldragons.com/",
     "twitter": "@EternalDragons_",
     "discord": "https://discord.com/invite/eternaldragons",
     "github": "https://github.com/trailblazer-games/"
