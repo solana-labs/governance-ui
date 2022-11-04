@@ -13,7 +13,6 @@ const SelectInstructionType = ({
 }: {
   selectedInstruction?: InstructionType
   instructionTypes: InstructionType[]
-
   onChange: (instructionType: InstructionType | null) => void
 }) => {
   const [packageId, setPackageId] = useState<PackageEnum | null>(null)
