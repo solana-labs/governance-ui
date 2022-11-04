@@ -17,15 +17,6 @@ export const ITEMS = [
     urlId: 'Aurory',
   },
   {
-    bannerImgSrc: 'https://i.imgur.com/M57B2Xb.jpg',
-    description:
-      'Remix the world! A new card strategy racing game from a team that worked on HALO, FIFA, Battlefield & PokerStars. Mask Up!',
-    iconImgSrc: 'https://i.imgur.com/PHo3WRt.jpg',
-    name: 'MixMob',
-    publicKey: new PublicKey('A3WX4QKcioruP71f4yweusv9jqU9R4LtGfJEHtZhs3Rx'),
-    urlId: 'MixMob',
-  },
-  {
     bannerImgSrc: 'https://i.imgur.com/6Qmfw0l.png',
     description:
       'The Free-to-Play, Move-to-Earn NFT mobile game. Steps you take every day fuel your journey in the Genoverse. Move. Play. Create.',
@@ -43,6 +34,15 @@ export const ITEMS = [
     publicKey: new PublicKey('5K4VVEeYpANxL79r7rM3heyXqYZkzu2KkD4kFkt1gGpG'),
     urlId: 'Multiverse',
   },
+  {
+    bannerImgSrc: 'https://i.imgur.com/M57B2Xb.jpg',
+    description:
+      'Remix the world! A new card strategy racing game from a team that worked on HALO, FIFA, Battlefield & PokerStars. Mask Up!',
+    iconImgSrc: 'https://i.imgur.com/PHo3WRt.jpg',
+    name: 'MixMob',
+    publicKey: new PublicKey('A3WX4QKcioruP71f4yweusv9jqU9R4LtGfJEHtZhs3Rx'),
+    urlId: 'MixMob',
+  },
 ];
 
 interface Props {
@@ -55,7 +55,7 @@ export function NotableGames(props: Props) {
       <div className="flex items-center space-x-2">
         <GameConsoleIcon className="fill-neutral-700 h-4 w-4" />
         <div className="text-sm text-neutral-700 uppercase font-semibold">
-          notable games
+          gaming
         </div>
       </div>
       <div className="text-neutral-500 max-w-3xl">

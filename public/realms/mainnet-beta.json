@@ -566,7 +566,7 @@
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "6NzVDMfEBJvkFDnjPx53K7mLGW3yQdSjLhsamS8go4cn",
     "ogImage": "https://i.imgur.com/34Ss9kj.png",
-    "shortDescription": "Bonfida has a simple, yet realistic goal of providing products and services that will enhance the Solana blockchain experience. ",
+    "shortDescription": "Bonfida has a simple, yet realistic goal of providing products and services that will enhance the Solana blockchain experience.",
     "sortRank": 3,
     "website": "https://bonfida.org/",
     "twitter": "@bonfida",
@@ -1298,7 +1298,7 @@
   {
     "symbol": "Unique Venture Clubs",
     "category": "daotools",
-    "bannerImage": "https://i.imgur.com/OaKEQrv.jpg",
+    "bannerImage": "https://i.imgur.com/uSs2TpD.png",
     "displayName": "Unique Venture Clubs",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "5Dj3fuNLYxd1tzpPnXiPo88V8JNVHhrDScTLMJpupoXf",
@@ -1481,7 +1481,7 @@
     "website": "dialect.to",
     "twitter": "@saydialect",
     "discord": "https://discord.gg/dialect",
-    "github": "GitHub.com/dialectlabs"
+    "github": "https://github.com/dialectlabs"
   },
   {
     "symbol": "MonkeDAO",
@@ -2277,7 +2277,7 @@
     "sortRank": 3,
     "website": "https://port.finance/",
     "twitter": "@port_finance",
-    "discord": "discord.gg/nAMXAYhTb2",
+    "discord": "https://discord.gg/nAMXAYhTb2",
     "github": "https://github.com/port-finance"
   },
   {
@@ -2292,7 +2292,7 @@
     "sortRank": 3,
     "website": "https://elusiv.io/",
     "twitter": "@elusivprivacy",
-    "discord": "discord.gg/elusivprivacy",
+    "discord": "https://discord.gg/elusivprivacy",
     "github": "https://github.com/elusiv-privacy"
   },
   {
@@ -2347,6 +2347,7 @@
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "7f47FkSAJqJLNY5p3jKxp7CLbEYbQDhhmKuYDJKrNJEq",
     "ogImage": "https://i.imgur.com/j6VhuZJ.png",
+    "shortDescription": "Degenerate Ape Academy was the first trustless NFT launch on Solana. Owning a Degen Ape is owning part of history, and grants you the highest level of possible entry into both The Degeniverse and the Degen DAOO.",
     "sortRank": 3,
     "website": "https://www.degenape.academy/",
     "twitter": "@degenapeacademy"
@@ -2418,7 +2419,7 @@
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "9MwbgfEkV8ZaeycfciBqytcxwfdYHqD2NYjsTZkH4GxA",
     "ogImage": "https://i.imgur.com/p9Ludt4.png",
-    "shortDescription": "Magic Eden is the leading NFT platform for discovery, expression, and ownership across digital cultures. ",
+    "shortDescription": "Magic Eden is the leading NFT platform for discovery, expression, and ownership across digital cultures.",
     "sortRank": 3,
     "website": "magiceden.io",
     "twitter": "@MagicEden",
@@ -2428,6 +2429,7 @@
   {
     "symbol": "DeGods",
     "category": "nft",
+    "bannerImage": "https://i.imgur.com/g7s83QR.jpg",
     "displayName": "DeGods",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "wx9R4TZLgL4VaVK89uW9D9DpMKMUCSm16nABeahk9Ex",
@@ -2698,6 +2700,19 @@
     "sortRank": 3,
     "website": "https://www.dispatch.forum",
     "twitter": "@usedispatch",
-    "github": "github.com/usedispatch"
+    "github": "https://github.com/usedispatch"
+  },
+  {
+    "symbol": "SunriseStake",
+    "category": "other",
+    "bannerImage": "https://sunrisestake.com/assets/images/bg.jpg?v=f3159644",
+    "displayName": "SunriseStake",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "4iUTtxTm6aJRLKJBqQrn36kg84i33xeGmruyQDd2pqbr",
+    "ogImage": "https://app.sunrisestake.com/logo.png",
+    "shortDescription": "Carbon-neutral Staking on Solana",
+    "sortRank": 3,
+    "website": "https://sunrisestake.com",
+    "twitter": "@sunrisestake"
   }
 ]

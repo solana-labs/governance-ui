@@ -87,9 +87,9 @@ export function Hackathon(props: Props) {
           hackathon winners
         </div>
       </div>
-      <div className="text-neutral-500">
+      {/* <div className="text-neutral-500">
         Who’s who from this summer’s hackathon
-      </div>
+      </div> */}
       <div
         className={cx(
           'gap-4',

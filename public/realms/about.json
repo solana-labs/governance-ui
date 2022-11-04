@@ -2719,7 +2719,7 @@
     ],
     "documentation": {
       "title": "Docs",
-      "url": "unloc.xyz"
+      "url": "https://unloc.xyz/"
     },
     "resources": [
       {
@@ -3356,13 +3356,33 @@
     "heading": "Chillchat is the collaborative platform to build virtual worlds.",
     "about": [
       {
-        "heading": "Introduction",
+        "heading": "Your home on the internet",
         "content": [
-          "Your home on the internet: Find an escape while exploring tons of unique worlds.",
-          "Find your party: A place where you belong, with people just as weird as you.",
-          "Create your wildest dreams: Go at it alone or drag your frens along and build something epic. Don’t worry, it’s easy!",
-          "Virtual worlds make everything more fun: There's one for every occasion, whether for playing games, running events, working remotely, or just chilling out  It's all up to how you use them.",
-          "Powered by $CHILL: Use it to mint your creations as NFTs or buy, sell, and trade with other creators on our community marketplace. Got extra $CHILL? Stake it to earn more passively."
+          "Find an escape while exploring tons of unique worlds."
+        ]
+      },
+      {
+        "heading": "Find your party",
+        "content": [
+          "Find your party: A place where you belong, with people just as weird as you."
+        ]
+      },
+      {
+        "heading": "Create your wildest dreams",
+        "content": [
+          "Go at it alone or drag your frens along and build something epic. Don’t worry, it’s easy!"
+        ]
+      },
+      {
+        "heading": "Virtual worlds make everything more fun",
+        "content": [
+          "There's one for every occasion, whether for playing games, running events, working remotely, or just chilling out It's all up to how you use them."
+        ]
+      },
+      {
+        "heading": "Powered by $CHILL",
+        "content": [
+          "Use it to mint your creations as NFTs or buy, sell, and trade with other creators on our community marketplace. Got extra $CHILL? Stake it to earn more passively."
         ]
       }
     ],
@@ -4861,6 +4881,31 @@
         "answer": [
           "You can purchase a skateboard from: https://magiceden.io/creators/skatex"
         ]
+      }
+    ]
+  },
+  "4iUTtxTm6aJRLKJBqQrn36kg84i33xeGmruyQDd2pqbr" : {
+    "symbol": "SunriseStake",
+    "heading": "Carbon-neutral Staking on Solana",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "SunriseStake's mission is to make Solana climate-positive, by funneling stake yield into projects and initiatives that reduce global carbon emissions.",
+          "Web3 public goods often rely on donations to fund their work.",
+          "SunriseStake gives an example of an alternative revenue mechanism via stake rewards.  Instead of donating principal participants allocate a portion of their yield from staked capital. This injects capital back into the ecosystem and enables donors to participate in a predictable, long-term manner.",
+          "SunriseStake is built on top of the trusted Marinade Finance staking platform, which strengthens the Solana ecosystem by allocating stake to smaller validators, improving the chain's Nakamoto constant and overall resilience. In return, stakers are granted voting rights in the SunriseStake DAO, allowing them to exert influence on the usage of the stake yield that is collected by the DAO's treasury.",
+          "The goal of SunriseStake is to invest the treasury funds in climate-positive projects, allowing  Solana token holders to passively reduce or offset carbon emissions, while strengthening the Solana blockchain."
+        ]
+      }
+    ],
+    "resources": [
+      {
+        "title": "Secure Solana and earn rewards without your funds locked in",
+        "content": [
+          "Get mSOL, staked SOL supported all across the Solana ecosystem"
+        ],
+        "url": "https://marinade.finance/"
       }
     ]
   }

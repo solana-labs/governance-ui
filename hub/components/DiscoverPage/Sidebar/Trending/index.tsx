@@ -7,19 +7,20 @@ import { Org } from './Org';
 
 const CONFIG = [
   {
-    name: 'Magic Eden',
-    category: RealmCategory.Other,
-    logo: 'https://i.imgur.com/p9Ludt4.png',
-    publicKey: new PublicKey('9MwbgfEkV8ZaeycfciBqytcxwfdYHqD2NYjsTZkH4GxA'),
-    url: '/realm/Magic%20Eden',
-  },
-  {
     name: 'Backpack',
     category: RealmCategory.Web3,
     logo:
       'https://static.ftx.com/nfts/e814aeb2-a599-4697-a199-abf077b8cd5f.jpeg',
     publicKey: new PublicKey('BqLWTZv8xfJiCtu9gm87T1EqtAnL2cCJ1PS9JoKn3oBy'),
     url: '/realm/Backpack',
+  },
+  {
+    name: 'Solana Spaces',
+    category: RealmCategory.Other,
+    logo:
+      'https://pbs.twimg.com/profile_images/1583182250581102623/AOrgeepS_400x400.jpg',
+    publicKey: new PublicKey('58axqgJSAEK3adKL5hx5dYoRqkYMEiEXQZqk9FFFpa7f'),
+    url: '/realm/Solana%20Spaces',
   },
   {
     name: 'GenesysGo',
@@ -29,19 +30,20 @@ const CONFIG = [
     url: '/realm/GenesysGo',
   },
   {
-    name: 'Dual Finance',
-    category: RealmCategory.Defi,
+    name: 'Superteam',
+    category: RealmCategory.Other,
     logo:
-      'https://pbs.twimg.com/profile_images/1525300156551274497/FMlM80mn_400x400.jpg',
-    publicKey: new PublicKey('HnLuYmBxDxK1MCihHJVFnNudUTpLPc2km6xNcRQ8KPdj'),
-    url: '/realm/Dual%20Finance',
+      'https://superteam.fun/_next/image?url=https%3A%2F%2Fsuper-static-assets.s3.amazonaws.com%2F75e99297-73de-4946-ba6b-0ac603638793%2Fimages%2F259d92ba-12da-42d7-be75-4c9b8b0796dd.png&w=3840&q=80',
+    publicKey: new PublicKey('5NNv1oJ4PFhE2416kTNDzrR9axoHjBTw2CNABqcYpXXL'),
+    url: '/realm/Superteam',
   },
   {
-    name: 'Metaplex',
+    name: 'Rye',
     category: RealmCategory.Web3,
-    logo: '/realms/metaplex/img/black-circle.png',
-    publicKey: new PublicKey('DA5G7QQbFioZ6K33wQcH8fVdgFcnaDjLD7DLQkapZg5X'),
-    url: '/realm/Metaplex',
+    logo:
+      'https://pbs.twimg.com/profile_images/1571859763121758208/32YgNnii_400x400.png',
+    publicKey: new PublicKey('7KsnMMyrF8wsxsLZNBZ8hRkGe13MdjAT9ko1qDEvkEWQ'),
+    url: '/realm/Rye',
   },
 ];
 

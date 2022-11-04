@@ -6,14 +6,13 @@ import cx from '@hub/lib/cx';
 
 export const ITEMS = [
   {
-    bannerImgSrc:
-      'https://pbs.twimg.com/profile_banners/1387427286362861570/1657283618/1500x500',
+    bannerImgSrc: 'https://i.imgur.com/zXTrhXU.png',
     description:
-      'GRAPE DAO is a power user community for digital governance primitives & tooling',
-    iconImgSrc: '/realms/Grape/img/grape.png',
-    name: 'GRAPE',
-    publicKey: new PublicKey('By2sVGZXwfQq6rAiAM3rNPJ9iQfb5e2QhnF4YjJ4Bip'),
-    urlId: 'GRAPE',
+      'Bonfida has a simple, yet realistic goal of providing products and services that will enhance the Solana blockchain experience.',
+    iconImgSrc: 'https://i.imgur.com/34Ss9kj.png',
+    name: 'Bonfida DAO',
+    publicKey: new PublicKey('6NzVDMfEBJvkFDnjPx53K7mLGW3yQdSjLhsamS8go4cn'),
+    urlId: 'FIDA',
   },
   {
     bannerImgSrc: 'https://i.imgur.com/uW2laRX.png',
@@ -57,7 +56,7 @@ export function NotableWeb3(props: Props) {
       <div className="flex items-center space-x-2">
         <CubeIcon className="fill-neutral-700 h-4 w-4" />
         <div className="text-sm text-neutral-700 uppercase font-semibold">
-          notable web3 projects
+          web3 projects
         </div>
       </div>
       <div className="text-neutral-500 max-w-3xl">

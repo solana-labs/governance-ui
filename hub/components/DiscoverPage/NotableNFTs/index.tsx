@@ -16,18 +16,18 @@ export const ITEMS = [
   },
   {
     bannerImgSrc: 'https://i.imgur.com/wgLWNen.png',
-    // description:
-    //   'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
+    description:
+      'Degenerate Ape Academy was the first trustless NFT launch on Solana. Owning a Degen Ape is owning part of history, and grants you the highest level of possible entry into both The Degeniverse and the Degen DAOO.',
     iconImgSrc: 'https://i.imgur.com/j6VhuZJ.png',
     name: 'Degenerate Ape Academy',
     publicKey: new PublicKey('7f47FkSAJqJLNY5p3jKxp7CLbEYbQDhhmKuYDJKrNJEq'),
     urlId: 'Degenerate Ape Academy',
   },
   {
-    // bannerImgSrc: '/realms/RCH/banner.png',
+    bannerImgSrc: 'https://i.imgur.com/g7s83QR.jpg',
     description:
       'Degods is on a mission to build the best communities on the internet.',
-    // iconImgSrc: '/realms/RCH/icon.png',
+    iconImgSrc: 'https://i.imgur.com/wnyQRln.jpg',
     name: 'DeGods',
     publicKey: new PublicKey('wx9R4TZLgL4VaVK89uW9D9DpMKMUCSm16nABeahk9Ex'),
     urlId: 'DeGods',
@@ -52,7 +52,7 @@ export function NotableNFTs(props: Props) {
       <div className="flex items-center space-x-2">
         <NFTIcon className="fill-neutral-700 h-4 w-4" />
         <div className="text-sm text-neutral-700 uppercase font-semibold">
-          notable nft collections
+          nft collections
         </div>
       </div>
       <div className="text-neutral-500 max-w-3xl">

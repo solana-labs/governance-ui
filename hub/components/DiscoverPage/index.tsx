@@ -52,8 +52,8 @@ export function DiscoverPage(props: Props) {
         <div className="mt-16 md:pr-16 max-w-[1188px]">
           <Hackathon />
           <Popular className="mt-16" />
-          <NotableDefi className="mt-16" />
           <NotableNFTs className="mt-16" />
+          <NotableDefi className="mt-16" />
           <NotableGames className="mt-16" />
           <NotableDAOTooling className="mt-16" />
           <NotableWeb3 className="mt-16" />
