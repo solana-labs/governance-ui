@@ -34,7 +34,6 @@ export default async function getMeanCreateAccountInstruction({
 
   const serializedInstruction = ''
   const governedTokenAccount = form.governedTokenAccount
-  const additionalSerializedInstructions = [] as string[]
 
   const formTreasury = form.treasury as Treasury | undefined
 
@@ -62,8 +61,8 @@ export default async function getMeanCreateAccountInstruction({
       amount
     )
 
-    transaction.instructions.map((i) =>
-      additionalSerializedInstructions.push(serializeInstructionToBase64(i))
+    const additionalSerializedInstructions = transaction.instructions.map(
+      serializeInstructionToBase64
     )
 
     const obj: UiInstruction = {
@@ -80,7 +79,7 @@ export default async function getMeanCreateAccountInstruction({
     serializedInstruction,
     isValid: false,
     governance: governedTokenAccount?.governance,
-    additionalSerializedInstructions,
+    additionalSerializedInstructions: [],
     shouldSplitIntoSeparateTxs: true,
   }
 

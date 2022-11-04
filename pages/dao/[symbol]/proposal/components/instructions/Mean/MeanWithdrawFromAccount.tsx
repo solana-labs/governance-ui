@@ -1,19 +1,16 @@
-import { Governance, ProgramAccount } from '@solana/spl-governance'
 import { Treasury } from '@mean-dao/msp'
-import useWalletStore from 'stores/useWalletStore'
+import { Governance, ProgramAccount } from '@solana/spl-governance'
 import React, { useContext, useEffect, useState } from 'react'
+import useWalletStore from 'stores/useWalletStore'
 
 import Input from '@components/inputs/Input'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import {
-  MeanWithdrawFromAccount,
-  UiInstruction,
-} from '@utils/uiTypes/proposalCreationTypes'
-import getMeanWithdrawFromAccountInstruction from '@utils/instructions/Mean/getMeanWithdrawFromAccountInstruction'
 import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import { precision } from '@utils/formatting'
-import { getMeanWithdrawFromAccountSchema } from '@utils/validations'
+import getMeanWithdrawFromAccountInstruction from '@utils/instructions/Mean/getMeanWithdrawFromAccountInstruction'
 import getMint from '@utils/instructions/Mean/getMint'
+import { MeanWithdrawFromAccount } from '@utils/uiTypes/proposalCreationTypes'
+import { getMeanWithdrawFromAccountSchema } from '@utils/validations'
 
 import { NewProposalContext } from '../../../new'
 import SelectStreamingAccount from './SelectStreamingAccount'
@@ -50,14 +47,13 @@ const MeanWithdrawFromAccountComponent = ({ index, governance }: Props) => {
   })
   const { handleSetInstructions } = useContext(NewProposalContext)
 
-  const getInstruction = async (): Promise<UiInstruction> => {
-    return await getMeanWithdrawFromAccountInstruction({
+  const getInstruction = () =>
+    getMeanWithdrawFromAccountInstruction({
       connection,
       form,
       setFormErrors,
       schema,
     })
-  }
 
   useEffect(() => {
     handleSetInstructions(
@@ -77,8 +73,8 @@ const MeanWithdrawFromAccountComponent = ({ index, governance }: Props) => {
     handleSetForm({
       value: parseFloat(
         Math.max(
-          Number(mintMinAmount),
-          Math.min(Number(Number.MAX_SAFE_INTEGER), Number(value))
+          mintMinAmount,
+          Math.min(Number.MAX_SAFE_INTEGER, value ?? 0)
         ).toFixed(currentPrecision)
       ),
       propertyName: 'amount',
@@ -88,7 +84,7 @@ const MeanWithdrawFromAccountComponent = ({ index, governance }: Props) => {
   const setAmount = (event) => {
     const value = event.target.value
     handleSetForm({
-      value: value,
+      value,
       propertyName: 'amount',
     })
   }
@@ -157,6 +153,7 @@ const MeanWithdrawFromAccountComponent = ({ index, governance }: Props) => {
       />
       <Input
         min={mintMinAmount}
+        max={Number.MAX_SAFE_INTEGER}
         label="Amount"
         value={form.amount}
         type="number"

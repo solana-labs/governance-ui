@@ -35,7 +35,6 @@ export default async function getMeanCreateAccountInstruction({
 
   const serializedInstruction = ''
   const governedTokenAccount = form.governedTokenAccount
-  const additionalSerializedInstructions = [] as string[]
 
   if (
     isValid &&
@@ -49,8 +48,7 @@ export default async function getMeanCreateAccountInstruction({
     const mint = governedTokenAccount.extensions.mint.publicKey
     const label = form.label
     const treasurer = governedTokenAccount.governance.pubkey
-
-    const type = form.type === 0 ? TreasuryType.Open : TreasuryType.Lock
+    const type = form.type
 
     const [transaction1, treasuryPublicKey] = await msp.createTreasury2(
       payer,
@@ -75,12 +73,10 @@ export default async function getMeanCreateAccountInstruction({
       amount
     )
 
-    transaction1.instructions.map((i) =>
-      additionalSerializedInstructions.push(serializeInstructionToBase64(i))
-    )
-    transaction2.instructions.map((i) =>
-      additionalSerializedInstructions.push(serializeInstructionToBase64(i))
-    )
+    const additionalSerializedInstructions = [
+      ...transaction1.instructions,
+      ...transaction2.instructions,
+    ].map(serializeInstructionToBase64)
 
     const obj: UiInstruction = {
       serializedInstruction,
@@ -97,7 +93,7 @@ export default async function getMeanCreateAccountInstruction({
     serializedInstruction,
     isValid: false,
     governance: governedTokenAccount?.governance,
-    additionalSerializedInstructions,
+    additionalSerializedInstructions: [],
     chunkSplitByDefault: true,
     chunkBy: 1,
   }

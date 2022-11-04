@@ -3,8 +3,8 @@ import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 
 import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
-import { validateInstruction } from '@utils/instructionTools'
 import { ConnectionContext } from '@utils/connection'
+import { validateInstruction } from '@utils/instructionTools'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import {
   MeanCreateStream,
@@ -55,7 +55,6 @@ Args): Promise<UiInstruction> {
 
   const serializedInstruction = ''
   const governedTokenAccount = form.governedTokenAccount
-  const additionalSerializedInstructions = [] as string[]
 
   const formTreasury = form.treasury as Treasury | undefined
 
@@ -105,8 +104,8 @@ Args): Promise<UiInstruction> {
       usePda
     )
 
-    transaction.instructions.map((i) =>
-      additionalSerializedInstructions.push(serializeInstructionToBase64(i))
+    const additionalSerializedInstructions = transaction.instructions.map(
+      serializeInstructionToBase64
     )
 
     const obj: UiInstruction = {
@@ -123,7 +122,7 @@ Args): Promise<UiInstruction> {
     serializedInstruction,
     isValid: false,
     governance: governedTokenAccount?.governance,
-    additionalSerializedInstructions,
+    additionalSerializedInstructions: [],
     shouldSplitIntoSeparateTxs: true,
   }
 

@@ -15,6 +15,7 @@ import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
   TOKEN_PROGRAM_ID,
+  MintInfo,
 } from '@solana/spl-token'
 import { Connection } from '@solana/web3.js'
 import { BN } from '@project-serum/anchor'
@@ -397,7 +398,7 @@ export const getMeanWithdrawFromAccountSchema = ({
 }: {
   form: any
   connection: ConnectionContext
-  mintInfo: any
+  mintInfo?: MintInfo
 }) => {
   return yup.object().shape({
     governedTokenAccount: yup.object().required('Governance is required'),
@@ -442,27 +443,17 @@ export const getMeanWithdrawFromAccountSchema = ({
         'amount',
         'Transfer amount must be less than the source of funds available amount',
         async function (val: number) {
-          if (val && !form.treasury && !mintInfo) {
+          if (val && !form.treasury) {
             return this.createError({
               message: `Please select source of funds to validate the amount`,
             })
           }
-          if (val && form.treasury) {
+          if (val && form.treasury && mintInfo) {
             const mintValue = getMintNaturalAmountFromDecimalAsBN(
               val,
               mintInfo.decimals
             )
             return new BN(form.treasury.balance).gte(mintValue)
-            /*
-            return !!(governedTokenAccount?.extensions.token?.publicKey &&
-            !governedTokenAccount.isSol
-              ? governedTokenAccount.extensions.token.account.amount.gte(
-                  mintValue
-                )
-              : new BN(
-                  governedTokenAccount.extensions.solAccount!.lamports
-                ).gte(mintValue))
-                */
           }
           return this.createError({
             message: `Amount is required`,
@@ -472,7 +463,15 @@ export const getMeanWithdrawFromAccountSchema = ({
   })
 }
 
-export const getMeanCreateStreamSchema = ({ form, connection, mintInfo }) => {
+export const getMeanCreateStreamSchema = ({
+  form,
+  connection,
+  mintInfo,
+}: {
+  form: any
+  connection: ConnectionContext
+  mintInfo?: MintInfo
+}) => {
   return yup.object().shape({
     governedTokenAccount: yup.object().required('Governance is required'),
     treasury: yup.object().required('Streaming account source is required'),
@@ -516,27 +515,17 @@ export const getMeanCreateStreamSchema = ({ form, connection, mintInfo }) => {
         'amount',
         'Transfer amount must be less than the source of funds available amount',
         async function (val: number) {
-          if (val && !form.treasury && !mintInfo) {
+          if (val && !form.treasury) {
             return this.createError({
               message: `Please select source of funds to validate the amount`,
             })
           }
-          if (val && form.treasury) {
+          if (val && form.treasury && mintInfo) {
             const mintValue = getMintNaturalAmountFromDecimalAsBN(
               val,
               mintInfo.decimals
             )
             return new BN(form.treasury.balance).gte(mintValue)
-            /*
-            return !!(governedTokenAccount?.extensions.token?.publicKey &&
-            !governedTokenAccount.isSol
-              ? governedTokenAccount.extensions.token.account.amount.gte(
-                  mintValue
-                )
-              : new BN(
-                  governedTokenAccount.extensions.solAccount!.lamports
-                ).gte(mintValue))
-                */
           }
           return this.createError({
             message: `Amount is required`,

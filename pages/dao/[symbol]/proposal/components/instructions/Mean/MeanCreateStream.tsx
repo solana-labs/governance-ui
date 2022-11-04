@@ -1,19 +1,16 @@
-import { Governance, ProgramAccount } from '@solana/spl-governance'
-import React, { useContext, useEffect, useState } from 'react'
-import { Treasury } from '@mean-dao/msp'
-import useWalletStore from 'stores/useWalletStore'
 import Input from '@components/inputs/Input'
 import Select from '@components/inputs/Select'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { Treasury } from '@mean-dao/msp'
+import { Governance, ProgramAccount } from '@solana/spl-governance'
 import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import { precision } from '@utils/formatting'
 import getMeanCreateStreamInstruction from '@utils/instructions/Mean/getMeanCreateStreamInstruction'
 import getMint from '@utils/instructions/Mean/getMint'
-import {
-  MeanCreateStream,
-  UiInstruction,
-} from '@utils/uiTypes/proposalCreationTypes'
+import { MeanCreateStream } from '@utils/uiTypes/proposalCreationTypes'
 import { getMeanCreateStreamSchema } from '@utils/validations'
+import React, { useContext, useEffect, useState } from 'react'
+import useWalletStore from 'stores/useWalletStore'
 
 import { NewProposalContext } from '../../../new'
 import SelectStreamingAccount from './SelectStreamingAccount'
@@ -69,14 +66,13 @@ const MeanCreateStreamComponent = ({ index, governance }: Props) => {
   })
   const { handleSetInstructions } = useContext(NewProposalContext)
 
-  const getInstruction = async (): Promise<UiInstruction> => {
-    return await getMeanCreateStreamInstruction({
+  const getInstruction = () =>
+    getMeanCreateStreamInstruction({
       connection,
       form,
       setFormErrors,
       schema,
     })
-  }
 
   useEffect(() => {
     handleSetInstructions(
@@ -134,8 +130,8 @@ const MeanCreateStreamComponent = ({ index, governance }: Props) => {
     handleSetForm({
       value: parseFloat(
         Math.max(
-          Number(mintMinAmount),
-          Math.min(Number(Number.MAX_SAFE_INTEGER), Number(value))
+          mintMinAmount,
+          Math.min(Number.MAX_SAFE_INTEGER, value ?? 0)
         ).toFixed(currentPrecision)
       ),
       propertyName: 'allocationAssigned',
@@ -145,7 +141,7 @@ const MeanCreateStreamComponent = ({ index, governance }: Props) => {
   const setAllocationAssigned = (event) => {
     const value = event.target.value
     handleSetForm({
-      value: value,
+      value,
       propertyName: 'allocationAssigned',
     })
   }
@@ -158,8 +154,8 @@ const MeanCreateStreamComponent = ({ index, governance }: Props) => {
     handleSetForm({
       value: parseFloat(
         Math.max(
-          Number(mintMinAmount),
-          Math.min(Number(Number.MAX_SAFE_INTEGER), Number(value))
+          mintMinAmount,
+          Math.min(Number.MAX_SAFE_INTEGER, value ?? 0)
         ).toFixed(currentPrecision)
       ),
       propertyName: 'rateAmount',
@@ -169,7 +165,7 @@ const MeanCreateStreamComponent = ({ index, governance }: Props) => {
   const setRateAmount = (event) => {
     const value = event.target.value
     handleSetForm({
-      value: value,
+      value,
       propertyName: 'rateAmount',
     })
   }
@@ -179,7 +175,7 @@ const MeanCreateStreamComponent = ({ index, governance }: Props) => {
   const setStartDate = (event) => {
     const value = event.target.value
     handleSetForm({
-      value: value,
+      value,
       propertyName: 'startDate',
     })
   }
@@ -222,6 +218,7 @@ const MeanCreateStreamComponent = ({ index, governance }: Props) => {
       />
       <Input
         min={mintMinAmount}
+        max={Number.MAX_SAFE_INTEGER}
         label="Amount to stream"
         value={form.allocationAssigned}
         type="number"
@@ -242,6 +239,7 @@ const MeanCreateStreamComponent = ({ index, governance }: Props) => {
         <div style={{ width: '45%' }}>
           <Input
             min={mintMinAmount}
+            max={Number.MAX_SAFE_INTEGER}
             label="Payment rate amount"
             value={form.rateAmount}
             type="number"

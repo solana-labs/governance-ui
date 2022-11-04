@@ -1,17 +1,14 @@
-import { Governance, ProgramAccount } from '@solana/spl-governance'
 import { Treasury } from '@mean-dao/msp'
-import useWalletStore from 'stores/useWalletStore'
+import { Governance, ProgramAccount } from '@solana/spl-governance'
 import React, { useContext, useEffect, useState } from 'react'
+import useWalletStore from 'stores/useWalletStore'
 
 import Input from '@components/inputs/Input'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
-import {
-  MeanFundAccount,
-  UiInstruction,
-} from '@utils/uiTypes/proposalCreationTypes'
-import getMeanFundAccountInstruction from '@utils/instructions/Mean/getMeanFundAccountInstruction'
 import { precision } from '@utils/formatting'
+import getMeanFundAccountInstruction from '@utils/instructions/Mean/getMeanFundAccountInstruction'
+import { MeanFundAccount } from '@utils/uiTypes/proposalCreationTypes'
 import { getMeanFundAccountSchema } from '@utils/validations'
 
 import { NewProposalContext } from '../../../new'
@@ -52,14 +49,13 @@ const MeanFundAccountComponent = ({ index, governance }: Props) => {
   const { handleSetInstructions } = useContext(NewProposalContext)
 
   const connection = useWalletStore((s) => s.connection)
-  const getInstruction = async (): Promise<UiInstruction> => {
-    return await getMeanFundAccountInstruction({
+  const getInstruction = () =>
+    getMeanFundAccountInstruction({
       connection,
       form,
       setFormErrors,
       schema,
     })
-  }
 
   useEffect(() => {
     handleSetInstructions(
@@ -92,8 +88,8 @@ const MeanFundAccountComponent = ({ index, governance }: Props) => {
     handleSetForm({
       value: parseFloat(
         Math.max(
-          Number(mintMinAmount),
-          Math.min(Number(Number.MAX_SAFE_INTEGER), Number(value))
+          mintMinAmount,
+          Math.min(Number.MAX_SAFE_INTEGER, value ?? 0)
         ).toFixed(currentPrecision)
       ),
       propertyName: 'amount',
@@ -103,7 +99,7 @@ const MeanFundAccountComponent = ({ index, governance }: Props) => {
   const setAmount = (event) => {
     const value = event.target.value
     handleSetForm({
-      value: value,
+      value,
       propertyName: 'amount',
     })
   }
@@ -142,6 +138,7 @@ const MeanFundAccountComponent = ({ index, governance }: Props) => {
       />
       <Input
         min={mintMinAmount}
+        max={Number.MAX_SAFE_INTEGER}
         label="Amount"
         value={form.amount}
         type="number"

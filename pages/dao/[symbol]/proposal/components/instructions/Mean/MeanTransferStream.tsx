@@ -1,15 +1,12 @@
-import React, { useContext, useEffect, useState } from 'react'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Stream } from '@mean-dao/msp'
 import { Governance, ProgramAccount } from '@solana/spl-governance'
+import React, { useContext, useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 
 import Input from '@components/inputs/Input'
-import {
-  MeanTransferStream,
-  UiInstruction,
-} from '@utils/uiTypes/proposalCreationTypes'
 import getMeanTransferStreamInstruction from '@utils/instructions/Mean/getMeanTransferStreamInstruction'
+import { MeanTransferStream } from '@utils/uiTypes/proposalCreationTypes'
 import { getMeanTransferStreamSchema } from '@utils/validations'
 
 import { NewProposalContext } from '../../../new'
@@ -41,14 +38,13 @@ const MeanTransferStreamComponent = ({ index, governance }: Props) => {
   const schema = getMeanTransferStreamSchema()
   const { handleSetInstructions } = useContext(NewProposalContext)
 
-  const getInstruction = async (): Promise<UiInstruction> => {
-    return await getMeanTransferStreamInstruction({
+  const getInstruction = () =>
+    getMeanTransferStreamInstruction({
       connection,
       form,
       setFormErrors,
       schema,
     })
-  }
 
   useEffect(() => {
     handleSetInstructions(

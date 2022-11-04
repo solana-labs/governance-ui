@@ -1,31 +1,29 @@
+import { TreasuryType } from '@mean-dao/msp'
 import { Governance, ProgramAccount } from '@solana/spl-governance'
-import useWalletStore from 'stores/useWalletStore'
 import React, { useContext, useEffect, useState } from 'react'
+import useWalletStore from 'stores/useWalletStore'
 
 import Input from '@components/inputs/Input'
 import Select from '@components/inputs/Select'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
-import {
-  MeanCreateAccount,
-  UiInstruction,
-} from '@utils/uiTypes/proposalCreationTypes'
-import getMeanCreateAccountInstruction from '@utils/instructions/Mean/getMeanCreateAccountInstruction'
 import { precision } from '@utils/formatting'
+import getMeanCreateAccountInstruction from '@utils/instructions/Mean/getMeanCreateAccountInstruction'
+import { MeanCreateAccount } from '@utils/uiTypes/proposalCreationTypes'
 import { getMeanCreateAccountSchema } from '@utils/validations'
 
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 
-const typeSelectOptions = [0, 1] as const
+const typeSelectOptions = [TreasuryType.Open, TreasuryType.Lock] as const
 
-const TypeSelectOption = ({ value }: { value: 0 | 1 }) => {
+const TypeSelectOption = ({ value }: { value: TreasuryType }) => {
   const name =
-    value === 0
+    value === TreasuryType.Open
       ? 'Open money streaming account'
       : 'Locked money streaming account'
   const description =
-    value === 0
+    value === TreasuryType.Open
       ? 'With an open streaming account, you can create money streams that run indefinitely. When the account runs out of money all streams stop, until it gets replenished.'
       : 'With a locked streaming account you can create streams that act like a vesting contract for reserved allocations, like the ones needed for investors. They usually have a fixed end date.'
 
@@ -38,8 +36,8 @@ const TypeSelectOption = ({ value }: { value: 0 | 1 }) => {
 }
 
 interface TypeSelectProps {
-  onChange: (value: 0 | 1) => void
-  value: 0 | 1
+  onChange: (value: TreasuryType) => void
+  value: TreasuryType
 }
 
 const TypeSelect = ({ onChange, value }: TypeSelectProps) => {
@@ -73,7 +71,7 @@ const MeanCreateAccountComponent = ({ index, governance }: Props) => {
     label: undefined,
     mintInfo: undefined,
     amount: undefined,
-    type: 0,
+    type: TreasuryType.Open,
   })
 
   const [formErrors, setFormErrors] = useState({})
@@ -94,14 +92,13 @@ const MeanCreateAccountComponent = ({ index, governance }: Props) => {
   const { handleSetInstructions } = useContext(NewProposalContext)
 
   const connection = useWalletStore((s) => s.connection)
-  const getInstruction = async (): Promise<UiInstruction> => {
-    return await getMeanCreateAccountInstruction({
+  const getInstruction = () =>
+    getMeanCreateAccountInstruction({
       connection,
       form,
       setFormErrors,
       schema,
     })
-  }
 
   useEffect(() => {
     handleSetInstructions(
@@ -135,8 +132,8 @@ const MeanCreateAccountComponent = ({ index, governance }: Props) => {
     handleSetForm({
       value: parseFloat(
         Math.max(
-          Number(mintMinAmount),
-          Math.min(Number(Number.MAX_SAFE_INTEGER), Number(value))
+          mintMinAmount,
+          Math.min(Number.MAX_SAFE_INTEGER, value ?? 0)
         ).toFixed(currentPrecision)
       ),
       propertyName: 'amount',
@@ -146,7 +143,7 @@ const MeanCreateAccountComponent = ({ index, governance }: Props) => {
   const setAmount = (event) => {
     const value = event.target.value
     handleSetForm({
-      value: value,
+      value,
       propertyName: 'amount',
     })
   }
@@ -180,6 +177,7 @@ const MeanCreateAccountComponent = ({ index, governance }: Props) => {
       />
       <Input
         min={mintMinAmount}
+        max={Number.MAX_SAFE_INTEGER}
         label="Amount"
         value={form.amount}
         type="number"

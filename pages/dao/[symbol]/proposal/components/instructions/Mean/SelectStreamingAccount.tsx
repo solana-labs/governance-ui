@@ -1,16 +1,15 @@
 import { Treasury } from '@mean-dao/msp'
 import { BN } from '@project-serum/anchor'
-import { Governance } from '@solana/spl-governance'
-import { ProgramAccount } from '@solana/spl-governance'
-import React, { useEffect, useState } from 'react'
+import { Governance, ProgramAccount } from '@solana/spl-governance'
+import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 
 import Select from '@components/inputs/Select'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
+import { abbreviateAddress } from '@utils/formatting'
 import createMsp from '@utils/instructions/Mean/createMsp'
 import getMint from '@utils/instructions/Mean/getMint'
-import { abbreviateAddress } from '@utils/formatting'
 import { AssetAccount } from '@utils/uiTypes/assets'
 
 const getLabel = (treasury: Treasury | undefined, accounts: AssetAccount[]) => {

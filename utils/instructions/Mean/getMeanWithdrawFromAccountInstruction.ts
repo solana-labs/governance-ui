@@ -35,7 +35,6 @@ export default async function getMeanWithdrawFromAccountInstruction({
 
   const serializedInstruction = ''
   const governedTokenAccount = form.governedTokenAccount
-  const additionalSerializedInstructions = [] as string[]
 
   const formTreasury = form.treasury as Treasury | undefined
 
@@ -64,8 +63,8 @@ export default async function getMeanWithdrawFromAccountInstruction({
       autoWSol
     )
 
-    transaction.instructions.map((i) =>
-      additionalSerializedInstructions.push(serializeInstructionToBase64(i))
+    const additionalSerializedInstructions = transaction.instructions.map(
+      serializeInstructionToBase64
     )
 
     const obj: UiInstruction = {
@@ -82,7 +81,7 @@ export default async function getMeanWithdrawFromAccountInstruction({
     serializedInstruction,
     isValid: false,
     governance: governedTokenAccount?.governance,
-    additionalSerializedInstructions,
+    additionalSerializedInstructions: [],
     shouldSplitIntoSeparateTxs: true,
   }
 
