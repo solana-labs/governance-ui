@@ -7,13 +7,6 @@ import { Org } from './Org';
 
 const CONFIG = [
   {
-    name: 'Magic Eden',
-    category: RealmCategory.Other,
-    logo: 'https://i.imgur.com/DGcchtX.png',
-    publicKey: new PublicKey('9MwbgfEkV8ZaeycfciBqytcxwfdYHqD2NYjsTZkH4GxA'),
-    url: '/realm/Magic%20Eden',
-  },
-  {
     name: 'Backpack',
     category: RealmCategory.Web3,
     logo:
@@ -22,26 +15,35 @@ const CONFIG = [
     url: '/realm/Backpack',
   },
   {
-    name: 'Hubble Protocol',
-    category: RealmCategory.Defi,
-    logo: 'https://i.imgur.com/B5SNT8F.png',
-    publicKey: new PublicKey('AgR2tq1xcbqwmgDcNRaV1BEP5J3kfJfswP5vn6WWe6uC'),
-    url: '/realm/Hubble%20Protocol',
-  },
-  {
-    name: 'Dual Finance',
-    category: RealmCategory.Defi,
+    name: 'Solana Spaces',
+    category: RealmCategory.Other,
     logo:
-      'https://pbs.twimg.com/profile_images/1525300156551274497/FMlM80mn_400x400.jpg',
-    publicKey: new PublicKey('HnLuYmBxDxK1MCihHJVFnNudUTpLPc2km6xNcRQ8KPdj'),
-    url: '/realm/Dual%20Finance',
+      'https://pbs.twimg.com/profile_images/1583182250581102623/AOrgeepS_400x400.jpg',
+    publicKey: new PublicKey('58axqgJSAEK3adKL5hx5dYoRqkYMEiEXQZqk9FFFpa7f'),
+    url: '/realm/Solana%20Spaces',
   },
   {
-    name: 'Metaplex',
+    name: 'GenesysGo',
     category: RealmCategory.Web3,
-    logo: '/realms/metaplex/img/black-circle.png',
-    publicKey: new PublicKey('DA5G7QQbFioZ6K33wQcH8fVdgFcnaDjLD7DLQkapZg5X'),
-    url: '/realm/Metaplex',
+    logo: 'https://i.imgur.com/topNFE2.jpg',
+    publicKey: new PublicKey('96VSxgcsxhh8qcFXdT7nMzxA1CMrUBxrxcetqYFqdV5V'),
+    url: '/realm/GenesysGo',
+  },
+  {
+    name: 'Superteam',
+    category: RealmCategory.Other,
+    logo:
+      'https://superteam.fun/_next/image?url=https%3A%2F%2Fsuper-static-assets.s3.amazonaws.com%2F75e99297-73de-4946-ba6b-0ac603638793%2Fimages%2F259d92ba-12da-42d7-be75-4c9b8b0796dd.png&w=3840&q=80',
+    publicKey: new PublicKey('5NNv1oJ4PFhE2416kTNDzrR9axoHjBTw2CNABqcYpXXL'),
+    url: '/realm/Superteam',
+  },
+  {
+    name: 'Rye',
+    category: RealmCategory.Web3,
+    logo:
+      'https://pbs.twimg.com/profile_images/1571859763121758208/32YgNnii_400x400.png',
+    publicKey: new PublicKey('7KsnMMyrF8wsxsLZNBZ8hRkGe13MdjAT9ko1qDEvkEWQ'),
+    url: '/realm/Rye',
   },
 ];
 

@@ -1,5 +1,6 @@
 import type { PublicKey } from '@solana/web3.js';
 import { pipe } from 'fp-ts/function';
+import Head from 'next/head';
 
 import * as RealmHeader from '@hub/components/RealmHeader';
 import { useQuery } from '@hub/hooks/useQuery';
@@ -38,6 +39,10 @@ export function Home(props: Props) {
           ),
           ({ hub, realm }) => (
             <div>
+              <Head>
+                <title>{realm.name}</title>
+                <meta property="og:title" content={realm.name} key="title" />
+              </Head>
               <RealmHeader.Content
                 bannerUrl={realm.bannerImageUrl}
                 iconUrl={realm.iconUrl}

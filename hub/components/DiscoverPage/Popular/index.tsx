@@ -6,6 +6,15 @@ import cx from '@hub/lib/cx';
 
 export const ITEMS = [
   {
+    bannerImgSrc: 'https://i.imgur.com/hDJj3dL.png',
+    description:
+      'Magic Eden is the leading NFT platform for discovery, expression, and ownership across digital cultures.',
+    iconImgSrc: 'https://i.imgur.com/p9Ludt4.png',
+    name: 'Magic Eden',
+    publicKey: new PublicKey('9MwbgfEkV8ZaeycfciBqytcxwfdYHqD2NYjsTZkH4GxA'),
+    urlId: 'Magic%20Eden',
+  },
+  {
     bannerImgSrc: 'https://i.imgur.com/VfFjhk5.jpeg',
     description:
       'GARI Network enables everyone to monetize their social media time and activities by leveraging web3 technologies.',
@@ -13,16 +22,6 @@ export const ITEMS = [
     name: 'GARI Network',
     publicKey: new PublicKey('uWg5gaTsBnXc5qiVMB8XxBUPYqLAb5bzzgkkpxi6UAY'),
     urlId: 'GARI%20Network',
-  },
-  {
-    bannerImgSrc:
-      'https://pbs.twimg.com/profile_banners/1512518742051237893/1666295049/1500x500',
-    description: 'Experience the World of Solana. IRL.',
-    iconImgSrc:
-      'https://pbs.twimg.com/profile_images/1583182250581102623/AOrgeepS_400x400.jpg',
-    name: 'Solana Spaces',
-    publicKey: new PublicKey('58axqgJSAEK3adKL5hx5dYoRqkYMEiEXQZqk9FFFpa7f'),
-    urlId: 'Solana%20Spaces',
   },
   {
     bannerImgSrc: 'https://i.ibb.co/bNRH0hh/1500x500.jpg',
@@ -33,14 +32,13 @@ export const ITEMS = [
     urlId: 'SERUM',
   },
   {
-    bannerImgSrc:
-      'https://pbs.twimg.com/profile_banners/2408321/1665595450/1500x500',
-    description: 'The easiest way to add checkout and shopping data to any app',
-    iconImgSrc:
-      'https://pbs.twimg.com/profile_images/1571859763121758208/32YgNnii_400x400.png',
-    name: 'Rye',
-    publicKey: new PublicKey('7KsnMMyrF8wsxsLZNBZ8hRkGe13MdjAT9ko1qDEvkEWQ'),
-    urlId: 'Rye',
+    bannerImgSrc: 'https://i.imgur.com/ZiHW6ho.png',
+    description:
+      'Hello Moon provides innovative datasets on Solana to empower NFT & DeFi investors & traders.',
+    iconImgSrc: 'https://www.hellomoon.io/Logo.svg',
+    name: 'Hello Moon',
+    publicKey: new PublicKey('G4CR3KUvqPZWmHbuvWhBPqL4vBBBujviyeTVynN2rhKB'),
+    urlId: 'Hello%20Moon',
   },
 ];
 
@@ -57,7 +55,7 @@ export function Popular(props: Props) {
           popular projects
         </div>
       </div>
-      <div className="text-neutral-500">Solana projects gaining momentum</div>
+      {/* <div className="text-neutral-500">Solana projects gaining momentum</div> */}
       <div
         className={cx(
           'grid',

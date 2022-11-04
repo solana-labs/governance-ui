@@ -1,6 +1,7 @@
 import * as Separator from '@radix-ui/react-separator';
 import type { PublicKey } from '@solana/web3.js';
 import { pipe } from 'fp-ts/function';
+import Head from 'next/head';
 
 import { EcosystemHeader } from '@hub/components/EcosystemHeader';
 import * as Back from '@hub/components/FeedItem/Back';
@@ -140,6 +141,16 @@ export function FeedItemComment(props: Props) {
                 ),
                 ({ feedItem }) => (
                   <div>
+                    <Head>
+                      <title>
+                        {feedItem.title} - {realm.name}
+                      </title>
+                      <meta
+                        property="og:title"
+                        content={`${feedItem.title} - ${realm.name}`}
+                        key="title"
+                      />
+                    </Head>
                     {props.realm.equals(ECOSYSTEM_PAGE) ? (
                       <EcosystemHeader />
                     ) : (
@@ -160,7 +171,10 @@ export function FeedItemComment(props: Props) {
                       />
                     )}
                     <div className="max-w-3xl mx-auto pt-8 w-full">
-                      <Back.Content className="mb-7 mt-4" />
+                      <Back.Content
+                        className="mb-7 mt-4"
+                        url={`/realm/${props.realmUrlId}/${feedItem.id}`}
+                      />
                       <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
                       <Header.Content
                         className="mt-6"

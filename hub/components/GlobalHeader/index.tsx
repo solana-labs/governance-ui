@@ -67,10 +67,10 @@ export function GlobalHeader(props: Props) {
                     href: '/ecosystem',
                     title: 'Ecosystem Feed',
                   },
-                  // {
-                  //   href: '/discover',
-                  //   title: 'Discover',
-                  // },
+                  {
+                    href: '/discover',
+                    title: 'Discover',
+                  },
                 ]}
               />
             ) : (
@@ -84,16 +84,16 @@ export function GlobalHeader(props: Props) {
                     href: '/ecosystem',
                     title: 'Feed',
                   },
-                  // {
-                  //   href: '/discover',
-                  //   title: 'Discover',
-                  // },
+                  {
+                    href: '/discover',
+                    title: 'Discover',
+                  },
                 ]}
               />
             )}
           </div>
           <div className="flex items-center">
-            {showCreateHub && <CreateHub className="mr-8" />}
+            {showCreateHub && <CreateHub className="mr-4" />}
             {!showDesktopRealmSelector && (
               <NavigationMenu.Item asChild>
                 <MobileRealmSearchNavigation />

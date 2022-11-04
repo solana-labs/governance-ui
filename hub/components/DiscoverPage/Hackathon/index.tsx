@@ -52,24 +52,25 @@ export const ITEMS = [
     urlId: 'IntoTheVerse',
   },
   {
-    bannerImgSrc: 'https://i.imgur.com/Gwq0ZLa.png',
+    bannerImgSrc:
+      'https://pbs.twimg.com/profile_banners/1443288033025937411/1633010666/1500x500',
     category: RealmCategory.DAOTools,
     description:
-      'Bastion, leveling up the DAO experience both for the voter and for the DAO!',
-    iconImgSrc: 'https://i.imgur.com/AnlE3V1.png',
-    name: 'Bastion',
-    publicKey: new PublicKey('G1RWjNmizVM6vR8pEsHta4iRYcTa7jWM1mQErz4phpRy'),
-    urlId: 'Bastion',
+      'Gilder makes interacting and staying connected to your decentralized internet community easy on mobile.',
+    iconImgSrc:
+      'https://pbs.twimg.com/profile_images/1458164179244765184/lqJUjPYh_400x400.jpg',
+    name: 'Gilder',
+    publicKey: new PublicKey('6jydyMWSqV2bFHjCHydEQxa9XfXQWDwjVqAdjBEA1BXx'),
+    urlId: 'Gilder',
   },
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
+    bannerImgSrc: 'https://i.imgur.com/j4xkSPp.jpeg',
     category: RealmCategory.Web3,
-    description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+    description: 'Payments Infrastructure for web3',
+    iconImgSrc: 'https://i.imgur.com/j9HOqJ5.png',
+    name: 'Sphere',
+    publicKey: new PublicKey('GHVYhVLqSfqsuNXkKrALXDEX8xq76WGMAtJka5zr3jqw'),
+    urlId: 'Sphere',
   },
 ];
 
@@ -86,9 +87,9 @@ export function Hackathon(props: Props) {
           hackathon winners
         </div>
       </div>
-      <div className="text-neutral-500">
+      {/* <div className="text-neutral-500">
         Who’s who from this summer’s hackathon
-      </div>
+      </div> */}
       <div
         className={cx(
           'gap-4',
