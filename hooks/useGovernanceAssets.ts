@@ -1,9 +1,40 @@
 import { GovernanceAccountType } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
-import { Instructions } from '@utils/uiTypes/proposalCreationTypes'
+import { Instructions, PackageEnum } from '@utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import useRealm from './useRealm'
 import { vsrPluginsPks } from './useVotingPlugins'
+
+type Package = {
+  name: string
+  image?: string
+}
+
+type Packages = {
+  [packageId in PackageEnum]: Package
+}
+
+type PackageType = Package & {
+  id: PackageEnum
+}
+
+type Instruction = {
+  name: string
+  isVisible?: boolean
+  packageId: PackageEnum
+}
+
+type InstructionsMap = {
+  [instructionId in Instructions]: Instruction
+}
+
+// TODO
+// TO USE IN NEW PROPOSAL
+export type InstructionType = {
+  id: Instructions
+  name: string
+  packageId: PackageEnum
+}
 
 export default function useGovernanceAssets() {
   const { ownVoterWeight, realm, symbol, governances, config } = useRealm()
@@ -135,6 +166,72 @@ export default function useGovernanceAssets() {
       )
     }
   )
+
+  const packages: Packages = {
+    [PackageEnum.Native]: {
+      name: 'Native',
+    },
+    [PackageEnum.Solend]: {
+      name: 'Solend',
+      image: '/img/solend.png',
+    },
+    [PackageEnum.Raydium]: {
+      name: 'Raydium',
+      image: '/img/raydium.png',
+    },
+    [PackageEnum.UXD]: {
+      name: 'UXD',
+      image: '/img/uxd.png',
+    },
+    [PackageEnum.UXDStaking]: {
+      name: 'UXD Staking',
+      image: '/img/uxd-staking.png',
+    },
+    [PackageEnum.Friktion]: {
+      name: 'Friktion',
+      image: '/img/friktion.png',
+    },
+    [PackageEnum.Lifinity]: {
+      name: 'Lifinity',
+      image: '/img/lifinity.png',
+    },
+    [PackageEnum.Tribeca]: {
+      name: 'Tribeca',
+      image: '/img/tribeca.png',
+    },
+    [PackageEnum.Socean]: {
+      name: 'Socean',
+      image: '/img/socean.png',
+    },
+    [PackageEnum.Saber]: {
+      name: 'Saber',
+      image: '/img/saber.png',
+    },
+    [PackageEnum.Quarry]: {
+      name: 'Quarry',
+      image: '/img/quarry.png',
+    },
+    [PackageEnum.MapleFinance]: {
+      name: 'Maple Finance',
+      image: '/img/mapleFinance.png',
+    },
+    [PackageEnum.Deltafi]: {
+      name: 'Deltafi',
+      image: '/img/deltafi.png',
+    },
+    [PackageEnum.Orca]: {
+      name: 'Orca',
+      image: '/img/orca.svg',
+    },
+    [PackageEnum.Mercurial]: {
+      name: 'Mercurial',
+      image: '/img/mercurial.png',
+    },
+    [PackageEnum.Credix]: {
+      name: 'Credix',
+      image: '/img/credix.jpeg',
+    },
+  }
 
   const commonInstructions = [
     {
@@ -590,6 +687,20 @@ export default function useGovernanceAssets() {
     },
     ...foresightInstructions,
   ]
+
+  const availablePackages: PackageType[] = Object.entries(packages).map(
+    ([id, infos]) => ({
+      id: Number(id) as PackageEnum,
+      ...infos,
+    })
+  )
+
+  const getPackageTypeById = (packageId: PackageEnum) => {
+    return availablePackages.find(
+      (availablePackage) => availablePackage.id === packageId
+    )
+  }
+
   return {
     governancesArray,
     getGovernancesByAccountType,
@@ -609,5 +720,7 @@ export default function useGovernanceAssets() {
     canUseAuthorityInstruction,
     assetAccounts,
     auxiliaryTokenAccounts,
+    availablePackages,
+    getPackageTypeById,
   }
 }

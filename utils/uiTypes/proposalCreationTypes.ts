@@ -12,6 +12,25 @@ import { AssetAccount, StakeAccount } from '@utils/uiTypes/assets'
 import { RealmInfo } from '@models/registry/api'
 import * as Msp from '@mean-dao/msp'
 
+export enum PackageEnum {
+  Native = 1,
+  Solend,
+  Raydium,
+  UXD,
+  UXDStaking,
+  Friktion,
+  Tribeca,
+  Socean,
+  Saber,
+  Quarry,
+  Lifinity,
+  MapleFinance,
+  Deltafi,
+  Orca,
+  Mercurial,
+  Credix,
+}
+
 export interface UiInstruction {
   serializedInstruction: string
   additionalSerializedInstructions?: string[]
