@@ -34,9 +34,9 @@ export const ITEMS = [
     urlId: 'SLND',
   },
   {
-    // bannerImgSrc: '/realms/RCH/banner.png',
-    // description:
-    //   'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
+    bannerImgSrc: 'https://i.imgur.com/i1gGoIw.jpg',
+    description:
+      'Every market, all the power, none of the fuss. Simplifying decentralized finance through easy-to-use products and developer tools.',
     iconImgSrc: 'https://trade.mango.markets/assets/icons/logo.svg',
     name: 'Mango DAO',
     publicKey: new PublicKey('DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE'),
@@ -54,13 +54,12 @@ export function NotableDefi(props: Props) {
       <div className="flex items-center space-x-2">
         <ChartViolinPlotIcon className="fill-neutral-700 h-4 w-4" />
         <div className="text-sm text-neutral-700 uppercase font-semibold">
-          notable defi projects
+          defi projects
         </div>
       </div>
       <div className="text-neutral-500 max-w-3xl">
-        The rapidly evolving Solana DeFi industry features multiple innovations
-        in FinTech allowing for maximal financial inclusion while boasting
-        blazing fast transaction speeds and ultra low fees
+        Solana DeFi allows for maximal financial inclusion alongside blazing
+        fast transaction speeds and ultra low fees.
       </div>
       <div
         className={cx(

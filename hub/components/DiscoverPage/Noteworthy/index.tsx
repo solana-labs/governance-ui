@@ -12,34 +12,6 @@ import imgStaratlas from './staratlas.png';
 
 export const ITEMS = [
   {
-    imgSrc: imgAudius.src,
-    category: RealmCategory.Web3,
-    content: (
-      <div>
-        Audius puts artists in control. It’s a fully decentralized music
-        community and discovery platform owned and run by artists, fans, and
-        developers around the world.
-      </div>
-    ),
-    publicKey: new PublicKey('5Mt6EghNJHaPbNtHxH7tbbrMdwSP3sXcPRCqwPCbTVN4'),
-    stats: [
-      {
-        top: '7.2M',
-        bottom: 'Active Listeners',
-      },
-      {
-        top: '250.7K',
-        bottom: 'Artists',
-      },
-      {
-        top: '1.1M',
-        bottom: 'Songs Served',
-      },
-    ],
-    title: 'Audius',
-    urlId: 'Audius',
-  },
-  {
     imgSrc: imgStaratlas.src,
     category: RealmCategory.Gaming,
     content: (
@@ -96,6 +68,34 @@ export const ITEMS = [
     urlId: 'Solana%20Mobile',
   },
   {
+    imgSrc: imgAudius.src,
+    category: RealmCategory.Web3,
+    content: (
+      <div>
+        Audius puts artists in control. It’s a fully decentralized music
+        community and discovery platform owned and run by artists, fans, and
+        developers around the world.
+      </div>
+    ),
+    publicKey: new PublicKey('5Mt6EghNJHaPbNtHxH7tbbrMdwSP3sXcPRCqwPCbTVN4'),
+    stats: [
+      {
+        top: '7.2M',
+        bottom: 'Active Listeners',
+      },
+      {
+        top: '250.7K',
+        bottom: 'Artists',
+      },
+      {
+        top: '1.1M',
+        bottom: 'Songs Served',
+      },
+    ],
+    title: 'Audius',
+    urlId: 'Audius',
+  },
+  {
     imgSrc: imgMonkedao.src,
     category: RealmCategory.Web3,
     content: (
@@ -135,7 +135,7 @@ export function Noteworthy(props: Props) {
       <div className="flex items-center space-x-2">
         <ThumbUpIcon className="fill-neutral-700 h-4 w-4" />
         <div className="text-sm text-neutral-700 uppercase font-semibold">
-          noteworthy launches
+          spotlight
         </div>
       </div>
       <div

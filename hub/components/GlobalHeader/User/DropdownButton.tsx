@@ -11,8 +11,9 @@ export function DropdownButton(props: Props) {
         {...props}
         className={cx(
           props.className,
+          'fill-neutral-700',
           'gap-x-2',
-          'grid-cols-[12px,1fr]',
+          'grid-cols-[16px,1fr]',
           'grid',
           'h-10',
           'items-center',

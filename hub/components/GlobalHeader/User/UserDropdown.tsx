@@ -6,6 +6,7 @@ import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import { useWallet } from '@solana/wallet-adapter-react';
 
 import { AuthorAvatar } from '@hub/components/AuthorAvatar';
+import { Civic as CivicIcon } from '@hub/components/icons/Civic';
 import { useJWT } from '@hub/hooks/useJWT';
 import { abbreviateAddress } from '@hub/lib/abbreviateAddress';
 import cx from '@hub/lib/cx';
@@ -85,6 +86,19 @@ export function UserDropdown(props: Props) {
               <RecentlyViewedIcon />
               <div>View DAOs</div>
             </DropdownButton>
+            {!props.user.civicInfo && (
+              <DropdownButton
+                onClick={() => {
+                  window.open(
+                    `https://civic.me/${props.user.publicKey.toBase58()}`,
+                    '_blank',
+                  );
+                }}
+              >
+                <CivicIcon />
+                <div>Connect Civic</div>
+              </DropdownButton>
+            )}
             <DropdownButton onClick={() => setJwt(null)}>
               <LogoutIcon />
               <div className="flex items-center justify-between">

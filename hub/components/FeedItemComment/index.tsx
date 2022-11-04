@@ -171,7 +171,10 @@ export function FeedItemComment(props: Props) {
                       />
                     )}
                     <div className="max-w-3xl mx-auto pt-8 w-full">
-                      <Back.Content className="mb-7 mt-4" />
+                      <Back.Content
+                        className="mb-7 mt-4"
+                        url={`/realm/${props.realmUrlId}/${feedItem.id}`}
+                      />
                       <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
                       <Header.Content
                         className="mt-6"

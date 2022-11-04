@@ -171,7 +171,10 @@ export function FeedItem(props: Props) {
                             key="title"
                           />
                         </Head>
-                        <Back.Content className="mb-7 mt-4" />
+                        <Back.Content
+                          className="mb-7 mt-4"
+                          url={`/realm/${props.realmUrlId}`}
+                        />
                         <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
                         <Header.Content
                           className="mt-6"

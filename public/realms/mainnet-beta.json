@@ -566,12 +566,12 @@
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "6NzVDMfEBJvkFDnjPx53K7mLGW3yQdSjLhsamS8go4cn",
     "ogImage": "https://i.imgur.com/34Ss9kj.png",
-    "shortDescription": "Bonfida has a simple, yet realistic goal of providing products and services that will enhance the Solana blockchain experience. ",
+    "shortDescription": "Bonfida has a simple, yet realistic goal of providing products and services that will enhance the Solana blockchain experience.",
     "sortRank": 3,
     "website": "https://bonfida.org/",
     "twitter": "@bonfida",
     "keywords": "Bonfida, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
-    "discord": "discord.gg/tusXFZXGTV ",
+    "discord": "https://discord.gg/tusXFZXGTV",
     "github": "https://github.com/Bonfida"
   },
   {
@@ -1129,7 +1129,7 @@
     "ogImage": "/realms/MEAN/logo.svg",
     "shortDescription": "Mean DAO is a protocol DAO offering Real-time payment infrastructure and Multisig to retail and businesses.",
     "sortRank": 3,
-    "website": "www.meanfi.com",
+    "website": "https://www.meanfi.com/",
     "twitter": "@meanfinance",
     "discord": "https://discord.com/invite/8P4vK6SWz3",
     "github": "https://github.com/mean-dao"
@@ -1248,7 +1248,7 @@
     "ogImage": "https://superteam.fun/_next/image?url=https%3A%2F%2Fsuper-static-assets.s3.amazonaws.com%2F75e99297-73de-4946-ba6b-0ac603638793%2Fimages%2F259d92ba-12da-42d7-be75-4c9b8b0796dd.png&w=3840&q=80",
     "shortDescription": "Superteam is a community dedicated to helping Solana projects launch and grow. ",
     "sortRank": 3,
-    "website": "superteam.fun",
+    "website": "https://superteam.fun/",
     "twitter": "@SuperteamDAO",
     "discord": "https://discord.com/invite/Mq3ReaekgG ",
     "github": "https://github.com/SuperteamDAO"
@@ -1265,7 +1265,7 @@
     "sortRank": 3,
     "website": "https://www.hellomoon.io/",
     "twitter": "@HelloMoon_io",
-    "discord": "discord.gg/hellomoon"
+    "discord": "https://discord.gg/hellomoon"
   },
   {
     "symbol": "Orbis Protocol",
@@ -1298,7 +1298,7 @@
   {
     "symbol": "Unique Venture Clubs",
     "category": "daotools",
-    "bannerImage": "https://i.imgur.com/OaKEQrv.jpg",
+    "bannerImage": "https://i.imgur.com/uSs2TpD.png",
     "displayName": "Unique Venture Clubs",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "5Dj3fuNLYxd1tzpPnXiPo88V8JNVHhrDScTLMJpupoXf",
@@ -1349,7 +1349,7 @@
     "ogImage": "https://i.imgur.com/1NzLRGM.png",
     "shortDescription": "Lighthouse enables communities to design reputation, rewards and membership systems by attesting to member contributions on-chain.",
     "sortRank": 3,
-    "website": "lighthouse.xyz",
+    "website": "https://lighthouse.xyz/",
     "twitter": "@lighthouse_dao",
     "discord": "https://discord.gg/Bv8JhaPF",
     "github": "https://github.com/sher9n/Lighthouse"
@@ -1478,10 +1478,10 @@
     "ogImage": "/realms/Dialect/img/avatar-dialect.png",
     "shortDescription": "Dialect is building an open source protocol for Smart Messaging — dynamic, composable dapp notifications and wallet-to-wallet chat",
     "sortRank": 3,
-    "website": "dialect.to",
+    "website": "https://dialect.to/",
     "twitter": "@saydialect",
     "discord": "https://discord.gg/dialect",
-    "github": "GitHub.com/dialectlabs"
+    "github": "https://github.com/dialectlabs"
   },
   {
     "symbol": "MonkeDAO",
@@ -1493,7 +1493,7 @@
     "sortRank": 3,
     "website": "https://monkedao.io/",
     "twitter": "@MonkeDAO",
-    "discord": "discord.gg/monkedao",
+    "discord": "https://discord.gg/monkedao",
     "github": "https://monkedao.gitbook.io/welcome-to-monkedao/"
   },
   {
@@ -1549,15 +1549,16 @@
     "ogImage": "https://pbs.twimg.com/profile_images/1458164179244765184/lqJUjPYh_400x400.jpg",
     "shortDescription": "Gilder makes interacting and staying connected to your decentralized internet community easy on mobile.",
     "sortRank": 3,
+    "website": "https://gilder.xyz/",
     "twitter": "@gilderxyz",
-    "discord": "discord.gg/u7zuwaAb7Z",
+    "discord": "https://discord.gg/u7zuwaAb7Z",
     "github": "https://github.com/Gilder-Labs/gilder-app"
   },
   {
     "symbol": "RCH",
     "category": "daotools",
     "bannerImage": "/realms/RCH/banner.png",
-    "displayName": "Realms Community Hub",
+    "displayName": "Realms / SPL Governance",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e",
     "ogImage": "/realms/RCH/icon.png",
@@ -1657,9 +1658,9 @@
     "ogImage": "https://i.imgur.com/MGcybjN.jpg",
     "shortDescription": "Licensed athlete token, NFT & social platform.",
     "sortRank": 3,
-    "website": "www.blocksset.co",
+    "website": "https://www.blocksset.co/",
     "twitter": "@blockassetco",
-    "discord": "www.discord.gg/blockasset"
+    "discord": "https://www.discord.gg/blockasset"
   },
   {
     "symbol": "Aten",
@@ -1673,7 +1674,7 @@
     "sortRank": 3,
     "website": "https://aten.app/",
     "twitter": "@AtenSolana",
-    "discord": "http://discord.gg/pUn8uTj8Kv"
+    "discord": "https://discord.gg/pUn8uTj8Kv"
   },
   {
     "symbol": "Virtual Basketball Association",
@@ -1712,7 +1713,7 @@
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "EVsSaLkZbnekEnVeMsYEKtj2gYxcuaVYjGLUhVXzKTA9",
     "sortRank": 3,
-    "website": "01.xyz",
+    "website": "https://01.xyz/",
     "twitter": "@01_exchange"
   },
   {
@@ -1727,7 +1728,7 @@
     "sortRank": 3,
     "website": "https://www.drippies.space/",
     "twitter": "@drippieverse",
-    "discord": "discord.gg/drippieverse"
+    "discord": "https://discord.gg/drippieverse"
   },
   {
     "symbol": "Degen Legends",
@@ -1747,7 +1748,7 @@
   {
     "symbol": "Francium",
     "category": "defi",
-    "bannerImage": "https://i.imgur.com/6Vfu1ur.jpg",
+    "bannerImage": "https://i.imgur.com/bsgHzty.png",
     "displayName": "Francium",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "GMpWmXc3sKejmAcAFpcQ4NgCL9Fx3gFR2FeepNUtK5Mh",
@@ -1784,7 +1785,7 @@
     "sortRank": 3,
     "website": "https://Contribute.xyz",
     "twitter": "@Contribute_xyz",
-    "github": "https://github.com/ContributeDAO/contribute"
+    "github": "https://github.com/ContributeDAO/"
   },
   {
     "symbol": "Artivive",
@@ -1893,7 +1894,7 @@
     "ogImage": "https://notifi.network/logo.png",
     "shortDescription": "Notifi allows Web3 teams to manage user communication under a unified platform.",
     "sortRank": 3,
-    "website": "notifi.network",
+    "website": "https://notifi.network/",
     "twitter": "@NotifiNetwork",
     "discord": "https://discord.gg/notifi",
     "github": "https://github.com/notifi-network"
@@ -2014,7 +2015,7 @@
   {
     "symbol": "Diaspora DAO",
     "category": "nft",
-    "bannerImage": "https://i.imgur.com/HIPhTSE.png",
+    "bannerImage": "https://i.imgur.com/ratcY61.jpg",
     "displayName": "Diaspora DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "6iMVHPfcBebctV5bvSY23d2nuDuKvzTLP9HNCwWV2gGe",
@@ -2042,12 +2043,14 @@
   {
     "symbol": "Satellite IM",
     "category": "web3",
+    "bannerImage": "https://i.imgur.com/Fe9kDmp.png",
     "displayName": "Satellite IM",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "3DLKv41oFs8DiHBkUEdm3MwiyJ9Sp4E6sb8QCAqynnbA",
+    "ogImage": "https://i.imgur.com/4T6fjCz.png",
     "shortDescription": "A fully decentralized peer-to-peer communications platform",
     "sortRank": 3,
-    "website": "www.satellite.im",
+    "website": "https://www.satellite.im/",
     "twitter": "@Satellite_im"
   },
   {
@@ -2162,7 +2165,7 @@
     "ogImage": "https://pbs.twimg.com/profile_images/1582121955448209409/r3gbjCkP_400x400.png",
     "shortDescription": "primitives is the most joyful place to interact with blockchains :)",
     "sortRank": 3,
-    "website": "primitives.xyz",
+    "website": "https://primitives.xyz/",
     "twitter": "@primitives_xyz"
   },
   {
@@ -2253,13 +2256,13 @@
   },
   {
     "symbol": "CAMPUS",
-    "category": "other",
+    "category": "web3",
     "bannerImage": "https://ipfs.io/ipfs/bafkreieivbbl7rpvi6qtzde3mfp7khru5f23otwnjuntwl7fnm5ywz5pje",
     "displayName": "CAMPUS",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "HivVP77n6hsrgsaJUoHkYRMzgjjfmgWdcRrdrYSm6LLg",
     "ogImage": "https://ipfs.io/ipfs/bafkreieiumjwp6dt6xckxvineeqowt6m565c3i25fn2b3hz4wodeirfn5q",
-    "shortDescription": "The First & Fastest-Growing Officially-Licensed Token Marketplace for College Sports",
+    "shortDescription": "Helping brands, influencers, and their fans thrive in the new tokenized economy.",
     "sortRank": 3,
     "website": "https://campus.io/",
     "twitter": "@campusunlocks"
@@ -2275,13 +2278,13 @@
     "sortRank": 3,
     "website": "https://port.finance/",
     "twitter": "@port_finance",
-    "discord": "discord.gg/nAMXAYhTb2",
+    "discord": "https://discord.gg/nAMXAYhTb2",
     "github": "https://github.com/port-finance"
   },
   {
     "symbol": "Elusiv",
     "category": "other",
-    "bannerImage": "https://i.imgur.com/kkg5xOP.png",
+    "bannerImage": "https://i.imgur.com/AFMGnkE.png",
     "displayName": "Elusiv",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "J7deUothQNZ2momjrDwetv9RjL714h8U8cSz6oVd3s1m",
@@ -2290,7 +2293,7 @@
     "sortRank": 3,
     "website": "https://elusiv.io/",
     "twitter": "@elusivprivacy",
-    "discord": "discord.gg/elusivprivacy",
+    "discord": "https://discord.gg/elusivprivacy",
     "github": "https://github.com/elusiv-privacy"
   },
   {
@@ -2303,7 +2306,7 @@
     "ogImage": "https://i.seadn.io/gae/Qzl6u460tNyzWFrlaLQIa2VMBc1HBX5X7IDfEYBbKV3q1p_BDVkqC-A7-DS5RA-IKagzD0m7J-LDpmr_XnY2ocsTcXGM01DXM7lqUg?auto=format&w=2048",
     "shortDescription": "Aurory Project is a AAA studio building the web3 gaming platform of the future.",
     "sortRank": 3,
-    "website": "aurory.io",
+    "website": "https://aurory.io/",
     "twitter": "@AuroryProject",
     "discord": "https://discord.gg/aurory"
   },
@@ -2345,6 +2348,7 @@
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "7f47FkSAJqJLNY5p3jKxp7CLbEYbQDhhmKuYDJKrNJEq",
     "ogImage": "https://i.imgur.com/j6VhuZJ.png",
+    "shortDescription": "Degenerate Ape Academy was the first trustless NFT launch on Solana. Owning a Degen Ape is owning part of history, and grants you the highest level of possible entry into both The Degeniverse and the Degen DAOO.",
     "sortRank": 3,
     "website": "https://www.degenape.academy/",
     "twitter": "@degenapeacademy"
@@ -2416,9 +2420,9 @@
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "9MwbgfEkV8ZaeycfciBqytcxwfdYHqD2NYjsTZkH4GxA",
     "ogImage": "https://i.imgur.com/p9Ludt4.png",
-    "shortDescription": "Magic Eden is the leading NFT platform for discovery, expression, and ownership across digital cultures. ",
+    "shortDescription": "Magic Eden is the leading NFT platform for discovery, expression, and ownership across digital cultures.",
     "sortRank": 3,
-    "website": "magiceden.io",
+    "website": "https://magiceden.io/",
     "twitter": "@MagicEden",
     "discord": "https://discord.gg/magiceden",
     "github": "https://github.com/magiceden"
@@ -2426,11 +2430,11 @@
   {
     "symbol": "DeGods",
     "category": "nft",
-    "bannerImage": "https://drive.google.com/drive/u/5/my-drive",
+    "bannerImage": "https://i.imgur.com/g7s83QR.jpg",
     "displayName": "DeGods",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "wx9R4TZLgL4VaVK89uW9D9DpMKMUCSm16nABeahk9Ex",
-    "ogImage": "https://drive.google.com/file/d/1zrnol6I1JYB7oWxuTHs5DG9cFhVJykp2/view",
+    "ogImage": "https://i.imgur.com/wnyQRln.jpg",
     "shortDescription": "Degods is on a mission to build the best communities on the internet.",
     "sortRank": 3,
     "website": "https://www.degods.com/",
@@ -2476,7 +2480,7 @@
     "ogImage": "https://i.imgur.com/tSTSdAh.png",
     "shortDescription": "Eternal Dragons is a Web3 gaming series brought to you by Trailblazer Games, telling the story of the long-lost Eternal Dragons.",
     "sortRank": 3,
-    "website": "Eternaldragons.com",
+    "website": "https://eternaldragons.com/",
     "twitter": "@EternalDragons_",
     "discord": "https://discord.com/invite/eternaldragons",
     "github": "https://github.com/trailblazer-games/"
@@ -2697,6 +2701,19 @@
     "sortRank": 3,
     "website": "https://www.dispatch.forum",
     "twitter": "@usedispatch",
-    "github": "github.com/usedispatch"
+    "github": "https://github.com/usedispatch"
+  },
+  {
+    "symbol": "SunriseStake",
+    "category": "other",
+    "bannerImage": "https://sunrisestake.com/assets/images/bg.jpg?v=f3159644",
+    "displayName": "SunriseStake",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "4iUTtxTm6aJRLKJBqQrn36kg84i33xeGmruyQDd2pqbr",
+    "ogImage": "https://app.sunrisestake.com/logo.png",
+    "shortDescription": "Carbon-neutral Staking on Solana",
+    "sortRank": 3,
+    "website": "https://sunrisestake.com",
+    "twitter": "@sunrisestake"
   }
 ]
