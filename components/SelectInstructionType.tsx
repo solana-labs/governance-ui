@@ -66,7 +66,7 @@ const SelectInstructionType = ({
       <>
         {packageId === null ? (
           <span className="pr-1">
-            {getPackageTypeById(instruction.packageId)!.name}:
+            {getPackageTypeById(instruction.packageId)?.name ?? ''}:
           </span>
         ) : null}
 

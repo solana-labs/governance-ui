@@ -611,6 +611,7 @@ export enum Instructions {
   SerumUpdateGovConfigAuthority,
   JoinDAO,
   ClaimMangoTokens,
+  MyNewAwmazingInstruction,
 }
 
 export type createParams = [
