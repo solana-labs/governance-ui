@@ -427,7 +427,6 @@ const New = () => {
       [Instructions.MangoV4TokenRegisterTrustless]: TokenRegisterTrustless,
       [Instructions.CreateStream]: CreateStream,
       [Instructions.CancelStream]: CancelStream,
-      [Instructions.CancelStream]: null,
       [Instructions.Grant]: Grant,
       [Instructions.Clawback]: Clawback,
       [Instructions.CreateAssociatedTokenAccount]: CreateAssociatedTokenAccount,
