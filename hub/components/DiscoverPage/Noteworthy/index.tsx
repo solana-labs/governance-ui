@@ -101,7 +101,7 @@ export const ITEMS = [
     category: RealmCategory.Web3,
     content: (
       <div>
-        Monkedao is the community of Solana Monke Business owners, operating a
+        MonkeDAO is the community of Solana Monke Business owners, operating a
         validator to help secure Solana and fund the community both online and
         IRL.
       </div>
@@ -121,7 +121,7 @@ export const ITEMS = [
         bottom: 'To Operate Validator',
       },
     ],
-    title: 'Monke Dao',
+    title: 'MonkeDAO',
     urlId: 'MonkeDAO',
   },
 ];
