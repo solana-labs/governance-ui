@@ -30,13 +30,24 @@ export function GlobalFooter(props: Props) {
       <div className="max-w-md mt-6 mb-2.5 w-full">
         <Separator.Root className="h-[1px] w-full bg-black" />
       </div>
-      <div className="flex items-center justify-center text-xs sm:text-sm text-neutral-900">
+      <div
+        className={cx(
+          'flex-col',
+          'flex',
+          'items-center',
+          'justify-center',
+          'text-neutral-900',
+          'text-xs',
+          'sm:flex-row',
+          'sm:text-sm',
+        )}
+      >
         <div>© 2022 Solana Technology Services LLC</div>
-        <div className="mx-2">|</div>
+        <div className="hidden sm:block mx-2">|</div>
         <a href="https://realms.today/terms" target="_blank" rel="noreferrer">
           Terms
         </a>
-        <div className="mx-2">|</div>
+        <div className="hidden sm:block mx-2">|</div>
         <a
           href="https://realms.today/privacy-policy"
           target="_blank"

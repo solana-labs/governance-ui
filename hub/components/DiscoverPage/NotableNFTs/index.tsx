@@ -33,7 +33,7 @@ export const ITEMS = [
     urlId: 'DeGods',
   },
   {
-    // bannerImgSrc: '/realms/RCH/banner.png',
+    bannerImgSrc: 'https://i.imgur.com/nr1riOL.jpg',
     description: 'Raindrops Protocol, standardizing gaming across Solana',
     iconImgSrc: '/realms/RAIN/img/rain_logo.png',
     name: 'The Imperium of Rain',
