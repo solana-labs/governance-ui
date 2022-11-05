@@ -44,27 +44,28 @@ export const ITEMS = [
     category: RealmCategory.Web3,
     content: (
       <div>
-        The Solana Mobile Stack and accompanying mobile Phone provides Web3
-        natives native crypto experience on their phone. This new frontier
-        features several opportunities including:
+        Solana Mobiles’s inaugural flagship Saga phone offers a powerful mobile
+        device enabled with native and seamless Web3 experiences. The Solana
+        Mobile Stack provides the tools for developers to build truly mobile
+        native dApps
       </div>
     ),
     publicKey: new PublicKey('ALzXvpmcmqmpNcFTbPzZ8ykSxHGqta85gTANfi8YPkPW'),
     stats: [
       {
         top: 'Seed Vault',
-        bottom: 'Wallet Hardware',
+        bottom: 'Key Custody on Saga',
       },
       {
-        top: 'Low Fees',
-        bottom: 'dApp Transactions',
+        top: 'dApp Store',
+        bottom: 'Fee Free Txns',
       },
       {
-        top: 'OSOM',
-        bottom: 'Premium Hardware',
+        top: 'OSOM Design',
+        bottom: 'Flagship Android',
       },
     ],
-    title: 'Solana Mobile / SMS',
+    title: 'Solana Mobile / Solana Mobile Stack',
     urlId: 'Solana%20Mobile',
   },
   {

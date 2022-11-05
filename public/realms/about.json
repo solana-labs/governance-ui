@@ -3655,9 +3655,10 @@
       {
         "heading": "Introduction",
         "content": [
-          "Solana Mobile is set out to provide the best web3 experience on mobile for Solana users. We're doing so through two efforts: First, the Solana Mobile Stack (SMS) provides a new set of libraries for wallets and apps, allowing developers to create rich mobile experiences on Solana, the world’s most performant blockchain, and is built to run alongside Android. The SDK provides libraries and programming interfaces for Android apps and secure key private storage, simplifying the developer experience to build and extend dApps functionality for Solana.",
-          "In addition to the Solana Mobile Stack, we're releasing Saga. Saga is a flagship Android mobile phone with unique functionality and features tightly integrated with the Solana blockchain making it easy and secure to transact in web3 and manage digital assets, such as tokens and NFTs. Saga will be the first device to include Seed Vault, which protects user private keys via secure hardware and AES encryption.",
-          "Finally, Solana Mobile is introducing the Solana dApp Store, a new distribution channel for native mobile dApps built on Solana. With no fees on in-app purchases, dApp sales, or subscriptions, the dApp Store will be the home to the next wave of great web3 experiences."
+          "Solana Mobile’s mission is to provide the best web3 experience on mobile.",
+          "Solana Mobile’s first flagship device, Saga, is an Android mobile phone with unique functionality and features tightly integrated with the Solana blockchain. Saga makes it easy and secure to transact in web3 and manage digital assets, such as tokens and NFTs. Saga will be the first device to include Seed Vault, which protects user private keys via secure hardware and AES encryption.",
+          "We also launched the Solana Mobile Stack (SMS), which  provides a new set of libraries for wallets and dApps, allowing developers to create rich mobile experiences on Solana, the world’s most performant blockchain. The SDK is built to run alongside Android and provides libraries and programming interfaces for Android apps and secure key custody, simplifying the developer experience to build and extend dApps functionality for Solana.",
+          "The Saga devices will be pre-installed with the Solana dApp Store, a new distribution channel for native mobile dApps built on Solana. With no fees on in-app purchases, dApp sales, or subscriptions, the dApp Store will be the home to the next wave of great web3 experiences."
         ]
       }
     ]
@@ -4071,6 +4072,7 @@
       },
       {
         "name": "Dennis Zdonov",
+        "avatar": "https://media-exp1.licdn.com/dms/image/C4E03AQE4acqoOhvkGg/profile-displayphoto-shrink_800_800/0/1529192513215?e=1672876800&v=beta&t=OHx0X4thfZsRVzXcVm-zT28MoePVmaosevanjIWeBqk",
         "description": [
           "Dennis Zdonov is a co-founder of Faraway, a web3 gaming studio specializing in hyper-social games with player-driven economies. Prior to founding Faraway with his long-time co-founder, Alex Paley, he was VP of Product at Scopely and Head of Studio at Glu Mobile."
         ],
