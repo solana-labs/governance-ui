@@ -23,7 +23,7 @@ export function Content(props: Props & { url: string }) {
     >
       <ArrowLeftIcon className="h-4 w-4 fill-zinc-800 transition-colors group-hover:fill-sky-500" />
       <div className="text-neutral-700 text-xs transition-colors group-hover:text-sky-500">
-        Goto Feed
+        Go to Feed
       </div>
     </button>
   );

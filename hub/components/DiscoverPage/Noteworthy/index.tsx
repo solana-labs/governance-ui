@@ -44,7 +44,7 @@ export const ITEMS = [
     category: RealmCategory.Web3,
     content: (
       <div>
-        Solana Mobiles’s inaugural flagship Saga phone offers a powerful mobile
+        Solana Mobile's inaugural flagship Saga phone offers a powerful mobile
         device enabled with native and seamless Web3 experiences. The Solana
         Mobile Stack provides the tools for developers to build truly mobile
         native dApps
