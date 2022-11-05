@@ -52,7 +52,7 @@ export function LinksDropdown(props: Props) {
             )}
           >
             <Select.Value asChild>
-              <div>{selected?.title || 'Goto'}</div>
+              <div>{selected?.title || 'Go to'}</div>
             </Select.Value>
           </div>
           <Select.Icon>

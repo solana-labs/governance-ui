@@ -176,7 +176,7 @@ export function Trending(props: Props) {
                             'font-bold',
                             'text-neutral-900',
                             'transition-colors',
-                            'truncate',
+                            'whitespace-pre-wrap',
                             'group-hover:text-sky-500',
                           )}
                         >

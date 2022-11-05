@@ -6,6 +6,7 @@ import { RealmCircle } from '@hub/components/branding/RealmCircle';
 import { SmallCard } from '@hub/components/DiscoverPage/SmallCard';
 import { LoadingDots } from '@hub/components/LoadingDots';
 import { useQuery } from '@hub/hooks/useQuery';
+import { STEALTH_HUBS } from '@hub/lib/constants';
 import cx from '@hub/lib/cx';
 import { RealmCategory } from '@hub/types/RealmCategory';
 import * as RE from '@hub/types/Result';
@@ -64,11 +65,7 @@ export function AllOrgs(props: Props) {
             urlId: item.urlId,
           }))
           .filter((item) => {
-            // Metaplex filter
-            if (
-              item.publicKey.toBase58() ===
-              'DA5G7QQbFioZ6K33wQcH8fVdgFcnaDjLD7DLQkapZg5X'
-            ) {
+            if (STEALTH_HUBS.has(item.publicKey.toBase58())) {
               return false;
             }
 
