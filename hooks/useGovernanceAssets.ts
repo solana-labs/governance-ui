@@ -226,7 +226,6 @@ export default function useGovernanceAssets() {
   // To generate package name comment, use:
   // https://patorjk.com/software/taag/#p=display&f=ANSI%20Regular&t=COMMON%0A
   //
-  //
   // If isVisible is not set, it's equal to canUseAnyInstruction
   const instructionsMap: InstructionsMap = {
     /*
