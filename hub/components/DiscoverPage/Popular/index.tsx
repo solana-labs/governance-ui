@@ -6,6 +6,15 @@ import cx from '@hub/lib/cx';
 
 export const ITEMS = [
   {
+    bannerImgSrc: 'https://i.imgur.com/hDJj3dL.png',
+    description:
+      'Magic Eden is the leading NFT platform for discovery, expression, and ownership across digital cultures.',
+    iconImgSrc: 'https://i.imgur.com/p9Ludt4.png',
+    name: 'Magic Eden',
+    publicKey: new PublicKey('9MwbgfEkV8ZaeycfciBqytcxwfdYHqD2NYjsTZkH4GxA'),
+    urlId: 'Magic%20Eden',
+  },
+  {
     bannerImgSrc: 'https://i.imgur.com/VfFjhk5.jpeg',
     description:
       'GARI Network enables everyone to monetize their social media time and activities by leveraging web3 technologies.',
@@ -15,31 +24,21 @@ export const ITEMS = [
     urlId: 'GARI%20Network',
   },
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
-    description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+    bannerImgSrc: 'https://i.ibb.co/bNRH0hh/1500x500.jpg',
+    description: 'Faster, Cheaper and more Powerful DeFi',
+    iconImgSrc: 'https://i.ibb.co/0j2TR8T/serum.jpg',
+    name: 'Project Serum',
+    publicKey: new PublicKey('3MMDxjv1SzEFQDKryT7csAvaydYtrgMAc3L9xL9CVLCg'),
+    urlId: 'SERUM',
   },
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
+    bannerImgSrc: 'https://i.imgur.com/ZiHW6ho.png',
     description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
-  },
-  {
-    bannerImgSrc: '/realms/RCH/banner.png',
-    description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+      'Hello Moon provides innovative datasets on Solana to empower NFT & DeFi investors & traders.',
+    iconImgSrc: 'https://www.hellomoon.io/Logo.svg',
+    name: 'Hello Moon',
+    publicKey: new PublicKey('G4CR3KUvqPZWmHbuvWhBPqL4vBBBujviyeTVynN2rhKB'),
+    urlId: 'Hello%20Moon',
   },
 ];
 
@@ -56,12 +55,21 @@ export function Popular(props: Props) {
           popular projects
         </div>
       </div>
-      <div className="text-neutral-500">Solana projects gaining momentum</div>
+      {/* <div className="text-neutral-500">Solana projects gaining momentum</div> */}
       <div
-        className={cx('grid', 'grid-cols-4', 'mt-6', 'gap-3', 'items-center')}
+        className={cx(
+          'grid',
+          'mt-6',
+          'gap-3',
+          'items-center',
+          'md:grid-cols-2',
+          'lg:grid-cols-4',
+          'xl:grid-cols-2',
+          '2xl:grid-cols-4',
+        )}
       >
         {ITEMS.map((item, i) => (
-          <div className="flex-shrink-0 max-w-[290px] h-56" key={i}>
+          <div className="flex-shrink-0 w-full 2xl:max-w-[290px] h-56" key={i}>
             <SmallCard {...item} />
           </div>
         ))}

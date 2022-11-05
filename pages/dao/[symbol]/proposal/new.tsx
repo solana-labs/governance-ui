@@ -1,6 +1,12 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React, { createContext, useEffect, useState } from 'react'
+import React, {
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import * as yup from 'yup'
 import {
   ArrowLeftIcon,
@@ -61,6 +67,7 @@ import MakeChangePerpMarket from './components/instructions/Mango/MakeChangePerp
 import MakeAddOracle from './components/instructions/Mango/MakeAddOracle'
 import MakeAddSpotMarket from './components/instructions/Mango/MakeAddSpotMarket'
 import CreateStream from './components/instructions/Streamflow/CreateStream'
+import CancelStream from './components/instructions/Streamflow/CancelStream'
 import StakeValidator from './components/instructions/Validators/StakeValidator'
 import DeactivateValidatorStake from './components/instructions/Validators/DeactivateStake'
 import WithdrawValidatorStake from './components/instructions/Validators/WithdrawStake'
@@ -145,7 +152,7 @@ const New = () => {
   const { handleCreateProposal } = useCreateProposal()
   const { fmtUrlWithCluster } = useQueryContext()
   const { symbol, realm, realmDisplayName, canChooseWhoVote } = useRealm()
-  const { getAvailableInstructions, assetAccounts } = useGovernanceAssets()
+  const { getAvailableInstructions } = useGovernanceAssets()
   const availableInstructions = getAvailableInstructions()
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const [voteByCouncil, setVoteByCouncil] = useState(false)
@@ -374,423 +381,183 @@ const New = () => {
     }
   }, [router.query, availableInstructions, instructionsData])
 
-  const getCurrentInstruction = ({ typeId, idx }) => {
-    switch (typeId) {
-      case Instructions.Transfer:
-        return (
-          <SplTokenTransfer
-            index={idx}
-            governance={governance}
-          ></SplTokenTransfer>
-        )
-      case Instructions.CreateStream:
-        return <CreateStream index={idx} governance={governance}></CreateStream>
-      case Instructions.StakeValidator:
-        return (
-          <StakeValidator index={idx} governance={governance}></StakeValidator>
-        )
-      case Instructions.DeactivateValidatorStake:
-        return (
-          <DeactivateValidatorStake
-            index={idx}
-            governance={governance}
-          ></DeactivateValidatorStake>
-        )
-      case Instructions.WithdrawValidatorStake:
-        return (
-          <WithdrawValidatorStake
-            index={idx}
-            governance={governance}
-          ></WithdrawValidatorStake>
-        )
-      case Instructions.ChangeMakeDonation:
-        return (
-          <ChangeDonation index={idx} governance={governance}></ChangeDonation>
-        )
-      case Instructions.ProgramUpgrade:
-        return (
-          <ProgramUpgrade index={idx} governance={governance}></ProgramUpgrade>
-        )
-      case Instructions.CreateAssociatedTokenAccount:
-        return (
-          <CreateAssociatedTokenAccount index={idx} governance={governance} />
-        )
-      case Instructions.Mint:
-        return (
-          <Mint
-            index={idx}
-            governance={governance}
-            initialMintAccount={
-              typeof router.query['m'] === 'string' && assetAccounts.length
-                ? assetAccounts.find(
-                    (acc) => acc.pubkey.toBase58() === router.query['m']
-                  )
-                : undefined
-            }
-          />
-        )
-      case Instructions.SagaPreOrder:
-        return <SagaPreOrder index={idx} governance={governance}></SagaPreOrder>
-      case Instructions.Base64:
-        return <CustomBase64 index={idx} governance={governance}></CustomBase64>
-      case Instructions.None:
-        return <Empty index={idx} governance={governance}></Empty>
-      case Instructions.DepositIntoVolt:
-        return <FriktionDeposit index={idx} governance={governance} />
-      case Instructions.WithdrawFromVolt:
-        return <FriktionWithdraw index={idx} governance={governance} />
-      case Instructions.ClaimPendingDeposit:
-        return (
-          <FriktionClaimPendingDeposit index={idx} governance={governance} />
-        )
-      case Instructions.ClaimPendingWithdraw:
-        return (
-          <FriktionClaimPendingWithdraw index={idx} governance={governance} />
-        )
-      case Instructions.DepositIntoCastle:
-        return <CastleDeposit index={idx} governance={governance} />
-      case Instructions.WithrawFromCastle:
-        return <CastleWithdraw index={idx} governance={governance} />
-      case Instructions.DepositIntoGoblinGold:
-        return <GoblinGoldDeposit index={idx} governance={governance} />
-      case Instructions.WithdrawFromGoblinGold:
-        return <GoblinGoldWithdraw index={idx} governance={governance} />
-
-      case Instructions.SwitchboardAdmitOracle:
-        return <SwitchboardAdmitOracle index={idx} _governance={governance} />
-      case Instructions.SwitchboardRevokeOracle:
-        return <SwitchboardRevokeOracle index={idx} _governance={governance} />
-
-      case Instructions.CreateSolendObligationAccount:
-        return <CreateObligationAccount index={idx} governance={governance} />
-      case Instructions.InitSolendObligationAccount:
-        return <InitObligationAccount index={idx} governance={governance} />
-      case Instructions.DepositReserveLiquidityAndObligationCollateral:
-        return (
-          <DepositReserveLiquidityAndObligationCollateral
-            index={idx}
-            governance={governance}
-          />
-        )
-      case Instructions.RefreshSolendObligation:
-        return <RefreshObligation index={idx} governance={governance} />
-      case Instructions.RefreshSolendReserve:
-        return <RefreshReserve index={idx} governance={governance} />
-      case Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity:
-        return (
-          <WithdrawObligationCollateralAndRedeemReserveLiquidity
-            index={idx}
-            governance={governance}
-          />
-        )
-      case Instructions.CreateNftPluginRegistrar:
-        return (
-          <CreateNftPluginRegistrar
-            index={idx}
-            governance={governance}
-          ></CreateNftPluginRegistrar>
-        )
-      case Instructions.ConfigureNftPluginCollection:
-        return (
-          <ConfigureNftPluginCollection
-            index={idx}
-            governance={governance}
-          ></ConfigureNftPluginCollection>
-        )
-      case Instructions.CreateNftPluginMaxVoterWeight:
-        return (
-          <CreateNftPluginMaxVoterWeightRecord
-            index={idx}
-            governance={governance}
-          ></CreateNftPluginMaxVoterWeightRecord>
-        )
-      case Instructions.CreateGatewayPluginRegistrar:
-        return (
-          <CreateGatewayPluginRegistrar
-            index={idx}
-            governance={governance}
-          ></CreateGatewayPluginRegistrar>
-        )
-      case Instructions.ConfigureGatewayPlugin:
-        return (
-          <ConfigureGatewayPlugin
-            index={idx}
-            governance={governance}
-          ></ConfigureGatewayPlugin>
-        )
-      case Instructions.MangoAddOracle:
-        return (
-          <MakeAddOracle index={idx} governance={governance}></MakeAddOracle>
-        )
-      case Instructions.MangoAddSpotMarket:
-        return (
-          <MakeAddSpotMarket
-            index={idx}
-            governance={governance}
-          ></MakeAddSpotMarket>
-        )
-      case Instructions.MangoChangeMaxAccounts:
-        return (
-          <MakeChangeMaxAccounts
-            index={idx}
-            governance={governance}
-          ></MakeChangeMaxAccounts>
-        )
-      case Instructions.MangoChangePerpMarket:
-        return (
-          <MakeChangePerpMarket
-            index={idx}
-            governance={governance}
-          ></MakeChangePerpMarket>
-        )
-      case Instructions.MangoChangeReferralFeeParams:
-        return (
-          <MakeChangeReferralFeeParams
-            index={idx}
-            governance={governance}
-          ></MakeChangeReferralFeeParams>
-        )
-      case Instructions.MangoChangeReferralFeeParams2:
-        return (
-          <MakeChangeReferralFeeParams2
-            index={idx}
-            governance={governance}
-          ></MakeChangeReferralFeeParams2>
-        )
-      case Instructions.MangoChangeSpotMarket:
-        return (
-          <MakeChangeSpotMarket
-            index={idx}
-            governance={governance}
-          ></MakeChangeSpotMarket>
-        )
-      case Instructions.MangoChangeQuoteParams:
-        return (
-          <MakeChangeQuoteParams
-            index={idx}
-            governance={governance}
-          ></MakeChangeQuoteParams>
-        )
-      case Instructions.MangoCreatePerpMarket:
-        return (
-          <MakeCreatePerpMarket
-            index={idx}
-            governance={governance}
-          ></MakeCreatePerpMarket>
-        )
-      case Instructions.MangoSetMarketMode:
-        return (
-          <MakeSetMarketMode
-            index={idx}
-            governance={governance}
-          ></MakeSetMarketMode>
-        )
-      case Instructions.MangoRemoveSpotMarket:
-        return (
-          <MakeRemoveSpotMarket
-            index={idx}
-            governance={governance}
-          ></MakeRemoveSpotMarket>
-        )
-      case Instructions.MangoRemovePerpMarket:
-        return (
-          <MakeRemovePerpMarket
-            index={idx}
-            governance={governance}
-          ></MakeRemovePerpMarket>
-        )
-      case Instructions.MangoSwapSpotMarket:
-        return (
-          <MakeSwapSpotMarket
-            index={idx}
-            governance={governance}
-          ></MakeSwapSpotMarket>
-        )
-      case Instructions.MangoRemoveOracle:
-        return (
-          <MakeRemoveOracle
-            index={idx}
-            governance={governance}
-          ></MakeRemoveOracle>
-        )
-      case Instructions.MangoV4TokenRegister:
-        return (
-          <TokenRegister index={idx} governance={governance}></TokenRegister>
-        )
-      case Instructions.MangoV4TokenEdit:
-        return <EditToken index={idx} governance={governance}></EditToken>
-      case Instructions.DepositToMangoAccount:
-        return (
-          <MakeDepositToMangoAccount
-            index={idx}
-            governance={governance}
-          ></MakeDepositToMangoAccount>
-        )
-      case Instructions.MangoV4PerpEdit:
-        return <PerpEdit index={idx} governance={governance}></PerpEdit>
-      case Instructions.MangoV4PerpCreate:
-        return <PerpCreate index={idx} governance={governance}></PerpCreate>
-      case Instructions.MangoV4Serum3RegisterMarket:
-        return (
-          <Serum3RegisterMarket
-            index={idx}
-            governance={governance}
-          ></Serum3RegisterMarket>
-        )
-      case Instructions.MangoV4TokenRegisterTrustless:
-        return (
-          <TokenRegisterTrustless
-            index={idx}
-            governance={governance}
-          ></TokenRegisterTrustless>
-        )
-      case Instructions.DepositToMangoAccountCsv:
-        return (
-          <MakeDepositToMangoAccountCsv
-            index={idx}
-            governance={governance}
-          ></MakeDepositToMangoAccountCsv>
-        )
-      case Instructions.ClaimMangoTokens:
-        return (
-          <ClaimMangoTokens
-            index={idx}
-            governance={governance}
-          ></ClaimMangoTokens>
-        )
-      case Instructions.ForesightInitMarket:
-        return (
-          <MakeInitMarketParams
-            index={idx}
-            governance={governance}
-          ></MakeInitMarketParams>
-        )
-      case Instructions.ForesightInitMarketList:
-        return (
-          <MakeInitMarketListParams
-            index={idx}
-            governance={governance}
-          ></MakeInitMarketListParams>
-        )
-      case Instructions.ForesightInitCategory:
-        return (
-          <MakeInitCategoryParams
-            index={idx}
-            governance={governance}
-          ></MakeInitCategoryParams>
-        )
-      case Instructions.ForesightResolveMarket:
-        return (
-          <MakeResolveMarketParams
-            index={idx}
-            governance={governance}
-          ></MakeResolveMarketParams>
-        )
-      case Instructions.ForesightAddMarketListToCategory:
-        return (
-          <MakeAddMarketListToCategoryParams
-            index={idx}
-            governance={governance}
-          ></MakeAddMarketListToCategoryParams>
-        )
-      case Instructions.ForesightSetMarketMetadata:
-        return (
-          <MakeSetMarketMetadataParams
-            index={idx}
-            governance={governance}
-          ></MakeSetMarketMetadataParams>
-        )
-      case Instructions.RealmConfig:
-        return <RealmConfig index={idx} governance={governance}></RealmConfig>
-      case Instructions.Grant:
-        return <Grant index={idx} governance={governance}></Grant>
-      case Instructions.Clawback:
-        return <Clawback index={idx} governance={governance}></Clawback>
-      case Instructions.CloseTokenAccount:
-        return (
-          <CloseTokenAccount
-            index={idx}
-            governance={governance}
-          ></CloseTokenAccount>
-        )
-      case Instructions.VotingMintConfig:
-        return (
-          <VotingMintConfig
-            index={idx}
-            governance={governance}
-          ></VotingMintConfig>
-        )
-      case Instructions.CreateVsrRegistrar:
-        return (
-          <CreateVsrRegistrar
-            index={idx}
-            governance={governance}
-          ></CreateVsrRegistrar>
-        )
-      case Instructions.CreateTokenMetadata:
-        return <CreateTokenMetadata index={idx} governance={governance} />
-      case Instructions.UpdateTokenMetadata:
-        return <UpdateTokenMetadata index={idx} governance={governance} />
-      case Instructions.TransferDomainName:
-        return (
-          <TransferDomainName
-            index={idx}
-            governance={governance}
-          ></TransferDomainName>
-        )
-      case Instructions.EverlendDeposit:
-        return <DepositForm index={idx} governance={governance} />
-      case Instructions.EverlendWithdraw:
-        return <WithdrawForm index={idx} governance={governance} />
-      case Instructions.SerumInitUser:
-        return <InitUser index={idx} governance={governance} />
-      case Instructions.SerumGrantLockedSRM:
-        return (
+  // Map instruction enum with components
+  //
+  // by default, components are created with index/governance attributes
+  // if a component needs specials attributes, use componentBuilderFunction object
+  const instructionMap: {
+    [key in Instructions]:
+      | ((props: {
+          index: number
+          governance: ProgramAccount<Governance> | null
+        }) => JSX.Element | null)
+      | {
+          componentBuilderFunction: (props: {
+            index: number
+            governance: ProgramAccount<Governance> | null
+          }) => JSX.Element | null
+        }
+      | null
+  } = useMemo(
+    () => ({
+      [Instructions.Transfer]: SplTokenTransfer,
+      [Instructions.ProgramUpgrade]: ProgramUpgrade,
+      [Instructions.Mint]: Mint,
+      [Instructions.Base64]: CustomBase64,
+      [Instructions.None]: Empty,
+      [Instructions.MangoAddOracle]: MakeAddOracle,
+      [Instructions.MangoAddSpotMarket]: MakeAddSpotMarket,
+      [Instructions.MangoChangeMaxAccounts]: MakeChangeMaxAccounts,
+      [Instructions.MangoChangePerpMarket]: MakeChangePerpMarket,
+      [Instructions.MangoChangeReferralFeeParams]: MakeChangeReferralFeeParams,
+      [Instructions.MangoChangeReferralFeeParams2]: MakeChangeReferralFeeParams2,
+      [Instructions.MangoChangeSpotMarket]: MakeChangeSpotMarket,
+      [Instructions.MangoCreatePerpMarket]: MakeCreatePerpMarket,
+      [Instructions.MangoSetMarketMode]: MakeSetMarketMode,
+      [Instructions.MangoChangeQuoteParams]: MakeChangeQuoteParams,
+      [Instructions.MangoRemoveSpotMarket]: MakeRemoveSpotMarket,
+      [Instructions.MangoRemovePerpMarket]: MakeRemovePerpMarket,
+      [Instructions.MangoSwapSpotMarket]: MakeSwapSpotMarket,
+      [Instructions.MangoRemoveOracle]: MakeRemoveOracle,
+      [Instructions.MangoV4TokenRegister]: TokenRegister,
+      [Instructions.MangoV4TokenEdit]: EditToken,
+      [Instructions.MangoV4PerpEdit]: PerpEdit,
+      [Instructions.MangoV4Serum3RegisterMarket]: Serum3RegisterMarket,
+      [Instructions.MangoV4PerpCreate]: PerpCreate,
+      [Instructions.MangoV4TokenRegisterTrustless]: TokenRegisterTrustless,
+      [Instructions.CreateStream]: CreateStream,
+      [Instructions.CancelStream]: CancelStream,
+      [Instructions.CancelStream]: null,
+      [Instructions.Grant]: Grant,
+      [Instructions.Clawback]: Clawback,
+      [Instructions.CreateAssociatedTokenAccount]: CreateAssociatedTokenAccount,
+      [Instructions.DepositIntoVolt]: FriktionDeposit,
+      [Instructions.WithdrawFromVolt]: FriktionWithdraw,
+      [Instructions.ClaimPendingDeposit]: FriktionClaimPendingDeposit,
+      [Instructions.ClaimPendingWithdraw]: FriktionClaimPendingWithdraw,
+      [Instructions.DepositIntoCastle]: CastleDeposit,
+      [Instructions.WithrawFromCastle]: CastleWithdraw,
+      [Instructions.DepositIntoGoblinGold]: GoblinGoldDeposit,
+      [Instructions.WithdrawFromGoblinGold]: GoblinGoldWithdraw,
+      [Instructions.CreateSolendObligationAccount]: CreateObligationAccount,
+      [Instructions.InitSolendObligationAccount]: InitObligationAccount,
+      [Instructions.DepositReserveLiquidityAndObligationCollateral]: DepositReserveLiquidityAndObligationCollateral,
+      [Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity]: WithdrawObligationCollateralAndRedeemReserveLiquidity,
+      [Instructions.SwitchboardAdmitOracle]: SwitchboardAdmitOracle,
+      [Instructions.SwitchboardRevokeOracle]: SwitchboardRevokeOracle,
+      [Instructions.RefreshSolendObligation]: RefreshObligation,
+      [Instructions.RefreshSolendReserve]: RefreshReserve,
+      [Instructions.ForesightInitMarket]: MakeInitMarketParams,
+      [Instructions.ForesightInitMarketList]: MakeInitMarketListParams,
+      [Instructions.ForesightInitCategory]: MakeInitCategoryParams,
+      [Instructions.ForesightResolveMarket]: MakeResolveMarketParams,
+      [Instructions.ForesightAddMarketListToCategory]: MakeAddMarketListToCategoryParams,
+      [Instructions.ForesightSetMarketMetadata]: MakeSetMarketMetadataParams,
+      [Instructions.RealmConfig]: RealmConfig,
+      [Instructions.CreateNftPluginRegistrar]: CreateNftPluginRegistrar,
+      [Instructions.CreateNftPluginMaxVoterWeight]: CreateNftPluginMaxVoterWeightRecord,
+      [Instructions.ConfigureNftPluginCollection]: ConfigureNftPluginCollection,
+      [Instructions.CloseTokenAccount]: CloseTokenAccount,
+      [Instructions.VotingMintConfig]: VotingMintConfig,
+      [Instructions.CreateVsrRegistrar]: CreateVsrRegistrar,
+      [Instructions.CreateGatewayPluginRegistrar]: CreateGatewayPluginRegistrar,
+      [Instructions.ConfigureGatewayPlugin]: ConfigureGatewayPlugin,
+      [Instructions.ChangeMakeDonation]: ChangeDonation,
+      [Instructions.CreateTokenMetadata]: CreateTokenMetadata,
+      [Instructions.UpdateTokenMetadata]: UpdateTokenMetadata,
+      [Instructions.SagaPreOrder]: SagaPreOrder,
+      [Instructions.DepositToMangoAccount]: MakeDepositToMangoAccount,
+      [Instructions.DepositToMangoAccountCsv]: MakeDepositToMangoAccountCsv,
+      [Instructions.StakeValidator]: StakeValidator,
+      [Instructions.DeactivateValidatorStake]: DeactivateValidatorStake,
+      [Instructions.WithdrawValidatorStake]: WithdrawValidatorStake,
+      [Instructions.DifferValidatorStake]: null,
+      [Instructions.TransferDomainName]: TransferDomainName,
+      [Instructions.EverlendDeposit]: DepositForm,
+      [Instructions.EverlendWithdraw]: WithdrawForm,
+      [Instructions.SerumInitUser]: InitUser,
+      [Instructions.SerumGrantLockedSRM]: {
+        componentBuilderFunction: ({ index, governance }) => (
           <GrantForm
+            index={index}
+            governance={governance}
             isLocked={true}
             isMsrm={false}
-            index={idx}
-            governance={governance}
           />
-        )
-      case Instructions.SerumGrantLockedMSRM:
-        return (
+        ),
+      },
+      [Instructions.SerumGrantLockedMSRM]: {
+        componentBuilderFunction: ({ index, governance }) => (
           <GrantForm
+            index={index}
+            governance={governance}
             isLocked={true}
             isMsrm={true}
-            index={idx}
-            governance={governance}
           />
-        )
-      case Instructions.SerumGrantVestSRM:
-        return (
+        ),
+      },
+      [Instructions.SerumGrantVestSRM]: {
+        componentBuilderFunction: ({ index, governance }) => (
           <GrantForm
+            index={index}
+            governance={governance}
             isLocked={false}
             isMsrm={false}
-            index={idx}
-            governance={governance}
           />
-        )
-      case Instructions.SerumGrantVestMSRM:
-        return (
+        ),
+      },
+      [Instructions.SerumGrantVestMSRM]: {
+        componentBuilderFunction: ({ index, governance }) => (
           <GrantForm
+            index={index}
+            governance={governance}
             isLocked={false}
             isMsrm={true}
-            index={idx}
-            governance={governance}
           />
-        )
-      case Instructions.JoinDAO:
-        return <JoinDAO index={idx} governance={governance} />
+        ),
+      },
+      [Instructions.SerumUpdateGovConfigParams]: UpdateConfigParams,
+      [Instructions.SerumUpdateGovConfigAuthority]: UpdateConfigAuthority,
+      [Instructions.JoinDAO]: JoinDAO,
+      [Instructions.ClaimMangoTokens]: ClaimMangoTokens,
+    }),
+    []
+  )
 
-      case Instructions.SerumUpdateGovConfigAuthority:
-        return <UpdateConfigAuthority index={idx} governance={governance} />
-      case Instructions.SerumUpdateGovConfigParams:
-        return <UpdateConfigParams index={idx} governance={governance} />
-      default:
-        null
-    }
-  }
+  const getCurrentInstruction = useCallback(
+    ({
+      typeId,
+      index,
+    }: {
+      typeId?: Instructions
+      index: number
+    }): JSX.Element => {
+      if (!typeId) return <></>
+
+      const conf = instructionMap[typeId]
+
+      if (!conf) return <></>
+
+      if ('componentBuilderFunction' in conf) {
+        return (
+          conf.componentBuilderFunction({
+            index,
+            governance,
+          }) ?? <></>
+        )
+      }
+
+      const component = conf
+
+      return (
+        React.createElement(component, {
+          index,
+          governance,
+        }) ?? <></>
+      )
+    },
+    []
+  )
 
   const titleTooLong = form.title.length > TITLE_LENGTH_LIMIT
 
@@ -913,7 +680,7 @@ const New = () => {
                       >
                         {getCurrentInstruction({
                           typeId: instruction.type?.id,
-                          idx,
+                          index: idx,
                         })}
                       </InstructionContentContainer>
                       {idx !== 0 && (

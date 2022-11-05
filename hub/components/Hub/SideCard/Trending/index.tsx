@@ -131,6 +131,11 @@ export function Trending(props: Props) {
 
             return (
               <div className="space-y-5">
+                {!edges.length && (
+                  <div className="my-4 text-center text-neutral-500 text-sm">
+                    There are no trending posts
+                  </div>
+                )}
                 {edges.map((edge, i) => {
                   const isNew =
                     Math.abs(
@@ -151,8 +156,15 @@ export function Trending(props: Props) {
                       )}
                       key={edge.node.id}
                       onClick={() => {
-                        const url = `/realm/${props.realmUrlId}/${edge.node.id}`;
-                        router.push(url);
+                        if (edge.node.proposal) {
+                          const url = `/dao/${
+                            props.realmUrlId
+                          }/proposal/${edge.node.proposal.publicKey.toBase58()}`;
+                          router.push(url);
+                        } else {
+                          const url = `/realm/${props.realmUrlId}/${edge.node.id}`;
+                          router.push(url);
+                        }
                       }}
                     >
                       <div className="text-xs leading-6 text-neutral-900 font-medium">

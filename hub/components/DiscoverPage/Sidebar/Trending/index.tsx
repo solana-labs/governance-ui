@@ -7,40 +7,43 @@ import { Org } from './Org';
 
 const CONFIG = [
   {
-    name: 'Dialect',
-    category: RealmCategory.Web3,
-    logo: '/realms/Dialect/img/avatar-dialect.png',
-    publicKey: new PublicKey('7s5QZmpit4uu1y2bkByXerE2mv3XBHtiNQ4JkDdmKRiQ'),
-    url: '/realm/Dialect',
-  },
-  {
-    name: 'Solend',
+    name: 'Backpack',
     category: RealmCategory.Web3,
     logo:
-      'https://solend-image-assets.s3.us-east-2.amazonaws.com/1280-circle.png',
-    publicKey: new PublicKey('7sf3tcWm58vhtkJMwuw2P3T6UBX7UE5VKxPMnXJUZ1Hn'),
-    url: '/realm/SLND',
+      'https://static.ftx.com/nfts/e814aeb2-a599-4697-a199-abf077b8cd5f.jpeg',
+    publicKey: new PublicKey('BqLWTZv8xfJiCtu9gm87T1EqtAnL2cCJ1PS9JoKn3oBy'),
+    url: '/realm/Backpack',
   },
   {
-    name: 'The Imperium of Rain',
-    category: RealmCategory.Web3,
-    logo: '/realms/RAIN/img/rain_logo.png',
-    publicKey: new PublicKey('6orGiJYGXYk9GT2NFoTv2ZMYpA6asMieAqdek4YRH2Dn'),
-    url: '/realm/DTP',
+    name: 'Solana Spaces',
+    category: RealmCategory.Other,
+    logo:
+      'https://pbs.twimg.com/profile_images/1583182250581102623/AOrgeepS_400x400.jpg',
+    publicKey: new PublicKey('58axqgJSAEK3adKL5hx5dYoRqkYMEiEXQZqk9FFFpa7f'),
+    url: '/realm/Solana%20Spaces',
   },
   {
-    name: 'The Mysterious Death of Lord Harrington',
+    name: 'GenesysGo',
     category: RealmCategory.Web3,
-    logo: '/realms/MDLH/img/MDLH.png',
-    publicKey: new PublicKey('6Fiy6ZrCKBfcMieNq3S6qSzfpgRTYKn5zPW78VL9FwjL'),
-    url: '/realm/MDLH',
+    logo: 'https://i.imgur.com/topNFE2.jpg',
+    publicKey: new PublicKey('96VSxgcsxhh8qcFXdT7nMzxA1CMrUBxrxcetqYFqdV5V'),
+    url: '/realm/GenesysGo',
   },
   {
-    name: 'Metaplex',
+    name: 'Superteam',
+    category: RealmCategory.Other,
+    logo:
+      'https://superteam.fun/_next/image?url=https%3A%2F%2Fsuper-static-assets.s3.amazonaws.com%2F75e99297-73de-4946-ba6b-0ac603638793%2Fimages%2F259d92ba-12da-42d7-be75-4c9b8b0796dd.png&w=3840&q=80',
+    publicKey: new PublicKey('5NNv1oJ4PFhE2416kTNDzrR9axoHjBTw2CNABqcYpXXL'),
+    url: '/realm/Superteam',
+  },
+  {
+    name: 'Rye',
     category: RealmCategory.Web3,
-    logo: '/realms/metaplex/img/black-circle.png',
-    publicKey: new PublicKey('DA5G7QQbFioZ6K33wQcH8fVdgFcnaDjLD7DLQkapZg5X'),
-    url: '/realm/Metaplex',
+    logo:
+      'https://pbs.twimg.com/profile_images/1571859763121758208/32YgNnii_400x400.png',
+    publicKey: new PublicKey('7KsnMMyrF8wsxsLZNBZ8hRkGe13MdjAT9ko1qDEvkEWQ'),
+    url: '/realm/Rye',
   },
 ];
 

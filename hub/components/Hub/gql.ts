@@ -3,6 +3,7 @@ import { gql } from 'urql';
 
 import { HubInfoRoadmapItemStatus } from '@hub/types/decoders/HubInfoRoadmapItemStatus';
 import { PublicKey } from '@hub/types/decoders/PublicKey';
+import { RealmCategory } from '@hub/types/decoders/RealmCategory';
 import { RichTextDocument } from '@hub/types/decoders/RichTextDocument';
 
 export const getHub = gql`
@@ -68,6 +69,7 @@ export const getHub = gql`
     }
     realm(publicKey: $realm) {
       bannerImageUrl
+      category
       iconUrl
       membersCount
       name
@@ -166,6 +168,7 @@ export const getHubResp = IT.type({
   }),
   realm: IT.type({
     bannerImageUrl: IT.union([IT.null, IT.string]),
+    category: RealmCategory,
     iconUrl: IT.union([IT.null, IT.string]),
     membersCount: IT.number,
     name: IT.string,

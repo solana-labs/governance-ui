@@ -38,7 +38,9 @@ export function LargeCard(props: Props) {
           'block',
           'overflow-hidden',
           'rounded',
-          'w-[496px]',
+          'transition-transform',
+          'active:scale-95',
+          'md:active:scale-[.98]',
           props.className,
         )}
       >
@@ -56,7 +58,9 @@ export function LargeCard(props: Props) {
                     <div className="flex items-center">
                       <TwitterIcon className="fill-sky-500 h-4 w-4 mr-1" />
                       <div className="text-sm text-neutral-700">
-                        {abbreviateNumber(hub.twitterFollowerCount)}
+                        {abbreviateNumber(hub.twitterFollowerCount, undefined, {
+                          maximumFractionDigits: 0,
+                        })}
                       </div>
                     </div>
                   ) : (
@@ -65,7 +69,9 @@ export function LargeCard(props: Props) {
               ),
             )}
           </header>
-          <div className="mt-2 text-sm text-neutral-700">{props.content}</div>
+          <div className="mt-2 text-sm text-neutral-700 line-clamp-4 h-20">
+            {props.content}
+          </div>
           <div className="mt-6 grid grid-cols-3 items-center">
             {props.stats.map((stat, i) => (
               <div

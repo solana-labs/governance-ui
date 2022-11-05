@@ -66,16 +66,18 @@ export function Header(props: Props) {
         'w-full',
       )}
     >
-      <div className="flex items-baseline space-x-2">
+      <div className="flex items-baseline">
         {props.realm &&
           (props.realmPublicKey.equals(ECOSYSTEM_PAGE) ? (
             <div
               className={cx(
                 'cursor-default',
                 'font-medium',
-                'mr-2',
+                'hidden',
                 'text-neutral-900',
                 'text-sm',
+                'sm:block',
+                'sm:mr-2',
               )}
               onClick={(e) => e.stopPropagation()}
             >
@@ -92,11 +94,15 @@ export function Header(props: Props) {
             >
               <a
                 className={cx(
+                  'block',
                   'font-medium',
-                  'mr-2',
+                  'hidden',
                   'text-neutral-900',
                   'text-sm',
+                  'truncate',
                   'hover:underline',
+                  'sm:block',
+                  'sm:mr-2',
                 )}
                 onClick={(e) => e.stopPropagation()}
               >
@@ -104,7 +110,7 @@ export function Header(props: Props) {
               </a>
             </Link>
           ))}
-        <div className="flex items-center">
+        <div className="flex items-center mr-2">
           {props.author ? (
             <AuthorHovercard
               asChild

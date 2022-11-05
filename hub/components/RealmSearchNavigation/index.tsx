@@ -55,7 +55,7 @@ export const RealmSearchNavigation = forwardRef<HTMLInputElement, Props>(
                 iconUrl: item.iconUrl,
                 name: item.name,
                 publicKey: item.publicKey,
-                url: `/realm/${item.urlId}`,
+                url: `/realm/${item.urlId}/hub`,
               })),
             )
             .filter((choice) => {
@@ -125,7 +125,10 @@ export const RealmSearchNavigation = forwardRef<HTMLInputElement, Props>(
                 open && 'opacity-100',
                 open && 'pointer-events-auto',
               )}
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                setText('');
+                setOpen(true);
+              }}
             >
               <CloseIcon
                 className={cx(
@@ -163,8 +166,8 @@ export const RealmSearchNavigation = forwardRef<HTMLInputElement, Props>(
                 {text ? 'Results' : 'All communities'}
               </div>
               <div className="max-h-[350px] overflow-y-auto">
-                {options.map((option) => (
-                  <Link passHref href={option.url} key={option.key}>
+                {options.map((option, i) => (
+                  <Link passHref href={option.url} key={option.key + i}>
                     <a
                       className={cx(
                         'flex',

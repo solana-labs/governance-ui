@@ -5,27 +5,36 @@ import cx from '@hub/lib/cx';
 import * as RE from '@hub/types/Result';
 
 import { Connect } from './Connect';
+import { DialectNotifications } from './DialectNotifications';
 import * as gql from './gql';
 import { Loading } from './Loading';
-import { User } from './User';
+import { UserDropdown } from './UserDropdown';
 
 interface Props {
   className?: string;
+  compressed?: boolean;
 }
 
-export function UserDropdown(props: Props) {
+export function User(props: Props) {
   const [result, refetch] = useQuery(gql.getUserResp, { query: gql.getUser });
 
   return pipe(
     result,
     RE.match(
       () => (
-        <Connect className={props.className} onConnected={() => refetch({})} />
+        <Connect
+          className={props.className}
+          compressed={props.compressed}
+          onConnected={() => refetch({})}
+        />
       ),
-      () => <Loading className={props.className} />,
+      () => (
+        <Loading compressed={props.compressed} className={props.className} />
+      ),
       ({ me }) => (
         <div className={cx(props.className, 'flex', 'items-center')}>
-          <User user={me} />
+          <DialectNotifications className="mx-2" />
+          <UserDropdown user={me} compressed={props.compressed} />
         </div>
       ),
     ),

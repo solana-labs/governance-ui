@@ -1,19 +1,31 @@
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import React from 'react';
+import { useMediaQuery } from 'react-responsive';
 
+import { MobileRealmSearchNavigation } from '@hub/components/MobileRealmSearchNavigation';
 import { RealmSearchNavigation } from '@hub/components/RealmSearchNavigation';
 import cx from '@hub/lib/cx';
 
 import { CreateHub } from './CreateHub';
 import { Links } from './Links';
+import { LinksDropdown } from './LinksDropdown';
 import { Logo } from './Logo';
-import { UserDropdown } from './UserDropdown';
+import { User } from './User';
 
 interface Props {
   className?: string;
 }
 
 export function GlobalHeader(props: Props) {
+  const showCreateHub = useMediaQuery({ query: '(min-width: 1140px)' });
+  const displayLinkRow = useMediaQuery({ query: '(min-width: 966px)' });
+  const showDesktopRealmSelector = useMediaQuery({
+    query: '(min-width: 770px)',
+  });
+  const showExpandedUserDropdown = useMediaQuery({
+    query: '(min-width: 550px)',
+  });
+
   return (
     <NavigationMenu.Root
       className={cx(
@@ -41,27 +53,53 @@ export function GlobalHeader(props: Props) {
           )}
         >
           <div className={cx('flex', 'items-center')}>
-            <Logo />
-            <NavigationMenu.Item asChild>
-              <RealmSearchNavigation className="ml-4" />
-            </NavigationMenu.Item>
-            <Links
-              className="ml-16"
-              links={[
-                {
-                  href: '/ecosystem',
-                  title: 'Ecosystem Feed',
-                },
-                // {
-                //   href: '/discover',
-                //   title: 'Discover',
-                // },
-              ]}
-            />
+            <Logo compressed={!showExpandedUserDropdown} />
+            {showDesktopRealmSelector && (
+              <NavigationMenu.Item asChild>
+                <RealmSearchNavigation className="ml-4" />
+              </NavigationMenu.Item>
+            )}
+            {displayLinkRow ? (
+              <Links
+                className="ml-16"
+                links={[
+                  {
+                    href: '/ecosystem',
+                    title: 'Ecosystem Feed',
+                  },
+                  {
+                    href: '/discover',
+                    title: 'Discover',
+                  },
+                ]}
+              />
+            ) : (
+              <LinksDropdown
+                className={cx(
+                  'z-50',
+                  showExpandedUserDropdown ? 'ml-8' : 'ml-2',
+                )}
+                links={[
+                  {
+                    href: '/ecosystem',
+                    title: 'Feed',
+                  },
+                  {
+                    href: '/discover',
+                    title: 'Discover',
+                  },
+                ]}
+              />
+            )}
           </div>
           <div className="flex items-center">
-            <CreateHub className="mr-8" />
-            <UserDropdown />
+            {showCreateHub && <CreateHub className="mr-4" />}
+            {!showDesktopRealmSelector && (
+              <NavigationMenu.Item asChild>
+                <MobileRealmSearchNavigation />
+              </NavigationMenu.Item>
+            )}
+            <User compressed={!showExpandedUserDropdown} />
           </div>
         </NavigationMenu.List>
       </div>

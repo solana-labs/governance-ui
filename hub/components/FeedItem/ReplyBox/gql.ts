@@ -23,6 +23,14 @@ export const getUser = gql`
 
 export const User = IT.type({
   publicKey: PublicKey,
+  civicInfo: IT.union([
+    IT.null,
+    IT.type({
+      avatarUrl: IT.union([IT.null, IT.string]),
+      handle: IT.string,
+      isVerified: IT.boolean,
+    }),
+  ]),
   twitterInfo: IT.union([
     IT.null,
     IT.type({

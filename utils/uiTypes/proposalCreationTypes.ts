@@ -153,6 +153,13 @@ export interface CreateStreamForm {
   releaseAmount: number
   amountAtCliff: number
   cancelable: boolean
+  period: number
+}
+
+export interface CancelStreamForm {
+  recipient: string
+  strmMetadata: string
+  tokenAccount?: AssetAccount
 }
 
 export const programUpgradeFormNameOf = getNameOf<ProgramUpgradeForm>()

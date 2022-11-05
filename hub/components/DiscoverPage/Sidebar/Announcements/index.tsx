@@ -12,19 +12,19 @@ import { Post } from './Post';
 
 const CONFIG = [
   {
-    postId: '1h9',
+    postId: '2ay',
   },
   {
-    postId: '1h6',
+    postId: '2a7',
   },
   {
-    postId: '1ha',
+    postId: '2b0',
   },
   {
-    postId: '1hd',
+    postId: '2aq',
   },
   {
-    postId: '1h7',
+    postId: '2b6',
   },
 ];
 

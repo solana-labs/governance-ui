@@ -20,54 +20,57 @@ export const ITEMS = [
     urlId: 'Dual%20Finance',
   },
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
+    bannerImgSrc:
+      'https://worldtop.mypinata.cloud/ipfs/QmfA63uoZe8Dh5drYS7haQXJAMETovkoVCxS2MjcMHPPSA',
     category: RealmCategory.Web3,
     description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+      'BlockLive is fast, easy, transparent way to buy and sell live event tickets that you can hold onto for a lifetime.',
+    iconImgSrc:
+      'https://worldtop.mypinata.cloud/ipfs/QmXbMPq3Js6iJx6guEZsB8PaAPX6vB1Fr5wMRQnLavoUQk',
+    name: 'BlockLive',
+    publicKey: new PublicKey('G43QB1csngJDWBhrBCba5tbVcxcPHhGNtGkqfntfP6fg'),
+    urlId: 'BlockLive',
   },
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
+    bannerImgSrc: 'https://i.imgur.com/Nk2lRMv.jpg',
     category: RealmCategory.Web3,
-    description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+    description: 'The Search Engine for Blockchains',
+    iconImgSrc: 'https://i.imgur.com/dwuDf3u.jpg',
+    name: 'Ora',
+    publicKey: new PublicKey('9dvvWxLNRv2HWRkc1FJdgpXuF9fDRZMsCbw6vTdHbp5'),
+    urlId: 'Ora',
   },
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
-    category: RealmCategory.Web3,
+    bannerImgSrc: 'https://i.imgur.com/PwBA2It.png',
+    category: RealmCategory.Gaming,
     description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+      'Building #Games4Good powered by Blockchain Technology on Solana and Celo',
+    iconImgSrc:
+      'https://intotheverse.xyz/static/media/logo.f2cbbe9e72f20f3706c979e20e711a96.svg',
+    name: 'IntoTheVerse',
+    publicKey: new PublicKey('22nDweMdSCCDoCMFUoS8Zgv7jnZxpLuqGrkL3cmSwuU3'),
+    urlId: 'IntoTheVerse',
   },
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
-    category: RealmCategory.Web3,
+    bannerImgSrc:
+      'https://pbs.twimg.com/profile_banners/1443288033025937411/1633010666/1500x500',
+    category: RealmCategory.DAOTools,
     description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+      'Gilder makes interacting and staying connected to your decentralized internet community easy on mobile.',
+    iconImgSrc:
+      'https://pbs.twimg.com/profile_images/1458164179244765184/lqJUjPYh_400x400.jpg',
+    name: 'Gilder',
+    publicKey: new PublicKey('6jydyMWSqV2bFHjCHydEQxa9XfXQWDwjVqAdjBEA1BXx'),
+    urlId: 'Gilder',
   },
   {
-    bannerImgSrc: '/realms/RCH/banner.png',
+    bannerImgSrc: 'https://i.imgur.com/j4xkSPp.jpeg',
     category: RealmCategory.Web3,
-    description:
-      'The standard for enabling modern communities to share ideas, make decisions, and collectively manage treasuries.',
-    iconImgSrc: '/realms/RCH/icon.png',
-    name: 'Realms Community Hub',
-    publicKey: new PublicKey('9efHuf3HAKiMDWNhgJyZW1Zyo8P7rRhAMXoJa9vpRo1e'),
-    urlId: 'RCH',
+    description: 'Payments Infrastructure for web3',
+    iconImgSrc: 'https://i.imgur.com/j9HOqJ5.png',
+    name: 'Sphere',
+    publicKey: new PublicKey('GHVYhVLqSfqsuNXkKrALXDEX8xq76WGMAtJka5zr3jqw'),
+    urlId: 'Sphere',
   },
 ];
 
@@ -84,12 +87,23 @@ export function Hackathon(props: Props) {
           hackathon winners
         </div>
       </div>
-      <div className="text-neutral-500">
+      {/* <div className="text-neutral-500">
         Who’s who from this summer’s hackathon
-      </div>
-      <div className={cx('grid', 'grid-cols-3', 'mt-6', 'gap-4')}>
+      </div> */}
+      <div
+        className={cx(
+          'gap-4',
+          'grid',
+          'justify-items-start',
+          'mt-6',
+          'md:grid-cols-2',
+          'lg:grid-cols-3',
+          'xl:grid-cols-2',
+          '2xl:grid-cols-3',
+        )}
+      >
         {ITEMS.map((item, i) => (
-          <div className="flex-shrink-0 max-w-[388px] h-60" key={i}>
+          <div className="flex-shrink-0 w-full 2xl:max-w-[388px] h-60" key={i}>
             <SmallCard {...item} />
           </div>
         ))}

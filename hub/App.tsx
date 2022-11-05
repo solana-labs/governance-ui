@@ -132,6 +132,10 @@ export function App(props: Props) {
             letter-spacing: normal !important;
           }
         `}</style>
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1"
+        />
       </Head>
       <GoogleTag />
       <Twitter />

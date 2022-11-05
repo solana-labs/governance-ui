@@ -3,13 +3,6 @@ import { pipe } from 'fp-ts/lib/function';
 import { useState } from 'react';
 
 import { RealmCircle } from '@hub/components/branding/RealmCircle';
-import { ITEMS as HACKATHON_ITEMS } from '@hub/components/DiscoverPage/Hackathon';
-import { ITEMS as DEFI_ITEMS } from '@hub/components/DiscoverPage/NotableDefi';
-import { ITEMS as GAME_ITEMS } from '@hub/components/DiscoverPage/NotableGames';
-import { ITEMS as NFT_ITEMS } from '@hub/components/DiscoverPage/NotableNFTs';
-import { ITEMS as WEB3_ITEMS } from '@hub/components/DiscoverPage/NotableWeb3';
-import { ITEMS as NOTEWORTHY_ITEMS } from '@hub/components/DiscoverPage/Noteworthy';
-import { ITEMS as POPULAR_ITEMS } from '@hub/components/DiscoverPage/Popular';
 import { SmallCard } from '@hub/components/DiscoverPage/SmallCard';
 import { LoadingDots } from '@hub/components/LoadingDots';
 import { useQuery } from '@hub/hooks/useQuery';
@@ -19,16 +12,6 @@ import * as RE from '@hub/types/Result';
 
 import { CategorySelector } from './CategorySelector';
 import * as gql from './gql';
-
-const ALREADY_DISPLAYED = new Set([
-  ...DEFI_ITEMS.map((item) => item.publicKey.toBase58()),
-  ...GAME_ITEMS.map((item) => item.publicKey.toBase58()),
-  ...HACKATHON_ITEMS.map((item) => item.publicKey.toBase58()),
-  ...NFT_ITEMS.map((item) => item.publicKey.toBase58()),
-  ...WEB3_ITEMS.map((item) => item.publicKey.toBase58()),
-  ...POPULAR_ITEMS.map((item) => item.publicKey.toBase58()),
-  ...NOTEWORTHY_ITEMS.map((item) => item.publicKey.toBase58()),
-]);
 
 interface Props {
   className?: string;
@@ -81,7 +64,11 @@ export function AllOrgs(props: Props) {
             urlId: item.urlId,
           }))
           .filter((item) => {
-            if (ALREADY_DISPLAYED.has(item.publicKey.toBase58())) {
+            // Metaplex filter
+            if (
+              item.publicKey.toBase58() ===
+              'DA5G7QQbFioZ6K33wQcH8fVdgFcnaDjLD7DLQkapZg5X'
+            ) {
               return false;
             }
 
@@ -135,11 +122,11 @@ export function AllOrgs(props: Props) {
                 all organizations building on solana
               </div>
             </div>
-            <div className="text-neutral-500">
+            {/* <div className="text-neutral-500">
               All the projects and organizations on Solana
-            </div>
+            </div> */}
             <div className="mt-3 grid grid-cols-4 gap-x-3">
-              <div className="relative">
+              <div className="relative col-span-2 md:col-span-1">
                 <input
                   className={cx(
                     'bg-white',
@@ -163,17 +150,16 @@ export function AllOrgs(props: Props) {
                 />
                 <SearchIcon
                   className={cx(
-                    '-translate-y-1/2',
                     'absolute',
                     'h-4',
                     'left-4',
                     'text-neutral-900',
-                    'top-1/2',
+                    'top-3',
                     'w-4',
                   )}
                 />
               </div>
-              <div className="col-span-3">
+              <div className="col-span-2 md:col-span-3">
                 <CategorySelector
                   selected={categoryFilter}
                   onChange={(categories) => setCategoryFilter(categories)}
@@ -183,15 +169,19 @@ export function AllOrgs(props: Props) {
             <div
               className={cx(
                 'grid',
-                'grid-cols-4',
                 'mt-6',
                 'gap-3',
                 'items-center',
+                'grid-cols-2',
+                'lg:grid-cols-4',
               )}
             >
               {items.map((item, i) => (
-                <div className="flex-shrink-0 max-w-[290px] h-60" key={i}>
-                  <SmallCard {...item} />
+                <div
+                  className="flex-shrink-0 2xl:max-w-[290px] h-60"
+                  key={item.publicKey.toBase58() + i}
+                >
+                  <SmallCard compressable {...item} />
                 </div>
               ))}
             </div>
