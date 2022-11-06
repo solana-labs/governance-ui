@@ -531,10 +531,9 @@ const New = () => {
       typeId?: Instructions
       index: number
     }): JSX.Element => {
-      if (!typeId) return <></>
+      if (typeof typeId === 'undefined' || typeId === null) return <></>
 
       const conf = instructionMap[typeId]
-
       if (!conf) return <></>
 
       if ('componentBuilderFunction' in conf) {
