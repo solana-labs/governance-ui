@@ -240,7 +240,7 @@ export default function useGovernanceAssets() {
       name: 'Deposit into Vault',
       packageId: PackageEnum.Castle,
     },
-    [Instructions.WithrawFromCastle]: {
+    [Instructions.WithdrawFromCastle]: {
       name: 'Withdraw from Vault',
       packageId: PackageEnum.Castle,
     },
