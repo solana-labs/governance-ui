@@ -1,19 +1,15 @@
-import { Adapter, WalletReadyState } from '@solana/wallet-adapter-base';
+import { WalletReadyState } from '@solana/wallet-adapter-base';
 import {
   ConnectionProvider,
   WalletProvider as _WalletProvider,
   useWallet,
   WalletContextState,
+  Wallet as BaseWallet,
 } from '@solana/wallet-adapter-react';
-import {
-  GlowWalletAdapter,
-  PhantomWalletAdapter,
-  SlopeWalletAdapter,
-  SolflareWalletAdapter,
-  TorusWalletAdapter,
-} from '@solana/wallet-adapter-wallets';
 import type { PublicKey } from '@solana/web3.js';
 import React, { createContext, useEffect, useMemo, useState } from 'react';
+
+import { WALLET_PROVIDERS } from 'utils/wallet-adapters';
 
 import { RealmCircle } from '@hub/components/branding/RealmCircle';
 import { SolanaLogo } from '@hub/components/branding/SolanaLogo';
@@ -23,10 +19,10 @@ import { useToast, ToastType } from '@hub/hooks/useToast';
 import cx from '@hub/lib/cx';
 
 interface Wallet {
-  adapter: Adapter;
   publicKey: PublicKey;
   signMessage: NonNullable<WalletContextState['signMessage']>;
   signTransaction: NonNullable<WalletContextState['signTransaction']>;
+  wallet: BaseWallet;
 }
 
 interface Value {
@@ -51,8 +47,7 @@ interface Props {
 }
 
 function WalletSelectorInner(props: Props) {
-  const { wallets, signMessage, signTransaction, select } = useWallet();
-  const [adapter, setAdapter] = useState<Adapter | null>(null);
+  const { wallets, signMessage, signTransaction, select, wallet } = useWallet();
   const [selectorOpen, setSelectorOpen] = useState(false);
   const [publicKey, setPublicKey] = useState<PublicKey | null>(null);
   const [shouldConnect, setShouldConnect] = useState(false);
@@ -69,74 +64,45 @@ function WalletSelectorInner(props: Props) {
       )?.adapter;
 
       if (adapter) {
-        setAdapter(adapter);
+        select(adapter.name);
       }
     }
   }, []);
 
   useEffect(() => {
-    async function connect() {
-      if (adapter && shouldConnect) {
-        if (
-          adapter.connected &&
-          adapter.publicKey &&
-          signMessage &&
-          signTransaction &&
-          adapter.publicKey
-        ) {
-          return adapter.publicKey;
+    async function completeConnect() {
+      if (wallet && shouldConnect) {
+        await wallet.adapter.connect();
+
+        if (wallet.adapter.connected) {
+          setPublicKey(wallet.adapter.publicKey);
         }
-
-        await adapter.disconnect();
-        await adapter.connect();
-
-        let publicKey = adapter.publicKey;
-
-        if (!publicKey) {
-          // turn the wallet on and off in an attempt to get the key
-          await adapter.disconnect();
-          await adapter.connect();
-        }
-
-        publicKey = adapter.publicKey;
-
-        if (!publicKey) {
-          // if we still don't have the key, something has gone wrong
-          throw new Error('No public key');
-        }
-
-        select(adapter.name);
-        return publicKey;
       }
     }
 
-    connect()
-      .then((publicKey) => {
-        if (publicKey) {
-          setPublicKey(publicKey);
-        }
-      })
-      .catch((e) =>
-        toast.publish({
-          type: ToastType.Error,
-          title: 'Could not connect to wallet',
-          message: e instanceof Error ? e.message : 'Something went wrong',
-        }),
-      );
-  }, [adapter, shouldConnect]);
+    completeConnect().catch((e) => {
+      console.error(e);
+
+      toast.publish({
+        type: ToastType.Error,
+        title: 'Could not connect to wallet',
+        message: e instanceof Error ? e.message : 'Something went wrong',
+      });
+    });
+  }, [wallet, shouldConnect]);
 
   useEffect(() => {
-    if (signMessage && signTransaction && publicKey && adapter) {
+    if (signMessage && signTransaction && publicKey && wallet) {
       setSelectorOpen(false);
 
       resolveAdapterPromise?.({
-        adapter,
         publicKey,
         signMessage,
         signTransaction,
+        wallet,
       });
     }
-  }, [signMessage, signTransaction, publicKey, adapter]);
+  }, [signMessage, signTransaction, publicKey, wallet]);
 
   const adapters = wallets.filter(
     (adapter) =>
@@ -150,7 +116,7 @@ function WalletSelectorInner(props: Props) {
         getAdapter: () => {
           setShouldConnect(true);
 
-          if (!adapter) {
+          if (!wallet) {
             setSelectorOpen(true);
           }
 
@@ -160,7 +126,7 @@ function WalletSelectorInner(props: Props) {
     >
       {props.children}
       <Dialog.Root
-        open={selectorOpen && !adapter}
+        open={selectorOpen && !wallet}
         onOpenChange={setSelectorOpen}
       >
         <Dialog.Portal>
@@ -207,7 +173,7 @@ function WalletSelectorInner(props: Props) {
                     key={adapter.adapter.name}
                     onClick={() => {
                       setSelectorOpen(false);
-                      setAdapter(adapter.adapter);
+                      select(adapter.adapter.name);
                     }}
                   >
                     <img
@@ -237,14 +203,8 @@ export function WalletSelector(props: Props) {
   const [cluster] = useCluster();
 
   const supportedWallets = useMemo(
-    () => [
-      new PhantomWalletAdapter(),
-      new GlowWalletAdapter(),
-      new SlopeWalletAdapter(),
-      new SolflareWalletAdapter({ network: cluster.network }),
-      new TorusWalletAdapter(),
-    ],
-    [cluster.network],
+    () => WALLET_PROVIDERS.map((provider) => provider.adapter),
+    [],
   );
 
   return (
