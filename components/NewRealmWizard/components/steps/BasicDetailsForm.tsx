@@ -60,7 +60,7 @@ export default function BasicDetailsForm({
     setValue,
     control,
     handleSubmit,
-    formState: { errors, isValid, touchedFields },
+    formState: { errors, isValid },
   } = useForm({
     mode: 'all',
     resolver: yupResolver(schema),
