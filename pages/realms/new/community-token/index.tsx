@@ -31,6 +31,7 @@ import InviteMembersForm, {
   InviteMembersSchema,
   InviteMembers,
 } from '@components/NewRealmWizard/components/steps/InviteMembersForm'
+import { useProgramVersionByIdQuery } from '@hooks/queries/useProgramVersionQuery'
 
 export const FORM_NAME = 'tokenized'
 
@@ -45,6 +46,7 @@ export default function CommunityTokenWizard() {
   const { push } = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const [requestPending, setRequestPending] = useState(false)
+
   const steps = [
     { Form: BasicDetailsForm, schema: BasicDetailsSchema, required: 'true' },
     {
