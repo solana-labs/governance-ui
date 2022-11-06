@@ -136,6 +136,20 @@ export default function BasicDetailsForm({
                   data-testid="programId-input"
                   error={errors.programId?.message || ''}
                   autoComplete="on"
+                  success={
+                    !programVersionQuery.isLoading &&
+                    programVersionQuery.data !== 1
+                      ? `Program version ${programVersionQuery.data}`
+                      : undefined
+                  }
+                  warning={
+                    !programVersionQuery.isLoading &&
+                    programVersionQuery.data === 1
+                      ? 'Program version could not be verified'
+                      : programVersionQuery.isFetching
+                      ? 'Fetching program version...'
+                      : undefined
+                  }
                   {...field}
                 />
               </FormField>

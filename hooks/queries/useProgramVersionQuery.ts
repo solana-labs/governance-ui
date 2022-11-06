@@ -1,7 +1,7 @@
 import { getGovernanceProgramVersion } from '@solana/spl-governance'
-import { useConnection } from '@solana/wallet-adapter-react'
 import { PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
+import useWalletStore from 'stores/useWalletStore'
 
 export const programVersionQueryKeys = {
   byProgramId: (programId: PublicKey) => [
@@ -11,16 +11,18 @@ export const programVersionQueryKeys = {
 }
 
 export function useProgramVersionByIdQuery(realmsProgramId?: PublicKey) {
-  const { connection } = useConnection()
+  // @asktree is unsure why we use this instead of `useConnection` (which has no corresponding provider in the BaseApp)
+  const { connection } = useWalletStore()
   console.log('connection', connection)
 
   const query = useQuery({
     queryKey:
       realmsProgramId && programVersionQueryKeys.byProgramId(realmsProgramId),
-    queryFn: async () => {
-      getGovernanceProgramVersion(connection, realmsProgramId!)
-    },
+    queryFn: () =>
+      getGovernanceProgramVersion(connection.current, realmsProgramId!),
     enabled: realmsProgramId !== undefined,
+    // Staletime is zero by default, so queries get refetched often. Since program version is immutable it should never go stale.
+    staleTime: Number.MAX_SAFE_INTEGER,
   })
 
   return query
