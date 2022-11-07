@@ -72,7 +72,6 @@ export default function BasicDetailsForm({
       ? new PublicKey(programIdInput)
       : undefined
   const programVersionQuery = useProgramVersionByIdQuery(validProgramId)
-  console.log('fa', validProgramId)
 
   useEffect(() => {
     updateUserInput(formData, BasicDetailsSchema, setValue)
