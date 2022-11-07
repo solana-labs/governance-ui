@@ -7,7 +7,7 @@ interface Props {
   className?: string;
 }
 
-export function Content(props: Props) {
+export function Content(props: Props & { url: string }) {
   const router = useRouter();
 
   return (
@@ -19,11 +19,11 @@ export function Content(props: Props) {
         'items-center',
         'space-x-2',
       )}
-      onClick={() => router.back()}
+      onClick={() => router.push(props.url)}
     >
       <ArrowLeftIcon className="h-4 w-4 fill-zinc-800 transition-colors group-hover:fill-sky-500" />
       <div className="text-neutral-700 text-xs transition-colors group-hover:text-sky-500">
-        Back
+        Go to Feed
       </div>
     </button>
   );

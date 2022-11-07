@@ -73,7 +73,7 @@ export default function LockedCouncilVotingPower(props: Props) {
     <div className={props.className}>
       {amount.isZero() ? (
         <div className={'text-xs text-white/50'}>
-          You do not have any voting power in this realm.
+          You do not have any voting power in this dao.
         </div>
       ) : (
         <div className={'p-3 rounded-md bg-bkg-1'}>

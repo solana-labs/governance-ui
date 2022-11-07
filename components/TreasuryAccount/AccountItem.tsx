@@ -1,10 +1,10 @@
+import { useEffect, useState } from 'react'
+import { PublicKey } from '@solana/web3.js'
+import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
+import { findMetadataPda } from '@metaplex-foundation/js'
 import { getTreasuryAccountItemInfoV2 } from '@utils/treasuryTools'
 import { AssetAccount } from '@utils/uiTypes/assets'
-import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
-import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
-import { findMetadataPda } from '@metaplex-foundation/js'
-import { PublicKey } from '@solana/web3.js'
 
 const AccountItem = ({
   governedAccountTokenAccount,
@@ -28,34 +28,50 @@ const AccountItem = ({
   const connection = useWalletStore((s) => s.connection)
 
   useEffect(() => {
-    const getTokenMetadata = async (mintAddress: string) => {
+    const tryAndLoadLogoAndSymbolFromTokenMetadata = async (
+      mintAddress: PublicKey
+    ) => {
       try {
-        const mintPubkey = new PublicKey(mintAddress)
-        const metadataAccount = findMetadataPda(mintPubkey)
+        const metadataAccount = findMetadataPda(mintAddress)
+
         const accountData = await connection.current.getAccountInfo(
           metadataAccount
         )
 
-        const state = Metadata.deserialize(accountData!.data)
-        const jsonUri = state[0].data.uri.slice(
-          0,
-          state[0].data.uri.indexOf('\x00')
-        )
+        if (!accountData) {
+          throw new Error(
+            `Cannot find metaplex token metadata for mint ${mintAddress.toBase58()} at pda ${metadataAccount.toBase58()}`
+          )
+        }
 
-        const data = await (await fetch(jsonUri)).json()
+        const [
+          {
+            data: { uri },
+          },
+        ] = Metadata.deserialize(accountData.data)
+
+        const jsonUri = uri.slice(0, uri.indexOf('\x00'))
+
+        const data: {
+          // Token Metadata Standard (Version 1.0) doesn't include image attribute, v2 does
+          image?: string
+          symbol: string
+        } = await (await fetch(jsonUri)).json()
 
         setLogoFromMeta(data.image)
         setSymbolFromMeta(data.symbol)
       } catch (e) {
-        console.log(e)
+        console.warn(e.message)
       }
     }
+
     if (
       !logo &&
-      governedAccountTokenAccount.extensions.mint?.publicKey.toBase58()
+      typeof governedAccountTokenAccount.extensions.mint?.publicKey !==
+        'undefined'
     ) {
-      getTokenMetadata(
-        governedAccountTokenAccount.extensions.mint?.publicKey.toBase58()
+      tryAndLoadLogoAndSymbolFromTokenMetadata(
+        governedAccountTokenAccount.extensions.mint.publicKey
       )
     }
   }, [governedAccountTokenAccount.extensions.mint?.publicKey.toBase58()])

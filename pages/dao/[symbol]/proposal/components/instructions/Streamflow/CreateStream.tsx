@@ -1,43 +1,40 @@
 import React, { useContext, useEffect, useState } from 'react'
-import Input from 'components/inputs/Input'
-import Switch from '@components/Switch'
-
+import * as yup from 'yup'
 import {
   Governance,
   ProgramAccount,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
 import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
   TOKEN_PROGRAM_ID,
-  ASSOCIATED_TOKEN_PROGRAM_ID,
   u64,
 } from '@solana/spl-token'
-import * as yup from 'yup'
 import {
-  PublicKey,
-  SYSVAR_RENT_PUBKEY,
-  SystemProgram,
   Keypair,
+  PublicKey,
+  SystemProgram,
+  SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
 } from '@solana/web3.js'
+import { createUncheckedStreamInstruction } from '@streamflow/stream'
+import Select from '@components/inputs/Select'
+import { StyledLabel } from '@components/inputs/styles'
+import { getMintMetadata } from '@components/instructions/programs/streamflow'
+import Switch from '@components/Switch'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { isFormValid } from '@utils/formValidation'
 import {
   CreateStreamForm,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
-
+import useTreasuryInfo from '@hooks/useTreasuryInfo'
+import Input from 'components/inputs/Input'
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import useWalletStore from 'stores/useWalletStore'
-
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-import { getMintMetadata } from '@components/instructions/programs/streamflow'
-import { createUncheckedStreamInstruction } from '@streamflow/stream'
-import Select from '@components/inputs/Select'
-import { StyledLabel } from '@components/inputs/styles'
-// import { ConnectionContext } from '@utils/connection'
 
 const STREAMFLOW_TREASURY_PUBLIC_KEY = new PublicKey(
   '5SEpbdjFK5FxwTvfsGMXVQTD2v4M2c5tyRTxhdsPkgDw'
@@ -116,6 +113,7 @@ const CreateStream = ({
   const strmProgram = new PublicKey(STREAMFLOW_PROGRAM_ID)
 
   const { assetAccounts } = useGovernanceAssets()
+  const treasuryInfo = useTreasuryInfo()
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = strmProgram
   const [releaseUnitIdx, setReleaseUnitIdx] = useState<number>(0)
@@ -127,6 +125,7 @@ const CreateStream = ({
     releaseAmount: 0,
     amountAtCliff: 0,
     cancelable: false,
+    period: 1,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -221,6 +220,18 @@ const CreateStream = ({
     } else [(start = new u64(0))]
     const strmMetadata = Keypair.generate()
 
+    // Identifying Fee Payer account to support PDA owned tokens vesting
+    const payerAccountStr:
+      | string
+      | undefined = (treasuryInfo as any).data.wallets.find(
+      (wallet) =>
+        wallet.governanceAddress ===
+        form.tokenAccount?.extensions?.token?.account.owner.toBase58()
+    )?.address
+    const payerAccount = payerAccountStr
+      ? new PublicKey(payerAccountStr)
+      : senderAccount
+
     const [escrowTokens] = await PublicKey.findProgramAddress(
       [Buffer.from('strm'), strmMetadata.publicKey.toBuffer()],
       new PublicKey(STREAMFLOW_PROGRAM_ID)
@@ -265,13 +276,12 @@ const CreateStream = ({
       STREAMFLOW_TREASURY_PUBLIC_KEY,
       wallet?.publicKey
     )
-
     const tokenAccount = form.tokenAccount.pubkey
-    const period = releaseFrequencyUnits[releaseUnitIdx].value
+
     const createStreamData = {
       start,
       depositedAmount: new u64(form.depositedAmount * 10 ** decimals),
-      period: new u64(period),
+      period: new u64(form.period),
       cliff: start,
       cliffAmount: new u64(form.amountAtCliff * 10 ** decimals),
       amountPerPeriod: new u64(form.releaseAmount * 10 ** decimals),
@@ -282,7 +292,7 @@ const CreateStream = ({
       transferableBySender: true,
       transferableByRecipient: false,
       automaticWithdrawal: true,
-      withdrawFrequency: new u64(period),
+      withdrawFrequency: new u64(form.period),
       recipient: recipientPublicKey,
       recipientTokens: recipientTokens,
       streamflowTreasury: STREAMFLOW_TREASURY_PUBLIC_KEY,
@@ -291,6 +301,7 @@ const CreateStream = ({
       partnerTokens: partnerTokens,
     }
     const createStreamAccounts = {
+      payer: payerAccount,
       sender: senderAccount,
       senderTokens: tokenAccount,
       metadata: strmMetadata.publicKey,
@@ -436,7 +447,11 @@ const CreateStream = ({
           <Select
             label={'Release unit'}
             onChange={(unitIdx) => {
-              setReleaseUnitIdx(unitIdx)
+              setReleaseUnitIdx(releaseFrequencyUnits[unitIdx].idx)
+              handleSetForm({
+                value: releaseFrequencyUnits[unitIdx].value,
+                propertyName: 'period',
+              })
             }}
             placeholder="Please select..."
             value={releaseFrequencyUnits[releaseUnitIdx].display}

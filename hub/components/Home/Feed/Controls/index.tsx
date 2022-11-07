@@ -39,6 +39,7 @@ export function Content(props: Props) {
     >
       <Toolbar.Button asChild>
         <Select
+          dropdownClassName="drop-shadow-xl"
           choices={[
             {
               key: FeedItemSort.Relevance,
@@ -50,6 +51,11 @@ export function Content(props: Props) {
               label: 'Latest',
               value: FeedItemSort.New,
             },
+            {
+              key: FeedItemSort.TopAllTime,
+              label: 'Top',
+              value: FeedItemSort.TopAllTime,
+            },
           ]}
           selected={props.sort}
           onChange={(choice) => props.onChangeSort?.(choice.value)}
@@ -59,9 +65,9 @@ export function Content(props: Props) {
         <Dialog.Root open={dialogOpen} onOpenChange={setDialogOpen}>
           <Toolbar.Button asChild>
             <Dialog.Trigger asChild>
-              <Button.Primary className="w-32" disabled={!jwt}>
-                <LicenseDraftIcon className="h-4 w-4 mr-1.5" />
-                <div>Post</div>
+              <Button.Primary className="w-10 sm:w-32" disabled={!jwt}>
+                <LicenseDraftIcon className="h-4 w-4 sm:mr-1.5" />
+                <div className="hidden sm:block">Post</div>
               </Button.Primary>
             </Dialog.Trigger>
           </Toolbar.Button>
@@ -70,15 +76,18 @@ export function Content(props: Props) {
               <Dialog.Content>
                 <Dialog.Close className="top-8 right-16" />
                 <NewPostEditor
-                  className="w-[840px] min-h-[675px] max-h-[calc(100vh-80px)] py-8 px-16 h-full"
+                  className="w-[840px] min-h-[675px] max-h-[calc(100vh-80px)] py-6 px-16 h-full"
                   realm={props.realm}
                   realmIconUrl={props.realmIconUrl}
                   realmName={props.realmName}
-                  onPostCreated={(post) => {
-                    if (props.realm.equals(ECOSYSTEM_PAGE)) {
+                  onPostCreated={(post, realm) => {
+                    if (realm.equals(ECOSYSTEM_PAGE)) {
                       router.push(`/ecosystem/${post.id}`);
-                    } else {
+                    } else if (realm.equals(props.realm)) {
                       router.push(`/realm/${props.realmUrlId}/${post.id}`);
+                    } else {
+                      const urlId = post.realm.urlId;
+                      router.push(`/realm/${urlId}/${post.id}`);
                     }
                   }}
                 />
@@ -90,9 +99,9 @@ export function Content(props: Props) {
         <HoverCard.Root>
           <Toolbar.Button asChild>
             <HoverCard.Trigger asChild>
-              <Button.Primary className="w-32" disabled>
-                <LicenseDraftIcon className="h-4 w-4 mr-1.5" />
-                <div>Post</div>
+              <Button.Primary className="w-10 sm:w-32" disabled>
+                <LicenseDraftIcon className="h-4 w-4 sm:mr-1.5" />
+                <div className="hidden sm:block">Post</div>
               </Button.Primary>
             </HoverCard.Trigger>
           </Toolbar.Button>
@@ -113,23 +122,23 @@ export function Content(props: Props) {
         (jwt ? (
           <Toolbar.Button asChild>
             <Button.Secondary
-              className="w-32"
+              className="w-10 sm:w-32"
               disabled={!jwt}
               onClick={() =>
                 router.push(`/dao/${props.realmUrlId}/proposal/new`)
               }
             >
-              <DocumentAddIcon className="h-4 w-4 mr-1.5" />
-              <div>Proposal</div>
+              <DocumentAddIcon className="h-4 w-4 sm:mr-1.5" />
+              <div className="hidden sm:block">Proposal</div>
             </Button.Secondary>
           </Toolbar.Button>
         ) : (
           <HoverCard.Root>
             <Toolbar.Button asChild>
               <HoverCard.Trigger asChild>
-                <Button.Secondary className="w-32" disabled>
-                  <DocumentAddIcon className="h-4 w-4 mr-1.5" />
-                  <div>Proposal</div>
+                <Button.Secondary className="w-10 sm:w-32" disabled>
+                  <DocumentAddIcon className="h-4 w-4 sm:mr-1.5" />
+                  <div className="hidden sm:block">Proposal</div>
                 </Button.Secondary>
               </HoverCard.Trigger>
             </Toolbar.Button>

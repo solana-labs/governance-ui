@@ -13,6 +13,7 @@ interface Choice<T> {
 
 interface Props<T> {
   className?: string;
+  dropdownClassName?: string;
   choices: Choice<T>[];
   selected: string;
   onChange?(item: Choice<T>): void;
@@ -87,11 +88,11 @@ export const Select: Select = forwardRef(function Select<T>(
       <_Select.Portal>
         <_Select.Content
           className={cx(
-            props.className,
             'bg-white',
             'rounded',
             'overflow-hidden',
             'tracking-normal',
+            props.dropdownClassName,
           )}
         >
           <_Select.Viewport>

@@ -31,10 +31,9 @@ import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
 const SwitchboardRevokeOracle = ({
   index,
-  _governance,
 }: {
   index: number
-  _governance: ProgramAccount<Governance> | null
+  governance: ProgramAccount<Governance> | null
 }) => {
   const [form, setForm] = useState<SwitchboardRevokeOracleForm>({
     oraclePubkey: undefined,

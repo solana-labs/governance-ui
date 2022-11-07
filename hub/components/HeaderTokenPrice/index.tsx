@@ -2,8 +2,8 @@
 import CautionIcon from '@carbon/icons-react/lib/Caution';
 import type { PublicKey } from '@solana/web3.js';
 import { pipe } from 'fp-ts/lib/function';
-import { useEffect, useState } from 'react';
 
+import { useCachedValue } from '@hub/hooks/useCachedValue';
 import cx from '@hub/lib/cx';
 import * as RE from '@hub/types/Result';
 
@@ -14,25 +14,20 @@ interface TokenPrice {
 }
 
 function useTokenPrice(symbol: string, mint: PublicKey) {
-  const [result, setResult] = useState<RE.Result<TokenPrice>>(RE.pending());
+  const mintAddress = mint.toString();
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setResult(RE.pending());
-
-      setTimeout(() => {
-        setResult(
-          RE.ok({
-            direction: 'up',
-            percentChange: 59.8,
-            price: 0.345132,
-          }),
-        );
-      }, 1000);
-    }
-  }, [symbol]);
-
-  return result;
+  return useCachedValue<TokenPrice>(mintAddress, () =>
+    fetch(`https://price.jup.ag/v3/price?ids=${mintAddress}`)
+      .then((resp) => resp.json())
+      .then((result) => {
+        const price = result.data[mintAddress].price || 0;
+        return {
+          direction: 'up',
+          percentChange: 0,
+          price,
+        };
+      }),
+  );
 }
 
 interface Props {
@@ -81,25 +76,30 @@ export function HeaderTokenPrice(props: Props) {
             <div className="text-xs text-neutral-600">
               #{props.symbol} Price
             </div>
-            <CautionIcon
-              className={cx(
-                'h-2',
-                'mx-[1px]',
-                'w-2',
-                direction === 'up' && 'fill-emerald-500',
-                direction === 'down' && 'fill-rose-500',
-                direction === 'down' && 'rotate-180',
-              )}
-            />
-            <div
-              className={cx(
-                'text-xs',
-                direction === 'up' && 'text-emerald-500',
-                direction === 'down' && 'text-rose-500',
-              )}
-            >
-              {percentChange}%
-            </div>
+            {percentChange !== 0 ? (
+              <CautionIcon
+                className={cx(
+                  'h-2',
+                  'mx-[1px]',
+                  'w-2',
+                  direction === 'up' && 'fill-emerald-500',
+                  direction === 'down' && 'fill-rose-500',
+                  direction === 'down' && 'rotate-180',
+                )}
+              />
+            ) : null}
+
+            {percentChange !== 0 ? (
+              <div
+                className={cx(
+                  'text-xs',
+                  direction === 'up' && 'text-emerald-500',
+                  direction === 'down' && 'text-rose-500',
+                )}
+              >
+                {percentChange}%
+              </div>
+            ) : null}
           </div>
           <div className="text-lg text-neutral-900">${price}</div>
         </div>

@@ -30,10 +30,7 @@ export default function InspectorButton({
         instructionData
       )
 
-      inspectUrl = getExplorerInspectorUrl(
-        connection.endpoint,
-        result.transaction
-      )
+      inspectUrl = await getExplorerInspectorUrl(connection, result.transaction)
     } else {
       try {
         const recentActivity = await connection.current.getConfirmedSignaturesForAddress2(

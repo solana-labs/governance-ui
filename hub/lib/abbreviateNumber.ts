@@ -17,7 +17,7 @@ export function abbreviateNumber(
     if (typeof number === 'number') {
       if (number > value) {
         const abbr = (number / value).toFixed(
-          options?.maximumFractionDigits || 2,
+          options?.maximumFractionDigits ?? 2,
         );
         return `${abbr}${symbol}`;
       }
@@ -26,7 +26,7 @@ export function abbreviateNumber(
         const val = BigInt(value);
         const str = (number / val).toString();
         const abbr = parseFloat(str).toFixed(
-          options?.maximumFractionDigits || 2,
+          options?.maximumFractionDigits ?? 2,
         );
         return `${abbr}${symbol}`;
       }
@@ -35,7 +35,7 @@ export function abbreviateNumber(
         const abbr = number
           .dividedBy(value)
           .toNumber()
-          .toFixed(options?.maximumFractionDigits || 2);
+          .toFixed(options?.maximumFractionDigits ?? 2);
         return `${abbr}${symbol}`;
       }
     }

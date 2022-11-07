@@ -21,7 +21,10 @@ import { DepositWithMintAccount } from 'VoteStakeRegistry/sdk/accounts'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { notify } from '@utils/notifications'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { getTokenOwnerRecordAddress } from '@solana/spl-governance'
+import {
+  getTokenOwnerRecordAddress,
+  GoverningTokenRole,
+} from '@solana/spl-governance'
 import InlineNotification from '@components/InlineNotification'
 import {
   LightningBoltIcon,
@@ -31,6 +34,7 @@ import {
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import Account from './Account'
 import { abbreviateAddress } from '@utils/formatting'
+import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
 
 interface DepositBox {
   mintPk: PublicKey
@@ -380,6 +384,14 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
             onClose={() => setIsLockModalOpen(false)}
           ></LockTokensModal>
         )}
+        <div className="mt-4">
+          <TokenDeposit
+            mint={councilMint}
+            tokenRole={GoverningTokenRole.Council}
+            councilVote={true}
+            inAccountDetails={true}
+          />
+        </div>
       </div>
       {connected && <Account withHeader={false} displayPanel={false}></Account>}
     </div>

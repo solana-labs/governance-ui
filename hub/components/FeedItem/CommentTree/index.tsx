@@ -2,6 +2,7 @@ import type { PublicKey } from '@solana/web3.js';
 
 import { FeedItemComment } from '../gql';
 import cx from '@hub/lib/cx';
+import { filterUniqueBy } from '@hub/lib/filterUniqueBy';
 import { useUserCreatedTopLevelFeedItemRepliesStore } from '@hub/stores/userCreatedTopLevelFeedItemRepliesStore';
 
 import * as Comment from './Comment';
@@ -37,7 +38,7 @@ export function Content(props: Props) {
             realmUrlId={props.realmUrlId}
           />
         ))}
-      {props.comments.map((comment) => (
+      {props.comments.filter(filterUniqueBy('id')).map((comment) => (
         <Comment.Content
           comment={comment}
           feedItemId={props.feedItemId}

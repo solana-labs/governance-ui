@@ -1,7 +1,9 @@
 import * as Separator from '@radix-ui/react-separator';
 import type { PublicKey } from '@solana/web3.js';
 import { pipe } from 'fp-ts/function';
+import Head from 'next/head';
 
+import { EcosystemHeader } from '@hub/components/EcosystemHeader';
 import * as Back from '@hub/components/FeedItem/Back';
 import * as CommentTree from '@hub/components/FeedItem/CommentTree';
 import * as Footer from '@hub/components/FeedItem/Footer';
@@ -11,6 +13,7 @@ import * as Title from '@hub/components/FeedItem/Title';
 import * as RealmHeader from '@hub/components/RealmHeader';
 import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay';
 import { useQuery } from '@hub/hooks/useQuery';
+import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
 import * as RE from '@hub/types/Result';
 
 import * as gql from './gql';
@@ -138,23 +141,40 @@ export function FeedItemComment(props: Props) {
                 ),
                 ({ feedItem }) => (
                   <div>
-                    <RealmHeader.Content
-                      bannerUrl={realm.bannerImageUrl}
-                      iconUrl={realm.iconUrl}
-                      name={realm.name}
-                      realm={realm.publicKey}
-                      realmUrlId={props.realmUrlId}
-                      selectedTab="feed"
-                      token={hub.info.token}
-                      twitterHandle={realm.twitterHandle}
-                      websiteUrl={realm.websiteUrl}
-                      discordUrl={realm.discordUrl}
-                      githubUrl={realm.githubUrl}
-                      instagramUrl={realm.instagramUrl}
-                      linkedInUrl={realm.linkedInUrl}
-                    />
+                    <Head>
+                      <title>
+                        {feedItem.title} - {realm.name}
+                      </title>
+                      <meta
+                        property="og:title"
+                        content={`${feedItem.title} - ${realm.name}`}
+                        key="title"
+                      />
+                    </Head>
+                    {props.realm.equals(ECOSYSTEM_PAGE) ? (
+                      <EcosystemHeader />
+                    ) : (
+                      <RealmHeader.Content
+                        bannerUrl={realm.bannerImageUrl}
+                        iconUrl={realm.iconUrl}
+                        name={realm.name}
+                        realm={realm.publicKey}
+                        realmUrlId={props.realmUrlId}
+                        selectedTab="feed"
+                        token={hub.info.token}
+                        twitterHandle={realm.twitterHandle}
+                        websiteUrl={realm.websiteUrl}
+                        discordUrl={realm.discordUrl}
+                        githubUrl={realm.githubUrl}
+                        instagramUrl={realm.instagramUrl}
+                        linkedInUrl={realm.linkedInUrl}
+                      />
+                    )}
                     <div className="max-w-3xl mx-auto pt-8 w-full">
-                      <Back.Content className="mb-7 mt-4" />
+                      <Back.Content
+                        className="mb-7 mt-4"
+                        url={`/realm/${props.realmUrlId}/${feedItem.id}`}
+                      />
                       <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
                       <Header.Content
                         className="mt-6"
