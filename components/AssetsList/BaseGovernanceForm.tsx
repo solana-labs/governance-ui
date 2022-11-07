@@ -15,6 +15,7 @@ import {
 } from '@tools/sdk/units'
 import BigNumber from 'bignumber.js'
 import React, { useEffect, useState } from 'react'
+import { BaseGovernanceFormFieldsV3 } from './BaseGovernanceForm-data'
 import { BaseGovernanceFormV3 } from './BaseGovernanceFormV3'
 
 export interface BaseGovernanceFormFieldsV2 {
