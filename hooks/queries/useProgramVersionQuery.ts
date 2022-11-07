@@ -13,7 +13,6 @@ export const programVersionQueryKeys = {
 export function useProgramVersionByIdQuery(realmsProgramId?: PublicKey) {
   // @asktree is unsure why we use this instead of `useConnection` (which has no corresponding provider in the BaseApp)
   const { connection } = useWalletStore()
-  console.log('connection', connection)
 
   const query = useQuery({
     queryKey:
