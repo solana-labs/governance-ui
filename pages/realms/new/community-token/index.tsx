@@ -44,6 +44,64 @@ type CommunityTokenForm = BasicDetails &
   AddCouncil &
   InviteMembers
 
+// All transformation of form data to business logical program inputs should occur here
+const transformFormData2RealmCreation = (formData: CommunityTokenForm) => {
+  const createCouncil = formData.addCouncil ?? false
+  const existingCouncilMintPk = formData.councilTokenMintAddress
+    ? new PublicKey(formData.councilTokenMintAddress)
+    : undefined
+
+  const programIdAddress = formData?.programId || DEFAULT_GOVERNANCE_PROGRAM_ID
+
+  const params = {
+    ...{
+      programIdAddress,
+      realmName: formData.name,
+      // COMMUNITY INFO
+      tokensToGovernThreshold: formData.minimumNumberOfCommunityTokensToGovern,
+      useSupplyFactor: formData.useSupplyFactor,
+      communityAbsoluteMaxVoteWeight: formData.communityAbsoluteMaxVoteWeight,
+      communityMintSupplyFactor: formData.communityMintSupplyFactor,
+      communityYesVotePercentage: formData.communityYesVotePercentage,
+      existingCommunityMintPk: formData.communityTokenMintAddress
+        ? new PublicKey(formData.communityTokenMintAddress)
+        : undefined,
+      transferCommunityMintAuthority:
+        formData.transferCommunityMintAuthority ?? true,
+      // COUNCIL INFO
+      createCouncil: formData.addCouncil ?? false,
+
+      existingCouncilMintPk: formData.councilTokenMintAddress
+        ? new PublicKey(formData.councilTokenMintAddress)
+        : undefined,
+      transferCouncilMintAuthority:
+        formData.transferCouncilMintAuthority ?? true,
+      councilWalletPks:
+        formData?.memberAddresses?.map((w) => new PublicKey(w)) || [],
+    },
+    ...(formData._programVersion === 3
+      ? ({
+          _programVersion: 3,
+          councilYesVotePercentage: formData.councilYesVotePercentage,
+          councilTokenConfig:
+            createCouncil || existingCouncilMintPk
+              ? new GoverningTokenConfigAccountArgs({
+                  tokenType: GoverningTokenType.Membership,
+                  voterWeightAddin: undefined,
+                  maxVoterWeightAddin: undefined,
+                })
+              : new GoverningTokenConfigAccountArgs({
+                  tokenType: GoverningTokenType.Dormant,
+                  voterWeightAddin: undefined,
+                  maxVoterWeightAddin: undefined,
+                }),
+        } as const)
+      : ({ _programVersion: 2 } as const)),
+  } as const
+
+  return params
+}
+
 export default function CommunityTokenWizard() {
   const { connected, connection, current: wallet } = useWalletStore((s) => s)
   const { push } = useRouter()
@@ -88,64 +146,11 @@ export default function CommunityTokenWizard() {
         throw new Error('No valid wallet connected')
       }
 
-      const programIdAddress =
-        formData?.programId || DEFAULT_GOVERNANCE_PROGRAM_ID
-
-      const params = {
-        programIdAddress,
-        realmName: formData.name,
-        // COMMUNITY INFO
-        tokensToGovernThreshold:
-          formData.minimumNumberOfCommunityTokensToGovern,
-        useSupplyFactor: formData.useSupplyFactor,
-        communityAbsoluteMaxVoteWeight: formData.communityAbsoluteMaxVoteWeight,
-        communityMintSupplyFactor: formData.communityMintSupplyFactor,
-        communityYesVotePercentage: formData.communityYesVotePercentage,
-        existingCommunityMintPk: formData.communityTokenMintAddress
-          ? new PublicKey(formData.communityTokenMintAddress)
-          : undefined,
-        transferCommunityMintAuthority:
-          formData.transferCommunityMintAuthority ?? true,
-        // COUNCIL INFO
-        createCouncil: formData.addCouncil ?? false,
-        // TODO add ui for setting this to something else
-        // councilYesVotePercentage: 'disabled',
-        existingCouncilMintPk: formData.councilTokenMintAddress
-          ? new PublicKey(formData.councilTokenMintAddress)
-          : undefined,
-        transferCouncilMintAuthority:
-          formData.transferCouncilMintAuthority ?? true,
-        councilWalletPks:
-          formData?.memberAddresses?.map((w) => new PublicKey(w)) || [],
-      }
-
-      const results =
-        formData._programVersion === 3
-          ? await createTokenizedRealm({
-              _programVersion: 3,
-              wallet,
-              connection: connection.current,
-              ...params,
-              councilYesVotePercentage: formData.councilYesVotePercentage,
-              councilTokenConfig:
-                params.createCouncil || params.existingCouncilMintPk
-                  ? new GoverningTokenConfigAccountArgs({
-                      tokenType: GoverningTokenType.Membership,
-                      voterWeightAddin: undefined,
-                      maxVoterWeightAddin: undefined,
-                    })
-                  : new GoverningTokenConfigAccountArgs({
-                      tokenType: GoverningTokenType.Dormant,
-                      voterWeightAddin: undefined,
-                      maxVoterWeightAddin: undefined,
-                    }),
-            })
-          : await createTokenizedRealm({
-              _programVersion: 2,
-              wallet,
-              connection: connection.current,
-              ...params,
-            })
+      const results = await createTokenizedRealm({
+        wallet,
+        connection: connection.current,
+        ...transformFormData2RealmCreation(formData),
+      })
 
       if (results) {
         push(

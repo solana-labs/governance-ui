@@ -11,7 +11,7 @@ import {
   Web3Context,
 } from '@tools/governance/prepareRealmCreation'
 
-type TokenizedRealm = Web3Context & RealmCreation
+export type TokenizedRealm = Web3Context & RealmCreation
 
 export default async function createTokenizedRealm({
   connection,

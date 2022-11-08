@@ -81,39 +81,40 @@ export default function NFTWizard() {
       const programIdAddress =
         formData?.programId || DEFAULT_GOVERNANCE_PROGRAM_ID
 
+      // All transformation of form data to business logical program inputs should occur here
       const params = {
-        programIdAddress,
-        realmName: formData.name,
-        collectionAddress: formData.collectionKey,
-        nftCollectionCount: formData.numberOfNFTs,
-        tokensToGovernThreshold: 1, // 1 NFT 1 vote
+        ...{
+          programIdAddress,
+          realmName: formData.name,
+          collectionAddress: formData.collectionKey,
+          nftCollectionCount: formData.numberOfNFTs,
+          tokensToGovernThreshold: 1, // 1 NFT 1 vote
 
-        existingCommunityMintPk: undefined,
-        communityYesVotePercentage: formData.communityYesVotePercentage,
+          existingCommunityMintPk: undefined,
+          communityYesVotePercentage: formData.communityYesVotePercentage,
 
-        // COUNCIL INFO
-        createCouncil: formData.addCouncil ?? false,
+          // COUNCIL INFO
+          createCouncil: formData.addCouncil ?? false,
 
-        // TODO add ui to make this separate
-        // councilYesVotePercentage: formData.communityYesVotePercentage,
-        existingCouncilMintPk: formData.councilTokenMintAddress
-          ? new PublicKey(formData.councilTokenMintAddress)
-          : undefined,
-        transferCouncilMintAuthority:
-          formData.transferCouncilMintAuthority ?? true,
-        councilWalletPks:
-          formData?.memberAddresses?.map((w) => new PublicKey(w)) || [],
-        transferCommunityMintAuthority: false, // delay this until we have created NFT instructions
+          existingCouncilMintPk: formData.councilTokenMintAddress
+            ? new PublicKey(formData.councilTokenMintAddress)
+            : undefined,
+          transferCouncilMintAuthority:
+            formData.transferCouncilMintAuthority ?? true,
+          councilWalletPks:
+            formData?.memberAddresses?.map((w) => new PublicKey(w)) || [],
+          transferCommunityMintAuthority: false, // delay this until we have created NFT instructions
 
-        // (useSupplyFactor = true && communityMintSupplyFactor = undefined) => FULL_SUPPLY_FRACTION
-        useSupplyFactor: true,
-        communityMintSupplyFactor: undefined,
-        communityAbsoluteMaxVoteWeight: undefined,
-        communityTokenConfig: new GoverningTokenConfigAccountArgs({
-          voterWeightAddin: new PublicKey(nftPluginsPks[0]),
-          maxVoterWeightAddin: new PublicKey(nftPluginsPks[0]),
-          tokenType: GoverningTokenType.Liquid,
-        }),
+          // (useSupplyFactor = true && communityMintSupplyFactor = undefined) => FULL_SUPPLY_FRACTION
+          useSupplyFactor: true,
+          communityMintSupplyFactor: undefined,
+          communityAbsoluteMaxVoteWeight: undefined,
+          communityTokenConfig: new GoverningTokenConfigAccountArgs({
+            voterWeightAddin: new PublicKey(nftPluginsPks[0]),
+            maxVoterWeightAddin: new PublicKey(nftPluginsPks[0]),
+            tokenType: GoverningTokenType.Liquid,
+          }),
+        },
       }
 
       const results =
