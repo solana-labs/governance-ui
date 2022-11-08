@@ -53,6 +53,7 @@ export const AddCouncilSchema = {
 }
 
 export type AddCouncilV2 = {
+  // Ideally we would have a type discriminator, but current approach can never ensure the discriminator is set in a type-safe way
   // _programVersion: 2
   addCouncil: boolean
   useExistingCouncilToken?: boolean
