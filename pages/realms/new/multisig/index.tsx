@@ -9,10 +9,7 @@ import useQueryContext from '@hooks/useQueryContext'
 
 import { notify } from '@utils/notifications'
 
-import {
-  DEFAULT_GOVERNANCE_PROGRAM_ID,
-  DEFAULT_GOVERNANCE_PROGRAM_VERSION,
-} from '@components/instructions/tools'
+import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
 
 import BasicDetailsForm, {
   BasicDetailsSchema,
@@ -31,8 +28,6 @@ import {
   GoverningTokenConfigAccountArgs,
   GoverningTokenType,
 } from '@solana/spl-governance'
-import { fetchProgramVersionById } from '@hooks/queries/useProgramVersionQuery'
-import { validateSolAddress } from '@utils/formValidation'
 
 export const FORM_NAME = 'multisig'
 
