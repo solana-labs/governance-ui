@@ -36,12 +36,11 @@ import { validateSolAddress } from '@utils/formValidation'
 
 export const FORM_NAME = 'multisig'
 
-type MultisigForm = BasicDetails & InviteMembers & CouncilYesVotePercentage
+type MultisigForm = BasicDetails &
+  InviteMembers &
+  CouncilYesVotePercentage & { _programVersion: 2 | 3 }
 
-const transformMultisigForm2RealmCreation = (
-  programVersion: 2 | 3,
-  { ...formData }: MultisigForm
-) => {
+const transformMultisigForm2RealmCreation = ({ ...formData }: MultisigForm) => {
   const programIdAddress = formData?.programId || DEFAULT_GOVERNANCE_PROGRAM_ID
 
   const sharedParams = {
@@ -65,7 +64,7 @@ const transformMultisigForm2RealmCreation = (
     councilWalletPks: formData.memberAddresses.map((w) => new PublicKey(w)),
   }
   const discriminatedParams =
-    programVersion === 3
+    formData._programVersion === 3
       ? ({
           _programVersion: 3,
           communityYesVotePercentage: 'disabled',
@@ -118,16 +117,7 @@ export default function MultiSigWizard() {
     console.log('submit clicked')
     setRequestPending(true)
 
-    const programId =
-      formData.programId !== undefined && validateSolAddress(formData.programId)
-        ? new PublicKey(formData.programId)
-        : undefined
-    const programVersion =
-      programId !== undefined
-        ? await fetchProgramVersionById(connection.current, programId)
-        : DEFAULT_GOVERNANCE_PROGRAM_VERSION
-
-    if (programVersion !== 3 && programVersion !== 2)
+    if (formData._programVersion !== 3 && formData._programVersion !== 2)
       throw new Error('Could not verify version of supplied programId')
 
     try {
@@ -142,7 +132,7 @@ export default function MultiSigWizard() {
       const results = await createMultisigWallet({
         wallet,
         connection: connection.current,
-        ...transformMultisigForm2RealmCreation(programVersion, formData),
+        ...transformMultisigForm2RealmCreation(formData),
       })
 
       if (results) {
