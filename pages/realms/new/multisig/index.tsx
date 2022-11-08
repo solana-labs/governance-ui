@@ -28,15 +28,10 @@ import YesVotePercentageForm, {
 } from '@components/NewRealmWizard/components/steps/YesVotePercentageThresholdForm'
 import FormPage from '@components/NewRealmWizard/PageTemplate'
 import {
-  getGovernanceProgramVersion,
   GoverningTokenConfigAccountArgs,
   GoverningTokenType,
 } from '@solana/spl-governance'
-import queryClient from '@hooks/queries/queryClient'
-import {
-  fetchProgramVersionById,
-  programVersionQueryKeys,
-} from '@hooks/queries/useProgramVersionQuery'
+import { fetchProgramVersionById } from '@hooks/queries/useProgramVersionQuery'
 import { validateSolAddress } from '@utils/formValidation'
 
 export const FORM_NAME = 'multisig'

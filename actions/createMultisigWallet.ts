@@ -1,10 +1,7 @@
-import { Connection, PublicKey } from '@solana/web3.js'
-
 import {
   sendTransactionsV3,
   SequenceType,
   txBatchesToInstructionSetWithSigners,
-  WalletSigner,
 } from 'utils/sendTransactions'
 import { chunks } from '@utils/helpers'
 
@@ -13,10 +10,6 @@ import {
   RealmCreation,
   Web3Context,
 } from '@tools/governance/prepareRealmCreation'
-import {
-  GoverningTokenConfigAccountArgs,
-  GoverningTokenType,
-} from '@solana/spl-governance'
 
 /// Creates multisig realm with community mint with 0 supply
 /// and council mint used as multisig token
