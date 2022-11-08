@@ -37,6 +37,7 @@ import {
   fetchProgramVersionById,
   programVersionQueryKeys,
 } from '@hooks/queries/useProgramVersionQuery'
+import { validateSolAddress } from '@utils/formValidation'
 
 export const FORM_NAME = 'multisig'
 
@@ -123,7 +124,7 @@ export default function MultiSigWizard() {
     setRequestPending(true)
 
     const programId =
-      formData.programId !== undefined
+      formData.programId !== undefined && validateSolAddress(formData.programId)
         ? new PublicKey(formData.programId)
         : undefined
     const programVersion =
