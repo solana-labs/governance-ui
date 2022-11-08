@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 
-import { isWizardValid } from '@utils/formValidation'
+import { isWizardValid, validateSolAddress } from '@utils/formValidation'
 
 import CreateDAOWizard from '@components/NewRealmWizard/CreateDAOWizard'
 import useWalletStore from 'stores/useWalletStore'
@@ -10,6 +10,9 @@ import useWalletStore from 'stores/useWalletStore'
 // import { FORM_NAME as NFT_FORM } from 'pages/realms/new/nft'
 import { FORM_NAME as MULTISIG_WALLET_FORM } from 'pages/realms/new/multisig'
 import { FORM_NAME as COMMUNITY_TOKEN_FORM } from 'pages/realms/new/community-token'
+import { useProgramVersionByIdQuery } from '@hooks/queries/useProgramVersionQuery'
+import { PublicKey } from '@blockworks-foundation/mango-client'
+import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
 
 export const Section = ({ children }) => {
   return (
@@ -29,6 +32,7 @@ export default function FormPage({
   const { connected, current: wallet } = useWalletStore((s) => s)
   const userAddress = wallet?.publicKey?.toBase58()
   const [formData, setFormData] = useState<any>({
+    _programVersion: DEFAULT_GOVERNANCE_PROGRAM_VERSION,
     memberAddresses:
       autoInviteWallet && userAddress ? [userAddress] : undefined,
   })
@@ -41,6 +45,22 @@ export default function FormPage({
       ? 'community token DAO'
       : 'NFT community DAO'
   } | Realms`
+
+  // Update formData's _programVersion
+  const programIdInput = formData.programId
+  const validProgramId =
+    programIdInput && validateSolAddress(programIdInput)
+      ? new PublicKey(programIdInput)
+      : undefined
+  const programVersionQuery = useProgramVersionByIdQuery(validProgramId)
+
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      _programVersion:
+        programVersionQuery.data ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION,
+    }))
+  }, [programVersionQuery.data])
 
   useEffect(() => {
     async function tryToConnect() {
