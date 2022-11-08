@@ -40,6 +40,7 @@ export const V2_DEFAULT_GOVERNANCE_PROGRAM_ID =
  * Default governance program id instance
  */
 export const DEFAULT_GOVERNANCE_PROGRAM_ID = V2_DEFAULT_GOVERNANCE_PROGRAM_ID
+export const DEFAULT_GOVERNANCE_PROGRAM_VERSION = 2
 
 /**
  * Default TEST governance program id instance

@@ -8,7 +8,11 @@ import {
 } from 'utils/sendTransactions'
 import { chunks } from '@utils/helpers'
 
-import { prepareRealmCreation } from '@tools/governance/prepareRealmCreation'
+import {
+  prepareRealmCreation,
+  RealmCreation,
+  Web3Context,
+} from '@tools/governance/prepareRealmCreation'
 import {
   GoverningTokenConfigAccountArgs,
   GoverningTokenType,
@@ -16,24 +20,12 @@ import {
 
 /// Creates multisig realm with community mint with 0 supply
 /// and council mint used as multisig token
-interface MultisigWallet {
-  connection: Connection
-  wallet: WalletSigner
-  programIdAddress: string
-
-  realmName: string
-  councilYesVotePercentage: number
-  councilWalletPks: PublicKey[]
-}
+type MultisigWallet = RealmCreation & Web3Context
 
 export default async function createMultisigWallet({
   connection,
   wallet,
-  programIdAddress,
-  realmName,
-
-  councilYesVotePercentage,
-  councilWalletPks,
+  ...params
 }: MultisigWallet) {
   const {
     communityMintPk,
@@ -45,40 +37,9 @@ export default async function createMultisigWallet({
     mintsSetupSigners,
     councilMembersInstructions,
   } = await prepareRealmCreation({
-    // TODO support v3
-    _programVersion: 2,
     connection,
     wallet,
-    programIdAddress,
-
-    realmName,
-    tokensToGovernThreshold: undefined,
-
-    existingCommunityMintPk: undefined,
-    transferCommunityMintAuthority: true,
-    communityYesVotePercentage: 'disabled',
-
-    // (useSupplyFactor = true && communityMintSupplyFactor = undefined) => FULL_SUPPLY_FRACTION
-    useSupplyFactor: true,
-    communityMintSupplyFactor: undefined,
-    communityAbsoluteMaxVoteWeight: undefined,
-
-    createCouncil: true,
-    existingCouncilMintPk: undefined,
-    transferCouncilMintAuthority: true,
-    councilWalletPks,
-    // councilYesVotePercentage,
-
-    communityTokenConfig: new GoverningTokenConfigAccountArgs({
-      tokenType: GoverningTokenType.Dormant,
-      voterWeightAddin: undefined,
-      maxVoterWeightAddin: undefined,
-    }),
-    /* councilTokenConfig: new GoverningTokenConfigAccountArgs({
-      tokenType: GoverningTokenType.Membership,
-      voterWeightAddin: undefined,
-      maxVoterWeightAddin: undefined,
-    }), */
+    ...params,
   })
 
   try {

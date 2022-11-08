@@ -9,7 +9,10 @@ import useQueryContext from '@hooks/useQueryContext'
 
 import { notify } from '@utils/notifications'
 
-import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
+import {
+  DEFAULT_GOVERNANCE_PROGRAM_ID,
+  DEFAULT_GOVERNANCE_PROGRAM_VERSION,
+} from '@components/instructions/tools'
 
 import BasicDetailsForm, {
   BasicDetailsSchema,
@@ -24,10 +27,79 @@ import YesVotePercentageForm, {
   CouncilYesVotePercentage,
 } from '@components/NewRealmWizard/components/steps/YesVotePercentageThresholdForm'
 import FormPage from '@components/NewRealmWizard/PageTemplate'
+import {
+  getGovernanceProgramVersion,
+  GoverningTokenConfigAccountArgs,
+  GoverningTokenType,
+} from '@solana/spl-governance'
+import queryClient from '@hooks/queries/queryClient'
+import {
+  fetchProgramVersionById,
+  programVersionQueryKeys,
+} from '@hooks/queries/useProgramVersionQuery'
 
 export const FORM_NAME = 'multisig'
 
 type MultisigForm = BasicDetails & InviteMembers & CouncilYesVotePercentage
+
+const transformMultisigForm2RealmCreation = (
+  programVersion: 2 | 3,
+  { ...formData }: MultisigForm
+) => {
+  const programIdAddress = formData?.programId || DEFAULT_GOVERNANCE_PROGRAM_ID
+
+  const sharedParams = {
+    programIdAddress,
+
+    realmName: formData.name,
+    tokensToGovernThreshold: undefined,
+
+    existingCommunityMintPk: undefined,
+    transferCommunityMintAuthority: true,
+    communityYesVotePercentage: 'disabled',
+
+    // (useSupplyFactor = true && communityMintSupplyFactor = undefined) => FULL_SUPPLY_FRACTION
+    useSupplyFactor: true,
+    communityMintSupplyFactor: undefined,
+    communityAbsoluteMaxVoteWeight: undefined,
+
+    createCouncil: true,
+    existingCouncilMintPk: undefined,
+    transferCouncilMintAuthority: true,
+    councilWalletPks: formData.memberAddresses.map((w) => new PublicKey(w)),
+  }
+  const discriminatedParams =
+    programVersion === 3
+      ? ({
+          _programVersion: 3,
+          communityYesVotePercentage: 'disabled',
+          councilYesVotePercentage: formData.councilYesVotePercentage,
+          councilTokenConfig: new GoverningTokenConfigAccountArgs({
+            tokenType: GoverningTokenType.Membership,
+            voterWeightAddin: undefined,
+            maxVoterWeightAddin: undefined,
+          }),
+          communityTokenConfig: new GoverningTokenConfigAccountArgs({
+            tokenType: GoverningTokenType.Dormant,
+            voterWeightAddin: undefined,
+            maxVoterWeightAddin: undefined,
+          }),
+        } as const)
+      : ({
+          _programVersion: 2,
+          communityYesVotePercentage: formData.councilYesVotePercentage,
+          communityTokenConfig: new GoverningTokenConfigAccountArgs({
+            tokenType: GoverningTokenType.Liquid,
+            voterWeightAddin: undefined,
+            maxVoterWeightAddin: undefined,
+          }),
+        } as const)
+
+  return {
+    ...sharedParams,
+    ...discriminatedParams,
+  }
+}
 
 export default function MultiSigWizard() {
   const { connected, connection, current: wallet } = useWalletStore((s) => s)
@@ -49,6 +121,19 @@ export default function MultiSigWizard() {
   async function handleSubmit(formData: MultisigForm) {
     console.log('submit clicked')
     setRequestPending(true)
+
+    const programId =
+      formData.programId !== undefined
+        ? new PublicKey(formData.programId)
+        : undefined
+    const programVersion =
+      programId !== undefined
+        ? await fetchProgramVersionById(connection.current, programId)
+        : DEFAULT_GOVERNANCE_PROGRAM_VERSION
+
+    if (programVersion !== 3 && programVersion !== 2)
+      throw new Error('Could not verify version of supplied programId')
+
     try {
       console.log('connection', connected, wallet)
       if (!connected) {
@@ -58,17 +143,10 @@ export default function MultiSigWizard() {
         throw new Error('No valid wallet connected')
       }
 
-      const programIdAddress =
-        formData?.programId || DEFAULT_GOVERNANCE_PROGRAM_ID
-
       const results = await createMultisigWallet({
         wallet,
         connection: connection.current,
-        programIdAddress,
-
-        realmName: formData.name,
-        councilYesVotePercentage: formData.councilYesVotePercentage,
-        councilWalletPks: formData.memberAddresses.map((w) => new PublicKey(w)),
+        ...transformMultisigForm2RealmCreation(programVersion, formData),
       })
 
       if (results) {
