@@ -53,15 +53,14 @@ export const AddCouncilSchema = {
 }
 
 export type AddCouncilV2 = {
-  // Ideally we would have a type discriminator, but current approach can never ensure the discriminator is set in a type-safe way
-  // _programVersion: 2
+  _programVersion: 2
   addCouncil: boolean
   useExistingCouncilToken?: boolean
   councilTokenMintAddress?: string
   transferCouncilMintAuthority?: boolean
 }
 export type AddCouncilV3 = {
-  // _programVersion: 3
+  _programVersion: 3
   councilYesVotePercentage: number
 } & Omit<AddCouncilV2, '_programVersion'>
 export type AddCouncil = AddCouncilV2 | AddCouncilV3
