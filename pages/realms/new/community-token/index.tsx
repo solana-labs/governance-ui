@@ -31,6 +31,10 @@ import InviteMembersForm, {
   InviteMembersSchema,
   InviteMembers,
 } from '@components/NewRealmWizard/components/steps/InviteMembersForm'
+import {
+  GoverningTokenConfigAccountArgs,
+  GoverningTokenType,
+} from '@solana/spl-governance'
 
 export const FORM_NAME = 'tokenized'
 
@@ -87,9 +91,7 @@ export default function CommunityTokenWizard() {
       const programIdAddress =
         formData?.programId || DEFAULT_GOVERNANCE_PROGRAM_ID
 
-      const results = await createTokenizedRealm({
-        wallet,
-        connection: connection.current,
+      const params = {
         programIdAddress,
         realmName: formData.name,
         // COMMUNITY INFO
@@ -102,18 +104,48 @@ export default function CommunityTokenWizard() {
         existingCommunityMintPk: formData.communityTokenMintAddress
           ? new PublicKey(formData.communityTokenMintAddress)
           : undefined,
-        transferCommunityMintAuthority: formData.transferCommunityMintAuthority,
+        transferCommunityMintAuthority:
+          formData.transferCommunityMintAuthority ?? true,
         // COUNCIL INFO
-        createCouncil: formData.addCouncil,
+        createCouncil: formData.addCouncil ?? false,
         // TODO add ui for setting this to something else
-        councilYesVotePercentage: formData.communityYesVotePercentage,
+        // councilYesVotePercentage: 'disabled',
         existingCouncilMintPk: formData.councilTokenMintAddress
           ? new PublicKey(formData.councilTokenMintAddress)
           : undefined,
-        transferCouncilMintAuthority: formData.transferCouncilMintAuthority,
+        transferCouncilMintAuthority:
+          formData.transferCouncilMintAuthority ?? true,
         councilWalletPks:
           formData?.memberAddresses?.map((w) => new PublicKey(w)) || [],
-      })
+      }
+
+      const results =
+        formData._programVersion === 3
+          ? await createTokenizedRealm({
+              _programVersion: 3,
+              wallet,
+              connection: connection.current,
+              ...params,
+              councilYesVotePercentage: formData.councilYesVotePercentage,
+              councilTokenConfig:
+                params.createCouncil || params.existingCouncilMintPk
+                  ? new GoverningTokenConfigAccountArgs({
+                      tokenType: GoverningTokenType.Membership,
+                      voterWeightAddin: undefined,
+                      maxVoterWeightAddin: undefined,
+                    })
+                  : new GoverningTokenConfigAccountArgs({
+                      tokenType: GoverningTokenType.Dormant,
+                      voterWeightAddin: undefined,
+                      maxVoterWeightAddin: undefined,
+                    }),
+            })
+          : await createTokenizedRealm({
+              _programVersion: 2,
+              wallet,
+              connection: connection.current,
+              ...params,
+            })
 
       if (results) {
         push(

@@ -45,6 +45,8 @@ export default async function createMultisigWallet({
     mintsSetupSigners,
     councilMembersInstructions,
   } = await prepareRealmCreation({
+    // TODO support v3
+    _programVersion: 2,
     connection,
     wallet,
     programIdAddress,
@@ -65,18 +67,18 @@ export default async function createMultisigWallet({
     existingCouncilMintPk: undefined,
     transferCouncilMintAuthority: true,
     councilWalletPks,
-    councilYesVotePercentage,
+    // councilYesVotePercentage,
 
     communityTokenConfig: new GoverningTokenConfigAccountArgs({
       tokenType: GoverningTokenType.Dormant,
       voterWeightAddin: undefined,
       maxVoterWeightAddin: undefined,
     }),
-    councilTokenConfig: new GoverningTokenConfigAccountArgs({
+    /* councilTokenConfig: new GoverningTokenConfigAccountArgs({
       tokenType: GoverningTokenType.Membership,
       voterWeightAddin: undefined,
       maxVoterWeightAddin: undefined,
-    }),
+    }), */
   })
 
   try {

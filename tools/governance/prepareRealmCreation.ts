@@ -36,9 +36,13 @@ import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import BN from 'bn.js'
 import { createGovernanceThresholds } from './configs'
 
-interface RealmCreation {
+export interface Web3Context {
   connection: Connection
   wallet: WalletSigner
+}
+export interface RealmCreationV2 {
+  _programVersion: 2
+
   programIdAddress: string
 
   realmName: string
@@ -58,11 +62,16 @@ interface RealmCreation {
   existingCouncilMintPk: PublicKey | undefined
   transferCouncilMintAuthority: boolean
   councilWalletPks: PublicKey[]
-  councilYesVotePercentage: 'disabled' | number
 
   communityTokenConfig?: GoverningTokenConfigAccountArgs
-  councilTokenConfig?: GoverningTokenConfigAccountArgs
 }
+type RealmCreationV3 = {
+  _programVersion: 3
+  councilTokenConfig: GoverningTokenConfigAccountArgs
+  councilYesVotePercentage: 'disabled' | number
+} & Omit<RealmCreationV2, '_programVersion'>
+
+export type RealmCreation = RealmCreationV2 | RealmCreationV3
 
 export async function prepareRealmCreation({
   connection,
@@ -86,11 +95,10 @@ export async function prepareRealmCreation({
   existingCouncilMintPk,
   transferCouncilMintAuthority,
   councilWalletPks,
-  councilYesVotePercentage,
 
   communityTokenConfig,
-  councilTokenConfig,
-}: RealmCreation) {
+  ...params
+}: RealmCreation & Web3Context) {
   const realmInstructions: TransactionInstruction[] = []
   const realmSigners: Keypair[] = []
 
@@ -255,7 +263,7 @@ export async function prepareRealmCreation({
     communityMaxVoteWeightSource,
     minCommunityTokensToCreateAsMintValue,
     communityTokenConfig,
-    councilTokenConfig
+    params._programVersion === 3 ? params.councilTokenConfig : undefined
   )
 
   // If the current wallet is in the team then deposit the council token
@@ -282,7 +290,7 @@ export async function prepareRealmCreation({
   } = createGovernanceThresholds(
     programVersion,
     communityYesVotePercentage,
-    councilYesVotePercentage
+    params._programVersion === 3 ? params.councilYesVotePercentage : 'disabled'
   )
 
   // Put community and council mints under the realm governance with default config

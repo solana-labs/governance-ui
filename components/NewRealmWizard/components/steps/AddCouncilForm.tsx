@@ -52,12 +52,18 @@ export const AddCouncilSchema = {
     }),
 }
 
-export interface AddCouncil {
+export type AddCouncilV2 = {
+  _programVersion: 2
   addCouncil: boolean
   useExistingCouncilToken?: boolean
   councilTokenMintAddress?: string
   transferCouncilMintAuthority?: boolean
 }
+export type AddCouncilV3 = {
+  _programVersion: 3
+  councilYesVotePercentage: number
+} & Omit<AddCouncilV2, '_programVersion'>
+export type AddCouncil = AddCouncilV2 | AddCouncilV3
 
 export default function AddCouncilForm({
   type,

@@ -28,6 +28,15 @@ import InviteMembersForm, {
 } from '@components/NewRealmWizard/components/steps/InviteMembersForm'
 
 import FormPage from '@components/NewRealmWizard/PageTemplate'
+import {
+  GoverningTokenConfigAccountArgs,
+  GoverningTokenType,
+} from '@solana/spl-governance'
+import { nftPluginsPks } from '@hooks/useVotingPlugins'
+import {
+  RealmCreation,
+  RealmCreationV2,
+} from '@tools/governance/prepareRealmCreation'
 
 export const FORM_NAME = 'nft'
 
@@ -54,6 +63,8 @@ export default function NFTWizard() {
     },
   ]
 
+  const programVersion: 2 | 3 = 2
+
   async function handleSubmit(formData: NFTForm) {
     console.log('submit clicked')
     setRequestPending(true)
@@ -70,31 +81,68 @@ export default function NFTWizard() {
       const programIdAddress =
         formData?.programId || DEFAULT_GOVERNANCE_PROGRAM_ID
 
-      const results = await createNFTRealm({
-        wallet,
-        connection: connection.current,
+      const params = {
         programIdAddress,
-
         realmName: formData.name,
         collectionAddress: formData.collectionKey,
-        collectionCount: formData.numberOfNFTs,
+        nftCollectionCount: formData.numberOfNFTs,
         tokensToGovernThreshold: 1, // 1 NFT 1 vote
 
         existingCommunityMintPk: undefined,
         communityYesVotePercentage: formData.communityYesVotePercentage,
 
         // COUNCIL INFO
-        createCouncil: formData.addCouncil,
+        createCouncil: formData.addCouncil ?? false,
 
         // TODO add ui to make this separate
-        councilYesVotePercentage: formData.communityYesVotePercentage,
+        // councilYesVotePercentage: formData.communityYesVotePercentage,
         existingCouncilMintPk: formData.councilTokenMintAddress
           ? new PublicKey(formData.councilTokenMintAddress)
           : undefined,
-        transferCouncilMintAuthority: formData.transferCouncilMintAuthority,
+        transferCouncilMintAuthority:
+          formData.transferCouncilMintAuthority ?? true,
         councilWalletPks:
           formData?.memberAddresses?.map((w) => new PublicKey(w)) || [],
-      })
+        transferCommunityMintAuthority: false, // delay this until we have created NFT instructions
+
+        // (useSupplyFactor = true && communityMintSupplyFactor = undefined) => FULL_SUPPLY_FRACTION
+        useSupplyFactor: true,
+        communityMintSupplyFactor: undefined,
+        communityAbsoluteMaxVoteWeight: undefined,
+        communityTokenConfig: new GoverningTokenConfigAccountArgs({
+          voterWeightAddin: new PublicKey(nftPluginsPks[0]),
+          maxVoterWeightAddin: new PublicKey(nftPluginsPks[0]),
+          tokenType: GoverningTokenType.Liquid,
+        }),
+      }
+
+      const results =
+        formData._programVersion === 3
+          ? await createNFTRealm({
+              _programVersion: 3,
+              wallet,
+              connection: connection.current,
+              ...params,
+              councilYesVotePercentage: formData.councilYesVotePercentage,
+              councilTokenConfig:
+                params.createCouncil || params.existingCouncilMintPk
+                  ? new GoverningTokenConfigAccountArgs({
+                      tokenType: GoverningTokenType.Membership,
+                      voterWeightAddin: undefined,
+                      maxVoterWeightAddin: undefined,
+                    })
+                  : new GoverningTokenConfigAccountArgs({
+                      tokenType: GoverningTokenType.Dormant,
+                      voterWeightAddin: undefined,
+                      maxVoterWeightAddin: undefined,
+                    }),
+            })
+          : await createNFTRealm({
+              _programVersion: 2,
+              wallet,
+              connection: connection.current,
+              ...params,
+            })
 
       if (results) {
         push(

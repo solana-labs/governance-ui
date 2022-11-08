@@ -1,62 +1,23 @@
-import { Connection, PublicKey } from '@solana/web3.js'
-
 import {
   SequenceType,
-  WalletSigner,
   txBatchesToInstructionSetWithSigners,
   sendTransactionsV3,
 } from 'utils/sendTransactions'
 import { chunks } from '@utils/helpers'
 
-import { prepareRealmCreation } from '@tools/governance/prepareRealmCreation'
 import {
-  GoverningTokenConfigAccountArgs,
-  GoverningTokenType,
-} from '@solana/spl-governance'
+  prepareRealmCreation,
+  RealmCreation,
+  Web3Context,
+} from '@tools/governance/prepareRealmCreation'
 
-interface TokenizedRealm {
-  connection: Connection
-  wallet: WalletSigner
-  programIdAddress: string
-
-  realmName: string
-  tokensToGovernThreshold: number | undefined
-
-  communityYesVotePercentage: number
-  existingCommunityMintPk: PublicKey | undefined
-  transferCommunityMintAuthority: boolean | undefined
-
-  useSupplyFactor: boolean
-  communityMintSupplyFactor: number | undefined
-  communityAbsoluteMaxVoteWeight: number | undefined
-
-  createCouncil: boolean
-  existingCouncilMintPk: PublicKey | undefined
-  transferCouncilMintAuthority: boolean | undefined
-  councilWalletPks: PublicKey[]
-  councilYesVotePercentage: 'disabled' | number
-}
+type TokenizedRealm = Web3Context & RealmCreation
 
 export default async function createTokenizedRealm({
   connection,
   wallet,
-  programIdAddress,
-  realmName,
-  tokensToGovernThreshold,
 
-  communityYesVotePercentage,
-  existingCommunityMintPk,
-  transferCommunityMintAuthority = true,
-
-  useSupplyFactor,
-  communityMintSupplyFactor: rawCMSF,
-  communityAbsoluteMaxVoteWeight,
-
-  createCouncil = false,
-  councilYesVotePercentage,
-  existingCouncilMintPk,
-  transferCouncilMintAuthority = true,
-  councilWalletPks,
+  ...params
 }: TokenizedRealm) {
   const {
     communityMintPk,
@@ -70,36 +31,8 @@ export default async function createTokenizedRealm({
   } = await prepareRealmCreation({
     connection,
     wallet,
-    programIdAddress,
-
-    realmName,
-    tokensToGovernThreshold,
-
-    existingCommunityMintPk,
-    transferCommunityMintAuthority,
-    communityYesVotePercentage,
-
-    useSupplyFactor,
-    communityMintSupplyFactor: rawCMSF,
-    communityAbsoluteMaxVoteWeight,
-
-    createCouncil,
-    councilYesVotePercentage,
-    existingCouncilMintPk,
-    transferCouncilMintAuthority,
-    councilWalletPks,
-    councilTokenConfig:
-      createCouncil || existingCouncilMintPk
-        ? new GoverningTokenConfigAccountArgs({
-            tokenType: GoverningTokenType.Membership,
-            voterWeightAddin: undefined,
-            maxVoterWeightAddin: undefined,
-          })
-        : new GoverningTokenConfigAccountArgs({
-            tokenType: GoverningTokenType.Dormant,
-            voterWeightAddin: undefined,
-            maxVoterWeightAddin: undefined,
-          }),
+    // TODO does there need to be community token config
+    ...params,
   })
 
   try {

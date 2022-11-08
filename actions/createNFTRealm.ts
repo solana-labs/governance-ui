@@ -31,47 +31,26 @@ import {
 } from '@utils/plugin/accounts'
 import { NftVoterClient } from '@solana/governance-program-library'
 
-import { prepareRealmCreation } from '@tools/governance/prepareRealmCreation'
-interface NFTRealm {
-  connection: Connection
-  wallet: WalletSigner
-  programIdAddress: string
+import {
+  prepareRealmCreation,
+  RealmCreation,
+  Web3Context,
+} from '@tools/governance/prepareRealmCreation'
 
-  realmName: string
-  collectionAddress: string
-  collectionCount: number
-  tokensToGovernThreshold: number | undefined
-
-  communityYesVotePercentage: number
-  existingCommunityMintPk: PublicKey | undefined
-  // communityMintSupplyFactor: number | undefined
-
-  createCouncil: boolean
-  existingCouncilMintPk: PublicKey | undefined
-  transferCouncilMintAuthority: boolean | undefined
-  councilWalletPks: PublicKey[]
-  councilYesVotePercentage: 'disabled' | number
-}
+export type NFTRealm = Web3Context &
+  RealmCreation & {
+    collectionAddress: string
+    nftCollectionCount: number
+  }
 
 export default async function createNFTRealm({
   connection,
   wallet,
-  programIdAddress,
-  realmName,
-  tokensToGovernThreshold = 1,
 
   collectionAddress,
-  collectionCount,
+  nftCollectionCount,
 
-  existingCommunityMintPk,
-  communityYesVotePercentage,
-  // communityMintSupplyFactor: rawCMSF,
-
-  createCouncil = false,
-  existingCouncilMintPk,
-  transferCouncilMintAuthority = true,
-  councilWalletPks,
-  councilYesVotePercentage,
+  ...params
 }: NFTRealm) {
   const options = AnchorProvider.defaultOptions()
   const provider = new AnchorProvider(connection, wallet as Wallet, options)
@@ -92,45 +71,9 @@ export default async function createNFTRealm({
     mintsSetupSigners,
     councilMembersInstructions,
   } = await prepareRealmCreation({
+    ...params,
     connection,
     wallet,
-    programIdAddress,
-
-    realmName,
-    tokensToGovernThreshold,
-
-    existingCommunityMintPk,
-    nftCollectionCount: collectionCount,
-    transferCommunityMintAuthority: false, // delay this until we have created NFT instructions
-    communityYesVotePercentage,
-
-    // (useSupplyFactor = true && communityMintSupplyFactor = undefined) => FULL_SUPPLY_FRACTION
-    useSupplyFactor: true,
-    communityMintSupplyFactor: undefined,
-    communityAbsoluteMaxVoteWeight: undefined,
-
-    createCouncil,
-    existingCouncilMintPk,
-    transferCouncilMintAuthority,
-    councilWalletPks,
-    councilYesVotePercentage,
-    communityTokenConfig: new GoverningTokenConfigAccountArgs({
-      voterWeightAddin: new PublicKey(nftPluginsPks[0]),
-      maxVoterWeightAddin: new PublicKey(nftPluginsPks[0]),
-      tokenType: GoverningTokenType.Liquid,
-    }),
-    councilTokenConfig:
-      createCouncil || existingCouncilMintPk
-        ? new GoverningTokenConfigAccountArgs({
-            tokenType: GoverningTokenType.Membership,
-            voterWeightAddin: undefined,
-            maxVoterWeightAddin: undefined,
-          })
-        : new GoverningTokenConfigAccountArgs({
-            tokenType: GoverningTokenType.Dormant,
-            voterWeightAddin: undefined,
-            maxVoterWeightAddin: undefined,
-          }),
   })
 
   console.log('NFT REALM realm public-key', realmPk.toBase58())
@@ -182,7 +125,10 @@ export default async function createNFTRealm({
   )
 
   const instructionCC = await nftClient!.program.methods
-    .configureCollection(minCommunityTokensToCreateAsMintValue, collectionCount)
+    .configureCollection(
+      minCommunityTokensToCreateAsMintValue,
+      nftCollectionCount
+    )
     .accounts({
       registrar,
       realm: realmPk,
