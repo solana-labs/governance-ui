@@ -6,7 +6,10 @@ import useWalletStore from 'stores/useWalletStore'
 import createTokenizedRealm from 'actions/createTokenizedRealm'
 import useQueryContext from '@hooks/useQueryContext'
 
-import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
+import {
+  DEFAULT_GOVERNANCE_PROGRAM_ID,
+  DEFAULT_GOVERNANCE_PROGRAM_VERSION,
+} from '@components/instructions/tools'
 
 import { notify } from '@utils/notifications'
 
@@ -26,6 +29,7 @@ import YesVotePercentageForm, {
 import AddCouncilForm, {
   AddCouncilSchema,
   AddCouncil,
+  AddCouncilV3,
 } from '@components/NewRealmWizard/components/steps/AddCouncilForm'
 import InviteMembersForm, {
   InviteMembersSchema,
@@ -35,6 +39,8 @@ import {
   GoverningTokenConfigAccountArgs,
   GoverningTokenType,
 } from '@solana/spl-governance'
+import { validateSolAddress } from '@utils/formValidation'
+import { fetchProgramVersionById } from '@hooks/queries/useProgramVersionQuery'
 
 export const FORM_NAME = 'tokenized'
 
@@ -45,7 +51,10 @@ type CommunityTokenForm = BasicDetails &
   InviteMembers
 
 // All transformation of form data to business logical program inputs should occur here
-const transformFormData2RealmCreation = (formData: CommunityTokenForm) => {
+const transformFormData2RealmCreation = (
+  programVersion: 2 | 3,
+  formData: CommunityTokenForm
+) => {
   const createCouncil = formData.addCouncil ?? false
   const existingCouncilMintPk = formData.councilTokenMintAddress
     ? new PublicKey(formData.councilTokenMintAddress)
@@ -79,10 +88,11 @@ const transformFormData2RealmCreation = (formData: CommunityTokenForm) => {
       councilWalletPks:
         formData?.memberAddresses?.map((w) => new PublicKey(w)) || [],
     },
-    ...(formData._programVersion === 3
+    ...(programVersion === 3
       ? ({
           _programVersion: 3,
-          councilYesVotePercentage: formData.councilYesVotePercentage,
+          councilYesVotePercentage: (formData as AddCouncilV3)
+            .councilYesVotePercentage,
           councilTokenConfig:
             createCouncil || existingCouncilMintPk
               ? new GoverningTokenConfigAccountArgs({
@@ -146,10 +156,22 @@ export default function CommunityTokenWizard() {
         throw new Error('No valid wallet connected')
       }
 
+      const programId =
+        formData.programId !== undefined &&
+        validateSolAddress(formData.programId)
+          ? new PublicKey(formData.programId)
+          : undefined
+      const programVersion =
+        programId !== undefined
+          ? await fetchProgramVersionById(connection.current, programId)
+          : DEFAULT_GOVERNANCE_PROGRAM_VERSION
+
+      if (programVersion !== 3 && programVersion !== 2)
+        throw new Error('Could not verify version of supplied programId')
       const results = await createTokenizedRealm({
         wallet,
         connection: connection.current,
-        ...transformFormData2RealmCreation(formData),
+        ...transformFormData2RealmCreation(programVersion, formData),
       })
 
       if (results) {

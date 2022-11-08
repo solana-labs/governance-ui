@@ -2,7 +2,10 @@ import { useState } from 'react'
 import { useRouter } from 'next/router'
 import { PublicKey } from '@solana/web3.js'
 import createNFTRealm from 'actions/createNFTRealm'
-import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
+import {
+  DEFAULT_GOVERNANCE_PROGRAM_ID,
+  DEFAULT_GOVERNANCE_PROGRAM_VERSION,
+} from '@components/instructions/tools'
 
 import useWalletStore from 'stores/useWalletStore'
 
@@ -21,6 +24,7 @@ import AddNFTCollectionForm, {
 import AddCouncilForm, {
   AddCouncilSchema,
   AddCouncil,
+  AddCouncilV3,
 } from '@components/NewRealmWizard/components/steps/AddCouncilForm'
 import InviteMembersForm, {
   InviteMembersSchema,
@@ -33,10 +37,8 @@ import {
   GoverningTokenType,
 } from '@solana/spl-governance'
 import { nftPluginsPks } from '@hooks/useVotingPlugins'
-import {
-  RealmCreation,
-  RealmCreationV2,
-} from '@tools/governance/prepareRealmCreation'
+import { validateSolAddress } from '@utils/formValidation'
+import { fetchProgramVersionById } from '@hooks/queries/useProgramVersionQuery'
 
 export const FORM_NAME = 'nft'
 
@@ -63,8 +65,6 @@ export default function NFTWizard() {
     },
   ]
 
-  const programVersion: 2 | 3 = 2
-
   async function handleSubmit(formData: NFTForm) {
     console.log('submit clicked')
     setRequestPending(true)
@@ -77,6 +77,19 @@ export default function NFTWizard() {
       if (!wallet?.publicKey) {
         throw new Error('No valid wallet connected')
       }
+
+      const programId =
+        formData.programId !== undefined &&
+        validateSolAddress(formData.programId)
+          ? new PublicKey(formData.programId)
+          : undefined
+      const programVersion =
+        programId !== undefined
+          ? await fetchProgramVersionById(connection.current, programId)
+          : DEFAULT_GOVERNANCE_PROGRAM_VERSION
+
+      if (programVersion !== 3 && programVersion !== 2)
+        throw new Error('Could not verify version of supplied programId')
 
       const programIdAddress =
         formData?.programId || DEFAULT_GOVERNANCE_PROGRAM_ID
@@ -118,13 +131,14 @@ export default function NFTWizard() {
       }
 
       const results =
-        formData._programVersion === 3
+        programVersion === 3
           ? await createNFTRealm({
               _programVersion: 3,
               wallet,
               connection: connection.current,
               ...params,
-              councilYesVotePercentage: formData.councilYesVotePercentage,
+              councilYesVotePercentage: (formData as AddCouncilV3)
+                .councilYesVotePercentage,
               councilTokenConfig:
                 params.createCouncil || params.existingCouncilMintPk
                   ? new GoverningTokenConfigAccountArgs({

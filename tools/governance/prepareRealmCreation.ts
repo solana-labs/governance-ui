@@ -293,6 +293,8 @@ export async function prepareRealmCreation({
     params._programVersion === 3 ? params.councilYesVotePercentage : 'disabled'
   )
 
+  console.log('THRESHOLDS', communityVoteThreshold, councilVoteThreshold)
+
   // Put community and council mints under the realm governance with default config
   const config = new GovernanceConfig({
     communityVoteThreshold: communityVoteThreshold,
