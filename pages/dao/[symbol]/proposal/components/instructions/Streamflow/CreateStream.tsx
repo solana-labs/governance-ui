@@ -53,6 +53,7 @@ export const PERIOD = {
   HOUR: 3600,
   DAY: 24 * 3600,
   WEEK: 7 * 24 * 3600,
+  FORTNIGHT: 14 * 24 * 3600,
   MONTH: Math.floor(30.4167 * 24 * 3600), //30.4167 days
   YEAR: 365 * 24 * 3600, // 365 days
 }
@@ -63,8 +64,9 @@ const releaseFrequencyUnits = {
   2: { idx: 2, display: 'hour', value: PERIOD.HOUR },
   3: { idx: 3, display: 'day', value: PERIOD.DAY },
   4: { idx: 4, display: 'week', value: PERIOD.WEEK },
-  5: { idx: 5, display: 'month', value: PERIOD.MONTH },
-  6: { idx: 6, display: 'year', value: PERIOD.YEAR },
+  5: { idx: 5, display: 'fortnight', value: PERIOD.FORTNIGHT },
+  6: { idx: 6, display: 'month', value: PERIOD.MONTH },
+  7: { idx: 7, display: 'year', value: PERIOD.YEAR },
 }
 
 function ata(mint: PublicKey, account: PublicKey): Promise<PublicKey> {
