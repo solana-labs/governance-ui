@@ -34,6 +34,7 @@ import Input from 'components/inputs/Input'
 import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
+import BigNumber from 'bignumber.js'
 
 const STREAMFLOW_TREASURY_PUBLIC_KEY = new PublicKey(
   '5SEpbdjFK5FxwTvfsGMXVQTD2v4M2c5tyRTxhdsPkgDw'
@@ -66,8 +67,8 @@ const releaseFrequencyUnits = {
   6: { idx: 6, display: 'year', value: PERIOD.YEAR },
 }
 
-async function ata(mint: PublicKey, account: PublicKey) {
-  return await Token.getAssociatedTokenAddress(
+function ata(mint: PublicKey, account: PublicKey): Promise<PublicKey> {
+  return Token.getAssociatedTokenAddress(
     ASSOCIATED_TOKEN_PROGRAM_ID,
     TOKEN_PROGRAM_ID,
     mint,
@@ -122,7 +123,7 @@ const CreateStream = ({
     depositedAmount: 0,
     releaseAmount: 0,
     amountAtCliff: 0,
-    cancelable: false,
+    cancelable: true,
     period: 1,
   })
   const [formErrors, setFormErrors] = useState({})
@@ -266,11 +267,17 @@ const CreateStream = ({
 
     const createStreamData = {
       start,
-      depositedAmount: new u64(form.depositedAmount * 10 ** decimals),
+      depositedAmount: new u64(
+        new BigNumber(form.depositedAmount).shiftedBy(decimals).toString()
+      ),
       period: new u64(form.period),
       cliff: start,
-      cliffAmount: new u64(form.amountAtCliff * 10 ** decimals),
-      amountPerPeriod: new u64(form.releaseAmount * 10 ** decimals),
+      cliffAmount: new u64(
+        new BigNumber(form.amountAtCliff).shiftedBy(decimals).toString()
+      ),
+      amountPerPeriod: new u64(
+        new BigNumber(form.releaseAmount).shiftedBy(decimals).toString()
+      ),
       name: 'SPL Realms proposal',
       canTopup: false,
       cancelableBySender: form.cancelable,
@@ -280,11 +287,11 @@ const CreateStream = ({
       automaticWithdrawal: true,
       withdrawFrequency: new u64(form.period),
       recipient: recipientPublicKey,
-      recipientTokens: recipientTokens,
+      recipientTokens,
       streamflowTreasury: STREAMFLOW_TREASURY_PUBLIC_KEY,
-      streamflowTreasuryTokens: streamflowTreasuryTokens,
+      streamflowTreasuryTokens,
       partner: partnerPublicKey,
-      partnerTokens: partnerTokens,
+      partnerTokens,
     }
     const createStreamAccounts = {
       sender: senderAccount,
