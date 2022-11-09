@@ -34,13 +34,7 @@ import useRealm from '@hooks/useRealm'
 import Button from '@components/Button'
 import Tooltip from '@components/Tooltip'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import {
-  BN,
-  Program,
-  AnchorProvider,
-  Wallet,
-  web3,
-} from '@project-serum/anchor'
+import { BN, Program, web3 } from '@project-serum/anchor'
 import { getValidatedPublickKey } from '@utils/validations'
 import { validateInstruction } from '@utils/instructionTools'
 import {
@@ -63,7 +57,7 @@ import {
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { TokenProgramAccount } from '@utils/tokens'
-import { Keypair } from '@solana/web3.js'
+import useWallet from '@hooks/useWallet'
 
 export type TradeOnSerumProps = { tokenAccount: AssetAccount }
 
@@ -239,7 +233,7 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const router = useRouter()
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const { wallet, anchorProvider } = useWallet()
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const { handleCreateProposal } = useCreateProposal()
   const serumRemoteProgramId = getProgramId(connection.cluster)
@@ -297,19 +291,11 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
     if (!currentAccount || !currentAccount!.extensions!.token!.account.owner) {
       throw new Error('currentAccount is null or undefined')
     }
-    if (wallet && wallet.publicKey && isValid) {
-      // create the anchor Program
-      // @ts-ignore: Wallet compatability issues
-      const options = AnchorProvider.defaultOptions()
-      const provider = new AnchorProvider(
-        connection.current,
-        new Wallet(Keypair.generate()),
-        options
-      )
+    if (wallet && wallet.publicKey && anchorProvider && isValid) {
       const program = new Program<SerumRemote>(
         SerumRemoteIDL,
         serumRemoteProgramId,
-        provider
+        anchorProvider
       )
       // convert amount to mintAmount
       const mintValue = getMintNaturalAmountFromDecimalAsBN(
@@ -374,7 +360,8 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
         ASSOCIATED_TOKEN_PROGRAM_ID,
         TOKEN_PROGRAM_ID,
         form.orderSide === 0 ? market.baseMintAddress : market.quoteMintAddress,
-        currentAccount!.extensions!.token!.account.owner
+        currentAccount!.extensions!.token!.account.owner,
+        true
       )
       const depositAccountInfo = await connection.current.getAccountInfo(
         aTADepositAddress
