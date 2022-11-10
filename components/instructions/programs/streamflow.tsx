@@ -20,14 +20,6 @@ export const formatAmount = (
   decimalPlaces?: number
 ) => amount.toFixed(decimalPlaces || decimals)
 
-export const roundAmount = (
-  amount: number,
-  decimalPlaces = DEFAULT_DECIMAL_PLACES
-) => {
-  const tens = 10 ** decimalPlaces
-  return Math.round(amount * tens) / tens
-}
-
 const isMoreThanOne = (amount: number) => (amount > 1 ? 's' : '')
 
 export const formatPeriodOfTime = (period: number): string => {
