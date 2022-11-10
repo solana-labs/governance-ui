@@ -17,8 +17,7 @@ const CONFIG = [
   {
     name: 'Solana Spaces',
     category: RealmCategory.Other,
-    logo:
-      'https://pbs.twimg.com/profile_images/1583182250581102623/AOrgeepS_400x400.jpg',
+    logo: 'https://i.imgur.com/PSk30Rp.jpg',
     publicKey: new PublicKey('58axqgJSAEK3adKL5hx5dYoRqkYMEiEXQZqk9FFFpa7f'),
     url: '/realm/Solana%20Spaces',
   },
