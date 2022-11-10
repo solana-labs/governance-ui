@@ -105,6 +105,7 @@ export default function MultiSigWizard() {
       schema: CouncilYesVotePercentageSchema,
       required: 'true',
       forCouncil: true,
+      title: `Next, set your wallet's approval threshold.`,
     },
   ]
 

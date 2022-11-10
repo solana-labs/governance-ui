@@ -55,6 +55,7 @@ export default function YesVotePercentageForm({
   forCommunity = false,
   onSubmit,
   onPrevClick,
+  title,
 }) {
   const schema = yup
     .object(
@@ -104,9 +105,7 @@ export default function YesVotePercentageForm({
         type={type}
         currentStep={currentStep}
         totalSteps={totalSteps}
-        title={`Next, set your ${
-          forCommunity ? "DAO's" : "wallet's"
-        } approval threshold.`}
+        title={title}
       />
       <div className="mt-16 space-y-10 md:space-y-12">
         <Controller

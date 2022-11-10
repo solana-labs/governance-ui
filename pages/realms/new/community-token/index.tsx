@@ -22,6 +22,7 @@ import CommunityTokenDetailsForm, {
 import YesVotePercentageForm, {
   CommunityYesVotePercentageSchema,
   CommunityYesVotePercentage,
+  CouncilYesVotePercentageSchema,
 } from '@components/NewRealmWizard/components/steps/YesVotePercentageThresholdForm'
 import AddCouncilForm, {
   AddCouncilSchema,
@@ -119,6 +120,7 @@ export default function CommunityTokenWizard() {
       schema: CommunityYesVotePercentageSchema,
       required: 'true',
       forCommunity: true,
+      title: "Next, set your DAO's community approval threshold.",
     },
     { Form: AddCouncilForm, schema: AddCouncilSchema, required: 'true' },
     {
@@ -126,12 +128,13 @@ export default function CommunityTokenWizard() {
       schema: InviteMembersSchema,
       required: 'form.addCouncil',
     },
-    // {
-    //   Form: YesVotePercentageForm,
-    //   schema: CouncilYesVotePercentageSchema,
-    //   required: 'true',
-    //   forCouncil: true,
-    // },
+    {
+      Form: YesVotePercentageForm,
+      schema: CouncilYesVotePercentageSchema,
+      required: 'form.addCouncil && form._programVersion >= 3',
+      forCouncil: true,
+      title: "Next, set your DAO's council approval threshold.",
+    },
   ]
 
   async function handleSubmit(formData: CommunityTokenForm) {
