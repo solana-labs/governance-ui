@@ -47,10 +47,13 @@ const DepositReserveLiquidityAndObligationCollateral = ({
   const [
     form,
     setForm,
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   ] = useState<DepositReserveLiquidityAndObligationCollateralForm>({
     uiAmount: '0',
   })
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [formErrors, setFormErrors] = useState({})
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const { handleSetInstructions } = useContext(NewProposalContext)
 
   const handleSetForm = ({ propertyName, value }) => {
@@ -102,13 +105,16 @@ const DepositReserveLiquidityAndObligationCollateral = ({
     }
   }
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   useEffect(() => {
     handleSetForm({
       propertyName: 'programId',
       value: programId?.toString(),
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [programId])
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   useEffect(() => {
     handleSetInstructions(
       {
@@ -117,6 +123,7 @@ const DepositReserveLiquidityAndObligationCollateral = ({
       },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
 
   const schema = yup.object().shape({

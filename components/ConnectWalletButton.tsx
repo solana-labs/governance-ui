@@ -55,6 +55,7 @@ const ConnectWalletButton = (props) => {
     if (connection.cluster !== currentCluster) {
       setCurrentCluster(connection.cluster)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [connection.cluster])
 
   function updateClusterParam(cluster) {
@@ -116,6 +117,7 @@ const ConnectWalletButton = (props) => {
         dark={true}
       />
     ) : null
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [current?.publicKey?.toBase58()])
 
   const displayAddressImage = useMemo(() => {
@@ -139,6 +141,7 @@ const ConnectWalletButton = (props) => {
         <img src={provider?.adapter.icon} className="w-5 h-5" />
       </div>
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [provider])
 
   return (

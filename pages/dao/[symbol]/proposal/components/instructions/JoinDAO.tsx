@@ -163,6 +163,7 @@ const JoinDAO = ({
       const realms = getCertifiedRealmInfos(connection)
       setCertifiedRealms(realms.filter((r) => !!r.communityMint))
     } else setCertifiedRealms([])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [connection.current.rpcEndpoint])
 
   // Update mint info when selected token account changes.
@@ -171,6 +172,7 @@ const JoinDAO = ({
       ...form,
       mintInfo: form.governedAccount?.extensions.mint?.account,
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.governedAccount])
 
   useEffect(() => {
@@ -181,6 +183,7 @@ const JoinDAO = ({
       },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
 
   return (

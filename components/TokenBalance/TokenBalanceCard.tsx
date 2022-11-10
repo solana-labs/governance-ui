@@ -419,10 +419,12 @@ export const TokenDeposit = ({
       )
     : '0'
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   useEffect(() => {
     if (availableTokens != '0' || hasTokensDeposited || hasTokensInWallet) {
       if (setHasGovPower) setHasGovPower(true)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [availableTokens, hasTokensDeposited, hasTokensInWallet])
 
   const canShowAvailableTokensMessage = hasTokensInWallet && connected

@@ -44,6 +44,7 @@ const GatewayCard = () => {
       (!records.voteWeightRecord.accountExists &&
         records.voteWeightRecord.accountRequired)
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [records, client])
 
   const handleRegister = async () => {
@@ -126,6 +127,7 @@ const GatewayCard = () => {
     if (realm && wallet?.connected) {
       getTokenOwnerRecord()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [realm?.pubkey.toBase58(), wallet?.connected])
 
   return (

@@ -66,6 +66,7 @@ const MyProposalsBn = () => {
                 ownCouncilTokenRecord?.pubkey.toBase58()
           )
         : [],
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     [proposals, ownVoteRecordsByProposal, connected]
   )
   const drafts = myProposals.filter((x) => {
@@ -315,6 +316,7 @@ const MyProposalsBn = () => {
     if (wallet?.publicKey && isNftMode && client.client && modalIsOpen) {
       getNftsVoteRecord()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [client.clientType, isNftMode, wallet?.publicKey?.toBase58(), modalIsOpen])
 
   return (

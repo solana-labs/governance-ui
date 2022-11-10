@@ -34,6 +34,7 @@ const LockTokenRow = ({
         dark={true}
       />
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [depositWithWallet.wallet.toBase58()])
   const renderAddressImage = useMemo(
     () => (
@@ -46,6 +47,7 @@ const LockTokenRow = ({
         placeholder={<UserCircleIcon className="h-6 text-fgd-3 w-6" />}
       />
     ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     [depositWithWallet.wallet.toBase58()]
   )
   const type = Object.keys(

@@ -158,9 +158,11 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
     ) {
       handleGetDeposits()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(ownDeposits), ownDeposits.length])
   useEffect(() => {
     handleGetDeposits()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [isOwnerOfDeposits, client])
   useEffect(() => {
     const getTokenOwnerRecord = async () => {
@@ -184,6 +186,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
     if (realm && wallet?.connected) {
       getTokenOwnerRecord()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [realm?.pubkey.toBase58(), wallet?.connected, tokenOwnerRecordPk])
 
   const hasLockedTokens = useMemo(() => {
@@ -208,6 +211,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
             )?.index
         )
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [deposits])
 
   return (

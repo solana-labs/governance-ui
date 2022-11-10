@@ -354,6 +354,7 @@ const New = () => {
     if (instructionsData?.length) {
       setInstructions([instructionsData[0]])
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [instructionsData[0]?.governedAccount?.pubkey])
 
   useEffect(() => {
@@ -379,6 +380,7 @@ const New = () => {
         setInstructionType({ value: instruction, idx: 0 })
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [router.query, availableInstructions, instructionsData])
 
   // Map instruction enum with components
@@ -554,6 +556,7 @@ const New = () => {
         }) ?? <></>
       )
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     []
   )
 

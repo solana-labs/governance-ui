@@ -237,6 +237,7 @@ const LockTokenStats = () => {
     if (realmInfo?.programId && vsrClient) {
       getProposalsInstructions()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [possibleGrantProposals.length, realmInfo?.programId])
   useEffect(() => {
     const depositsWithWalletsInner: DepositWithWallet[] = []
@@ -267,6 +268,7 @@ const LockTokenStats = () => {
         a.deposit.amountDepositedNative.toNumber()
     )
     setDepositsWithWallets(depositWithWalletSorted)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [voters.length])
 
   useEffect(() => {
@@ -285,8 +287,11 @@ const LockTokenStats = () => {
     if (vsrClient && voteStakeRegistryRegistrarPk) {
       getLockedDeposits()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     vsrClient?.program.programId.toBase58(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     voteStakeRegistryRegistrarPk?.toBase58(),
   ])
   useEffect(() => {
@@ -294,6 +299,7 @@ const LockTokenStats = () => {
     const monthsFormat = months.map((x) => x.format('MMM'))
     setVestPerMonthStats(vestingPerMonth)
     setStatsMonths(monthsFormat)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [depositsWithWallets.length])
   useEffect(() => {
     if (depositsWithWallets.length && givenGrantsTokenAmounts.length) {
@@ -320,6 +326,7 @@ const LockTokenStats = () => {
       }
       setUnlockedFromGrants(currentlyUnlocked)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [depositsWithWallets.length, givenGrantsTokenAmounts.length])
   useEffect(() => {
     const mngoPerpMarket = async () => {
@@ -353,10 +360,12 @@ const LockTokenStats = () => {
     if (symbol === 'MNGO') {
       mngoPerpMarket()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [connection.cluster])
   useEffect(() => {
     setPaginatedWallets(paginateWallets(0))
     pagination?.current?.setPage(0)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(filteredDepositWithWallets)])
   const onPageChange = (page) => {
     setPaginatedWallets(paginateWallets(page))

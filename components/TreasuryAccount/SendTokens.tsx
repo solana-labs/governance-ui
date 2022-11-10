@@ -289,6 +289,7 @@ const SendTokens = ({
         propertyName: 'governedTokenAccount',
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [currentAccount])
   useEffect(() => {
     if (form.destinationAccount) {
@@ -304,6 +305,7 @@ const SendTokens = ({
     } else {
       setDestinationAccount(null)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.destinationAccount])
 
   const schema = getTokenTransferSchema({ form, connection, nftMode: isNft })

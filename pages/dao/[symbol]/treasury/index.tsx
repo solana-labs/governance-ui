@@ -49,8 +49,10 @@ const Treasury = () => {
     ) {
       getStrategies(connection)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
     tokenService._tokenList.length,
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     governedTokenAccountsWithoutNfts.filter((x) => x.extensions.mint).length,
   ])
   useEffect(() => {
@@ -73,6 +75,7 @@ const Treasury = () => {
       }
     }
     prepTreasuryAccounts()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(governedTokenAccountsWithoutNfts)])
 
   useEffect(() => {
@@ -80,6 +83,7 @@ const Treasury = () => {
       setActiveAccount(treasuryAccounts[0])
       setCurrentAccount(treasuryAccounts[0], connection)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(treasuryAccounts)])
 
   const { totalPriceFormatted } = useTotalTreasuryPrice()
