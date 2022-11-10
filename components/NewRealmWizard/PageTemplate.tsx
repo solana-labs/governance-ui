@@ -94,7 +94,7 @@ export default function FormPage({
       .map(
         ({ required }) =>
           required === 'true' ||
-          !!eval(required.replace('form', 'updatedFormState'))
+          !!eval(required.replaceAll('form', 'updatedFormState'))
       )
       .indexOf(true, fromStep + 1)
 
@@ -131,7 +131,8 @@ export default function FormPage({
       const previousStep = steps
         .map(
           ({ required }) =>
-            required === 'true' || !!eval(required.replace('form', 'formData'))
+            required === 'true' ||
+            !!eval(required.replaceAll('form', 'formData'))
         )
         .lastIndexOf(true, fromStep - 1)
 
