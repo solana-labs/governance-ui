@@ -263,6 +263,7 @@ export default function AddNFTCollectionForm({
   useEffect(() => {
     updateUserInput(formData, AddNFTCollectionSchema, setValue)
     setSelectedNFTCollection(formData?.collectionMetadata)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [])
 
   useEffect(() => {
@@ -271,6 +272,7 @@ export default function AddNFTCollectionForm({
     } else {
       // setFocus('collectionInput')
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [unverifiedCollection, selectedNFTCollection])
 
   function serializeValues(values) {

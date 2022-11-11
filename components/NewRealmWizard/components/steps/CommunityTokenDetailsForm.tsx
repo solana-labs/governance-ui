@@ -107,6 +107,7 @@ export default function CommunityTokenForm({
 
   useEffect(() => {
     updateUserInput(formData, CommunityTokenSchema, setValue)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [])
 
   useEffect(() => {
@@ -118,12 +119,14 @@ export default function CommunityTokenForm({
         shouldValidate: true,
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [useExistingCommunityToken])
 
   useEffect(() => {
     if (useSupplyFactor) {
       setValue('communityAbsoluteMaxVoteWeight', undefined)
     } else setValue('communityMintSupplyFactor', undefined)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [useSupplyFactor])
 
   function handleTokenInput({ suggestedMinTokenAmount, tokenInfo }) {

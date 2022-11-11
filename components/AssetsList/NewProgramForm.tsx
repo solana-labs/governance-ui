@@ -182,6 +182,7 @@ const NewProgramForm = () => {
         setFormErrors(validationErrors)
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.programId])
   useEffect(() => {
     setForm({
@@ -192,6 +193,7 @@ const NewProgramForm = () => {
         ? getMintDecimalAmount(realmMint!, realmMint!.supply).toNumber() * 0.01
         : 0,
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(realmMint)])
   return (
     <div className="space-y-3">

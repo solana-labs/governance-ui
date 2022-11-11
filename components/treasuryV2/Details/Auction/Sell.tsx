@@ -315,6 +315,7 @@ export default function Sell({ className, asset }: Props) {
       ...form,
       ...newFormValues,
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.areBidsEncrypted, form.tokensForSale, form.minPrice, auctionSize])
   useEffect(() => {
     setFormErrors({})
@@ -322,6 +323,7 @@ export default function Sell({ className, asset }: Props) {
       ...form,
       auctionPk: '',
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [withCreateAuction])
 
   return (

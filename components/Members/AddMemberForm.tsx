@@ -182,6 +182,7 @@ const AddMemberForm = ({ close }) => {
     }
 
     initForm()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [])
 
   return (
