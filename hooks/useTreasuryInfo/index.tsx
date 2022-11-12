@@ -54,7 +54,7 @@ export default function useTreasuryInfo(): Result<Data> {
 
       getDomains(
         accounts.filter((acc) => acc.isSol),
-        connection
+        connection.current
       ).then((domainNames) => {
         setDomains(domainNames)
         setDoaminsLoading(false)
@@ -100,7 +100,15 @@ export default function useTreasuryInfo(): Result<Data> {
       )
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [accounts, nfts, nftsLoading, domains, domainsLoading, realmInfo, connection.current.rpcEndpoint])
+  }, [
+    accounts,
+    nfts,
+    nftsLoading,
+    domains,
+    domainsLoading,
+    realmInfo,
+    connection.current.rpcEndpoint,
+  ])
 
   useEffect(() => {
     setBuildingWallets(true)
