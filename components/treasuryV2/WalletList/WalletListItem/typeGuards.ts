@@ -7,6 +7,7 @@ import {
   Programs,
   RealmAuthority,
   Sol,
+  Domains,
   Unknown,
 } from '@models/treasury/Asset'
 
@@ -18,7 +19,7 @@ export function isMint(asset: Asset): asset is Mint {
   return asset.type === AssetType.Mint
 }
 
-export function isDomain(asset: Asset): asset is Mint {
+export function isDomain(asset: Asset): asset is Domains {
   return asset.type === AssetType.Domain
 }
 

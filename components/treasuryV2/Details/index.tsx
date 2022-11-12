@@ -13,6 +13,7 @@ import ProgramsDetails from './ProgramsDetails'
 import RealmAuthorityDetails from './RealmAuthorityDetails'
 import TokenDetails from './TokenDetails'
 import WalletDetails from './WalletDetails'
+import DomainsDetails from './DomainsDetails'
 
 function walletIsNotAuxiliary(
   wallet: AuxiliaryWallet | Wallet
@@ -88,6 +89,11 @@ const Details = forwardRef<HTMLDivElement, Props>((props, ref) => {
               ) : props.data.data.asset.type === AssetType.NFTCollection ? (
                 <NFTCollectionDetails
                   nftCollection={props.data.data.asset}
+                  isStickied={props.isStickied}
+                />
+              ) : props.data.data.asset.type === AssetType.Domain ? (
+                <DomainsDetails
+                  domains={props.data.data.asset}
                   isStickied={props.isStickied}
                 />
               ) : (

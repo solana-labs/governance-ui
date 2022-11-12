@@ -5,6 +5,8 @@ import type { AssetAccount } from '@utils/uiTypes/assets'
 
 import { NFT } from './NFT'
 import { Program } from './Program'
+import { Domain } from './Domain'
+
 import { PublicKey } from '@solana/web3.js'
 
 export enum AssetType {
@@ -96,18 +98,17 @@ export interface Unknown {
   name: string
 }
 
-export interface Domain {
+export interface Domains {
   type: AssetType.Domain
-  address: string
-  icon?: JSX.Element
   id: string
-  name: string
+  count: BigNumber
+  list: Domain[]
 }
 
 export type Asset =
   | Mint
   | NFTCollection
-  | Domain
+  | Domains
   | Programs
   | RealmAuthority
   | Sol

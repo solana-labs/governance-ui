@@ -35,6 +35,7 @@ export default function useTreasuryInfo(): Result<Data> {
   )
   const [nfts, setNfts] = useState<NFT[]>([])
   const [nftsLoading, setNftsLoading] = useState(true)
+  const [domainsLoading, setDoaminsLoading] = useState(true)
   const [auxWallets, setAuxWallets] = useState<AuxiliaryWallet[]>([])
   const [wallets, setWallets] = useState<Wallet[]>([])
   const [domains, setDomains] = useState<Domain[]>([])
@@ -48,16 +49,16 @@ export default function useTreasuryInfo(): Result<Data> {
   useEffect(() => {
     if (!loadingGovernedAccounts && accounts.length) {
       setNftsLoading(true)
+      setDoaminsLoading(true)
       setBuildingWallets(true)
 
       getDomains(
         accounts.filter((acc) => acc.isSol),
         connection
-      )
-        .then((domainNames) => {
-          setDomains(domainNames)
-        })
-        .catch(console.log)
+      ).then((domainNames) => {
+        setDomains(domainNames)
+        setDoaminsLoading(false)
+      })
 
       getNfts(
         accounts
@@ -78,13 +79,14 @@ export default function useTreasuryInfo(): Result<Data> {
   ])
 
   const walletsAsync = useMemo(() => {
-    if (nftsLoading || !realmInfo) {
+    if (nftsLoading || domainsLoading || !realmInfo) {
       return Promise.resolve({ wallets: [] })
     } else {
       return assembleWallets(
         connection,
         accounts,
         nfts,
+        domains,
         realmInfo.programId,
         realm?.account.config.councilMint?.toBase58(),
         realm?.account.communityMint?.toBase58(),
@@ -95,20 +97,20 @@ export default function useTreasuryInfo(): Result<Data> {
         realmInfo
       )
     }
-  }, [accounts, nfts, nftsLoading, realmInfo])
+  }, [accounts, nfts, domains, domainsLoading, nftsLoading, realmInfo])
 
   useEffect(() => {
     setBuildingWallets(true)
     setWallets([])
 
-    if (!nftsLoading && realmInfo) {
+    if (!nftsLoading && !domainsLoading && realmInfo) {
       walletsAsync.then(({ auxiliaryWallets, wallets }) => {
         setWallets(wallets)
         setAuxWallets(auxiliaryWallets)
         setBuildingWallets(false)
       })
     }
-  }, [walletsAsync, nftsLoading, realmInfo])
+  }, [walletsAsync, nftsLoading, realmInfo, domainsLoading])
 
   if (!realmInfo || loadingGovernedAccounts || nftsLoading || buildingWallets) {
     return {
