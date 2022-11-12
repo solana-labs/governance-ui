@@ -88,6 +88,17 @@
     "github": "https://github.com/project-serum"
   },
   {
+    "symbol": "SERUMDEX",
+    "bannerImage": "https://i.ibb.co/bNRH0hh/1500x500.jpg",
+    "displayName": "Serum Community Fork",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "BtD6wKiazt4EEvfw6tqDh1BPSVchGeqyZ1e4HhV9VHJ6",
+    "ogImage": "/realms/SERUM_COMMUNITY_FORK/logo.png",
+    "shortDescription": "Faster, Cheaper and more Powerful DeFi",
+    "sortRank": 3,
+    "github": "https://github.com/blockworks-foundation/serum-dex"
+  },
+  {
     "symbol": "SERUM2",
     "displayName": "Serum DAO (NEW)",
     "programId": "G41fmJzd29v7Qmdi8ZyTBBYa98ghh3cwHBTexqCG1PQJ",
