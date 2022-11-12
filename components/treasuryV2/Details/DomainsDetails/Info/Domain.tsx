@@ -87,19 +87,19 @@ const Domain: React.FC<Props> = (props) => {
           }
         >
           <Tooltip content={tooltipContent}>
-            <Link href={fmtUrlWithCluster(`/dao/${symbol}/proposal/new`)}>
-              <a
-                className={cx(
-                  !canCreateProposal
-                    ? 'cursor-not-allowed pointer-events-none'
-                    : '',
-                  'flex items-center text-fgd-3 cursor-pointer hover:text-fgd-2 gap-2 text-sm'
-                )}
-              >
-                <ArrowsHorizontal className="h-4 w-4" />
-                Transfer Domain
-              </a>
-            </Link>
+            <div className={cx(!canCreateProposal ? 'cursor-not-allowed' : '')}>
+              <Link href={fmtUrlWithCluster(`/dao/${symbol}/proposal/new`)}>
+                <a
+                  className={cx(
+                    !canCreateProposal ? 'pointer-events-none' : '',
+                    'flex items-center text-fgd-3 hover:text-fgd-2 gap-2 text-sm'
+                  )}
+                >
+                  <ArrowsHorizontal className="h-4 w-4" />
+                  Transfer Domain
+                </a>
+              </Link>
+            </div>
           </Tooltip>
         </DropdownMenu>
       </div>
