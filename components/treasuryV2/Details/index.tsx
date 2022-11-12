@@ -96,6 +96,7 @@ const Details = forwardRef<HTMLDivElement, Props>((props, ref) => {
                 <DomainsDetails
                   domains={props.data.data.asset}
                   isStickied={props.isStickied}
+                />
               ) : props.data.data.asset.type ===
                   AssetType.TokenOwnerRecordAsset &&
                 walletIsNotAuxiliary(props.data.data.wallet) ? (

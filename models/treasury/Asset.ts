@@ -13,7 +13,6 @@ import { NFT } from './NFT'
 import { Program } from './Program'
 import { Domain } from './Domain'
 
-
 import { TokenProgramAccount } from '@utils/tokens'
 import { MintInfo } from '@solana/spl-token'
 
@@ -109,12 +108,12 @@ export interface Unknown {
   name: string
 }
 
-
 export interface Domains {
   type: AssetType.Domain
   id: string
   count: BigNumber
   list: Domain[]
+}
 
 export interface TokenOwnerRecordAsset {
   type: AssetType.TokenOwnerRecordAsset
