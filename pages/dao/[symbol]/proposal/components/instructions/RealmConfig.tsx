@@ -42,7 +42,7 @@ const RealmConfig = ({
 }) => {
   const { realm, mint, realmInfo } = useRealm()
   const wallet = useWalletStore((s) => s.current)
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const { assetAccounts } = useGovernanceAssets()
   const realmAuthority = assetAccounts.find(
     (x) =>

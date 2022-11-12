@@ -434,6 +434,8 @@ const getAccountsForGovernances = async (
     )
   )
 
+  console.log()
+
   const fetchTokenAccounts = (addresses: string[]) =>
     axios.request({
       url: connection.endpoint,

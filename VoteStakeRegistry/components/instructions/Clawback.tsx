@@ -47,7 +47,7 @@ const Clawback = ({
     governedTokenAccountsWithoutNfts,
     governancesArray,
   } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const [voters, setVoters] = useState<Voter[]>([])
   const [deposits, setDeposits] = useState<DepositWithMintAccount[]>([])
   const [form, setForm] = useState<ClawbackForm>({

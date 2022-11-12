@@ -43,7 +43,7 @@ const CloseTokenAccount = ({
   const { realm } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const [form, setForm] = useState<CloseTokenAccountForm>()
   const [formErrors, setFormErrors] = useState({})

@@ -42,7 +42,7 @@ const DepositReserveLiquidityAndObligationCollateral = ({
     return <>This instruction does not support {connection.cluster}</>
   }
 
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [
     form,

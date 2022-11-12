@@ -21,41 +21,43 @@ const GovernedAccountSelect = ({
   noMaxWidth,
   autoselectFirst = true,
 }: {
-  onChange
-  value
-  error?
+  onChange: (value: unknown) => void
+  value?: AssetAccount
+  error?: string
   governedAccounts: AssetAccount[]
-  shouldBeGoverned?
+  shouldBeGoverned?: boolean
   governance?: ProgramAccount<Governance> | null | undefined
-  label?
+  label?: string
   noMaxWidth?: boolean
   autoselectFirst?: boolean
 }) => {
-  function getLabel(value: AssetAccount) {
-    if (value) {
-      const accountType = value.governance.account.accountType
-      if (value.isSol || value.isToken) {
-        return getTokenAccountLabelComponent(
-          value.isSol
-            ? getSolAccountLabel(value)
-            : getTokenAccountLabelInfo(value)
-        )
-      } else {
-        switch (accountType) {
-          case GovernanceAccountType.MintGovernanceV1:
-          case GovernanceAccountType.MintGovernanceV2:
-            return getMintAccountLabelComponent(getMintAccountLabelInfo(value))
-          case GovernanceAccountType.ProgramGovernanceV1:
-          case GovernanceAccountType.ProgramGovernanceV2:
-            return getProgramAccountLabel(value.governance)
-          default:
-            return value.governance.account.governedAccount.toBase58()
-        }
-      }
-    } else {
+  function getLabel(value?: AssetAccount) {
+    if (!value) {
       return null
     }
+
+    const accountType = value.governance.account.accountType
+
+    if (value.isSol || value.isToken) {
+      return getTokenAccountLabelComponent(
+        value.isSol
+          ? getSolAccountLabel(value)
+          : getTokenAccountLabelInfo(value)
+      )
+    }
+
+    switch (accountType) {
+      case GovernanceAccountType.MintGovernanceV1:
+      case GovernanceAccountType.MintGovernanceV2:
+        return getMintAccountLabelComponent(getMintAccountLabelInfo(value))
+      case GovernanceAccountType.ProgramGovernanceV1:
+      case GovernanceAccountType.ProgramGovernanceV2:
+        return getProgramAccountLabel(value.governance)
+      default:
+        return value.governance.account.governedAccount.toBase58()
+    }
   }
+
   //TODO refactor both methods (getMintAccountLabelComponent, getTokenAccountLabelComponent) make it more common
   function getMintAccountLabelComponent({
     account,

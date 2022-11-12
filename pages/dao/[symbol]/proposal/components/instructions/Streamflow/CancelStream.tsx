@@ -51,7 +51,7 @@ const CancelStream = ({
   const strmProgram = new PublicKey(STREAMFLOW_PROGRAM_ID)
 
   const { assetAccounts } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = strmProgram
 
   const [form, setForm] = useState<CancelStreamForm>({
