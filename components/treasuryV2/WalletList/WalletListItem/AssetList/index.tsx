@@ -10,7 +10,7 @@ import {
   RealmAuthority,
   Unknown,
   AssetType,
-  Domain,
+  Domains,
 } from '@models/treasury/Asset'
 
 import TokenList from './TokenList'
@@ -43,7 +43,7 @@ function isTokenLike(asset: Asset): asset is Token | Sol {
 
 function isOther(
   asset: Asset
-): asset is Mint | Programs | Unknown | Domain | RealmAuthority {
+): asset is Mint | Programs | Unknown | Domains | RealmAuthority {
   return (
     isMint(asset) ||
     isPrograms(asset) ||
@@ -149,7 +149,7 @@ export default function AssetList(props: Props) {
   )
 
   const [others, setOthers] = useState<
-    (Mint | Programs | Unknown | Domain | RealmAuthority)[]
+    (Mint | Programs | Unknown | Domains | RealmAuthority)[]
   >(othersFromProps)
 
   useEffect(() => {
@@ -183,7 +183,7 @@ export default function AssetList(props: Props) {
         | Mint
         | Programs
         | Unknown
-        | Domain
+        | Domains
         | RealmAuthority
       )[] = []
       for await (const token of othersFromProps) {
