@@ -126,7 +126,7 @@ export default function VotingPower(props: Props) {
   if (connected && types.length === 0) {
     return (
       <div className={classNames(props.className, 'text-xs', 'text-white/50')}>
-        You do not have any voting power in this realm.
+        You do not have any voting power in this dao.
       </div>
     )
   }

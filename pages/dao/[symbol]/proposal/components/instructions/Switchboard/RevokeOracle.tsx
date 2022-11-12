@@ -31,10 +31,9 @@ import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
 const SwitchboardRevokeOracle = ({
   index,
-  _governance,
 }: {
   index: number
-  _governance: ProgramAccount<Governance> | null
+  governance: ProgramAccount<Governance> | null
 }) => {
   const [form, setForm] = useState<SwitchboardRevokeOracleForm>({
     oraclePubkey: undefined,
@@ -52,6 +51,7 @@ const SwitchboardRevokeOracle = ({
       },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
 
   async function getInstruction(): Promise<UiInstruction> {

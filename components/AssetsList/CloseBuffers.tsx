@@ -189,6 +189,7 @@ const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
       propertyName: 'programId',
       value: programId?.toString(),
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [realmInfo?.programId])
 
   useEffect(() => {
@@ -218,6 +219,7 @@ const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
     if (form.governedAccount?.governance?.pubkey.toBase58()) {
       getBuffers()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.governedAccount?.governance?.pubkey.toBase58()])
   return (
     <>

@@ -28,7 +28,7 @@ interface Data {
 
 export default function useTreasuryInfo(): Result<Data> {
   const { realmInfo, realm, mint, councilMint, config } = useRealm()
-  const connection = useWalletStore((s) => s.connection.current)
+  const connection = useWalletStore((s) => s.connection)
   const accounts = useGovernanceAssetsStore((s) => s.assetAccounts)
   const loadingGovernedAccounts = useGovernanceAssetsStore(
     (s) => s.loadGovernedAccounts
@@ -73,8 +73,10 @@ export default function useTreasuryInfo(): Result<Data> {
         setNftsLoading(false)
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
     loadingGovernedAccounts,
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     accounts.map((account) => account.pubkey.toBase58()).join('-'),
   ])
 
@@ -97,7 +99,8 @@ export default function useTreasuryInfo(): Result<Data> {
         realmInfo
       )
     }
-  }, [accounts, nfts, domains, domainsLoading, nftsLoading, realmInfo])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+  }, [accounts, nfts, nftsLoading, domains, domainsLoading, realmInfo, connection.current.rpcEndpoint])
 
   useEffect(() => {
     setBuildingWallets(true)

@@ -1,6 +1,7 @@
 import * as Separator from '@radix-ui/react-separator';
 import type { PublicKey } from '@solana/web3.js';
 import { pipe } from 'fp-ts/function';
+import Head from 'next/head';
 import { useEffect, useState } from 'react';
 
 import { EcosystemHeader } from '@hub/components/EcosystemHeader';
@@ -70,7 +71,7 @@ export function FeedItem(props: Props) {
           () => (
             <div>
               <RealmHeader.Error />
-              <div className="max-w-3xl mx-auto pt-8 w-full">
+              <div className="max-w-3xl mx-auto pt-8 w-full px-4">
                 <Back.Error className="mb-8 mt-4" />
                 <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
                 <Header.Error className="mt-6" />
@@ -88,7 +89,7 @@ export function FeedItem(props: Props) {
           () => (
             <div>
               <RealmHeader.Loading />
-              <div className="max-w-3xl mx-auto pt-8 w-full">
+              <div className="max-w-3xl mx-auto pt-8 w-full px-4">
                 <Back.Loading className="mb-8 mt-4" />
                 <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
                 <Header.Loading className="mt-6" />
@@ -129,7 +130,7 @@ export function FeedItem(props: Props) {
                   feedItemResult,
                   RE.match(
                     () => (
-                      <div className="max-w-3xl mx-auto pt-8 w-full">
+                      <div className="max-w-3xl mx-auto pt-8 w-full px-4">
                         <Back.Error className="mb-8 mt-4" />
                         <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
                         <Header.Error className="mt-6" />
@@ -144,7 +145,7 @@ export function FeedItem(props: Props) {
                       </div>
                     ),
                     () => (
-                      <div className="max-w-3xl mx-auto pt-8 w-full">
+                      <div className="max-w-3xl mx-auto pt-8 w-full px-4">
                         <Back.Loading className="mb-8 mt-4" />
                         <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
                         <Header.Loading className="mt-6" />
@@ -159,8 +160,21 @@ export function FeedItem(props: Props) {
                       </div>
                     ),
                     ({ feedItem }) => (
-                      <div className="max-w-3xl mx-auto pt-8 w-full">
-                        <Back.Content className="mb-7 mt-4" />
+                      <div className="max-w-3xl mx-auto pt-8 w-full px-4">
+                        <Head>
+                          <title>
+                            {feedItem.title} - {realm.name}
+                          </title>
+                          <meta
+                            property="og:title"
+                            content={`${feedItem.title} - ${realm.name}`}
+                            key="title"
+                          />
+                        </Head>
+                        <Back.Content
+                          className="mb-7 mt-4"
+                          url={`/realm/${props.realmUrlId}`}
+                        />
                         <Separator.Root className="h-[1px] bg-neutral-300 w-full" />
                         <Header.Content
                           className="mt-6"

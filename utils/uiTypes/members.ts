@@ -15,8 +15,8 @@ export interface Member {
 export interface Delegate {
   communityMembers?: Array<Member>
   councilMembers?: Array<Member>
-  communityTokenCount?: number
-  councilTokenCount?: number
+  communityTokenCount?: BN
+  councilTokenCount?: BN
 }
 
 export interface Delegates {

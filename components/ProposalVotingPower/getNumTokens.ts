@@ -1,9 +1,6 @@
 import type { ProgramAccount, TokenOwnerRecord } from '@solana/spl-governance'
 import type { MintInfo } from '@solana/spl-token'
-import {
-  LOCALNET_REALM_ID as PYTH_LOCALNET_REALM_ID,
-  PythBalance,
-} from 'pyth-staking-api'
+import { REALM_ID as PYTH_REALM_ID, PythBalance } from 'pyth-staking-api'
 import { BigNumber } from 'bignumber.js'
 
 import { getMintDecimalAmount } from '@tools/sdk/units'
@@ -31,13 +28,10 @@ export default function getNumTokens(
   mint?: MintInfo,
   realmInfo?: RealmInfo
 ) {
-  const isPyth =
-    realmInfo?.realmId.toBase58() === PYTH_LOCALNET_REALM_ID.toBase58()
+  const isPyth = realmInfo?.realmId.toBase58() === PYTH_REALM_ID.toBase58()
 
   if (isPyth && ownVoterWeight.votingPower) {
-    return new BigNumber(
-      new PythBalance(ownVoterWeight.votingPower).toBN().toString()
-    )
+    return new BigNumber(new PythBalance(ownVoterWeight.votingPower).toString())
   }
 
   if (depositTokenRecord && mint) {

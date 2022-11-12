@@ -1,4 +1,5 @@
 [
+   
   {
     "symbol": "UNQ",
     "displayName": "UNQ Universe",
@@ -16,6 +17,21 @@
     "twitter": "@mangomarkets",
     "ogImage": "https://trade.mango.markets/assets/icons/logo.svg",
     "notificationsEnabled": true
+  },
+  {
+    "symbol": "SERUM",
+    "displayName": "SerumDAO - Devnet",
+    "programId": "G41fmJzd29v7Qmdi8ZyTBBYa98ghh3cwHBTexqCG1PQJ",
+    "communityMint": "CEdTnJ9Yr2G3zWt8J1hA2XbAAgSPVvxtuE9g44sjtecs",
+    "realmId": "8rTohXsU2L3xaf3KeHiS55DNninzCjDZT8zkpwikHSQt",
+    "ogImage": "https://assets.website-files.com/61284dcff241c2f0729af9f3/61285237ce2e301255d09108_logo-serum.png"
+  },
+  {
+    "symbol": "DAO2DAO",
+    "displayName": "DAO-to-DAO",
+    "programId": "GTesTBiEWE32WHXXE2S4XbZvA5CrEc4xs6ZgRe895dP",
+    "realmId": "3SXQuce59HJMy1udz9UaQJKjWrRw2s6q2rEK1S9Ep7cv",
+    "ogImage": "https://assets.website-files.com/61284dcff241c2f0729af9f3/61285237ce2e301255d09108_logo-serum.png"
   },
   {
     "symbol": "SOCEAN",
@@ -198,12 +214,12 @@
     "ogImage": "/realms/MEAN/logo.svg"
   },
   {
-    "symbol": "SAP",
-    "displayName": "SAP DAO",
-    "programId": "MGovW65tDhMMcpEmsegpsdgvzb6zUwGsNjhXFxRAnjd",
-    "realmId": "7HHEADbEF77yAtJ58CYhy93SbcAeGjtixQ7gsHxuamyU",
-    "website": "",
-    "twitter": "",
-    "ogImage": "/realms/SAPDAO/img//SAPDAO.png"
+    "symbol": "SOLDC",
+    "displayName": "SOLANA DOTA CLUB",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "5aNk7Zig6p3GwQgP4XnxGFg6DgC3jzmM9FURwabjnGTa",
+    "website": "https://soldc.us",
+    "twitter": "https://twitter.com/deniz_safak",
+    "ogImage": "/realms/SOLDCDAO/img/NEWSOLDCDAO.png"
   }
 ]

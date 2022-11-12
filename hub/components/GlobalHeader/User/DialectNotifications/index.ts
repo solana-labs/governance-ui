@@ -1,0 +1,1 @@
+export { DialectNotifications } from './DialectNotifications';

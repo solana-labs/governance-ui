@@ -1,9 +1,12 @@
 import type { PublicKey } from '@solana/web3.js';
 import { pipe } from 'fp-ts/function';
+import Head from 'next/head';
+import { useMediaQuery } from 'react-responsive';
 
 import * as RealmHeader from '@hub/components/RealmHeader';
 import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay';
 import { useQuery } from '@hub/hooks/useQuery';
+import cx from '@hub/lib/cx';
 import * as RE from '@hub/types/Result';
 
 import { About } from './About';
@@ -28,6 +31,7 @@ export function Hub(props: Props) {
     query: gql.getHub,
     variables: { realm: props.realm.toBase58() },
   });
+  const isTwoColLayout = useMediaQuery({ query: '(min-width:1024px)' });
 
   return (
     <main className={props.className}>
@@ -48,6 +52,10 @@ export function Hub(props: Props) {
           ),
           ({ hub, realm }) => (
             <div className="pb-28">
+              <Head>
+                <title>{realm.name}</title>
+                <meta property="og:title" content={realm.name} key="title" />
+              </Head>
               <RealmHeader.Content
                 bannerUrl={realm.bannerImageUrl}
                 iconUrl={realm.iconUrl}
@@ -66,12 +74,22 @@ export function Hub(props: Props) {
               <div className="max-w-7xl mx-auto relative w-full">
                 {hub.info.heading && (
                   <RichTextDocumentDisplay
-                    className="mt-8 text-3xl font-medium text-neutral-500 px-8 max-w-5xl"
+                    className={cx(
+                      'mt-8',
+                      'font-medium',
+                      'text-neutral-500',
+                      'max-w-5xl',
+                      'px-4',
+                      'text-xl',
+                      'md:px-8',
+                      'md:text-3xl',
+                    )}
                     document={hub.info.heading}
                   />
                 )}
-                <div className="mt-8 px-8">
+                <div className="mt-8 px-4 md:px-8">
                   <Stats
+                    category={realm.category}
                     documentation={hub.info.documentation}
                     numMembers={realm.membersCount}
                     realm={props.realm}
@@ -79,7 +97,25 @@ export function Hub(props: Props) {
                     twitterFollowers={hub.twitterFollowerCount}
                   />
                 </div>
-                <div className="grid grid-cols-[1fr,450px] gap-x-12 mt-16 px-8">
+                <div
+                  className={cx(
+                    'mt-16',
+                    'px-4',
+                    'lg:gap-x-12',
+                    'lg:grid-cols-[1fr,450px]',
+                    'lg:grid',
+                    'md:px-8',
+                  )}
+                >
+                  {!isTwoColLayout && (
+                    <div>
+                      <SideCard
+                        className="mb-14 max-w-lg mx-auto"
+                        realm={props.realm}
+                        realmUrlId={props.realmUrlId}
+                      />
+                    </div>
+                  )}
                   <div>
                     <About sections={hub.info.about} />
                     {hub.info.resources.length > 0 && (
@@ -93,13 +129,15 @@ export function Hub(props: Props) {
                       </>
                     )}
                   </div>
-                  <div>
-                    <SideCard
-                      className="sticky top-24"
-                      realm={props.realm}
-                      realmUrlId={props.realmUrlId}
-                    />
-                  </div>
+                  {isTwoColLayout && (
+                    <div>
+                      <SideCard
+                        className="sticky top-24"
+                        realm={props.realm}
+                        realmUrlId={props.realmUrlId}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
               {hub.info.gallery.length > 0 && (
@@ -107,7 +145,10 @@ export function Hub(props: Props) {
               )}
               <div className="max-w-7xl mx-auto relative w-full">
                 {hub.info.team.length > 0 && (
-                  <Team className="mt-14 px-8" teamMembers={hub.info.team} />
+                  <Team
+                    className="mt-14 px-4 md:px-8"
+                    teamMembers={hub.info.team}
+                  />
                 )}
                 {hub.info.roadmap.items.length > 0 && (
                   <Roadmap

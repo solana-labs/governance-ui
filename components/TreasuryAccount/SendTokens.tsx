@@ -50,6 +50,7 @@ import NFTSelector from '@components/NFTS/NFTSelector'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
 import useCreateProposal from '@hooks/useCreateProposal'
 import NFTAccountSelect from './NFTAccountSelect'
+import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 
 const SendTokens = ({
   isNft = false,
@@ -153,6 +154,10 @@ const SendTokens = ({
   }
 
   const handleProposeNftSend = async () => {
+    const instructions: InstructionDataWithHoldUpTime[] = []
+    let proposalTitle = ''
+    const governance = currentAccount?.governance
+    setIsLoading(true)
     for (const x of selectedNfts) {
       const nftName = x?.name
       const nftTitle = `Send ${nftName ? nftName : 'NFT'} to ${
@@ -160,51 +165,52 @@ const SendTokens = ({
           ? abbreviateAddress(new PublicKey(form.destinationAccount))
           : ''
       }`
-      const proposalTitle = isNFT
+      proposalTitle = isNFT
         ? nftTitle
         : `Pay ${form.amount}${tokenInfo ? ` ${tokenInfo?.symbol} ` : ' '}to ${
             tryParseKey(form.destinationAccount)
               ? abbreviateAddress(new PublicKey(form.destinationAccount))
               : ''
           }`
-      setIsLoading(true)
       const instruction: UiInstruction = await getNftInstruction(x)
       if (instruction.isValid) {
-        const governance = currentAccount?.governance
-        let proposalAddress: PublicKey | null = null
         if (!realm) {
           setIsLoading(false)
           throw 'No realm selected'
         }
-        const instructionData = {
+        const instructionData: InstructionDataWithHoldUpTime = {
           data: instruction.serializedInstruction
             ? getInstructionDataFromBase64(instruction.serializedInstruction)
             : null,
           holdUpTime: governance?.account?.config.minInstructionHoldUpTime,
           prerequisiteInstructions: instruction.prerequisiteInstructions || [],
+          chunkSplitByDefault: true,
+          chunkBy: 4,
         }
-        try {
-          // Fetch governance to get up to date proposalCount
-          const selectedGovernance = (await fetchRealmGovernance(
-            governance?.pubkey
-          )) as ProgramAccount<Governance>
-          proposalAddress = await handleCreateProposal({
-            title: form.title ? form.title : proposalTitle,
-            description: form.description ? form.description : '',
-            voteByCouncil,
-            instructionsData: [instructionData],
-            governance: selectedGovernance!,
-          })
-          const url = fmtUrlWithCluster(
-            `/dao/${symbol}/proposal/${proposalAddress}`
-          )
-          router.push(url)
-        } catch (ex) {
-          notify({ type: 'error', message: `${ex}` })
-        }
+        instructions.push(instructionData)
       }
-      setIsLoading(false)
     }
+    try {
+      proposalTitle = instructions.length > 1 ? 'Send NFTS' : proposalTitle
+      // Fetch governance to get up to date proposalCount
+      const selectedGovernance = (await fetchRealmGovernance(
+        governance?.pubkey
+      )) as ProgramAccount<Governance>
+      const proposalAddress = await handleCreateProposal({
+        title: form.title ? form.title : proposalTitle,
+        description: form.description ? form.description : '',
+        voteByCouncil,
+        instructionsData: [...instructions],
+        governance: selectedGovernance!,
+      })
+      const url = fmtUrlWithCluster(
+        `/dao/${symbol}/proposal/${proposalAddress}`
+      )
+      router.push(url)
+    } catch (ex) {
+      notify({ type: 'error', message: `${ex}` })
+    }
+    setIsLoading(false)
   }
 
   async function getInstruction(): Promise<UiInstruction> {
@@ -283,6 +289,7 @@ const SendTokens = ({
         propertyName: 'governedTokenAccount',
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [currentAccount])
   useEffect(() => {
     if (form.destinationAccount) {
@@ -298,6 +305,7 @@ const SendTokens = ({
     } else {
       setDestinationAccount(null)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.destinationAccount])
 
   const schema = getTokenTransferSchema({ form, connection, nftMode: isNft })

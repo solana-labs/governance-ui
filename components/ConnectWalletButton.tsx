@@ -14,7 +14,7 @@ import {
   ChevronDownIcon,
 } from '@heroicons/react/solid'
 import { abbreviateAddress } from '@utils/formatting'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import useLocalStorageState from '../hooks/useLocalStorageState'
 import useWalletStore from '../stores/useWalletStore'
 import {
@@ -25,6 +25,8 @@ import Switch from './Switch'
 import { TwitterIcon } from './icons'
 import { notify } from '@utils/notifications'
 import { Profile } from '@components/Profile'
+import Loading from './Loading'
+import { WalletReadyState } from '@solana/wallet-adapter-base'
 
 const StyledWalletProviderLabel = styled.p`
   font-size: 0.65rem;
@@ -33,6 +35,7 @@ const StyledWalletProviderLabel = styled.p`
 
 const ConnectWalletButton = (props) => {
   const { pathname, query, replace } = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
   const [currentCluster, setCurrentCluster] = useLocalStorageState(
     'cluster',
     'mainnet'
@@ -52,6 +55,7 @@ const ConnectWalletButton = (props) => {
     if (connection.cluster !== currentCluster) {
       setCurrentCluster(connection.cluster)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [connection.cluster])
 
   function updateClusterParam(cluster) {
@@ -74,6 +78,7 @@ const ConnectWalletButton = (props) => {
   }
 
   const handleConnectDisconnect = async () => {
+    setIsLoading(true)
     try {
       if (connected) {
         await current?.disconnect()
@@ -89,6 +94,7 @@ const ConnectWalletButton = (props) => {
       }
       console.warn('handleConnectDisconnect', e)
     }
+    setIsLoading(false)
   }
 
   const { show } = useWalletIdentity()
@@ -111,6 +117,7 @@ const ConnectWalletButton = (props) => {
         dark={true}
       />
     ) : null
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [current?.publicKey?.toBase58()])
 
   const displayAddressImage = useMemo(() => {
@@ -134,6 +141,7 @@ const ConnectWalletButton = (props) => {
         <img src={provider?.adapter.icon} className="w-5 h-5" />
       </div>
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [provider])
 
   return (
@@ -160,7 +168,7 @@ const ConnectWalletButton = (props) => {
               </>
             ) : (
               <>
-                Connect
+                {isLoading ? <Loading></Loading> : 'Connect'}
                 <StyledWalletProviderLabel className="font-normal text-fgd-3">
                   {provider?.name}
                 </StyledWalletProviderLabel>
@@ -185,7 +193,10 @@ const ConnectWalletButton = (props) => {
               </Menu.Button>
               <Menu.Items className="absolute right-0 z-20 w-48 p-2 border rounded-md shadow-md outline-none bg-bkg-1 border-fgd-4 top-14">
                 <>
-                  {WALLET_PROVIDERS.map(({ name, url, adapter: { icon } }) => (
+                  {WALLET_PROVIDERS.filter(
+                    ({ adapter }) =>
+                      adapter.readyState !== WalletReadyState.Unsupported
+                  ).map(({ name, url, adapter: { icon } }) => (
                     <Menu.Item key={name}>
                       <button
                         className="flex items-center w-full p-2 font-normal default-transition h-9 hover:bg-bkg-3 hover:cursor-pointer hover:rounded focus:outline-none"

@@ -21,7 +21,10 @@ import { DepositWithMintAccount } from 'VoteStakeRegistry/sdk/accounts'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { notify } from '@utils/notifications'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { getTokenOwnerRecordAddress } from '@solana/spl-governance'
+import {
+  getTokenOwnerRecordAddress,
+  GoverningTokenRole,
+} from '@solana/spl-governance'
 import InlineNotification from '@components/InlineNotification'
 import {
   LightningBoltIcon,
@@ -31,6 +34,7 @@ import {
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import Account from './Account'
 import { abbreviateAddress } from '@utils/formatting'
+import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
 
 interface DepositBox {
   mintPk: PublicKey
@@ -154,9 +158,11 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
     ) {
       handleGetDeposits()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(ownDeposits), ownDeposits.length])
   useEffect(() => {
     handleGetDeposits()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [isOwnerOfDeposits, client])
   useEffect(() => {
     const getTokenOwnerRecord = async () => {
@@ -180,6 +186,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
     if (realm && wallet?.connected) {
       getTokenOwnerRecord()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [realm?.pubkey.toBase58(), wallet?.connected, tokenOwnerRecordPk])
 
   const hasLockedTokens = useMemo(() => {
@@ -204,6 +211,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
             )?.index
         )
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [deposits])
 
   return (
@@ -380,6 +388,14 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
             onClose={() => setIsLockModalOpen(false)}
           ></LockTokensModal>
         )}
+        <div className="mt-4">
+          <TokenDeposit
+            mint={councilMint}
+            tokenRole={GoverningTokenRole.Council}
+            councilVote={true}
+            inAccountDetails={true}
+          />
+        </div>
       </div>
       {connected && <Account withHeader={false} displayPanel={false}></Account>}
     </div>

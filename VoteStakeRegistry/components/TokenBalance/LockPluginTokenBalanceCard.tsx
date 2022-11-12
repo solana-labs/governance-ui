@@ -73,11 +73,12 @@ const LockPluginTokenBalanceCard = ({
     if (realm && wallet?.connected) {
       getTokenOwnerRecord()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [realm?.pubkey.toBase58(), wallet?.connected])
 
   const hasLoaded = mint || councilMint
   return (
-    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
+    <>
       <div className="flex items-center justify-between">
         <h3 className="mb-0">My governance power</h3>
         <Link
@@ -136,7 +137,7 @@ const LockPluginTokenBalanceCard = ({
           <div className="animate-pulse bg-bkg-3 h-10 rounded-lg" />
         </>
       )}
-    </div>
+    </>
   )
 }
 
@@ -207,20 +208,19 @@ const TokenDepositLock = ({
       ? fmtMintAmount(mint, depositRecord.amountDepositedNative)
       : '0'
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   useEffect(() => {
     if (availableTokens != '0' || hasTokensDeposited || hasTokensInWallet) {
       setHasGovPower(true)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [availableTokens, hasTokensDeposited, hasTokensInWallet])
 
-  const canShowAvailableTokensMessage =
-    !hasTokensDeposited && hasTokensInWallet && connected
-  const canExecuteAction = !hasTokensDeposited ? 'deposit' : 'withdraw'
-  const canDepositToken = !hasTokensDeposited && hasTokensInWallet
+  const canShowAvailableTokensMessage = hasTokensInWallet && connected
   const tokensToShow =
-    canDepositToken && depositTokenAccount
+    hasTokensInWallet && depositTokenAccount
       ? fmtMintAmount(mint, depositTokenAccount.account.amount)
-      : canDepositToken
+      : hasTokensInWallet
       ? availableTokens
       : 0
 
@@ -229,7 +229,9 @@ const TokenDepositLock = ({
       {canShowAvailableTokensMessage ? (
         <div className="pt-2">
           <InlineNotification
-            desc={`You have ${tokensToShow} tokens available to ${canExecuteAction}`}
+            desc={`You have ${tokensToShow} ${
+              hasTokensDeposited ? `more` : ``
+            } ${depositTokenName} available to deposit.`}
             type="info"
           />
         </div>

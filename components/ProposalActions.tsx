@@ -32,9 +32,12 @@ const ProposalActionsPanel = () => {
   const connection = useWalletStore((s) => s.connection)
   const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
   const [signatoryRecord, setSignatoryRecord] = useState<any>(undefined)
-  const maxVoterWeight =
-    useNftPluginStore((s) => s.state.maxVoteRecord)?.pubkey ||
-    useVotePluginsClientStore((s) => s.state.maxVoterWeight)
+  const nftMaxVoterWeight = useNftPluginStore((s) => s.state.maxVoteRecord)
+    ?.pubkey
+  const votePLuginsClientMaxVoterWeight = useVotePluginsClientStore(
+    (s) => s.state.maxVoterWeight
+  )
+  const maxVoterWeight = nftMaxVoterWeight || votePLuginsClientMaxVoterWeight
   const canFinalizeVote =
     hasVoteTimeExpired && proposal?.account.state === ProposalState.Voting
 
@@ -56,7 +59,8 @@ const ProposalActionsPanel = () => {
     }
 
     setup()
-  }, [proposal, realmInfo, walletPk])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+  }, [proposal?.pubkey.toBase58(), realmInfo?.symbol, walletPk?.toBase58()])
 
   const canSignOff =
     signatoryRecord &&

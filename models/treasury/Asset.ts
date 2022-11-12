@@ -1,11 +1,21 @@
 import type { BigNumber } from 'bignumber.js'
-import type { MintMaxVoteWeightSource } from '@solana/spl-governance'
+import type {
+  Governance,
+  MintMaxVoteWeightSource,
+  ProgramAccount,
+  Realm,
+  TokenOwnerRecord,
+} from '@solana/spl-governance'
 
 import type { AssetAccount } from '@utils/uiTypes/assets'
 
 import { NFT } from './NFT'
 import { Program } from './Program'
 import { Domain } from './Domain'
+
+
+import { TokenProgramAccount } from '@utils/tokens'
+import { MintInfo } from '@solana/spl-token'
 
 import { PublicKey } from '@solana/web3.js'
 
@@ -18,6 +28,7 @@ export enum AssetType {
   Sol,
   Token,
   Unknown,
+  TokenOwnerRecordAsset,
 }
 
 export interface Mint {
@@ -98,11 +109,27 @@ export interface Unknown {
   name: string
 }
 
+
 export interface Domains {
   type: AssetType.Domain
   id: string
   count: BigNumber
   list: Domain[]
+
+export interface TokenOwnerRecordAsset {
+  type: AssetType.TokenOwnerRecordAsset
+  id: string
+  address: PublicKey
+  owner: PublicKey
+  realmId: string
+  realmSymbol: string
+  displayName: string
+  programId: string
+  realmImage?: string
+  communityMint: TokenProgramAccount<MintInfo>
+  realmAccount: ProgramAccount<Realm>
+  tokenOwnerRecordAccount: ProgramAccount<TokenOwnerRecord>
+  governanceOwner: ProgramAccount<Governance>
 }
 
 export type Asset =
@@ -114,3 +141,4 @@ export type Asset =
   | Sol
   | Token
   | Unknown
+  | TokenOwnerRecordAsset

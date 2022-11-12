@@ -22,7 +22,7 @@ export function Content(props: Props) {
         'bg-cover',
         'h-60',
         'w-full',
-        'bg-black',
+        'bg-white',
         props.className,
       )}
       style={{ backgroundImage: `url(${url})` }}

@@ -58,6 +58,7 @@ export const useRecords = (): AvailableRecordAccounts => {
         return undefined
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     [realm, wallet, client]
   )
 
@@ -70,7 +71,7 @@ export const useRecords = (): AvailableRecordAccounts => {
   )
 
   useEffect(() => {
-    ;(async () => {
+    const func = async () => {
       // tokenOwnerRecord
       if (ownTokenRecord) {
         setTokenOwnerRecord({
@@ -102,7 +103,9 @@ export const useRecords = (): AvailableRecordAccounts => {
           accountRequired: true,
         })
       }
-    })()
+    }
+    func()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [client, wallet])
 
   return {

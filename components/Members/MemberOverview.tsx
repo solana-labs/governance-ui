@@ -59,6 +59,7 @@ const MemberOverview = ({ member }: { member: Member }) => {
       communityVotes && communityVotes && !communityVotes.isZero()
         ? fmtMintAmount(mint, communityVotes)
         : '',
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     [walletAddress]
   )
 
@@ -67,6 +68,7 @@ const MemberOverview = ({ member }: { member: Member }) => {
       councilVotes && councilVotes && !councilVotes.isZero()
         ? fmtMintAmount(councilMint, councilVotes)
         : '',
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     [walletAddress]
   )
 
@@ -135,6 +137,7 @@ const MemberOverview = ({ member }: { member: Member }) => {
       setOwnVoteRecords(voteRecordsArray)
     }
     handleSetVoteRecords()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [walletAddress])
 
   const memberVotePowerRank = useMemo(() => {
@@ -146,10 +149,12 @@ const MemberOverview = ({ member }: { member: Member }) => {
         (m) => m.walletAddress === member?.walletAddress
       ) + 1
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(activeMembers.length), member.walletAddress])
 
   useEffect(() => {
     setRecentVotes(paginateVotes(0))
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(ownVoteRecords)])
 
   const perPage = 8
@@ -171,6 +176,7 @@ const MemberOverview = ({ member }: { member: Member }) => {
         dark={true}
       />
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [walletPublicKey?.toBase58()])
   return (
     <>

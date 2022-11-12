@@ -24,9 +24,9 @@ import { chunks } from '@utils/helpers'
 import { sendSignedTransaction } from '@utils/send'
 import { getRegistrarPDA, getVoterWeightRecord } from '@utils/plugin/accounts'
 import {
-  sendTransactionsV2,
+  sendTransactionsV3,
   SequenceType,
-  transactionInstructionsToTypedInstructionsSets,
+  txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
 
 const MyProposalsBn = () => {
@@ -66,6 +66,7 @@ const MyProposalsBn = () => {
                 ownCouncilTokenRecord?.pubkey.toBase58()
           )
         : [],
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     [proposals, ownVoteRecordsByProposal, connected]
   )
   const drafts = myProposals.filter((x) => {
@@ -268,19 +269,20 @@ const MyProposalsBn = () => {
       instructions.push(relinquishNftVoteIx)
     }
     try {
-      const insertChunks = chunks(instructions, 10)
-      const signerChunks = Array(insertChunks.length).fill([])
-      await sendTransactionsV2({
+      const insertChunks = chunks(instructions, 10).map((txBatch, batchIdx) => {
+        return {
+          instructionsSet: txBatchesToInstructionSetWithSigners(
+            txBatch,
+            [],
+            batchIdx
+          ),
+          sequenceType: SequenceType.Parallel,
+        }
+      })
+      await sendTransactionsV3({
         connection,
-        showUiComponent: true,
         wallet: wallet!,
-        signersSet: [...signerChunks],
-        TransactionInstructions: insertChunks.map((x) =>
-          transactionInstructionsToTypedInstructionsSets(
-            x,
-            SequenceType.Parallel
-          )
-        ),
+        transactionInstructions: insertChunks,
       })
       setIsLoading(false)
       getNftsVoteRecord()
@@ -314,6 +316,7 @@ const MyProposalsBn = () => {
     if (wallet?.publicKey && isNftMode && client.client && modalIsOpen) {
       getNftsVoteRecord()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [client.clientType, isNftMode, wallet?.publicKey?.toBase58(), modalIsOpen])
 
   return (

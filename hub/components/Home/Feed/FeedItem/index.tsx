@@ -1,5 +1,6 @@
 import MilestoneIcon from '@carbon/icons-react/lib/Milestone';
 import type { PublicKey } from '@solana/web3.js';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import { FeedItem } from '../gql';
@@ -27,6 +28,7 @@ interface Props extends BaseProps {
   realmInfo?: {
     iconUrl?: null | string;
     name: string;
+    urlId: string;
   };
   realmUrlId: string;
 }
@@ -38,9 +40,11 @@ function getUrl(props: Props) {
 
   if (props.feedItem.type === FeedItemType.Post) {
     if (!props.feedItem.realmPublicKey.equals(props.realm)) {
-      return `/realm/${estimateRealmUrlId(props.feedItem.realmPublicKey)}/${
-        props.feedItem.id
-      }`;
+      const urlId = props.realmInfo
+        ? props.realmInfo.urlId
+        : estimateRealmUrlId(props.feedItem.realmPublicKey);
+
+      return `/realm/${urlId}/${props.feedItem.id}`;
     }
 
     return `/realm/${props.realmUrlId}/${props.feedItem.id}`;
@@ -80,11 +84,15 @@ export function Content(props: Props) {
           </div>
         )}
         {props.realmInfo ? (
-          <RealmIcon
-            className="h-12 w-12 text-lg"
-            iconUrl={props.realmInfo.iconUrl}
-            name={props.realmInfo.name}
-          />
+          <Link passHref href={`/realm/${props.realmInfo.urlId}`}>
+            <a className="block">
+              <RealmIcon
+                className="h-12 w-12 text-lg"
+                iconUrl={props.realmInfo.iconUrl}
+                name={props.realmInfo.name}
+              />
+            </a>
+          </Link>
         ) : props.feedItem.author ? (
           <AuthorHovercard
             civicAvatar={props.feedItem.author?.civicInfo?.avatarUrl}

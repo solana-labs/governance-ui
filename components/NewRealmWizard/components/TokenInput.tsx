@@ -74,6 +74,7 @@ export default function TokenInput({
     if (!connected) {
       wallet?.connect()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [wallet])
 
   useEffect(() => {
@@ -119,6 +120,7 @@ export default function TokenInput({
     } else {
       setTokenInfo(undefined)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [tokenList, tokenMintAddress])
 
   useEffect(() => {
@@ -134,6 +136,7 @@ export default function TokenInput({
       suggestedMinTokenAmount,
       walletIsMintAuthority,
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [validMintAddress, walletIsMintAuthority, tokenInfo])
 
   return (

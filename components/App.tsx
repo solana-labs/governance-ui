@@ -96,6 +96,7 @@ export function App(props: Props) {
     if (realm?.pubkey) {
       loadMarket(connection, connection.cluster)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [connection.cluster, realm?.pubkey.toBase58()])
   useEffect(() => {
     if (
@@ -119,10 +120,14 @@ export function App(props: Props) {
     } else if (!wallet?.connected || !ownTokenRecord) {
       resetDepositState()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     realm?.pubkey.toBase58(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     ownTokenRecord?.pubkey.toBase58(),
     wallet?.connected,
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     client?.program.programId.toBase58(),
   ])
 
@@ -134,6 +139,7 @@ export function App(props: Props) {
     ) {
       getNfts(possibleNftsAccounts, connection)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(possibleNftsAccounts), realm?.pubkey.toBase58()])
 
   return (

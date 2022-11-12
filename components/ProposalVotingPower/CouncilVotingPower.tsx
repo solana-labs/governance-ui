@@ -34,6 +34,7 @@ export default function CouncilVotingPower(props: Props) {
   const connection = useWalletStore((s) => s.connection.current)
   const wallet = useWalletStore((s) => s.current)
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   const depositAmount = councilTokenAccount
     ? new BigNumber(councilTokenAccount.account.amount.toString())
     : new BigNumber(0)
@@ -91,7 +92,7 @@ export default function CouncilVotingPower(props: Props) {
     <div className={props.className}>
       {amount.isZero() ? (
         <div className={'text-xs text-white/50'}>
-          You do not have any voting power in this realm.
+          You do not have any voting power in this dao.
         </div>
       ) : (
         <div className={'p-3 rounded-md bg-bkg-1'}>
@@ -114,7 +115,7 @@ export default function CouncilVotingPower(props: Props) {
               ? depositAmount.shiftedBy(-councilMint.decimals).toFormat()
               : depositAmount.toFormat()}{' '}
             more {tokenName} council votes in your wallet. Do you want to
-            deposit them to increase your voting power in this Realm?
+            deposit them to increase your voting power in this Dao?
           </div>
           <SecondaryButton className="mt-4 w-48" onClick={deposit}>
             Deposit

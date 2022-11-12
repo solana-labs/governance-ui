@@ -94,12 +94,12 @@ export function Content(props: Props) {
         </div>
         <div className="flex items-center justify-end mt-2 space-x-2">
           {props.onClose && (
-            <Button.Secondary className="w-48" onClick={props.onClose}>
+            <Button.Secondary className="sm:w-48" onClick={props.onClose}>
               Cancel
             </Button.Secondary>
           )}
           <Button.Primary
-            className="w-48"
+            className="sm:w-48"
             disabled={disabled}
             pending={submitting}
             onClick={async (e) => {
