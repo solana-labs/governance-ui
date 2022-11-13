@@ -3,6 +3,7 @@ import { PROGRAM_VERSION_V1, Realm, getRealms } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { arrayToMap, arrayToUnique } from '@tools/core/script'
+import { chunks } from '@utils/helpers'
 
 import devnetRealms from 'public/realms/devnet.json'
 import mainnetBetaRealms from 'public/realms/mainnet-beta.json'
@@ -173,10 +174,14 @@ export async function getUnchartedRealmInfos(connection: ConnectionContext) {
   ).map((p) => {
     return p.programId
   })
-
+  const programIdsChunk = chunks(programIds, 5)
   const allRealms = (
-    await getRealms(connection.current, programIds)
-  ).sort((r1, r2) => r1.account.name.localeCompare(r2.account.name))
+    await Promise.all(
+      programIdsChunk.map((x) => getRealms(connection.current, x))
+    )
+  )
+    .flat(1)
+    .sort((r1, r2) => r1.account.name.localeCompare(r2.account.name))
 
   const excludedRealms = arrayToMap(certifiedRealms, (r) =>
     r.realmId.toBase58()
