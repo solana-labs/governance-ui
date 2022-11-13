@@ -31,13 +31,10 @@ export const CouncilYesVotePercentageSchema = {
     .number()
     .transform((value) => (isNaN(value) ? 0 : value))
     .max(100, 'Approval cannot require more than 100% of votes')
-    .when('$memberAddresses', (memberAddresses, schema) => {
-      if (memberAddresses) {
-        return schema
-          .min(1, 'Quorum must be at least 1% of member')
-          .required('Required')
-      } else {
-        return schema.min(1, 'Quorum must be at least 1% of member')
+    .min(1, 'Quorum must be at least 1% of member')
+    .when('$_programVersion', (_programVersion, schema) => {
+      if (_programVersion >= 3) {
+        return schema.required('Council yes threshold is required')
       }
     }),
 }

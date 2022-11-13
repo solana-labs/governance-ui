@@ -72,6 +72,7 @@ export default function FormPage({
           throw new Error('No valid wallet connected')
         }
       } catch (err) {
+        // @asktree: why would this be the correct behavior if the user isn't connected?
         if (currentStep > 0) handlePreviousButton(1)
       }
     }
@@ -81,6 +82,7 @@ export default function FormPage({
 
   useEffect(() => {
     if (currentStep > 0 && !isWizardValid({ currentStep, steps, formData })) {
+      // @asktree: why would this be the correct behavior? It's just confusing for the user (or the dev as the case may be).
       handlePreviousButton(currentStep)
     }
   }, [currentStep])
@@ -100,7 +102,20 @@ export default function FormPage({
 
     updatedFormState.currentStep = nextStep > -1 ? nextStep : steps.length + 1
 
-    console.log('next button clicked', fromStep, nextStep)
+    console.log(
+      'required steps',
+      steps.map(
+        ({ required }) =>
+          required === 'true' ||
+          !!eval(required.replaceAll('form', 'updatedFormState'))
+      )
+    )
+    console.log(
+      'next button clicked',
+      fromStep,
+      nextStep,
+      updatedFormState.currentStep
+    )
 
     for (const key in updatedFormState) {
       if (updatedFormState[key] == null) {
