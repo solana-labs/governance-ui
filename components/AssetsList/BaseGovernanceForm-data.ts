@@ -3,15 +3,13 @@ import {
   VoteThresholdType,
   VoteTipping,
 } from '@solana/spl-governance'
-import { MintInfo } from '@solana/spl-token'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import { isDisabledVoterWeight } from '@tools/governance/units'
 import {
-  formatMintNaturalAmountAsDecimal,
   getTimestampFromDays,
   getDaysFromTimestamp,
   parseMintNaturalAmountFromDecimalAsBN,
-  fmtBnMintDecimals,
+  fmtBnMintDecimalsUndelimited,
 } from '@tools/sdk/units'
 
 type FormErrors<T> = {
@@ -58,11 +56,11 @@ export const transformerGovernanceConfig_2_BaseGovernanceFormFieldsV3 = (
   minCommunityTokensToCreateProposal: (x) =>
     isDisabledVoterWeight(x)
       ? 'disabled'
-      : fmtBnMintDecimals(x, communityMintDecimals),
+      : fmtBnMintDecimalsUndelimited(x, communityMintDecimals),
   minCouncilTokensToCreateProposal: (x) =>
     isDisabledVoterWeight(x)
       ? 'disabled'
-      : fmtBnMintDecimals(x, councilMintDecimals),
+      : fmtBnMintDecimalsUndelimited(x, councilMintDecimals),
   communityVoteThreshold: (x) =>
     x.type === VoteThresholdType.Disabled ? 'disabled' : x.value!.toString(),
   communityVetoVoteThreshold: (x) =>

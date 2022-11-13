@@ -17,6 +17,13 @@ export function fmtBnMintDecimals(amount: BN, decimals: number) {
   return new BigNumber(amount.toString()).shiftedBy(-decimals).toFormat()
 }
 
+export function fmtBnMintDecimalsUndelimited(amount: BN, decimals: number) {
+  return new BigNumber(amount.toString())
+    .shiftedBy(-decimals)
+    .toFormat()
+    .replaceAll(',', '')
+}
+
 export function fmtBNAmount(amount: BN | number | string) {
   return new BigNumber(amount.toString()).toFormat()
 }
