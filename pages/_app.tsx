@@ -26,6 +26,15 @@ export default function App({ Component, pageProps, router }: AppProps) {
   if (router.pathname.startsWith('/code')) {
     return <Component {...pageProps} />
   }
+
+  if (router.pathname.startsWith('/verify-wallet')) {
+    return (
+      <HubApp>
+        <Component {...pageProps} />
+      </HubApp>
+    )
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       {router.pathname.startsWith('/realm/[id]') ||
