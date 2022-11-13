@@ -35,6 +35,7 @@ import Input from 'components/inputs/Input'
 import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
+import BigNumber from 'bignumber.js'
 
 const STREAMFLOW_TREASURY_PUBLIC_KEY = new PublicKey(
   '5SEpbdjFK5FxwTvfsGMXVQTD2v4M2c5tyRTxhdsPkgDw'
@@ -53,6 +54,7 @@ export const PERIOD = {
   HOUR: 3600,
   DAY: 24 * 3600,
   WEEK: 7 * 24 * 3600,
+  FORTNIGHT: 14 * 24 * 3600,
   MONTH: Math.floor(30.4167 * 24 * 3600), //30.4167 days
   YEAR: 365 * 24 * 3600, // 365 days
 }
@@ -63,12 +65,13 @@ const releaseFrequencyUnits = {
   2: { idx: 2, display: 'hour', value: PERIOD.HOUR },
   3: { idx: 3, display: 'day', value: PERIOD.DAY },
   4: { idx: 4, display: 'week', value: PERIOD.WEEK },
-  5: { idx: 5, display: 'month', value: PERIOD.MONTH },
-  6: { idx: 6, display: 'year', value: PERIOD.YEAR },
+  5: { idx: 5, display: 'fortnight', value: PERIOD.FORTNIGHT },
+  6: { idx: 6, display: 'month', value: PERIOD.MONTH },
+  7: { idx: 7, display: 'year', value: PERIOD.YEAR },
 }
 
-async function ata(mint: PublicKey, account: PublicKey) {
-  return await Token.getAssociatedTokenAddress(
+function ata(mint: PublicKey, account: PublicKey): Promise<PublicKey> {
+  return Token.getAssociatedTokenAddress(
     ASSOCIATED_TOKEN_PROGRAM_ID,
     TOKEN_PROGRAM_ID,
     mint,
@@ -124,7 +127,7 @@ const CreateStream = ({
     depositedAmount: 0,
     releaseAmount: 0,
     amountAtCliff: 0,
-    cancelable: false,
+    cancelable: true,
     period: 1,
   })
   const [formErrors, setFormErrors] = useState({})
@@ -280,11 +283,17 @@ const CreateStream = ({
 
     const createStreamData = {
       start,
-      depositedAmount: new u64(form.depositedAmount * 10 ** decimals),
+      depositedAmount: new u64(
+        new BigNumber(form.depositedAmount).shiftedBy(decimals).toString()
+      ),
       period: new u64(form.period),
       cliff: start,
-      cliffAmount: new u64(form.amountAtCliff * 10 ** decimals),
-      amountPerPeriod: new u64(form.releaseAmount * 10 ** decimals),
+      cliffAmount: new u64(
+        new BigNumber(form.amountAtCliff).shiftedBy(decimals).toString()
+      ),
+      amountPerPeriod: new u64(
+        new BigNumber(form.releaseAmount).shiftedBy(decimals).toString()
+      ),
       name: 'SPL Realms proposal',
       canTopup: false,
       cancelableBySender: form.cancelable,
@@ -294,11 +303,11 @@ const CreateStream = ({
       automaticWithdrawal: true,
       withdrawFrequency: new u64(form.period),
       recipient: recipientPublicKey,
-      recipientTokens: recipientTokens,
+      recipientTokens,
       streamflowTreasury: STREAMFLOW_TREASURY_PUBLIC_KEY,
-      streamflowTreasuryTokens: streamflowTreasuryTokens,
+      streamflowTreasuryTokens,
       partner: partnerPublicKey,
-      partnerTokens: partnerTokens,
+      partnerTokens,
     }
     const createStreamAccounts = {
       payer: payerAccount,
@@ -339,6 +348,7 @@ const CreateStream = ({
       },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
 
   const schema = yup.object().shape({

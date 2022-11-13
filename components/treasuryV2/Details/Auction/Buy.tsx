@@ -81,6 +81,7 @@ export default function Buy({ className, asset }: Props) {
     } else {
       setCurrentAuction(null)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.auctionPk])
 
   const handleSetForm = ({ propertyName, value }) => {

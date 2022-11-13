@@ -47,11 +47,13 @@ const DelegateBalanceCard = () => {
         ownDelegateTokenRecords[0]?.account?.governingTokenOwner?.toBase58()
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [walletId])
 
   // whenever we change delegate, get that delegates vote record so we can display it
   useEffect(() => {
     actions.fetchDelegateVoteRecords()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [selectedCommunityDelegate, selectedCouncilDelegate])
 
   const getCouncilTokenCount = () => {

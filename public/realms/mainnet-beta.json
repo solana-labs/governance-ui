@@ -88,6 +88,17 @@
     "github": "https://github.com/project-serum"
   },
   {
+    "symbol": "SERUMDEX",
+    "bannerImage": "https://i.ibb.co/bNRH0hh/1500x500.jpg",
+    "displayName": "Serum Community Fork",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "BtD6wKiazt4EEvfw6tqDh1BPSVchGeqyZ1e4HhV9VHJ6",
+    "ogImage": "/realms/SERUM_COMMUNITY_FORK/logo.png",
+    "shortDescription": "Faster, Cheaper and more Powerful DeFi",
+    "sortRank": 3,
+    "github": "https://github.com/blockworks-foundation/serum-dex"
+  },
+  {
     "symbol": "SERUM2",
     "displayName": "Serum DAO (NEW)",
     "programId": "G41fmJzd29v7Qmdi8ZyTBBYa98ghh3cwHBTexqCG1PQJ",
@@ -1818,11 +1829,11 @@
   {
     "symbol": "Solana Spaces",
     "category": "other",
-    "bannerImage": "https://pbs.twimg.com/profile_banners/1512518742051237893/1666295049/1500x500",
+    "bannerImage": "https://i.imgur.com/P6rqiCY.jpg",
     "displayName": "Solana Spaces",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "58axqgJSAEK3adKL5hx5dYoRqkYMEiEXQZqk9FFFpa7f",
-    "ogImage": "https://pbs.twimg.com/profile_images/1583182250581102623/AOrgeepS_400x400.jpg",
+    "ogImage": "https://i.imgur.com/PSk30Rp.jpg",
     "shortDescription": "Experience the World of Solana. IRL.",
     "sortRank": 3,
     "website": "https://solanaspaces.com",

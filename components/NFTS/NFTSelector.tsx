@@ -78,21 +78,25 @@ function NFTSelector(
     if (selectedNft) {
       setSelected([selectedNft])
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [])
   useEffect(() => {
     if (ownersPk.length && !isPredefinedMode) {
       handleGetNfts()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(ownersPk.map((x) => x.toBase58()))])
   useEffect(() => {
     if (!isPredefinedMode && selected) {
       onNftSelect(selected)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [selected])
   useEffect(() => {
     if (predefinedNfts && isPredefinedMode) {
       setNfts(predefinedNfts)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [predefinedNfts])
   return (
     <>

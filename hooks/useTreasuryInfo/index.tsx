@@ -60,8 +60,10 @@ export default function useTreasuryInfo(): Result<Data> {
         setNftsLoading(false)
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
     loadingGovernedAccounts,
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     accounts.map((account) => account.pubkey.toBase58()).join('-'),
   ])
 
@@ -83,6 +85,7 @@ export default function useTreasuryInfo(): Result<Data> {
         realmInfo
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [accounts, nfts, nftsLoading, realmInfo, connection.current.rpcEndpoint])
 
   useEffect(() => {

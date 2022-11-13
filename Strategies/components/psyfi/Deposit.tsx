@@ -96,6 +96,7 @@ export const Deposit: React.FC<{
       setFormErrors({})
       setForm({ ...form, [propertyName]: value })
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     [setForm, setFormErrors]
   )
   const tokenInfo = tokenService.getTokenInfo(handledMint)
@@ -152,6 +153,7 @@ export const Deposit: React.FC<{
       )) as unknown) as DepositReceipt | undefined
       setDepositReceipt(currentDepositReceipt)
     })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.strategy, psyFiProgram])
 
   // Find the owned strategy token account, if one exists
@@ -261,6 +263,7 @@ export const Deposit: React.FC<{
       notify({ type: 'error', message: `Error ${error}` })
       setIsDepositing(false)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
     client,
     config,

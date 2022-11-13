@@ -37,6 +37,7 @@ type EmptyObject = Record<string, never>
 type SetFormErrors = Dispatch<React.SetStateAction<EmptyObject>>
 
 export function getFilteredTokenAccounts(): AssetAccount[] {
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   return governedTokenAccountsWithoutNfts.filter((x) => {
     const transferAddress = x.extensions.transferAddress
@@ -160,10 +161,14 @@ export function commonAssets<T extends ForesightHasGovernedAccount>(
     defaultValToYupSchema
   )
   const schema = getSchema<T>(extraSchemaFields)
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const wallet = useWalletStore((s) => s.current)
   const filteredTokenAccounts = getFilteredTokenAccounts()
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [formErrors, setFormErrors] = useState({})
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const { handleSetInstructions } = useContext(NewProposalContext)
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [form, setForm] = useState<T>({
     governedAccount: filteredTokenAccounts[0],
     ...formDefaults,
@@ -232,6 +237,7 @@ function ForesightUseEffects<T extends ForesightHasGovernedAccount>(
       propertyName: 'programId',
       value: programId?.toString(),
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [programId])
 
   useEffect(() => {
@@ -239,6 +245,7 @@ function ForesightUseEffects<T extends ForesightHasGovernedAccount>(
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
 }
 

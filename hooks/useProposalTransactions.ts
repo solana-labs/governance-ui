@@ -65,16 +65,21 @@ export default function useProposalTransactions(
 ) {
   if (!proposal) return null
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [executed, setExecuted] = useState<
     ProgramAccount<ProposalTransaction>[]
   >([])
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [ready, setReady] = useState<ProgramAccount<ProposalTransaction>[]>([])
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [notReady, setNotReady] = useState<
     ProgramAccount<ProposalTransaction>[]
   >([])
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [nextExecuteAt, setNextExecuteAt] = useState<number | null>(null)
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null
 
@@ -99,6 +104,7 @@ export default function useProposalTransactions(
     return () => {
       if (interval) clearInterval(interval)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [executed])
 
   return {

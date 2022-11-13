@@ -56,6 +56,7 @@ export default function Investments(props: Props) {
     if (!currentAccount) {
       setCurrentAccount(props.asset.raw, connection)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [connection, props])
 
   switch (investments._tag) {

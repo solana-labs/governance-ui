@@ -96,10 +96,12 @@ export default function AddCouncilForm({
 
   useEffect(() => {
     updateUserInput(formData, AddCouncilSchema, setValue)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [])
 
   useEffect(() => {
     setValue('addCouncil', forceCouncil || undefined)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [forceCouncil])
 
   useEffect(() => {
@@ -108,12 +110,14 @@ export default function AddCouncilForm({
       setValue('transferCouncilMintAuthority', undefined)
       setCouncilTokenInfo(undefined)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [useExistingCouncilToken])
 
   useEffect(() => {
     if (!addCouncil) {
       setValue('useExistingCouncilToken', undefined, { shouldValidate: true })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [addCouncil])
 
   function handleTokenInput({ tokenInfo }) {

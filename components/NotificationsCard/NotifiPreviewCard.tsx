@@ -56,6 +56,7 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
     if (!isAuthenticated) {
       onClick()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [isAuthenticated])
 
   const handleSubscribe = useCallback(
@@ -128,6 +129,7 @@ const NotifiPreviewCard: FunctionComponent<NotifiPreviewCardProps> = ({
         </div>
       )
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     [alerts, handleDelete, handleSubscribe]
   )
 

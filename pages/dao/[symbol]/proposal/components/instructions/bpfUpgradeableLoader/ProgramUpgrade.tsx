@@ -84,6 +84,7 @@ const ProgramUpgrade = ({
       propertyName: programUpgradeFormNameOf('programId'),
       value: programId?.toString(),
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [realmInfo?.programId])
 
   useEffect(() => {
@@ -91,6 +92,7 @@ const ProgramUpgrade = ({
       propertyName: programUpgradeFormNameOf('bufferSpillAddress'),
       value: wallet?.publicKey?.toBase58(),
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [wallet?.publicKey?.toBase58()])
 
   useEffect(() => {
@@ -100,6 +102,7 @@ const ProgramUpgrade = ({
         setFormErrors(validationErrors)
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.bufferAddress])
 
   useEffect(() => {
@@ -107,6 +110,7 @@ const ProgramUpgrade = ({
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
 
   const schema = yup.object().shape({

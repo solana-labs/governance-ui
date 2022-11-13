@@ -62,6 +62,7 @@ const TokenMintInput = ({
       setMintInfo(undefined)
       onValidMintChange(undefined, undefined)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [typedMint, foundByNameToken])
   useEffect(() => {
     if (isTyping !== !!query) {
@@ -70,6 +71,7 @@ const TokenMintInput = ({
     debounce.debounceFcn(async () => {
       setIsTyping(false)
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [query])
   return (
     <>

@@ -66,6 +66,7 @@ export default function useProposalVotesForRealm(
     }
     console.log("[serum_gov]: fetching proposal's mint")
     fetchProposalMint()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [proposalMintKey?.toBase58()])
 
   useEffect(() => {
@@ -122,6 +123,7 @@ export default function useProposalVotesForRealm(
       }
     }
     setProposalVotes(calculateProposalVotes())
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [governance, proposal, proposalMint])
 
   return proposalVotes

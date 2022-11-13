@@ -64,8 +64,11 @@ const ClaimMangoTokensTableRow = ({
     } else {
       setIsClaimed(false)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     reimbursementClient !== null,
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     reimbursementAccount && JSON.stringify(reimbursementAccount),
   ])
   const tokenInfo = tokenService.getTokenInfo(item.mintPubKey.toBase58())
