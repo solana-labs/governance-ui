@@ -37,6 +37,9 @@ import {
   RealmCreation,
   RealmCreationV2,
 } from '@tools/governance/prepareRealmCreation'
+import YesVotePercentageForm, {
+  CouncilYesVotePercentageSchema,
+} from '@components/NewRealmWizard/components/steps/YesVotePercentageThresholdForm'
 
 export const FORM_NAME = 'nft'
 
@@ -61,9 +64,14 @@ export default function NFTWizard() {
       schema: InviteMembersSchema,
       required: 'form.addCouncil',
     },
+    {
+      Form: YesVotePercentageForm,
+      schema: CouncilYesVotePercentageSchema,
+      required: 'form.addCouncil && form._programVersion >= 3',
+      forCouncil: true,
+      title: "Next, set your DAO's council approval threshold.",
+    },
   ]
-
-  const programVersion: 2 | 3 = 2
 
   async function handleSubmit(formData: NFTForm) {
     console.log('submit clicked')
