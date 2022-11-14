@@ -174,14 +174,14 @@ const RealmConfigModal = ({ closeProposalModal, isProposalModalOpen }) => {
               propertyName: 'description',
             })
           }
-        ></Textarea>
+        />
         {canChooseWhoVote && (
           <VoteBySwitch
             checked={voteByCouncil}
             onChange={() => {
               setVoteByCouncil(!voteByCouncil)
             }}
-          ></VoteBySwitch>
+          />
         )}
         {realmAuthorityGovernance && (
           <RealmConfigFormComponent
@@ -192,7 +192,7 @@ const RealmConfigModal = ({ closeProposalModal, isProposalModalOpen }) => {
             shouldBeGoverned={false}
             governedAccount={realmAuthorityGovernance}
             form={form}
-          ></RealmConfigFormComponent>
+          />
         )}
       </div>
       <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
