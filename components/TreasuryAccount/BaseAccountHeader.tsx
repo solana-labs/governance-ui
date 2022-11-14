@@ -18,6 +18,7 @@ const BaseAccountHeader: React.FC<{
   const [symbol, setSymbol] = useState<undefined | string>(tokenInfo?.symbol)
   const connection = useWalletStore((s) => s.connection)
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   useEffect(() => {
     const getTokenMetadata = async (mintAddress: string) => {
       try {

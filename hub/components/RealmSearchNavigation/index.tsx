@@ -9,7 +9,7 @@ import { forwardRef, useState, useRef } from 'react';
 import ecosystemIcon from '@hub/components/EcosystemHeader/icon.png';
 import { RealmIcon } from '@hub/components/RealmIcon';
 import { useQuery } from '@hub/hooks/useQuery';
-import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
+import { ECOSYSTEM_PAGE, STEALTH_HUBS } from '@hub/lib/constants';
 import cx from '@hub/lib/cx';
 import * as RE from '@hub/types/Result';
 
@@ -58,6 +58,13 @@ export const RealmSearchNavigation = forwardRef<HTMLInputElement, Props>(
                 url: `/realm/${item.urlId}/hub`,
               })),
             )
+            .filter((item) => {
+              if (STEALTH_HUBS.has(item.publicKey.toBase58())) {
+                return false;
+              }
+
+              return true;
+            })
             .filter((choice) => {
               if (!text) {
                 return true;

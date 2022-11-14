@@ -14,61 +14,39 @@ import { PERIOD } from 'pages/dao/[symbol]/proposal/components/instructions/Stre
 
 export const DEFAULT_DECIMAL_PLACES = 2
 
-export const formatAmount = (
-  amount: number,
-  decimals: number,
-  decimalPlaces?: number
-) => amount.toFixed(decimalPlaces || decimals)
-
-export const roundAmount = (
-  amount: number,
-  decimalPlaces = DEFAULT_DECIMAL_PLACES
-) => {
-  const tens = 10 ** decimalPlaces
-  return Math.round(amount * tens) / tens
-}
-
-const isMoreThanOne = (amount: number) => (amount > 1 ? 's' : '')
-
 export const formatPeriodOfTime = (period: number): string => {
   if (!period) return '0 seconds'
+
   const years = period / PERIOD.YEAR
-  if (Math.floor(years))
-    return `${years > 1 ? years : ''} year${isMoreThanOne(years)}`
+  if (Math.floor(years)) return years > 1 ? `${years} years` : 'year'
 
   const months = period / PERIOD.MONTH
   if (Math.floor(months))
-    return `${
-      months > 1 ? formatAmount(months, 0, DEFAULT_DECIMAL_PLACES) : ''
-    } month${isMoreThanOne(months)}`
+    return months > 1
+      ? `${months.toFixed(DEFAULT_DECIMAL_PLACES)} months`
+      : 'month'
 
   const weeks = period / PERIOD.WEEK
-  if (Math.floor(weeks))
-    return `${weeks > 1 ? weeks : ''} week${isMoreThanOne(weeks)}`
+  if (Math.floor(weeks)) return weeks > 1 ? `${weeks} weeks` : 'week'
 
   const days = period / PERIOD.DAY
-  if (Math.floor(days))
-    return `${days > 1 ? days : ''} day${isMoreThanOne(days)}`
+  if (Math.floor(days)) return days > 1 ? `${days} days` : 'day'
 
   const hours = period / PERIOD.HOUR
-  if (Math.floor(hours))
-    return `${hours > 1 ? hours : ''} hour${isMoreThanOne(hours)}`
+  if (Math.floor(hours)) return hours > 1 ? `${hours} hours` : 'hour'
 
   const minutes = period / PERIOD.MINUTE
-  if (Math.floor(minutes))
-    return `${minutes > 1 ? minutes : ''} minute${isMoreThanOne(minutes)}`
+  if (Math.floor(minutes)) return minutes > 1 ? `${minutes} minutes` : 'minute'
 
   const seconds = period / PERIOD.SECOND
-  if (Math.floor(seconds))
-    return `${seconds > 1 ? seconds : ''} second${isMoreThanOne(seconds)}`
+  if (Math.floor(seconds)) return seconds > 1 ? `${seconds} seconds` : 'second'
 
   return ''
 }
 
-function deserStream(
+function deserializeStreamInformationFromData(
   data: Uint8Array,
-  stream: Stream,
-  decimals
+  mintMetadataDecimals: number
 ): {
   start: number
   amountDeposited: number
@@ -76,33 +54,28 @@ function deserStream(
   releaseAmount: number
   amountAtCliff: number
   cancelable: boolean
+  recipient: PublicKey
 } {
-  if (stream.createdAt > 0) {
-    return {
-      start: stream.start,
-      amountDeposited: getNumberFromBN(stream.depositedAmount, decimals),
-      releaseFrequency: stream.period,
-      releaseAmount: getNumberFromBN(stream.amountPerPeriod, decimals),
-      amountAtCliff: getNumberFromBN(stream.cliffAmount, decimals),
-      cancelable: stream.cancelableBySender,
-    }
-  }
-  // stream not yet initialized -> we deserialize from instruction data
+  // - Follows UnckeckedStreamLayout
+  // - Needs to add extra +8 bytes for header
+  // - All numbers are stored in little endian
   const start = new BN(data.slice(8, 16), 'le').toNumber()
   const amountDeposited = getNumberFromBN(
     new BN(data.slice(16, 24), 'le'),
-    decimals
+    mintMetadataDecimals
   )
   const releaseFrequency = new BN(data.slice(24, 32), 'le').toNumber()
   const releaseAmount = getNumberFromBN(
     new BN(data.slice(32, 40), 'le'),
-    decimals
+    mintMetadataDecimals
   )
   const amountAtCliff = getNumberFromBN(
     new BN(data.slice(48, 56), 'le'),
-    decimals
+    mintMetadataDecimals
   )
   const cancelable = Boolean(data.slice(56, 57)[0])
+  const recipient = new PublicKey(data.slice(134, 166))
+
   return {
     start,
     amountDeposited,
@@ -110,6 +83,7 @@ function deserStream(
     releaseAmount,
     amountAtCliff,
     cancelable,
+    recipient,
   }
 }
 
@@ -118,29 +92,167 @@ export interface TokenMintMetadata {
   readonly symbol: string
 }
 
+export function getMintMetadata(tokenMintPk: PublicKey): TokenMintMetadata {
+  const tokenMintAddress = tokenMintPk.toBase58()
+  const tokenInfo = tokenService.getTokenInfo(tokenMintAddress)
+
+  if (!tokenInfo) {
+    return MINT_METADATA[tokenMintAddress]
+  }
+
+  return {
+    decimals: tokenInfo.decimals,
+    symbol: tokenInfo.symbol,
+  }
+}
+
 // Mint metadata for Well known tokens displayed on the instruction card
 export const MINT_METADATA = {
   Gssm3vfi8s65R31SBdmQRq6cKeYojGgup7whkw4VCiQj: { symbol: 'STRM', decimals: 9 },
 }
 
-export function getMintMetadata(
-  tokenMintPk: PublicKey | undefined
-): TokenMintMetadata {
-  const tokenMintAddress = tokenMintPk ? tokenMintPk.toBase58() : ''
-  const tokenInfo = tokenMintAddress
-    ? tokenService.getTokenInfo(tokenMintAddress)
-    : null
-  return tokenInfo
-    ? {
-        name: tokenInfo.symbol,
-        decimals: tokenInfo.decimals,
-        address: tokenInfo.address,
-      }
-    : MINT_METADATA[tokenMintAddress]
+function decodeStream(stream: Stream, mintMetadataDecimals: number) {
+  return {
+    start: stream.start,
+    amountDeposited: getNumberFromBN(
+      stream.depositedAmount,
+      mintMetadataDecimals
+    ),
+    releaseFrequency: stream.period,
+    releaseAmount: getNumberFromBN(
+      stream.amountPerPeriod,
+      mintMetadataDecimals
+    ),
+    amountAtCliff: getNumberFromBN(stream.cliffAmount, mintMetadataDecimals),
+    cancelable: stream.cancelableBySender,
+    recipient: new PublicKey(stream.recipient),
+  }
+}
+
+async function getStreamCreateDataUI(
+  connection: Connection,
+  data: Uint8Array,
+  accounts: AccountMetaData[]
+) {
+  try {
+    const cli = new StreamClient(
+      connection.rpcEndpoint,
+      Cluster.Devnet, //add option to client to attach connection
+      undefined,
+      accounts[0].pubkey.toBase58()
+    )
+
+    const hasExplicitPayer = accounts.length === 12
+    const metadataIndex = hasExplicitPayer ? 3 : 2
+    const mintIndex = hasExplicitPayer ? 6 : 5
+    const contractMetadata = accounts[metadataIndex].pubkey
+    const mint = accounts[mintIndex].pubkey
+    const stream = await cli.getOne(contractMetadata.toBase58())
+    const isExecuted = stream.createdAt > 0
+    const mintMetadata = getMintMetadata(mint)
+    const { decimals } = mintMetadata
+
+    const {
+      start,
+      amountDeposited,
+      releaseFrequency,
+      releaseAmount,
+      amountAtCliff,
+      cancelable,
+      recipient,
+    } = isExecuted
+      ? decodeStream(stream, decimals)
+      : // stream not yet initialized -> we deserialize from instruction data
+        deserializeStreamInformationFromData(data, decimals)
+
+    const withdrawn = getNumberFromBN(stream.withdrawnAmount, decimals)
+    const unlockedPercent = Math.round((withdrawn / amountDeposited) * 100)
+
+    return (
+      <div>
+        <div>
+          <span>Recipient:</span>
+          <span className="ml-2">{recipient.toBase58()}</span>
+        </div>
+
+        <span className="text-orange mt-2">
+          RECIPIENT SHOULD BE THE WALLET, NOT THE ASSOCIATED TOKEN ACCOUNT
+        </span>
+
+        <div className="mt-4">
+          <span>Start:</span>
+          {start == 0 && 'On approval'}
+          {start > 0 && (
+            <span className="ml-2">
+              {new Date(start * 1_000 /* second to ms */).toISOString()} UTC
+            </span>
+          )}
+        </div>
+
+        <div>
+          <span>Amount:</span>
+          <span className="ml-2">
+            {amountDeposited} {mintMetadata.symbol}
+          </span>
+        </div>
+
+        <div>
+          <span>Unlocked every:</span>
+          <span className="ml-2">{formatPeriodOfTime(releaseFrequency)}</span>
+        </div>
+        <div>
+          <span>Release amount:</span>
+          <span className="ml-2">
+            {releaseAmount} {mintMetadata.symbol}
+          </span>
+        </div>
+        <div>
+          <span>Released at start:</span>
+          <span className="ml-2">{amountAtCliff}</span>
+        </div>
+        <div>
+          <span>Contract is cancelable:</span>
+          <span className="ml-2">{cancelable ? 'Yes' : 'No'}</span>
+        </div>
+        <br></br>
+        {isExecuted && (
+          <div>
+            <span>Unlocked: {unlockedPercent}%</span>
+            <VoteResultsBar
+              approveVotePercentage={unlockedPercent}
+              denyVotePercentage={0}
+            />
+            <br></br>
+          </div>
+        )}
+      </div>
+    )
+  } catch (error) {
+    console.log(error)
+    return <></>
+  }
 }
 
 export const STREAMFLOW_INSTRUCTIONS = {
   strmRqUCoQUgGUan5YhzUZa6KqdzwX5L6FpUxfmKg5m: {
+    0: {
+      name: 'Streamflow: Create',
+      accounts: [
+        { name: 'Payer treasury', important: true },
+        { name: 'Governed treasury', important: true },
+        { name: 'Token treasury', important: true },
+        { name: 'Contract metadata' },
+        { name: 'PDA Token account' },
+        { name: 'Liquidator' },
+        { name: 'Mint' },
+        { name: 'Streamflow treasury' },
+        { name: 'Rent' },
+        { name: 'Streamflow program' },
+        { name: 'Token program' },
+        { name: 'System program' },
+      ],
+      getDataUI: getStreamCreateDataUI,
+    },
     174: {
       name: 'Streamflow: Create',
       accounts: [
@@ -156,92 +268,7 @@ export const STREAMFLOW_INSTRUCTIONS = {
         { name: 'Token program' },
         { name: 'System program' },
       ],
-      getDataUI: async (
-        connection: Connection,
-        data: Uint8Array,
-        accounts: AccountMetaData[]
-      ) => {
-        try {
-          const cli = new StreamClient(
-            connection.rpcEndpoint,
-            Cluster.Devnet, //add option to client to attach connection
-            undefined,
-            accounts[0].pubkey.toBase58()
-          )
-
-          const hasExplicitPayer = accounts.length === 12
-          const metadataIndex = hasExplicitPayer ? 3 : 2
-          const mintIndex = hasExplicitPayer ? 6 : 5
-
-          const contractMetadata = accounts[metadataIndex].pubkey
-          const mint = accounts[mintIndex].pubkey
-          const stream = await cli.getOne(contractMetadata.toBase58())
-          const isExecuted = stream.createdAt > 0
-          const mintMetadata = getMintMetadata(mint)
-          const decimals = mintMetadata.decimals
-          const streamData = deserStream(data, stream, decimals)
-          const withdrawn = getNumberFromBN(stream.withdrawnAmount, decimals)
-          const unlockedPercent = Math.round(
-            (withdrawn / streamData.amountDeposited) * 100
-          )
-
-          return (
-            <div>
-              <div>
-                <span>Start:</span>
-                {streamData.start == 0 && ' On approval '}
-                {streamData.start > 0 && (
-                  <span>
-                    {' '}
-                    {new Date(streamData.start * 1000).toISOString()} UTC
-                  </span>
-                )}
-              </div>
-
-              <div>
-                <span>Amount:</span>
-                <span>
-                  {' '}
-                  {streamData.amountDeposited} {mintMetadata.symbol}
-                </span>
-              </div>
-              <div>
-                <span>Unlocked every:</span>
-                <span> {formatPeriodOfTime(streamData.releaseFrequency)}</span>
-              </div>
-              <div>
-                <span>Release amount:</span>
-                <span>
-                  {' '}
-                  {streamData.releaseAmount} {mintMetadata.symbol}
-                </span>
-              </div>
-              <div>
-                <span>Released at start:</span>
-                <span> {streamData.amountAtCliff}</span>
-              </div>
-              <div>
-                <span>Contract is cancelable:</span>
-                <span> {streamData.cancelable ? 'Yes' : 'No'}</span>
-              </div>
-              <br></br>
-              {isExecuted && (
-                <div>
-                  <span>Unlocked: {unlockedPercent}%</span>
-                  <VoteResultsBar
-                    approveVotePercentage={unlockedPercent}
-                    denyVotePercentage={0}
-                  />
-                  <br></br>
-                </div>
-              )}
-            </div>
-          )
-        } catch (error) {
-          console.log(error)
-          return <></>
-        }
-      },
+      getDataUI: getStreamCreateDataUI,
     },
     232: {
       name: 'Streamflow: Cancel',
@@ -262,7 +289,7 @@ export const STREAMFLOW_INSTRUCTIONS = {
       ],
       getDataUI: async (
         connection: Connection,
-        data: Uint8Array,
+        _data: Uint8Array,
         accounts: AccountMetaData[]
       ) => {
         try {
@@ -292,25 +319,22 @@ export const STREAMFLOW_INSTRUCTIONS = {
             <div>
               <div>
                 <span>Stream ID:</span>
-
-                <span> {contractMetadata.toBase58()}</span>
+                <span className="ml-2"> {contractMetadata.toBase58()}</span>
               </div>
 
               <div>
                 <span>Recipient:</span>
-                <span> {recipient.toBase58()}</span>
+                <span className="ml-2"> {recipient.toBase58()}</span>
               </div>
               <div>
                 <span>Total withdrawn:</span>
-                <span>
-                  {' '}
+                <span className="ml-2">
                   {withdrawn} {mintMetadata.symbol}
                 </span>
               </div>
               <div>
                 <span>Amount to be returned:</span>
-                <span>
-                  {' '}
+                <span className="ml-2">
                   {amountDeposited - withdrawn} {mintMetadata.symbol}
                 </span>
               </div>

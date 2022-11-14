@@ -95,6 +95,7 @@ const REALM = () => {
   useEffect(() => {
     setPaginatedProposals(paginateProposals(0))
     pagination?.current?.setPage(0)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(filteredProposals)])
 
   useEffect(() => {
@@ -108,12 +109,14 @@ const REALM = () => {
       )
     }
     setFilteredProposals(proposals)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [filters, proposalSearch])
 
   useEffect(() => {
     const proposals = filterProposals(allProposals, filters)
     setDisplayedProposals(proposals)
     setFilteredProposals(proposals)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(proposals)])
 
   const onProposalPageChange = (page) => {
@@ -140,6 +143,7 @@ const REALM = () => {
           !v.account.hasVoteTimeEnded(governance)
         )
       }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     [allProposals]
   )
 
@@ -151,6 +155,7 @@ const REALM = () => {
       const proposals = filterProposals(allProposals, filters)
       setFilteredProposals(proposals)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [multiVoteMode])
 
   const allVotingProposalsSelected =
@@ -266,6 +271,7 @@ const REALM = () => {
       realm
         ? realm.account.votingProposalCount > 1 && connected && !isNftMode
         : false,
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     [realm, connected]
   )
   //Todo: move to own components with refactor to dao folder structure

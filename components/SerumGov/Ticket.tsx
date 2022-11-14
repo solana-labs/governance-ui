@@ -17,7 +17,6 @@ import { fmtBnMintDecimals } from '@tools/sdk/units'
 import { createAssociatedTokenAccount } from '@utils/associated'
 import { fmtSecsToTime, fmtTimeToString } from '@utils/formatting'
 import { notify } from '@utils/notifications'
-import { simulateTransaction } from '@utils/send'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import { BigNumber } from 'bignumber.js'
 import classNames from 'classnames'
@@ -140,11 +139,7 @@ const Ticket: FC<Props> = ({ ticket, createProposal, callback }) => {
             const tx = new Transaction({ feePayer: owner }).add(
               ...instructions.map((i) => i)
             )
-            const simulationResult = await simulateTransaction(
-              connection,
-              tx,
-              'single'
-            )
+            const simulationResult = await connection.simulateTransaction(tx)
 
             if (simulationResult.value.err) {
               notify({
@@ -225,11 +220,7 @@ const Ticket: FC<Props> = ({ ticket, createProposal, callback }) => {
             })
 
             const tx = new Transaction().add(...instructions.map((i) => i))
-            const simulationResult = await simulateTransaction(
-              connection,
-              tx,
-              'single'
-            )
+            const simulationResult = await connection.simulateTransaction(tx)
 
             if (simulationResult.value.err) {
               notify({

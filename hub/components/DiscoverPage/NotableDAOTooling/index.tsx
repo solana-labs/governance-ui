@@ -24,7 +24,7 @@ export const ITEMS = [
     urlId: 'RCH',
   },
   {
-    bannerImgSrc: 'https://snipboard.io/I2pMe5.jpg',
+    bannerImgSrc: 'https://i.imgur.com/uSs2TpD.png',
     description:
       'Explore a web3 native way to raise, invest and govern assets. Your partner for every stage of your venture.',
     iconImgSrc: 'https://snipboard.io/9tpqwk.jpg',

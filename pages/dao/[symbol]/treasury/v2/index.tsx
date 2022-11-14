@@ -24,6 +24,7 @@ export default function Treasury() {
     if (data._tag === Status.Ok && !selectedWallet) {
       setSelectedWallet(data.data.wallets[0])
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [data._tag])
 
   useEffect(() => {

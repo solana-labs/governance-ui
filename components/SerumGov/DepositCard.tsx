@@ -24,12 +24,11 @@ import {
 } from '@solana/spl-governance'
 import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 import useCreateProposal from '@hooks/useCreateProposal'
-import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
-import { simulateTransaction } from '@utils/send'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import { useRouter } from 'next/router'
 import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
+import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 
 type DepositCardProps = {
   mint: 'SRM' | 'MSRM'
@@ -182,10 +181,8 @@ const DepositCard = ({ mint, callback, createProposal }: DepositCardProps) => {
         const tx = new Transaction({ feePayer: createProposal.owner }).add(
           ...instructions.map((i) => i)
         )
-        const simulationResult = await simulateTransaction(
-          connection.current,
-          tx,
-          'single'
+        const simulationResult = await connection.current.simulateTransaction(
+          tx
         )
 
         if (simulationResult.value.err) {

@@ -92,6 +92,7 @@ const NewAccountForm = () => {
       },
     ]
     setTypes(accTypes)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [realmInfo?.programVersion])
   const filteredTypes = types.filter((x) => !x.hide)
   const wallet = useWalletStore((s) => s.current)
@@ -118,6 +119,7 @@ const NewAccountForm = () => {
   }
   useEffect(() => {
     setTreasuryType(filteredTypes[0])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [filteredTypes.length])
   const handleCreate = async () => {
     try {
@@ -255,6 +257,7 @@ const NewAccountForm = () => {
       setMint(null)
       setTokenInfo(undefined)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.mintAddress])
 
   useEffect(() => {
@@ -262,6 +265,7 @@ const NewAccountForm = () => {
       value: treasuryType?.defaultMint,
       propertyName: 'mintAddress',
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [treasuryType])
   useEffect(() => {
     setForm({
@@ -272,6 +276,7 @@ const NewAccountForm = () => {
         ? getMintDecimalAmount(realmMint!, realmMint!.supply).toNumber() * 0.01
         : 0,
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(realmMint)])
   return (
     <div className="space-y-3">

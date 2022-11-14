@@ -108,6 +108,7 @@ const Clawback = ({
       { governedAccount: governedAccount, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
   useEffect(() => {
     setGovernedAccount(
@@ -115,6 +116,7 @@ const Clawback = ({
         (x) => x.pubkey.toBase58() === realm?.account.authority?.toBase58()
       )
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.governedTokenAccount])
   useEffect(() => {
     const getVoters = async () => {
@@ -146,6 +148,7 @@ const Clawback = ({
     if (client) {
       getVoters()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [client])
   useEffect(() => {
     const getOwnedDepositsInfo = async () => {
@@ -182,9 +185,11 @@ const Clawback = ({
       setDeposits([])
     }
     setForm({ ...form, deposit: null, governedTokenAccount: undefined })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.voter])
   useEffect(() => {
     setForm({ ...form, governedTokenAccount: undefined })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.deposit])
   const schema = yup.object().shape({
     governedTokenAccount: yup

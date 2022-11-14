@@ -131,6 +131,7 @@ export default function useMembers() {
             }
           })
         : [],
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     [JSON.stringify(tokenRecords)]
   )
 
@@ -144,6 +145,7 @@ export default function useMembers() {
             }
           })
         : [],
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     [JSON.stringify(councilTokenOwnerRecords)]
   )
 
@@ -201,9 +203,13 @@ export default function useMembers() {
         .sort((a, b) => a.votesCasted - b.votesCasted)
         .reverse(),
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     [
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
       JSON.stringify(tokenRecordArray),
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
       JSON.stringify(councilRecordArray),
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
       realm?.pubkey.toBase58(),
     ]
   )
@@ -299,5 +305,6 @@ export default function useMembers() {
       getDelegates()
       setMembers([])
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [realm?.pubkey.toBase58()])
 }

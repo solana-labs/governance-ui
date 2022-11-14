@@ -47,7 +47,9 @@ export function LargeCard(props: Props) {
         <img className="w-full" src={props.imgSrc} />
         <div className="pt-3 px-6 pb-8">
           <header className="flex items-center justify-between">
-            <div className="font-bold text-neutral-900">{props.title}</div>
+            <div className="font-bold text-neutral-900 truncate">
+              {props.title}
+            </div>
             {pipe(
               result,
               RE.match(

@@ -11,6 +11,7 @@ import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay
 import { abbreviateAddress } from '@hub/lib/abbreviateAddress';
 import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
 import cx from '@hub/lib/cx';
+import { filterUniqueBy } from '@hub/lib/filterUniqueBy';
 import { useUserCreatedFeedItemCommentRepliesStore } from '@hub/stores/userCreatedFeedItemCommentReplies';
 import { BlockNodeType } from '@hub/types/RichTextDocument';
 
@@ -170,7 +171,7 @@ export function Content(props: Props) {
           </div>
         </div>
       )}
-      {replies.map((comment, i) => {
+      {replies.filter(filterUniqueBy('id')).map((comment, i) => {
         const isLast = replies && i === replies.length - 1;
 
         return (

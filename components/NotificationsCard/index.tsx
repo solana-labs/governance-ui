@@ -171,6 +171,7 @@ const NotificationsCard = ({
       }
       setLoading(false)
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     [setLoading, isAuthenticated, wallet, setErrorMessage, logIn]
   )
 
@@ -254,6 +255,7 @@ const NotificationsCard = ({
     if (firstTimeUser && sources) {
       anotherhandleUpdate()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [firstTimeUser, sources])
 
   const handleSave = useCallback(async () => {
@@ -277,6 +279,7 @@ const NotificationsCard = ({
       }
     }
     setLoading(false)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
     alerts,
     checkTelegramUnconfirmed,

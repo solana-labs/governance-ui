@@ -1,9 +1,5 @@
 import { BN, EventParser } from '@project-serum/anchor'
-import {
-  ProgramAccount,
-  Realm,
-  simulateTransaction,
-} from '@solana/spl-governance'
+import { ProgramAccount, Realm } from '@solana/spl-governance'
 import { PublicKey, Transaction, Connection } from '@solana/web3.js'
 import { tryGetMint } from '@utils/tokens'
 import {
@@ -230,11 +226,7 @@ const getDepositsAdditionalInfoEvents = async (
       .accounts({ registrar, voter })
       .instruction()
     transaction.add(logVoterInfoIx)
-    const batchOfDeposits = await simulateTransaction(
-      connection,
-      transaction,
-      'recent'
-    )
+    const batchOfDeposits = await connection.simulateTransaction(transaction)
     parser.parseLogs(batchOfDeposits.value.logs!, (event) => {
       events.push(event)
     })

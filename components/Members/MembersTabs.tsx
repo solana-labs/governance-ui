@@ -103,6 +103,7 @@ const MemberItems = ({
         dark={true}
       />
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [walletAddress])
   const renderAddressImage = useMemo(
     () => (
@@ -115,6 +116,7 @@ const MemberItems = ({
         placeholder={<UserCircleIcon className="w-6 h-6 text-fgd-3" />}
       />
     ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     [walletAddress]
   )
   return (

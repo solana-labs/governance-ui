@@ -182,6 +182,7 @@ export default function InviteMembersForm({
       // go to next step:
       serializeValues({ memberAddresses: null })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [formData])
 
   useEffect(() => {
@@ -189,6 +190,7 @@ export default function InviteMembersForm({
       shouldValidate: true,
       shouldDirty: true,
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [inviteList])
 
   // The user can get to this screen without connecting their wallet. If they
@@ -202,6 +204,7 @@ export default function InviteMembersForm({
     ) {
       setInviteList((currentList) => currentList.concat(userAddress))
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [userAddress])
 
   function serializeValues(values) {
