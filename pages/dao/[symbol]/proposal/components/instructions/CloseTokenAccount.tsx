@@ -4,10 +4,7 @@ import {
   ProgramAccount,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
-import {
-  getTransferInstructionObj,
-  validateInstruction,
-} from '@utils/instructionTools'
+import { validateInstruction } from '@utils/instructionTools'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import useWalletStore from 'stores/useWalletStore'
 
@@ -19,10 +16,16 @@ import InstructionForm, {
   InstructionInput,
   InstructionInputType,
 } from './FormCreator'
-import { Token, TOKEN_PROGRAM_ID } from '@solana/spl-token'
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  Token,
+  TOKEN_PROGRAM_ID,
+} from '@solana/spl-token'
 import * as yup from 'yup'
 import { getValidatedPublickKey } from '@utils/validations'
 import { PublicKey } from '@solana/web3.js'
+import { getATA } from '@utils/ataTools'
+import { sendTransactionsV3, SequenceType } from '@utils/sendTransactions'
 
 export interface CloseTokenAccountForm {
   governedAccount: AssetAccount | undefined
@@ -101,23 +104,72 @@ const CloseTokenAccount = ({
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstructionClose = ''
-    let serializedTransfer = ''
-    let instructions: any = null
+    const additionalSerializedInstructions: string[] = []
     if (
       isValid &&
       form!.governedAccount?.governance?.account &&
       wallet?.publicKey &&
       realm
     ) {
-      instructions = !form!.governedAccount.extensions.token!.account.amount?.isZero()
-        ? await getTransferInstructionObj({
-            connection: connection,
-            governedTokenAccount: form!.governedAccount!,
-            amount: form!.governedAccount.extensions.token!.account.amount!,
-            destinationAccount: form!.fundsDestinationAccount!,
+      if (!form!.governedAccount.extensions.token!.account.amount?.isZero()) {
+        const sourceAccount = form!.governedAccount.extensions.token?.publicKey
+        //this is the original owner
+        const destinationAccount = new PublicKey(form!.fundsDestinationAccount)
+        const mintPK = form!.governedAccount.extensions.mint!.publicKey
+        const amount = form!.governedAccount.extensions.token!.account.amount
+
+        //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
+        const {
+          currentAddress: receiverAddress,
+          needToCreateAta,
+        } = await getATA({
+          connection: connection,
+          receiverAddress: destinationAccount,
+          mintPK,
+          wallet: wallet!,
+        })
+        //we push this createATA instruction to transactions to create right before creating proposal
+        //we don't want to create ata only when instruction is serialized
+        if (needToCreateAta) {
+          const createAtaInstruction = Token.createAssociatedTokenAccountInstruction(
+            ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+            TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+            mintPK, // mint
+            receiverAddress, // ata
+            destinationAccount, // owner of token account
+            wallet!.publicKey! // fee payer
+          )
+          //ata needs to be created before otherwise simulations will throw errors.
+          //createCloseAccountInstruction has check if ata is existing its not like in transfer where we can run
+          //simulation without created ata.
+          await sendTransactionsV3({
+            connection: connection.current,
             wallet: wallet,
+            transactionInstructions: [
+              {
+                instructionsSet: [
+                  {
+                    transactionInstruction: createAtaInstruction,
+                  },
+                ],
+                sequenceType: SequenceType.Parallel,
+              },
+            ],
           })
-        : null
+        }
+        const transferIx = Token.createTransferInstruction(
+          TOKEN_PROGRAM_ID,
+          sourceAccount!,
+          receiverAddress,
+          form!.governedAccount!.extensions!.token!.account.owner,
+          [],
+          amount
+        )
+        additionalSerializedInstructions.push(
+          serializeInstructionToBase64(transferIx)
+        )
+      }
+
       const closeInstruction = Token.createCloseAccountInstruction(
         TOKEN_PROGRAM_ID,
         form!.governedAccount.extensions.token!.publicKey!,
@@ -125,26 +177,19 @@ const CloseTokenAccount = ({
         form!.governedAccount.extensions.token!.account.owner!,
         []
       )
-      serializedTransfer = instructions?.transferInstruction
-        ? serializeInstructionToBase64(instructions?.transferInstruction)
-        : ''
       serializedInstructionClose = serializeInstructionToBase64(
         closeInstruction
       )
+      additionalSerializedInstructions.push(serializedInstructionClose)
     }
     const obj: UiInstruction = {
       prerequisiteInstructions: [],
-      serializedInstruction: serializedInstructionClose,
-      additionalSerializedInstructions: [],
+      serializedInstruction: '',
+      additionalSerializedInstructions: additionalSerializedInstructions,
       isValid,
       governance: form!.governedAccount?.governance,
     }
-    if (instructions?.ataInstruction) {
-      obj.prerequisiteInstructions?.push(instructions?.ataInstruction)
-    }
-    if (serializedTransfer) {
-      obj.additionalSerializedInstructions!.push(serializedTransfer)
-    }
+
     return obj
   }
   useEffect(() => {

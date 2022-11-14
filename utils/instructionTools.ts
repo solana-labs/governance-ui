@@ -10,7 +10,7 @@ import {
   TOKEN_PROGRAM_ID,
   u64,
 } from '@solana/spl-token'
-import { SignerWalletAdapter, WalletAdapter } from '@solana/wallet-adapter-base'
+import { WalletAdapter } from '@solana/wallet-adapter-base'
 import {
   Keypair,
   PublicKey,
@@ -608,70 +608,6 @@ export async function getConvertToStSolInstruction({
     governance: form.governedTokenAccount?.governance,
     prerequisiteInstructions: prerequisiteInstructions,
   }
-}
-
-export const getTransferInstructionObj = async ({
-  connection,
-  governedTokenAccount,
-  destinationAccount,
-  amount,
-  wallet,
-}: {
-  connection: ConnectionContext
-  governedTokenAccount: AssetAccount
-  destinationAccount: string
-  amount: number | BN
-  wallet: SignerWalletAdapter
-}) => {
-  const obj: {
-    transferInstruction: TransactionInstruction | null
-    ataInstruction: TransactionInstruction | null
-  } = {
-    transferInstruction: null,
-    ataInstruction: null,
-  }
-  const sourceAccount = governedTokenAccount.extensions.transferAddress
-  //this is the original owner
-  const destinationAccountPk = new PublicKey(destinationAccount)
-  const mintPK = governedTokenAccount!.extensions!.mint!.publicKey!
-  const mintAmount =
-    typeof amount === 'number'
-      ? parseMintNaturalAmountFromDecimal(
-          amount,
-          governedTokenAccount.extensions.mint!.account.decimals
-        )
-      : amount
-
-  //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
-  const { currentAddress: receiverAddress, needToCreateAta } = await getATA({
-    connection: connection,
-    receiverAddress: destinationAccountPk,
-    mintPK,
-    wallet: wallet!,
-  })
-  //we push this createATA instruction to transactions to create right before creating proposal
-  //we don't want to create ata only when instruction is serialized
-  if (needToCreateAta) {
-    const ataInst = Token.createAssociatedTokenAccountInstruction(
-      ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-      TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-      mintPK, // mint
-      receiverAddress, // ata
-      destinationAccountPk, // owner of token account
-      wallet!.publicKey! // fee payer
-    )
-    obj.ataInstruction = ataInst
-  }
-  const transferIx = Token.createTransferInstruction(
-    TOKEN_PROGRAM_ID,
-    sourceAccount!,
-    receiverAddress,
-    governedTokenAccount!.extensions!.token!.account.owner,
-    [],
-    new u64(mintAmount.toString())
-  )
-  obj.transferInstruction = transferIx
-  return obj
 }
 
 export async function getCreateTokenMetadataInstruction({
