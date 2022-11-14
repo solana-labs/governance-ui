@@ -81,7 +81,6 @@ const SelectInstructionType = ({
     computeFilteredAndSortedInstructionsTypes()
   }, [computeFilteredAndSortedInstructionsTypes])
 
-  // Only display the package name is a no package is selected
   const getInstructionDisplayName = (
     instruction?: InstructionType
   ): string | JSX.Element => {
