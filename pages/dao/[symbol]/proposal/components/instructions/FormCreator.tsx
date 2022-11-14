@@ -127,6 +127,7 @@ const InstructionInput = ({
         return (
           <Select
             label={input.label}
+            // Note that this is different from native selects, which simply use the value as the value, not the name-value pair.
             value={form[input.name]?.name}
             placeholder="Please select..."
             onChange={(value) => {
