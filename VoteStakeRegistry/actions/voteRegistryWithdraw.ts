@@ -53,13 +53,13 @@ export const voteRegistryWithdraw = async ({
     splProgramId,
     splProgramVersion,
   })
-  const txes = [instructions].map((txBatch, batchIdx) => {
+  const txes = [instructions].map((txBatch) => {
     return {
-      instructionsSet: txBatchesToInstructionSetWithSigners(
-        txBatch,
-        [],
-        batchIdx
-      ),
+      instructionsSet: txBatch.map((x) => {
+        return {
+          transactionInstruction: x,
+        }
+      }),
       sequenceType: SequenceType.Sequential,
     }
   })
