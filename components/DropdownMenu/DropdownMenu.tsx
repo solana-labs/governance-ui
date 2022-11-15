@@ -21,10 +21,14 @@ const DropdownMenu: React.FC<Props> = (props) => {
         side="top"
         sideOffset={5}
       >
-       {(Array.isArray(props.children) ? props.children : [props.children])
+        {(Array.isArray(props.children) ? props.children : [props.children])
           .filter((menuItem) => menuItem)
-          .map((menuItem: React.ReactNode, index: number) => (
-            <Dropdown.Item className="DropdownMenuItem" key={menuItem.toString()}>
+          .map((menuItem: React.ReactNode) => (
+            <Dropdown.Item
+              className="DropdownMenuItem"
+              // menu item will exist because of the filter above.
+              key={menuItem!.toString()}
+            >
               {menuItem}
             </Dropdown.Item>
           ))}
