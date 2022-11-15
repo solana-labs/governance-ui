@@ -113,9 +113,7 @@ const RealmConfigModal = ({ closeProposalModal, isProposalModalOpen }) => {
               programVersion,
               realm.pubkey,
               realm.account.authority,
-              form?.removeCouncil
-                ? undefined
-                : realm?.account.config.councilMint,
+              form.removeCouncil ? undefined : realm.account.config.councilMint,
               parseMintSupplyFraction(
                 form.communityMintSupplyFactor.toString()
               ),
