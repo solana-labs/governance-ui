@@ -442,16 +442,12 @@ const New = () => {
       [Instructions.ClaimPendingDeposit]: FriktionClaimPendingDeposit,
       [Instructions.ClaimPendingWithdraw]: FriktionClaimPendingWithdraw,
       [Instructions.DepositIntoCastle]: CastleDeposit,
-<<<<<<< HEAD
-      [Instructions.WithrawFromCastle]: CastleWithdraw,
       [Instructions.MeanCreateAccount]: MeanCreateAccount,
       [Instructions.MeanFundAccount]: MeanFundAccount,
       [Instructions.MeanWithdrawFromAccount]: MeanWithdrawFromAccount,
       [Instructions.MeanCreateStream]: MeanCreateStream,
       [Instructions.MeanTransferStream]: MeanTransferStream,
-=======
       [Instructions.WithdrawFromCastle]: CastleWithdraw,
->>>>>>> 71d7da18 (nit)
       [Instructions.DepositIntoGoblinGold]: GoblinGoldDeposit,
       [Instructions.WithdrawFromGoblinGold]: GoblinGoldWithdraw,
       [Instructions.CreateSolendObligationAccount]: CreateObligationAccount,
