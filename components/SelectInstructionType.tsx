@@ -75,7 +75,7 @@ const SelectInstructionType = ({
     }
 
     setFilteredAndSortedInstructionTypes(filteredAndSortedInstructionTypes)
-  }, [packageId, instructionTypes])
+  }, [packageId, selectedInstruction, instructionTypes, onChange])
 
   useEffect(() => {
     computeFilteredAndSortedInstructionsTypes()
