@@ -3,11 +3,7 @@ import { BN } from '@project-serum/anchor'
 import { withVoteRegistryWithdraw } from '../sdk/withVoteRegistryWithdraw'
 import { RpcContext } from '@solana/spl-governance'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
-import {
-  sendTransactionsV3,
-  SequenceType,
-  txBatchesToInstructionSetWithSigners,
-} from '@utils/sendTransactions'
+import { sendTransactionsV3, SequenceType } from '@utils/sendTransactions'
 
 export const voteRegistryWithdraw = async ({
   rpcContext,
