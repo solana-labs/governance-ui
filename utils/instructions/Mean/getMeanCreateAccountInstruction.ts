@@ -1,4 +1,3 @@
-import { TreasuryType } from '@mean-dao/msp'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 
