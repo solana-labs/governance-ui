@@ -35,7 +35,7 @@ export default function useTreasuryInfo(): Result<Data> {
   )
   const [nfts, setNfts] = useState<NFT[]>([])
   const [nftsLoading, setNftsLoading] = useState(true)
-  const [domainsLoading, setDoaminsLoading] = useState(true)
+  const [domainsLoading, setDomainsLoading] = useState(true)
   const [auxWallets, setAuxWallets] = useState<AuxiliaryWallet[]>([])
   const [wallets, setWallets] = useState<Wallet[]>([])
   const [domains, setDomains] = useState<Domain[]>([])
@@ -49,7 +49,7 @@ export default function useTreasuryInfo(): Result<Data> {
   useEffect(() => {
     if (!loadingGovernedAccounts && accounts.length) {
       setNftsLoading(true)
-      setDoaminsLoading(true)
+      setDomainsLoading(true)
       setBuildingWallets(true)
 
       getDomains(
@@ -57,7 +57,7 @@ export default function useTreasuryInfo(): Result<Data> {
         connection.current
       ).then((domainNames) => {
         setDomains(domainNames)
-        setDoaminsLoading(false)
+        setDomainsLoading(false)
       })
 
       getNfts(
