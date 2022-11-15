@@ -236,7 +236,7 @@ const getSolAccountsObj = async (
 }
 
 // Return array without duplicates
-function uniquePublicKey(array: PublicKey[]): PublicKey[] {
+const uniquePublicKey = (array: PublicKey[]): PublicKey[] => {
   return Array.from(
     array.reduce((mintsPks, publicKey) => {
       // Transform to string for Set to be able to identify duplicates
@@ -410,7 +410,7 @@ const getSolAccountObj = async (
     }
   )
 
-  const groups = chunks(tokenAccountsOwnedBySolAccounts, 10)
+  const groups = chunks(tokenAccountsOwnedBySolAccounts, 100)
 
   const mintAccounts = (
     await Promise.all(
@@ -480,31 +480,25 @@ const getMintAccountsInfo = async (
   { endpoint, current: { commitment } }: ConnectionContext,
   publicKeys: PublicKey[]
 ): Promise<TokenProgramAccount<MintAccount>[]> => {
-  const { data: mintAccountsJson } = await axios.request({
-    url: endpoint,
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: JSON.stringify(
-      publicKeys.map((pubkey) => {
-        const id = pubkey.toBase58()
+  const { data: mintAccountsJson } = await axios.post(
+    endpoint,
+    publicKeys.map((pubkey) => {
+      const id = pubkey.toBase58()
 
-        return {
-          jsonrpc: '2.0',
+      return {
+        jsonrpc: '2.0',
+        id,
+        method: 'getAccountInfo',
+        params: [
           id,
-          method: 'getAccountInfo',
-          params: [
-            id,
-            {
-              commitment,
-              encoding: 'base64',
-            },
-          ],
-        }
-      })
-    ),
-  })
+          {
+            commitment,
+            encoding: 'base64',
+          },
+        ],
+      }
+    })
+  )
 
   if (!mintAccountsJson) {
     throw new Error(
@@ -535,7 +529,7 @@ const getTokenAccountsInfo = async (
   { endpoint, current: { commitment } }: ConnectionContext,
   publicKeys: PublicKey[]
 ): Promise<TokenProgramAccount<TokenAccount>[]> => {
-  const { data: tokenAccountsInfoJson } = await axios.request<
+  const { data: tokenAccountsInfoJson } = await axios.post<
     unknown,
     {
       data: {
@@ -547,40 +541,34 @@ const getTokenAccountsInfo = async (
         }[]
       }[]
     }
-  >({
-    url: endpoint,
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: JSON.stringify(
-      publicKeys.map((publicKey) => ({
-        jsonrpc: '2.0',
-        id: 1,
-        method: 'getProgramAccounts',
-        params: [
-          TOKEN_PROGRAM_ID.toBase58(),
-          {
-            commitment,
-            encoding: 'base64',
-            filters: [
-              {
+  >(
+    endpoint,
+    publicKeys.map((publicKey) => ({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'getProgramAccounts',
+      params: [
+        TOKEN_PROGRAM_ID.toBase58(),
+        {
+          commitment,
+          encoding: 'base64',
+          filters: [
+            {
+              // number of bytes
+              dataSize: TokenAccountLayout.span,
+            },
+            {
+              memcmp: {
                 // number of bytes
-                dataSize: TokenAccountLayout.span,
+                offset: tokenAccountOwnerOffset,
+                bytes: publicKey.toBase58(),
               },
-              {
-                memcmp: {
-                  // number of bytes
-                  offset: tokenAccountOwnerOffset,
-                  bytes: publicKey.toBase58(),
-                },
-              },
-            ],
-          },
-        ],
-      }))
-    ),
-  })
+            },
+          ],
+        },
+      ],
+    }))
+  )
 
   if (!tokenAccountsInfoJson) {
     throw new Error(
@@ -613,7 +601,7 @@ const getSolAccountsInfo = async (
   connection: ConnectionContext,
   publicKeys: { governancePk: PublicKey; nativeSolAddress: PublicKey }[]
 ): Promise<SolAccInfo[]> => {
-  const { data: solAccountsJson } = await axios.request<
+  const { data: solAccountsJson } = await axios.post<
     unknown,
     {
       data: {
@@ -624,27 +612,21 @@ const getSolAccountsInfo = async (
         }
       }[]
     }
-  >({
-    url: connection.endpoint,
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: JSON.stringify([
-      ...publicKeys.map((x) => ({
-        jsonrpc: '2.0',
-        id: 1,
-        method: 'getAccountInfo',
-        params: [
-          x.nativeSolAddress.toBase58(),
-          {
-            commitment: connection.current.commitment,
-            encoding: 'jsonParsed',
-          },
-        ],
-      })),
-    ]),
-  })
+  >(
+    connection.endpoint,
+    publicKeys.map((x) => ({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'getAccountInfo',
+      params: [
+        x.nativeSolAddress.toBase58(),
+        {
+          commitment: connection.current.commitment,
+          encoding: 'jsonParsed',
+        },
+      ],
+    }))
+  )
 
   if (!solAccountsJson.length) {
     return []
@@ -701,7 +683,7 @@ const loadGovernedTokenAccounts = async (
   const tokenAccountsInfo = (
     await Promise.all(
       // Load infos in batch, cannot load 9999 accounts within one request
-      chunks(tokenAccountsOwnedByGovernances, 10).map((group) =>
+      chunks(tokenAccountsOwnedByGovernances, 100).map((group) =>
         getTokenAccountsInfo(connection, group)
       )
     )
@@ -710,7 +692,7 @@ const loadGovernedTokenAccounts = async (
   const governedTokenAccounts = (
     await Promise.all(
       // Load infos in batch, cannot load 9999 accounts within one request
-      chunks(tokenAccountsInfo, 10).map((group) =>
+      chunks(tokenAccountsInfo, 100).map((group) =>
         getTokenAssetAccounts(group, governancesArray, realm, connection)
       )
     )
