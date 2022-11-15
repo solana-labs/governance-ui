@@ -141,7 +141,7 @@ const CloseTokenAccount = ({
           )
           //ata needs to be created before otherwise simulations will throw errors.
           //createCloseAccountInstruction has check if ata is existing its not like in transfer where we can run
-          //simulation without created ata.
+          //simulation without created ata and we create it on the fly before proposal
           await sendTransactionsV3({
             connection: connection.current,
             wallet: wallet,
