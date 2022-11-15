@@ -57,7 +57,7 @@ const Domain: React.FC<Props> = (props) => {
   return (
     <div className="flex justify-between items-center px-2 py-6 border-b-[0.5px] border-white/50">
       <span className="block text-base font-medium">
-        {props.domain.name + '.sol'}
+        {`${props.domain.name}.sol`}
       </span>
       <div className="flex gap-4 ">
         <Link
