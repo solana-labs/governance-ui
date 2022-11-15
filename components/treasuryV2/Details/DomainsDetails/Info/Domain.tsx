@@ -82,7 +82,7 @@ const Domain: React.FC<Props> = (props) => {
         <DropdownMenu
           triggerButton={
             <button aria-label="Further Options">
-              <DotsVerticalIcon className=" h-4 w-4" />
+              <DotsVerticalIcon className="h-4 w-4" />
             </button>
           }
         >

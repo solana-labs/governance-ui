@@ -1,5 +1,5 @@
 export interface Domain {
   owner: string
-  name: string | undefined
+  name?: string
   address: string
 }
