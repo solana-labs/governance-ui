@@ -4,7 +4,6 @@ const Index = () => {
   const router = useRouter()
 
   useEffect(() => {
-    const { REALM } = process.env
     const mainUrl = `/dao/ORCA`
     router.replace(mainUrl)
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
