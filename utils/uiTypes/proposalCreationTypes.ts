@@ -405,7 +405,7 @@ export interface ForesightHasCategoryId extends ForesightHasGovernedAccount {
 
 export interface ForesightMakeAddMarketListToCategoryParams
   extends ForesightHasCategoryId,
-  ForesightHasMarketListId { }
+    ForesightHasMarketListId {}
 
 export interface ForesightMakeResolveMarketParams extends ForesightHasMarketId {
   winner: number
