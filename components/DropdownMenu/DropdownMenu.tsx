@@ -12,7 +12,7 @@ const DropdownMenu: React.FC<Props> = (props) => {
     <Dropdown.Root>
       <Dropdown.Trigger asChild>
         <button aria-label="Further Options">
-          <DotsVerticalIcon className=" h-4 w-4" />
+          <DotsVerticalIcon className="h-4 w-4" />
         </button>
       </Dropdown.Trigger>
 
