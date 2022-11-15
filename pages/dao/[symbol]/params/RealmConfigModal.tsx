@@ -73,7 +73,9 @@ const RealmConfigModal = ({ closeProposalModal, isProposalModalOpen }) => {
       throw new Error('realm.account.authority is not defined')
     if (
       form.communityMintSupplyFactor === undefined ||
-      form.minCommunityTokensToCreateGovernance === undefined
+      form.minCommunityTokensToCreateGovernance === undefined ||
+      form.communityTokenType === undefined ||
+      form.councilTokenType === undefined
     ) {
       throw new Error('form is missing required fields')
     }
@@ -123,12 +125,20 @@ const RealmConfigModal = ({ closeProposalModal, isProposalModalOpen }) => {
                 voterWeightAddin: form.communityVoterWeightAddin
                   ? new PublicKey(form.communityVoterWeightAddin)
                   : undefined,
-                maxVoterWeightAddin: form?.maxCommunityVoterWeightAddin
+                maxVoterWeightAddin: form.maxCommunityVoterWeightAddin
                   ? new PublicKey(form.maxCommunityVoterWeightAddin)
                   : undefined,
-                tokenType: GoverningTokenType.Liquid,
+                tokenType: form.communityTokenType.value,
               }),
-              undefined,
+              new GoverningTokenConfigAccountArgs({
+                voterWeightAddin: form.councilVoterWeightAddin
+                  ? new PublicKey(form.councilVoterWeightAddin)
+                  : undefined,
+                maxVoterWeightAddin: form.maxCouncilVoterWeightAddin
+                  ? new PublicKey(form.maxCouncilVoterWeightAddin)
+                  : undefined,
+                tokenType: form.councilTokenType.value,
+              }),
               // Pass the payer only if RealmConfigAccount doens't exist and needs to be created
               // TODO: If payer is passed then only the payer can execute the proposal
               //       We should use the DAO Wallet instead, and top it up if there is not enough SOL there
@@ -150,7 +160,7 @@ const RealmConfigModal = ({ closeProposalModal, isProposalModalOpen }) => {
                 voterWeightAddin: form.communityVoterWeightAddin
                   ? new PublicKey(form.communityVoterWeightAddin)
                   : undefined,
-                maxVoterWeightAddin: form?.maxCommunityVoterWeightAddin
+                maxVoterWeightAddin: form.maxCommunityVoterWeightAddin
                   ? new PublicKey(form.maxCommunityVoterWeightAddin)
                   : undefined,
                 tokenType: GoverningTokenType.Liquid,
