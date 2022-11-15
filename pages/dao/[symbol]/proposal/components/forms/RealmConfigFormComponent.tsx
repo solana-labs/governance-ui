@@ -25,6 +25,10 @@ export interface RealmConfigForm {
   removeCouncil: boolean
   maxCommunityVoterWeightAddin: string
   communityMintSupplyFactor: number
+  communityTokenType: typeof TOKEN_TYPE_NAME_VALUES[number]
+  councilTokenType: typeof TOKEN_TYPE_NAME_VALUES[number]
+  councilVoterWeightAddin: string
+  maxCouncilVoterWeightAddin: string
 }
 
 const TOKEN_TYPE_NAME_VALUES = [
