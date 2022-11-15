@@ -65,8 +65,7 @@ const RealmConfigModal = ({ closeProposalModal, isProposalModalOpen }) => {
   const schema = getRealmCfgSchema({ form })
   const handleCreate = async () => {
     // START jank validation
-    // @asktree: obviously better to have non-jank, but at the very least we shouldn't run instruction-generating code on invalid inputs.
-    // Should not run if mint is not defined
+    // @asktree: at the very least we shouldn't run instruction-generating code on undefined inputs.
     if (mint === undefined) throw new Error('mint info is not defined')
     if (realmInfo === undefined) throw new Error('realm info is not defined')
     if (realm?.account.authority === undefined)

@@ -16,7 +16,6 @@ import InstructionForm, {
   InstructionInputType,
 } from '../instructions/FormCreator'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
-import { useEffect } from 'react'
 
 export interface RealmConfigForm {
   governedAccount: AssetAccount | undefined
@@ -25,10 +24,10 @@ export interface RealmConfigForm {
   removeCouncil: boolean
   maxCommunityVoterWeightAddin: string
   communityMintSupplyFactor: number
-  communityTokenType: typeof TOKEN_TYPE_NAME_VALUES[number]
-  councilTokenType: typeof TOKEN_TYPE_NAME_VALUES[number]
-  councilVoterWeightAddin: string
-  maxCouncilVoterWeightAddin: string
+  communityTokenType: typeof TOKEN_TYPE_NAME_VALUES[number] // programVersion >= v3
+  councilTokenType: typeof TOKEN_TYPE_NAME_VALUES[number] // programVersion >= v3
+  councilVoterWeightAddin: string // programVersion >= v3
+  maxCouncilVoterWeightAddin: string // programVersion >= v3
 }
 
 const TOKEN_TYPE_NAME_VALUES = [
