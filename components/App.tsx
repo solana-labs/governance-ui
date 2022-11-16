@@ -27,7 +27,6 @@ import useWallet from '@hooks/useWallet'
 import useWalletStore from 'stores/useWalletStore'
 import NftVotingCountingModal from '@components/NftVotingCountingModal'
 import { getResourcePathPart } from '@tools/core/resources'
-import Footer from './Footer'
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -241,7 +240,6 @@ export function App(props: Props) {
               <TransactionLoader></TransactionLoader>
               <NftVotingCountingModal />
               <PageBodyContainer>{props.children}</PageBodyContainer>
-              <Footer />
             </GatewayProvider>
           </WalletIdentityProvider>
         </ThemeProvider>
