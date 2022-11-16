@@ -22,7 +22,6 @@ const PageBodyContainer = ({ children }) => {
           {children}
         </div>
       </div>
-      <Footer />
     </>
   )
 }
