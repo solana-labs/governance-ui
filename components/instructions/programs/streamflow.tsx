@@ -11,6 +11,16 @@ import {
   Stream,
 } from '@streamflow/stream'
 import { PERIOD } from 'pages/dao/[symbol]/proposal/components/instructions/Streamflow/CreateStream'
+import {
+  InstructionDataUI,
+  DataUIAddress,
+  DataUIAmount,
+  DataUIDateUTC,
+  DataUILabel,
+  DataUIRow,
+  DataUIWarning,
+  DataUIText,
+} from '@components/InstructionDataUI'
 
 export const DEFAULT_DECIMAL_PLACES = 2
 
@@ -170,60 +180,60 @@ async function getStreamCreateDataUI(
 
     return (
       <div>
-        <div>
-          <span>Recipient:</span>
-          <span className="ml-2">{recipient.toBase58()}</span>
-        </div>
+        <InstructionDataUI>
+          <DataUIRow>
+            <DataUILabel label="Recipient" />
+            <DataUIAddress address={recipient} />
+          </DataUIRow>
+          <DataUIRow>
+            <DataUIWarning message="RECIPIENT SHOULD BE THE WALLET, NOT THE ASSOCIATED TOKEN ACCOUNT" />
+          </DataUIRow>
+          <DataUIRow>
+            <DataUILabel label="Start" />
+            {start > 0 ? (
+              <DataUIDateUTC
+                date={new Date(start * 1_000 /* second to ms */)}
+              />
+            ) : (
+              <DataUIText text="On Approval" />
+            )}
+          </DataUIRow>
 
-        <span className="text-orange mt-2">
-          RECIPIENT SHOULD BE THE WALLET, NOT THE ASSOCIATED TOKEN ACCOUNT
-        </span>
+          <DataUIRow>
+            <DataUILabel label="Amount" />
+            <DataUIAmount
+              amount={amountDeposited}
+              symbol={mintMetadata.symbol}
+            />
+          </DataUIRow>
+          <DataUIRow>
+            <DataUILabel label="Unlocked every" />
+            <DataUIText text={formatPeriodOfTime(releaseFrequency)} />
+          </DataUIRow>
+          <DataUIRow>
+            <DataUILabel label="Release amount" />
+            <DataUIAmount amount={releaseAmount} symbol={mintMetadata.symbol} />
+          </DataUIRow>
+          <DataUIRow>
+            <DataUILabel label="Release at start" />
+            <DataUIAmount amount={amountAtCliff} symbol={mintMetadata.symbol} />
+          </DataUIRow>
+          <DataUIRow>
+            <DataUILabel label="Contract is cancelable" />
+            <DataUIText text={cancelable ? 'Yes' : 'No'} />
+          </DataUIRow>
+        </InstructionDataUI>
 
-        <div className="mt-4">
-          <span>Start:</span>
-          {start == 0 && 'On approval'}
-          {start > 0 && (
-            <span className="ml-2">
-              {new Date(start * 1_000 /* second to ms */).toISOString()} UTC
-            </span>
-          )}
-        </div>
-
-        <div>
-          <span>Amount:</span>
-          <span className="ml-2">
-            {amountDeposited} {mintMetadata.symbol}
-          </span>
-        </div>
-
-        <div>
-          <span>Unlocked every:</span>
-          <span className="ml-2">{formatPeriodOfTime(releaseFrequency)}</span>
-        </div>
-        <div>
-          <span>Release amount:</span>
-          <span className="ml-2">
-            {releaseAmount} {mintMetadata.symbol}
-          </span>
-        </div>
-        <div>
-          <span>Released at start:</span>
-          <span className="ml-2">{amountAtCliff}</span>
-        </div>
-        <div>
-          <span>Contract is cancelable:</span>
-          <span className="ml-2">{cancelable ? 'Yes' : 'No'}</span>
-        </div>
         <br></br>
         {isExecuted && (
-          <div>
+          <span>
             <span>Unlocked: {unlockedPercent}%</span>
             <VoteResultsBar
               approveVotePercentage={unlockedPercent}
               denyVotePercentage={0}
             />
             <br></br>
-          </div>
+          </span>
         )}
       </div>
     )
@@ -316,29 +326,27 @@ export const STREAMFLOW_INSTRUCTIONS = {
           )
 
           return (
-            <div>
-              <div>
-                <span>Stream ID:</span>
-                <span className="ml-2"> {contractMetadata.toBase58()}</span>
-              </div>
-
-              <div>
-                <span>Recipient:</span>
-                <span className="ml-2"> {recipient.toBase58()}</span>
-              </div>
-              <div>
-                <span>Total withdrawn:</span>
-                <span className="ml-2">
-                  {withdrawn} {mintMetadata.symbol}
-                </span>
-              </div>
-              <div>
-                <span>Amount to be returned:</span>
-                <span className="ml-2">
-                  {amountDeposited - withdrawn} {mintMetadata.symbol}
-                </span>
-              </div>
-            </div>
+            <InstructionDataUI>
+              <DataUIRow>
+                <DataUILabel label="Stream ID" />
+                <DataUIAddress address={contractMetadata} />
+              </DataUIRow>
+              <DataUIRow>
+                <DataUILabel label="Recipient" />
+                <DataUIAddress address={recipient} />
+              </DataUIRow>
+              <DataUIRow>
+                <DataUILabel label="Total Withdrawn" />
+                <DataUIAmount amount={withdrawn} symbol={mintMetadata.symbol} />
+              </DataUIRow>
+              <DataUIRow>
+                <DataUILabel label="Amount to be returned" />
+                <DataUIAmount
+                  amount={amountDeposited - withdrawn}
+                  symbol={mintMetadata.symbol}
+                />
+              </DataUIRow>
+            </InstructionDataUI>
           )
         } catch (error) {
           console.log(error)
