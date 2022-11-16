@@ -19,19 +19,19 @@ const GovernedAccountSelect = ({
   governance,
   label,
   noMaxWidth,
-  autoselectFirst = true,
+  autoSelectFirst = true,
 }: {
   onChange: (value: unknown) => void
-  value?: AssetAccount
+  value?: AssetAccount | null
   error?: string
   governedAccounts: AssetAccount[]
-  shouldBeGoverned?: boolean
-  governance?: ProgramAccount<Governance> | null | undefined
+  shouldBeGoverned?: boolean | null
+  governance?: ProgramAccount<Governance> | null
   label?: string
   noMaxWidth?: boolean
-  autoselectFirst?: boolean
+  autoSelectFirst?: boolean
 }) => {
-  function getLabel(value?: AssetAccount) {
+  function getLabel(value?: AssetAccount | null) {
     if (!value) {
       return null
     }
@@ -116,7 +116,7 @@ const GovernedAccountSelect = ({
     )
   }
   useEffect(() => {
-    if (governedAccounts.length == 1 && autoselectFirst) {
+    if (governedAccounts.length == 1 && autoSelectFirst) {
       //wait for microtask queue to be empty
       setTimeout(() => {
         onChange(governedAccounts[0])

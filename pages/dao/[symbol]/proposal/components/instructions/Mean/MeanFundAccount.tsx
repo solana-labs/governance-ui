@@ -40,7 +40,7 @@ const MeanFundAccountComponent = ({ index, governance }: Props) => {
 
   // governedTokenAccount
 
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
 
   // instruction
