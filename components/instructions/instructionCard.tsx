@@ -21,7 +21,6 @@ import { ExecuteInstructionButton, PlayState } from './ExecuteInstructionButton'
 import { ProgramAccount } from '@solana/spl-governance'
 import InspectorButton from '@components/explorer/inspectorButton'
 import { FlagInstructionErrorButton } from './FlagInstructionErrorButton'
-import { deprecated } from '@metaplex-foundation/mpl-token-metadata'
 import axios from 'axios'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import tokenService from '@utils/services/token'
@@ -30,6 +29,7 @@ import InstructionOptionInput, {
   InstructionOptions,
 } from '@components/InstructionOptions'
 import StreamCard from '@components/StreamCard'
+import { Metaplex, findMetadataPda } from '@metaplex-foundation/js'
 
 export default function InstructionCard({
   index,
@@ -88,12 +88,13 @@ export default function InstructionCard({
         const mint = tokenAccount?.account.mint
         if (mint) {
           try {
-            const metadataPDA = await deprecated.Metadata.getPDA(mint)
-            const tokenMetadata = await deprecated.Metadata.load(
-              connection.current,
-              metadataPDA
-            )
-            const url = (await axios.get(tokenMetadata?.data!.data.uri)).data
+            const metaplex = new Metaplex(connection.current)
+            const metadataPDA = findMetadataPda(mint)
+            const tokenMetadata = await metaplex.nfts().findByMetadata({
+              metadata: new PublicKey(metadataPDA.toBase58()),
+            })
+
+            const url = (await axios.get(tokenMetadata.uri)).data
             setNftImgUrl(url.image)
           } catch (e) {
             console.log(e)
