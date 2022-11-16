@@ -14,7 +14,7 @@ const PageBodyContainer = ({ children }) => {
       >
         <div className="z-[1] fixed top-0 left-0 w-[100vw] h-[100vh] bg-bkg-1">
           <picture>
-            <source srcSet="/img/bg-desktop.png" media="(min-width: 640px)" />
+            <source srcSet="/img/shimmer.svg" media="(min-width: 640px)" />
             <img src="/img/bg-mobile.png" />
           </picture>
         </div>
