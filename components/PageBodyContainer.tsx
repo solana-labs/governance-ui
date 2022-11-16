@@ -1,5 +1,4 @@
 import { useRouter } from 'next/router'
-import Footer from '@components/Footer'
 
 const PageBodyContainer = ({ children }) => {
   const { pathname } = useRouter()
