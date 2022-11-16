@@ -30,7 +30,7 @@ const CustomBase64 = ({
   const { ownVoterWeight } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const { assetAccounts } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<Base64InstructionForm>({
     governedAccount: undefined,
     base64: '',

@@ -40,7 +40,7 @@ const MakeDepositToMangoAccountCsv = ({
   const { governedTokenAccounts } = useGovernanceAssets()
   const tokenAccounts = governedTokenAccounts.filter((x) => x.isToken)
   const connection = useWalletStore((s) => s.connection)
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   // It state will contain the error when
   // correct file extension is not used

@@ -41,7 +41,7 @@ const RefreshObligation = ({
     return <>This instruction does not support {connection.cluster}</>
   }
 
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [form, setForm] = useState<RefreshObligationForm>({})

@@ -11,6 +11,7 @@ export default function useGovernanceAssets() {
   const governedTokenAccounts: AssetAccount[] = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
   )
+
   const assetAccounts = useGovernanceAssetsStore((s) =>
     s.assetAccounts.filter((x) => x.type !== AccountType.AuxiliaryToken)
   )

@@ -38,7 +38,7 @@ const MakeDepositToMangoAccount = ({
   const { governedTokenAccounts } = useGovernanceAssets()
   const tokenAccounts = governedTokenAccounts.filter((x) => x.isToken)
   const connection = useWalletStore((s) => s.connection)
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<MangoDepositToMangoAccountForm>({
     governedAccount: null,
