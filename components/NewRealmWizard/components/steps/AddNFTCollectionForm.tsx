@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
-import { deprecated } from '@metaplex-foundation/mpl-token-metadata'
 import axios from 'axios'
 
 import { updateUserInput, validatePubkey } from '@utils/formValidation'
@@ -21,6 +20,22 @@ import Input, {
 } from '@components/NewRealmWizard/components/Input'
 import AdviceBox from '@components/NewRealmWizard/components/AdviceBox'
 import NFTCollectionModal from '@components/NewRealmWizard/components/NFTCollectionModal'
+import { Metaplex } from '@metaplex-foundation/js'
+import { Connection, PublicKey } from '@solana/web3.js'
+import { HOLAPLEX_GRAPQL_URL } from '@tools/constants'
+
+const getNftQuery = (limit, offset) => {
+  return `
+    query nfts($collection: PublicKey!) {
+        nfts(
+          collection: $collection,
+           limit: ${limit}, offset: ${offset}) {
+          mintAddress
+        }
+  
+    }
+  `
+}
 
 function filterAndMapVerifiedCollections(nfts) {
   return nfts
@@ -32,7 +47,7 @@ function filterAndMapVerifiedCollections(nfts) {
       }
     })
     .map((nft) => {
-      if (nft.data.collection) {
+      if (nft.data?.collection) {
         return nft.data
       } else {
         return nft
@@ -59,11 +74,16 @@ async function enrichItemInfo(item, uri) {
   }
 }
 
-async function enrichCollectionInfo(connection, collectionKey) {
-  const data = await deprecated.Metadata.findByMint(connection, collectionKey)
+async function enrichCollectionInfo(
+  connection: Connection,
+  collectionKey: string
+) {
+  const metaplex = new Metaplex(connection)
+  const data = await metaplex
+    .nfts()
+    .findByMint({ mintAddress: new PublicKey(collectionKey) })
 
-  const collectionData = data!.data!.data
-
+  const collectionData = data
   return enrichItemInfo(
     {
       ...collectionData,
@@ -73,48 +93,63 @@ async function enrichCollectionInfo(connection, collectionKey) {
   )
 }
 
-async function getNFTCollectionInfo(connection, collectionKey) {
-  const { data: result } = await deprecated.Metadata.findByMint(
-    connection,
-    collectionKey
-  )
-  console.log('NFT findByMint result', result)
-  if (result?.collection?.verified && result.collection?.key) {
+async function getNFTCollectionInfo(
+  connection: Connection,
+  collectionKey: string
+) {
+  const collectionResult = await axios.post(HOLAPLEX_GRAPQL_URL, {
+    query: getNftQuery(1, 0),
+    variables: {
+      collection: new PublicKey(collectionKey),
+    },
+  })
+  const mintToCheck = collectionResult.data?.nfts[0]?.mintAddress
+  if (!mintToCheck) {
+    throw new Error(
+      'Address did not return collection with children whose "collection.key" matched'
+    )
+  }
+  const metaplex = new Metaplex(connection)
+  const metaplexData = await metaplex.nfts().findByMint({
+    mintAddress: new PublicKey(mintToCheck),
+  })
+
+  console.log('NFT findByMint result', metaplexData)
+  if (metaplexData?.collection?.verified && metaplexData.collection?.address) {
     // here we were given a child of the collection (hence the "collection" property is present)
     const collectionInfo = await enrichCollectionInfo(
       connection,
-      result.collection.key
+      metaplexData.collection.address.toBase58()
     )
-    const nft = await enrichItemInfo(result.data, result.data.uri)
+    const nft = await enrichItemInfo(metaplexData, metaplexData.uri)
     collectionInfo.nfts = [nft]
     return collectionInfo
-  } else {
-    // assume we've been given the collection address already, so we need to go find it's children
-    const children = await deprecated.Metadata.findMany(connection, {
-      updateAuthority: result!.updateAuthority,
-    })
-
-    const verifiedCollections = filterAndMapVerifiedCollections(children)
-    if (verifiedCollections[collectionKey]) {
-      const collectionInfo = await enrichCollectionInfo(
-        connection,
-        collectionKey
-      )
-      const nfts = await Promise.all(
-        verifiedCollections[collectionKey].map((item) => {
-          return enrichItemInfo(item.data, item.data.uri)
-        })
-      )
-      collectionInfo.nfts = nfts
-      return collectionInfo
-    } else {
-      throw new Error(
-        'Address did not return collection with children whose "collection.key" matched'
-      )
-    }
   }
+  // assume we've been given the collection address already, so we need to go find it's children
+  const allNftsResult = await axios.post(HOLAPLEX_GRAPQL_URL, {
+    query: getNftQuery(1000, 0),
+    variables: {
+      collection: new PublicKey(collectionKey),
+    },
+  })
 
-  // 3iBYdnzA418tD2o7vm85jBeXgxbdUyXzX9Qfm2XJuKME
+  const verifiedCollections = filterAndMapVerifiedCollections(
+    allNftsResult.data?.nfts
+  )
+  if (verifiedCollections[collectionKey]) {
+    const collectionInfo = await enrichCollectionInfo(connection, collectionKey)
+    const nfts = await Promise.all(
+      verifiedCollections[collectionKey].map((item) => {
+        return enrichItemInfo(item, item.uri)
+      })
+    )
+    collectionInfo.nfts = nfts
+    return collectionInfo
+  } else {
+    throw new Error(
+      'Address did not return collection with children whose "collection.key" matched'
+    )
+  }
 }
 
 export const AddNFTCollectionSchema = {
@@ -341,11 +376,10 @@ export default function AddNFTCollectionForm({
       if (!wallet?.publicKey) {
         throw new Error('No valid wallet connected')
       }
-
-      const ownedNfts = await deprecated.Metadata.findDataByOwner(
-        connection.current,
-        wallet.publicKey
-      )
+      const metaplex = new Metaplex(connection.current)
+      const ownedNfts = await metaplex.nfts().findAllByOwner({
+        owner: wallet.publicKey,
+      })
       console.log('NFT wallet contents', ownedNfts)
       const verfiedNfts = filterAndMapVerifiedCollections(ownedNfts)
       console.log('NFT verified nft by collection', verfiedNfts)
@@ -356,9 +390,10 @@ export default function AddNFTCollectionForm({
           connection.current,
           collectionKey
         )
+
         const nftsWithInfo = await Promise.all(
           verfiedNfts[collectionKey].slice(0, 2).map((nft) => {
-            return enrichItemInfo(nft.data, nft.data.uri)
+            return enrichItemInfo(nft, nft.uri)
           })
         )
 
