@@ -1,4 +1,5 @@
 import { useRouter } from 'next/router'
+import Footer from './Footer'
 
 const PageBodyContainer = ({ children }) => {
   const { pathname } = useRouter()
@@ -11,7 +12,7 @@ const PageBodyContainer = ({ children }) => {
           isNewRealmsWizard ? '' : 'min-h-[calc(100vh_-_80px)] pb-64'
         }`}
       >
-        <div className="z-[1] relative top-0 right-0 w-[100vw] h-[100vh] bg-bkg-1">
+        <div className="z-[1] relative top-0 left-0 w-[100vw] h-[100vh] bg-bkg-1">
           <picture>
             <source srcSet="/img/shimmer.svg" media="(min-width: 640px)" />
             <img src="/img/bg-mobile.png" />
@@ -21,6 +22,7 @@ const PageBodyContainer = ({ children }) => {
           {children}
         </div>
       </div>
+      <Footer />
     </>
   )
 }
