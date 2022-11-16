@@ -1,5 +1,4 @@
 import { useRouter } from 'next/router'
-import Footer from './Footer'
 
 const PageBodyContainer = ({ children }) => {
   const { pathname } = useRouter()
@@ -22,7 +21,6 @@ const PageBodyContainer = ({ children }) => {
           {children}
         </div>
       </div>
-      <Footer />
     </>
   )
 }
