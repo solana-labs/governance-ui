@@ -64,4 +64,8 @@ export const DataUIWarning = ({
 }: {
   message: string
   className?: string
-}) => <span className={cx('mt-2', className)}>{message.toUpperCase()}</span>
+}) => (
+  <span className={cx('mt-2', 'text-orange', className)}>
+    {message.toUpperCase()}
+  </span>
+)

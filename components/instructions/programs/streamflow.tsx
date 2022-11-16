@@ -186,10 +186,7 @@ async function getStreamCreateDataUI(
             <DataUIAddress address={recipient} />
           </DataUIRow>
           <DataUIRow>
-            <DataUIWarning
-              className="text-orange"
-              message="RECIPIENT SHOULD BE THE WALLET, NOT THE ASSOCIATED TOKEN ACCOUNT"
-            />
+            <DataUIWarning message="RECIPIENT SHOULD BE THE WALLET, NOT THE ASSOCIATED TOKEN ACCOUNT" />
           </DataUIRow>
           <DataUIRow>
             <DataUILabel label="Start" />
