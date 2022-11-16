@@ -756,7 +756,7 @@ const getAccountsForGovernances = async (
     ...governedTokenAccounts,
   ]
 
-  // 6 - Create generic asset accounts for governances governedAccounts that have not been handled yet
+  // 6 - Create generic asset accounts for governance's governedAccounts that have not been handled yet
   // We do this so theses accounts may be selected
   const genericGovernances = getGenericAssetAccounts(
     governancesArray.filter(
