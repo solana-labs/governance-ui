@@ -8,23 +8,18 @@ import { RichTextDocument } from '@hub/types/decoders/RichTextDocument';
 export const getRealmsList = gql`
   query realms {
     realmDropdownList {
+      bannerImageUrl
+      category
+      displayName
       iconUrl
       name
       publicKey
+      shortDescription
+      twitterFollowerCount
       urlId
-      realm {
-        bannerImageUrl
-        category
-        shortDescription
-        hub {
-          info {
-            clippedHeading(charLimit: 100) {
-              document
-              isClipped
-            }
-          }
-          twitterFollowerCount
-        }
+      clippedHeading(charLimit: 100) {
+        document
+        isClipped
       }
     }
   }
@@ -33,27 +28,22 @@ export const getRealmsList = gql`
 export const getRealmsListResp = IT.type({
   realmDropdownList: IT.array(
     IT.type({
+      bannerImageUrl: IT.union([IT.null, IT.string]),
+      category: RealmCategory,
+      displayName: IT.union([IT.null, IT.string]),
       iconUrl: IT.union([IT.null, IT.string]),
       name: IT.string,
       publicKey: PublicKey,
+      shortDescription: IT.union([IT.null, IT.string]),
+      twitterFollowerCount: IT.number,
       urlId: IT.string,
-      realm: IT.type({
-        bannerImageUrl: IT.union([IT.null, IT.string]),
-        category: RealmCategory,
-        shortDescription: IT.union([IT.null, IT.string]),
-        hub: IT.type({
-          info: IT.type({
-            clippedHeading: IT.union([
-              IT.null,
-              IT.type({
-                document: RichTextDocument,
-                isClipped: IT.boolean,
-              }),
-            ]),
-          }),
-          twitterFollowerCount: IT.number,
+      clippedHeading: IT.union([
+        IT.null,
+        IT.type({
+          document: RichTextDocument,
+          isClipped: IT.boolean,
         }),
-      }),
+      ]),
     }),
   ),
 });

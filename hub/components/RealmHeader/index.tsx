@@ -1,5 +1,6 @@
 import AssemblyClusterIcon from '@carbon/icons-react/lib/AssemblyCluster';
 import EarthIcon from '@carbon/icons-react/lib/Earth';
+import EditIcon from '@carbon/icons-react/lib/Edit';
 import ListDropdownIcon from '@carbon/icons-react/lib/ListDropdown';
 import LogoDiscord from '@carbon/icons-react/lib/LogoDiscord';
 import LogoGithub from '@carbon/icons-react/lib/LogoGithub';
@@ -11,6 +12,7 @@ import ProgressBarRound from '@carbon/icons-react/lib/ProgressBarRound';
 import WalletIcon from '@carbon/icons-react/lib/Wallet';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import type { PublicKey } from '@solana/web3.js';
+import Link from 'next/link';
 import { useMemo } from 'react';
 import { useMediaQuery } from 'react-responsive';
 
@@ -41,6 +43,7 @@ interface Props extends BaseProps {
     mint: PublicKey;
     symbol: string;
   };
+  userIsAdmin?: boolean;
   // external links
   discordUrl?: string | null;
   githubUrl?: string | null;
@@ -88,7 +91,7 @@ export function Content(props: Props) {
             'md:pl-48',
           )}
         >
-          <div className="relative overflow-visible -mx-4 md:-mx-2">
+          <div className="flex items-baseline relative overflow-visible -mx-4 md:-mx-2">
             <div
               className={cx(
                 'absolute',
@@ -104,6 +107,24 @@ export function Content(props: Props) {
             >
               {props.name}
             </div>
+            {props.userIsAdmin && (
+              <Link passHref href={`/realm/${props.realmUrlId}/hub/edit`}>
+                <a
+                  className={cx(
+                    'flex',
+                    'items-center',
+                    'ml-4',
+                    'text-neutral-500',
+                    'text-xs',
+                    'transition-colors',
+                    'hover:text-neutral-900',
+                  )}
+                >
+                  <EditIcon className="h-3 w-3 fill-current mr-1" />
+                  <div>edit metadata</div>
+                </a>
+              </Link>
+            )}
           </div>
           <div className="flex items-center">
             {props.token && (

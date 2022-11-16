@@ -52,7 +52,7 @@ export const MobileRealmSearchNavigation = forwardRef<HTMLButtonElement, Props>(
               realmDropdownList.map((item) => ({
                 key: item.publicKey.toBase58(),
                 iconUrl: item.iconUrl,
-                name: item.name,
+                name: item.displayName || item.name,
                 publicKey: item.publicKey,
                 url: `/realm/${item.urlId}/hub`,
               })),
