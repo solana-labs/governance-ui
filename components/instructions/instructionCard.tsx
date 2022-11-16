@@ -91,7 +91,7 @@ export default function InstructionCard({
             const metaplex = new Metaplex(connection.current)
             const metadataPDA = findMetadataPda(mint)
             const tokenMetadata = await metaplex.nfts().findByMetadata({
-              metadata: new PublicKey(metadataPDA.toBase58()),
+              metadata: metadataPDA,
             })
 
             const url = (await axios.get(tokenMetadata.uri)).data

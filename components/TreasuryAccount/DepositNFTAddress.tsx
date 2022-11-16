@@ -24,7 +24,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import DepositLabel from './DepositLabel'
 import NFTAccountSelect from './NFTAccountSelect'
 import ImgWithLoader from '@components/ImgWithLoader'
-import { findMetadataPda, Metaplex } from '@metaplex-foundation/js'
+import { Metaplex } from '@metaplex-foundation/js'
 import {
   Nft,
   NftWithToken,
@@ -106,9 +106,12 @@ const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
           setIsLoading(true)
           try {
             const metaplex = new Metaplex(connection.current)
-            const metadataPDA = findMetadataPda(pubKey)
+            const metadataPDA = await metaplex
+              .nfts()
+              .pdas()
+              .metadata({ mint: pubKey })
             const tokenMetadata = await metaplex.nfts().findByMetadata({
-              metadata: new PublicKey(metadataPDA.toBase58()),
+              metadata: metadataPDA,
             })
             setNftMetaData(tokenMetadata)
           } catch (e) {

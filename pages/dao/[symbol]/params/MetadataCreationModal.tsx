@@ -27,7 +27,7 @@ import { AccountType } from '@utils/uiTypes/assets'
 import { WebBundlr } from '@bundlr-network/client'
 import { LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { PublicKey } from '@solana/web3.js'
-import { findMetadataPda, Metaplex } from '@metaplex-foundation/js'
+import { Metaplex } from '@metaplex-foundation/js'
 
 interface GovernanceConfigForm {
   mintAccount: AssetAccount | undefined
@@ -266,9 +266,12 @@ const MetadataCreationModal = ({
     if (form.mintAccount) {
       try {
         const metaplex = new Metaplex(connection.current)
-        const metadataPDA = findMetadataPda(form.mintAccount.pubkey)
+        const metadataPDA = await metaplex
+          .nfts()
+          .pdas()
+          .metadata({ mint: form.mintAccount.pubkey })
         const tokenMetadata = await metaplex.nfts().findByMetadata({
-          metadata: new PublicKey(metadataPDA.toBase58()),
+          metadata: metadataPDA,
         })
         if (tokenMetadata) return true
         return false

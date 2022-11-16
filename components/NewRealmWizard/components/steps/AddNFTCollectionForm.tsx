@@ -22,14 +22,17 @@ import AdviceBox from '@components/NewRealmWizard/components/AdviceBox'
 import NFTCollectionModal from '@components/NewRealmWizard/components/NFTCollectionModal'
 import { Metaplex } from '@metaplex-foundation/js'
 import { Connection, PublicKey } from '@solana/web3.js'
+import { HOLAPLEX_GRAPQL_URL } from '@tools/constants'
 
 const getNftQuery = (limit, offset) => {
-  return `query nfts($collection: PublicKey!) {
+  return `
+    query nfts($collection: PublicKey!) {
         nfts(
           collection: $collection,
-           limit: ${limit}, offset: ${offset}}) {
+           limit: ${limit}, offset: ${offset}) {
           mintAddress
         }
+  
     }
   `
 }
@@ -94,20 +97,18 @@ async function getNFTCollectionInfo(
   connection: Connection,
   collectionKey: string
 ) {
-  const result = await fetch('https://graph.holaplex.com/v1', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
+  const collectionResult = await axios.post(HOLAPLEX_GRAPQL_URL, {
+    query: getNftQuery(1, 0),
+    variables: {
+      collection: new PublicKey(collectionKey),
     },
-    body: JSON.stringify({
-      query: getNftQuery(1, 0),
-      variables: {
-        collection: new PublicKey(collectionKey),
-      },
-    }),
   })
-  const body = await result.json()
-  const mintToCheck = body.data?.nfts[0]?.mintAddress
+  const mintToCheck = collectionResult.data?.nfts[0]?.mintAddress
+  if (!mintToCheck) {
+    throw new Error(
+      'Address did not return collection with children whose "collection.key" matched'
+    )
+  }
   const metaplex = new Metaplex(connection)
   const metaplexData = await metaplex.nfts().findByMint({
     mintAddress: new PublicKey(mintToCheck),
@@ -123,43 +124,32 @@ async function getNFTCollectionInfo(
     const nft = await enrichItemInfo(metaplexData, metaplexData.uri)
     collectionInfo.nfts = [nft]
     return collectionInfo
-  } else {
-    // assume we've been given the collection address already, so we need to go find it's children
-    const result = await fetch('https://graph.holaplex.com/v1', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        query: getNftQuery(1000, 0),
-        variables: {
-          collection: new PublicKey(collectionKey),
-        },
-      }),
-    })
-    const body = await result.json()
-
-    const verifiedCollections = filterAndMapVerifiedCollections(body.data?.nfts)
-    if (verifiedCollections[collectionKey]) {
-      const collectionInfo = await enrichCollectionInfo(
-        connection,
-        collectionKey
-      )
-      const nfts = await Promise.all(
-        verifiedCollections[collectionKey].map((item) => {
-          return enrichItemInfo(item, item.uri)
-        })
-      )
-      collectionInfo.nfts = nfts
-      return collectionInfo
-    } else {
-      throw new Error(
-        'Address did not return collection with children whose "collection.key" matched'
-      )
-    }
   }
+  // assume we've been given the collection address already, so we need to go find it's children
+  const allNftsResult = await axios.post(HOLAPLEX_GRAPQL_URL, {
+    query: getNftQuery(1000, 0),
+    variables: {
+      collection: new PublicKey(collectionKey),
+    },
+  })
 
-  // 3iBYdnzA418tD2o7vm85jBeXgxbdUyXzX9Qfm2XJuKME
+  const verifiedCollections = filterAndMapVerifiedCollections(
+    allNftsResult.data?.nfts
+  )
+  if (verifiedCollections[collectionKey]) {
+    const collectionInfo = await enrichCollectionInfo(connection, collectionKey)
+    const nfts = await Promise.all(
+      verifiedCollections[collectionKey].map((item) => {
+        return enrichItemInfo(item, item.uri)
+      })
+    )
+    collectionInfo.nfts = nfts
+    return collectionInfo
+  } else {
+    throw new Error(
+      'Address did not return collection with children whose "collection.key" matched'
+    )
+  }
 }
 
 export const AddNFTCollectionSchema = {
