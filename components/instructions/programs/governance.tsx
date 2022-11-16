@@ -160,11 +160,6 @@ export const GOVERNANCE_INSTRUCTIONS = {
           connection,
           realm.account.communityMint
         )
-        const realmConfig = await tryGetRealmConfig(
-          connection,
-          realm.owner,
-          realm.pubkey
-        )
 
         return (
           <>
@@ -206,4 +201,4 @@ export const GOVERNANCE_INSTRUCTIONS = {
       },
     },
   },
-}
+} as const
