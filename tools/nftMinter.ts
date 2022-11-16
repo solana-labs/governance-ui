@@ -1,4 +1,4 @@
-// import Arweave from 'arweave'
+import Arweave from 'arweave'
 // import {
 //   CreateNftOutput,
 //   findMasterEditionV2Pda,
@@ -171,7 +171,5 @@
 
 //   return url
 // }
-
-export const log = () => {
-  console.log('123')
-}
+//TODO fix when needed
+console.log(Arweave)
