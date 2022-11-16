@@ -20,7 +20,7 @@ const PageBodyContainer = ({ children }) => {
         <div className="relative z-[2] col-span-12 px-4 md:px-8 xl:px-4 xl:col-start-2 xl:col-span-10">
           {children}
         </div>
-        <Footer />
+        <Footer></Footer>
       </div>
     </>
   )

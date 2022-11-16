@@ -19,7 +19,7 @@ const NavBar = () => {
           <div className="flex cursor-pointer sm:items-center min-w-[36px]">
             <picture>
               <source srcSet="/img/orcalogo.svg" media="(min-width: 640px)" />
-              <img src="/img/orcalogo.svg" className="w-10 h-10 md:w-24" />
+              <img src="/img/orcalogo.svg" className="w-25 h-25 md:w-40" />
             </picture>
           </div>
         </Link>
