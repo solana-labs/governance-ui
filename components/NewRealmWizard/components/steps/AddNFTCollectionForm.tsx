@@ -23,6 +23,17 @@ import NFTCollectionModal from '@components/NewRealmWizard/components/NFTCollect
 import { Metaplex } from '@metaplex-foundation/js'
 import { Connection, PublicKey } from '@solana/web3.js'
 
+const getNftQuery = (limit, offset) => {
+  return `query nfts($collection: PublicKey!) {
+        nfts(
+          collection: $collection,
+           limit: ${limit}, offset: ${offset}}) {
+          mintAddress
+        }
+    }
+  `
+}
+
 function filterAndMapVerifiedCollections(nfts) {
   return nfts
     .filter((nft) => {
@@ -89,16 +100,7 @@ async function getNFTCollectionInfo(
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      query: `
-        query nfts($collection: PublicKey!) {
-            nfts(
-              collection: $collection,
-               limit: 1, offset: 0) {
-              mintAddress
-            }
-
-        }
-      `,
+      query: getNftQuery(1, 0),
       variables: {
         collection: new PublicKey(collectionKey),
       },
@@ -129,16 +131,7 @@ async function getNFTCollectionInfo(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        query: `
-            query nfts($collection: PublicKey!) {
-                nfts(
-                  collection: $collection,
-                   limit: 200, offset: 0) {
-                  mintAddress
-                }
-    
-            }
-          `,
+        query: getNftQuery(1000, 0),
         variables: {
           collection: new PublicKey(collectionKey),
         },
