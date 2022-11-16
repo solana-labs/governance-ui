@@ -201,18 +201,6 @@ export const GOVERNANCE_INSTRUCTIONS = {
               {`useMaxCommunityVoterWeightAddin:
                ${!!args.configArgs.useMaxCommunityVoterWeightAddin}`}
             </p>
-            {realmConfig?.account.communityTokenConfig.voterWeightAddin && (
-              <p>
-                {`communityVoterWeightAddin :
-               ${realmConfig?.account.communityTokenConfig.voterWeightAddin?.toBase58()}`}
-              </p>
-            )}
-            {realmConfig?.account.communityTokenConfig.maxVoterWeightAddin && (
-              <p>
-                {`maxCommunityVoterWeightAddin:
-               ${realmConfig?.account.communityTokenConfig.maxVoterWeightAddin?.toBase58()}`}
-              </p>
-            )}
           </>
         )
       },
