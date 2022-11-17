@@ -1,8 +1,4 @@
-import { useRouter } from 'next/router'
-
 const PageBodyContainer = ({ children }) => {
-  const { pathname } = useRouter()
-
   return (
     <>
       <div className={`grid grid-cols-12 gap-4 pt-4`}>
