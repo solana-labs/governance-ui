@@ -34,13 +34,14 @@ export const ITEMS = [
     urlId: 'SLND',
   },
   {
-    bannerImgSrc: 'https://i.imgur.com/i1gGoIw.jpg',
-    description:
-      'Every market, all the power, none of the fuss. Simplifying decentralized finance through easy-to-use products and developer tools.',
-    iconImgSrc: 'https://trade.mango.markets/assets/icons/logo.svg',
-    name: 'Mango DAO',
-    publicKey: new PublicKey('DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE'),
-    urlId: 'MNGO',
+    bannerImgSrc:
+      'https://tulipprotocol.notion.site/image/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F7f6ad7fd-3750-4908-b3ee-ac18660a69b6%2F1500x500.jpeg?table=block&id=bfb9c7e5-bc09-4b91-97e1-f211d4fa8eb1&spaceId=b22e9cdb-d148-4721-823e-c7a372f168da&width=1880&userId=&cache=v2',
+    description: "Solana's Yield Aggregation Homestead",
+    iconImgSrc:
+      'https://tulipprotocol.notion.site/image/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F7fb0fb44-825e-46f3-aae1-b76cc9684547%2Fnew-logo.png?table=block&id=e0916de3-eca0-429b-ab04-6b9df820f4f1&spaceId=b22e9cdb-d148-4721-823e-c7a372f168da&width=1200&userId=&cache=v2',
+    name: 'Tulip',
+    publicKey: new PublicKey('413KSeuFUBSWDzfjU9BBqBAWYKmoR8mncrhV84WcGNAk'),
+    urlId: 'Tulip',
   },
 ];
 
