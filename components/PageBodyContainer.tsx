@@ -17,12 +17,6 @@ const PageBodyContainer = ({ children }) => {
             <img src="/img/wavestop.svg" />
           </picture>
         </div>
-        <div className="fixed bottom-0 w-[100vw] h-[100vh] bg-bkg-1">
-          <picture>
-            <source srcSet="/img/coral.svg" media="(min-width: 640px)" />
-            <img src="/img/coral.svg" />
-          </picture>
-        </div>
         <div className="relative z-[3] col-span-12 px-4 md:px-8 xl:px-4 xl:col-start-2 xl:col-span-10">
           {children}
         </div>
