@@ -1,4 +1,4 @@
-import { ThemeProvider } from 'next-themes'
+// import { ThemeProvider } from 'next-themes'
 import { WalletIdentityProvider } from '@cardinal/namespaces-components'
 import dynamic from 'next/dynamic'
 import React, { useEffect } from 'react'
@@ -233,17 +233,17 @@ export function App(props: Props) {
       </Head>
       <GoogleTag />
       <ErrorBoundary>
-        <ThemeProvider defaultTheme="Dark">
-          <WalletIdentityProvider appName={'Realms'}>
-            <GatewayProvider>
-              <NavBar />
-              <Notifications />
-              <TransactionLoader></TransactionLoader>
-              <NftVotingCountingModal />
-              <PageBodyContainer>{props.children}</PageBodyContainer>
-            </GatewayProvider>
-          </WalletIdentityProvider>
-        </ThemeProvider>
+        {/* <ThemeProvider defaultTheme="Dark"> */}
+        <WalletIdentityProvider appName={'Realms'}>
+          <GatewayProvider>
+            <NavBar />
+            <Notifications />
+            <TransactionLoader></TransactionLoader>
+            <NftVotingCountingModal />
+            <PageBodyContainer>{props.children}</PageBodyContainer>
+          </GatewayProvider>
+        </WalletIdentityProvider>
+        {/* </ThemeProvider> */}
       </ErrorBoundary>
       <Footer />
     </div>
