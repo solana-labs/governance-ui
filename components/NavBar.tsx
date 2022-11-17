@@ -2,7 +2,6 @@ import useQueryContext from '@hooks/useQueryContext'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import NotificationsSwitch from './NotificationsSwitch'
-import ThemeSwitch from './ThemeSwitch'
 
 const ConnectWalletButtonDynamic = dynamic(
   async () => await import('./ConnectWalletButton'),
