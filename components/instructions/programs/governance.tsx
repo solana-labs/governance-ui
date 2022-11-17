@@ -7,7 +7,6 @@ import {
   getRealm,
   SetRealmAuthorityAction,
   SetRealmAuthorityArgs,
-  tryGetRealmConfig,
   VoteTipping,
 } from '@solana/spl-governance'
 import {
