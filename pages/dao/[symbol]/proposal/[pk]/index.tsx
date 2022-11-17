@@ -26,6 +26,7 @@ import useWalletStore from 'stores/useWalletStore'
 import ProposalVotingPower from '@components/ProposalVotingPower'
 import { useMediaQuery } from 'react-responsive'
 import NftProposalVoteState from 'NftVotePlugin/NftProposalVoteState'
+import ProposalWarnings from './ProposalWarnings'
 
 const Proposal = () => {
   const { realmInfo, symbol } = useRealm()
@@ -120,7 +121,7 @@ const Proposal = () => {
                 </ReactMarkdown>
               </div>
             )}
-
+            <ProposalWarnings />
             <InstructionPanel />
             {isTwoCol && <DiscussionPanel />}
           </>
