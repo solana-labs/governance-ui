@@ -29,7 +29,7 @@ export default function App({ Component, pageProps, router }: AppProps) {
 
   if (router.pathname.startsWith('/verify-wallet')) {
     return (
-      <HubApp>
+      <HubApp minimal>
         <Component {...pageProps} />
       </HubApp>
     )

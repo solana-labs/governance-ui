@@ -32,10 +32,6 @@
           {
             "pattern": "@hub/**/**",
             "group": "parent"
-          },
-          {
-            "pattern": "@verify-wallet/**/**",
-            "group": "parent"
           }
         ],
         "alphabetize": {

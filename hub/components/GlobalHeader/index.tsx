@@ -14,6 +14,7 @@ import { User } from './User';
 
 interface Props {
   className?: string;
+  minimal?: boolean;
 }
 
 export function GlobalHeader(props: Props) {
@@ -52,52 +53,64 @@ export function GlobalHeader(props: Props) {
             'w-full',
           )}
         >
-          <div className={cx('flex', 'items-center')}>
-            <Logo compressed={!showExpandedUserDropdown} />
-            {showDesktopRealmSelector && (
-              <NavigationMenu.Item asChild>
-                <RealmSearchNavigation className="ml-4" />
-              </NavigationMenu.Item>
-            )}
-            {displayLinkRow ? (
-              <Links
-                className="ml-16"
-                links={[
-                  {
-                    href: '/ecosystem',
-                    title: 'Ecosystem Feed',
-                  },
-                  {
-                    href: '/discover',
-                    title: 'Discover',
-                  },
-                ]}
-              />
-            ) : (
-              <LinksDropdown
-                className={cx(
-                  'z-50',
-                  showExpandedUserDropdown ? 'ml-8' : 'ml-2',
-                )}
-                links={[
-                  {
-                    href: '/ecosystem',
-                    title: 'Feed',
-                  },
-                  {
-                    href: '/discover',
-                    title: 'Discover',
-                  },
-                ]}
-              />
-            )}
-          </div>
+          {props.minimal ? (
+            <div className={cx('flex', 'items-center')}>
+              <Logo compressed={!showExpandedUserDropdown} />
+            </div>
+          ) : (
+            <div className={cx('flex', 'items-center')}>
+              <Logo compressed={!showExpandedUserDropdown} />
+              {showDesktopRealmSelector && (
+                <NavigationMenu.Item asChild>
+                  <RealmSearchNavigation className="ml-4" />
+                </NavigationMenu.Item>
+              )}
+              {displayLinkRow ? (
+                <Links
+                  className="ml-16"
+                  links={[
+                    {
+                      href: '/ecosystem',
+                      title: 'Ecosystem Feed',
+                    },
+                    {
+                      href: '/discover',
+                      title: 'Discover',
+                    },
+                  ]}
+                />
+              ) : (
+                <LinksDropdown
+                  className={cx(
+                    'z-50',
+                    showExpandedUserDropdown ? 'ml-8' : 'ml-2',
+                  )}
+                  links={[
+                    {
+                      href: '/ecosystem',
+                      title: 'Feed',
+                    },
+                    {
+                      href: '/discover',
+                      title: 'Discover',
+                    },
+                  ]}
+                />
+              )}
+            </div>
+          )}
           <div className="flex items-center">
-            {showCreateHub && <CreateHub className="mr-4" />}
-            {!showDesktopRealmSelector && (
-              <NavigationMenu.Item asChild>
-                <MobileRealmSearchNavigation />
-              </NavigationMenu.Item>
+            {props.minimal ? (
+              <></>
+            ) : (
+              <>
+                {showCreateHub && <CreateHub className="mr-4" />}
+                {!showDesktopRealmSelector && (
+                  <NavigationMenu.Item asChild>
+                    <MobileRealmSearchNavigation />
+                  </NavigationMenu.Item>
+                )}
+              </>
             )}
             <User compressed={!showExpandedUserDropdown} />
           </div>

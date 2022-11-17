@@ -51,6 +51,7 @@ const Twitter = React.memo(
 
 interface Props {
   children?: React.ReactNode;
+  minimal?: boolean;
 }
 
 export function App(props: Props) {
@@ -139,7 +140,10 @@ export function App(props: Props) {
       </Head>
       <GoogleTag />
       <Twitter />
-      <GlobalHeader className="fixed h-14 top-0 left-0 right-0 z-30" />
+      <GlobalHeader
+        className="fixed h-14 top-0 left-0 right-0 z-30"
+        minimal={props.minimal}
+      />
       {props.children}
     </RootProvider>
   );
