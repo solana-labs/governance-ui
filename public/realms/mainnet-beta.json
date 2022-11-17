@@ -2724,5 +2724,18 @@
     "sortRank": 3,
     "website": "https://sunrisestake.com",
     "twitter": "@sunrisestake"
+  },
+  {
+    "symbol": "LPFi",
+    "category": "defi",
+    "displayName": "LP Finance Governance",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "E9mhy68gywPtFFeU5zhXKbJ7e5NKzHRk7LxsYhnsERWb",
+    "ogImage": "https://www.lp.finance/logo192.png",
+    "shortDescription": "Engineering the standard of synthetics.",
+    "website": "https://lp.finance",
+    "twitter": "@LPFinance_",
+    "discord": "https://discord.gg/N2Uebv58v2",
+    "github": "https://github.com/LP-Finance-Inc"
   }
 ]
