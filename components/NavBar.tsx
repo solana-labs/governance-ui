@@ -24,7 +24,6 @@ const NavBar = () => {
           </div>
         </Link>
         <div className="flex items-center justify-end space-x-2 md:space-x-4">
-          <ThemeSwitch />
           <NotificationsSwitch />
           <ConnectWalletButtonDynamic />
         </div>
