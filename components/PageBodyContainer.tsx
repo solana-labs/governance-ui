@@ -11,13 +11,13 @@ const PageBodyContainer = ({ children }) => {
           isNewRealmsWizard ? '' : 'min-h-[calc(100vh_-_80px)] pb-64'
         }`}
       >
-        <div className="relative top-0px left-0px w-[100vw] h-[100vh] bg-bkg-1">
+        <div className="relative top:0px left:0px">
           <picture>
             <source srcSet="/img/wavestop.svg" media="(min-width: 640px)" />
             <img src="/img/wavestop.svg" />
           </picture>
         </div>
-        <div className="relative bottom-0px left-50px w-[100vw] h-[100vh] bg-bkg-1">
+        <div className="relative top:100px left:50px">
           <picture>
             <source srcSet="/img/coral.svg" media="(min-width: 640px)" />
             <img src="/img/coral.svg" />
