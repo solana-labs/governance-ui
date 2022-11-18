@@ -89,7 +89,7 @@ const Prompt = () => {
         <h1 className="text-3xl font-medium mt-8">
           Your new role awaits in Discord!
         </h1>
-        <div className="mt-8">
+        {/* <div className="mt-8">
           <a
             type="button"
             className="btn btn-primary text-white bg-[#7289da] hover:bg-[#7289da]/90 focus:ring-4 focus:outline-none focus:ring-[#7289da]/50 font-medium rounded-lg text-sm px-5 py-2.5 h-[40px] text-center inline-flex items-center dark:focus:ring-[#7289da]/55 mr-2 mb-2"
@@ -104,9 +104,9 @@ const Prompt = () => {
             />
             Return to Discord
           </a>
-        </div>
-        <p className="text-xs text-neutral-700 mt-4">
-          (This will open the Discord app)
+        </div> */}
+        <p className="text-lg text-neutral-700 mt-4">
+          You can safely close this tab and go back to Discord
         </p>
       </>
     );
