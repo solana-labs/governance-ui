@@ -59,45 +59,95 @@ export const GOVERNANCE_INSTRUCTIONS = {
         const isMaxNumber =
           args.config.minCommunityTokensToCreateProposal.toString() ===
           DISABLED_VOTER_WEIGHT.toString()
+        const isCurrentGovernanceMinCommMax =
+          governance.account.config.minCommunityTokensToCreateProposal.toString() ===
+          DISABLED_VOTER_WEIGHT.toString()
         return (
           <>
-            <p>
-              {`voteThresholdPercentage:
-              ${args.config.communityVoteThreshold.value?.toLocaleString()}%`}
-            </p>
-            {isMaxNumber ? (
-              <p>minCommunityTokensToCreateProposal: Disabled</p>
-            ) : (
+            <h1>Current config</h1>
+            <div className="space-y-3">
               <p>
-                {`minCommunityTokensToCreateProposal:
+                {`voteThresholdPercentage:
+              ${governance.account.config.communityVoteThreshold.value?.toLocaleString()}%`}
+              </p>
+              {isCurrentGovernanceMinCommMax ? (
+                <p>minCommunityTokensToCreateProposal: Disabled</p>
+              ) : (
+                <p>
+                  {`minCommunityTokensToCreateProposal:
+              ${fmtMintAmount(
+                communityMint?.account,
+                governance.account.config.minCommunityTokensToCreateProposal
+              )}`}{' '}
+                  (
+                  {governance.account.config.minCommunityTokensToCreateProposal.toNumber()}
+                  )
+                </p>
+              )}
+              <p>
+                {`minCouncilTokensToCreateProposal:
+              ${fmtMintAmount(
+                councilMint?.account,
+                governance.account.config.minCouncilTokensToCreateProposal
+              )}`}
+              </p>
+              <p>
+                {`minInstructionHoldUpTime:
+              ${getDaysFromTimestamp(
+                governance.account.config.minInstructionHoldUpTime
+              )} day(s)`}
+              </p>
+              <p>
+                {`maxVotingTime:
+              ${getDaysFromTimestamp(
+                governance.account.config.maxVotingTime
+              )} days(s)`}
+              </p>
+              <p>
+                {`voteTipping:
+              ${VoteTipping[governance.account.config.communityVoteTipping]}`}
+              </p>
+            </div>
+            <h1 className="mt-10">Proposed config</h1>
+            <div className="space-y-3">
+              <p>
+                {`voteThresholdPercentage:
+              ${args.config.communityVoteThreshold.value?.toLocaleString()}%`}
+              </p>
+              {isMaxNumber ? (
+                <p>minCommunityTokensToCreateProposal: Disabled</p>
+              ) : (
+                <p>
+                  {`minCommunityTokensToCreateProposal:
               ${fmtMintAmount(
                 communityMint?.account,
                 args.config.minCommunityTokensToCreateProposal
               )}`}{' '}
-                ({args.config.minCommunityTokensToCreateProposal.toNumber()})
-              </p>
-            )}
-            <p>
-              {`minCouncilTokensToCreateProposal:
+                  ({args.config.minCommunityTokensToCreateProposal.toNumber()})
+                </p>
+              )}
+              <p>
+                {`minCouncilTokensToCreateProposal:
               ${fmtMintAmount(
                 councilMint?.account,
                 args.config.minCouncilTokensToCreateProposal
               )}`}
-            </p>
-            <p>
-              {`minInstructionHoldUpTime:
+              </p>
+              <p>
+                {`minInstructionHoldUpTime:
               ${getDaysFromTimestamp(
                 args.config.minInstructionHoldUpTime
               )} day(s)`}
-            </p>
-            <p>
-              {`maxVotingTime:
+              </p>
+              <p>
+                {`maxVotingTime:
               ${getDaysFromTimestamp(args.config.maxVotingTime)} days(s)`}
-            </p>
-            <p>
-              {`voteTipping:
+              </p>
+              <p>
+                {`voteTipping:
               ${VoteTipping[args.config.communityVoteTipping]}`}
-            </p>
+              </p>
+            </div>
           </>
         )
       },
