@@ -2,7 +2,7 @@ import * as IT from 'io-ts';
 import { gql } from 'urql';
 
 const VerifyWalletResponse = IT.type({
-  status: IT.string,
+  publicKey: IT.string,
 });
 
 export const verifyWallet = gql`
