@@ -1,13 +1,10 @@
 import { XIcon } from '@heroicons/react/solid';
-import type { PublicKey } from '@solana/web3.js';
-import { pipe } from 'fp-ts/function';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import { SolanaLogo } from '@hub/components/branding/SolanaLogo';
-import * as gql from '@hub/components/GlobalHeader/User/gql';
 import { LoadingDots } from '@hub/components/LoadingDots';
 import { useMutation } from '@hub/hooks/useMutation';
-import { useQuery } from '@hub/hooks/useQuery';
 import * as RE from '@hub/types/Result';
 
 import * as gqlWallet from './gql';
@@ -17,11 +14,12 @@ const DiscordLogo = () => (
 );
 
 const STATES = {
+  FAILED: 'FAILED',
   VERIFYING: 'VERIFYING',
   VERIFIED: 'VERIFIED',
 };
 
-const Prompt = ({ publicKey }: { publicKey: PublicKey }) => {
+const Prompt = () => {
   const [, verifyWallet] = useMutation(
     gqlWallet.verifyWalletResp,
     gqlWallet.verifyWallet,
@@ -31,18 +29,26 @@ const Prompt = ({ publicKey }: { publicKey: PublicKey }) => {
     window.location.search.substring(1),
   );
 
-  console.log(parsedLocationHash, parsedLocationHash.get('code'));
+  const router = useRouter();
+
   useEffect(() => {
     const updateDiscordMetadata = async () => {
-      // console.info('updating!', publicKey.toBase58());
       try {
-        const response = await verifyWallet({
+        const verifyWalletResult = await verifyWallet({
           code: parsedLocationHash.get('code'),
         });
 
-        // const responseJson = response.json();
-        // console.info({ responseJson });
-        // TODO(jon): Actually check the status of the response
+        if (RE.isFailed(verifyWalletResult)) {
+          // Likely an issue like the Discord code has already been used
+          // Probably should redirect to `verify-wallet`
+          setStatus(STATES.FAILED);
+          console.error(verifyWalletResult.error);
+          setTimeout(() => {
+            router.push('/verify-wallet');
+          }, 5000);
+          throw verifyWalletResult.error;
+        }
+
         setStatus(STATES.VERIFIED);
       } catch (e) {
         console.error(e);
@@ -53,13 +59,22 @@ const Prompt = ({ publicKey }: { publicKey: PublicKey }) => {
     }
   }, [window.location.search]);
 
-  if (status === STATES.VERIFYING) {
-    // TODO(jon): Add intermediary state
+  if (status === STATES.FAILED) {
+    return (
+      <>
+        <XIcon height="48px" className="text-red" />
+        <h1 className="text-3xl font-medium mt-8">Something went wrong!</h1>
+        <p className="text-sm text-neutral-700 mt-4">
+          Retrying the connection to Discord...
+        </p>
+      </>
+    );
+  } else if (status === STATES.VERIFYING) {
     return (
       <>
         <LoadingDots />
         <h1 className="text-3xl font-medium mt-8">
-          Your new role awaits in Discord!
+          Linking this wallet to your Discord account...
         </h1>
       </>
     );
@@ -99,14 +114,5 @@ const Prompt = ({ publicKey }: { publicKey: PublicKey }) => {
 };
 
 export const StepThree = () => {
-  const [result] = useQuery(gql.getUserResp, { query: gql.getUser });
-
-  return pipe(
-    result,
-    RE.match(
-      () => <></>,
-      () => <></>,
-      ({ me }) => <Prompt publicKey={me.publicKey} />,
-    ),
-  );
+  return <Prompt />;
 };
