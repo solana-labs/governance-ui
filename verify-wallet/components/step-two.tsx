@@ -3,7 +3,7 @@ import { SolanaLogo } from '@hub/components/branding/SolanaLogo';
 const DISCORD_AUTHORIZE_URL = `https://discord.com/api/oauth2/authorize?${new URLSearchParams(
   {
     // Too lazy to figure out how to actually make this clean
-    client_id: '1041465587202805801',
+    client_id: '1042836142560645130',
     redirect_uri: encodeURI('http://localhost:3000/verify-wallet'),
     response_type: 'code',
     scope: ['role_connections.write'].join(' '),

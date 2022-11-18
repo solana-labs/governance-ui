@@ -30,14 +30,11 @@ const getCurrentStep = (jwt, accessToken) => {
 
 const VerifyWallet = (/* props: Props */) => {
   const parsedLocationHash = new URLSearchParams(
-    window.location.hash.substring(1)
+    window.location.search.substring(1)
   )
   const [jwt] = useJWT()
 
-  const currentStep = getCurrentStep(
-    jwt,
-    parsedLocationHash.get('access_token')
-  )
+  const currentStep = getCurrentStep(jwt, parsedLocationHash.get('code'))
 
   return (
     <>

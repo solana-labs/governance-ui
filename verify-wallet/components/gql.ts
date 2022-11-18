@@ -6,8 +6,8 @@ const VerifyWalletResponse = IT.type({
 });
 
 export const verifyWallet = gql`
-  mutation {
-    verifyWallet($code: String!) {
+  mutation($code: String!) {
+    verifyWallet(code: $code) {
       status
     }
   }

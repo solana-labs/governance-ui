@@ -28,18 +28,19 @@ const Prompt = ({ publicKey }: { publicKey: PublicKey }) => {
   );
   const [status, setStatus] = useState(STATES.VERIFYING);
   const parsedLocationHash = new URLSearchParams(
-    window.location.hash.substring(1),
+    window.location.search.substring(1),
   );
 
+  console.log(parsedLocationHash, parsedLocationHash.get('code'));
   useEffect(() => {
     const updateDiscordMetadata = async () => {
-      console.info('updating!', publicKey.toBase58());
+      // console.info('updating!', publicKey.toBase58());
       try {
         const response = await verifyWallet({
           code: parsedLocationHash.get('code'),
         });
 
-        const responseJson = await response.json();
+        const responseJson = response.json();
         // TODO(jon): Actually check the status of the response
         setStatus(STATES.VERIFIED);
         console.info({ responseJson });
@@ -47,10 +48,10 @@ const Prompt = ({ publicKey }: { publicKey: PublicKey }) => {
         console.error(e);
       }
     };
-    if (parsedLocationHash.get('access_token')) {
+    if (parsedLocationHash.get('code')) {
       updateDiscordMetadata();
     }
-  }, [parsedLocationHash]);
+  }, [window.location.search]);
 
   if (status === STATES.VERIFYING) {
     // TODO(jon): Add intermediary state
