@@ -11,8 +11,8 @@ import { ANCHOR_DISCRIMINATOR_LAYOUT } from '@utils/helpers';
 import { getSplTokenNameByMint } from '@utils/splTokens';
 
 export const UXD_PROGRAM_INSTRUCTIONS = {
-  //UXD8m9cvwk4RcSxnX2HZ9VudQCEeDH6fRnB4CAP57Dr: {
-  HtBAjXoadvKg8KBAtcUL1BjgxM55itScsZYe9LHt3NiP: {
+  UXD8m9cvwk4RcSxnX2HZ9VudQCEeDH6fRnB4CAP57Dr: {
+    // HtBAjXoadvKg8KBAtcUL1BjgxM55itScsZYe9LHt3NiP: {
     122: {
       name: 'UXD - Edit Identity Depository',
       accounts: ['Authority', 'Controller', 'Depository'],
