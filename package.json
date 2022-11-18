@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "next dev",
-    "build": "yarn && next build",
+    "build": "next build",
     "start": "next start",
     "prepare": "husky install",
     "analyze": "ANALYZE=true next build",
