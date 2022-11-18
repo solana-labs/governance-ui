@@ -1,16 +1,13 @@
 import * as yup from 'yup';
 import Select from '@components/inputs/Select';
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
-import {
-  getDepositoryMintSymbols,
-  getInsuranceMintSymbols,
-} from '@tools/sdk/uxdProtocol/uxdClient';
+import { getDepositoryMintSymbols } from '@tools/sdk/uxdProtocol/uxdClient';
 import { GovernedMultiTypeAccount } from '@utils/tokens';
-import { UXDQuoteRedeemWithMangoDepositoryForm } from '@utils/uiTypes/proposalCreationTypes';
+import { UXDRedeemFromMercurialVaultDepositoryForm } from '@utils/uiTypes/proposalCreationTypes';
 import SelectOptionList from '../../SelectOptionList';
 import Input from '@components/inputs/Input';
-import createQuoteRedeemWithMangoDepositoryInstruction from '@tools/sdk/uxdProtocol/createQuoteRedeemWithMangoDepositoryInstruction';
 import { PublicKey } from '@solana/web3.js';
+import createRedeemFromMercurialVaultDepositoryInstruction from '@tools/sdk/uxdProtocol/createRedeemFromMercurialVaultDepositoryInstruction';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -19,14 +16,13 @@ const schema = yup.object().shape({
     .required('Governance account is required'),
   uxdProgram: yup.string().required('UXD Program address is required'),
   collateralName: yup.string().required('Collateral Name address is required'),
-  insuranceName: yup.string().required('Insurance Name address is required'),
   uiRedeemableAmount: yup
     .number()
     .moreThan(0, 'Redeemable amount should be more than 0')
     .required('Redeemable Amount is required'),
 });
 
-const UXDQuoteRedeemWithMangoDepository = ({
+const UXDRedeemFromMercurialVaultDepository = ({
   index,
   governedAccount,
 }: {
@@ -38,7 +34,7 @@ const UXDQuoteRedeemWithMangoDepository = ({
     form,
     formErrors,
     handleSetForm,
-  } = useInstructionFormBuilder<UXDQuoteRedeemWithMangoDepositoryForm>({
+  } = useInstructionFormBuilder<UXDRedeemFromMercurialVaultDepositoryForm>({
     index,
     initialFormValues: {
       governedAccount,
@@ -46,12 +42,11 @@ const UXDQuoteRedeemWithMangoDepository = ({
     schema,
     shouldSplitIntoSeparateTxs: true,
     buildInstruction: async function ({ form, governedAccountPubkey, wallet }) {
-      return createQuoteRedeemWithMangoDepositoryInstruction({
+      return createRedeemFromMercurialVaultDepositoryInstruction({
         connection,
         uxdProgramId: new PublicKey(form.uxdProgram!),
         authority: governedAccountPubkey,
         depositoryMintName: form.collateralName!,
-        insuranceMintName: form.insuranceName!,
         redeemableAmount: form.uiRedeemableAmount!,
         payer: wallet.publicKey!,
       });
@@ -85,18 +80,6 @@ const UXDQuoteRedeemWithMangoDepository = ({
         <SelectOptionList list={getDepositoryMintSymbols(connection.cluster)} />
       </Select>
 
-      <Select
-        label="Insurance Name"
-        value={form.insuranceName}
-        placeholder="Please select..."
-        onChange={(value) =>
-          handleSetForm({ value, propertyName: 'insuranceName' })
-        }
-        error={formErrors['insuranceName']}
-      >
-        <SelectOptionList list={getInsuranceMintSymbols(connection.cluster)} />
-      </Select>
-
       <Input
         label="Redeemable Amount"
         value={form.uiRedeemableAmount}
@@ -115,4 +98,4 @@ const UXDQuoteRedeemWithMangoDepository = ({
   );
 };
 
-export default UXDQuoteRedeemWithMangoDepository;
+export default UXDRedeemFromMercurialVaultDepository;

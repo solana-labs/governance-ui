@@ -1,12 +1,7 @@
 import { Cluster } from '@blockworks-foundation/mango-client';
-import { EndpointTypes } from '@models/types';
 import { utils } from '@project-serum/anchor';
-import { Connection, PublicKey } from '@solana/web3.js';
-import {
-  createAndInitializeMango,
-  MangoDepository,
-  UXDClient,
-} from '@uxd-protocol/uxd-client';
+import { PublicKey } from '@solana/web3.js';
+import { MangoDepository, UXDClient } from '@uxd-protocol/uxd-client';
 
 export const DEPOSITORY_MINTS = {
   devnet: {
@@ -18,8 +13,8 @@ export const DEPOSITORY_MINTS = {
       address: new PublicKey('So11111111111111111111111111111111111111112'),
       decimals: 9,
     },
-    SOLEND_USDC: {
-      address: new PublicKey('zVzi5VAf4qMEwzv7NXECVx5v2pQ7xnqVVjCXZwS9XzA'),
+    MERCURIAL_USDC: {
+      address: new PublicKey('6L9fgyYtbz34JvwvYyL6YzJDAywz9PKGttuZuWyuoqje'),
       decimals: 6,
     },
   },
@@ -94,10 +89,6 @@ export const getDepositoryMintKey = (
 export const getDepositoryToken = (cluster: Cluster, symbol: string) =>
   DEPOSITORY_MINTS[cluster][symbol];
 
-export const getInsuranceMintSymbols = (cluster: Cluster): string[] => [
-  ...Object.keys(INSURANCE_MINTS[cluster]),
-];
-
 export const getInsuranceMintInfo = (
   cluster: Cluster,
   symbol: string,
@@ -106,32 +97,8 @@ export const getInsuranceMintInfo = (
   decimals: number;
 } => INSURANCE_MINTS[cluster][symbol];
 
-export const getInsuranceMintKey = (
-  cluster: Cluster,
-  symbol: string,
-): PublicKey => INSURANCE_MINTS[cluster][symbol].address;
-
-export const getGovernanceMintSymbols = (cluster: Cluster): string[] => [
-  ...Object.keys(GOVERNANCE_MINTS[cluster]),
-];
-
-export const getGovernanceMintKey = (
-  cluster: Cluster,
-  symbol: string,
-): PublicKey => GOVERNANCE_MINTS[cluster][symbol].address;
-
-export const getGovernanceToken = (cluster: Cluster, symbol: string) =>
-  GOVERNANCE_MINTS[cluster][symbol];
-
 export const uxdClient = (programId: PublicKey): UXDClient => {
   return new UXDClient(programId);
-};
-
-export const initializeMango = async (
-  connection: Connection,
-  cluster: EndpointTypes,
-) => {
-  return createAndInitializeMango(connection, cluster);
 };
 
 export const getControllerPda = (uxdProgramId: PublicKey): PublicKey => {

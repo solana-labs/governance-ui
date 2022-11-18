@@ -46,22 +46,18 @@ import TribecaNewEscrow from './Tribeca/NewEscrow';
 import TribecaPrepareEpochGaugeVoter from './Tribeca/PrepareEpochGaugeVoter';
 import TribecaResetEpochGaugeVoter from './Tribeca/ResetEpochGaugeVoter';
 import TribecaGaugeSetVote from './Tribeca/SetGaugeVote';
-import UXDDepositInsuranceToMangoDepository from './UXD/DepositInsuranceToMangoDepository';
 import UXDInitializeController from './UXD/InitializeController';
-import UXDRegisterMangoDeposiory from './UXD/RegisterMangoDepository';
-import UXDSetMangoDepositoriesRedeemableSoftCap from './UXD/SetMangoDepositoriesRedeemableSoftCap';
 import UXDSetRedeemableGlobalSupplyCap from './UXD/SetRedeemGlobalSupplyCap';
-import UXDWithdrawInsuranceFromMangoDepository from './UXD/WithdrawInsuranceFromMangoDepository';
 import UXDRegisterMercurialVaultDepository from './UXD/RegisterMercurialVaultDepository';
 import UXDEditMercurialVaultDepository from './UXD/EditMercurialVaultDepository';
 import UXDEditController from './UXD/EditController';
-import UXDEditMangoDepository from './UXD/EditMangoDepository';
 import UXDMintWithMercurialVaultDepository from './UXD/MintWithMercurialVaultDepository';
-import UXDDisableDepositoryMinting from './UXD/DisableDepositoryMinting';
-import UXDQuoteMintWithMangoDepository from './UXD/QuoteMintWithMangoDepository';
-import UXDQuoteRedeemWithMangoDepository from './UXD/QuoteRedeemWithMangoDepository';
-import UXDSetMangoDepositoryQuoteMintAndRedeemFee from './UXD/SetMangoDepositoryQuoteMintAndRedeemFee';
-import UXDSetMangoDepositoryQuoteMintAndRedeemSoftCap from './UXD/SetMangoDepositoryQuoteMintAndRedeemSoftCap';
+import UXDInitializeIdentityDepository from './UXD/InitializeIdentityDepository';
+import UXDMintWithIdentityDepository from './UXD/MintWithIdentityDepository';
+import UXDRedeemFromIdentityDepository from './UXD/RedeemFromIdentityDepository';
+import UXDRedeemFromMercurialVaultDepository from './UXD/RedeemFromMercurialVaultDepository';
+import UXDReinjectMangoToIdentityDepository from './UXD/ReinjectMangoToIdentityDepository';
+import UXDEditIdentityDepository from './UXD/EditIdentityDepository';
 import UXDStakingInitializeStakingCampaign from './UXDStaking/InitializeStakingCampaign';
 import UXDStakingMigrateStakingCampaignFromV1ToV2 from './UXDStaking/MigrateStakingCampaignFromV1ToV2';
 import UXDStakingFinalizeStakingCampaign from './UXDStaking/FinalizeStakingCampaign';
@@ -233,55 +229,6 @@ const SelectedInstruction = ({
           governedAccount={governedAccount}
         />
       );
-    case InstructionEnum.UXDSetMangoDepositoriesRedeemableSoftCap:
-      return (
-        <UXDSetMangoDepositoriesRedeemableSoftCap
-          index={index}
-          governedAccount={governedAccount}
-        />
-      );
-    case InstructionEnum.UXDRegisterMangoDepository:
-      return (
-        <UXDRegisterMangoDeposiory
-          index={index}
-          governedAccount={governedAccount}
-        />
-      );
-    case InstructionEnum.UXDDepositInsuranceToMangoDepository:
-      return (
-        <UXDDepositInsuranceToMangoDepository
-          index={index}
-          governedAccount={governedAccount}
-        />
-      );
-    case InstructionEnum.UXDWithdrawInsuranceFromMangoDepository:
-      return (
-        <UXDWithdrawInsuranceFromMangoDepository
-          index={index}
-          governedAccount={governedAccount}
-        />
-      );
-    case InstructionEnum.UXDDisableDepositoryMinting:
-      return (
-        <UXDDisableDepositoryMinting
-          index={index}
-          governedAccount={governedAccount}
-        />
-      );
-    case InstructionEnum.UXDQuoteMintWithMangoDepository:
-      return (
-        <UXDQuoteMintWithMangoDepository
-          index={index}
-          governedAccount={governedAccount}
-        />
-      );
-    case InstructionEnum.UXDQuoteRedeemWithMangoDepository:
-      return (
-        <UXDQuoteRedeemWithMangoDepository
-          index={index}
-          governedAccount={governedAccount}
-        />
-      );
     case InstructionEnum.UXDRegisterMercurialVaultDepository:
       return (
         <UXDRegisterMercurialVaultDepository
@@ -303,30 +250,52 @@ const SelectedInstruction = ({
           governedAccount={governedAccount}
         />
       );
+
+    case InstructionEnum.UXDInitializeIdentityDepository:
+      return (
+        <UXDInitializeIdentityDepository
+          index={index}
+          governedAccount={governedAccount}
+        />
+      );
+    case InstructionEnum.UXDMintWithIdentityDepository:
+      return (
+        <UXDMintWithIdentityDepository
+          index={index}
+          governedAccount={governedAccount}
+        />
+      );
+    case InstructionEnum.UXDRedeemFromIdentityDepository:
+      return (
+        <UXDRedeemFromIdentityDepository
+          index={index}
+          governedAccount={governedAccount}
+        />
+      );
+    case InstructionEnum.UXDRedeemFromMercurialVaultDepository:
+      return (
+        <UXDRedeemFromMercurialVaultDepository
+          index={index}
+          governedAccount={governedAccount}
+        />
+      );
+    case InstructionEnum.UXDReinjectMangoToIdentityDepository:
+      return (
+        <UXDReinjectMangoToIdentityDepository
+          index={index}
+          governedAccount={governedAccount}
+        />
+      );
+    case InstructionEnum.UXDEditIdentityDepository:
+      return (
+        <UXDEditIdentityDepository
+          index={index}
+          governedAccount={governedAccount}
+        />
+      );
     case InstructionEnum.UXDEditController:
       return (
         <UXDEditController index={index} governedAccount={governedAccount} />
-      );
-    case InstructionEnum.UXDEditMangoDepository:
-      return (
-        <UXDEditMangoDepository
-          index={index}
-          governedAccount={governedAccount}
-        />
-      );
-    case InstructionEnum.UXDSetMangoDepositoryQuoteMintAndRedeemFee:
-      return (
-        <UXDSetMangoDepositoryQuoteMintAndRedeemFee
-          index={index}
-          governedAccount={governedAccount}
-        />
-      );
-    case InstructionEnum.UXDSetMangoDepositoryQuoteMintAndRedeemSoftCap:
-      return (
-        <UXDSetMangoDepositoryQuoteMintAndRedeemSoftCap
-          index={index}
-          governedAccount={governedAccount}
-        />
       );
     case InstructionEnum.UXDStakingMigrateStakingCampaignFromV1ToV2:
       return (

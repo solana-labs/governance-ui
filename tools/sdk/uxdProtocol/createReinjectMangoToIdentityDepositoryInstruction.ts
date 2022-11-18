@@ -1,28 +1,38 @@
 import { Provider } from '@project-serum/anchor';
 import { TransactionInstruction, PublicKey } from '@solana/web3.js';
-import { Controller, UXD_DECIMALS } from '@uxd-protocol/uxd-client';
-import type { ConnectionContext } from 'utils/connection';
+import { ConnectionContext } from '@utils/connection';
 import {
-  uxdClient,
-  instantiateMangoDepository,
+  Controller,
+  IdentityDepository,
+  UXD_DECIMALS,
+} from '@uxd-protocol/uxd-client';
+import {
   getDepositoryMintInfo,
   getInsuranceMintInfo,
+  instantiateMangoDepository,
+  uxdClient,
 } from './uxdClient';
 
-const createSetMangoDepositoryQuoteMintAndRedeemSoftCapInstruction = async ({
+const createReinjectMangoToIdentityDepositoryInstruction = async ({
   connection,
   uxdProgramId,
   authority,
+  payer,
   depositoryMintName,
   insuranceMintName,
-  softCapUiAmount,
+  collateralMint,
+  collateralMintSymbol,
+  collateralMintDecimals,
 }: {
   connection: ConnectionContext;
   uxdProgramId: PublicKey;
   authority: PublicKey;
+  payer: PublicKey;
   depositoryMintName: string;
   insuranceMintName: string;
-  softCapUiAmount: number;
+  collateralMint: PublicKey;
+  collateralMintSymbol: string;
+  collateralMintDecimals: number;
 }): Promise<TransactionInstruction> => {
   const client = uxdClient(uxdProgramId);
 
@@ -36,7 +46,7 @@ const createSetMangoDepositoryQuoteMintAndRedeemSoftCapInstruction = async ({
     decimals: insuranceDecimals,
   } = getInsuranceMintInfo(connection.cluster, insuranceMintName);
 
-  const depository = instantiateMangoDepository({
+  const mangoDepository = instantiateMangoDepository({
     uxdProgramId,
     depositoryMint,
     insuranceMint,
@@ -46,13 +56,21 @@ const createSetMangoDepositoryQuoteMintAndRedeemSoftCapInstruction = async ({
     insuranceDecimals,
   });
 
-  return client.createSetMangoDepositoryQuoteMintAndRedeemSoftCapInstruction(
-    softCapUiAmount,
+  const identityDepository = new IdentityDepository(
+    collateralMint,
+    collateralMintSymbol,
+    collateralMintDecimals,
+    uxdProgramId,
+  );
+
+  return client.createReinjectMangoToIdentityDepositoryInstruction(
     new Controller('UXD', UXD_DECIMALS, uxdProgramId),
-    depository,
+    identityDepository,
+    mangoDepository,
     authority,
     Provider.defaultOptions(),
+    payer,
   );
 };
 
-export default createSetMangoDepositoryQuoteMintAndRedeemSoftCapInstruction;
+export default createReinjectMangoToIdentityDepositoryInstruction;

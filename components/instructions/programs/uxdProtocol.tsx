@@ -11,7 +11,171 @@ import { ANCHOR_DISCRIMINATOR_LAYOUT } from '@utils/helpers';
 import { getSplTokenNameByMint } from '@utils/splTokens';
 
 export const UXD_PROGRAM_INSTRUCTIONS = {
-  UXD8m9cvwk4RcSxnX2HZ9VudQCEeDH6fRnB4CAP57Dr: {
+  //UXD8m9cvwk4RcSxnX2HZ9VudQCEeDH6fRnB4CAP57Dr: {
+  HtBAjXoadvKg8KBAtcUL1BjgxM55itScsZYe9LHt3NiP: {
+    122: {
+      name: 'UXD - Edit Identity Depository',
+      accounts: ['Authority', 'Controller', 'Depository'],
+      getDataUI: (
+        _connection: Connection,
+        data: Uint8Array,
+        _accounts: AccountMetaData[],
+      ) => {
+        let redeemableAmountUnderManagementCapOption = false;
+        let mintingDisabledOption = false;
+
+        // Check if options are used or not
+        if (data[8] == 1) {
+          redeemableAmountUnderManagementCapOption = true;
+        }
+
+        if (
+          data[9 + (redeemableAmountUnderManagementCapOption ? 16 : 0)] == 1
+        ) {
+          mintingDisabledOption = true;
+        }
+
+        const layout: Layout<any>[] = [
+          u8('instruction'),
+          ...ANCHOR_DISCRIMINATOR_LAYOUT,
+        ];
+
+        layout.push(u8('redeemableAmountUnderManagementCapOption'));
+        if (redeemableAmountUnderManagementCapOption) {
+          layout.push(u128('redeemableAmountUnderManagementCap'));
+        }
+
+        layout.push(u8('mintingDisabledOption'));
+        if (mintingDisabledOption) {
+          layout.push(u8('mintingDisabled'));
+        }
+
+        const dataLayout = struct(layout);
+
+        const {
+          redeemableAmountUnderManagementCap,
+          mintingDisabled,
+        } = dataLayout.decode(Buffer.from(data)) as any;
+
+        return (
+          <>
+            <p>{`Native redeemable amount under management supply cap: ${
+              redeemableAmountUnderManagementCapOption
+                ? redeemableAmountUnderManagementCap.toString()
+                : 'Not used'
+            }`}</p>
+            <p>{`Minting disabled: ${
+              mintingDisabledOption
+                ? mintingDisabled
+                  ? 'Minting is disabled'
+                  : 'Minting is enabled'
+                : 'Not used'
+            }`}</p>
+          </>
+        );
+      },
+    },
+    98: {
+      name: 'UXD - Mint with Identity Depository',
+      accounts: [
+        'User',
+        'Payer',
+        'Controller',
+        'Depository',
+        'Collateral Vault',
+        'Redeemable Mint',
+        'User Collateral',
+        'User Redeemable',
+        'System Program',
+        'Token Program',
+      ],
+      getDataUI: (
+        _connection: Connection,
+        data: Uint8Array,
+        _accounts: AccountMetaData[],
+      ) => {
+        const dataLayout = struct([
+          u8('instruction'),
+          ...ANCHOR_DISCRIMINATOR_LAYOUT,
+          nu64('collateralAmount'),
+        ]);
+
+        const { collateralAmount } = dataLayout.decode(
+          Buffer.from(data),
+        ) as any;
+
+        return (
+          <>
+            <p>{`Collateral amount: ${nativeToUi(
+              collateralAmount,
+              6,
+            ).toLocaleString()}`}</p>
+            <p>Collateral mint: USDC</p>
+          </>
+        );
+      },
+    },
+    42: {
+      name: 'UXD - Redeem with Identity Depository',
+      accounts: [
+        'User',
+        'Payer',
+        'Controller',
+        'Depository',
+        'Collateral Vault',
+        'Redeemable Mint',
+        'User Collateral',
+        'User Redeemable',
+        'System Program',
+        'Token Program',
+      ],
+      getDataUI: (
+        _connection: Connection,
+        data: Uint8Array,
+        _accounts: AccountMetaData[],
+      ) => {
+        const dataLayout = struct([
+          u8('instruction'),
+          ...ANCHOR_DISCRIMINATOR_LAYOUT,
+          nu64('redeemableAmount'),
+        ]);
+
+        const { redeemableAmount } = dataLayout.decode(
+          Buffer.from(data),
+        ) as any;
+
+        return (
+          <>
+            <p>{`Redeemable amount: ${nativeToUi(
+              redeemableAmount,
+              6,
+            ).toLocaleString()}`}</p>
+            <p>Collateral mint: USDC</p>
+          </>
+        );
+      },
+    },
+    181: {
+      name: 'UXD - Reinject Mango Funds using Identity Depository',
+      accounts: [
+        'Authority',
+        'Payer',
+        'Controller',
+        'Depository',
+        'Collateral Vault',
+        'Mango Depository',
+        'User Collateral',
+        'System Program',
+        'Token Program',
+      ],
+      getDataUI: (
+        _connection: Connection,
+        _data: Uint8Array,
+        _accounts: AccountMetaData[],
+      ) => {
+        return <></>;
+      },
+    },
     228: {
       name: 'UXD - Mint with Mercurial Vault Depository',
       accounts: [
@@ -50,7 +214,7 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
 
         return (
           <>
-            <p>{`native collateral amount: ${nativeToUi(
+            <p>{`Collateral amount: ${nativeToUi(
               collateralAmount,
               6,
             ).toLocaleString()}`}</p>
@@ -303,8 +467,6 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
         if (data[8] == 1) {
           redeemableDepositorySupplyCapOption = true;
         }
-
-        console.log('data', data);
 
         if (data[9 + (redeemableDepositorySupplyCapOption ? 16 : 0)] == 1) {
           mintingFeeInBpsOption = true;

@@ -421,45 +421,6 @@ export default function useGovernanceAssets() {
       packageId: PackageEnum.UXD,
       tag: 'deprecated',
     },
-    [InstructionEnum.UXDSetMangoDepositoriesRedeemableSoftCap]: {
-      name: 'Set Mango Depositories Redeemable Supply Soft Cap',
-      isVisible: canUseAnyInstruction,
-      packageId: PackageEnum.UXD,
-      tag: 'deprecated',
-    },
-    [InstructionEnum.UXDRegisterMangoDepository]: {
-      name: 'Register Mango Depository',
-      isVisible: canUseAnyInstruction,
-      packageId: PackageEnum.UXD,
-    },
-    [InstructionEnum.UXDDepositInsuranceToMangoDepository]: {
-      name: 'Deposit Insurance To Mango Depository',
-      isVisible: canUseAnyInstruction,
-      packageId: PackageEnum.UXD,
-    },
-    [InstructionEnum.UXDWithdrawInsuranceFromMangoDepository]: {
-      name: 'Withdraw Insurance From Mango Depository',
-      isVisible: canUseAnyInstruction,
-      packageId: PackageEnum.UXD,
-    },
-    [InstructionEnum.UXDDisableDepositoryMinting]: {
-      name: 'Disable Depository Minting',
-      isVisible: canUseAnyInstruction,
-      packageId: PackageEnum.UXD,
-      tag: 'beta',
-    },
-    [InstructionEnum.UXDQuoteMintWithMangoDepository]: {
-      name: 'Quote Mint With Mango Depository',
-      isVisible: canUseAnyInstruction,
-      packageId: PackageEnum.UXD,
-      tag: 'beta',
-    },
-    [InstructionEnum.UXDQuoteRedeemWithMangoDepository]: {
-      name: 'Quote Redeem With Mango Depository',
-      isVisible: canUseAnyInstruction,
-      packageId: PackageEnum.UXD,
-      tag: 'beta',
-    },
     [InstructionEnum.UXDRegisterMercurialVaultDepository]: {
       name: 'Register Mercurial Vault Depository',
       isVisible: canUseAnyInstruction,
@@ -478,26 +439,44 @@ export default function useGovernanceAssets() {
       packageId: PackageEnum.UXD,
       tag: 'beta',
     },
-    [InstructionEnum.UXDEditMangoDepository]: {
-      name: 'Edit Mango Depository',
-      isVisible: canUseAnyInstruction,
-      packageId: PackageEnum.UXD,
-      tag: 'beta',
-    },
     [InstructionEnum.UXDMintWithMercurialVaultDepository]: {
       name: 'Mint with Mercurial Vault Depository',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.UXD,
       tag: 'beta',
     },
-    [InstructionEnum.UXDSetMangoDepositoryQuoteMintAndRedeemFee]: {
-      name: 'Set Mango Depository Quote Mint And Redeem Fee',
+    [InstructionEnum.UXDInitializeIdentityDepository]: {
+      name: 'Initialize Identity Depository',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.UXD,
       tag: 'beta',
     },
-    [InstructionEnum.UXDSetMangoDepositoryQuoteMintAndRedeemSoftCap]: {
-      name: 'Set Mango Depository Quote Mint And Redeem Soft Cap',
+    [InstructionEnum.UXDMintWithIdentityDepository]: {
+      name: 'Mint with Identity Depository',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.UXD,
+      tag: 'beta',
+    },
+    [InstructionEnum.UXDRedeemFromIdentityDepository]: {
+      name: 'Redeem from Identity Depository',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.UXD,
+      tag: 'beta',
+    },
+    [InstructionEnum.UXDRedeemFromMercurialVaultDepository]: {
+      name: 'Redeem from Mercurial Vault Depository',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.UXD,
+      tag: 'beta',
+    },
+    [InstructionEnum.UXDReinjectMangoToIdentityDepository]: {
+      name: 'Reinject Mango Funds to Identity Depository',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.UXD,
+      tag: 'beta',
+    },
+    [InstructionEnum.UXDEditIdentityDepository]: {
+      name: 'Edit Identity Depository',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.UXD,
       tag: 'beta',
