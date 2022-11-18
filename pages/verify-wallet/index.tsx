@@ -2,7 +2,7 @@ import { GlobalFooter } from '@hub/components/GlobalFooter'
 import { useJWT } from '@hub/hooks/useJWT'
 import cx from '@hub/lib/cx'
 
-import React, { useEffect } from 'react'
+import React from 'react'
 import { StepOne } from 'verify-wallet/components/step-one'
 import { StepTwo } from 'verify-wallet/components/step-two'
 import { StepThree } from 'verify-wallet/components/step-three'
