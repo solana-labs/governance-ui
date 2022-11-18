@@ -40,10 +40,10 @@ const Prompt = ({ publicKey }: { publicKey: PublicKey }) => {
           code: parsedLocationHash.get('code'),
         });
 
-        const responseJson = response.json();
+        // const responseJson = response.json();
+        // console.info({ responseJson });
         // TODO(jon): Actually check the status of the response
         setStatus(STATES.VERIFIED);
-        console.info({ responseJson });
       } catch (e) {
         console.error(e);
       }
