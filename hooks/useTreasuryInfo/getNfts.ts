@@ -1,7 +1,7 @@
 import { gql, request } from 'graphql-request'
 
 import { NFT } from '@models/treasury/NFT'
-import { HOLAPLEX_GRAPQL_URL } from '@tools/constants'
+import { HOLAPLEX_GRAPQL_URL_MAINNET } from '@tools/constants'
 
 const LIMIT = 500
 
@@ -24,7 +24,7 @@ const query = gql`
 `
 
 const _getNfts = (owners: string[], page: number) =>
-  request(HOLAPLEX_GRAPQL_URL, query, {
+  request(HOLAPLEX_GRAPQL_URL_MAINNET, query, {
     owners,
     limit: LIMIT,
     offset: page * LIMIT,

@@ -33,7 +33,7 @@ import { getParsedNftAccountsByOwner } from '@nfteyez/sol-rayz'
 import axios from 'axios'
 import { ConnectionContext } from './connection'
 import { findMetadataPda, Metaplex } from '@metaplex-foundation/js'
-import { HOLAPLEX_GRAPQL_URL } from '@tools/constants'
+import { HOLAPLEX_GRAPQL_URL_MAINNET } from '@tools/constants'
 
 export type TokenAccount = AccountInfo
 export type MintAccount = MintInfo
@@ -382,7 +382,7 @@ export const deserializeMint = (data: Buffer) => {
 }
 
 const fetchNftsFromHolaplexIndexer = async (owner: PublicKey) => {
-  const result = await fetch(HOLAPLEX_GRAPQL_URL, {
+  const result = await fetch(HOLAPLEX_GRAPQL_URL_MAINNET, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

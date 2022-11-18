@@ -165,20 +165,12 @@ export const GOVERNANCE_INSTRUCTIONS = {
           realm.owner,
           realm.pubkey
         )
-
+        const proposedPluginPk = accounts[5]?.pubkey?.toBase58()
+        const proposedMaxVoterWeightPk = accounts[6]?.pubkey?.toBase58()
         return (
           <>
             <h1>Current config</h1>
-            <div>
-              <p>
-                {`communityMintMaxVoteWeightSource:
-               ${realm.account.config.communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}% supply`}{' '}
-                (
-                {fmtBNAmount(
-                  realm.account.config.communityMintMaxVoteWeightSource.value
-                )}
-                )
-              </p>
+            <div className="space-y-3">
               <p>
                 {`minCommunityTokensToCreateGovernance:
               ${fmtVoterWeightThresholdMintAmount(
@@ -192,12 +184,75 @@ export const GOVERNANCE_INSTRUCTIONS = {
                 )
               </p>
               <p>
+                {`communityMintMaxVoteWeightSource:
+               ${realm.account.config.communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}% supply`}{' '}
+                (
+                {fmtBNAmount(
+                  realm.account.config.communityMintMaxVoteWeightSource.value
+                )}
+                )
+              </p>
+              <p>
+                {`useCouncilMint:
+               ${!!realm.account.config.councilMint}`}
+              </p>
+              <p>
                 {`useCommunityVoterWeightAddin:
                ${!!realm.account.config.useCommunityVoterWeightAddin}`}
               </p>
               <p>
                 {`useMaxCommunityVoterWeightAddin:
                ${!!realm.account.config.useMaxCommunityVoterWeightAddin}`}
+              </p>
+              <p>
+                {proposedPluginPk && (
+                  <p>
+                    {`communityVoterWeightAddin :
+               ${proposedPluginPk}`}
+                  </p>
+                )}
+                {proposedMaxVoterWeightPk && (
+                  <p>
+                    {`maxCommunityVoterWeightAddin:
+               ${proposedMaxVoterWeightPk}`}
+                  </p>
+                )}
+              </p>
+            </div>
+            <h1 className="mt-10">Proposed config</h1>
+            <div className="space-y-3">
+              <p>
+                {`minCommunityTokensToCreateGovernance:
+              ${fmtVoterWeightThresholdMintAmount(
+                communityMint?.account,
+                args.configArgs.minCommunityTokensToCreateGovernance
+              )}`}{' '}
+                (
+                {fmtBNAmount(
+                  args.configArgs.minCommunityTokensToCreateGovernance
+                )}
+                )
+              </p>
+              <p>
+                {`communityMintMaxVoteWeightSource:
+               ${args.configArgs.communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}% supply`}{' '}
+                (
+                {fmtBNAmount(
+                  args.configArgs.communityMintMaxVoteWeightSource.value
+                )}
+                )
+              </p>
+              <p>
+                {`useCouncilMint:
+               ${args.configArgs.useCouncilMint}`}
+              </p>
+              <p>
+                {`useCommunityVoterWeightAddin:
+               ${!!args.configArgs.useCommunityVoterWeightAddin}`}
+              </p>
+              <p>
+                {`useMaxCommunityVoterWeightAddin:
+               ${!!args.configArgs.useMaxCommunityVoterWeightAddin}`}
               </p>
               <p>
                 {currentRealmConfig?.account.communityTokenConfig
@@ -214,42 +269,6 @@ export const GOVERNANCE_INSTRUCTIONS = {
                ${currentRealmConfig?.account.communityTokenConfig.maxVoterWeightAddin?.toBase58()}`}
                   </p>
                 )}
-              </p>
-            </div>
-            <h1>Proposed config</h1>
-            <div>
-              <p>
-                {`minCommunityTokensToCreateGovernance:
-              ${fmtVoterWeightThresholdMintAmount(
-                communityMint?.account,
-                args.configArgs.minCommunityTokensToCreateGovernance
-              )}`}{' '}
-                (
-                {fmtBNAmount(
-                  args.configArgs.minCommunityTokensToCreateGovernance
-                )}
-                )
-              </p>
-              <p>
-                {`useCouncilMint:
-               ${args.configArgs.useCouncilMint}`}
-              </p>
-              <p>
-                {`communityMintMaxVoteWeightSource:
-               ${args.configArgs.communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}% supply`}{' '}
-                (
-                {fmtBNAmount(
-                  args.configArgs.communityMintMaxVoteWeightSource.value
-                )}
-                )
-              </p>
-              <p>
-                {`useCommunityVoterWeightAddin:
-               ${!!args.configArgs.useCommunityVoterWeightAddin}`}
-              </p>
-              <p>
-                {`useMaxCommunityVoterWeightAddin:
-               ${!!args.configArgs.useMaxCommunityVoterWeightAddin}`}
               </p>
             </div>
           </>

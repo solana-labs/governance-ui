@@ -55,12 +55,7 @@ const ThirdPartyInstructionWritesConfigWarning = () => (
 )
 
 const useProposalSafetyCheck = () => {
-  const { realm, config, realmInfo } = useRealm()
-  console.log(
-    'agrippa debug',
-    realm?.pubkey.toString(),
-    config?.pubkey.toString()
-  )
+  const { config, realmInfo } = useRealm()
   const { instructions } = useProposal()
 
   const realmConfigWarnings = useMemo(() => {
