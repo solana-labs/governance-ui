@@ -22,7 +22,7 @@ import AdviceBox from '@components/NewRealmWizard/components/AdviceBox'
 import NFTCollectionModal from '@components/NewRealmWizard/components/NFTCollectionModal'
 import { Metaplex } from '@metaplex-foundation/js'
 import { Connection, PublicKey } from '@solana/web3.js'
-import { HOLAPLEX_GRAPQL_URL } from '@tools/constants'
+import { HOLAPLEX_GRAPQL_URL_MAINNET } from '@tools/constants'
 
 const getNftQuery = (limit, offset) => {
   return `
@@ -97,7 +97,7 @@ async function getNFTCollectionInfo(
   connection: Connection,
   collectionKey: string
 ) {
-  const collectionResult = await axios.post(HOLAPLEX_GRAPQL_URL, {
+  const collectionResult = await axios.post(HOLAPLEX_GRAPQL_URL_MAINNET, {
     query: getNftQuery(1, 0),
     variables: {
       collection: new PublicKey(collectionKey),
@@ -126,7 +126,7 @@ async function getNFTCollectionInfo(
     return collectionInfo
   }
   // assume we've been given the collection address already, so we need to go find it's children
-  const allNftsResult = await axios.post(HOLAPLEX_GRAPQL_URL, {
+  const allNftsResult = await axios.post(HOLAPLEX_GRAPQL_URL_MAINNET, {
     query: getNftQuery(1000, 0),
     variables: {
       collection: new PublicKey(collectionKey),
