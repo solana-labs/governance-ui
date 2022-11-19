@@ -290,7 +290,7 @@ export function InstructionAccount({
             <div className="text-primary-light">Signer</div>
           )}{' '}
           {accountMeta.isWritable && (
-            <div className="text-primary-light">Writable</div>
+            <div className="text-[#b45be1]">Writable</div>
           )}
         </div>
       </div>
