@@ -239,6 +239,7 @@ export function InstructionProgram({
                 {programLabel}
               </div>
             )}
+            <div></div>
           </div>
           <ExternalLinkIcon
             className={`flex-shrink-0 h-4 w-4 ml-2 text-primary-light`}
@@ -280,10 +281,18 @@ export function InstructionAccount({
       <div className="pb-1 lg:pb-0">
         <p className="font-bold text-fgd-1">{`Account ${index + 1}`}</p>
         {descriptor?.accounts && (
-          <div className="mt-0.5 text-fgd-3 text-xs">
+          <div className="my-0.5 text-fgd-3 text-xs">
             {descriptor.accounts[index]?.name}
           </div>
         )}
+        <div className="text-[10px] flex space-x-3">
+          {accountMeta.isSigner && (
+            <div className="text-primary-light">Signer</div>
+          )}{' '}
+          {accountMeta.isWritable && (
+            <div className="text-primary-light">Writable</div>
+          )}
+        </div>
       </div>
       <div className="flex items-center">
         <a
@@ -293,7 +302,8 @@ export function InstructionAccount({
           rel="noopener noreferrer"
         >
           <div>
-            {accountMeta.pubkey.toBase58()}
+            <div>{accountMeta.pubkey.toBase58()}</div>
+            <div></div>
             {accountLabel && (
               <div className="mt-0.5 text-fgd-3 text-right text-xs">
                 {accountLabel}

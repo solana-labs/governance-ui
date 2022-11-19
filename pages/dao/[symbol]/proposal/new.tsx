@@ -207,6 +207,7 @@ const New = () => {
   const handleSetInstructions = (val: any, index) => {
     const newInstructions = [...instructionsData]
     newInstructions[index] = { ...instructionsData[index], ...val }
+    console.log(val)
     setInstructions(newInstructions)
   }
   const handleSetForm = ({ propertyName, value }) => {

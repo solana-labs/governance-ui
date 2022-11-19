@@ -276,6 +276,5 @@ export const createProposal = async (
       transactionInstructions: txes,
     })
   }
-
   return proposalAddress
 }
