@@ -85,6 +85,11 @@ import MakeSetMarketMetadataParams from './components/instructions/Foresight/Mak
 import CloseTokenAccount from './components/instructions/CloseTokenAccount'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import CastleWithdraw from './components/instructions/Castle/CastleWithdraw'
+import MeanCreateAccount from './components/instructions/Mean/MeanCreateAccount'
+import MeanFundAccount from './components/instructions/Mean/MeanFundAccount'
+import MeanWithdrawFromAccount from './components/instructions/Mean/MeanWithdrawFromAccount'
+import MeanCreateStream from './components/instructions/Mean/MeanCreateStream'
+import MeanTransferStream from './components/instructions/Mean/MeanTransferStream'
 import ChangeDonation from './components/instructions/Change/ChangeDonation'
 import VotingMintConfig from './components/instructions/Vsr/VotingMintConfig'
 import CreateVsrRegistrar from './components/instructions/Vsr/CreateRegistrar'
@@ -438,6 +443,11 @@ const New = () => {
       [Instructions.ClaimPendingWithdraw]: FriktionClaimPendingWithdraw,
       [Instructions.DepositIntoCastle]: CastleDeposit,
       [Instructions.WithrawFromCastle]: CastleWithdraw,
+      [Instructions.MeanCreateAccount]: MeanCreateAccount,
+      [Instructions.MeanFundAccount]: MeanFundAccount,
+      [Instructions.MeanWithdrawFromAccount]: MeanWithdrawFromAccount,
+      [Instructions.MeanCreateStream]: MeanCreateStream,
+      [Instructions.MeanTransferStream]: MeanTransferStream,
       [Instructions.DepositIntoGoblinGold]: GoblinGoldDeposit,
       [Instructions.WithdrawFromGoblinGold]: GoblinGoldWithdraw,
       [Instructions.CreateSolendObligationAccount]: CreateObligationAccount,

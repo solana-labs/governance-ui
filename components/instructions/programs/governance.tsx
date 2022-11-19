@@ -56,6 +56,12 @@ export const GOVERNANCE_INSTRUCTIONS = {
         const councilMint = realm.account.config.councilMint
           ? await tryGetMint(connection, realm.account.config.councilMint)
           : undefined
+        const isMaxNumber =
+          args.config.minCommunityTokensToCreateProposal.toString() ===
+          DISABLED_VOTER_WEIGHT.toString()
+        const isCurrentGovernanceMinCommMax =
+          governance.account.config.minCommunityTokensToCreateProposal.toString() ===
+          DISABLED_VOTER_WEIGHT.toString()
 
         return programVersion >= 3 ? (
           <>
@@ -131,50 +137,90 @@ export const GOVERNANCE_INSTRUCTIONS = {
           </>
         ) : (
           <>
-            <p>
-              {`voteThresholdPercentage:
+            <h1>Current config</h1>
+            <div className="space-y-3">
+              <p>
+                {`voteThresholdPercentage:
+              ${governance.account.config.communityVoteThreshold.value?.toLocaleString()}%`}
+              </p>
+              {isCurrentGovernanceMinCommMax ? (
+                <p>minCommunityTokensToCreateProposal: Disabled</p>
+              ) : (
+                <p>
+                  {`minCommunityTokensToCreateProposal:
+              ${fmtMintAmount(
+                communityMint?.account,
+                governance.account.config.minCommunityTokensToCreateProposal
+              )}`}{' '}
+                  (
+                  {governance.account.config.minCommunityTokensToCreateProposal.toNumber()}
+                  )
+                </p>
+              )}
+              <p>
+                {`minCouncilTokensToCreateProposal:
+              ${fmtMintAmount(
+                councilMint?.account,
+                governance.account.config.minCouncilTokensToCreateProposal
+              )}`}
+              </p>
+              <p>
+                {`minInstructionHoldUpTime:
+              ${getDaysFromTimestamp(
+                governance.account.config.minInstructionHoldUpTime
+              )} day(s)`}
+              </p>
+              <p>
+                {`maxVotingTime:
+              ${getDaysFromTimestamp(
+                governance.account.config.maxVotingTime
+              )} days(s)`}
+              </p>
+              <p>
+                {`voteTipping:
+              ${VoteTipping[governance.account.config.communityVoteTipping]}`}
+              </p>
+            </div>
+            <h1 className="mt-10">Proposed config</h1>
+            <div className="space-y-3">
+              <p>
+                {`voteThresholdPercentage:
               ${args.config.communityVoteThreshold.value?.toLocaleString()}%`}
-            </p>
-            {args.config.minCommunityTokensToCreateProposal.toString() ===
-            DISABLED_VOTER_WEIGHT.toString() ? (
-              <p>minCommunityTokensToCreateProposal: Disabled</p>
-            ) : (
-              <p>
-                minCommunityTokensToCreateProposal:{' '}
-                {fmtMintAmount(
-                  communityMint?.account,
-                  args.config.minCommunityTokensToCreateProposal
-                )}{' '}
-                ({args.config.minCommunityTokensToCreateProposal.toString()})
               </p>
-            )}
-            {args.config.minCouncilTokensToCreateProposal.toString() ===
-            DISABLED_VOTER_WEIGHT.toString() ? (
-              <p>minCouncilTokensToCreateProposal: Disabled</p>
-            ) : (
+              {isMaxNumber ? (
+                <p>minCommunityTokensToCreateProposal: Disabled</p>
+              ) : (
+                <p>
+                  {`minCommunityTokensToCreateProposal:
+              ${fmtMintAmount(
+                communityMint?.account,
+                args.config.minCommunityTokensToCreateProposal
+              )}`}{' '}
+                  ({args.config.minCommunityTokensToCreateProposal.toNumber()})
+                </p>
+              )}
               <p>
-                minCouncilTokensToCreateProposal:{' '}
-                {fmtMintAmount(
-                  councilMint?.account,
-                  args.config.minCouncilTokensToCreateProposal
-                )}{' '}
-                ({args.config.minCouncilTokensToCreateProposal.toString()})
+                {`minCouncilTokensToCreateProposal:
+              ${fmtMintAmount(
+                councilMint?.account,
+                args.config.minCouncilTokensToCreateProposal
+              )}`}
               </p>
-            )}
-            <p>
-              {`minInstructionHoldUpTime:
+              <p>
+                {`minInstructionHoldUpTime:
               ${getDaysFromTimestamp(
                 args.config.minInstructionHoldUpTime
               )} day(s)`}
-            </p>
-            <p>
-              {`maxVotingTime:
+              </p>
+              <p>
+                {`maxVotingTime:
               ${getDaysFromTimestamp(args.config.maxVotingTime)} days(s)`}
-            </p>
-            <p>
-              {`voteTipping:
+              </p>
+              <p>
+                {`voteTipping:
               ${VoteTipping[args.config.communityVoteTipping]}`}
-            </p>
+              </p>
+            </div>
           </>
         )
       },
@@ -237,62 +283,120 @@ export const GOVERNANCE_INSTRUCTIONS = {
           connection,
           realm.account.communityMint
         )
-        const realmConfig = await tryGetRealmConfig(
+        const currentRealmConfig = await tryGetRealmConfig(
           connection,
           realm.owner,
           realm.pubkey
         )
-
+        const proposedPluginPk = accounts[5]?.pubkey?.toBase58()
+        const proposedMaxVoterWeightPk = accounts[6]?.pubkey?.toBase58()
         return (
           <>
-            <p>
-              {`minCommunityTokensToCreateGovernance:
+            <h1>Current config</h1>
+            <div className="space-y-3">
+              <p>
+                {`minCommunityTokensToCreateGovernance:
+              ${fmtVoterWeightThresholdMintAmount(
+                communityMint?.account,
+                realm.account.config.minCommunityTokensToCreateGovernance
+              )}`}{' '}
+                (
+                {fmtBNAmount(
+                  realm.account.config.minCommunityTokensToCreateGovernance
+                )}
+                )
+              </p>
+              <p>
+                {`communityMintMaxVoteWeightSource:
+               ${realm.account.config.communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}% supply`}{' '}
+                (
+                {fmtBNAmount(
+                  realm.account.config.communityMintMaxVoteWeightSource.value
+                )}
+                )
+              </p>
+              <p>
+                {`useCouncilMint:
+               ${!!realm.account.config.councilMint}`}
+              </p>
+              <p>
+                {`useCommunityVoterWeightAddin:
+               ${!!realm.account.config.useCommunityVoterWeightAddin}`}
+              </p>
+              <p>
+                {`useMaxCommunityVoterWeightAddin:
+               ${!!realm.account.config.useMaxCommunityVoterWeightAddin}`}
+              </p>
+              <p>
+                {proposedPluginPk && (
+                  <p>
+                    {`communityVoterWeightAddin :
+               ${proposedPluginPk}`}
+                  </p>
+                )}
+                {proposedMaxVoterWeightPk && (
+                  <p>
+                    {`maxCommunityVoterWeightAddin:
+               ${proposedMaxVoterWeightPk}`}
+                  </p>
+                )}
+              </p>
+            </div>
+            <h1 className="mt-10">Proposed config</h1>
+            <div className="space-y-3">
+              <p>
+                {`minCommunityTokensToCreateGovernance:
               ${fmtVoterWeightThresholdMintAmount(
                 communityMint?.account,
                 args.configArgs.minCommunityTokensToCreateGovernance
               )}`}{' '}
-              (
-              {fmtBNAmount(
-                args.configArgs.minCommunityTokensToCreateGovernance
-              )}
-              )
-            </p>
-            <p>
-              {`useCouncilMint:
-               ${args.configArgs.useCouncilMint}`}
-            </p>
-            <p>
-              {`communityMintMaxVoteWeightSource:
+                (
+                {fmtBNAmount(
+                  args.configArgs.minCommunityTokensToCreateGovernance
+                )}
+                )
+              </p>
+              <p>
+                {`communityMintMaxVoteWeightSource:
                ${args.configArgs.communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}% supply`}{' '}
-              (
-              {fmtBNAmount(
-                args.configArgs.communityMintMaxVoteWeightSource.value
-              )}
-              )
-            </p>
-            <p>
-              {`useCommunityVoterWeightAddin:
+                (
+                {fmtBNAmount(
+                  args.configArgs.communityMintMaxVoteWeightSource.value
+                )}
+                )
+              </p>
+              <p>
+                {`useCouncilMint:
+               ${args.configArgs.useCouncilMint}`}
+              </p>
+              <p>
+                {`useCommunityVoterWeightAddin:
                ${!!args.configArgs.useCommunityVoterWeightAddin}`}
-            </p>
-            <p>
-              {`useMaxCommunityVoterWeightAddin:
+              </p>
+              <p>
+                {`useMaxCommunityVoterWeightAddin:
                ${!!args.configArgs.useMaxCommunityVoterWeightAddin}`}
-            </p>
-            {realmConfig?.account.communityTokenConfig.voterWeightAddin && (
-              <p>
-                {`communityVoterWeightAddin :
-               ${realmConfig?.account.communityTokenConfig.voterWeightAddin?.toBase58()}`}
               </p>
-            )}
-            {realmConfig?.account.communityTokenConfig.maxVoterWeightAddin && (
               <p>
-                {`maxCommunityVoterWeightAddin:
-               ${realmConfig?.account.communityTokenConfig.maxVoterWeightAddin?.toBase58()}`}
+                {currentRealmConfig?.account.communityTokenConfig
+                  .voterWeightAddin && (
+                  <p>
+                    {`communityVoterWeightAddin :
+               ${currentRealmConfig?.account.communityTokenConfig.voterWeightAddin?.toBase58()}`}
+                  </p>
+                )}
+                {currentRealmConfig?.account.communityTokenConfig
+                  .maxVoterWeightAddin && (
+                  <p>
+                    {`maxCommunityVoterWeightAddin:
+               ${currentRealmConfig?.account.communityTokenConfig.maxVoterWeightAddin?.toBase58()}`}
+                  </p>
+                )}
               </p>
-            )}
+            </div>
           </>
         )
       },
     },
   },
-}
+} as const

@@ -1,8 +1,13 @@
-import { PROGRAM_VERSION_V1, Realm, getRealms } from '@solana/spl-governance'
+import { PROGRAM_VERSION_V1 } from '@solana/spl-governance'
 
-import { ProgramAccount } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
-import { arrayToMap, arrayToUnique } from '@tools/core/script'
+import {
+  HOLAPLEX_GRAPQL_URL_DEVNET,
+  HOLAPLEX_GRAPQL_URL_MAINNET,
+} from '@tools/constants'
+import { arrayToMap } from '@tools/core/script'
+import axios from 'axios'
+import { gql } from 'graphql-request'
 
 import devnetRealms from 'public/realms/devnet.json'
 import mainnetBetaRealms from 'public/realms/mainnet-beta.json'
@@ -168,39 +173,58 @@ const EXCLUDED_REALMS = new Map<string, string>([
 // Returns all known realms from all known spl-gov instances which are not certified
 export async function getUnchartedRealmInfos(connection: ConnectionContext) {
   const certifiedRealms = getCertifiedRealmInfos(connection)
-  const programIds = arrayToUnique(certifiedRealms, (r) =>
-    r.programId.toBase58()
-  ).map((p) => {
-    return p.programId
+  const queryUrl =
+    connection.cluster === 'devnet'
+      ? HOLAPLEX_GRAPQL_URL_DEVNET
+      : HOLAPLEX_GRAPQL_URL_MAINNET
+  const query = gql`
+    query realms($limit: Int!, $offset: Int!) {
+      realms(limit: $limit, offset: $offset) {
+        name
+        programId
+        address
+      }
+    }
+  `
+  const allRealms: {
+    data: { data: { realms: UnchartedRealm[] } }
+  } = await axios.post(queryUrl, {
+    query,
+    variables: {
+      limit: 10000,
+      offset: 0,
+    },
   })
-
-  const allRealms = (
-    await getRealms(connection.current, programIds)
-  ).sort((r1, r2) => r1.account.name.localeCompare(r2.account.name))
+  const sortedRealms = allRealms.data.data.realms.sort((r1, r2) =>
+    r1.name.localeCompare(r2.name)
+  )
 
   const excludedRealms = arrayToMap(certifiedRealms, (r) =>
     r.realmId.toBase58()
   )
 
-  return Object.values(allRealms)
+  return Object.values(sortedRealms)
     .map((r) => {
-      return !(
-        excludedRealms.has(r.pubkey.toBase58()) ||
-        EXCLUDED_REALMS.has(r.pubkey.toBase58())
-      )
+      return !(excludedRealms.has(r.address) || EXCLUDED_REALMS.has(r.address))
         ? createUnchartedRealmInfo(r)
         : undefined
     })
     .filter(Boolean) as readonly RealmInfo[]
 }
 
-export function createUnchartedRealmInfo(realm: ProgramAccount<Realm>) {
+export function createUnchartedRealmInfo(realm: UnchartedRealm) {
   return {
-    symbol: realm.account.name,
-    programId: new PublicKey(realm.owner),
-    realmId: realm.pubkey,
-    displayName: realm.account.name,
+    symbol: realm.name,
+    programId: new PublicKey(realm.programId),
+    realmId: new PublicKey(realm.address),
+    displayName: realm.name,
     isCertified: false,
     enableNotifi: true, // enable by default
   } as RealmInfo
+}
+
+type UnchartedRealm = {
+  name: string
+  programId: string
+  address: string
 }

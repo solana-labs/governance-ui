@@ -121,8 +121,7 @@ const LockTokensModal = ({
       x.lockup.kind.none
   )
   const [lockupPeriodDays, setLockupPeriodDays] = useState<number>(0)
-  const [allowClawback, setAllowClawback] = useState(false)
-  console.log(setAllowClawback)
+  const allowClawback = false
   const [lockupPeriod, setLockupPeriod] = useState<Period>(lockupPeriods[0])
   const [amount, setAmount] = useState<number | undefined>()
   const [lockMoreThenDeposited, setLockMoreThenDeposited] = useState<string>(

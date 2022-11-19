@@ -10,6 +10,7 @@ import { LockupKind } from 'VoteStakeRegistry/tools/types'
 import { consts as foresightConsts } from '@foresight-tmp/foresight-sdk'
 import { AssetAccount, StakeAccount } from '@utils/uiTypes/assets'
 import { RealmInfo } from '@models/registry/api'
+import * as Msp from '@mean-dao/msp'
 
 export interface UiInstruction {
   serializedInstruction: string
@@ -53,6 +54,47 @@ export interface CastleWithdrawForm {
   castleVaultId: string
   programId: string | undefined
   mintInfo: MintInfo | undefined
+}
+
+export interface MeanCreateAccount {
+  governedTokenAccount: AssetAccount | undefined
+  label: string | undefined
+  mintInfo: MintInfo | undefined
+  amount: number | undefined
+  type: Msp.TreasuryType
+}
+
+export interface MeanFundAccount {
+  governedTokenAccount: AssetAccount | undefined
+  mintInfo: MintInfo | undefined
+  amount: number | undefined
+  treasury: Msp.Treasury | undefined
+}
+
+export interface MeanWithdrawFromAccount {
+  governedTokenAccount: AssetAccount | undefined
+  mintInfo: MintInfo | undefined
+  amount: number | undefined
+  treasury: Msp.Treasury | undefined
+  destination: string | undefined
+}
+
+export interface MeanCreateStream {
+  governedTokenAccount: AssetAccount | undefined
+  treasury: Msp.Treasury | undefined
+  streamName: string | undefined
+  destination: string | undefined
+  mintInfo: MintInfo | undefined
+  allocationAssigned: number | undefined
+  rateAmount: number | undefined
+  rateInterval: 0 | 1 | 2 | 3 | 4 | 5
+  startDate: string
+}
+
+export interface MeanTransferStream {
+  governedTokenAccount: AssetAccount | undefined
+  stream: Msp.Stream | undefined
+  destination: string | undefined
 }
 
 export interface FriktionDepositForm {
@@ -499,6 +541,11 @@ export enum Instructions {
   ClaimPendingWithdraw,
   DepositIntoCastle,
   WithrawFromCastle,
+  MeanCreateAccount,
+  MeanFundAccount,
+  MeanWithdrawFromAccount,
+  MeanCreateStream,
+  MeanTransferStream,
   DepositIntoGoblinGold,
   WithdrawFromGoblinGold,
   CreateSolendObligationAccount,

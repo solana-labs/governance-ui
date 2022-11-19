@@ -31,20 +31,19 @@ export const getSolInvestments = () => [
   },
 ]
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const getTokenInvestments = (tokenImg: string) => [
-  //   {
-  //     liquidity: 0,
-  //     protocolSymbol: '',
-  //     apy: '',
-  //     protocolName: 'Serum',
-  //     handledMint: '',
-  //     handledTokenSymbol: '',
-  //     handledTokenImgSrc: tokenImg,
-  //     protocolLogoSrc:
-  //       'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt/logo.png',
-  //     strategyName: 'Trade',
-  //     strategyDescription: '',
-  //     createProposalFcn: () => null,
-  //   },
+  {
+    liquidity: 0,
+    protocolSymbol: '',
+    apy: '',
+    protocolName: 'Serum',
+    handledMint: '',
+    handledTokenSymbol: '',
+    handledTokenImgSrc: tokenImg,
+    protocolLogoSrc:
+      'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt/logo.png',
+    strategyName: 'Trade',
+    strategyDescription: '',
+    createProposalFcn: () => null,
+  },
 ]

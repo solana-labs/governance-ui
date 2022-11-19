@@ -56,7 +56,7 @@ const TokenRegister = ({
     (x) => x.type === AccountType.PROGRAM
   )
   const { connection } = useWalletStore()
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<RegisterTokenForm>({
     governedAccount: null,

@@ -32,7 +32,7 @@ const DeactivateValidatorStake = ({
   const connection = useWalletStore((s) => s.connection)
   const programId: PublicKey = StakeProgram.programId
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
 
   const [form, setForm] = useState<ValidatorDeactivateStakeForm>({
     stakingAccount: undefined,

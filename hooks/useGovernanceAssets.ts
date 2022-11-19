@@ -11,6 +11,7 @@ export default function useGovernanceAssets() {
   const governedTokenAccounts: AssetAccount[] = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
   )
+
   const assetAccounts = useGovernanceAssetsStore((s) =>
     s.assetAccounts.filter((x) => x.type !== AccountType.AuxiliaryToken)
   )
@@ -476,6 +477,31 @@ export default function useGovernanceAssets() {
     {
       id: Instructions.WithrawFromCastle,
       name: 'Castle: Withdraw from Vault',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.MeanCreateAccount,
+      name: 'Payment Stream: New account',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.MeanFundAccount,
+      name: 'Payment Stream: Fund account',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.MeanWithdrawFromAccount,
+      name: 'Payment Stream: Withdraw funds',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.MeanCreateStream,
+      name: 'Payment Stream: New stream',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.MeanTransferStream,
+      name: 'Payment Stream: Transfer stream',
       isVisible: canUseAnyInstruction,
     },
     {
