@@ -16,6 +16,7 @@ import { withCreateProgramGovernance } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { sendTransaction } from '@utils/send'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
+import { trySentryLog } from '@utils/logs'
 
 export const registerProgramGovernance = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -79,6 +80,15 @@ export const registerProgramGovernance = async (
     sendingMessage: 'Creating governance program account',
     successMessage: 'Governance program account has been created',
   })
-
+  const logInfo = {
+    realmId: realm.pubkey.toBase58(),
+    realmSymbol: realm.account.name,
+    wallet: wallet.publicKey?.toBase58(),
+    governanceAddress: governanceAddress,
+  }
+  trySentryLog({
+    tag: 'governanceCreated',
+    objToStringify: logInfo,
+  })
   return governanceAddress
 }
