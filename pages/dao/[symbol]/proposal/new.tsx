@@ -85,6 +85,7 @@ import MakeSetMarketMetadataParams from './components/instructions/Foresight/Mak
 import CloseTokenAccount from './components/instructions/CloseTokenAccount'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import CastleWithdraw from './components/instructions/Castle/CastleWithdraw'
+import StakingOption from './components/instructions/Dual/StakingOption'
 import MeanCreateAccount from './components/instructions/Mean/MeanCreateAccount'
 import MeanFundAccount from './components/instructions/Mean/MeanFundAccount'
 import MeanWithdrawFromAccount from './components/instructions/Mean/MeanWithdrawFromAccount'
@@ -442,6 +443,7 @@ const New = () => {
       [Instructions.ClaimPendingDeposit]: FriktionClaimPendingDeposit,
       [Instructions.ClaimPendingWithdraw]: FriktionClaimPendingWithdraw,
       [Instructions.DepositIntoCastle]: CastleDeposit,
+      [Instructions.DualFinanceStakingOption]: StakingOption,
       [Instructions.WithrawFromCastle]: CastleWithdraw,
       [Instructions.MeanCreateAccount]: MeanCreateAccount,
       [Instructions.MeanFundAccount]: MeanFundAccount,

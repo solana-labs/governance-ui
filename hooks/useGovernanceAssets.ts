@@ -589,6 +589,11 @@ export default function useGovernanceAssets() {
       name: 'Serum: Update Governance Config Authority',
       isVisible: canUseAnyInstruction,
     },
+    {
+      id: Instructions.DualFinanceStakingOption,
+      name: 'Dual Finance: Staking Option',
+      isVisible: canUseAnyInstruction,
+    },
     ...foresightInstructions,
   ]
   return {

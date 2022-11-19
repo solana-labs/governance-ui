@@ -593,6 +593,7 @@ export enum Instructions {
   SerumUpdateGovConfigAuthority,
   JoinDAO,
   ClaimMangoTokens,
+  DualFinanceStakingOption,
 }
 
 export type createParams = [
@@ -663,4 +664,15 @@ export interface ValidatorWithdrawStakeForm {
   governedTokenAccount: AssetAccount | undefined
   stakingAccount: StakeAccount | undefined
   amount: number
+}
+
+export interface DualFinanceStakingOptionForm {
+  soAuthority: string | undefined
+  soName: string | undefined
+  optionExpirationUnixSeconds: number
+  subscriptionPeriodEndUnixSeconds: number
+  numTokens: number
+  lotSize: number
+  baseTreasury: string | undefined
+  quoteTreasury: string | undefined
 }
