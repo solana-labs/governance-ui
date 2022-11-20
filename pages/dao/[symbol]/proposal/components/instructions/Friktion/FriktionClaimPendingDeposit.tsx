@@ -27,7 +27,7 @@ const FriktionClaimPendingDeposit = ({
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<FriktionClaimPendingDepositForm>({
     governedTokenAccount: undefined,

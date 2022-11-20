@@ -29,7 +29,7 @@ export interface InstructionInput {
   max?: number
   step?: number
   onBlur?: () => void
-  shouldBeGoverned?: false | ProgramAccount<Governance> | null
+  shouldBeGoverned?: boolean
   governance?: ProgramAccount<Governance> | null
   options?: any[]
   hide?: boolean | (() => boolean)
@@ -111,7 +111,7 @@ const InstructionInput = ({
       case InstructionInputType.GOVERNED_ACCOUNT:
         return (
           <GovernedAccountSelect
-            autoselectFirst={false}
+            autoSelectFirst={false}
             label={input.label}
             governedAccounts={input.options!}
             onChange={(value) => {

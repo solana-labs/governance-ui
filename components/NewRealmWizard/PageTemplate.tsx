@@ -83,7 +83,7 @@ export default function FormPage({
 
   useEffect(() => {
     if (currentStep > 0 && !isWizardValid({ currentStep, steps, formData })) {
-      // @asktree: why would this be the correct behavior? It's just confusing for the user (or the dev as the case may be).
+      // @asktree: Why would this be the correct behavior for validation failure? It just seems silently confusing for the user (or the dev as the case may be).
       handlePreviousButton(currentStep)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree

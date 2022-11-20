@@ -21,7 +21,6 @@ import { ExecuteInstructionButton, PlayState } from './ExecuteInstructionButton'
 import { ProgramAccount } from '@solana/spl-governance'
 import InspectorButton from '@components/explorer/inspectorButton'
 import { FlagInstructionErrorButton } from './FlagInstructionErrorButton'
-import { deprecated } from '@metaplex-foundation/mpl-token-metadata'
 import axios from 'axios'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import tokenService from '@utils/services/token'
@@ -30,6 +29,7 @@ import InstructionOptionInput, {
   InstructionOptions,
 } from '@components/InstructionOptions'
 import StreamCard from '@components/StreamCard'
+import { Metaplex, findMetadataPda } from '@metaplex-foundation/js'
 
 export default function InstructionCard({
   index,
@@ -88,12 +88,13 @@ export default function InstructionCard({
         const mint = tokenAccount?.account.mint
         if (mint) {
           try {
-            const metadataPDA = await deprecated.Metadata.getPDA(mint)
-            const tokenMetadata = await deprecated.Metadata.load(
-              connection.current,
-              metadataPDA
-            )
-            const url = (await axios.get(tokenMetadata?.data!.data.uri)).data
+            const metaplex = new Metaplex(connection.current)
+            const metadataPDA = findMetadataPda(mint)
+            const tokenMetadata = await metaplex.nfts().findByMetadata({
+              metadata: metadataPDA,
+            })
+
+            const url = (await axios.get(tokenMetadata.uri)).data
             setNftImgUrl(url.image)
           } catch (e) {
             console.log(e)
@@ -238,6 +239,7 @@ export function InstructionProgram({
                 {programLabel}
               </div>
             )}
+            <div></div>
           </div>
           <ExternalLinkIcon
             className={`flex-shrink-0 h-4 w-4 ml-2 text-primary-light`}
@@ -279,10 +281,18 @@ export function InstructionAccount({
       <div className="pb-1 lg:pb-0">
         <p className="font-bold text-fgd-1">{`Account ${index + 1}`}</p>
         {descriptor?.accounts && (
-          <div className="mt-0.5 text-fgd-3 text-xs">
+          <div className="my-0.5 text-fgd-3 text-xs">
             {descriptor.accounts[index]?.name}
           </div>
         )}
+        <div className="text-[10px] flex space-x-3">
+          {accountMeta.isSigner && (
+            <div className="text-primary-light">Signer</div>
+          )}{' '}
+          {accountMeta.isWritable && (
+            <div className="text-[#b45be1]">Writable</div>
+          )}
+        </div>
       </div>
       <div className="flex items-center">
         <a
@@ -292,7 +302,8 @@ export function InstructionAccount({
           rel="noopener noreferrer"
         >
           <div>
-            {accountMeta.pubkey.toBase58()}
+            <div>{accountMeta.pubkey.toBase58()}</div>
+            <div></div>
             {accountLabel && (
               <div className="mt-0.5 text-fgd-3 text-right text-xs">
                 {accountLabel}

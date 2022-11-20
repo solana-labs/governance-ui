@@ -33,10 +33,7 @@ import {
   GoverningTokenType,
 } from '@solana/spl-governance'
 import { nftPluginsPks } from '@hooks/useVotingPlugins'
-import {
-  RealmCreation,
-  RealmCreationV2,
-} from '@tools/governance/prepareRealmCreation'
+
 import YesVotePercentageForm, {
   CouncilYesVotePercentageSchema,
 } from '@components/NewRealmWizard/components/steps/YesVotePercentageThresholdForm'

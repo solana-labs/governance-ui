@@ -14,7 +14,7 @@ import { Connection, PublicKey } from '@solana/web3.js'
 export function createGovernanceThresholds(
   programVersion: number,
   communityYesVotePercentage: 'disabled' | number,
-  // @asktree: program version >= v3
+  // ignored if program version < v3
   councilYesVotePercentage?: 'disabled' | number
 ) {
   // For backward compatybility with spl-gov versions <= 2

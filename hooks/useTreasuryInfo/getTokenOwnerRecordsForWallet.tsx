@@ -1,4 +1,3 @@
-import { MintInfo } from '@blockworks-foundation/mango-v4'
 import { getCertifiedRealmInfos, RealmInfo } from '@models/registry/api'
 import { AssetType, TokenOwnerRecordAsset } from '@models/treasury/Asset'
 import {
@@ -11,7 +10,11 @@ import {
 } from '@solana/spl-governance'
 import { AccountInfo, PublicKey } from '@solana/web3.js'
 import { ConnectionContext } from '@utils/connection'
-import { parseMintAccountData, TokenProgramAccount } from '@utils/tokens'
+import {
+  MintAccount,
+  parseMintAccountData,
+  TokenProgramAccount,
+} from '@utils/tokens'
 import axios from 'axios'
 
 const getAccountInfoFromRaw = (raw: any) => {
@@ -112,7 +115,7 @@ const getTokenOwnerRecordsForWallet = async (
             tokenOwnerRecordAccountInfo
           ) as ProgramAccount<TokenOwnerRecord>
 
-          const mintAccount: TokenProgramAccount<MintInfo> = {
+          const mintAccount: TokenProgramAccount<MintAccount> = {
             publicKey: cacheMap[id].realmInfo.communityMint!, // already checking above if present
             account: parseMintAccountData(communityMintAccountInfo.data),
           }

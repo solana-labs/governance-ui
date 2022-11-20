@@ -130,6 +130,8 @@ const WithDrawCommunityTokens = () => {
       depositIndex: depositRecord!.index,
       connection,
       client: client,
+      splProgramId: realm!.owner,
+      splProgramVersion: getProgramVersionForRealm(realmInfo!),
     })
 
     try {

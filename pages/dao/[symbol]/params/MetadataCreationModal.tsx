@@ -26,8 +26,8 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { AccountType } from '@utils/uiTypes/assets'
 import { WebBundlr } from '@bundlr-network/client'
 import { LAMPORTS_PER_SOL } from '@solana/web3.js'
-import { deprecated } from '@metaplex-foundation/mpl-token-metadata'
 import { PublicKey } from '@solana/web3.js'
+import { Metaplex } from '@metaplex-foundation/js'
 
 interface GovernanceConfigForm {
   mintAccount: AssetAccount | undefined
@@ -265,15 +265,15 @@ const MetadataCreationModal = ({
   const checkCurrentMetadataExist = async () => {
     if (form.mintAccount) {
       try {
-        const tokenMetaPubkey = await deprecated.Metadata.getPDA(
-          form.mintAccount.pubkey
-        )
-
-        const tokenMeta = await deprecated.Metadata.load(
-          connection.current,
-          tokenMetaPubkey
-        )
-        if (tokenMeta) return true
+        const metaplex = new Metaplex(connection.current)
+        const metadataPDA = await metaplex
+          .nfts()
+          .pdas()
+          .metadata({ mint: form.mintAccount.pubkey })
+        const tokenMetadata = await metaplex.nfts().findByMetadata({
+          metadata: metadataPDA,
+        })
+        if (tokenMetadata) return true
         return false
       } catch (e) {
         return false

@@ -93,7 +93,11 @@ export default function useRealm() {
       ? realm
         ? // Realm program data needs to contain config options to enable/disable things such as notifications
           // Currently defaulting to false here for now
-          createUnchartedRealmInfo(realm)
+          createUnchartedRealmInfo({
+            programId: realm.owner.toBase58(),
+            address: realm.pubkey.toBase58(),
+            name: realm.account.name,
+          })
         : undefined
       : getCertifiedRealmInfo(symbol as string, connection)
 

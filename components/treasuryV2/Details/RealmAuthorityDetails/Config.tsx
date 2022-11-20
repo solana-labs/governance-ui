@@ -8,7 +8,6 @@ import {
   CogIcon,
   UserGroupIcon,
   OfficeBuildingIcon,
-  QuestionMarkCircleIcon,
 } from '@heroicons/react/outline'
 import { BigNumber } from 'bignumber.js'
 

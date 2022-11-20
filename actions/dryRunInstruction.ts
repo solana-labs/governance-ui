@@ -36,7 +36,11 @@ export async function dryRunInstruction(
     })
   }
 
-  const result = await connection.simulateTransaction(transaction)
+  const result = await connection.simulateTransaction(
+    transaction,
+    undefined,
+    true
+  )
 
   return { response: result.value, transaction }
 }

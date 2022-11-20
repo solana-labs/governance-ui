@@ -24,12 +24,13 @@ export const ITEMS = [
     urlId: 'GARI%20Network',
   },
   {
-    bannerImgSrc: 'https://i.ibb.co/bNRH0hh/1500x500.jpg',
-    description: 'Faster, Cheaper and more Powerful DeFi',
-    iconImgSrc: 'https://i.ibb.co/0j2TR8T/serum.jpg',
-    name: 'Project Serum',
-    publicKey: new PublicKey('3MMDxjv1SzEFQDKryT7csAvaydYtrgMAc3L9xL9CVLCg'),
-    urlId: 'SERUM',
+    bannerImgSrc: 'https://i.imgur.com/i1gGoIw.jpg',
+    description:
+      'Every market, all the power, none of the fuss. Simplifying decentralized finance through easy-to-use products and developer tools.',
+    iconImgSrc: 'https://trade.mango.markets/assets/icons/logo.svg',
+    name: 'Mango DAO',
+    publicKey: new PublicKey('DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE'),
+    urlId: 'MNGO',
   },
   {
     bannerImgSrc: 'https://i.imgur.com/ZiHW6ho.png',
