@@ -250,6 +250,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
             try {
               const account = GovernanceAccountParser(RealmConfigAccount)(
                 PublicKey.default,
+                //moq for accountInfo
                 {
                   data: Buffer.from(acc!.data[0], 'base64'),
                   owner: new PublicKey(governanceProgramId),
@@ -260,7 +261,6 @@ export const GOVERNANCE_INSTRUCTIONS = {
             } catch {}
           }
         }
-
         const proposedPluginPk = parsedRealmConfig?.account?.communityTokenConfig?.voterWeightAddin?.toBase58()
         const proposedMaxVoterWeightPk = parsedRealmConfig?.account?.communityTokenConfig?.maxVoterWeightAddin?.toBase58()
         return (
@@ -301,16 +301,18 @@ export const GOVERNANCE_INSTRUCTIONS = {
                ${!!realm.account.config.useMaxCommunityVoterWeightAddin}`}
               </p>
               <p>
-                {proposedPluginPk && (
+                {currentRealmConfig?.account.communityTokenConfig
+                  .voterWeightAddin && (
                   <div>
                     {`communityVoterWeightAddin :
-               ${proposedPluginPk}`}
+               ${currentRealmConfig?.account.communityTokenConfig.voterWeightAddin?.toBase58()}`}
                   </div>
                 )}
-                {proposedMaxVoterWeightPk && (
+                {currentRealmConfig?.account.communityTokenConfig
+                  .maxVoterWeightAddin && (
                   <div>
                     {`maxCommunityVoterWeightAddin:
-               ${proposedMaxVoterWeightPk}`}
+               ${currentRealmConfig?.account.communityTokenConfig.maxVoterWeightAddin?.toBase58()}`}
                   </div>
                 )}
               </p>
@@ -351,18 +353,16 @@ export const GOVERNANCE_INSTRUCTIONS = {
                ${!!args.configArgs.useMaxCommunityVoterWeightAddin}`}
               </p>
               <p>
-                {currentRealmConfig?.account.communityTokenConfig
-                  .voterWeightAddin && (
+                {proposedPluginPk && (
                   <div>
                     {`communityVoterWeightAddin :
-               ${currentRealmConfig?.account.communityTokenConfig.voterWeightAddin?.toBase58()}`}
+               ${proposedPluginPk}`}
                   </div>
                 )}
-                {currentRealmConfig?.account.communityTokenConfig
-                  .maxVoterWeightAddin && (
+                {proposedMaxVoterWeightPk && (
                   <div>
                     {`maxCommunityVoterWeightAddin:
-               ${currentRealmConfig?.account.communityTokenConfig.maxVoterWeightAddin?.toBase58()}`}
+               ${proposedMaxVoterWeightPk}`}
                   </div>
                 )}
               </p>
