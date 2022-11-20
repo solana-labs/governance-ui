@@ -5,6 +5,10 @@ import {
   getGovernanceInstructionSchema,
   getGovernanceProgramVersion,
   getRealm,
+  GovernanceAccountParser,
+  InstructionData,
+  ProgramAccount,
+  RealmConfigAccount,
   SetRealmAuthorityAction,
   SetRealmAuthorityArgs,
   tryGetRealmConfig,
@@ -14,7 +18,7 @@ import {
   SetGovernanceConfigArgs,
   SetRealmConfigArgs,
 } from '@solana/spl-governance'
-import { Connection } from '@solana/web3.js'
+import { Connection, PublicKey } from '@solana/web3.js'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import { fmtVoterWeightThresholdMintAmount } from '@tools/governance/units'
 import {
@@ -22,11 +26,14 @@ import {
   fmtMintAmount,
   getDaysFromTimestamp,
 } from '@tools/sdk/units'
+import { dryRunInstruction } from 'actions/dryRunInstruction'
 
 import { tryGetMint } from '../../../utils/tokens'
 
+const governanceProgramId = 'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
+
 export const GOVERNANCE_INSTRUCTIONS = {
-  GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw: {
+  [governanceProgramId]: {
     19: {
       name: 'Set Governance Config',
       accounts: [{ name: 'Governance' }],
@@ -71,9 +78,9 @@ export const GOVERNANCE_INSTRUCTIONS = {
               ${governance.account.config.communityVoteThreshold.value?.toLocaleString()}%`}
               </p>
               {isCurrentGovernanceMinCommMax ? (
-                <p>minCommunityTokensToCreateProposal: Disabled</p>
+                <div>minCommunityTokensToCreateProposal: Disabled</div>
               ) : (
-                <p>
+                <div>
                   {`minCommunityTokensToCreateProposal:
               ${fmtMintAmount(
                 communityMint?.account,
@@ -82,7 +89,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
                   (
                   {governance.account.config.minCommunityTokensToCreateProposal.toNumber()}
                   )
-                </p>
+                </div>
               )}
               <p>
                 {`minCouncilTokensToCreateProposal:
@@ -115,16 +122,16 @@ export const GOVERNANCE_INSTRUCTIONS = {
               ${args.config.communityVoteThreshold.value?.toLocaleString()}%`}
               </p>
               {isMaxNumber ? (
-                <p>minCommunityTokensToCreateProposal: Disabled</p>
+                <div>minCommunityTokensToCreateProposal: Disabled</div>
               ) : (
-                <p>
+                <div>
                   {`minCommunityTokensToCreateProposal:
               ${fmtMintAmount(
                 communityMint?.account,
                 args.config.minCommunityTokensToCreateProposal
               )}`}{' '}
                   ({args.config.minCommunityTokensToCreateProposal.toNumber()})
-                </p>
+                </div>
               )}
               <p>
                 {`minCouncilTokensToCreateProposal:
@@ -215,8 +222,47 @@ export const GOVERNANCE_INSTRUCTIONS = {
           realm.owner,
           realm.pubkey
         )
-        const proposedPluginPk = accounts[5]?.pubkey?.toBase58()
-        const proposedMaxVoterWeightPk = accounts[6]?.pubkey?.toBase58()
+        // The wallet can be any existing account for the simulation
+        // Note: when running a local validator ensure the account is copied from devnet: --clone ENmcpFCpxN1CqyUjuog9yyUVfdXBKF3LVCwLr7grJZpk -ud
+        const walletPk = new PublicKey(
+          'ENmcpFCpxN1CqyUjuog9yyUVfdXBKF3LVCwLr7grJZpk'
+        )
+        const walletMoq: any = {
+          publicKey: walletPk,
+        }
+        const instructionMoq = new InstructionData({
+          programId: new PublicKey(governanceProgramId),
+          accounts: accounts,
+          data: data,
+        })
+
+        const result = await dryRunInstruction(
+          connection,
+          walletMoq,
+          instructionMoq
+        )
+        const possibleRealmConfigsAccounts = result.response.accounts?.filter(
+          (x) => x?.owner === governanceProgramId
+        )
+        let parsedRealmConfig: null | ProgramAccount<RealmConfigAccount> = null
+        if (possibleRealmConfigsAccounts) {
+          for (const acc of possibleRealmConfigsAccounts) {
+            try {
+              const account = GovernanceAccountParser(RealmConfigAccount)(
+                PublicKey.default,
+                {
+                  data: Buffer.from(acc!.data[0], 'base64'),
+                  owner: new PublicKey(governanceProgramId),
+                } as any
+              )
+              parsedRealmConfig = account as ProgramAccount<RealmConfigAccount>
+              // eslint-disable-next-line no-empty
+            } catch {}
+          }
+        }
+
+        const proposedPluginPk = parsedRealmConfig?.account?.communityTokenConfig?.voterWeightAddin?.toBase58()
+        const proposedMaxVoterWeightPk = parsedRealmConfig?.account?.communityTokenConfig?.maxVoterWeightAddin?.toBase58()
         return (
           <>
             <h1>Current config</h1>
@@ -256,16 +302,16 @@ export const GOVERNANCE_INSTRUCTIONS = {
               </p>
               <p>
                 {proposedPluginPk && (
-                  <p>
+                  <div>
                     {`communityVoterWeightAddin :
                ${proposedPluginPk}`}
-                  </p>
+                  </div>
                 )}
                 {proposedMaxVoterWeightPk && (
-                  <p>
+                  <div>
                     {`maxCommunityVoterWeightAddin:
                ${proposedMaxVoterWeightPk}`}
-                  </p>
+                  </div>
                 )}
               </p>
             </div>
@@ -307,17 +353,17 @@ export const GOVERNANCE_INSTRUCTIONS = {
               <p>
                 {currentRealmConfig?.account.communityTokenConfig
                   .voterWeightAddin && (
-                  <p>
+                  <div>
                     {`communityVoterWeightAddin :
                ${currentRealmConfig?.account.communityTokenConfig.voterWeightAddin?.toBase58()}`}
-                  </p>
+                  </div>
                 )}
                 {currentRealmConfig?.account.communityTokenConfig
                   .maxVoterWeightAddin && (
-                  <p>
+                  <div>
                     {`maxCommunityVoterWeightAddin:
                ${currentRealmConfig?.account.communityTokenConfig.maxVoterWeightAddin?.toBase58()}`}
-                  </p>
+                  </div>
                 )}
               </p>
             </div>
