@@ -281,7 +281,7 @@ export const createProposal = async (
     realmSymbol: realm.account.name,
     wallet: wallet.publicKey?.toBase58(),
     proposalAddress: proposalAddress.toBase58(),
-    instructions: instructionsData.filter((x) => x.data).map((x) => x.data),
+    proposalIndex: proposalIndex,
   }
   trySentryLog({
     tag: 'proposalCreated',
