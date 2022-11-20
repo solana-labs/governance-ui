@@ -7,9 +7,8 @@ import {
   WalletSigner,
 } from 'utils/sendTransactions'
 import { chunks } from '@utils/helpers'
-
 import { prepareRealmCreation } from '@tools/governance/prepareRealmCreation'
-
+import { trySentryLog } from '@utils/logs'
 /// Creates multisig realm with community mint with 0 supply
 /// and council mint used as multisig token
 interface MultisigWallet {
@@ -94,6 +93,16 @@ export default async function createMultisigWallet({
       connection,
       wallet,
       transactionInstructions: txes,
+    })
+
+    const logInfo = {
+      realmId: realmPk,
+      realmSymbol: realmName,
+      wallet: wallet.publicKey?.toBase58(),
+    }
+    trySentryLog({
+      tag: 'realmCreated',
+      objToStringify: logInfo,
     })
 
     return {

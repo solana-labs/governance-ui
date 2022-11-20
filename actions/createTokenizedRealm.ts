@@ -1,5 +1,4 @@
 import { Connection, PublicKey } from '@solana/web3.js'
-
 import {
   SequenceType,
   WalletSigner,
@@ -7,9 +6,8 @@ import {
   sendTransactionsV3,
 } from 'utils/sendTransactions'
 import { chunks } from '@utils/helpers'
-
 import { prepareRealmCreation } from '@tools/governance/prepareRealmCreation'
-
+import { trySentryLog } from '@utils/logs'
 interface TokenizedRealm {
   connection: Connection
   wallet: WalletSigner
@@ -116,6 +114,16 @@ export default async function createTokenizedRealm({
       connection,
       wallet,
       transactionInstructions: txes,
+    })
+
+    const logInfo = {
+      realmId: realmPk,
+      realmSymbol: realmName,
+      wallet: wallet.publicKey?.toBase58(),
+    }
+    trySentryLog({
+      tag: 'realmCreated',
+      objToStringify: logInfo,
     })
 
     return {
