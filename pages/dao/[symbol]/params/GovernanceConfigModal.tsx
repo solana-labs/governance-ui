@@ -98,8 +98,6 @@ const GovernanceConfigModal = ({
     )
       return
 
-    if (form !== undefined) return
-
     if (programVersion <= 2) {
       setForm({
         _programVersion: 2,
@@ -134,7 +132,7 @@ const GovernanceConfigModal = ({
         ...baseForm,
       })
     }
-  }, [config, mint, councilMint, realm])
+  }, [config, mint, councilMint, realm, programVersion])
 
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
