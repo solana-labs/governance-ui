@@ -10,6 +10,7 @@ import {
   RealmCreation,
   Web3Context,
 } from '@tools/governance/prepareRealmCreation'
+import { trySentryLog } from '@utils/logs'
 
 export type TokenizedRealm = Web3Context & RealmCreation
 
@@ -67,6 +68,16 @@ export default async function createTokenizedRealm({
       connection,
       wallet,
       transactionInstructions: txes,
+    })
+
+    const logInfo = {
+      realmId: realmPk,
+      realmSymbol: params.realmName,
+      wallet: wallet.publicKey?.toBase58(),
+    }
+    trySentryLog({
+      tag: 'realmCreated',
+      objToStringify: logInfo,
     })
 
     return {
