@@ -1,3 +1,4 @@
+import Loading from '@components/Loading'
 import {
   AccountMetaData,
   deserializeBorsh,
@@ -27,7 +28,6 @@ import {
   getDaysFromTimestamp,
 } from '@tools/sdk/units'
 import { dryRunInstruction } from 'actions/dryRunInstruction'
-
 import { tryGetMint } from '../../../utils/tokens'
 
 const governanceProgramId = 'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
@@ -201,27 +201,8 @@ export const GOVERNANCE_INSTRUCTIONS = {
         data: Uint8Array,
         accounts: AccountMetaData[]
       ) => {
+        let isLoading = true
         const realm = await getRealm(connection, accounts[0].pubkey)
-        const programVersion = await getGovernanceProgramVersion(
-          connection,
-          realm.owner
-        )
-
-        const args = deserializeBorsh(
-          getGovernanceInstructionSchema(programVersion),
-          SetRealmConfigArgs,
-          Buffer.from(data)
-        ) as SetRealmConfigArgs
-
-        const communityMint = await tryGetMint(
-          connection,
-          realm.account.communityMint
-        )
-        const currentRealmConfig = await tryGetRealmConfig(
-          connection,
-          realm.owner,
-          realm.pubkey
-        )
         // The wallet can be any existing account for the simulation
         // Note: when running a local validator ensure the account is copied from devnet: --clone ENmcpFCpxN1CqyUjuog9yyUVfdXBKF3LVCwLr7grJZpk -ud
         const walletPk = new PublicKey(
@@ -236,12 +217,25 @@ export const GOVERNANCE_INSTRUCTIONS = {
           data: data,
         })
 
-        const result = await dryRunInstruction(
-          connection,
-          walletMoq,
-          instructionMoq
-        )
-        const possibleRealmConfigsAccounts = result.response.accounts?.filter(
+        const [
+          programVersion,
+          communityMint,
+          currentRealmConfig,
+          simulationResults,
+        ] = await Promise.all([
+          getGovernanceProgramVersion(connection, realm.owner),
+          tryGetMint(connection, realm.account.communityMint),
+          tryGetRealmConfig(connection, realm.owner, realm.pubkey),
+          dryRunInstruction(connection, walletMoq, instructionMoq),
+        ])
+
+        const args = deserializeBorsh(
+          getGovernanceInstructionSchema(programVersion),
+          SetRealmConfigArgs,
+          Buffer.from(data)
+        ) as SetRealmConfigArgs
+
+        const possibleRealmConfigsAccounts = simulationResults.response.accounts?.filter(
           (x) => x?.owner === governanceProgramId
         )
         let parsedRealmConfig: null | ProgramAccount<RealmConfigAccount> = null
@@ -263,7 +257,10 @@ export const GOVERNANCE_INSTRUCTIONS = {
         }
         const proposedPluginPk = parsedRealmConfig?.account?.communityTokenConfig?.voterWeightAddin?.toBase58()
         const proposedMaxVoterWeightPk = parsedRealmConfig?.account?.communityTokenConfig?.maxVoterWeightAddin?.toBase58()
-        return (
+        isLoading = false
+        return isLoading ? (
+          <Loading></Loading>
+        ) : (
           <>
             <h1>Current config</h1>
             <div className="space-y-3">
