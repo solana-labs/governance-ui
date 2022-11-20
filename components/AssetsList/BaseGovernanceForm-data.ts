@@ -16,8 +16,6 @@ type FormErrors<T> = {
   [P in keyof T]: Error | undefined
 }
 
-// @asktree: If GovernanceConfig updates in the future in an unversioned way, I suggest using Omit to exclude non-V3 fields
-// I chose to do this in order to make transformation and validation as straightforward as possible.
 /* all token values in human-readable units */
 export type BaseGovernanceFormFieldsV3 = {
   /* in days */
