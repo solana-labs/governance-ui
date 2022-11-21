@@ -1,7 +1,11 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { withFinalizeVote, YesNoVote } from '@solana/spl-governance'
+import {
+  VoteThresholdType,
+  withFinalizeVote,
+  YesNoVote,
+} from '@solana/spl-governance'
 import { TransactionInstruction } from '@solana/web3.js'
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { relinquishVote } from '../actions/relinquishVote'
 import { useHasVoteTimeExpired } from '../hooks/useHasVoteTimeExpired'
 import useRealm from '../hooks/useRealm'
@@ -21,6 +25,25 @@ import { REALM_ID as PYTH_REALM_ID } from 'pyth-staking-api'
 import { isYesVote } from '@models/voteRecords'
 import Tooltip from '@components/Tooltip'
 import { VotingClientType } from '@utils/uiTypes/VotePlugin'
+
+/* 
+  returns: undefined if loading, false if nobody can veto, 'council' if council can veto, 'community' if community can veto
+*/
+const useVetoingPop = () => {
+  const { tokenRole, governance } = useWalletStore((s) => s.selectedProposal)
+
+  const vetoingPop = useMemo(() => {
+    if (governance === undefined) return undefined
+
+    return tokenRole === GoverningTokenRole.Community
+      ? governance?.account.config.councilVetoVoteThreshold.type !==
+          VoteThresholdType.Disabled && 'council'
+      : governance?.account.config.communityVetoVoteThreshold.type !==
+          VoteThresholdType.Disabled && 'community'
+  }, [governance, tokenRole])
+
+  return vetoingPop
+}
 
 const VotePanel = () => {
   const [showVoteModal, setShowVoteModal] = useState(false)
@@ -153,12 +176,11 @@ const VotePanel = () => {
     setShowVoteModal(false)
   }, [])
 
+  const votingPop =
+    tokenRole === GoverningTokenRole.Community ? 'community' : 'council'
+
   const actionLabel =
-    !isVoteCast || !connected
-      ? `Cast your ${
-          tokenRole === GoverningTokenRole.Community ? 'community' : 'council'
-        } vote`
-      : 'Your vote'
+    !isVoteCast || !connected ? `Cast your ${votingPop} vote` : 'Your vote'
 
   const withdrawTooltipContent = !connected
     ? 'You need to connect your wallet'
@@ -296,6 +318,16 @@ const VotePanel = () => {
           ) : null}
         </div>
       )}
+      {
+        // VETO VOTE PANEL
+        <>
+          <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-4">
+            <div className="flex flex-col items-center justify-center">
+              <h3 className="text-center">hi</h3>
+            </div>
+          </div>
+        </>
+      }
       {didNotVote && (
         <div className="bg-bkg-2 p-4 md:p-6 rounded-lg flex flex-col items-center justify-center">
           <h3 className="text-center mb-0">You did not vote</h3>
