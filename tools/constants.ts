@@ -15,4 +15,4 @@ export const DISABLED_VALUE = new BN('18446744073709551615')
 
 export const HOLAPLEX_GRAPQL_URL_MAINNET = 'https://graph.holaplex.com/v1'
 export const HOLAPLEX_GRAPQL_URL_DEVNET =
-  'https://graph.devnet.holaplex.tools/v1'
+  'https://graph.devnet.holaplex.tools/v1/graphql'
