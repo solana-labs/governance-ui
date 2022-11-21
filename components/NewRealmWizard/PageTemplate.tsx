@@ -100,17 +100,6 @@ export default function FormPage({
 
     updatedFormState.currentStep = nextStep > -1 ? nextStep : steps.length + 1
 
-    console.log(
-      'required steps',
-      steps.map(({ required }) => required(updatedFormState))
-    )
-    console.log(
-      'next button clicked',
-      fromStep,
-      nextStep,
-      updatedFormState.currentStep
-    )
-
     for (const key in updatedFormState) {
       if (updatedFormState[key] == null) {
         delete updatedFormState[key]
@@ -120,13 +109,6 @@ export default function FormPage({
   }
 
   function handlePreviousButton(fromStep) {
-    console.log(
-      'previous button clicked from step:',
-      fromStep,
-      currentStep,
-      query
-    )
-
     if (fromStep === 0) {
       push(
         {
