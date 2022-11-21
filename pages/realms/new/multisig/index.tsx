@@ -98,12 +98,20 @@ export default function MultiSigWizard() {
   const [requestPending, setRequestPending] = useState(false)
 
   const steps = [
-    { Form: BasicDetailsForm, schema: BasicDetailsSchema, required: 'true' },
-    { Form: InviteMembersForm, schema: InviteMembersSchema, required: 'true' },
+    {
+      Form: BasicDetailsForm,
+      schema: BasicDetailsSchema,
+      required: () => true,
+    },
+    {
+      Form: InviteMembersForm,
+      schema: InviteMembersSchema,
+      required: () => true,
+    },
     {
       Form: YesVotePercentageForm,
       schema: CouncilYesVotePercentageSchema,
-      required: 'true',
+      required: () => true,
       forCouncil: true,
       title: `Next, set your wallet's approval threshold.`,
     },

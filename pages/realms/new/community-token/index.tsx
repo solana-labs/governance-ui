@@ -109,29 +109,34 @@ export default function CommunityTokenWizard() {
   const { fmtUrlWithCluster } = useQueryContext()
   const [requestPending, setRequestPending] = useState(false)
   const steps = [
-    { Form: BasicDetailsForm, schema: BasicDetailsSchema, required: 'true' },
+    {
+      Form: BasicDetailsForm,
+      schema: BasicDetailsSchema,
+      required: () => true,
+    },
     {
       Form: CommunityTokenDetailsForm,
       schema: CommunityTokenSchema,
-      required: 'true',
+      required: () => true,
     },
     {
       Form: YesVotePercentageForm,
       schema: CommunityYesVotePercentageSchema,
-      required: 'true',
+      required: () => true,
       forCommunity: true,
       title: "Next, set your DAO's community approval threshold.",
     },
-    { Form: AddCouncilForm, schema: AddCouncilSchema, required: 'true' },
+    { Form: AddCouncilForm, schema: AddCouncilSchema, required: () => true },
     {
       Form: InviteMembersForm,
       schema: InviteMembersSchema,
-      required: 'form.addCouncil',
+      required: (form: CommunityTokenForm) => form.addCouncil,
     },
     {
       Form: YesVotePercentageForm,
       schema: CouncilYesVotePercentageSchema,
-      required: 'form.addCouncil && form._programVersion >= 3',
+      required: (form: CommunityTokenForm) =>
+        form.addCouncil && form._programVersion >= 3,
       forCouncil: true,
       title: "Next, set your DAO's council approval threshold.",
     },

@@ -95,22 +95,14 @@ export default function FormPage({
       ...data,
     }
     const nextStep = steps
-      .map(
-        ({ required }) =>
-          required === 'true' ||
-          !!eval(required.replaceAll('form', 'updatedFormState'))
-      )
+      .map(({ required }) => required(updatedFormState))
       .indexOf(true, fromStep + 1)
 
     updatedFormState.currentStep = nextStep > -1 ? nextStep : steps.length + 1
 
     console.log(
       'required steps',
-      steps.map(
-        ({ required }) =>
-          required === 'true' ||
-          !!eval(required.replaceAll('form', 'updatedFormState'))
-      )
+      steps.map(({ required }) => required(updatedFormState))
     )
     console.log(
       'next button clicked',
@@ -146,11 +138,7 @@ export default function FormPage({
       )
     } else {
       const previousStep = steps
-        .map(
-          ({ required }) =>
-            required === 'true' ||
-            !!eval(required.replaceAll('form', 'formData'))
-        )
+        .map(({ required }) => required(formData))
         .lastIndexOf(true, fromStep - 1)
 
       const updatedFormState = {
