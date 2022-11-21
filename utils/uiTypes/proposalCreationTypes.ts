@@ -667,12 +667,13 @@ export interface ValidatorWithdrawStakeForm {
 }
 
 export interface DualFinanceStakingOptionForm {
-  soAuthority: string | undefined
+  strike: number
   soName: string | undefined
   optionExpirationUnixSeconds: number
-  subscriptionPeriodEndUnixSeconds: number
   numTokens: number
   lotSize: number
-  baseTreasury: string | undefined
-  quoteTreasury: string | undefined
+  baseTreasury: AssetAccount | undefined
+  quoteTreasury: AssetAccount | undefined
+  payer: AssetAccount | undefined
+  userPk: string | undefined
 }
