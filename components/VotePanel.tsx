@@ -45,6 +45,109 @@ const useVetoingPop = () => {
   return vetoingPop
 }
 
+const useIsVetoable = (): undefined | boolean => {
+  const vetoingPop = useVetoingPop()
+  const isVoting = useIsVoting()
+
+  if (isVoting === false) return false
+  if (vetoingPop === undefined) return undefined
+  return !!vetoingPop
+}
+
+const useUserVetoRecord = () => {
+  // TODO
+  return undefined
+}
+
+const useCanVeto = ():
+  | undefined
+  | { canVote: true }
+  | { canVote: false; message: string } => {
+  const vetoingPop = useVetoingPop()
+  const { ownTokenRecord, ownCouncilTokenRecord, ownVoterWeight } = useRealm()
+  const connected = useWalletStore((s) => s.connected)
+  const isVetoable = useIsVetoable()
+  const userVetoRecord = useUserVetoRecord()
+
+  if (isVetoable === false)
+    return {
+      canVote: false,
+      // (Note that users should never actually see this)
+      message: 'This proposal is not vetoable',
+    }
+
+  const voterTokenRecord =
+    vetoingPop === 'community' ? ownTokenRecord : ownCouncilTokenRecord
+
+  // Are you connected?
+  if (connected === false)
+    return { canVote: false, message: 'You must connect your wallet' }
+
+  // Did you already veto?
+  if (userVetoRecord) return { canVote: false, message: 'You already voted' }
+
+  // Do you have any voting power?
+  const hasMinAmountToVote =
+    voterTokenRecord &&
+    ownVoterWeight.hasMinAmountToVote(
+      voterTokenRecord.account.governingTokenMint
+    )
+  if (hasMinAmountToVote === undefined) return undefined
+  if (hasMinAmountToVote === false)
+    return {
+      canVote: false,
+      message: 'You don’t have governance power to vote in this dao',
+    }
+
+  return { canVote: true }
+}
+
+const useIsVoting = () => {
+  const { governance, proposal } = useWalletStore((s) => s.selectedProposal)
+  const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
+
+  const isVoting =
+    proposal?.account.state === ProposalState.Voting && !hasVoteTimeExpired
+  return isVoting
+}
+
+const VetoPanel = () => {
+  const vetoable = useIsVetoable()
+  const vetoingPop = useVetoingPop()
+  const canVeto = useCanVeto()
+
+  return (
+    vetoable &&
+    vetoingPop && (
+      <>
+        <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-4">
+          <div className="flex flex-col items-center justify-center">
+            <h3 className="text-center">Cast your {vetoingPop} veto vote</h3>
+          </div>
+          <div className="flex flex-col items-center justify-center">
+            <Button
+              tooltipMessage={
+                canVeto?.canVote === false ? canVeto.message : undefined
+              }
+              className="w-full"
+              onClick={
+                () => {}
+                //handleShowVoteModal(YesNoVote.Yes)
+              }
+              disabled={!canVeto?.canVote}
+            >
+              <div className="flex flex-row items-center justify-center">
+                <BanIcon className="h-4 w-4 mr-2" />
+                Veto
+              </div>
+            </Button>
+          </div>
+        </div>
+      </>
+    )
+  )
+}
+
 const VotePanel = () => {
   const [showVoteModal, setShowVoteModal] = useState(false)
   const [vote, setVote] = useState<YesNoVote | null>(null)
@@ -94,8 +197,7 @@ const VotePanel = () => {
       : ownCouncilTokenRecord
 
   const isVoteCast = ownVoteRecord !== undefined
-  const isVoting =
-    proposal?.account.state === ProposalState.Voting && !hasVoteTimeExpired
+  const isVoting = useIsVoting()
 
   const hasMinAmountToVote =
     voterTokenRecord &&
@@ -130,10 +232,7 @@ const VotePanel = () => {
       setIsLoading(true)
       const instructions: TransactionInstruction[] = []
 
-      if (
-        proposal?.account.state === ProposalState.Voting &&
-        hasVoteTimeExpired
-      ) {
+      if (proposal !== undefined && isVoting) {
         await withFinalizeVote(
           instructions,
           realmInfo!.programId,
@@ -318,16 +417,7 @@ const VotePanel = () => {
           ) : null}
         </div>
       )}
-      {
-        // VETO VOTE PANEL
-        <>
-          <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-4">
-            <div className="flex flex-col items-center justify-center">
-              <h3 className="text-center">hi</h3>
-            </div>
-          </div>
-        </>
-      }
+      <VetoPanel />
       {didNotVote && (
         <div className="bg-bkg-2 p-4 md:p-6 rounded-lg flex flex-col items-center justify-center">
           <h3 className="text-center mb-0">You did not vote</h3>
