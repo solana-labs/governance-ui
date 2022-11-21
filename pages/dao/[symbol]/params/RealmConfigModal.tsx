@@ -64,6 +64,8 @@ const RealmConfigModal = ({ closeProposalModal, isProposalModalOpen }) => {
 
   const schema = getRealmCfgSchema({ form, programVersion })
   const handleCreate = async () => {
+    const isValid = await validateInstruction({ schema, form, setFormErrors })
+
     // START jank validation for type safety
     // @asktree: at the very least we shouldn't run instruction-generating code on undefined inputs.
     if (mint === undefined) throw new Error('mint info is not defined')
@@ -80,7 +82,6 @@ const RealmConfigModal = ({ closeProposalModal, isProposalModalOpen }) => {
     }
     // END jank validation
 
-    const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstruction = ''
     if (
       isValid &&
