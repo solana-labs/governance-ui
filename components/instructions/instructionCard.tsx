@@ -257,7 +257,9 @@ export function InstructionProgram({
         // eslint-disable-next-line no-empty
       } catch {}
     }
-    tryGetProgramInfo(programId)
+    if (connection.cluster === 'mainnet') {
+      tryGetProgramInfo(programId)
+    }
   }, [programId, connection])
   return (
     <div className="border-t border-bkg-4 flex flex-col lg:flex-row lg:items-center lg:justify-between py-3">
