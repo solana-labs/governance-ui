@@ -10,7 +10,21 @@ import * as RE from '@hub/types/Result';
 import * as gqlWallet from './gql';
 
 const DiscordLogo = () => (
-  <img src="/icons/discord.svg" alt="Discord" height="32px" width="32px" />
+  <img
+    src="/verify-wallet/img/logo-discord.svg"
+    alt="Discord"
+    height="64px"
+    width="64px"
+  />
+);
+
+const ConnectedIcon = () => (
+  <img
+    src="/verify-wallet/img/icon-connected.svg"
+    alt="Connected"
+    height="24px"
+    width="24px"
+  />
 );
 
 const STATES = {
@@ -81,30 +95,14 @@ const Prompt = () => {
   } else {
     return (
       <>
-        <div className="flex align-middle gap-1">
-          <SolanaLogo height="32px" />
-          <XIcon height="14px" className="my-auto" />
+        <div className="flex align-middle gap-2">
+          <SolanaLogo height="64px" />
+          <ConnectedIcon />
           <DiscordLogo />
         </div>
         <h1 className="text-3xl font-medium mt-8">
           Your new role awaits in Discord!
         </h1>
-        {/* <div className="mt-8">
-          <a
-            type="button"
-            className="btn btn-primary text-white bg-[#7289da] hover:bg-[#7289da]/90 focus:ring-4 focus:outline-none focus:ring-[#7289da]/50 font-medium rounded-lg text-sm px-5 py-2.5 h-[40px] text-center inline-flex items-center dark:focus:ring-[#7289da]/55 mr-2 mb-2"
-            href={'discord://'}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <img
-              src="/icons/discord.svg"
-              alt="Discord"
-              className="h-[18px] w-[18px] mr-2"
-            />
-            Return to Discord
-          </a>
-        </div> */}
         <p className="text-lg text-neutral-700 mt-4">
           You can safely close this tab and go back to Discord
         </p>

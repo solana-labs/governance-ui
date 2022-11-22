@@ -1,4 +1,11 @@
-import { SolanaLogo } from '@hub/components/branding/SolanaLogo';
+const SolanaConnectedIcon = () => (
+  <img
+    src="/verify-wallet/img/confirm-checkmark.svg"
+    alt="Connected"
+    height="64px"
+    width="64px"
+  />
+);
 
 export const StepTwo = () => {
   const DISCORD_AUTHORIZE_URL = `https://discord.com/api/oauth2/authorize?${new URLSearchParams(
@@ -15,7 +22,7 @@ export const StepTwo = () => {
 
   return (
     <>
-      <SolanaLogo height="32px" />
+      <SolanaConnectedIcon />
       <h1 className="text-3xl font-medium mt-8">
         Your wallet has been verified!
       </h1>
