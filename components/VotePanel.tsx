@@ -116,36 +116,33 @@ const VetoPanel = () => {
   const vetoingPop = useVetoingPop()
   const canVeto = useCanVeto()
 
-  return (
-    vetoable &&
-    vetoingPop && (
-      <>
-        <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-4">
-          <div className="flex flex-col items-center justify-center">
-            <h3 className="text-center">Cast your {vetoingPop} veto vote</h3>
-          </div>
-          <div className="flex flex-col items-center justify-center">
-            <Button
-              tooltipMessage={
-                canVeto?.canVote === false ? canVeto.message : undefined
-              }
-              className="w-full"
-              onClick={
-                () => {}
-                //handleShowVoteModal(YesNoVote.Yes)
-              }
-              disabled={!canVeto?.canVote}
-            >
-              <div className="flex flex-row items-center justify-center">
-                <BanIcon className="h-4 w-4 mr-2" />
-                Veto
-              </div>
-            </Button>
-          </div>
+  return vetoable && vetoingPop ? (
+    <>
+      <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-4">
+        <div className="flex flex-col items-center justify-center">
+          <h3 className="text-center">Cast your {vetoingPop} veto vote</h3>
         </div>
-      </>
-    )
-  )
+        <div className="flex flex-col items-center justify-center">
+          <Button
+            tooltipMessage={
+              canVeto?.canVote === false ? canVeto.message : undefined
+            }
+            className="w-full"
+            onClick={
+              () => {}
+              //handleShowVoteModal(YesNoVote.Yes)
+            }
+            disabled={!canVeto?.canVote}
+          >
+            <div className="flex flex-row items-center justify-center">
+              <BanIcon className="h-4 w-4 mr-2" />
+              Veto
+            </div>
+          </Button>
+        </div>
+      </div>
+    </>
+  ) : null
 }
 
 const VotePanel = () => {
