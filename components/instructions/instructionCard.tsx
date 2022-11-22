@@ -224,6 +224,7 @@ export function InstructionProgram({
   programId: PublicKey
 }) {
   const [isAnchorVerified, setIsAnchorVerified] = useState(false)
+  const [isUpgradeable, setIsUpgradeable] = useState(false)
   const [authority, setAuthority] = useState('')
   const programLabel = getProgramName(programId)
   useEffect(() => {
@@ -237,6 +238,8 @@ export function InstructionProgram({
         )
         const info = programInfo.value?.data['parsed']?.info
         const authority = info.authority
+        const isUpgradeable = !programInfo.value?.executable
+        setIsUpgradeable(isUpgradeable)
         setAuthority(authority)
         const deploymentSlot = info.slot
         tryGetAnchorInfo(programId, deploymentSlot)
@@ -273,6 +276,9 @@ export function InstructionProgram({
           >
             <div className="text-[10px] text-link">
               Authority: {abbreviateAddress(authority)}
+            </div>
+            <div className="text-[10px]">
+              Upgradeable: {isUpgradeable ? 'Yes' : 'No'}
             </div>
           </a>
         )}
