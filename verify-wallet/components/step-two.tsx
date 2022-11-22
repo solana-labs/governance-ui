@@ -10,8 +10,7 @@ const SolanaConnectedIcon = () => (
 export const StepTwo = () => {
   const DISCORD_AUTHORIZE_URL = `https://discord.com/api/oauth2/authorize?${new URLSearchParams(
     {
-      // Too lazy to figure out how to actually make this clean
-      client_id: '1042836142560645130',
+      client_id: process.env.DISCORD_APPLICATION_CLIENT_ID!,
       redirect_uri: encodeURI(
         `${window.location.protocol}//${window.location.host}/verify-wallet`,
       ),

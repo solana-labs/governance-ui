@@ -54,7 +54,6 @@ const Prompt = () => {
 
         if (RE.isFailed(verifyWalletResult)) {
           // Likely an issue like the Discord code has already been used
-          // Probably should redirect to `verify-wallet`
           setStatus(STATES.FAILED);
           console.error(verifyWalletResult.error);
           setTimeout(() => {

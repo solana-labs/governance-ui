@@ -1,14 +1,15 @@
 import * as IT from 'io-ts';
+import { gql } from 'urql';
 
+import { SolanaLogo } from '@hub/components/branding/SolanaLogo';
 import { useJWT } from '@hub/hooks/useJWT';
 import { useMutation } from '@hub/hooks/useMutation';
 import { ToastType, useToast } from '@hub/hooks/useToast';
 import { useWallet } from '@hub/hooks/useWallet';
 import cx from '@hub/lib/cx';
-import { gql } from 'urql';
+
 import * as sig from '@hub/lib/signature';
 import * as RE from '@hub/types/Result';
-import { SolanaLogo } from '@hub/components/branding/SolanaLogo';
 
 const getClaim = gql`
   mutation getClaim($publicKey: PublicKey!) {
@@ -91,7 +92,6 @@ export const SignInWithSolana = (props: Props) => {
 
           const { createAuthenticationToken: token } = tokenResult.data;
           setJwt(token);
-          // props.onConnected?.()
         } catch (e) {
           publish({
             type: ToastType.Error,
