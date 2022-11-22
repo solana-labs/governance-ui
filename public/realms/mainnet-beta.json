@@ -1581,6 +1581,22 @@
     "github": "https://github.com/solana-labs/governance-ui"
   },
   {
+    "symbol": "WISE",
+    "displayName": "WisdomDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "8Jx7cvj32DJP8bsMQ3pZvDdx2qfynrkovgVQG8DBmY9P",
+    "website": "https://www.wisdom-dao.com/",
+    "twitter": "@WiseEldersDAO",
+    "ogImage": "/realms/WisdomDAO/og.jpg",
+    "bannerImage": "/realms/WisdomDAO/banner.jpg"
+  },
+  {
+    "symbol": "wdmdao",
+    "displayName": "wdmdao",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Hx1vKARnpS8nV8qxzqK9DG1kFXbAy49HJtPQKq6UEHa1"
+  },
+  {
     "symbol": "GenesysGo",
     "category": "web3",
     "bannerImage": "https://i.imgur.com/S2ACWLv.jpg",
