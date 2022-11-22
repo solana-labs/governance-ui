@@ -130,7 +130,7 @@ export default function Config(props: Props) {
 
             <Section
               icon={<BeakerIcon />}
-              name={'Use community voter weight add-in'}
+              name={'Use community voter weight add‑in'}
               value={
                 props.realmAuthority.config.communityTokenConfig
                   ?.voterWeightAddin ? (
@@ -154,7 +154,7 @@ export default function Config(props: Props) {
             />
             <Section
               icon={<BeakerIcon />}
-              name={'Use community max voter weight add-in'}
+              name={'Use community max voter weight add‑in'}
               value={
                 props.realmAuthority.config.communityTokenConfig
                   ?.maxVoterWeightAddin ? (
@@ -196,7 +196,7 @@ export default function Config(props: Props) {
               />
               <Section
                 icon={<BeakerIcon />}
-                name={'Use council voter weight add-in'}
+                name={'Use council voter weight add‑in'}
                 value={
                   props.realmAuthority.config.councilTokenConfig
                     ?.voterWeightAddin ? (
@@ -220,7 +220,7 @@ export default function Config(props: Props) {
               />
               <Section
                 icon={<BeakerIcon />}
-                name={'Use council max voter weight add-in'}
+                name={'Use council max voter weight add‑in'}
                 value={
                   props.realmAuthority.config.councilTokenConfig
                     ?.maxVoterWeightAddin ? (

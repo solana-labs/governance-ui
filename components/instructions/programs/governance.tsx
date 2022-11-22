@@ -30,6 +30,7 @@ import {
 import { dryRunInstruction } from 'actions/dryRunInstruction'
 import { tryGetMint } from '../../../utils/tokens'
 
+const TOKEN_TYPES = { 0: 'Liquid', 1: 'Membership', 2: 'Disabled' }
 const governanceProgramId = 'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
 
 export const GOVERNANCE_INSTRUCTIONS = {
@@ -333,6 +334,77 @@ export const GOVERNANCE_INSTRUCTIONS = {
         isLoading = false
         return isLoading ? (
           <Loading></Loading>
+        ) : programVersion >= 3 ? (
+          <>
+            <p>
+              {`minCommunityTokensToCreateGovernance:
+              ${fmtVoterWeightThresholdMintAmount(
+                communityMint?.account,
+                args.configArgs.minCommunityTokensToCreateGovernance
+              )}`}{' '}
+              (
+              {fmtBNAmount(
+                args.configArgs.minCommunityTokensToCreateGovernance
+              )}
+              )
+            </p>
+            <p>
+              {`useCouncilMint:
+               ${args.configArgs.useCouncilMint}`}
+            </p>
+            <p>
+              {`communityMintMaxVoteWeightSource:
+               ${args.configArgs.communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}% supply`}{' '}
+              (
+              {fmtBNAmount(
+                args.configArgs.communityMintMaxVoteWeightSource.value
+              )}
+              )
+            </p>
+            <p>
+              {`communityTokenConfigArgs.tokenType:
+               ${
+                 TOKEN_TYPES[args.configArgs.communityTokenConfigArgs.tokenType]
+               }`}{' '}
+              ({args.configArgs.communityTokenConfigArgs.tokenType})
+            </p>
+            <p>
+              {`communityTokenConfigArgs.useVoterWeightAddin:
+               ${
+                 // note that the !! should do nothing, but the typing is inaccurate and the value is actually 0 or 1
+                 !!args.configArgs.communityTokenConfigArgs.useVoterWeightAddin
+               }`}
+            </p>
+            <p>
+              {`communityTokenConfigArgs.useMaxVoterWeightAddin:
+               ${
+                 // note that the !! should do nothing, but the typing is inaccurate and the value is actually 0 or 1
+                 !!args.configArgs.communityTokenConfigArgs
+                   .useMaxVoterWeightAddin
+               }`}
+            </p>
+            <p>
+              {`councilTokenConfigArgs.tokenType:
+               ${
+                 TOKEN_TYPES[args.configArgs.councilTokenConfigArgs.tokenType]
+               }`}{' '}
+              ({args.configArgs.councilTokenConfigArgs.tokenType})
+            </p>
+            <p>
+              {`councilTokenConfigArgs.useVoterWeightAddin:
+               ${
+                 // note that the !! should do nothing, but the typing is inaccurate and the value is actually 0 or 1
+                 !!args.configArgs.councilTokenConfigArgs.useVoterWeightAddin
+               }`}
+            </p>
+            <p>
+              {`councilTokenConfigArgs.useMaxVoterWeightAddin:
+               ${
+                 // note that the !! should do nothing, but the typing is inaccurate and the value is actually 0 or 1
+                 !!args.configArgs.councilTokenConfigArgs.useMaxVoterWeightAddin
+               }`}
+            </p>
+          </>
         ) : (
           <>
             <h1>Current config</h1>

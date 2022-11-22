@@ -49,22 +49,26 @@ export default function NFTWizard() {
   const [requestPending, setRequestPending] = useState(false)
 
   const steps = [
-    { Form: BasicDetailsForm, schema: BasicDetailsSchema, required: 'true' },
+    {
+      Form: BasicDetailsForm,
+      schema: BasicDetailsSchema,
+      required: () => true,
+    },
     {
       Form: AddNFTCollectionForm,
       schema: AddNFTCollectionSchema,
-      required: 'true',
+      required: () => true,
     },
-    { Form: AddCouncilForm, schema: AddCouncilSchema, required: 'true' },
+    { Form: AddCouncilForm, schema: AddCouncilSchema, required: () => true },
     {
       Form: InviteMembersForm,
       schema: InviteMembersSchema,
-      required: 'form.addCouncil',
+      required: (form: NFTForm) => form.addCouncil,
     },
     {
       Form: YesVotePercentageForm,
       schema: CouncilYesVotePercentageSchema,
-      required: 'form.addCouncil && form._programVersion >= 3',
+      required: (form: NFTForm) => form.addCouncil && form._programVersion >= 3,
       forCouncil: true,
       title: "Next, set your DAO's council approval threshold.",
     },
