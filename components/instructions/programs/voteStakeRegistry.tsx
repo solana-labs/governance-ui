@@ -45,7 +45,6 @@ const common_instructions = (programId: PublicKey) => ({
       { name: 'Registrar' },
       { name: 'Realm authority' },
       { name: 'Voter' },
-      { name: 'Token owner record' },
       { name: 'Vault' },
       { name: 'Destination' },
     ],
