@@ -50,7 +50,7 @@
     "@mean-dao/msp": "3.0.1-alpha.13",
     "@metaplex-foundation/js": "0.17.5",
     "@metaplex-foundation/mpl-token-metadata": "~2.5.1",
-    "@mithraic-labs/serum-remote": "0.0.1-rc.16",
+    "@mithraic-labs/serum-remote": "0.0.2",
     "@next/bundle-analyzer": "12.1.5",
     "@nfteyez/sol-rayz": "0.10.2",
     "@nivo/bar": "0.79.1",
