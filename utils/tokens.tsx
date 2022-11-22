@@ -21,7 +21,7 @@ import {
 import { chunks } from './helpers'
 import { getAccountName, WSOL_MINT } from '@components/instructions/tools'
 import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
-import tokenService from './services/token'
+import tokenPriceService from './services/tokenPrice'
 import { notify } from './notifications'
 import { BN } from '@project-serum/anchor'
 import { abbreviateAddress } from './formatting'
@@ -267,7 +267,7 @@ export function getTokenAccountLabelInfo(acc: AssetAccount | undefined) {
   let imgUrl = ''
 
   if (acc?.extensions.token && acc.extensions.mint) {
-    const info = tokenService.getTokenInfo(
+    const info = tokenPriceService.getTokenInfo(
       acc.extensions!.mint!.publicKey.toBase58()
     )
     imgUrl = info?.logoURI ? info.logoURI : ''
@@ -298,7 +298,7 @@ export function getSolAccountLabel(acc: AssetAccount | undefined) {
   let imgUrl = ''
 
   if (acc?.extensions.mint) {
-    const info = tokenService.getTokenInfo(WSOL_MINT)
+    const info = tokenPriceService.getTokenInfo(WSOL_MINT)
     imgUrl = info?.logoURI ? info.logoURI : ''
     tokenAccount = acc.extensions.transferAddress!.toBase58()
     tokenName = 'SOL'
@@ -327,7 +327,7 @@ export function getMintAccountLabelInfo(acc: AssetAccount | undefined) {
   let amount = ''
   let imgUrl = ''
   if (acc?.extensions.mint && acc.governance) {
-    const info = tokenService.getTokenInfo(
+    const info = tokenPriceService.getTokenInfo(
       acc.governance.account.governedAccount.toBase58()
     )
     imgUrl = info?.logoURI ? info.logoURI : ''

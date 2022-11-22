@@ -13,7 +13,7 @@ import handleGovernanceAssetsStore from '@hooks/handleGovernanceAssetsStore'
 import handleRouterHistory from '@hooks/handleRouterHistory'
 import NavBar from '@components/NavBar'
 import PageBodyContainer from '@components/PageBodyContainer'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import TransactionLoader from '@components/TransactionLoader'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -64,7 +64,7 @@ export function App(props: Props) {
   handleGovernanceAssetsStore()
   useMembers()
   useEffect(() => {
-    tokenService.fetchSolanaTokenList()
+    tokenPriceService.fetchSolanaTokenList()
   }, [])
   const { loadMarket } = useMarketStore()
   const { governedTokenAccounts } = useGovernanceAssets()

@@ -32,7 +32,7 @@ import {
   TokenAccount,
   TokenProgramAccount,
 } from '@utils/tokens'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import { ConnectionContext } from '@utils/connection'
 import {
   AccountType,
@@ -737,7 +737,7 @@ const getAccountsForGovernances = async (
   )
 
   // 5 - Call to fetch token prices for every token account's mints
-  await tokenService.fetchTokenPrices(
+  await tokenPriceService.fetchTokenPrices(
     governedTokenAccounts.reduce((mints, governedTokenAccount) => {
       if (!governedTokenAccount.extensions.mint?.publicKey) {
         return mints

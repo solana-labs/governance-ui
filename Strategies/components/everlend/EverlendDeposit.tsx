@@ -7,7 +7,7 @@ import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 
 import {
   getMintMinAmountAsDecimal,
@@ -42,7 +42,7 @@ const EverlendDeposit = ({
   maxDepositAmount,
 }: IProps) => {
   const [amount, setAmount] = useState(0)
-  const tokenSymbol = tokenService.getTokenInfo(
+  const tokenSymbol = tokenPriceService.getTokenInfo(
     governedTokenAccount.extensions.mint!.publicKey.toBase58()
   )?.symbol
 

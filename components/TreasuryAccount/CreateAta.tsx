@@ -14,7 +14,7 @@ import useRealm from '@hooks/useRealm'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import * as serum from '@project-serum/common'
 import TokenMintInput from '@components/inputs/TokenMintInput'
-import { TokenInfo } from '@solana/spl-token-registry'
+import { TokenInfoWithoutDecimals } from '@utils/services/tokenPrice'
 
 const CreateAta = ({
   owner,
@@ -36,7 +36,7 @@ const CreateAta = ({
     string | undefined
   >()
   const [foundByNameToken, setFoundByNameToken] = useState<
-    TokenInfo | undefined
+    TokenInfoWithoutDecimals | undefined
   >()
   const handleCreate = async () => {
     const mintPk = validatedTypedMint

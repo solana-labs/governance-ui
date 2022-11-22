@@ -1,7 +1,7 @@
 import { BN, PublicKey } from '@blockworks-foundation/mango-client'
 import { MangoV3ReimbursementClient } from '@blockworks-foundation/mango-v3-reimbursement-lib/dist'
 import { CheckIcon } from '@heroicons/react/solid'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import { useEffect, useState } from 'react'
 
 function toDecimalAmount(amount: BN, decimals: number) {
@@ -71,7 +71,7 @@ const ClaimMangoTokensTableRow = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     reimbursementAccount && JSON.stringify(reimbursementAccount),
   ])
-  const tokenInfo = tokenService.getTokenInfo(item.mintPubKey.toBase58())
+  const tokenInfo = tokenPriceService.getTokenInfo(item.mintPubKey.toBase58())
   return (
     <div className="grid grid-cols-12 items-center gap-3 rounded-md border border-th-bkg-3 p-4">
       <div className="col-span-5 flex flex-col overflow-hidden">

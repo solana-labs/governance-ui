@@ -20,7 +20,7 @@ import { tryParsePublicKey } from '@tools/core/pubkey'
 import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { notify } from '@utils/notifications'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import { Member } from '@utils/uiTypes/members'
 import React, { useEffect, useMemo, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
@@ -52,7 +52,8 @@ const MemberOverview = ({ member }: { member: Member }) => {
 
   const walletPublicKey = tryParsePublicKey(walletAddress)
   const tokenName = realm
-    ? tokenService.getTokenInfo(realm?.account.communityMint.toBase58())?.symbol
+    ? tokenPriceService.getTokenInfo(realm?.account.communityMint.toBase58())
+        ?.symbol
     : ''
   const communityAmount = useMemo(
     () =>
