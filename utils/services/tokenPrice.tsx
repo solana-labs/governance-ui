@@ -7,6 +7,8 @@ import { WSOL_MINT } from '@components/instructions/tools'
 import { MANGO_MINT } from 'Strategies/protocols/mango/tools'
 import overrides from 'public/realms/token-overrides.json'
 
+//this service provide prices it is not recommended to get anything more from here besides token name or price.
+//decimals from metadata can be different from the realm on chain one
 const endpoint = 'https://price.jup.ag/v3/price'
 
 type Price = {
@@ -17,7 +19,9 @@ type Price = {
   vsTokenSymbol: string
 }
 
-class TokenService {
+export type TokenInfoWithoutDecimals = Omit<TokenInfo, 'decimals'>
+
+class TokenPriceService {
   _tokenList: TokenInfo[]
   _tokenPriceToUSDlist: {
     [mintAddress: string]: Price
@@ -81,13 +85,21 @@ class TokenService {
   getUSDTokenPrice(mintAddress: string): number {
     return mintAddress ? this._tokenPriceToUSDlist[mintAddress]?.price || 0 : 0
   }
-  getTokenInfo(mintAddress: string) {
+  /**
+   * For decimals use on chain tryGetMint
+   */
+  getTokenInfo(mintAddress: string): TokenInfoWithoutDecimals | undefined {
     const tokenListRecord = this._tokenList?.find(
       (x) => x.address === mintAddress
     )
     return tokenListRecord
   }
-  getTokenInfoFromCoingeckoId(coingeckoId: string) {
+  /**
+   * For decimals use on chain tryGetMint
+   */
+  getTokenInfoFromCoingeckoId(
+    coingeckoId: string
+  ): TokenInfoWithoutDecimals | undefined {
     const tokenListRecord = this._tokenList?.find(
       (x) => x.extensions?.coingeckoId === coingeckoId
     )
@@ -95,6 +107,6 @@ class TokenService {
   }
 }
 
-const tokenService = new TokenService()
+const tokenPriceService = new TokenPriceService()
 
-export default tokenService
+export default tokenPriceService

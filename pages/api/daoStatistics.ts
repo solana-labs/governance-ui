@@ -6,7 +6,7 @@ import {
   Realm,
 } from '@solana/spl-governance'
 import { Connection, PublicKey } from '@solana/web3.js'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import { getOwnedTokenAccounts, tryGetMint } from '@utils/tokens'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getAllSplGovernanceProgramIds } from './tools/realms'
@@ -121,16 +121,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   console.log('fetching tokens and prices...')
   console.log('token count', tokenAmountMap.size)
 
-  await tokenService.fetchSolanaTokenList()
+  await tokenPriceService.fetchSolanaTokenList()
 
   for (const chunk of chunks([...tokenAmountMap.keys()], 100)) {
-    await tokenService.fetchTokenPrices(chunk)
+    await tokenPriceService.fetchTokenPrices(chunk)
   }
 
   let totalUsdAmount = 0
 
   for (const [mintPk, amount] of tokenAmountMap.entries()) {
-    const tokenUsdPrice = tokenService.getUSDTokenPrice(mintPk)
+    const tokenUsdPrice = tokenPriceService.getUSDTokenPrice(mintPk)
     if (tokenUsdPrice > 0) {
       const mint = await tryGetMint(conn, new PublicKey(mintPk))
       const decimalAmount = amount.shiftedBy(-mint!.account.decimals)

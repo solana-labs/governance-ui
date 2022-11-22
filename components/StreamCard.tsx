@@ -2,8 +2,6 @@ import { Connection, PublicKey, SystemProgram } from '@solana/web3.js'
 import { AccountMetaData } from '@solana/spl-governance'
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 
-import tokenService from '@utils/services/token'
-
 import {
   StreamClient,
   Cluster,
@@ -35,22 +33,6 @@ export interface TokenMintMetadata {
 // Mint metadata for Well known tokens displayed on the instruction card
 export const MINT_METADATA = {
   Gssm3vfi8s65R31SBdmQRq6cKeYojGgup7whkw4VCiQj: { symbol: 'STRM', decimals: 9 },
-}
-
-export function getMintMetadata(
-  tokenMintPk: PublicKey | undefined
-): TokenMintMetadata {
-  const tokenMintAddress = tokenMintPk ? tokenMintPk.toBase58() : ''
-  const tokenInfo = tokenMintAddress
-    ? tokenService.getTokenInfo(tokenMintAddress)
-    : null
-  return tokenInfo
-    ? {
-        name: tokenInfo.symbol,
-        decimals: tokenInfo.decimals,
-        address: tokenInfo.address,
-      }
-    : MINT_METADATA[tokenMintAddress]
 }
 
 export default function StreamCard({

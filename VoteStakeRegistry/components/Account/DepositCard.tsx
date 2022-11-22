@@ -10,7 +10,7 @@ import {
   LockupType,
 } from 'VoteStakeRegistry/sdk/accounts'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import LockTokensModal from './LockTokensModal'
 import { useState } from 'react'
 import {
@@ -132,7 +132,9 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       </div>
     )
   }
-  const tokenInfo = tokenService.getTokenInfo(deposit.mint.publicKey.toBase58())
+  const tokenInfo = tokenPriceService.getTokenInfo(
+    deposit.mint.publicKey.toBase58()
+  )
   return (
     <div className="border border-fgd-4 rounded-lg flex flex-col">
       <div className="bg-bkg-3 px-4 py-4 pr-16 rounded-md rounded-b-none flex items-center">

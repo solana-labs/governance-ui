@@ -25,7 +25,7 @@ import {
   parseMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
 import { abbreviateAddress, precision } from '@utils/formatting'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import BigNumber from 'bignumber.js'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -89,7 +89,7 @@ const MangoDepositComponent = ({
   const market = useMarketStore((s) => s)
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
-  const tokenInfo = tokenService.getTokenInfo(handledMint)
+  const tokenInfo = tokenPriceService.getTokenInfo(handledMint)
   const { canUseTransferInstruction } = useGovernanceAssets()
   const treasuryAmount = governedTokenAccount.extensions.amount!
   const mintInfo = governedTokenAccount.extensions?.mint?.account
@@ -102,7 +102,7 @@ const MangoDepositComponent = ({
   })
   const [formErrors, setFormErrors] = useState({})
   const proposalTitle = `Deposit ${form.amount} ${
-    tokenService.getTokenInfo(
+    tokenPriceService.getTokenInfo(
       governedTokenAccount.extensions.mint!.publicKey.toBase58()
     )?.symbol || 'tokens'
   } to Mango account`
