@@ -3,6 +3,7 @@ import Script from 'next/script';
 import React from 'react';
 
 import { GlobalHeader } from '@hub/components/GlobalHeader';
+import { MinimalHeader } from '@hub/components/GlobalHeader/MinimalHeader';
 import { RootProvider } from '@hub/providers/Root';
 
 const GoogleTag = React.memo(
@@ -140,10 +141,11 @@ export function App(props: Props) {
       </Head>
       <GoogleTag />
       <Twitter />
-      <GlobalHeader
-        className="fixed h-14 top-0 left-0 right-0 z-30"
-        minimal={props.minimal}
-      />
+      {props.minimal ? (
+        <MinimalHeader className="fixed h-14 top-0 left-0 right-0 z-30" />
+      ) : (
+        <GlobalHeader className="fixed h-14 top-0 left-0 right-0 z-30" />
+      )}
       {props.children}
     </RootProvider>
   );

@@ -27,18 +27,18 @@ const ConnectedIcon = () => (
   />
 );
 
-const STATES = {
-  FAILED: 'FAILED',
-  VERIFYING: 'VERIFYING',
-  VERIFIED: 'VERIFIED',
-};
+enum VerifyWalletState {
+  FAILED,
+  VERIFYING,
+  VERIFIED,
+}
 
 const Prompt = () => {
   const [, verifyWallet] = useMutation(
     gqlWallet.verifyWalletResp,
     gqlWallet.verifyWallet,
   );
-  const [status, setStatus] = useState(STATES.VERIFYING);
+  const [status, setStatus] = useState(VerifyWalletState.VERIFYING);
   const parsedLocationHash = new URLSearchParams(
     window.location.search.substring(1),
   );
@@ -54,7 +54,7 @@ const Prompt = () => {
 
         if (RE.isFailed(verifyWalletResult)) {
           // Likely an issue like the Discord code has already been used
-          setStatus(STATES.FAILED);
+          setStatus(VerifyWalletState.FAILED);
           console.error(verifyWalletResult.error);
           setTimeout(() => {
             router.push('/verify-wallet');
@@ -62,7 +62,7 @@ const Prompt = () => {
           throw verifyWalletResult.error;
         }
 
-        setStatus(STATES.VERIFIED);
+        setStatus(VerifyWalletState.VERIFIED);
       } catch (e) {
         console.error(e);
       }
@@ -72,7 +72,7 @@ const Prompt = () => {
     }
   }, [window.location.search]);
 
-  if (status === STATES.FAILED) {
+  if (status === VerifyWalletState.FAILED) {
     return (
       <>
         <XIcon height="48px" className="text-red" />
@@ -82,7 +82,7 @@ const Prompt = () => {
         </p>
       </>
     );
-  } else if (status === STATES.VERIFYING) {
+  } else if (status === VerifyWalletState.VERIFYING) {
     return (
       <>
         <LoadingDots />

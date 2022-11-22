@@ -3,25 +3,25 @@ import { useJWT } from '@hub/hooks/useJWT'
 import cx from '@hub/lib/cx'
 
 import React from 'react'
-import { StepOne } from 'verify-wallet/components/step-one'
-import { StepTwo } from 'verify-wallet/components/step-two'
-import { StepThree } from 'verify-wallet/components/step-three'
+import { StepOne } from '@verify-wallet/components/step-one'
+import { StepTwo } from '@verify-wallet/components/step-two'
+import { StepThree } from '@verify-wallet/components/step-three'
 
-const STEPS = {
-  STEP_ONE: 0,
-  STEP_TWO: 1,
-  STEP_THREE: 2,
+enum VerifyWalletSteps {
+  SIGN_IN_WITH_SOLANA, // Step one
+  AUTHORIZE_DISCORD_OAUTH, // Step two
+  UPDATE_DISCORD_METADATA, // Step three
 }
 
 const getCurrentStep = (jwt, accessToken) => {
   if (jwt) {
     if (accessToken) {
-      return STEPS.STEP_THREE
+      return VerifyWalletSteps.UPDATE_DISCORD_METADATA
     } else {
-      return STEPS.STEP_TWO
+      return VerifyWalletSteps.AUTHORIZE_DISCORD_OAUTH
     }
   }
-  return STEPS.STEP_ONE
+  return VerifyWalletSteps.SIGN_IN_WITH_SOLANA
 }
 
 const VerifyWallet = (/* props: Props */) => {
@@ -34,16 +34,24 @@ const VerifyWallet = (/* props: Props */) => {
 
   return (
     <>
-      <div className={cx('grid', 'overflow-x-visible', 'pt-14')}>
+      <div
+        className={cx('grid', 'overflow-x-visible', 'pt-14', 'min-h-screen')}
+      >
         <div className={cx('overflow-hidden', 'w-full', 'py-8')}>
           <div className="grid justify-items-center">
-            {currentStep === STEPS.STEP_ONE && <StepOne />}
-            {currentStep === STEPS.STEP_TWO && <StepTwo />}
-            {currentStep === STEPS.STEP_THREE && <StepThree />}
+            {currentStep === VerifyWalletSteps.SIGN_IN_WITH_SOLANA && (
+              <StepOne />
+            )}
+            {currentStep === VerifyWalletSteps.AUTHORIZE_DISCORD_OAUTH && (
+              <StepTwo />
+            )}
+            {currentStep === VerifyWalletSteps.UPDATE_DISCORD_METADATA && (
+              <StepThree />
+            )}
           </div>
         </div>
       </div>
-      <GlobalFooter className="absolute bottom-0 max-w-3xl mx-auto pt-8 bg-white h-[138px]" />
+      <GlobalFooter className="absolute bottom-0 w-full mx-auto pt-8 bg-white h-[138px]" />
     </>
   )
 }
