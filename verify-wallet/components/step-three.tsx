@@ -9,9 +9,9 @@ import * as RE from '@hub/types/Result';
 
 import * as gqlWallet from './gql';
 
-const DiscordLogo = () => (
+const ConnectedDiscordIcon = () => (
   <img
-    src="/verify-wallet/img/logo-discord.svg"
+    src="/verify-wallet/img/icon-discord-role.svg"
     alt="Discord"
     height="64px"
     width="64px"
@@ -98,7 +98,7 @@ const Prompt = () => {
         <div className="flex align-middle gap-2">
           <SolanaLogo height="64px" />
           <ConnectedIcon />
-          <DiscordLogo />
+          <ConnectedDiscordIcon />
         </div>
         <h1 className="text-3xl font-medium mt-8">
           Your new role awaits in Discord!

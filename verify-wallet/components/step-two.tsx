@@ -1,6 +1,6 @@
 const SolanaConnectedIcon = () => (
   <img
-    src="/verify-wallet/img/confirm-checkmark.svg"
+    src="/verify-wallet/img/icon-solana-connected.svg"
     alt="Connected"
     height="64px"
     width="64px"
