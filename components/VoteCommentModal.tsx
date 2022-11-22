@@ -31,17 +31,19 @@ interface VoteCommentModalProps {
   voterTokenRecord: ProgramAccount<TokenOwnerRecord>
 }
 
-const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
+const useSubmitVote = ({
+  comment,
   onClose,
-  isOpen,
-  vote,
   voterTokenRecord,
+}: {
+  comment: string
+  onClose: () => void
+  voterTokenRecord: ProgramAccount<TokenOwnerRecord>
 }) => {
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
   const [submitting, setSubmitting] = useState(false)
-  const [comment, setComment] = useState('')
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const { proposal } = useWalletStore((s) => s.selectedProposal)
@@ -103,6 +105,22 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
 
     fetchChatMessages(proposal!.pubkey)
   }
+
+  return { submitting, submitVote }
+}
+
+const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
+  onClose,
+  isOpen,
+  vote,
+  voterTokenRecord,
+}) => {
+  const [comment, setComment] = useState('')
+  const { submitting, submitVote } = useSubmitVote({
+    comment,
+    onClose,
+    voterTokenRecord,
+  })
 
   const voteString = vote === YesNoVote.Yes ? 'Yes' : 'No'
 
