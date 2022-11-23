@@ -70,6 +70,12 @@ class RealmsDocument extends Document {
         <body>
           <Main />
           <NextScript />
+          <script src={`https://jupiter-embed.vercel.app/main.js`}></script>
+          {/* import css */}
+          <link
+            rel="stylesheet"
+            href={`https://jupiter-embed.vercel.app/main.css`}
+          />
         </body>
       </Html>
     )

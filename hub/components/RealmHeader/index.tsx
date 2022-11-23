@@ -8,12 +8,12 @@ import LogoLinkedin from '@carbon/icons-react/lib/LogoLinkedin';
 import ProgressBarRound from '@carbon/icons-react/lib/ProgressBarRound';
 // import UserFollow from '@carbon/icons-react/lib/UserFollow';
 import WalletIcon from '@carbon/icons-react/lib/Wallet';
-import Modal from '@components/Modal';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
+import { useWallet } from '@solana/wallet-adapter-react';
 import type { PublicKey } from '@solana/web3.js';
-import { useState } from 'react';
 
-import JupiterApp from '../Hub/Jupiter';
+import { useCallback } from 'react';
+
 import * as Button from '@hub/components/controls/Button';
 import { HeaderTokenPrice } from '@hub/components/HeaderTokenPrice';
 import { Twitter } from '@hub/components/icons/Twitter';
@@ -49,24 +49,32 @@ interface Props extends BaseProps {
   websiteUrl?: string | null;
 }
 
+const jupiterDefaultParams = {
+  mode: 'outputOnly',
+  endpoint:
+    'https://solana-mainnet.g.alchemy.com/v2/ZT3c4pYf1inIrB0GVDNR7nx4LwyED5Ci',
+};
+
 export function Content(props: Props) {
-  const [showJupiter, setShowJupiter] = useState(false);
+  const { wallet } = useWallet();
+
+  const initJupiter = useCallback(() => {
+    if (wallet) {
+      (window as any).Jupiter.init({
+        ...jupiterDefaultParams,
+        mint: props.token?.mint.toString(),
+        passThroughWallet: wallet,
+      });
+    } else {
+      (window as any).Jupiter.init({
+        ...jupiterDefaultParams,
+        mint: props.token?.mint.toString(),
+      });
+    }
+  }, [wallet, props.token?.mint]);
 
   return (
     <>
-      {showJupiter && (
-        <Modal
-          sizeClassName="sm:max-w-md bg-[#F8FAFD] !p-0"
-          onClose={(e: any) => {
-            e.preventDefault();
-            setShowJupiter(false);
-          }}
-          isOpen={showJupiter}
-        >
-          <JupiterApp mint={props.token?.mint} />
-        </Modal>
-      )}
-
       <header className={cx(props.className, 'bg-white')}>
         <RealmBanner.Content bannerUrl={props.bannerUrl} realm={props.realm} />
         <div className="max-w-7xl mx-auto px-8 relative w-full">
@@ -97,7 +105,7 @@ export function Content(props: Props) {
               {props.token && (
                 <Button.Primary
                   className="w-36 text-white ml-2"
-                  onClick={() => setShowJupiter(true)}
+                  onClick={initJupiter}
                 >
                   <ProgressBarRound className="h-4 w-4 mr-1.5" />
                   Buy #{props.token.symbol}
