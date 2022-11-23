@@ -1,8 +1,9 @@
 import React, { FunctionComponent, useState } from 'react'
-import { ThumbDownIcon, ThumbUpIcon } from '@heroicons/react/solid'
+import { BanIcon, ThumbDownIcon, ThumbUpIcon } from '@heroicons/react/solid'
 import {
   ChatMessageBody,
   ChatMessageBodyType,
+  VoteKind,
   YesNoVote,
 } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
@@ -27,7 +28,7 @@ import { NftVoterClient } from '@solana/governance-program-library'
 interface VoteCommentModalProps {
   onClose: () => void
   isOpen: boolean
-  vote: YesNoVote
+  vote: VoteKind
   voterTokenRecord: ProgramAccount<TokenOwnerRecord>
 }
 
@@ -56,7 +57,7 @@ const useSubmitVote = ({
       config?.account.communityTokenConfig.voterWeightAddin?.toBase58()
     )
   const { closeNftVotingCountingModal } = useNftProposalStore.getState()
-  const submitVote = async (vote: YesNoVote) => {
+  const submitVote = async (vote: VoteKind) => {
     setSubmitting(true)
     const rpcContext = new RpcContext(
       proposal!.owner,
@@ -109,6 +110,13 @@ const useSubmitVote = ({
   return { submitting, submitVote }
 }
 
+const VOTE_STRINGS = {
+  [VoteKind.Approve]: 'Yes',
+  [VoteKind.Deny]: 'No',
+  [VoteKind.Veto]: 'Veto',
+  [VoteKind.Abstain]: 'Abstain',
+}
+
 const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   onClose,
   isOpen,
@@ -122,7 +130,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
     voterTokenRecord,
   })
 
-  const voteString = vote === YesNoVote.Yes ? 'Yes' : 'No'
+  const voteString = VOTE_STRINGS[vote]
 
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
@@ -154,10 +162,12 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
         >
           <div className="flex items-center">
             {!submitting &&
-              (vote === YesNoVote.Yes ? (
+              (vote === VoteKind.Approve ? (
                 <ThumbUpIcon className="h-4 w-4 fill-black mr-2" />
-              ) : (
+              ) : vote === VoteKind.Deny ? (
                 <ThumbDownIcon className="h-4 w-4 fill-black mr-2" />
+              ) : (
+                <BanIcon className="h-4 w-4 fill-black mr-2" />
               ))}
             {submitting ? <Loading /> : <span>Vote {voteString}</span>}
           </div>
