@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {
+  VoteKind,
   VoteThresholdType,
   withFinalizeVote,
   YesNoVote,
@@ -59,6 +60,14 @@ const useUserVetoRecord = () => {
   return undefined
 }
 
+const useUserVetoTokenRecord = () => {
+  const { ownTokenRecord, ownCouncilTokenRecord } = useRealm()
+  const vetoingPop = useVetoingPop()
+  const voterTokenRecord =
+    vetoingPop === 'community' ? ownTokenRecord : ownCouncilTokenRecord
+  return voterTokenRecord
+}
+
 const useCanVeto = ():
   | undefined
   | { canVote: true }
@@ -68,6 +77,7 @@ const useCanVeto = ():
   const connected = useWalletStore((s) => s.connected)
   const isVetoable = useIsVetoable()
   const userVetoRecord = useUserVetoRecord()
+  const voterTokenRecord = useUserVetoTokenRecord()
 
   if (isVetoable === false)
     return {
@@ -75,9 +85,6 @@ const useCanVeto = ():
       // (Note that users should never actually see this)
       message: 'This proposal is not vetoable',
     }
-
-  const voterTokenRecord =
-    vetoingPop === 'community' ? ownTokenRecord : ownCouncilTokenRecord
 
   // Are you connected?
   if (connected === false)
@@ -115,8 +122,10 @@ const VetoPanel = () => {
   const vetoable = useIsVetoable()
   const vetoingPop = useVetoingPop()
   const canVeto = useCanVeto()
+  const [openModal, setOpenModal] = useState(false)
+  const voterTokenRecord = useUserVetoTokenRecord()
 
-  return vetoable && vetoingPop ? (
+  return vetoable && vetoingPop && voterTokenRecord ? (
     <>
       <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-4">
         <div className="flex flex-col items-center justify-center">
@@ -128,10 +137,7 @@ const VetoPanel = () => {
               canVeto?.canVote === false ? canVeto.message : undefined
             }
             className="w-full"
-            onClick={
-              () => {}
-              //handleShowVoteModal(YesNoVote.Yes)
-            }
+            onClick={() => setOpenModal(true)}
             disabled={!canVeto?.canVote}
           >
             <div className="flex flex-row items-center justify-center">
@@ -141,6 +147,14 @@ const VetoPanel = () => {
           </Button>
         </div>
       </div>
+      {openModal ? (
+        <VoteCommentModal
+          onClose={() => setOpenModal(false)}
+          isOpen={openModal}
+          voterTokenRecord={voterTokenRecord}
+          vote={VoteKind.Veto}
+        />
+      ) : null}
     </>
   ) : null
 }
@@ -408,7 +422,7 @@ const VotePanel = () => {
             <VoteCommentModal
               isOpen={showVoteModal}
               onClose={handleCloseShowVoteModal}
-              vote={vote!}
+              vote={vote! === YesNoVote.Yes ? VoteKind.Approve : VoteKind.Deny}
               voterTokenRecord={voterTokenRecord!}
             />
           ) : null}
