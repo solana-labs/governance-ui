@@ -27,7 +27,7 @@ import {
   ArrowCircleUpIcon,
   //   InformationCircleIcon,
 } from '@heroicons/react/solid'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import BigNumber from 'bignumber.js'
 import { getInstructionDataFromBase64 } from '@solana/spl-governance'
 import useQueryContext from '@hooks/useQueryContext'
@@ -127,7 +127,7 @@ const SendTokens = ({
     })
   }
   const calcTransactionDolarAmount = (amount) => {
-    const price = tokenService.getUSDTokenPrice(
+    const price = tokenPriceService.getUSDTokenPrice(
       currentAccount!.extensions.mint!.publicKey.toBase58()
     )
     const totalPrice = amount * price

@@ -290,7 +290,7 @@
     ],
     "documentation": {
       "title": "Docs",
-      "url": "https://drive.google.com/file/d/1ZJWk2J87gC1uNzwvQT3KlSjUwyrw-nSn/view"
+      "url": "https://uniquevc.gitbook.io/unique-venture-clubs-docs/"
     },
     "resources": [
       {
@@ -4083,6 +4083,121 @@
   },
   "HnLuYmBxDxK1MCihHJVFnNudUTpLPc2km6xNcRQ8KPdj": {
     "symbol": "Dual Finance",
+    "heading": "Sustainable Incentive Liquidity Infrastructure for Web3 Communities",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Dual Finance gives token communities sustainable ways to earn yield & generate value from their treasuries. Through liquid option based incentives, Dual Finance unlocks value & unleashes participation in decentralized communities. Goodbye inflationary token rewards. Hello sustainable Staking Options.",
+          "Dual Finance has designed itself upon this breakthrough token incentive mechanism to gain allegiance & prevent token dumping. DUAL token distribution is being conducted fully & fairly through the use of Staking Options.",
+          "Partner projects can use Staking Options themselves via Dual Finance to better incentivize their own communities. When designed through Dual Finance, Staking Options serve to bolster their token's option & spot liquidity by utilizing a DAO owned AMM (Risk Manager) and capitally efficient lending product (Rehypothecated Lending Pools).",
+          "Completing the offering are Dual Investment Pools (DIPs), an upgrade to conventional option vaults (DOVs) that offer streaming executable yield strategies. Customize strategies based on your risk appetite and earn yield immediately."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://medium.com/@dualfinance"
+    },
+    "resources": [
+      {
+        "title": "Dual Finance's Youtube Channel",
+        "content": [
+          "Providing educational videos that give token communities sustainable ways to earn yield & generate value from their treasuries"
+        ],
+        "url": "https://www.youtube.com/channel/UCMyYJ7GUzk7GCgyb9AgOU6w"
+      }
+    ],
+    "gallery": [
+      {
+        "caption": "Dual Investment Pools (DIP)",
+        "url": "https://i.imgur.com/punX3y0.png",
+        "height": 157,
+        "width": 600
+      },
+      {
+        "caption": "Staking Options Studio (SOS)",
+        "url": "https://i.imgur.com/t8h5dFa.png",
+        "height": 233,
+        "width": 600
+      }
+    ],
+    "team": [
+      {
+        "name": "Britt Cyr",
+        "avatar": "https://pbs.twimg.com/profile_images/1507165603240591367/hQDLyFw4_400x400.jpg",
+        "description": [
+          "MIT Masters & MIT B.Sc in Computer Science, concentration in Theoretical Computer Science (Cryptography)",
+          "Lead developer at YouTube. Over 7 years launched multiple live streaming projects & scaled the system from 100s of broadcasts to over 100K concurrent broadcasts with over 10M viewers. Managed live streaming ingestion & transcoding on projects, including webrtc mobile live streaming & ultra low latency, reducing latency from 45 seconds to < 1 second. Ex-Google, Ex-Facebook"
+        ],
+        "role": "Co-Founder",
+        "twitter": "@cyrzorhands"
+      },
+      {
+        "name": "John Kramer",
+        "avatar": "https://pbs.twimg.com/profile_images/1432394328387858432/YbfgF5gL_400x400.jpg",
+        "description": [
+          "MIT Masters in Finance & MIT B.Sc Aerospace Engineering",
+          "Prior Head of OTC & DeFi Trading at GSR. Led buildout of options trading capabilities, market making deal structures, and global team of traders & operations. Specialty in illiquid crypto derivatives trading, structured products, bespoke margining & lending. Crypto’s first-ever trades across altcoin options, variance swaps, accumulators, average price options, onchain derivatives/DOVs. Risk managed a portfolio of 300+ illiquid token derivatives with a multi-billion $ AUM."
+        ],
+        "role": "Co-Founder",
+        "twitter": "@jktrader16"
+      }
+    ],
+    "roadmap": {
+      "items": [
+        {
+          "title": "Dual Token Launch",
+          "date": "2022-12-01T15:42:21.109Z",
+          "status": "upcoming",
+          "resource": {
+            "title": "Staking Option Fair Launch",
+            "url": "https://medium.com/@dualfinance/staking-option-fair-launch-f08a2ba958e8"
+          }
+        }
+      ]
+    },
+    "faq": [
+      {
+        "question": "What are DIPs?",
+        "answer": [
+          "Dual Investment Pools, similar in structure to more commonly known Decentralized Option Vaults (DOVs) but with real-time pricing and customizable yields. They are also physically settled, meaning you will end up with either your staked asset or stablecoins upon withdrawing after expiration. Premiums are also paid immediately upon staking so you can put your funds to work for longer."
+        ]
+      },
+      {
+        "question": "Will there be a DUAL DAO?",
+        "answer": [
+          "Yes the plan is to fully decentralize every aspect of the project. DUAL token holders will provide the governance function and steward the treasury assets."
+        ]
+      },
+      {
+        "question": "What is the mission of the project?",
+        "answer": [
+          "To fix crypto’s broken tokenomic incentive structures through sustainable option based pathways. For a broader understanding of what is meant by that, please review our Whitepaper and other articles on Medium."
+        ]
+      },
+      {
+        "question": "How is the premium provided?",
+        "answer": [
+          "Premiums are quoted via an API directly from Option Market Makers or via the Dual Finance Backstop Volatility Model. This premium updates in real-time so you can better time the market."
+        ]
+      },
+      {
+        "question": "What are Staking Options?",
+        "answer": [
+          "Staking Options (SOs) are DUAL's incentive for staking funds into a DIP and for usage by other token projects to incentivize their communities. SOs allow users to acquire the DUAL token by exercising their right to buy it at the strike price up until expiration."
+        ]
+      },
+      {
+        "question": "What are Rehypothecated Lending Pools?",
+        "answer": [
+          "Rehypothecated Lending Pools (RLPs), a pool of capital that permits uncollateralized borrowing only from counterparties who have unbounded risk exposure to the pool. Dual Finance's RLPs allow market makers of DIPs capped by their long exposure to borrow to support hedging, providing greater capital efficiency and further positive return to Stakers. Users get paid this interest to generate additional yield!"
+        ]
+      }
+    ]
+  },
+  "EGYbpow8V9gt8JFmadFYai4sjfwc7Vc9gazU735hE6u7": {
+    "symbol": "Dual DAO",
     "heading": "Sustainable Incentive Liquidity Infrastructure for Web3 Communities",
     "about": [
       {

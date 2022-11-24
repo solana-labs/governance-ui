@@ -209,7 +209,8 @@ const CreateStream = ({
         governance: form.tokenAccount?.governance,
       }
     }
-    const token = getMintMetadata(
+    const token = await getMintMetadata(
+      connection.current,
       form.tokenAccount.extensions.token?.account.mint
     )
     const decimals = token?.decimals ? token.decimals : 0

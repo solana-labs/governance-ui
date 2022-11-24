@@ -4,7 +4,7 @@ import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import { AssetType, Asset } from '@models/treasury/Asset'
 import { getTreasuryAccountItemInfoV2 } from '@utils/treasuryTools'
 import TokenIcon from '@components/treasuryV2/icons/TokenIcon'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import { WSOL_MINT } from '@components/instructions/tools'
 import { abbreviateAddress } from '@utils/formatting'
 
@@ -65,7 +65,7 @@ export const convertAccountToAsset = (
         ),
         price: account.extensions.mint
           ? new BigNumber(
-              tokenService.getUSDTokenPrice(
+              tokenPriceService.getUSDTokenPrice(
                 account.extensions.mint.publicKey.toBase58()
               )
             )
@@ -90,7 +90,7 @@ export const convertAccountToAsset = (
         name: info.accountName || info.info?.name || info.name || info.symbol,
         price: account.extensions.mint
           ? new BigNumber(
-              tokenService.getUSDTokenPrice(
+              tokenPriceService.getUSDTokenPrice(
                 account.extensions.mint.publicKey.toBase58()
               )
             )

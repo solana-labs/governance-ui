@@ -14,7 +14,7 @@ import {
   getMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
 import { precision } from '@utils/formatting'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import BigNumber from 'bignumber.js'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -71,9 +71,9 @@ const SolendWithdraw = ({
   )
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
-  const tokenInfo = tokenService.getTokenInfo(handledMint)
+  const tokenInfo = tokenPriceService.getTokenInfo(handledMint)
   const mintInfo = governedTokenAccount.extensions?.mint?.account
-  const tokenSymbol = tokenService.getTokenInfo(
+  const tokenSymbol = tokenPriceService.getTokenInfo(
     governedTokenAccount.extensions.mint!.publicKey.toBase58()
   )?.symbol
   const [form, setForm] = useState<{
