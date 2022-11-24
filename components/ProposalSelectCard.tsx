@@ -73,7 +73,7 @@ const ProposalSelectCard = ({
           <div className="lg:pl-4 w-full lg:w-1/2">
             <ApprovalQuorum
               progress={yesVoteProgress}
-              yesVotesRequired={yesVotesRequired}
+              votesRequired={yesVotesRequired}
             />
           </div>
         </div>

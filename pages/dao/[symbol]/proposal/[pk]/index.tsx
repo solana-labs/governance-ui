@@ -150,7 +150,7 @@ const Proposal = () => {
               {proposal?.account.state === ProposalState.Voting ? (
                 <div className="pb-3">
                   <ApprovalQuorum
-                    yesVotesRequired={yesVotesRequired}
+                    votesRequired={yesVotesRequired}
                     progress={yesVoteProgress}
                     showBg
                   />
