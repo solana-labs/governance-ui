@@ -530,8 +530,6 @@ export enum Instructions {
   MangoV4Serum3RegisterMarket,
   MangoV4PerpCreate,
   MangoV4TokenRegisterTrustless,
-  CreateStream,
-  CancelStream,
   Grant,
   Clawback,
   CreateAssociatedTokenAccount,
