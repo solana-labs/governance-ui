@@ -24,7 +24,7 @@ export default function useProposalVotes(proposal?: Proposal) {
   // TODO: optimize using memo
   if (!realm || !proposal || !governance || !proposalMint)
     return {
-      _programVersion: programVersion,
+      _programVersion: undefined,
       voteThresholdPct: undefined,
       yesVotePct: undefined,
       yesVoteProgress: undefined,
@@ -102,7 +102,7 @@ export default function useProposalVotes(proposal?: Proposal) {
     ? governance.config.councilVetoVoteThreshold
     : governance.config.communityVetoVoteThreshold
 
-  if (vetoThreshold === undefined)
+  if (vetoThreshold.value === undefined)
     return {
       _programVersion: programVersion,
       ...results,
@@ -136,11 +136,17 @@ export default function useProposalVotes(proposal?: Proposal) {
     vetoMaxVoteWeight
   )
 
+  const minimumVetoVotes =
+    fmtTokenAmount(vetoMaxVoteWeight, vetoMint.decimals) *
+    (vetoThreshold.value / 100)
+
+  const vetoVotesRequired = minimumVetoVotes - vetoVoteCount
+
   return {
     _programVersion: programVersion,
     ...results,
     veto: {
-      threshold: vetoThreshold,
+      votesRequired: vetoVotesRequired,
       voteCount: vetoVoteCount,
       voteProgress: vetoVoteProgress,
     },
