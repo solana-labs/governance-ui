@@ -18,13 +18,13 @@ export default function useProposalVotes(proposal?: Proposal) {
   // TODO: optimize using memo
   if (!realm || !proposal || !governance || !proposalMint)
     return {
-      voteThresholdPct: 100,
-      yesVotePct: 0,
-      yesVoteProgress: 0,
-      yesVoteCount: 0,
-      noVoteCount: 0,
-      minimumYesVotes: 0,
-      yesVotesRequired: 0,
+      voteThresholdPct: undefined,
+      yesVotePct: undefined,
+      yesVoteProgress: undefined,
+      yesVoteCount: undefined,
+      noVoteCount: undefined,
+      minimumYesVotes: undefined,
+      yesVotesRequired: undefined,
     }
 
   const isCommunityVote =
