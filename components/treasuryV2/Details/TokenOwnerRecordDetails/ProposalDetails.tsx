@@ -1,4 +1,4 @@
-import ApprovalQuorum, { ApprovalProgress } from '@components/ApprovalQuorum'
+import { ApprovalProgress } from '@components/QuorumProgress'
 import Button from '@components/Button'
 import VoteResultsForRealmProposal from '@components/VoteResultsForRealmProposal'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
