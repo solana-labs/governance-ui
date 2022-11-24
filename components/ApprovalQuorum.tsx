@@ -5,11 +5,12 @@ import {
 } from '@heroicons/react/outline'
 
 type ApprovalProgressProps = {
-  progress: number
+  progress?: number
+  yesVotesRequired?: number
   showBg?: boolean
-  yesVotesRequired: number
 }
 
+// TODO make component display well when data is loading
 const ApprovalProgress = ({
   progress,
   showBg,
@@ -26,14 +27,13 @@ const ApprovalProgress = ({
             </Tooltip>
           </div>
 
-          {progress < 100 ? (
-            <p className="font-bold mb-0 text-fgd-1">{`${yesVotesRequired?.toLocaleString(
-              undefined,
-              {
-                maximumFractionDigits: 0,
-              }
-            )} ${progress > 0 ? 'more' : ''} Yes vote${
-              yesVotesRequired > 1 ? 's' : ''
+          {(progress ?? 0) < 100 ? (
+            <p className="font-bold mb-0 text-fgd-1">{`${(
+              yesVotesRequired ?? 0
+            ).toLocaleString(undefined, {
+              maximumFractionDigits: 0,
+            })} ${(progress ?? 0) > 0 ? 'more' : ''} Yes vote${
+              (yesVotesRequired ?? 0) > 1 ? 's' : ''
             } required`}</p>
           ) : (
             <div className="flex items-center">
@@ -52,7 +52,7 @@ const ApprovalProgress = ({
             width: `${progress}%`,
           }}
           className={`${
-            progress >= 100 ? 'bg-green' : 'bg-fgd-3'
+            (progress ?? 0) >= 100 ? 'bg-green' : 'bg-fgd-3'
           } flex rounded`}
         ></div>
       </div>
