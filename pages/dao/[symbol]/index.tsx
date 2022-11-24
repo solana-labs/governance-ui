@@ -266,13 +266,7 @@ const REALM = () => {
     setIsMultiVoting(false)
   }
 
-  const showMultiVote = useMemo(
-    () =>
-      realm
-        ? realm.account.votingProposalCount > 1 && connected && !isNftMode
-        : false,
-    [realm, connected, isNftMode]
-  )
+  const showMultiVote = true
   //Todo: move to own components with refactor to dao folder structure
   const isPyth = realmInfo?.realmId.toBase58() === PYTH_REALM_ID.toBase58()
 
