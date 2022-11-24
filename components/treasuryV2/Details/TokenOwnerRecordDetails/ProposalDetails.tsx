@@ -317,7 +317,7 @@ export default function ProposalDetails({
         <div className="flex-1">
           <ApprovalQuorum
             progress={voteData.yesVoteProgress}
-            yesVotesRequired={voteData.yesVotesRequired}
+            votesRequired={voteData.yesVotesRequired}
           />
         </div>
       </div>

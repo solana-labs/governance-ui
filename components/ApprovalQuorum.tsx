@@ -4,18 +4,13 @@ import {
   InformationCircleIcon,
 } from '@heroicons/react/outline'
 
-type ApprovalProgressProps = {
+type Props = {
   progress?: number
-  yesVotesRequired?: number
+  votesRequired?: number
   showBg?: boolean
 }
 
-// TODO make component display well when data is loading
-const ApprovalProgress = ({
-  progress,
-  showBg,
-  yesVotesRequired,
-}: ApprovalProgressProps) => {
+const QuorumProgress = ({ progress, showBg, votesRequired }: Props) => {
   return (
     <div className={`${showBg ? 'bg-bkg-1 p-3' : ''} rounded-md`}>
       <div className="flex items-center">
@@ -29,11 +24,11 @@ const ApprovalProgress = ({
 
           {(progress ?? 0) < 100 ? (
             <p className="font-bold mb-0 text-fgd-1">{`${(
-              yesVotesRequired ?? 0
+              votesRequired ?? 0
             ).toLocaleString(undefined, {
               maximumFractionDigits: 0,
             })} ${(progress ?? 0) > 0 ? 'more' : ''} Yes vote${
-              (yesVotesRequired ?? 0) > 1 ? 's' : ''
+              (votesRequired ?? 0) > 1 ? 's' : ''
             } required`}</p>
           ) : (
             <div className="flex items-center">
@@ -61,4 +56,4 @@ const ApprovalProgress = ({
   )
 }
 
-export default ApprovalProgress
+export default QuorumProgress
