@@ -76,4 +76,11 @@ export const ApprovalProgress = (props: Props) => (
   />
 )
 
-export default QuorumProgress
+export const VetoProgress = (props: Props) => (
+  <QuorumProgress
+    tooltip={`This proposal can be vetoed. If the veto quorum is reached the proposal will fail regardless of the approval quorum.`}
+    quorumTitle="Veto"
+    voteKindTitle="Veto"
+    {...props}
+  />
+)
