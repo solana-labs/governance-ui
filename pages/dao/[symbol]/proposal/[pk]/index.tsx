@@ -6,7 +6,7 @@ import ProposalStateBadge from 'components/ProposalStatusBadge'
 import { InstructionPanel } from 'components/instructions/instructionPanel'
 import DiscussionPanel from 'components/chat/DiscussionPanel'
 import VotePanel from 'components/VotePanel'
-import ApprovalQuorum from 'components/ApprovalQuorum'
+import ApprovalQuorum, { ApprovalProgress } from 'components/ApprovalQuorum'
 import useRealm from 'hooks/useRealm'
 import useProposalVotes from 'hooks/useProposalVotes'
 import ProposalTimeStatus from 'components/ProposalTimeStatus'
@@ -149,7 +149,7 @@ const Proposal = () => {
               )}
               {proposal?.account.state === ProposalState.Voting ? (
                 <div className="pb-3">
-                  <ApprovalQuorum
+                  <ApprovalProgress
                     votesRequired={yesVotesRequired}
                     progress={yesVoteProgress}
                     showBg

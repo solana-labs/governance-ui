@@ -1,7 +1,7 @@
 import { CheckIcon } from '@heroicons/react/solid'
 import ProposalStateBadge from './ProposalStatusBadge'
 import { Proposal, ProposalState } from '@solana/spl-governance'
-import ApprovalQuorum from './ApprovalQuorum'
+import ApprovalQuorum, { ApprovalProgress } from './ApprovalQuorum'
 import useProposalVotes from '../hooks/useProposalVotes'
 import ProposalTimeStatus from './ProposalTimeStatus'
 import { PublicKey } from '@solana/web3.js'
@@ -71,7 +71,7 @@ const ProposalSelectCard = ({
             <VoteResults isListView proposal={proposal} />
           </div>
           <div className="lg:pl-4 w-full lg:w-1/2">
-            <ApprovalQuorum
+            <ApprovalProgress
               progress={yesVoteProgress}
               votesRequired={yesVotesRequired}
             />
