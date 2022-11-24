@@ -271,8 +271,7 @@ const REALM = () => {
       realm
         ? realm.account.votingProposalCount > 1 && connected && !isNftMode
         : false,
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    [realm, connected]
+    [realm, connected, isNftMode]
   )
   //Todo: move to own components with refactor to dao folder structure
   const isPyth = realmInfo?.realmId.toBase58() === PYTH_REALM_ID.toBase58()
