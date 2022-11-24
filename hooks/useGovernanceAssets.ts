@@ -206,6 +206,9 @@ export default function useGovernanceAssets() {
     [PackageEnum.Serum]: {
       name: 'Serum',
       image: '/img/serum.png',
+      // Temporary:
+      // Hide serum package for now due to wallet disconnection bug
+      isVisible: false,
     },
     [PackageEnum.Solend]: {
       name: 'Solend',
