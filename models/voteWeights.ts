@@ -551,7 +551,7 @@ export class SimpleGatedVoterWeight implements VoterWeightInterface {
   }
 }
 
-/// Returns max VoteWeight for given mint and max source
+/** Returns max VoteWeight for given mint and max source */
 export function getMintMaxVoteWeight(
   mint: MintInfo,
   maxVoteWeightSource: MintMaxVoteWeightSource
@@ -574,7 +574,7 @@ export function getMintMaxVoteWeight(
   }
 }
 
-/// Returns max vote weight for a proposal
+/** Returns max vote weight for a proposal  */
 export function getProposalMaxVoteWeight(
   realm: Realm,
   proposal: Proposal,
