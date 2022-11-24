@@ -96,9 +96,10 @@ const SelectInstructionType = ({
       return ''
     }
 
+    // Only display package name as prefix when no package is selected
     return `${
-      instruction.packageId === null
-        ? getPackageTypeById(instruction.packageId)?.name ?? ''
+      instruction.packageId !== null && packageId === null
+        ? `${getPackageTypeById(instruction.packageId)?.name}: ` ?? ''
         : ''
     }${instruction.name}`
   }
