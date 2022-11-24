@@ -1,10 +1,10 @@
-import Select from '@components/inputs/Select'
 import useGovernanceAssets, {
   InstructionType,
 } from '@hooks/useGovernanceAssets'
 import { PackageEnum } from '@utils/uiTypes/proposalCreationTypes'
 import { useCallback, useEffect, useState } from 'react'
 import ImageTextSelection from './ImageTextSelection'
+import TypeaheadSelect from './TypeaheadSelect'
 
 function sortInstructionTypes(
   instructionTypes: InstructionType[]
@@ -81,24 +81,16 @@ const SelectInstructionType = ({
     computeFilteredAndSortedInstructionsTypes()
   }, [computeFilteredAndSortedInstructionsTypes])
 
-  const getInstructionDisplayName = (
-    instruction?: InstructionType
-  ): string | JSX.Element => {
+  const getInstructionDisplayName = (instruction?: InstructionType): string => {
     if (!instruction || typeof instruction.packageId === 'undefined') {
       return ''
     }
 
-    return (
-      <>
-        {packageId === null ? (
-          <span className="pr-1">
-            {getPackageTypeById(instruction.packageId)?.name ?? ''}:
-          </span>
-        ) : null}
-
-        <span>{instruction.name}</span>
-      </>
-    )
+    return `${
+      instruction.packageId === null
+        ? getPackageTypeById(instruction.packageId)?.name ?? ''
+        : ''
+    }${instruction.name}`
   }
 
   const packages = [
@@ -144,26 +136,34 @@ const SelectInstructionType = ({
           onClick={setPackageId}
         />
 
-        <Select
-          className="p-2 w-full text-sm"
-          disabled={!filteredAndSortedInstructionTypes.length}
-          placeholder={`${
-            filteredAndSortedInstructionTypes.length
-              ? 'Select instruction'
-              : 'No available instructions'
-          }`}
-          onChange={(instructionType: InstructionType) =>
-            onChange(instructionType)
+        <TypeaheadSelect
+          className="w-full border-none"
+          placeholder="Search Proposals"
+          options={filteredAndSortedInstructionTypes.map((instructionType) => ({
+            key: instructionType.id.toString(),
+            text: getInstructionDisplayName(instructionType),
+          }))}
+          selected={
+            selectedInstruction
+              ? {
+                  key: selectedInstruction.id.toString(),
+                }
+              : undefined
           }
-          value={getInstructionDisplayName(selectedInstruction)}
-          useDefaultStyle={false}
-        >
-          {filteredAndSortedInstructionTypes.map((instructionType) => (
-            <Select.Option key={instructionType.id} value={instructionType}>
-              <span>{getInstructionDisplayName(instructionType)}</span>
-            </Select.Option>
-          ))}
-        </Select>
+          onSelect={(option) => {
+            if (!option?.key) {
+              return onChange(null)
+            }
+
+            const id = option.key
+
+            onChange(
+              filteredAndSortedInstructionTypes.find(
+                (instructionType) => instructionType.id.toString() === id
+              ) ?? null
+            )
+          }}
+        />
       </div>
     </div>
   )
