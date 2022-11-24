@@ -1,4 +1,4 @@
-import ApprovalQuorum from '@components/ApprovalQuorum'
+import ApprovalQuorum, { ApprovalProgress } from '@components/ApprovalQuorum'
 import Button from '@components/Button'
 import VoteResultsForRealmProposal from '@components/VoteResultsForRealmProposal'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
@@ -315,7 +315,7 @@ export default function ProposalDetails({
         </div>
         <div className="hidden lg:block self-stretch w-0.5 bg-fgd-4" />
         <div className="flex-1">
-          <ApprovalQuorum
+          <ApprovalProgress
             progress={voteData.yesVoteProgress}
             votesRequired={voteData.yesVotesRequired}
           />

@@ -3,7 +3,7 @@ import { ChevronRightIcon } from '@heroicons/react/solid'
 import ProposalStateBadge from './ProposalStatusBadge'
 import Link from 'next/link'
 import { Proposal, ProposalState } from '@solana/spl-governance'
-import ApprovalQuorum from './ApprovalQuorum'
+import ApprovalQuorum, { ApprovalProgress } from './ApprovalQuorum'
 import useRealm from '../hooks/useRealm'
 import useProposalVotes from '../hooks/useProposalVotes'
 import ProposalTimeStatus from './ProposalTimeStatus'
@@ -66,7 +66,7 @@ const ProposalCard = ({ proposalPk, proposal }: ProposalCardProps) => {
                   <VoteResults isListView proposal={proposal} />
                 </div>
                 <div className="lg:pl-4 w-full lg:w-1/2">
-                  <ApprovalQuorum
+                  <ApprovalProgress
                     progress={yesVoteProgress}
                     votesRequired={yesVotesRequired}
                   />

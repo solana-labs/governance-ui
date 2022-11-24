@@ -9,15 +9,26 @@ type Props = {
   votesRequired?: number
   showBg?: boolean
 }
+type GenericProps = {
+  voteKindTitle: string
+  quorumTitle: string
+  tooltip: string
+}
 
-const QuorumProgress = ({ progress, showBg, votesRequired }: Props) => {
+const QuorumProgress = ({
+  progress,
+  showBg,
+  votesRequired,
+}: Props & GenericProps) => {
   return (
     <div className={`${showBg ? 'bg-bkg-1 p-3' : ''} rounded-md`}>
       <div className="flex items-center">
         <div className="w-full">
           <div className="flex items-center">
             <p className="text-fgd-2 mb-0 mr-1.5">Approval Quorum</p>
-            <Tooltip content="Proposals must reach a minimum number of 'Yes' votes before they are eligible to pass. If the minimum is reached but there are more 'No' votes when voting ends the proposal will fail.">
+            <Tooltip
+              content={`Proposals must reach a minimum number of 'Yes' votes before they are eligible to pass. If the minimum is reached but there are more 'No' votes when voting ends the proposal will fail.`}
+            >
               <InformationCircleIcon className="cursor-help h-5 text-fgd-2 w-5" />
             </Tooltip>
           </div>
@@ -55,5 +66,14 @@ const QuorumProgress = ({ progress, showBg, votesRequired }: Props) => {
     </div>
   )
 }
+
+export const ApprovalProgress = (props: Props) => (
+  <QuorumProgress
+    tooltip={`Proposals must reach a minimum number of 'Yes' votes before they are eligible to pass. If the minimum is reached but there are more 'No' votes when voting ends the proposal will fail.`}
+    quorumTitle="Approval"
+    voteKindTitle="Yes"
+    {...props}
+  />
+)
 
 export default QuorumProgress
