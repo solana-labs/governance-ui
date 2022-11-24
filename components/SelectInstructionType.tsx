@@ -1,7 +1,7 @@
 import useGovernanceAssets, {
   InstructionType,
 } from '@hooks/useGovernanceAssets'
-import { PackageEnum } from '@utils/uiTypes/proposalCreationTypes'
+import { Instructions, PackageEnum } from '@utils/uiTypes/proposalCreationTypes'
 import { useCallback, useEffect, useState } from 'react'
 import ImageTextSelection from './ImageTextSelection'
 import TypeaheadSelect from './TypeaheadSelect'
@@ -25,6 +25,16 @@ function sortInstructionTypes(
     }
 
     // Then sort by instruction name
+    // None transaction always first
+    if (instructionTypeA.id === Instructions.None) {
+      return -1
+    }
+
+    if (instructionTypeB.id === Instructions.None) {
+      return 1
+    }
+
+    // Alphabetical order
     return instructionTypeA.name < instructionTypeB.name ? -1 : 1
   })
 }
