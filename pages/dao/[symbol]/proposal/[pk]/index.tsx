@@ -6,7 +6,7 @@ import ProposalStateBadge from 'components/ProposalStatusBadge'
 import { InstructionPanel } from 'components/instructions/instructionPanel'
 import DiscussionPanel from 'components/chat/DiscussionPanel'
 import VotePanel from 'components/VotePanel'
-import { ApprovalProgress } from '@components/QuorumProgress'
+import { ApprovalProgress, VetoProgress } from '@components/QuorumProgress'
 import useRealm from 'hooks/useRealm'
 import useProposalVotes from 'hooks/useProposalVotes'
 import ProposalTimeStatus from 'components/ProposalTimeStatus'
@@ -32,9 +32,7 @@ const Proposal = () => {
   const { realmInfo, symbol } = useRealm()
   const { proposal, descriptionLink, governance } = useProposal()
   const [description, setDescription] = useState('')
-  const { yesVoteProgress, yesVotesRequired } = useProposalVotes(
-    proposal?.account
-  )
+  const voteData = useProposalVotes(proposal?.account)
   const currentWallet = useWalletStore((s) => s.current)
   const showResults =
     proposal &&
@@ -148,19 +146,31 @@ const Proposal = () => {
                 <h3 className="mb-4">Results</h3>
               )}
               {proposal?.account.state === ProposalState.Voting ? (
-                <div className="pb-3">
-                  <ApprovalProgress
-                    votesRequired={yesVotesRequired}
-                    progress={yesVoteProgress}
-                    showBg
-                  />
-                </div>
+                <>
+                  <div className="pb-3">
+                    <ApprovalProgress
+                      votesRequired={voteData.yesVotesRequired}
+                      progress={voteData.yesVoteProgress}
+                      showBg
+                    />
+                  </div>
+                  {voteData._programVersion === 3 &&
+                  voteData.veto !== undefined ? (
+                    <div className="pb-3">
+                      <VetoProgress
+                        votesRequired={voteData.veto.votesRequired}
+                        progress={voteData.veto.voteProgress}
+                        showBg
+                      />
+                    </div>
+                  ) : undefined}
+                </>
               ) : (
                 <div className="pb-3">
                   <VoteResultStatus
-                    progress={yesVoteProgress}
+                    progress={voteData.yesVoteProgress}
                     votePassed={votePassed}
-                    yesVotesRequired={yesVotesRequired}
+                    yesVotesRequired={voteData.yesVotesRequired}
                   />
                 </div>
               )}
