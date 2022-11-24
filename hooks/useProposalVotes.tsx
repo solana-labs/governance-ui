@@ -5,6 +5,7 @@ import {
   getProposalMaxVoteWeight,
 } from '../models/voteWeights'
 import { calculatePct, fmtTokenAmount } from '../utils/formatting'
+import useProgramVersion from './useProgramVersion'
 import useRealm from './useRealm'
 
 // TODO support council plugins
@@ -13,6 +14,7 @@ export default function useProposalVotes(proposal?: Proposal) {
   const maxVoteRecord = useNftPluginStore((s) => s.state.maxVoteRecord)
   const governance =
     proposal && governances[proposal.governance?.toBase58()]?.account
+  const programVersion = useProgramVersion()
 
   const proposalMint =
     proposal?.governingTokenMint.toBase58() ===
@@ -22,6 +24,7 @@ export default function useProposalVotes(proposal?: Proposal) {
   // TODO: optimize using memo
   if (!realm || !proposal || !governance || !proposalMint)
     return {
+      _programVersion: programVersion,
       voteThresholdPct: undefined,
       yesVotePct: undefined,
       yesVoteProgress: undefined,
@@ -29,9 +32,8 @@ export default function useProposalVotes(proposal?: Proposal) {
       noVoteCount: undefined,
       minimumYesVotes: undefined,
       yesVotesRequired: undefined,
-      vetoVoteCount: undefined,
-      vetoVoteProgress: undefined,
-      vetoThreshold: undefined,
+      relativeNoVotes: undefined,
+      relativeYesVotes: undefined,
     }
 
   const isCommunityVote =
@@ -78,39 +80,7 @@ export default function useProposalVotes(proposal?: Proposal) {
       ? Math.ceil(rawYesVotesRequired)
       : rawYesVotesRequired
 
-  // VETOS
-  const vetoThreshold = isCommunityVote
-    ? governance.config.councilVetoVoteThreshold
-    : governance.config.communityVetoVoteThreshold
-
-  const vetoMint =
-    vetoThreshold.value === undefined
-      ? undefined
-      : isCommunityVote
-      ? councilMint
-      : mint
-
-  // Council votes are currently not affected by MaxVoteWeightSource
-  const vetoMaxVoteWeight =
-    vetoMint === undefined
-      ? undefined
-      : isCommunityVote
-      ? vetoMint.supply
-      : getMintMaxVoteWeight(
-          vetoMint,
-          realm.account.config.communityMintMaxVoteWeightSource
-        )
-
-  const vetoVoteCount = vetoMint
-    ? fmtTokenAmount(proposal.vetoVoteWeight, vetoMint.decimals)
-    : undefined
-
-  const vetoVoteProgress =
-    vetoMaxVoteWeight !== undefined && vetoMint !== undefined
-      ? calculatePct(proposal.vetoVoteWeight, vetoMaxVoteWeight)
-      : undefined
-
-  return {
+  const results = {
     voteThresholdPct,
     yesVotePct,
     yesVoteProgress,
@@ -120,8 +90,59 @@ export default function useProposalVotes(proposal?: Proposal) {
     relativeNoVotes,
     minimumYesVotes,
     yesVotesRequired,
-    vetoVoteCount,
-    vetoVoteProgress,
-    vetoThreshold,
+  }
+  if (programVersion !== 3)
+    return {
+      _programVersion: programVersion,
+      ...results,
+    }
+
+  // VETOS
+  const vetoThreshold = isCommunityVote
+    ? governance.config.councilVetoVoteThreshold
+    : governance.config.communityVetoVoteThreshold
+
+  if (vetoThreshold === undefined)
+    return {
+      _programVersion: programVersion,
+      ...results,
+      veto: undefined,
+    }
+
+  const vetoMint = isCommunityVote ? councilMint : mint
+  // This represents an edge case where councilVetoVoteThreshold is defined but there is no councilMint
+  if (vetoMint === undefined)
+    return {
+      _programVersion: programVersion,
+      ...results,
+      veto: undefined,
+    }
+
+  // Council votes are currently not affected by MaxVoteWeightSource
+  const vetoMaxVoteWeight = isCommunityVote
+    ? vetoMint.supply
+    : getMintMaxVoteWeight(
+        vetoMint,
+        realm.account.config.communityMintMaxVoteWeightSource
+      )
+
+  const vetoVoteCount = fmtTokenAmount(
+    proposal.vetoVoteWeight,
+    vetoMint.decimals
+  )
+
+  const vetoVoteProgress = calculatePct(
+    proposal.vetoVoteWeight,
+    vetoMaxVoteWeight
+  )
+
+  return {
+    _programVersion: programVersion,
+    ...results,
+    veto: {
+      threshold: vetoThreshold,
+      voteCount: vetoVoteCount,
+      voteProgress: vetoVoteProgress,
+    },
   }
 }
