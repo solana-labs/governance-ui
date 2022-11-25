@@ -192,7 +192,7 @@ export default function useGovernanceAssets() {
     },
     [PackageEnum.Identity]: {
       name: 'Identity',
-      image: '/img/civic.svg',
+      image: '/img/identity.png',
     },
     [PackageEnum.NftPlugin]: {
       name: 'NFT Plugin',
