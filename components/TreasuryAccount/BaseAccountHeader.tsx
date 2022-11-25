@@ -1,14 +1,14 @@
-import { TokenInfo } from '@solana/spl-token-registry'
 import React from 'react'
 import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { findMetadataPda } from '@metaplex-foundation/js'
 import { PublicKey } from '@solana/web3.js'
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
+import { TokenInfoWithoutDecimals } from '@utils/services/tokenPrice'
 
 const BaseAccountHeader: React.FC<{
   isNFT?: boolean
-  tokenInfo?: TokenInfo
+  tokenInfo?: TokenInfoWithoutDecimals
   amountFormatted: string
   totalPrice?: string
   mintAddress: string
@@ -18,6 +18,7 @@ const BaseAccountHeader: React.FC<{
   const [symbol, setSymbol] = useState<undefined | string>(tokenInfo?.symbol)
   const connection = useWalletStore((s) => s.connection)
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   useEffect(() => {
     const getTokenMetadata = async (mintAddress: string) => {
       try {

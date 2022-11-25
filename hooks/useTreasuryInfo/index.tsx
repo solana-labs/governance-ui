@@ -1,6 +1,7 @@
 import { BigNumber } from 'bignumber.js'
 import { useEffect, useMemo, useState } from 'react'
 
+import { Domain } from '@models/treasury/Domain'
 import { NFT } from '@models/treasury/NFT'
 import { Status, Result } from '@utils/uiTypes/Result'
 import { AuxiliaryWallet, Wallet } from '@models/treasury/Wallet'
@@ -11,6 +12,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { assembleWallets } from './assembleWallets'
 import { calculateTokenCountAndValue } from './calculateTokenCountAndValue'
 import { getNfts } from './getNfts'
+import { getDomains } from './getDomains'
 
 interface Data {
   auxiliaryWallets: AuxiliaryWallet[]
@@ -26,15 +28,17 @@ interface Data {
 
 export default function useTreasuryInfo(): Result<Data> {
   const { realmInfo, realm, mint, councilMint, config } = useRealm()
-  const connection = useWalletStore((s) => s.connection.current)
+  const connection = useWalletStore((s) => s.connection)
   const accounts = useGovernanceAssetsStore((s) => s.assetAccounts)
   const loadingGovernedAccounts = useGovernanceAssetsStore(
     (s) => s.loadGovernedAccounts
   )
   const [nfts, setNfts] = useState<NFT[]>([])
   const [nftsLoading, setNftsLoading] = useState(true)
+  const [domainsLoading, setDomainsLoading] = useState(true)
   const [auxWallets, setAuxWallets] = useState<AuxiliaryWallet[]>([])
   const [wallets, setWallets] = useState<Wallet[]>([])
+  const [domains, setDomains] = useState<Domain[]>([])
   const [buildingWallets, setBuildingWallets] = useState(true)
 
   const { counts, values } = useMemo(
@@ -45,7 +49,16 @@ export default function useTreasuryInfo(): Result<Data> {
   useEffect(() => {
     if (!loadingGovernedAccounts && accounts.length) {
       setNftsLoading(true)
+      setDomainsLoading(true)
       setBuildingWallets(true)
+
+      getDomains(
+        accounts.filter((acc) => acc.isSol),
+        connection.current
+      ).then((domainNames) => {
+        setDomains(domainNames)
+        setDomainsLoading(false)
+      })
 
       getNfts(
         accounts
@@ -60,19 +73,22 @@ export default function useTreasuryInfo(): Result<Data> {
         setNftsLoading(false)
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
     loadingGovernedAccounts,
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     accounts.map((account) => account.pubkey.toBase58()).join('-'),
   ])
 
   const walletsAsync = useMemo(() => {
-    if (nftsLoading || !realmInfo) {
+    if (nftsLoading || domainsLoading || !realmInfo) {
       return Promise.resolve({ wallets: [] })
     } else {
       return assembleWallets(
         connection,
         accounts,
         nfts,
+        domains,
         realmInfo.programId,
         realm?.account.config.councilMint?.toBase58(),
         realm?.account.communityMint?.toBase58(),
@@ -83,20 +99,29 @@ export default function useTreasuryInfo(): Result<Data> {
         realmInfo
       )
     }
-  }, [accounts, nfts, nftsLoading, realmInfo])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+  }, [
+    accounts,
+    nfts,
+    nftsLoading,
+    domains,
+    domainsLoading,
+    realmInfo,
+    connection.current.rpcEndpoint,
+  ])
 
   useEffect(() => {
     setBuildingWallets(true)
     setWallets([])
 
-    if (!nftsLoading && realmInfo) {
+    if (!nftsLoading && !domainsLoading && realmInfo) {
       walletsAsync.then(({ auxiliaryWallets, wallets }) => {
         setWallets(wallets)
         setAuxWallets(auxiliaryWallets)
         setBuildingWallets(false)
       })
     }
-  }, [walletsAsync, nftsLoading, realmInfo])
+  }, [walletsAsync, nftsLoading, realmInfo, domainsLoading])
 
   if (!realmInfo || loadingGovernedAccounts || nftsLoading || buildingWallets) {
     return {

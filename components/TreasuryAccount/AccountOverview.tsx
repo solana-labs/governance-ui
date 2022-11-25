@@ -47,7 +47,7 @@ import {
   getReserveData,
   SOLEND,
 } from 'Strategies/protocols/solend'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import { EVERLEND } from '../../Strategies/protocols/everlend/tools'
 import { findAssociatedTokenAccount } from '@everlend/common'
 
@@ -238,6 +238,7 @@ const AccountOverview = () => {
     }
 
     loadData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [currentAccount, mngoAccounts, visibleInvestments.length])
   useEffect(() => {
     const getMangoAcccounts = async () => {
@@ -289,7 +290,7 @@ const AccountOverview = () => {
 
   const StaticInvestmentsComponent = () => {
     const currentTokenImg = currentAccount.isToken
-      ? tokenService.getTokenInfo(
+      ? tokenPriceService.getTokenInfo(
           currentAccount.extensions.mint!.publicKey.toBase58()
         )?.logoURI || ''
       : ''

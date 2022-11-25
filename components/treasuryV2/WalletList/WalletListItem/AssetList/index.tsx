@@ -10,6 +10,7 @@ import {
   RealmAuthority,
   Unknown,
   AssetType,
+  Domains,
 } from '@models/treasury/Asset'
 
 import TokenList from './TokenList'
@@ -24,12 +25,15 @@ import {
   isPrograms,
   isRealmAuthority,
   isUnknown,
+  isDomain,
+  isTokenOwnerRecord,
 } from '../typeGuards'
 
 import { PublicKey } from '@solana/web3.js'
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 import { findMetadataPda } from '@metaplex-foundation/js'
 import useWalletStore from 'stores/useWalletStore'
+import TokenOwnerRecordsList from './TokenOwnerRecordsList'
 
 export type Section = 'tokens' | 'nfts' | 'others'
 
@@ -39,12 +43,13 @@ function isTokenLike(asset: Asset): asset is Token | Sol {
 
 function isOther(
   asset: Asset
-): asset is Mint | Programs | Unknown | RealmAuthority {
+): asset is Mint | Programs | Unknown | Domains | RealmAuthority {
   return (
     isMint(asset) ||
     isPrograms(asset) ||
     isUnknown(asset) ||
-    isRealmAuthority(asset)
+    isRealmAuthority(asset) ||
+    isDomain(asset)
   )
 }
 
@@ -62,6 +67,7 @@ export default function AssetList(props: Props) {
     return props.assets
       .filter(isTokenLike)
       .sort((a, b) => b.value.comparedTo(a.value))
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [])
 
   const [tokens, setTokens] = useState<(Token | Sol)[]>(tokensFromProps)
@@ -121,6 +127,7 @@ export default function AssetList(props: Props) {
       setTokens(newTokens)
     }
     getTokenData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [tokensFromProps])
 
   const nfts = props.assets.filter(isNFTCollection).sort((a, b) => {
@@ -133,10 +140,16 @@ export default function AssetList(props: Props) {
     }
   })
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   const othersFromProps = useMemo(() => props.assets.filter(isOther), [])
 
+  const tokenOwnerRecordsFromProps = useMemo(
+    () => props.assets.filter(isTokenOwnerRecord),
+    [props.assets]
+  )
+
   const [others, setOthers] = useState<
-    (Mint | Programs | Unknown | RealmAuthority)[]
+    (Mint | Programs | Unknown | Domains | RealmAuthority)[]
   >(othersFromProps)
 
   useEffect(() => {
@@ -166,7 +179,13 @@ export default function AssetList(props: Props) {
     }
 
     const getTokenData = async () => {
-      const newTokens: (Mint | Programs | Unknown | RealmAuthority)[] = []
+      const newTokens: (
+        | Mint
+        | Programs
+        | Unknown
+        | Domains
+        | RealmAuthority
+      )[] = []
       for await (const token of othersFromProps) {
         if (isMint(token)) {
           const newTokenData = await getTokenMetadata(token.address)
@@ -188,6 +207,7 @@ export default function AssetList(props: Props) {
       setOthers(newTokens)
     }
     getTokenData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [othersFromProps])
 
   const diplayingMultipleAssetTypes =
@@ -228,6 +248,16 @@ export default function AssetList(props: Props) {
           disableCollapse={!diplayingMultipleAssetTypes}
           expanded={props.expandedSections?.includes('others')}
           assets={others}
+          selectedAssetId={props.selectedAssetId}
+          onSelect={props.onSelectAsset}
+          onToggleExpand={() => props.onToggleExpandSection?.('others')}
+        />
+      )}
+      {tokenOwnerRecordsFromProps.length > 0 && (
+        <TokenOwnerRecordsList
+          disableCollapse={false}
+          expanded={true}
+          assets={tokenOwnerRecordsFromProps}
           selectedAssetId={props.selectedAssetId}
           onSelect={props.onSelectAsset}
           onToggleExpand={() => props.onToggleExpandSection?.('others')}

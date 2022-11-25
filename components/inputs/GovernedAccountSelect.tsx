@@ -19,17 +19,17 @@ const GovernedAccountSelect = ({
   governance,
   label,
   noMaxWidth,
-  autoselectFirst = true,
+  autoSelectFirst = true,
 }: {
   onChange
   value
   error?
   governedAccounts: AssetAccount[]
-  shouldBeGoverned?
+  shouldBeGoverned?: boolean
   governance?: ProgramAccount<Governance> | null | undefined
   label?
   noMaxWidth?: boolean
-  autoselectFirst?: boolean
+  autoSelectFirst?: boolean
 }) => {
   function getLabel(value: AssetAccount) {
     if (value) {
@@ -114,12 +114,13 @@ const GovernedAccountSelect = ({
     )
   }
   useEffect(() => {
-    if (governedAccounts.length == 1 && autoselectFirst) {
+    if (governedAccounts.length == 1 && autoSelectFirst) {
       //wait for microtask queue to be empty
       setTimeout(() => {
         onChange(governedAccounts[0])
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(governedAccounts)])
   return (
     <Select

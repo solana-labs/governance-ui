@@ -1,20 +1,20 @@
 import Modal from '@components/Modal'
-import { Token } from '@models/treasury/Asset'
+//import { Token } from '@models/treasury/Asset'
 import Sell from './Sell'
 //import { createAuctionInstructions } from 'auction-house/sdk/auction'
 
 interface Props {
   isOpen: boolean
-  asset: Token
+  //asset: Token
   onClose: () => void
 }
 
-export default function SellModal({ onClose, isOpen, asset }: Props) {
+export default function SellModal({ onClose, isOpen }: Props) {
   return isOpen ? (
     <Modal onClose={onClose} isOpen={isOpen}>
       <>
         <h3 className="mb-4 flex items-center">Sell tokens</h3>
-        <Sell asset={asset}></Sell>
+        <Sell></Sell>
       </>
     </Modal>
   ) : null

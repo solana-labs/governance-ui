@@ -18,9 +18,9 @@ import { withCastVote } from '@solana/spl-governance'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
 import { chunks } from '@utils/helpers'
 import {
-  sendTransactionsV2,
+  sendTransactionsV3,
   SequenceType,
-  transactionInstructionsToTypedInstructionsSets,
+  txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
 import { sendTransaction } from '@utils/send'
 import { NftVoterClient } from '@solana/governance-program-library'
@@ -117,25 +117,28 @@ export async function castVote(
       2
     )
     const nftsAccountsChunks = chunks(remainingInstructionsToChunk, 2)
-
-    const signerChunks = Array(
-      splInstructionsWithAccountsChunk.length + nftsAccountsChunks.length
-    ).fill([])
-
-    const singersMap = message
-      ? [...signerChunks.slice(0, signerChunks.length - 1), signers]
-      : signerChunks
-
+    console.log(splInstructionsWithAccountsChunk, '@@@@@')
     const instructionsChunks = [
-      ...nftsAccountsChunks.map((x) =>
-        transactionInstructionsToTypedInstructionsSets(x, SequenceType.Parallel)
-      ),
-      ...splInstructionsWithAccountsChunk.map((x) =>
-        transactionInstructionsToTypedInstructionsSets(
-          x,
-          SequenceType.Sequential
-        )
-      ),
+      ...nftsAccountsChunks.map((txBatch, batchIdx) => {
+        return {
+          instructionsSet: txBatchesToInstructionSetWithSigners(
+            txBatch,
+            [],
+            batchIdx
+          ),
+          sequenceType: SequenceType.Parallel,
+        }
+      }),
+      ...splInstructionsWithAccountsChunk.map((txBatch, batchIdx) => {
+        return {
+          instructionsSet: txBatchesToInstructionSetWithSigners(
+            txBatch,
+            message ? [[], signers] : [],
+            batchIdx
+          ),
+          sequenceType: SequenceType.Sequential,
+        }
+      }),
     ]
     const totalVoteCost = await calcCostOfNftVote(
       message,
@@ -152,23 +155,24 @@ export async function castVote(
       return
     }
 
-    await sendTransactionsV2({
+    await sendTransactionsV3({
       connection,
       wallet,
-      TransactionInstructions: instructionsChunks,
-      signersSet: singersMap,
-      showUiComponent: true,
-      runAfterApproval:
-        instructionsChunks.length > 2 ? openNftVotingCountingModal : null,
-      runAfterTransactionConfirmation: () => {
-        if (runAfterConfirmation) {
-          runAfterConfirmation()
-        }
-        closeNftVotingCountingModal(
-          votingPlugin.client as NftVoterClient,
-          proposal,
-          wallet.publicKey!
-        )
+      transactionInstructions: instructionsChunks,
+      callbacks: {
+        afterFirstBatchSign: () => {
+          instructionsChunks.length > 2 ? openNftVotingCountingModal() : null
+        },
+        afterAllTxConfirmed: () => {
+          if (runAfterConfirmation) {
+            runAfterConfirmation()
+          }
+          closeNftVotingCountingModal(
+            votingPlugin.client as NftVoterClient,
+            proposal,
+            wallet.publicKey!
+          )
+        },
       },
     })
   } else {

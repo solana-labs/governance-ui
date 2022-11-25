@@ -37,7 +37,7 @@ const MakeChangeReferralFeeParams2 = ({
   const governedProgramAccounts = assetAccounts.filter(
     (x) => x.type === AccountType.PROGRAM
   )
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<MangoMakeChangeReferralFeeParams2>({
     governedAccount: undefined,
@@ -113,6 +113,7 @@ const MakeChangeReferralFeeParams2 = ({
       propertyName: 'programId',
       value: programId?.toString(),
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [realmInfo?.programId])
 
   useEffect(() => {
@@ -120,6 +121,7 @@ const MakeChangeReferralFeeParams2 = ({
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
   const schema = yup.object().shape({
     governedAccount: yup

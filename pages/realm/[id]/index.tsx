@@ -1,38 +1,25 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { PublicKey } from '@solana/web3.js'
+import { useEffect } from 'react'
 
 import { Home } from '@hub/components/Home'
-
-import mainnetList from 'public/realms/mainnet-beta.json'
-import devnetList from 'public/realms/devnet.json'
+import { ECOSYSTEM_PAGE } from '@hub/lib/constants'
+import { useRealmPublicKey } from '@hub/hooks/useRealmPublicKey'
 
 export default function Realm() {
   const router = useRouter()
   const { id } = router.query
+  const publicKey = useRealmPublicKey(id)
 
-  let publicKey: PublicKey | null = null
-
-  if (typeof id === 'string') {
-    for (const item of mainnetList) {
-      if (item.symbol.toLowerCase() === id.toLowerCase()) {
-        publicKey = new PublicKey(item.realmId)
-      }
+  useEffect(() => {
+    if (publicKey?.equals(ECOSYSTEM_PAGE)) {
+      router.replace('/ecosystem')
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+  }, [publicKey])
 
-    for (const item of devnetList) {
-      if (item.symbol.toLowerCase() === id.toLowerCase()) {
-        publicKey = new PublicKey(item.realmId)
-      }
-    }
-  }
-
-  if (!publicKey) {
-    try {
-      publicKey = new PublicKey(id as string)
-    } catch {
-      throw new Error('Not a valid realm')
-    }
+  if (publicKey.equals(ECOSYSTEM_PAGE)) {
+    return <div />
   }
 
   return (

@@ -19,7 +19,9 @@ import { debounce } from 'utils/debounce'
 import { isFormValid } from 'utils/formValidation'
 import { getGovernanceConfig } from '@utils/GovernanceTools'
 import { notify } from 'utils/notifications'
-import tokenService from 'utils/services/token'
+import tokenPriceService, {
+  TokenInfoWithoutDecimals,
+} from '@utils/services/tokenPrice'
 import { TokenProgramAccount, tryGetMint } from 'utils/tokens'
 import { createTreasuryAccount } from 'actions/createTreasuryAccount'
 import { useRouter } from 'next/router'
@@ -29,7 +31,6 @@ import * as yup from 'yup'
 import { DEFAULT_NFT_TREASURY_MINT } from '@components/instructions/tools'
 import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import { TokenInfo } from '@solana/spl-token-registry'
 import Select from '@components/inputs/Select'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { getMintDecimalAmount } from '@tools/sdk/units'
@@ -92,6 +93,7 @@ const NewAccountForm = () => {
       },
     ]
     setTypes(accTypes)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [realmInfo?.programVersion])
   const filteredTypes = types.filter((x) => !x.hide)
   const wallet = useWalletStore((s) => s.current)
@@ -101,7 +103,9 @@ const NewAccountForm = () => {
   const [form, setForm] = useState<NewTreasuryAccountForm>({
     ...defaultFormValues,
   })
-  const [tokenInfo, setTokenInfo] = useState<TokenInfo | undefined>(undefined)
+  const [tokenInfo, setTokenInfo] = useState<
+    TokenInfoWithoutDecimals | undefined
+  >(undefined)
   const [mint, setMint] = useState<TokenProgramAccount<MintInfo> | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
@@ -118,6 +122,7 @@ const NewAccountForm = () => {
   }
   useEffect(() => {
     setTreasuryType(filteredTypes[0])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [filteredTypes.length])
   const handleCreate = async () => {
     try {
@@ -242,7 +247,7 @@ const NewAccountForm = () => {
           const mintAccount = await tryGetMint(connection.current, pubKey)
           if (mintAccount) {
             setMint(mintAccount)
-            const info = tokenService.getTokenInfo(form.mintAddress)
+            const info = tokenPriceService.getTokenInfo(form.mintAddress)
             setTokenInfo(info)
           } else {
             handleSetDefaultMintError()
@@ -255,6 +260,7 @@ const NewAccountForm = () => {
       setMint(null)
       setTokenInfo(undefined)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.mintAddress])
 
   useEffect(() => {
@@ -262,6 +268,7 @@ const NewAccountForm = () => {
       value: treasuryType?.defaultMint,
       propertyName: 'mintAddress',
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [treasuryType])
   useEffect(() => {
     setForm({
@@ -272,6 +279,7 @@ const NewAccountForm = () => {
         ? getMintDecimalAmount(realmMint!, realmMint!.supply).toNumber() * 0.01
         : 0,
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(realmMint)])
   return (
     <div className="space-y-3">

@@ -17,7 +17,7 @@ import { getProgramVersionForRealm } from '@models/registry/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { useRouter } from 'next/router'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
-import { LOCALNET_REALM_ID as PYTH_LOCALNET_REALM_ID } from 'pyth-staking-api'
+import { REALM_ID as PYTH_REALM_ID } from 'pyth-staking-api'
 import { isYesVote } from '@models/voteRecords'
 import Tooltip from '@components/Tooltip'
 import { VotingClientType } from '@utils/uiTypes/VotePlugin'
@@ -178,7 +178,7 @@ const VotePanel = () => {
       !ownVoterWeight.hasMinAmountToVote(
         voterTokenRecord.account.governingTokenMint
       )
-    ? 'You don’t have governance power to vote in this realm'
+    ? 'You don’t have governance power to vote in this dao'
     : ''
 
   const notVisibleStatesForNotConnectedWallet = [
@@ -205,8 +205,7 @@ const VotePanel = () => {
     isVisibleToWallet
 
   //Todo: move to own components with refactor to dao folder structure
-  const isPyth =
-    realmInfo?.realmId.toBase58() === PYTH_LOCALNET_REALM_ID.toBase58()
+  const isPyth = realmInfo?.realmId.toBase58() === PYTH_REALM_ID.toBase58()
 
   const isRelinquishVotePanelVisible = !(
     isPyth &&

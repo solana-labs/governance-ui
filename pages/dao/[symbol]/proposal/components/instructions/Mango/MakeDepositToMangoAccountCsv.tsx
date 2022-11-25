@@ -40,7 +40,7 @@ const MakeDepositToMangoAccountCsv = ({
   const { governedTokenAccounts } = useGovernanceAssets()
   const tokenAccounts = governedTokenAccounts.filter((x) => x.isToken)
   const connection = useWalletStore((s) => s.connection)
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   // It state will contain the error when
   // correct file extension is not used
@@ -138,7 +138,7 @@ const MakeDepositToMangoAccountCsv = ({
           : null
         if (mangoAccountPk) {
           const mintAmount = parseMintNaturalAmountFromDecimal(
-            deposit.srm_payout!,
+            deposit.token_amount!,
             form.governedAccount.extensions.mint!.account.decimals
           )
           //Mango instruction call and serialize
@@ -172,6 +172,7 @@ const MakeDepositToMangoAccountCsv = ({
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(form)])
   const schema = yup.object().shape({
     governedAccount: yup

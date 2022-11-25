@@ -121,8 +121,7 @@ const LockTokensModal = ({
       x.lockup.kind.none
   )
   const [lockupPeriodDays, setLockupPeriodDays] = useState<number>(0)
-  const [allowClawback, setAllowClawback] = useState(false)
-  console.log(setAllowClawback)
+  const allowClawback = false
   const [lockupPeriod, setLockupPeriod] = useState<Period>(lockupPeriods[0])
   const [amount, setAmount] = useState<number | undefined>()
   const [lockMoreThenDeposited, setLockMoreThenDeposited] = useState<string>(
@@ -540,9 +539,11 @@ const LockTokensModal = ({
     if (amount) {
       validateAmountOnBlur()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [lockMoreThenDeposited])
   useEffect(() => {
     setLockupPeriod(lockupPeriods[0])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [voteStakeRegistryRegistrar])
   useEffect(() => {
     if (depositToUnlock) {

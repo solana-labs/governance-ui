@@ -36,7 +36,7 @@ const WithdrawValidatorStake = ({
   const connection = useWalletStore((s) => s.connection)
   const programId: PublicKey = StakeProgram.programId
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
 
   const [form, setForm] = useState<ValidatorWithdrawStakeForm>({
     stakingAccount: undefined,
@@ -203,6 +203,7 @@ const WithdrawValidatorStake = ({
       },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
 
   useEffect(() => {
@@ -210,12 +211,14 @@ const WithdrawValidatorStake = ({
       { governedAccount: governedAccount, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
   useEffect(() => {
     setGovernedAccount(form.governedTokenAccount?.governance)
     if (form.governedTokenAccount) {
       getStakeAccounts().then((x) => setStakeAccounts(x))
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.governedTokenAccount])
 
   return (

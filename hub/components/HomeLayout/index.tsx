@@ -1,6 +1,8 @@
 import * as Separator from '@radix-ui/react-separator';
+import type { PublicKey } from '@solana/web3.js';
 import { useEffect, useRef, useState } from 'react';
 
+import * as RealmBanner from '@hub/components/RealmBanner';
 import cx from '@hub/lib/cx';
 
 interface Props {
@@ -8,6 +10,7 @@ interface Props {
   bannerUrl?: string | null;
   error?: boolean;
   loading?: boolean;
+  realm: PublicKey;
   sidebar: (isStickied: boolean) => JSX.Element;
   content: () => JSX.Element;
 }
@@ -35,24 +38,13 @@ export function HomeLayout(props: Props) {
 
   return (
     <div className={cx(props.className)}>
-      <div
-        className={cx(
-          'bg-center',
-          'bg-cover',
-          'h-60',
-          'w-full',
-          props.loading
-            ? 'bg-neutral-200 animate-pulse'
-            : props.error
-            ? 'bg-neutral-200'
-            : 'bg-sky-400',
-        )}
-        style={{
-          backgroundImage: props.bannerUrl
-            ? `url(${props.bannerUrl})`
-            : undefined,
-        }}
-      />
+      {props.loading ? (
+        <RealmBanner.Loading />
+      ) : props.error ? (
+        <RealmBanner.Error />
+      ) : (
+        <RealmBanner.Content bannerUrl={props.bannerUrl} realm={props.realm} />
+      )}
       <div
         className={cx(
           'grid-cols-[370px,1fr]',

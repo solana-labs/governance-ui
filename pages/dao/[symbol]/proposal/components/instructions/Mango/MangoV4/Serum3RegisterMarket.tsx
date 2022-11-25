@@ -43,7 +43,7 @@ const EditToken = ({
     (x) => x.type === AccountType.PROGRAM
   )
   const { connection } = useWalletStore()
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<Serum3RegisterMarketForm>({
     governedAccount: null,
@@ -107,12 +107,14 @@ const EditToken = ({
       propertyName: 'programId',
       value: programId?.toString(),
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [realmInfo?.programId])
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
   const schema = yup.object().shape({
     governedAccount: yup

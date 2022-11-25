@@ -31,7 +31,7 @@ const TransferDomainName = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const connection = useWalletStore((s) => s.connection.current)
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const { handleSetInstructions } = useContext(NewProposalContext)
 
   const { assetAccounts } = useGovernanceAssets()
@@ -94,6 +94,7 @@ const TransferDomainName = ({
       { governedAccount: governedAccount?.governance, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
 
   const schema = yup.object().shape({

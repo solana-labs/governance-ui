@@ -19,43 +19,45 @@ const GovernedAccountSelect = ({
   governance,
   label,
   noMaxWidth,
-  autoselectFirst = true,
+  autoSelectFirst = true,
 }: {
-  onChange
-  value
-  error?
+  onChange: (value: unknown) => void
+  value?: AssetAccount | null
+  error?: string
   governedAccounts: AssetAccount[]
-  shouldBeGoverned?
-  governance?: ProgramAccount<Governance> | null | undefined
-  label?
+  shouldBeGoverned?: boolean | null
+  governance?: ProgramAccount<Governance> | null
+  label?: string
   noMaxWidth?: boolean
-  autoselectFirst?: boolean
+  autoSelectFirst?: boolean
 }) => {
-  function getLabel(value: AssetAccount) {
-    if (value) {
-      const accountType = value.governance.account.accountType
-      if (value.isSol || value.isToken) {
-        return getTokenAccountLabelComponent(
-          value.isSol
-            ? getSolAccountLabel(value)
-            : getTokenAccountLabelInfo(value)
-        )
-      } else {
-        switch (accountType) {
-          case GovernanceAccountType.MintGovernanceV1:
-          case GovernanceAccountType.MintGovernanceV2:
-            return getMintAccountLabelComponent(getMintAccountLabelInfo(value))
-          case GovernanceAccountType.ProgramGovernanceV1:
-          case GovernanceAccountType.ProgramGovernanceV2:
-            return getProgramAccountLabel(value.governance)
-          default:
-            return value.governance.account.governedAccount.toBase58()
-        }
-      }
-    } else {
+  function getLabel(value?: AssetAccount | null) {
+    if (!value) {
       return null
     }
+
+    const accountType = value.governance.account.accountType
+
+    if (value.isSol || value.isToken) {
+      return getTokenAccountLabelComponent(
+        value.isSol
+          ? getSolAccountLabel(value)
+          : getTokenAccountLabelInfo(value)
+      )
+    }
+
+    switch (accountType) {
+      case GovernanceAccountType.MintGovernanceV1:
+      case GovernanceAccountType.MintGovernanceV2:
+        return getMintAccountLabelComponent(getMintAccountLabelInfo(value))
+      case GovernanceAccountType.ProgramGovernanceV1:
+      case GovernanceAccountType.ProgramGovernanceV2:
+        return getProgramAccountLabel(value.governance)
+      default:
+        return value.governance.account.governedAccount.toBase58()
+    }
   }
+
   //TODO refactor both methods (getMintAccountLabelComponent, getTokenAccountLabelComponent) make it more common
   function getMintAccountLabelComponent({
     account,
@@ -114,12 +116,13 @@ const GovernedAccountSelect = ({
     )
   }
   useEffect(() => {
-    if (governedAccounts.length == 1 && autoselectFirst) {
+    if (governedAccounts.length == 1 && autoSelectFirst) {
       //wait for microtask queue to be empty
       setTimeout(() => {
         onChange(governedAccounts[0])
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(governedAccounts)])
   return (
     <Select

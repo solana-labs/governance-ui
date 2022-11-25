@@ -34,7 +34,7 @@ const StakeAccountSelect = ({
   stakeAccounts = [],
   label,
   noMaxWidth,
-  autoselectFirst = true,
+  autoSelectFirst = true,
 }: {
   onChange
   value
@@ -44,7 +44,7 @@ const StakeAccountSelect = ({
   governance?: ProgramAccount<Governance> | null | undefined
   label?
   noMaxWidth?: boolean
-  autoselectFirst?: boolean
+  autoSelectFirst?: boolean
 }) => {
   function getLabel(value: StakeAccount) {
     if (value) {
@@ -81,12 +81,13 @@ const StakeAccountSelect = ({
     )
   }
   useEffect(() => {
-    if (stakeAccounts.length == 1 && autoselectFirst) {
+    if (stakeAccounts.length == 1 && autoSelectFirst) {
       //wait for microtask queue to be empty
       setTimeout(() => {
         onChange(stakeAccounts[0])
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(stakeAccounts)])
   return (
     <Select

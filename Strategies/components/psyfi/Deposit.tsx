@@ -19,7 +19,7 @@ import {
   getMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
 import { precision } from '@utils/formatting'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import BigNumber from 'bignumber.js'
 import { useRouter } from 'next/router'
@@ -96,10 +96,11 @@ export const Deposit: React.FC<{
       setFormErrors({})
       setForm({ ...form, [propertyName]: value })
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     [setForm, setFormErrors]
   )
-  const tokenInfo = tokenService.getTokenInfo(handledMint)
-  const tokenSymbol = tokenService.getTokenInfo(
+  const tokenInfo = tokenPriceService.getTokenInfo(handledMint)
+  const tokenSymbol = tokenPriceService.getTokenInfo(
     governedTokenAccount.extensions.mint!.publicKey.toBase58()
   )?.symbol
   const mintInfo = governedTokenAccount.extensions?.mint?.account
@@ -152,6 +153,7 @@ export const Deposit: React.FC<{
       )) as unknown) as DepositReceipt | undefined
       setDepositReceipt(currentDepositReceipt)
     })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.strategy, psyFiProgram])
 
   // Find the owned strategy token account, if one exists
@@ -261,6 +263,7 @@ export const Deposit: React.FC<{
       notify({ type: 'error', message: `Error ${error}` })
       setIsDepositing(false)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
     client,
     config,

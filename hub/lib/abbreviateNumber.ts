@@ -16,19 +16,26 @@ export function abbreviateNumber(
   for (const [value, symbol] of ABBREVIATIONS) {
     if (typeof number === 'number') {
       if (number > value) {
-        const abbr = (number / value).toFixed(2);
+        const abbr = (number / value).toFixed(
+          options?.maximumFractionDigits ?? 2,
+        );
         return `${abbr}${symbol}`;
       }
     } else if (typeof number === 'bigint') {
       if (number > value) {
         const val = BigInt(value);
         const str = (number / val).toString();
-        const abbr = parseFloat(str).toFixed(2);
+        const abbr = parseFloat(str).toFixed(
+          options?.maximumFractionDigits ?? 2,
+        );
         return `${abbr}${symbol}`;
       }
     } else {
       if (number.isGreaterThanOrEqualTo(value)) {
-        const abbr = number.dividedBy(value).toNumber().toFixed(2);
+        const abbr = number
+          .dividedBy(value)
+          .toNumber()
+          .toFixed(options?.maximumFractionDigits ?? 2);
         return `${abbr}${symbol}`;
       }
     }

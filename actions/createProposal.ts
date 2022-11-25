@@ -16,16 +16,16 @@ import { withInsertTransaction } from '@solana/spl-governance'
 import { InstructionData } from '@solana/spl-governance'
 import { withSignOffProposal } from '@solana/spl-governance'
 import {
-  sendTransactionsV2,
+  sendTransactionsV3,
   SequenceType,
-  transactionInstructionsToTypedInstructionsSets,
+  txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
 import { chunks } from '@utils/helpers'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
 import { NftVoterClient } from '@solana/governance-program-library'
 import { withAddSignatory } from '@solana/spl-governance'
-
+import { trySentryLog } from '@utils/logs'
 export interface InstructionDataWithHoldUpTime {
   data: InstructionData | null
   holdUpTime: number | undefined
@@ -149,6 +149,7 @@ export const createProposal = async (
   const splitToChunkByDefault = instructionsData.filter(
     (x) => x.chunkSplitByDefault
   ).length
+
   const chunkBys = instructionsData
     .filter((x) => x.chunkBy)
     .map((x) => x.chunkBy!)
@@ -209,46 +210,83 @@ export const createProposal = async (
     // We merge instructions with prerequisiteInstructions
     // Prerequisite  instructions can came from instructions as something we need to do before instruction can be executed
     // For example we create ATAs if they don't exist as part of the proposal creation flow
-    await sendTransactionsV2({
-      wallet,
+    const signersSet = [[], [], signers]
+    const txes = [
+      prerequisiteInstructions,
+      instructions,
+      insertInstructions,
+    ].map((txBatch, batchIdx) => {
+      return {
+        instructionsSet: txBatchesToInstructionSetWithSigners(
+          txBatch,
+          signersSet,
+          batchIdx
+        ),
+        sequenceType: SequenceType.Sequential,
+      }
+    })
+
+    await sendTransactionsV3({
       connection,
-      signersSet: [[], [], signers],
-      showUiComponent: true,
-      TransactionInstructions: [
-        prerequisiteInstructions,
-        instructions,
-        insertInstructions,
-      ].map((x) =>
-        transactionInstructionsToTypedInstructionsSets(
-          x,
-          SequenceType.Sequential
-        )
-      ),
+      wallet,
+      transactionInstructions: txes,
     })
   } else {
     const insertChunks = chunks(insertInstructions, chunkBy)
     const signerChunks = Array(insertChunks.length)
     signerChunks.push(...chunks(signers, chunkBy))
     signerChunks.fill([])
-
-    console.log(`Creating proposal using ${insertChunks.length} chunks`)
-    await sendTransactionsV2({
-      wallet,
-      connection,
-      signersSet: [[...prerequisiteInstructionsSigners], [], ...signerChunks],
-      showUiComponent: true,
-      TransactionInstructions: [
-        prerequisiteInstructions,
-        instructions,
-        ...insertChunks,
-      ].map((x) =>
-        transactionInstructionsToTypedInstructionsSets(
-          x,
-          SequenceType.Sequential
+    const deduplicatedPrerequisiteInstructions = prerequisiteInstructions.filter(
+      (value, index, self) =>
+        index ===
+        self.findIndex(
+          (t) =>
+            t.data.toString() === value.data.toString() &&
+            t.keys.every((x) =>
+              value.keys.find(
+                (key) => key.pubkey.toBase58() === x.pubkey.toBase58()
+              )
+            )
         )
-      ),
+    )
+
+    const signersSet = [
+      ...chunks([...prerequisiteInstructionsSigners], 5),
+      [],
+      ...signerChunks,
+    ]
+    const txes = [
+      ...chunks(deduplicatedPrerequisiteInstructions, 5),
+      instructions,
+      ...insertChunks,
+    ].map((txBatch, batchIdx) => {
+      return {
+        instructionsSet: txBatchesToInstructionSetWithSigners(
+          txBatch,
+          signersSet,
+          batchIdx
+        ),
+        sequenceType: SequenceType.Sequential,
+      }
+    })
+
+    await sendTransactionsV3({
+      connection,
+      wallet,
+      transactionInstructions: txes,
     })
   }
-
+  const logInfo = {
+    realmId: realm.pubkey.toBase58(),
+    realmSymbol: realm.account.name,
+    wallet: wallet.publicKey?.toBase58(),
+    proposalAddress: proposalAddress.toBase58(),
+    proposalIndex: proposalIndex,
+    cluster: connection.rpcEndpoint.includes('devnet') ? 'devnet' : 'mainnet',
+  }
+  trySentryLog({
+    tag: 'proposalCreated',
+    objToStringify: logInfo,
+  })
   return proposalAddress
 }

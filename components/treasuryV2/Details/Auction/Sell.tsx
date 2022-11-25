@@ -1,332 +1,334 @@
-import Button from '@components/Button'
-import Input from '@components/inputs/Input'
-import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
-import { useEffect, useState } from 'react'
-import { Token } from '@models/treasury/Asset'
-import Checkbox from '@components/inputs/Checkbox'
-import { ParticipantPreset, SellForm } from './models'
-import { MANGO_AUCTION_PROGRAM_ID, paramsForTokenSale } from './tools'
-import TokenMintInput from '@components/inputs/TokenMintInput'
-import AdditionalProposalOptions from '@components/AdditionalProposalOptions'
-import { abbreviateAddress } from '@utils/formatting'
-import { tryParsePublicKey } from '@tools/core/pubkey'
-import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js'
-import useWalletStore from 'stores/useWalletStore'
-import Modal from '@components/Modal'
-import dayjs from 'dayjs'
-import {
-  createInitOpenOrdersInstructions,
-  createNewOrderInstructions,
-  getOpenOrdersPk,
-  getOrderHistoryPk,
-  getCreateDefaultFeeAtas,
-  createAuctionInstructions,
-  AuctionObj,
-  fetchAuction,
-} from 'auction-house-sdk/sdk'
-import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
-import {
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  Token as SPL_TOKEN,
-  TOKEN_PROGRAM_ID,
-} from '@solana/spl-token'
-import useCreateProposal from '@hooks/useCreateProposal'
-import useQueryContext from '@hooks/useQueryContext'
-import useRealm from '@hooks/useRealm'
-import { useRouter } from 'next/router'
-import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
-import { serializeInstructionToBase64 } from '@solana/spl-governance'
-import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
-import { notify } from '@utils/notifications'
-import Switch from '@components/Switch'
-import { OpenOrders } from 'auction-house-sdk/generated/accounts'
-interface Props {
-  className?: string
-  asset: Token
-}
+// import Button from '@components/Button'
+// import Input from '@components/inputs/Input'
+// import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
+// import { useEffect, useState } from 'react'
+// import { Token } from '@models/treasury/Asset'
+// import Checkbox from '@components/inputs/Checkbox'
+// import { ParticipantPreset, SellForm } from './models'
+// import { MANGO_AUCTION_PROGRAM_ID, paramsForTokenSale } from './tools'
+// import TokenMintInput from '@components/inputs/TokenMintInput'
+// import AdditionalProposalOptions from '@components/AdditionalProposalOptions'
+// import { abbreviateAddress } from '@utils/formatting'
+// import { tryParsePublicKey } from '@tools/core/pubkey'
+// import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js'
+// import useWalletStore from 'stores/useWalletStore'
+// import Modal from '@components/Modal'
+// import dayjs from 'dayjs'
+// import {
+//   createInitOpenOrdersInstructions,
+//   createNewOrderInstructions,
+//   getOpenOrdersPk,
+//   getOrderHistoryPk,
+//   getCreateDefaultFeeAtas,
+//   createAuctionInstructions,
+//   AuctionObj,
+//   fetchAuction,
+// } from 'auction-house-sdk/sdk'
+// import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
+// import {
+//   ASSOCIATED_TOKEN_PROGRAM_ID,
+//   Token as SPL_TOKEN,
+//   TOKEN_PROGRAM_ID,
+// } from '@solana/spl-token'
+// import useCreateProposal from '@hooks/useCreateProposal'
+// import useQueryContext from '@hooks/useQueryContext'
+// import useRealm from '@hooks/useRealm'
+// import { useRouter } from 'next/router'
+// import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
+// import { serializeInstructionToBase64 } from '@solana/spl-governance'
+// import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
+// import { notify } from '@utils/notifications'
+// import Switch from '@components/Switch'
+// import { OpenOrders } from 'auction-house-sdk/generated/accounts'
+// interface Props {
+//   className?: string
+//   asset: Token
+// }
 
-const DEFAULT_TOKENS_FOR_SALE = 1
-const DEFAULT_MIN_PRICE = 1
+// const DEFAULT_TOKENS_FOR_SALE = 1
+// const DEFAULT_MIN_PRICE = 1
 
-export default function Sell({ className, asset }: Props) {
-  const wallet = useWalletStore((s) => s.current)
-  const connection = useWalletStore((s) => s.connection)
-  const formatter = Intl.NumberFormat('en', {
-    notation: 'compact',
-  })
-  const { symbol } = useRealm()
-  const router = useRouter()
-  const { handleCreateProposal } = useCreateProposal()
-  const { fmtUrlWithCluster } = useQueryContext()
-  const [openSaveBackupKeyModal, setOpenSaveBackupKeyModal] = useState(false)
-  const [auctionObj, setAuctionObj] = useState<AuctionObj | null>(null)
-  const [fileDownloaded, setFileDownloaded] = useState(false)
-  const [auctionSize, setAuctionSize] = useState<number>(ParticipantPreset.M)
-  const [withCreateAuction, setWithCreateAuction] = useState(true)
-  const [form, setForm] = useState<SellForm>({
-    auctionPk: '',
-    baseMint: asset.raw.extensions.mint!.publicKey.toBase58(),
-    quoteMint: '',
-    areAsksEncrypted: false,
-    areBidsEncrypted: true,
-    maxOrders: 4,
-    orderPhaseLength: 24 * 60 * 60,
-    tokensForSale: DEFAULT_TOKENS_FOR_SALE,
-    minPrice: DEFAULT_MIN_PRICE,
-    ...paramsForTokenSale(
-      ParticipantPreset.M,
-      DEFAULT_TOKENS_FOR_SALE,
-      DEFAULT_MIN_PRICE
-    ),
-  })
-  const DEFAULT_TITLE = `Sell ${form.tokensForSale} ${
-    asset.name ? asset.name : abbreviateAddress(asset.id)
-  } on auction`
-  const DEFAULT_DESCRIPTION = `Sell ${form.tokensForSale} ${
-    asset.name ? asset.name : abbreviateAddress(asset.id)
-  } on auction for min price: ${form.minPrice}`
-  const [proposalInfo, setProposalInfo] = useState({
-    title: '',
-    description: '',
-    voteByCouncil: false,
-  })
-  const [formErrors, setFormErrors] = useState({})
-  const handleSetForm = ({ propertyName, value }) => {
-    setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
-  }
-  const sizeBtnClass = (size: number) => {
-    const classnames = `text-xs ${size === auctionSize ? 'bg-fgd-1' : ''}`
-    return classnames
-  }
-  const closeSaveKeyPrompt = () => {
-    setOpenSaveBackupKeyModal(false)
-    setAuctionObj(null)
-    setFileDownloaded(false)
-  }
-  const downloadBackupFile = async () => {
-    // Create blob link to download
-    const url = window.URL.createObjectURL(
-      new Blob([JSON.stringify(auctionObj!.localAuctionKey)])
-    )
-    const link = document.createElement('a')
-    link.href = url
-    const timestamp = dayjs().unix()
-    link.setAttribute(
-      'download',
-      `keypair-backup-${auctionObj?.auctionPk.toBase58()}-${timestamp}.json`
-    )
+export default function Sell() {
+  //   const wallet = useWalletStore((s) => s.current)
+  //   const connection = useWalletStore((s) => s.connection)
+  //   const formatter = Intl.NumberFormat('en', {
+  //     notation: 'compact',
+  //   })
+  //   const { symbol } = useRealm()
+  //   const router = useRouter()
+  //   const { handleCreateProposal } = useCreateProposal()
+  //   const { fmtUrlWithCluster } = useQueryContext()
+  //   const [openSaveBackupKeyModal, setOpenSaveBackupKeyModal] = useState(false)
+  //   const [auctionObj, setAuctionObj] = useState<AuctionObj | null>(null)
+  //   const [fileDownloaded, setFileDownloaded] = useState(false)
+  //   const [auctionSize, setAuctionSize] = useState<number>(ParticipantPreset.M)
+  //   const [withCreateAuction, setWithCreateAuction] = useState(true)
+  //   const [form, setForm] = useState<SellForm>({
+  //     auctionPk: '',
+  //     baseMint: asset.raw.extensions.mint!.publicKey.toBase58(),
+  //     quoteMint: '',
+  //     areAsksEncrypted: false,
+  //     areBidsEncrypted: true,
+  //     maxOrders: 4,
+  //     orderPhaseLength: 24 * 60 * 60,
+  //     tokensForSale: DEFAULT_TOKENS_FOR_SALE,
+  //     minPrice: DEFAULT_MIN_PRICE,
+  //     ...paramsForTokenSale(
+  //       ParticipantPreset.M,
+  //       DEFAULT_TOKENS_FOR_SALE,
+  //       DEFAULT_MIN_PRICE
+  //     ),
+  //   })
+  //   const DEFAULT_TITLE = `Sell ${form.tokensForSale} ${
+  //     asset.name ? asset.name : abbreviateAddress(asset.id)
+  //   } on auction`
+  //   const DEFAULT_DESCRIPTION = `Sell ${form.tokensForSale} ${
+  //     asset.name ? asset.name : abbreviateAddress(asset.id)
+  //   } on auction for min price: ${form.minPrice}`
+  //   const [proposalInfo, setProposalInfo] = useState({
+  //     title: '',
+  //     description: '',
+  //     voteByCouncil: false,
+  //   })
+  //   const [formErrors, setFormErrors] = useState({})
+  //   const handleSetForm = ({ propertyName, value }) => {
+  //     setFormErrors({})
+  //     setForm({ ...form, [propertyName]: value })
+  //   }
+  //   const sizeBtnClass = (size: number) => {
+  //     const classnames = `text-xs ${size === auctionSize ? 'bg-fgd-1' : ''}`
+  //     return classnames
+  //   }
+  //   const closeSaveKeyPrompt = () => {
+  //     setOpenSaveBackupKeyModal(false)
+  //     setAuctionObj(null)
+  //     setFileDownloaded(false)
+  //   }
+  //   const downloadBackupFile = async () => {
+  //     // Create blob link to download
+  //     const url = window.URL.createObjectURL(
+  //       new Blob([JSON.stringify(auctionObj!.localAuctionKey)])
+  //     )
+  //     const link = document.createElement('a')
+  //     link.href = url
+  //     const timestamp = dayjs().unix()
+  //     link.setAttribute(
+  //       'download',
+  //       `keypair-backup-${auctionObj?.auctionPk.toBase58()}-${timestamp}.json`
+  //     )
 
-    // Append to html link element page
-    document.body.appendChild(link)
+  //     // Append to html link element page
+  //     document.body.appendChild(link)
 
-    // Start download
-    link.click()
+  //     // Start download
+  //     link.click()
 
-    // Clean up and remove the link
-    link.parentNode!.removeChild(link)
-    setFileDownloaded(true)
-  }
-  const promptSaveKey = async (data: SellForm) => {
-    const baseMintPk = tryParsePublicKey(data.baseMint)
-    const quoteMintPk = tryParsePublicKey(data.quoteMint)
-    if (!baseMintPk) {
-      throw 'No baseMintPk'
-    }
-    if (!quoteMintPk) {
-      throw 'No quoteMintPk'
-    }
-    const transactionInstructions: TransactionInstruction[] = []
-    const auctionObj = await createAuctionInstructions({
-      ...data,
-      connection: connection.current,
-      wallet: wallet!.publicKey!,
-      programId: MANGO_AUCTION_PROGRAM_ID,
-      baseMint: new PublicKey(data.baseMint),
-      quoteMint: new PublicKey(data.quoteMint),
-      baseDecimals: asset.raw.extensions.mint!.account.decimals,
-    })
-    auctionObj.transactionInstructions.unshift(...transactionInstructions)
-    setAuctionObj(auctionObj)
-    setOpenSaveBackupKeyModal(true)
-  }
-  const handlePropose = async (newAuctionObj: AuctionObj | null) => {
-    const auctionPk = newAuctionObj
-      ? newAuctionObj.auctionPk
-      : new PublicKey(form.auctionPk)
+  //     // Clean up and remove the link
+  //     link.parentNode!.removeChild(link)
+  //     setFileDownloaded(true)
+  //   }
+  //   const promptSaveKey = async (data: SellForm) => {
+  //     const baseMintPk = tryParsePublicKey(data.baseMint)
+  //     const quoteMintPk = tryParsePublicKey(data.quoteMint)
+  //     if (!baseMintPk) {
+  //       throw 'No baseMintPk'
+  //     }
+  //     if (!quoteMintPk) {
+  //       throw 'No quoteMintPk'
+  //     }
+  //     const transactionInstructions: TransactionInstruction[] = []
+  //     const auctionObj = await createAuctionInstructions({
+  //       ...data,
+  //       connection: connection.current,
+  //       wallet: wallet!.publicKey!,
+  //       programId: MANGO_AUCTION_PROGRAM_ID,
+  //       baseMint: new PublicKey(data.baseMint),
+  //       quoteMint: new PublicKey(data.quoteMint),
+  //       baseDecimals: asset.raw.extensions.mint!.account.decimals,
+  //     })
+  //     auctionObj.transactionInstructions.unshift(...transactionInstructions)
+  //     setAuctionObj(auctionObj)
+  //     setOpenSaveBackupKeyModal(true)
+  //   }
+  //   const handlePropose = async (newAuctionObj: AuctionObj | null) => {
+  //     const auctionPk = newAuctionObj
+  //       ? newAuctionObj.auctionPk
+  //       : new PublicKey(form.auctionPk)
 
-    const existingAuction = !newAuctionObj
-      ? await fetchAuction(connection.current, auctionPk)
-      : null
+  //     const existingAuction = !newAuctionObj
+  //       ? await fetchAuction(connection.current, auctionPk)
+  //       : null
 
-    const assetExtenstions = asset.raw.extensions
-    const newAuctionArgs = newAuctionObj?.auctionParams.args
-    const newAuctionAccounts = newAuctionObj?.auctionParams.accounts
-    const governance = asset.raw.governance
-    const authority = assetExtenstions.token?.account.owner
+  //     const assetExtenstions = asset.raw.extensions
+  //     const newAuctionArgs = newAuctionObj?.auctionParams.args
+  //     const newAuctionAccounts = newAuctionObj?.auctionParams.accounts
+  //     const governance = asset.raw.governance
+  //     const authority = assetExtenstions.token?.account.owner
 
-    const auctionId = newAuctionArgs?.auctionId || existingAuction!.auctionId
-    const auctionAuthroity =
-      newAuctionAccounts?.authority || existingAuction!.authority
-    const quoteMint =
-      newAuctionAccounts?.quoteMint || existingAuction!.quoteMint
-    const tickSize = newAuctionArgs?.tickSize || existingAuction!.tickSize
-    const quoteVault =
-      newAuctionAccounts?.quoteVault || existingAuction!.quoteVault
-    const eventQueue =
-      newAuctionAccounts?.eventQueue || existingAuction!.eventQueue
-    const bids = newAuctionAccounts?.bids || existingAuction!.bids
-    const asks = newAuctionAccounts?.asks || existingAuction!.asks
-    const baseMint = newAuctionAccounts?.baseMint || existingAuction!.baseMint
-    const baseVault =
-      newAuctionAccounts?.baseVault || existingAuction!.baseVault
+  //     const auctionId = newAuctionArgs?.auctionId || existingAuction!.auctionId
+  //     const auctionAuthroity =
+  //       newAuctionAccounts?.authority || existingAuction!.authority
+  //     const quoteMint =
+  //       newAuctionAccounts?.quoteMint || existingAuction!.quoteMint
+  //     const tickSize = newAuctionArgs?.tickSize || existingAuction!.tickSize
+  //     const quoteVault =
+  //       newAuctionAccounts?.quoteVault || existingAuction!.quoteVault
+  //     const eventQueue =
+  //       newAuctionAccounts?.eventQueue || existingAuction!.eventQueue
+  //     const bids = newAuctionAccounts?.bids || existingAuction!.bids
+  //     const asks = newAuctionAccounts?.asks || existingAuction!.asks
+  //     const baseMint = newAuctionAccounts?.baseMint || existingAuction!.baseMint
+  //     const baseVault =
+  //       newAuctionAccounts?.baseVault || existingAuction!.baseVault
 
-    const perquisiteInstructions: TransactionInstruction[] = newAuctionObj
-      ? [...newAuctionObj.transactionInstructions]
-      : []
-    const perquisiteSingers: Keypair[] = newAuctionObj
-      ? [...newAuctionObj.signers]
-      : []
+  //     const perquisiteInstructions: TransactionInstruction[] = newAuctionObj
+  //       ? [...newAuctionObj.transactionInstructions]
+  //       : []
+  //     const perquisiteSingers: Keypair[] = newAuctionObj
+  //       ? [...newAuctionObj.signers]
+  //       : []
 
-    const transactionInstructions: TransactionInstruction[] = []
+  //     const transactionInstructions: TransactionInstruction[] = []
 
-    const openOrdersPk = await getOpenOrdersPk(
-      authority!,
-      auctionId,
-      auctionAuthroity,
-      MANGO_AUCTION_PROGRAM_ID
-    )
+  //     const openOrdersPk = await getOpenOrdersPk(
+  //       authority!,
+  //       auctionId,
+  //       auctionAuthroity,
+  //       MANGO_AUCTION_PROGRAM_ID
+  //     )
 
-    const openOrders = await OpenOrders.fetch(connection.current, openOrdersPk)
-    if (!openOrders) {
-      const {
-        quoteFeeAta,
-        baseFeeAta,
-        instructions,
-      } = await getCreateDefaultFeeAtas({
-        wallet: wallet!,
-        connection: connection.current,
-        baseMint: new PublicKey(form.baseMint),
-        quoteMint: new PublicKey(form.quoteMint),
-        cluster: connection.cluster,
-      })
-      perquisiteInstructions.push(...instructions)
-      const orderHistoryPk = await getOrderHistoryPk(
-        assetExtenstions.token!.account.owner,
-        auctionId,
-        auctionAuthroity,
-        MANGO_AUCTION_PROGRAM_ID
-      )
-      transactionInstructions.push(
-        ...createInitOpenOrdersInstructions({
-          authority: authority!,
-          auctionPk: auctionPk,
-          openOrdersPk: openOrdersPk,
-          orderHistoryPk: orderHistoryPk,
-          baseFeePk: baseFeeAta,
-          quoteFeePk: quoteFeeAta,
-          side: 'Ask',
-        })
-      )
-    }
+  //     const openOrders = await OpenOrders.fetch(connection.current, openOrdersPk)
+  //     if (!openOrders) {
+  //       const {
+  //         quoteFeeAta,
+  //         baseFeeAta,
+  //         instructions,
+  //       } = await getCreateDefaultFeeAtas({
+  //         wallet: wallet!,
+  //         connection: connection.current,
+  //         baseMint: new PublicKey(form.baseMint),
+  //         quoteMint: new PublicKey(form.quoteMint),
+  //         cluster: connection.cluster,
+  //       })
+  //       perquisiteInstructions.push(...instructions)
+  //       const orderHistoryPk = await getOrderHistoryPk(
+  //         assetExtenstions.token!.account.owner,
+  //         auctionId,
+  //         auctionAuthroity,
+  //         MANGO_AUCTION_PROGRAM_ID
+  //       )
+  //       transactionInstructions.push(
+  //         ...createInitOpenOrdersInstructions({
+  //           authority: authority!,
+  //           auctionPk: auctionPk,
+  //           openOrdersPk: openOrdersPk,
+  //           orderHistoryPk: orderHistoryPk,
+  //           baseFeePk: baseFeeAta,
+  //           quoteFeePk: quoteFeeAta,
+  //           side: 'Ask',
+  //         })
+  //       )
+  //     }
 
-    const quoteAta = await getAssociatedTokenAddress(
-      quoteMint, // mint
-      assetExtenstions.token!.account.owner, // owner
-      true
-    )
-    const quoteAtaAcc = await connection.current.getParsedAccountInfo(quoteAta)
-    if (!quoteAtaAcc?.value) {
-      const ataCreateionIx = SPL_TOKEN.createAssociatedTokenAccountInstruction(
-        ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-        TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-        quoteMint, // mint
-        quoteAta, // ata
-        assetExtenstions.token!.account.owner, // owner of token account
-        wallet!.publicKey! // fee payer
-      )
-      perquisiteInstructions.push(ataCreateionIx)
-    }
-    transactionInstructions.push(
-      ...createNewOrderInstructions({
-        price: form.minPrice,
-        amount: form.tokensForSale,
-        baseDecimals: assetExtenstions.mint!.account.decimals,
-        authority: authority!,
-        auctionPk: auctionPk,
-        openOrdersPk: openOrdersPk,
-        quoteToken: quoteAta,
-        baseToken: assetExtenstions.token!.publicKey,
-        tickSize: tickSize,
-        quoteMint: quoteMint,
-        quoteVault: quoteVault,
-        eventQueue: eventQueue,
-        bids: bids,
-        asks: asks,
-        baseMint: baseMint,
-        baseVault: baseVault,
-      })
-    )
-    const instructionsData = transactionInstructions.map((x, idx) => {
-      const obj: UiInstruction = {
-        serializedInstruction: serializeInstructionToBase64(x),
-        isValid: true,
-        governance,
-        prerequisiteInstructions: idx === 0 ? perquisiteInstructions : [],
-        prerequisiteInstructionsSigners: idx === 0 ? perquisiteSingers : [],
-        chunkBy: 1,
-        chunkSplitByDefault: true,
-      }
-      return new InstructionDataWithHoldUpTime({
-        instruction: obj,
-        governance,
-      })
-    })
+  //     const quoteAta = await getAssociatedTokenAddress(
+  //       quoteMint, // mint
+  //       assetExtenstions.token!.account.owner, // owner
+  //       true
+  //     )
+  //     const quoteAtaAcc = await connection.current.getParsedAccountInfo(quoteAta)
+  //     if (!quoteAtaAcc?.value) {
+  //       const ataCreateionIx = SPL_TOKEN.createAssociatedTokenAccountInstruction(
+  //         ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+  //         TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+  //         quoteMint, // mint
+  //         quoteAta, // ata
+  //         assetExtenstions.token!.account.owner, // owner of token account
+  //         wallet!.publicKey! // fee payer
+  //       )
+  //       perquisiteInstructions.push(ataCreateionIx)
+  //     }
+  //     transactionInstructions.push(
+  //       ...createNewOrderInstructions({
+  //         price: form.minPrice,
+  //         amount: form.tokensForSale,
+  //         baseDecimals: assetExtenstions.mint!.account.decimals,
+  //         authority: authority!,
+  //         auctionPk: auctionPk,
+  //         openOrdersPk: openOrdersPk,
+  //         quoteToken: quoteAta,
+  //         baseToken: assetExtenstions.token!.publicKey,
+  //         tickSize: tickSize,
+  //         quoteMint: quoteMint,
+  //         quoteVault: quoteVault,
+  //         eventQueue: eventQueue,
+  //         bids: bids,
+  //         asks: asks,
+  //         baseMint: baseMint,
+  //         baseVault: baseVault,
+  //       })
+  //     )
+  //     const instructionsData = transactionInstructions.map((x, idx) => {
+  //       const obj: UiInstruction = {
+  //         serializedInstruction: serializeInstructionToBase64(x),
+  //         isValid: true,
+  //         governance,
+  //         prerequisiteInstructions: idx === 0 ? perquisiteInstructions : [],
+  //         prerequisiteInstructionsSigners: idx === 0 ? perquisiteSingers : [],
+  //         chunkBy: 1,
+  //         chunkSplitByDefault: true,
+  //       }
+  //       return new InstructionDataWithHoldUpTime({
+  //         instruction: obj,
+  //         governance,
+  //       })
+  //     })
 
-    try {
-      const proposalAddress = await handleCreateProposal({
-        title: proposalInfo.title ? proposalInfo.title : DEFAULT_TITLE,
-        description: proposalInfo.description
-          ? proposalInfo.description
-          : DEFAULT_DESCRIPTION,
-        voteByCouncil: proposalInfo.voteByCouncil,
-        instructionsData: instructionsData,
-        governance: governance,
-      })
-      const url = fmtUrlWithCluster(
-        `/dao/${symbol}/proposal/${proposalAddress}`
-      )
-      router.push(url)
-    } catch (ex) {
-      notify({ type: 'error', message: `${ex}` })
-    }
-  }
-  useEffect(() => {
-    setFormErrors({})
-    const newFormValues = form.areBidsEncrypted
-      ? {
-          ...paramsForTokenSale(auctionSize, form.tokensForSale, form.minPrice),
-        }
-      : {
-          ...paramsForTokenSale(auctionSize, form.tokensForSale, form.minPrice),
-          decryptionPhaseLength: 0,
-        }
-    setForm({
-      ...form,
-      ...newFormValues,
-    })
-  }, [form.areBidsEncrypted, form.tokensForSale, form.minPrice, auctionSize])
-  useEffect(() => {
-    setFormErrors({})
-    setForm({
-      ...form,
-      auctionPk: '',
-    })
-  }, [withCreateAuction])
+  //     try {
+  //       const proposalAddress = await handleCreateProposal({
+  //         title: proposalInfo.title ? proposalInfo.title : DEFAULT_TITLE,
+  //         description: proposalInfo.description
+  //           ? proposalInfo.description
+  //           : DEFAULT_DESCRIPTION,
+  //         voteByCouncil: proposalInfo.voteByCouncil,
+  //         instructionsData: instructionsData,
+  //         governance: governance,
+  //       })
+  //       const url = fmtUrlWithCluster(
+  //         `/dao/${symbol}/proposal/${proposalAddress}`
+  //       )
+  //       router.push(url)
+  //     } catch (ex) {
+  //       notify({ type: 'error', message: `${ex}` })
+  //     }
+  //   }
+  //   useEffect(() => {
+  //     setFormErrors({})
+  //     const newFormValues = form.areBidsEncrypted
+  //       ? {
+  //           ...paramsForTokenSale(auctionSize, form.tokensForSale, form.minPrice),
+  //         }
+  //       : {
+  //           ...paramsForTokenSale(auctionSize, form.tokensForSale, form.minPrice),
+  //           decryptionPhaseLength: 0,
+  //         }
+  //     setForm({
+  //       ...form,
+  //       ...newFormValues,
+  //     })
+  //     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+  //   }, [form.areBidsEncrypted, form.tokensForSale, form.minPrice, auctionSize])
+  //   useEffect(() => {
+  //     setFormErrors({})
+  //     setForm({
+  //       ...form,
+  //       auctionPk: '',
+  //     })
+  //     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+  //   }, [withCreateAuction])
 
   return (
     <>
-      <section className={`${className} space-y-3`}>
+      {/* <section className={`${className} space-y-3`}>
         <h4>Witch create auction</h4>
         <div className="flex flex-row text-xs items-center">
           <Switch
@@ -586,7 +588,7 @@ export default function Sell({ className, asset }: Props) {
             </Button>
           </div>
         </Modal>
-      )}
+      )} */}
     </>
   )
 }

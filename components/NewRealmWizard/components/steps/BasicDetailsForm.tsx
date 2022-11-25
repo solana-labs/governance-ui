@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useForm, Controller } from 'react-hook-form'
+import { useForm, Controller, useWatch } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 
@@ -14,6 +14,8 @@ import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
 import { updateUserInput, validateSolAddress } from '@utils/formValidation'
 
 import { FORM_NAME as MUTISIG_FORM } from 'pages/realms/new/multisig'
+import { useProgramVersionByIdQuery } from '@hooks/queries/useProgramVersionQuery'
+import { PublicKey } from '@solana/web3.js'
 
 export const BasicDetailsSchema = {
   avatar: yup.string(),
@@ -42,6 +44,16 @@ export default function BasicDetailsForm({
   totalSteps,
   onSubmit,
   onPrevClick,
+}: {
+  // TODO type me
+  type: any
+  formData: BasicDetails
+  currentStep: any
+  totalSteps: any
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  onSubmit: Function
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  onPrevClick: Function
 }) {
   const schema = yup.object(BasicDetailsSchema).required()
   const {
@@ -54,8 +66,16 @@ export default function BasicDetailsForm({
     resolver: yupResolver(schema),
   })
 
+  const programIdInput = useWatch({ name: 'programId', control })
+  const validProgramId =
+    programIdInput && validateSolAddress(programIdInput)
+      ? new PublicKey(programIdInput)
+      : undefined
+  const programVersionQuery = useProgramVersionByIdQuery(validProgramId)
+
   useEffect(() => {
     updateUserInput(formData, BasicDetailsSchema, setValue)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [])
 
   function serializeValues(values) {
@@ -116,6 +136,20 @@ export default function BasicDetailsForm({
                   data-testid="programId-input"
                   error={errors.programId?.message || ''}
                   autoComplete="on"
+                  success={
+                    !programVersionQuery.isLoading &&
+                    programVersionQuery.data !== 1
+                      ? `Program version ${programVersionQuery.data}`
+                      : undefined
+                  }
+                  warning={
+                    !programVersionQuery.isLoading &&
+                    programVersionQuery.data === 1
+                      ? 'Program version could not be verified'
+                      : programVersionQuery.isFetching
+                      ? 'Fetching program version...'
+                      : undefined
+                  }
                   {...field}
                 />
               </FormField>

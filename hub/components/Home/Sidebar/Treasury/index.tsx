@@ -5,7 +5,6 @@ import * as IT from 'io-ts';
 import { gql } from 'urql';
 
 import { useQuery } from '@hub/hooks/useQuery';
-import cx from '@hub/lib/cx';
 import { formatNumber } from '@hub/lib/formatNumber';
 import { BigNumber } from '@hub/types/decoders/BigNumber';
 import { PublicKey } from '@hub/types/decoders/PublicKey';
@@ -50,7 +49,7 @@ export function Content(props: Props) {
           <div>WALLETS & ASSETS</div>
         </div>
         <a
-          className="flex items-center space-x-1 text-sm transition-colors text-neutral-500 hover:text-cyan-500"
+          className="flex items-center space-x-1 text-sm transition-colors text-neutral-500 hover:text-sky-500"
           href={`/dao/${props.realmUrlId}/treasury/v2`}
         >
           <div>View</div>

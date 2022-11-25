@@ -24,11 +24,17 @@ export enum BlockStyle {
 export enum InlineNodeType {
   Anchor = 'A',
   Inline = 'I',
+  PublicKey = 'PK',
 }
 
 export enum BlockNodeType {
   Block = 'B',
   Image = 'IM',
+  TwitterEmbed = 'TWE',
+}
+
+export enum AttachmentType {
+  TwitterEmbed = 'TWE',
 }
 
 export interface InlineNode {
@@ -39,8 +45,15 @@ export interface InlineNode {
 
 export interface AnchorNode {
   t: InlineNodeType.Anchor;
-  c: InlineNode[];
+  c: (InlineNode | PublicKeyNode)[];
   u: string;
+}
+
+export interface PublicKeyNode {
+  t: InlineNodeType.PublicKey;
+  c: string;
+  k: string;
+  s?: null | InlineStyle[];
 }
 
 export interface ImageNode {
@@ -51,11 +64,29 @@ export interface ImageNode {
 
 export interface BlockNode {
   t: BlockNodeType.Block;
-  c: (AnchorNode | InlineNode)[];
+  c: (AnchorNode | InlineNode | PublicKeyNode)[];
   s: BlockStyle;
 }
 
+export interface TwitterEmbedNode {
+  t: BlockNodeType.TwitterEmbed;
+  c: {
+    u: string;
+    t?: null | string;
+    h?: null | string;
+  };
+}
+
+export interface TwitterEmbedAttachment {
+  t: AttachmentType.TwitterEmbed;
+  c: {
+    u: string;
+    t?: null | string;
+    h?: null | string;
+  };
+}
+
 export interface RichTextDocument {
-  attachments: unknown[];
-  content: (BlockNode | ImageNode)[];
+  attachments: TwitterEmbedAttachment[];
+  content: (BlockNode | ImageNode | TwitterEmbedNode)[];
 }

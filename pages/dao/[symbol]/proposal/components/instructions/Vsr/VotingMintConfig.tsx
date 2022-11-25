@@ -20,7 +20,7 @@ import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getScaledFactor } from '@utils/tokens'
 import { yearsToSecs } from 'VoteStakeRegistry/tools/dateTools'
-import { BN, web3 } from '@project-serum/anchor'
+import { AnchorProvider, BN, Wallet, web3 } from '@project-serum/anchor'
 import { PublicKey } from '@solana/web3.js'
 import {
   emptyPk,
@@ -28,7 +28,7 @@ import {
   Registrar,
 } from 'VoteStakeRegistry/sdk/accounts'
 import { DEFAULT_VSR_ID, VsrClient } from 'VoteStakeRegistry/sdk/client'
-import useWallet from '@hooks/useWallet'
+import useWalletStore from 'stores/useWalletStore'
 
 interface ConfigureCollectionForm {
   programId: string | undefined
@@ -51,11 +51,11 @@ const VotingMintConfig = ({
 }) => {
   const { realm } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<ConfigureCollectionForm>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
-  const { anchorProvider, wallet } = useWallet()
+  const { current: wallet, connection } = useWalletStore()
 
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
@@ -64,10 +64,16 @@ const VotingMintConfig = ({
       isValid &&
       form &&
       form!.governedAccount?.governance.pubkey &&
-      wallet?.publicKey
+      wallet?.publicKey?.toBase58()
     ) {
+      const options = AnchorProvider.defaultOptions()
+      const provider = new AnchorProvider(
+        connection.current,
+        (wallet as unknown) as Wallet,
+        options
+      )
       const vsrClient = VsrClient.connect(
-        anchorProvider,
+        provider,
         form?.programId ? new web3.PublicKey(form.programId) : undefined
       )
       const digitShift = form.mintDigitShift
@@ -147,6 +153,7 @@ const VotingMintConfig = ({
       { governedAccount: form?.governedAccount?.governance, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
   const schema = yup.object().shape({
     programId: yup

@@ -30,7 +30,7 @@ const GoblinGoldDeposit = ({
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
 
   const [form, setForm] = useState<GoblinGoldDepositForm>({
@@ -111,6 +111,7 @@ const GoblinGoldDeposit = ({
       propertyName: 'programId',
       value: programId?.toString(),
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [programId])
 
   useEffect(() => {
@@ -118,11 +119,13 @@ const GoblinGoldDeposit = ({
       { governedAccount: governedAccount, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
 
   useEffect(() => {
     setGovernedAccount(form.governedTokenAccount?.governance)
     setMintInfo(form.governedTokenAccount?.extensions.mint?.account)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.governedTokenAccount])
 
   const schema = getGoblinGoldDepositSchema({ form })

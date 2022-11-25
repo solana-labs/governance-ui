@@ -51,7 +51,7 @@ const Grant = ({
   const wallet = useWalletStore((s) => s.current)
   const { realm, tokenRecords, realmInfo } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const [startDate, setStartDate] = useState(dayjs().format('DD-MM-YYYY'))
   const [endDate, setEndDate] = useState('')
   const [useableGrantMints, setUseableGrantMints] = useState<string[]>([])
@@ -193,6 +193,7 @@ const Grant = ({
         propertyName: 'periods',
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [startDate, endDate, form.lockupKind.value])
   useEffect(() => {
     if (form.destinationAccount) {
@@ -208,16 +209,19 @@ const Grant = ({
     } else {
       setDestinationAccount(null)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.destinationAccount])
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: governedAccount, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
   useEffect(() => {
     setGovernedAccount(form.governedTokenAccount?.governance)
     setMintInfo(form.governedTokenAccount?.extensions.mint?.account)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.governedTokenAccount])
   const destinationAccountName =
     destinationAccount?.publicKey &&
@@ -252,6 +256,7 @@ const Grant = ({
     if (client) {
       getGrantMints()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [client])
   return (
     <>

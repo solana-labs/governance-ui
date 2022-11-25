@@ -19,7 +19,7 @@ import {
   redeemReserveCollateralInstruction,
   syncNative,
 } from '@solendprotocol/solend-sdk'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import {
   createProposal,
   InstructionDataWithHoldUpTime,
@@ -496,7 +496,7 @@ async function handleSolendAction(
     tokenOwnerRecord,
     form.title ||
       `${form.action} ${form.amountFmt} ${
-        tokenService.getTokenInfo(
+        tokenPriceService.getTokenInfo(
           matchedTreasury.extensions.mint!.publicKey.toBase58()
         )?.symbol || 'tokens'
       } ${form.action === 'Deposit' ? 'into' : 'from'} the Solend ${

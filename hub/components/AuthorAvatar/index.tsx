@@ -25,8 +25,8 @@ const POSSIBLE_COLORS = [
 
 const computedColors = new Map<string, string>();
 
-function pickDefaultBg(publicKey: PublicKey) {
-  const pk = publicKey.toBase58();
+export function pickDefaultBg(id: PublicKey | string) {
+  const pk = typeof id === 'string' ? id : id.toBase58();
 
   if (computedColors.has(pk)) {
     return computedColors.get(pk);
@@ -50,7 +50,19 @@ interface Props {
 }
 
 export function AuthorAvatar(props: Props) {
-  if (props.author?.twitterInfo?.avatarUrl) {
+  if (props.author?.civicInfo?.avatarUrl) {
+    return (
+      <img
+        className={cx(
+          'rounded-full',
+          'border',
+          'border-neutral-400',
+          props.className,
+        )}
+        src={props.author.civicInfo.avatarUrl}
+      />
+    );
+  } else if (props.author?.twitterInfo?.avatarUrl) {
     return (
       <img
         className={cx(

@@ -24,14 +24,26 @@ export const feedItemPostParts = `
   numComments
   author {
     publicKey
+    civicInfo {
+      avatarUrl
+      handle
+      isVerified
+    }
     twitterInfo {
       avatarUrl
       handle
     }
   }
-  clippedDocument(charLimit: 400) {
+  clippedDocument(charLimit: 400, attachmentLimit: 1) {
     document
     isClipped
+  }
+  realmPublicKey
+  realm {
+    iconUrl
+    name
+    symbol
+    urlId
   }
 `;
 
@@ -47,12 +59,17 @@ export const feedItemProposalParts = `
   numComments
   author {
     publicKey
+    civicInfo {
+      avatarUrl
+      handle
+      isVerified
+    }
     twitterInfo {
       avatarUrl
       handle
     }
   }
-  clippedDocument(charLimit: 400) {
+  clippedDocument(charLimit: 400, attachmentLimit: 1) {
     document
     isClipped
   }
@@ -72,6 +89,13 @@ export const feedItemProposalParts = `
       voteThresholdPercentage
       votingEnd
     }
+  }
+  realmPublicKey
+  realm {
+    iconUrl
+    name
+    symbol
+    urlId
   }
 `;
 
@@ -138,7 +162,17 @@ export const getAdditionalPage = gql`
 
 export const FeedItemAuthor = IT.type({
   publicKey: PublicKey,
+  civicInfo: IT.union([
+    IT.undefined,
+    IT.null,
+    IT.type({
+      avatarUrl: IT.union([IT.null, IT.string]),
+      handle: IT.string,
+      isVerified: IT.boolean,
+    }),
+  ]),
   twitterInfo: IT.union([
+    IT.undefined,
     IT.null,
     IT.type({
       avatarUrl: IT.union([IT.null, IT.string]),
@@ -156,6 +190,15 @@ export const FeedItemClippedDocument = IT.type({
 
 export type FeedItemClippedDocument = IT.TypeOf<typeof FeedItemClippedDocument>;
 
+export const RealmInfo = IT.type({
+  iconUrl: IT.union([IT.null, IT.string]),
+  name: IT.string,
+  symbol: IT.union([IT.null, IT.string]),
+  urlId: IT.string,
+});
+
+export type RealmInfo = IT.TypeOf<typeof RealmInfo>;
+
 export const FeedItemPost = IT.type({
   type: FeedItemTypePost,
   author: IT.union([IT.null, FeedItemAuthor]),
@@ -165,6 +208,8 @@ export const FeedItemPost = IT.type({
   id: IT.string,
   myVote: IT.union([IT.null, FeedItemVoteType]),
   numComments: IT.number,
+  realmPublicKey: PublicKey,
+  realm: RealmInfo,
   score: IT.number,
   title: IT.string,
   updated: IT.number,
@@ -181,6 +226,8 @@ export const FeedItemProposal = IT.type({
   id: IT.string,
   myVote: IT.union([IT.null, FeedItemVoteType]),
   numComments: IT.number,
+  realmPublicKey: PublicKey,
+  realm: RealmInfo,
   score: IT.number,
   title: IT.string,
   updated: IT.number,

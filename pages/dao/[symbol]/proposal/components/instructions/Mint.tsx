@@ -35,7 +35,7 @@ const Mint = ({
   const mintGovernancesWithMintInfo = assetAccounts.filter(
     (x) => x.type === AccountType.MINT
   )
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<MintForm>({
     destinationAccount: '',
@@ -99,6 +99,7 @@ const Mint = ({
       propertyName: 'programId',
       value: programId?.toString(),
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [realmInfo?.programId])
   useEffect(() => {
     if (form.destinationAccount) {
@@ -114,12 +115,14 @@ const Mint = ({
     } else {
       setDestinationAccount(null)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.destinationAccount])
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: governedAccount, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form, governedAccount])
   useEffect(() => {
     setGovernedAccount(form?.mintAccount?.governance)

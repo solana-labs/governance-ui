@@ -5,36 +5,59 @@ import {
   BlockNode as BlockNodeModel,
   BlockStyle,
   InlineNodeType,
+  AnchorNode as AnchorNodeModel,
+  InlineNode as InlineNodeModel,
+  PublicKeyNode as PublicKeyNodeModel,
 } from '@hub/types/RichTextDocument';
 
 import { AnchorNode } from './AnchorNode';
 import { InlineNode } from './InlineNode';
+import { PublicKeyNode } from './PublicKeyNode';
 
 function getTag(style: BlockStyle) {
   switch (style) {
     case BlockStyle.Blockquote:
-      return <blockquote className="text-current rounded bg-neutral-200 p-2" />;
+      return (
+        <blockquote className="text-current rounded bg-neutral-200 p-2 text-[1em]" />
+      );
     case BlockStyle.Codeblock:
-      return <pre className="text-current rounded bg-neutral-200 p-2" />;
+      return (
+        <pre className="text-current rounded bg-neutral-200 p-2 text-[1em]" />
+      );
     case BlockStyle.H1:
-      return <h1 className="text-current m-0" />;
+      return <h1 className="text-current m-0 text-[3em] leading-[1.5]" />;
     case BlockStyle.H2:
-      return <h2 className="text-current m-0" />;
+      return <h2 className="text-current m-0 text-[2.25em] leading-[1.5]" />;
     case BlockStyle.H3:
-      return <h3 className="text-current m-0" />;
+      return <h3 className="text-current m-0 text-[1.875em] leading-[1.5]" />;
     case BlockStyle.H4:
-      return <h4 className="text-current m-0" />;
+      return <h4 className="text-current m-0 text-[1.5em] leading-[1.5]" />;
     case BlockStyle.H5:
-      return <h5 className="text-current m-0" />;
+      return <h5 className="text-current m-0 text-[1.25em] leading-[1.5]" />;
     case BlockStyle.H6:
-      return <h6 className="text-current m-0" />;
+      return <h6 className="text-current m-0 text-[1.125em] leading-[1.5]" />;
     case BlockStyle.OL:
       return <ol className="text-current m-0" />;
     case BlockStyle.P:
-      return <p className="text-current m-0" />;
+      return <p className="text-current m-0 text-[1em] leading-[inherit]" />;
     case BlockStyle.UL:
       return <ul className="text-current m-0" />;
   }
+}
+
+function doesNotEndWithEllipsis(
+  node: string | AnchorNodeModel | InlineNodeModel | PublicKeyNodeModel,
+): boolean {
+  if (typeof node === 'string') {
+    return !node.endsWith('…');
+  }
+
+  if (!node.c.length) {
+    return true;
+  }
+
+  const last = node.c[node.c.length - 1];
+  return doesNotEndWithEllipsis(last);
 }
 
 interface Props {
@@ -54,10 +77,19 @@ export function BlockNode(props: Props) {
         return <AnchorNode anchor={child} key={i} />;
       case InlineNodeType.Inline:
         return <InlineNode node={child} key={i} />;
+      case InlineNodeType.PublicKey:
+        return <PublicKeyNode node={child} key={i} />;
     }
   });
 
-  if (props.isClipped && props.isLast) {
+  const lastChild = props.block.c[props.block.c.length - 1];
+
+  if (
+    props.isClipped &&
+    props.isLast &&
+    lastChild &&
+    doesNotEndWithEllipsis(lastChild)
+  ) {
     children.push(<span key="ellipsis">&#8230;</span>);
   }
 
@@ -68,10 +100,12 @@ export function BlockNode(props: Props) {
         className={cx(
           'cursor-pointer',
           'inline-block',
+          'leading-[1.75em]',
           'ml-2',
-          'text-cyan-500',
+          'text-sky-500',
+          'text-[1em]',
           'transition-colors',
-          'hover:text-cyan-400',
+          'hover:text-sky-400',
         )}
         onClick={(e) => {
           e.stopPropagation();

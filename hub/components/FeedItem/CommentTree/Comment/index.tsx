@@ -6,10 +6,14 @@ import { useState } from 'react';
 import { FeedItemComment } from '../../gql';
 import * as ReplyBox from '../../ReplyBox';
 import { AuthorAvatar } from '@hub/components/AuthorAvatar';
+import { AuthorHovercard } from '@hub/components/AuthorHovercard';
 import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay';
 import { abbreviateAddress } from '@hub/lib/abbreviateAddress';
+import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
 import cx from '@hub/lib/cx';
+import { filterUniqueBy } from '@hub/lib/filterUniqueBy';
 import { useUserCreatedFeedItemCommentRepliesStore } from '@hub/stores/userCreatedFeedItemCommentReplies';
+import { BlockNodeType } from '@hub/types/RichTextDocument';
 
 import { Controls } from './Controls';
 
@@ -31,21 +35,40 @@ export function Content(props: Props) {
   );
 
   const authorName = props.comment.author
-    ? props.comment.author.twitterInfo?.handle ||
+    ? props.comment.author.civicInfo?.handle ||
+      props.comment.author.twitterInfo?.handle ||
       abbreviateAddress(props.comment.author.publicKey)
     : 'unknown author';
 
   const replies = (userReplies || []).concat(props.comment.replies || []);
   const originalRepliesCount = props.comment.replies?.length || 0;
+  const url = props.realm.equals(ECOSYSTEM_PAGE)
+    ? `/ecosystem/${props.feedItemId}/${props.comment.id}`
+    : `/realm/${props.realmUrlId}/${props.feedItemId}/${props.comment.id}`;
 
   return (
     <article className={cx(props.className, 'w-full')}>
       <div className={cx('grid', 'grid-cols-[32px,1fr]', 'gap-x-3')}>
         <div className="relative">
-          <AuthorAvatar
-            author={props.comment.author}
-            className="h-8 w-8 text-sm"
-          />
+          {props.comment.author ? (
+            <AuthorHovercard
+              civicAvatar={props.comment.author?.civicInfo?.avatarUrl}
+              civicHandle={props.comment.author?.civicInfo?.handle}
+              publicKey={props.comment.author?.publicKey}
+              twitterAvatar={props.comment.author?.twitterInfo?.avatarUrl}
+              twitterHandle={props.comment.author?.twitterInfo?.handle}
+            >
+              <AuthorAvatar
+                author={props.comment.author}
+                className="h-8 w-8 text-sm"
+              />
+            </AuthorHovercard>
+          ) : (
+            <AuthorAvatar
+              author={props.comment.author}
+              className="h-8 w-8 text-sm"
+            />
+          )}
           {(!!replies.length ||
             !!props.comment.repliesCount ||
             replyBoxOpen) && (
@@ -69,12 +92,22 @@ export function Content(props: Props) {
             (!!replies.length || replyBoxOpen) && 'pb-8',
           )}
         >
-          <header className="flex items-center">
-            <div className="text-xs text-neutral-900">{authorName}</div>
-            <Link
-              passHref
-              href={`/realm/${props.realmUrlId}/${props.feedItemId}/${props.comment.id}`}
-            >
+          <header className="flex items-baseline">
+            {props.comment.author ? (
+              <AuthorHovercard
+                asChild
+                civicAvatar={props.comment.author?.civicInfo?.avatarUrl}
+                civicHandle={props.comment.author?.civicInfo?.handle}
+                publicKey={props.comment.author?.publicKey}
+                twitterAvatar={props.comment.author?.twitterInfo?.avatarUrl}
+                twitterHandle={props.comment.author?.twitterInfo?.handle}
+              >
+                <div className="text-xs text-neutral-900">{authorName}</div>
+              </AuthorHovercard>
+            ) : (
+              <div className="text-xs text-neutral-900">{authorName}</div>
+            )}
+            <Link passHref href={url}>
               <a className="ml-4 text-xs text-neutral-500 hover:underline">
                 {formatDistanceToNowStrict(props.comment.created)} ago
               </a>
@@ -83,6 +116,7 @@ export function Content(props: Props) {
           <RichTextDocumentDisplay
             className="mt-2.5 text-sm"
             document={props.comment.document}
+            excludeBlocks={[BlockNodeType.TwitterEmbed, BlockNodeType.Image]}
           />
           <Controls
             className="mt-4"
@@ -137,7 +171,7 @@ export function Content(props: Props) {
           </div>
         </div>
       )}
-      {replies.map((comment, i) => {
+      {replies.filter(filterUniqueBy('id')).map((comment, i) => {
         const isLast = replies && i === replies.length - 1;
 
         return (
@@ -203,11 +237,8 @@ export function Content(props: Props) {
             </div>
           </div>
           <div>
-            <Link
-              passHref
-              href={`/realm/${props.realmUrlId}/${props.feedItemId}/${props.comment.id}`}
-            >
-              <a className="inline-block py-4 text-xs text-neutral-500 hover:text-cyan-500">
+            <Link passHref href={url}>
+              <a className="inline-block py-4 text-xs text-neutral-500 hover:text-sky-500">
                 View replies
               </a>
             </Link>

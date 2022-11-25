@@ -1,14 +1,14 @@
 import { Connection, PublicKey } from '@solana/web3.js'
 
 import {
-  sendTransactionsV2,
+  sendTransactionsV3,
   SequenceType,
-  transactionInstructionsToTypedInstructionsSets,
+  txBatchesToInstructionSetWithSigners,
   WalletSigner,
 } from 'utils/sendTransactions'
 import { chunks } from '@utils/helpers'
-
 import { prepareRealmCreation } from '@tools/governance/prepareRealmCreation'
+import { trySentryLog } from '@utils/logs'
 
 /// Creates multisig realm with community mint with 0 supply
 /// and council mint used as multisig token
@@ -49,9 +49,13 @@ export default async function createMultisigWallet({
     tokensToGovernThreshold: undefined,
 
     existingCommunityMintPk: undefined,
-    communityMintSupplyFactor: undefined,
     transferCommunityMintAuthority: true,
     communityYesVotePercentage: councilYesVotePercentage,
+
+    // (useSupplyFactor = true && communityMintSupplyFactor = undefined) => FULL_SUPPLY_FRACTION
+    useSupplyFactor: true,
+    communityMintSupplyFactor: undefined,
+    communityAbsoluteMaxVoteWeight: undefined,
 
     createCouncil: true,
     existingCouncilMintPk: undefined,
@@ -65,26 +69,42 @@ export default async function createMultisigWallet({
     const councilMembersSignersChunks = Array(councilMembersChunks.length).fill(
       []
     )
+    const signers = [
+      mintsSetupSigners,
+      ...councilMembersSignersChunks,
+      realmSigners,
+    ]
+    const txes = [
+      mintsSetupInstructions,
+      ...councilMembersChunks,
+      realmInstructions,
+    ].map((txBatch, batchIdx) => {
+      return {
+        instructionsSet: txBatchesToInstructionSetWithSigners(
+          txBatch,
+          signers,
+          batchIdx
+        ),
+        sequenceType: SequenceType.Sequential,
+      }
+    })
+
     console.log('CREATE MULTISIG WALLET: sending transactions')
-    const tx = await sendTransactionsV2({
+    const tx = await sendTransactionsV3({
       connection,
-      showUiComponent: true,
       wallet,
-      signersSet: [
-        mintsSetupSigners,
-        ...councilMembersSignersChunks,
-        realmSigners,
-      ],
-      TransactionInstructions: [
-        mintsSetupInstructions,
-        ...councilMembersChunks,
-        realmInstructions,
-      ].map((x) =>
-        transactionInstructionsToTypedInstructionsSets(
-          x,
-          SequenceType.Sequential
-        )
-      ),
+      transactionInstructions: txes,
+    })
+
+    const logInfo = {
+      realmId: realmPk,
+      realmSymbol: realmName,
+      wallet: wallet.publicKey?.toBase58(),
+      cluster: connection.rpcEndpoint.includes('devnet') ? 'devnet' : 'mainnet',
+    }
+    trySentryLog({
+      tag: 'realmCreated',
+      objToStringify: logInfo,
     })
 
     return {

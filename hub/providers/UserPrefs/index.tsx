@@ -1,5 +1,6 @@
 import { createContext, useEffect, useState } from 'react';
 
+import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
 import { FeedItemSort } from '@hub/types/FeedItemSort';
 
 const LOCAL_STORAGE_KEY = 'userPrefs';
@@ -74,7 +75,12 @@ export function UserPrefsProvider(props: Props) {
       value={{
         prefs,
         getFeedSort: (key) => {
-          return prefs.defaultFeedSort[key] || FeedItemSort.Relevance;
+          return (
+            prefs.defaultFeedSort[key] ||
+            (key === ECOSYSTEM_PAGE.toBase58()
+              ? FeedItemSort.TopAllTime
+              : FeedItemSort.Relevance)
+          );
         },
         setFeedSort: (key, sort) => {
           setPrefs((cur) => ({

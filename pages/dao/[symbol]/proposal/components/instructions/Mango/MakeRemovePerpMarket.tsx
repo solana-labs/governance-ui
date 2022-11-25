@@ -42,7 +42,7 @@ const MakeRemovePerpMarket = ({
     (x) => x.type === AccountType.PROGRAM
   )
   const connection = useWalletStore((s) => s.connection)
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<MangoRemovePerpMarketForm>({
     governedAccount: null,
@@ -132,6 +132,7 @@ const MakeRemovePerpMarket = ({
         value: form.governedAccount?.governance.pubkey.toBase58(),
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(form)])
   const schema = yup.object().shape({
     mangoGroup: yup.object().nullable().required('Mango group is required'),

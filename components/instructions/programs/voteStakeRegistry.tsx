@@ -7,7 +7,7 @@ import {
 import { AccountMetaData } from '@solana/spl-governance'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import { fmtMintAmount } from '@tools/sdk/units'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import { tryGetMint } from '@utils/tokens'
 import { tryGetRegistrar, tryGetVoter } from 'VoteStakeRegistry/sdk/api'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
@@ -45,7 +45,6 @@ const common_instructions = (programId: PublicKey) => ({
       { name: 'Registrar' },
       { name: 'Realm authority' },
       { name: 'Voter' },
-      { name: 'Token owner record' },
       { name: 'Vault' },
       { name: 'Destination' },
     ],
@@ -209,7 +208,8 @@ const common_instructions = (programId: PublicKey) => ({
           ? Object.keys(decodedInstructionData?.kind)[0]
           : null
         const periods = decodedInstructionData?.periods
-        const logoUrl = tokenService.getTokenInfo(mintPk.toBase58())?.logoURI
+        const logoUrl = tokenPriceService.getTokenInfo(mintPk.toBase58())
+          ?.logoURI
         return (
           <>
             {decodedInstructionData ? (

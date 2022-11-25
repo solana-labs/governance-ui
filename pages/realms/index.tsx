@@ -52,7 +52,8 @@ const Realms = () => {
     if (selectedRealm.realm) {
       actions.deselectRealm()
     }
-  }, [connection])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+  }, [connection.cluster, connection.endpoint, connection.current.commitment])
 
   const handleCreateRealmButtonClick = async () => {
     if (!connected) {

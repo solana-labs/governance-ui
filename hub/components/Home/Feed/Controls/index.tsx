@@ -11,6 +11,7 @@ import * as Dialog from '@hub/components/controls/Dialog';
 import { Select } from '@hub/components/controls/Select';
 import { NewPostEditor } from '@hub/components/NewPostEditor';
 import { useJWT } from '@hub/hooks/useJWT';
+import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
 import cx from '@hub/lib/cx';
 import { FeedItemSort } from '@hub/types/FeedItemSort';
 
@@ -38,6 +39,7 @@ export function Content(props: Props) {
     >
       <Toolbar.Button asChild>
         <Select
+          dropdownClassName="drop-shadow-xl"
           choices={[
             {
               key: FeedItemSort.Relevance,
@@ -49,6 +51,11 @@ export function Content(props: Props) {
               label: 'Latest',
               value: FeedItemSort.New,
             },
+            {
+              key: FeedItemSort.TopAllTime,
+              label: 'Top',
+              value: FeedItemSort.TopAllTime,
+            },
           ]}
           selected={props.sort}
           onChange={(choice) => props.onChangeSort?.(choice.value)}
@@ -58,9 +65,9 @@ export function Content(props: Props) {
         <Dialog.Root open={dialogOpen} onOpenChange={setDialogOpen}>
           <Toolbar.Button asChild>
             <Dialog.Trigger asChild>
-              <Button.Primary className="w-32" disabled={!jwt}>
-                <LicenseDraftIcon className="h-4 w-4 mr-1.5" />
-                <div>Post</div>
+              <Button.Primary className="w-10 sm:w-32" disabled={!jwt}>
+                <LicenseDraftIcon className="h-4 w-4 sm:mr-1.5" />
+                <div className="hidden sm:block">Post</div>
               </Button.Primary>
             </Dialog.Trigger>
           </Toolbar.Button>
@@ -69,12 +76,19 @@ export function Content(props: Props) {
               <Dialog.Content>
                 <Dialog.Close className="top-8 right-16" />
                 <NewPostEditor
-                  className="w-[840px] min-h-[675px] max-h-[calc(100vh-80px)] py-8 px-16 h-full"
+                  className="w-[840px] min-h-[675px] max-h-[calc(100vh-80px)] py-6 px-16 h-full"
                   realm={props.realm}
                   realmIconUrl={props.realmIconUrl}
                   realmName={props.realmName}
-                  onPostCreated={(post) => {
-                    router.push(`/realm/${props.realmUrlId}/${post.id}`);
+                  onPostCreated={(post, realm) => {
+                    if (realm.equals(ECOSYSTEM_PAGE)) {
+                      router.push(`/ecosystem/${post.id}`);
+                    } else if (realm.equals(props.realm)) {
+                      router.push(`/realm/${props.realmUrlId}/${post.id}`);
+                    } else {
+                      const urlId = post.realm.urlId;
+                      router.push(`/realm/${urlId}/${post.id}`);
+                    }
                   }}
                 />
               </Dialog.Content>
@@ -85,9 +99,9 @@ export function Content(props: Props) {
         <HoverCard.Root>
           <Toolbar.Button asChild>
             <HoverCard.Trigger asChild>
-              <Button.Primary className="w-32" disabled>
-                <LicenseDraftIcon className="h-4 w-4 mr-1.5" />
-                <div>Post</div>
+              <Button.Primary className="w-10 sm:w-32" disabled>
+                <LicenseDraftIcon className="h-4 w-4 sm:mr-1.5" />
+                <div className="hidden sm:block">Post</div>
               </Button.Primary>
             </HoverCard.Trigger>
           </Toolbar.Button>
@@ -104,40 +118,43 @@ export function Content(props: Props) {
           </HoverCard.Portal>
         </HoverCard.Root>
       )}
-      {jwt ? (
-        <Toolbar.Button asChild>
-          <Button.Secondary
-            className="w-32"
-            disabled={!jwt}
-            onClick={() => router.push(`/dao/${props.realmUrlId}/proposal/new`)}
-          >
-            <DocumentAddIcon className="h-4 w-4 mr-1.5" />
-            <div>Proposal</div>
-          </Button.Secondary>
-        </Toolbar.Button>
-      ) : (
-        <HoverCard.Root>
+      {!props.realm.equals(ECOSYSTEM_PAGE) &&
+        (jwt ? (
           <Toolbar.Button asChild>
-            <HoverCard.Trigger asChild>
-              <Button.Secondary className="w-32" disabled>
-                <DocumentAddIcon className="h-4 w-4 mr-1.5" />
-                <div>Proposal</div>
-              </Button.Secondary>
-            </HoverCard.Trigger>
-          </Toolbar.Button>
-          <HoverCard.Portal>
-            <HoverCard.Content
-              className="p-3 bg-white rounded shadow-xl w-72 text-center"
-              side="top"
+            <Button.Secondary
+              className="w-10 sm:w-32"
+              disabled={!jwt}
+              onClick={() =>
+                router.push(`/dao/${props.realmUrlId}/proposal/new`)
+              }
             >
-              <HoverCard.Arrow className="fill-white" />
-              <div className="text-neutral-700 text-xs">
-                You must be logged in to create a proposal
-              </div>
-            </HoverCard.Content>
-          </HoverCard.Portal>
-        </HoverCard.Root>
-      )}
+              <DocumentAddIcon className="h-4 w-4 sm:mr-1.5" />
+              <div className="hidden sm:block">Proposal</div>
+            </Button.Secondary>
+          </Toolbar.Button>
+        ) : (
+          <HoverCard.Root>
+            <Toolbar.Button asChild>
+              <HoverCard.Trigger asChild>
+                <Button.Secondary className="w-10 sm:w-32" disabled>
+                  <DocumentAddIcon className="h-4 w-4 sm:mr-1.5" />
+                  <div className="hidden sm:block">Proposal</div>
+                </Button.Secondary>
+              </HoverCard.Trigger>
+            </Toolbar.Button>
+            <HoverCard.Portal>
+              <HoverCard.Content
+                className="p-3 bg-white rounded shadow-xl w-72 text-center"
+                side="top"
+              >
+                <HoverCard.Arrow className="fill-white" />
+                <div className="text-neutral-700 text-xs">
+                  You must be logged in to create a proposal
+                </div>
+              </HoverCard.Content>
+            </HoverCard.Portal>
+          </HoverCard.Root>
+        ))}
     </Toolbar.Root>
   );
 }

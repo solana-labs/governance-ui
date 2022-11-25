@@ -14,7 +14,14 @@ interface Props extends BaseProps {
 
 export function Content(props: Props) {
   return (
-    <Link passHref href={`/realm/${props.realmUrlId}/${props.feedItemId}`}>
+    <Link
+      passHref
+      href={
+        props.realmUrlId === 'ecosystem'
+          ? `/ecosystem/${props.feedItemId}`
+          : `/realm/${props.realmUrlId}/${props.feedItemId}`
+      }
+    >
       <a
         className={cx(
           props.className,
@@ -24,8 +31,8 @@ export function Content(props: Props) {
           'space-x-2',
         )}
       >
-        <ArrowLeftIcon className="h-4 w-4 fill-zinc-800 transition-colors group-hover:fill-cyan-500" />
-        <div className="text-neutral-700 text-xs transition-colors group-hover:text-cyan-500">
+        <ArrowLeftIcon className="h-4 w-4 fill-neutral-700 transition-colors group-hover:fill-sky-500" />
+        <div className="text-neutral-700 text-xs transition-colors group-hover:text-sky-500">
           View all comments
         </div>
       </a>

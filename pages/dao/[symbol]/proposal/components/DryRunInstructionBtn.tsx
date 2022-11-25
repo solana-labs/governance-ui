@@ -26,10 +26,10 @@ const DryRunInstructionBtn = ({
   } | null>(null)
   const [isOpen, setIsOpen] = useState(false)
 
-  const onInspect = () => {
+  const onInspect = async () => {
     if (result) {
-      const inspectUrl = getExplorerInspectorUrl(
-        connection.endpoint,
+      const inspectUrl = await getExplorerInspectorUrl(
+        connection,
         result.transaction
       )
       window.open(inspectUrl, '_blank')

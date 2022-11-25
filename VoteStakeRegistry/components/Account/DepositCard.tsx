@@ -10,7 +10,7 @@ import {
   LockupType,
 } from 'VoteStakeRegistry/sdk/accounts'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import LockTokensModal from './LockTokensModal'
 import { useState } from 'react'
 import {
@@ -34,14 +34,16 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const connection = useWalletStore((s) => s.connection.current)
   const endpoint = useWalletStore((s) => s.connection.endpoint)
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false)
-  const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
-    (s) => s.actions
-  )
+  const {
+    fetchRealm,
+    fetchWalletTokenAccounts,
+    fetchOwnVoteRecords,
+  } = useWalletStore((s) => s.actions)
   const handleWithDrawFromDeposit = async (
     depositEntry: DepositWithMintAccount
   ) => {
     if (
-      ownTokenRecord!.account!.unrelinquishedVotesCount &&
+      ownTokenRecord?.account?.unrelinquishedVotesCount &&
       realm!.account.communityMint.toBase58() ===
         deposit.mint.publicKey.toBase58()
     ) {
@@ -66,10 +68,12 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       amount: depositEntry.available,
       communityMintPk: realm!.account.communityMint,
       closeDepositAfterOperation: depositEntry.currentlyLocked.isZero(),
-      tokenOwnerRecordPubKey: tokenRecords[wallet!.publicKey!.toBase58()]
-        .pubkey!,
+      tokenOwnerRecordPubKey:
+        tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey,
       depositIndex: depositEntry.index,
       client: client,
+      splProgramId: realm!.owner!,
+      splProgramVersion: getProgramVersionForRealm(realmInfo!),
     })
     await getOwnedDeposits({
       realmPk: realm!.pubkey,
@@ -79,6 +83,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       connection,
     })
     await fetchWalletTokenAccounts()
+    await fetchOwnVoteRecords()
     await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
   }
   const handleStartUnlock = () => {
@@ -127,7 +132,9 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       </div>
     )
   }
-  const tokenInfo = tokenService.getTokenInfo(deposit.mint.publicKey.toBase58())
+  const tokenInfo = tokenPriceService.getTokenInfo(
+    deposit.mint.publicKey.toBase58()
+  )
   return (
     <div className="border border-fgd-4 rounded-lg flex flex-col">
       <div className="bg-bkg-3 px-4 py-4 pr-16 rounded-md rounded-b-none flex items-center">
@@ -189,9 +196,11 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
           {isRealmCommunityMint && (
             <CardLabel
               label="Vote Multiplier"
-              value={(
-                deposit.votingPower.toNumber() /
-                deposit.votingPowerBaseline.toNumber()
+              value={(deposit.votingPower.isZero() ||
+              deposit.votingPowerBaseline.isZero()
+                ? 0
+                : deposit.votingPower.toNumber() /
+                  deposit.votingPowerBaseline.toNumber()
               ).toFixed(2)}
             />
           )}

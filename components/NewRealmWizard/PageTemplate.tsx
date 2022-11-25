@@ -57,12 +57,14 @@ export default function FormPage({
     }
 
     tryToConnect()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [connected])
 
   useEffect(() => {
     if (currentStep > 0 && !isWizardValid({ currentStep, steps, formData })) {
       handlePreviousButton(currentStep)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [currentStep])
 
   function handleNextButtonClick({ step: fromStep, data }) {

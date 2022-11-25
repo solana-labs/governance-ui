@@ -39,7 +39,7 @@ const MakeRemoveOracle = ({
   const governedProgramAccounts = assetAccounts.filter(
     (x) => x.type === AccountType.PROGRAM
   )
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<MangoRemoveOracleForm>({
     governedAccount: null,
@@ -93,6 +93,7 @@ const MakeRemoveOracle = ({
       propertyName: 'programId',
       value: programId?.toString(),
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [realmInfo?.programId])
   const previousProgramGov = usePrevious(
     form.governedAccount?.governance.pubkey.toBase58()
@@ -111,6 +112,7 @@ const MakeRemoveOracle = ({
         value: form.governedAccount?.governance.pubkey.toBase58(),
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
   const schema = yup.object().shape({
     mangoGroup: yup.object().nullable().required('Mango group is required'),

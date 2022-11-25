@@ -17,8 +17,8 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { SYSVAR_RENT_PUBKEY } from '@solana/web3.js'
 import { getRegistrarPDA } from 'VoteStakeRegistry/sdk/accounts'
 import { DEFAULT_VSR_ID, VsrClient } from 'VoteStakeRegistry/sdk/client'
-import useWallet from '@hooks/useWallet'
-import { web3 } from '@project-serum/anchor'
+import { AnchorProvider, Wallet, web3 } from '@project-serum/anchor'
+import useWalletStore from 'stores/useWalletStore'
 
 interface CreateVsrRegistrarForm {
   governedAccount: AssetAccount | undefined
@@ -34,11 +34,11 @@ const CreateVsrRegistrar = ({
 }) => {
   const { realm, realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<CreateVsrRegistrarForm>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
-  const { anchorProvider, wallet } = useWallet()
+  const { current: wallet, connection } = useWalletStore()
 
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
@@ -48,8 +48,14 @@ const CreateVsrRegistrar = ({
       form!.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
+      const options = AnchorProvider.defaultOptions()
+      const provider = new AnchorProvider(
+        connection.current,
+        (wallet as unknown) as Wallet,
+        options
+      )
       const vsrClient = VsrClient.connect(
-        anchorProvider,
+        provider,
         form?.programId ? new web3.PublicKey(form.programId) : undefined
       )
       const { registrar, registrarBump } = await getRegistrarPDA(
@@ -85,6 +91,7 @@ const CreateVsrRegistrar = ({
       { governedAccount: form?.governedAccount?.governance, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
   const schema = yup.object().shape({
     governedAccount: yup

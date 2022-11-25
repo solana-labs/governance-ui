@@ -29,7 +29,7 @@ export interface InstructionInput {
   max?: number
   step?: number
   onBlur?: () => void
-  shouldBeGoverned?: false | ProgramAccount<Governance> | null
+  shouldBeGoverned?: boolean
   governance?: ProgramAccount<Governance> | null
   options?: any[]
   hide?: boolean | (() => boolean)
@@ -61,12 +61,15 @@ const InstructionForm = ({
   )
   useEffect(() => {
     setForm(form)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(form)])
   useEffect(() => {
     setInnerForm({
       ...inputs.reduce((a, v) => ({ ...a, [v.name]: v.initialValue }), {}),
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     previousInitialValue !== JSON.stringify(inputs.map((x) => x.initialValue)),
   ])
   return (
@@ -108,7 +111,7 @@ const InstructionInput = ({
       case InstructionInputType.GOVERNED_ACCOUNT:
         return (
           <GovernedAccountSelect
-            autoselectFirst={false}
+            autoSelectFirst={false}
             label={input.label}
             governedAccounts={input.options!}
             onChange={(value) => {

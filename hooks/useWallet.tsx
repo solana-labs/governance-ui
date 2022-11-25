@@ -50,6 +50,7 @@ export default function useWallet() {
         s.providerUrl = savedProviderUrl
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [selectedProviderUrl, savedProviderUrl])
 
   const provider = useMemo(() => getWalletProviderByUrl(selectedProviderUrl), [
@@ -61,6 +62,7 @@ export default function useWallet() {
     if (selectedProviderUrl && selectedProviderUrl != savedProviderUrl) {
       setSavedProviderUrl(selectedProviderUrl)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [selectedProviderUrl])
 
   useEffect(() => {
@@ -85,6 +87,7 @@ export default function useWallet() {
         updateWallet()
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [provider, connection])
 
   useEffect(() => {
@@ -121,6 +124,7 @@ export default function useWallet() {
         state.connected = false
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [wallet])
 
   // fetch on page load
@@ -152,6 +156,7 @@ export default function useWallet() {
       (wallet as unknown) as Wallet,
       options
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [wallet])
 
   return { connected, wallet, anchorProvider }

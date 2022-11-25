@@ -35,7 +35,7 @@ const StakeValidator = ({
   const connection = useWalletStore((s) => s.connection)
   const programId: PublicKey = StakeProgram.programId
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const wallet = useWalletStore((s) => s.current)
 
   const [form, setForm] = useState<ValidatorStakingForm>({
@@ -211,6 +211,7 @@ const StakeValidator = ({
       },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
 
   useEffect(() => {
@@ -218,6 +219,7 @@ const StakeValidator = ({
       { governedAccount: governedAccount, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
   useEffect(() => {
     setGovernedAccount(form.governedTokenAccount?.governance)

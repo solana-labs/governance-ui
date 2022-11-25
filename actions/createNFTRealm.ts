@@ -6,7 +6,6 @@ import {
   withCreateTokenOwnerRecord,
   withSetRealmAuthority,
 } from '@solana/spl-governance'
-
 import {
   Connection,
   Keypair,
@@ -14,24 +13,22 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js'
 import { AnchorProvider, Wallet } from '@project-serum/anchor'
-
 import {
-  sendTransactionsV2,
   SequenceType,
   WalletSigner,
-  transactionInstructionsToTypedInstructionsSets,
+  sendTransactionsV3,
+  txBatchesToInstructionSetWithSigners,
 } from 'utils/sendTransactions'
 import { chunks } from '@utils/helpers'
 import { nftPluginsPks } from '@hooks/useVotingPlugins'
-
 import {
   getVoterWeightRecord,
   getMaxVoterWeightRecord,
   getRegistrarPDA,
 } from '@utils/plugin/accounts'
 import { NftVoterClient } from '@solana/governance-program-library'
-
 import { prepareRealmCreation } from '@tools/governance/prepareRealmCreation'
+import { trySentryLog } from '@utils/logs'
 interface NFTRealm {
   connection: Connection
   wallet: WalletSigner
@@ -100,9 +97,13 @@ export default async function createNFTRealm({
 
     existingCommunityMintPk,
     nftCollectionCount: collectionCount,
-    communityMintSupplyFactor: undefined,
     transferCommunityMintAuthority: false, // delay this until we have created NFT instructions
     communityYesVotePercentage,
+
+    // (useSupplyFactor = true && communityMintSupplyFactor = undefined) => FULL_SUPPLY_FRACTION
+    useSupplyFactor: true,
+    communityMintSupplyFactor: undefined,
+    communityAbsoluteMaxVoteWeight: undefined,
 
     createCouncil,
     existingCouncilMintPk,
@@ -240,27 +241,43 @@ export default async function createNFTRealm({
     )
     const nftSigners: Keypair[] = []
     console.log('CREATE NFT REALM: sending transactions')
-    const tx = await sendTransactionsV2({
+    const signers = [
+      mintsSetupSigners,
+      ...councilMembersSignersChunks,
+      realmSigners,
+      nftSigners,
+    ]
+    const txes = [
+      mintsSetupInstructions,
+      ...councilMembersChunks,
+      realmInstructions,
+      nftConfigurationInstructions,
+    ].map((txBatch, batchIdx) => {
+      return {
+        instructionsSet: txBatchesToInstructionSetWithSigners(
+          txBatch,
+          signers,
+          batchIdx
+        ),
+        sequenceType: SequenceType.Sequential,
+      }
+    })
+
+    const tx = await sendTransactionsV3({
       connection,
-      showUiComponent: true,
       wallet,
-      signersSet: [
-        mintsSetupSigners,
-        ...councilMembersSignersChunks,
-        realmSigners,
-        nftSigners,
-      ],
-      TransactionInstructions: [
-        mintsSetupInstructions,
-        ...councilMembersChunks,
-        realmInstructions,
-        nftConfigurationInstructions,
-      ].map((x) =>
-        transactionInstructionsToTypedInstructionsSets(
-          x,
-          SequenceType.Sequential
-        )
-      ),
+      transactionInstructions: txes,
+    })
+
+    const logInfo = {
+      realmId: realmPk,
+      realmSymbol: realmName,
+      wallet: wallet.publicKey?.toBase58(),
+      cluster: connection.rpcEndpoint.includes('devnet') ? 'devnet' : 'mainnet',
+    }
+    trySentryLog({
+      tag: 'realmCreated',
+      objToStringify: logInfo,
     })
 
     return {

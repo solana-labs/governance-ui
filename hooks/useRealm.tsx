@@ -77,6 +77,7 @@ export default function useRealm() {
       }
     }
     getPythVoterWeight()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [wallet?.publicKey])
 
   const delegates = useMembersStore((s) => s.compact.delegates)
@@ -92,7 +93,11 @@ export default function useRealm() {
       ? realm
         ? // Realm program data needs to contain config options to enable/disable things such as notifications
           // Currently defaulting to false here for now
-          createUnchartedRealmInfo(realm)
+          createUnchartedRealmInfo({
+            programId: realm.owner.toBase58(),
+            address: realm.pubkey.toBase58(),
+            name: realm.account.name,
+          })
         : undefined
       : getCertifiedRealmInfo(symbol as string, connection)
 
@@ -103,6 +108,7 @@ export default function useRealm() {
     if (programVersion) {
       setRealmInfo(realmInfo)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [symbol, realm, programVersion])
 
   const realmTokenAccount = useMemo(
@@ -126,6 +132,7 @@ export default function useRealm() {
       return tokenRecords[wallet.publicKey.toBase58()]
     }
     return undefined
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [tokenRecords, wallet, connected, selectedCommunityDelegate])
 
   // returns array of community tokenOwnerRecords that connected wallet has been delegated
@@ -145,6 +152,7 @@ export default function useRealm() {
     }
 
     return undefined
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [tokenRecords, wallet, connected])
 
   const councilTokenAccount = useMemo(
@@ -156,6 +164,7 @@ export default function useRealm() {
           realm.account.config.councilMint &&
           a.account.mint.equals(realm.account.config.councilMint)
       ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     [realm, tokenAccounts]
   )
 
@@ -171,6 +180,7 @@ export default function useRealm() {
       return councilTokenOwnerRecords[wallet.publicKey.toBase58()]
     }
     return undefined
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [tokenRecords, wallet, connected, selectedCouncilDelegate])
 
   // returns array of council tokenOwnerRecords that connected wallet has been delegated
@@ -189,6 +199,7 @@ export default function useRealm() {
       }
     }
     return undefined
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [tokenRecords, wallet, connected])
 
   const canChooseWhoVote =

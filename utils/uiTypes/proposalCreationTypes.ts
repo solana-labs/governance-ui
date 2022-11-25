@@ -9,6 +9,28 @@ import { DepositWithMintAccount, Voter } from 'VoteStakeRegistry/sdk/accounts'
 import { LockupKind } from 'VoteStakeRegistry/tools/types'
 import { consts as foresightConsts } from '@foresight-tmp/foresight-sdk'
 import { AssetAccount, StakeAccount } from '@utils/uiTypes/assets'
+import { RealmInfo } from '@models/registry/api'
+import * as Msp from '@mean-dao/msp'
+
+// Alphabetical order
+export enum PackageEnum {
+  Castle = 1,
+  Common,
+  Everlend,
+  Foresight,
+  Friktion,
+  GatewayPlugin,
+  GoblinGold,
+  NftPlugin,
+  MangoMarketV3,
+  MangoMarketV4,
+  MeanFinance,
+  Serum,
+  Solend,
+  Streamflow,
+  Switchboard,
+  VsrPlugin,
+}
 
 export interface UiInstruction {
   serializedInstruction: string
@@ -52,6 +74,47 @@ export interface CastleWithdrawForm {
   castleVaultId: string
   programId: string | undefined
   mintInfo: MintInfo | undefined
+}
+
+export interface MeanCreateAccount {
+  governedTokenAccount: AssetAccount | undefined
+  label: string | undefined
+  mintInfo: MintInfo | undefined
+  amount: number | undefined
+  type: Msp.TreasuryType
+}
+
+export interface MeanFundAccount {
+  governedTokenAccount: AssetAccount | undefined
+  mintInfo: MintInfo | undefined
+  amount: number | undefined
+  treasury: Msp.Treasury | undefined
+}
+
+export interface MeanWithdrawFromAccount {
+  governedTokenAccount: AssetAccount | undefined
+  mintInfo: MintInfo | undefined
+  amount: number | undefined
+  treasury: Msp.Treasury | undefined
+  destination: string | undefined
+}
+
+export interface MeanCreateStream {
+  governedTokenAccount: AssetAccount | undefined
+  treasury: Msp.Treasury | undefined
+  streamName: string | undefined
+  destination: string | undefined
+  mintInfo: MintInfo | undefined
+  allocationAssigned: number | undefined
+  rateAmount: number | undefined
+  rateInterval: 0 | 1 | 2 | 3 | 4 | 5
+  startDate: string
+}
+
+export interface MeanTransferStream {
+  governedTokenAccount: AssetAccount | undefined
+  stream: Msp.Stream | undefined
+  destination: string | undefined
 }
 
 export interface FriktionDepositForm {
@@ -152,6 +215,13 @@ export interface CreateStreamForm {
   releaseAmount: number
   amountAtCliff: number
   cancelable: boolean
+  period: number
+}
+
+export interface CancelStreamForm {
+  recipient: string
+  strmMetadata: string
+  tokenAccount?: AssetAccount
 }
 
 export const programUpgradeFormNameOf = getNameOf<ProgramUpgradeForm>()
@@ -420,81 +490,127 @@ export interface UpdateTokenMetadataForm {
   programId: string | undefined
 }
 
+export interface SerumInitUserForm {
+  governedAccount?: AssetAccount
+  owner: string
+  programId: string
+}
+
+export interface SerumGrantLockedForm {
+  governedAccount?: AssetAccount
+  owner: string
+  mintInfo: MintInfo | undefined
+  amount: number | undefined
+  programId: string
+}
+
+export interface SerumUpdateConfigParam {
+  governedAccount?: AssetAccount // Config Authority
+  claimDelay?: number
+  redeemDelay?: number
+  cliffPeriod?: number
+  linearVestingPeriod?: number
+}
+
+export interface SerumUpdateConfigAuthority {
+  governedAccount?: AssetAccount // Config Authority
+  newAuthority?: string
+}
+
+export interface JoinDAOForm {
+  governedAccount?: AssetAccount
+  mintInfo: MintInfo | undefined
+  realm: RealmInfo | null
+  amount?: number
+}
+
 export enum Instructions {
-  Transfer,
-  ProgramUpgrade,
-  Mint,
   Base64,
-  None,
+  ChangeMakeDonation,
+  ClaimMangoTokens,
+  ClaimPendingDeposit,
+  ClaimPendingWithdraw,
+  Clawback,
+  CloseTokenAccount,
+  ConfigureGatewayPlugin,
+  ConfigureNftPluginCollection,
+  CreateAssociatedTokenAccount,
+  CreateGatewayPluginRegistrar,
+  CreateNftPluginMaxVoterWeight,
+  CreateNftPluginRegistrar,
+  CreateSolendObligationAccount,
+  CreateTokenMetadata,
+  CreateVsrRegistrar,
+  DeactivateValidatorStake,
+  DepositIntoCastle,
+  DepositIntoGoblinGold,
+  DepositIntoVolt,
+  DepositReserveLiquidityAndObligationCollateral,
+  DepositToMangoAccount,
+  DepositToMangoAccountCsv,
+  DifferValidatorStake,
+  EverlendDeposit,
+  EverlendWithdraw,
+  ForesightAddMarketListToCategory,
+  ForesightInitCategory,
+  ForesightInitMarket,
+  ForesightInitMarketList,
+  ForesightResolveMarket,
+  ForesightSetMarketMetadata,
+  Grant,
+  InitSolendObligationAccount,
+  JoinDAO,
   MangoAddOracle,
   MangoAddSpotMarket,
   MangoChangeMaxAccounts,
   MangoChangePerpMarket,
+  MangoChangeQuoteParams,
   MangoChangeReferralFeeParams,
   MangoChangeReferralFeeParams2,
   MangoChangeSpotMarket,
   MangoCreatePerpMarket,
-  MangoSetMarketMode,
-  MangoChangeQuoteParams,
-  MangoRemoveSpotMarket,
-  MangoRemovePerpMarket,
-  MangoSwapSpotMarket,
   MangoRemoveOracle,
-  MangoV4TokenRegister,
-  MangoV4TokenEdit,
+  MangoRemovePerpMarket,
+  MangoRemoveSpotMarket,
+  MangoSetMarketMode,
+  MangoSwapSpotMarket,
+  MangoV4PerpCreate,
   MangoV4PerpEdit,
   MangoV4Serum3RegisterMarket,
-  MangoV4PerpCreate,
+  MangoV4TokenEdit,
+  MangoV4TokenRegister,
   MangoV4TokenRegisterTrustless,
-  CreateStream,
-  CancelStream,
-  Grant,
-  Clawback,
-  CreateAssociatedTokenAccount,
-  DepositIntoVolt,
-  WithdrawFromVolt,
-  ClaimPendingDeposit,
-  ClaimPendingWithdraw,
-  DepositIntoCastle,
-  WithrawFromCastle,
-  DepositIntoGoblinGold,
-  WithdrawFromGoblinGold,
-  CreateSolendObligationAccount,
-  InitSolendObligationAccount,
-  DepositReserveLiquidityAndObligationCollateral,
-  WithdrawObligationCollateralAndRedeemReserveLiquidity,
-  SwitchboardAdmitOracle,
-  SwitchboardRevokeOracle,
+  MeanCreateAccount,
+  MeanCreateStream,
+  MeanFundAccount,
+  MeanTransferStream,
+  MeanWithdrawFromAccount,
+  Mint,
+  None,
+  ProgramUpgrade,
+  RealmConfig,
   RefreshSolendObligation,
   RefreshSolendReserve,
-  ForesightInitMarket,
-  ForesightInitMarketList,
-  ForesightInitCategory,
-  ForesightResolveMarket,
-  ForesightAddMarketListToCategory,
-  ForesightSetMarketMetadata,
-  RealmConfig,
-  CreateNftPluginRegistrar,
-  CreateNftPluginMaxVoterWeight,
-  ConfigureNftPluginCollection,
-  CloseTokenAccount,
-  VotingMintConfig,
-  CreateVsrRegistrar,
-  CreateGatewayPluginRegistrar,
-  ConfigureGatewayPlugin,
-  ChangeMakeDonation,
-  CreateTokenMetadata,
-  UpdateTokenMetadata,
   SagaPreOrder,
-  DepositToMangoAccount,
-  DepositToMangoAccountCsv,
+  SerumGrantLockedMSRM,
+  SerumGrantLockedSRM,
+  SerumGrantVestMSRM,
+  SerumGrantVestSRM,
+  SerumInitUser,
+  SerumUpdateGovConfigAuthority,
+  SerumUpdateGovConfigParams,
   StakeValidator,
-  DeactivateValidatorStake,
-  WithdrawValidatorStake,
-  DifferValidatorStake,
+  SwitchboardAdmitOracle,
+  SwitchboardRevokeOracle,
+  Transfer,
   TransferDomainName,
-  EverlendDeposit,
-  EverlendWithdraw,
+  UpdateTokenMetadata,
+  VotingMintConfig,
+  WithdrawFromCastle,
+  WithdrawFromGoblinGold,
+  WithdrawObligationCollateralAndRedeemReserveLiquidity,
+  WithdrawValidatorStake,
+  WithdrawFromVolt,
   AddKeyToDID,
   RemoveKeyFromDID,
 }

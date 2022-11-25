@@ -15,7 +15,7 @@ import {
   getMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
 import { precision } from '@utils/formatting'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import BigNumber from 'bignumber.js'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -69,7 +69,7 @@ const SolendDeposit = ({
   )
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
-  const tokenInfo = tokenService.getTokenInfo(handledMint)
+  const tokenInfo = tokenPriceService.getTokenInfo(handledMint)
   const {
     governedTokenAccountsWithoutNfts,
     auxiliaryTokenAccounts,
@@ -82,7 +82,7 @@ const SolendDeposit = ({
       : governedTokenAccount.extensions.token!.account.amount
   )
   const mintInfo = governedTokenAccount.extensions?.mint?.account
-  const tokenSymbol = tokenService.getTokenInfo(
+  const tokenSymbol = tokenPriceService.getTokenInfo(
     governedTokenAccount.extensions.mint!.publicKey.toBase58()
   )?.symbol
   const [form, setForm] = useState<{
@@ -191,6 +191,7 @@ const SolendDeposit = ({
       setDeposits(results)
     }
     getSlndCTokens()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [])
 
   const handleDeposit = async () => {
