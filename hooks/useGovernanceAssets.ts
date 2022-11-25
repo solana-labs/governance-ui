@@ -184,10 +184,15 @@ export default function useGovernanceAssets() {
     },
     [PackageEnum.GatewayPlugin]: {
       name: 'Gateway Plugin',
+      image: '/img/civic.svg',
     },
     [PackageEnum.GoblinGold]: {
       name: 'Goblin Gold',
       image: '/img/goblingold.png',
+    },
+    [PackageEnum.Identity]: {
+      name: 'Identity',
+      image: '/img/civic.svg',
     },
     [PackageEnum.NftPlugin]: {
       name: 'NFT Plugin',
@@ -464,12 +469,12 @@ export default function useGovernanceAssets() {
     [Instructions.AddKeyToDID]: {
       name: 'Add Key to DID',
       isVisible: canUseAnyInstruction,
-      packageId: PackageEnum.AddKeyToDID,
+      packageId: PackageEnum.Identity,
     },
     [Instructions.RemoveKeyFromDID]: {
       name: 'Remove Key from DID',
       isVisible: canUseAnyInstruction,
-      packageId: PackageEnum.RemoveKeyFromDID,
+      packageId: PackageEnum.Identity,
     },
 
     /*

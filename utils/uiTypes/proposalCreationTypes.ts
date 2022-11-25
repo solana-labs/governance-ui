@@ -21,6 +21,7 @@ export enum PackageEnum {
   Friktion,
   GatewayPlugin,
   GoblinGold,
+  Identity,
   NftPlugin,
   MangoMarketV3,
   MangoMarketV4,

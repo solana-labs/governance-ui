@@ -74,7 +74,12 @@ const AddKeyToDID = ({
           // TODO support eth keys too
           methodType: VerificationMethodType.Ed25519VerificationKey2018,
         })
-        .withAutomaticAlloc(form!.governedAccount.governance.pubkey)
+        // Adds a DID resize instruction if needed
+        // The resize instruction performs a SOL transfer, so needs to be from
+        // an account with no data, otherwise the Solana runtime will reject it.
+        // this is why we use the governed account here as opposed to the governance
+        // itself.
+        .withAutomaticAlloc(form!.governedAccount.pubkey)
         .instructions()
 
       serializedInstructions = addKeyIxs.map(serializeInstructionToBase64)
