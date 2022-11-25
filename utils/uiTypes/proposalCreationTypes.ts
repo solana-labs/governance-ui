@@ -526,7 +526,6 @@ export interface JoinDAOForm {
 
 export enum Instructions {
   Base64,
-  CancelStream,
   ChangeMakeDonation,
   ClaimMangoTokens,
   ClaimPendingDeposit,
@@ -540,7 +539,6 @@ export enum Instructions {
   CreateNftPluginMaxVoterWeight,
   CreateNftPluginRegistrar,
   CreateSolendObligationAccount,
-  CreateStream,
   CreateTokenMetadata,
   CreateVsrRegistrar,
   DeactivateValidatorStake,
