@@ -198,7 +198,12 @@
     "port-sdk/@saberhq/token-utils": "1.12.53",
     "@solana/web3.js": "1.66.2",
     "react": "18.2.0",
-    "@solana/spl-token-registry": "0.2.3775"
+    "@solana/spl-token-registry": "0.2.3775",
+    "@solana/wallet-adapter-base": "0.9.5",
+    "@solana/buffer-layout": "4.0.0",
+    "bn.js": "5.1.3",
+    "@types/bn.js": "5.1.0",
+    "@project-serum/sol-wallet-adapter": "0.2.6"
   },
   "browserslist": [
     "chrome >= 67",
