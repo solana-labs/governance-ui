@@ -10,7 +10,6 @@ import {
   getNumberFromBN,
   Stream,
 } from '@streamflow/stream'
-import { PERIOD } from 'pages/dao/[symbol]/proposal/components/instructions/Streamflow/CreateStream'
 import {
   InstructionDataUI,
   DataUIAddress,
@@ -22,6 +21,17 @@ import {
   DataUIText,
 } from '@components/InstructionDataUI'
 import { tryGetMint } from '@utils/tokens'
+
+export const PERIOD = {
+  SECOND: 1,
+  MINUTE: 60,
+  HOUR: 3600,
+  DAY: 24 * 3600,
+  WEEK: 7 * 24 * 3600,
+  FORTNIGHT: 14 * 24 * 3600,
+  MONTH: Math.floor(30.4167 * 24 * 3600), //30.4167 days
+  YEAR: 365 * 24 * 3600, // 365 days
+}
 
 export const DEFAULT_DECIMAL_PLACES = 2
 

@@ -23,8 +23,6 @@ import useRealm from '@hooks/useRealm'
 import { useEffect, useState } from 'react'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 
-import { STREAMFLOW_PROGRAM_ID } from 'pages/dao/[symbol]/proposal/components/instructions/Streamflow/CreateStream'
-
 export interface TokenMintMetadata {
   readonly decimals: number
   readonly symbol: string
@@ -34,6 +32,9 @@ export interface TokenMintMetadata {
 export const MINT_METADATA = {
   Gssm3vfi8s65R31SBdmQRq6cKeYojGgup7whkw4VCiQj: { symbol: 'STRM', decimals: 9 },
 }
+
+export const STREAMFLOW_PROGRAM_ID =
+  'strmRqUCoQUgGUan5YhzUZa6KqdzwX5L6FpUxfmKg5m'
 
 export default function StreamCard({
   connection,
