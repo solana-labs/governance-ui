@@ -229,7 +229,6 @@ export default function useGovernanceAssets() {
       name: 'Vsr Plugin',
       // Temporary:
       // Hide vsr package for now, due to wallet disconnection bug
-      isVisible: false,
     },
   }
 
