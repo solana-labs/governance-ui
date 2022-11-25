@@ -1,6 +1,6 @@
 import styled from '@emotion/styled'
 import { ChevronRightIcon } from '@heroicons/react/solid'
-import ProposalStateBadge from './ProposalStatusBadge'
+import ProposalStateBadge from './ProposalStateBadge'
 import Link from 'next/link'
 import { Proposal, ProposalState } from '@solana/spl-governance'
 import { ApprovalProgress } from './QuorumProgress'

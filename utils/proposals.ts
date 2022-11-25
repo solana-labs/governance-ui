@@ -1,5 +1,5 @@
 import { Filters } from '@components/ProposalFilter'
-import { hasInstructions } from '@components/ProposalStatusBadge'
+import { hasInstructions } from '@components/ProposalStateBadge'
 import {
   Governance,
   ProgramAccount,

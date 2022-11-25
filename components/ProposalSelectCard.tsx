@@ -1,5 +1,5 @@
 import { CheckIcon } from '@heroicons/react/solid'
-import ProposalStateBadge from './ProposalStatusBadge'
+import ProposalStateBadge from './ProposalStateBadge'
 import { Proposal, ProposalState } from '@solana/spl-governance'
 import { ApprovalProgress } from './QuorumProgress'
 import useProposalVotes from '../hooks/useProposalVotes'
