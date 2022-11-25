@@ -107,6 +107,7 @@
     "arweave": "1.11.4",
     "axios": "0.26.1",
     "bignumber.js": "9.0.2",
+    "borsh": "0.7.0",
     "buffer-layout": "1.2.2",
     "classnames": "2.3.1",
     "d3": "7.4.4",
