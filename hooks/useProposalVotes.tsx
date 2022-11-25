@@ -91,7 +91,15 @@ export default function useProposalVotes(proposal?: Proposal) {
     minimumYesVotes,
     yesVotesRequired,
   }
-  if (programVersion !== 3)
+
+  // @asktree: you may be asking yourself, "is this different from the more succinct way to write this?"
+  // the answer is yes, in typescript it is different and this lets us use discriminated unions properly.
+  if (programVersion === 1)
+    return {
+      _programVersion: programVersion,
+      ...results,
+    }
+  if (programVersion === 2)
     return {
       _programVersion: programVersion,
       ...results,
