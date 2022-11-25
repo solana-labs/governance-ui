@@ -47,12 +47,12 @@ export default function Auction(props: Props) {
           Buy
         </Button>
         <SellModal
-          asset={props.asset}
+          //asset={props.asset}
           isOpen={sellModalOpen}
           onClose={closeSellModal}
         ></SellModal>
         <BuyModal
-          asset={props.asset}
+          //asset={props.asset}
           isOpen={buyModalOpen}
           onClose={closeBuyModal}
         ></BuyModal>
