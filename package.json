@@ -92,6 +92,7 @@
     "@solana/wallet-adapter-wallets": "0.18.7",
     "@solana/web3.js": "1.66.2",
     "@solendprotocol/solend-sdk": "0.5.5",
+    "@streamflow/stream": "3.0.16",
     "@switchboard-xyz/switchboard-v2": "0.0.110",
     "@tailwindcss/line-clamp": "0.4.2",
     "@tanstack/react-query": "4.14.3",
