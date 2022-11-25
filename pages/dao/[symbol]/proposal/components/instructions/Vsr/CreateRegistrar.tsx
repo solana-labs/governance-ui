@@ -17,8 +17,8 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { SYSVAR_RENT_PUBKEY } from '@solana/web3.js'
 import { getRegistrarPDA } from 'VoteStakeRegistry/sdk/accounts'
 import { DEFAULT_VSR_ID, VsrClient } from 'VoteStakeRegistry/sdk/client'
-import useWallet from '@hooks/useWallet'
-import { web3 } from '@project-serum/anchor'
+import { AnchorProvider, Wallet, web3 } from '@project-serum/anchor'
+import useWalletStore from 'stores/useWalletStore'
 
 interface CreateVsrRegistrarForm {
   governedAccount: AssetAccount | undefined
@@ -38,7 +38,7 @@ const CreateVsrRegistrar = ({
   const [form, setForm] = useState<CreateVsrRegistrarForm>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
-  const { anchorProvider, wallet } = useWallet()
+  const { current: wallet, connection } = useWalletStore()
 
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
@@ -48,8 +48,14 @@ const CreateVsrRegistrar = ({
       form!.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
+      const options = AnchorProvider.defaultOptions()
+      const provider = new AnchorProvider(
+        connection.current,
+        (wallet as unknown) as Wallet,
+        options
+      )
       const vsrClient = VsrClient.connect(
-        anchorProvider,
+        provider,
         form?.programId ? new web3.PublicKey(form.programId) : undefined
       )
       const { registrar, registrarBump } = await getRegistrarPDA(

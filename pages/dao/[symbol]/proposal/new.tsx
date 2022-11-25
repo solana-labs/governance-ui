@@ -23,7 +23,9 @@ import Button, { LinkButton, SecondaryButton } from '@components/Button'
 import Input from '@components/inputs/Input'
 import Textarea from '@components/inputs/Textarea'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import useGovernanceAssets, {
+  InstructionType,
+} from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import { getTimestampFromDays } from '@tools/sdk/units'
@@ -99,8 +101,6 @@ import ConfigureGatewayPlugin from './components/instructions/GatewayPlugin/Conf
 import MakeChangeQuoteParams from './components/instructions/Mango/MakeChangeQuoteParams'
 import CreateTokenMetadata from './components/instructions/CreateTokenMetadata'
 import UpdateTokenMetadata from './components/instructions/UpdateTokenMetadata'
-import TypeaheadSelect from '@components/TypeaheadSelect'
-import { StyledLabel } from '@components/inputs/styles'
 import classNames from 'classnames'
 import MakeRemoveSpotMarket from './components/instructions/Mango/MakeRemoveSpotMarket'
 import MakeRemovePerpMarket from './components/instructions/Mango/MakeRemovePerpMarket'
@@ -125,6 +125,8 @@ import JoinDAO from './components/instructions/JoinDAO'
 import UpdateConfigAuthority from './components/instructions/Serum/UpdateConfigAuthority'
 import UpdateConfigParams from './components/instructions/Serum/UpdateConfigParams'
 import ClaimMangoTokens from './components/instructions/Mango/ClaimTokens'
+import SelectInstructionType from '@components/SelectInstructionType'
+import { StyledLabel } from '@components/inputs/styles'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -155,8 +157,7 @@ const New = () => {
   const { handleCreateProposal } = useCreateProposal()
   const { fmtUrlWithCluster } = useQueryContext()
   const { symbol, realm, realmDisplayName, canChooseWhoVote } = useRealm()
-  const { getAvailableInstructions } = useGovernanceAssets()
-  const availableInstructions = getAvailableInstructions()
+  const { availableInstructions } = useGovernanceAssets()
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [form, setForm] = useState({
@@ -192,13 +193,6 @@ const New = () => {
   //     }
   //   }
 
-  const getAvailableInstructionsForIndex = (index) => {
-    if (index === 0) {
-      return availableInstructions
-    } else {
-      return availableInstructions
-    }
-  }
   const [instructionsData, setInstructions] = useState<
     ComponentInstructionData[]
   >([{ type: undefined }])
@@ -211,7 +205,13 @@ const New = () => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-  const setInstructionType = ({ value, idx }) => {
+  const setInstructionType = ({
+    value,
+    idx,
+  }: {
+    value: InstructionType | null
+    idx: number
+  }) => {
     const newInstruction = {
       type: value,
     }
@@ -220,7 +220,7 @@ const New = () => {
   const addInstruction = () => {
     setInstructions([...instructionsData, { type: undefined }])
   }
-  const removeInstruction = (idx) => {
+  const removeInstruction = (idx: number) => {
     setInstructions([...instructionsData.filter((x, index) => index !== idx)])
   }
   const handleGetInstructions = async () => {
@@ -438,12 +438,12 @@ const New = () => {
       [Instructions.ClaimPendingDeposit]: FriktionClaimPendingDeposit,
       [Instructions.ClaimPendingWithdraw]: FriktionClaimPendingWithdraw,
       [Instructions.DepositIntoCastle]: CastleDeposit,
-      [Instructions.WithrawFromCastle]: CastleWithdraw,
       [Instructions.MeanCreateAccount]: MeanCreateAccount,
       [Instructions.MeanFundAccount]: MeanFundAccount,
       [Instructions.MeanWithdrawFromAccount]: MeanWithdrawFromAccount,
       [Instructions.MeanCreateStream]: MeanCreateStream,
       [Instructions.MeanTransferStream]: MeanTransferStream,
+      [Instructions.WithdrawFromCastle]: CastleWithdraw,
       [Instructions.DepositIntoGoblinGold]: GoblinGoldDeposit,
       [Instructions.WithdrawFromGoblinGold]: GoblinGoldWithdraw,
       [Instructions.CreateSolendObligationAccount]: CreateObligationAccount,
@@ -649,37 +649,28 @@ const New = () => {
               }}
             >
               <h2>Transactions</h2>
-              {instructionsData.map((instruction, idx) => {
-                const availableInstructionsForIdx = getAvailableInstructionsForIndex(
-                  idx
-                )
+              {instructionsData.map((instruction, index) => {
+                // copy index to keep its value for onChange function
+                const idx = index
+
                 return (
                   <div
                     key={idx}
                     className="mb-3 border border-fgd-4 p-4 md:p-6 rounded-lg"
                   >
-                    <StyledLabel>Transaction {idx + 1}</StyledLabel>
-                    <TypeaheadSelect
-                      className="max-w-lg"
-                      options={availableInstructionsForIdx.map(
-                        (availableInstruction) => ({
-                          data: availableInstruction,
-                          key: availableInstruction.id.toString(),
-                          text: availableInstruction.name,
+                    <StyledLabel>Instruction {idx + 1}</StyledLabel>
+
+                    <SelectInstructionType
+                      instructionTypes={availableInstructions}
+                      onChange={(instructionType) =>
+                        setInstructionType({
+                          value: instructionType,
+                          idx,
                         })
-                      )}
-                      placeholder="Add a transaction"
-                      selected={
-                        instruction.type
-                          ? {
-                              key: instruction.type.id.toString(),
-                            }
-                          : undefined
                       }
-                      onSelect={(option) => {
-                        setInstructionType({ value: option?.data, idx })
-                      }}
+                      selectedInstruction={instruction.type}
                     />
+
                     <div className="flex items-end pt-4">
                       <InstructionContentContainer
                         idx={idx}
@@ -710,7 +701,7 @@ const New = () => {
                 onClick={addInstruction}
               >
                 <PlusCircleIcon className="h-5 mr-1.5 text-green w-5" />
-                Add transaction
+                Add instruction
               </LinkButton>
             </div>
             <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
