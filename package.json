@@ -195,7 +195,10 @@
     }
   },
   "resolutions": {
-    "port-sdk/@saberhq/token-utils": "1.12.53"
+    "port-sdk/@saberhq/token-utils": "1.12.53",
+    "@solana/web3.js": "1.66.2",
+    "react": "18.2.0",
+    "@solana/spl-token-registry": "0.2.3775"
   },
   "browserslist": [
     "chrome >= 67",
