@@ -30,7 +30,7 @@ import { VotingClientType } from '@utils/uiTypes/VotePlugin'
 /* 
   returns: undefined if loading, false if nobody can veto, 'council' if council can veto, 'community' if community can veto
 */
-const useVetoingPop = () => {
+export const useVetoingPop = () => {
   const { tokenRole, governance } = useWalletStore((s) => s.selectedProposal)
 
   const vetoingPop = useMemo(() => {

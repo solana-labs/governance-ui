@@ -39,14 +39,6 @@ const Proposal = () => {
     proposal.account.state !== ProposalState.Cancelled &&
     proposal.account.state !== ProposalState.Draft
 
-  const votePassed =
-    proposal &&
-    (proposal.account.state === ProposalState.Completed ||
-      proposal.account.state === ProposalState.Executing ||
-      proposal.account.state === ProposalState.SigningOff ||
-      proposal.account.state === ProposalState.Succeeded ||
-      proposal.account.state === ProposalState.ExecutingWithErrors)
-
   const votingEnded =
     !!governance &&
     !!proposal &&
@@ -167,11 +159,7 @@ const Proposal = () => {
                 </>
               ) : (
                 <div className="pb-3">
-                  <VoteResultStatus
-                    progress={voteData.yesVoteProgress}
-                    votePassed={votePassed}
-                    yesVotesRequired={voteData.yesVotesRequired}
-                  />
+                  <VoteResultStatus />
                 </div>
               )}
               <VoteResults proposal={proposal.account} />
