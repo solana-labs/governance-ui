@@ -6,7 +6,6 @@ import {
 } from '@bonfida/spl-name-service'
 import { Domain } from '@models/treasury/Domain'
 
-
 const getAccountDomains = async (
   account: AssetAccount,
   connection: Connection
@@ -30,7 +29,9 @@ export const getDomains = async (
   accounts: AssetAccount[],
   connection: Connection
 ): Promise<Domain[]> => {
-  const accountsDomains = await Promise.all(accounts.map((account) => getAccountDomains(account, connection)))
+  const accountsDomains = await Promise.all(
+    accounts.map((account) => getAccountDomains(account, connection))
+  )
 
   return accountsDomains.flat()
 }

@@ -14,7 +14,6 @@ import '../components/DropdownMenu/index.css'
 import { useEffect } from 'react'
 import useSerumGovStore from 'stores/useSerumGovStore'
 
-
 export default function App({ Component, pageProps, router }: AppProps) {
   const { cluster } = router.query
   const updateSerumGovAccounts = useSerumGovStore(
