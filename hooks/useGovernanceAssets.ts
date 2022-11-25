@@ -165,10 +165,6 @@ export default function useGovernanceAssets() {
       name: 'Castle',
       image: '/img/castle.png',
     },
-    [PackageEnum.Civic]: {
-      name: 'Civic',
-      image: '/img/civic.png',
-    },
     [PackageEnum.Common]: {
       name: 'Common',
     },
@@ -185,9 +181,15 @@ export default function useGovernanceAssets() {
       name: 'Friktion',
       image: '/img/friktion.png',
     },
+    [PackageEnum.GatewayPlugin]: {
+      name: 'Gateway Plugin',
+    },
     [PackageEnum.GoblinGold]: {
       name: 'Goblin Gold',
       image: '/img/goblingold.png',
+    },
+    [PackageEnum.NftPlugin]: {
+      name: 'NFT Plugin',
     },
     [PackageEnum.MangoMarketV3]: {
       name: 'Mango Market v3',
@@ -222,6 +224,9 @@ export default function useGovernanceAssets() {
       name: 'Switchboard',
       image: '/img/switchboard.png',
     },
+    [PackageEnum.VsrPlugin]: {
+      name: 'Vsr Plugin',
+    },
   }
 
   // Alphabetical order, Packages then instructions
@@ -246,25 +251,6 @@ export default function useGovernanceAssets() {
     [Instructions.WithdrawFromCastle]: {
       name: 'Withdraw from Vault',
       packageId: PackageEnum.Castle,
-    },
-
-    /*
-       ██████ ██ ██    ██ ██  ██████ 
-      ██      ██ ██    ██ ██ ██      
-      ██      ██ ██    ██ ██ ██      
-      ██      ██  ██  ██  ██ ██      
-       ██████ ██   ████   ██  ██████ 
-    */
-
-    [Instructions.ConfigureGatewayPlugin]: {
-      name: 'Configure existing Gateway plugin',
-      isVisible: canUseAuthorityInstruction,
-      packageId: PackageEnum.Civic,
-    },
-    [Instructions.CreateGatewayPluginRegistrar]: {
-      name: 'Create Gateway plugin registrar',
-      isVisible: canUseAuthorityInstruction,
-      packageId: PackageEnum.Civic,
     },
 
     /*
@@ -296,32 +282,12 @@ export default function useGovernanceAssets() {
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Common,
     },
-    [Instructions.ConfigureNftPluginCollection]: {
-      name: 'Configure NFT plugin collection',
-      isVisible: canUseAuthorityInstruction,
-      packageId: PackageEnum.Common,
-    },
     [Instructions.CreateAssociatedTokenAccount]: {
       name: 'Create Associated Token Account',
       packageId: PackageEnum.Common,
     },
-    [Instructions.CreateNftPluginMaxVoterWeight]: {
-      name: 'Create NFT plugin max voter weight',
-      isVisible: canUseAuthorityInstruction,
-      packageId: PackageEnum.Common,
-    },
-    [Instructions.CreateNftPluginRegistrar]: {
-      name: 'Create NFT plugin registrar',
-      isVisible: canUseAuthorityInstruction,
-      packageId: PackageEnum.Common,
-    },
     [Instructions.CreateTokenMetadata]: {
       name: 'Create Token Metadata',
-      isVisible: canUseAuthorityInstruction,
-      packageId: PackageEnum.Common,
-    },
-    [Instructions.CreateVsrRegistrar]: {
-      name: 'Vote Escrowed Tokens: Create Registrar',
       isVisible: canUseAuthorityInstruction,
       packageId: PackageEnum.Common,
     },
@@ -391,11 +357,6 @@ export default function useGovernanceAssets() {
     },
     [Instructions.UpdateTokenMetadata]: {
       name: 'Update Token Metadata',
-      isVisible: canUseAuthorityInstruction,
-      packageId: PackageEnum.Common,
-    },
-    [Instructions.VotingMintConfig]: {
-      name: 'Vote Escrowed Tokens: Configure Voting Mint',
       isVisible: canUseAuthorityInstruction,
       packageId: PackageEnum.Common,
     },
@@ -480,6 +441,25 @@ export default function useGovernanceAssets() {
     },
 
     /*
+      ██████   █████  ████████ ███████ ██     ██  █████  ██    ██     ██████  ██      ██    ██  ██████  ██ ███    ██ 
+     ██       ██   ██    ██    ██      ██     ██ ██   ██  ██  ██      ██   ██ ██      ██    ██ ██       ██ ████   ██ 
+     ██   ███ ███████    ██    █████   ██  █  ██ ███████   ████       ██████  ██      ██    ██ ██   ███ ██ ██ ██  ██ 
+     ██    ██ ██   ██    ██    ██      ██ ███ ██ ██   ██    ██        ██      ██      ██    ██ ██    ██ ██ ██  ██ ██ 
+      ██████  ██   ██    ██    ███████  ███ ███  ██   ██    ██        ██      ███████  ██████   ██████  ██ ██   ████ 
+    */
+
+    [Instructions.ConfigureGatewayPlugin]: {
+      name: 'Configure',
+      isVisible: canUseAuthorityInstruction,
+      packageId: PackageEnum.GatewayPlugin,
+    },
+    [Instructions.CreateGatewayPluginRegistrar]: {
+      name: 'Create registrar',
+      isVisible: canUseAuthorityInstruction,
+      packageId: PackageEnum.GatewayPlugin,
+    },
+
+    /*
        ██████   ██████  ██████  ██      ██ ███    ██  ██████   ██████  ██      ██████  
       ██       ██    ██ ██   ██ ██      ██ ████   ██ ██       ██    ██ ██      ██   ██ 
       ██   ███ ██    ██ ██████  ██      ██ ██ ██  ██ ██   ███ ██    ██ ██      ██   ██ 
@@ -494,6 +474,30 @@ export default function useGovernanceAssets() {
     [Instructions.WithdrawFromGoblinGold]: {
       name: 'Withdraw',
       packageId: PackageEnum.GoblinGold,
+    },
+
+    /*
+      ███    ██ ███████ ████████     ██████  ██      ██    ██  ██████  ██ ███    ██ 
+      ████   ██ ██         ██        ██   ██ ██      ██    ██ ██       ██ ████   ██ 
+      ██ ██  ██ █████      ██        ██████  ██      ██    ██ ██   ███ ██ ██ ██  ██ 
+      ██  ██ ██ ██         ██        ██      ██      ██    ██ ██    ██ ██ ██  ██ ██ 
+      ██   ████ ██         ██        ██      ███████  ██████   ██████  ██ ██   ████ 
+    */
+
+    [Instructions.ConfigureNftPluginCollection]: {
+      name: 'Configure collection',
+      isVisible: canUseAuthorityInstruction,
+      packageId: PackageEnum.NftPlugin,
+    },
+    [Instructions.CreateNftPluginMaxVoterWeight]: {
+      name: 'Create max voter weight',
+      isVisible: canUseAuthorityInstruction,
+      packageId: PackageEnum.NftPlugin,
+    },
+    [Instructions.CreateNftPluginRegistrar]: {
+      name: 'Create registrar',
+      isVisible: canUseAuthorityInstruction,
+      packageId: PackageEnum.NftPlugin,
     },
 
     /*
@@ -624,11 +628,11 @@ export default function useGovernanceAssets() {
     },
 
     /*
-     ███    ███ ███████  █████  ███    ██     ███████ ██ ███    ██  █████  ███    ██  ██████ ███████ 
-     ████  ████ ██      ██   ██ ████   ██     ██      ██ ████   ██ ██   ██ ████   ██ ██      ██      
-     ██ ████ ██ █████   ███████ ██ ██  ██     █████   ██ ██ ██  ██ ███████ ██ ██  ██ ██      █████   
-     ██  ██  ██ ██      ██   ██ ██  ██ ██     ██      ██ ██  ██ ██ ██   ██ ██  ██ ██ ██      ██      
-     ██      ██ ███████ ██   ██ ██   ████     ██      ██ ██   ████ ██   ██ ██   ████  ██████ ███████ 
+      ███    ███ ███████  █████  ███    ██     ███████ ██ ███    ██  █████  ███    ██  ██████ ███████ 
+      ████  ████ ██      ██   ██ ████   ██     ██      ██ ████   ██ ██   ██ ████   ██ ██      ██      
+      ██ ████ ██ █████   ███████ ██ ██  ██     █████   ██ ██ ██  ██ ███████ ██ ██  ██ ██      █████   
+      ██  ██  ██ ██      ██   ██ ██  ██ ██     ██      ██ ██  ██ ██ ██   ██ ██  ██ ██ ██      ██      
+      ██      ██ ███████ ██   ██ ██   ████     ██      ██ ██   ████ ██   ██ ██   ████  ██████ ███████ 
     */
 
     [Instructions.MeanCreateAccount]: {
@@ -754,6 +758,25 @@ export default function useGovernanceAssets() {
     [Instructions.SwitchboardRevokeOracle]: {
       name: 'Remove Oracle from Queue',
       packageId: PackageEnum.Switchboard,
+    },
+
+    /*
+      ██    ██ ███████ ██████      ██████  ██      ██    ██  ██████  ██ ███    ██ 
+      ██    ██ ██      ██   ██     ██   ██ ██      ██    ██ ██       ██ ████   ██ 
+      ██    ██ ███████ ██████      ██████  ██      ██    ██ ██   ███ ██ ██ ██  ██ 
+       ██  ██       ██ ██   ██     ██      ██      ██    ██ ██    ██ ██ ██  ██ ██ 
+        ████   ███████ ██   ██     ██      ███████  ██████   ██████  ██ ██   ████ 
+    */
+
+    [Instructions.CreateVsrRegistrar]: {
+      name: 'Vote Escrowed Tokens: Create Registrar',
+      isVisible: canUseAuthorityInstruction,
+      packageId: PackageEnum.VsrPlugin,
+    },
+    [Instructions.VotingMintConfig]: {
+      name: 'Vote Escrowed Tokens: Configure Voting Mint',
+      isVisible: canUseAuthorityInstruction,
+      packageId: PackageEnum.VsrPlugin,
     },
   }
 

@@ -15,12 +15,13 @@ import * as Msp from '@mean-dao/msp'
 // Alphabetical order
 export enum PackageEnum {
   Castle = 1,
-  Civic,
   Common,
   Everlend,
   Foresight,
   Friktion,
+  GatewayPlugin,
   GoblinGold,
+  NftPlugin,
   MangoMarketV3,
   MangoMarketV4,
   MeanFinance,
@@ -28,6 +29,7 @@ export enum PackageEnum {
   Solend,
   Streamflow,
   Switchboard,
+  VsrPlugin,
 }
 
 export interface UiInstruction {
