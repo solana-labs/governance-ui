@@ -21,6 +21,7 @@ export enum PackageEnum {
   Friktion,
   GatewayPlugin,
   GoblinGold,
+  Identity,
   NftPlugin,
   MangoMarketV3,
   MangoMarketV4,
@@ -611,6 +612,8 @@ export enum Instructions {
   WithdrawObligationCollateralAndRedeemReserveLiquidity,
   WithdrawValidatorStake,
   WithdrawFromVolt,
+  AddKeyToDID,
+  RemoveKeyFromDID,
 }
 
 export type createParams = [

@@ -184,10 +184,15 @@ export default function useGovernanceAssets() {
     },
     [PackageEnum.GatewayPlugin]: {
       name: 'Gateway Plugin',
+      image: '/img/civic.svg',
     },
     [PackageEnum.GoblinGold]: {
       name: 'Goblin Gold',
       image: '/img/goblingold.png',
+    },
+    [PackageEnum.Identity]: {
+      name: 'Identity',
+      image: '/img/identity.png',
     },
     [PackageEnum.NftPlugin]: {
       name: 'NFT Plugin',
@@ -460,6 +465,16 @@ export default function useGovernanceAssets() {
       name: 'Create registrar',
       isVisible: canUseAuthorityInstruction,
       packageId: PackageEnum.GatewayPlugin,
+    },
+    [Instructions.AddKeyToDID]: {
+      name: 'Add Key to DID',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Identity,
+    },
+    [Instructions.RemoveKeyFromDID]: {
+      name: 'Remove Key from DID',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Identity,
     },
 
     /*

@@ -127,6 +127,8 @@ import UpdateConfigParams from './components/instructions/Serum/UpdateConfigPara
 import ClaimMangoTokens from './components/instructions/Mango/ClaimTokens'
 import SelectInstructionType from '@components/SelectInstructionType'
 import { StyledLabel } from '@components/inputs/styles'
+import AddKeyToDID from './components/instructions/Identity/AddKeyToDID'
+import RemoveKeyFromDID from './components/instructions/Identity/RemoveKeyFromDID'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -527,6 +529,8 @@ const New = () => {
       [Instructions.SerumUpdateGovConfigAuthority]: UpdateConfigAuthority,
       [Instructions.JoinDAO]: JoinDAO,
       [Instructions.ClaimMangoTokens]: ClaimMangoTokens,
+      [Instructions.AddKeyToDID]: AddKeyToDID,
+      [Instructions.RemoveKeyFromDID]: RemoveKeyFromDID,
     }),
     []
   )
