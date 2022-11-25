@@ -13,6 +13,7 @@ export const InitialFilters = {
   ExecutingWithErrors: true,
   SigningOff: true,
   Voting: true,
+  Vetoed: true,
 }
 
 export type Filters = typeof InitialFilters

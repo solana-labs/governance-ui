@@ -76,6 +76,10 @@ export const filterProposals = (
       }
     }
 
+    if (!filters.Vetoed && proposal.account.state === ProposalState.Vetoed) {
+      return false
+    }
+
     if (
       !filters.Defeated &&
       proposal.account.state === ProposalState.Defeated
