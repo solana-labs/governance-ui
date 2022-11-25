@@ -2,6 +2,7 @@ import { PublicKey } from '@solana/web3.js'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 import {
   AccountMetaData,
+  BPF_UPGRADE_LOADER_ID,
   Proposal,
   ProposalTransaction,
 } from '@solana/spl-governance'
@@ -15,7 +16,7 @@ import {
 import React, { useEffect, useState } from 'react'
 import useWalletStore from '../../stores/useWalletStore'
 import { getExplorerUrl } from '../explorer/tools'
-import { getProgramName } from './programs/names'
+import { getProgramName, isNativeSolanaProgram } from './programs/names'
 import { tryGetTokenAccount } from '@utils/tokens'
 import { ExecuteInstructionButton, PlayState } from './ExecuteInstructionButton'
 import { ProgramAccount } from '@solana/spl-governance'
@@ -23,13 +24,15 @@ import InspectorButton from '@components/explorer/inspectorButton'
 import { FlagInstructionErrorButton } from './FlagInstructionErrorButton'
 import axios from 'axios'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import InstructionOptionInput, {
   InstructionOption,
   InstructionOptions,
 } from '@components/InstructionOptions'
 import StreamCard from '@components/StreamCard'
 import { Metaplex, findMetadataPda } from '@metaplex-foundation/js'
+import { ConnectionContext } from '@utils/connection'
+import { abbreviateAddress } from '@utils/formatting'
 
 export default function InstructionCard({
   index,
@@ -104,14 +107,14 @@ export default function InstructionCard({
       }
 
       if (isSol) {
-        const info = tokenService.getTokenInfo(WSOL_MINT)
+        const info = tokenPriceService.getTokenInfo(WSOL_MINT)
         const imgUrl = info?.logoURI ? info.logoURI : ''
         setTokenImgUrl(imgUrl)
         return
       }
       const mint = tokenAccount?.account.mint
       if (mint) {
-        const info = tokenService.getTokenInfo(mint.toBase58())
+        const info = tokenPriceService.getTokenInfo(mint.toBase58())
         const imgUrl = info?.logoURI ? info.logoURI : ''
         setTokenImgUrl(imgUrl)
       }
@@ -135,7 +138,7 @@ export default function InstructionCard({
         )}
       </h3>
       <InstructionProgram
-        endpoint={connection.endpoint}
+        connection={connection}
         programId={proposalInstruction.account.getSingleInstruction().programId}
       ></InstructionProgram>
       <div className="border-b border-bkg-4 mb-6">
@@ -215,20 +218,83 @@ export default function InstructionCard({
 }
 
 export function InstructionProgram({
-  endpoint,
+  connection,
   programId,
 }: {
-  endpoint: string
+  connection: ConnectionContext
   programId: PublicKey
 }) {
+  const isNativeSolProgram = isNativeSolanaProgram(programId)
+  const [isAnchorVerified, setIsAnchorVerified] = useState(false)
+  const [isUpgradeable, setIsUpgradeable] = useState(false)
+  const [authority, setAuthority] = useState('')
   const programLabel = getProgramName(programId)
+  useEffect(() => {
+    const tryGetProgramInfo = async (programId: PublicKey) => {
+      try {
+        const programAccount = await connection.current.getParsedAccountInfo(
+          programId
+        )
+        const programInfo = await connection.current.getParsedAccountInfo(
+          new PublicKey(programAccount.value?.data['parsed']?.info?.programData)
+        )
+        const info = programInfo.value?.data['parsed']?.info
+        const authority = info.authority
+        const isUpgradeable =
+          programInfo.value?.owner?.equals(BPF_UPGRADE_LOADER_ID) && authority
+        setIsUpgradeable(isUpgradeable)
+        setAuthority(authority)
+        const deploymentSlot = info.slot
+        tryGetAnchorInfo(programId, deploymentSlot)
+        // eslint-disable-next-line no-empty
+      } catch {}
+    }
+    const tryGetAnchorInfo = async (
+      programId: PublicKey,
+      lastDeploymentSlot: number
+    ) => {
+      try {
+        const apiUrl = `https://api.apr.dev/api/v0/program/${programId.toBase58()}/latest?limit=5`
+        const resp = await axios.get(apiUrl)
+        const isLastVersionVerified = resp.data[0].verified === 'Verified'
+        const lastDeploymentSlotMatch =
+          resp.data[0].verified_slot === lastDeploymentSlot
+        setIsAnchorVerified(isLastVersionVerified && lastDeploymentSlotMatch)
+        // eslint-disable-next-line no-empty
+      } catch {}
+    }
+    if (connection.cluster === 'mainnet' && !isNativeSolProgram) {
+      tryGetProgramInfo(programId)
+    }
+  }, [programId, connection, isNativeSolProgram])
   return (
     <div className="border-t border-bkg-4 flex flex-col lg:flex-row lg:items-center lg:justify-between py-3">
-      <span className="font-bold text-fgd-1 text-sm">Program</span>
+      <span className="font-bold text-fgd-1 text-sm">
+        <div>Program</div>
+        {authority && (
+          <a
+            href={`https://explorer.solana.com/address/${authority}`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <div className="text-[10px] text-link">
+              Authority: {abbreviateAddress(authority)}
+            </div>
+            <div className="text-[10px]">
+              Upgradeable: {isUpgradeable ? 'Yes' : 'No'}
+            </div>
+          </a>
+        )}
+        {!isNativeSolProgram && (
+          <div className="text-primary-light text-[10px]">
+            Anchor: {isAnchorVerified ? 'Verified' : 'Unverified'}
+          </div>
+        )}
+      </span>
       <div className="flex items-center pt-1 lg:pt-0">
         <a
           className="text-sm hover:brightness-[1.15] focus:outline-none flex items-center"
-          href={getExplorerUrl(endpoint, programId)}
+          href={getExplorerUrl(connection.endpoint, programId)}
           target="_blank"
           rel="noopener noreferrer"
         >

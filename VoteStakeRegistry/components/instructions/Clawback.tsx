@@ -27,7 +27,7 @@ import {
 import Select from '@components/inputs/Select'
 import { tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
 import { fmtMintAmount } from '@tools/sdk/units'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import { getClawbackInstruction } from 'VoteStakeRegistry/actions/getClawbackInstruction'
 import { abbreviateAddress } from '@utils/formatting'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
@@ -201,8 +201,8 @@ const Clawback = ({
 
   const getOwnedDepositsLabel = (deposit: DepositWithMintAccount | null) => {
     const symbol = deposit
-      ? tokenService.getTokenInfo(deposit.mint.publicKey.toBase58())?.symbol ||
-        ''
+      ? tokenPriceService.getTokenInfo(deposit.mint.publicKey.toBase58())
+          ?.symbol || ''
       : null
     return deposit
       ? `${fmtMintAmount(
