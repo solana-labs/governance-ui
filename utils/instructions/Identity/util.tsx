@@ -87,7 +87,12 @@ export const instructionInputs: Record<string, InstructionInput> = {
     additionalComponent: (
       <Tooltip content="The DID to add the key to - the governed account must be registered on the DID">
         <InformationCircleIcon className="w-4 h-4 ml-1"></InformationCircleIcon>
-        <a href="https://docs.identity.com/docs/overview#dids">
+        <a
+          href="https://docs.identity.com/docs/overview#dids"
+          target="_blank"
+          rel="noreferrer"
+          className="text-xs"
+        >
           What is a DID?
         </a>
       </Tooltip>
