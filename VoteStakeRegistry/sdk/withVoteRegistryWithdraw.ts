@@ -12,6 +12,7 @@ import {
 } from 'VoteStakeRegistry/sdk/accounts'
 import { tryGetTokenAccount } from '@utils/tokens'
 import { VsrClient } from './client'
+import { withCreateTokenOwnerRecord } from '@solana/spl-governance'
 
 export const withVoteRegistryWithdraw = async ({
   instructions,
@@ -23,6 +24,8 @@ export const withVoteRegistryWithdraw = async ({
   depositIndex,
   communityMintPk,
   closeDepositAfterOperation,
+  splProgramId,
+  splProgramVersion,
   client,
   connection,
 }: {
@@ -32,9 +35,11 @@ export const withVoteRegistryWithdraw = async ({
   realmPk: PublicKey
   communityMintPk: PublicKey
   amount: BN
-  tokenOwnerRecordPubKey: PublicKey
+  tokenOwnerRecordPubKey: PublicKey | undefined
   depositIndex: number
   connection: Connection
+  splProgramId: PublicKey
+  splProgramVersion: number
   //if we want to close deposit after doing operation we need to fill this because we can close only deposits that have 0 tokens inside
   closeDepositAfterOperation?: boolean
   client?: VsrClient
@@ -82,6 +87,18 @@ export const withVoteRegistryWithdraw = async ({
         walletPk, // owner of token account
         walletPk // fee payer
       )
+    )
+  }
+  //spl governance tokenownerrecord pubkey
+  if (!tokenOwnerRecordPubKey) {
+    tokenOwnerRecordPubKey = await withCreateTokenOwnerRecord(
+      instructions,
+      splProgramId,
+      splProgramVersion,
+      realmPk,
+      walletPk,
+      mintPk,
+      walletPk
     )
   }
   const withdrawInstruction = await client?.program.methods

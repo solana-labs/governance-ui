@@ -31,7 +31,7 @@ const TransferDomainName = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const connection = useWalletStore((s) => s.connection.current)
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const { handleSetInstructions } = useContext(NewProposalContext)
 
   const { assetAccounts } = useGovernanceAssets()

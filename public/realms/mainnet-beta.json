@@ -88,15 +88,14 @@
     "github": "https://github.com/project-serum"
   },
   {
-    "symbol": "SERUMDEX",
-    "bannerImage": "https://i.ibb.co/bNRH0hh/1500x500.jpg",
-    "displayName": "Serum Community Fork",
+    "symbol": "OPENBOOK",
+    "displayName": "OpenBook DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "BtD6wKiazt4EEvfw6tqDh1BPSVchGeqyZ1e4HhV9VHJ6",
-    "ogImage": "/realms/SERUM_COMMUNITY_FORK/logo.png",
+    "ogImage": "/realms/OpenBook/OpenBook-Logomark.svg",
     "shortDescription": "Faster, Cheaper and more Powerful DeFi",
     "sortRank": 3,
-    "github": "https://github.com/blockworks-foundation/serum-dex"
+    "github": "https://github.com/openbook-dex"
   },
   {
     "symbol": "SERUM2",

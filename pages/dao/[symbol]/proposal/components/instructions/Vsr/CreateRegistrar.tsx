@@ -34,7 +34,7 @@ const CreateVsrRegistrar = ({
 }) => {
   const { realm, realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<CreateVsrRegistrarForm>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)

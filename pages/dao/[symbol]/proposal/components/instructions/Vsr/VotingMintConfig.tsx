@@ -51,7 +51,7 @@ const VotingMintConfig = ({
 }) => {
   const { realm } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<ConfigureCollectionForm>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)

@@ -117,7 +117,7 @@ const CreateStream = ({
 
   const { assetAccounts } = useGovernanceAssets()
   const treasuryInfo = useTreasuryInfo()
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = strmProgram
   const [releaseUnitIdx, setReleaseUnitIdx] = useState<number>(0)
   const [startOnApproval, setStartOnApproval] = useState<boolean>(true)

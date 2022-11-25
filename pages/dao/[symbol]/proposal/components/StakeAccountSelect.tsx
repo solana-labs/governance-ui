@@ -34,7 +34,7 @@ const StakeAccountSelect = ({
   stakeAccounts = [],
   label,
   noMaxWidth,
-  autoselectFirst = true,
+  autoSelectFirst = true,
 }: {
   onChange
   value
@@ -44,7 +44,7 @@ const StakeAccountSelect = ({
   governance?: ProgramAccount<Governance> | null | undefined
   label?
   noMaxWidth?: boolean
-  autoselectFirst?: boolean
+  autoSelectFirst?: boolean
 }) => {
   function getLabel(value: StakeAccount) {
     if (value) {
@@ -81,7 +81,7 @@ const StakeAccountSelect = ({
     )
   }
   useEffect(() => {
-    if (stakeAccounts.length == 1 && autoselectFirst) {
+    if (stakeAccounts.length == 1 && autoSelectFirst) {
       //wait for microtask queue to be empty
       setTimeout(() => {
         onChange(stakeAccounts[0])

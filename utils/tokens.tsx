@@ -31,8 +31,9 @@ import { I80F48 } from '@blockworks-foundation/mango-client'
 import { NFTWithMeta } from './uiTypes/VotePlugin'
 import { getParsedNftAccountsByOwner } from '@nfteyez/sol-rayz'
 import axios from 'axios'
-import { deprecated } from '@metaplex-foundation/mpl-token-metadata'
 import { ConnectionContext } from './connection'
+import { findMetadataPda, Metaplex } from '@metaplex-foundation/js'
+import { HOLAPLEX_GRAPQL_URL_MAINNET } from '@tools/constants'
 
 export type TokenAccount = AccountInfo
 export type MintAccount = MintInfo
@@ -183,7 +184,7 @@ export function parseTokenAccountData(
   return accountInfo
 }
 
-export function parseMintAccountData(data: Buffer) {
+export function parseMintAccountData(data: Buffer): MintAccount {
   const mintInfo = MintLayout.decode(data)
   if (mintInfo.mintAuthorityOption === 0) {
     mintInfo.mintAuthority = null
@@ -381,7 +382,7 @@ export const deserializeMint = (data: Buffer) => {
 }
 
 const fetchNftsFromHolaplexIndexer = async (owner: PublicKey) => {
-  const result = await fetch('https://graph.holaplex.com/v1', {
+  const result = await fetch(HOLAPLEX_GRAPQL_URL_MAINNET, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -445,8 +446,11 @@ const getDevnetNfts = async (
   const data = Object.keys(nfts).map((key) => nfts[key])
   const arr: NFTWithMeta[] = []
   const vals = await Promise.all(data.map((x) => axios.get(x.data.uri)))
+  const metaplex = new Metaplex(connection)
   const metadataAccounts = await Promise.all(
-    data.map((x) => deprecated.Metadata.getPDA(x.mint))
+    data.map((x) => {
+      return findMetadataPda(new PublicKey(x.mint))
+    })
   )
   for (let i = 0; i < data.length; i++) {
     try {
@@ -459,10 +463,9 @@ const getDevnetNfts = async (
         )
       })
       const metadataAccount = metadataAccounts[i]
-      const metadata = await deprecated.Metadata.load(
-        connection,
-        metadataAccount
-      )
+      const metadata = await metaplex.nfts().findByMetadata({
+        metadata: new PublicKey(metadataAccount.toBase58()),
+      })
       if (tokenAccount) {
         arr.push({
           image: val.image,
@@ -473,12 +476,12 @@ const getDevnetNfts = async (
             files: val.properties?.files,
           },
           collection: {
-            mintAddress: metadata?.data?.collection?.key || '',
+            mintAddress: metadata?.collection?.address.toBase58() || '',
             creators: nft.data.creators,
-            verified: metadata?.data?.collection?.verified,
+            verified: metadata?.collection?.verified,
           },
           mintAddress: nft.mint,
-          address: metadata.pubkey.toBase58(),
+          address: metadata.address.toBase58(),
           tokenAccountAddress: tokenAccount.publicKey.toBase58(),
           getAssociatedTokenAccount: async () => {
             const ata = await Token.getAssociatedTokenAddress(

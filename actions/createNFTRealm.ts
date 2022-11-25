@@ -6,7 +6,6 @@ import {
   withCreateTokenOwnerRecord,
   withSetRealmAuthority,
 } from '@solana/spl-governance'
-
 import {
   Connection,
   Keypair,
@@ -14,7 +13,6 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js'
 import { AnchorProvider, Wallet } from '@project-serum/anchor'
-
 import {
   SequenceType,
   WalletSigner,
@@ -23,15 +21,14 @@ import {
 } from 'utils/sendTransactions'
 import { chunks } from '@utils/helpers'
 import { nftPluginsPks } from '@hooks/useVotingPlugins'
-
 import {
   getVoterWeightRecord,
   getMaxVoterWeightRecord,
   getRegistrarPDA,
 } from '@utils/plugin/accounts'
 import { NftVoterClient } from '@solana/governance-program-library'
-
 import { prepareRealmCreation } from '@tools/governance/prepareRealmCreation'
+import { trySentryLog } from '@utils/logs'
 interface NFTRealm {
   connection: Connection
   wallet: WalletSigner
@@ -270,6 +267,16 @@ export default async function createNFTRealm({
       connection,
       wallet,
       transactionInstructions: txes,
+    })
+
+    const logInfo = {
+      realmId: realmPk,
+      realmSymbol: realmName,
+      wallet: wallet.publicKey?.toBase58(),
+    }
+    trySentryLog({
+      tag: 'realmCreated',
+      objToStringify: logInfo,
     })
 
     return {
