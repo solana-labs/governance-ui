@@ -209,7 +209,7 @@ export default function useGovernanceAssets() {
       name: 'Serum',
       image: '/img/serum.png',
       // Temporary:
-      // Hide serum package for now due to wallet disconnection bug
+      // Hide serum package for now, due to wallet disconnection bug
       isVisible: false,
     },
     [PackageEnum.Solend]: {
@@ -226,6 +226,9 @@ export default function useGovernanceAssets() {
     },
     [PackageEnum.VsrPlugin]: {
       name: 'Vsr Plugin',
+      // Temporary:
+      // Hide vsr package for now, due to wallet disconnection bug
+      isVisible: false,
     },
   }
 
