@@ -582,15 +582,6 @@ export enum Instructions {
   MangoV4TokenEdit,
   MangoV4TokenRegister,
   MangoV4TokenRegisterTrustless,
-  Grant,
-  Clawback,
-  CreateAssociatedTokenAccount,
-  DepositIntoVolt,
-  WithdrawFromVolt,
-  ClaimPendingDeposit,
-  ClaimPendingWithdraw,
-  DepositIntoCastle,
-  WithrawFromCastle,
   MeanCreateAccount,
   MeanCreateStream,
   MeanFundAccount,
@@ -619,9 +610,9 @@ export enum Instructions {
   VotingMintConfig,
   WithdrawFromCastle,
   WithdrawFromGoblinGold,
-  WithdrawFromVolt,
   WithdrawObligationCollateralAndRedeemReserveLiquidity,
   WithdrawValidatorStake,
+  WithdrawFromVolt,
 }
 
 export type createParams = [

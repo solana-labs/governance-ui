@@ -256,7 +256,7 @@ export default function useGovernanceAssets() {
       name: 'Withdraw from Vault',
       packageId: PackageEnum.Castle,
     },
-    
+
     /*
         ██████  ██████  ███    ███ ███    ███  ██████  ███    ██ 
        ██      ██    ██ ████  ████ ████  ████ ██    ██ ████   ██ 
