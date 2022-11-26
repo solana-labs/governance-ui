@@ -449,11 +449,28 @@ export default function useGovernanceAssets() {
     },
 
     /*
-      ██████   █████  ████████ ███████ ██     ██  █████  ██    ██     ██████  ██      ██    ██  ██████  ██ ███    ██ 
-     ██       ██   ██    ██    ██      ██     ██ ██   ██  ██  ██      ██   ██ ██      ██    ██ ██       ██ ████   ██ 
-     ██   ███ ███████    ██    █████   ██  █  ██ ███████   ████       ██████  ██      ██    ██ ██   ███ ██ ██ ██  ██ 
-     ██    ██ ██   ██    ██    ██      ██ ███ ██ ██   ██    ██        ██      ██      ██    ██ ██    ██ ██ ██  ██ ██ 
-      ██████  ██   ██    ██    ███████  ███ ███  ██   ██    ██        ██      ███████  ██████   ██████  ██ ██   ████ 
+       ██████   ██████  ██████  ██      ██ ███    ██  ██████   ██████  ██      ██████  
+      ██       ██    ██ ██   ██ ██      ██ ████   ██ ██       ██    ██ ██      ██   ██ 
+      ██   ███ ██    ██ ██████  ██      ██ ██ ██  ██ ██   ███ ██    ██ ██      ██   ██ 
+      ██    ██ ██    ██ ██   ██ ██      ██ ██  ██ ██ ██    ██ ██    ██ ██      ██   ██ 
+       ██████   ██████  ██████  ███████ ██ ██   ████  ██████   ██████  ███████ ██████  
+    */
+
+    [Instructions.DepositIntoGoblinGold]: {
+      name: 'Deposit',
+      packageId: PackageEnum.GoblinGold,
+    },
+    [Instructions.WithdrawFromGoblinGold]: {
+      name: 'Withdraw',
+      packageId: PackageEnum.GoblinGold,
+    },
+
+    /*
+      ██ ██████  ███████ ███    ██ ████████ ██ ████████ ██    ██
+      ██ ██   ██ ██      ████   ██    ██    ██    ██     ██  ██
+      ██ ██   ██ █████   ██ ██  ██    ██    ██    ██      ████
+      ██ ██   ██ ██      ██  ██ ██    ██    ██    ██       ██
+      ██ ██████  ███████ ██   ████    ██    ██    ██       ██
     */
 
     [Instructions.ConfigureGatewayPlugin]: {
@@ -485,23 +502,6 @@ export default function useGovernanceAssets() {
       name: 'Remove Service from DID',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.Identity,
-    },
-
-    /*
-       ██████   ██████  ██████  ██      ██ ███    ██  ██████   ██████  ██      ██████  
-      ██       ██    ██ ██   ██ ██      ██ ████   ██ ██       ██    ██ ██      ██   ██ 
-      ██   ███ ██    ██ ██████  ██      ██ ██ ██  ██ ██   ███ ██    ██ ██      ██   ██ 
-      ██    ██ ██    ██ ██   ██ ██      ██ ██  ██ ██ ██    ██ ██    ██ ██      ██   ██ 
-       ██████   ██████  ██████  ███████ ██ ██   ████  ██████   ██████  ███████ ██████  
-    */
-
-    [Instructions.DepositIntoGoblinGold]: {
-      name: 'Deposit',
-      packageId: PackageEnum.GoblinGold,
-    },
-    [Instructions.WithdrawFromGoblinGold]: {
-      name: 'Withdraw',
-      packageId: PackageEnum.GoblinGold,
     },
 
     /*
