@@ -2,7 +2,6 @@ import Input from '@components/inputs/Input'
 import Select from '@components/inputs/Select'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useRealmAccount from '@hooks/useRealmAccount'
-import useWallet from '@hooks/useWallet'
 import { getCertifiedRealmInfos, RealmInfo } from '@models/registry/api'
 import {
   getGovernanceProgramVersion,
@@ -37,7 +36,7 @@ const JoinDAO = ({
   //Small hack to prevent race conditions with cluster change until we remove connection from store and move it to global dep.
   const routeHasClusterInPath = router.asPath.includes('cluster')
 
-  const { wallet } = useWallet()
+  const { current: wallet } = useWalletStore()
   const connection = useWalletStore((s) => s.connection)
 
   const { governedSPLTokenAccounts } = useGovernanceAssets()

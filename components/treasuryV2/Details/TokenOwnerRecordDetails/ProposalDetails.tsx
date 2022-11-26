@@ -8,7 +8,6 @@ import { useHasVoteTimeExpired } from '@hooks/useHasVoteTimeExpired'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import useRealmProposalVotes from '@hooks/useRealmProposalVotes'
-import useWallet from '@hooks/useWallet'
 import {
   getGovernanceProgramVersion,
   getInstructionDataFromBase64,
@@ -149,7 +148,7 @@ export default function ProposalDetails({
   const { cluster } = router.query
 
   const { symbol } = useRealm()
-  const { wallet } = useWallet()
+  const { current: wallet } = useWalletStore()
   const connection = useWalletStore((s) => s.connection.current)
   const { fmtUrlWithCluster } = useQueryContext()
 
