@@ -476,6 +476,16 @@ export default function useGovernanceAssets() {
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.Identity,
     },
+    [Instructions.AddServiceToDID]: {
+      name: 'Add Service to DID',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Identity,
+    },
+    [Instructions.RemoveServiceFromDID]: {
+      name: 'Remove Service from DID',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Identity,
+    },
 
     /*
        ██████   ██████  ██████  ██      ██ ███    ██  ██████   ██████  ██      ██████  

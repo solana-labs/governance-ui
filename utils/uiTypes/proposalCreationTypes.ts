@@ -614,6 +614,8 @@ export enum Instructions {
   WithdrawFromVolt,
   AddKeyToDID,
   RemoveKeyFromDID,
+  AddServiceToDID,
+  RemoveServiceFromDID,
 }
 
 export type createParams = [

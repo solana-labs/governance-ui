@@ -69,7 +69,7 @@ export const governanceInstructionInput = (
   initialValue: null,
   name: 'governedAccount',
   type: InstructionInputType.GOVERNED_ACCOUNT,
-  shouldBeGoverned,
+  shouldBeGoverned: !!shouldBeGoverned,
   governance,
   options: assetAccounts.filter(
     (x) =>
@@ -106,6 +106,34 @@ export const instructionInputs: Record<string, InstructionInput> = {
     type: InstructionInputType.INPUT,
     additionalComponent: (
       <Tooltip content="The key to add to the DID">
+        <span>
+          <InformationCircleIcon className="w-4 h-4 ml-1"></InformationCircleIcon>
+        </span>
+      </Tooltip>
+    ),
+  },
+  serviceEndpoint: {
+    label: 'Endpoint',
+    initialValue: '',
+    inputType: 'text',
+    name: 'serviceEndpoint',
+    type: InstructionInputType.INPUT,
+    additionalComponent: (
+      <Tooltip content="The serviceEndpoint field on the DID">
+        <span>
+          <InformationCircleIcon className="w-4 h-4 ml-1"></InformationCircleIcon>
+        </span>
+      </Tooltip>
+    ),
+  },
+  serviceType: {
+    label: 'Type',
+    initialValue: '',
+    inputType: 'text',
+    name: 'serviceType',
+    type: InstructionInputType.INPUT,
+    additionalComponent: (
+      <Tooltip content="The free-text serviceType field on the DID">
         <span>
           <InformationCircleIcon className="w-4 h-4 ml-1"></InformationCircleIcon>
         </span>
