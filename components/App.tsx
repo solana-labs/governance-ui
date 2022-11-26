@@ -23,10 +23,10 @@ import useMembers from '@components/Members/useMembers'
 import useRealm from '@hooks/useRealm'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import useWallet from '@hooks/useWallet'
 import useWalletStore from 'stores/useWalletStore'
 import NftVotingCountingModal from '@components/NftVotingCountingModal'
 import { getResourcePathPart } from '@tools/core/resources'
+import useInitWallet from '@hooks/useInitWallet'
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -58,7 +58,7 @@ interface Props {
 
 export function App(props: Props) {
   useHydrateStore()
-  useWallet()
+  useInitWallet()
   handleRouterHistory()
   useVotingPlugins()
   handleGovernanceAssetsStore()

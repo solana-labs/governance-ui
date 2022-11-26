@@ -227,8 +227,6 @@ export default function useGovernanceAssets() {
     },
     [PackageEnum.VsrPlugin]: {
       name: 'Vsr Plugin',
-      // Temporary:
-      // Hide vsr package for now, due to wallet disconnection bug
     },
   }
 
