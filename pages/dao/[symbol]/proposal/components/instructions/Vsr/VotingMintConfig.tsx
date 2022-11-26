@@ -20,7 +20,7 @@ import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getScaledFactor } from '@utils/tokens'
 import { yearsToSecs } from 'VoteStakeRegistry/tools/dateTools'
-import { AnchorProvider, BN, Wallet, web3 } from '@project-serum/anchor'
+import { BN, web3 } from '@project-serum/anchor'
 import { PublicKey } from '@solana/web3.js'
 import {
   emptyPk,
@@ -28,7 +28,7 @@ import {
   Registrar,
 } from 'VoteStakeRegistry/sdk/accounts'
 import { DEFAULT_VSR_ID, VsrClient } from 'VoteStakeRegistry/sdk/client'
-import useWalletStore from 'stores/useWalletStore'
+import useWallet from '@hooks/useWallet'
 
 interface ConfigureCollectionForm {
   programId: string | undefined
@@ -55,7 +55,7 @@ const VotingMintConfig = ({
   const [form, setForm] = useState<ConfigureCollectionForm>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
-  const { current: wallet, connection } = useWalletStore()
+  const { wallet, anchorProvider } = useWallet()
 
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
@@ -66,14 +66,8 @@ const VotingMintConfig = ({
       form!.governedAccount?.governance.pubkey &&
       wallet?.publicKey?.toBase58()
     ) {
-      const options = AnchorProvider.defaultOptions()
-      const provider = new AnchorProvider(
-        connection.current,
-        (wallet as unknown) as Wallet,
-        options
-      )
       const vsrClient = VsrClient.connect(
-        provider,
+        anchorProvider,
         form?.programId ? new web3.PublicKey(form.programId) : undefined
       )
       const digitShift = form.mintDigitShift

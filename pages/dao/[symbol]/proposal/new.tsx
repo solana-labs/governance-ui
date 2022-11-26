@@ -125,8 +125,8 @@ import JoinDAO from './components/instructions/JoinDAO'
 import UpdateConfigAuthority from './components/instructions/Serum/UpdateConfigAuthority'
 import UpdateConfigParams from './components/instructions/Serum/UpdateConfigParams'
 import ClaimMangoTokens from './components/instructions/Mango/ClaimTokens'
-import SelectInstructionType from '@components/SelectInstructionType'
 import { StyledLabel } from '@components/inputs/styles'
+import SelectInstructionType from '@components/SelectInstructionType'
 
 const TITLE_LENGTH_LIMIT = 130
 
