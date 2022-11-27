@@ -84,7 +84,7 @@ const StakingOption = ({
           error={formErrors['soName']}
         />
       </Tooltip>
-      <Tooltip content="Treasury owned account providing the assets for the option. When the recipient exercises, these are the tokens they receive.">
+      <Tooltip content="Treasury owned account providing the assets for the option. When the recipient exercises, these are the tokens they receive. For SOL/USDC Calls, enter SOL. For SOL/USDC Puts, enter USDC.">
         <GovernedAccountSelect
           label="Base Treasury"
           governedAccounts={governedTokenAccountsWithoutNfts}
@@ -97,7 +97,7 @@ const StakingOption = ({
           governance={governance}
         ></GovernedAccountSelect>
       </Tooltip>
-      <Tooltip content="Treasury owned account receiving payment for the option exercise. This is where payments from exercise accumulate.">
+      <Tooltip content="Treasury owned account receiving payment for the option exercise. This is where payments from exercise accumulate. For SOL/USDC Calls, enter USDC. For SOL/USDC Puts, enter SOL.">
         <GovernedAccountSelect
           label="Quote Treasury"
           governedAccounts={governedTokenAccountsWithoutNfts}
@@ -138,7 +138,7 @@ const StakingOption = ({
           error={formErrors['optionExpirationUnixSeconds']}
         />
       </Tooltip>
-      <Tooltip content="Strike price for the staking option. Units are atomic quote atoms per lot">
+      <Tooltip content="Strike price for the staking option. Units are quote atoms per lot. So if it is a SOL/USDC put with a lot size of 1 USDC, then this is lamports per USDC.">
         <Input
           label="Strike"
           value={form.strike}
