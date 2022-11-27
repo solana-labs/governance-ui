@@ -23,6 +23,7 @@ import { uiToNative } from '@blockworks-foundation/mango-client'
 import { tryGetMint } from '@utils/tokens'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { NewProposalContext } from '../../../new'
+import { findATAAddrSync } from '@utils/ataTools'
 
 const schema = yup.object().shape({
   governedAccount: yup.object().required('Governed token account is required'),
@@ -99,6 +100,11 @@ const LenderDepositForm = ({
       )
     }
 
+    // Needs to renew PublicKey to avoid:
+    // TypeError: The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object
+    // tbh not sure why, since starts seems the variable is a PublicKey imported from solana/web3.js which is correct
+    const lenderUser = new PublicKey(governedAccount.pubkey.toBase58())
+
     // Use the baseMint ATA for deposit
     const tx = await syrupClient.lenderActions().deposit({
       amount: uiToNative(form.depositAmount!, tokenMint.account.decimals),
@@ -106,10 +112,8 @@ const LenderDepositForm = ({
         address: pool,
         data: poolData as AccountData<'pool'>,
       },
-      // Needs to renew PublicKey to avoid:
-      // TypeError: The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object
-      // tbh not sure why, since starts seems the variable is a PublicKey imported from solana/web3.js which is correct
-      lenderUser: new PublicKey(governedAccount.pubkey.toBase58()),
+      lenderUser,
+      lenderLocker: findATAAddrSync(lenderUser, poolData.baseMint)[0],
     })
 
     if (!tx.instructions.length) {
