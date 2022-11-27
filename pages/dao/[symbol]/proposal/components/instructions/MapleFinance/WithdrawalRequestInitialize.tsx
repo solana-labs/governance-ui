@@ -7,7 +7,6 @@ import {
   ProgramAccount,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
-import { PublicKey } from '@solana/web3.js'
 import useWalletStore from 'stores/useWalletStore'
 import { validateInstruction } from '@utils/instructionTools'
 import {
@@ -93,10 +92,7 @@ const WithdrawalRequestInitializeForm = ({
 
     const poolData = await syrupClient.program.account.pool.fetch(pool)
 
-    // Needs to renew PublicKey to avoid:
-    // TypeError: The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object
-    // tbh not sure why, since starts seems the variable is a PublicKey imported from solana/web3.js which is correct
-    const lenderUser = new PublicKey(governedAccount.pubkey.toBase58())
+    const lenderUser = governedAccount.pubkey
 
     const [lenderAddress] = await syrupClient.findProgramAddress([
       'lender',
@@ -130,10 +126,7 @@ const WithdrawalRequestInitializeForm = ({
         data: lenderData,
       },
 
-      // Needs to renew PublicKey to avoid:
-      // TypeError: The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object
-      // tbh not sure why, since starts seems the variable is a PublicKey imported from solana/web3.js which is correct
-      lenderUser: new PublicKey(governedAccount.pubkey.toBase58()),
+      lenderUser,
     })
 
     if (!tx.instructions.length) {

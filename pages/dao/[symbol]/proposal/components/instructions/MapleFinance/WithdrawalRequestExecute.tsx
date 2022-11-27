@@ -104,10 +104,7 @@ const WithdrawalRequestExecuteForm = ({
       )
     }
 
-    // Needs to renew PublicKey to avoid:
-    // TypeError: The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object
-    // tbh not sure why, since starts seems the variable is a PublicKey imported from solana/web3.js which is correct
-    const lenderUser = new PublicKey(governedAccount.pubkey.toBase58())
+    const lenderUser = governedAccount.pubkey
 
     // Use BaseMint ATA for fund reception
     const tx = await syrupClient.lenderActions().executeWithdrawalRequest({

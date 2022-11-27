@@ -7,7 +7,6 @@ import {
   ProgramAccount,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
-import { PublicKey } from '@solana/web3.js'
 import useWalletStore from 'stores/useWalletStore'
 import { validateInstruction } from '@utils/instructionTools'
 import {
@@ -88,10 +87,7 @@ const LenderInitializeForm = ({
         address: pool,
         data: poolData as AccountData<'pool'>,
       },
-      // Needs to renew PublicKey to avoid:
-      // TypeError: The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object
-      // tbh not sure why, since starts seems the variable is a PublicKey imported from solana/web3.js which is correct
-      owner: new PublicKey(governedAccount.pubkey.toBase58()),
+      owner: governedAccount.pubkey,
       payer: wallet.publicKey,
     })
 
