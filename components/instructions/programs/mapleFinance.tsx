@@ -1,7 +1,7 @@
 import { nu64, struct, u8 } from 'buffer-layout'
 import { AccountMetaData } from '@solana/spl-governance'
 import { Connection } from '@solana/web3.js'
-import { SyrupClient, SYRUP_ADDRESSES } from '@maplelabs/syrup-sdk'
+import { AccountData, SyrupClient, SYRUP_ADDRESSES } from '@maplelabs/syrup-sdk'
 import { ANCHOR_DISCRIMINATOR_LAYOUT } from '@utils/helpers'
 import { nativeToUi } from '@blockworks-foundation/mango-client'
 import { tryGetMint, tryGetTokenMint } from '@utils/tokens'
@@ -153,7 +153,10 @@ export const MAPLE_FINANCE_PROGRAM_INSTRUCTIONS = {
 
         const pool = accounts[2].pubkey
 
-        const poolData = await syrupClient.program.account.pool.fetch(pool)
+        // Need to cas due to typing mistake in mapleFinance SDK
+        const poolData = (await syrupClient.program.account.pool.fetch(
+          pool
+        )) as AccountData<'pool'>
 
         const baseMintInfo = await tryGetMint(connection, poolData.baseMint)
         if (!baseMintInfo) {
@@ -167,8 +170,7 @@ export const MAPLE_FINANCE_PROGRAM_INSTRUCTIONS = {
         cooldownPeriodDate.setTime(
           new Date().getTime() +
             // Transform seconds to milliseconds for timestamp
-            // Cast to any because the type is not correct
-            (poolData.config as any).cooldownPeriod.toNumber() * 1_000
+            poolData.config.cooldownPeriod.toNumber() * 1_000
         )
 
         const uiAmount = nativeToUi(
