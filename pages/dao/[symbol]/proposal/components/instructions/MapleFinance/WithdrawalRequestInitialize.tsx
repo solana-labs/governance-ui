@@ -1,0 +1,217 @@
+import React, { useContext, useEffect, useState } from 'react'
+import * as yup from 'yup'
+import { SyrupClient, AccountData } from '@maplelabs/syrup-sdk'
+import {
+  Governance,
+  GovernanceAccountType,
+  ProgramAccount,
+  serializeInstructionToBase64,
+} from '@solana/spl-governance'
+import { PublicKey } from '@solana/web3.js'
+import useWalletStore from 'stores/useWalletStore'
+import { validateInstruction } from '@utils/instructionTools'
+import {
+  MapleFinanceWithdrawalRequestInitializeForm,
+  UiInstruction,
+} from '@utils/uiTypes/proposalCreationTypes'
+import Select from '@components/inputs/Select'
+import { pools } from '@utils/instructions/MapleFinance/poolList'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import useWallet from '@hooks/useWallet'
+import GovernedAccountSelect from '../../GovernedAccountSelect'
+import { NewProposalContext } from '../../../new'
+import { tryGetMint } from '@utils/tokens'
+import { uiToNative } from '@blockworks-foundation/mango-client'
+import Input from '@components/inputs/Input'
+
+const schema = yup.object().shape({
+  governedAccount: yup.object().required('Governed token account is required'),
+  poolName: yup.string().required('Pool Name is required'),
+  sharesAmount: yup
+    .number()
+    .moreThan(0, 'Shares amount should be more than 0')
+    .required('Shares amount is required'),
+})
+
+const WithdrawalRequestInitializeForm = ({
+  index,
+  governance,
+}: {
+  index: number
+  governance: ProgramAccount<Governance> | null
+}) => {
+  const wallet = useWalletStore((s) => s.current)
+  const connection = useWalletStore((s) => s.connection.current)
+  const { anchorProvider } = useWallet()
+  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
+  const { handleSetInstructions } = useContext(NewProposalContext)
+  const [form, setForm] = useState<MapleFinanceWithdrawalRequestInitializeForm>(
+    {}
+  )
+  const [formErrors, setFormErrors] = useState({})
+
+  const handleSetForm = ({ propertyName, value }) => {
+    setFormErrors({})
+    setForm({ ...form, [propertyName]: value })
+  }
+
+  const shouldBeGoverned = !!(index !== 0 && governance)
+
+  // Only allow treasury v2 accounts, because Maple require authority to pay fees when withdrawing
+  // Which is not possible for other governance's types
+  const governancesV2 = governedTokenAccountsWithoutNfts.filter(
+    (governance) =>
+      governance.governance.account.accountType ===
+        GovernanceAccountType.GovernanceV2 && governance.isSol
+  )
+
+  const getInstruction = async (): Promise<UiInstruction> => {
+    const isValid = await validateInstruction({ schema, form, setFormErrors })
+    const { governedAccount, poolName } = form
+
+    if (
+      !isValid ||
+      !governedAccount ||
+      !governedAccount.governance?.account ||
+      !poolName ||
+      !wallet ||
+      !wallet.publicKey
+    ) {
+      return {
+        serializedInstruction: '',
+        isValid: false,
+        governance: governedAccount?.governance,
+      }
+    }
+
+    const syrupClient = SyrupClient.load({
+      // anchorProvider is enough match, that's why we force the compatibility with any
+      provider: anchorProvider as any,
+    })
+
+    const pool = pools[poolName]
+
+    const poolData = await syrupClient.program.account.pool.fetch(pool)
+
+    // Needs to renew PublicKey to avoid:
+    // TypeError: The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object
+    // tbh not sure why, since starts seems the variable is a PublicKey imported from solana/web3.js which is correct
+    const lenderUser = new PublicKey(governedAccount.pubkey.toBase58())
+
+    const [lenderAddress] = await syrupClient.findProgramAddress([
+      'lender',
+      pool,
+      lenderUser,
+    ])
+
+    const lenderData = await syrupClient.program.account.lender.fetch(
+      lenderAddress
+    )
+
+    const sharesMint = await tryGetMint(connection, poolData.sharesMint)
+    if (!sharesMint) {
+      throw new Error(
+        `Cannot load maple pool base mint for ${poolData.baseMint.toBase58()}`
+      )
+    }
+
+    const {
+      tx,
+    } = await syrupClient.lenderActions().initializeWithdrawalRequest({
+      sharesAmount: uiToNative(form.sharesAmount!, sharesMint.account.decimals),
+
+      pool: {
+        address: pool,
+        data: poolData as AccountData<'pool'>,
+      },
+
+      lender: {
+        address: lenderAddress,
+        data: lenderData,
+      },
+
+      // Needs to renew PublicKey to avoid:
+      // TypeError: The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object
+      // tbh not sure why, since starts seems the variable is a PublicKey imported from solana/web3.js which is correct
+      lenderUser: new PublicKey(governedAccount.pubkey.toBase58()),
+    })
+
+    if (!tx.instructions.length) {
+      throw new Error(
+        'Unexpected amount of instructions generated by initializeWithdrawalRequest function (maple sdk)'
+      )
+    }
+
+    const [instruction] = tx.instructions
+
+    return {
+      serializedInstruction: serializeInstructionToBase64(instruction),
+      isValid: true,
+      governance: governedAccount.governance,
+      additionalSerializedInstructions: [],
+    }
+  }
+
+  useEffect(() => {
+    handleSetInstructions(
+      {
+        governedAccount: form.governedAccount?.governance,
+        getInstruction,
+      },
+      index
+    )
+    // Only set instruction when form changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form])
+
+  return (
+    <>
+      <GovernedAccountSelect
+        label="Governed Account"
+        governedAccounts={governancesV2}
+        onChange={(value) => {
+          handleSetForm({ value, propertyName: 'governedAccount' })
+        }}
+        value={form.governedAccount}
+        error={formErrors['governedAccount']}
+        shouldBeGoverned={shouldBeGoverned}
+        governance={governance}
+      />
+
+      <Select
+        label="Pool"
+        value={form.poolName}
+        placeholder="Please select..."
+        onChange={(value) => {
+          handleSetForm({
+            value,
+            propertyName: 'poolName',
+          })
+        }}
+        error={formErrors['poolName']}
+      >
+        {Object.keys(pools).map((name) => (
+          <Select.Option key={name} value={name}>
+            {name}
+          </Select.Option>
+        ))}
+      </Select>
+
+      <Input
+        label="Shares Amount"
+        value={form.sharesAmount}
+        type="number"
+        min="0"
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'sharesAmount',
+          })
+        }
+        error={formErrors['sharesAmount']}
+      />
+    </>
+  )
+}
+
+export default WithdrawalRequestInitializeForm

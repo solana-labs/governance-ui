@@ -47,6 +47,7 @@
     "@headlessui/react": "1.6.6",
     "@heroicons/react": "1.0.6",
     "@hookform/resolvers": "2.8.10",
+    "@maplelabs/syrup-sdk": "2.0.4",
     "@marinade.finance/marinade-ts-sdk": "2.0.9",
     "@mean-dao/msp": "3.0.1-alpha.13",
     "@metaplex-foundation/js": "0.17.5",

@@ -1,3 +1,4 @@
+import { u8 } from 'buffer-layout'
 import { gistApi } from './github'
 
 export function capitalize(str?: string) {
@@ -49,3 +50,6 @@ export const firstOrNull = <T>(
   }
   return null
 }
+
+// Anchor instruction adds a 7 byte discriminator prefix on instruction data
+export const ANCHOR_DISCRIMINATOR_LAYOUT = Array.from(new Array(7)).map(u8)

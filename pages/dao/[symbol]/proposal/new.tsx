@@ -127,6 +127,12 @@ import UpdateConfigParams from './components/instructions/Serum/UpdateConfigPara
 import ClaimMangoTokens from './components/instructions/Mango/ClaimTokens'
 import { StyledLabel } from '@components/inputs/styles'
 import SelectInstructionType from '@components/SelectInstructionType'
+import MapleFinanceLenderInitialize from './components/instructions/MapleFinance/LenderInitialize'
+import MapleFinanceLenderDeposit from './components/instructions/MapleFinance/LenderDeposit'
+import MapleFinanceLenderUnlockDeposit from './components/instructions/MapleFinance/LenderUnlockDeposit'
+import MapleFinanceWithdrawalRequestInitialize from './components/instructions/MapleFinance/WithdrawalRequestInitialize'
+import MapleFinanceWithdrawalRequestExecute from './components/instructions/MapleFinance/WithdrawalRequestExecute'
+import MapleFinanceWithdrawalRequestClose from './components/instructions/MapleFinance/WithdrawalRequestClose'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -430,6 +436,12 @@ const New = () => {
       [Instructions.MangoV4Serum3RegisterMarket]: Serum3RegisterMarket,
       [Instructions.MangoV4PerpCreate]: PerpCreate,
       [Instructions.MangoV4TokenRegisterTrustless]: TokenRegisterTrustless,
+      [Instructions.MapleFinanceLenderInitialize]: MapleFinanceLenderInitialize,
+      [Instructions.MapleFinanceLenderDeposit]: MapleFinanceLenderDeposit,
+      [Instructions.MapleFinanceLenderUnlockDeposit]: MapleFinanceLenderUnlockDeposit,
+      [Instructions.MapleFinanceWithdrawalRequestInitialize]: MapleFinanceWithdrawalRequestInitialize,
+      [Instructions.MapleFinanceWithdrawalRequestExecute]: MapleFinanceWithdrawalRequestExecute,
+      [Instructions.MapleFinanceWithdrawalRequestClose]: MapleFinanceWithdrawalRequestClose,
       [Instructions.Grant]: Grant,
       [Instructions.Clawback]: Clawback,
       [Instructions.CreateAssociatedTokenAccount]: CreateAssociatedTokenAccount,

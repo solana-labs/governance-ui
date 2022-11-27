@@ -202,6 +202,10 @@ export default function useGovernanceAssets() {
       isVisible: symbol === 'MNGO',
       image: '/img/mango.png',
     },
+    [PackageEnum.MapleFinance]: {
+      name: 'Maple Finance',
+      image: '/img/maplefinance.png',
+    },
     [PackageEnum.MeanFinance]: {
       name: 'Mean Finance',
       image: '/img/meanfinance.png',
@@ -626,6 +630,39 @@ export default function useGovernanceAssets() {
     [Instructions.MangoV4TokenRegisterTrustless]: {
       name: 'Token Register Trustless',
       packageId: PackageEnum.MangoMarketV4,
+    },
+
+    /*
+      ███    ███  █████  ██████  ██      ███████     ███████ ██ ███    ██  █████  ███    ██  ██████ ███████ 
+      ████  ████ ██   ██ ██   ██ ██      ██          ██      ██ ████   ██ ██   ██ ████   ██ ██      ██      
+      ██ ████ ██ ███████ ██████  ██      █████       █████   ██ ██ ██  ██ ███████ ██ ██  ██ ██      █████   
+      ██  ██  ██ ██   ██ ██      ██      ██          ██      ██ ██  ██ ██ ██   ██ ██  ██ ██ ██      ██      
+      ██      ██ ██   ██ ██      ███████ ███████     ██      ██ ██   ████ ██   ██ ██   ████  ██████ ███████ 
+    */
+
+    [Instructions.MapleFinanceLenderDeposit]: {
+      name: 'Lender Deposit',
+      packageId: PackageEnum.MapleFinance,
+    },
+    [Instructions.MapleFinanceLenderInitialize]: {
+      name: 'Lender Initialize',
+      packageId: PackageEnum.MapleFinance,
+    },
+    [Instructions.MapleFinanceLenderUnlockDeposit]: {
+      name: 'Lender Unlock Deposit',
+      packageId: PackageEnum.MapleFinance,
+    },
+    [Instructions.MapleFinanceWithdrawalRequestClose]: {
+      name: 'Withdrawal Request Close',
+      packageId: PackageEnum.MapleFinance,
+    },
+    [Instructions.MapleFinanceWithdrawalRequestExecute]: {
+      name: 'Withdrawal Request Execute',
+      packageId: PackageEnum.MapleFinance,
+    },
+    [Instructions.MapleFinanceWithdrawalRequestInitialize]: {
+      name: 'Withdrawal Request Initialize',
+      packageId: PackageEnum.MapleFinance,
     },
 
     /*

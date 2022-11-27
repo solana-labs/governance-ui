@@ -29,6 +29,7 @@ import { LIDO_INSTRUCTIONS } from './programs/lido'
 import { NAME_SERVICE_INSTRUCTIONS } from './programs/nameService'
 import { TOKEN_AUCTION_INSTRUCTIONS } from './programs/tokenAuction'
 import { VALIDATORDAO_INSTRUCTIONS } from './programs/validatordao'
+import { MAPLE_FINANCE_PROGRAM_INSTRUCTIONS } from './programs/mapleFinance'
 
 /**
  * Default governance program id instance
@@ -299,6 +300,7 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...SAGA_PHONE,
   ...TOKEN_AUCTION_INSTRUCTIONS,
   ...VALIDATORDAO_INSTRUCTIONS,
+  ...MAPLE_FINANCE_PROGRAM_INSTRUCTIONS,
 }
 
 export async function getInstructionDescriptor(

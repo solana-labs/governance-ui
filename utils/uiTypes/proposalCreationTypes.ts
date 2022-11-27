@@ -11,6 +11,7 @@ import { consts as foresightConsts } from '@foresight-tmp/foresight-sdk'
 import { AssetAccount, StakeAccount } from '@utils/uiTypes/assets'
 import { RealmInfo } from '@models/registry/api'
 import * as Msp from '@mean-dao/msp'
+import { PoolName as MapleFinancePoolName } from '@utils/instructions/MapleFinance/poolList'
 
 // Alphabetical order
 export enum PackageEnum {
@@ -24,6 +25,7 @@ export enum PackageEnum {
   NftPlugin,
   MangoMarketV3,
   MangoMarketV4,
+  MapleFinance,
   MeanFinance,
   Serum,
   Solend,
@@ -524,6 +526,40 @@ export interface JoinDAOForm {
   amount?: number
 }
 
+export interface MapleFinanceLenderInitializeForm {
+  governedAccount?: AssetAccount
+  poolName?: MapleFinancePoolName
+}
+
+export interface MapleFinanceLenderDepositForm {
+  governedAccount?: AssetAccount
+  poolName?: MapleFinancePoolName
+  depositAmount?: number
+}
+
+export interface MapleFinanceLenderUnlockDepositForm {
+  governedAccount?: AssetAccount
+  poolName?: MapleFinancePoolName
+}
+
+export interface MapleFinanceWithdrawalRequestInitializeForm {
+  governedAccount?: AssetAccount
+  poolName?: MapleFinancePoolName
+  sharesAmount?: number
+}
+
+export interface MapleFinanceWithdrawalRequestExecuteForm {
+  governedAccount?: AssetAccount
+  poolName?: MapleFinancePoolName
+  withdrawalRequestAddress?: string
+}
+
+export interface MapleFinanceWithdrawalRequestCloseForm {
+  governedAccount?: AssetAccount
+  poolName?: MapleFinancePoolName
+  withdrawalRequestAddress?: string
+}
+
 export enum Instructions {
   Base64,
   ChangeMakeDonation,
@@ -580,6 +616,12 @@ export enum Instructions {
   MangoV4TokenEdit,
   MangoV4TokenRegister,
   MangoV4TokenRegisterTrustless,
+  MapleFinanceLenderDeposit,
+  MapleFinanceLenderInitialize,
+  MapleFinanceLenderUnlockDeposit,
+  MapleFinanceWithdrawalRequestClose,
+  MapleFinanceWithdrawalRequestExecute,
+  MapleFinanceWithdrawalRequestInitialize,
   MeanCreateAccount,
   MeanCreateStream,
   MeanFundAccount,
@@ -608,9 +650,9 @@ export enum Instructions {
   VotingMintConfig,
   WithdrawFromCastle,
   WithdrawFromGoblinGold,
+  WithdrawFromVolt,
   WithdrawObligationCollateralAndRedeemReserveLiquidity,
   WithdrawValidatorStake,
-  WithdrawFromVolt,
 }
 
 export type createParams = [
