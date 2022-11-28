@@ -3,7 +3,7 @@ import * as AspectRatio from '@radix-ui/react-aspect-ratio';
 
 import cx from '@hub/lib/cx';
 
-function getYoutubeEmbedUrl(url: string) {
+export function getYoutubeEmbedUrl(url: string) {
   const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
   const match = url.match(regExp);
   const id = match && match[7].length == 11 ? match[7] : null;

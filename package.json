@@ -68,6 +68,7 @@
     "@radix-ui/react-hover-card": "1.0.0",
     "@radix-ui/react-navigation-menu": "1.0.0",
     "@radix-ui/react-popover": "1.0.2",
+    "@radix-ui/react-radio-group": "1.1.0",
     "@radix-ui/react-select": "1.0.0",
     "@radix-ui/react-separator": "1.0.0",
     "@radix-ui/react-tabs": "1.0.0",

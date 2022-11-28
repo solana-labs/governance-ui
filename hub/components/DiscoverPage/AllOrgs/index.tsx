@@ -54,14 +54,14 @@ export function AllOrgs(props: Props) {
       ({ realmDropdownList }) => {
         const items = realmDropdownList
           .map((item) => ({
-            bannerImgSrc: item.realm.bannerImageUrl,
-            category: item.realm.category,
-            description: item.realm.shortDescription,
-            heading: item.realm.hub.info.clippedHeading,
+            bannerImgSrc: item.bannerImageUrl,
+            category: item.category,
+            description: item.shortDescription,
+            heading: item.clippedHeading,
             iconImgSrc: item.iconUrl,
-            name: item.name,
+            name: item.displayName || item.name,
             publicKey: item.publicKey,
-            twitterFollowerCount: item.realm.hub.twitterFollowerCount,
+            twitterFollowerCount: item.twitterFollowerCount,
             urlId: item.urlId,
           }))
           .filter((item) => {
