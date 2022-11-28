@@ -60,7 +60,6 @@ const REALM = () => {
     ownTokenRecord,
     councilTokenOwnerRecords,
     ownCouncilTokenRecord,
-    isNftMode,
   } = useRealm()
   const proposalsPerPage = 20
   const [filters, setFilters] = useState<Filters>(InitialFilters)
@@ -86,7 +85,6 @@ const REALM = () => {
     (s) => s.state.currentRealmVotingClient
   )
   const wallet = useWalletStore((s) => s.current)
-  const connected = useWalletStore((s) => s.connected)
   const connection = useWalletStore((s) => s.connection.current)
 
   const allProposals = Object.entries(proposals).sort((a, b) =>

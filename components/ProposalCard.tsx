@@ -33,11 +33,6 @@ const ProposalCard = ({ proposalPk, proposal }: ProposalCardProps) => {
   const { fmtUrlWithCluster } = useQueryContext()
   const votesData = useProposalVotes(proposal)
 
-  const x = (votesData as Exclude<
-    typeof votesData,
-    { _programVersion: 1 | 2 | undefined }
-  >).veto
-
   return (
     <div>
       <Link
