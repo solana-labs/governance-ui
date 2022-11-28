@@ -92,7 +92,7 @@ const useCanVeto = ():
   return { canVote: true }
 }
 
-const VetoPanel = () => {
+const VetoButtons = () => {
   const vetoable = useIsVetoable()
   const vetoingPop = useVetoingPop()
   const canVeto = useCanVeto()
@@ -133,4 +133,4 @@ const VetoPanel = () => {
   ) : null
 }
 
-export default VetoPanel
+export default VetoButtons
