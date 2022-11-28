@@ -3,7 +3,7 @@ import { BanIcon } from '@heroicons/react/solid'
 import useProposal from '@hooks/useProposal'
 import useProposalVotes from '@hooks/useProposalVotes'
 import { ProposalState } from '@solana/spl-governance'
-import { useVetoingPop } from './VotePanel/VetoPanel'
+import { useVetoingPop } from './VotePanel/VetoButtons'
 
 const VetoResult = () => {
   const vetoingPop = useVetoingPop()

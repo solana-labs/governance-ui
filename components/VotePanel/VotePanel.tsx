@@ -8,8 +8,8 @@ import useWalletStore from '../../stores/useWalletStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import Tooltip from '@components/Tooltip'
 import { VotingClientType } from '@utils/uiTypes/VotePlugin'
-import VetoPanel from './VetoPanel'
-import { CastVotePanel } from './CastVotePanel'
+import VetoButtons from './VetoButtons'
+import { CastVoteButtons } from './CastVoteButtons'
 import { YouVoted } from './YouVoted'
 import { useIsVoting } from './hooks'
 
@@ -96,14 +96,14 @@ const VotePanel = () => {
     <>
       <YouVoted />
       {isVoting && (
-        <CastVotePanel
+        <CastVoteButtons
           {...{
             voteTooltipContent,
             isVoteEnabled: !!isVoteEnabled,
           }}
         />
       )}
-      <VetoPanel />
+      <VetoButtons />
       {didNotVote && (
         <div className="bg-bkg-2 p-4 md:p-6 rounded-lg flex flex-col items-center justify-center">
           <h3 className="text-center mb-0">You did not vote</h3>

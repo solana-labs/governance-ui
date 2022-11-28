@@ -5,7 +5,7 @@ import Button from '../Button'
 import VoteCommentModal from '../VoteCommentModal'
 import { useVoterTokenRecord, useVotingPop } from './hooks'
 
-export const CastVotePanel = ({
+export const CastVoteButtons = ({
   voteTooltipContent,
   isVoteEnabled,
 }: {
