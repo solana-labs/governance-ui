@@ -1,8 +1,4 @@
-import {
-  ProgramAccount,
-  TokenOwnerRecord,
-  VoteKind,
-} from '@solana/spl-governance'
+import { VoteKind } from '@solana/spl-governance'
 import { useState } from 'react'
 import { ThumbUpIcon, ThumbDownIcon } from '@heroicons/react/solid'
 import Button from '../Button'
