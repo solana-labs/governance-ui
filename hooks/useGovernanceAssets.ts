@@ -169,6 +169,9 @@ export default function useGovernanceAssets() {
     [PackageEnum.Common]: {
       name: 'Common',
     },
+    [PackageEnum.Dual]: {
+      name: 'Dual',
+    },
     [PackageEnum.Everlend]: {
       name: 'Everlend',
       image: '/img/everlend.png',
@@ -382,7 +385,7 @@ export default function useGovernanceAssets() {
       name: 'Withdraw Funds',
       packageId: PackageEnum.Everlend,
     },
-    
+
     /*
       ██████  ██    ██  █████   ██      
       ██   ██ ██    ██ ██   ██  ██      
@@ -390,10 +393,11 @@ export default function useGovernanceAssets() {
       ██   ██ ██    ██ ██   ██  ██      
       ██████   ██████  ██   ██  ███████ 
     */
-    
+
     [Instructions.DualFinanceStakingOption]: {
       name: 'Dual Finance: Staking Option',
-      isVisible: canUseAnyInstruction,
+      isVisible: canUseTransferInstruction,
+      packageId: PackageEnum.Dual,
     },
 
     /*

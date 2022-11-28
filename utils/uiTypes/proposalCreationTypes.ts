@@ -30,6 +30,7 @@ export enum PackageEnum {
   Streamflow,
   Switchboard,
   VsrPlugin,
+  Dual,
 }
 
 export interface UiInstruction {
