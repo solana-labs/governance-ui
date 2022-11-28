@@ -1,5 +1,13 @@
-import { serializeInstructionToBase64 } from '@solana/spl-governance'
-import { PublicKey } from '@solana/web3.js'
+import {
+  serializeInstructionToBase64,
+  TOKEN_PROGRAM_ID,
+} from '@solana/spl-governance'
+import {
+  Keypair,
+  PublicKey,
+  SystemProgram,
+  TransactionInstruction,
+} from '@solana/web3.js'
 
 import { StakingOptions } from '@dual-finance/staking-options'
 import { ConnectionContext } from '@utils/connection'
@@ -14,6 +22,11 @@ import {
 } from '@utils/associated'
 import { tryGetTokenAccount } from '@utils/tokens'
 import { WalletAdapter } from '@solana/wallet-adapter-base'
+import {
+  closeAccount,
+  initializeAccount,
+} from '@project-serum/serum/lib/token-instructions'
+import { Token } from '@solana/spl-token'
 
 interface Args {
   connection: ConnectionContext
@@ -37,8 +50,8 @@ export default async function getConfigInstruction({
   const isValid = await validateInstruction({ schema, form, setFormErrors })
 
   const serializedInstruction = ''
-  let additionalSerializedInstructions: string[] = []
-
+  const additionalSerializedInstructions: string[] = []
+  const prerequisiteInstructions: TransactionInstruction[] = []
   if (
     isValid &&
     form.soName &&
@@ -49,11 +62,49 @@ export default async function getConfigInstruction({
     wallet?.publicKey
   ) {
     const so = getStakingOptionsApi(connection)
-    const baseTreasuryAccount = await tryGetTokenAccount(
-      connection.current,
-      form.baseTreasury.pubkey
+    const baseMint = form.baseTreasury.extensions.mint?.publicKey
+    const space = 165
+    const rent = await connection.current.getMinimumBalanceForRentExemption(
+      space,
+      'processed'
     )
-    const baseMint = baseTreasuryAccount?.account.mint
+    //Creating checking account on the fly with same mint as base and owner
+    //made to be more safe - instructions don't have access to main treasury
+    const helperTokenAccount = new Keypair()
+    //run as prerequsite instructions payer is connected wallet
+    prerequisiteInstructions.push(
+      SystemProgram.createAccount({
+        fromPubkey: wallet.publicKey,
+        newAccountPubkey: helperTokenAccount.publicKey,
+        lamports: rent,
+        space: space,
+        programId: TOKEN_PROGRAM_ID,
+      }),
+      //initialized account with same mint as base
+      initializeAccount({
+        account: helperTokenAccount.publicKey,
+        mint: baseMint,
+        owner: form.baseTreasury.isSol
+          ? form.baseTreasury.governance.pubkey
+          : form.baseTreasury.extensions.token?.account.owner,
+      })
+    )
+
+    additionalSerializedInstructions.push(
+      //transfer funds from base treasury to the helper checking account
+      serializeInstructionToBase64(
+        Token.createTransferInstruction(
+          TOKEN_PROGRAM_ID,
+          form.baseTreasury.extensions.transferAddress!,
+          helperTokenAccount.publicKey,
+          //owner is sol wallet or governance same as baseTokenAccount
+          form.baseTreasury.extensions!.token!.account.owner,
+          [],
+          form.numTokens
+        )
+      )
+    )
+
     const quoteTreasuryAccount = await tryGetTokenAccount(
       connection.current,
       form.quoteTreasury.pubkey
@@ -77,24 +128,27 @@ export default async function getConfigInstruction({
       form.numTokens,
       form.lotSize,
       form.soName,
-      form.payer.pubkey,
+      //use sol wallet as authority
+      form.payer.extensions.transferAddress!,
       baseMint,
-      form.baseTreasury.pubkey,
+      //use helper account as base account
+      helperTokenAccount.publicKey,
       quoteMint,
       form.quoteTreasury.pubkey
     )
 
-    additionalSerializedInstructions = additionalSerializedInstructions.concat(
+    additionalSerializedInstructions.push(
       serializeInstructionToBase64(configInstruction)
     )
 
     const initStrikeInstruction = await so.createInitStrikeInstruction(
       form.strike,
       form.soName,
-      form.payer.pubkey,
+      //authority sol wallet
+      form.payer.extensions.transferAddress!,
       baseMint
     )
-    additionalSerializedInstructions = additionalSerializedInstructions.concat(
+    additionalSerializedInstructions.push(
       serializeInstructionToBase64(initStrikeInstruction)
     )
 
@@ -110,31 +164,44 @@ export default async function getConfigInstruction({
         new PublicKey(form.userPk),
         soMint
       )
-      additionalSerializedInstructions = additionalSerializedInstructions.concat(
-        serializeInstructionToBase64(ataIx)
-      )
+      additionalSerializedInstructions.push(serializeInstructionToBase64(ataIx))
     }
 
     const issueInstruction = await so.createIssueInstruction(
       form.numTokens,
       form.strike,
       form.soName,
-      form.payer.pubkey,
+      //authority sol wallet
+      form.payer.extensions.transferAddress!,
       baseMint,
       userSoAccount
     )
 
-    additionalSerializedInstructions = additionalSerializedInstructions.concat(
+    additionalSerializedInstructions.push(
       serializeInstructionToBase64(issueInstruction)
+    )
+
+    //after everything we close helper account
+    additionalSerializedInstructions.push(
+      serializeInstructionToBase64(
+        closeAccount({
+          source: helperTokenAccount.publicKey,
+          //sol wallet
+          destination: form.payer.extensions.transferAddress,
+          //owner governance or sol wallet same as baseTokenAccount
+          owner: form.baseTreasury.extensions.token?.account.owner,
+        })
+      )
     )
 
     const obj: UiInstruction = {
       serializedInstruction,
       isValid: true,
+      prerequisiteInstructions: prerequisiteInstructions,
       governance: form.baseTreasury?.governance,
       additionalSerializedInstructions,
       chunkSplitByDefault: true,
-      chunkBy: 1,
+      chunkBy: 2,
     }
     return obj
   }

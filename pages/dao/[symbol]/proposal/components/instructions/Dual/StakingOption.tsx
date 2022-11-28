@@ -166,10 +166,15 @@ const StakingOption = ({
           error={formErrors['lotSize']}
         />
       </Tooltip>
-      <Tooltip content="Rent payer. Should be the governance wallet">
+      <Tooltip content="Rent payer. Should be the governance wallet with same governance as base treasury">
         <GovernedAccountSelect
           label="Payer Account"
-          governedAccounts={governedTokenAccountsWithoutNfts}
+          governedAccounts={governedTokenAccountsWithoutNfts.filter(
+            (x) =>
+              x.isSol &&
+              form.baseTreasury?.governance &&
+              x.governance.pubkey.equals(form.baseTreasury.governance.pubkey)
+          )}
           onChange={(value) => {
             handleSetForm({ value, propertyName: 'payer' })
           }}
@@ -179,7 +184,7 @@ const StakingOption = ({
           governance={governance}
         ></GovernedAccountSelect>
       </Tooltip>
-      <Tooltip content="Recipient of the staking options">
+      <Tooltip content="Recipient (Wallet address) of the staking options">
         <Input
           label="Recipient Public Key"
           value={form.userPk}
