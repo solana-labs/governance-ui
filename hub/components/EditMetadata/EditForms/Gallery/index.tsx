@@ -81,7 +81,6 @@ export function Gallery(props: Props) {
       </header>
       <FieldDescription className="mt-2">
         Express your project, brand, and team activity with images and videos.
-        Currently, Realms does not support image or video uploads.
       </FieldDescription>
       <div className="mt-16 space-y-16">
         {gallery.map((item, i) => (

@@ -81,7 +81,7 @@ export function Member(props: Props) {
           You must provide a name
         </div>
       )}
-      <FieldHeader className="mb-1 mt-8">Avatar</FieldHeader>
+      <FieldHeader className="mb-1 mt-8">Image</FieldHeader>
       <FieldDescription>
         Please input a URL linking to a square JPG or PNG. Preferably under
         300KB to prevent long load times. The url should support hot-linking.

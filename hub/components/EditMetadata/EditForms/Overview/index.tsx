@@ -10,7 +10,9 @@ import { FieldHeader } from '../common/FieldHeader';
 import { FieldRichTextEditor } from '../common/FieldRichTextEditor';
 import { SecondaryRed } from '@hub/components/controls/Button';
 import { Input } from '@hub/components/controls/Input';
-import { isEmpty } from '@hub/lib/richText';
+import { Textarea } from '@hub/components/controls/Textarea';
+import cx from '@hub/lib/cx';
+import { isEmpty, fromPlainText, toPlainText } from '@hub/lib/richText';
 import { RichTextDocument } from '@hub/types/RichTextDocument';
 
 function trimAbout(
@@ -136,6 +138,9 @@ export function Overview(props: Props) {
     url: string;
   }[];
 
+  const headingText = props.heading ? toPlainText(props.heading) : '';
+  const headingIsTooLong = headingText.length > 130;
+
   return (
     <section className={props.className}>
       <header className="flex items-center space-x-2 mb-16">
@@ -147,18 +152,37 @@ export function Overview(props: Props) {
       <div>
         <FieldHeader className="mb-1">Overview Statement</FieldHeader>
         <FieldDescription>
-          This will display in large text, prominently displayed on your hub.
+          This will display in large text, prominently displayed on your Hub
+          page.
         </FieldDescription>
-        <FieldRichTextEditor
-          className="mt-1"
-          document={props.heading}
+        <Textarea
+          className="mt-1 h-20 w-full"
           placeholder="e.g. Our mission is to..."
-          onDocumentChange={props.onHeadingChange}
+          value={headingText}
+          onChange={(e) => {
+            const value = e.currentTarget.value;
+
+            if (value) {
+              props.onHeadingChange?.(fromPlainText(value));
+            } else {
+              props.onHeadingChange?.(null);
+            }
+          }}
         />
+        <div className="flex items-center justify-end">
+          <div
+            className={cx(
+              'text-xs',
+              headingIsTooLong ? 'text-rose-500' : 'text-neutral-500',
+            )}
+          >
+            {headingText.length} / 130
+          </div>
+        </div>
       </div>
       <div className="mt-16">
         <div className="text-xl sm:text-2xl font-medium text-sky-500 mb-2">
-          About your Realm
+          About Your Organization
         </div>
         <FieldDescription>
           You can add a few paragraphs to explain your organization or project
@@ -252,7 +276,7 @@ export function Overview(props: Props) {
                 props.onResourcesChange?.(trimResources(newResources));
               }}
             />
-            <FieldHeader className="mt-3 mb-1">Url</FieldHeader>
+            <FieldHeader className="mt-3 mb-1">URL</FieldHeader>
             <Input
               className="w-full"
               value={resource.url}

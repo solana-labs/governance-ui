@@ -90,7 +90,8 @@ export function BasicInfo(props: Props) {
         <FieldHeader className="mb-1">Short Description</FieldHeader>
         <FieldDescription>
           You can provide a short (one sentence) description of your
-          organization or product.
+          organization or product. This text will be used on the Discover page
+          to describe your organization.
         </FieldDescription>
         <Input
           className="w-full mt-2"

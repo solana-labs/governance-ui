@@ -121,7 +121,7 @@ export function Content(props: Props) {
                   )}
                 >
                   <EditIcon className="h-3 w-3 fill-current mr-1" />
-                  <div>edit metadata</div>
+                  <div>edit info</div>
                 </a>
               </Link>
             )}

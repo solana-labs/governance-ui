@@ -459,3 +459,41 @@ export function isEmpty(document: RichTextDocument) {
 
   return true;
 }
+
+export function toPlainText(document: RichTextDocument) {
+  let text = '';
+
+  for (const block of document.content) {
+    if (block.t === BlockNodeType.Block) {
+      for (const child of block.c) {
+        if (typeof child.c === 'string') {
+          text += child.c;
+        } else {
+          for (const node of child.c) {
+            text += node.c;
+          }
+        }
+      }
+    }
+  }
+
+  return text;
+}
+
+export function fromPlainText(text: string): RichTextDocument {
+  return {
+    attachments: [],
+    content: [
+      {
+        t: BlockNodeType.Block,
+        c: [
+          {
+            t: InlineNodeType.Inline,
+            c: text,
+          },
+        ],
+        s: BlockStyle.P,
+      },
+    ],
+  };
+}

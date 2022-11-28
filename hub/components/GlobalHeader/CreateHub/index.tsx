@@ -6,6 +6,7 @@ import LaunchIcon from '@carbon/icons-react/lib/Launch';
 import WarningIcon from '@carbon/icons-react/lib/Warning';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import { PublicKey } from '@solana/web3.js';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
@@ -38,7 +39,7 @@ export function CreateHub(props: Props) {
         <Dialog.Trigger asChild>
           <Button.Primary className={cx('w-36', props.className)}>
             <AddIcon className="w-4 h-4 mr-1" />
-            Create Realm
+            Create Hub
           </Button.Primary>
         </Dialog.Trigger>
       </NavigationMenu.Item>
@@ -51,16 +52,17 @@ export function CreateHub(props: Props) {
                 <RealmCircle className="h-8 w-8" />
                 <div>
                   <div className="text-3xl font-medium text-neutral-900">
-                    Before creating your Realm...
+                    Before creating your Hub...
                   </div>
                   <div className="mt-14">
                     <div className="font-bold text-neutral-900">
-                      Does your organization have a multi-sig wallet or DAO?
+                      Does your organization have a multisig wallet or DAO
+                      through SPL Governance?
                     </div>
                     <div className="text-sm text-neutral-500">
-                      All organizations that want to create a Realm must first
-                      create a multi-sig or DAO using the SPL Governance
-                      on-chain program.
+                      All wallet addresses in the multisig or DAO council will
+                      have admin privileges like moderating the feed and editing
+                      the hub.
                     </div>
                   </div>
                   <Radio.Root
@@ -88,11 +90,11 @@ export function CreateHub(props: Props) {
                   {hasDAO === HasDAO.Yes && (
                     <div className="mt-10">
                       <div className="font-bold text-neutral-900">
-                        What is your multi-sig's or DAO's address?
+                        What is your multi-sig's or DAO's public key?
                       </div>
                       <div className="text-sm text-neutral-500">
                         This will link your organization's DAO or multi-sig to
-                        your Realm.
+                        your Hub.
                       </div>
                       <Input
                         className="w-full mt-4"
@@ -128,13 +130,13 @@ export function CreateHub(props: Props) {
                     <div className="mt-8 bg-white py-5 px-6">
                       <div className="flex items-center font-bold text-rose-500 space-x-2">
                         <WarningIcon className="h-4 w-4" />
-                        <div>Before you can create your Realm...</div>
+                        <div>Before you can create your Hub...</div>
                       </div>
                       <div className="mt-1 text-sm text-neutral-700">
                         You must first create your organization’s multi-sig
                         wallet or DAO. Members of the multi-sig or council
                         members of the DAO will gain admin privileges like
-                        moderating and editing for the hub and its feed.
+                        moderating and editing for the Hub and its feed.
                       </div>
                       <div className="mt-6 flex items-center space-x-4">
                         <Button.Secondary
@@ -156,15 +158,28 @@ export function CreateHub(props: Props) {
               </div>
               <div className="flex items-center justify-between px-[108px]">
                 <div className="text-xs text-neutral-500">
-                  Need help? Email{' '}
-                  <a
+                  {/* Need help? Email{' '} */}
+                  Need help? Post your question on the{' '}
+                  <Link passHref href="/realm/rch">
+                    <a
+                      className="text-sky-500 hover:text-sky-400 transition-colors"
+                      onClick={() => {
+                        setDialogOpen(false);
+                        setPk('');
+                        setPkIsValid(false);
+                      }}
+                    >
+                      Realms Org Hub
+                    </a>
+                  </Link>
+                  {/* <a
                     className="underline"
-                    href="mailto:hello@realms.today"
+                    href="mailto:realms@solana.com"
                     target="_blank"
                     rel="noreferrer"
                   >
-                    hello@realms.today
-                  </a>
+                    realms@solana.com
+                  </a> */}
                 </div>
                 <Button.Primary
                   className="w-44"

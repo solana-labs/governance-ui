@@ -54,7 +54,7 @@ const New: React.FC = () => {
         </div>
         <div className="flex items-center justify-center px-4 mt-10 space-x-8">
           <a
-            href="https://governance-docs.vercel.app/DAO-Management/creating-DAOs/DAO-wizard"
+            href="https://governance-docs.vercel.app/"
             target="_blank"
             rel="noopener noreferrer"
           >

@@ -1,4 +1,3 @@
-import ChatBotIcon from '@carbon/icons-react/lib/ChatBot';
 import { produce } from 'immer';
 import { useState } from 'react';
 
@@ -6,6 +5,7 @@ import { FieldHeader } from '../common/FieldHeader';
 import { FieldRichTextEditor } from '../common/FieldRichTextEditor';
 import { SecondaryRed } from '@hub/components/controls/Button';
 import { Input } from '@hub/components/controls/Input';
+import { FaqOutline as FaqIcon } from '@hub/components/icons/FaqOutline';
 import { isEmpty } from '@hub/lib/richText';
 import { RichTextDocument } from '@hub/types/RichTextDocument';
 
@@ -68,7 +68,7 @@ export function FAQ(props: Props) {
   return (
     <section className={props.className}>
       <header className="flex items-center space-x-2">
-        <ChatBotIcon className="h-4 w-4 sm:h-6 sm:w-6 fill-sky-500" />
+        <FaqIcon className="h-4 w-4 sm:h-6 sm:w-6 fill-sky-500" />
         <div className="text-xl sm:text-3xl font-medium text-neutral-900">
           Add Frequently Asked Questions
         </div>

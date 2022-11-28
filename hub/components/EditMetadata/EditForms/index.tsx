@@ -1,5 +1,4 @@
 import ArrowRightIcon from '@carbon/icons-react/lib/ArrowRight';
-import ChatBotIcon from '@carbon/icons-react/lib/ChatBot';
 import ImageIcon from '@carbon/icons-react/lib/Image';
 import LocationStarIcon from '@carbon/icons-react/lib/LocationStar';
 import OrderDetailsIcon from '@carbon/icons-react/lib/OrderDetails';
@@ -10,12 +9,14 @@ import * as Tabs from '@radix-ui/react-tabs';
 import { PublicKey } from '@solana/web3.js';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Primary, Secondary } from '@hub/components/controls/Button';
+import { FaqOutline as FaqIcon } from '@hub/components/icons/FaqOutline';
 import { useQuery } from '@hub/hooks/useQuery';
 import cx from '@hub/lib/cx';
 import { getDimensions } from '@hub/lib/image';
+import { toPlainText } from '@hub/lib/richText';
 import { RealmCategory } from '@hub/types/RealmCategory';
 import * as RE from '@hub/types/Result';
 import { RichTextDocument } from '@hub/types/RichTextDocument';
@@ -236,11 +237,21 @@ export function EditForms(props: Props) {
   const [tab, setTab] = useState('Basics');
   const [submitting, setSubmitting] = useState(false);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0 });
+    }
+  }, [tab]);
+
+  const headingText = heading ? toPlainText(heading) : '';
+  const headingIsTooLong = headingText.length > 130;
+
   const hasErrors =
     (symbol &&
       RE.isOk(symbolValidResp) &&
       symbolValidResp.data.canAssignSymbolToRealm === false) ||
-    !tokenIsValid;
+    !tokenIsValid ||
+    headingIsTooLong;
 
   const updatedRealm = {
     about,
@@ -275,7 +286,7 @@ export function EditForms(props: Props) {
             <Tab icon={<ImageIcon />} text="Gallery" />
             <Tab icon={<UserMultipleIcon />} text="Team" />
             <Tab icon={<LocationStarIcon />} text="Roadmap" />
-            <Tab icon={<ChatBotIcon />} text="FAQs" />
+            <Tab icon={<FaqIcon />} text="FAQs" />
           </Tabs.List>
         </div>
         <div className="mt-16 pb-48">
@@ -389,40 +400,64 @@ export function EditForms(props: Props) {
             )}
           </div>
           {props.newRealmMode ? (
-            <Secondary
-              className="flex-shrink-0"
-              disabled={hasErrors}
-              pending={submitting}
-              onClick={async () => {
-                let success = true;
+            tab === 'FAQs' ? (
+              <Primary
+                className="flex-shrink-0"
+                disabled={hasErrors}
+                pending={submitting}
+                onClick={async () => {
+                  let success = true;
 
-                if (props.onSave) {
-                  setSubmitting(true);
-                  const updates = await enhanceData(updatedRealm);
-                  success = await props.onSave(updates);
-                  setSubmitting(false);
-                }
+                  if (props.onSave) {
+                    setSubmitting(true);
+                    const updates = await enhanceData(updatedRealm);
+                    success = await props.onSave(updates);
+                    setSubmitting(false);
+                  }
 
-                if (success) {
-                  if (tab === 'Basics') {
-                    setTab('Overview');
-                  } else if (tab === 'Overview') {
-                    setTab('Gallery');
-                  } else if (tab === 'Gallery') {
-                    setTab('Team');
-                  } else if (tab === 'Team') {
-                    setTab('Roadmap');
-                  } else if (tab === 'Roadmap') {
-                    setTab('FAQs');
-                  } else if (tab === 'FAQs') {
+                  if (success) {
                     router.push(`/realm/${props.data.urlId}/hub`);
                   }
-                }
-              }}
-            >
-              {tab === 'FAQs' ? 'Done' : 'Save & Continue'}{' '}
-              <ArrowRightIcon className="h-4 w-4 ml-1" />
-            </Secondary>
+                }}
+              >
+                Finish <ArrowRightIcon className="h-4 w-4 ml-1" />
+              </Primary>
+            ) : (
+              <Secondary
+                className="flex-shrink-0"
+                disabled={hasErrors}
+                pending={submitting}
+                onClick={async () => {
+                  let success = true;
+
+                  if (props.onSave) {
+                    setSubmitting(true);
+                    const updates = await enhanceData(updatedRealm);
+                    success = await props.onSave(updates);
+                    setSubmitting(false);
+                  }
+
+                  if (success) {
+                    if (tab === 'Basics') {
+                      setTab('Overview');
+                    } else if (tab === 'Overview') {
+                      setTab('Gallery');
+                    } else if (tab === 'Gallery') {
+                      setTab('Team');
+                    } else if (tab === 'Team') {
+                      setTab('Roadmap');
+                    } else if (tab === 'Roadmap') {
+                      setTab('FAQs');
+                    } else if (tab === 'FAQs') {
+                      router.push(`/realm/${props.data.urlId}/hub`);
+                    }
+                  }
+                }}
+              >
+                {tab === 'FAQs' ? 'Done' : 'Save & Continue'}{' '}
+                <ArrowRightIcon className="h-4 w-4 ml-1" />
+              </Secondary>
+            )
           ) : (
             <div className="flex items-center space-x-8">
               <Link passHref href={`/realm/${props.data.urlId}/hub`}>
