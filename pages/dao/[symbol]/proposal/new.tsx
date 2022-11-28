@@ -440,7 +440,6 @@ const New = () => {
       [Instructions.ClaimPendingWithdraw]: FriktionClaimPendingWithdraw,
       [Instructions.DepositIntoCastle]: CastleDeposit,
       [Instructions.DualFinanceStakingOption]: StakingOption,
-      [Instructions.WithrawFromCastle]: CastleWithdraw,
       [Instructions.MeanCreateAccount]: MeanCreateAccount,
       [Instructions.MeanFundAccount]: MeanFundAccount,
       [Instructions.MeanWithdrawFromAccount]: MeanWithdrawFromAccount,
