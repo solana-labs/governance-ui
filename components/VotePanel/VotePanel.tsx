@@ -13,27 +13,16 @@ import { CastVoteButtons } from './CastVoteButtons'
 import { YouVoted } from './YouVoted'
 import { useIsVoting } from './hooks'
 
-const STATES_NOT_VISIBLE_IF_NOT_CONNECTED = [
-  ProposalState.Cancelled,
-  ProposalState.Succeeded,
-  ProposalState.Draft,
-  ProposalState.Completed,
-]
-
 const VotePanel = () => {
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
-  const {
-    governance,
-    proposal,
-    voteRecordsByVoter,
-    tokenRole,
-  } = useWalletStore((s) => s.selectedProposal)
+  const { proposal, voteRecordsByVoter, tokenRole } = useWalletStore(
+    (s) => s.selectedProposal
+  )
   const { ownTokenRecord, ownCouncilTokenRecord, ownVoterWeight } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
-  const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
 
   // Handle state based on if a delegated wallet has already voted or not
   const ownVoteRecord =
@@ -77,20 +66,13 @@ const VotePanel = () => {
     ? 'You don’t have governance power to vote in this dao'
     : ''
 
-  const isVisibleToWallet = !connected
-    ? !hasVoteTimeExpired &&
-      typeof STATES_NOT_VISIBLE_IF_NOT_CONNECTED.find(
-        (x) => x === proposal?.account.state
-      ) === 'undefined'
-    : !ownVoteRecord?.account.isRelinquished
-
   const didNotVote =
+    connected &&
     !!proposal &&
     !isVoting &&
     proposal.account.state !== ProposalState.Cancelled &&
     proposal.account.state !== ProposalState.Draft &&
-    !isVoteCast &&
-    isVisibleToWallet
+    !isVoteCast
 
   return (
     <>
