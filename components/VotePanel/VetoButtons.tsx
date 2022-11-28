@@ -34,6 +34,7 @@ const useIsVetoable = (): undefined | boolean => {
   const vetoingPop = useVetoingPop()
   const isVoting = useIsVoting()
 
+  // TODO is this accurate?
   if (isVoting === false) return false
   if (vetoingPop === undefined) return undefined
   return !!vetoingPop

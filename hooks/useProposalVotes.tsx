@@ -48,6 +48,7 @@ export default function useProposalVotes(proposal?: Proposal) {
       'Proposal has no vote threshold (this shouldnt be possible)'
     )
 
+  // note this can be WRONG if the proposal status is vetoed
   const maxVoteWeight = isPluginCommunityVoting
     ? maxVoteRecord.account.maxVoterWeight
     : getProposalMaxVoteWeight(realm.account, proposal, proposalMint)
@@ -126,13 +127,11 @@ export default function useProposalVotes(proposal?: Proposal) {
       veto: undefined,
     }
 
-  // Council votes are currently not affected by MaxVoteWeightSource
-  const vetoMaxVoteWeight = isCommunityVote
-    ? vetoMint.supply
-    : getMintMaxVoteWeight(
-        vetoMint,
-        realm.account.config.communityMintMaxVoteWeightSource
-      )
+  const isPluginCommunityVeto = maxVoteRecord && !isCommunityVote
+
+  const vetoMaxVoteWeight = isPluginCommunityVeto
+    ? maxVoteRecord.account.maxVoterWeight
+    : getProposalMaxVoteWeight(realm.account, proposal, vetoMint)
 
   const vetoVoteCount = fmtTokenAmount(
     proposal.vetoVoteWeight,
