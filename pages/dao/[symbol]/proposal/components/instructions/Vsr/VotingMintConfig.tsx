@@ -55,7 +55,7 @@ const VotingMintConfig = ({
   const [form, setForm] = useState<ConfigureCollectionForm>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
-  const { anchorProvider, wallet } = useWallet()
+  const { wallet, anchorProvider } = useWallet()
 
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
@@ -64,7 +64,7 @@ const VotingMintConfig = ({
       isValid &&
       form &&
       form!.governedAccount?.governance.pubkey &&
-      wallet?.publicKey
+      wallet?.publicKey?.toBase58()
     ) {
       const vsrClient = VsrClient.connect(
         anchorProvider,

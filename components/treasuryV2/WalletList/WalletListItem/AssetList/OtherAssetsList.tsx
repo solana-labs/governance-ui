@@ -4,6 +4,7 @@ import { CollectionIcon } from '@heroicons/react/outline'
 import {
   AssetType,
   Mint,
+  Domains,
   Programs,
   RealmAuthority,
   Unknown,
@@ -11,6 +12,7 @@ import {
 
 import Collapsible from './Collapsible'
 import MintListItem from './MintListItem'
+import DomainListItem from './DomainListItem'
 import ProgramsListItem from './ProgramsListItem'
 import UnknownAssetListItem from './UnknownAssetListItem'
 import RealmAuthorityListItem from './RealmAuthorityListItem'
@@ -19,9 +21,9 @@ interface Props {
   className?: string
   disableCollapse?: boolean
   expanded?: boolean
-  assets: (Mint | Programs | RealmAuthority | Unknown)[]
+  assets: (Mint | Domains | Programs | RealmAuthority | Unknown)[]
   selectedAssetId?: string | null
-  onSelect?(asset: Mint | Programs | RealmAuthority | Unknown): void
+  onSelect?(asset: Mint | Domains | Programs | RealmAuthority | Unknown): void
   onToggleExpand?(): void
 }
 
@@ -43,6 +45,15 @@ export default function OtherAssetsList(props: Props) {
               <MintListItem
                 key={i}
                 mint={asset}
+                selected={props.selectedAssetId === asset.id}
+                onSelect={() => props.onSelect?.(asset)}
+              />
+            )
+          case AssetType.Domain:
+            return (
+              <DomainListItem
+                key={i}
+                count={asset.count}
                 selected={props.selectedAssetId === asset.id}
                 onSelect={() => props.onSelect?.(asset)}
               />

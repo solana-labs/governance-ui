@@ -3,7 +3,7 @@ import { abbreviateAddress } from '@utils/formatting'
 import useWalletStore from '../../stores/useWalletStore'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import { AssetAccount } from '@utils/uiTypes/assets'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import { WSOL_MINT } from '@components/instructions/tools'
 const AccountItemNFT = ({
   governedAccountTokenAccount,
@@ -28,7 +28,7 @@ const AccountItemNFT = ({
     setCurrentAccount(governedAccountTokenAccount, connection)
   }
   const info = governedAccountTokenAccount.isSol
-    ? tokenService.getTokenInfo(WSOL_MINT)
+    ? tokenPriceService.getTokenInfo(WSOL_MINT)
     : undefined
   const nftsCount = governedAccountTokenAccount.isSol
     ? nftsPerPubkey[governedAccountTokenAccount.governance.pubkey.toBase58()]

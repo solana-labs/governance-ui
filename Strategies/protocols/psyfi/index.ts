@@ -11,7 +11,7 @@ import {
   TokenGroupedVaults,
   VaultInfo,
 } from './types'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import {
   ProgramAccount,
   Realm,
@@ -102,7 +102,7 @@ export const convertVaultInfoToStrategy = async (
     strategyName = vaultInfo.name
   }
   const handledMint = vaultInfo.accounts.collateralAssetMint
-  const tokenInfo = await tokenService.getTokenInfo(handledMint)
+  const tokenInfo = await tokenPriceService.getTokenInfo(handledMint)
   if (!tokenInfo) {
     return
   }

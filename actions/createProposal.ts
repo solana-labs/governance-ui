@@ -282,6 +282,7 @@ export const createProposal = async (
     wallet: wallet.publicKey?.toBase58(),
     proposalAddress: proposalAddress.toBase58(),
     proposalIndex: proposalIndex,
+    cluster: connection.rpcEndpoint.includes('devnet') ? 'devnet' : 'mainnet',
   }
   trySentryLog({
     tag: 'proposalCreated',
