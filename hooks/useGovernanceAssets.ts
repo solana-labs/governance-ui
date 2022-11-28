@@ -171,6 +171,7 @@ export default function useGovernanceAssets() {
     },
     [PackageEnum.Dual]: {
       name: 'Dual',
+      image: '/img/dual-logo.png',
     },
     [PackageEnum.Everlend]: {
       name: 'Everlend',
