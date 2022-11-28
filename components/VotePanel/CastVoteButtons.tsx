@@ -3,21 +3,66 @@ import { useState } from 'react'
 import { ThumbUpIcon, ThumbDownIcon } from '@heroicons/react/solid'
 import Button from '../Button'
 import VoteCommentModal from '../VoteCommentModal'
-import { useVoterTokenRecord, useVotingPop } from './hooks'
+import {
+  useIsVoting,
+  useOwnVoteRecord,
+  useVoterTokenRecord,
+  useVotingPop,
+} from './hooks'
+import useRealm from '@hooks/useRealm'
+import { VotingClientType } from '@utils/uiTypes/VotePlugin'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import useWalletStore from 'stores/useWalletStore'
 
-export const CastVoteButtons = ({
-  voteTooltipContent,
-  isVoteEnabled,
-}: {
-  voteTooltipContent: string
-  isVoteEnabled: boolean
-}) => {
+const useCanVote = () => {
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
+  const { ownVoterWeight } = useRealm()
+  const connected = useWalletStore((s) => s.connected)
+
+  const ownVoteRecord = useOwnVoteRecord()
+  const voterTokenRecord = useVoterTokenRecord()
+
+  const isVoteCast = ownVoteRecord !== undefined
+
+  const hasMinAmountToVote =
+    voterTokenRecord &&
+    ownVoterWeight.hasMinAmountToVote(
+      voterTokenRecord.account.governingTokenMint
+    )
+
+  const canVote =
+    connected &&
+    !(
+      client.clientType === VotingClientType.NftVoterClient && !voterTokenRecord
+    ) &&
+    !isVoteCast &&
+    hasMinAmountToVote
+
+  const voteTooltipContent = !connected
+    ? 'You need to connect your wallet to be able to vote'
+    : client.clientType === VotingClientType.NftVoterClient && !voterTokenRecord
+    ? 'You must join the Realm to be able to vote'
+    : !hasMinAmountToVote
+    ? 'You don’t have governance power to vote in this dao'
+    : ''
+  return [canVote, voteTooltipContent] as const
+}
+
+export const CastVoteButtons = () => {
   const [showVoteModal, setShowVoteModal] = useState(false)
   const [vote, setVote] = useState<'yes' | 'no' | null>(null)
   const votingPop = useVotingPop()
   const voterTokenRecord = useVoterTokenRecord()
 
-  return (
+  const [canVote, tooltipContent] = useCanVote()
+  const ownVoteRecord = useOwnVoteRecord()
+
+  const isVoteCast = ownVoteRecord !== undefined
+  const isVoting = useIsVoting()
+
+  return isVoting && !isVoteCast ? (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-4">
       <div className="flex flex-col items-center justify-center">
         <h3 className="text-center">Cast your {votingPop} vote</h3>
@@ -26,13 +71,13 @@ export const CastVoteButtons = ({
       <div className="items-center justify-center flex w-full gap-5">
         <div className="w-full flex justify-between items-center gap-5">
           <Button
-            tooltipMessage={voteTooltipContent}
+            tooltipMessage={tooltipContent}
             className="w-1/2"
             onClick={() => {
               setVote('yes')
               setShowVoteModal(true)
             }}
-            disabled={!isVoteEnabled}
+            disabled={!canVote}
           >
             <div className="flex flex-row items-center justify-center">
               <ThumbUpIcon className="h-4 w-4 mr-2" />
@@ -41,13 +86,13 @@ export const CastVoteButtons = ({
           </Button>
 
           <Button
-            tooltipMessage={voteTooltipContent}
+            tooltipMessage={tooltipContent}
             className="w-1/2"
             onClick={() => {
               setVote('no')
               setShowVoteModal(true)
             }}
-            disabled={!isVoteEnabled}
+            disabled={!canVote}
           >
             <div className="flex flex-row items-center justify-center">
               <ThumbDownIcon className="h-4 w-4 mr-2" />
@@ -66,5 +111,5 @@ export const CastVoteButtons = ({
         />
       ) : null}
     </div>
-  )
+  ) : null
 }
