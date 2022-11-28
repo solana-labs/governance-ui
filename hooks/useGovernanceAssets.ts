@@ -370,6 +370,20 @@ export default function useGovernanceAssets() {
     },
 
     /*
+      ██████  ██    ██  █████   ██      
+      ██   ██ ██    ██ ██   ██  ██      
+      ██   ██ ██    ██ ███████  ██      
+      ██   ██ ██    ██ ██   ██  ██      
+      ██████   ██████  ██   ██  ███████ 
+    */
+
+    [Instructions.DualFinanceStakingOption]: {
+      name: 'Dual Finance: Staking Option',
+      isVisible: canUseTransferInstruction,
+      packageId: PackageEnum.Dual,
+    },
+
+    /*
       ███████ ██    ██ ███████ ██████  ██      ███████ ███    ██ ██████  
       ██      ██    ██ ██      ██   ██ ██      ██      ████   ██ ██   ██ 
       █████   ██    ██ █████   ██████  ██      █████   ██ ██  ██ ██   ██ 
@@ -384,20 +398,6 @@ export default function useGovernanceAssets() {
     [Instructions.EverlendWithdraw]: {
       name: 'Withdraw Funds',
       packageId: PackageEnum.Everlend,
-    },
-
-    /*
-      ██████  ██    ██  █████   ██      
-      ██   ██ ██    ██ ██   ██  ██      
-      ██   ██ ██    ██ ███████  ██      
-      ██   ██ ██    ██ ██   ██  ██      
-      ██████   ██████  ██   ██  ███████ 
-    */
-
-    [Instructions.DualFinanceStakingOption]: {
-      name: 'Dual Finance: Staking Option',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
     },
 
     /*
