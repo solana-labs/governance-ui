@@ -73,6 +73,7 @@ export default async function createMultisigWallet({
       realmId: realmPk,
       realmSymbol: params.realmName,
       wallet: wallet.publicKey?.toBase58(),
+      cluster: connection.rpcEndpoint.includes('devnet') ? 'devnet' : 'mainnet',
     }
     trySentryLog({
       tag: 'realmCreated',

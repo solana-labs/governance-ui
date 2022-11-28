@@ -14,7 +14,7 @@ import VotingPowerBox from '../TokenBalance/VotingPowerBox'
 import { PublicKey } from '@solana/web3.js'
 import { MintInfo } from '@solana/spl-token'
 import { BN } from '@project-serum/anchor'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import useWalletStore from 'stores/useWalletStore'
 import { getDeposits } from 'VoteStakeRegistry/tools/deposits'
 import { DepositWithMintAccount } from 'VoteStakeRegistry/sdk/accounts'
@@ -281,10 +281,11 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
                         x.mint,
                         x.currentAmount
                       ).toNumber() *
-                      tokenService.getUSDTokenPrice(x.mintPk.toBase58())
+                      tokenPriceService.getUSDTokenPrice(x.mintPk.toBase58())
                     const tokenName =
                       getMintMetadata(x.mintPk)?.name ||
-                      tokenService.getTokenInfo(x.mintPk.toBase58())?.name ||
+                      tokenPriceService.getTokenInfo(x.mintPk.toBase58())
+                        ?.name ||
                       abbreviateAddress(x.mintPk)
                     const formatter = Intl.NumberFormat('en', {
                       notation: 'compact',

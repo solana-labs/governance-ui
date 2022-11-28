@@ -3,7 +3,7 @@ import { AccountMetaData } from '@solana/spl-governance'
 import { tryGetMint, tryGetTokenAccount } from '../../../utils/tokens'
 import BN from 'bn.js'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 export interface TokenMintMetadata {
   name: string
 }
@@ -24,7 +24,7 @@ export function getMintMetadata(
 ): TokenMintMetadata {
   const tokenMintAddress = tokenMintPk ? tokenMintPk.toBase58() : ''
   const tokenInfo = tokenMintAddress
-    ? tokenService.getTokenInfo(tokenMintAddress)
+    ? tokenPriceService.getTokenInfo(tokenMintAddress)
     : null
   return tokenInfo
     ? { name: tokenInfo.symbol }

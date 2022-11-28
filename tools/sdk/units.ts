@@ -1,6 +1,6 @@
 import { BN, ProgramAccount } from '@project-serum/anchor'
 import { MintInfo } from '@solana/spl-token'
-import { TokenInfo } from '@solana/spl-token-registry'
+import { TokenInfoWithoutDecimals } from '@utils/services/tokenPrice'
 import { BigNumber } from 'bignumber.js'
 
 const SECONDS_PER_DAY = 86400
@@ -38,7 +38,7 @@ export function fmtMintAmount(mint: MintInfo | undefined, mintAmount: BN) {
 export function fmtTokenInfoWithMint(
   amount: BN,
   mintInfo: ProgramAccount<MintInfo>,
-  tokenInfo: TokenInfo | undefined = undefined
+  tokenInfo: TokenInfoWithoutDecimals | undefined = undefined
 ) {
   return `${fmtBnMintDecimals(amount, mintInfo.account.decimals)} ${
     tokenInfo?.symbol

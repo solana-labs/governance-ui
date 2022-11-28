@@ -5,7 +5,6 @@ import { fmtMintAmount } from '@tools/sdk/units'
 import { BN } from '@project-serum/anchor'
 import Button from '@components/Button'
 import { useState } from 'react'
-import useWallet from '@hooks/useWallet'
 import { notify } from '@utils/notifications'
 import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 import {
@@ -39,7 +38,7 @@ export default function Header(props: Props) {
   const asset = props.tokenOwnerRecordAsset
 
   const connection = useWalletStore((s) => s.connection)
-  const { wallet } = useWallet()
+  const { current: wallet } = useWalletStore()
 
   const [isLeaving, setIsLeaving] = useState(false)
 

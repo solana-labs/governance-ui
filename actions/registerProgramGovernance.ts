@@ -85,6 +85,7 @@ export const registerProgramGovernance = async (
     realmSymbol: realm.account.name,
     wallet: wallet.publicKey?.toBase58(),
     governanceAddress: governanceAddress,
+    cluster: connection.rpcEndpoint.includes('devnet') ? 'devnet' : 'mainnet',
   }
   trySentryLog({
     tag: 'governanceCreated',
