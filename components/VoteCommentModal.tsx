@@ -4,7 +4,6 @@ import {
   ChatMessageBody,
   ChatMessageBodyType,
   VoteKind,
-  YesNoVote,
 } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import useWalletStore from '../stores/useWalletStore'

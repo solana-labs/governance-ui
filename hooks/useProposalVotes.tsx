@@ -1,9 +1,6 @@
 import { Proposal } from '@solana/spl-governance'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
-import {
-  getMintMaxVoteWeight,
-  getProposalMaxVoteWeight,
-} from '../models/voteWeights'
+import { getProposalMaxVoteWeight } from '../models/voteWeights'
 import { calculatePct, fmtTokenAmount } from '../utils/formatting'
 import useProgramVersion from './useProgramVersion'
 import useRealm from './useRealm'
