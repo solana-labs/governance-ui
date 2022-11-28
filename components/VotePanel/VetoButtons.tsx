@@ -54,8 +54,8 @@ const useUserVetoTokenRecord = () => {
 
 const useCanVeto = ():
   | undefined
-  | { canVote: true }
-  | { canVote: false; message: string } => {
+  | { canVeto: true }
+  | { canVeto: false; message: string } => {
   const { ownVoterWeight } = useRealm()
   const connected = useWalletStore((s) => s.connected)
   const isVetoable = useIsVetoable()
@@ -64,17 +64,17 @@ const useCanVeto = ():
 
   if (isVetoable === false)
     return {
-      canVote: false,
+      canVeto: false,
       // (Note that users should never actually see this)
       message: 'This proposal is not vetoable',
     }
 
   // Are you connected?
   if (connected === false)
-    return { canVote: false, message: 'You must connect your wallet' }
+    return { canVeto: false, message: 'You must connect your wallet' }
 
   // Did you already veto?
-  if (userVetoRecord) return { canVote: false, message: 'You already voted' }
+  if (userVetoRecord) return { canVeto: false, message: 'You already voted' }
 
   // Do you have any voting power?
   const hasMinAmountToVote =
@@ -85,11 +85,11 @@ const useCanVeto = ():
   if (hasMinAmountToVote === undefined) return undefined
   if (hasMinAmountToVote === false)
     return {
-      canVote: false,
+      canVeto: false,
       message: 'You don’t have governance power to vote in this dao',
     }
 
-  return { canVote: true }
+  return { canVeto: true }
 }
 
 const VetoButtons = () => {
@@ -108,11 +108,11 @@ const VetoButtons = () => {
         <div className="flex flex-col items-center justify-center">
           <Button
             tooltipMessage={
-              canVeto?.canVote === false ? canVeto.message : undefined
+              canVeto?.canVeto === false ? canVeto.message : undefined
             }
             className="w-full"
             onClick={() => setOpenModal(true)}
-            disabled={!canVeto?.canVote}
+            disabled={!canVeto?.canVeto}
           >
             <div className="flex flex-row items-center justify-center">
               <BanIcon className="h-4 w-4 mr-2" />
