@@ -5,7 +5,6 @@ import { relinquishVote } from '../../actions/relinquishVote'
 import useRealm from '../../hooks/useRealm'
 import { ProposalState } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
-import { GoverningTokenRole } from '@solana/spl-governance'
 import { ThumbUpIcon, ThumbDownIcon } from '@heroicons/react/solid'
 import useWalletStore from '../../stores/useWalletStore'
 import { SecondaryButton } from '../Button'
@@ -15,8 +14,7 @@ import { useRouter } from 'next/router'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { isYesVote } from '@models/voteRecords'
 import Tooltip from '@components/Tooltip'
-import { useIsVoting } from './VotePanel'
-import { useOwnVoteRecord, useVoterTokenRecord } from './hooks'
+import { useOwnVoteRecord, useVoterTokenRecord, useIsVoting } from './hooks'
 
 export const YouVoted = () => {
   const client = useVotePluginsClientStore(

@@ -1,7 +1,7 @@
+import Button from '@components/Button'
 import VoteCommentModal from '@components/VoteCommentModal'
 import { BanIcon } from '@heroicons/react/solid'
 import useRealm from '@hooks/useRealm'
-import { Button } from '@radix-ui/react-toolbar'
 import {
   GoverningTokenRole,
   VoteThresholdType,
@@ -9,7 +9,7 @@ import {
 } from '@solana/spl-governance'
 import { useMemo, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
-import { useIsVoting } from './VotePanel'
+import { useIsVoting } from './hooks'
 
 /* 
   returns: undefined if loading, false if nobody can veto, 'council' if council can veto, 'community' if community can veto
