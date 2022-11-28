@@ -4,7 +4,7 @@ import { getAllSplGovernanceProgramIds } from './tools/realms'
 
 // Returns unique spl-governance program ids
 const handler = (req: NextApiRequest, res: NextApiResponse) => {
-  const cluster = req.query.cluster || undefined
+  const cluster = req.query.cluster?.toString() || undefined
   res.status(200).json(getAllSplGovernanceProgramIds(cluster))
 }
 
