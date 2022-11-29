@@ -1,4 +1,5 @@
 import FlagFilledIcon from '@carbon/icons-react/lib/FlagFilled';
+import LinkedInIcon from '@carbon/icons-react/lib/LogoLinkedin';
 import TwitterIcon from '@carbon/icons-react/lib/LogoTwitter';
 
 import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay';
@@ -14,6 +15,7 @@ interface Props {
   teamMembers: {
     avatar?: null | string;
     description?: null | RichTextDocument;
+    linkedIn?: null | string;
     name: string;
     role?: null | string;
     twitter?: null | string;
@@ -78,20 +80,30 @@ export function Team(props: Props) {
                     {teamMember.role}
                   </div>
                 )}
-
-                {teamMember.twitter && (
+                {(teamMember.twitter || teamMember.linkedIn) && (
                   <div className="flex items-center mt-0.5">
-                    <a
-                      className="flex items-center hover:underline"
-                      href={`https://www.twitter.com/${teamMember.twitter}`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      <TwitterIcon className="h-6 fill-blue-400 mr-0.5 w-6" />
-                      <div className="text-sm text-neutral-900">
-                        {teamMember.twitter}
-                      </div>
-                    </a>
+                    {teamMember.linkedIn && (
+                      <a
+                        href={teamMember.linkedIn}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <LinkedInIcon className="h-6 w-6 fill-sky-600" />
+                      </a>
+                    )}
+                    {teamMember.twitter && (
+                      <a
+                        className="flex items-center hover:underline"
+                        href={`https://www.twitter.com/${teamMember.twitter}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <TwitterIcon className="h-6 fill-blue-400 mr-0.5 w-6" />
+                        <div className="text-sm text-neutral-900">
+                          {teamMember.twitter}
+                        </div>
+                      </a>
+                    )}
                     {teamMember.twitterFollowerCount > 0 && (
                       <div className="text-sm text-neutral-500 ml-1.5">
                         {formatNumber(

@@ -71,6 +71,7 @@ export const getMetadata = gql`
       team {
         avatar
         description
+        linkedIn
         name
         role
         twitter
@@ -149,6 +150,7 @@ export const saveMetadata = gql`
       team {
         avatar
         description
+        linkedIn
         name
         role
         twitter
@@ -242,6 +244,7 @@ const realm = IT.type({
     IT.type({
       avatar: IT.union([IT.null, IT.string]),
       description: IT.union([IT.null, RichTextDocument]),
+      linkedIn: IT.union([IT.null, IT.string]),
       name: IT.string,
       role: IT.union([IT.null, IT.string]),
       twitter: IT.union([IT.null, IT.string]),

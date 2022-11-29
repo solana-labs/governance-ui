@@ -16,6 +16,7 @@ interface Props {
   member: {
     avatar: null | string;
     description: null | RichTextDocument;
+    linkedIn: null | string;
     name: string;
     role: null | string;
     twitter: null | string;
@@ -23,6 +24,7 @@ interface Props {
   onChange?(member: {
     avatar: null | string;
     description: null | RichTextDocument;
+    linkedIn: null | string;
     name: string;
     role: null | string;
     twitter: null | string;
@@ -31,6 +33,7 @@ interface Props {
 }
 
 export function Member(props: Props) {
+  const [avatarInvalid, setAvatarInvalid] = useState(false);
   const [nameError, setNameError] = useState(false);
 
   return (
@@ -83,10 +86,9 @@ export function Member(props: Props) {
       )}
       <FieldHeader className="mb-1 mt-8">Image</FieldHeader>
       <FieldDescription>
-        Please input a URL linking to a square JPG or PNG. Preferably under
-        300KB to prevent long load times. The url should support hot-linking.
-        You can test that the url supports hotlinking using the preview. If your
-        image does not appear in preview, please try a different url.
+        Please input a URL linking to a square JPG or PNG (no Google Drive link,
+        instead something publicly accessible like Imgur). Preferably under
+        300KB to prevent long load times.
       </FieldDescription>
       <div className="grid items-center grid-cols-[1fr,56px] gap-x-4 mt-2">
         <Input
@@ -102,11 +104,22 @@ export function Member(props: Props) {
           }}
         />
         <FieldIconPreview
-          allowYoutube
           className="rounded-full"
           url={props.member.avatar}
+          onError={() => setAvatarInvalid(true)}
+          onClearError={() => setAvatarInvalid(false)}
         />
       </div>
+      {avatarInvalid && (
+        <div className="text-xs text-rose-500 mt-1 grid grid-cols-[1fr,56px] gap-x-4">
+          <div>
+            The URL should support hot-linking, and should point to an image. It
+            appears that the URL you provided doesn't work. Please try another
+            URL.
+          </div>
+          <div />
+        </div>
+      )}
       <FieldHeader className="mb-1 mt-8">Role</FieldHeader>
       <Input
         className="w-full"
@@ -137,19 +150,38 @@ export function Member(props: Props) {
           props.onChange?.(newMember);
         }}
       />
-      <FieldHeader className="mb-1 mt-8">Twitter</FieldHeader>
-      <Input
-        className="w-full"
-        placeholder="e.g. @stevejobs"
-        value={props.member.twitter || ''}
-        onChange={(e) => {
-          const value = e.currentTarget.value || null;
-          const newMember = produce(props.member, (draft) => {
-            draft.twitter = value;
-          });
-          props.onChange?.(newMember);
-        }}
-      />
+      <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-8">
+        <div>
+          <FieldHeader className="mb-1">Twitter</FieldHeader>
+          <Input
+            className="w-full"
+            placeholder="e.g. @stevejobs"
+            value={props.member.twitter || ''}
+            onChange={(e) => {
+              const value = e.currentTarget.value || null;
+              const newMember = produce(props.member, (draft) => {
+                draft.twitter = value;
+              });
+              props.onChange?.(newMember);
+            }}
+          />
+        </div>
+        <div>
+          <FieldHeader className="mb-1">LinkedIn</FieldHeader>
+          <Input
+            className="w-full"
+            placeholder="e.g. https://linkedin.com/in/stevejobs"
+            value={props.member.linkedIn || ''}
+            onChange={(e) => {
+              const value = e.currentTarget.value || null;
+              const newMember = produce(props.member, (draft) => {
+                draft.linkedIn = value;
+              });
+              props.onChange?.(newMember);
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 }

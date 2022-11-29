@@ -90,10 +90,10 @@ export function CreateHub(props: Props) {
                   {hasDAO === HasDAO.Yes && (
                     <div className="mt-10">
                       <div className="font-bold text-neutral-900">
-                        What is your multi-sig's or DAO's public key?
+                        What is your multisig's or DAO's public key?
                       </div>
                       <div className="text-sm text-neutral-500">
-                        This will link your organization's DAO or multi-sig to
+                        This will link your organization's DAO or multisig to
                         your Hub.
                       </div>
                       <Input
@@ -133,8 +133,8 @@ export function CreateHub(props: Props) {
                         <div>Before you can create your Hub...</div>
                       </div>
                       <div className="mt-1 text-sm text-neutral-700">
-                        You must first create your organization’s multi-sig
-                        wallet or DAO. Members of the multi-sig or council
+                        You must first create your organization’s multisig
+                        wallet or DAO. Members of the multisig or council
                         members of the DAO will gain admin privileges like
                         moderating and editing for the Hub and its feed.
                       </div>
@@ -145,7 +145,7 @@ export function CreateHub(props: Props) {
                             window.open('/realms/new', '_blank');
                           }}
                         >
-                          Create Multi-Sig or DAO{' '}
+                          Create Multisig or DAO{' '}
                           <LaunchIcon className="h-4 w-4 ml-1" />
                         </Button.Secondary>
                         <div className="text-xs text-neutral-500">
