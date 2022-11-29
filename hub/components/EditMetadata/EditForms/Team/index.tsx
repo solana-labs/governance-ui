@@ -56,6 +56,7 @@ interface Props {
     team: {
       avatar: null | string;
       description: null | RichTextDocument;
+      linkedIn: null | string;
       name: string;
       role: null | string;
       twitter: null | string;
