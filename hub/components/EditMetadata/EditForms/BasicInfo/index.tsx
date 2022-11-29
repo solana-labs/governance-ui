@@ -51,6 +51,7 @@ interface Props {
 }
 
 export function BasicInfo(props: Props) {
+  const [avatarInvalid, setAvatarInvalid] = useState(false);
   const [bannerInvalid, setBannerInvalid] = useState(false);
 
   return (
@@ -152,10 +153,9 @@ export function BasicInfo(props: Props) {
       <div className="mt-9">
         <FieldHeader className="mb-1">Avatar</FieldHeader>
         <FieldDescription>
-          Please input a URL linking to a square JPG or PNG. Preferably under
-          300KB to prevent long load times. The url should support hot-linking.
-          You can test that the url supports hotlinking using the preview. If
-          your image does not appear in preview, please try a different url.
+          Please input a URL linking to a square JPG or PNG (no Google Drive
+          link, instead something publicly accessible like Imgur). Preferably
+          under 300KB to prevent long load times.
         </FieldDescription>
         <div className="grid grid-cols-[1fr,56px] gap-x-4 mt-2">
           <Input
@@ -186,19 +186,32 @@ export function BasicInfo(props: Props) {
             >
               Remove
             </button>
-            <FieldIconPreview className="rounded-full" url={props.iconUrl} />
+            <FieldIconPreview
+              className="rounded-full"
+              url={props.iconUrl}
+              onError={() => setAvatarInvalid(true)}
+              onClearError={() => setAvatarInvalid(false)}
+            />
           </div>
         </div>
+        {avatarInvalid && (
+          <div className="text-xs text-rose-500 mt-1 grid grid-cols-[1fr,56px] gap-x-4">
+            <div>
+              The URL should support hot-linking, and should point to an image.
+              It appears that the URL you provided doesn't work. Please try
+              another URL.
+            </div>
+            <div />
+          </div>
+        )}
       </div>
       <div className="mt-9">
         <FieldHeader className="mb-1">Banner Image</FieldHeader>
         <FieldDescription>
-          Please input a URL linking to a landscape-oriented JPG or PNG. We
-          recommend omitting text from banners to avoid formatting issues.
-          Preferably under 1MB to prevent long load times. The url should
-          support hot-linking. You can test that the url supports hotlinking
-          using the preview. If your image does not appear in preview, please
-          try a different url.
+          Please input a URL linking to a landscape-oriented JPG or PNG (no
+          Google Drive link, instead something publicly accessible like Imgur).
+          We recommend omitting text from banners to avoid formatting issues.
+          Preferably under 1MB to prevent long load times.
         </FieldDescription>
         <div className="mt-2">
           <Input
@@ -241,22 +254,32 @@ export function BasicInfo(props: Props) {
             <div className="border-2 border-dashed border-zinc-300 h-24 mt-4" />
           )}
         </div>
-        <div className="flex items-center justify-end">
-          <button
-            className={cx(
-              'mt-2.5',
-              'text-xs',
-              'tracking-normal',
-              props.bannerImageUrl ? 'text-rose-500' : 'text-neutral-300',
+        <div className="grid grid-cols-[1fr,56px] gap-x-4 items-start mt-1">
+          <div>
+            {bannerInvalid && (
+              <div className="text-xs text-rose-500">
+                The URL should support hot-linking, and should point to an
+                image. It appears that the URL you provided doesn't work. Please
+                try another URL.
+              </div>
             )}
-            disabled={!props.bannerImageUrl}
-            onClick={() => {
-              props.onBannerImageUrlChange?.(null);
-              setBannerInvalid(false);
-            }}
-          >
-            Remove
-          </button>
+          </div>
+          <div className="flex items-center justify-end">
+            <button
+              className={cx(
+                'text-xs',
+                'tracking-normal',
+                props.bannerImageUrl ? 'text-rose-500' : 'text-neutral-300',
+              )}
+              disabled={!props.bannerImageUrl}
+              onClick={() => {
+                props.onBannerImageUrlChange?.(null);
+                setBannerInvalid(false);
+              }}
+            >
+              Remove
+            </button>
+          </div>
         </div>
       </div>
       <div className="mt-6">

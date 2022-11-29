@@ -13,6 +13,7 @@ function trimTeam(
     __typename?: string;
     avatar: null | string;
     description: null | RichTextDocument;
+    linkedIn: null | string;
     name: string;
     role: null | string;
     twitter: null | string;
@@ -20,6 +21,7 @@ function trimTeam(
 ): {
   avatar: null | string;
   description: null | RichTextDocument;
+  linkedIn: null | string;
   name: string;
   role: null | string;
   twitter: null | string;
@@ -45,6 +47,7 @@ interface Props {
   team: {
     avatar: null | string;
     description: null | RichTextDocument;
+    linkedIn: null | string;
     name: string;
     role: null | string;
     twitter: null | string;
@@ -53,6 +56,7 @@ interface Props {
     team: {
       avatar: null | string;
       description: null | RichTextDocument;
+      linkedIn: null | string;
       name: string;
       role: null | string;
       twitter: null | string;
@@ -69,6 +73,7 @@ export function Team(props: Props) {
         {
           avatar: null,
           description: null,
+          linkedIn: null,
           name: '',
           role: null,
           twitter: null,
@@ -77,6 +82,7 @@ export function Team(props: Props) {
   ).concat({
     avatar: null,
     description: null,
+    linkedIn: null,
     name: '',
     role: null,
     twitter: null,

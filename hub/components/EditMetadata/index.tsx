@@ -82,7 +82,7 @@ export function EditMetadata(props: Props) {
                         </div>
                       </div>
                       <div className="text-neutral-700 text-center">
-                        You are not authorized to edit this Realm's metadata
+                        You are not authorized to edit this Org's info
                       </div>
                     </div>
                   </Dialog.Overlay>

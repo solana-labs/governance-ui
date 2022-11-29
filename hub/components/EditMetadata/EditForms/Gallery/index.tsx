@@ -7,6 +7,8 @@ import { FieldIconPreview } from '../common/FieldIconPreview';
 import { SecondaryRed } from '@hub/components/controls/Button';
 import { Input } from '@hub/components/controls/Input';
 
+import { Item } from './Item';
+
 function trimGallery(
   gallery: {
     __typename?: string;
@@ -84,60 +86,21 @@ export function Gallery(props: Props) {
       </FieldDescription>
       <div className="mt-16 space-y-16">
         {gallery.map((item, i) => (
-          <div key={i}>
-            <div className="flex items-center justify-between mb-2">
-              <h1 className="my-0 text-xl sm:text-2xl text-sky-500 font-medium leading-[40px]">
-                Visual {i + 1}
-              </h1>
-              <SecondaryRed
-                disabled={!item.url && !item.caption}
-                onClick={() => {
-                  const newGallery = gallery.filter((g, index) => index !== i);
-                  props.onGalleryChange?.(trimGallery(newGallery));
-                }}
-              >
-                Delete visual
-              </SecondaryRed>
-            </div>
-            <FieldHeader className="mb-1 mt-8">URL</FieldHeader>
-            <FieldDescription>
-              You may add a URL to a PNG, JPG or Youtube video. The url should
-              support hot-linking. Use the preview to test that the url works
-              with hot-linking.
-            </FieldDescription>
-            <div className="grid items-center grid-cols-[1fr,56px] gap-x-4 mt-2">
-              <Input
-                className="w-full"
-                placeholder="e.g. imgur.com/avatar.png"
-                value={item.url}
-                onChange={(e) => {
-                  const value = e.currentTarget.value;
-                  const newGallery = produce(gallery, (draft) => {
-                    draft[i].url = value;
-                  });
-                  props.onGalleryChange?.(trimGallery(newGallery));
-                }}
-              />
-              <FieldIconPreview
-                allowYoutube
-                className="rounded"
-                url={item.url}
-              />
-            </div>
-            <FieldHeader className="mb-1 mt-6">Caption</FieldHeader>
-            <Input
-              className="w-full"
-              placeholder="e.g. This describes the visual"
-              value={item.caption || ''}
-              onChange={(e) => {
-                const value = e.currentTarget.value;
-                const newGallery = produce(gallery, (draft) => {
-                  draft[i].caption = value || null;
-                });
-                props.onGalleryChange?.(trimGallery(newGallery));
-              }}
-            />
-          </div>
+          <Item
+            {...item}
+            index={i}
+            key={i}
+            onChange={(updates) => {
+              const newGallery = produce(gallery, (draft) => {
+                draft[i] = updates;
+              });
+              props.onGalleryChange?.(trimGallery(newGallery));
+            }}
+            onDelete={() => {
+              const newGallery = gallery.filter((g, index) => index !== i);
+              props.onGalleryChange?.(trimGallery(newGallery));
+            }}
+          />
         ))}
       </div>
     </section>
