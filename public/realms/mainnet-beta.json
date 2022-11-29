@@ -1336,12 +1336,20 @@
     "discord": "https://discord.gg/garitoken"
   },
   {
-    "symbol": "Dual Finance",
+    "symbol": "df test",
     "category": "defi",
-    "bannerImage": "https://pbs.twimg.com/profile_banners/1488237042068819971/1652495773/1500x500",
-    "displayName": "Dual Finance",
+    "displayName": "df test",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "HnLuYmBxDxK1MCihHJVFnNudUTpLPc2km6xNcRQ8KPdj",
+    "sortRank": 3
+  },
+  {
+    "symbol": "Dual DAO",
+    "category": "defi",
+    "bannerImage": "https://pbs.twimg.com/profile_banners/1488237042068819971/1652495773/1500x500",
+    "displayName": "Dual DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "EGYbpow8V9gt8JFmadFYai4sjfwc7Vc9gazU735hE6u7",
     "ogImage": "https://pbs.twimg.com/profile_images/1525300156551274497/FMlM80mn_400x400.jpg",
     "shortDescription": "Sustainable Incentive Liquidity Infrastructure for Web3 Communities",
     "sortRank": 3,
@@ -1579,6 +1587,22 @@
     "twitter": "@Realms_DAOs",
     "discord": "https://discord.gg/zfxTA762",
     "github": "https://github.com/solana-labs/governance-ui"
+  },
+  {
+    "symbol": "WISE",
+    "displayName": "WisdomDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "8Jx7cvj32DJP8bsMQ3pZvDdx2qfynrkovgVQG8DBmY9P",
+    "website": "https://www.wisdom-dao.com/",
+    "twitter": "@WiseEldersDAO",
+    "ogImage": "/realms/WisdomDAO/og.jpg",
+    "bannerImage": "/realms/WisdomDAO/banner.jpg"
+  },
+  {
+    "symbol": "wdmdao",
+    "displayName": "wdmdao",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Hx1vKARnpS8nV8qxzqK9DG1kFXbAy49HJtPQKq6UEHa1"
   },
   {
     "symbol": "GenesysGo",

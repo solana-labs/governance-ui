@@ -1,4 +1,4 @@
-export enum HubInfoRoadmapItemStatus {
+export enum RoadmapItemStatus {
   Completed = 'Completed',
   Delayed = 'Delayed',
   InProgress = 'InProgress',

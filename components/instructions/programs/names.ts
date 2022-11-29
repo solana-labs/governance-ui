@@ -28,6 +28,7 @@ export const GOVERNANCE_PROGRAM_NAMES = {
 // Well known program names displayed on the instruction card
 export const PROGRAM_NAMES = {
   TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA: 'Token Program',
+  ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL: 'ATA Program',
   '11111111111111111111111111111111': 'System Program',
   mv3ekLzLbnVPNxjSKvqBpU3ZeZXPQdEC3bp5MDEBG68: 'Mango v3 Program',
   '9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin': 'Serum v3 Program',
@@ -57,6 +58,32 @@ export const PROGRAM_NAMES = {
   StakeConfig11111111111111111111111111111111: 'Stake Config',
   SysvarStakeHistory1111111111111111111111111: 'Sysvar: Stake History',
   ...GOVERNANCE_PROGRAM_NAMES,
+}
+
+export const NATIVE_SOLANA_PROGRAMS = {
+  //Token
+  TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA: '',
+  '11111111111111111111111111111111': '',
+  BPFLoaderUpgradeab1e11111111111111111111111: '',
+  SysvarRent111111111111111111111111111111111: '',
+  SysvarC1ock11111111111111111111111111111111: '',
+  Stake11111111111111111111111111111111111111: '',
+  StakeConfig11111111111111111111111111111111: '',
+  SysvarStakeHistory1111111111111111111111111: '',
+  Config1111111111111111111111111111111111111: '',
+  Vote111111111111111111111111111111111111111: '',
+  Ed25519SigVerify111111111111111111111111111: '',
+  KeccakSecp256k11111111111111111111111111111: '',
+  //ATA
+  ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL: '',
+  //Token 2022
+  TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb: '',
+  SwapsVeCiPHMUAtzQWZw7RjsKjgCjhwU55QGu4U1Szw: '',
+  LendZqTs7gn5CTSJU1jWKhKuVpjJGom45nnwPb2AMTi: '',
+}
+
+export function isNativeSolanaProgram(programId: PublicKey) {
+  return typeof NATIVE_SOLANA_PROGRAMS[programId.toBase58()] !== 'undefined'
 }
 
 export function getProgramName(programId: PublicKey | string) {

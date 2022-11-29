@@ -47,7 +47,7 @@ import {
   getReserveData,
   SOLEND,
 } from 'Strategies/protocols/solend'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import { EVERLEND } from '../../Strategies/protocols/everlend/tools'
 import { findAssociatedTokenAccount } from '@everlend/common'
 
@@ -290,7 +290,7 @@ const AccountOverview = () => {
 
   const StaticInvestmentsComponent = () => {
     const currentTokenImg = currentAccount.isToken
-      ? tokenService.getTokenInfo(
+      ? tokenPriceService.getTokenInfo(
           currentAccount.extensions.mint!.publicKey.toBase58()
         )?.logoURI || ''
       : ''

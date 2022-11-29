@@ -273,6 +273,7 @@ export default async function createNFTRealm({
       realmId: realmPk,
       realmSymbol: realmName,
       wallet: wallet.publicKey?.toBase58(),
+      cluster: connection.rpcEndpoint.includes('devnet') ? 'devnet' : 'mainnet',
     }
     trySentryLog({
       tag: 'realmCreated',

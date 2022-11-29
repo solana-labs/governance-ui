@@ -10,7 +10,6 @@ import { RealmIcon } from '@hub/components/RealmIcon';
 import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay';
 import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
 import cx from '@hub/lib/cx';
-import { estimateRealmUrlId } from '@hub/lib/estimateRealmUrlId';
 import { FeedItemType } from '@hub/types/FeedItemType';
 import { ProposalState } from '@hub/types/ProposalState';
 
@@ -42,7 +41,7 @@ function getUrl(props: Props) {
     if (!props.feedItem.realmPublicKey.equals(props.realm)) {
       const urlId = props.realmInfo
         ? props.realmInfo.urlId
-        : estimateRealmUrlId(props.feedItem.realmPublicKey);
+        : props.feedItem.realm.urlId;
 
       return `/realm/${urlId}/${props.feedItem.id}`;
     }

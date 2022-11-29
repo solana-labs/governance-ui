@@ -2,7 +2,7 @@ import { FunctionComponent, useMemo } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { LogoutIcon, UserCircleIcon } from '@heroicons/react/outline'
 import useRealm from '@hooks/useRealm'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { PublicKey } from '@solana/web3.js'
 import { AddressImage, DisplayAddress } from '@cardinal/namespaces-components'
@@ -22,7 +22,8 @@ const MembersTabs: FunctionComponent<MembersTabsProps> = ({
 }) => {
   const { mint, councilMint, realm } = useRealm()
   const tokenName = realm
-    ? tokenService.getTokenInfo(realm?.account.communityMint.toBase58())?.symbol
+    ? tokenPriceService.getTokenInfo(realm?.account.communityMint.toBase58())
+        ?.symbol
     : ''
   return (
     <div

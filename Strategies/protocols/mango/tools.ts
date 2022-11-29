@@ -26,7 +26,7 @@ import {
 import { syncNative } from '@solendprotocol/solend-sdk'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { ConnectionContext } from '@utils/connection'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import {
   createProposal,
   InstructionDataWithHoldUpTime,
@@ -93,7 +93,7 @@ function findClosestToDate(values, date) {
 
 //method to fetch mango strategies
 export async function tvl(timestamp, connection: ConnectionContext) {
-  const protocolInfo = await tokenService.getTokenInfo(MANGO_MINT)
+  const protocolInfo = await tokenPriceService.getTokenInfo(MANGO_MINT)
   const balances: TreasuryStrategy[] = []
   const stats = await axios.get(endpoint)
   const date = new Date(timestamp * 1000).getTime()
@@ -101,7 +101,7 @@ export async function tvl(timestamp, connection: ConnectionContext) {
     const assetDeposits = stats.data.filter((s) => s.name === mangoId)
 
     if (assetDeposits.length > 0) {
-      const info = tokenService.getTokenInfoFromCoingeckoId(mangoTokens)
+      const info = tokenPriceService.getTokenInfoFromCoingeckoId(mangoTokens)
       const handledMint =
         (info?.address === MANGO_MINT && connection.cluster === 'devnet'
           ? MANGO_MINT_DEVNET
@@ -353,7 +353,7 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
     tokenOwnerRecord,
     form.title ||
       `Deposit ${fmtAmount} ${
-        tokenService.getTokenInfo(
+        tokenPriceService.getTokenInfo(
           matchedTreasury.extensions.mint!.publicKey.toBase58()
         )?.symbol || 'tokens'
       } to Mango account`,

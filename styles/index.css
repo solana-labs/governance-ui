@@ -88,10 +88,6 @@ tbody {
   @apply text-2xl font-bold;
 }
 
-button {
-  @apply tracking-wide;
-}
-
 .default-transition {
   @apply transition-all duration-300;
 }
