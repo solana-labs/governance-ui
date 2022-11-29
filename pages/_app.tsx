@@ -20,6 +20,14 @@ export default function App({ Component, pageProps, router }: AppProps) {
     return <Component {...pageProps} />
   }
 
+  if (router.pathname.startsWith('/verify-wallet')) {
+    return (
+      <HubApp minimal>
+        <Component {...pageProps} />
+      </HubApp>
+    )
+  }
+
   if (
     router.pathname.startsWith('/realm/[id]') ||
     router.pathname.startsWith('/ecosystem') ||

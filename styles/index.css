@@ -24,6 +24,7 @@
   --fgd-2: theme('colors.dark-theme.fgd-2');
   --fgd-3: theme('colors.dark-theme.fgd-3');
   --fgd-4: theme('colors.dark-theme.fgd-4');
+  --discord: theme('colors.dark-theme.discord');
 }
 
 [data-theme='Light'] {
@@ -46,6 +47,7 @@
   --fgd-2: theme('colors.light-theme.fgd-2');
   --fgd-3: theme('colors.light-theme.fgd-3');
   --fgd-4: theme('colors.light-theme.fgd-4');
+  --discord: theme('colors.light-theme.discord');
 }
 
 /* base */
