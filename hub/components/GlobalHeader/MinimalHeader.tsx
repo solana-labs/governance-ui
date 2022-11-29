@@ -1,7 +1,8 @@
-import cx from '@hub/lib/cx';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import React from 'react';
 import { useMediaQuery } from 'react-responsive';
+
+import cx from '@hub/lib/cx';
 
 import { Logo } from './Logo';
 import { User } from './User';
