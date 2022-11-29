@@ -30,6 +30,8 @@ interface Props extends BaseProps {
     urlId: string;
   };
   realmUrlId: string;
+  userIsAdmin?: boolean;
+  onDelete?(): void;
 }
 
 function getUrl(props: Props) {
@@ -176,7 +178,10 @@ export function Content(props: Props) {
                 )
               : null
           }
+          type={props.feedItem.type}
+          userIsAdmin={props.userIsAdmin}
           userVote={props.feedItem.myVote}
+          onDelete={props.onDelete}
         />
       </div>
     </article>

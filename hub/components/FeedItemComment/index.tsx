@@ -1,6 +1,7 @@
 import * as Separator from '@radix-ui/react-separator';
 import { pipe } from 'fp-ts/function';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 
 import { EcosystemHeader } from '@hub/components/EcosystemHeader';
 import * as Back from '@hub/components/FeedItem/Back';
@@ -49,11 +50,13 @@ export function FeedItemComment(props: Props) {
     pause: !realmPublicKey,
   });
 
-  const [commentResult] = useQuery(gql.getCommentResp, {
+  const [commentResult, refresh] = useQuery(gql.getCommentResp, {
     query: gql.getComments,
     variables: { commentId: props.commentId, feedItemId: props.feedItemId },
     pause: !realmPublicKey,
   });
+
+  const router = useRouter();
 
   return (
     <main className={props.className}>
@@ -209,7 +212,12 @@ export function FeedItemComment(props: Props) {
                         numReplies={feedItem.numComments}
                         realm={realmByUrlId.publicKey}
                         score={feedItem.score}
+                        type={feedItem.type}
                         userVote={feedItem.myVote}
+                        userIsAdmin={realmByUrlId.amAdmin}
+                        onDelete={() => {
+                          router.push(`/realm/${props.realmUrlId}`);
+                        }}
                       />
                       {pipe(
                         commentResult,
@@ -238,6 +246,9 @@ export function FeedItemComment(props: Props) {
                                 feedItemId={props.feedItemId}
                                 realm={realmByUrlId.publicKey}
                                 realmUrlId={props.realmUrlId}
+                                onRefresh={() =>
+                                  refresh({ requestPolicy: 'network-only' })
+                                }
                               />
                             </div>
                           ),

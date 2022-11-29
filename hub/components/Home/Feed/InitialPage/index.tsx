@@ -16,6 +16,8 @@ interface Props extends BaseProps {
   pinnedFeedItems: FeedItemModel[];
   realm: PublicKey;
   realmUrlId: string;
+  userIsAdmin?: boolean;
+  onRefresh?(): void;
 }
 
 export function Content(props: Props) {
@@ -44,6 +46,8 @@ export function Content(props: Props) {
             feedItem={feedItem}
             realm={props.realm}
             realmUrlId={props.realmUrlId}
+            userIsAdmin={props.userIsAdmin}
+            onDelete={props.onRefresh}
           />
           <Separator.Root className="w-full h-[1px] bg-neutral-300 my-4" />
         </React.Fragment>
@@ -54,6 +58,8 @@ export function Content(props: Props) {
             feedItem={feedItem.node}
             realm={props.realm}
             realmUrlId={props.realmUrlId}
+            userIsAdmin={props.userIsAdmin}
+            onDelete={props.onRefresh}
           />
           <Separator.Root className="w-full h-[1px] bg-neutral-300 my-4" />
         </React.Fragment>

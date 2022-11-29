@@ -67,6 +67,7 @@ export function Home(props: Props) {
                 realmIconUrl={realmByUrlId.iconUrl}
                 realmName={realmByUrlId.name}
                 realmUrlId={props.realmUrlId}
+                userIsAdmin={realmByUrlId.amAdmin}
               />
             </div>
           ),
