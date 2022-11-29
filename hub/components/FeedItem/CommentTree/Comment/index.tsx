@@ -216,6 +216,8 @@ export function Content(props: Props) {
                 feedItemId={props.feedItemId}
                 realm={props.realm}
                 realmUrlId={props.realmUrlId}
+                userIsAdmin={props.userIsAdmin}
+                onDelete={props.onDelete}
               />
             </div>
           </div>
