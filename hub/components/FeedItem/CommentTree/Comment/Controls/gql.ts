@@ -16,6 +16,16 @@ export const toggleApproval = gql`
   }
 `;
 
+export const deleteComment = gql`
+  mutation($commentId: RealmFeedItemCommentID!, $realm: PublicKey!) {
+    deleteComment(commentId: $commentId, realm: $realm)
+  }
+`;
+
 export const toggleApprovalResp = IT.type({
   voteOnFeedItemComment: FeedItemComment,
+});
+
+export const deleteCommentResp = IT.type({
+  deleteComment: IT.boolean,
 });

@@ -26,14 +26,16 @@ interface Props extends BaseProps {
   realmIconUrl?: string | null;
   realmName: string;
   realmUrlId: string;
+  userIsAdmin?: boolean;
 }
 
 export function Content(props: Props) {
+  const [refreshKey, setRefreshKey] = useState(0);
   const { getFeedSort, setFeedSort } = useUserPrefs();
 
   const sort = getFeedSort(props.realmUrlId);
 
-  const [result] = useQuery(getFeedResp, {
+  const [result, refresh] = useQuery(getFeedResp, {
     query: getFeed,
     variables: {
       sort,
@@ -61,8 +63,13 @@ export function Content(props: Props) {
     }
   }, [firstPageEndCursor, RE.isOk(result)]);
 
+  useEffect(() => {
+    setReachedEndOfFeed(false);
+    setAdditionalPageCursors([]);
+  }, [refreshKey]);
+
   return (
-    <section className={props.className}>
+    <section className={props.className} key={String(refreshKey)}>
       <header className="flex items-center justify-between">
         <div className="flex items-center space-x-3 text-neutral-900">
           <ListDropdownIcon className="h-5 w-5 fill-current" />
@@ -113,6 +120,11 @@ export function Content(props: Props) {
                   }
                   realm={props.realm}
                   realmUrlId={props.realmUrlId}
+                  userIsAdmin={props.userIsAdmin}
+                  onRefresh={() => {
+                    refresh({ requestPolicy: 'network-only' });
+                    setRefreshKey((key) => key + 1);
+                  }}
                 />
               ) : (
                 <Empty className="mt-24" />
@@ -127,10 +139,15 @@ export function Content(props: Props) {
                   sort={sort}
                   realm={props.realm}
                   realmUrlId={props.realmUrlId}
+                  userIsAdmin={props.userIsAdmin}
                   onLoadMore={(after) =>
                     setAdditionalPageCursors((cursors) => cursors.concat(after))
                   }
                   onNoAdditionalPages={() => setReachedEndOfFeed(true)}
+                  onRefresh={() => {
+                    refresh({ requestPolicy: 'network-only' });
+                    setRefreshKey((key) => key + 1);
+                  }}
                 />
               ))}
               {!!feed.edges.length && reachedEndOfFeed && (

@@ -25,8 +25,10 @@ interface BaseProps {
   sort: FeedItemSort;
   realm: PublicKey;
   realmUrlId: string;
+  userIsAdmin?: boolean;
   onLoadMore?(after: string): void;
   onNoAdditionalPages?(): void;
+  onRefresh?(): void;
 }
 
 interface Props extends BaseProps {
@@ -67,6 +69,7 @@ export function Content(props: Props) {
             feedItem={feedItem.node}
             realm={props.realm}
             realmUrlId={props.realmUrlId}
+            userIsAdmin={props.userIsAdmin}
           />
           <Separator.Root className="w-full h-[1px] bg-neutral-300 my-4" />
         </React.Fragment>
@@ -101,6 +104,7 @@ export function AdditionalPage(props: BaseProps) {
           realmUrlId={props.realmUrlId}
           onLoadMore={props.onLoadMore}
           onNoAdditionalPages={props.onNoAdditionalPages}
+          onRefresh={props.onRefresh}
         />
       ),
     ),

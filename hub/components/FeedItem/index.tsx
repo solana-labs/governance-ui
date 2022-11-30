@@ -1,6 +1,7 @@
 import * as Separator from '@radix-ui/react-separator';
 import { pipe } from 'fp-ts/function';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import { EcosystemHeader } from '@hub/components/EcosystemHeader';
@@ -27,6 +28,7 @@ interface Props {
 }
 
 export function FeedItem(props: Props) {
+  const [refreshKey, setRefreshKey] = useState(0);
   const [realmResult] = useQuery(gql.getRealmResp, {
     query: gql.getRealm,
     variables: {
@@ -50,10 +52,9 @@ export function FeedItem(props: Props) {
     pause: !realmPublicKey,
   });
 
-  const [commentsResult] = useQuery(gql.getCommentsResp, {
+  const [commentsResult, refreshComments] = useQuery(gql.getCommentsResp, {
     query: gql.getComments,
     variables: { feedItemId: props.feedItemId },
-    pause: !realmPublicKey,
   });
 
   const [jwt] = useJWT();
@@ -62,9 +63,15 @@ export function FeedItem(props: Props) {
     [],
   );
 
+  const router = useRouter();
+
   const firstPageEndCursor = RE.isOk(commentsResult)
     ? commentsResult.data.feedItemCommentTree.pageInfo.endCursor
     : null;
+
+  useEffect(() => {
+    setAdditionalPageCursors([]);
+  }, [refreshKey]);
 
   useEffect(() => {
     if (firstPageEndCursor) {
@@ -170,7 +177,10 @@ export function FeedItem(props: Props) {
                       </div>
                     ),
                     ({ feedItem }) => (
-                      <div className="max-w-3xl mx-auto pt-8 w-full px-4">
+                      <div
+                        className="max-w-3xl mx-auto pt-8 w-full px-4"
+                        key={String(refreshKey)}
+                      >
                         <Head>
                           <title>
                             {feedItem.title} - {realmByUrlId.name}
@@ -207,7 +217,12 @@ export function FeedItem(props: Props) {
                           numReplies={feedItem.numComments}
                           realm={realmByUrlId.publicKey}
                           score={feedItem.score}
+                          type={feedItem.type}
                           userVote={feedItem.myVote}
+                          userIsAdmin={realmByUrlId.amAdmin}
+                          onDelete={() => {
+                            router.push(`/realm/${props.realmUrlId}`);
+                          }}
                         />
                         {jwt && (
                           <ReplyBox.Content
@@ -239,6 +254,13 @@ export function FeedItem(props: Props) {
                                   feedItemId={props.feedItemId}
                                   realm={realmByUrlId.publicKey}
                                   realmUrlId={props.realmUrlId}
+                                  userIsAdmin={realmByUrlId.amAdmin}
+                                  onRefresh={() => {
+                                    refreshComments({
+                                      requestPolicy: 'network-only',
+                                    });
+                                    setRefreshKey((key) => key + 1);
+                                  }}
                                 />
                                 {additionalPageCursors.map((cursor) => (
                                   <AdditionalCommentTree
@@ -248,11 +270,18 @@ export function FeedItem(props: Props) {
                                     key={cursor}
                                     realm={realmByUrlId.publicKey}
                                     realmUrlId={props.realmUrlId}
+                                    userIsAdmin={realmByUrlId.amAdmin}
                                     onLoadMore={(newCursor) =>
                                       setAdditionalPageCursors((cursors) =>
                                         cursors.concat(newCursor),
                                       )
                                     }
+                                    onRefresh={() => {
+                                      refreshComments({
+                                        requestPolicy: 'network-only',
+                                      });
+                                      setRefreshKey((key) => key + 1);
+                                    }}
                                   />
                                 ))}
                               </div>
