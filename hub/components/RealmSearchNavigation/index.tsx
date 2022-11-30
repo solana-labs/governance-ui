@@ -31,49 +31,80 @@ export const RealmSearchNavigation = forwardRef<HTMLInputElement, Props>(
     const options = pipe(
       result,
       RE.match(
-        () => [],
-        () => [],
-        ({ realmDropdownList }) => {
-          return [
-            {
-              key: ECOSYSTEM_PAGE.toBase58(),
-              iconUrl: ecosystemIcon.src,
-              name: 'Solana Ecosystem',
-              publicKey: ECOSYSTEM_PAGE,
-              url: '/ecosystem',
-            } as {
-              key: string;
-              iconUrl: null | string;
-              name: string;
-              publicKey: PublicKey;
-              url: string;
-            },
-          ]
-            .concat(
-              realmDropdownList.map((item) => ({
+        () => ({ following: [], all: [] }),
+        () => ({ following: [], all: [] }),
+        ({ me, realmDropdownList }) => {
+          const followedRealms = me?.followedRealms || [];
+          const followedRealmsPks = followedRealms.map((r) =>
+            r.publicKey.toBase58(),
+          );
+
+          return {
+            following: followedRealms
+              .map((item) => ({
                 key: item.publicKey.toBase58(),
                 iconUrl: item.iconUrl,
                 name: item.displayName || item.name,
                 publicKey: item.publicKey,
                 url: `/realm/${item.urlId}/hub`,
-              })),
-            )
-            .filter((item) => {
-              if (STEALTH_HUBS.has(item.publicKey.toBase58())) {
-                return false;
-              }
+              }))
+              .filter((choice) => {
+                if (!text) {
+                  return true;
+                }
 
-              return true;
-            })
-            .filter((choice) => {
-              if (!text) {
+                return choice.name
+                  .toLocaleLowerCase()
+                  .includes(text.toLocaleLowerCase());
+              }),
+            all: [
+              {
+                key: ECOSYSTEM_PAGE.toBase58(),
+                iconUrl: ecosystemIcon.src,
+                name: 'Solana Ecosystem',
+                publicKey: ECOSYSTEM_PAGE,
+                url: '/ecosystem',
+              } as {
+                key: string;
+                iconUrl: null | string;
+                name: string;
+                publicKey: PublicKey;
+                url: string;
+              },
+            ]
+              .concat(
+                realmDropdownList.map((item) => ({
+                  key: item.publicKey.toBase58(),
+                  iconUrl: item.iconUrl,
+                  name: item.displayName || item.name,
+                  publicKey: item.publicKey,
+                  url: `/realm/${item.urlId}/hub`,
+                })),
+              )
+              .filter((item) => {
+                if (followedRealmsPks.includes(item.publicKey.toBase58())) {
+                  return false;
+                }
+
                 return true;
-              }
+              })
+              .filter((item) => {
+                if (STEALTH_HUBS.has(item.publicKey.toBase58())) {
+                  return false;
+                }
 
-              return choice.name
-                .toLocaleLowerCase()
-                .includes(text.toLocaleLowerCase());
-            });
+                return true;
+              })
+              .filter((choice) => {
+                if (!text) {
+                  return true;
+                }
+
+                return choice.name
+                  .toLocaleLowerCase()
+                  .includes(text.toLocaleLowerCase());
+              }),
+          };
         },
       ),
     );
@@ -169,39 +200,79 @@ export const RealmSearchNavigation = forwardRef<HTMLInputElement, Props>(
                 }
               }}
             >
-              <div className="p-2 text-xs text-neutral-500">
-                {text ? 'Results' : 'All communities'}
-              </div>
               <div className="max-h-[350px] overflow-y-auto">
-                {options.map((option, i) => (
-                  <Link passHref href={option.url} key={option.key + i}>
-                    <a
-                      className={cx(
-                        'flex',
-                        'gap-x-2',
-                        'grid-cols-[24px,1fr]',
-                        'grid',
-                        'items-center',
-                        'p-2',
-                        'transition-colors',
-                        'w-full',
-                        'hover:bg-neutral-200',
-                      )}
-                      onClick={(e) => {
-                        setOpen(false);
-                      }}
-                    >
-                      <RealmIcon
-                        className="h-6 w-6"
-                        iconUrl={option.iconUrl}
-                        name={option.name}
-                      />
-                      <div className="text-sm text-neutral-900">
-                        {option.name}
-                      </div>
-                    </a>
-                  </Link>
-                ))}
+                {!!options.following.length && (
+                  <>
+                    <div className="p-2 text-xs text-neutral-500">
+                      Following
+                    </div>
+                    <div>
+                      {options.following.map((option, i) => (
+                        <Link passHref href={option.url} key={option.key + i}>
+                          <a
+                            className={cx(
+                              'flex',
+                              'gap-x-2',
+                              'grid-cols-[24px,1fr]',
+                              'grid',
+                              'items-center',
+                              'p-2',
+                              'transition-colors',
+                              'w-full',
+                              'hover:bg-neutral-200',
+                            )}
+                            onClick={(e) => {
+                              setOpen(false);
+                            }}
+                          >
+                            <RealmIcon
+                              className="h-6 w-6"
+                              iconUrl={option.iconUrl}
+                              name={option.name}
+                            />
+                            <div className="text-sm text-neutral-900">
+                              {option.name}
+                            </div>
+                          </a>
+                        </Link>
+                      ))}
+                    </div>
+                  </>
+                )}
+                <div className="p-2 text-xs text-neutral-500">
+                  All communities
+                </div>
+                <div>
+                  {options.all.map((option, i) => (
+                    <Link passHref href={option.url} key={option.key + i}>
+                      <a
+                        className={cx(
+                          'flex',
+                          'gap-x-2',
+                          'grid-cols-[24px,1fr]',
+                          'grid',
+                          'items-center',
+                          'p-2',
+                          'transition-colors',
+                          'w-full',
+                          'hover:bg-neutral-200',
+                        )}
+                        onClick={(e) => {
+                          setOpen(false);
+                        }}
+                      >
+                        <RealmIcon
+                          className="h-6 w-6"
+                          iconUrl={option.iconUrl}
+                          name={option.name}
+                        />
+                        <div className="text-sm text-neutral-900">
+                          {option.name}
+                        </div>
+                      </a>
+                    </Link>
+                  ))}
+                </div>
               </div>
             </Popover.Content>
           </Popover.Portal>

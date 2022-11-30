@@ -23,7 +23,8 @@ export default function App({ Component, pageProps, router }: AppProps) {
   if (
     router.pathname.startsWith('/realm/[id]') ||
     router.pathname.startsWith('/ecosystem') ||
-    router.pathname.startsWith('/discover')
+    router.pathname.startsWith('/discover') ||
+    router.pathname.startsWith('/feed')
   ) {
     return (
       <HubApp>

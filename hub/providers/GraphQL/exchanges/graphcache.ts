@@ -52,7 +52,6 @@ export const graphcache = async (
     keys: {
       ClippedRichTextDocument: () => null,
       Realm: (realm) => realm.publicKey as string,
-      RealmDropdownListItem: (item) => item.publicKey as string,
       RealmAboutSection: () => null,
       RealmDocumentation: () => null,
       RealmFaqItem: () => null,
@@ -99,6 +98,24 @@ export const graphcache = async (
               },
             );
           }
+        },
+        followRealm(_result, args, cache) {
+          cache.invalidate(
+            {
+              __typename: 'Query',
+            },
+            'followedRealmsFeed',
+            { first: 10, sort: 'Relevance' },
+          );
+        },
+        unfollowRealm(_result, args, cache) {
+          cache.invalidate(
+            {
+              __typename: 'Query',
+            },
+            'followedRealmsFeed',
+            { first: 10, sort: 'Relevance' },
+          );
         },
       },
     },
