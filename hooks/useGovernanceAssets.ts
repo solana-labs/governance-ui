@@ -379,7 +379,7 @@ export default function useGovernanceAssets() {
     */
 
     [Instructions.DualFinanceStakingOption]: {
-      name: 'Dual Finance: Staking Option',
+      name: 'Staking Option',
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,
     },
