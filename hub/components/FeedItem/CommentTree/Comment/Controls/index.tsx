@@ -171,6 +171,11 @@ export function Controls(props: Props) {
                         message: result.error.message,
                       });
                     } else {
+                      publish({
+                        type: ToastType.Success,
+                        title: 'Comment deleted!',
+                        message: 'The comment has been deleted.',
+                      });
                       props.onDelete?.();
                     }
                   });
