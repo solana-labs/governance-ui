@@ -28,7 +28,8 @@ export const useOwnVoteRecord = () => {
   const { ownTokenRecord, ownCouncilTokenRecord } = useRealm()
   const wallet = useWalletStore((s) => s.current)
 
-  // Handle state based on if a delegated wallet has already voted or not
+  // If we are using a delegate wallet, use the vote record for the *owner* of the *electoral* TokenOwnerRecord
+  // note: this means that your delegated *veto* TokenOwnerRecord may have a different owner, and thus a different VoteRecord.
   const ownVoteRecord =
     tokenRole === GoverningTokenRole.Community && ownTokenRecord
       ? voteRecordsByVoter[
@@ -39,6 +40,7 @@ export const useOwnVoteRecord = () => {
           ownCouncilTokenRecord.account.governingTokenOwner.toBase58()
         ]
       : wallet?.publicKey && voteRecordsByVoter[wallet.publicKey.toBase58()]
+
   return ownVoteRecord
 }
 
