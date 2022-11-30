@@ -169,8 +169,8 @@ export default function useGovernanceAssets() {
     [PackageEnum.Common]: {
       name: 'Common',
     },
-    [PackageEnum.Dual]: {
-      name: 'Dual',
+    [PackageEnum.DualFinance]: {
+      name: 'Dual Finance',
       image: '/img/dual-logo.png',
     },
     [PackageEnum.Everlend]: {
@@ -371,11 +371,11 @@ export default function useGovernanceAssets() {
     },
 
     /*
-      ██████  ██    ██  █████   ██      
-      ██   ██ ██    ██ ██   ██  ██      
-      ██   ██ ██    ██ ███████  ██      
-      ██   ██ ██    ██ ██   ██  ██      
-      ██████   ██████  ██   ██  ███████ 
+      ██████  ██    ██  █████  ██          ███████ ██ ███    ██  █████  ███    ██  ██████ ███████ 
+      ██   ██ ██    ██ ██   ██ ██          ██      ██ ████   ██ ██   ██ ████   ██ ██      ██      
+      ██   ██ ██    ██ ███████ ██          █████   ██ ██ ██  ██ ███████ ██ ██  ██ ██      █████   
+      ██   ██ ██    ██ ██   ██ ██          ██      ██ ██  ██ ██ ██   ██ ██  ██ ██ ██      ██      
+      ██████   ██████  ██   ██ ███████     ██      ██ ██   ████ ██   ██ ██   ████  ██████ ███████                                                                                        
     */
 
     [Instructions.DualFinanceStakingOption]: {

@@ -194,7 +194,7 @@ export default async function getConfigInstruction({
       )
     )
 
-    const obj: UiInstruction = {
+    return  {
       serializedInstruction,
       isValid: true,
       prerequisiteInstructions: prerequisiteInstructions,
@@ -204,7 +204,6 @@ export default async function getConfigInstruction({
       chunkSplitByDefault: true,
       chunkBy: 2,
     }
-    return obj
   }
 
   const obj: UiInstruction = {

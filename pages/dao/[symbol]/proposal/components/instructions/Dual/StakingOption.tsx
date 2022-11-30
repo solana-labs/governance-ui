@@ -1,14 +1,13 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
+import { ProgramAccount, Governance } from '@solana/spl-governance'
 import {
   UiInstruction,
   DualFinanceStakingOptionForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-import { Governance } from '@solana/spl-governance'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { ProgramAccount } from '@solana/spl-governance'
 import Input from '@components/inputs/Input'
 import getConfigInstruction from '@utils/instructions/Dual'
 import useWalletStore from 'stores/useWalletStore'
@@ -47,15 +46,14 @@ const StakingOption = ({
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-  async function getInstruction(): Promise<UiInstruction> {
-    const obj: UiInstruction = await getConfigInstruction({
+  function getInstruction(): Promise<UiInstruction> {
+    return getConfigInstruction({
       connection,
       form,
       schema,
       setFormErrors,
       wallet,
     })
-    return obj
   }
   useEffect(() => {
     handleSetInstructions(
