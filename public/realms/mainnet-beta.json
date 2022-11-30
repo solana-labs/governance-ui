@@ -2748,5 +2748,21 @@
     "sortRank": 3,
     "website": "https://sunrisestake.com",
     "twitter": "@sunrisestake"
+  },
+  {
+    "symbol": "xLPFi",
+    "displayName": "LP Finance xGovernance",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "HUDn6xDodk7sSE1ZPNzZEMJh1j8qu5zFxYFXPgAQ1AHE",
+    "communityMint": "xLPFiPmWve5rUnAYcHZSZWjwgyqEdcV6dDzoBJRtNw9",
+    "ogImage": "/realms/xLPFi/xLPFi-min.png",
+    "shortDescription": "LP Finance is a synthetic asset issuance protocol on Solana",
+    "sortRank": 3,
+    "website": "https://lp.finance/",
+    "twitter": "@LPFinance_",
+    "linkedin": "https://www.linkedin.com/company/lpfinance/",
+    "instagram": "https://www.instagram.com/lp.finance/",
+    "discord": "https://discord.gg/N2Uebv58v2",
+    "github": "https://github.com/LP-Finance-Inc/"
   }
 ]
