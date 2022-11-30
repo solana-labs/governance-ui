@@ -284,15 +284,15 @@ export default function useGovernanceAssets() {
     //   name: 'Everlend Withdraw Funds',
     //   isVisible: canUseAnyInstruction,
     // },
-    {
-      id: Instructions.None,
-      name: 'None',
-      isVisible:
-        realm &&
-        Object.values(governances).some((g) =>
-          ownVoterWeight.canCreateProposal(g.account.config)
-        ),
-    },
+    // {
+    //   id: Instructions.None,
+    //   name: 'None',
+    //   isVisible:
+    //     realm &&
+    //     Object.values(governances).some((g) =>
+    //       ownVoterWeight.canCreateProposal(g.account.config)
+    //     ),
+    // },
   ]
   // const foresightInstructions = [
   //   {
