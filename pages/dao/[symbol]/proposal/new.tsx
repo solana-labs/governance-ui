@@ -85,6 +85,7 @@ import MakeSetMarketMetadataParams from './components/instructions/Foresight/Mak
 import CloseTokenAccount from './components/instructions/CloseTokenAccount'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import CastleWithdraw from './components/instructions/Castle/CastleWithdraw'
+import StakingOption from './components/instructions/Dual/StakingOption'
 import MeanCreateAccount from './components/instructions/Mean/MeanCreateAccount'
 import MeanFundAccount from './components/instructions/Mean/MeanFundAccount'
 import MeanWithdrawFromAccount from './components/instructions/Mean/MeanWithdrawFromAccount'
@@ -273,6 +274,7 @@ const New = () => {
         throw Error('No governance selected')
       }
 
+      //TODO fix duplicated instructions when use only additional instruction
       const additionalInstructions = [
         ...(instructions
           .flatMap((instruction) => {
@@ -285,6 +287,8 @@ const New = () => {
                       .minInstructionHoldUpTime,
                 prerequisiteInstructions:
                   instruction.prerequisiteInstructions || [],
+                prerequisiteInstructionsSigners:
+                  instruction.prerequisiteInstructionsSigners || [],
                 chunkSplitByDefault: instruction.chunkSplitByDefault || false,
                 signers: instruction.signers,
                 shouldSplitIntoSeparateTxs:
@@ -438,6 +442,7 @@ const New = () => {
       [Instructions.ClaimPendingDeposit]: FriktionClaimPendingDeposit,
       [Instructions.ClaimPendingWithdraw]: FriktionClaimPendingWithdraw,
       [Instructions.DepositIntoCastle]: CastleDeposit,
+      [Instructions.DualFinanceStakingOption]: StakingOption,
       [Instructions.MeanCreateAccount]: MeanCreateAccount,
       [Instructions.MeanFundAccount]: MeanFundAccount,
       [Instructions.MeanWithdrawFromAccount]: MeanWithdrawFromAccount,

@@ -169,6 +169,10 @@ export default function useGovernanceAssets() {
     [PackageEnum.Common]: {
       name: 'Common',
     },
+    [PackageEnum.Dual]: {
+      name: 'Dual Finance',
+      image: '/img/dual-logo.png',
+    },
     [PackageEnum.Everlend]: {
       name: 'Everlend',
       image: '/img/everlend.png',
@@ -364,6 +368,20 @@ export default function useGovernanceAssets() {
     [Instructions.WithdrawValidatorStake]: {
       name: 'Withdraw validator stake',
       packageId: PackageEnum.Common,
+    },
+
+    /*
+      ██████  ██    ██  █████  ██          ███████ ██ ███    ██  █████  ███    ██  ██████ ███████ 
+      ██   ██ ██    ██ ██   ██ ██          ██      ██ ████   ██ ██   ██ ████   ██ ██      ██      
+      ██   ██ ██    ██ ███████ ██          █████   ██ ██ ██  ██ ███████ ██ ██  ██ ██      █████   
+      ██   ██ ██    ██ ██   ██ ██          ██      ██ ██  ██ ██ ██   ██ ██  ██ ██ ██      ██      
+      ██████   ██████  ██   ██ ███████     ██      ██ ██   ████ ██   ██ ██   ████  ██████ ███████                                                                                        
+    */
+
+    [Instructions.DualFinanceStakingOption]: {
+      name: 'Staking Option',
+      isVisible: canUseTransferInstruction,
+      packageId: PackageEnum.Dual,
     },
 
     /*

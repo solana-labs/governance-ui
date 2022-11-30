@@ -30,6 +30,7 @@ export enum PackageEnum {
   Streamflow,
   Switchboard,
   VsrPlugin,
+  Dual,
 }
 
 export interface UiInstruction {
@@ -549,6 +550,7 @@ export enum Instructions {
   DepositToMangoAccount,
   DepositToMangoAccountCsv,
   DifferValidatorStake,
+  DualFinanceStakingOption,
   EverlendDeposit,
   EverlendWithdraw,
   ForesightAddMarketListToCategory,
@@ -681,4 +683,16 @@ export interface ValidatorWithdrawStakeForm {
   governedTokenAccount: AssetAccount | undefined
   stakingAccount: StakeAccount | undefined
   amount: number
+}
+
+export interface DualFinanceStakingOptionForm {
+  strike: number
+  soName: string | undefined
+  optionExpirationUnixSeconds: number
+  numTokens: number
+  lotSize: number
+  baseTreasury: AssetAccount | undefined
+  quoteTreasury: AssetAccount | undefined
+  payer: AssetAccount | undefined
+  userPk: string | undefined
 }
