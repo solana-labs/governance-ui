@@ -1,20 +1,25 @@
-import { withFinalizeVote } from '@solana/spl-governance'
+import { VoteKind, withFinalizeVote } from '@solana/spl-governance'
 import { TransactionInstruction } from '@solana/web3.js'
 import { useState } from 'react'
 import { relinquishVote } from '../../actions/relinquishVote'
 import useRealm from '../../hooks/useRealm'
 import { ProposalState } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
-import { ThumbUpIcon, ThumbDownIcon } from '@heroicons/react/solid'
+import {
+  ThumbUpIcon,
+  ThumbDownIcon,
+  BanIcon,
+  MinusCircleIcon,
+} from '@heroicons/react/solid'
 import useWalletStore from '../../stores/useWalletStore'
 import { SecondaryButton } from '../Button'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { useRouter } from 'next/router'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
-import { isYesVote } from '@models/voteRecords'
 import Tooltip from '@components/Tooltip'
 import { useOwnVoteRecord, useVoterTokenRecord, useIsVoting } from './hooks'
+import assertUnreachable from '@utils/typescript/assertUnreachable'
 
 export const YouVoted = () => {
   const client = useVotePluginsClientStore(
@@ -113,22 +118,38 @@ export const YouVoted = () => {
     setIsLoading(false)
   }
 
-  return ownVoteRecord !== undefined && ownVoteRecord !== null ? (
+  const vote = ownVoteRecord?.account.vote
+
+  return vote !== undefined ? (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-4">
       <div className="flex flex-col items-center justify-center">
         <h3 className="text-center">Your vote</h3>
-        {isYesVote(ownVoteRecord.account) ? (
+        {vote.voteType === VoteKind.Approve ? (
           <Tooltip content={`You voted "Yes"`}>
             <div className="flex flex-row items-center justify-center rounded-full border border-[#8EFFDD] p-2 mt-2">
               <ThumbUpIcon className="h-4 w-4 fill-[#8EFFDD]" />
             </div>
           </Tooltip>
-        ) : (
+        ) : vote.voteType === VoteKind.Deny ? (
           <Tooltip content={`You voted "No"`}>
             <div className="flex flex-row items-center justify-center rounded-full border border-[#FF7C7C] p-2 mt-2">
               <ThumbDownIcon className="h-4 w-4 fill-[#FF7C7C]" />
             </div>
           </Tooltip>
+        ) : vote.voteType === VoteKind.Veto ? (
+          <Tooltip content={`You voted "Veto"`}>
+            <div className="flex flex-row items-center justify-center rounded-full border border-[#FF7C7C] p-2 mt-2">
+              <BanIcon className="h-4 w-4 fill-[#FF7C7C]" />
+            </div>
+          </Tooltip>
+        ) : vote.voteType === VoteKind.Abstain ? (
+          <Tooltip content={`You voted "Abstain"`}>
+            <div className="flex flex-row items-center justify-center rounded-full border border-gray-400 p-2 mt-2">
+              <MinusCircleIcon className="h-4 w-4 fill-gray-400" />
+            </div>
+          </Tooltip>
+        ) : (
+          assertUnreachable(vote.voteType)
         )}
       </div>
       {isVoting && (
