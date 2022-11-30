@@ -18,7 +18,6 @@
       "@components/*": ["components/*"],
       "@hooks/*": ["hooks/*"],
       "@hub/*": ["hub/*"],
-      "@verify-wallet/*": ["verify-wallet/*"],
       "@tools/*": ["tools/*"],
       "@models/*": ["models/*"],
       "@utils/*": ["utils/*"]

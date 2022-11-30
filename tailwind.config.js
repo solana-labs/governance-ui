@@ -7,7 +7,6 @@ module.exports = {
     './Strategies/**/*.{js,ts,jsx,tsx}',
     './VoteStakeRegistry/**/*.{js,ts,jsx,tsx}',
     './hub/**/*.{js,ts,jsx,tsx}',
-    './verify-wallet/**/*.{js,ts,jsx,tsx}',
   ],
   future: {
     removeDeprecatedGapUtilities: true,
@@ -25,7 +24,6 @@ module.exports = {
         help: 'help',
       },
       colors: {
-        discord: '#7289da',
         'dark-theme': {
           primary: { light: '#5DC9EB', dark: '#cecece' },
           'secondary-1': { light: '#AFD803', dark: '#6CBF00' },
@@ -43,7 +41,6 @@ module.exports = {
           red: '#FF7C7C',
           green: '#30C89A',
           blue: '#00e4ff',
-          discord: '#7289da',
         },
         'light-theme': {
           primary: { light: '#5DC9EB', dark: '#101010' },
@@ -61,7 +58,6 @@ module.exports = {
           red: '#cb676f',
           green: '#6BBF5F',
           blue: '#3F77DE',
-          discord: '#7289da',
         },
         'mango-theme': {
           primary: { light: '#F2C94C', dark: '#EEB91B' },
