@@ -198,6 +198,7 @@ export default async function getConfigInstruction({
       serializedInstruction,
       isValid: true,
       prerequisiteInstructions: prerequisiteInstructions,
+      prerequisiteInstructionsSigners: [helperTokenAccount],
       governance: form.baseTreasury?.governance,
       additionalSerializedInstructions,
       chunkSplitByDefault: true,

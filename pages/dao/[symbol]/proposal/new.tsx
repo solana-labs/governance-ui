@@ -274,6 +274,7 @@ const New = () => {
         throw Error('No governance selected')
       }
 
+      //TODO fix duplicated instructions when use only additional instruction
       const additionalInstructions = [
         ...(instructions
           .flatMap((instruction) => {
@@ -286,6 +287,8 @@ const New = () => {
                       .minInstructionHoldUpTime,
                 prerequisiteInstructions:
                   instruction.prerequisiteInstructions || [],
+                prerequisiteInstructionsSigners:
+                  instruction.prerequisiteInstructionsSigners || [],
                 chunkSplitByDefault: instruction.chunkSplitByDefault || false,
                 signers: instruction.signers,
                 shouldSplitIntoSeparateTxs:
