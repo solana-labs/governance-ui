@@ -6,7 +6,7 @@ import useRealm from './useRealm'
 // import { vsrPluginsPks } from './useVotingPlugins'
 
 export default function useGovernanceAssets() {
-  const { ownVoterWeight, realm, symbol, governances, config } = useRealm()
+  const { ownVoterWeight, realm } = useRealm()
 
   const governedTokenAccounts: AssetAccount[] = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
