@@ -104,7 +104,7 @@ export default function useGovernanceAssets() {
       isVisible: boolean | undefined
     }[]
     if (symbol === 'FORE') {
-      toBeFiltered = [...foresightInstructions, ...commonInstructions]
+      toBeFiltered = [...commonInstructions]
     } else {
       toBeFiltered = availableInstructions
     }
@@ -179,28 +179,8 @@ export default function useGovernanceAssets() {
       isVisible: canUseAnyInstruction,
     },
     {
-      id: Instructions.JoinDAO,
-      name: 'Join a DAO',
-      isVisible: canUseAnyInstruction,
-    },
-    {
       id: Instructions.Base64,
       name: 'Execute Custom Instruction',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.VotingMintConfig,
-      name: 'Vote Escrowed Tokens: Configure Voting Mint',
-      isVisible: canUseAuthorityInstruction,
-    },
-    {
-      id: Instructions.CreateVsrRegistrar,
-      name: 'Vote Escrowed Tokens: Create Registrar',
-      isVisible: canUseAuthorityInstruction,
-    },
-    {
-      id: Instructions.ChangeMakeDonation,
-      name: 'Change: Donation to Charity',
       isVisible: canUseAnyInstruction,
     },
     {
@@ -209,33 +189,8 @@ export default function useGovernanceAssets() {
       isVisible: canUseProgramUpgradeInstruction,
     },
     {
-      id: Instructions.CreateNftPluginRegistrar,
-      name: 'Create NFT plugin registrar',
-      isVisible: canUseAuthorityInstruction,
-    },
-    {
-      id: Instructions.ConfigureNftPluginCollection,
-      name: 'Configure NFT plugin collection',
-      isVisible: canUseAuthorityInstruction,
-    },
-    {
-      id: Instructions.CreateGatewayPluginRegistrar,
-      name: 'Civic: Create Gateway plugin registrar',
-      isVisible: canUseAuthorityInstruction,
-    },
-    {
-      id: Instructions.ConfigureGatewayPlugin,
-      name: 'Civic: Configure existing Gateway plugin',
-      isVisible: canUseAuthorityInstruction,
-    },
-    {
       id: Instructions.RealmConfig,
       name: 'Realm config',
-      isVisible: canUseAuthorityInstruction,
-    },
-    {
-      id: Instructions.CreateNftPluginMaxVoterWeight,
-      name: 'Create NFT plugin max voter weight',
       isVisible: canUseAuthorityInstruction,
     },
     {
@@ -254,41 +209,6 @@ export default function useGovernanceAssets() {
       isVisible: canUseAuthorityInstruction,
     },
     {
-      id: Instructions.SagaPreOrder,
-      name: 'Pre-order Saga Phone',
-      isVisible: canUseTokenTransferInstruction,
-    },
-    {
-      id: Instructions.StakeValidator,
-      name: 'Stake A Validator',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.DeactivateValidatorStake,
-      name: 'Deactivate validator stake',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.WithdrawValidatorStake,
-      name: 'Withdraw validator stake',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.TransferDomainName,
-      name: 'SNS Transfer Out Domain Name',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.EverlendDeposit,
-      name: 'Everlend Deposit Funds',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.EverlendWithdraw,
-      name: 'Everlend Withdraw Funds',
-      isVisible: canUseAnyInstruction,
-    },
-    {
       id: Instructions.None,
       name: 'None',
       isVisible:
@@ -298,297 +218,9 @@ export default function useGovernanceAssets() {
         ),
     },
   ]
-  const foresightInstructions = [
-    {
-      id: Instructions.ForesightInitMarket,
-      name: 'Foresight: Init Market',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.ForesightInitMarketList,
-      name: 'Foresight: Init Market List',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.ForesightInitCategory,
-      name: 'Foresight: Init Category',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.ForesightResolveMarket,
-      name: 'Foresight: Resolve Market',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.ForesightAddMarketListToCategory,
-      name: 'Foresight: Add Market List To Category',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.ForesightSetMarketMetadata,
-      name: 'Foresight: Set Market Metadata',
-      isVisible: canUseAnyInstruction,
-    },
-  ]
 
   const availableInstructions = [
     ...commonInstructions,
-    {
-      id: Instructions.MangoChangePerpMarket,
-      name: 'Mango: Change Perp Market',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
-    },
-    {
-      id: Instructions.MangoChangeSpotMarket,
-      name: 'Mango: Change Spot Market',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
-    },
-    {
-      id: Instructions.MangoChangeQuoteParams,
-      name: 'Mango: Change Quote Params',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
-    },
-    {
-      id: Instructions.MangoChangeReferralFeeParams,
-      name: 'Mango: Change Referral Fee Params',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
-    },
-    {
-      id: Instructions.MangoChangeReferralFeeParams2,
-      name: 'Mango: Change Referral Fee Params V2',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
-    },
-    {
-      id: Instructions.MangoChangeMaxAccounts,
-      name: 'Mango: Change Max Accounts',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
-    },
-    {
-      id: Instructions.MangoAddOracle,
-      name: 'Mango: Add Oracle',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
-    },
-    {
-      id: Instructions.MangoAddSpotMarket,
-      name: 'Mango: Add Spot Market',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
-    },
-    {
-      id: Instructions.MangoCreatePerpMarket,
-      name: 'Mango: Create Perp Market',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
-    },
-    {
-      id: Instructions.MangoSetMarketMode,
-      name: 'Mango: Set Market Mode',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
-    },
-    {
-      id: Instructions.MangoRemoveSpotMarket,
-      name: 'Mango: Remove Spot Market',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
-    },
-    {
-      id: Instructions.MangoRemovePerpMarket,
-      name: 'Mango: Remove Perp Market',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
-    },
-    {
-      id: Instructions.MangoSwapSpotMarket,
-      name: 'Mango: Swap Spot Market',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
-    },
-    {
-      id: Instructions.MangoRemoveOracle,
-      name: 'Mango: Remove Oracle',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
-    },
-    {
-      id: Instructions.MangoV4TokenRegister,
-      name: 'Mango v4: Token Register',
-      isVisible: canUseAnyInstruction && symbol === 'MNGO',
-    },
-    {
-      id: Instructions.MangoV4TokenEdit,
-      name: 'Mango v4: Token Edit',
-      isVisible: canUseAnyInstruction && symbol === 'MNGO',
-    },
-    {
-      id: Instructions.MangoV4TokenRegisterTrustless,
-      name: 'Mango v4: Token Register Trustless',
-      isVisible: canUseAnyInstruction && symbol === 'MNGO',
-    },
-    {
-      id: Instructions.MangoV4PerpCreate,
-      name: 'Mango v4: Perp Create',
-      isVisible: canUseAnyInstruction && symbol === 'MNGO',
-    },
-    {
-      id: Instructions.MangoV4PerpEdit,
-      name: 'Mango v4: Perp Edit',
-      isVisible: canUseAnyInstruction && symbol === 'MNGO',
-    },
-    {
-      id: Instructions.MangoV4Serum3RegisterMarket,
-      name: 'Mango v4: Serum 3 Register Market',
-      isVisible: canUseAnyInstruction && symbol === 'MNGO',
-    },
-    {
-      id: Instructions.DepositToMangoAccount,
-      name: 'Mango: Deposit to mango account',
-      isVisible: canUseTokenTransferInstruction,
-    },
-    {
-      id: Instructions.DepositToMangoAccountCsv,
-      name: 'Mango: Deposit to mango account with CSV',
-      isVisible: canUseTokenTransferInstruction,
-    },
-    {
-      id: Instructions.ClaimMangoTokens,
-      name: 'Mango: Claim Tokens',
-      isVisible: canUseTokenTransferInstruction,
-    },
-    {
-      id: Instructions.DepositIntoVolt,
-      name: 'Friktion: Deposit into Volt',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.WithdrawFromVolt,
-      name: 'Friktion: Withdraw from Volt',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.ClaimPendingDeposit,
-      name: 'Friktion: Claim Volt Tokens',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.ClaimPendingWithdraw,
-      name: 'Friktion: Claim Pending Withdraw',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.DepositIntoCastle,
-      name: 'Castle: Deposit into Vault',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.WithrawFromCastle,
-      name: 'Castle: Withdraw from Vault',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.MeanCreateAccount,
-      name: 'Payment Stream: New account',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.MeanFundAccount,
-      name: 'Payment Stream: Fund account',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.MeanWithdrawFromAccount,
-      name: 'Payment Stream: Withdraw funds',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.MeanCreateStream,
-      name: 'Payment Stream: New stream',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.MeanTransferStream,
-      name: 'Payment Stream: Transfer stream',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.SwitchboardAdmitOracle,
-      name: 'Switchboard: Admit Oracle to Queue',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.SwitchboardRevokeOracle,
-      name: 'Switchboard: Remove Oracle from Queue',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.DepositIntoGoblinGold,
-      name: 'GoblinGold: Deposit into GoblinGold',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.WithdrawFromGoblinGold,
-      name: 'GoblinGold: Withdraw from GoblinGold',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.CreateSolendObligationAccount,
-      name: 'Solend: Create Obligation Account',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.InitSolendObligationAccount,
-      name: 'Solend: Init Obligation Account',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.DepositReserveLiquidityAndObligationCollateral,
-      name: 'Solend: Deposit Funds',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.RefreshSolendReserve,
-      name: 'Solend: Refresh Reserve',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.RefreshSolendObligation,
-      name: 'Solend: Refresh Obligation',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity,
-      name: 'Solend: Withdraw Funds',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.SerumInitUser,
-      name: 'Serum: Init User Account',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.SerumGrantLockedSRM,
-      name: 'Serum: Grant Locked SRM',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.SerumGrantLockedMSRM,
-      name: 'Serum: Grant Locked MSRM',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.SerumGrantVestSRM,
-      name: 'Serum: Grant Vested SRM',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.SerumGrantVestMSRM,
-      name: 'Serum: Grant Vested MSRM',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.SerumUpdateGovConfigParams,
-      name: 'Serum: Update Governance Config Params',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.SerumUpdateGovConfigAuthority,
-      name: 'Serum: Update Governance Config Authority',
-      isVisible: canUseAnyInstruction,
-    },
-    ...foresightInstructions,
   ]
   return {
     governancesArray,
