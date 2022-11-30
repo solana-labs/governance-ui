@@ -164,7 +164,7 @@ const Params = () => {
           </h1>
         </div>
         <div className="grid grid-cols-1 gap-4 pb-6 lg:grid-cols-2 lg:gap-6">
-          {activeGovernance ? (
+          {realm ? (
             <>
               <div className="col-span-1 p-4 border rounded-md border-fgd-4">
                 <h2>Addresses</h2>

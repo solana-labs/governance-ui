@@ -6,13 +6,16 @@ interface UserCreatedTopLevelFeedItemRepliesStore extends State {
   comments: {
     [feedItemId: string]: FeedItemComment[] | undefined;
   };
+  deletedComments: string[];
   addComment: (feedItemId: string, comment: FeedItemComment) => void;
+  deleteComment: (commentId: string) => void;
   updateComment: (feedItemId: string, comment: FeedItemComment) => void;
 }
 
 export const useUserCreatedTopLevelFeedItemRepliesStore = create<UserCreatedTopLevelFeedItemRepliesStore>(
   (set, get) => ({
     comments: {},
+    deletedComments: [],
     addComment: (feedItemId, comment) => {
       const comments = get().comments;
       const feedItemComments = comments[feedItemId] || [];
@@ -24,6 +27,11 @@ export const useUserCreatedTopLevelFeedItemRepliesStore = create<UserCreatedTopL
 
       set((state) => {
         state.comments[feedItemId] = newComments;
+      });
+    },
+    deleteComment: (commentId: string) => {
+      set((state) => {
+        state.deletedComments.push(commentId);
       });
     },
     updateComment: (feedItemId, comment) => {
