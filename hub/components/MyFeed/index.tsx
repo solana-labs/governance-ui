@@ -22,7 +22,7 @@ export function MyFeed(props: Props) {
 
   return (
     <section className={props.className}>
-      <div className="pt-10"></div>
+      <div className="pt-14"></div>
       <div className="max-w-3xl mx-auto py-8 w-full px-4">
         <header className="flex items-center justify-between">
           <div className="flex items-center space-x-3 text-neutral-900">

@@ -2,6 +2,7 @@ import * as Separator from '@radix-ui/react-separator';
 import { pipe } from 'fp-ts/function';
 import React from 'react';
 
+import { Empty } from '../Empty';
 import { EnteredViewport } from '@hub/components/Home/Feed/AdditionalPage/EnteredViewport';
 import * as FeedItem from '@hub/components/Home/Feed/FeedItem';
 import { Loading, Error } from '@hub/components/Home/Feed/InitialPage';
@@ -76,11 +77,14 @@ export function Page(props: Props) {
                 )}
               </div>
             )}
+            {props.isFirstPage && !feedItems.length && (
+              <Empty className="pt-16" />
+            )}
             <EnteredViewport
               onEnteredViewport={() => {
                 if (followedRealmsFeed.pageInfo.endCursor) {
                   props.onLoadMore?.(followedRealmsFeed.pageInfo.endCursor);
-                } else {
+                } else if (feedItems.length) {
                   props.onNoAdditionalPages?.();
                 }
               }}
