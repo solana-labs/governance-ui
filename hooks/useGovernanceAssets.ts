@@ -178,66 +178,66 @@ export default function useGovernanceAssets() {
       name: 'Create Associated Token Account',
       isVisible: canUseAnyInstruction,
     },
-    {
-      id: Instructions.JoinDAO,
-      name: 'Join a DAO',
-      isVisible: canUseAnyInstruction,
-    },
+    // {
+    //   id: Instructions.JoinDAO,
+    //   name: 'Join a DAO',
+    //   isVisible: canUseAnyInstruction,
+    // },
     {
       id: Instructions.Base64,
       name: 'Execute Custom Instruction',
       isVisible: canUseAnyInstruction,
     },
-    {
-      id: Instructions.VotingMintConfig,
-      name: 'Vote Escrowed Tokens: Configure Voting Mint',
-      isVisible: canUseAuthorityInstruction,
-    },
-    {
-      id: Instructions.CreateVsrRegistrar,
-      name: 'Vote Escrowed Tokens: Create Registrar',
-      isVisible: canUseAuthorityInstruction,
-    },
-    {
-      id: Instructions.ChangeMakeDonation,
-      name: 'Change: Donation to Charity',
-      isVisible: canUseAnyInstruction,
-    },
+    // {
+    //   id: Instructions.VotingMintConfig,
+    //   name: 'Vote Escrowed Tokens: Configure Voting Mint',
+    //   isVisible: canUseAuthorityInstruction,
+    // },
+    // {
+    //   id: Instructions.CreateVsrRegistrar,
+    //   name: 'Vote Escrowed Tokens: Create Registrar',
+    //   isVisible: canUseAuthorityInstruction,
+    // },
+    // {
+    //   id: Instructions.ChangeMakeDonation,
+    //   name: 'Change: Donation to Charity',
+    //   isVisible: canUseAnyInstruction,
+    // },
     {
       id: Instructions.ProgramUpgrade,
       name: 'Upgrade Program',
       isVisible: canUseProgramUpgradeInstruction,
     },
-    {
-      id: Instructions.CreateNftPluginRegistrar,
-      name: 'Create NFT plugin registrar',
-      isVisible: canUseAuthorityInstruction,
-    },
-    {
-      id: Instructions.ConfigureNftPluginCollection,
-      name: 'Configure NFT plugin collection',
-      isVisible: canUseAuthorityInstruction,
-    },
-    {
-      id: Instructions.CreateGatewayPluginRegistrar,
-      name: 'Civic: Create Gateway plugin registrar',
-      isVisible: canUseAuthorityInstruction,
-    },
-    {
-      id: Instructions.ConfigureGatewayPlugin,
-      name: 'Civic: Configure existing Gateway plugin',
-      isVisible: canUseAuthorityInstruction,
-    },
+    // {
+    //   id: Instructions.CreateNftPluginRegistrar,
+    //   name: 'Create NFT plugin registrar',
+    //   isVisible: canUseAuthorityInstruction,
+    // },
+    // {
+    //   id: Instructions.ConfigureNftPluginCollection,
+    //   name: 'Configure NFT plugin collection',
+    //   isVisible: canUseAuthorityInstruction,
+    // },
+    // {
+    //   id: Instructions.CreateGatewayPluginRegistrar,
+    //   name: 'Civic: Create Gateway plugin registrar',
+    //   isVisible: canUseAuthorityInstruction,
+    // },
+    // {
+    //   id: Instructions.ConfigureGatewayPlugin,
+    //   name: 'Civic: Configure existing Gateway plugin',
+    //   isVisible: canUseAuthorityInstruction,
+    // },
     {
       id: Instructions.RealmConfig,
       name: 'Realm config',
       isVisible: canUseAuthorityInstruction,
     },
-    {
-      id: Instructions.CreateNftPluginMaxVoterWeight,
-      name: 'Create NFT plugin max voter weight',
-      isVisible: canUseAuthorityInstruction,
-    },
+    // {
+    //   id: Instructions.CreateNftPluginMaxVoterWeight,
+    //   name: 'Create NFT plugin max voter weight',
+    //   isVisible: canUseAuthorityInstruction,
+    // },
     {
       id: Instructions.CloseTokenAccount,
       name: 'Close token account',
@@ -253,41 +253,41 @@ export default function useGovernanceAssets() {
       name: 'Update Token Metadata',
       isVisible: canUseAuthorityInstruction,
     },
-    {
-      id: Instructions.SagaPreOrder,
-      name: 'Pre-order Saga Phone',
-      isVisible: canUseTokenTransferInstruction,
-    },
-    {
-      id: Instructions.StakeValidator,
-      name: 'Stake A Validator',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.DeactivateValidatorStake,
-      name: 'Deactivate validator stake',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.WithdrawValidatorStake,
-      name: 'Withdraw validator stake',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.TransferDomainName,
-      name: 'SNS Transfer Out Domain Name',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.EverlendDeposit,
-      name: 'Everlend Deposit Funds',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.EverlendWithdraw,
-      name: 'Everlend Withdraw Funds',
-      isVisible: canUseAnyInstruction,
-    },
+    // {
+    //   id: Instructions.SagaPreOrder,
+    //   name: 'Pre-order Saga Phone',
+    //   isVisible: canUseTokenTransferInstruction,
+    // },
+    // {
+    //   id: Instructions.StakeValidator,
+    //   name: 'Stake A Validator',
+    //   isVisible: canUseAnyInstruction,
+    // },
+    // {
+    //   id: Instructions.DeactivateValidatorStake,
+    //   name: 'Deactivate validator stake',
+    //   isVisible: canUseAnyInstruction,
+    // },
+    // {
+    //   id: Instructions.WithdrawValidatorStake,
+    //   name: 'Withdraw validator stake',
+    //   isVisible: canUseAnyInstruction,
+    // },
+    // {
+    //   id: Instructions.TransferDomainName,
+    //   name: 'SNS Transfer Out Domain Name',
+    //   isVisible: canUseAnyInstruction,
+    // },
+    // {
+    //   id: Instructions.EverlendDeposit,
+    //   name: 'Everlend Deposit Funds',
+    //   isVisible: canUseAnyInstruction,
+    // },
+    // {
+    //   id: Instructions.EverlendWithdraw,
+    //   name: 'Everlend Withdraw Funds',
+    //   isVisible: canUseAnyInstruction,
+    // },
     {
       id: Instructions.None,
       name: 'None',
@@ -299,36 +299,36 @@ export default function useGovernanceAssets() {
     },
   ]
   const foresightInstructions = [
-    {
-      id: Instructions.ForesightInitMarket,
-      name: 'Foresight: Init Market',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.ForesightInitMarketList,
-      name: 'Foresight: Init Market List',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.ForesightInitCategory,
-      name: 'Foresight: Init Category',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.ForesightResolveMarket,
-      name: 'Foresight: Resolve Market',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.ForesightAddMarketListToCategory,
-      name: 'Foresight: Add Market List To Category',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.ForesightSetMarketMetadata,
-      name: 'Foresight: Set Market Metadata',
-      isVisible: canUseAnyInstruction,
-    },
+    // {
+    //   id: Instructions.ForesightInitMarket,
+    //   name: 'Foresight: Init Market',
+    //   isVisible: canUseAnyInstruction,
+    // },
+    // {
+    //   id: Instructions.ForesightInitMarketList,
+    //   name: 'Foresight: Init Market List',
+    //   isVisible: canUseAnyInstruction,
+    // },
+    // {
+    //   id: Instructions.ForesightInitCategory,
+    //   name: 'Foresight: Init Category',
+    //   isVisible: canUseAnyInstruction,
+    // },
+    // {
+    //   id: Instructions.ForesightResolveMarket,
+    //   name: 'Foresight: Resolve Market',
+    //   isVisible: canUseAnyInstruction,
+    // },
+    // {
+    //   id: Instructions.ForesightAddMarketListToCategory,
+    //   name: 'Foresight: Add Market List To Category',
+    //   isVisible: canUseAnyInstruction,
+    // },
+    // {
+    //   id: Instructions.ForesightSetMarketMetadata,
+    //   name: 'Foresight: Set Market Metadata',
+    //   isVisible: canUseAnyInstruction,
+    // },
   ]
 
   const availableInstructions = [
