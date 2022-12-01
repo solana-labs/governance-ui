@@ -551,7 +551,9 @@ export enum Instructions {
   DepositToMangoAccount,
   DepositToMangoAccountCsv,
   DifferValidatorStake,
+  DualFinanceExercise,
   DualFinanceStakingOption,
+  DualFinanceWithdraw,
   EverlendDeposit,
   EverlendWithdraw,
   ForesightAddMarketListToCategory,
@@ -701,3 +703,7 @@ export interface DualFinanceStakingOptionForm {
   payer: AssetAccount | undefined
   userPk: string | undefined
 }
+
+export interface DualFinanceExerciseForm {}
+
+export interface DualFinanceWithdrawForm {}

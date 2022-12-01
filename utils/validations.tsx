@@ -567,6 +567,8 @@ export const getDualFinanceStakingOptionSchema = () => {
   })
 }
 
+/////// DUAL exercise and withdraw
+
 export const getGoblinGoldDepositSchema = ({ form }) => {
   const governedTokenAccount = form.governedTokenAccount as AssetAccount
   return yup.object().shape({
