@@ -1,4 +1,5 @@
 import AssemblyClusterIcon from '@carbon/icons-react/lib/AssemblyCluster';
+import CheckmarkIcon from '@carbon/icons-react/lib/Checkmark';
 import EarthIcon from '@carbon/icons-react/lib/Earth';
 import EditIcon from '@carbon/icons-react/lib/Edit';
 import ListDropdownIcon from '@carbon/icons-react/lib/ListDropdown';
@@ -157,19 +158,29 @@ export function Content(props: Props) {
                       .map((r) => r.publicKey.toBase58())
                       .includes(props.realm.toBase58());
 
+                    if (isCurrentlyFollowing) {
+                      return (
+                        <Button.Tertiary
+                          className="w-36"
+                          onClick={() => {
+                            unfollow({ realm: props.realm });
+                          }}
+                        >
+                          <CheckmarkIcon className="h-4 w-4 mr-1.5" />
+                          Followed
+                        </Button.Tertiary>
+                      );
+                    }
+
                     return (
                       <Button.Secondary
                         className="w-36"
                         onClick={() => {
-                          if (isCurrentlyFollowing) {
-                            unfollow({ realm: props.realm });
-                          } else {
-                            follow({ realm: props.realm });
-                          }
+                          follow({ realm: props.realm });
                         }}
                       >
                         <UserFollow className="h-4 w-4 mr-1.5" />
-                        {isCurrentlyFollowing ? 'Unfollow' : 'Follow'}
+                        Follow
                       </Button.Secondary>
                     );
                   }
@@ -184,8 +195,8 @@ export function Content(props: Props) {
               ),
             )}
             {props.token && (
-              <a href={jupiterDirectLink} target="_blank">
-                <Button.Primary className="w-36 text-white ml-2">
+              <a className="ml-2" href={jupiterDirectLink} target="_blank">
+                <Button.Primary className="w-36 text-white">
                   <ProgressBarRound className="h-4 w-4 mr-1.5" />
                   Buy #{props.token.symbol}
                 </Button.Primary>
