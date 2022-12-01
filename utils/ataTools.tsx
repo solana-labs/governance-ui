@@ -99,6 +99,7 @@ export function findATAAddrSync(
     TOKEN_PROGRAM_ID.toBuffer(),
     mintAddress.toBuffer(),
   ]
+
   return utils.publicKey.findProgramAddressSync(
     seeds,
     ASSOCIATED_TOKEN_PROGRAM_ID

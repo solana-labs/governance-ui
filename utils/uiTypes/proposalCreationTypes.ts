@@ -25,6 +25,7 @@ export enum PackageEnum {
   MangoMarketV3,
   MangoMarketV4,
   MeanFinance,
+  Raydium,
   Serum,
   Solend,
   Streamflow,
@@ -525,6 +526,14 @@ export interface JoinDAOForm {
   amount?: number
 }
 
+export interface RaydiumSwapFixedInForm {
+  governedTokenAccount?: AssetAccount
+  poolName?: string
+  amountIn?: number
+  slippage: number
+  minAmountOut?: number
+}
+
 export enum Instructions {
   Base64,
   ChangeMakeDonation,
@@ -590,6 +599,7 @@ export enum Instructions {
   Mint,
   None,
   ProgramUpgrade,
+  RaydiumSwapFixedIn,
   RealmConfig,
   RefreshSolendObligation,
   RefreshSolendReserve,

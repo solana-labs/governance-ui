@@ -663,7 +663,7 @@
     ramda "^0.28.0"
     tweetnacl "^1.0.3"
 
-"@colors/colors@1.5.0":
+"@colors/colors@1.5.0", "@colors/colors@^1.5.0":
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/@colors/colors/-/colors-1.5.0.tgz#bb504579c1cae923e6576a4f5da43d25f97bdbd9"
   integrity sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==
@@ -3616,6 +3616,21 @@
   integrity sha512-eUuv90M4LBrdL+A6qTrOqaICeRqmwZKW7JIfgaM6GgmfDopf8ugdK0gA2TuaCvCytA/NahEnsM5+Eup/ngUsLA==
   dependencies:
     "@randlabs/communication-bridge" "^1.0.0"
+
+"@raydium-io/raydium-sdk@1.1.0-beta.44":
+  version "1.1.0-beta.44"
+  resolved "https://registry.yarnpkg.com/@raydium-io/raydium-sdk/-/raydium-sdk-1.1.0-beta.44.tgz#f72e699837800360326157e1610f5573557020e6"
+  integrity sha512-wyGWrrUGtwZyMwk/VQH7kiioItJ1Trzqv2d0cFey/UOmTfoN4y7Wg1NZyEJw21L1rXM21cMxSYcNdLaEJOH69A==
+  dependencies:
+    "@colors/colors" "^1.5.0"
+    "@solana/buffer-layout" "^4.0.0"
+    "@solana/spl-token" "^0.1.8"
+    big.js "^6.1.1"
+    decimal.js "^10.4.0"
+    decimal.js-light "^2.5.1"
+    fecha "^4.2.3"
+    lodash "^4.17.21"
+    toformat "^2.0.0"
 
 "@reach/dialog@^0.16.2":
   version "0.16.2"
@@ -8380,7 +8395,7 @@ decimal.js-light@^2.5.1:
   resolved "https://registry.npmjs.org/decimal.js-light/-/decimal.js-light-2.5.1.tgz"
   integrity sha512-qIMFpTMZmny+MMIitAB6D7iVPEorVw6YQRWkvarTkT4tBeSLLiHzcwj6q0MmYSFCiVpiqPJTJEYIrpcPzVEIvg==
 
-decimal.js@^10.3.1, decimal.js@^10.4.1:
+decimal.js@^10.3.1, decimal.js@^10.4.0, decimal.js@^10.4.1:
   version "10.4.2"
   resolved "https://registry.yarnpkg.com/decimal.js/-/decimal.js-10.4.2.tgz#0341651d1d997d86065a2ce3a441fbd0d8e8b98e"
   integrity sha512-ic1yEvwT6GuvaYwBLLY6/aFFgjZdySKTE8en/fkU3QICTmRtgtSlFn0u0BXN06InZwtfCelR7j8LRiDI/02iGA==
@@ -9407,6 +9422,11 @@ fbjs@^2.0.0:
     promise "^7.1.1"
     setimmediate "^1.0.5"
     ua-parser-js "^0.7.18"
+
+fecha@^4.2.3:
+  version "4.2.3"
+  resolved "https://registry.yarnpkg.com/fecha/-/fecha-4.2.3.tgz#4d9ccdbc61e8629b259fdca67e65891448d569fd"
+  integrity sha512-OP2IUU6HeYKJi3i0z4A19kHMQoLVs4Hc+DPqqxI2h/DPZHTm/vjsfC6P0b4jCMy14XizLBqvndQ+UilD7707Jw==
 
 fetch-blob@^3.1.2, fetch-blob@^3.1.4:
   version "3.1.5"

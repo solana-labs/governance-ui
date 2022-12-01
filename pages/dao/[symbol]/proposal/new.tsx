@@ -128,6 +128,7 @@ import UpdateConfigParams from './components/instructions/Serum/UpdateConfigPara
 import ClaimMangoTokens from './components/instructions/Mango/ClaimTokens'
 import { StyledLabel } from '@components/inputs/styles'
 import SelectInstructionType from '@components/SelectInstructionType'
+import RaydiumSwapFixedInForm from './components/instructions/Raydium/RaydiumSwapFixedIn'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -487,6 +488,7 @@ const New = () => {
       [Instructions.TransferDomainName]: TransferDomainName,
       [Instructions.EverlendDeposit]: DepositForm,
       [Instructions.EverlendWithdraw]: WithdrawForm,
+      [Instructions.RaydiumSwapFixedIn]: RaydiumSwapFixedInForm,
       [Instructions.SerumInitUser]: InitUser,
       [Instructions.SerumGrantLockedSRM]: {
         componentBuilderFunction: ({ index, governance }) => (

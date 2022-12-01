@@ -210,6 +210,10 @@ export default function useGovernanceAssets() {
       name: 'Mean Finance',
       image: '/img/meanfinance.png',
     },
+    [PackageEnum.Raydium]: {
+      name: 'Raydium',
+      image: '/img/raydium.png',
+    },
     [PackageEnum.Serum]: {
       name: 'Serum',
       image: '/img/serum.png',
@@ -673,6 +677,19 @@ export default function useGovernanceAssets() {
     [Instructions.MeanTransferStream]: {
       name: 'Payment Stream: Transfer stream',
       packageId: PackageEnum.MeanFinance,
+    },
+
+    /*
+      ██████   █████  ██    ██ ██████  ██ ██    ██ ███    ███ 
+      ██   ██ ██   ██  ██  ██  ██   ██ ██ ██    ██ ████  ████ 
+      ██████  ███████   ████   ██   ██ ██ ██    ██ ██ ████ ██ 
+      ██   ██ ██   ██    ██    ██   ██ ██ ██    ██ ██  ██  ██ 
+      ██   ██ ██   ██    ██    ██████  ██  ██████  ██      ██ 
+    */
+
+    [Instructions.RaydiumSwapFixedIn]: {
+      name: 'Swap Fixed In',
+      packageId: PackageEnum.Raydium,
     },
 
     /*

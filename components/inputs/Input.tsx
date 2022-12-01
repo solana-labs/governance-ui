@@ -71,7 +71,7 @@ const Input = ({
 
       {suffix && <StyledSuffix>{suffix}</StyledSuffix>}
 
-      <div className={error && 'pt-1'}>
+      <div className={error ? 'pt-1' : ''}>
         <ErrorField text={error}></ErrorField>
       </div>
     </div>
