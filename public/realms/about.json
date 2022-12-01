@@ -4997,5 +4997,299 @@
         "url": "https://marinade.finance/"
       }
     ]
+  },
+  "87piQaXhHJffNHLkjixEViCoNWFTpXDPnqNTfzj523aD": {
+    "symbol": "Neoland",
+    "heading": "Transform the world into a giant game board",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Neopolis is a free-to-play mobile game where players manage and trade real-world buildings. The best players become Landowners and get access to the Neoland mode. Landowners can organize events, providing other Neopolis players with the rewards and resources they need.",
+          "Neopolis recently hit 2m downloads and 250k active users in a limited soft launch.",
+          "The game is developed by Revolt Games, a studio of 17 focusing on real-world-based games.",
+          "With Neopolis and Neoland, the studio is creating a persistent world where players can have fun in a mass-market game (Neopolis) and build their estates by managing their Lands (Neoland)."
+        ]
+      }
+    ]
+  },
+  "6LjHttTUQfps53BjCFibfZx3BnGvCnGeYRaVjLuXv64L": {
+    "symbol": "RACE Protocol",
+    "heading": "Redefine web3 game and app development experience with RACE protocol",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "RACE Protocol makes creating an onchain game a fast and easy experience by offering a set of tools that cover the most complex development parts. Race protocol offers: peer-to-peer randomization tools implemented with users wallet encryption, player decisions that are hidden to other players but immutable and verifiable, serverless onchain gama data storage, set of predefine settlement programs to take care of assets.",
+          "With RACE protocol all he builders need to care about is designing a game logic and ui to build a truly decentralised game."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://team-race.gitbook.io/"
+    }
+  },
+  "ASUYfCjE6uNBo5scmiFqC67v7Dyoq3znaZPvohR9yL2j": {
+    "symbol": "Civic",
+    "heading": "Civic provides identity management tools for Web3 across chains for both consumers and dApps. ",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "For consumers, Civic.me offers Dynamic Web3 profiles where you can display NFTs, manage your identity and use on-chain messaging. For dApps, Civic Pass is an integrated permissioning tool for dApps that gives users access to their services."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.civic.com/"
+    },
+    "resources": [
+      {
+        "title": "What is KYC? How Crypto Exchanges Prevent Money Laundering",
+        "content": [
+          "Know-your-customer (KYC) requirements are a growing part of Web3, as crypto becomes more integrated with the existing financial system."
+        ],
+        "url": "https://decrypt.co/resources/what-is-kyc-how-crypto-exchanges-prevent-money-laundering"
+      },
+      {
+        "title": "Where DAOs Excel — And Where They Must Improve",
+        "content": [
+          "DAOs seemingly present elegant solutions to common problems, yet they are still widely misunderstood."
+        ],
+        "url": "https://www.newsweek.com/where-daos-excel-where-they-must-improve-1742544"
+      },
+      {
+        "title": "Civic Adds Verification Platform to Battle Bots and Scams",
+        "content": [
+          "The set of tools is designed to stop bots from taking unfair advantage of NFT drops by limiting the number of wallets an account can use."
+        ],
+        "url": "https://decrypt.co/106288/civic-continues-its-campaign-to-battle-bots-and-scams"
+      }
+    ]
+  },
+  "EYNTFC5dB6ofU6AgbQgDsRsJ6oXBU783drDYQbdm9kba": {
+    "symbol": "Coinable",
+    "heading": "No-code Web3 ecommerce platform built for everyone. Together we build.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Coinable is a Web3 ecommerce platform that makes it easy for anyone to turn the business of their dreams into a reality. Launch a store, integrate a checkout, and start accepting Solana payments today."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.coinablepay.com/"
+    },
+    "resources": [
+      {
+        "title": "The Coinable Medium Page",
+        "url": "https://medium.com/@coinable"
+      }
+    ]
+  },
+  "HvSw2w9Ctfr8ejS8Gm1SvXpNxiQ7Fdgz8W6HmBvqVpC6": {
+    "symbol": "PBN3 Paul Barron Network",
+    "heading": "The leading Web3 and Crypto Independent Media Sourse",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Over 20 years in technology, media, and business, Paul Barron has created the perfect storm for what has become one of the fastest-growing web3, crypto, and investing platform available. Paul is an astute tech executive, having built consumer science data platforms, media companies, and the longest-running sentiment tool for blockchain. With millions of viewers each month to his popular blockchain and Web3 shows, he has become one of the most important voices in the next generation of tech and finance."
+        ]
+      }
+    ]
+  },
+  "DoFABWkP3qRV2yggE3Tm1MpemKDviwnDaQAVB3gRiPwc": {
+    "symbol": "BizFirst",
+    "heading": "BizFirst helps merchants accept USDC payments and run NFT-based loyalty programs on their Store/Website.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Using BizFirst, merchants can:",
+          "1. Create their BizFirst business wallet",
+          "2. Accept USDC payments from their store",
+          "3. Send USDC based invoices",
+          "4. Run NFT-based loyalty programs."
+        ]
+      }
+    ]
+  },
+  "H5Me9k9Vk42d1eEfmfWX9z8hnFJvzCDN33z3hp6BwexH": {
+    "symbol": "Alien Chicken Farm (ACF)",
+    "heading": "ACF is the simplest play-and-earn game.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Alien Chicken Farm is a classic breeding and town-space real-time strategy game. It is the simplest play-and-earn game in the Solana ecosystem and in the larger crypto community. While ACF is fun to play, it presents real opportunities for its players to create a steady stream of passive income by breeding and selling high-value chickens.",
+          "Players can earn in Alien Chicken Farm by:",
+          "1. Breeding Chickens and selling them on the ACF Marketplace or any other Metaplex powered marketplace in the Solana ecosystem.",
+          "2. Collecting rare Chickens.",
+          "3. Culling Chickens for $FEED tokens that are needed to prepare the chickens and make them ready for breeding."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://whitepaper.alienchickenfarm.com/"
+    }
+  },
+  "bxPumP2w94Pz9QYYCCTYERgZSnTBWMh8xHwUCBU9N7W": {
+    "symbol": "SKY Wallet",
+    "heading": "The Crypto Wallet You Deserve.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "With SKY, along with the basic wallet functionalities, you can showcase your NFT collections via a shareable link, create custom USDC/SOL Payment Links, view Token details right from your wallet and much more."
+        ]
+      }
+    ]
+  },
+  "9AmuU93FiiMCY6LA6HK1wBocT4y1C55hbNDC8jWA3qEi": {
+    "symbol": "RetroTrades",
+    "heading": "RetroTrades Community Hub",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "RetroTrades is an NFT-based community that has created several collections, each generating different amounts of our token called $RTRO. We also have an Arcade that offers various games to win $RTRO, Arcade Tickets, and valuable NFTs. You can even spend those Arcade Tickets in the Arcade Shop to purchase those NFTs directly!"
+        ]
+      }
+    ]
+  },
+  "HtQ6TCLsLnR4iw78J8d5qR9Sac2ZfQkqpFqTnj8zgXEx": {
+    "symbol": "WaterDAO",
+    "heading": "The Water DAO is a decentralized platform for certifying water sources and issuing water credits. ",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "The purpose of the Water DAO is to create transparency around sources of water, how they are generated, and establish a water credit classification system. We believe this can be done by creating a trustworthy and verifiable water credit that can be easily purchased and used to offset water usage. This would allow companies to continue to focus on their operational efficiencies while supporting the replacement of their water usage with equally efficient water producers.",
+          "The purpose of the Water DAO can be summed up through four main goals:",
+          "Create a universally accepted water credit that is first supported by the Regenerative Finance (ReFi) community and eventually, by larger outside organizations. This credit class can serve as a building block for many types of water credits to be created.",
+          "The Water DAO will act as a support mechanism to verify credit quality. The DAO will oversee specific verification standards to provide a certain level of quality, standard for the credits issued through the DAO.",
+          "Incentivize companies to be \"Water Positive\" or at lease Water Neutral. This will come as the DAO expands and gains more influence. The DAO will make the process of becoming \"Water Positive\" a significantly easier process than it was previously, leaving companies fewer excuses to maintain their indifference.",
+          "Incentivize more environmentally friendly forms of desalination and other water treatments. This is done through a tiered credit system. For example, a water producer using desalination methods that require energy intensive methods and that has a potentially damaging runoff, would only qualify for second tier credits. To receive top tier credits, water producers must power their operations with cleaner and less energy intensive methods while mitigating harmful runoff."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://waterdao.gitbook.io/water-dao-whitepaper/"
+    }
+  },
+  "Gz9Zoht1gb6RW9hn9ejCup3uMDRqMSnppBWiQr9dHCaK": {
+    "symbol": "Infinity Labs NFT",
+    "heading": "Home of the Infinite. A world is unfolding, compounding. First collect & merge to unlock animated artwork on chain. ",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Infinity Labs built the first of its kinds deflationary collect and merge collection to unlock animated NFTs in the Solana Ecosystem, working with Metaplex on fusion and merging.",
+          "There are currently 1111 one-of-a-kind animations that may be unlocked by merging two Infinity Labs NFT copies, or \"timelines.\"",
+          "All 8 copies of the same scenes will be able to gather and combine over time until there exists a single 1111-piece timeline as determined by the community.",
+          "To Infinity."
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://infinitylabsnft.com/"
+    },
+    "resources": [
+      {
+        "title": "Eve's Breakpoint Talk 2022",
+        "content": [
+          "Our Founder, Eve, was selected as one of the speakers at the conference and spoke in front of attendees about Infinity Labs and the journey so far, among other exciting things."
+        ],
+        "url": "https://www.youtube.com/watch?v=M5UiWMj7clE"
+      },
+      {
+        "title": "The Infinity Labs Medium Page",
+        "url": "https://infinitylabsnft.medium.com/"
+      },
+      {
+        "title": "Infinity Labs Solana Ecosystem Page",
+        "url": "https://solana.com/ecosystem/infinitylabs"
+      }
+    ]
+  },
+  "3rQGVXuERbo9jakn5QXYBDFPR3uPXrNhPFQSmTeMNC2X": {
+    "symbol": "Cyber Feminists",
+    "heading": "We are Cyber Feminists - an online group of intellectual women at the forefront of technology for human evolution. ",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Cyber Feminism is a feminist approach that foregrounds the relationship between cyberspace, the internet, and technology. It was inspired by Donna Haraway's \"A Cyborg Manifesto\" and has seen then been iterated on by artists, technologies, and scholars alike.  We believe in the power of technology for human transformation - transformation into something beyond what the flesh of evolution could carve. Women lead this evolution, and always have. "
+        ]
+      }
+    ]
+  },
+  "DhuExYnEG55GzCrEWsUjTF6jDjoXuvWj8Y2x3eb6SZqb": {
+    "symbol": "Hxro",
+    "heading": "Hxro is an open primitive powering on-chain derivatives for market-based applications.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "Hxro is a open derivatives primitive for market-based applications built on the Solana blockchain. Through a series of native protocols, Hxro provides the framework and infrastructure for a robust, fully-functional decentralized exchange for derivatives contracts (futures and options) and parimutuel contracts.",
+          "Hxro derivatives are built off of its native open source protocol - Dexterity.",
+          "Dexterity is a collection of smart contracts on Solana.",
+          "It provides a framework for trading any instrument with a defined payoff function, including but not limited to options, futures, perpetual swaps, and bonds.",
+          "The framework has a modularized design that creates a hard separation between the mechanical components of trading market infrastructure (e.g. the order book data structure, position tracking, funding distribution) and the application-specific logic that relates to the instruments and exchange operators (e.g. settlement algorithms, margin calculation, liquidation thresholds, fee model).",
+          "We believe the flexibility this modular design creates will allow for a wide spectrum of on-chain market types to be created and supported by the protocol, making Dexterity a new fundamental building block for decentralized trading applications"
+        ]
+      }
+    ],
+    "documentation": {
+      "title": "Docs",
+      "url": "https://docs.hxro.network/"
+    },
+    "resources": [
+      {
+        "title": "Breakpoint 2022: The Case for On-Chain Derivatives",
+        "url": "https://www.youtube.com/watch?v=51LvGbdkzEw"
+      },
+      {
+        "title": "The Scoop Podcast: How the multi-trillion dollar derivatives industry could be disrupted by decentralized technology",
+        "content": [
+          "Hxro co-founder & CEO Dan Gunsberg joins host Frank Chaparro to unpack the idea behind the Hxro protocol, and to explain how Hxro hopes to solve liquidity problems that currently exist in the decentralized derivatives space."
+        ],
+        "url": "https://www.youtube.com/watch?v=_YMbqDzQmW4"
+      },
+      {
+        "title": "Hxro Network Announces $34M Strategic Round Co-Led by SIG DT, Jump Crypto and Blockchain Capital",
+        "content": [
+          "Hxro announced the closing of a $34 million strategic funding round co-led by SIG DT Investments, Jump Crypto, and Blockchain Capital."
+        ],
+        "url": "https://finance.yahoo.com/news/hxro-network-announces-34m-strategic-140000258.html"
+      }
+    ]
+  },
+  "Huv6gAgfyjqj24WAypHthD85SGDc9N3WvhwFAxm7eDgn": {
+    "symbol": "DigitalEyes Market",
+    "heading": "Solana's first open NFT marketplace.",
+    "about": [
+      {
+        "heading": "Introduction",
+        "content": [
+          "DigitalEyes is the the ultimate one-stop shop for NFTs on Solana.",
+          "- Marketplace aggregator for secondary trading",
+          "- Launchpad for primary NFT drops",
+          "- Mint Calendar for all upcoming NFT drops",
+          "- Solo for 1/1 Art",
+          "- Domains for secondary domain auctions",
+          "- Fully customizable user profile",
+          "- Direct on-chain messaging"
+        ]
+      }
+    ]
   }
 }

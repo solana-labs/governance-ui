@@ -221,7 +221,8 @@ export const RealmSearchNavigation = forwardRef<HTMLInputElement, Props>(
                               'w-full',
                               'hover:bg-neutral-200',
                             )}
-                            onClick={(e) => {
+                            onClick={() => {
+                              setText('');
                               setOpen(false);
                             }}
                           >
@@ -257,7 +258,8 @@ export const RealmSearchNavigation = forwardRef<HTMLInputElement, Props>(
                           'w-full',
                           'hover:bg-neutral-200',
                         )}
-                        onClick={(e) => {
+                        onClick={() => {
+                          setText('');
                           setOpen(false);
                         }}
                       >
