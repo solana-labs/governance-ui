@@ -16,7 +16,7 @@ export function Empty(props: Props) {
           Your feed is empty!
         </h1>
         <div className="text-sm text-neutral-700">
-          Join more Hubs to populate your feed.
+          Follow more Hubs to populate your feed.
         </div>
       </div>
     </article>
