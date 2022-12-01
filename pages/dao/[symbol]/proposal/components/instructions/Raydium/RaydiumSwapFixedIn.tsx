@@ -23,6 +23,12 @@ import { findATAAddrSync } from '@utils/ataTools'
 import TypeaheadSelect from '@components/TypeaheadSelect'
 import { debounce } from '@utils/debounce'
 import { getMinimumAmountOut } from '@utils/instructions/Raydium/helpers'
+import Link from 'next/link'
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  Token,
+  TOKEN_PROGRAM_ID,
+} from '@solana/spl-token'
 
 const schema = yup.object().shape({
   governedTokenAccount: yup
@@ -92,6 +98,8 @@ const SwapFixedInInstructionForm = ({
       }
     }
 
+    const additionalSerializedInstructions: string[] = []
+
     const { poolKeys } = pools[poolName]
 
     const {
@@ -132,11 +140,27 @@ const SwapFixedInInstructionForm = ({
       version
     )
 
+    // If tokenAccountOut is not initialize, create it
+    if (!(await connection.getAccountInfo(tokenAccountOut))) {
+      const createAtaInstruction = Token.createAssociatedTokenAccountInstruction(
+        ASSOCIATED_TOKEN_PROGRAM_ID,
+        TOKEN_PROGRAM_ID,
+        quoteMint,
+        tokenAccountOut,
+        owner,
+        wallet.publicKey!
+      )
+
+      additionalSerializedInstructions.push(
+        serializeInstructionToBase64(createAtaInstruction)
+      )
+    }
+
     return {
       serializedInstruction: serializeInstructionToBase64(instruction),
       isValid: true,
       governance: governedTokenAccount.governance,
-      additionalSerializedInstructions: [],
+      additionalSerializedInstructions,
     }
   }
 
@@ -207,7 +231,19 @@ const SwapFixedInInstructionForm = ({
 
       {!loadingPools && pools && form.governedTokenAccount ? (
         <>
-          <span className="text-sm relative top-2">Select Pools</span>
+          <div className="text-sm relative top-2">Authority</div>
+
+          {form.governedTokenAccount.extensions.token?.account.owner.toBase58() ? (
+            <div className="mt-2">
+              <Link
+                href={`https://explorer.solana.com/address/${form.governedTokenAccount.extensions.token?.account.owner.toBase58()}`}
+              >
+                {form.governedTokenAccount.extensions.token?.account.owner.toBase58()}
+              </Link>
+            </div>
+          ) : null}
+
+          <div className="text-sm relative top-2">Select Pools</div>
 
           {Object.keys(pools).length ? (
             <TypeaheadSelect
@@ -244,7 +280,7 @@ const SwapFixedInInstructionForm = ({
             <div className="text-white mt-2 text-sm">No pool available</div>
           )}
 
-          {form.poolName ? (
+          {pools && form.poolName && pools[form.poolName] ? (
             <>
               <Input
                 label={`${pools[form.poolName].tokenAName} amount in to swap`}

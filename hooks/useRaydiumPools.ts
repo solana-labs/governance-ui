@@ -1,7 +1,7 @@
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import { LiquidityPoolKeysV4 } from '@raydium-io/raydium-sdk'
 import { PublicKey } from '@solana/web3.js'
-import { fetchPoolKeysForMint } from '@utils/instructions/Raydium/helpers'
+import { fetchPoolKeysForBaseMint } from '@utils/instructions/Raydium/helpers'
 import { useCallback, useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 
@@ -16,17 +16,20 @@ type Pools = {
 // You may provide mints to limit the amount of loaded pools
 // Do not load anything if filter is unset
 export default function useRaydiumPools(
-  filterPoolsByMint?: PublicKey
+  filterPoolsByBaseMint?: PublicKey
 ): Pools | null | undefined {
   const connection = useWalletStore((s) => s.connection.current)
 
   const [pools, setPools] = useState<Pools | null>()
 
   const fetchPools = useCallback(async () => {
-    if (!filterPoolsByMint) return
+    if (!filterPoolsByBaseMint) return
 
     // Load pool info (list of keys by pool)
-    const poolsInfo = await fetchPoolKeysForMint(connection, filterPoolsByMint)
+    const poolsInfo = await fetchPoolKeysForBaseMint(
+      connection,
+      filterPoolsByBaseMint
+    )
 
     // 2 - Extract the mints used to generate the pool name
     const mints: PublicKey[] = Array.from(
@@ -73,7 +76,7 @@ export default function useRaydiumPools(
     }, {} as Pools)
 
     setPools(pools)
-  }, [connection, filterPoolsByMint])
+  }, [connection, filterPoolsByBaseMint])
 
   useEffect(() => {
     fetchPools()

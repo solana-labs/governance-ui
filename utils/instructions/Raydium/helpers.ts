@@ -165,9 +165,9 @@ function parsePoolAccountInfo(
 }
 
 // Rewrite SDK fetchAllPoolKeys and adapt it to be able to load only pools matching provided mint
-export async function fetchPoolKeysForMint(
+export async function fetchPoolKeysForBaseMint(
   connection: Connection,
-  mint: PublicKey
+  baseMint: PublicKey
 ): Promise<LiquidityPoolKeys[]> {
   const logger = Logger.from('Liquidity')
 
@@ -198,70 +198,33 @@ export async function fetchPoolKeysForMint(
 
   try {
     poolsAccountInfo = await Promise.all(
-      supported.reduce(
-        (
-          requests,
-          { programId, version, serumVersion, serumProgramId, stateLayout }
-        ) => {
-          requests.push(
-            connection
-              .getProgramAccounts(programId, {
-                filters: [
-                  { dataSize: stateLayout.span },
-                  {
-                    memcmp: {
-                      // Look for pool having USDC as baseMint
-                      offset: 400,
-                      bytes: mint.toBase58(),
-                    },
+      supported.map(
+        ({ programId, version, serumVersion, serumProgramId, stateLayout }) =>
+          connection
+            .getProgramAccounts(programId, {
+              filters: [
+                { dataSize: stateLayout.span },
+                {
+                  memcmp: {
+                    // Look for pool having USDC as baseMint
+                    offset: 400,
+                    bytes: baseMint.toBase58(),
                   },
-                ],
-              })
-              .then((accounts) =>
-                accounts.map((info) => ({
-                  ...info,
-                  ...{
-                    version,
-                    programId,
-                    serumVersion,
-                    serumProgramId,
-                    stateLayout,
-                  },
-                }))
-              )
-          )
-
-          requests.push(
-            connection
-              .getProgramAccounts(programId, {
-                filters: [
-                  { dataSize: stateLayout.span },
-                  {
-                    memcmp: {
-                      // Look for pool having USDC as quoteMint
-                      offset: 432,
-                      bytes: mint.toBase58(),
-                    },
-                  },
-                ],
-              })
-              .then((accounts) =>
-                accounts.map((info) => ({
-                  ...info,
-                  ...{
-                    version,
-                    programId,
-                    serumVersion,
-                    serumProgramId,
-                    stateLayout,
-                  },
-                }))
-              )
-          )
-
-          return requests
-        },
-        [] as Promise<any>[]
+                },
+              ],
+            })
+            .then((accounts) =>
+              accounts.map((info) => ({
+                ...info,
+                ...{
+                  version,
+                  programId,
+                  serumVersion,
+                  serumProgramId,
+                  stateLayout,
+                },
+              }))
+            )
       )
     )
   } catch (error) {
