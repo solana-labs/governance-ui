@@ -195,7 +195,12 @@ export function Content(props: Props) {
               ),
             )}
             {props.token && (
-              <a className="ml-2" href={jupiterDirectLink} target="_blank">
+              <a
+                className="ml-2"
+                href={jupiterDirectLink}
+                target="_blank"
+                rel="noreferrer"
+              >
                 <Button.Primary className="w-36 text-white">
                   <ProgressBarRound className="h-4 w-4 mr-1.5" />
                   Buy #{props.token.symbol}
