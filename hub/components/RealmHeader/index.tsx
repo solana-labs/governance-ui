@@ -1,4 +1,5 @@
 import AssemblyClusterIcon from '@carbon/icons-react/lib/AssemblyCluster';
+import CheckmarkIcon from '@carbon/icons-react/lib/Checkmark';
 import EarthIcon from '@carbon/icons-react/lib/Earth';
 import EditIcon from '@carbon/icons-react/lib/Edit';
 import ListDropdownIcon from '@carbon/icons-react/lib/ListDropdown';
@@ -8,10 +9,11 @@ import LogoInstagram from '@carbon/icons-react/lib/LogoInstagram';
 import LogoLinkedin from '@carbon/icons-react/lib/LogoLinkedin';
 import OverflowMenuHorizontalIcon from '@carbon/icons-react/lib/OverflowMenuHorizontal';
 import ProgressBarRound from '@carbon/icons-react/lib/ProgressBarRound';
-// import UserFollow from '@carbon/icons-react/lib/UserFollow';
+import UserFollow from '@carbon/icons-react/lib/UserFollow';
 import WalletIcon from '@carbon/icons-react/lib/Wallet';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import type { PublicKey } from '@solana/web3.js';
+import { pipe } from 'fp-ts/lib/function';
 import Link from 'next/link';
 import { useMemo } from 'react';
 import { useMediaQuery } from 'react-responsive';
@@ -21,11 +23,15 @@ import { HeaderTokenPrice } from '@hub/components/HeaderTokenPrice';
 import { Twitter } from '@hub/components/icons/Twitter';
 import * as RealmBanner from '@hub/components/RealmBanner';
 import * as RealmHeaderIcon from '@hub/components/RealmHeaderIcon';
+import { useMutation } from '@hub/hooks/useMutation';
+import { useQuery } from '@hub/hooks/useQuery';
 import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
 import cx from '@hub/lib/cx';
+import * as RE from '@hub/types/Result';
 
 import { ExternalLinkIcon } from './ExternalLinkIcon';
 import { ExternalLinkMenuItem } from './ExternalLinkMenuItem';
+import * as gql from './gql';
 import { Tab } from './Tab';
 
 interface BaseProps {
@@ -69,6 +75,12 @@ export function Content(props: Props) {
     props.linkedInUrl ||
     props.githubUrl
   );
+
+  const [followedResp] = useQuery(gql.followedRealmsResp, {
+    query: gql.followedRealms,
+  });
+  const [, follow] = useMutation(gql.followResp, gql.follow);
+  const [, unfollow] = useMutation(gql.unfollowResp, gql.unfollow);
 
   return (
     <header className={cx(props.className, 'bg-white')}>
@@ -135,13 +147,61 @@ export function Content(props: Props) {
                 />
               </div>
             )}
-            {/* <Button.Secondary className="w-36">
-              <UserFollow className="h-4 w-4 mr-1.5" />
-              Follow
-            </Button.Secondary> */}
+            {pipe(
+              followedResp,
+              RE.match(
+                () => <div />,
+                () => <div />,
+                ({ me }) => {
+                  if (me) {
+                    const isCurrentlyFollowing = me.followedRealms
+                      .map((r) => r.publicKey.toBase58())
+                      .includes(props.realm.toBase58());
+
+                    if (isCurrentlyFollowing) {
+                      return (
+                        <Button.Tertiary
+                          className="w-36"
+                          onClick={() => {
+                            unfollow({ realm: props.realm });
+                          }}
+                        >
+                          <CheckmarkIcon className="h-4 w-4 mr-1.5" />
+                          Followed
+                        </Button.Tertiary>
+                      );
+                    }
+
+                    return (
+                      <Button.Secondary
+                        className="w-36"
+                        onClick={() => {
+                          follow({ realm: props.realm });
+                        }}
+                      >
+                        <UserFollow className="h-4 w-4 mr-1.5" />
+                        Follow
+                      </Button.Secondary>
+                    );
+                  }
+
+                  return (
+                    <Button.Secondary disabled className="w-36">
+                      <UserFollow className="h-4 w-4 mr-1.5" />
+                      Follow
+                    </Button.Secondary>
+                  );
+                },
+              ),
+            )}
             {props.token && (
-              <a href={jupiterDirectLink} target="_blank">
-                <Button.Primary className="w-36 text-white ml-2">
+              <a
+                className="ml-2"
+                href={jupiterDirectLink}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <Button.Primary className="w-36 text-white">
                   <ProgressBarRound className="h-4 w-4 mr-1.5" />
                   Buy #{props.token.symbol}
                 </Button.Primary>
