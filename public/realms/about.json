@@ -231,12 +231,12 @@
   },
   "HP1Y12FPbWMAqqVTpKMXKVk6yK3zJaNSxwUEqLzzzuqc": {
     "symbol": "SolanaFM",
-    "heading": "Friendlist Web3 Explorer ",
+    "heading": "Bridging the gaps of data accessibility via our indexer, APIs and explorer tools on Solana.",
     "about": [
       {
         "heading": "Introduction",
         "content": [
-          "SolanaFM aims to bridge the gaps of data accessibility via our indexer, APIs and explorer tools on Solana "
+          "SolanaFM is a leading blockchain explorer on Solana. As the first on-chain data indexer, the team provides human-readable data for users, developers and protocols."
         ]
       }
     ],
@@ -2201,6 +2201,37 @@
           "Artivive is defining the art form of the 21st century by building the community around creative augmented reality. With 200k creators from 190 countries, we have the 3rd biggest creator community after Facebook and Snapchat."
         ]
       }
+    ],
+    "team": [
+      {
+        "name": "Sergiu",
+        "avatar": "https://media-exp1.licdn.com/dms/image/C4D03AQGizU9YfTo3QQ/profile-displayphoto-shrink_400_400/0/1658910213572?e=1675296000&v=beta&t=QmPugTj3m-8Fxqc18sU9jgEznwcuIxqphDmOaON1riM",
+        "description": [
+          "Hi, I'm Sergiu.",
+          "SERIAL ENTREPRENEUR, CREATIVE DIRECTOR, SPEAKER, MENTOR",
+          "I see myself as a creative who builds tools. I love to travel, meet people, projects and try new things out.",
+          "Soon after getting my degree, I started with a friend at an agency in Vienna. The agency became a leading Augmented Reality agency serving clients from 42 countries such as Volkswagen and Audi.",
+          "Today I want to change how art is created and consumed. The project is called Artivive and became from an idea born at a beer to a platform serving more than 100k artists in 120 countries with offices in Europe, US and China."
+        ],
+        "role": "CEO"
+      },
+      {
+        "name": "Codin",
+        "avatar": "https://media-exp1.licdn.com/dms/image/C4E03AQEqdL9rl4xbfw/profile-displayphoto-shrink_400_400/0/1522834753585?e=1675296000&v=beta&t=kDfdk-bHSAhAX0C9YE5Fn7sgGhSgM26z0dB3ufQ-Sxo",
+        "description": [
+          "Codin is an Austrian-Romanian serial entrepreneur with more than 15 years of management experience in business and sales channel development. He highly values Impact projects and has held workshops and panel talks in several countries; one of his favorites being a digital art biz dev program in Zimbabwe. He believes AR is the new creative medium of our times and building Artivive to be the go-to worldwide platform for AR art is more than a commercial undertaking; it is his professional passion."
+        ],
+        "role": "CEO"
+      },
+      {
+        "name": "Clemens",
+        "avatar": "https://media-exp1.licdn.com/dms/image/C5603AQHrYGhFmD3S2Q/profile-displayphoto-shrink_400_400/0/1657119850359?e=1675296000&v=beta&t=pGZZySoQJdmuFQntvqwM0YZWmVTPzM3gsI1O9-SAbps",
+        "description": [
+          "Clemens is a self made entrepreneur since his early business years. Is a vespre native since 2016 and Leads the crapes and NFT project of Artivive."
+        ],
+        "role": "Head of Blockchain & NFT Management @ Artivive - Entrepreneur @ LoeX",
+        "twitter": "@WunderWandel"
+      }
     ]
   },
   "AH4qTqRFcoNqmYEi7p8heAGVSPHfJrNUPa8DvjDnBsf3": {
@@ -2926,16 +2957,48 @@
   },
   "DntR8BU5tYVhQUNfARFG5VxKrpdRaKY2qKC3v8cYJirm": {
     "symbol": "Okay Bears",
-    "heading": "Okay Bears has the highest trade volume of any NFT collection on Solana and is an emerging global icon of clean, positive cool. ",
+    "heading": "Okay Bears has the highest trade volume of any NFT collection on Solana and is an emerging global icon of clean, positive cool.",
     "about": [
       {
         "heading": "Introduction",
         "content": [
-          "Okay Bears represent a seismic shift in online culture. Breaking NFT records at launch, the brand quickly transcended from a virtuous Web3 community to a unique place in mainstream popular culture.",
-          "It is the first Web3 brand to be signed by IMG, the world’s leading brand licensing company representing global icons such as Angry Birds, Fortnite and Pepsi. Bruno Maglione, President of Licensing, IMG, said: “Okay Bears has shown that NFTs can be a powerful tool of mobilization and empowerment, creating a global community that exudes positivity and support. Their brand message and values have resonated with people across the world, and we plan to ensure these are celebrated and reflected in a range of creative collaborations and products as we work with Okay Bears towards elevating online and offline cultures together.",
-          "The Okay Bears NFT collection features 10,000 diverse bears, reaching over $150 million in total trade volume since its launch in April 2022. The brand has also collaborated with NBA athletes and Wilson (via HEIR) and organically attracted a wide range of celebrities from Game of Thrones, FaZe Clan, Olympians, athletes, actors and models.",
+          "Okay Bears represent a seismic shift in online culture. Breaking NFT records at launch, the brand quickly transcended from a virtuous Web3 community to a unique place in mainstream popular culture."
+        ]
+      },
+      {
+        "content": [
+          "It is the first Web3 brand to be signed by IMG, the world’s leading brand licensing company representing global icons such as Angry Birds, Fortnite and Pepsi. Bruno Maglione, President of Licensing, IMG, said: “Okay Bears has shown that NFTs can be a powerful tool of mobilization and empowerment, creating a global community that exudes positivity and support. Their brand message and values have resonated with people across the world, and we plan to ensure these are celebrated and reflected in a range of creative collaborations and products as we work with Okay Bears towards elevating online and offline cultures together."
+        ]
+      },
+      {
+        "content": [
+          "The Okay Bears NFT collection features 10,000 diverse bears, reaching over $150 million in total trade volume since its launch in April 2022. The brand has also collaborated with NBA athletes and Wilson (via HEIR) and organically attracted a wide range of celebrities from Game of Thrones, FaZe Clan, Olympians, athletes, actors and models."
+        ]
+      },
+      {
+        "content": [
           "Co-Founder Kais shares, “Together with our community, we inspire hope through our online activity every single day. We spread the message that you are enough just the way you are; that it is okay to just be okay."
         ]
+      }
+    ],
+    "gallery": [
+      {
+        "caption": "A celebration of over 15 Okay Bears holders.",
+        "url": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/ff8338db-1c0b-490f-b8e3-4cdc40532786/dfffgfm-ba998197-d4fc-48f7-a1f4-c3b7b309f13f.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcL2ZmODMzOGRiLTFjMGItNDkwZi1iOGUzLTRjZGM0MDUzMjc4NlwvZGZmZmdmbS1iYTk5ODE5Ny1kNGZjLTQ4ZjctYTFmNC1jM2I3YjMwOWYxM2YuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.D-XpOtwpezcAkN0Kaw87z5A8v-GETiJjThOa591GrEw",
+        "height": 338,
+        "width": 600
+      },
+      {
+        "caption": "Okay Bears is a culture shift. A clean collection of 10,000 diverse bears building a virtuous community.",
+        "url": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/ff8338db-1c0b-490f-b8e3-4cdc40532786/dfebic3-3383b36d-09e0-49c7-aabb-31abdde41757.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcL2ZmODMzOGRiLTFjMGItNDkwZi1iOGUzLTRjZGM0MDUzMjc4NlwvZGZlYmljMy0zMzgzYjM2ZC0wOWUwLTQ5YzctYWFiYi0zMWFiZGRlNDE3NTcucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.VC4P0KshwekGSxl62_NROWAIEonJ_lWvaGF2TfHJvIg",
+        "height": 388,
+        "width": 600
+      },
+      {
+        "caption": "Nothing says #WeAreOkay more than chill beats and good vibes. ",
+        "url": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/ff8338db-1c0b-490f-b8e3-4cdc40532786/dfffdjb-39b49771-5f4d-4393-896e-ede247dbaf4f.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcL2ZmODMzOGRiLTFjMGItNDkwZi1iOGUzLTRjZGM0MDUzMjc4NlwvZGZmZmRqYi0zOWI0OTc3MS01ZjRkLTQzOTMtODk2ZS1lZGUyNDdkYmFmNGYucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.GojSqWwN15nfv4uvt29xEl8bLLj-abIZvafgw-AeWE4",
+        "height": 338,
+        "width": 600
       }
     ],
     "resources": [
@@ -2946,7 +3009,30 @@
         ],
         "url": "https://imglicensing.com/clients/okay-bears/"
       }
-    ]
+    ],
+    "team": [
+      {
+        "name": "Chadwick",
+        "avatar": "https://assets-global.website-files.com/623ab58321ca25f489fca9e6/6307059865bd55479fe1f266_ChadBear-2.jpeg",
+        "description": [
+          "Community engagement, growing brand reach, and strategy."
+        ],
+        "role": "Social Media and Engagement",
+        "twitter": "@chadwick"
+      }
+    ],
+    "roadmap": {
+      "items": [
+        {
+          "title": "The Blueprint - We're Building This Together",
+          "date": "2023-11-01T15:42:21.109Z",
+          "status": "inprogress",
+          "resource": {
+            "url": "https://www.okaybears.com/blueprint"
+          }
+        }
+      ]
+    }
   },
   "wij7YqAPCYtPk4isjY5TpoMpbYC7xupwuKVzpbnZHp7": {
     "symbol": "HEIR Labs, Inc.",
