@@ -100,22 +100,20 @@ export const graphcache = async (
           }
         },
         followRealm(_result, args, cache) {
-          cache.invalidate(
-            {
-              __typename: 'Query',
-            },
-            'followedRealmsFeed',
-            { first: 10, sort: 'Relevance' },
-          );
+          cache
+            .inspectFields('Query')
+            .filter((field) => field.fieldName.startsWith('followedRealmsFeed'))
+            .forEach((field) => {
+              cache.invalidate('Query', field.fieldKey);
+            });
         },
         unfollowRealm(_result, args, cache) {
-          cache.invalidate(
-            {
-              __typename: 'Query',
-            },
-            'followedRealmsFeed',
-            { first: 10, sort: 'Relevance' },
-          );
+          cache
+            .inspectFields('Query')
+            .filter((field) => field.fieldName.startsWith('followedRealmsFeed'))
+            .forEach((field) => {
+              cache.invalidate('Query', field.fieldKey);
+            });
         },
       },
     },
