@@ -6,13 +6,13 @@ import Tooltip from '@components/Tooltip'
 import VetoButtons from './VetoButtons'
 import { CastVoteButtons } from './CastVoteButtons'
 import { YouVoted } from './YouVoted'
-import { useIsVoting, useOwnVoteRecord } from './hooks'
+import { useIsVoting, useProposalVoteRecordQuery } from './hooks'
 
 const VotePanel = () => {
   const { proposal } = useWalletStore((s) => s.selectedProposal)
   const connected = useWalletStore((s) => s.connected)
 
-  const ownVoteRecord = useOwnVoteRecord()
+  const { data: ownVoteRecord } = useProposalVoteRecordQuery('electoral')
 
   const isVoteCast = ownVoteRecord !== undefined
   const isVoting = useIsVoting()

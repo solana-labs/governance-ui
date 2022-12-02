@@ -5,7 +5,7 @@ import Button from '../Button'
 import VoteCommentModal from '../VoteCommentModal'
 import {
   useIsVoting,
-  useOwnVoteRecord,
+  useProposalVoteRecordQuery,
   useVoterTokenRecord,
   useVotingPop,
 } from './hooks'
@@ -21,7 +21,7 @@ const useCanVote = () => {
   const { ownVoterWeight } = useRealm()
   const connected = useWalletStore((s) => s.connected)
 
-  const ownVoteRecord = useOwnVoteRecord()
+  const { data: ownVoteRecord } = useProposalVoteRecordQuery('electoral')
   const voterTokenRecord = useVoterTokenRecord()
 
   const isVoteCast = ownVoteRecord !== undefined
@@ -57,7 +57,7 @@ export const CastVoteButtons = () => {
   const voterTokenRecord = useVoterTokenRecord()
 
   const [canVote, tooltipContent] = useCanVote()
-  const ownVoteRecord = useOwnVoteRecord()
+  const { data: ownVoteRecord } = useProposalVoteRecordQuery('electoral')
 
   const isVoteCast = ownVoteRecord !== undefined
   const isVoting = useIsVoting()

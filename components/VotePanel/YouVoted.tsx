@@ -18,7 +18,11 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { useRouter } from 'next/router'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import Tooltip from '@components/Tooltip'
-import { useOwnVoteRecord, useVoterTokenRecord, useIsVoting } from './hooks'
+import {
+  useVoterTokenRecord,
+  useIsVoting,
+  useProposalVoteRecordQuery,
+} from './hooks'
 import assertUnreachable from '@utils/typescript/assertUnreachable'
 
 export const YouVoted = () => {
@@ -41,7 +45,7 @@ export const YouVoted = () => {
 
   const [isLoading, setIsLoading] = useState(false)
 
-  const ownVoteRecord = useOwnVoteRecord()
+  const { data: ownVoteRecord } = useProposalVoteRecordQuery('electoral')
   const voterTokenRecord = useVoterTokenRecord()
 
   const isWithdrawEnabled =
