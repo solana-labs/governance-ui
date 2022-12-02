@@ -28,7 +28,7 @@ export const useAddressQuery_VoteRecord = (
 ) => {
   const enabled =
     programId !== undefined &&
-    typeof proposalAddress === 'string' &&
+    proposalAddress !== undefined &&
     tokenOwnerRecordAddress !== undefined
 
   return useQuery({
@@ -39,13 +39,13 @@ export const useAddressQuery_VoteRecord = (
         ]
       : undefined,
     queryFn: () => {
-      if (enabled)
-        return getVoteRecordAddress(
-          programId,
-          new PublicKey(proposalAddress),
-          tokenOwnerRecordAddress
-        )
-      else throw new Error()
+      if (!enabled) throw new Error()
+
+      return getVoteRecordAddress(
+        programId,
+        proposalAddress,
+        tokenOwnerRecordAddress
+      )
     },
     enabled,
     // Staletime is zero by default, so queries get refetched often. PDAs will never go stale.
