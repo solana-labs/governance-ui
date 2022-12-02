@@ -3,19 +3,10 @@ import {
   useAddressQuery_CouncilTokenOwner,
 } from '@hooks/queries/addresses/tokenOwner'
 import { useAddressQuery_SelectedProposalVoteRecord } from '@hooks/queries/addresses/voteRecord'
-import {
-  useVoteRecordByPubkeyQuery,
-  voteRecordQueryKeys,
-} from '@hooks/queries/voteRecord'
+import { useVoteRecordByPubkeyQuery } from '@hooks/queries/voteRecord'
 import { useHasVoteTimeExpired } from '@hooks/useHasVoteTimeExpired'
 import useRealm from '@hooks/useRealm'
-import {
-  ProposalState,
-  GoverningTokenRole,
-  getVoteRecord,
-} from '@solana/spl-governance'
-import { useQuery } from '@tanstack/react-query'
-import { useMemo } from 'react'
+import { ProposalState, GoverningTokenRole } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
 
 export const useIsVoting = () => {
@@ -70,7 +61,7 @@ export const useVoterTokenRecord = () => {
   return voterTokenRecord
 }
 
-export const useProposalVoteRecordsQuery = (quorum: 'electoral' | 'veto') => {
+export const useProposalVoteRecordQuery = (quorum: 'electoral' | 'veto') => {
   const tokenRole = useWalletStore((s) => s.selectedProposal.tokenRole)
   const community = useAddressQuery_CommunityTokenOwner()
   const council = useAddressQuery_CouncilTokenOwner()
