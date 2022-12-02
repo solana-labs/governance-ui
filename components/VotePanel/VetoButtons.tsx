@@ -9,7 +9,7 @@ import {
 } from '@solana/spl-governance'
 import { useMemo, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
-import { useIsVoting } from './hooks'
+import { useIsVoting, useProposalVoteRecordQuery } from './hooks'
 
 /* 
   returns: undefined if loading, false if nobody can veto, 'council' if council can veto, 'community' if community can veto
@@ -40,11 +40,6 @@ const useIsVetoable = (): undefined | boolean => {
   return !!vetoingPop
 }
 
-const useUserVetoRecord = () => {
-  // TODO
-  return undefined
-}
-
 const useUserVetoTokenRecord = () => {
   const { ownTokenRecord, ownCouncilTokenRecord } = useRealm()
   const vetoingPop = useVetoingPop()
@@ -60,7 +55,7 @@ const useCanVeto = ():
   const { ownVoterWeight } = useRealm()
   const connected = useWalletStore((s) => s.connected)
   const isVetoable = useIsVetoable()
-  const userVetoRecord = useUserVetoRecord()
+  const { data: userVetoRecord } = useProposalVoteRecordQuery('veto')
   const voterTokenRecord = useUserVetoTokenRecord()
 
   if (isVetoable === false)
