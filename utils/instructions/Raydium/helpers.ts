@@ -18,25 +18,30 @@ import { AccountInfo, Connection, PublicKey } from '@solana/web3.js'
 import { uiToNative } from '@blockworks-foundation/mango-client'
 import group from '@utils/group'
 
+// TokenA is in
+// TokenB is out
 export const getMinimumAmountOut = async ({
   poolKeys,
+  tokenIn,
+  tokenOut,
   amountIn,
   connection,
   slippage,
 }: {
   poolKeys: LiquidityPoolKeysV4
+  tokenIn: {
+    mint: PublicKey
+    decimals: number
+  }
+  tokenOut: {
+    mint: PublicKey
+    decimals: number
+  }
   amountIn: number
   connection: Connection
   slippage: number
 }) => {
   if (amountIn <= 0) return 0
-
-  const { baseMint, quoteMint } = poolKeys
-
-  const [base, quote] = await Promise.all([
-    connection.getTokenSupply(baseMint),
-    connection.getTokenSupply(quoteMint),
-  ])
 
   const { minAmountOut } = Liquidity.computeAmountOut({
     poolKeys,
@@ -47,17 +52,17 @@ export const getMinimumAmountOut = async ({
     }),
 
     amountIn: new TokenAmount(
-      new Token(baseMint, base.value.decimals),
-      uiToNative(amountIn, base.value.decimals)
+      new Token(tokenIn.mint, tokenIn.decimals),
+      uiToNative(amountIn, tokenIn.decimals)
     ),
 
-    currencyOut: new Token(quoteMint, quote.value.decimals),
+    currencyOut: new Token(tokenOut.mint, tokenOut.decimals),
 
     // slippage in 1/1000
     slippage: new Percent(new BN(slippage), 10),
   })
 
-  const currentPrice = minAmountOut.toFixed(quote.value.decimals)
+  const currentPrice = minAmountOut.toFixed(tokenOut.decimals)
 
   return Number(currentPrice) * amountIn
 }
@@ -165,9 +170,9 @@ function parsePoolAccountInfo(
 }
 
 // Rewrite SDK fetchAllPoolKeys and adapt it to be able to load only pools matching provided mint
-export async function fetchPoolKeysForBaseMint(
+export async function fetchPoolKeysForMint(
   connection: Connection,
-  baseMint: PublicKey
+  mint: PublicKey
 ): Promise<LiquidityPoolKeys[]> {
   const logger = Logger.from('Liquidity')
 
@@ -197,8 +202,8 @@ export async function fetchPoolKeysForBaseMint(
   }[][] = []
 
   try {
-    poolsAccountInfo = await Promise.all(
-      supported.map(
+    poolsAccountInfo = await Promise.all([
+      ...supported.map(
         ({ programId, version, serumVersion, serumProgramId, stateLayout }) =>
           connection
             .getProgramAccounts(programId, {
@@ -208,7 +213,7 @@ export async function fetchPoolKeysForBaseMint(
                   memcmp: {
                     // Look for pool having USDC as baseMint
                     offset: 400,
-                    bytes: baseMint.toBase58(),
+                    bytes: mint.toBase58(),
                   },
                 },
               ],
@@ -225,8 +230,36 @@ export async function fetchPoolKeysForBaseMint(
                 },
               }))
             )
-      )
-    )
+      ),
+      ...supported.map(
+        ({ programId, version, serumVersion, serumProgramId, stateLayout }) =>
+          connection
+            .getProgramAccounts(programId, {
+              filters: [
+                { dataSize: stateLayout.span },
+                {
+                  memcmp: {
+                    // Look for pool having USDC as quoteMint
+                    offset: 432,
+                    bytes: mint.toBase58(),
+                  },
+                },
+              ],
+            })
+            .then((accounts) =>
+              accounts.map((info) => ({
+                ...info,
+                ...{
+                  version,
+                  programId,
+                  serumVersion,
+                  serumProgramId,
+                  stateLayout,
+                },
+              }))
+            )
+      ),
+    ])
   } catch (error) {
     if (error instanceof Error) {
       return logger.throwError(

@@ -18,7 +18,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Input from '@components/inputs/Input'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { NewProposalContext } from '../../../new'
-import useRaydiumPools from '@hooks/useRaydiumPools'
+import useRaydiumPoolsForSwap from '@hooks/useRaydiumPoolsForSwap'
 import { findATAAddrSync } from '@utils/ataTools'
 import TypeaheadSelect from '@components/TypeaheadSelect'
 import { debounce } from '@utils/debounce'
@@ -29,6 +29,7 @@ import {
   Token,
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
+import { TransactionInstruction } from '@solana/web3.js'
 
 const schema = yup.object().shape({
   governedTokenAccount: yup
@@ -65,7 +66,7 @@ const SwapFixedInInstructionForm = ({
   const [formErrors, setFormErrors] = useState({})
 
   // Only load pools about following mint to avoid loading ALL pools (thousands of them)
-  const pools = useRaydiumPools(
+  const pools = useRaydiumPoolsForSwap(
     form.governedTokenAccount?.extensions.mint?.publicKey
   )
 
@@ -98,17 +99,15 @@ const SwapFixedInInstructionForm = ({
       }
     }
 
-    const additionalSerializedInstructions: string[] = []
-
-    const { poolKeys } = pools[poolName]
+    const prerequisiteInstructions: TransactionInstruction[] = []
 
     const {
-      baseMint,
-      quoteMint,
-      baseDecimals,
-      quoteDecimals,
-      version,
-    } = poolKeys
+      poolKeys,
+      tokenIn: { mint: tokenInMint, decimals: tokenInDecimals },
+      tokenOut: { mint: tokenOutMint, decimals: tokenOutDecimals },
+    } = pools[poolName]
+
+    const { version } = poolKeys
 
     const owner = governedTokenAccount.extensions.token?.account.owner
 
@@ -116,11 +115,19 @@ const SwapFixedInInstructionForm = ({
       throw new Error('Selected token account does not have owner information')
     }
 
-    const [tokenAccountIn] = findATAAddrSync(owner, baseMint)
-    const [tokenAccountOut] = findATAAddrSync(owner, quoteMint)
+    const [tokenAccountIn] = findATAAddrSync(owner, tokenInMint)
+    const [tokenAccountOut] = findATAAddrSync(owner, tokenOutMint)
 
     const minAmountOut = await getMinimumAmountOut({
       poolKeys,
+      tokenIn: {
+        mint: tokenInMint,
+        decimals: tokenInDecimals,
+      },
+      tokenOut: {
+        mint: tokenOutMint,
+        decimals: tokenOutDecimals,
+      },
       amountIn,
       connection,
       slippage,
@@ -134,8 +141,8 @@ const SwapFixedInInstructionForm = ({
           tokenAccountOut,
           owner,
         },
-        amountIn: uiToNative(amountIn, baseDecimals),
-        minAmountOut: uiToNative(minAmountOut, quoteDecimals),
+        amountIn: uiToNative(amountIn, tokenInDecimals),
+        minAmountOut: uiToNative(minAmountOut, tokenOutDecimals),
       },
       version
     )
@@ -145,22 +152,21 @@ const SwapFixedInInstructionForm = ({
       const createAtaInstruction = Token.createAssociatedTokenAccountInstruction(
         ASSOCIATED_TOKEN_PROGRAM_ID,
         TOKEN_PROGRAM_ID,
-        quoteMint,
+        tokenOutMint,
         tokenAccountOut,
         owner,
         wallet.publicKey!
       )
 
-      additionalSerializedInstructions.push(
-        serializeInstructionToBase64(createAtaInstruction)
-      )
+      prerequisiteInstructions.push(createAtaInstruction)
     }
 
     return {
       serializedInstruction: serializeInstructionToBase64(instruction),
       isValid: true,
       governance: governedTokenAccount.governance,
-      additionalSerializedInstructions,
+      additionalSerializedInstructions: [],
+      prerequisiteInstructions,
     }
   }
 
@@ -181,10 +187,18 @@ const SwapFixedInInstructionForm = ({
     debounce.debounceFcn(async () => {
       if (!form.amountIn || !form.poolName || !pools) return
 
-      const { poolKeys } = pools[form.poolName]
+      const { poolKeys, tokenIn, tokenOut } = pools[form.poolName]
 
       const minAmountOut = await getMinimumAmountOut({
         poolKeys,
+        tokenIn: {
+          mint: tokenIn.mint,
+          decimals: tokenIn.decimals,
+        },
+        tokenOut: {
+          mint: tokenOut.mint,
+          decimals: tokenOut.decimals,
+        },
         connection,
         amountIn: form.amountIn,
         slippage: form.slippage,
@@ -283,7 +297,7 @@ const SwapFixedInInstructionForm = ({
           {pools && form.poolName && pools[form.poolName] ? (
             <>
               <Input
-                label={`${pools[form.poolName].tokenAName} amount in to swap`}
+                label={`${pools[form.poolName].tokenIn.name} amount in to swap`}
                 value={form.amountIn}
                 type="number"
                 min={0}
@@ -313,7 +327,7 @@ const SwapFixedInInstructionForm = ({
 
               <Input
                 label={`Minimum ${
-                  pools[form.poolName].tokenBName
+                  pools[form.poolName].tokenOut.name
                 } amount received`}
                 value={form.minAmountOut}
                 type="number"
