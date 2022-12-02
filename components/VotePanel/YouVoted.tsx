@@ -45,7 +45,8 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
 
   const [isLoading, setIsLoading] = useState(false)
 
-  const { data: ownVoteRecord } = useProposalVoteRecordQuery(quorum)
+  const { data } = useProposalVoteRecordQuery(quorum)
+  const ownVoteRecord = data?.result
   const voterTokenRecord = useVoterTokenRecord()
 
   const isWithdrawEnabled =
