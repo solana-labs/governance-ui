@@ -28,8 +28,9 @@ const VotePanel = () => {
   return (
     <>
       {/* START: Note that these components control for themselves whether they are displayed and may not be visible */}
-      <YouVoted />
+      <YouVoted quorum="electoral" />
       <CastVoteButtons />
+      <YouVoted quorum="veto" />
       <VetoButtons />
       {/* END */}
       {didNotVote && (
