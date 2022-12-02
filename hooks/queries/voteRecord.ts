@@ -1,6 +1,7 @@
 import { getVoteRecord } from '@solana/spl-governance'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
+import asFindable from '@utils/queries/asFindable'
 import useWalletStore from 'stores/useWalletStore'
 import { useAddressQuery_SelectedProposalVoteRecord } from './addresses/voteRecord'
 import queryClient from './queryClient'
@@ -23,10 +24,14 @@ export const useVoteRecordByTokenOwnerRecordQuery = (
 export const useVoteRecordByPubkeyQuery = (pubkey?: PublicKey) => {
   const connection = useWalletStore((s) => s.connection)
 
+  const enabled = pubkey !== undefined
   const query = useQuery({
-    queryKey: voteRecordQueryKeys.byPubkey(pubkey!),
-    queryFn: () => getVoteRecord(connection.current, pubkey!),
-    enabled: pubkey !== undefined,
+    queryKey: enabled ? voteRecordQueryKeys.byPubkey(pubkey) : undefined,
+    queryFn: async () => {
+      if (!enabled) throw new Error()
+      return asFindable(getVoteRecord)(connection.current, pubkey)
+    },
+    enabled,
     staleTime: Number.MAX_SAFE_INTEGER,
   })
 
@@ -39,5 +44,5 @@ export const fetchVoteRecordByPubkey = (
 ) =>
   queryClient.fetchQuery({
     queryKey: voteRecordQueryKeys.byPubkey(pubkey),
-    queryFn: () => getVoteRecord(connection, pubkey),
+    queryFn: () => asFindable(getVoteRecord)(connection, pubkey),
   })

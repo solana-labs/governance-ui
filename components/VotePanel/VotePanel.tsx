@@ -14,7 +14,7 @@ const VotePanel = () => {
 
   const { data: ownVoteRecord } = useProposalVoteRecordQuery('electoral')
 
-  const isVoteCast = ownVoteRecord !== undefined
+  const isVoteCast = ownVoteRecord?.result !== undefined
   const isVoting = useIsVoting()
 
   const didNotVote =
@@ -27,20 +27,20 @@ const VotePanel = () => {
 
   return (
     <>
+      {didNotVote && (
+        <div className="bg-bkg-2 p-4 md:p-6 rounded-lg flex flex-col items-center justify-center">
+          <h3 className="text-center mb-0">You did not vote electorally</h3>
+          <Tooltip content="You did not vote on this proposal">
+            <BanIcon className="h-[34px] w-[34px] fill-white/50 mt-2" />
+          </Tooltip>
+        </div>
+      )}
       {/* START: Note that these components control for themselves whether they are displayed and may not be visible */}
       <YouVoted quorum="electoral" />
       <CastVoteButtons />
       <YouVoted quorum="veto" />
       <VetoButtons />
       {/* END */}
-      {didNotVote && (
-        <div className="bg-bkg-2 p-4 md:p-6 rounded-lg flex flex-col items-center justify-center">
-          <h3 className="text-center mb-0">You did not vote</h3>
-          <Tooltip content="You did not vote on this proposal">
-            <BanIcon className="h-[34px] w-[34px] fill-white/50 mt-2" />
-          </Tooltip>
-        </div>
-      )}
     </>
   )
 }
