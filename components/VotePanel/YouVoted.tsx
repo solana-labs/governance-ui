@@ -25,7 +25,7 @@ import {
 } from './hooks'
 import assertUnreachable from '@utils/typescript/assertUnreachable'
 
-export const YouVoted = () => {
+export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
@@ -45,7 +45,7 @@ export const YouVoted = () => {
 
   const [isLoading, setIsLoading] = useState(false)
 
-  const { data: ownVoteRecord } = useProposalVoteRecordQuery('electoral')
+  const { data: ownVoteRecord } = useProposalVoteRecordQuery(quorum)
   const voterTokenRecord = useVoterTokenRecord()
 
   const isWithdrawEnabled =
