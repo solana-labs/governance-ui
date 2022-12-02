@@ -13,6 +13,7 @@ export const getHub = gql`
       bannerImageUrl
       category
       discordUrl
+      displayName
       githubUrl
       heading
       iconUrl
@@ -88,6 +89,7 @@ export const getHubResp = IT.type({
     bannerImageUrl: IT.union([IT.null, IT.string]),
     category: RealmCategory,
     discordUrl: IT.union([IT.null, IT.string]),
+    displayName: IT.union([IT.null, IT.string]),
     githubUrl: IT.union([IT.null, IT.string]),
     heading: IT.union([IT.null, RichTextDocument]),
     iconUrl: IT.union([IT.null, IT.string]),

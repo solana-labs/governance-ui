@@ -1,12 +1,17 @@
+import CheckmarkIcon from '@carbon/icons-react/lib/Checkmark';
+import UserFollow from '@carbon/icons-react/lib/UserFollow';
 import { PublicKey } from '@solana/web3.js';
 import { pipe } from 'fp-ts/lib/function';
 import Link from 'next/link';
 import { cloneElement } from 'react';
 
+import * as Button from '@hub/components/controls/Button';
+import { Tooltip } from '@hub/components/controls/Tooltip';
 import { Twitter as TwitterIcon } from '@hub/components/icons/Twitter';
 import { getCategoryIcon, getCategoryName } from '@hub/components/OrgCategory';
 import { RealmIcon } from '@hub/components/RealmIcon';
 import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay';
+import { useMutation } from '@hub/hooks/useMutation';
 import { useQuery } from '@hub/hooks/useQuery';
 import { abbreviateNumber } from '@hub/lib/abbreviateNumber';
 import cx from '@hub/lib/cx';
@@ -58,6 +63,12 @@ export function SmallCard(props: Props) {
     pause: typeof props.twitterFollowerCount === 'number',
   });
 
+  const [followedRealms] = useQuery(gql.followedRealmsResp, {
+    query: gql.followedRealms,
+  });
+  const [, follow] = useMutation(gql.followResp, gql.follow);
+  const [, unfollow] = useMutation(gql.unfollowResp, gql.unfollow);
+
   return (
     <Link passHref href={`/realm/${props.urlId}/hub`}>
       <a
@@ -68,20 +79,94 @@ export function SmallCard(props: Props) {
           'overflow-hidden',
           'relative',
           'h-full',
-          'transition-transform',
-          'active:scale-95',
-          'md:active:scale-[.98]',
           props.className,
         )}
       >
         <div
-          className="h-16 bg-center bg-cover bg-white"
+          className="h-16 bg-center bg-cover bg-white relative"
           style={{
             backgroundImage: `url(${
               props.bannerImgSrc || getDefaultBannerUrl(props.publicKey)
             })`,
           }}
-        />
+        >
+          {pipe(
+            followedRealms,
+            RE.match(
+              () => <div />,
+              () => <div />,
+              ({ me }) => {
+                if (me) {
+                  const isCurrentlyFollowing = me.followedRealms
+                    .map((r) => r.publicKey.toBase58())
+                    .includes(props.publicKey.toBase58());
+
+                  if (isCurrentlyFollowing) {
+                    return (
+                      <Tooltip asChild message="Unfollow this hub">
+                        <Button.Secondary
+                          className={cx(
+                            '-bottom-5',
+                            'absolute',
+                            'bg-white',
+                            'right-6',
+                            'rounded-full',
+                            'w-10',
+                          )}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            unfollow({ realm: props.publicKey });
+                          }}
+                        >
+                          <CheckmarkIcon className="h-4 w-4" />
+                        </Button.Secondary>
+                      </Tooltip>
+                    );
+                  } else {
+                    return (
+                      <Tooltip asChild message="Follow this hub">
+                        <Button.Primary
+                          className={cx(
+                            '-bottom-5',
+                            'absolute',
+                            'right-6',
+                            'rounded-full',
+                            'w-10',
+                          )}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            follow({ realm: props.publicKey });
+                          }}
+                        >
+                          <UserFollow className="h-4 w-4" />
+                        </Button.Primary>
+                      </Tooltip>
+                    );
+                  }
+                }
+
+                return (
+                  <Tooltip asChild message="Please sign in to follow this hub">
+                    <Button.Primary
+                      className={cx(
+                        '-bottom-5',
+                        'absolute',
+                        'right-6',
+                        'rounded-full',
+                        'w-10',
+                      )}
+                      disabled
+                    >
+                      <UserFollow className="h-4 w-4" />
+                    </Button.Primary>
+                  </Tooltip>
+                );
+              },
+            ),
+          )}
+        </div>
         <div className="pt-5 px-6 pb-7">
           <header className="flex items-center justify-between gap-x-2">
             <div className="font-bold text-neutral-900 truncate flex-shrink">
