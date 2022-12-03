@@ -54,7 +54,6 @@ const SwapFixedInInstructionForm = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const [loadingPools, setLoadingPools] = useState<boolean>(false)
-
   const connection = useWalletStore((s) => s.connection.current)
   const wallet = useWalletStore((s) => s.current)
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
