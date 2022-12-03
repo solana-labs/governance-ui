@@ -34,7 +34,7 @@ const Realms = () => {
   const { cluster } = router.query
   //Small hack to prevent race conditions with cluster change until we remove connection from store and move it to global dep.
   const routeHasClusterInPath = router.asPath.includes('cluster')
-
+  console.log(connection)
   useMemo(async () => {
     if (
       connection &&

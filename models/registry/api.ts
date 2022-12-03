@@ -87,7 +87,11 @@ function parseCertifiedRealms(realms: RealmInfoAsJSON[]) {
 // Note: the certification process is currently done through PRs to this repo
 // This is a temp. workaround until we have the registry up and running
 export function getCertifiedRealmInfos({ cluster }: ConnectionContext) {
-  return cluster === 'mainnet' ? MAINNET_REALMS : DEVNET_REALMS
+  return cluster === 'mainnet'
+    ? MAINNET_REALMS
+    : cluster === 'localnet'
+    ? MAINNET_REALMS
+    : DEVNET_REALMS
 }
 
 export function getCertifiedRealmInfo(

@@ -319,6 +319,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const connectionContext = get().connection
       const realms = get().realms
       const realm = realms[realmId.toBase58()]
+      console.log(realm)
       const mintsArray = (
         await Promise.all([
           realm?.account.communityMint
