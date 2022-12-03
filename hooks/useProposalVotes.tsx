@@ -115,9 +115,13 @@ export default function useProposalVotes(proposal?: Proposal) {
       veto: undefined,
     }
 
-  const vetoMint = isCommunityVote ? councilMint : mint
+  const vetoMintInfo = isCommunityVote ? councilMint : mint
+  const vetoMintPk = isCommunityVote
+    ? realm.account.config.councilMint
+    : realm.account.communityMint
+
   // This represents an edge case where councilVetoVoteThreshold is defined but there is no councilMint
-  if (vetoMint === undefined)
+  if (vetoMintInfo === undefined || vetoMintPk === undefined)
     return {
       _programVersion: programVersion,
       ...results,
@@ -128,11 +132,16 @@ export default function useProposalVotes(proposal?: Proposal) {
 
   const vetoMaxVoteWeight = isPluginCommunityVeto
     ? maxVoteRecord.account.maxVoterWeight
-    : getProposalMaxVoteWeight(realm.account, proposal, vetoMint)
+    : getProposalMaxVoteWeight(
+        realm.account,
+        proposal,
+        vetoMintInfo,
+        vetoMintPk
+      )
 
   const vetoVoteCount = fmtTokenAmount(
     proposal.vetoVoteWeight,
-    vetoMint.decimals
+    vetoMintInfo.decimals
   )
 
   const vetoVoteProgress = calculatePct(
@@ -141,8 +150,13 @@ export default function useProposalVotes(proposal?: Proposal) {
   )
 
   const minimumVetoVotes =
-    fmtTokenAmount(vetoMaxVoteWeight, vetoMint.decimals) *
+    fmtTokenAmount(vetoMaxVoteWeight, vetoMintInfo.decimals) *
     (vetoThreshold.value / 100)
+
+  console.log('BEGIN DEBUG')
+  console.log('vetoMaxVoteWeight', vetoMaxVoteWeight.toString())
+  console.log('vetoMint.decimals', vetoMintInfo.decimals)
+  console.log('minimumVetoVotes', minimumVetoVotes)
 
   const vetoVotesRequired = minimumVetoVotes - vetoVoteCount
 
