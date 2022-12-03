@@ -1,5 +1,5 @@
-const asFindable = <F extends (...args: any[]) => any>(f: F) => async (
-  ...p: Parameters<F>
+const asFindable = <P extends any[], R>(f: (...p: P) => Promise<R>) => async (
+  ...p: P
 ) => {
   try {
     return {
