@@ -128,7 +128,9 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
   return vote !== undefined ? (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-4">
       <div className="flex flex-col items-center justify-center">
-        <h3 className="text-center">Your vote</h3>
+        <h3 className="text-center">
+          {quorum === 'electoral' ? 'Your vote' : 'You voted to veto'}
+        </h3>
         {vote.voteType === VoteKind.Approve ? (
           <Tooltip content={`You voted "Yes"`}>
             <div className="flex flex-row items-center justify-center rounded-full border border-[#8EFFDD] p-2 mt-2">
