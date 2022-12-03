@@ -153,11 +153,6 @@ export default function useProposalVotes(proposal?: Proposal) {
     fmtTokenAmount(vetoMaxVoteWeight, vetoMintInfo.decimals) *
     (vetoThreshold.value / 100)
 
-  console.log('BEGIN DEBUG')
-  console.log('vetoMaxVoteWeight', vetoMaxVoteWeight.toString())
-  console.log('vetoMint.decimals', vetoMintInfo.decimals)
-  console.log('minimumVetoVotes', minimumVetoVotes)
-
   const vetoVotesRequired = minimumVetoVotes - vetoVoteCount
 
   return {
