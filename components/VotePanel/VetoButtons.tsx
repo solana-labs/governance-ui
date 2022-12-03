@@ -70,7 +70,8 @@ const useCanVeto = ():
     return { canVeto: false, message: 'You must connect your wallet' }
 
   // Did you already veto?
-  if (userVetoRecord) return { canVeto: false, message: 'You already voted' }
+  if (userVetoRecord?.found)
+    return { canVeto: false, message: 'You already voted' }
 
   // Do you have any voting power?
   const hasMinAmountToVote =
@@ -94,8 +95,12 @@ const VetoButtons = () => {
   const canVeto = useCanVeto()
   const [openModal, setOpenModal] = useState(false)
   const voterTokenRecord = useUserVetoTokenRecord()
+  const { data: userVetoRecord } = useProposalVoteRecordQuery('veto')
 
-  return vetoable && vetoingPop && voterTokenRecord ? (
+  return vetoable &&
+    vetoingPop &&
+    voterTokenRecord &&
+    !userVetoRecord?.found ? (
     <>
       <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-4">
         <div className="flex flex-col items-center justify-center">
