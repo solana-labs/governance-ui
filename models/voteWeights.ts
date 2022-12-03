@@ -592,10 +592,6 @@ export function getProposalMaxVoteWeight(
     (governingTokenMintPk ?? proposal.governingTokenMint).toBase58() ===
     realm.config.councilMint?.toBase58()
   ) {
-    console.log(
-      'DEBUG - returning council mint supply',
-      governingTokenMint.supply.toString()
-    )
     return governingTokenMint.supply
   }
 
