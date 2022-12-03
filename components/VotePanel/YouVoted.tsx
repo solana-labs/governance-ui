@@ -160,7 +160,6 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
       {isVoting && (
         <div className="items-center justify-center flex w-full gap-5">
           <div className="flex flex-col gap-6 items-center">
-            (
             <SecondaryButton
               className="min-w-[200px]"
               isLoading={isLoading}
