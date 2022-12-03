@@ -15,7 +15,7 @@ const ENDPOINTS: EndpointInfo[] = [
   },
   {
     name: 'localnet',
-    url: 'http://127.0.0.1:8899',
+    url: 'http://5.62.126.197:8899',
   },
 ]
 
