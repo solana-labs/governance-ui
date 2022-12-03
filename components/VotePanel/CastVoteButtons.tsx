@@ -24,7 +24,7 @@ const useCanVote = () => {
   const { data: ownVoteRecord } = useProposalVoteRecordQuery('electoral')
   const voterTokenRecord = useVoterTokenRecord()
 
-  const isVoteCast = ownVoteRecord !== undefined
+  const isVoteCast = !!ownVoteRecord?.found
 
   const hasMinAmountToVote =
     voterTokenRecord &&
@@ -59,7 +59,7 @@ export const CastVoteButtons = () => {
   const [canVote, tooltipContent] = useCanVote()
   const { data: ownVoteRecord } = useProposalVoteRecordQuery('electoral')
 
-  const isVoteCast = ownVoteRecord !== undefined
+  const isVoteCast = !!ownVoteRecord?.found
   const isVoting = useIsVoting()
 
   return isVoting && !isVoteCast ? (
