@@ -23,6 +23,8 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { nftPluginsPks } from '@hooks/useVotingPlugins'
 import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
 import { NftVoterClient } from '@solana/governance-program-library'
+import queryClient from '@hooks/queries/queryClient'
+import { voteRecordQueryKeys } from '@hooks/queries/voteRecord'
 
 interface VoteCommentModalProps {
   onClose: () => void
@@ -73,6 +75,12 @@ const useSubmitVote = ({
         })
       : undefined
 
+    const confirmationCallback = async () => {
+      await refetchProposals()
+      // TODO refine this to only invalidate the one query
+      await queryClient.invalidateQueries(voteRecordQueryKeys.all)
+    }
+
     try {
       await castVote(
         rpcContext,
@@ -82,7 +90,7 @@ const useSubmitVote = ({
         vote,
         msg,
         client,
-        refetchProposals
+        confirmationCallback
       )
       if (!isNftPlugin) {
         await refetchProposals()

@@ -7,7 +7,8 @@ import { useAddressQuery_SelectedProposalVoteRecord } from './addresses/voteReco
 import queryClient from './queryClient'
 
 export const voteRecordQueryKeys = {
-  byPubkey: (k: PublicKey) => ['VoteRecord', k.toString()],
+  all: ['VoteRecord'],
+  byPubkey: (k: PublicKey) => [...voteRecordQueryKeys.all, k.toString()],
 }
 
 // currently unused
@@ -32,7 +33,6 @@ export const useVoteRecordByPubkeyQuery = (pubkey?: PublicKey) => {
       return asFindable(getVoteRecord)(connection.current, pubkey)
     },
     enabled,
-    staleTime: Number.MAX_SAFE_INTEGER,
   })
 
   return query
