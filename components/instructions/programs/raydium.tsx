@@ -38,12 +38,14 @@ const RAYDIUM_AMM_INSTRUCTIONS = {
       ) => {
         const poolCoinMint = await tryGetTokenMint(
           connection,
-          accounts[6].pubkey // poolCoinTokenAccount
+          // poolCoinTokenAccount
+          accounts[6].pubkey
         )
 
         const poolPcMint = await tryGetTokenMint(
           connection,
-          accounts[7].pubkey // poolPcTokenAccount
+          // poolPcTokenAccount
+          accounts[7].pubkey
         )
 
         const dataLayout = struct([
@@ -103,11 +105,13 @@ const RAYDIUM_AMM_INSTRUCTIONS = {
         const [mintIn, mintOut] = await Promise.all([
           tryGetTokenMint(
             connection,
-            accounts[15].pubkey // tokenAccountIn
+            // tokenAccountIn
+            accounts[15].pubkey
           ),
           tryGetTokenMint(
             connection,
-            accounts[16].pubkey // tokenAccountOut
+            // tokenAccountOut
+            accounts[16].pubkey
           ),
         ])
 
