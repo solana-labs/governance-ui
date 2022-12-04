@@ -127,44 +127,6 @@ function serializeAccount(pubkey: PublicKey, ai: AccountInfo<Buffer>): string {
   )
 }
 
-function getGovernanceAccountClass(
-  type: GovernanceAccountType
-): GovernanceAccountClass | undefined {
-  switch (type) {
-    case GovernanceAccountType.RealmV1:
-    case GovernanceAccountType.RealmV2:
-      return Realm
-    case GovernanceAccountType.TokenOwnerRecordV1:
-    case GovernanceAccountType.TokenOwnerRecordV2:
-      return TokenOwnerRecord
-    case GovernanceAccountType.GovernanceV1:
-    case GovernanceAccountType.GovernanceV2:
-    case GovernanceAccountType.MintGovernanceV1:
-    case GovernanceAccountType.MintGovernanceV2:
-    case GovernanceAccountType.ProgramGovernanceV1:
-    case GovernanceAccountType.ProgramGovernanceV2:
-    case GovernanceAccountType.TokenGovernanceV1:
-    case GovernanceAccountType.TokenGovernanceV2:
-      return Governance
-    case GovernanceAccountType.ProposalV1:
-    case GovernanceAccountType.ProposalV2:
-      return Proposal
-    case GovernanceAccountType.SignatoryRecordV1:
-    case GovernanceAccountType.SignatoryRecordV2:
-      return SignatoryRecord
-    case GovernanceAccountType.VoteRecordV1:
-    case GovernanceAccountType.VoteRecordV2:
-      return VoteRecord
-    case GovernanceAccountType.ProposalInstructionV1:
-    case GovernanceAccountType.ProposalTransactionV2:
-      return ProposalTransaction
-    case GovernanceAccountType.RealmConfig:
-      return RealmConfigAccount
-    case GovernanceAccountType.ProgramMetadata:
-      return ProgramMetadata
-  }
-}
-
 ;(BinaryWriter.prototype as any).writePubkey = function (value: PublicKey) {
   const writer = (this as unknown) as BinaryWriter
   writer.writeFixedArray(value.toBuffer())
@@ -188,12 +150,12 @@ function getGovernanceAccountClass(
 }
 
 async function main() {
-  let client = await VsrClient.connect(
+  const client = await VsrClient.connect(
     anchor.AnchorProvider.local(RPC_URL!),
     vsr
   )
-  let registrars = await client.program.account.registrar.all()
-  let voters = await client.program.account.voter.all()
+  const registrars = await client.program.account.registrar.all()
+  const voters = await client.program.account.voter.all()
 
   console.log(
     'VSR registrars',
@@ -204,19 +166,20 @@ async function main() {
     registrars.map((r) => r.account.realm.toString())
   )
 
-  let voterAssociatedAccounts: PublicKey[] = []
-  for (let voter of voters) {
-    let path = `${outDir}/${vsr.toString()}/accounts/${voter.publicKey.toString()}.json`
-    let registrar = registrars.find((r) =>
+  const voterAssociatedAccounts: PublicKey[] = []
+  for (const voter of voters) {
+    const registrar = registrars.find((r) =>
       r.publicKey.equals(voter.account.registrar)
     )
-    let votingMints = (registrar!.account.votingMints as { mint: PublicKey }[])
+    const votingMints = (registrar!.account.votingMints as {
+      mint: PublicKey
+    }[])
       .map((vm) => vm.mint)
       .filter((m) => !PublicKey.default.equals(m))
 
-    for (let mint of votingMints) {
-      let voterAta = await findAssociatedTokenAddress(voter.publicKey, mint)
-      let walletAta = await findAssociatedTokenAddress(
+    for (const mint of votingMints) {
+      const voterAta = await findAssociatedTokenAddress(voter.publicKey, mint)
+      const walletAta = await findAssociatedTokenAddress(
         voter.account.voterAuthority,
         mint
       )
