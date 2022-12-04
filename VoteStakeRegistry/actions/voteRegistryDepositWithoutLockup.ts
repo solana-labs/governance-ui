@@ -40,6 +40,9 @@ export const voteRegistryDepositWithoutLockup = async ({
   const signers: Keypair[] = []
   const { wallet, connection } = rpcContext
   const instructions: TransactionInstruction[] = []
+  console.log({
+    fromPk: fromPk,
+  })
   await withVoteRegistryDeposit({
     instructions,
     walletPk: rpcContext.walletPubkey,
