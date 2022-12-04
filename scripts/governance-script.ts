@@ -32,7 +32,14 @@ import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { getAccountsForGovernances } from './governanceAccounts'
 import { ConnectionContext } from '@utils/connection'
 
-const { RPC_URL, GOV_PROGRAM_ID, VSR_PROGRAM_ID, REALM_ID, OUT } = process.env
+const {
+  RPC_URL,
+  GOV_PROGRAM_ID,
+  VSR_PROGRAM_ID,
+  GMA_LIMIT,
+  REALM_ID,
+  OUT,
+} = process.env
 
 const conn = new Connection(RPC_URL || 'https://api.mainnet-beta.solana.com/')
 
@@ -52,12 +59,35 @@ const realm = new PublicKey(
   REALM_ID || 'DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE'
 )
 
+const gmaLimit = Number(GMA_LIMIT || 100)
+
 const outDir = OUT || 'out'
 
 function ensureDir(dir: string) {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true })
   }
+}
+
+const chunkItems = <T>(items: T[], length: number) =>
+  items.reduce((chunks: T[][], item: T, index) => {
+    const chunk = Math.floor(index / length)
+    chunks[chunk] = ([] as T[]).concat(chunks[chunk] || [], item)
+    return chunks
+  }, [])
+
+function zip<S1, S2>(
+  firstCollection: Array<S1>,
+  lastCollection: Array<S2>
+): Array<[S1, S2]> {
+  const length = Math.min(firstCollection.length, lastCollection.length)
+  const zipped: Array<[S1, S2]> = []
+
+  for (let index = 0; index < length; index++) {
+    zipped.push([firstCollection[index], lastCollection[index]])
+  }
+
+  return zipped
 }
 
 const SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID: PublicKey = new PublicKey(
@@ -80,19 +110,16 @@ async function findAssociatedTokenAddress(
   )[0]
 }
 
-function serializeAccount(acc: {
-  pubkey: PublicKey
-  account: AccountInfo<Buffer>
-}): string {
-  acc.account.rentEpoch ||= 0
+function serializeAccount(pubkey: PublicKey, ai: AccountInfo<Buffer>): string {
+  ai.rentEpoch ||= 0
   return JSON.stringify(
     {
-      pubkey: acc.pubkey.toString(),
+      pubkey: pubkey.toString(),
       account: {
-        ...acc.account,
-        data: [acc.account.data.toString('base64'), 'base64'],
-        owner: acc.account.owner.toString(),
-        space: acc.account.data.length,
+        ...ai,
+        data: [ai.data.toString('base64'), 'base64'],
+        owner: ai.owner.toString(),
+        space: ai.data.length,
       },
     },
     undefined,
@@ -161,42 +188,10 @@ function getGovernanceAccountClass(
 }
 
 async function main() {
-  const govProgramAccounts = await conn.getProgramAccounts(gov)
-  const vsrProgramAccounts = await conn.getProgramAccounts(vsr)
-  console.log(
-    'govProgramAccounts',
-    govProgramAccounts.length,
-    'vsrProgramAccounts',
-    vsrProgramAccounts.length
-  )
-
-  ensureDir(`${outDir}/${gov.toString()}/accounts`)
-  for (let acc of govProgramAccounts) {
-    let path = `${outDir}/${gov.toString()}/accounts/${acc.pubkey.toString()}.json`
-    let accountType = acc.account.data[0]
-    let schema = getGovernanceSchemaForAccount(accountType)
-    let accountClass = getGovernanceAccountClass(accountType)
-    if (accountClass) {
-      const buffer = Buffer.from(acc.account.data)
-      const data = deserializeBorsh(schema, accountClass, buffer)
-      switch (accountClass) {
-        case Governance:
-          let governance = data as Governance
-          governance.config.maxVotingTime = 333
-          acc.account.data = Buffer.from(serialize(schema, governance))
-          // overwrite governance accounts with lower voting time
-          fs.writeFileSync(path, serializeAccount(acc))
-      }
-    } else {
-      console.error('could not deduce class for', path, acc.account.data[0])
-    }
-  }
-
   let client = await VsrClient.connect(
     anchor.AnchorProvider.local(RPC_URL!),
     vsr
   )
-
   let registrars = await client.program.account.registrar.all()
   let voters = await client.program.account.voter.all()
 
@@ -209,7 +204,7 @@ async function main() {
     registrars.map((r) => r.account.realm.toString())
   )
 
-  let tokenAccounts: PublicKey[] = []
+  let voterAssociatedAccounts: PublicKey[] = []
   for (let voter of voters) {
     let path = `${outDir}/${vsr.toString()}/accounts/${voter.publicKey.toString()}.json`
     let registrar = registrars.find((r) =>
@@ -225,16 +220,31 @@ async function main() {
         voter.account.voterAuthority,
         mint
       )
-      tokenAccounts.push(voterAta, walletAta)
+      voterAssociatedAccounts.push(
+        voter.account.voterAuthority,
+        voterAta,
+        walletAta
+      )
     }
   }
 
   console.log(
-    'associated token accounts',
-    tokenAccounts.length,
+    'voter associated accounts',
+    voterAssociatedAccounts.length,
     'unique',
-    Array.from(new Set(tokenAccounts)).length
+    Array.from(new Set(voterAssociatedAccounts)).length
   )
+
+  ensureDir(`${outDir}/${vsr.toString()}/accounts`)
+  for (const chunk of chunkItems(voterAssociatedAccounts, gmaLimit)) {
+    const ais = await conn.getMultipleAccountsInfo(chunk)
+    for (const [pk, ai] of zip(chunk, ais)) {
+      if (ai) {
+        const path = `${outDir}/${vsr.toString()}/accounts/${pk.toString()}.json`
+        fs.writeFileSync(path, serializeAccount(pk, ai))
+      }
+    }
+  }
 
   const realmAcc = await getRealm(conn, realm)
   const governances = await getGovernanceAccounts(
@@ -243,6 +253,23 @@ async function main() {
     Governance,
     [pubkeyFilter(1, realmAcc.pubkey)!]
   )
+  console.log(
+    'governances',
+    governances.length,
+    governances.map((g) => g.pubkey)
+  )
+
+  const governancePKs = governances.map((g) => g.pubkey)
+  const governanceAIs = await conn.getMultipleAccountsInfo(governancePKs)
+  ensureDir(`${outDir}/${gov.toString()}/accounts`)
+  for (const [{ account, pubkey }, ai] of zip(governances, governanceAIs)) {
+    const path = `${outDir}/${gov.toString()}/accounts/${pubkey.toString()}.json`
+    const schema = getGovernanceSchemaForAccount(account.accountType)
+    account.config.maxVotingTime = 333
+    ai!.data = Buffer.from(serialize(schema, account))
+    fs.writeFileSync(path, serializeAccount(pubkey, ai!))
+  }
+
   const accounts = await getAccountsForGovernances(
     connectionContext,
     realmAcc,
