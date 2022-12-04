@@ -1,27 +1,14 @@
 import fs from 'fs'
-import { BinaryWriter, serialize, Schema, BorshError } from 'borsh'
+import { BinaryWriter, serialize } from 'borsh'
 
-import { Account, AccountInfo, Connection, PublicKey } from '@solana/web3.js'
+import { AccountInfo, Connection, PublicKey } from '@solana/web3.js'
 
 import {
-  deserializeBorsh,
-  getGovernanceAccount,
   getGovernanceAccounts,
   getGovernanceSchemaForAccount,
   getRealm,
   Governance,
-  GovernanceAccountClass,
-  GovernanceAccountParser,
-  GovernanceAccountType,
-  ProgramMetadata,
-  Proposal,
-  ProposalTransaction,
   pubkeyFilter,
-  Realm,
-  RealmConfigAccount,
-  SignatoryRecord,
-  TokenOwnerRecord,
-  VoteRecord,
   VoteThreshold,
   VoteThresholdType,
 } from '@solana/spl-governance'
@@ -232,17 +219,27 @@ async function main() {
     ai!.data = Buffer.from(serialize(schema, account))
     fs.writeFileSync(path, serializeAccount(pubkey, ai!))
   }
-
   const accounts = await getAccountsForGovernances(
     connectionContext,
     realmAcc,
     governances
   )
+  const assetAccountsPks = accounts.map((x) => ({
+    pubkey: x.pubkey,
+    governance: x.governance.pubkey,
+  }))
+  const bufferAssetAccounts = await conn.getMultipleAccountsInfo(
+    assetAccountsPks.map((x) => x.pubkey)
+  )
 
-  console.log({
-    governances: governances,
-    assetAccounts: accounts,
-  })
+  for (const idx in bufferAssetAccounts) {
+    const bufferAccount = bufferAssetAccounts[idx]
+    const assetAccountPkWithGov = assetAccountsPks[idx]
+    const path = `${outDir}/${gov.toString()}/accounts/${assetAccountPkWithGov.pubkey.toBase58()}.json`
+    if (bufferAccount !== null) {
+      fs.writeFileSync(path, bufferAccount!.data)
+    }
+  }
 }
 
 main()
