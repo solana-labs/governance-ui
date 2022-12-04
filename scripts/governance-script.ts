@@ -186,7 +186,10 @@ async function main() {
   )
 
   ensureDir(`${outDir}/${vsr.toString()}/accounts`)
-  for (const chunk of chunkItems(voterAssociatedAccounts, gmaLimit)) {
+  for (const chunk of chunkItems(
+    Array.from(new Set(voterAssociatedAccounts)),
+    gmaLimit
+  )) {
     const ais = await conn.getMultipleAccountsInfo(chunk)
     for (const [pk, ai] of zip(chunk, ais)) {
       if (ai) {
@@ -203,13 +206,14 @@ async function main() {
     Governance,
     [pubkeyFilter(1, realmAcc.pubkey)!]
   )
+  const governancePKs = governances.map((g) => g.pubkey)
+
   console.log(
     'governances',
     governances.length,
-    governances.map((g) => g.pubkey)
+    governancePKs.map((g) => g.toString())
   )
 
-  const governancePKs = governances.map((g) => g.pubkey)
   const governanceAIs = await conn.getMultipleAccountsInfo(governancePKs)
   ensureDir(`${outDir}/${gov.toString()}/accounts`)
   for (const [{ account, pubkey }, ai] of zip(governances, governanceAIs)) {
@@ -219,25 +223,21 @@ async function main() {
     ai!.data = Buffer.from(serialize(schema, account))
     fs.writeFileSync(path, serializeAccount(pubkey, ai!))
   }
-  const accounts = await getAccountsForGovernances(
+  const assetAccounts = await getAccountsForGovernances(
     connectionContext,
     realmAcc,
     governances
   )
-  const assetAccountsPks = accounts.map((x) => ({
-    pubkey: x.pubkey,
-    governance: x.governance.pubkey,
-  }))
-  const bufferAssetAccounts = await conn.getMultipleAccountsInfo(
-    assetAccountsPks.map((x) => x.pubkey)
-  )
 
-  for (const idx in bufferAssetAccounts) {
-    const bufferAccount = bufferAssetAccounts[idx]
-    const assetAccountPkWithGov = assetAccountsPks[idx]
-    const path = `${outDir}/${gov.toString()}/accounts/${assetAccountPkWithGov.pubkey.toBase58()}.json`
-    if (bufferAccount !== null) {
-      fs.writeFileSync(path, bufferAccount!.data)
+  console.log('assetAccounts', assetAccounts.length)
+
+  const assetAccountsPKs = assetAccounts.map((a) => a.pubkey)
+  const assetAccountsAIs = await conn.getMultipleAccountsInfo(assetAccountsPKs)
+
+  for (const [pk, ai] of zip(assetAccountsPKs, assetAccountsAIs)) {
+    if (ai) {
+      const path = `${outDir}/${gov.toString()}/accounts/${pk.toString()}.json`
+      fs.writeFileSync(path, serializeAccount(pk, ai))
     }
   }
 }
