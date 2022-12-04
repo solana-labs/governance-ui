@@ -26,7 +26,7 @@ import {
   VoteThresholdType,
 } from '@solana/spl-governance'
 import * as anchor from '@project-serum/anchor'
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
+import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { getAccountsForGovernances } from './governanceAccounts'
@@ -160,113 +160,6 @@ function getGovernanceAccountClass(
   }
 }
 
-function capitalizeFirstLetter(string: String): string {
-  return string.charAt(0).toUpperCase() + string.slice(1)
-}
-
-function serializeField(
-  schema: Schema,
-  fieldName: any,
-  value: any,
-  fieldType: any,
-  writer: any
-) {
-  try {
-    // TODO: Handle missing values properly (make sure they never result in just skipped write)
-    if (typeof fieldType === 'string') {
-      writer[`write${capitalizeFirstLetter(fieldType)}`](value)
-    } else if (fieldType instanceof Array) {
-      if (typeof fieldType[0] === 'number') {
-        if (value.length !== fieldType[0]) {
-          throw new BorshError(
-            `Expecting byte array of length ${fieldType[0]}, but got ${value.length} bytes`
-          )
-        }
-        writer.writeFixedArray(value)
-      } else if (fieldType.length === 2 && typeof fieldType[1] === 'number') {
-        if (value.length !== fieldType[1]) {
-          throw new BorshError(
-            `Expecting byte array of length ${fieldType[1]}, but got ${value.length} bytes`
-          )
-        }
-        for (let i = 0; i < fieldType[1]; i++) {
-          serializeField(schema, null, value[i], fieldType[0], writer)
-        }
-      } else {
-        writer.writeArray(value, (item: any) => {
-          serializeField(schema, fieldName, item, fieldType[0], writer)
-        })
-      }
-    } else if (fieldType.kind !== undefined) {
-      switch (fieldType.kind) {
-        case 'option': {
-          if (value === null || value === undefined) {
-            writer.writeU8(0)
-          } else {
-            writer.writeU8(1)
-            serializeField(schema, fieldName, value, fieldType.type, writer)
-          }
-          break
-        }
-        case 'map': {
-          writer.writeU32(value.size)
-          value.forEach((val: any, key: any) => {
-            serializeField(schema, fieldName, key, fieldType.key, writer)
-            serializeField(schema, fieldName, val, fieldType.value, writer)
-          })
-          break
-        }
-        default:
-          throw new BorshError(`FieldType ${fieldType} unrecognized`)
-      }
-    } else {
-      serializeStruct(schema, value, writer)
-    }
-  } catch (error) {
-    if (error instanceof BorshError) {
-      error.addToFieldPath(fieldName)
-    }
-    throw error
-  }
-}
-
-function serializeStruct(schema: Schema, obj: any, writer: BinaryWriter) {
-  if (typeof obj.borshSerialize === 'function') {
-    obj.borshSerialize(writer)
-    return
-  }
-
-  const structSchema = schema.get(obj.constructor)
-  if (!structSchema) {
-    throw new BorshError(`Class ${obj.constructor.name} is missing in schema`)
-  }
-  if (structSchema.kind === 'struct') {
-    structSchema.fields.map(([fieldName, fieldType]: [string, any]) => {
-      serializeField(schema, fieldName, obj[fieldName], fieldType, writer)
-    })
-  } else if (structSchema.kind === 'enum') {
-    const name = obj[structSchema.field]
-    for (let idx = 0; idx < structSchema.values.length; ++idx) {
-      const [fieldName, fieldType] = structSchema.values[idx]
-      if (fieldName === name) {
-        writer.writeU8(idx)
-        serializeField(schema, fieldName, obj[fieldName], fieldType, writer)
-        break
-      }
-    }
-  } else {
-    throw new BorshError(
-      `Unexpected schema kind: ${structSchema.kind} for ${obj.constructor.name}`
-    )
-  }
-}
-
-function serializeBorsh(schema: Schema, obj: any): any {
-  const writer = new BinaryWriter()
-  serializeStruct(schema, obj, writer)
-  return writer.toArray()
-}
-
 async function main() {
   const govProgramAccounts = await conn.getProgramAccounts(gov)
   const vsrProgramAccounts = await conn.getProgramAccounts(vsr)
@@ -290,7 +183,7 @@ async function main() {
         case Governance:
           let governance = data as Governance
           governance.config.maxVotingTime = 333
-          acc.account.data = Buffer.from(serializeBorsh(schema, governance))
+          acc.account.data = Buffer.from(serialize(schema, governance))
           // overwrite governance accounts with lower voting time
           fs.writeFileSync(path, serializeAccount(acc))
       }
@@ -299,10 +192,22 @@ async function main() {
     }
   }
 
-  let client = await VsrClient.connect(anchor.AnchorProvider.local(RPC_URL!))
+  let client = await VsrClient.connect(
+    anchor.AnchorProvider.local(RPC_URL!),
+    vsr
+  )
 
   let registrars = await client.program.account.registrar.all()
   let voters = await client.program.account.voter.all()
+
+  console.log(
+    'VSR registrars',
+    registrars.length,
+    'voters',
+    voters.length,
+    'realms',
+    registrars.map((r) => r.account.realm.toString())
+  )
 
   let tokenAccounts: PublicKey[] = []
   for (let voter of voters) {
@@ -324,6 +229,13 @@ async function main() {
     }
   }
 
+  console.log(
+    'associated token accounts',
+    tokenAccounts.length,
+    'unique',
+    Array.from(new Set(tokenAccounts)).length
+  )
+
   const realmAcc = await getRealm(conn, realm)
   const governances = await getGovernanceAccounts(
     conn,
@@ -341,13 +253,6 @@ async function main() {
     governances: governances,
     assetAccounts: accounts,
   })
-
-  console.log(
-    'associated token accounts',
-    tokenAccounts.length,
-    'unique',
-    Array.from(new Set(tokenAccounts)).length
-  )
 }
 
 main()
