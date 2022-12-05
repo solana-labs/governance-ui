@@ -41,3 +41,6 @@ yarn-error.log*
 
 # Sentry
 .sentryclirc
+
+# governance account dumps
+/dump

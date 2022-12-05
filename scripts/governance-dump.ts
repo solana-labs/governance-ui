@@ -28,6 +28,9 @@ const {
   OUT,
 } = process.env
 
+// anchor needs this to be set, as we don't have an Anchor.toml setup
+process.env.ANCHOR_WALLET ||= `${process.env.HOME}/.config/solana/id.json`
+
 const conn = new Connection(RPC_URL || 'https://api.mainnet-beta.solana.com/')
 
 const connectionContext: ConnectionContext = {
