@@ -16,7 +16,7 @@ import {
   DataUIWarning,
 } from '@components/InstructionDataUI'
 
-export const IGNORE_NONCE_ACCOUNT_LAYOUT = Array.from(new Array(7)).map(u8)
+export const IGNORE_NONCE_ACCOUNT_LAYOUT = Array.from(new Array(8)).map(u8)
 
 export const MAPLE_FINANCE_PROGRAM_INSTRUCTIONS = {
   [SYRUP_ADDRESSES.Syrup.toBase58()]: {
