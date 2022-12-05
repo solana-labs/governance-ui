@@ -70,7 +70,7 @@ export function Content(props: Props) {
 
   return (
     <section className={props.className} key={String(refreshKey)}>
-      <header className="flex items-center justify-between">
+      <header className="flex items-center justify-between py-6 border-b border-neutral-300">
         <div className="flex items-center space-x-3 text-neutral-900">
           <ListDropdownIcon className="h-5 w-5 fill-current" />
           <div className="font-bold text-xl">Feed</div>

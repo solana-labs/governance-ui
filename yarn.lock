@@ -1462,7 +1462,7 @@
     "@solana/web3.js" "^1.63.1"
     bs58 "^4.0.1"
 
-"@identity.com/sol-did-client-legacy@^2.0.3":
+"@identity.com/sol-did-client-legacy@^2.0.4":
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/@identity.com/sol-did-client-legacy/-/sol-did-client-legacy-2.0.4.tgz#95b7be01f0022cd34abaee37cc11750f423f1b54"
   integrity sha512-+LrYg0g3UriEMLpOrzFFZ17eeCA3Ynuyg5cbaAFnoV5bmMCOKr8Y03DERQWrtagfvVJBsWBtz6h6v/ZQSzxnlQ==
@@ -1474,14 +1474,28 @@
     did-resolver "^3.0.1"
     ramda "^0.27.1"
 
-"@identity.com/sol-did-client@^3.1.2":
-  version "3.1.2"
-  resolved "https://registry.yarnpkg.com/@identity.com/sol-did-client/-/sol-did-client-3.1.2.tgz#47b15f6f5acba798a6ceff943345045b68422147"
-  integrity sha512-DyIykIadVPqy+8BjjwS0UTtI03dF+SurYi2vdXDeg02hzHYYQCwP4KJzRAj34XQKeK93TeB3ahRbKfiA0DJ2Jg==
+"@identity.com/sol-did-client@3.1.4":
+  version "3.1.4"
+  resolved "https://registry.yarnpkg.com/@identity.com/sol-did-client/-/sol-did-client-3.1.4.tgz#8902329ce0aaa09fd18c4d6d4da394a45006ca81"
+  integrity sha512-DRzSi3SlFm71+9MIguHN/1oM459StW1QENHLQaxBF03rKMu1M62IYZEbryjrr9S3WzUkgQXph6G3tPuq/gXGUw==
   dependencies:
     "@ethersproject/address" "^5.7.0"
     "@ethersproject/bytes" "^5.7.0"
-    "@identity.com/sol-did-client-legacy" "^2.0.3"
+    "@identity.com/sol-did-client-legacy" "^2.0.4"
+    "@identity.com/sol-did-idl" "^3.1.0"
+    "@project-serum/anchor" "0.25.0"
+    "@solana/web3.js" "^1.59.1"
+    bs58 "^5.0.0"
+    did-resolver "^3.2.2"
+
+"@identity.com/sol-did-client@^3.1.2":
+  version "3.1.3"
+  resolved "https://registry.yarnpkg.com/@identity.com/sol-did-client/-/sol-did-client-3.1.3.tgz#ee2da0eb1911c69fd8b79f50b68841997c16728c"
+  integrity sha512-2hWTa6wBYdNqaPd6kbit6nlOFXnap8KZk7gNzH/DvRgS+0HrqkwsBF4mk1CVKnk0Ewub42GO704Pmn8AHv2aZQ==
+  dependencies:
+    "@ethersproject/address" "^5.7.0"
+    "@ethersproject/bytes" "^5.7.0"
+    "@identity.com/sol-did-client-legacy" "^2.0.4"
     "@identity.com/sol-did-idl" "^3.1.0"
     "@project-serum/anchor" "0.25.0"
     "@solana/web3.js" "^1.59.1"
@@ -8514,9 +8528,10 @@ dezalgo@1.0.3, dezalgo@^1.0.0:
     asap "^2.0.0"
     wrappy "1"
 
-"did-jwt@git+https://github.com/civicteam/did-jwt":
-  version "6.1.0"
-  resolved "git+https://github.com/civicteam/did-jwt#d4e318df78bd88e3127e62784915c7a334881eb6"
+did-jwt@6.10.1:
+  version "6.10.1"
+  resolved "https://registry.yarnpkg.com/did-jwt/-/did-jwt-6.10.1.tgz#40966b86b18759b771186d9274fc211af2f64d7c"
+  integrity sha512-YJOvkuPKKX364ooAFNxZPcz/KBLRwLhRABQVQlVEqOjygsCkplNFB3UL97UqZ7Y3cAG6Jh5jKoAC4xFSm+h0qw==
   dependencies:
     "@stablelib/ed25519" "^1.0.2"
     "@stablelib/random" "^1.0.1"
@@ -8525,16 +8540,25 @@ dezalgo@1.0.3, dezalgo@^1.0.0:
     "@stablelib/xchacha20poly1305" "^1.0.1"
     bech32 "^2.0.0"
     canonicalize "^1.0.8"
-    did-resolver "^3.1.5"
+    did-resolver "^4.0.0"
     elliptic "^6.5.4"
     js-sha3 "^0.8.0"
-    multiformats "^9.6.4"
+    multiformats "^9.6.5"
     uint8arrays "^3.0.0"
+
+"did-jwt@git+https://github.com/civicteam/did-jwt":
+  version "6.1.0"
+  resolved "git+https://github.com/civicteam/did-jwt#d4e318df78bd88e3127e62784915c7a334881eb6"
 
 did-resolver@^3.0.1, did-resolver@^3.1.5, did-resolver@^3.2.0, did-resolver@^3.2.2:
   version "3.2.2"
   resolved "https://registry.yarnpkg.com/did-resolver/-/did-resolver-3.2.2.tgz#6f4e252a810f785d1b28a10265fad6dffee25158"
   integrity sha512-Eeo2F524VM5N3W4GwglZrnul2y6TLTwMQP3In62JdG34NZoqihYyOZLk+5wUW8sSgvIYIcJM8Dlt3xsdKZZ3tg==
+
+did-resolver@^4.0.0:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/did-resolver/-/did-resolver-4.0.1.tgz#11bb3f19ed1c8f53f4af4702912fa9f7852fc305"
+  integrity sha512-eHs2VLKhcANmh08S87PKvOauIAmSOd7nb7AlhNxcvOyDAIGQY1UfbiqI1VOW5IDKvOO6aEWY+5edOt1qrCp1Eg==
 
 didyoumean@^1.2.2:
   version "1.2.2"
@@ -12627,6 +12651,11 @@ multiformats@^9.4.2, multiformats@^9.6.4, multiformats@^9.7.1:
   version "9.7.1"
   resolved "https://registry.yarnpkg.com/multiformats/-/multiformats-9.7.1.tgz#ab348e5fd6f8e7fb3fd56033211bda48854e2173"
   integrity sha512-TaVmGEBt0fhxiNJMGphBfB+oGvUxFs8KgGvgl8d3C+GWtrFcvXdJ2196eg+dYhmSFClmgFfSfJEklo+SZzdNuw==
+
+multiformats@^9.6.5:
+  version "9.9.0"
+  resolved "https://registry.yarnpkg.com/multiformats/-/multiformats-9.9.0.tgz#c68354e7d21037a8f1f8833c8ccd68618e8f1d37"
+  integrity sha512-HoMUjhH9T8DDBNT+6xzkrd9ga/XiBI4xLr58LJACwK6G3HTOPeMz4nB4KJs33L2BelrIJa7P0VuNaVF3hMYfjg==
 
 multistream@^4.1.0:
   version "4.1.0"

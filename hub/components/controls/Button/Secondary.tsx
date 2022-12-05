@@ -30,10 +30,10 @@ export const Secondary = forwardRef<HTMLButtonElement, Props>(
           'tracking-normal',
           'transition-colors',
           rest.className,
-          !pending && 'active:border-sky-500',
           'disabled:border-zinc-300',
           'disabled:cursor-not-allowed',
-          !pending && 'hover:border-sky-400',
+          !pending && 'hover:bg-sky-100',
+          !pending && 'active:bg-sky-200',
           pending && 'cursor-not-allowed',
         )}
         onClick={(e) => {
@@ -50,9 +50,7 @@ export const Secondary = forwardRef<HTMLButtonElement, Props>(
             'text-current',
             'text-sm',
             'transition-all',
-            !pending && 'group-active:text-sky-500',
             'group-disabled:text-zinc-300',
-            !pending && 'group-hover:text-sky-400',
             pending ? 'opacity-0' : 'opacity-100',
           )}
         >
