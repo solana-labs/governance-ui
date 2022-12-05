@@ -4,14 +4,14 @@ import { BinaryWriter, serialize } from 'borsh'
 import { AccountInfo, Connection, PublicKey } from '@solana/web3.js'
 
 import {
-  getGovernanceAccounts,
   getGovernanceSchemaForAccount,
-  getRealm,
+  VoteThresholdPercentageType,
   Governance,
+  getGovernanceAccounts,
+  getRealm,
   pubkeyFilter,
-  VoteThreshold,
-  VoteThresholdType,
-} from '@solana/spl-governance'
+} from 'spl-governanceV2'
+
 import * as anchor from '@project-serum/anchor'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 
@@ -122,19 +122,19 @@ function serializeAccount(pubkey: PublicKey, ai: AccountInfo<Buffer>): string {
   writer.writeFixedArray(value.toBuffer())
 }
 ;(BinaryWriter.prototype as any).writeVoteThreshold = function (
-  value: VoteThreshold
+  value: VoteThresholdPercentageType
 ) {
   const writer = (this as unknown) as BinaryWriter
   writer.maybeResize()
-  writer.buf.writeUInt8(value.type, writer.length)
+  writer.buf.writeUInt8(value, writer.length)
   writer.length += 1
 
   // Write value for VoteThresholds with u8 value
   if (
-    value.type === VoteThresholdType.YesVotePercentage ||
-    value.type === VoteThresholdType.QuorumPercentage
+    value === VoteThresholdPercentageType.YesVote ||
+    value === VoteThresholdPercentageType.Quorum
   ) {
-    writer.buf.writeUInt8(value.value!, writer.length)
+    writer.buf.writeUInt8(value!, writer.length)
     writer.length += 1
   }
 }
