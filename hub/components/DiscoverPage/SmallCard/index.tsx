@@ -147,22 +147,7 @@ export function SmallCard(props: Props) {
                   }
                 }
 
-                return (
-                  <Tooltip asChild message="Please sign in to follow this hub">
-                    <Button.Primary
-                      className={cx(
-                        '-bottom-5',
-                        'absolute',
-                        'right-6',
-                        'rounded-full',
-                        'w-10',
-                      )}
-                      disabled
-                    >
-                      <UserFollow className="h-4 w-4" />
-                    </Button.Primary>
-                  </Tooltip>
-                );
+                return <div />;
               },
             ),
           )}
