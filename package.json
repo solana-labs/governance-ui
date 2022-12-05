@@ -172,6 +172,8 @@
     "@types/react": "17.0.44",
     "@typescript-eslint/eslint-plugin": "5.30.6",
     "@typescript-eslint/parser": "5.30.6",
+    "chalk": "4.1.2",
+    "diff": "5.1.0",
     "eslint": "8.17.0",
     "eslint-config-prettier": "8.5.0",
     "eslint-plugin-import": "2.26.0",

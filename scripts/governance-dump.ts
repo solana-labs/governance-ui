@@ -1,22 +1,21 @@
 import fs from 'fs'
+
 import { BinaryWriter, serialize } from 'borsh'
-
+import chalk from 'chalk'
+import * as diff from 'diff'
 import { AccountInfo, Connection, PublicKey } from '@solana/web3.js'
-
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
+import * as anchor from '@project-serum/anchor'
 import {
-  getGovernanceSchemaForAccount,
-  VoteThresholdPercentageType,
   Governance,
   getGovernanceAccounts,
+  getGovernanceSchemaForAccount,
   getRealm,
   pubkeyFilter,
   VoteThresholdPercentage,
 } from 'spl-governanceV2'
 
-import * as anchor from '@project-serum/anchor'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
-
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { getAccountsForGovernances } from './governanceAccounts'
 import { ConnectionContext } from '@utils/connection'
 
@@ -194,17 +193,14 @@ async function main() {
   )
   const governancePKs = governances.map((g) => g.pubkey)
 
-  console.log(
-    'governances',
-    governances.length,
-    governancePKs.map((g) => g.toString())
-  )
+  console.log('governances', governances.length)
 
   const governanceAIs = await conn.getMultipleAccountsInfo(governancePKs)
   ensureDir(`${outDir}/${gov.toString()}/accounts`)
   for (const [{ account, pubkey }, ai] of zip(governances, governanceAIs)) {
     const path = `${outDir}/${gov.toString()}/accounts/${pubkey.toString()}.json`
     const schema = getGovernanceSchemaForAccount(account.accountType)
+    const before = ai!.data.toString('base64')
 
     // override any governance settings to improve testing as you whish
     account.config.voteThresholdPercentage = new VoteThresholdPercentage({
@@ -214,6 +210,19 @@ async function main() {
 
     ai!.data = Buffer.from(serialize(schema, account))
     fs.writeFileSync(path, serializeAccount(pubkey, ai!))
+
+    const after = ai!.data.toString('base64')
+    process.stdout.write(`${pubkey.toString()}: `)
+    diff.diffChars(before, after).forEach((c) => {
+      if (c.added) {
+        process.stdout.write(chalk.green(c.value))
+      } else if (c.removed) {
+        process.stdout.write(chalk.red(c.value))
+      } else {
+        process.stdout.write(c.value)
+      }
+    })
+    process.stdout.write('\n')
   }
   const assetAccounts = await getAccountsForGovernances(
     connectionContext,
