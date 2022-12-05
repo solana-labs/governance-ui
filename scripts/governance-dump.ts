@@ -205,10 +205,13 @@ async function main() {
   for (const [{ account, pubkey }, ai] of zip(governances, governanceAIs)) {
     const path = `${outDir}/${gov.toString()}/accounts/${pubkey.toString()}.json`
     const schema = getGovernanceSchemaForAccount(account.accountType)
+
+    // override any governance settings to improve testing as you whish
     account.config.voteThresholdPercentage = new VoteThresholdPercentage({
-      value: 0.001,
+      value: 0,
     })
-    account.config.maxVotingTime = 333
+    account.config.maxVotingTime = 300 // in seconds = 5 minutes
+
     ai!.data = Buffer.from(serialize(schema, account))
     fs.writeFileSync(path, serializeAccount(pubkey, ai!))
   }

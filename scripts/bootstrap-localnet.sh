@@ -18,6 +18,9 @@ do
  solana program dump-owned-accounts $program_id $output_path/$program_id/accounts
 done
 
+# save wallet used for simulation of VSR accounts
+solana account -o $output_path/GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw/accounts/ENmcpFCpxN1CqyUjuog9yyUVfdXBKF3LVCwLr7grJZpk.json --output json ENmcpFCpxN1CqyUjuog9yyUVfdXBKF3LVCwLr7grJZpk
+
 # find token accounts & mints to download through parsing all governances of the realm
 export OUT=$output_path
 export GOV_PROGRAM_ID=GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J
