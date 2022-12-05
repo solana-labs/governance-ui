@@ -234,7 +234,12 @@ async function main() {
 
   console.log('assetAccounts', assetAccounts.length)
 
-  const assetAccountsPKs = assetAccounts.map((a) => a.pubkey)
+  const assetAccountsPKs = [
+    ...assetAccounts.map((a) => a.pubkey),
+    ...assetAccounts
+      .filter((x) => typeof x.extensions.mint !== 'undefined')
+      .map((a) => a.extensions.mint!.publicKey),
+  ]
   const assetAccountsAIs = await conn.getMultipleAccountsInfo(assetAccountsPKs)
 
   for (const [pk, ai] of zip(assetAccountsPKs, assetAccountsAIs)) {
