@@ -132,6 +132,8 @@ import AddKeyToDID from './components/instructions/Identity/AddKeyToDID'
 import RemoveKeyFromDID from './components/instructions/Identity/RemoveKeyFromDID'
 import AddServiceToDID from './components/instructions/Identity/AddServiceToDID'
 import RemoveServiceFromDID from './components/instructions/Identity/RemoveServiceFromDID'
+import DualWithdraw from './components/instructions/Dual/DualWithdraw'
+import DualExercise from './components/instructions/Dual/DualExercise'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -447,6 +449,8 @@ const New = () => {
       [Instructions.ClaimPendingWithdraw]: FriktionClaimPendingWithdraw,
       [Instructions.DepositIntoCastle]: CastleDeposit,
       [Instructions.DualFinanceStakingOption]: StakingOption,
+      [Instructions.DualFinanceWithdraw]: DualWithdraw,
+      [Instructions.DualFinanceExercise]: DualExercise,
       [Instructions.MeanCreateAccount]: MeanCreateAccount,
       [Instructions.MeanFundAccount]: MeanFundAccount,
       [Instructions.MeanWithdrawFromAccount]: MeanWithdrawFromAccount,
