@@ -10,6 +10,7 @@ import {
   getGovernanceAccounts,
   getRealm,
   pubkeyFilter,
+  VoteThresholdPercentage,
 } from 'spl-governanceV2'
 
 import * as anchor from '@project-serum/anchor'
@@ -123,23 +124,6 @@ function serializeAccount(pubkey: PublicKey, ai: AccountInfo<Buffer>): string {
   const writer = (this as unknown) as BinaryWriter
   writer.writeFixedArray(value.toBuffer())
 }
-;(BinaryWriter.prototype as any).writeVoteThreshold = function (
-  value: VoteThresholdPercentageType
-) {
-  const writer = (this as unknown) as BinaryWriter
-  writer.maybeResize()
-  writer.buf.writeUInt8(value, writer.length)
-  writer.length += 1
-
-  // Write value for VoteThresholds with u8 value
-  if (
-    value === VoteThresholdPercentageType.YesVote ||
-    value === VoteThresholdPercentageType.Quorum
-  ) {
-    writer.buf.writeUInt8(value!, writer.length)
-    writer.length += 1
-  }
-}
 
 async function main() {
   const client = await VsrClient.connect(
@@ -221,6 +205,9 @@ async function main() {
   for (const [{ account, pubkey }, ai] of zip(governances, governanceAIs)) {
     const path = `${outDir}/${gov.toString()}/accounts/${pubkey.toString()}.json`
     const schema = getGovernanceSchemaForAccount(account.accountType)
+    account.config.voteThresholdPercentage = new VoteThresholdPercentage({
+      value: 0.001,
+    })
     account.config.maxVotingTime = 333
     ai!.data = Buffer.from(serialize(schema, account))
     fs.writeFileSync(path, serializeAccount(pubkey, ai!))
