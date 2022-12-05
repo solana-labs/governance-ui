@@ -2,7 +2,6 @@ import fs from 'fs'
 
 import { BinaryWriter, serialize } from 'borsh'
 import chalk from 'chalk'
-import * as diff from 'diff'
 import { AccountInfo, Connection, PublicKey } from '@solana/web3.js'
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import * as anchor from '@project-serum/anchor'
@@ -200,7 +199,7 @@ async function main() {
   for (const [{ account, pubkey }, ai] of zip(governances, governanceAIs)) {
     const path = `${outDir}/${gov.toString()}/accounts/${pubkey.toString()}.json`
     const schema = getGovernanceSchemaForAccount(account.accountType)
-    const before = ai!.data.toString('base64')
+    const before = ai!.data.toString('hex')
 
     // override any governance settings to improve testing as you whish
     account.config.voteThresholdPercentage = new VoteThresholdPercentage({
@@ -211,21 +210,28 @@ async function main() {
     ai!.data = Buffer.from(serialize(schema, account))
     fs.writeFileSync(path, serializeAccount(pubkey, ai!))
 
-    const after = ai!.data.toString('base64')
-    process.stdout.write(
+    const after = ai!.data.toString('hex')
+    console.log(
       `${pubkey.toString()} type:${account.accountType} len:${
-        after.length - before.length
+        (after.length - before.length) / 2
       } data:`
     )
-    diff.diffChars(before, after).forEach((c) => {
-      if (c.added) {
-        process.stdout.write(chalk.green(c.value))
-      } else if (c.removed) {
-        process.stdout.write(chalk.red(c.value))
-      } else {
-        process.stdout.write(c.value)
-      }
-    })
+    for (let i = 0; i < before.length || i < after.length; ++i) {
+      if (i >= before.length) process.stdout.write(chalk.red(after[i]))
+      else if (i >= after.length) process.stdout.write(chalk.green(before[i]))
+      else if (after[i] != before[i]) process.stdout.write(before[i])
+      else process.stdout.write(chalk.gray(before[i]))
+    }
+
+    process.stdout.write('\n')
+
+    for (let i = 0; i < before.length || i < after.length; ++i) {
+      if (i >= before.length) process.stdout.write(chalk.green(after[i]))
+      else if (i >= after.length) process.stdout.write(chalk.red(before[i]))
+      else if (after[i] != before[i]) process.stdout.write(after[i])
+      else process.stdout.write(chalk.gray(after[i]))
+    }
+
     process.stdout.write('\n')
   }
   const assetAccounts = await getAccountsForGovernances(
