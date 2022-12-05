@@ -212,7 +212,11 @@ async function main() {
     fs.writeFileSync(path, serializeAccount(pubkey, ai!))
 
     const after = ai!.data.toString('base64')
-    process.stdout.write(`${pubkey.toString()}: `)
+    process.stdout.write(
+      `${pubkey.toString()} type:${account.accountType} len:${
+        after.length - before.length
+      } data:`
+    )
     diff.diffChars(before, after).forEach((c) => {
       if (c.added) {
         process.stdout.write(chalk.green(c.value))
