@@ -13,7 +13,7 @@
     "type-check": "tsc --pretty --noEmit --skipLibCheck",
     "format": "prettier --write .",
     "lint": "eslint . --ext ts --ext tsx --ext js --ext jsx",
-    "test": "jest ",
+    "test": "jest",
     "test-all": "yarn lint && yarn type-check && yarn test",
     "notifier": "ts-node scripts/governance-notifier.ts",
     "postinstall": "echo '\\033[35mIf you just added a package, consider running `\\033[1m\\033[36;1mnpx yarn-deduplicate\\033[0m\\033[35m`!\\033[00m'"
@@ -48,6 +48,7 @@
     "@headlessui/react": "1.6.6",
     "@heroicons/react": "1.0.6",
     "@hookform/resolvers": "2.8.10",
+    "@identity.com/sol-did-client": "3.1.4",
     "@marinade.finance/marinade-ts-sdk": "2.0.9",
     "@mean-dao/msp": "3.0.1-alpha.13",
     "@metaplex-foundation/js": "0.17.5",

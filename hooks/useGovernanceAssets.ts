@@ -188,10 +188,15 @@ export default function useGovernanceAssets() {
     },
     [PackageEnum.GatewayPlugin]: {
       name: 'Gateway Plugin',
+      image: '/img/civic.svg',
     },
     [PackageEnum.GoblinGold]: {
       name: 'Goblin Gold',
       image: '/img/goblingold.png',
+    },
+    [PackageEnum.Identity]: {
+      name: 'Identity',
+      image: '/img/identity.png',
     },
     [PackageEnum.NftPlugin]: {
       name: 'NFT Plugin',
@@ -460,25 +465,6 @@ export default function useGovernanceAssets() {
     },
 
     /*
-      ██████   █████  ████████ ███████ ██     ██  █████  ██    ██     ██████  ██      ██    ██  ██████  ██ ███    ██ 
-     ██       ██   ██    ██    ██      ██     ██ ██   ██  ██  ██      ██   ██ ██      ██    ██ ██       ██ ████   ██ 
-     ██   ███ ███████    ██    █████   ██  █  ██ ███████   ████       ██████  ██      ██    ██ ██   ███ ██ ██ ██  ██ 
-     ██    ██ ██   ██    ██    ██      ██ ███ ██ ██   ██    ██        ██      ██      ██    ██ ██    ██ ██ ██  ██ ██ 
-      ██████  ██   ██    ██    ███████  ███ ███  ██   ██    ██        ██      ███████  ██████   ██████  ██ ██   ████ 
-    */
-
-    [Instructions.ConfigureGatewayPlugin]: {
-      name: 'Configure',
-      isVisible: canUseAuthorityInstruction,
-      packageId: PackageEnum.GatewayPlugin,
-    },
-    [Instructions.CreateGatewayPluginRegistrar]: {
-      name: 'Create registrar',
-      isVisible: canUseAuthorityInstruction,
-      packageId: PackageEnum.GatewayPlugin,
-    },
-
-    /*
        ██████   ██████  ██████  ██      ██ ███    ██  ██████   ██████  ██      ██████  
       ██       ██    ██ ██   ██ ██      ██ ████   ██ ██       ██    ██ ██      ██   ██ 
       ██   ███ ██    ██ ██████  ██      ██ ██ ██  ██ ██   ███ ██    ██ ██      ██   ██ 
@@ -493,6 +479,45 @@ export default function useGovernanceAssets() {
     [Instructions.WithdrawFromGoblinGold]: {
       name: 'Withdraw',
       packageId: PackageEnum.GoblinGold,
+    },
+
+    /*
+      ██ ██████  ███████ ███    ██ ████████ ██ ████████ ██    ██
+      ██ ██   ██ ██      ████   ██    ██    ██    ██     ██  ██
+      ██ ██   ██ █████   ██ ██  ██    ██    ██    ██      ████
+      ██ ██   ██ ██      ██  ██ ██    ██    ██    ██       ██
+      ██ ██████  ███████ ██   ████    ██    ██    ██       ██
+    */
+
+    [Instructions.ConfigureGatewayPlugin]: {
+      name: 'Configure',
+      isVisible: canUseAuthorityInstruction,
+      packageId: PackageEnum.GatewayPlugin,
+    },
+    [Instructions.CreateGatewayPluginRegistrar]: {
+      name: 'Create registrar',
+      isVisible: canUseAuthorityInstruction,
+      packageId: PackageEnum.GatewayPlugin,
+    },
+    [Instructions.AddKeyToDID]: {
+      name: 'Add Key to DID',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Identity,
+    },
+    [Instructions.RemoveKeyFromDID]: {
+      name: 'Remove Key from DID',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Identity,
+    },
+    [Instructions.AddServiceToDID]: {
+      name: 'Add Service to DID',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Identity,
+    },
+    [Instructions.RemoveServiceFromDID]: {
+      name: 'Remove Service from DID',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Identity,
     },
 
     /*
