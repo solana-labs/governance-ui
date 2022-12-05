@@ -66,6 +66,8 @@ const chunkItems = <T>(items: T[], length: number) =>
     return chunks
   }, [])
 
+const unique = <T>(items: T[]) => Array.from(new Set(items))
+
 function zip<S1, S2>(
   firstCollection: Array<S1>,
   lastCollection: Array<S2>
@@ -185,14 +187,11 @@ async function main() {
     'voter associated accounts',
     voterAssociatedAccounts.length,
     'unique',
-    Array.from(new Set(voterAssociatedAccounts)).length
+    unique(voterAssociatedAccounts).length
   )
 
   ensureDir(`${outDir}/${vsr.toString()}/accounts`)
-  for (const chunk of chunkItems(
-    Array.from(new Set(voterAssociatedAccounts)),
-    gmaLimit
-  )) {
+  for (const chunk of chunkItems(unique(voterAssociatedAccounts), gmaLimit)) {
     const ais = await conn.getMultipleAccountsInfo(chunk)
     for (const [pk, ai] of zip(chunk, ais)) {
       if (ai) {
@@ -234,12 +233,12 @@ async function main() {
 
   console.log('assetAccounts', assetAccounts.length)
 
-  const assetAccountsPKs = [
+  const assetAccountsPKs = unique([
     ...assetAccounts.map((a) => a.pubkey),
     ...assetAccounts
       .filter((x) => typeof x.extensions.mint !== 'undefined')
       .map((a) => a.extensions.mint!.publicKey),
-  ]
+  ])
   const assetAccountsAIs = await conn.getMultipleAccountsInfo(assetAccountsPKs)
 
   for (const [pk, ai] of zip(assetAccountsPKs, assetAccountsAIs)) {
