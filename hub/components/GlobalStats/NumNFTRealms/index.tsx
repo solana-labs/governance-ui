@@ -26,9 +26,14 @@ export function NumNFTRealms(props: Props) {
         props.className,
       )}
     >
-      <div className="flex items-center">
+      <div className="flex items-baseline">
         <common.Label>Number of NFT Realms</common.Label>
-        {props.fetching && <LoadingDots className="text-base" />}
+        {props.fetching && (
+          <LoadingDots
+            className="text-xs ml-1 text-neutral-400"
+            style="pulse"
+          />
+        )}
       </div>
       <common.Value>
         {formatNumber(props.realms.length, undefined, {

@@ -2,8 +2,13 @@ import { WSOL_MINT_PK } from '@components/instructions/tools';
 import * as Progress from '@radix-ui/react-progress';
 import {
   getRealms,
+  getGovernanceAccounts,
   getAllGovernances,
   getNativeTreasuryAddress,
+  ProgramAccount,
+  Proposal,
+  TokenOwnerRecord,
+  VoteRecord,
 } from '@solana/spl-governance';
 import { AccountInfo } from '@solana/spl-token';
 import { Connection, PublicKey } from '@solana/web3.js';
@@ -53,10 +58,9 @@ async function getGovernances(
       logger.warn(
         `Could not find any governances for ${realm.toBase58()} using Holaplex. Will double check using the RPC`,
       );
-      throw new Error();
+    } else {
+      return resp.governances.map((g: any) => new PublicKey(g.address));
     }
-
-    return resp.governances.map((g: any) => new PublicKey(g.address));
   } catch (e) {
     logger.error(
       `Failed to fetch governances for ${realm.toBase58()} using Holaplex, will try using RPC`,
@@ -102,11 +106,14 @@ async function fetchData(
   logger: Logger,
   cbs: {
     onComplete?(): void;
+    onMembersComplete?(members: Set<string>): void;
     onNFTRealms?(realms: PublicKey[]): void;
     onNFTRealmsComplete?(realms: PublicKey[]): void;
+    onProposalsComplete?(proposals: ProgramAccount<Proposal>[]): void;
     onRealmsComplete?(realms: PublicKey[]): void;
     onTVLComplete?(value: number): void;
     onUpdate?(update: Update): void;
+    onVoteRecordsComplete?(voteRecords: ProgramAccount<VoteRecord>[]): void;
   },
 ) {
   const tokenAmountMap = new Map<string, BigNumber>();
@@ -158,7 +165,7 @@ async function fetchData(
     }
   }
 
-  // allRealms = allRealms.slice(0, 100);
+  allRealms = allRealms.slice(0, 100);
 
   cbs.onRealmsComplete?.(allRealms.map((r) => r.publicKey));
 
@@ -166,10 +173,11 @@ async function fetchData(
 
   for (const [idx, realm] of allRealms.entries()) {
     cbs.onUpdate?.({
-      progress: 5 + 70 * (idx / allRealms.length),
+      progress: 5 + 50 * (idx / allRealms.length),
       text: `Fetching "${realm.name}" wallets and tokens...`,
       title: 'Getting Realm details',
     });
+    logger.log(`Fetching "${realm.name}" wallets and tokens...`);
 
     const realmConfig = await getRealmConfigAccountOrDefault(
       connection,
@@ -249,7 +257,7 @@ async function fetchData(
   cbs.onNFTRealms?.(nftRealms);
   cbs.onNFTRealmsComplete?.(nftRealms);
   cbs.onUpdate?.({
-    progress: 75,
+    progress: 55,
     text: 'Fetching token prices...',
     title: 'Calculating account values',
   });
@@ -263,7 +271,7 @@ async function fetchData(
 
   for (const [idx, tokenGroup] of tokenGroups.entries()) {
     cbs.onUpdate?.({
-      progress: 75 + 20 * (idx / tokenGroups.length),
+      progress: 55 + 20 * (idx / tokenGroups.length),
       text: `Fetching token prices (${idx + 1}/${tokenGroups.length})...`,
       title: 'Calculating account values',
     });
@@ -275,7 +283,7 @@ async function fetchData(
   let totalUsdAmount = 0;
 
   cbs.onUpdate?.({
-    progress: 95,
+    progress: 75,
     text: 'Computing total value...',
     title: 'Calculating account values',
   });
@@ -291,6 +299,74 @@ async function fetchData(
   }
 
   cbs.onTVLComplete?.(totalUsdAmount);
+
+  cbs.onUpdate?.({
+    progress: 85,
+    text: 'Fetching proposals...',
+    title: 'Getting vote statistics',
+  });
+
+  logger.log('Fetching proposals...');
+  let allProposals: ProgramAccount<Proposal>[] = [];
+
+  for (const programId of allProgramIds) {
+    const allProgramProposals = await getGovernanceAccounts(
+      connection,
+      new PublicKey(programId),
+      Proposal,
+    );
+
+    allProposals = allProposals.concat(allProgramProposals);
+  }
+
+  cbs.onProposalsComplete?.(allProposals);
+
+  cbs.onUpdate?.({
+    progress: 90,
+    text: 'Fetching vote records...',
+    title: 'Getting vote statistics',
+  });
+
+  logger.log('Fetching vote records...');
+  let allVoteRecords: ProgramAccount<VoteRecord>[] = [];
+
+  for (const programId of allProgramIds) {
+    const allProgramVoteRecords = await getGovernanceAccounts(
+      connection,
+      new PublicKey(programId),
+      VoteRecord,
+    );
+
+    allVoteRecords = allVoteRecords.concat(allProgramVoteRecords);
+  }
+
+  cbs.onVoteRecordsComplete?.(allVoteRecords);
+
+  cbs.onUpdate?.({
+    progress: 95,
+    text: 'Fetching members...',
+    title: 'Getting vote statistics',
+  });
+
+  logger.log('Fetching members...');
+  let allMembers = new Set<string>();
+
+  for (const programId of allProgramIds) {
+    const allOwnerRecords = await getGovernanceAccounts(
+      connection,
+      new PublicKey(programId),
+      TokenOwnerRecord,
+    );
+
+    for (const ownerRecord of allOwnerRecords) {
+      allMembers = allMembers.add(
+        ownerRecord.account.governingTokenOwner.toBase58(),
+      );
+    }
+  }
+
+  cbs.onMembersComplete?.(allMembers);
+
   cbs.onUpdate?.({
     progress: 100,
     text: '',
@@ -305,10 +381,13 @@ interface Props {
   logger: Logger;
   runCount: number;
   onComplete?(): void;
-  onRealmsComplete?(realms: PublicKey[]): void;
+  onMembersComplete?(members: Set<string>): void;
   onNFTRealms?(realms: PublicKey[]): void;
   onNFTRealmsComplete?(realm: PublicKey[]): void;
+  onProposalsComplete?(proposals: ProgramAccount<Proposal>[]): void;
+  onRealmsComplete?(realms: PublicKey[]): void;
   onTVLComplete?(amount: number): void;
+  onVoteRecordsComplete?(voteRecords: ProgramAccount<VoteRecord>[]): void;
 }
 
 export function DataFetch(props: Props) {
@@ -321,54 +400,59 @@ export function DataFetch(props: Props) {
   useEffect(() => {
     if (props.runCount) {
       fetchData(props.connection, props.logger, {
+        onMembersComplete: props.onMembersComplete,
         onNFTRealms: props.onNFTRealms,
         onNFTRealmsComplete: props.onNFTRealmsComplete,
+        onProposalsComplete: props.onProposalsComplete,
         onRealmsComplete: props.onRealmsComplete,
         onTVLComplete: props.onTVLComplete,
         onUpdate: setProgress,
+        onVoteRecordsComplete: props.onVoteRecordsComplete,
       });
     }
   }, [props.runCount]);
 
   return (
     <div className={props.className} key={props.runCount}>
-      <div className="text-2xl text-neutral-900 mb-1">{progress.title}</div>
       {progress.progress < 100 && (
-        <Progress.Root
-          className="h-10 rounded overflow-hidden w-full bg-neutral-200 relative"
-          value={progress.progress}
-        >
-          <Progress.Indicator
-            className={cx(
-              'absolute',
-              'animate-move-stripes',
-              'duration-700',
-              'top-0',
-              'bottom-0',
-              'transition-all',
-              'w-full',
-            )}
-            style={{
-              background:
-                'repeating-linear-gradient(-67.5deg, #bae6fd, #bae6fd 20px, #7dd3fc 20px, #7dd3fc 40px)',
-              right: `${100 - progress.progress}%`,
-            }}
-          />
-          <div
-            className="absolute text-sm leading-[40px] text-neutral-900"
-            style={{
-              right: `${Math.max(100 - progress.progress, 5)}%`,
-              transform: 'translateX(150%)',
-            }}
+        <>
+          <div className="text-2xl text-neutral-900 mb-1">{progress.title}</div>
+          <Progress.Root
+            className="h-10 rounded overflow-hidden w-full bg-neutral-200 relative"
+            value={progress.progress}
           >
-            {formatNumber(progress.progress, undefined, {
-              maximumFractionDigits: 0,
-            })}
-            %
-          </div>
-        </Progress.Root>
+            <Progress.Indicator
+              className={cx(
+                'absolute',
+                'animate-move-stripes',
+                'duration-700',
+                'top-0',
+                'bottom-0',
+                'transition-all',
+                'w-full',
+              )}
+              style={{
+                background:
+                  'repeating-linear-gradient(-67.5deg, #bae6fd, #bae6fd 20px, #7dd3fc 20px, #7dd3fc 40px)',
+                right: `${100 - progress.progress}%`,
+              }}
+            />
+            <div
+              className="absolute text-sm leading-[40px] text-neutral-900 transition-all"
+              style={{
+                right: `${Math.max(100 - progress.progress, 6)}%`,
+                transform: 'translateX(150%)',
+              }}
+            >
+              {formatNumber(progress.progress, undefined, {
+                maximumFractionDigits: 0,
+              })}
+              %
+            </div>
+          </Progress.Root>
+          <div className="text-sm text-neutral-500">{progress.text}</div>
+        </>
       )}
-      <div className="text-sm text-neutral-500">{progress.text}</div>
     </div>
   );
 }

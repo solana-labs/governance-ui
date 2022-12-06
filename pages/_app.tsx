@@ -16,10 +16,7 @@ export default function App({ Component, pageProps, router }: AppProps) {
   // the providers and perform data fetches in the relevant sub-apps (`HubApp`,
   // `BaseApp`) instead.
 
-  if (
-    router.pathname.startsWith('/code') ||
-    router.pathname.startsWith('/stats')
-  ) {
+  if (router.pathname.startsWith('/code')) {
     return <Component {...pageProps} />
   }
 
@@ -27,7 +24,8 @@ export default function App({ Component, pageProps, router }: AppProps) {
     router.pathname.startsWith('/realm/[id]') ||
     router.pathname.startsWith('/ecosystem') ||
     router.pathname.startsWith('/discover') ||
-    router.pathname.startsWith('/feed')
+    router.pathname.startsWith('/feed') ||
+    router.pathname.startsWith('/stats')
   ) {
     return (
       <HubApp>
