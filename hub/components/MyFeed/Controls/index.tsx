@@ -20,7 +20,7 @@ export function Controls(props: Props) {
     >
       <Toolbar.Button asChild>
         <Select
-          dropdownClassName="drop-shadow-xl"
+          dropdownClassName="drop-shadow-xl z-30"
           choices={[
             {
               key: FeedItemSort.Relevance,

@@ -61,7 +61,7 @@ export function Hub(props: Props) {
               <RealmHeader.Content
                 bannerUrl={realmByUrlId.bannerImageUrl}
                 iconUrl={realmByUrlId.iconUrl}
-                name={realmByUrlId.name}
+                name={realmByUrlId.displayName || realmByUrlId.name}
                 realm={realmByUrlId.publicKey}
                 realmUrlId={props.realmUrlId}
                 selectedTab="hub"
