@@ -32,7 +32,7 @@ import {
   TokenAccount,
   TokenProgramAccount,
 } from '@utils/tokens'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import { ConnectionContext } from '@utils/connection'
 import {
   AccountType,
@@ -45,7 +45,7 @@ import {
   AccountTypeToken,
   AssetAccount,
 } from '@utils/uiTypes/assets'
-import { chunks } from '@utils/helpers'
+import group from '@utils/group'
 
 const tokenAccountOwnerOffset = 32
 
@@ -410,7 +410,7 @@ const getSolAccountObj = async (
     }
   )
 
-  const groups = chunks(tokenAccountsOwnedBySolAccounts, 100)
+  const groups = group(tokenAccountsOwnedBySolAccounts)
 
   const mintAccounts = (
     await Promise.all(
@@ -683,7 +683,7 @@ const loadGovernedTokenAccounts = async (
   const tokenAccountsInfo = (
     await Promise.all(
       // Load infos in batch, cannot load 9999 accounts within one request
-      chunks(tokenAccountsOwnedByGovernances, 100).map((group) =>
+      group(tokenAccountsOwnedByGovernances, 100).map((group) =>
         getTokenAccountsInfo(connection, group)
       )
     )
@@ -692,7 +692,7 @@ const loadGovernedTokenAccounts = async (
   const governedTokenAccounts = (
     await Promise.all(
       // Load infos in batch, cannot load 9999 accounts within one request
-      chunks(tokenAccountsInfo, 100).map((group) =>
+      group(tokenAccountsInfo).map((group) =>
         getTokenAssetAccounts(group, governancesArray, realm, connection)
       )
     )
@@ -737,7 +737,7 @@ const getAccountsForGovernances = async (
   )
 
   // 5 - Call to fetch token prices for every token account's mints
-  await tokenService.fetchTokenPrices(
+  await tokenPriceService.fetchTokenPrices(
     governedTokenAccounts.reduce((mints, governedTokenAccount) => {
       if (!governedTokenAccount.extensions.mint?.publicKey) {
         return mints

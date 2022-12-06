@@ -7,6 +7,7 @@ import {
   Programs,
   RealmAuthority,
   Sol,
+  Domains,
   Unknown,
   TokenOwnerRecordAsset,
 } from '@models/treasury/Asset'
@@ -17,6 +18,10 @@ export function isToken(asset: Asset): asset is Token {
 
 export function isMint(asset: Asset): asset is Mint {
   return asset.type === AssetType.Mint
+}
+
+export function isDomain(asset: Asset): asset is Domains {
+  return asset.type === AssetType.Domain
 }
 
 export function isNFTCollection(asset: Asset): asset is NFTCollection {

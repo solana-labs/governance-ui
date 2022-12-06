@@ -13,7 +13,7 @@ import handleGovernanceAssetsStore from '@hooks/handleGovernanceAssetsStore'
 import handleRouterHistory from '@hooks/handleRouterHistory'
 import NavBar from '@components/NavBar'
 import PageBodyContainer from '@components/PageBodyContainer'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import TransactionLoader from '@components/TransactionLoader'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -23,10 +23,10 @@ import useMembers from '@components/Members/useMembers'
 import useRealm from '@hooks/useRealm'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import useWallet from '@hooks/useWallet'
 import useWalletStore from 'stores/useWalletStore'
 import NftVotingCountingModal from '@components/NftVotingCountingModal'
 import { getResourcePathPart } from '@tools/core/resources'
+import useInitWallet from '@hooks/useInitWallet'
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -58,13 +58,13 @@ interface Props {
 
 export function App(props: Props) {
   useHydrateStore()
-  useWallet()
+  useInitWallet()
   handleRouterHistory()
   useVotingPlugins()
   handleGovernanceAssetsStore()
   useMembers()
   useEffect(() => {
-    tokenService.fetchSolanaTokenList()
+    tokenPriceService.fetchSolanaTokenList()
   }, [])
   const { loadMarket } = useMarketStore()
   const { governedTokenAccounts } = useGovernanceAssets()

@@ -2,7 +2,7 @@ import { Connection, PublicKey } from '@solana/web3.js'
 import { AccountMetaData } from '@solana/spl-governance'
 import BN from 'bn.js'
 
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import VoteResultsBar from '@components/VoteResultsBar'
 import {
   StreamClient,
@@ -10,7 +10,6 @@ import {
   getNumberFromBN,
   Stream,
 } from '@streamflow/stream'
-import { PERIOD } from 'pages/dao/[symbol]/proposal/components/instructions/Streamflow/CreateStream'
 import {
   InstructionDataUI,
   DataUIAddress,
@@ -21,6 +20,18 @@ import {
   DataUIWarning,
   DataUIText,
 } from '@components/InstructionDataUI'
+import { tryGetMint } from '@utils/tokens'
+
+export const PERIOD = {
+  SECOND: 1,
+  MINUTE: 60,
+  HOUR: 3600,
+  DAY: 24 * 3600,
+  WEEK: 7 * 24 * 3600,
+  FORTNIGHT: 14 * 24 * 3600,
+  MONTH: Math.floor(30.4167 * 24 * 3600), //30.4167 days
+  YEAR: 365 * 24 * 3600, // 365 days
+}
 
 export const DEFAULT_DECIMAL_PLACES = 2
 
@@ -102,16 +113,18 @@ export interface TokenMintMetadata {
   readonly symbol: string
 }
 
-export function getMintMetadata(tokenMintPk: PublicKey): TokenMintMetadata {
+export async function getMintMetadata(
+  connection: Connection,
+  tokenMintPk: PublicKey
+): Promise<TokenMintMetadata> {
   const tokenMintAddress = tokenMintPk.toBase58()
-  const tokenInfo = tokenService.getTokenInfo(tokenMintAddress)
-
+  const tokenInfo = tokenPriceService.getTokenInfo(tokenMintAddress)
   if (!tokenInfo) {
     return MINT_METADATA[tokenMintAddress]
   }
-
+  const mintInfo = await tryGetMint(connection, tokenMintPk)
   return {
-    decimals: tokenInfo.decimals,
+    decimals: mintInfo!.account.decimals,
     symbol: tokenInfo.symbol,
   }
 }
@@ -159,7 +172,7 @@ async function getStreamCreateDataUI(
     const mint = accounts[mintIndex].pubkey
     const stream = await cli.getOne(contractMetadata.toBase58())
     const isExecuted = stream.createdAt > 0
-    const mintMetadata = getMintMetadata(mint)
+    const mintMetadata = await getMintMetadata(connection, mint)
     const { decimals } = mintMetadata
 
     const {
@@ -313,7 +326,7 @@ export const STREAMFLOW_INSTRUCTIONS = {
           const contractMetadata = accounts[5].pubkey
           const stream = await cli.getOne(contractMetadata.toBase58())
           const mint = accounts[11].pubkey
-          const mintMetadata = getMintMetadata(mint)
+          const mintMetadata = await getMintMetadata(connection, mint)
           const recipient = accounts[3].pubkey
 
           const withdrawn = getNumberFromBN(

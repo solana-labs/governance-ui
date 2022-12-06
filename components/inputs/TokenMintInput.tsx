@@ -1,7 +1,9 @@
 import Input from './Input'
 import { inputClasses } from './styles'
 import { useEffect, useState } from 'react'
-import tokenService from '@utils/services/token'
+import tokenPriceService, {
+  TokenInfoWithoutDecimals,
+} from '@utils/services/tokenPrice'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { TokenProgramAccount, tryGetMint } from '@utils/tokens'
 import useWalletStore from 'stores/useWalletStore'
@@ -9,7 +11,6 @@ import { PublicKey } from '@solana/web3.js'
 import { MintInfo } from '@solana/spl-token'
 import { debounce } from '@utils/debounce'
 import { InformationCircleIcon } from '@heroicons/react/outline'
-import { TokenInfo } from '@solana/spl-token-registry'
 
 const TokenMintInput = ({
   noMaxWidth = true,
@@ -24,7 +25,7 @@ const TokenMintInput = ({
   label?: string
   onValidMintChange: (
     mintAddress: string | undefined,
-    foundByNameToken: TokenInfo | undefined
+    foundByNameToken: TokenInfoWithoutDecimals | undefined
   ) => void
 }) => {
   const connection = useWalletStore((s) => s.connection)
@@ -33,7 +34,7 @@ const TokenMintInput = ({
   const [mintInfo, setMintInfo] = useState<
     TokenProgramAccount<MintInfo> | undefined
   >(undefined)
-  const tokenList = tokenService._tokenList
+  const tokenList = tokenPriceService._tokenList
   const foundByNameToken = tokenList.find(
     (x) =>
       x.address.toLowerCase() === query.toLowerCase() ||

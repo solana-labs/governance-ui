@@ -12,13 +12,17 @@ import type { AssetAccount } from '@utils/uiTypes/assets'
 
 import { NFT } from './NFT'
 import { Program } from './Program'
+import { Domain } from './Domain'
+
 import { TokenProgramAccount } from '@utils/tokens'
 import { MintInfo } from '@solana/spl-token'
+
 import { PublicKey } from '@solana/web3.js'
 
 export enum AssetType {
   Mint,
   NFTCollection,
+  Domain,
   Programs,
   RealmAuthority,
   Sol,
@@ -105,6 +109,13 @@ export interface Unknown {
   name: string
 }
 
+export interface Domains {
+  type: AssetType.Domain
+  id: string
+  count: BigNumber
+  list: Domain[]
+}
+
 export interface TokenOwnerRecordAsset {
   type: AssetType.TokenOwnerRecordAsset
   id: string
@@ -124,6 +135,7 @@ export interface TokenOwnerRecordAsset {
 export type Asset =
   | Mint
   | NFTCollection
+  | Domains
   | Programs
   | RealmAuthority
   | Sol

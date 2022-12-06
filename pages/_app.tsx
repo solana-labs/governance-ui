@@ -10,6 +10,8 @@ import { App as HubApp } from '@hub/App'
 import '../styles/index.css'
 import '../styles/typography.css'
 import '@hub/components/controls/RichTextEditor/index.css'
+import '../components/DropdownMenu/index.css'
+
 import { useEffect } from 'react'
 import useSerumGovStore from 'stores/useSerumGovStore'
 

@@ -41,7 +41,7 @@ import { getATA } from '@utils/ataTools'
 import { abbreviateAddress } from '@utils/formatting'
 import { validateInstruction } from '@utils/instructionTools'
 import { notify } from '@utils/notifications'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import { tryGetMint, tryGetTokenAccount } from '@utils/tokens'
 import {
   getValidateAccount,
@@ -310,7 +310,7 @@ const WithdrawModal = ({
     <div>
       {selectedMangoAccount?.deposits.map((x, idx) => {
         const mint = group?.tokens[idx].mint
-        const tokenInfo = tokenService.getTokenInfo(mint!.toBase58())
+        const tokenInfo = tokenPriceService.getTokenInfo(mint!.toBase58())
         const symbol = tokenInfo?.symbol
         return !x.isZero() ? (
           <div

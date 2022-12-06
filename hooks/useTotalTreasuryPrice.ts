@@ -1,6 +1,6 @@
 import { BN } from '@project-serum/anchor'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import BigNumber from 'bignumber.js'
 import { useState, useEffect } from 'react'
 import useGovernanceAssets from './useGovernanceAssets'
@@ -24,7 +24,7 @@ export function useTotalTreasuryPrice() {
                   : 0
               )
             ).toNumber() *
-            tokenService.getUSDTokenPrice(
+            tokenPriceService.getUSDTokenPrice(
               x.extensions.mint!.publicKey.toBase58()
             )
           )
@@ -44,7 +44,7 @@ export function useTotalTreasuryPrice() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     JSON.stringify(governedTokenAccountsWithoutNfts),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    JSON.stringify(tokenService._tokenPriceToUSDlist),
+    JSON.stringify(tokenPriceService._tokenPriceToUSDlist),
   ])
 
   return {

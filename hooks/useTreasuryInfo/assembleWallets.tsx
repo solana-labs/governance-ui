@@ -26,6 +26,8 @@ import {
 } from './groupProgramsByWallet'
 import { getRulesFromAccount } from './getRulesFromAccount'
 import { abbreviateAddress } from '@utils/formatting'
+import { Domain } from '@models/treasury/Domain'
+import { groupDomainsByWallet } from './groupDomainsByWallet'
 import { ConnectionContext } from '@utils/connection'
 import { PublicKey } from '@solana/web3.js'
 import getTokenOwnerRecordsForWallet from './getTokenOwnerRecordsForWallet'
@@ -39,6 +41,7 @@ export const assembleWallets = async (
   connection: ConnectionContext,
   accounts: AssetAccount[],
   nfts: NFT[],
+  domains: Domain[],
   programId: PublicKey,
   councilMintAddress?: string,
   communityMintAddress?: string,
@@ -57,6 +60,7 @@ export const assembleWallets = async (
     programId,
     programs
   )
+  const domainsGroupedByWallet = groupDomainsByWallet(domains)
   const ungovernedAssets: AssetAccount[] = []
   const governanceToWallet: { [address: string]: string } = {}
 
@@ -170,6 +174,27 @@ export const assembleWallets = async (
       id: 'program-list',
       count: new BigNumber(dataAccounts.length),
       list: dataAccounts,
+    })
+  }
+
+  for (const [walletAddress, domainList] of Object.entries(
+    domainsGroupedByWallet
+  )) {
+    if (!walletMap[walletAddress]) {
+      walletMap[walletAddress] = {
+        address: walletAddress,
+        assets: [],
+        rules: {},
+        stats: {},
+        totalValue: new BigNumber(0),
+      }
+    }
+
+    walletMap[walletAddress].assets.push({
+      type: AssetType.Domain,
+      id: 'domain-list',
+      count: new BigNumber(domainList.length),
+      list: domainList,
     })
   }
 
