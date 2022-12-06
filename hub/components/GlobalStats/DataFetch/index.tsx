@@ -33,6 +33,7 @@ export function DataFetch(props: Props) {
   useEffect(() => {
     if (props.runCount) {
       fetchData(props.connection, props.logger, {
+        onComplete: props.onComplete,
         onMembersComplete: props.onMembersComplete,
         onNFTRealms: props.onNFTRealms,
         onNFTRealmsComplete: props.onNFTRealmsComplete,

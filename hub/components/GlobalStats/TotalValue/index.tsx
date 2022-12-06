@@ -24,9 +24,10 @@ export function TotalValue(props: Props) {
     >
       <common.Label>Total Value Locked</common.Label>
       <common.Value>
-        {formatNumber(props.value, undefined, {
-          maximumFractionDigits: 0,
-        })}
+        {'$' +
+          formatNumber(props.value, undefined, {
+            maximumFractionDigits: 0,
+          })}
       </common.Value>
     </section>
   );
