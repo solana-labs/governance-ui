@@ -1,13 +1,18 @@
 import {
-  getAllGovernances,
   getNativeTreasuryAddress,
   getRealms,
   ProgramAccount,
   Realm,
+  getAllGovernances,
 } from '@solana/spl-governance'
+import { AccountInfo } from '@solana/spl-token'
 import { Connection, PublicKey } from '@solana/web3.js'
 import tokenPriceService from '@utils/services/tokenPrice'
-import { getOwnedTokenAccounts, tryGetMint } from '@utils/tokens'
+import {
+  TokenProgramAccount,
+  getOwnedTokenAccounts,
+  tryGetMint,
+} from '@utils/tokens'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getAllSplGovernanceProgramIds } from './tools/realms'
 import BigNumber from 'bignumber.js'
@@ -16,6 +21,70 @@ import { WSOL_MINT_PK } from '@components/instructions/tools'
 import { withSentry } from '@sentry/nextjs'
 import { getRealmConfigAccountOrDefault } from '@tools/governance/configs'
 import { chunks } from '@utils/helpers'
+import { gql, request } from 'graphql-request'
+import { HOLAPLEX_GRAPQL_URL_MAINNET } from '@tools/constants'
+import { differenceInMinutes, minutesToMilliseconds } from 'date-fns'
+import { pause } from '@utils/pause'
+
+interface CachedTokenAccounts {
+  time: number
+  value: TokenProgramAccount<AccountInfo>[]
+}
+
+const tokenAmounts = new Map<string, CachedTokenAccounts>()
+
+async function getTokenAmount(conn: Connection, publicKey: PublicKey) {
+  const cached = tokenAmounts.get(publicKey.toBase58())
+
+  if (cached) {
+    const now = Date.now()
+    const timePassed = Math.abs(differenceInMinutes(cached.time, now))
+
+    if (timePassed < minutesToMilliseconds(10)) {
+      return cached.value
+    }
+  }
+
+  const value = await getOwnedTokenAccounts(conn, publicKey)
+  tokenAmounts.set(publicKey.toBase58(), { value, time: Date.now() })
+  return value
+}
+
+const getGovernancesQuery = gql`
+  query($realm: PublicKey!) {
+    governances(realms: [$realm]) {
+      address
+    }
+  }
+`
+
+async function getGovernances(
+  conn: Connection,
+  programId: PublicKey,
+  realm: PublicKey
+): Promise<PublicKey[]> {
+  try {
+    const resp = await request(
+      HOLAPLEX_GRAPQL_URL_MAINNET,
+      getGovernancesQuery,
+      { realm }
+    )
+
+    if (!resp.governances || resp.governances.length === 0) {
+      throw new Error()
+    }
+
+    return resp.governances.map((g) => new PublicKey(g.address))
+  } catch (e) {
+    console.error(
+      `Failed to fetch governances for ${realm.toBase58()} using Holaplex, will try using PRC`
+    )
+    console.error(e)
+  }
+
+  const governances = await getAllGovernances(conn, programId, realm)
+  return governances.map((g) => g.pubkey)
+}
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const conn = new Connection(
@@ -79,10 +148,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     // Get Governances
-    const governances = await getAllGovernances(conn, programId, realm.pubkey)
-    for (const governance of governances) {
+    const governanceAddrs: PublicKey[] = await getGovernances(
+      conn,
+      programId,
+      realm.pubkey
+    )
+
+    for (const governanceAddress of governanceAddrs) {
       // Check governance owned token accounts
-      let tokenAccounts = await getOwnedTokenAccounts(conn, governance.pubkey)
+      let tokenAccounts = await getTokenAmount(conn, governanceAddress)
       for (const tokenAccount of tokenAccounts.filter(
         (ta) => !ta.account.amount.isZero()
       )) {
@@ -95,7 +169,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       // Check SOL wallet owned token accounts
       const solWalletPk = await getNativeTreasuryAddress(
         programId,
-        governance.pubkey
+        governanceAddress
       )
 
       const solWallet = await conn.getAccountInfo(solWalletPk)
@@ -105,7 +179,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           updateTokenAmount(WSOL_MINT_PK, new BN(solWallet.lamports))
         }
 
-        tokenAccounts = await getOwnedTokenAccounts(conn, solWalletPk)
+        tokenAccounts = await getTokenAmount(conn, solWalletPk)
         for (const tokenAccount of tokenAccounts.filter(
           (ta) => !ta.account.amount.isZero()
         )) {
@@ -123,8 +197,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   await tokenPriceService.fetchSolanaTokenList()
 
-  for (const chunk of chunks([...tokenAmountMap.keys()], 100)) {
+  for (const chunk of chunks([...tokenAmountMap.keys()], 50)) {
     await tokenPriceService.fetchTokenPrices(chunk)
+    await pause(1000)
   }
 
   let totalUsdAmount = 0

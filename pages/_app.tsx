@@ -16,7 +16,10 @@ export default function App({ Component, pageProps, router }: AppProps) {
   // the providers and perform data fetches in the relevant sub-apps (`HubApp`,
   // `BaseApp`) instead.
 
-  if (router.pathname.startsWith('/code')) {
+  if (
+    router.pathname.startsWith('/code') ||
+    router.pathname.startsWith('/stats')
+  ) {
     return <Component {...pageProps} />
   }
 
