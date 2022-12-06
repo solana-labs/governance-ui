@@ -83,7 +83,7 @@ async function fetchCollection(
 async function fetchCollections(
   configs: CollectionConfig[],
   connection: ConnectionContext,
-  mintPublicKey: PublicKey
+  mintPublicKey?: null | PublicKey
 ) {
   const collections = await Promise.all(
     configs.map((config) =>
@@ -99,7 +99,9 @@ async function fetchCollections(
     )
   )
 
-  const mint = await tryGetMint(connection.current, mintPublicKey)
+  const mint = mintPublicKey
+    ? await tryGetMint(connection.current, mintPublicKey)
+    : undefined
 
   return { collections, mint }
 }
@@ -167,7 +169,7 @@ export function NFTVotePluginSettingsDisplay(props: Props) {
     fetchCollections(
       collectionConfigs,
       connection,
-      registrar.governingTokenMint
+      registrar?.governingTokenMint
     )
       .then((collections) => {
         setCollections(RE.ok(collections))
