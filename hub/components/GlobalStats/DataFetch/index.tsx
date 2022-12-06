@@ -102,6 +102,7 @@ async function fetchData(
   logger: Logger,
   cbs: {
     onComplete?(): void;
+    onNFTRealms?(realms: PublicKey[]): void;
     onNFTRealmsComplete?(realms: PublicKey[]): void;
     onRealmsComplete?(realms: PublicKey[]): void;
     onTVLComplete?(value: number): void;
@@ -166,7 +167,7 @@ async function fetchData(
   for (const [idx, realm] of allRealms.entries()) {
     cbs.onUpdate?.({
       progress: 5 + 70 * (idx / allRealms.length),
-      text: `Fetching ${realm.name} wallets and tokens...`,
+      text: `Fetching "${realm.name}" wallets and tokens...`,
       title: 'Getting Realm details',
     });
 
@@ -183,6 +184,7 @@ async function fetchData(
       )
     ) {
       nftRealms.push(realm.publicKey);
+      cbs.onNFTRealms?.(nftRealms);
     }
 
     // Get Governances
@@ -195,30 +197,11 @@ async function fetchData(
 
     for (const governanceAddress of governanceAddrs) {
       // Check governance owned token accounts
-      let tokenAccounts = await getTokenAmount(connection, governanceAddress);
-      for (const tokenAccount of tokenAccounts.filter(
-        (ta) => !ta.account.amount.isZero(),
-      )) {
-        updateTokenAmount(
-          tokenAccount.account.mint,
-          tokenAccount.account.amount,
+      try {
+        const tokenAccounts = await getTokenAmount(
+          connection,
+          governanceAddress,
         );
-      }
-
-      // Check SOL wallet owned token accounts
-      const solWalletPk = await getNativeTreasuryAddress(
-        realm.programId,
-        governanceAddress,
-      );
-
-      const solWallet = await connection.getAccountInfo(solWalletPk);
-
-      if (solWallet) {
-        if (solWallet.lamports > 0) {
-          updateTokenAmount(WSOL_MINT_PK, new BN(solWallet.lamports));
-        }
-
-        tokenAccounts = await getTokenAmount(connection, solWalletPk);
         for (const tokenAccount of tokenAccounts.filter(
           (ta) => !ta.account.amount.isZero(),
         )) {
@@ -227,10 +210,43 @@ async function fetchData(
             tokenAccount.account.amount,
           );
         }
+      } catch (e) {
+        logger.error('Error fetching token accounts:');
+        logger.error(String(e));
+      }
+
+      // Check SOL wallet owned token accounts
+      try {
+        const solWalletPk = await getNativeTreasuryAddress(
+          realm.programId,
+          governanceAddress,
+        );
+
+        const solWallet = await connection.getAccountInfo(solWalletPk);
+
+        if (solWallet) {
+          if (solWallet.lamports > 0) {
+            updateTokenAmount(WSOL_MINT_PK, new BN(solWallet.lamports));
+          }
+
+          const tokenAccounts = await getTokenAmount(connection, solWalletPk);
+          for (const tokenAccount of tokenAccounts.filter(
+            (ta) => !ta.account.amount.isZero(),
+          )) {
+            updateTokenAmount(
+              tokenAccount.account.mint,
+              tokenAccount.account.amount,
+            );
+          }
+        }
+      } catch (e) {
+        logger.error('Error fetching sol accounts:');
+        logger.error(String(e));
       }
     }
   }
 
+  cbs.onNFTRealms?.(nftRealms);
   cbs.onNFTRealmsComplete?.(nftRealms);
   cbs.onUpdate?.({
     progress: 75,
@@ -290,6 +306,7 @@ interface Props {
   runCount: number;
   onComplete?(): void;
   onRealmsComplete?(realms: PublicKey[]): void;
+  onNFTRealms?(realms: PublicKey[]): void;
   onNFTRealmsComplete?(realm: PublicKey[]): void;
   onTVLComplete?(amount: number): void;
 }
@@ -304,6 +321,7 @@ export function DataFetch(props: Props) {
   useEffect(() => {
     if (props.runCount) {
       fetchData(props.connection, props.logger, {
+        onNFTRealms: props.onNFTRealms,
         onNFTRealmsComplete: props.onNFTRealmsComplete,
         onRealmsComplete: props.onRealmsComplete,
         onTVLComplete: props.onTVLComplete,

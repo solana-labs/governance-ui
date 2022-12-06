@@ -1,11 +1,13 @@
 import { PublicKey } from '@solana/web3.js';
 
 import * as common from '../common';
+import { LoadingDots } from '@hub/components/LoadingDots';
 import cx from '@hub/lib/cx';
 import { formatNumber } from '@hub/lib/formatNumber';
 
 interface Props {
   className?: string;
+  fetching?: boolean;
   realms: PublicKey[];
 }
 
@@ -24,7 +26,10 @@ export function NumNFTRealms(props: Props) {
         props.className,
       )}
     >
-      <common.Label>Number of NFT Realms</common.Label>
+      <div className="flex items-center">
+        <common.Label>Number of NFT Realms</common.Label>
+        {props.fetching && <LoadingDots className="text-base" />}
+      </div>
       <common.Value>
         {formatNumber(props.realms.length, undefined, {
           maximumFractionDigits: 0,

@@ -22,6 +22,7 @@ export function GlobalStats(props: Props) {
   const [totalValue, setTotalValue] = useState(0);
   const [nftRealms, setNFTRealms] = useState<PublicKey[]>([]);
   const [duration, setDuration] = useState('');
+  const [donefetchingNFTs, setDoneFetchingNFTs] = useState(false);
   const timer = useRef<number | null>(null);
   const connection = useRef(
     new Connection(
@@ -73,7 +74,7 @@ export function GlobalStats(props: Props) {
           </div>
         )}
         <NumRealms realms={realms} />
-        <NumNFTRealms realms={nftRealms} />
+        <NumNFTRealms fetching={!donefetchingNFTs} realms={nftRealms} />
         <TotalValue value={totalValue} />
         <DataFetch
           className="mt-10"
@@ -81,7 +82,11 @@ export function GlobalStats(props: Props) {
           logger={logger.current}
           runCount={runCount}
           onComplete={() => setRunning(false)}
-          onNFTRealmsComplete={setNFTRealms}
+          onNFTRealms={setNFTRealms}
+          onNFTRealmsComplete={(realms) => {
+            setNFTRealms(realms);
+            setDoneFetchingNFTs(true);
+          }}
           onRealmsComplete={setRealms}
           onTVLComplete={setTotalValue}
         />
