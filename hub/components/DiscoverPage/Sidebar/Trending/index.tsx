@@ -9,8 +9,7 @@ const CONFIG = [
   {
     name: 'Backpack',
     category: RealmCategory.Web3,
-    logo:
-      'https://static.ftx.com/nfts/e814aeb2-a599-4697-a199-abf077b8cd5f.jpeg',
+    logo: 'https://i.imgur.com/hdOFyqW.jpg',
     publicKey: new PublicKey('BqLWTZv8xfJiCtu9gm87T1EqtAnL2cCJ1PS9JoKn3oBy'),
     url: '/realm/Backpack',
   },
