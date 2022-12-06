@@ -134,6 +134,7 @@ import AddServiceToDID from './components/instructions/Identity/AddServiceToDID'
 import RemoveServiceFromDID from './components/instructions/Identity/RemoveServiceFromDID'
 import DualWithdraw from './components/instructions/Dual/DualWithdraw'
 import DualExercise from './components/instructions/Dual/DualExercise'
+import PsyFinanceMintAmericanOptions from './components/instructions/PsyFinance/MintAmericanOptions'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -464,6 +465,7 @@ const New = () => {
       [Instructions.InitSolendObligationAccount]: InitObligationAccount,
       [Instructions.DepositReserveLiquidityAndObligationCollateral]: DepositReserveLiquidityAndObligationCollateral,
       [Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity]: WithdrawObligationCollateralAndRedeemReserveLiquidity,
+      [Instructions.PsyFinanceMintAmericanOptions]: PsyFinanceMintAmericanOptions,
       [Instructions.SwitchboardAdmitOracle]: SwitchboardAdmitOracle,
       [Instructions.SwitchboardRevokeOracle]: SwitchboardRevokeOracle,
       [Instructions.RefreshSolendObligation]: RefreshObligation,
