@@ -61,7 +61,11 @@ export function Stats(props: Props) {
 
   useEffect(() => {
     if (!running && wakePrevent.current) {
-      wakePrevent.current.release();
+      wakePrevent.current.release?.();
+    }
+
+    if (!running && timer.current && typeof window !== 'undefined') {
+      window.clearInterval(timer.current);
     }
   }, [running]);
 
