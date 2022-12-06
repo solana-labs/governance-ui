@@ -24,7 +24,8 @@ export default function App({ Component, pageProps, router }: AppProps) {
     router.pathname.startsWith('/realm/[id]') ||
     router.pathname.startsWith('/ecosystem') ||
     router.pathname.startsWith('/discover') ||
-    router.pathname.startsWith('/feed')
+    router.pathname.startsWith('/feed') ||
+    router.pathname.startsWith('/stats')
   ) {
     return (
       <HubApp>
