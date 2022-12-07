@@ -3,15 +3,15 @@ import React, { useContext, useEffect, useState } from 'react'
 import { ProgramAccount, Governance } from '@solana/spl-governance'
 import {
   UiInstruction,
-  DualFinanceStakingOptionForm,
+  DualFinanceExerciseForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Input from '@components/inputs/Input'
-import getConfigInstruction from '@utils/instructions/Dual'
+import { getExerciseInstruction } from '@utils/instructions/Dual'
 import useWalletStore from 'stores/useWalletStore'
-import { getDualFinanceStakingOptionSchema } from '@utils/validations'
+import { getDualFinanceExerciseSchema } from '@utils/validations'
 import Tooltip from '@components/Tooltip'
 
 const DualExercise = ({
@@ -21,16 +21,12 @@ const DualExercise = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const [form, setForm] = useState<DualFinanceStakingOptionForm>({
-    soName: undefined,
-    optionExpirationUnixSeconds: 0,
+  const [form, setForm] = useState<DualFinanceExerciseForm>({
     numTokens: 0,
-    lotSize: 0,
+    soName: undefined,
     baseTreasury: undefined,
     quoteTreasury: undefined,
-    payer: undefined,
-    userPk: undefined,
-    strike: 0,
+    optionAccount: undefined,
   })
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
@@ -47,7 +43,7 @@ const DualExercise = ({
     setForm({ ...form, [propertyName]: value })
   }
   function getInstruction(): Promise<UiInstruction> {
-    return getConfigInstruction({
+    return getExerciseInstruction({
       connection,
       form,
       schema,
@@ -64,11 +60,13 @@ const DualExercise = ({
   useEffect(() => {
     setGovernedAccount(form.baseTreasury?.governance)
   }, [form.baseTreasury])
-  const schema = getDualFinanceStakingOptionSchema()
+  const schema = getDualFinanceExerciseSchema()
 
+  // TODO: Find the name from metaplex from a token lookup once that is
+  // connected to the program.
   return (
     <>
-      <Tooltip content="Custom name to identify the Staking Option">
+      <Tooltip content="Identifier for the Staking Option">
         <Input
           label="Name"
           value={form.soName}
@@ -82,20 +80,20 @@ const DualExercise = ({
           error={formErrors['soName']}
         />
       </Tooltip>
-      <Tooltip content="Treasury owned account providing the assets for the option. When the recipient exercises, these are the tokens they receive. For SOL/USDC Calls, enter SOL. For SOL/USDC Puts, enter USDC.">
+      <Tooltip content="Option token that will be exercised.">
         <GovernedAccountSelect
-          label="Base Treasury"
+          label="Option Account"
           governedAccounts={governedTokenAccountsWithoutNfts}
           onChange={(value) => {
-            handleSetForm({ value, propertyName: 'baseTreasury' })
+            handleSetForm({ value, propertyName: 'optionAccount' })
           }}
-          value={form.baseTreasury}
-          error={formErrors['baseTreasury']}
+          value={form.optionAccount}
+          error={formErrors['optionAccount']}
           shouldBeGoverned={shouldBeGoverned}
           governance={governance}
         ></GovernedAccountSelect>
       </Tooltip>
-      <Tooltip content="Treasury owned account receiving payment for the option exercise. This is where payments from exercise accumulate. For SOL/USDC Calls, enter USDC. For SOL/USDC Puts, enter SOL.">
+      <Tooltip content="Treasury owned account providing the payment for the option.">
         <GovernedAccountSelect
           label="Quote Treasury"
           governedAccounts={governedTokenAccountsWithoutNfts}
@@ -108,7 +106,20 @@ const DualExercise = ({
           governance={governance}
         ></GovernedAccountSelect>
       </Tooltip>
-      <Tooltip content="How many tokens are in the staking options. Units are in atoms of the base token.">
+      <Tooltip content="Treasury owned account receiving the option exercise.">
+        <GovernedAccountSelect
+          label="Base Treasury"
+          governedAccounts={governedTokenAccountsWithoutNfts}
+          onChange={(value) => {
+            handleSetForm({ value, propertyName: 'baseTreasury' })
+          }}
+          value={form.baseTreasury}
+          error={formErrors['baseTreasury']}
+          shouldBeGoverned={shouldBeGoverned}
+          governance={governance}
+        ></GovernedAccountSelect>
+      </Tooltip>
+      <Tooltip content="How many option tokens are exercised staking options.">
         <Input
           label="Quantity"
           value={form.numTokens}
@@ -120,80 +131,6 @@ const DualExercise = ({
             })
           }
           error={formErrors['numTokens']}
-        />
-      </Tooltip>
-      <Tooltip content="Date in unix seconds for option expiration">
-        <Input
-          label="Expiration"
-          value={form.optionExpirationUnixSeconds}
-          type="number"
-          onChange={(evt) =>
-            handleSetForm({
-              value: evt.target.value,
-              propertyName: 'optionExpirationUnixSeconds',
-            })
-          }
-          error={formErrors['optionExpirationUnixSeconds']}
-        />
-      </Tooltip>
-      <Tooltip content="Strike price for the staking option. Units are quote atoms per lot. So if it is a SOL/USDC put with a lot size of 1 USDC, then this is lamports per USDC.">
-        <Input
-          label="Strike"
-          value={form.strike}
-          type="number"
-          onChange={(evt) =>
-            handleSetForm({
-              value: evt.target.value,
-              propertyName: 'strike',
-            })
-          }
-          error={formErrors['strike']}
-        />
-      </Tooltip>
-      <Tooltip content="Lot size for base atoms. This is the min size of an option.">
-        <Input
-          label="Lot Size"
-          value={form.lotSize}
-          type="number"
-          onChange={(evt) =>
-            handleSetForm({
-              value: evt.target.value,
-              propertyName: 'lotSize',
-            })
-          }
-          error={formErrors['lotSize']}
-        />
-      </Tooltip>
-      <Tooltip content="Rent payer. Should be the governance wallet with same governance as base treasury">
-        <GovernedAccountSelect
-          label="Payer Account"
-          governedAccounts={governedTokenAccountsWithoutNfts.filter(
-            (x) =>
-              x.isSol &&
-              form.baseTreasury?.governance &&
-              x.governance.pubkey.equals(form.baseTreasury.governance.pubkey)
-          )}
-          onChange={(value) => {
-            handleSetForm({ value, propertyName: 'payer' })
-          }}
-          value={form.payer}
-          error={formErrors['payer']}
-          shouldBeGoverned={shouldBeGoverned}
-          governance={governance}
-        ></GovernedAccountSelect>
-      </Tooltip>
-      <Tooltip content="Recipient (Wallet address) of the staking options">
-        <Input
-          label="Recipient Public Key"
-          value={form.userPk}
-          type="text"
-          onChange={(evt) =>
-            handleSetForm({
-              value: evt.target.value,
-              propertyName: 'userPk',
-            })
-          }
-          error={formErrors['userPk']}
         />
       </Tooltip>
     </>

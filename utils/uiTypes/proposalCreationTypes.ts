@@ -704,6 +704,15 @@ export interface DualFinanceStakingOptionForm {
   userPk: string | undefined
 }
 
-export interface DualFinanceExerciseForm {}
+export interface DualFinanceExerciseForm {
+  numTokens: number
+  soName: string | undefined
+  baseTreasury: AssetAccount | undefined
+  quoteTreasury: AssetAccount | undefined
+  optionAccount: AssetAccount | undefined
+}
 
-export interface DualFinanceWithdrawForm {}
+export interface DualFinanceWithdrawForm {
+  soName: string | undefined
+  baseTreasury: AssetAccount | undefined
+}

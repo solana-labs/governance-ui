@@ -567,7 +567,22 @@ export const getDualFinanceStakingOptionSchema = () => {
   })
 }
 
-/////// DUAL exercise and withdraw
+export const getDualFinanceExerciseSchema = () => {
+  return yup.object().shape({
+    soName: yup.string().required('Staking option name is required'),
+    optionAccount: yup.object().required('Option account is required'),
+    numTokens: yup.number().typeError('Num tokens is required'),
+    baseTreasury: yup.object().typeError('baseTreasury is required'),
+    quoteTreasury: yup.object().typeError('quoteTreasury is required'),
+  })
+}
+
+export const getDualFinanceWithdrawSchema = () => {
+  return yup.object().shape({
+    soName: yup.string().required('Staking option name is required'),
+    baseTreasury: yup.object().typeError('baseTreasury is required'),
+  })
+}
 
 export const getGoblinGoldDepositSchema = ({ form }) => {
   const governedTokenAccount = form.governedTokenAccount as AssetAccount

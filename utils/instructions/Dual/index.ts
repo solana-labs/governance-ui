@@ -13,7 +13,9 @@ import { StakingOptions } from '@dual-finance/staking-options'
 import { ConnectionContext } from '@utils/connection'
 import { validateInstruction } from '@utils/instructionTools'
 import {
+  DualFinanceExerciseForm,
   DualFinanceStakingOptionForm,
+  DualFinanceWithdrawForm,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import {
@@ -28,7 +30,7 @@ import {
 } from '@project-serum/serum/lib/token-instructions'
 import { Token } from '@solana/spl-token'
 
-interface Args {
+interface StakingOptionArgs {
   connection: ConnectionContext
   form: DualFinanceStakingOptionForm
   setFormErrors: any
@@ -40,13 +42,13 @@ function getStakingOptionsApi(connection: ConnectionContext) {
   return new StakingOptions(connection.endpoint, 'confirmed')
 }
 
-export default async function getConfigInstruction({
+export async function getConfigInstruction({
   connection,
   wallet,
   form,
   schema,
   setFormErrors,
-}: Args): Promise<UiInstruction> {
+}: StakingOptionArgs): Promise<UiInstruction> {
   const isValid = await validateInstruction({ schema, form, setFormErrors })
 
   const serializedInstruction = ''
@@ -194,6 +196,7 @@ export default async function getConfigInstruction({
       )
     )
 
+    console.log(form.payer.extensions.transferAddress!.toBase58())
     return {
       serializedInstruction,
       isValid: true,
@@ -217,4 +220,93 @@ export default async function getConfigInstruction({
   return obj
 }
 
-///////// Withdraw and Exercise
+interface ExerciseArgs {
+  connection: ConnectionContext
+  form: DualFinanceExerciseForm
+  setFormErrors: any
+  schema: any
+  wallet: WalletAdapter | undefined
+}
+
+export async function getExerciseInstruction({
+  connection,
+  wallet,
+  form,
+  schema,
+  setFormErrors,
+}: ExerciseArgs): Promise<UiInstruction> {
+  const isValid = await validateInstruction({ schema, form, setFormErrors })
+
+  const serializedInstruction = ''
+  const additionalSerializedInstructions: string[] = []
+  if (isValid && form.soName && form.baseTreasury && wallet?.publicKey) {
+    const so = getStakingOptionsApi(connection)
+    const baseMint = form.baseTreasury.extensions.mint?.publicKey
+
+    // TODO: Fill this in
+    return {
+      serializedInstruction,
+      isValid: true,
+      governance: form.baseTreasury?.governance,
+      additionalSerializedInstructions,
+    }
+  }
+
+  return {
+    serializedInstruction,
+    isValid: false,
+    governance: form.baseTreasury?.governance,
+    additionalSerializedInstructions: [],
+    chunkSplitByDefault: true,
+    chunkBy: 1,
+  }
+}
+
+interface WithdrawArgs {
+  connection: ConnectionContext
+  form: DualFinanceWithdrawForm
+  setFormErrors: any
+  schema: any
+  wallet: WalletAdapter | undefined
+}
+
+export async function getWithdrawInstruction({
+  connection,
+  wallet,
+  form,
+  schema,
+  setFormErrors,
+}: WithdrawArgs): Promise<UiInstruction> {
+  const isValid = await validateInstruction({ schema, form, setFormErrors })
+
+  const serializedInstruction = ''
+  const additionalSerializedInstructions: string[] = []
+  if (isValid && form.soName && form.baseTreasury && wallet?.publicKey) {
+    const so = getStakingOptionsApi(connection)
+    const baseMint = form.baseTreasury.extensions.mint?.publicKey
+
+    const withdrawInstruction = await so.createWithdrawInstruction(
+      form.soName,
+      form.baseTreasury.extensions.solAccount?.owner!,
+      baseMint!,
+      form.baseTreasury.pubkey
+    )
+    additionalSerializedInstructions.push(
+      serializeInstructionToBase64(withdrawInstruction)
+    )
+
+    return {
+      serializedInstruction,
+      isValid: true,
+      governance: form.baseTreasury?.governance,
+      additionalSerializedInstructions,
+    }
+  }
+
+  return {
+    serializedInstruction,
+    isValid: false,
+    governance: form.baseTreasury?.governance,
+    additionalSerializedInstructions: [],
+  }
+}
