@@ -8,6 +8,7 @@ export const getRealm = gql`
     realmByUrlId(urlId: $urlId) {
       amAdmin
       bannerImageUrl
+      displayName
       iconUrl
       name
       publicKey
@@ -31,6 +32,7 @@ export const getRealmResp = IT.type({
   realmByUrlId: IT.type({
     amAdmin: IT.boolean,
     bannerImageUrl: IT.union([IT.null, IT.string]),
+    displayName: IT.union([IT.null, IT.string]),
     iconUrl: IT.union([IT.null, IT.string]),
     name: IT.string,
     publicKey: PublicKey,

@@ -32,6 +32,22 @@
           {
             "pattern": "@hub/**/**",
             "group": "parent"
+          },
+          {
+            "pattern": "@tools/**/**",
+            "group": "parent"
+          },
+          {
+            "pattern": "@utils/**/**",
+            "group": "parent"
+          },
+          {
+            "pattern": "@components/**/**",
+            "group": "parent"
+          },
+          {
+            "pattern": "pages/**/**",
+            "group": "parent"
           }
         ],
         "alphabetize": {
