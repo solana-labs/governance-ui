@@ -196,7 +196,6 @@ export async function getConfigInstruction({
       )
     )
 
-    console.log(form.payer.extensions.transferAddress!.toBase58())
     return {
       serializedInstruction,
       isValid: true,
