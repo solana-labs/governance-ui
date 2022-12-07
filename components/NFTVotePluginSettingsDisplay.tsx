@@ -4,7 +4,7 @@ import { gql, request } from 'graphql-request'
 import React, { useEffect, useState } from 'react'
 import { pipe } from 'fp-ts/lib/function'
 import cx from 'classnames'
-import ChevronRightIcon from '@carbon/icons-react/lib/ChevronRight'
+// import ChevronRightIcon from '@carbon/icons-react/lib/ChevronRight'
 
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import {
@@ -52,7 +52,7 @@ async function fetchCollection(
 
   const resp = await request(endpoint, getCollectionQuery, {
     collectionAddress: address.toBase58(),
-    limit: count,
+    limit: 1,
   })
 
   const nftsRaw = resp.nfts || []
@@ -107,50 +107,50 @@ async function fetchCollections(
 }
 
 type Data = Awaited<ReturnType<typeof fetchCollections>>
-type Collections = Data['collections']
-type NFTs = Collections[number]['nfts']
+// type Collections = Data['collections']
+// type NFTs = Collections[number]['nfts']
 
-function NFTList(props: { className?: string; nfts: NFTs }) {
-  const [expanded, setExpanded] = useState(false)
+// function NFTList(props: { className?: string; nfts: NFTs }) {
+//   const [expanded, setExpanded] = useState(false)
 
-  return (
-    <div className={props.className}>
-      <button
-        className="flex items-center text-xs text-primary-light"
-        onClick={() => setExpanded((cur) => !cur)}
-      >
-        <div>{expanded ? 'Hide' : 'View'} NFTs</div>
-        <ChevronRightIcon
-          className={cx(
-            'h-4',
-            'w-4',
-            'fill-current',
-            'transition-transform',
-            expanded && 'rotate-90'
-          )}
-        />
-      </button>
-      {expanded && (
-        <div className="mt-2">
-          <div className="grid grid-cols-[25%,1fr] text-white/50 text-xs gap-1">
-            <div>Name</div>
-            <div>Owner</div>
-          </div>
-          <div className="grid grid-cols-[25%,1fr] text-sm text-fgd-1 gap-1 mt-1 max-h-96 overflow-y-auto">
-            {props.nfts.map((nft, i) => (
-              <React.Fragment key={i}>
-                <div className="truncate">{nft.name}</div>
-                <div className="truncate">
-                  {nft.owner ? nft.owner.toBase58() : ''}
-                </div>
-              </React.Fragment>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
+//   return (
+//     <div className={props.className}>
+//       <button
+//         className="flex items-center text-xs text-primary-light"
+//         onClick={() => setExpanded((cur) => !cur)}
+//       >
+//         <div>{expanded ? 'Hide' : 'View'} NFTs</div>
+//         <ChevronRightIcon
+//           className={cx(
+//             'h-4',
+//             'w-4',
+//             'fill-current',
+//             'transition-transform',
+//             expanded && 'rotate-90'
+//           )}
+//         />
+//       </button>
+//       {expanded && (
+//         <div className="mt-2">
+//           <div className="grid grid-cols-[25%,1fr] text-white/50 text-xs gap-1">
+//             <div>Name</div>
+//             <div>Owner</div>
+//           </div>
+//           <div className="grid grid-cols-[25%,1fr] text-sm text-fgd-1 gap-1 mt-1 max-h-96 overflow-y-auto">
+//             {props.nfts.map((nft, i) => (
+//               <React.Fragment key={i}>
+//                 <div className="truncate">{nft.name}</div>
+//                 <div className="truncate">
+//                   {nft.owner ? nft.owner.toBase58() : ''}
+//                 </div>
+//               </React.Fragment>
+//             ))}
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   )
+// }
 
 interface Props {
   className?: string
@@ -195,7 +195,7 @@ export function NFTVotePluginSettingsDisplay(props: Props) {
             <NFTIcon className="h-5 w-5 stroke-current" />{' '}
             <span>NFT Voting Configuration</span>
           </div>
-          <div className="rounded bg-bkg-2 px-6 py-4 mt-4 h-[172px] animate-pulse" />
+          <div className="rounded bg-bkg-2 px-6 py-4 mt-4 h-[140px] animate-pulse" />
         </div>
       ),
       ({ collections, mint }) => (
@@ -235,7 +235,7 @@ export function NFTVotePluginSettingsDisplay(props: Props) {
                         .toFormat()}
                     </div>
                   </div>
-                  <NFTList className="mt-4" nfts={collection.nfts} />
+                  {/* <NFTList className="mt-4" nfts={collection.nfts} /> */}
                 </div>
               </div>
             </div>
