@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import ChevronRightIcon from '@carbon/icons-react/lib/ChevronRight';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import ChevronRightIcon from '@carbon/icons-react/lib/ChevronRight';
+import { useEffect, useState } from 'react';
 
 import { abbreviateNumber } from '@hub/lib/abbreviateNumber';
 import cx from '@hub/lib/cx';
