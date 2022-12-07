@@ -66,6 +66,12 @@ class RealmsDocument extends Document {
           <meta name="twitter:title" content="Realms" />
           <meta property="og:type" content="website" />
           <meta name="twitter:card" content="summary" />
+
+          <script
+            type="text/javascript"
+            src="https://terminal.jup.ag/main.js"
+          />
+          <link rel="stylesheet" href="https://terminal.jup.ag/main.css" />
         </Head>
         <body>
           <Main />

@@ -11,12 +11,16 @@ import OverflowMenuHorizontalIcon from '@carbon/icons-react/lib/OverflowMenuHori
 import ProgressBarRound from '@carbon/icons-react/lib/ProgressBarRound';
 import UserFollow from '@carbon/icons-react/lib/UserFollow';
 import WalletIcon from '@carbon/icons-react/lib/Wallet';
+
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
+import { useWallet } from '@solana/wallet-adapter-react';
 import type { PublicKey } from '@solana/web3.js';
 import { pipe } from 'fp-ts/lib/function';
 import Link from 'next/link';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useMediaQuery } from 'react-responsive';
+
+import useWalletStore from 'stores/useWalletStore';
 
 import * as Button from '@hub/components/controls/Button';
 import { HeaderTokenPrice } from '@hub/components/HeaderTokenPrice';
@@ -60,12 +64,31 @@ interface Props extends BaseProps {
 }
 
 export function Content(props: Props) {
-  const jupiterDirectLink = useMemo(() => {
-    if (props.token?.mint) {
-      return `https://jup.ag/swap/USDC-${props.token?.mint.toString()}?inAmount=1`;
+  const { wallet } = useWallet();
+  const connection = useWalletStore((s) => s.connection);
+  const endpoint = useMemo(() => connection.endpoint, [connection]);
+
+  const mint = useMemo(() => props.token?.mint.toString(), [props.token?.mint]);
+  const initJupiter = useCallback(() => {
+    const isLoaded = (window as any).Jupiter;
+    // If Jupiter is not loaded yet, keep polling and execute when it is.
+    if (!isLoaded) {
+      setTimeout(() => {
+        initJupiter();
+      }, 500);
+      return;
     }
-    return 'https://jup.ag';
-  }, [props.token]);
+
+    if (isLoaded && mint) {
+      (window as any).Jupiter.init({
+        mode: 'outputOnly',
+        mint,
+        endpoint,
+        passThroughWallet: wallet,
+      });
+    }
+  }, [mint, endpoint, wallet]);
+
   const showFullLinkList = useMediaQuery({ query: '(min-width: 768px)' });
   const hasExternalLinks = !!(
     props.websiteUrl ||
@@ -197,7 +220,7 @@ export function Content(props: Props) {
             {props.token && (
               <a
                 className="ml-2"
-                href={jupiterDirectLink}
+                onClick={initJupiter}
                 target="_blank"
                 rel="noreferrer"
               >
