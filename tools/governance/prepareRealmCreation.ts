@@ -341,17 +341,15 @@ export async function prepareRealmCreation({
   }
 
   // Set the community governance as the realm authority
-  if (transferCommunityMintAuthority) {
-    withSetRealmAuthority(
-      realmInstructions,
-      programIdPk,
-      programVersion,
-      realmPk,
-      walletPk,
-      communityMintGovPk,
-      SetRealmAuthorityAction.SetChecked
-    )
-  }
+  withSetRealmAuthority(
+    realmInstructions,
+    programIdPk,
+    programVersion,
+    realmPk,
+    walletPk,
+    communityMintGovPk,
+    SetRealmAuthorityAction.SetChecked
+  )
 
   return {
     communityMintGovPk,
