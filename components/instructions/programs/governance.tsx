@@ -343,11 +343,18 @@ export const GOVERNANCE_INSTRUCTIONS = {
               </p>
               <p>
                 {`useCommunityVoterWeightAddin:
-               ${!!args.configArgs.useCommunityVoterWeightAddin}`}
+               ${
+                 !!args.configArgs.useCommunityVoterWeightAddin ||
+                 !!args.configArgs.communityTokenConfigArgs.useVoterWeightAddin
+               }`}
               </p>
               <p>
                 {`useMaxCommunityVoterWeightAddin:
-               ${!!args.configArgs.useMaxCommunityVoterWeightAddin}`}
+               ${
+                 !!args.configArgs.useMaxCommunityVoterWeightAddin ||
+                 !!args.configArgs.communityTokenConfigArgs
+                   .useMaxVoterWeightAddin
+               }`}
               </p>
               <p>
                 {proposedPluginPk && (
