@@ -60,6 +60,7 @@ interface RealmCreation {
   councilWalletPks: PublicKey[]
 
   communityTokenConfig?: GoverningTokenConfigAccountArgs
+  skipRealmAuthority?: boolean
 }
 
 export async function prepareRealmCreation({
@@ -86,6 +87,8 @@ export async function prepareRealmCreation({
   councilWalletPks,
 
   communityTokenConfig = undefined,
+
+  skipRealmAuthority = false,
 }: RealmCreation) {
   const realmInstructions: TransactionInstruction[] = []
   const realmSigners: Keypair[] = []
@@ -341,15 +344,17 @@ export async function prepareRealmCreation({
   }
 
   // Set the community governance as the realm authority
-  withSetRealmAuthority(
-    realmInstructions,
-    programIdPk,
-    programVersion,
-    realmPk,
-    walletPk,
-    communityMintGovPk,
-    SetRealmAuthorityAction.SetChecked
-  )
+  if (!skipRealmAuthority) {
+    withSetRealmAuthority(
+      realmInstructions,
+      programIdPk,
+      programVersion,
+      realmPk,
+      walletPk,
+      communityMintGovPk,
+      SetRealmAuthorityAction.SetChecked
+    )
+  }
 
   return {
     communityMintGovPk,

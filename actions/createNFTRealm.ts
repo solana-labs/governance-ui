@@ -115,6 +115,8 @@ export default async function createNFTRealm({
       maxVoterWeightAddin: new PublicKey(nftPluginsPks[0]),
       tokenType: GoverningTokenType.Liquid,
     }),
+
+    skipRealmAuthority: true,
   })
 
   console.log('NFT REALM realm public-key', realmPk.toBase58())
