@@ -212,11 +212,10 @@ export const GOVERNANCE_INSTRUCTIONS = {
           publicKey: walletPk,
         }
         const instructionMoq = new InstructionData({
-          programId: new PublicKey(governanceProgramId),
+          programId: realm.owner,
           accounts: accounts,
           data: data,
         })
-
         const [
           programVersion,
           communityMint,
@@ -236,7 +235,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
         ) as SetRealmConfigArgs
 
         const possibleRealmConfigsAccounts = simulationResults.response.accounts?.filter(
-          (x) => x?.owner === governanceProgramId
+          (x) => x?.owner === realm.owner.toBase58()
         )
         let parsedRealmConfig: null | ProgramAccount<RealmConfigAccount> = null
         if (possibleRealmConfigsAccounts) {
@@ -247,7 +246,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
                 //moq for accountInfo
                 {
                   data: Buffer.from(acc!.data[0], 'base64'),
-                  owner: new PublicKey(governanceProgramId),
+                  owner: realm.owner,
                 } as any
               )
               parsedRealmConfig = account as ProgramAccount<RealmConfigAccount>
@@ -258,6 +257,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
         const proposedPluginPk = parsedRealmConfig?.account?.communityTokenConfig?.voterWeightAddin?.toBase58()
         const proposedMaxVoterWeightPk = parsedRealmConfig?.account?.communityTokenConfig?.maxVoterWeightAddin?.toBase58()
         isLoading = false
+
         return isLoading ? (
           <Loading></Loading>
         ) : (
@@ -343,11 +343,18 @@ export const GOVERNANCE_INSTRUCTIONS = {
               </p>
               <p>
                 {`useCommunityVoterWeightAddin:
-               ${!!args.configArgs.useCommunityVoterWeightAddin}`}
+               ${
+                 !!args.configArgs.useCommunityVoterWeightAddin ||
+                 !!args.configArgs.communityTokenConfigArgs.useVoterWeightAddin
+               }`}
               </p>
               <p>
                 {`useMaxCommunityVoterWeightAddin:
-               ${!!args.configArgs.useMaxCommunityVoterWeightAddin}`}
+               ${
+                 !!args.configArgs.useMaxCommunityVoterWeightAddin ||
+                 !!args.configArgs.communityTokenConfigArgs
+                   .useMaxVoterWeightAddin
+               }`}
               </p>
               <p>
                 {proposedPluginPk && (

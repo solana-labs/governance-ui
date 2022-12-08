@@ -60,16 +60,6 @@ export function Stats(props: Props) {
   }, [running]);
 
   useEffect(() => {
-    if (!running && wakePrevent.current) {
-      wakePrevent.current.release?.();
-    }
-
-    if (!running && timer.current && typeof window !== 'undefined') {
-      window.clearInterval(timer.current);
-    }
-  }, [running]);
-
-  useEffect(() => {
     return () => {
       if (wakePrevent.current) {
         wakePrevent.current.release();
@@ -104,7 +94,7 @@ export function Stats(props: Props) {
             Run
           </Button.Primary>
         </div>
-        {running && duration && (
+        {duration && (
           <div className="mt-2 text-sm text-neutral-500 text-center">
             Time elapsed: {duration}
           </div>
@@ -119,7 +109,17 @@ export function Stats(props: Props) {
           className="mt-10"
           connection={connection.current}
           logger={logger.current}
-          onComplete={() => setRunning(false)}
+          onComplete={() => {
+            if (wakePrevent?.current?.release) {
+              wakePrevent.current.release();
+            }
+
+            if (timer?.current) {
+              window.clearInterval(timer.current);
+            }
+
+            setRunning(false);
+          }}
           onMembersComplete={setMembers}
           onNFTRealms={setNFTRealms}
           onNFTRealmsComplete={(realms) => {

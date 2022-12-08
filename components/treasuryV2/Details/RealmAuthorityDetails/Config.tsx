@@ -18,6 +18,7 @@ import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import useRealm from '@hooks/useRealm'
 import Section from '../Section'
 import Address from '@components/Address'
+import { NFTVotePluginSettingsDisplay } from '@components/NFTVotePluginSettingsDisplay'
 
 const DISABLED = new BigNumber(DISABLED_VOTER_WEIGHT.toString())
 
@@ -133,6 +134,7 @@ export default function Config(props: Props) {
           <Section key={title} value={value} name={title} icon={icon} />
         ))}
       </div>
+      <NFTVotePluginSettingsDisplay className="mt-24" />
       {editRealmOpen && (
         <RealmConfigModal
           isProposalModalOpen
