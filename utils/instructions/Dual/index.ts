@@ -245,7 +245,7 @@ export async function getExerciseInstruction({
 
     let strike = 1
     for (let candidate of state.strikes as any) {
-      // Check for the
+      // Check for the strike in the list of strikes
       let candidateStrike = Number(candidate)
       if (
         (await so.soMint(candidateStrike, form.soName, baseMint)).toBase58() ==
@@ -255,7 +255,19 @@ export async function getExerciseInstruction({
       }
     }
 
-    await so.createExerciseInstruction(
+    const feeAccount = await so.getFeeAccount(
+      form.quoteTreasury?.extensions.mint?.publicKey!
+    )
+    if ((await connection.current.getAccountInfo(feeAccount)) === null) {
+      const [ataIx] = await createAssociatedTokenAccount(
+        wallet.publicKey,
+        new PublicKey('7Z36Efbt7a4nLiV7s5bY7J2e4TJ6V9JEKGccsy2od2bE'),
+        form.quoteTreasury?.extensions.mint?.publicKey!
+      )
+      additionalSerializedInstructions.push(serializeInstructionToBase64(ataIx))
+    }
+
+    const exerciseInstruction = await so.createExerciseInstruction(
       form.numTokens,
       strike,
       form.soName,
@@ -263,6 +275,9 @@ export async function getExerciseInstruction({
       form.optionAccount?.pubkey!,
       form.quoteTreasury?.pubkey!,
       form.baseTreasury.pubkey
+    )
+    additionalSerializedInstructions.push(
+      serializeInstructionToBase64(exerciseInstruction)
     )
 
     return {
