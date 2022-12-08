@@ -255,14 +255,16 @@ export async function getExerciseInstruction({
       }
     }
 
-    const feeAccount = await so.getFeeAccount(
-      form.quoteTreasury?.extensions.mint?.publicKey!
-    )
+    const stateObj = await so.getState(form.soName, baseMint)
+    const quoteMint: PublicKey = stateObj.quoteMint as PublicKey
+
+    const feeAccount = await so.getFeeAccount(quoteMint)
+
     if ((await connection.current.getAccountInfo(feeAccount)) === null) {
       const [ataIx] = await createAssociatedTokenAccount(
         wallet.publicKey,
         new PublicKey('7Z36Efbt7a4nLiV7s5bY7J2e4TJ6V9JEKGccsy2od2bE'),
-        form.quoteTreasury?.extensions.mint?.publicKey!
+        quoteMint
       )
       additionalSerializedInstructions.push(serializeInstructionToBase64(ataIx))
     }
