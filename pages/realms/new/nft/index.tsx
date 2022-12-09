@@ -123,6 +123,8 @@ export default function NFTWizard() {
             maxVoterWeightAddin: new PublicKey(nftPluginsPks[0]),
             tokenType: GoverningTokenType.Liquid,
           }),
+
+          skipRealmAuthority: true,
         },
       }
 
