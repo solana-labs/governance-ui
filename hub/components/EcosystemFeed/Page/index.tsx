@@ -1,4 +1,3 @@
-import * as Separator from '@radix-ui/react-separator';
 import { pipe } from 'fp-ts/function';
 import React from 'react';
 
@@ -91,15 +90,14 @@ export function Page(props: Props) {
                 feedItem.node.realmPublicKey.toBase58();
 
               return (
-                <React.Fragment key={feedItem.node.id}>
-                  <FeedItem.Content
-                    feedItem={feedItem.node}
-                    realm={feedItem.node.realmPublicKey}
-                    realmInfo={feedItem.node.realm}
-                    realmUrlId={realmUrlId}
-                  />
-                  <Separator.Root className="w-full h-[1px] bg-neutral-300 my-4" />
-                </React.Fragment>
+                <FeedItem.Content
+                  className="mb-16"
+                  key={feedItem.node.id}
+                  feedItem={feedItem.node}
+                  realm={feedItem.node.realmPublicKey}
+                  realmInfo={feedItem.node.realm}
+                  realmUrlId={realmUrlId}
+                />
               );
             })}
           </div>

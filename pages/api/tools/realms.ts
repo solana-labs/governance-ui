@@ -1,10 +1,10 @@
 import { getCertifiedRealmInfos } from '@models/registry/api'
 import { getConnectionContext } from '@utils/connection'
 
-export function getAllSplGovernanceProgramIds() {
+export function getAllSplGovernanceProgramIds(cluster = 'mainnet') {
   return [
     ...new Set(
-      getCertifiedRealmInfos(getConnectionContext('mainnet')).map((info) =>
+      getCertifiedRealmInfos(getConnectionContext(cluster)).map((info) =>
         info.programId.toBase58()
       )
     ),

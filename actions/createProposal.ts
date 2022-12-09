@@ -249,9 +249,17 @@ export const createProposal = async (
             )
         )
     )
-
+    const deduplicatedPrerequisiteInstructionsSigners = prerequisiteInstructionsSigners.filter(
+      (value, index, self) =>
+        index ===
+        self.findIndex(
+          (t) =>
+            t.publicKey.toString() === value.publicKey.toString() &&
+            t.secretKey.toString() === value.secretKey.toString()
+        )
+    )
     const signersSet = [
-      ...chunks([...prerequisiteInstructionsSigners], 5),
+      ...chunks([...deduplicatedPrerequisiteInstructionsSigners], 5),
       [],
       ...signerChunks,
     ]

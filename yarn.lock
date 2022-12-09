@@ -746,6 +746,15 @@
     js-sha256 "^0.9.0"
     tweetnacl "1.0.3"
 
+"@dual-finance/staking-options@0.0.7":
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/@dual-finance/staking-options/-/staking-options-0.0.7.tgz#fef915ca8fd941502772165f587380f93157f462"
+  integrity sha512-6yTSN8IvTJkPi10B6Ad8WoSJ4mOqfg8NrXlIE71IiIx546/QGW6uwrNd+o3kiscREDpn56BdH1+co0LWeGsEiQ==
+  dependencies:
+    "@project-serum/anchor" "^0.25.0"
+    "@solana/spl-token" "^0.3.6"
+    "@solana/web3.js" "^1.66.2"
+
 "@emotion/babel-plugin@^11.7.1":
   version "11.7.2"
   resolved "https://registry.yarnpkg.com/@emotion/babel-plugin/-/babel-plugin-11.7.2.tgz#fec75f38a6ab5b304b0601c74e2a5e77c95e5fa0"
@@ -1453,7 +1462,7 @@
     "@solana/web3.js" "^1.63.1"
     bs58 "^4.0.1"
 
-"@identity.com/sol-did-client-legacy@^2.0.3":
+"@identity.com/sol-did-client-legacy@^2.0.4":
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/@identity.com/sol-did-client-legacy/-/sol-did-client-legacy-2.0.4.tgz#95b7be01f0022cd34abaee37cc11750f423f1b54"
   integrity sha512-+LrYg0g3UriEMLpOrzFFZ17eeCA3Ynuyg5cbaAFnoV5bmMCOKr8Y03DERQWrtagfvVJBsWBtz6h6v/ZQSzxnlQ==
@@ -1465,14 +1474,28 @@
     did-resolver "^3.0.1"
     ramda "^0.27.1"
 
-"@identity.com/sol-did-client@^3.1.2":
-  version "3.1.2"
-  resolved "https://registry.yarnpkg.com/@identity.com/sol-did-client/-/sol-did-client-3.1.2.tgz#47b15f6f5acba798a6ceff943345045b68422147"
-  integrity sha512-DyIykIadVPqy+8BjjwS0UTtI03dF+SurYi2vdXDeg02hzHYYQCwP4KJzRAj34XQKeK93TeB3ahRbKfiA0DJ2Jg==
+"@identity.com/sol-did-client@3.1.4":
+  version "3.1.4"
+  resolved "https://registry.yarnpkg.com/@identity.com/sol-did-client/-/sol-did-client-3.1.4.tgz#8902329ce0aaa09fd18c4d6d4da394a45006ca81"
+  integrity sha512-DRzSi3SlFm71+9MIguHN/1oM459StW1QENHLQaxBF03rKMu1M62IYZEbryjrr9S3WzUkgQXph6G3tPuq/gXGUw==
   dependencies:
     "@ethersproject/address" "^5.7.0"
     "@ethersproject/bytes" "^5.7.0"
-    "@identity.com/sol-did-client-legacy" "^2.0.3"
+    "@identity.com/sol-did-client-legacy" "^2.0.4"
+    "@identity.com/sol-did-idl" "^3.1.0"
+    "@project-serum/anchor" "0.25.0"
+    "@solana/web3.js" "^1.59.1"
+    bs58 "^5.0.0"
+    did-resolver "^3.2.2"
+
+"@identity.com/sol-did-client@^3.1.2":
+  version "3.1.3"
+  resolved "https://registry.yarnpkg.com/@identity.com/sol-did-client/-/sol-did-client-3.1.3.tgz#ee2da0eb1911c69fd8b79f50b68841997c16728c"
+  integrity sha512-2hWTa6wBYdNqaPd6kbit6nlOFXnap8KZk7gNzH/DvRgS+0HrqkwsBF4mk1CVKnk0Ewub42GO704Pmn8AHv2aZQ==
+  dependencies:
+    "@ethersproject/address" "^5.7.0"
+    "@ethersproject/bytes" "^5.7.0"
+    "@identity.com/sol-did-client-legacy" "^2.0.4"
     "@identity.com/sol-did-idl" "^3.1.0"
     "@project-serum/anchor" "0.25.0"
     "@solana/web3.js" "^1.59.1"
@@ -3034,6 +3057,17 @@
     "@radix-ui/react-primitive" "1.0.0"
     "@radix-ui/react-slot" "1.0.0"
 
+"@radix-ui/react-collection@1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-collection/-/react-collection-1.0.1.tgz#259506f97c6703b36291826768d3c1337edd1de5"
+  integrity sha512-uuiFbs+YCKjn3X1DTSx9G7BHApu4GHbi3kgiwsnFUbOKCrwejAJv4eE4Vc8C0Oaxt9T0aV4ox0WCOdx+39Xo+g==
+  dependencies:
+    "@babel/runtime" "^7.13.10"
+    "@radix-ui/react-compose-refs" "1.0.0"
+    "@radix-ui/react-context" "1.0.0"
+    "@radix-ui/react-primitive" "1.0.1"
+    "@radix-ui/react-slot" "1.0.1"
+
 "@radix-ui/react-compose-refs@1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@radix-ui/react-compose-refs/-/react-compose-refs-1.0.0.tgz#37595b1f16ec7f228d698590e78eeed18ff218ae"
@@ -3317,6 +3351,32 @@
     "@babel/runtime" "^7.13.10"
     "@radix-ui/react-slot" "1.0.1"
 
+"@radix-ui/react-progress@1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-progress/-/react-progress-1.0.1.tgz#49ec2f729a67ba3b580a90356fc1d871466a4212"
+  integrity sha512-QbDf9eguM5QtkvGcGHe/nUgloM9yfRGpJTB/Te5cn4WmVHvcbhHyHw39/rbCZxNX4E+GEPp5Vs6+mEoyIotUbg==
+  dependencies:
+    "@babel/runtime" "^7.13.10"
+    "@radix-ui/react-context" "1.0.0"
+    "@radix-ui/react-primitive" "1.0.1"
+
+"@radix-ui/react-radio-group@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-radio-group/-/react-radio-group-1.1.0.tgz#e1719e1c9af03230d1b02c1f180dee816544e1ec"
+  integrity sha512-7rrkZCXu0Q7oC0MxCm497X1DdV/tI78oNIGXA8sDbCkboiTkuLSe728zCCpRYHw+9PifHIx86nsbITPEq5yijg==
+  dependencies:
+    "@babel/runtime" "^7.13.10"
+    "@radix-ui/primitive" "1.0.0"
+    "@radix-ui/react-compose-refs" "1.0.0"
+    "@radix-ui/react-context" "1.0.0"
+    "@radix-ui/react-direction" "1.0.0"
+    "@radix-ui/react-presence" "1.0.0"
+    "@radix-ui/react-primitive" "1.0.1"
+    "@radix-ui/react-roving-focus" "1.0.1"
+    "@radix-ui/react-use-controllable-state" "1.0.0"
+    "@radix-ui/react-use-previous" "1.0.0"
+    "@radix-ui/react-use-size" "1.0.0"
+
 "@radix-ui/react-roving-focus@1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@radix-ui/react-roving-focus/-/react-roving-focus-1.0.0.tgz#aadeb65d5dbcdbdd037078156ae1f57c2ff754ee"
@@ -3330,6 +3390,22 @@
     "@radix-ui/react-direction" "1.0.0"
     "@radix-ui/react-id" "1.0.0"
     "@radix-ui/react-primitive" "1.0.0"
+    "@radix-ui/react-use-callback-ref" "1.0.0"
+    "@radix-ui/react-use-controllable-state" "1.0.0"
+
+"@radix-ui/react-roving-focus@1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-roving-focus/-/react-roving-focus-1.0.1.tgz#475621f63aee43faa183a5270f35d49e530de3d7"
+  integrity sha512-TB76u5TIxKpqMpUAuYH2VqMhHYKa+4Vs1NHygo/llLvlffN6mLVsFhz0AnSFlSBAvTBYVHYAkHAyEt7x1gPJOA==
+  dependencies:
+    "@babel/runtime" "^7.13.10"
+    "@radix-ui/primitive" "1.0.0"
+    "@radix-ui/react-collection" "1.0.1"
+    "@radix-ui/react-compose-refs" "1.0.0"
+    "@radix-ui/react-context" "1.0.0"
+    "@radix-ui/react-direction" "1.0.0"
+    "@radix-ui/react-id" "1.0.0"
+    "@radix-ui/react-primitive" "1.0.1"
     "@radix-ui/react-use-callback-ref" "1.0.0"
     "@radix-ui/react-use-controllable-state" "1.0.0"
 
@@ -4083,10 +4159,10 @@
     "@solana/web3.js" "^1.32.0"
     start-server-and-test "^1.14.0"
 
-"@solana/spl-token@^0.3.5":
-  version "0.3.5"
-  resolved "https://registry.yarnpkg.com/@solana/spl-token/-/spl-token-0.3.5.tgz#cabf9f92d755589420b46e457b9b10a879e755aa"
-  integrity sha512-0bGC6n415lGjKu02gkLOIpP1wzndSP0SHwN9PefJ+wKAhmfU1rl3AV1Pa41uap2kzSCD6F9642ngNO8KXPvh/g==
+"@solana/spl-token@^0.3.5", "@solana/spl-token@^0.3.6":
+  version "0.3.6"
+  resolved "https://registry.yarnpkg.com/@solana/spl-token/-/spl-token-0.3.6.tgz#35473ad2ed71fe91e5754a2ac72901e1b8b26a42"
+  integrity sha512-P9pTXjDIRvVbjr3J0mCnSamYqLnICeds7IoH1/Ro2R9OBuOHdp5pqKZoscfZ3UYrgnCWUc1bc9M2m/YPHjw+1g==
   dependencies:
     "@solana/buffer-layout" "^4.0.0"
     "@solana/buffer-layout-utils" "^0.2.0"
@@ -4577,7 +4653,7 @@
     "@wallet-standard/app" "^1.0.0"
     "@wallet-standard/base" "^1.0.0"
 
-"@solana/web3.js@1.42.0", "@solana/web3.js@1.56.0", "@solana/web3.js@1.66.2", "@solana/web3.js@^1.16.1", "@solana/web3.js@^1.17.0", "@solana/web3.js@^1.20.0", "@solana/web3.js@^1.21.0", "@solana/web3.js@^1.22.0", "@solana/web3.js@^1.29.2", "@solana/web3.js@^1.30.2", "@solana/web3.js@^1.31.0", "@solana/web3.js@^1.32.0", "@solana/web3.js@^1.35.0", "@solana/web3.js@^1.35.1", "@solana/web3.js@^1.36.0", "@solana/web3.js@^1.37.1", "@solana/web3.js@^1.42.0", "@solana/web3.js@^1.43.5", "@solana/web3.js@^1.44.3", "@solana/web3.js@^1.48.0", "@solana/web3.js@^1.56.2", "@solana/web3.js@^1.59.1", "@solana/web3.js@^1.63.0", "@solana/web3.js@^1.63.1":
+"@solana/web3.js@1.42.0", "@solana/web3.js@1.56.0", "@solana/web3.js@1.66.2", "@solana/web3.js@^1.16.1", "@solana/web3.js@^1.17.0", "@solana/web3.js@^1.20.0", "@solana/web3.js@^1.21.0", "@solana/web3.js@^1.22.0", "@solana/web3.js@^1.29.2", "@solana/web3.js@^1.30.2", "@solana/web3.js@^1.31.0", "@solana/web3.js@^1.32.0", "@solana/web3.js@^1.35.0", "@solana/web3.js@^1.35.1", "@solana/web3.js@^1.36.0", "@solana/web3.js@^1.37.1", "@solana/web3.js@^1.42.0", "@solana/web3.js@^1.43.5", "@solana/web3.js@^1.44.3", "@solana/web3.js@^1.48.0", "@solana/web3.js@^1.56.2", "@solana/web3.js@^1.59.1", "@solana/web3.js@^1.63.0", "@solana/web3.js@^1.63.1", "@solana/web3.js@^1.66.2":
   version "1.66.2"
   resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.66.2.tgz#80b43c5868b846124fe3ebac7d3943930c3fa60c"
   integrity sha512-RyaHMR2jGmaesnYP045VLeBGfR/gAW3cvZHzMFGg7bkO+WOYOYp1nEllf0/la4U4qsYGKCsO9eEevR5fhHiVHg==
@@ -8461,6 +8537,24 @@ dezalgo@1.0.3, dezalgo@^1.0.0:
     asap "^2.0.0"
     wrappy "1"
 
+did-jwt@6.10.1:
+  version "6.10.1"
+  resolved "https://registry.yarnpkg.com/did-jwt/-/did-jwt-6.10.1.tgz#40966b86b18759b771186d9274fc211af2f64d7c"
+  integrity sha512-YJOvkuPKKX364ooAFNxZPcz/KBLRwLhRABQVQlVEqOjygsCkplNFB3UL97UqZ7Y3cAG6Jh5jKoAC4xFSm+h0qw==
+  dependencies:
+    "@stablelib/ed25519" "^1.0.2"
+    "@stablelib/random" "^1.0.1"
+    "@stablelib/sha256" "^1.0.1"
+    "@stablelib/x25519" "^1.0.2"
+    "@stablelib/xchacha20poly1305" "^1.0.1"
+    bech32 "^2.0.0"
+    canonicalize "^1.0.8"
+    did-resolver "^4.0.0"
+    elliptic "^6.5.4"
+    js-sha3 "^0.8.0"
+    multiformats "^9.6.5"
+    uint8arrays "^3.0.0"
+
 "did-jwt@git+https://github.com/civicteam/did-jwt":
   version "6.1.0"
   resolved "git+https://github.com/civicteam/did-jwt#d4e318df78bd88e3127e62784915c7a334881eb6"
@@ -8478,10 +8572,15 @@ dezalgo@1.0.3, dezalgo@^1.0.0:
     multiformats "^9.6.4"
     uint8arrays "^3.0.0"
 
-did-resolver@^3.0.1, did-resolver@^3.1.5, did-resolver@^3.2.0, did-resolver@^3.2.2:
+did-resolver@^3.0.1, did-resolver@^3.2.0, did-resolver@^3.2.2:
   version "3.2.2"
   resolved "https://registry.yarnpkg.com/did-resolver/-/did-resolver-3.2.2.tgz#6f4e252a810f785d1b28a10265fad6dffee25158"
   integrity sha512-Eeo2F524VM5N3W4GwglZrnul2y6TLTwMQP3In62JdG34NZoqihYyOZLk+5wUW8sSgvIYIcJM8Dlt3xsdKZZ3tg==
+
+did-resolver@^4.0.0:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/did-resolver/-/did-resolver-4.0.1.tgz#11bb3f19ed1c8f53f4af4702912fa9f7852fc305"
+  integrity sha512-eHs2VLKhcANmh08S87PKvOauIAmSOd7nb7AlhNxcvOyDAIGQY1UfbiqI1VOW5IDKvOO6aEWY+5edOt1qrCp1Eg==
 
 didyoumean@^1.2.2:
   version "1.2.2"
@@ -12557,7 +12656,7 @@ ms@2.0.0:
 
 ms@2.1.2:
   version "2.1.2"
-  resolved "https://registry.npmjs.org/ms/-/ms-2.1.2.tgz"
+  resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.2.tgz#d09d1f357b443f493382a8eb3ccd183872ae6009"
   integrity sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==
 
 ms@2.1.3, ms@^2.0.0, ms@^2.1.1, ms@^2.1.2:
@@ -12565,10 +12664,15 @@ ms@2.1.3, ms@^2.0.0, ms@^2.1.1, ms@^2.1.2:
   resolved "https://registry.npmjs.org/ms/-/ms-2.1.3.tgz"
   integrity sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==
 
-multiformats@^9.4.2, multiformats@^9.6.4, multiformats@^9.7.1:
+multiformats@^9.4.2, multiformats@^9.7.1:
   version "9.7.1"
   resolved "https://registry.yarnpkg.com/multiformats/-/multiformats-9.7.1.tgz#ab348e5fd6f8e7fb3fd56033211bda48854e2173"
   integrity sha512-TaVmGEBt0fhxiNJMGphBfB+oGvUxFs8KgGvgl8d3C+GWtrFcvXdJ2196eg+dYhmSFClmgFfSfJEklo+SZzdNuw==
+
+multiformats@^9.6.5:
+  version "9.9.0"
+  resolved "https://registry.yarnpkg.com/multiformats/-/multiformats-9.9.0.tgz#c68354e7d21037a8f1f8833c8ccd68618e8f1d37"
+  integrity sha512-HoMUjhH9T8DDBNT+6xzkrd9ga/XiBI4xLr58LJACwK6G3HTOPeMz4nB4KJs33L2BelrIJa7P0VuNaVF3hMYfjg==
 
 multistream@^4.1.0:
   version "4.1.0"
@@ -15148,9 +15252,9 @@ socket.io-client@^4.5.0, socket.io-client@^4.5.1:
     socket.io-parser "~4.2.0"
 
 socket.io-parser@~4.2.0:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/socket.io-parser/-/socket.io-parser-4.2.0.tgz#3f01e5bc525d94aa52a97ed5cbc12e229bbc4d6b"
-  integrity sha512-tLfmEwcEwnlQTxFB7jibL/q2+q8dlVQzj4JdRLJ/W/G1+Fu9VSxCx1Lo+n1HvXxKnM//dUuD0xgiA7tQf57Vng==
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/socket.io-parser/-/socket.io-parser-4.2.1.tgz#01c96efa11ded938dcb21cbe590c26af5eff65e5"
+  integrity sha512-V4GrkLy+HeF1F/en3SpUaM+7XxYXpuMUWLGde1kSSh5nQMN4hLrbPIkD+otwh6q9R6NOQBN4AMaOZ2zVjui82g==
   dependencies:
     "@socket.io/component-emitter" "~3.1.0"
     debug "~4.3.1"

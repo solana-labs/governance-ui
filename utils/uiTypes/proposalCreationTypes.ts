@@ -21,6 +21,7 @@ export enum PackageEnum {
   Friktion,
   GatewayPlugin,
   GoblinGold,
+  Identity,
   NftPlugin,
   MangoMarketV3,
   MangoMarketV4,
@@ -30,6 +31,7 @@ export enum PackageEnum {
   Streamflow,
   Switchboard,
   VsrPlugin,
+  Dual,
 }
 
 export interface UiInstruction {
@@ -549,6 +551,7 @@ export enum Instructions {
   DepositToMangoAccount,
   DepositToMangoAccountCsv,
   DifferValidatorStake,
+  DualFinanceStakingOption,
   EverlendDeposit,
   EverlendWithdraw,
   ForesightAddMarketListToCategory,
@@ -611,6 +614,10 @@ export enum Instructions {
   WithdrawObligationCollateralAndRedeemReserveLiquidity,
   WithdrawValidatorStake,
   WithdrawFromVolt,
+  AddKeyToDID,
+  RemoveKeyFromDID,
+  AddServiceToDID,
+  RemoveServiceFromDID,
 }
 
 export type createParams = [
@@ -681,4 +688,16 @@ export interface ValidatorWithdrawStakeForm {
   governedTokenAccount: AssetAccount | undefined
   stakingAccount: StakeAccount | undefined
   amount: number
+}
+
+export interface DualFinanceStakingOptionForm {
+  strike: number
+  soName: string | undefined
+  optionExpirationUnixSeconds: number
+  numTokens: number
+  lotSize: number
+  baseTreasury: AssetAccount | undefined
+  quoteTreasury: AssetAccount | undefined
+  payer: AssetAccount | undefined
+  userPk: string | undefined
 }

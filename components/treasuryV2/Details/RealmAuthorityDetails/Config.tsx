@@ -23,6 +23,7 @@ import Address from '@components/Address'
 import useProgramVersion from '@hooks/useProgramVersion'
 import clsx from 'clsx'
 import TokenIcon from '@components/treasuryV2/icons/TokenIcon'
+import { NFTVotePluginSettingsDisplay } from '@components/NFTVotePluginSettingsDisplay'
 
 const DISABLED = new BigNumber(DISABLED_VOTER_WEIGHT.toString())
 
@@ -246,6 +247,7 @@ export default function Config(props: Props) {
           </div>
         )}
       </div>
+      <NFTVotePluginSettingsDisplay className="mt-24" />
       {editRealmOpen && (
         <RealmConfigModal
           isProposalModalOpen

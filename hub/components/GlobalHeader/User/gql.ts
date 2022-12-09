@@ -16,6 +16,13 @@ export const getUser = gql`
         avatarUrl
         handle
       }
+      followedRealms {
+        displayName
+        name
+        publicKey
+        iconUrl
+        urlId
+      }
     }
   }
 `;
@@ -39,6 +46,15 @@ export const User = IT.type({
       handle: IT.string,
     }),
   ]),
+  followedRealms: IT.array(
+    IT.type({
+      displayName: IT.union([IT.null, IT.string]),
+      name: IT.string,
+      publicKey: PublicKey,
+      iconUrl: IT.union([IT.null, IT.string]),
+      urlId: IT.string,
+    }),
+  ),
 });
 
 export type User = IT.TypeOf<typeof User>;

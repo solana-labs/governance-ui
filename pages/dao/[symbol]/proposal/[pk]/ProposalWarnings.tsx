@@ -61,8 +61,8 @@ const useProposalSafetyCheck = () => {
   const realmConfigWarnings = useMemo(() => {
     if (realmInfo === undefined || config === undefined) return undefined
 
-    const ixs = Object.values(instructions).flatMap(
-      (pix) => pix.account.instructions
+    const ixs = Object.values(instructions).flatMap((pix) =>
+      pix.account.getAllInstructions()
     )
 
     const realmConfigWarnings = ixs.map((ix) => {

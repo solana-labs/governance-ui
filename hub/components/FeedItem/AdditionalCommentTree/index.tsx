@@ -13,7 +13,9 @@ interface Props {
   cursor: string;
   realm: PublicKey;
   realmUrlId: string;
+  userIsAdmin?: boolean;
   onLoadMore?(cursor: string): void;
+  onRefresh?(): void;
 }
 
 export function AdditionalCommentTree(props: Props) {
@@ -49,6 +51,8 @@ export function AdditionalCommentTree(props: Props) {
             feedItemId={props.feedItemId}
             realm={props.realm}
             realmUrlId={props.realmUrlId}
+            userIsAdmin={props.userIsAdmin}
+            onRefresh={props.onRefresh}
           />
         </div>
       ),

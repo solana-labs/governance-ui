@@ -64,6 +64,7 @@ export interface RealmCreationV2 {
   councilWalletPks: PublicKey[]
 
   communityTokenConfig?: GoverningTokenConfigAccountArgs
+  skipRealmAuthority?: boolean
 }
 type RealmCreationV3 = {
   _programVersion: 3
@@ -97,6 +98,7 @@ export async function prepareRealmCreation({
   councilWalletPks,
 
   communityTokenConfig,
+  skipRealmAuthority,
   ...params
 }: RealmCreation & Web3Context) {
   const realmInstructions: TransactionInstruction[] = []
@@ -360,7 +362,7 @@ export async function prepareRealmCreation({
   }
 
   // Set the community governance as the realm authority
-  if (transferCommunityMintAuthority) {
+  if (!skipRealmAuthority) {
     withSetRealmAuthority(
       realmInstructions,
       programIdPk,
