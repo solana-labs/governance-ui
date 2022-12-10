@@ -152,6 +152,7 @@ module.exports = {
         gradient: 'gradient 4s ease-in-out infinite',
         loader: 'loader 0.6s infinite alternate',
         'staggered-bounce': 'staggered-bounce 1600ms infinite',
+        'move-stripes': 'move-stripes 2s linear infinite',
       },
       keyframes: {
         'connect-wallet-ping': {
@@ -186,6 +187,10 @@ module.exports = {
             transform: 'translateY(-50%)',
             'animation-timing-function': 'cubic-bezier(0.8, 0, 1, 1)',
           },
+        },
+        'move-stripes': {
+          '0%': { backgroundPosition: '0 0' },
+          '100%': { backgroundPosition: '44px 0' },
         },
       },
       fontFamily: {

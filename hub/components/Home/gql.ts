@@ -4,18 +4,11 @@ import { gql } from 'urql';
 import { PublicKey } from '@hub/types/decoders/PublicKey';
 
 export const getRealm = gql`
-  query getRealm($realm: PublicKey!) {
-    hub(realm: $realm) {
-      realm
-      info {
-        token {
-          mint
-          symbol
-        }
-      }
-    }
-    realm(publicKey: $realm) {
+  query getRealmByUrlId($urlId: String!) {
+    realmByUrlId(urlId: $urlId) {
+      amAdmin
       bannerImageUrl
+      displayName
       iconUrl
       name
       publicKey
@@ -27,25 +20,19 @@ export const getRealm = gql`
       linkedInUrl
       discordUrl
       instagramUrl
+      token {
+        mint
+        symbol
+      }
     }
   }
 `;
 
 export const getRealmResp = IT.type({
-  hub: IT.type({
-    realm: PublicKey,
-    info: IT.type({
-      token: IT.union([
-        IT.null,
-        IT.type({
-          mint: PublicKey,
-          symbol: IT.string,
-        }),
-      ]),
-    }),
-  }),
-  realm: IT.type({
+  realmByUrlId: IT.type({
+    amAdmin: IT.boolean,
     bannerImageUrl: IT.union([IT.null, IT.string]),
+    displayName: IT.union([IT.null, IT.string]),
     iconUrl: IT.union([IT.null, IT.string]),
     name: IT.string,
     publicKey: PublicKey,
@@ -57,5 +44,12 @@ export const getRealmResp = IT.type({
     linkedInUrl: IT.union([IT.null, IT.string]),
     discordUrl: IT.union([IT.null, IT.string]),
     instagramUrl: IT.union([IT.null, IT.string]),
+    token: IT.union([
+      IT.null,
+      IT.type({
+        mint: PublicKey,
+        symbol: IT.string,
+      }),
+    ]),
   }),
 });

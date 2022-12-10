@@ -1,10 +1,11 @@
 import create, { State } from 'zustand'
 import { getNfts } from '@utils/tokens'
-import tokenService from '@utils/services/token'
+import tokenPriceService, {
+  TokenInfoWithoutDecimals,
+} from '@utils/services/tokenPrice'
 import { ConfirmedSignatureInfo, PublicKey } from '@solana/web3.js'
 import { notify } from '@utils/notifications'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
-import { TokenInfo } from '@solana/spl-token-registry'
 import { WSOL_MINT } from '@components/instructions/tools'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import { ConnectionContext } from '@utils/connection'
@@ -12,7 +13,7 @@ import { ConnectionContext } from '@utils/connection'
 interface TreasuryAccountStore extends State {
   currentAccount: AssetAccount | null
   mintAddress: string
-  tokenInfo?: TokenInfo
+  tokenInfo?: TokenInfoWithoutDecimals
   recentActivity: ConfirmedSignatureInfo[]
 
   allNfts: NFTWithMint[]
@@ -103,7 +104,7 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
     if (account.type === AccountType.SOL) {
       mintAddress = WSOL_MINT
     }
-    const tokenInfo = tokenService.getTokenInfo(mintAddress)
+    const tokenInfo = tokenPriceService.getTokenInfo(mintAddress)
     set((s) => {
       s.currentAccount = account
       s.mintAddress = mintAddress

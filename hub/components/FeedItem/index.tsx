@@ -1,7 +1,7 @@
 import * as Separator from '@radix-ui/react-separator';
-import type { PublicKey } from '@solana/web3.js';
 import { pipe } from 'fp-ts/function';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import { EcosystemHeader } from '@hub/components/EcosystemHeader';
@@ -24,25 +24,35 @@ import * as Title from './Title';
 interface Props {
   className?: string;
   feedItemId: string;
-  realm: PublicKey;
   realmUrlId: string;
 }
 
 export function FeedItem(props: Props) {
-  const [feedItemResult] = useQuery(gql.getFeedItemResp, {
-    query: gql.getFeedItem,
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [realmResult] = useQuery(gql.getRealmResp, {
+    query: gql.getRealm,
     variables: {
-      realm: props.realm,
-      feedItemId: props.feedItemId,
+      urlId:
+        props.realmUrlId === 'ecosystem'
+          ? ECOSYSTEM_PAGE.toBase58()
+          : props.realmUrlId,
     },
   });
 
-  const [realmResult] = useQuery(gql.getRealmResp, {
-    query: gql.getRealm,
-    variables: { realm: props.realm },
+  const realmPublicKey = RE.isOk(realmResult)
+    ? realmResult.data.realmByUrlId.publicKey
+    : null;
+
+  const [feedItemResult] = useQuery(gql.getFeedItemResp, {
+    query: gql.getFeedItem,
+    variables: {
+      realm: realmPublicKey?.toBase58(),
+      feedItemId: props.feedItemId,
+    },
+    pause: !realmPublicKey,
   });
 
-  const [commentsResult] = useQuery(gql.getCommentsResp, {
+  const [commentsResult, refreshComments] = useQuery(gql.getCommentsResp, {
     query: gql.getComments,
     variables: { feedItemId: props.feedItemId },
   });
@@ -53,9 +63,15 @@ export function FeedItem(props: Props) {
     [],
   );
 
+  const router = useRouter();
+
   const firstPageEndCursor = RE.isOk(commentsResult)
     ? commentsResult.data.feedItemCommentTree.pageInfo.endCursor
     : null;
+
+  useEffect(() => {
+    setAdditionalPageCursors([]);
+  }, [refreshKey]);
 
   useEffect(() => {
     if (firstPageEndCursor) {
@@ -104,26 +120,27 @@ export function FeedItem(props: Props) {
               </div>
             </div>
           ),
-          ({ hub, realm }) => {
+          ({ realmByUrlId }) => {
             return (
               <div>
-                {props.realm.equals(ECOSYSTEM_PAGE) ? (
+                {props.realmUrlId === 'ecosystem' ? (
                   <EcosystemHeader />
                 ) : (
                   <RealmHeader.Content
-                    bannerUrl={realm.bannerImageUrl}
-                    iconUrl={realm.iconUrl}
-                    name={realm.name}
-                    realm={realm.publicKey}
+                    bannerUrl={realmByUrlId.bannerImageUrl}
+                    iconUrl={realmByUrlId.iconUrl}
+                    name={realmByUrlId.displayName || realmByUrlId.name}
+                    realm={realmByUrlId.publicKey}
                     realmUrlId={props.realmUrlId}
                     selectedTab="feed"
-                    token={hub.info.token}
-                    twitterHandle={realm.twitterHandle}
-                    websiteUrl={realm.websiteUrl}
-                    discordUrl={realm.discordUrl}
-                    githubUrl={realm.githubUrl}
-                    instagramUrl={realm.instagramUrl}
-                    linkedInUrl={realm.linkedInUrl}
+                    token={realmByUrlId.token}
+                    userIsAdmin={realmByUrlId.amAdmin}
+                    twitterHandle={realmByUrlId.twitterHandle}
+                    websiteUrl={realmByUrlId.websiteUrl}
+                    discordUrl={realmByUrlId.discordUrl}
+                    githubUrl={realmByUrlId.githubUrl}
+                    instagramUrl={realmByUrlId.instagramUrl}
+                    linkedInUrl={realmByUrlId.linkedInUrl}
                   />
                 )}
                 {pipe(
@@ -160,14 +177,17 @@ export function FeedItem(props: Props) {
                       </div>
                     ),
                     ({ feedItem }) => (
-                      <div className="max-w-3xl mx-auto pt-8 w-full px-4">
+                      <div
+                        className="max-w-3xl mx-auto pt-8 w-full px-4"
+                        key={String(refreshKey)}
+                      >
                         <Head>
                           <title>
-                            {feedItem.title} - {realm.name}
+                            {feedItem.title} - {realmByUrlId.name}
                           </title>
                           <meta
                             property="og:title"
-                            content={`${feedItem.title} - ${realm.name}`}
+                            content={`${feedItem.title} - ${realmByUrlId.name}`}
                             key="title"
                           />
                         </Head>
@@ -195,15 +215,20 @@ export function FeedItem(props: Props) {
                           className="mt-5"
                           feedItemId={feedItem.id}
                           numReplies={feedItem.numComments}
-                          realm={props.realm}
+                          realm={realmByUrlId.publicKey}
                           score={feedItem.score}
+                          type={feedItem.type}
                           userVote={feedItem.myVote}
+                          userIsAdmin={realmByUrlId.amAdmin}
+                          onDelete={() => {
+                            router.push(`/realm/${props.realmUrlId}`);
+                          }}
                         />
                         {jwt && (
                           <ReplyBox.Content
                             className="mt-8 mb-4"
                             feedItemId={props.feedItemId}
-                            realm={props.realm}
+                            realm={realmByUrlId.publicKey}
                           />
                         )}
                         {pipe(
@@ -227,8 +252,15 @@ export function FeedItem(props: Props) {
                                     (edge) => edge.node,
                                   )}
                                   feedItemId={props.feedItemId}
-                                  realm={props.realm}
+                                  realm={realmByUrlId.publicKey}
                                   realmUrlId={props.realmUrlId}
+                                  userIsAdmin={realmByUrlId.amAdmin}
+                                  onRefresh={() => {
+                                    refreshComments({
+                                      requestPolicy: 'network-only',
+                                    });
+                                    setRefreshKey((key) => key + 1);
+                                  }}
                                 />
                                 {additionalPageCursors.map((cursor) => (
                                   <AdditionalCommentTree
@@ -236,13 +268,20 @@ export function FeedItem(props: Props) {
                                     cursor={cursor}
                                     feedItemId={props.feedItemId}
                                     key={cursor}
-                                    realm={props.realm}
+                                    realm={realmByUrlId.publicKey}
                                     realmUrlId={props.realmUrlId}
+                                    userIsAdmin={realmByUrlId.amAdmin}
                                     onLoadMore={(newCursor) =>
                                       setAdditionalPageCursors((cursors) =>
                                         cursors.concat(newCursor),
                                       )
                                     }
+                                    onRefresh={() => {
+                                      refreshComments({
+                                        requestPolicy: 'network-only',
+                                      });
+                                      setRefreshKey((key) => key + 1);
+                                    }}
                                   />
                                 ))}
                               </div>

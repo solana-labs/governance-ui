@@ -1,7 +1,7 @@
 import { BigNumber } from 'bignumber.js'
 
 import { AssetAccount } from '@utils/uiTypes/assets'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import { getAccountAssetCount } from './getAccountAssetCount'
 
 export const getAccountValue = (account: AssetAccount) => {
@@ -11,7 +11,9 @@ export const getAccountValue = (account: AssetAccount) => {
 
   const count = getAccountAssetCount(account)
   const value = new BigNumber(
-    tokenService.getUSDTokenPrice(account.extensions.mint.publicKey.toBase58())
+    tokenPriceService.getUSDTokenPrice(
+      account.extensions.mint.publicKey.toBase58()
+    )
   )
 
   return count.multipliedBy(value)

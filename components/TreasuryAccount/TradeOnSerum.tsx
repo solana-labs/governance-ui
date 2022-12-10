@@ -8,7 +8,7 @@ import {
   getMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
 import { Market as SerumMarket } from '@project-serum/serum'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import React, { useCallback, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import AccountLabel from './BaseAccountHeader'
@@ -270,7 +270,9 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
   const token = tokenAccount.extensions.token
   const schema = formSchema(mintAccount, token)
 
-  const tokenInfo = tokenService.getTokenInfo(mintAccount.publicKey.toString())
+  const tokenInfo = tokenPriceService.getTokenInfo(
+    mintAccount.publicKey.toString()
+  )
 
   const totalValue = useTotalTokenValue({
     amount: getMintDecimalAmountFromNatural(

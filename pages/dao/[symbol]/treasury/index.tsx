@@ -11,7 +11,7 @@ import { CurrencyDollarIcon, PlusCircleIcon } from '@heroicons/react/outline'
 import { LinkButton } from '@components/Button'
 import { useRouter } from 'next/router'
 import useQueryContext from '@hooks/useQueryContext'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import useStrategiesStore from 'Strategies/store/useStrategiesStore'
 import Select from '@components/inputs/Select'
 import { getTreasuryAccountItemInfoV2 } from '@utils/treasuryTools'
@@ -44,14 +44,14 @@ const Treasury = () => {
   const { realmInfo } = useRealm()
   useEffect(() => {
     if (
-      tokenService._tokenList.length &&
+      tokenPriceService._tokenList.length &&
       governedTokenAccountsWithoutNfts.filter((x) => x.extensions.mint).length
     ) {
       getStrategies(connection)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
-    tokenService._tokenList.length,
+    tokenPriceService._tokenList.length,
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     governedTokenAccountsWithoutNfts.filter((x) => x.extensions.mint).length,
   ])

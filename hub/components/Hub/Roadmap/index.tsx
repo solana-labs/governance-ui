@@ -2,8 +2,8 @@ import ToolKit from '@carbon/icons-react/lib/ToolKit';
 
 import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay';
 import cx from '@hub/lib/cx';
-import { HubInfoRoadmapItemStatus } from '@hub/types/HubInfoRoadmapItemStatus';
 import { RichTextDocument } from '@hub/types/RichTextDocument';
+import { RoadmapItemStatus } from '@hub/types/RoadmapItemStatus';
 
 import { DashesSvg } from './DashesSvg';
 import { Item } from './Item';
@@ -21,7 +21,7 @@ interface Props {
       title: string;
       url: string;
     };
-    status?: null | HubInfoRoadmapItemStatus;
+    status?: null | RoadmapItemStatus;
     title: string;
   }[];
 }

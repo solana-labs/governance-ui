@@ -3,6 +3,7 @@ import type { BigNumber } from 'bignumber.js';
 
 import { Controls } from '@hub/components/Home/Feed/FeedItem/Controls';
 import cx from '@hub/lib/cx';
+import { FeedItemType } from '@hub/types/FeedItemType';
 import { FeedItemVoteType } from '@hub/types/FeedItemVoteType';
 
 interface BaseProps {
@@ -15,7 +16,10 @@ interface Props extends BaseProps {
   realm: PublicKey;
   score: number;
   totalProposalVotes?: BigNumber | null;
+  type: FeedItemType;
   userVote?: FeedItemVoteType | null;
+  userIsAdmin?: boolean;
+  onDelete?(): void;
 }
 
 export function Content(props: Props) {

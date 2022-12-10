@@ -10,7 +10,7 @@ import { AssetAccount } from '@utils/uiTypes/assets'
 import { ConnectionContext } from '@utils/connection'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
 import numbro from 'numbro'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import { Pool } from '@everlend/general-pool'
 import axios from 'axios'
 
@@ -53,7 +53,7 @@ async function getStrategies(connection: ConnectionContext) {
           tokenAccount,
           totalAmountBorrowed,
         } = pool.data
-        const tokenInfo = tokenService.getTokenInfo(tokenMint.toString())
+        const tokenInfo = tokenPriceService.getTokenInfo(tokenMint.toString())
         const apy =
           apys.data.find((apy) => apy.token === tokenInfo?.symbol)?.supply_apy *
             100 ?? 0

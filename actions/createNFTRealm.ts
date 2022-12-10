@@ -115,6 +115,8 @@ export default async function createNFTRealm({
       maxVoterWeightAddin: new PublicKey(nftPluginsPks[0]),
       tokenType: GoverningTokenType.Liquid,
     }),
+
+    skipRealmAuthority: true,
   })
 
   console.log('NFT REALM realm public-key', realmPk.toBase58())
@@ -273,6 +275,7 @@ export default async function createNFTRealm({
       realmId: realmPk,
       realmSymbol: realmName,
       wallet: wallet.publicKey?.toBase58(),
+      cluster: connection.rpcEndpoint.includes('devnet') ? 'devnet' : 'mainnet',
     }
     trySentryLog({
       tag: 'realmCreated',

@@ -1,4 +1,3 @@
-import type { PublicKey } from '@solana/web3.js';
 import { pipe } from 'fp-ts/function';
 import Head from 'next/head';
 
@@ -12,14 +11,13 @@ import { getRealm, getRealmResp } from './gql';
 
 interface Props {
   className?: string;
-  realm: PublicKey;
   realmUrlId: string;
 }
 
 export function Home(props: Props) {
   const [result] = useQuery(getRealmResp, {
     query: getRealm,
-    variables: { realm: props.realm.toBase58() },
+    variables: { urlId: props.realmUrlId },
   });
 
   return (
@@ -37,33 +35,39 @@ export function Home(props: Props) {
               <RealmHeader.Loading />
             </div>
           ),
-          ({ hub, realm }) => (
+          ({ realmByUrlId }) => (
             <div>
               <Head>
-                <title>{realm.name}</title>
-                <meta property="og:title" content={realm.name} key="title" />
+                <title>{realmByUrlId.name}</title>
+                <meta
+                  property="og:title"
+                  content={realmByUrlId.name}
+                  key="title"
+                />
               </Head>
               <RealmHeader.Content
-                bannerUrl={realm.bannerImageUrl}
-                iconUrl={realm.iconUrl}
-                name={realm.name}
-                realm={realm.publicKey}
+                bannerUrl={realmByUrlId.bannerImageUrl}
+                iconUrl={realmByUrlId.iconUrl}
+                name={realmByUrlId.displayName || realmByUrlId.name}
+                realm={realmByUrlId.publicKey}
                 realmUrlId={props.realmUrlId}
                 selectedTab="feed"
-                token={hub.info.token}
-                twitterHandle={realm.twitterHandle}
-                websiteUrl={realm.websiteUrl}
-                discordUrl={realm.discordUrl}
-                githubUrl={realm.githubUrl}
-                instagramUrl={realm.instagramUrl}
-                linkedInUrl={realm.linkedInUrl}
+                token={realmByUrlId.token}
+                twitterHandle={realmByUrlId.twitterHandle}
+                userIsAdmin={realmByUrlId.amAdmin}
+                websiteUrl={realmByUrlId.websiteUrl}
+                discordUrl={realmByUrlId.discordUrl}
+                githubUrl={realmByUrlId.githubUrl}
+                instagramUrl={realmByUrlId.instagramUrl}
+                linkedInUrl={realmByUrlId.linkedInUrl}
               />
               <Feed.Content
                 className="max-w-3xl mx-auto pt-8 w-full px-4"
-                realm={realm.publicKey}
-                realmIconUrl={realm.iconUrl}
-                realmName={realm.name}
+                realm={realmByUrlId.publicKey}
+                realmIconUrl={realmByUrlId.iconUrl}
+                realmName={realmByUrlId.name}
                 realmUrlId={props.realmUrlId}
+                userIsAdmin={realmByUrlId.amAdmin}
               />
             </div>
           ),
