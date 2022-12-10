@@ -3,7 +3,6 @@ import { BN } from '@project-serum/anchor'
 import { Governance, ProgramAccount } from '@solana/spl-governance'
 import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
-
 import Select from '@components/inputs/Select'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'

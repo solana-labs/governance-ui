@@ -3,7 +3,6 @@ import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import React, { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
-
 import Select from '@components/inputs/Select'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import createMsp from '@utils/instructions/Mean/createMsp'
@@ -59,6 +58,7 @@ const SelectStream = ({
       )
       setStreams(nextStreams.flat())
     })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(accounts)])
 
   return (

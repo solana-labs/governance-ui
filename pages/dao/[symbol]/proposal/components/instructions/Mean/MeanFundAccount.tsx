@@ -2,7 +2,6 @@ import { Treasury } from '@mean-dao/msp'
 import { Governance, ProgramAccount } from '@solana/spl-governance'
 import React, { useContext, useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
-
 import Input from '@components/inputs/Input'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
@@ -10,10 +9,8 @@ import { precision } from '@utils/formatting'
 import getMeanFundAccountInstruction from '@utils/instructions/Mean/getMeanFundAccountInstruction'
 import { MeanFundAccount } from '@utils/uiTypes/proposalCreationTypes'
 import { getMeanFundAccountSchema } from '@utils/validations'
-
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-
 import SelectStreamingAccount from './SelectStreamingAccount'
 
 interface Props {
@@ -65,6 +62,7 @@ const MeanFundAccountComponent = ({ index, governance }: Props) => {
       },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form])
 
   // mint info
@@ -78,6 +76,7 @@ const MeanFundAccountComponent = ({ index, governance }: Props) => {
       ...form,
       mintInfo: form.governedTokenAccount?.extensions.mint?.account,
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.governedTokenAccount])
 
   // amount

@@ -82,6 +82,7 @@ const MeanCreateStreamComponent = ({ index, governance }: Props) => {
       },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form])
 
   // treasury
@@ -105,6 +106,7 @@ const MeanCreateStreamComponent = ({ index, governance }: Props) => {
       ...prevForm,
       governedTokenAccount: value,
     }))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(governedTokenAccountsWithoutNfts), formTreasury])
 
   // mint info
@@ -120,6 +122,7 @@ const MeanCreateStreamComponent = ({ index, governance }: Props) => {
       mintInfo:
         formTreasury && getMint(governedTokenAccountsWithoutNfts, formTreasury),
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.governedTokenAccount])
 
   // amount

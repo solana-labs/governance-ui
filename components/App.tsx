@@ -6,7 +6,6 @@ import Head from 'next/head'
 import Script from 'next/script'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
-
 import { GatewayProvider } from '@components/Gateway/GatewayProvider'
 import { usePrevious } from '@hooks/usePrevious'
 import { useVotingPlugins, vsrPluginsPks } from '@hooks/useVotingPlugins'

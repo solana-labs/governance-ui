@@ -3,12 +3,10 @@ import { Stream } from '@mean-dao/msp'
 import { Governance, ProgramAccount } from '@solana/spl-governance'
 import React, { useContext, useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
-
 import Input from '@components/inputs/Input'
 import getMeanTransferStreamInstruction from '@utils/instructions/Mean/getMeanTransferStreamInstruction'
 import { MeanTransferStream } from '@utils/uiTypes/proposalCreationTypes'
 import { getMeanTransferStreamSchema } from '@utils/validations'
-
 import { NewProposalContext } from '../../../new'
 import SelectStream from './SelectStream'
 
@@ -54,6 +52,7 @@ const MeanTransferStreamComponent = ({ index, governance }: Props) => {
       },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form])
 
   // treasury
@@ -77,6 +76,7 @@ const MeanTransferStreamComponent = ({ index, governance }: Props) => {
       ...prevForm,
       governedTokenAccount: value,
     }))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(governedTokenAccountsWithoutNfts), formStream])
 
   return (

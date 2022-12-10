@@ -63,6 +63,7 @@ const MeanWithdrawFromAccountComponent = ({ index, governance }: Props) => {
       },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form])
 
   // amount
@@ -110,6 +111,7 @@ const MeanWithdrawFromAccountComponent = ({ index, governance }: Props) => {
       ...prevForm,
       governedTokenAccount: value,
     }))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(governedTokenAccountsWithoutNfts), formTreasury])
 
   // mint info
@@ -125,6 +127,7 @@ const MeanWithdrawFromAccountComponent = ({ index, governance }: Props) => {
       mintInfo:
         formTreasury && getMint(governedTokenAccountsWithoutNfts, formTreasury),
     }))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(governedTokenAccountsWithoutNfts), formTreasury])
 
   return (
