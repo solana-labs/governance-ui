@@ -22,11 +22,10 @@ export const StepTwo = () => {
   return (
     <>
       <SolanaConnectedIcon />
-      <h1 className="text-3xl font-medium mt-8">
-        Your wallet has been verified!
-      </h1>
+      <h1 className="text-3xl font-medium mt-8">One more step...</h1>
       <p className="text-sm text-neutral-700 mt-4">
-        To continue, please link with Discord by clicking the button below.
+        Your Solana wallet has been verified, but you must link it with Discord
+        to finish.
       </p>
       <div className="mt-8">
         <a
