@@ -490,7 +490,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
                 {`useCommunityVoterWeightAddin:
                ${
                  !!args.configArgs.useCommunityVoterWeightAddin ||
-                 !!args.configArgs.communityTokenConfigArgs.useVoterWeightAddin
+                 !!args.configArgs.communityTokenConfigArgs?.useVoterWeightAddin
                }`}
               </p>
               <p>
@@ -498,7 +498,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
                ${
                  !!args.configArgs.useMaxCommunityVoterWeightAddin ||
                  !!args.configArgs.communityTokenConfigArgs
-                   .useMaxVoterWeightAddin
+                   ?.useMaxVoterWeightAddin
                }`}
               </p>
               <p>
