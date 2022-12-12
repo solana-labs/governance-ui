@@ -26,6 +26,7 @@ import {
   fmtBNAmount,
   fmtMintAmount,
   getDaysFromTimestamp,
+  getHoursFromTimestamp,
 } from '@tools/sdk/units'
 import { dryRunInstruction } from 'actions/dryRunInstruction'
 import { tryGetMint } from '../../../utils/tokens'
@@ -133,6 +134,14 @@ export const GOVERNANCE_INSTRUCTIONS = {
             <p>
               {`maxVotingTime:
           ${getDaysFromTimestamp(args.config.maxVotingTime)} days(s)`}
+            </p>
+            <p>
+              {`votingCoolOffTime:
+          ${getHoursFromTimestamp(args.config.votingCoolOffTime)} hour(s)`}
+            </p>
+            <p>
+              {`depositExemptProposalCount:
+          ${args.config.depositExemptProposalCount}`}
             </p>
             <p>
               {`communityVoteTipping:

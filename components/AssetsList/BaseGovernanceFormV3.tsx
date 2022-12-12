@@ -107,6 +107,36 @@ export const BaseGovernanceFormV3 = ({
           }
           error={formErrors['maxVotingTime']}
         />
+        <Input
+          label="Proposal Cool-off Time (hours)"
+          value={form.votingCoolOffTime}
+          name="votingCoolOffTime"
+          type="number"
+          min={0.01}
+          onChange={(evt) =>
+            setForm((prev) => ({
+              ...prev,
+              votingCoolOffTime:
+                evt.target.value !== '' ? evt.target.value : '0',
+            }))
+          }
+          error={formErrors['votingCoolOffTime']}
+        />
+        <Input
+          label="Deposit Exempt Proposal Count"
+          value={form.depositExemptProposalCount}
+          name="depositExemptProposalCount"
+          type="number"
+          min={0}
+          onChange={(evt) =>
+            setForm((prev) => ({
+              ...prev,
+              depositExemptProposalCount:
+                evt.target.value !== '' ? evt.target.value : '0',
+            }))
+          }
+          error={formErrors['depositExemptProposalCount']}
+        />
         {(['community', 'council'] as const).map((govPop) => {
           const capitalized = govPop === 'community' ? 'Community' : 'Council'
           const minProposalTokensEnabled =
