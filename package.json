@@ -27,7 +27,7 @@
     "@blockworks-foundation/mango-client": "3.6.14",
     "@blockworks-foundation/mango-v3-reimbursement-lib": "1.0.8",
     "@blockworks-foundation/mango-v4": "0.0.2",
-    "@blockworks-foundation/mangolana": "0.0.1-beta.8",
+    "@blockworks-foundation/mangolana": "0.0.1-beta.11",
     "@bonfida/spl-name-service": "0.1.47",
     "@bundlr-network/client": "0.7.15",
     "@carbon/icons-react": "11.7.0",
