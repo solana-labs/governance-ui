@@ -176,7 +176,7 @@ const GovernanceConfigModal = ({
                 form
               )[0]
             )
-      console.log(governanceConfig, '@@@@@@@@@@')
+
       const instruction = createSetGovernanceConfig(
         realm.owner,
         realmInfo!.programVersion!,
