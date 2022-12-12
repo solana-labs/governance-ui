@@ -5,11 +5,16 @@ import { CollectionIcon } from '@heroicons/react/outline'
 import {
   Asset,
   AssetType,
+  Mint,
+  RealmAuthority,
   Token,
   NFTCollection,
   Sol,
 } from '@models/treasury/Asset'
 import Tooltip from '@components/Tooltip'
+import CommunityMintIcon from '@components/treasuryV2/icons/CommunityMintIcon'
+import CouncilMintIcon from '@components/treasuryV2/icons/CouncilMintIcon'
+import PlainRealmLogo from '@components/treasuryV2/icons/PlainRealmLogo'
 
 function isToken(asset: Asset): asset is Token {
   return asset.type === AssetType.Token
@@ -23,9 +28,23 @@ function isSol(asset: Asset): asset is Sol {
   return asset.type === AssetType.Sol
 }
 
+function isCouncilMint(asset: Asset): asset is Mint {
+  return asset.type === AssetType.Mint && asset.tokenRole === 'council'
+}
+
+function isCommunityMint(asset: Asset): asset is Mint {
+  return asset.type === AssetType.Mint && asset.tokenRole === 'community'
+}
+
+function isRealmAuthority(asset: Asset): asset is RealmAuthority {
+  return asset.type === AssetType.RealmAuthority
+}
+
 interface Props {
   className?: string
   assets: Asset[]
+  showRealmAuthority?: boolean
+  showMints?: boolean
 }
 
 /**
@@ -46,16 +65,55 @@ export default function AssetsPreviewIconList(props: Props) {
     .sort((a, b) => b.value.comparedTo(a.value))
   const nfts = props.assets.filter(isNFTCollection)
   const sol = props.assets.filter(isSol)
+  const councilMint: Mint | undefined = props.assets.filter(isCouncilMint)[0]
+  const communityMint: Mint | undefined = props.assets.filter(
+    isCommunityMint
+  )[0]
+  const realmAuthority: RealmAuthority | undefined = props.assets.filter(
+    isRealmAuthority
+  )[0]
   const assetCount = props.assets.length
-  const otherCount = assetCount - tokens.length - nfts.length - sol.length
+
+  let otherCount = assetCount - tokens.length - nfts.length - sol.length
+
+  if (props.showRealmAuthority && realmAuthority) {
+    otherCount -= 1
+  }
+
+  if (props.showMints && councilMint) {
+    otherCount -= 1
+  }
+
+  if (props.showMints && communityMint) {
+    otherCount -= 1
+  }
 
   const previewList: JSX.Element[] = []
   const summary: string[] = []
 
   let remainingCount = assetCount
 
-  // If the wallet contains sol, show that first
+  // Handle special cases first
+  if (props.showRealmAuthority && realmAuthority) {
+    previewList.push(<PlainRealmLogo className="fill-current" />)
+    remainingCount--
+    summary.push('the Realm Authority')
+  }
+
+  if (props.showMints && councilMint) {
+    previewList.push(<CouncilMintIcon className="stroke-current" />)
+    remainingCount--
+    summary.push('the Council Mint')
+  }
+
+  if (props.showMints && communityMint) {
+    previewList.push(<CommunityMintIcon className="stroke-current" />)
+    remainingCount--
+    summary.push('the Community Mint')
+  }
+
   if (sol.length) {
+    // If the wallet contains sol, show that
     previewList.push(sol[0].icon)
     remainingCount--
     summary.push('SOL')

@@ -1,5 +1,5 @@
 import Select from '@components/inputs/Select'
-import { Governance, GovernanceAccountType } from '@solana/spl-governance'
+import { Governance } from '@solana/spl-governance'
 import {
   ProgramAccount,
   getNativeTreasuryAddress,
@@ -25,19 +25,22 @@ import cx from 'classnames'
 import { NewProposalContext } from 'pages/dao/[symbol]/proposal/new'
 import useRealm from '@hooks/useRealm'
 import { PublicKey } from '@solana/web3.js'
+import Tooltip from '@components/Tooltip'
 
 function exists<T>(item: T | null | undefined): item is T {
   return item !== null || item !== undefined
 }
 
-function RulesPill(props: { icon: JSX.Element; value: string }) {
+function RulesPill(props: { icon: JSX.Element; value: string; label: string }) {
   return (
-    <div className="flex items-center space-x-1 bg-bkg-2 px-2 py-1 rounded text-xs">
-      {cloneElement(props.icon, {
-        className: cx(props.icon.props.className, 'h-4 w-4'),
-      })}
-      <div>{props.value}</div>
-    </div>
+    <Tooltip content={props.label}>
+      <div className="flex items-center space-x-1 bg-bkg-2 px-2 py-1 rounded text-xs">
+        {cloneElement(props.icon, {
+          className: cx(props.icon.props.className, 'h-4 w-4'),
+        })}
+        <div>{props.value}</div>
+      </div>
+    </Tooltip>
   )
 }
 
@@ -128,12 +131,12 @@ const GovernedAccountSelect = ({
       ? getTokenAccountLabelInfo(value).tokenAccountName
       : getMintAccountLabelInfo(value).mintAccountName
 
-    const walletInfo =
-      RE.isOk(treasuryInfo) &&
-      treasuryInfo.data.wallets.find(
-        (wallet) =>
-          wallet.governanceAddress === value.governance.pubkey.toBase58()
-      )
+    const walletInfo = RE.isOk(treasuryInfo)
+      ? treasuryInfo.data.wallets.find(
+          (wallet) =>
+            wallet.governanceAddress === value.governance.pubkey.toBase58()
+        )
+      : null
 
     return (
       <div className="grid grid-cols-[48px,1fr,max-content] gap-x-4 text-fgd-1 items-center w-full">
@@ -159,6 +162,7 @@ const GovernedAccountSelect = ({
                 {walletInfo.rules.common?.maxVotingTime && (
                   <RulesPill
                     icon={<ClockIcon className="stroke-current fill-none" />}
+                    label="Max Voting Time"
                     value={durationStr(
                       walletInfo.rules.common.maxVotingTime,
                       true
@@ -168,6 +172,7 @@ const GovernedAccountSelect = ({
                 {voteByCouncil && exists(walletInfo.rules.council) ? (
                   <RulesPill
                     icon={<ScaleIcon className="stroke-current fill-none" />}
+                    label="Council Vote Threshold"
                     value={
                       walletInfo.rules.council.voteThresholdPercentage + '%'
                     }
@@ -175,6 +180,7 @@ const GovernedAccountSelect = ({
                 ) : !voteByCouncil && exists(walletInfo.rules.community) ? (
                   <RulesPill
                     icon={<ScaleIcon className="stroke-current fill-none" />}
+                    label="Community Vote Threshold"
                     value={
                       walletInfo.rules.community.voteThresholdPercentage + '%'
                     }
@@ -183,6 +189,7 @@ const GovernedAccountSelect = ({
                 {voteByCouncil && exists(walletInfo.rules.council) ? (
                   <RulesPill
                     icon={<HandIcon className="stroke-current fill-none" />}
+                    label="Council Vote Tipping"
                     value={voteTippingText(
                       walletInfo.rules.council.voteTipping
                     )}
@@ -190,6 +197,7 @@ const GovernedAccountSelect = ({
                 ) : !voteByCouncil && exists(walletInfo.rules.community) ? (
                   <RulesPill
                     icon={<HandIcon className="stroke-current fill-none" />}
+                    label="Community Vote Tipping"
                     value={voteTippingText(
                       walletInfo.rules.community.voteTipping
                     )}
@@ -203,6 +211,8 @@ const GovernedAccountSelect = ({
                 ${walletInfo.totalValue.toFormat(2)}
               </div>
               <AssetsPreviewIconList
+                showMints
+                showRealmAuthority
                 assets={walletInfo.assets}
                 className="h-4"
               />
