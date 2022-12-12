@@ -316,12 +316,8 @@ export const assembleWallets = async (
             minCommunityTokensToCreateGovernance: new BigNumber(
               config.minCommunityTokensToCreateGovernance.toString()
             ).shiftedBy(communityMint ? -communityMint.decimals : 0),
-            useCommunityVoterWeightAddin:
-              realmConfig?.account.communityTokenConfig.voterWeightAddin ??
-              false,
-            useMaxCommunityVoterWeightAddin:
-              realmConfig?.account.communityTokenConfig.maxVoterWeightAddin ??
-              false,
+            communityTokenConfig: realmConfig?.account.communityTokenConfig,
+            councilTokenConfig: realmConfig?.account.councilTokenConfig,
           },
           icon: realmInfo?.ogImage ? (
             <img src={realmInfo.ogImage} />

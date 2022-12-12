@@ -108,9 +108,10 @@ const INITIAL_REALM_STATE = {
   councilTokenOwnerRecords: {},
   loading: true,
   mints: {},
+  // @askfish: this should probably just be undefined, and leave it up to components how to handle things while loading
   programVersion: 1,
   config: undefined,
-}
+} as const
 
 const INITIAL_PROPOSAL_STATE = {
   proposal: undefined,
@@ -124,7 +125,7 @@ const INITIAL_PROPOSAL_STATE = {
   proposalMint: undefined,
   loading: true,
   proposalOwner: undefined,
-}
+} as const
 
 const useWalletStore = create<WalletStore>((set, get) => ({
   connected: false,

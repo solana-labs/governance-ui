@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import BaseGovernanceForm, {
-  BaseGovernanceFormFields,
+  BaseGovernanceFormFieldsV2,
 } from 'components/AssetsList/BaseGovernanceForm'
 import Button from 'components/Button'
 import Input from 'components/inputs/Input'
@@ -17,7 +17,7 @@ import { PublicKey } from '@solana/web3.js'
 import { tryParseKey } from 'tools/validators/pubkey'
 import { debounce } from 'utils/debounce'
 import { isFormValid } from 'utils/formValidation'
-import { getGovernanceConfig } from '@utils/GovernanceTools'
+import { getGovernanceConfigFromV2Form } from '@utils/GovernanceTools'
 import { notify } from 'utils/notifications'
 import tokenPriceService, {
   TokenInfoWithoutDecimals,
@@ -34,17 +34,19 @@ import { getProgramVersionForRealm } from '@models/registry/api'
 import Select from '@components/inputs/Select'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { getMintDecimalAmount } from '@tools/sdk/units'
-interface NewTreasuryAccountForm extends BaseGovernanceFormFields {
+interface NewTreasuryAccountForm extends BaseGovernanceFormFieldsV2 {
   mintAddress: string
 }
 const defaultFormValues = {
+  // TODO support v3
+  _programVersion: 2,
   mintAddress: '',
   minCommunityTokensToCreateProposal: MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
   minInstructionHoldUpTime: 0,
   maxVotingTime: 3,
   voteThreshold: 60,
   voteTipping: VoteTipping.Strict,
-}
+} as const
 
 const SOL = 'SOL'
 const OTHER = 'OTHER'
@@ -157,7 +159,7 @@ const NewAccountForm = () => {
           voteTipping: form.voteTipping,
         }
 
-        const governanceConfig = getGovernanceConfig(
+        const governanceConfig = getGovernanceConfigFromV2Form(
           realmInfo?.programVersion!,
           governanceConfigValues
         )

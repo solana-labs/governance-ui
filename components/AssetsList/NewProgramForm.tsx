@@ -9,14 +9,14 @@ import { RpcContext, VoteTipping } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { tryParseKey } from 'tools/validators/pubkey'
 import { isFormValid } from 'utils/formValidation'
-import { getGovernanceConfig } from 'utils/GovernanceTools'
+import { getGovernanceConfigFromV2Form } from 'utils/GovernanceTools'
 import { notify } from 'utils/notifications'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import * as yup from 'yup'
 import BaseGovernanceForm, {
-  BaseGovernanceFormFields,
+  BaseGovernanceFormFieldsV2,
 } from './BaseGovernanceForm'
 import { registerProgramGovernance } from 'actions/registerProgramGovernance'
 import { GovernanceType } from '@solana/spl-governance'
@@ -26,7 +26,7 @@ import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { getMintDecimalAmount } from '@tools/sdk/units'
-interface NewProgramForm extends BaseGovernanceFormFields {
+interface NewProgramForm extends BaseGovernanceFormFieldsV2 {
   programId: string
   transferAuthority: boolean
 }
@@ -37,12 +37,15 @@ const defaultFormValues = {
   // This should be dynamic and set to 1% of the community mint supply or
   // MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY when supply is 0
   minCommunityTokensToCreateProposal: MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
+  // TODO support v3
+  _programVersion: 2,
   minInstructionHoldUpTime: 0,
   maxVotingTime: 3,
   voteThreshold: 60,
   transferAuthority: true,
   voteTipping: VoteTipping.Strict,
-}
+} as const
+
 const NewProgramForm = () => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
@@ -107,7 +110,7 @@ const NewProgramForm = () => {
           mintDecimals: realmMint.decimals,
           voteTipping: form.voteTipping,
         }
-        const governanceConfig = getGovernanceConfig(
+        const governanceConfig = getGovernanceConfigFromV2Form(
           realmInfo?.programVersion!,
           governanceConfigValues
         )

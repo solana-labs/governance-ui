@@ -17,8 +17,6 @@ export function getRulesFromAccount(
     rules.common = {
       maxVotingTime: govConfig.maxVotingTime,
       minInstructionHoldupTime: govConfig.minInstructionHoldUpTime,
-      voteThresholdPercentage: govConfig.communityVoteThreshold.value!,
-      voteTipping: govConfig.communityVoteTipping,
     }
   }
 
@@ -28,7 +26,12 @@ export function getRulesFromAccount(
     !rules.community
   ) {
     rules.community = {
+      voteTipping: govConfig.communityVoteTipping,
       decimals: communityMint?.decimals,
+      voteThresholdPercentage:
+        govConfig.communityVoteThreshold.value ?? 'disabled',
+      vetoVoteThresholdPercentage:
+        govConfig.communityVetoVoteThreshold.value ?? 'disabled',
       minTokensToCreateProposal: new BigNumber(
         govConfig.minCommunityTokensToCreateProposal.toString()
       ).shiftedBy(communityMint ? -communityMint.decimals : 0),
@@ -41,7 +44,12 @@ export function getRulesFromAccount(
     !rules.council
   ) {
     rules.council = {
+      voteTipping: govConfig.councilVoteTipping,
       decimals: councilMint?.decimals,
+      voteThresholdPercentage:
+        govConfig.councilVoteThreshold.value ?? 'disabled',
+      vetoVoteThresholdPercentage:
+        govConfig.councilVetoVoteThreshold.value ?? 'disabled',
       minTokensToCreateProposal: new BigNumber(
         govConfig.minCouncilTokensToCreateProposal.toString()
       ).shiftedBy(councilMint ? -councilMint.decimals : 0),
