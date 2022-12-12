@@ -1,5 +1,5 @@
 import useRealm from '@hooks/useRealm'
-import { fmtMintAmount } from '@tools/sdk/units'
+import { fmtMintAmount, getHoursFromTimestamp } from '@tools/sdk/units'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import {
   getFormattedStringFromDays,
@@ -8,10 +8,11 @@ import {
 import Button from '@components/Button'
 import { VoteTipping } from '@solana/spl-governance'
 import { AddressField, NumberField } from '../index'
+import useProgramVersion from '@hooks/useProgramVersion'
 
 const ParamsView = ({ activeGovernance, openGovernanceProposalModal }) => {
   const { realm, mint, councilMint, ownVoterWeight } = useRealm()
-
+  const programVersion = useProgramVersion()
   const realmAccount = realm?.account
   const communityMint = realmAccount?.communityMint.toBase58()
 
@@ -65,12 +66,22 @@ const ParamsView = ({ activeGovernance, openGovernanceProposalModal }) => {
             padding
             val={activeGovernance.account.config.minInstructionHoldUpTime}
           />
-          {/* NOT NEEDED RIGHT NOW */}
-          {/* <AddressField
-          label="Proposal Cool-off Time"
-          padding
-          val={activeGovernance.account.config.proposalCoolOffTime}
-          /> */}
+          {programVersion >= 3 && (
+            <>
+              <AddressField
+                label="Proposal Cool-off Time"
+                padding
+                val={`${getHoursFromTimestamp(
+                  activeGovernance.account.config.votingCoolOffTime
+                )} hour(s)`}
+              />
+              <AddressField
+                label="Deposit Exempt Proposal Count"
+                padding
+                val={`${activeGovernance.account.config.depositExemptProposalCount}`}
+              />
+            </>
+          )}
           <AddressField
             label="Vote Threshold Percentage"
             padding

@@ -26,6 +26,7 @@ import {
   fmtBNAmount,
   fmtMintAmount,
   getDaysFromTimestamp,
+  getHoursFromTimestamp,
 } from '@tools/sdk/units'
 import { dryRunInstruction } from 'actions/dryRunInstruction'
 import { tryGetMint } from '../../../utils/tokens'
@@ -133,6 +134,14 @@ export const GOVERNANCE_INSTRUCTIONS = {
             <p>
               {`maxVotingTime:
           ${getDaysFromTimestamp(args.config.maxVotingTime)} days(s)`}
+            </p>
+            <p>
+              {`votingCoolOffTime:
+          ${getHoursFromTimestamp(args.config.votingCoolOffTime)} hour(s)`}
+            </p>
+            <p>
+              {`depositExemptProposalCount:
+          ${args.config.depositExemptProposalCount}`}
             </p>
             <p>
               {`communityVoteTipping:
@@ -490,7 +499,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
                 {`useCommunityVoterWeightAddin:
                ${
                  !!args.configArgs.useCommunityVoterWeightAddin ||
-                 !!args.configArgs.communityTokenConfigArgs.useVoterWeightAddin
+                 !!args.configArgs.communityTokenConfigArgs?.useVoterWeightAddin
                }`}
               </p>
               <p>
@@ -498,7 +507,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
                ${
                  !!args.configArgs.useMaxCommunityVoterWeightAddin ||
                  !!args.configArgs.communityTokenConfigArgs
-                   .useMaxVoterWeightAddin
+                   ?.useMaxVoterWeightAddin
                }`}
               </p>
               <p>

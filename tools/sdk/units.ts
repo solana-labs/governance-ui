@@ -9,8 +9,16 @@ export function getDaysFromTimestamp(unixTimestamp: number) {
   return unixTimestamp / SECONDS_PER_DAY
 }
 
+export function getHoursFromTimestamp(unixTimestamp: number) {
+  return unixTimestamp / (60 * 60)
+}
+
 export function getTimestampFromDays(days: number) {
   return days * SECONDS_PER_DAY
+}
+
+export function getTimestampFromHours(hours: number) {
+  return hours * 60 * 60
 }
 
 export function fmtBnMintDecimals(amount: BN, decimals: number) {

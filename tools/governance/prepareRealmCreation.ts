@@ -309,6 +309,8 @@ export async function prepareRealmCreation({
     councilVoteThreshold: councilVoteThreshold,
     councilVetoVoteThreshold: councilVetoVoteThreshold,
     communityVetoVoteThreshold: communityVetoVoteThreshold,
+    votingCoolOffTime: 0,
+    depositExemptProposalCount: 10,
   })
 
   const communityMintGovPk = createCommunityMintGovernance
