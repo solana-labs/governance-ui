@@ -155,9 +155,9 @@ const GovernedAccountSelect = ({
             <div>Rules: {abbreviateAddress(value.governance.pubkey)}</div>
           </div>
         </div>
-        {walletInfo &&
-          (selected ? (
-            <div className="pr-2 text-white/50 space-y-1">
+        {walletInfo ? (
+          selected ? (
+            <div className="pr-2 text-white/50">
               <div className="flex items-center space-x-1 justify-end">
                 {walletInfo.rules.common?.maxVotingTime && (
                   <RulesPill
@@ -217,7 +217,26 @@ const GovernedAccountSelect = ({
                 className="h-4"
               />
             </div>
-          ))}
+          )
+        ) : selected ? (
+          <div className="pr-2 text-white/50 flex items-center space-x-1">
+            <div className="bg-bkg-2 px-2 py-1 rounded text-xs w-12 animate-pulse">
+              &nbsp;
+            </div>
+            <div className="bg-bkg-2 px-2 py-1 rounded text-xs w-12 animate-pulse">
+              &nbsp;
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-end">
+            <div className="bg-bkg-2 px-2 py-1 rounded h-4 w-12 animate-pulse mb-1">
+              &nbsp;
+            </div>
+            <div className="bg-bkg-2 px-2 py-1 rounded h-4 w-16 animate-pulse">
+              &nbsp;
+            </div>
+          </div>
+        )}
       </div>
     )
   }
