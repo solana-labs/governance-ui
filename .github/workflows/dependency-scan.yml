@@ -1,7 +1,7 @@
 name: Dependency Vulnerability Scan
 
 on:
-  pull_request: 
+  pull_request:
     branches: [main]
   push:
 
@@ -23,7 +23,7 @@ jobs:
           hide-progress: true
           format: 'sarif'
           output: 'trivy-results.sarif'
-          
+
       # Fail the job on critical vulnerabiliies with fix available
       - name: Fail on critical vulnerabilities
         uses: aquasecurity/trivy-action@master
