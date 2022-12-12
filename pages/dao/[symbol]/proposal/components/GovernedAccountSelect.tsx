@@ -1,8 +1,15 @@
 import Select from '@components/inputs/Select'
 import { Governance, GovernanceAccountType } from '@solana/spl-governance'
-import { ProgramAccount } from '@solana/spl-governance'
-import { getMintAccountLabelInfo } from '@utils/tokens'
-import React, { cloneElement, useEffect, useContext } from 'react'
+import {
+  ProgramAccount,
+  getNativeTreasuryAddress,
+} from '@solana/spl-governance'
+import {
+  getMintAccountLabelInfo,
+  getSolAccountLabel,
+  getTokenAccountLabelInfo,
+} from '@utils/tokens'
+import React, { cloneElement, useEffect, useContext, useState } from 'react'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import UnselectedWalletIcon from '@components/treasuryV2/icons/UnselectedWalletIcon'
 import { abbreviateAddress } from '@utils/formatting'
@@ -16,6 +23,8 @@ import {
 import { ClockIcon, HandIcon, ScaleIcon } from '@heroicons/react/outline'
 import cx from 'classnames'
 import { NewProposalContext } from 'pages/dao/[symbol]/proposal/new'
+import useRealm from '@hooks/useRealm'
+import { PublicKey } from '@solana/web3.js'
 
 function exists<T>(item: T | null | undefined): item is T {
   return item !== null || item !== undefined
@@ -53,116 +62,154 @@ const GovernedAccountSelect = ({
   noMaxWidth?: boolean
   autoSelectFirst?: boolean
 }) => {
+  const realm = useRealm()
   const treasuryInfo = useTreasuryInfo()
   const { voteByCouncil } = useContext(NewProposalContext)
+  const [wallets, setWallets] = useState<
+    {
+      account: AssetAccount
+      governance: PublicKey
+      walletAddress: PublicKey
+    }[]
+  >([])
+  const programId = realm.realmInfo?.programId
+
+  useEffect(() => {
+    if (programId) {
+      const governances = new Set<string>([])
+
+      for (const account of governedAccounts) {
+        governances.add(account.governance.pubkey.toBase58())
+      }
+
+      Promise.all(
+        governedAccounts.map((account) => {
+          return getNativeTreasuryAddress(
+            programId,
+            account.governance.pubkey
+          ).then((walletAddress) => ({
+            account,
+            governance: account.governance.pubkey,
+            walletAddress,
+          }))
+        })
+      ).then((rawWallets) => {
+        const visited = new Set<string>()
+        const deduped: typeof rawWallets = []
+
+        for (const wallet of rawWallets) {
+          if (!visited.has(wallet.walletAddress.toBase58())) {
+            visited.add(wallet.walletAddress.toBase58())
+            deduped.push(wallet)
+          }
+        }
+
+        setWallets(deduped)
+      })
+    }
+  }, [governedAccounts, programId])
 
   function getLabel(value?: AssetAccount | null, selected = false) {
     if (!value) {
       return null
     }
 
-    const accountType = value.governance.account.accountType
+    const wallet = wallets.find(({ account }) =>
+      account.pubkey.equals(value.pubkey)
+    )
 
-    if (value.isSol || value.isToken) {
+    if (!wallet) {
       return null
     }
 
-    if (
-      accountType === GovernanceAccountType.MintGovernanceV1 ||
-      accountType === GovernanceAccountType.MintGovernanceV2
-    ) {
-      const mintInfo = getMintAccountLabelInfo(value)
-      const walletInfo =
-        RE.isOk(treasuryInfo) &&
-        treasuryInfo.data.wallets.find(
-          (wallet) =>
-            wallet.governanceAddress === value.governance.pubkey.toBase58()
-        )
+    const accountName = value.isSol
+      ? getSolAccountLabel(value).tokenAccountName
+      : value.isToken
+      ? getTokenAccountLabelInfo(value).tokenAccountName
+      : getMintAccountLabelInfo(value).mintAccountName
 
-      return (
-        <div className="grid grid-cols-[48px,1fr,max-content] gap-x-4 text-fgd-1 items-center w-full">
-          <div>
-            <UnselectedWalletIcon className="h-12 w-12 stroke-white/50" />
-          </div>
-          <div>
-            {mintInfo.mintAccountName ? (
-              <div className="mb-0.5 truncate w-full">
-                {mintInfo.mintAccountName}
-              </div>
-            ) : mintInfo.tokenName ? (
-              <div className="mb-0.5 truncate w-full">{mintInfo.tokenName}</div>
-            ) : mintInfo.account ? (
-              <div className="mb-0.5 truncate w-full">
-                {abbreviateAddress(mintInfo.account)}
-              </div>
-            ) : (
-              <div className="mb-0.5 truncate w-full">
-                {abbreviateAddress(value.governance.pubkey)}
-              </div>
-            )}
-            <div className="space-y-0.5 text-xs text-fgd-3">
-              <div>Rules: {abbreviateAddress(value.governance.pubkey)}</div>
-            </div>
-          </div>
-          {walletInfo &&
-            (selected ? (
-              <div className="pr-2 text-white/50 space-y-1">
-                <div className="flex items-center space-x-1 justify-end">
-                  {walletInfo.rules.common?.maxVotingTime && (
-                    <RulesPill
-                      icon={<ClockIcon className="stroke-current fill-none" />}
-                      value={durationStr(
-                        walletInfo.rules.common.maxVotingTime,
-                        true
-                      )}
-                    />
-                  )}
-                  {voteByCouncil && exists(walletInfo.rules.council) ? (
-                    <RulesPill
-                      icon={<ScaleIcon className="stroke-current fill-none" />}
-                      value={
-                        walletInfo.rules.council.voteThresholdPercentage + '%'
-                      }
-                    />
-                  ) : !voteByCouncil && exists(walletInfo.rules.community) ? (
-                    <RulesPill
-                      icon={<ScaleIcon className="stroke-current fill-none" />}
-                      value={
-                        walletInfo.rules.community.voteThresholdPercentage + '%'
-                      }
-                    />
-                  ) : null}
-                  {voteByCouncil && exists(walletInfo.rules.council) ? (
-                    <RulesPill
-                      icon={<HandIcon className="stroke-current fill-none" />}
-                      value={voteTippingText(
-                        walletInfo.rules.council.voteTipping
-                      )}
-                    />
-                  ) : !voteByCouncil && exists(walletInfo.rules.community) ? (
-                    <RulesPill
-                      icon={<HandIcon className="stroke-current fill-none" />}
-                      value={voteTippingText(
-                        walletInfo.rules.community.voteTipping
-                      )}
-                    />
-                  ) : null}
-                </div>
-              </div>
-            ) : (
-              <div>
-                <div className="text-right font-bold text-white text-sm mb-1">
-                  ${walletInfo.totalValue.toFormat(2)}
-                </div>
-                <AssetsPreviewIconList
-                  assets={walletInfo.assets}
-                  className="h-4"
-                />
-              </div>
-            ))}
-        </div>
+    const walletInfo =
+      RE.isOk(treasuryInfo) &&
+      treasuryInfo.data.wallets.find(
+        (wallet) =>
+          wallet.governanceAddress === value.governance.pubkey.toBase58()
       )
-    }
+
+    return (
+      <div className="grid grid-cols-[48px,1fr,max-content] gap-x-4 text-fgd-1 items-center w-full">
+        <div>
+          <UnselectedWalletIcon className="h-12 w-12 stroke-white/50" />
+        </div>
+        <div>
+          {accountName ? (
+            <div className="mb-0.5 truncate w-full">{accountName}</div>
+          ) : (
+            <div className="mb-0.5 truncate w-full">
+              {abbreviateAddress(wallet.walletAddress)}
+            </div>
+          )}
+          <div className="space-y-0.5 text-xs text-fgd-3">
+            <div>Rules: {abbreviateAddress(value.governance.pubkey)}</div>
+          </div>
+        </div>
+        {walletInfo &&
+          (selected ? (
+            <div className="pr-2 text-white/50 space-y-1">
+              <div className="flex items-center space-x-1 justify-end">
+                {walletInfo.rules.common?.maxVotingTime && (
+                  <RulesPill
+                    icon={<ClockIcon className="stroke-current fill-none" />}
+                    value={durationStr(
+                      walletInfo.rules.common.maxVotingTime,
+                      true
+                    )}
+                  />
+                )}
+                {voteByCouncil && exists(walletInfo.rules.council) ? (
+                  <RulesPill
+                    icon={<ScaleIcon className="stroke-current fill-none" />}
+                    value={
+                      walletInfo.rules.council.voteThresholdPercentage + '%'
+                    }
+                  />
+                ) : !voteByCouncil && exists(walletInfo.rules.community) ? (
+                  <RulesPill
+                    icon={<ScaleIcon className="stroke-current fill-none" />}
+                    value={
+                      walletInfo.rules.community.voteThresholdPercentage + '%'
+                    }
+                  />
+                ) : null}
+                {voteByCouncil && exists(walletInfo.rules.council) ? (
+                  <RulesPill
+                    icon={<HandIcon className="stroke-current fill-none" />}
+                    value={voteTippingText(
+                      walletInfo.rules.council.voteTipping
+                    )}
+                  />
+                ) : !voteByCouncil && exists(walletInfo.rules.community) ? (
+                  <RulesPill
+                    icon={<HandIcon className="stroke-current fill-none" />}
+                    value={voteTippingText(
+                      walletInfo.rules.community.voteTipping
+                    )}
+                  />
+                ) : null}
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col items-end">
+              <div className="font-bold text-white text-sm mb-1">
+                ${walletInfo.totalValue.toFormat(2)}
+              </div>
+              <AssetsPreviewIconList
+                assets={walletInfo.assets}
+                className="h-4"
+              />
+            </div>
+          ))}
+      </div>
+    )
   }
 
   useEffect(() => {
@@ -174,6 +221,7 @@ const GovernedAccountSelect = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(governedAccounts)])
+
   return (
     <Select
       label={label}
@@ -184,21 +232,21 @@ const GovernedAccountSelect = ({
       error={error}
       noMaxWidth={noMaxWidth}
     >
-      {governedAccounts
-        .filter((x) =>
+      {wallets
+        .filter((wallet) =>
           !shouldBeGoverned
             ? !shouldBeGoverned
-            : x?.governance?.pubkey.toBase58() ===
+            : wallet.account?.governance?.pubkey.toBase58() ===
               governance?.pubkey?.toBase58()
         )
-        .map((acc) => {
-          const label = getLabel(acc)
+        .map((wallet) => {
+          const label = getLabel(wallet.account)
 
           return label ? (
             <Select.Option
               className="border-red"
-              key={acc.pubkey.toBase58()}
-              value={acc}
+              key={wallet.account.pubkey.toBase58()}
+              value={wallet.account}
             >
               {label}
             </Select.Option>
