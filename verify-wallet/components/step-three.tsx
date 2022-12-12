@@ -1,4 +1,5 @@
 import { XIcon } from '@heroicons/react/solid';
+import { Application } from '@verify-wallet/constants';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
@@ -27,13 +28,26 @@ const ConnectedIcon = () => (
   />
 );
 
+const MatchdayLogo = () => (
+  <img
+    src="/verify-wallet/img/logo-matchday.png"
+    alt="Matchday"
+    height="64px"
+    width="64px"
+  />
+);
+
 enum VerifyWalletState {
   FAILED,
   VERIFYING,
   VERIFIED,
 }
 
-const Prompt = () => {
+interface Props {
+  application: Application;
+}
+
+export const StepThree = (props: Props) => {
   const [, verifyWallet] = useMutation(
     gqlWallet.verifyWalletResp,
     gqlWallet.verifyWallet,
@@ -50,6 +64,8 @@ const Prompt = () => {
       try {
         const verifyWalletResult = await verifyWallet({
           code: parsedLocationHash.get('code'),
+          application:
+            props.application == Application.MATCHDAY ? 'MATCHDAY' : 'SOLANA',
         });
 
         if (RE.isFailed(verifyWalletResult)) {
@@ -57,7 +73,7 @@ const Prompt = () => {
           setStatus(VerifyWalletState.FAILED);
           console.error(verifyWalletResult.error);
           setTimeout(() => {
-            router.push('/verify-wallet');
+            router.push(window.location.pathname);
           }, 5000);
           throw verifyWalletResult.error;
         }
@@ -95,7 +111,11 @@ const Prompt = () => {
     return (
       <>
         <div className="flex align-middle gap-2">
-          <SolanaLogo height="64px" />
+          {props.application === Application.MATCHDAY ? (
+            <MatchdayLogo />
+          ) : (
+            <SolanaLogo height="64px" />
+          )}
           <ConnectedIcon />
           <ConnectedDiscordIcon />
         </div>
@@ -108,8 +128,4 @@ const Prompt = () => {
       </>
     );
   }
-};
-
-export const StepThree = () => {
-  return <Prompt />;
 };
