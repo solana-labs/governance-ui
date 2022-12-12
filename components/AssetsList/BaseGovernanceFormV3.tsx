@@ -112,7 +112,7 @@ export const BaseGovernanceFormV3 = ({
           value={form.votingCoolOffTime}
           name="votingCoolOffTime"
           type="number"
-          min={0.01}
+          min={0}
           onChange={(evt) =>
             setForm((prev) => ({
               ...prev,
