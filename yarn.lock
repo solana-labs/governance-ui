@@ -4257,10 +4257,10 @@
     bs58 "^4.0.1"
     superstruct "^0.15.2"
 
-"@solana/spl-governance@0.3.17":
-  version "0.3.17"
-  resolved "https://registry.yarnpkg.com/@solana/spl-governance/-/spl-governance-0.3.17.tgz#ec6fc9c3e3c2eb5de0c00ebc8c4d46f6e5a899e9"
-  integrity sha512-GdKBb9Hwzsu6X3Kn1SwKUuuo4cGG9cUCnlSE0JXeGOriFEVcQf3rcuUIOU7JbKcN1vIMyDyayE8p632EOgFprw==
+"@solana/spl-governance@0.3.18":
+  version "0.3.18"
+  resolved "https://registry.yarnpkg.com/@solana/spl-governance/-/spl-governance-0.3.18.tgz#13a17c6344b196fa8303749b68e8fec2a0b1988a"
+  integrity sha512-7bHAiQkzpJS1FYMBMSoVMfUmVqTHV9I5kF4KbcUZaUe08sGPUTNeu/EXXQaQyoJLqlrSYRQWIq/ckLaA9YJzJg==
   dependencies:
     "@solana/web3.js" "^1.22.0"
     axios "^1.1.3"
