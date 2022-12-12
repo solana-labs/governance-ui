@@ -407,10 +407,10 @@
     big.js "^6.1.1"
     bs58 "^5.0.0"
 
-"@blockworks-foundation/mangolana@0.0.1-beta.8":
-  version "0.0.1-beta.8"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mangolana/-/mangolana-0.0.1-beta.8.tgz#9c70df1c0f9b37bd0bdd528749085633859c9376"
-  integrity sha512-2c4nI4zbNnLGkNvajaanogdar/r5OfMkFrwGaGq4y3UVO1OJ8WAwKm2TkhQwhU6xWghpyRGYfcFMDVtbe4iNcQ==
+"@blockworks-foundation/mangolana@0.0.1-beta.11":
+  version "0.0.1-beta.11"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mangolana/-/mangolana-0.0.1-beta.11.tgz#0ecd10bde701fb852614df8a90a1c883af0c28da"
+  integrity sha512-Pf4FNOc0yFbYdDprs8mic1H3Cn7u1wmZO57vcy1o90C1OsuaGX0JUZuTm/NTcBWSBYfmBQtqUAOZE9d34Xe6qA==
   dependencies:
     "@solana/web3.js" "^1.63.1"
     bs58 "^5.0.0"
