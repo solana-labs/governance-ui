@@ -200,7 +200,7 @@ const GovernedAccountSelect = ({
               key={acc.pubkey.toBase58()}
               value={acc}
             >
-              {getLabel(acc)}
+              {label}
             </Select.Option>
           ) : null
         })
