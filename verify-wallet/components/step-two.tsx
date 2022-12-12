@@ -1,3 +1,5 @@
+import { Application } from '@verify-wallet/constants';
+
 const SolanaConnectedIcon = () => (
   <img
     src="/verify-wallet/img/icon-solana-connected.svg"
@@ -7,15 +9,31 @@ const SolanaConnectedIcon = () => (
   />
 );
 
-export const StepTwo = () => {
+interface Props {
+  application: Application;
+}
+
+export const StepTwo = (props: Props) => {
+  const DISCORD_CLIENT_ID =
+    props.application === Application.SOLANA
+      ? process.env.NEXT_PUBLIC_DISCORD_APPLICATION_CLIENT_ID!
+      : process.env.NEXT_PUBLIC_DISCORD_MATCHDAY_CLIENT_ID!;
+
+  const discordRedirectURI = encodeURI(
+    `${window.location.protocol}//${window.location.host}${window.location.pathname}`,
+  );
+
+  const scopes = ['role_connections.write'];
+  if (props.application === Application.MATCHDAY) {
+    scopes.push('identify');
+  }
+
   const DISCORD_AUTHORIZE_URL = `https://discord.com/api/oauth2/authorize?${new URLSearchParams(
     {
-      client_id: process.env.NEXT_PUBLIC_DISCORD_APPLICATION_CLIENT_ID!,
-      redirect_uri: encodeURI(
-        `${window.location.protocol}//${window.location.host}/verify-wallet`,
-      ),
+      client_id: DISCORD_CLIENT_ID,
+      redirect_uri: discordRedirectURI,
       response_type: 'code',
-      scope: ['role_connections.write'].join(' '),
+      scope: scopes.join(' '),
     },
   )}`;
 

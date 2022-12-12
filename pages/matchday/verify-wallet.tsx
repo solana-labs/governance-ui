@@ -1,15 +1,17 @@
-import VerifyWallet from '@verify-wallet/components'
 import { Application } from '@verify-wallet/constants'
+import VerifyPage from '@verify-wallet/components'
 
-export default () => {
+const MatchdayVerifyPage = () => {
   const parsedLocationHash = new URLSearchParams(
     window.location.search.substring(1)
   )
 
   return (
-    <VerifyWallet
-      application={Application.SOLANA}
+    <VerifyPage
+      application={Application.MATCHDAY}
       discordCode={parsedLocationHash.get('code')}
     />
   )
 }
+
+export default MatchdayVerifyPage
