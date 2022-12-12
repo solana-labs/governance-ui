@@ -1,5 +1,7 @@
 import { SignInWithSolana as SignInWithSolanaButton } from '@verify-wallet/components/sign-in-with-solana';
 
+import { Application } from '@verify-wallet/constants';
+
 import { SolanaLogo } from '@hub/components/branding/SolanaLogo';
 
 const DirectionRightIcon = () => (
@@ -20,10 +22,27 @@ const DiscordLogo = () => (
   />
 );
 
-export const StepOne = () => (
+const MatchdayLogo = () => (
+  <img
+    src="/verify-wallet/img/logo-matchday.png"
+    alt="Matchday"
+    height="64px"
+    width="64px"
+  />
+);
+
+interface Props {
+  application: Application;
+}
+
+export const StepOne = (props: Props) => (
   <>
     <div className="flex align-middle gap-2">
-      <SolanaLogo height="64px" />
+      {props.application === Application.SOLANA ? (
+        <SolanaLogo height="64px" />
+      ) : (
+        <MatchdayLogo />
+      )}
       <DirectionRightIcon />
       <DiscordLogo />
     </div>

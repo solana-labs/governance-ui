@@ -92,7 +92,12 @@ export function isWizardValid({ currentStep, steps, formData }) {
       yup.object(schema).validateSync(formData, { context: formData })
       return true
     } catch (error) {
-      console.log('error', error.message, error.values)
+      console.log(
+        'form validation error',
+        error.message,
+        error.values,
+        JSON.stringify('error')
+      )
       return false
     }
   }

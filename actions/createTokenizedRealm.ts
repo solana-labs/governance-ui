@@ -1,56 +1,24 @@
-import { Connection, PublicKey } from '@solana/web3.js'
 import {
   SequenceType,
-  WalletSigner,
   txBatchesToInstructionSetWithSigners,
   sendTransactionsV3,
 } from 'utils/sendTransactions'
 import { chunks } from '@utils/helpers'
-import { prepareRealmCreation } from '@tools/governance/prepareRealmCreation'
+
+import {
+  prepareRealmCreation,
+  RealmCreation,
+  Web3Context,
+} from '@tools/governance/prepareRealmCreation'
 import { trySentryLog } from '@utils/logs'
 
-interface TokenizedRealm {
-  connection: Connection
-  wallet: WalletSigner
-  programIdAddress: string
-
-  realmName: string
-  tokensToGovernThreshold: number | undefined
-
-  communityYesVotePercentage: number
-  existingCommunityMintPk: PublicKey | undefined
-  transferCommunityMintAuthority: boolean | undefined
-
-  useSupplyFactor: boolean
-  communityMintSupplyFactor: number | undefined
-  communityAbsoluteMaxVoteWeight: number | undefined
-
-  createCouncil: boolean
-  existingCouncilMintPk: PublicKey | undefined
-  transferCouncilMintAuthority: boolean | undefined
-  councilWalletPks: PublicKey[]
-}
+export type TokenizedRealm = Web3Context & RealmCreation
 
 export default async function createTokenizedRealm({
   connection,
   wallet,
-  programIdAddress,
-  realmName,
-  tokensToGovernThreshold,
 
-  communityYesVotePercentage,
-  existingCommunityMintPk,
-  transferCommunityMintAuthority = true,
-
-  useSupplyFactor,
-  communityMintSupplyFactor: rawCMSF,
-  communityAbsoluteMaxVoteWeight,
-
-  createCouncil = false,
-  existingCouncilMintPk,
-  transferCouncilMintAuthority = true,
-  // councilYesVotePercentage,
-  councilWalletPks,
+  ...params
 }: TokenizedRealm) {
   const {
     communityMintPk,
@@ -64,23 +32,8 @@ export default async function createTokenizedRealm({
   } = await prepareRealmCreation({
     connection,
     wallet,
-    programIdAddress,
-
-    realmName,
-    tokensToGovernThreshold,
-
-    existingCommunityMintPk,
-    transferCommunityMintAuthority,
-    communityYesVotePercentage,
-
-    useSupplyFactor,
-    communityMintSupplyFactor: rawCMSF,
-    communityAbsoluteMaxVoteWeight,
-
-    createCouncil,
-    existingCouncilMintPk,
-    transferCouncilMintAuthority,
-    councilWalletPks,
+    // TODO does there need to be community token config
+    ...params,
   })
 
   try {
@@ -119,7 +72,7 @@ export default async function createTokenizedRealm({
 
     const logInfo = {
       realmId: realmPk,
-      realmSymbol: realmName,
+      realmSymbol: params.realmName,
       wallet: wallet.publicKey?.toBase58(),
       cluster: connection.rpcEndpoint.includes('devnet') ? 'devnet' : 'mainnet',
     }

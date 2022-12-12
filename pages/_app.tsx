@@ -20,7 +20,10 @@ export default function App({ Component, pageProps, router }: AppProps) {
     return <Component {...pageProps} />
   }
 
-  if (router.pathname.startsWith('/verify-wallet')) {
+  if (
+    router.pathname.startsWith('/verify-wallet') ||
+    router.pathname.startsWith('/matchday/verify-wallet')
+  ) {
     return (
       <HubApp minimal>
         <Component {...pageProps} />
