@@ -10,6 +10,8 @@ import {
   getDaysFromTimestamp,
   parseMintNaturalAmountFromDecimalAsBN,
   fmtBnMintDecimalsUndelimited,
+  getHoursFromTimestamp,
+  getTimestampFromHours,
 } from '@tools/sdk/units'
 
 type FormErrors<T> = {
@@ -27,7 +29,8 @@ export type BaseGovernanceFormFieldsV3 = {
   minCommunityTokensToCreateProposal: string | 'disabled'
   // 'disabled' for disabled values
   minCouncilTokensToCreateProposal: string | 'disabled'
-
+  votingCoolOffTime: string
+  depositExemptProposalCount: string
   communityVoteThreshold: string | 'disabled'
   communityVetoVoteThreshold: string | 'disabled'
   councilVoteThreshold: string | 'disabled'
@@ -69,6 +72,8 @@ export const transformerGovernanceConfig_2_BaseGovernanceFormFieldsV3 = (
     x.type === VoteThresholdType.Disabled ? 'disabled' : x.value!.toString(),
   communityVoteTipping: (x) => x,
   councilVoteTipping: (x) => x,
+  votingCoolOffTime: (x) => getHoursFromTimestamp(x).toString(),
+  depositExemptProposalCount: (x) => x.toString(),
   _programVersion: (x) => x,
 })
 
@@ -107,6 +112,8 @@ export const transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig = (
       : { type: VoteThresholdType.YesVotePercentage, value: parseInt(x) },
   communityVoteTipping: (x) => x,
   councilVoteTipping: (x) => x,
+  votingCoolOffTime: (x) => getTimestampFromHours(parseFloat(x)),
+  depositExemptProposalCount: (x) => parseFloat(x),
   _programVersion: (x) => x,
 })
 

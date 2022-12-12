@@ -27,6 +27,8 @@ export interface GovernanceConfigValues {
   voteThresholdPercentage: number
   mintDecimals: number
   voteTipping?: VoteTipping
+  votingCoolOffTime?: number
+  depositExemptProposalCount?: number
 }
 
 // Parses min tokens to create (proposal or governance)
@@ -79,6 +81,8 @@ export function getGovernanceConfigFromV2Form(
     councilVoteThreshold: councilVoteThreshold,
     councilVetoVoteThreshold: councilVetoVoteThreshold,
     communityVetoVoteThreshold: communityVetoVoteThreshold,
+    votingCoolOffTime: values.votingCoolOffTime || 0,
+    depositExemptProposalCount: values.votingCoolOffTime || 10,
   })
 }
 
