@@ -19,7 +19,7 @@ const schema = yup.object().shape({
     .min(0, 'Redeemable amount under management cap should be min 0'),
 });
 
-const RegisterMercurialVaultDepository = ({
+const RegisterIdentityDepository = ({
   index,
   governedAccount,
 }: {
@@ -135,4 +135,4 @@ const RegisterMercurialVaultDepository = ({
   );
 };
 
-export default RegisterMercurialVaultDepository;
+export default RegisterIdentityDepository;

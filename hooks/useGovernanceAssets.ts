@@ -427,8 +427,20 @@ export default function useGovernanceAssets() {
       packageId: PackageEnum.UXD,
       tag: 'beta',
     },
+    [InstructionEnum.UXDRegisterCredixLpDepository]: {
+      name: 'Register Credix Lp Depository',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.UXD,
+      tag: 'beta',
+    },
     [InstructionEnum.UXDEditMercurialVaultDepository]: {
       name: 'Edit Mercurial Vault Depository',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.UXD,
+      tag: 'beta',
+    },
+    [InstructionEnum.UXDEditCredixLpDepository]: {
+      name: 'Edit Credix Lp Depository',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.UXD,
       tag: 'beta',
@@ -441,6 +453,12 @@ export default function useGovernanceAssets() {
     },
     [InstructionEnum.UXDMintWithMercurialVaultDepository]: {
       name: 'Mint with Mercurial Vault Depository',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.UXD,
+      tag: 'beta',
+    },
+    [InstructionEnum.UXDMintWithCredixLpDepository]: {
+      name: 'Mint with Credix Lp Depository',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.UXD,
       tag: 'beta',
@@ -465,6 +483,18 @@ export default function useGovernanceAssets() {
     },
     [InstructionEnum.UXDRedeemFromMercurialVaultDepository]: {
       name: 'Redeem from Mercurial Vault Depository',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.UXD,
+      tag: 'beta',
+    },
+    [InstructionEnum.UXDRedeemFromCredixLpDepository]: {
+      name: 'Redeem from Credix Lp Depository',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.UXD,
+      tag: 'beta',
+    },
+    [InstructionEnum.UXDCollectProfitOfCredixLpDepository]: {
+      name: 'Collect profit of Credix Lp Depository',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.UXD,
       tag: 'beta',

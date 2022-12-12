@@ -215,7 +215,23 @@ export interface UXDRegisterMercurialVaultDepositoryForm {
   redeemingFeeInBps?: number;
 }
 
+export interface UXDRegisterCredixLpDepositoryForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  collateralName?: string;
+  uiRedeemableDepositorySupplyCap?: number;
+  mintingFeeInBps?: number;
+  redeemingFeeInBps?: number;
+}
+
 export interface UXDEditMercurialVaultDepositoryForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  collateralName?: string;
+  uiRedeemableAmountUnderManagementCap?: number;
+  mintingFeeInBps?: number;
+  redeemingFeeInBps?: number;
+}
+
+export interface UXDEditCredixLpDepositoryForm {
   governedAccount?: GovernedMultiTypeAccount;
   collateralName?: string;
   uiRedeemableAmountUnderManagementCap?: number;
@@ -241,7 +257,21 @@ export interface UXDMintWithMercurialVaultDepositoryForm {
   uiCollateralAmount?: number;
 }
 
+export interface UXDMintWithCredixLpDepositoryForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  uxdProgram?: string;
+  collateralName?: string;
+  uiCollateralAmount?: number;
+}
+
 export interface UXDRedeemFromMercurialVaultDepositoryForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  uxdProgram?: string;
+  collateralName?: string;
+  uiRedeemableAmount?: number;
+}
+
+export interface UXDRedeemFromCredixLpDepositoryForm {
   governedAccount?: GovernedMultiTypeAccount;
   uxdProgram?: string;
   collateralName?: string;
@@ -676,13 +706,18 @@ export enum InstructionEnum {
   UXDInitializeController,
   UXDSetRedeemableGlobalSupplyCap,
   UXDRegisterMercurialVaultDepository,
+  UXDRegisterCredixLpDepository,
   UXDEditMercurialVaultDepository,
+  UXDEditCredixLpDepository,
   UXDEditController,
   UXDMintWithMercurialVaultDepository,
+  UXDMintWithCredixLpDepository,
   UXDInitializeIdentityDepository,
   UXDMintWithIdentityDepository,
   UXDRedeemFromIdentityDepository,
   UXDRedeemFromMercurialVaultDepository,
+  UXDRedeemFromCredixLpDepository,
+  UXDCollectProfitOfCredixLpDepository,
   UXDReinjectMangoToIdentityDepository,
   UXDEditIdentityDepository,
   UXDStakingInitializeStakingCampaign,
