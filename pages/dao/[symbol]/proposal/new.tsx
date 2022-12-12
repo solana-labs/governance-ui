@@ -140,6 +140,7 @@ const schema = yup.object().shape({
 })
 const defaultGovernanceCtx: InstructionsContext = {
   instructionsData: [],
+  voteByCouncil: null,
   handleSetInstructions: () => null,
   governance: null,
   setGovernance: () => null,
@@ -659,6 +660,7 @@ const New = () => {
                 handleSetInstructions,
                 governance,
                 setGovernance,
+                voteByCouncil,
               }}
             >
               <h2>Transactions</h2>

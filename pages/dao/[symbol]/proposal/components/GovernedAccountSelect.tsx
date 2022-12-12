@@ -1,14 +1,36 @@
 import Select from '@components/inputs/Select'
 import { Governance, GovernanceAccountType } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import {
-  getMintAccountLabelInfo,
-  getSolAccountLabel,
-  getTokenAccountLabelInfo,
-} from '@utils/tokens'
-import React, { useEffect } from 'react'
-import { getProgramName } from '@components/instructions/programs/names'
+import { getMintAccountLabelInfo } from '@utils/tokens'
+import React, { cloneElement, useEffect, useContext } from 'react'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import UnselectedWalletIcon from '@components/treasuryV2/icons/UnselectedWalletIcon'
+import { abbreviateAddress } from '@utils/formatting'
+import useTreasuryInfo from '@hooks/useTreasuryInfo'
+import AssetsPreviewIconList from '@components/treasuryV2/WalletList/WalletListItem/AssetsPreviewIconList'
+import * as RE from '@utils/uiTypes/Result'
+import {
+  durationStr,
+  voteTippingText,
+} from '@components/treasuryV2/Details/WalletDetails/Info/Rules'
+import { ClockIcon, HandIcon, ScaleIcon } from '@heroicons/react/outline'
+import cx from 'classnames'
+import { NewProposalContext } from 'pages/dao/[symbol]/proposal/new'
+
+function exists<T>(item: T | null | undefined): item is T {
+  return item !== null || item !== undefined
+}
+
+function RulesPill(props: { icon: JSX.Element; value: string }) {
+  return (
+    <div className="flex items-center space-x-1 bg-bkg-2 px-2 py-1 rounded text-xs">
+      {cloneElement(props.icon, {
+        className: cx(props.icon.props.className, 'h-4 w-4'),
+      })}
+      <div>{props.value}</div>
+    </div>
+  )
+}
 
 const GovernedAccountSelect = ({
   onChange,
@@ -31,7 +53,10 @@ const GovernedAccountSelect = ({
   noMaxWidth?: boolean
   autoSelectFirst?: boolean
 }) => {
-  function getLabel(value?: AssetAccount | null) {
+  const treasuryInfo = useTreasuryInfo()
+  const { voteByCouncil } = useContext(NewProposalContext)
+
+  function getLabel(value?: AssetAccount | null, selected = false) {
     if (!value) {
       return null
     }
@@ -39,82 +64,107 @@ const GovernedAccountSelect = ({
     const accountType = value.governance.account.accountType
 
     if (value.isSol || value.isToken) {
-      return getTokenAccountLabelComponent(
-        value.isSol
-          ? getSolAccountLabel(value)
-          : getTokenAccountLabelInfo(value)
+      return null
+    }
+
+    if (
+      accountType === GovernanceAccountType.MintGovernanceV1 ||
+      accountType === GovernanceAccountType.MintGovernanceV2
+    ) {
+      const mintInfo = getMintAccountLabelInfo(value)
+      const walletInfo =
+        RE.isOk(treasuryInfo) &&
+        treasuryInfo.data.wallets.find(
+          (wallet) =>
+            wallet.governanceAddress === value.governance.pubkey.toBase58()
+        )
+
+      return (
+        <div className="grid grid-cols-[48px,1fr,max-content] gap-x-4 text-fgd-1 items-center w-full">
+          <div>
+            <UnselectedWalletIcon className="h-12 w-12 stroke-white/50" />
+          </div>
+          <div>
+            {mintInfo.mintAccountName ? (
+              <div className="mb-0.5 truncate w-full">
+                {mintInfo.mintAccountName}
+              </div>
+            ) : mintInfo.tokenName ? (
+              <div className="mb-0.5 truncate w-full">{mintInfo.tokenName}</div>
+            ) : mintInfo.account ? (
+              <div className="mb-0.5 truncate w-full">
+                {abbreviateAddress(mintInfo.account)}
+              </div>
+            ) : (
+              <div className="mb-0.5 truncate w-full">
+                {abbreviateAddress(value.governance.pubkey)}
+              </div>
+            )}
+            <div className="space-y-0.5 text-xs text-fgd-3">
+              <div>Rules: {abbreviateAddress(value.governance.pubkey)}</div>
+            </div>
+          </div>
+          {walletInfo &&
+            (selected ? (
+              <div className="pr-2 text-white/50 space-y-1">
+                <div className="flex items-center space-x-1 justify-end">
+                  {walletInfo.rules.common?.maxVotingTime && (
+                    <RulesPill
+                      icon={<ClockIcon className="stroke-current fill-none" />}
+                      value={durationStr(
+                        walletInfo.rules.common.maxVotingTime,
+                        true
+                      )}
+                    />
+                  )}
+                  {voteByCouncil && exists(walletInfo.rules.council) ? (
+                    <RulesPill
+                      icon={<ScaleIcon className="stroke-current fill-none" />}
+                      value={
+                        walletInfo.rules.council.voteThresholdPercentage + '%'
+                      }
+                    />
+                  ) : !voteByCouncil && exists(walletInfo.rules.community) ? (
+                    <RulesPill
+                      icon={<ScaleIcon className="stroke-current fill-none" />}
+                      value={
+                        walletInfo.rules.community.voteThresholdPercentage + '%'
+                      }
+                    />
+                  ) : null}
+                  {voteByCouncil && exists(walletInfo.rules.council) ? (
+                    <RulesPill
+                      icon={<HandIcon className="stroke-current fill-none" />}
+                      value={voteTippingText(
+                        walletInfo.rules.council.voteTipping
+                      )}
+                    />
+                  ) : !voteByCouncil && exists(walletInfo.rules.community) ? (
+                    <RulesPill
+                      icon={<HandIcon className="stroke-current fill-none" />}
+                      value={voteTippingText(
+                        walletInfo.rules.community.voteTipping
+                      )}
+                    />
+                  ) : null}
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div className="text-right font-bold text-white text-sm mb-1">
+                  ${walletInfo.totalValue.toFormat(2)}
+                </div>
+                <AssetsPreviewIconList
+                  assets={walletInfo.assets}
+                  className="h-4"
+                />
+              </div>
+            ))}
+        </div>
       )
     }
-
-    switch (accountType) {
-      case GovernanceAccountType.MintGovernanceV1:
-      case GovernanceAccountType.MintGovernanceV2:
-        return getMintAccountLabelComponent(getMintAccountLabelInfo(value))
-      case GovernanceAccountType.ProgramGovernanceV1:
-      case GovernanceAccountType.ProgramGovernanceV2:
-        return getProgramAccountLabel(value.governance)
-      default:
-        return value.governance.account.governedAccount.toBase58()
-    }
   }
 
-  //TODO refactor both methods (getMintAccountLabelComponent, getTokenAccountLabelComponent) make it more common
-  function getMintAccountLabelComponent({
-    account,
-    tokenName,
-    mintAccountName,
-    amount,
-    imgUrl,
-  }) {
-    return (
-      <div className="break-all text-fgd-1">
-        {account && <div className="mb-0.5">{account}</div>}
-        <div className="mb-2">{mintAccountName}</div>
-        <div className="space-y-0.5 text-xs text-fgd-3">
-          {tokenName && (
-            <div className="flex items-center">
-              Token: <img className="flex-shrink-0 h-4 mx-1 w-4" src={imgUrl} />
-              {tokenName}
-            </div>
-          )}
-          <div>Supply: {amount}</div>
-        </div>
-      </div>
-    )
-  }
-  function getTokenAccountLabelComponent({
-    tokenAccount,
-    tokenAccountName,
-    tokenName,
-    amount,
-  }) {
-    return (
-      <div className="break-all text-fgd-1 ">
-        {tokenAccountName && <div className="mb-0.5">{tokenAccountName}</div>}
-        <div className="mb-2 text-fgd-3 text-xs">{tokenAccount}</div>
-        <div className="flex space-x-3 text-xs text-fgd-3">
-          {tokenName && (
-            <div className="flex items-center">
-              Token:
-              <span className="ml-1 text-fgd-1">{tokenName}</span>
-            </div>
-          )}
-          <div>
-            Bal:<span className="ml-1 text-fgd-1">{amount}</span>
-          </div>
-        </div>
-      </div>
-    )
-  }
-  function getProgramAccountLabel(val: ProgramAccount<Governance>) {
-    const name = val ? getProgramName(val.account.governedAccount) : ''
-    return (
-      <div className="flex flex-col">
-        {name && <div>{name}</div>}
-        <div>{val?.account?.governedAccount?.toBase58()}</div>
-      </div>
-    )
-  }
   useEffect(() => {
     if (governedAccounts.length == 1 && autoSelectFirst) {
       //wait for microtask queue to be empty
@@ -128,7 +178,7 @@ const GovernedAccountSelect = ({
     <Select
       label={label}
       onChange={onChange}
-      componentLabel={getLabel(value)}
+      componentLabel={getLabel(value, true)}
       placeholder="Please select..."
       value={value?.governance?.account.governedAccount.toBase58()}
       error={error}
@@ -142,7 +192,9 @@ const GovernedAccountSelect = ({
               governance?.pubkey?.toBase58()
         )
         .map((acc) => {
-          return (
+          const label = getLabel(acc)
+
+          return label ? (
             <Select.Option
               className="border-red"
               key={acc.pubkey.toBase58()}
@@ -150,8 +202,9 @@ const GovernedAccountSelect = ({
             >
               {getLabel(acc)}
             </Select.Option>
-          )
-        })}
+          ) : null
+        })
+        .filter(exists)}
     </Select>
   )
 }
