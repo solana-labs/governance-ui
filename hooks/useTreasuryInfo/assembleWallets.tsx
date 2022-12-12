@@ -112,7 +112,7 @@ export const assembleWallets = async (
 
     if (!walletMap[walletAddress].stats.votingProposalCount) {
       walletMap[walletAddress].stats.votingProposalCount =
-        account.governance.account.votingProposalCount || 0
+        account.governance.account.activeProposalCount.toNumber() || 0
     }
 
     // We're going to handle NFTs & programs specially
