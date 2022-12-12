@@ -16,7 +16,7 @@ export const Secondary = forwardRef<HTMLButtonElement, Props>(
         {...rest}
         ref={ref}
         className={cx(
-          'border-neutral-500',
+          'border-sky-500',
           'border',
           'flex',
           'group',
@@ -26,14 +26,14 @@ export const Secondary = forwardRef<HTMLButtonElement, Props>(
           'p-3',
           'relative',
           'rounded',
-          'text-neutral-500',
+          'text-sky-500',
           'tracking-normal',
           'transition-colors',
           rest.className,
-          !pending && 'active:border-neutral-900',
-          'disabled:border-neutral-300',
+          'disabled:border-zinc-300',
           'disabled:cursor-not-allowed',
-          !pending && 'hover:border-neutral-700',
+          !pending && 'hover:bg-sky-100',
+          !pending && 'active:bg-sky-200',
           pending && 'cursor-not-allowed',
         )}
         onClick={(e) => {
@@ -50,9 +50,7 @@ export const Secondary = forwardRef<HTMLButtonElement, Props>(
             'text-current',
             'text-sm',
             'transition-all',
-            !pending && 'group-active:text-neutral-900',
-            'group-disabled:text-neutral-300',
-            !pending && 'group-hover:text-neutral-700',
+            'group-disabled:text-zinc-300',
             pending ? 'opacity-0' : 'opacity-100',
           )}
         >

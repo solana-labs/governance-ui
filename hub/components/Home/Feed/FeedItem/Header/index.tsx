@@ -7,6 +7,7 @@ import { FeedItemAuthor } from '../../gql';
 import { AuthorAvatar } from '@hub/components/AuthorAvatar';
 import { AuthorHovercard } from '@hub/components/AuthorHovercard';
 import { ProposalStateBadge } from '@hub/components/ProposalStateBadge';
+import { RealmHovercard } from '@hub/components/RealmHovercard';
 import { RealmIcon } from '@hub/components/RealmIcon';
 import { abbreviateAddress } from '@hub/lib/abbreviateAddress';
 import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
@@ -92,22 +93,24 @@ export function Header(props: Props) {
                   : `/realm/${props.realmPublicKey.toBase58()}`
               }
             >
-              <a
-                className={cx(
-                  'block',
-                  'font-medium',
-                  'hidden',
-                  'text-neutral-900',
-                  'text-sm',
-                  'truncate',
-                  'hover:underline',
-                  'sm:block',
-                  'sm:mr-2',
-                )}
-                onClick={(e) => e.stopPropagation()}
-              >
-                {props.realm.name}
-              </a>
+              <RealmHovercard asChild publicKey={props.realmPublicKey}>
+                <a
+                  className={cx(
+                    'block',
+                    'font-medium',
+                    'hidden',
+                    'text-neutral-900',
+                    'text-sm',
+                    'truncate',
+                    'hover:underline',
+                    'sm:block',
+                    'sm:mr-2',
+                  )}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {props.realm.name}
+                </a>
+              </RealmHovercard>
             </Link>
           ))}
         <div className="flex items-center mr-2">

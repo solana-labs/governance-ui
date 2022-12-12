@@ -1,7 +1,7 @@
 import * as Separator from '@radix-ui/react-separator';
-import type { PublicKey } from '@solana/web3.js';
 import { pipe } from 'fp-ts/function';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 
 import { EcosystemHeader } from '@hub/components/EcosystemHeader';
 import * as Back from '@hub/components/FeedItem/Back';
@@ -23,28 +23,40 @@ interface Props {
   className?: string;
   commentId: string;
   feedItemId: string;
-  realm: PublicKey;
   realmUrlId: string;
 }
 
 export function FeedItemComment(props: Props) {
-  const [feedItemResult] = useQuery(feedItemGql.getFeedItemResp, {
-    query: feedItemGql.getFeedItem,
+  const [realmResult] = useQuery(feedItemGql.getRealmResp, {
+    query: feedItemGql.getRealm,
     variables: {
-      realm: props.realm,
-      feedItemId: props.feedItemId,
+      urlId:
+        props.realmUrlId === 'ecosystem'
+          ? ECOSYSTEM_PAGE.toBase58()
+          : props.realmUrlId,
     },
   });
 
-  const [realmResult] = useQuery(feedItemGql.getRealmResp, {
-    query: feedItemGql.getRealm,
-    variables: { realm: props.realm },
+  const realmPublicKey = RE.isOk(realmResult)
+    ? realmResult.data.realmByUrlId.publicKey
+    : null;
+
+  const [feedItemResult] = useQuery(feedItemGql.getFeedItemResp, {
+    query: feedItemGql.getFeedItem,
+    variables: {
+      realm: realmPublicKey?.toBase58(),
+      feedItemId: props.feedItemId,
+    },
+    pause: !realmPublicKey,
   });
 
-  const [commentResult] = useQuery(gql.getCommentResp, {
+  const [commentResult, refresh] = useQuery(gql.getCommentResp, {
     query: gql.getComments,
     variables: { commentId: props.commentId, feedItemId: props.feedItemId },
+    pause: !realmPublicKey,
   });
+
+  const router = useRouter();
 
   return (
     <main className={props.className}>
@@ -79,26 +91,27 @@ export function FeedItemComment(props: Props) {
               </div>
             </div>
           ),
-          ({ realm, hub }) =>
+          ({ realmByUrlId }) =>
             pipe(
               feedItemResult,
               RE.match(
                 () => (
                   <div>
                     <RealmHeader.Content
-                      bannerUrl={realm.bannerImageUrl}
-                      iconUrl={realm.iconUrl}
-                      name={realm.name}
-                      realm={realm.publicKey}
+                      bannerUrl={realmByUrlId.bannerImageUrl}
+                      iconUrl={realmByUrlId.iconUrl}
+                      name={realmByUrlId.displayName || realmByUrlId.name}
+                      realm={realmByUrlId.publicKey}
                       realmUrlId={props.realmUrlId}
                       selectedTab="feed"
-                      token={hub.info.token}
-                      twitterHandle={realm.twitterHandle}
-                      websiteUrl={realm.websiteUrl}
-                      discordUrl={realm.discordUrl}
-                      githubUrl={realm.githubUrl}
-                      instagramUrl={realm.instagramUrl}
-                      linkedInUrl={realm.linkedInUrl}
+                      token={realmByUrlId.token}
+                      twitterHandle={realmByUrlId.twitterHandle}
+                      userIsAdmin={realmByUrlId.amAdmin}
+                      websiteUrl={realmByUrlId.websiteUrl}
+                      discordUrl={realmByUrlId.discordUrl}
+                      githubUrl={realmByUrlId.githubUrl}
+                      instagramUrl={realmByUrlId.instagramUrl}
+                      linkedInUrl={realmByUrlId.linkedInUrl}
                     />
                     <div className="max-w-3xl mx-auto pt-8 w-full">
                       <Back.Error className="mb-8 mt-4" />
@@ -114,19 +127,20 @@ export function FeedItemComment(props: Props) {
                 () => (
                   <div>
                     <RealmHeader.Content
-                      bannerUrl={realm.bannerImageUrl}
-                      iconUrl={realm.iconUrl}
-                      name={realm.name}
-                      realm={realm.publicKey}
+                      bannerUrl={realmByUrlId.bannerImageUrl}
+                      iconUrl={realmByUrlId.iconUrl}
+                      name={realmByUrlId.displayName || realmByUrlId.name}
+                      realm={realmByUrlId.publicKey}
                       realmUrlId={props.realmUrlId}
                       selectedTab="feed"
-                      token={hub.info.token}
-                      twitterHandle={realm.twitterHandle}
-                      websiteUrl={realm.websiteUrl}
-                      discordUrl={realm.discordUrl}
-                      githubUrl={realm.githubUrl}
-                      instagramUrl={realm.instagramUrl}
-                      linkedInUrl={realm.linkedInUrl}
+                      token={realmByUrlId.token}
+                      twitterHandle={realmByUrlId.twitterHandle}
+                      userIsAdmin={realmByUrlId.amAdmin}
+                      websiteUrl={realmByUrlId.websiteUrl}
+                      discordUrl={realmByUrlId.discordUrl}
+                      githubUrl={realmByUrlId.githubUrl}
+                      instagramUrl={realmByUrlId.instagramUrl}
+                      linkedInUrl={realmByUrlId.linkedInUrl}
                     />
                     <div className="max-w-3xl mx-auto pt-8 w-full">
                       <Back.Loading className="mb-8 mt-4" />
@@ -143,31 +157,32 @@ export function FeedItemComment(props: Props) {
                   <div>
                     <Head>
                       <title>
-                        {feedItem.title} - {realm.name}
+                        {feedItem.title} - {realmByUrlId.name}
                       </title>
                       <meta
                         property="og:title"
-                        content={`${feedItem.title} - ${realm.name}`}
+                        content={`${feedItem.title} - ${realmByUrlId.name}`}
                         key="title"
                       />
                     </Head>
-                    {props.realm.equals(ECOSYSTEM_PAGE) ? (
+                    {props.realmUrlId === 'ecosystem' ? (
                       <EcosystemHeader />
                     ) : (
                       <RealmHeader.Content
-                        bannerUrl={realm.bannerImageUrl}
-                        iconUrl={realm.iconUrl}
-                        name={realm.name}
-                        realm={realm.publicKey}
+                        bannerUrl={realmByUrlId.bannerImageUrl}
+                        iconUrl={realmByUrlId.iconUrl}
+                        name={realmByUrlId.displayName || realmByUrlId.name}
+                        realm={realmByUrlId.publicKey}
                         realmUrlId={props.realmUrlId}
                         selectedTab="feed"
-                        token={hub.info.token}
-                        twitterHandle={realm.twitterHandle}
-                        websiteUrl={realm.websiteUrl}
-                        discordUrl={realm.discordUrl}
-                        githubUrl={realm.githubUrl}
-                        instagramUrl={realm.instagramUrl}
-                        linkedInUrl={realm.linkedInUrl}
+                        token={realmByUrlId.token}
+                        twitterHandle={realmByUrlId.twitterHandle}
+                        userIsAdmin={realmByUrlId.amAdmin}
+                        websiteUrl={realmByUrlId.websiteUrl}
+                        discordUrl={realmByUrlId.discordUrl}
+                        githubUrl={realmByUrlId.githubUrl}
+                        instagramUrl={realmByUrlId.instagramUrl}
+                        linkedInUrl={realmByUrlId.linkedInUrl}
                       />
                     )}
                     <div className="max-w-3xl mx-auto pt-8 w-full">
@@ -195,9 +210,14 @@ export function FeedItemComment(props: Props) {
                         className="mt-5"
                         feedItemId={feedItem.id}
                         numReplies={feedItem.numComments}
-                        realm={props.realm}
+                        realm={realmByUrlId.publicKey}
                         score={feedItem.score}
+                        type={feedItem.type}
                         userVote={feedItem.myVote}
+                        userIsAdmin={realmByUrlId.amAdmin}
+                        onDelete={() => {
+                          router.push(`/realm/${props.realmUrlId}`);
+                        }}
                       />
                       {pipe(
                         commentResult,
@@ -224,8 +244,11 @@ export function FeedItemComment(props: Props) {
                               <CommentTree.Content
                                 comments={[feedItemComment]}
                                 feedItemId={props.feedItemId}
-                                realm={props.realm}
+                                realm={realmByUrlId.publicKey}
                                 realmUrlId={props.realmUrlId}
+                                onRefresh={() =>
+                                  refresh({ requestPolicy: 'network-only' })
+                                }
                               />
                             </div>
                           ),
