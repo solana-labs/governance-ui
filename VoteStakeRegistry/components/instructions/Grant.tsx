@@ -293,6 +293,7 @@ const Grant = ({
         error={formErrors['governedTokenAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
+        type="token"
       ></GovernedAccountSelect>
       <div className="text-sm mb-3">
         <div className="mb-2">Allow dao to clawback</div>

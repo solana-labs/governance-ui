@@ -106,6 +106,8 @@ export default function SummaryButton(props: Props) {
             </div>
           )}
           <AssetsPreviewIconList
+            showMints
+            showRealmAuthority
             assets={props.wallet.assets}
             className="mt-1"
           />
