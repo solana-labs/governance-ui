@@ -368,7 +368,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         ),
         getRealmConfigAccountOrDefault(connection, programId, realmId),
       ])
-      console.log(governances, programVersion)
+
       //during the upgrade from v2 to v3 some values are undefined we need to ensure the defaults that match the program: 10 for depositExemptProposalCount and 0 for votingCoolOffTime
       const governancesWithDefaultValues =
         programVersion >= 3
