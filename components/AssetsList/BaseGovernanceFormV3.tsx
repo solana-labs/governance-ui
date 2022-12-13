@@ -32,7 +32,7 @@ export const BaseGovernanceFormV3 = ({
   // @asktree: unclear that this should not just be an effect in the parent, I am just replicating the behavior of previous components
   useEffect(() => {
     setFormErrors({})
-  }, [form])
+  }, [form, setFormErrors])
 
   const [communityTokenHelpers, councilTokenHelpers] = useMemo(() => {
     return [realmMint, councilMint].map((mint) => {

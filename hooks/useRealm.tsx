@@ -132,8 +132,7 @@ export default function useRealm() {
       return tokenRecords[wallet.publicKey.toBase58()]
     }
     return undefined
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [tokenRecords, wallet, connected, selectedCommunityDelegate])
+  }, [tokenRecords, wallet, selectedCommunityDelegate])
 
   // returns array of community tokenOwnerRecords that connected wallet has been delegated
   const ownDelegateTokenRecords = useMemo(() => {

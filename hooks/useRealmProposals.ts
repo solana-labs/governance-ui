@@ -28,6 +28,7 @@ const VotingFilter: Filters = {
   ExecutingWithErrors: false,
   SigningOff: false,
   Voting: true,
+  Vetoed: false,
 }
 
 export default function useRealmProposals(

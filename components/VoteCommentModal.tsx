@@ -1,9 +1,9 @@
 import React, { FunctionComponent, useState } from 'react'
-import { ThumbDownIcon, ThumbUpIcon } from '@heroicons/react/solid'
+import { BanIcon, ThumbDownIcon, ThumbUpIcon } from '@heroicons/react/solid'
 import {
   ChatMessageBody,
   ChatMessageBodyType,
-  YesNoVote,
+  VoteKind,
 } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import useWalletStore from '../stores/useWalletStore'
@@ -23,25 +23,29 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { nftPluginsPks } from '@hooks/useVotingPlugins'
 import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
 import { NftVoterClient } from '@solana/governance-program-library'
+import queryClient from '@hooks/queries/queryClient'
+import { voteRecordQueryKeys } from '@hooks/queries/voteRecord'
 
 interface VoteCommentModalProps {
   onClose: () => void
   isOpen: boolean
-  vote: YesNoVote
+  vote: VoteKind
   voterTokenRecord: ProgramAccount<TokenOwnerRecord>
 }
 
-const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
+const useSubmitVote = ({
+  comment,
   onClose,
-  isOpen,
-  vote,
   voterTokenRecord,
+}: {
+  comment: string
+  onClose: () => void
+  voterTokenRecord: ProgramAccount<TokenOwnerRecord>
 }) => {
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
   const [submitting, setSubmitting] = useState(false)
-  const [comment, setComment] = useState('')
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const { proposal } = useWalletStore((s) => s.selectedProposal)
@@ -54,7 +58,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
       config?.account.communityTokenConfig.voterWeightAddin?.toBase58()
     )
   const { closeNftVotingCountingModal } = useNftProposalStore.getState()
-  const submitVote = async (vote: YesNoVote) => {
+  const submitVote = async (vote: VoteKind) => {
     setSubmitting(true)
     const rpcContext = new RpcContext(
       proposal!.owner,
@@ -71,6 +75,12 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
         })
       : undefined
 
+    const confirmationCallback = async () => {
+      await refetchProposals()
+      // TODO refine this to only invalidate the one query
+      await queryClient.invalidateQueries(voteRecordQueryKeys.all)
+    }
+
     try {
       await castVote(
         rpcContext,
@@ -80,7 +90,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
         vote,
         msg,
         client,
-        refetchProposals
+        confirmationCallback
       )
       if (!isNftPlugin) {
         await refetchProposals()
@@ -104,7 +114,30 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
     fetchChatMessages(proposal!.pubkey)
   }
 
-  const voteString = vote === YesNoVote.Yes ? 'Yes' : 'No'
+  return { submitting, submitVote }
+}
+
+const VOTE_STRINGS = {
+  [VoteKind.Approve]: 'Yes',
+  [VoteKind.Deny]: 'No',
+  [VoteKind.Veto]: 'Veto',
+  [VoteKind.Abstain]: 'Abstain',
+}
+
+const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
+  onClose,
+  isOpen,
+  vote,
+  voterTokenRecord,
+}) => {
+  const [comment, setComment] = useState('')
+  const { submitting, submitVote } = useSubmitVote({
+    comment,
+    onClose,
+    voterTokenRecord,
+  })
+
+  const voteString = VOTE_STRINGS[vote]
 
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
@@ -136,10 +169,12 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
         >
           <div className="flex items-center">
             {!submitting &&
-              (vote === YesNoVote.Yes ? (
+              (vote === VoteKind.Approve ? (
                 <ThumbUpIcon className="h-4 w-4 fill-black mr-2" />
-              ) : (
+              ) : vote === VoteKind.Deny ? (
                 <ThumbDownIcon className="h-4 w-4 fill-black mr-2" />
+              ) : (
+                <BanIcon className="h-4 w-4 fill-black mr-2" />
               ))}
             {submitting ? <Loading /> : <span>Vote {voteString}</span>}
           </div>
