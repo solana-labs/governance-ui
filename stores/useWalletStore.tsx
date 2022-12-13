@@ -375,7 +375,12 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       //match the program:
       //10 for depositExemptProposalCount and 0 for votingCoolOffTime
       const governancesToSetDefaultValues = governances
-        .filter((x) => x.account.config.councilVoteThreshold.value === 0)
+        .filter(
+          (x) =>
+            x.account.config.councilVoteThreshold.value === 0 &&
+            x.account.config.councilVoteThreshold.type ===
+              VoteThresholdType.YesVotePercentage
+        )
         .map((x) => x.pubkey)
       const governancesWithDefaultValues =
         programVersion >= 3
