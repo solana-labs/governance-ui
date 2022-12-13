@@ -60,9 +60,6 @@ export function Post(props: Props) {
             ? 'Solana Ecosystem'
             : props.post.realm.name}
         </div>
-        <div className="text-xs text-neutral-500 ml-3">
-          {formatDistanceToNowStrict(props.post.created)} ago
-        </div>
       </div>
     </button>
   );
