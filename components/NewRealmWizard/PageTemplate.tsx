@@ -12,7 +12,7 @@ import { FORM_NAME as MULTISIG_WALLET_FORM } from 'pages/realms/new/multisig'
 import { FORM_NAME as COMMUNITY_TOKEN_FORM } from 'pages/realms/new/community-token'
 import { useProgramVersionByIdQuery } from '@hooks/queries/useProgramVersionQuery'
 import { PublicKey } from '@blockworks-foundation/mango-client'
-import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
+import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
 
 export const Section = ({ children }) => {
   return (
@@ -31,12 +31,13 @@ export default function FormPage({
 }) {
   const { connected, current: wallet } = useWalletStore((s) => s)
   const userAddress = wallet?.publicKey?.toBase58()
+
+  const { query, push } = useRouter()
   const [formData, setFormData] = useState<any>({
-    _programVersion: DEFAULT_GOVERNANCE_PROGRAM_VERSION,
+    _programVersion: undefined,
     memberAddresses:
       autoInviteWallet && userAddress ? [userAddress] : undefined,
   })
-  const { query, push } = useRouter()
   const currentStep = formData?.currentStep || 0
   const title = `Create ${
     type === MULTISIG_WALLET_FORM
@@ -47,7 +48,8 @@ export default function FormPage({
   } | Realms`
 
   // Update formData's _programVersion
-  const programIdInput = formData.programId
+  const programIdInput =
+    formData.programId ?? DEFAULT_GOVERNANCE_PROGRAM_ID.toString()
   const validProgramId =
     programIdInput && validateSolAddress(programIdInput)
       ? new PublicKey(programIdInput)
@@ -55,11 +57,12 @@ export default function FormPage({
   const programVersionQuery = useProgramVersionByIdQuery(validProgramId)
 
   useEffect(() => {
-    setFormData((prev) => ({
-      ...prev,
-      _programVersion:
-        programVersionQuery.data ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION,
-    }))
+    if (programVersionQuery.data) {
+      setFormData((prev) => ({
+        ...prev,
+        _programVersion: programVersionQuery.data,
+      }))
+    }
   }, [programVersionQuery.data])
 
   useEffect(() => {
