@@ -395,7 +395,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
                       councilVoteThreshold:
                         currentConfig.communityVoteThreshold,
                       councilVetoVoteThreshold:
-                        currentConfig.councilVoteThreshold,
+                        currentConfig.communityVoteThreshold,
                       councilVoteTipping: currentConfig.communityVoteTipping,
                       communityVetoVoteThreshold: new VoteThreshold({
                         type: VoteThresholdType.Disabled,
