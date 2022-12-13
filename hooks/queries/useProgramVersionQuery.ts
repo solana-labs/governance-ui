@@ -1,11 +1,12 @@
+import { EndpointTypes } from '@models/types'
 import { getGovernanceProgramVersion } from '@solana/spl-governance'
-import { Connection, PublicKey } from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
 import useWalletStore from 'stores/useWalletStore'
-import queryClient from './queryClient'
 
 export const programVersionQueryKeys = {
-  byProgramId: (programId: PublicKey) => [
+  byProgramId: (cluster: EndpointTypes, programId: PublicKey) => [
+    cluster,
     'programVersion',
     programId.toString(),
   ],
@@ -17,7 +18,8 @@ export function useProgramVersionByIdQuery(realmsProgramId?: PublicKey) {
 
   const query = useQuery({
     queryKey:
-      realmsProgramId && programVersionQueryKeys.byProgramId(realmsProgramId),
+      realmsProgramId &&
+      programVersionQueryKeys.byProgramId(connection.cluster, realmsProgramId),
     queryFn: () =>
       getGovernanceProgramVersion(connection.current, realmsProgramId!),
     enabled: realmsProgramId !== undefined,
@@ -27,12 +29,3 @@ export function useProgramVersionByIdQuery(realmsProgramId?: PublicKey) {
 
   return query
 }
-
-export const fetchProgramVersionById = (
-  connection: Connection,
-  programId: PublicKey
-) =>
-  queryClient.fetchQuery({
-    queryKey: programVersionQueryKeys.byProgramId(programId),
-    queryFn: () => getGovernanceProgramVersion(connection, programId),
-  })
