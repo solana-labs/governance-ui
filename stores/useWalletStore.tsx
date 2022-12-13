@@ -23,6 +23,8 @@ import {
   SignatoryRecord,
   TokenOwnerRecord,
   VoteRecord,
+  VoteThreshold,
+  VoteThresholdType,
 } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { getGovernanceChatMessages } from '@solana/spl-governance'
@@ -368,28 +370,41 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         ),
         getRealmConfigAccountOrDefault(connection, programId, realmId),
       ])
-
-      //during the upgrade from v2 to v3 some values are undefined we need to ensure the defaults that match the program: 10 for depositExemptProposalCount and 0 for votingCoolOffTime
+      //during the upgrade from v2 to v3 some values are undefined
+      //we need to ensure the defaults that
+      //match the program:
+      //10 for depositExemptProposalCount and 0 for votingCoolOffTime
+      const governancesToSetDefaultValues = governances
+        .filter((x) => x.account.config.councilVoteThreshold.value === 0)
+        .map((x) => x.pubkey)
       const governancesWithDefaultValues =
         programVersion >= 3
           ? governances.map((x) => {
-              return {
-                ...x,
-                account: {
-                  ...x.account,
-                  config: {
-                    ...x.account.config,
-                    votingCoolOffTime:
-                      typeof x.account.config.votingCoolOffTime === 'undefined'
-                        ? 0
-                        : x.account.config.votingCoolOffTime,
-                    depositExemptProposalCount:
-                      typeof x.account.config.depositExemptProposalCount ===
-                      'undefined'
-                        ? 10
-                        : x.account.config.depositExemptProposalCount,
+              if (
+                governancesToSetDefaultValues.find((pk) => pk.equals(x.pubkey))
+              ) {
+                const currentConfig = x.account.config
+                return {
+                  ...x,
+                  account: {
+                    ...x.account,
+                    config: {
+                      ...currentConfig,
+                      votingCoolOffTime: 0,
+                      depositExemptProposalCount: 10,
+                      councilVoteThreshold:
+                        currentConfig.communityVoteThreshold,
+                      councilVetoVoteThreshold:
+                        currentConfig.communityVoteThreshold,
+                      councilVoteTipping: currentConfig.communityVoteTipping,
+                      communityVetoVoteThreshold: new VoteThreshold({
+                        type: VoteThresholdType.Disabled,
+                      }),
+                    },
                   },
-                },
+                }
+              } else {
+                return x
               }
             })
           : governances
