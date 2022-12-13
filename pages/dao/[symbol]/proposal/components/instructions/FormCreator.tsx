@@ -23,6 +23,7 @@ export interface InstructionInput {
   initialValue: any
   name: string
   type: InstructionInputType
+  assetType?: 'mint' | 'token' | 'wallet'
   inputType?: string
   placeholder?: string
   min?: number
@@ -121,6 +122,7 @@ const InstructionInput = ({
             error={formErrors[input.name]}
             shouldBeGoverned={input.shouldBeGoverned}
             governance={input.governance}
+            type={input.assetType}
           />
         )
       case InstructionInputType.SELECT:

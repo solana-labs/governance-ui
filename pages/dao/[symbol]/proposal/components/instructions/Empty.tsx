@@ -54,7 +54,7 @@ const Empty = ({
   })
   return (
     <GovernedAccountSelect
-      label="Governance"
+      label="Wallet"
       governedAccounts={assetAccounts.filter((x) =>
         ownVoterWeight.canCreateProposal(x.governance.account.config)
       )}

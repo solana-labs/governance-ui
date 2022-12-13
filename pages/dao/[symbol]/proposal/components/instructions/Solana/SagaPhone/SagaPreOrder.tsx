@@ -160,6 +160,7 @@ const SagaPreOrder = ({
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governance,
       options: governedUSDCAccounts,
+      assetType: 'token',
       additionalComponent: form.governedAccount?.extensions.token ? (
         <div>
           SOL account:{' '}

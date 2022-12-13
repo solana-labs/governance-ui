@@ -235,6 +235,7 @@ const WithdrawValidatorStake = ({
         error={formErrors['governedTokenAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
+        type="token"
       ></GovernedAccountSelect>
       <StakeAccountSelect
         label="Staking Account"

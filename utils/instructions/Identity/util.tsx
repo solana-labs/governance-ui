@@ -65,7 +65,7 @@ export const governanceInstructionInput = (
   assetAccounts: AssetAccount[],
   shouldBeGoverned: false | ProgramAccount<Governance> | null
 ): InstructionInput => ({
-  label: 'Governance',
+  label: 'Wallet',
   initialValue: null,
   name: 'governedAccount',
   type: InstructionInputType.GOVERNED_ACCOUNT,

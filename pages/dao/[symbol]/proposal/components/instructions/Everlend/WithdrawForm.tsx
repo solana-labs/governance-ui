@@ -80,7 +80,6 @@ const WithdrawForm = ({
     setFormErrors(validationErrors)
     return isValid
   }
-  console.log(form.governedAccount)
 
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
@@ -113,8 +112,6 @@ const WithdrawForm = ({
         el.handledMint ===
         form.governedAccount?.extensions.mint?.publicKey.toString()
     )
-
-    console.log(matchedStratagie)
 
     const [rewardPool] = PublicKey.findProgramAddressSync(
       [
@@ -213,7 +210,7 @@ const WithdrawForm = ({
   return (
     <>
       <GovernedAccountSelect
-        label="Governance"
+        label="Wallet"
         governedAccounts={assetAccounts}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedAccount' })

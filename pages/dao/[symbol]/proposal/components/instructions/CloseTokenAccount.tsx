@@ -208,6 +208,7 @@ const CloseTokenAccount = ({
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governance,
       options: governedTokenAccountsWithoutNfts.filter((x) => !x.isSol),
+      assetType: 'token',
     },
     {
       label: 'Token recipient',

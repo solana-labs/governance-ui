@@ -161,6 +161,7 @@ const CastleWithdraw = ({
         error={formErrors['governedTokenAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
+        type="token"
       />
       <Select
         label="Castle Vault Destination"

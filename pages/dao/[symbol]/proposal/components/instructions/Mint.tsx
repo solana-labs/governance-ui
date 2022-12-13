@@ -144,6 +144,7 @@ const Mint = ({
         error={formErrors['mintAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
+        type="mint"
       ></GovernedAccountSelect>
       <Input
         label="Destination account"

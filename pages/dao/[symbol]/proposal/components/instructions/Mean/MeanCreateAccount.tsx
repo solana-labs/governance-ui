@@ -174,6 +174,7 @@ const MeanCreateAccountComponent = ({ index, governance }: Props) => {
         error={formErrors['governedTokenAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
+        type="token"
       />
       <Input
         min={mintMinAmount}
