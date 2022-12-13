@@ -41,7 +41,6 @@ import {
 } from '@models/api'
 import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 import { HIDDEN_PROPOSALS } from '@components/instructions/tools'
-import { sleep } from '@blockworks-foundation/mango-client'
 import { getRealmConfigAccountOrDefault } from '@tools/governance/configs'
 import { getProposals } from '@utils/GovernanceTools'
 
@@ -317,6 +316,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
     async fetchRealm(programId: PublicKey, realmId: PublicKey) {
       const set = get().set
       const connection = get().connection.current
+      const programVersion = get().selectedRealm.programVersion
       const connectionContext = get().connection
       const realms = get().realms
       const realm = realms[realmId.toBase58()]
@@ -369,7 +369,32 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         getRealmConfigAccountOrDefault(connection, programId, realmId),
       ])
 
-      const governancesMap = accountsToPubkeyMap(governances)
+      //during the upgrade from v2 to v3 some values are undefined we need to ensure the defaults that match the program: 10 for depositExemptProposalCount and 0 for votingCoolOffTime
+      const governancesWithDefaultValues =
+        programVersion >= 3
+          ? governances.map((x) => {
+              return {
+                ...x,
+                account: {
+                  ...x.account,
+                  config: {
+                    ...x.account.config,
+                    votingCoolOffTime:
+                      typeof x.account.config.votingCoolOffTime === 'undefined'
+                        ? 0
+                        : x.account.config.votingCoolOffTime,
+                    depositExemptProposalCount:
+                      typeof x.account.config.depositExemptProposalCount ===
+                      'undefined'
+                        ? 10
+                        : x.account.config.depositExemptProposalCount,
+                  },
+                },
+              }
+            })
+          : governances
+
+      const governancesMap = accountsToPubkeyMap(governancesWithDefaultValues)
 
       set((s) => {
         s.selectedRealm.config = config
@@ -403,20 +428,12 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
     async refetchProposals() {
       console.log('REFETCH PROPOSALS')
-      await sleep(200)
       const set = get().set
-      const connection = get().connection.current
       const connectionContext = get().connection
-      const realmId = get().selectedRealm.realm?.pubkey
       const programId = get().selectedRealm.programId
-      const governances = await getGovernanceAccounts(
-        connection,
-        programId!,
-        Governance,
-        [pubkeyFilter(1, realmId)!]
-      )
+      const governances = get().selectedRealm.governances
       const proposalsByGovernance = await getProposals(
-        governances.map((x) => x.pubkey),
+        Object.keys(governances).map((x) => new PublicKey(x)),
         connectionContext,
         programId!
       )

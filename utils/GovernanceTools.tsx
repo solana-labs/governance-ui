@@ -81,8 +81,9 @@ export function getGovernanceConfigFromV2Form(
     councilVoteThreshold: councilVoteThreshold,
     councilVetoVoteThreshold: councilVetoVoteThreshold,
     communityVetoVoteThreshold: communityVetoVoteThreshold,
-    votingCoolOffTime: values.votingCoolOffTime || 0,
-    depositExemptProposalCount: values.votingCoolOffTime || 10,
+    //defaults in v2 there is no votingCoolOffTime and depositExemptProposalCount
+    votingCoolOffTime: 0,
+    depositExemptProposalCount: 10,
   })
 }
 

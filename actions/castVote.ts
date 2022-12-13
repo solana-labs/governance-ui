@@ -117,7 +117,7 @@ export async function castVote(
       2
     )
     const nftsAccountsChunks = chunks(remainingInstructionsToChunk, 2)
-    console.log(splInstructionsWithAccountsChunk, '@@@@@')
+
     const instructionsChunks = [
       ...nftsAccountsChunks.map((txBatch, batchIdx) => {
         return {

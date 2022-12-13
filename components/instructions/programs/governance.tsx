@@ -137,7 +137,9 @@ export const GOVERNANCE_INSTRUCTIONS = {
             </p>
             <p>
               {`votingCoolOffTime:
-          ${getHoursFromTimestamp(args.config.votingCoolOffTime)} hour(s)`}
+          ${getHoursFromTimestamp(
+            args.config.votingCoolOffTime
+          )} hour(s) | raw arg: ${args.config.votingCoolOffTime} secs`}
             </p>
             <p>
               {`depositExemptProposalCount:
