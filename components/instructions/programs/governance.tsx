@@ -140,13 +140,15 @@ export const GOVERNANCE_INSTRUCTIONS = {
             governance.account.config.minInstructionHoldUpTime
           )} day(s) | raw arg: ${
                   governance.account.config.minInstructionHoldUpTime
-                }`}
+                } secs`}
               </p>
               <p>
                 {`maxVotingTime:
           ${getDaysFromTimestamp(
             governance.account.config.maxVotingTime
-          )} days(s) | raw arg: ${governance.account.config.maxVotingTime}`}
+          )} days(s) | raw arg: ${
+                  governance.account.config.maxVotingTime
+                } secs`}
               </p>
               <p>
                 {`votingCoolOffTime:
@@ -232,21 +234,19 @@ export const GOVERNANCE_INSTRUCTIONS = {
                 {`minInstructionHoldUpTime:
           ${getDaysFromTimestamp(
             args.config.minInstructionHoldUpTime
-          )} day(s) | raw arg: ${args.config.minInstructionHoldUpTime}`}
+          )} day(s) | raw arg: ${args.config.minInstructionHoldUpTime} secs`}
               </p>
               <p>
                 {`maxVotingTime:
           ${getDaysFromTimestamp(
             args.config.maxVotingTime
-          )} days(s) | raw arg: ${args.config.maxVotingTime}`}
+          )} days(s) | raw arg: ${args.config.maxVotingTime} secs`}
               </p>
               <p>
                 {`votingCoolOffTime:
           ${getHoursFromTimestamp(
             args.config.votingCoolOffTime
-          )} hour(s) | raw arg: ${
-                  args.config.votingCoolOffTime
-                } secs | raw arg: ${args.config.votingCoolOffTime}`}
+          )} hour(s) | raw arg: ${args.config.votingCoolOffTime} secs`}
               </p>
               <p>
                 {`depositExemptProposalCount:
