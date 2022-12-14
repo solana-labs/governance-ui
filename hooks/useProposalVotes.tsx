@@ -39,7 +39,10 @@ export default function useProposalVotes(proposal?: Proposal) {
   const isPluginCommunityVoting = maxVoteRecord && isCommunityVote
   const voteThresholdPct = isCommunityVote
     ? governance.config.communityVoteThreshold.value
-    : governance.config.councilVoteThreshold.value
+    : programVersion > 2
+    ? governance.config.councilVoteThreshold.value
+    : governance.config.communityVoteThreshold.value
+
   if (voteThresholdPct === undefined)
     throw new Error(
       'Proposal has no vote threshold (this shouldnt be possible)'
@@ -71,7 +74,6 @@ export default function useProposalVotes(proposal?: Proposal) {
 
   const relativeYesVotes = getRelativeVoteCount(yesVoteCount)
   const relativeNoVotes = getRelativeVoteCount(noVoteCount)
-
   const rawYesVotesRequired = minimumYesVotes - yesVoteCount
   const yesVotesRequired =
     proposalMint.decimals == 0
