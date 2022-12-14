@@ -24,6 +24,7 @@ import {
   useProposalVoteRecordQuery,
 } from './hooks'
 import assertUnreachable from '@utils/typescript/assertUnreachable'
+import { useHasVoteTimeExpired } from '@hooks/useHasVoteTimeExpired'
 
 export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
   const client = useVotePluginsClientStore(
@@ -38,9 +39,10 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
   const connected = useWalletStore((s) => s.connected)
   const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
   const fetchProposal = useWalletStore((s) => s.actions.fetchProposal)
+  const { governance } = useWalletStore((s) => s.selectedProposal)
   const maxVoterWeight =
     useNftPluginStore((s) => s.state.maxVoteRecord)?.pubkey || undefined
-
+  const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
   const isVoting = useIsVoting()
 
   const [isLoading, setIsLoading] = useState(false)
@@ -90,7 +92,13 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
       setIsLoading(true)
       const instructions: TransactionInstruction[] = []
 
-      if (proposal !== undefined && isVoting) {
+      //we want to finalize only if someone try to withdraw after voting time ended
+      //but its before finalize state
+      if (
+        proposal !== undefined &&
+        proposal?.account.state === ProposalState.Voting &&
+        hasVoteTimeExpired
+      ) {
         await withFinalizeVote(
           instructions,
           realmInfo!.programId,
