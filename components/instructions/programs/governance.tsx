@@ -153,6 +153,8 @@ export const GOVERNANCE_INSTRUCTIONS = {
               {`councilVoteTipping:
           ${VoteTipping[args.config.councilVoteTipping]}`}
             </p>
+            <h3 className="mt-5">Raw JSON args</h3>
+            {JSON.stringify(args)}
           </>
         ) : (
           <>
