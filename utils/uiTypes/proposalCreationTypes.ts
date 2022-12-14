@@ -10,7 +10,7 @@ import { LockupKind } from 'VoteStakeRegistry/tools/types'
 import { consts as foresightConsts } from '@foresight-tmp/foresight-sdk'
 import { AssetAccount, StakeAccount } from '@utils/uiTypes/assets'
 import { RealmInfo } from '@models/registry/api'
-import * as Msp from '@mean-dao/msp'
+import * as PaymentStreaming from '@mean-dao/payment-streaming'
 
 // Alphabetical order
 export enum PackageEnum {
@@ -83,27 +83,27 @@ export interface MeanCreateAccount {
   label: string | undefined
   mintInfo: MintInfo | undefined
   amount: number | undefined
-  type: Msp.TreasuryType
+  type: PaymentStreaming.AccountType
 }
 
 export interface MeanFundAccount {
   governedTokenAccount: AssetAccount | undefined
   mintInfo: MintInfo | undefined
   amount: number | undefined
-  treasury: Msp.Treasury | undefined
+  paymentStreamingAccount: PaymentStreaming.PaymentStreamingAccount | undefined
 }
 
 export interface MeanWithdrawFromAccount {
   governedTokenAccount: AssetAccount | undefined
   mintInfo: MintInfo | undefined
   amount: number | undefined
-  treasury: Msp.Treasury | undefined
+  paymentStreamingAccount: PaymentStreaming.PaymentStreamingAccount | undefined
   destination: string | undefined
 }
 
 export interface MeanCreateStream {
   governedTokenAccount: AssetAccount | undefined
-  treasury: Msp.Treasury | undefined
+  paymentStreamingAccount: PaymentStreaming.PaymentStreamingAccount | undefined
   streamName: string | undefined
   destination: string | undefined
   mintInfo: MintInfo | undefined
@@ -115,7 +115,7 @@ export interface MeanCreateStream {
 
 export interface MeanTransferStream {
   governedTokenAccount: AssetAccount | undefined
-  stream: Msp.Stream | undefined
+  stream: PaymentStreaming.Stream | undefined
   destination: string | undefined
 }
 

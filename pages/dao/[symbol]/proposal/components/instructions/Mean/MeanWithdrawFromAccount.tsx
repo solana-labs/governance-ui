@@ -1,4 +1,4 @@
-import { Treasury } from '@mean-dao/msp'
+import { PaymentStreamingAccount } from '@mean-dao/payment-streaming'
 import { Governance, ProgramAccount } from '@solana/spl-governance'
 import React, { useContext, useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
@@ -26,7 +26,7 @@ const MeanWithdrawFromAccountComponent = ({ index, governance }: Props) => {
     governedTokenAccount: undefined,
     mintInfo: undefined,
     amount: undefined,
-    treasury: undefined,
+    paymentStreamingAccount: undefined,
     destination: undefined,
   })
 
@@ -89,28 +89,34 @@ const MeanWithdrawFromAccountComponent = ({ index, governance }: Props) => {
     })
   }
 
-  // treasury
+  // paymentStreamingAccount
 
   const shouldBeGoverned = index !== 0 && !!governance
-  const formTreasury = form.treasury as Treasury | undefined
+  const formPaymentStreamingAccount = form.paymentStreamingAccount as
+    | PaymentStreamingAccount
+    | undefined
 
   // governedTokenAccount
 
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
 
+  const governedTokenAccountsWithoutNftsJson = JSON.stringify(
+    governedTokenAccountsWithoutNfts
+  )
   useEffect(() => {
     const value =
-      formTreasury &&
+      formPaymentStreamingAccount &&
       governedTokenAccountsWithoutNfts.find(
         (acc) =>
           acc.governance.pubkey.toBase58() ===
-            formTreasury.treasurer.toString() && acc.isSol
+            formPaymentStreamingAccount.owner.toString() && acc.isSol
       )
     setForm((prevForm) => ({
       ...prevForm,
       governedTokenAccount: value,
     }))
-  }, [JSON.stringify(governedTokenAccountsWithoutNfts), formTreasury])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [governedTokenAccountsWithoutNftsJson, formPaymentStreamingAccount])
 
   // mint info
 
@@ -123,19 +129,24 @@ const MeanWithdrawFromAccountComponent = ({ index, governance }: Props) => {
     setForm((prevForm) => ({
       ...prevForm,
       mintInfo:
-        formTreasury && getMint(governedTokenAccountsWithoutNfts, formTreasury),
+        formPaymentStreamingAccount &&
+        getMint(governedTokenAccountsWithoutNfts, formPaymentStreamingAccount),
     }))
-  }, [JSON.stringify(governedTokenAccountsWithoutNfts), formTreasury])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [governedTokenAccountsWithoutNftsJson, formPaymentStreamingAccount])
 
   return (
     <React.Fragment>
       <SelectStreamingAccount
         label="Select streaming account source"
-        onChange={(treasury) => {
-          handleSetForm({ value: treasury, propertyName: 'treasury' })
+        onChange={(paymentStreamingAccount) => {
+          handleSetForm({
+            value: paymentStreamingAccount,
+            propertyName: 'paymentStreamingAccount',
+          })
         }}
-        value={formTreasury}
-        error={formErrors['treasury']}
+        value={formPaymentStreamingAccount}
+        error={formErrors['paymentStreamingAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
       />
