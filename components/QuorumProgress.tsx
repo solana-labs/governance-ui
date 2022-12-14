@@ -1,5 +1,8 @@
 import Tooltip from './Tooltip'
-import { InformationCircleIcon } from '@heroicons/react/outline'
+import {
+  CheckCircleIcon,
+  InformationCircleIcon,
+} from '@heroicons/react/outline'
 
 type Props = {
   progress?: number
@@ -30,13 +33,22 @@ const QuorumProgress = ({
               <InformationCircleIcon className="cursor-help h-5 text-fgd-2 w-5" />
             </Tooltip>
           </div>
-          <p className="font-bold mb-0 text-fgd-1">{`${(
-            votesRequired ?? 0
-          ).toLocaleString(undefined, {
-            maximumFractionDigits: 0,
-          })} ${(progress ?? 0) > 0 ? 'more' : ''} ${voteKindTitle} vote${
-            (votesRequired ?? 0) > 1 ? 's' : ''
-          } required`}</p>
+          {progress && progress < 100 ? (
+            <p className="font-bold mb-0 text-fgd-1">{`${(
+              votesRequired ?? 0
+            ).toLocaleString(undefined, {
+              maximumFractionDigits: 0,
+            })} ${(progress ?? 0) > 0 ? 'more' : ''} ${voteKindTitle} vote${
+              (votesRequired ?? 0) > 1 ? 's' : ''
+            } required`}</p>
+          ) : (
+            <div className="flex items-center">
+              <CheckCircleIcon className="flex-shrink-0 h-5 mr-1.5 text-green w-5" />
+              <p className="font-bold mb-0 text-fgd-1">
+                Required approval achieved
+              </p>
+            </div>
+          )}
         </div>
       </div>
       {/* {progress < 100 ? ( */}
