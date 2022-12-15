@@ -6,20 +6,18 @@ import { Twitter as TwitterIcon } from '@hub/components/icons/Twitter';
 import { useQuery } from '@hub/hooks/useQuery';
 import { abbreviateNumber } from '@hub/lib/abbreviateNumber';
 import cx from '@hub/lib/cx';
-import { RealmCategory } from '@hub/types/RealmCategory';
 import * as RE from '@hub/types/Result';
 
 import * as gql from './gql';
 
 interface Props {
   className?: string;
-  category: RealmCategory;
   content: React.ReactNode;
   imgSrc: string;
   publicKey: PublicKey;
   stats: {
-    top: string;
-    bottom: string;
+    value: string;
+    label: string;
   }[];
   title: string;
   urlId: string;
@@ -88,8 +86,10 @@ export function LargeCard(props: Props) {
                 key={i}
               >
                 <div>
-                  <div className="font-medium text-neutral-900">{stat.top}</div>
-                  <div className="text-xs text-neutral-700">{stat.bottom}</div>
+                  <div className="font-medium text-neutral-900">
+                    {stat.value}
+                  </div>
+                  <div className="text-xs text-neutral-700">{stat.label}</div>
                 </div>
               </div>
             ))}
