@@ -6,8 +6,9 @@ import {
   Proposal,
   Realm,
   TokenOwnerRecord,
+  VoteChoice,
+  VoteKind,
   withPostChatMessage,
-  YesNoVote,
 } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
@@ -27,12 +28,27 @@ import { NftVoterClient } from '@solana/governance-program-library'
 import { calcCostOfNftVote, checkHasEnoughSolToVote } from '@tools/nftVoteCalc'
 import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
 
+const getVetoTokenMint = (
+  proposal: ProgramAccount<Proposal>,
+  realm: ProgramAccount<Realm>
+) => {
+  const communityMint = realm.account.communityMint
+  const councilMint = realm.account.config.councilMint
+  const governingMint = proposal.account.governingTokenMint
+  const vetoTokenMint = governingMint.equals(communityMint)
+    ? councilMint
+    : communityMint
+  if (vetoTokenMint === undefined)
+    throw new Error('There is no token that can veto this proposal')
+  return vetoTokenMint
+}
+
 export async function castVote(
   { connection, wallet, programId, walletPubkey }: RpcContext,
   realm: ProgramAccount<Realm>,
   proposal: ProgramAccount<Proposal>,
   tokeOwnerRecord: ProgramAccount<TokenOwnerRecord>,
-  yesNoVote: YesNoVote,
+  voteKind: VoteKind,
   message?: ChatMessageBody | undefined,
   votingPlugin?: VotingClient,
   runAfterConfirmation?: (() => void) | null
@@ -57,6 +73,42 @@ export async function castVote(
     tokeOwnerRecord
   )
 
+  // It is not clear that defining these extraneous fields, `deny` and `veto`, is actually necessary.
+  // See:  https://discord.com/channels/910194960941338677/910630743510777926/1044741454175674378
+  const vote =
+    voteKind === VoteKind.Approve
+      ? new Vote({
+          voteType: VoteKind.Approve,
+          approveChoices: [new VoteChoice({ rank: 0, weightPercentage: 100 })],
+          deny: undefined,
+          veto: undefined,
+        })
+      : voteKind === VoteKind.Deny
+      ? new Vote({
+          voteType: VoteKind.Deny,
+          approveChoices: undefined,
+          deny: true,
+          veto: undefined,
+        })
+      : voteKind == VoteKind.Veto
+      ? new Vote({
+          voteType: VoteKind.Veto,
+          veto: true,
+          deny: undefined,
+          approveChoices: undefined,
+        })
+      : new Vote({
+          voteType: VoteKind.Abstain,
+          veto: undefined,
+          deny: undefined,
+          approveChoices: undefined,
+        })
+
+  const tokenMint =
+    voteKind === VoteKind.Veto
+      ? getVetoTokenMint(proposal, realm)
+      : proposal.account.governingTokenMint
+
   await withCastVote(
     instructions,
     programId,
@@ -67,8 +119,8 @@ export async function castVote(
     proposal.account.tokenOwnerRecord,
     tokeOwnerRecord.pubkey,
     governanceAuthority,
-    proposal.account.governingTokenMint,
-    Vote.fromYesNoVote(yesNoVote),
+    tokenMint,
+    vote,
     payer,
     plugin?.voterWeightPk,
     plugin?.maxVoterWeightRecord
@@ -117,7 +169,7 @@ export async function castVote(
       2
     )
     const nftsAccountsChunks = chunks(remainingInstructionsToChunk, 2)
-    console.log(splInstructionsWithAccountsChunk, '@@@@@')
+
     const instructionsChunks = [
       ...nftsAccountsChunks.map((txBatch, batchIdx) => {
         return {

@@ -100,6 +100,7 @@ const MyProposalsBn = () => {
         x.account.state === ProposalState.Succeeded ||
         x.account.state === ProposalState.ExecutingWithErrors ||
         x.account.state === ProposalState.Defeated ||
+        x.account.state === ProposalState.Vetoed ||
         x.account.state === ProposalState.Cancelled) &&
       ownVoteRecordsByProposal[x.pubkey.toBase58()] &&
       !ownVoteRecordsByProposal[x.pubkey.toBase58()]?.account.isRelinquished

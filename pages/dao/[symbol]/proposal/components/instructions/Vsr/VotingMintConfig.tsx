@@ -201,7 +201,7 @@ const VotingMintConfig = ({
       type: InstructionInputType.INPUT,
     },
     {
-      label: 'Governance',
+      label: 'Wallet',
       initialValue: null,
       name: 'governedAccount',
       type: InstructionInputType.GOVERNED_ACCOUNT,

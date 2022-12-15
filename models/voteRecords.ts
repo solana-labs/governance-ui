@@ -10,16 +10,7 @@ export function isYesVote(voteRecord: VoteRecord) {
       return voteRecord.voteWeight?.yes && !voteRecord.voteWeight.yes.isZero()
     }
     case GovernanceAccountType.VoteRecordV2: {
-      switch (voteRecord.vote?.voteType) {
-        case VoteKind.Approve: {
-          return true
-        }
-        case VoteKind.Deny: {
-          return false
-        }
-        default:
-          throw new Error('Invalid voteKind')
-      }
+      return voteRecord.vote?.voteType === VoteKind.Approve
     }
     default:
       throw new Error(`Invalid account type ${voteRecord.accountType} `)

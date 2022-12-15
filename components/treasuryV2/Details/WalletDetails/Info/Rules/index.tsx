@@ -31,7 +31,7 @@ const UNIX_MINUTE = UNIX_SECOND * 60
 const UNIX_HOUR = UNIX_MINUTE * 60
 const UNIX_DAY = UNIX_HOUR * 24
 
-function voteTippingText(voteTipping: VoteTipping) {
+export function voteTippingText(voteTipping: VoteTipping) {
   switch (voteTipping) {
     case VoteTipping.Disabled:
       return 'Disabled'
@@ -42,28 +42,28 @@ function voteTippingText(voteTipping: VoteTipping) {
   }
 }
 
-function durationStr(duration: number) {
+export function durationStr(duration: number, short = false) {
   if (duration === 0) {
-    return '0 days'
+    return short ? '0d' : '0 days'
   }
 
   if (duration > UNIX_DAY) {
     const count = duration / UNIX_DAY
-    return count + ' ' + ntext(count, 'day')
+    return count + (short ? 'd' : ' ' + ntext(count, 'day'))
   }
 
   if (duration > UNIX_HOUR) {
     const count = duration / UNIX_HOUR
-    return count + ' ' + ntext(count, 'hour')
+    return count + (short ? 'h' : ' ' + ntext(count, 'hour'))
   }
 
   if (duration > UNIX_MINUTE) {
     const count = duration / UNIX_MINUTE
-    return count + ' ' + ntext(count, 'minute')
+    return count + (short ? 'm' : ' ' + ntext(count, 'minute'))
   }
 
   const count = duration / UNIX_SECOND
-  return count + ' ' + ntext(count, 'second')
+  return count + (short ? 's' : ' ' + ntext(count, 'second'))
 }
 
 interface Props {

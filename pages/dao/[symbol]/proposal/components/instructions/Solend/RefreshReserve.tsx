@@ -119,7 +119,7 @@ const RefreshReserve = ({
   return (
     <>
       <GovernedAccountSelect
-        label="Governance"
+        label="Wallet"
         governedAccounts={assetAccounts}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedAccount' })

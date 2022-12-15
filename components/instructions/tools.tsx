@@ -42,12 +42,6 @@ export const V2_DEFAULT_GOVERNANCE_PROGRAM_ID =
 export const DEFAULT_GOVERNANCE_PROGRAM_ID = V2_DEFAULT_GOVERNANCE_PROGRAM_ID
 export const DEFAULT_GOVERNANCE_PROGRAM_VERSION = 2
 
-/**
- * Default TEST governance program id instance
- */
-export const DEFAULT_TEST_GOVERNANCE_PROGRAM_ID =
-  'GTesTBiEWE32WHXXE2S4XbZvA5CrEc4xs6ZgRe895dP'
-
 export const MANGO_DAO_TREASURY = '9RGoboEjmaAjSCXsKi6p6zJucnwF3Eg5NUN9jPS6ziL3'
 
 // Well known account names displayed on the instruction card
@@ -60,7 +54,11 @@ export const ACCOUNT_NAMES = {
   '7zGXUAeUkY9pEGfApsY26amibvqsf2dmty1cbtxHdfaQ': 'Mango DAO Wallet Governance',
   '5tgfd6XgwiXB9otEnzFpXK11m7Q7yZUaAJzWK4oT5UGF': 'Mango DAO Wallet',
   '9RGoboEjmaAjSCXsKi6p6zJucnwF3Eg5NUN9jPS6ziL3': 'Mango DAO MNGO Treasury',
-  '3r1tQ2qaR5teYPEyGoHwZeZfMU1zxD5FAAmtAJPbj9xX': 'Mango DAO Opinion Voting',
+  '3r1tQ2qaR5teYPEyGoHwZeZfMU1zxD5FAAmtAJPbj9xX':
+    'Mango DAO Opinion Voting Governance',
+  '36LbigK7RRiw12u7rb83Ztb9SFrUFUCDfYPxtfZndtyV':
+    'Mango DAO Opinion Voting Wallet',
+  '65u1A86RC2U6whcHeD2mRG1tXCSmH2GsiktmEFQmzZgq': 'Mango DAO USDC Governance',
   '4PdEyhrV3gaUj4ffwjKGXBLo42jF2CQCCBoXenwCRWXf':
     'Mango DAO USDC Treasury Vault',
   '6h29sTzK4XsL4Gjo8uXLWXgKLNSXvnnax45RJ4NSCziP': 'Mango DAO USDC Treasury',

@@ -5,11 +5,23 @@ import { CollectionIcon } from '@heroicons/react/outline'
 import {
   Asset,
   AssetType,
+  Domains,
+  Mint,
+  Programs,
+  RealmAuthority,
   Token,
   NFTCollection,
   Sol,
 } from '@models/treasury/Asset'
 import Tooltip from '@components/Tooltip'
+import CommunityMintIcon from '@components/treasuryV2/icons/CommunityMintIcon'
+import CouncilMintIcon from '@components/treasuryV2/icons/CouncilMintIcon'
+import PlainRealmLogo from '@components/treasuryV2/icons/PlainRealmLogo'
+import { ntext } from '@utils/ntext'
+
+function isDomains(asset: Asset): asset is Domains {
+  return asset.type === AssetType.Domain
+}
 
 function isToken(asset: Asset): asset is Token {
   return asset.type === AssetType.Token
@@ -19,13 +31,31 @@ function isNFTCollection(asset: Asset): asset is NFTCollection {
   return asset.type === AssetType.NFTCollection
 }
 
+function isPrograms(asset: Asset): asset is Programs {
+  return asset.type === AssetType.Programs
+}
+
 function isSol(asset: Asset): asset is Sol {
   return asset.type === AssetType.Sol
+}
+
+function isCouncilMint(asset: Asset): asset is Mint {
+  return asset.type === AssetType.Mint && asset.tokenRole === 'council'
+}
+
+function isCommunityMint(asset: Asset): asset is Mint {
+  return asset.type === AssetType.Mint && asset.tokenRole === 'community'
+}
+
+function isRealmAuthority(asset: Asset): asset is RealmAuthority {
+  return asset.type === AssetType.RealmAuthority
 }
 
 interface Props {
   className?: string
   assets: Asset[]
+  showRealmAuthority?: boolean
+  showMints?: boolean
 }
 
 /**
@@ -46,19 +76,62 @@ export default function AssetsPreviewIconList(props: Props) {
     .sort((a, b) => b.value.comparedTo(a.value))
   const nfts = props.assets.filter(isNFTCollection)
   const sol = props.assets.filter(isSol)
+  const councilMint: Mint | undefined = props.assets.filter(isCouncilMint)[0]
+  const communityMint: Mint | undefined = props.assets.filter(
+    isCommunityMint
+  )[0]
+  const realmAuthority: RealmAuthority | undefined = props.assets.filter(
+    isRealmAuthority
+  )[0]
   const assetCount = props.assets.length
-  const otherCount = assetCount - tokens.length - nfts.length - sol.length
+  let unaccounted = [...props.assets]
+  let otherCount = assetCount - tokens.length - nfts.length - sol.length
+
+  if (props.showRealmAuthority && realmAuthority) {
+    otherCount -= 1
+  }
+
+  if (props.showMints && councilMint) {
+    otherCount -= 1
+  }
+
+  if (props.showMints && communityMint) {
+    otherCount -= 1
+  }
 
   const previewList: JSX.Element[] = []
   const summary: string[] = []
 
   let remainingCount = assetCount
 
-  // If the wallet contains sol, show that first
+  // Handle special cases first
+  if (props.showRealmAuthority && realmAuthority) {
+    previewList.push(<PlainRealmLogo className="fill-current" />)
+    remainingCount--
+    summary.push('the Realm Authority')
+    unaccounted = unaccounted.filter((item) => !isRealmAuthority(item))
+  }
+
+  if (props.showMints && councilMint) {
+    previewList.push(<CouncilMintIcon className="stroke-current" />)
+    remainingCount--
+    summary.push('the Council Mint')
+    unaccounted = unaccounted.filter((item) => !isCouncilMint(item))
+  }
+
+  if (props.showMints && communityMint) {
+    previewList.push(<CommunityMintIcon className="stroke-current" />)
+    remainingCount--
+    summary.push('the Community Mint')
+    unaccounted = unaccounted.filter((item) => !isCommunityMint(item))
+  }
+
   if (sol.length) {
+    // If the wallet contains sol, show that
     previewList.push(sol[0].icon)
     remainingCount--
     summary.push('SOL')
+    unaccounted = unaccounted.filter((item) => !isSol(item))
   }
 
   // Display the tokens next
@@ -77,12 +150,26 @@ export default function AssetsPreviewIconList(props: Props) {
     previewList.push(list[0].icon)
     remainingCount--
     summary.push(list[0].symbol)
+    unaccounted = unaccounted.filter((item) => {
+      if (isToken(item)) {
+        return item.address !== list[0].address
+      }
+
+      return true
+    })
 
     // If the wallet does not have any Sol, we can show a second token
     if (!sol.length && list[1]) {
       previewList.push(list[1].icon)
       remainingCount--
       summary.push(list[1].symbol)
+      unaccounted = unaccounted.filter((item) => {
+        if (isToken(item)) {
+          return item.address !== list[1].address
+        }
+
+        return true
+      })
     }
 
     // If the wallet does not have any Nfts or any other assets, we can show
@@ -91,6 +178,13 @@ export default function AssetsPreviewIconList(props: Props) {
       previewList.push(list[2].icon)
       remainingCount--
       summary.push(list[2].symbol)
+      unaccounted = unaccounted.filter((item) => {
+        if (isToken(item)) {
+          return item.address !== list[2].address
+        }
+
+        return true
+      })
     }
   }
 
@@ -104,6 +198,7 @@ export default function AssetsPreviewIconList(props: Props) {
     )
     remainingCount -= nfts.length
     summary.push('NFTs')
+    unaccounted = unaccounted.filter((item) => !isNFTCollection(item))
   }
 
   // If we have space, show an icon for remaining assets
@@ -113,7 +208,34 @@ export default function AssetsPreviewIconList(props: Props) {
   }
 
   if (remainingCount > 0 || otherCount > 0) {
-    summary.push('other assets')
+    const remainingTokens = unaccounted.filter(isToken).length
+    const remainingDomains = unaccounted.filter(isDomains).length
+    const remainingPrograms = unaccounted.filter(isPrograms).length
+    const remainingOther =
+      unaccounted.length -
+      remainingTokens -
+      remainingDomains -
+      remainingPrograms
+
+    if (remainingTokens) {
+      summary.push(
+        `${remainingTokens} ${ntext(remainingTokens, 'other token')}`
+      )
+    }
+
+    if (remainingDomains) {
+      summary.push(`${remainingDomains} ${ntext(remainingDomains, 'domain')}`)
+    }
+
+    if (remainingPrograms) {
+      summary.push(
+        `${remainingPrograms} ${ntext(remainingPrograms, 'program')}`
+      )
+    }
+
+    if (remainingOther) {
+      summary.push('other assets')
+    }
   }
 
   const summaryStr =

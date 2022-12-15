@@ -95,6 +95,7 @@ const UpdateTokenMetadata = ({
         error={formErrors['mintAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
+        type="mint"
       />
 
       <Input

@@ -136,6 +136,7 @@ const FriktionDeposit = ({
         error={formErrors['governedTokenAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
+        type="token"
       ></GovernedAccountSelect>
       <Select
         label="Friktion Volt"

@@ -114,8 +114,6 @@ const DepositForm = ({
         form.governedAccount?.extensions.mint?.publicKey.toString()
     )
 
-    console.log(matchedStratagie)
-
     const [rewardPool] = PublicKey.findProgramAddressSync(
       [
         Buffer.from('reward_pool'),
@@ -222,7 +220,7 @@ const DepositForm = ({
   return (
     <>
       <GovernedAccountSelect
-        label="Governance"
+        label="Wallet"
         governedAccounts={assetAccounts}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedAccount' })

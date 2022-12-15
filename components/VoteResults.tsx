@@ -7,6 +7,7 @@ type VoteResultsProps = {
   proposal: Proposal
 }
 
+// TODO make component display well when data is loading
 const VoteResults = ({ isListView, proposal }: VoteResultsProps) => {
   const {
     yesVoteCount,
@@ -29,7 +30,7 @@ const VoteResults = ({ isListView, proposal }: VoteResultsProps) => {
                   !isListView ? 'hero-text' : ''
                 }`}
               >
-                {yesVoteCount.toLocaleString()}
+                {(yesVoteCount ?? 0).toLocaleString()}
                 {isListView ? (
                   <span className="ml-1 text-xs font-normal text-fgd-3">
                     {relativeYesVotes?.toFixed(1)}%
@@ -49,7 +50,7 @@ const VoteResults = ({ isListView, proposal }: VoteResultsProps) => {
                   !isListView ? 'hero-text' : ''
                 }`}
               >
-                {noVoteCount.toLocaleString()}
+                {(noVoteCount ?? 0).toLocaleString()}
                 {isListView ? (
                   <span className="ml-1 text-xs font-normal text-fgd-3">
                     {relativeNoVotes?.toFixed(1)}%
