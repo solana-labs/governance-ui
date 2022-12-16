@@ -845,10 +845,10 @@
     js-sha256 "^0.9.0"
     tweetnacl "1.0.3"
 
-"@dual-finance/staking-options@0.0.7":
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@dual-finance/staking-options/-/staking-options-0.0.7.tgz#fef915ca8fd941502772165f587380f93157f462"
-  integrity sha512-6yTSN8IvTJkPi10B6Ad8WoSJ4mOqfg8NrXlIE71IiIx546/QGW6uwrNd+o3kiscREDpn56BdH1+co0LWeGsEiQ==
+"@dual-finance/staking-options@0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@dual-finance/staking-options/-/staking-options-0.0.10.tgz#2d225bd022275dcc40a74a813ba57bc362bffbf8"
+  integrity sha512-HENMppmr3b89CtLOX+RH9edMYgj5+1LxP9Ls51xlx5rcynvqyhnywU06QluT1l0ULGqZo9LumhqzDb2gJgCfbQ==
   dependencies:
     "@project-serum/anchor" "^0.25.0"
     "@solana/spl-token" "^0.3.6"
