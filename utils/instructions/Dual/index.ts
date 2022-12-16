@@ -240,13 +240,13 @@ export async function getExerciseInstruction({
   const additionalSerializedInstructions: string[] = []
   if (isValid && form.soName && form.baseTreasury && wallet?.publicKey) {
     const so = getStakingOptionsApi(connection)
-    const baseMint = form.baseTreasury.extensions.mint?.publicKey!
+    const baseMint = form.baseTreasury.extensions.mint!.publicKey!
     const state = await so.getState(form.soName, baseMint)
 
     let strike = 1
-    for (let candidate of state.strikes as any) {
+    for (const candidate of state.strikes as any) {
       // Check for the strike in the list of strikes
-      let candidateStrike = Number(candidate)
+      const candidateStrike = Number(candidate)
       if (
         (await so.soMint(candidateStrike, form.soName, baseMint)).toBase58() ==
         form.optionAccount?.extensions.mint?.publicKey.toBase58()
@@ -273,9 +273,9 @@ export async function getExerciseInstruction({
       form.numTokens,
       strike,
       form.soName,
-      form.baseTreasury.extensions.token?.account.owner!,
-      form.optionAccount?.pubkey!,
-      form.quoteTreasury?.pubkey!,
+      form.baseTreasury.extensions.token!.account.owner!,
+      form.optionAccount!.pubkey!,
+      form.quoteTreasury!.pubkey!,
       form.baseTreasury.pubkey
     )
     additionalSerializedInstructions.push(
@@ -326,7 +326,7 @@ export async function getWithdrawInstruction({
 
     const withdrawInstruction = await so.createWithdrawInstruction(
       form.soName,
-      form.baseTreasury.extensions.token?.account.owner!,
+      form.baseTreasury.extensions.token!.account.owner!,
       form.baseTreasury.pubkey
     )
     additionalSerializedInstructions.push(
