@@ -117,6 +117,7 @@
     "d3": "7.4.4",
     "date-fns": "2.29.2",
     "dayjs": "1.11.1",
+    "did-jwt": "6.11.0",
     "draft-js": "0.11.7",
     "fp-ts": "2.12.2",
     "goblingold-sdk": "1.2.35",
@@ -209,7 +210,16 @@
     "@project-serum/serum": "0.13.65",
     "@project-serum/borsh": "0.2.5",
     "bignumber.js": "9.0.2",
-    "lodash": "4.17.21"
+    "lodash": "4.17.21",
+    "@switchboard-xyz/switchboard-v2/mocha": "10.1.0",
+    "**/@cardinal/certificates/mocha": "10.1.0",
+    "**/@cardinal/stake-pool/mocha": "10.1.0",
+    "@sentry/nextjs/**/ansi-regex": "3.0.1",
+    "ansi-regex": ">=3.0.1 <=5.0.1",
+    "@nivo/core/**/d3-color": "3.1.0",
+    "@nivo/bar/**/d3-color": "3.1.0",
+    "dset": "3.1.2",
+    "**/@solana/spl-token-registry/cross-fetch/node-fetch": "2.6.7"
   },
   "browserslist": [
     "chrome >= 67",
