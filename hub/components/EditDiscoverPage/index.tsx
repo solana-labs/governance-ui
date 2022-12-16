@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 
 import * as Button from '@hub/components/controls/Button';
 import { Input } from '@hub/components/controls/Input';
+import { useMutation } from '@hub/hooks/useMutation';
 import { useQuery } from '@hub/hooks/useQuery';
 import cx from '@hub/lib/cx';
 import * as RE from '@hub/types/Result';
@@ -16,6 +17,16 @@ import * as gql from './gql';
 import { RealmSelect } from './RealmSelect';
 import { SpotlightEditor } from './SpotlightEditor';
 import { TrendingSelect } from './TrendingSelect';
+
+function buildFormStateFromData(data: gql.DiscoverPage) {
+  const keyAnnouncements = ['', '', '', '', ''];
+
+  data.keyAnnouncements.forEach((item, i) => {
+    keyAnnouncements[i] = item.id;
+  });
+
+  return { ...data, keyAnnouncements };
+}
 
 interface FormState {
   daoTooling: gql.Realm[];
@@ -76,19 +87,15 @@ export function EditDiscoverPage(props: Props) {
     query: gql.getDiscoverPage,
   });
   const [formState, setFormState] = useState<null | FormState>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [, updateDiscoverPage] = useMutation(
+    gql.updateDiscoverPageResp,
+    gql.updateDiscoverPage,
+  );
 
   useEffect(() => {
     if (RE.isOk(result) && formState === null) {
-      const keyAnnouncements = ['', '', '', '', ''];
-
-      result.data.discoverPage.keyAnnouncements.forEach((item, i) => {
-        keyAnnouncements[i] = item.id;
-      });
-
-      setFormState({
-        ...result.data.discoverPage,
-        keyAnnouncements,
-      });
+      setFormState(buildFormStateFromData(result.data.discoverPage));
     }
   }, [result]);
 
@@ -246,7 +253,8 @@ export function EditDiscoverPage(props: Props) {
                   </div>
                   <footer className="flex items-center justify-end w-full max-w-[1104px]">
                     <Button.Primary
-                      onClick={() => {
+                      pending={submitting}
+                      onClick={async () => {
                         const submission = {
                           daoTooling: (formState?.daoTooling || []).map(
                             (r) => r.publicKey,
@@ -258,7 +266,9 @@ export function EditDiscoverPage(props: Props) {
                           hackathonWinners: (
                             formState?.hackathonWinners || []
                           ).map((r) => r.publicKey),
-                          keyAnncouncements: formState?.keyAnnouncements || [],
+                          keyAnnouncements: (
+                            formState?.keyAnnouncements || []
+                          ).filter(Boolean),
                           nftCollections: (formState?.nftCollections || []).map(
                             (r) => r.publicKey,
                           ),
@@ -275,7 +285,19 @@ export function EditDiscoverPage(props: Props) {
                           web3: (formState?.web3 || []).map((r) => r.publicKey),
                         };
 
-                        console.log(submission);
+                        setSubmitting(true);
+                        const resp = await updateDiscoverPage({
+                          data: submission,
+                        });
+                        setSubmitting(false);
+
+                        if (RE.isOk(resp)) {
+                          setFormState(
+                            buildFormStateFromData(
+                              resp.data.updateDiscoverPage,
+                            ),
+                          );
+                        }
                       }}
                     >
                       Save
