@@ -28,6 +28,13 @@ function buildFormStateFromData(data: gql.DiscoverPage) {
   return { ...data, keyAnnouncements };
 }
 
+function removeExtraneousFields<T extends { __typename?: string }>(
+  item: T,
+): Omit<T, '__typename'> {
+  const { __typename, ...rest } = item;
+  return rest;
+}
+
 interface FormState {
   daoTooling: gql.Realm[];
   defi: gql.Realm[];
@@ -277,7 +284,12 @@ export function EditDiscoverPage(props: Props) {
                           ),
                           spotlight: (formState?.spotlight || []).map((s) => {
                             const { realm, ...rest } = s;
-                            return rest;
+                            return removeExtraneousFields({
+                              ...rest,
+                              stats: (rest.stats as any).map(
+                                removeExtraneousFields,
+                              ),
+                            } as any);
                           }),
                           trending: (formState?.trending || []).map(
                             (r) => r.publicKey,

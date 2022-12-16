@@ -94,6 +94,8 @@ const discoverPage = IT.type({
   web3: IT.array(Realm),
 });
 
+export type DiscoverPage = IT.TypeOf<typeof discoverPage>;
+
 export const getDiscoverPage = gql`
   query {
     me {
