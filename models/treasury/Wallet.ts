@@ -10,13 +10,14 @@ import { Asset, Token } from './Asset'
 export interface CommonRules {
   maxVotingTime: number
   minInstructionHoldupTime: number
-  voteThresholdPercentage: number
-  voteTipping: VoteTipping
 }
 
 export interface Rules {
   decimals?: number
   minTokensToCreateProposal: BigNumber
+  voteThresholdPercentage: number | 'disabled'
+  vetoVoteThresholdPercentage: number | 'disabled'
+  voteTipping: VoteTipping
 }
 
 export interface Wallet {

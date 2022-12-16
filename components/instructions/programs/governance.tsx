@@ -26,10 +26,12 @@ import {
   fmtBNAmount,
   fmtMintAmount,
   getDaysFromTimestamp,
+  getHoursFromTimestamp,
 } from '@tools/sdk/units'
 import { dryRunInstruction } from 'actions/dryRunInstruction'
 import { tryGetMint } from '../../../utils/tokens'
 
+const TOKEN_TYPES = { 0: 'Liquid', 1: 'Membership', 2: 'Disabled' }
 const governanceProgramId = 'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
 
 export const GOVERNANCE_INSTRUCTIONS = {
@@ -69,7 +71,198 @@ export const GOVERNANCE_INSTRUCTIONS = {
         const isCurrentGovernanceMinCommMax =
           governance.account.config.minCommunityTokensToCreateProposal.toString() ===
           DISABLED_VOTER_WEIGHT.toString()
-        return (
+
+        return programVersion >= 3 ? (
+          <>
+            <h1>Current config</h1>
+            <div className="space-y-3">
+              <p>
+                communityVoteThreshold:{' '}
+                {governance.account.config.communityVoteThreshold.value
+                  ? governance.account.config.communityVoteThreshold.value?.toLocaleString() +
+                    '%'
+                  : 'Disabled'}
+              </p>
+              <p>
+                councilVoteThreshold:{' '}
+                {governance.account.config.councilVoteThreshold.value
+                  ? governance.account.config.councilVoteThreshold.value?.toLocaleString() +
+                    '%'
+                  : 'Disabled'}
+              </p>
+              <p>
+                communityVetoVoteThreshold:{' '}
+                {governance.account.config.communityVetoVoteThreshold.value
+                  ? governance.account.config.communityVetoVoteThreshold.value?.toLocaleString() +
+                    '%'
+                  : 'Disabled'}
+              </p>
+              <p>
+                councilVetoVoteThreshold:{' '}
+                {governance.account.config.councilVetoVoteThreshold.value
+                  ? governance.account.config.councilVetoVoteThreshold.value?.toLocaleString() +
+                    '%'
+                  : 'Disabled'}
+              </p>
+              {governance.account.config.minCommunityTokensToCreateProposal.toString() ===
+              DISABLED_VOTER_WEIGHT.toString() ? (
+                <p>minCommunityTokensToCreateProposal: Disabled</p>
+              ) : (
+                <p>
+                  minCommunityTokensToCreateProposal:{' '}
+                  {fmtMintAmount(
+                    communityMint?.account,
+                    governance.account.config.minCommunityTokensToCreateProposal
+                  )}{' '}
+                  (
+                  {governance.account.config.minCommunityTokensToCreateProposal.toString()}
+                  )
+                </p>
+              )}
+              {governance.account.config.minCouncilTokensToCreateProposal.toString() ===
+              DISABLED_VOTER_WEIGHT.toString() ? (
+                <p>minCouncilTokensToCreateProposal: Disabled</p>
+              ) : (
+                <p>
+                  minCouncilTokensToCreateProposal:{' '}
+                  {fmtMintAmount(
+                    councilMint?.account,
+                    governance.account.config.minCouncilTokensToCreateProposal
+                  )}{' '}
+                  (
+                  {governance.account.config.minCouncilTokensToCreateProposal.toString()}
+                  )
+                </p>
+              )}
+              <p>
+                {`minInstructionHoldUpTime:
+          ${getDaysFromTimestamp(
+            governance.account.config.minInstructionHoldUpTime
+          )} day(s) | raw arg: ${
+                  governance.account.config.minInstructionHoldUpTime
+                } secs`}
+              </p>
+              <p>
+                {`maxVotingTime:
+          ${getDaysFromTimestamp(
+            governance.account.config.maxVotingTime
+          )} days(s) | raw arg: ${
+                  governance.account.config.maxVotingTime
+                } secs`}
+              </p>
+              <p>
+                {`votingCoolOffTime:
+          ${getHoursFromTimestamp(
+            governance.account.config.votingCoolOffTime
+          )} hour(s) | raw arg: ${
+                  governance.account.config.votingCoolOffTime
+                } secs`}
+              </p>
+              <p>
+                {`depositExemptProposalCount:
+          ${governance.account.config.depositExemptProposalCount}`}
+              </p>
+              <p>
+                {`communityVoteTipping:
+          ${VoteTipping[governance.account.config.communityVoteTipping]}`}
+              </p>
+              <p>
+                {`councilVoteTipping:
+          ${VoteTipping[governance.account.config.councilVoteTipping]}`}
+              </p>
+            </div>
+
+            {/* --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- */}
+
+            <h1 className="mt-10">Proposed config</h1>
+            <div className="space-y-3">
+              <p>
+                communityVoteThreshold:
+                {args.config.communityVoteThreshold.value
+                  ? args.config.communityVoteThreshold.value?.toLocaleString() +
+                    '%'
+                  : 'Disabled'}
+              </p>
+              <p>
+                councilVoteThreshold:{' '}
+                {args.config.councilVoteThreshold.value
+                  ? args.config.councilVoteThreshold.value?.toLocaleString() +
+                    '%'
+                  : 'Disabled'}
+              </p>
+              <p>
+                communityVetoVoteThreshold:{' '}
+                {args.config.communityVetoVoteThreshold.value
+                  ? args.config.communityVetoVoteThreshold.value?.toLocaleString() +
+                    '%'
+                  : 'Disabled'}
+              </p>
+              <p>
+                councilVetoVoteThreshold:{' '}
+                {args.config.councilVetoVoteThreshold.value
+                  ? args.config.councilVetoVoteThreshold.value?.toLocaleString() +
+                    '%'
+                  : 'Disabled'}
+              </p>
+              {args.config.minCommunityTokensToCreateProposal.toString() ===
+              DISABLED_VOTER_WEIGHT.toString() ? (
+                <p>minCommunityTokensToCreateProposal: Disabled</p>
+              ) : (
+                <p>
+                  minCommunityTokensToCreateProposal:{' '}
+                  {fmtMintAmount(
+                    communityMint?.account,
+                    args.config.minCommunityTokensToCreateProposal
+                  )}{' '}
+                  ({args.config.minCommunityTokensToCreateProposal.toString()})
+                </p>
+              )}
+              {args.config.minCouncilTokensToCreateProposal.toString() ===
+              DISABLED_VOTER_WEIGHT.toString() ? (
+                <p>minCouncilTokensToCreateProposal: Disabled</p>
+              ) : (
+                <p>
+                  minCouncilTokensToCreateProposal:{' '}
+                  {fmtMintAmount(
+                    councilMint?.account,
+                    args.config.minCouncilTokensToCreateProposal
+                  )}{' '}
+                  ({args.config.minCouncilTokensToCreateProposal.toString()})
+                </p>
+              )}
+              <p>
+                {`minInstructionHoldUpTime:
+          ${getDaysFromTimestamp(
+            args.config.minInstructionHoldUpTime
+          )} day(s) | raw arg: ${args.config.minInstructionHoldUpTime} secs`}
+              </p>
+              <p>
+                {`maxVotingTime:
+          ${getDaysFromTimestamp(
+            args.config.maxVotingTime
+          )} days(s) | raw arg: ${args.config.maxVotingTime} secs`}
+              </p>
+              <p>
+                {`votingCoolOffTime:
+          ${getHoursFromTimestamp(
+            args.config.votingCoolOffTime
+          )} hour(s) | raw arg: ${args.config.votingCoolOffTime} secs`}
+              </p>
+              <p>
+                {`depositExemptProposalCount:
+          ${args.config.depositExemptProposalCount}`}
+              </p>
+              <p>
+                {`communityVoteTipping:
+          ${VoteTipping[args.config.communityVoteTipping]}`}
+              </p>
+              <p>
+                {`councilVoteTipping:
+          ${VoteTipping[args.config.councilVoteTipping]}`}
+              </p>
+            </div>
+          </>
+        ) : (
           <>
             <h1>Current config</h1>
             <div className="space-y-3">
@@ -260,6 +453,77 @@ export const GOVERNANCE_INSTRUCTIONS = {
 
         return isLoading ? (
           <Loading></Loading>
+        ) : programVersion >= 3 ? (
+          <>
+            <p>
+              {`minCommunityTokensToCreateGovernance:
+              ${fmtVoterWeightThresholdMintAmount(
+                communityMint?.account,
+                args.configArgs.minCommunityTokensToCreateGovernance
+              )}`}{' '}
+              (
+              {fmtBNAmount(
+                args.configArgs.minCommunityTokensToCreateGovernance
+              )}
+              )
+            </p>
+            <p>
+              {`useCouncilMint:
+               ${args.configArgs.useCouncilMint}`}
+            </p>
+            <p>
+              {`communityMintMaxVoteWeightSource:
+               ${args.configArgs.communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}% supply`}{' '}
+              (
+              {fmtBNAmount(
+                args.configArgs.communityMintMaxVoteWeightSource.value
+              )}
+              )
+            </p>
+            <p>
+              {`communityTokenConfigArgs.tokenType:
+               ${
+                 TOKEN_TYPES[args.configArgs.communityTokenConfigArgs.tokenType]
+               }`}{' '}
+              ({args.configArgs.communityTokenConfigArgs.tokenType})
+            </p>
+            <p>
+              {`communityTokenConfigArgs.useVoterWeightAddin:
+               ${
+                 // note that the !! should do nothing, but the typing is inaccurate and the value is actually 0 or 1
+                 !!args.configArgs.communityTokenConfigArgs.useVoterWeightAddin
+               }`}
+            </p>
+            <p>
+              {`communityTokenConfigArgs.useMaxVoterWeightAddin:
+               ${
+                 // note that the !! should do nothing, but the typing is inaccurate and the value is actually 0 or 1
+                 !!args.configArgs.communityTokenConfigArgs
+                   .useMaxVoterWeightAddin
+               }`}
+            </p>
+            <p>
+              {`councilTokenConfigArgs.tokenType:
+               ${
+                 TOKEN_TYPES[args.configArgs.councilTokenConfigArgs.tokenType]
+               }`}{' '}
+              ({args.configArgs.councilTokenConfigArgs.tokenType})
+            </p>
+            <p>
+              {`councilTokenConfigArgs.useVoterWeightAddin:
+               ${
+                 // note that the !! should do nothing, but the typing is inaccurate and the value is actually 0 or 1
+                 !!args.configArgs.councilTokenConfigArgs.useVoterWeightAddin
+               }`}
+            </p>
+            <p>
+              {`councilTokenConfigArgs.useMaxVoterWeightAddin:
+               ${
+                 // note that the !! should do nothing, but the typing is inaccurate and the value is actually 0 or 1
+                 !!args.configArgs.councilTokenConfigArgs.useMaxVoterWeightAddin
+               }`}
+            </p>
+          </>
         ) : (
           <>
             <h1>Current config</h1>
@@ -345,7 +609,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
                 {`useCommunityVoterWeightAddin:
                ${
                  !!args.configArgs.useCommunityVoterWeightAddin ||
-                 !!args.configArgs.communityTokenConfigArgs.useVoterWeightAddin
+                 !!args.configArgs.communityTokenConfigArgs?.useVoterWeightAddin
                }`}
               </p>
               <p>
@@ -353,7 +617,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
                ${
                  !!args.configArgs.useMaxCommunityVoterWeightAddin ||
                  !!args.configArgs.communityTokenConfigArgs
-                   .useMaxVoterWeightAddin
+                   ?.useMaxVoterWeightAddin
                }`}
               </p>
               <p>

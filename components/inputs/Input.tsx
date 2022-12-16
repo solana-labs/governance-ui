@@ -1,11 +1,12 @@
 import { StyledLabel, StyledSuffix, inputClasses } from './styles'
 import ErrorField from './ErrorField'
 import { CheckCircleIcon } from '@heroicons/react/outline'
+import { ChangeEventHandler } from 'react'
 
 interface InputProps {
   type: string
   value: any
-  onChange?: (e) => void
+  onChange?: ChangeEventHandler<HTMLInputElement>
   className?: string
   disabled?: boolean
   useDefaultStyle?: boolean

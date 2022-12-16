@@ -239,6 +239,7 @@ const StakeValidator = ({
         error={formErrors['governedTokenAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
+        type="token"
       ></GovernedAccountSelect>
       <Input
         label="Validator Vote Address"

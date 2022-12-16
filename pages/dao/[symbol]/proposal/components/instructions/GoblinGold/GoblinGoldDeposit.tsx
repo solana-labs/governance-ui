@@ -142,6 +142,7 @@ const GoblinGoldDeposit = ({
         error={formErrors['governedTokenAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
+        type="token"
       />
 
       <Select

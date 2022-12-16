@@ -1,6 +1,7 @@
 import type { BigNumber } from 'bignumber.js'
 import type {
   Governance,
+  GoverningTokenConfig,
   MintMaxVoteWeightSource,
   ProgramAccount,
   Realm,
@@ -66,8 +67,8 @@ export interface RealmAuthority {
   config: {
     communityMintMaxVoteWeightSource?: MintMaxVoteWeightSource
     minCommunityTokensToCreateGovernance: BigNumber
-    useCommunityVoterWeightAddin?: PublicKey | false
-    useMaxCommunityVoterWeightAddin?: PublicKey | false
+    communityTokenConfig?: GoverningTokenConfig
+    councilTokenConfig?: GoverningTokenConfig
   }
   icon: JSX.Element
   name: string

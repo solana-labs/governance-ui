@@ -21,6 +21,17 @@ export default function App({ Component, pageProps, router }: AppProps) {
   }
 
   if (
+    router.pathname.startsWith('/verify-wallet') ||
+    router.pathname.startsWith('/matchday/verify-wallet')
+  ) {
+    return (
+      <HubApp minimal>
+        <Component {...pageProps} />
+      </HubApp>
+    )
+  }
+
+  if (
     router.pathname.startsWith('/realm/[id]') ||
     router.pathname.startsWith('/ecosystem') ||
     router.pathname.startsWith('/discover') ||

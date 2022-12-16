@@ -48,6 +48,10 @@
           {
             "pattern": "pages/**/**",
             "group": "parent"
+          },
+          {
+            "pattern": "@verify-wallet/**/**",
+            "group": "parent"
           }
         ],
         "alphabetize": {

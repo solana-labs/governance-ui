@@ -24,13 +24,14 @@ import Address from '@components/Address'
 
 import Section from '../../../Section'
 import TokenIcon from '../../../../icons/TokenIcon'
+import useProgramVersion from '@hooks/useProgramVersion'
 
 const UNIX_SECOND = 1
 const UNIX_MINUTE = UNIX_SECOND * 60
 const UNIX_HOUR = UNIX_MINUTE * 60
 const UNIX_DAY = UNIX_HOUR * 24
 
-function voteTippingText(voteTipping: VoteTipping) {
+export function voteTippingText(voteTipping: VoteTipping) {
   switch (voteTipping) {
     case VoteTipping.Disabled:
       return 'Disabled'
@@ -41,28 +42,28 @@ function voteTippingText(voteTipping: VoteTipping) {
   }
 }
 
-function durationStr(duration: number) {
+export function durationStr(duration: number, short = false) {
   if (duration === 0) {
-    return '0 days'
+    return short ? '0d' : '0 days'
   }
 
   if (duration > UNIX_DAY) {
     const count = duration / UNIX_DAY
-    return count + ' ' + ntext(count, 'day')
+    return count + (short ? 'd' : ' ' + ntext(count, 'day'))
   }
 
   if (duration > UNIX_HOUR) {
     const count = duration / UNIX_HOUR
-    return count + ' ' + ntext(count, 'hour')
+    return count + (short ? 'h' : ' ' + ntext(count, 'hour'))
   }
 
   if (duration > UNIX_MINUTE) {
     const count = duration / UNIX_MINUTE
-    return count + ' ' + ntext(count, 'minute')
+    return count + (short ? 'm' : ' ' + ntext(count, 'minute'))
   }
 
   const count = duration / UNIX_SECOND
-  return count + ' ' + ntext(count, 'second')
+  return count + (short ? 's' : ' ' + ntext(count, 'second'))
 }
 
 interface Props {
@@ -73,6 +74,8 @@ interface Props {
 export default function Rules(props: Props) {
   const [editRulesOpen, setEditRulesOpen] = useState(false)
   const { ownVoterWeight } = useRealm()
+
+  const programVersion = useProgramVersion()
 
   const hasCommon = !!props.wallet.rules.common
   const hasCommunity = !!props.wallet.rules.community
@@ -145,126 +148,117 @@ export default function Rules(props: Props) {
                     props.wallet.rules.common.minInstructionHoldupTime
                   )}
                 />
-                <Section
-                  icon={<HandIcon />}
-                  name="Vote Tipping"
-                  value={voteTippingText(props.wallet.rules.common.voteTipping)}
-                />
-                <Section
-                  icon={<ScaleIcon />}
-                  name="Approval Quorum"
-                  value={
-                    props.wallet.rules.common.voteThresholdPercentage + '%'
-                  }
-                />
-                {!(
-                  props.wallet.rules.community && props.wallet.rules.council
-                ) &&
-                  (props.wallet.rules.community ? (
+                {/** Under versions < 3, vote tipping is just one field for both **/}
+                {programVersion <= 2 && (
+                  <Section
+                    icon={<HandIcon />}
+                    name="Vote Tipping"
+                    value={voteTippingText(
+                      props.wallet.rules.community!.voteTipping
+                    )}
+                  />
+                )}
+                {/** Under versions < 3, approval quorum is just one field for both **/}
+                {programVersion <= 2 && (
+                  <Section
+                    icon={<ScaleIcon />}
+                    name="Approval Quorum"
+                    value={
+                      props.wallet.rules.community?.voteThresholdPercentage !==
+                      undefined
+                        ? props.wallet.rules.community
+                            ?.voteThresholdPercentage + '%'
+                        : 'Disabled'
+                    }
+                  />
+                )}
+              </div>
+            </div>
+          )}
+
+          <div
+            className={
+              'mt-12 grid gap-x-8 ' +
+              (props.wallet.rules.community && props.wallet.rules.council
+                ? 'grid-cols-2'
+                : 'grid-cols-1')
+            }
+          >
+            {(['community', 'council'] as const).map((govpop) => {
+              const rules = props.wallet.rules[govpop]
+              if (!rules) return null
+              return (
+                <div key={govpop} className="border-t border-white/10 pt-6">
+                  <div className="flex items-center space-x-2 text-fgd-1 mb-4">
+                    {govpop === 'community' ? (
+                      <UserGroupIcon className="h-5 w-5" />
+                    ) : (
+                      <OfficeBuildingIcon className="h-5 w-5" />
+                    )}
+                    <div className="font-bold">
+                      {govpop === 'community' ? 'Community' : 'Council'} Rules
+                    </div>
+                  </div>
+                  <div
+                    className={
+                      'grid grid-cols-1 gap-8 ' +
+                      (props.wallet.rules.community &&
+                      props.wallet.rules.council
+                        ? 'grid-cols-1'
+                        : 'grid-cols-2')
+                    }
+                  >
                     <Section
                       icon={<TokenIcon />}
                       name="Min Governance Power to Create a Proposal"
                       value={
                         new BigNumber(DISABLED_VOTER_WEIGHT.toString())
-                          .shiftedBy(
-                            -(props.wallet.rules.community?.decimals || 0)
-                          )
-                          .isLessThanOrEqualTo(
-                            props.wallet.rules.community
-                              .minTokensToCreateProposal
-                          )
+                          .shiftedBy(-(rules.decimals || 0))
+                          .isLessThanOrEqualTo(rules.minTokensToCreateProposal)
                           ? 'Disabled'
                           : formatNumber(
-                              props.wallet.rules.community
-                                .minTokensToCreateProposal,
+                              rules.minTokensToCreateProposal,
                               undefined,
                               { maximumFractionDigits: 0 }
                             )
                       }
                     />
-                  ) : props.wallet.rules.council ? (
-                    <Section
-                      icon={<TokenIcon />}
-                      name="Min Governance Power to Create a Proposal"
-                      value={
-                        new BigNumber(DISABLED_VOTER_WEIGHT.toString())
-                          .shiftedBy(
-                            -(props.wallet.rules.council?.decimals || 0)
-                          )
-                          .isLessThanOrEqualTo(
-                            props.wallet.rules.council.minTokensToCreateProposal
-                          )
-                          ? 'Disabled'
-                          : formatNumber(
-                              props.wallet.rules.council
-                                .minTokensToCreateProposal,
-                              undefined,
-                              { maximumFractionDigits: 0 }
-                            )
-                      }
-                    />
-                  ) : null)}
-              </div>
-            </div>
-          )}
-          {props.wallet.rules.community && props.wallet.rules.council && (
-            <div className="mt-12 grid grid-cols-2 gap-x-8">
-              <div className="border-t border-white/10 pt-6">
-                <div className="flex items-center space-x-2 text-fgd-1 mb-4">
-                  <UserGroupIcon className="h-5 w-5" />
-                  <div className="font-bold">Community Rules</div>
+                    {programVersion >= 3 && (
+                      <Section
+                        icon={<HandIcon />}
+                        name="Vote Tipping"
+                        value={voteTippingText(rules.voteTipping)}
+                      />
+                    )}
+                    {/** Under versions < 3, approval quorum is just one field for both **/}
+                    {programVersion >= 3 && (
+                      <Section
+                        icon={<ScaleIcon />}
+                        name="Approval Quorum"
+                        value={
+                          rules.voteThresholdPercentage !== 'disabled'
+                            ? rules?.voteThresholdPercentage + '%'
+                            : 'Disabled'
+                        }
+                      />
+                    )}
+                    {/** Under versions < 3, vetos dont exist **/}
+                    {programVersion >= 3 && (
+                      <Section
+                        icon={<ScaleIcon />}
+                        name="Veto Quorum"
+                        value={
+                          rules.vetoVoteThresholdPercentage !== 'disabled'
+                            ? rules.vetoVoteThresholdPercentage + '%'
+                            : 'Disabled'
+                        }
+                      />
+                    )}
+                  </div>
                 </div>
-                <div className="grid grid-cols-1 gap-8">
-                  <Section
-                    icon={<TokenIcon />}
-                    name="Min Governance Power to Create a Proposal"
-                    value={
-                      new BigNumber(DISABLED_VOTER_WEIGHT.toString())
-                        .shiftedBy(
-                          -(props.wallet.rules.community?.decimals || 0)
-                        )
-                        .isLessThanOrEqualTo(
-                          props.wallet.rules.community.minTokensToCreateProposal
-                        )
-                        ? 'Disabled'
-                        : formatNumber(
-                            props.wallet.rules.community
-                              .minTokensToCreateProposal,
-                            undefined,
-                            { maximumFractionDigits: 0 }
-                          )
-                    }
-                  />
-                </div>
-              </div>
-              <div className="border-t border-white/10 pt-6">
-                <div className="flex items-center space-x-2 text-fgd-1 mb-4">
-                  <OfficeBuildingIcon className="h-5 w-5" />
-                  <div className="font-bold">Council Rules</div>
-                </div>
-                <div className="grid grid-cols-1 gap-8">
-                  <Section
-                    icon={<TokenIcon />}
-                    name="Min Governance Power to Create a Proposal"
-                    value={
-                      new BigNumber(DISABLED_VOTER_WEIGHT.toString())
-                        .shiftedBy(-(props.wallet.rules.council?.decimals || 0))
-                        .isLessThanOrEqualTo(
-                          props.wallet.rules.council.minTokensToCreateProposal
-                        )
-                        ? 'Disabled'
-                        : formatNumber(
-                            props.wallet.rules.council
-                              .minTokensToCreateProposal,
-                            undefined,
-                            { maximumFractionDigits: 0 }
-                          )
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-          )}
+              )
+            })}
+          </div>
         </div>
       ) : (
         <div>This Wallet has no rules</div>

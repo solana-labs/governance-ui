@@ -23,6 +23,7 @@ export interface InstructionInput {
   initialValue: any
   name: string
   type: InstructionInputType
+  assetType?: 'mint' | 'token' | 'wallet'
   inputType?: string
   placeholder?: string
   min?: number
@@ -121,12 +122,14 @@ const InstructionInput = ({
             error={formErrors[input.name]}
             shouldBeGoverned={input.shouldBeGoverned}
             governance={input.governance}
+            type={input.assetType}
           />
         )
       case InstructionInputType.SELECT:
         return (
           <Select
             label={input.label}
+            // Note that this is different from native selects, which simply use the value as the value, not the name-value pair.
             value={form[input.name]?.name}
             placeholder="Please select..."
             onChange={(value) => {

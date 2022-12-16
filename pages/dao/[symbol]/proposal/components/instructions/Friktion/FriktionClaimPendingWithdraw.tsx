@@ -99,7 +99,7 @@ const FriktionClaimPendingWithdraw = ({
   return (
     <>
       <GovernedAccountSelect
-        label="Source account"
+        label="Wallet"
         governedAccounts={governedTokenAccountsWithoutNfts}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedTokenAccount' })

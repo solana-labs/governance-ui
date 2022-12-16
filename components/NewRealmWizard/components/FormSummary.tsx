@@ -167,7 +167,7 @@ function CouncilInfo({
   tokenInfo,
   mintAddress,
   transferMintAuthority,
-  // yesVotePercentage,
+  yesVotePercentage,
   numberOfMembers,
 }) {
   const updatedTokenInfo = {
@@ -184,16 +184,18 @@ function CouncilInfo({
       </div>
       <TokenInfoSummary title="Council token" {...updatedTokenInfo} />
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        {yesVotePercentage !== undefined && (
+          <SummaryModule title="Approval threshold">
+            <Text level="0" className="input-base">
+              {yesVotePercentage}%
+            </Text>
+          </SummaryModule>
+        )}
         <SummaryModule title="Council members">
           <Text level="0" className="input-base">
             {numberOfMembers}
           </Text>
         </SummaryModule>
-        {/* <SummaryModule title="Approval threshold">
-          <Text level="0" className="input-base">
-            {yesVotePercentage}%
-          </Text>
-        </SummaryModule> */}
         {updatedTokenInfo.name !== TO_BE_GENERATED && (
           <SummaryModule title="Transfer mint authority?">
             <Text level="0" className="input-base">
@@ -275,10 +277,7 @@ export default function WizardSummary({
                   formData.transferCouncilMintAuthority ||
                   !formData.useExistingCouncilToken
                 }
-                // yesVotePercentage={
-                //   formData?.councilYesVotePercentage ||
-                //   formData.communityYesVotePercentage
-                // }
+                yesVotePercentage={formData.councilYesVotePercentage}
                 numberOfMembers={formData?.memberAddresses?.length}
               />
             )}

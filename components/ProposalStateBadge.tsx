@@ -3,6 +3,7 @@ import classNames from 'classnames'
 
 import useRealm from '@hooks/useRealm'
 import useRealmGovernance from '../hooks/useRealmGovernance'
+import assertUnreachable from '@utils/typescript/assertUnreachable'
 
 export const hasInstructions = (proposal: Proposal) => {
   if (proposal.instructionsCount) {
@@ -33,6 +34,7 @@ function getBorderColor(proposalState: ProposalState, otherState: OtherState) {
     case ProposalState.Completed:
     case ProposalState.Defeated:
     case ProposalState.ExecutingWithErrors:
+    case ProposalState.Vetoed:
       return 'border-transparent'
     case ProposalState.Executing:
       return 'border-[#5DC9EB]'
@@ -46,6 +48,8 @@ function getBorderColor(proposalState: ProposalState, otherState: OtherState) {
         : 'border-[#5DC9EB]'
     case ProposalState.Voting:
       return otherState.votingEnded ? 'border-[#5DC9EB]' : 'border-[#8EFFDD]'
+    default:
+      assertUnreachable(proposalState)
   }
 }
 
@@ -72,6 +76,10 @@ function getLabel(
       return !hasInstructions(otherState.proposal) ? 'Completed' : 'Executable'
     case ProposalState.Voting:
       return otherState.votingEnded ? 'Finalizing' : 'Voting'
+    case ProposalState.Vetoed:
+      return 'Vetoed'
+    default:
+      assertUnreachable(proposalState)
   }
 }
 
@@ -84,6 +92,7 @@ function getOpacity(
     case ProposalState.Completed:
     case ProposalState.Defeated:
     case ProposalState.ExecutingWithErrors:
+    case ProposalState.Vetoed:
       return 'opacity-70'
     case ProposalState.Draft:
       return otherState.isCreator ? '' : 'opacity-70'
@@ -91,8 +100,11 @@ function getOpacity(
       return otherState.isSignatory ? '' : 'opacity-70'
     case ProposalState.Succeeded:
       return !hasInstructions(otherState.proposal) ? 'opacity-70' : ''
-    default:
+    case ProposalState.Voting:
+    case ProposalState.Executing:
       return ''
+    default:
+      assertUnreachable(proposalState)
   }
 }
 
@@ -107,6 +119,7 @@ function getTextColor(
     case ProposalState.Completed:
       return 'text-[#8EFFDD]'
     case ProposalState.Defeated:
+    case ProposalState.Vetoed:
     case ProposalState.ExecutingWithErrors:
       return 'text-[#FF7C7C]'
     case ProposalState.Executing:
@@ -121,6 +134,8 @@ function getTextColor(
       return otherState.votingEnded
         ? 'bg-gradient-to-r from-[#00C2FF] via-[#00E4FF] to-[#87F2FF] bg-clip-text text-transparent'
         : 'text-[#8EFFDD]'
+    default:
+      assertUnreachable(proposalState)
   }
 }
 

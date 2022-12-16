@@ -112,7 +112,9 @@ export const assembleWallets = async (
 
     if (!walletMap[walletAddress].stats.votingProposalCount) {
       walletMap[walletAddress].stats.votingProposalCount =
-        account.governance.account.votingProposalCount || 0
+        account.governance.account?.activeProposalCount?.toNumber() ||
+        account.governance.account?.proposalCount ||
+        0
     }
 
     // We're going to handle NFTs & programs specially
@@ -316,12 +318,8 @@ export const assembleWallets = async (
             minCommunityTokensToCreateGovernance: new BigNumber(
               config.minCommunityTokensToCreateGovernance.toString()
             ).shiftedBy(communityMint ? -communityMint.decimals : 0),
-            useCommunityVoterWeightAddin:
-              realmConfig?.account.communityTokenConfig.voterWeightAddin ??
-              false,
-            useMaxCommunityVoterWeightAddin:
-              realmConfig?.account.communityTokenConfig.maxVoterWeightAddin ??
-              false,
+            communityTokenConfig: realmConfig?.account.communityTokenConfig,
+            councilTokenConfig: realmConfig?.account.councilTokenConfig,
           },
           icon: realmInfo?.ogImage ? (
             <img src={realmInfo.ogImage} />

@@ -27,6 +27,8 @@ export interface GovernanceConfigValues {
   voteThresholdPercentage: number
   mintDecimals: number
   voteTipping?: VoteTipping
+  votingCoolOffTime?: number
+  depositExemptProposalCount?: number
 }
 
 // Parses min tokens to create (proposal or governance)
@@ -39,7 +41,7 @@ export function parseMinTokensToCreate(
     : getMintNaturalAmountFromDecimal(value, mintDecimals)
 }
 
-export function getGovernanceConfig(
+export function getGovernanceConfigFromV2Form(
   programVersion: number,
   values: GovernanceConfigValues
 ) {
@@ -79,6 +81,9 @@ export function getGovernanceConfig(
     councilVoteThreshold: councilVoteThreshold,
     councilVetoVoteThreshold: councilVetoVoteThreshold,
     communityVetoVoteThreshold: communityVetoVoteThreshold,
+    //defaults in v2 there is no votingCoolOffTime and depositExemptProposalCount
+    votingCoolOffTime: 0,
+    depositExemptProposalCount: 10,
   })
 }
 
