@@ -7,7 +7,7 @@ const ENDPOINTS: EndpointInfo[] = [
     name: 'mainnet',
     url:
       process.env.MAINNET_RPC ||
-       'https://ssc-dao.genesysgo.net',
+      'http://realms-realms-c335.mainnet.rpcpool.com/258d3727-bb96-409d-abea-0b1b4c48af29/',
   },
   {
     name: 'devnet',
