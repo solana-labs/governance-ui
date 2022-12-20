@@ -33,7 +33,7 @@ const QuorumProgress = ({
               <InformationCircleIcon className="cursor-help h-5 text-fgd-2 w-5" />
             </Tooltip>
           </div>
-          {progress && progress < 100 ? (
+          {typeof progress !== 'undefined' && progress < 100 ? (
             <p className="font-bold mb-0 text-fgd-1">{`${(
               votesRequired ?? 0
             ).toLocaleString(undefined, {
