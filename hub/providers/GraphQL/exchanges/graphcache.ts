@@ -51,6 +51,9 @@ export const graphcache = async (
     storage,
     keys: {
       ClippedRichTextDocument: () => null,
+      DiscoverPage: (page) => String(page.version as number),
+      DiscoverPageSpotlightItem: (item) => item.publicKey as string,
+      DiscoverPageSpotlightItemStat: () => null,
       Realm: (realm) => realm.publicKey as string,
       RealmAboutSection: () => null,
       RealmDocumentation: () => null,
