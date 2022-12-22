@@ -26,7 +26,6 @@ export const tryParseDomain = async (
 ): Promise<PublicKey | null> => {
   const { current: connection } = getConnectionContext('mainnet')
   try {
-    // pda
     const { pubkey: domainPDA } = await getDomainKey(
       domain.trim().toLowerCase()
     )
@@ -43,6 +42,10 @@ export const tryParseDomain = async (
     console.log(`NFT Owner: ${nftOwner?.toBase58()}`)
 
     // if domain is tokenized nftOwner should return the owner of it
+    // Test domain
+    // const domain = snakeoil.sol
+    // expected nftOwner = 9apnHjEQ8enLaPLxP7z9VQTphWE4nWqZcyHJYocQMpSE
+
     if (nftOwner) return nftOwner
 
     return registry.owner
