@@ -5,7 +5,7 @@ import { AccountInfo } from '@solana/spl-token'
 import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import { PublicKey } from '@solana/web3.js'
 import { precision } from '@utils/formatting'
-import { tryParseKey } from '@tools/validators/pubkey'
+import { tryParseDomain, tryParseKey } from '@tools/validators/pubkey'
 import useWalletStore from 'stores/useWalletStore'
 import { TokenProgramAccount, tryGetTokenAccount } from '@utils/tokens'
 import {
@@ -53,6 +53,7 @@ const SplTokenTransfer = ({
     destinationAccount,
     setDestinationAccount,
   ] = useState<TokenProgramAccount<AccountInfo> | null>(null)
+  const [destinationAddress, setDestinationAddress] = useState('')
   const [formErrors, setFormErrors] = useState({})
   const mintMinAmount = form.mintInfo
     ? getMintMinAmountAsDecimal(form.mintInfo)
@@ -116,9 +117,20 @@ const SplTokenTransfer = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [realmInfo?.programId])
   useEffect(() => {
-    if (form.destinationAccount) {
+    if (destinationAddress) {
       debounce.debounceFcn(async () => {
-        const pubKey = tryParseKey(form.destinationAccount)
+        let pubKey: PublicKey | null = null
+        if (destinationAddress.trim().toLowerCase().endsWith('.sol')) {
+          pubKey = await tryParseDomain(destinationAddress)
+        } else {
+          pubKey = tryParseKey(destinationAddress)
+        }
+
+        handleSetForm({
+          value: pubKey?.toBase58() ?? '',
+          propertyName: 'destinationAccount',
+        })
+
         if (pubKey) {
           const account = await tryGetTokenAccount(connection.current, pubKey)
           setDestinationAccount(account ? account : null)
@@ -128,9 +140,14 @@ const SplTokenTransfer = ({
       })
     } else {
       setDestinationAccount(null)
+
+      handleSetForm({
+        value: '',
+        propertyName: 'destinationAccount',
+      })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form.destinationAccount])
+  }, [destinationAddress])
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: governedAccount, getInstruction },
@@ -146,6 +163,9 @@ const SplTokenTransfer = ({
   const destinationAccountName =
     destinationAccount?.publicKey &&
     getAccountName(destinationAccount?.account.address)
+  const base58DestinationAddress = destinationAddress.endsWith('.sol')
+    ? form.destinationAccount
+    : undefined
   const schema = getTokenTransferSchema({ form, connection })
 
   return (
@@ -163,16 +183,17 @@ const SplTokenTransfer = ({
       ></GovernedAccountSelect>
       <Input
         label="Destination account"
-        value={form.destinationAccount}
+        value={destinationAddress}
         type="text"
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'destinationAccount',
-          })
-        }
+        onChange={(evt) => setDestinationAddress(evt.target.value)}
         error={formErrors['destinationAccount']}
       />
+      {base58DestinationAddress && (
+        <div>
+          <div className="pb-0.5 text-fgd-3 text-xs">{destinationAddress}</div>
+          <div className="text-xs">{base58DestinationAddress}</div>
+        </div>
+      )}
       {destinationAccount && (
         <div>
           <div className="pb-0.5 text-fgd-3 text-xs">Account owner</div>

@@ -5,7 +5,7 @@ import { AccountInfo } from '@solana/spl-token'
 import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import { PublicKey } from '@solana/web3.js'
 import { precision } from 'utils/formatting'
-import { tryParseKey } from 'tools/validators/pubkey'
+import { tryParseDomain, tryParseKey } from 'tools/validators/pubkey'
 import useWalletStore from 'stores/useWalletStore'
 import { TokenProgramAccount, tryGetTokenAccount } from '@utils/tokens'
 import { UiInstruction, MintForm } from 'utils/uiTypes/proposalCreationTypes'
@@ -52,6 +52,7 @@ const Mint = ({
     destinationAccount,
     setDestinationAccount,
   ] = useState<TokenProgramAccount<AccountInfo> | null>(null)
+  const [destinationAddress, setDestinationAddress] = useState('')
   const [formErrors, setFormErrors] = useState({})
   const mintMinAmount = form.mintAccount
     ? getMintMinAmountAsDecimal(form.mintAccount.extensions.mint!.account)
@@ -101,10 +102,22 @@ const Mint = ({
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [realmInfo?.programId])
+
   useEffect(() => {
-    if (form.destinationAccount) {
+    if (destinationAddress) {
       debounce.debounceFcn(async () => {
-        const pubKey = tryParseKey(form.destinationAccount)
+        let pubKey: PublicKey | null = null
+        if (destinationAddress.trim().toLowerCase().endsWith('.sol')) {
+          pubKey = await tryParseDomain(destinationAddress)
+        } else {
+          pubKey = tryParseKey(destinationAddress)
+        }
+
+        handleSetForm({
+          value: pubKey?.toBase58() ?? '',
+          propertyName: 'destinationAccount',
+        })
+
         if (pubKey) {
           const account = await tryGetTokenAccount(connection.current, pubKey)
           setDestinationAccount(account ? account : null)
@@ -114,9 +127,15 @@ const Mint = ({
       })
     } else {
       setDestinationAccount(null)
+
+      handleSetForm({
+        value: '',
+        propertyName: 'destinationAccount',
+      })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form.destinationAccount])
+  }, [destinationAddress])
+
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: governedAccount, getInstruction },
@@ -130,6 +149,9 @@ const Mint = ({
   const destinationAccountName =
     destinationAccount?.publicKey &&
     getAccountName(destinationAccount?.account.address)
+  const destinationAddressParsed = destinationAddress.endsWith('.sol')
+    ? form.destinationAccount
+    : undefined
   const schema = getMintSchema({ form, connection })
 
   return (
@@ -147,16 +169,17 @@ const Mint = ({
       ></GovernedAccountSelect>
       <Input
         label="Destination account"
-        value={form.destinationAccount}
+        value={destinationAddress}
         type="text"
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'destinationAccount',
-          })
-        }
+        onChange={(e) => setDestinationAddress(e.target.value)}
         error={formErrors['destinationAccount']}
       />
+      {destinationAddressParsed && (
+        <div>
+          <div className="pb-0.5 text-fgd-3 text-xs">{destinationAddress}</div>
+          <div className="text-xs">{destinationAddressParsed}</div>
+        </div>
+      )}
       {destinationAccount && (
         <div>
           <div className="pb-0.5 text-fgd-3 text-xs">Account owner</div>
