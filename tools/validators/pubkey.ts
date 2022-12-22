@@ -35,16 +35,11 @@ export const tryParseDomain = async (
       domainPDA
     )
 
-    console.log(`Class: ${registry.class.toBase58()}`)
-    console.log(`Data: ${registry.data?.toString()}`)
-    console.log(`Owner: ${registry.owner?.toBase58()}`)
-    console.log(`Parent: ${registry.parentName?.toBase58()}`)
-    console.log(`NFT Owner: ${nftOwner?.toBase58()}`)
-
-    // if domain is tokenized nftOwner should return the owner of it
-    // Test domain
-    // const domain = snakeoil.sol
-    // expected nftOwner = 9apnHjEQ8enLaPLxP7z9VQTphWE4nWqZcyHJYocQMpSE
+    // console.log(`Class: ${registry.class.toBase58()}`)
+    // console.log(`Data: ${registry.data?.toString()}`)
+    // console.log(`Owner: ${registry.owner?.toBase58()}`)
+    // console.log(`Parent: ${registry.parentName?.toBase58()}`)
+    // console.log(`NFT Owner: ${nftOwner?.toBase58()}`)
 
     if (nftOwner) return nftOwner
 
