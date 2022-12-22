@@ -780,7 +780,7 @@ export const getMintSchema = ({ form, connection }) => {
             }
           } else {
             return this.createError({
-              message: `Destination account is required`,
+              message: `Invalid destination account`,
             })
           }
         }
