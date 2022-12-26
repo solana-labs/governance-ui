@@ -5,7 +5,7 @@ import {
   withFinalizeVote,
   YesNoVote,
 } from '@solana/spl-governance';
-import { TransactionInstruction } from '@solana/web3.js';
+import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { useState } from 'react';
 import relinquishVotes from '../actions/relinquishVotes';
 import { useHasVoteTimeExpired } from '../hooks/useHasVoteTimeExpired';
@@ -31,6 +31,7 @@ export type AccountToVoteFor = {
   voterWeight?: VoteRegistryVoterWeight | VoterWeight;
   voteRecord?: ProgramAccount<VoteRecord>;
   voterTokenRecord?: ProgramAccount<TokenOwnerRecord>;
+  beneficiary: PublicKey;
 };
 
 export type AccountsToVoteFor = AccountToVoteFor[];
@@ -232,6 +233,7 @@ const VotePanel = () => {
         tokenType === GoverningTokenType.Community
           ? ownTokenRecord
           : ownCouncilTokenRecord,
+      beneficiary: wallet.publicKey,
     },
 
     // Then the delegated accounts
@@ -246,6 +248,7 @@ const VotePanel = () => {
         tokenType === GoverningTokenType.Community
           ? tokenRecords[delegatedAccountAddress]
           : councilTokenOwnerRecords[delegatedAccountAddress],
+      beneficiary: new PublicKey(delegatedAccountAddress),
     })),
   ];
 
@@ -362,13 +365,15 @@ const VotePanel = () => {
         rpcContext,
         proposal: proposal!,
         records: sortedAccounts.accountsThatHaveAlreadyVoted.map(
-          ({ tokenRecord, voteRecord }) => ({
+          ({ tokenRecord, voteRecord, beneficiary }) => ({
             tokenOwnerRecord: tokenRecord!.pubkey,
             voteRecord: voteRecord!.pubkey,
+            beneficiary,
           }),
         ),
 
         instructions,
+        realm: realm!,
       });
     } catch (ex) {
       console.error("Can't relinquish vote", ex);

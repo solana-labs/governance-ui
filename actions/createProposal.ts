@@ -88,9 +88,6 @@ export async function createProposalInstruction({
     governanceProgram,
   );
 
-  console.log('proposalDepositAddress', proposalDepositAddress.toBase58());
-  console.log('proposalAddress', proposalAddress.toBase58());
-
   const data = Buffer.from(
     borsh.serialize(
       new Map([
