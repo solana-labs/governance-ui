@@ -149,21 +149,21 @@ export interface FriktionClaimPendingWithdrawForm {
   mintInfo: MintInfo | undefined
 }
 
-// export interface GoblinGoldDepositForm {
-//   amount: number | undefined
-//   governedTokenAccount?: AssetAccount | undefined
-//   goblinGoldVaultId: string
-//   mintName?: SupportedMintName | undefined
-//   mintInfo: MintInfo | undefined
-// }
+export interface GoblinGoldDepositForm {
+  amount: number | undefined
+  governedTokenAccount?: AssetAccount | undefined
+  goblinGoldVaultId: string
+  mintName?: SupportedMintName | undefined
+  mintInfo: MintInfo | undefined
+}
 
-// export interface GoblinGoldWithdrawForm {
-//   amount: number | undefined
-//   governedTokenAccount?: AssetAccount | undefined
-//   goblinGoldVaultId?: string
-//   mintName?: SupportedMintName
-//   mintInfo: MintInfo | undefined
-// }
+export interface GoblinGoldWithdrawForm {
+  amount: number | undefined
+  governedTokenAccount?: AssetAccount | undefined
+  goblinGoldVaultId?: string
+  mintName?: SupportedMintName
+  mintInfo: MintInfo | undefined
+}
 
 export interface GrantForm {
   destinationAccount: string
