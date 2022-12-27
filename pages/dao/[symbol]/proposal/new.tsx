@@ -291,7 +291,7 @@ const New = () => {
                 holdUpTime: instruction.customHoldUpTime
                   ? getTimestampFromDays(instruction.customHoldUpTime)
                   : selectedGovernance?.account?.config
-                      .minInstructionHoldUpTime,
+                    .minInstructionHoldUpTime,
                 prerequisiteInstructions:
                   instruction.prerequisiteInstructions || [],
                 prerequisiteInstructionsSigners:
@@ -403,17 +403,17 @@ const New = () => {
   // if a component needs specials attributes, use componentBuilderFunction object
   const instructionMap: {
     [key in Instructions]:
-      | ((props: {
-          index: number
-          governance: ProgramAccount<Governance> | null
-        }) => JSX.Element | null)
-      | {
-          componentBuilderFunction: (props: {
-            index: number
-            governance: ProgramAccount<Governance> | null
-          }) => JSX.Element | null
-        }
-      | null
+    | ((props: {
+      index: number
+      governance: ProgramAccount<Governance> | null
+    }) => JSX.Element | null)
+    | {
+      componentBuilderFunction: (props: {
+        index: number
+        governance: ProgramAccount<Governance> | null
+      }) => JSX.Element | null
+    }
+    | null
   } = useMemo(
     () => ({
       [Instructions.Transfer]: SplTokenTransfer,
@@ -458,8 +458,8 @@ const New = () => {
       [Instructions.MeanCreateStream]: MeanCreateStream,
       [Instructions.MeanTransferStream]: MeanTransferStream,
       [Instructions.WithdrawFromCastle]: CastleWithdraw,
-      [Instructions.DepositIntoGoblinGold]: GoblinGoldDeposit,
-      [Instructions.WithdrawFromGoblinGold]: GoblinGoldWithdraw,
+      // [Instructions.DepositIntoGoblinGold]: GoblinGoldDeposit,
+      // [Instructions.WithdrawFromGoblinGold]: GoblinGoldWithdraw,
       [Instructions.CreateSolendObligationAccount]: CreateObligationAccount,
       [Instructions.InitSolendObligationAccount]: InitObligationAccount,
       [Instructions.DepositReserveLiquidityAndObligationCollateral]: DepositReserveLiquidityAndObligationCollateral,
@@ -589,9 +589,8 @@ const New = () => {
   return (
     <div className="grid grid-cols-12 gap-4">
       <div
-        className={`bg-bkg-2 col-span-12 md:col-span-7 md:order-first lg:col-span-8 order-last p-4 md:p-6 rounded-lg space-y-3 ${
-          isLoading ? 'pointer-events-none' : ''
-        }`}
+        className={`bg-bkg-2 col-span-12 md:col-span-7 md:order-first lg:col-span-8 order-last p-4 md:p-6 rounded-lg space-y-3 ${isLoading ? 'pointer-events-none' : ''
+          }`}
       >
         <>
           <Link href={fmtUrlWithCluster(`/dao/${symbol}/`)}>
