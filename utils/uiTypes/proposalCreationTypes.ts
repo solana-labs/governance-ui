@@ -20,7 +20,7 @@ export enum PackageEnum {
   Foresight,
   Friktion,
   GatewayPlugin,
-  GoblinGold,
+  // GoblinGold,
   Identity,
   NftPlugin,
   MangoMarketV3,
@@ -149,21 +149,21 @@ export interface FriktionClaimPendingWithdrawForm {
   mintInfo: MintInfo | undefined
 }
 
-export interface GoblinGoldDepositForm {
-  amount: number | undefined
-  governedTokenAccount?: AssetAccount | undefined
-  goblinGoldVaultId: string
-  mintName?: SupportedMintName | undefined
-  mintInfo: MintInfo | undefined
-}
+// export interface GoblinGoldDepositForm {
+//   amount: number | undefined
+//   governedTokenAccount?: AssetAccount | undefined
+//   goblinGoldVaultId: string
+//   mintName?: SupportedMintName | undefined
+//   mintInfo: MintInfo | undefined
+// }
 
-export interface GoblinGoldWithdrawForm {
-  amount: number | undefined
-  governedTokenAccount?: AssetAccount | undefined
-  goblinGoldVaultId?: string
-  mintName?: SupportedMintName
-  mintInfo: MintInfo | undefined
-}
+// export interface GoblinGoldWithdrawForm {
+//   amount: number | undefined
+//   governedTokenAccount?: AssetAccount | undefined
+//   goblinGoldVaultId?: string
+//   mintName?: SupportedMintName
+//   mintInfo: MintInfo | undefined
+// }
 
 export interface GrantForm {
   destinationAccount: string
@@ -409,7 +409,7 @@ export interface ForesightHasCategoryId extends ForesightHasGovernedAccount {
 
 export interface ForesightMakeAddMarketListToCategoryParams
   extends ForesightHasCategoryId,
-    ForesightHasMarketListId {}
+  ForesightHasMarketListId { }
 
 export interface ForesightMakeResolveMarketParams extends ForesightHasMarketId {
   winner: number
@@ -545,7 +545,7 @@ export enum Instructions {
   CreateVsrRegistrar,
   DeactivateValidatorStake,
   DepositIntoCastle,
-  DepositIntoGoblinGold,
+  // DepositIntoGoblinGold,
   DepositIntoVolt,
   DepositReserveLiquidityAndObligationCollateral,
   DepositToMangoAccount,
@@ -612,7 +612,7 @@ export enum Instructions {
   UpdateTokenMetadata,
   VotingMintConfig,
   WithdrawFromCastle,
-  WithdrawFromGoblinGold,
+  // WithdrawFromGoblinGold,
   WithdrawObligationCollateralAndRedeemReserveLiquidity,
   WithdrawValidatorStake,
   WithdrawFromVolt,
