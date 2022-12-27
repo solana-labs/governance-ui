@@ -37,7 +37,8 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   const [
     undecidedDepositByVoteRecord,
     setUndecidedDepositByVoteRecord,
-  ] = useState(null)
+  ] = useState<{ [walletPk: string]: BN }>({})
+
   const [context, setContext] = useState<RpcContext | null>(null)
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const connection = useWalletStore((s) => s.connection)
@@ -45,20 +46,17 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   const isVsrPluginDao =
     currentPluginPk && vsrPluginsPks.includes(currentPluginPk.toBase58())
 
-  const getVotingPowerFromWallets = async (walletsPks: PublicKey[]) => {
-    if (!client) {
-      return new BN(0)
-    }
+  const getLockTokensVotingPowerPerWallet = async (walletsPks: PublicKey[]) => {
     const { registrar } = await getRegistrarPDA(
       realm!.pubkey,
       realm!.account.communityMint,
-      client.program.programId
+      client!.program.programId
     )
-    const existingRegistrar = await tryGetRegistrar(registrar, client)
+    const existingRegistrar = await tryGetRegistrar(registrar, client!)
     const votingPowers = await Promise.all(
       walletsPks.map((x) =>
         getVotingPower({
-          client,
+          client: client!,
           registrarPk: registrar,
           existingRegistrar: existingRegistrar!,
           walletPk: x,
@@ -74,7 +72,6 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
         v,
       ])
     )
-    console.log(votingPowerByWallets)
     setUndecidedDepositByVoteRecord(votingPowerByWallets)
   }
   useEffect(() => {
@@ -109,24 +106,28 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
           setTokenOwnerRecords([])
         }, setTokenOwnerRecords)
       )()
-      if (isVsrPluginDao) {
-        const electoralVotes = voteRecords.filter(
-          (x) => x.account.vote?.voteType !== VoteKind.Veto
-        )
-        const undecidedData = tokenOwnerRecords.filter(
-          (tokenOwnerRecord) =>
-            !electoralVotes.some(
+    }
+  }, [context, governingTokenMintPk, proposal, realm])
+
+  useEffect(() => {
+    if (isVsrPluginDao && !Object.keys(undecidedDepositByVoteRecord).length) {
+      const undecidedData = tokenOwnerRecords.filter(
+        (tokenOwnerRecord) =>
+          !voteRecords
+            .filter((x) => x.account.vote?.voteType !== VoteKind.Veto)
+            .some(
               (voteRecord) =>
                 voteRecord.account.governingTokenOwner.toBase58() ===
                 tokenOwnerRecord.account.governingTokenOwner.toBase58()
             )
-        )
-        getVotingPowerFromWallets(
+      )
+      if (undecidedData.length) {
+        getLockTokensVotingPowerPerWallet(
           undecidedData.map((x) => x.account.governingTokenOwner)
         )
       }
     }
-  }, [context, governingTokenMintPk, proposal, realm, isVsrPluginDao])
+  }, [tokenOwnerRecords.length, voteRecords.length, isVsrPluginDao])
 
   useEffect(() => {
     if (realm) {
@@ -142,12 +143,19 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
         tokenOwnerRecords,
         realm,
         proposal,
-        mint
+        mint,
+        undecidedDepositByVoteRecord
       )
     }
 
     return []
-  }, [voteRecords, tokenOwnerRecords, realm, proposal, mint])
-
+  }, [
+    voteRecords,
+    tokenOwnerRecords,
+    realm,
+    proposal,
+    mint,
+    undecidedDepositByVoteRecord,
+  ])
   return topVoters
 }
