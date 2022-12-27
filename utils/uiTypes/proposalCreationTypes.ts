@@ -514,17 +514,17 @@ export interface SerumUpdateConfigParam {
   linearVestingPeriod?: number
 }
 
-// export interface SerumUpdateConfigAuthority {
-//   governedAccount?: AssetAccount // Config Authority
-//   newAuthority?: string
-// }
+export interface SerumUpdateConfigAuthority {
+  governedAccount?: AssetAccount // Config Authority
+  newAuthority?: string
+}
 
-// export interface JoinDAOForm {
-//   governedAccount?: AssetAccount
-//   mintInfo: MintInfo | undefined
-//   realm: RealmInfo | null
-//   amount?: number
-// }
+export interface JoinDAOForm {
+  governedAccount?: AssetAccount
+  mintInfo: MintInfo | undefined
+  realm: RealmInfo | null
+  amount?: number
+}
 
 export enum Instructions {
   Base64,

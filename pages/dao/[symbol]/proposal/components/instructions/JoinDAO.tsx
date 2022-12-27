@@ -16,7 +16,7 @@ import {
   parseMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
 import { precision } from '@utils/formatting'
-import { JoinDAOForm } from '@utils/uiTypes/proposalCreationTypes'
+// import { JoinDAOForm } from '@utils/uiTypes/proposalCreationTypes'
 import { useRouter } from 'next/router'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
