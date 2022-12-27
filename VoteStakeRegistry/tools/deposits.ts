@@ -1,8 +1,9 @@
 import { BN, EventParser } from '@project-serum/anchor'
 import { ProgramAccount, Realm } from '@solana/spl-governance'
+import { MintInfo } from '@solana/spl-token'
 import { PublicKey, Transaction, Connection } from '@solana/web3.js'
 import { SIMULATION_WALLET } from '@tools/constants'
-import { tryGetMint } from '@utils/tokens'
+import { TokenProgramAccount, tryGetMint } from '@utils/tokens'
 import {
   getRegistrarPDA,
   getVoterPDA,
@@ -116,6 +117,8 @@ export const getVotingPower = async ({
   walletPk,
   communityMint,
   connection,
+  mintsUsedInRealm,
+  latestBlockhash,
 }: {
   client: VsrClient
   connection: Connection
@@ -123,6 +126,11 @@ export const getVotingPower = async ({
   existingRegistrar: Registrar
   walletPk: PublicKey
   communityMint: PublicKey
+  mintsUsedInRealm: TokenProgramAccount<MintInfo>[]
+  latestBlockhash: Readonly<{
+    blockhash: string
+    lastValidBlockHeight: number
+  }>
 }) => {
   const clientProgramId = client.program.programId
   const { voter } = await getVoterPDA(registrarPk, walletPk, clientProgramId)
@@ -133,7 +141,7 @@ export const getVotingPower = async ({
   let deposits: DepositWithMintAccount[] = []
   for (const i of mintCfgs) {
     if (i.mint.toBase58() !== emptyPk) {
-      const mint = await tryGetMint(connection, i.mint)
+      const mint = mintsUsedInRealm.find((x) => x.publicKey.equals(i.mint))
       mints[i.mint.toBase58()] = mint
     }
   }
@@ -158,14 +166,42 @@ export const getVotingPower = async ({
         client.program.programId,
         client.program.coder
       )
-      const transaction = new Transaction({ feePayer: walletPk })
+      const originalTx = new Transaction({ feePayer: walletPk })
       const logVoterInfoIx = await client.program.methods
         .logVoterInfo(1, 1)
         .accounts({ registrar: registrarPk, voter })
         .instruction()
-      transaction.add(logVoterInfoIx)
-      const batchOfDeposits = await connection.simulateTransaction(transaction)
-      parser.parseLogs(batchOfDeposits.value.logs!, (event) => {
+      originalTx.add(logVoterInfoIx)
+
+      const transaction = originalTx
+      transaction.lastValidBlockHeight = latestBlockhash.lastValidBlockHeight
+      transaction.recentBlockhash = latestBlockhash.blockhash
+      //@ts-ignore
+      const message = transaction._compile()
+      const signData = message.serialize()
+      //@ts-ignore
+      const wireTransaction = transaction._serialize(signData)
+      const encodedTransaction = wireTransaction.toString('base64')
+      const batchOfDeposits = await fetch(connection.rpcEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'simulateTransaction',
+          params: [
+            encodedTransaction,
+            {
+              commitment: 'recent',
+              encoding: 'base64',
+            },
+          ],
+        }),
+      })
+      const logs = await batchOfDeposits.json()
+      parser.parseLogs(logs.result.value.logs!, (event) => {
         events.push(event)
       })
       const votingPowerEntry = events.find(

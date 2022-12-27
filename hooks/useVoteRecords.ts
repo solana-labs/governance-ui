@@ -22,6 +22,7 @@ import { PublicKey } from '@blockworks-foundation/mango-client'
 import useWalletStore from 'stores/useWalletStore'
 import { tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
 import { getRegistrarPDA } from 'VoteStakeRegistry/sdk/accounts'
+import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 
 export { VoteType }
 
@@ -34,6 +35,10 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
     ProgramAccount<TokenOwnerRecord>[]
   >([])
   const { mint, realm, currentPluginPk } = useRealm()
+  const assetAccounts = useGovernanceAssetsStore((s) => s.assetAccounts)
+  const mintsUsedInRealm = assetAccounts
+    .filter((x) => x.isToken)
+    .map((x) => x.extensions.mint!)
   const [
     undecidedDepositByVoteRecord,
     setUndecidedDepositByVoteRecord,
@@ -53,6 +58,7 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
       client!.program.programId
     )
     const existingRegistrar = await tryGetRegistrar(registrar, client!)
+    const latestBlockhash = await connection.current.getLatestBlockhash()
     const votingPowers = await Promise.all(
       walletsPks.map((x) =>
         getVotingPower({
@@ -62,6 +68,8 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
           walletPk: x,
           communityMint: realm!.account.communityMint,
           connection: connection.current,
+          mintsUsedInRealm,
+          latestBlockhash,
         })
       )
     )
@@ -121,13 +129,18 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
                 tokenOwnerRecord.account.governingTokenOwner.toBase58()
             )
       )
-      if (undecidedData.length) {
+      if (undecidedData.length && mintsUsedInRealm.length) {
         getLockTokensVotingPowerPerWallet(
           undecidedData.map((x) => x.account.governingTokenOwner)
         )
       }
     }
-  }, [tokenOwnerRecords.length, voteRecords.length, isVsrPluginDao])
+  }, [
+    tokenOwnerRecords.length,
+    voteRecords.length,
+    isVsrPluginDao,
+    mintsUsedInRealm.length,
+  ])
 
   useEffect(() => {
     if (realm) {

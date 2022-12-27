@@ -61,7 +61,6 @@ export function buildTopVoters(
   const electoralVotes = voteRecords.filter(
     (x) => x.account.vote?.voteType !== VoteKind.Veto
   )
-  console.log(tokenOwnerRecords.length)
 
   const undecidedData = tokenOwnerRecords
     .filter(
