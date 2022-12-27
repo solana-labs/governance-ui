@@ -84,25 +84,7 @@ async function importJupiter() {
     }
   });
 
-  const css = new Promise((res, rej) => {
-    const existing = document.getElementById(
-      'jupiter-load-styles',
-    ) as HTMLLinkElement | null;
-
-    if (existing) {
-      res({});
-    } else {
-      const el = document.createElement('link');
-      el.onload = res;
-      el.onerror = rej;
-      el.id = 'jupiter-load-styles';
-      el.rel = 'stylesheet';
-      el.href = 'https://terminal.jup.ag/main.css';
-      document.head.append(el);
-    }
-  });
-
-  return Promise.all([script, css]).then(() => {
+  return Promise.all([script]).then(() => {
     return (window as any).Jupiter as Jupiter;
   });
 }
@@ -123,6 +105,11 @@ export function Content(props: Props) {
       mint,
       endpoint,
       passThroughWallet: wallet,
+      containerStyles: {
+        top: 24,
+        height: '80vh',
+        maxHeight: '600',
+      },
     });
   }, [mint, endpoint, wallet]);
 
