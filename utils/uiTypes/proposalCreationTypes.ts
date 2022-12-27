@@ -562,7 +562,7 @@ export enum Instructions {
   // ForesightInitMarketList,
   // ForesightResolveMarket,
   // ForesightSetMarketMetadata,
-  Grant,
+  // Grant,
   // InitSolendObligationAccount,
   // JoinDAO,
   // MangoAddOracle,

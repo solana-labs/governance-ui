@@ -312,14 +312,14 @@ export default function useGovernanceAssets() {
     //   isVisible: false,
     //   packageId: PackageEnum.Common,
     // },
-    [Instructions.Grant]: {
-      name: 'Grant',
-      isVisible:
-        canUseTokenTransferInstruction &&
-        currentPluginPk &&
-        vsrPluginsPks.includes(currentPluginPk.toBase58()),
-      packageId: PackageEnum.Common,
-    },
+    // [Instructions.Grant]: {
+    //   name: 'Grant',
+    //   isVisible:
+    //     canUseTokenTransferInstruction &&
+    //     currentPluginPk &&
+    //     vsrPluginsPks.includes(currentPluginPk.toBase58()),
+    //   packageId: PackageEnum.Common,
+    // },
     // [Instructions.JoinDAO]: {
     //   name: 'Join a DAO',
     //   packageId: PackageEnum.Common,
