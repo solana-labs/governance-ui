@@ -528,11 +528,11 @@ export interface JoinDAOForm {
 
 export enum Instructions {
   Base64,
-  ChangeMakeDonation,
+  // ChangeMakeDonation,
   // ClaimMangoTokens,
   // ClaimPendingDeposit,
   // ClaimPendingWithdraw,
-  Clawback,
+  // Clawback,
   CloseTokenAccount,
   // ConfigureGatewayPlugin,
   // ConfigureNftPluginCollection,

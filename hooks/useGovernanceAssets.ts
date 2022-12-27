@@ -276,18 +276,18 @@ export default function useGovernanceAssets() {
       name: 'Execute Custom Instruction',
       packageId: PackageEnum.Common,
     },
-    [Instructions.ChangeMakeDonation]: {
-      name: 'Donation to Charity',
-      packageId: PackageEnum.Common,
-    },
-    [Instructions.Clawback]: {
-      name: 'Clawback',
-      isVisible:
-        canUseTokenTransferInstruction &&
-        currentPluginPk &&
-        vsrPluginsPks.includes(currentPluginPk.toBase58()),
-      packageId: PackageEnum.Common,
-    },
+    // [Instructions.ChangeMakeDonation]: {
+    //   name: 'Donation to Charity',
+    //   packageId: PackageEnum.Common,
+    // // },
+    // [Instructions.Clawback]: {
+    //   name: 'Clawback',
+    //   isVisible:
+    //     canUseTokenTransferInstruction &&
+    //     currentPluginPk &&
+    //     vsrPluginsPks.includes(currentPluginPk.toBase58()),
+    //   packageId: PackageEnum.Common,
+    // },
     [Instructions.CloseTokenAccount]: {
       name: 'Close token account',
       isVisible: canUseTransferInstruction,
