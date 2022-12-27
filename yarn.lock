@@ -1705,6 +1705,28 @@
     "@jest/types" "^29.3.1"
     jest-mock "^29.3.1"
 
+"@jest/fake-timers@^29.3.1":
+  version "29.3.1"
+  resolved "https://registry.yarnpkg.com/@jest/fake-timers/-/fake-timers-29.3.1.tgz#b140625095b60a44de820876d4c14da1aa963f67"
+  integrity sha512-iHTL/XpnDlFki9Tq0Q1GGuVeQ8BHZGIYsvCO5eN/O/oJaRzofG9Xndd9HuSDBI/0ZS79pg0iwn07OMTQ7ngF2A==
+  dependencies:
+    "@jest/types" "^29.3.1"
+    "@sinonjs/fake-timers" "^9.1.2"
+    "@types/node" "*"
+    jest-message-util "^29.3.1"
+    jest-mock "^29.3.1"
+    jest-util "^29.3.1"
+
+"@jest/globals@^29.3.1":
+  version "29.3.1"
+  resolved "https://registry.yarnpkg.com/@jest/globals/-/globals-29.3.1.tgz#92be078228e82d629df40c3656d45328f134a0c6"
+  integrity sha512-cTicd134vOcwO59OPaB6AmdHQMCtWOe+/DitpTZVxWgMJ+YvXL1HNAmPyiGbSHmF/mXVBkvlm8YYtQhyHPnV6Q==
+  dependencies:
+    "@jest/environment" "^29.3.1"
+    "@jest/expect" "^29.3.1"
+    "@jest/types" "^29.3.1"
+    jest-mock "^29.3.1"
+
 "@jest/reporters@^29.3.1":
   version "29.3.1"
   resolved "https://registry.yarnpkg.com/@jest/reporters/-/reporters-29.3.1.tgz#9a6d78c109608e677c25ddb34f907b90e07b4310"
@@ -4911,11 +4933,6 @@
   dependencies:
     "@stablelib/binary" "^1.0.1"
     "@stablelib/wipe" "^1.0.1"
-
-"@stablelib/constant-time@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@stablelib/constant-time/-/constant-time-1.0.1.tgz#bde361465e1cf7b9753061b77e376b0ca4c77e35"
-  integrity sha512-tNOs3uD0vSJcK6z1fvef4Y+buN7DXhzHDPqRLSXUel1UfqMB1PWNsnnAezrKfEwTLpN0cGH2p9NNjs6IqeD0eg==
 
 "@stablelib/ed25519@^1.0.2":
   version "1.0.3"
@@ -11406,6 +11423,15 @@ jest-message-util@^29.3.1:
     stack-utils "^2.0.3"
 
 jest-mock@^29.2.2, jest-mock@^29.3.1:
+  version "29.3.1"
+  resolved "https://registry.yarnpkg.com/jest-mock/-/jest-mock-29.3.1.tgz#60287d92e5010979d01f218c6b215b688e0f313e"
+  integrity sha512-H8/qFDtDVMFvFP4X8NuOT3XRDzOUTz+FeACjufHzsOIBAxivLqkB1PoLCaJx9iPPQ8dZThHPp/G3WRWyMgA3JA==
+  dependencies:
+    "@jest/types" "^29.3.1"
+    "@types/node" "*"
+    jest-util "^29.3.1"
+
+jest-mock@^29.3.1:
   version "29.3.1"
   resolved "https://registry.yarnpkg.com/jest-mock/-/jest-mock-29.3.1.tgz#60287d92e5010979d01f218c6b215b688e0f313e"
   integrity sha512-H8/qFDtDVMFvFP4X8NuOT3XRDzOUTz+FeACjufHzsOIBAxivLqkB1PoLCaJx9iPPQ8dZThHPp/G3WRWyMgA3JA==

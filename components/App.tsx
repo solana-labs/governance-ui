@@ -31,6 +31,7 @@ import { getResourcePathPart } from '@tools/core/resources'
 import useInitWallet from '@hooks/useInitWallet'
 import queryClient from '@hooks/queries/queryClient'
 import useSerumGovStore from 'stores/useSerumGovStore'
+import Footer from './Footer'
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -261,6 +262,7 @@ export function App(props: Props) {
           </ThemeProvider>
         </QueryClientProvider>
       </ErrorBoundary>
+      <Footer />
     </div>
   )
 }

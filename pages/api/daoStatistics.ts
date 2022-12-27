@@ -88,7 +88,7 @@ async function getGovernances(
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const conn = new Connection(
-    'http://realms-realms-c335.mainnet.rpcpool.com/258d3727-bb96-409d-abea-0b1b4c48af29/',
+    'https://wild-empty-sunset.solana-mainnet.quiknode.pro/58b024b787bbbe155d39de4ae5e789ac63ed1982/',
     'recent'
   )
 
