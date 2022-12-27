@@ -1,6 +1,7 @@
 import { BN, EventParser } from '@project-serum/anchor'
 import { ProgramAccount, Realm } from '@solana/spl-governance'
 import { PublicKey, Transaction, Connection } from '@solana/web3.js'
+import { SIMULATION_WALLET } from '@tools/constants'
 import { tryGetMint } from '@utils/tokens'
 import {
   getRegistrarPDA,
@@ -14,6 +15,9 @@ import { tryGetVoter, tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 import { DAYS_PER_MONTH } from './dateTools'
 import { MONTHLY } from './types'
+
+const VOTER_INFO_EVENT_NAME = 'VoterInfo'
+const DEPOSIT_EVENT_NAME = 'DepositEntryInfo'
 
 export const getDeposits = async ({
   isUsed = true,
@@ -71,8 +75,6 @@ export const getDeposits = async ({
         registrar,
         voter
       )
-      const DEPOSIT_EVENT_NAME = 'DepositEntryInfo'
-      const VOTER_INFO_EVENT_NAME = 'VoterInfo'
       const depositsInfo = events.filter((x) => x.name === DEPOSIT_EVENT_NAME)
       const votingPowerEntry = events.find(
         (x) => x.name === VOTER_INFO_EVENT_NAME
@@ -105,6 +107,77 @@ export const getDeposits = async ({
     }
   }
   return { votingPower, deposits, votingPowerFromDeposits }
+}
+
+export const getVotingPower = async ({
+  client,
+  registrarPk,
+  existingRegistrar,
+  walletPk,
+  communityMint,
+  connection,
+}: {
+  client: VsrClient
+  connection: Connection
+  registrarPk: PublicKey
+  existingRegistrar: Registrar
+  walletPk: PublicKey
+  communityMint: PublicKey
+}) => {
+  const clientProgramId = client.program.programId
+  const { voter } = await getVoterPDA(registrarPk, walletPk, clientProgramId)
+  const existingVoter = await tryGetVoter(voter, client)
+  const mintCfgs = existingRegistrar?.votingMints || []
+  const mints = {}
+  let votingPower = new BN(0)
+  let deposits: DepositWithMintAccount[] = []
+  for (const i of mintCfgs) {
+    if (i.mint.toBase58() !== emptyPk) {
+      const mint = await tryGetMint(connection, i.mint)
+      mints[i.mint.toBase58()] = mint
+    }
+  }
+  if (existingVoter) {
+    deposits = existingVoter.deposits
+      .map(
+        (x, idx) =>
+          ({
+            ...x,
+            mint: mints[mintCfgs![x.votingMintConfigIdx].mint.toBase58()],
+            index: idx,
+          } as DepositWithMintAccount)
+      )
+      .filter(
+        (x) =>
+          x.isUsed && x.mint.publicKey.toBase58() === communityMint.toBase58()
+      )
+    if (deposits.length) {
+      const walletPk = new PublicKey(SIMULATION_WALLET)
+      const events: any[] = []
+      const parser = new EventParser(
+        client.program.programId,
+        client.program.coder
+      )
+      const transaction = new Transaction({ feePayer: walletPk })
+      const logVoterInfoIx = await client.program.methods
+        .logVoterInfo(1, 1)
+        .accounts({ registrar: registrarPk, voter })
+        .instruction()
+      transaction.add(logVoterInfoIx)
+      const batchOfDeposits = await connection.simulateTransaction(transaction)
+      parser.parseLogs(batchOfDeposits.value.logs!, (event) => {
+        events.push(event)
+      })
+      const votingPowerEntry = events.find(
+        (x) => x.name === VOTER_INFO_EVENT_NAME
+      )
+      if (votingPowerEntry && !votingPowerEntry.data.votingPower.isZero()) {
+        votingPower = votingPowerEntry.data.votingPower
+      }
+      return votingPower
+    }
+  }
+  return votingPower
 }
 
 export const calcMultiplier = ({
@@ -208,7 +281,7 @@ const getDepositsAdditionalInfoEvents = async (
 ) => {
   // The wallet can be any existing account for the simulation
   // Note: when running a local validator ensure the account is copied from devnet: --clone ENmcpFCpxN1CqyUjuog9yyUVfdXBKF3LVCwLr7grJZpk -ud
-  const walletPk = new PublicKey('ENmcpFCpxN1CqyUjuog9yyUVfdXBKF3LVCwLr7grJZpk')
+  const walletPk = new PublicKey(SIMULATION_WALLET)
   //because we switch wallet in here we can't use rpc from npm module
   //anchor dont allow to switch wallets inside existing client
   //parse events response as anchor do
