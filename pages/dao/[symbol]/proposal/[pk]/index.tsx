@@ -146,8 +146,12 @@ const Proposal = () => {
                       showBg
                     />
                   </div>
-                  {voteData._programVersion === 3 &&
-                  voteData.veto !== undefined ? (
+                  {voteData._programVersion !== undefined &&
+                  // @asktree: here is some typescript gore because typescript doesn't know that a number being > 3 means it isn't 1 or 2
+                  voteData._programVersion !== 1 &&
+                  voteData._programVersion !== 2 &&
+                  voteData.veto !== undefined &&
+                  voteData.veto.voteProgress > 0 ? (
                     <div className="pb-3">
                       <VetoProgress
                         votesRequired={voteData.veto.votesRequired}
