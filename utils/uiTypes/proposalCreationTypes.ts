@@ -9,7 +9,7 @@ import { DepositWithMintAccount, Voter } from 'VoteStakeRegistry/sdk/accounts'
 import { LockupKind } from 'VoteStakeRegistry/tools/types'
 import { consts as foresightConsts } from '@foresight-tmp/foresight-sdk'
 import { AssetAccount, StakeAccount } from '@utils/uiTypes/assets'
-// import { RealmInfo } from '@models/registry/api'
+import { RealmInfo } from '@models/registry/api'
 import * as Msp from '@mean-dao/msp'
 
 // Alphabetical order
