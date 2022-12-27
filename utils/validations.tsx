@@ -229,13 +229,13 @@ export const getFriktionDepositSchema = ({ form }) => {
               governedTokenAccount?.extensions.mint.account.decimals
             )
             return !!(governedTokenAccount?.extensions.token?.publicKey &&
-            !governedTokenAccount.isSol
+              !governedTokenAccount.isSol
               ? governedTokenAccount.extensions.token.account.amount.gte(
-                  mintValue
-                )
+                mintValue
+              )
               : new BN(
-                  governedTokenAccount.extensions.solAccount!.lamports
-                ).gte(mintValue))
+                governedTokenAccount.extensions.solAccount!.lamports
+              ).gte(mintValue))
           }
           return this.createError({
             message: `Amount is required`,
@@ -275,13 +275,13 @@ export const getCastleDepositSchema = ({ form }) => {
               governedTokenAccount?.extensions.mint.account.decimals
             )
             return !!(governedTokenAccount?.extensions.token?.publicKey &&
-            !governedTokenAccount.isSol
+              !governedTokenAccount.isSol
               ? governedTokenAccount.extensions.token.account.amount.gte(
-                  mintValue
-                )
+                mintValue
+              )
               : new BN(
-                  governedTokenAccount.extensions.solAccount!.lamports
-                ).gte(mintValue))
+                governedTokenAccount.extensions.solAccount!.lamports
+              ).gte(mintValue))
           }
           return this.createError({
             message: `Amount is required`,
@@ -328,13 +328,13 @@ export const getMeanCreateAccountSchema = ({ form }) => {
               governedTokenAccount?.extensions.mint.account.decimals
             )
             return !!(governedTokenAccount?.extensions.token?.publicKey &&
-            !governedTokenAccount.isSol
+              !governedTokenAccount.isSol
               ? governedTokenAccount.extensions.token.account.amount.gte(
-                  mintValue
-                )
+                mintValue
+              )
               : new BN(
-                  governedTokenAccount.extensions.solAccount!.lamports
-                ).gte(mintValue))
+                governedTokenAccount.extensions.solAccount!.lamports
+              ).gte(mintValue))
           }
           return this.createError({
             message: `Amount is required`,
@@ -376,13 +376,13 @@ export const getMeanFundAccountSchema = ({ form }) => {
               governedTokenAccount?.extensions.mint.account.decimals
             )
             return !!(governedTokenAccount?.extensions.token?.publicKey &&
-            !governedTokenAccount.isSol
+              !governedTokenAccount.isSol
               ? governedTokenAccount.extensions.token.account.amount.gte(
-                  mintValue
-                )
+                mintValue
+              )
               : new BN(
-                  governedTokenAccount.extensions.solAccount!.lamports
-                ).gte(mintValue))
+                governedTokenAccount.extensions.solAccount!.lamports
+              ).gte(mintValue))
           }
           return this.createError({
             message: `Amount is required`,
@@ -611,13 +611,13 @@ export const getGoblinGoldDepositSchema = ({ form }) => {
               governedTokenAccount?.extensions.mint.account.decimals
             )
             return !!(governedTokenAccount?.extensions.token?.publicKey &&
-            !governedTokenAccount.isSol
+              !governedTokenAccount.isSol
               ? governedTokenAccount.extensions.token.account.amount.gte(
-                  mintValue
-                )
+                mintValue
+              )
               : new BN(
-                  governedTokenAccount.extensions.solAccount!.lamports
-                ).gte(mintValue))
+                governedTokenAccount.extensions.solAccount!.lamports
+              ).gte(mintValue))
           }
           return this.createError({
             message: `Amount is required`,
@@ -694,13 +694,13 @@ export const getTokenTransferSchema = ({
               return tokenAmount.gte(mintValue)
             }
             return !!(governedTokenAccount?.extensions.token?.publicKey &&
-            !governedTokenAccount.isSol
+              !governedTokenAccount.isSol
               ? governedTokenAccount.extensions.token.account.amount.gte(
-                  mintValue
-                )
+                mintValue
+              )
               : new BN(
-                  governedTokenAccount.extensions.solAccount!.lamports
-                ).gte(mintValue))
+                governedTokenAccount.extensions.solAccount!.lamports
+              ).gte(mintValue))
           }
           return this.createError({
             message: `Amount is required`,
@@ -836,7 +836,7 @@ export const getStakeSchema = ({ form }) => {
           return !!(
             form.governedTokenAccount.extensions.solAccount.owner &&
             form.governedTokenAccount.extensions.solAccount.lamports >=
-              new BN(mintValue)
+            new BN(mintValue)
           )
         }
         return this.createError({ message: 'Amount is required' })
@@ -858,215 +858,215 @@ export const getRealmCfgSchema = ({
 }) => {
   return programVersion >= 3
     ? yup.object().shape({
-        governedAccount: yup
-          .object()
-          .nullable()
-          .required('Governed account is required'),
-        minCommunityTokensToCreateGovernance: yup
-          .number()
-          .required('Min community tokens to create governance is required'),
-        communityVoterWeightAddin: yup
-          .string()
-          .test(
-            'communityVoterWeightAddinTest',
-            'communityVoterWeightAddin validation error',
-            function (val: string) {
-              if (!form?.communityVoterWeightAddin) {
-                return true
-              }
-              if (val) {
-                try {
-                  getValidatedPublickKey(val)
-                  if (supportedPlugins.includes(val)) {
-                    return true
-                  } else {
-                    return this.createError({
-                      message: `Provided pubkey is not a known plugin pubkey`,
-                    })
-                  }
-                } catch (e) {
-                  console.log(e)
+      governedAccount: yup
+        .object()
+        .nullable()
+        .required('Governed account is required'),
+      minCommunityTokensToCreateGovernance: yup
+        .number()
+        .required('Min community tokens to create governance is required'),
+      communityVoterWeightAddin: yup
+        .string()
+        .test(
+          'communityVoterWeightAddinTest',
+          'communityVoterWeightAddin validation error',
+          function (val: string) {
+            if (!form?.communityVoterWeightAddin) {
+              return true
+            }
+            if (val) {
+              try {
+                getValidatedPublickKey(val)
+                if (supportedPlugins.includes(val)) {
+                  return true
+                } else {
                   return this.createError({
-                    message: `${e}`,
+                    message: `Provided pubkey is not a known plugin pubkey`,
                   })
                 }
-              } else {
+              } catch (e) {
+                console.log(e)
                 return this.createError({
-                  message: `communityVoterWeightAddin is required`,
+                  message: `${e}`,
                 })
               }
+            } else {
+              return this.createError({
+                message: `communityVoterWeightAddin is required`,
+              })
             }
-          ),
-        maxCommunityVoterWeightAddin: yup
-          .string()
-          .test(
-            'maxCommunityVoterWeightAddin',
-            'maxCommunityVoterWeightAddin validation error',
-            function (val: string) {
-              if (!form?.maxCommunityVoterWeightAddin) {
-                return true
-              }
-              if (val) {
-                try {
-                  getValidatedPublickKey(val)
-                  if ([...nftPluginsPks].includes(val)) {
-                    return true
-                  } else {
-                    return this.createError({
-                      message: `Provided pubkey is not a known plugin pubkey`,
-                    })
-                  }
-                } catch (e) {
-                  console.log(e)
+          }
+        ),
+      maxCommunityVoterWeightAddin: yup
+        .string()
+        .test(
+          'maxCommunityVoterWeightAddin',
+          'maxCommunityVoterWeightAddin validation error',
+          function (val: string) {
+            if (!form?.maxCommunityVoterWeightAddin) {
+              return true
+            }
+            if (val) {
+              try {
+                getValidatedPublickKey(val)
+                if ([...nftPluginsPks].includes(val)) {
+                  return true
+                } else {
                   return this.createError({
-                    message: `${e}`,
+                    message: `Provided pubkey is not a known plugin pubkey`,
                   })
                 }
-              } else {
+              } catch (e) {
+                console.log(e)
                 return this.createError({
-                  message: `maxCommunityVoterWeightAddin is required`,
+                  message: `${e}`,
                 })
               }
+            } else {
+              return this.createError({
+                message: `maxCommunityVoterWeightAddin is required`,
+              })
             }
-          ),
-        councilVoterWeightAddin: yup
-          .string()
-          .test(
-            'councilVoterWeightAddinTest',
-            'councilVoterWeightAddin validation error',
-            function (val: string) {
-              if (!form?.councilVoterWeightAddin) {
-                return true
-              }
-              if (val) {
-                try {
-                  getValidatedPublickKey(val)
-                  if (supportedPlugins.includes(val)) {
-                    return true
-                  } else {
-                    return this.createError({
-                      message: `Provided pubkey is not a known plugin pubkey`,
-                    })
-                  }
-                } catch (e) {
-                  console.log(e)
+          }
+        ),
+      councilVoterWeightAddin: yup
+        .string()
+        .test(
+          'councilVoterWeightAddinTest',
+          'councilVoterWeightAddin validation error',
+          function (val: string) {
+            if (!form?.councilVoterWeightAddin) {
+              return true
+            }
+            if (val) {
+              try {
+                getValidatedPublickKey(val)
+                if (supportedPlugins.includes(val)) {
+                  return true
+                } else {
                   return this.createError({
-                    message: `${e}`,
+                    message: `Provided pubkey is not a known plugin pubkey`,
                   })
                 }
-              } else {
+              } catch (e) {
+                console.log(e)
                 return this.createError({
-                  message: `councilVoterWeightAddin is required`,
+                  message: `${e}`,
                 })
               }
+            } else {
+              return this.createError({
+                message: `councilVoterWeightAddin is required`,
+              })
             }
-          ),
-        maxCouncilVoterWeightAddin: yup
-          .string()
-          .test(
-            'maxCouncilVoterWeightAddin',
-            'maxCouncilVoterWeightAddin validation error',
-            function (val: string) {
-              if (!form?.maxCouncilVoterWeightAddin) {
-                return true
-              }
-              if (val) {
-                try {
-                  getValidatedPublickKey(val)
-                  if ([...nftPluginsPks].includes(val)) {
-                    return true
-                  } else {
-                    return this.createError({
-                      message: `Provided pubkey is not a known plugin pubkey`,
-                    })
-                  }
-                } catch (e) {
-                  console.log(e)
+          }
+        ),
+      maxCouncilVoterWeightAddin: yup
+        .string()
+        .test(
+          'maxCouncilVoterWeightAddin',
+          'maxCouncilVoterWeightAddin validation error',
+          function (val: string) {
+            if (!form?.maxCouncilVoterWeightAddin) {
+              return true
+            }
+            if (val) {
+              try {
+                getValidatedPublickKey(val)
+                if ([...nftPluginsPks].includes(val)) {
+                  return true
+                } else {
                   return this.createError({
-                    message: `${e}`,
+                    message: `Provided pubkey is not a known plugin pubkey`,
                   })
                 }
-              } else {
+              } catch (e) {
+                console.log(e)
                 return this.createError({
-                  message: `maxCouncilVoterWeightAddin is required`,
+                  message: `${e}`,
                 })
               }
+            } else {
+              return this.createError({
+                message: `maxCouncilVoterWeightAddin is required`,
+              })
             }
-          ),
-      })
+          }
+        ),
+    })
     : yup.object().shape({
-        governedAccount: yup
-          .object()
-          .nullable()
-          .required('Governed account is required'),
-        minCommunityTokensToCreateGovernance: yup
-          .number()
-          .required('Min community tokens to create governance is required'),
-        communityVoterWeightAddin: yup
-          .string()
-          .test(
-            'communityVoterWeightAddinTest',
-            'communityVoterWeightAddin validation error',
-            function (val: string) {
-              if (!form?.communityVoterWeightAddin) {
-                return true
-              }
-              if (val) {
-                try {
-                  getValidatedPublickKey(val)
-                  if (supportedPlugins.includes(val)) {
-                    return true
-                  } else {
-                    return this.createError({
-                      message: `Provided pubkey is not a known plugin pubkey`,
-                    })
-                  }
-                } catch (e) {
-                  console.log(e)
+      governedAccount: yup
+        .object()
+        .nullable()
+        .required('Governed account is required'),
+      minCommunityTokensToCreateGovernance: yup
+        .number()
+        .required('Min community tokens to create governance is required'),
+      communityVoterWeightAddin: yup
+        .string()
+        .test(
+          'communityVoterWeightAddinTest',
+          'communityVoterWeightAddin validation error',
+          function (val: string) {
+            if (!form?.communityVoterWeightAddin) {
+              return true
+            }
+            if (val) {
+              try {
+                getValidatedPublickKey(val)
+                if (supportedPlugins.includes(val)) {
+                  return true
+                } else {
                   return this.createError({
-                    message: `${e}`,
+                    message: `Provided pubkey is not a known plugin pubkey`,
                   })
                 }
-              } else {
+              } catch (e) {
+                console.log(e)
                 return this.createError({
-                  message: `communityVoterWeightAddin is required`,
+                  message: `${e}`,
                 })
               }
+            } else {
+              return this.createError({
+                message: `communityVoterWeightAddin is required`,
+              })
             }
-          ),
-        maxCommunityVoterWeightAddin: yup
-          .string()
-          .test(
-            'maxCommunityVoterWeightAddin',
-            'maxCommunityVoterWeightAddin validation error',
-            function (val: string) {
-              if (!form?.maxCommunityVoterWeightAddin) {
-                return true
-              }
-              if (val) {
-                try {
-                  getValidatedPublickKey(val)
-                  if ([...nftPluginsPks].includes(val)) {
-                    return true
-                  } else {
-                    return this.createError({
-                      message: `Provided pubkey is not a known plugin pubkey`,
-                    })
-                  }
-                } catch (e) {
-                  console.log(e)
+          }
+        ),
+      maxCommunityVoterWeightAddin: yup
+        .string()
+        .test(
+          'maxCommunityVoterWeightAddin',
+          'maxCommunityVoterWeightAddin validation error',
+          function (val: string) {
+            if (!form?.maxCommunityVoterWeightAddin) {
+              return true
+            }
+            if (val) {
+              try {
+                getValidatedPublickKey(val)
+                if ([...nftPluginsPks].includes(val)) {
+                  return true
+                } else {
                   return this.createError({
-                    message: `${e}`,
+                    message: `Provided pubkey is not a known plugin pubkey`,
                   })
                 }
-              } else {
+              } catch (e) {
+                console.log(e)
                 return this.createError({
-                  message: `maxCommunityVoterWeightAddin is required`,
+                  message: `${e}`,
                 })
               }
+            } else {
+              return this.createError({
+                message: `maxCommunityVoterWeightAddin is required`,
+              })
             }
-          ),
-      })
+          }
+        ),
+    })
 }
 
 export const getCreateTokenMetadataSchema = () => {
