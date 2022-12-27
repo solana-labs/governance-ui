@@ -42,7 +42,7 @@ const MakeRemovePerpMarket = ({
     (x) => x.type === AccountType.PROGRAM
   )
   const connection = useWalletStore((s) => s.connection)
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<MangoRemovePerpMarketForm>({
     governedAccount: null,

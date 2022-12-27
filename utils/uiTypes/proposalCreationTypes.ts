@@ -12,6 +12,28 @@ import { AssetAccount, StakeAccount } from '@utils/uiTypes/assets'
 import { RealmInfo } from '@models/registry/api'
 import * as Msp from '@mean-dao/msp'
 
+// Alphabetical order
+export enum PackageEnum {
+  // Castle = 1,
+  Common,
+  // Everlend,
+  // Foresight,
+  // Friktion,
+  // GatewayPlugin,
+  // GoblinGold,
+  // Identity,
+  // NftPlugin,
+  // MangoMarketV3,
+  // MangoMarketV4,
+  // MeanFinance,
+  // Serum,
+  // Solend,
+  // Streamflow,
+  // Switchboard,
+  // VsrPlugin,
+  // Dual,
+}
+
 export interface UiInstruction {
   serializedInstruction: string
   additionalSerializedInstructions?: string[]
@@ -387,7 +409,7 @@ export interface ForesightHasCategoryId extends ForesightHasGovernedAccount {
 
 export interface ForesightMakeAddMarketListToCategoryParams
   extends ForesightHasCategoryId,
-    ForesightHasMarketListId {}
+  ForesightHasMarketListId { }
 
 export interface ForesightMakeResolveMarketParams extends ForesightHasMarketId {
   winner: number
@@ -505,94 +527,99 @@ export interface JoinDAOForm {
 }
 
 export enum Instructions {
-  Transfer,
-  ProgramUpgrade,
-  Mint,
   Base64,
-  None,
-  MangoAddOracle,
-  MangoAddSpotMarket,
-  MangoChangeMaxAccounts,
-  MangoChangePerpMarket,
-  MangoChangeReferralFeeParams,
-  MangoChangeReferralFeeParams2,
-  MangoChangeSpotMarket,
-  MangoCreatePerpMarket,
-  MangoSetMarketMode,
-  MangoChangeQuoteParams,
-  MangoRemoveSpotMarket,
-  MangoRemovePerpMarket,
-  MangoSwapSpotMarket,
-  MangoRemoveOracle,
-  MangoV4TokenRegister,
-  MangoV4TokenEdit,
-  MangoV4PerpEdit,
-  MangoV4Serum3RegisterMarket,
-  MangoV4PerpCreate,
-  MangoV4TokenRegisterTrustless,
-  CreateStream,
-  CancelStream,
-  Grant,
-  Clawback,
-  CreateAssociatedTokenAccount,
-  DepositIntoVolt,
-  WithdrawFromVolt,
-  ClaimPendingDeposit,
-  ClaimPendingWithdraw,
-  DepositIntoCastle,
-  WithrawFromCastle,
-  MeanCreateAccount,
-  MeanFundAccount,
-  MeanWithdrawFromAccount,
-  MeanCreateStream,
-  MeanTransferStream,
-  DepositIntoGoblinGold,
-  WithdrawFromGoblinGold,
-  CreateSolendObligationAccount,
-  InitSolendObligationAccount,
-  DepositReserveLiquidityAndObligationCollateral,
-  WithdrawObligationCollateralAndRedeemReserveLiquidity,
-  SwitchboardAdmitOracle,
-  SwitchboardRevokeOracle,
-  RefreshSolendObligation,
-  RefreshSolendReserve,
-  ForesightInitMarket,
-  ForesightInitMarketList,
-  ForesightInitCategory,
-  ForesightResolveMarket,
-  ForesightAddMarketListToCategory,
-  ForesightSetMarketMetadata,
-  RealmConfig,
-  CreateNftPluginRegistrar,
-  CreateNftPluginMaxVoterWeight,
-  ConfigureNftPluginCollection,
+  // ChangeMakeDonation,
+  // ClaimMangoTokens,
+  // ClaimPendingDeposit,
+  // ClaimPendingWithdraw,
+  // Clawback,
   CloseTokenAccount,
-  VotingMintConfig,
-  CreateVsrRegistrar,
-  CreateGatewayPluginRegistrar,
-  ConfigureGatewayPlugin,
-  ChangeMakeDonation,
+  // ConfigureGatewayPlugin,
+  // ConfigureNftPluginCollection,
+  CreateAssociatedTokenAccount,
+  // CreateGatewayPluginRegistrar,
+  // CreateNftPluginMaxVoterWeight,
+  // CreateNftPluginRegistrar,
+  // CreateSolendObligationAccount,
   CreateTokenMetadata,
-  UpdateTokenMetadata,
-  SagaPreOrder,
-  DepositToMangoAccount,
-  DepositToMangoAccountCsv,
-  StakeValidator,
+  // CreateVsrRegistrar,
   DeactivateValidatorStake,
-  WithdrawValidatorStake,
-  DifferValidatorStake,
+  // DepositIntoCastle,
+  // DepositIntoGoblinGold,
+  // DepositIntoVolt,
+  // DepositReserveLiquidityAndObligationCollateral,
+  // DepositToMangoAccount,
+  // DepositToMangoAccountCsv,
+  // DifferValidatorStake,
+  // DualFinanceExercise,
+  // DualFinanceStakingOption,
+  // DualFinanceWithdraw,
+  // EverlendDeposit,
+  // EverlendWithdraw,
+  // ForesightAddMarketListToCategory,
+  // ForesightInitCategory,
+  // ForesightInitMarket,
+  // ForesightInitMarketList,
+  // ForesightResolveMarket,
+  // ForesightSetMarketMetadata,
+  // Grant,
+  // InitSolendObligationAccount,
+  // JoinDAO,
+  // MangoAddOracle,
+  // MangoAddSpotMarket,
+  // MangoChangeMaxAccounts,
+  // MangoChangePerpMarket,
+  // MangoChangeQuoteParams,
+  // MangoChangeReferralFeeParams,
+  // MangoChangeReferralFeeParams2,
+  // MangoChangeSpotMarket,
+  // MangoCreatePerpMarket,
+  // MangoRemoveOracle,
+  // MangoRemovePerpMarket,
+  // MangoRemoveSpotMarket,
+  // MangoSetMarketMode,
+  // MangoSwapSpotMarket,
+  // MangoV4PerpCreate,
+  // MangoV4PerpEdit,
+  // MangoV4Serum3RegisterMarket,
+  // MangoV4TokenEdit,
+  // MangoV4TokenRegister,
+  // MangoV4TokenRegisterTrustless,
+  // MeanCreateAccount,
+  // MeanCreateStream,
+  // MeanFundAccount,
+  // MeanTransferStream,
+  // MeanWithdrawFromAccount,
+  Mint,
+  None,
+  ProgramUpgrade,
+  RealmConfig,
+  // RefreshSolendObligation,
+  // RefreshSolendReserve,
+  // SagaPreOrder,
+  // SerumGrantLockedMSRM,
+  // SerumGrantLockedSRM,
+  // SerumGrantVestMSRM,
+  // SerumGrantVestSRM,
+  // SerumInitUser,
+  // SerumUpdateGovConfigAuthority,
+  // SerumUpdateGovConfigParams,
+  StakeValidator,
+  // SwitchboardAdmitOracle,
+  // SwitchboardRevokeOracle,
+  Transfer,
   TransferDomainName,
-  EverlendDeposit,
-  EverlendWithdraw,
-  SerumInitUser,
-  SerumGrantLockedSRM,
-  SerumGrantLockedMSRM,
-  SerumGrantVestSRM,
-  SerumGrantVestMSRM,
-  SerumUpdateGovConfigParams,
-  SerumUpdateGovConfigAuthority,
-  JoinDAO,
-  ClaimMangoTokens,
+  UpdateTokenMetadata,
+  // VotingMintConfig,
+  // WithdrawFromCastle,
+  // WithdrawFromGoblinGold,
+  // WithdrawObligationCollateralAndRedeemReserveLiquidity,
+  // WithdrawValidatorStake,
+  // WithdrawFromVolt,
+  // AddKeyToDID,
+  // RemoveKeyFromDID,
+  // AddServiceToDID,
+  // RemoveServiceFromDID,
 }
 
 export type createParams = [
@@ -616,6 +643,7 @@ export interface ComponentInstructionData {
 }
 export interface InstructionsContext {
   instructionsData: ComponentInstructionData[]
+  voteByCouncil?: boolean | null
   handleSetInstructions: (val, index) => void
   governance: ProgramAccount<Governance> | null | undefined
   setGovernance: (val) => void
@@ -663,4 +691,29 @@ export interface ValidatorWithdrawStakeForm {
   governedTokenAccount: AssetAccount | undefined
   stakingAccount: StakeAccount | undefined
   amount: number
+}
+
+export interface DualFinanceStakingOptionForm {
+  strike: number
+  soName: string | undefined
+  optionExpirationUnixSeconds: number
+  numTokens: number
+  lotSize: number
+  baseTreasury: AssetAccount | undefined
+  quoteTreasury: AssetAccount | undefined
+  payer: AssetAccount | undefined
+  userPk: string | undefined
+}
+
+export interface DualFinanceExerciseForm {
+  numTokens: number
+  soName: string | undefined
+  baseTreasury: AssetAccount | undefined
+  quoteTreasury: AssetAccount | undefined
+  optionAccount: AssetAccount | undefined
+}
+
+export interface DualFinanceWithdrawForm {
+  soName: string | undefined
+  baseTreasury: AssetAccount | undefined
 }

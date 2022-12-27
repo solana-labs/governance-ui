@@ -23,13 +23,14 @@ export interface InstructionInput {
   initialValue: any
   name: string
   type: InstructionInputType
+  assetType?: 'mint' | 'token' | 'wallet'
   inputType?: string
   placeholder?: string
   min?: number
   max?: number
   step?: number
   onBlur?: () => void
-  shouldBeGoverned?: false | ProgramAccount<Governance> | null
+  shouldBeGoverned?: boolean
   governance?: ProgramAccount<Governance> | null
   options?: any[]
   hide?: boolean | (() => boolean)
@@ -111,7 +112,7 @@ const InstructionInput = ({
       case InstructionInputType.GOVERNED_ACCOUNT:
         return (
           <GovernedAccountSelect
-            autoselectFirst={false}
+            autoSelectFirst={false}
             label={input.label}
             governedAccounts={input.options!}
             onChange={(value) => {
@@ -121,12 +122,14 @@ const InstructionInput = ({
             error={formErrors[input.name]}
             shouldBeGoverned={input.shouldBeGoverned}
             governance={input.governance}
+            type={input.assetType}
           />
         )
       case InstructionInputType.SELECT:
         return (
           <Select
             label={input.label}
+            // Note that this is different from native selects, which simply use the value as the value, not the name-value pair.
             value={form[input.name]?.name}
             placeholder="Please select..."
             onChange={(value) => {

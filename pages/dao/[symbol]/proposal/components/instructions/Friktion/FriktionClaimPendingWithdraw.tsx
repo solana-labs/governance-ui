@@ -27,7 +27,7 @@ const FriktionClaimPendingWithdraw = ({
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<FriktionClaimPendingWithdrawForm>({
     governedTokenAccount: undefined,
@@ -99,7 +99,7 @@ const FriktionClaimPendingWithdraw = ({
   return (
     <>
       <GovernedAccountSelect
-        label="Source account"
+        label="Wallet"
         governedAccounts={governedTokenAccountsWithoutNfts}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedTokenAccount' })

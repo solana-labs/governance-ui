@@ -69,7 +69,7 @@ const SagaPreOrder = ({
           token.extensions.token?.account.owner.toBase58()
       )
   )
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<SagaPhoneForm>({
     governedAccount: null,
@@ -160,6 +160,7 @@ const SagaPreOrder = ({
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governance,
       options: governedUSDCAccounts,
+      assetType: 'token',
       additionalComponent: form.governedAccount?.extensions.token ? (
         <div>
           SOL account:{' '}

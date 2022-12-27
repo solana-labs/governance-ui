@@ -79,7 +79,7 @@ const MangoClaimTokens = ({
   const [table, setTable] = useState<TableInfo[]>([])
   const connection = useWalletStore((s) => s.connection)
   const groupName = connection.cluster === 'devnet' ? 'devnet.2' : 'mainnet.1'
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<MangoClaimTokens>({
     governedAccount: null,

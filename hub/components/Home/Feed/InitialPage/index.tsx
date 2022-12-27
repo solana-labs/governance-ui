@@ -1,4 +1,3 @@
-import * as Separator from '@radix-ui/react-separator';
 import type { PublicKey } from '@solana/web3.js';
 import React from 'react';
 
@@ -16,6 +15,8 @@ interface Props extends BaseProps {
   pinnedFeedItems: FeedItemModel[];
   realm: PublicKey;
   realmUrlId: string;
+  userIsAdmin?: boolean;
+  onRefresh?(): void;
 }
 
 export function Content(props: Props) {
@@ -39,24 +40,26 @@ export function Content(props: Props) {
   return (
     <div className={props.className}>
       {pinnedItems.map((feedItem) => (
-        <React.Fragment key={feedItem.id}>
-          <FeedItem.Content
-            feedItem={feedItem}
-            realm={props.realm}
-            realmUrlId={props.realmUrlId}
-          />
-          <Separator.Root className="w-full h-[1px] bg-neutral-300 my-4" />
-        </React.Fragment>
+        <FeedItem.Content
+          className="mb-16"
+          key={feedItem.id}
+          feedItem={feedItem}
+          realm={props.realm}
+          realmUrlId={props.realmUrlId}
+          userIsAdmin={props.userIsAdmin}
+          onDelete={props.onRefresh}
+        />
       ))}
       {remainingItems.map((feedItem) => (
-        <React.Fragment key={feedItem.node.id}>
-          <FeedItem.Content
-            feedItem={feedItem.node}
-            realm={props.realm}
-            realmUrlId={props.realmUrlId}
-          />
-          <Separator.Root className="w-full h-[1px] bg-neutral-300 my-4" />
-        </React.Fragment>
+        <FeedItem.Content
+          className="mb-16"
+          key={feedItem.node.id}
+          feedItem={feedItem.node}
+          realm={props.realm}
+          realmUrlId={props.realmUrlId}
+          userIsAdmin={props.userIsAdmin}
+          onDelete={props.onRefresh}
+        />
       ))}
     </div>
   );
@@ -66,12 +69,7 @@ export function Loading(props: BaseProps) {
   return (
     <div className={props.className}>
       {Array.from({ length: 5 }).map((_, i) => (
-        <React.Fragment key={i}>
-          <FeedItem.Loading />
-          {i < 4 && (
-            <Separator.Root className="w-full h-[1px] bg-neutral-300 my-4" />
-          )}
-        </React.Fragment>
+        <FeedItem.Loading className="mb-16" key={i} />
       ))}
     </div>
   );
@@ -81,12 +79,7 @@ export function Error(props: BaseProps) {
   return (
     <div className={props.className}>
       {Array.from({ length: 5 }).map((_, i) => (
-        <React.Fragment key={i}>
-          <FeedItem.Error />
-          {i < 4 && (
-            <Separator.Root className="w-full h-[1px] bg-neutral-300 my-4" />
-          )}
-        </React.Fragment>
+        <FeedItem.Error className="mb-16" key={i} />
       ))}
     </div>
   );

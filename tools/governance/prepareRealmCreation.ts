@@ -36,9 +36,13 @@ import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import BN from 'bn.js'
 import { createGovernanceThresholds } from './configs'
 
-interface RealmCreation {
+export interface Web3Context {
   connection: Connection
   wallet: WalletSigner
+}
+export interface RealmCreationV2 {
+  _programVersion: 2
+
   programIdAddress: string
 
   realmName: string
@@ -47,7 +51,7 @@ interface RealmCreation {
 
   nftCollectionCount?: number
   existingCommunityMintPk: PublicKey | undefined
-  communityYesVotePercentage: number
+  communityYesVotePercentage: 'disabled' | number
   transferCommunityMintAuthority: boolean
 
   useSupplyFactor: boolean
@@ -60,7 +64,15 @@ interface RealmCreation {
   councilWalletPks: PublicKey[]
 
   communityTokenConfig?: GoverningTokenConfigAccountArgs
+  skipRealmAuthority?: boolean
 }
+type RealmCreationV3 = {
+  _programVersion: 3
+  councilTokenConfig: GoverningTokenConfigAccountArgs
+  councilYesVotePercentage: 'disabled' | number
+} & Omit<RealmCreationV2, '_programVersion'>
+
+export type RealmCreation = RealmCreationV2 | RealmCreationV3
 
 export async function prepareRealmCreation({
   connection,
@@ -85,8 +97,10 @@ export async function prepareRealmCreation({
   transferCouncilMintAuthority,
   councilWalletPks,
 
-  communityTokenConfig = undefined,
-}: RealmCreation) {
+  communityTokenConfig,
+  skipRealmAuthority,
+  ...params
+}: RealmCreation & Web3Context) {
   const realmInstructions: TransactionInstruction[] = []
   const realmSigners: Keypair[] = []
 
@@ -172,6 +186,8 @@ export async function prepareRealmCreation({
   console.log('Prepare realm - council mint address', existingCouncilMintPk)
   // Create council mint
   let councilMintPk
+
+  // TODO explain the circumstances under which this set of conditions would be true
   if (
     zeroCommunityTokenSupply &&
     zeroCouncilTokenSupply &&
@@ -248,7 +264,8 @@ export async function prepareRealmCreation({
     councilMintPk,
     communityMaxVoteWeightSource,
     minCommunityTokensToCreateAsMintValue,
-    communityTokenConfig
+    communityTokenConfig,
+    params._programVersion === 3 ? params.councilTokenConfig : undefined
   )
 
   // If the current wallet is in the team then deposit the council token
@@ -272,7 +289,11 @@ export async function prepareRealmCreation({
     councilVoteThreshold,
     councilVetoVoteThreshold,
     communityVetoVoteThreshold,
-  } = createGovernanceThresholds(programVersion, communityYesVotePercentage)
+  } = createGovernanceThresholds(
+    programVersion,
+    communityYesVotePercentage,
+    params._programVersion === 3 ? params.councilYesVotePercentage : 'disabled'
+  )
 
   // Put community and council mints under the realm governance with default config
   const config = new GovernanceConfig({
@@ -288,6 +309,8 @@ export async function prepareRealmCreation({
     councilVoteThreshold: councilVoteThreshold,
     councilVetoVoteThreshold: councilVetoVoteThreshold,
     communityVetoVoteThreshold: communityVetoVoteThreshold,
+    votingCoolOffTime: 0,
+    depositExemptProposalCount: 10,
   })
 
   const communityMintGovPk = createCommunityMintGovernance
@@ -341,7 +364,7 @@ export async function prepareRealmCreation({
   }
 
   // Set the community governance as the realm authority
-  if (transferCommunityMintAuthority) {
+  if (!skipRealmAuthority) {
     withSetRealmAuthority(
       realmInstructions,
       programIdPk,

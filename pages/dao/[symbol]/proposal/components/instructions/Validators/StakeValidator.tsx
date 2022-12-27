@@ -35,7 +35,7 @@ const StakeValidator = ({
   const connection = useWalletStore((s) => s.connection)
   const programId: PublicKey = StakeProgram.programId
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const wallet = useWalletStore((s) => s.current)
 
   const [form, setForm] = useState<ValidatorStakingForm>({
@@ -239,6 +239,7 @@ const StakeValidator = ({
         error={formErrors['governedTokenAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
+        type="token"
       ></GovernedAccountSelect>
       <Input
         label="Validator Vote Address"

@@ -35,7 +35,7 @@ const Mint = ({
   const mintGovernancesWithMintInfo = assetAccounts.filter(
     (x) => x.type === AccountType.MINT
   )
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<MintForm>({
     destinationAccount: '',
@@ -144,6 +144,7 @@ const Mint = ({
         error={formErrors['mintAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
+        type="mint"
       ></GovernedAccountSelect>
       <Input
         label="Destination account"

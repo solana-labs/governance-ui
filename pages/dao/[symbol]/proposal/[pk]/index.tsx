@@ -2,11 +2,11 @@ import ReactMarkdown from 'react-markdown/react-markdown.min'
 import remarkGfm from 'remark-gfm'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 import useProposal from 'hooks/useProposal'
-import ProposalStateBadge from 'components/ProposalStatusBadge'
+import ProposalStateBadge from '@components/ProposalStateBadge'
 import { InstructionPanel } from 'components/instructions/instructionPanel'
 import DiscussionPanel from 'components/chat/DiscussionPanel'
-import VotePanel from 'components/VotePanel'
-import ApprovalQuorum from 'components/ApprovalQuorum'
+import VotePanel from '@components/VotePanel/VotePanel'
+import { ApprovalProgress, VetoProgress } from '@components/QuorumProgress'
 import useRealm from 'hooks/useRealm'
 import useProposalVotes from 'hooks/useProposalVotes'
 import ProposalTimeStatus from 'components/ProposalTimeStatus'
@@ -26,27 +26,18 @@ import useWalletStore from 'stores/useWalletStore'
 import ProposalVotingPower from '@components/ProposalVotingPower'
 import { useMediaQuery } from 'react-responsive'
 import NftProposalVoteState from 'NftVotePlugin/NftProposalVoteState'
+import ProposalWarnings from './ProposalWarnings'
 
 const Proposal = () => {
   const { realmInfo, symbol } = useRealm()
   const { proposal, descriptionLink, governance } = useProposal()
   const [description, setDescription] = useState('')
-  const { yesVoteProgress, yesVotesRequired } = useProposalVotes(
-    proposal?.account
-  )
+  const voteData = useProposalVotes(proposal?.account)
   const currentWallet = useWalletStore((s) => s.current)
   const showResults =
     proposal &&
     proposal.account.state !== ProposalState.Cancelled &&
     proposal.account.state !== ProposalState.Draft
-
-  const votePassed =
-    proposal &&
-    (proposal.account.state === ProposalState.Completed ||
-      proposal.account.state === ProposalState.Executing ||
-      proposal.account.state === ProposalState.SigningOff ||
-      proposal.account.state === ProposalState.Succeeded ||
-      proposal.account.state === ProposalState.ExecutingWithErrors)
 
   const votingEnded =
     !!governance &&
@@ -120,7 +111,7 @@ const Proposal = () => {
                 </ReactMarkdown>
               </div>
             )}
-
+            <ProposalWarnings />
             <InstructionPanel />
             {isTwoCol && <DiscussionPanel />}
           </>
@@ -147,20 +138,32 @@ const Proposal = () => {
                 <h3 className="mb-4">Results</h3>
               )}
               {proposal?.account.state === ProposalState.Voting ? (
-                <div className="pb-3">
-                  <ApprovalQuorum
-                    yesVotesRequired={yesVotesRequired}
-                    progress={yesVoteProgress}
-                    showBg
-                  />
-                </div>
+                <>
+                  <div className="pb-3">
+                    <ApprovalProgress
+                      votesRequired={voteData.yesVotesRequired}
+                      progress={voteData.yesVoteProgress}
+                      showBg
+                    />
+                  </div>
+                  {voteData._programVersion !== undefined &&
+                  // @asktree: here is some typescript gore because typescript doesn't know that a number being > 3 means it isn't 1 or 2
+                  voteData._programVersion !== 1 &&
+                  voteData._programVersion !== 2 &&
+                  voteData.veto !== undefined &&
+                  voteData.veto.voteProgress > 0 ? (
+                    <div className="pb-3">
+                      <VetoProgress
+                        votesRequired={voteData.veto.votesRequired}
+                        progress={voteData.veto.voteProgress}
+                        showBg
+                      />
+                    </div>
+                  ) : undefined}
+                </>
               ) : (
                 <div className="pb-3">
-                  <VoteResultStatus
-                    progress={yesVoteProgress}
-                    votePassed={votePassed}
-                    yesVotesRequired={yesVotesRequired}
-                  />
+                  <VoteResultStatus />
                 </div>
               )}
               <VoteResults proposal={proposal.account} />

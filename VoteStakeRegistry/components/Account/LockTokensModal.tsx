@@ -390,7 +390,7 @@ const LockTokensModal = ({
                   min={mintMinAmount}
                   value={amount}
                   type="number"
-                  onChange={(e) => setAmount(e.target.value)}
+                  onChange={(e) => setAmount(e.target.value as any)}
                   step={mintMinAmount}
                   onBlur={validateAmountOnBlur}
                 />

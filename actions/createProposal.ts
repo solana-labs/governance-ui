@@ -25,7 +25,7 @@ import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
 import { NftVoterClient } from '@solana/governance-program-library'
 import { withAddSignatory } from '@solana/spl-governance'
-
+import { trySentryLog } from '@utils/logs'
 export interface InstructionDataWithHoldUpTime {
   data: InstructionData | null
   holdUpTime: number | undefined
@@ -249,9 +249,17 @@ export const createProposal = async (
             )
         )
     )
-
+    const deduplicatedPrerequisiteInstructionsSigners = prerequisiteInstructionsSigners.filter(
+      (value, index, self) =>
+        index ===
+        self.findIndex(
+          (t) =>
+            t.publicKey.toString() === value.publicKey.toString() &&
+            t.secretKey.toString() === value.secretKey.toString()
+        )
+    )
     const signersSet = [
-      ...chunks([...prerequisiteInstructionsSigners], 5),
+      ...chunks([...deduplicatedPrerequisiteInstructionsSigners], 5),
       [],
       ...signerChunks,
     ]
@@ -276,6 +284,17 @@ export const createProposal = async (
       transactionInstructions: txes,
     })
   }
-
+  const logInfo = {
+    realmId: realm.pubkey.toBase58(),
+    realmSymbol: realm.account.name,
+    wallet: wallet.publicKey?.toBase58(),
+    proposalAddress: proposalAddress.toBase58(),
+    proposalIndex: proposalIndex,
+    cluster: connection.rpcEndpoint.includes('devnet') ? 'devnet' : 'mainnet',
+  }
+  trySentryLog({
+    tag: 'proposalCreated',
+    objToStringify: logInfo,
+  })
   return proposalAddress
 }

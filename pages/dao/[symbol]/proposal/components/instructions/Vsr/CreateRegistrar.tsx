@@ -17,8 +17,8 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { SYSVAR_RENT_PUBKEY } from '@solana/web3.js'
 import { getRegistrarPDA } from 'VoteStakeRegistry/sdk/accounts'
 import { DEFAULT_VSR_ID, VsrClient } from 'VoteStakeRegistry/sdk/client'
-import useWallet from '@hooks/useWallet'
 import { web3 } from '@project-serum/anchor'
+import useWallet from '@hooks/useWallet'
 
 interface CreateVsrRegistrarForm {
   governedAccount: AssetAccount | undefined
@@ -34,11 +34,11 @@ const CreateVsrRegistrar = ({
 }) => {
   const { realm, realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<CreateVsrRegistrarForm>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
-  const { anchorProvider, wallet } = useWallet()
+  const { wallet, anchorProvider } = useWallet()
 
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
@@ -107,7 +107,7 @@ const CreateVsrRegistrar = ({
   })
   const inputs = [
     {
-      label: 'Governance',
+      label: 'Wallet',
       initialValue: null,
       name: 'governedAccount',
       type: InstructionInputType.GOVERNED_ACCOUNT,

@@ -1,5 +1,7 @@
 import AssemblyClusterIcon from '@carbon/icons-react/lib/AssemblyCluster';
+import CheckmarkIcon from '@carbon/icons-react/lib/Checkmark';
 import EarthIcon from '@carbon/icons-react/lib/Earth';
+import EditIcon from '@carbon/icons-react/lib/Edit';
 import ListDropdownIcon from '@carbon/icons-react/lib/ListDropdown';
 import LogoDiscord from '@carbon/icons-react/lib/LogoDiscord';
 import LogoGithub from '@carbon/icons-react/lib/LogoGithub';
@@ -7,11 +9,14 @@ import LogoInstagram from '@carbon/icons-react/lib/LogoInstagram';
 import LogoLinkedin from '@carbon/icons-react/lib/LogoLinkedin';
 import OverflowMenuHorizontalIcon from '@carbon/icons-react/lib/OverflowMenuHorizontal';
 import ProgressBarRound from '@carbon/icons-react/lib/ProgressBarRound';
-// import UserFollow from '@carbon/icons-react/lib/UserFollow';
+import UserFollow from '@carbon/icons-react/lib/UserFollow';
 import WalletIcon from '@carbon/icons-react/lib/Wallet';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
+import { useWallet } from '@solana/wallet-adapter-react';
 import type { PublicKey } from '@solana/web3.js';
-import { useMemo } from 'react';
+import { pipe } from 'fp-ts/lib/function';
+import Link from 'next/link';
+import { useCallback, useMemo } from 'react';
 import { useMediaQuery } from 'react-responsive';
 
 import * as Button from '@hub/components/controls/Button';
@@ -19,11 +24,16 @@ import { HeaderTokenPrice } from '@hub/components/HeaderTokenPrice';
 import { Twitter } from '@hub/components/icons/Twitter';
 import * as RealmBanner from '@hub/components/RealmBanner';
 import * as RealmHeaderIcon from '@hub/components/RealmHeaderIcon';
+import { useCluster } from '@hub/hooks/useCluster';
+import { useMutation } from '@hub/hooks/useMutation';
+import { useQuery } from '@hub/hooks/useQuery';
 import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
 import cx from '@hub/lib/cx';
+import * as RE from '@hub/types/Result';
 
 import { ExternalLinkIcon } from './ExternalLinkIcon';
 import { ExternalLinkMenuItem } from './ExternalLinkMenuItem';
+import * as gql from './gql';
 import { Tab } from './Tab';
 
 interface BaseProps {
@@ -41,6 +51,7 @@ interface Props extends BaseProps {
     mint: PublicKey;
     symbol: string;
   };
+  userIsAdmin?: boolean;
   // external links
   discordUrl?: string | null;
   githubUrl?: string | null;
@@ -50,13 +61,71 @@ interface Props extends BaseProps {
   websiteUrl?: string | null;
 }
 
-export function Content(props: Props) {
-  const jupiterDirectLink = useMemo(() => {
-    if (props.token?.mint) {
-      return `https://jup.ag/swap/USDC-${props.token?.mint.toString()}?inAmount=1`;
+interface Jupiter {
+  init(args: any): any;
+}
+
+async function importJupiter() {
+  const script = new Promise<any>((res, rej) => {
+    const existing = document.getElementById(
+      'jupiter-load-script',
+    ) as HTMLScriptElement | null;
+
+    if (existing) {
+      res({});
+    } else {
+      const el = document.createElement('script');
+      el.onload = res;
+      el.onerror = rej;
+      el.id = 'jupiter-load-script';
+      el.type = 'text/javascript';
+      el.src = 'https://terminal.jup.ag/main.js';
+      document.head.append(el);
     }
-    return 'https://jup.ag';
-  }, [props.token]);
+  });
+
+  const css = new Promise((res, rej) => {
+    const existing = document.getElementById(
+      'jupiter-load-styles',
+    ) as HTMLLinkElement | null;
+
+    if (existing) {
+      res({});
+    } else {
+      const el = document.createElement('link');
+      el.onload = res;
+      el.onerror = rej;
+      el.id = 'jupiter-load-styles';
+      el.rel = 'stylesheet';
+      el.href = 'https://terminal.jup.ag/main.css';
+      document.head.append(el);
+    }
+  });
+
+  return Promise.all([script, css]).then(() => {
+    return (window as any).Jupiter as Jupiter;
+  });
+}
+
+export function Content(props: Props) {
+  const { wallet } = useWallet();
+  const [cluster] = useCluster();
+  const endpoint = useMemo(() => cluster.connection.rpcEndpoint, [
+    cluster.connection,
+  ]);
+
+  const mint = useMemo(() => props.token?.mint.toString(), [props.token?.mint]);
+  const initJupiter = useCallback(async () => {
+    const jupiter = await importJupiter();
+
+    jupiter.init({
+      mode: 'outputOnly',
+      mint,
+      endpoint,
+      passThroughWallet: wallet,
+    });
+  }, [mint, endpoint, wallet]);
+
   const showFullLinkList = useMediaQuery({ query: '(min-width: 768px)' });
   const hasExternalLinks = !!(
     props.websiteUrl ||
@@ -66,6 +135,12 @@ export function Content(props: Props) {
     props.linkedInUrl ||
     props.githubUrl
   );
+
+  const [followedResp] = useQuery(gql.followedRealmsResp, {
+    query: gql.followedRealms,
+  });
+  const [, follow] = useMutation(gql.followResp, gql.follow);
+  const [, unfollow] = useMutation(gql.unfollowResp, gql.unfollow);
 
   return (
     <header className={cx(props.className, 'bg-white')}>
@@ -88,7 +163,7 @@ export function Content(props: Props) {
             'md:pl-48',
           )}
         >
-          <div className="relative overflow-visible -mx-4 md:-mx-2">
+          <div className="flex items-baseline relative overflow-visible -mx-4 md:-mx-2">
             <div
               className={cx(
                 'absolute',
@@ -104,6 +179,24 @@ export function Content(props: Props) {
             >
               {props.name}
             </div>
+            {props.userIsAdmin && (
+              <Link passHref href={`/realm/${props.realmUrlId}/hub/edit`}>
+                <a
+                  className={cx(
+                    'flex',
+                    'items-center',
+                    'ml-4',
+                    'text-neutral-500',
+                    'text-xs',
+                    'transition-colors',
+                    'hover:text-neutral-900',
+                  )}
+                >
+                  <EditIcon className="h-3 w-3 fill-current mr-1" />
+                  <div>edit info</div>
+                </a>
+              </Link>
+            )}
           </div>
           <div className="flex items-center">
             {props.token && (
@@ -114,13 +207,61 @@ export function Content(props: Props) {
                 />
               </div>
             )}
-            {/* <Button.Secondary className="w-36">
-              <UserFollow className="h-4 w-4 mr-1.5" />
-              Follow
-            </Button.Secondary> */}
+            {pipe(
+              followedResp,
+              RE.match(
+                () => <div />,
+                () => <div />,
+                ({ me }) => {
+                  if (me) {
+                    const isCurrentlyFollowing = me.followedRealms
+                      .map((r) => r.publicKey.toBase58())
+                      .includes(props.realm.toBase58());
+
+                    if (isCurrentlyFollowing) {
+                      return (
+                        <Button.Tertiary
+                          className="w-36"
+                          onClick={() => {
+                            unfollow({ realm: props.realm });
+                          }}
+                        >
+                          <CheckmarkIcon className="h-4 w-4 mr-1.5" />
+                          Followed
+                        </Button.Tertiary>
+                      );
+                    }
+
+                    return (
+                      <Button.Secondary
+                        className="w-36"
+                        onClick={() => {
+                          follow({ realm: props.realm });
+                        }}
+                      >
+                        <UserFollow className="h-4 w-4 mr-1.5" />
+                        Follow
+                      </Button.Secondary>
+                    );
+                  }
+
+                  return (
+                    <Button.Secondary disabled className="w-36">
+                      <UserFollow className="h-4 w-4 mr-1.5" />
+                      Follow
+                    </Button.Secondary>
+                  );
+                },
+              ),
+            )}
             {props.token && (
-              <a href={jupiterDirectLink} target="_blank">
-                <Button.Primary className="w-36 text-white ml-2">
+              <a
+                className="ml-2"
+                onClick={initJupiter}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <Button.Primary className="w-36 text-white">
                   <ProgressBarRound className="h-4 w-4 mr-1.5" />
                   Buy #{props.token.symbol}
                 </Button.Primary>

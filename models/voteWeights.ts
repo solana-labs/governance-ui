@@ -551,7 +551,7 @@ export class SimpleGatedVoterWeight implements VoterWeightInterface {
   }
 }
 
-/// Returns max VoteWeight for given mint and max source
+/** Returns max VoteWeight for given mint and max source */
 export function getMintMaxVoteWeight(
   mint: MintInfo,
   maxVoteWeightSource: MintMaxVoteWeightSource
@@ -574,11 +574,13 @@ export function getMintMaxVoteWeight(
   }
 }
 
-/// Returns max vote weight for a proposal
+/** Returns max vote weight for a proposal  */
 export function getProposalMaxVoteWeight(
   realm: Realm,
   proposal: Proposal,
-  governingTokenMint: MintInfo
+  governingTokenMint: MintInfo,
+  // For vetos we want to override the proposal.governingTokenMint
+  governingTokenMintPk?: PublicKey
 ) {
   // For finalized proposals the max is stored on the proposal in case it can change in the future
   if (proposal.isVoteFinalized() && proposal.maxVoteWeight) {
@@ -587,7 +589,7 @@ export function getProposalMaxVoteWeight(
 
   // Council votes are currently not affected by MaxVoteWeightSource
   if (
-    proposal.governingTokenMint.toBase58() ===
+    (governingTokenMintPk ?? proposal.governingTokenMint).toBase58() ===
     realm.config.councilMint?.toBase58()
   ) {
     return governingTokenMint.supply

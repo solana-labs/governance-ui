@@ -22,7 +22,7 @@ const Empty = ({
   })
   const { ownVoterWeight } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
   const handleSetForm = ({ propertyName, value }) => {
@@ -54,7 +54,7 @@ const Empty = ({
   })
   return (
     <GovernedAccountSelect
-      label="Governance"
+      label="Wallet"
       governedAccounts={assetAccounts.filter((x) =>
         ownVoterWeight.canCreateProposal(x.governance.account.config)
       )}

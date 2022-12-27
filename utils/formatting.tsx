@@ -6,7 +6,7 @@ const relativeTime = require('dayjs/plugin/relativeTime')
 import { abbreviateAddress } from '@hub/lib/abbreviateAddress'
 
 const votePrecision = 10000
-export const calculatePct = (c: BN, total?: BN) => {
+export const calculatePct = (c = new BN(0), total?: BN) => {
   if (total?.isZero()) {
     return 0
   }

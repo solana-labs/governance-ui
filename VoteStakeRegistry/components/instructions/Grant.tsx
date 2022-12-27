@@ -51,7 +51,7 @@ const Grant = ({
   const wallet = useWalletStore((s) => s.current)
   const { realm, tokenRecords, realmInfo } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const [startDate, setStartDate] = useState(dayjs().format('DD-MM-YYYY'))
   const [endDate, setEndDate] = useState('')
   const [useableGrantMints, setUseableGrantMints] = useState<string[]>([])
@@ -293,6 +293,7 @@ const Grant = ({
         error={formErrors['governedTokenAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
+        type="token"
       ></GovernedAccountSelect>
       <div className="text-sm mb-3">
         <div className="mb-2">Allow dao to clawback</div>

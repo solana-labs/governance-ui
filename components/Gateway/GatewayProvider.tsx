@@ -28,7 +28,7 @@ export const GatewayProvider: FC = ({ children }) => {
 
   return (
     <InternalGatewayProvider
-      clusterUrl={connection.endpoint}
+      connection={connection.current}
       cluster={cluster}
       gatekeeperNetwork={gatekeeperNetwork}
       wallet={{

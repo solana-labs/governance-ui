@@ -29,7 +29,7 @@ const CreateTokenMetadata = ({
   const mintGovernancesWithMintInfo = assetAccounts.filter(
     (x) => x.type === AccountType.MINT
   )
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<CreateTokenMetadataForm>({
     name: '',
@@ -126,6 +126,7 @@ const CreateTokenMetadata = ({
         error={formErrors['mintAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
+        type="mint"
       />
 
       {shouldMakeSolTreasury && (

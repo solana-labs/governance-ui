@@ -5,7 +5,7 @@ import { ChevronLeftIcon } from '@heroicons/react/solid'
 
 import useProposal from '@hooks/useProposal'
 import useVoteRecords from '@hooks/useVoteRecords'
-import ProposalStateBadge from '@components/ProposalStatusBadge'
+import ProposalStateBadge from '@components/ProposalStateBadge'
 import ProposalTopVotersList from '@components/ProposalTopVotersList'
 import ProposalTopVotersBubbleChart from '@components/ProposalTopVotersBubbleChart'
 import useWalletStore from 'stores/useWalletStore'

@@ -1,4 +1,4 @@
-import ApprovalQuorum from '@components/ApprovalQuorum'
+import { ApprovalProgress } from '@components/QuorumProgress'
 import Button from '@components/Button'
 import VoteResultsForRealmProposal from '@components/VoteResultsForRealmProposal'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
@@ -8,7 +8,6 @@ import { useHasVoteTimeExpired } from '@hooks/useHasVoteTimeExpired'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import useRealmProposalVotes from '@hooks/useRealmProposalVotes'
-import useWallet from '@hooks/useWallet'
 import {
   getGovernanceProgramVersion,
   getInstructionDataFromBase64,
@@ -26,104 +25,12 @@ import {
 import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 import { notify } from '@utils/notifications'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
-import classNames from 'classnames'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useCallback, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import VoteProposalModal from './VoteProposalModal'
-
-function getLabel(proposalState: ProposalState, hasVotingExpired?: boolean) {
-  switch (proposalState) {
-    case ProposalState.Cancelled:
-      return 'Cancelled'
-    case ProposalState.Completed:
-      return 'Completed'
-    case ProposalState.Defeated:
-      return 'Defeated'
-    case ProposalState.Draft:
-      return 'Draft'
-    case ProposalState.Executing:
-      return 'Executable'
-    case ProposalState.ExecutingWithErrors:
-      return 'Executing w/ errors'
-    case ProposalState.SigningOff:
-      return 'Signing off'
-    case ProposalState.Succeeded:
-      return 'Completed'
-    case ProposalState.Voting:
-      return hasVotingExpired ? 'Finalizing' : 'Voting'
-  }
-}
-
-function getTextColor(
-  proposalState: ProposalState,
-  hasVotingExpired?: boolean
-) {
-  switch (proposalState) {
-    case ProposalState.Cancelled:
-    case ProposalState.Draft:
-      return 'text-white'
-    case ProposalState.Completed:
-      return 'text-[#8EFFDD]'
-    case ProposalState.Defeated:
-    case ProposalState.ExecutingWithErrors:
-      return 'text-[#FF7C7C]'
-    case ProposalState.Executing:
-      return 'text-[#5DC9EB]'
-    case ProposalState.SigningOff:
-      return 'text-[#F5A458]'
-    case ProposalState.Succeeded:
-      return 'text-[#8EFFDD]'
-
-    case ProposalState.Voting:
-      return hasVotingExpired
-        ? 'bg-gradient-to-r from-[#00C2FF] via-[#00E4FF] to-[#87F2FF] bg-clip-text text-transparent'
-        : 'text-[#8EFFDD]'
-  }
-}
-
-function getBorderColor(
-  proposalState: ProposalState,
-  hasVotingExpired?: boolean
-) {
-  switch (proposalState) {
-    case ProposalState.Cancelled:
-    case ProposalState.Completed:
-    case ProposalState.Defeated:
-    case ProposalState.ExecutingWithErrors:
-      return 'border-transparent'
-    case ProposalState.Executing:
-      return 'border-[#5DC9EB]'
-    case ProposalState.Draft:
-      return 'border-white'
-    case ProposalState.SigningOff:
-      return 'border-[#F5A458]'
-    case ProposalState.Succeeded:
-      return 'border-transparent'
-
-    case ProposalState.Voting:
-      return hasVotingExpired ? 'border-[#5DC9EB]' : 'border-[#8EFFDD]'
-  }
-}
-
-function getOpacity(proposalState: ProposalState) {
-  switch (proposalState) {
-    case ProposalState.Cancelled:
-    case ProposalState.Completed:
-    case ProposalState.Defeated:
-    case ProposalState.ExecutingWithErrors:
-      return 'opacity-70'
-    case ProposalState.Draft:
-      return ''
-    case ProposalState.SigningOff:
-      return ''
-    case ProposalState.Succeeded:
-      return 'opacity-70'
-    default:
-      return ''
-  }
-}
+import ProposalStateBadge from '@components/ProposalStateBadge'
 
 interface Props {
   voteRecord?: ProgramAccount<VoteRecord>
@@ -149,7 +56,7 @@ export default function ProposalDetails({
   const { cluster } = router.query
 
   const { symbol } = useRealm()
-  const { wallet } = useWallet()
+  const { current: wallet } = useWalletStore()
   const connection = useWalletStore((s) => s.connection.current)
   const { fmtUrlWithCluster } = useQueryContext()
 
@@ -287,23 +194,7 @@ export default function ProposalDetails({
             </span>
           </p>
         </div>
-        <div
-          className={classNames(
-            'border',
-            'inline-flex',
-            'min-w-max',
-            'items-center',
-            'px-2',
-            'py-1',
-            'rounded-full',
-            'text-xs',
-            getBorderColor(proposal.account.state, hasVoteTimeExpired),
-            getOpacity(proposal.account.state),
-            getTextColor(proposal.account.state, hasVoteTimeExpired)
-          )}
-        >
-          {getLabel(proposal.account.state, hasVoteTimeExpired)}
-        </div>
+        <ProposalStateBadge proposal={proposal.account} />
       </div>
       <div className="flex flex-col lg:flex-row space-y-1 lg:space-y-0 lg:space-x-3">
         <div className="flex-1">
@@ -316,9 +207,9 @@ export default function ProposalDetails({
         </div>
         <div className="hidden lg:block self-stretch w-0.5 bg-fgd-4" />
         <div className="flex-1">
-          <ApprovalQuorum
+          <ApprovalProgress
             progress={voteData.yesVoteProgress}
-            yesVotesRequired={voteData.yesVotesRequired}
+            votesRequired={voteData.yesVotesRequired}
           />
         </div>
       </div>

@@ -83,7 +83,7 @@ const MeanCreateAccountComponent = ({ index, governance }: Props) => {
 
   // governedTokenAccount
 
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
 
   // instruction
@@ -174,6 +174,7 @@ const MeanCreateAccountComponent = ({ index, governance }: Props) => {
         error={formErrors['governedTokenAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
+        type="token"
       />
       <Input
         min={mintMinAmount}

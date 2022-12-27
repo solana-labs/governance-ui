@@ -282,7 +282,7 @@ function ForesightGovernedAccountSelect(props: {
   index: number
   governance: ProgramAccount<Governance> | null
 }) {
-  const shouldBeGoverned = props.index !== 0 && props.governance
+  const shouldBeGoverned = !!(props.index !== 0 && props.governance)
   return (
     <GovernedAccountSelect
       label="Program"

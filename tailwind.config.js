@@ -7,6 +7,7 @@ module.exports = {
     './Strategies/**/*.{js,ts,jsx,tsx}',
     './VoteStakeRegistry/**/*.{js,ts,jsx,tsx}',
     './hub/**/*.{js,ts,jsx,tsx}',
+    './verify-wallet/**/*.{js,ts,jsx,tsx}',
   ],
   future: {
     removeDeprecatedGapUtilities: true,
@@ -24,6 +25,7 @@ module.exports = {
         help: 'help',
       },
       colors: {
+        discord: '#7289da',
         'dark-theme': {
           primary: { light: '#5DC9EB', dark: '#cecece' },
           'secondary-1': { light: '#AFD803', dark: '#6CBF00' },
@@ -41,6 +43,7 @@ module.exports = {
           red: '#FF7C7C',
           green: '#30C89A',
           blue: '#00e4ff',
+          discord: '#7289da',
         },
         'light-theme': {
           primary: { light: '#5DC9EB', dark: '#101010' },
@@ -58,6 +61,7 @@ module.exports = {
           red: '#cb676f',
           green: '#6BBF5F',
           blue: '#3F77DE',
+          discord: '#7289da',
         },
         'mango-theme': {
           primary: { light: '#F2C94C', dark: '#EEB91B' },
@@ -148,6 +152,7 @@ module.exports = {
         gradient: 'gradient 4s ease-in-out infinite',
         loader: 'loader 0.6s infinite alternate',
         'staggered-bounce': 'staggered-bounce 1600ms infinite',
+        'move-stripes': 'move-stripes 2s linear infinite',
       },
       keyframes: {
         'connect-wallet-ping': {
@@ -182,6 +187,10 @@ module.exports = {
             transform: 'translateY(-50%)',
             'animation-timing-function': 'cubic-bezier(0.8, 0, 1, 1)',
           },
+        },
+        'move-stripes': {
+          '0%': { backgroundPosition: '0 0' },
+          '100%': { backgroundPosition: '44px 0' },
         },
       },
       fontFamily: {

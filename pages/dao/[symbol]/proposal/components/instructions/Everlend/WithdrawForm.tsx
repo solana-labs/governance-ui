@@ -59,7 +59,7 @@ const WithdrawForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [])
 
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [
     form,
@@ -80,7 +80,6 @@ const WithdrawForm = ({
     setFormErrors(validationErrors)
     return isValid
   }
-  console.log(form.governedAccount)
 
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
@@ -113,8 +112,6 @@ const WithdrawForm = ({
         el.handledMint ===
         form.governedAccount?.extensions.mint?.publicKey.toString()
     )
-
-    console.log(matchedStratagie)
 
     const [rewardPool] = PublicKey.findProgramAddressSync(
       [
@@ -213,7 +210,7 @@ const WithdrawForm = ({
   return (
     <>
       <GovernedAccountSelect
-        label="Governance"
+        label="Wallet"
         governedAccounts={assetAccounts}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedAccount' })

@@ -36,7 +36,7 @@ const WithdrawValidatorStake = ({
   const connection = useWalletStore((s) => s.connection)
   const programId: PublicKey = StakeProgram.programId
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
 
   const [form, setForm] = useState<ValidatorWithdrawStakeForm>({
     stakingAccount: undefined,
@@ -235,6 +235,7 @@ const WithdrawValidatorStake = ({
         error={formErrors['governedTokenAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
+        type="token"
       ></GovernedAccountSelect>
       <StakeAccountSelect
         label="Staking Account"

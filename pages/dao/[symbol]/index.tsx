@@ -60,7 +60,6 @@ const REALM = () => {
     ownTokenRecord,
     councilTokenOwnerRecords,
     ownCouncilTokenRecord,
-    isNftMode,
   } = useRealm()
   const proposalsPerPage = 20
   const [filters, setFilters] = useState<Filters>(InitialFilters)
@@ -86,7 +85,6 @@ const REALM = () => {
     (s) => s.state.currentRealmVotingClient
   )
   const wallet = useWalletStore((s) => s.current)
-  const connected = useWalletStore((s) => s.connected)
   const connection = useWalletStore((s) => s.connection.current)
 
   const allProposals = Object.entries(proposals).sort((a, b) =>
@@ -266,14 +264,6 @@ const REALM = () => {
     setIsMultiVoting(false)
   }
 
-  const showMultiVote = useMemo(
-    () =>
-      realm
-        ? realm.account.votingProposalCount > 1 && connected && !isNftMode
-        : false,
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    [realm, connected]
-  )
   //Todo: move to own components with refactor to dao folder structure
   const isPyth = realmInfo?.realmId.toBase58() === PYTH_REALM_ID.toBase58()
 
@@ -382,9 +372,7 @@ const REALM = () => {
                         />
                       </div>
                       <div
-                        className={`flex lg:flex-row items-center justify-between lg:space-x-3 w-full ${
-                          showMultiVote ? 'flex-col-reverse' : 'flex-row'
-                        }`}
+                        className={`flex lg:flex-row items-center justify-between lg:space-x-3 w-full flex-col-reverse`}
                       >
                         <h4 className="font-normal mb-0 text-fgd-2 whitespace-nowrap">{`${
                           filteredProposals.length
@@ -392,25 +380,17 @@ const REALM = () => {
                           filteredProposals.length === 1 ? '' : 's'
                         }`}</h4>
                         <div
-                          className={`flex items-center lg:justify-end lg:pb-0 lg:space-x-3 w-full ${
-                            showMultiVote
-                              ? 'justify-between pb-3'
-                              : 'justify-end'
-                          }`}
+                          className={`flex items-center lg:justify-end lg:pb-0 lg:space-x-3 w-full justify-between pb-3`}
                         >
-                          {showMultiVote ? (
-                            <div className="flex items-center">
-                              <p className="mb-0 mr-1 text-fgd-3">
-                                Multi-vote Mode
-                              </p>
-                              <Switch
-                                checked={multiVoteMode}
-                                onChange={() => {
-                                  toggleMultiVoteMode()
-                                }}
-                              />
-                            </div>
-                          ) : null}
+                          <div className="flex items-center">
+                            <p className="mb-0 mr-1 text-fgd-3">Batch voting</p>
+                            <Switch
+                              checked={multiVoteMode}
+                              onChange={() => {
+                                toggleMultiVoteMode()
+                              }}
+                            />
+                          </div>
                           <NewProposalBtn />
                         </div>
                       </div>

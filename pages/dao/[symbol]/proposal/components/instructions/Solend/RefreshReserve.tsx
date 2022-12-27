@@ -35,7 +35,7 @@ const RefreshReserve = ({
   const { realmInfo } = useRealm()
 
   const { assetAccounts } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
 
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<RefreshReserveForm>({})
@@ -119,7 +119,7 @@ const RefreshReserve = ({
   return (
     <>
       <GovernedAccountSelect
-        label="Governance"
+        label="Wallet"
         governedAccounts={assetAccounts}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedAccount' })

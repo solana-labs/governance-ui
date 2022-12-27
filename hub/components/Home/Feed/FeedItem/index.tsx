@@ -10,7 +10,6 @@ import { RealmIcon } from '@hub/components/RealmIcon';
 import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay';
 import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
 import cx from '@hub/lib/cx';
-import { estimateRealmUrlId } from '@hub/lib/estimateRealmUrlId';
 import { FeedItemType } from '@hub/types/FeedItemType';
 import { ProposalState } from '@hub/types/ProposalState';
 
@@ -31,6 +30,8 @@ interface Props extends BaseProps {
     urlId: string;
   };
   realmUrlId: string;
+  userIsAdmin?: boolean;
+  onDelete?(): void;
 }
 
 function getUrl(props: Props) {
@@ -42,7 +43,7 @@ function getUrl(props: Props) {
     if (!props.feedItem.realmPublicKey.equals(props.realm)) {
       const urlId = props.realmInfo
         ? props.realmInfo.urlId
-        : estimateRealmUrlId(props.feedItem.realmPublicKey);
+        : props.feedItem.realm.urlId;
 
       return `/realm/${urlId}/${props.feedItem.id}`;
     }
@@ -177,7 +178,10 @@ export function Content(props: Props) {
                 )
               : null
           }
+          type={props.feedItem.type}
+          userIsAdmin={props.userIsAdmin}
           userVote={props.feedItem.myVote}
+          onDelete={props.onDelete}
         />
       </div>
     </article>

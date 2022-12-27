@@ -1,7 +1,7 @@
 import { CheckIcon } from '@heroicons/react/solid'
-import ProposalStateBadge from './ProposalStatusBadge'
+import ProposalStateBadge from './ProposalStateBadge'
 import { Proposal, ProposalState } from '@solana/spl-governance'
-import ApprovalQuorum from './ApprovalQuorum'
+import { ApprovalProgress, VetoProgress } from './QuorumProgress'
 import useProposalVotes from '../hooks/useProposalVotes'
 import ProposalTimeStatus from './ProposalTimeStatus'
 import { PublicKey } from '@solana/web3.js'
@@ -21,7 +21,7 @@ const ProposalSelectCard = ({
   setSelectedProposals,
   selectedProposals,
 }: ProposalCardProps) => {
-  const { yesVoteProgress, yesVotesRequired } = useProposalVotes(proposal)
+  const votesData = useProposalVotes(proposal)
 
   const checked = !!selectedProposals.find(
     // @ts-ignore
@@ -66,16 +66,33 @@ const ProposalSelectCard = ({
         <ProposalTimeStatus proposal={proposal} />
       </div>
       {proposal.state === ProposalState.Voting && (
-        <div className="border-t border-fgd-4 flex flex-col lg:flex-row mt-2 p-4">
-          <div className="pb-3 lg:pb-0 lg:border-r lg:border-fgd-4 lg:pr-4 w-full lg:w-1/2">
+        <div className="border-t border-fgd-4 flex flex-col lg:flex-row mt-2 p-4 gap-x-4 gap-y-3">
+          <div className="w-full lg:w-auto flex-1">
             <VoteResults isListView proposal={proposal} />
           </div>
-          <div className="lg:pl-4 w-full lg:w-1/2">
-            <ApprovalQuorum
-              progress={yesVoteProgress}
-              yesVotesRequired={yesVotesRequired}
+          <div className="border-r border-fgd-4 hidden lg:block" />
+          <div className="w-full lg:w-auto flex-1">
+            <ApprovalProgress
+              progress={votesData.yesVoteProgress}
+              votesRequired={votesData.yesVotesRequired}
             />
           </div>
+          {votesData._programVersion !== undefined &&
+          // @asktree: here is some typescript gore because typescript doesn't know that a number being > 3 means it isn't 1 or 2
+          votesData._programVersion !== 1 &&
+          votesData._programVersion !== 2 &&
+          votesData.veto !== undefined &&
+          votesData.veto.voteProgress > 0 ? (
+            <>
+              <div className="border-r border-fgd-4 hidden lg:block" />
+              <div className="w-full lg:w-auto flex-1">
+                <VetoProgress
+                  progress={votesData.veto.voteProgress}
+                  votesRequired={votesData.veto.votesRequired}
+                />
+              </div>
+            </>
+          ) : undefined}
         </div>
       )}
     </button>
