@@ -76,7 +76,7 @@ export function buildTopVoters(
         ? record.account.governingTokenDepositAmount.add(
             undecidedVoterWeightByWallets[
               record.account.governingTokenOwner.toBase58()
-            ]
+            ] || new BN(0)
           )
         : record.account.governingTokenDepositAmount
       return buildResults(
