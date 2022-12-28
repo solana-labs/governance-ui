@@ -3,6 +3,7 @@ import { ProgramAccount, Realm } from '@solana/spl-governance'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey, Transaction, Connection } from '@solana/web3.js'
 import { SIMULATION_WALLET } from '@tools/constants'
+import { chunks } from '@utils/helpers'
 import { TokenProgramAccount, tryGetMint } from '@utils/tokens'
 import {
   getRegistrarPDA,
@@ -11,6 +12,7 @@ import {
   DepositWithMintAccount,
   LockupType,
   Registrar,
+  Voter,
 } from 'VoteStakeRegistry/sdk/accounts'
 import { tryGetVoter, tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
@@ -110,11 +112,11 @@ export const getDeposits = async ({
   return { votingPower, deposits, votingPowerFromDeposits }
 }
 
-export const getVotingPower = async ({
+export const getVotingPowersForWallets = async ({
   client,
   registrarPk,
   existingRegistrar,
-  walletPk,
+  walletPks,
   communityMint,
   connection,
   mintsUsedInRealm,
@@ -124,7 +126,7 @@ export const getVotingPower = async ({
   connection: Connection
   registrarPk: PublicKey
   existingRegistrar: Registrar
-  walletPk: PublicKey
+  walletPks: PublicKey[]
   communityMint: PublicKey
   mintsUsedInRealm: TokenProgramAccount<MintInfo>[]
   latestBlockhash: Readonly<{
@@ -133,87 +135,126 @@ export const getVotingPower = async ({
   }>
 }) => {
   const clientProgramId = client.program.programId
-  const { voter } = await getVoterPDA(registrarPk, walletPk, clientProgramId)
-  const existingVoter = await tryGetVoter(voter, client)
+  const voterPks: PublicKey[] = []
+  const voterAccs: Voter[] = []
+  const encodedTransactionsParsedByWallets: {
+    walletPk: string
+    tx: string
+  }[] = []
   const mintCfgs = existingRegistrar?.votingMints || []
   const mints = {}
-  let votingPower = new BN(0)
+  const events: {
+    walletPk: string
+    event: any
+  }[] = []
+  const parser = new EventParser(client.program.programId, client.program.coder)
   let deposits: DepositWithMintAccount[] = []
+
+  for (const walletPk of walletPks) {
+    const { voter } = await getVoterPDA(registrarPk, walletPk, clientProgramId)
+    const existingVoter = await tryGetVoter(voter, client)
+    if (existingVoter) {
+      voterPks.push(voter)
+      voterAccs.push(existingVoter)
+    }
+  }
   for (const i of mintCfgs) {
     if (i.mint.toBase58() !== emptyPk) {
       const mint = mintsUsedInRealm.find((x) => x.publicKey.equals(i.mint))
       mints[i.mint.toBase58()] = mint
     }
   }
-  if (existingVoter) {
-    deposits = existingVoter.deposits
-      .map(
-        (x, idx) =>
-          ({
-            ...x,
-            mint: mints[mintCfgs![x.votingMintConfigIdx].mint.toBase58()],
-            index: idx,
-          } as DepositWithMintAccount)
-      )
-      .filter(
-        (x) =>
-          x.isUsed && x.mint.publicKey.toBase58() === communityMint.toBase58()
-      )
-    if (deposits.length) {
-      const walletPk = new PublicKey(SIMULATION_WALLET)
-      const events: any[] = []
-      const parser = new EventParser(
-        client.program.programId,
-        client.program.coder
-      )
-      const originalTx = new Transaction({ feePayer: walletPk })
-      const logVoterInfoIx = await client.program.methods
-        .logVoterInfo(1, 1)
-        .accounts({ registrar: registrarPk, voter })
-        .instruction()
-      originalTx.add(logVoterInfoIx)
+  if (voterAccs.length) {
+    for (const i in voterAccs) {
+      const voter = voterAccs[i]
+      const voterPk = voterPks[i]
+      deposits = voter.deposits
+        .map(
+          (x, idx) =>
+            ({
+              ...x,
+              mint: mints[mintCfgs![x.votingMintConfigIdx].mint.toBase58()],
+              index: idx,
+            } as DepositWithMintAccount)
+        )
+        .filter(
+          (x) =>
+            x.isUsed && x.mint.publicKey.toBase58() === communityMint.toBase58()
+        )
+      if (deposits.length) {
+        const walletPk = new PublicKey(SIMULATION_WALLET)
 
-      const transaction = originalTx
-      transaction.lastValidBlockHeight = latestBlockhash.lastValidBlockHeight
-      transaction.recentBlockhash = latestBlockhash.blockhash
-      //@ts-ignore
-      const message = transaction._compile()
-      const signData = message.serialize()
-      //@ts-ignore
-      const wireTransaction = transaction._serialize(signData)
-      const encodedTransaction = wireTransaction.toString('base64')
-      const batchOfDeposits = await fetch(connection.rpcEndpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 1,
-          method: 'simulateTransaction',
-          params: [
-            encodedTransaction,
-            {
-              commitment: 'recent',
-              encoding: 'base64',
-            },
-          ],
-        }),
-      })
-      const logs = await batchOfDeposits.json()
-      parser.parseLogs(logs.result.value.logs!, (event) => {
-        events.push(event)
-      })
-      const votingPowerEntry = events.find(
-        (x) => x.name === VOTER_INFO_EVENT_NAME
-      )
-      if (votingPowerEntry && !votingPowerEntry.data.votingPower.isZero()) {
-        votingPower = votingPowerEntry.data.votingPower
+        const originalTx = new Transaction({ feePayer: walletPk })
+        const logVoterInfoIx = await client.program.methods
+          .logVoterInfo(1, 1)
+          .accounts({ registrar: registrarPk, voter: voterPk })
+          .instruction()
+        originalTx.add(logVoterInfoIx)
+
+        const transaction = originalTx
+        transaction.lastValidBlockHeight = latestBlockhash.lastValidBlockHeight
+        transaction.recentBlockhash = latestBlockhash.blockhash
+        //@ts-ignore
+        const message = transaction._compile()
+        const signData = message.serialize()
+        //@ts-ignore
+        const wireTransaction = transaction._serialize(signData)
+        const encodedTransaction = wireTransaction.toString('base64')
+        encodedTransactionsParsedByWallets.push({
+          walletPk: voter.voterAuthority.toBase58(),
+          tx: encodedTransaction,
+        })
       }
-      return votingPower
     }
+    const chunkedEncodedTransactionsParsed = chunks(
+      encodedTransactionsParsedByWallets,
+      100
+    )
+    const simulations = await Promise.all(
+      chunkedEncodedTransactionsParsed.map((txChunk) =>
+        fetch(connection.rpcEndpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify([
+            ...txChunk.map((encodedTransaction) => ({
+              jsonrpc: '2.0',
+              id: encodedTransaction.walletPk,
+              method: 'simulateTransaction',
+              params: [
+                encodedTransaction.tx,
+                {
+                  commitment: 'recent',
+                  encoding: 'base64',
+                },
+              ],
+            })),
+          ]),
+        })
+      )
+    )
+    const logsJsons = await Promise.all(simulations.map((x) => x.json()))
+    for (const logJson of logsJsons) {
+      for (const result of logJson) {
+        parser.parseLogs(result.result.value.logs!, (event) => {
+          events.push({
+            event: event,
+            walletPk: result.id,
+          })
+        })
+      }
+    }
+
+    const votingPowersPerWallet = events
+      .filter((x) => x.event.name === VOTER_INFO_EVENT_NAME)
+      .map((x) => ({
+        walletPk: x.walletPk,
+        votingPower: (x.event?.data?.votingPower as BN) || new BN(0),
+      }))
+    return votingPowersPerWallet
   }
-  return votingPower
+  return null
 }
 
 export const calcMultiplier = ({

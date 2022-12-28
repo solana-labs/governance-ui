@@ -16,7 +16,7 @@ import useRealm from '@hooks/useRealm'
 import { buildTopVoters, VoteType } from '@models/proposal'
 import { vsrPluginsPks } from './useVotingPlugins'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { getVotingPower } from 'VoteStakeRegistry/tools/deposits'
+import { getVotingPowersForWallets } from 'VoteStakeRegistry/tools/deposits'
 import { BN } from '@project-serum/anchor'
 import { PublicKey } from '@blockworks-foundation/mango-client'
 import useWalletStore from 'stores/useWalletStore'
@@ -59,28 +59,23 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
     )
     const existingRegistrar = await tryGetRegistrar(registrar, client!)
     const latestBlockhash = await connection.current.getLatestBlockhash()
-    const votingPowers = await Promise.all(
-      walletsPks.map((x) =>
-        getVotingPower({
-          client: client!,
-          registrarPk: registrar,
-          existingRegistrar: existingRegistrar!,
-          walletPk: x,
-          communityMint: realm!.account.communityMint,
-          connection: connection.current,
-          mintsUsedInRealm,
-          latestBlockhash,
-        })
-      )
-    )
-    const votinPowerObj = Object.assign({}, votingPowers)
-    const votingPowerByWallets = Object.fromEntries(
-      Object.entries(votinPowerObj).map(([k, v]) => [
-        walletsPks[k].toBase58(),
-        v,
-      ])
-    )
-    setUndecidedDepositByVoteRecord(votingPowerByWallets)
+    const votingPowers = await getVotingPowersForWallets({
+      client: client!,
+      registrarPk: registrar,
+      existingRegistrar: existingRegistrar!,
+      walletPks: walletsPks,
+      communityMint: realm!.account.communityMint,
+      connection: connection.current,
+      mintsUsedInRealm,
+      latestBlockhash,
+    })
+    if (votingPowers) {
+      const votingPowerObj = {}
+      for (const record of votingPowers) {
+        votingPowerObj[record.walletPk] = record.votingPower
+      }
+      setUndecidedDepositByVoteRecord(votingPowerObj)
+    }
   }
   useEffect(() => {
     if (context && proposal && realm) {
