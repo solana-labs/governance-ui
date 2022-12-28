@@ -69,13 +69,13 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
       mintsUsedInRealm,
       latestBlockhash,
     })
-    console.log(votingPowers)
+
     if (votingPowers) {
       const votingPowerObj = {}
       for (const record of votingPowers) {
         votingPowerObj[record.walletPk] = record.votingPower
       }
-      console.log(votingPowerObj)
+
       setUndecidedDepositByVoteRecord(votingPowerObj)
     }
   }

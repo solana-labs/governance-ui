@@ -152,12 +152,12 @@ export const getVotingPowersForWallets = async ({
 
   for (const walletPk of walletPks) {
     const { voter } = await getVoterPDA(registrarPk, walletPk, clientProgramId)
-    const existingVoter = await tryGetVoter(voter, client)
-    if (existingVoter) {
-      voterPks.push(voter)
-      voterAccs.push(existingVoter)
-    }
+    voterPks.push(voter)
   }
+  const voterAccsResponse = await client?.program.account.voter.fetchMultiple(
+    voterPks
+  )
+  voterAccs.push(...(voterAccsResponse.filter((x) => x !== null) as Voter[]))
   for (const i of mintCfgs) {
     if (i.mint.toBase58() !== emptyPk) {
       const mint = mintsUsedInRealm.find((x) => x.publicKey.equals(i.mint))
