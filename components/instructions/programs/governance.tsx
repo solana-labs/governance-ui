@@ -20,7 +20,7 @@ import {
   SetRealmConfigArgs,
 } from '@solana/spl-governance'
 import { Connection, PublicKey } from '@solana/web3.js'
-import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
+import { DISABLED_VOTER_WEIGHT, SIMULATION_WALLET } from '@tools/constants'
 import { fmtVoterWeightThresholdMintAmount } from '@tools/governance/units'
 import {
   fmtBNAmount,
@@ -398,9 +398,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
         const realm = await getRealm(connection, accounts[0].pubkey)
         // The wallet can be any existing account for the simulation
         // Note: when running a local validator ensure the account is copied from devnet: --clone ENmcpFCpxN1CqyUjuog9yyUVfdXBKF3LVCwLr7grJZpk -ud
-        const walletPk = new PublicKey(
-          'ENmcpFCpxN1CqyUjuog9yyUVfdXBKF3LVCwLr7grJZpk'
-        )
+        const walletPk = new PublicKey(SIMULATION_WALLET)
         const walletMoq: any = {
           publicKey: walletPk,
         }
