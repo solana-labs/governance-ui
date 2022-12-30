@@ -31,7 +31,7 @@ const DualExercise = ({
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
+  const { assetAccounts } = useGovernanceAssets()
   const [governedAccount, setGovernedAccount] = useState<
     ProgramAccount<Governance> | undefined
   >(undefined)
@@ -83,7 +83,7 @@ const DualExercise = ({
       <Tooltip content="Option token that will be exercised.">
         <GovernedAccountSelect
           label="Option Account"
-          governedAccounts={governedTokenAccountsWithoutNfts}
+          governedAccounts={assetAccounts}
           onChange={(value) => {
             handleSetForm({ value, propertyName: 'optionAccount' })
           }}
@@ -91,32 +91,33 @@ const DualExercise = ({
           error={formErrors['optionAccount']}
           shouldBeGoverned={shouldBeGoverned}
           governance={governance}
+          type="token"
         ></GovernedAccountSelect>
       </Tooltip>
       <Tooltip content="Treasury owned account providing the payment for the option.">
         <GovernedAccountSelect
           label="Quote Treasury"
-          governedAccounts={governedTokenAccountsWithoutNfts}
+          governedAccounts={assetAccounts}
           onChange={(value) => {
             handleSetForm({ value, propertyName: 'quoteTreasury' })
           }}
           value={form.quoteTreasury}
           error={formErrors['quoteTreasury']}
-          shouldBeGoverned={shouldBeGoverned}
           governance={governance}
+          type="token"
         ></GovernedAccountSelect>
       </Tooltip>
       <Tooltip content="Treasury owned account receiving the option exercise.">
         <GovernedAccountSelect
           label="Base Treasury"
-          governedAccounts={governedTokenAccountsWithoutNfts}
+          governedAccounts={assetAccounts}
           onChange={(value) => {
             handleSetForm({ value, propertyName: 'baseTreasury' })
           }}
           value={form.baseTreasury}
           error={formErrors['baseTreasury']}
-          shouldBeGoverned={shouldBeGoverned}
           governance={governance}
+          type="token"
         ></GovernedAccountSelect>
       </Tooltip>
       <Tooltip content="How many option tokens are exercised staking options.">
