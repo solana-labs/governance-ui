@@ -84,13 +84,12 @@ async function importJupiter() {
     }
   });
 
-  return Promise.all([script]).then(() => {
-    return (window as any).Jupiter as Jupiter;
-  });
+  await script;
+  return (window as any).Jupiter as Jupiter;
 }
 
 export function Content(props: Props) {
-  const { wallet } = useWallet();
+  const { wallet, connected } = useWallet();
   const [cluster] = useCluster();
   const endpoint = useMemo(() => cluster.connection.rpcEndpoint, [
     cluster.connection,
@@ -104,7 +103,7 @@ export function Content(props: Props) {
       mode: 'outputOnly',
       mint,
       endpoint,
-      passThroughWallet: wallet,
+      passThroughWallet: connected ? wallet : undefined,
       containerStyles: {
         top: 24,
         height: '80vh',
