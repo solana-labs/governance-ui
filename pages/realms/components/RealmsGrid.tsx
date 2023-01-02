@@ -52,8 +52,8 @@ const RealmBox = React.forwardRef<HTMLDivElement, IRealmBox>(
         </div>
         <h3 className="text-center">{realm.displayName ?? realm.symbol}</h3>
       </div>
-      {editing && (
-        <AiOutlineDrag className="absolute cursor-grab active:cursor-grabbing left-0 right-0 top-0 bottom-0 m-auto h-20 w-20 opacity-50" />
+      {editing && !inGrid && (
+        <AiOutlineDrag className="absolute cursor-grab active:cursor-grabbing right-1 top-1 m-auto h-8 w-8 hover:opacity-50" />
       )}
       {editing && inGrid && (
         <div
