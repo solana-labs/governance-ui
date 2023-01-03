@@ -4,7 +4,7 @@ import {
   ProgramAccount,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
-import React, { useContext, useEffect, useReducer } from 'react'
+import React, { useContext, useEffect, useReducer, useState } from 'react'
 import Input from '@components/inputs/Input'
 import Tooltip from '@components/Tooltip'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -13,7 +13,6 @@ import {
   PsyFinanceMintAmericanOptionsForm,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
-import { useState } from 'react'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   MintInfo,
@@ -34,6 +33,7 @@ import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { PSY_AMERICAN_PROGRAM_ID } from '@utils/instructions/PsyFinance'
 import useWallet from '@hooks/useWallet'
 import { getATA } from '@utils/ataTools'
+import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
 
 const formReducer = (
   state: PsyFinanceMintAmericanOptionsForm,
@@ -89,20 +89,20 @@ const MintAmericanOptions = ({
     const prerequisiteInstructions: TransactionInstruction[] = []
 
     // derive option params needed for instruction
-    const underlyingAmountPerContract = new BigNumber(
-      form.contractSize
-    ).multipliedBy(new BigNumber(10 ** underlyingMintInfo.decimals))
-    const quoteAmountPerContract = new BigNumber(form.strike ?? 0)
-      .multipliedBy(form.contractSize)
-      .multipliedBy(quoteMintInfo.account.decimals)
+    const underlyingAmountPerContract = getMintNaturalAmountFromDecimalAsBN(
+      form.contractSize,
+      underlyingMintInfo.decimals
+    )
+    const quoteAmountPerContract = getMintNaturalAmountFromDecimalAsBN(
+      new BigNumber(form.strike).multipliedBy(form.contractSize).toNumber(),
+      quoteMintInfo.account.decimals
+    )
     const optionParams = {
       programId: PSY_AMERICAN_PROGRAM_ID,
       underlyingMint: form.underlyingMint,
       quoteMint,
-      underlyingAmountPerContract: new BN(
-        underlyingAmountPerContract.toString()
-      ),
-      quoteAmountPerContract: new BN(quoteAmountPerContract.toString()),
+      underlyingAmountPerContract,
+      quoteAmountPerContract,
       expirationUnixTimestamp: new BN(form.expirationUnixTimestamp),
     }
 

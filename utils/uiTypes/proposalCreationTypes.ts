@@ -398,7 +398,7 @@ export interface PsyFinanceMintAmericanOptionsForm {
   optionTokenDestinationAccount: string
   quoteMint: string
   size: number | undefined
-  strike: number | undefined
+  strike: number
   underlyingAccount: AssetAccount | undefined
   underlyingMint: PublicKey | undefined
   writerTokenDestinationAccount: string
