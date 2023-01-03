@@ -28,12 +28,12 @@ import {
   instructions,
 } from '@mithraic-labs/psy-american'
 import BigNumber from 'bignumber.js'
-import { tryGetMint } from '../../../../../../../utils/tokens'
+import { tryGetMint } from '@utils/tokens'
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-import { PSY_AMERICAN_PROGRAM_ID } from '../../../../../../../utils/instructions/PsyFinance'
-import useWallet from '../../../../../../../hooks/useWallet'
-import { getATA } from '../../../../../../../utils/ataTools'
+import { PSY_AMERICAN_PROGRAM_ID } from '@utils/instructions/PsyFinance'
+import useWallet from '@hooks/useWallet'
+import { getATA } from '@utils/ataTools'
 
 const formReducer = (
   state: PsyFinanceMintAmericanOptionsForm,
