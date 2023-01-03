@@ -160,6 +160,8 @@
     "zustand": "3.7.2"
   },
   "devDependencies": {
+    "@lavamoat/allow-scripts": "2.3.0",
+    "@lavamoat/preinstall-always-fail": "1.0.0",
     "@notifi-network/notifi-core": "0.18.2",
     "@testing-library/jest-dom": "5.16.4",
     "@testing-library/react": "11.2.5",
@@ -227,5 +229,26 @@
     "firefox >= 68",
     "opera >= 54",
     "safari >= 14"
-  ]
+  ],
+  "lavamoat": {
+    "allowScripts": {
+      "$root$": false,
+      "@bundlr-network/client>arbundles>keccak": true,
+      "@bundlr-network/client>arbundles>secp256k1": true,
+      "@carbon/icons-react": true,
+      "@civic/solana-gateway-react>@civic/common-gateway-react>styled-components": false,
+      "@lavamoat/preinstall-always-fail": false,
+      "@sentry/nextjs>@sentry/webpack-plugin>@sentry/cli": true,
+      "@solana/wallet-adapter-torus>@toruslabs/solana-embed>@toruslabs/base-controllers>@toruslabs/broadcast-channel>@toruslabs/eccrypto": true,
+      "@solana/wallet-adapter-torus>@toruslabs/solana-embed>@toruslabs/base-controllers>@toruslabs/broadcast-channel>@toruslabs/eccrypto>secp256k1": true,
+      "@solana/wallet-adapter-torus>@toruslabs/solana-embed>@toruslabs/base-controllers>@toruslabs/broadcast-channel>microtime": true,
+      "@solana/web3.js>bigint-buffer": true,
+      "@solana/web3.js>rpc-websockets>bufferutil": true,
+      "@solana/web3.js>rpc-websockets>utf-8-validate": true,
+      "@switchboard-xyz/switchboard-v2>protobufjs": false,
+      "@testing-library/react>@testing-library/dom>aria-query>@babel/runtime-corejs3>core-js-pure": false,
+      "draft-js>fbjs>core-js": false,
+      "goblingold-sdk": true
+    }
+  }
 }
