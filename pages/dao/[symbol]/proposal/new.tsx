@@ -132,6 +132,7 @@ import InitStrike from './components/instructions/Dual/InitStrike'
 import IdlSetBuffer from './components/instructions/Mango/MangoV4/IdlSetBuffer'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { usePrevious } from '@hooks/usePrevious'
+import UXDInitializeController from './components/instructions/UXDProtocol/InitializeController'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -517,6 +518,7 @@ const New = () => {
       [Instructions.RemoveServiceFromDID]: RemoveServiceFromDID,
       [Instructions.RevokeGoverningTokens]: RevokeGoverningTokens,
       [Instructions.SetMintAuthority]: SetMintAuthority,
+      [Instructions.UXDInitializeController]: UXDInitializeController,
     }),
     [governance?.pubkey?.toBase58()]
   )

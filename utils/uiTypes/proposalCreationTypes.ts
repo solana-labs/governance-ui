@@ -31,6 +31,7 @@ export enum PackageEnum {
   Switchboard,
   VsrPlugin,
   Dual,
+  UXDProtocol,
 }
 
 export interface UiInstruction {
@@ -388,6 +389,11 @@ export interface JoinDAOForm {
   amount?: number
 }
 
+export interface UXDInitializeControllerForm {
+  governedAccount?: AssetAccount
+  mintDecimals: number
+}
+
 export enum Instructions {
   Base64,
   ChangeMakeDonation,
@@ -483,6 +489,7 @@ export enum Instructions {
   RemoveServiceFromDID,
   RevokeGoverningTokens,
   SetMintAuthority,
+  UXDInitializeController,
 }
 
 export interface ComponentInstructionData {

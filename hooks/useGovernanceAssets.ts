@@ -223,6 +223,10 @@ export default function useGovernanceAssets() {
           currentPluginPk.toBase58()
         ),
     },
+    [PackageEnum.UXDProtocol]: {
+      name: 'UXD Protocol',
+      image: '/img/uxd.png',
+    },
   }
 
   // Alphabetical order, Packages then instructions
@@ -818,6 +822,11 @@ export default function useGovernanceAssets() {
       name: 'Vote Escrowed Tokens: Configure Voting Mint',
       isVisible: canUseAuthorityInstruction,
       packageId: PackageEnum.VsrPlugin,
+    },
+    [Instructions.UXDInitializeController]: {
+      name: 'UXD: Initialize Controller',
+      isVisible: symbol === 'UXP',
+      packageId: PackageEnum.UXDProtocol,
     },
   }
 

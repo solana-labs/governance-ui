@@ -118,6 +118,7 @@
     "@urql/exchange-multipart-fetch": "1.0.1",
     "@urql/exchange-persisted-fetch": "2.0.0",
     "@urql/exchange-request-policy": "1.0.0",
+    "@uxd-protocol/uxd-client": "6.0.0",
     "arweave": "1.11.4",
     "axios": "0.26.1",
     "bignumber.js": "9.0.2",
