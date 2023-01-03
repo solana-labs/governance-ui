@@ -16,7 +16,7 @@
     "test": "jest",
     "test-all": "yarn lint && yarn type-check && yarn test",
     "notifier": "ts-node scripts/governance-notifier.ts",
-    "postinstall": "echo '\\033[35mIf you just added a package, consider running `\\033[1m\\033[36;1mnpx yarn-deduplicate\\033[0m\\033[35m`!\\033[00m'"
+    "postinstall": "echo '\\033[35mIf you just added a package, consider running `\\033[1m\\033[36;1mnpx yarn-deduplicate to check for duplicates\\033[0m\\033[35m`!\\033[00m\n \\033[35malso make sure scripts run by new packages are reviewed and added using `\\033[1m\\033[36;1myarn allow-scripts\\033[0m\\033[35m`!\\033[00m'"
   },
   "lint-staged": {
     "*.@(ts|tsx|js|jsx)": [
