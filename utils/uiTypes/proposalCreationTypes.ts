@@ -394,6 +394,11 @@ export interface UXDInitializeControllerForm {
   mintDecimals: number
 }
 
+export interface UXDEditControllerForm {
+  governedAccount?: AssetAccount
+  decimalRedeemableGlobalSupplyCap?: number
+}
+
 export enum Instructions {
   Base64,
   ChangeMakeDonation,
@@ -490,6 +495,7 @@ export enum Instructions {
   RevokeGoverningTokens,
   SetMintAuthority,
   UXDInitializeController,
+  UXDEditController,
 }
 
 export interface ComponentInstructionData {

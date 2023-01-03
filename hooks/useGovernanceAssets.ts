@@ -823,8 +823,14 @@ export default function useGovernanceAssets() {
       isVisible: canUseAuthorityInstruction,
       packageId: PackageEnum.VsrPlugin,
     },
+    // UXD PROTOCOL
     [Instructions.UXDInitializeController]: {
       name: 'UXD: Initialize Controller',
+      isVisible: symbol === 'UXP',
+      packageId: PackageEnum.UXDProtocol,
+    },
+    [Instructions.UXDEditController]: {
+      name: 'UXD: Edit Controller',
       isVisible: symbol === 'UXP',
       packageId: PackageEnum.UXDProtocol,
     },

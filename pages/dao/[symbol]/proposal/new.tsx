@@ -133,6 +133,7 @@ import IdlSetBuffer from './components/instructions/Mango/MangoV4/IdlSetBuffer'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { usePrevious } from '@hooks/usePrevious'
 import UXDInitializeController from './components/instructions/UXDProtocol/InitializeController'
+import UXDEditController from './components/instructions/UXDProtocol/EditController'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -519,6 +520,7 @@ const New = () => {
       [Instructions.RevokeGoverningTokens]: RevokeGoverningTokens,
       [Instructions.SetMintAuthority]: SetMintAuthority,
       [Instructions.UXDInitializeController]: UXDInitializeController,
+      [Instructions.UXDEditController]: UXDEditController,
     }),
     [governance?.pubkey?.toBase58()]
   )
