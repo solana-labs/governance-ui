@@ -165,6 +165,8 @@ export function App(props: Props) {
         <style>{`
           body {
             background-color: #17161c;
+            width: 100%;
+            position: fixed
           }
         `}</style>
         {faviconUrl ? (
