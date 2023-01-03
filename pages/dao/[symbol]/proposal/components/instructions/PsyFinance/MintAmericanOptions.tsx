@@ -98,7 +98,7 @@ const MintAmericanOptions = ({
     const optionParams = {
       programId: PSY_AMERICAN_PROGRAM_ID,
       underlyingMint: form.underlyingMint,
-      quoteMint: quoteMint,
+      quoteMint,
       underlyingAmountPerContract: new BN(
         underlyingAmountPerContract.toString()
       ),
