@@ -91,6 +91,7 @@ export function useVotingPlugins() {
     (s) => s.state.currentRealmVotingClient
   )
   const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
+
   const nftMintRegistrar = useVotePluginsClientStore(
     (s) => s.state.nftMintRegistrar
   )
@@ -306,7 +307,7 @@ export function useVotingPlugins() {
     )
   }
   useEffect(() => {
-    if (wallet) {
+    if (wallet && currentPluginPk) {
       handleSetVsrClient(wallet, connection, currentPluginPk)
       handleSetNftClient(wallet, connection)
       handleSetSwitchboardClient(wallet, connection)
@@ -314,7 +315,7 @@ export function useVotingPlugins() {
       handleSetPythClient(wallet, connection)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [connection.endpoint, wallet, currentPluginPk])
+  }, [connection.endpoint, wallet, currentPluginPk?.toBase58()])
 
   useEffect(() => {
     const handleVsrPlugin = () => {
