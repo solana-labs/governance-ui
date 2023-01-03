@@ -68,7 +68,7 @@ const VotingMintConfig = ({
     ) {
       const vsrClient = VsrClient.connect(
         anchorProvider,
-        form?.programId ? new web3.PublicKey(form.programId) : undefined
+        form?.programId ? new web3.PublicKey(form.programId) : DEFAULT_VSR_ID
       )
       const digitShift = form.mintDigitShift
       const unlockedScaledFactor = getScaledFactor(form.mintUnlockedFactor)

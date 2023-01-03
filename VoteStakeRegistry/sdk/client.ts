@@ -13,17 +13,13 @@ export class VsrClient {
 
   static connect(
     provider: Provider,
-    programId?: web3.PublicKey,
+    programId: web3.PublicKey,
     devnet?: boolean
   ): VsrClient {
     const idl = IDL
 
     return new VsrClient(
-      new Program<VoterStakeRegistry>(
-        idl,
-        programId || DEFAULT_VSR_ID,
-        provider
-      ),
+      new Program<VoterStakeRegistry>(idl, programId, provider),
       devnet
     )
   }
