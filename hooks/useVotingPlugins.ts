@@ -307,8 +307,11 @@ export function useVotingPlugins() {
     )
   }
   useEffect(() => {
-    if (wallet && currentPluginPk) {
-      handleSetVsrClient(wallet, connection, currentPluginPk)
+    if (wallet) {
+      if (currentPluginPk) {
+        handleSetVsrClient(wallet, connection, currentPluginPk)
+      }
+
       handleSetNftClient(wallet, connection)
       handleSetSwitchboardClient(wallet, connection)
       handleSetGatewayClient(wallet, connection)
