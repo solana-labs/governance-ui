@@ -6,6 +6,7 @@ import Input from '@components/inputs/Input';
 import { PublicKey } from '@solana/web3.js';
 import createMintWithIdentityDepositoryInstruction from '@tools/sdk/uxdProtocol/createMintWithIdentityDepositoryInstruction';
 import { USDC, USDC_DECIMALS } from '@uxd-protocol/uxd-client';
+import InputNumber from '@components/inputs/InputNumber';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -69,15 +70,14 @@ const UXDMintWithIdentityDepository = ({
         error={formErrors['uxdProgram']}
       />
 
-      <Input
+      <InputNumber
         label="Collateral Amount (USDC)"
         value={form.uiCollateralAmount}
-        type="number"
         min={0}
         max={10 ** 12}
-        onChange={(evt) =>
+        onChange={(value) =>
           handleSetForm({
-            value: evt.target.value,
+            value: value,
             propertyName: 'uiCollateralAmount',
           })
         }

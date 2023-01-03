@@ -2,11 +2,11 @@ import * as yup from 'yup';
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
 import { GovernedMultiTypeAccount } from '@utils/tokens';
 import { UXDEditIdentityDepositoryForm } from '@utils/uiTypes/proposalCreationTypes';
-import Input from '@components/inputs/Input';
 import Switch from '@components/Switch';
 import { useState } from 'react';
 import createEditIdentityDepositoryInstruction from '@tools/sdk/uxdProtocol/createEditIdentityDepositoryInstruction';
 import { USDC, USDC_DECIMALS } from '@uxd-protocol/uxd-client';
+import InputNumber from '@components/inputs/InputNumber';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -19,7 +19,7 @@ const schema = yup.object().shape({
     .min(0, 'Redeemable amount under management cap should be min 0'),
 });
 
-const RegisterMercurialVaultDepository = ({
+const EditIdentityDepository = ({
   index,
   governedAccount,
 }: {
@@ -117,14 +117,13 @@ const RegisterMercurialVaultDepository = ({
         }}
       />
       {uiRedeemableAmountUnderManagementCapChange ? (
-        <Input
+        <InputNumber
           value={form.uiRedeemableAmountUnderManagementCap}
-          type="number"
           min={0}
           max={10 ** 12}
-          onChange={(evt) =>
+          onChange={(value) =>
             handleSetForm({
-              value: evt.target.value,
+              value,
               propertyName: 'uiRedeemableAmountUnderManagementCap',
             })
           }
@@ -135,4 +134,4 @@ const RegisterMercurialVaultDepository = ({
   );
 };
 
-export default RegisterMercurialVaultDepository;
+export default EditIdentityDepository;

@@ -3,9 +3,9 @@ import Select from '@components/inputs/Select';
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
 import { getDepositoryMintSymbols } from '@tools/sdk/uxdProtocol/uxdClient';
 import { GovernedMultiTypeAccount } from '@utils/tokens';
-import { UXDRegisterMercurialVaultDepositoryForm } from '@utils/uiTypes/proposalCreationTypes';
+import { UXDRegisterCredixLpDepositoryForm } from '@utils/uiTypes/proposalCreationTypes';
 import SelectOptionList from '../../SelectOptionList';
-import createRegisterMercurialVaultDepositoryInstruction from '@tools/sdk/uxdProtocol/createRegisterMercurialVaultDepositoryInstruction';
+import createRegisterCredixLpDepositoryInstruction from '@tools/sdk/uxdProtocol/createRegisterCredixLpDepositoryInstruction';
 import InputNumber from '@components/inputs/InputNumber';
 
 const schema = yup.object().shape({
@@ -30,7 +30,7 @@ const schema = yup.object().shape({
     .required('Redeemable depository supply cap is required'),
 });
 
-const RegisterMercurialVaultDepository = ({
+const RegisterCredixLpDepository = ({
   index,
   governedAccount,
 }: {
@@ -42,14 +42,15 @@ const RegisterMercurialVaultDepository = ({
     form,
     formErrors,
     handleSetForm,
-  } = useInstructionFormBuilder<UXDRegisterMercurialVaultDepositoryForm>({
+  } = useInstructionFormBuilder<UXDRegisterCredixLpDepositoryForm>({
     index,
     initialFormValues: {
       governedAccount,
     },
     schema,
+    shouldSplitIntoSeparateTxs: true,
     buildInstruction: async function ({ form, wallet, governedAccountPubkey }) {
-      return createRegisterMercurialVaultDepositoryInstruction({
+      return createRegisterCredixLpDepositoryInstruction({
         connection,
         uxdProgramId: form.governedAccount!.governance!.account.governedAccount,
         authority: governedAccountPubkey,
@@ -129,4 +130,4 @@ const RegisterMercurialVaultDepository = ({
   );
 };
 
-export default RegisterMercurialVaultDepository;
+export default RegisterCredixLpDepository;

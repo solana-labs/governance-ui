@@ -49,14 +49,18 @@ import TribecaGaugeSetVote from './Tribeca/SetGaugeVote';
 import UXDInitializeController from './UXD/InitializeController';
 import UXDSetRedeemableGlobalSupplyCap from './UXD/SetRedeemGlobalSupplyCap';
 import UXDRegisterMercurialVaultDepository from './UXD/RegisterMercurialVaultDepository';
+import UXDRegisterCredixLpDepository from './UXD/RegisterCredixLpDepository';
 import UXDEditMercurialVaultDepository from './UXD/EditMercurialVaultDepository';
+import UXDEditCredixLpDepository from './UXD/EditCredixLpDepository';
 import UXDEditController from './UXD/EditController';
 import UXDMintWithMercurialVaultDepository from './UXD/MintWithMercurialVaultDepository';
+import UXDMintWithCredixLpDepository from './UXD/MintWithCredixLpDepository';
 import UXDInitializeIdentityDepository from './UXD/InitializeIdentityDepository';
 import UXDMintWithIdentityDepository from './UXD/MintWithIdentityDepository';
 import UXDRedeemFromIdentityDepository from './UXD/RedeemFromIdentityDepository';
 import UXDRedeemFromMercurialVaultDepository from './UXD/RedeemFromMercurialVaultDepository';
-import UXDReinjectMangoToIdentityDepository from './UXD/ReinjectMangoToIdentityDepository';
+import UXDRedeemFromCredixLpDepository from './UXD/RedeemFromCredixLpDepository';
+import UXDCollectProfitOfCredixLpDepository from './UXD/CollectProfitOfCredixLpDepository';
 import UXDEditIdentityDepository from './UXD/EditIdentityDepository';
 import UXDStakingInitializeStakingCampaign from './UXDStaking/InitializeStakingCampaign';
 import UXDStakingMigrateStakingCampaignFromV1ToV2 from './UXDStaking/MigrateStakingCampaignFromV1ToV2';
@@ -236,9 +240,23 @@ const SelectedInstruction = ({
           governedAccount={governedAccount}
         />
       );
+    case InstructionEnum.UXDRegisterCredixLpDepository:
+      return (
+        <UXDRegisterCredixLpDepository
+          index={index}
+          governedAccount={governedAccount}
+        />
+      );
     case InstructionEnum.UXDEditMercurialVaultDepository:
       return (
         <UXDEditMercurialVaultDepository
+          index={index}
+          governedAccount={governedAccount}
+        />
+      );
+    case InstructionEnum.UXDEditCredixLpDepository:
+      return (
+        <UXDEditCredixLpDepository
           index={index}
           governedAccount={governedAccount}
         />
@@ -250,7 +268,13 @@ const SelectedInstruction = ({
           governedAccount={governedAccount}
         />
       );
-
+    case InstructionEnum.UXDMintWithCredixLpDepository:
+      return (
+        <UXDMintWithCredixLpDepository
+          index={index}
+          governedAccount={governedAccount}
+        />
+      );
     case InstructionEnum.UXDInitializeIdentityDepository:
       return (
         <UXDInitializeIdentityDepository
@@ -279,9 +303,16 @@ const SelectedInstruction = ({
           governedAccount={governedAccount}
         />
       );
-    case InstructionEnum.UXDReinjectMangoToIdentityDepository:
+    case InstructionEnum.UXDRedeemFromCredixLpDepository:
       return (
-        <UXDReinjectMangoToIdentityDepository
+        <UXDRedeemFromCredixLpDepository
+          index={index}
+          governedAccount={governedAccount}
+        />
+      );
+    case InstructionEnum.UXDCollectProfitOfCredixLpDepository:
+      return (
+        <UXDCollectProfitOfCredixLpDepository
           index={index}
           governedAccount={governedAccount}
         />

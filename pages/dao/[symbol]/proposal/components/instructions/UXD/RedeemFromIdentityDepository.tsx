@@ -6,6 +6,7 @@ import Input from '@components/inputs/Input';
 import { PublicKey } from '@solana/web3.js';
 import createRedeemFromIdentityDepositoryInstruction from '@tools/sdk/uxdProtocol/createRedeemFromIdentityDepositoryInstruction';
 import { USDC, USDC_DECIMALS } from '@uxd-protocol/uxd-client';
+import InputNumber from '@components/inputs/InputNumber';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -67,15 +68,14 @@ const UXDRedeemFromIdentityDepository = ({
         error={formErrors['uxdProgram']}
       />
 
-      <Input
+      <InputNumber
         label="Redeemable Amount (UXD)"
         value={form.uiRedeemableAmount}
-        type="number"
         min={0}
         max={10 ** 12}
-        onChange={(evt) =>
+        onChange={(value) =>
           handleSetForm({
-            value: evt.target.value,
+            value,
             propertyName: 'uiRedeemableAmount',
           })
         }

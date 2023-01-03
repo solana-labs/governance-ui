@@ -3,11 +3,11 @@ import Select from '@components/inputs/Select';
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
 import { getDepositoryMintSymbols } from '@tools/sdk/uxdProtocol/uxdClient';
 import { GovernedMultiTypeAccount } from '@utils/tokens';
-import { UXDRedeemFromMercurialVaultDepositoryForm } from '@utils/uiTypes/proposalCreationTypes';
+import { UXDMintWithCredixLpDepositoryForm } from '@utils/uiTypes/proposalCreationTypes';
 import SelectOptionList from '../../SelectOptionList';
 import Input from '@components/inputs/Input';
 import { PublicKey } from '@solana/web3.js';
-import createRedeemFromMercurialVaultDepositoryInstruction from '@tools/sdk/uxdProtocol/createRedeemFromMercurialVaultDepositoryInstruction';
+import createMintWithCredixLpDepositoryInstruction from '@tools/sdk/uxdProtocol/createMintWithCredixLpDepositoryInstruction';
 import InputNumber from '@components/inputs/InputNumber';
 
 const schema = yup.object().shape({
@@ -17,13 +17,13 @@ const schema = yup.object().shape({
     .required('Governance account is required'),
   uxdProgram: yup.string().required('UXD Program address is required'),
   collateralName: yup.string().required('Collateral Name address is required'),
-  uiRedeemableAmount: yup
+  uiCollateralAmount: yup
     .number()
-    .moreThan(0, 'Redeemable amount should be more than 0')
-    .required('Redeemable Amount is required'),
+    .moreThan(0, 'Collateral amount should be more than 0')
+    .required('Collateral Amount is required'),
 });
 
-const UXDRedeemFromMercurialVaultDepository = ({
+const UXDMintWithCredixLpDepository = ({
   index,
   governedAccount,
 }: {
@@ -35,7 +35,7 @@ const UXDRedeemFromMercurialVaultDepository = ({
     form,
     formErrors,
     handleSetForm,
-  } = useInstructionFormBuilder<UXDRedeemFromMercurialVaultDepositoryForm>({
+  } = useInstructionFormBuilder<UXDMintWithCredixLpDepositoryForm>({
     index,
     initialFormValues: {
       governedAccount,
@@ -43,12 +43,12 @@ const UXDRedeemFromMercurialVaultDepository = ({
     schema,
     shouldSplitIntoSeparateTxs: true,
     buildInstruction: async function ({ form, governedAccountPubkey, wallet }) {
-      return createRedeemFromMercurialVaultDepositoryInstruction({
+      return createMintWithCredixLpDepositoryInstruction({
         connection,
         uxdProgramId: new PublicKey(form.uxdProgram!),
         authority: governedAccountPubkey,
         depositoryMintName: form.collateralName!,
-        redeemableAmount: form.uiRedeemableAmount!,
+        collateralAmount: form.uiCollateralAmount!,
         payer: wallet.publicKey!,
       });
     },
@@ -82,20 +82,20 @@ const UXDRedeemFromMercurialVaultDepository = ({
       </Select>
 
       <InputNumber
-        label="Redeemable Amount"
-        value={form.uiRedeemableAmount}
+        label="Collateral Amount"
+        value={form.uiCollateralAmount}
         min={0}
         max={10 ** 12}
         onChange={(value) =>
           handleSetForm({
             value,
-            propertyName: 'uiRedeemableAmount',
+            propertyName: 'uiCollateralAmount',
           })
         }
-        error={formErrors['uiRedeemableAmount']}
+        error={formErrors['uiCollateralAmount']}
       />
     </>
   );
 };
 
-export default UXDRedeemFromMercurialVaultDepository;
+export default UXDMintWithCredixLpDepository;

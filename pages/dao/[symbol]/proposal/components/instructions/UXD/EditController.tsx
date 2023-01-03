@@ -2,10 +2,10 @@ import * as yup from 'yup';
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
 import { GovernedMultiTypeAccount } from '@utils/tokens';
 import { UXDEditControllerForm } from '@utils/uiTypes/proposalCreationTypes';
-import Input from '@components/inputs/Input';
 import Switch from '@components/Switch';
 import { useState } from 'react';
 import createEditControllerInstruction from '@tools/sdk/uxdProtocol/createEditControllerInstruction';
+import InputNumber from '@components/inputs/InputNumber';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -66,15 +66,14 @@ const EditControllerDepository = ({
         onChange={(checked) => setRedeemableGlobalSupplyCapChange(checked)}
       />
       {redeemableGlobalSupplyCapChange ? (
-        <Input
+        <InputNumber
           label="Redeemable Global Supply Cap"
           value={form.uiRedeemableGlobalSupplyCap}
-          type="number"
           min={0}
           max={10 ** 12}
-          onChange={(evt) =>
+          onChange={(value) =>
             handleSetForm({
-              value: evt.target.value,
+              value,
               propertyName: 'uiRedeemableGlobalSupplyCap',
             })
           }

@@ -1,7 +1,11 @@
 import { Cluster } from '@blockworks-foundation/mango-client';
 import { utils } from '@project-serum/anchor';
 import { PublicKey } from '@solana/web3.js';
-import { MangoDepository, UXDClient } from '@uxd-protocol/uxd-client';
+import { ConnectionContext } from '@utils/connection';
+import { UXDClient } from '@uxd-protocol/uxd-client';
+import {
+  CredixLpDepository,
+} from '@uxd-protocol/uxd-client';
 
 export const DEPOSITORY_MINTS = {
   devnet: {
@@ -15,6 +19,10 @@ export const DEPOSITORY_MINTS = {
     },
     MERCURIAL_USDC: {
       address: new PublicKey('6L9fgyYtbz34JvwvYyL6YzJDAywz9PKGttuZuWyuoqje'),
+      decimals: 6,
+    },
+    CREDIX_USDC: {
+      address: new PublicKey('Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr'),
       decimals: 6,
     },
   },
@@ -35,21 +43,6 @@ export const DEPOSITORY_MINTS = {
       address: new PublicKey('2FPyTwcZLUg1MDrwsyoP4D6s1tM7hAkHYRjkNb5w6Pxk'),
       decimals: 6,
     },
-    USDC: {
-      address: new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'),
-      decimals: 6,
-    },
-  },
-};
-
-export const INSURANCE_MINTS = {
-  devnet: {
-    USDC: {
-      address: new PublicKey('8FRFC6MoGGkMFQwngccyu69VnYbzykGeez7ignHVAFSN'),
-      decimals: 6,
-    },
-  },
-  mainnet: {
     USDC: {
       address: new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'),
       decimals: 6,
@@ -89,14 +82,6 @@ export const getDepositoryMintKey = (
 export const getDepositoryToken = (cluster: Cluster, symbol: string) =>
   DEPOSITORY_MINTS[cluster][symbol];
 
-export const getInsuranceMintInfo = (
-  cluster: Cluster,
-  symbol: string,
-): {
-  address: PublicKey;
-  decimals: number;
-} => INSURANCE_MINTS[cluster][symbol];
-
 export const uxdClient = (programId: PublicKey): UXDClient => {
   return new UXDClient(programId);
 };
@@ -108,33 +93,16 @@ export const getControllerPda = (uxdProgramId: PublicKey): PublicKey => {
   )[0];
 };
 
-// We do not need the decimals and names for both depository and insurance
-// in order to register a new mango depository
-// we just set placeholder values
-export const instantiateMangoDepository = ({
-  uxdProgramId,
-  depositoryMint,
-  insuranceMint,
-  depositoryName,
-  depositoryDecimals,
-  insuranceName,
-  insuranceDecimals,
-}: {
-  uxdProgramId: PublicKey;
-  depositoryMint: PublicKey;
-  insuranceMint: PublicKey;
-  depositoryName: string;
-  depositoryDecimals: number;
-  insuranceName: string;
-  insuranceDecimals: number;
-}): MangoDepository => {
-  return new MangoDepository(
-    depositoryMint,
-    depositoryName,
-    depositoryDecimals,
-    insuranceMint,
-    insuranceName,
-    insuranceDecimals,
+export const getCredixLpDepository = (connection: ConnectionContext,  uxdProgramId: PublicKey, depositoryMintName: string) => {
+  const collateralMintAddress = getDepositoryMintInfo(connection.cluster, depositoryMintName).address;
+  const credixProgramId = connection.cluster == "devnet"
+    ? new PublicKey("CRdXwuY984Au227VnMJ2qvT7gPd83HwARYXcbHfseFKC")
+    : new PublicKey("CRDx2YkdtYtGZXGHZ59wNv1EwKHQndnRc1gT4p8i2vPX");
+  return CredixLpDepository.initialize({
+    connection: connection.current,
+    collateralMint: collateralMintAddress,
+    collateralSymbol: depositoryMintName,
     uxdProgramId,
-  );
-};
+    credixProgramId: credixProgramId,
+  });
+}

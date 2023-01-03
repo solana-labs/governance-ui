@@ -3,11 +3,11 @@ import Select from '@components/inputs/Select';
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
 import { getDepositoryMintSymbols } from '@tools/sdk/uxdProtocol/uxdClient';
 import { GovernedMultiTypeAccount } from '@utils/tokens';
-import { UXDRedeemFromMercurialVaultDepositoryForm } from '@utils/uiTypes/proposalCreationTypes';
+import { UXDRedeemFromCredixLpDepositoryForm } from '@utils/uiTypes/proposalCreationTypes';
 import SelectOptionList from '../../SelectOptionList';
 import Input from '@components/inputs/Input';
 import { PublicKey } from '@solana/web3.js';
-import createRedeemFromMercurialVaultDepositoryInstruction from '@tools/sdk/uxdProtocol/createRedeemFromMercurialVaultDepositoryInstruction';
+import createRedeemFromCredixLpDepositoryInstruction from '@tools/sdk/uxdProtocol/createRedeemFromCredixLpDepositoryInstruction';
 import InputNumber from '@components/inputs/InputNumber';
 
 const schema = yup.object().shape({
@@ -23,7 +23,7 @@ const schema = yup.object().shape({
     .required('Redeemable Amount is required'),
 });
 
-const UXDRedeemFromMercurialVaultDepository = ({
+const UXDRedeemFromCredixLpDepository = ({
   index,
   governedAccount,
 }: {
@@ -35,7 +35,7 @@ const UXDRedeemFromMercurialVaultDepository = ({
     form,
     formErrors,
     handleSetForm,
-  } = useInstructionFormBuilder<UXDRedeemFromMercurialVaultDepositoryForm>({
+  } = useInstructionFormBuilder<UXDRedeemFromCredixLpDepositoryForm>({
     index,
     initialFormValues: {
       governedAccount,
@@ -43,7 +43,7 @@ const UXDRedeemFromMercurialVaultDepository = ({
     schema,
     shouldSplitIntoSeparateTxs: true,
     buildInstruction: async function ({ form, governedAccountPubkey, wallet }) {
-      return createRedeemFromMercurialVaultDepositoryInstruction({
+      return createRedeemFromCredixLpDepositoryInstruction({
         connection,
         uxdProgramId: new PublicKey(form.uxdProgram!),
         authority: governedAccountPubkey,
@@ -98,4 +98,4 @@ const UXDRedeemFromMercurialVaultDepository = ({
   );
 };
 
-export default UXDRedeemFromMercurialVaultDepository;
+export default UXDRedeemFromCredixLpDepository;

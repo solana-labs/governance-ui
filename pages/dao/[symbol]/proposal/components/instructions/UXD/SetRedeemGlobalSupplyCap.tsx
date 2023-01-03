@@ -3,8 +3,8 @@ import * as yup from 'yup';
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
 import createSetRedeemableGlobalSupplyCapInstruction from '@tools/sdk/uxdProtocol/createSetRedeemableGlobalSupplyCapInstruction';
 import { UXDSetRedeemableGlobalSupplyCapForm } from '@utils/uiTypes/proposalCreationTypes';
-import Input from '@components/inputs/Input';
 import { GovernedMultiTypeAccount } from '@utils/tokens';
+import InputNumber from '@components/inputs/InputNumber';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -45,14 +45,13 @@ const SetRedeemGlobalSupplyCap = ({
   });
 
   return (
-    <Input
+    <InputNumber
       label="Redeem Global Supply Cap"
       value={form.supplyCap}
-      type="number"
       min={0}
-      onChange={(evt) =>
+      onChange={(value) =>
         handleSetForm({
-          value: evt.target.value,
+          value: value,
           propertyName: 'supplyCap',
         })
       }

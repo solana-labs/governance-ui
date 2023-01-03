@@ -3,11 +3,11 @@ import Select from '@components/inputs/Select';
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
 import { getDepositoryMintSymbols } from '@tools/sdk/uxdProtocol/uxdClient';
 import { GovernedMultiTypeAccount } from '@utils/tokens';
-import { UXDEditMercurialVaultDepositoryForm } from '@utils/uiTypes/proposalCreationTypes';
+import { UXDEditCredixLpDepositoryForm } from '@utils/uiTypes/proposalCreationTypes';
 import SelectOptionList from '../../SelectOptionList';
 import Switch from '@components/Switch';
 import { useState } from 'react';
-import createEditMercurialVaultDepositoryInstruction from '@tools/sdk/uxdProtocol/createEditMercurialVaultDepositoryInstruction';
+import createEditCredixLpDepositoryInstruction from '@tools/sdk/uxdProtocol/createEditCredixLpDepositoryInstruction';
 import InputNumber from '@components/inputs/InputNumber';
 
 const schema = yup.object().shape({
@@ -29,7 +29,7 @@ const schema = yup.object().shape({
     .min(0, 'Redeemable amount under management cap should be min 0'),
 });
 
-const EditMercurialVaultDepository = ({
+const EditCredixLpDepository = ({
   index,
   governedAccount,
 }: {
@@ -55,14 +55,15 @@ const EditMercurialVaultDepository = ({
     form,
     formErrors,
     handleSetForm,
-  } = useInstructionFormBuilder<UXDEditMercurialVaultDepositoryForm>({
+  } = useInstructionFormBuilder<UXDEditCredixLpDepositoryForm>({
     index,
     initialFormValues: {
       governedAccount,
     },
     schema,
+    shouldSplitIntoSeparateTxs: true,
     buildInstruction: async function ({ form, governedAccountPubkey }) {
-      return createEditMercurialVaultDepositoryInstruction({
+      return createEditCredixLpDepositoryInstruction({
         connection,
         uxdProgramId: form.governedAccount!.governance!.account.governedAccount,
 
@@ -176,4 +177,4 @@ const EditMercurialVaultDepository = ({
   );
 };
 
-export default EditMercurialVaultDepository;
+export default EditCredixLpDepository;

@@ -1,9 +1,9 @@
 import * as yup from 'yup';
-import Input from '@components/inputs/Input';
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
 import createInitializeControllerInstruction from '@tools/sdk/uxdProtocol/createInitializeControllerInstruction';
 import { GovernedMultiTypeAccount } from '@utils/tokens';
 import { UXDInitializeControllerForm } from '@utils/uiTypes/proposalCreationTypes';
+import InputNumber from '@components/inputs/InputNumber';
 
 const schema = yup.object().shape({
   mintDecimals: yup
@@ -46,15 +46,14 @@ const InitializeController = ({
 
   return (
     <>
-      <Input
+      <InputNumber
         label="Mint Decimals"
         value={form.mintDecimals}
-        type="number"
         min={0}
         max={9}
-        onChange={(evt) =>
+        onChange={(value) =>
           handleSetForm({
-            value: evt.target.value,
+            value,
             propertyName: 'mintDecimals',
           })
         }
