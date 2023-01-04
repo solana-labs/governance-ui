@@ -834,6 +834,11 @@ export default function useGovernanceAssets() {
       isVisible: symbol === 'UXP',
       packageId: PackageEnum.UXDProtocol,
     },
+    [Instructions.UXDInitializeIdentityRepository]: {
+      name: 'UXD: Initialize Identity Repository',
+      isVisible: symbol === 'UXP',
+      packageId: PackageEnum.UXDProtocol,
+    },
   }
 
   const availablePackages: PackageType[] = Object.entries(packages)

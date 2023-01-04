@@ -134,6 +134,7 @@ import { useRealmQuery } from '@hooks/queries/realm'
 import { usePrevious } from '@hooks/usePrevious'
 import UXDInitializeController from './components/instructions/UXDProtocol/InitializeController'
 import UXDEditController from './components/instructions/UXDProtocol/EditController'
+import UXDInitializeIdentoryRepository from './components/instructions/UXDProtocol/InitializeIdentityRepository'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -521,6 +522,7 @@ const New = () => {
       [Instructions.SetMintAuthority]: SetMintAuthority,
       [Instructions.UXDInitializeController]: UXDInitializeController,
       [Instructions.UXDEditController]: UXDEditController,
+      [Instructions.UXDInitializeIdentityRepository]: UXDInitializeIdentoryRepository,
     }),
     [governance?.pubkey?.toBase58()]
   )
