@@ -16,6 +16,19 @@
 
 - most of the work is in `hooks/useRealm.ts` and `hooks/useVotingPlugins.ts` in the governance-ui. The UI work is in `components/TokenBalance`
 
+## Changing dependencies
+Whenever you change dependencies (adding, removing, or updating, either in package.json or yarn.lock), there are various files that must be kept up-to-date.
+
+`yarn.lock`:
+- Run yarn again after your changes to ensure yarn.lock has been properly updated.
+- Run `yarn deduplicate` to remove duplicate dependencies from the lockfile.
+
+The `allow-scripts` configuration in `package.json`:
+- Run `yarn allow-scripts auto` to update the `allow-scripts` configuration automatically. This config determines whether the package's install/postinstall scripts are allowed to run.
+- Alternatively update the `allow-scripts` section manually. 
+- Review each new package to determine whether the install script needs to run or not, testing if necessary.
+- Use `npx can-i-ignore-scripts` to help assessing whether scripts are needed
+
 # NextJS Typescript Boilerplate
 
 Bootstrap a developer-friendly NextJS app configured with:

@@ -17,7 +17,8 @@
     "test-all": "yarn lint && yarn type-check && yarn test",
     "notifier": "ts-node scripts/governance-notifier.ts",
     "setup": "yarn install && yarn allow-scripts",
-    "postinstall": "echo '\\033[35mIf you just added a package, consider running `\\033[1m\\033[36;1mnpx yarn-deduplicate to check for duplicates\\033[0m\\033[35m`!\\033[00m\n \\033[35malso make sure scripts run by new packages are reviewed and added in the allowScripts section. Then run `\\033[1m\\033[36;1myarn allow-scripts\\033[0m\\033[35m`!\\033[00m'"
+    "deduplicate": "npx yarn-deduplicate",
+    "postinstall": "echo '\\033[35mIf you just added a package, consider running `\\033[1m\\033[36;1myarn deduplicate` \\033[0m\\033[35mto check for duplicates!\\033[00m\n \\033[35malso make sure scripts run by new packages are reviewed and added in the allowScripts section. Then run `\\033[1m\\033[36;1myarn allow-scripts\\033[0m\\033[35m`!\\033[00m'"
   },
   "lint-staged": {
     "*.@(ts|tsx|js|jsx)": [
