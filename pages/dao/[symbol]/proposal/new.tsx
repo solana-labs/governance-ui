@@ -134,7 +134,8 @@ import { useRealmQuery } from '@hooks/queries/realm'
 import { usePrevious } from '@hooks/usePrevious'
 import UXDInitializeController from './components/instructions/UXDProtocol/InitializeController'
 import UXDEditController from './components/instructions/UXDProtocol/EditController'
-import UXDInitializeIdentoryRepository from './components/instructions/UXDProtocol/InitializeIdentityRepository'
+import UXDInitializeIdentityDepository from './components/instructions/UXDProtocol/InitializeIdentityDepository'
+import UXDRegisterMercurialVaultDepository from './components/instructions/UXDProtocol/RegisterMercurialVaultDepository'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -522,7 +523,8 @@ const New = () => {
       [Instructions.SetMintAuthority]: SetMintAuthority,
       [Instructions.UXDInitializeController]: UXDInitializeController,
       [Instructions.UXDEditController]: UXDEditController,
-      [Instructions.UXDInitializeIdentityRepository]: UXDInitializeIdentoryRepository,
+      [Instructions.UXDInitializeIdentityDepository]: UXDInitializeIdentityDepository,
+      [Instructions.UXDRegisterMercurialVaultDepository]: UXDRegisterMercurialVaultDepository,
     }),
     [governance?.pubkey?.toBase58()]
   )

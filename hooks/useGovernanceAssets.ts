@@ -834,8 +834,13 @@ export default function useGovernanceAssets() {
       isVisible: symbol === 'UXP',
       packageId: PackageEnum.UXDProtocol,
     },
-    [Instructions.UXDInitializeIdentityRepository]: {
-      name: 'UXD: Initialize Identity Repository',
+    [Instructions.UXDInitializeIdentityDepository]: {
+      name: 'UXD: Initialize Identity Depository',
+      isVisible: symbol === 'UXP',
+      packageId: PackageEnum.UXDProtocol,
+    },
+    [Instructions.UXDRegisterMercurialVaultDepository]: {
+      name: 'UXD: Register Mercurial Vault Depository',
       isVisible: symbol === 'UXP',
       packageId: PackageEnum.UXDProtocol,
     },

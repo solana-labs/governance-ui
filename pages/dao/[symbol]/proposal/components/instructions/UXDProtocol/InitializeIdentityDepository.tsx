@@ -30,7 +30,7 @@ const schema = yup.object().shape({
     .required('Governance account is required'),
 })
 
-const InitializeIdentityRepository = ({
+const InitializeIdentityDepository = ({
   index,
   governance,
 }: {
@@ -128,4 +128,4 @@ const InitializeIdentityRepository = ({
   )
 }
 
-export default InitializeIdentityRepository
+export default InitializeIdentityDepository
