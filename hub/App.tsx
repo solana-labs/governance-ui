@@ -1,6 +1,7 @@
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import Script from 'next/script';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { GlobalHeader } from '@hub/components/GlobalHeader';
 import { MinimalHeader } from '@hub/components/GlobalHeader/MinimalHeader';
@@ -56,6 +57,17 @@ interface Props {
 }
 
 export function App(props: Props) {
+  const router = useRouter();
+  const isDarkMode = router.pathname.startsWith('/realm/[id]/wallet');
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDarkMode]);
+
   return (
     <RootProvider>
       <Head>

@@ -3,6 +3,7 @@ import cx from 'classnames'
 import { PlusCircleIcon } from '@heroicons/react/outline'
 import { useRouter } from 'next/router'
 import { PublicKey } from '@solana/web3.js'
+import { PencilIcon } from '@heroicons/react/outline'
 
 import { formatNumber } from '@utils/formatNumber'
 import { NEW_PROGRAM_VIEW } from 'pages/dao/[symbol]/assets'
@@ -78,6 +79,17 @@ export default function Header(props: Props) {
           <div className="flex items-center justify-center">
             <PlusCircleIcon className="h-4 w-4 mr-1" />
             Add Asset
+          </div>
+        </SecondaryButton>
+        <SecondaryButton
+          className="w-48"
+          onClick={() => {
+            router.push(`/realm/${symbol}/wallet/${props.wallet.address}/edit`)
+          }}
+        >
+          <div className="flex items-center justify-center">
+            <PencilIcon className="h-4 w-4 mr-1" />
+            Edit Wallet
           </div>
         </SecondaryButton>
       </div>

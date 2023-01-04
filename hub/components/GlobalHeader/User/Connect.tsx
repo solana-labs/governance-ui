@@ -66,6 +66,10 @@ export function Connect(props: Props) {
           'transition-colors',
           'active:bg-black/20',
           'hover:bg-black/10',
+          'dark:text-neutral-400',
+          'dark:hover:text-neutral-200',
+          'dark:active:bg-neutral-800',
+          'dark:hover:bg-neutral-700',
         )}
         onClick={async () => {
           try {
