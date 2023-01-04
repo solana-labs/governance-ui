@@ -2176,6 +2176,14 @@
     "github": "https://github.com/raydium-io"
   },
   {
+    "symbol": "Bonk",
+    "displayName": "BonkDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "9K6P7vbAPqZ8hHsDbShLZat9bFdWzA52QAgJThGeWui5",
+    "ogImage": "https://i.imgur.com/5JK4nEL.jpeg",
+    "sortRank": 3
+  },
+  {
     "symbol": "Wordcel Club",
     "category": "web3",
     "bannerImage": "https://www.wordcelclub.com/_next/static/media/user-default-banner.29900c53.png",

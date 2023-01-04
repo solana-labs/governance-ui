@@ -27,8 +27,6 @@ export function DiscoverPage(props: Props) {
     query: gql.getDiscoverPage,
   });
 
-  console.log(result);
-
   return pipe(
     result,
     RE.match(
