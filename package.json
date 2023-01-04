@@ -16,7 +16,9 @@
     "test": "jest",
     "test-all": "yarn lint && yarn type-check && yarn test",
     "notifier": "ts-node scripts/governance-notifier.ts",
-    "postinstall": "echo '\\033[35mIf you just added a package, consider running `\\033[1m\\033[36;1mnpx yarn-deduplicate\\033[0m\\033[35m`!\\033[00m'"
+    "setup": "yarn install && yarn allow-scripts",
+    "deduplicate": "npx yarn-deduplicate",
+    "postinstall": "echo '\\033[35mIf you just added a package, consider running `\\033[1m\\033[36;1myarn deduplicate` \\033[0m\\033[35mto check for duplicates!\\033[00m\n \\033[35malso make sure scripts run by new packages are reviewed and added in the allowScripts section. Then run `\\033[1m\\033[36;1myarn allow-scripts\\033[0m\\033[35m`!\\033[00m'"
   },
   "lint-staged": {
     "*.@(ts|tsx|js|jsx)": [
@@ -160,6 +162,8 @@
     "zustand": "3.7.2"
   },
   "devDependencies": {
+    "@lavamoat/allow-scripts": "2.3.0",
+    "@lavamoat/preinstall-always-fail": "1.0.0",
     "@notifi-network/notifi-core": "0.18.2",
     "@testing-library/jest-dom": "5.16.4",
     "@testing-library/react": "11.2.5",
@@ -227,5 +231,26 @@
     "firefox >= 68",
     "opera >= 54",
     "safari >= 14"
-  ]
+  ],
+  "lavamoat": {
+    "allowScripts": {
+      "$root$": false,
+      "@bundlr-network/client>arbundles>keccak": true,
+      "@bundlr-network/client>arbundles>secp256k1": true,
+      "@carbon/icons-react": false,
+      "@civic/solana-gateway-react>@civic/common-gateway-react>styled-components": false,
+      "@lavamoat/preinstall-always-fail": false,
+      "@sentry/nextjs>@sentry/webpack-plugin>@sentry/cli": false,
+      "@solana/wallet-adapter-torus>@toruslabs/solana-embed>@toruslabs/base-controllers>@toruslabs/broadcast-channel>@toruslabs/eccrypto": true,
+      "@solana/wallet-adapter-torus>@toruslabs/solana-embed>@toruslabs/base-controllers>@toruslabs/broadcast-channel>@toruslabs/eccrypto>secp256k1": true,
+      "@solana/wallet-adapter-torus>@toruslabs/solana-embed>@toruslabs/base-controllers>@toruslabs/broadcast-channel>microtime": true,
+      "@solana/web3.js>bigint-buffer": false,
+      "@solana/web3.js>rpc-websockets>bufferutil": true,
+      "@solana/web3.js>rpc-websockets>utf-8-validate": true,
+      "@switchboard-xyz/switchboard-v2>protobufjs": false,
+      "@testing-library/react>@testing-library/dom>aria-query>@babel/runtime-corejs3>core-js-pure": false,
+      "draft-js>fbjs>core-js": false,
+      "goblingold-sdk": false
+    }
+  }
 }
