@@ -546,7 +546,7 @@ const New = () => {
       [Instructions.AddServiceToDID]: AddServiceToDID,
       [Instructions.RemoveServiceFromDID]: RemoveServiceFromDID,
     }),
-    []
+    [governance?.pubkey.toBase58()]
   )
 
   const getCurrentInstruction = useCallback(
@@ -581,7 +581,7 @@ const New = () => {
       )
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    []
+    [governance?.pubkey.toBase58()]
   )
 
   const titleTooLong = form.title.length > TITLE_LENGTH_LIMIT
