@@ -52,9 +52,14 @@ const ProposalActionsPanel = () => {
     : mainVotingEndedAt
 
   const canFinalizeNow = canFinalizeAt ? canFinalizeAt <= now : true
+  const endOfProposalAndCoolOffTime = canFinalizeAt
+    ? dayjs(1000 * canFinalizeAt!)
+    : undefined
+  const coolOffTimeLeft = endOfProposalAndCoolOffTime
+    ? diffTime(false, dayjs(), endOfProposalAndCoolOffTime)
+    : undefined
+
   const walletPk = wallet?.publicKey
-  const end = canFinalizeAt ? dayjs(1000 * canFinalizeAt!) : undefined
-  const timeLeft = end ? diffTime(false, dayjs(), end) : undefined
   useEffect(() => {
     const setup = async () => {
       if (proposal && realmInfo && walletPk) {
@@ -240,21 +245,23 @@ const ProposalActionsPanel = () => {
             )}
 
             {canFinalizeVote && (
-              <Button
-                tooltipMessage={finalizeVoteTooltipContent}
-                className="w-1/2"
-                onClick={handleFinalizeVote}
-                disabled={!connected || !canFinalizeVote || !canFinalizeNow}
-              >
-                Finalize
-                {!canFinalizeNow && timeLeft && (
+              <>
+                <Button
+                  tooltipMessage={finalizeVoteTooltipContent}
+                  className="w-1/2"
+                  onClick={handleFinalizeVote}
+                  disabled={!connected || !canFinalizeVote || !canFinalizeNow}
+                >
+                  Finalize
+                </Button>
+                {!canFinalizeNow && coolOffTimeLeft && (
                   <div>
-                    Cool off time: {timeLeft.days}d &nbsp; : &nbsp;
-                    {timeLeft.hours}h &nbsp; : &nbsp;
-                    {timeLeft.minutes}m
+                    Cool Off Time: {coolOffTimeLeft.days}d &nbsp;
+                    {coolOffTimeLeft.hours}h &nbsp;
+                    {coolOffTimeLeft.minutes}m
                   </div>
                 )}
-              </Button>
+              </>
             )}
           </div>
         </div>
