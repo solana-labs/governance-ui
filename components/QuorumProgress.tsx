@@ -6,7 +6,7 @@ import {
 
 type Props = {
   progress?: number
-  votesRequired?: number
+  votesRequired?: string | number
   showBg?: boolean
 }
 type GenericProps = {
