@@ -844,6 +844,11 @@ export default function useGovernanceAssets() {
       isVisible: symbol === 'UXP',
       packageId: PackageEnum.UXDProtocol,
     },
+    [Instructions.UXDEditMercurialVaultDepository]: {
+      name: 'UXD: Edit Mercurial Vault Depository',
+      isVisible: symbol === 'UXP',
+      packageId: PackageEnum.UXDProtocol,
+    },
   }
 
   const availablePackages: PackageType[] = Object.entries(packages)
