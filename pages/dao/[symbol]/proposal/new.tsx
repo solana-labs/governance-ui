@@ -135,6 +135,7 @@ import { usePrevious } from '@hooks/usePrevious'
 import UXDInitializeController from './components/instructions/UXDProtocol/InitializeController'
 import UXDEditController from './components/instructions/UXDProtocol/EditController'
 import UXDInitializeIdentityDepository from './components/instructions/UXDProtocol/InitializeIdentityDepository'
+import UXDMintWithIdentityDepository from './components/instructions/UXDProtocol/MintWithIdentityDepository'
 import UXDRegisterMercurialVaultDepository from './components/instructions/UXDProtocol/RegisterMercurialVaultDepository'
 import UXDEditMercurialVaultDepository from './components/instructions/UXDProtocol/EditMercurialVaultDepository'
 
@@ -525,6 +526,7 @@ const New = () => {
       [Instructions.UXDInitializeController]: UXDInitializeController,
       [Instructions.UXDEditController]: UXDEditController,
       [Instructions.UXDInitializeIdentityDepository]: UXDInitializeIdentityDepository,
+      [Instructions.UXDMintWithIdentityDepository]: UXDMintWithIdentityDepository,
       [Instructions.UXDRegisterMercurialVaultDepository]: UXDRegisterMercurialVaultDepository,
       [Instructions.UXDEditMercurialVaultDepository]: UXDEditMercurialVaultDepository,
     }),

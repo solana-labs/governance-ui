@@ -403,6 +403,12 @@ export interface UXDInitializeIdentityDepositoryForm {
   governedAccount?: AssetAccount
 }
 
+export interface UXDMintWithIdentityDepositoryForm {
+  governedAccount?: AssetAccount
+  uxdProgram: string
+  collateralAmount: number
+}
+
 export interface UXDRegisterMercurialVaultDepositoryForm {
   governedAccount?: AssetAccount
   collateralName?: string
@@ -517,6 +523,7 @@ export enum Instructions {
   UXDInitializeController,
   UXDEditController,
   UXDInitializeIdentityDepository,
+  UXDMintWithIdentityDepository,
   UXDRegisterMercurialVaultDepository,
   UXDEditMercurialVaultDepository,
 }
