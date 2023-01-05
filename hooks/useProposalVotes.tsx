@@ -1,3 +1,4 @@
+import { BN } from '@project-serum/anchor'
 import { Proposal } from '@solana/spl-governance'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { getProposalMaxVoteWeight } from '../models/voteWeights'
@@ -151,11 +152,11 @@ export default function useProposalVotes(proposal?: Proposal) {
     vetoMaxVoteWeight
   )
 
-  const minimumVetoVotes =
-    fmtTokenAmount(vetoMaxVoteWeight, vetoMintInfo.decimals) *
-    (vetoThreshold.value / 100)
+  const minimumVetoVotes = vetoMaxVoteWeight
+    ?.div(new BN(10).pow(new BN(vetoMintInfo.decimals ?? 0)))
+    .muln(vetoThreshold.value / 100)
 
-  const vetoVotesRequired = minimumVetoVotes - vetoVoteCount
+  const vetoVotesRequired = minimumVetoVotes.subn(vetoVoteCount).toString()
 
   return {
     _programVersion: programVersion,
