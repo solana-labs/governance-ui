@@ -141,7 +141,7 @@ export function UpdatesList(props: Props) {
           'grid',
           'place-items-center',
           'w-full',
-          'h-96',
+          'h-52',
         )}
       >
         <div className="text-lg dark:text-white">
@@ -386,7 +386,7 @@ export function UpdatesList(props: Props) {
             )}
             {!!councilDetailsDiff.councilHasVeto?.length && (
               <SummaryItem
-                label="Council Veto Power over Council Proposals?"
+                label="Council Veto Power over Community Proposals?"
                 value={
                   <div className="flex items-baseline">
                     <div>

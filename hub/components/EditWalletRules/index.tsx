@@ -6,9 +6,9 @@ import type { PublicKey } from '@solana/web3.js';
 import { BigNumber } from 'bignumber.js';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import { Primary } from '@hub/components/controls/Button';
+import { Primary, Secondary } from '@hub/components/controls/Button';
 import { abbreviateAddress } from '@hub/lib/abbreviateAddress';
 import cx from '@hub/lib/cx';
 
@@ -112,6 +112,12 @@ export function EditWalletRules(props: Props) {
   const [minCommunityPower, setMinCommunityPower] = useState(new BigNumber(0));
   const [minCouncilPower, setMinCouncilPower] = useState(new BigNumber(0));
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0 });
+    }
+  }, [step]);
+
   return (
     <div className={cx(props.className, 'dark:bg-neutral-900')}>
       <div className="w-full max-w-3xl pt-14 mx-auto">
@@ -176,9 +182,12 @@ export function EditWalletRules(props: Props) {
                   <ChevronLeftIcon className="h-4 fill-current w-4" />
                   Go Back
                 </button>
-                <Primary onClick={() => setStep(Step.Summary)}>
+                <Secondary
+                  className="h-14 w-44"
+                  onClick={() => setStep(Step.Summary)}
+                >
                   Continue
-                </Primary>
+                </Secondary>
               </footer>
             </>
           )}
