@@ -1,10 +1,15 @@
+import ChevronDownIcon from '@carbon/icons-react/lib/ChevronDown';
 import type { VoteTipping } from '@solana/spl-governance';
 import type { PublicKey } from '@solana/web3.js';
+import { BigNumber } from 'bignumber.js';
+import { useState } from 'react';
 
+import { AdvancedOptions } from '../AdvancedOptions';
 import { CommunityDetails } from '../CommunityDetails';
 import { CouncilDetails } from '../CouncilDetails';
 import { VotingDuration } from '../VotingDuration';
 import { WalletDescription } from '../WalletDescription';
+import cx from '@hub/lib/cx';
 import { FormProps } from '@hub/types/FormProps';
 
 interface Props
@@ -18,17 +23,23 @@ interface Props
     councilHasVeto: boolean;
     councilQuorumPercent: number;
     councilVoteTipping: VoteTipping;
+    depositExemptProposalCount: number;
     maxVoteDays: number;
-    minCommunityPower: number;
-    minCouncilPower: number;
+    minCommunityPower: BigNumber;
+    minCouncilPower: BigNumber;
   }> {
   className?: string;
+  communityTokenSupply: BigNumber;
+  councilTokenSupply: BigNumber;
   walletAddress: PublicKey;
 }
 
 export function Form(props: Props) {
+  const [showAdvanceOptions, setShowAdvanceOptions] = useState(false);
+
   return (
     <article className={props.className}>
+      <WalletDescription className="mb-3" walletAddress={props.walletAddress} />
       <h1 className="text-5xl font-medium m-0 mb-4 dark:text-white ">
         What changes would you like to make to this wallet?
       </h1>
@@ -38,7 +49,6 @@ export function Form(props: Props) {
         implemented.
       </p>
       <div className="space-y-8">
-        <WalletDescription walletAddress={props.walletAddress} />
         <VotingDuration
           coolOffHours={props.coolOffHours}
           maxVoteDays={props.maxVoteDays}
@@ -49,6 +59,7 @@ export function Form(props: Props) {
           communityCanCreate={props.communityCanCreate}
           communityHasVeto={props.communityHasVeto}
           communityQuorumPercent={props.communityQuorumPercent}
+          communityTokenSupply={props.communityTokenSupply}
           communityVoteTipping={props.communityVoteTipping}
           minCommunityPower={props.minCommunityPower}
           onCommunityCanCreateChange={props.onCommunityCanCreateChange}
@@ -61,6 +72,7 @@ export function Form(props: Props) {
           councilCanCreate={props.councilCanCreate}
           councilHasVeto={props.councilHasVeto}
           councilQuorumPercent={props.councilQuorumPercent}
+          councilTokenSupply={props.councilTokenSupply}
           councilVoteTipping={props.councilVoteTipping}
           minCouncilPower={props.minCouncilPower}
           onCouncilCanCreateChange={props.onCouncilCanCreateChange}
@@ -69,6 +81,32 @@ export function Form(props: Props) {
           onCouncilVoteTippingChange={props.onCouncilVoteTippingChange}
           onMinCouncilPowerChange={props.onMinCouncilPowerChange}
         />
+      </div>
+      <div className="mt-16">
+        <button
+          className="flex items-center text-sm text-neutral-500"
+          onClick={() => setShowAdvanceOptions((cur) => !cur)}
+        >
+          Advanced Options{' '}
+          <ChevronDownIcon
+            className={cx(
+              'fill-current',
+              'h-4',
+              'transition-transform',
+              'w-4',
+              showAdvanceOptions && '-rotate-180',
+            )}
+          />
+        </button>
+        {showAdvanceOptions && (
+          <AdvancedOptions
+            className="mt-2.5"
+            depositExemptProposalCount={props.depositExemptProposalCount}
+            onDepositExemptProposalCountChange={
+              props.onDepositExemptProposalCountChange
+            }
+          />
+        )}
       </div>
     </article>
   );

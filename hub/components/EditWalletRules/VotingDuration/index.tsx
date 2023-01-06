@@ -3,12 +3,11 @@ import TimeIcon from '@carbon/icons-react/lib/Time';
 import { SectionBlock } from '../SectionBlock';
 import { SectionHeader } from '../SectionHeader';
 import { SliderValue } from '../SliderValue';
+import { SummaryItem } from '../SummaryItem';
 import { ValueBlock } from '../ValueBlock';
 import { Slider } from '@hub/components/controls/Slider';
 import { ntext } from '@hub/lib/ntext';
 import { FormProps } from '@hub/types/FormProps';
-
-import { SummaryItem } from './SummaryItem';
 
 interface Props
   extends FormProps<{

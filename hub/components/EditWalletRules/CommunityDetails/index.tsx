@@ -1,5 +1,6 @@
 import UserMultipleIcon from '@carbon/icons-react/lib/UserMultiple';
 import type { VoteTipping } from '@solana/spl-governance';
+import { BigNumber } from 'bignumber.js';
 
 import { SectionBlock } from '../SectionBlock';
 import { SectionHeader } from '../SectionHeader';
@@ -18,12 +19,17 @@ interface Props
     communityHasVeto: boolean;
     communityQuorumPercent: number;
     communityVoteTipping: VoteTipping;
-    minCommunityPower: number;
+    minCommunityPower: BigNumber;
   }> {
   className?: string;
+  communityTokenSupply: BigNumber;
 }
 
 export function CommunityDetails(props: Props) {
+  const communityPowerPercent = props.minCommunityPower
+    .dividedBy(props.communityTokenSupply)
+    .multipliedBy(100);
+
   return (
     <SectionBlock className={props.className}>
       <SectionHeader
@@ -48,17 +54,32 @@ export function CommunityDetails(props: Props) {
         >
           <div className="relative">
             <Input
-              className="w-full"
+              className="w-full pr-24"
               placeholder="# of tokens"
               value={formatNumber(props.minCommunityPower, undefined, {
                 maximumFractionDigits: 0,
               })}
               onChange={(e) => {
-                const text = e.currentTarget.value.replaceAll(',', '');
-                const numVal = parseInt(text, 10);
-                props.onMinCommunityPowerChange?.(numVal || 0);
+                const text = e.currentTarget.value.replaceAll(/[^\d.-]/g, '');
+                props.onMinCommunityPowerChange?.(new BigNumber(text || 0));
               }}
             />
+            <div className="absolute top-1/2 right-4 text-neutral-500 -translate-y-1/2">
+              Tokens
+            </div>
+          </div>
+          <div className="flex items-center justify-end">
+            <div className="mt-1 text-xs text-neutral-500">
+              {communityPowerPercent.isGreaterThan(0)
+                ? communityPowerPercent.isLessThan(0.01)
+                  ? '<0.01'
+                  : formatNumber(communityPowerPercent, undefined, {
+                      maximumFractionDigits: 2,
+                      minimumFractionDigits: 0,
+                    })
+                : 0}
+              % of token supply
+            </div>
           </div>
         </ValueBlock>
         <ValueBlock

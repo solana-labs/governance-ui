@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import cx from '@hub/lib/cx';
 
-function getLabel(value: VoteTipping): string {
+export function getLabel(value: VoteTipping): string {
   switch (value) {
     case VoteTipping.Disabled:
       return 'Disabled';
@@ -30,6 +30,7 @@ function getDescription(value: VoteTipping): string {
 
 const itemStyles = cx(
   'border',
+  'cursor-pointer',
   'gap-x-4',
   'grid-cols-[80px,1fr,20px]',
   'grid',
@@ -38,8 +39,10 @@ const itemStyles = cx(
   'px-4',
   'rounded-md',
   'text-left',
+  'transition-colors',
   'dark:bg-neutral-800',
   'dark:border-neutral-700',
+  'dark:hover:bg-neutral-700',
 );
 
 const labelStyles = cx('font-700', 'dark:text-neutral-50');
@@ -88,11 +91,8 @@ export function VoteTippingSelector(props: Props) {
                 <DropdownMenu.Item
                   className={cx(
                     itemStyles,
-                    'cursor-pointer',
-                    'transition-colors',
                     'w-full',
                     'focus:outline-none',
-                    'dark:hover:bg-neutral-700',
                     'dark:focus:bg-neutral-700',
                   )}
                   onClick={() => props.onChange?.(voteTippingType)}

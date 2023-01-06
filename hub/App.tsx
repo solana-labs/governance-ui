@@ -71,6 +71,17 @@ export function App(props: Props) {
   return (
     <RootProvider>
       <Head>
+        {isDarkMode && (
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `
+                html {
+                  background-color: #171717;
+                }
+              `,
+            }}
+          />
+        )}
         <link
           rel="apple-touch-icon"
           sizes="57x57"
