@@ -403,6 +403,12 @@ export interface UXDInitializeIdentityDepositoryForm {
   governedAccount?: AssetAccount
 }
 
+export interface UXDEditIdentityDepositoryForm {
+  governedAccount?: AssetAccount
+  redeemableAmountUnderManagementCap: number
+  mintingDisabled: boolean
+}
+
 export interface UXDMintWithIdentityDepositoryForm {
   governedAccount?: AssetAccount
   uxdProgram: string
@@ -420,7 +426,7 @@ export interface UXDRegisterMercurialVaultDepositoryForm {
 export interface UXDEditMercurialVaultDepositoryForm {
   governedAccount?: AssetAccount
   collateralName?: string
-  uiRedeemableAmountUnderManagementCap: number
+  redeemableAmountUnderManagementCap: number
   mintingFeeInBps: number
   redeemingFeeInBps: number
 }
@@ -523,6 +529,7 @@ export enum Instructions {
   UXDInitializeController,
   UXDEditController,
   UXDInitializeIdentityDepository,
+  UXDEditIdentityDepository,
   UXDMintWithIdentityDepository,
   UXDRegisterMercurialVaultDepository,
   UXDEditMercurialVaultDepository,

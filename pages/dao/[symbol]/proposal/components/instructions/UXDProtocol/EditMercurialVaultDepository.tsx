@@ -44,7 +44,7 @@ const schema = yup.object().shape({
     .number()
     .min(0, 'Redeeming fee in bps should be min 0')
     .max(255, 'Redeeming fee in bps should be max 255'),
-  uiRedeemableAmountUnderManagementCap: yup
+  redeemableAmountUnderManagementCap: yup
     .number()
     .min(0, 'Redeemable amount under management cap should be min 0'),
 })
@@ -66,8 +66,8 @@ const EditMercurialVaultDepository = ({
   ] = useState<boolean>(false)
 
   const [
-    uiRedeemableAmountUnderManagementCapChange,
-    setUiRedeemableAmountUnderManagementCapChange,
+    redeemableAmountUnderManagementCapChange,
+    setRedeemableAmountUnderManagementCapChange,
   ] = useState<boolean>(false)
 
   const connection = useWalletStore((s) => s.connection)
@@ -78,7 +78,7 @@ const EditMercurialVaultDepository = ({
 
   const [form, setForm] = useState<UXDEditMercurialVaultDepositoryForm>({
     governedAccount: undefined,
-    uiRedeemableAmountUnderManagementCap: 0,
+    redeemableAmountUnderManagementCap: 0,
     mintingFeeInBps: 0,
     redeemingFeeInBps: 0,
   })
@@ -123,8 +123,8 @@ const EditMercurialVaultDepository = ({
       ? form.redeemingFeeInBps
       : undefined
 
-    const redeemableAmountUnderManagementCap = uiRedeemableAmountUnderManagementCapChange
-      ? form.uiRedeemableAmountUnderManagementCap
+    const redeemableAmountUnderManagementCap = redeemableAmountUnderManagementCapChange
+      ? form.redeemableAmountUnderManagementCap
       : undefined
 
     const {
@@ -248,25 +248,25 @@ const EditMercurialVaultDepository = ({
       <h5>Redeemable Depository Supply Cap</h5>
 
       <Switch
-        checked={uiRedeemableAmountUnderManagementCapChange}
+        checked={redeemableAmountUnderManagementCapChange}
         onChange={(checked) =>
-          setUiRedeemableAmountUnderManagementCapChange(checked)
+          setRedeemableAmountUnderManagementCapChange(checked)
         }
       />
 
-      {uiRedeemableAmountUnderManagementCapChange ? (
+      {redeemableAmountUnderManagementCapChange ? (
         <Input
           type="number"
-          value={form.uiRedeemableAmountUnderManagementCap}
+          value={form.redeemableAmountUnderManagementCap}
           min={0}
           max={10 ** 12}
           onChange={(evt) =>
             handleSetForm({
               value: evt.target.value,
-              propertyName: 'uiRedeemableAmountUnderManagementCap',
+              propertyName: 'redeemableAmountUnderManagementCap',
             })
           }
-          error={formErrors['uiRedeemableAmountUnderManagementCap']}
+          error={formErrors['redeemableAmountUnderManagementCap']}
         />
       ) : null}
     </>

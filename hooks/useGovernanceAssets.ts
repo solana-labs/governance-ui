@@ -839,6 +839,11 @@ export default function useGovernanceAssets() {
       isVisible: symbol === 'UXP',
       packageId: PackageEnum.UXDProtocol,
     },
+    [Instructions.UXDEditIdentityDepository]: {
+      name: 'UXD: Edit Identity Depository',
+      isVisible: symbol === 'UXP',
+      packageId: PackageEnum.UXDProtocol,
+    },
     [Instructions.UXDMintWithIdentityDepository]: {
       name: 'UXD: Mint with Identity Depository',
       isVisible: symbol === 'UXP',
