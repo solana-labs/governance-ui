@@ -20,20 +20,21 @@ import {
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
 import { BN } from 'bn.js'
-import {
-  createProgram,
-  deriveOptionKeyFromParams,
-  getOptionByKey,
-  instructions,
-} from '@mithraic-labs/psy-american'
 import BigNumber from 'bignumber.js'
 import { tryGetMint } from '@utils/tokens'
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-import { PSY_AMERICAN_PROGRAM_ID } from '@utils/instructions/PsyFinance'
+import {
+  deriveOptionKeyFromParams,
+  getOptionByKey,
+  initializeOptionInstruction,
+  PsyAmericanIdl,
+  PSY_AMERICAN_PROGRAM_ID,
+} from '@utils/instructions/PsyFinance'
 import useWallet from '@hooks/useWallet'
 import { getATA } from '@utils/ataTools'
 import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
+import { Program } from '@project-serum/anchor'
 
 const formReducer = (
   state: PsyFinanceMintAmericanOptionsForm,
@@ -80,7 +81,11 @@ const MintAmericanOptions = ({
     ) {
       throw Error('Missing input(s)')
     }
-    const program = createProgram(PSY_AMERICAN_PROGRAM_ID, anchorProvider)
+    const program = new Program(
+      PsyAmericanIdl,
+      PSY_AMERICAN_PROGRAM_ID,
+      anchorProvider
+    )
     const quoteMint = new PublicKey(form.quoteMint)
     const quoteMintInfo = await tryGetMint(connection.current, quoteMint)
     if (!quoteMintInfo) {
@@ -117,7 +122,7 @@ const MintAmericanOptions = ({
         optionMintKey: _optionMintKey,
         writerMintKey: _writerMintKey,
         underlyingAssetPoolKey: _underlyingAssetPoolKey,
-      } = await instructions.initializeOptionInstruction(program, {
+      } = await initializeOptionInstruction(program, {
         ...optionParams,
       })
       optionMintKey = _optionMintKey
