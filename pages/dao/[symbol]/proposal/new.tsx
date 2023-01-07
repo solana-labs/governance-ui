@@ -139,6 +139,7 @@ import UXDEditIdentityDepository from './components/instructions/UXDProtocol/Edi
 import UXDMintWithIdentityDepository from './components/instructions/UXDProtocol/MintWithIdentityDepository'
 import UXDRegisterMercurialVaultDepository from './components/instructions/UXDProtocol/RegisterMercurialVaultDepository'
 import UXDEditMercurialVaultDepository from './components/instructions/UXDProtocol/EditMercurialVaultDepository'
+import UXDMintWithMercurialVaultDepository from './components/instructions/UXDProtocol/MintWithMercurialVaultDepository'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -527,10 +528,11 @@ const New = () => {
       [Instructions.UXDInitializeController]: UXDInitializeController,
       [Instructions.UXDEditController]: UXDEditController,
       [Instructions.UXDInitializeIdentityDepository]: UXDInitializeIdentityDepository,
+      [Instructions.UXDEditIdentityDepository]: UXDEditIdentityDepository,
       [Instructions.UXDMintWithIdentityDepository]: UXDMintWithIdentityDepository,
       [Instructions.UXDRegisterMercurialVaultDepository]: UXDRegisterMercurialVaultDepository,
       [Instructions.UXDEditMercurialVaultDepository]: UXDEditMercurialVaultDepository,
-      [Instructions.UXDEditIdentityDepository]: UXDEditIdentityDepository,
+      [Instructions.UXDMintWithMercurialVaultDepository]: UXDMintWithMercurialVaultDepository,
     }),
     [governance?.pubkey?.toBase58()]
   )

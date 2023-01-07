@@ -859,6 +859,11 @@ export default function useGovernanceAssets() {
       isVisible: symbol === 'UXP',
       packageId: PackageEnum.UXDProtocol,
     },
+    [Instructions.UXDMintWithMercurialVaultDepository]: {
+      name: 'UXD: Mint with Mercurial Vault Depository',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.UXDProtocol,
+    },
   }
 
   const availablePackages: PackageType[] = Object.entries(packages)
