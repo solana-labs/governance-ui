@@ -1,11 +1,17 @@
 import { coerce, instance, string } from 'superstruct'
-import { PublicKey } from '@solana/web3.js'
 import {
-  getDomainKey,
-  NameRegistryState,
-  // resolve,
-} from '@bonfida/spl-name-service'
+  Connection,
+  GetProgramAccountsFilter,
+  PublicKey,
+} from '@solana/web3.js'
+
 import { getConnectionContext } from '@utils/connection'
+import {
+  MINT_PREFIX,
+  NAME_TOKENIZER_ID,
+  resolve,
+} from '@bonfida/spl-name-service'
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 
 export const PublicKeyFromString = coerce(
   instance(PublicKey),
@@ -26,25 +32,11 @@ export const tryParseDomain = async (
 ): Promise<PublicKey | null> => {
   const { current: connection } = getConnectionContext('mainnet')
   try {
-    const { pubkey: domainPDA } = await getDomainKey(
-      domain.trim().toLowerCase()
-    )
+    const publicKey = await resolve(connection, domain.toLowerCase().trim())
 
-    const { nftOwner, registry } = await NameRegistryState.retrieve(
-      connection,
-      domainPDA
-    )
-
-    // console.log(`Class: ${registry.class.toBase58()}`)
-    // console.log(`Data: ${registry.data?.toString()}`)
-    // console.log(`Owner: ${registry.owner?.toBase58()}`)
-    // console.log(`Parent: ${registry.parentName?.toBase58()}`)
-    // console.log(`NFT Owner: ${nftOwner?.toBase58()}`)
-
-    if (nftOwner) return nftOwner
-
-    return registry.owner
+    return publicKey
   } catch (error) {
+    console.log('🚀 ~ file: pubkey.ts:32 ~ error', error)
     return null
   }
 }
