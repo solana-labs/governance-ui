@@ -137,6 +137,7 @@ import UXDEditController from './components/instructions/UXDProtocol/EditControl
 import UXDInitializeIdentityDepository from './components/instructions/UXDProtocol/InitializeIdentityDepository'
 import UXDEditIdentityDepository from './components/instructions/UXDProtocol/EditIdentityDepository'
 import UXDMintWithIdentityDepository from './components/instructions/UXDProtocol/MintWithIdentityDepository'
+import UXDRedeemWithIdentityDepository from './components/instructions/UXDProtocol/RedeemWithIdentityDepository'
 import UXDRegisterMercurialVaultDepository from './components/instructions/UXDProtocol/RegisterMercurialVaultDepository'
 import UXDEditMercurialVaultDepository from './components/instructions/UXDProtocol/EditMercurialVaultDepository'
 import UXDMintWithMercurialVaultDepository from './components/instructions/UXDProtocol/MintWithMercurialVaultDepository'
@@ -529,6 +530,7 @@ const New = () => {
       [Instructions.UXDEditController]: UXDEditController,
       [Instructions.UXDInitializeIdentityDepository]: UXDInitializeIdentityDepository,
       [Instructions.UXDEditIdentityDepository]: UXDEditIdentityDepository,
+      [Instructions.UXDRedeemWithIdentityDepository]: UXDRedeemWithIdentityDepository,
       [Instructions.UXDMintWithIdentityDepository]: UXDMintWithIdentityDepository,
       [Instructions.UXDRegisterMercurialVaultDepository]: UXDRegisterMercurialVaultDepository,
       [Instructions.UXDEditMercurialVaultDepository]: UXDEditMercurialVaultDepository,
