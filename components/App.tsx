@@ -161,10 +161,6 @@ export function App(props: Props) {
     <div className="relative bg-bkg-1 text-fgd-1">
       <Head>
         <meta property="og:title" content={title} key="title" />
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=1"
-        />
         <title>{title}</title>
         <style>{`
           body {
