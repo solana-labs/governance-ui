@@ -7,18 +7,21 @@ import {
 } from '@solana/spl-governance'
 import {
   Controller,
-  IdentityDepository,
+  MercurialVaultDepository,
   USDC,
-  USDC_DECIMALS,
   UXD_DECIMALS,
 } from '@uxd-protocol/uxd-client'
 import Input from '@components/inputs/Input'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { uxdClient } from '@tools/sdk/uxdProtocol/uxdClient'
+import {
+  getDepositoryMintInfo,
+  getDepositoryMintSymbols,
+  uxdClient,
+} from '@tools/sdk/uxdProtocol/uxdClient'
 import { isFormValid } from '@utils/formValidation'
 import {
   UiInstruction,
-  UXDRedeemWithIdentityDepositoryForm,
+  UXDRedeemWithMercurialVaultDepositoryForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
@@ -30,6 +33,8 @@ import {
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
 import { findATAAddrSync } from '@utils/ataTools'
+import Select from '@components/inputs/Select'
+import SelectOptionList from '../../SelectOptionList'
 
 async function checkInitTokenAccount(
   account: PublicKey,
@@ -60,13 +65,14 @@ const schema = yup.object().shape({
     .nullable()
     .required('Governance account is required'),
   uxdProgram: yup.string().required('UXD Program address is required'),
+  collateralName: yup.string().required('Collateral Name address is required'),
   redeemableAmount: yup
     .number()
     .moreThan(0, 'Redeemable amount should be more than 0')
     .required('Redeemable Amount is required'),
 })
 
-const RedeemWithIdentityDepository = ({
+const RedeemWithMercurialVaultDepository = ({
   index,
   governance,
 }: {
@@ -80,7 +86,7 @@ const RedeemWithIdentityDepository = ({
   const { handleSetInstructions } = useContext(NewProposalContext)
   const { assetAccounts } = useGovernanceAssets()
 
-  const [form, setForm] = useState<UXDRedeemWithIdentityDepositoryForm>({
+  const [form, setForm] = useState<UXDRedeemWithMercurialVaultDepositoryForm>({
     governedAccount: undefined,
     redeemableAmount: 0,
     uxdProgram: 'UXD8m9cvwk4RcSxnX2HZ9VudQCEeDH6fRnB4CAP57Dr',
@@ -104,7 +110,8 @@ const RedeemWithIdentityDepository = ({
       !connection ||
       !isValid ||
       !form.governedAccount?.governance?.account.governedAccount ||
-      !wallet?.publicKey
+      !wallet?.publicKey ||
+      !form.collateralName
     ) {
       return {
         serializedInstruction: '',
@@ -112,20 +119,27 @@ const RedeemWithIdentityDepository = ({
         governance: form.governedAccount?.governance,
       }
     }
-    const uxdProgramId =
-      form.governedAccount?.governance?.account.governedAccount
+    const uxdProgramId = new PublicKey(form.uxdProgram)
     const client = uxdClient(uxdProgramId)
     const authority = form.governedAccount.governance.pubkey
-    const identityDepository = new IdentityDepository(
-      USDC,
-      'USDC',
-      USDC_DECIMALS,
-      uxdProgramId
-    )
-    const ix = client.createRedeemFromIdentityDepositoryInstruction(
+    const {
+      address: collateralMint,
+      decimals: collateralDecimals,
+    } = getDepositoryMintInfo(connection.cluster, form.collateralName)
+    const depository = await MercurialVaultDepository.initialize({
+      connection: connection.current,
+      collateralMint: {
+        mint: collateralMint,
+        name: form.collateralName,
+        decimals: collateralDecimals,
+        symbol: form.collateralName,
+      },
+      uxdProgramId,
+    })
+    const ix = client.createMintWithMercurialVaultDepositoryInstruction(
       new Controller('UXD', UXD_DECIMALS, uxdProgramId),
-      identityDepository,
-      new PublicKey(form.uxdProgram),
+      depository,
+      authority,
       form.redeemableAmount,
       { preflightCommitment: 'processed', commitment: 'processed' },
       wallet.publicKey
@@ -175,6 +189,7 @@ const RedeemWithIdentityDepository = ({
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
       />
+
       <Input
         label="UXD Program"
         value={form.uxdProgram}
@@ -188,9 +203,21 @@ const RedeemWithIdentityDepository = ({
         error={formErrors['uxdProgram']}
       />
 
+      <Select
+        label="Collateral Name"
+        value={form.collateralName}
+        placeholder="Please select..."
+        onChange={(value) =>
+          handleSetForm({ value, propertyName: 'collateralName' })
+        }
+        error={formErrors['collateralName']}
+      >
+        <SelectOptionList list={getDepositoryMintSymbols(connection.cluster)} />
+      </Select>
+
       <Input
         type="number"
-        label="Redeemable Amount (UXD)"
+        label="Redeemable Amount"
         value={form.redeemableAmount}
         min={0}
         max={10 ** 12}
@@ -206,4 +233,4 @@ const RedeemWithIdentityDepository = ({
   )
 }
 
-export default RedeemWithIdentityDepository
+export default RedeemWithMercurialVaultDepository

@@ -869,6 +869,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.UXDProtocol,
     },
+    [Instructions.UXDRedeemWithMercurialVaultDepository]: {
+      name: 'UXD: Redeem with Mercurial Vault Depository',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.UXDProtocol,
+    },
   }
 
   const availablePackages: PackageType[] = Object.entries(packages)

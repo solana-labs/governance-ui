@@ -444,6 +444,13 @@ export interface UXDMintWithMercurialVaultDepositoryForm {
   collateralAmount: number
 }
 
+export interface UXDRedeemWithMercurialVaultDepositoryForm {
+  governedAccount?: AssetAccount
+  uxdProgram: string
+  collateralName?: string
+  redeemableAmount: number
+}
+
 export enum Instructions {
   Base64,
   ChangeMakeDonation,
@@ -548,6 +555,7 @@ export enum Instructions {
   UXDRegisterMercurialVaultDepository,
   UXDEditMercurialVaultDepository,
   UXDMintWithMercurialVaultDepository,
+  UXDRedeemWithMercurialVaultDepository,
 }
 
 export interface ComponentInstructionData {
