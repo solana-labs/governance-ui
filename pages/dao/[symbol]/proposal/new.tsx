@@ -142,6 +142,7 @@ import UXDRegisterMercurialVaultDepository from './components/instructions/UXDPr
 import UXDEditMercurialVaultDepository from './components/instructions/UXDProtocol/EditMercurialVaultDepository'
 import UXDMintWithMercurialVaultDepository from './components/instructions/UXDProtocol/MintWithMercurialVaultDepository'
 import UXDRedeemWithMercurialVaultDepository from './components/instructions/UXDProtocol/RedeemWithMercurialVaultDepository'
+import UXDRegisterCredixDepository from './components/instructions/UXDProtocol/RegisterCredixDepository'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -537,6 +538,7 @@ const New = () => {
       [Instructions.UXDEditMercurialVaultDepository]: UXDEditMercurialVaultDepository,
       [Instructions.UXDMintWithMercurialVaultDepository]: UXDMintWithMercurialVaultDepository,
       [Instructions.UXDRedeemWithMercurialVaultDepository]: UXDRedeemWithMercurialVaultDepository,
+      [Instructions.UXDRegisterCredixDepository]: UXDRegisterCredixDepository,
     }),
     [governance?.pubkey?.toBase58()]
   )

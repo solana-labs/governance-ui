@@ -424,7 +424,7 @@ export interface UXDRedeemWithIdentityDepositoryForm {
 export interface UXDRegisterMercurialVaultDepositoryForm {
   governedAccount?: AssetAccount
   collateralName?: string
-  uiRedeemableDepositorySupplyCap: number
+  redeemableDepositorySupplyCap: number
   mintingFeeInBps: number
   redeemingFeeInBps: number
 }
@@ -449,6 +449,14 @@ export interface UXDRedeemWithMercurialVaultDepositoryForm {
   uxdProgram: string
   collateralName?: string
   redeemableAmount: number
+}
+
+export interface UXDRegisterCredixDepositoryForm {
+  governedAccount?: AssetAccount
+  collateralName?: string
+  redeemableDepositorySupplyCap: number
+  mintingFeeInBps: number
+  redeemingFeeInBps: number
 }
 
 export enum Instructions {
@@ -556,6 +564,7 @@ export enum Instructions {
   UXDEditMercurialVaultDepository,
   UXDMintWithMercurialVaultDepository,
   UXDRedeemWithMercurialVaultDepository,
+  UXDRegisterCredixDepository,
 }
 
 export interface ComponentInstructionData {

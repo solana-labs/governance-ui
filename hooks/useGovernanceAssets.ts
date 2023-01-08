@@ -874,6 +874,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.UXDProtocol,
     },
+    [Instructions.UXDRegisterCredixDepository]: {
+      name: 'UXD: Register Credix Depository',
+      isVisible: symbol === 'UXP',
+      packageId: PackageEnum.UXDProtocol,
+    },
   }
 
   const availablePackages: PackageType[] = Object.entries(packages)

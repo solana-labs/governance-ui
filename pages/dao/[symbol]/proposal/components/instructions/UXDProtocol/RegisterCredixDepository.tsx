@@ -1,7 +1,7 @@
 import * as yup from 'yup'
 import {
   UiInstruction,
-  UXDRegisterMercurialVaultDepositoryForm,
+  UXDRegisterCredixDepositoryForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import {
   Governance,
@@ -15,15 +15,11 @@ import { NewProposalContext } from '../../../new'
 import { isFormValid } from '@utils/formValidation'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import {
-  getDepositoryMintInfo,
+  getCredixLpDepository,
   getDepositoryMintSymbols,
   uxdClient,
 } from '@tools/sdk/uxdProtocol/uxdClient'
-import {
-  Controller,
-  MercurialVaultDepository,
-  UXD_DECIMALS,
-} from '@uxd-protocol/uxd-client'
+import { Controller, UXD_DECIMALS } from '@uxd-protocol/uxd-client'
 import Select from '@components/inputs/Select'
 import SelectOptionList from '../../SelectOptionList'
 import Input from '@components/inputs/Input'
@@ -50,7 +46,7 @@ const schema = yup.object().shape({
     .required('Redeemable depository supply cap is required'),
 })
 
-const RegisterMercurialVaultDepository = ({
+const RegisterCredixDepository = ({
   index,
   governance,
 }: {
@@ -64,7 +60,7 @@ const RegisterMercurialVaultDepository = ({
   const { handleSetInstructions } = useContext(NewProposalContext)
   const { assetAccounts } = useGovernanceAssets()
 
-  const [form, setForm] = useState<UXDRegisterMercurialVaultDepositoryForm>({
+  const [form, setForm] = useState<UXDRegisterCredixDepositoryForm>({
     governedAccount: undefined,
     redeemableDepositorySupplyCap: 0,
     mintingFeeInBps: 0,
@@ -104,22 +100,14 @@ const RegisterMercurialVaultDepository = ({
     const authority = form.governedAccount.governance.pubkey
     const payer = wallet.publicKey
     const depositoryMintName = form.collateralName!
-    const {
-      address: collateralMint,
-      decimals: collateralDecimals,
-    } = getDepositoryMintInfo(connection.cluster, depositoryMintName)
-    const depository = await MercurialVaultDepository.initialize({
-      connection: connection.current,
-      collateralMint: {
-        mint: collateralMint,
-        name: depositoryMintName,
-        symbol: depositoryMintName,
-        decimals: collateralDecimals,
-      },
-      uxdProgramId,
-    })
 
-    const ix = client.createRegisterMercurialVaultDepositoryInstruction(
+    const depository = await getCredixLpDepository(
+      connection,
+      uxdProgramId,
+      depositoryMintName
+    )
+
+    const ix = client.createRegisterCredixLpDepositoryInstruction(
       new Controller('UXD', UXD_DECIMALS, uxdProgramId),
       depository,
       authority,
@@ -222,4 +210,4 @@ const RegisterMercurialVaultDepository = ({
   )
 }
 
-export default RegisterMercurialVaultDepository
+export default RegisterCredixDepository
