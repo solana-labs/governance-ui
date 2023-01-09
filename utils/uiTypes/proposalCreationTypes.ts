@@ -26,6 +26,7 @@ export enum PackageEnum {
   MangoMarketV3,
   MangoMarketV4,
   MeanFinance,
+  PsyFinance,
   Serum,
   Solend,
   Streamflow,
@@ -391,6 +392,18 @@ export interface MangoMakeChangeReferralFeeParams2 {
   refMngoRequired2: number
 }
 
+export interface PsyFinanceMintAmericanOptionsForm {
+  contractSize: number
+  expirationUnixTimestamp: number
+  optionTokenDestinationAccount: string
+  quoteMint: string
+  size: number | undefined
+  strike: number
+  underlyingAccount: AssetAccount | undefined
+  underlyingMint: PublicKey | undefined
+  writerTokenDestinationAccount: string
+}
+
 export interface ForesightHasGovernedAccount {
   governedAccount: AssetAccount
 }
@@ -593,6 +606,7 @@ export enum Instructions {
   Mint,
   None,
   ProgramUpgrade,
+  PsyFinanceMintAmericanOptions,
   RealmConfig,
   RefreshSolendObligation,
   RefreshSolendReserve,
