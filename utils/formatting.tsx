@@ -11,13 +11,11 @@ export const calculatePct = (c = new BN(0), total?: BN) => {
     return 0
   }
 
-  return (
-    c
-      .mul(new BN(votePrecision))
-      .div(total ?? new BN(1))
-      .toNumber() *
-    (100 / votePrecision)
-  )
+  return c
+    .mul(new BN(votePrecision))
+    .div(total ?? new BN(1))
+    .mul(new BN(100).div(new BN(votePrecision)))
+    .toNumber()
 }
 
 export const fmtTokenAmount = (c: BN, decimals?: number) =>
