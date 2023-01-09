@@ -1,7 +1,7 @@
 import * as yup from 'yup'
 import {
   UiInstruction,
-  UXDRegisterCredixDepositoryForm,
+  UXDRegisterDepositoryForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import {
   Governance,
@@ -15,20 +15,22 @@ import { NewProposalContext } from '../../../new'
 import { isFormValid } from '@utils/formValidation'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import {
-  getCredixLpDepository,
+  DEPOSITORY_TYPES,
   getDepositoryMintSymbols,
-  uxdClient,
+  getDepositoryTypes,
+  registerUXDDepositoryIx,
 } from '@tools/sdk/uxdProtocol/uxdClient'
-import { Controller, UXD_DECIMALS } from '@uxd-protocol/uxd-client'
 import Select from '@components/inputs/Select'
 import SelectOptionList from '../../SelectOptionList'
 import Input from '@components/inputs/Input'
+import useRealm from '@hooks/useRealm'
 
 const schema = yup.object().shape({
   governedAccount: yup
     .object()
     .nullable()
     .required('Governance account is required'),
+  depositoryType: yup.string().required('Valid Depository type is required'),
   collateralName: yup.string().required('Valid Collateral name is required'),
   mintingFeeInBps: yup
     .number()
@@ -58,10 +60,12 @@ const RegisterCredixDepository = ({
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
+  const { symbol } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
 
-  const [form, setForm] = useState<UXDRegisterCredixDepositoryForm>({
+  const [form, setForm] = useState<UXDRegisterDepositoryForm>({
     governedAccount: undefined,
+    depositoryType: 'Credix',
     redeemableDepositorySupplyCap: 0,
     mintingFeeInBps: 0,
     redeemingFeeInBps: 0,
@@ -85,7 +89,8 @@ const RegisterCredixDepository = ({
       !connection ||
       !isValid ||
       !wallet?.publicKey ||
-      !form.governedAccount?.governance?.account.governedAccount
+      !form.governedAccount?.governance?.account.governedAccount ||
+      !form.collateralName
     ) {
       return {
         serializedInstruction: '',
@@ -96,26 +101,21 @@ const RegisterCredixDepository = ({
 
     const uxdProgramId =
       form.governedAccount?.governance?.account.governedAccount
-    const client = uxdClient(uxdProgramId)
     const authority = form.governedAccount.governance.pubkey
     const payer = wallet.publicKey
-    const depositoryMintName = form.collateralName!
 
-    const depository = await getCredixLpDepository(
+    const ix = await registerUXDDepositoryIx(
       connection,
       uxdProgramId,
-      depositoryMintName
-    )
-
-    const ix = client.createRegisterCredixLpDepositoryInstruction(
-      new Controller('UXD', UXD_DECIMALS, uxdProgramId),
-      depository,
-      authority,
-      form.mintingFeeInBps,
-      form.redeemingFeeInBps,
-      form.redeemableDepositorySupplyCap,
-      { preflightCommitment: 'processed', commitment: 'processed' },
-      payer
+      form.depositoryType as DEPOSITORY_TYPES,
+      {
+        authority,
+        payer,
+        depositoryMintName: form.collateralName,
+        mintingFeeInBps: form.mintingFeeInBps,
+        redeemingFeeInBps: form.redeemingFeeInBps,
+        redeemableDepositorySupplyCap: form.redeemableDepositorySupplyCap,
+      }
     )
 
     return {
@@ -150,6 +150,17 @@ const RegisterCredixDepository = ({
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
       />
+      <Select
+        label="Depository Type"
+        value={form.depositoryType}
+        placeholder="Please select..."
+        onChange={(value) =>
+          handleSetForm({ value, propertyName: 'depositoryType' })
+        }
+        error={formErrors['depositoryType']}
+      >
+        <SelectOptionList list={getDepositoryTypes(symbol == 'UXP')} />
+      </Select>
       <Select
         label="Collateral Name"
         value={form.collateralName}

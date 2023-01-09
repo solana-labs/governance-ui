@@ -138,14 +138,13 @@ import UXDInitializeIdentityDepository from './components/instructions/UXDProtoc
 import UXDEditIdentityDepository from './components/instructions/UXDProtocol/EditIdentityDepository'
 import UXDMintWithIdentityDepository from './components/instructions/UXDProtocol/MintWithIdentityDepository'
 import UXDRedeemWithIdentityDepository from './components/instructions/UXDProtocol/RedeemWithIdentityDepository'
-import UXDRegisterMercurialVaultDepository from './components/instructions/UXDProtocol/RegisterMercurialVaultDepository'
 import UXDEditMercurialVaultDepository from './components/instructions/UXDProtocol/EditMercurialVaultDepository'
 import UXDMintWithMercurialVaultDepository from './components/instructions/UXDProtocol/MintWithMercurialVaultDepository'
 import UXDRedeemWithMercurialVaultDepository from './components/instructions/UXDProtocol/RedeemWithMercurialVaultDepository'
-import UXDRegisterCredixDepository from './components/instructions/UXDProtocol/RegisterCredixDepository'
 import UXDEditCredixDepository from './components/instructions/UXDProtocol/EditCredixDepository'
 import UXDMintWithCredixDepository from './components/instructions/UXDProtocol/MintWithCredixDepository'
 import UXDRedeemWithCredixDepository from './components/instructions/UXDProtocol/RedeemWithCredixDepository'
+import UXDRegisterDepository from './components/instructions/UXDProtocol/RegisterDepository'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -537,14 +536,13 @@ const New = () => {
       [Instructions.UXDEditIdentityDepository]: UXDEditIdentityDepository,
       [Instructions.UXDRedeemWithIdentityDepository]: UXDRedeemWithIdentityDepository,
       [Instructions.UXDMintWithIdentityDepository]: UXDMintWithIdentityDepository,
-      [Instructions.UXDRegisterMercurialVaultDepository]: UXDRegisterMercurialVaultDepository,
       [Instructions.UXDEditMercurialVaultDepository]: UXDEditMercurialVaultDepository,
       [Instructions.UXDMintWithMercurialVaultDepository]: UXDMintWithMercurialVaultDepository,
       [Instructions.UXDRedeemWithMercurialVaultDepository]: UXDRedeemWithMercurialVaultDepository,
-      [Instructions.UXDRegisterCredixDepository]: UXDRegisterCredixDepository,
       [Instructions.UXDEditCredixDepository]: UXDEditCredixDepository,
       [Instructions.UXDMintWithCredixDepository]: UXDMintWithCredixDepository,
       [Instructions.UXDRedeemWithCredixDepository]: UXDRedeemWithCredixDepository,
+      [Instructions.UXDRegisterDepository]: UXDRegisterDepository,
     }),
     [governance?.pubkey?.toBase58()]
   )
