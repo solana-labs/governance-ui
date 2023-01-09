@@ -54,7 +54,7 @@ export function EditWalletRules(props: Props) {
   const [proposalDescription, setProposalDescription] = useState('');
 
   const [communityCanCreate, setCommunityCanCreate] = useState(true);
-  const [communityHasVeto, setCommunityHasVeto] = useState(false);
+  const [communityHasVeto, setCommunityHasVeto] = useState(true);
   const [communityQuorumPercent, setCommunityQuorumPercent] = useState(0);
   const [communityTokenSupply, setCommunityTokenSupply] = useState(
     new BigNumber(1000000),

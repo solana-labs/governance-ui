@@ -95,6 +95,7 @@ export function VoteTippingSelector(props: Props) {
                     'focus:outline-none',
                     'dark:focus:bg-neutral-700',
                   )}
+                  key={voteTippingType}
                   onClick={() => props.onChange?.(voteTippingType)}
                 >
                   <div className={labelStyles}>{getLabel(voteTippingType)}</div>

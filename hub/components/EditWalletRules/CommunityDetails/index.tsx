@@ -31,6 +31,8 @@ export function CommunityDetails(props: Props) {
     .dividedBy(props.communityTokenSupply)
     .multipliedBy(100);
 
+  console.log(props);
+
   return (
     <SectionBlock className={props.className}>
       <SectionHeader

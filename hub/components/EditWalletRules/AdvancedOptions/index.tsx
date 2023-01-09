@@ -40,12 +40,12 @@ export function AdvancedOptions(props: Props) {
       </ValueBlock>
       <ValueBlock
         title="Minimum Instruction Holdup Time"
-        description="Measured in days"
+        description="The minimum time which must pass before proposal instructions can be executed."
       >
         <div className="relative">
           <Input
             className="w-full pr-24"
-            placeholder="# of proposals"
+            placeholder="# of days"
             value={formatNumber(props.minInstructionHoldupDays, undefined, {
               maximumFractionDigits: 0,
             })}
