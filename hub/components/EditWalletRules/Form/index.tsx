@@ -29,6 +29,7 @@ interface Props
     maxVoteDays: number;
     minCommunityPower: BigNumber;
     minCouncilPower: BigNumber;
+    minInstructionHoldupDays: number;
   }> {
   className?: string;
   communityTokenSupply: BigNumber;
@@ -108,8 +109,12 @@ export function Form(props: Props) {
           <AdvancedOptions
             className="mt-2.5"
             depositExemptProposalCount={props.depositExemptProposalCount}
+            minInstructionHoldupDays={props.minInstructionHoldupDays}
             onDepositExemptProposalCountChange={
               props.onDepositExemptProposalCountChange
+            }
+            onMinInstructionHoldupDaysChange={
+              props.onMinInstructionHoldupDaysChange
             }
           />
         )}

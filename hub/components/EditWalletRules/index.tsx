@@ -2,7 +2,8 @@ import CheckmarkIcon from '@carbon/icons-react/lib/Checkmark';
 import ChevronLeftIcon from '@carbon/icons-react/lib/ChevronLeft';
 import EditIcon from '@carbon/icons-react/lib/Edit';
 import { VoteTipping } from '@solana/spl-governance';
-import type { PublicKey } from '@solana/web3.js';
+import { getNativeTreasuryAddress } from '@solana/spl-governance';
+import { PublicKey } from '@solana/web3.js';
 import { BigNumber } from 'bignumber.js';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -41,7 +42,7 @@ function stepName(step: Step): string {
 interface Props {
   className?: string;
   realmUrlId: string;
-  walletAddress: PublicKey;
+  governanceAddress: PublicKey;
 }
 
 export function EditWalletRules(props: Props) {
@@ -115,9 +116,17 @@ export function EditWalletRules(props: Props) {
     currentDepositExemptProposalCount,
     setCurrentDepositExemptProposalCount,
   ] = useState(0);
+  const [
+    currentMinInstructionHoldupDays,
+    setCurrentMinInstructionHoldupDays,
+  ] = useState(0);
+
   const [maxVoteDays, setMaxVoteDays] = useState(3);
   const [minCommunityPower, setMinCommunityPower] = useState(new BigNumber(0));
   const [minCouncilPower, setMinCouncilPower] = useState(new BigNumber(0));
+  const [minInstructionHoldupDays, setMinInstructionHoldupDays] = useState(0);
+
+  const [walletAddress, setWalletAddress] = useState<PublicKey | null>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -137,16 +146,25 @@ export function EditWalletRules(props: Props) {
     }
   }, [councilHasVeto]);
 
+  useEffect(() => {
+    getNativeTreasuryAddress(
+      new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
+      props.governanceAddress,
+    ).then(setWalletAddress);
+  }, [props.governanceAddress]);
+
+  if (!walletAddress) {
+    return null;
+  }
+
   return (
     <div className={cx(props.className, 'dark:bg-neutral-900')}>
       <div className="w-full max-w-3xl pt-14 mx-auto">
         <Head>
-          <title>
-            Edit Wallet Rules - {abbreviateAddress(props.walletAddress)}
-          </title>
+          <title>Edit Wallet Rules - {abbreviateAddress(walletAddress)}</title>
           <meta
             property="og:title"
-            content={`Edit Wallet Rules - ${props.walletAddress.toBase58()}`}
+            content={`Edit Wallet Rules - ${walletAddress.toBase58()}`}
             key="title"
           />
         </Head>
@@ -178,7 +196,8 @@ export function EditWalletRules(props: Props) {
                 maxVoteDays={maxVoteDays}
                 minCommunityPower={minCommunityPower}
                 minCouncilPower={minCouncilPower}
-                walletAddress={props.walletAddress}
+                minInstructionHoldupDays={minInstructionHoldupDays}
+                walletAddress={walletAddress}
                 onCommunityCanCreateChange={setCommunityCanCreate}
                 onCommunityHasVetoChange={setCommunityHasVeto}
                 onCommunityQuorumPercentChange={setCommunityQuorumPercent}
@@ -196,6 +215,7 @@ export function EditWalletRules(props: Props) {
                 onMaxVoteDaysChange={setMaxVoteDays}
                 onMinCommunityPowerChange={setMinCommunityPower}
                 onMinCouncilPowerChange={setMinCouncilPower}
+                onMinInstructionHoldupDaysChange={setMinInstructionHoldupDays}
               />
               <footer className="flex items-center justify-between">
                 <button
@@ -246,13 +266,17 @@ export function EditWalletRules(props: Props) {
                 currentMaxVoteDays={currentMaxVoteDays}
                 currentMinCommunityPower={currentMinCommunityPower}
                 currentMinCouncilPower={currentMinCouncilPower}
+                currentMinInstructionHoldupDays={
+                  currentMinInstructionHoldupDays
+                }
                 depositExemptProposalCount={depositExemptProposalCount}
                 maxVoteDays={maxVoteDays}
                 minCommunityPower={minCommunityPower}
                 minCouncilPower={minCouncilPower}
+                minInstructionHoldupDays={minInstructionHoldupDays}
                 proposalDescription={proposalDescription}
                 proposalVoteType={proposalVoteType}
-                walletAddress={props.walletAddress}
+                walletAddress={walletAddress}
                 onProposalVoteTypeChange={setProposalVoteType}
                 onProposalDescriptionChange={setProposalDescription}
               />

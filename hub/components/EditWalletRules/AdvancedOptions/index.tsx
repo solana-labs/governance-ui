@@ -8,13 +8,14 @@ import { FormProps } from '@hub/types/FormProps';
 interface Props
   extends FormProps<{
     depositExemptProposalCount: number;
+    minInstructionHoldupDays: number;
   }> {
   className?: string;
 }
 
 export function AdvancedOptions(props: Props) {
   return (
-    <SectionBlock className={props.className}>
+    <SectionBlock className={cx(props.className, 'space-y-8')}>
       <ValueBlock
         title="Deposit Exempt Proposal Count"
         description="The amount of proposals a member can create without a deposit."
@@ -34,6 +35,28 @@ export function AdvancedOptions(props: Props) {
           />
           <div className="absolute top-1/2 right-4 text-neutral-500 -translate-y-1/2">
             Proposals
+          </div>
+        </div>
+      </ValueBlock>
+      <ValueBlock
+        title="Minimum Instruction Holdup Time"
+        description="Measured in days"
+      >
+        <div className="relative">
+          <Input
+            className="w-full pr-24"
+            placeholder="# of proposals"
+            value={formatNumber(props.minInstructionHoldupDays, undefined, {
+              maximumFractionDigits: 0,
+            })}
+            onChange={(e) => {
+              const text = e.currentTarget.value.replaceAll(/[^\d.-]/g, '');
+              const val = parseInt(text || '0', 10);
+              props.onMinInstructionHoldupDaysChange?.(val);
+            }}
+          />
+          <div className="absolute top-1/2 right-4 text-neutral-500 -translate-y-1/2">
+            Days
           </div>
         </div>
       </ValueBlock>

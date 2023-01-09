@@ -68,6 +68,7 @@ interface Props {
   maxVoteDays: number;
   minCommunityPower: BigNumber;
   minCouncilPower: BigNumber;
+  minInstructionHoldupDays: number;
   currentCommunityCanCreate: boolean;
   currentCommunityHasVeto: boolean;
   currentCommunityQuorumPercent: number;
@@ -83,6 +84,7 @@ interface Props {
   currentMaxVoteDays: number;
   currentMinCommunityPower: BigNumber;
   currentMinCouncilPower: BigNumber;
+  currentMinInstructionHoldupDays: number;
 }
 
 export function UpdatesList(props: Props) {
@@ -111,6 +113,7 @@ export function UpdatesList(props: Props) {
 
   const currentAdvancedSettings = {
     depositExemptProposalCount: props.currentDepositExemptProposalCount,
+    minInstructionHoldupDays: props.currentMinInstructionHoldupDays,
   };
 
   const newVotingDuration = {
@@ -138,6 +141,7 @@ export function UpdatesList(props: Props) {
 
   const newAdvancedSettings = {
     depositExemptProposalCount: props.depositExemptProposalCount,
+    minInstructionHoldupDays: props.minInstructionHoldupDays,
   };
 
   const votingDurationDiff = diff(currentVotingDuration, newVotingDuration);
@@ -472,6 +476,29 @@ export function UpdatesList(props: Props) {
                   </div>
                   <div className="ml-3 text-base text-neutral-500 line-through">
                     {advancedSettingsDiff.depositExemptProposalCount[0]}
+                  </div>
+                </div>
+              }
+            />
+          )}
+          {!!advancedSettingsDiff.minInstructionHoldupDays?.length && (
+            <SummaryItem
+              label="Minimum Instruction Holdup Time"
+              value={
+                <div className="flex items-baseline">
+                  <div>
+                    {advancedSettingsDiff.minInstructionHoldupDays[1]}{' '}
+                    {ntext(
+                      advancedSettingsDiff.minInstructionHoldupDays[1],
+                      'day',
+                    )}
+                  </div>
+                  <div className="ml-3 text-base text-neutral-500 line-through">
+                    {advancedSettingsDiff.minInstructionHoldupDays[0]}{' '}
+                    {ntext(
+                      advancedSettingsDiff.minInstructionHoldupDays[0],
+                      'day',
+                    )}
                   </div>
                 </div>
               }

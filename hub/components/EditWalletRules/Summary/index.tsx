@@ -30,6 +30,7 @@ interface Props
   maxVoteDays: number;
   minCommunityPower: BigNumber;
   minCouncilPower: BigNumber;
+  minInstructionHoldupDays: number;
   currentCommunityCanCreate: boolean;
   currentCommunityHasVeto: boolean;
   currentCommunityQuorumPercent: number;
@@ -45,6 +46,7 @@ interface Props
   currentMaxVoteDays: number;
   currentMinCommunityPower: BigNumber;
   currentMinCouncilPower: BigNumber;
+  currentMinInstructionHoldupDays: number;
   walletAddress: PublicKey;
 }
 
@@ -110,6 +112,7 @@ export function Summary(props: Props) {
         maxVoteDays={props.maxVoteDays}
         minCommunityPower={props.minCommunityPower}
         minCouncilPower={props.minCouncilPower}
+        minInstructionHoldupDays={props.minInstructionHoldupDays}
         currentCommunityCanCreate={props.currentCommunityCanCreate}
         currentCommunityHasVeto={props.currentCommunityHasVeto}
         currentCommunityQuorumPercent={props.currentCommunityQuorumPercent}
@@ -127,6 +130,7 @@ export function Summary(props: Props) {
         currentMaxVoteDays={props.currentMaxVoteDays}
         currentMinCommunityPower={props.currentMinCommunityPower}
         currentMinCouncilPower={props.currentMinCouncilPower}
+        currentMinInstructionHoldupDays={props.currentMinInstructionHoldupDays}
       />
     </article>
   );

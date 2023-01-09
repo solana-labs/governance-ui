@@ -12,6 +12,7 @@ import { VoteTipping } from '@solana/spl-governance'
 import cx from 'classnames'
 import React, { useState } from 'react'
 import { BigNumber } from 'bignumber.js'
+import { useRouter } from 'next/router'
 
 import { formatNumber } from '@utils/formatNumber'
 import { ntext } from '@utils/ntext'
@@ -73,7 +74,8 @@ interface Props {
 
 export default function Rules(props: Props) {
   const [editRulesOpen, setEditRulesOpen] = useState(false)
-  const { ownVoterWeight } = useRealm()
+  const { ownVoterWeight, symbol } = useRealm()
+  const router = useRouter()
 
   const programVersion = useProgramVersion()
 
@@ -123,7 +125,13 @@ export default function Rules(props: Props) {
                 'disabled:opacity-50'
               )}
               disabled={!canEditRules}
-              onClick={() => setEditRulesOpen(true)}
+              onClick={() => {
+                if (props.wallet.governanceAccount) {
+                  router.push(
+                    `/realm/${symbol}/wallet/${props.wallet.governanceAccount.pubkey.toBase58()}/edit`
+                  )
+                }
+              }}
             >
               <PencilIcon className="h-4 w-4 stroke-primary-light" />
               <div>Edit Rules</div>

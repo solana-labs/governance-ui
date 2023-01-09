@@ -8,13 +8,13 @@ import { ECOSYSTEM_PAGE } from '@hub/lib/constants'
 
 export default function EditWallet() {
   const router = useRouter()
-  const { id, walletId } = router.query
+  const { id, governanceId } = router.query
 
-  if (typeof walletId !== 'string') {
+  if (typeof governanceId !== 'string') {
     throw new Error('Not a valid wallet address')
   }
 
-  const walletAddress = new PublicKey(walletId)
+  const governanceAddress = new PublicKey(governanceId)
 
   useEffect(() => {
     if (id === ECOSYSTEM_PAGE.toBase58()) {
@@ -36,7 +36,7 @@ export default function EditWallet() {
       <EditWalletRules
         className="min-h-screen"
         realmUrlId={id as string}
-        walletAddress={walletAddress}
+        governanceAddress={governanceAddress}
       />
     </div>
   )
