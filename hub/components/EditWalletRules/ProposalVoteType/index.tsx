@@ -25,37 +25,42 @@ interface Props
   currentCommunityCanCreate: boolean;
   currentCommunityHasVeto: boolean;
   currentCommunityQuorumPercent: number;
+  currentCommunityVetoQuorum: number;
   currentCommunityVoteTipping: VoteTipping;
   currentCoolOffHours: number;
   currentCouncilCanCreate: boolean;
   currentCouncilHasVeto: boolean;
   currentCouncilQuorumPercent: number;
+  currentCouncilVetoQuorum: number;
   currentCouncilVoteTipping: VoteTipping;
   currentDepositExemptProposalCount: number;
   currentMaxVoteDays: number;
   currentMinCommunityPower: BigNumber;
   currentMinCouncilPower: BigNumber;
+  currentMinInstructionHoldupDays: number;
 }
 
 export function ProposalVoteType(props: Props) {
   const [showRules, setShowRules] = useState(false);
 
   const communityRules = {
-    maxVotingDays: props.currentMaxVoteDays,
-    minInstructionHoldupDays: 0,
-    minPowerToCreateProposal: props.currentMinCommunityPower,
     approvalQuorum: props.currentCommunityQuorumPercent,
+    hasVeto: props.currentCommunityHasVeto,
+    maxVotingDays: props.currentMaxVoteDays,
+    minInstructionHoldupDays: props.currentMinInstructionHoldupDays,
+    minPowerToCreateProposal: props.currentMinCommunityPower,
+    vetoQuorum: props.currentCommunityVetoQuorum,
     voteTipping: props.currentCommunityVoteTipping,
-    vetoQuorum: 40,
   };
 
   const councilRules = {
-    maxVotingDays: props.currentMaxVoteDays,
-    minInstructionHoldupDays: 0,
-    minPowerToCreateProposal: props.currentMinCouncilPower,
     approvalQuorum: props.currentCouncilQuorumPercent,
+    hasVeto: props.currentCouncilHasVeto,
+    maxVotingDays: props.currentMaxVoteDays,
+    minInstructionHoldupDays: props.currentMinInstructionHoldupDays,
+    minPowerToCreateProposal: props.currentMinCouncilPower,
+    vetoQuorum: props.currentCouncilVetoQuorum,
     voteTipping: props.currentCouncilVoteTipping,
-    vetoQuorum: 40,
   };
 
   const rules =
@@ -105,7 +110,7 @@ export function ProposalVoteType(props: Props) {
             />
             <SummaryItem
               label="Min Instruction Holdup Time"
-              value={`${rules.maxVotingDays} ${ntext(
+              value={`${rules.minInstructionHoldupDays} ${ntext(
                 rules.minInstructionHoldupDays,
                 'day',
               )}`}
@@ -124,7 +129,10 @@ export function ProposalVoteType(props: Props) {
               label="Vote Tipping"
               value={getLabel(rules.voteTipping)}
             />
-            <SummaryItem label="Veto Quorum" value={`${rules.vetoQuorum}%`} />
+            <SummaryItem
+              label="Veto Quorum"
+              value={rules.hasVeto ? `${rules.vetoQuorum}%` : 'Disabled'}
+            />
           </div>
         </div>
       )}

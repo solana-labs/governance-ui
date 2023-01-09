@@ -71,11 +71,13 @@ export function Summary(props: Props) {
         currentCommunityCanCreate={props.currentCommunityCanCreate}
         currentCommunityHasVeto={props.currentCommunityHasVeto}
         currentCommunityQuorumPercent={props.currentCommunityQuorumPercent}
+        currentCommunityVetoQuorum={props.currentCommunityVetoQuorum}
         currentCommunityVoteTipping={props.currentCommunityVoteTipping}
         currentCoolOffHours={props.currentCoolOffHours}
         currentCouncilCanCreate={props.currentCouncilCanCreate}
         currentCouncilHasVeto={props.currentCouncilHasVeto}
         currentCouncilQuorumPercent={props.currentCouncilQuorumPercent}
+        currentCouncilVetoQuorum={props.currentCouncilVetoQuorum}
         currentCouncilVoteTipping={props.currentCouncilVoteTipping}
         currentDepositExemptProposalCount={
           props.currentDepositExemptProposalCount
@@ -83,6 +85,7 @@ export function Summary(props: Props) {
         currentMaxVoteDays={props.currentMaxVoteDays}
         currentMinCommunityPower={props.currentMinCommunityPower}
         currentMinCouncilPower={props.currentMinCouncilPower}
+        currentMinInstructionHoldupDays={props.currentMinInstructionHoldupDays}
         proposalVoteType={props.proposalVoteType}
         onProposalVoteTypeChange={props.onProposalVoteTypeChange}
       />
