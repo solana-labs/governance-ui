@@ -28,6 +28,7 @@ import {
   closeAccount,
   initializeAccount,
 } from '@project-serum/serum/lib/token-instructions'
+import { BN } from '@project-serum/anchor'
 import { Token } from '@solana/spl-token'
 
 interface StakingOptionArgs {
@@ -127,8 +128,8 @@ export async function getConfigInstruction({
     const configInstruction = await so.createConfigInstruction(
       form.optionExpirationUnixSeconds,
       form.optionExpirationUnixSeconds,
-      form.numTokens,
-      form.lotSize,
+      new BN(form.numTokens),
+      new BN(form.lotSize),
       form.soName,
       //use sol wallet as authority
       form.payer.extensions.transferAddress!,
@@ -143,8 +144,19 @@ export async function getConfigInstruction({
       serializeInstructionToBase64(configInstruction)
     )
 
+    const nameInstruction = await so.createNameTokenInstruction(
+      new BN(form.strike),
+      form.soName,
+      form.payer.extensions.transferAddress!,
+      baseMint
+    )
+    
+    additionalSerializedInstructions.push(
+      serializeInstructionToBase64(nameInstruction)
+    )
+
     const initStrikeInstruction = await so.createInitStrikeInstruction(
-      form.strike,
+      new BN(form.strike),
       form.soName,
       //authority sol wallet
       form.payer.extensions.transferAddress!,
@@ -170,8 +182,8 @@ export async function getConfigInstruction({
     }
 
     const issueInstruction = await so.createIssueInstruction(
-      form.numTokens,
-      form.strike,
+      new BN(form.numTokens),
+      new BN(form.strike),
       form.soName,
       //authority sol wallet
       form.payer.extensions.transferAddress!,
@@ -258,7 +270,7 @@ export async function getExerciseInstruction({
     const stateObj = await so.getState(form.soName, baseMint)
     const quoteMint: PublicKey = stateObj.quoteMint as PublicKey
 
-    const feeAccount = await so.getFeeAccount(quoteMint)
+    const feeAccount = await StakingOptions.getFeeAccount(quoteMint)
 
     if ((await connection.current.getAccountInfo(feeAccount)) === null) {
       const [ataIx] = await createAssociatedTokenAccount(
@@ -270,8 +282,8 @@ export async function getExerciseInstruction({
     }
 
     const exerciseInstruction = await so.createExerciseInstruction(
-      form.numTokens,
-      strike,
+      new BN(form.numTokens),
+      new BN(strike),
       form.soName,
       form.baseTreasury.extensions.token!.account.owner!,
       form.optionAccount!.pubkey!,
