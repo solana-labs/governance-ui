@@ -2965,5 +2965,14 @@
     "instagram": "https://www.instagram.com/lp.finance/",
     "discord": "https://discord.gg/N2Uebv58v2",
     "github": "https://github.com/LP-Finance-Inc/"
+  },
+  {
+    "symbol": "Hackerz DAO - High Council",
+    "displayName": "Hackerz DAO - High Council",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "zv8G3bXWe589fpb51LXfsoK2ACMAEqqHyjdYcxVys5R",
+    "twitter": "@HackerzDAO",
+    "discord": "https://discord.gg/gK2PSJYe",
+	  "ogImage": "/realms/HackerzDAO/img/HackerzDAO_PFP.png"
   }
 ]
