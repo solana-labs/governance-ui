@@ -879,6 +879,26 @@ export default function useGovernanceAssets() {
       isVisible: symbol === 'UXP',
       packageId: PackageEnum.UXDProtocol,
     },
+    [Instructions.UXDRegisterCredixDepository]: {
+      name: 'UXD: Register Credix Depository',
+      isVisible: symbol === 'UXP',
+      packageId: PackageEnum.UXDProtocol,
+    },
+    [Instructions.UXDEditCredixDepository]: {
+      name: 'UXD: Edit Credix Depository',
+      isVisible: symbol === 'UXP',
+      packageId: PackageEnum.UXDProtocol,
+    },
+    [Instructions.UXDMintWithCredixDepository]: {
+      name: 'UXD: Mint with Credix Depository',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.UXDProtocol,
+    },
+    [Instructions.UXDRedeemWithCredixDepository]: {
+      name: 'UXD: Redeem with Credix Depository',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.UXDProtocol,
+    },
   }
 
   const availablePackages: PackageType[] = Object.entries(packages)

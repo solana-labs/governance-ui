@@ -459,6 +459,28 @@ export interface UXDRegisterCredixDepositoryForm {
   redeemingFeeInBps: number
 }
 
+export interface UXDEditCredixDepositoryForm {
+  governedAccount?: AssetAccount
+  collateralName?: string
+  redeemableAmountUnderManagementCap: number
+  mintingFeeInBps: number
+  redeemingFeeInBps: number
+}
+
+export interface UXDMintWithCredixDepositoryForm {
+  governedAccount?: AssetAccount
+  uxdProgram: string
+  collateralName?: string
+  collateralAmount: number
+}
+
+export interface UXDRedeemWithCredixDepositoryForm {
+  governedAccount?: AssetAccount
+  uxdProgram: string
+  collateralName?: string
+  redeemableAmount: number
+}
+
 export enum Instructions {
   Base64,
   ChangeMakeDonation,
@@ -565,6 +587,9 @@ export enum Instructions {
   UXDMintWithMercurialVaultDepository,
   UXDRedeemWithMercurialVaultDepository,
   UXDRegisterCredixDepository,
+  UXDEditCredixDepository,
+  UXDMintWithCredixDepository,
+  UXDRedeemWithCredixDepository,
 }
 
 export interface ComponentInstructionData {
