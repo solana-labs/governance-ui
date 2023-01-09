@@ -13,22 +13,37 @@ import cx from '@hub/lib/cx';
 import { formatNumber } from '@hub/lib/formatNumber';
 import { ntext } from '@hub/lib/ntext';
 
-function diff<T extends { [key: string]: unknown }>(left: T, right: T) {
+function diff<T extends { [key: string]: unknown }>(existing: T, changed: T) {
   const diffs = {} as {
     [K in keyof T]: [T[K], T[K]];
   };
 
-  for (const key of Object.keys(left) as (keyof T)[]) {
-    const leftValue = left[key];
-    const rightValue = right[key];
+  for (const key of Object.keys(existing) as (keyof T)[]) {
+    const existingValue = existing[key];
+    const changedValue = changed[key];
 
-    if (BigNumber.isBigNumber(leftValue) && BigNumber.isBigNumber(rightValue)) {
-      if (!leftValue.isEqualTo(rightValue)) {
-        diffs[key] = [leftValue, rightValue];
+    if (
+      BigNumber.isBigNumber(existingValue) &&
+      BigNumber.isBigNumber(changedValue)
+    ) {
+      if (!existingValue.isEqualTo(changedValue)) {
+        diffs[key] = [existingValue, changedValue];
+      }
+    } else if (key === 'communityVetoQuorum') {
+      if (changed['communityHasVeto']) {
+        if (existingValue !== changedValue) {
+          diffs[key] = [existingValue, changedValue];
+        }
+      }
+    } else if (key === 'councilVetoQuorum') {
+      if (changed['councilHasVeto']) {
+        if (existingValue !== changedValue) {
+          diffs[key] = [existingValue, changedValue];
+        }
       }
     } else {
-      if (leftValue !== rightValue) {
-        diffs[key] = [leftValue, rightValue];
+      if (existingValue !== changedValue) {
+        diffs[key] = [existingValue, changedValue];
       }
     }
   }
@@ -41,11 +56,13 @@ interface Props {
   communityCanCreate: boolean;
   communityHasVeto: boolean;
   communityQuorumPercent: number;
+  communityVetoQuorum: number;
   communityVoteTipping: VoteTipping;
   coolOffHours: number;
   councilCanCreate: boolean;
   councilHasVeto: boolean;
   councilQuorumPercent: number;
+  councilVetoQuorum: number;
   councilVoteTipping: VoteTipping;
   depositExemptProposalCount: number;
   maxVoteDays: number;
@@ -54,11 +71,13 @@ interface Props {
   currentCommunityCanCreate: boolean;
   currentCommunityHasVeto: boolean;
   currentCommunityQuorumPercent: number;
+  currentCommunityVetoQuorum: number;
   currentCommunityVoteTipping: VoteTipping;
   currentCoolOffHours: number;
   currentCouncilCanCreate: boolean;
   currentCouncilHasVeto: boolean;
   currentCouncilQuorumPercent: number;
+  currentCouncilVetoQuorum: number;
   currentCouncilVoteTipping: VoteTipping;
   currentDepositExemptProposalCount: number;
   currentMaxVoteDays: number;
@@ -76,6 +95,7 @@ export function UpdatesList(props: Props) {
     communityCanCreate: props.currentCommunityCanCreate,
     communityHasVeto: props.currentCommunityHasVeto,
     communityQuorumPercent: props.currentCommunityQuorumPercent,
+    communityVetoQuorum: props.currentCommunityVetoQuorum,
     communityVoteTipping: props.currentCommunityVoteTipping,
     minCommunityPower: props.currentMinCommunityPower,
   };
@@ -84,6 +104,7 @@ export function UpdatesList(props: Props) {
     councilCanCreate: props.currentCouncilCanCreate,
     councilHasVeto: props.currentCouncilHasVeto,
     councilQuorumPercent: props.currentCouncilQuorumPercent,
+    councilVetoQuorum: props.currentCouncilVetoQuorum,
     councilVoteTipping: props.currentCouncilVoteTipping,
     minCouncilPower: props.currentMinCouncilPower,
   };
@@ -101,6 +122,7 @@ export function UpdatesList(props: Props) {
     communityCanCreate: props.communityCanCreate,
     communityHasVeto: props.communityHasVeto,
     communityQuorumPercent: props.communityQuorumPercent,
+    communityVetoQuorum: props.communityVetoQuorum,
     communityVoteTipping: props.communityVoteTipping,
     minCommunityPower: props.minCommunityPower,
   };
@@ -109,6 +131,7 @@ export function UpdatesList(props: Props) {
     councilCanCreate: props.councilCanCreate,
     councilHasVeto: props.councilHasVeto,
     councilQuorumPercent: props.councilQuorumPercent,
+    councilVetoQuorum: props.councilVetoQuorum,
     councilVoteTipping: props.councilVoteTipping,
     minCouncilPower: props.minCouncilPower,
   };
@@ -299,6 +322,22 @@ export function UpdatesList(props: Props) {
                 }
               />
             )}
+            {props.communityHasVeto &&
+              !!communityDetailsDiff.communityVetoQuorum?.length && (
+                <SummaryItem
+                  label="Community Veto Voting Quorum"
+                  value={
+                    <div className="flex items-baseline">
+                      <div>
+                        {communityDetailsDiff.communityVetoQuorum[1] || 0}%
+                      </div>
+                      <div className="ml-3 text-base text-neutral-500 line-through">
+                        {communityDetailsDiff.communityVetoQuorum[0] || 0}%
+                      </div>
+                    </div>
+                  }
+                />
+              )}
           </div>
         </div>
       )}
@@ -399,6 +438,20 @@ export function UpdatesList(props: Props) {
                 }
               />
             )}
+            {props.councilHasVeto &&
+              !!councilDetailsDiff.councilVetoQuorum?.length && (
+                <SummaryItem
+                  label="Council Veto Voting Quorum"
+                  value={
+                    <div className="flex items-baseline">
+                      <div>{councilDetailsDiff.councilVetoQuorum[1] || 0}%</div>
+                      <div className="ml-3 text-base text-neutral-500 line-through">
+                        {councilDetailsDiff.councilVetoQuorum[0] || 0}%
+                      </div>
+                    </div>
+                  }
+                />
+              )}
           </div>
         </div>
       )}

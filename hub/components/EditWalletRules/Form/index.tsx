@@ -17,11 +17,13 @@ interface Props
     communityCanCreate: boolean;
     communityHasVeto: boolean;
     communityQuorumPercent: number;
+    communityVetoQuorum: number;
     communityVoteTipping: VoteTipping;
     coolOffHours: number;
     councilCanCreate: boolean;
     councilHasVeto: boolean;
     councilQuorumPercent: number;
+    councilVetoQuorum: number;
     councilVoteTipping: VoteTipping;
     depositExemptProposalCount: number;
     maxVoteDays: number;
@@ -60,11 +62,13 @@ export function Form(props: Props) {
           communityHasVeto={props.communityHasVeto}
           communityQuorumPercent={props.communityQuorumPercent}
           communityTokenSupply={props.communityTokenSupply}
+          communityVetoQuorum={props.communityVetoQuorum}
           communityVoteTipping={props.communityVoteTipping}
           minCommunityPower={props.minCommunityPower}
           onCommunityCanCreateChange={props.onCommunityCanCreateChange}
           onCommunityHasVetoChange={props.onCommunityHasVetoChange}
           onCommunityQuorumPercentChange={props.onCommunityQuorumPercentChange}
+          onCommunityVetoQuorumChange={props.onCommunityVetoQuorumChange}
           onCommunityVoteTippingChange={props.onCommunityVoteTippingChange}
           onMinCommunityPowerChange={props.onMinCommunityPowerChange}
         />
@@ -73,11 +77,13 @@ export function Form(props: Props) {
           councilHasVeto={props.councilHasVeto}
           councilQuorumPercent={props.councilQuorumPercent}
           councilTokenSupply={props.councilTokenSupply}
+          councilVetoQuorum={props.councilVetoQuorum}
           councilVoteTipping={props.councilVoteTipping}
           minCouncilPower={props.minCouncilPower}
           onCouncilCanCreateChange={props.onCouncilCanCreateChange}
           onCouncilHasVetoChange={props.onCouncilHasVetoChange}
           onCouncilQuorumPercentChange={props.onCouncilQuorumPercentChange}
+          onCouncilVetoQuorumChange={props.onCouncilVetoQuorumChange}
           onCouncilVoteTippingChange={props.onCouncilVoteTippingChange}
           onMinCouncilPowerChange={props.onMinCouncilPowerChange}
         />

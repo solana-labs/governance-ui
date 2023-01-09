@@ -58,6 +58,7 @@ export function EditWalletRules(props: Props) {
   const [communityTokenSupply, setCommunityTokenSupply] = useState(
     new BigNumber(1000000),
   );
+  const [communityVetoQuorum, setCommunityVetoQuorum] = useState(0);
   const [communityVoteTipping, setCommunityVoteTipping] = useState(
     VoteTipping.Disabled,
   );
@@ -68,6 +69,7 @@ export function EditWalletRules(props: Props) {
   const [councilTokenSupply, setCouncilTokenSupply] = useState(
     new BigNumber(100),
   );
+  const [councilVetoQuorum, setCouncilVetoQuorum] = useState(0);
   const [councilVoteTipping, setCouncilVoteTipping] = useState(
     VoteTipping.Disabled,
   );
@@ -85,11 +87,14 @@ export function EditWalletRules(props: Props) {
   const [currentCommunityCanCreate, setCurrentCommunityCanCreate] = useState(
     true,
   );
-  const [currentCommunityHasVeto, setCurrentCommunityHasVeto] = useState(false);
+  const [currentCommunityHasVeto, setCurrentCommunityHasVeto] = useState(true);
   const [
     currentCommunityQuorumPercent,
     setCurrentCommunityQuorumPercent,
   ] = useState(0);
+  const [currentCommunityVetoQuorum, setCurrentCommunityVetoQuorum] = useState(
+    0,
+  );
   const [
     currentCommunityVoteTipping,
     setCurrentCommunityVoteTipping,
@@ -101,6 +106,8 @@ export function EditWalletRules(props: Props) {
     currentCouncilQuorumPercent,
     setCurrentCouncilQuorumPercent,
   ] = useState(0);
+  const [currentCouncilVetoQuorum, setCurrentCouncilVetoQuorum] = useState(0);
+
   const [currentCouncilVoteTipping, setCurrentCouncilVoteTipping] = useState(
     VoteTipping.Disabled,
   );
@@ -117,6 +124,18 @@ export function EditWalletRules(props: Props) {
       window.scrollTo({ top: 0 });
     }
   }, [step]);
+
+  useEffect(() => {
+    if (!communityHasVeto) {
+      setCommunityVetoQuorum(50);
+    }
+  }, [communityHasVeto]);
+
+  useEffect(() => {
+    if (!councilHasVeto) {
+      setCouncilVetoQuorum(50);
+    }
+  }, [councilHasVeto]);
 
   return (
     <div className={cx(props.className, 'dark:bg-neutral-900')}>
@@ -146,12 +165,14 @@ export function EditWalletRules(props: Props) {
                 communityHasVeto={communityHasVeto}
                 communityQuorumPercent={communityQuorumPercent}
                 communityTokenSupply={communityTokenSupply}
+                communityVetoQuorum={communityVetoQuorum}
                 communityVoteTipping={communityVoteTipping}
                 coolOffHours={coolOffHours}
                 councilCanCreate={councilCanCreate}
                 councilHasVeto={councilHasVeto}
                 councilQuorumPercent={councilQuorumPercent}
                 councilTokenSupply={councilTokenSupply}
+                councilVetoQuorum={councilVetoQuorum}
                 councilVoteTipping={councilVoteTipping}
                 depositExemptProposalCount={depositExemptProposalCount}
                 maxVoteDays={maxVoteDays}
@@ -161,11 +182,13 @@ export function EditWalletRules(props: Props) {
                 onCommunityCanCreateChange={setCommunityCanCreate}
                 onCommunityHasVetoChange={setCommunityHasVeto}
                 onCommunityQuorumPercentChange={setCommunityQuorumPercent}
+                onCommunityVetoQuorumChange={setCommunityVetoQuorum}
                 onCommunityVoteTippingChange={setCommunityVoteTipping}
                 onCoolOffHoursChange={setCoolOffHours}
                 onCouncilCanCreateChange={setCouncilCanCreate}
                 onCouncilHasVetoChange={setCouncilHasVeto}
                 onCouncilQuorumPercentChange={setCouncilQuorumPercent}
+                onCouncilVetoQuorumChange={setCouncilVetoQuorum}
                 onCouncilVoteTippingChange={setCouncilVoteTipping}
                 onDepositExemptProposalCountChange={
                   setDepositExemptProposalCount
@@ -198,20 +221,24 @@ export function EditWalletRules(props: Props) {
                 communityCanCreate={communityCanCreate}
                 communityHasVeto={communityHasVeto}
                 communityQuorumPercent={communityQuorumPercent}
+                communityVetoQuorum={communityVetoQuorum}
                 communityVoteTipping={communityVoteTipping}
                 coolOffHours={coolOffHours}
                 councilCanCreate={councilCanCreate}
                 councilHasVeto={councilHasVeto}
                 councilQuorumPercent={councilQuorumPercent}
+                councilVetoQuorum={councilVetoQuorum}
                 councilVoteTipping={councilVoteTipping}
                 currentCommunityCanCreate={currentCommunityCanCreate}
                 currentCommunityHasVeto={currentCommunityHasVeto}
                 currentCommunityQuorumPercent={currentCommunityQuorumPercent}
+                currentCommunityVetoQuorum={currentCommunityVetoQuorum}
                 currentCommunityVoteTipping={currentCommunityVoteTipping}
                 currentCoolOffHours={currentCoolOffHours}
                 currentCouncilCanCreate={currentCouncilCanCreate}
                 currentCouncilHasVeto={currentCouncilHasVeto}
                 currentCouncilQuorumPercent={currentCouncilQuorumPercent}
+                currentCouncilVetoQuorum={currentCouncilVetoQuorum}
                 currentCouncilVoteTipping={currentCouncilVoteTipping}
                 currentDepositExemptProposalCount={
                   currentDepositExemptProposalCount

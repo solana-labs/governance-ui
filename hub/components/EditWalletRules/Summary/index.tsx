@@ -18,11 +18,13 @@ interface Props
   communityCanCreate: boolean;
   communityHasVeto: boolean;
   communityQuorumPercent: number;
+  communityVetoQuorum: number;
   communityVoteTipping: VoteTipping;
   coolOffHours: number;
   councilCanCreate: boolean;
   councilHasVeto: boolean;
   councilQuorumPercent: number;
+  councilVetoQuorum: number;
   councilVoteTipping: VoteTipping;
   depositExemptProposalCount: number;
   maxVoteDays: number;
@@ -31,11 +33,13 @@ interface Props
   currentCommunityCanCreate: boolean;
   currentCommunityHasVeto: boolean;
   currentCommunityQuorumPercent: number;
+  currentCommunityVetoQuorum: number;
   currentCommunityVoteTipping: VoteTipping;
   currentCoolOffHours: number;
   currentCouncilCanCreate: boolean;
   currentCouncilHasVeto: boolean;
   currentCouncilQuorumPercent: number;
+  currentCouncilVetoQuorum: number;
   currentCouncilVoteTipping: VoteTipping;
   currentDepositExemptProposalCount: number;
   currentMaxVoteDays: number;
@@ -94,11 +98,13 @@ export function Summary(props: Props) {
         communityCanCreate={props.communityCanCreate}
         communityHasVeto={props.communityHasVeto}
         communityQuorumPercent={props.communityQuorumPercent}
+        communityVetoQuorum={props.communityVetoQuorum}
         communityVoteTipping={props.communityVoteTipping}
         coolOffHours={props.coolOffHours}
         councilCanCreate={props.councilCanCreate}
         councilHasVeto={props.councilHasVeto}
         councilQuorumPercent={props.councilQuorumPercent}
+        councilVetoQuorum={props.councilVetoQuorum}
         councilVoteTipping={props.councilVoteTipping}
         depositExemptProposalCount={props.depositExemptProposalCount}
         maxVoteDays={props.maxVoteDays}
@@ -107,11 +113,13 @@ export function Summary(props: Props) {
         currentCommunityCanCreate={props.currentCommunityCanCreate}
         currentCommunityHasVeto={props.currentCommunityHasVeto}
         currentCommunityQuorumPercent={props.currentCommunityQuorumPercent}
+        currentCommunityVetoQuorum={props.currentCommunityVetoQuorum}
         currentCommunityVoteTipping={props.currentCommunityVoteTipping}
         currentCoolOffHours={props.currentCoolOffHours}
         currentCouncilCanCreate={props.currentCouncilCanCreate}
         currentCouncilHasVeto={props.currentCouncilHasVeto}
         currentCouncilQuorumPercent={props.currentCouncilQuorumPercent}
+        currentCouncilVetoQuorum={props.currentCouncilVetoQuorum}
         currentCouncilVoteTipping={props.currentCouncilVoteTipping}
         currentDepositExemptProposalCount={
           props.currentDepositExemptProposalCount

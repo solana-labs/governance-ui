@@ -18,6 +18,7 @@ interface Props
     councilCanCreate: boolean;
     councilHasVeto: boolean;
     councilQuorumPercent: number;
+    councilVetoQuorum: number;
     councilVoteTipping: VoteTipping;
     minCouncilPower: BigNumber;
   }> {
@@ -118,6 +119,29 @@ export function CouncilDetails(props: Props) {
             onChange={props.onCouncilHasVetoChange}
           />
         </ValueBlock>
+        {props.councilHasVeto && (
+          <ValueBlock
+            title="Council Veto Voting Quorum"
+            description={
+              <>
+                The percentage of <span className="font-bold">No</span> votes
+                required to veto a community proposal
+              </>
+            }
+          >
+            <div className="grid grid-cols-[100px,1fr] gap-x-2 items-center">
+              <SliderValue value={props.councilVetoQuorum} units="%" />
+              <Slider
+                min={1}
+                max={100}
+                trackColor="bg-sky-400"
+                value={props.councilVetoQuorum}
+                onChange={props.onCouncilVetoQuorumChange}
+                onRenderValue={(val) => `${val}%`}
+              />
+            </div>
+          </ValueBlock>
+        )}
       </div>
     </SectionBlock>
   );
