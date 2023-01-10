@@ -7,10 +7,7 @@ import ButtonGroup from '@components/ButtonGroup'
 import Input from '@components/inputs/Input'
 import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import { precision } from '@utils/formatting'
-import {
-  getFormattedStringFromDays,
-  yearsToDays,
-} from '@utils/dateTools'
+import { getFormattedStringFromDays, yearsToDays } from '@utils/dateTools'
 import Tooltip from '@components/Tooltip'
 import { QuestionMarkCircleIcon } from '@heroicons/react/solid'
 import { notify } from '@utils/notifications'
@@ -120,26 +117,27 @@ export const LockTokensModal: React.FC<{
 
   const { lockupKind, amount, lockupPeriod, lockupPeriodInDays } = watch()
 
-  // validateAmountOnChange
-  useEffect(() => {
-    if (amount) {
-      setValue(
-        'amount',
-        parseFloat(
-          Math.max(
-            Number(mintMinAmount),
-            Math.min(Number(maxLockupAmount), Number(amount))
-          ).toFixed(currentPrecision)
-        )
-      )
-    }
-  }, [amount, setValue, mintMinAmount, maxLockupAmount, currentPrecision])
-
   useEffect(() => {
     if (lockupPeriod) {
       setValue('lockupPeriodInDays', lockupPeriod?.value)
     }
   }, [lockupPeriod, setValue])
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!Number(e.target.value)) {
+      return setValue('amount', Number(e.target.value))
+    }
+
+    setValue(
+      'amount',
+      parseFloat(
+        Math.max(
+          Number(mintMinAmount),
+          Math.min(Number(maxLockupAmount), Number(e.target.value))
+        ).toFixed(currentPrecision)
+      )
+    )
+  }
 
   const handleOnSubmit = handleSubmit(
     async (values: LockTokensModalFormValues) => {
@@ -221,7 +219,7 @@ export const LockTokensModal: React.FC<{
                     min={mintMinAmount}
                     value={amount}
                     type="number"
-                    onChange={(e) => setValue('amount', +e.target.value)}
+                    onChange={handleAmountChange}
                     step={mintMinAmount}
                   />
                 </div>

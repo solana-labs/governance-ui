@@ -343,7 +343,9 @@ export const PositionCard: React.FC<PositionCardProps> = ({
               {hasGenesisMultiplier && (
                 <CardLabel
                   label="Landrush"
-                  value={`${votingMint.genesisVotePowerMultiplier}x`}
+                  value={`${
+                    votingMint.genesisVotePowerMultiplier
+                  }x (${getTimeLeftFromNowFmt(position.genesisEnd)})`}
                 />
               )}
             </div>
