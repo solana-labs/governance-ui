@@ -3058,5 +3058,32 @@
     "shortDescription": "Take Action for the Zero Hunger by mining for Proof-of-Health over Helium Network.",
     "website": "https://safecows.com",
     "discord": "https://discord.gg/aQCeMSWs"
-  }
+  },
+  {
+    "symbol": "HNT",
+    "displayName": "Helium DAO",
+    "programId": "hgovkRU6Ghe1Qoyb54HdSLdqN7VtxaifBzRmh9jtd3S",
+    "realmId": "2VfPJn8ML1hNBnsEBo7SzmG11UJc7gbY8b23A3K8expd",
+    "website": "https://helium.com",
+    "twitter": "@Helium",
+    "ogImage": "/realms/Helium/img/logo.svg"
+  },
+  {
+    "symbol": "IOT",
+    "displayName": "Helium IOT DAO",
+    "programId": "hgovkRU6Ghe1Qoyb54HdSLdqN7VtxaifBzRmh9jtd3S",
+    "realmId": "8UQNtD5Zw8ijB7ZpGiPLodKXMxtVyQmtu1AEztd3p6Po",
+    "website": "https://helium.com",
+    "twitter": "@Helium",
+    "ogImage": "/realms/Helium/img/iotlogo.png"
+  },
+  {
+    "symbol": "MOBILE",
+    "displayName": "Helium MOBILE DAO",
+    "programId": "hgovkRU6Ghe1Qoyb54HdSLdqN7VtxaifBzRmh9jtd3S",
+    "realmId": "8itzNAn1kMZ5sf18dVd8gGykztWZLVT93Svbdt7Gn2NP",
+    "website": "https://helium.com",
+    "twitter": "@Helium",
+    "ogImage": "/realms/Helium/img/mobilelogo.png"
+  }  
 ]
