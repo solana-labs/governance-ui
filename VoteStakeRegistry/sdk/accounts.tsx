@@ -10,7 +10,7 @@ export interface Voter {
   //there are more fields but no use for them on ui yet
 }
 
-export interface votingMint {
+export interface VotingMint {
   baselineVoteWeightScaledFactor: BN
   digitShift: number
   grantAuthority: PublicKey
@@ -19,13 +19,24 @@ export interface votingMint {
   mint: PublicKey
 }
 
+export interface HeliumVotingMint
+  extends Omit<
+    VotingMint,
+    'baselineVoteWeightScaledFactor' | 'grantAuthority'
+  > {
+  lockedVoteWeightScaledFactor: BN
+  minimumRequiredLockupSecs: BN
+  genesisVotePowerMultiplier: number
+  genesisVotePowerMultiplierExpirationTs: BN
+}
+
 export type LockupType = 'none' | 'monthly' | 'cliff' | 'constant' | 'daily' //there is also daily type but not used on ui yet
 export interface Registrar {
   governanceProgramId: PublicKey
   realm: PublicKey
   realmAuthority: PublicKey
   realmGoverningTokenMint: PublicKey
-  votingMints: votingMint[]
+  votingMints: VotingMint[]
   //there are more fields but no use for them on ui yet
 }
 interface LockupKind {

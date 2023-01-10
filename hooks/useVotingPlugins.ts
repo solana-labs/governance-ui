@@ -32,6 +32,7 @@ export const vsrPluginsPks: string[] = [
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo',
   'vsr2nfGVNHmSY8uxoBGqq8AQbwz3JwaEaHqGbsTPXqQ',
   'VotEn9AWwTFtJPJSMV5F9jsMY6QwWM5qn3XP9PATGW7',
+  'hvsrY9UBtHhYRvstM2BWCsni81kevfn7B2DEhYbGA1a',
 ]
 
 export const nftPluginsPks: string[] = [
@@ -338,6 +339,7 @@ export function useVotingPlugins() {
         }
       }
     }
+
     const handleNftplugin = () => {
       if (
         nftClient &&

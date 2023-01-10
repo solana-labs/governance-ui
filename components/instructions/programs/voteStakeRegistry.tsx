@@ -22,6 +22,7 @@ import { calcMultiplier } from 'VoteStakeRegistry/tools/deposits'
 interface ClawbackInstruction {
   depositEntryIndex: number
 }
+
 interface VotingMintCfgInstruction {
   idx: number
   digitShift: number
@@ -30,6 +31,18 @@ interface VotingMintCfgInstruction {
   lockupSaturationSecs: BN
   grantAuthority: PublicKey
 }
+
+interface HeliumVotingMintCfgInstruction
+  extends Omit<
+    VotingMintCfgInstruction,
+    'baselineVoteWeightScaledFactor' | 'grantAuthority'
+  > {
+  lockedVoteWeightScaledFactor: BN
+  minimumRequiredLockupSecs: BN
+  genesisVotePowerMultiplier: number
+  genesisVotePowerMultiplierExpirationTs: BN
+}
+
 export interface GrantInstruction {
   periods: number
   kind: object
@@ -38,7 +51,7 @@ export interface GrantInstruction {
   allowClawback: boolean
 }
 
-const common_instructions = (programId: PublicKey) => ({
+const clawbackIx = (programId: PublicKey) => ({
   111: {
     name: 'Clawback',
     accounts: [
@@ -91,6 +104,9 @@ const common_instructions = (programId: PublicKey) => ({
       }
     },
   },
+})
+
+const createRegistrarIx = (_programId: PublicKey) => ({
   132: {
     name: 'Create registrar',
     accounts: [
@@ -105,6 +121,9 @@ const common_instructions = (programId: PublicKey) => ({
       return <div></div>
     },
   },
+})
+
+const configVotingMintIx = (programId: PublicKey) => ({
   113: {
     name: 'Configure voting mint',
     accounts: [
@@ -172,6 +191,95 @@ const common_instructions = (programId: PublicKey) => ({
       }
     },
   },
+})
+
+const configVotingMintHeliumIx = (programId: PublicKey) => ({
+  113: {
+    name: 'Configure voting mint',
+    accounts: [
+      { name: 'Registrar' },
+      { name: 'Realm authority' },
+      { name: 'Mint' },
+    ],
+    getDataUI: async (connection: Connection, data: Uint8Array) => {
+      try {
+        const options = AnchorProvider.defaultOptions()
+        const provider = new AnchorProvider(
+          connection,
+          new Wallet(Keypair.generate()),
+          options
+        )
+        const vsrClient = await VsrClient.connect(provider, programId)
+
+        const decodedInstructionData = new BorshInstructionCoder(
+          vsrClient.program.idl
+        ).decode(Buffer.from(data))?.data as HeliumVotingMintCfgInstruction
+
+        const {
+          maxExtraLockupVoteWeightScaledFactor,
+          lockupSaturationSecs,
+          lockedVoteWeightScaledFactor,
+          minimumRequiredLockupSecs,
+          genesisVotePowerMultiplier,
+          genesisVotePowerMultiplierExpirationTs,
+        } = decodedInstructionData
+
+        return (
+          <div className="space-y-3">
+            <div>Index: {decodedInstructionData?.idx}</div>
+            <div>Digit shifts: {decodedInstructionData?.digitShift}</div>
+            <div>Unlocked factor: 0</div>
+            <div>
+              Lockup factor: {lockedVoteWeightScaledFactor.toNumber() / 1e9} (
+              {lockedVoteWeightScaledFactor.toNumber()})
+            </div>
+            <div>
+              Minimum Requied lockup time:{' '}
+              {decodedInstructionData &&
+                getFormattedStringFromDays(
+                  secsToDays(minimumRequiredLockupSecs.toNumber())
+                )}{' '}
+              (secs: {minimumRequiredLockupSecs.toNumber()})
+            </div>
+            <div>
+              Max lockup time:{' '}
+              {decodedInstructionData &&
+                getFormattedStringFromDays(
+                  secsToDays(lockupSaturationSecs.toNumber())
+                )}{' '}
+              (secs: {lockupSaturationSecs.toNumber()})
+            </div>
+            <div>
+              Max multiplier:{' '}
+              {calcMultiplier({
+                depositScaledFactor: lockedVoteWeightScaledFactor.toNumber(),
+                maxExtraLockupVoteWeightScaledFactor: maxExtraLockupVoteWeightScaledFactor.toNumber(),
+                lockupSaturationSecs: lockupSaturationSecs.toNumber(),
+                lockupSecs: lockupSaturationSecs.toNumber(),
+              })}
+            </div>
+            <div>
+              Additional Geneisis Multiplier: {genesisVotePowerMultiplier}
+            </div>
+            <div>
+              Additional Genesis Duration:
+              {decodedInstructionData &&
+                getFormattedStringFromDays(
+                  secsToDays(genesisVotePowerMultiplierExpirationTs.toNumber())
+                )}{' '}
+              (secs: {genesisVotePowerMultiplierExpirationTs.toNumber()})
+            </div>
+          </div>
+        )
+      } catch (e) {
+        console.log(e)
+        return <div>{JSON.stringify(data)}</div>
+      }
+    },
+  },
+})
+
+const grantIx = (programId: PublicKey) => ({
   145: {
     name: 'Grant',
     accounts: [
@@ -271,6 +379,15 @@ const common_instructions = (programId: PublicKey) => ({
   },
 })
 
+const common_instructions = (programId: PublicKey) =>
+  [clawbackIx, createRegistrarIx, configVotingMintIx, grantIx].reduce(
+    (acc, ix) => ({
+      ...acc,
+      ...ix(programId),
+    }),
+    {}
+  )
+
 export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo': common_instructions(
     new PublicKey('4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo')
@@ -280,5 +397,17 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
   ),
   VotEn9AWwTFtJPJSMV5F9jsMY6QwWM5qn3XP9PATGW7: common_instructions(
     new PublicKey('VotEn9AWwTFtJPJSMV5F9jsMY6QwWM5qn3XP9PATGW7')
+  ),
+  // Helium vsr has no concept of clawback or grants
+  // and has slightly different accounts for voting mint config
+  hvsrY9UBtHhYRvstM2BWCsni81kevfn7B2DEhYbGA1a: [
+    createRegistrarIx,
+    configVotingMintHeliumIx,
+  ].reduce(
+    (acc, ix) => ({
+      ...acc,
+      ...ix(new PublicKey('hvsrY9UBtHhYRvstM2BWCsni81kevfn7B2DEhYbGA1a')),
+    }),
+    {}
   ),
 }

@@ -48,7 +48,7 @@ const CreateVsrRegistrar = ({
       form!.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const vsrClient = VsrClient.connect(
+      const vsrClient = await VsrClient.connect(
         anchorProvider,
         form?.programId ? new web3.PublicKey(form.programId) : DEFAULT_VSR_ID
       )
@@ -58,19 +58,40 @@ const CreateVsrRegistrar = ({
         vsrClient!.program.programId
       )
 
-      const createRegistrarIx = await vsrClient!.program.methods
-        .createRegistrar(registrarBump)
-        .accounts({
-          registrar,
-          realm: realm!.pubkey,
-          governanceProgramId: realmInfo!.programId,
-          realmAuthority: realm!.account.authority!,
-          realmGoverningTokenMint: realm!.account.communityMint!,
-          payer: wallet.publicKey!,
-          systemProgram: SYSTEM_PROGRAM_ID,
-          rent: SYSVAR_RENT_PUBKEY,
-        })
-        .instruction()
+      let createRegistrarIx
+      if (vsrClient) {
+        if (vsrClient.isHeliumVsr) {
+          createRegistrarIx = await vsrClient.program.methods
+            .initializeRegistrarV0({
+              positionUpdateAuthority: null,
+            })
+            .accounts({
+              registrar,
+              realm: realm!.pubkey,
+              governanceProgramId: realmInfo!.programId,
+              realmAuthority: realm!.account.authority!,
+              realmGoverningTokenMint: realm!.account.communityMint!,
+              payer: wallet.publicKey!,
+              systemProgram: SYSTEM_PROGRAM_ID,
+            })
+            .instruction()
+        } else {
+          createRegistrarIx = await vsrClient.program.methods
+            .createRegistrar(registrarBump)
+            .accounts({
+              registrar,
+              realm: realm!.pubkey,
+              governanceProgramId: realmInfo!.programId,
+              realmAuthority: realm!.account.authority!,
+              realmGoverningTokenMint: realm!.account.communityMint!,
+              payer: wallet.publicKey!,
+              systemProgram: SYSTEM_PROGRAM_ID,
+              rent: SYSVAR_RENT_PUBKEY,
+            })
+            .instruction()
+        }
+      }
+
       serializedInstruction = serializeInstructionToBase64(createRegistrarIx)
     }
     const obj: UiInstruction = {

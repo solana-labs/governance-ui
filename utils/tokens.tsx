@@ -481,3 +481,7 @@ export function getScaledFactor(amount: number) {
     new BigNumber(amount.toString()).shiftedBy(SCALED_FACTOR_SHIFT).toString()
   )
 }
+
+export function getUnscaledFactor(amount: number) {
+  return amount / + `1e${SCALED_FACTOR_SHIFT}`
+}

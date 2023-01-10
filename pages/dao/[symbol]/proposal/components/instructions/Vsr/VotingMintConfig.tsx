@@ -19,7 +19,11 @@ import { getValidatedPublickKey } from '@utils/validations'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getScaledFactor } from '@utils/tokens'
-import { yearsToSecs } from 'VoteStakeRegistry/tools/dateTools'
+import {
+  yearsToSecs,
+  yearsToDays,
+  daysToSecs,
+} from 'VoteStakeRegistry/tools/dateTools'
 import { BN, web3 } from '@project-serum/anchor'
 import { PublicKey } from '@solana/web3.js'
 import {
@@ -30,16 +34,22 @@ import {
 import { DEFAULT_VSR_ID, VsrClient } from 'VoteStakeRegistry/sdk/client'
 import useWallet from '@hooks/useWallet'
 
-interface ConfigureCollectionForm {
+interface ConfigureVotingMintForm {
   programId: string | undefined
   governedAccount: AssetAccount | undefined
   mint: string
   mintIndex: number
-  grantAuthority: AssetAccount | undefined
   mintDigitShift: number
-  mintUnlockedFactor: number
-  mintLockupFactor: number
-  mintLockupSaturation: number
+  maxLockupFactor: number
+  lockupSaturation: number
+
+  // DynamicFields based on programId
+  baselineVoteWeightFactor?: number
+  grantAuthority?: AssetAccount | undefined
+  lockedVoteWeightFactor?: number
+  minimumRequiredLockup?: number
+  genesisVotePowerMultiplier?: number
+  genesisVotePowerMultiplierExpTs?: number
 }
 
 const VotingMintConfig = ({
@@ -49,36 +59,67 @@ const VotingMintConfig = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
+  const [vsrClient, setVSRClient] = useState<VsrClient | null>(null)
   const { realm } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const [form, setForm] = useState<ConfigureCollectionForm>()
+  const [form, setForm] = useState<ConfigureVotingMintForm>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
   const { wallet, anchorProvider } = useWallet()
 
+  useEffect(() => {
+    ;(async () => {
+      if (anchorProvider && form?.programId) {
+        let programId
+        try {
+          programId = new PublicKey(form.programId)
+        } catch (err) {
+          // invalid pubkey
+          return
+        }
+
+        setVSRClient(await VsrClient.connect(anchorProvider, programId))
+      }
+    })()
+  }, [anchorProvider, form?.programId, setVSRClient])
+
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstruction = ''
+
     if (
       isValid &&
       form &&
       form!.governedAccount?.governance.pubkey &&
       wallet?.publicKey?.toBase58()
     ) {
-      const vsrClient = VsrClient.connect(
-        anchorProvider,
-        form?.programId ? new web3.PublicKey(form.programId) : DEFAULT_VSR_ID
-      )
-      const digitShift = form.mintDigitShift
-      const unlockedScaledFactor = getScaledFactor(form.mintUnlockedFactor)
-      const lockupScaledFactor = getScaledFactor(form.mintLockupFactor)
-      const lockupSaturationSecs = new BN(
-        yearsToSecs(form.mintLockupSaturation).toString()
-      )
+      const {
+        mintIndex,
+        mintDigitShift,
+        baselineVoteWeightFactor,
+        lockedVoteWeightFactor,
+        minimumRequiredLockup,
+        maxLockupFactor,
+        lockupSaturation,
+        grantAuthority,
+      } = {
+        baselineVoteWeightFactor: 0,
+        lockedVoteWeightFactor: 0,
+        minimumRequiredLockup: 0,
+        ...form,
+      }
+
       const mint = new PublicKey(form.mint)
-      const mintIndex = form.mintIndex
-      const grantAuthority = form.grantAuthority!.governance.pubkey
+      const baselineScaledFactor = getScaledFactor(baselineVoteWeightFactor)
+      const lockedScaledFactor = getScaledFactor(lockedVoteWeightFactor)
+      const maxLockupScaledFactor = getScaledFactor(maxLockupFactor)
+      const minimumRequiredLockupSecs = new BN(
+        yearsToSecs(minimumRequiredLockup).toString()
+      )
+      const lockupSaturationSecs = new BN(
+        yearsToSecs(lockupSaturation).toString()
+      )
       const { registrar } = await getRegistrarPDA(
         realm!.pubkey,
         realm!.account.communityMint,
@@ -114,22 +155,48 @@ const VotingMintConfig = ({
       } catch (ex) {
         console.info("Can't fetch registrar", ex)
       }
-      const configureCollectionIx = await vsrClient!.program.methods
-        .configureVotingMint(
-          mintIndex, // mint index
-          digitShift, // digit_shift
-          unlockedScaledFactor, // unlocked_scaled_factor
-          lockupScaledFactor, // lockup_scaled_factor
-          lockupSaturationSecs, // lockup_saturation_secs
-          grantAuthority! // grant_authority)
-        )
-        .accounts({
-          registrar,
-          realmAuthority: realm!.account.authority,
-          mint,
-        })
-        .remainingAccounts(remainingAccounts)
-        .instruction()
+
+      let configureCollectionIx
+      if (vsrClient!.isHeliumVsr) {
+        configureCollectionIx = await vsrClient!.program.methods
+          .configureVotingMintV0({
+            idx: mintIndex,
+            digitShift: mintDigitShift,
+            lockedVoteWeightScaledFactor: lockedScaledFactor,
+            minimumRequiredLockupSecs,
+            maxExtraLockupVoteWeightScaledFactor: maxLockupScaledFactor,
+            genesisVotePowerMultiplier: 0,
+            genesisVotePowerMultiplierExpirationTs: new BN(
+              Math.floor(new Date().getTime() - 60) / 1000
+            ),
+            lockupSaturationSecs,
+          })
+          .accounts({
+            registrar,
+            realmAuthority: realm!.account.authority,
+            mint,
+          })
+          .remainingAccounts(remainingAccounts)
+          .instruction()
+      } else {
+        configureCollectionIx = await vsrClient!.program.methods
+          .configureVotingMint(
+            mintIndex, // mint index
+            mintDigitShift, // digit_shift
+            baselineScaledFactor, // unlocked_scaled_factor
+            maxLockupScaledFactor, // lockup_scaled_factor
+            lockupSaturationSecs, // lockup_saturation_secs
+            grantAuthority!.governance.pubkey // grant_authority)
+          )
+          .accounts({
+            registrar,
+            realmAuthority: realm!.account.authority,
+            mint,
+          })
+          .remainingAccounts(remainingAccounts)
+          .instruction()
+      }
+
       serializedInstruction = serializeInstructionToBase64(
         configureCollectionIx
       )
@@ -166,10 +233,6 @@ const VotingMintConfig = ({
       .object()
       .nullable()
       .required('Governed account is required'),
-    grantAuthority: yup
-      .object()
-      .nullable()
-      .required('Grant authority is required'),
     mint: yup
       .string()
       .test(
@@ -192,11 +255,20 @@ const VotingMintConfig = ({
           }
         }
       ),
+    ...(!vsrClient?.isHeliumVsr
+      ? {
+          grantAuthority: yup
+            .object()
+            .nullable()
+            .required('Grant authority is required'),
+        }
+      : {}),
   })
   const inputs: InstructionInput[] = [
     {
       label: 'Voter Stake Registry Program ID',
-      initialValue: DEFAULT_VSR_ID.toString(),
+      initialValue:
+        vsrClient?.program.programId.toString() || DEFAULT_VSR_ID.toString(),
       name: 'programId',
       type: InstructionInputType.INPUT,
     },
@@ -228,13 +300,19 @@ const VotingMintConfig = ({
       name: 'mintIndex',
       type: InstructionInputType.INPUT,
     },
-    {
-      label: 'Grant authority (Governance)',
-      initialValue: null,
-      name: 'grantAuthority',
-      type: InstructionInputType.GOVERNED_ACCOUNT,
-      options: assetAccounts.filter((x) => x.isToken || x.isSol || x.isNft),
-    },
+    ...(!vsrClient?.isHeliumVsr
+      ? [
+          {
+            label: 'Grant authority (Governance)',
+            initialValue: null,
+            name: 'grantAuthority',
+            type: InstructionInputType.GOVERNED_ACCOUNT,
+            options: assetAccounts.filter(
+              (x) => x.isToken || x.isSol || x.isNft
+            ),
+          },
+        ]
+      : []),
     {
       label: 'mint digit shift',
       initialValue: 0,
@@ -243,20 +321,41 @@ const VotingMintConfig = ({
       name: 'mintDigitShift',
       type: InstructionInputType.INPUT,
     },
+    ...(!vsrClient?.isHeliumVsr
+      ? [
+          {
+            label: 'mint unlocked factor',
+            initialValue: 0,
+            min: 0,
+            inputType: 'number',
+            name: 'baselineVoteWeightFactor',
+            type: InstructionInputType.INPUT,
+          },
+        ]
+      : [
+          {
+            label: 'mint lockup factor',
+            initialValue: 0,
+            min: 0,
+            inputType: 'number',
+            name: 'lockedVoteWeightFactor',
+            type: InstructionInputType.INPUT,
+          },
+          {
+            label: 'mint min required lockup saturation (years)',
+            initialValue: 0,
+            min: 0,
+            inputType: 'number',
+            name: 'minimumRequiredLockup',
+            type: InstructionInputType.INPUT,
+          },
+        ]),
     {
-      label: 'mint unlocked factor',
+      label: 'max extra vote weight',
       initialValue: 0,
       min: 0,
       inputType: 'number',
-      name: 'mintUnlockedFactor',
-      type: InstructionInputType.INPUT,
-    },
-    {
-      label: 'mint lockup factor',
-      initialValue: 0,
-      min: 0,
-      inputType: 'number',
-      name: 'mintLockupFactor',
+      name: 'maxLockupFactor',
       type: InstructionInputType.INPUT,
     },
     {
@@ -264,7 +363,7 @@ const VotingMintConfig = ({
       initialValue: 0,
       min: 0,
       inputType: 'number',
-      name: 'mintLockupSaturation',
+      name: 'lockupSaturation',
       type: InstructionInputType.INPUT,
     },
   ]

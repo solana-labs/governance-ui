@@ -44,6 +44,10 @@ export const yearsToSecs = (years: number) => {
   return DAYS_PER_YEAR * years * SECS_PER_DAY
 }
 
+export const daysToSecs = (days: number) => {
+  return days * SECS_PER_DAY
+}
+
 export const secsToDays = (secs: number) => {
   return secs / SECS_PER_DAY
 }
