@@ -60,6 +60,7 @@ export default function useProposalVotes(proposal?: Proposal) {
 
   const yesVotePct = calculatePct(proposal.getYesVoteCount(), maxVoteWeight)
   const yesVoteProgress = (yesVotePct / voteThresholdPct) * 100
+
   const isMultiProposal = proposal?.options?.length > 1
   const yesVoteCount = !isMultiProposal
     ? fmtTokenAmount(proposal.getYesVoteCount(), proposalMint.decimals)
@@ -76,10 +77,12 @@ export default function useProposalVotes(proposal?: Proposal) {
   const relativeYesVotes = getRelativeVoteCount(yesVoteCount)
   const relativeNoVotes = getRelativeVoteCount(noVoteCount)
   const rawYesVotesRequired = minimumYesVotes - yesVoteCount
+  const actualVotesRequired = rawYesVotesRequired < 0 ? 0 : rawYesVotesRequired
+
   const yesVotesRequired =
     proposalMint.decimals == 0
-      ? Math.ceil(rawYesVotesRequired)
-      : rawYesVotesRequired
+      ? Math.ceil(actualVotesRequired)
+      : actualVotesRequired
 
   const results = {
     voteThresholdPct,
