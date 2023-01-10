@@ -76,7 +76,7 @@ export function App(props: Props) {
   const { realm, ownTokenRecord, realmInfo, symbol, config } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
-  const [vsrClient] = useVotePluginsClientStore((s) => [s.state.vsrClient])
+  const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
   const prevStringifyPossibleNftsAccounts = usePrevious(
     JSON.stringify(possibleNftsAccounts)
   )
