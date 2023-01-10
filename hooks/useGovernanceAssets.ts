@@ -3,7 +3,7 @@ import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import { Instructions, PackageEnum } from '@utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import useRealm from './useRealm'
-import { vsrPluginsPks } from './useVotingPlugins'
+import { heliumVsrPluginsPks, vsrPluginsPks } from './useVotingPlugins'
 
 type Package = {
   name: string
@@ -222,7 +222,10 @@ export default function useGovernanceAssets() {
     [PackageEnum.VsrPlugin]: {
       name: 'Vsr Plugin',
       isVisible:
-        currentPluginPk && vsrPluginsPks.includes(currentPluginPk.toBase58()),
+        currentPluginPk && [
+          ...vsrPluginsPks,
+          ...heliumVsrPluginsPks
+        ].includes(currentPluginPk.toBase58()),
     },
   }
 

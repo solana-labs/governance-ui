@@ -444,7 +444,6 @@ export const getNfts = async (
   return await getNftsFromHolaplex(ownerPk, connection)
 }
 
-// TODO: Remove when upgrade spl-token
 export async function getAssociatedTokenAddress(
   mint: PublicKey,
   owner: PublicKey,
@@ -515,6 +514,8 @@ export function getScaledFactor(amount: number) {
   )
 }
 
-export function getUnscaledFactor(amount: number) {
-  return amount / +`1e${SCALED_FACTOR_SHIFT}`
+export function getInverseScaledFactor(amount: BN) {
+  return new BigNumber(amount.toNumber())
+    .shiftedBy(-SCALED_FACTOR_SHIFT)
+    .toNumber()
 }

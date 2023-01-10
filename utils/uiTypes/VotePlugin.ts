@@ -527,6 +527,7 @@ export class VotingClient {
       )
 
       for (const chunk of [firstFiveNfts, ...remainingNftsChunk]) {
+        36
         instructions.push(
           await this.client.program.methods
             .castNftVote(proposal.pubkey)

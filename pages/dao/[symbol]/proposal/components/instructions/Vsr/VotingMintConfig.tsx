@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useMemo, useEffect, useState } from 'react'
 import * as yup from 'yup'
 import {
   Governance,
@@ -39,13 +39,8 @@ interface ConfigureVotingMintForm {
   mintDigitShift: number
   maxLockupFactor: number
   lockupSaturation: number
-
-  // Helium DynamicFields based on programId
-  baselineVoteWeightFactor?: number
-  grantAuthority?: AssetAccount | undefined
-  lockedVoteWeightFactor?: number
-  genesisVotePowerMultiplier?: number
-  genesisVotePowerMultiplierExpTs?: number
+  baselineVoteWeightFactor: number
+  grantAuthority: AssetAccount | undefined
 }
 
 const VotingMintConfig = ({
@@ -59,22 +54,13 @@ const VotingMintConfig = ({
   const { assetAccounts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [formErrors, setFormErrors] = useState({})
-  const [showHeliumFields, setShowHeliumFields] = useState(false)
   const [form, setForm] = useState<ConfigureVotingMintForm>()
   const { handleSetInstructions } = useContext(NewProposalContext)
   const { wallet, anchorProvider } = useWallet()
-
-  useEffect(() => {
-    if (form?.programId) {
-      if (vsrPluginsPks.includes(form.programId)) {
-        setShowHeliumFields(false)
-      }
-
-      if (heliumVsrPluginsPks.includes(form.programId)) {
-        setShowHeliumFields(true)
-      }
-    }
-  }, [form?.programId, setShowHeliumFields])
+  const showGrantAuth = useMemo(
+    () => form?.programId && !heliumVsrPluginsPks.includes(form.programId),
+    [form?.programId]
+  )
 
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
@@ -125,7 +111,6 @@ const VotingMintConfig = ({
       lockupSaturation,
       grantAuthority,
     } = {
-      baselineVoteWeightFactor: 0,
       ...form,
     }
 
@@ -264,7 +249,7 @@ const VotingMintConfig = ({
           }
         }
       ),
-    ...(!showHeliumFields
+    ...(showGrantAuth
       ? {
           grantAuthority: yup
             .object()
@@ -308,7 +293,7 @@ const VotingMintConfig = ({
       name: 'mintIndex',
       type: InstructionInputType.INPUT,
     },
-    ...(!showHeliumFields
+    ...(showGrantAuth
       ? [
           {
             label: 'Grant authority (Governance)',

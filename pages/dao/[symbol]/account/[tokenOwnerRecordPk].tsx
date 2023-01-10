@@ -6,7 +6,7 @@ import { default as VoteStakeRegistryAccount } from 'VoteStakeRegistry/component
 import LockTokensAccount from 'VoteStakeRegistry/components/Account/LockTokensAccount'
 import { LockTokensAccount as HeliumLockTokensAccount } from 'HeliumVotePlugin/components/LockTokensAccount'
 
-const Account: React.FC<any> = () => {
+const Account: React.FC = () => {
   const router = useRouter()
   const { config } = useRealm()
   const tokenOwnerRecordPk = router?.query?.tokenOwnerRecordPk
