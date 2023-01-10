@@ -467,22 +467,28 @@ const getNftsFromHolaplex = async (
   ownerPk: PublicKey,
   connection: ConnectionContext
 ): Promise<NFTWithMeta[]> => {
-  try {
-    const data = await fetchNftsFromHolaplexIndexer(ownerPk, connection.cluster)
-    return data.nfts.map((nft) => {
-      return {
-        ...nft,
-        getAssociatedTokenAccount: async () => {
-          return nft.tokenAccountAddress
-        },
-      }
-    })
-  } catch (error) {
-    notify({
-      type: 'error',
-      message: 'Unable to fetch nfts',
-    })
+  if (!process?.env?.DISABLE_NFTS) {
+    try {
+      const data = await fetchNftsFromHolaplexIndexer(
+        ownerPk,
+        connection.cluster
+      )
+      return data.nfts.map((nft) => {
+        return {
+          ...nft,
+          getAssociatedTokenAccount: async () => {
+            return nft.tokenAccountAddress
+          },
+        }
+      })
+    } catch (error) {
+      notify({
+        type: 'error',
+        message: 'Unable to fetch nfts',
+      })
+    }
   }
+
   return []
 }
 

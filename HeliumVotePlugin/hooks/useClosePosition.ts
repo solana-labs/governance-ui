@@ -12,10 +12,9 @@ import { useUnixNow } from '@hooks/useUnixNow'
 export const useClosePosition = () => {
   const { unixNow } = useUnixNow()
   const { connection, wallet } = useWallet()
-  const { realm, realmInfo } = useRealm()
-  const [{ client }, registrarPk] = useVotePluginsClientStore((s) => [
+  const { realm } = useRealm()
+  const [{ client }] = useVotePluginsClientStore((s) => [
     s.state.currentRealmVotingClient,
-    s.state.voteStakeRegistryRegistrarPk,
   ])
   const { error, loading, execute } = useAsyncCallback(
     async ({ position }: { position: PositionWithMeta }) => {
@@ -24,13 +23,10 @@ export const useClosePosition = () => {
       const isInvalid =
         !connection ||
         !connection.current ||
-        !registrarPk ||
         !realm ||
         !client ||
         !(client instanceof HeliumVsrClient) ||
         !wallet ||
-        !realmInfo ||
-        !realmInfo.programVersion ||
         position.numActiveVotes > 0 ||
         // lockupExpired
         !(

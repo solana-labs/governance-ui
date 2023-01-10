@@ -163,11 +163,6 @@ export async function castVote(
 
   // we need to chunk instructions
   if (isHeliumVoter) {
-    // const {
-    //   openNftVotingCountingModal,
-    //   closeNftVotingCountingModal,
-    // } = useNftProposalStore.getState()
-
     // update voter weight + cast vote from spl gov need to be in one transaction
     const ixsWithOwnChunk = instructions.slice(-ixChunkCount)
     const remainingIxsToChunk = instructions.slice(
@@ -206,14 +201,8 @@ export async function castVote(
       transactionInstructions: ixsChunks,
       callbacks: {
         afterFirstBatchSign: () => (ixsChunks.length > 2 ? null : null),
-        // ixsChunks.length > 2 ? openNftVotingCountingModal() : null,
         afterAllTxConfirmed: () =>
           runAfterConfirmation ? runAfterConfirmation() : null,
-        // closeNftVotingCountingModal(
-        //   votingPlugin.client as NftVoterClient,
-        //   proposal,
-        //   wallet.publicKey!
-        // )
       },
     })
   }
