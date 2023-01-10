@@ -78,28 +78,6 @@ export const getRegistrarPDA = async (
   }
 }
 
-export const getMaxVoterWeightPDA = async (
-  realmPk: PublicKey,
-  mint: PublicKey,
-  clientProgramId: PublicKey
-) => {
-  const [
-    maxVoterWeight,
-    maxVoterWeightBump,
-  ] = await PublicKey.findProgramAddress(
-    [
-      Buffer.from('max-voter-weight-record'),
-      realmPk.toBuffer(),
-      mint.toBuffer(),
-    ],
-    clientProgramId
-  )
-  return {
-    maxVoterWeight,
-    maxVoterWeightBump,
-  }
-}
-
 export const getVoterPDA = async (
   registrar: PublicKey,
   walletPk: PublicKey,
