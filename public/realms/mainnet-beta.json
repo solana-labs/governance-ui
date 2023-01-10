@@ -1061,15 +1061,6 @@
     "ogImage": "/realms/BootstrapDAO/BootRealms.png"
   },
   {
-    "symbol": "laptopDAO",
-    "displayName": "laptopDAO",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "6JzsaQYYi4vGTZogASscZsBALWbSbJU9tMDRtq6nbeff",
-    "website": "https://laptop-dao.vercel.app/",
-    "twitter": "@laptopDAO",
-    "ogImage": "/realms/laptopDAO/logo.png"
-  },
-  {
     "symbol": "HOADAO",
     "displayName": "HOA DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
