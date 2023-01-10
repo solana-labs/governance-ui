@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start -p ${PORT-3000}",
+    "start": "next start",
     "prepare": "husky install",
     "analyze": "ANALYZE=true next build",
     "tc": "yarn type-check --watch",
