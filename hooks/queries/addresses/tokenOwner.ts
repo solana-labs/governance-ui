@@ -33,11 +33,11 @@ export const useAddressQuery_CommunityTokenOwner = () => {
   )
 
   // if we have a community token delegator selected (this is rare), use that. otherwise use user wallet.
-  const owner =
-    selectedCommunityDelegator !== undefined
-      ? new PublicKey(selectedCommunityDelegator)
-      : // I wanted to eliminate `null` as a possible type
-        wallet?.publicKey ?? undefined
+  // eslint-disable-next-line no-extra-boolean-cast
+  const owner = !!selectedCommunityDelegator
+    ? new PublicKey(selectedCommunityDelegator)
+    : // I wanted to eliminate `null` as a possible type
+      wallet?.publicKey ?? undefined
 
   return useAddressQuery_TokenOwnerRecord(
     realm?.owner,

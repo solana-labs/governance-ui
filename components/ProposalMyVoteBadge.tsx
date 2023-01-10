@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useMemo } from 'react'
 import {
   Proposal,
   ProgramAccount,
@@ -53,9 +53,6 @@ interface Props {
 
 export default function ProposalMyVoteBadge(props: Props) {
   const { realm, ownTokenRecord } = useRealm()
-  const [ownVoteRecord, setOwnVoteRecord] = useState<
-    ProgramAccount<VoteRecord> | undefined
-  >(undefined)
   const [
     ownVoteRecords,
     communityDelegateVoteRecords,
@@ -66,29 +63,24 @@ export default function ProposalMyVoteBadge(props: Props) {
     s.councilDelegateVoteRecordsByProposal,
   ])
 
-  useEffect(() => {
-    setOwnVoteRecord(undefined)
-    const voteRecord = getOwnVoteRecord(
+  const ownVoteRecord = useMemo(
+    () =>
+      getOwnVoteRecord(
+        communityDelegateVoteRecords,
+        councilDelegateVoteRecords,
+        ownVoteRecords,
+        props.proposal,
+        realm
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+    [
       communityDelegateVoteRecords,
       councilDelegateVoteRecords,
       ownVoteRecords,
-      props.proposal,
-      realm
-    )
-    if (
-      voteRecord?.account.governingTokenOwner.equals(
-        ownTokenRecord!.account!.governingTokenOwner
-      )
-    ) {
-      setOwnVoteRecord(voteRecord)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [
-    setOwnVoteRecord,
-    communityDelegateVoteRecords,
-    councilDelegateVoteRecords,
-    ownVoteRecords,
-  ])
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+      ownTokenRecord?.account.governingTokenOwner.toBase58(),
+    ]
+  )
 
   if (!ownVoteRecord) {
     return null
