@@ -22,7 +22,7 @@ const NavBar = () => {
                 srcSet="/img/logotype-realms-blue-white.svg"
                 media="(min-width: 640px)"
               />
-              <img src="/img/logo-realms.svg" className="w-8 h-8 md:w-24" />
+              <img src="/img/logo-realms.svg" className="w-8 h-8 sm:w-24" />
             </picture>
           </div>
         </Link>

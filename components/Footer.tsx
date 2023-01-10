@@ -23,19 +23,20 @@ const Footer = () => {
         'justify-around',
         'w-full',
         'h-20',
-        'pb-24',
+        'pb-0',
+        'lg:pb-24',
         'gap-y-8',
-        'md:gap-y-0'
+        'md:gap-y-0',
+        'z-10'
       )}
     >
-      <div className="pl-14 w-80" />
-
       <div
         className={cx(
           'absolute',
           'flex-col',
           'flex',
-          'gap-2',
+          'gap-1',
+          'sm:gap-2',
           'items-center',
           'justify-center',
           'left-1/2',
@@ -56,44 +57,42 @@ const Footer = () => {
           className={cx('flex', 'flex-col', 'items-center', 'justify-center')}
         >
           <SocialIcons className="mb-5" />
-          <div className="flex justify-center space-x-2 text-sm opacity-70">
-            <div className="flex-shrink-0 whitespace-nowrap">
-              © 2022 Solana Technology Services LLC
+          <div className="flex flex-col justify-center sm:space-x-2 text-center text-sm opacity-70 sm:flex-row sm:text-sm sm:text-left">
+            <div className="flex-shrink-0">
+              © 2023 Solana Technology Services LLC
             </div>
-            <span>|</span>
+            <span className="hidden sm:block mx-2">|</span>
             <Link href="https://realms.today/terms" passHref>
               <a className="flex-shrink-0 whitespace-nowrap">Terms</a>
             </Link>
-            <span>|</span>
+            <span className="hidden sm:block mx-2">|</span>
             <Link href="https://realms.today/privacy-policy" passHref>
               <a className="flex-shrink-0 whitespace-nowrap">Privacy Policy</a>
             </Link>
           </div>
         </div>
-        <div className="opacity-70">
-          Powered by <span className="font-bold">Solana</span>
-        </div>
-      </div>
 
-      <div className="pr-14 w-80 flex items-center justify-end">
         <a
           className={cx(
             'flex',
             'items-center',
             'group',
-            '-mr-11',
-            'px-11',
-            'py-5',
             'opacity-70',
             'active:opacity-50',
             'focus:opacity-[.80]',
-            'hover:opacity-[.80]'
+            'hover:opacity-[.80]',
+            'mr-2',
+            'text-sm'
           )}
           href="https://docs.realms.today/"
         >
           <ExternalLinkIcon className="w-4 h-4 mr-2 stroke-current" />
           <div>Read the Docs</div>
         </a>
+
+        <div className="opacity-70">
+          Powered by <span className="font-bold">Solana</span>
+        </div>
       </div>
     </div>
   )
