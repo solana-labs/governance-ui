@@ -1,6 +1,6 @@
 import { BN } from '@coral-xyz/anchor'
-import { keypairIdentity, Metaplex } from '@metaplex-foundation/js'
-import { Connection, Keypair, PublicKey } from '@solana/web3.js'
+import { Metaplex } from '@metaplex-foundation/js'
+import { Connection, PublicKey } from '@solana/web3.js'
 import { registrarKey, positionKey } from '@helium/voter-stake-registry-sdk'
 import { delegatedPositionKey } from '@helium/helium-sub-daos-sdk'
 import { tryGetMint } from '@utils/tokens'
@@ -32,9 +32,8 @@ export const getPositions = async (
   let amountLocked: BN = new BN(0)
   let votingPower: BN = new BN(0)
 
-  const keypair = Keypair.generate()
   const now = new BN(Math.round(new Date().getTime() / 1000))
-  const metaplex = new Metaplex(connection).use(keypairIdentity(keypair))
+  const metaplex = new Metaplex(connection)
   const registrarPk = registrarKey(realmPk, communityMintPk)[0]
   const registrar = (await client.program.account.registrar.fetch(
     registrarPk

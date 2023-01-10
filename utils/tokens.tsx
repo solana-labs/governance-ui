@@ -8,7 +8,6 @@ import {
 import {
   AccountInfo,
   AccountLayout,
-  ASSOCIATED_TOKEN_PROGRAM_ID,
   MintInfo,
   MintLayout,
   Token,

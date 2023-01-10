@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { BN } from '@coral-xyz/anchor'
-import {
-  getTokenOwnerRecordAddress,
-  GoverningTokenRole,
-} from '@solana/spl-governance'
+import { GoverningTokenRole } from '@solana/spl-governance'
 import useRealm from '@hooks/useRealm'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
@@ -17,67 +14,24 @@ import useWalletStore from 'stores/useWalletStore'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import { MintInfo } from '@solana/spl-token'
 import { VotingPowerBox } from './VotingPowerBox'
+import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
 
 export const VotingPowerCard: React.FC<{
   inAccountDetails?: boolean
 }> = ({ inAccountDetails }) => {
   const { fmtUrlWithCluster } = useQueryContext()
   const [hasGovPower, setHasGovPower] = useState(false)
-  const [tokenOwnerRecordPk, setTokenOwnerRecordPk] = useState('')
-  const {
-    councilMint,
-    ownTokenRecord,
-    mint,
-    realm,
-    symbol,
-    config,
-  } = useRealm()
-  const [wallet] = useWalletStore((s) => [s.current])
+  const { councilMint, ownTokenRecord, mint, symbol } = useRealm()
+  const [wallet, connected] = useWalletStore((s) => [s.current, s.connected])
   const councilDepositVisible = !!councilMint
-
-  useEffect(() => {
-    const getTokenOwnerRecord = async () => {
-      const defaultMint =
-        !mint?.supply.isZero() ||
-        config?.account.communityTokenConfig.maxVoterWeightAddin
-          ? realm!.account.communityMint
-          : !councilMint?.supply.isZero()
-          ? realm!.account.config.councilMint
-          : undefined
-
-      const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
-        realm!.owner,
-        realm!.pubkey,
-        defaultMint!,
-        ownTokenRecord!.account.governingTokenOwner
-      )
-      setTokenOwnerRecordPk(tokenOwnerRecordAddress.toBase58())
-    }
-
-    if (realm && wallet?.connected && ownTokenRecord) {
-      getTokenOwnerRecord()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    realm?.pubkey.toBase58(),
-    wallet?.connected,
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    ownTokenRecord?.account.governingTokenOwner.toBase58(),
-  ])
+  const { data: tokenOwnerRecordPk } = useAddressQuery_CommunityTokenOwner()
 
   const isLoading = !mint || !councilMint
-
-  const isConnected =
-    wallet &&
-    ownTokenRecord &&
-    wallet.connected &&
-    wallet.publicKey &&
-    ownTokenRecord.account.governingTokenOwner
-
   const isSameWallet =
-    isConnected &&
-    wallet!.publicKey!.equals(ownTokenRecord!.account.governingTokenOwner)
+    (connected && !ownTokenRecord) ||
+    (connected &&
+      ownTokenRecord &&
+      wallet!.publicKey!.equals(ownTokenRecord!.account.governingTokenOwner))
 
   return (
     <>
@@ -90,7 +44,7 @@ export const VotingPowerCard: React.FC<{
         >
           <a
             className={`default-transition flex items-center text-fgd-2 text-sm transition-all hover:text-fgd-3 ${
-              !isConnected || !tokenOwnerRecordPk
+              !connected || !tokenOwnerRecordPk
                 ? 'opacity-50 pointer-events-none'
                 : ''
             }`}
@@ -102,17 +56,17 @@ export const VotingPowerCard: React.FC<{
       </div>
       {!isLoading ? (
         <>
-          {!hasGovPower && !inAccountDetails && isConnected && (
+          {!hasGovPower && !inAccountDetails && connected && (
             <div className={'text-xs text-white/50 mt-8'}>
               You do not have any governance power in this dao
             </div>
           )}
-          {!isConnected && (
+          {!connected && (
             <div className={'text-xs text-white/50 mt-8'}>
               Connect your wallet to see governance power
             </div>
           )}
-          {isConnected && (
+          {connected && (
             <TokenDepositLock
               mint={mint}
               setHasGovPower={setHasGovPower}

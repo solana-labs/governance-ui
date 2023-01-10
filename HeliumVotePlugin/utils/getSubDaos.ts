@@ -1,7 +1,7 @@
 import { AnchorProvider, Program } from '@coral-xyz/anchor'
-import { keypairIdentity, Metaplex } from '@metaplex-foundation/js'
+import { Metaplex } from '@metaplex-foundation/js'
 import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes'
-import { Connection, Keypair, PublicKey } from '@solana/web3.js'
+import { Connection, PublicKey } from '@solana/web3.js'
 import { SubDaoWithMeta } from '../sdk/types'
 import { PROGRAM_ID, init, daoKey } from '@helium/helium-sub-daos-sdk'
 import { HNT_MINT } from '@helium/spl-utils'
@@ -16,8 +16,7 @@ export const getSubDaos = async (
     const idl = await Program.fetchIdl(programId, provider)
     const hsdProgram = await init(provider as any, programId, idl)
 
-    const keypair = Keypair.generate()
-    const metaplex = new Metaplex(connection).use(keypairIdentity(keypair))
+    const metaplex = new Metaplex(connection)
     const dao = await daoKey(HNT_MINT, programId)[0]
     const subdaos = await hsdProgram.account.subDaoV0.all([
       {

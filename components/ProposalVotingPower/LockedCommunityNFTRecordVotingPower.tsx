@@ -103,10 +103,10 @@ export default function LockedCommunityNFTRecordVotingPower(props: Props) {
   }
 
   const isSameWallet =
-    wallet &&
-    wallet.publicKey &&
-    ownTokenRecord &&
-    wallet.publicKey.equals(ownTokenRecord.account.governingTokenOwner)
+    (connected && !ownTokenRecord) ||
+    (connected &&
+      ownTokenRecord &&
+      wallet!.publicKey!.equals(ownTokenRecord!.account.governingTokenOwner))
 
   return (
     <div className={`${props.className} -mt-10`}>
