@@ -336,13 +336,13 @@ export const LockTokensAccount: React.FC<{
             >
               {!isLoading &&
                 positions
-                  .sort((a, b) => {
-                    return a.hasGenesisMultiplier
-                      ? -1
-                      : a.lockup.endTs.lt(b.lockup.endTs)
-                      ? 1
-                      : 0
-                  })
+                  .sort((a, b) =>
+                    a.hasGenesisMultiplier
+                      ? b.hasGenesisMultiplier
+                        ? 0
+                        : -1
+                      : 1
+                  )
                   .map((pos, idx) => (
                     <PositionCard
                       key={idx}
