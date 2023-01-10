@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from 'react'
+import React, { useCallback, useState, useMemo } from 'react'
 import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
@@ -45,9 +45,6 @@ export const PositionCard: React.FC<PositionCardProps> = ({
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
   const [isExtendModalOpen, setIsExtendModalOpen] = useState(false)
   const [isDelegateModalOpen, setIsDelegateModalOpen] = useState(false)
-  const [transferablePositions, setTransferablePositions] = useState<
-    PositionWithMeta[]
-  >([])
   const { realm, realmInfo } = useRealm()
   const [isLoading, positions, getPositions] = useHeliumVsrStore((s) => [
     s.state.isLoading,
@@ -63,6 +60,36 @@ export const PositionCard: React.FC<PositionCardProps> = ({
     s.state.heliumVsrClient,
     s.state.heliumVsrRegistrar,
   ])
+
+  const transferablePositions: PositionWithMeta[] = useMemo(() => {
+    if (!unixNow || !positions.length) {
+      return []
+    }
+
+    const lockup = position.lockup
+    const lockupKind = Object.keys(lockup.kind)[0]
+    const positionLockupPeriodInDays = secsToDays(
+      lockupKind === 'constant'
+        ? lockup.endTs.sub(lockup.startTs).toNumber()
+        : lockup.endTs.sub(new BN(unixNow || 0)).toNumber()
+    )
+
+    return positions.filter((pos) => {
+      const lockup = pos.lockup
+      const lockupKind = Object.keys(lockup.kind)[0]
+      const lockupPeriodInDays = secsToDays(
+        lockupKind === 'constant'
+          ? lockup.endTs.sub(lockup.startTs).toNumber()
+          : lockup.endTs.sub(new BN(unixNow)).toNumber()
+      )
+
+      return (
+        !pos.hasGenesisMultiplier &&
+        !position.pubkey.equals(pos.pubkey) &&
+        lockupPeriodInDays >= positionLockupPeriodInDays
+      )
+    })
+  }, [position, unixNow, positions])
 
   const {
     loading: isExtending,
@@ -105,36 +132,6 @@ export const PositionCard: React.FC<PositionCardProps> = ({
     wallet,
     { fetchRealm, fetchWalletTokenAccounts },
   ] = useWalletStore((s) => [s.connection.current, s.current, s.actions])
-
-  useEffect(() => {
-    if (position && unixNow && positions.length > 0) {
-      const lockup = position.lockup
-      const lockupKind = Object.keys(lockup.kind)[0]
-      const positionLockupPeriodInDays = secsToDays(
-        lockupKind === 'constant'
-          ? lockup.endTs.sub(lockup.startTs).toNumber()
-          : lockup.endTs.sub(new BN(unixNow || 0)).toNumber()
-      )
-
-      setTransferablePositions(
-        positions.filter((pos) => {
-          const lockup = pos.lockup
-          const lockupKind = Object.keys(lockup.kind)[0]
-          const lockupPeriodInDays = secsToDays(
-            lockupKind === 'constant'
-              ? lockup.endTs.sub(lockup.startTs).toNumber()
-              : lockup.endTs.sub(new BN(unixNow)).toNumber()
-          )
-
-          return (
-            !pos.hasGenesisMultiplier &&
-            !position.pubkey.equals(pos.pubkey) &&
-            lockupPeriodInDays >= positionLockupPeriodInDays
-          )
-        })
-      )
-    }
-  }, [position, unixNow, positions, setTransferablePositions])
 
   const { lockup, hasGenesisMultiplier, votingMint } = position
   const lockupKind = Object.keys(lockup.kind)[0] as string

@@ -25,16 +25,12 @@ export const LockCommunityTokensBtn: React.FC<{
     ? "You don't have any governance tokens in your wallet to lock."
     : ''
 
-  const handleOnClick = () => {
-    onClick()
-  }
-
   return (
     <SecondaryButton
       tooltipMessage={tooltipContent}
       className={className}
       disabled={!connected || !hasTokensInWallet}
-      onClick={handleOnClick}
+      onClick={onClick}
     >
       <div className="flex items-center">
         <LockClosedIcon className="h-5 mr-1.5 w-5" />
