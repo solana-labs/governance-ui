@@ -36,7 +36,6 @@ import {
   getNftVoteRecordProgramAddress,
   getUsedNftsForProposal,
 } from 'NftVotePlugin/accounts'
-import { getAssociatedTokenAddress } from '@utils/tokens'
 import { PositionWithMeta } from 'HeliumVotePlugin/sdk/types'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import {
@@ -48,6 +47,7 @@ import {
 import { getUnusedPositionsForProposal } from 'HeliumVotePlugin/utils/getUnusedPositionsForProposal'
 import { getUsedPositionsForProposal } from 'HeliumVotePlugin/utils/getUsedPositionsForProposal'
 import { getConnectionContext } from '@utils/connection'
+import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
 
 type UpdateVoterWeightRecordTypes =
   | 'castVote'

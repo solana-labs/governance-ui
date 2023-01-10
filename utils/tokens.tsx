@@ -8,7 +8,6 @@ import {
 import {
   AccountInfo,
   AccountLayout,
-  ASSOCIATED_TOKEN_PROGRAM_ID,
   MintInfo,
   MintLayout,
   Token,
@@ -527,24 +526,6 @@ export const deserializeMint = (data: Buffer) => {
   }
 
   return mintInfo as MintInfo
-}
-
-export async function getAssociatedTokenAddress(
-  mint: PublicKey,
-  owner: PublicKey,
-  allowOwnerOffCurve = false,
-  programId = TOKEN_PROGRAM_ID,
-  associatedTokenProgramId = ASSOCIATED_TOKEN_PROGRAM_ID
-): Promise<PublicKey> {
-  if (!allowOwnerOffCurve && !PublicKey.isOnCurve(owner.toBuffer()))
-    throw new Error('Token Owner Off Curve')
-
-  const [address] = await PublicKey.findProgramAddress(
-    [owner.toBuffer(), programId.toBuffer(), mint.toBuffer()],
-    associatedTokenProgramId
-  )
-
-  return address
 }
 
 export const getNfts = (
