@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
+import { useAsync } from 'react-async-hook'
 import { BN } from '@coral-xyz/anchor'
 import {
   LightningBoltIcon,
@@ -92,7 +93,7 @@ export const LockTokensAccount: React.FC<{
     s.getPositions,
   ])
 
-  const handleGetPositions = useCallback(async () => {
+  useAsync(async () => {
     try {
       if (
         config?.account.communityTokenConfig.voterWeightAddin &&
@@ -117,14 +118,7 @@ export const LockTokensAccount: React.FC<{
         message: 'Unable to fetch positions',
       })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [])
-
-  useEffect(() => {
-    ;(async () => {
-      await handleGetPositions()
-    })()
-  }, [isOwnerOfPositions, vsrClient, handleGetPositions])
+  }, [isOwnerOfPositions, vsrClient])
 
   useEffect(() => {
     const getTokenOwnerRecord = async () => {
