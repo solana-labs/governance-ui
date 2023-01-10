@@ -3,7 +3,6 @@ import { getTokenOwnerRecordAddress } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
 import useWalletStore from 'stores/useWalletStore'
-import { truthy } from '@utils/truthy'
 
 export const useAddressQuery_CouncilTokenOwner = () => {
   const { realm } = useRealm()
@@ -34,10 +33,11 @@ export const useAddressQuery_CommunityTokenOwner = () => {
   )
 
   // if we have a community token delegator selected (this is rare), use that. otherwise use user wallet.
-  const owner = truthy(selectedCommunityDelegator)
-    ? new PublicKey(selectedCommunityDelegator)
-    : // I wanted to eliminate `null` as a possible type
-      wallet?.publicKey ?? undefined
+  const owner =
+    selectedCommunityDelegator !== undefined
+      ? new PublicKey(selectedCommunityDelegator)
+      : // I wanted to eliminate `null` as a possible type
+        wallet?.publicKey ?? undefined
 
   return useAddressQuery_TokenOwnerRecord(
     realm?.owner,

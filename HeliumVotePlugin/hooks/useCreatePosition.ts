@@ -12,7 +12,6 @@ import {
 import { useAsyncCallback } from 'react-async-hook'
 import { positionKey } from '@helium/voter-stake-registry-sdk'
 import { sendTransaction } from '@utils/send'
-import { truthy } from '@utils/truthy'
 import useRealm from '@hooks/useRealm'
 import { LockupKind } from 'HeliumVotePlugin/components/LockTokensModal'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
@@ -126,7 +125,7 @@ export const useCreatePosition = () => {
           transaction: tx,
           wallet,
           connection: connection.current,
-          signers: [mintKeypair].filter(truthy),
+          signers: [mintKeypair].filter(Boolean),
           sendingMessage: `Locking`,
           successMessage: `Locking successful`,
         })
