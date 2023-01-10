@@ -310,10 +310,10 @@ export const PositionCard: React.FC<PositionCardProps> = ({
             </h3>
           </div>
           <div
-            className="p-4 rounded-lg flex flex-col h-full"
-            style={{ minHeight: '220px' }}
+            className="p-4 rounded-lg flex flex-col h-full w-full"
+            style={{ minHeight: '290px' }}
           >
-            <div className="flex flex-row flex-wrap mb-4">
+            <div className="flex flex-wrap mb-4">
               <CardLabel
                 label="Lockup Type"
                 value={lockupKind.charAt(0).toUpperCase() + lockupKind.slice(1)}
