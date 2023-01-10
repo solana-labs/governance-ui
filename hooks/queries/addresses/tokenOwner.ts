@@ -12,10 +12,10 @@ export const useAddressQuery_CouncilTokenOwner = () => {
   )
 
   // if we have a council token delegator selected (this is rare), use that. otherwise use user wallet.
-  const owner =
-    selectedCouncilDelegator !== undefined
-      ? new PublicKey(selectedCouncilDelegator)
-      : wallet?.publicKey ?? undefined
+  // eslint-disable-next-line no-extra-boolean-cast
+  const owner = !!selectedCouncilDelegator
+    ? new PublicKey(selectedCouncilDelegator)
+    : wallet?.publicKey ?? undefined
 
   return useAddressQuery_TokenOwnerRecord(
     realm?.owner,
