@@ -34,6 +34,7 @@ import useSwitchboardPluginStore from 'SwitchboardVotePlugin/store/switchboardSt
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import { BN } from '@coral-xyz/anchor'
 import { PublicKey } from '@solana/web3.js'
+import { useVsrMode } from './useVsrMode'
 
 export default function useRealm() {
   const router = useRouter()
@@ -222,12 +223,7 @@ export default function useRealm() {
     ownCouncilTokenRecord &&
     ownCouncilTokenRecord?.account.outstandingProposalCount >=
       realmCfgMaxOutstandingProposalCount
-  //based on realm config it will provide proper tokenBalanceCardComponent
-  const isDefaultVsrMode =
-    currentPluginPk && vsrPluginsPks.includes(currentPluginPk?.toBase58())
-  const isHeliumVsrMode =
-    currentPluginPk && heliumVsrPluginsPks.includes(currentPluginPk?.toBase58())
-
+  const vsrMode = useVsrMode()
   const isNftMode =
     currentPluginPk && nftPluginsPks.includes(currentPluginPk?.toBase58())
   const pythVotingPower = pythVoterWeight?.toBN() || new BN(0)
@@ -265,8 +261,7 @@ export default function useRealm() {
     ownDelegateCouncilTokenRecords,
     config,
     currentPluginPk,
-    isDefaultVsrMode,
-    isHeliumVsrMode,
+    vsrMode,
     isNftMode,
   }
 }

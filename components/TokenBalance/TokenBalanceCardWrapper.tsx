@@ -7,9 +7,7 @@ import useQueryContext from '@hooks/useQueryContext'
 import {
   gatewayPluginsPks,
   nftPluginsPks,
-  vsrPluginsPks,
   switchboardPluginsPks,
-  heliumVsrPluginsPks,
 } from '@hooks/useVotingPlugins'
 import GatewayCard from '@components/Gateway/GatewayCard'
 import ClaimUnreleasedNFTs from './ClaimUnreleasedNFTs'
@@ -79,15 +77,10 @@ const TokenBalanceCardWrapper = ({
     config,
     ownCouncilTokenRecord,
     councilTokenAccount,
+    vsrMode,
   } = useRealm()
   const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin
   const getTokenBalanceCard = () => {
-    //based on realm config it will provide proper tokenBalanceCardComponent
-    const isDefaultVsrMode =
-      currentPluginPk && vsrPluginsPks.includes(currentPluginPk?.toBase58())
-    const isHeliumVsrMode =
-      currentPluginPk &&
-      heliumVsrPluginsPks.includes(currentPluginPk?.toBase58())
     const isNftMode =
       currentPluginPk && nftPluginsPks.includes(currentPluginPk?.toBase58())
     const isGatewayMode =
@@ -97,7 +90,7 @@ const TokenBalanceCardWrapper = ({
       switchboardPluginsPks.includes(currentPluginPk?.toBase58())
 
     if (
-      isDefaultVsrMode &&
+      vsrMode === 'default' &&
       (!ownTokenRecord ||
         ownTokenRecord.account.governingTokenDepositAmount.isZero())
     ) {
@@ -105,7 +98,7 @@ const TokenBalanceCardWrapper = ({
     }
 
     if (
-      isHeliumVsrMode &&
+      vsrMode === 'helium' &&
       (!ownTokenRecord ||
         ownTokenRecord.account.governingTokenDepositAmount.isZero())
     ) {
