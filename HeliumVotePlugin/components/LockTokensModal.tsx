@@ -266,12 +266,13 @@ export const LockTokensModal: React.FC<{
                     setValue('lockupPeriodInDays', Number(value))
                   }}
                   onBlur={({ target: { value } }) => {
+                    const val = Number(value)
                     setValue(
                       'lockupPeriodInDays',
-                      value > minLockupTimeInDays
-                        ? value > maxLockupTimeInDays
+                      val > minLockupTimeInDays
+                        ? val > maxLockupTimeInDays
                           ? maxLockupTimeInDays
-                          : value
+                          : val
                         : minLockupTimeInDays
                     )
                   }}
