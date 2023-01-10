@@ -1,6 +1,6 @@
-import { AnchorProvider, Program } from '@project-serum/anchor'
+import { AnchorProvider, Program } from '@coral-xyz/anchor'
 import { keypairIdentity, Metaplex } from '@metaplex-foundation/js'
-import { bs58 } from '@project-serum/anchor/dist/cjs/utils/bytes'
+import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import { SubDaoWithMeta } from '../sdk/types'
 import { PROGRAM_ID, init, daoKey } from '@helium/helium-sub-daos-sdk'

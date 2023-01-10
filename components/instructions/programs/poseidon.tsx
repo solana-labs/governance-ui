@@ -1,4 +1,4 @@
-import { BN, web3 } from '@project-serum/anchor'
+import { BN, web3 } from '@coral-xyz/anchor'
 import { AccountMetaData } from '@solana/spl-governance'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
 import tokenPriceService from '@utils/services/tokenPrice'

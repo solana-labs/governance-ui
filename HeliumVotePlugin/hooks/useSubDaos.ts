@@ -1,5 +1,5 @@
 import useWallet from '@hooks/useWallet'
-import { web3 } from '@project-serum/anchor'
+import { web3 } from '@coral-xyz/anchor'
 import { useAsync, UseAsyncReturn } from 'react-async-hook'
 import { SubDaoWithMeta } from '../sdk/types'
 import { PROGRAM_ID } from '@helium/helium-sub-daos-sdk'

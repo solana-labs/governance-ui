@@ -1,4 +1,4 @@
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { MintLayout, Token, TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { withCreateTokenOwnerRecord } from '@solana/spl-governance'
 import useWallet from '@hooks/useWallet'

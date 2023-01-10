@@ -1,5 +1,5 @@
 import create, { State } from 'zustand'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { ProgramAccount } from '@solana/spl-governance'
 import { PositionWithMeta } from 'HeliumVotePlugin/sdk/types'
 import {

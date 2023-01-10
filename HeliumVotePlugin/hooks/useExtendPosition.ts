@@ -1,5 +1,5 @@
 import useWallet from '@hooks/useWallet'
-import { Program } from '@project-serum/anchor'
+import { Program } from '@coral-xyz/anchor'
 import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 import { useAsyncCallback } from 'react-async-hook'
 import { sendTransaction } from '@utils/send'

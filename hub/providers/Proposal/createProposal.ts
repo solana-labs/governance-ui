@@ -1,4 +1,4 @@
-import { Wallet } from '@project-serum/anchor';
+import { Wallet } from '@coral-xyz/anchor';
 import {
   serializeInstructionToBase64,
   getGovernance,

@@ -1,4 +1,4 @@
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { calcMultiplier } from './calcLockupMultiplier'
 import { Position, VotingMintConfig, Registrar, LockupKind } from '../sdk/types'
 

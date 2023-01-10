@@ -1,5 +1,5 @@
 import { PublicKey } from '@solana/web3.js'
-import { BN, IdlAccounts, IdlTypes } from '@project-serum/anchor'
+import { BN, IdlAccounts, IdlTypes } from '@coral-xyz/anchor'
 import { VoterStakeRegistry as HeliumVoterStakeRegistry } from '@helium/idls/lib/types/voter_stake_registry'
 import { HeliumSubDaos } from '@helium/idls/lib/types/helium_sub_daos'
 import { TokenProgramAccount } from '@utils/tokens'

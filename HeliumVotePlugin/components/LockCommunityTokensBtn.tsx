@@ -1,5 +1,5 @@
 import React from 'react'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { LockClosedIcon } from '@heroicons/react/solid'
 import useRealm from '@hooks/useRealm'
 import { SecondaryButton } from '@components/Button'

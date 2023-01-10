@@ -1,4 +1,4 @@
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { keypairIdentity, Metaplex } from '@metaplex-foundation/js'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import { registrarKey, positionKey } from '@helium/voter-stake-registry-sdk'
