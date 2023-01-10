@@ -14,6 +14,7 @@ import {
   LockupType,
   Registrar,
   Voter,
+  Deposit,
 } from 'VoteStakeRegistry/sdk/accounts'
 import { tryGetVoter, tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
@@ -425,4 +426,19 @@ export const getLockTokensVotingPowerPerWallet = async (
     return votingPowerObj
   }
   return {}
+}
+
+export const getDepositType = (deposit: Deposit): LockupType => {
+  if (typeof deposit.lockup.kind.monthly !== 'undefined') {
+    return 'monthly'
+  } else if (typeof deposit.lockup.kind.cliff !== 'undefined') {
+    return 'cliff'
+  } else if (typeof deposit.lockup.kind.constant !== 'undefined') {
+    return 'constant'
+  } else if (typeof deposit.lockup.kind.daily !== 'undefined') {
+    return 'daily'
+  } else if (typeof deposit.lockup.kind.none !== 'undefined') {
+    return 'none'
+  }
+  return 'none'
 }
