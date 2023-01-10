@@ -15,8 +15,8 @@ import { BN } from '@coral-xyz/anchor'
 import Link from 'next/link'
 import useQueryContext from '@hooks/useQueryContext'
 import InlineNotification from '@components/InlineNotification'
-import { getTokenOwnerRecordAddress } from '@solana/spl-governance'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
 
 interface Props {
   className?: string
@@ -25,18 +25,10 @@ interface Props {
 export default function LockedCommunityNFTRecordVotingPower(props: Props) {
   const { fmtUrlWithCluster } = useQueryContext()
   const [amount, setAmount] = useState(new BigNumber(0))
-  const {
-    councilMint,
-    mint,
-    realm,
-    ownTokenRecord,
-    realmTokenAccount,
-    symbol,
-    config,
-  } = useRealm()
+  const { mint, realm, ownTokenRecord, realmTokenAccount, symbol } = useRealm()
   const { proposal } = useProposal()
   const [connected, wallet] = useWalletStore((s) => [s.connected, s.current])
-  const [tokenOwnerRecordPk, setTokenOwnerRecordPk] = useState('')
+  const { data: tokenOwnerRecordPk } = useAddressQuery_CommunityTokenOwner()
   const [currentClient] = useVotePluginsClientStore((s) => [
     s.state.currentRealmVotingClient,
   ])
@@ -65,35 +57,6 @@ export default function LockedCommunityNFTRecordVotingPower(props: Props) {
       setAmount(getMintDecimalAmount(mint, votingPower))
     }
   }, [mint, votingPower])
-
-  useEffect(() => {
-    const getTokenOwnerRecord = async () => {
-      const defaultMint =
-        !mint?.supply.isZero() ||
-        config?.account.communityTokenConfig.maxVoterWeightAddin
-          ? realm!.account.communityMint
-          : !councilMint?.supply.isZero()
-          ? realm!.account.config.councilMint
-          : undefined
-      const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
-        realm!.owner,
-        realm!.pubkey,
-        defaultMint!,
-        ownTokenRecord!.account.governingTokenOwner
-      )
-      setTokenOwnerRecordPk(tokenOwnerRecordAddress.toBase58())
-    }
-    if (realm && wallet?.connected && ownTokenRecord) {
-      getTokenOwnerRecord()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    realm?.pubkey.toBase58(),
-    wallet?.connected,
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    ownTokenRecord?.account.governingTokenOwner.toBase58(),
-  ])
 
   const isLoading = loadingPositions || !(votingPower && mint)
   const communityMint = realm?.account.communityMint

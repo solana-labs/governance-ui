@@ -147,6 +147,7 @@ export const LockTokensAccount: React.FC<{
         tokenOwnerRecordAddress.toBase58() === tokenOwnerRecordPk
       )
     }
+
     if (realm && wallet?.connected) {
       getTokenOwnerRecord()
     }
