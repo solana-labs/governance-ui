@@ -223,7 +223,7 @@
     "ogImage": "/realms/SOLDCDAO/img/NEWSOLDCDAO.png"
   },
   {
-    "symbol": "Helium",
+    "symbol": "HNT",
     "displayName": "Helium DAO",
     "programId": "hgovkRU6Ghe1Qoyb54HdSLdqN7VtxaifBzRmh9jtd3S",
     "realmId": "2VfPJn8ML1hNBnsEBo7SzmG11UJc7gbY8b23A3K8expd",
@@ -232,7 +232,7 @@
     "ogImage": "/realms/Helium/img/logo.svg"
   },
   {
-    "symbol": "HeliumIOT",
+    "symbol": "IOT",
     "displayName": "Helium IOT DAO",
     "programId": "hgovkRU6Ghe1Qoyb54HdSLdqN7VtxaifBzRmh9jtd3S",
     "realmId": "8UQNtD5Zw8ijB7ZpGiPLodKXMxtVyQmtu1AEztd3p6Po",
@@ -241,7 +241,7 @@
     "ogImage": "/realms/Helium/img/iotlogo.png"
   },
   {
-    "symbol": "HeliumMOBILE",
+    "symbol": "MOBILE",
     "displayName": "Helium MOBILE DAO",
     "programId": "hgovkRU6Ghe1Qoyb54HdSLdqN7VtxaifBzRmh9jtd3S",
     "realmId": "8itzNAn1kMZ5sf18dVd8gGykztWZLVT93Svbdt7Gn2NP",
