@@ -5,16 +5,14 @@ const relativeTime = require('dayjs/plugin/relativeTime')
 
 import { abbreviateAddress } from '@hub/lib/abbreviateAddress'
 
-const votePrecision = 10000
 export const calculatePct = (c = new BN(0), total?: BN) => {
   if (total?.isZero()) {
     return 0
   }
 
-  return c
-    .mul(new BN(votePrecision))
+  return new BN(100)
+    .mul(c)
     .div(total ?? new BN(1))
-    .mul(new BN(100).div(new BN(votePrecision)))
     .toNumber()
 }
 
