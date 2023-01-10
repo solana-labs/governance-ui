@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import BigNumber from 'bignumber.js'
 import * as yup from 'yup'
 
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import {
   Governance,
   ProgramAccount,

@@ -19,7 +19,6 @@ import TransactionLoader from '@components/TransactionLoader'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useHydrateStore from '@hooks/useHydrateStore'
-import useMarketStore from 'Strategies/store/marketStore'
 import useMembers from '@components/Members/useMembers'
 import useRealm from '@hooks/useRealm'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
@@ -27,9 +26,9 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
 import NftVotingCountingModal from '@components/NftVotingCountingModal'
 import { getResourcePathPart } from '@tools/core/resources'
-import useInitWallet from '@hooks/useInitWallet'
 import queryClient from '@hooks/queries/queryClient'
 import useSerumGovStore from 'stores/useSerumGovStore'
+import { WalletProvider } from '@hub/providers/Wallet'
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -61,7 +60,6 @@ interface Props {
 
 export function App(props: Props) {
   useHydrateStore()
-  useInitWallet()
   handleRouterHistory()
   useVotingPlugins()
   handleGovernanceAssetsStore()
@@ -69,7 +67,6 @@ export function App(props: Props) {
   useEffect(() => {
     tokenPriceService.fetchSolanaTokenList()
   }, [])
-  const { loadMarket } = useMarketStore()
   const { governedTokenAccounts } = useGovernanceAssets()
   const possibleNftsAccounts = governedTokenAccounts.filter(
     (x) => x.isSol || x.isNft
@@ -100,13 +97,6 @@ export function App(props: Props) {
     `/realms/${getResourcePathPart(
       symbol as string
     )}/favicon.ico?v=${Date.now()}`
-
-  useEffect(() => {
-    if (realm?.pubkey) {
-      loadMarket(connection, connection.cluster)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [connection.cluster, realm?.pubkey.toBase58()])
 
   useEffect(() => {
     if (
@@ -250,13 +240,15 @@ export function App(props: Props) {
         <QueryClientProvider client={queryClient}>
           <ThemeProvider defaultTheme="Dark">
             <WalletIdentityProvider appName={'Realms'}>
-              <GatewayProvider>
-                <NavBar />
-                <Notifications />
-                <TransactionLoader></TransactionLoader>
-                <NftVotingCountingModal />
-                <PageBodyContainer>{props.children}</PageBodyContainer>
-              </GatewayProvider>
+              <WalletProvider>
+                <GatewayProvider>
+                  <NavBar />
+                  <Notifications />
+                  <TransactionLoader></TransactionLoader>
+                  <NftVotingCountingModal />
+                  <PageBodyContainer>{props.children}</PageBodyContainer>
+                </GatewayProvider>
+              </WalletProvider>
             </WalletIdentityProvider>
           </ThemeProvider>
         </QueryClientProvider>

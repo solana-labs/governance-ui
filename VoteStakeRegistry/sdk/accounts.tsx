@@ -1,4 +1,4 @@
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
 import { TokenProgramAccount } from '@utils/tokens'
@@ -19,7 +19,7 @@ export interface VotingMint {
   mint: PublicKey
 }
 
-export type LockupType = 'none' | 'monthly' | 'cliff' | 'constant' | 'daily' //there is also daily type but not used on ui yet
+export type LockupType = 'none' | 'monthly' | 'cliff' | 'constant' | 'daily'
 export interface Registrar {
   governanceProgramId: PublicKey
   realm: PublicKey

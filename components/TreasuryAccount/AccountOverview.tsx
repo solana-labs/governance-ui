@@ -1,10 +1,6 @@
 import Button, { LinkButton } from '@components/Button'
 import { getExplorerUrl } from '@components/explorer/tools'
-import {
-  getAccountName,
-  WSOL_MINT,
-  WSOL_MINT_PK,
-} from '@components/instructions/tools'
+import { getAccountName, WSOL_MINT } from '@components/instructions/tools'
 import Modal from '@components/Modal'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
@@ -31,15 +27,8 @@ import useStrategiesStore from 'Strategies/store/useStrategiesStore'
 import DepositModal from 'Strategies/components/DepositModal'
 import { SolendStrategy, TreasuryStrategy } from 'Strategies/types/types'
 import BigNumber from 'bignumber.js'
-import { MangoAccount } from '@blockworks-foundation/mango-client'
-import {
-  calculateAllDepositsInMangoAccountsForMint,
-  MANGO,
-  tryGetMangoAccountsForOwner,
-} from 'Strategies/protocols/mango/tools'
-import useMarketStore from 'Strategies/store/marketStore'
 import LoadingRows from './LoadingRows'
-import TradeOnSerum, { TradeOnSerumProps } from './TradeOnSerum'
+import TradeOnSerum, { TradeProps } from './Trade'
 import { AccountType } from '@utils/uiTypes/assets'
 import CreateAta from './CreateAta'
 import {
@@ -81,8 +70,6 @@ const AccountOverview = () => {
   const isLoadingRecentActivity = useTreasuryAccountStore(
     (s) => s.isLoadingRecentActivity
   )
-  const market = useMarketStore((s) => s)
-  const [mngoAccounts, setMngoAccounts] = useState<MangoAccount[]>([])
   const [openNftDepositModal, setOpenNftDepositModal] = useState(false)
   const [openCommonSendModal, setOpenCommonSendModal] = useState(false)
   const [openMsolConvertModal, setOpenMsolConvertModal] = useState(false)
@@ -99,10 +86,7 @@ const AccountOverview = () => {
     setProposedInvestment,
   ] = useState<InvestmentType | null>(null)
   const [isCopied, setIsCopied] = useState<boolean>(false)
-  const [
-    tradeSerumInfo,
-    setTradeSerumInfo,
-  ] = useState<TradeOnSerumProps | null>(null)
+  const [tradeSerumInfo, setTradeSerumInfo] = useState<TradeProps | null>(null)
   const strategyMint = currentAccount?.isSol
     ? WSOL_MINT
     : currentAccount?.extensions.token?.account.mint.toString()
@@ -166,26 +150,6 @@ const AccountOverview = () => {
       }) as Array<InvestmentType>
     }
 
-    const handleGetMangoAccounts = async () => {
-      const currentAccountMint = currentAccount?.isSol
-        ? WSOL_MINT_PK
-        : currentAccount?.extensions.token?.account.mint
-      const currentPositions = calculateAllDepositsInMangoAccountsForMint(
-        mngoAccounts,
-        currentAccountMint!,
-        market
-      )
-      if (currentPositions > 0) {
-        return strategies
-          .map((invest) => ({
-            ...invest,
-            investedAmount: currentPositions,
-          }))
-          .filter((x) => x.protocolName === MANGO)
-      }
-      return []
-    }
-
     const handleEverlendAccounts = async (): Promise<InvestmentType[]> => {
       const everlendStrategy = visibleInvestments.filter(
         (strat) => strat.protocolName === EVERLEND
@@ -214,9 +178,6 @@ const AccountOverview = () => {
 
     const loadData = async () => {
       const requests = [] as Array<Promise<Array<InvestmentType>>>
-      if (visibleInvestments.filter((x) => x.protocolName === MANGO).length) {
-        requests.push(handleGetMangoAccounts())
-      }
       if (visibleInvestments.filter((x) => x.protocolName === SOLEND).length) {
         requests.push(getSlndCTokens())
       }
@@ -239,19 +200,7 @@ const AccountOverview = () => {
 
     loadData()
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [currentAccount, mngoAccounts, visibleInvestments.length])
-  useEffect(() => {
-    const getMangoAcccounts = async () => {
-      const accounts = await tryGetMangoAccountsForOwner(
-        market,
-        currentAccount!.governance!.pubkey
-      )
-      setMngoAccounts(accounts ? accounts : [])
-    }
-    if (currentAccount) {
-      getMangoAcccounts()
-    }
-  }, [currentAccount, market])
+  }, [currentAccount, visibleInvestments.length])
 
   useEffect(() => {
     if (isCopied) {
@@ -324,16 +273,16 @@ const AccountOverview = () => {
       strategyDescription: '',
       createProposalFcn: () => null,
     }
-    const serumStrategy = {
+    const tradeStrategy = {
       liquidity: 0,
       protocolSymbol: '',
       apy: '',
-      protocolName: 'Serum',
+      protocolName: 'Solana',
       handledMint: '',
       handledTokenSymbol: '',
       handledTokenImgSrc: currentTokenImg,
       protocolLogoSrc:
-        'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt/logo.png',
+        'https://user-images.githubusercontent.com/32071703/149460918-3694084f-2a37-4c95-93d3-b5aaf078d444.png',
       strategyName: 'Trade',
       strategyDescription: '',
       createProposalFcn: () => null,
@@ -358,7 +307,7 @@ const AccountOverview = () => {
           <StrategyCard
             onClick={() => setTradeSerumInfo({ tokenAccount: currentAccount })}
             currentDeposits={0}
-            strat={serumStrategy}
+            strat={tradeStrategy}
           ></StrategyCard>
         )}
       </>
@@ -563,8 +512,6 @@ const AccountOverview = () => {
       {proposedInvestment && (
         <DepositModal
           governedTokenAccount={currentAccount}
-          mangoAccounts={mngoAccounts}
-          currentPosition={proposedInvestment.investedAmount}
           apy={proposedInvestment.apy}
           handledMint={proposedInvestment.handledMint}
           onClose={() => {
@@ -675,6 +622,7 @@ export const StrategyCard = ({
     handledTokenSymbol,
     apy,
     apyHeader,
+    noProtocol,
   } = strat
   const currentPositionFtm = new BigNumber(
     currentDeposits.toFixed(2)
@@ -700,9 +648,9 @@ export const StrategyCard = ({
           <div className="w-8 h-8 mr-3 rounded-full"></div>
         )}
         <div>
-          <p className="text-xs">{`${strategyName} ${handledTokenSymbol} on ${protocolName}${
-            strategySubtext ? ` - ${strategySubtext}` : ''
-          }`}</p>
+          <p className="text-xs">{`${strategyName} ${handledTokenSymbol} ${
+            noProtocol ? '' : `on ${protocolName}`
+          }${strategySubtext ? ` - ${strategySubtext}` : ''}`}</p>
           {(handledTokenSymbol || currentPositionFtm !== '0') && (
             <p className="font-bold text-fgd-1">{`${currentPositionFtm} ${handledTokenSymbol}`}</p>
           )}

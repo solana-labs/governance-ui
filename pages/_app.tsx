@@ -8,6 +8,7 @@ import '../styles/index.css'
 import '../styles/typography.css'
 import '@hub/components/controls/RichTextEditor/index.css'
 import '../components/DropdownMenu/index.css'
+import '@multifarm/solana-realms/dist/multifarm-solana-realms.css'
 
 export default function App({ Component, pageProps, router }: AppProps) {
   // **NOTE**
@@ -22,7 +23,8 @@ export default function App({ Component, pageProps, router }: AppProps) {
 
   if (
     router.pathname.startsWith('/verify-wallet') ||
-    router.pathname.startsWith('/matchday/verify-wallet')
+    router.pathname.startsWith('/matchday/verify-wallet') ||
+    router.pathname.startsWith('/realm/[id]/governance')
   ) {
     return (
       <HubApp minimal>

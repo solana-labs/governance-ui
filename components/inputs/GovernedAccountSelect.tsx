@@ -1,5 +1,5 @@
 import Select from '@components/inputs/Select'
-import { Governance, GovernanceAccountType } from '@solana/spl-governance'
+import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import {
   getMintAccountLabelInfo,
@@ -8,7 +8,7 @@ import {
 } from '@utils/tokens'
 import React, { useEffect } from 'react'
 import { getProgramName } from '@components/instructions/programs/names'
-import { AssetAccount } from '@utils/uiTypes/assets'
+import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 
 const GovernedAccountSelect = ({
   onChange,
@@ -33,7 +33,6 @@ const GovernedAccountSelect = ({
 }) => {
   function getLabel(value: AssetAccount) {
     if (value) {
-      const accountType = value.governance.account.accountType
       if (value.isSol || value.isToken) {
         return getTokenAccountLabelComponent(
           value.isSol
@@ -41,12 +40,10 @@ const GovernedAccountSelect = ({
             : getTokenAccountLabelInfo(value)
         )
       } else {
-        switch (accountType) {
-          case GovernanceAccountType.MintGovernanceV1:
-          case GovernanceAccountType.MintGovernanceV2:
+        switch (value.type) {
+          case AccountType.MINT:
             return getMintAccountLabelComponent(getMintAccountLabelInfo(value))
-          case GovernanceAccountType.ProgramGovernanceV1:
-          case GovernanceAccountType.ProgramGovernanceV2:
+          case AccountType.PROGRAM:
             return getProgramAccountLabel(value.governance)
           default:
             return value.governance.account.governedAccount.toBase58()

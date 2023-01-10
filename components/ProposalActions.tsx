@@ -45,6 +45,7 @@ const ProposalActionsPanel = () => {
   const mainVotingEndedAt = proposal?.account.signingOffAt
     ?.addn(governance?.account.config.maxVotingTime || 0)
     .toNumber()
+
   const votingCoolOffTime = governance?.account.config.votingCoolOffTime || 0
   const canFinalizeAt = mainVotingEndedAt
     ? mainVotingEndedAt + votingCoolOffTime

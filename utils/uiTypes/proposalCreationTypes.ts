@@ -23,7 +23,6 @@ export enum PackageEnum {
   GoblinGold,
   Identity,
   NftPlugin,
-  MangoMarketV3,
   MangoMarketV4,
   MeanFinance,
   PsyFinance,
@@ -387,6 +386,7 @@ export interface MangoMakeChangeReferralFeeParams2 {
   refMngoRequired2: number
 }
 
+/* PsyOptions American options */
 export interface PsyFinanceMintAmericanOptionsForm {
   contractSize: number
   expirationUnixTimestamp: number
@@ -398,6 +398,26 @@ export interface PsyFinanceMintAmericanOptionsForm {
   underlyingMint: PublicKey | undefined
   writerTokenDestinationAccount: string
 }
+
+export interface PsyFinanceBurnWriterForQuote {
+  size: number
+  writerTokenAccount: AssetAccount | undefined
+  quoteDestination: string
+}
+
+export interface PsyFinanceClaimUnderlyingPostExpiration {
+  size: number
+  writerTokenAccount: AssetAccount | undefined
+  underlyingDestination: string
+}
+
+export interface PsyFinanceExerciseOption {
+  size: number
+  optionTokenAccount: AssetAccount | undefined
+  quoteAssetAccount: AssetAccount | undefined
+}
+
+/* End PsyOptions American options */
 
 export interface ForesightHasGovernedAccount {
   governedAccount: AssetAccount
@@ -537,7 +557,6 @@ export interface JoinDAOForm {
 export enum Instructions {
   Base64,
   ChangeMakeDonation,
-  ClaimMangoTokens,
   ClaimPendingDeposit,
   ClaimPendingWithdraw,
   Clawback,
@@ -556,9 +575,8 @@ export enum Instructions {
   DepositIntoGoblinGold,
   DepositIntoVolt,
   DepositReserveLiquidityAndObligationCollateral,
-  DepositToMangoAccount,
-  DepositToMangoAccountCsv,
   DifferValidatorStake,
+  DualFinanceAirdrop,
   DualFinanceExercise,
   DualFinanceStakingOption,
   DualFinanceWithdraw,
@@ -573,26 +591,20 @@ export enum Instructions {
   Grant,
   InitSolendObligationAccount,
   JoinDAO,
-  MangoAddOracle,
-  MangoAddSpotMarket,
-  MangoChangeMaxAccounts,
-  MangoChangePerpMarket,
-  MangoChangeQuoteParams,
-  MangoChangeReferralFeeParams,
-  MangoChangeReferralFeeParams2,
-  MangoChangeSpotMarket,
-  MangoCreatePerpMarket,
-  MangoRemoveOracle,
-  MangoRemovePerpMarket,
-  MangoRemoveSpotMarket,
-  MangoSetMarketMode,
-  MangoSwapSpotMarket,
   MangoV4PerpCreate,
   MangoV4PerpEdit,
-  MangoV4Serum3RegisterMarket,
+  MangoV4OpenBookRegisterMarket,
+  MangoV4OpenBookEditMarket,
   MangoV4TokenEdit,
   MangoV4TokenRegister,
   MangoV4TokenRegisterTrustless,
+  MangoV4GroupEdit,
+  MangoV4IxGateSet,
+  MangoV4AltSet,
+  MangoV4AltExtend,
+  MangoV4StubOracleCreate,
+  MangoV4StubOracleSet,
+  MangoV4TokenAddBank,
   MeanCreateAccount,
   MeanCreateStream,
   MeanFundAccount,
@@ -601,6 +613,9 @@ export enum Instructions {
   Mint,
   None,
   ProgramUpgrade,
+  PsyFinanceBurnWriterForQuote,
+  PsyFinanceClaimUnderlyingPostExpiration,
+  PsyFinanceExerciseOption,
   PsyFinanceMintAmericanOptions,
   RealmConfig,
   RefreshSolendObligation,
@@ -628,6 +643,8 @@ export enum Instructions {
   RemoveKeyFromDID,
   AddServiceToDID,
   RemoveServiceFromDID,
+  RevokeGoverningTokens,
+  SetMintAuthority,
 }
 
 export type createParams = [
@@ -701,6 +718,15 @@ export interface ValidatorWithdrawStakeForm {
   amount: number
 }
 
+export interface DualFinanceAirdropForm {
+  root: string
+  amount: number
+  eligibilityStart: number
+  eligibilityEnd: number
+  amountPerVoter: number
+  treasury: AssetAccount | undefined
+}
+
 export interface DualFinanceStakingOptionForm {
   strike: number
   soName: string | undefined
@@ -724,4 +750,5 @@ export interface DualFinanceExerciseForm {
 export interface DualFinanceWithdrawForm {
   soName: string | undefined
   baseTreasury: AssetAccount | undefined
+  mintPk: string | undefined
 }

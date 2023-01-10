@@ -1,4 +1,4 @@
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 
 export const DAYS_PER_YEAR = 365
 export const SECS_PER_DAY = 86400

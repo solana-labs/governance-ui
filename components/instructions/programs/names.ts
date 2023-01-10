@@ -9,6 +9,7 @@ import { NAME_PROGRAM_ID } from '@bonfida/spl-name-service'
 
 export const GOVERNANCE_PROGRAM_NAMES = {
   GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J: 'Mango Governance Program',
+  FP4PxqHTVzeG2c6eZd7974F9WvKUSdBeduUK3rjYyvBw: 'Mango v4 Program Governance ',
   AVoAYTs36yB5izAaBkxRG67wL1AMwG3vo41hKtUSb8is:
     'Serum Governance Program (Old)',
   G41fmJzd29v7Qmdi8ZyTBBYa98ghh3cwHBTexqCG1PQJ:
@@ -31,6 +32,7 @@ export const PROGRAM_NAMES = {
   TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA: 'Token Program',
   ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL: 'ATA Program',
   '11111111111111111111111111111111': 'System Program',
+  '4MangoMjqJ2firMokCjjGgoK8d4MXcrgL7XJaL3w6fVg': 'Mango v4 Program',
   mv3ekLzLbnVPNxjSKvqBpU3ZeZXPQdEC3bp5MDEBG68: 'Mango v3 Program',
   '9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin': 'Serum v3 Program',
   DESVgJVGajEgKGXhb6XmqDHGz3VjdgP7rEVESBgxmroY: 'Serum v3 Program (devnet)',

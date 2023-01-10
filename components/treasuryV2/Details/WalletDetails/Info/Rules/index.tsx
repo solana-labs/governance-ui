@@ -10,17 +10,18 @@ import {
 } from '@heroicons/react/outline'
 import { VoteTipping } from '@solana/spl-governance'
 import cx from 'classnames'
-import React, { useState } from 'react'
+import React from 'react'
 import { BigNumber } from 'bignumber.js'
+import { useRouter } from 'next/router'
 
 import { formatNumber } from '@utils/formatNumber'
 import { ntext } from '@utils/ntext'
 import { Wallet } from '@models/treasury/Wallet'
-import GovernanceConfigModal from 'pages/dao/[symbol]/params/GovernanceConfigModal'
 import useRealm from '@hooks/useRealm'
 import Tooltip from '@components/Tooltip'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import Address from '@components/Address'
+import useQueryContext from '@hooks/useQueryContext'
 
 import Section from '../../../Section'
 import TokenIcon from '../../../../icons/TokenIcon'
@@ -66,14 +67,26 @@ export function durationStr(duration: number, short = false) {
   return count + (short ? 's' : ' ' + ntext(count, 'second'))
 }
 
+function votingLengthText(time: number) {
+  const hours = time / UNIX_HOUR
+  const days = Math.floor(hours / 24)
+  const remainingHours = (time - days * UNIX_DAY) / UNIX_HOUR
+
+  return (
+    durationStr(days * UNIX_DAY) +
+    (remainingHours ? ` ${durationStr(remainingHours * UNIX_HOUR)}` : '')
+  )
+}
+
 interface Props {
   className?: string
   wallet: Wallet
 }
 
 export default function Rules(props: Props) {
-  const [editRulesOpen, setEditRulesOpen] = useState(false)
-  const { ownVoterWeight } = useRealm()
+  const { ownVoterWeight, symbol } = useRealm()
+  const router = useRouter()
+  const { fmtUrlWithCluster } = useQueryContext()
 
   const programVersion = useProgramVersion()
 
@@ -123,7 +136,15 @@ export default function Rules(props: Props) {
                 'disabled:opacity-50'
               )}
               disabled={!canEditRules}
-              onClick={() => setEditRulesOpen(true)}
+              onClick={() => {
+                if (props.wallet.governanceAccount) {
+                  router.push(
+                    fmtUrlWithCluster(
+                      `/realm/${symbol}/governance/${props.wallet.governanceAccount.pubkey.toBase58()}/edit`
+                    )
+                  )
+                }
+              }}
             >
               <PencilIcon className="h-4 w-4 stroke-primary-light" />
               <div>Edit Rules</div>
@@ -138,8 +159,17 @@ export default function Rules(props: Props) {
               <div className="grid grid-cols-2 gap-8">
                 <Section
                   icon={<CalendarIcon />}
-                  name="Max Voting Time"
-                  value={durationStr(props.wallet.rules.common.maxVotingTime)}
+                  name="Unrestricted Voting Time"
+                  value={votingLengthText(
+                    props.wallet.rules.common.maxVotingTime
+                  )}
+                />
+                <Section
+                  icon={<CalendarIcon />}
+                  name="Voting Cool-Off Time"
+                  value={durationStr(
+                    props.wallet.rules.common.votingCoolOffSeconds
+                  )}
                 />
                 <Section
                   icon={<ClockIcon />}
@@ -262,13 +292,6 @@ export default function Rules(props: Props) {
         </div>
       ) : (
         <div>This Wallet has no rules</div>
-      )}
-      {editRulesOpen && props.wallet.governanceAccount && (
-        <GovernanceConfigModal
-          isProposalModalOpen
-          governance={props.wallet.governanceAccount}
-          closeProposalModal={() => setEditRulesOpen(false)}
-        />
       )}
     </section>
   )

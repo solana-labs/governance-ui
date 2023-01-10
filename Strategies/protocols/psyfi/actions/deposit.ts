@@ -1,4 +1,4 @@
-import { Program } from '@project-serum/anchor'
+import { Program } from '@coral-xyz/anchor'
 import {
   RpcContext,
   serializeInstructionToBase64,

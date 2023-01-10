@@ -1,5 +1,5 @@
-import { BN } from '@project-serum/anchor'
-import { Proposal } from '@solana/spl-governance'
+import { BN } from '@coral-xyz/anchor'
+import { Proposal, ProposalState } from '@solana/spl-governance'
 import { getProposalMaxVoteWeight } from '../models/voteWeights'
 import { calculatePct, fmtTokenAmount } from '../utils/formatting'
 import { useMaxVoteRecord } from './useMaxVoteRecord'
@@ -38,8 +38,11 @@ export default function useProposalVotes(proposal?: Proposal) {
     proposal?.governingTokenMint.toBase58() ===
     realm?.account.communityMint.toBase58()
   const isPluginCommunityVoting = maxVoteRecord && isCommunityVote
+
   const voteThresholdPct = isCommunityVote
     ? governance.config.communityVoteThreshold.value
+      ? governance.config.communityVoteThreshold.value
+      : 0
     : programVersion > 2
     ? governance.config.councilVoteThreshold.value
     : governance.config.communityVoteThreshold.value
@@ -134,8 +137,23 @@ export default function useProposalVotes(proposal?: Proposal) {
       veto: undefined,
     }
 
-  const isPluginCommunityVeto = maxVoteRecord && !isCommunityVote
+  const vetoVoteCount = fmtTokenAmount(
+    proposal.vetoVoteWeight,
+    vetoMintInfo.decimals
+  )
+  // its impossible to accurately know the veto votes required for a finalized, non-vetoed proposal
+  if (proposal.isVoteFinalized() && proposal.state !== ProposalState.Vetoed)
+    return {
+      _programVersion: programVersion,
+      ...results,
+      veto: {
+        votesRequired: undefined,
+        voteCount: vetoVoteCount,
+        voteProgress: undefined,
+      },
+    }
 
+  const isPluginCommunityVeto = maxVoteRecord && !isCommunityVote
   const vetoMaxVoteWeight = isPluginCommunityVeto
     ? maxVoteRecord.account.maxVoterWeight
     : getProposalMaxVoteWeight(
@@ -144,11 +162,6 @@ export default function useProposalVotes(proposal?: Proposal) {
         vetoMintInfo,
         vetoMintPk
       )
-
-  const vetoVoteCount = fmtTokenAmount(
-    proposal.vetoVoteWeight,
-    vetoMintInfo.decimals
-  )
 
   const vetoVoteProgress = calculatePct(
     proposal.vetoVoteWeight,

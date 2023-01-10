@@ -1,4 +1,4 @@
-import { Program, Provider } from '@project-serum/anchor'
+import { Program, Provider } from '@coral-xyz/anchor'
 import { PublicKey, Transaction } from '@solana/web3.js'
 import { Switchboard, IDL } from './SwitchboardIdl'
 //import { NftVoter, IDL } from './nft_voter';

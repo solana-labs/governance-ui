@@ -28,7 +28,7 @@ import {
   closeAccount,
   initializeAccount,
 } from '@project-serum/serum/lib/token-instructions'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { Token } from '@solana/spl-token'
 
 interface StakingOptionArgs {
@@ -144,17 +144,6 @@ export async function getConfigInstruction({
       serializeInstructionToBase64(configInstruction)
     )
 
-    const nameInstruction = await so.createNameTokenInstruction(
-      new BN(form.strike),
-      form.soName,
-      form.payer.extensions.transferAddress!,
-      baseMint
-    )
-    
-    additionalSerializedInstructions.push(
-      serializeInstructionToBase64(nameInstruction)
-    )
-
     const initStrikeInstruction = await so.createInitStrikeInstruction(
       new BN(form.strike),
       form.soName,
@@ -164,6 +153,17 @@ export async function getConfigInstruction({
     )
     additionalSerializedInstructions.push(
       serializeInstructionToBase64(initStrikeInstruction)
+    )
+
+    const nameInstruction = await so.createNameTokenInstruction(
+      new BN(form.strike),
+      form.soName,
+      form.payer.extensions.transferAddress!,
+      baseMint
+    )
+
+    additionalSerializedInstructions.push(
+      serializeInstructionToBase64(nameInstruction)
     )
 
     const soMint = await so.soMint(form.strike, form.soName, baseMint)
@@ -333,23 +333,67 @@ export async function getWithdrawInstruction({
 
   const serializedInstruction = ''
   const additionalSerializedInstructions: string[] = []
+  const prerequisiteInstructions: TransactionInstruction[] = []
+  let helperTokenAccount: Keypair | null = null
   if (isValid && form.soName && form.baseTreasury && wallet?.publicKey) {
     const so = getStakingOptionsApi(connection)
+    const authority = form.baseTreasury.isSol
+      ? form.baseTreasury.extensions.transferAddress
+      : form.baseTreasury.extensions.token!.account.owner!
+    let destination = form.baseTreasury.pubkey
+    if (form.baseTreasury.isSol) {
+      const baseMint = form.mintPk
+      const space = 165
+      const rent = await connection.current.getMinimumBalanceForRentExemption(
+        space,
+        'processed'
+      )
+      //Creating checking account on the fly with given mint
+      //made to be more safe - instructions don't have access to main treasury
+      helperTokenAccount = new Keypair()
+      //run as prerequsite instructions payer is connected wallet
+      prerequisiteInstructions.push(
+        SystemProgram.createAccount({
+          fromPubkey: wallet.publicKey,
+          newAccountPubkey: helperTokenAccount.publicKey,
+          lamports: rent,
+          space: space,
+          programId: TOKEN_PROGRAM_ID,
+        }),
+        //initialized account with same mint as base
+        initializeAccount({
+          account: helperTokenAccount.publicKey,
+          mint: new PublicKey(baseMint!),
+          owner: form.baseTreasury.governance.pubkey,
+        })
+      )
+      destination = helperTokenAccount.publicKey
+    }
 
-    const withdrawInstruction = await so.createWithdrawInstruction(
-      form.soName,
-      form.baseTreasury.extensions.token!.account.owner!,
-      form.baseTreasury.pubkey
-    )
+    const withdrawInstruction = form.baseTreasury.isSol
+      ? await so.createWithdrawInstructionWithMint(
+          form.soName,
+          authority!,
+          destination,
+          new PublicKey(form.mintPk!)
+        )
+      : await so.createWithdrawInstruction(form.soName, authority!, destination)
+
     additionalSerializedInstructions.push(
       serializeInstructionToBase64(withdrawInstruction)
     )
 
     return {
       serializedInstruction,
+      prerequisiteInstructions: prerequisiteInstructions,
+      prerequisiteInstructionsSigners: helperTokenAccount
+        ? [helperTokenAccount]
+        : [],
       isValid: true,
       governance: form.baseTreasury?.governance,
       additionalSerializedInstructions,
+      chunkSplitByDefault: true,
+      chunkBy: 2,
     }
   }
 

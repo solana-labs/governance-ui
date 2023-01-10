@@ -71,7 +71,8 @@ export const createProposal = async (
   proposalIndex: number,
   instructionsData: InstructionDataWithHoldUpTime[],
   isDraft: boolean,
-  client?: VotingClient
+  client?: VotingClient,
+  callbacks?: Parameters<typeof sendTransactionsV3>[0]['callbacks']
 ): Promise<PublicKey> => {
   const instructions: TransactionInstruction[] = []
   const governanceAuthority = walletPubkey
@@ -227,6 +228,7 @@ export const createProposal = async (
     })
 
     await sendTransactionsV3({
+      callbacks,
       connection,
       wallet,
       transactionInstructions: txes,
@@ -279,6 +281,7 @@ export const createProposal = async (
     })
 
     await sendTransactionsV3({
+      callbacks,
       connection,
       wallet,
       transactionInstructions: txes,

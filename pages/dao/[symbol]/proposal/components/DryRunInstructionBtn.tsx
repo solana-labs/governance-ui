@@ -103,7 +103,7 @@ const DryRunInstructionBtn = ({
       </SecondaryButton>
 
       {result?.response && (
-        <Modal onClose={onClose} isOpen={isOpen}>
+        <Modal sizeClassName={'sm:max-w-2xl'} onClose={onClose} isOpen={isOpen}>
           <h2>
             {result?.response.err
               ? 'Simulation error'

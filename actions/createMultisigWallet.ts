@@ -62,7 +62,6 @@ export default async function createMultisigWallet({
       }
     })
 
-    console.log('CREATE MULTISIG WALLET: sending transactions')
     const tx = await sendTransactionsV3({
       connection,
       wallet,

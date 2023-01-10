@@ -18,7 +18,7 @@ import {
   MintInfo,
 } from '@solana/spl-token'
 import { Connection } from '@solana/web3.js'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import {
   nftPluginsPks,
   vsrPluginsPks,
@@ -26,6 +26,7 @@ import {
   gatewayPluginsPks,
 } from '@hooks/useVotingPlugins'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import { validatePubkey } from './formValidation'
 
 // Plugins supported by Realms
 const supportedPlugins = [
@@ -553,6 +554,72 @@ export const getFriktionWithdrawSchema = () => {
   })
 }
 
+export const getDualFinanceGovernanceAirdropSchema = () => {
+  return yup.object().shape({
+    amountPerVoter: yup.number().typeError('Amount per voter is required'),
+    eligibilityStart: yup.number().typeError('Eligibility start is required'),
+    eligibilityEnd: yup.number().typeError('Eligibility end is required'),
+    treasury: yup.object().typeError('Treasury is required'),
+    amount: yup.number().typeError('Amount is required'),
+  })
+}
+
+export const getDualFinanceMerkleAirdropSchema = () => {
+  return yup.object().shape({
+    root: yup
+      .string()
+      .required('Root is required')
+      .test(
+        'destination',
+        'Account validation error',
+        async function (val: string) {
+          if (val) {
+            try {
+              const arr = Uint8Array.from(Buffer.from(val, 'hex'))
+              if (arr.length !== 32) {
+                return this.createError({
+                  message: 'Expected 32 bytes',
+                })
+              }
+              return true
+            } catch (e) {
+              console.log(e)
+            }
+            try {
+              const root = val.split(',').map(function (item) {
+                return parseInt(item, 10)
+              })
+              if (root.length !== 32) {
+                return this.createError({
+                  message: 'Expected 32 bytes',
+                })
+              }
+              for (const byte of root) {
+                if (byte < 0 || byte >= 256) {
+                  return this.createError({
+                    message: 'Invalid byte',
+                  })
+                }
+              }
+              return true
+            } catch (e) {
+              console.log(e)
+            }
+            return this.createError({
+              message: `Could not parse`,
+            })
+          } else {
+            return this.createError({
+              message: `Root is required`,
+            })
+          }
+        }
+      ),
+    treasury: yup.object().typeError('Treasury is required'),
+    amount: yup.number().typeError('Amount is required'),
+  })
+}
+
 export const getDualFinanceStakingOptionSchema = () => {
   return yup.object().shape({
     soName: yup.string().required('Staking option name is required'),
@@ -583,6 +650,11 @@ export const getDualFinanceWithdrawSchema = () => {
   return yup.object().shape({
     soName: yup.string().required('Staking option name is required'),
     baseTreasury: yup.object().typeError('baseTreasury is required'),
+    mintPk: yup
+      .string()
+      .test('is-valid-address1', 'Please enter a valid PublicKey', (value) =>
+        value ? validatePubkey(value) : true
+      ),
   })
 }
 
@@ -799,7 +871,7 @@ export const getMintSchema = ({ form, connection }) => {
             }
           } else {
             return this.createError({
-              message: `Destination account is required`,
+              message: `Invalid destination account`,
             })
           }
         }

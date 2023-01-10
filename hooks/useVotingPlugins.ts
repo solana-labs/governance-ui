@@ -18,7 +18,7 @@ import {
 } from '@solana/spl-governance'
 import { getMaxVoterWeightRecord as getPluginMaxVoterWeightRecord } from '@utils/plugin/accounts'
 import { notify } from '@utils/notifications'
-import * as anchor from '@project-serum/anchor'
+import * as anchor from '@coral-xyz/anchor'
 import * as sbv2 from '@switchboard-xyz/switchboard-v2'
 import sbIdl from 'SwitchboardVotePlugin/switchboard_v2.json'
 import gonIdl from 'SwitchboardVotePlugin/gameofnodes.json'
@@ -64,7 +64,7 @@ export function useVotingPlugins() {
     handleSetHeliumVsrClient,
     handleSetNftClient,
     handleSetGatewayClient,
-    handleSetSwitchboardClient,
+    //handleSetSwitchboardClient,
     handleSetNftRegistrar,
     handleSetGatewayRegistrar,
     handleSetPythClient,
@@ -118,7 +118,7 @@ export function useVotingPlugins() {
     } catch (e) {
       console.log(e)
       notify({
-        message: "Something went wrong can't fetch nfts",
+        message: `Something went wrong can't fetch nfts: ${e}`,
         type: 'error',
       })
     }
@@ -366,7 +366,7 @@ export function useVotingPlugins() {
         handleSetHeliumVsrClient(wallet, connection, currentPluginPk)
       }
       handleSetNftClient(wallet, connection)
-      handleSetSwitchboardClient(wallet, connection)
+      //handleSetSwitchboardClient(wallet, connection)
       handleSetGatewayClient(wallet, connection)
       handleSetPythClient(wallet, connection)
     }
@@ -467,6 +467,8 @@ export function useVotingPlugins() {
         }
       }
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleSwitchboardPlugin = () => {
       if (
         switchboardClient &&
@@ -475,7 +477,6 @@ export function useVotingPlugins() {
       ) {
         // Switchboard: don't think we need this
         //handleSetNftRegistrar(nftClient!, realm)
-        console.log('Switchboard')
         if (connected) {
           handleSetCurrentRealmVotingClient({
             client: switchboardClient,
@@ -496,7 +497,7 @@ export function useVotingPlugins() {
       handleGatewayPlugin()
       handleVsrPlugin()
       handleHeliumVsrPlugin()
-      handleSwitchboardPlugin()
+      //handleSwitchboardPlugin()
       handlePythPlugin()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree

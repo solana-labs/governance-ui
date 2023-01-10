@@ -4,6 +4,7 @@ import classNames from 'classnames'
 import useRealm from '@hooks/useRealm'
 import useRealmGovernance from '../hooks/useRealmGovernance'
 import assertUnreachable from '@utils/typescript/assertUnreachable'
+import { isInCoolOffTime } from './VotePanel/hooks'
 
 export const hasInstructions = (proposal: Proposal) => {
   if (proposal.instructionsCount) {
@@ -26,6 +27,7 @@ interface OtherState {
   isSignatory: boolean
   proposal: Proposal
   votingEnded: boolean
+  coolOff: boolean
 }
 
 function getBorderColor(proposalState: ProposalState, otherState: OtherState) {
@@ -55,7 +57,7 @@ function getBorderColor(proposalState: ProposalState, otherState: OtherState) {
 
 function getLabel(
   proposalState: ProposalState,
-  otherState: Pick<OtherState, 'proposal' | 'votingEnded'>
+  otherState: Pick<OtherState, 'proposal' | 'votingEnded' | 'coolOff'>
 ) {
   switch (proposalState) {
     case ProposalState.Cancelled:
@@ -75,7 +77,11 @@ function getLabel(
     case ProposalState.Succeeded:
       return !hasInstructions(otherState.proposal) ? 'Completed' : 'Executable'
     case ProposalState.Voting:
-      return otherState.votingEnded ? 'Finalizing' : 'Voting'
+      return otherState.votingEnded
+        ? otherState.coolOff
+          ? 'Cool Off'
+          : 'Finalizing'
+        : 'Voting'
     case ProposalState.Vetoed:
       return 'Vetoed'
     default:
@@ -158,12 +164,14 @@ export default function ProposalStateBadge(props: Props) {
 
   const votingEnded =
     governance && props.proposal.getTimeToVoteEnd(governance) < 0
+  const coolOff = isInCoolOffTime(props.proposal, governance)
 
   const otherState = {
     isCreator,
     isSignatory,
     votingEnded,
     proposal: props.proposal,
+    coolOff,
   }
 
   return (

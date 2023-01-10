@@ -88,5 +88,17 @@ export const DEFAULT_PROVIDER =
     ? MOBILE_WALLET_PROVIDER
     : PHANTOM_PROVIDER
 
-export const getWalletProviderByUrl = (urlOrNull) =>
-  WALLET_PROVIDERS.find(({ url }) => url === urlOrNull) || DEFAULT_PROVIDER
+export const getWalletProviderByName = (
+  nameOrNull: string | null | undefined,
+  wallets?
+) => {
+  if (wallets) {
+    return (
+      wallets.find(({ adapter: { name } }) => name === nameOrNull) ||
+      DEFAULT_PROVIDER
+    )
+  }
+  return (
+    WALLET_PROVIDERS.find(({ name }) => name === nameOrNull) || DEFAULT_PROVIDER
+  )
+}

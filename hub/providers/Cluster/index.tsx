@@ -1,6 +1,7 @@
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import { clusterApiUrl, Connection } from '@solana/web3.js';
-import { createContext, useState } from 'react';
+import { useRouter } from 'next/router';
+import { createContext, useEffect, useState } from 'react';
 
 const DEVNET_RPC_ENDPOINT =
   process.env.DEVNET_RPC || 'https://api.dao.devnet.solana.com/';
@@ -68,7 +69,21 @@ interface Props {
 }
 
 export function ClusterProvider(props: Props) {
-  const [type, setType] = useState(ClusterType.Mainnet);
+  const router = useRouter();
+  const { cluster: urlCluster } = router.query;
+  const [type, setType] = useState(
+    typeof urlCluster === 'string' && urlCluster === 'devnet'
+      ? ClusterType.Devnet
+      : ClusterType.Mainnet,
+  );
+
+  useEffect(() => {
+    if (typeof urlCluster === 'string' && urlCluster === 'devnet') {
+      setType(ClusterType.Devnet);
+    } else {
+      setType(ClusterType.Mainnet);
+    }
+  }, [urlCluster]);
 
   const cluster =
     type === ClusterType.Devnet

@@ -5,7 +5,7 @@ import {
   RpcContext,
   TokenOwnerRecord,
 } from '@solana/spl-governance'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { ConnectionContext } from '@utils/connection'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'

@@ -1,11 +1,10 @@
-import { Config, MangoClient } from '@blockworks-foundation/mango-client'
 import Input from '@components/inputs/Input'
 import { GrantInstruction } from '@components/instructions/programs/voteStakeRegistry'
 import { MANGO_DAO_TREASURY } from '@components/instructions/tools'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import { SearchIcon, UserCircleIcon } from '@heroicons/react/outline'
 import useRealm from '@hooks/useRealm'
-import { BN, BorshInstructionCoder } from '@project-serum/anchor'
+import { BN, BorshInstructionCoder } from '@coral-xyz/anchor'
 import {
   GovernanceAccountType,
   InstructionExecutionStatus,
@@ -20,7 +19,6 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
 import {
   DAYS_PER_MONTH,
-  SECS_PER_MONTH,
   getMinDurationFmt,
   getTimeLeftFromNowFmt,
 } from '@utils/dateTools'
@@ -53,6 +51,8 @@ const VestingVsTime = dynamic(
 const isBetween = require('dayjs/plugin/isBetween')
 dayjs.extend(isBetween)
 
+const mainMangoVaultPk = 'Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z'
+
 const LockTokenStats = () => {
   const walletsPerPage = 10
   const pagination = useRef<{ setPage: (val) => void }>(null)
@@ -82,10 +82,7 @@ const LockTokenStats = () => {
     DepoistWithVoter[]
   >([])
   const [unlockedFromGrants, setUnlockedFromGrants] = useState(new BN(0))
-  const [
-    liquidityMiningEmissionPerMonth,
-    setLiqudiityMiningEmissionPerMonth,
-  ] = useState(new BN(0))
+  const [liquidityMiningEmissionPerMonth] = useState(new BN(0))
   const [vestPerMonthStats, setVestPerMonthStats] = useState<{
     [key: string]: { vestingDate: dayjs.Dayjs; vestingAmount: BN }[]
   }>({})
@@ -119,12 +116,14 @@ const LockTokenStats = () => {
   const mngoValut = governedTokenAccounts.find(
     (x) =>
       x.extensions.mint?.publicKey.toBase58() ===
-      realm?.account.communityMint.toBase58()
+        realm?.account.communityMint.toBase58() &&
+      x.extensions.transferAddress?.toBase58() === mainMangoVaultPk
   )
   const mngoLocked = depositsWithWallets.reduce(
     (acc, curr) => acc.add(curr.deposit.amountDepositedNative),
     new BN(0)
   )
+
   const circulatingSupply =
     mngoValut && mint
       ? mint.supply.sub(mngoValut.extensions.amount!).sub(mngoLocked)
@@ -373,40 +372,6 @@ const LockTokenStats = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [depositsWithWallets.length, givenGrantsTokenAmounts.length])
-  useEffect(() => {
-    const mngoPerpMarket = async () => {
-      const GROUP = connection.cluster === 'devnet' ? 'devnet.2' : 'mainnet.1'
-      const groupConfig = Config.ids().getGroupWithName(GROUP)!
-      const client = new MangoClient(
-        connection.current,
-        groupConfig.mangoProgramId
-      )
-      const group = await client.getMangoGroup(groupConfig.publicKey)
-      const perpMarkets = await Promise.all([
-        ...groupConfig!.perpMarkets.map((x) =>
-          group.loadPerpMarket(
-            connection.current,
-            x.marketIndex,
-            x.baseDecimals,
-            x.quoteDecimals
-          )
-        ),
-      ])
-
-      const emissionPerMonth = perpMarkets
-        .reduce(
-          (acc, next) => acc.iadd(next.liquidityMiningInfo.mngoPerPeriod),
-          new BN(0)
-        )
-        .muln(SECS_PER_MONTH)
-        .div(perpMarkets[0].liquidityMiningInfo.targetPeriodLength)
-      setLiqudiityMiningEmissionPerMonth(emissionPerMonth)
-    }
-    if (symbol === 'MNGO') {
-      mngoPerpMarket()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [connection.cluster])
   useEffect(() => {
     setPaginatedWallets(paginateWallets(0))
     pagination?.current?.setPage(0)

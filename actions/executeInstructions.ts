@@ -28,7 +28,6 @@ export const executeInstructions = async (
   instructions.push(
     ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 })
   )
-
   await Promise.all(
     proposalInstructions.map((instruction) =>
       // withExecuteTransaction function mutate the given 'instructions' parameter
