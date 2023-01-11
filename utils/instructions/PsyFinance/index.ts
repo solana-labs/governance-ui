@@ -16,6 +16,7 @@ import { PsyAmerican } from './PsyAmericanIdl'
 import { OptionMarket, OptionMarketWithKey } from './types'
 
 export { PsyAmericanIdl } from './PsyAmericanIdl'
+export * from './types'
 
 export const PSY_AMERICAN_PROGRAM_ID = new PublicKey(
   'R2y9ip6mxmWUj4pt54jP2hz2dgvMozy9VTSwMWE7evs'

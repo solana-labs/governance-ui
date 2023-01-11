@@ -135,6 +135,7 @@ import RemoveServiceFromDID from './components/instructions/Identity/RemoveServi
 import DualWithdraw from './components/instructions/Dual/DualWithdraw'
 import DualExercise from './components/instructions/Dual/DualExercise'
 import PsyFinanceMintAmericanOptions from './components/instructions/PsyFinance/MintAmericanOptions'
+import PsyFinanceBurnWriterTokenForQuote from './components/instructions/PsyFinance/BurnWriterTokenForQuote'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -466,6 +467,7 @@ const New = () => {
       [Instructions.DepositReserveLiquidityAndObligationCollateral]: DepositReserveLiquidityAndObligationCollateral,
       [Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity]: WithdrawObligationCollateralAndRedeemReserveLiquidity,
       [Instructions.PsyFinanceMintAmericanOptions]: PsyFinanceMintAmericanOptions,
+      [Instructions.PsyFinanceBurnWriterForQuote]: PsyFinanceBurnWriterTokenForQuote,
       [Instructions.SwitchboardAdmitOracle]: SwitchboardAdmitOracle,
       [Instructions.SwitchboardRevokeOracle]: SwitchboardRevokeOracle,
       [Instructions.RefreshSolendObligation]: RefreshObligation,

@@ -404,6 +404,12 @@ export interface PsyFinanceMintAmericanOptionsForm {
   writerTokenDestinationAccount: string
 }
 
+export interface PsyFinanceBurnWriterForQuote {
+  size: number
+  writerTokenAccount: AssetAccount | undefined
+  quoteDestination: string
+}
+
 export interface ForesightHasGovernedAccount {
   governedAccount: AssetAccount
 }
@@ -606,6 +612,7 @@ export enum Instructions {
   Mint,
   None,
   ProgramUpgrade,
+  PsyFinanceBurnWriterForQuote,
   PsyFinanceMintAmericanOptions,
   RealmConfig,
   RefreshSolendObligation,
