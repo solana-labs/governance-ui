@@ -410,6 +410,12 @@ export interface PsyFinanceBurnWriterForQuote {
   quoteDestination: string
 }
 
+export interface PsyFinanceClaimUnderlyingPostExpiration {
+  size: number
+  writerTokenAccount: AssetAccount | undefined
+  underlyingDestination: string
+}
+
 export interface ForesightHasGovernedAccount {
   governedAccount: AssetAccount
 }
@@ -613,6 +619,7 @@ export enum Instructions {
   None,
   ProgramUpgrade,
   PsyFinanceBurnWriterForQuote,
+  PsyFinanceClaimUnderlyingPostExpiration,
   PsyFinanceMintAmericanOptions,
   RealmConfig,
   RefreshSolendObligation,

@@ -731,6 +731,10 @@ export default function useGovernanceAssets() {
       name: 'Claim Quote with Writer Token',
       packageId: PackageEnum.PsyFinance,
     },
+    [Instructions.PsyFinanceClaimUnderlyingPostExpiration]: {
+      name: 'Claim Underlying (post expiration)',
+      packageId: PackageEnum.PsyFinance,
+    },
 
     /*
       ███████ ███████ ██████  ██    ██ ███    ███
