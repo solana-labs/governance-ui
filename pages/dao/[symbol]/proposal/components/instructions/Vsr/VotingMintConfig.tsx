@@ -19,11 +19,7 @@ import { getValidatedPublickKey } from '@utils/validations'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getScaledFactor } from '@utils/tokens'
-import {
-  yearsToSecs,
-  yearsToDays,
-  daysToSecs,
-} from 'VoteStakeRegistry/tools/dateTools'
+import { yearsToSecs } from 'VoteStakeRegistry/tools/dateTools'
 import { BN, web3 } from '@project-serum/anchor'
 import { PublicKey } from '@solana/web3.js'
 import {
@@ -43,7 +39,7 @@ interface ConfigureVotingMintForm {
   maxLockupFactor: number
   lockupSaturation: number
 
-  // DynamicFields based on programId
+  // Helium DynamicFields based on programId
   baselineVoteWeightFactor?: number
   grantAuthority?: AssetAccount | undefined
   lockedVoteWeightFactor?: number

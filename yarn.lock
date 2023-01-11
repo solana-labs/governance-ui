@@ -1524,6 +1524,18 @@
   dependencies:
     client-only "^0.0.1"
 
+"@helium/helium-react-hooks@0.0.14":
+  version "0.0.14"
+  resolved "https://registry.yarnpkg.com/@helium/helium-react-hooks/-/helium-react-hooks-0.0.14.tgz#c8cabb8b8f5430dafe594a17d287e79d7934cb9f"
+  integrity sha512-N4bvCChYkOWMGepKgFFZmQuIxrcA3AHIBQQHtGgcB1GJkgs5DXmXHDelV/gglo/7bf3GQcNc3JmyhCdEH6RYBQ==
+  dependencies:
+    "@helium/spl-utils" "^0.0.14"
+    "@project-serum/anchor" "0.26.0"
+    "@solana/spl-token" "^0.3.6"
+    "@solana/web3.js" "^1.66.2"
+    bs58 "^5.0.0"
+    react-async-hook "^4.0.0"
+
 "@helium/idls@0.0.13", "@helium/idls@^0.0.13":
   version "0.0.13"
   resolved "https://registry.yarnpkg.com/@helium/idls/-/idls-0.0.13.tgz#e6b003fa0d0d33318221b09976dd973f42cbde08"
@@ -1539,6 +1551,17 @@
   version "0.0.13"
   resolved "https://registry.yarnpkg.com/@helium/spl-utils/-/spl-utils-0.0.13.tgz#20d983cfef4bc045126b53bbd4542c26efe6c8f7"
   integrity sha512-tOVbk2P7pnVXFRh6aTh2/7R2n0IXAeUhS0/KHM/Tjx/7v8LliSWdnIn05cSOx4WaKu2l9J0gcknDRD++4m9b7Q==
+  dependencies:
+    "@project-serum/anchor" "0.26.0"
+    "@solana/web3.js" "^1.43.4"
+    bn.js "^5.2.0"
+    borsh "^0.7.0"
+    bs58 "^4.0.1"
+
+"@helium/spl-utils@^0.0.14":
+  version "0.0.14"
+  resolved "https://registry.yarnpkg.com/@helium/spl-utils/-/spl-utils-0.0.14.tgz#06015847523785d5c8dd4252d5152fd284d325cb"
+  integrity sha512-qZAmSfSzsh1AM2l0kRVr+4hGnj9IDX9HCKA5rHEzUCOspmdwLTX6nGnzxwRJPsgEkqO9zggQjwHNvard4Plt5g==
   dependencies:
     "@project-serum/anchor" "0.26.0"
     "@solana/web3.js" "^1.43.4"
@@ -14943,6 +14966,11 @@ rc-util@^5.16.1, rc-util@^5.19.2, rc-util@^5.21.0, rc-util@^5.3.0:
     "@babel/runtime" "^7.18.3"
     react-is "^16.12.0"
     shallowequal "^1.1.0"
+
+react-async-hook@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/react-async-hook/-/react-async-hook-4.0.0.tgz#1f0467586654e1f33b7433bd98c300a0c5f9b3d0"
+  integrity sha512-97lgjFkOcHCTYSrsKBpsXg3iVWM0LnzedB749iP76sb3/8Ouu4nHIkCLEOrQWHVYqrYxjF05NN6GHoXWFkB3Kw==
 
 react-clientside-effect@^1.2.6:
   version "1.2.6"
