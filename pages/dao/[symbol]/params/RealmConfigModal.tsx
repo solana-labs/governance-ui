@@ -239,7 +239,7 @@ const RealmConfigModal = ({ closeProposalModal, isProposalModalOpen }) => {
           <VoteBySwitch
             checked={voteByCouncil}
             onChange={() => {
-              setVoteByCouncil(voteByCouncil)
+              setVoteByCouncil(!voteByCouncil)
             }}
           />
         )}
