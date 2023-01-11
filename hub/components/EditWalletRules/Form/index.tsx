@@ -1,12 +1,11 @@
 import ChevronDownIcon from '@carbon/icons-react/lib/ChevronDown';
-import type { VoteTipping } from '@solana/spl-governance';
 import type { PublicKey } from '@solana/web3.js';
-import { BigNumber } from 'bignumber.js';
 import { useState } from 'react';
 
 import { AdvancedOptions } from '../AdvancedOptions';
 import { CommunityDetails } from '../CommunityDetails';
 import { CouncilDetails } from '../CouncilDetails';
+import { CommunityRules, CouncilRules } from '../types';
 import { VotingDuration } from '../VotingDuration';
 import { WalletDescription } from '../WalletDescription';
 import cx from '@hub/lib/cx';
@@ -14,26 +13,16 @@ import { FormProps } from '@hub/types/FormProps';
 
 interface Props
   extends FormProps<{
-    communityCanCreate: boolean;
-    communityHasVeto: boolean;
-    communityQuorumPercent: number;
-    communityVetoQuorum: number;
-    communityVoteTipping: VoteTipping;
+    communityRules: CommunityRules;
+    councilRules: CouncilRules;
     coolOffHours: number;
-    councilCanCreate: boolean;
-    councilHasVeto: boolean;
-    councilQuorumPercent: number;
-    councilVetoQuorum: number;
-    councilVoteTipping: VoteTipping;
     depositExemptProposalCount: number;
     maxVoteDays: number;
-    minCommunityPower: BigNumber;
-    minCouncilPower: BigNumber;
     minInstructionHoldupDays: number;
   }> {
   className?: string;
-  communityTokenSupply: BigNumber;
-  councilTokenSupply: BigNumber;
+  currentCommunityRules: CommunityRules;
+  currentCouncilRules: CouncilRules;
   walletAddress: PublicKey;
 }
 
@@ -59,35 +48,17 @@ export function Form(props: Props) {
           onMaxVoteDaysChange={props.onMaxVoteDaysChange}
         />
         <CommunityDetails
-          communityCanCreate={props.communityCanCreate}
-          communityHasVeto={props.communityHasVeto}
-          communityQuorumPercent={props.communityQuorumPercent}
-          communityTokenSupply={props.communityTokenSupply}
-          communityVetoQuorum={props.communityVetoQuorum}
-          communityVoteTipping={props.communityVoteTipping}
-          minCommunityPower={props.minCommunityPower}
-          onCommunityCanCreateChange={props.onCommunityCanCreateChange}
-          onCommunityHasVetoChange={props.onCommunityHasVetoChange}
-          onCommunityQuorumPercentChange={props.onCommunityQuorumPercentChange}
-          onCommunityVetoQuorumChange={props.onCommunityVetoQuorumChange}
-          onCommunityVoteTippingChange={props.onCommunityVoteTippingChange}
-          onMinCommunityPowerChange={props.onMinCommunityPowerChange}
+          communityRules={props.communityRules}
+          currentCommunityRules={props.currentCommunityRules}
+          onCommunityRulesChange={props.onCommunityRulesChange}
         />
-        <CouncilDetails
-          councilCanCreate={props.councilCanCreate}
-          councilHasVeto={props.councilHasVeto}
-          councilQuorumPercent={props.councilQuorumPercent}
-          councilTokenSupply={props.councilTokenSupply}
-          councilVetoQuorum={props.councilVetoQuorum}
-          councilVoteTipping={props.councilVoteTipping}
-          minCouncilPower={props.minCouncilPower}
-          onCouncilCanCreateChange={props.onCouncilCanCreateChange}
-          onCouncilHasVetoChange={props.onCouncilHasVetoChange}
-          onCouncilQuorumPercentChange={props.onCouncilQuorumPercentChange}
-          onCouncilVetoQuorumChange={props.onCouncilVetoQuorumChange}
-          onCouncilVoteTippingChange={props.onCouncilVoteTippingChange}
-          onMinCouncilPowerChange={props.onMinCouncilPowerChange}
-        />
+        {props.councilRules && props.currentCouncilRules && (
+          <CouncilDetails
+            councilRules={props.councilRules}
+            currentCouncilRules={props.currentCouncilRules}
+            onCouncilRulesChange={props.onCouncilRulesChange}
+          />
+        )}
       </div>
       <div className="mt-16">
         <button

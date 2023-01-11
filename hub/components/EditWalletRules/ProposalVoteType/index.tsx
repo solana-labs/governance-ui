@@ -2,13 +2,13 @@ import BuildingIcon from '@carbon/icons-react/lib/Building';
 import ChevronDownIcon from '@carbon/icons-react/lib/ChevronDown';
 import UserMultipleIcon from '@carbon/icons-react/lib/UserMultiple';
 import WalletIcon from '@carbon/icons-react/lib/Wallet';
-import type { VoteTipping } from '@solana/spl-governance';
 import type { BigNumber } from 'bignumber.js';
 import { useState } from 'react';
 
 import { SectionBlock } from '../SectionBlock';
 import { SectionHeader } from '../SectionHeader';
 import { SummaryItem } from '../SummaryItem';
+import { CommunityRules, CouncilRules } from '../types';
 import { ValueBlock } from '../ValueBlock';
 import { getLabel } from '../VoteTippingSelector';
 import { ButtonToggle } from '@hub/components/controls/ButtonToggle';
@@ -22,49 +22,19 @@ interface Props
     proposalVoteType: 'council' | 'community';
   }> {
   className?: string;
-  currentCommunityCanCreate: boolean;
-  currentCommunityHasVeto: boolean;
-  currentCommunityQuorumPercent: number;
-  currentCommunityVetoQuorum: number;
-  currentCommunityVoteTipping: VoteTipping;
-  currentCoolOffHours: number;
-  currentCouncilCanCreate: boolean;
-  currentCouncilHasVeto: boolean;
-  currentCouncilQuorumPercent: number;
-  currentCouncilVetoQuorum: number;
-  currentCouncilVoteTipping: VoteTipping;
-  currentDepositExemptProposalCount: number;
+  currentCommunityRules: CommunityRules;
+  currentCouncilRules: CouncilRules;
   currentMaxVoteDays: number;
-  currentMinCommunityPower: BigNumber;
-  currentMinCouncilPower: BigNumber;
   currentMinInstructionHoldupDays: number;
 }
 
 export function ProposalVoteType(props: Props) {
   const [showRules, setShowRules] = useState(false);
 
-  const communityRules = {
-    approvalQuorum: props.currentCommunityQuorumPercent,
-    hasVeto: props.currentCommunityHasVeto,
-    maxVotingDays: props.currentMaxVoteDays,
-    minInstructionHoldupDays: props.currentMinInstructionHoldupDays,
-    minPowerToCreateProposal: props.currentMinCommunityPower,
-    vetoQuorum: props.currentCommunityVetoQuorum,
-    voteTipping: props.currentCommunityVoteTipping,
-  };
-
-  const councilRules = {
-    approvalQuorum: props.currentCouncilQuorumPercent,
-    hasVeto: props.currentCouncilHasVeto,
-    maxVotingDays: props.currentMaxVoteDays,
-    minInstructionHoldupDays: props.currentMinInstructionHoldupDays,
-    minPowerToCreateProposal: props.currentMinCouncilPower,
-    vetoQuorum: props.currentCouncilVetoQuorum,
-    voteTipping: props.currentCouncilVoteTipping,
-  };
-
   const rules =
-    props.proposalVoteType === 'community' ? communityRules : councilRules;
+    props.proposalVoteType === 'council' && props.currentCouncilRules
+      ? props.currentCouncilRules
+      : props.currentCommunityRules;
 
   return (
     <SectionBlock className={props.className}>
@@ -81,9 +51,13 @@ export function ProposalVoteType(props: Props) {
           value={props.proposalVoteType === 'community'}
           valueTrueText="Community"
           valueFalseText="Council"
-          onChange={(value) =>
-            props.onProposalVoteTypeChange?.(value ? 'community' : 'council')
-          }
+          onChange={(value) => {
+            if (value === false && !!props.currentCouncilRules) {
+              props.onProposalVoteTypeChange?.('council');
+            } else {
+              props.onProposalVoteTypeChange?.('community');
+            }
+          }}
         />
       </ValueBlock>
       {showRules && (
@@ -103,27 +77,31 @@ export function ProposalVoteType(props: Props) {
           <div className="gap-x-4 gap-y-8 grid grid-cols-2 mt-8">
             <SummaryItem
               label="Max Voting Time"
-              value={`${rules.maxVotingDays} ${ntext(
-                rules.maxVotingDays,
+              value={`${props.currentMaxVoteDays} ${ntext(
+                props.currentMaxVoteDays,
                 'day',
               )}`}
             />
             <SummaryItem
               label="Min Instruction Holdup Time"
-              value={`${rules.minInstructionHoldupDays} ${ntext(
-                rules.minInstructionHoldupDays,
+              value={`${props.currentMinInstructionHoldupDays} ${ntext(
+                props.currentMinInstructionHoldupDays,
                 'day',
               )}`}
             />
             <SummaryItem
               label="Min Governance Power to Create a Proposal"
-              value={formatNumber(rules.minPowerToCreateProposal, undefined, {
-                maximumFractionDigits: 0,
-              })}
+              value={formatNumber(
+                rules.votingPowerToCreateProposals,
+                undefined,
+                {
+                  maximumFractionDigits: 0,
+                },
+              )}
             />
             <SummaryItem
               label="Approval Quorum"
-              value={`${rules.approvalQuorum}%`}
+              value={`${rules.quorumPercent}%`}
             />
             <SummaryItem
               label="Vote Tipping"
@@ -131,7 +109,7 @@ export function ProposalVoteType(props: Props) {
             />
             <SummaryItem
               label="Veto Quorum"
-              value={rules.hasVeto ? `${rules.vetoQuorum}%` : 'Disabled'}
+              value={rules.canVeto ? `${rules.vetoQuorumPercent}%` : 'Disabled'}
             />
           </div>
         </div>

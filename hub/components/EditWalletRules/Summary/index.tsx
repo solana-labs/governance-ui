@@ -1,10 +1,9 @@
 import BotIcon from '@carbon/icons-react/lib/Bot';
-import type { VoteTipping } from '@solana/spl-governance';
 import type { PublicKey } from '@solana/web3.js';
-import { BigNumber } from 'bignumber.js';
 
 import { ProposalDetails } from '../ProposalDetails';
 import { ProposalVoteType } from '../ProposalVoteType';
+import { CommunityRules, CouncilRules } from '../types';
 import { UpdatesList } from '../UpdatesList';
 import { WalletDescription } from '../WalletDescription';
 import { FormProps } from '@hub/types/FormProps';
@@ -15,38 +14,18 @@ interface Props
     proposalVoteType: 'council' | 'community';
   }> {
   className?: string;
-  communityCanCreate: boolean;
-  communityHasVeto: boolean;
-  communityQuorumPercent: number;
-  communityVetoQuorum: number;
-  communityVoteTipping: VoteTipping;
+  communityRules: CommunityRules;
   coolOffHours: number;
-  councilCanCreate: boolean;
-  councilHasVeto: boolean;
-  councilQuorumPercent: number;
-  councilVetoQuorum: number;
-  councilVoteTipping: VoteTipping;
-  depositExemptProposalCount: number;
-  maxVoteDays: number;
-  minCommunityPower: BigNumber;
-  minCouncilPower: BigNumber;
-  minInstructionHoldupDays: number;
-  currentCommunityCanCreate: boolean;
-  currentCommunityHasVeto: boolean;
-  currentCommunityQuorumPercent: number;
-  currentCommunityVetoQuorum: number;
-  currentCommunityVoteTipping: VoteTipping;
+  councilRules: CouncilRules;
+  currentCommunityRules: CommunityRules;
   currentCoolOffHours: number;
-  currentCouncilCanCreate: boolean;
-  currentCouncilHasVeto: boolean;
-  currentCouncilQuorumPercent: number;
-  currentCouncilVetoQuorum: number;
-  currentCouncilVoteTipping: VoteTipping;
+  currentCouncilRules: CouncilRules;
   currentDepositExemptProposalCount: number;
   currentMaxVoteDays: number;
-  currentMinCommunityPower: BigNumber;
-  currentMinCouncilPower: BigNumber;
   currentMinInstructionHoldupDays: number;
+  depositExemptProposalCount: number;
+  maxVoteDays: number;
+  minInstructionHoldupDays: number;
   walletAddress: PublicKey;
 }
 
@@ -68,23 +47,9 @@ export function Summary(props: Props) {
       />
       <ProposalVoteType
         className="mt-8"
-        currentCommunityCanCreate={props.currentCommunityCanCreate}
-        currentCommunityHasVeto={props.currentCommunityHasVeto}
-        currentCommunityQuorumPercent={props.currentCommunityQuorumPercent}
-        currentCommunityVetoQuorum={props.currentCommunityVetoQuorum}
-        currentCommunityVoteTipping={props.currentCommunityVoteTipping}
-        currentCoolOffHours={props.currentCoolOffHours}
-        currentCouncilCanCreate={props.currentCouncilCanCreate}
-        currentCouncilHasVeto={props.currentCouncilHasVeto}
-        currentCouncilQuorumPercent={props.currentCouncilQuorumPercent}
-        currentCouncilVetoQuorum={props.currentCouncilVetoQuorum}
-        currentCouncilVoteTipping={props.currentCouncilVoteTipping}
-        currentDepositExemptProposalCount={
-          props.currentDepositExemptProposalCount
-        }
+        currentCommunityRules={props.currentCommunityRules}
+        currentCouncilRules={props.currentCouncilRules}
         currentMaxVoteDays={props.currentMaxVoteDays}
-        currentMinCommunityPower={props.currentMinCommunityPower}
-        currentMinCouncilPower={props.currentMinCouncilPower}
         currentMinInstructionHoldupDays={props.currentMinInstructionHoldupDays}
         proposalVoteType={props.proposalVoteType}
         onProposalVoteTypeChange={props.onProposalVoteTypeChange}
@@ -100,40 +65,20 @@ export function Summary(props: Props) {
       </div>
       <UpdatesList
         className="mt-4"
-        communityCanCreate={props.communityCanCreate}
-        communityHasVeto={props.communityHasVeto}
-        communityQuorumPercent={props.communityQuorumPercent}
-        communityVetoQuorum={props.communityVetoQuorum}
-        communityVoteTipping={props.communityVoteTipping}
+        communityRules={props.communityRules}
         coolOffHours={props.coolOffHours}
-        councilCanCreate={props.councilCanCreate}
-        councilHasVeto={props.councilHasVeto}
-        councilQuorumPercent={props.councilQuorumPercent}
-        councilVetoQuorum={props.councilVetoQuorum}
-        councilVoteTipping={props.councilVoteTipping}
-        depositExemptProposalCount={props.depositExemptProposalCount}
-        maxVoteDays={props.maxVoteDays}
-        minCommunityPower={props.minCommunityPower}
-        minCouncilPower={props.minCouncilPower}
-        minInstructionHoldupDays={props.minInstructionHoldupDays}
-        currentCommunityCanCreate={props.currentCommunityCanCreate}
-        currentCommunityHasVeto={props.currentCommunityHasVeto}
-        currentCommunityQuorumPercent={props.currentCommunityQuorumPercent}
-        currentCommunityVetoQuorum={props.currentCommunityVetoQuorum}
-        currentCommunityVoteTipping={props.currentCommunityVoteTipping}
+        councilRules={props.councilRules}
+        currentCommunityRules={props.currentCommunityRules}
         currentCoolOffHours={props.currentCoolOffHours}
-        currentCouncilCanCreate={props.currentCouncilCanCreate}
-        currentCouncilHasVeto={props.currentCouncilHasVeto}
-        currentCouncilQuorumPercent={props.currentCouncilQuorumPercent}
-        currentCouncilVetoQuorum={props.currentCouncilVetoQuorum}
-        currentCouncilVoteTipping={props.currentCouncilVoteTipping}
+        currentCouncilRules={props.currentCouncilRules}
         currentDepositExemptProposalCount={
           props.currentDepositExemptProposalCount
         }
         currentMaxVoteDays={props.currentMaxVoteDays}
-        currentMinCommunityPower={props.currentMinCommunityPower}
-        currentMinCouncilPower={props.currentMinCouncilPower}
         currentMinInstructionHoldupDays={props.currentMinInstructionHoldupDays}
+        depositExemptProposalCount={props.depositExemptProposalCount}
+        maxVoteDays={props.maxVoteDays}
+        minInstructionHoldupDays={props.minInstructionHoldupDays}
       />
     </article>
   );

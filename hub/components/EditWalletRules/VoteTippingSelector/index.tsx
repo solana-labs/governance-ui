@@ -1,29 +1,29 @@
 import CheckmarkIcon from '@carbon/icons-react/lib/Checkmark';
 import ChevronDownIcon from '@carbon/icons-react/lib/ChevronDown';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import { VoteTipping } from '@solana/spl-governance';
 import { useEffect, useRef, useState } from 'react';
 
 import cx from '@hub/lib/cx';
+import { GovernanceVoteTipping } from '@hub/types/GovernanceVoteTipping';
 
-export function getLabel(value: VoteTipping): string {
+export function getLabel(value: GovernanceVoteTipping): string {
   switch (value) {
-    case VoteTipping.Disabled:
+    case GovernanceVoteTipping.Disabled:
       return 'Disabled';
-    case VoteTipping.Early:
+    case GovernanceVoteTipping.Early:
       return 'Early';
-    case VoteTipping.Strict:
+    case GovernanceVoteTipping.Strict:
       return 'Strict';
   }
 }
 
-function getDescription(value: VoteTipping): string {
+function getDescription(value: GovernanceVoteTipping): string {
   switch (value) {
-    case VoteTipping.Disabled:
+    case GovernanceVoteTipping.Disabled:
       return 'A proposal passes only when the total voting duration elapses';
-    case VoteTipping.Early:
+    case GovernanceVoteTipping.Early:
       return 'A proposal passes when quorum is reached';
-    case VoteTipping.Strict:
+    case GovernanceVoteTipping.Strict:
       return 'A proposal passes when it cannot mathematically be defeated';
   }
 }
@@ -51,8 +51,8 @@ const iconStyles = cx('fill-neutral-500', 'h-5', 'transition-transform', 'w-4');
 
 interface Props {
   className?: string;
-  value: VoteTipping;
-  onChange?(value: VoteTipping): void;
+  value: GovernanceVoteTipping;
+  onChange?(value: GovernanceVoteTipping): void;
 }
 
 export function VoteTippingSelector(props: Props) {
@@ -85,7 +85,11 @@ export function VoteTippingSelector(props: Props) {
             sideOffset={2}
             style={{ width }}
           >
-            {[VoteTipping.Disabled, VoteTipping.Early, VoteTipping.Strict]
+            {[
+              GovernanceVoteTipping.Disabled,
+              GovernanceVoteTipping.Early,
+              GovernanceVoteTipping.Strict,
+            ]
               .filter((voteTippingType) => voteTippingType !== props.value)
               .map((voteTippingType) => (
                 <DropdownMenu.Item

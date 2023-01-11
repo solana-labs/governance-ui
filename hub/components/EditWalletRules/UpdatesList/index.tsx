@@ -2,12 +2,13 @@ import BuildingIcon from '@carbon/icons-react/lib/Building';
 import ChemistryIcon from '@carbon/icons-react/lib/Chemistry';
 import TimeIcon from '@carbon/icons-react/lib/Time';
 import UserMultipleIcon from '@carbon/icons-react/lib/UserMultiple';
-import type { VoteTipping } from '@solana/spl-governance';
 import { BigNumber } from 'bignumber.js';
 
+import { MAX_NUM } from '../constants';
 import { SectionBlock } from '../SectionBlock';
 import { SectionHeader } from '../SectionHeader';
 import { SummaryItem } from '../SummaryItem';
+import { CommunityRules, CouncilRules } from '../types';
 import { getLabel } from '../VoteTippingSelector';
 import cx from '@hub/lib/cx';
 import { formatNumber } from '@hub/lib/formatNumber';
@@ -53,62 +54,24 @@ function diff<T extends { [key: string]: unknown }>(existing: T, changed: T) {
 
 interface Props {
   className?: string;
-  communityCanCreate: boolean;
-  communityHasVeto: boolean;
-  communityQuorumPercent: number;
-  communityVetoQuorum: number;
-  communityVoteTipping: VoteTipping;
+  communityRules: CommunityRules;
   coolOffHours: number;
-  councilCanCreate: boolean;
-  councilHasVeto: boolean;
-  councilQuorumPercent: number;
-  councilVetoQuorum: number;
-  councilVoteTipping: VoteTipping;
-  depositExemptProposalCount: number;
-  maxVoteDays: number;
-  minCommunityPower: BigNumber;
-  minCouncilPower: BigNumber;
-  minInstructionHoldupDays: number;
-  currentCommunityCanCreate: boolean;
-  currentCommunityHasVeto: boolean;
-  currentCommunityQuorumPercent: number;
-  currentCommunityVetoQuorum: number;
-  currentCommunityVoteTipping: VoteTipping;
+  councilRules: CouncilRules;
+  currentCommunityRules: CommunityRules;
   currentCoolOffHours: number;
-  currentCouncilCanCreate: boolean;
-  currentCouncilHasVeto: boolean;
-  currentCouncilQuorumPercent: number;
-  currentCouncilVetoQuorum: number;
-  currentCouncilVoteTipping: VoteTipping;
+  currentCouncilRules: CouncilRules;
   currentDepositExemptProposalCount: number;
   currentMaxVoteDays: number;
-  currentMinCommunityPower: BigNumber;
-  currentMinCouncilPower: BigNumber;
   currentMinInstructionHoldupDays: number;
+  depositExemptProposalCount: number;
+  maxVoteDays: number;
+  minInstructionHoldupDays: number;
 }
 
 export function UpdatesList(props: Props) {
   const currentVotingDuration = {
     coolOffHours: props.currentCoolOffHours,
     maxVoteDays: props.currentMaxVoteDays,
-  };
-
-  const currentCommunityDetails = {
-    communityCanCreate: props.currentCommunityCanCreate,
-    communityHasVeto: props.currentCommunityHasVeto,
-    communityQuorumPercent: props.currentCommunityQuorumPercent,
-    communityVetoQuorum: props.currentCommunityVetoQuorum,
-    communityVoteTipping: props.currentCommunityVoteTipping,
-    minCommunityPower: props.currentMinCommunityPower,
-  };
-
-  const currentCouncilDetails = {
-    councilCanCreate: props.currentCouncilCanCreate,
-    councilHasVeto: props.currentCouncilHasVeto,
-    councilQuorumPercent: props.currentCouncilQuorumPercent,
-    councilVetoQuorum: props.currentCouncilVetoQuorum,
-    councilVoteTipping: props.currentCouncilVoteTipping,
-    minCouncilPower: props.currentMinCouncilPower,
   };
 
   const currentAdvancedSettings = {
@@ -121,24 +84,6 @@ export function UpdatesList(props: Props) {
     maxVoteDays: props.maxVoteDays,
   };
 
-  const newCommunityDetails = {
-    communityCanCreate: props.communityCanCreate,
-    communityHasVeto: props.communityHasVeto,
-    communityQuorumPercent: props.communityQuorumPercent,
-    communityVetoQuorum: props.communityVetoQuorum,
-    communityVoteTipping: props.communityVoteTipping,
-    minCommunityPower: props.minCommunityPower,
-  };
-
-  const newCouncilDetails = {
-    councilCanCreate: props.councilCanCreate,
-    councilHasVeto: props.councilHasVeto,
-    councilQuorumPercent: props.councilQuorumPercent,
-    councilVetoQuorum: props.councilVetoQuorum,
-    councilVoteTipping: props.councilVoteTipping,
-    minCouncilPower: props.minCouncilPower,
-  };
-
   const newAdvancedSettings = {
     depositExemptProposalCount: props.depositExemptProposalCount,
     minInstructionHoldupDays: props.minInstructionHoldupDays,
@@ -146,10 +91,13 @@ export function UpdatesList(props: Props) {
 
   const votingDurationDiff = diff(currentVotingDuration, newVotingDuration);
   const communityDetailsDiff = diff(
-    currentCommunityDetails,
-    newCommunityDetails,
+    props.currentCommunityRules,
+    props.communityRules,
   );
-  const councilDetailsDiff = diff(currentCouncilDetails, newCouncilDetails);
+  const councilDetailsDiff = diff(
+    (props.currentCouncilRules || {}) as NonNullable<CouncilRules>,
+    (props.councilRules || {}) as NonNullable<CouncilRules>,
+  );
   const advancedSettingsDiff = diff(
     currentAdvancedSettings,
     newAdvancedSettings,
@@ -233,49 +181,59 @@ export function UpdatesList(props: Props) {
             text="Community Details"
           />
           <div className="grid grid-cols-2 gap-x-4 gap-y-8">
-            {!!communityDetailsDiff.communityCanCreate?.length && (
-              <SummaryItem
-                label="Allow community members to create proposals"
-                value={
-                  <div className="flex items-baseline">
-                    <div>
-                      {communityDetailsDiff.communityCanCreate[1]
-                        ? 'Yes'
-                        : 'No'}
+            {!!communityDetailsDiff.votingPowerToCreateProposals?.length &&
+              (props.currentCommunityRules.votingPowerToCreateProposals.isEqualTo(
+                MAX_NUM,
+              ) ||
+                props.currentCommunityRules.votingPowerToCreateProposals.isEqualTo(
+                  MAX_NUM,
+                )) && (
+                <SummaryItem
+                  label="Allow community members to create proposals"
+                  value={
+                    <div className="flex items-baseline">
+                      <div>
+                        {communityDetailsDiff.votingPowerToCreateProposals[1].isLessThan(
+                          MAX_NUM,
+                        )
+                          ? 'Yes'
+                          : 'No'}
+                      </div>
+                      <div className="ml-3 text-base text-neutral-500 line-through">
+                        {communityDetailsDiff.votingPowerToCreateProposals[0].isLessThan(
+                          MAX_NUM,
+                        )
+                          ? 'Yes'
+                          : 'No'}
+                      </div>
                     </div>
-                    <div className="ml-3 text-base text-neutral-500 line-through">
-                      {communityDetailsDiff.communityCanCreate[0]
-                        ? 'Yes'
-                        : 'No'}
-                    </div>
-                  </div>
-                }
-              />
-            )}
-            {!!communityDetailsDiff.minCommunityPower?.length && (
+                  }
+                />
+              )}
+            {!!communityDetailsDiff.votingPowerToCreateProposals?.length && (
               <SummaryItem
                 label="Minimum amount of community tokens required to create a proposal"
                 value={
                   <div>
                     <div>
                       {formatNumber(
-                        communityDetailsDiff.minCommunityPower[1],
+                        communityDetailsDiff.votingPowerToCreateProposals[1],
                         undefined,
                         { maximumFractionDigits: 0 },
                       )}{' '}
                       {ntext(
-                        communityDetailsDiff.minCommunityPower[1].toNumber(),
+                        communityDetailsDiff.votingPowerToCreateProposals[1].toNumber(),
                         'token',
                       )}
                     </div>
                     <div className="text-base text-neutral-500 line-through">
                       {formatNumber(
-                        communityDetailsDiff.minCommunityPower[0],
+                        communityDetailsDiff.votingPowerToCreateProposals[0],
                         undefined,
                         { maximumFractionDigits: 0 },
                       )}{' '}
                       {ntext(
-                        communityDetailsDiff.minCommunityPower[0].toNumber(),
+                        communityDetailsDiff.votingPowerToCreateProposals[0].toNumber(),
                         'token',
                       )}
                     </div>
@@ -283,60 +241,56 @@ export function UpdatesList(props: Props) {
                 }
               />
             )}
-            {!!communityDetailsDiff.communityQuorumPercent?.length && (
+            {!!communityDetailsDiff.quorumPercent?.length && (
               <SummaryItem
                 label="Community Voting Quorum"
                 value={
                   <div className="flex items-baseline">
-                    <div>{communityDetailsDiff.communityQuorumPercent[1]}%</div>
+                    <div>{communityDetailsDiff.quorumPercent[1]}%</div>
                     <div className="ml-3 text-base text-neutral-500 line-through">
-                      {communityDetailsDiff.communityQuorumPercent[0]}%
+                      {communityDetailsDiff.quorumPercent[0]}%
                     </div>
                   </div>
                 }
               />
             )}
-            {!!communityDetailsDiff.communityVoteTipping?.length && (
+            {!!communityDetailsDiff.voteTipping?.length && (
               <SummaryItem
                 label="Community Vote Tipping"
                 value={
                   <div className="flex items-baseline">
-                    <div>
-                      {getLabel(communityDetailsDiff.communityVoteTipping[1])}
-                    </div>
+                    <div>{getLabel(communityDetailsDiff.voteTipping[1])}</div>
                     <div className="ml-3 text-base text-neutral-500 line-through">
-                      {getLabel(communityDetailsDiff.communityVoteTipping[0])}
+                      {getLabel(communityDetailsDiff.voteTipping[0])}
                     </div>
                   </div>
                 }
               />
             )}
-            {!!communityDetailsDiff.communityHasVeto?.length && (
+            {!!communityDetailsDiff.canVeto?.length && (
               <SummaryItem
                 label="Community Veto Power over Council Proposals?"
                 value={
                   <div className="flex items-baseline">
-                    <div>
-                      {communityDetailsDiff.communityHasVeto[1] ? 'Yes' : 'No'}
-                    </div>
+                    <div>{communityDetailsDiff.canVeto[1] ? 'Yes' : 'No'}</div>
                     <div className="ml-3 text-base text-neutral-500 line-through">
-                      {communityDetailsDiff.communityHasVeto[0] ? 'Yes' : 'No'}
+                      {communityDetailsDiff.canVeto[0] ? 'Yes' : 'No'}
                     </div>
                   </div>
                 }
               />
             )}
-            {props.communityHasVeto &&
-              !!communityDetailsDiff.communityVetoQuorum?.length && (
+            {props.communityRules.canVeto &&
+              !!communityDetailsDiff.vetoQuorumPercent?.length && (
                 <SummaryItem
                   label="Community Veto Voting Quorum"
                   value={
                     <div className="flex items-baseline">
                       <div>
-                        {communityDetailsDiff.communityVetoQuorum[1] || 0}%
+                        {communityDetailsDiff.vetoQuorumPercent[1] || 0}%
                       </div>
                       <div className="ml-3 text-base text-neutral-500 line-through">
-                        {communityDetailsDiff.communityVetoQuorum[0] || 0}%
+                        {communityDetailsDiff.vetoQuorumPercent[0] || 0}%
                       </div>
                     </div>
                   }
@@ -353,45 +307,59 @@ export function UpdatesList(props: Props) {
             text="Council Details"
           />
           <div className="grid grid-cols-2 gap-x-4 gap-y-8">
-            {!!councilDetailsDiff.councilCanCreate?.length && (
-              <SummaryItem
-                label="Allow council members to create proposals"
-                value={
-                  <div className="flex items-baseline">
-                    <div>
-                      {councilDetailsDiff.councilCanCreate[1] ? 'Yes' : 'No'}
+            {!!councilDetailsDiff.votingPowerToCreateProposals?.length &&
+              (props.currentCouncilRules?.votingPowerToCreateProposals.isEqualTo(
+                MAX_NUM,
+              ) ||
+                props.currentCouncilRules?.votingPowerToCreateProposals.isEqualTo(
+                  MAX_NUM,
+                )) && (
+                <SummaryItem
+                  label="Allow council members to create proposals"
+                  value={
+                    <div className="flex items-baseline">
+                      <div>
+                        {councilDetailsDiff.votingPowerToCreateProposals[1].isLessThan(
+                          MAX_NUM,
+                        )
+                          ? 'Yes'
+                          : 'No'}
+                      </div>
+                      <div className="ml-3 text-base text-neutral-500 line-through">
+                        {councilDetailsDiff.votingPowerToCreateProposals[0].isLessThan(
+                          MAX_NUM,
+                        )
+                          ? 'Yes'
+                          : 'No'}
+                      </div>
                     </div>
-                    <div className="ml-3 text-base text-neutral-500 line-through">
-                      {councilDetailsDiff.councilCanCreate[0] ? 'Yes' : 'No'}
-                    </div>
-                  </div>
-                }
-              />
-            )}
-            {!!councilDetailsDiff.minCouncilPower?.length && (
+                  }
+                />
+              )}
+            {!!councilDetailsDiff.votingPowerToCreateProposals?.length && (
               <SummaryItem
                 label="Minimum amount of council tokens required to create a proposal"
                 value={
                   <div>
                     <div>
                       {formatNumber(
-                        councilDetailsDiff.minCouncilPower[1],
+                        councilDetailsDiff.votingPowerToCreateProposals[1],
                         undefined,
                         { maximumFractionDigits: 0 },
                       )}{' '}
                       {ntext(
-                        councilDetailsDiff.minCouncilPower[1].toNumber(),
+                        councilDetailsDiff.votingPowerToCreateProposals[1].toNumber(),
                         'token',
                       )}
                     </div>
                     <div className="text-base text-neutral-500 line-through">
                       {formatNumber(
-                        councilDetailsDiff.minCouncilPower[0],
+                        councilDetailsDiff.votingPowerToCreateProposals[0],
                         undefined,
                         { maximumFractionDigits: 0 },
                       )}{' '}
                       {ntext(
-                        councilDetailsDiff.minCouncilPower[0].toNumber(),
+                        councilDetailsDiff.votingPowerToCreateProposals[0].toNumber(),
                         'token',
                       )}
                     </div>
@@ -399,58 +367,54 @@ export function UpdatesList(props: Props) {
                 }
               />
             )}
-            {!!councilDetailsDiff.councilQuorumPercent?.length && (
+            {!!councilDetailsDiff.quorumPercent?.length && (
               <SummaryItem
                 label="Council Voting Quorum"
                 value={
                   <div className="flex items-baseline">
-                    <div>{councilDetailsDiff.councilQuorumPercent[1]}%</div>
+                    <div>{councilDetailsDiff.quorumPercent[1]}%</div>
                     <div className="ml-3 text-base text-neutral-500 line-through">
-                      {councilDetailsDiff.councilQuorumPercent[0]}%
+                      {councilDetailsDiff.quorumPercent[0]}%
                     </div>
                   </div>
                 }
               />
             )}
-            {!!councilDetailsDiff.councilVoteTipping?.length && (
+            {!!councilDetailsDiff.voteTipping?.length && (
               <SummaryItem
                 label="Council Vote Tipping"
                 value={
                   <div className="flex items-baseline">
-                    <div>
-                      {getLabel(councilDetailsDiff.councilVoteTipping[1])}
-                    </div>
+                    <div>{getLabel(councilDetailsDiff.voteTipping[1])}</div>
                     <div className="ml-3 text-base text-neutral-500 line-through">
-                      {getLabel(councilDetailsDiff.councilVoteTipping[0])}
+                      {getLabel(councilDetailsDiff.voteTipping[0])}
                     </div>
                   </div>
                 }
               />
             )}
-            {!!councilDetailsDiff.councilHasVeto?.length && (
+            {!!councilDetailsDiff.canVeto?.length && (
               <SummaryItem
                 label="Council Veto Power over Community Proposals?"
                 value={
                   <div className="flex items-baseline">
-                    <div>
-                      {councilDetailsDiff.councilHasVeto[1] ? 'Yes' : 'No'}
-                    </div>
+                    <div>{councilDetailsDiff.canVeto[1] ? 'Yes' : 'No'}</div>
                     <div className="ml-3 text-base text-neutral-500 line-through">
-                      {councilDetailsDiff.councilHasVeto[0] ? 'Yes' : 'No'}
+                      {councilDetailsDiff.canVeto[0] ? 'Yes' : 'No'}
                     </div>
                   </div>
                 }
               />
             )}
-            {props.councilHasVeto &&
-              !!councilDetailsDiff.councilVetoQuorum?.length && (
+            {props.councilRules?.canVeto &&
+              !!councilDetailsDiff.vetoQuorumPercent?.length && (
                 <SummaryItem
                   label="Council Veto Voting Quorum"
                   value={
                     <div className="flex items-baseline">
-                      <div>{councilDetailsDiff.councilVetoQuorum[1] || 0}%</div>
+                      <div>{councilDetailsDiff.vetoQuorumPercent[1] || 0}%</div>
                       <div className="ml-3 text-base text-neutral-500 line-through">
-                        {councilDetailsDiff.councilVetoQuorum[0] || 0}%
+                        {councilDetailsDiff.vetoQuorumPercent[0] || 0}%
                       </div>
                     </div>
                   }

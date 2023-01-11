@@ -1,10 +1,12 @@
 import UserMultipleIcon from '@carbon/icons-react/lib/UserMultiple';
-import type { VoteTipping } from '@solana/spl-governance';
 import { BigNumber } from 'bignumber.js';
+import { produce } from 'immer';
 
+import { MAX_NUM } from '../constants';
 import { SectionBlock } from '../SectionBlock';
 import { SectionHeader } from '../SectionHeader';
 import { SliderValue } from '../SliderValue';
+import { CommunityRules } from '../types';
 import { ValueBlock } from '../ValueBlock';
 import { VoteTippingSelector } from '../VoteTippingSelector';
 import { ButtonToggle } from '@hub/components/controls/ButtonToggle';
@@ -15,23 +17,16 @@ import { FormProps } from '@hub/types/FormProps';
 
 interface Props
   extends FormProps<{
-    communityCanCreate: boolean;
-    communityHasVeto: boolean;
-    communityQuorumPercent: number;
-    communityVetoQuorum: number;
-    communityVoteTipping: VoteTipping;
-    minCommunityPower: BigNumber;
+    communityRules: CommunityRules;
   }> {
+  currentCommunityRules: CommunityRules;
   className?: string;
-  communityTokenSupply: BigNumber;
 }
 
 export function CommunityDetails(props: Props) {
-  const communityPowerPercent = props.minCommunityPower
-    .dividedBy(props.communityTokenSupply)
+  const communityPowerPercent = props.communityRules.votingPowerToCreateProposals
+    .dividedBy(props.communityRules.totalSupply)
     .multipliedBy(100);
-
-  console.log(props);
 
   return (
     <SectionBlock className={props.className}>
@@ -43,60 +38,101 @@ export function CommunityDetails(props: Props) {
       <div className="space-y-8">
         <ValueBlock
           title="Do you want to allow community members to create proposals?"
-          description="asdf asdf asdf asdf asdf"
+          description="If disabled, the community token members can no longer create proposals."
         >
           <ButtonToggle
             className="h-14"
-            value={props.communityCanCreate}
-            onChange={props.onCommunityCanCreateChange}
+            value={props.communityRules.votingPowerToCreateProposals.isLessThan(
+              MAX_NUM,
+            )}
+            onChange={(value) => {
+              const newRules = produce(props.communityRules, (data) => {
+                data.votingPowerToCreateProposals = value
+                  ? props.currentCommunityRules.votingPowerToCreateProposals
+                  : MAX_NUM;
+              });
+              props.onCommunityRulesChange?.(newRules);
+            }}
           />
         </ValueBlock>
+        {props.communityRules.votingPowerToCreateProposals.isLessThan(
+          MAX_NUM,
+        ) && (
+          <ValueBlock
+            title="What is the minimum amount of community tokens required to create a proposal?"
+            description="A user must have this many community tokens in order to create a proposal."
+          >
+            <div className="relative">
+              <Input
+                className="w-full pr-24"
+                placeholder="# of tokens"
+                value={formatNumber(
+                  props.communityRules.votingPowerToCreateProposals,
+                  undefined,
+                  {
+                    maximumFractionDigits: 0,
+                  },
+                )}
+                onChange={(e) => {
+                  const text = e.currentTarget.value.replaceAll(/[^\d.-]/g, '');
+                  const value = new BigNumber(text);
+                  const newRules = produce(props.communityRules, (data) => {
+                    data.votingPowerToCreateProposals = value;
+                  });
+                  props.onCommunityRulesChange?.(newRules);
+                }}
+              />
+              <div className="absolute top-1/2 right-4 text-neutral-500 -translate-y-1/2">
+                Tokens
+              </div>
+            </div>
+            <div className="flex items-center justify-end">
+              <div className="mt-1 text-xs text-neutral-500">
+                {communityPowerPercent.isGreaterThan(0)
+                  ? communityPowerPercent.isLessThan(0.01)
+                    ? '<0.01'
+                    : formatNumber(communityPowerPercent, undefined, {
+                        maximumFractionDigits: 2,
+                        minimumFractionDigits: 0,
+                      })
+                  : 0}
+                % of token supply
+              </div>
+            </div>
+          </ValueBlock>
+        )}
         <ValueBlock
-          title="What is the minimum amount of community tokens required to create a proposal?"
-          description="A user must have this many community tokens in order to create a proposal."
+          title="Do you want to allow community members to vote?"
+          description="If disabled, the community token members can no longer vote on proposals."
         >
-          <div className="relative">
-            <Input
-              className="w-full pr-24"
-              placeholder="# of tokens"
-              value={formatNumber(props.minCommunityPower, undefined, {
-                maximumFractionDigits: 0,
-              })}
-              onChange={(e) => {
-                const text = e.currentTarget.value.replaceAll(/[^\d.-]/g, '');
-                props.onMinCommunityPowerChange?.(new BigNumber(text || 0));
-              }}
-            />
-            <div className="absolute top-1/2 right-4 text-neutral-500 -translate-y-1/2">
-              Tokens
-            </div>
-          </div>
-          <div className="flex items-center justify-end">
-            <div className="mt-1 text-xs text-neutral-500">
-              {communityPowerPercent.isGreaterThan(0)
-                ? communityPowerPercent.isLessThan(0.01)
-                  ? '<0.01'
-                  : formatNumber(communityPowerPercent, undefined, {
-                      maximumFractionDigits: 2,
-                      minimumFractionDigits: 0,
-                    })
-                : 0}
-              % of token supply
-            </div>
-          </div>
+          <ButtonToggle
+            className="h-14"
+            value={props.communityRules.canVote}
+            onChange={(value) => {
+              const newRules = produce(props.communityRules, (data) => {
+                data.canVote = value;
+              });
+              props.onCommunityRulesChange?.(newRules);
+            }}
+          />
         </ValueBlock>
         <ValueBlock
           title="Community Voting Quorum"
           description="The percentage of Yes votes required to pass a proposal"
         >
           <div className="grid grid-cols-[100px,1fr] gap-x-2 items-center">
-            <SliderValue value={props.communityQuorumPercent} units="%" />
+            <SliderValue value={props.communityRules.quorumPercent} units="%" />
             <Slider
               min={1}
               max={100}
               trackColor="bg-sky-400"
-              value={props.communityQuorumPercent}
-              onChange={props.onCommunityQuorumPercentChange}
+              value={props.communityRules.quorumPercent}
+              onChange={(value) => {
+                const newRules = produce(props.communityRules, (data) => {
+                  data.quorumPercent = value;
+                });
+                props.onCommunityRulesChange?.(newRules);
+              }}
               onRenderValue={(val) => `${val}%`}
             />
           </div>
@@ -107,8 +143,13 @@ export function CommunityDetails(props: Props) {
         >
           <VoteTippingSelector
             className="w-full"
-            value={props.communityVoteTipping}
-            onChange={props.onCommunityVoteTippingChange}
+            value={props.communityRules.voteTipping}
+            onChange={(value) => {
+              const newRules = produce(props.communityRules, (data) => {
+                data.voteTipping = value;
+              });
+              props.onCommunityRulesChange?.(newRules);
+            }}
           />
         </ValueBlock>
         <ValueBlock
@@ -117,11 +158,16 @@ export function CommunityDetails(props: Props) {
         >
           <ButtonToggle
             className="h-14"
-            value={props.communityHasVeto}
-            onChange={props.onCommunityHasVetoChange}
+            value={props.communityRules.canVeto}
+            onChange={(value) => {
+              const newRules = produce(props.communityRules, (data) => {
+                data.canVeto = value;
+              });
+              props.onCommunityRulesChange?.(newRules);
+            }}
           />
         </ValueBlock>
-        {props.communityHasVeto && (
+        {props.communityRules.canVeto && (
           <ValueBlock
             title="Community Veto Voting Quorum"
             description={
@@ -132,13 +178,21 @@ export function CommunityDetails(props: Props) {
             }
           >
             <div className="grid grid-cols-[100px,1fr] gap-x-2 items-center">
-              <SliderValue value={props.communityVetoQuorum} units="%" />
+              <SliderValue
+                value={props.communityRules.vetoQuorumPercent}
+                units="%"
+              />
               <Slider
                 min={1}
                 max={100}
                 trackColor="bg-sky-400"
-                value={props.communityVetoQuorum}
-                onChange={props.onCommunityVetoQuorumChange}
+                value={props.communityRules.vetoQuorumPercent}
+                onChange={(value) => {
+                  const newRules = produce(props.communityRules, (data) => {
+                    data.vetoQuorumPercent = value;
+                  });
+                  props.onCommunityRulesChange?.(newRules);
+                }}
                 onRenderValue={(val) => `${val}%`}
               />
             </div>
