@@ -1,40 +1,38 @@
-import * as yup from 'yup'
-
-import Switch from '@components/Switch'
 import { useContext, useEffect, useState } from 'react'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import * as yup from 'yup'
 import {
   Governance,
   ProgramAccount,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
-import useWalletStore from 'stores/useWalletStore'
-import { NewProposalContext } from '../../../new'
 import Input from '@components/inputs/Input'
+import Select from '@components/inputs/Select'
+import Switch from '@components/Switch'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import {
-  UiInstruction,
-  UXDEditMercurialVaultDepositoryForm,
-} from '@utils/uiTypes/proposalCreationTypes'
+  DEPOSITORY_TYPES,
+  editUXDDepositoryIx,
+  getDepositoryMintSymbols,
+  getDepositoryTypes,
+} from '@tools/sdk/uxdProtocol'
 import { isFormValid } from '@utils/formValidation'
 import {
-  Controller,
-  MercurialVaultDepository,
-  UXD_DECIMALS,
-} from '@uxd-protocol/uxd-client'
-import {
-  getDepositoryMintInfo,
-  getDepositoryMintSymbols,
-  uxdClient,
-} from '@tools/sdk/uxdProtocol/uxdClient'
+  UiInstruction,
+  UXDEditDepositoryForm,
+} from '@utils/uiTypes/proposalCreationTypes'
+
+import useWalletStore from 'stores/useWalletStore'
+
+import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import SelectOptionList from '../../SelectOptionList'
-import Select from '@components/inputs/Select'
 
 const schema = yup.object().shape({
   governedAccount: yup
     .object()
     .nullable()
     .required('Governance account is required'),
+  depositoryType: yup.string().required('Valid Depository type is required'),
   collateralName: yup.string().required('Valid Collateral name is required'),
   mintingFeeInBps: yup
     .number()
@@ -49,7 +47,7 @@ const schema = yup.object().shape({
     .min(0, 'Redeemable amount under management cap should be min 0'),
 })
 
-const EditMercurialVaultDepository = ({
+const EditDepository = ({
   index,
   governance,
 }: {
@@ -76,8 +74,9 @@ const EditMercurialVaultDepository = ({
   const { handleSetInstructions } = useContext(NewProposalContext)
   const { assetAccounts } = useGovernanceAssets()
 
-  const [form, setForm] = useState<UXDEditMercurialVaultDepositoryForm>({
+  const [form, setForm] = useState<UXDEditDepositoryForm>({
     governedAccount: undefined,
+    depositoryType: 'Credix',
     redeemableAmountUnderManagementCap: 0,
     mintingFeeInBps: 0,
     redeemingFeeInBps: 0,
@@ -111,7 +110,6 @@ const EditMercurialVaultDepository = ({
     }
     const uxdProgramId =
       form.governedAccount?.governance?.account.governedAccount
-    const client = uxdClient(uxdProgramId)
     const authority = form.governedAccount.governance.pubkey
 
     const depositoryMintName = form.collateralName
@@ -127,32 +125,17 @@ const EditMercurialVaultDepository = ({
       ? form.redeemableAmountUnderManagementCap
       : undefined
 
-    const {
-      address: collateralMint,
-      decimals: collateralDecimals,
-    } = getDepositoryMintInfo(connection.cluster, depositoryMintName)
-
-    const depository = await MercurialVaultDepository.initialize({
-      connection: connection.current,
-      collateralMint: {
-        mint: collateralMint,
-        name: depositoryMintName,
-        symbol: depositoryMintName,
-        decimals: collateralDecimals,
-      },
+    const ix = await editUXDDepositoryIx(
+      connection,
       uxdProgramId,
-    })
-
-    const ix = client.createEditMercurialVaultDepositoryInstruction(
-      new Controller('UXD', UXD_DECIMALS, uxdProgramId),
-      depository,
-      authority,
+      form.depositoryType as DEPOSITORY_TYPES,
       {
-        redeemableAmountUnderManagementCap,
+        authority,
+        depositoryMintName,
         mintingFeeInBps,
         redeemingFeeInBps,
-      },
-      { preflightCommitment: 'processed', commitment: 'processed' }
+        redeemableAmountUnderManagementCap,
+      }
     )
 
     return {
@@ -187,6 +170,17 @@ const EditMercurialVaultDepository = ({
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
       />
+      <Select
+        label="Depository Type"
+        value={form.depositoryType}
+        placeholder="Please select..."
+        onChange={(value) =>
+          handleSetForm({ value, propertyName: 'depositoryType' })
+        }
+        error={formErrors['depositoryType']}
+      >
+        <SelectOptionList list={getDepositoryTypes(false)} />
+      </Select>
       <Select
         label="Collateral Name"
         value={form.collateralName}
@@ -273,4 +267,4 @@ const EditMercurialVaultDepository = ({
   )
 }
 
-export default EditMercurialVaultDepository
+export default EditDepository

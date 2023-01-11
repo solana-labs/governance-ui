@@ -19,11 +19,10 @@ import {
   getDepositoryMintSymbols,
   getDepositoryTypes,
   registerUXDDepositoryIx,
-} from '@tools/sdk/uxdProtocol/uxdClient'
+} from '@tools/sdk/uxdProtocol'
 import Select from '@components/inputs/Select'
 import SelectOptionList from '../../SelectOptionList'
 import Input from '@components/inputs/Input'
-import useRealm from '@hooks/useRealm'
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -60,7 +59,6 @@ const RegisterCredixDepository = ({
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
-  const { symbol } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
 
   const [form, setForm] = useState<UXDRegisterDepositoryForm>({
@@ -159,7 +157,7 @@ const RegisterCredixDepository = ({
         }
         error={formErrors['depositoryType']}
       >
-        <SelectOptionList list={getDepositoryTypes(symbol == 'UXP')} />
+        <SelectOptionList list={getDepositoryTypes(false)} />
       </Select>
       <Select
         label="Collateral Name"

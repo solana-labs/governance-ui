@@ -854,11 +854,6 @@ export default function useGovernanceAssets() {
       isVisible: symbol === 'UXP',
       packageId: PackageEnum.UXDProtocol,
     },
-    [Instructions.UXDEditMercurialVaultDepository]: {
-      name: 'UXD: Edit Mercurial Vault Depository',
-      isVisible: symbol === 'UXP',
-      packageId: PackageEnum.UXDProtocol,
-    },
     [Instructions.UXDMintWithMercurialVaultDepository]: {
       name: 'UXD: Mint with Mercurial Vault Depository',
       isVisible: canUseAnyInstruction,
@@ -867,11 +862,6 @@ export default function useGovernanceAssets() {
     [Instructions.UXDRedeemWithMercurialVaultDepository]: {
       name: 'UXD: Redeem with Mercurial Vault Depository',
       isVisible: canUseAnyInstruction,
-      packageId: PackageEnum.UXDProtocol,
-    },
-    [Instructions.UXDEditCredixDepository]: {
-      name: 'UXD: Edit Credix Depository',
-      isVisible: symbol === 'UXP',
       packageId: PackageEnum.UXDProtocol,
     },
     [Instructions.UXDMintWithCredixDepository]: {
@@ -886,6 +876,11 @@ export default function useGovernanceAssets() {
     },
     [Instructions.UXDRegisterDepository]: {
       name: 'UXD: Register a Depository',
+      isVisible: symbol === 'UXP',
+      packageId: PackageEnum.UXDProtocol,
+    },
+    [Instructions.UXDEditDepository]: {
+      name: 'UXD: Edit a Depository',
       isVisible: symbol === 'UXP',
       packageId: PackageEnum.UXDProtocol,
     },
