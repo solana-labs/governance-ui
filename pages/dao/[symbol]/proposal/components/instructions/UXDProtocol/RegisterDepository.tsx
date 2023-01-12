@@ -63,7 +63,7 @@ const RegisterCredixDepository = ({
 
   const [form, setForm] = useState<UXDRegisterDepositoryForm>({
     governedAccount: undefined,
-    depositoryType: 'Credix',
+    depositoryType: DEPOSITORY_TYPES.CREDIX,
     redeemableDepositorySupplyCap: 0,
     mintingFeeInBps: 0,
     redeemingFeeInBps: 0,

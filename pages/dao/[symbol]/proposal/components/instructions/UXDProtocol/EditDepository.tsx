@@ -76,7 +76,7 @@ const EditDepository = ({
 
   const [form, setForm] = useState<UXDEditDepositoryForm>({
     governedAccount: undefined,
-    depositoryType: 'Credix',
+    depositoryType: DEPOSITORY_TYPES.CREDIX,
     redeemableAmountUnderManagementCap: 0,
     mintingFeeInBps: 0,
     redeemingFeeInBps: 0,
