@@ -36,8 +36,11 @@ export function VotingDuration(props: Props) {
       >
         <div className="grid grid-cols-[100px,1fr] gap-x-2 items-center">
           <SliderValue
+            min={1}
+            max={7}
             value={props.maxVoteDays}
             units={ntext(props.maxVoteDays, 'Day')}
+            onChange={props.onMaxVoteDaysChange}
           />
           <Slider
             min={1}
@@ -61,8 +64,11 @@ export function VotingDuration(props: Props) {
       >
         <div className="grid grid-cols-[100px,1fr] gap-x-2 items-center">
           <SliderValue
+            min={0}
+            max={24}
             value={props.coolOffHours}
             units={ntext(props.coolOffHours, 'Hour')}
+            onChange={props.onCoolOffHoursChange}
           />
           <Slider
             min={0}

@@ -9,12 +9,15 @@ import { PublicKey } from '@hub/types/decoders/PublicKey';
 export const getGovernanceRules = gql`
   query($realmUrlId: String!, $governancePublicKey: PublicKey!) {
     realmByUrlId(urlId: $realmUrlId) {
+      programPublicKey
+      publicKey
       governance(governance: $governancePublicKey) {
         communityTokenRules {
           canCreateProposal
           canVeto
           canVote
           quorumPercent
+          tokenMintAddress
           tokenType
           totalSupply
           vetoQuorumPercent
@@ -27,6 +30,7 @@ export const getGovernanceRules = gql`
           canVeto
           canVote
           quorumPercent
+          tokenMintAddress
           tokenType
           totalSupply
           vetoQuorumPercent
@@ -49,6 +53,7 @@ const Rules = IT.type({
   canVeto: IT.boolean,
   canVote: IT.boolean,
   quorumPercent: IT.number,
+  tokenMintAddress: PublicKey,
   tokenType: GovernanceTokenType,
   totalSupply: BigNumber,
   vetoQuorumPercent: IT.number,
@@ -58,6 +63,8 @@ const Rules = IT.type({
 
 export const getGovernanceRulesResp = IT.type({
   realmByUrlId: IT.type({
+    programPublicKey: PublicKey,
+    publicKey: PublicKey,
     governance: IT.type({
       communityTokenRules: Rules,
       coolOffHours: IT.number,

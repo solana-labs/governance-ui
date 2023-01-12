@@ -2,9 +2,9 @@ import BuildingIcon from '@carbon/icons-react/lib/Building';
 import ChemistryIcon from '@carbon/icons-react/lib/Chemistry';
 import TimeIcon from '@carbon/icons-react/lib/Time';
 import UserMultipleIcon from '@carbon/icons-react/lib/UserMultiple';
+import { PublicKey } from '@solana/web3.js';
 import { BigNumber } from 'bignumber.js';
 
-import { MAX_NUM } from '../constants';
 import { SectionBlock } from '../SectionBlock';
 import { SectionHeader } from '../SectionHeader';
 import { SummaryItem } from '../SummaryItem';
@@ -24,6 +24,11 @@ function diff<T extends { [key: string]: unknown }>(existing: T, changed: T) {
     const changedValue = changed[key];
 
     if (
+      existingValue instanceof PublicKey &&
+      changedValue instanceof PublicKey
+    ) {
+      continue;
+    } else if (
       BigNumber.isBigNumber(existingValue) &&
       BigNumber.isBigNumber(changedValue)
     ) {

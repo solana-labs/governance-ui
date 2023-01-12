@@ -114,7 +114,18 @@ export function CommunityDetails(props: Props) {
           description="The percentage of Yes votes required to pass a proposal"
         >
           <div className="grid grid-cols-[100px,1fr] gap-x-2 items-center">
-            <SliderValue value={props.communityRules.quorumPercent} units="%" />
+            <SliderValue
+              min={1}
+              max={100}
+              value={props.communityRules.quorumPercent}
+              units="%"
+              onChange={(value) => {
+                const newRules = produce(props.communityRules, (data) => {
+                  data.quorumPercent = value;
+                });
+                props.onCommunityRulesChange?.(newRules);
+              }}
+            />
             <Slider
               min={1}
               max={100}
@@ -172,8 +183,16 @@ export function CommunityDetails(props: Props) {
           >
             <div className="grid grid-cols-[100px,1fr] gap-x-2 items-center">
               <SliderValue
+                min={1}
+                max={100}
                 value={props.communityRules.vetoQuorumPercent}
                 units="%"
+                onChange={(value) => {
+                  const newRules = produce(props.communityRules, (data) => {
+                    data.vetoQuorumPercent = value;
+                  });
+                  props.onCommunityRulesChange?.(newRules);
+                }}
               />
               <Slider
                 min={1}

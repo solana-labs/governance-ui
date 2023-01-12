@@ -58,7 +58,7 @@ interface Props {
 
 export function App(props: Props) {
   const router = useRouter();
-  const isDarkMode = router.pathname.startsWith('/realm/[id]/wallet');
+  const isDarkMode = router.pathname.startsWith('/realm/[id]/governance');
 
   useEffect(() => {
     if (isDarkMode) {

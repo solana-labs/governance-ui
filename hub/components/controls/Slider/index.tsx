@@ -1,4 +1,5 @@
 import * as SliderRoot from '@radix-ui/react-slider';
+import { clamp } from 'ramda';
 
 import cx from '@hub/lib/cx';
 
@@ -36,7 +37,7 @@ export function Slider(props: Props) {
         max={props.max}
         min={props.min}
         step={props.step}
-        value={[props.value]}
+        value={[clamp(props.min, props.max, props.value)]}
         onValueChange={(values) => props.onChange?.(values[0])}
         onValueCommit={(values) => props.onChange?.(values[0])}
       >

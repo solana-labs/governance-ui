@@ -9,6 +9,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import { Primary, Secondary } from '@hub/components/controls/Button';
+import { useProposal } from '@hub/hooks/useProposal';
 import { useQuery } from '@hub/hooks/useQuery';
 import { abbreviateAddress } from '@hub/lib/abbreviateAddress';
 import cx from '@hub/lib/cx';
@@ -17,6 +18,7 @@ import { GovernanceVoteTipping } from '@hub/types/GovernanceVoteTipping';
 import * as RE from '@hub/types/Result';
 
 import { MAX_NUM } from './constants';
+import { createTransaction } from './createTransaction';
 import { Form } from './Form';
 import * as gql from './gql';
 import { Summary } from './Summary';
@@ -52,6 +54,7 @@ interface Props {
 }
 
 export function EditWalletRules(props: Props) {
+  const { createProposal } = useProposal();
   const [result] = useQuery(gql.getGovernanceRulesResp, {
     query: gql.getGovernanceRules,
     variables: {
@@ -68,9 +71,13 @@ export function EditWalletRules(props: Props) {
   const [proposalDescription, setProposalDescription] = useState('');
 
   const [communityRules, setCommunityRules] = useState<CommunityRules>({
+    canCreateProposal: true,
     canVeto: false,
     canVote: false,
     quorumPercent: 1,
+    // this isn't a valid value, but it's just to satisfy the types for the
+    // default initialized value
+    tokenMintAddress: props.governanceAddress,
     tokenType: GovernanceTokenType.Community,
     totalSupply: new BigNumber(1),
     vetoQuorumPercent: 100,
@@ -86,6 +93,8 @@ export function EditWalletRules(props: Props) {
 
   const [maxVoteDays, setMaxVoteDays] = useState(3);
   const [minInstructionHoldupDays, setMinInstructionHoldupDays] = useState(0);
+
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -112,7 +121,7 @@ export function EditWalletRules(props: Props) {
     RE.match(
       () => <div />,
       () => <div />,
-      ({ realmByUrlId: { governance } }) => (
+      ({ realmByUrlId: { governance, programPublicKey, publicKey } }) => (
         <div className={cx(props.className, 'dark:bg-neutral-900')}>
           <div className="w-full max-w-3xl pt-14 mx-auto">
             <Head>
@@ -210,7 +219,57 @@ export function EditWalletRules(props: Props) {
                       <EditIcon className="h-4 fill-current mr-1 w-4" />
                       Edit Rules
                     </button>
-                    <Primary className="ml-16 h-14 w-44">
+                    <Primary
+                      className="ml-16 h-14 w-44"
+                      pending={submitting}
+                      onClick={async () => {
+                        setSubmitting(true);
+
+                        const transaction = createTransaction(
+                          programPublicKey,
+                          governance.version,
+                          governance.governanceAddress,
+                          {
+                            coolOffHours,
+                            depositExemptProposalCount,
+                            maxVoteDays,
+                            minInstructionHoldupDays,
+                            communityTokenRules: communityRules,
+                            councilTokenRules: councilRules,
+                            governanceAddress: governance.governanceAddress,
+                            version: governance.version,
+                            walletAddress: governance.walletAddress,
+                          },
+                        );
+
+                        const governingTokenMintPublicKey =
+                          proposalVoteType === 'council' &&
+                          governance.councilTokenRules
+                            ? governance.councilTokenRules.tokenMintAddress
+                            : governance.communityTokenRules.tokenMintAddress;
+
+                        const proposalAddress = await createProposal({
+                          governingTokenMintPublicKey,
+                          programPublicKey,
+                          proposalDescription,
+                          governancePublicKey: governance.governanceAddress,
+                          instructions: [transaction],
+                          isDraft: false,
+                          proposalTitle: `Update Wallet Rules for “${governance.governanceAddress.toBase58()}”`,
+                          realmPublicKey: publicKey,
+                        });
+
+                        if (proposalAddress) {
+                          router.push(
+                            `/dao/${
+                              props.realmUrlId
+                            }/proposal/${proposalAddress.toBase58()}`,
+                          );
+                        }
+
+                        setSubmitting(false);
+                      }}
+                    >
                       <CheckmarkIcon className="h-4 fill-current mr-1 w-4" />
                       Create Proposal
                     </Primary>

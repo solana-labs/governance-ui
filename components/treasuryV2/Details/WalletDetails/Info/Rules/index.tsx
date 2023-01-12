@@ -128,7 +128,7 @@ export default function Rules(props: Props) {
               onClick={() => {
                 if (props.wallet.governanceAccount) {
                   router.push(
-                    `/realm/${symbol}/wallet/${props.wallet.governanceAccount.pubkey.toBase58()}/edit`
+                    `/realm/${symbol}/governance/${props.wallet.governanceAccount.pubkey.toBase58()}/edit`
                   )
                 }
               }}
