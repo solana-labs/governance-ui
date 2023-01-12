@@ -138,12 +138,11 @@ import UXDInitializeIdentityDepository from './components/instructions/UXDProtoc
 import UXDEditIdentityDepository from './components/instructions/UXDProtocol/EditIdentityDepository'
 import UXDMintWithIdentityDepository from './components/instructions/UXDProtocol/MintWithIdentityDepository'
 import UXDRedeemWithIdentityDepository from './components/instructions/UXDProtocol/RedeemWithIdentityDepository'
-import UXDMintWithMercurialVaultDepository from './components/instructions/UXDProtocol/MintWithMercurialVaultDepository'
 import UXDRedeemWithMercurialVaultDepository from './components/instructions/UXDProtocol/RedeemWithMercurialVaultDepository'
-import UXDMintWithCredixDepository from './components/instructions/UXDProtocol/MintWithCredixDepository'
 import UXDRedeemWithCredixDepository from './components/instructions/UXDProtocol/RedeemWithCredixDepository'
 import UXDRegisterDepository from './components/instructions/UXDProtocol/RegisterDepository'
 import UXDEditDepository from './components/instructions/UXDProtocol/EditDepository'
+import UXDMint from './components/instructions/UXDProtocol/Mint'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -535,12 +534,11 @@ const New = () => {
       [Instructions.UXDEditIdentityDepository]: UXDEditIdentityDepository,
       [Instructions.UXDRedeemWithIdentityDepository]: UXDRedeemWithIdentityDepository,
       [Instructions.UXDMintWithIdentityDepository]: UXDMintWithIdentityDepository,
-      [Instructions.UXDMintWithMercurialVaultDepository]: UXDMintWithMercurialVaultDepository,
       [Instructions.UXDRedeemWithMercurialVaultDepository]: UXDRedeemWithMercurialVaultDepository,
-      [Instructions.UXDMintWithCredixDepository]: UXDMintWithCredixDepository,
       [Instructions.UXDRedeemWithCredixDepository]: UXDRedeemWithCredixDepository,
       [Instructions.UXDRegisterDepository]: UXDRegisterDepository,
       [Instructions.UXDEditDepository]: UXDEditDepository,
+      [Instructions.UXDMint]: UXDMint,
     }),
     [governance?.pubkey?.toBase58()]
   )
