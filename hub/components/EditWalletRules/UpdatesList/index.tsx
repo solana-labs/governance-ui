@@ -30,14 +30,8 @@ function diff<T extends { [key: string]: unknown }>(existing: T, changed: T) {
       if (!existingValue.isEqualTo(changedValue)) {
         diffs[key] = [existingValue, changedValue];
       }
-    } else if (key === 'communityVetoQuorum') {
-      if (changed['communityHasVeto']) {
-        if (existingValue !== changedValue) {
-          diffs[key] = [existingValue, changedValue];
-        }
-      }
-    } else if (key === 'councilVetoQuorum') {
-      if (changed['councilHasVeto']) {
+    } else if (key === 'vetoQuorumPercent') {
+      if (changed['canVeto']) {
         if (existingValue !== changedValue) {
           diffs[key] = [existingValue, changedValue];
         }
@@ -181,61 +175,68 @@ export function UpdatesList(props: Props) {
             text="Community Details"
           />
           <div className="grid grid-cols-2 gap-x-4 gap-y-8">
+            {!!communityDetailsDiff.canCreateProposal?.length && (
+              <SummaryItem
+                label="Allow community members to create proposals"
+                value={
+                  <div className="flex items-baseline">
+                    <div>
+                      {communityDetailsDiff.canCreateProposal[1] ? 'Yes' : 'No'}
+                    </div>
+                    <div className="ml-3 text-base text-neutral-500 line-through">
+                      {communityDetailsDiff.canCreateProposal[0] ? 'Yes' : 'No'}
+                    </div>
+                  </div>
+                }
+              />
+            )}
             {!!communityDetailsDiff.votingPowerToCreateProposals?.length &&
-              (props.currentCommunityRules.votingPowerToCreateProposals.isEqualTo(
-                MAX_NUM,
-              ) ||
-                props.currentCommunityRules.votingPowerToCreateProposals.isEqualTo(
-                  MAX_NUM,
-                )) && (
+              props.communityRules.canCreateProposal && (
                 <SummaryItem
-                  label="Allow community members to create proposals"
+                  label="Minimum amount of community tokens required to create a proposal"
                   value={
-                    <div className="flex items-baseline">
+                    <div>
                       <div>
-                        {communityDetailsDiff.votingPowerToCreateProposals[1].isLessThan(
-                          MAX_NUM,
-                        )
-                          ? 'Yes'
-                          : 'No'}
+                        {formatNumber(
+                          communityDetailsDiff.votingPowerToCreateProposals[1],
+                          undefined,
+                          { maximumFractionDigits: 0 },
+                        )}{' '}
+                        {ntext(
+                          communityDetailsDiff.votingPowerToCreateProposals[1].toNumber(),
+                          'token',
+                        )}
                       </div>
-                      <div className="ml-3 text-base text-neutral-500 line-through">
-                        {communityDetailsDiff.votingPowerToCreateProposals[0].isLessThan(
-                          MAX_NUM,
-                        )
-                          ? 'Yes'
-                          : 'No'}
-                      </div>
+                      {!props.currentCommunityRules.canCreateProposal ? (
+                        <div className="text-base text-neutral-500 line-through">
+                          Disabled
+                        </div>
+                      ) : (
+                        <div className="text-base text-neutral-500 line-through">
+                          {formatNumber(
+                            communityDetailsDiff
+                              .votingPowerToCreateProposals[0],
+                            undefined,
+                            { maximumFractionDigits: 0 },
+                          )}{' '}
+                          {ntext(
+                            communityDetailsDiff.votingPowerToCreateProposals[0].toNumber(),
+                            'token',
+                          )}
+                        </div>
+                      )}
                     </div>
                   }
                 />
               )}
-            {!!communityDetailsDiff.votingPowerToCreateProposals?.length && (
+            {!!communityDetailsDiff.canVote?.length && (
               <SummaryItem
-                label="Minimum amount of community tokens required to create a proposal"
+                label="Community Members Can Vote?"
                 value={
-                  <div>
-                    <div>
-                      {formatNumber(
-                        communityDetailsDiff.votingPowerToCreateProposals[1],
-                        undefined,
-                        { maximumFractionDigits: 0 },
-                      )}{' '}
-                      {ntext(
-                        communityDetailsDiff.votingPowerToCreateProposals[1].toNumber(),
-                        'token',
-                      )}
-                    </div>
-                    <div className="text-base text-neutral-500 line-through">
-                      {formatNumber(
-                        communityDetailsDiff.votingPowerToCreateProposals[0],
-                        undefined,
-                        { maximumFractionDigits: 0 },
-                      )}{' '}
-                      {ntext(
-                        communityDetailsDiff.votingPowerToCreateProposals[0].toNumber(),
-                        'token',
-                      )}
+                  <div className="flex items-baseline">
+                    <div>{communityDetailsDiff.canVote[1] ? 'Yes' : 'No'}</div>
+                    <div className="ml-3 text-base text-neutral-500 line-through">
+                      {communityDetailsDiff.canVote[0] ? 'Yes' : 'No'}
                     </div>
                   </div>
                 }
@@ -307,61 +308,67 @@ export function UpdatesList(props: Props) {
             text="Council Details"
           />
           <div className="grid grid-cols-2 gap-x-4 gap-y-8">
+            {!!councilDetailsDiff.canCreateProposal && (
+              <SummaryItem
+                label="Allow council members to create proposals"
+                value={
+                  <div className="flex items-baseline">
+                    <div>
+                      {councilDetailsDiff.canCreateProposal[1] ? 'Yes' : 'No'}
+                    </div>
+                    <div className="ml-3 text-base text-neutral-500 line-through">
+                      {councilDetailsDiff.canCreateProposal[0] ? 'Yes' : 'No'}
+                    </div>
+                  </div>
+                }
+              />
+            )}
             {!!councilDetailsDiff.votingPowerToCreateProposals?.length &&
-              (props.currentCouncilRules?.votingPowerToCreateProposals.isEqualTo(
-                MAX_NUM,
-              ) ||
-                props.currentCouncilRules?.votingPowerToCreateProposals.isEqualTo(
-                  MAX_NUM,
-                )) && (
+              props.councilRules?.canCreateProposal && (
                 <SummaryItem
-                  label="Allow council members to create proposals"
+                  label="Minimum amount of council tokens required to create a proposal"
                   value={
-                    <div className="flex items-baseline">
+                    <div>
                       <div>
-                        {councilDetailsDiff.votingPowerToCreateProposals[1].isLessThan(
-                          MAX_NUM,
-                        )
-                          ? 'Yes'
-                          : 'No'}
+                        {formatNumber(
+                          councilDetailsDiff.votingPowerToCreateProposals[1],
+                          undefined,
+                          { maximumFractionDigits: 0 },
+                        )}{' '}
+                        {ntext(
+                          councilDetailsDiff.votingPowerToCreateProposals[1].toNumber(),
+                          'token',
+                        )}
                       </div>
-                      <div className="ml-3 text-base text-neutral-500 line-through">
-                        {councilDetailsDiff.votingPowerToCreateProposals[0].isLessThan(
-                          MAX_NUM,
-                        )
-                          ? 'Yes'
-                          : 'No'}
-                      </div>
+                      {!props.currentCouncilRules?.canCreateProposal ? (
+                        <div className="text-base text-neutral-500 line-through">
+                          Disabled
+                        </div>
+                      ) : (
+                        <div className="text-base text-neutral-500 line-through">
+                          {formatNumber(
+                            councilDetailsDiff.votingPowerToCreateProposals[0],
+                            undefined,
+                            { maximumFractionDigits: 0 },
+                          )}{' '}
+                          {ntext(
+                            councilDetailsDiff.votingPowerToCreateProposals[0].toNumber(),
+                            'token',
+                          )}
+                        </div>
+                      )}
                     </div>
                   }
                 />
               )}
-            {!!councilDetailsDiff.votingPowerToCreateProposals?.length && (
+            {!!councilDetailsDiff.canVote?.length && (
               <SummaryItem
-                label="Minimum amount of council tokens required to create a proposal"
+                label="Council Members Can Vote?"
                 value={
-                  <div>
-                    <div>
-                      {formatNumber(
-                        councilDetailsDiff.votingPowerToCreateProposals[1],
-                        undefined,
-                        { maximumFractionDigits: 0 },
-                      )}{' '}
-                      {ntext(
-                        councilDetailsDiff.votingPowerToCreateProposals[1].toNumber(),
-                        'token',
-                      )}
-                    </div>
-                    <div className="text-base text-neutral-500 line-through">
-                      {formatNumber(
-                        councilDetailsDiff.votingPowerToCreateProposals[0],
-                        undefined,
-                        { maximumFractionDigits: 0 },
-                      )}{' '}
-                      {ntext(
-                        councilDetailsDiff.votingPowerToCreateProposals[0].toNumber(),
-                        'token',
-                      )}
+                  <div className="flex items-baseline">
+                    <div>{councilDetailsDiff.canVote[1] ? 'Yes' : 'No'}</div>
+                    <div className="ml-3 text-base text-neutral-500 line-through">
+                      {councilDetailsDiff.canVote[0] ? 'Yes' : 'No'}
                     </div>
                   </div>
                 }

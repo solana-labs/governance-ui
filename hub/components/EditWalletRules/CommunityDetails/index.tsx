@@ -2,7 +2,6 @@ import UserMultipleIcon from '@carbon/icons-react/lib/UserMultiple';
 import { BigNumber } from 'bignumber.js';
 import { produce } from 'immer';
 
-import { MAX_NUM } from '../constants';
 import { SectionBlock } from '../SectionBlock';
 import { SectionHeader } from '../SectionHeader';
 import { SliderValue } from '../SliderValue';
@@ -42,22 +41,16 @@ export function CommunityDetails(props: Props) {
         >
           <ButtonToggle
             className="h-14"
-            value={props.communityRules.votingPowerToCreateProposals.isLessThan(
-              MAX_NUM,
-            )}
+            value={props.communityRules.canCreateProposal}
             onChange={(value) => {
               const newRules = produce(props.communityRules, (data) => {
-                data.votingPowerToCreateProposals = value
-                  ? props.currentCommunityRules.votingPowerToCreateProposals
-                  : MAX_NUM;
+                data.canCreateProposal = value;
               });
               props.onCommunityRulesChange?.(newRules);
             }}
           />
         </ValueBlock>
-        {props.communityRules.votingPowerToCreateProposals.isLessThan(
-          MAX_NUM,
-        ) && (
+        {props.communityRules.canCreateProposal && (
           <ValueBlock
             title="What is the minimum amount of community tokens required to create a proposal?"
             description="A user must have this many community tokens in order to create a proposal."

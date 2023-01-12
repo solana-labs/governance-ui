@@ -91,13 +91,17 @@ export function ProposalVoteType(props: Props) {
             />
             <SummaryItem
               label="Min Governance Power to Create a Proposal"
-              value={formatNumber(
-                rules.votingPowerToCreateProposals,
-                undefined,
-                {
-                  maximumFractionDigits: 0,
-                },
-              )}
+              value={
+                rules.canCreateProposal
+                  ? formatNumber(
+                      rules.votingPowerToCreateProposals,
+                      undefined,
+                      {
+                        maximumFractionDigits: 0,
+                      },
+                    )
+                  : 'Disabled'
+              }
             />
             <SummaryItem
               label="Approval Quorum"

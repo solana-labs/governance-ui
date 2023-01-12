@@ -2,7 +2,6 @@ import BuildingIcon from '@carbon/icons-react/lib/Building';
 import { BigNumber } from 'bignumber.js';
 import { produce } from 'immer';
 
-import { MAX_NUM } from '../constants';
 import { SectionBlock } from '../SectionBlock';
 import { SectionHeader } from '../SectionHeader';
 import { SliderValue } from '../SliderValue';
@@ -38,26 +37,20 @@ export function CouncilDetails(props: Props) {
       <div className="space-y-8">
         <ValueBlock
           title="Do you want to allow council members to create proposals?"
-          description="asdf asdf asdf asdf asdf"
+          description="If disabled, the council token members can no longer create proposals."
         >
           <ButtonToggle
             className="h-14"
-            value={props.councilRules.votingPowerToCreateProposals.isLessThan(
-              MAX_NUM,
-            )}
+            value={props.councilRules.canCreateProposal}
             onChange={(value) => {
               const newRules = produce(props.councilRules, (data) => {
-                data.votingPowerToCreateProposals = value
-                  ? props.currentCouncilRules.votingPowerToCreateProposals
-                  : MAX_NUM;
+                data.canCreateProposal = value;
               });
               props.onCouncilRulesChange?.(newRules);
             }}
           />
         </ValueBlock>
-        {props.councilRules.votingPowerToCreateProposals.isLessThan(
-          MAX_NUM,
-        ) && (
+        {props.councilRules.canCreateProposal && (
           <ValueBlock
             title="What is the minimum amount of council tokens required to create a proposal?"
             description="A user must have this many council tokens in order to create a proposal."

@@ -11,6 +11,7 @@ export const getGovernanceRules = gql`
     realmByUrlId(urlId: $realmUrlId) {
       governance(governance: $governancePublicKey) {
         communityTokenRules {
+          canCreateProposal
           canVeto
           canVote
           quorumPercent
@@ -22,6 +23,7 @@ export const getGovernanceRules = gql`
         }
         coolOffHours
         councilTokenRules {
+          canCreateProposal
           canVeto
           canVote
           quorumPercent
@@ -43,6 +45,7 @@ export const getGovernanceRules = gql`
 `;
 
 const Rules = IT.type({
+  canCreateProposal: IT.boolean,
   canVeto: IT.boolean,
   canVote: IT.boolean,
   quorumPercent: IT.number,
