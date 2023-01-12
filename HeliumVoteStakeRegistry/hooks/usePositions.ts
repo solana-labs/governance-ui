@@ -10,7 +10,7 @@ export const usePositions = () => {
     ;(async () => {
       try {
         if (program) {
-          const { positions } = getPositions(program)
+          const { positions } = await getPositions(program)
           setPositions(positions)
         }
       } catch (e: any) {
@@ -19,5 +19,5 @@ export const usePositions = () => {
     })()
   }, [program])
 
-  return positions
+  return { positions }
 }

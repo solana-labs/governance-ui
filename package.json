@@ -49,6 +49,7 @@
     "@headlessui/react": "1.6.6",
     "@helium/helium-react-hooks": "0.0.14",
     "@helium/idls": "0.0.13",
+    "@helium/spl-utils": "0.0.14",
     "@helium/voter-stake-registry-sdk": "0.0.13",
     "@heroicons/react": "1.0.6",
     "@hookform/resolvers": "2.8.10",

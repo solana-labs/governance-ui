@@ -3,6 +3,7 @@ import {
   AnchorProvider,
   BN,
   BorshInstructionCoder,
+  IdlTypes,
 } from '@project-serum/anchor'
 import { AccountMetaData } from '@solana/spl-governance'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
@@ -18,6 +19,7 @@ import {
   SECS_PER_DAY,
 } from 'VoteStakeRegistry/tools/dateTools'
 import { calcMultiplier } from 'VoteStakeRegistry/tools/deposits'
+import { VoterStakeRegistry as HeliumVSR } from '@helium/idls/lib/types/voter_stake_registry'
 import { PROGRAM_ID as HELIUM_VSR_PROGRAM_ID } from '@helium/voter-stake-registry-sdk'
 
 interface ClawbackInstruction {
@@ -33,16 +35,9 @@ interface VotingMintCfgInstruction {
   grantAuthority: PublicKey
 }
 
+type HeliumVotingMintCfgArgs = IdlTypes<HeliumVSR>['ConfigureVotingMintArgsV0']
 interface HeliumVotingMintCfgInstruction {
-  args: Omit<
-    VotingMintCfgInstruction,
-    'baselineVoteWeightScaledFactor' | 'grantAuthority'
-  > & {
-    lockedVoteWeightScaledFactor: BN
-    minimumRequiredLockupSecs: BN
-    genesisVotePowerMultiplier: number
-    genesisVotePowerMultiplierExpirationTs: BN
-  }
+  args: HeliumVotingMintCfgArgs
 }
 
 export interface GrantInstruction {

@@ -162,9 +162,7 @@ const VotingMintConfig = ({
             minimumRequiredLockupSecs,
             maxExtraLockupVoteWeightScaledFactor: maxLockupScaledFactor,
             genesisVotePowerMultiplier: 0,
-            genesisVotePowerMultiplierExpirationTs: new BN(
-              Math.floor(new Date().getTime() - 60) / 1000
-            ),
+            genesisVotePowerMultiplierExpirationTs: new BN(0),
             lockupSaturationSecs,
           })
           .accounts({

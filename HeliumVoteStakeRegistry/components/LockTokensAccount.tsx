@@ -1,36 +1,39 @@
-import React, { useState } from 'react'
-import useRealm from '@hooks/useRealm'
+import React, { useMemo, useState } from 'react'
 import { BN } from '@project-serum/anchor'
-import useWalletStore from 'stores/useWalletStore'
-import PreviousRouteBtn from '@components/PreviousRouteBtn'
-import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
-import { GoverningTokenRole } from '@solana/spl-governance'
-import DepositCommunityTokensBtn from 'VoteStakeRegistry/components/TokenBalance/DepositCommunityTokensBtn'
-import WithDrawCommunityTokens from 'VoteStakeRegistry/components/TokenBalance/WithdrawCommunityTokensBtn'
-import InlineNotification from '@components/InlineNotification'
 import {
   LightningBoltIcon,
   LinkIcon,
   LockClosedIcon,
 } from '@heroicons/react/solid'
+import useRealm from '@hooks/useRealm'
+import {
+  fmtMintAmount,
+  getMintDecimalAmountFromNatural,
+} from '@tools/sdk/units'
+import useWalletStore from 'stores/useWalletStore'
+import PreviousRouteBtn from '@components/PreviousRouteBtn'
+import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
+import { GoverningTokenRole } from '@solana/spl-governance'
+import InlineNotification from '@components/InlineNotification'
+import tokenPriceService from '@utils/services/tokenPrice'
+import { getMintMetadata } from '@components/instructions/programs/splToken'
+import { abbreviateAddress } from '@utils/formatting'
+import Button from '@components/Button'
+import { usePositions } from '../hooks/usePositions'
+import { LockCommunityTokensBtn } from './LockCommunityTokensBtn'
+import { LockTokensModal } from './LockTokensModal'
 
 // const unlockedTypes = ['none']
 export const LockTokensAccount: React.FC<{
   tokenOwnerRecordPk: string | string[] | undefined
   children: React.ReactNode
 }> = ({ tokenOwnerRecordPk, children }) => {
-  const {
-    realm,
-    realmInfo,
-    mint,
-    tokenRecords,
-    councilMint,
-    config,
-  } = useRealm()
+  const { realm, realmTokenAccount, realmInfo, mint, councilMint } = useRealm()
   const [isLoading, setIsLoading] = useState(false)
   const [isOwnerOfPositions, setIsOwnerOfPositions] = useState(true)
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
   const [votingPower, setVotingPower] = useState<BN>(new BN(0))
+  const { positions } = usePositions()
   const [connection, wallet, connected] = useWalletStore((s) => [
     s.connection.current,
     s.current,
@@ -50,6 +53,32 @@ export const LockTokensAccount: React.FC<{
   //         unlockedTypes.includes(nextType)))
   //   )
   // }
+
+  const hasTokensInWallet =
+    realmTokenAccount && realmTokenAccount.account.amount.gt(new BN(0))
+
+  const availableTokens =
+    hasTokensInWallet && mint
+      ? fmtMintAmount(mint, realmTokenAccount?.account.amount as BN)
+      : 0
+
+  const availableTokensPrice =
+    hasTokensInWallet && mint && realm?.account.communityMint
+      ? getMintDecimalAmountFromNatural(
+          mint,
+          realmTokenAccount?.account.amount
+        ).toNumber() *
+        tokenPriceService.getUSDTokenPrice(
+          realm?.account.communityMint.toBase58()
+        )
+      : 0
+
+  const tokenName = realm?.account.communityMint
+    ? getMintMetadata(realm?.account.communityMint)?.name ||
+      tokenPriceService.getTokenInfo(realm?.account.communityMint.toBase58())
+        ?.name ||
+      abbreviateAddress(realm?.account.communityMint)
+    : ''
 
   return (
     <div className="grid grid-cols-12 gap-4">
@@ -72,11 +101,7 @@ export const LockTokensAccount: React.FC<{
           </h1>
 
           <div className="ml-auto flex flex-row">
-            <DepositCommunityTokensBtn
-              inAccountDetails={true}
-              className="mr-3"
-            />
-            <WithDrawCommunityTokens />
+            <LockCommunityTokensBtn onClick={() => setIsLockModalOpen(true)} />
           </div>
         </div>
         {!isOwnerOfPositions && connected && (
@@ -108,14 +133,18 @@ export const LockTokensAccount: React.FC<{
                       </div>
                     )}
                   </div>
-                  {/* iterate over positions and calc */}
                   <div className={mainBoxesClasses}>
-                    <p className="text-fgd-3">Deposited</p>
+                    <p className="text-fgd-3">{`${tokenName} Available`}</p>
                     <span className="hero-text">
-                      0
-                      <span className="font-normal text-xs ml-2">
-                        <span className="text-fgd-3">≈</span>${0}
-                      </span>
+                      {availableTokens}
+                      {availableTokensPrice ? (
+                        <span className="font-normal text-xs ml-2">
+                          <span className="text-fgd-3">≈</span>$
+                          {Intl.NumberFormat('en', {
+                            notation: 'compact',
+                          }).format(availableTokensPrice)}
+                        </span>
+                      ) : null}
                     </span>
                   </div>
                   {/* iterate over positions and calc */}
@@ -128,6 +157,19 @@ export const LockTokensAccount: React.FC<{
                       </span>
                     </span>
                   </div>
+                  <div className="border border-fgd-4 flex flex-col items-center justify-center p-6 rounded-lg">
+                    <LightningBoltIcon className="h-8 mb-2 text-primary-light w-8" />
+                    <p className="flex text-center pb-6">
+                      Increase your voting power by<br></br> locking your
+                      tokens.
+                    </p>
+                    <Button onClick={() => setIsLockModalOpen(true)}>
+                      <div className="flex items-center">
+                        <LockClosedIcon className="h-5 mr-1.5 w-5" />
+                        <span>Lock Tokens</span>
+                      </div>
+                    </Button>
+                  </div>
                 </>
               )}
             </div>
@@ -138,7 +180,12 @@ export const LockTokensAccount: React.FC<{
             <span className="text-fgd-1 text-sm">Connect your wallet</span>
           </div>
         )}
-
+        {isLockModalOpen && (
+          <LockTokensModal
+            isOpen={isLockModalOpen}
+            onClose={() => setIsLockModalOpen(false)}
+          />
+        )}
         <div className="mt-4">
           <TokenDeposit
             mint={councilMint}
