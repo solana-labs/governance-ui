@@ -107,7 +107,6 @@ import MakeRemoveSpotMarket from './components/instructions/Mango/MakeRemoveSpot
 import MakeRemovePerpMarket from './components/instructions/Mango/MakeRemovePerpMarket'
 import MakeSwapSpotMarket from './components/instructions/Mango/MakeSwapSpotMarket'
 import MakeRemoveOracle from './components/instructions/Mango/MakeRemoveOracle'
-import SagaPreOrder from './components/instructions/Solana/SagaPhone/SagaPreOrder'
 import MakeDepositToMangoAccount from './components/instructions/Mango/MakeDepositToMangoAccount'
 import MakeDepositToMangoAccountCsv from './components/instructions/Mango/MakeDepositToMangoAccountCsv'
 import TokenRegister from './components/instructions/Mango/MangoV4/TokenRegister'
@@ -488,7 +487,6 @@ const New = () => {
       [Instructions.ChangeMakeDonation]: ChangeDonation,
       [Instructions.CreateTokenMetadata]: CreateTokenMetadata,
       [Instructions.UpdateTokenMetadata]: UpdateTokenMetadata,
-      [Instructions.SagaPreOrder]: SagaPreOrder,
       [Instructions.DepositToMangoAccount]: MakeDepositToMangoAccount,
       [Instructions.DepositToMangoAccountCsv]: MakeDepositToMangoAccountCsv,
       [Instructions.StakeValidator]: StakeValidator,

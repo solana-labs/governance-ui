@@ -352,11 +352,6 @@ export default function useGovernanceAssets() {
       isVisible: canUseAuthorityInstruction,
       packageId: PackageEnum.Common,
     },
-    [Instructions.SagaPreOrder]: {
-      name: 'Pre-order Saga Phone',
-      isVisible: canUseTokenTransferInstruction,
-      packageId: PackageEnum.Common,
-    },
     [Instructions.StakeValidator]: {
       name: 'Stake A Validator',
       packageId: PackageEnum.Common,
