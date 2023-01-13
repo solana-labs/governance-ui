@@ -421,20 +421,6 @@ export interface UXDRedeemWithIdentityDepositoryForm {
   redeemableAmount: number
 }
 
-export interface UXDRedeemWithMercurialVaultDepositoryForm {
-  governedAccount?: AssetAccount
-  uxdProgram: string
-  collateralName?: string
-  redeemableAmount: number
-}
-
-export interface UXDRedeemWithCredixDepositoryForm {
-  governedAccount?: AssetAccount
-  uxdProgram: string
-  collateralName?: string
-  redeemableAmount: number
-}
-
 export interface UXDRegisterDepositoryForm {
   governedAccount?: AssetAccount
   depositoryType: string
@@ -459,6 +445,14 @@ export interface UXDMintForm {
   uxdProgram: string
   collateralName?: string
   collateralAmount: number
+}
+
+export interface UXDRedeemForm {
+  governedAccount?: AssetAccount
+  depositoryType: string
+  uxdProgram: string
+  collateralName?: string
+  redeemableAmount: number
 }
 
 export enum Instructions {
@@ -562,11 +556,10 @@ export enum Instructions {
   UXDEditIdentityDepository,
   UXDMintWithIdentityDepository,
   UXDRedeemWithIdentityDepository,
-  UXDRedeemWithMercurialVaultDepository,
-  UXDRedeemWithCredixDepository,
   UXDRegisterDepository,
   UXDEditDepository,
   UXDMint,
+  UXDRedeem,
 }
 
 export interface ComponentInstructionData {

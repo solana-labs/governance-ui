@@ -13,14 +13,14 @@ import {
   uxdClient,
 } from './uxdClient'
 
-export type UXDMintParams = {
+export type UXDRedeemParams = {
   authority: PublicKey
   payer: PublicKey
   collateralName: string
-  collateralAmount: number
+  redeemableAmount: number
 }
 
-const mintWithMercurialIx = async ({
+const redeemWithMercurialIx = async ({
   connection,
   uxdProgramId,
   client,
@@ -31,7 +31,7 @@ const mintWithMercurialIx = async ({
   uxdProgramId: PublicKey
   client: UXDClient
   controller: Controller
-  params: UXDMintParams
+  params: UXDRedeemParams
 }) => {
   const {
     address: collateralMint,
@@ -49,17 +49,17 @@ const mintWithMercurialIx = async ({
     uxdProgramId,
   })
 
-  return client.createMintWithMercurialVaultDepositoryInstruction(
+  return client.createRedeemFromMercurialVaultDepositoryInstruction(
     controller,
     depository,
     params.authority,
-    params.collateralAmount,
+    params.redeemableAmount,
     { preflightCommitment: 'processed', commitment: 'processed' },
     params.payer
   )
 }
 
-const mintWithCredixIx = async ({
+const redeemWithCredixIx = async ({
   connection,
   uxdProgramId,
   client,
@@ -70,7 +70,7 @@ const mintWithCredixIx = async ({
   uxdProgramId: PublicKey
   client: UXDClient
   controller: Controller
-  params: UXDMintParams
+  params: UXDRedeemParams
 }) => {
   const depository = await getCredixLpDepository(
     connection,
@@ -78,28 +78,28 @@ const mintWithCredixIx = async ({
     params.collateralName
   )
 
-  return client.createMintWithCredixLpDepositoryInstruction(
+  return client.createRedeemFromCredixLpDepositoryInstruction(
     controller,
     depository,
     params.authority,
-    params.collateralAmount,
+    params.redeemableAmount,
     { preflightCommitment: 'processed', commitment: 'processed' },
     params.payer
   )
 }
 
-export const mintUXDIx = async (
+export const redeemUXDIx = async (
   connection: ConnectionContext,
   uxdProgramId: PublicKey,
   depositoryType: DEPOSITORY_TYPES,
-  params: UXDMintParams
+  params: UXDRedeemParams
 ): Promise<TransactionInstruction> => {
   const client = uxdClient(uxdProgramId)
   const controller = new Controller('UXD', UXD_DECIMALS, uxdProgramId)
 
   switch (depositoryType) {
     case DEPOSITORY_TYPES.MERCURIAL:
-      return mintWithMercurialIx({
+      return redeemWithMercurialIx({
         connection,
         uxdProgramId,
         client,
@@ -108,7 +108,7 @@ export const mintUXDIx = async (
       })
     case DEPOSITORY_TYPES.CREDIX:
     default:
-      return mintWithCredixIx({
+      return redeemWithCredixIx({
         connection,
         uxdProgramId,
         client,

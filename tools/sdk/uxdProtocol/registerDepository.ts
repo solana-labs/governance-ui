@@ -1,11 +1,11 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
-import { ConnectionContext } from '@utils/connection'
 import {
   UXDClient,
   MercurialVaultDepository,
   UXD_DECIMALS,
   Controller,
 } from '@uxd-protocol/uxd-client'
+import { ConnectionContext } from '@utils/connection'
 import {
   getCredixLpDepository,
   getDepositoryMintInfo,

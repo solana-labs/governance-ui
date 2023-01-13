@@ -5,18 +5,19 @@ import {
   ProgramAccount,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
-import { Controller, UXD, UXD_DECIMALS } from '@uxd-protocol/uxd-client'
+import { USDC } from '@uxd-protocol/uxd-client'
 import Input from '@components/inputs/Input'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import {
-  getCredixLpDepository,
+  DEPOSITORY_TYPES,
   getDepositoryMintSymbols,
-  uxdClient,
-} from '@tools/sdk/uxdProtocol/uxdClient'
+  getDepositoryTypes,
+  redeemUXDIx,
+} from '@tools/sdk/uxdProtocol'
 import { isFormValid } from '@utils/formValidation'
 import {
   UiInstruction,
-  UXDMintWithCredixDepositoryForm,
+  UXDRedeemForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
@@ -59,15 +60,16 @@ const schema = yup.object().shape({
     .object()
     .nullable()
     .required('Governance account is required'),
+  depositoryType: yup.string().required('Valid Depository type is required'),
   uxdProgram: yup.string().required('UXD Program address is required'),
   collateralName: yup.string().required('Collateral Name address is required'),
-  collateralAmount: yup
+  redeemableAmount: yup
     .number()
-    .moreThan(0, 'Collateral amount should be more than 0')
-    .required('Collateral Amount is required'),
+    .moreThan(0, 'Redeemable amount should be more than 0')
+    .required('Redeemable Amount is required'),
 })
 
-const MintWithCredixDepository = ({
+const Redeem = ({
   index,
   governance,
 }: {
@@ -81,9 +83,10 @@ const MintWithCredixDepository = ({
   const { handleSetInstructions } = useContext(NewProposalContext)
   const { assetAccounts } = useGovernanceAssets()
 
-  const [form, setForm] = useState<UXDMintWithCredixDepositoryForm>({
+  const [form, setForm] = useState<UXDRedeemForm>({
     governedAccount: undefined,
-    collateralAmount: 0,
+    depositoryType: DEPOSITORY_TYPES.CREDIX,
+    redeemableAmount: 0,
     uxdProgram: 'UXD8m9cvwk4RcSxnX2HZ9VudQCEeDH6fRnB4CAP57Dr',
   })
 
@@ -115,30 +118,27 @@ const MintWithCredixDepository = ({
       }
     }
     const uxdProgramId = new PublicKey(form.uxdProgram)
-    const client = uxdClient(uxdProgramId)
     const authority = form.governedAccount.governance.pubkey
-    const depository = await getCredixLpDepository(
+
+    const ix = await redeemUXDIx(
       connection,
       uxdProgramId,
-      form.collateralName
-    )
-
-    const ix = client.createMintWithCredixLpDepositoryInstruction(
-      new Controller('UXD', UXD_DECIMALS, uxdProgramId),
-      depository,
-      authority,
-      form.collateralAmount,
-      { preflightCommitment: 'processed', commitment: 'processed' },
-      wallet.publicKey
+      form.depositoryType as DEPOSITORY_TYPES,
+      {
+        authority,
+        payer: wallet.publicKey,
+        collateralName: form.collateralName,
+        redeemableAmount: form.redeemableAmount,
+      }
     )
 
     const prerequisiteInstructions: TransactionInstruction[] = []
-    const [authorityUXDATA] = findATAAddrSync(authority, UXD)
+    const [authorityUSDCATA] = findATAAddrSync(authority, USDC)
     checkInitTokenAccount(
-      authorityUXDATA,
+      authorityUSDCATA,
       prerequisiteInstructions,
       connection,
-      UXD,
+      USDC,
       authority,
       wallet.publicKey
     )
@@ -177,6 +177,18 @@ const MintWithCredixDepository = ({
         governance={governance}
       />
 
+      <Select
+        label="Depository Type"
+        value={form.depositoryType}
+        placeholder="Please select..."
+        onChange={(value) =>
+          handleSetForm({ value, propertyName: 'depositoryType' })
+        }
+        error={formErrors['depositoryType']}
+      >
+        <SelectOptionList list={getDepositoryTypes(false)} />
+      </Select>
+
       <Input
         label="UXD Program"
         value={form.uxdProgram}
@@ -204,20 +216,20 @@ const MintWithCredixDepository = ({
 
       <Input
         type="number"
-        label="Collateral Amount"
-        value={form.collateralAmount}
+        label="Redeemable Amount"
+        value={form.redeemableAmount}
         min={0}
         max={10 ** 12}
         onChange={(evt) =>
           handleSetForm({
             value: evt.target.value,
-            propertyName: 'collateralAmount',
+            propertyName: 'redeemableAmount',
           })
         }
-        error={formErrors['collateralAmount']}
+        error={formErrors['redeemableAmount']}
       />
     </>
   )
 }
 
-export default MintWithCredixDepository
+export default Redeem

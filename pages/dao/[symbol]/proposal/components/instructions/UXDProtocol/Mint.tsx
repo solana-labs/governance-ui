@@ -5,14 +5,23 @@ import {
   ProgramAccount,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  Token,
+  TOKEN_PROGRAM_ID,
+} from '@solana/spl-token'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { UXD } from '@uxd-protocol/uxd-client'
 import Input from '@components/inputs/Input'
+import Select from '@components/inputs/Select'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import {
   DEPOSITORY_TYPES,
   getDepositoryMintSymbols,
   getDepositoryTypes,
-} from '@tools/sdk/uxdProtocol/uxdClient'
+  mintUXDIx,
+} from '@tools/sdk/uxdProtocol'
+import { findATAAddrSync } from '@utils/ataTools'
 import { isFormValid } from '@utils/formValidation'
 import {
   UiInstruction,
@@ -21,16 +30,7 @@ import {
 import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
-import {
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  Token,
-  TOKEN_PROGRAM_ID,
-} from '@solana/spl-token'
-import { findATAAddrSync } from '@utils/ataTools'
-import Select from '@components/inputs/Select'
 import SelectOptionList from '../../SelectOptionList'
-import { mintUXDIx } from '@tools/sdk/uxdProtocol/mint'
 
 async function checkInitTokenAccount(
   account: PublicKey,
