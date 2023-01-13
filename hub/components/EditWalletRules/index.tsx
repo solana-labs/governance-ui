@@ -10,9 +10,9 @@ import { useEffect, useState } from 'react';
 
 import { getAccountName } from '@components/instructions/tools';
 import { Primary, Secondary } from '@hub/components/controls/Button';
+import { Connect } from '@hub/components/GlobalHeader/User/Connect';
 import { useProposal } from '@hub/hooks/useProposal';
 import { useQuery } from '@hub/hooks/useQuery';
-import { abbreviateAddress } from '@hub/lib/abbreviateAddress';
 import cx from '@hub/lib/cx';
 import { GovernanceTokenType } from '@hub/types/GovernanceTokenType';
 import { GovernanceVoteTipping } from '@hub/types/GovernanceVoteTipping';
@@ -126,20 +126,42 @@ export function EditWalletRules(props: Props) {
     RE.match(
       () => <div />,
       () => <div />,
-      ({ realmByUrlId: { governance, programPublicKey, publicKey } }) => {
+      ({ me, realmByUrlId: { governance, programPublicKey, publicKey } }) => {
         const walletName =
           getAccountName(governance.walletAddress) ||
           getAccountName(governance.governanceAddress) ||
           governance.walletAddress.toBase58();
 
+        if (!me) {
+          return (
+            <div className={cx(props.className, 'dark:bg-neutral-900')}>
+              <Head>
+                <title>Edit Wallet Rules - {walletName}</title>
+                <meta
+                  property="og:title"
+                  content={`Edit Wallet Rules - ${governance.walletAddress.toBase58()}`}
+                  key="title"
+                />
+              </Head>
+              <div className="w-full max-w-3xl pt-14 mx-auto grid place-items-center">
+                <div className="my-16 py-8 px-16 dark:bg-black/40 rounded flex flex-col items-center">
+                  <div className="text-white mb-2 text-center">
+                    Please sign in to edit wallet rules
+                    <br />
+                    for "{walletName}"
+                  </div>
+                  <Connect />
+                </div>
+              </div>
+            </div>
+          );
+        }
+
         return (
           <div className={cx(props.className, 'dark:bg-neutral-900')}>
             <div className="w-full max-w-3xl pt-14 mx-auto">
               <Head>
-                <title>
-                  Edit Wallet Rules -{' '}
-                  {abbreviateAddress(governance.walletAddress)}
-                </title>
+                <title>Edit Wallet Rules - {walletName}</title>
                 <meta
                   property="og:title"
                   content={`Edit Wallet Rules - ${governance.walletAddress.toBase58()}`}

@@ -52,7 +52,6 @@ export function Connect(props: Props) {
     <NavigationMenu.Item>
       <button
         className={cx(
-          props.className,
           'cursor-pointer',
           'flex',
           'items-center',
@@ -70,6 +69,7 @@ export function Connect(props: Props) {
           'dark:hover:text-neutral-200',
           'dark:active:bg-neutral-800',
           'dark:hover:bg-neutral-700',
+          props.className,
         )}
         onClick={async () => {
           try {
