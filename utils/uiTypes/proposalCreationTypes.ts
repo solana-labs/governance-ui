@@ -265,11 +265,6 @@ export interface MangoRemoveOracleForm {
   oraclePk: NameValue | null
 }
 
-export interface SagaPhoneForm {
-  governedAccount: AssetAccount | null
-  quantity: number
-}
-
 export interface MangoRemovePerpMarketForm {
   governedAccount: AssetAccount | null
   mangoGroup: NameValue | null
@@ -610,7 +605,6 @@ export enum Instructions {
   RealmConfig,
   RefreshSolendObligation,
   RefreshSolendReserve,
-  SagaPreOrder,
   SerumGrantLockedMSRM,
   SerumGrantLockedSRM,
   SerumGrantVestMSRM,
