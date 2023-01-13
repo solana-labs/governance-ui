@@ -24,6 +24,7 @@ interface Props
   currentMaxVoteDays: number;
   currentMinInstructionHoldupDays: number;
   depositExemptProposalCount: number;
+  governanceAddress: PublicKey;
   maxVoteDays: number;
   minInstructionHoldupDays: number;
   walletAddress: PublicKey;
@@ -32,7 +33,11 @@ interface Props
 export function Summary(props: Props) {
   return (
     <article className={props.className}>
-      <WalletDescription className="mb-3" walletAddress={props.walletAddress} />
+      <WalletDescription
+        className="mb-3"
+        governanceAddress={props.governanceAddress}
+        walletAddress={props.walletAddress}
+      />
       <h1 className="text-5xl font-medium m-0 mb-4 dark:text-white ">
         Your proposal is almost ready. Does everything look correct?
       </h1>
@@ -42,6 +47,7 @@ export function Summary(props: Props) {
       </p>
       <ProposalDetails
         proposalDescription={props.proposalDescription}
+        governanceAddress={props.governanceAddress}
         walletAddress={props.walletAddress}
         onProposalDescriptionChange={props.onProposalDescriptionChange}
       />

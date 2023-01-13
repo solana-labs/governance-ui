@@ -38,6 +38,7 @@ export const SecondaryAlt = forwardRef<HTMLButtonElement, Props>(
           !pending && 'active:bg-sky-200',
           pending && 'cursor-not-allowed',
           !pending && 'dark:hover:bg-neutral-50/20',
+          !pending && 'disabled:dark:hover:bg-transparent',
           !pending && 'dark:active:border-neutral-300',
           !pending && 'dark:active:text-neutral-300',
           !pending && 'dark:hover:border-neutral-200',

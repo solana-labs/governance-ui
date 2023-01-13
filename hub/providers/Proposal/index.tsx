@@ -17,7 +17,7 @@ type CreateProposalsArgs = Omit<
 interface Value {
   createProposal(
     args: CreateProposalsArgs,
-  ): ReturnType<typeof createProposal> | null;
+  ): Promise<Awaited<ReturnType<typeof createProposal>> | null>;
 }
 
 export const DEFAULT: Value = {
@@ -34,14 +34,18 @@ interface Props {
 
 export function ProposalProvider(props: Props) {
   const [cluster] = useCluster();
-  const { publicKey, signTransaction, signAllTransactions } = useWallet();
+  const { connect, signTransaction, signAllTransactions } = useWallet();
   const { publish } = useToast();
 
   return (
     <context.Provider
       value={{
-        createProposal: (args) => {
+        createProposal: async (args) => {
           try {
+            const publicKey = await connect();
+
+            console.log(publicKey);
+
             if (!publicKey) {
               throw new Error('User must be signed in');
             }

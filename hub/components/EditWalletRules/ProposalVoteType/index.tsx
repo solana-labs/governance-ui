@@ -2,7 +2,7 @@ import BuildingIcon from '@carbon/icons-react/lib/Building';
 import ChevronDownIcon from '@carbon/icons-react/lib/ChevronDown';
 import UserMultipleIcon from '@carbon/icons-react/lib/UserMultiple';
 import WalletIcon from '@carbon/icons-react/lib/Wallet';
-import type { BigNumber } from 'bignumber.js';
+import WarningFilledIcon from '@carbon/icons-react/lib/WarningFilled';
 import { useState } from 'react';
 
 import { SectionBlock } from '../SectionBlock';
@@ -45,9 +45,19 @@ export function ProposalVoteType(props: Props) {
       />
       <ValueBlock
         title="Who should vote on this proposal?"
-        description="Community or council?"
+        description={
+          !!props.currentCouncilRules ? (
+            'Community or council?'
+          ) : (
+            <div className="text-amber-400 flex items-center">
+              <WarningFilledIcon className="h-4 w-4 mr-2" />
+              <div>This wallet only supports community voting.</div>
+            </div>
+          )
+        }
       >
         <ButtonToggle
+          disableValueFalse={!props.currentCouncilRules}
           value={props.proposalVoteType === 'community'}
           valueTrueText="Community"
           valueFalseText="Council"

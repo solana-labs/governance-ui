@@ -9,6 +9,8 @@ interface Props {
   value: boolean;
   valueFalseText: string;
   valueTrueText: string;
+  disableValueTrue?: boolean;
+  disableValueFalse?: boolean;
   onChange?(value: boolean): void;
 }
 
@@ -18,6 +20,7 @@ export function ButtonToggle(props: Props) {
       {props.value === true ? (
         <Button.PrimaryAlt
           className="h-full"
+          disabled={props.disableValueTrue}
           onClick={() => props.onChange?.(true)}
         >
           <RadioButtonCheckedIcon className="h-4 mr-1 w-4" />
@@ -26,6 +29,7 @@ export function ButtonToggle(props: Props) {
       ) : (
         <Button.SecondaryAlt
           className="h-full opacity-60"
+          disabled={props.disableValueTrue}
           onClick={() => props.onChange?.(true)}
         >
           <RadioButtonIcon className="h-4 mr-1 w-4" />
@@ -35,6 +39,7 @@ export function ButtonToggle(props: Props) {
       {props.value === false ? (
         <Button.PrimaryAlt
           className="h-full"
+          disabled={props.disableValueFalse}
           onClick={() => props.onChange?.(false)}
         >
           <RadioButtonCheckedIcon className="h-4 mr-1 w-4" />
@@ -43,6 +48,7 @@ export function ButtonToggle(props: Props) {
       ) : (
         <Button.SecondaryAlt
           className="h-full opacity-60"
+          disabled={props.disableValueFalse}
           onClick={() => props.onChange?.(false)}
         >
           <RadioButtonIcon className="h-4 mr-1 w-4" />

@@ -14,12 +14,15 @@ interface Props
     proposalDescription: string;
   }> {
   className?: string;
+  governanceAddress: PublicKey;
   walletAddress: PublicKey;
 }
 
 export function ProposalDetails(props: Props) {
   const walletName =
-    getAccountName(props.walletAddress) || props.walletAddress.toBase58();
+    getAccountName(props.walletAddress) ||
+    getAccountName(props.governanceAddress) ||
+    props.walletAddress.toBase58();
 
   return (
     <SectionBlock className={cx(props.className, 'space-y-8')}>

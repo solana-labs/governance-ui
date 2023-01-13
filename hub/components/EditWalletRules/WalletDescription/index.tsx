@@ -9,11 +9,14 @@ import cx from '@hub/lib/cx';
 
 interface Props {
   className?: string;
+  governanceAddress: PublicKey;
   walletAddress: PublicKey;
 }
 
 export function WalletDescription(props: Props) {
-  const name = getAccountName(props.walletAddress);
+  const name =
+    getAccountName(props.walletAddress) ||
+    getAccountName(props.governanceAddress);
   const address = abbreviateAddress(props.walletAddress);
 
   return (

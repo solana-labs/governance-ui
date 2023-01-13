@@ -23,6 +23,7 @@ interface Props
   className?: string;
   currentCommunityRules: CommunityRules;
   currentCouncilRules: CouncilRules;
+  governanceAddress: PublicKey;
   walletAddress: PublicKey;
 }
 
@@ -31,7 +32,11 @@ export function Form(props: Props) {
 
   return (
     <article className={props.className}>
-      <WalletDescription className="mb-3" walletAddress={props.walletAddress} />
+      <WalletDescription
+        className="mb-3"
+        governanceAddress={props.governanceAddress}
+        walletAddress={props.walletAddress}
+      />
       <h1 className="text-5xl font-medium m-0 mb-4 dark:text-white ">
         What changes would you like to make to this wallet?
       </h1>

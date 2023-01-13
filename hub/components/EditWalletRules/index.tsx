@@ -8,6 +8,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
+import { getAccountName } from '@components/instructions/tools';
 import { Primary, Secondary } from '@hub/components/controls/Button';
 import { useProposal } from '@hub/hooks/useProposal';
 import { useQuery } from '@hub/hooks/useQuery';
@@ -112,6 +113,10 @@ export function EditWalletRules(props: Props) {
       setDepositExemptProposalCount(data.depositExemptProposalCount);
       setMaxVoteDays(data.maxVoteDays);
       setMinInstructionHoldupDays(data.minInstructionHoldupDays);
+
+      if (!data.councilTokenRules) {
+        setProposalVoteType('community');
+      }
     }
   }, [result._tag]);
 
@@ -121,165 +126,174 @@ export function EditWalletRules(props: Props) {
     RE.match(
       () => <div />,
       () => <div />,
-      ({ realmByUrlId: { governance, programPublicKey, publicKey } }) => (
-        <div className={cx(props.className, 'dark:bg-neutral-900')}>
-          <div className="w-full max-w-3xl pt-14 mx-auto">
-            <Head>
-              <title>
-                Edit Wallet Rules -{' '}
-                {abbreviateAddress(governance.walletAddress)}
-              </title>
-              <meta
-                property="og:title"
-                content={`Edit Wallet Rules - ${governance.walletAddress.toBase58()}`}
-                key="title"
-              />
-            </Head>
-            <div className="flex items-center mt-4">
-              <div className="text-sm dark:text-neutral-500">
-                Step {stepNum(step)} of 2
+      ({ realmByUrlId: { governance, programPublicKey, publicKey } }) => {
+        const walletName =
+          getAccountName(governance.walletAddress) ||
+          getAccountName(governance.governanceAddress) ||
+          governance.walletAddress.toBase58();
+
+        return (
+          <div className={cx(props.className, 'dark:bg-neutral-900')}>
+            <div className="w-full max-w-3xl pt-14 mx-auto">
+              <Head>
+                <title>
+                  Edit Wallet Rules -{' '}
+                  {abbreviateAddress(governance.walletAddress)}
+                </title>
+                <meta
+                  property="og:title"
+                  content={`Edit Wallet Rules - ${governance.walletAddress.toBase58()}`}
+                  key="title"
+                />
+              </Head>
+              <div className="flex items-center mt-4">
+                <div className="text-sm dark:text-neutral-500">
+                  Step {stepNum(step)} of 2
+                </div>
+                <div className="text-sm dark:text-white ml-2">
+                  {stepName(step)}
+                </div>
               </div>
-              <div className="text-sm dark:text-white ml-2">
-                {stepName(step)}
-              </div>
-            </div>
-            <div className="py-16">
-              {step === Step.Form && (
-                <>
-                  <Form
-                    className="mb-16"
-                    communityRules={communityRules}
-                    coolOffHours={coolOffHours}
-                    councilRules={councilRules}
-                    currentCommunityRules={governance.communityTokenRules}
-                    currentCouncilRules={governance.councilTokenRules}
-                    depositExemptProposalCount={depositExemptProposalCount}
-                    maxVoteDays={maxVoteDays}
-                    minInstructionHoldupDays={minInstructionHoldupDays}
-                    walletAddress={governance.walletAddress}
-                    onCommunityRulesChange={setCommunityRules}
-                    onCoolOffHoursChange={setCoolOffHours}
-                    onCouncilRulesChange={setCouncilRules}
-                    onDepositExemptProposalCountChange={
-                      setDepositExemptProposalCount
-                    }
-                    onMaxVoteDaysChange={setMaxVoteDays}
-                    onMinInstructionHoldupDaysChange={
-                      setMinInstructionHoldupDays
-                    }
-                  />
-                  <footer className="flex items-center justify-between">
-                    <button
-                      className="flex items-center text-sm text-neutral-500"
-                      onClick={() => router.back()}
-                    >
-                      <ChevronLeftIcon className="h-4 fill-current w-4" />
-                      Go Back
-                    </button>
-                    <Secondary
-                      className="h-14 w-44"
-                      onClick={() => setStep(Step.Summary)}
-                    >
-                      Continue
-                    </Secondary>
-                  </footer>
-                </>
-              )}
-              {step === Step.Summary && (
-                <>
-                  <Summary
-                    className="mb-16"
-                    communityRules={communityRules}
-                    coolOffHours={coolOffHours}
-                    councilRules={councilRules}
-                    currentCommunityRules={governance.communityTokenRules}
-                    currentCoolOffHours={governance.coolOffHours}
-                    currentCouncilRules={governance.councilTokenRules}
-                    currentDepositExemptProposalCount={
-                      governance.depositExemptProposalCount
-                    }
-                    currentMaxVoteDays={governance.maxVoteDays}
-                    currentMinInstructionHoldupDays={
-                      governance.minInstructionHoldupDays
-                    }
-                    depositExemptProposalCount={depositExemptProposalCount}
-                    maxVoteDays={maxVoteDays}
-                    minInstructionHoldupDays={minInstructionHoldupDays}
-                    proposalDescription={proposalDescription}
-                    proposalVoteType={proposalVoteType}
-                    walletAddress={governance.walletAddress}
-                    onProposalVoteTypeChange={setProposalVoteType}
-                    onProposalDescriptionChange={setProposalDescription}
-                  />
-                  <footer className="flex items-center justify-end">
-                    <button
-                      className="flex items-center text-sm text-neutral-500"
-                      onClick={() => setStep(Step.Form)}
-                    >
-                      <EditIcon className="h-4 fill-current mr-1 w-4" />
-                      Edit Rules
-                    </button>
-                    <Primary
-                      className="ml-16 h-14 w-44"
-                      pending={submitting}
-                      onClick={async () => {
-                        setSubmitting(true);
+              <div className="py-16">
+                {step === Step.Form && (
+                  <>
+                    <Form
+                      className="mb-16"
+                      communityRules={communityRules}
+                      coolOffHours={coolOffHours}
+                      councilRules={councilRules}
+                      currentCommunityRules={governance.communityTokenRules}
+                      currentCouncilRules={governance.councilTokenRules}
+                      depositExemptProposalCount={depositExemptProposalCount}
+                      governanceAddress={governance.governanceAddress}
+                      maxVoteDays={maxVoteDays}
+                      minInstructionHoldupDays={minInstructionHoldupDays}
+                      walletAddress={governance.walletAddress}
+                      onCommunityRulesChange={setCommunityRules}
+                      onCoolOffHoursChange={setCoolOffHours}
+                      onCouncilRulesChange={setCouncilRules}
+                      onDepositExemptProposalCountChange={
+                        setDepositExemptProposalCount
+                      }
+                      onMaxVoteDaysChange={setMaxVoteDays}
+                      onMinInstructionHoldupDaysChange={
+                        setMinInstructionHoldupDays
+                      }
+                    />
+                    <footer className="flex items-center justify-between">
+                      <button
+                        className="flex items-center text-sm text-neutral-500"
+                        onClick={() => router.back()}
+                      >
+                        <ChevronLeftIcon className="h-4 fill-current w-4" />
+                        Go Back
+                      </button>
+                      <Secondary
+                        className="h-14 w-44"
+                        onClick={() => setStep(Step.Summary)}
+                      >
+                        Continue
+                      </Secondary>
+                    </footer>
+                  </>
+                )}
+                {step === Step.Summary && (
+                  <>
+                    <Summary
+                      className="mb-16"
+                      communityRules={communityRules}
+                      coolOffHours={coolOffHours}
+                      councilRules={councilRules}
+                      currentCommunityRules={governance.communityTokenRules}
+                      currentCoolOffHours={governance.coolOffHours}
+                      currentCouncilRules={governance.councilTokenRules}
+                      currentDepositExemptProposalCount={
+                        governance.depositExemptProposalCount
+                      }
+                      currentMaxVoteDays={governance.maxVoteDays}
+                      currentMinInstructionHoldupDays={
+                        governance.minInstructionHoldupDays
+                      }
+                      depositExemptProposalCount={depositExemptProposalCount}
+                      governanceAddress={governance.governanceAddress}
+                      maxVoteDays={maxVoteDays}
+                      minInstructionHoldupDays={minInstructionHoldupDays}
+                      proposalDescription={proposalDescription}
+                      proposalVoteType={proposalVoteType}
+                      walletAddress={governance.walletAddress}
+                      onProposalVoteTypeChange={setProposalVoteType}
+                      onProposalDescriptionChange={setProposalDescription}
+                    />
+                    <footer className="flex items-center justify-end">
+                      <button
+                        className="flex items-center text-sm text-neutral-500"
+                        onClick={() => setStep(Step.Form)}
+                      >
+                        <EditIcon className="h-4 fill-current mr-1 w-4" />
+                        Edit Rules
+                      </button>
+                      <Primary
+                        className="ml-16 h-14 w-44"
+                        pending={submitting}
+                        onClick={async () => {
+                          setSubmitting(true);
 
-                        const transaction = createTransaction(
-                          programPublicKey,
-                          governance.version,
-                          governance.governanceAddress,
-                          {
-                            coolOffHours,
-                            depositExemptProposalCount,
-                            maxVoteDays,
-                            minInstructionHoldupDays,
-                            communityTokenRules: communityRules,
-                            councilTokenRules: councilRules,
-                            governanceAddress: governance.governanceAddress,
-                            version: governance.version,
-                            walletAddress: governance.walletAddress,
-                          },
-                        );
-
-                        const governingTokenMintPublicKey =
-                          proposalVoteType === 'council' &&
-                          governance.councilTokenRules
-                            ? governance.councilTokenRules.tokenMintAddress
-                            : governance.communityTokenRules.tokenMintAddress;
-
-                        const proposalAddress = await createProposal({
-                          governingTokenMintPublicKey,
-                          programPublicKey,
-                          proposalDescription,
-                          governancePublicKey: governance.governanceAddress,
-                          instructions: [transaction],
-                          isDraft: false,
-                          proposalTitle: `Update Wallet Rules for “${governance.governanceAddress.toBase58()}”`,
-                          realmPublicKey: publicKey,
-                        });
-
-                        if (proposalAddress) {
-                          router.push(
-                            `/dao/${
-                              props.realmUrlId
-                            }/proposal/${proposalAddress.toBase58()}`,
+                          const transaction = createTransaction(
+                            programPublicKey,
+                            governance.version,
+                            governance.governanceAddress,
+                            {
+                              coolOffHours,
+                              depositExemptProposalCount,
+                              maxVoteDays,
+                              minInstructionHoldupDays,
+                              communityTokenRules: communityRules,
+                              councilTokenRules: councilRules,
+                              governanceAddress: governance.governanceAddress,
+                              version: governance.version,
+                              walletAddress: governance.walletAddress,
+                            },
                           );
-                        }
 
-                        setSubmitting(false);
-                      }}
-                    >
-                      <CheckmarkIcon className="h-4 fill-current mr-1 w-4" />
-                      Create Proposal
-                    </Primary>
-                  </footer>
-                </>
-              )}
+                          const governingTokenMintPublicKey =
+                            proposalVoteType === 'council' &&
+                            governance.councilTokenRules
+                              ? governance.councilTokenRules.tokenMintAddress
+                              : governance.communityTokenRules.tokenMintAddress;
+
+                          const proposalAddress = await createProposal({
+                            governingTokenMintPublicKey,
+                            programPublicKey,
+                            proposalDescription,
+                            governancePublicKey: governance.governanceAddress,
+                            instructions: [transaction],
+                            isDraft: false,
+                            proposalTitle: `Update Wallet Rules for “${walletName}”`,
+                            realmPublicKey: publicKey,
+                          });
+
+                          if (proposalAddress) {
+                            router.push(
+                              `/dao/${
+                                props.realmUrlId
+                              }/proposal/${proposalAddress.toBase58()}`,
+                            );
+                          }
+
+                          setSubmitting(false);
+                        }}
+                      >
+                        <CheckmarkIcon className="h-4 fill-current mr-1 w-4" />
+                        Create Proposal
+                      </Primary>
+                    </footer>
+                  </>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      ),
+        );
+      },
     ),
   );
 }
