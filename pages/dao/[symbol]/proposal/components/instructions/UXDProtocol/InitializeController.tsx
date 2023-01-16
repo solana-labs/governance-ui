@@ -1,22 +1,22 @@
+import { useContext, useEffect, useState } from 'react'
 import * as yup from 'yup'
-import {
-  UiInstruction,
-  UXDInitializeControllerForm,
-} from '@utils/uiTypes/proposalCreationTypes'
 import {
   Governance,
   ProgramAccount,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
+import { uxdClient } from '@tools/sdk/uxdProtocol/uxdClient'
+import Input from '@components/inputs/Input'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { useState, useContext, useEffect } from 'react'
+import { isFormValid } from '@utils/formValidation'
+import {
+  UiInstruction,
+  UXDInitializeControllerForm,
+} from '@utils/uiTypes/proposalCreationTypes'
+import { Controller } from '@uxd-protocol/uxd-client'
 import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
-import { isFormValid } from '@utils/formValidation'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-import { uxdClient } from '@tools/sdk/uxdProtocol/uxdClient'
-import { Controller } from '@uxd-protocol/uxd-client'
-import Input from '@components/inputs/Input'
 
 const schema = yup.object().shape({
   mintDecimals: yup

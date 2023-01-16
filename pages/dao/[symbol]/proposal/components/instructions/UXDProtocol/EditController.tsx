@@ -1,23 +1,22 @@
-import * as yup from 'yup'
-
-import Switch from '@components/Switch'
 import { useContext, useEffect, useState } from 'react'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import * as yup from 'yup'
+import { Controller, UXD_DECIMALS } from '@uxd-protocol/uxd-client'
 import {
   Governance,
   ProgramAccount,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
-import useWalletStore from 'stores/useWalletStore'
-import { NewProposalContext } from '../../../new'
 import Input from '@components/inputs/Input'
+import Switch from '@components/Switch'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { uxdClient } from '@tools/sdk/uxdProtocol/uxdClient'
+import { isFormValid } from '@utils/formValidation'
 import {
   UiInstruction,
   UXDEditControllerForm,
 } from '@utils/uiTypes/proposalCreationTypes'
-import { isFormValid } from '@utils/formValidation'
-import { Controller, UXD_DECIMALS } from '@uxd-protocol/uxd-client'
-import { uxdClient } from '@tools/sdk/uxdProtocol/uxdClient'
+import useWalletStore from 'stores/useWalletStore'
+import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 
 const schema = yup.object().shape({

@@ -5,8 +5,10 @@ import {
   ProgramAccount,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { USDC } from '@uxd-protocol/uxd-client'
 import Input from '@components/inputs/Input'
+import Select from '@components/inputs/Select'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import {
   DEPOSITORY_TYPES,
@@ -14,6 +16,7 @@ import {
   getDepositoryTypes,
   redeemUXDIx,
 } from '@tools/sdk/uxdProtocol'
+import { checkInitTokenAccount, findATAAddrSync } from '@utils/ataTools'
 import { isFormValid } from '@utils/formValidation'
 import {
   UiInstruction,
@@ -22,39 +25,8 @@ import {
 import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
-import {
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  Token,
-  TOKEN_PROGRAM_ID,
-} from '@solana/spl-token'
-import { findATAAddrSync } from '@utils/ataTools'
-import Select from '@components/inputs/Select'
 import SelectOptionList from '../../SelectOptionList'
 
-async function checkInitTokenAccount(
-  account: PublicKey,
-  instructions: TransactionInstruction[],
-  connection: any,
-  mint: PublicKey,
-  owner: PublicKey,
-  feePayer: PublicKey
-) {
-  const accountInfo = await connection.current.getAccountInfo(account)
-  if (accountInfo && accountInfo.lamports > 0) {
-    return
-  }
-  instructions.push(
-    Token.createAssociatedTokenAccountInstruction(
-      ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-      TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-      mint, // mint
-      account, // ata
-      owner, // owner of token account
-      feePayer
-    )
-  )
-}
 const schema = yup.object().shape({
   governedAccount: yup
     .object()

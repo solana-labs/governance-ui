@@ -6,6 +6,12 @@ import {
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
 import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  Token,
+  TOKEN_PROGRAM_ID,
+} from '@solana/spl-token'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
+import {
   Controller,
   IdentityDepository,
   USDC,
@@ -16,6 +22,7 @@ import {
 import Input from '@components/inputs/Input'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { uxdClient } from '@tools/sdk/uxdProtocol/uxdClient'
+import { findATAAddrSync } from '@utils/ataTools'
 import { isFormValid } from '@utils/formValidation'
 import {
   UiInstruction,
@@ -24,13 +31,6 @@ import {
 import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
-import {
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  Token,
-  TOKEN_PROGRAM_ID,
-} from '@solana/spl-token'
-import { findATAAddrSync } from '@utils/ataTools'
 
 async function checkInitTokenAccount(
   account: PublicKey,
@@ -113,8 +113,7 @@ const MintWithIdentityDepository = ({
         governance: form.governedAccount?.governance,
       }
     }
-    const uxdProgramId =
-      form.governedAccount?.governance?.account.governedAccount
+    const uxdProgramId = new PublicKey(form.uxdProgram)
     const client = uxdClient(uxdProgramId)
     const authority = form.governedAccount.governance.pubkey
     const identityDepository = new IdentityDepository(

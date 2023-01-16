@@ -1,20 +1,10 @@
+import { useContext, useEffect, useState } from 'react'
 import * as yup from 'yup'
-import {
-  UiInstruction,
-  UXDInitializeIdentityDepositoryForm,
-} from '@utils/uiTypes/proposalCreationTypes'
 import {
   Governance,
   ProgramAccount,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { useState, useContext, useEffect } from 'react'
-import useWalletStore from 'stores/useWalletStore'
-import { NewProposalContext } from '../../../new'
-import { isFormValid } from '@utils/formValidation'
-import GovernedAccountSelect from '../../GovernedAccountSelect'
-import { uxdClient } from '@tools/sdk/uxdProtocol/uxdClient'
 import {
   Controller,
   IdentityDepository,
@@ -22,6 +12,16 @@ import {
   USDC_DECIMALS,
   UXD_DECIMALS,
 } from '@uxd-protocol/uxd-client'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { uxdClient } from '@tools/sdk/uxdProtocol/uxdClient'
+import { isFormValid } from '@utils/formValidation'
+import {
+  UiInstruction,
+  UXDInitializeIdentityDepositoryForm,
+} from '@utils/uiTypes/proposalCreationTypes'
+import useWalletStore from 'stores/useWalletStore'
+import { NewProposalContext } from '../../../new'
+import GovernedAccountSelect from '../../GovernedAccountSelect'
 
 const schema = yup.object().shape({
   governedAccount: yup

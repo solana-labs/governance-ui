@@ -1,28 +1,28 @@
+import { useContext, useEffect, useState } from 'react'
 import * as yup from 'yup'
-import {
-  UiInstruction,
-  UXDRegisterDepositoryForm,
-} from '@utils/uiTypes/proposalCreationTypes'
 import {
   Governance,
   ProgramAccount,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
+import Input from '@components/inputs/Input'
+import Select from '@components/inputs/Select'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { useState, useContext, useEffect } from 'react'
-import useWalletStore from 'stores/useWalletStore'
-import { NewProposalContext } from '../../../new'
-import { isFormValid } from '@utils/formValidation'
-import GovernedAccountSelect from '../../GovernedAccountSelect'
 import {
   DEPOSITORY_TYPES,
   getDepositoryMintSymbols,
   getDepositoryTypes,
   registerUXDDepositoryIx,
 } from '@tools/sdk/uxdProtocol'
-import Select from '@components/inputs/Select'
+import { isFormValid } from '@utils/formValidation'
+import {
+  UiInstruction,
+  UXDRegisterDepositoryForm,
+} from '@utils/uiTypes/proposalCreationTypes'
+import useWalletStore from 'stores/useWalletStore'
+import { NewProposalContext } from '../../../new'
+import GovernedAccountSelect from '../../GovernedAccountSelect'
 import SelectOptionList from '../../SelectOptionList'
-import Input from '@components/inputs/Input'
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -47,7 +47,7 @@ const schema = yup.object().shape({
     .required('Redeemable depository supply cap is required'),
 })
 
-const RegisterCredixDepository = ({
+const RegisterDepository = ({
   index,
   governance,
 }: {
@@ -219,4 +219,4 @@ const RegisterCredixDepository = ({
   )
 }
 
-export default RegisterCredixDepository
+export default RegisterDepository
