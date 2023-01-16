@@ -4349,6 +4349,16 @@
   dependencies:
     cross-fetch "3.0.6"
 
+"@solana/spl-token-v2@npm:@solana/spl-token@^0.2.0", "@solana/spl-token@0.2.0", "@solana/spl-token@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@solana/spl-token/-/spl-token-0.2.0.tgz#329bb6babb5de0f9c40035ddb1657f01a8347acd"
+  integrity sha512-RWcn31OXtdqIxmkzQfB2R+WpsJOVS6rKuvpxJFjvik2LyODd+WN58ZP3Rpjpro03fscGAkzlFuP3r42doRJgyQ==
+  dependencies:
+    "@solana/buffer-layout" "^4.0.0"
+    "@solana/buffer-layout-utils" "^0.2.0"
+    "@solana/web3.js" "^1.32.0"
+    start-server-and-test "^1.14.0"
+
 "@solana/spl-token@0.1.8", "@solana/spl-token@^0.1.5", "@solana/spl-token@^0.1.6", "@solana/spl-token@^0.1.8":
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/@solana/spl-token/-/spl-token-0.1.8.tgz#f06e746341ef8d04165e21fc7f555492a2a0faa6"
@@ -4360,16 +4370,6 @@
     buffer "6.0.3"
     buffer-layout "^1.2.0"
     dotenv "10.0.0"
-
-"@solana/spl-token@0.2.0", "@solana/spl-token@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@solana/spl-token/-/spl-token-0.2.0.tgz#329bb6babb5de0f9c40035ddb1657f01a8347acd"
-  integrity sha512-RWcn31OXtdqIxmkzQfB2R+WpsJOVS6rKuvpxJFjvik2LyODd+WN58ZP3Rpjpro03fscGAkzlFuP3r42doRJgyQ==
-  dependencies:
-    "@solana/buffer-layout" "^4.0.0"
-    "@solana/buffer-layout-utils" "^0.2.0"
-    "@solana/web3.js" "^1.32.0"
-    start-server-and-test "^1.14.0"
 
 "@solana/spl-token@^0.3.5", "@solana/spl-token@^0.3.6":
   version "0.3.6"
@@ -5154,21 +5154,25 @@
     typedoc "^0.22.15"
     ws "^7.4.6"
 
-"@switchboard-xyz/switchboard-v2@0.0.110":
-  version "0.0.110"
-  resolved "https://registry.yarnpkg.com/@switchboard-xyz/switchboard-v2/-/switchboard-v2-0.0.110.tgz#b01b74fa368d33659f0b2b7b232eee7f8193dc53"
-  integrity sha512-T5bgO/SA66fwQbAYBFqP5KOhiQ4JUQG06XUMhxtLgyWQ0qYrpjC1EINyaq0TZzEB6r6cjZufvYBTFA3zhPKydg==
+"@switchboard-xyz/switchboard-v2@0.0.127":
+  version "0.0.127"
+  resolved "https://registry.yarnpkg.com/@switchboard-xyz/switchboard-v2/-/switchboard-v2-0.0.127.tgz#613d305ba4a09913995da8eb4de785688727e307"
+  integrity sha512-ZUu9AdEWYp3thkPqhYA9yt6gneE3TniyAai46k7CZf+NJXd4CFYcJHmEbMF9I4akv0eq1TsU4pcGliTFaOO8HQ==
   dependencies:
     "@project-serum/anchor" "^0.24.2"
     "@solana/spl-governance" "^0.0.34"
+    "@solana/spl-token-v2" "npm:@solana/spl-token@^0.2.0"
+    "@solana/web3.js" "^1.44.3"
+    "@types/big.js" "^6.1.4"
     assert "^2.0.0"
-    big.js "^6.1.1"
-    bs58 "^4.0.1"
+    big.js "^6.2.0"
+    bs58 "^5.0.0"
     chan "^0.6.1"
     crypto-js "^4.0.0"
+    glob "^8.0.3"
     long "^4.0.0"
     mocha "^9.1.1"
-    node-fetch "^3.2.3"
+    node-fetch "^3.2.6"
     protobufjs "^6.11.3"
 
 "@switchboard-xyz/switchboard-v2@^0.0.34":
@@ -5532,7 +5536,7 @@
   dependencies:
     "@babel/types" "^7.3.0"
 
-"@types/big.js@^6.1.6":
+"@types/big.js@^6.1.4", "@types/big.js@^6.1.6":
   version "6.1.6"
   resolved "https://registry.yarnpkg.com/@types/big.js/-/big.js-6.1.6.tgz#3d417e758483d55345a03a087f7e0c87137ca444"
   integrity sha512-0r9J+Zz9rYm2hOTwiMAVkm3XFQ4u5uTK37xrQMhc9bysn/sf/okzovWMYYIBMFTn/yrEZ11pusgLEaoarTlQbA==
@@ -7201,7 +7205,7 @@ bech32@^2.0.0:
   resolved "https://registry.yarnpkg.com/bech32/-/bech32-2.0.0.tgz#078d3686535075c8c79709f054b1b226a133b355"
   integrity sha512-LcknSilhIGatDAsY1ak2I8VtGaHNhgMSYVxFrGLXv+xLHytaKZKcaUJJUE7qmBr7h33o5YQwP55pMI0xmkpJwg==
 
-big.js@^6.1.1, big.js@^6.2.1:
+big.js@^6.1.1, big.js@^6.2.0, big.js@^6.2.1:
   version "6.2.1"
   resolved "https://registry.yarnpkg.com/big.js/-/big.js-6.2.1.tgz#7205ce763efb17c2e41f26f121c420c6a7c2744f"
   integrity sha512-bCtHMwL9LeDIozFn+oNhhFoq+yQ3BNdnsLSASUxLciOb1vgvpHsIO1dsENiGMgbb4SkP5TrzWzRiLddn8ahVOQ==
@@ -13367,7 +13371,7 @@ node-fetch@2.6.1:
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.1.tgz#045bd323631f76ed2e2b55573394416b639a0052"
   integrity sha512-V4aYg89jEoVRxRb2fJdAg8FHvI7cEyYdVAh94HH0UIK8oJxUfkjlDQN9RbMx+bEjP7+ggMiFRprSti032Oipxw==
 
-node-fetch@^3.2.10, node-fetch@^3.2.3:
+node-fetch@^3.2.10, node-fetch@^3.2.6:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-3.3.0.tgz#37e71db4ecc257057af828d523a7243d651d91e4"
   integrity sha512-BKwRP/O0UvoMKp7GNdwPlObhYGB5DQqwhEDQlNKuoqwVYSxkSZCSbHjnFFmUEtwSKRPU4kNK8PbDYYitwaE3QA==
