@@ -426,33 +426,28 @@
     eip1193-provider "^1.0.1"
     js-sha3 "^0.8.0"
 
-"@bonfida/name-offers@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@bonfida/name-offers/-/name-offers-0.0.1.tgz#8a52700eb3031e01dd9314fab55dec0a7275a5bb"
-  integrity sha512-R0GJ/+R5OXfm4KfiKEjHx88QnQxw+kzDA8O4pHouev1voPJueOzzo5x+YLowMpk3/2maqEwkNPWiWIlSExjdug==
+"@bonfida/name-offers@^0.0.4":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@bonfida/name-offers/-/name-offers-0.0.4.tgz#13a8baa8103c1e9637eb5ae675991ddb9cdcd060"
+  integrity sha512-bkrvN6OLsjaMFg51BsaZTimhmbjsc8lk31kMo3u7HYq6uCbpXEa1M2mquBj6TZ74CLA4+5bsgPaQP5WynAFdTw==
   dependencies:
-    "@bonfida/spl-name-service" "^0.1.24"
-    "@solana/spl-token" "0.1.8"
-    "@solana/web3.js" "^1.30.2"
+    "@bonfida/utils" "^0.0.5"
     bn.js "^5.2.0"
     borsh "^0.6.0"
     bs58 "4.0.1"
 
-"@bonfida/spl-name-service@0.1.47":
-  version "0.1.47"
-  resolved "https://registry.yarnpkg.com/@bonfida/spl-name-service/-/spl-name-service-0.1.47.tgz#bb5b22ccbbb3135d70f2fa3e7bbfaee0c2c7f3dc"
-  integrity sha512-BQrdvWm27KJowPvCuWmDWNC4vtYOnBNK9i+PFzfhKAMxa0X58DYpmk7ZSQDr4/EklAK8aR2noUMfvBInlsIfgg==
+"@bonfida/spl-name-service@0.1.61", "@bonfida/spl-name-service@^0.1.50":
+  version "0.1.61"
+  resolved "https://registry.yarnpkg.com/@bonfida/spl-name-service/-/spl-name-service-0.1.61.tgz#f334a32f84bb171fd4f275c9feeb1103bc4a6063"
+  integrity sha512-0QiESEas2LCfQkwwP9X8m8A0kT1cPg+q4W5S7NEbAsnZE4LTagOzXcqhnbotF45Hbt0DMTSxcW/1OncT3kn5Ww==
   dependencies:
-    "@bonfida/name-offers" "^0.0.1"
+    "@bonfida/name-offers" "^0.0.4"
     "@ethersproject/sha2" "^5.5.0"
 
-"@bonfida/spl-name-service@^0.1.24", "@bonfida/spl-name-service@^0.1.50":
-  version "0.1.58"
-  resolved "https://registry.yarnpkg.com/@bonfida/spl-name-service/-/spl-name-service-0.1.58.tgz#4819c0d18e55495f3dac2437cc2fec59f64f3825"
-  integrity sha512-4M2RJViB+WFLwY5mvkC4A+u38j1+We2ODPG4OdllTWhUj4o3ncZQxQT5zxleEkdJH/eUhSHFVNcX/OB82c9/VA==
-  dependencies:
-    "@bonfida/name-offers" "^0.0.1"
-    "@ethersproject/sha2" "^5.5.0"
+"@bonfida/utils@^0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@bonfida/utils/-/utils-0.0.5.tgz#e6086db62e1e3822257819ec2c20e933db59f419"
+  integrity sha512-T4l72mwrG+tISIuRe+1qyxxKszB8DC8EH5bCKVIKEqBzazSMX087c17pA7RtsTBxcErpJ1GICCM2iVf0z4hSSw==
 
 "@bundlr-network/client@0.7.15":
   version "0.7.15"
@@ -705,6 +700,14 @@
     ramda "^0.27.1"
     styled-components "^5.3.1"
 
+"@civic/did-registry@0.0.3-alpha.3":
+  version "0.0.3-alpha.3"
+  resolved "https://registry.yarnpkg.com/@civic/did-registry/-/did-registry-0.0.3-alpha.3.tgz#5900d97b8a7a80b29fa6327fb203c46eb3f32fc2"
+  integrity sha512-3o57XJAwi4sqa5pukOrdkjDAWeJ/8XRaOlynRBz36XiSuvUz0eL47lt8INZOUhzsCRMt7X4qPdUNxLPRPvUt9g==
+  dependencies:
+    "@identity.com/sol-did-client" "^3.0.1-beta1"
+    "@project-serum/anchor" "^0.25.0"
+
 "@civic/lexi@0.0.10":
   version "0.0.10"
   resolved "https://registry.yarnpkg.com/@civic/lexi/-/lexi-0.0.10.tgz#77066df36e8c78cf88a9ee50fc8cb1bbec9d987e"
@@ -719,13 +722,15 @@
     ed2curve-esm "^0.3.0-alpha-1"
     tweetnacl "^1.0.3"
 
-"@civic/profile@0.1.2":
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/@civic/profile/-/profile-0.1.2.tgz#a529a2fb7205098c4137efdc8ef4aaa3e0dd19c8"
-  integrity sha512-gtP5rseTKXOtnhSVoObp2w5ZyVGiFvyjrgnjgA8OZWa8ul0YEfwPi2NQgIHQZvWLR1zexmzPpVF7VlRFJg2nYA==
+"@civic/profile@0.1.3":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@civic/profile/-/profile-0.1.3.tgz#66762d399eec647ab278a383069606b68e7bf4c5"
+  integrity sha512-mJlTR59YbmE8K1GIgaIEdic3gWfiREfoRa0z4VttSIUAitVwOtwPKu2sDAXnr4K4zoCr1crC71Qlzt8xh80JWw==
   dependencies:
     "@bonfida/spl-name-service" "^0.1.50"
-    "@civic/storage" "^0.1.14"
+    "@civic/did-registry" "0.0.3-alpha.3"
+    "@civic/storage" "^0.1.15"
+    "@ethersproject/providers" "^5.7.2"
     "@identity.com/sol-did-client" "^3.1.2"
     "@identity.com/solana-gateway-ts" "^0.9.0-beta.1"
     "@solana/web3.js" "^1.48.0"
@@ -743,7 +748,7 @@
     "@solana/web3.js" "^1.63.0"
     ramda "^0.28.0"
 
-"@civic/storage@^0.1.14":
+"@civic/storage@^0.1.15":
   version "0.1.15"
   resolved "https://registry.yarnpkg.com/@civic/storage/-/storage-0.1.15.tgz#9c888d2bfdb1bb64dc5e4c24e8b0c0053bf6fcef"
   integrity sha512-5gQSjEIeV9rAv4eCY3bOe5ooiNUiSs8XlB13pCRVErdSPkQxPm//xhbp6aefgR/o8/KsPB7vGH5HuKudOnbJDg==
@@ -765,6 +770,14 @@
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/@colors/colors/-/colors-1.5.0.tgz#bb504579c1cae923e6576a4f5da43d25f97bdbd9"
   integrity sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==
+
+"@coral-xyz/borsh@^0.26.0":
+  version "0.26.0"
+  resolved "https://registry.yarnpkg.com/@coral-xyz/borsh/-/borsh-0.26.0.tgz#d054f64536d824634969e74138f9f7c52bbbc0d5"
+  integrity sha512-uCZ0xus0CszQPHYfWAqKS5swS1UxvePu83oOF+TWpUkedsNlg6p2p4azxZNSSqwXb9uXMFgxhuMBX9r3Xoi0vQ==
+  dependencies:
+    bn.js "^5.1.2"
+    buffer-layout "^1.2.0"
 
 "@cspotcode/source-map-support@^0.8.0":
   version "0.8.1"
@@ -1207,7 +1220,7 @@
   dependencies:
     "@ethersproject/logger" "^5.7.0"
 
-"@ethersproject/providers@5.7.2":
+"@ethersproject/providers@5.7.2", "@ethersproject/providers@^5.7.2":
   version "5.7.2"
   resolved "https://registry.yarnpkg.com/@ethersproject/providers/-/providers-5.7.2.tgz#f8b1a4f275d7ce58cf0a2eec222269a08beb18cb"
   integrity sha512-g34EWZ1WWAVgr4aptGlVBF8mhl3VWjv+8hoAnzStu8Ah22VHBsuGzP17eb6xDVRzw895G4W7vvx60lFFur/1Rg==
@@ -1568,7 +1581,7 @@
     did-resolver "^3.0.1"
     ramda "^0.27.1"
 
-"@identity.com/sol-did-client@3.1.4", "@identity.com/sol-did-client@^3.1.2":
+"@identity.com/sol-did-client@3.1.4":
   version "3.1.4"
   resolved "https://registry.yarnpkg.com/@identity.com/sol-did-client/-/sol-did-client-3.1.4.tgz#8902329ce0aaa09fd18c4d6d4da394a45006ca81"
   integrity sha512-DRzSi3SlFm71+9MIguHN/1oM459StW1QENHLQaxBF03rKMu1M62IYZEbryjrr9S3WzUkgQXph6G3tPuq/gXGUw==
@@ -1578,6 +1591,20 @@
     "@identity.com/sol-did-client-legacy" "^2.0.4"
     "@identity.com/sol-did-idl" "^3.1.0"
     "@project-serum/anchor" "0.25.0"
+    "@solana/web3.js" "^1.59.1"
+    bs58 "^5.0.0"
+    did-resolver "^3.2.2"
+
+"@identity.com/sol-did-client@^3.0.1-beta1", "@identity.com/sol-did-client@^3.1.2":
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/@identity.com/sol-did-client/-/sol-did-client-3.3.0.tgz#05df2f37d0d4c19b4eeeacde7842f552b0c5d0a2"
+  integrity sha512-v/hPHocEG0eaWyOUvLIMcl8+EDVXNFxX4EHInn/UsFpTrjg73ZIcPTEylWlRBF4mvBf1Qt7CuV60jK6H36GfNQ==
+  dependencies:
+    "@ethersproject/address" "^5.7.0"
+    "@ethersproject/bytes" "^5.7.0"
+    "@identity.com/sol-did-client-legacy" "^2.0.4"
+    "@identity.com/sol-did-idl" "^3.1.0"
+    "@project-serum/anchor" "0.26.0"
     "@solana/web3.js" "^1.59.1"
     bs58 "^5.0.0"
     did-resolver "^3.2.2"
@@ -2934,6 +2961,27 @@
     bs58 "^4.0.1"
     buffer-layout "^1.2.2"
     camelcase "^5.3.1"
+    cross-fetch "^3.1.5"
+    crypto-hash "^1.3.0"
+    eventemitter3 "^4.0.7"
+    js-sha256 "^0.9.0"
+    pako "^2.0.3"
+    snake-case "^3.0.4"
+    superstruct "^0.15.4"
+    toml "^3.0.0"
+
+"@project-serum/anchor@0.26.0":
+  version "0.26.0"
+  resolved "https://registry.yarnpkg.com/@project-serum/anchor/-/anchor-0.26.0.tgz#99e15a3923a5d10514f8185b2d3909e5699d60d5"
+  integrity sha512-Nq+COIjE1135T7qfnOHEn7E0q39bQTgXLFk837/rgFe6Hkew9WML7eHsS+lSYD2p3OJaTiUOHTAq1lHy36oIqQ==
+  dependencies:
+    "@coral-xyz/borsh" "^0.26.0"
+    "@solana/web3.js" "^1.68.0"
+    base64-js "^1.5.1"
+    bn.js "^5.1.2"
+    bs58 "^4.0.1"
+    buffer-layout "^1.2.2"
+    camelcase "^6.3.0"
     cross-fetch "^3.1.5"
     crypto-hash "^1.3.0"
     eventemitter3 "^4.0.7"
@@ -4313,7 +4361,7 @@
     buffer-layout "^1.2.0"
     dotenv "10.0.0"
 
-"@solana/spl-token@^0.2.0":
+"@solana/spl-token@0.2.0", "@solana/spl-token@^0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@solana/spl-token/-/spl-token-0.2.0.tgz#329bb6babb5de0f9c40035ddb1657f01a8347acd"
   integrity sha512-RWcn31OXtdqIxmkzQfB2R+WpsJOVS6rKuvpxJFjvik2LyODd+WN58ZP3Rpjpro03fscGAkzlFuP3r42doRJgyQ==
@@ -4815,7 +4863,7 @@
     "@wallet-standard/app" "^1.0.0"
     "@wallet-standard/base" "^1.0.0"
 
-"@solana/web3.js@1.42.0", "@solana/web3.js@1.56.0", "@solana/web3.js@1.66.2", "@solana/web3.js@^1.16.1", "@solana/web3.js@^1.17.0", "@solana/web3.js@^1.20.0", "@solana/web3.js@^1.21.0", "@solana/web3.js@^1.22.0", "@solana/web3.js@^1.29.2", "@solana/web3.js@^1.30.2", "@solana/web3.js@^1.31.0", "@solana/web3.js@^1.32.0", "@solana/web3.js@^1.35.0", "@solana/web3.js@^1.35.1", "@solana/web3.js@^1.36.0", "@solana/web3.js@^1.37.1", "@solana/web3.js@^1.42.0", "@solana/web3.js@^1.43.5", "@solana/web3.js@^1.44.3", "@solana/web3.js@^1.48.0", "@solana/web3.js@^1.56.2", "@solana/web3.js@^1.59.1", "@solana/web3.js@^1.63.0", "@solana/web3.js@^1.63.1", "@solana/web3.js@^1.66.2":
+"@solana/web3.js@1.42.0", "@solana/web3.js@1.56.0", "@solana/web3.js@1.66.2", "@solana/web3.js@^1.16.1", "@solana/web3.js@^1.17.0", "@solana/web3.js@^1.20.0", "@solana/web3.js@^1.21.0", "@solana/web3.js@^1.22.0", "@solana/web3.js@^1.29.2", "@solana/web3.js@^1.30.2", "@solana/web3.js@^1.31.0", "@solana/web3.js@^1.32.0", "@solana/web3.js@^1.35.0", "@solana/web3.js@^1.35.1", "@solana/web3.js@^1.36.0", "@solana/web3.js@^1.37.1", "@solana/web3.js@^1.42.0", "@solana/web3.js@^1.43.5", "@solana/web3.js@^1.44.3", "@solana/web3.js@^1.48.0", "@solana/web3.js@^1.56.2", "@solana/web3.js@^1.59.1", "@solana/web3.js@^1.63.0", "@solana/web3.js@^1.63.1", "@solana/web3.js@^1.66.2", "@solana/web3.js@^1.68.0":
   version "1.66.2"
   resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.66.2.tgz#80b43c5868b846124fe3ebac7d3943930c3fa60c"
   integrity sha512-RyaHMR2jGmaesnYP045VLeBGfR/gAW3cvZHzMFGg7bkO+WOYOYp1nEllf0/la4U4qsYGKCsO9eEevR5fhHiVHg==
@@ -7562,7 +7610,7 @@ camelcase@^5.0.0, camelcase@^5.3.1:
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-5.3.1.tgz#e3c9b31569e106811df242f715725a1f4c494320"
   integrity sha512-L28STB170nwWS63UjtlEOE3dldQApaJXZkOI1uMFfzf3rRuPegHaHesyee+YxQ+W6SvRDQV6UrdOdRiR153wJg==
 
-camelcase@^6.0.0, camelcase@^6.2.0:
+camelcase@^6.0.0, camelcase@^6.2.0, camelcase@^6.3.0:
   version "6.3.0"
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-6.3.0.tgz#5685b95eb209ac9c0c177467778c9c84df58ba9a"
   integrity sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==
