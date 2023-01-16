@@ -123,8 +123,7 @@ const BurnWriterTokenForQuote = ({
 
     const ix = program.instruction.burnWriterForQuote(new BN(form.size), {
       accounts: {
-        // @ts-ignore
-        userAuthority: program.provider.wallet.publicKey,
+        userAuthority: form.writerTokenAccount.extensions.token!.account.owner,
         optionMarket: optionAccount.publicKey,
         writerTokenMint: optionAccount.account.writerTokenMint,
         writerTokenSrc: form.writerTokenAccount.extensions.token!.publicKey,
