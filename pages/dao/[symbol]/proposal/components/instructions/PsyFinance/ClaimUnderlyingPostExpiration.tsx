@@ -1,4 +1,3 @@
-import { ProgramAccount as AnchorProgramAccount } from '@project-serum/anchor'
 import {
   Governance,
   ProgramAccount,
@@ -6,8 +5,7 @@ import {
 } from '@solana/spl-governance'
 import { PsyFinanceClaimUnderlyingPostExpiration } from '@utils/uiTypes/proposalCreationTypes'
 import useWallet from '@hooks/useWallet'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { useContext, useEffect, useMemo, useReducer, useState } from 'react'
+import { useContext, useEffect, useReducer } from 'react'
 import { NewProposalContext } from '../../../new'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
@@ -15,9 +13,10 @@ import Input from '@components/inputs/Input'
 import Tooltip from '@components/Tooltip'
 import { Program } from '@project-serum/anchor'
 import {
-  OptionMarket,
   PsyAmericanIdl,
   PSY_AMERICAN_PROGRAM_ID,
+  useGovernedWriterTokenAccounts,
+  useOptionAccounts,
 } from '@utils/instructions/PsyFinance'
 import {
   PublicKey,
@@ -48,26 +47,9 @@ const ClaimUnderlyingPostExpiration = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const { anchorProvider, connection, wallet } = useWallet()
-  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const { handleSetInstructions } = useContext(NewProposalContext)
-  const [options, setOptions] = useState<
-    AnchorProgramAccount<OptionMarket>[] | null
-  >(null)
-  const governedWriterTokenAccounts = useMemo(() => {
-    const _accounts: AssetAccount[] = []
-    options?.forEach((option) => {
-      const govWriterTokenAccount = governedTokenAccountsWithoutNfts.find(
-        (gAcct) =>
-          gAcct.extensions.token?.account.mint.equals(
-            option.account.writerTokenMint
-          )
-      )
-      if (govWriterTokenAccount) {
-        _accounts.push(govWriterTokenAccount)
-      }
-    })
-    return _accounts
-  }, [governedTokenAccountsWithoutNfts, options])
+  const options = useOptionAccounts()
+  const governedWriterTokenAccounts = useGovernedWriterTokenAccounts(options)
 
   const [form, dispatch] = useReducer(formReducer, {
     size: 0,
@@ -146,20 +128,6 @@ const ClaimUnderlyingPostExpiration = ({
       governance: form.writerTokenAccount?.governance,
     }
   }
-
-  useEffect(() => {
-    const program = new Program(
-      PsyAmericanIdl,
-      PSY_AMERICAN_PROGRAM_ID,
-      anchorProvider
-    )
-    ;(async () => {
-      const _options = (await program.account.optionMarket.all()) as
-        | AnchorProgramAccount<OptionMarket>[]
-        | null
-      setOptions(_options)
-    })()
-  }, [anchorProvider])
 
   useEffect(() => {
     handleSetInstructions(
