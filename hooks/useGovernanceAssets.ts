@@ -735,6 +735,10 @@ export default function useGovernanceAssets() {
       name: 'Claim Underlying (post expiration)',
       packageId: PackageEnum.PsyFinance,
     },
+    [Instructions.PsyFinanceExerciseOption]: {
+      name: 'Exercise Option',
+      packageId: PackageEnum.PsyFinance,
+    },
 
     /*
       ███████ ███████ ██████  ██    ██ ███    ███

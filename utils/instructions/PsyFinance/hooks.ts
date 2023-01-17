@@ -58,3 +58,25 @@ export const useGovernedWriterTokenAccounts = (
     return _accounts
   }, [governedTokenAccountsWithoutNfts, options])
 }
+
+/**
+ * Governed accounts for option tokens only.
+ */
+export const useGovernedOptionTokenAccounts = (
+  options: AnchorProgramAccount<OptionMarket>[] | null
+) => {
+  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
+  return useMemo(() => {
+    const _accounts: AssetAccount[] = []
+    options?.forEach((option) => {
+      const govOptionTokenAccount = governedTokenAccountsWithoutNfts.find(
+        (gAcct) =>
+          gAcct.extensions.token?.account.mint.equals(option.account.optionMint)
+      )
+      if (govOptionTokenAccount) {
+        _accounts.push(govOptionTokenAccount)
+      }
+    })
+    return _accounts
+  }, [governedTokenAccountsWithoutNfts, options])
+}

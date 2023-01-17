@@ -392,6 +392,7 @@ export interface MangoMakeChangeReferralFeeParams2 {
   refMngoRequired2: number
 }
 
+/* PsyOptions American options */
 export interface PsyFinanceMintAmericanOptionsForm {
   contractSize: number
   expirationUnixTimestamp: number
@@ -415,6 +416,14 @@ export interface PsyFinanceClaimUnderlyingPostExpiration {
   writerTokenAccount: AssetAccount | undefined
   underlyingDestination: string
 }
+
+export interface PsyFinanceExerciseOption {
+  size: number
+  optionTokenAccount: AssetAccount | undefined
+  quoteAssetAccount: AssetAccount | undefined
+}
+
+/* End PsyOptions American options */
 
 export interface ForesightHasGovernedAccount {
   governedAccount: AssetAccount
@@ -620,6 +629,7 @@ export enum Instructions {
   ProgramUpgrade,
   PsyFinanceBurnWriterForQuote,
   PsyFinanceClaimUnderlyingPostExpiration,
+  PsyFinanceExerciseOption,
   PsyFinanceMintAmericanOptions,
   RealmConfig,
   RefreshSolendObligation,
