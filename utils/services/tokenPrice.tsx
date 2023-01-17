@@ -9,7 +9,7 @@ import overrides from 'public/realms/token-overrides.json'
 
 //this service provide prices it is not recommended to get anything more from here besides token name or price.
 //decimals from metadata can be different from the realm on chain one
-const endpoint = 'https://price.jup.ag/v3/price'
+const endpoint = 'https://price.jup.ag/v4/price'
 
 type Price = {
   id: string
@@ -56,10 +56,7 @@ class TokenPriceService {
   async fetchTokenPrices(mintAddresses: string[]) {
     if (mintAddresses.length) {
       const mintAddressesWithSol = [...mintAddresses, WSOL_MINT, MANGO_MINT]
-      const tokenListRecords = this._tokenList?.filter((x) =>
-        mintAddressesWithSol.includes(x.address)
-      )
-      const symbols = tokenListRecords.map((x) => x.symbol).join(',')
+      const symbols = mintAddressesWithSol.join(',')
       try {
         const response = await axios.get(`${endpoint}?ids=${symbols}`)
         const priceToUsd: Price[] = response?.data?.data

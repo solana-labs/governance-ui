@@ -85,7 +85,7 @@
     "@solana/governance-program-library": "npm:@civic/governance-program-library@0.16.9-beta.2",
     "@solana/spl-governance": "0.3.18",
     "@solana/spl-token": "0.1.8",
-    "@solana/spl-token-registry": "0.2.3775",
+    "@solana/spl-token-registry": "0.2.4574",
     "@solana/wallet-adapter-backpack": "0.1.0",
     "@solana/wallet-adapter-base": "0.9.5",
     "@solana/wallet-adapter-exodus": "0.1.8",
