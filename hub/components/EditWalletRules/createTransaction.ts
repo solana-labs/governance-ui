@@ -52,9 +52,9 @@ export function createTransaction(
       : new BN(MAX_NUM.toString()),
     minInstructionHoldUpTime: daysToSeconds(rules.minInstructionHoldupDays),
     maxVotingTime: daysToSeconds(rules.maxVoteDays),
-    communityVoteTipping: convertVoteTipping(
-      rules.communityTokenRules.voteTipping,
-    ),
+    communityVoteTipping: rules.communityTokenRules.canVote
+      ? convertVoteTipping(rules.communityTokenRules.voteTipping)
+      : VoteTipping.Disabled,
     minCouncilTokensToCreateProposal:
       rules.councilTokenRules && rules.councilTokenRules.canCreateProposal
         ? new BN(
@@ -88,9 +88,10 @@ export function createTransaction(
           type: VoteThresholdType.Disabled,
           value: undefined,
         },
-    councilVoteTipping: rules.councilTokenRules
-      ? convertVoteTipping(rules.councilTokenRules.voteTipping)
-      : VoteTipping.Disabled,
+    councilVoteTipping:
+      rules.councilTokenRules && rules.communityTokenRules.canVote
+        ? convertVoteTipping(rules.councilTokenRules.voteTipping)
+        : VoteTipping.Disabled,
     votingCoolOffTime: daysToSeconds(rules.coolOffHours),
     depositExemptProposalCount: rules.depositExemptProposalCount,
   });

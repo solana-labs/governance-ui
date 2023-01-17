@@ -11,6 +11,7 @@ import { FormProps } from '@hub/types/FormProps';
 interface Props
   extends FormProps<{
     proposalDescription: string;
+    proposalTitle: string;
     proposalVoteType: 'council' | 'community';
   }> {
   className?: string;
@@ -47,9 +48,11 @@ export function Summary(props: Props) {
       </p>
       <ProposalDetails
         proposalDescription={props.proposalDescription}
+        proposalTitle={props.proposalTitle}
         governanceAddress={props.governanceAddress}
         walletAddress={props.walletAddress}
         onProposalDescriptionChange={props.onProposalDescriptionChange}
+        onProposalTitleChange={props.onProposalTitleChange}
       />
       <ProposalVoteType
         className="mt-8"

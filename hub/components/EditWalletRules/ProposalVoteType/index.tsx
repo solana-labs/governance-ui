@@ -100,20 +100,6 @@ export function ProposalVoteType(props: Props) {
               )}`}
             />
             <SummaryItem
-              label="Min Governance Power to Create a Proposal"
-              value={
-                rules.canCreateProposal
-                  ? formatNumber(
-                      rules.votingPowerToCreateProposals,
-                      undefined,
-                      {
-                        maximumFractionDigits: 0,
-                      },
-                    )
-                  : 'Disabled'
-              }
-            />
-            <SummaryItem
               label="Approval Quorum"
               value={`${rules.quorumPercent}%`}
             />
@@ -121,10 +107,21 @@ export function ProposalVoteType(props: Props) {
               label="Vote Tipping"
               value={getLabel(rules.voteTipping)}
             />
-            <SummaryItem
-              label="Veto Quorum"
-              value={rules.canVeto ? `${rules.vetoQuorumPercent}%` : 'Disabled'}
-            />
+            {props.proposalVoteType === 'council' &&
+              props.currentCommunityRules.canVeto && (
+                <SummaryItem
+                  label="Community Veto Quorum"
+                  value={`${props.currentCommunityRules.vetoQuorumPercent}%`}
+                />
+              )}
+            {props.proposalVoteType === 'community' &&
+              props.currentCouncilRules &&
+              props.currentCouncilRules.canVeto && (
+                <SummaryItem
+                  label="Council Veto Quorum"
+                  value={`${props.currentCommunityRules.vetoQuorumPercent}%`}
+                />
+              )}
           </div>
         </div>
       )}

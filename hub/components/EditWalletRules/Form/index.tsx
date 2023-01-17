@@ -42,8 +42,7 @@ export function Form(props: Props) {
       </h1>
       <p className="m-0 mb-16 dark:text-neutral-300">
         Submitting updates to a wallet’s rules will create a proposal for the
-        DAO to vote on. If approved, the updates will automatically be
-        implemented.
+        DAO to vote on. If approved, the updates will be ready to be executed.
       </p>
       <div className="space-y-8">
         <VotingDuration

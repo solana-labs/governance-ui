@@ -6,6 +6,7 @@ import { SliderValue } from '../SliderValue';
 import { SummaryItem } from '../SummaryItem';
 import { ValueBlock } from '../ValueBlock';
 import { Slider } from '@hub/components/controls/Slider';
+import { formatNumber } from '@hub/lib/formatNumber';
 import { ntext } from '@hub/lib/ntext';
 import { FormProps } from '@hub/types/FormProps';
 
@@ -55,7 +56,7 @@ export function VotingDuration(props: Props) {
         description={
           <>
             After an unrestricted voting time, cool-off voting time limits
-            members to voting <span className="font-bold">No</span>, reversing
+            members to voting <span className="font-bold">No</span>, withdrawing
             their vote, or vetoing a proposal. A member cannot vote to approve a
             proposal during the cool-off time.
           </>
@@ -81,13 +82,21 @@ export function VotingDuration(props: Props) {
         <div className="flex items-center mt-3 text-xs">
           <div className="dark:text-neutral-500">Unrestricted Voting Time:</div>
           <div className="ml-2 dark:text-neutral-50">
-            <span className="font-bold">{unrestrictedVotingDays}</span>{' '}
+            <span className="font-bold">
+              {formatNumber(unrestrictedVotingDays, undefined, {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2,
+              })}
+            </span>{' '}
             {ntext(unrestrictedVotingDays, 'day')}
           </div>
           {!!unrestrictedVotingRemainingHours && (
             <div className="ml-2 dark:text-neutral-50">
               <span className="font-bold">
-                {unrestrictedVotingRemainingHours}
+                {formatNumber(unrestrictedVotingRemainingHours, undefined, {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 2,
+                })}
               </span>{' '}
               {ntext(unrestrictedVotingRemainingHours, 'hour')}
             </div>
@@ -102,12 +111,18 @@ export function VotingDuration(props: Props) {
             value={
               <div className="flex items-center">
                 <div>
-                  {unrestrictedVotingDays}{' '}
+                  {formatNumber(unrestrictedVotingDays, undefined, {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 2,
+                  })}{' '}
                   {ntext(unrestrictedVotingDays, 'day')}
                 </div>
                 {!!unrestrictedVotingRemainingHours && (
                   <div className="ml-3">
-                    {unrestrictedVotingRemainingHours}{' '}
+                    {formatNumber(unrestrictedVotingRemainingHours, undefined, {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 2,
+                    })}{' '}
                     {ntext(unrestrictedVotingRemainingHours, 'hour')}
                   </div>
                 )}
@@ -116,11 +131,17 @@ export function VotingDuration(props: Props) {
           />
           <SummaryItem
             label="Cool-Off Voting Time"
-            value={`${props.coolOffHours} ${ntext(props.coolOffHours, 'hour')}`}
+            value={`${formatNumber(props.coolOffHours, undefined, {
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 2,
+            })} ${ntext(props.coolOffHours, 'hour')}`}
           />
           <SummaryItem
             label="Total Voting Duration"
-            value={`${props.maxVoteDays} ${ntext(props.maxVoteDays, 'day')}`}
+            value={`${formatNumber(props.maxVoteDays, undefined, {
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 2,
+            })} ${ntext(props.maxVoteDays, 'day')}`}
           />
         </div>
       </div>

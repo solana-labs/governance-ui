@@ -24,7 +24,7 @@ function getDescription(value: GovernanceVoteTipping): string {
     case GovernanceVoteTipping.Early:
       return 'A proposal passes when quorum is reached';
     case GovernanceVoteTipping.Strict:
-      return 'A proposal passes when it cannot mathematically be defeated';
+      return 'A proposal passes as soon as it cannot mathematically be defeated';
   }
 }
 

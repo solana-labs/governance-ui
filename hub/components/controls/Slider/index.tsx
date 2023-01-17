@@ -69,7 +69,7 @@ export function Slider(props: Props) {
         </SliderRoot.Track>
       </SliderRoot.Root>
       <div className="text-center min-w-[32px] dark:text-neutral-300">
-        {props.onRenderValue(props.max)}
+        {props.onRenderValue(Math.max(props.max, props.value))}
       </div>
     </div>
   );

@@ -18,7 +18,6 @@ import { GovernanceTokenType } from '@hub/types/GovernanceTokenType';
 import { GovernanceVoteTipping } from '@hub/types/GovernanceVoteTipping';
 import * as RE from '@hub/types/Result';
 
-import { MAX_NUM } from './constants';
 import { createTransaction } from './createTransaction';
 import { Form } from './Form';
 import * as gql from './gql';
@@ -68,8 +67,9 @@ export function EditWalletRules(props: Props) {
   const [step, setStep] = useState(Step.Form);
   const [proposalVoteType, setProposalVoteType] = useState<
     'community' | 'council'
-  >('council');
+  >('community');
   const [proposalDescription, setProposalDescription] = useState('');
+  const [proposalTitle, setProposalTitle] = useState('');
 
   const [communityRules, setCommunityRules] = useState<CommunityRules>({
     canCreateProposal: true,
@@ -83,7 +83,7 @@ export function EditWalletRules(props: Props) {
     totalSupply: new BigNumber(1),
     vetoQuorumPercent: 100,
     voteTipping: GovernanceVoteTipping.Disabled,
-    votingPowerToCreateProposals: MAX_NUM,
+    votingPowerToCreateProposals: new BigNumber(1),
   });
 
   const [councilRules, setCouncilRules] = useState<CouncilRules>(null);
@@ -117,8 +117,19 @@ export function EditWalletRules(props: Props) {
       if (!data.councilTokenRules) {
         setProposalVoteType('community');
       }
+
+      const walletName =
+        getAccountName(data.walletAddress) ||
+        getAccountName(data.governanceAddress) ||
+        data.walletAddress.toBase58();
+
+      const title = `Update Wallet Rules for “${walletName}”`;
+
+      setProposalTitle(title);
     }
   }, [result._tag]);
+
+  console.log(proposalTitle);
 
   return pipe(
     result,
@@ -241,10 +252,12 @@ export function EditWalletRules(props: Props) {
                       maxVoteDays={maxVoteDays}
                       minInstructionHoldupDays={minInstructionHoldupDays}
                       proposalDescription={proposalDescription}
+                      proposalTitle={proposalTitle}
                       proposalVoteType={proposalVoteType}
                       walletAddress={governance.walletAddress}
-                      onProposalVoteTypeChange={setProposalVoteType}
                       onProposalDescriptionChange={setProposalDescription}
+                      onProposalTitleChange={setProposalTitle}
+                      onProposalVoteTypeChange={setProposalVoteType}
                     />
                     <footer className="flex items-center justify-end">
                       <button
@@ -287,10 +300,10 @@ export function EditWalletRules(props: Props) {
                             governingTokenMintPublicKey,
                             programPublicKey,
                             proposalDescription,
+                            proposalTitle,
                             governancePublicKey: governance.governanceAddress,
                             instructions: [transaction],
                             isDraft: false,
-                            proposalTitle: `Update Wallet Rules for “${walletName}”`,
                             realmPublicKey: publicKey,
                           });
 

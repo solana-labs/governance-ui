@@ -37,7 +37,7 @@ export function CouncilDetails(props: Props) {
       <div className="space-y-8">
         <ValueBlock
           title="Do you want to allow council members to create proposals?"
-          description="If disabled, the council token members can no longer create proposals."
+          description="If disabled, the council members can no longer create proposals."
         >
           <ButtonToggle
             className="h-14"
@@ -52,13 +52,13 @@ export function CouncilDetails(props: Props) {
         </ValueBlock>
         {props.councilRules.canCreateProposal && (
           <ValueBlock
-            title="What is the minimum amount of council tokens required to create a proposal?"
-            description="A user must have this many council tokens in order to create a proposal."
+            title="What is the minimum amount of council governance power required to create a proposal?"
+            description="A user must have this many council governance power in order to create a proposal."
           >
             <div className="relative">
               <Input
                 className="w-full pr-24"
-                placeholder="# of tokens"
+                placeholder="amount of governance power"
                 value={formatNumber(
                   props.councilRules.votingPowerToCreateProposals,
                   undefined,
@@ -68,7 +68,7 @@ export function CouncilDetails(props: Props) {
                 )}
                 onChange={(e) => {
                   const text = e.currentTarget.value.replaceAll(/[^\d.-]/g, '');
-                  const value = new BigNumber(text);
+                  const value = text ? new BigNumber(text) : new BigNumber(0);
                   const newRules = produce(props.councilRules, (data) => {
                     data.votingPowerToCreateProposals = value;
                   });
@@ -80,23 +80,25 @@ export function CouncilDetails(props: Props) {
               </div>
             </div>
             <div className="flex items-center justify-end">
-              <div className="mt-1 text-xs text-neutral-500">
-                {councilPowerPercent.isGreaterThan(0)
-                  ? councilPowerPercent.isLessThan(0.01)
-                    ? '<0.01'
-                    : formatNumber(councilPowerPercent, undefined, {
-                        maximumFractionDigits: 2,
-                        minimumFractionDigits: 0,
-                      })
-                  : 0}
-                % of token supply
-              </div>
+              {props.councilRules.totalSupply.isGreaterThan(0) && (
+                <div className="mt-1 text-xs text-neutral-500">
+                  {councilPowerPercent.isGreaterThan(0)
+                    ? councilPowerPercent.isLessThan(0.01)
+                      ? '<0.01'
+                      : formatNumber(councilPowerPercent, undefined, {
+                          maximumFractionDigits: 2,
+                          minimumFractionDigits: 0,
+                        })
+                    : 0}
+                  % of token supply
+                </div>
+              )}
             </div>
           </ValueBlock>
         )}
         <ValueBlock
           title="Do you want to allow council members to vote?"
-          description="If disabled, the council token members can no longer vote on proposals."
+          description="If disabled, the council members can no longer vote on proposals."
         >
           <ButtonToggle
             className="h-14"
@@ -109,56 +111,60 @@ export function CouncilDetails(props: Props) {
             }}
           />
         </ValueBlock>
-        <ValueBlock
-          title="Council Voting Quorum"
-          description="The percentage of Yes votes required to pass a proposal"
-        >
-          <div className="grid grid-cols-[100px,1fr] gap-x-2 items-center">
-            <SliderValue
-              min={1}
-              max={100}
-              value={props.councilRules.quorumPercent}
-              units="%"
-              onChange={(value) => {
-                const newRules = produce(props.councilRules, (data) => {
-                  data.quorumPercent = value;
-                });
-                props.onCouncilRulesChange?.(newRules);
-              }}
-            />
-            <Slider
-              min={1}
-              max={100}
-              trackColor="bg-sky-400"
-              value={props.councilRules.quorumPercent}
-              onChange={(value) => {
-                const newRules = produce(props.councilRules, (data) => {
-                  data.quorumPercent = value;
-                });
-                props.onCouncilRulesChange?.(newRules);
-              }}
-              onRenderValue={(val) => `${val}%`}
-            />
-          </div>
-        </ValueBlock>
-        <ValueBlock
-          title="Council Vote Tipping"
-          description="Decide when voting should end"
-        >
-          <VoteTippingSelector
-            className="w-full"
-            value={props.councilRules.voteTipping}
-            onChange={(value) => {
-              const newRules = produce(props.councilRules, (data) => {
-                data.voteTipping = value;
-              });
-              props.onCouncilRulesChange?.(newRules);
-            }}
-          />
-        </ValueBlock>
+        {props.councilRules.canVote && (
+          <>
+            <ValueBlock
+              title="Council Approval Quorum"
+              description="The percentage of Yes votes required to pass a proposal"
+            >
+              <div className="grid grid-cols-[100px,1fr] gap-x-2 items-center">
+                <SliderValue
+                  min={1}
+                  max={100}
+                  value={props.councilRules.quorumPercent}
+                  units="%"
+                  onChange={(value) => {
+                    const newRules = produce(props.councilRules, (data) => {
+                      data.quorumPercent = value;
+                    });
+                    props.onCouncilRulesChange?.(newRules);
+                  }}
+                />
+                <Slider
+                  min={1}
+                  max={100}
+                  trackColor="bg-sky-400"
+                  value={props.councilRules.quorumPercent}
+                  onChange={(value) => {
+                    const newRules = produce(props.councilRules, (data) => {
+                      data.quorumPercent = value;
+                    });
+                    props.onCouncilRulesChange?.(newRules);
+                  }}
+                  onRenderValue={(val) => `${val}%`}
+                />
+              </div>
+            </ValueBlock>
+            <ValueBlock
+              title="Council Vote Tipping"
+              description="Decide when voting should end"
+            >
+              <VoteTippingSelector
+                className="w-full"
+                value={props.councilRules.voteTipping}
+                onChange={(value) => {
+                  const newRules = produce(props.councilRules, (data) => {
+                    data.voteTipping = value;
+                  });
+                  props.onCouncilRulesChange?.(newRules);
+                }}
+              />
+            </ValueBlock>
+          </>
+        )}
         <ValueBlock
           title="Do you want your council to have veto power over community proposals?"
-          description="Your council can veto a community-approved proposal during its Cool-Off Duration."
+          description="Your council can veto a community-approved proposal."
         >
           <ButtonToggle
             className="h-14"

@@ -1,4 +1,4 @@
-import { clamp } from 'ramda';
+import { useEffect, useState } from 'react';
 
 import { Input } from '@hub/components/controls/Input';
 import cx from '@hub/lib/cx';
@@ -13,27 +13,28 @@ interface Props {
 }
 
 export function SliderValue(props: Props) {
+  const [value, setValue] = useState(String(props.value));
+
+  useEffect(() => {
+    setValue(String(props.value));
+  }, [props.value]);
+
   return (
     <div className={cx('relative', props.className)}>
       <Input
         className="block w-full"
-        value={props.value}
+        value={value}
         onChange={(e) => {
-          const text = e.currentTarget.value.replaceAll(/[^\d.-]/g, '');
-
-          if (!text) {
-            props.onChange?.(0);
-          } else {
-            const parsed = parseInt(text, 10);
-            const value = Number.isNaN(parsed) ? props.min : parsed;
-            props.onChange?.(clamp(props.min, props.max, value));
-          }
+          setValue(e.currentTarget.value);
         }}
         onBlur={(e) => {
-          const text = e.currentTarget.value.replaceAll(/[^\d.-]/g, '');
-          const parsed = parseInt(text, 10);
+          const text = e.currentTarget.value.replaceAll(
+            /.*?(([0-9]*\.)?[0-9]+).*/g,
+            '$1',
+          );
+          const parsed = parseFloat(text);
           const value = Number.isNaN(parsed) ? props.min : parsed;
-          props.onChange?.(clamp(props.min, props.max, value));
+          props.onChange?.(Math.max(props.min, value));
         }}
       />
       <div
