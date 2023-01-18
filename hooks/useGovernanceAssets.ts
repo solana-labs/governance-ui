@@ -365,6 +365,10 @@ export default function useGovernanceAssets() {
       name: 'SNS Transfer Out Domain Name',
       packageId: PackageEnum.Common,
     },
+    [Instructions.RegisterNewDomain]: {
+      name: 'Register New Domain Name',
+      packageId: PackageEnum.Common,
+    },
     [Instructions.UpdateTokenMetadata]: {
       name: 'Update Token Metadata',
       isVisible: canUseAuthorityInstruction,

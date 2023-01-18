@@ -134,6 +134,7 @@ import RemoveServiceFromDID from './components/instructions/Identity/RemoveServi
 import DualWithdraw from './components/instructions/Dual/DualWithdraw'
 import DualExercise from './components/instructions/Dual/DualExercise'
 import PsyFinanceMintAmericanOptions from './components/instructions/PsyFinance/MintAmericanOptions'
+import RegisterNewDomain from './components/instructions/RegisterNewDomain'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -494,6 +495,7 @@ const New = () => {
       [Instructions.WithdrawValidatorStake]: WithdrawValidatorStake,
       [Instructions.DifferValidatorStake]: null,
       [Instructions.TransferDomainName]: TransferDomainName,
+      [Instructions.RegisterNewDomain]: RegisterNewDomain,
       [Instructions.EverlendDeposit]: DepositForm,
       [Instructions.EverlendWithdraw]: WithdrawForm,
       [Instructions.SerumInitUser]: InitUser,

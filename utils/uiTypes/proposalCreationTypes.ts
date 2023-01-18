@@ -63,6 +63,13 @@ export interface DomainNameTransferForm {
   domainAddress: string | undefined
 }
 
+export interface RegisterNewDomainForm {
+  storage: number | null
+  governedAccount: AssetAccount | undefined
+  destinationAccount: string
+  domain: string | undefined
+}
+
 export interface CastleDepositForm {
   amount: number | undefined
   governedTokenAccount: AssetAccount | undefined
@@ -617,6 +624,7 @@ export enum Instructions {
   SwitchboardRevokeOracle,
   Transfer,
   TransferDomainName,
+  RegisterNewDomain,
   UpdateTokenMetadata,
   VotingMintConfig,
   WithdrawFromCastle,
