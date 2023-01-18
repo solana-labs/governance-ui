@@ -183,7 +183,9 @@ export const LockTokensAccount: React.FC<{
         {isLockModalOpen && (
           <LockTokensModal
             isOpen={isLockModalOpen}
+            minimumLockupTimeInDays={183}
             onClose={() => setIsLockModalOpen(false)}
+            onSubmit={(values) => console.log('SUBMIT', values)}
           />
         )}
         <div className="mt-4">

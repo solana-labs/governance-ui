@@ -314,6 +314,7 @@ const heliumConfigVotingMintIx = (programId: PublicKey) => ({
       { name: 'Registrar' },
       { name: 'Realm authority' },
       { name: 'Mint' },
+      { name: 'Payer' },
     ],
     getDataUI: async (connection: Connection, data: Uint8Array) => {
       try {

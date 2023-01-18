@@ -20,7 +20,6 @@ export const executeInstructions = async (
   multiTransactionMode = false
 ) => {
   const instructions: TransactionInstruction[] = []
-
   await Promise.all(
     proposalInstructions.map((instruction) =>
       // withExecuteTransaction function mutate the given 'instructions' parameter
@@ -35,7 +34,6 @@ export const executeInstructions = async (
       )
     )
   )
-
   if (multiTransactionMode) {
     const txes = [...instructions.map((x) => [x])].map((txBatch, batchIdx) => {
       return {
@@ -47,7 +45,6 @@ export const executeInstructions = async (
         sequenceType: SequenceType.Sequential,
       }
     })
-
     await sendTransactionsV3({
       connection,
       wallet,
@@ -55,7 +52,6 @@ export const executeInstructions = async (
     })
   } else {
     const transaction = new Transaction()
-
     transaction.add(...instructions)
     const signedTransaction = await signTransaction({
       transaction,
@@ -63,7 +59,6 @@ export const executeInstructions = async (
       connection,
       signers: [],
     })
-
     await sendSignedTransaction({
       signedTransaction,
       connection,
