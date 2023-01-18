@@ -23,7 +23,7 @@ interface EditTokenForm {
   governedAccount: AssetAccount | null
   oraclePk: string
   oracleConfFilter: number
-  tokenIndex: number
+  mintPk: string
   name: string
   adjustmentFactor: number
   util0: number
@@ -39,6 +39,17 @@ interface EditTokenForm {
   initLiabWeight: number
   liquidationFee: number
   groupInsuranceFund: boolean
+  stablePriceDelayIntervalSeconds: number
+  stablePriceDelayGrowthLimit: number
+  stablePriceGrowthLimit: number
+  minVaultToDepositsRatio: number
+  netBorrowLimitPerWindowQuote: number
+  netBorrowLimitWindowSizeTs: number
+  borrowWeightScaleStartQuote: number
+  depositWeightScaleStartQuote: number
+  resetStablePrice: boolean
+  resetNetBorrowLimit: boolean
+  reduceOnly: boolean
 }
 
 const EditToken = ({
@@ -62,7 +73,7 @@ const EditToken = ({
     governedAccount: null,
     oraclePk: '',
     oracleConfFilter: 0,
-    tokenIndex: 0,
+    mintPk: '',
     name: '',
     adjustmentFactor: 0,
     util0: 0,
@@ -77,7 +88,18 @@ const EditToken = ({
     maintLiabWeight: 0,
     initLiabWeight: 0,
     liquidationFee: 0,
+    stablePriceDelayIntervalSeconds: 0,
+    stablePriceDelayGrowthLimit: 0,
+    stablePriceGrowthLimit: 0,
+    minVaultToDepositsRatio: 0,
+    netBorrowLimitPerWindowQuote: 0,
+    netBorrowLimitWindowSizeTs: 0,
+    borrowWeightScaleStartQuote: 0,
+    depositWeightScaleStartQuote: 0,
     groupInsuranceFund: false,
+    resetStablePrice: false,
+    resetNetBorrowLimit: false,
+    reduceOnly: false,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -101,12 +123,11 @@ const EditToken = ({
     ) {
       const client = await getClient(connection, wallet)
       const group = await client.getGroupForCreator(ADMIN_PK, GROUP_NUM)
-      const bank = group.banksMap.get(form.name.toUpperCase())!
-      const mintInfo = group.mintInfosMap.get(bank.tokenIndex)!
+      const bank = group.getFirstBankByMint(new PublicKey(form.mintPk))
+      const mintInfo = group.mintInfosMapByTokenIndex.get(bank.tokenIndex)!
       //Mango instruction call and serialize
       const ix = await client.program.methods
         .tokenEdit(
-          new BN(0),
           new PublicKey(form.oraclePk),
           {
             confFilter: {
@@ -128,10 +149,22 @@ const EditToken = ({
           Number(form.initAssetWeight),
           Number(form.maintLiabWeight),
           Number(form.initLiabWeight),
-          Number(form.liquidationFee)
+          Number(form.liquidationFee),
+          Number(form.stablePriceDelayIntervalSeconds),
+          Number(form.stablePriceDelayGrowthLimit),
+          Number(form.stablePriceGrowthLimit),
+          Number(form.minVaultToDepositsRatio),
+          new BN(form.netBorrowLimitPerWindowQuote),
+          new BN(form.netBorrowLimitWindowSizeTs),
+          Number(form.borrowWeightScaleStartQuote),
+          Number(form.depositWeightScaleStartQuote),
+          form.resetStablePrice,
+          form.resetNetBorrowLimit,
+          form.reduceOnly
         )
         .accounts({
           group: group.publicKey,
+          oracle: form.oraclePk ? new PublicKey(form.oraclePk) : bank.oracle,
           admin: ADMIN_PK,
           mintInfo: mintInfo.publicKey,
         })
@@ -182,6 +215,12 @@ const EditToken = ({
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governance,
       options: governedProgramAccounts,
+    },
+    {
+      label: 'Mint Pk',
+      initialValue: form.mintPk,
+      type: InstructionInputType.INPUT,
+      name: 'mintPk',
     },
     {
       label: 'Oracle Pk',
@@ -298,6 +337,80 @@ const EditToken = ({
       initialValue: form.groupInsuranceFund,
       type: InstructionInputType.SWITCH,
       name: 'groupInsuranceFund',
+    },
+    {
+      label: 'Stable Price Delay Interval Seconds',
+      initialValue: form.stablePriceDelayIntervalSeconds,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'stablePriceDelayIntervalSeconds',
+    },
+    {
+      label: 'Stable Price Delay Growth Limit',
+      initialValue: form.stablePriceDelayGrowthLimit,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'stablePriceDelayGrowthLimit',
+    },
+    {
+      label: 'Stable Price Growth Limit',
+      initialValue: form.stablePriceGrowthLimit,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'stablePriceGrowthLimit',
+    },
+    {
+      label: 'Min Vault To Deposits Ratio',
+      initialValue: form.minVaultToDepositsRatio,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'minVaultToDepositsRatio',
+    },
+    {
+      label: 'Net Borrow Limit Per Window Quote',
+      initialValue: form.netBorrowLimitPerWindowQuote,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'netBorrowLimitPerWindowQuote',
+    },
+    {
+      label: 'Net Borrow Limit Window Size Ts',
+      initialValue: form.netBorrowLimitWindowSizeTs,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'netBorrowLimitWindowSizeTs',
+    },
+    {
+      label: 'Borrow Weight Scale Start Quote',
+      initialValue: form.borrowWeightScaleStartQuote,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'borrowWeightScaleStartQuote',
+    },
+    {
+      label: 'Deposit Weight Scale Start Quote',
+      initialValue: form.depositWeightScaleStartQuote,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'depositWeightScaleStartQuote',
+    },
+    {
+      label: 'Reset Stable Price',
+      initialValue: form.resetStablePrice,
+      type: InstructionInputType.SWITCH,
+      name: 'resetStablePrice',
+    },
+    {
+      label: 'Reset Net Borrow Limit',
+      initialValue: form.resetNetBorrowLimit,
+      type: InstructionInputType.SWITCH,
+      name: 'resetNetBorrowLimit',
+    },
+    {
+      label: 'Reduce Only',
+      initialValue: form.reduceOnly,
+      type: InstructionInputType.SWITCH,
+      name: 'reduceOnly',
     },
   ]
 

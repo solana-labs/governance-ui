@@ -17,7 +17,7 @@ import InstructionForm, {
   InstructionInputType,
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
-import { SERUM3_PROGRAM_ID } from '@blockworks-foundation/mango-v4'
+import { OPENBOOK_PROGRAM_ID } from '@blockworks-foundation/mango-v4'
 
 interface Serum3RegisterMarketForm {
   governedAccount: AssetAccount | null
@@ -83,7 +83,7 @@ const EditToken = ({
         .accounts({
           group: group.publicKey,
           admin: ADMIN_PK,
-          serumProgram: SERUM3_PROGRAM_ID[connection.cluster],
+          serumProgram: OPENBOOK_PROGRAM_ID[connection.cluster],
           serumMarketExternal: new PublicKey(form.serum3MarketExternalPk),
           baseBank: group.banksMap.get(form.baseBankTokenName.toUpperCase())!
             .publicKey,
