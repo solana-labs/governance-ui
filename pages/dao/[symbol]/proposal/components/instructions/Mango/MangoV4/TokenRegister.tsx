@@ -11,7 +11,7 @@ import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
-import { I80F48 } from '@blockworks-foundation/mango-client'
+import { BN, I80F48 } from '@blockworks-foundation/mango-client'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, {
   InstructionInput,
@@ -39,6 +39,9 @@ interface RegisterTokenForm {
   maintLiabWeight: number
   initLiabWeight: number
   liquidationFee: number
+  minVaultToDepositsRatio: number
+  netBorrowLimitWindowSizeTs: number
+  netBorrowLimitPerWindowQuote: number
 }
 
 const TokenRegister = ({
@@ -78,6 +81,9 @@ const TokenRegister = ({
     maintLiabWeight: 0,
     initLiabWeight: 0,
     liquidationFee: 0,
+    minVaultToDepositsRatio: 0,
+    netBorrowLimitWindowSizeTs: 0,
+    netBorrowLimitPerWindowQuote: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -101,7 +107,7 @@ const TokenRegister = ({
     ) {
       const client = await getClient(connection, wallet)
       const group = await client.getGroupForCreator(ADMIN_PK, GROUP_NUM)
-      const tokenIndex = group.banksMap.size
+      const tokenIndex = group.banksMapByMint.size
       //Mango instruction call and serialize
       //TODO dao sol account as payer
       const ix = await client.program.methods
@@ -127,7 +133,10 @@ const TokenRegister = ({
           Number(form.initAssetWeight),
           Number(form.maintLiabWeight),
           Number(form.initLiabWeight),
-          Number(form.liquidationFee)
+          Number(form.liquidationFee),
+          Number(form.minVaultToDepositsRatio),
+          new BN(form.netBorrowLimitWindowSizeTs),
+          new BN(form.netBorrowLimitPerWindowQuote)
         )
         .accounts({
           group: group.publicKey,
