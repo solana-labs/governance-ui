@@ -25,6 +25,9 @@ config = withTM({
     return config
   },
   env: {
+    MAIN_VIEW_SHOW_MAX_TOP_TOKENS_NUM:
+      process.env.MAIN_VIEW_SHOW_MAX_TOP_TOKENS_NUM,
+    DISABLE_NFTS: process.env.DISABLE_NFTS,
     REALM: process.env.REALM,
     MAINNET_RPC: process.env.MAINNET_RPC,
     DEVNET_RPC: process.env.DEVNET_RPC,
