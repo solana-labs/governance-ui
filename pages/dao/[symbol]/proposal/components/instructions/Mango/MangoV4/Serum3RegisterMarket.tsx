@@ -75,7 +75,7 @@ const EditToken = ({
     ) {
       const client = await getClient(connection, wallet)
       const group = await client.getGroupForCreator(ADMIN_PK, GROUP_NUM)
-      const marketIndex = group.serum3MarketsMap.size
+      const marketIndex = group.serum3ExternalMarketsMap.size
       //TODO dao sol account as payer
       //Mango instruction call and serialize
       const ix = await client.program.methods
@@ -85,10 +85,13 @@ const EditToken = ({
           admin: ADMIN_PK,
           serumProgram: OPENBOOK_PROGRAM_ID[connection.cluster],
           serumMarketExternal: new PublicKey(form.serum3MarketExternalPk),
-          baseBank: group.banksMap.get(form.baseBankTokenName.toUpperCase())!
-            .publicKey,
-          quoteBank: group.banksMap.get(form.quoteBankTokenName.toUpperCase())!
-            .publicKey,
+          //todo fix by getFirstBankByMint
+          baseBank: group.banksMapByName.get(
+            form.baseBankTokenName.toUpperCase()
+          )![0]!.publicKey,
+          quoteBank: group.banksMapByName.get(
+            form.quoteBankTokenName.toUpperCase()
+          )![0]!.publicKey,
           payer: wallet.publicKey,
         })
         .instruction()
