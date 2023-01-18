@@ -42,28 +42,27 @@ const DualExercise = ({
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-  function getInstruction(): Promise<UiInstruction> {
-    return getExerciseInstruction({
-      connection,
-      form,
-      schema,
-      setFormErrors,
-      wallet,
-    })
-  }
+  const schema = getDualFinanceExerciseSchema()
   useEffect(() => {
+    function getInstruction(): Promise<UiInstruction> {
+      return getExerciseInstruction({
+        connection,
+        form,
+        schema,
+        setFormErrors,
+        wallet,
+      })
+    }
     handleSetInstructions(
       { governedAccount: governedAccount, getInstruction },
       index
     )
-  }, [form])
+  }, [form, governedAccount, handleSetInstructions, index, connection, schema, wallet])
   useEffect(() => {
     setGovernedAccount(form.baseTreasury?.governance)
   }, [form.baseTreasury])
-  const schema = getDualFinanceExerciseSchema()
 
-  // TODO: Find the name from metaplex from a token lookup once that is
-  // connected to the program.
+  // TODO: Find the name from a lookup of all staking option states
   return (
     <>
       <Tooltip content="Identifier for the Staking Option">
