@@ -72,6 +72,20 @@ const CredixWithdraw = ({
         marketMintInfo.account.decimals,
       );
 
+      console.log(
+        'userBaseBalance',
+        await market.userBaseBalance(governedAccountPubkey),
+      );
+      console.log(
+        'getUserStake',
+        await market.getUserStake(governedAccountPubkey),
+      );
+
+      console.log(
+        'fetchLiquidityPoolBalance',
+        await market.fetchLiquidityPoolBalance(),
+      );
+
       return market.withdrawIx(amount.toNumber(), governedAccountPubkey);
     },
   });

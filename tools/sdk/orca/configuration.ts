@@ -7,6 +7,7 @@ import { parseMintAccountData } from '@utils/tokens';
 
 export type WhirlpoolName =
   | 'UXD_USDC'
+  | 'UXP_USDC'
   | 'SOL_UXD'
   | 'SOL_USDC'
   | 'stSOL_USDC'
@@ -73,6 +74,10 @@ export class OrcaConfiguration {
     UXD_USDC: {
       displayName: 'UXD-USDC',
       publicKey: new PublicKey('GLNvG5Ly4cK512oQeJqnwLftwfoPZ4skyDwZWzxorYQ9'),
+    },
+    UXP_USDC: {
+      displayName: 'UXP-USDC',
+      publicKey: new PublicKey('9r5v3ZTSZaRkRANZ5PSxh32ry4udrvtYmxypQG3XJbqN'),
     },
     SOL_UXD: {
       displayName: 'SOL-UXD',
