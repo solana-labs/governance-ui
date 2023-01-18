@@ -18,25 +18,35 @@ import InstructionForm, {
   InstructionInputType,
 } from '../../FormCreator'
 import UseMangoV4 from '@hooks/useMangoV4'
-import { tryGetMint } from '@utils/tokens'
 
 interface PerpCreateForm {
   governedAccount: AssetAccount | null
-  oracleConfFilter: number
-  baseTokenName: string
+  oraclePk: string
   name: string
+  oracleConfFilter: number
+  baseDecimals: number
   quoteLotSize: number
   baseLotSize: number
-  maintAssetWeight: number
-  initAssetWeight: number
-  maintLiabWeight: number
-  initLiabWeight: number
+  maintBaseAssetWeight: number
+  initBaseAssetWeight: number
+  maintBaseLiabWeight: number
+  initBaseLiabWeight: number
+  maintPnlAssetWeight: number
+  initPnlAssetWeight: number
   liquidationFee: number
   makerFee: number
   takerFee: number
+  feePenalty: number
   minFunding: number
   maxFunding: number
   impactQuantity: number
+  groupInsuranceFund: boolean
+  settleFeeFlat: number
+  settleFeeAmountThreshold: number
+  settleFeeFractionLowHealth: number
+  settleTokenIndex: number
+  settlePnlLimitFactor: number
+  settlePnlLimitWindowSize: number
 }
 
 const PerpCreate = ({
@@ -59,20 +69,31 @@ const PerpCreate = ({
   const [form, setForm] = useState<PerpCreateForm>({
     governedAccount: null,
     oracleConfFilter: 0,
-    baseTokenName: '',
+    oraclePk: '',
     name: '',
+    baseDecimals: 0,
     quoteLotSize: 0,
     baseLotSize: 0,
-    maintAssetWeight: 0,
-    initAssetWeight: 0,
-    maintLiabWeight: 0,
-    initLiabWeight: 0,
+    maintBaseAssetWeight: 0,
+    initBaseAssetWeight: 0,
+    maintBaseLiabWeight: 0,
+    initBaseLiabWeight: 0,
+    maintPnlAssetWeight: 0,
+    initPnlAssetWeight: 0,
     liquidationFee: 0,
     makerFee: 0,
     takerFee: 0,
+    feePenalty: 0,
     minFunding: 0,
     maxFunding: 0,
     impactQuantity: 0,
+    groupInsuranceFund: false,
+    settleFeeFlat: 0,
+    settleFeeAmountThreshold: 0,
+    settleFeeFractionLowHealth: 0,
+    settleTokenIndex: 0,
+    settlePnlLimitFactor: 0,
+    settlePnlLimitWindowSize: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -99,45 +120,53 @@ const PerpCreate = ({
       const bids = new Keypair()
       const asks = new Keypair()
       const eventQueue = new Keypair()
-      const perpMarketIndex = group.perpMarketsMap.size
-      const bank = group.banksMap.get(form.baseTokenName.toUpperCase())!
-      const mintInfo = group.mintInfosMap.get(bank.tokenIndex)!
-      const mint = await tryGetMint(connection.current, mintInfo.mint)
+      const perpMarketIndex = group.perpMarketsMapByName.size
+
       //Mango instruction call and serialize
 
       //TODO dao sol account as payer
       const ix = await client.program.methods
         .perpCreateMarket(
-          perpMarketIndex,
+          Number(perpMarketIndex),
           form.name,
           {
             confFilter: {
-              val: I80F48.fromNumber(form.oracleConfFilter).getData(),
+              val: I80F48.fromNumber(Number(form.oracleConfFilter)).getData(),
             },
-          } as any, // future: nested custom types dont typecheck, fix if possible?
-          bank.tokenIndex,
-          mint!.account.decimals!,
+          } as any,
+          Number(form.baseDecimals),
           new BN(form.quoteLotSize),
           new BN(form.baseLotSize),
-          Number(form.maintAssetWeight),
-          Number(form.initAssetWeight),
-          Number(form.maintLiabWeight),
-          Number(form.initLiabWeight),
+          Number(form.maintBaseAssetWeight),
+          Number(form.initBaseAssetWeight),
+          Number(form.maintBaseLiabWeight),
+          Number(form.initBaseLiabWeight),
+          Number(form.maintPnlAssetWeight),
+          Number(form.initPnlAssetWeight),
           Number(form.liquidationFee),
           Number(form.makerFee),
           Number(form.takerFee),
           Number(form.minFunding),
           Number(form.maxFunding),
-          new BN(form.impactQuantity)
+          new BN(form.impactQuantity),
+          form.groupInsuranceFund,
+          Number(form.feePenalty),
+          Number(form.settleFeeFlat),
+          Number(form.settleFeeAmountThreshold),
+          Number(form.settleFeeFractionLowHealth),
+          Number(form.settleTokenIndex),
+          Number(form.settlePnlLimitFactor),
+          new BN(form.settlePnlLimitWindowSize)
         )
         .accounts({
           group: group.publicKey,
           admin: ADMIN_PK,
-          oracle: mintInfo.oracle,
+          oracle: new PublicKey(form.oraclePk),
           bids: bids.publicKey,
           asks: asks.publicKey,
           eventQueue: eventQueue.publicKey,
-          payer: wallet.publicKey,
+          //TODO PAYER SOL WALLET
+          payer: ADMIN_PK,
         })
         .preInstructions([
           // TODO: try to pick up sizes of bookside and eventqueue from IDL, so we can stay in sync with program
@@ -221,10 +250,10 @@ const PerpCreate = ({
       name: 'name',
     },
     {
-      label: 'Base token name',
-      initialValue: form.baseTokenName,
+      label: 'Oracle',
+      initialValue: form.oraclePk,
       type: InstructionInputType.INPUT,
-      name: 'baseTokenName',
+      name: 'oraclePk',
     },
 
     {
@@ -235,39 +264,11 @@ const PerpCreate = ({
       name: 'oracleConfFilter',
     },
     {
-      label: 'Maint Asset Weight',
-      initialValue: form.maintAssetWeight,
+      label: 'Base Decimals',
+      initialValue: form.baseDecimals,
       type: InstructionInputType.INPUT,
       inputType: 'number',
-      name: 'maintAssetWeight',
-    },
-    {
-      label: 'Init Asset Weight',
-      initialValue: form.initAssetWeight,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'initAssetWeight',
-    },
-    {
-      label: 'Maint Liab Weight',
-      initialValue: form.maintLiabWeight,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'maintLiabWeight',
-    },
-    {
-      label: 'Init Liab Weight',
-      initialValue: form.initLiabWeight,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'initLiabWeight',
-    },
-    {
-      label: 'Liquidation Fee',
-      initialValue: form.liquidationFee,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'liquidationFee',
+      name: 'baseDecimals',
     },
     {
       label: 'Quote Lot Size',
@@ -284,6 +285,62 @@ const PerpCreate = ({
       name: 'baseLotSize',
     },
     {
+      label: 'Maint Base Asset Weight',
+      initialValue: form.maintBaseAssetWeight,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'maintBaseAssetWeight',
+    },
+    {
+      label: 'Init Base Asset Weight',
+      initialValue: form.initBaseAssetWeight,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'initBaseAssetWeight',
+    },
+    {
+      label: 'Maint Base Liab Weight',
+      initialValue: form.maintBaseLiabWeight,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'maintBaseLiabWeight',
+    },
+    {
+      label: 'Init Base Liab Weight',
+      initialValue: form.initBaseLiabWeight,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'initBaseLiabWeight',
+    },
+    {
+      label: 'Maint Base Liab Weight',
+      initialValue: form.maintBaseLiabWeight,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'maintBaseLiabWeight',
+    },
+    {
+      label: 'Maint Pnl Asset Weight',
+      initialValue: form.maintPnlAssetWeight,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'maintPnlAssetWeight',
+    },
+    {
+      label: 'Liquidation Fee',
+      initialValue: form.liquidationFee,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'liquidationFee',
+    },
+    {
+      label: 'Init Pnl Asset Weight',
+      initialValue: form.initPnlAssetWeight,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'initPnlAssetWeight',
+    },
+    {
       label: 'Maker Fee',
       initialValue: form.makerFee,
       type: InstructionInputType.INPUT,
@@ -296,6 +353,61 @@ const PerpCreate = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'takerFee',
+    },
+    {
+      label: 'Fee Penalty',
+      initialValue: form.feePenalty,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'feePenalty',
+    },
+    {
+      label: 'Group Insurance Fund',
+      initialValue: form.groupInsuranceFund,
+      type: InstructionInputType.SWITCH,
+      name: 'groupInsuranceFund',
+    },
+    {
+      label: 'Settle Fee Flat',
+      initialValue: form.settleFeeFlat,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'settleFeeFlat',
+    },
+    {
+      label: 'Settle Fee Amount Threshold',
+      initialValue: form.settleFeeAmountThreshold,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'settleFeeAmountThreshold',
+    },
+    {
+      label: 'Settle Fee Fraction Low Health',
+      initialValue: form.settleFeeFractionLowHealth,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'settleFeeFractionLowHealth',
+    },
+    {
+      label: 'Settle Token Index',
+      initialValue: form.settleTokenIndex,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'settleTokenIndex',
+    },
+    {
+      label: 'Settle Pnl Limit Factor',
+      initialValue: form.settlePnlLimitFactor,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'settlePnlLimitFactor',
+    },
+    {
+      label: 'Settle Pnl Limit Window Size',
+      initialValue: form.settlePnlLimitWindowSize,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'settlePnlLimitWindowSize',
     },
     {
       label: 'Min Funding',
