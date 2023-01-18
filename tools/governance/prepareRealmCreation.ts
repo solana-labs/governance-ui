@@ -187,6 +187,7 @@ export async function prepareRealmCreation({
   // Create council mint
   let councilMintPk
 
+  console.log('NFT COLLECTION COUNT', nftCollectionCount)
   // TODO explain the circumstances under which this set of conditions would be true
   if (
     zeroCommunityTokenSupply &&
@@ -243,6 +244,7 @@ export async function prepareRealmCreation({
       walletAtaPk = ataPk
     }
   }
+  console.log('COUNCIL WALLETS', councilWalletPks, walletAtaPk)
 
   // Convert to mint natural amount
   const minCommunityTokensToCreateAsMintValue =

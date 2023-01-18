@@ -127,6 +127,7 @@ export default function NFTWizard() {
           skipRealmAuthority: true,
         },
       }
+      console.log('PARAMS - NFT COUNT', params.nftCollectionCount)
 
       const results =
         formData._programVersion === 3
