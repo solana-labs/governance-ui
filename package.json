@@ -50,7 +50,7 @@
     "@hookform/resolvers": "2.8.10",
     "@identity.com/sol-did-client": "3.1.4",
     "@marinade.finance/marinade-ts-sdk": "2.0.9",
-    "@mean-dao/payment-streaming": "3.1.2-beta.1",
+    "@mean-dao/payment-streaming": "4.0.0",
     "@metaplex-foundation/js": "0.17.5",
     "@metaplex-foundation/mpl-token-metadata": "~2.5.1",
     "@mithraic-labs/serum-remote": "0.0.2",
