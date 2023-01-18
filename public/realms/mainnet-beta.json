@@ -1061,15 +1061,6 @@
     "ogImage": "/realms/BootstrapDAO/BootRealms.png"
   },
   {
-    "symbol": "laptopDAO",
-    "displayName": "laptopDAO",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "6JzsaQYYi4vGTZogASscZsBALWbSbJU9tMDRtq6nbeff",
-    "website": "https://laptop-dao.vercel.app/",
-    "twitter": "@laptopDAO",
-    "ogImage": "/realms/laptopDAO/logo.png"
-  },
-  {
     "symbol": "HOADAO",
     "displayName": "HOA DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -2166,7 +2157,7 @@
     "bannerImage": "https://i.imgur.com/mN0eY0k.png",
     "displayName": "Raydium",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "GDBJ3qv4tJXiCbz5ASkSMYq6Xfb35MdXsMzgVaMnr9Q7",
+    "realmId": "8JZdqeTaMkPaatN8xKRXRHeSGSrNLSMAT5vWQjdNp7K",
     "ogImage": "https://raw.githubusercontent.com/raydium-io/media-assets/ac2e46c4d8fc72d935cab0878992ce9a99b88589/logo.svg",
     "shortDescription": "Raydium is an Automated Market Maker (AMM) built on the Solana blockchain for the Serum Decentralized Exchange (DEX).",
     "sortRank": 3,
@@ -2174,6 +2165,14 @@
     "twitter": "@RaydiumProtocol",
     "discord": "https://discord.com/invite/raydium",
     "github": "https://github.com/raydium-io"
+  },
+  {
+    "symbol": "Bonk",
+    "displayName": "BonkDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "84pGFuy1Y27ApK67ApethaPvexeDWA66zNV8gm38TVeQ",
+    "ogImage": "https://i.imgur.com/5JK4nEL.jpeg",
+    "sortRank": 3
   },
   {
     "symbol": "Wordcel Club",
@@ -2941,5 +2940,30 @@
     "website": "https://www.digitaleyes.market/",
     "twitter": "@DigitalEyesNFT",
     "discord": "https://discord.com/invite/hhbgab4bsD"
+  },
+  {
+    "symbol": "xLPFi",
+    "displayName": "LP Finance xGovernance",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "HUDn6xDodk7sSE1ZPNzZEMJh1j8qu5zFxYFXPgAQ1AHE",
+    "communityMint": "xLPFiPmWve5rUnAYcHZSZWjwgyqEdcV6dDzoBJRtNw9",
+    "ogImage": "/realms/xLPFi/xLPFi-min.png",
+    "shortDescription": "LP Finance is a synthetic asset issuance protocol on Solana",
+    "sortRank": 3,
+    "website": "https://lp.finance/",
+    "twitter": "@LPFinance_",
+    "linkedin": "https://www.linkedin.com/company/lpfinance/",
+    "instagram": "https://www.instagram.com/lp.finance/",
+    "discord": "https://discord.gg/N2Uebv58v2",
+    "github": "https://github.com/LP-Finance-Inc/"
+  },
+  {
+    "symbol": "Hackerz DAO - High Council",
+    "displayName": "Hackerz DAO - High Council",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "zv8G3bXWe589fpb51LXfsoK2ACMAEqqHyjdYcxVys5R",
+    "twitter": "@HackerzDAO",
+    "discord": "https://discord.gg/zfQWsKMQCn",
+    "ogImage": "/realms/HackerzDAO/img/HackerzDAO_PFP.png"
   }
 ]

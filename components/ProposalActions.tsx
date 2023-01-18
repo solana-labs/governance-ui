@@ -19,6 +19,8 @@ import { cancelProposal } from 'actions/cancelProposal'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import dayjs from 'dayjs'
+import { diffTime } from './ProposalRemainingVotingTime'
 
 const ProposalActionsPanel = () => {
   const { governance, proposal, proposalOwner } = useWalletStore(
@@ -40,9 +42,24 @@ const ProposalActionsPanel = () => {
   const maxVoterWeight = nftMaxVoterWeight || votePLuginsClientMaxVoterWeight
   const canFinalizeVote =
     hasVoteTimeExpired && proposal?.account.state === ProposalState.Voting
+  const now = new Date().getTime() / 1000 // unix timestamp in seconds
+  const mainVotingEndedAt = proposal?.account.signingOffAt
+    ?.addn(governance?.account.config.maxVotingTime || 0)
+    .toNumber()
+  const votingCoolOffTime = governance?.account.config.votingCoolOffTime || 0
+  const canFinalizeAt = mainVotingEndedAt
+    ? mainVotingEndedAt + votingCoolOffTime
+    : mainVotingEndedAt
+
+  const canFinalizeNow = canFinalizeAt ? canFinalizeAt <= now : true
+  const endOfProposalAndCoolOffTime = canFinalizeAt
+    ? dayjs(1000 * canFinalizeAt!)
+    : undefined
+  const coolOffTimeLeft = endOfProposalAndCoolOffTime
+    ? diffTime(false, dayjs(), endOfProposalAndCoolOffTime)
+    : undefined
 
   const walletPk = wallet?.publicKey
-
   useEffect(() => {
     const setup = async () => {
       if (proposal && realmInfo && walletPk) {
@@ -228,14 +245,23 @@ const ProposalActionsPanel = () => {
             )}
 
             {canFinalizeVote && (
-              <Button
-                tooltipMessage={finalizeVoteTooltipContent}
-                className="w-1/2"
-                onClick={handleFinalizeVote}
-                disabled={!connected || !canFinalizeVote}
-              >
-                Finalize
-              </Button>
+              <>
+                <Button
+                  tooltipMessage={finalizeVoteTooltipContent}
+                  className="w-1/2"
+                  onClick={handleFinalizeVote}
+                  disabled={!connected || !canFinalizeVote || !canFinalizeNow}
+                >
+                  Finalize
+                </Button>
+                {!canFinalizeNow && coolOffTimeLeft && (
+                  <div>
+                    Cool Off Time: {coolOffTimeLeft.days}d &nbsp;
+                    {coolOffTimeLeft.hours}h &nbsp;
+                    {coolOffTimeLeft.minutes}m
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

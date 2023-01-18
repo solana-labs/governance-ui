@@ -1,49 +1,13 @@
 import { PublicKey } from '@solana/web3.js';
 
+import { Realm } from '../gql';
 import { SmallCard } from '@hub/components/DiscoverPage/SmallCard';
 import { NFT as NFTIcon } from '@hub/components/icons/NFT';
 import cx from '@hub/lib/cx';
 
-export const ITEMS = [
-  {
-    bannerImgSrc: 'https://i.imgur.com/NfXLoSZ.jpg',
-    description:
-      'Okay Bears has the highest trade volume of any NFT collection on Solana and is an emerging global icon of clean, positive cool.',
-    iconImgSrc: 'https://i.imgur.com/eKF74mG.png',
-    name: 'Okay Bears',
-    publicKey: new PublicKey('DntR8BU5tYVhQUNfARFG5VxKrpdRaKY2qKC3v8cYJirm'),
-    urlId: 'Okay Bears',
-  },
-  {
-    bannerImgSrc: 'https://i.imgur.com/wgLWNen.png',
-    description:
-      'Degenerate Ape Academy was the first trustless NFT launch on Solana. Owning a Degen Ape is owning part of history, and grants you the highest level of possible entry into both The Degeniverse and the Degen DAOO.',
-    iconImgSrc: 'https://i.imgur.com/j6VhuZJ.png',
-    name: 'Degenerate Ape Academy',
-    publicKey: new PublicKey('7f47FkSAJqJLNY5p3jKxp7CLbEYbQDhhmKuYDJKrNJEq'),
-    urlId: 'Degenerate Ape Academy',
-  },
-  {
-    bannerImgSrc: 'https://i.imgur.com/g7s83QR.jpg',
-    description:
-      'Degods is on a mission to build the best communities on the internet.',
-    iconImgSrc: 'https://i.imgur.com/wnyQRln.jpg',
-    name: 'DeGods',
-    publicKey: new PublicKey('wx9R4TZLgL4VaVK89uW9D9DpMKMUCSm16nABeahk9Ex'),
-    urlId: 'DeGods',
-  },
-  {
-    bannerImgSrc: 'https://i.imgur.com/nr1riOL.jpg',
-    description: 'Raindrops Protocol, standardizing gaming across Solana',
-    iconImgSrc: '/realms/RAIN/img/rain_logo.png',
-    name: 'The Imperium of Rain',
-    publicKey: new PublicKey('6orGiJYGXYk9GT2NFoTv2ZMYpA6asMieAqdek4YRH2Dn'),
-    urlId: 'DTP',
-  },
-];
-
 interface Props {
   className?: string;
+  realms: Realm[];
 }
 
 export function NotableNFTs(props: Props) {
@@ -71,9 +35,19 @@ export function NotableNFTs(props: Props) {
           '2xl:grid-cols-4',
         )}
       >
-        {ITEMS.map((item, i) => (
+        {props.realms.map((realm, i) => (
           <div className="flex-shrink-0 w-full 2xl:max-w-[290px] h-56" key={i}>
-            <SmallCard {...item} />
+            <SmallCard
+              bannerImgSrc={realm.bannerImageUrl}
+              category={realm.category}
+              description={realm.shortDescription}
+              heading={realm.clippedHeading}
+              iconImgSrc={realm.iconUrl}
+              name={realm.name}
+              publicKey={realm.publicKey}
+              twitterFollowerCount={realm.twitterFollowerCount}
+              urlId={realm.urlId}
+            />
           </div>
         ))}
       </div>

@@ -8,6 +8,7 @@ import PreviousRouteBtn from 'components/PreviousRouteBtn'
 import useQueryContext from 'hooks/useQueryContext'
 import useRealm from 'hooks/useRealm'
 import {
+  GovernanceConfig,
   PROGRAM_VERSION_V1,
   RpcContext,
   VoteTipping,
@@ -29,11 +30,18 @@ import React, { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import * as yup from 'yup'
 import { DEFAULT_NFT_TREASURY_MINT } from '@components/instructions/tools'
-import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
+import {
+  DISABLED_VOTER_WEIGHT,
+  MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
+} from '@tools/constants'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import Select from '@components/inputs/Select'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { getMintDecimalAmount } from '@tools/sdk/units'
+import {
+  transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig,
+  transform,
+} from '@components/AssetsList/BaseGovernanceForm-data'
 interface NewTreasuryAccountForm extends BaseGovernanceFormFieldsV2 {
   mintAddress: string
 }
@@ -70,6 +78,7 @@ const NewAccountForm = () => {
     realmInfo,
     realm,
     mint: realmMint,
+    councilMint,
     symbol,
     ownVoterWeight,
   } = useRealm()
@@ -159,10 +168,39 @@ const NewAccountForm = () => {
           voteTipping: form.voteTipping,
         }
 
-        const governanceConfig = getGovernanceConfigFromV2Form(
-          realmInfo?.programVersion!,
-          governanceConfigValues
-        )
+        const governanceConfig =
+          realmInfo!.programVersion === 2
+            ? getGovernanceConfigFromV2Form(
+                realmInfo!.programVersion!,
+                governanceConfigValues
+              )
+            : new GovernanceConfig(
+                transform(
+                  transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig(
+                    realmMint.decimals,
+                    councilMint?.decimals || 0
+                  ),
+                  {
+                    minCommunityTokensToCreateProposal:
+                      form.minCommunityTokensToCreateProposal ===
+                      DISABLED_VOTER_WEIGHT.toString()
+                        ? 'disabled'
+                        : form.minCommunityTokensToCreateProposal,
+                    minCouncilTokensToCreateProposal: '1',
+                    minInstructionHoldUpTime: form.minInstructionHoldUpTime.toString(),
+                    maxVotingTime: form.maxVotingTime.toString(),
+                    votingCoolOffTime: '0',
+                    depositExemptProposalCount: '10',
+                    communityVoteThreshold: form.voteThreshold.toString(),
+                    communityVetoVoteThreshold: 'disabled',
+                    councilVoteThreshold: form.voteThreshold.toString(),
+                    councilVetoVoteThreshold: form.voteThreshold.toString(),
+                    communityVoteTipping: form.voteTipping,
+                    councilVoteTipping: form.voteTipping,
+                    _programVersion: 3,
+                  }
+                )[0]
+              )
 
         await createTreasuryAccount(
           rpcContext,

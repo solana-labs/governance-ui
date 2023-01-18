@@ -9,7 +9,7 @@ import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Input from '@components/inputs/Input'
-import getConfigInstruction from '@utils/instructions/Dual'
+import { getConfigInstruction } from '@utils/instructions/Dual'
 import useWalletStore from 'stores/useWalletStore'
 import { getDualFinanceStakingOptionSchema } from '@utils/validations'
 import Tooltip from '@components/Tooltip'
@@ -35,7 +35,7 @@ const StakingOption = ({
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
+  const { assetAccounts } = useGovernanceAssets()
   const [governedAccount, setGovernedAccount] = useState<
     ProgramAccount<Governance> | undefined
   >(undefined)
@@ -85,27 +85,27 @@ const StakingOption = ({
       <Tooltip content="Treasury owned account providing the assets for the option. When the recipient exercises, these are the tokens they receive. For SOL/USDC Calls, enter SOL. For SOL/USDC Puts, enter USDC.">
         <GovernedAccountSelect
           label="Base Treasury"
-          governedAccounts={governedTokenAccountsWithoutNfts}
+          governedAccounts={assetAccounts}
           onChange={(value) => {
             handleSetForm({ value, propertyName: 'baseTreasury' })
           }}
           value={form.baseTreasury}
           error={formErrors['baseTreasury']}
-          shouldBeGoverned={shouldBeGoverned}
           governance={governance}
+          type="token"
         ></GovernedAccountSelect>
       </Tooltip>
       <Tooltip content="Treasury owned account receiving payment for the option exercise. This is where payments from exercise accumulate. For SOL/USDC Calls, enter USDC. For SOL/USDC Puts, enter SOL.">
         <GovernedAccountSelect
           label="Quote Treasury"
-          governedAccounts={governedTokenAccountsWithoutNfts}
+          governedAccounts={assetAccounts}
           onChange={(value) => {
             handleSetForm({ value, propertyName: 'quoteTreasury' })
           }}
           value={form.quoteTreasury}
           error={formErrors['quoteTreasury']}
-          shouldBeGoverned={shouldBeGoverned}
           governance={governance}
+          type="token"
         ></GovernedAccountSelect>
       </Tooltip>
       <Tooltip content="How many tokens are in the staking options. Units are in atoms of the base token.">
@@ -167,7 +167,7 @@ const StakingOption = ({
       <Tooltip content="Rent payer. Should be the governance wallet with same governance as base treasury">
         <GovernedAccountSelect
           label="Payer Account"
-          governedAccounts={governedTokenAccountsWithoutNfts.filter(
+          governedAccounts={assetAccounts.filter(
             (x) =>
               x.isSol &&
               form.baseTreasury?.governance &&

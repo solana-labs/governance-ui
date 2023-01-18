@@ -107,7 +107,6 @@ import MakeRemoveSpotMarket from './components/instructions/Mango/MakeRemoveSpot
 import MakeRemovePerpMarket from './components/instructions/Mango/MakeRemovePerpMarket'
 import MakeSwapSpotMarket from './components/instructions/Mango/MakeSwapSpotMarket'
 import MakeRemoveOracle from './components/instructions/Mango/MakeRemoveOracle'
-import SagaPreOrder from './components/instructions/Solana/SagaPhone/SagaPreOrder'
 import MakeDepositToMangoAccount from './components/instructions/Mango/MakeDepositToMangoAccount'
 import MakeDepositToMangoAccountCsv from './components/instructions/Mango/MakeDepositToMangoAccountCsv'
 import TokenRegister from './components/instructions/Mango/MangoV4/TokenRegister'
@@ -132,6 +131,9 @@ import AddKeyToDID from './components/instructions/Identity/AddKeyToDID'
 import RemoveKeyFromDID from './components/instructions/Identity/RemoveKeyFromDID'
 import AddServiceToDID from './components/instructions/Identity/AddServiceToDID'
 import RemoveServiceFromDID from './components/instructions/Identity/RemoveServiceFromDID'
+import DualWithdraw from './components/instructions/Dual/DualWithdraw'
+import DualExercise from './components/instructions/Dual/DualExercise'
+import PsyFinanceMintAmericanOptions from './components/instructions/PsyFinance/MintAmericanOptions'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -448,6 +450,8 @@ const New = () => {
       [Instructions.ClaimPendingWithdraw]: FriktionClaimPendingWithdraw,
       [Instructions.DepositIntoCastle]: CastleDeposit,
       [Instructions.DualFinanceStakingOption]: StakingOption,
+      [Instructions.DualFinanceWithdraw]: DualWithdraw,
+      [Instructions.DualFinanceExercise]: DualExercise,
       [Instructions.MeanCreateAccount]: MeanCreateAccount,
       [Instructions.MeanFundAccount]: MeanFundAccount,
       [Instructions.MeanWithdrawFromAccount]: MeanWithdrawFromAccount,
@@ -460,6 +464,7 @@ const New = () => {
       [Instructions.InitSolendObligationAccount]: InitObligationAccount,
       [Instructions.DepositReserveLiquidityAndObligationCollateral]: DepositReserveLiquidityAndObligationCollateral,
       [Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity]: WithdrawObligationCollateralAndRedeemReserveLiquidity,
+      [Instructions.PsyFinanceMintAmericanOptions]: PsyFinanceMintAmericanOptions,
       [Instructions.SwitchboardAdmitOracle]: SwitchboardAdmitOracle,
       [Instructions.SwitchboardRevokeOracle]: SwitchboardRevokeOracle,
       [Instructions.RefreshSolendObligation]: RefreshObligation,
@@ -482,7 +487,6 @@ const New = () => {
       [Instructions.ChangeMakeDonation]: ChangeDonation,
       [Instructions.CreateTokenMetadata]: CreateTokenMetadata,
       [Instructions.UpdateTokenMetadata]: UpdateTokenMetadata,
-      [Instructions.SagaPreOrder]: SagaPreOrder,
       [Instructions.DepositToMangoAccount]: MakeDepositToMangoAccount,
       [Instructions.DepositToMangoAccountCsv]: MakeDepositToMangoAccountCsv,
       [Instructions.StakeValidator]: StakeValidator,
@@ -542,7 +546,7 @@ const New = () => {
       [Instructions.AddServiceToDID]: AddServiceToDID,
       [Instructions.RemoveServiceFromDID]: RemoveServiceFromDID,
     }),
-    []
+    [governance?.pubkey.toBase58()]
   )
 
   const getCurrentInstruction = useCallback(
@@ -577,7 +581,7 @@ const New = () => {
       )
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    []
+    [governance?.pubkey.toBase58()]
   )
 
   const titleTooLong = form.title.length > TITLE_LENGTH_LIMIT

@@ -20,7 +20,7 @@ import {
   SetRealmConfigArgs,
 } from '@solana/spl-governance'
 import { Connection, PublicKey } from '@solana/web3.js'
-import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
+import { DISABLED_VOTER_WEIGHT, SIMULATION_WALLET } from '@tools/constants'
 import { fmtVoterWeightThresholdMintAmount } from '@tools/governance/units'
 import {
   fmtBNAmount,
@@ -74,85 +74,193 @@ export const GOVERNANCE_INSTRUCTIONS = {
 
         return programVersion >= 3 ? (
           <>
-            <p>
-              communityVoteThreshold:{' '}
-              {args.config.communityVoteThreshold.value
-                ? args.config.communityVoteThreshold.value?.toLocaleString() +
-                  '%'
-                : 'Disabled'}
-            </p>
-            <p>
-              councilVoteThreshold:{' '}
-              {args.config.councilVoteThreshold.value
-                ? args.config.councilVoteThreshold.value?.toLocaleString() + '%'
-                : 'Disabled'}
-            </p>
-            <p>
-              communityVetoVoteThreshold:{' '}
-              {args.config.communityVetoVoteThreshold.value
-                ? args.config.communityVetoVoteThreshold.value?.toLocaleString() +
-                  '%'
-                : 'Disabled'}
-            </p>
-            <p>
-              councilVetoVoteThreshold:{' '}
-              {args.config.councilVetoVoteThreshold.value
-                ? args.config.councilVetoVoteThreshold.value?.toLocaleString() +
-                  '%'
-                : 'Disabled'}
-            </p>
-            {args.config.minCommunityTokensToCreateProposal.toString() ===
-            DISABLED_VOTER_WEIGHT.toString() ? (
-              <p>minCommunityTokensToCreateProposal: Disabled</p>
-            ) : (
+            <h1>Current config</h1>
+            <div className="space-y-3">
               <p>
-                minCommunityTokensToCreateProposal:{' '}
-                {fmtMintAmount(
-                  communityMint?.account,
-                  args.config.minCommunityTokensToCreateProposal
-                )}{' '}
-                ({args.config.minCommunityTokensToCreateProposal.toString()})
+                communityVoteThreshold:{' '}
+                {governance.account.config.communityVoteThreshold.value
+                  ? governance.account.config.communityVoteThreshold.value?.toLocaleString() +
+                    '%'
+                  : 'Disabled'}
               </p>
-            )}
-            {args.config.minCouncilTokensToCreateProposal.toString() ===
-            DISABLED_VOTER_WEIGHT.toString() ? (
-              <p>minCouncilTokensToCreateProposal: Disabled</p>
-            ) : (
               <p>
-                minCouncilTokensToCreateProposal:{' '}
-                {fmtMintAmount(
-                  councilMint?.account,
-                  args.config.minCouncilTokensToCreateProposal
-                )}{' '}
-                ({args.config.minCouncilTokensToCreateProposal.toString()})
+                councilVoteThreshold:{' '}
+                {governance.account.config.councilVoteThreshold.value
+                  ? governance.account.config.councilVoteThreshold.value?.toLocaleString() +
+                    '%'
+                  : 'Disabled'}
               </p>
-            )}
-            <p>
-              {`minInstructionHoldUpTime:
-          ${getDaysFromTimestamp(args.config.minInstructionHoldUpTime)} day(s)`}
-            </p>
-            <p>
-              {`maxVotingTime:
-          ${getDaysFromTimestamp(args.config.maxVotingTime)} days(s)`}
-            </p>
-            <p>
-              {`votingCoolOffTime:
+              <p>
+                communityVetoVoteThreshold:{' '}
+                {governance.account.config.communityVetoVoteThreshold.value
+                  ? governance.account.config.communityVetoVoteThreshold.value?.toLocaleString() +
+                    '%'
+                  : 'Disabled'}
+              </p>
+              <p>
+                councilVetoVoteThreshold:{' '}
+                {governance.account.config.councilVetoVoteThreshold.value
+                  ? governance.account.config.councilVetoVoteThreshold.value?.toLocaleString() +
+                    '%'
+                  : 'Disabled'}
+              </p>
+              {governance.account.config.minCommunityTokensToCreateProposal.toString() ===
+              DISABLED_VOTER_WEIGHT.toString() ? (
+                <p>minCommunityTokensToCreateProposal: Disabled</p>
+              ) : (
+                <p>
+                  minCommunityTokensToCreateProposal:{' '}
+                  {fmtMintAmount(
+                    communityMint?.account,
+                    governance.account.config.minCommunityTokensToCreateProposal
+                  )}{' '}
+                  (
+                  {governance.account.config.minCommunityTokensToCreateProposal.toString()}
+                  )
+                </p>
+              )}
+              {governance.account.config.minCouncilTokensToCreateProposal.toString() ===
+              DISABLED_VOTER_WEIGHT.toString() ? (
+                <p>minCouncilTokensToCreateProposal: Disabled</p>
+              ) : (
+                <p>
+                  minCouncilTokensToCreateProposal:{' '}
+                  {fmtMintAmount(
+                    councilMint?.account,
+                    governance.account.config.minCouncilTokensToCreateProposal
+                  )}{' '}
+                  (
+                  {governance.account.config.minCouncilTokensToCreateProposal.toString()}
+                  )
+                </p>
+              )}
+              <p>
+                {`minInstructionHoldUpTime:
+          ${getDaysFromTimestamp(
+            governance.account.config.minInstructionHoldUpTime
+          )} day(s) | raw arg: ${
+                  governance.account.config.minInstructionHoldUpTime
+                } secs`}
+              </p>
+              <p>
+                {`maxVotingTime:
+          ${getDaysFromTimestamp(
+            governance.account.config.maxVotingTime
+          )} days(s) | raw arg: ${
+                  governance.account.config.maxVotingTime
+                } secs`}
+              </p>
+              <p>
+                {`votingCoolOffTime:
+          ${getHoursFromTimestamp(
+            governance.account.config.votingCoolOffTime
+          )} hour(s) | raw arg: ${
+                  governance.account.config.votingCoolOffTime
+                } secs`}
+              </p>
+              <p>
+                {`depositExemptProposalCount:
+          ${governance.account.config.depositExemptProposalCount}`}
+              </p>
+              <p>
+                {`communityVoteTipping:
+          ${VoteTipping[governance.account.config.communityVoteTipping]}`}
+              </p>
+              <p>
+                {`councilVoteTipping:
+          ${VoteTipping[governance.account.config.councilVoteTipping]}`}
+              </p>
+            </div>
+
+            {/* --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- */}
+
+            <h1 className="mt-10">Proposed config</h1>
+            <div className="space-y-3">
+              <p>
+                communityVoteThreshold:
+                {args.config.communityVoteThreshold.value
+                  ? args.config.communityVoteThreshold.value?.toLocaleString() +
+                    '%'
+                  : 'Disabled'}
+              </p>
+              <p>
+                councilVoteThreshold:{' '}
+                {args.config.councilVoteThreshold.value
+                  ? args.config.councilVoteThreshold.value?.toLocaleString() +
+                    '%'
+                  : 'Disabled'}
+              </p>
+              <p>
+                communityVetoVoteThreshold:{' '}
+                {args.config.communityVetoVoteThreshold.value
+                  ? args.config.communityVetoVoteThreshold.value?.toLocaleString() +
+                    '%'
+                  : 'Disabled'}
+              </p>
+              <p>
+                councilVetoVoteThreshold:{' '}
+                {args.config.councilVetoVoteThreshold.value
+                  ? args.config.councilVetoVoteThreshold.value?.toLocaleString() +
+                    '%'
+                  : 'Disabled'}
+              </p>
+              {args.config.minCommunityTokensToCreateProposal.toString() ===
+              DISABLED_VOTER_WEIGHT.toString() ? (
+                <p>minCommunityTokensToCreateProposal: Disabled</p>
+              ) : (
+                <p>
+                  minCommunityTokensToCreateProposal:{' '}
+                  {fmtMintAmount(
+                    communityMint?.account,
+                    args.config.minCommunityTokensToCreateProposal
+                  )}{' '}
+                  ({args.config.minCommunityTokensToCreateProposal.toString()})
+                </p>
+              )}
+              {args.config.minCouncilTokensToCreateProposal.toString() ===
+              DISABLED_VOTER_WEIGHT.toString() ? (
+                <p>minCouncilTokensToCreateProposal: Disabled</p>
+              ) : (
+                <p>
+                  minCouncilTokensToCreateProposal:{' '}
+                  {fmtMintAmount(
+                    councilMint?.account,
+                    args.config.minCouncilTokensToCreateProposal
+                  )}{' '}
+                  ({args.config.minCouncilTokensToCreateProposal.toString()})
+                </p>
+              )}
+              <p>
+                {`minInstructionHoldUpTime:
+          ${getDaysFromTimestamp(
+            args.config.minInstructionHoldUpTime
+          )} day(s) | raw arg: ${args.config.minInstructionHoldUpTime} secs`}
+              </p>
+              <p>
+                {`maxVotingTime:
+          ${getDaysFromTimestamp(
+            args.config.maxVotingTime
+          )} days(s) | raw arg: ${args.config.maxVotingTime} secs`}
+              </p>
+              <p>
+                {`votingCoolOffTime:
           ${getHoursFromTimestamp(
             args.config.votingCoolOffTime
           )} hour(s) | raw arg: ${args.config.votingCoolOffTime} secs`}
-            </p>
-            <p>
-              {`depositExemptProposalCount:
+              </p>
+              <p>
+                {`depositExemptProposalCount:
           ${args.config.depositExemptProposalCount}`}
-            </p>
-            <p>
-              {`communityVoteTipping:
+              </p>
+              <p>
+                {`communityVoteTipping:
           ${VoteTipping[args.config.communityVoteTipping]}`}
-            </p>
-            <p>
-              {`councilVoteTipping:
+              </p>
+              <p>
+                {`councilVoteTipping:
           ${VoteTipping[args.config.councilVoteTipping]}`}
-            </p>
+              </p>
+            </div>
           </>
         ) : (
           <>
@@ -290,9 +398,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
         const realm = await getRealm(connection, accounts[0].pubkey)
         // The wallet can be any existing account for the simulation
         // Note: when running a local validator ensure the account is copied from devnet: --clone ENmcpFCpxN1CqyUjuog9yyUVfdXBKF3LVCwLr7grJZpk -ud
-        const walletPk = new PublicKey(
-          'ENmcpFCpxN1CqyUjuog9yyUVfdXBKF3LVCwLr7grJZpk'
-        )
+        const walletPk = new PublicKey(SIMULATION_WALLET)
         const walletMoq: any = {
           publicKey: walletPk,
         }

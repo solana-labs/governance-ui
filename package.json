@@ -16,7 +16,9 @@
     "test": "jest",
     "test-all": "yarn lint && yarn type-check && yarn test",
     "notifier": "ts-node scripts/governance-notifier.ts",
-    "postinstall": "echo '\\033[35mIf you just added a package, consider running `\\033[1m\\033[36;1mnpx yarn-deduplicate\\033[0m\\033[35m`!\\033[00m'"
+    "setup": "yarn install && yarn allow-scripts",
+    "deduplicate": "npx yarn-deduplicate",
+    "postinstall": "echo '\\033[35mIf you just added a package, consider running `\\033[1m\\033[36;1myarn deduplicate` \\033[0m\\033[35mto check for duplicates!\\033[00m\n \\033[35malso make sure scripts run by new packages are reviewed and added in the allowScripts section. Then run `\\033[1m\\033[36;1myarn allow-scripts\\033[0m\\033[35m`!\\033[00m'"
   },
   "lint-staged": {
     "*.@(ts|tsx|js|jsx)": [
@@ -38,10 +40,9 @@
     "@civic/solana-gateway-react": "0.11.0",
     "@dialectlabs/react-sdk-blockchain-solana": "1.0.0-beta.3",
     "@dialectlabs/react-ui": "1.1.0-beta.5",
-    "@dual-finance/staking-options": "0.0.7",
+    "@dual-finance/staking-options": "0.0.17",
     "@emotion/react": "11.9.0",
     "@emotion/styled": "11.8.1",
-    "@everlend/core": "0.0.6",
     "@everlend/general-pool": "0.0.27",
     "@foresight-tmp/foresight-sdk": "0.1.46",
     "@friktion-labs/friktion-sdk": "1.1.118",
@@ -84,7 +85,7 @@
     "@solana/governance-program-library": "npm:@civic/governance-program-library@0.16.9-beta.2",
     "@solana/spl-governance": "0.3.18",
     "@solana/spl-token": "0.1.8",
-    "@solana/spl-token-registry": "0.2.3775",
+    "@solana/spl-token-registry": "0.2.4574",
     "@solana/wallet-adapter-backpack": "0.1.0",
     "@solana/wallet-adapter-base": "0.9.5",
     "@solana/wallet-adapter-exodus": "0.1.8",
@@ -101,7 +102,6 @@
     "@switchboard-xyz/switchboard-v2": "0.0.110",
     "@tailwindcss/line-clamp": "0.4.2",
     "@tanstack/react-query": "4.14.3",
-    "@tanstack/react-query-devtools": "4.19.1",
     "@tippyjs/react": "4.2.6",
     "@types/ramda": "0.28.15",
     "@urql/exchange-auth": "1.0.0",
@@ -119,7 +119,7 @@
     "d3": "7.4.4",
     "date-fns": "2.29.2",
     "dayjs": "1.11.1",
-    "did-jwt": "6.10.1",
+    "did-jwt": "6.11.0",
     "draft-js": "0.11.7",
     "fp-ts": "2.12.2",
     "goblingold-sdk": "1.2.35",
@@ -127,8 +127,6 @@
     "graphql-request": "4.3.0",
     "immer": "9.0.15",
     "io-ts": "2.2.18",
-    "io-ts-types": "0.5.16",
-    "js-cookie": "3.0.1",
     "libphonenumber-js": "1.10.6",
     "localforage": "1.10.0",
     "next": "12.3.2",
@@ -159,12 +157,13 @@
     "tailwind-merge": "1.6.0",
     "ts-node": "10.9.1",
     "tsconfig-paths": "3.14.1",
-    "tweetnacl": "1.0.3",
     "urql": "3.0.3",
     "yup": "0.32.11",
     "zustand": "3.7.2"
   },
   "devDependencies": {
+    "@lavamoat/allow-scripts": "2.3.0",
+    "@lavamoat/preinstall-always-fail": "1.0.0",
     "@notifi-network/notifi-core": "0.18.2",
     "@testing-library/jest-dom": "5.16.4",
     "@testing-library/react": "11.2.5",
@@ -215,7 +214,16 @@
     "@project-serum/serum": "0.13.65",
     "@project-serum/borsh": "0.2.5",
     "bignumber.js": "9.0.2",
-    "lodash": "4.17.21"
+    "lodash": "4.17.21",
+    "@switchboard-xyz/switchboard-v2/mocha": "10.1.0",
+    "**/@cardinal/certificates/mocha": "10.1.0",
+    "**/@cardinal/stake-pool/mocha": "10.1.0",
+    "@sentry/nextjs/**/ansi-regex": "3.0.1",
+    "ansi-regex": ">=3.0.1 <=5.0.1",
+    "@nivo/core/**/d3-color": "3.1.0",
+    "@nivo/bar/**/d3-color": "3.1.0",
+    "dset": "3.1.2",
+    "**/@solana/spl-token-registry/cross-fetch/node-fetch": "2.6.7"
   },
   "browserslist": [
     "chrome >= 67",
@@ -223,5 +231,26 @@
     "firefox >= 68",
     "opera >= 54",
     "safari >= 14"
-  ]
+  ],
+  "lavamoat": {
+    "allowScripts": {
+      "$root$": false,
+      "@bundlr-network/client>arbundles>keccak": true,
+      "@bundlr-network/client>arbundles>secp256k1": true,
+      "@carbon/icons-react": false,
+      "@civic/solana-gateway-react>@civic/common-gateway-react>styled-components": false,
+      "@lavamoat/preinstall-always-fail": false,
+      "@sentry/nextjs>@sentry/webpack-plugin>@sentry/cli": false,
+      "@solana/wallet-adapter-torus>@toruslabs/solana-embed>@toruslabs/base-controllers>@toruslabs/broadcast-channel>@toruslabs/eccrypto": true,
+      "@solana/wallet-adapter-torus>@toruslabs/solana-embed>@toruslabs/base-controllers>@toruslabs/broadcast-channel>@toruslabs/eccrypto>secp256k1": true,
+      "@solana/wallet-adapter-torus>@toruslabs/solana-embed>@toruslabs/base-controllers>@toruslabs/broadcast-channel>microtime": true,
+      "@solana/web3.js>bigint-buffer": false,
+      "@solana/web3.js>rpc-websockets>bufferutil": true,
+      "@solana/web3.js>rpc-websockets>utf-8-validate": true,
+      "@switchboard-xyz/switchboard-v2>protobufjs": false,
+      "@testing-library/react>@testing-library/dom>aria-query>@babel/runtime-corejs3>core-js-pure": false,
+      "draft-js>fbjs>core-js": false,
+      "goblingold-sdk": false
+    }
+  }
 }

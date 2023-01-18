@@ -50,7 +50,7 @@ const CreateVsrRegistrar = ({
     ) {
       const vsrClient = VsrClient.connect(
         anchorProvider,
-        form?.programId ? new web3.PublicKey(form.programId) : undefined
+        form?.programId ? new web3.PublicKey(form.programId) : DEFAULT_VSR_ID
       )
       const { registrar, registrarBump } = await getRegistrarPDA(
         realm!.pubkey,

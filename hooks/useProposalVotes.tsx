@@ -1,3 +1,4 @@
+import { BN } from '@project-serum/anchor'
 import { Proposal } from '@solana/spl-governance'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { getProposalMaxVoteWeight } from '../models/voteWeights'
@@ -39,7 +40,10 @@ export default function useProposalVotes(proposal?: Proposal) {
   const isPluginCommunityVoting = maxVoteRecord && isCommunityVote
   const voteThresholdPct = isCommunityVote
     ? governance.config.communityVoteThreshold.value
-    : governance.config.councilVoteThreshold.value
+    : programVersion > 2
+    ? governance.config.councilVoteThreshold.value
+    : governance.config.communityVoteThreshold.value
+
   if (voteThresholdPct === undefined)
     throw new Error(
       'Proposal has no vote threshold (this shouldnt be possible)'
@@ -56,6 +60,7 @@ export default function useProposalVotes(proposal?: Proposal) {
 
   const yesVotePct = calculatePct(proposal.getYesVoteCount(), maxVoteWeight)
   const yesVoteProgress = (yesVotePct / voteThresholdPct) * 100
+
   const isMultiProposal = proposal?.options?.length > 1
   const yesVoteCount = !isMultiProposal
     ? fmtTokenAmount(proposal.getYesVoteCount(), proposalMint.decimals)
@@ -71,12 +76,13 @@ export default function useProposalVotes(proposal?: Proposal) {
 
   const relativeYesVotes = getRelativeVoteCount(yesVoteCount)
   const relativeNoVotes = getRelativeVoteCount(noVoteCount)
-
   const rawYesVotesRequired = minimumYesVotes - yesVoteCount
+  const actualVotesRequired = rawYesVotesRequired < 0 ? 0 : rawYesVotesRequired
+
   const yesVotesRequired =
     proposalMint.decimals == 0
-      ? Math.ceil(rawYesVotesRequired)
-      : rawYesVotesRequired
+      ? Math.ceil(actualVotesRequired)
+      : actualVotesRequired
 
   const results = {
     voteThresholdPct,
@@ -149,11 +155,11 @@ export default function useProposalVotes(proposal?: Proposal) {
     vetoMaxVoteWeight
   )
 
-  const minimumVetoVotes =
-    fmtTokenAmount(vetoMaxVoteWeight, vetoMintInfo.decimals) *
-    (vetoThreshold.value / 100)
+  const minimumVetoVotes = vetoMaxVoteWeight
+    ?.div(new BN(10).pow(new BN(vetoMintInfo.decimals ?? 0)))
+    .muln(vetoThreshold.value / 100)
 
-  const vetoVotesRequired = minimumVetoVotes - vetoVoteCount
+  const vetoVotesRequired = minimumVetoVotes.subn(vetoVoteCount).toString()
 
   return {
     _programVersion: programVersion,

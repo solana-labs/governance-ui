@@ -26,6 +26,7 @@ export enum PackageEnum {
   MangoMarketV3,
   MangoMarketV4,
   MeanFinance,
+  PsyFinance,
   Serum,
   Solend,
   Streamflow,
@@ -264,11 +265,6 @@ export interface MangoRemoveOracleForm {
   oraclePk: NameValue | null
 }
 
-export interface SagaPhoneForm {
-  governedAccount: AssetAccount | null
-  quantity: number
-}
-
 export interface MangoRemovePerpMarketForm {
   governedAccount: AssetAccount | null
   mangoGroup: NameValue | null
@@ -389,6 +385,18 @@ export interface MangoMakeChangeReferralFeeParams2 {
   refSurchargeCentibps2: number
   refShareCentibps2: number
   refMngoRequired2: number
+}
+
+export interface PsyFinanceMintAmericanOptionsForm {
+  contractSize: number
+  expirationUnixTimestamp: number
+  optionTokenDestinationAccount: string
+  quoteMint: string
+  size: number | undefined
+  strike: number
+  underlyingAccount: AssetAccount | undefined
+  underlyingMint: PublicKey | undefined
+  writerTokenDestinationAccount: string
 }
 
 export interface ForesightHasGovernedAccount {
@@ -551,7 +559,9 @@ export enum Instructions {
   DepositToMangoAccount,
   DepositToMangoAccountCsv,
   DifferValidatorStake,
+  DualFinanceExercise,
   DualFinanceStakingOption,
+  DualFinanceWithdraw,
   EverlendDeposit,
   EverlendWithdraw,
   ForesightAddMarketListToCategory,
@@ -591,10 +601,10 @@ export enum Instructions {
   Mint,
   None,
   ProgramUpgrade,
+  PsyFinanceMintAmericanOptions,
   RealmConfig,
   RefreshSolendObligation,
   RefreshSolendReserve,
-  SagaPreOrder,
   SerumGrantLockedMSRM,
   SerumGrantLockedSRM,
   SerumGrantVestMSRM,
@@ -701,4 +711,17 @@ export interface DualFinanceStakingOptionForm {
   quoteTreasury: AssetAccount | undefined
   payer: AssetAccount | undefined
   userPk: string | undefined
+}
+
+export interface DualFinanceExerciseForm {
+  numTokens: number
+  soName: string | undefined
+  baseTreasury: AssetAccount | undefined
+  quoteTreasury: AssetAccount | undefined
+  optionAccount: AssetAccount | undefined
+}
+
+export interface DualFinanceWithdrawForm {
+  soName: string | undefined
+  baseTreasury: AssetAccount | undefined
 }

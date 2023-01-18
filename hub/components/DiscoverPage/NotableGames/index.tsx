@@ -1,52 +1,12 @@
 import GameConsoleIcon from '@carbon/icons-react/lib/GameConsole';
-import { PublicKey } from '@solana/web3.js';
 
+import { Realm } from '../gql';
 import { SmallCard } from '@hub/components/DiscoverPage/SmallCard';
 import cx from '@hub/lib/cx';
 
-export const ITEMS = [
-  {
-    bannerImgSrc:
-      'https://i.seadn.io/gae/9qqR3x65Uu5YmBTQ75hqy_NCVoEmkixVHQl7XcvnPF2yeWEiLpbN3B-zf1IlqwxFQh4TGg85wU_EKtbYAG2P_4nAFQTXyJ5QXmu_8A?auto=format&w=2048',
-    description:
-      'Aurory Project is a AAA studio building the web3 gaming platform of the future.',
-    iconImgSrc:
-      'https://i.seadn.io/gae/Qzl6u460tNyzWFrlaLQIa2VMBc1HBX5X7IDfEYBbKV3q1p_BDVkqC-A7-DS5RA-IKagzD0m7J-LDpmr_XnY2ocsTcXGM01DXM7lqUg?auto=format&w=2048',
-    name: 'Aurory',
-    publicKey: new PublicKey('C98yb8FSshG7oH5pCMf41ghg199YjsoUozxQ4VdCpwmM'),
-    urlId: 'Aurory',
-  },
-  {
-    bannerImgSrc: 'https://i.imgur.com/6Qmfw0l.png',
-    description:
-      'The Free-to-Play, Move-to-Earn NFT mobile game. Steps you take every day fuel your journey in the Genoverse. Move. Play. Create.',
-    iconImgSrc: 'https://i.imgur.com/mEUafGW.png',
-    name: 'Genopets',
-    publicKey: new PublicKey('8gqpog28H6UvefDu7wMbwaRQX7a7rbVtw7z3yX9xjJQa'),
-    urlId: 'Genopets',
-  },
-  {
-    // bannerImgSrc: '/realms/RCH/banner.png',
-    description:
-      'Earth From Another Sun is an open-world MMO sandbox FPS game where you can command massive armies to fight & conquer the Galaxy.',
-    iconImgSrc: 'https://i.imgur.com/2d1aeHo.png',
-    name: 'Multiverse (Earth From Another Sun)',
-    publicKey: new PublicKey('5K4VVEeYpANxL79r7rM3heyXqYZkzu2KkD4kFkt1gGpG'),
-    urlId: 'Multiverse',
-  },
-  {
-    bannerImgSrc: 'https://i.imgur.com/M57B2Xb.jpg',
-    description:
-      'Remix the world! A new card strategy racing game from a team that worked on HALO, FIFA, Battlefield & PokerStars. Mask Up!',
-    iconImgSrc: 'https://i.imgur.com/PHo3WRt.jpg',
-    name: 'MixMob',
-    publicKey: new PublicKey('A3WX4QKcioruP71f4yweusv9jqU9R4LtGfJEHtZhs3Rx'),
-    urlId: 'MixMob',
-  },
-];
-
 interface Props {
   className?: string;
+  realms: Realm[];
 }
 
 export function NotableGames(props: Props) {
@@ -75,9 +35,19 @@ export function NotableGames(props: Props) {
           '2xl:grid-cols-4',
         )}
       >
-        {ITEMS.map((item, i) => (
+        {props.realms.map((realm, i) => (
           <div className="flex-shrink-0 w-full 2xl:max-w-[290px] h-56" key={i}>
-            <SmallCard {...item} />
+            <SmallCard
+              bannerImgSrc={realm.bannerImageUrl}
+              category={realm.category}
+              description={realm.shortDescription}
+              heading={realm.clippedHeading}
+              iconImgSrc={realm.iconUrl}
+              name={realm.name}
+              publicKey={realm.publicKey}
+              twitterFollowerCount={realm.twitterFollowerCount}
+              urlId={realm.urlId}
+            />
           </div>
         ))}
       </div>

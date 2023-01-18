@@ -13,7 +13,9 @@ import { StakingOptions } from '@dual-finance/staking-options'
 import { ConnectionContext } from '@utils/connection'
 import { validateInstruction } from '@utils/instructionTools'
 import {
+  DualFinanceExerciseForm,
   DualFinanceStakingOptionForm,
+  DualFinanceWithdrawForm,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import {
@@ -26,9 +28,10 @@ import {
   closeAccount,
   initializeAccount,
 } from '@project-serum/serum/lib/token-instructions'
+import { BN } from '@project-serum/anchor'
 import { Token } from '@solana/spl-token'
 
-interface Args {
+interface StakingOptionArgs {
   connection: ConnectionContext
   form: DualFinanceStakingOptionForm
   setFormErrors: any
@@ -40,13 +43,13 @@ function getStakingOptionsApi(connection: ConnectionContext) {
   return new StakingOptions(connection.endpoint, 'confirmed')
 }
 
-export default async function getConfigInstruction({
+export async function getConfigInstruction({
   connection,
   wallet,
   form,
   schema,
   setFormErrors,
-}: Args): Promise<UiInstruction> {
+}: StakingOptionArgs): Promise<UiInstruction> {
   const isValid = await validateInstruction({ schema, form, setFormErrors })
 
   const serializedInstruction = ''
@@ -125,8 +128,8 @@ export default async function getConfigInstruction({
     const configInstruction = await so.createConfigInstruction(
       form.optionExpirationUnixSeconds,
       form.optionExpirationUnixSeconds,
-      form.numTokens,
-      form.lotSize,
+      new BN(form.numTokens),
+      new BN(form.lotSize),
       form.soName,
       //use sol wallet as authority
       form.payer.extensions.transferAddress!,
@@ -141,8 +144,19 @@ export default async function getConfigInstruction({
       serializeInstructionToBase64(configInstruction)
     )
 
+    const nameInstruction = await so.createNameTokenInstruction(
+      new BN(form.strike),
+      form.soName,
+      form.payer.extensions.transferAddress!,
+      baseMint
+    )
+    
+    additionalSerializedInstructions.push(
+      serializeInstructionToBase64(nameInstruction)
+    )
+
     const initStrikeInstruction = await so.createInitStrikeInstruction(
-      form.strike,
+      new BN(form.strike),
       form.soName,
       //authority sol wallet
       form.payer.extensions.transferAddress!,
@@ -168,8 +182,8 @@ export default async function getConfigInstruction({
     }
 
     const issueInstruction = await so.createIssueInstruction(
-      form.numTokens,
-      form.strike,
+      new BN(form.numTokens),
+      new BN(form.strike),
       form.soName,
       //authority sol wallet
       form.payer.extensions.transferAddress!,
@@ -215,4 +229,134 @@ export default async function getConfigInstruction({
     chunkBy: 1,
   }
   return obj
+}
+
+interface ExerciseArgs {
+  connection: ConnectionContext
+  form: DualFinanceExerciseForm
+  setFormErrors: any
+  schema: any
+  wallet: WalletAdapter | undefined
+}
+
+export async function getExerciseInstruction({
+  connection,
+  wallet,
+  form,
+  schema,
+  setFormErrors,
+}: ExerciseArgs): Promise<UiInstruction> {
+  const isValid = await validateInstruction({ schema, form, setFormErrors })
+
+  const serializedInstruction = ''
+  const additionalSerializedInstructions: string[] = []
+  if (isValid && form.soName && form.baseTreasury && wallet?.publicKey) {
+    const so = getStakingOptionsApi(connection)
+    const baseMint = form.baseTreasury.extensions.mint!.publicKey!
+    const state = await so.getState(form.soName, baseMint)
+
+    let strike = 1
+    for (const candidate of state.strikes as any) {
+      // Check for the strike in the list of strikes
+      const candidateStrike = Number(candidate)
+      if (
+        (await so.soMint(candidateStrike, form.soName, baseMint)).toBase58() ==
+        form.optionAccount?.extensions.mint?.publicKey.toBase58()
+      ) {
+        strike = candidateStrike
+      }
+    }
+
+    const stateObj = await so.getState(form.soName, baseMint)
+    const quoteMint: PublicKey = stateObj.quoteMint as PublicKey
+
+    const feeAccount = await StakingOptions.getFeeAccount(quoteMint)
+
+    if ((await connection.current.getAccountInfo(feeAccount)) === null) {
+      const [ataIx] = await createAssociatedTokenAccount(
+        wallet.publicKey,
+        new PublicKey('7Z36Efbt7a4nLiV7s5bY7J2e4TJ6V9JEKGccsy2od2bE'),
+        quoteMint
+      )
+      additionalSerializedInstructions.push(serializeInstructionToBase64(ataIx))
+    }
+
+    const exerciseInstruction = await so.createExerciseInstruction(
+      new BN(form.numTokens),
+      new BN(strike),
+      form.soName,
+      form.baseTreasury.extensions.token!.account.owner!,
+      form.optionAccount!.pubkey!,
+      form.quoteTreasury!.pubkey!,
+      form.baseTreasury.pubkey
+    )
+    additionalSerializedInstructions.push(
+      serializeInstructionToBase64(exerciseInstruction)
+    )
+
+    return {
+      serializedInstruction,
+      isValid: true,
+      governance: form.baseTreasury?.governance,
+      additionalSerializedInstructions,
+      chunkSplitByDefault: true,
+      chunkBy: 1,
+    }
+  }
+
+  return {
+    serializedInstruction,
+    isValid: false,
+    governance: form.baseTreasury?.governance,
+    additionalSerializedInstructions: [],
+    chunkSplitByDefault: true,
+    chunkBy: 1,
+  }
+}
+
+interface WithdrawArgs {
+  connection: ConnectionContext
+  form: DualFinanceWithdrawForm
+  setFormErrors: any
+  schema: any
+  wallet: WalletAdapter | undefined
+}
+
+export async function getWithdrawInstruction({
+  connection,
+  wallet,
+  form,
+  schema,
+  setFormErrors,
+}: WithdrawArgs): Promise<UiInstruction> {
+  const isValid = await validateInstruction({ schema, form, setFormErrors })
+
+  const serializedInstruction = ''
+  const additionalSerializedInstructions: string[] = []
+  if (isValid && form.soName && form.baseTreasury && wallet?.publicKey) {
+    const so = getStakingOptionsApi(connection)
+
+    const withdrawInstruction = await so.createWithdrawInstruction(
+      form.soName,
+      form.baseTreasury.extensions.token!.account.owner!,
+      form.baseTreasury.pubkey
+    )
+    additionalSerializedInstructions.push(
+      serializeInstructionToBase64(withdrawInstruction)
+    )
+
+    return {
+      serializedInstruction,
+      isValid: true,
+      governance: form.baseTreasury?.governance,
+      additionalSerializedInstructions,
+    }
+  }
+
+  return {
+    serializedInstruction,
+    isValid: false,
+    governance: form.baseTreasury?.governance,
+    additionalSerializedInstructions: [],
+  }
 }

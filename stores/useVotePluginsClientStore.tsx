@@ -35,7 +35,7 @@ interface UseVotePluginsClientStore extends State {
   handleSetVsrClient: (
     wallet: SignerWalletAdapter | undefined,
     connection: ConnectionContext,
-    programId?: PublicKey
+    programId: PublicKey
   ) => void
   handleSetNftClient: (
     wallet: SignerWalletAdapter | undefined,
