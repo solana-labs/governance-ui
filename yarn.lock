@@ -4384,14 +4384,14 @@
     bs58 "^4.0.1"
     superstruct "^0.15.2"
 
-"@solana/spl-token-registry@0.2.3775", "@solana/spl-token-registry@^0.2.1107":
+"@solana/spl-token-registry@0.2.3775":
   version "0.2.3775"
   resolved "https://registry.yarnpkg.com/@solana/spl-token-registry/-/spl-token-registry-0.2.3775.tgz#96abffc351fe156917aedb8bba7db94600abed6e"
   integrity sha512-3a6wn6LZ1ZdCt50p9Bz2s8tIh1cJvJue4vvlPlzZ1n2j/0H2Coy4Xx92nIsYot399TjtO9NeLU2NowBDH4vtpg==
   dependencies:
     cross-fetch "3.0.6"
 
-"@solana/spl-token-registry@0.2.4574":
+"@solana/spl-token-registry@0.2.4574", "@solana/spl-token-registry@^0.2.1107":
   version "0.2.4574"
   resolved "https://registry.yarnpkg.com/@solana/spl-token-registry/-/spl-token-registry-0.2.4574.tgz#13f4636b7bec90d2bb43bbbb83512cd90d2ce257"
   integrity sha512-JzlfZmke8Rxug20VT/VpI2XsXlsqMlcORIUivF+Yucj7tFi7A0dXG7h+2UnD0WaZJw8BrUz2ABNkUnv89vbv1A==
@@ -4410,6 +4410,15 @@
     buffer-layout "^1.2.0"
     dotenv "10.0.0"
 
+"@solana/spl-token@0.3.7", "@solana/spl-token@^0.3.5", "@solana/spl-token@^0.3.6":
+  version "0.3.7"
+  resolved "https://registry.yarnpkg.com/@solana/spl-token/-/spl-token-0.3.7.tgz#6f027f9ad8e841f792c32e50920d9d2e714fc8da"
+  integrity sha512-bKGxWTtIw6VDdCBngjtsGlKGLSmiu/8ghSt/IOYJV24BsymRbgq7r12GToeetpxmPaZYLddKwAz7+EwprLfkfg==
+  dependencies:
+    "@solana/buffer-layout" "^4.0.0"
+    "@solana/buffer-layout-utils" "^0.2.0"
+    buffer "^6.0.3"
+
 "@solana/spl-token@^0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@solana/spl-token/-/spl-token-0.2.0.tgz#329bb6babb5de0f9c40035ddb1657f01a8347acd"
@@ -4419,15 +4428,6 @@
     "@solana/buffer-layout-utils" "^0.2.0"
     "@solana/web3.js" "^1.32.0"
     start-server-and-test "^1.14.0"
-
-"@solana/spl-token@^0.3.5", "@solana/spl-token@^0.3.6":
-  version "0.3.6"
-  resolved "https://registry.yarnpkg.com/@solana/spl-token/-/spl-token-0.3.6.tgz#35473ad2ed71fe91e5754a2ac72901e1b8b26a42"
-  integrity sha512-P9pTXjDIRvVbjr3J0mCnSamYqLnICeds7IoH1/Ro2R9OBuOHdp5pqKZoscfZ3UYrgnCWUc1bc9M2m/YPHjw+1g==
-  dependencies:
-    "@solana/buffer-layout" "^4.0.0"
-    "@solana/buffer-layout-utils" "^0.2.0"
-    buffer "^6.0.3"
 
 "@solana/wallet-adapter-alpha@^0.1.1":
   version "0.1.7"
