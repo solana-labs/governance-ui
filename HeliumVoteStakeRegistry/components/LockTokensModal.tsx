@@ -110,12 +110,7 @@ export const LockTokensModal: React.FC<{
     ),
   ]
 
-  const {
-    setValue,
-    watch,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LockTokensModalFormValues>({
+  const { setValue, watch, handleSubmit } = useForm<LockTokensModalFormValues>({
     defaultValues: {
       lockupType: lockupTypeOptions[0],
       lockupPeriod: lockupPeriodOptions[0],
@@ -157,10 +152,10 @@ export const LockTokensModal: React.FC<{
     async (values: LockTokensModalFormValues) => {
       try {
         await onSubmit(values)
-        onClose()        
-      } catch(e) {
-        console.error(e);
-      }      
+        onClose()
+      } catch (e) {
+        console.error(e)
+      }
     }
   )
 
@@ -258,6 +253,9 @@ export const LockTokensModal: React.FC<{
                   max={hasMaxLockup ? maxLockupTimeInDays : Infinity}
                   value={lockupPeriodInDays}
                   step={1}
+                  onChange={({ target: { value } }) => {
+                    setValue('lockupPeriodInDays', Number(value))
+                  }}
                   onBlur={({ target: { value } }) => {
                     setValue(
                       'lockupPeriodInDays',
@@ -267,9 +265,6 @@ export const LockTokensModal: React.FC<{
                           : value
                         : minLockupTimeInDays
                     )
-                  }}
-                  onChange={({ target: { value } }) => {
-                    setValue('lockupPeriodInDays', Number(value))
                   }}
                 />
               </>

@@ -1,7 +1,13 @@
 import { BN } from '@project-serum/anchor'
+import { MintLayout, Token, TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { ProgramAccount, Realm } from '@solana/spl-governance'
 import useWallet from '@hooks/useWallet'
-import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js'
+import {
+  Keypair,
+  PublicKey,
+  SystemProgram,
+  TransactionInstruction,
+} from '@solana/web3.js'
 import { useAsyncCallback } from 'react-async-hook'
 import { useHeliumVsr } from './useHeliumVsr'
 import { positionKey } from '@helium/voter-stake-registry-sdk'
@@ -17,7 +23,7 @@ export const useCreatePosition = ({
   realm: ProgramAccount<Realm> | undefined
 }) => {
   const program = useHeliumVsr()
-  const { anchorProvider, wallet } = useWallet()
+  const { connection, anchorProvider, wallet } = useWallet()
   const { error, loading, execute } = useAsyncCallback(
     async ({
       amount,
@@ -28,11 +34,34 @@ export const useCreatePosition = ({
       kind: { [key in 'cliff' | 'constant']?: Record<string, never> }
       periods: number
     }) => {
-      if (registrar && realm && program && wallet) {
+      if (connection && registrar && realm && program && wallet) {
         if (loading) return
         const mintKeypair = Keypair.generate()
         const position = positionKey(mintKeypair.publicKey)[0]
         const instructions: TransactionInstruction[] = []
+        const mintRent = await connection.current.getMinimumBalanceForRentExemption(
+          MintLayout.span
+        )
+        instructions.push(
+          SystemProgram.createAccount({
+            fromPubkey: wallet!.publicKey!,
+            newAccountPubkey: mintKeypair.publicKey,
+            lamports: mintRent,
+            space: MintLayout.span,
+            programId: TOKEN_PROGRAM_ID,
+          })
+        )
+
+        instructions.push(
+          Token.createInitMintInstruction(
+            TOKEN_PROGRAM_ID,
+            mintKeypair.publicKey,
+            0,
+            position,
+            position
+          )
+        )
+
         instructions.push(
           await program.methods
             .initializePositionV0({
@@ -43,7 +72,7 @@ export const useCreatePosition = ({
               registrar,
               mint: mintKeypair.publicKey,
               depositMint: realm.account.communityMint,
-              recipient: wallet.publicKey || undefined,
+              recipient: wallet!.publicKey!,
             })
             .instruction()
         )
@@ -61,6 +90,10 @@ export const useCreatePosition = ({
             .instruction()
         )
 
+        console.log('mint', mintKeypair.publicKey.toBase58())
+        console.log('registrar', registrar.toBase58())
+        console.log('recipient', wallet!.publicKey!.toBase58())
+        console.log('position', position.toBase58())
         await sendInstructions(
           anchorProvider as any,
           instructions,
