@@ -1061,15 +1061,6 @@
     "ogImage": "/realms/BootstrapDAO/BootRealms.png"
   },
   {
-    "symbol": "laptopDAO",
-    "displayName": "laptopDAO",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "6JzsaQYYi4vGTZogASscZsBALWbSbJU9tMDRtq6nbeff",
-    "website": "https://laptop-dao.vercel.app/",
-    "twitter": "@laptopDAO",
-    "ogImage": "/realms/laptopDAO/logo.png"
-  },
-  {
     "symbol": "HOADAO",
     "displayName": "HOA DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -2179,7 +2170,7 @@
     "symbol": "Bonk",
     "displayName": "BonkDAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "9K6P7vbAPqZ8hHsDbShLZat9bFdWzA52QAgJThGeWui5",
+    "realmId": "84pGFuy1Y27ApK67ApethaPvexeDWA66zNV8gm38TVeQ",
     "ogImage": "https://i.imgur.com/5JK4nEL.jpeg",
     "sortRank": 3
   },
@@ -2965,5 +2956,14 @@
     "instagram": "https://www.instagram.com/lp.finance/",
     "discord": "https://discord.gg/N2Uebv58v2",
     "github": "https://github.com/LP-Finance-Inc/"
+  },
+  {
+    "symbol": "Hackerz DAO - High Council",
+    "displayName": "Hackerz DAO - High Council",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "zv8G3bXWe589fpb51LXfsoK2ACMAEqqHyjdYcxVys5R",
+    "twitter": "@HackerzDAO",
+    "discord": "https://discord.gg/zfQWsKMQCn",
+    "ogImage": "/realms/HackerzDAO/img/HackerzDAO_PFP.png"
   }
 ]

@@ -216,6 +216,10 @@ export default function useGovernanceAssets() {
       name: 'Mean Finance',
       image: '/img/meanfinance.png',
     },
+    [PackageEnum.PsyFinance]: {
+      name: 'PsyFinance',
+      image: '/img/psyfinance.png',
+    },
     [PackageEnum.Serum]: {
       name: 'Serum',
       image: '/img/serum.png',
@@ -346,11 +350,6 @@ export default function useGovernanceAssets() {
     [Instructions.RealmConfig]: {
       name: 'Realm config',
       isVisible: canUseAuthorityInstruction,
-      packageId: PackageEnum.Common,
-    },
-    [Instructions.SagaPreOrder]: {
-      name: 'Pre-order Saga Phone',
-      isVisible: canUseTokenTransferInstruction,
       packageId: PackageEnum.Common,
     },
     [Instructions.StakeValidator]: {
@@ -709,6 +708,19 @@ export default function useGovernanceAssets() {
     [Instructions.MeanTransferStream]: {
       name: 'Payment Stream: Transfer stream',
       packageId: PackageEnum.MeanFinance,
+    },
+
+    /*
+      ██████  ███████ ██    ██  ███████ ██ ███    ██  █████  ███    ██  ██████ ███████
+      ██   ██ ██       ██  ██   ██      ██ ████   ██ ██   ██ ████   ██ ██      ██     
+      ██████  ███████   ████    █████   ██ ██ ██  ██ ███████ ██ ██  ██ ██      █████  
+      ██           ██    ██     ██      ██ ██  ██ ██ ██   ██ ██  ██ ██ ██      ██      
+      ██      ███████    ██     ██      ██ ██   ████ ██   ██ ██   ████  ██████ ███████ 
+    */
+
+    [Instructions.PsyFinanceMintAmericanOptions]: {
+      name: 'Mint American Options',
+      packageId: PackageEnum.PsyFinance,
     },
 
     /*
