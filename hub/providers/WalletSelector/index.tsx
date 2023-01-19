@@ -107,6 +107,7 @@ function WalletSelectorInner(props: Props) {
   const adapters = wallets.filter(
     (adapter) =>
       adapter.readyState === WalletReadyState.Installed ||
+      adapter.readyState === WalletReadyState.NotDetected ||
       adapter.readyState === WalletReadyState.Loadable,
   );
 
@@ -131,7 +132,7 @@ function WalletSelectorInner(props: Props) {
       >
         <Dialog.Portal>
           <Dialog.Overlay>
-            <Dialog.Content className={cx('max-h-[410px]', 'w-[375px]')}>
+            <Dialog.Content className="w-[375px]">
               <Dialog.Close />
               <div
                 className={cx(
