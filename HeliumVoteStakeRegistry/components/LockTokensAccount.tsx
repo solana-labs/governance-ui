@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useState } from 'react'
 import { BN } from '@project-serum/anchor'
 import {
   LightningBoltIcon,
@@ -8,7 +8,9 @@ import {
 import useRealm from '@hooks/useRealm'
 import {
   fmtMintAmount,
+  getMintDecimalAmount,
   getMintDecimalAmountFromNatural,
+  getMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
 import useWalletStore from 'stores/useWalletStore'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
@@ -21,7 +23,10 @@ import { abbreviateAddress } from '@utils/formatting'
 import Button from '@components/Button'
 import { usePositions } from '../hooks/usePositions'
 import { LockCommunityTokensBtn } from './LockCommunityTokensBtn'
-import { LockTokensModal } from './LockTokensModal'
+import { LockTokensModal, LockTokensModalFormValues } from './LockTokensModal'
+import { yearsToDays } from 'VoteStakeRegistry/tools/dateTools'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import { useCreatePosition } from 'HeliumVoteStakeRegistry/hooks/useCreatePosition'
 
 // const unlockedTypes = ['none']
 export const LockTokensAccount: React.FC<{
@@ -34,15 +39,28 @@ export const LockTokensAccount: React.FC<{
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
   const [votingPower, setVotingPower] = useState<BN>(new BN(0))
   const { positions } = usePositions()
-  const [connection, wallet, connected] = useWalletStore((s) => [
+  const [
+    connected,
+    connection,
+    wallet,
+    { fetchRealm, fetchWalletTokenAccounts },
+  ] = useWalletStore((s) => [
+    s.connected,
     s.connection.current,
     s.current,
-    s.connected,
+    s.actions,
   ])
+  const [vsrClient, vsrRegistrarPk] = useVotePluginsClientStore((s) => [
+    s.state.vsrClient,
+    s.state.voteStakeRegistryRegistrarPk,
+  ])
+  const { error, loading, createPosition } = useCreatePosition({
+    realm,
+    registrar: vsrRegistrarPk || undefined,
+  })
   // const tokenOwnerRecordWalletPk = Object.keys(tokenRecords)?.find(
   //   (key) => tokenRecords[key]?.pubkey?.toBase58() === tokenOwnerRecordPk
   // )
-  const mainBoxesClasses = 'bg-bkg-1 col-span-1 p-4 rounded-md'
   // const isNextSameRecord = (x, next) => {
   //   const nextType = Object.keys(next.lockup.kind)[0]
   //   return (
@@ -57,9 +75,17 @@ export const LockTokensAccount: React.FC<{
   const hasTokensInWallet =
     realmTokenAccount && realmTokenAccount.account.amount.gt(new BN(0))
 
-  const availableTokens =
+  const availableTokensDisplay =
     hasTokensInWallet && mint
       ? fmtMintAmount(mint, realmTokenAccount?.account.amount as BN)
+      : '0'
+
+  const maxLockupAmount =
+    hasTokensInWallet && mint
+      ? getMintDecimalAmount(
+          mint,
+          realmTokenAccount?.account.amount as BN
+        ).toNumber()
       : 0
 
   const availableTokensPrice =
@@ -80,6 +106,37 @@ export const LockTokensAccount: React.FC<{
       abbreviateAddress(realm?.account.communityMint)
     : ''
 
+  const handleCalcLockupMultiplier = (lockupPeriodInDays: number) => {
+    // TODO (Bry): Actually calc multiplier
+    return 50
+  }
+
+  const handleLockTokens = async (values: LockTokensModalFormValues) => {
+    const { amount, lockupPeriodInDays, lockupType } = values
+    const amountToLock = getMintNaturalAmountFromDecimalAsBN(
+      amount,
+      mint!.decimals
+    )
+
+    await console.log('lockupType', lockupType.value)
+    console.log('amount', amount)
+    console.log('amountToLock', amountToLock.toNumber())
+    console.log('lockupPeriodInDays', lockupPeriodInDays)
+
+    // create position and deposit
+    await createPosition({
+      amount: amountToLock,
+      periods: lockupPeriodInDays,
+      kind: { cliff: {}},
+    })
+
+    if (!error) {
+      fetchWalletTokenAccounts()
+      fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+    }
+  }
+
+  const mainBoxesClasses = 'bg-bkg-1 col-span-1 p-4 rounded-md'
   return (
     <div className="grid grid-cols-12 gap-4">
       <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12">
@@ -136,7 +193,7 @@ export const LockTokensAccount: React.FC<{
                   <div className={mainBoxesClasses}>
                     <p className="text-fgd-3">{`${tokenName} Available`}</p>
                     <span className="hero-text">
-                      {availableTokens}
+                      {availableTokensDisplay}
                       {availableTokensPrice ? (
                         <span className="font-normal text-xs ml-2">
                           <span className="text-fgd-3">≈</span>$
@@ -183,9 +240,13 @@ export const LockTokensAccount: React.FC<{
         {isLockModalOpen && (
           <LockTokensModal
             isOpen={isLockModalOpen}
-            minimumLockupTimeInDays={183}
+            maxLockupAmount={maxLockupAmount}
+            // TODO (BRY): values from votingMintCfg here
+            minLockupTimeInDays={yearsToDays(0.5)}
+            maxLockupTimeInDays={yearsToDays(4)}
+            calcMultiplierFn={handleCalcLockupMultiplier}
             onClose={() => setIsLockModalOpen(false)}
-            onSubmit={(values) => console.log('SUBMIT', values)}
+            onSubmit={handleLockTokens}
           />
         )}
         <div className="mt-4">
