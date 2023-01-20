@@ -17,18 +17,14 @@ import InstructionForm, {
   InstructionInputType,
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
-import { OPENBOOK_PROGRAM_ID } from '@blockworks-foundation/mango-v4'
 
 interface Serum3RegisterMarketForm {
   governedAccount: AssetAccount | null
-  serum3MarketExternalPk: string
-  baseBankTokenName: string
-  quoteBankTokenName: string
   marketIndex: number
-  name: string
+  reduceOnly: boolean
 }
 
-const Serum3RegisterMarket = ({
+const Serum3EditMarket = ({
   index,
   governance,
 }: {
@@ -47,11 +43,8 @@ const Serum3RegisterMarket = ({
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<Serum3RegisterMarketForm>({
     governedAccount: null,
-    serum3MarketExternalPk: '',
-    baseBankTokenName: '',
-    quoteBankTokenName: '',
+    reduceOnly: false,
     marketIndex: 0,
-    name: '',
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -75,24 +68,17 @@ const Serum3RegisterMarket = ({
     ) {
       const client = await getClient(connection, wallet)
       const group = await client.getGroupForCreator(ADMIN_PK, GROUP_NUM)
-      const marketIndex = group.serum3ExternalMarketsMap.size
+      const market = group.serum3MarketsMapByMarketIndex.get(
+        Number(form.marketIndex)
+      )
       //TODO dao sol account as payer
       //Mango instruction call and serialize
       const ix = await client.program.methods
-        .serum3RegisterMarket(marketIndex, form.name)
+        .serum3EditMarket(true)
         .accounts({
           group: group.publicKey,
           admin: ADMIN_PK,
-          serumProgram: OPENBOOK_PROGRAM_ID[connection.cluster],
-          serumMarketExternal: new PublicKey(form.serum3MarketExternalPk),
-          //todo fix by getFirstBankByMint
-          baseBank: group.banksMapByName.get(
-            form.baseBankTokenName.toUpperCase()
-          )![0]!.publicKey,
-          quoteBank: group.banksMapByName.get(
-            form.quoteBankTokenName.toUpperCase()
-          )![0]!.publicKey,
-          payer: wallet.publicKey,
+          market: market!.publicKey,
         })
         .instruction()
 
@@ -136,28 +122,17 @@ const Serum3RegisterMarket = ({
       options: governedProgramAccounts,
     },
     {
-      label: 'Name',
-      initialValue: form.name,
+      label: 'Market index',
+      initialValue: form.marketIndex,
       type: InstructionInputType.INPUT,
-      name: 'name',
+      inputType: 'number',
+      name: 'marketIndex',
     },
     {
-      label: 'Serum 3 Market External Pk',
-      initialValue: form.serum3MarketExternalPk,
-      type: InstructionInputType.INPUT,
-      name: 'serum3MarketExternalPk',
-    },
-    {
-      label: 'Base Bank Token Name',
-      initialValue: form.baseBankTokenName,
-      type: InstructionInputType.INPUT,
-      name: 'baseBankTokenName',
-    },
-    {
-      label: 'Quote Bank Token Name',
-      initialValue: form.quoteBankTokenName,
-      type: InstructionInputType.INPUT,
-      name: 'quoteBankTokenName',
+      label: 'Reduce Only',
+      initialValue: form.reduceOnly,
+      type: InstructionInputType.SWITCH,
+      name: 'reduceOnly',
     },
   ]
 
@@ -176,4 +151,4 @@ const Serum3RegisterMarket = ({
   )
 }
 
-export default Serum3RegisterMarket
+export default Serum3EditMarket
