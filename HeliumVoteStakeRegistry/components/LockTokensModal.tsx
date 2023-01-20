@@ -38,6 +38,7 @@ const defaultLockupPeriods = [
 ]
 
 export enum LockupType {
+  none = 'none',
   cliff = 'cliff',
   constant = 'constant',
 }
@@ -81,6 +82,7 @@ export const LockTokensModal: React.FC<{
   onSubmit,
 }) => {
   const { mint } = useRealm()
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [showCustomDuration, setShowCustomDuration] = useState(false)
   const [showLockupTypeInfo, setShowLockupTypeInfo] = useState<boolean>(false)
   const mintMinAmount = mint ? getMintMinAmountAsDecimal(mint) : 1
@@ -151,16 +153,20 @@ export const LockTokensModal: React.FC<{
   const handleOnSubmit = handleSubmit(
     async (values: LockTokensModalFormValues) => {
       try {
+        setIsSubmitting(true)
         await onSubmit(values)
         onClose()
       } catch (e) {
-        console.error(e)
+        setIsSubmitting(false)
+        throw e
       }
     }
   )
 
   const labelClasses = 'mb-2 text-fgd-2 text-sm'
+  const lockupMultiplier = calcMultiplierFn(lockupPeriodInDays)
   // TODO (BRY): Add lockupMoreThenDeposited logic
+  // backwards compatability for preexisting LockTokensModal
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
       <form onSubmit={handleOnSubmit}>
@@ -170,7 +176,7 @@ export const LockTokensModal: React.FC<{
             <div>
               There is a minimum required lockup time of{' '}
               <span className="bont-bold text-sm text-primary-light">
-                {getFormattedStringFromDays(minLockupTimeInDays)}
+                {getFormattedStringFromDays(Math.ceil(minLockupTimeInDays))}
               </span>
             </div>
           </div>
@@ -279,17 +285,13 @@ export const LockTokensModal: React.FC<{
                 </Tooltip>
               ) : null}
               <span className="font-bold ml-auto text-fgd-1">
-                {calcMultiplierFn(lockupPeriodInDays)}x
+                {lockupMultiplier}x
               </span>
             </div>
             <div className="w-full h-2 bg-bkg-1 rounded-lg mb-4">
               <div
                 style={{
-                  width: `${
-                    calcMultiplierFn(lockupPeriodInDays) > 100
-                      ? 100
-                      : calcMultiplierFn(lockupPeriodInDays)
-                  }%`,
+                  width: `${lockupMultiplier > 100 ? 100 : lockupMultiplier}%`,
                 }}
                 className="bg-primary-light h-2 rounded-lg"
               ></div>
@@ -330,7 +332,8 @@ export const LockTokensModal: React.FC<{
                   !amount ||
                   !maxLockupAmount ||
                   !lockupPeriodInDays ||
-                  lockupPeriodInDays === 0
+                  lockupPeriodInDays === 0 ||
+                  isSubmitting
                 }
               >
                 Lock Tokens

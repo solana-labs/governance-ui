@@ -6,15 +6,15 @@ import {
   Keypair,
   PublicKey,
   SystemProgram,
+  Transaction,
   TransactionInstruction,
 } from '@solana/web3.js'
 import { useAsyncCallback } from 'react-async-hook'
 import { useHeliumVsr } from './useHeliumVsr'
 import { positionKey } from '@helium/voter-stake-registry-sdk'
-import { sendInstructions } from '@helium/spl-utils'
+import { sendTransaction } from '@utils/send'
+import { truthy } from '../utils/types'
 
-export type Truthy<T> = T extends false | '' | 0 | null | undefined ? never : T // from lodash
-export const truthy = <T>(value: T): value is Truthy<T> => !!value
 export const useCreatePosition = ({
   registrar,
   realm,
@@ -23,7 +23,7 @@ export const useCreatePosition = ({
   realm: ProgramAccount<Realm> | undefined
 }) => {
   const program = useHeliumVsr()
-  const { connection, anchorProvider, wallet } = useWallet()
+  const { connection, wallet } = useWallet()
   const { error, loading, execute } = useAsyncCallback(
     async ({
       amount,
@@ -94,11 +94,18 @@ export const useCreatePosition = ({
         console.log('registrar', registrar.toBase58())
         console.log('recipient', wallet!.publicKey!.toBase58())
         console.log('position', position.toBase58())
-        await sendInstructions(
-          anchorProvider as any,
-          instructions,
-          [mintKeypair].filter(truthy)
-        )
+
+        const tx = new Transaction()
+        tx.add(...instructions)
+
+        await sendTransaction({
+          transaction: tx,
+          wallet,
+          connection: connection.current,
+          signers: [mintKeypair].filter(truthy),
+          sendingMessage: `Locking`,
+          successMessage: `Locking successful`,
+        })
       }
     }
   )

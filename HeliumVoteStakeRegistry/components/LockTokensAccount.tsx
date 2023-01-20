@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { BN } from '@project-serum/anchor'
 import {
   LightningBoltIcon,
@@ -24,11 +24,11 @@ import Button from '@components/Button'
 import { usePositions } from '../hooks/usePositions'
 import { LockCommunityTokensBtn } from './LockCommunityTokensBtn'
 import { LockTokensModal, LockTokensModalFormValues } from './LockTokensModal'
-import { yearsToDays } from 'VoteStakeRegistry/tools/dateTools'
+import { daysToSecs, secsToDays } from 'VoteStakeRegistry/tools/dateTools'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { useCreatePosition } from 'HeliumVoteStakeRegistry/hooks/useCreatePosition'
+import { calcLockupMultiplier } from '../utils/calcLockupMultiplier'
 
-// const unlockedTypes = ['none']
 export const LockTokensAccount: React.FC<{
   tokenOwnerRecordPk: string | string[] | undefined
   children: React.ReactNode
@@ -50,14 +50,24 @@ export const LockTokensAccount: React.FC<{
     s.current,
     s.actions,
   ])
-  const [vsrClient, vsrRegistrarPk] = useVotePluginsClientStore((s) => [
+  const [
+    vsrClient,
+    vsrRegistrar,
+    vsrRegistrarPk,
+  ] = useVotePluginsClientStore((s) => [
     s.state.vsrClient,
+    s.state.voteStakeRegistryRegistrar,
     s.state.voteStakeRegistryRegistrarPk,
   ])
+
   const { error, loading, createPosition } = useCreatePosition({
     realm,
     registrar: vsrRegistrarPk || undefined,
   })
+
+  const communityVotingMintCfg = vsrRegistrar?.votingMints.find((vm) =>
+    vm.mint.equals(realm!.account.communityMint)
+  )
   // const tokenOwnerRecordWalletPk = Object.keys(tokenRecords)?.find(
   //   (key) => tokenRecords[key]?.pubkey?.toBase58() === tokenOwnerRecordPk
   // )
@@ -106,10 +116,15 @@ export const LockTokensAccount: React.FC<{
       abbreviateAddress(realm?.account.communityMint)
     : ''
 
-  const handleCalcLockupMultiplier = (lockupPeriodInDays: number) => {
-    // TODO (Bry): Actually calc multiplier
-    return 50
-  }
+  const handleCalcLockupMultiplier = useCallback(
+    (lockupPeriodInDays: number) =>
+      calcLockupMultiplier({
+        lockupSecs: daysToSecs(lockupPeriodInDays),
+        registrar: vsrRegistrar as any,
+        realm,
+      }),
+    [realm, vsrRegistrar]
+  )
 
   const handleLockTokens = async (values: LockTokensModalFormValues) => {
     const { amount, lockupPeriodInDays, lockupType } = values
@@ -118,16 +133,10 @@ export const LockTokensAccount: React.FC<{
       mint!.decimals
     )
 
-    await console.log('lockupType', lockupType.value)
-    console.log('amount', amount)
-    console.log('amountToLock', amountToLock.toNumber())
-    console.log('lockupPeriodInDays', lockupPeriodInDays)
-
-    // create position and deposit
     await createPosition({
       amount: amountToLock,
-      periods: lockupPeriodInDays,
-      kind: { cliff: {}},
+      periods: Math.ceil(lockupPeriodInDays),
+      kind: { [lockupType.value]: {} },
     })
 
     if (!error) {
@@ -241,9 +250,10 @@ export const LockTokensAccount: React.FC<{
           <LockTokensModal
             isOpen={isLockModalOpen}
             maxLockupAmount={maxLockupAmount}
-            // TODO (BRY): values from votingMintCfg here
-            minLockupTimeInDays={yearsToDays(0.5)}
-            maxLockupTimeInDays={yearsToDays(4)}
+            minLockupTimeInDays={secsToDays(
+              ((communityVotingMintCfg as any)
+                ?.minimumRequiredLockupSecs as BN).toNumber() || 0
+            )}
             calcMultiplierFn={handleCalcLockupMultiplier}
             onClose={() => setIsLockModalOpen(false)}
             onSubmit={handleLockTokens}
