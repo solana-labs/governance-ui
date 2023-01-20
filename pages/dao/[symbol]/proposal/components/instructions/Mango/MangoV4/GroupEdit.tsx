@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
 import useRealm from '@hooks/useRealm'
 import { PublicKey } from '@solana/web3.js'
@@ -18,13 +17,16 @@ import InstructionForm, {
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 
-interface Serum3EditMarketForm {
+interface GroupEditForm {
   governedAccount: AssetAccount | null
-  marketIndex: number
-  reduceOnly: boolean
+  admin: string
+  fastListingAdmin: string
+  securityAdmin: string
+  testing: number
+  version: number
 }
 
-const Serum3EditMarket = ({
+const GroupEdit = ({
   index,
   governance,
 }: {
@@ -32,19 +34,22 @@ const Serum3EditMarket = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { getClient, ADMIN_PK, GROUP_NUM } = UseMangoV4()
+  const { getClient, GROUP_NUM, ADMIN_PK } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
-    (x) => x.type === AccountType.PROGRAM
+    (x) => x.type === AccountType.SOL
   )
   const { connection } = useWalletStore()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<Serum3EditMarketForm>({
+  const [form, setForm] = useState<GroupEditForm>({
     governedAccount: null,
-    reduceOnly: false,
-    marketIndex: 0,
+    admin: '',
+    fastListingAdmin: '',
+    securityAdmin: '',
+    testing: 0,
+    version: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -68,17 +73,19 @@ const Serum3EditMarket = ({
     ) {
       const client = await getClient(connection, wallet)
       const group = await client.getGroupForCreator(ADMIN_PK, GROUP_NUM)
-      const market = group.serum3MarketsMapByMarketIndex.get(
-        Number(form.marketIndex)
-      )
-      //TODO dao sol account as payer
       //Mango instruction call and serialize
+      //TODO dao sol account as payer
       const ix = await client.program.methods
-        .serum3EditMarket(true)
+        .groupEdit(
+          new PublicKey(form.admin),
+          new PublicKey(form.fastListingAdmin),
+          new PublicKey(form.securityAdmin),
+          Number(form.testing),
+          Number(form.version)
+        )
         .accounts({
           group: group.publicKey,
-          admin: ADMIN_PK,
-          market: market!.publicKey,
+          admin: group.admin,
         })
         .instruction()
 
@@ -111,6 +118,7 @@ const Serum3EditMarket = ({
       .nullable()
       .required('Program governed account is required'),
   })
+
   const inputs: InstructionInput[] = [
     {
       label: 'Governance',
@@ -122,17 +130,36 @@ const Serum3EditMarket = ({
       options: governedProgramAccounts,
     },
     {
-      label: 'Market index',
-      initialValue: form.marketIndex,
+      label: 'Admin',
+      initialValue: form.admin,
       type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'marketIndex',
+      name: 'admin',
     },
     {
-      label: 'Reduce Only',
-      initialValue: form.reduceOnly,
-      type: InstructionInputType.SWITCH,
-      name: 'reduceOnly',
+      label: 'Fast Listing Admin',
+      initialValue: form.fastListingAdmin,
+      type: InstructionInputType.INPUT,
+      name: 'fastListingAdmin',
+    },
+    {
+      label: 'Security Admin',
+      initialValue: form.securityAdmin,
+      type: InstructionInputType.INPUT,
+      name: 'securityAdmin',
+    },
+    {
+      label: 'Testing',
+      initialValue: form.testing,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'securityAdmin',
+    },
+    {
+      label: 'Version',
+      initialValue: form.version,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'version',
     },
   ]
 
@@ -151,4 +178,4 @@ const Serum3EditMarket = ({
   )
 }
 
-export default Serum3EditMarket
+export default GroupEdit
