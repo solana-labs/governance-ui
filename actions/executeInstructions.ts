@@ -26,7 +26,7 @@ export const executeInstructions = async (
   const instructions: TransactionInstruction[] = []
 
   instructions.push(
-    ComputeBudgetProgram.setComputeUnitLimit({ units: 1000000 })
+    ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 })
   )
   await Promise.all(
     proposalInstructions.map((instruction) =>
