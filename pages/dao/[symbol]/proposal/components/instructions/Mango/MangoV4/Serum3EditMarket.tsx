@@ -17,10 +17,17 @@ import InstructionForm, {
   InstructionInputType,
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
+import { MarketIndex } from '@blockworks-foundation/mango-v4/dist/types/src/accounts/serum3'
+import { Group } from '@blockworks-foundation/mango-v4'
+
+type NameMarketIndexVal = {
+  name: string
+  value: MarketIndex
+}
 
 interface Serum3EditMarketForm {
   governedAccount: AssetAccount | null
-  marketIndex: number
+  market: NameMarketIndexVal | null
   reduceOnly: boolean
 }
 
@@ -44,8 +51,10 @@ const Serum3EditMarket = ({
   const [form, setForm] = useState<Serum3EditMarketForm>({
     governedAccount: null,
     reduceOnly: false,
-    marketIndex: 0,
+    market: null,
   })
+  const [mangoGroup, setMangoGroup] = useState<Group | null>(null)
+  const [currentMarkets, setCurrentMarkets] = useState<NameMarketIndexVal[]>([])
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
   const handleSetForm = ({ propertyName, value }) => {
@@ -69,12 +78,12 @@ const Serum3EditMarket = ({
       const client = await getClient(connection, wallet)
       const group = await client.getGroupForCreator(ADMIN_PK, GROUP_NUM)
       const market = group.serum3MarketsMapByMarketIndex.get(
-        Number(form.marketIndex)
+        Number(form.market?.value)
       )
       //TODO dao sol account as payer
       //Mango instruction call and serialize
       const ix = await client.program.methods
-        .serum3EditMarket(true)
+        .serum3EditMarket(form.reduceOnly)
         .accounts({
           group: group.publicKey,
           admin: ADMIN_PK,
@@ -105,6 +114,37 @@ const Serum3EditMarket = ({
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
+  useEffect(() => {
+    const getMarkets = async () => {
+      const client = await getClient(connection, wallet!)
+      const group = await client.getGroupForCreator(ADMIN_PK, GROUP_NUM)
+      const markets = [...group.serum3MarketsMapByExternal.values()].map(
+        (x) => ({
+          name: x.name,
+          value: x.marketIndex,
+        })
+      )
+      setCurrentMarkets(markets)
+      setMangoGroup(group)
+    }
+    if (wallet?.publicKey) {
+      getMarkets()
+    }
+  }, [connection.current && wallet?.publicKey?.toBase58()])
+  useEffect(() => {
+    const getCurrentMarketProps = () => {
+      const market = mangoGroup!.serum3MarketsMapByMarketIndex.get(
+        Number(form.market?.value)
+      )
+      setForm({
+        ...form,
+        reduceOnly: market?.reduceOnly || false,
+      })
+    }
+    if (form.market && mangoGroup) {
+      getCurrentMarketProps()
+    }
+  }, [form.market?.value])
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
@@ -122,11 +162,11 @@ const Serum3EditMarket = ({
       options: governedProgramAccounts,
     },
     {
-      label: 'Market index',
-      initialValue: form.marketIndex,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'marketIndex',
+      label: 'Market',
+      name: 'market',
+      type: InstructionInputType.SELECT,
+      initialValue: null,
+      options: currentMarkets,
     },
     {
       label: 'Reduce Only',

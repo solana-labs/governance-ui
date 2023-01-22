@@ -118,6 +118,23 @@ const GroupEdit = ({
       .nullable()
       .required('Program governed account is required'),
   })
+  useEffect(() => {
+    const getGroupParams = async () => {
+      const client = await getClient(connection, wallet!)
+      const group = await client.getGroupForCreator(ADMIN_PK, GROUP_NUM)
+      setForm({
+        ...form,
+        admin: group.admin.toBase58(),
+        fastListingAdmin: group.fastListingAdmin.toBase58(),
+        // securityAdmin: group.securityAdmin.toBase58(),
+        testing: group.testing,
+        version: group.version,
+      })
+    }
+    if (wallet?.publicKey) {
+      getGroupParams()
+    }
+  }, [connection && wallet?.publicKey?.toBase58()])
 
   const inputs: InstructionInput[] = [
     {
