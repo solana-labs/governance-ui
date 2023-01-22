@@ -11,20 +11,20 @@ import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
-import { BN, I80F48 } from '@blockworks-foundation/mango-client'
+import { BN } from '@blockworks-foundation/mango-client'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, {
   InstructionInput,
   InstructionInputType,
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
+import { toNative } from '@blockworks-foundation/mango-v4'
 
 interface TokenRegisterForm {
   governedAccount: AssetAccount | null
   mintPk: string
   oraclePk: string
   oracleConfFilter: number
-  tokenIndex: number
   name: string
   adjustmentFactor: number
   util0: number
@@ -65,25 +65,24 @@ const TokenRegister = ({
     governedAccount: null,
     mintPk: '',
     oraclePk: '',
-    oracleConfFilter: 0,
-    tokenIndex: 0,
+    oracleConfFilter: 0.1,
     name: '',
-    adjustmentFactor: 0,
-    util0: 0,
-    rate0: 0,
-    util1: 0,
-    rate1: 0,
-    maxRate: 0,
-    loanFeeRate: 0,
-    loanOriginationFeeRate: 0,
-    maintAssetWeight: 0,
-    initAssetWeight: 0,
-    maintLiabWeight: 0,
-    initLiabWeight: 0,
+    adjustmentFactor: 0.004, // rate parameters are chosen to be the same for all high asset weight tokens,
+    util0: 0.7,
+    rate0: 0.1,
+    util1: 0.85,
+    rate1: 0.2,
+    maxRate: 2.0,
+    loanFeeRate: 0.005,
+    loanOriginationFeeRate: 0.0005,
+    maintAssetWeight: 1,
+    initAssetWeight: 1,
+    maintLiabWeight: 1,
+    initLiabWeight: 1,
     liquidationFee: 0,
-    minVaultToDepositsRatio: 0,
-    netBorrowLimitWindowSizeTs: 0,
-    netBorrowLimitPerWindowQuote: 0,
+    minVaultToDepositsRatio: 0.2,
+    netBorrowLimitWindowSizeTs: 24 * 60 * 60,
+    netBorrowLimitPerWindowQuote: toNative(1000000, 6).toNumber(),
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -113,12 +112,11 @@ const TokenRegister = ({
       const ix = await client.program.methods
         .tokenRegister(
           tokenIndex,
-          form.name.toUpperCase(),
+          form.name,
           {
-            confFilter: {
-              val: I80F48.fromNumber(Number(form.oracleConfFilter)).getData(),
-            },
-          } as any, // future: nested custom types dont typecheck, fix if possible?
+            confFilter: Number(form.oracleConfFilter),
+            maxStalenessSlots: null,
+          }, // future: nested custom types dont typecheck, fix if possible?
           {
             adjustmentFactor: Number(form.adjustmentFactor),
             util0: Number(form.util0),

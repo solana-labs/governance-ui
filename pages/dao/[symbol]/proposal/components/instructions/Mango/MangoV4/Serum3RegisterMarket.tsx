@@ -22,9 +22,8 @@ import { OPENBOOK_PROGRAM_ID } from '@blockworks-foundation/mango-v4'
 interface Serum3RegisterMarketForm {
   governedAccount: AssetAccount | null
   serum3MarketExternalPk: string
-  baseBankTokenName: string
-  quoteBankTokenName: string
-  marketIndex: number
+  baseBankMintPk: string
+  quoteBankMintPk: string
   name: string
 }
 
@@ -48,9 +47,8 @@ const Serum3RegisterMarket = ({
   const [form, setForm] = useState<Serum3RegisterMarketForm>({
     governedAccount: null,
     serum3MarketExternalPk: '',
-    baseBankTokenName: '',
-    quoteBankTokenName: '',
-    marketIndex: 0,
+    baseBankMintPk: '',
+    quoteBankMintPk: '',
     name: '',
   })
   const [formErrors, setFormErrors] = useState({})
@@ -85,13 +83,10 @@ const Serum3RegisterMarket = ({
           admin: ADMIN_PK,
           serumProgram: OPENBOOK_PROGRAM_ID[connection.cluster],
           serumMarketExternal: new PublicKey(form.serum3MarketExternalPk),
-          //todo fix by getFirstBankByMint
-          baseBank: group.banksMapByName.get(
-            form.baseBankTokenName.toUpperCase()
-          )![0]!.publicKey,
-          quoteBank: group.banksMapByName.get(
-            form.quoteBankTokenName.toUpperCase()
-          )![0]!.publicKey,
+          baseBank: group.banksMapByMint.get(form.baseBankMintPk)![0]!
+            .publicKey,
+          quoteBank: group.banksMapByMint.get(form.quoteBankMintPk)![0]!
+            .publicKey,
           payer: wallet.publicKey,
         })
         .instruction()
@@ -149,15 +144,15 @@ const Serum3RegisterMarket = ({
     },
     {
       label: 'Base Bank Token Name',
-      initialValue: form.baseBankTokenName,
+      initialValue: form.baseBankMintPk,
       type: InstructionInputType.INPUT,
-      name: 'baseBankTokenName',
+      name: 'baseBankMintPk',
     },
     {
       label: 'Quote Bank Token Name',
-      initialValue: form.quoteBankTokenName,
+      initialValue: form.quoteBankMintPk,
       type: InstructionInputType.INPUT,
-      name: 'quoteBankTokenName',
+      name: 'quoteBankMintPk',
     },
   ]
 

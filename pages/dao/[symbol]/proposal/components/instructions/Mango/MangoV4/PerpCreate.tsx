@@ -11,7 +11,7 @@ import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
-import { BN, I80F48 } from '@blockworks-foundation/mango-client'
+import { BN } from '@blockworks-foundation/mango-client'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, {
   InstructionInput,
@@ -68,32 +68,32 @@ const PerpCreate = ({
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<PerpCreateForm>({
     governedAccount: null,
-    oracleConfFilter: 0,
+    oracleConfFilter: 0.1,
     oraclePk: '',
     name: '',
-    baseDecimals: 0,
-    quoteLotSize: 0,
-    baseLotSize: 0,
-    maintBaseAssetWeight: 0,
-    initBaseAssetWeight: 0,
-    maintBaseLiabWeight: 0,
-    initBaseLiabWeight: 0,
-    maintPnlAssetWeight: 0,
-    initPnlAssetWeight: 0,
-    liquidationFee: 0,
-    makerFee: 0,
-    takerFee: 0,
-    feePenalty: 0,
-    minFunding: 0,
-    maxFunding: 0,
-    impactQuantity: 0,
-    groupInsuranceFund: false,
-    settleFeeFlat: 0,
-    settleFeeAmountThreshold: 0,
-    settleFeeFractionLowHealth: 0,
+    baseDecimals: 6,
+    quoteLotSize: 10,
+    baseLotSize: 100,
+    maintBaseAssetWeight: 0.975,
+    initBaseAssetWeight: 0.95,
+    maintBaseLiabWeight: 1.025,
+    initBaseLiabWeight: 1.05,
+    maintPnlAssetWeight: 1,
+    initPnlAssetWeight: 1,
+    liquidationFee: 0.0125,
+    makerFee: -0.0001,
+    takerFee: 0.0004,
+    feePenalty: 5,
+    minFunding: -0.05,
+    maxFunding: 0.05,
+    impactQuantity: 100,
+    groupInsuranceFund: true,
+    settleFeeFlat: 1000,
+    settleFeeAmountThreshold: 1000000,
+    settleFeeFractionLowHealth: 0.01,
     settleTokenIndex: 0,
-    settlePnlLimitFactor: 0,
-    settlePnlLimitWindowSize: 0,
+    settlePnlLimitFactor: 1.0,
+    settlePnlLimitWindowSize: 2 * 60 * 60,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -130,10 +130,9 @@ const PerpCreate = ({
           Number(perpMarketIndex),
           form.name,
           {
-            confFilter: {
-              val: I80F48.fromNumber(Number(form.oracleConfFilter)).getData(),
-            },
-          } as any,
+            confFilter: Number(form.oracleConfFilter),
+            maxStalenessSlots: null,
+          },
           Number(form.baseDecimals),
           new BN(form.quoteLotSize),
           new BN(form.baseLotSize),
