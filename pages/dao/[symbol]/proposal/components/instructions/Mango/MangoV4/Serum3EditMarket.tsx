@@ -39,7 +39,7 @@ const Serum3EditMarket = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { getClient, ADMIN_PK, GROUP_NUM } = UseMangoV4()
+  const { getClient, ADMIN_PK, GROUP } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
@@ -76,7 +76,7 @@ const Serum3EditMarket = ({
       wallet?.publicKey
     ) {
       const client = await getClient(connection, wallet)
-      const group = await client.getGroupForCreator(ADMIN_PK, GROUP_NUM)
+      const group = await client.getGroup(GROUP)
       const market = group.serum3MarketsMapByMarketIndex.get(
         Number(form.market?.value)
       )
@@ -117,7 +117,7 @@ const Serum3EditMarket = ({
   useEffect(() => {
     const getMarkets = async () => {
       const client = await getClient(connection, wallet!)
-      const group = await client.getGroupForCreator(ADMIN_PK, GROUP_NUM)
+      const group = await client.getGroup(GROUP)
       const markets = [...group.serum3MarketsMapByExternal.values()].map(
         (x) => ({
           name: x.name,

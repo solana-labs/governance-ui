@@ -67,7 +67,7 @@ const EditToken = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { getClient, ADMIN_PK, GROUP_NUM } = UseMangoV4()
+  const { getClient, ADMIN_PK, GROUP } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
@@ -132,7 +132,7 @@ const EditToken = ({
       wallet?.publicKey
     ) {
       const client = await getClient(connection, wallet)
-      const group = await client.getGroupForCreator(ADMIN_PK, GROUP_NUM)
+      const group = await client.getGroup(GROUP)
       const bank = group.getFirstBankByMint(new PublicKey(form.mintPk))
       const mintInfo = group.mintInfosMapByTokenIndex.get(bank.tokenIndex)!
       //Mango instruction call and serialize
@@ -213,7 +213,7 @@ const EditToken = ({
   useEffect(() => {
     const getTokens = async () => {
       const client = await getClient(connection, wallet!)
-      const group = await client.getGroupForCreator(ADMIN_PK, GROUP_NUM)
+      const group = await client.getGroup(GROUP)
       const currentTokens = [...group.banksMapByMint.values()].map((x) => ({
         name: x[0].name,
         value: x[0].mint,

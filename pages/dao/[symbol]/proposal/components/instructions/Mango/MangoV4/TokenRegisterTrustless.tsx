@@ -33,7 +33,7 @@ const TokenRegisterTrustless = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { getClient, GROUP_NUM, ADMIN_PK } = UseMangoV4()
+  const { getClient, GROUP } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
@@ -69,7 +69,7 @@ const TokenRegisterTrustless = ({
       wallet?.publicKey
     ) {
       const client = await getClient(connection, wallet)
-      const group = await client.getGroupForCreator(ADMIN_PK, GROUP_NUM)
+      const group = await client.getGroup(GROUP)
       const tokenIndex = group.banksMapByName.size
       //Mango instruction call and serialize
       //TODO dao sol account as payer

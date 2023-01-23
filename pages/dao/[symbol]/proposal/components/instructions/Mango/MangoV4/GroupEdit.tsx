@@ -36,7 +36,7 @@ const GroupEdit = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { getClient, GROUP_NUM, ADMIN_PK } = UseMangoV4()
+  const { getClient, GROUP } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
@@ -75,7 +75,7 @@ const GroupEdit = ({
       wallet?.publicKey
     ) {
       const client = await getClient(connection, wallet)
-      const group = await client.getGroupForCreator(ADMIN_PK, GROUP_NUM)
+      const group = await client.getGroup(GROUP)
       //Mango instruction call and serialize
       //TODO dao sol account as payer
       const ix = await client.program.methods
@@ -125,7 +125,8 @@ const GroupEdit = ({
   useEffect(() => {
     const getGroupParams = async () => {
       const client = await getClient(connection, wallet!)
-      const group = await client.getGroupForCreator(ADMIN_PK, GROUP_NUM)
+      console.log(client)
+      const group = await client.getGroup(GROUP)
       setForm({
         ...form,
         admin: group.admin.toBase58(),
@@ -173,7 +174,7 @@ const GroupEdit = ({
       initialValue: form.testing,
       type: InstructionInputType.INPUT,
       inputType: 'number',
-      name: 'securityAdmin',
+      name: 'testing',
     },
     {
       label: 'Version',

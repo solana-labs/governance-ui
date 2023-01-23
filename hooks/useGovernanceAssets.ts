@@ -680,6 +680,14 @@ export default function useGovernanceAssets() {
       name: 'Token Register Trustless',
       packageId: PackageEnum.MangoMarketV4,
     },
+    [Instructions.MangoV4GroupEdit]: {
+      name: 'Group Edit',
+      packageId: PackageEnum.MangoMarketV4,
+    },
+    [Instructions.MangoV4Serum3EditMarket]: {
+      name: 'Serum 3 Edit Market',
+      packageId: PackageEnum.MangoMarketV4,
+    },
 
     /*
       ███    ███ ███████  █████  ███    ██     ███████ ██ ███    ██  █████  ███    ██  ██████ ███████

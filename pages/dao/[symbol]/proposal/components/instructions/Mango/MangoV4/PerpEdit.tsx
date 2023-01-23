@@ -65,7 +65,7 @@ const PerpEdit = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { getClient, ADMIN_PK, GROUP_NUM } = UseMangoV4()
+  const { getClient, GROUP, ADMIN_PK } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const [mangoGroup, setMangoGroup] = useState<Group | null>(null)
@@ -129,7 +129,7 @@ const PerpEdit = ({
       wallet?.publicKey
     ) {
       const client = await getClient(connection, wallet)
-      const group = await client.getGroupForCreator(ADMIN_PK, GROUP_NUM)
+      const group = await client.getGroup(GROUP)
       const perpMarket = group.perpMarketsMapByName.get(form.name)!
       //Mango instruction call and serialize
 
@@ -209,7 +209,7 @@ const PerpEdit = ({
   useEffect(() => {
     const getTokens = async () => {
       const client = await getClient(connection, wallet!)
-      const group = await client.getGroupForCreator(ADMIN_PK, GROUP_NUM)
+      const group = await client.getGroup(GROUP)
       const currentTokens = [...group.perpMarketsMapByMarketIndex.values()].map(
         (x) => ({
           name: x.name,
