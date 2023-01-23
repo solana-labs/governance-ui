@@ -246,7 +246,18 @@ export async function prepareRealmCreation({
   for (const teamWalletPk of councilWalletPks) {
     // In version 3 we just deposit council tokens directly into the DAO
     if (programVersion >= 3) {
-      continue
+      await withDepositGoverningTokens(
+        realmInstructions,
+        programIdPk,
+        programVersion,
+        realmPk,
+        councilMintPk,
+        councilMintPk,
+        walletPk,
+        walletPk,
+        walletPk,
+        new BN(initialCouncilTokenAmount)
+      )
     }
 
     // before version 3, we have to mint the tokens to wallets
