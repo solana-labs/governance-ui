@@ -253,7 +253,7 @@ export async function prepareRealmCreation({
         realmPk,
         councilMintPk,
         councilMintPk,
-        walletPk,
+        teamWalletPk,
         walletPk,
         walletPk,
         new BN(initialCouncilTokenAmount)
