@@ -16,6 +16,7 @@ import InstructionForm, {
   InstructionInputType,
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
+import { BN } from '@project-serum/anchor'
 
 interface GroupEditForm {
   governedAccount: AssetAccount | null
@@ -24,6 +25,7 @@ interface GroupEditForm {
   securityAdmin: string
   testing: number
   version: number
+  depositLimitQuote: number
 }
 
 const GroupEdit = ({
@@ -50,6 +52,7 @@ const GroupEdit = ({
     securityAdmin: '',
     testing: 0,
     version: 0,
+    depositLimitQuote: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -81,7 +84,8 @@ const GroupEdit = ({
           new PublicKey(form.fastListingAdmin),
           new PublicKey(form.securityAdmin),
           Number(form.testing),
-          Number(form.version)
+          Number(form.version),
+          new BN(form.depositLimitQuote)
         )
         .accounts({
           group: group.publicKey,
@@ -126,7 +130,7 @@ const GroupEdit = ({
         ...form,
         admin: group.admin.toBase58(),
         fastListingAdmin: group.fastListingAdmin.toBase58(),
-        // securityAdmin: group.securityAdmin.toBase58(),
+        securityAdmin: group.securityAdmin.toBase58(),
         testing: group.testing,
         version: group.version,
       })
@@ -177,6 +181,13 @@ const GroupEdit = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'version',
+    },
+    {
+      label: 'Deposit Limit Quote',
+      initialValue: form.depositLimitQuote,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'depositLimitQuote',
     },
   ]
 

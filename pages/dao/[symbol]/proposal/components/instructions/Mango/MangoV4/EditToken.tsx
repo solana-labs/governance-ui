@@ -18,9 +18,16 @@ import InstructionForm, {
   InstructionInputType,
 } from '../../FormCreator'
 import UseMangoV4 from '@hooks/useMangoV4'
+import { Group } from '@blockworks-foundation/mango-v4'
+
+type NamePkVal = {
+  name: string
+  value: PublicKey
+}
 
 interface EditTokenForm {
   governedAccount: AssetAccount | null
+  token: null | NamePkVal
   oraclePk: string
   oracleConfFilter: number
   mintPk: string
@@ -68,9 +75,12 @@ const EditToken = ({
   )
   const { connection } = useWalletStore()
   const shouldBeGoverned = !!(index !== 0 && governance)
+  const [mangoGroup, setMangoGroup] = useState<Group | null>(null)
+  const [tokens, setTokens] = useState<NamePkVal[]>([])
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<EditTokenForm>({
     governedAccount: null,
+    token: null,
     oraclePk: '',
     oracleConfFilter: 0,
     mintPk: '',
@@ -200,6 +210,60 @@ const EditToken = ({
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
+  useEffect(() => {
+    const getTokens = async () => {
+      const client = await getClient(connection, wallet!)
+      const group = await client.getGroupForCreator(ADMIN_PK, GROUP_NUM)
+      const currentTokens = [...group.banksMapByMint.values()].map((x) => ({
+        name: x[0].name,
+        value: x[0].mint,
+      }))
+      setMangoGroup(group)
+      setTokens(currentTokens)
+    }
+    if (wallet?.publicKey) {
+      getTokens()
+    }
+  }, [connection && wallet?.publicKey?.toBase58()])
+  useEffect(() => {
+    if (form.token && mangoGroup) {
+      const currentToken = mangoGroup!.banksMapByMint.get(
+        form.token.value.toBase58()
+      )![0]
+      setForm({
+        ...form,
+        oraclePk: currentToken.oracle.toBase58(),
+        oracleConfFilter: currentToken.oracleConfig.confFilter.toNumber(),
+        mintPk: currentToken.mint.toBase58(),
+        name: currentToken.name,
+        adjustmentFactor: currentToken.adjustmentFactor.toNumber(),
+        util0: currentToken.util0.toNumber(),
+        rate0: currentToken.rate0.toNumber(),
+        util1: currentToken.util1.toNumber(),
+        rate1: currentToken.rate1.toNumber(),
+        maxRate: currentToken.maxRate.toNumber(),
+        loanFeeRate: currentToken.loanFeeRate.toNumber(),
+        loanOriginationFeeRate: currentToken.loanOriginationFeeRate.toNumber(),
+        maintAssetWeight: currentToken.maintAssetWeight.toNumber(),
+        initAssetWeight: currentToken.initAssetWeight.toNumber(),
+        maintLiabWeight: currentToken.maintLiabWeight.toNumber(),
+        initLiabWeight: currentToken.initLiabWeight.toNumber(),
+        liquidationFee: currentToken.liquidationFee.toNumber(),
+        stablePriceDelayIntervalSeconds:
+          currentToken.stablePriceModel.delayIntervalSeconds,
+        stablePriceDelayGrowthLimit:
+          currentToken.stablePriceModel.delayGrowthLimit,
+        stablePriceGrowthLimit: currentToken.stablePriceModel.stableGrowthLimit,
+        minVaultToDepositsRatio: currentToken.minVaultToDepositsRatio,
+        netBorrowLimitPerWindowQuote: currentToken.netBorrowLimitPerWindowQuote.toNumber(),
+        netBorrowLimitWindowSizeTs: 0,
+        borrowWeightScaleStartQuote: currentToken.borrowWeightScaleStartQuote,
+        depositWeightScaleStartQuote: currentToken.depositWeightScaleStartQuote,
+        groupInsuranceFund: false,
+        reduceOnly: currentToken.reduceOnly,
+      })
+    }
+  }, [form.token?.value.toBase58()])
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
@@ -215,6 +279,13 @@ const EditToken = ({
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governance,
       options: governedProgramAccounts,
+    },
+    {
+      label: 'Tokens',
+      name: 'token',
+      type: InstructionInputType.SELECT,
+      initialValue: null,
+      options: tokens,
     },
     {
       label: 'Mint Pk',

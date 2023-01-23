@@ -18,11 +18,17 @@ import InstructionForm, {
   InstructionInputType,
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
+import { Group, PerpMarketIndex } from '@blockworks-foundation/mango-v4'
 
+type NameMarketIndexVal = {
+  name: string
+  value: PerpMarketIndex
+}
 interface PerpEditForm {
   governedAccount: AssetAccount | null
-  oraclePk: ''
-  name: ''
+  perp: null | NameMarketIndexVal
+  oraclePk: string
+  name: string
   oracleConfFilter: number
   baseDecimals: number
   maintBaseAssetWeight: number
@@ -48,6 +54,7 @@ interface PerpEditForm {
   settlePnlLimitFactor: number
   settlePnlLimitWindowSize: number
   reduceOnly: boolean
+  resetStablePrice: boolean
 }
 
 const PerpEdit = ({
@@ -61,6 +68,8 @@ const PerpEdit = ({
   const { getClient, ADMIN_PK, GROUP_NUM } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
+  const [mangoGroup, setMangoGroup] = useState<Group | null>(null)
+  const [perps, setPerps] = useState<NameMarketIndexVal[]>([])
   const governedProgramAccounts = assetAccounts.filter(
     (x) => x.type === AccountType.PROGRAM
   )
@@ -69,6 +78,7 @@ const PerpEdit = ({
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<PerpEditForm>({
     governedAccount: null,
+    perp: null,
     oraclePk: '',
     name: '',
     oracleConfFilter: 0,
@@ -96,6 +106,7 @@ const PerpEdit = ({
     settlePnlLimitFactor: 0,
     settlePnlLimitWindowSize: 0,
     reduceOnly: false,
+    resetStablePrice: false,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -156,7 +167,8 @@ const PerpEdit = ({
           form.settlePnlLimitWindowSize !== null
             ? new BN(form.settlePnlLimitWindowSize)
             : null,
-          form.reduceOnly
+          form.reduceOnly,
+          form.resetStablePrice
         )
         .accounts({
           group: group.publicKey,
@@ -194,6 +206,63 @@ const PerpEdit = ({
       .nullable()
       .required('Program governed account is required'),
   })
+  useEffect(() => {
+    const getTokens = async () => {
+      const client = await getClient(connection, wallet!)
+      const group = await client.getGroupForCreator(ADMIN_PK, GROUP_NUM)
+      const currentTokens = [...group.perpMarketsMapByMarketIndex.values()].map(
+        (x) => ({
+          name: x.name,
+          value: x.perpMarketIndex,
+        })
+      )
+      setMangoGroup(group)
+      setPerps(currentTokens)
+    }
+    if (wallet?.publicKey) {
+      getTokens()
+    }
+  }, [connection && wallet?.publicKey?.toBase58()])
+  useEffect(() => {
+    if (form.perp && mangoGroup) {
+      const currentPerp = mangoGroup!.perpMarketsMapByMarketIndex.get(
+        form.perp.value
+      )!
+      setForm({
+        ...form,
+        oraclePk: currentPerp.oracle.toBase58(),
+        name: currentPerp.name,
+        oracleConfFilter: currentPerp.oracleConfig.confFilter.toNumber(),
+        baseDecimals: currentPerp.baseDecimals,
+        maintBaseAssetWeight: currentPerp.maintBaseAssetWeight.toNumber(),
+        initBaseAssetWeight: currentPerp.initBaseAssetWeight.toNumber(),
+        maintBaseLiabWeight: currentPerp.maintBaseLiabWeight.toNumber(),
+        initBaseLiabWeight: currentPerp.initBaseLiabWeight.toNumber(),
+        maintPnlAssetWeight: currentPerp.maintPnlAssetWeight.toNumber(),
+        initPnlAssetWeight: currentPerp.initPnlAssetWeight.toNumber(),
+        liquidationFee: currentPerp.liquidationFee.toNumber(),
+        makerFee: currentPerp.makerFee.toNumber(),
+        takerFee: currentPerp.takerFee.toNumber(),
+        feePenalty: currentPerp.feePenalty,
+        minFunding: currentPerp.minFunding.toNumber(),
+        maxFunding: currentPerp.maxFunding.toNumber(),
+        impactQuantity: currentPerp.impactQuantity.toNumber(),
+        groupInsuranceFund: currentPerp.groupInsuranceFund,
+        settleFeeFlat: currentPerp.settleFeeFlat,
+        settleFeeAmountThreshold: currentPerp.settleFeeAmountThreshold,
+        settleFeeFractionLowHealth: currentPerp.settleFeeFractionLowHealth,
+        stablePriceDelayIntervalSeconds:
+          currentPerp.stablePriceModel.delayIntervalSeconds,
+        stablePriceDelayGrowthLimit:
+          currentPerp.stablePriceModel.delayGrowthLimit,
+        stablePriceGrowthLimit: currentPerp.stablePriceModel.stableGrowthLimit,
+        settlePnlLimitFactor: currentPerp.settlePnlLimitFactor,
+        settlePnlLimitWindowSize: currentPerp.settlePnlLimitWindowSizeTs.toNumber(),
+        reduceOnly: currentPerp.reduceOnly,
+        resetStablePrice: false,
+      })
+    }
+  }, [form.perp?.value])
   const inputs: InstructionInput[] = [
     {
       label: 'Governance',
@@ -203,6 +272,13 @@ const PerpEdit = ({
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governance,
       options: governedProgramAccounts,
+    },
+    {
+      label: 'Perp',
+      name: 'perp',
+      type: InstructionInputType.SELECT,
+      initialValue: null,
+      options: perps,
     },
     {
       label: 'Token Name',
@@ -333,6 +409,12 @@ const PerpEdit = ({
       initialValue: form.reduceOnly,
       type: InstructionInputType.SWITCH,
       name: 'reduceOnly',
+    },
+    {
+      label: 'Reset Stable Price',
+      initialValue: form.resetStablePrice,
+      type: InstructionInputType.SWITCH,
+      name: 'resetStablePrice',
     },
     {
       label: 'Settle Fee Flat',

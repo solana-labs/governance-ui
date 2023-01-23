@@ -402,9 +402,9 @@
     "@solana/spl-token" "^0.3.5"
     "@solana/web3.js" "^1.63.1"
 
-"@blockworks-foundation/mango-v4@https://github.com/blockworks-foundation/mango-v4.git#ts-client":
+"@blockworks-foundation/mango-v4@https://github.com/blockworks-foundation/mango-v4.git#dev":
   version "0.0.1-beta.6"
-  resolved "https://github.com/blockworks-foundation/mango-v4.git#2f754115d06745282b863e7a905bdb25bf85d309"
+  resolved "https://github.com/blockworks-foundation/mango-v4.git#80f4bd8048ecd7c80005ee7aaf885d14e15ea903"
   dependencies:
     "@project-serum/anchor" "^0.25.0"
     "@project-serum/serum" "^0.13.65"
