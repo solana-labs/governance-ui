@@ -2,6 +2,7 @@ import useRealm from '@hooks/useRealm'
 import React, { useEffect, useMemo, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import {
+  getProposalDepositsByDepositPayer,
   ProgramAccount,
   Proposal,
   ProposalState,
@@ -313,6 +314,29 @@ const MyProposalsBn = () => {
     )
     setOwnNftVoteRecords(nftVoteRecordsFiltered)
   }
+  const releaseSol = () => {
+    return null
+  }
+  console.log(releaseSol)
+  useEffect(() => {
+    const getSolDeposits = async () => {
+      const solDeposits = await getProposalDepositsByDepositPayer(
+        connection,
+        realm!.owner,
+        wallet!.publicKey!
+      )
+
+      console.log(solDeposits)
+    }
+    if (
+      wallet?.publicKey &&
+      modalIsOpen &&
+      realmInfo!.programVersion &&
+      realmInfo!.programVersion > 2
+    ) {
+      getSolDeposits()
+    }
+  }, [wallet?.publicKey?.toBase58(), modalIsOpen, realmInfo?.programVersion])
   useEffect(() => {
     if (wallet?.publicKey && isNftMode && client.client && modalIsOpen) {
       getNftsVoteRecord()
@@ -337,6 +361,7 @@ const MyProposalsBn = () => {
             <h3 className="mb-4 flex flex-col">
               Your proposals {isLoading && <Loading w="50px"></Loading>}
             </h3>
+            <div>Release sol</div>
             <ProposalList
               title="Drafts"
               fcn={cleanDrafts}
