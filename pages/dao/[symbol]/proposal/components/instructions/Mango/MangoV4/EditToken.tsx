@@ -11,7 +11,7 @@ import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
-import { BN, I80F48 } from '@blockworks-foundation/mango-client'
+import { BN } from '@blockworks-foundation/mango-client'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, {
   InstructionInput,
@@ -19,6 +19,7 @@ import InstructionForm, {
 } from '../../FormCreator'
 import UseMangoV4 from '@hooks/useMangoV4'
 import { Group } from '@blockworks-foundation/mango-v4'
+import { getChangedValues, getNullOrTransform } from './tools'
 
 type NamePkVal = {
   name: string
@@ -59,6 +60,40 @@ interface EditTokenForm {
   reduceOnly: boolean
 }
 
+const defaultFormValues = {
+  governedAccount: null,
+  token: null,
+  oraclePk: '',
+  oracleConfFilter: 0,
+  mintPk: '',
+  name: '',
+  adjustmentFactor: 0,
+  util0: 0,
+  rate0: 0,
+  util1: 0,
+  rate1: 0,
+  maxRate: 0,
+  loanFeeRate: 0,
+  loanOriginationFeeRate: 0,
+  maintAssetWeight: 0,
+  initAssetWeight: 0,
+  maintLiabWeight: 0,
+  initLiabWeight: 0,
+  liquidationFee: 0,
+  stablePriceDelayIntervalSeconds: 0,
+  stablePriceDelayGrowthLimit: 0,
+  stablePriceGrowthLimit: 0,
+  minVaultToDepositsRatio: 0,
+  netBorrowLimitPerWindowQuote: 0,
+  netBorrowLimitWindowSizeTs: 0,
+  borrowWeightScaleStartQuote: 0,
+  depositWeightScaleStartQuote: 0,
+  groupInsuranceFund: false,
+  resetStablePrice: false,
+  resetNetBorrowLimit: false,
+  reduceOnly: false,
+}
+
 const EditToken = ({
   index,
   governance,
@@ -71,45 +106,18 @@ const EditToken = ({
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
-    (x) => x.type === AccountType.PROGRAM
+    (x) => x.type === AccountType.SOL
   )
   const { connection } = useWalletStore()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [mangoGroup, setMangoGroup] = useState<Group | null>(null)
   const [tokens, setTokens] = useState<NamePkVal[]>([])
   const programId: PublicKey | undefined = realmInfo?.programId
+  const [originalFormValues, setOriginalFormValues] = useState<EditTokenForm>({
+    ...defaultFormValues,
+  })
   const [form, setForm] = useState<EditTokenForm>({
-    governedAccount: null,
-    token: null,
-    oraclePk: '',
-    oracleConfFilter: 0,
-    mintPk: '',
-    name: '',
-    adjustmentFactor: 0,
-    util0: 0,
-    rate0: 0,
-    util1: 0,
-    rate1: 0,
-    maxRate: 0,
-    loanFeeRate: 0,
-    loanOriginationFeeRate: 0,
-    maintAssetWeight: 0,
-    initAssetWeight: 0,
-    maintLiabWeight: 0,
-    initLiabWeight: 0,
-    liquidationFee: 0,
-    stablePriceDelayIntervalSeconds: 0,
-    stablePriceDelayGrowthLimit: 0,
-    stablePriceGrowthLimit: 0,
-    minVaultToDepositsRatio: 0,
-    netBorrowLimitPerWindowQuote: 0,
-    netBorrowLimitWindowSizeTs: 0,
-    borrowWeightScaleStartQuote: 0,
-    depositWeightScaleStartQuote: 0,
-    groupInsuranceFund: false,
-    resetStablePrice: false,
-    resetNetBorrowLimit: false,
-    reduceOnly: false,
+    ...defaultFormValues,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -135,16 +143,16 @@ const EditToken = ({
       const group = await client.getGroup(GROUP)
       const bank = group.getFirstBankByMint(new PublicKey(form.mintPk))
       const mintInfo = group.mintInfosMapByTokenIndex.get(bank.tokenIndex)!
+      const values = getChangedValues<EditTokenForm>(originalFormValues, form)
       //Mango instruction call and serialize
       const ix = await client.program.methods
         .tokenEdit(
-          new PublicKey(form.oraclePk),
+          getNullOrTransform(values.oraclePk, PublicKey),
           {
-            confFilter: {
-              val: I80F48.fromNumber(Number(form.oracleConfFilter)).getData(),
-            },
-          } as any, // future: nested custom types dont typecheck, fix if possible?
-          form.groupInsuranceFund,
+            confFilter: Number(form.oracleConfFilter),
+            maxStalenessSlots: null,
+          },
+          values.groupInsuranceFund,
           {
             adjustmentFactor: Number(form.adjustmentFactor),
             util0: Number(form.util0),
@@ -153,24 +161,28 @@ const EditToken = ({
             rate1: Number(form.rate1),
             maxRate: Number(form.maxRate),
           },
-          Number(form.loanFeeRate),
-          Number(form.loanOriginationFeeRate),
-          Number(form.maintAssetWeight),
-          Number(form.initAssetWeight),
-          Number(form.maintLiabWeight),
-          Number(form.initLiabWeight),
-          Number(form.liquidationFee),
-          Number(form.stablePriceDelayIntervalSeconds),
-          Number(form.stablePriceDelayGrowthLimit),
-          Number(form.stablePriceGrowthLimit),
-          Number(form.minVaultToDepositsRatio),
-          new BN(form.netBorrowLimitPerWindowQuote),
-          new BN(form.netBorrowLimitWindowSizeTs),
-          Number(form.borrowWeightScaleStartQuote),
-          Number(form.depositWeightScaleStartQuote),
-          form.resetStablePrice,
-          form.resetNetBorrowLimit,
-          form.reduceOnly
+          getNullOrTransform(values.loanFeeRate, null, Number),
+          getNullOrTransform(values.loanOriginationFeeRate, null, Number),
+          getNullOrTransform(values.maintAssetWeight, null, Number),
+          getNullOrTransform(values.initAssetWeight, null, Number),
+          getNullOrTransform(values.maintLiabWeight, null, Number),
+          getNullOrTransform(values.initLiabWeight, null, Number),
+          getNullOrTransform(values.liquidationFee, null, Number),
+          getNullOrTransform(
+            values.stablePriceDelayIntervalSeconds,
+            null,
+            Number
+          ),
+          getNullOrTransform(values.stablePriceDelayGrowthLimit, null, Number),
+          getNullOrTransform(values.stablePriceGrowthLimit, null, Number),
+          getNullOrTransform(values.minVaultToDepositsRatio, null, Number),
+          getNullOrTransform(values.netBorrowLimitPerWindowQuote, BN),
+          getNullOrTransform(values.netBorrowLimitWindowSizeTs, BN),
+          getNullOrTransform(values.borrowWeightScaleStartQuote, null, Number),
+          getNullOrTransform(values.depositWeightScaleStartQuote, null, Number),
+          values.resetStablePrice,
+          values.resetNetBorrowLimit,
+          values.reduceOnly
         )
         .accounts({
           group: group.publicKey,
@@ -230,7 +242,7 @@ const EditToken = ({
       const currentToken = mangoGroup!.banksMapByMint.get(
         form.token.value.toBase58()
       )![0]
-      setForm({
+      const vals = {
         ...form,
         oraclePk: currentToken.oracle.toBase58(),
         oracleConfFilter: currentToken.oracleConfig.confFilter.toNumber(),
@@ -261,7 +273,11 @@ const EditToken = ({
         depositWeightScaleStartQuote: currentToken.depositWeightScaleStartQuote,
         groupInsuranceFund: false,
         reduceOnly: currentToken.reduceOnly,
+      }
+      setForm({
+        ...vals,
       })
+      setOriginalFormValues({ ...vals })
     }
   }, [form.token?.value.toBase58()])
   const schema = yup.object().shape({

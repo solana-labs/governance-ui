@@ -11,7 +11,7 @@ import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
-import { BN, I80F48 } from '@blockworks-foundation/mango-client'
+import { BN } from '@blockworks-foundation/mango-client'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, {
   InstructionInput,
@@ -19,6 +19,7 @@ import InstructionForm, {
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { Group, PerpMarketIndex } from '@blockworks-foundation/mango-v4'
+import { getChangedValues, getNullOrTransform } from './tools'
 
 type NameMarketIndexVal = {
   name: string
@@ -57,6 +58,39 @@ interface PerpEditForm {
   resetStablePrice: boolean
 }
 
+const defaultFormValues = {
+  governedAccount: null,
+  perp: null,
+  oraclePk: '',
+  name: '',
+  oracleConfFilter: 0,
+  baseDecimals: 0,
+  maintBaseAssetWeight: 0,
+  initBaseAssetWeight: 0,
+  maintBaseLiabWeight: 0,
+  initBaseLiabWeight: 0,
+  maintPnlAssetWeight: 0,
+  initPnlAssetWeight: 0,
+  liquidationFee: 0,
+  makerFee: 0,
+  takerFee: 0,
+  feePenalty: 0,
+  minFunding: 0,
+  maxFunding: 0,
+  impactQuantity: 0,
+  groupInsuranceFund: false,
+  settleFeeFlat: 0,
+  settleFeeAmountThreshold: 0,
+  settleFeeFractionLowHealth: 0,
+  stablePriceDelayIntervalSeconds: 0,
+  stablePriceDelayGrowthLimit: 0,
+  stablePriceGrowthLimit: 0,
+  settlePnlLimitFactor: 0,
+  settlePnlLimitWindowSize: 0,
+  reduceOnly: false,
+  resetStablePrice: false,
+}
+
 const PerpEdit = ({
   index,
   governance,
@@ -71,42 +105,14 @@ const PerpEdit = ({
   const [mangoGroup, setMangoGroup] = useState<Group | null>(null)
   const [perps, setPerps] = useState<NameMarketIndexVal[]>([])
   const governedProgramAccounts = assetAccounts.filter(
-    (x) => x.type === AccountType.PROGRAM
+    (x) => x.type === AccountType.SOL
   )
   const { connection } = useWalletStore()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<PerpEditForm>({
-    governedAccount: null,
-    perp: null,
-    oraclePk: '',
-    name: '',
-    oracleConfFilter: 0,
-    baseDecimals: 0,
-    maintBaseAssetWeight: 0,
-    initBaseAssetWeight: 0,
-    maintBaseLiabWeight: 0,
-    initBaseLiabWeight: 0,
-    maintPnlAssetWeight: 0,
-    initPnlAssetWeight: 0,
-    liquidationFee: 0,
-    makerFee: 0,
-    takerFee: 0,
-    feePenalty: 0,
-    minFunding: 0,
-    maxFunding: 0,
-    impactQuantity: 0,
-    groupInsuranceFund: false,
-    settleFeeFlat: 0,
-    settleFeeAmountThreshold: 0,
-    settleFeeFractionLowHealth: 0,
-    stablePriceDelayIntervalSeconds: 0,
-    stablePriceDelayGrowthLimit: 0,
-    stablePriceGrowthLimit: 0,
-    settlePnlLimitFactor: 0,
-    settlePnlLimitWindowSize: 0,
-    reduceOnly: false,
-    resetStablePrice: false,
+  const [form, setForm] = useState<PerpEditForm>({ ...defaultFormValues })
+  const [originalFormValues, setOriginalFormValues] = useState<PerpEditForm>({
+    ...defaultFormValues,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -131,44 +137,44 @@ const PerpEdit = ({
       const client = await getClient(connection, wallet)
       const group = await client.getGroup(GROUP)
       const perpMarket = group.perpMarketsMapByName.get(form.name)!
+      const values = getChangedValues<PerpEditForm>(originalFormValues, form)
       //Mango instruction call and serialize
-
-      //TODO dao sol account as payer
       const ix = await client.program.methods
         .perpEditMarket(
-          new PublicKey(form.oraclePk),
+          getNullOrTransform(form.oraclePk, PublicKey),
           {
-            confFilter: {
-              val: I80F48.fromNumber(Number(form.oracleConfFilter)).getData(),
-            },
-          } as any,
-          form.baseDecimals,
-          form.maintBaseAssetWeight,
-          form.initBaseAssetWeight,
-          form.maintBaseLiabWeight,
-          form.initBaseLiabWeight,
-          form.maintPnlAssetWeight,
-          form.initPnlAssetWeight,
-          form.liquidationFee,
-          form.makerFee,
-          form.takerFee,
-          form.minFunding,
-          form.maxFunding,
-          form.impactQuantity !== null ? new BN(form.impactQuantity) : null,
-          form.groupInsuranceFund,
-          form.feePenalty,
-          form.settleFeeFlat,
-          form.settleFeeAmountThreshold,
-          form.settleFeeFractionLowHealth,
-          form.stablePriceDelayIntervalSeconds,
-          form.stablePriceDelayGrowthLimit,
-          form.stablePriceGrowthLimit,
-          form.settlePnlLimitFactor,
-          form.settlePnlLimitWindowSize !== null
-            ? new BN(form.settlePnlLimitWindowSize)
-            : null,
-          form.reduceOnly,
-          form.resetStablePrice
+            confFilter: Number(form.oracleConfFilter),
+            maxStalenessSlots: null,
+          },
+          getNullOrTransform(values.baseDecimals, null, Number),
+          getNullOrTransform(values.maintBaseAssetWeight, null, Number),
+          getNullOrTransform(values.initBaseAssetWeight, null, Number),
+          getNullOrTransform(values.maintBaseLiabWeight, null, Number),
+          getNullOrTransform(values.initBaseLiabWeight, null, Number),
+          getNullOrTransform(values.maintPnlAssetWeight, null, Number),
+          getNullOrTransform(values.initPnlAssetWeight, null, Number),
+          getNullOrTransform(values.liquidationFee, null, Number),
+          getNullOrTransform(values.makerFee, null, Number),
+          getNullOrTransform(values.takerFee, null, Number),
+          getNullOrTransform(values.minFunding, null, Number),
+          getNullOrTransform(values.maxFunding, null, Number),
+          getNullOrTransform(values.impactQuantity, BN),
+          values.groupInsuranceFund,
+          getNullOrTransform(values.feePenalty, null, Number),
+          getNullOrTransform(values.settleFeeFlat, null, Number),
+          getNullOrTransform(values.settleFeeAmountThreshold, null, Number),
+          getNullOrTransform(values.settleFeeFractionLowHealth, null, Number),
+          getNullOrTransform(
+            values.stablePriceDelayIntervalSeconds,
+            null,
+            Number
+          ),
+          getNullOrTransform(values.stablePriceDelayGrowthLimit, null, Number),
+          getNullOrTransform(values.stablePriceGrowthLimit, null, Number),
+          getNullOrTransform(values.settlePnlLimitFactor, null, Number),
+          getNullOrTransform(values.settlePnlLimitWindowSize, BN),
+          values.reduceOnly,
+          values.resetStablePrice
         )
         .accounts({
           group: group.publicKey,
@@ -228,7 +234,7 @@ const PerpEdit = ({
       const currentPerp = mangoGroup!.perpMarketsMapByMarketIndex.get(
         form.perp.value
       )!
-      setForm({
+      const vals = {
         ...form,
         oraclePk: currentPerp.oracle.toBase58(),
         name: currentPerp.name,
@@ -260,7 +266,11 @@ const PerpEdit = ({
         settlePnlLimitWindowSize: currentPerp.settlePnlLimitWindowSizeTs.toNumber(),
         reduceOnly: currentPerp.reduceOnly,
         resetStablePrice: false,
+      }
+      setForm({
+        ...vals,
       })
+      setOriginalFormValues({ ...vals })
     }
   }, [form.perp?.value])
   const inputs: InstructionInput[] = [

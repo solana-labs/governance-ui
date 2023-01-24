@@ -39,7 +39,7 @@ const Serum3RegisterMarket = ({
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
-    (x) => x.type === AccountType.PROGRAM
+    (x) => x.type === AccountType.SOL
   )
   const { connection } = useWalletStore()
   const shouldBeGoverned = !!(index !== 0 && governance)
