@@ -291,7 +291,7 @@ const PerpEdit = ({
       options: perps,
     },
     {
-      label: 'Token Name',
+      label: 'Perp Name',
       initialValue: form.name,
       type: InstructionInputType.INPUT,
       name: 'name',

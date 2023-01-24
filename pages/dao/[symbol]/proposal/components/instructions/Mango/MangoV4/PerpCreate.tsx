@@ -243,7 +243,7 @@ const PerpCreate = ({
       options: governedProgramAccounts,
     },
     {
-      label: 'Token Name',
+      label: 'Perp Name',
       initialValue: form.name,
       type: InstructionInputType.INPUT,
       name: 'name',
