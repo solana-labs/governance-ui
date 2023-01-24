@@ -209,7 +209,6 @@ export default function useGovernanceAssets() {
     },
     [PackageEnum.MangoMarketV4]: {
       name: 'Mango Market v4',
-      isVisible: symbol === 'MNGO',
       image: '/img/mango.png',
     },
     [PackageEnum.MeanFinance]: {

@@ -17,8 +17,9 @@ import InstructionForm, {
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { BN } from '@project-serum/anchor'
+import { getChangedValues, getNullOrTransform } from './tools'
 
-interface GroupEditForm {
+type GroupEditForm = {
   governedAccount: AssetAccount | null
   admin: string
   fastListingAdmin: string
@@ -26,6 +27,16 @@ interface GroupEditForm {
   testing: number
   version: number
   depositLimitQuote: number
+}
+
+const defaultFormValues = {
+  governedAccount: null,
+  admin: '',
+  fastListingAdmin: '',
+  securityAdmin: '',
+  testing: 0,
+  version: 0,
+  depositLimitQuote: 0,
 }
 
 const GroupEdit = ({
@@ -45,15 +56,10 @@ const GroupEdit = ({
   const { connection } = useWalletStore()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<GroupEditForm>({
-    governedAccount: null,
-    admin: '',
-    fastListingAdmin: '',
-    securityAdmin: '',
-    testing: 0,
-    version: 0,
-    depositLimitQuote: 0,
+  const [originalFormValues, setOriginalFormValues] = useState<GroupEditForm>({
+    ...defaultFormValues,
   })
+  const [form, setForm] = useState<GroupEditForm>({ ...defaultFormValues })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
   const handleSetForm = ({ propertyName, value }) => {
@@ -76,16 +82,16 @@ const GroupEdit = ({
     ) {
       const client = await getClient(connection, wallet)
       const group = await client.getGroup(GROUP)
+      const values = getChangedValues<GroupEditForm>(originalFormValues, form)
       //Mango instruction call and serialize
-      //TODO dao sol account as payer
       const ix = await client.program.methods
         .groupEdit(
-          new PublicKey(form.admin),
-          new PublicKey(form.fastListingAdmin),
-          new PublicKey(form.securityAdmin),
-          Number(form.testing),
-          Number(form.version),
-          new BN(form.depositLimitQuote)
+          getNullOrTransform(values.admin, PublicKey),
+          getNullOrTransform(values.fastListingAdmin, PublicKey),
+          getNullOrTransform(values.securityAdmin, PublicKey),
+          getNullOrTransform(values.testing, null, Number),
+          getNullOrTransform(values.version, null, Number),
+          getNullOrTransform(values.depositLimitQuote, BN)
         )
         .accounts({
           group: group.publicKey,
@@ -125,16 +131,19 @@ const GroupEdit = ({
   useEffect(() => {
     const getGroupParams = async () => {
       const client = await getClient(connection, wallet!)
-      console.log(client)
       const group = await client.getGroup(GROUP)
-      setForm({
+      const vals = {
         ...form,
         admin: group.admin.toBase58(),
         fastListingAdmin: group.fastListingAdmin.toBase58(),
         securityAdmin: group.securityAdmin.toBase58(),
         testing: group.testing,
         version: group.version,
+      }
+      setForm({
+        ...vals,
       })
+      setOriginalFormValues({ ...vals })
     }
     if (wallet?.publicKey) {
       getGroupParams()
