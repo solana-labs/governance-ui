@@ -44,8 +44,6 @@ export function ProposalProvider(props: Props) {
           try {
             const publicKey = await connect();
 
-            console.log(publicKey);
-
             if (!publicKey) {
               throw new Error('User must be signed in');
             }

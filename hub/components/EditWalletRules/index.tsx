@@ -13,6 +13,7 @@ import { Primary, Secondary } from '@hub/components/controls/Button';
 import { Connect } from '@hub/components/GlobalHeader/User/Connect';
 import { useProposal } from '@hub/hooks/useProposal';
 import { useQuery } from '@hub/hooks/useQuery';
+import { useToast, ToastType } from '@hub/hooks/useToast';
 import cx from '@hub/lib/cx';
 import { GovernanceTokenType } from '@hub/types/GovernanceTokenType';
 import { GovernanceVoteTipping } from '@hub/types/GovernanceVoteTipping';
@@ -55,6 +56,7 @@ interface Props {
 
 export function EditWalletRules(props: Props) {
   const { createProposal } = useProposal();
+  const { publish } = useToast();
   const [result] = useQuery(gql.getGovernanceRulesResp, {
     query: gql.getGovernanceRules,
     variables: {
@@ -116,6 +118,8 @@ export function EditWalletRules(props: Props) {
 
       if (!data.councilTokenRules) {
         setProposalVoteType('community');
+      } else if (!data.communityTokenRules.canVote) {
+        setProposalVoteType('council');
       }
 
       const walletName =
@@ -128,8 +132,6 @@ export function EditWalletRules(props: Props) {
       setProposalTitle(title);
     }
   }, [result._tag]);
-
-  console.log(proposalTitle);
 
   return pipe(
     result,
@@ -296,23 +298,31 @@ export function EditWalletRules(props: Props) {
                               ? governance.councilTokenRules.tokenMintAddress
                               : governance.communityTokenRules.tokenMintAddress;
 
-                          const proposalAddress = await createProposal({
-                            governingTokenMintPublicKey,
-                            programPublicKey,
-                            proposalDescription,
-                            proposalTitle,
-                            governancePublicKey: governance.governanceAddress,
-                            instructions: [transaction],
-                            isDraft: false,
-                            realmPublicKey: publicKey,
-                          });
+                          try {
+                            const proposalAddress = await createProposal({
+                              governingTokenMintPublicKey,
+                              programPublicKey,
+                              proposalDescription,
+                              proposalTitle,
+                              governancePublicKey: governance.governanceAddress,
+                              instructions: [transaction],
+                              isDraft: false,
+                              realmPublicKey: publicKey,
+                            });
 
-                          if (proposalAddress) {
-                            router.push(
-                              `/dao/${
-                                props.realmUrlId
-                              }/proposal/${proposalAddress.toBase58()}`,
-                            );
+                            if (proposalAddress) {
+                              router.push(
+                                `/dao/${
+                                  props.realmUrlId
+                                }/proposal/${proposalAddress.toBase58()}`,
+                              );
+                            }
+                          } catch (e) {
+                            publish({
+                              type: ToastType.Error,
+                              title: 'Could not create proposal.',
+                              message: String(e),
+                            });
                           }
 
                           setSubmitting(false);

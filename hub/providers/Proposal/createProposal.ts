@@ -5,8 +5,12 @@ import {
   getRealm,
   getTokenOwnerRecordForRealm,
   getRealmConfigAddress,
-  getRealmConfig,
+  GoverningTokenType,
+  GoverningTokenConfig,
   RpcContext,
+  GovernanceAccountParser,
+  RealmConfigAccount,
+  ProgramAccount,
 } from '@solana/spl-governance';
 import type {
   Connection,
@@ -65,10 +69,35 @@ export async function createProposal(args: Args) {
     getRealmConfigAddress(args.programPublicKey, args.realmPublicKey),
   ]);
 
-  const realmConfig = await getRealmConfig(
-    args.connection,
+  const realmConfigAccountInfo = await args.connection.getAccountInfo(
     realmConfigPublicKey,
   );
+
+  const realmConfig: ProgramAccount<RealmConfigAccount> = realmConfigAccountInfo
+    ? GovernanceAccountParser(RealmConfigAccount)(
+        realmConfigPublicKey,
+        realmConfigAccountInfo,
+      )
+    : {
+        pubkey: realmConfigPublicKey,
+        owner: args.programPublicKey,
+        account: new RealmConfigAccount({
+          realm: args.realmPublicKey,
+          communityTokenConfig: new GoverningTokenConfig({
+            voterWeightAddin: undefined,
+            maxVoterWeightAddin: undefined,
+            tokenType: GoverningTokenType.Liquid,
+            reserved: new Uint8Array(),
+          }),
+          councilTokenConfig: new GoverningTokenConfig({
+            voterWeightAddin: undefined,
+            maxVoterWeightAddin: undefined,
+            tokenType: GoverningTokenType.Liquid,
+            reserved: new Uint8Array(),
+          }),
+          reserved: new Uint8Array(),
+        }),
+      };
 
   const serializedInstructions = args.instructions.map(
     serializeInstructionToBase64,

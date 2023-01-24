@@ -13,7 +13,6 @@ import { ValueBlock } from '../ValueBlock';
 import { getLabel } from '../VoteTippingSelector';
 import { ButtonToggle } from '@hub/components/controls/ButtonToggle';
 import cx from '@hub/lib/cx';
-import { formatNumber } from '@hub/lib/formatNumber';
 import { ntext } from '@hub/lib/ntext';
 import { FormProps } from '@hub/types/FormProps';
 
@@ -46,17 +45,26 @@ export function ProposalVoteType(props: Props) {
       <ValueBlock
         title="Who should vote on this proposal?"
         description={
-          !!props.currentCouncilRules ? (
+          !!props.currentCouncilRules &&
+          props.currentCouncilRules.canVote &&
+          props.currentCommunityRules.canVote ? (
             'Community or council?'
+          ) : !props.currentCouncilRules ||
+            !props.currentCouncilRules.canVote ? (
+            <div className="text-amber-400 flex items-center">
+              <WarningFilledIcon className="h-4 w-4 mr-2" />
+              <div>This wallet currently only supports community voting.</div>
+            </div>
           ) : (
             <div className="text-amber-400 flex items-center">
               <WarningFilledIcon className="h-4 w-4 mr-2" />
-              <div>This wallet only supports community voting.</div>
+              <div>This wallet currently only supports council voting.</div>
             </div>
           )
         }
       >
         <ButtonToggle
+          disableValueTrue={!props.currentCommunityRules.canVote}
           disableValueFalse={!props.currentCouncilRules}
           value={props.proposalVoteType === 'community'}
           valueTrueText="Community"

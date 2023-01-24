@@ -28,7 +28,14 @@ interface Props
 }
 
 export function Form(props: Props) {
+  const [showCouncilOptions, setShowCouncilOptions] = useState(
+    props.currentCouncilRules?.canVote || false,
+  );
+  const [showCommunityOptions, setShowCommunityOptions] = useState(
+    props.currentCommunityRules.canVote,
+  );
   const [showAdvanceOptions, setShowAdvanceOptions] = useState(false);
+  const showCommunityFirst = props.currentCommunityRules.canVote;
 
   return (
     <article className={props.className}>
@@ -44,23 +51,71 @@ export function Form(props: Props) {
         Submitting updates to a wallet’s rules will create a proposal for the
         DAO to vote on. If approved, the updates will be ready to be executed.
       </p>
-      <div className="space-y-8">
+      <div>
         <VotingDuration
+          className="mb-8"
           coolOffHours={props.coolOffHours}
           maxVoteDays={props.maxVoteDays}
           onCoolOffHoursChange={props.onCoolOffHoursChange}
           onMaxVoteDaysChange={props.onMaxVoteDaysChange}
         />
-        <CommunityDetails
-          communityRules={props.communityRules}
-          currentCommunityRules={props.currentCommunityRules}
-          onCommunityRulesChange={props.onCommunityRulesChange}
-        />
-        {props.councilRules && props.currentCouncilRules && (
-          <CouncilDetails
-            councilRules={props.councilRules}
-            currentCouncilRules={props.currentCouncilRules}
-            onCouncilRulesChange={props.onCouncilRulesChange}
+        {showCommunityOptions && showCommunityFirst && (
+          <CommunityDetails
+            className="mb-8"
+            communityRules={props.communityRules}
+            currentCommunityRules={props.currentCommunityRules}
+            onCommunityRulesChange={props.onCommunityRulesChange}
+          />
+        )}
+        {!props.currentCouncilRules?.canVote && props.currentCouncilRules && (
+          <button
+            className="flex items-center text-sm text-neutral-500 mt-16 mb-2.5"
+            onClick={() => setShowCouncilOptions((cur) => !cur)}
+          >
+            Council Options{' '}
+            <ChevronDownIcon
+              className={cx(
+                'fill-current',
+                'h-4',
+                'transition-transform',
+                'w-4',
+                showCouncilOptions && '-rotate-180',
+              )}
+            />
+          </button>
+        )}
+        {showCouncilOptions &&
+          props.councilRules &&
+          props.currentCouncilRules && (
+            <CouncilDetails
+              className="mb-8"
+              councilRules={props.councilRules}
+              currentCouncilRules={props.currentCouncilRules}
+              onCouncilRulesChange={props.onCouncilRulesChange}
+            />
+          )}
+        {!props.currentCommunityRules.canVote && !showCommunityFirst && (
+          <button
+            className="flex items-center text-sm text-neutral-500 mt-16 mb-2.5"
+            onClick={() => setShowCommunityOptions((cur) => !cur)}
+          >
+            Community Options{' '}
+            <ChevronDownIcon
+              className={cx(
+                'fill-current',
+                'h-4',
+                'transition-transform',
+                'w-4',
+                showCommunityOptions && '-rotate-180',
+              )}
+            />
+          </button>
+        )}
+        {showCommunityOptions && !showCommunityFirst && (
+          <CommunityDetails
+            communityRules={props.communityRules}
+            currentCommunityRules={props.currentCommunityRules}
+            onCommunityRulesChange={props.onCommunityRulesChange}
           />
         )}
       </div>
