@@ -176,7 +176,7 @@ export const LockTokensModal: React.FC<{
             <div>
               There is a minimum required lockup time of{' '}
               <span className="bont-bold text-sm text-primary-light">
-                {getFormattedStringFromDays(Math.ceil(minLockupTimeInDays))}
+                {getFormattedStringFromDays(minLockupTimeInDays)}
               </span>
             </div>
           </div>

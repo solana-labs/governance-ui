@@ -16,10 +16,10 @@ import { sendTransaction } from '@utils/send'
 import { truthy } from '../utils/types'
 
 export const useCreatePosition = ({
-  registrar,
+  registrarPk,
   realm,
 }: {
-  registrar: PublicKey | undefined
+  registrarPk: PublicKey | undefined
   realm: ProgramAccount<Realm> | undefined
 }) => {
   const program = useHeliumVsr()
@@ -34,7 +34,7 @@ export const useCreatePosition = ({
       kind: { [key in 'cliff' | 'constant']?: Record<string, never> }
       periods: number
     }) => {
-      if (connection && registrar && realm && program && wallet) {
+      if (connection && registrarPk && realm && program && wallet) {
         if (loading) return
         const mintKeypair = Keypair.generate()
         const position = positionKey(mintKeypair.publicKey)[0]
@@ -69,7 +69,7 @@ export const useCreatePosition = ({
               periods,
             } as any)
             .accounts({
-              registrar,
+              registrar: registrarPk,
               mint: mintKeypair.publicKey,
               depositMint: realm.account.communityMint,
               recipient: wallet!.publicKey!,
@@ -83,17 +83,12 @@ export const useCreatePosition = ({
               amount,
             })
             .accounts({
-              registrar,
+              registrar: registrarPk,
               position,
               mint: realm.account.communityMint,
             })
             .instruction()
         )
-
-        console.log('mint', mintKeypair.publicKey.toBase58())
-        console.log('registrar', registrar.toBase58())
-        console.log('recipient', wallet!.publicKey!.toBase58())
-        console.log('position', position.toBase58())
 
         const tx = new Transaction()
         tx.add(...instructions)

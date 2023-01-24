@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { BN } from '@project-serum/anchor'
 import {
   LightningBoltIcon,
@@ -21,24 +21,33 @@ import tokenPriceService from '@utils/services/tokenPrice'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import { abbreviateAddress } from '@utils/formatting'
 import Button from '@components/Button'
-import { usePositions } from '../hooks/usePositions'
-import { LockCommunityTokensBtn } from './LockCommunityTokensBtn'
-import { LockTokensModal, LockTokensModalFormValues } from './LockTokensModal'
 import { daysToSecs, secsToDays } from 'VoteStakeRegistry/tools/dateTools'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { useCreatePosition } from 'HeliumVoteStakeRegistry/hooks/useCreatePosition'
+import { LockCommunityTokensBtn } from './LockCommunityTokensBtn'
+import { LockTokensModal, LockTokensModalFormValues } from './LockTokensModal'
+import { usePositions } from '../hooks/usePositions'
+import { useCreatePosition } from '../hooks/useCreatePosition'
 import { calcLockupMultiplier } from '../utils/calcLockupMultiplier'
+import BigNumber from 'bignumber.js'
 
 export const LockTokensAccount: React.FC<{
   tokenOwnerRecordPk: string | string[] | undefined
   children: React.ReactNode
 }> = ({ tokenOwnerRecordPk, children }) => {
   const { realm, realmTokenAccount, realmInfo, mint, councilMint } = useRealm()
+  const [
+    vsrClient,
+    vsrRegistrar,
+    vsrRegistrarPk,
+  ] = useVotePluginsClientStore((s) => [
+    s.state.vsrClient,
+    s.state.voteStakeRegistryRegistrar,
+    s.state.voteStakeRegistryRegistrarPk,
+  ])
   const [isLoading, setIsLoading] = useState(false)
   const [isOwnerOfPositions, setIsOwnerOfPositions] = useState(true)
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
-  const [votingPower, setVotingPower] = useState<BN>(new BN(0))
-  const { positions } = usePositions()
+  const [amountLocked, setAmountLocked] = useState<BN>(new BN(0))
   const [
     connected,
     connection,
@@ -50,20 +59,36 @@ export const LockTokensAccount: React.FC<{
     s.current,
     s.actions,
   ])
-  const [
-    vsrClient,
-    vsrRegistrar,
-    vsrRegistrarPk,
-  ] = useVotePluginsClientStore((s) => [
-    s.state.vsrClient,
-    s.state.voteStakeRegistryRegistrar,
-    s.state.voteStakeRegistryRegistrarPk,
-  ])
 
-  const { error, loading, createPosition } = useCreatePosition({
-    realm,
-    registrar: vsrRegistrarPk || undefined,
+  const {
+    // error,
+    // loading,
+    positions,
+    votingPower,
+    refetchPostions,
+  } = usePositions({
+    registrarPk: vsrRegistrarPk || undefined,
   })
+
+  const {
+    error,
+    // loading,
+    createPosition,
+  } = useCreatePosition({
+    realm,
+    registrarPk: vsrRegistrarPk || undefined,
+  })
+
+  useEffect(() => {
+    if (positions.length) {
+      setAmountLocked(
+        positions.reduce(
+          (acc, pos) => acc.add(pos.amountDepositedNative),
+          new BN(0)
+        )
+      )
+    }
+  }, [positions, setAmountLocked])
 
   const communityVotingMintCfg = vsrRegistrar?.votingMints.find((vm) =>
     vm.mint.equals(realm!.account.communityMint)
@@ -85,10 +110,20 @@ export const LockTokensAccount: React.FC<{
   const hasTokensInWallet =
     realmTokenAccount && realmTokenAccount.account.amount.gt(new BN(0))
 
+  const votingPowerDisplay =
+    votingPower && mint
+      ? new BigNumber(
+          getMintDecimalAmount(mint, votingPower).toFixed(2)
+        ).toFormat()
+      : '0'
+
   const availableTokensDisplay =
     hasTokensInWallet && mint
       ? fmtMintAmount(mint, realmTokenAccount?.account.amount as BN)
       : '0'
+
+  const amountLockedDisplay =
+    amountLocked && mint ? fmtMintAmount(mint, amountLocked) : '0'
 
   const maxLockupAmount =
     hasTokensInWallet && mint
@@ -104,6 +139,14 @@ export const LockTokensAccount: React.FC<{
           mint,
           realmTokenAccount?.account.amount
         ).toNumber() *
+        tokenPriceService.getUSDTokenPrice(
+          realm?.account.communityMint.toBase58()
+        )
+      : 0
+
+  const lockedTokensPrice =
+    amountLocked && mint && realm?.account.communityMint
+      ? getMintDecimalAmountFromNatural(mint, amountLocked).toNumber() *
         tokenPriceService.getUSDTokenPrice(
           realm?.account.communityMint.toBase58()
         )
@@ -133,15 +176,20 @@ export const LockTokensAccount: React.FC<{
       mint!.decimals
     )
 
+    // vsr periods cant are u32
+    // 6 month min lockup is 182.5 days
+    // so we lose the .5 and the ix fails
+    // ceil to ensure its >= minimum required lockup
     await createPosition({
       amount: amountToLock,
-      periods: Math.ceil(lockupPeriodInDays),
+      periods: lockupPeriodInDays,
       kind: { [lockupType.value]: {} },
     })
 
     if (!error) {
       fetchWalletTokenAccounts()
       fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+      await refetchPostions()
     }
   }
 
@@ -193,9 +241,7 @@ export const LockTokensAccount: React.FC<{
                     {mint && (
                       <div className={mainBoxesClasses}>
                         <p className="text-fgd-3">Votes</p>
-                        <span className="hero-text">
-                          {votingPower.toNumber()}
-                        </span>
+                        <span className="hero-text">{votingPowerDisplay}</span>
                       </div>
                     )}
                   </div>
@@ -213,31 +259,44 @@ export const LockTokensAccount: React.FC<{
                       ) : null}
                     </span>
                   </div>
-                  {/* iterate over positions and calc */}
                   <div className={mainBoxesClasses}>
                     <p className="text-fgd-3">Locked</p>
                     <span className="hero-text">
-                      0
+                      {amountLockedDisplay}
                       <span className="font-normal text-xs ml-2">
-                        <span className="text-fgd-3">≈</span>${0}
+                        <span className="text-fgd-3">≈</span>$
+                        {Intl.NumberFormat('en', {
+                          notation: 'compact',
+                        }).format(lockedTokensPrice)}
                       </span>
                     </span>
                   </div>
-                  <div className="border border-fgd-4 flex flex-col items-center justify-center p-6 rounded-lg">
-                    <LightningBoltIcon className="h-8 mb-2 text-primary-light w-8" />
-                    <p className="flex text-center pb-6">
-                      Increase your voting power by<br></br> locking your
-                      tokens.
-                    </p>
-                    <Button onClick={() => setIsLockModalOpen(true)}>
-                      <div className="flex items-center">
-                        <LockClosedIcon className="h-5 mr-1.5 w-5" />
-                        <span>Lock Tokens</span>
-                      </div>
-                    </Button>
-                  </div>
                 </>
               )}
+            </div>
+            <h2 className="mb-4">Locked Positions</h2>
+            <div
+              className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8 ${
+                !isOwnerOfPositions ? 'opacity-0.8 pointer-events-none' : ''
+              }`}
+            >
+              {positions.map((pos, idx) => (
+                <div className={mainBoxesClasses} key={idx}>
+                  test
+                </div>
+              ))}
+              <div className="border border-fgd-4 flex flex-col items-center justify-center p-6 rounded-lg">
+                <LightningBoltIcon className="h-8 mb-2 text-primary-light w-8" />
+                <p className="flex text-center pb-6">
+                  Increase your voting power by<br></br> locking your tokens.
+                </p>
+                <Button onClick={() => setIsLockModalOpen(true)}>
+                  <div className="flex items-center">
+                    <LockClosedIcon className="h-5 mr-1.5 w-5" />
+                    <span>Lock Tokens</span>
+                  </div>
+                </Button>
+              </div>
             </div>
           </div>
         ) : (
@@ -253,6 +312,10 @@ export const LockTokensAccount: React.FC<{
             minLockupTimeInDays={secsToDays(
               ((communityVotingMintCfg as any)
                 ?.minimumRequiredLockupSecs as BN).toNumber() || 0
+            )}
+            maxLockupTimeInDays={secsToDays(
+              ((communityVotingMintCfg as any)
+                ?.lockupSaturationSecs as BN).toNumber() || 0
             )}
             calcMultiplierFn={handleCalcLockupMultiplier}
             onClose={() => setIsLockModalOpen(false)}

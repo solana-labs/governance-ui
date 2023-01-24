@@ -7,6 +7,9 @@ export type VotingMintConfig = IdlTypes<HeliumVoterStakeRegistry>['VotingMintCon
 export type Registrar = IdlAccounts<HeliumVoterStakeRegistry>['registrar'] & {
   votingMints: VotingMintConfig[]
 }
-export type Position = IdlAccounts<HeliumVoterStakeRegistry>['positionV0']
+export type Lockup = IdlTypes<HeliumVoterStakeRegistry>['Lockup']
+export type Position = IdlAccounts<HeliumVoterStakeRegistry>['positionV0'] & {
+  lockup: Lockup
+}
 export type LockupKind = IdlTypes<HeliumVoterStakeRegistry>['LockupKind']
 export type InitializePositionV0Args = IdlTypes<HeliumVoterStakeRegistry>['InitializePositionArgsV0']

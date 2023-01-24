@@ -1,7 +1,6 @@
 import { PublicKey } from '@solana/web3.js'
 import { ProgramAccount, Realm } from '@solana/spl-governance'
-import { Registrar } from './types'
-import { daysToSecs, secsToDays } from 'VoteStakeRegistry/tools/dateTools'
+import { Registrar, VotingMintConfig } from './types'
 
 export const calcMultiplier = ({
   lockedScaledFactor,
@@ -47,7 +46,7 @@ export const calcLockupMultiplier = ({
   realm: ProgramAccount<Realm> | undefined
 }) => {
   let multiplier = 0
-  const mintCfgs = registrar?.votingMints
+  const mintCfgs = registrar?.votingMints || []
   const mintCfg = mintCfgs?.find((cfg) =>
     cfg.mint.equals(realm?.account.communityMint || PublicKey.default)
   )
@@ -59,7 +58,7 @@ export const calcLockupMultiplier = ({
       lockedVoteWeightScaledFactor,
       maxExtraLockupVoteWeightScaledFactor,
       // genesisVotePowerMultiplier,
-    } = mintCfg
+    } = mintCfg as VotingMintConfig
     const lockedScaledFactorNum = lockedVoteWeightScaledFactor.toNumber()
     const maxExtraLockupVoteWeightScaledFactorNum = maxExtraLockupVoteWeightScaledFactor.toNumber()
     const minimumRequiredLockupSecsNum = minimumRequiredLockupSecs.toNumber()
