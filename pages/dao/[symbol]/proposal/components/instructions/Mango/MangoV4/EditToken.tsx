@@ -300,7 +300,7 @@ const EditToken = ({
       label: 'Tokens',
       name: 'token',
       type: InstructionInputType.SELECT,
-      initialValue: null,
+      initialValue: form.token,
       options: tokens,
     },
     {
