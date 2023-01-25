@@ -39,7 +39,7 @@ const Serum3EditMarket = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { getClient, ADMIN_PK, GROUP } = UseMangoV4()
+  const { getClient, GROUP } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
@@ -80,13 +80,12 @@ const Serum3EditMarket = ({
       const market = group.serum3MarketsMapByMarketIndex.get(
         Number(form.market?.value)
       )
-      //TODO dao sol account as payer
-      //Mango instruction call and serialize
+
       const ix = await client.program.methods
         .serum3EditMarket(form.reduceOnly)
         .accounts({
           group: group.publicKey,
-          admin: ADMIN_PK,
+          admin: form.governedAccount.extensions.transferAddress,
           market: market!.publicKey,
         })
         .instruction()
@@ -165,7 +164,7 @@ const Serum3EditMarket = ({
       label: 'Market',
       name: 'market',
       type: InstructionInputType.SELECT,
-      initialValue: null,
+      initialValue: form.market,
       options: currentMarkets,
     },
     {

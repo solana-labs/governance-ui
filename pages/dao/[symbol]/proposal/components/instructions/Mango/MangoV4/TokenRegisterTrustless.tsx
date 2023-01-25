@@ -72,7 +72,6 @@ const TokenRegisterTrustless = ({
       const group = await client.getGroup(GROUP)
       const tokenIndex = group.banksMapByName.size
       //Mango instruction call and serialize
-      console.log(group.publicKey.toBase58())
       const ix = await client.program.methods
         .tokenRegisterTrustless(tokenIndex, form.name)
         .accounts({
