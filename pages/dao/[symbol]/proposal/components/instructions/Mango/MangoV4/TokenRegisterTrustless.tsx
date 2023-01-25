@@ -72,15 +72,15 @@ const TokenRegisterTrustless = ({
       const group = await client.getGroup(GROUP)
       const tokenIndex = group.banksMapByName.size
       //Mango instruction call and serialize
-      //TODO dao sol account as payer
+      console.log(group.publicKey.toBase58())
       const ix = await client.program.methods
         .tokenRegisterTrustless(tokenIndex, form.name)
         .accounts({
           group: group.publicKey,
-          fastListingAdmin: form.governedAccount.governance.pubkey,
+          fastListingAdmin: form.governedAccount.extensions.transferAddress,
           mint: new PublicKey(form.mintPk),
           oracle: new PublicKey(form.oraclePk),
-          payer: wallet.publicKey,
+          payer: form.governedAccount.extensions.transferAddress,
           rent: SYSVAR_RENT_PUBKEY,
         })
         .instruction()

@@ -143,13 +143,13 @@ const Serum3RegisterMarket = ({
       name: 'serum3MarketExternalPk',
     },
     {
-      label: 'Base Bank Token Name',
+      label: 'Base Bank Mint',
       initialValue: form.baseBankMintPk,
       type: InstructionInputType.INPUT,
       name: 'baseBankMintPk',
     },
     {
-      label: 'Quote Bank Token Name',
+      label: 'Quote Bank Mint',
       initialValue: form.quoteBankMintPk,
       type: InstructionInputType.INPUT,
       name: 'quoteBankMintPk',

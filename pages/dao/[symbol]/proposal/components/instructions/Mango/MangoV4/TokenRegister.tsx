@@ -52,7 +52,7 @@ const TokenRegister = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { getClient, ADMIN_PK, GROUP } = UseMangoV4()
+  const { getClient, GROUP } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
@@ -107,16 +107,18 @@ const TokenRegister = ({
       const client = await getClient(connection, wallet)
       const group = await client.getGroup(GROUP)
       const tokenIndex = group.banksMapByMint.size
-      //Mango instruction call and serialize
-      //TODO dao sol account as payer
+      const usdcDevnetOracle = (
+        await client.getStubOracle(group, new PublicKey(form.mintPk))
+      )[0]
+      console.log(usdcDevnetOracle.publicKey.toBase58())
       const ix = await client.program.methods
         .tokenRegister(
-          tokenIndex,
+          Number(tokenIndex),
           form.name,
           {
             confFilter: Number(form.oracleConfFilter),
             maxStalenessSlots: null,
-          }, // future: nested custom types dont typecheck, fix if possible?
+          },
           {
             adjustmentFactor: Number(form.adjustmentFactor),
             util0: Number(form.util0),
@@ -138,10 +140,10 @@ const TokenRegister = ({
         )
         .accounts({
           group: group.publicKey,
-          admin: ADMIN_PK,
+          admin: form.governedAccount.extensions.transferAddress,
           mint: new PublicKey(form.mintPk),
-          oracle: new PublicKey(form.oraclePk),
-          payer: wallet.publicKey,
+          oracle: usdcDevnetOracle.publicKey,
+          payer: form.governedAccount.extensions.transferAddress,
           rent: SYSVAR_RENT_PUBKEY,
         })
         .instruction()
