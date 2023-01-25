@@ -45,7 +45,6 @@ export const LockTokensAccount: React.FC<{
     s.state.voteStakeRegistryRegistrar,
     s.state.voteStakeRegistryRegistrarPk,
   ])
-  const [isLoading, setIsLoading] = useState(false)
   const [isOwnerOfPositions, setIsOwnerOfPositions] = useState(true)
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
   const [amountLocked, setAmountLocked] = useState<BN>(new BN(0))
@@ -62,8 +61,8 @@ export const LockTokensAccount: React.FC<{
   ])
 
   const {
-    // error,
-    // loading,
+    error,
+    loading,
     positions,
     votingPower,
     refetchPostions,
@@ -72,7 +71,8 @@ export const LockTokensAccount: React.FC<{
   })
 
   const {
-    error,
+    // TODO: Do Someting with these
+    // error,
     // loading,
     createPosition,
   } = useCreatePosition({
@@ -157,10 +157,6 @@ export const LockTokensAccount: React.FC<{
       mint!.decimals
     )
 
-    // vsr periods cant are u32
-    // 6 month min lockup is 182.5 days
-    // so we lose the .5 and the ix fails
-    // ceil to ensure its >= minimum required lockup
     await createPosition({
       amount: amountToLock,
       periods: lockupPeriodInDays,
@@ -210,7 +206,7 @@ export const LockTokensAccount: React.FC<{
         {connected ? (
           <div>
             <div className="grid md:grid-cols-3 grid-flow-row gap-4 pb-8">
-              {isLoading ? (
+              {loading ? (
                 <>
                   <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-md" />
                   <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-md" />

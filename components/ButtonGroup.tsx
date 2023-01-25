@@ -7,7 +7,6 @@ interface ButtonGroupProps {
   unit?: string
   values: Array<string>
   names?: Array<string>
-  style?: any
 }
 
 const ButtonGroup: FunctionComponent<ButtonGroupProps> = ({
@@ -17,10 +16,9 @@ const ButtonGroup: FunctionComponent<ButtonGroupProps> = ({
   values,
   onChange,
   names,
-  style = '',
 }) => {
   return (
-    <div className="bg-bkg-3 rounded-md" style={style}>
+    <div className="bg-bkg-3 rounded-md">
       <div className="flex relative">
         {activeValue && values.includes(activeValue) ? (
           <div
