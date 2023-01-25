@@ -1,5 +1,5 @@
 import { BN } from '@project-serum/anchor'
-import { DepositWithMintAccount } from 'VoteStakeRegistry/sdk/accounts'
+import { DepositWithMintAccount, Lockup } from 'VoteStakeRegistry/sdk/accounts'
 
 export const DAYS_PER_YEAR = 365
 export const SECS_PER_DAY = 86400
@@ -56,18 +56,16 @@ export const daysToMonths = (days: number) => {
   return days / DAYS_PER_MONTH
 }
 
-export const getMinDurationFmt = (deposit: DepositWithMintAccount) => {
-  return getFormattedStringFromDays(getMinDurationInDays(deposit))
+export const getMinDurationFmt = (lockup: Lockup) => {
+  return getFormattedStringFromDays(getMinDurationInDays(lockup))
 }
-export const getTimeLeftFromNowFmt = (deposit: DepositWithMintAccount) => {
+export const getTimeLeftFromNowFmt = (lockup: Lockup) => {
   const dateNowSecTimeStampBN = new BN(new Date().getTime() / 1000)
   return getFormattedStringFromDays(
-    deposit.lockup.endTs.sub(dateNowSecTimeStampBN).toNumber() / SECS_PER_DAY
+    lockup.endTs.sub(dateNowSecTimeStampBN).toNumber() / SECS_PER_DAY
   )
 }
 
-export const getMinDurationInDays = (deposit: DepositWithMintAccount) => {
-  return (
-    deposit.lockup.endTs.sub(deposit.lockup.startTs).toNumber() / SECS_PER_DAY
-  )
+export const getMinDurationInDays = (lockup: Lockup) => {
+  return lockup.endTs.sub(lockup.startTs).toNumber() / SECS_PER_DAY
 }

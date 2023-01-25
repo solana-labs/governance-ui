@@ -8,7 +8,14 @@ import { positionKey } from '@helium/voter-stake-registry-sdk'
 import { chunks } from '../utils'
 import { calcPositionVotingPower } from '../utils/calcPositionVotingPower'
 import { BN } from '@project-serum/anchor'
-import { Registrar, Position, Lockup, LockupKind } from '../utils/types'
+import {
+  Registrar,
+  Lockup,
+  LockupKind,
+  Position,
+  PositionWithVotingMint,
+} from '../utils/types'
+import { tryGetMint } from '@utils/tokens'
 
 export const usePositions = ({
   registrarPk,
@@ -18,7 +25,7 @@ export const usePositions = ({
   const program = useHeliumVsr()
   const { connection, connected, wallet } = useWallet()
   const [state, setState] = useState<{
-    positions: Position[]
+    positions: PositionWithVotingMint[]
     votingPower: BN
   }>({ positions: [], votingPower: new BN(0) })
   const { error, loading, execute } = useAsyncCallback(async () => {
@@ -29,9 +36,16 @@ export const usePositions = ({
       const registrar = (await program.account.registrar.fetch(
         registrarPk
       )) as Registrar
-      let positions: Position[] = []
+      const mintCfgs = registrar?.votingMints || []
+      const mints = {}
+      let positions: PositionWithVotingMint[] = []
       let votingPower = new BN(0)
       metaplex.use(keypairIdentity(keypair))
+      for (const i of mintCfgs) {
+        const mint = await tryGetMint(connection.current, i.mint)
+        mints[i.mint.toBase58()] = mint
+      }
+
       const posKeys = (
         await metaplex.nfts().findAllByOwner({
           owner: wallet!.publicKey!,
@@ -51,6 +65,16 @@ export const usePositions = ({
         .map(
           (pos) =>
             program.coder.accounts.decode('PositionV0', pos!.data) as Position
+        )
+        .map(
+          (pos) =>
+            ({
+              ...pos,
+              votingMint: {
+                ...mintCfgs[pos.votingMintConfigIdx],
+                mint: mints[mintCfgs[pos.votingMintConfigIdx].mint.toBase58()],
+              },
+            } as PositionWithVotingMint)
         )
         .filter((pos) => {
           const lockup = pos.lockup as Lockup

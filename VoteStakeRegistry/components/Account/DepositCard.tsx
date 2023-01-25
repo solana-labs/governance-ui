@@ -208,8 +208,8 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
             label={isConstant ? 'Min. Duration' : 'Time left'}
             value={
               isConstant
-                ? getMinDurationFmt(deposit)
-                : getTimeLeftFromNowFmt(deposit)
+                ? getMinDurationFmt(deposit.lockup)
+                : getTimeLeftFromNowFmt(deposit.lockup)
             }
           />
           <CardLabel

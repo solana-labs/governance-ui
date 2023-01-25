@@ -611,8 +611,8 @@ const LockTokenStats = () => {
                       </Td>
                       <Td>
                         {isConstant
-                          ? getMinDurationFmt(x.deposit as any)
-                          : getTimeLeftFromNowFmt(x.deposit as any)}
+                          ? getMinDurationFmt(x.deposit.lockup as any)
+                          : getTimeLeftFromNowFmt(x.deposit.lockup as any)}
                       </Td>
                       <Td>{lockedTokens}</Td>
                     </TrBody>
@@ -664,8 +664,8 @@ const LockTokenStats = () => {
                         </div>
                         <div className="text-fgd-2 text-sm">
                           {isConstant
-                            ? getMinDurationFmt(x.deposit as any)
-                            : getTimeLeftFromNowFmt(x.deposit as any)}
+                            ? getMinDurationFmt(x.deposit.lockup as any)
+                            : getTimeLeftFromNowFmt(x.deposit.lockup as any)}
                         </div>
                       </div>
                     </div>

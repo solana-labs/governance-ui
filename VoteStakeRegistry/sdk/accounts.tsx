@@ -46,11 +46,13 @@ interface LockupKind {
   cliff: object
   constant: object
 }
-interface Lockup {
+
+export interface Lockup {
   endTs: BN
   kind: LockupKind
   startTs: BN
 }
+
 export interface Deposit {
   allowClawback: boolean
   amountDepositedNative: BN

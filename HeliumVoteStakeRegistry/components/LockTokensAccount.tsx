@@ -28,7 +28,8 @@ import { LockTokensModal, LockTokensModalFormValues } from './LockTokensModal'
 import { usePositions } from '../hooks/usePositions'
 import { useCreatePosition } from '../hooks/useCreatePosition'
 import { calcLockupMultiplier } from '../utils/calcLockupMultiplier'
-import BigNumber from 'bignumber.js'
+import VotingPowerBox from 'VoteStakeRegistry/components/TokenBalance/VotingPowerBox'
+import { PositionCard } from './PositionCard'
 
 export const LockTokensAccount: React.FC<{
   tokenOwnerRecordPk: string | string[] | undefined
@@ -93,29 +94,9 @@ export const LockTokensAccount: React.FC<{
   const communityVotingMintCfg = vsrRegistrar?.votingMints.find((vm) =>
     vm.mint.equals(realm!.account.communityMint)
   )
-  // const tokenOwnerRecordWalletPk = Object.keys(tokenRecords)?.find(
-  //   (key) => tokenRecords[key]?.pubkey?.toBase58() === tokenOwnerRecordPk
-  // )
-  // const isNextSameRecord = (x, next) => {
-  //   const nextType = Object.keys(next.lockup.kind)[0]
-  //   return (
-  //     x.mintPk.toBase58() === next.mint.publicKey.toBase58() &&
-  //     ((!unlockedTypes.includes(x.lockUpKind) &&
-  //       !unlockedTypes.includes(nextType)) ||
-  //       (unlockedTypes.includes(x.lockUpKind) &&
-  //         unlockedTypes.includes(nextType)))
-  //   )
-  // }
 
   const hasTokensInWallet =
     realmTokenAccount && realmTokenAccount.account.amount.gt(new BN(0))
-
-  const votingPowerDisplay =
-    votingPower && mint
-      ? new BigNumber(
-          getMintDecimalAmount(mint, votingPower).toFixed(2)
-        ).toFormat()
-      : '0'
 
   const availableTokensDisplay =
     hasTokensInWallet && mint
@@ -239,10 +220,12 @@ export const LockTokensAccount: React.FC<{
                 <>
                   <div className="col-span-1">
                     {mint && (
-                      <div className={mainBoxesClasses}>
-                        <p className="text-fgd-3">Votes</p>
-                        <span className="hero-text">{votingPowerDisplay}</span>
-                      </div>
+                      <VotingPowerBox
+                        className={mainBoxesClasses}
+                        mint={mint}
+                        votingPower={votingPower}
+                        votingPowerFromDeposits={amountLocked}
+                      />
                     )}
                   </div>
                   <div className={mainBoxesClasses}>
@@ -281,9 +264,7 @@ export const LockTokensAccount: React.FC<{
               }`}
             >
               {positions.map((pos, idx) => (
-                <div className={mainBoxesClasses} key={idx}>
-                  test
-                </div>
+                <PositionCard position={pos} key={idx} />
               ))}
               <div className="border border-fgd-4 flex flex-col items-center justify-center p-6 rounded-lg">
                 <LightningBoltIcon className="h-8 mb-2 text-primary-light w-8" />

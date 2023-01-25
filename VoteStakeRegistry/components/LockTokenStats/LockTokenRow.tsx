@@ -71,8 +71,8 @@ const LockTokenRow = ({
       <div>{typeName}</div>
       <div>
         {isConstant
-          ? getMinDurationFmt(depositWithWallet.deposit as any)
-          : getTimeLeftFromNowFmt(depositWithWallet.deposit as any)}
+          ? getMinDurationFmt(depositWithWallet.deposit.lockup as any)
+          : getTimeLeftFromNowFmt(depositWithWallet.deposit.lockup as any)}
       </div>
       <div>{lockedTokens}</div>
     </div>
