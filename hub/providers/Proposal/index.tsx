@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 
-import { useCluster } from '@hub/hooks/useCluster';
+import { ClusterType, useCluster } from '@hub/hooks/useCluster';
 import { useToast, ToastType } from '@hub/hooks/useToast';
 import { useWallet } from '@hub/hooks/useWallet';
 
@@ -9,6 +9,7 @@ import { createProposal } from './createProposal';
 type CreateProposalsArgs = Omit<
   Parameters<typeof createProposal>[0],
   | 'connection'
+  | 'cluster'
   | 'signTransaction'
   | 'signAllTransactions'
   | 'requestingUserPublicKey'
@@ -50,6 +51,12 @@ export function ProposalProvider(props: Props) {
 
             return createProposal({
               ...args,
+              cluster:
+                cluster.type === ClusterType.Devnet
+                  ? 'devnet'
+                  : cluster.type === ClusterType.Mainnet
+                  ? 'mainnet'
+                  : 'localnet',
               connection: cluster.connection,
               requestingUserPublicKey: publicKey,
               signAllTransactions,

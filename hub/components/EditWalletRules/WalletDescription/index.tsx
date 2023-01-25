@@ -26,7 +26,14 @@ export function WalletDescription(props: Props) {
         <div className="dark:text-white">{name || `Wallet ${address}`}</div>
       </div>
       <div className="flex items-center mt-1 ml-2">
-        <div className="text-xs dark:text-neutral-500">{address}</div>
+        <a
+          className="text-xs dark:text-neutral-500 hover:underline"
+          href={`https://explorer.solana.com/address/${props.governanceAddress}`}
+          target="_blank"
+          rel="noreferrer"
+        >
+          {address}
+        </a>
         <CopyAddressButton address={props.walletAddress} className="group ml-2">
           <CopyIcon className="h-3 transition-colors w-3 dark:fill-neutral-500 dark:group-hover:fill-neutral-300" />
         </CopyAddressButton>

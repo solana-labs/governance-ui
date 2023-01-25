@@ -23,6 +23,7 @@ import {
   InstructionDataWithHoldUpTime,
   createProposal as _createProposal,
 } from 'actions/createProposal';
+import { tryGetNftRegistrar } from 'VoteStakeRegistry/sdk/api';
 
 import {
   vsrPluginsPks,
@@ -31,12 +32,17 @@ import {
   switchboardPluginsPks,
   pythPluginsPks,
 } from '@hooks/useVotingPlugins';
-import { VotingClient } from '@utils/uiTypes/VotePlugin';
+import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts';
+import { getNfts } from '@utils/tokens';
+import { NFTWithMeta, VotingClient } from '@utils/uiTypes/VotePlugin';
 
 import { fetchPlugins } from './fetchPlugins';
 
 interface Args {
+  cluster?: string;
   connection: Connection;
+  councilTokenMintPublicKey?: PublicKey;
+  communityTokenMintPublicKey?: PublicKey;
   governancePublicKey: PublicKey;
   governingTokenMintPublicKey: PublicKey;
   instructions: TransactionInstruction[];
@@ -56,6 +62,8 @@ export async function createProposal(args: Args) {
     realm,
     tokenOwnerRecord,
     realmConfigPublicKey,
+    councilTokenOwnerRecord,
+    communityTokenOwnerRecord,
   ] = await Promise.all([
     getGovernance(args.connection, args.governancePublicKey),
     getRealm(args.connection, args.realmPublicKey),
@@ -67,6 +75,24 @@ export async function createProposal(args: Args) {
       args.requestingUserPublicKey,
     ),
     getRealmConfigAddress(args.programPublicKey, args.realmPublicKey),
+    args.councilTokenMintPublicKey
+      ? getTokenOwnerRecordForRealm(
+          args.connection,
+          args.programPublicKey,
+          args.realmPublicKey,
+          args.councilTokenMintPublicKey,
+          args.requestingUserPublicKey,
+        )
+      : undefined,
+    args.communityTokenMintPublicKey
+      ? getTokenOwnerRecordForRealm(
+          args.connection,
+          args.programPublicKey,
+          args.realmPublicKey,
+          args.communityTokenMintPublicKey,
+          args.requestingUserPublicKey,
+        )
+      : undefined,
   ]);
 
   const realmConfigAccountInfo = await args.connection.getAccountInfo(
@@ -126,9 +152,10 @@ export async function createProposal(args: Args) {
     } as Wallet,
   );
 
-  let votingClient: VotingClient | undefined = undefined;
   const pluginPublicKey =
     realmConfig.account.communityTokenConfig.voterWeightAddin;
+  let votingClient: VotingClient | undefined = undefined;
+  let votingNfts: NFTWithMeta[] = [];
 
   if (pluginPublicKey) {
     const pluginPublicKeyStr = pluginPublicKey.toBase58();
@@ -141,6 +168,37 @@ export async function createProposal(args: Args) {
 
     if (nftPluginsPks.includes(pluginPublicKeyStr) && votingPlugins.nftClient) {
       client = votingPlugins.nftClient;
+
+      if (client && args.communityTokenMintPublicKey) {
+        const programId = client.program.programId;
+        const registrarPDA = (
+          await getPluginRegistrarPDA(
+            args.realmPublicKey,
+            args.communityTokenMintPublicKey,
+            programId,
+          )
+        ).registrar;
+
+        const registrar: any = await tryGetNftRegistrar(registrarPDA, client);
+        const collections: string[] =
+          registrar?.collectionConfigs.map((x: any) =>
+            x.collection.toBase58(),
+          ) || [];
+
+        const nfts = await getNfts(args.requestingUserPublicKey, {
+          cluster: args.cluster,
+        } as any);
+
+        votingNfts = nfts.filter(
+          (nft) =>
+            nft.collection &&
+            nft.collection.mintAddress &&
+            (nft.collection.verified ||
+              typeof nft.collection.verified === 'undefined') &&
+            collections.includes(nft.collection.mintAddress) &&
+            nft.collection.creators?.filter((x) => x.verified).length > 0,
+        );
+      }
     }
 
     if (
@@ -170,6 +228,8 @@ export async function createProposal(args: Args) {
         client,
         walletPk: args.requestingUserPublicKey,
       });
+
+      votingClient._setCurrentVoterNfts(votingNfts);
     }
   }
 

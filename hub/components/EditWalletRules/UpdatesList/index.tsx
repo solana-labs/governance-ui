@@ -187,7 +187,7 @@ export function UpdatesList(props: Props) {
                 label="Cool-Off Voting Time"
                 value={
                   <div className="flex items-baseline">
-                    {votingDurationDiff.coolOffHours[1] ? (
+                    {typeof votingDurationDiff.coolOffHours[1] === 'number' ? (
                       <div>
                         {votingDurationDiff.coolOffHours[1]}{' '}
                         {ntext(votingDurationDiff.coolOffHours[1], 'hour')}
@@ -195,13 +195,15 @@ export function UpdatesList(props: Props) {
                     ) : (
                       <div>Disabled</div>
                     )}
-                    {votingDurationDiff.coolOffHours[0] ? (
+                    {typeof votingDurationDiff.coolOffHours[0] === 'number' ? (
                       <div className="ml-3 text-base text-neutral-500 line-through">
                         {votingDurationDiff.coolOffHours[0]}{' '}
                         {ntext(votingDurationDiff.coolOffHours[0], 'hour')}
                       </div>
                     ) : (
-                      <div>Disabled</div>
+                      <div className="ml-3 text-base text-neutral-500 line-through">
+                        Disabled
+                      </div>
                     )}
                   </div>
                 }
@@ -306,7 +308,9 @@ export function UpdatesList(props: Props) {
                         {communityDetailsDiff.quorumPercent[0]}%
                       </div>
                     ) : (
-                      <div>Disabled</div>
+                      <div className="ml-3 text-base text-neutral-500 line-through">
+                        Disabled
+                      </div>
                     )}
                   </div>
                 }
@@ -327,7 +331,9 @@ export function UpdatesList(props: Props) {
                         {getLabel(communityDetailsDiff.voteTipping[0])}
                       </div>
                     ) : (
-                      <div>Disabled</div>
+                      <div className="ml-3 text-base text-neutral-500 line-through">
+                        Disabled
+                      </div>
                     )}
                   </div>
                 }
@@ -459,7 +465,9 @@ export function UpdatesList(props: Props) {
                         {councilDetailsDiff.quorumPercent[0]}%
                       </div>
                     ) : (
-                      <div>Disabled</div>
+                      <div className="ml-3 text-base text-neutral-500 line-through">
+                        Disabled
+                      </div>
                     )}
                   </div>
                 }
@@ -480,7 +488,9 @@ export function UpdatesList(props: Props) {
                         {getLabel(councilDetailsDiff.voteTipping[0])}
                       </div>
                     ) : (
-                      <div>Disabled</div>
+                      <div className="ml-3 text-base text-neutral-500 line-through">
+                        Disabled
+                      </div>
                     )}
                   </div>
                 }
@@ -563,7 +573,9 @@ export function UpdatesList(props: Props) {
                       )}
                     </div>
                   ) : (
-                    <div>Disabled</div>
+                    <div className="ml-3 text-base text-neutral-500 line-through">
+                      Disabled
+                    </div>
                   )}
                 </div>
               }

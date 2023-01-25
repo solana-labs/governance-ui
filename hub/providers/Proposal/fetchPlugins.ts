@@ -17,7 +17,6 @@ export async function fetchPlugins(
   isDevnet?: boolean,
 ) {
   const defaultOptions = AnchorProvider.defaultOptions();
-
   const anchorProvider = new AnchorProvider(connection, wallet, defaultOptions);
 
   const [
