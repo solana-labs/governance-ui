@@ -102,7 +102,7 @@ const EditToken = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { getClient, ADMIN_PK, GROUP } = UseMangoV4()
+  const { getClient, GROUP } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
@@ -187,7 +187,7 @@ const EditToken = ({
         .accounts({
           group: group.publicKey,
           oracle: form.oraclePk ? new PublicKey(form.oraclePk) : bank.oracle,
-          admin: ADMIN_PK,
+          admin: form.governedAccount.extensions.transferAddress,
           mintInfo: mintInfo.publicKey,
         })
         .remainingAccounts([
