@@ -220,6 +220,13 @@ export async function fetchData(
       const mint = await tryGetMint(connection, new PublicKey(mintPk));
       const decimalAmount = amount.shiftedBy(-(mint?.account.decimals || 0));
       const usdAmount = decimalAmount.toNumber() * tokenUsdPrice;
+      const priceInfo = tokenPriceService.getPriceInfo(mintPk);
+      const symbol = priceInfo?.mintSymbol || mintPk;
+      logger.log(
+        `Token value for ${symbol}: ${decimalAmount.toFormat(
+          2,
+        )} * ${tokenUsdPrice.toFixed(2)} = ${usdAmount.toFixed(2)}`,
+      );
       totalUsdAmount += usdAmount;
     }
   }

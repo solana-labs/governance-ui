@@ -82,6 +82,10 @@ class TokenPriceService {
   getUSDTokenPrice(mintAddress: string): number {
     return mintAddress ? this._tokenPriceToUSDlist[mintAddress]?.price || 0 : 0
   }
+
+  getPriceInfo(mintAddress: string) {
+    return this._tokenPriceToUSDlist[mintAddress]
+  }
   /**
    * For decimals use on chain tryGetMint
    */
