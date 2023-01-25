@@ -35,7 +35,7 @@ const Serum3RegisterMarket = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { getClient, ADMIN_PK, GROUP } = UseMangoV4()
+  const { getClient, GROUP } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
@@ -74,20 +74,20 @@ const Serum3RegisterMarket = ({
       const client = await getClient(connection, wallet)
       const group = await client.getGroup(GROUP)
       const marketIndex = group.serum3ExternalMarketsMap.size
-      //TODO dao sol account as payer
-      //Mango instruction call and serialize
+
       const ix = await client.program.methods
         .serum3RegisterMarket(marketIndex, form.name)
         .accounts({
           group: group.publicKey,
-          admin: ADMIN_PK,
+          admin: form.governedAccount.extensions.transferAddress,
           serumProgram: OPENBOOK_PROGRAM_ID[connection.cluster],
           serumMarketExternal: new PublicKey(form.serum3MarketExternalPk),
-          baseBank: group.banksMapByMint.get(form.baseBankMintPk)![0]!
+          baseBank: group.getFirstBankByMint(new PublicKey(form.baseBankMintPk))
             .publicKey,
-          quoteBank: group.banksMapByMint.get(form.quoteBankMintPk)![0]!
-            .publicKey,
-          payer: wallet.publicKey,
+          quoteBank: group.getFirstBankByMint(
+            new PublicKey(form.quoteBankMintPk)
+          ).publicKey,
+          payer: form.governedAccount.extensions.transferAddress,
         })
         .instruction()
 

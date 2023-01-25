@@ -107,10 +107,6 @@ const TokenRegister = ({
       const client = await getClient(connection, wallet)
       const group = await client.getGroup(GROUP)
       const tokenIndex = group.banksMapByMint.size
-      const usdcDevnetOracle = (
-        await client.getStubOracle(group, new PublicKey(form.mintPk))
-      )[0]
-      console.log(usdcDevnetOracle.publicKey.toBase58())
       const ix = await client.program.methods
         .tokenRegister(
           Number(tokenIndex),
@@ -142,7 +138,7 @@ const TokenRegister = ({
           group: group.publicKey,
           admin: form.governedAccount.extensions.transferAddress,
           mint: new PublicKey(form.mintPk),
-          oracle: usdcDevnetOracle.publicKey,
+          oracle: new PublicKey(form.oraclePk),
           payer: form.governedAccount.extensions.transferAddress,
           rent: SYSVAR_RENT_PUBKEY,
         })
@@ -302,6 +298,27 @@ const TokenRegister = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'liquidationFee',
+    },
+    {
+      label: 'Min Vault To Deposits Ratio',
+      initialValue: form.minVaultToDepositsRatio,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'minVaultToDepositsRatio',
+    },
+    {
+      label: 'Net Borrow Limit Window Size Ts',
+      initialValue: form.netBorrowLimitWindowSizeTs,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'netBorrowLimitWindowSizeTs',
+    },
+    {
+      label: 'netBorrowLimitPerWindowQuote',
+      initialValue: form.netBorrowLimitPerWindowQuote,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'netBorrowLimitPerWindowQuote',
     },
   ]
 

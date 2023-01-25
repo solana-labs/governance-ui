@@ -268,7 +268,7 @@ const EditToken = ({
         stablePriceGrowthLimit: currentToken.stablePriceModel.stableGrowthLimit,
         minVaultToDepositsRatio: currentToken.minVaultToDepositsRatio,
         netBorrowLimitPerWindowQuote: currentToken.netBorrowLimitPerWindowQuote.toNumber(),
-        netBorrowLimitWindowSizeTs: 0,
+        netBorrowLimitWindowSizeTs: currentToken.netBorrowLimitWindowSizeTs.toNumber(),
         borrowWeightScaleStartQuote: currentToken.borrowWeightScaleStartQuote,
         depositWeightScaleStartQuote: currentToken.depositWeightScaleStartQuote,
         groupInsuranceFund: false,

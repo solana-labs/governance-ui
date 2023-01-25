@@ -1,7 +1,12 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
 import useRealm from '@hooks/useRealm'
-import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js'
+import {
+  Keypair,
+  PublicKey,
+  SystemProgram,
+  TransactionInstruction,
+} from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
@@ -57,7 +62,7 @@ const PerpCreate = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { getClient, GROUP, ADMIN_PK } = UseMangoV4()
+  const { getClient, GROUP } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
@@ -109,6 +114,8 @@ const PerpCreate = ({
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
+    let prerequisiteInstructions: TransactionInstruction[] = []
+    let prerequisiteInstructionsSigners: Keypair[] = []
     if (
       isValid &&
       programId &&
@@ -121,10 +128,42 @@ const PerpCreate = ({
       const asks = new Keypair()
       const eventQueue = new Keypair()
       const perpMarketIndex = group.perpMarketsMapByName.size
-
-      //Mango instruction call and serialize
-
-      //TODO dao sol account as payer
+      const bookSideSize = client.program.coder.accounts.size(
+        (client.program.account.bookSide as any)._idlAccount
+      )
+      const eventQueueSize = client.program.coder.accounts.size(
+        (client.program.account.eventQueue as any)._idlAccount
+      )
+      prerequisiteInstructionsSigners = [bids, asks, eventQueue]
+      prerequisiteInstructions = [
+        SystemProgram.createAccount({
+          programId: client.program.programId,
+          space: bookSideSize,
+          lamports: await connection.current.getMinimumBalanceForRentExemption(
+            bookSideSize
+          ),
+          fromPubkey: wallet.publicKey,
+          newAccountPubkey: bids.publicKey,
+        }),
+        SystemProgram.createAccount({
+          programId: client.program.programId,
+          space: bookSideSize,
+          lamports: await connection.current.getMinimumBalanceForRentExemption(
+            bookSideSize
+          ),
+          fromPubkey: wallet.publicKey,
+          newAccountPubkey: asks.publicKey,
+        }),
+        SystemProgram.createAccount({
+          programId: client.program.programId,
+          space: eventQueueSize,
+          lamports: await connection.current.getMinimumBalanceForRentExemption(
+            eventQueueSize
+          ),
+          fromPubkey: wallet.publicKey,
+          newAccountPubkey: eventQueue.publicKey,
+        }),
+      ]
       const ix = await client.program.methods
         .perpCreateMarket(
           Number(perpMarketIndex),
@@ -159,53 +198,22 @@ const PerpCreate = ({
         )
         .accounts({
           group: group.publicKey,
-          admin: ADMIN_PK,
+          admin: form.governedAccount.extensions.transferAddress,
           oracle: new PublicKey(form.oraclePk),
           bids: bids.publicKey,
           asks: asks.publicKey,
           eventQueue: eventQueue.publicKey,
-          //TODO PAYER SOL WALLET
-          payer: ADMIN_PK,
+          payer: form.governedAccount.extensions.transferAddress,
         })
-        .preInstructions([
-          // TODO: try to pick up sizes of bookside and eventqueue from IDL, so we can stay in sync with program
-
-          // book sides
-          SystemProgram.createAccount({
-            programId: this.program.programId,
-            space: 8 + 98584,
-            lamports: await this.program.provider.connection.getMinimumBalanceForRentExemption(
-              8 + 98584
-            ),
-            fromPubkey: wallet.publicKey,
-            newAccountPubkey: bids.publicKey,
-          }),
-          SystemProgram.createAccount({
-            programId: this.program.programId,
-            space: 8 + 98584,
-            lamports: await this.program.provider.connection.getMinimumBalanceForRentExemption(
-              8 + 98584
-            ),
-            fromPubkey: wallet.publicKey,
-            newAccountPubkey: asks.publicKey,
-          }),
-          // event queue
-          SystemProgram.createAccount({
-            programId: this.program.programId,
-            space: 8 + 4 * 2 + 8 + 488 * 208,
-            lamports: await this.program.provider.connection.getMinimumBalanceForRentExemption(
-              8 + 4 * 2 + 8 + 488 * 208
-            ),
-            fromPubkey: wallet.publicKey,
-            newAccountPubkey: eventQueue.publicKey,
-          }),
-        ])
         .signers([bids, asks, eventQueue])
         .instruction()
 
       serializedInstruction = serializeInstructionToBase64(ix)
     }
     const obj: UiInstruction = {
+      prerequisiteInstructions: prerequisiteInstructions,
+      prerequisiteInstructionsSigners: prerequisiteInstructionsSigners,
+      shouldSplitIntoSeparateTxs: true,
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
@@ -296,13 +304,6 @@ const PerpCreate = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'initBaseAssetWeight',
-    },
-    {
-      label: 'Maint Base Liab Weight',
-      initialValue: form.maintBaseLiabWeight,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'maintBaseLiabWeight',
     },
     {
       label: 'Init Base Liab Weight',
