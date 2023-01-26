@@ -21,6 +21,7 @@ export const getGovernanceRules = gql`
           canVote
           quorumPercent
           tokenMintAddress
+          tokenMintDecimals
           tokenType
           totalSupply
           vetoQuorumPercent
@@ -34,6 +35,7 @@ export const getGovernanceRules = gql`
           canVote
           quorumPercent
           tokenMintAddress
+          tokenMintDecimals
           tokenType
           totalSupply
           vetoQuorumPercent
@@ -57,6 +59,7 @@ const Rules = IT.type({
   canVote: IT.boolean,
   quorumPercent: IT.number,
   tokenMintAddress: PublicKey,
+  tokenMintDecimals: BigNumber,
   tokenType: GovernanceTokenType,
   totalSupply: BigNumber,
   vetoQuorumPercent: IT.number,

@@ -81,6 +81,7 @@ export function EditWalletRules(props: Props) {
     // this isn't a valid value, but it's just to satisfy the types for the
     // default initialized value
     tokenMintAddress: props.governanceAddress,
+    tokenMintDecimals: new BigNumber(0),
     tokenType: GovernanceTokenType.Community,
     totalSupply: new BigNumber(1),
     vetoQuorumPercent: 100,

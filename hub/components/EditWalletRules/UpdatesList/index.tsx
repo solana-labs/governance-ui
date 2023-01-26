@@ -13,7 +13,6 @@ import { getLabel } from '../VoteTippingSelector';
 import cx from '@hub/lib/cx';
 import { formatNumber } from '@hub/lib/formatNumber';
 import { ntext } from '@hub/lib/ntext';
-import { GovernanceVoteTipping } from '@hub/types/GovernanceVoteTipping';
 
 function diff<T extends { [key: string]: unknown }>(existing: T, changed: T) {
   const diffs = {} as {
@@ -35,33 +34,6 @@ function diff<T extends { [key: string]: unknown }>(existing: T, changed: T) {
     ) {
       if (!existingValue.isEqualTo(changedValue)) {
         diffs[key] = [existingValue, changedValue];
-      }
-    } else if (key === 'vetoQuorumPercent') {
-      if (changed['canVeto']) {
-        if (existingValue !== changedValue) {
-          diffs[key] = [existingValue, changedValue];
-        }
-      } else if (existing['canVeto']) {
-        diffs[key] = [existingValue, null];
-      }
-    } else if (key === 'quorumPercent') {
-      if (changed['canVote']) {
-        if (existingValue !== changedValue) {
-          diffs[key] = [existingValue, changedValue];
-        }
-      } else if (existing['canVote']) {
-        diffs[key] = [existingValue, null];
-      }
-    } else if (key === 'voteTipping') {
-      if (changed['canVote']) {
-        if (existingValue !== changedValue) {
-          diffs[key] = [existingValue, changedValue];
-        }
-      } else if (
-        existing['canVote'] &&
-        existingValue !== GovernanceVoteTipping.Disabled
-      ) {
-        diffs[key] = [existingValue, null];
       }
     } else {
       if (existingValue !== changedValue) {
@@ -527,7 +499,7 @@ export function UpdatesList(props: Props) {
         </div>
       )}
       {!!Object.keys(advancedSettingsDiff).length && (
-        <div>
+        <div className="space-y-8">
           <SectionHeader
             className="mb-8"
             icon={<ChemistryIcon />}

@@ -13,8 +13,12 @@ import { MAX_NUM } from './constants';
 
 import { Rules } from './types';
 
+function hoursToSeconds(hours: number) {
+  return hours * 60 * 60;
+}
+
 function daysToSeconds(days: number) {
-  return days * 24 * 60 * 60;
+  return hoursToSeconds(days * 24);
 }
 
 function convertVoteTipping(tipping: GovernanceVoteTipping): VoteTipping {
@@ -34,65 +38,72 @@ export function createTransaction(
   governance: PublicKey,
   rules: Rules,
 ) {
+  const communityRules = rules.communityTokenRules;
+  const councilRules = rules.councilTokenRules;
+  const minCommunityTokensToCreateProposal = new BN(
+    (communityRules.canCreateProposal
+      ? communityRules.votingPowerToCreateProposals.shiftedBy(
+          communityRules.tokenMintDecimals.toNumber(),
+        )
+      : MAX_NUM
+    ).toString(),
+  );
+
+  const minCouncilTokensToCreateProposal = new BN(
+    (councilRules && councilRules.canCreateProposal
+      ? councilRules.votingPowerToCreateProposals.shiftedBy(
+          councilRules.tokenMintDecimals.toNumber(),
+        )
+      : MAX_NUM
+    ).toString(),
+  );
+
   const newConfig = new GovernanceConfig({
-    communityVoteThreshold: rules.communityTokenRules.canVote
+    minCommunityTokensToCreateProposal,
+    minCouncilTokensToCreateProposal,
+    communityVoteThreshold: communityRules.canVote
       ? {
-          type: VoteThresholdType.QuorumPercentage,
-          value: rules.communityTokenRules.quorumPercent,
+          type: VoteThresholdType.YesVotePercentage,
+          value: communityRules.quorumPercent,
         }
       : {
           type: VoteThresholdType.Disabled,
           value: undefined,
         },
-    minCommunityTokensToCreateProposal: rules.communityTokenRules
-      .canCreateProposal
-      ? new BN(
-          rules.communityTokenRules.votingPowerToCreateProposals.toString(),
-        )
-      : new BN(MAX_NUM.toString()),
     minInstructionHoldUpTime: daysToSeconds(rules.minInstructionHoldupDays),
     maxVotingTime: daysToSeconds(rules.maxVoteDays),
-    communityVoteTipping: rules.communityTokenRules.canVote
-      ? convertVoteTipping(rules.communityTokenRules.voteTipping)
+    communityVoteTipping: convertVoteTipping(communityRules.voteTipping),
+    councilVoteThreshold: councilRules?.canVote
+      ? {
+          type: VoteThresholdType.YesVotePercentage,
+          value: councilRules.quorumPercent,
+        }
+      : {
+          type: VoteThresholdType.Disabled,
+          value: undefined,
+        },
+    councilVetoVoteThreshold: councilRules?.canVeto
+      ? {
+          type: VoteThresholdType.YesVotePercentage,
+          value: councilRules.vetoQuorumPercent,
+        }
+      : {
+          type: VoteThresholdType.Disabled,
+          value: undefined,
+        },
+    communityVetoVoteThreshold: communityRules.canVeto
+      ? {
+          type: VoteThresholdType.YesVotePercentage,
+          value: communityRules.vetoQuorumPercent,
+        }
+      : {
+          type: VoteThresholdType.Disabled,
+          value: undefined,
+        },
+    councilVoteTipping: councilRules
+      ? convertVoteTipping(councilRules.voteTipping)
       : VoteTipping.Disabled,
-    minCouncilTokensToCreateProposal:
-      rules.councilTokenRules && rules.councilTokenRules.canCreateProposal
-        ? new BN(
-            rules.councilTokenRules.votingPowerToCreateProposals.toString(),
-          )
-        : new BN(MAX_NUM.toString()),
-    councilVoteThreshold: rules.councilTokenRules?.canVote
-      ? {
-          type: VoteThresholdType.QuorumPercentage,
-          value: rules.councilTokenRules.quorumPercent,
-        }
-      : {
-          type: VoteThresholdType.Disabled,
-          value: undefined,
-        },
-    councilVetoVoteThreshold: rules.councilTokenRules?.canVeto
-      ? {
-          type: VoteThresholdType.QuorumPercentage,
-          value: rules.councilTokenRules.vetoQuorumPercent,
-        }
-      : {
-          type: VoteThresholdType.Disabled,
-          value: undefined,
-        },
-    communityVetoVoteThreshold: rules.communityTokenRules.canVeto
-      ? {
-          type: VoteThresholdType.QuorumPercentage,
-          value: rules.communityTokenRules.vetoQuorumPercent,
-        }
-      : {
-          type: VoteThresholdType.Disabled,
-          value: undefined,
-        },
-    councilVoteTipping:
-      rules.councilTokenRules && rules.communityTokenRules.canVote
-        ? convertVoteTipping(rules.councilTokenRules.voteTipping)
-        : VoteTipping.Disabled,
-    votingCoolOffTime: daysToSeconds(rules.coolOffHours),
+    votingCoolOffTime: hoursToSeconds(rules.coolOffHours),
     depositExemptProposalCount: rules.depositExemptProposalCount,
   });
 
