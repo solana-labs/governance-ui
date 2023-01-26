@@ -29,7 +29,6 @@ interface PerpEditForm {
   governedAccount: AssetAccount | null
   perp: null | NameMarketIndexVal
   oraclePk: string
-  name: string
   oracleConfFilter: number
   baseDecimals: number
   maintBaseAssetWeight: number
@@ -62,7 +61,6 @@ const defaultFormValues = {
   governedAccount: null,
   perp: null,
   oraclePk: '',
-  name: '',
   oracleConfFilter: 0,
   baseDecimals: 0,
   maintBaseAssetWeight: 0,
@@ -99,7 +97,7 @@ const PerpEdit = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { getClient, GROUP, ADMIN_PK } = UseMangoV4()
+  const { getClient, GROUP } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const [mangoGroup, setMangoGroup] = useState<Group | null>(null)
@@ -136,12 +134,14 @@ const PerpEdit = ({
     ) {
       const client = await getClient(connection, wallet)
       const group = await client.getGroup(GROUP)
-      const perpMarket = group.perpMarketsMapByName.get(form.name)!
+      const perpMarket = group.perpMarketsMapByMarketIndex.get(
+        form.perp!.value
+      )!
       const values = getChangedValues<PerpEditForm>(originalFormValues, form)
       //Mango instruction call and serialize
       const ix = await client.program.methods
         .perpEditMarket(
-          getNullOrTransform(form.oraclePk, PublicKey),
+          getNullOrTransform(values.oraclePk, PublicKey),
           {
             confFilter: Number(form.oracleConfFilter),
             maxStalenessSlots: null,
@@ -178,8 +178,10 @@ const PerpEdit = ({
         )
         .accounts({
           group: group.publicKey,
-          admin: ADMIN_PK,
+          admin: form.governedAccount.extensions.transferAddress,
           perpMarket: perpMarket.publicKey,
+          oracle:
+            getNullOrTransform(values.oraclePk, PublicKey) || perpMarket.oracle,
         })
         .instruction()
 
@@ -237,7 +239,6 @@ const PerpEdit = ({
       const vals = {
         ...form,
         oraclePk: currentPerp.oracle.toBase58(),
-        name: currentPerp.name,
         oracleConfFilter: currentPerp.oracleConfig.confFilter.toNumber(),
         baseDecimals: currentPerp.baseDecimals,
         maintBaseAssetWeight: currentPerp.maintBaseAssetWeight.toNumber(),
@@ -287,14 +288,8 @@ const PerpEdit = ({
       label: 'Perp',
       name: 'perp',
       type: InstructionInputType.SELECT,
-      initialValue: null,
+      initialValue: form.perp,
       options: perps,
-    },
-    {
-      label: 'Perp Name',
-      initialValue: form.name,
-      type: InstructionInputType.INPUT,
-      name: 'name',
     },
     {
       label: 'Oracle',
@@ -358,13 +353,6 @@ const PerpEdit = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'initBaseLiabWeight',
-    },
-    {
-      label: 'Maint Base Liab Weight',
-      initialValue: form.maintBaseLiabWeight,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'maintBaseLiabWeight',
     },
     {
       label: 'Maint Pnl Asset Weight',
