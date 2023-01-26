@@ -9,7 +9,7 @@ export const truthy = <T>(value: T): value is Truthy<T> => !!value
 export type VotingMintConfig = IdlTypes<HeliumVoterStakeRegistry>['VotingMintConfigV0']
 type RegistrarV0 = IdlAccounts<HeliumVoterStakeRegistry>['registrar']
 type Lockup = IdlTypes<HeliumVoterStakeRegistry>['Lockup']
-type PositionV0 = IdlAccounts<HeliumVoterStakeRegistry>['positionV0']
+export type PositionV0 = IdlAccounts<HeliumVoterStakeRegistry>['positionV0']
 export interface Registrar extends RegistrarV0 {
   votingMints: VotingMintConfig[]
 }

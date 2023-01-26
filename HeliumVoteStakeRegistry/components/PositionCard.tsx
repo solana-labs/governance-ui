@@ -2,8 +2,8 @@ import React, { useState } from 'react'
 import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
-import { fmtMintAmount } from '@tools/sdk/units'
-import { PositionWithVotingMint } from '../utils/types'
+// import { fmtMintAmount } from '@tools/sdk/units'
+import { Position, VotingMintConfig } from '../sdk/types'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { abbreviateAddress } from '@utils/formatting'
 import { useNft } from '@hooks/useNft'
@@ -17,10 +17,14 @@ import { BN } from '@project-serum/anchor'
 import Button from '@components/Button'
 
 export interface PositionCardProps {
-  position: PositionWithVotingMint
+  votingMintCfg: VotingMintConfig
+  position: Position
 }
 
-export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
+export const PositionCard: React.FC<PositionCardProps> = ({
+  votingMintCfg,
+  position,
+}) => {
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false)
   const [isExtendModalOpen, setIsExtendModalOpen] = useState(false)
   const [isDelegateModalOpen, setIsDelegateModalOpen] = useState(false)
@@ -52,17 +56,19 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
     position,
     registrar: vsrRegistrar as any,
   })
-  const lockedTokens = fmtMintAmount(
-    position.votingMint.mint.account,
-    position.amountDepositedNative
-  )
+  // Todo (BRY): fix;
+  // const lockedTokens = fmtMintAmount(
+  //   votingMintCfg.
+  //   votingMintCfg.mint.account,
+  //   position.amountDepositedNative
+  // )
+  const lockedTokens = 0
   const isRealmCommunityMint =
-    position.votingMint.mint.publicKey.toBase58() ===
-    realm?.account.communityMint.toBase58()
+    votingMintCfg.mint.toBase58() === realm?.account.communityMint.toBase58()
   const isConstant = lockupKind === 'constant'
 
   const tokenInfo = tokenPriceService.getTokenInfo(
-    position.votingMint.mint.publicKey.toBase58()
+    votingMintCfg.mint.toBase58()
   )
 
   const CardLabel = ({ label, value }) => {
@@ -89,8 +95,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
             )}
             <h3 className="hero-text mb-0">
               {lockedTokens}{' '}
-              {!tokenInfo?.logoURI &&
-                abbreviateAddress(position.votingMint.mint.publicKey)}
+              {!tokenInfo?.logoURI && abbreviateAddress(votingMintCfg.mint)}
               <span className="font-normal text-xs text-fgd-3">
                 {tokenInfo?.symbol}
               </span>

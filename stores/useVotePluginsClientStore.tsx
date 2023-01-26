@@ -16,11 +16,13 @@ import { PythClient } from 'pyth-staking-api'
 import { PublicKey } from '@solana/web3.js'
 import { tryGetGatewayRegistrar } from '../GatewayPlugin/sdk/api'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
+import { HeliumVsrClient } from 'HeliumVoteStakeRegistry/sdk/client'
 
 interface UseVotePluginsClientStore extends State {
   state: {
     //diffrent plugins to choose because we will still have functions related only to one plugin
     vsrClient: VsrClient | undefined
+    heliumVsrClient: HeliumVsrClient | undefined
     nftClient: NftVoterClient | undefined
     gatewayClient: GatewayClient | undefined
     switchboardClient: SwitchboardQueueVoterClient | undefined
@@ -36,6 +38,10 @@ interface UseVotePluginsClientStore extends State {
     wallet: SignerWalletAdapter | undefined,
     connection: ConnectionContext,
     programId: PublicKey
+  ) => void
+  handleSetHeliumVsrClient: (
+    wallet: SignerWalletAdapter | undefined,
+    connection: ConnectionContext
   ) => void
   handleSetNftClient: (
     wallet: SignerWalletAdapter | undefined,
@@ -74,6 +80,7 @@ interface UseVotePluginsClientStore extends State {
 
 const defaultState = {
   vsrClient: undefined,
+  heliumVsrClient: undefined,
   nftClient: undefined,
   gatewayClient: undefined,
   switchboardClient: undefined,
@@ -109,6 +116,23 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
       )
       set((s) => {
         s.state.vsrClient = vsrClient
+      })
+    },
+    handleSetHeliumVsrClient: async (wallet, connection) => {
+      const options = AnchorProvider.defaultOptions()
+      const provider = new AnchorProvider(
+        connection.current,
+        (wallet as unknown) as Wallet,
+        options
+      )
+
+      const heliumVsrClient = await HeliumVsrClient.connect(
+        provider,
+        connection.cluster === 'devnet'
+      )
+
+      set((s) => {
+        s.state.heliumVsrClient = heliumVsrClient
       })
     },
     handleSetVsrRegistrar: async (client, realm) => {

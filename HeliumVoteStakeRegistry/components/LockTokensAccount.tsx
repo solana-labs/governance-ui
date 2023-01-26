@@ -25,29 +25,46 @@ import { daysToSecs, secsToDays } from 'VoteStakeRegistry/tools/dateTools'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { LockCommunityTokensBtn } from './LockCommunityTokensBtn'
 import { LockTokensModal, LockTokensModalFormValues } from './LockTokensModal'
-import { usePositions } from '../hooks/usePositions'
 import { useCreatePosition } from '../hooks/useCreatePosition'
 import { calcLockupMultiplier } from '../utils/calcLockupMultiplier'
 import VotingPowerBox from 'VoteStakeRegistry/components/TokenBalance/VotingPowerBox'
 import { PositionCard } from './PositionCard'
+import useHeliumVsrStore from 'HeliumVoteStakeRegistry/hooks/useHeliumVsrStore'
+import { Registrar } from 'HeliumVoteStakeRegistry/sdk/types'
+import { notify } from '@utils/notifications'
+import { PublicKey } from '@solana/web3.js'
 
 export const LockTokensAccount: React.FC<{
   tokenOwnerRecordPk: string | string[] | undefined
   children: React.ReactNode
 }> = ({ tokenOwnerRecordPk, children }) => {
-  const { realm, realmTokenAccount, realmInfo, mint, councilMint } = useRealm()
+  const {
+    realm,
+    realmTokenAccount,
+    realmInfo,
+    mint,
+    tokenRecords,
+    councilMint,
+    config,
+  } = useRealm()
+  const tokenOwnerRecordWalletPk = Object.keys(tokenRecords)?.find(
+    (key) => tokenRecords[key]?.pubkey?.toBase58() === tokenOwnerRecordPk
+  )
   const [
     vsrClient,
     vsrRegistrar,
     vsrRegistrarPk,
   ] = useVotePluginsClientStore((s) => [
-    s.state.vsrClient,
-    s.state.voteStakeRegistryRegistrar,
+    s.state.heliumVsrClient,
+    s.state.voteStakeRegistryRegistrar as Registrar | null,
     s.state.voteStakeRegistryRegistrarPk,
   ])
+  const { error, loading: isCreating, createPosition } = useCreatePosition({
+    realm,
+    registrarPk: vsrRegistrarPk || undefined,
+  })
   const [isOwnerOfPositions, setIsOwnerOfPositions] = useState(true)
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
-  const [amountLocked, setAmountLocked] = useState<BN>(new BN(0))
   const [
     connected,
     connection,
@@ -59,37 +76,53 @@ export const LockTokensAccount: React.FC<{
     s.current,
     s.actions,
   ])
-
-  const {
-    error,
+  const [
     loading,
     positions,
     votingPower,
-    refetchPostions,
-  } = usePositions({
-    registrarPk: vsrRegistrarPk || undefined,
-  })
+    amountLocked,
+    getPositions,
+  ] = useHeliumVsrStore((s) => [
+    s.state.isLoading,
+    s.state.positions,
+    s.state.votingPower,
+    s.state.amountLocked,
+    s.getPositions,
+  ])
 
-  const {
-    // TODO: Do Someting with these
-    // error,
-    // loading,
-    createPosition,
-  } = useCreatePosition({
-    realm,
-    registrarPk: vsrRegistrarPk || undefined,
-  })
+  const handleGetPositions = useCallback(async () => {
+    try {
+      if (
+        config?.account.communityTokenConfig.voterWeightAddin &&
+        realm?.pubkey &&
+        wallet?.publicKey &&
+        vsrClient
+      ) {
+        await getPositions({
+          realmPk: realm.pubkey,
+          communityMintPk: realm.account.communityMint,
+          walletPk: tokenOwnerRecordWalletPk
+            ? new PublicKey(tokenOwnerRecordWalletPk)
+            : wallet.publicKey,
+          client: vsrClient,
+          connection: connection,
+        })
+      }
+    } catch (e) {
+      console.log(e)
+      notify({
+        type: 'error',
+        message: "Can't fetch deposits",
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+  }, [])
 
   useEffect(() => {
-    if (positions.length) {
-      setAmountLocked(
-        positions.reduce(
-          (acc, pos) => acc.add(pos.amountDepositedNative),
-          new BN(0)
-        )
-      )
-    }
-  }, [positions, setAmountLocked])
+    ;(async () => {
+      await handleGetPositions()
+    })()
+  }, [vsrClient, handleGetPositions])
 
   const communityVotingMintCfg = vsrRegistrar?.votingMints.find((vm) =>
     vm.mint.equals(realm!.account.communityMint)
@@ -144,7 +177,7 @@ export const LockTokensAccount: React.FC<{
     (lockupPeriodInDays: number) =>
       calcLockupMultiplier({
         lockupSecs: daysToSecs(lockupPeriodInDays),
-        registrar: vsrRegistrar as any,
+        registrar: vsrRegistrar,
         realm,
       }),
     [realm, vsrRegistrar]
@@ -166,7 +199,13 @@ export const LockTokensAccount: React.FC<{
     if (!error) {
       fetchWalletTokenAccounts()
       fetchRealm(realmInfo!.programId, realmInfo!.realmId)
-      await refetchPostions()
+      await getPositions({
+        realmPk: realm!.pubkey,
+        communityMintPk: realm!.account.communityMint,
+        walletPk: wallet!.publicKey!,
+        client: vsrClient!,
+        connection,
+      })
     }
   }
 
@@ -259,9 +298,18 @@ export const LockTokensAccount: React.FC<{
                 !isOwnerOfPositions ? 'opacity-0.8 pointer-events-none' : ''
               }`}
             >
-              {positions.map((pos, idx) => (
-                <PositionCard position={pos} key={idx} />
-              ))}
+              {positions.map((pos, idx) => {
+                const votingMintCfg =
+                  vsrRegistrar?.votingMints[pos.votingMintConfigIdx]
+
+                return (
+                  <PositionCard
+                    key={idx}
+                    position={pos}
+                    votingMintCfg={votingMintCfg!}
+                  />
+                )
+              })}
               <div className="border border-fgd-4 flex flex-col items-center justify-center p-6 rounded-lg">
                 <LightningBoltIcon className="h-8 mb-2 text-primary-light w-8" />
                 <p className="flex text-center pb-6">

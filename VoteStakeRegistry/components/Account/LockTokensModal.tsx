@@ -99,7 +99,7 @@ const LockTokensModal = ({
     },
   ].filter((x) =>
     depositToUnlock
-      ? getMinDurationInDays(depositToUnlock) <= x.defaultValue ||
+      ? getMinDurationInDays(depositToUnlock.lockup) <= x.defaultValue ||
         x.display === 'Custom'
       : true
   )

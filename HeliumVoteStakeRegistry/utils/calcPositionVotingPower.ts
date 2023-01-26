@@ -1,12 +1,6 @@
 import { BN } from '@project-serum/anchor'
 import { calcMultiplier } from './calcLockupMultiplier'
-import {
-  Position,
-  VotingMintConfig,
-  Lockup,
-  Registrar,
-  LockupKind,
-} from './types'
+import { Position, VotingMintConfig, Registrar, LockupKind } from '../sdk/types'
 
 export const calcPositionVotingPower = ({
   position,
@@ -28,7 +22,7 @@ export const calcPositionVotingPower = ({
       // genesisVotePowerMultiplier,
     } = mintCfg as VotingMintConfig
     const now = Math.round(new Date().getTime() / 1000)
-    const lockup = position!.lockup as Lockup
+    const lockup = position!.lockup
     const lockupKind = Object.keys(lockup.kind as LockupKind)[0]
     const currTs = lockupKind === 'constant' ? lockup.startTs : new BN(now)
     const lockupSecs = lockup.endTs.sub(currTs).toNumber()

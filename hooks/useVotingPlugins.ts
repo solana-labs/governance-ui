@@ -33,8 +33,9 @@ export const vsrPluginsPks: string[] = [
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo',
   'vsr2nfGVNHmSY8uxoBGqq8AQbwz3JwaEaHqGbsTPXqQ',
   'VotEn9AWwTFtJPJSMV5F9jsMY6QwWM5qn3XP9PATGW7',
-  HELIUM_VSR_PROGRAM_ID.toBase58(),
 ]
+
+export const heliumVsrPluginsPks: string[] = [HELIUM_VSR_PROGRAM_ID.toBase58()]
 
 export const nftPluginsPks: string[] = [
   'GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw',
@@ -54,6 +55,7 @@ export function useVotingPlugins() {
   const {
     handleSetVsrRegistrar,
     handleSetVsrClient,
+    handleSetHeliumVsrClient,
     handleSetNftClient,
     handleSetGatewayClient,
     handleSetSwitchboardClient,
@@ -82,6 +84,9 @@ export function useVotingPlugins() {
   const connection = useWalletStore((s) => s.connection)
   const connected = useWalletStore((s) => s.connected)
   const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
+  const heliumVsrClient = useVotePluginsClientStore(
+    (s) => s.state.heliumVsrClient
+  )
   const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
   const gatewayClient = useVotePluginsClientStore((s) => s.state.gatewayClient)
   const switchboardClient = useVotePluginsClientStore(
@@ -314,6 +319,7 @@ export function useVotingPlugins() {
         handleSetVsrClient(wallet, connection, currentPluginPk)
       }
 
+      handleSetHeliumVsrClient(wallet, connection)
       handleSetNftClient(wallet, connection)
       handleSetSwitchboardClient(wallet, connection)
       handleSetGatewayClient(wallet, connection)
@@ -333,6 +339,24 @@ export function useVotingPlugins() {
         if (connected) {
           handleSetCurrentRealmVotingClient({
             client: vsrClient,
+            realm,
+            walletPk:
+              ownTokenRecord?.account?.governingTokenOwner || wallet?.publicKey,
+          })
+        }
+      }
+    }
+
+    const handleHeliumVsrPlugin = () => {
+      if (
+        heliumVsrClient &&
+        currentPluginPk &&
+        heliumVsrPluginsPks.includes(currentPluginPk.toBase58())
+      ) {
+        // handleSetVsrRegistrar(vsrClient, realm)
+        if (connected) {
+          handleSetCurrentRealmVotingClient({
+            client: heliumVsrClient,
             realm,
             walletPk:
               ownTokenRecord?.account?.governingTokenOwner || wallet?.publicKey,
@@ -426,6 +450,7 @@ export function useVotingPlugins() {
       handleNftplugin()
       handleGatewayPlugin()
       handleVsrPlugin()
+      handleHeliumVsrPlugin()
       handleSwitchboardPlugin()
       handlePythPlugin()
     }
@@ -435,6 +460,8 @@ export function useVotingPlugins() {
     currentPluginPk?.toBase58(),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     vsrClient?.program.programId.toBase58(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+    heliumVsrClient?.program.programId.toBase58(),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     nftClient?.program.programId.toBase58(),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree

@@ -36,6 +36,7 @@ import {
   getNftVoteRecordProgramAddress,
   getUsedNftsForProposal,
 } from 'NftVotePlugin/accounts'
+import { HeliumVsrClient } from 'HeliumVoteStakeRegistry/sdk/client'
 
 type UpdateVoterWeightRecordTypes =
   | 'castVote'
@@ -57,6 +58,7 @@ export interface NFTWithMeta extends NFTWithMint {
 export enum VotingClientType {
   NoClient,
   VsrClient,
+  HeliumVsrClient,
   NftVoterClient,
   SwitchboardVoterClient,
   PythClient,
@@ -85,6 +87,7 @@ interface ProgramAddresses {
 
 export type Client =
   | VsrClient
+  | HeliumVsrClient
   | NftVoterClient
   | SwitchboardQueueVoterClient
   | PythClient
@@ -112,6 +115,10 @@ export class VotingClient {
     this.clientType = VotingClientType.NoClient
     if (this.client instanceof VsrClient) {
       this.clientType = VotingClientType.VsrClient
+      this.noClient = false
+    }
+    if (this.client instanceof HeliumVsrClient) {
+      this.clientType = VotingClientType.HeliumVsrClient
       this.noClient = false
     }
     if (this.client instanceof NftVoterClient) {
@@ -176,6 +183,33 @@ export class VotingClient {
         .instruction()
       instructions.push(updateVoterWeightRecordIx)
       return { voterWeightPk, maxVoterWeightRecord: undefined }
+    }
+
+    if (this.client instanceof HeliumVsrClient) {
+      console.log("TODO (BRY): UPDATE VOTER_WEIGHT_RECORD");
+      // const { registrar } = await getRegistrarPDA(
+      //   realm.pubkey,
+      //   realm.account.communityMint,
+      //   clientProgramId
+      // )
+
+      // const remainingAccounts: AccountData[] = []
+      // for (let i = 0; i < this.votingNfts.length; i++) {
+      //   const nft = this.votingNfts[i]
+      //   const tokenAccount = await nft.getAssociatedTokenAccount()
+
+      //   remainingAccounts.push(
+      //     new AccountData(tokenAccount),
+      //     new AccountData(nft.address)
+      //   )
+      // }
+
+      // TODO (Bry): Finish this logic
+      // const updateVoterWeightRecordIx = await this.client!.program.methods.updateVoterWeightRecordV0(
+      //   { voterWeightAction: { [type]: {} }, owner: walletPk }
+      // )
+      //   .accounts({ registrar, })
+      //   .instruction()
     }
 
     if (this.client instanceof NftVoterClient) {

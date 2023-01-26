@@ -1,6 +1,6 @@
 import { PublicKey } from '@solana/web3.js'
 import { ProgramAccount, Realm } from '@solana/spl-governance'
-import { Registrar, VotingMintConfig } from './types'
+import { Registrar, VotingMintConfig } from '../sdk/types'
 
 export const calcMultiplier = ({
   lockedScaledFactor,

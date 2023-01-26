@@ -13,7 +13,7 @@ import { useAsyncCallback } from 'react-async-hook'
 import { useHeliumVsr } from './useHeliumVsr'
 import { positionKey } from '@helium/voter-stake-registry-sdk'
 import { sendTransaction } from '@utils/send'
-import { truthy } from '../utils/types'
+import { truthy } from '../sdk/types'
 
 export const useCreatePosition = ({
   registrarPk,

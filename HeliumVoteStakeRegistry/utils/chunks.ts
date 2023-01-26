@@ -1,5 +1,3 @@
-export { calcLockupMultiplier } from './calcLockupMultiplier'
-
 export const chunks = (array, size) => {
   return Array.apply(
     0,
