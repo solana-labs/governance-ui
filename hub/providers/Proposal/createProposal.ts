@@ -150,6 +150,7 @@ export async function createProposal(args: Args) {
       signTransaction: args.signTransaction,
       signAllTransactions: args.signAllTransactions,
     } as Wallet,
+    args.cluster === 'devnet',
   );
 
   const pluginPublicKey =
