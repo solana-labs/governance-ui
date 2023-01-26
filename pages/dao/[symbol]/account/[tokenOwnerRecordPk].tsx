@@ -1,40 +1,40 @@
+import React from 'react'
 import useRealm from '@hooks/useRealm'
-import { vsrPluginsPks } from '@hooks/useVotingPlugins'
+import { vsrPluginsPks, heliumVsrPluginsPks } from '@hooks/useVotingPlugins'
 import { PROGRAM_ID as HELIUM_VSR_PROGRAM_ID } from '@helium/voter-stake-registry-sdk'
 import { useRouter } from 'next/router'
-import Account from 'VoteStakeRegistry/components/Account/Account'
+import { default as VoteStakeRegistryAccount } from 'VoteStakeRegistry/components/Account/Account'
 import LockTokensAccount from 'VoteStakeRegistry/components/Account/LockTokensAccount'
 import { LockTokensAccount as HeliumLockTokensAccount } from 'HeliumVoteStakeRegistry/components/LockTokensAccount'
 
-const account = () => {
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
+const Account: React.FC<any> = () => {
   const router = useRouter()
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const { config } = useRealm()
   const tokenOwnerRecordPk = router?.query?.tokenOwnerRecordPk
   const communityVsrPk = config?.account.communityTokenConfig.voterWeightAddin
-  const isHeliumVsr =
-    communityVsrPk && communityVsrPk.equals(HELIUM_VSR_PROGRAM_ID)
   const isLockTokensMode =
-    communityVsrPk && vsrPluginsPks.includes(communityVsrPk.toBase58())
+    communityVsrPk &&
+    [...vsrPluginsPks, ...heliumVsrPluginsPks].includes(
+      communityVsrPk.toBase58()
+    )
 
   if (isLockTokensMode) {
-    if (isHeliumVsr) {
+    if (communityVsrPk.equals(HELIUM_VSR_PROGRAM_ID)) {
       return (
         <HeliumLockTokensAccount tokenOwnerRecordPk={tokenOwnerRecordPk}>
-          <Account withHeader={false} displayPanel={false} />
+          <VoteStakeRegistryAccount withHeader={false} displayPanel={false} />
         </HeliumLockTokensAccount>
       )
     }
 
     return (
       <LockTokensAccount tokenOwnerRecordPk={tokenOwnerRecordPk}>
-        <Account withHeader={false} displayPanel={false} />
+        <VoteStakeRegistryAccount withHeader={false} displayPanel={false} />
       </LockTokensAccount>
     )
   }
 
-  return <Account />
+  return <VoteStakeRegistryAccount />
 }
 
-export default account
+export default Account

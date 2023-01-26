@@ -353,7 +353,7 @@ export function useVotingPlugins() {
         currentPluginPk &&
         heliumVsrPluginsPks.includes(currentPluginPk.toBase58())
       ) {
-        // handleSetVsrRegistrar(vsrClient, realm)
+        handleSetVsrRegistrar(heliumVsrClient, realm)
         if (connected) {
           handleSetCurrentRealmVotingClient({
             client: heliumVsrClient,

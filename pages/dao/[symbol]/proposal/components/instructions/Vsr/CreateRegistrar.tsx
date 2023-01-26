@@ -14,11 +14,17 @@ import { NewProposalContext } from '../../../new'
 import InstructionForm, { InstructionInputType } from '../FormCreator'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { SYSVAR_RENT_PUBKEY } from '@solana/web3.js'
+import {
+  ComputeBudgetProgram,
+  PublicKey,
+  SYSVAR_RENT_PUBKEY,
+} from '@solana/web3.js'
 import { getRegistrarPDA } from 'VoteStakeRegistry/sdk/accounts'
 import { DEFAULT_VSR_ID, VsrClient } from 'VoteStakeRegistry/sdk/client'
 import { web3 } from '@project-serum/anchor'
 import useWallet from '@hooks/useWallet'
+import { heliumVsrPluginsPks, vsrPluginsPks } from '@hooks/useVotingPlugins'
+import { HeliumVsrClient } from 'HeliumVoteStakeRegistry/sdk/client'
 
 interface CreateVsrRegistrarForm {
   governedAccount: AssetAccount | undefined
@@ -48,10 +54,25 @@ const CreateVsrRegistrar = ({
       form!.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const vsrClient = await VsrClient.connect(
-        anchorProvider,
-        form?.programId ? new web3.PublicKey(form.programId) : DEFAULT_VSR_ID
-      )
+      let vsrClient: VsrClient | HeliumVsrClient
+
+      if (
+        form?.programId &&
+        [...vsrPluginsPks, ...heliumVsrPluginsPks].includes(form.programId)
+      ) {
+        if (vsrPluginsPks.includes(form.programId)) {
+          vsrClient = await VsrClient.connect(
+            anchorProvider,
+            new PublicKey(form.programId)
+          )
+        }
+        if (heliumVsrPluginsPks.includes(form.programId)) {
+          vsrClient = await HeliumVsrClient.connect(anchorProvider)
+        }
+      } else {
+        vsrClient = await VsrClient.connect(anchorProvider, DEFAULT_VSR_ID)
+      }
+
       const { registrar, registrarBump } = await getRegistrarPDA(
         realm!.pubkey,
         realm!.account.communityMint,
@@ -59,8 +80,8 @@ const CreateVsrRegistrar = ({
       )
 
       let createRegistrarIx
-      if (vsrClient) {
-        if (vsrClient.isHeliumVsr) {
+      if (vsrClient!) {
+        if (vsrClient instanceof HeliumVsrClient) {
           createRegistrarIx = await vsrClient.program.methods
             .initializeRegistrarV0({
               positionUpdateAuthority: null,
@@ -74,6 +95,9 @@ const CreateVsrRegistrar = ({
               payer: wallet.publicKey!,
               systemProgram: SYSTEM_PROGRAM_ID,
             })
+            .preInstructions([
+              ComputeBudgetProgram.setComputeUnitLimit({ units: 400000 }),
+            ])
             .instruction()
         } else {
           createRegistrarIx = await vsrClient.program.methods

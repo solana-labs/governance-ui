@@ -60,7 +60,7 @@ interface UseVotePluginsClientStore extends State {
     connection: ConnectionContext
   ) => void
   handleSetVsrRegistrar: (
-    client: VsrClient,
+    client: VsrClient | HeliumVsrClient,
     realm: ProgramAccount<Realm> | undefined
   ) => void
   handleSetNftRegistrar: (

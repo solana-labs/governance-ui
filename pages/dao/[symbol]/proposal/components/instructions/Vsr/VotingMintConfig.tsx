@@ -32,7 +32,9 @@ import {
   Registrar,
 } from 'VoteStakeRegistry/sdk/accounts'
 import { DEFAULT_VSR_ID, VsrClient } from 'VoteStakeRegistry/sdk/client'
+import { HeliumVsrClient } from 'HeliumVoteStakeRegistry/sdk/client'
 import useWallet from '@hooks/useWallet'
+import { heliumVsrPluginsPks, vsrPluginsPks } from '@hooks/useVotingPlugins'
 
 interface ConfigureVotingMintForm {
   programId: string | undefined
@@ -59,7 +61,9 @@ const VotingMintConfig = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const [vsrClient, setVSRClient] = useState<VsrClient | null>(null)
+  const [vsrClient, setVsrClient] = useState<
+    VsrClient | HeliumVsrClient | null
+  >(null)
   const { realm } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)
@@ -71,18 +75,24 @@ const VotingMintConfig = ({
   useEffect(() => {
     ;(async () => {
       if (anchorProvider && form?.programId) {
-        let programId
+        let programId: PublicKey = PublicKey.default
+
         try {
           programId = new PublicKey(form.programId)
+          if (vsrPluginsPks.includes(programId.toBase58())) {
+            setVsrClient(await VsrClient.connect(anchorProvider, programId))
+          }
+
+          if (heliumVsrPluginsPks.includes(programId.toBase58())) {
+            setVsrClient(await HeliumVsrClient.connect(anchorProvider))
+          }
         } catch (err) {
           // invalid pubkey
           return
         }
-
-        setVSRClient(await VsrClient.connect(anchorProvider, programId))
       }
     })()
-  }, [anchorProvider, form?.programId, setVSRClient])
+  }, [anchorProvider, form?.programId, setVsrClient])
 
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
@@ -157,7 +167,7 @@ const VotingMintConfig = ({
       }
 
       let configureCollectionIx
-      if (vsrClient!.isHeliumVsr) {
+      if (vsrClient instanceof HeliumVsrClient) {
         configureCollectionIx = await vsrClient!.program.methods
           .configureVotingMintV0({
             idx: mintIndex,
@@ -253,7 +263,7 @@ const VotingMintConfig = ({
           }
         }
       ),
-    ...(!vsrClient?.isHeliumVsr
+    ...(!(vsrClient instanceof HeliumVsrClient)
       ? {
           grantAuthority: yup
             .object()
@@ -298,7 +308,7 @@ const VotingMintConfig = ({
       name: 'mintIndex',
       type: InstructionInputType.INPUT,
     },
-    ...(!vsrClient?.isHeliumVsr
+    ...(!(vsrClient instanceof HeliumVsrClient)
       ? [
           {
             label: 'Grant authority (Governance)',
@@ -319,7 +329,7 @@ const VotingMintConfig = ({
       name: 'mintDigitShift',
       type: InstructionInputType.INPUT,
     },
-    ...(!vsrClient?.isHeliumVsr
+    ...(!(vsrClient instanceof HeliumVsrClient)
       ? [
           {
             label: 'mint unlocked factor',
