@@ -595,6 +595,7 @@ export enum Instructions {
   MangoV4TokenRegister,
   MangoV4TokenRegisterTrustless,
   MangoV4GroupEdit,
+  MangoV4IxGateSet,
   MeanCreateAccount,
   MeanCreateStream,
   MeanFundAccount,

@@ -687,7 +687,10 @@ export default function useGovernanceAssets() {
       name: 'Serum 3 Edit Market',
       packageId: PackageEnum.MangoMarketV4,
     },
-
+    [Instructions.MangoV4IxGateSet]: {
+      name: 'Ix Gate Set',
+      packageId: PackageEnum.MangoMarketV4,
+    },
     /*
       ███    ███ ███████  █████  ███    ██     ███████ ██ ███    ██  █████  ███    ██  ██████ ███████
       ████  ████ ██      ██   ██ ████   ██     ██      ██ ████   ██ ██   ██ ████   ██ ██      ██
