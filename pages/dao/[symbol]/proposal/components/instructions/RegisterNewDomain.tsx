@@ -6,23 +6,16 @@ import {
   ProgramAccount,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
-import { PublicKey, SYSVAR_RENT_PUBKEY } from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js'
 import { validateInstruction } from '@utils/instructionTools'
 import {
   RegisterNewDomainForm,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import {
-  transferInstruction,
-  NAME_PROGRAM_ID,
   getDomainKey,
   NameRegistryState,
-  registerDomainName,
-  REGISTER_PROGRAM_ID,
-  getHashedName,
-  getNameAccountKey,
-  ROOT_DOMAIN_ACCOUNT,
-  createV2Instruction,
+  createNameRegistry,
 } from '@bonfida/spl-name-service'
 import { NewProposalContext } from '../../new'
 import GovernedAccountSelect from '../GovernedAccountSelect'
@@ -31,14 +24,11 @@ import { LoadingDots } from '@components/Loading'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Select from '@components/inputs/Select'
 import Input from '@components/inputs/Input'
-import { isPublicKey } from '@tools/core/pubkey'
-import { useConnection } from '@solana/wallet-adapter-react'
 import { debounce } from '@utils/debounce'
 import UnselectedWalletIcon from '@components/treasuryV2/icons/UnselectedWalletIcon'
 import { abbreviateAddress } from '@utils/formatting'
 import Link from 'next/link'
-import { number } from 'superstruct'
-import { USDC_MINT } from 'Strategies/protocols/mango/tools'
+import { serialize } from 'borsh'
 
 const RegisterNewDomain = ({
   index,
@@ -92,11 +82,10 @@ const RegisterNewDomain = ({
     setForm((f) => ({ ...f, domain: '' }))
     setIsDomainAvailable(false)
     debounce.debounceFcn(async () => {
-      // todo: check domain exists and set domain in form
       if (domain && (await isDomainTaken(domain))) {
         setFormErrors((f) => ({
           ...f,
-          domain: `${domain} is not available. Try a different domain name. `,
+          domain: `${domain.toLowerCase()} is not available. Try a different domain name. `,
         }))
       } else {
         setForm((f) => ({ ...f, domain: domain }))
@@ -149,62 +138,19 @@ const RegisterNewDomain = ({
       form.domain &&
       form.governedAccount
     ) {
-      // todo: get instruction from bonfida
-      // const [centralState] = await PublicKey.findProgramAddress(
-      //   [REGISTER_PROGRAM_ID.toBuffer()],
-      //   REGISTER_PROGRAM_ID
-      // )
-      // const hashed = await getHashedName(
-      //   domain.trim().toLowerCase().replace('.sol', '')
-      // )
-      // const nameAccount = await getNameAccountKey(
-      //   hashed,
-      //   undefined,
-      //   ROOT_DOMAIN_ACCOUNT
-      // )
-      // const hashedReverseLookup = await getHashedName(nameAccount.toBase58())
-      // const reverseLookupAccount = await getNameAccountKey(
-      //   hashedReverseLookup,
-      //   centralState
-      // )
-      // const [derived_state] = await PublicKey.findProgramAddress(
-      //   [nameAccount.toBuffer()],
-      //   REGISTER_PROGRAM_ID
-      // )
-      // const ix = new createV2Instruction({
-      //   name: domain.trim().toLowerCase().replace('.sol', ''),
-      //   space: form.storage ?? 1,
-      // }).getInstruction(REGISTER_PROGRAM_ID, SYSVAR_RENT_PUBKEY, NAME_PROGRAM_ID, ROOT_DOMAIN_ACCOUNT, nameAccount, reverseLookupAccount, centralState, new PublicKey(form.governedAccount),/* usdc token account */ , USDC_MINT )
-      try {
-        console.log(new PublicKey(form.destinationAccount))
+      // todo: add advanced options
+      console.log('Form', form)
 
-        const ix = await fetch(
-          'https://naming-api.bonfida.com/registrar/new-domain',
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              domain: domain.toLowerCase().trim().replace('.sol', ''),
-              pubkey: form.destinationAccount,
-              space: `${(form.storage ?? 1) * 1000}`,
-              language: '0',
-            }),
-          }
-        )
-          .then((res) => res.json())
-          .catch(console.log)
-        // {
-        //   "domain": "domain_to_register",
-        //   "pubkey": "pubkey_of_the_user",
-        //   "space": "domain_space", // Between 1_000 and 10_000
-        //   "language": "0"
-        // }
-        console.log(JSON.stringify(ix), null, 4)
-      } catch (err) {
-        console.error('Error posting to notify webhook:', err)
-      }
-      // todo: serialize instruction
-      // obj.serializedInstruction = serializeInstructionToBase64(transferIx)
+      const instruction = await createNameRegistry(
+        connection,
+        form.domain.trim().toLowerCase().replace('.sol', ''),
+        form.storage ? form.storage * 1024 : 1024,
+        form.governedAccount.pubkey,
+        new PublicKey(form.destinationAccount)
+      ).catch(console.log)
+
+      if (instruction)
+        obj.serializedInstruction = serializeInstructionToBase64(instruction)
     }
     return obj
   }
@@ -226,7 +172,7 @@ const RegisterNewDomain = ({
     domain: yup.string().required('Please input a domain name'),
     storage: yup
       .number()
-      .required('Provide a a number for the size of the desired account')
+      .required('Provide a a number for the size in kb of the desired account')
       .min(1)
       .max(10),
   })
@@ -239,7 +185,7 @@ const RegisterNewDomain = ({
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedAccount' })
         }}
-        value={governedAccount}
+        value={form.governedAccount}
         error={formErrors['governedAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
@@ -300,6 +246,7 @@ const RegisterNewDomain = ({
           handleSetForm({ value, propertyName: 'destinationAccount' })
         }}
         placeholder="Please select..."
+        // className="overflow-hidden"
         value={form.destinationAccount || null}
         error={formErrors['destinationAccount']}
       >
@@ -367,5 +314,4 @@ const RegisterNewDomain = ({
     </>
   )
 }
-
 export default RegisterNewDomain
