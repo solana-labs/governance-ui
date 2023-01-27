@@ -71,7 +71,8 @@ export function createTransaction(
           value: undefined,
         },
     minInstructionHoldUpTime: daysToSeconds(rules.minInstructionHoldupDays),
-    maxVotingTime: daysToSeconds(rules.maxVoteDays),
+    maxVotingTime:
+      daysToSeconds(rules.maxVoteDays) - hoursToSeconds(rules.coolOffHours),
     communityVoteTipping: convertVoteTipping(communityRules.voteTipping),
     councilVoteThreshold: councilRules?.canVote
       ? {
