@@ -41,93 +41,112 @@ const CreateVsrRegistrar = ({
   const { realm, realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const [form, setForm] = useState<CreateVsrRegistrarForm>()
+  const [form, setForm] = useState<CreateVsrRegistrarForm>({
+    governedAccount: undefined,
+    programId: undefined,
+  })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
   const { wallet, anchorProvider } = useWallet()
 
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
-    let serializedInstruction = ''
+    const governanceAccount = governance?.account
+
+    const returnInvalid = (): UiInstruction => ({
+      serializedInstruction: '',
+      isValid: false,
+      governance: undefined,
+    })
+
     if (
-      isValid &&
-      form!.governedAccount?.governance?.account &&
-      wallet?.publicKey
+      !isValid ||
+      !governanceAccount ||
+      !wallet ||
+      !wallet.publicKey ||
+      !form.governedAccount?.governance?.account ||
+      !form.programId ||
+      !realmInfo ||
+      !realm
     ) {
-      let vsrClient: VsrClient | HeliumVsrClient
+      return returnInvalid()
+    }
 
-      if (
-        form?.programId &&
-        [...vsrPluginsPks, ...heliumVsrPluginsPks].includes(form.programId)
-      ) {
-        if (vsrPluginsPks.includes(form.programId)) {
-          vsrClient = await VsrClient.connect(
-            anchorProvider,
-            new PublicKey(form.programId)
-          )
-        }
-        if (heliumVsrPluginsPks.includes(form.programId)) {
-          vsrClient = await HeliumVsrClient.connect(anchorProvider)
-        }
-      } else {
-        vsrClient = await VsrClient.connect(anchorProvider, DEFAULT_VSR_ID)
-      }
+    let instruction: web3.TransactionInstruction
+    const prerequisiteInstructions: web3.TransactionInstruction[] = []
+    let vsrClient: VsrClient | HeliumVsrClient | undefined
 
-      const { registrar, registrarBump } = await getRegistrarPDA(
-        realm!.pubkey,
-        realm!.account.communityMint,
-        vsrClient!.program.programId
+    if (vsrPluginsPks.includes(form?.programId)) {
+      vsrClient = await VsrClient.connect(
+        anchorProvider,
+        new PublicKey(form.programId)
+      )
+    }
+
+    if (heliumVsrPluginsPks.includes(form?.programId)) {
+      vsrClient = await HeliumVsrClient.connect(anchorProvider)
+    }
+
+    if (!vsrClient) {
+      return returnInvalid()
+    }
+
+    const { registrar, registrarBump } = await getRegistrarPDA(
+      realm.pubkey,
+      realm.account.communityMint,
+      vsrClient.program.programId
+    )
+
+    if (vsrClient instanceof HeliumVsrClient) {
+      prerequisiteInstructions.push(
+        ComputeBudgetProgram.setComputeUnitLimit({ units: 400000 })
       )
 
-      let createRegistrarIx
-      if (vsrClient!) {
-        if (vsrClient instanceof HeliumVsrClient) {
-          createRegistrarIx = await vsrClient.program.methods
-            .initializeRegistrarV0({
-              positionUpdateAuthority: null,
-            })
-            .accounts({
-              registrar,
-              realm: realm!.pubkey,
-              governanceProgramId: realmInfo!.programId,
-              realmAuthority: realm!.account.authority!,
-              realmGoverningTokenMint: realm!.account.communityMint!,
-              payer: wallet.publicKey!,
-              systemProgram: SYSTEM_PROGRAM_ID,
-            })
-            .preInstructions([
-              ComputeBudgetProgram.setComputeUnitLimit({ units: 400000 }),
-            ])
-            .instruction()
-        } else {
-          createRegistrarIx = await vsrClient.program.methods
-            .createRegistrar(registrarBump)
-            .accounts({
-              registrar,
-              realm: realm!.pubkey,
-              governanceProgramId: realmInfo!.programId,
-              realmAuthority: realm!.account.authority!,
-              realmGoverningTokenMint: realm!.account.communityMint!,
-              payer: wallet.publicKey!,
-              systemProgram: SYSTEM_PROGRAM_ID,
-              rent: SYSVAR_RENT_PUBKEY,
-            })
-            .instruction()
-        }
-      }
+      instruction = await vsrClient.program.methods
+        .initializeRegistrarV0({
+          positionUpdateAuthority: null,
+        })
+        .accounts({
+          registrar,
+          realm: realm!.pubkey,
+          governanceProgramId: realmInfo!.programId,
+          realmAuthority: realm!.account.authority!,
+          realmGoverningTokenMint: realm!.account.communityMint!,
+          payer: wallet.publicKey!,
+          systemProgram: SYSTEM_PROGRAM_ID,
+        })
+        .instruction()
+    } else {
+      instruction = await vsrClient.program.methods
+        .createRegistrar(registrarBump)
+        .accounts({
+          registrar,
+          realm: realm!.pubkey,
+          governanceProgramId: realmInfo!.programId,
+          realmAuthority: realm!.account.authority!,
+          realmGoverningTokenMint: realm!.account.communityMint!,
+          payer: wallet.publicKey!,
+          systemProgram: SYSTEM_PROGRAM_ID,
+          rent: SYSVAR_RENT_PUBKEY,
+        })
+        .instruction()
+    }
 
-      serializedInstruction = serializeInstructionToBase64(createRegistrarIx)
+    return {
+      serializedInstruction: serializeInstructionToBase64(instruction),
+      isValid: true,
+      governance: form.governedAccount.governance,
+      prerequisiteInstructions: prerequisiteInstructions,
+      shouldSplitIntoSeparateTxs: false,
     }
-    const obj: UiInstruction = {
-      serializedInstruction: serializedInstruction,
-      isValid,
-      governance: form!.governedAccount?.governance,
-    }
-    return obj
   }
+
   useEffect(() => {
     handleSetInstructions(
-      { governedAccount: form?.governedAccount?.governance, getInstruction },
+      {
+        governedAccount: form?.governedAccount?.governance,
+        getInstruction,
+      },
       index
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
