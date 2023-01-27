@@ -298,18 +298,9 @@ export const LockTokensAccount: React.FC<{
                 !isOwnerOfPositions ? 'opacity-0.8 pointer-events-none' : ''
               }`}
             >
-              {positions.map((pos, idx) => {
-                const votingMintCfg =
-                  vsrRegistrar?.votingMints[pos.votingMintConfigIdx]
-
-                return (
-                  <PositionCard
-                    key={idx}
-                    position={pos}
-                    votingMintCfg={votingMintCfg!}
-                  />
-                )
-              })}
+              {positions.map((pos, idx) => (
+                <PositionCard key={idx} position={pos} />
+              ))}
               <div className="border border-fgd-4 flex flex-col items-center justify-center p-6 rounded-lg">
                 <LightningBoltIcon className="h-8 mb-2 text-primary-light w-8" />
                 <p className="flex text-center pb-6">

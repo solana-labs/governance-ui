@@ -22,6 +22,7 @@ import { BN } from '@project-serum/anchor'
 import {
   nftPluginsPks,
   vsrPluginsPks,
+  heliumVsrPluginsPks,
   gatewayPluginsPks,
 } from '@hooks/useVotingPlugins'
 import { AssetAccount } from '@utils/uiTypes/assets'
@@ -30,6 +31,7 @@ import { AssetAccount } from '@utils/uiTypes/assets'
 const supportedPlugins = [
   ...nftPluginsPks,
   ...vsrPluginsPks,
+  ...heliumVsrPluginsPks,
   ...gatewayPluginsPks,
 ]
 

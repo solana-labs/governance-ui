@@ -61,162 +61,174 @@ const VotingMintConfig = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const [vsrClient, setVsrClient] = useState<
-    VsrClient | HeliumVsrClient | null
-  >(null)
   const { realm } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const [form, setForm] = useState<ConfigureVotingMintForm>()
   const [formErrors, setFormErrors] = useState({})
+  const [showHeliumFields, setShowHeliumFields] = useState(false)
+  const [form, setForm] = useState<ConfigureVotingMintForm>()
   const { handleSetInstructions } = useContext(NewProposalContext)
   const { wallet, anchorProvider } = useWallet()
 
   useEffect(() => {
-    ;(async () => {
-      if (anchorProvider && form?.programId) {
-        let programId: PublicKey = PublicKey.default
-
-        try {
-          programId = new PublicKey(form.programId)
-          if (vsrPluginsPks.includes(programId.toBase58())) {
-            setVsrClient(await VsrClient.connect(anchorProvider, programId))
-          }
-
-          if (heliumVsrPluginsPks.includes(programId.toBase58())) {
-            setVsrClient(await HeliumVsrClient.connect(anchorProvider))
-          }
-        } catch (err) {
-          // invalid pubkey
-          return
-        }
+    if (form?.programId) {
+      if (vsrPluginsPks.includes(form.programId)) {
+        setShowHeliumFields(false)
       }
-    })()
-  }, [anchorProvider, form?.programId, setVsrClient])
+
+      if (heliumVsrPluginsPks.includes(form.programId)) {
+        setShowHeliumFields(true)
+      }
+    }
+  }, [form?.programId, setShowHeliumFields])
 
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
-    let serializedInstruction = ''
+    const returnInvalid = (): UiInstruction => ({
+      serializedInstruction: '',
+      isValid: false,
+      governance: undefined,
+    })
 
     if (
-      isValid &&
-      form &&
-      form!.governedAccount?.governance.pubkey &&
-      wallet?.publicKey?.toBase58()
+      !isValid ||
+      !wallet ||
+      !wallet.publicKey ||
+      !form ||
+      !form.governedAccount?.governance?.account ||
+      !form.programId ||
+      !realm
     ) {
-      const {
-        mintIndex,
-        mintDigitShift,
-        baselineVoteWeightFactor,
-        lockedVoteWeightFactor,
-        minimumRequiredLockup,
-        maxLockupFactor,
-        lockupSaturation,
-        grantAuthority,
-      } = {
-        baselineVoteWeightFactor: 0,
-        lockedVoteWeightFactor: 0,
-        minimumRequiredLockup: 0,
-        ...form,
-      }
+      return returnInvalid()
+    }
 
-      const mint = new PublicKey(form.mint)
-      const baselineScaledFactor = getScaledFactor(baselineVoteWeightFactor)
-      const lockedScaledFactor = getScaledFactor(lockedVoteWeightFactor)
-      const maxLockupScaledFactor = getScaledFactor(maxLockupFactor)
-      const minimumRequiredLockupSecs = new BN(
-        daysToSecs(Math.ceil(yearsToDays(minimumRequiredLockup))).toString()
-      )
-      const lockupSaturationSecs = new BN(
-        yearsToSecs(lockupSaturation).toString()
-      )
-      const { registrar } = await getRegistrarPDA(
-        realm!.pubkey,
-        realm!.account.communityMint,
-        vsrClient!.program.programId!
-      )
-      let remainingAccounts = [
-        {
-          pubkey: mint,
-          isSigner: false,
-          isWritable: false,
-        },
-      ]
+    let instruction: web3.TransactionInstruction
+    let vsrClient: VsrClient | HeliumVsrClient | undefined
 
-      try {
-        // If we can fetch the registrar then use it for the additional mint configs
-        // Note: The registrar might not exist if we are setting this for the first time in a single proposal
-        // In that case we default to 0 existing mints
-        const registrarAcc = (await vsrClient?.program.account.registrar.fetch(
-          registrar
-        )) as Registrar
-
-        const registrarMints = registrarAcc?.votingMints
-          .filter((vm) => !vm.mint.equals(new PublicKey(emptyPk)))
-          .map((vm) => {
-            return {
-              pubkey: vm.mint,
-              isSigner: false,
-              isWritable: false,
-            }
-          })
-
-        remainingAccounts = remainingAccounts.concat(registrarMints)
-      } catch (ex) {
-        console.info("Can't fetch registrar", ex)
-      }
-
-      let configureCollectionIx
-      if (vsrClient instanceof HeliumVsrClient) {
-        configureCollectionIx = await vsrClient!.program.methods
-          .configureVotingMintV0({
-            idx: mintIndex,
-            digitShift: mintDigitShift,
-            lockedVoteWeightScaledFactor: lockedScaledFactor,
-            minimumRequiredLockupSecs,
-            maxExtraLockupVoteWeightScaledFactor: maxLockupScaledFactor,
-            genesisVotePowerMultiplier: 0,
-            genesisVotePowerMultiplierExpirationTs: new BN(0),
-            lockupSaturationSecs,
-          })
-          .accounts({
-            registrar,
-            realmAuthority: realm!.account.authority,
-            mint,
-          })
-          .remainingAccounts(remainingAccounts)
-          .instruction()
-      } else {
-        configureCollectionIx = await vsrClient!.program.methods
-          .configureVotingMint(
-            mintIndex, // mint index
-            mintDigitShift, // digit_shift
-            baselineScaledFactor, // unlocked_scaled_factor
-            maxLockupScaledFactor, // lockup_scaled_factor
-            lockupSaturationSecs, // lockup_saturation_secs
-            grantAuthority!.governance.pubkey // grant_authority)
-          )
-          .accounts({
-            registrar,
-            realmAuthority: realm!.account.authority,
-            mint,
-          })
-          .remainingAccounts(remainingAccounts)
-          .instruction()
-      }
-
-      serializedInstruction = serializeInstructionToBase64(
-        configureCollectionIx
+    if (vsrPluginsPks.includes(form.programId)) {
+      vsrClient = await VsrClient.connect(
+        anchorProvider,
+        new PublicKey(form.programId)
       )
     }
-    const obj: UiInstruction = {
-      serializedInstruction: serializedInstruction,
-      isValid,
-      governance: form!.governedAccount?.governance,
+
+    if (heliumVsrPluginsPks.includes(form.programId)) {
+      vsrClient = await HeliumVsrClient.connect(anchorProvider)
+    }
+
+    if (!vsrClient) {
+      return returnInvalid()
+    }
+
+    const {
+      mintIndex,
+      mintDigitShift,
+      baselineVoteWeightFactor,
+      lockedVoteWeightFactor,
+      minimumRequiredLockup,
+      maxLockupFactor,
+      lockupSaturation,
+      grantAuthority,
+    } = {
+      baselineVoteWeightFactor: 0,
+      lockedVoteWeightFactor: 0,
+      minimumRequiredLockup: 0,
+      ...form,
+    }
+
+    const { registrar } = await getRegistrarPDA(
+      realm!.pubkey,
+      realm!.account.communityMint,
+      vsrClient!.program.programId!
+    )
+
+    const mint = new PublicKey(form.mint)
+    const baselineScaledFactor = getScaledFactor(baselineVoteWeightFactor)
+    const lockedScaledFactor = getScaledFactor(lockedVoteWeightFactor)
+    const maxLockupScaledFactor = getScaledFactor(maxLockupFactor)
+    const minimumRequiredLockupSecs = new BN(
+      daysToSecs(Math.ceil(yearsToDays(minimumRequiredLockup))).toString()
+    )
+    const lockupSaturationSecs = new BN(
+      yearsToSecs(lockupSaturation).toString()
+    )
+    let remainingAccounts = [
+      {
+        pubkey: mint,
+        isSigner: false,
+        isWritable: false,
+      },
+    ]
+
+    try {
+      // If we can fetch the registrar then use it for the additional mint configs
+      // Note: The registrar might not exist if we are setting this for the first time in a single proposal
+      // In that case we default to 0 existing mints
+      const registrarAcc = (await vsrClient?.program.account.registrar.fetch(
+        registrar
+      )) as Registrar
+
+      const registrarMints = registrarAcc?.votingMints
+        .filter((vm) => !vm.mint.equals(new PublicKey(emptyPk)))
+        .map((vm) => {
+          return {
+            pubkey: vm.mint,
+            isSigner: false,
+            isWritable: false,
+          }
+        })
+
+      remainingAccounts = remainingAccounts.concat(registrarMints)
+    } catch (ex) {
+      console.info("Can't fetch registrar", ex)
+    }
+
+    if (vsrClient instanceof HeliumVsrClient) {
+      instruction = await vsrClient!.program.methods
+        .configureVotingMintV0({
+          idx: mintIndex,
+          digitShift: mintDigitShift,
+          lockedVoteWeightScaledFactor: lockedScaledFactor,
+          minimumRequiredLockupSecs,
+          maxExtraLockupVoteWeightScaledFactor: maxLockupScaledFactor,
+          genesisVotePowerMultiplier: 0,
+          genesisVotePowerMultiplierExpirationTs: new BN(0),
+          lockupSaturationSecs,
+        })
+        .accounts({
+          registrar,
+          realmAuthority: realm!.account.authority,
+          mint,
+        })
+        .remainingAccounts(remainingAccounts)
+        .instruction()
+    } else {
+      instruction = await vsrClient!.program.methods
+        .configureVotingMint(
+          mintIndex, // mint index
+          mintDigitShift, // digit_shift
+          baselineScaledFactor, // unlocked_scaled_factor
+          maxLockupScaledFactor, // lockup_scaled_factor
+          lockupSaturationSecs, // lockup_saturation_secs
+          grantAuthority!.governance.pubkey // grant_authority)
+        )
+        .accounts({
+          registrar,
+          realmAuthority: realm!.account.authority,
+          mint,
+        })
+        .remainingAccounts(remainingAccounts)
+        .instruction()
+    }
+
+    return {
+      serializedInstruction: serializeInstructionToBase64(instruction),
+      isValid: true,
+      governance: form.governedAccount.governance,
       chunkSplitByDefault: true,
     }
-    return obj
   }
+
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: form?.governedAccount?.governance, getInstruction },
@@ -224,6 +236,7 @@ const VotingMintConfig = ({
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
+
   const schema = yup.object().shape({
     programId: yup
       .string()
@@ -263,7 +276,7 @@ const VotingMintConfig = ({
           }
         }
       ),
-    ...(!(vsrClient instanceof HeliumVsrClient)
+    ...(!showHeliumFields
       ? {
           grantAuthority: yup
             .object()
@@ -275,14 +288,13 @@ const VotingMintConfig = ({
   const inputs: InstructionInput[] = [
     {
       label: 'Voter Stake Registry Program ID',
-      initialValue:
-        vsrClient?.program.programId.toString() || DEFAULT_VSR_ID.toString(),
+      initialValue: DEFAULT_VSR_ID,
       name: 'programId',
       type: InstructionInputType.INPUT,
     },
     {
       label: 'Wallet',
-      initialValue: null,
+      initialValue: undefined,
       name: 'governedAccount',
       type: InstructionInputType.GOVERNED_ACCOUNT,
       shouldBeGoverned: shouldBeGoverned,
@@ -308,7 +320,7 @@ const VotingMintConfig = ({
       name: 'mintIndex',
       type: InstructionInputType.INPUT,
     },
-    ...(!(vsrClient instanceof HeliumVsrClient)
+    ...(!showHeliumFields
       ? [
           {
             label: 'Grant authority (Governance)',
@@ -329,7 +341,7 @@ const VotingMintConfig = ({
       name: 'mintDigitShift',
       type: InstructionInputType.INPUT,
     },
-    ...(!(vsrClient instanceof HeliumVsrClient)
+    ...(!showHeliumFields
       ? [
           {
             label: 'mint unlocked factor',

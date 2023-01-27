@@ -5,7 +5,11 @@ import {
   RpcContext,
   withExecuteTransaction,
 } from '@solana/spl-governance'
-import { Transaction, TransactionInstruction } from '@solana/web3.js'
+import {
+  ComputeBudgetProgram,
+  Transaction,
+  TransactionInstruction,
+} from '@solana/web3.js'
 import { sendSignedTransaction, signTransaction } from '@utils/send'
 import {
   sendTransactionsV3,
@@ -20,6 +24,11 @@ export const executeInstructions = async (
   multiTransactionMode = false
 ) => {
   const instructions: TransactionInstruction[] = []
+
+  instructions.push(
+    ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 })
+  )
+
   await Promise.all(
     proposalInstructions.map((instruction) =>
       // withExecuteTransaction function mutate the given 'instructions' parameter

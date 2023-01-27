@@ -6,7 +6,7 @@ import { tryGetMint } from '@utils/tokens'
 import { chunks } from './chunks'
 import { calcPositionVotingPower } from './calcPositionVotingPower'
 import { HeliumVsrClient } from '../sdk/client'
-import { Registrar, Position } from '../sdk/types'
+import { Registrar, Position, PositionWithVotingMint } from '../sdk/types'
 
 export interface GetPositionsArgs {
   realmPk: PublicKey
@@ -17,7 +17,7 @@ export interface GetPositionsArgs {
 }
 
 export interface GetPositionsReturn {
-  positions: Position[]
+  positions: PositionWithVotingMint[]
   amountLocked: BN
   votingPower: BN
 }
@@ -26,9 +26,9 @@ export const getPositions = async (
   args: GetPositionsArgs
 ): Promise<GetPositionsReturn> => {
   const { realmPk, walletPk, communityMintPk, client, connection } = args
-  const positions: Position[] = []
-  const amountLocked: BN = new BN(0)
-  const votingPower: BN = new BN(0)
+  const positions: PositionWithVotingMint[] = []
+  let amountLocked: BN = new BN(0)
+  let votingPower: BN = new BN(0)
 
   const keypair = Keypair.generate()
   const metaplex = new Metaplex(connection).use(keypairIdentity(keypair))
@@ -47,15 +47,15 @@ export const getPositions = async (
   const nfts = await metaplex.nfts().findAllByOwner({ owner: walletPk })
   const posKeys = nfts
     .filter((nft) => nft.collection?.address.equals(registrar.collection))
-    .map((nft) => positionKey(nft.address)[0])
+    .map((nft) => positionKey((nft as any).mintAddress)[0])
 
   const positionAccountInfos = (
     await Promise.all(
-      chunks(posKeys, 100).map((chunk) =>
+      chunks(posKeys, 99).map((chunk) =>
         connection.getMultipleAccountsInfo(chunk)
       )
     )
-  ).flatMap((c) => c)
+  ).flat()
 
   positions.push(
     ...positionAccountInfos
@@ -66,6 +66,16 @@ export const getPositions = async (
             pos!.data
           ) as Position
       )
+      .map(
+        (pos) =>
+          ({
+            ...pos,
+            votingMint: {
+              ...mintCfgs[pos.votingMintConfigIdx],
+              mint: mints[mintCfgs[pos.votingMintConfigIdx].mint.toBase58()],
+            },
+          } as PositionWithVotingMint)
+      )
       .filter((pos) => {
         const lockup = pos.lockup
         const lockupKind = Object.keys(lockup.kind)[0]
@@ -73,24 +83,20 @@ export const getPositions = async (
       })
   )
 
-  amountLocked.add(
-    positions.reduce(
-      (acc, pos) => acc.add(pos.amountDepositedNative),
-      amountLocked
-    )
+  amountLocked = positions.reduce(
+    (acc, pos) => acc.add(pos.amountDepositedNative),
+    new BN(0)
   )
 
-  votingPower.add(
-    positions.reduce(
-      (acc, pos) =>
-        acc.add(
-          calcPositionVotingPower({
-            position: pos,
-            registrar,
-          })
-        ),
-      votingPower
-    )
+  votingPower = positions.reduce(
+    (acc, pos) =>
+      acc.add(
+        calcPositionVotingPower({
+          position: pos,
+          registrar,
+        })
+      ),
+    new BN(0)
   )
 
   return {

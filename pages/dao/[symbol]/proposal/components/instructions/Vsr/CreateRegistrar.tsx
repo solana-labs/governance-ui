@@ -14,11 +14,7 @@ import { NewProposalContext } from '../../../new'
 import InstructionForm, { InstructionInputType } from '../FormCreator'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import {
-  ComputeBudgetProgram,
-  PublicKey,
-  SYSVAR_RENT_PUBKEY,
-} from '@solana/web3.js'
+import { PublicKey, SYSVAR_RENT_PUBKEY } from '@solana/web3.js'
 import { getRegistrarPDA } from 'VoteStakeRegistry/sdk/accounts'
 import { DEFAULT_VSR_ID, VsrClient } from 'VoteStakeRegistry/sdk/client'
 import { web3 } from '@project-serum/anchor'
@@ -31,6 +27,25 @@ interface CreateVsrRegistrarForm {
   programId: string | undefined
 }
 
+const schema = yup.object().shape({
+  governedAccount: yup
+    .object()
+    .nullable()
+    .required('Governed account is required'),
+  programId: yup
+    .string()
+    .nullable()
+    .test((key) => {
+      try {
+        new web3.PublicKey(key as string)
+      } catch (err) {
+        return false
+      }
+      return true
+    })
+    .required('VSR Program ID is required'),
+})
+
 const CreateVsrRegistrar = ({
   index,
   governance,
@@ -41,18 +56,13 @@ const CreateVsrRegistrar = ({
   const { realm, realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const [form, setForm] = useState<CreateVsrRegistrarForm>({
-    governedAccount: undefined,
-    programId: undefined,
-  })
+  const [form, setForm] = useState<CreateVsrRegistrarForm>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
   const { wallet, anchorProvider } = useWallet()
 
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
-    const governanceAccount = governance?.account
-
     const returnInvalid = (): UiInstruction => ({
       serializedInstruction: '',
       isValid: false,
@@ -61,9 +71,9 @@ const CreateVsrRegistrar = ({
 
     if (
       !isValid ||
-      !governanceAccount ||
       !wallet ||
       !wallet.publicKey ||
+      !form ||
       !form.governedAccount?.governance?.account ||
       !form.programId ||
       !realmInfo ||
@@ -73,17 +83,16 @@ const CreateVsrRegistrar = ({
     }
 
     let instruction: web3.TransactionInstruction
-    const prerequisiteInstructions: web3.TransactionInstruction[] = []
     let vsrClient: VsrClient | HeliumVsrClient | undefined
 
-    if (vsrPluginsPks.includes(form?.programId)) {
+    if (vsrPluginsPks.includes(form.programId)) {
       vsrClient = await VsrClient.connect(
         anchorProvider,
         new PublicKey(form.programId)
       )
     }
 
-    if (heliumVsrPluginsPks.includes(form?.programId)) {
+    if (heliumVsrPluginsPks.includes(form.programId)) {
       vsrClient = await HeliumVsrClient.connect(anchorProvider)
     }
 
@@ -98,20 +107,16 @@ const CreateVsrRegistrar = ({
     )
 
     if (vsrClient instanceof HeliumVsrClient) {
-      prerequisiteInstructions.push(
-        ComputeBudgetProgram.setComputeUnitLimit({ units: 400000 })
-      )
-
       instruction = await vsrClient.program.methods
         .initializeRegistrarV0({
           positionUpdateAuthority: null,
         })
         .accounts({
           registrar,
-          realm: realm!.pubkey,
-          governanceProgramId: realmInfo!.programId,
-          realmAuthority: realm!.account.authority!,
-          realmGoverningTokenMint: realm!.account.communityMint!,
+          realm: realm.pubkey,
+          governanceProgramId: realmInfo.programId,
+          realmAuthority: realm.account.authority!,
+          realmGoverningTokenMint: realm.account.communityMint!,
           payer: wallet.publicKey!,
           systemProgram: SYSTEM_PROGRAM_ID,
         })
@@ -121,10 +126,10 @@ const CreateVsrRegistrar = ({
         .createRegistrar(registrarBump)
         .accounts({
           registrar,
-          realm: realm!.pubkey,
-          governanceProgramId: realmInfo!.programId,
-          realmAuthority: realm!.account.authority!,
-          realmGoverningTokenMint: realm!.account.communityMint!,
+          realm: realm.pubkey,
+          governanceProgramId: realmInfo.programId,
+          realmAuthority: realm.account.authority!,
+          realmGoverningTokenMint: realm.account.communityMint!,
           payer: wallet.publicKey!,
           systemProgram: SYSTEM_PROGRAM_ID,
           rent: SYSVAR_RENT_PUBKEY,
@@ -136,43 +141,21 @@ const CreateVsrRegistrar = ({
       serializedInstruction: serializeInstructionToBase64(instruction),
       isValid: true,
       governance: form.governedAccount.governance,
-      prerequisiteInstructions: prerequisiteInstructions,
-      shouldSplitIntoSeparateTxs: false,
     }
   }
 
   useEffect(() => {
     handleSetInstructions(
-      {
-        governedAccount: form?.governedAccount?.governance,
-        getInstruction,
-      },
+      { governedAccount: form?.governedAccount?.governance, getInstruction },
       index
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
-  const schema = yup.object().shape({
-    governedAccount: yup
-      .object()
-      .nullable()
-      .required('Governed account is required'),
-    programId: yup
-      .string()
-      .nullable()
-      .test((key) => {
-        try {
-          new web3.PublicKey(key as string)
-        } catch (err) {
-          return false
-        }
-        return true
-      })
-      .required('VSR Program ID is required'),
-  })
+
   const inputs = [
     {
       label: 'Wallet',
-      initialValue: null,
+      initialValue: undefined,
       name: 'governedAccount',
       type: InstructionInputType.GOVERNED_ACCOUNT,
       shouldBeGoverned: shouldBeGoverned,

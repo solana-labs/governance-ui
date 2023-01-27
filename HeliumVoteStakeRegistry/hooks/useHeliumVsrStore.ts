@@ -1,12 +1,12 @@
 import create, { State } from 'zustand'
 import { BN } from '@project-serum/anchor'
 import { NFTWithMeta } from '@utils/uiTypes/VotePlugin'
-import { Position } from 'HeliumVoteStakeRegistry/sdk/types'
+import { PositionWithVotingMint } from 'HeliumVoteStakeRegistry/sdk/types'
 import { MaxVoterWeightRecord, ProgramAccount } from '@solana/spl-governance'
 import { GetPositionsArgs, getPositions } from '../utils/getPositions'
 
 interface HeliumVsrStoreState {
-  positions: Position[]
+  positions: PositionWithVotingMint[]
   amountLocked: BN
   votingPower: BN
   votingNfts: NFTWithMeta[]
@@ -51,7 +51,7 @@ const useHeliumVsrStore = create<HeliumVsrStore>((set, _get) => ({
           (s.state.votingPower = votingPower)
       })
     } catch (e) {
-      throw "Can't fech positons"
+      throw new Error(e)
     } finally {
       set((s) => {
         s.state.isLoading = false

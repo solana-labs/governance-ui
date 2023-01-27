@@ -171,7 +171,7 @@ export const LockTokensModal: React.FC<{
     <Modal onClose={onClose} isOpen={isOpen}>
       <form onSubmit={handleOnSubmit}>
         <h2 className="mb-4 flex flex-row items-center">Lock Tokens</h2>
-        {hasMinLockup && !showLockupTypeInfo && (
+        {hasMinLockup && !showLockupTypeInfo ? (
           <div className="bg-bkg-3 rounded-md w-full p-4 mb-4 font-normal text-xs">
             <div>
               There is a minimum required lockup time of{' '}
@@ -180,7 +180,7 @@ export const LockTokensModal: React.FC<{
               </span>
             </div>
           </div>
-        )}
+        ) : null}
         {!showLockupTypeInfo && (
           <>
             <div className="flex items-center justify-between">

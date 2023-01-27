@@ -74,7 +74,6 @@ export const createProposal = async (
   client?: VotingClient
 ): Promise<PublicKey> => {
   const instructions: TransactionInstruction[] = []
-
   const governanceAuthority = walletPubkey
   const signatory = walletPubkey
   const payer = walletPubkey
@@ -198,6 +197,7 @@ export const createProposal = async (
       undefined
     )
   }
+
   if (
     insertInstructionCount <= 2 &&
     !shouldSplitIntoSeparateTxs &&
@@ -208,7 +208,7 @@ export const createProposal = async (
     // This is conservative setting and we might need to revise it if we have more empirical examples or
     // reliable way to determine Tx size
     // We merge instructions with prerequisiteInstructions
-    // Prerequisite  instructions can came from instructions as something we need to do before instruction can be executed
+    // Prerequisite instructions can came from instructions as something we need to do before instruction can be executed
     // For example we create ATAs if they don't exist as part of the proposal creation flow
     const signersSet = [[], [], signers]
     const txes = [

@@ -295,6 +295,10 @@ const heliumInitializeRegistrarIx = (_programId: PublicKey) => ({
     name: 'Initialize registrar',
     accounts: [
       { name: 'Registrar' },
+      { name: 'Collection' },
+      { name: 'Collection Metadata' },
+      { name: 'Master Edition' },
+      { name: 'Token Account' },
       { name: 'Realm' },
       { name: 'Governance program id' },
       { name: 'Realm governing token mint' },
