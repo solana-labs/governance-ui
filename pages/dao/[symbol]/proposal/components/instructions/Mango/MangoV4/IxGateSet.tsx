@@ -17,8 +17,7 @@ import InstructionForm, {
   InstructionInputType,
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
-import { IxGateParams } from '@blockworks-foundation/mango-v4/dist/types/src/clientIxParamBuilder'
-import { BN } from '@project-serum/anchor'
+import { buildIxGate } from '@blockworks-foundation/mango-v4/dist/types/src/clientIxParamBuilder'
 
 interface IxGateSetForm {
   governedAccount: AssetAccount | null
@@ -174,7 +173,7 @@ const IxGateSet = ({
           v,
         ])
       )
-      console.log(builderTypedIxGate)
+
       const ix = await client.program.methods
         .ixGateSet(buildIxGate(builderTypedIxGate))
         .accounts({
@@ -546,69 +545,3 @@ const IxGateSet = ({
 }
 
 export default IxGateSet
-
-export function buildIxGate(p: IxGateParams): BN {
-  const ixGate = new BN(0)
-
-  function toggleIx(
-    ixGate: BN,
-    p: IxGateParams,
-    propName: string,
-    index: number
-  ): void {
-    if (p[propName] === undefined) {
-      throw new Error(`Unknown property ${propName}`)
-    }
-    ixGate.ior(p[propName] ? new BN(0) : new BN(1).ushln(index))
-  }
-  toggleIx(ixGate, p, 'AccountClose', 0)
-  toggleIx(ixGate, p, 'AccountCreate', 1)
-  toggleIx(ixGate, p, 'AccountEdit', 2)
-  toggleIx(ixGate, p, 'AccountExpand', 3)
-  toggleIx(ixGate, p, 'AccountToggleFreeze', 4)
-  toggleIx(ixGate, p, 'AltExtend', 5)
-  toggleIx(ixGate, p, 'AltSet', 6)
-  toggleIx(ixGate, p, 'FlashLoan', 7)
-  toggleIx(ixGate, p, 'GroupClose', 8)
-  toggleIx(ixGate, p, 'GroupCreate', 9)
-  toggleIx(ixGate, p, 'HealthRegion', 10)
-  toggleIx(ixGate, p, 'PerpCancelAllOrders', 11)
-  toggleIx(ixGate, p, 'PerpCancelAllOrdersBySide', 12)
-  toggleIx(ixGate, p, 'PerpCancelOrder', 13)
-  toggleIx(ixGate, p, 'PerpCancelOrderByClientOrderId', 14)
-  toggleIx(ixGate, p, 'PerpCloseMarket', 15)
-  toggleIx(ixGate, p, 'PerpConsumeEvents', 16)
-  toggleIx(ixGate, p, 'PerpCreateMarket', 17)
-  toggleIx(ixGate, p, 'PerpDeactivatePosition', 18)
-  toggleIx(ixGate, p, 'PerpLiqBasePosition', 19)
-  toggleIx(ixGate, p, 'PerpLiqForceCancelOrders', 20)
-  toggleIx(ixGate, p, 'PerpLiqQuoteAndBankruptcy', 21)
-  toggleIx(ixGate, p, 'PerpPlaceOrder', 22)
-  toggleIx(ixGate, p, 'PerpSettleFees', 23)
-  toggleIx(ixGate, p, 'PerpSettlePnl', 24)
-  toggleIx(ixGate, p, 'PerpUpdateFunding', 25)
-  toggleIx(ixGate, p, 'Serum3CancelAllOrders', 26)
-  toggleIx(ixGate, p, 'Serum3CancelOrder', 27)
-  toggleIx(ixGate, p, 'Serum3CloseOpenOrders', 28)
-  toggleIx(ixGate, p, 'Serum3CreateOpenOrders', 29)
-  toggleIx(ixGate, p, 'Serum3DeregisterMarket', 30)
-  toggleIx(ixGate, p, 'Serum3EditMarket', 31)
-  toggleIx(ixGate, p, 'Serum3LiqForceCancelOrders', 32)
-  toggleIx(ixGate, p, 'Serum3PlaceOrder', 33)
-  toggleIx(ixGate, p, 'Serum3RegisterMarket', 34)
-  toggleIx(ixGate, p, 'Serum3SettleFunds', 35)
-  toggleIx(ixGate, p, 'StubOracleClose', 36)
-  toggleIx(ixGate, p, 'StubOracleCreate', 37)
-  toggleIx(ixGate, p, 'StubOracleSet', 38)
-  toggleIx(ixGate, p, 'TokenAddBank', 39)
-  toggleIx(ixGate, p, 'TokenDeposit', 40)
-  toggleIx(ixGate, p, 'TokenDeregister', 41)
-  toggleIx(ixGate, p, 'TokenLiqBankruptcy', 42)
-  toggleIx(ixGate, p, 'TokenLiqWithToken', 43)
-  toggleIx(ixGate, p, 'TokenRegister', 44)
-  toggleIx(ixGate, p, 'TokenRegisterTrustless', 45)
-  toggleIx(ixGate, p, 'TokenUpdateIndexAndRate', 46)
-  toggleIx(ixGate, p, 'TokenWithdraw', 47)
-
-  return ixGate
-}

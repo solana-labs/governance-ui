@@ -297,7 +297,6 @@ const PerpEdit = ({
       type: InstructionInputType.INPUT,
       name: 'oraclePk',
     },
-
     {
       label: 'Oracle Configuration Filter',
       initialValue: form.oracleConfFilter,
