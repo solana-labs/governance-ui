@@ -301,11 +301,6 @@ export function EditWalletRules(props: Props) {
 
                           try {
                             const proposalAddress = await createProposal({
-                              councilTokenMintPublicKey:
-                                governance.councilTokenRules?.tokenMintAddress,
-                              communityTokenMintPublicKey:
-                                governance.communityTokenRules
-                                  ?.tokenMintAddress,
                               governingTokenMintPublicKey,
                               programPublicKey,
                               proposalDescription,
