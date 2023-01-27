@@ -1,4 +1,3 @@
-import useQueryContext from '@hooks/useQueryContext'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import NotificationsSwitch from './NotificationsSwitch'
@@ -10,7 +9,7 @@ const ConnectWalletButtonDynamic = dynamic(
 )
 
 const NavBar = () => {
-  const { fmtUrlWithCluster } = useQueryContext()
+
 
   return (
     <div className="flex flex-col sm:grid sm:grid-cols-12 relative z-20">
