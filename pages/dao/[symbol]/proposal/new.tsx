@@ -137,6 +137,8 @@ import DualWithdraw from './components/instructions/Dual/DualWithdraw'
 import DualExercise from './components/instructions/Dual/DualExercise'
 import PsyFinanceMintAmericanOptions from './components/instructions/PsyFinance/MintAmericanOptions'
 import IxGateSet from './components/instructions/Mango/MangoV4/IxGateSet'
+import StubOracleCreate from './components/instructions/Mango/MangoV4/StubOracleCreate'
+import StubOracleSet from './components/instructions/Mango/MangoV4/StubOracleSet'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -443,6 +445,8 @@ const New = () => {
       [Instructions.MangoV4GroupEdit]: GroupEdit,
       [Instructions.MangoV4Serum3EditMarket]: Serum3EditMarket,
       [Instructions.MangoV4IxGateSet]: IxGateSet,
+      [Instructions.MangoV4StubOracleCreate]: StubOracleCreate,
+      [Instructions.MangoV4StubOracleSet]: StubOracleSet,
       [Instructions.MangoV4PerpEdit]: PerpEdit,
       [Instructions.MangoV4Serum3RegisterMarket]: Serum3RegisterMarket,
       [Instructions.MangoV4PerpCreate]: PerpCreate,

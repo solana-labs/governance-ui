@@ -691,6 +691,14 @@ export default function useGovernanceAssets() {
       name: 'Ix Gate Set',
       packageId: PackageEnum.MangoMarketV4,
     },
+    [Instructions.MangoV4StubOracleCreate]: {
+      name: 'Stub oracle create',
+      packageId: PackageEnum.MangoMarketV4,
+    },
+    [Instructions.MangoV4StubOracleSet]: {
+      name: 'Stub oracle set',
+      packageId: PackageEnum.MangoMarketV4,
+    },
     /*
       ███    ███ ███████  █████  ███    ██     ███████ ██ ███    ██  █████  ███    ██  ██████ ███████
       ████  ████ ██      ██   ██ ████   ██     ██      ██ ████   ██ ██   ██ ████   ██ ██      ██
