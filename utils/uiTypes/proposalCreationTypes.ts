@@ -596,6 +596,8 @@ export enum Instructions {
   MangoV4TokenRegisterTrustless,
   MangoV4GroupEdit,
   MangoV4IxGateSet,
+  MangoV4AltSet,
+  MangoV4AltExtend,
   MangoV4StubOracleCreate,
   MangoV4StubOracleSet,
   MeanCreateAccount,

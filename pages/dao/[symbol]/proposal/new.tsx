@@ -139,6 +139,8 @@ import PsyFinanceMintAmericanOptions from './components/instructions/PsyFinance/
 import IxGateSet from './components/instructions/Mango/MangoV4/IxGateSet'
 import StubOracleCreate from './components/instructions/Mango/MangoV4/StubOracleCreate'
 import StubOracleSet from './components/instructions/Mango/MangoV4/StubOracleSet'
+import AltSet from './components/instructions/Mango/MangoV4/AltSet'
+import AltExtend from './components/instructions/Mango/MangoV4/AltExtend'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -445,6 +447,8 @@ const New = () => {
       [Instructions.MangoV4GroupEdit]: GroupEdit,
       [Instructions.MangoV4Serum3EditMarket]: Serum3EditMarket,
       [Instructions.MangoV4IxGateSet]: IxGateSet,
+      [Instructions.MangoV4AltExtend]: AltExtend,
+      [Instructions.MangoV4AltSet]: AltSet,
       [Instructions.MangoV4StubOracleCreate]: StubOracleCreate,
       [Instructions.MangoV4StubOracleSet]: StubOracleSet,
       [Instructions.MangoV4PerpEdit]: PerpEdit,

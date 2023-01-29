@@ -699,6 +699,14 @@ export default function useGovernanceAssets() {
       name: 'Stub oracle set',
       packageId: PackageEnum.MangoMarketV4,
     },
+    [Instructions.MangoV4AltSet]: {
+      name: 'Alt set',
+      packageId: PackageEnum.MangoMarketV4,
+    },
+    [Instructions.MangoV4AltExtend]: {
+      name: 'Alt extend',
+      packageId: PackageEnum.MangoMarketV4,
+    },
     /*
       ███    ███ ███████  █████  ███    ██     ███████ ██ ███    ██  █████  ███    ██  ██████ ███████
       ████  ████ ██      ██   ██ ████   ██     ██      ██ ████   ██ ██   ██ ████   ██ ██      ██
