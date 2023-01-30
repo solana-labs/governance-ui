@@ -28,7 +28,6 @@ import { debounce } from '@utils/debounce'
 import UnselectedWalletIcon from '@components/treasuryV2/icons/UnselectedWalletIcon'
 import { abbreviateAddress } from '@utils/formatting'
 import Link from 'next/link'
-import { serialize } from 'borsh'
 
 const RegisterNewDomain = ({
   index,
@@ -138,16 +137,13 @@ const RegisterNewDomain = ({
       form.domain &&
       form.governedAccount
     ) {
-      // todo: add advanced options
-      console.log('Form', form)
-
       const instruction = await createNameRegistry(
         connection,
         form.domain.trim().toLowerCase().replace('.sol', ''),
         form.storage ? form.storage * 1024 : 1024,
         form.governedAccount.pubkey,
         new PublicKey(form.destinationAccount)
-      ).catch(console.log)
+      )
 
       if (instruction)
         obj.serializedInstruction = serializeInstructionToBase64(instruction)
@@ -271,46 +267,6 @@ const RegisterNewDomain = ({
             </Select.Option>
           ))}
       </Select>
-      {/* {isLoading ? (
-        <div className="mt-5">
-          <div>Looking up accountDomains...</div>
-          <LoadingDots />
-        </div>
-      ) : (
-        <Select
-          className=""
-          label="Domain"
-          value={
-            form.domainAddress
-              ? accountDomains.find(
-                  (d) => d.domainAddress === form.domainAddress
-                )?.domainName + '.sol'
-              : ''
-          }
-          placeholder="Please select..."
-          error={formErrors['domainAddress']}
-          onChange={(value) => {
-            handleSetForm({
-              value: accountDomains.find((d) => d.domainName === value)
-                ?.domainAddress,
-              propertyName: 'domainAddress',
-            })
-          }}
-        >
-          {accountDomains?.map(
-            (domain, index) =>
-              domain.domainAddress && (
-                <Select.Option
-                  key={domain.domainName! + index}
-                  value={domain.domainName}
-                >
-                  <div className="text-fgd-1 mb-2">{domain.domainName}.sol</div>
-                  <div className="">{domain.domainAddress?.toString()}</div>
-                </Select.Option>
-              )
-          )}
-        </Select>
-      )} */}
     </>
   )
 }
