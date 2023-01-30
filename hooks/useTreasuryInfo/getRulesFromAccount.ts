@@ -17,6 +17,7 @@ export function getRulesFromAccount(
     rules.common = {
       maxVotingTime: govConfig.maxVotingTime,
       minInstructionHoldupTime: govConfig.minInstructionHoldUpTime,
+      votingCoolOffSeconds: govConfig.votingCoolOffTime,
     }
   }
 

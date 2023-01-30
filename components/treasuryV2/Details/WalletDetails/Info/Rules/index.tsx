@@ -68,6 +68,17 @@ export function durationStr(duration: number, short = false) {
   return count + (short ? 's' : ' ' + ntext(count, 'second'))
 }
 
+function votingLengthText(time: number) {
+  const hours = time / UNIX_HOUR
+  const days = Math.floor(hours / 24)
+  const remainingHours = (time - days * UNIX_DAY) / UNIX_HOUR
+
+  return (
+    durationStr(days * UNIX_DAY) +
+    (remainingHours ? ` ${durationStr(remainingHours * UNIX_HOUR)}` : '')
+  )
+}
+
 interface Props {
   className?: string
   wallet: Wallet
@@ -150,8 +161,17 @@ export default function Rules(props: Props) {
               <div className="grid grid-cols-2 gap-8">
                 <Section
                   icon={<CalendarIcon />}
-                  name="Max Voting Time"
-                  value={durationStr(props.wallet.rules.common.maxVotingTime)}
+                  name="Unrestricted Voting Time"
+                  value={votingLengthText(
+                    props.wallet.rules.common.maxVotingTime
+                  )}
+                />
+                <Section
+                  icon={<CalendarIcon />}
+                  name="Voting Cool-Off Time"
+                  value={durationStr(
+                    props.wallet.rules.common.votingCoolOffSeconds
+                  )}
                 />
                 <Section
                   icon={<ClockIcon />}
