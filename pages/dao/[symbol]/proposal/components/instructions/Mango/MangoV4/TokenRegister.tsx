@@ -184,13 +184,13 @@ const TokenRegister = ({
       options: governedProgramAccounts,
     },
     {
-      label: 'Mint Pk',
+      label: 'Mint PublicKey',
       initialValue: form.mintPk,
       type: InstructionInputType.INPUT,
       name: 'mintPk',
     },
     {
-      label: 'Oracle Pk',
+      label: 'Oracle PublicKey',
       initialValue: form.oraclePk,
       type: InstructionInputType.INPUT,
       name: 'oraclePk',
@@ -300,21 +300,23 @@ const TokenRegister = ({
       name: 'liquidationFee',
     },
     {
-      label: 'Min Vault To Deposits Ratio',
+      label:
+        'Min Vault To Deposits Ratio (Min fraction of deposits that must remain in the vault when borrowing)',
       initialValue: form.minVaultToDepositsRatio,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'minVaultToDepositsRatio',
     },
     {
-      label: 'Net Borrow Limit Window Size Ts',
+      label: 'Net Borrow Limit Window Size (Seconds of a net borrows window)',
       initialValue: form.netBorrowLimitWindowSizeTs,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'netBorrowLimitWindowSizeTs',
     },
     {
-      label: 'netBorrowLimitPerWindowQuote',
+      label:
+        'Net Borrow Limit Per Window Quote (Net borrow limit per window in quote native; set to -1 to disable)',
       initialValue: form.netBorrowLimitPerWindowQuote,
       type: InstructionInputType.INPUT,
       inputType: 'number',
