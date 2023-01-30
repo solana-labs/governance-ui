@@ -16,6 +16,7 @@ import {
   withCreateMintGovernance,
   withCreateNativeTreasury,
   withCreateRealm,
+  withCreateTokenOwnerRecord,
   withDepositGoverningTokens,
   withSetRealmAuthority,
 } from '@solana/spl-governance'
@@ -187,24 +188,16 @@ export async function prepareRealmCreation({
   // Create council mint
   let councilMintPk
 
-  // TODO explain the circumstances under which this set of conditions would be true
   if (
     zeroCommunityTokenSupply &&
     zeroCouncilTokenSupply &&
     nftCollectionCount === 0 &&
     councilWalletPks.length === 0
   ) {
-    councilWalletPks.push(wallet.publicKey as PublicKey)
-    councilMintPk = await withCreateMint(
-      connection,
-      mintsSetupInstructions,
-      mintsSetupSigners,
-      walletPk,
-      null,
-      0,
-      walletPk
-    )
-  } else if (!existingCouncilMintPk && createCouncil) {
+    throw new Error('no tokens exist that could govern this DAO')
+  }
+
+  if (!existingCouncilMintPk && createCouncil) {
     councilMintPk = await withCreateMint(
       connection,
       mintsSetupInstructions,
@@ -216,32 +209,6 @@ export async function prepareRealmCreation({
     )
   } else {
     councilMintPk = existingCouncilMintPk
-  }
-
-  let walletAtaPk: PublicKey | undefined
-  const tokenAmount = 1
-
-  console.log('Prepare realm - council members', councilWalletPks)
-  for (const teamWalletPk of councilWalletPks) {
-    const ataPk = await withCreateAssociatedTokenAccount(
-      councilMembersInstructions,
-      councilMintPk,
-      teamWalletPk,
-      walletPk
-    )
-
-    // Mint 1 council token to each team member
-    await withMintTo(
-      councilMembersInstructions,
-      councilMintPk,
-      ataPk,
-      walletPk,
-      tokenAmount
-    )
-
-    if (teamWalletPk.equals(walletPk)) {
-      walletAtaPk = ataPk
-    }
   }
 
   // Convert to mint natural amount
@@ -268,20 +235,79 @@ export async function prepareRealmCreation({
     params._programVersion === 3 ? params.councilTokenConfig : undefined
   )
 
-  // If the current wallet is in the team then deposit the council token
-  if (walletAtaPk) {
-    await withDepositGoverningTokens(
-      realmInstructions,
-      programIdPk,
-      programVersion,
-      realmPk,
-      walletAtaPk,
-      councilMintPk,
-      walletPk,
-      walletPk,
-      walletPk,
-      new BN(initialCouncilTokenAmount)
-    )
+  console.log('Prepare realm - council members', councilWalletPks)
+  for (const teamWalletPk of councilWalletPks) {
+    // In version 3 we just deposit council tokens directly into the DAO
+    if (programVersion >= 3) {
+      // This is a workaround for an unnecessary signer check in DepositGoverningTokens.
+      if (teamWalletPk !== walletPk) {
+        await withCreateTokenOwnerRecord(
+          realmInstructions,
+          programIdPk,
+          programVersion,
+          realmPk,
+          teamWalletPk,
+          councilMintPk,
+          walletPk
+        )
+      }
+
+      await withDepositGoverningTokens(
+        realmInstructions,
+        programIdPk,
+        programVersion,
+        realmPk,
+        councilMintPk,
+        councilMintPk,
+        teamWalletPk,
+        walletPk,
+        walletPk,
+        new BN(initialCouncilTokenAmount)
+      )
+      // TODO remove workaround once unnecessary signer bug in sdk is fixed
+      // this is a workaround
+      const buggedIx = realmInstructions[realmInstructions.length - 1]
+      // make teamWalletPk not a signer
+      buggedIx.keys = buggedIx.keys.map((key) =>
+        key.pubkey.equals(teamWalletPk) && !key.pubkey.equals(walletPk)
+          ? { ...key, isSigner: false }
+          : key
+      )
+    }
+
+    // before version 3, we have to mint the tokens to wallets
+    else {
+      const ataPk = await withCreateAssociatedTokenAccount(
+        councilMembersInstructions,
+        councilMintPk,
+        teamWalletPk,
+        walletPk
+      )
+
+      // Mint 1 council token to each team member
+      await withMintTo(
+        councilMembersInstructions,
+        councilMintPk,
+        ataPk,
+        walletPk,
+        initialCouncilTokenAmount
+      )
+
+      if (teamWalletPk.equals(walletPk)) {
+        await withDepositGoverningTokens(
+          realmInstructions,
+          programIdPk,
+          programVersion,
+          realmPk,
+          ataPk,
+          councilMintPk,
+          walletPk,
+          walletPk,
+          walletPk,
+          new BN(initialCouncilTokenAmount)
+        )
+      }
+    }
   }
 
   const {
