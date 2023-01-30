@@ -22,11 +22,11 @@ interface Props
   currentCoolOffHours: number;
   currentCouncilRules: CouncilRules;
   currentDepositExemptProposalCount: number;
-  currentMaxVoteDays: number;
+  currentBaseVoteDays: number;
   currentMinInstructionHoldupDays: number;
   depositExemptProposalCount: number;
   governanceAddress: PublicKey;
-  maxVoteDays: number;
+  baseVoteDays: number;
   minInstructionHoldupDays: number;
   walletAddress: PublicKey;
 }
@@ -58,7 +58,8 @@ export function Summary(props: Props) {
         className="mt-8"
         currentCommunityRules={props.currentCommunityRules}
         currentCouncilRules={props.currentCouncilRules}
-        currentMaxVoteDays={props.currentMaxVoteDays}
+        currentBaseVoteDays={props.currentBaseVoteDays}
+        currentCoolOffHours={props.currentCoolOffHours}
         currentMinInstructionHoldupDays={props.currentMinInstructionHoldupDays}
         proposalVoteType={props.proposalVoteType}
         onProposalVoteTypeChange={props.onProposalVoteTypeChange}
@@ -83,10 +84,10 @@ export function Summary(props: Props) {
         currentDepositExemptProposalCount={
           props.currentDepositExemptProposalCount
         }
-        currentMaxVoteDays={props.currentMaxVoteDays}
+        currentBaseVoteDays={props.currentBaseVoteDays}
         currentMinInstructionHoldupDays={props.currentMinInstructionHoldupDays}
         depositExemptProposalCount={props.depositExemptProposalCount}
-        maxVoteDays={props.maxVoteDays}
+        baseVoteDays={props.baseVoteDays}
         minInstructionHoldupDays={props.minInstructionHoldupDays}
       />
     </article>

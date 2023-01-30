@@ -11,6 +11,7 @@ import { SummaryItem } from '../SummaryItem';
 import { CommunityRules, CouncilRules } from '../types';
 import { ValueBlock } from '../ValueBlock';
 import { getLabel } from '../VoteTippingSelector';
+
 import { ButtonToggle } from '@hub/components/controls/ButtonToggle';
 import cx from '@hub/lib/cx';
 import { ntext } from '@hub/lib/ntext';
@@ -23,7 +24,8 @@ interface Props
   className?: string;
   currentCommunityRules: CommunityRules;
   currentCouncilRules: CouncilRules;
-  currentMaxVoteDays: number;
+  currentBaseVoteDays: number;
+  currentCoolOffHours: number;
   currentMinInstructionHoldupDays: number;
 }
 
@@ -34,6 +36,11 @@ export function ProposalVoteType(props: Props) {
     props.proposalVoteType === 'council' && props.currentCouncilRules
       ? props.currentCouncilRules
       : props.currentCommunityRules;
+
+  const unrestrictedVotingHours = 24 * props.currentBaseVoteDays;
+  const unrestrictedVotingDays = Math.floor(unrestrictedVotingHours / 24);
+  const unrestrictedVotingRemainingHours =
+    unrestrictedVotingHours - unrestrictedVotingDays * 24;
 
   return (
     <SectionBlock className={props.className}>
@@ -94,10 +101,25 @@ export function ProposalVoteType(props: Props) {
           </div>
           <div className="gap-x-4 gap-y-8 grid grid-cols-2 mt-8">
             <SummaryItem
-              label="Max Voting Time"
-              value={`${props.currentMaxVoteDays} ${ntext(
-                props.currentMaxVoteDays,
-                'day',
+              label="Unrestricted Voting Time"
+              value={
+                `${unrestrictedVotingDays} ${ntext(
+                  unrestrictedVotingDays,
+                  'day',
+                )}` +
+                (unrestrictedVotingRemainingHours
+                  ? ` ${unrestrictedVotingRemainingHours} ${ntext(
+                      unrestrictedVotingRemainingHours,
+                      'hour',
+                    )}`
+                  : '')
+              }
+            />
+            <SummaryItem
+              label="Voting Cool-off Hours"
+              value={`${props.currentCoolOffHours} ${ntext(
+                props.currentCoolOffHours,
+                'hour',
               )}`}
             />
             <SummaryItem

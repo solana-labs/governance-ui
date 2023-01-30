@@ -1,4 +1,3 @@
-import { useGateway } from '@civic/solana-gateway-react';
 import { createContext } from 'react';
 
 import { ClusterType, useCluster } from '@hub/hooks/useCluster';
@@ -38,7 +37,6 @@ export function ProposalProvider(props: Props) {
   const [cluster] = useCluster();
   const { connect, signTransaction, signAllTransactions } = useWallet();
   const { publish } = useToast();
-  const { gatewayToken } = useGateway();
 
   return (
     <context.Provider

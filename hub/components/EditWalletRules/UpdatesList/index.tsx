@@ -45,6 +45,19 @@ function diff<T extends { [key: string]: unknown }>(existing: T, changed: T) {
   return diffs;
 }
 
+function unrestrictedVotingTimeText(days: number) {
+  const hours = days * 24;
+  const votingDays = Math.floor(hours / 24);
+  const remainingHours = hours - votingDays * 24;
+
+  return (
+    `${votingDays} ${ntext(votingDays, 'day')}` +
+    (remainingHours
+      ? ` ${remainingHours} ${ntext(remainingHours, 'hour')}`
+      : '')
+  );
+}
+
 interface Props {
   className?: string;
   communityRules: CommunityRules;
@@ -54,17 +67,17 @@ interface Props {
   currentCoolOffHours: number;
   currentCouncilRules: CouncilRules;
   currentDepositExemptProposalCount: number;
-  currentMaxVoteDays: number;
+  currentBaseVoteDays: number;
   currentMinInstructionHoldupDays: number;
   depositExemptProposalCount: number;
-  maxVoteDays: number;
+  baseVoteDays: number;
   minInstructionHoldupDays: number;
 }
 
 export function UpdatesList(props: Props) {
   const currentVotingDuration = {
     coolOffHours: props.currentCoolOffHours,
-    maxVoteDays: props.currentMaxVoteDays,
+    baseVoteDays: props.currentBaseVoteDays,
   };
 
   const currentAdvancedSettings = {
@@ -74,7 +87,7 @@ export function UpdatesList(props: Props) {
 
   const newVotingDuration = {
     coolOffHours: props.coolOffHours,
-    maxVoteDays: props.maxVoteDays,
+    baseVoteDays: props.baseVoteDays,
   };
 
   const newAdvancedSettings = {
@@ -129,23 +142,25 @@ export function UpdatesList(props: Props) {
             text="Voting Duration"
           />
           <div className="grid grid-cols-2 gap-x-4 gap-y-8">
-            {!!votingDurationDiff.maxVoteDays?.length && (
+            {!!votingDurationDiff.baseVoteDays?.length && (
               <SummaryItem
-                label="Total Voting Duration"
+                label="Unrestricted Voting Time"
                 value={
                   <div className="flex items-baseline">
-                    {votingDurationDiff.maxVoteDays[1] ? (
+                    {votingDurationDiff.baseVoteDays[1] ? (
                       <div>
-                        {votingDurationDiff.maxVoteDays[1]}{' '}
-                        {ntext(votingDurationDiff.maxVoteDays[1], 'hour')}
+                        {unrestrictedVotingTimeText(
+                          votingDurationDiff.baseVoteDays[1],
+                        )}
                       </div>
                     ) : (
                       <div>Disabled</div>
                     )}
-                    {votingDurationDiff.maxVoteDays[0] ? (
+                    {votingDurationDiff.baseVoteDays[0] ? (
                       <div className="ml-3 text-base text-neutral-500 line-through">
-                        {votingDurationDiff.maxVoteDays[0]}{' '}
-                        {ntext(votingDurationDiff.maxVoteDays[0], 'hour')}
+                        {unrestrictedVotingTimeText(
+                          votingDurationDiff.baseVoteDays[0],
+                        )}
                       </div>
                     ) : (
                       <div>Disabled</div>

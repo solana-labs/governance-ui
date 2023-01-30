@@ -3,6 +3,7 @@ import ChevronLeftIcon from '@carbon/icons-react/lib/ChevronLeft';
 import EditIcon from '@carbon/icons-react/lib/Edit';
 import { PublicKey } from '@solana/web3.js';
 import { BigNumber } from 'bignumber.js';
+import { hoursToSeconds, secondsToHours } from 'date-fns';
 import { pipe } from 'fp-ts/function';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -11,6 +12,7 @@ import { useEffect, useState } from 'react';
 import { getAccountName } from '@components/instructions/tools';
 import { Primary, Secondary } from '@hub/components/controls/Button';
 import { Connect } from '@hub/components/GlobalHeader/User/Connect';
+import { useCluster, ClusterType } from '@hub/hooks/useCluster';
 import { useProposal } from '@hub/hooks/useProposal';
 import { useQuery } from '@hub/hooks/useQuery';
 import { useToast, ToastType } from '@hub/hooks/useToast';
@@ -55,6 +57,7 @@ interface Props {
 }
 
 export function EditWalletRules(props: Props) {
+  const [cluster] = useCluster();
   const { createProposal } = useProposal();
   const { publish } = useToast();
   const [result] = useQuery(gql.getGovernanceRulesResp, {
@@ -94,7 +97,7 @@ export function EditWalletRules(props: Props) {
   const [depositExemptProposalCount, setDepositExemptProposalCount] = useState(
     0,
   );
-
+  const [baseVoteDays, setBaseVoteDays] = useState(3);
   const [maxVoteDays, setMaxVoteDays] = useState(3);
   const [minInstructionHoldupDays, setMinInstructionHoldupDays] = useState(0);
 
@@ -114,7 +117,14 @@ export function EditWalletRules(props: Props) {
       setCoolOffHours(data.coolOffHours);
       setCouncilRules(data.councilTokenRules);
       setDepositExemptProposalCount(data.depositExemptProposalCount);
-      setMaxVoteDays(data.maxVoteDays);
+
+      // maxVotingDays is actually misnamed on-chain. It should be `baseVotingDays`
+      const baseVotingSeconds = hoursToSeconds(24 * data.maxVoteDays);
+      const coolOffSeconds = hoursToSeconds(data.coolOffHours);
+      const maxVotingSeconds = baseVotingSeconds + coolOffSeconds;
+
+      setBaseVoteDays(data.maxVoteDays);
+      setMaxVoteDays(maxVotingSeconds / 60 / 60 / 24);
       setMinInstructionHoldupDays(data.minInstructionHoldupDays);
 
       if (!data.councilTokenRules) {
@@ -206,12 +216,30 @@ export function EditWalletRules(props: Props) {
                       minInstructionHoldupDays={minInstructionHoldupDays}
                       walletAddress={governance.walletAddress}
                       onCommunityRulesChange={setCommunityRules}
-                      onCoolOffHoursChange={setCoolOffHours}
+                      onCoolOffHoursChange={(coolOffHours) => {
+                        setCoolOffHours(coolOffHours);
+                        const maxVotingSeconds = hoursToSeconds(
+                          maxVoteDays * 24,
+                        );
+                        const coolOffSeconds = hoursToSeconds(coolOffHours);
+                        const baseVotingSeconds =
+                          maxVotingSeconds - coolOffSeconds;
+                        setBaseVoteDays(secondsToHours(baseVotingSeconds) / 24);
+                      }}
                       onCouncilRulesChange={setCouncilRules}
                       onDepositExemptProposalCountChange={
                         setDepositExemptProposalCount
                       }
-                      onMaxVoteDaysChange={setMaxVoteDays}
+                      onMaxVoteDaysChange={(votingDays) => {
+                        setMaxVoteDays(votingDays);
+                        const maxVotingSeconds = hoursToSeconds(
+                          24 * votingDays,
+                        );
+                        const coolOffSeconds = hoursToSeconds(coolOffHours);
+                        const baseVotingSeconds =
+                          maxVotingSeconds - coolOffSeconds;
+                        setBaseVoteDays(secondsToHours(baseVotingSeconds) / 24);
+                      }}
                       onMinInstructionHoldupDaysChange={
                         setMinInstructionHoldupDays
                       }
@@ -246,13 +274,13 @@ export function EditWalletRules(props: Props) {
                       currentDepositExemptProposalCount={
                         governance.depositExemptProposalCount
                       }
-                      currentMaxVoteDays={governance.maxVoteDays}
+                      currentBaseVoteDays={governance.maxVoteDays}
                       currentMinInstructionHoldupDays={
                         governance.minInstructionHoldupDays
                       }
                       depositExemptProposalCount={depositExemptProposalCount}
                       governanceAddress={governance.governanceAddress}
-                      maxVoteDays={maxVoteDays}
+                      baseVoteDays={baseVoteDays}
                       minInstructionHoldupDays={minInstructionHoldupDays}
                       proposalDescription={proposalDescription}
                       proposalTitle={proposalTitle}
@@ -309,13 +337,21 @@ export function EditWalletRules(props: Props) {
                               instructions: [transaction],
                               isDraft: false,
                               realmPublicKey: publicKey,
+                              councilTokenMintPublicKey:
+                                governance.councilTokenRules
+                                  ?.tokenMintAddress || undefined,
+                              communityTokenMintPublicKey:
+                                governance.communityTokenRules.tokenMintAddress,
                             });
 
                             if (proposalAddress) {
                               router.push(
                                 `/dao/${
                                   props.realmUrlId
-                                }/proposal/${proposalAddress.toBase58()}`,
+                                }/proposal/${proposalAddress.toBase58()}` +
+                                  (cluster.type === ClusterType.Devnet
+                                    ? '?cluster=devnet'
+                                    : ''),
                               );
                             }
                           } catch (e) {

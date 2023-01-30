@@ -82,7 +82,7 @@ export async function createProposal(args: Args) {
           args.realmPublicKey,
           args.councilTokenMintPublicKey,
           args.requestingUserPublicKey,
-        )
+        ).catch(() => undefined)
       : undefined,
     args.communityTokenMintPublicKey
       ? getTokenOwnerRecordForRealm(
@@ -91,7 +91,7 @@ export async function createProposal(args: Args) {
           args.realmPublicKey,
           args.communityTokenMintPublicKey,
           args.requestingUserPublicKey,
-        )
+        ).catch(() => undefined)
       : undefined,
   ]);
 

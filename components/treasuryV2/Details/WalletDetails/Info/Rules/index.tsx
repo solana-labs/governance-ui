@@ -22,6 +22,7 @@ import useRealm from '@hooks/useRealm'
 import Tooltip from '@components/Tooltip'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import Address from '@components/Address'
+import useQueryContext from '@hooks/useQueryContext'
 
 import Section from '../../../Section'
 import TokenIcon from '../../../../icons/TokenIcon'
@@ -76,6 +77,7 @@ export default function Rules(props: Props) {
   const [editRulesOpen, setEditRulesOpen] = useState(false)
   const { ownVoterWeight, symbol } = useRealm()
   const router = useRouter()
+  const { fmtUrlWithCluster } = useQueryContext()
 
   const programVersion = useProgramVersion()
 
@@ -128,7 +130,9 @@ export default function Rules(props: Props) {
               onClick={() => {
                 if (props.wallet.governanceAccount) {
                   router.push(
-                    `/realm/${symbol}/governance/${props.wallet.governanceAccount.pubkey.toBase58()}/edit`
+                    fmtUrlWithCluster(
+                      `/realm/${symbol}/governance/${props.wallet.governanceAccount.pubkey.toBase58()}/edit`
+                    )
                   )
                 }
               }}
