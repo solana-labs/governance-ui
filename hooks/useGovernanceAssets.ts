@@ -707,6 +707,10 @@ export default function useGovernanceAssets() {
       name: 'Alt extend',
       packageId: PackageEnum.MangoMarketV4,
     },
+    [Instructions.MangoV4TokenAddBank]: {
+      name: 'Token add bank',
+      packageId: PackageEnum.MangoMarketV4,
+    },
     /*
       ███    ███ ███████  █████  ███    ██     ███████ ██ ███    ██  █████  ███    ██  ██████ ███████
       ████  ████ ██      ██   ██ ████   ██     ██      ██ ████   ██ ██   ██ ████   ██ ██      ██

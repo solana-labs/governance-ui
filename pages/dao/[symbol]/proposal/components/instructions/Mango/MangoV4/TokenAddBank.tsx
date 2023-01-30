@@ -19,11 +19,14 @@ import InstructionForm, {
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 
+type NamePkVal = {
+  name: string
+  value: PublicKey
+}
+
 interface TokenAddBankForm {
   governedAccount: AssetAccount | null
-  tokenIndex: number
-  bankNum: number
-  mint: string
+  token: null | NamePkVal
 }
 
 const TokenAddBank = ({
@@ -40,14 +43,13 @@ const TokenAddBank = ({
   const governedProgramAccounts = assetAccounts.filter(
     (x) => x.type === AccountType.SOL
   )
+  const [tokens, setTokens] = useState<NamePkVal[]>([])
   const { connection } = useWalletStore()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<TokenAddBankForm>({
     governedAccount: null,
-    tokenIndex: 0,
-    bankNum: 0,
-    mint: '',
+    token: null,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -71,50 +73,23 @@ const TokenAddBank = ({
     ) {
       const client = await getClient(connection, wallet)
       const group = await client.getGroup(GROUP)
-      const tokenIndexBuffer = Buffer.alloc(2)
-      tokenIndexBuffer.writeUInt16LE(form.tokenIndex)
-      const bankNumBuffer = Buffer.alloc(8)
-      bankNumBuffer.writeUInt32LE(form.bankNum)
-      const [bankPk] = await PublicKey.findProgramAddress(
-        [
-          Buffer.from('Bank'),
-          group.publicKey.toBuffer(),
-          tokenIndexBuffer,
-          bankNumBuffer,
-        ],
-        client.programId
-      )
-      const [vaultPk] = await PublicKey.findProgramAddress(
-        [
-          Buffer.from('Valut'),
-          group.publicKey.toBuffer(),
-          tokenIndexBuffer,
-          bankNumBuffer,
-        ],
-        client.programId
-      )
-      const [mintInfoPk] = await PublicKey.findProgramAddress(
-        [
-          Buffer.from('MintInfo'),
-          group.publicKey.toBuffer(),
-          new PublicKey(form.mint).toBuffer(),
-        ],
-        client.programId
-      )
+      const token = group.banksMapByMint.get(form.token!.value.toBase58())![0]
+      const mintInfo = group.mintInfosMapByTokenIndex.get(token.tokenIndex)
+      const bank = group.banksMapByTokenIndex.get(token.tokenIndex)
       const ix = await client.program.methods
-        .tokenAddBank(Number(form.tokenIndex), Number(form.bankNum))
+        .tokenAddBank(Number(token.tokenIndex), Number(token.bankNum))
         .accounts({
           group: group.publicKey,
           admin: form.governedAccount.extensions.transferAddress,
-          mint: new PublicKey(form.mint),
+          mint: token.mint,
           payer: form.governedAccount.extensions.transferAddress,
           rent: SYSVAR_RENT_PUBKEY,
           tokenProgram: TOKEN_PROGRAM_ID,
           systemProgram: SYSTEM_PROGRAM_ID,
           existingBank: PublicKey.default,
-          mintInfo: mintInfoPk,
-          vault: vaultPk,
-          bank: bankPk,
+          mintInfo: mintInfo!.publicKey,
+          vault: token.vault,
+          bank: bank![0].publicKey,
         })
         .instruction()
 
@@ -141,6 +116,21 @@ const TokenAddBank = ({
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
+
+  useEffect(() => {
+    const getTokens = async () => {
+      const client = await getClient(connection, wallet!)
+      const group = await client.getGroup(GROUP)
+      const currentTokens = [...group.banksMapByMint.values()].map((x) => ({
+        name: x[0].name,
+        value: x[0].mint,
+      }))
+      setTokens(currentTokens)
+    }
+    if (wallet?.publicKey) {
+      getTokens()
+    }
+  }, [connection && wallet?.publicKey?.toBase58()])
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
@@ -158,24 +148,11 @@ const TokenAddBank = ({
       options: governedProgramAccounts,
     },
     {
-      label: 'Token Index',
-      initialValue: form.tokenIndex,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'tokenIndex',
-    },
-    {
-      label: 'Bank Num',
-      initialValue: form.bankNum,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'bankNum',
-    },
-    {
-      label: 'Mint',
-      initialValue: form.mint,
-      type: InstructionInputType.INPUT,
-      name: 'mint',
+      label: 'Tokens',
+      name: 'token',
+      type: InstructionInputType.SELECT,
+      initialValue: form.token,
+      options: tokens,
     },
   ]
 
