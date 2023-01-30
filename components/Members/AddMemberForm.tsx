@@ -1,4 +1,4 @@
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import useRealm from 'hooks/useRealm'
 import Input from 'components/inputs/Input'
 import Button, { SecondaryButton } from '@components/Button'
@@ -14,6 +14,9 @@ import {
   getInstructionDataFromBase64,
   Governance,
   ProgramAccount,
+  serializeInstructionToBase64,
+  withCreateTokenOwnerRecord,
+  withDepositGoverningTokens,
 } from '@solana/spl-governance'
 import { useRouter } from 'next/router'
 import { notify } from 'utils/notifications'
@@ -25,6 +28,9 @@ import {
   ArrowCircleUpIcon,
 } from '@heroicons/react/outline'
 import useCreateProposal from '@hooks/useCreateProposal'
+import useProgramVersion from '@hooks/useProgramVersion'
+import BN from 'bn.js'
+import { governance } from '@foresight-tmp/foresight-sdk'
 
 interface AddMemberForm extends MintForm {
   description: string
@@ -32,6 +38,7 @@ interface AddMemberForm extends MintForm {
 }
 
 const AddMemberForm = ({ close }) => {
+  const programVersion = useProgramVersion()
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [showOptions, setShowOptions] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -102,15 +109,67 @@ const AddMemberForm = ({ close }) => {
   }
 
   const getInstruction = async (): Promise<UiInstruction> => {
-    return getMintInstruction({
-      schema,
-      form,
-      programId,
-      connection,
-      wallet,
-      governedMintInfoAccount: form.mintAccount,
-      setFormErrors,
-    })
+    if (programVersion >= 3) {
+      if (
+        form.mintAccount === undefined ||
+        programId === undefined ||
+        realm === undefined ||
+        form.destinationAccount === undefined ||
+        !wallet?.publicKey
+      ) {
+        throw new Error()
+      }
+
+      const goofySillyArrayForBuilderPattern = []
+      const tokenMint = form.mintAccount?.governance.account.governedAccount
+      const tokenOwnerRecordPk = await withDepositGoverningTokens(
+        goofySillyArrayForBuilderPattern,
+        programId,
+        programVersion,
+        realm.pubkey,
+        tokenMint,
+        tokenMint,
+        new PublicKey(form.destinationAccount),
+        form.mintAccount?.governance.pubkey,
+        wallet.publicKey,
+        new BN(form.amount ?? 1)
+      )
+      const ix = goofySillyArrayForBuilderPattern[0]
+
+      const prerequisiteInstructions: TransactionInstruction[] = []
+      // now we have to see if recipient has token owner record already or not.
+      // this is due to a bug -- unnecessary signer check in program if there's not a token owner record.
+      const mustCreateTOR =
+        (await connection.current.getAccountInfo(tokenOwnerRecordPk)) === null
+      if (mustCreateTOR) {
+        await withCreateTokenOwnerRecord(
+          prerequisiteInstructions,
+          programId,
+          programVersion,
+          realm.pubkey,
+          new PublicKey(form.destinationAccount),
+          tokenMint,
+          wallet.publicKey
+        )
+      }
+
+      return {
+        serializedInstruction: serializeInstructionToBase64(ix),
+        isValid: true, // TODO
+        governance: form.mintAccount.governance,
+        prerequisiteInstructions,
+      }
+    } else {
+      return getMintInstruction({
+        schema,
+        form,
+        programId,
+        connection,
+        wallet,
+        governedMintInfoAccount: form.mintAccount,
+        setFormErrors,
+      })
+    }
   }
 
   //TODO common handle propose
