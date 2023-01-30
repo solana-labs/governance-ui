@@ -25,13 +25,13 @@ type NameMarketIndexVal = {
   value: MarketIndex
 }
 
-interface Serum3EditMarketForm {
+interface OpenBookEditMarketForm {
   governedAccount: AssetAccount | null
   market: NameMarketIndexVal | null
   reduceOnly: boolean
 }
 
-const Serum3EditMarket = ({
+const OpenBookEditMarket = ({
   index,
   governance,
 }: {
@@ -48,7 +48,7 @@ const Serum3EditMarket = ({
   const { connection } = useWalletStore()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<Serum3EditMarketForm>({
+  const [form, setForm] = useState<OpenBookEditMarketForm>({
     governedAccount: null,
     reduceOnly: false,
     market: null,
@@ -190,4 +190,4 @@ const Serum3EditMarket = ({
   )
 }
 
-export default Serum3EditMarket
+export default OpenBookEditMarket

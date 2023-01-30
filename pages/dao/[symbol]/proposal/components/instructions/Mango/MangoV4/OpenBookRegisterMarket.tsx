@@ -19,15 +19,15 @@ import InstructionForm, {
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { OPENBOOK_PROGRAM_ID } from '@blockworks-foundation/mango-v4'
 
-interface Serum3RegisterMarketForm {
+interface OpenBookRegisterMarketForm {
   governedAccount: AssetAccount | null
-  serum3MarketExternalPk: string
+  openBookMarketExternalPk: string
   baseBankMintPk: string
   quoteBankMintPk: string
   name: string
 }
 
-const Serum3RegisterMarket = ({
+const OpenBookRegisterMarket = ({
   index,
   governance,
 }: {
@@ -44,9 +44,9 @@ const Serum3RegisterMarket = ({
   const { connection } = useWalletStore()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<Serum3RegisterMarketForm>({
+  const [form, setForm] = useState<OpenBookRegisterMarketForm>({
     governedAccount: null,
-    serum3MarketExternalPk: '',
+    openBookMarketExternalPk: '',
     baseBankMintPk: '',
     quoteBankMintPk: '',
     name: '',
@@ -81,7 +81,7 @@ const Serum3RegisterMarket = ({
           group: group.publicKey,
           admin: form.governedAccount.extensions.transferAddress,
           serumProgram: OPENBOOK_PROGRAM_ID[connection.cluster],
-          serumMarketExternal: new PublicKey(form.serum3MarketExternalPk),
+          serumMarketExternal: new PublicKey(form.openBookMarketExternalPk),
           baseBank: group.getFirstBankByMint(new PublicKey(form.baseBankMintPk))
             .publicKey,
           quoteBank: group.getFirstBankByMint(
@@ -137,10 +137,10 @@ const Serum3RegisterMarket = ({
       name: 'name',
     },
     {
-      label: 'Serum 3 Market External Pk',
-      initialValue: form.serum3MarketExternalPk,
+      label: 'Openbook Market External Pk',
+      initialValue: form.openBookMarketExternalPk,
       type: InstructionInputType.INPUT,
-      name: 'serum3MarketExternalPk',
+      name: 'openBookMarketExternalPk',
     },
     {
       label: 'Base Bank Mint',
@@ -171,4 +171,4 @@ const Serum3RegisterMarket = ({
   )
 }
 
-export default Serum3RegisterMarket
+export default OpenBookRegisterMarket

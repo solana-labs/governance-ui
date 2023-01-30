@@ -656,59 +656,59 @@ export default function useGovernanceAssets() {
     */
 
     [Instructions.MangoV4PerpCreate]: {
-      name: 'Perp Create',
+      name: 'Create Perp',
       packageId: PackageEnum.MangoMarketV4,
     },
     [Instructions.MangoV4PerpEdit]: {
-      name: 'Perp Edit',
+      name: 'Edit Perp',
       packageId: PackageEnum.MangoMarketV4,
     },
-    [Instructions.MangoV4Serum3RegisterMarket]: {
-      name: 'Serum 3 Register Market',
+    [Instructions.MangoV4OpenBookRegisterMarket]: {
+      name: 'Register Openbook Market',
       packageId: PackageEnum.MangoMarketV4,
     },
     [Instructions.MangoV4TokenEdit]: {
-      name: 'Token Edit',
+      name: 'Edit Token',
       packageId: PackageEnum.MangoMarketV4,
     },
     [Instructions.MangoV4TokenRegister]: {
-      name: 'Token Register',
+      name: 'Register Token',
       packageId: PackageEnum.MangoMarketV4,
     },
     [Instructions.MangoV4TokenRegisterTrustless]: {
-      name: 'Token Register Trustless',
+      name: 'Register Trustless Token',
       packageId: PackageEnum.MangoMarketV4,
     },
     [Instructions.MangoV4GroupEdit]: {
-      name: 'Group Edit',
+      name: 'Edit Group',
       packageId: PackageEnum.MangoMarketV4,
     },
-    [Instructions.MangoV4Serum3EditMarket]: {
-      name: 'Serum 3 Edit Market',
+    [Instructions.MangoV4OpenBookEditMarket]: {
+      name: 'Edit Openbook Market',
       packageId: PackageEnum.MangoMarketV4,
     },
     [Instructions.MangoV4IxGateSet]: {
-      name: 'Ix Gate Set',
+      name: 'Enable/Disable individual instructions in Group',
       packageId: PackageEnum.MangoMarketV4,
     },
     [Instructions.MangoV4StubOracleCreate]: {
-      name: 'Stub oracle create',
+      name: 'Create Stub Oracle',
       packageId: PackageEnum.MangoMarketV4,
     },
     [Instructions.MangoV4StubOracleSet]: {
-      name: 'Stub oracle set',
+      name: 'Set Stub Oracle Value',
       packageId: PackageEnum.MangoMarketV4,
     },
     [Instructions.MangoV4AltSet]: {
-      name: 'Alt set',
+      name: 'Set Address Lookup Table for Group',
       packageId: PackageEnum.MangoMarketV4,
     },
     [Instructions.MangoV4AltExtend]: {
-      name: 'Alt extend',
+      name: 'Extend Address Lookup Table',
       packageId: PackageEnum.MangoMarketV4,
     },
     [Instructions.MangoV4TokenAddBank]: {
-      name: 'Token add bank',
+      name: 'Token Add Bank',
       packageId: PackageEnum.MangoMarketV4,
     },
     /*
