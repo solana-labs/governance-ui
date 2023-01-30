@@ -188,24 +188,16 @@ export async function prepareRealmCreation({
   // Create council mint
   let councilMintPk
 
-  // TODO explain the circumstances under which this set of conditions would be true
   if (
     zeroCommunityTokenSupply &&
     zeroCouncilTokenSupply &&
     nftCollectionCount === 0 &&
     councilWalletPks.length === 0
   ) {
-    councilWalletPks.push(wallet.publicKey as PublicKey)
-    councilMintPk = await withCreateMint(
-      connection,
-      mintsSetupInstructions,
-      mintsSetupSigners,
-      walletPk,
-      null,
-      0,
-      walletPk
-    )
-  } else if (!existingCouncilMintPk && createCouncil) {
+    throw new Error('no tokens exist that could govern this DAO')
+  }
+
+  if (!existingCouncilMintPk && createCouncil) {
     councilMintPk = await withCreateMint(
       connection,
       mintsSetupInstructions,
