@@ -16,6 +16,7 @@ import {
   withCreateMintGovernance,
   withCreateNativeTreasury,
   withCreateRealm,
+  withCreateTokenOwnerRecord,
   withDepositGoverningTokens,
   withSetRealmAuthority,
 } from '@solana/spl-governance'
@@ -246,6 +247,19 @@ export async function prepareRealmCreation({
   for (const teamWalletPk of councilWalletPks) {
     // In version 3 we just deposit council tokens directly into the DAO
     if (programVersion >= 3) {
+      // This is a workaround for an unnecessary signer check in DepositGoverningTokens.
+      if (teamWalletPk !== walletPk) {
+        await withCreateTokenOwnerRecord(
+          realmInstructions,
+          programIdPk,
+          programVersion,
+          realmPk,
+          teamWalletPk,
+          councilMintPk,
+          walletPk
+        )
+      }
+
       await withDepositGoverningTokens(
         realmInstructions,
         programIdPk,
@@ -257,6 +271,15 @@ export async function prepareRealmCreation({
         walletPk,
         walletPk,
         new BN(initialCouncilTokenAmount)
+      )
+      // TODO remove workaround once unnecessary signer bug in sdk is fixed
+      // this is a workaround
+      const buggedIx = realmInstructions[realmInstructions.length - 1]
+      // make teamWalletPk not a signer
+      buggedIx.keys = buggedIx.keys.map((key) =>
+        key.pubkey.equals(teamWalletPk) && !key.pubkey.equals(walletPk)
+          ? { ...key, isSigner: false }
+          : key
       )
     }
 
