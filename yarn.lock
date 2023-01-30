@@ -403,8 +403,8 @@
     "@solana/web3.js" "^1.63.1"
 
 "@blockworks-foundation/mango-v4@https://github.com/blockworks-foundation/mango-v4.git#dev":
-  version "0.0.1-beta.6"
-  resolved "https://github.com/blockworks-foundation/mango-v4.git#0012907ee3c38337696cd9d800f7f6cb7caf7dcb"
+  version "0.4.2"
+  resolved "https://github.com/blockworks-foundation/mango-v4.git#9039e2c586ed04345e9827a5fd61a4a6902844fb"
   dependencies:
     "@project-serum/anchor" "^0.25.0"
     "@project-serum/serum" "^0.13.65"

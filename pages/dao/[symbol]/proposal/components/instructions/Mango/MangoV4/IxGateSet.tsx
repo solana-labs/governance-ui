@@ -17,7 +17,7 @@ import InstructionForm, {
   InstructionInputType,
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
-import { buildIxGate } from '@blockworks-foundation/mango-v4/dist/types/src/clientIxParamBuilder'
+import { buildIxGate } from '@blockworks-foundation/mango-v4'
 
 interface IxGateSetForm {
   governedAccount: AssetAccount | null
