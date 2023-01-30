@@ -86,7 +86,7 @@ const TokenAddBank = ({
           rent: SYSVAR_RENT_PUBKEY,
           tokenProgram: TOKEN_PROGRAM_ID,
           systemProgram: SYSTEM_PROGRAM_ID,
-          existingBank: PublicKey.default,
+          existingBank: bank![0].publicKey,
           mintInfo: mintInfo!.publicKey,
           vault: token.vault,
           bank: bank![0].publicKey,
