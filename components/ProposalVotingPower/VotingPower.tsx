@@ -12,7 +12,11 @@ import { GoverningTokenRole } from '@solana/spl-governance'
 
 import { TokenProgramAccount } from '@utils/tokens'
 import useRealm from '@hooks/useRealm'
-import { nftPluginsPks, vsrPluginsPks } from '@hooks/useVotingPlugins'
+import {
+  heliumVsrPluginsPks,
+  nftPluginsPks,
+  vsrPluginsPks,
+} from '@hooks/useVotingPlugins'
 import useProposal from '@hooks/useProposal'
 import useWalletStore from 'stores/useWalletStore'
 
@@ -21,6 +25,7 @@ import CouncilVotingPower from './CouncilVotingPower'
 import LockedCommunityVotingPower from './LockedCommunityVotingPower'
 import LockedCouncilVotingPower from './LockedCouncilVotingPower'
 import NftVotingPower from './NftVotingPower'
+import LockedCommunityNFTRecordVotingPower from './LockedCommunityNFTRecordVotingPower'
 
 enum Type {
   Council,
@@ -28,6 +33,8 @@ enum Type {
   LockedCommunity,
   NFT,
   Community,
+  LockedCommunityNFTRecord,
+  LockedCouncilNFTRecord,
 }
 
 function getTypes(
@@ -44,6 +51,13 @@ function getTypes(
   const types: Type[] = []
 
   const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin
+  const isDepositVisible = (
+    depositMint: MintInfo | undefined,
+    realmMint: PublicKey | undefined
+  ) =>
+    depositMint &&
+    (!proposal ||
+      proposal.account.governingTokenMint.toBase58() === realmMint?.toBase58())
 
   if (
     currentPluginPk &&
@@ -55,15 +69,6 @@ function getTypes(
     currentPluginPk &&
     vsrPluginsPks.includes(currentPluginPk.toBase58())
   ) {
-    const isDepositVisible = (
-      depositMint: MintInfo | undefined,
-      realmMint: PublicKey | undefined
-    ) =>
-      depositMint &&
-      (!proposal ||
-        proposal.account.governingTokenMint.toBase58() ===
-          realmMint?.toBase58())
-
     if (
       (!realm?.account.config.councilMint ||
         isDepositVisible(mint, realm?.account.communityMint)) &&
@@ -75,6 +80,22 @@ function getTypes(
       tokenRole === GoverningTokenRole.Council
     ) {
       types.push(Type.LockedCouncil)
+    }
+  } else if (
+    currentPluginPk &&
+    heliumVsrPluginsPks.includes(currentPluginPk.toBase58())
+  ) {
+    if (
+      (!realm?.account.config.councilMint ||
+        isDepositVisible(mint, realm?.account.communityMint)) &&
+      tokenRole === GoverningTokenRole.Community
+    ) {
+      types.push(Type.LockedCommunityNFTRecord)
+    } else if (
+      isDepositVisible(councilMint, realm?.account.config.councilMint) &&
+      tokenRole === GoverningTokenRole.Council
+    ) {
+      types.push(Type.LockedCouncilNFTRecord)
     }
   } else if (tokenRole === GoverningTokenRole.Council) {
     types.push(Type.Council)
@@ -145,6 +166,10 @@ export default function VotingPower(props: Props) {
             return <CommunityVotingPower key={type} />
           case Type.NFT:
             return <NftVotingPower key={type} />
+          case Type.LockedCommunityNFTRecord:
+            return <LockedCommunityNFTRecordVotingPower key={type} />
+          case Type.LockedCouncilNFTRecord:
+            return <div>TODO: Build out comp</div>
         }
       })}
     </div>

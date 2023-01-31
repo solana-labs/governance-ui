@@ -58,6 +58,7 @@ export const calcLockupMultiplier = ({
       lockedVoteWeightScaledFactor,
       maxExtraLockupVoteWeightScaledFactor,
       // genesisVotePowerMultiplier,
+      // genesisVotePowerMultiplierExpirationTs
     } = mintCfg as VotingMintConfig
     const lockedScaledFactorNum = lockedVoteWeightScaledFactor.toNumber()
     const maxExtraLockupVoteWeightScaledFactorNum = maxExtraLockupVoteWeightScaledFactor.toNumber()

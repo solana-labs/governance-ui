@@ -15,7 +15,10 @@ import {
 import useWalletStore from 'stores/useWalletStore'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
-import { GoverningTokenRole } from '@solana/spl-governance'
+import {
+  getTokenOwnerRecordAddress,
+  GoverningTokenRole,
+} from '@solana/spl-governance'
 import InlineNotification from '@components/InlineNotification'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
@@ -59,7 +62,7 @@ export const LockTokensAccount: React.FC<{
     s.state.voteStakeRegistryRegistrar as Registrar | null,
     s.state.voteStakeRegistryRegistrarPk,
   ])
-  const { error, loading: isCreating, createPosition } = useCreatePosition({
+  const { error, createPosition } = useCreatePosition({
     realm,
     registrarPk: vsrRegistrarPk || undefined,
   })
@@ -77,7 +80,7 @@ export const LockTokensAccount: React.FC<{
     s.actions,
   ])
   const [
-    loading,
+    isLoading,
     positions,
     votingPower,
     amountLocked,
@@ -123,6 +126,31 @@ export const LockTokensAccount: React.FC<{
       await handleGetPositions()
     })()
   }, [vsrClient, handleGetPositions])
+
+  useEffect(() => {
+    const getTokenOwnerRecord = async () => {
+      const defaultMint =
+        !mint?.supply.isZero() ||
+        config?.account.communityTokenConfig.maxVoterWeightAddin
+          ? realm!.account.communityMint
+          : !councilMint?.supply.isZero()
+          ? realm!.account.config.councilMint
+          : undefined
+      const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
+        realm!.owner,
+        realm!.pubkey,
+        defaultMint!,
+        wallet!.publicKey!
+      )
+      setIsOwnerOfPositions(
+        tokenOwnerRecordAddress.toBase58() === tokenOwnerRecordPk
+      )
+    }
+    if (realm && wallet?.connected) {
+      getTokenOwnerRecord()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+  }, [realm?.pubkey.toBase58(), wallet?.connected, tokenOwnerRecordPk])
 
   const communityVotingMintCfg = vsrRegistrar?.votingMints.find((vm) =>
     vm.mint.equals(realm!.account.communityMint)
@@ -230,9 +258,13 @@ export const LockTokensAccount: React.FC<{
             My governance power{' '}
           </h1>
 
-          <div className="ml-auto flex flex-row">
-            <LockCommunityTokensBtn onClick={() => setIsLockModalOpen(true)} />
-          </div>
+          {isOwnerOfPositions && (
+            <div className="ml-auto flex flex-row">
+              <LockCommunityTokensBtn
+                onClick={() => setIsLockModalOpen(true)}
+              />
+            </div>
+          )}
         </div>
         {!isOwnerOfPositions && connected && (
           <div className="pb-6">
@@ -245,7 +277,7 @@ export const LockTokensAccount: React.FC<{
         {connected ? (
           <div>
             <div className="grid md:grid-cols-3 grid-flow-row gap-4 pb-8">
-              {loading ? (
+              {isLoading ? (
                 <>
                   <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-md" />
                   <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-md" />
@@ -298,9 +330,10 @@ export const LockTokensAccount: React.FC<{
                 !isOwnerOfPositions ? 'opacity-0.8 pointer-events-none' : ''
               }`}
             >
-              {positions.map((pos, idx) => (
-                <PositionCard key={idx} position={pos} />
-              ))}
+              {!isLoading &&
+                positions.map((pos, idx) => (
+                  <PositionCard key={idx} position={pos} />
+                ))}
               <div className="border border-fgd-4 flex flex-col items-center justify-center p-6 rounded-lg">
                 <LightningBoltIcon className="h-8 mb-2 text-primary-light w-8" />
                 <p className="flex text-center pb-6">

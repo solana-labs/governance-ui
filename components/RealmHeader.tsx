@@ -8,7 +8,7 @@ import { ExternalLinkIcon } from '@heroicons/react/outline'
 import { getRealmExplorerHost } from 'tools/routing'
 
 import useMembersStore from 'stores/useMembersStore'
-import { vsrPluginsPks } from '@hooks/useVotingPlugins'
+import { heliumVsrPluginsPks, vsrPluginsPks } from '@hooks/useVotingPlugins'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 
 const RealmHeader = () => {
@@ -16,9 +16,14 @@ const RealmHeader = () => {
   const { realm, realmInfo, realmDisplayName, symbol, config } = useRealm()
   const { REALM } = process.env
   const activeMembers = useMembersStore((s) => s.compact.activeMembers)
-  const isLockTokensMode =
+  const isDefaultVsrMode =
     config?.account.communityTokenConfig.voterWeightAddin &&
     vsrPluginsPks.includes(
+      config?.account.communityTokenConfig.voterWeightAddin?.toBase58()
+    )
+  const isHeliumVsrMode =
+    config?.account.communityTokenConfig.voterWeightAddin &&
+    heliumVsrPluginsPks.includes(
       config?.account.communityTokenConfig.voterWeightAddin?.toBase58()
     )
   const isBackNavVisible = realmInfo?.symbol !== REALM // hide backnav for the default realm
@@ -73,17 +78,18 @@ const RealmHeader = () => {
               </a>
             </Link>
           )}
-          {isLockTokensMode && (
-            <Link href={fmtUrlWithCluster(`/dao/${symbol}/token-stats`)}>
-              <a className="flex items-center text-sm cursor-pointer default-transition text-fgd-2 hover:text-fgd-3">
-                <ChartPieIcon className="flex-shrink-0 w-5 h-5 mr-1" />
-                {typeof symbol === 'string' && tryParsePublicKey(symbol)
-                  ? realm?.account.name
-                  : symbol}{' '}
-                stats
-              </a>
-            </Link>
-          )}
+          {isDefaultVsrMode ||
+            (isHeliumVsrMode && (
+              <Link href={fmtUrlWithCluster(`/dao/${symbol}/token-stats`)}>
+                <a className="flex items-center text-sm cursor-pointer default-transition text-fgd-2 hover:text-fgd-3">
+                  <ChartPieIcon className="flex-shrink-0 w-5 h-5 mr-1" />
+                  {typeof symbol === 'string' && tryParsePublicKey(symbol)
+                    ? realm?.account.name
+                    : symbol}{' '}
+                  stats
+                </a>
+              </Link>
+            ))}
           <Link href={fmtUrlWithCluster(`/dao/${symbol}/params`)}>
             <a className="flex items-center text-sm cursor-pointer default-transition text-fgd-2 hover:text-fgd-3">
               <CogIcon className="flex-shrink-0 w-5 h-5 mr-1" />

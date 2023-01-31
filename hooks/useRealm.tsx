@@ -28,9 +28,11 @@ import {
   switchboardPluginsPks,
   pythPluginsPks,
   gatewayPluginsPks,
+  heliumVsrPluginsPks,
 } from './useVotingPlugins'
 import useGatewayPluginStore from '../GatewayPlugin/store/gatewayPluginStore'
 import useSwitchboardPluginStore from 'SwitchboardVotePlugin/store/switchboardStore'
+import useHeliumVsrStore from 'HeliumVoteStakeRegistry/hooks/useHeliumVsrStore'
 
 export default function useRealm() {
   const router = useRouter()
@@ -51,6 +53,7 @@ export default function useRealm() {
     config,
   } = useWalletStore((s) => s.selectedRealm)
   const votingPower = useDepositStore((s) => s.state.votingPower)
+  const heliumVotingPower = useHeliumVsrStore((s) => s.state.votingPower)
   const nftVotingPower = useNftPluginStore((s) => s.state.votingPower)
   const gatewayVotingPower = useGatewayPluginStore((s) => s.state.votingPower)
   const sbVotingPower = useSwitchboardPluginStore((s) => s.state.votingPower)
@@ -219,8 +222,11 @@ export default function useRealm() {
     ownCouncilTokenRecord?.account.outstandingProposalCount >=
       realmCfgMaxOutstandingProposalCount
   //based on realm config it will provide proper tokenBalanceCardComponent
-  const isLockTokensMode =
+  const isDefaultVsrMode =
     currentPluginPk && vsrPluginsPks.includes(currentPluginPk?.toBase58())
+  const isHeliumVsrMode =
+    currentPluginPk && heliumVsrPluginsPks.includes(currentPluginPk?.toBase58())
+
   const isNftMode =
     currentPluginPk && nftPluginsPks.includes(currentPluginPk?.toBase58())
   const pythVotingPower = pythVoterWeight?.toBN() || new BN(0)
@@ -232,7 +238,8 @@ export default function useRealm() {
     sbVotingPower,
     pythVotingPower,
     gatewayVotingPower,
-    ownCouncilTokenRecord
+    ownCouncilTokenRecord,
+    heliumVotingPower
   )
   return {
     realm,
@@ -257,7 +264,8 @@ export default function useRealm() {
     ownDelegateCouncilTokenRecords,
     config,
     currentPluginPk,
-    isLockTokensMode,
+    isDefaultVsrMode,
+    isHeliumVsrMode,
     isNftMode,
   }
 }
@@ -270,7 +278,8 @@ const getVoterWeight = (
   sbVotingPower: BN,
   pythVotingPower: BN,
   gatewayVotingPower: BN,
-  ownCouncilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
+  ownCouncilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,
+  heliumVotingPower: BN
 ) => {
   if (currentPluginPk) {
     if (vsrPluginsPks.includes(currentPluginPk.toBase58())) {
@@ -278,6 +287,13 @@ const getVoterWeight = (
         ownTokenRecord,
         ownCouncilTokenRecord,
         votingPower
+      )
+    }
+    if (heliumVsrPluginsPks.includes(currentPluginPk.toBase58())) {
+      return new VoteRegistryVoterWeight(
+        ownTokenRecord,
+        ownCouncilTokenRecord,
+        heliumVotingPower
       )
     }
     if (nftPluginsPks.includes(currentPluginPk.toBase58())) {

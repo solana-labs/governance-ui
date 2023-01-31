@@ -9,6 +9,7 @@ import {
   nftPluginsPks,
   vsrPluginsPks,
   switchboardPluginsPks,
+  heliumVsrPluginsPks,
 } from '@hooks/useVotingPlugins'
 import GatewayCard from '@components/Gateway/GatewayCard'
 import ClaimUnreleasedNFTs from './ClaimUnreleasedNFTs'
@@ -23,6 +24,16 @@ const LockPluginTokenBalanceCard = dynamic(
       'VoteStakeRegistry/components/TokenBalance/LockPluginTokenBalanceCard'
     )
 )
+
+const HeliumVotingPowerCard = dynamic(() =>
+  import('HeliumVoteStakeRegistry/components/VotingPowerCard').then(
+    (module) => {
+      const { VotingPowerCard } = module
+      return VotingPowerCard
+    }
+  )
+)
+
 const TokenBalanceCard = dynamic(() => import('./TokenBalanceCard'))
 const NftVotingPower = dynamic(
   () => import('../ProposalVotingPower/NftVotingPower')
@@ -96,8 +107,11 @@ const TokenBalanceCardWrapper = ({
   const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin
   const getTokenBalanceCard = () => {
     //based on realm config it will provide proper tokenBalanceCardComponent
-    const isLockTokensMode =
+    const isDefaultVsrMode =
       currentPluginPk && vsrPluginsPks.includes(currentPluginPk?.toBase58())
+    const isHeliumVsrMode =
+      currentPluginPk &&
+      heliumVsrPluginsPks.includes(currentPluginPk?.toBase58())
     const isNftMode =
       currentPluginPk && nftPluginsPks.includes(currentPluginPk?.toBase58())
     const isGatewayMode =
@@ -107,16 +121,21 @@ const TokenBalanceCardWrapper = ({
       switchboardPluginsPks.includes(currentPluginPk?.toBase58())
 
     if (
-      isLockTokensMode &&
+      isDefaultVsrMode &&
       (!ownTokenRecord ||
         ownTokenRecord.account.governingTokenDepositAmount.isZero())
     ) {
-      return (
-        <LockPluginTokenBalanceCard
-          inAccountDetails={inAccountDetails}
-        ></LockPluginTokenBalanceCard>
-      )
+      return <LockPluginTokenBalanceCard inAccountDetails={inAccountDetails} />
     }
+
+    if (
+      isHeliumVsrMode &&
+      (!ownTokenRecord ||
+        ownTokenRecord.account.governingTokenDepositAmount.isZero())
+    ) {
+      return <HeliumVotingPowerCard inAccountDetails={inAccountDetails} />
+    }
+
     if (
       isNftMode &&
       (!ownTokenRecord ||

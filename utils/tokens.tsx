@@ -397,25 +397,21 @@ const fetchNftsFromHolaplexIndexer = async (
       body: JSON.stringify({
         query: `
         query nfts($owners: [PublicKey!]) {
-            nfts(
-              owners: $owners,
-               limit: 10000, offset: 0) {
-              name
+          nfts(owners: $owners, limit: 10000, offset: 0) {
+            name
+            mintAddress
+            address
+            image
+            tokenAccountAddress
+            updateAuthorityAddress
+            collection {
               mintAddress
-              address
-              image
-              tokenAccountAddress
-              updateAuthorityAddress
-              collection {
-                creators {
-                  verified
-                  address
-                }
-                mintAddress
+              creators {
+                verified
+                address
               }
-
             }
-
+          }
         }
       `,
         variables: {
@@ -438,7 +434,6 @@ export const getNfts = async (
 
 const getNftsFromHolaplex = async (
   ownerPk: PublicKey,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   connection: ConnectionContext
 ): Promise<NFTWithMeta[]> => {
   try {
