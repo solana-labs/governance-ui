@@ -242,6 +242,9 @@ const EditToken = ({
       const currentToken = mangoGroup!.banksMapByMint.get(
         form.token.value.toBase58()
       )![0]
+      const groupInsuranceFund = mangoGroup.mintInfosMapByMint.get(
+        form.token.value.toBase58()
+      )?.groupInsuranceFund
       const vals = {
         ...form,
         oraclePk: currentToken.oracle.toBase58(),
@@ -271,7 +274,7 @@ const EditToken = ({
         netBorrowLimitWindowSizeTs: currentToken.netBorrowLimitWindowSizeTs.toNumber(),
         borrowWeightScaleStartQuote: currentToken.borrowWeightScaleStartQuote,
         depositWeightScaleStartQuote: currentToken.depositWeightScaleStartQuote,
-        groupInsuranceFund: false,
+        groupInsuranceFund: !!groupInsuranceFund,
         reduceOnly: currentToken.reduceOnly,
       }
       setForm({

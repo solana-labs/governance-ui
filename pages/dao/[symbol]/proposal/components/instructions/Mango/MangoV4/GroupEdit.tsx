@@ -83,6 +83,7 @@ const GroupEdit = ({
       const client = await getClient(connection, wallet)
       const group = await client.getGroup(GROUP)
       const values = getChangedValues<GroupEditForm>(originalFormValues, form)
+      console.log(values, originalFormValues, form)
       //Mango instruction call and serialize
       const ix = await client.program.methods
         .groupEdit(

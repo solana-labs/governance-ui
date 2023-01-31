@@ -708,7 +708,7 @@ export default function useGovernanceAssets() {
       packageId: PackageEnum.MangoMarketV4,
     },
     [Instructions.MangoV4TokenAddBank]: {
-      name: 'Token Add Bank',
+      name: 'Add additional Bank to an existing Token',
       packageId: PackageEnum.MangoMarketV4,
     },
     /*

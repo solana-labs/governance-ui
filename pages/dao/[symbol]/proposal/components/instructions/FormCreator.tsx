@@ -180,10 +180,23 @@ const InstructionInput = ({
             value={form[input.name]}
             type={input.inputType!}
             onChange={(event) => {
-              handleSetForm({
-                value: event.target.value,
-                propertyName: input.name,
-              })
+              if (input.inputType === 'number') {
+                const isNumber =
+                  event.target.value !== '' &&
+                  !isNaN(Number(event.target.value))
+
+                handleSetForm({
+                  value: isNumber
+                    ? Number(event.target.value)
+                    : event.target.value,
+                  propertyName: input.name,
+                })
+              } else {
+                handleSetForm({
+                  value: event.target.value,
+                  propertyName: input.name,
+                })
+              }
             }}
             step={input.step}
             error={formErrors[input.name]}

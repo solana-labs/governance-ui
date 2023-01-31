@@ -75,9 +75,9 @@ const TokenAddBank = ({
       const group = await client.getGroup(GROUP)
       const token = group.banksMapByMint.get(form.token!.value.toBase58())![0]
       const mintInfo = group.mintInfosMapByTokenIndex.get(token.tokenIndex)
-      const bank = group.banksMapByTokenIndex.get(token.tokenIndex)
+      const banks = group.banksMapByTokenIndex.get(token.tokenIndex)
       const ix = await client.program.methods
-        .tokenAddBank(Number(token.tokenIndex), Number(token.bankNum))
+        .tokenAddBank(Number(token.tokenIndex), Number(banks!.length))
         .accounts({
           group: group.publicKey,
           admin: form.governedAccount.extensions.transferAddress,
@@ -86,10 +86,9 @@ const TokenAddBank = ({
           rent: SYSVAR_RENT_PUBKEY,
           tokenProgram: TOKEN_PROGRAM_ID,
           systemProgram: SYSTEM_PROGRAM_ID,
-          existingBank: bank![0].publicKey,
+          existingBank: banks![banks!.length - 1].publicKey,
           mintInfo: mintInfo!.publicKey,
           vault: token.vault,
-          bank: bank![0].publicKey,
         })
         .instruction()
 
