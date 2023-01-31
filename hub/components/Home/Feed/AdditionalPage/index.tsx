@@ -1,4 +1,3 @@
-import * as Separator from '@radix-ui/react-separator';
 import type { PublicKey } from '@solana/web3.js';
 import { pipe } from 'fp-ts/function';
 import React from 'react';

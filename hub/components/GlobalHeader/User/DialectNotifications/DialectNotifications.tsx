@@ -16,8 +16,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { REALMS_PUBLIC_KEY, themeVariables } from './Notifications.constants';
 import { solanaWalletToDialectWallet } from './solanaWalletToDialectWallet';
 
-type ThemeType = 'light' | 'dark' | undefined;
-
 interface Props {
   className?: string;
 }

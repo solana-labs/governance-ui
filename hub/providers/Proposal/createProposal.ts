@@ -62,7 +62,9 @@ export async function createProposal(args: Args) {
     realm,
     tokenOwnerRecord,
     realmConfigPublicKey,
+    // eslint-disable-next-line
     councilTokenOwnerRecord,
+    // eslint-disable-next-line
     communityTokenOwnerRecord,
   ] = await Promise.all([
     getGovernance(args.connection, args.governancePublicKey),
