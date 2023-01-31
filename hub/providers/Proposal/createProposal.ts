@@ -39,6 +39,7 @@ import { NFTWithMeta, VotingClient } from '@utils/uiTypes/VotePlugin';
 import { fetchPlugins } from './fetchPlugins';
 
 interface Args {
+  callbacks?: Parameters<typeof _createProposal>[11];
   cluster?: string;
   connection: Connection;
   councilTokenMintPublicKey?: PublicKey;
@@ -257,5 +258,6 @@ export async function createProposal(args: Args) {
     instructionData,
     args.isDraft,
     votingClient,
+    args.callbacks,
   );
 }

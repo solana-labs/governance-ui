@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react';
 import { getAccountName } from '@components/instructions/tools';
 import { Primary, Secondary } from '@hub/components/controls/Button';
 import { Connect } from '@hub/components/GlobalHeader/User/Connect';
+import { ProposalCreationProgress } from '@hub/components/ProposalCreationProgress';
 import { useCluster, ClusterType } from '@hub/hooks/useCluster';
 import { useProposal } from '@hub/hooks/useProposal';
 import { useQuery } from '@hub/hooks/useQuery';
@@ -58,7 +59,7 @@ interface Props {
 
 export function EditWalletRules(props: Props) {
   const [cluster] = useCluster();
-  const { createProposal } = useProposal();
+  const { createProposal, progress } = useProposal();
   const { publish } = useToast();
   const [result] = useQuery(gql.getGovernanceRulesResp, {
     query: gql.getGovernanceRules,
@@ -183,6 +184,7 @@ export function EditWalletRules(props: Props) {
 
         return (
           <div className={cx(props.className, 'dark:bg-neutral-900')}>
+            <ProposalCreationProgress progress={progress} />
             <div className="w-full max-w-3xl pt-14 mx-auto">
               <Head>
                 <title>Edit Wallet Rules - {walletName}</title>

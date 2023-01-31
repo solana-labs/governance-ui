@@ -1,6 +1,11 @@
 import { createContext } from 'react';
 
 import { ClusterType, useCluster } from '@hub/hooks/useCluster';
+import {
+  useProposalCreationProgress,
+  CreationProgress,
+  CreationProgressState,
+} from '@hub/hooks/useProposalCreationProgress';
 import { useToast, ToastType } from '@hub/hooks/useToast';
 import { useWallet } from '@hub/hooks/useWallet';
 
@@ -8,6 +13,7 @@ import { createProposal } from './createProposal';
 
 type CreateProposalsArgs = Omit<
   Parameters<typeof createProposal>[0],
+  | 'callbacks'
   | 'connection'
   | 'cluster'
   | 'signTransaction'
@@ -19,12 +25,14 @@ interface Value {
   createProposal(
     args: CreateProposalsArgs,
   ): Promise<Awaited<ReturnType<typeof createProposal>> | null>;
+  progress: CreationProgress;
 }
 
 export const DEFAULT: Value = {
   createProposal: async () => {
     throw new Error('Not implemented');
   },
+  progress: { state: CreationProgressState.Ready },
 };
 
 export const context = createContext(DEFAULT);
@@ -37,10 +45,12 @@ export function ProposalProvider(props: Props) {
   const [cluster] = useCluster();
   const { connect, signTransaction, signAllTransactions } = useWallet();
   const { publish } = useToast();
+  const { callbacks, progress } = useProposalCreationProgress();
 
   return (
     <context.Provider
       value={{
+        progress,
         createProposal: async (args) => {
           try {
             const publicKey = await connect();
@@ -51,6 +61,7 @@ export function ProposalProvider(props: Props) {
 
             return createProposal({
               ...args,
+              callbacks,
               cluster:
                 cluster.type === ClusterType.Devnet
                   ? 'devnet'
