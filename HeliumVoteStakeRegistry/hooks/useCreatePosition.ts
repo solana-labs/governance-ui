@@ -10,29 +10,33 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js'
 import { useAsyncCallback } from 'react-async-hook'
-import { useHeliumVsr } from './useHeliumVsr'
 import { positionKey } from '@helium/voter-stake-registry-sdk'
 import { sendTransaction } from '@utils/send'
 import { truthy } from '../sdk/types'
 import useRealm from '@hooks/useRealm'
+import { LockupKind } from 'HeliumVoteStakeRegistry/components/LockTokensModal'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import { HeliumVsrClient } from 'HeliumVoteStakeRegistry/sdk/client'
 
 export const useCreatePosition = ({
   registrarPk,
 }: {
   registrarPk: PublicKey | undefined
 }) => {
-  const program = useHeliumVsr()
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
   const { connection, wallet } = useWallet()
   const { realm, realmInfo } = useRealm()
   const { error, loading, execute } = useAsyncCallback(
     async ({
       amount,
-      lockupKind = 'cliff',
+      lockupKind = LockupKind.cliff,
       lockupPeriodsInDays,
       tokenOwnerRecordPk,
     }: {
       amount: BN
-      lockupKind: 'cliff' | 'constant'
+      lockupKind: LockupKind
       lockupPeriodsInDays: number
       tokenOwnerRecordPk: PublicKey | null
     }) => {
@@ -40,7 +44,8 @@ export const useCreatePosition = ({
         !connection ||
         !registrarPk ||
         !realm ||
-        !program ||
+        !client ||
+        !(client instanceof HeliumVsrClient) ||
         !wallet ||
         !realmInfo ||
         !realmInfo.programVersion
@@ -87,7 +92,7 @@ export const useCreatePosition = ({
         }
 
         instructions.push(
-          await program.methods
+          await client.program.methods
             .initializePositionV0({
               kind: { [lockupKind]: {} },
               periods: lockupPeriodsInDays,
@@ -102,7 +107,7 @@ export const useCreatePosition = ({
         )
 
         instructions.push(
-          await program.methods
+          await client.program.methods
             .depositV0({
               amount,
             })

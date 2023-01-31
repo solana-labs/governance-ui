@@ -55,6 +55,7 @@ export function useVotingPlugins() {
   const {
     handleSetVsrRegistrar,
     handleSetVsrClient,
+    handleSetHeliumVsrRegistrar,
     handleSetHeliumVsrClient,
     handleSetNftClient,
     handleSetGatewayClient,
@@ -102,6 +103,12 @@ export function useVotingPlugins() {
   const nftMintRegistrar = useVotePluginsClientStore(
     (s) => s.state.nftMintRegistrar
   )
+
+  // TODO (BRY): Might not need this
+  // const heliumVsrRegistrar = useVotePluginsClientStore(
+  //   (s) => s.state.heliumVsrRegistrar
+  // )
+
   const usedCollectionsPks: string[] =
     (currentPluginPk &&
       nftPluginsPks.includes(currentPluginPk?.toBase58()) &&
@@ -109,6 +116,7 @@ export function useVotingPlugins() {
         x.collection.toBase58()
       )) ||
     []
+
   const handleGetNfts = async () => {
     setIsLoadingNfts(true)
     try {
@@ -303,6 +311,7 @@ export function useVotingPlugins() {
       setMaxVoterWeight(null)
     }
   }
+
   const getIsFromCollection = (nft: NFTWithMeta) => {
     return (
       nft.collection &&
@@ -353,7 +362,7 @@ export function useVotingPlugins() {
         currentPluginPk &&
         heliumVsrPluginsPks.includes(currentPluginPk.toBase58())
       ) {
-        handleSetVsrRegistrar(heliumVsrClient, realm)
+        handleSetHeliumVsrRegistrar(heliumVsrClient, realm)
         if (connected) {
           handleSetCurrentRealmVotingClient({
             client: heliumVsrClient,

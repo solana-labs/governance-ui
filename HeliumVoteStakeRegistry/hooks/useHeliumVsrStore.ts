@@ -2,7 +2,6 @@ import create, { State } from 'zustand'
 import { BN } from '@project-serum/anchor'
 import { NFTWithMeta } from '@utils/uiTypes/VotePlugin'
 import { PositionWithVotingMint } from 'HeliumVoteStakeRegistry/sdk/types'
-import { MaxVoterWeightRecord, ProgramAccount } from '@solana/spl-governance'
 import { GetPositionsArgs, getPositions } from '../utils/getPositions'
 
 interface HeliumVsrStoreState {
@@ -10,7 +9,6 @@ interface HeliumVsrStoreState {
   amountLocked: BN
   votingPower: BN
   votingNfts: NFTWithMeta[]
-  maxVoteRecord: ProgramAccount<MaxVoterWeightRecord> | null
   isLoading: boolean
 }
 
@@ -26,7 +24,6 @@ const defaultState: HeliumVsrStoreState = {
   amountLocked: new BN(0),
   votingPower: new BN(0),
   votingNfts: [],
-  maxVoteRecord: null,
   isLoading: false,
 }
 
@@ -47,8 +44,8 @@ const useHeliumVsrStore = create<HeliumVsrStore>((set, _get) => ({
       const { positions, amountLocked, votingPower } = await getPositions(args)
       set((s) => {
         s.state.positions = positions
-        ;(s.state.amountLocked = amountLocked),
-          (s.state.votingPower = votingPower)
+        s.state.amountLocked = amountLocked
+        s.state.votingPower = votingPower
       })
     } catch (e) {
       throw new Error(e)

@@ -37,19 +37,19 @@ const defaultLockupPeriods = [
   },
 ]
 
-export enum LockupType {
+export enum LockupKind {
   none = 'none',
   cliff = 'cliff',
   constant = 'constant',
 }
 
 const lockupInfosByType = {
-  [LockupType.cliff]: [
+  [LockupKind.cliff]: [
     'Tokens are locked for a fixed duration and are released in full at the end of it.',
     'Vote weight declines linearly until release.',
     'Example: You lock 10.000 tokens for two years. They are then unavailable for the next two years. After this time, you can withdraw them again.',
   ],
-  [LockupType.constant]: [
+  [LockupKind.constant]: [
     'Tokens are locked indefinitely. At any time you can start the unlock process which lasts for the initially chosen lockup duration.',
     'Vote weight stays constant until you start the unlock process, then it declines linearly until release.',
     'Example: You lock 10.000 tokens with a lockup duration of one year. After two years you decide to start the unlocking process. Another year after that, you can withdraw the tokens.',
@@ -57,7 +57,7 @@ const lockupInfosByType = {
 }
 
 export interface LockTokensModalFormValues {
-  lockupType: { value: LockupType; display: string }
+  lockupKind: { value: LockupKind; display: string }
   amount: number
   lockupPeriod: { value: number; display: string }
   lockupPeriodInDays: number
@@ -84,7 +84,7 @@ export const LockTokensModal: React.FC<{
   const { mint } = useRealm()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showCustomDuration, setShowCustomDuration] = useState(false)
-  const [showLockupTypeInfo, setShowLockupTypeInfo] = useState<boolean>(false)
+  const [showLockupKindInfo, setShowLockupKindInfo] = useState<boolean>(false)
   const mintMinAmount = mint ? getMintMinAmountAsDecimal(mint) : 1
   const currentPrecision = precision(mintMinAmount)
   const hasMinLockup = minLockupTimeInDays && minLockupTimeInDays > 0
@@ -93,9 +93,9 @@ export const LockTokensModal: React.FC<{
     { value: false, display: 'No' },
     { value: true, display: 'Yes' },
   ]
-  const lockupTypeOptions = [
-    { value: LockupType.cliff, display: 'Cliff' },
-    { value: LockupType.constant, display: 'Constant' },
+  const lockupKindOptions = [
+    { value: LockupKind.cliff, display: 'Cliff' },
+    { value: LockupKind.constant, display: 'Constant' },
   ]
 
   const lockupPeriodOptions = [
@@ -114,7 +114,7 @@ export const LockTokensModal: React.FC<{
 
   const { setValue, watch, handleSubmit } = useForm<LockTokensModalFormValues>({
     defaultValues: {
-      lockupType: lockupTypeOptions[0],
+      lockupKind: lockupKindOptions[0],
       lockupPeriod: lockupPeriodOptions[0],
       lockupPeriodInDays: lockupPeriodOptions[0].value,
       lockupMoreThenDeposited: lockupMoreThenDepositedOptions[0],
@@ -122,7 +122,7 @@ export const LockTokensModal: React.FC<{
   })
 
   const {
-    lockupType,
+    lockupKind,
     amount,
     lockupPeriod,
     lockupPeriodInDays,
@@ -171,7 +171,7 @@ export const LockTokensModal: React.FC<{
     <Modal onClose={onClose} isOpen={isOpen}>
       <form onSubmit={handleOnSubmit}>
         <h2 className="mb-4 flex flex-row items-center">Lock Tokens</h2>
-        {hasMinLockup && !showLockupTypeInfo ? (
+        {hasMinLockup && !showLockupKindInfo ? (
           <div className="bg-bkg-3 rounded-md w-full p-4 mb-4 font-normal text-xs">
             <div>
               There is a minimum required lockup time of{' '}
@@ -181,26 +181,26 @@ export const LockTokensModal: React.FC<{
             </div>
           </div>
         ) : null}
-        {!showLockupTypeInfo && (
+        {!showLockupKindInfo && (
           <>
             <div className="flex items-center justify-between">
               <div className={labelClasses}>Lockup Type</div>
               <LinkButton
                 className="mb-2"
-                onClick={() => setShowLockupTypeInfo(true)}
+                onClick={() => setShowLockupKindInfo(true)}
               >
                 About Lockup Types
               </LinkButton>
             </div>
             <div className="mb-4">
               <ButtonGroup
-                activeValue={lockupType!.display}
+                activeValue={lockupKind!.display}
                 className="h-10"
-                values={lockupTypeOptions.map((lt) => lt.display)}
-                onChange={(type) =>
+                values={lockupKindOptions.map((lt) => lt.display)}
+                onChange={(kind) =>
                   setValue(
-                    'lockupType',
-                    lockupTypeOptions.find((lt) => lt.display === type)!
+                    'lockupKind',
+                    lockupKindOptions.find((lt) => lt.display === kind)!
                   )
                 }
               />
@@ -276,10 +276,10 @@ export const LockTokensModal: React.FC<{
               </>
             )}
             <div className={`${labelClasses} flex items-center`}>
-              {lockupType.value === LockupType.constant
+              {lockupKind.value === LockupKind.constant
                 ? 'Vote Weight Multiplier'
                 : 'Initial Vote Weight Multiplier'}
-              {lockupType.value !== LockupType.constant ? (
+              {lockupKind.value !== LockupKind.constant ? (
                 <Tooltip content="The multiplier will decline linearly over time">
                   <QuestionMarkCircleIcon className="cursor-help h-4 ml-1 w-4" />
                 </Tooltip>
@@ -298,9 +298,9 @@ export const LockTokensModal: React.FC<{
             </div>
           </>
         )}
-        {showLockupTypeInfo ? (
+        {showLockupKindInfo ? (
           <>
-            {lockupTypeOptions.map((type) => (
+            {lockupKindOptions.map((type) => (
               <>
                 <h2 className="text-base" key={type.value}>
                   {type.display}
@@ -317,7 +317,7 @@ export const LockTokensModal: React.FC<{
 
             <Button
               className="mt-4 w-full"
-              onClick={() => setShowLockupTypeInfo(false)}
+              onClick={() => setShowLockupKindInfo(false)}
             >
               Back
             </Button>

@@ -78,18 +78,17 @@ const RealmHeader = () => {
               </a>
             </Link>
           )}
-          {isDefaultVsrMode ||
-            (isHeliumVsrMode && (
-              <Link href={fmtUrlWithCluster(`/dao/${symbol}/token-stats`)}>
-                <a className="flex items-center text-sm cursor-pointer default-transition text-fgd-2 hover:text-fgd-3">
-                  <ChartPieIcon className="flex-shrink-0 w-5 h-5 mr-1" />
-                  {typeof symbol === 'string' && tryParsePublicKey(symbol)
-                    ? realm?.account.name
-                    : symbol}{' '}
-                  stats
-                </a>
-              </Link>
-            ))}
+          {isDefaultVsrMode && (
+            <Link href={fmtUrlWithCluster(`/dao/${symbol}/token-stats`)}>
+              <a className="flex items-center text-sm cursor-pointer default-transition text-fgd-2 hover:text-fgd-3">
+                <ChartPieIcon className="flex-shrink-0 w-5 h-5 mr-1" />
+                {typeof symbol === 'string' && tryParsePublicKey(symbol)
+                  ? realm?.account.name
+                  : symbol}{' '}
+                stats
+              </a>
+            </Link>
+          )}
           <Link href={fmtUrlWithCluster(`/dao/${symbol}/params`)}>
             <a className="flex items-center text-sm cursor-pointer default-transition text-fgd-2 hover:text-fgd-3">
               <CogIcon className="flex-shrink-0 w-5 h-5 mr-1" />

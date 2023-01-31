@@ -186,14 +186,14 @@ export class VotingClient {
     }
 
     if (this.client instanceof HeliumVsrClient) {
-      console.log("TODO (BRY): UPDATE VOTER_WEIGHT_RECORD");
-      // const { registrar } = await getRegistrarPDA(
-      //   realm.pubkey,
-      //   realm.account.communityMint,
-      //   clientProgramId
-      // )
+      const remainingAccounts: AccountData[] = []
+      const { registrar } = await getRegistrarPDA(
+        realm.pubkey,
+        realm.account.communityMint,
+        clientProgramId
+      )
 
-      // const remainingAccounts: AccountData[] = []
+      // TODO (BRY): fix logic with nfts from holaplex
       // for (let i = 0; i < this.votingNfts.length; i++) {
       //   const nft = this.votingNfts[i]
       //   const tokenAccount = await nft.getAssociatedTokenAccount()
@@ -204,12 +204,25 @@ export class VotingClient {
       //   )
       // }
 
-      // TODO (Bry): Finish this logic
-      // const updateVoterWeightRecordIx = await this.client!.program.methods.updateVoterWeightRecordV0(
-      //   { voterWeightAction: { [type]: {} }, owner: walletPk }
-      // )
-      //   .accounts({ registrar, })
-      //   .instruction()
+      // const builder = this.client!.program.methods.updateVoterWeightRecordV0({
+      //   voterWeightAction: {
+      //     [type]: {},
+      //   },
+      //   owner: walletPk,
+      // } as any)
+      //   .accounts({
+      //     registrar,
+      //   })
+      //   .remainingAccounts(remainingAccounts)
+
+      // const { voterWeightRecord } = await builder.pubkeys()
+      // const instruction = await builder.instruction()
+      // instructions.push(instruction)
+
+      // return {
+      //   voterWeightPk: voterWeightRecord,
+      //   maxVoterWeightRecord: undefined,
+      // }
     }
 
     if (this.client instanceof NftVoterClient) {

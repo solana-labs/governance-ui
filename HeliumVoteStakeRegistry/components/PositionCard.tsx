@@ -30,7 +30,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
   const { realm, realmInfo, tokenRecords, ownTokenRecord } = useRealm()
   const [vsrClient, vsrRegistrar] = useVotePluginsClientStore((s) => [
     s.state.vsrClient,
-    s.state.voteStakeRegistryRegistrar,
+    s.state.heliumVsrClient,
   ])
   const { error, loading, nft } = useNft(position.mint)
   const [connection, wallet, endpoint] = useWalletStore((s) => [

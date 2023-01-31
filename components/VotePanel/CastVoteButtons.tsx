@@ -32,8 +32,6 @@ const useCanVote = () => {
       voterTokenRecord.account.governingTokenMint
     )
 
-  console.log(client.clientType)
-  console.log(VotingClientType.HeliumVsrClient)
   const canVote =
     connected &&
     !(
@@ -49,6 +47,7 @@ const useCanVote = () => {
     : !hasMinAmountToVote
     ? 'You don’t have governance power to vote in this dao'
     : ''
+
   return [canVote, voteTooltipContent] as const
 }
 

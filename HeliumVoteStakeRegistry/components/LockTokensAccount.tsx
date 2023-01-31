@@ -42,10 +42,10 @@ export const LockTokensAccount: React.FC<{
   children: React.ReactNode
 }> = ({ tokenOwnerRecordPk, children }) => {
   const {
+    mint,
     realm,
     realmTokenAccount,
     realmInfo,
-    mint,
     tokenRecords,
     councilMint,
     config,
@@ -53,17 +53,17 @@ export const LockTokensAccount: React.FC<{
   const tokenOwnerRecordWalletPk = Object.keys(tokenRecords)?.find(
     (key) => tokenRecords[key]?.pubkey?.toBase58() === tokenOwnerRecordPk
   )
+
   const [
     vsrClient,
     vsrRegistrar,
     vsrRegistrarPk,
   ] = useVotePluginsClientStore((s) => [
     s.state.heliumVsrClient,
-    s.state.voteStakeRegistryRegistrar as Registrar | null,
+    s.state.heliumVsrRegistrar,
     s.state.voteStakeRegistryRegistrarPk,
   ])
   const { error, createPosition } = useCreatePosition({
-    realm,
     registrarPk: vsrRegistrarPk || undefined,
   })
   const [isOwnerOfPositions, setIsOwnerOfPositions] = useState(true)
@@ -136,12 +136,14 @@ export const LockTokensAccount: React.FC<{
           : !councilMint?.supply.isZero()
           ? realm!.account.config.councilMint
           : undefined
+
       const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
         realm!.owner,
         realm!.pubkey,
         defaultMint!,
         wallet!.publicKey!
       )
+
       setIsOwnerOfPositions(
         tokenOwnerRecordAddress.toBase58() === tokenOwnerRecordPk
       )
@@ -212,7 +214,7 @@ export const LockTokensAccount: React.FC<{
   )
 
   const handleLockTokens = async (values: LockTokensModalFormValues) => {
-    const { amount, lockupPeriodInDays, lockupType } = values
+    const { amount, lockupPeriodInDays, lockupKind } = values
     const amountToLock = getMintNaturalAmountFromDecimalAsBN(
       amount,
       mint!.decimals
@@ -220,8 +222,10 @@ export const LockTokensAccount: React.FC<{
 
     await createPosition({
       amount: amountToLock,
-      periods: lockupPeriodInDays,
-      kind: { [lockupType.value]: {} },
+      lockupPeriodsInDays: lockupPeriodInDays,
+      lockupKind: lockupKind.value,
+      tokenOwnerRecordPk:
+        tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey || null,
     })
 
     if (!error) {

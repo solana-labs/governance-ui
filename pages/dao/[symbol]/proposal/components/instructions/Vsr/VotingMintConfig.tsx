@@ -4,7 +4,6 @@ import {
   Governance,
   ProgramAccount,
   serializeInstructionToBase64,
-  //serializeInstructionToBase64,
 } from '@solana/spl-governance'
 import { validateInstruction } from '@utils/instructionTools'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
@@ -288,13 +287,13 @@ const VotingMintConfig = ({
   const inputs: InstructionInput[] = [
     {
       label: 'Voter Stake Registry Program ID',
-      initialValue: DEFAULT_VSR_ID,
+      initialValue: form?.programId || DEFAULT_VSR_ID,
       name: 'programId',
       type: InstructionInputType.INPUT,
     },
     {
       label: 'Wallet',
-      initialValue: undefined,
+      initialValue: form?.governedAccount || undefined,
       name: 'governedAccount',
       type: InstructionInputType.GOVERNED_ACCOUNT,
       shouldBeGoverned: shouldBeGoverned,
@@ -307,14 +306,14 @@ const VotingMintConfig = ({
     },
     {
       label: 'mint',
-      initialValue: realm?.account.communityMint.toBase58() || '',
+      initialValue: form?.mint || realm?.account.communityMint.toBase58() || '',
       inputType: 'text',
       name: 'mint',
       type: InstructionInputType.INPUT,
     },
     {
       label: 'mint index',
-      initialValue: 0,
+      initialValue: form?.mintIndex || 0,
       min: 0,
       inputType: 'number',
       name: 'mintIndex',
@@ -324,7 +323,7 @@ const VotingMintConfig = ({
       ? [
           {
             label: 'Grant authority (Governance)',
-            initialValue: null,
+            initialValue: form?.grantAuthority || null,
             name: 'grantAuthority',
             type: InstructionInputType.GOVERNED_ACCOUNT,
             options: assetAccounts.filter(
@@ -335,7 +334,7 @@ const VotingMintConfig = ({
       : []),
     {
       label: 'mint digit shift',
-      initialValue: 0,
+      initialValue: form?.mintDigitShift || 0,
       min: 0,
       inputType: 'number',
       name: 'mintDigitShift',
@@ -345,7 +344,7 @@ const VotingMintConfig = ({
       ? [
           {
             label: 'mint unlocked factor',
-            initialValue: 0,
+            initialValue: form?.baselineVoteWeightFactor || 0,
             min: 0,
             inputType: 'number',
             name: 'baselineVoteWeightFactor',
@@ -355,7 +354,7 @@ const VotingMintConfig = ({
       : [
           {
             label: 'mint lockup factor',
-            initialValue: 0,
+            initialValue: form?.lockedVoteWeightFactor || 0,
             min: 0,
             inputType: 'number',
             name: 'lockedVoteWeightFactor',
@@ -363,7 +362,7 @@ const VotingMintConfig = ({
           },
           {
             label: 'mint min required lockup saturation (years)',
-            initialValue: 0,
+            initialValue: form?.minimumRequiredLockup || 0,
             min: 0,
             inputType: 'number',
             name: 'minimumRequiredLockup',
@@ -372,7 +371,7 @@ const VotingMintConfig = ({
         ]),
     {
       label: 'max extra vote weight',
-      initialValue: 0,
+      initialValue: form?.maxLockupFactor || 0,
       min: 0,
       inputType: 'number',
       name: 'maxLockupFactor',
@@ -380,7 +379,7 @@ const VotingMintConfig = ({
     },
     {
       label: 'mint lockup saturation (years)',
-      initialValue: 0,
+      initialValue: form?.lockupSaturation || 0,
       min: 0,
       inputType: 'number',
       name: 'lockupSaturation',

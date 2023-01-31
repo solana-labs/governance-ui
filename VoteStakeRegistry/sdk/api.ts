@@ -12,15 +12,31 @@ export const tryGetVoter = async (voterPk: PublicKey, client: VsrClient) => {
     return null
   }
 }
+
 export const tryGetRegistrar = async (
   registrarPk: PublicKey,
-  client: VsrClient | HeliumVsrClient
+  client: VsrClient
 ) => {
   try {
     const existingRegistrar = await client.program.account.registrar.fetch(
       registrarPk
     )
     return existingRegistrar as Registrar
+  } catch (e) {
+    return null
+  }
+}
+
+export const tryGetHeliumRegistrar = async (
+  registrarPk: PublicKey,
+  client: HeliumVsrClient
+) => {
+  try {
+    const existingRegistrar = await client.program.account.registrar.fetch(
+      registrarPk
+    )
+
+    return existingRegistrar
   } catch (e) {
     return null
   }

@@ -19,17 +19,6 @@ export interface VotingMint {
   mint: PublicKey
 }
 
-export interface HeliumVotingMint
-  extends Omit<
-    VotingMint,
-    'baselineVoteWeightScaledFactor' | 'grantAuthority'
-  > {
-  lockedVoteWeightScaledFactor: BN
-  minimumRequiredLockupSecs: BN
-  genesisVotePowerMultiplier: number
-  genesisVotePowerMultiplierExpirationTs: BN
-}
-
 export type LockupType = 'none' | 'monthly' | 'cliff' | 'constant' | 'daily' //there is also daily type but not used on ui yet
 export interface Registrar {
   governanceProgramId: PublicKey
