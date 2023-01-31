@@ -58,6 +58,22 @@ export default function UseMangoV4() {
     }
   }, [connection.cluster, wallet?.publicKey?.toBase58()])
 
+  const docs = mangoClient?.program.idl.accounts
+    .flatMap((x) => x.type.fields as any)
+    .filter((x) => x)
+    .filter((x) => (x as any).docs?.length)
+    .map((x) => ({ ...x, docs: x.docs.join(' ') }))
+
+  const getAdditionalLabelInfo = (name: string) => {
+    const val = docs?.find((x) => x.name === name)
+
+    if (val) {
+      return `- ${val.docs}`
+    } else {
+      return ''
+    }
+  }
+
   return {
     ADMIN_PK,
     GROUP_NUM,
@@ -65,5 +81,6 @@ export default function UseMangoV4() {
     getClient,
     mangoClient,
     mangoGroup,
+    getAdditionalLabelInfo,
   }
 }

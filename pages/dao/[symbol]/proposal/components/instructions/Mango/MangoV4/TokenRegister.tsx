@@ -52,7 +52,7 @@ const TokenRegister = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { mangoClient, mangoGroup } = UseMangoV4()
+  const { mangoClient, mangoGroup, getAdditionalLabelInfo } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
@@ -171,22 +171,6 @@ const TokenRegister = ({
       .required('Program governed account is required'),
   })
 
-  const docs = mangoClient?.program.idl.accounts
-    .flatMap((x) => x.type.fields as any)
-    .filter((x) => x)
-    .filter((x) => (x as any).docs?.length)
-    .map((x) => ({ ...x, docs: x.docs.join(' ') }))
-
-  const getAdditionalLabelInfo = (name: string) => {
-    const val = docs?.find((x) => x.name === name)
-
-    if (val) {
-      return `- ${val.docs}`
-    } else {
-      return ''
-    }
-  }
-
   const inputs: InstructionInput[] = [
     {
       label: 'Governance',
@@ -204,14 +188,14 @@ const TokenRegister = ({
       name: 'mintPk',
     },
     {
-      label: `Oracle PublicKey ${getAdditionalLabelInfo('oraclePk')}`,
+      label: `Oracle PublicKey`,
       initialValue: form.oraclePk,
       type: InstructionInputType.INPUT,
       name: 'oraclePk',
     },
     {
       label: `Oracle Configuration Filter ${getAdditionalLabelInfo(
-        'oracleConfFilter'
+        'confFilter'
       )}`,
       initialValue: form.oracleConfFilter,
       type: InstructionInputType.INPUT,

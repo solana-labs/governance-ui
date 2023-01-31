@@ -18,7 +18,6 @@ import InstructionForm, {
   InstructionInputType,
 } from '../../FormCreator'
 import UseMangoV4 from '@hooks/useMangoV4'
-import { Group } from '@blockworks-foundation/mango-v4'
 import { getChangedValues, getNullOrTransform } from './tools'
 
 type NamePkVal = {
@@ -102,15 +101,13 @@ const EditToken = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { getClient, GROUP } = UseMangoV4()
+  const { getAdditionalLabelInfo, mangoClient, mangoGroup } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
     (x) => x.type === AccountType.SOL
   )
-  const { connection } = useWalletStore()
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const [mangoGroup, setMangoGroup] = useState<Group | null>(null)
   const [tokens, setTokens] = useState<NamePkVal[]>([])
   const programId: PublicKey | undefined = realmInfo?.programId
   const [originalFormValues, setOriginalFormValues] = useState<EditTokenForm>({
@@ -139,13 +136,13 @@ const EditToken = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const client = await getClient(connection, wallet)
-      const group = await client.getGroup(GROUP)
-      const bank = group.getFirstBankByMint(new PublicKey(form.mintPk))
-      const mintInfo = group.mintInfosMapByTokenIndex.get(bank.tokenIndex)!
+      const bank = mangoGroup!.getFirstBankByMint(new PublicKey(form.mintPk))
+      const mintInfo = mangoGroup!.mintInfosMapByTokenIndex.get(
+        bank.tokenIndex
+      )!
       const values = getChangedValues<EditTokenForm>(originalFormValues, form)
       //Mango instruction call and serialize
-      const ix = await client.program.methods
+      const ix = await mangoClient!.program.methods
         .tokenEdit(
           getNullOrTransform(values.oraclePk, PublicKey),
           {
@@ -185,7 +182,7 @@ const EditToken = ({
           values.reduceOnly
         )
         .accounts({
-          group: group.publicKey,
+          group: mangoGroup!.publicKey,
           oracle: form.oraclePk ? new PublicKey(form.oraclePk) : bank.oracle,
           admin: form.governedAccount.extensions.transferAddress,
           mintInfo: mintInfo.publicKey,
@@ -224,19 +221,18 @@ const EditToken = ({
   }, [form])
   useEffect(() => {
     const getTokens = async () => {
-      const client = await getClient(connection, wallet!)
-      const group = await client.getGroup(GROUP)
-      const currentTokens = [...group.banksMapByMint.values()].map((x) => ({
-        name: x[0].name,
-        value: x[0].mint,
-      }))
-      setMangoGroup(group)
+      const currentTokens = [...mangoGroup!.banksMapByMint.values()].map(
+        (x) => ({
+          name: x[0].name,
+          value: x[0].mint,
+        })
+      )
       setTokens(currentTokens)
     }
     if (wallet?.publicKey) {
       getTokens()
     }
-  }, [connection && wallet?.publicKey?.toBase58()])
+  }, [JSON.stringify(mangoGroup)])
   useEffect(() => {
     if (form.token && mangoGroup) {
       const currentToken = mangoGroup!.banksMapByMint.get(
@@ -307,19 +303,21 @@ const EditToken = ({
       options: tokens,
     },
     {
-      label: 'Mint Pk',
+      label: 'Mint PublicKey',
       initialValue: form.mintPk,
       type: InstructionInputType.INPUT,
       name: 'mintPk',
     },
     {
-      label: 'Oracle Pk',
+      label: 'Oracle PublicKey',
       initialValue: form.oraclePk,
       type: InstructionInputType.INPUT,
       name: 'oraclePk',
     },
     {
-      label: 'Oracle Configuration Filter',
+      label: `Oracle Configuration Filter ${getAdditionalLabelInfo(
+        'confFilter'
+      )}`,
       initialValue: form.oracleConfFilter,
       type: InstructionInputType.INPUT,
       inputType: 'number',
@@ -332,172 +330,194 @@ const EditToken = ({
       name: 'name',
     },
     {
-      label: 'Adjustment Factor',
+      label: `Adjustment Factor ${getAdditionalLabelInfo('adjustmentFactor')}`,
       initialValue: form.adjustmentFactor,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'adjustmentFactor',
     },
     {
-      label: 'Util 0',
+      label: `Util0 ${getAdditionalLabelInfo('util0')}`,
       initialValue: form.util0,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'util0',
     },
     {
-      label: 'Rate 0',
+      label: `Rate0 ${getAdditionalLabelInfo('rate0')}`,
       initialValue: form.rate0,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'rate0',
     },
     {
-      label: 'Util 1',
+      label: `Util1 ${getAdditionalLabelInfo('util1')}`,
       initialValue: form.util1,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'util1',
     },
     {
-      label: 'Rate 1',
+      label: `Rate1 ${getAdditionalLabelInfo('rate1')}`,
       initialValue: form.rate1,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'rate1',
     },
     {
-      label: 'Max Rate',
+      label: `Max Rate ${getAdditionalLabelInfo('maxRate')}`,
       initialValue: form.maxRate,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'maxRate',
     },
     {
-      label: 'Loan Fee Rate',
+      label: `Loadn Fee Rate ${getAdditionalLabelInfo('loanFeeRate')}`,
       initialValue: form.loanFeeRate,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'loanFeeRate',
     },
     {
-      label: 'Loan Origination Fee Rate',
+      label: `Loan Origination Fee Rate ${getAdditionalLabelInfo(
+        'loanOriginationFeeRate'
+      )}`,
       initialValue: form.loanOriginationFeeRate,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'loanOriginationFeeRate',
     },
     {
-      label: 'Maint Asset Weight',
+      label: `Maint Asset Weight ${getAdditionalLabelInfo('maintAssetWeight')}`,
       initialValue: form.maintAssetWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'maintAssetWeight',
     },
     {
-      label: 'Init Asset Weight',
+      label: `Init Asset Weight ${getAdditionalLabelInfo('initAssetWeight')}`,
       initialValue: form.initAssetWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'initAssetWeight',
     },
     {
-      label: 'Maint Liab Weight',
+      label: `Maint Liab Weight ${getAdditionalLabelInfo('maintLiabWeight')}`,
       initialValue: form.maintLiabWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'maintLiabWeight',
     },
     {
-      label: 'Init Liab Weight',
+      label: `Init Liab Weight ${getAdditionalLabelInfo('initLiabWeight')}`,
       initialValue: form.initLiabWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'initLiabWeight',
     },
     {
-      label: 'Liquidation Fee',
+      label: `Liquidation Fee ${getAdditionalLabelInfo('liquidationFee')}`,
       initialValue: form.liquidationFee,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'liquidationFee',
     },
     {
-      label: 'Group Insurance Fund',
+      label: `Group Insurance Fund ${getAdditionalLabelInfo(
+        'groupInsuranceFund'
+      )}`,
       initialValue: form.groupInsuranceFund,
       type: InstructionInputType.SWITCH,
       name: 'groupInsuranceFund',
     },
     {
-      label: 'Stable Price Delay Interval Seconds',
+      label: `Stable Price Delay Interval Seconds ${getAdditionalLabelInfo(
+        'stablePriceDelayIntervalSeconds'
+      )}`,
       initialValue: form.stablePriceDelayIntervalSeconds,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'stablePriceDelayIntervalSeconds',
     },
     {
-      label: 'Stable Price Delay Growth Limit',
+      label: `Stable Price Delay Growth Limit ${getAdditionalLabelInfo(
+        'stablePriceDelayGrowthLimit'
+      )}`,
       initialValue: form.stablePriceDelayGrowthLimit,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'stablePriceDelayGrowthLimit',
     },
     {
-      label: 'Stable Price Growth Limit',
+      label: `Stable Price Growth Limit ${getAdditionalLabelInfo(
+        'stablePriceGrowthLimit'
+      )}`,
       initialValue: form.stablePriceGrowthLimit,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'stablePriceGrowthLimit',
     },
     {
-      label: 'Min Vault To Deposits Ratio',
+      label: `Min Vault To Deposits Ratio ${getAdditionalLabelInfo(
+        'minVaultToDepositsRatio'
+      )}`,
       initialValue: form.minVaultToDepositsRatio,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'minVaultToDepositsRatio',
     },
     {
-      label: 'Net Borrow Limit Per Window Quote',
+      label: `Net Borrow Limit Per Window Quote ${getAdditionalLabelInfo(
+        'netBorrowLimitPerWindowQuote'
+      )}`,
       initialValue: form.netBorrowLimitPerWindowQuote,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'netBorrowLimitPerWindowQuote',
     },
     {
-      label: 'Net Borrow Limit Window Size Ts',
+      label: `Net Borrow Limit Window Size Ts ${getAdditionalLabelInfo(
+        'netBorrowLimitWindowSizeTs'
+      )}`,
       initialValue: form.netBorrowLimitWindowSizeTs,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'netBorrowLimitWindowSizeTs',
     },
     {
-      label: 'Borrow Weight Scale Start Quote',
+      label: `Borrow Weight Scale Start Quote ${getAdditionalLabelInfo(
+        'borrowWeightScaleStartQuote'
+      )}`,
       initialValue: form.borrowWeightScaleStartQuote,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'borrowWeightScaleStartQuote',
     },
     {
-      label: 'Deposit Weight Scale Start Quote',
+      label: `Deposit Weight Scale Start Quote ${getAdditionalLabelInfo(
+        'depositWeightScaleStartQuote'
+      )}`,
       initialValue: form.depositWeightScaleStartQuote,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'depositWeightScaleStartQuote',
     },
     {
-      label: 'Reset Stable Price',
+      label: `Reset Stable Price ${getAdditionalLabelInfo('resetStablePrice')}`,
       initialValue: form.resetStablePrice,
       type: InstructionInputType.SWITCH,
       name: 'resetStablePrice',
     },
     {
-      label: 'Reset Net Borrow Limit',
+      label: `Reset Net Borrow Limit ${getAdditionalLabelInfo(
+        'resetNetBorrowLimit'
+      )}`,
       initialValue: form.resetNetBorrowLimit,
       type: InstructionInputType.SWITCH,
       name: 'resetNetBorrowLimit',
     },
     {
-      label: 'Reduce Only',
+      label: `Reduce Only ${getAdditionalLabelInfo('reduceOnly')}`,
       initialValue: form.reduceOnly,
       type: InstructionInputType.SWITCH,
       name: 'reduceOnly',

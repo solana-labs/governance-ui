@@ -33,13 +33,12 @@ const TokenRegisterTrustless = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { getClient, GROUP } = UseMangoV4()
+  const { mangoClient, mangoGroup } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
     (x) => x.type === AccountType.SOL
   )
-  const { connection } = useWalletStore()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<TokenRegisterTrustlessForm>({
@@ -68,14 +67,12 @@ const TokenRegisterTrustless = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const client = await getClient(connection, wallet)
-      const group = await client.getGroup(GROUP)
-      const tokenIndex = group.banksMapByName.size
+      const tokenIndex = mangoGroup!.banksMapByName.size
       //Mango instruction call and serialize
-      const ix = await client.program.methods
+      const ix = await mangoClient!.program.methods
         .tokenRegisterTrustless(tokenIndex, form.name)
         .accounts({
-          group: group.publicKey,
+          group: mangoGroup!.publicKey,
           fastListingAdmin: form.governedAccount.extensions.transferAddress,
           mint: new PublicKey(form.mintPk),
           oracle: new PublicKey(form.oraclePk),
@@ -124,13 +121,13 @@ const TokenRegisterTrustless = ({
       options: governedProgramAccounts,
     },
     {
-      label: 'Mint Pk',
+      label: 'Mint PublicKey',
       initialValue: form.mintPk,
       type: InstructionInputType.INPUT,
       name: 'mintPk',
     },
     {
-      label: 'Oracle Pk',
+      label: 'Oracle PublicKey',
       initialValue: form.oraclePk,
       type: InstructionInputType.INPUT,
       name: 'oraclePk',
