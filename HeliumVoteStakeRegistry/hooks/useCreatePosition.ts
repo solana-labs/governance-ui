@@ -1,6 +1,6 @@
 import { BN } from '@project-serum/anchor'
 import { MintLayout, Token, TOKEN_PROGRAM_ID } from '@solana/spl-token'
-import { ProgramAccount, Realm } from '@solana/spl-governance'
+import { withCreateTokenOwnerRecord } from '@solana/spl-governance'
 import useWallet from '@hooks/useWallet'
 import {
   Keypair,
@@ -14,34 +14,46 @@ import { useHeliumVsr } from './useHeliumVsr'
 import { positionKey } from '@helium/voter-stake-registry-sdk'
 import { sendTransaction } from '@utils/send'
 import { truthy } from '../sdk/types'
+import useRealm from '@hooks/useRealm'
 
 export const useCreatePosition = ({
   registrarPk,
-  realm,
 }: {
   registrarPk: PublicKey | undefined
-  realm: ProgramAccount<Realm> | undefined
 }) => {
   const program = useHeliumVsr()
   const { connection, wallet } = useWallet()
+  const { realm, realmInfo } = useRealm()
   const { error, loading, execute } = useAsyncCallback(
     async ({
       amount,
-      kind = { cliff: {} },
-      periods,
+      lockupKind = 'cliff',
+      lockupPeriodsInDays,
+      tokenOwnerRecordPk,
     }: {
       amount: BN
-      kind: { [key in 'cliff' | 'constant']?: Record<string, never> }
-      periods: number
+      lockupKind: 'cliff' | 'constant'
+      lockupPeriodsInDays: number
+      tokenOwnerRecordPk: PublicKey | null
     }) => {
-      if (connection && registrarPk && realm && program && wallet) {
-        if (loading) return
+      const isInvalid =
+        !connection ||
+        !registrarPk ||
+        !realm ||
+        !program ||
+        !wallet ||
+        !realmInfo ||
+        !realmInfo.programVersion
+
+      if (loading) return
+      if (!isInvalid) {
         const mintKeypair = Keypair.generate()
         const position = positionKey(mintKeypair.publicKey)[0]
         const instructions: TransactionInstruction[] = []
         const mintRent = await connection.current.getMinimumBalanceForRentExemption(
           MintLayout.span
         )
+
         instructions.push(
           SystemProgram.createAccount({
             fromPubkey: wallet!.publicKey!,
@@ -62,11 +74,23 @@ export const useCreatePosition = ({
           )
         )
 
+        if (!tokenOwnerRecordPk) {
+          await withCreateTokenOwnerRecord(
+            instructions,
+            realm.owner,
+            realmInfo.programVersion!,
+            realm.pubkey,
+            wallet!.publicKey!,
+            realm.account.communityMint,
+            wallet!.publicKey!
+          )
+        }
+
         instructions.push(
           await program.methods
             .initializePositionV0({
-              kind,
-              periods,
+              kind: { [lockupKind]: {} },
+              periods: lockupPeriodsInDays,
             } as any)
             .accounts({
               registrar: registrarPk,

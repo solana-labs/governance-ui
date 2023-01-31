@@ -39,7 +39,6 @@ export default function LockedCommunityNFTRecordVotingPower(props: Props) {
 
   const isLoading = loadingPositions || !(votingPower && mint)
 
-  // TODO: (BRY): we have no tokenOwnerRecord
   const currentTokenOwnerRecord =
     wallet && wallet.publicKey
       ? tokenRecords[wallet.publicKey.toBase58()]

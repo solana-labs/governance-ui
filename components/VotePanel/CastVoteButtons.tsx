@@ -32,6 +32,8 @@ const useCanVote = () => {
       voterTokenRecord.account.governingTokenMint
     )
 
+  console.log(client.clientType)
+  console.log(VotingClientType.HeliumVsrClient)
   const canVote =
     connected &&
     !(

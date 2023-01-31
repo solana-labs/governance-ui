@@ -169,7 +169,7 @@ export default function VotingPower(props: Props) {
           case Type.LockedCommunityNFTRecord:
             return <LockedCommunityNFTRecordVotingPower key={type} />
           case Type.LockedCouncilNFTRecord:
-            return <div>TODO: Build out comp</div>
+            return <div>TODO (BRY): Build out comp</div>
         }
       })}
     </div>
