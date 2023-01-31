@@ -1,14 +1,19 @@
-//temp solution for mango client
-
 import { AnchorProvider } from '@project-serum/anchor'
 import { PublicKey } from '@solana/web3.js'
 import { ConnectionContext } from '@utils/connection'
 import { WalletSigner } from '@solana/spl-governance'
-import { MangoClient, MANGO_V4_ID } from '@blockworks-foundation/mango-v4'
+import {
+  Group,
+  MangoClient,
+  MANGO_V4_ID,
+} from '@blockworks-foundation/mango-v4'
 import useWalletStore from 'stores/useWalletStore'
+import { useEffect, useState } from 'react'
 
 export default function UseMangoV4() {
   const cluster = useWalletStore((s) => s.connection).cluster
+  const connection = useWalletStore((s) => s.connection)
+  const wallet = useWalletStore((s) => s.current)
   const GROUP_NUM = 0
   const ADMIN_PK = new PublicKey('BJFYN2ZbcxRSTFGCAVkUEn4aJF99xaPFuyQj2rq5pFpo')
   const DEVNET_GROUP = new PublicKey(
@@ -19,6 +24,8 @@ export default function UseMangoV4() {
   )
   const clientCluster = cluster === 'devnet' ? 'devnet' : 'mainnet-beta'
   const GROUP = cluster === 'devnet' ? DEVNET_GROUP : MAINNET_GROUP
+  const [mangoClient, setMangoClient] = useState<MangoClient | null>(null)
+  const [mangoGroup, setMangoGroup] = useState<Group | null>(null)
   const getClient = async (
     connection: ConnectionContext,
     wallet: WalletSigner
@@ -34,12 +41,29 @@ export default function UseMangoV4() {
       clientCluster,
       MANGO_V4_ID[clientCluster]
     )
+
     return client
   }
+
+  useEffect(() => {
+    const handleSetClient = async () => {
+      const client = await getClient(connection, wallet!)
+      const group = await client.getGroup(GROUP)
+      setMangoClient(client)
+      setMangoGroup(group)
+    }
+    if (wallet?.publicKey && connection) {
+      console.log('SET NEW CLIENT')
+      handleSetClient()
+    }
+  }, [connection.cluster, wallet?.publicKey?.toBase58()])
+
   return {
     ADMIN_PK,
     GROUP_NUM,
     GROUP,
     getClient,
+    mangoClient,
+    mangoGroup,
   }
 }

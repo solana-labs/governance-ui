@@ -52,13 +52,12 @@ const TokenRegister = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { getClient, GROUP } = UseMangoV4()
+  const { mangoClient, mangoGroup } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
     (x) => x.type === AccountType.SOL
   )
-  const { connection } = useWalletStore()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<TokenRegisterForm>({
@@ -104,10 +103,8 @@ const TokenRegister = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const client = await getClient(connection, wallet)
-      const group = await client.getGroup(GROUP)
-      const tokenIndex = group.banksMapByMint.size
-      const ix = await client.program.methods
+      const tokenIndex = mangoGroup!.banksMapByMint.size
+      const ix = await mangoClient!.program.methods
         .tokenRegister(
           Number(tokenIndex),
           form.name,
@@ -135,7 +132,7 @@ const TokenRegister = ({
           new BN(form.netBorrowLimitPerWindowQuote)
         )
         .accounts({
-          group: group.publicKey,
+          group: mangoGroup!.publicKey,
           admin: form.governedAccount.extensions.transferAddress,
           mint: new PublicKey(form.mintPk),
           oracle: new PublicKey(form.oraclePk),
@@ -173,6 +170,23 @@ const TokenRegister = ({
       .nullable()
       .required('Program governed account is required'),
   })
+
+  const docs = mangoClient?.program.idl.accounts
+    .flatMap((x) => x.type.fields as any)
+    .filter((x) => x)
+    .filter((x) => (x as any).docs?.length)
+    .map((x) => ({ ...x, docs: x.docs.join(' ') }))
+
+  const getAdditionalLabelInfo = (name: string) => {
+    const val = docs?.find((x) => x.name === name)
+
+    if (val) {
+      return `- ${val.docs}`
+    } else {
+      return ''
+    }
+  }
+
   const inputs: InstructionInput[] = [
     {
       label: 'Governance',
@@ -190,13 +204,15 @@ const TokenRegister = ({
       name: 'mintPk',
     },
     {
-      label: 'Oracle PublicKey',
+      label: `Oracle PublicKey ${getAdditionalLabelInfo('oraclePk')}`,
       initialValue: form.oraclePk,
       type: InstructionInputType.INPUT,
       name: 'oraclePk',
     },
     {
-      label: 'Oracle Configuration Filter',
+      label: `Oracle Configuration Filter ${getAdditionalLabelInfo(
+        'oracleConfFilter'
+      )}`,
       initialValue: form.oracleConfFilter,
       type: InstructionInputType.INPUT,
       inputType: 'number',
@@ -209,114 +225,120 @@ const TokenRegister = ({
       name: 'name',
     },
     {
-      label: 'Adjustment Factor',
+      label: `Adjustment Factor ${getAdditionalLabelInfo('adjustmentFactor')}`,
       initialValue: form.adjustmentFactor,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'adjustmentFactor',
     },
     {
-      label: 'Util 0',
+      label: `Util 0 ${getAdditionalLabelInfo('util0')}`,
       initialValue: form.util0,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'util0',
     },
     {
-      label: 'Rate 0',
+      label: `Rate 0 ${getAdditionalLabelInfo('rate0')}`,
       initialValue: form.rate0,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'rate0',
     },
     {
-      label: 'Util 1',
+      label: `Util 1 ${getAdditionalLabelInfo('util1')}`,
       initialValue: form.util1,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'util1',
     },
     {
-      label: 'Rate 1',
+      label: `Rate 1 ${getAdditionalLabelInfo('rate1')}`,
       initialValue: form.rate1,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'rate1',
     },
     {
-      label: 'Max Rate',
+      label: `Max Rate ${getAdditionalLabelInfo('maxRate')}`,
       initialValue: form.maxRate,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'maxRate',
     },
     {
-      label: 'Loan Fee Rate',
+      label: `Loan Fee Rate ${getAdditionalLabelInfo('loanFeeRate')}`,
       initialValue: form.loanFeeRate,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'loanFeeRate',
     },
     {
-      label: 'Loan Origination Fee Rate',
+      label: `Loan Origination Fee Rate ${getAdditionalLabelInfo(
+        'loanOriginationFeeRate'
+      )}`,
       initialValue: form.loanOriginationFeeRate,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'loanOriginationFeeRate',
     },
     {
-      label: 'Maint Asset Weight',
+      label: `Maint Asset Weight ${getAdditionalLabelInfo('maintAssetWeight')}`,
       initialValue: form.maintAssetWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'maintAssetWeight',
     },
     {
-      label: 'Init Asset Weight',
+      label: `Init Asset Weight ${getAdditionalLabelInfo('initAssetWeight')}`,
       initialValue: form.initAssetWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'initAssetWeight',
     },
     {
-      label: 'Maint Liab Weight',
+      label: `Maint Liab Weight ${getAdditionalLabelInfo('maintLiabWeight')}`,
       initialValue: form.maintLiabWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'maintLiabWeight',
     },
     {
-      label: 'Init Liab Weight',
+      label: `Init Liab Weight ${getAdditionalLabelInfo('initLiabWeight')}`,
       initialValue: form.initLiabWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'initLiabWeight',
     },
     {
-      label: 'Liquidation Fee',
+      label: `Liquidation Fee ${getAdditionalLabelInfo('liquidationFee')}`,
       initialValue: form.liquidationFee,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'liquidationFee',
     },
     {
-      label:
-        'Min Vault To Deposits Ratio (Min fraction of deposits that must remain in the vault when borrowing)',
+      label: `Min Vault To Deposits Ratio ${getAdditionalLabelInfo(
+        'minVaultToDepositsRatio'
+      )}`,
       initialValue: form.minVaultToDepositsRatio,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'minVaultToDepositsRatio',
     },
     {
-      label: 'Net Borrow Limit Window Size (Seconds of a net borrows window)',
+      label: `Net Borrow Limit Window Size ${getAdditionalLabelInfo(
+        'netBorrowLimitWindowSizeTs'
+      )}`,
       initialValue: form.netBorrowLimitWindowSizeTs,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'netBorrowLimitWindowSizeTs',
     },
     {
-      label:
-        'Net Borrow Limit Per Window Quote (Net borrow limit per window in quote native; set to -1 to disable)',
+      label: `Net Borrow Limit Per Window Quote ${getAdditionalLabelInfo(
+        'netBorrowLimitPerWindowQuote'
+      )}`,
       initialValue: form.netBorrowLimitPerWindowQuote,
       type: InstructionInputType.INPUT,
       inputType: 'number',
