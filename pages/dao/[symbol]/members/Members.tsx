@@ -1,12 +1,12 @@
 import useRealm from '@hooks/useRealm'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import MemberOverview from '@components/Members/MemberOverview'
 import { PlusCircleIcon, SearchIcon, UsersIcon } from '@heroicons/react/outline'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Tooltip from '@components/Tooltip'
 import useWalletStore from 'stores/useWalletStore'
 import Modal from '@components/Modal'
-import AddMemberForm from '@components/Members/AddMemberForm'
+import { AddCouncilMemberForm } from '@components/Members/AddMemberForm'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import { LinkButton } from '@components/Button'
 import MembersTabs from '@components/Members/MembersTabs'
@@ -194,7 +194,7 @@ const Members = () => {
           onClose={() => setOpenAddMemberModal(false)}
           isOpen={openAddMemberModal}
         >
-          <AddMemberForm close={() => setOpenAddMemberModal(false)} />
+          <AddCouncilMemberForm close={() => setOpenAddMemberModal(false)} />
         </Modal>
       )}
     </div>

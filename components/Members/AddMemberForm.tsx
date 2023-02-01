@@ -37,19 +37,6 @@ interface AddMemberForm extends Omit<MintForm, 'mintAccount'> {
   title: string
 }
 
-const useCouncilMintAccount = () => {
-  const { realm } = useRealm()
-  const { assetAccounts } = useGovernanceAssets()
-  const councilMintAccount = useMemo(() => {
-    assetAccounts.find(
-      (x) =>
-        x.governance?.account.governedAccount.toBase58() ===
-        realm?.account.config.councilMint?.toBase58()
-    )
-  }, [assetAccounts, realm?.account.config.councilMint])
-  return councilMintAccount
-}
-
 const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
   close,
   mintAccount,
@@ -82,7 +69,7 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
 
   const schema = getMintSchema({ form, connection })
 
-  const mintMinAmount = form.mintAccount
+  const mintMinAmount = mintAccount
     ? getMintMinAmountAsDecimal(councilMint!)
     : 1
 
@@ -126,13 +113,16 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
 
   const getInstruction = async (): Promise<UiInstruction | false> => {
     if (programVersion >= 3) {
-      const isValid = await validateInstruction({ schema, form, setFormErrors })
+      const isValid = await validateInstruction({
+        schema,
+        form: { ...form, mintAccount },
+        setFormErrors,
+      })
       if (!isValid) {
         return false
       }
 
       if (
-        form.mintAccount === undefined ||
         programId === undefined ||
         realm === undefined ||
         form.destinationAccount === undefined ||
@@ -142,7 +132,7 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
       }
 
       const goofySillyArrayForBuilderPattern = []
-      const tokenMint = form.mintAccount?.governance.account.governedAccount
+      const tokenMint = mintAccount.governance.account.governedAccount
       const tokenOwnerRecordPk = await withDepositGoverningTokens(
         goofySillyArrayForBuilderPattern,
         programId,
@@ -151,7 +141,7 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
         tokenMint,
         tokenMint,
         new PublicKey(form.destinationAccount),
-        form.mintAccount?.governance.pubkey,
+        mintAccount.governance.pubkey,
         wallet.publicKey,
         new BN(form.amount ?? 1)
       )
@@ -177,17 +167,17 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
       return {
         serializedInstruction: serializeInstructionToBase64(ix),
         isValid: true,
-        governance: form.mintAccount.governance,
+        governance: mintAccount.governance,
         prerequisiteInstructions,
       }
     } else {
       const mintInstruction = await getMintInstruction({
         schema,
-        form,
+        form: { ...form, mintAccount },
         programId,
         connection,
         wallet,
-        governedMintInfoAccount: form.mintAccount,
+        governedMintInfoAccount: mintAccount,
         setFormErrors,
       })
       return mintInstruction.isValid ? mintInstruction : false
@@ -201,7 +191,7 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
     const instruction = await getInstruction()
 
     if (!!instruction && wallet && realmInfo) {
-      const governance = form.mintAccount?.governance
+      const governance = mintAccount.governance
 
       let proposalAddress: PublicKey | null = null
 
@@ -249,23 +239,6 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
 
     setIsLoading(false)
   }
-
-  // TODO mintAccount just shouldn't be part of the form
-  useEffect(() => {
-    const initForm = () => {
-      handleSetForm({
-        value: assetAccounts.find(
-          (x) =>
-            x.governance?.account.governedAccount.toBase58() ===
-            realm?.account.config.councilMint?.toBase58()
-        ),
-        propertyName: 'mintAccount',
-      })
-    }
-
-    initForm()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [])
 
   return (
     <>
@@ -386,6 +359,23 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
       </div>
     </>
   )
+}
+
+const useCouncilMintAccount = () => {
+  const { realm } = useRealm()
+  const { assetAccounts } = useGovernanceAssets()
+  const councilMintAccount = useMemo(() => {
+    assetAccounts.find(
+      (x) =>
+        x.governance?.account.governedAccount.toBase58() ===
+        realm?.account.config.councilMint?.toBase58()
+    )
+  }, [assetAccounts, realm?.account.config.councilMint])
+  return councilMintAccount
+}
+export const AddCouncilMemberForm: FC<{ close: () => void }> = (props) => {
+  const councilMintAccount = useCouncilMintAccount()
+  return <AddMemberForm {...props} mintAccount={councilMintAccount} />
 }
 
 export default AddMemberForm

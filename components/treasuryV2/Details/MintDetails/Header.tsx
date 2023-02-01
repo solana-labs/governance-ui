@@ -212,7 +212,10 @@ export default function Header(props: Props) {
           sizeClassName="sm:max-w-3xl"
           onClose={() => setAddMemberModalOpen(false)}
         >
-          <AddMemberForm close={() => setAddMemberModalOpen(false)} />
+          <AddMemberForm
+            close={() => setAddMemberModalOpen(false)}
+            mintAccount={props.mint.raw}
+          />
         </Modal>
       )}
       {createMetadataModalOpen && (
