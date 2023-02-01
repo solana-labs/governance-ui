@@ -21,7 +21,7 @@ import {
 import { useRouter } from 'next/router'
 import { notify } from 'utils/notifications'
 import useQueryContext from 'hooks/useQueryContext'
-import { getMintInstruction } from 'utils/instructionTools'
+import { getMintInstruction, validateInstruction } from 'utils/instructionTools'
 import AddMemberIcon from '@components/AddMemberIcon'
 import {
   ArrowCircleDownIcon,
@@ -108,8 +108,13 @@ const AddMemberForm = ({ close }) => {
     })
   }
 
-  const getInstruction = async (): Promise<UiInstruction> => {
+  const getInstruction = async (): Promise<UiInstruction | false> => {
     if (programVersion >= 3) {
+      const isValid = await validateInstruction({ schema, form, setFormErrors })
+      if (!isValid) {
+        return false
+      }
+
       if (
         form.mintAccount === undefined ||
         programId === undefined ||
@@ -117,7 +122,7 @@ const AddMemberForm = ({ close }) => {
         form.destinationAccount === undefined ||
         !wallet?.publicKey
       ) {
-        throw new Error()
+        return false
       }
 
       const goofySillyArrayForBuilderPattern = []
@@ -155,12 +160,12 @@ const AddMemberForm = ({ close }) => {
 
       return {
         serializedInstruction: serializeInstructionToBase64(ix),
-        isValid: true, // TODO
+        isValid: true,
         governance: form.mintAccount.governance,
         prerequisiteInstructions,
       }
     } else {
-      return getMintInstruction({
+      const mintInstruction = await getMintInstruction({
         schema,
         form,
         programId,
@@ -169,6 +174,7 @@ const AddMemberForm = ({ close }) => {
         governedMintInfoAccount: form.mintAccount,
         setFormErrors,
       })
+      return mintInstruction.isValid ? mintInstruction : false
     }
   }
 
@@ -176,9 +182,9 @@ const AddMemberForm = ({ close }) => {
   const handlePropose = async () => {
     setIsLoading(true)
 
-    const instruction: UiInstruction = await getInstruction()
+    const instruction = await getInstruction()
 
-    if (instruction.isValid && wallet && realmInfo) {
+    if (!!instruction && wallet && realmInfo) {
       const governance = form.mintAccount?.governance
 
       let proposalAddress: PublicKey | null = null
