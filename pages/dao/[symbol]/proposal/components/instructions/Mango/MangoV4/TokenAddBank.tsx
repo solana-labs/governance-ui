@@ -130,7 +130,7 @@ const TokenAddBank = ({
     if (mangoGroup) {
       getTokens()
     }
-  }, [JSON.stringify(mangoGroup)])
+  }, [mangoGroup?.publicKey.toBase58()])
   const schema = yup.object().shape({
     governedAccount: yup
       .object()

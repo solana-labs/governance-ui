@@ -143,7 +143,7 @@ const GroupEdit = ({
     if (mangoGroup) {
       getGroupParams()
     }
-  }, [JSON.stringify(mangoGroup)])
+  }, [mangoGroup?.publicKey.toBase58()])
 
   const inputs: InstructionInput[] = [
     {

@@ -232,7 +232,7 @@ const EditToken = ({
     if (wallet?.publicKey) {
       getTokens()
     }
-  }, [JSON.stringify(mangoGroup)])
+  }, [mangoGroup?.publicKey.toBase58()])
   useEffect(() => {
     if (form.token && mangoGroup) {
       const currentToken = mangoGroup!.banksMapByMint.get(
