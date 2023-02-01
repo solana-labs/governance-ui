@@ -32,13 +32,12 @@ const AltSet = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { getClient, GROUP } = UseMangoV4()
+  const { mangoClient, mangoGroup } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
     (x) => x.type === AccountType.SOL
   )
-  const { connection } = useWalletStore()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<AltSetForm>({
@@ -66,12 +65,10 @@ const AltSet = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const client = await getClient(connection, wallet)
-      const group = await client.getGroup(GROUP)
-      const ix = await client.program.methods
+      const ix = await mangoClient!.program.methods
         .altSet(Number(form.index))
         .accounts({
-          group: group.publicKey,
+          group: mangoGroup!.publicKey,
           admin: form.governedAccount.extensions.transferAddress,
           addressLookupTable: new PublicKey(form.addressLookupTable),
         })

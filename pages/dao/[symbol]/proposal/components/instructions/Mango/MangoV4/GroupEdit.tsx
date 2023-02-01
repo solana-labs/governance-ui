@@ -47,13 +47,12 @@ const GroupEdit = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { getClient, GROUP } = UseMangoV4()
+  const { mangoClient, mangoGroup } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
     (x) => x.type === AccountType.SOL
   )
-  const { connection } = useWalletStore()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [originalFormValues, setOriginalFormValues] = useState<GroupEditForm>({
@@ -80,12 +79,10 @@ const GroupEdit = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const client = await getClient(connection, wallet)
-      const group = await client.getGroup(GROUP)
       const values = getChangedValues<GroupEditForm>(originalFormValues, form)
       console.log(values, originalFormValues, form)
       //Mango instruction call and serialize
-      const ix = await client.program.methods
+      const ix = await mangoClient!.program.methods
         .groupEdit(
           getNullOrTransform(values.admin, PublicKey),
           getNullOrTransform(values.fastListingAdmin, PublicKey),
@@ -95,8 +92,8 @@ const GroupEdit = ({
           getNullOrTransform(values.depositLimitQuote, BN)
         )
         .accounts({
-          group: group.publicKey,
-          admin: group.admin,
+          group: mangoGroup!.publicKey,
+          admin: mangoGroup!.admin,
         })
         .instruction()
 
@@ -131,15 +128,13 @@ const GroupEdit = ({
   })
   useEffect(() => {
     const getGroupParams = async () => {
-      const client = await getClient(connection, wallet!)
-      const group = await client.getGroup(GROUP)
       const vals = {
         ...form,
-        admin: group.admin.toBase58(),
-        fastListingAdmin: group.fastListingAdmin.toBase58(),
-        securityAdmin: group.securityAdmin.toBase58(),
-        testing: group.testing,
-        version: group.version,
+        admin: mangoGroup!.admin.toBase58(),
+        fastListingAdmin: mangoGroup!.fastListingAdmin.toBase58(),
+        securityAdmin: mangoGroup!.securityAdmin.toBase58(),
+        testing: mangoGroup!.testing,
+        version: mangoGroup!.version,
       }
       setForm({
         ...vals,
@@ -149,7 +144,7 @@ const GroupEdit = ({
     if (wallet?.publicKey) {
       getGroupParams()
     }
-  }, [connection && wallet?.publicKey?.toBase58()])
+  }, [JSON.stringify(mangoGroup)])
 
   const inputs: InstructionInput[] = [
     {
