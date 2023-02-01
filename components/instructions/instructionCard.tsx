@@ -13,7 +13,7 @@ import {
   InstructionDescriptor,
   WSOL_MINT,
 } from './tools'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import useWalletStore from '../../stores/useWalletStore'
 import { getExplorerUrl } from '../explorer/tools'
 import { getProgramName, isNativeSolanaProgram } from './programs/names'
@@ -331,16 +331,21 @@ export function InstructionAccount({
   const [accountLabel, setAccountLabel] = useState(
     getAccountName(accountMeta.pubkey)
   )
+  const isFetching = useRef(false)
 
-  if (!accountLabel) {
-    // Check if the account is SPL token account and if yes then display its owner
-    tryGetTokenAccount(connection.current, accountMeta.pubkey).then((ta) => {
-      if (ta) {
-        setAccountLabel(`owner: ${ta?.account.owner.toBase58()}`)
-      }
-    })
-    // TODO: Extend to other well known account types
-  }
+  useEffect(() => {
+    if (!accountLabel && !isFetching.current) {
+      isFetching.current = true
+      // Check if the account is SPL token account and if yes then display its owner
+      tryGetTokenAccount(connection.current, accountMeta.pubkey).then((ta) => {
+        if (ta) {
+          setAccountLabel(`owner: ${ta?.account.owner.toBase58()}`)
+        }
+        isFetching.current = false
+      })
+      // TODO: Extend to other well known account types
+    }
+  }, [accountLabel, accountMeta.pubkey, connection])
 
   return (
     <div className="border-t border-bkg-4 flex flex-col lg:flex-row lg:items-center lg:justify-between py-3">
