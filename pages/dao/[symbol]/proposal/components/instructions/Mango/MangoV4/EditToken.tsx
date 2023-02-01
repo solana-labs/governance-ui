@@ -18,7 +18,7 @@ import InstructionForm, {
   InstructionInputType,
 } from '../../FormCreator'
 import UseMangoV4 from '@hooks/useMangoV4'
-import { getChangedValues, getNullOrTransform } from './tools'
+import { getChangedValues, getNullOrTransform } from '@utils/mangoV4Tools'
 
 type NamePkVal = {
   name: string

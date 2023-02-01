@@ -19,7 +19,7 @@ import InstructionForm, {
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { PerpMarketIndex } from '@blockworks-foundation/mango-v4'
-import { getChangedValues, getNullOrTransform } from './tools'
+import { getChangedValues, getNullOrTransform } from '@utils/mangoV4Tools'
 
 type NameMarketIndexVal = {
   name: string

@@ -17,7 +17,7 @@ import InstructionForm, {
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { BN } from '@project-serum/anchor'
-import { getChangedValues, getNullOrTransform } from './tools'
+import { getChangedValues, getNullOrTransform } from '@utils/mangoV4Tools'
 
 type GroupEditForm = {
   governedAccount: AssetAccount | null
@@ -80,7 +80,6 @@ const GroupEdit = ({
       wallet?.publicKey
     ) {
       const values = getChangedValues<GroupEditForm>(originalFormValues, form)
-      console.log(values, originalFormValues, form)
       //Mango instruction call and serialize
       const ix = await mangoClient!.program.methods
         .groupEdit(
