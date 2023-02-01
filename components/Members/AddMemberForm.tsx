@@ -1,4 +1,4 @@
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import useRealm from 'hooks/useRealm'
 import Input from 'components/inputs/Input'
 import Button, { SecondaryButton } from '@components/Button'
@@ -14,11 +14,14 @@ import {
   getInstructionDataFromBase64,
   Governance,
   ProgramAccount,
+  serializeInstructionToBase64,
+  withCreateTokenOwnerRecord,
+  withDepositGoverningTokens,
 } from '@solana/spl-governance'
 import { useRouter } from 'next/router'
 import { notify } from 'utils/notifications'
 import useQueryContext from 'hooks/useQueryContext'
-import { getMintInstruction } from 'utils/instructionTools'
+import { getMintInstruction, validateInstruction } from 'utils/instructionTools'
 import AddMemberIcon from '@components/AddMemberIcon'
 import {
   ArrowCircleDownIcon,
@@ -26,6 +29,8 @@ import {
 } from '@heroicons/react/outline'
 import useCreateProposal from '@hooks/useCreateProposal'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import useProgramVersion from '@hooks/useProgramVersion'
+import BN from 'bn.js'
 
 interface AddMemberForm extends Omit<MintForm, 'mintAccount'> {
   description: string
@@ -33,7 +38,8 @@ interface AddMemberForm extends Omit<MintForm, 'mintAccount'> {
 }
 
 const useCouncilMintAccount = () => {
-  const { assetAccounts, realm } = useGovernanceAssets()
+  const { realm } = useRealm()
+  const { assetAccounts } = useGovernanceAssets()
   const councilMintAccount = useMemo(() => {
     assetAccounts.find(
       (x) =>
@@ -48,6 +54,7 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
   close,
   mintAccount,
 }) => {
+  const programVersion = useProgramVersion()
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [showOptions, setShowOptions] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -81,11 +88,13 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
 
   const currentPrecision = precision(mintMinAmount)
 
-  const proposalTitle = `Add council member ${
-    form.destinationAccount
-      ? abbreviateAddress(new PublicKey(form.destinationAccount))
-      : ''
-  }`
+  let x: string
+  try {
+    x = abbreviateAddress(new PublicKey(form.destinationAccount))
+  } catch {
+    x = ''
+  }
+  const proposalTitle = `Add council member ${x}`
 
   const setAmount = (event) => {
     const value = event.target.value
@@ -115,25 +124,83 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
     })
   }
 
-  const getInstruction = async (): Promise<UiInstruction> => {
-    return getMintInstruction({
-      schema,
-      form,
-      programId,
-      connection,
-      wallet,
-      governedMintInfoAccount: form.mintAccount,
-      setFormErrors,
-    })
+  const getInstruction = async (): Promise<UiInstruction | false> => {
+    if (programVersion >= 3) {
+      const isValid = await validateInstruction({ schema, form, setFormErrors })
+      if (!isValid) {
+        return false
+      }
+
+      if (
+        form.mintAccount === undefined ||
+        programId === undefined ||
+        realm === undefined ||
+        form.destinationAccount === undefined ||
+        !wallet?.publicKey
+      ) {
+        return false
+      }
+
+      const goofySillyArrayForBuilderPattern = []
+      const tokenMint = form.mintAccount?.governance.account.governedAccount
+      const tokenOwnerRecordPk = await withDepositGoverningTokens(
+        goofySillyArrayForBuilderPattern,
+        programId,
+        programVersion,
+        realm.pubkey,
+        tokenMint,
+        tokenMint,
+        new PublicKey(form.destinationAccount),
+        form.mintAccount?.governance.pubkey,
+        wallet.publicKey,
+        new BN(form.amount ?? 1)
+      )
+      const ix = goofySillyArrayForBuilderPattern[0]
+
+      const prerequisiteInstructions: TransactionInstruction[] = []
+      // now we have to see if recipient has token owner record already or not.
+      // this is due to a bug -- unnecessary signer check in program if there's not a token owner record.
+      const mustCreateTOR =
+        (await connection.current.getAccountInfo(tokenOwnerRecordPk)) === null
+      if (mustCreateTOR) {
+        await withCreateTokenOwnerRecord(
+          prerequisiteInstructions,
+          programId,
+          programVersion,
+          realm.pubkey,
+          new PublicKey(form.destinationAccount),
+          tokenMint,
+          wallet.publicKey
+        )
+      }
+
+      return {
+        serializedInstruction: serializeInstructionToBase64(ix),
+        isValid: true,
+        governance: form.mintAccount.governance,
+        prerequisiteInstructions,
+      }
+    } else {
+      const mintInstruction = await getMintInstruction({
+        schema,
+        form,
+        programId,
+        connection,
+        wallet,
+        governedMintInfoAccount: form.mintAccount,
+        setFormErrors,
+      })
+      return mintInstruction.isValid ? mintInstruction : false
+    }
   }
 
   //TODO common handle propose
   const handlePropose = async () => {
     setIsLoading(true)
 
-    const instruction: UiInstruction = await getInstruction()
+    const instruction = await getInstruction()
 
-    if (instruction.isValid && wallet && realmInfo) {
+    if (!!instruction && wallet && realmInfo) {
       const governance = form.mintAccount?.governance
 
       let proposalAddress: PublicKey | null = null
@@ -183,6 +250,7 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
     setIsLoading(false)
   }
 
+  // TODO mintAccount just shouldn't be part of the form
   useEffect(() => {
     const initForm = () => {
       handleSetForm({
