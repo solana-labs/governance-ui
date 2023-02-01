@@ -17,7 +17,6 @@ import Link from 'next/link';
 import { useMediaQuery } from 'react-responsive';
 
 import * as Button from '@hub/components/controls/Button';
-import { HeaderTokenPrice } from '@hub/components/HeaderTokenPrice';
 import { Twitter } from '@hub/components/icons/Twitter';
 import * as RealmBanner from '@hub/components/RealmBanner';
 import * as RealmHeaderIcon from '@hub/components/RealmHeaderIcon';
@@ -131,14 +130,6 @@ export function Content(props: Props) {
             )}
           </div>
           <div className="flex items-center">
-            {props.token && (
-              <div className="mr-8 hidden lg:block">
-                <HeaderTokenPrice
-                  mint={props.token.mint}
-                  symbol={props.token.symbol}
-                />
-              </div>
-            )}
             {pipe(
               followedResp,
               RE.match(
