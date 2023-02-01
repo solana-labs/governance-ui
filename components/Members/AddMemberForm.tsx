@@ -237,6 +237,7 @@ const AddMemberForm = ({ close }) => {
     setIsLoading(false)
   }
 
+  // TODO mintAccount just shouldn't be part of the form
   useEffect(() => {
     const initForm = async () => {
       handleSetForm({
