@@ -223,7 +223,7 @@ const PerpEdit = ({
     if (mangoGroup) {
       getTokens()
     }
-  }, [JSON.stringify(mangoGroup)])
+  }, [mangoGroup?.publicKey.toBase58()])
 
   useEffect(() => {
     if (form.perp && mangoGroup) {

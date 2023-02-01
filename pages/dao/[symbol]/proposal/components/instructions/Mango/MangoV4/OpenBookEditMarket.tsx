@@ -121,7 +121,7 @@ const OpenBookEditMarket = ({
     if (mangoGroup) {
       getMarkets()
     }
-  }, [JSON.stringify(mangoGroup)])
+  }, [mangoGroup?.publicKey.toBase58()])
   useEffect(() => {
     const getCurrentMarketProps = () => {
       const market = mangoGroup!.serum3MarketsMapByMarketIndex.get(
