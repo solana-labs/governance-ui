@@ -14,7 +14,7 @@ import InlineNotification from '@components/InlineNotification'
 import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
 import useWalletStore from 'stores/useWalletStore'
-import useHeliumVsrStore from 'HeliumVoteStakeRegistry/hooks/useHeliumVsrStore'
+import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import { MintInfo } from '@solana/spl-token'
 import VotingPowerBox from 'VoteStakeRegistry/components/TokenBalance/VotingPowerBox'
 

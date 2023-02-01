@@ -1,29 +1,33 @@
 import create, { State } from 'zustand'
 import { BN } from '@project-serum/anchor'
-import { NFTWithMeta } from '@utils/uiTypes/VotePlugin'
-import { PositionWithVotingMint } from 'HeliumVoteStakeRegistry/sdk/types'
-import { GetPositionsArgs, getPositions } from '../utils/getPositions'
+import { PositionWithVotingMint } from 'HeliumVotePlugin/sdk/types'
+import {
+  GetPositionsArgs as GetPosArgs,
+  getPositions,
+} from '../utils/getPositions'
+import { VotingClient } from '@utils/uiTypes/VotePlugin'
 
 interface HeliumVsrStoreState {
   positions: PositionWithVotingMint[]
   amountLocked: BN
   votingPower: BN
-  votingNfts: NFTWithMeta[]
   isLoading: boolean
+}
+
+interface GetPositionsArgs extends GetPosArgs {
+  votingClient: VotingClient
 }
 
 interface HeliumVsrStore extends State {
   state: HeliumVsrStoreState
   resetState: () => void
   getPositions: (args: GetPositionsArgs) => Promise<void>
-  // setVotingNfts: (nfts: NFTWithMeta[], votingClient: VotingClient) => void
 }
 
 const defaultState: HeliumVsrStoreState = {
   positions: [],
   amountLocked: new BN(0),
   votingPower: new BN(0),
-  votingNfts: [],
   isLoading: false,
 }
 
@@ -35,13 +39,14 @@ const useHeliumVsrStore = create<HeliumVsrStore>((set, _get) => ({
     set((s) => {
       s.state = { ...defaultState }
     }),
-  getPositions: async (args) => {
+  getPositions: async ({ votingClient, ...args }) => {
     set((s) => {
       s.state.isLoading = true
     })
 
     try {
       const { positions, amountLocked, votingPower } = await getPositions(args)
+      votingClient._setCurrentHeliumVsrPositions(positions)
       set((s) => {
         s.state.positions = positions
         s.state.amountLocked = amountLocked
@@ -55,7 +60,6 @@ const useHeliumVsrStore = create<HeliumVsrStore>((set, _get) => ({
       })
     }
   },
-  // setVotingNfts: () => {},
 }))
 
 export default useHeliumVsrStore

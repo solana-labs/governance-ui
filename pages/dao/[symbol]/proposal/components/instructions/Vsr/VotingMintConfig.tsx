@@ -31,7 +31,7 @@ import {
   Registrar,
 } from 'VoteStakeRegistry/sdk/accounts'
 import { DEFAULT_VSR_ID, VsrClient } from 'VoteStakeRegistry/sdk/client'
-import { HeliumVsrClient } from 'HeliumVoteStakeRegistry/sdk/client'
+import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import useWallet from '@hooks/useWallet'
 import { heliumVsrPluginsPks, vsrPluginsPks } from '@hooks/useVotingPlugins'
 

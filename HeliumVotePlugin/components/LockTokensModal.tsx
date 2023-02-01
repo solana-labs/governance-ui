@@ -13,6 +13,7 @@ import {
 } from 'VoteStakeRegistry/tools/dateTools'
 import Tooltip from '@components/Tooltip'
 import { QuestionMarkCircleIcon } from '@heroicons/react/solid'
+import { notify } from '@utils/notifications'
 
 const defaultLockupPeriods = [
   {
@@ -158,7 +159,10 @@ export const LockTokensModal: React.FC<{
         onClose()
       } catch (e) {
         setIsSubmitting(false)
-        throw e
+        notify({
+          type: 'error',
+          message: e.message || 'Unable to lock tokens',
+        })
       }
     }
   )

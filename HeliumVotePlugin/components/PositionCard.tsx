@@ -7,7 +7,7 @@ import { PositionWithVotingMint } from '../sdk/types'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { abbreviateAddress } from '@utils/formatting'
 import { useNft } from '@hooks/useNft'
-import { calcPositionVotingPower } from 'HeliumVoteStakeRegistry/utils/calcPositionVotingPower'
+import { calcPositionVotingPower } from 'HeliumVotePlugin/utils/calcPositionVotingPower'
 import {
   getMinDurationFmt,
   getTimeLeftFromNowFmt,
@@ -29,8 +29,8 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
   const { unixNow = 0 } = useUnixNow()
   const { realm, realmInfo, tokenRecords, ownTokenRecord } = useRealm()
   const [vsrClient, vsrRegistrar] = useVotePluginsClientStore((s) => [
-    s.state.vsrClient,
     s.state.heliumVsrClient,
+    s.state.heliumVsrRegistrar,
   ])
   const { error, loading, nft } = useNft(position.mint)
   const [connection, wallet, endpoint] = useWalletStore((s) => [
@@ -73,6 +73,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
       </div>
     )
   }
+
   return (
     <div className="border border-fgd-4 rounded-lg flex flex-col">
       {loading ? (

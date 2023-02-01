@@ -32,10 +32,9 @@ import { useCreatePosition } from '../hooks/useCreatePosition'
 import { calcLockupMultiplier } from '../utils/calcLockupMultiplier'
 import VotingPowerBox from 'VoteStakeRegistry/components/TokenBalance/VotingPowerBox'
 import { PositionCard } from './PositionCard'
-import useHeliumVsrStore from 'HeliumVoteStakeRegistry/hooks/useHeliumVsrStore'
-import { Registrar } from 'HeliumVoteStakeRegistry/sdk/types'
-import { notify } from '@utils/notifications'
+import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import { PublicKey } from '@solana/web3.js'
+import { notify } from '@utils/notifications'
 
 export const LockTokensAccount: React.FC<{
   tokenOwnerRecordPk: string | string[] | undefined
@@ -55,10 +54,12 @@ export const LockTokensAccount: React.FC<{
   )
 
   const [
+    currentClient,
     vsrClient,
     vsrRegistrar,
     vsrRegistrarPk,
   ] = useVotePluginsClientStore((s) => [
+    s.state.currentRealmVotingClient,
     s.state.heliumVsrClient,
     s.state.heliumVsrRegistrar,
     s.state.voteStakeRegistryRegistrarPk,
@@ -79,6 +80,7 @@ export const LockTokensAccount: React.FC<{
     s.current,
     s.actions,
   ])
+
   const [
     isLoading,
     positions,
@@ -102,6 +104,7 @@ export const LockTokensAccount: React.FC<{
         vsrClient
       ) {
         await getPositions({
+          votingClient: currentClient,
           realmPk: realm.pubkey,
           communityMintPk: realm.account.communityMint,
           walletPk: tokenOwnerRecordWalletPk
@@ -232,6 +235,7 @@ export const LockTokensAccount: React.FC<{
       fetchWalletTokenAccounts()
       fetchRealm(realmInfo!.programId, realmInfo!.realmId)
       await getPositions({
+        votingClient: currentClient,
         realmPk: realm!.pubkey,
         communityMintPk: realm!.account.communityMint,
         walletPk: wallet!.publicKey!,

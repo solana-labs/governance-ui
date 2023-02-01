@@ -4,7 +4,7 @@ import { vsrPluginsPks, heliumVsrPluginsPks } from '@hooks/useVotingPlugins'
 import { useRouter } from 'next/router'
 import { default as VoteStakeRegistryAccount } from 'VoteStakeRegistry/components/Account/Account'
 import LockTokensAccount from 'VoteStakeRegistry/components/Account/LockTokensAccount'
-import { LockTokensAccount as HeliumLockTokensAccount } from 'HeliumVoteStakeRegistry/components/LockTokensAccount'
+import { LockTokensAccount as HeliumLockTokensAccount } from 'HeliumVotePlugin/components/LockTokensAccount'
 
 const Account: React.FC<any> = () => {
   const router = useRouter()

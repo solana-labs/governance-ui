@@ -14,9 +14,9 @@ import { positionKey } from '@helium/voter-stake-registry-sdk'
 import { sendTransaction } from '@utils/send'
 import { truthy } from '../sdk/types'
 import useRealm from '@hooks/useRealm'
-import { LockupKind } from 'HeliumVoteStakeRegistry/components/LockTokensModal'
+import { LockupKind } from 'HeliumVotePlugin/components/LockTokensModal'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { HeliumVsrClient } from 'HeliumVoteStakeRegistry/sdk/client'
+import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 
 export const useCreatePosition = ({
   registrarPk,

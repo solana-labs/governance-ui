@@ -148,7 +148,9 @@ export async function castVote(
       plugin?.voterWeightPk
     )
   }
+
   const shouldChunk = votingPlugin?.client instanceof NftVoterClient
+
   const instructionsCountThatMustHaveTheirOwnChunk = message ? 4 : 2
   if (shouldChunk) {
     const {

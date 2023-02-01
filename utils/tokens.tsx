@@ -8,6 +8,7 @@ import {
 import {
   AccountInfo,
   AccountLayout,
+  ASSOCIATED_TOKEN_PROGRAM_ID,
   MintInfo,
   MintLayout,
   Token,
@@ -430,6 +431,25 @@ export const getNfts = async (
   connection: ConnectionContext
 ): Promise<NFTWithMeta[]> => {
   return await getNftsFromHolaplex(ownerPk, connection)
+}
+
+// TODO: Remove when upgrade spl-token
+export async function getAssociatedTokenAddress(
+  mint: PublicKey,
+  owner: PublicKey,
+  allowOwnerOffCurve = false,
+  programId = TOKEN_PROGRAM_ID,
+  associatedTokenProgramId = ASSOCIATED_TOKEN_PROGRAM_ID
+): Promise<PublicKey> {
+  if (!allowOwnerOffCurve && !PublicKey.isOnCurve(owner.toBuffer()))
+    throw new Error('Token Owner Off Curve')
+
+  const [address] = await PublicKey.findProgramAddress(
+    [owner.toBuffer(), programId.toBuffer(), mint.toBuffer()],
+    associatedTokenProgramId
+  )
+
+  return address
 }
 
 const getNftsFromHolaplex = async (

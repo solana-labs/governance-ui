@@ -20,8 +20,8 @@ import { PythClient } from 'pyth-staking-api'
 import { PublicKey } from '@solana/web3.js'
 import { tryGetGatewayRegistrar } from '../GatewayPlugin/sdk/api'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
-import { HeliumVsrClient } from 'HeliumVoteStakeRegistry/sdk/client'
-import { Registrar as HeliumVsrRegistrar } from 'HeliumVoteStakeRegistry/sdk/types'
+import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
+import { Registrar as HeliumVsrRegistrar } from 'HeliumVotePlugin/sdk/types'
 import { registrarKey } from '@helium/voter-stake-registry-sdk'
 
 interface UseVotePluginsClientStore extends State {

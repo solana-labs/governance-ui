@@ -20,7 +20,7 @@ import { DEFAULT_VSR_ID, VsrClient } from 'VoteStakeRegistry/sdk/client'
 import { web3 } from '@project-serum/anchor'
 import useWallet from '@hooks/useWallet'
 import { heliumVsrPluginsPks, vsrPluginsPks } from '@hooks/useVotingPlugins'
-import { HeliumVsrClient } from 'HeliumVoteStakeRegistry/sdk/client'
+import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 
 interface CreateVsrRegistrarForm {
   governedAccount: AssetAccount | undefined

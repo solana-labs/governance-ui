@@ -26,12 +26,10 @@ const LockPluginTokenBalanceCard = dynamic(
 )
 
 const HeliumVotingPowerCard = dynamic(() =>
-  import('HeliumVoteStakeRegistry/components/VotingPowerCard').then(
-    (module) => {
-      const { VotingPowerCard } = module
-      return VotingPowerCard
-    }
-  )
+  import('HeliumVotePlugin/components/VotingPowerCard').then((module) => {
+    const { VotingPowerCard } = module
+    return VotingPowerCard
+  })
 )
 
 const TokenBalanceCard = dynamic(() => import('./TokenBalanceCard'))

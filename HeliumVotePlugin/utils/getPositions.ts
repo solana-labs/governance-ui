@@ -44,10 +44,11 @@ export const getPositions = async (
     mints[mcfg.mint.toBase58()] = mint
   }
 
-  const nfts = await metaplex.nfts().findAllByOwner({ owner: walletPk })
-  const posKeys = nfts
-    .filter((nft) => nft.collection?.address.equals(registrar.collection))
-    .map((nft) => positionKey((nft as any).mintAddress)[0])
+  const nfts = (
+    await metaplex.nfts().findAllByOwner({ owner: walletPk })
+  ).filter((nft) => nft.collection?.address.equals(registrar.collection))
+
+  const posKeys = nfts.map((nft) => positionKey((nft as any).mintAddress)[0])
 
   const positionAccountInfos = (
     await Promise.all(
