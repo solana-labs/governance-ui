@@ -95,6 +95,7 @@ export default function ProposalExecutionCard(props: Props) {
               setPlaying={setPlayState}
               small={false}
               proposalInstructions={ready}
+              multiTransactionMode={true}
             />
           ) : (
             <Button className="w-48" disabled>
