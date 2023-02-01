@@ -23,7 +23,7 @@ export const useCreatePosition = ({
 }: {
   registrarPk: PublicKey | undefined
 }) => {
-  const client = useVotePluginsClientStore(
+  const { client } = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
   const { connection, wallet } = useWallet()
@@ -42,6 +42,7 @@ export const useCreatePosition = ({
     }) => {
       const isInvalid =
         !connection ||
+        !connection.current ||
         !registrarPk ||
         !realm ||
         !client ||
@@ -51,7 +52,10 @@ export const useCreatePosition = ({
         !realmInfo.programVersion
 
       if (loading) return
-      if (!isInvalid) {
+
+      if (isInvalid) {
+        throw new Error('Unable to Create Position, Invalid params')
+      } else {
         const mintKeypair = Keypair.generate()
         const position = positionKey(mintKeypair.publicKey)[0]
         const instructions: TransactionInstruction[] = []

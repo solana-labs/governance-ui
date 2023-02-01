@@ -186,24 +186,21 @@ export class VotingClient {
     }
 
     if (this.client instanceof HeliumVsrClient) {
-      const remainingAccounts: AccountData[] = []
-      const { registrar } = await getRegistrarPDA(
-        realm.pubkey,
-        realm.account.communityMint,
-        clientProgramId
-      )
-
+      // const remainingAccounts: AccountData[] = []
+      // const { registrar } = await getRegistrarPDA(
+      //   realm.pubkey,
+      //   realm.account.communityMint,
+      //   clientProgramId
+      // )
       // TODO (BRY): fix logic with nfts from holaplex
       // for (let i = 0; i < this.votingNfts.length; i++) {
       //   const nft = this.votingNfts[i]
       //   const tokenAccount = await nft.getAssociatedTokenAccount()
-
       //   remainingAccounts.push(
       //     new AccountData(tokenAccount),
       //     new AccountData(nft.address)
       //   )
       // }
-
       // const builder = this.client!.program.methods.updateVoterWeightRecordV0({
       //   voterWeightAction: {
       //     [type]: {},
@@ -214,11 +211,9 @@ export class VotingClient {
       //     registrar,
       //   })
       //   .remainingAccounts(remainingAccounts)
-
       // const { voterWeightRecord } = await builder.pubkeys()
       // const instruction = await builder.instruction()
       // instructions.push(instruction)
-
       // return {
       //   voterWeightPk: voterWeightRecord,
       //   maxVoterWeightRecord: undefined,
