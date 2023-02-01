@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
 import useRealm from '@hooks/useRealm'
-import { PublicKey, SYSVAR_RENT_PUBKEY } from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
@@ -17,15 +16,30 @@ import InstructionForm, {
   InstructionInputType,
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
+import { BN } from '@project-serum/anchor'
+import { getChangedValues, getNullOrTransform } from '@utils/mangoV4Tools'
 
-interface TokenRegisterTrustlessForm {
+type GroupEditForm = {
   governedAccount: AssetAccount | null
-  mintPk: string
-  oraclePk: string
-  name: string
+  admin: string
+  fastListingAdmin: string
+  securityAdmin: string
+  testing: number
+  version: number
+  depositLimitQuote: number
 }
 
-const TokenRegisterTrustless = ({
+const defaultFormValues = {
+  governedAccount: null,
+  admin: '',
+  fastListingAdmin: '',
+  securityAdmin: '',
+  testing: 0,
+  version: 0,
+  depositLimitQuote: 0,
+}
+
+const GroupEdit = ({
   index,
   governance,
 }: {
@@ -33,7 +47,7 @@ const TokenRegisterTrustless = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { mangoClient, mangoGroup } = UseMangoV4()
+  const { mangoClient, mangoGroup, getAdditionalLabelInfo } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
@@ -41,12 +55,10 @@ const TokenRegisterTrustless = ({
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<TokenRegisterTrustlessForm>({
-    governedAccount: null,
-    mintPk: '',
-    oraclePk: '',
-    name: '',
+  const [originalFormValues, setOriginalFormValues] = useState<GroupEditForm>({
+    ...defaultFormValues,
   })
+  const [form, setForm] = useState<GroupEditForm>({ ...defaultFormValues })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
   const handleSetForm = ({ propertyName, value }) => {
@@ -67,17 +79,20 @@ const TokenRegisterTrustless = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const tokenIndex = mangoGroup!.banksMapByName.size
+      const values = getChangedValues<GroupEditForm>(originalFormValues, form)
       //Mango instruction call and serialize
       const ix = await mangoClient!.program.methods
-        .tokenRegisterTrustless(tokenIndex, form.name)
+        .groupEdit(
+          getNullOrTransform(values.admin, PublicKey),
+          getNullOrTransform(values.fastListingAdmin, PublicKey),
+          getNullOrTransform(values.securityAdmin, PublicKey),
+          getNullOrTransform(values.testing, null, Number),
+          getNullOrTransform(values.version, null, Number),
+          getNullOrTransform(values.depositLimitQuote, BN)
+        )
         .accounts({
           group: mangoGroup!.publicKey,
-          fastListingAdmin: form.governedAccount.extensions.transferAddress,
-          mint: new PublicKey(form.mintPk),
-          oracle: new PublicKey(form.oraclePk),
-          payer: form.governedAccount.extensions.transferAddress,
-          rent: SYSVAR_RENT_PUBKEY,
+          admin: mangoGroup!.admin,
         })
         .instruction()
 
@@ -110,6 +125,26 @@ const TokenRegisterTrustless = ({
       .nullable()
       .required('Program governed account is required'),
   })
+  useEffect(() => {
+    const getGroupParams = async () => {
+      const vals = {
+        ...form,
+        admin: mangoGroup!.admin.toBase58(),
+        fastListingAdmin: mangoGroup!.fastListingAdmin.toBase58(),
+        securityAdmin: mangoGroup!.securityAdmin.toBase58(),
+        testing: mangoGroup!.testing,
+        version: mangoGroup!.version,
+      }
+      setForm({
+        ...vals,
+      })
+      setOriginalFormValues({ ...vals })
+    }
+    if (mangoGroup) {
+      getGroupParams()
+    }
+  }, [JSON.stringify(mangoGroup)])
+
   const inputs: InstructionInput[] = [
     {
       label: 'Governance',
@@ -121,22 +156,45 @@ const TokenRegisterTrustless = ({
       options: governedProgramAccounts,
     },
     {
-      label: 'Mint PublicKey',
-      initialValue: form.mintPk,
+      label: `Admin ${getAdditionalLabelInfo('admin')}`,
+      initialValue: form.admin,
       type: InstructionInputType.INPUT,
-      name: 'mintPk',
+      name: 'admin',
     },
     {
-      label: 'Oracle PublicKey',
-      initialValue: form.oraclePk,
+      label: `Fast Listing Admin ${getAdditionalLabelInfo('fastListingAdmin')}`,
+      initialValue: form.fastListingAdmin,
       type: InstructionInputType.INPUT,
-      name: 'oraclePk',
+      name: 'fastListingAdmin',
     },
     {
-      label: 'Token Name',
-      initialValue: form.name,
+      label: `Security Admin ${getAdditionalLabelInfo('securityAdmin')}`,
+      initialValue: form.securityAdmin,
       type: InstructionInputType.INPUT,
-      name: 'name',
+      name: 'securityAdmin',
+    },
+    {
+      label: `Testing ${getAdditionalLabelInfo('testing')}`,
+      initialValue: form.testing,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'testing',
+    },
+    {
+      label: `Version ${getAdditionalLabelInfo('version')}`,
+      initialValue: form.version,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'version',
+    },
+    {
+      label: `Deposit Limit Quote ${getAdditionalLabelInfo(
+        'depositLimitQuote'
+      )}`,
+      initialValue: form.depositLimitQuote,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'depositLimitQuote',
     },
   ]
 
@@ -155,4 +213,4 @@ const TokenRegisterTrustless = ({
   )
 }
 
-export default TokenRegisterTrustless
+export default GroupEdit

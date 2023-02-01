@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
 import useRealm from '@hooks/useRealm'
-import { PublicKey, SYSVAR_RENT_PUBKEY } from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
@@ -18,14 +18,13 @@ import InstructionForm, {
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 
-interface TokenRegisterTrustlessForm {
+interface AltSetForm {
   governedAccount: AssetAccount | null
-  mintPk: string
-  oraclePk: string
-  name: string
+  index: number
+  addressLookupTable: string
 }
 
-const TokenRegisterTrustless = ({
+const AltSet = ({
   index,
   governance,
 }: {
@@ -41,11 +40,10 @@ const TokenRegisterTrustless = ({
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<TokenRegisterTrustlessForm>({
+  const [form, setForm] = useState<AltSetForm>({
     governedAccount: null,
-    mintPk: '',
-    oraclePk: '',
-    name: '',
+    addressLookupTable: '',
+    index: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -67,17 +65,12 @@ const TokenRegisterTrustless = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const tokenIndex = mangoGroup!.banksMapByName.size
-      //Mango instruction call and serialize
       const ix = await mangoClient!.program.methods
-        .tokenRegisterTrustless(tokenIndex, form.name)
+        .altSet(Number(form.index))
         .accounts({
           group: mangoGroup!.publicKey,
-          fastListingAdmin: form.governedAccount.extensions.transferAddress,
-          mint: new PublicKey(form.mintPk),
-          oracle: new PublicKey(form.oraclePk),
-          payer: form.governedAccount.extensions.transferAddress,
-          rent: SYSVAR_RENT_PUBKEY,
+          admin: form.governedAccount.extensions.transferAddress,
+          addressLookupTable: new PublicKey(form.addressLookupTable),
         })
         .instruction()
 
@@ -121,22 +114,17 @@ const TokenRegisterTrustless = ({
       options: governedProgramAccounts,
     },
     {
-      label: 'Mint PublicKey',
-      initialValue: form.mintPk,
+      label: 'Address Lookup Table',
+      initialValue: form.addressLookupTable,
       type: InstructionInputType.INPUT,
-      name: 'mintPk',
+      name: 'addressLookupTable',
     },
     {
-      label: 'Oracle PublicKey',
-      initialValue: form.oraclePk,
+      label: 'Index',
+      initialValue: form.index,
       type: InstructionInputType.INPUT,
-      name: 'oraclePk',
-    },
-    {
-      label: 'Token Name',
-      initialValue: form.name,
-      type: InstructionInputType.INPUT,
-      name: 'name',
+      inputType: 'number',
+      name: 'Index',
     },
   ]
 
@@ -155,4 +143,4 @@ const TokenRegisterTrustless = ({
   )
 }
 
-export default TokenRegisterTrustless
+export default AltSet

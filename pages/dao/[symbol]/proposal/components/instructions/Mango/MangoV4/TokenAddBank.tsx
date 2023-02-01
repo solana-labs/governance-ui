@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
 import useRealm from '@hooks/useRealm'
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey, SYSVAR_RENT_PUBKEY } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { Governance } from '@solana/spl-governance'
+import { Governance, SYSTEM_PROGRAM_ID } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
@@ -17,18 +17,19 @@ import InstructionForm, {
   InstructionInputType,
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
-import { SERUM3_PROGRAM_ID } from '@blockworks-foundation/mango-v4'
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 
-interface Serum3RegisterMarketForm {
-  governedAccount: AssetAccount | null
-  serum3MarketExternalPk: string
-  baseBankTokenName: string
-  quoteBankTokenName: string
-  marketIndex: number
+type NamePkVal = {
   name: string
+  value: PublicKey
 }
 
-const EditToken = ({
+interface TokenAddBankForm {
+  governedAccount: AssetAccount | null
+  token: null | NamePkVal
+}
+
+const TokenAddBank = ({
   index,
   governance,
 }: {
@@ -36,22 +37,18 @@ const EditToken = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { getClient, ADMIN_PK, GROUP_NUM } = UseMangoV4()
+  const { mangoGroup, mangoClient } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
-    (x) => x.type === AccountType.PROGRAM
+    (x) => x.type === AccountType.SOL
   )
-  const { connection } = useWalletStore()
+  const [tokens, setTokens] = useState<NamePkVal[]>([])
   const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<Serum3RegisterMarketForm>({
+  const [form, setForm] = useState<TokenAddBankForm>({
     governedAccount: null,
-    serum3MarketExternalPk: '',
-    baseBankTokenName: '',
-    quoteBankTokenName: '',
-    marketIndex: 0,
-    name: '',
+    token: null,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -73,23 +70,26 @@ const EditToken = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const client = await getClient(connection, wallet)
-      const group = await client.getGroupForCreator(ADMIN_PK, GROUP_NUM)
-      const marketIndex = group.serum3MarketsMap.size
-      //TODO dao sol account as payer
-      //Mango instruction call and serialize
-      const ix = await client.program.methods
-        .serum3RegisterMarket(marketIndex, form.name)
+      const token = mangoGroup!.banksMapByMint.get(
+        form.token!.value.toBase58()
+      )![0]
+      const mintInfo = mangoGroup!.mintInfosMapByTokenIndex.get(
+        token.tokenIndex
+      )
+      const banks = mangoGroup!.banksMapByTokenIndex.get(token.tokenIndex)
+      const ix = await mangoClient!.program.methods
+        .tokenAddBank(Number(token.tokenIndex), Number(banks!.length))
         .accounts({
-          group: group.publicKey,
-          admin: ADMIN_PK,
-          serumProgram: SERUM3_PROGRAM_ID[connection.cluster],
-          serumMarketExternal: new PublicKey(form.serum3MarketExternalPk),
-          baseBank: group.banksMap.get(form.baseBankTokenName.toUpperCase())!
-            .publicKey,
-          quoteBank: group.banksMap.get(form.quoteBankTokenName.toUpperCase())!
-            .publicKey,
-          payer: wallet.publicKey,
+          group: mangoGroup!.publicKey,
+          admin: form.governedAccount.extensions.transferAddress,
+          mint: token.mint,
+          payer: form.governedAccount.extensions.transferAddress,
+          rent: SYSVAR_RENT_PUBKEY,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          systemProgram: SYSTEM_PROGRAM_ID,
+          existingBank: banks![banks!.length - 1].publicKey,
+          mintInfo: mintInfo!.publicKey,
+          vault: token.vault,
         })
         .instruction()
 
@@ -116,6 +116,21 @@ const EditToken = ({
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
+
+  useEffect(() => {
+    const getTokens = async () => {
+      const currentTokens = [...mangoGroup!.banksMapByMint.values()].map(
+        (x) => ({
+          name: x[0].name,
+          value: x[0].mint,
+        })
+      )
+      setTokens(currentTokens)
+    }
+    if (mangoGroup) {
+      getTokens()
+    }
+  }, [JSON.stringify(mangoGroup)])
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
@@ -133,28 +148,11 @@ const EditToken = ({
       options: governedProgramAccounts,
     },
     {
-      label: 'Name',
-      initialValue: form.name,
-      type: InstructionInputType.INPUT,
-      name: 'name',
-    },
-    {
-      label: 'Serum 3 Market External Pk',
-      initialValue: form.serum3MarketExternalPk,
-      type: InstructionInputType.INPUT,
-      name: 'serum3MarketExternalPk',
-    },
-    {
-      label: 'Base Bank Token Name',
-      initialValue: form.baseBankTokenName,
-      type: InstructionInputType.INPUT,
-      name: 'baseBankTokenName',
-    },
-    {
-      label: 'Quote Bank Token Name',
-      initialValue: form.quoteBankTokenName,
-      type: InstructionInputType.INPUT,
-      name: 'quoteBankTokenName',
+      label: 'Tokens',
+      name: 'token',
+      type: InstructionInputType.SELECT,
+      initialValue: form.token,
+      options: tokens,
     },
   ]
 
@@ -173,4 +171,4 @@ const EditToken = ({
   )
 }
 
-export default EditToken
+export default TokenAddBank
