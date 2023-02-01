@@ -110,6 +110,7 @@ const AddMemberForm = ({ close }) => {
 
   const getInstruction = async (): Promise<UiInstruction | false> => {
     if (programVersion >= 3) {
+      // @asktree: note, I have included this schema since it was here before for v2, but I'm not sure it does anything.
       const isValid = await validateInstruction({ schema, form, setFormErrors })
       if (!isValid) {
         return false
