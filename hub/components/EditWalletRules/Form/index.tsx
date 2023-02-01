@@ -24,6 +24,7 @@ interface Props
   currentCommunityRules: CommunityRules;
   currentCouncilRules: CouncilRules;
   governanceAddress: PublicKey;
+  programVersion: number;
   walletAddress: PublicKey;
 }
 
@@ -56,6 +57,7 @@ export function Form(props: Props) {
           className="mb-8"
           coolOffHours={props.coolOffHours}
           maxVoteDays={props.maxVoteDays}
+          programVersion={props.programVersion}
           onCoolOffHoursChange={props.onCoolOffHoursChange}
           onMaxVoteDaysChange={props.onMaxVoteDaysChange}
         />
@@ -64,6 +66,8 @@ export function Form(props: Props) {
             className="mb-8"
             communityRules={props.communityRules}
             currentCommunityRules={props.currentCommunityRules}
+            currentCouncilRules={props.currentCouncilRules}
+            programVersion={props.programVersion}
             onCommunityRulesChange={props.onCommunityRulesChange}
           />
         )}
@@ -91,6 +95,7 @@ export function Form(props: Props) {
               className="mb-8"
               councilRules={props.councilRules}
               currentCouncilRules={props.currentCouncilRules}
+              programVersion={props.programVersion}
               onCouncilRulesChange={props.onCouncilRulesChange}
             />
           )}
@@ -115,6 +120,7 @@ export function Form(props: Props) {
           <CommunityDetails
             communityRules={props.communityRules}
             currentCommunityRules={props.currentCommunityRules}
+            programVersion={props.programVersion}
             onCommunityRulesChange={props.onCommunityRulesChange}
           />
         )}
@@ -140,6 +146,7 @@ export function Form(props: Props) {
             className="mt-2.5"
             depositExemptProposalCount={props.depositExemptProposalCount}
             minInstructionHoldupDays={props.minInstructionHoldupDays}
+            programVersion={props.programVersion}
             onDepositExemptProposalCountChange={
               props.onDepositExemptProposalCountChange
             }

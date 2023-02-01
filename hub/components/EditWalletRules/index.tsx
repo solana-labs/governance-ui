@@ -216,6 +216,7 @@ export function EditWalletRules(props: Props) {
                       governanceAddress={governance.governanceAddress}
                       maxVoteDays={maxVoteDays}
                       minInstructionHoldupDays={minInstructionHoldupDays}
+                      programVersion={governance.version}
                       walletAddress={governance.walletAddress}
                       onCommunityRulesChange={setCommunityRules}
                       onCoolOffHoursChange={(coolOffHours) => {

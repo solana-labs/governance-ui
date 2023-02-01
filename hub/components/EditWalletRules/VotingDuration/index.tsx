@@ -16,6 +16,7 @@ interface Props
     maxVoteDays: number;
   }> {
   className?: string;
+  programVersion: number;
 }
 
 export function VotingDuration(props: Props) {
@@ -51,100 +52,110 @@ export function VotingDuration(props: Props) {
           />
         </div>
       </ValueBlock>
-      <ValueBlock
-        className="mt-8"
-        description={
-          <>
-            After an unrestricted voting time, cool-off voting time limits
-            members to voting <span className="font-bold">No</span>, withdrawing
-            their vote, or vetoing a proposal. A member cannot vote to approve a
-            proposal during the cool-off time.
-          </>
-        }
-        title="Cool-Off Voting Time"
-      >
-        <div className="grid grid-cols-[100px,1fr] gap-x-2 items-center">
-          <SliderValue
-            min={0}
-            max={24}
-            value={props.coolOffHours}
-            units={ntext(props.coolOffHours, 'Hour')}
-            onChange={props.onCoolOffHoursChange}
-          />
-          <Slider
-            min={0}
-            max={24}
-            trackColor="bg-orange-400"
-            value={props.coolOffHours}
-            onChange={props.onCoolOffHoursChange}
-          />
-        </div>
-        <div className="flex items-center mt-3 text-xs">
-          <div className="dark:text-neutral-500">Unrestricted Voting Time:</div>
-          <div className="ml-2 dark:text-neutral-50">
-            <span className="font-bold">
-              {formatNumber(unrestrictedVotingDays, undefined, {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 2,
-              })}
-            </span>{' '}
-            {ntext(unrestrictedVotingDays, 'day')}
+      {props.programVersion >= 3 && (
+        <ValueBlock
+          className="mt-8"
+          description={
+            <>
+              After an unrestricted voting time, cool-off voting time limits
+              members to voting <span className="font-bold">No</span>,
+              withdrawing their vote, or vetoing a proposal. A member cannot
+              vote to approve a proposal during the cool-off time.
+            </>
+          }
+          title="Cool-Off Voting Time"
+        >
+          <div className="grid grid-cols-[100px,1fr] gap-x-2 items-center">
+            <SliderValue
+              min={0}
+              max={24}
+              value={props.coolOffHours}
+              units={ntext(props.coolOffHours, 'Hour')}
+              onChange={props.onCoolOffHoursChange}
+            />
+            <Slider
+              min={0}
+              max={24}
+              trackColor="bg-orange-400"
+              value={props.coolOffHours}
+              onChange={props.onCoolOffHoursChange}
+            />
           </div>
-          {!!unrestrictedVotingRemainingHours && (
+          <div className="flex items-center mt-3 text-xs">
+            <div className="dark:text-neutral-500">
+              Unrestricted Voting Time:
+            </div>
             <div className="ml-2 dark:text-neutral-50">
               <span className="font-bold">
-                {formatNumber(unrestrictedVotingRemainingHours, undefined, {
+                {formatNumber(unrestrictedVotingDays, undefined, {
                   minimumFractionDigits: 0,
                   maximumFractionDigits: 2,
                 })}
               </span>{' '}
-              {ntext(unrestrictedVotingRemainingHours, 'hour')}
+              {ntext(unrestrictedVotingDays, 'day')}
             </div>
-          )}
-        </div>
-      </ValueBlock>
-      <div className="mt-12">
-        <div className="font-bold text-neutral-500">Summary</div>
-        <div className="grid grid-cols-3 gap-x-4 mt-4 pb-4">
-          <SummaryItem
-            label="Unrestricted Voting Time"
-            value={
-              <div className="flex items-center">
-                <div>
-                  {formatNumber(unrestrictedVotingDays, undefined, {
+            {!!unrestrictedVotingRemainingHours && (
+              <div className="ml-2 dark:text-neutral-50">
+                <span className="font-bold">
+                  {formatNumber(unrestrictedVotingRemainingHours, undefined, {
                     minimumFractionDigits: 0,
                     maximumFractionDigits: 2,
-                  })}{' '}
-                  {ntext(unrestrictedVotingDays, 'day')}
-                </div>
-                {!!unrestrictedVotingRemainingHours && (
-                  <div className="ml-3">
-                    {formatNumber(unrestrictedVotingRemainingHours, undefined, {
+                  })}
+                </span>{' '}
+                {ntext(unrestrictedVotingRemainingHours, 'hour')}
+              </div>
+            )}
+          </div>
+        </ValueBlock>
+      )}
+      {props.programVersion >= 3 && (
+        <div className="mt-12">
+          <div className="font-bold text-neutral-500">Summary</div>
+          <div className="grid grid-cols-3 gap-x-4 mt-4 pb-4">
+            <SummaryItem
+              label="Unrestricted Voting Time"
+              value={
+                <div className="flex items-center">
+                  <div>
+                    {formatNumber(unrestrictedVotingDays, undefined, {
                       minimumFractionDigits: 0,
                       maximumFractionDigits: 2,
                     })}{' '}
-                    {ntext(unrestrictedVotingRemainingHours, 'hour')}
+                    {ntext(unrestrictedVotingDays, 'day')}
                   </div>
-                )}
-              </div>
-            }
-          />
-          <SummaryItem
-            label="Cool-Off Voting Time"
-            value={`${formatNumber(props.coolOffHours, undefined, {
-              minimumFractionDigits: 0,
-              maximumFractionDigits: 2,
-            })} ${ntext(props.coolOffHours, 'hour')}`}
-          />
-          <SummaryItem
-            label="Total Voting Duration"
-            value={`${formatNumber(props.maxVoteDays, undefined, {
-              minimumFractionDigits: 0,
-              maximumFractionDigits: 2,
-            })} ${ntext(props.maxVoteDays, 'day')}`}
-          />
+                  {!!unrestrictedVotingRemainingHours && (
+                    <div className="ml-3">
+                      {formatNumber(
+                        unrestrictedVotingRemainingHours,
+                        undefined,
+                        {
+                          minimumFractionDigits: 0,
+                          maximumFractionDigits: 2,
+                        },
+                      )}{' '}
+                      {ntext(unrestrictedVotingRemainingHours, 'hour')}
+                    </div>
+                  )}
+                </div>
+              }
+            />
+            <SummaryItem
+              label="Cool-Off Voting Time"
+              value={`${formatNumber(props.coolOffHours, undefined, {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2,
+              })} ${ntext(props.coolOffHours, 'hour')}`}
+            />
+            <SummaryItem
+              label="Total Voting Duration"
+              value={`${formatNumber(props.maxVoteDays, undefined, {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2,
+              })} ${ntext(props.maxVoteDays, 'day')}`}
+            />
+          </div>
         </div>
-      </div>
+      )}
     </SectionBlock>
   );
 }

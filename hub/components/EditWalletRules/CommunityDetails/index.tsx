@@ -19,7 +19,9 @@ interface Props
     communityRules: CommunityRules;
   }> {
   currentCommunityRules: CommunityRules;
+  currentCouncilRules?: CommunityRules | null;
   className?: string;
+  programVersion: number;
 }
 
 export function CommunityDetails(props: Props) {
@@ -35,22 +37,24 @@ export function CommunityDetails(props: Props) {
         text="Community Details"
       />
       <div className="space-y-8">
-        <ValueBlock
-          title="Do you want to allow community members to create proposals?"
-          description="If disabled, the community members can no longer create proposals."
-        >
-          <ButtonToggle
-            className="h-14"
-            value={props.communityRules.canCreateProposal}
-            onChange={(value) => {
-              const newRules = produce(props.communityRules, (data) => {
-                data.canCreateProposal = value;
-              });
-              props.onCommunityRulesChange?.(newRules);
-            }}
-          />
-        </ValueBlock>
-        {props.communityRules.canCreateProposal && (
+        {!!props.currentCouncilRules && (
+          <ValueBlock
+            title="Do you want to allow community members to create proposals?"
+            description="If disabled, the community members can no longer create proposals."
+          >
+            <ButtonToggle
+              className="h-14"
+              value={props.communityRules.canCreateProposal}
+              onChange={(value) => {
+                const newRules = produce(props.communityRules, (data) => {
+                  data.canCreateProposal = value;
+                });
+                props.onCommunityRulesChange?.(newRules);
+              }}
+            />
+          </ValueBlock>
+        )}
+        {!!props.currentCouncilRules && props.communityRules.canCreateProposal && (
           <ValueBlock
             title="What is the minimum amount of community governance power required to create a proposal?"
             description="A user must have this many community governance power in order to create a proposal."
@@ -96,22 +100,24 @@ export function CommunityDetails(props: Props) {
             </div>
           </ValueBlock>
         )}
-        <ValueBlock
-          title="Do you want to allow community members to vote?"
-          description="If disabled, the community members can no longer vote on proposals."
-        >
-          <ButtonToggle
-            className="h-14"
-            value={props.communityRules.canVote}
-            onChange={(value) => {
-              const newRules = produce(props.communityRules, (data) => {
-                data.canVote = value;
-              });
-              props.onCommunityRulesChange?.(newRules);
-            }}
-          />
-        </ValueBlock>
-        {props.communityRules.canVote && (
+        {!!props.currentCouncilRules && (
+          <ValueBlock
+            title="Do you want to allow community members to vote?"
+            description="If disabled, the community members can no longer vote on proposals."
+          >
+            <ButtonToggle
+              className="h-14"
+              value={props.communityRules.canVote}
+              onChange={(value) => {
+                const newRules = produce(props.communityRules, (data) => {
+                  data.canVote = value;
+                });
+                props.onCommunityRulesChange?.(newRules);
+              }}
+            />
+          </ValueBlock>
+        )}
+        {!!props.currentCouncilRules && props.communityRules.canVote && (
           <>
             <ValueBlock
               title="Community Approval Quorum"
@@ -162,22 +168,24 @@ export function CommunityDetails(props: Props) {
             </ValueBlock>
           </>
         )}
-        <ValueBlock
-          title="Do you want your community to have veto power over council proposals?"
-          description="Your community can veto a council-approved proposal."
-        >
-          <ButtonToggle
-            className="h-14"
-            value={props.communityRules.canVeto}
-            onChange={(value) => {
-              const newRules = produce(props.communityRules, (data) => {
-                data.canVeto = value;
-              });
-              props.onCommunityRulesChange?.(newRules);
-            }}
-          />
-        </ValueBlock>
-        {props.communityRules.canVeto && (
+        {!!props.currentCouncilRules && (
+          <ValueBlock
+            title="Do you want your community to have veto power over council proposals?"
+            description="Your community can veto a council-approved proposal."
+          >
+            <ButtonToggle
+              className="h-14"
+              value={props.communityRules.canVeto}
+              onChange={(value) => {
+                const newRules = produce(props.communityRules, (data) => {
+                  data.canVeto = value;
+                });
+                props.onCommunityRulesChange?.(newRules);
+              }}
+            />
+          </ValueBlock>
+        )}
+        {!!props.currentCouncilRules && props.communityRules.canVeto && (
           <ValueBlock
             title="Community Veto Voting Quorum"
             description={

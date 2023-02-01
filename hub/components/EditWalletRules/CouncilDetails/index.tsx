@@ -20,6 +20,7 @@ interface Props
   }> {
   className?: string;
   currentCouncilRules: NonNullable<CouncilRules>;
+  programVersion: number;
 }
 
 export function CouncilDetails(props: Props) {

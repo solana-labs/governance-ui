@@ -11,6 +11,7 @@ interface Props
     minInstructionHoldupDays: number;
   }> {
   className?: string;
+  programVersion: number;
 }
 
 export function AdvancedOptions(props: Props) {
