@@ -7,7 +7,7 @@ import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import { abbreviateAddress, precision } from 'utils/formatting'
 import useWalletStore from 'stores/useWalletStore'
 import { getMintSchema } from 'utils/validations'
-import { useEffect, useState } from 'react'
+import { FC, useEffect, useMemo, useState } from 'react'
 import { MintForm, UiInstruction } from 'utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssets from 'hooks/useGovernanceAssets'
 import {
@@ -25,13 +25,29 @@ import {
   ArrowCircleUpIcon,
 } from '@heroicons/react/outline'
 import useCreateProposal from '@hooks/useCreateProposal'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
-interface AddMemberForm extends MintForm {
+interface AddMemberForm extends Omit<MintForm, 'mintAccount'> {
   description: string
   title: string
 }
 
-const AddMemberForm = ({ close }) => {
+const useCouncilMintAccount = () => {
+  const { assetAccounts, realm } = useGovernanceAssets()
+  const councilMintAccount = useMemo(() => {
+    assetAccounts.find(
+      (x) =>
+        x.governance?.account.governedAccount.toBase58() ===
+        realm?.account.config.councilMint?.toBase58()
+    )
+  }, [assetAccounts, realm?.account.config.councilMint])
+  return councilMintAccount
+}
+
+const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
+  close,
+  mintAccount,
+}) => {
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [showOptions, setShowOptions] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -44,7 +60,6 @@ const AddMemberForm = ({ close }) => {
   const { fmtUrlWithCluster } = useQueryContext()
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const { symbol } = router.query
-  const { assetAccounts } = useGovernanceAssets()
 
   const { realmInfo, canChooseWhoVote, councilMint, realm } = useRealm()
 
@@ -53,7 +68,6 @@ const AddMemberForm = ({ close }) => {
   const [form, setForm] = useState<AddMemberForm>({
     destinationAccount: '',
     amount: 1,
-    mintAccount: undefined,
     programId: programId?.toString(),
     description: '',
     title: '',
@@ -170,7 +184,7 @@ const AddMemberForm = ({ close }) => {
   }
 
   useEffect(() => {
-    const initForm = async () => {
+    const initForm = () => {
       handleSetForm({
         value: assetAccounts.find(
           (x) =>
