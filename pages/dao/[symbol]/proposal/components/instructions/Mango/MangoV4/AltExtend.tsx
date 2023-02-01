@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
 import useRealm from '@hooks/useRealm'
-import { PublicKey, SYSVAR_RENT_PUBKEY } from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
@@ -18,14 +18,14 @@ import InstructionForm, {
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 
-interface TokenRegisterTrustlessForm {
+interface AltExtendForm {
   governedAccount: AssetAccount | null
-  mintPk: string
-  oraclePk: string
-  name: string
+  index: number
+  addressLookupTable: string
+  publicKeys: string
 }
 
-const TokenRegisterTrustless = ({
+const AltExtend = ({
   index,
   governance,
 }: {
@@ -41,11 +41,11 @@ const TokenRegisterTrustless = ({
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<TokenRegisterTrustlessForm>({
+  const [form, setForm] = useState<AltExtendForm>({
     governedAccount: null,
-    mintPk: '',
-    oraclePk: '',
-    name: '',
+    addressLookupTable: '',
+    index: 0,
+    publicKeys: '',
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -67,17 +67,17 @@ const TokenRegisterTrustless = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const tokenIndex = mangoGroup!.banksMapByName.size
-      //Mango instruction call and serialize
       const ix = await mangoClient!.program.methods
-        .tokenRegisterTrustless(tokenIndex, form.name)
+        .altExtend(Number(form.index), [
+          ...form.publicKeys
+            .replace(/\s/g, '')
+            .split(',')
+            .map((x) => new PublicKey(x)),
+        ])
         .accounts({
           group: mangoGroup!.publicKey,
-          fastListingAdmin: form.governedAccount.extensions.transferAddress,
-          mint: new PublicKey(form.mintPk),
-          oracle: new PublicKey(form.oraclePk),
-          payer: form.governedAccount.extensions.transferAddress,
-          rent: SYSVAR_RENT_PUBKEY,
+          admin: form.governedAccount.extensions.transferAddress,
+          addressLookupTable: new PublicKey(form.addressLookupTable),
         })
         .instruction()
 
@@ -121,22 +121,24 @@ const TokenRegisterTrustless = ({
       options: governedProgramAccounts,
     },
     {
-      label: 'Mint PublicKey',
-      initialValue: form.mintPk,
+      label: 'Address Lookup Table',
+      initialValue: form.addressLookupTable,
       type: InstructionInputType.INPUT,
-      name: 'mintPk',
+      name: 'addressLookupTable',
     },
     {
-      label: 'Oracle PublicKey',
-      initialValue: form.oraclePk,
+      label: 'Index',
+      initialValue: form.index,
       type: InstructionInputType.INPUT,
-      name: 'oraclePk',
+      inputType: 'number',
+      name: 'Index',
     },
     {
-      label: 'Token Name',
-      initialValue: form.name,
-      type: InstructionInputType.INPUT,
-      name: 'name',
+      label: 'Public Keys (separated by commas)',
+      initialValue: form.publicKeys,
+      type: InstructionInputType.TEXTAREA,
+      inputType: 'string',
+      name: 'publicKeys',
     },
   ]
 
@@ -155,4 +157,4 @@ const TokenRegisterTrustless = ({
   )
 }
 
-export default TokenRegisterTrustless
+export default AltExtend

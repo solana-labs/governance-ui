@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
 import useRealm from '@hooks/useRealm'
-import { PublicKey, SYSVAR_RENT_PUBKEY } from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
@@ -17,15 +17,20 @@ import InstructionForm, {
   InstructionInputType,
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
+import { MarketIndex } from '@blockworks-foundation/mango-v4/dist/types/src/accounts/serum3'
 
-interface TokenRegisterTrustlessForm {
-  governedAccount: AssetAccount | null
-  mintPk: string
-  oraclePk: string
+type NameMarketIndexVal = {
   name: string
+  value: MarketIndex
 }
 
-const TokenRegisterTrustless = ({
+interface OpenBookEditMarketForm {
+  governedAccount: AssetAccount | null
+  market: NameMarketIndexVal | null
+  reduceOnly: boolean
+}
+
+const OpenBookEditMarket = ({
   index,
   governance,
 }: {
@@ -41,12 +46,12 @@ const TokenRegisterTrustless = ({
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<TokenRegisterTrustlessForm>({
+  const [form, setForm] = useState<OpenBookEditMarketForm>({
     governedAccount: null,
-    mintPk: '',
-    oraclePk: '',
-    name: '',
+    reduceOnly: false,
+    market: null,
   })
+  const [currentMarkets, setCurrentMarkets] = useState<NameMarketIndexVal[]>([])
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
   const handleSetForm = ({ propertyName, value }) => {
@@ -67,17 +72,16 @@ const TokenRegisterTrustless = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const tokenIndex = mangoGroup!.banksMapByName.size
-      //Mango instruction call and serialize
+      const market = mangoGroup!.serum3MarketsMapByMarketIndex.get(
+        Number(form.market?.value)
+      )
+
       const ix = await mangoClient!.program.methods
-        .tokenRegisterTrustless(tokenIndex, form.name)
+        .serum3EditMarket(form.reduceOnly)
         .accounts({
           group: mangoGroup!.publicKey,
-          fastListingAdmin: form.governedAccount.extensions.transferAddress,
-          mint: new PublicKey(form.mintPk),
-          oracle: new PublicKey(form.oraclePk),
-          payer: form.governedAccount.extensions.transferAddress,
-          rent: SYSVAR_RENT_PUBKEY,
+          admin: form.governedAccount.extensions.transferAddress,
+          market: market!.publicKey,
         })
         .instruction()
 
@@ -104,6 +108,34 @@ const TokenRegisterTrustless = ({
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
+  useEffect(() => {
+    const getMarkets = async () => {
+      const markets = [...mangoGroup!.serum3MarketsMapByExternal.values()].map(
+        (x) => ({
+          name: x.name,
+          value: x.marketIndex,
+        })
+      )
+      setCurrentMarkets(markets)
+    }
+    if (mangoGroup) {
+      getMarkets()
+    }
+  }, [JSON.stringify(mangoGroup)])
+  useEffect(() => {
+    const getCurrentMarketProps = () => {
+      const market = mangoGroup!.serum3MarketsMapByMarketIndex.get(
+        Number(form.market?.value)
+      )
+      setForm({
+        ...form,
+        reduceOnly: market?.reduceOnly || false,
+      })
+    }
+    if (form.market && mangoGroup) {
+      getCurrentMarketProps()
+    }
+  }, [form.market?.value])
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
@@ -121,22 +153,17 @@ const TokenRegisterTrustless = ({
       options: governedProgramAccounts,
     },
     {
-      label: 'Mint PublicKey',
-      initialValue: form.mintPk,
-      type: InstructionInputType.INPUT,
-      name: 'mintPk',
+      label: 'Market',
+      name: 'market',
+      type: InstructionInputType.SELECT,
+      initialValue: form.market,
+      options: currentMarkets,
     },
     {
-      label: 'Oracle PublicKey',
-      initialValue: form.oraclePk,
-      type: InstructionInputType.INPUT,
-      name: 'oraclePk',
-    },
-    {
-      label: 'Token Name',
-      initialValue: form.name,
-      type: InstructionInputType.INPUT,
-      name: 'name',
+      label: 'Reduce Only',
+      initialValue: form.reduceOnly,
+      type: InstructionInputType.SWITCH,
+      name: 'reduceOnly',
     },
   ]
 
@@ -155,4 +182,4 @@ const TokenRegisterTrustless = ({
   )
 }
 
-export default TokenRegisterTrustless
+export default OpenBookEditMarket

@@ -112,7 +112,9 @@ import MakeDepositToMangoAccountCsv from './components/instructions/Mango/MakeDe
 import TokenRegister from './components/instructions/Mango/MangoV4/TokenRegister'
 import EditToken from './components/instructions/Mango/MangoV4/EditToken'
 import PerpEdit from './components/instructions/Mango/MangoV4/PerpEdit'
-import Serum3RegisterMarket from './components/instructions/Mango/MangoV4/Serum3RegisterMarket'
+import GroupEdit from './components/instructions/Mango/MangoV4/GroupEdit'
+import OpenBookRegisterMarket from './components/instructions/Mango/MangoV4/OpenBookRegisterMarket'
+import OpenBookEditMarket from './components/instructions/Mango/MangoV4/OpenBookEditMarket'
 import PerpCreate from './components/instructions/Mango/MangoV4/PerpCreate'
 import TokenRegisterTrustless from './components/instructions/Mango/MangoV4/TokenRegisterTrustless'
 import TransferDomainName from './components/instructions/TransferDomainName'
@@ -134,6 +136,12 @@ import RemoveServiceFromDID from './components/instructions/Identity/RemoveServi
 import DualWithdraw from './components/instructions/Dual/DualWithdraw'
 import DualExercise from './components/instructions/Dual/DualExercise'
 import PsyFinanceMintAmericanOptions from './components/instructions/PsyFinance/MintAmericanOptions'
+import IxGateSet from './components/instructions/Mango/MangoV4/IxGateSet'
+import StubOracleCreate from './components/instructions/Mango/MangoV4/StubOracleCreate'
+import StubOracleSet from './components/instructions/Mango/MangoV4/StubOracleSet'
+import AltSet from './components/instructions/Mango/MangoV4/AltSet'
+import AltExtend from './components/instructions/Mango/MangoV4/AltExtend'
+import TokenAddBank from './components/instructions/Mango/MangoV4/TokenAddBank'
 import PsyFinanceBurnWriterTokenForQuote from './components/instructions/PsyFinance/BurnWriterTokenForQuote'
 import PsyFinanceClaimUnderlyingPostExpiration from './components/instructions/PsyFinance/ClaimUnderlyingPostExpiration'
 import PsyFinanceExerciseOption from './components/instructions/PsyFinance/ExerciseOption'
@@ -440,10 +448,18 @@ const New = () => {
       [Instructions.MangoRemoveOracle]: MakeRemoveOracle,
       [Instructions.MangoV4TokenRegister]: TokenRegister,
       [Instructions.MangoV4TokenEdit]: EditToken,
+      [Instructions.MangoV4GroupEdit]: GroupEdit,
+      [Instructions.MangoV4OpenBookEditMarket]: OpenBookEditMarket,
+      [Instructions.MangoV4IxGateSet]: IxGateSet,
+      [Instructions.MangoV4AltExtend]: AltExtend,
+      [Instructions.MangoV4AltSet]: AltSet,
+      [Instructions.MangoV4StubOracleCreate]: StubOracleCreate,
+      [Instructions.MangoV4StubOracleSet]: StubOracleSet,
       [Instructions.MangoV4PerpEdit]: PerpEdit,
-      [Instructions.MangoV4Serum3RegisterMarket]: Serum3RegisterMarket,
+      [Instructions.MangoV4OpenBookRegisterMarket]: OpenBookRegisterMarket,
       [Instructions.MangoV4PerpCreate]: PerpCreate,
       [Instructions.MangoV4TokenRegisterTrustless]: TokenRegisterTrustless,
+      [Instructions.MangoV4TokenAddBank]: TokenAddBank,
       [Instructions.Grant]: Grant,
       [Instructions.Clawback]: Clawback,
       [Instructions.CreateAssociatedTokenAccount]: CreateAssociatedTokenAccount,
