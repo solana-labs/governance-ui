@@ -18,7 +18,6 @@ import InstructionForm, {
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { MarketIndex } from '@blockworks-foundation/mango-v4/dist/types/src/accounts/serum3'
-import { Group } from '@blockworks-foundation/mango-v4'
 
 type NameMarketIndexVal = {
   name: string
@@ -39,13 +38,12 @@ const OpenBookEditMarket = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { getClient, GROUP } = UseMangoV4()
+  const { mangoClient, mangoGroup } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
     (x) => x.type === AccountType.SOL
   )
-  const { connection } = useWalletStore()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<OpenBookEditMarketForm>({
@@ -53,7 +51,6 @@ const OpenBookEditMarket = ({
     reduceOnly: false,
     market: null,
   })
-  const [mangoGroup, setMangoGroup] = useState<Group | null>(null)
   const [currentMarkets, setCurrentMarkets] = useState<NameMarketIndexVal[]>([])
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -75,16 +72,14 @@ const OpenBookEditMarket = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const client = await getClient(connection, wallet)
-      const group = await client.getGroup(GROUP)
-      const market = group.serum3MarketsMapByMarketIndex.get(
+      const market = mangoGroup!.serum3MarketsMapByMarketIndex.get(
         Number(form.market?.value)
       )
 
-      const ix = await client.program.methods
+      const ix = await mangoClient!.program.methods
         .serum3EditMarket(form.reduceOnly)
         .accounts({
-          group: group.publicKey,
+          group: mangoGroup!.publicKey,
           admin: form.governedAccount.extensions.transferAddress,
           market: market!.publicKey,
         })
@@ -115,21 +110,18 @@ const OpenBookEditMarket = ({
   }, [form])
   useEffect(() => {
     const getMarkets = async () => {
-      const client = await getClient(connection, wallet!)
-      const group = await client.getGroup(GROUP)
-      const markets = [...group.serum3MarketsMapByExternal.values()].map(
+      const markets = [...mangoGroup!.serum3MarketsMapByExternal.values()].map(
         (x) => ({
           name: x.name,
           value: x.marketIndex,
         })
       )
       setCurrentMarkets(markets)
-      setMangoGroup(group)
     }
-    if (wallet?.publicKey) {
+    if (mangoGroup) {
       getMarkets()
     }
-  }, [connection.current && wallet?.publicKey?.toBase58()])
+  }, [JSON.stringify(mangoGroup)])
   useEffect(() => {
     const getCurrentMarketProps = () => {
       const market = mangoGroup!.serum3MarketsMapByMarketIndex.get(

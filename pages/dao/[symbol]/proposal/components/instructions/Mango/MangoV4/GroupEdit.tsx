@@ -47,7 +47,7 @@ const GroupEdit = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { mangoClient, mangoGroup } = UseMangoV4()
+  const { mangoClient, mangoGroup, getAdditionalLabelInfo } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
@@ -141,7 +141,7 @@ const GroupEdit = ({
       })
       setOriginalFormValues({ ...vals })
     }
-    if (wallet?.publicKey) {
+    if (mangoGroup) {
       getGroupParams()
     }
   }, [JSON.stringify(mangoGroup)])
@@ -157,39 +157,41 @@ const GroupEdit = ({
       options: governedProgramAccounts,
     },
     {
-      label: 'Admin',
+      label: `Admin ${getAdditionalLabelInfo('admin')}`,
       initialValue: form.admin,
       type: InstructionInputType.INPUT,
       name: 'admin',
     },
     {
-      label: 'Fast Listing Admin',
+      label: `Fast Listing Admin ${getAdditionalLabelInfo('fastListingAdmin')}`,
       initialValue: form.fastListingAdmin,
       type: InstructionInputType.INPUT,
       name: 'fastListingAdmin',
     },
     {
-      label: 'Security Admin',
+      label: `Security Admin ${getAdditionalLabelInfo('securityAdmin')}`,
       initialValue: form.securityAdmin,
       type: InstructionInputType.INPUT,
       name: 'securityAdmin',
     },
     {
-      label: 'Testing',
+      label: `Testing ${getAdditionalLabelInfo('testing')}`,
       initialValue: form.testing,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'testing',
     },
     {
-      label: 'Version',
+      label: `Version ${getAdditionalLabelInfo('version')}`,
       initialValue: form.version,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'version',
     },
     {
-      label: 'Deposit Limit Quote',
+      label: `Deposit Limit Quote ${getAdditionalLabelInfo(
+        'depositLimitQuote'
+      )}`,
       initialValue: form.depositLimitQuote,
       type: InstructionInputType.INPUT,
       inputType: 'number',
