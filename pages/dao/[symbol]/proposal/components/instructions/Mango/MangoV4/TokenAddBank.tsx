@@ -37,14 +37,13 @@ const TokenAddBank = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { getClient, GROUP } = UseMangoV4()
+  const { mangoGroup, mangoClient } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
     (x) => x.type === AccountType.SOL
   )
   const [tokens, setTokens] = useState<NamePkVal[]>([])
-  const { connection } = useWalletStore()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<TokenAddBankForm>({
@@ -71,15 +70,17 @@ const TokenAddBank = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const client = await getClient(connection, wallet)
-      const group = await client.getGroup(GROUP)
-      const token = group.banksMapByMint.get(form.token!.value.toBase58())![0]
-      const mintInfo = group.mintInfosMapByTokenIndex.get(token.tokenIndex)
-      const banks = group.banksMapByTokenIndex.get(token.tokenIndex)
-      const ix = await client.program.methods
+      const token = mangoGroup!.banksMapByMint.get(
+        form.token!.value.toBase58()
+      )![0]
+      const mintInfo = mangoGroup!.mintInfosMapByTokenIndex.get(
+        token.tokenIndex
+      )
+      const banks = mangoGroup!.banksMapByTokenIndex.get(token.tokenIndex)
+      const ix = await mangoClient!.program.methods
         .tokenAddBank(Number(token.tokenIndex), Number(banks!.length))
         .accounts({
-          group: group.publicKey,
+          group: mangoGroup!.publicKey,
           admin: form.governedAccount.extensions.transferAddress,
           mint: token.mint,
           payer: form.governedAccount.extensions.transferAddress,
@@ -118,18 +119,18 @@ const TokenAddBank = ({
 
   useEffect(() => {
     const getTokens = async () => {
-      const client = await getClient(connection, wallet!)
-      const group = await client.getGroup(GROUP)
-      const currentTokens = [...group.banksMapByMint.values()].map((x) => ({
-        name: x[0].name,
-        value: x[0].mint,
-      }))
+      const currentTokens = [...mangoGroup!.banksMapByMint.values()].map(
+        (x) => ({
+          name: x[0].name,
+          value: x[0].mint,
+        })
+      )
       setTokens(currentTokens)
     }
-    if (wallet?.publicKey) {
+    if (mangoGroup) {
       getTokens()
     }
-  }, [connection && wallet?.publicKey?.toBase58()])
+  }, [JSON.stringify(mangoGroup)])
   const schema = yup.object().shape({
     governedAccount: yup
       .object()

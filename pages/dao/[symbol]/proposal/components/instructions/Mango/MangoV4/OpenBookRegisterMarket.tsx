@@ -35,7 +35,7 @@ const OpenBookRegisterMarket = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { getClient, GROUP } = UseMangoV4()
+  const { mangoClient, mangoGroup } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
@@ -71,20 +71,19 @@ const OpenBookRegisterMarket = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const client = await getClient(connection, wallet)
-      const group = await client.getGroup(GROUP)
-      const marketIndex = group.serum3ExternalMarketsMap.size
+      const marketIndex = mangoGroup!.serum3ExternalMarketsMap.size
 
-      const ix = await client.program.methods
+      const ix = await mangoClient!.program.methods
         .serum3RegisterMarket(marketIndex, form.name)
         .accounts({
-          group: group.publicKey,
+          group: mangoGroup!.publicKey,
           admin: form.governedAccount.extensions.transferAddress,
           serumProgram: OPENBOOK_PROGRAM_ID[connection.cluster],
           serumMarketExternal: new PublicKey(form.openBookMarketExternalPk),
-          baseBank: group.getFirstBankByMint(new PublicKey(form.baseBankMintPk))
-            .publicKey,
-          quoteBank: group.getFirstBankByMint(
+          baseBank: mangoGroup!.getFirstBankByMint(
+            new PublicKey(form.baseBankMintPk)
+          ).publicKey,
+          quoteBank: mangoGroup!.getFirstBankByMint(
             new PublicKey(form.quoteBankMintPk)
           ).publicKey,
           payer: form.governedAccount.extensions.transferAddress,
@@ -137,7 +136,7 @@ const OpenBookRegisterMarket = ({
       name: 'name',
     },
     {
-      label: 'Openbook Market External Pk',
+      label: 'Openbook Market External',
       initialValue: form.openBookMarketExternalPk,
       type: InstructionInputType.INPUT,
       name: 'openBookMarketExternalPk',
