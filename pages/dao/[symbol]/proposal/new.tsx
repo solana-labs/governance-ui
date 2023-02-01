@@ -142,6 +142,9 @@ import StubOracleSet from './components/instructions/Mango/MangoV4/StubOracleSet
 import AltSet from './components/instructions/Mango/MangoV4/AltSet'
 import AltExtend from './components/instructions/Mango/MangoV4/AltExtend'
 import TokenAddBank from './components/instructions/Mango/MangoV4/TokenAddBank'
+import PsyFinanceBurnWriterTokenForQuote from './components/instructions/PsyFinance/BurnWriterTokenForQuote'
+import PsyFinanceClaimUnderlyingPostExpiration from './components/instructions/PsyFinance/ClaimUnderlyingPostExpiration'
+import PsyFinanceExerciseOption from './components/instructions/PsyFinance/ExerciseOption'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -481,6 +484,9 @@ const New = () => {
       [Instructions.DepositReserveLiquidityAndObligationCollateral]: DepositReserveLiquidityAndObligationCollateral,
       [Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity]: WithdrawObligationCollateralAndRedeemReserveLiquidity,
       [Instructions.PsyFinanceMintAmericanOptions]: PsyFinanceMintAmericanOptions,
+      [Instructions.PsyFinanceBurnWriterForQuote]: PsyFinanceBurnWriterTokenForQuote,
+      [Instructions.PsyFinanceClaimUnderlyingPostExpiration]: PsyFinanceClaimUnderlyingPostExpiration,
+      [Instructions.PsyFinanceExerciseOption]: PsyFinanceExerciseOption,
       [Instructions.SwitchboardAdmitOracle]: SwitchboardAdmitOracle,
       [Instructions.SwitchboardRevokeOracle]: SwitchboardRevokeOracle,
       [Instructions.RefreshSolendObligation]: RefreshObligation,

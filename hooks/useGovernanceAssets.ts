@@ -749,7 +749,19 @@ export default function useGovernanceAssets() {
     */
 
     [Instructions.PsyFinanceMintAmericanOptions]: {
-      name: 'Mint American Options',
+      name: ' Mint American Options',
+      packageId: PackageEnum.PsyFinance,
+    },
+    [Instructions.PsyFinanceBurnWriterForQuote]: {
+      name: 'Claim Quote with Writer Token',
+      packageId: PackageEnum.PsyFinance,
+    },
+    [Instructions.PsyFinanceClaimUnderlyingPostExpiration]: {
+      name: 'Claim Underlying (post expiration)',
+      packageId: PackageEnum.PsyFinance,
+    },
+    [Instructions.PsyFinanceExerciseOption]: {
+      name: 'Exercise Option',
       packageId: PackageEnum.PsyFinance,
     },
 
