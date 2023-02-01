@@ -11,6 +11,7 @@ import ListItem from './ListItem'
 import { Mint } from '@models/treasury/Asset'
 import { GoverningTokenType } from '@solana/spl-governance'
 import { UsersIcon } from '@heroicons/react/outline'
+import useProgramVersion from '@hooks/useProgramVersion'
 
 interface Props {
   className?: string
@@ -34,9 +35,14 @@ const useTokenType = (govpop: 'community' | 'council' | undefined) => {
 export default function MintListItem(props: Props) {
   const { realmInfo } = useRealm()
   const tokenType = useTokenType(props.mint.tokenRole)
+  const programVersion = useProgramVersion()
 
-  const typeLabel =
-    tokenType === GoverningTokenType.Membership ? 'Membership' : 'Token Mint'
+  const membership =
+    programVersion >= 3
+      ? tokenType === GoverningTokenType.Membership
+      : props.mint.tokenRole === 'council'
+
+  const typeLabel = membership ? 'Membership' : 'Token Mint'
 
   return (
     <ListItem
@@ -65,12 +71,7 @@ export default function MintListItem(props: Props) {
               ) : (
                 <CouncilMintIcon className="h-3 w-3 stroke-white/50" />
               ))}
-            <div>
-              Total{' '}
-              {tokenType === GoverningTokenType.Membership
-                ? 'Members'
-                : 'Supply'}
-            </div>
+            <div>Total {membership ? 'Members' : 'Supply'}</div>
           </div>
         </div>
       }
@@ -79,7 +80,7 @@ export default function MintListItem(props: Props) {
         <div className="h-6 relative w-6">
           {realmInfo?.ogImage && !!props.mint.tokenRole ? (
             <img className="h-6 w-6" src={realmInfo.ogImage} />
-          ) : tokenType === GoverningTokenType.Membership ? (
+          ) : membership ? (
             <UsersIcon className="h-6 w-6" />
           ) : (
             <TokenIcon className="h-6 w-6 fill-fgd-1" />
