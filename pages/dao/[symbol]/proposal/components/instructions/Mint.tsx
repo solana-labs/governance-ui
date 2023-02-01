@@ -1,16 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react'
 import Input from 'components/inputs/Input'
 import useRealm from 'hooks/useRealm'
-import { AccountInfo } from '@solana/spl-token'
 import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import { PublicKey } from '@solana/web3.js'
 import { precision } from 'utils/formatting'
-import { tryParseDomain, tryParseKey } from 'tools/validators/pubkey'
 import useWalletStore from 'stores/useWalletStore'
-import { TokenProgramAccount, tryGetTokenAccount } from '@utils/tokens'
 import { UiInstruction, MintForm } from 'utils/uiTypes/proposalCreationTypes'
 import { getAccountName } from 'components/instructions/tools'
-import { debounce } from 'utils/debounce'
 import { NewProposalContext } from '../../new'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
@@ -19,6 +15,7 @@ import { getMintSchema } from 'utils/validations'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { getMintInstruction } from 'utils/instructionTools'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
+import { useDestination } from '@hooks/useDestination'
 
 const Mint = ({
   index,
@@ -48,12 +45,8 @@ const Mint = ({
   const [governedAccount, setGovernedAccount] = useState<
     ProgramAccount<Governance> | undefined
   >(undefined)
-  const [
-    destinationAccount,
-    setDestinationAccount,
-  ] = useState<TokenProgramAccount<AccountInfo> | null>(null)
-  const [destinationAddress, setDestinationAddress] = useState('')
   const [formErrors, setFormErrors] = useState({})
+  const [address, setAddress] = useState('')
   const mintMinAmount = form.mintAccount
     ? getMintMinAmountAsDecimal(form.mintAccount.extensions.mint!.account)
     : 1
@@ -63,6 +56,11 @@ const Mint = ({
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
+  const { destinationAccount, destinationAddress } = useDestination(
+    connection.current,
+    address
+  )
+
   const setAmount = (event) => {
     const value = event.target.value
     handleSetForm({
@@ -105,33 +103,12 @@ const Mint = ({
 
   useEffect(() => {
     if (destinationAddress) {
-      debounce.debounceFcn(async () => {
-        let pubKey: PublicKey | null = null
-        if (destinationAddress.trim().toLowerCase().endsWith('.sol')) {
-          pubKey = await tryParseDomain(destinationAddress)
-        } else {
-          pubKey = tryParseKey(destinationAddress)
-        }
-
-        handleSetForm({
-          value: pubKey?.toBase58() ?? '',
-          propertyName: 'destinationAccount',
-        })
-
-        if (pubKey) {
-          const account = await tryGetTokenAccount(connection.current, pubKey)
-          setDestinationAccount(account ? account : null)
-        } else {
-          setDestinationAccount(null)
-        }
-      })
-    } else {
-      setDestinationAccount(null)
-
       handleSetForm({
-        value: '',
+        value: destinationAddress.toBase58(),
         propertyName: 'destinationAccount',
       })
+    } else {
+      handleSetForm({ value: '', propertyName: 'destinationAccount' })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [destinationAddress])
@@ -149,7 +126,7 @@ const Mint = ({
   const destinationAccountName =
     destinationAccount?.publicKey &&
     getAccountName(destinationAccount?.account.address)
-  const destinationAddressParsed = destinationAddress.endsWith('.sol')
+  const destinationAddressParsed = address.endsWith('.sol')
     ? form.destinationAccount
     : undefined
   const schema = getMintSchema({ form, connection })
@@ -169,14 +146,14 @@ const Mint = ({
       ></GovernedAccountSelect>
       <Input
         label="Destination account"
-        value={destinationAddress}
+        value={address}
         type="text"
-        onChange={(e) => setDestinationAddress(e.target.value)}
+        onChange={(e) => setAddress(e.target.value)}
         error={formErrors['destinationAccount']}
       />
       {destinationAddressParsed && (
         <div>
-          <div className="pb-0.5 text-fgd-3 text-xs">{destinationAddress}</div>
+          <div className="pb-0.5 text-fgd-3 text-xs">{address}</div>
           <div className="text-xs">{destinationAddressParsed}</div>
         </div>
       )}

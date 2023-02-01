@@ -30,7 +30,6 @@ export const tryParseDomain = async (
 
     return publicKey ?? null
   } catch (error) {
-    console.log('🚀 ~ file: pubkey.ts:32 ~ error', error)
     return null
   }
 }
