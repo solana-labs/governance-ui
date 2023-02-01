@@ -74,11 +74,13 @@ const AddMemberForm = ({ close }) => {
 
   const currentPrecision = precision(mintMinAmount)
 
-  const proposalTitle = `Add council member ${
-    form.destinationAccount
-      ? abbreviateAddress(new PublicKey(form.destinationAccount))
-      : ''
-  }`
+  let x: string
+  try {
+    x = abbreviateAddress(new PublicKey(form.destinationAccount))
+  } catch {
+    x = ''
+  }
+  const proposalTitle = `Add council member ${x}`
 
   const setAmount = (event) => {
     const value = event.target.value
