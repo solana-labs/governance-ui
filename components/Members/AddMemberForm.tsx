@@ -145,6 +145,8 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
 
       const goofySillyArrayForBuilderPattern = []
       const tokenMint = mintAccount.governance.account.governedAccount
+
+      // eslint-disable-next-line
       const tokenOwnerRecordPk = await withDepositGoverningTokens(
         goofySillyArrayForBuilderPattern,
         programId,
@@ -154,11 +156,13 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
         tokenMint,
         new PublicKey(form.destinationAccount),
         mintAccount.governance.pubkey,
-        wallet.publicKey,
+        new PublicKey(form.destinationAccount),
         new BN(form.amount ?? 1)
       )
       const ix = goofySillyArrayForBuilderPattern[0]
 
+      // This is not needed if we make the recipient a signer, which we do now
+      /* 
       const prerequisiteInstructions: TransactionInstruction[] = []
       // now we have to see if recipient has token owner record already or not.
       // this is due to a bug -- unnecessary signer check in program if there's not a token owner record.
@@ -174,13 +178,13 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
           tokenMint,
           wallet.publicKey
         )
-      }
+      } */
 
       return {
         serializedInstruction: serializeInstructionToBase64(ix),
         isValid: true,
         governance: mintAccount.governance,
-        prerequisiteInstructions,
+        //prerequisiteInstructions,
       }
     } else {
       const mintInstruction = await getMintInstruction({
