@@ -95,6 +95,7 @@ export function Form(props: Props) {
               className="mb-8"
               councilRules={props.councilRules}
               currentCouncilRules={props.currentCouncilRules}
+              currentCommunityRules={props.currentCommunityRules}
               programVersion={props.programVersion}
               onCouncilRulesChange={props.onCouncilRulesChange}
             />
@@ -120,6 +121,7 @@ export function Form(props: Props) {
           <CommunityDetails
             communityRules={props.communityRules}
             currentCommunityRules={props.currentCommunityRules}
+            currentCouncilRules={props.currentCouncilRules}
             programVersion={props.programVersion}
             onCommunityRulesChange={props.onCommunityRulesChange}
           />
