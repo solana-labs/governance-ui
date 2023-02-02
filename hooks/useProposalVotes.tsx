@@ -139,9 +139,7 @@ export default function useProposalVotes(proposal?: Proposal) {
     vetoMintInfo.decimals
   )
   // its impossible to accurately know the veto votes required for a finalized, non-vetoed proposal
-  const finalizedAndNotVetoed =
-    proposal.isVoteFinalized() && proposal.state !== ProposalState.Vetoed
-  if (finalizedAndNotVetoed)
+  if (proposal.isVoteFinalized() && proposal.state !== ProposalState.Vetoed)
     return {
       _programVersion: programVersion,
       ...results,
