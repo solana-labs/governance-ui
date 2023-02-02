@@ -31,6 +31,8 @@ import useCreateProposal from '@hooks/useCreateProposal'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useProgramVersion from '@hooks/useProgramVersion'
 import BN from 'bn.js'
+import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
+import BigNumber from 'bignumber.js'
 
 interface AddMemberForm extends Omit<MintForm, 'mintAccount'> {
   description: string
@@ -55,7 +57,8 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const { symbol } = router.query
 
-  const { realmInfo, canChooseWhoVote, councilMint, realm } = useRealm()
+  const { realmInfo, canChooseWhoVote, realm } = useRealm()
+  const { data: mintInfo } = useMintInfoByPubkeyQuery(mintAccount.pubkey)
 
   const programId: PublicKey | undefined = realmInfo?.programId
 
@@ -69,19 +72,28 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
 
   const schema = getMintSchema({ form, connection })
 
-  const mintMinAmount = mintAccount
-    ? getMintMinAmountAsDecimal(councilMint!)
+  const mintMinAmount = mintInfo?.found
+    ? new BigNumber(1).shiftedBy(mintInfo.result.decimals).toNumber()
     : 1
 
   const currentPrecision = precision(mintMinAmount)
 
-  let x: string
+  const govpop =
+    realm !== undefined &&
+    (mintAccount.pubkey.equals(realm.account.communityMint)
+      ? 'community '
+      : realm.account.config.councilMint &&
+        mintAccount.pubkey.equals(realm.account.config.councilMint)
+      ? 'council '
+      : '')
+  let abbrevAddress: string
   try {
-    x = abbreviateAddress(new PublicKey(form.destinationAccount))
+    abbrevAddress = abbreviateAddress(new PublicKey(form.destinationAccount))
   } catch {
-    x = ''
+    abbrevAddress = ''
   }
-  const proposalTitle = `Add council member ${x}`
+  // note the lack of space is not a typo
+  const proposalTitle = `Add ${govpop}member ${abbrevAddress}`
 
   const setAmount = (event) => {
     const value = event.target.value
