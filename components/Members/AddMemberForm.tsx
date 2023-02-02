@@ -155,7 +155,8 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
         new PublicKey(form.destinationAccount),
         mintAccount.governance.pubkey,
         new PublicKey(form.destinationAccount),
-        new BN(form.amount ?? 1)
+        new BN(form.amount ?? 1),
+        true // make recipient a signer
       )
       const ix = goofySillyArrayForBuilderPattern[0]
 
