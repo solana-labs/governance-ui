@@ -1,9 +1,8 @@
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js'
 import useRealm from 'hooks/useRealm'
 import Input from 'components/inputs/Input'
 import Button, { SecondaryButton } from '@components/Button'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
-import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import { abbreviateAddress, precision } from 'utils/formatting'
 import useWalletStore from 'stores/useWalletStore'
 import { getMintSchema } from 'utils/validations'
@@ -15,7 +14,6 @@ import {
   Governance,
   ProgramAccount,
   serializeInstructionToBase64,
-  withCreateTokenOwnerRecord,
   withDepositGoverningTokens,
 } from '@solana/spl-governance'
 import { useRouter } from 'next/router'
