@@ -250,13 +250,13 @@ export function App(props: Props) {
           <ThemeProvider defaultTheme="Dark">
             <WalletIdentityProvider appName={'Realms'}>
               <WalletProvider>
-              <GatewayProvider>
-                <NavBar />
-                <Notifications />
-                <TransactionLoader></TransactionLoader>
-                <NftVotingCountingModal />
-                <PageBodyContainer>{props.children}</PageBodyContainer>
-              </GatewayProvider>
+                <GatewayProvider>
+                  <NavBar />
+                  <Notifications />
+                  <TransactionLoader></TransactionLoader>
+                  <NftVotingCountingModal />
+                  <PageBodyContainer>{props.children}</PageBodyContainer>
+                </GatewayProvider>
               </WalletProvider>
             </WalletIdentityProvider>
           </ThemeProvider>

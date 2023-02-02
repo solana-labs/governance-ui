@@ -58,9 +58,6 @@ export default function useInitWallet() {
     wallets,
   ])
 
-  useEffect(() => {
-  }, [selectedProviderUrl, wallets])
-
   // save selection in local storage
   useEffect(() => {
     if (selectedProviderUrl && selectedProviderUrl != savedProviderUrl) {
