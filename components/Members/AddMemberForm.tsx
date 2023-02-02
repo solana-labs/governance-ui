@@ -68,7 +68,7 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
     title: '',
   })
 
-  const schema = getMintSchema({ form, connection })
+  const schema = getMintSchema({ form: { ...form, mintAccount }, connection })
 
   const mintMinAmount = mintInfo?.found
     ? new BigNumber(1).shiftedBy(mintInfo.result.decimals).toNumber()
@@ -379,18 +379,24 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
 const useCouncilMintAccount = () => {
   const { realm } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
-  const councilMintAccount = useMemo(() => {
-    assetAccounts.find(
-      (x) =>
-        x.governance?.account.governedAccount.toBase58() ===
-        realm?.account.config.councilMint?.toBase58()
-    )
-  }, [assetAccounts, realm?.account.config.councilMint])
+  const councilMintAccount = useMemo(
+    () =>
+      assetAccounts.find(
+        (x) =>
+          x.governance?.account.governedAccount.toBase58() ===
+          realm?.account.config.councilMint?.toBase58()
+      ),
+    [assetAccounts, realm?.account.config.councilMint]
+  )
   return councilMintAccount
 }
 export const AddCouncilMemberForm: FC<{ close: () => void }> = (props) => {
   const councilMintAccount = useCouncilMintAccount()
-  return <AddMemberForm {...props} mintAccount={councilMintAccount} />
+  return councilMintAccount ? (
+    <AddMemberForm {...props} mintAccount={councilMintAccount} />
+  ) : (
+    <div>Council not found</div>
+  )
 }
 
 export default AddMemberForm
