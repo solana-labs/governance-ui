@@ -7,7 +7,7 @@ import { isFormValid } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { Governance } from '@solana/spl-governance'
+import { Governance, SYSTEM_PROGRAM_ID } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
@@ -17,15 +17,19 @@ import InstructionForm, {
   InstructionInputType,
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 
-interface TokenRegisterTrustlessForm {
-  governedAccount: AssetAccount | null
-  mintPk: string
-  oraclePk: string
+type NamePkVal = {
   name: string
+  value: PublicKey
 }
 
-const TokenRegisterTrustless = ({
+interface TokenAddBankForm {
+  governedAccount: AssetAccount | null
+  token: null | NamePkVal
+}
+
+const TokenAddBank = ({
   index,
   governance,
 }: {
@@ -33,19 +37,18 @@ const TokenRegisterTrustless = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { mangoClient, mangoGroup } = UseMangoV4()
+  const { mangoGroup, mangoClient } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
     (x) => x.type === AccountType.SOL
   )
+  const [tokens, setTokens] = useState<NamePkVal[]>([])
   const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<TokenRegisterTrustlessForm>({
+  const [form, setForm] = useState<TokenAddBankForm>({
     governedAccount: null,
-    mintPk: '',
-    oraclePk: '',
-    name: '',
+    token: null,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -67,17 +70,26 @@ const TokenRegisterTrustless = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const tokenIndex = mangoGroup!.banksMapByName.size
-      //Mango instruction call and serialize
+      const token = mangoGroup!.banksMapByMint.get(
+        form.token!.value.toBase58()
+      )![0]
+      const mintInfo = mangoGroup!.mintInfosMapByTokenIndex.get(
+        token.tokenIndex
+      )
+      const banks = mangoGroup!.banksMapByTokenIndex.get(token.tokenIndex)
       const ix = await mangoClient!.program.methods
-        .tokenRegisterTrustless(tokenIndex, form.name)
+        .tokenAddBank(Number(token.tokenIndex), Number(banks!.length))
         .accounts({
           group: mangoGroup!.publicKey,
-          fastListingAdmin: form.governedAccount.extensions.transferAddress,
-          mint: new PublicKey(form.mintPk),
-          oracle: new PublicKey(form.oraclePk),
+          admin: form.governedAccount.extensions.transferAddress,
+          mint: token.mint,
           payer: form.governedAccount.extensions.transferAddress,
           rent: SYSVAR_RENT_PUBKEY,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          systemProgram: SYSTEM_PROGRAM_ID,
+          existingBank: banks![banks!.length - 1].publicKey,
+          mintInfo: mintInfo!.publicKey,
+          vault: token.vault,
         })
         .instruction()
 
@@ -104,6 +116,21 @@ const TokenRegisterTrustless = ({
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
+
+  useEffect(() => {
+    const getTokens = async () => {
+      const currentTokens = [...mangoGroup!.banksMapByMint.values()].map(
+        (x) => ({
+          name: x[0].name,
+          value: x[0].mint,
+        })
+      )
+      setTokens(currentTokens)
+    }
+    if (mangoGroup) {
+      getTokens()
+    }
+  }, [mangoGroup?.publicKey.toBase58()])
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
@@ -121,22 +148,11 @@ const TokenRegisterTrustless = ({
       options: governedProgramAccounts,
     },
     {
-      label: 'Mint PublicKey',
-      initialValue: form.mintPk,
-      type: InstructionInputType.INPUT,
-      name: 'mintPk',
-    },
-    {
-      label: 'Oracle PublicKey',
-      initialValue: form.oraclePk,
-      type: InstructionInputType.INPUT,
-      name: 'oraclePk',
-    },
-    {
-      label: 'Token Name',
-      initialValue: form.name,
-      type: InstructionInputType.INPUT,
-      name: 'name',
+      label: 'Tokens',
+      name: 'token',
+      type: InstructionInputType.SELECT,
+      initialValue: form.token,
+      options: tokens,
     },
   ]
 
@@ -155,4 +171,4 @@ const TokenRegisterTrustless = ({
   )
 }
 
-export default TokenRegisterTrustless
+export default TokenAddBank

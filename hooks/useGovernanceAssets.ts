@@ -209,7 +209,6 @@ export default function useGovernanceAssets() {
     },
     [PackageEnum.MangoMarketV4]: {
       name: 'Mango Market v4',
-      isVisible: symbol === 'MNGO',
       image: '/img/mango.png',
     },
     [PackageEnum.MeanFinance]: {
@@ -564,87 +563,87 @@ export default function useGovernanceAssets() {
 
     [Instructions.ClaimMangoTokens]: {
       name: 'Claim Tokens',
-      isVisible: canUseTokenTransferInstruction,
+      isVisible: false,
       packageId: PackageEnum.MangoMarketV3,
     },
     [Instructions.DepositToMangoAccount]: {
       name: 'Deposit to mango account',
-      isVisible: canUseTokenTransferInstruction,
+      isVisible: false,
       packageId: PackageEnum.MangoMarketV3,
     },
     [Instructions.DepositToMangoAccountCsv]: {
       name: 'Deposit to mango account with CSV',
-      isVisible: canUseTokenTransferInstruction,
+      isVisible: false,
       packageId: PackageEnum.MangoMarketV3,
     },
     [Instructions.MangoAddOracle]: {
       name: 'Add Oracle',
-      isVisible: canUseProgramUpgradeInstruction,
+      isVisible: false,
       packageId: PackageEnum.MangoMarketV3,
     },
     [Instructions.MangoAddSpotMarket]: {
       name: 'Add Spot Market',
-      isVisible: canUseProgramUpgradeInstruction,
+      isVisible: false,
       packageId: PackageEnum.MangoMarketV3,
     },
     [Instructions.MangoChangeMaxAccounts]: {
       name: 'Change Max Accounts',
-      isVisible: canUseProgramUpgradeInstruction,
+      isVisible: false,
       packageId: PackageEnum.MangoMarketV3,
     },
     [Instructions.MangoChangePerpMarket]: {
       name: 'Change Perp Market',
-      isVisible: canUseProgramUpgradeInstruction,
+      isVisible: false,
       packageId: PackageEnum.MangoMarketV3,
     },
     [Instructions.MangoChangeQuoteParams]: {
       name: 'Change Quote Params',
-      isVisible: canUseProgramUpgradeInstruction,
+      isVisible: false,
       packageId: PackageEnum.MangoMarketV3,
     },
     [Instructions.MangoChangeReferralFeeParams]: {
       name: 'Change Referral Fee Params',
-      isVisible: canUseProgramUpgradeInstruction,
+      isVisible: false,
       packageId: PackageEnum.MangoMarketV3,
     },
     [Instructions.MangoChangeReferralFeeParams2]: {
       name: 'Change Referral Fee Params V2',
-      isVisible: canUseProgramUpgradeInstruction,
+      isVisible: false,
       packageId: PackageEnum.MangoMarketV3,
     },
     [Instructions.MangoChangeSpotMarket]: {
       name: 'Change Spot Market',
-      isVisible: canUseProgramUpgradeInstruction,
+      isVisible: false,
       packageId: PackageEnum.MangoMarketV3,
     },
     [Instructions.MangoCreatePerpMarket]: {
       name: 'Create Perp Market',
-      isVisible: canUseProgramUpgradeInstruction,
+      isVisible: false,
       packageId: PackageEnum.MangoMarketV3,
     },
     [Instructions.MangoRemoveOracle]: {
       name: 'Remove Oracle',
-      isVisible: canUseProgramUpgradeInstruction,
+      isVisible: false,
       packageId: PackageEnum.MangoMarketV3,
     },
     [Instructions.MangoRemovePerpMarket]: {
       name: 'Remove Perp Market',
-      isVisible: canUseProgramUpgradeInstruction,
+      isVisible: false,
       packageId: PackageEnum.MangoMarketV3,
     },
     [Instructions.MangoRemoveSpotMarket]: {
       name: 'Remove Spot Market',
-      isVisible: canUseProgramUpgradeInstruction,
+      isVisible: false,
       packageId: PackageEnum.MangoMarketV3,
     },
     [Instructions.MangoSetMarketMode]: {
       name: 'Set Market Mode',
-      isVisible: canUseProgramUpgradeInstruction,
+      isVisible: false,
       packageId: PackageEnum.MangoMarketV3,
     },
     [Instructions.MangoSwapSpotMarket]: {
       name: 'Swap Spot Market',
-      isVisible: canUseProgramUpgradeInstruction,
+      isVisible: false,
       packageId: PackageEnum.MangoMarketV3,
     },
 
@@ -657,30 +656,75 @@ export default function useGovernanceAssets() {
     */
 
     [Instructions.MangoV4PerpCreate]: {
-      name: 'Perp Create',
+      name: 'Create Perp',
       packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
     },
     [Instructions.MangoV4PerpEdit]: {
-      name: 'Perp Edit',
+      name: 'Edit Perp',
       packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
     },
-    [Instructions.MangoV4Serum3RegisterMarket]: {
-      name: 'Serum 3 Register Market',
+    [Instructions.MangoV4OpenBookRegisterMarket]: {
+      name: 'Register Openbook Market',
       packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
     },
     [Instructions.MangoV4TokenEdit]: {
-      name: 'Token Edit',
+      name: 'Edit Token',
       packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
     },
     [Instructions.MangoV4TokenRegister]: {
-      name: 'Token Register',
+      name: 'Register Token',
       packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
     },
     [Instructions.MangoV4TokenRegisterTrustless]: {
-      name: 'Token Register Trustless',
+      name: 'Register Trustless Token',
       packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
     },
-
+    [Instructions.MangoV4GroupEdit]: {
+      name: 'Edit Group',
+      packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
+    },
+    [Instructions.MangoV4OpenBookEditMarket]: {
+      name: 'Edit Openbook Market',
+      packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
+    },
+    [Instructions.MangoV4IxGateSet]: {
+      name: 'Enable/Disable individual instructions in Group',
+      packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
+    },
+    [Instructions.MangoV4StubOracleCreate]: {
+      name: 'Create Stub Oracle',
+      packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
+    },
+    [Instructions.MangoV4StubOracleSet]: {
+      name: 'Set Stub Oracle Value',
+      packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
+    },
+    [Instructions.MangoV4AltSet]: {
+      name: 'Set Address Lookup Table for Group',
+      packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
+    },
+    [Instructions.MangoV4AltExtend]: {
+      name: 'Extend Address Lookup Table',
+      packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
+    },
+    [Instructions.MangoV4TokenAddBank]: {
+      name: 'Add additional Bank to an existing Token',
+      packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
+    },
     /*
       ███    ███ ███████  █████  ███    ██     ███████ ██ ███    ██  █████  ███    ██  ██████ ███████
       ████  ████ ██      ██   ██ ████   ██     ██      ██ ████   ██ ██   ██ ████   ██ ██      ██
@@ -719,7 +763,19 @@ export default function useGovernanceAssets() {
     */
 
     [Instructions.PsyFinanceMintAmericanOptions]: {
-      name: 'Mint American Options',
+      name: ' Mint American Options',
+      packageId: PackageEnum.PsyFinance,
+    },
+    [Instructions.PsyFinanceBurnWriterForQuote]: {
+      name: 'Claim Quote with Writer Token',
+      packageId: PackageEnum.PsyFinance,
+    },
+    [Instructions.PsyFinanceClaimUnderlyingPostExpiration]: {
+      name: 'Claim Underlying (post expiration)',
+      packageId: PackageEnum.PsyFinance,
+    },
+    [Instructions.PsyFinanceExerciseOption]: {
+      name: 'Exercise Option',
       packageId: PackageEnum.PsyFinance,
     },
 

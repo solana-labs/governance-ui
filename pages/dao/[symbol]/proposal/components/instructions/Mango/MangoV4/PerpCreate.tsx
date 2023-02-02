@@ -1,7 +1,12 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
 import useRealm from '@hooks/useRealm'
-import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js'
+import {
+  Keypair,
+  PublicKey,
+  SystemProgram,
+  TransactionInstruction,
+} from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
@@ -11,32 +16,42 @@ import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
-import { BN, I80F48 } from '@blockworks-foundation/mango-client'
+import { BN } from '@blockworks-foundation/mango-client'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, {
   InstructionInput,
   InstructionInputType,
 } from '../../FormCreator'
 import UseMangoV4 from '@hooks/useMangoV4'
-import { tryGetMint } from '@utils/tokens'
 
 interface PerpCreateForm {
   governedAccount: AssetAccount | null
-  oracleConfFilter: number
-  baseTokenName: string
+  oraclePk: string
   name: string
+  oracleConfFilter: number
+  baseDecimals: number
   quoteLotSize: number
   baseLotSize: number
-  maintAssetWeight: number
-  initAssetWeight: number
-  maintLiabWeight: number
-  initLiabWeight: number
+  maintBaseAssetWeight: number
+  initBaseAssetWeight: number
+  maintBaseLiabWeight: number
+  initBaseLiabWeight: number
+  maintPnlAssetWeight: number
+  initPnlAssetWeight: number
   liquidationFee: number
   makerFee: number
   takerFee: number
+  feePenalty: number
   minFunding: number
   maxFunding: number
   impactQuantity: number
+  groupInsuranceFund: boolean
+  settleFeeFlat: number
+  settleFeeAmountThreshold: number
+  settleFeeFractionLowHealth: number
+  settleTokenIndex: number
+  settlePnlLimitFactor: number
+  settlePnlLimitWindowSize: number
 }
 
 const PerpCreate = ({
@@ -47,32 +62,43 @@ const PerpCreate = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { getClient, ADMIN_PK, GROUP_NUM } = UseMangoV4()
+  const { mangoClient, mangoGroup, getAdditionalLabelInfo } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
-    (x) => x.type === AccountType.PROGRAM
+    (x) => x.type === AccountType.SOL
   )
   const { connection } = useWalletStore()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<PerpCreateForm>({
     governedAccount: null,
-    oracleConfFilter: 0,
-    baseTokenName: '',
+    oracleConfFilter: 0.1,
+    oraclePk: '',
     name: '',
-    quoteLotSize: 0,
-    baseLotSize: 0,
-    maintAssetWeight: 0,
-    initAssetWeight: 0,
-    maintLiabWeight: 0,
-    initLiabWeight: 0,
-    liquidationFee: 0,
-    makerFee: 0,
-    takerFee: 0,
-    minFunding: 0,
-    maxFunding: 0,
-    impactQuantity: 0,
+    baseDecimals: 6,
+    quoteLotSize: 10,
+    baseLotSize: 100,
+    maintBaseAssetWeight: 0.975,
+    initBaseAssetWeight: 0.95,
+    maintBaseLiabWeight: 1.025,
+    initBaseLiabWeight: 1.05,
+    maintPnlAssetWeight: 1,
+    initPnlAssetWeight: 1,
+    liquidationFee: 0.0125,
+    makerFee: -0.0001,
+    takerFee: 0.0004,
+    feePenalty: 5,
+    minFunding: -0.05,
+    maxFunding: 0.05,
+    impactQuantity: 100,
+    groupInsuranceFund: true,
+    settleFeeFlat: 1000,
+    settleFeeAmountThreshold: 1000000,
+    settleFeeFractionLowHealth: 0.01,
+    settleTokenIndex: 0,
+    settlePnlLimitFactor: 1.0,
+    settlePnlLimitWindowSize: 2 * 60 * 60,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -88,96 +114,104 @@ const PerpCreate = ({
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
+    let prerequisiteInstructions: TransactionInstruction[] = []
+    let prerequisiteInstructionsSigners: Keypair[] = []
     if (
       isValid &&
       programId &&
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const client = await getClient(connection, wallet)
-      const group = await client.getGroupForCreator(ADMIN_PK, GROUP_NUM)
       const bids = new Keypair()
       const asks = new Keypair()
       const eventQueue = new Keypair()
-      const perpMarketIndex = group.perpMarketsMap.size
-      const bank = group.banksMap.get(form.baseTokenName.toUpperCase())!
-      const mintInfo = group.mintInfosMap.get(bank.tokenIndex)!
-      const mint = await tryGetMint(connection.current, mintInfo.mint)
-      //Mango instruction call and serialize
-
-      //TODO dao sol account as payer
-      const ix = await client.program.methods
+      const perpMarketIndex = mangoGroup!.perpMarketsMapByName.size
+      const bookSideSize = mangoClient!.program.coder.accounts.size(
+        (mangoClient!.program.account.bookSide as any)._idlAccount
+      )
+      const eventQueueSize = mangoClient!.program.coder.accounts.size(
+        (mangoClient!.program.account.eventQueue as any)._idlAccount
+      )
+      prerequisiteInstructionsSigners = [bids, asks, eventQueue]
+      prerequisiteInstructions = [
+        SystemProgram.createAccount({
+          programId: mangoClient!.program.programId,
+          space: bookSideSize,
+          lamports: await connection.current.getMinimumBalanceForRentExemption(
+            bookSideSize
+          ),
+          fromPubkey: wallet.publicKey,
+          newAccountPubkey: bids.publicKey,
+        }),
+        SystemProgram.createAccount({
+          programId: mangoClient!.program.programId,
+          space: bookSideSize,
+          lamports: await connection.current.getMinimumBalanceForRentExemption(
+            bookSideSize
+          ),
+          fromPubkey: wallet.publicKey,
+          newAccountPubkey: asks.publicKey,
+        }),
+        SystemProgram.createAccount({
+          programId: mangoClient!.program.programId,
+          space: eventQueueSize,
+          lamports: await connection.current.getMinimumBalanceForRentExemption(
+            eventQueueSize
+          ),
+          fromPubkey: wallet.publicKey,
+          newAccountPubkey: eventQueue.publicKey,
+        }),
+      ]
+      const ix = await mangoClient!.program.methods
         .perpCreateMarket(
-          perpMarketIndex,
+          Number(perpMarketIndex),
           form.name,
           {
-            confFilter: {
-              val: I80F48.fromNumber(form.oracleConfFilter).getData(),
-            },
-          } as any, // future: nested custom types dont typecheck, fix if possible?
-          bank.tokenIndex,
-          mint!.account.decimals!,
+            confFilter: Number(form.oracleConfFilter),
+            maxStalenessSlots: null,
+          },
+          Number(form.baseDecimals),
           new BN(form.quoteLotSize),
           new BN(form.baseLotSize),
-          Number(form.maintAssetWeight),
-          Number(form.initAssetWeight),
-          Number(form.maintLiabWeight),
-          Number(form.initLiabWeight),
+          Number(form.maintBaseAssetWeight),
+          Number(form.initBaseAssetWeight),
+          Number(form.maintBaseLiabWeight),
+          Number(form.initBaseLiabWeight),
+          Number(form.maintPnlAssetWeight),
+          Number(form.initPnlAssetWeight),
           Number(form.liquidationFee),
           Number(form.makerFee),
           Number(form.takerFee),
           Number(form.minFunding),
           Number(form.maxFunding),
-          new BN(form.impactQuantity)
+          new BN(form.impactQuantity),
+          form.groupInsuranceFund,
+          Number(form.feePenalty),
+          Number(form.settleFeeFlat),
+          Number(form.settleFeeAmountThreshold),
+          Number(form.settleFeeFractionLowHealth),
+          Number(form.settleTokenIndex),
+          Number(form.settlePnlLimitFactor),
+          new BN(form.settlePnlLimitWindowSize)
         )
         .accounts({
-          group: group.publicKey,
-          admin: ADMIN_PK,
-          oracle: mintInfo.oracle,
+          group: mangoGroup!.publicKey,
+          admin: form.governedAccount.extensions.transferAddress,
+          oracle: new PublicKey(form.oraclePk),
           bids: bids.publicKey,
           asks: asks.publicKey,
           eventQueue: eventQueue.publicKey,
-          payer: wallet.publicKey,
+          payer: form.governedAccount.extensions.transferAddress,
         })
-        .preInstructions([
-          // TODO: try to pick up sizes of bookside and eventqueue from IDL, so we can stay in sync with program
-
-          // book sides
-          SystemProgram.createAccount({
-            programId: this.program.programId,
-            space: 8 + 98584,
-            lamports: await this.program.provider.connection.getMinimumBalanceForRentExemption(
-              8 + 98584
-            ),
-            fromPubkey: wallet.publicKey,
-            newAccountPubkey: bids.publicKey,
-          }),
-          SystemProgram.createAccount({
-            programId: this.program.programId,
-            space: 8 + 98584,
-            lamports: await this.program.provider.connection.getMinimumBalanceForRentExemption(
-              8 + 98584
-            ),
-            fromPubkey: wallet.publicKey,
-            newAccountPubkey: asks.publicKey,
-          }),
-          // event queue
-          SystemProgram.createAccount({
-            programId: this.program.programId,
-            space: 8 + 4 * 2 + 8 + 488 * 208,
-            lamports: await this.program.provider.connection.getMinimumBalanceForRentExemption(
-              8 + 4 * 2 + 8 + 488 * 208
-            ),
-            fromPubkey: wallet.publicKey,
-            newAccountPubkey: eventQueue.publicKey,
-          }),
-        ])
         .signers([bids, asks, eventQueue])
         .instruction()
 
       serializedInstruction = serializeInstructionToBase64(ix)
     }
     const obj: UiInstruction = {
+      prerequisiteInstructions: prerequisiteInstructions,
+      prerequisiteInstructionsSigners: prerequisiteInstructionsSigners,
+      shouldSplitIntoSeparateTxs: true,
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
@@ -215,104 +249,204 @@ const PerpCreate = ({
       options: governedProgramAccounts,
     },
     {
-      label: 'Token Name',
+      label: 'Perp Name',
       initialValue: form.name,
       type: InstructionInputType.INPUT,
       name: 'name',
     },
     {
-      label: 'Base token name',
-      initialValue: form.baseTokenName,
+      label: 'Oracle PublicKey',
+      initialValue: form.oraclePk,
       type: InstructionInputType.INPUT,
-      name: 'baseTokenName',
+      name: 'oraclePk',
     },
 
     {
-      label: 'Oracle Configuration Filter',
+      label: `Oracle Configuration Filter ${getAdditionalLabelInfo(
+        'confFilter'
+      )}`,
       initialValue: form.oracleConfFilter,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'oracleConfFilter',
     },
     {
-      label: 'Maint Asset Weight',
-      initialValue: form.maintAssetWeight,
+      label: 'Base Decimals',
+      initialValue: form.baseDecimals,
       type: InstructionInputType.INPUT,
       inputType: 'number',
-      name: 'maintAssetWeight',
+      name: 'baseDecimals',
     },
     {
-      label: 'Init Asset Weight',
-      initialValue: form.initAssetWeight,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'initAssetWeight',
-    },
-    {
-      label: 'Maint Liab Weight',
-      initialValue: form.maintLiabWeight,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'maintLiabWeight',
-    },
-    {
-      label: 'Init Liab Weight',
-      initialValue: form.initLiabWeight,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'initLiabWeight',
-    },
-    {
-      label: 'Liquidation Fee',
-      initialValue: form.liquidationFee,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'liquidationFee',
-    },
-    {
-      label: 'Quote Lot Size',
+      label: `Quote Lot Size ${getAdditionalLabelInfo('quoteLotSize')}`,
       initialValue: form.quoteLotSize,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'quoteLotSize',
     },
     {
-      label: 'Base Lot Size',
+      label: `Base Lot Size ${getAdditionalLabelInfo('baseLotSize')}`,
       initialValue: form.baseLotSize,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'baseLotSize',
     },
     {
-      label: 'Maker Fee',
+      label: `Maint Base Asset Weight ${getAdditionalLabelInfo(
+        'maintBaseAssetWeight'
+      )}`,
+      initialValue: form.maintBaseAssetWeight,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'maintBaseAssetWeight',
+    },
+    {
+      label: `Init Base Asset Weight ${getAdditionalLabelInfo(
+        'initBaseAssetWeight'
+      )}`,
+      initialValue: form.initBaseAssetWeight,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'initBaseAssetWeight',
+    },
+    {
+      label: `Init Base Liab Weight ${getAdditionalLabelInfo(
+        'initBaseLiabWeight'
+      )}`,
+      initialValue: form.initBaseLiabWeight,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'initBaseLiabWeight',
+    },
+    {
+      label: `Maint Base Liab Weight ${getAdditionalLabelInfo(
+        'maintBaseLiabWeight'
+      )}`,
+      initialValue: form.maintBaseLiabWeight,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'maintBaseLiabWeight',
+    },
+    {
+      label: `Maint Pnl Asset Weight ${getAdditionalLabelInfo(
+        'maintPnlAssetWeight'
+      )}`,
+      initialValue: form.maintPnlAssetWeight,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'maintPnlAssetWeight',
+    },
+    {
+      label: `Liquidation Fee ${getAdditionalLabelInfo('liquidationFee')}`,
+      initialValue: form.liquidationFee,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'liquidationFee',
+    },
+    {
+      label: `Init Pnl Asset Weight ${getAdditionalLabelInfo(
+        'initPnlAssetWeight'
+      )}`,
+      initialValue: form.initPnlAssetWeight,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'initPnlAssetWeight',
+    },
+    {
+      label: `Maker Fee ${getAdditionalLabelInfo('makerFee')}`,
       initialValue: form.makerFee,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'makerFee',
     },
     {
-      label: 'Taker Fee',
+      label: `Taker Fee ${getAdditionalLabelInfo('takerFee')}`,
       initialValue: form.takerFee,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'takerFee',
     },
     {
-      label: 'Min Funding',
+      label: `Fee Penalty ${getAdditionalLabelInfo('feePenalty')}`,
+      initialValue: form.feePenalty,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'feePenalty',
+    },
+    {
+      label: `Group Insurance Fund ${getAdditionalLabelInfo(
+        'groupInsuranceFund'
+      )}`,
+      initialValue: form.groupInsuranceFund,
+      type: InstructionInputType.SWITCH,
+      name: 'groupInsuranceFund',
+    },
+    {
+      label: `Settle Fee Flat ${getAdditionalLabelInfo('settleFeeFlat')}`,
+      initialValue: form.settleFeeFlat,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'settleFeeFlat',
+    },
+    {
+      label: `Settle Fee Amount Threshold ${getAdditionalLabelInfo(
+        'settleFeeAmountThreshold'
+      )}`,
+      initialValue: form.settleFeeAmountThreshold,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'settleFeeAmountThreshold',
+    },
+    {
+      label: `Settle Fee Fraction Low Health ${getAdditionalLabelInfo(
+        'settleFeeFractionLowHealth'
+      )}`,
+      initialValue: form.settleFeeFractionLowHealth,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'settleFeeFractionLowHealth',
+    },
+    {
+      label: `Settle Token Index ${getAdditionalLabelInfo('settleTokenIndex')}`,
+      initialValue: form.settleTokenIndex,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'settleTokenIndex',
+    },
+    {
+      label: `Settle Pnl Limit Factor ${getAdditionalLabelInfo(
+        'settlePnlLimitFactor'
+      )}`,
+      initialValue: form.settlePnlLimitFactor,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'settlePnlLimitFactor',
+    },
+    {
+      label: `Settle Pnl Limit Window Size ${getAdditionalLabelInfo(
+        'settlePnlLimitWindowSize'
+      )}`,
+      initialValue: form.settlePnlLimitWindowSize,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'settlePnlLimitWindowSize',
+    },
+    {
+      label: `Min Funding ${getAdditionalLabelInfo('minFunding')}`,
       initialValue: form.minFunding,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'minFunding',
     },
     {
-      label: 'Max Funding',
+      label: `Max Funding ${getAdditionalLabelInfo('maxFunding')}`,
       initialValue: form.maxFunding,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'maxFunding',
     },
     {
-      label: 'Impact Quantity',
+      label: `Impact Quantity ${getAdditionalLabelInfo('impactQuantity')}`,
       initialValue: form.impactQuantity,
       type: InstructionInputType.INPUT,
       inputType: 'number',

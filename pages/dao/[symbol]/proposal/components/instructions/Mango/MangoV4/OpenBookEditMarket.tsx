@@ -17,18 +17,20 @@ import InstructionForm, {
   InstructionInputType,
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
-import { SERUM3_PROGRAM_ID } from '@blockworks-foundation/mango-v4'
+import { MarketIndex } from '@blockworks-foundation/mango-v4/dist/types/src/accounts/serum3'
 
-interface Serum3RegisterMarketForm {
-  governedAccount: AssetAccount | null
-  serum3MarketExternalPk: string
-  baseBankTokenName: string
-  quoteBankTokenName: string
-  marketIndex: number
+type NameMarketIndexVal = {
   name: string
+  value: MarketIndex
 }
 
-const EditToken = ({
+interface OpenBookEditMarketForm {
+  governedAccount: AssetAccount | null
+  market: NameMarketIndexVal | null
+  reduceOnly: boolean
+}
+
+const OpenBookEditMarket = ({
   index,
   governance,
 }: {
@@ -36,23 +38,20 @@ const EditToken = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { getClient, ADMIN_PK, GROUP_NUM } = UseMangoV4()
+  const { mangoClient, mangoGroup } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
-    (x) => x.type === AccountType.PROGRAM
+    (x) => x.type === AccountType.SOL
   )
-  const { connection } = useWalletStore()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<Serum3RegisterMarketForm>({
+  const [form, setForm] = useState<OpenBookEditMarketForm>({
     governedAccount: null,
-    serum3MarketExternalPk: '',
-    baseBankTokenName: '',
-    quoteBankTokenName: '',
-    marketIndex: 0,
-    name: '',
+    reduceOnly: false,
+    market: null,
   })
+  const [currentMarkets, setCurrentMarkets] = useState<NameMarketIndexVal[]>([])
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
   const handleSetForm = ({ propertyName, value }) => {
@@ -73,23 +72,16 @@ const EditToken = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const client = await getClient(connection, wallet)
-      const group = await client.getGroupForCreator(ADMIN_PK, GROUP_NUM)
-      const marketIndex = group.serum3MarketsMap.size
-      //TODO dao sol account as payer
-      //Mango instruction call and serialize
-      const ix = await client.program.methods
-        .serum3RegisterMarket(marketIndex, form.name)
+      const market = mangoGroup!.serum3MarketsMapByMarketIndex.get(
+        Number(form.market?.value)
+      )
+
+      const ix = await mangoClient!.program.methods
+        .serum3EditMarket(form.reduceOnly)
         .accounts({
-          group: group.publicKey,
-          admin: ADMIN_PK,
-          serumProgram: SERUM3_PROGRAM_ID[connection.cluster],
-          serumMarketExternal: new PublicKey(form.serum3MarketExternalPk),
-          baseBank: group.banksMap.get(form.baseBankTokenName.toUpperCase())!
-            .publicKey,
-          quoteBank: group.banksMap.get(form.quoteBankTokenName.toUpperCase())!
-            .publicKey,
-          payer: wallet.publicKey,
+          group: mangoGroup!.publicKey,
+          admin: form.governedAccount.extensions.transferAddress,
+          market: market!.publicKey,
         })
         .instruction()
 
@@ -116,6 +108,34 @@ const EditToken = ({
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
+  useEffect(() => {
+    const getMarkets = async () => {
+      const markets = [...mangoGroup!.serum3MarketsMapByExternal.values()].map(
+        (x) => ({
+          name: x.name,
+          value: x.marketIndex,
+        })
+      )
+      setCurrentMarkets(markets)
+    }
+    if (mangoGroup) {
+      getMarkets()
+    }
+  }, [mangoGroup?.publicKey.toBase58()])
+  useEffect(() => {
+    const getCurrentMarketProps = () => {
+      const market = mangoGroup!.serum3MarketsMapByMarketIndex.get(
+        Number(form.market?.value)
+      )
+      setForm({
+        ...form,
+        reduceOnly: market?.reduceOnly || false,
+      })
+    }
+    if (form.market && mangoGroup) {
+      getCurrentMarketProps()
+    }
+  }, [form.market?.value])
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
@@ -133,28 +153,17 @@ const EditToken = ({
       options: governedProgramAccounts,
     },
     {
-      label: 'Name',
-      initialValue: form.name,
-      type: InstructionInputType.INPUT,
-      name: 'name',
+      label: 'Market',
+      name: 'market',
+      type: InstructionInputType.SELECT,
+      initialValue: form.market,
+      options: currentMarkets,
     },
     {
-      label: 'Serum 3 Market External Pk',
-      initialValue: form.serum3MarketExternalPk,
-      type: InstructionInputType.INPUT,
-      name: 'serum3MarketExternalPk',
-    },
-    {
-      label: 'Base Bank Token Name',
-      initialValue: form.baseBankTokenName,
-      type: InstructionInputType.INPUT,
-      name: 'baseBankTokenName',
-    },
-    {
-      label: 'Quote Bank Token Name',
-      initialValue: form.quoteBankTokenName,
-      type: InstructionInputType.INPUT,
-      name: 'quoteBankTokenName',
+      label: 'Reduce Only',
+      initialValue: form.reduceOnly,
+      type: InstructionInputType.SWITCH,
+      name: 'reduceOnly',
     },
   ]
 
@@ -173,4 +182,4 @@ const EditToken = ({
   )
 }
 
-export default EditToken
+export default OpenBookEditMarket
