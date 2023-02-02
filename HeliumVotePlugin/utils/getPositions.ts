@@ -3,10 +3,10 @@ import { keypairIdentity, Metaplex } from '@metaplex-foundation/js'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import { registrarKey, positionKey } from '@helium/voter-stake-registry-sdk'
 import { tryGetMint } from '@utils/tokens'
-import { chunks } from './chunks'
 import { calcPositionVotingPower } from './calcPositionVotingPower'
 import { HeliumVsrClient } from '../sdk/client'
 import { Registrar, Position, PositionWithVotingMint } from '../sdk/types'
+import { chunks } from '@utils/helpers'
 
 export interface GetPositionsArgs {
   realmPk: PublicKey

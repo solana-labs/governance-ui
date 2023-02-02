@@ -13,7 +13,7 @@ export class HeliumVsrClient {
     devnet?: boolean
   ): Promise<HeliumVsrClient> {
     return new HeliumVsrClient(
-      (await init(provider as any, PROGRAM_ID)) as any,
+      (await init(provider as any, PROGRAM_ID, null)) as any,
       devnet
     )
   }

@@ -75,6 +75,7 @@ export class VoteRegistryVoterWeight implements VoterWeightInterface {
       this.communityTokenRecord && this.votingPower.cmp(minCommunityWeight) >= 0
     )
   }
+
   hasMinCouncilWeight(minCouncilWeight: BN) {
     return (
       this.councilTokenRecord &&
@@ -90,6 +91,7 @@ export class VoteRegistryVoterWeight implements VoterWeightInterface {
       this.hasMinCouncilWeight(config.minCouncilTokensToCreateProposal)
     )
   }
+
   canCreateGovernanceUsingCommunityTokens(realm: ProgramAccount<Realm>) {
     return this.hasMinCommunityWeight(
       realm.account.config.minCommunityTokensToCreateGovernance

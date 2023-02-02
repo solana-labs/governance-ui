@@ -27,6 +27,7 @@ import { sendTransaction } from '@utils/send'
 import { NftVoterClient } from '@solana/governance-program-library'
 import { calcCostOfNftVote, checkHasEnoughSolToVote } from '@tools/nftVoteCalc'
 import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
+import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 
 const getVetoTokenMint = (
   proposal: ProgramAccount<Proposal>,
@@ -149,29 +150,90 @@ export async function castVote(
     )
   }
 
-  const shouldChunk = votingPlugin?.client instanceof NftVoterClient
+  const ixChunkCount = message ? 4 : 2
+  const isNftVoter = votingPlugin?.client instanceof NftVoterClient
+  const isHeliumVoter = votingPlugin?.client instanceof HeliumVsrClient
 
-  const instructionsCountThatMustHaveTheirOwnChunk = message ? 4 : 2
-  if (shouldChunk) {
+  if (!isNftVoter && !isHeliumVoter) {
+    const transaction = new Transaction()
+    transaction.add(...instructions)
+
+    await sendTransaction({ transaction, wallet, connection, signers })
+  }
+
+  // we need to chunk instructions
+  if (isHeliumVoter) {
+    // TODO (Bry): Move logic to Hvsr?
+    const {
+      openNftVotingCountingModal,
+      // closeNftVotingCountingModal,
+    } = useNftProposalStore.getState()
+
+    //update voter weight + cast vote from spl gov need to be in one transaction
+    const ixsWithOwnChunk = instructions.slice(-ixChunkCount)
+    const remainingIxsToChunk = instructions.slice(
+      0,
+      instructions.length - ixChunkCount
+    )
+
+    const splIxsWithAccountsChunk = chunks(ixsWithOwnChunk, 2)
+    const positionsAccountsChunks = chunks(remainingIxsToChunk, 2)
+    const ixsChunks = [
+      ...positionsAccountsChunks.map((txBatch, batchIdx) => {
+        return {
+          instructionsSet: txBatchesToInstructionSetWithSigners(
+            txBatch,
+            [],
+            batchIdx
+          ),
+          sequenceType: SequenceType.Parallel,
+        }
+      }),
+      ...splIxsWithAccountsChunk.map((txBatch, batchIdx) => {
+        return {
+          instructionsSet: txBatchesToInstructionSetWithSigners(
+            txBatch,
+            message ? [[], signers] : [],
+            batchIdx
+          ),
+          sequenceType: SequenceType.Sequential,
+        }
+      }),
+    ]
+
+    await sendTransactionsV3({
+      connection,
+      wallet,
+      transactionInstructions: ixsChunks,
+      callbacks: {
+        afterFirstBatchSign: () =>
+          ixsChunks.length > 2 ? openNftVotingCountingModal() : null,
+        afterAllTxConfirmed: () =>
+          runAfterConfirmation ? runAfterConfirmation() : null,
+        // closeNftVotingCountingModal(
+        //   votingPlugin.client as NftVoterClient,
+        //   proposal,
+        //   wallet.publicKey!
+        // )
+      },
+    })
+  }
+
+  // we need to chunk instructions
+  if (isNftVoter) {
     const {
       openNftVotingCountingModal,
       closeNftVotingCountingModal,
     } = useNftProposalStore.getState()
     //update voter weight + cast vote from spl gov need to be in one transaction
-    const instructionsWithTheirOwnChunk = instructions.slice(
-      -instructionsCountThatMustHaveTheirOwnChunk
-    )
-    const remainingInstructionsToChunk = instructions.slice(
+    const ixsWithOwnChunk = instructions.slice(-ixChunkCount)
+    const remainingIxsToChunk = instructions.slice(
       0,
-      instructions.length - instructionsCountThatMustHaveTheirOwnChunk
+      instructions.length - ixChunkCount
     )
 
-    const splInstructionsWithAccountsChunk = chunks(
-      instructionsWithTheirOwnChunk,
-      2
-    )
-    const nftsAccountsChunks = chunks(remainingInstructionsToChunk, 2)
-
+    const splIxsWithAccountsChunk = chunks(ixsWithOwnChunk, 2)
+    const nftsAccountsChunks = chunks(remainingIxsToChunk, 2)
     const instructionsChunks = [
       ...nftsAccountsChunks.map((txBatch, batchIdx) => {
         return {
@@ -183,7 +245,7 @@ export async function castVote(
           sequenceType: SequenceType.Parallel,
         }
       }),
-      ...splInstructionsWithAccountsChunk.map((txBatch, batchIdx) => {
+      ...splIxsWithAccountsChunk.map((txBatch, batchIdx) => {
         return {
           instructionsSet: txBatchesToInstructionSetWithSigners(
             txBatch,
@@ -229,10 +291,5 @@ export async function castVote(
         },
       },
     })
-  } else {
-    const transaction = new Transaction()
-    transaction.add(...instructions)
-
-    await sendTransaction({ transaction, wallet, connection, signers })
   }
 }
