@@ -49,42 +49,37 @@ export function ProposalVoteType(props: Props) {
         icon={<WalletIcon />}
         text="Membership Voting"
       />
-      <ValueBlock
-        title="Who should vote on this proposal?"
-        description={
-          !!props.currentCouncilRules &&
-          props.currentCouncilRules.canVote &&
-          props.currentCommunityRules.canVote ? (
-            'Community or council?'
-          ) : !props.currentCouncilRules ||
-            !props.currentCouncilRules.canVote ? (
-            <div className="text-amber-400 flex items-center">
-              <WarningFilledIcon className="h-4 w-4 mr-2" />
-              <div>This wallet currently only supports community voting.</div>
-            </div>
-          ) : (
-            <div className="text-amber-400 flex items-center">
-              <WarningFilledIcon className="h-4 w-4 mr-2" />
-              <div>This wallet currently only supports council voting.</div>
-            </div>
-          )
-        }
-      >
-        <ButtonToggle
-          disableValueTrue={!props.currentCommunityRules.canVote}
-          disableValueFalse={!props.currentCouncilRules}
-          value={props.proposalVoteType === 'community'}
-          valueTrueText="Community"
-          valueFalseText="Council"
-          onChange={(value) => {
-            if (value === false && !!props.currentCouncilRules) {
-              props.onProposalVoteTypeChange?.('council');
-            } else {
-              props.onProposalVoteTypeChange?.('community');
-            }
-          }}
-        />
-      </ValueBlock>
+      {!!props.currentCouncilRules &&
+      props.currentCouncilRules.canVote &&
+      props.currentCommunityRules.canVote ? (
+        <ValueBlock
+          title="Who should vote on this proposal?"
+          description="Community or council?"
+        >
+          <ButtonToggle
+            disableValueTrue={!props.currentCommunityRules.canVote}
+            disableValueFalse={!props.currentCouncilRules}
+            value={props.proposalVoteType === 'community'}
+            valueTrueText="Community"
+            valueFalseText="Council"
+            onChange={(value) => {
+              if (value === false && !!props.currentCouncilRules) {
+                props.onProposalVoteTypeChange?.('council');
+              } else {
+                props.onProposalVoteTypeChange?.('community');
+              }
+            }}
+          />
+        </ValueBlock>
+      ) : props.proposalVoteType === 'council' ? (
+        <div className="text-white text-lg">
+          The proposal will be voted on by council members
+        </div>
+      ) : (
+        <div className="text-white text-lg">
+          The proposal will be voted on by community members
+        </div>
+      )}
       {showRules && (
         <div className="mt-8">
           <div className="flex items-center">
