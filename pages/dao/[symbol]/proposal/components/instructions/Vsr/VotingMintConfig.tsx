@@ -144,7 +144,7 @@ const VotingMintConfig = ({
     const mint = new PublicKey(form.mint)
     const baselineScaledFactor = getScaledFactor(baselineVoteWeightFactor)
     const lockedScaledFactor = getScaledFactor(lockedVoteWeightFactor)
-    const maxLockupScaledFactor = getScaledFactor(maxLockupFactor)
+    const maxLockupScaledFactor = new BN(maxLockupFactor)
     const minimumRequiredLockupSecs = new BN(
       daysToSecs(Math.ceil(yearsToDays(minimumRequiredLockup))).toString()
     )
@@ -190,7 +190,7 @@ const VotingMintConfig = ({
           lockedVoteWeightScaledFactor: lockedScaledFactor,
           minimumRequiredLockupSecs,
           maxExtraLockupVoteWeightScaledFactor: maxLockupScaledFactor,
-          genesisVotePowerMultiplier: 0,
+          genesisVotePowerMultiplier: 1,
           genesisVotePowerMultiplierExpirationTs: new BN(0),
           lockupSaturationSecs,
         })

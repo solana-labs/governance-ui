@@ -133,6 +133,7 @@ export async function castVote(
       tokeOwnerRecord,
       'commentProposal'
     )
+
     await withPostChatMessage(
       instructions,
       signers,
@@ -163,13 +164,12 @@ export async function castVote(
 
   // we need to chunk instructions
   if (isHeliumVoter) {
-    // TODO (Bry): Move logic to Hvsr?
-    const {
-      openNftVotingCountingModal,
-      // closeNftVotingCountingModal,
-    } = useNftProposalStore.getState()
+    // const {
+    //   openNftVotingCountingModal,
+    //   closeNftVotingCountingModal,
+    // } = useNftProposalStore.getState()
 
-    //update voter weight + cast vote from spl gov need to be in one transaction
+    // update voter weight + cast vote from spl gov need to be in one transaction
     const ixsWithOwnChunk = instructions.slice(-ixChunkCount)
     const remainingIxsToChunk = instructions.slice(
       0,
@@ -206,8 +206,8 @@ export async function castVote(
       wallet,
       transactionInstructions: ixsChunks,
       callbacks: {
-        afterFirstBatchSign: () =>
-          ixsChunks.length > 2 ? openNftVotingCountingModal() : null,
+        afterFirstBatchSign: () => (ixsChunks.length > 2 ? null : null),
+        // ixsChunks.length > 2 ? openNftVotingCountingModal() : null,
         afterAllTxConfirmed: () =>
           runAfterConfirmation ? runAfterConfirmation() : null,
         // closeNftVotingCountingModal(

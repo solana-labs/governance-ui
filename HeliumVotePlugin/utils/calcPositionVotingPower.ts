@@ -19,7 +19,8 @@ export const calcPositionVotingPower = ({
       minimumRequiredLockupSecs,
       lockedVoteWeightScaledFactor,
       maxExtraLockupVoteWeightScaledFactor,
-      // genesisVotePowerMultiplier,
+      // genesisVotePowerMultiplier = 1,
+      // genesisVotePowerMultiplierExpirationTs,
     } = mintCfg as VotingMintConfig
     const now = Math.round(new Date().getTime() / 1000)
     const lockup = position!.lockup

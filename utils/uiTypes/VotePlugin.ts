@@ -199,23 +199,22 @@ export class VotingClient {
 
     if (this.client instanceof HeliumVsrClient) {
       const remainingAccounts: AccountData[] = []
-      const { registrar } = await getRegistrarPDA(
+      const registrar = registrarKey(
         realm.pubkey,
         realm.account.communityMint,
         clientProgramId
-      )
+      )[0]
 
-      for (let i = 0; i < this.heliumVsrVotingPositions.length; i++) {
-        const positionAcc = this.heliumVsrVotingPositions[i]
-        const position = positionKey(positionAcc.mint, clientProgramId)[0]
+      for (const position of this.heliumVsrVotingPositions) {
+        const positionPk = positionKey(position.mint, clientProgramId)[0]
         const tokenAccount = await getAssociatedTokenAddress(
-          positionAcc.mint,
+          position.mint,
           walletPk
         )
 
         remainingAccounts.push(
           new AccountData(tokenAccount),
-          new AccountData(position)
+          new AccountData(positionPk)
         )
       }
 
@@ -250,7 +249,7 @@ export class VotingClient {
       const { registrar } = await getPluginRegistrarPDA(
         realm.pubkey,
         realm.account.communityMint,
-        this.client!.program.programId
+        clientProgramId
       )
       const {
         voterWeightPk,
@@ -407,7 +406,7 @@ export class VotingClient {
       const registrar = registrarKey(
         realm.pubkey,
         realm.account.communityMint,
-        this.client!.program.programId
+        clientProgramId
       )[0]
 
       const unusedPositions = await getUnusedPositionsForProposal({
@@ -420,7 +419,7 @@ export class VotingClient {
       for (let i = 0; i < unusedPositions.length; i++) {
         const pos = unusedPositions[i]
         const tokenAccount = await getAssociatedTokenAddress(pos.mint, walletPk)
-        const posKey = positionKey(pos.mint, this.client!.program.programId)[0]
+        const posKey = positionKey(pos.mint, clientProgramId)[0]
         const nftVoteRecord = nftVoteRecordKey(
           proposal.pubkey,
           pos.mint,
@@ -440,23 +439,42 @@ export class VotingClient {
         clientProgramId
       )[0]
 
+      const firstFivePositions = remainingAccounts.slice(0, 15)
+      const remainingPositionsChunk = chunks(
+        remainingAccounts.slice(15, remainingAccounts.length),
+        12
+      )
+
+      for (const chunk of remainingPositionsChunk) {
+        instructions.push(
+          await this.client.program.methods
+            .castVoteV0({
+              proposal: proposal.pubkey,
+              owner: walletPk,
+            })
+            .accounts({
+              registrar,
+              voterAuthority: walletPk,
+              voterTokenOwnerRecord: tokenOwnerRecord.pubkey,
+            })
+            .remainingAccounts(chunk)
+            .instruction()
+        )
+      }
+
       instructions.push(
-        ...(await Promise.all(
-          chunks(remainingAccounts, 12).map(async (chunk) =>
-            (this.client as HeliumVsrClient).program.methods
-              .castVoteV0({
-                proposal: proposal.pubkey,
-                owner: walletPk,
-              })
-              .accounts({
-                registrar,
-                voterAuthority: walletPk,
-                voterTokenOwnerRecord: tokenOwnerRecord.pubkey,
-              })
-              .remainingAccounts(chunk)
-              .instruction()
-          )
-        ))
+        await this.client.program.methods
+          .castVoteV0({
+            proposal: proposal.pubkey,
+            owner: walletPk,
+          })
+          .accounts({
+            registrar,
+            voterAuthority: walletPk,
+            voterTokenOwnerRecord: tokenOwnerRecord.pubkey,
+          })
+          .remainingAccounts(firstFivePositions)
+          .instruction()
       )
 
       return {
@@ -559,6 +577,12 @@ export class VotingClient {
       proposal.account.governingTokenMint.toBase58()
     ) {
       return
+    }
+
+    if (this.client instanceof HeliumVsrClient) {
+      //const remainingAccounts: AccountData[] = [];
+      console.log('Relinquish Logic')
+      // TODO (Bry): logic
     }
 
     if (this.client instanceof NftVoterClient) {
