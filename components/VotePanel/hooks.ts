@@ -7,6 +7,7 @@ import { useVoteRecordByPubkeyQuery } from '@hooks/queries/voteRecord'
 import { useHasVoteTimeExpired } from '@hooks/useHasVoteTimeExpired'
 import useRealm from '@hooks/useRealm'
 import { ProposalState, GoverningTokenRole } from '@solana/spl-governance'
+import dayjs from 'dayjs'
 import useWalletStore from 'stores/useWalletStore'
 
 export const useIsVoting = () => {
@@ -16,6 +17,27 @@ export const useIsVoting = () => {
   const isVoting =
     proposal?.account.state === ProposalState.Voting && !hasVoteTimeExpired
   return isVoting
+}
+
+export const useIsInCoolOffTime = () => {
+  const { governance, proposal } = useWalletStore((s) => s.selectedProposal)
+
+  const mainVotingEndedAt = proposal?.account.signingOffAt
+    ?.addn(governance?.account.config.maxVotingTime || 0)
+    .toNumber()
+
+  const votingCoolOffTime = governance?.account.config.votingCoolOffTime || 0
+  const canFinalizeAt = mainVotingEndedAt
+    ? mainVotingEndedAt + votingCoolOffTime
+    : mainVotingEndedAt
+
+  const endOfProposalAndCoolOffTime = canFinalizeAt
+    ? dayjs(1000 * canFinalizeAt!)
+    : undefined
+  const isInCoolOffTime = endOfProposalAndCoolOffTime
+    ? dayjs().isBefore(endOfProposalAndCoolOffTime)
+    : undefined
+  return !!isInCoolOffTime
 }
 
 export const useVotingPop = () => {
