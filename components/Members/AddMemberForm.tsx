@@ -31,6 +31,7 @@ import useProgramVersion from '@hooks/useProgramVersion'
 import BN from 'bn.js'
 import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
 import BigNumber from 'bignumber.js'
+import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
 
 interface AddMemberForm extends Omit<MintForm, 'mintAccount'> {
   description: string
@@ -137,7 +138,8 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
         programId === undefined ||
         realm === undefined ||
         form.destinationAccount === undefined ||
-        !wallet?.publicKey
+        !wallet?.publicKey ||
+        mintInfo?.result === undefined
       ) {
         return false
       }
@@ -156,7 +158,10 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
         new PublicKey(form.destinationAccount),
         mintAccount.governance.pubkey,
         new PublicKey(form.destinationAccount),
-        new BN(form.amount ?? 1),
+        getMintNaturalAmountFromDecimalAsBN(
+          form.amount ?? 1,
+          mintInfo?.result.decimals
+        ),
         true // make recipient a signer
       )
       const ix = goofySillyArrayForBuilderPattern[0]
