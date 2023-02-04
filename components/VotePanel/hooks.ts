@@ -37,7 +37,7 @@ export const useIsInCoolOffTime = () => {
   const isInCoolOffTime = endOfProposalAndCoolOffTime
     ? dayjs().isBefore(endOfProposalAndCoolOffTime)
     : undefined
-  return !!isInCoolOffTime
+  return !!isInCoolOffTime && proposal!.account.state !== ProposalState.Defeated
 }
 
 export const useVotingPop = () => {

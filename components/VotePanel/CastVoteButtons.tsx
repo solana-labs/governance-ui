@@ -71,7 +71,11 @@ export const CastVoteButtons = () => {
       </div>
 
       <div className="items-center justify-center flex w-full gap-5">
-        <div className="w-full flex justify-between items-center gap-5">
+        <div
+          className={`w-full flex ${
+            !isInCoolOffTime ? 'justify-between' : 'justify-center'
+          } items-center gap-5`}
+        >
           {(isVoting || !isInCoolOffTime) && (
             <Button
               tooltipMessage={tooltipContent}
