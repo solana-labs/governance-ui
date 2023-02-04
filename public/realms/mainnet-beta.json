@@ -1,5 +1,19 @@
 [
   {
+    "symbol": "CAS",
+    "displayName": "Cyborg Ape Society",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "6ENR4hciiwNTEF2NJCyCjryxVZqd2gWRV1Dt2dsrZNQt",
+    "bannerImage": "/realms/Ukraine/img/Flag_of_Ukraine.svg",
+    "ogImage": "https://static.wixstatic.com/media/a456a9_0337b7b036a142baa2abaa4b4df14f5b~mv2.gif",
+    "website": "https://cyborg-apes.com",
+    "keywords": "Crypto, Solana, SOL, SPL, Cross-Chain, Trading, Vibes, Data",
+    "twitter": "@cyborgapes_nft",
+    "discord": "https://discord.gg/9ue6ktyu",
+    "shortDescription": "Cyborg Apes Society Mission DAO",
+    "sortRank": 3
+  },
+  {
     "symbol": "Ukraine",
     "displayName": "Ukraine.SOL",
     "programId": "gUAedF544JeE6NYbQakQvribHykUNgaPJqcgf3UQVnY",
