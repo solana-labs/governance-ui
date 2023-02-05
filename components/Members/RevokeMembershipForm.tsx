@@ -5,9 +5,7 @@ import Button, { SecondaryButton } from '@components/Button'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
 import { abbreviateAddress, precision } from 'utils/formatting'
 import useWalletStore from 'stores/useWalletStore'
-import { getMintSchema } from 'utils/validations'
 import { FC, useMemo, useState } from 'react'
-import { MintForm, UiInstruction } from 'utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssets from 'hooks/useGovernanceAssets'
 import {
   createRevokeGoverningTokens,
@@ -15,30 +13,16 @@ import {
   Governance,
   ProgramAccount,
   serializeInstructionToBase64,
-  withDepositGoverningTokens,
-  withRevokeGoverningTokens,
 } from '@solana/spl-governance'
 import { useRouter } from 'next/router'
 import { notify } from 'utils/notifications'
 import useQueryContext from 'hooks/useQueryContext'
-import { getMintInstruction, validateInstruction } from 'utils/instructionTools'
 import AddMemberIcon from '@components/AddMemberIcon'
-import {
-  ArrowCircleDownIcon,
-  ArrowCircleUpIcon,
-} from '@heroicons/react/outline'
 import useCreateProposal from '@hooks/useCreateProposal'
-import { AssetAccount } from '@utils/uiTypes/assets'
 import useProgramVersion from '@hooks/useProgramVersion'
 import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
 import BigNumber from 'bignumber.js'
-import { governance } from '@foresight-tmp/foresight-sdk'
-import { program } from '@project-serum/anchor/dist/cjs/spl/token'
-import {
-  getMintNaturalAmountFromDecimal,
-  getMintNaturalAmountFromDecimalAsBN,
-  getMintNaturalAmountFromDecimalAsBN,
-} from '@tools/sdk/units'
+import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
 
 interface Form {
   description?: string
@@ -54,20 +38,17 @@ const RevokeMembershipForm: FC<{
 }> = ({ close, mint, member, governance }) => {
   const programVersion = useProgramVersion()
   const [voteByCouncil, setVoteByCouncil] = useState(false)
-  const [showOptions, setShowOptions] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
   const { handleCreateProposal } = useCreateProposal()
   const router = useRouter()
-  const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
 
   const { fmtUrlWithCluster } = useQueryContext()
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const { symbol } = router.query
 
   const { realmInfo, canChooseWhoVote, realm } = useRealm()
-  const { data: mintInfo } = useMintInfoByPubkeyQuery(mintAccount.pubkey)
+  const { data: mintInfo } = useMintInfoByPubkeyQuery(mint)
 
   const programId: PublicKey | undefined = realmInfo?.programId
 
@@ -81,10 +62,10 @@ const RevokeMembershipForm: FC<{
   const currentPrecision = precision(mintMinAmount)
   const govpop =
     realm !== undefined &&
-    (mintAccount.pubkey.equals(realm.account.communityMint)
+    (mint.equals(realm.account.communityMint)
       ? 'community '
       : realm.account.config.councilMint &&
-        mintAccount.pubkey.equals(realm.account.config.councilMint)
+        mint.equals(realm.account.config.councilMint)
       ? 'council '
       : '')
   let abbrevAddress: string
@@ -132,9 +113,10 @@ const RevokeMembershipForm: FC<{
       programId === undefined ||
       mintInfo?.result === undefined
     ) {
-      throw new Error()
+      throw new Error('proposal created before necessary data is fetched')
     }
-    const instruction = createRevokeGoverningTokens(
+
+    const ix = await createRevokeGoverningTokens(
       programId,
       programVersion,
       realm.pubkey,
@@ -147,49 +129,43 @@ const RevokeMembershipForm: FC<{
       )
     )
 
-    if (!!instruction && wallet && realmInfo) {
-      let proposalAddress: PublicKey | null = null
+    let proposalAddress: PublicKey | null = null
 
-      if (!realm) {
-        setIsLoading(false)
+    try {
+      const selectedGovernance = (await fetchRealmGovernance(
+        governance
+      )) as ProgramAccount<Governance>
 
-        throw new Error('No realm selected')
-      }
+      const serializedInstruction = serializeInstructionToBase64(ix)
+
       const instructionData = {
-        data: instruction.serializedInstruction
-          ? getInstructionDataFromBase64(instruction.serializedInstruction)
-          : null,
-        holdUpTime: governance?.account?.config.minInstructionHoldUpTime,
-        prerequisiteInstructions: instruction.prerequisiteInstructions || [],
+        data: getInstructionDataFromBase64(serializedInstruction),
+        holdUpTime: selectedGovernance.account.config.minInstructionHoldUpTime,
+        prerequisiteInstructions: [],
       }
+      console.log(instructionData)
 
-      try {
-        const selectedGovernance = (await fetchRealmGovernance(
-          governance
-        )) as ProgramAccount<Governance>
+      proposalAddress = await handleCreateProposal({
+        title: form.title ? form.title : proposalTitle,
+        description: form.description ? form.description : '',
+        governance: selectedGovernance,
+        instructionsData: [instructionData],
+        voteByCouncil,
+        isDraft: false,
+      })
 
-        proposalAddress = await handleCreateProposal({
-          title: form.title ? form.title : proposalTitle,
-          description: form.description ? form.description : '',
-          governance: selectedGovernance,
-          instructionsData: [instructionData],
-          voteByCouncil,
-          isDraft: false,
-        })
+      const url = fmtUrlWithCluster(
+        `/dao/${symbol}/proposal/${proposalAddress}`
+      )
 
-        const url = fmtUrlWithCluster(
-          `/dao/${symbol}/proposal/${proposalAddress}`
-        )
+      router.push(url)
+    } catch (error) {
+      notify({
+        type: 'error',
+        message: `${error}`,
+      })
 
-        router.push(url)
-      } catch (error) {
-        notify({
-          type: 'error',
-          message: `${error}`,
-        })
-
-        close()
-      }
+      close()
     }
 
     setIsLoading(false)
