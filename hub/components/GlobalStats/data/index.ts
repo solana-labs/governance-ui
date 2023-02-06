@@ -149,13 +149,19 @@ export async function fetchData(
     for (const governanceAddress of governanceAddrs) {
       // Check governance owned token accounts
       try {
+        const solWalletPk = await getNativeTreasuryAddress(
+          realm.programId,
+          governanceAddress,
+        );
         const tokenAccounts = await getTokenAmount(
           connection,
           governanceAddress,
         );
-        for (const tokenAccount of tokenAccounts.filter(
-          (ta) => !ta.account.amount.isZero(),
-        )) {
+        const moreTokenAccounts = await getTokenAmount(connection, solWalletPk);
+
+        for (const tokenAccount of tokenAccounts
+          .concat(moreTokenAccounts)
+          .filter((ta) => !ta.account.amount.isZero())) {
           updateTokenAmount(
             tokenAccount.account.mint,
             tokenAccount.account.amount,
