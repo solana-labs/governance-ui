@@ -2,7 +2,6 @@ import type { BigNumber } from 'bignumber.js'
 import type {
   Governance,
   GoverningTokenConfig,
-  GoverningTokenType,
   MintMaxVoteWeightSource,
   ProgramAccount,
   Realm,
