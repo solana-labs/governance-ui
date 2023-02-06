@@ -28,7 +28,6 @@ import {
 import useCreateProposal from '@hooks/useCreateProposal'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useProgramVersion from '@hooks/useProgramVersion'
-import BN from 'bn.js'
 import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
 import BigNumber from 'bignumber.js'
 import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
