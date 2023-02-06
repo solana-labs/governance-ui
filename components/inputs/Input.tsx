@@ -3,7 +3,7 @@ import ErrorField from './ErrorField'
 import { CheckCircleIcon } from '@heroicons/react/outline'
 import { ChangeEventHandler } from 'react'
 
-interface InputProps {
+export interface InputProps {
   type: string
   value: any
   onChange?: ChangeEventHandler<HTMLInputElement>

@@ -58,6 +58,7 @@ import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { TokenProgramAccount } from '@utils/tokens'
 import useWallet from '@hooks/useWallet'
+import TokenSelect from '@components/inputs/TokenSelect'
 
 export type TradeOnSerumProps = { tokenAccount: AssetAccount }
 
@@ -442,7 +443,7 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
   return (
     <>
       <div>
-        <h3 className="mb-4 flex items-center">Trade on Serum!</h3>
+        <h3 className="mb-4 flex items-center">Trade</h3>
         <h6 className="mb-4 flex items-center">
           <a
             href="https://github.com/mithraiclabs/serum-remote"
@@ -469,6 +470,7 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
         />
         {/* Add Serum Remote form */}
         <div className="space-y-4 w-full pb-4">
+          <TokenSelect label="Destination Token" />
           <Input
             label="Serum Market"
             value={form.serumMarketId}
