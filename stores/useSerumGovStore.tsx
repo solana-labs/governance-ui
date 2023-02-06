@@ -1,6 +1,6 @@
 import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
-import * as anchor from '@project-serum/anchor'
-import { findProgramAddressSync } from '@project-serum/anchor/dist/cjs/utils/pubkey'
+import * as anchor from '@coral-xyz/anchor'
+import { findProgramAddressSync } from '@coral-xyz/anchor/dist/cjs/utils/pubkey'
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import {
   Connection,

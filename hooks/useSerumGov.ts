@@ -2,7 +2,7 @@ import useWallet from './useWallet'
 import useSWR from 'swr'
 import { Connection, PublicKey } from '@solana/web3.js'
 import useSerumGovUser from './useSerumGovUser'
-import { AnchorProvider, Idl, Program } from '@project-serum/anchor'
+import { AnchorProvider, Idl, Program } from '@coral-xyz/anchor'
 import IDL from '../idls/serum_gov.json'
 import useSerumGovStore, {
   ClaimTicketType,

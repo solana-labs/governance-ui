@@ -3,7 +3,7 @@ import {
   AnchorProvider,
   BN,
   BorshInstructionCoder,
-} from '@project-serum/anchor'
+} from '@coral-xyz/anchor'
 import { AccountMetaData } from '@solana/spl-governance'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import { fmtMintAmount } from '@tools/sdk/units'

@@ -7,7 +7,7 @@ import {
   Proposal,
   VoteTipping,
 } from '@solana/spl-governance'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import {
   getMintNaturalAmountFromDecimal,
   getTimestampFromDays,
@@ -18,7 +18,7 @@ import { createGovernanceThresholds } from '@tools/governance/configs'
 import { PublicKey } from '@blockworks-foundation/mango-client'
 import { ConnectionContext } from './connection'
 import axios from 'axios'
-import { bs58 } from '@project-serum/anchor/dist/cjs/utils/bytes'
+import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes'
 
 export interface GovernanceConfigValues {
   minTokensToCreateProposal: number | string

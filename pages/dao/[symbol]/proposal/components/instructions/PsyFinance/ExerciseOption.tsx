@@ -10,7 +10,7 @@ import { NewProposalContext } from '../../../new'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import Input from '@components/inputs/Input'
-import { Program } from '@project-serum/anchor'
+import { Program } from '@coral-xyz/anchor'
 import {
   PsyAmericanIdl,
   PSY_AMERICAN_PROGRAM_ID,

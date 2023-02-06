@@ -1,4 +1,4 @@
-import { AnchorProvider } from '@project-serum/anchor'
+import { AnchorProvider } from '@coral-xyz/anchor'
 import { PublicKey } from '@solana/web3.js'
 import { ConnectionContext } from '@utils/connection'
 import { WalletSigner } from '@solana/spl-governance'

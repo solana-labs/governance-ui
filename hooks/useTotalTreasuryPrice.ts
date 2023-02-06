@@ -1,4 +1,4 @@
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
 import tokenPriceService from '@utils/services/tokenPrice'
 import BigNumber from 'bignumber.js'
