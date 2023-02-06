@@ -18,9 +18,9 @@ export const SchemaComponents = {
     .object()
     .nullable()
     .required('Governed account is required'),
-  did: yup
+  amount: yup
     .string()
-    .required('DID is required')
+    .required('Amount is required')
     .test('didTest', 'DID validation error', function (didString: string) {
       try {
         DidSolIdentifier.parse(didString)
@@ -78,7 +78,7 @@ export const governanceInstructionInput = (
 })
 
 export const instructionInputs: Record<string, InstructionInput> = {
-  amount: {
+  did: {
     label: 'DID',
     initialValue: 'did:sol:',
     inputType: 'text',
