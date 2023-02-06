@@ -9,7 +9,7 @@ import {
 } from '@tools/sdk/units'
 import { Market as SerumMarket } from '@project-serum/serum'
 import tokenPriceService from '@utils/services/tokenPrice'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import AccountLabel from './BaseAccountHeader'
 import {
@@ -60,8 +60,12 @@ import { TokenProgramAccount } from '@utils/tokens'
 import useWallet from '@hooks/useWallet'
 import TokenSelect from '@components/inputs/TokenSelect'
 import { TokenInfo } from '@solana/spl-token-registry'
+import { filterRoutes, Route, queryRoutes } from '@utils/jupiter'
+import SelectRoute from './Trade/SelectRoute'
 
 export type TradeOnSerumProps = { tokenAccount: AssetAccount }
+
+export const SUPPORTED_TRADE_PLATFORMS = ['Raydium', 'Openbook']
 
 type TradeOnSerumForm = {
   amount: number
@@ -265,6 +269,7 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [destinationToken, setDestinationToken] = useState<TokenInfo>()
+  const [availableRoutes, setAvailableRoutes] = useState<Route[]>([])
 
   if (!tokenAccount.extensions.mint || !tokenAccount.extensions.token) {
     throw new Error('No mint information on the tokenAccount')
@@ -442,6 +447,25 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
     setIsLoading(false)
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [schema, form, setFormErrors, connection, currentAccount, symbol, wallet])
+
+  useEffect(() => {
+    if (destinationToken && tokenInfo) {
+      ;(async () => {
+        // TODO: Maybe use a real input amount?
+        const inputAmount = new BN(1_000_000)
+        const routes = await queryRoutes(
+          tokenInfo.address,
+          destinationToken.address,
+          inputAmount
+        )
+        const filteredRoutes = filterRoutes(
+          routes.data,
+          SUPPORTED_TRADE_PLATFORMS
+        )
+        setAvailableRoutes(filteredRoutes)
+      })()
+    }
+  }, [destinationToken, tokenInfo])
   return (
     <>
       <div>
@@ -509,6 +533,9 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
             error={formErrors['boundedPrice']}
             noMaxWidth={true}
           />
+          {availableRoutes.length > 0 && (
+            <SelectRoute routes={availableRoutes} />
+          )}
         </div>
 
         <div

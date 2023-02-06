@@ -25,8 +25,9 @@ const TokenSelect: React.FC<{
   }
 
   return (
-    <div>
+    <>
       <Input
+        noMaxWidth={true}
         label={label}
         type="text"
         value={query}
@@ -40,6 +41,7 @@ const TokenSelect: React.FC<{
       />
       {results.length > 0 && (
         <Select
+          noMaxWidth={true}
           value={''}
           onChange={(value) => {
             setSelectedToken(value)
@@ -54,7 +56,7 @@ const TokenSelect: React.FC<{
           ))}
         </Select>
       )}
-    </div>
+    </>
   )
 }
 
