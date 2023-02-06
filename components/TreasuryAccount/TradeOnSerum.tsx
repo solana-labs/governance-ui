@@ -1,6 +1,5 @@
 import * as yup from 'yup'
 import Input from '@components/inputs/Input'
-import Select from '@components/inputs/Select'
 import useTotalTokenValue from '@hooks/useTotalTokenValue'
 import {
   fmtTokenInfoWithMint,
@@ -14,9 +13,7 @@ import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import AccountLabel from './BaseAccountHeader'
 import {
   Bound,
-  boundOptions,
   OrderSide,
-  orderSideOptions,
   getProgramId,
   instructions as serumRemoteInstructions,
   getDexId,
