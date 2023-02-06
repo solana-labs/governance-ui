@@ -5,7 +5,10 @@ import tokenPriceService from '@utils/services/tokenPrice'
 import Select from './Select'
 import { StyledLabel } from './styles'
 
-const TokenSelect: React.FC<{ label: string }> = ({ label }) => {
+const TokenSelect: React.FC<{
+  label: string
+  onSelect: (tokenInfo: TokenInfo) => void
+}> = ({ label, onSelect }) => {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<TokenInfo[]>([])
   const [selectedToken, setSelectedToken] = useState<TokenInfo>()
@@ -40,6 +43,7 @@ const TokenSelect: React.FC<{ label: string }> = ({ label }) => {
           value={''}
           onChange={(value) => {
             setSelectedToken(value)
+            onSelect(value)
           }}
         >
           {results.map((tokenInfo) => (

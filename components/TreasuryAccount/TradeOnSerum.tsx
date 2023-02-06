@@ -59,6 +59,7 @@ import { AssetAccount } from '@utils/uiTypes/assets'
 import { TokenProgramAccount } from '@utils/tokens'
 import useWallet from '@hooks/useWallet'
 import TokenSelect from '@components/inputs/TokenSelect'
+import { TokenInfo } from '@solana/spl-token-registry'
 
 export type TradeOnSerumProps = { tokenAccount: AssetAccount }
 
@@ -263,6 +264,7 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
   const [showOptions, setShowOptions] = useState(false)
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [destinationToken, setDestinationToken] = useState<TokenInfo>()
 
   if (!tokenAccount.extensions.mint || !tokenAccount.extensions.token) {
     throw new Error('No mint information on the tokenAccount')
@@ -470,19 +472,11 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
         />
         {/* Add Serum Remote form */}
         <div className="space-y-4 w-full pb-4">
-          <TokenSelect label="Destination Token" />
-          <Input
-            label="Serum Market"
-            value={form.serumMarketId}
-            type="text"
-            onChange={(evt) =>
-              handleSetForm({
-                value: evt.target.value,
-                propertyName: 'serumMarketId',
-              })
+          <TokenSelect
+            label="Destination Token"
+            onSelect={(_destinationToken) =>
+              setDestinationToken(_destinationToken)
             }
-            noMaxWidth={true}
-            error={formErrors['serumMarketId']}
           />
           <Input
             label={`Amount of ${
@@ -501,45 +495,9 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
             error={formErrors['amount']}
             noMaxWidth={true}
           />
-          <Select
-            label={'Order Side'}
-            value={OrderSide[form.orderSide]}
-            onChange={(value) =>
-              handleSetForm({
-                value: value,
-                propertyName: 'orderSide',
-              })
-            }
-            error={formErrors['orderSide']}
-            noMaxWidth={true}
-          >
-            {orderSideOptions.map((option) => (
-              <Select.Option key={option} value={OrderSide[option]}>
-                {option}
-              </Select.Option>
-            ))}
-          </Select>
-          <Select
-            label={'Bound'}
-            value={Bound[form.bound]}
-            onChange={(value) =>
-              handleSetForm({
-                value: value,
-                propertyName: 'bound',
-              })
-            }
-            error={formErrors['bound']}
-            noMaxWidth={true}
-          >
-            {boundOptions.map((option) => (
-              <Select.Option key={option} value={Bound[option]}>
-                {option}
-              </Select.Option>
-            ))}
-          </Select>
           {/* TODO: Add reclaim date picker */}
           <Input
-            label={'Bounded Price'}
+            label={`Limit Price (${destinationToken?.symbol} per ${tokenInfo?.symbol})`}
             value={form.boundedPrice}
             type="number"
             onChange={(evt) =>
