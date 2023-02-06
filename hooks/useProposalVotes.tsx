@@ -1,5 +1,5 @@
 import { BN } from '@coral-xyz/anchor'
-import { Proposal } from '@solana/spl-governance'
+import { Proposal, ProposalState } from '@solana/spl-governance'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { getProposalMaxVoteWeight } from '../models/voteWeights'
 import { calculatePct, fmtTokenAmount } from '../utils/formatting'
@@ -134,8 +134,23 @@ export default function useProposalVotes(proposal?: Proposal) {
       veto: undefined,
     }
 
-  const isPluginCommunityVeto = maxVoteRecord && !isCommunityVote
+  const vetoVoteCount = fmtTokenAmount(
+    proposal.vetoVoteWeight,
+    vetoMintInfo.decimals
+  )
+  // its impossible to accurately know the veto votes required for a finalized, non-vetoed proposal
+  if (proposal.isVoteFinalized() && proposal.state !== ProposalState.Vetoed)
+    return {
+      _programVersion: programVersion,
+      ...results,
+      veto: {
+        votesRequired: undefined,
+        voteCount: vetoVoteCount,
+        voteProgress: undefined,
+      },
+    }
 
+  const isPluginCommunityVeto = maxVoteRecord && !isCommunityVote
   const vetoMaxVoteWeight = isPluginCommunityVeto
     ? maxVoteRecord.account.maxVoterWeight
     : getProposalMaxVoteWeight(
@@ -144,11 +159,6 @@ export default function useProposalVotes(proposal?: Proposal) {
         vetoMintInfo,
         vetoMintPk
       )
-
-  const vetoVoteCount = fmtTokenAmount(
-    proposal.vetoVoteWeight,
-    vetoMintInfo.decimals
-  )
 
   const vetoVoteProgress = calculatePct(
     proposal.vetoVoteWeight,
