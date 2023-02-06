@@ -205,7 +205,7 @@ const InstructionInput = ({
                 ? input.onBlur
                 : input.validateMinMax
                 ? validateAmountOnBlur
-                : null
+                : undefined
             }
           />
         )
@@ -309,7 +309,7 @@ const InstructionInput = ({
                           ? input.onBlur
                           : input.validateMinMax
                           ? validateAmountOnBlur
-                          : null
+                          : undefined
                       }
                     />
                   ) : (

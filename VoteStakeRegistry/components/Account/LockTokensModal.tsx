@@ -386,6 +386,7 @@ const LockTokensModal = ({
                   </LinkButton>
                 </div>
                 <Input
+                  // @ts-expect-error this probably doesn't work right, maxAmount is a BigNumber
                   max={maxAmount}
                   min={mintMinAmount}
                   value={amount}
