@@ -1096,15 +1096,15 @@
     "ogImage": "/realms/bacDao/logo_bulls.png",
     "website": "https://bullsarmyclub.com/"
   },
-  {
+ {
     "symbol": "EPCT",
     "category": "web3",
-    "bannerImage": "https://bafybeib4syqxnch4sf3rw6tuh62sun4cfu3ix4fprb7gff65v6zx74auv4.ipfs.w3s.link/BuidlersCollectiveSamples.jpg",
+    "bannerImage": "https://bafybeigyh52dlntjyn4lyajvt7v5d2vtifjhyaklu3j5rhkpihhbb3wkwa.ipfs.w3s.link/BuidlToEarnTwitterHeader.png",
     "displayName": "Epics",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "DCdCsuUjg6MnULfEmBUmvg1heggnLrKSFdp5uTRSKuwR",
-    "ogImage": "/realms/Epics/Epics-logo.svg",
-    "shortDescription": "Buidl to Earn. Epics is a decentralized crowdsourcing platform for incentivizing open-source software development.",
+    "ogImage": "/realms/Epics/Epics-logo-background.png",
+    "shortDescription": "Buidl to Earn. Epics is a decentralized crowdsourcing platform for incentivizing open source software development.",
     "sortRank": 3,
     "website": "https://epics.dev",
     "twitter": "@EpicsDAO2",
