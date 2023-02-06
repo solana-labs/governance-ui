@@ -660,6 +660,7 @@ export enum Instructions {
   RemoveKeyFromDID,
   AddServiceToDID,
   RemoveServiceFromDID,
+  RevokeGoverningTokens,
 }
 
 export type createParams = [
