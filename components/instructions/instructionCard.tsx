@@ -48,6 +48,7 @@ export default function InstructionCard({
     governedTokenAccountsWithoutNfts,
   } = useGovernanceAssets()
   const connection = useWalletStore((s) => s.connection)
+  const realm = useWalletStore((s) => s.selectedRealm.realm)
   const [descriptor, setDescriptor] = useState<InstructionDescriptor>()
   const [instructionOption, setInstructionOption] = useState<InstructionOption>(
     InstructionOptions.none
@@ -68,7 +69,8 @@ export default function InstructionCard({
   useEffect(() => {
     getInstructionDescriptor(
       connection,
-      proposalInstruction.account.getSingleInstruction()
+      proposalInstruction.account.getSingleInstruction(),
+      realm
     ).then((d) => setDescriptor(d))
     const getAmountImg = async () => {
       const sourcePk = proposalInstruction.account.getSingleInstruction()
@@ -122,7 +124,11 @@ export default function InstructionCard({
     }
     getAmountImg()
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [proposalInstruction, governedTokenAccountsWithoutNfts.length])
+  }, [
+    proposalInstruction,
+    governedTokenAccountsWithoutNfts.length,
+    realm?.pubkey.toBase58(),
+  ])
   const isSol = tokenImgUrl.includes(WSOL_MINT)
 
   return (

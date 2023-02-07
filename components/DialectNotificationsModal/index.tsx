@@ -75,8 +75,8 @@ const solanaWalletToDialectWallet = (
         (msg) => wallet.signMessage(msg)
       : undefined,
 
-    signTransaction: wallet.signTransaction,
-    signAllTransactions: wallet.signAllTransactions,
+    signTransaction: wallet.signTransaction as any,
+    signAllTransactions: wallet.signAllTransactions as any,
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     diffieHellman: wallet.wallet?.adapter?._wallet?.diffieHellman
