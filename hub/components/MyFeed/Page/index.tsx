@@ -1,4 +1,3 @@
-import * as Separator from '@radix-ui/react-separator';
 import { pipe } from 'fp-ts/function';
 import React from 'react';
 

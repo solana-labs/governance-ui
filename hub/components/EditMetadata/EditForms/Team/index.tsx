@@ -37,6 +37,7 @@ function trimTeam(
       );
     })
     .map((t) => {
+      // eslint-disable-next-line
       const { __typename, ...rest } = t;
       return rest;
     });

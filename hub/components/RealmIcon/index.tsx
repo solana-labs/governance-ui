@@ -16,6 +16,7 @@ export function RealmIcon(props: Props) {
           'rounded-full',
           'border',
           'border-neutral-400',
+          'dark:border-neutral-600',
           props.className,
         )}
         src={props.iconUrl}
@@ -28,6 +29,7 @@ export function RealmIcon(props: Props) {
           'rounded-full',
           'border',
           'border-neutral-400',
+          'dark:border-neutral-600',
           props.className,
         )}
         src={ecosystemIcon.src}

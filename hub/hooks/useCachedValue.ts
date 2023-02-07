@@ -15,6 +15,7 @@ interface Options {
 const cache = (() => {
   if (typeof window === 'undefined') {
     return {
+      // eslint-disable-next-line
       get: <V>(key: string, options?: Options): V | null => null,
       set: <V>(key: string, value: V) => value,
     };

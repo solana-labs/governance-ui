@@ -75,6 +75,7 @@
     "@radix-ui/react-radio-group": "1.1.0",
     "@radix-ui/react-select": "1.0.0",
     "@radix-ui/react-separator": "1.0.0",
+    "@radix-ui/react-slider": "1.1.0",
     "@radix-ui/react-tabs": "1.0.0",
     "@radix-ui/react-toast": "1.0.0",
     "@radix-ui/react-toolbar": "1.0.0",

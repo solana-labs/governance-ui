@@ -22,6 +22,7 @@ interface Wallet {
   publicKey: PublicKey;
   signMessage: NonNullable<WalletContextState['signMessage']>;
   signTransaction: NonNullable<WalletContextState['signTransaction']>;
+  signAllTransactions: NonNullable<WalletContextState['signAllTransactions']>;
   wallet: BaseWallet;
 }
 
@@ -47,7 +48,14 @@ interface Props {
 }
 
 function WalletSelectorInner(props: Props) {
-  const { wallets, signMessage, signTransaction, select, wallet } = useWallet();
+  const {
+    wallets,
+    signMessage,
+    signTransaction,
+    signAllTransactions,
+    select,
+    wallet,
+  } = useWallet();
   const [selectorOpen, setSelectorOpen] = useState(false);
   const [publicKey, setPublicKey] = useState<PublicKey | null>(null);
   const [shouldConnect, setShouldConnect] = useState(false);
@@ -100,6 +108,11 @@ function WalletSelectorInner(props: Props) {
         signMessage,
         signTransaction,
         wallet,
+        signAllTransactions:
+          signAllTransactions ||
+          (() => {
+            throw new Error('signAllTransactions not available');
+          }),
       });
     }
   }, [signMessage, signTransaction, publicKey, wallet]);
