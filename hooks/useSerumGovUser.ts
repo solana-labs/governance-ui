@@ -1,4 +1,4 @@
-import { AnchorProvider, BN, Idl, Program } from '@project-serum/anchor'
+import { AnchorProvider, BN, Idl, Program } from '@coral-xyz/anchor'
 import { PublicKey } from '@solana/web3.js'
 import useSerumGovStore, { UserAccountType } from 'stores/useSerumGovStore'
 import useSWR from 'swr'

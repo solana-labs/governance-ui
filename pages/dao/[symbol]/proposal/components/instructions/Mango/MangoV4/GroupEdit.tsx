@@ -16,7 +16,7 @@ import InstructionForm, {
   InstructionInputType,
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { getChangedValues, getNullOrTransform } from '@utils/mangoV4Tools'
 
 type GroupEditForm = {

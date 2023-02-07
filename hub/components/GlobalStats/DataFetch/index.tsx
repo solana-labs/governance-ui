@@ -19,7 +19,7 @@ interface Props {
   onNFTRealmsComplete?(realm: PublicKey[]): void;
   onProposalsComplete?(proposals: ProgramAccount<Proposal>[]): void;
   onRealmsComplete?(realms: PublicKey[]): void;
-  onTVLComplete?(amount: number): void;
+  onTVLComplete?(amount: number, amountByDao: { [dao: string]: number }): void;
   onVoteRecordsComplete?(voteRecords: ProgramAccount<VoteRecord>[]): void;
 }
 

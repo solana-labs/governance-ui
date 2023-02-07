@@ -39,14 +39,19 @@ export async function fetchData(
     onNFTRealmsComplete?(realms: PublicKey[]): void;
     onProposalsComplete?(proposals: ProgramAccount<Proposal>[]): void;
     onRealmsComplete?(realms: PublicKey[]): void;
-    onTVLComplete?(value: number): void;
+    onTVLComplete?(value: number, byDaos: { [name: string]: number }): void;
     onUpdate?(update: Update): void;
     onVoteRecordsComplete?(voteRecords: ProgramAccount<VoteRecord>[]): void;
   },
 ) {
   const tokenAmountMap = new Map<string, BigNumber>();
+  const tokensByDAOAmountMap: {
+    [dao: string]: {
+      [token: string]: BigNumber;
+    };
+  } = {};
 
-  const updateTokenAmount = (mintPk: PublicKey, amount: BN) => {
+  const updateTokenAmount = (mintPk: PublicKey, amount: BN, realm: string) => {
     const mintKey = mintPk.toBase58();
     tokenAmountMap.set(
       mintKey,
@@ -54,6 +59,18 @@ export async function fetchData(
         new BigNumber(amount.toString()),
       ),
     );
+
+    if (!tokensByDAOAmountMap[realm]) {
+      tokensByDAOAmountMap[realm] = {};
+    }
+
+    if (!tokensByDAOAmountMap[realm][mintKey]) {
+      tokensByDAOAmountMap[realm][mintKey] = new BigNumber(0);
+    }
+
+    tokensByDAOAmountMap[realm][mintKey] = tokensByDAOAmountMap[realm][
+      mintKey
+    ].plus(new BigNumber(amount.toString()));
   };
 
   cbs.onUpdate?.({
@@ -132,16 +149,23 @@ export async function fetchData(
     for (const governanceAddress of governanceAddrs) {
       // Check governance owned token accounts
       try {
+        const solWalletPk = await getNativeTreasuryAddress(
+          realm.programId,
+          governanceAddress,
+        );
         const tokenAccounts = await getTokenAmount(
           connection,
           governanceAddress,
         );
-        for (const tokenAccount of tokenAccounts.filter(
-          (ta) => !ta.account.amount.isZero(),
-        )) {
+        const moreTokenAccounts = await getTokenAmount(connection, solWalletPk);
+
+        for (const tokenAccount of tokenAccounts
+          .concat(moreTokenAccounts)
+          .filter((ta) => !ta.account.amount.isZero())) {
           updateTokenAmount(
             tokenAccount.account.mint,
             tokenAccount.account.amount,
+            realm.name,
           );
         }
       } catch (e) {
@@ -160,7 +184,11 @@ export async function fetchData(
 
         if (solWallet) {
           if (solWallet.lamports > 0) {
-            updateTokenAmount(WSOL_MINT_PK, new BN(solWallet.lamports));
+            updateTokenAmount(
+              WSOL_MINT_PK,
+              new BN(solWallet.lamports),
+              realm.name,
+            );
           }
 
           const tokenAccounts = await getTokenAmount(connection, solWalletPk);
@@ -170,6 +198,7 @@ export async function fetchData(
             updateTokenAmount(
               tokenAccount.account.mint,
               tokenAccount.account.amount,
+              realm.name,
             );
           }
         }
@@ -224,7 +253,30 @@ export async function fetchData(
     }
   }
 
-  cbs.onTVLComplete?.(totalUsdAmount);
+  const tvlPerDao: {
+    [dao: string]: number;
+  } = {};
+
+  for (const [dao, tokens] of Object.entries(tokensByDAOAmountMap)) {
+    let totalDaoTvl = 0;
+
+    for (const [mintPk, amount] of Object.entries(tokens)) {
+      const tokenUsdPrice = tokenPriceService.getUSDTokenPrice(mintPk);
+
+      if (tokenUsdPrice > 0) {
+        const mint = await tryGetMint(connection, new PublicKey(mintPk));
+        const decimalAmount = amount.shiftedBy(-(mint?.account.decimals || 0));
+        const usdAmount = decimalAmount.toNumber() * tokenUsdPrice;
+        totalDaoTvl += usdAmount;
+      }
+    }
+
+    if (totalDaoTvl > 0) {
+      tvlPerDao[dao] = totalDaoTvl;
+    }
+  }
+
+  cbs.onTVLComplete?.(totalUsdAmount, tvlPerDao);
 
   cbs.onUpdate?.({
     progress: 85,

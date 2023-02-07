@@ -28,9 +28,9 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
 import NftVotingCountingModal from '@components/NftVotingCountingModal'
 import { getResourcePathPart } from '@tools/core/resources'
-import useInitWallet from '@hooks/useInitWallet'
 import queryClient from '@hooks/queries/queryClient'
 import useSerumGovStore from 'stores/useSerumGovStore'
+import { WalletProvider } from '@hub/providers/Wallet';
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -62,7 +62,6 @@ interface Props {
 
 export function App(props: Props) {
   useHydrateStore()
-  useInitWallet()
   handleRouterHistory()
   useVotingPlugins()
   handleGovernanceAssetsStore()
@@ -250,13 +249,15 @@ export function App(props: Props) {
         <QueryClientProvider client={queryClient}>
           <ThemeProvider defaultTheme="Dark">
             <WalletIdentityProvider appName={'Realms'}>
-              <GatewayProvider>
-                <NavBar />
-                <Notifications />
-                <TransactionLoader></TransactionLoader>
-                <NftVotingCountingModal />
-                <PageBodyContainer>{props.children}</PageBodyContainer>
-              </GatewayProvider>
+              <WalletProvider>
+                <GatewayProvider>
+                  <NavBar />
+                  <Notifications />
+                  <TransactionLoader></TransactionLoader>
+                  <NftVotingCountingModal />
+                  <PageBodyContainer>{props.children}</PageBodyContainer>
+                </GatewayProvider>
+              </WalletProvider>
             </WalletIdentityProvider>
           </ThemeProvider>
         </QueryClientProvider>

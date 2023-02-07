@@ -1,4 +1,4 @@
-import { BN, EventParser } from '@project-serum/anchor'
+import { BN, EventParser, Idl, Program } from '@coral-xyz/anchor'
 import { ProgramAccount, Realm } from '@solana/spl-governance'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey, Transaction, Connection } from '@solana/web3.js'
@@ -26,6 +26,15 @@ const DEPOSIT_EVENT_NAME = 'DepositEntryInfo'
 // The wallet can be any existing account for the simulation
 // Note: when running a local validator ensure the account is copied from devnet: --clone ENmcpFCpxN1CqyUjuog9yyUVfdXBKF3LVCwLr7grJZpk -ud
 const simulationWallet = new PublicKey(SIMULATION_WALLET)
+
+const logsToEvents = <T extends Idl>(program: Program<T>, logs: string[], walletPk: string):{
+  walletPk: string
+  event: any
+}[] => {
+  const parser = new EventParser(program.programId, program.coder)
+  const errors = parser.parseLogs(logs);
+  return [...errors].map((event) =>({ event, walletPk }));
+}
 
 export const getDeposits = async ({
   isUsed = true,
@@ -152,8 +161,6 @@ export const getVotingPowersForWallets = async ({
     walletPk: string
     event: any
   }[] = []
-  const parser = new EventParser(client.program.programId, client.program.coder)
-
   for (const walletPk of walletPks) {
     const { voter } = await getVoterPDA(registrarPk, walletPk, clientProgramId)
     voterPks.push(voter)
@@ -249,12 +256,7 @@ export const getVotingPowersForWallets = async ({
     const logsJsons = await Promise.all(simulations.map((x) => x.json()))
     for (const logJson of logsJsons) {
       for (const result of logJson) {
-        parser.parseLogs(result.result.value.logs!, (event) => {
-          events.push({
-            event: event,
-            walletPk: result.id,
-          })
-        })
+        events.push(...logsToEvents(client.program, result.result.value.logs!, result.id))
       }
     }
 
@@ -385,9 +387,8 @@ const getDepositsAdditionalInfoEvents = async (
       .instruction()
     transaction.add(logVoterInfoIx)
     const batchOfDeposits = await connection.simulateTransaction(transaction)
-    parser.parseLogs(batchOfDeposits.value.logs!, (event) => {
-      events.push(event)
-    })
+    const logEvents = parser.parseLogs(batchOfDeposits.value.logs!)
+    events.push(...[...logEvents]);
   }
   return events
 }

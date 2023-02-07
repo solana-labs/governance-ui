@@ -1,5 +1,7 @@
 import { Filters } from '@components/ProposalFilter'
+import { Sorting, SORTING_OPTIONS } from '@components/ProposalSorting'
 import { hasInstructions } from '@components/ProposalStateBadge'
+import { BN } from '@coral-xyz/anchor'
 import {
   Governance,
   ProgramAccount,
@@ -53,75 +55,110 @@ export function getVotingStateRank(
 
 export const filterProposals = (
   proposals: [string, ProgramAccount<Proposal>][],
-  filters: Filters
+  filters: Filters,
+  sorting: Sorting
 ) => {
-  return proposals.filter(([, proposal]) => {
-    if (
-      !filters.Cancelled &&
-      proposal.account.state === ProposalState.Cancelled
-    ) {
-      return false
-    }
+  return proposals
+    .sort(([, proposalA], [, proposalB]) => {
+      if (sorting.completed_at === SORTING_OPTIONS.ASC) {
+        return (
+          proposalA.account.votingCompletedAt ||
+          proposalA.account.signingOffAt ||
+          proposalA.account.draftAt ||
+          new BN(0)
+        )
+          .sub(
+            proposalB.account.votingCompletedAt ||
+              proposalB.account.signingOffAt ||
+              proposalB.account.draftAt ||
+              new BN(0)
+          )
+          .toNumber()
+      }
+      if (sorting.completed_at === SORTING_OPTIONS.DESC) {
+        return (
+          proposalB.account.votingCompletedAt ||
+          proposalB.account.signingOffAt ||
+          proposalB.account.draftAt ||
+          new BN(0)
+        )
+          .sub(
+            proposalA.account.votingCompletedAt ||
+              proposalA.account.signingOffAt ||
+              proposalA.account.draftAt ||
+              new BN(0)
+          )
+          .toNumber()
+      }
+      return 0
+    })
+    .filter(([, proposal]) => {
+      if (
+        !filters.Cancelled &&
+        proposal.account.state === ProposalState.Cancelled
+      ) {
+        return false
+      }
 
-    if (!filters.Completed) {
-      if (proposal.account.state === ProposalState.Completed) {
+      if (!filters.Completed) {
+        if (proposal.account.state === ProposalState.Completed) {
+          return false
+        }
+
+        if (
+          proposal.account.state === ProposalState.Succeeded &&
+          !hasInstructions(proposal.account)
+        ) {
+          return false
+        }
+      }
+
+      if (!filters.Vetoed && proposal.account.state === ProposalState.Vetoed) {
         return false
       }
 
       if (
-        proposal.account.state === ProposalState.Succeeded &&
-        !hasInstructions(proposal.account)
+        !filters.Defeated &&
+        proposal.account.state === ProposalState.Defeated
       ) {
         return false
       }
-    }
 
-    if (!filters.Vetoed && proposal.account.state === ProposalState.Vetoed) {
-      return false
-    }
+      if (!filters.Draft && proposal.account.state === ProposalState.Draft) {
+        return false
+      }
 
-    if (
-      !filters.Defeated &&
-      proposal.account.state === ProposalState.Defeated
-    ) {
-      return false
-    }
+      if (!filters.Executable) {
+        if (proposal.account.state === ProposalState.Executing) {
+          return false
+        }
 
-    if (!filters.Draft && proposal.account.state === ProposalState.Draft) {
-      return false
-    }
+        if (
+          proposal.account.state === ProposalState.Succeeded &&
+          hasInstructions(proposal.account)
+        ) {
+          return false
+        }
+      }
 
-    if (!filters.Executable) {
-      if (proposal.account.state === ProposalState.Executing) {
+      if (
+        !filters.ExecutingWithErrors &&
+        proposal.account.state === ProposalState.ExecutingWithErrors
+      ) {
         return false
       }
 
       if (
-        proposal.account.state === ProposalState.Succeeded &&
-        hasInstructions(proposal.account)
+        !filters.SigningOff &&
+        proposal.account.state === ProposalState.SigningOff
       ) {
         return false
       }
-    }
 
-    if (
-      !filters.ExecutingWithErrors &&
-      proposal.account.state === ProposalState.ExecutingWithErrors
-    ) {
-      return false
-    }
+      if (!filters.Voting && proposal.account.state === ProposalState.Voting) {
+        return false
+      }
 
-    if (
-      !filters.SigningOff &&
-      proposal.account.state === ProposalState.SigningOff
-    ) {
-      return false
-    }
-
-    if (!filters.Voting && proposal.account.state === ProposalState.Voting) {
-      return false
-    }
-
-    return true
-  })
+      return true
+    })
 }

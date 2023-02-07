@@ -32,6 +32,11 @@ import { notify } from '@utils/notifications'
 import { sendSignedTransaction } from '@utils/send'
 import { compareProposals, filterProposals } from '@utils/proposals'
 import { REALM_ID as PYTH_REALM_ID } from 'pyth-staking-api'
+import ProposalSorting, {
+  InitialSorting,
+  PROPOSAL_SORTING_LOCAL_STORAGE_KEY,
+  Sorting,
+} from '@components/ProposalSorting'
 
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
@@ -63,6 +68,7 @@ const REALM = () => {
   } = useRealm()
   const proposalsPerPage = 20
   const [filters, setFilters] = useState<Filters>(InitialFilters)
+  const [sorting, setSorting] = useState<Sorting>(InitialSorting)
   const [displayedProposals, setDisplayedProposals] = useState(
     Object.entries(proposals)
   )
@@ -97,7 +103,7 @@ const REALM = () => {
   }, [JSON.stringify(filteredProposals)])
 
   useEffect(() => {
-    let proposals = filterProposals(allProposals, filters)
+    let proposals = filterProposals(allProposals, filters, sorting)
 
     if (proposalSearch) {
       proposals = proposals.filter(([, v]) =>
@@ -108,10 +114,10 @@ const REALM = () => {
     }
     setFilteredProposals(proposals)
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [filters, proposalSearch])
+  }, [filters, proposalSearch, sorting])
 
   useEffect(() => {
-    const proposals = filterProposals(allProposals, filters)
+    const proposals = filterProposals(allProposals, filters, sorting)
     setDisplayedProposals(proposals)
     setFilteredProposals(proposals)
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
@@ -129,6 +135,13 @@ const REALM = () => {
 
   const toggleMultiVoteMode = () => {
     setMultiVoteMode(!multiVoteMode)
+  }
+  const handleSetSorting = (sorting: Sorting) => {
+    localStorage.setItem(
+      PROPOSAL_SORTING_LOCAL_STORAGE_KEY,
+      JSON.stringify(sorting)
+    )
+    setSorting(sorting)
   }
 
   const votingProposals = useMemo(
@@ -150,11 +163,19 @@ const REALM = () => {
     if (multiVoteMode) {
       setFilteredProposals(votingProposals)
     } else {
-      const proposals = filterProposals(allProposals, filters)
+      const proposals = filterProposals(allProposals, filters, sorting)
       setFilteredProposals(proposals)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [multiVoteMode])
+
+  useEffect(() => {
+    const initialSort = localStorage.getItem(PROPOSAL_SORTING_LOCAL_STORAGE_KEY)
+    if (initialSort) {
+      const initialSortObj = JSON.parse(initialSort)
+      setSorting(initialSortObj)
+    }
+  }, [])
 
   const allVotingProposalsSelected =
     selectedProposals.length === votingProposals.length
@@ -370,15 +391,20 @@ const REALM = () => {
                           filters={filters}
                           onChange={setFilters}
                         />
+                        <ProposalSorting
+                          sorting={sorting}
+                          disabled={multiVoteMode}
+                          onChange={handleSetSorting}
+                        ></ProposalSorting>
                       </div>
                       <div
                         className={`flex lg:flex-row items-center justify-between lg:space-x-3 w-full flex-col-reverse`}
                       >
-                        <h4 className="font-normal mb-0 text-fgd-2 whitespace-nowrap">{`${
-                          filteredProposals.length
-                        } Proposal${
-                          filteredProposals.length === 1 ? '' : 's'
-                        }`}</h4>
+                        <h4 className="font-normal mb-0 text-fgd-2 whitespace-nowrap">
+                          {`${filteredProposals.length} Proposal${
+                            filteredProposals.length === 1 ? '' : 's'
+                          }`}
+                        </h4>
                         <div
                           className={`flex items-center lg:justify-end lg:pb-0 lg:space-x-3 w-full justify-between pb-3`}
                         >

@@ -1,4 +1,4 @@
-import { utils } from '@project-serum/anchor'
+import { utils } from '@coral-xyz/anchor'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,

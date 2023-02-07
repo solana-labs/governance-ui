@@ -1,4 +1,4 @@
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { DepositWithMintAccount } from 'VoteStakeRegistry/sdk/accounts'
 
 export const DAYS_PER_YEAR = 365

@@ -14,6 +14,7 @@ import { NumProposals } from './NumProposals';
 import { NumRealms } from './NumRealms';
 import { NumVoteRecords } from './NumVoteRecords';
 import { TotalValue } from './TotalValue';
+import { ValueByDao } from './ValueByDao';
 
 interface Props {
   className?: string;
@@ -24,6 +25,9 @@ export function Stats(props: Props) {
   const [runCount, setRunCount] = useState(0);
   const [realms, setRealms] = useState<PublicKey[]>([]);
   const [totalValue, setTotalValue] = useState(0);
+  const [valueByDao, setValueByDao] = useState<{
+    [dao: string]: number;
+  }>({});
   const [nftRealms, setNFTRealms] = useState<PublicKey[]>([]);
   const [duration, setDuration] = useState('');
   const [proposals, setProposals] = useState<ProgramAccount<Proposal>[]>([]);
@@ -102,6 +106,7 @@ export function Stats(props: Props) {
         <NumRealms realms={realms} />
         <NumNFTRealms fetching={!donefetchingNFTs} realms={nftRealms} />
         <TotalValue value={totalValue} />
+        <ValueByDao valueByDao={valueByDao} />
         <NumProposals proposals={proposals} />
         <NumVoteRecords voteRecords={voteRecords} />
         <NumMembers members={members} />
@@ -128,7 +133,10 @@ export function Stats(props: Props) {
           }}
           onProposalsComplete={setProposals}
           onRealmsComplete={setRealms}
-          onTVLComplete={setTotalValue}
+          onTVLComplete={(total, byDao) => {
+            setTotalValue(total);
+            setValueByDao(byDao);
+          }}
           onVoteRecordsComplete={setVoteRecords}
           runCount={runCount}
         />
