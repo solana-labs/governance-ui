@@ -1,7 +1,7 @@
 import { Filters } from '@components/ProposalFilter'
 import { Sorting, SORTING_OPTIONS } from '@components/ProposalSorting'
 import { hasInstructions } from '@components/ProposalStateBadge'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import {
   Governance,
   ProgramAccount,

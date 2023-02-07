@@ -5,7 +5,7 @@ import {
   withSetRealmAuthority,
 } from '@solana/spl-governance'
 import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js'
-import { AnchorProvider, Wallet } from '@project-serum/anchor'
+import { AnchorProvider, Wallet } from '@coral-xyz/anchor'
 import {
   SequenceType,
   sendTransactionsV3,
