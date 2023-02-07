@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useMemo } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import * as yup from 'yup'
 
 import {
@@ -18,14 +18,9 @@ import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
-import {
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  Token,
-  TOKEN_PROGRAM_ID,
-} from '@solana/spl-token'
 import { SunriseStakeClient, SUNRISE_STAKE_STATE } from '@sunrisestake/client'
 import useWallet from "@hooks/useWallet";
+import { BN } from '@coral-xyz/anchor'
 
 const DepositForm = ({
   index,
@@ -50,16 +45,10 @@ const DepositForm = ({
   const { handleSetInstructions } = useContext(NewProposalContext)
 
   const [ client, setClient ] = useState<SunriseStakeClient>()
-  const adaptedWalletProvider = useMemo(() => {
-    if (!wallet || !anchorProvider) return undefined;
-    return ({
-      publicKey: wallet.publicKey,
-      ...anchorProvider
-    });
-  }, [wallet, anchorProvider]);
+
   useEffect(() => {
-    if (!adaptedWalletProvider) return;
-    SunriseStakeClient.get(adaptedWalletProvider, SUNRISE_STAKE_STATE, {
+    if (!anchorProvider) return;
+    SunriseStakeClient.get(anchorProvider, SUNRISE_STAKE_STATE, {
       verbose: Boolean(process.env.REACT_APP_VERBOSE)
     }).then(setClient)
   }, [anchorProvider]);
@@ -83,7 +72,9 @@ const DepositForm = ({
       !connection ||
       !isValid ||
       !programId ||
+      !client ||
       !form.governedAccount?.governance?.account ||
+      !form.governedAccount.isSol ||  // TODO filter governed accounts by SOL only
       !wallet?.publicKey
     ) {
       return {
@@ -92,52 +83,12 @@ const DepositForm = ({
         governance: form.governedAccount?.governance,
       }
     }
-    const isSol = form.governedAccount.isSol
-    const owner = isSol
-      ? form.governedAccount.pubkey
-      : form.governedAccount.extensions!.token!.account.owner
-
-    const isDev = connection.cluster === 'devnet'
-
-
-    const tx = await
-
-    const {
-      actionTx: tx,
-      prerequisiteInstructions,
-    } = await handleEverlendDeposit(
-      wallet,
-      Boolean(isSol),
-      connection,
-      owner,
-      REGISTRY,
-      CONFIG,
-      rewardPool,
-      rewardAccount,
-      matchedStratagie.poolPubKey,
-      getMintNaturalAmountFromDecimalAsBN(
-        +form.uiAmount as number,
-        form.governedAccount.extensions.mint!.account.decimals
-      ),
-      liquidityATA,
-      ctokenATA
-    )
-
-    tx.instructions.forEach((inst, index) => {
-      if (index < tx.instructions.length - 1) {
-        prerequisiteInstructions.push(inst)
-      }
-    })
-
-    const additionalSerializedIxs = prerequisiteInstructions.map((inst) =>
-      serializeInstructionToBase64(inst)
-    )
+    const tx = await client.deposit(new BN(form.uiAmount).mul(new BN(10).pow(new BN(9))));
+    const serializedInstructions = tx.instructions.map(serializeInstructionToBase64);
 
     return {
-      serializedInstruction: serializeInstructionToBase64(
-        tx.instructions[tx.instructions.length - 1]
-      ),
-      additionalSerializedInstructions: additionalSerializedIxs,
+      serializedInstruction: serializedInstructions[serializedInstructions.length - 1],
+      additionalSerializedInstructions: serializedInstructions.slice(0, -1),
       isValid: true,
       governance: form.governedAccount.governance,
       shouldSplitIntoSeparateTxs: true,
@@ -149,7 +100,6 @@ const DepositForm = ({
       propertyName: 'programId',
       value: programId?.toString(),
     })
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [programId])
 
   useEffect(() => {
@@ -160,7 +110,6 @@ const DepositForm = ({
       },
       index
     )
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
 
   const schema = yup.object().shape({

@@ -234,6 +234,10 @@ export default function useGovernanceAssets() {
       name: 'Streamflow',
       image: '/img/streamflow.png',
     },
+    [PackageEnum.Sunrise]: {
+      name: 'Sunrise',
+      image: '/img/sunrise.png',
+    },
     [PackageEnum.Switchboard]: {
       name: 'Switchboard',
       image: '/img/switchboard.png',
@@ -864,6 +868,31 @@ export default function useGovernanceAssets() {
     // [Instructions.CreateStream]: {
     //   name: 'Create Vesting Contract',
     //   packageId: PackageEnum.Streamflow,
+    // },
+
+    /*
+      ███████ ██    ██ ███    ██ ██████  ██ ███████ ███████
+      ██      ██    ██ ████   ██ ██   ██ ██ ██      ██
+      ███████ ██    ██ ██ ██  ██ ██████  ██ ███████ █████
+           ██ ██    ██ ██  ██ ██ ██   ██ ██      ██ ██
+      ███████  ██████  ██   ████ ██   ██ ██ ███████ ███████
+     */
+    [Instructions.SunriseDeposit]: {
+      name: 'Deposit SOL to offset CO2',
+      packageId: PackageEnum.Sunrise,
+    },
+    // Uncomment when ready
+    // [Instructions.SunriseLiquidWithdraw]: {
+    //   name: 'Liquid Withdraw deposited SOL',
+    //   packageId: PackageEnum.Sunrise,
+    // },
+    // [Instructions.SunriseOrderWithdraw]: {
+    //   name: 'Order delayed withdrawal of deposited SOL',
+    //   packageId: PackageEnum.Sunrise,
+    // },
+    // [Instructions.SunriseClaimOrder]: {
+    //   name: 'Claim ordered withdrawal of deposited SOL',
+    //   packageId: PackageEnum.Sunrise,
     // },
 
     /*
