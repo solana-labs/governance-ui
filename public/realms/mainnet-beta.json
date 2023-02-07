@@ -2996,5 +2996,15 @@
     "twitter": "@HackerzDAO",
     "discord": "https://discord.gg/zfQWsKMQCn",
     "ogImage": "/realms/HackerzDAO/img/HackerzDAO_PFP.png"
+  },
+  {
+    "symbol": "Hadeswap Governance",
+    "displayName": "Hadeswap Governance",
+    "shortDescription": "Largest NFT AMM on Solana",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "HgcYAkXFT1ENpUCjBZWc1TjAAFacUwdGZRNhTHx9cuo",
+    "ogImage": "/realms/HadeswapGovernance/hadeswap_logo.jpg",
+    "website": "https://hadeswap.com",
+    "twitter": "@hadeswap"
   }
 ]
