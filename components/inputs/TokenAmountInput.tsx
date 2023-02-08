@@ -1,15 +1,16 @@
 import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
 import { PublicKey } from '@solana/web3.js'
 import { precision } from '@utils/formatting'
-import { FC } from 'react'
+import BigNumber from 'bignumber.js'
+import { FC, useEffect, useMemo } from 'react'
 import Input, { InputProps } from './Input'
 
 type Props = Omit<
   InputProps,
   'min' | 'step' | 'onChange' | 'type' | 'value'
 > & {
+  mint: PublicKey | undefined
   value: string | undefined
-  mint: PublicKey
   setValue: (x: string) => void
   setError: (x: string | undefined) => void
 }
@@ -23,14 +24,19 @@ const TokenAmountInput: FC<Props> = ({
 }) => {
   const { data: mintInfo } = useMintInfoByPubkeyQuery(mint)
 
-  const mintMinAmount = mintInfo?.found
-    ? // @ts-expect-error this discrimination fails on 4.6 but not future versions of TS
-      new BigNumber(1).shiftedBy(mintInfo.result.decimals).toNumber()
-    : 1
+  const mintMinAmount = useMemo(
+    () =>
+      mintInfo?.result
+        ? new BigNumber(1).shiftedBy(mintInfo.result.decimals).toNumber()
+        : 1,
+    [mintInfo?.result]
+  )
 
-  const currentPrecision = precision(mintMinAmount)
+  const currentPrecision = useMemo(() => precision(mintMinAmount), [
+    mintMinAmount,
+  ])
 
-  const validateAmountOnBlur = () => {
+  const validateAmount = () => {
     if (value === undefined || value === '') {
       if (props.required) {
         setError('Token amount is required')
@@ -48,6 +54,7 @@ const TokenAmountInput: FC<Props> = ({
 
   return (
     <Input
+      disabled={props.disabled || mint === undefined}
       min={mintMinAmount}
       label="Amount"
       value={value}
@@ -60,7 +67,7 @@ const TokenAmountInput: FC<Props> = ({
       error={props.error}
       onBlur={(e) => {
         props.onBlur?.(e)
-        validateAmountOnBlur()
+        validateAmount()
       }}
     />
   )
