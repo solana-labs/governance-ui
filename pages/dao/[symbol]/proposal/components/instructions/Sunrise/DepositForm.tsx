@@ -100,7 +100,7 @@ const DepositForm = ({
       propertyName: 'programId',
       value: programId?.toString(),
     })
-  }, [programId])
+  }, [handleSetForm, programId])
 
   useEffect(() => {
     handleSetInstructions(
@@ -110,7 +110,7 @@ const DepositForm = ({
       },
       index
     )
-  }, [form])
+  }, [form, getInstruction, handleSetInstructions, index])
 
   const schema = yup.object().shape({
     governedAccount: yup
@@ -138,7 +138,7 @@ const DepositForm = ({
       />
 
       <Input
-        label="Amount to deposit"
+        label="Amount to deposit (SOL)"
         value={form.uiAmount}
         type="string"
         min="0"
