@@ -74,6 +74,7 @@ function trimRoadmap(roadmap: {
         return !!item.date || !!item.resource || !!item.status || !!item.title;
       })
       .map((item) => {
+        // eslint-disable-next-line
         const { __typename, ...rest } = item;
         return rest;
       });

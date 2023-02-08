@@ -28,6 +28,11 @@ export function Stats(props: Props) {
   const [valueByDao, setValueByDao] = useState<{
     [dao: string]: number;
   }>({});
+  const [valueByDaoAndTokens, setValueByDaoAndTokens] = useState<{
+    [name: string]: {
+      [token: string]: number;
+    };
+  }>({});
   const [nftRealms, setNFTRealms] = useState<PublicKey[]>([]);
   const [duration, setDuration] = useState('');
   const [proposals, setProposals] = useState<ProgramAccount<Proposal>[]>([]);
@@ -106,7 +111,10 @@ export function Stats(props: Props) {
         <NumRealms realms={realms} />
         <NumNFTRealms fetching={!donefetchingNFTs} realms={nftRealms} />
         <TotalValue value={totalValue} />
-        <ValueByDao valueByDao={valueByDao} />
+        <ValueByDao
+          valueByDao={valueByDao}
+          valueByDaoAndTokens={valueByDaoAndTokens}
+        />
         <NumProposals proposals={proposals} />
         <NumVoteRecords voteRecords={voteRecords} />
         <NumMembers members={members} />
@@ -133,9 +141,10 @@ export function Stats(props: Props) {
           }}
           onProposalsComplete={setProposals}
           onRealmsComplete={setRealms}
-          onTVLComplete={(total, byDao) => {
+          onTVLComplete={(total, byDao, byDaosAndTokens) => {
             setTotalValue(total);
             setValueByDao(byDao);
+            setValueByDaoAndTokens(byDaosAndTokens);
           }}
           onVoteRecordsComplete={setVoteRecords}
           runCount={runCount}

@@ -13,6 +13,7 @@ import BN from 'bn.js';
 
 import type { Logger } from '../Logs';
 import { WSOL_MINT_PK } from '@components/instructions/tools';
+import { abbreviateAddress } from '@hub/lib/abbreviateAddress';
 import { getRealmConfigAccountOrDefault } from '@tools/governance/configs';
 import group from '@utils/group';
 import { pause } from '@utils/pause';
@@ -39,7 +40,15 @@ export async function fetchData(
     onNFTRealmsComplete?(realms: PublicKey[]): void;
     onProposalsComplete?(proposals: ProgramAccount<Proposal>[]): void;
     onRealmsComplete?(realms: PublicKey[]): void;
-    onTVLComplete?(value: number, byDaos: { [name: string]: number }): void;
+    onTVLComplete?(
+      value: number,
+      byDaos: { [name: string]: number },
+      byDaosAndTokens: {
+        [name: string]: {
+          [token: string]: number;
+        };
+      },
+    ): void;
     onUpdate?(update: Update): void;
     onVoteRecordsComplete?(voteRecords: ProgramAccount<VoteRecord>[]): void;
   },
@@ -49,6 +58,9 @@ export async function fetchData(
     [dao: string]: {
       [token: string]: BigNumber;
     };
+  } = {};
+  const tokenNameMap: {
+    [mintPk: string]: string;
   } = {};
 
   const updateTokenAmount = (mintPk: PublicKey, amount: BN, realm: string) => {
@@ -249,12 +261,30 @@ export async function fetchData(
       const mint = await tryGetMint(connection, new PublicKey(mintPk));
       const decimalAmount = amount.shiftedBy(-(mint?.account.decimals || 0));
       const usdAmount = decimalAmount.toNumber() * tokenUsdPrice;
+
+      if (!tokenNameMap[mintPk]) {
+        const tokenInfo = tokenPriceService.getTokenInfo(mintPk);
+
+        if (tokenInfo) {
+          tokenNameMap[mintPk] =
+            tokenInfo.symbol || tokenInfo.name || abbreviateAddress(mintPk);
+        } else {
+          tokenNameMap[mintPk] = abbreviateAddress(mintPk);
+        }
+      }
+
       totalUsdAmount += usdAmount;
     }
   }
 
   const tvlPerDao: {
     [dao: string]: number;
+  } = {};
+
+  const tvlPerDaoAndToken: {
+    [dao: string]: {
+      [token: string]: number;
+    };
   } = {};
 
   for (const [dao, tokens] of Object.entries(tokensByDAOAmountMap)) {
@@ -267,6 +297,14 @@ export async function fetchData(
         const mint = await tryGetMint(connection, new PublicKey(mintPk));
         const decimalAmount = amount.shiftedBy(-(mint?.account.decimals || 0));
         const usdAmount = decimalAmount.toNumber() * tokenUsdPrice;
+
+        if (!tvlPerDaoAndToken[dao]) {
+          tvlPerDaoAndToken[dao] = {};
+        }
+
+        const tokenName = tokenNameMap[mintPk] || abbreviateAddress(mintPk);
+
+        tvlPerDaoAndToken[dao][tokenName] = usdAmount;
         totalDaoTvl += usdAmount;
       }
     }
@@ -276,7 +314,7 @@ export async function fetchData(
     }
   }
 
-  cbs.onTVLComplete?.(totalUsdAmount, tvlPerDao);
+  cbs.onTVLComplete?.(totalUsdAmount, tvlPerDao, tvlPerDaoAndToken);
 
   cbs.onUpdate?.({
     progress: 85,

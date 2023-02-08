@@ -86,6 +86,31 @@ const REALM = () => {
   const ownVoteRecordsByProposal = useWalletStore(
     (s) => s.ownVoteRecordsByProposal
   )
+
+  const councilDelegateVoteRecordsByProposal = useWalletStore(
+    (s) => s.councilDelegateVoteRecordsByProposal
+  )
+
+  const communityDelegateVoteRecordsByProposal = useWalletStore(
+    (s) => s.communityDelegateVoteRecordsByProposal
+  )
+  const selectedCouncilDelegate = useWalletStore(
+    (s) => s.selectedCouncilDelegate
+  )
+  const selectedCommunityDelegate = useWalletStore(
+    (s) => s.selectedCommunityDelegate
+  )
+
+  const getCurrentVoteRecKeyVal = () => {
+    if (selectedCommunityDelegate) {
+      return communityDelegateVoteRecordsByProposal
+    }
+    if (selectedCouncilDelegate) {
+      return councilDelegateVoteRecordsByProposal
+    }
+    return ownVoteRecordsByProposal
+  }
+
   const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
@@ -150,7 +175,7 @@ const REALM = () => {
         const governance = governances[v.account.governance.toBase58()]?.account
         return (
           v.account.state === ProposalState.Voting &&
-          !ownVoteRecordsByProposal[k] &&
+          !getCurrentVoteRecKeyVal()[k] &&
           !v.account.hasVoteTimeEnded(governance)
         )
       }),
