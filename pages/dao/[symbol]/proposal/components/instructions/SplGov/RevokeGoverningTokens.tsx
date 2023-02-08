@@ -41,8 +41,8 @@ function capitalizeFirstLetter(string) {
 
 const RevokeGoverningTokens: FC<{
   index: number
-  governance: ProgramAccount<Governance> | null
-}> = ({ index, governance: governanceProp }) => {
+  //governance: ProgramAccount<Governance> | null
+}> = ({ index }) => {
   const { handleSetInstructions } = useContext(NewProposalContext)
   const [form, setForm] = useState<Form>({
     amount: '1',

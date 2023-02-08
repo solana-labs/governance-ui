@@ -2,7 +2,7 @@ import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
 import { PublicKey } from '@solana/web3.js'
 import { precision } from '@utils/formatting'
 import BigNumber from 'bignumber.js'
-import { FC, useEffect, useMemo } from 'react'
+import { FC, useMemo } from 'react'
 import Input, { InputProps } from './Input'
 
 type Props = Omit<
