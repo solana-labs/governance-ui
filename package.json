@@ -100,7 +100,7 @@
     "@solana/web3.js": "1.66.2",
     "@solendprotocol/solend-sdk": "0.5.5",
     "@streamflow/stream": "3.0.16",
-    "@sunrisestake/client": "0.1.0",
+    "@sunrisestake/client": "0.1.2",
     "@switchboard-xyz/switchboard-v2": "0.0.174",
     "@tailwindcss/line-clamp": "0.4.2",
     "@tanstack/react-query": "4.14.3",

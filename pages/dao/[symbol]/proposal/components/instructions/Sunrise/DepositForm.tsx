@@ -18,7 +18,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { SunriseStakeClient, SUNRISE_STAKE_STATE } from '@sunrisestake/client'
+import { SunriseStakeClient, Environment } from '@sunrisestake/client'
 import useWallet from "@hooks/useWallet";
 import { BN } from '@coral-xyz/anchor'
 
@@ -30,6 +30,7 @@ const DepositForm = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const connection = useWalletStore((s) => s.connection)
+  const cluster = useWalletStore((s) => s.connection).cluster
   const { wallet, anchorProvider } = useWallet()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
@@ -43,12 +44,13 @@ const DepositForm = ({
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
+  const sunriseStakeStateAddress = Environment[cluster].sunriseStakeStateAddress
 
   const [ client, setClient ] = useState<SunriseStakeClient>()
 
   useEffect(() => {
     if (!anchorProvider) return;
-    SunriseStakeClient.get(anchorProvider, SUNRISE_STAKE_STATE, {
+    SunriseStakeClient.get(anchorProvider, sunriseStakeStateAddress, {
       verbose: Boolean(process.env.REACT_APP_VERBOSE)
     }).then(setClient)
   }, [anchorProvider]);

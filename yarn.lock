@@ -5355,10 +5355,10 @@
     eventemitter3 "^4.0.7"
     uuid "^8.3.2"
 
-"@sunrisestake/client@0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@sunrisestake/client/-/client-0.1.0.tgz#2939c324aab0879d5704ee79884750fdc7307bca"
-  integrity sha512-iGgMfRjmGx7dhn5PgS9rb2TmP2zjGAfCZUJ+9b291FsUT+lWPd1fF0twuqjw05n42/utblv7i39FIRKg/D/vsw==
+"@sunrisestake/client@0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@sunrisestake/client/-/client-0.1.2.tgz#be6a6368336eafe3b6323b99f13da5a1671cf0fa"
+  integrity sha512-lk7ecLda47tPe19tc9a+Gsq3rkhX99vWZirpDu0UdVcYyCJKRuPhct+wq6GYOdkZ2Mzx2jpCp2ubH82DJcSqzg==
   dependencies:
     "@project-serum/anchor" "^0.26.0"
     "@project-serum/borsh" "^0.2.5"
