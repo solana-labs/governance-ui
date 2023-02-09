@@ -27,7 +27,7 @@ export interface InputProps
   error?: string
   showErrorState?: boolean
   noMaxWidth?: boolean
-  subtitle?: JSX.Element
+  subtitle?: JSX.Element | string
 }
 
 const Input = ({
