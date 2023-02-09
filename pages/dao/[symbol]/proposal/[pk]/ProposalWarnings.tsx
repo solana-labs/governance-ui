@@ -81,7 +81,7 @@ const SetGovernanceConfig = () => (
 )
 
 const useProposalSafetyCheck = () => {
-  const { config, realmInfo, realm } = useRealm()
+  const { config, realmInfo } = useRealm()
   const { instructions } = useProposal()
   const realmConfigWarnings = useMemo(() => {
     if (realmInfo === undefined || config === undefined) return undefined
@@ -111,7 +111,7 @@ const useProposalSafetyCheck = () => {
     })
 
     return realmConfigWarnings
-  }, [config, instructions, realm?.owner, realmInfo])
+  }, [config, instructions, realmInfo])
 
   return realmConfigWarnings
 }
