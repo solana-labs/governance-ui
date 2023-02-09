@@ -7,7 +7,7 @@ import {
   getMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
 import tokenPriceService from '@utils/services/tokenPrice'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import AccountLabel from './BaseAccountHeader'
 import {
@@ -54,8 +54,7 @@ import { TokenProgramAccount } from '@utils/tokens'
 import useWallet from '@hooks/useWallet'
 import TokenSelect from '@components/inputs/TokenSelect'
 import { TokenInfo } from '@solana/spl-token-registry'
-import { filterRoutes, Route, queryRoutes } from '@utils/jupiter'
-import SelectRoute from './Trade/SelectRoute'
+import DateTimePicker from '@components/inputs/DateTimePicker'
 
 export type TradeOnSerumProps = { tokenAccount: AssetAccount }
 
@@ -142,7 +141,6 @@ const formSchema = (
               return true
             }
           ),
-        // TODO: [nice to have] Validate the date is at least min voting period ahead
         reclaimDate: yup.date().typeError('reclaimDate must be a valid date'),
         reclaimAddress: yup
           .string()
@@ -313,7 +311,7 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
           reclaimDate
         )
         .accounts({
-          payer: wallet.publicKey,
+          payer: currentAccount!.extensions!.token!.account.owner,
           collateralAccount,
           mint: new web3.PublicKey(form.assetMint),
           strategy: boundedStrategyKey,
@@ -372,6 +370,18 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
     wallet,
   ])
 
+  const minReclaimDate = useMemo(() => {
+    const date = new Date()
+    let currentSeconds = date.getSeconds()
+    currentSeconds += currentAccount?.governance?.account?.config
+      .minInstructionHoldUpTime
+      ? currentAccount?.governance?.account?.config.minInstructionHoldUpTime +
+        5 * 60
+      : 60 * 60 * 24 * 5
+    date.setSeconds(currentSeconds)
+    return date
+  }, [currentAccount])
+
   return (
     <>
       <div>
@@ -425,7 +435,17 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
             error={formErrors['amount']}
             noMaxWidth={true}
           />
-          {/* TODO: Add reclaim date picker */}
+
+          <DateTimePicker
+            label={'Trade expiration'}
+            onChange={(value) => setForm((f) => ({ ...f, reclaimDate: value }))}
+            value={form.reclaimDate}
+            disableClock={true}
+            minDate={minReclaimDate}
+            required={true}
+            clearIcon={null}
+            calendarIcon={null}
+          />
           <Input
             label={`Limit Price (${destinationToken?.symbol} per ${tokenInfo?.symbol})`}
             value={form.limitPrice}
