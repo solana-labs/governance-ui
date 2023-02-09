@@ -376,12 +376,12 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
         <h3 className="mb-4 flex items-center">Trade</h3>
         <h6 className="mb-4 flex items-center">
           <a
-            href="https://github.com/mithraiclabs/serum-remote"
+            href="https://github.com/mithraiclabs/poseidon"
             target="_blank"
             rel="noreferrer"
           >
             <div className="flex items-center">
-              Serum Remote{' '}
+              Poseidon{' '}
               <ExternalLinkIcon className="flex-shrink-0 h-3.5 ml-1 text-primary-light w-3.5" />
             </div>
           </a>
@@ -398,7 +398,6 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
           )}
           totalPrice={totalValue}
         />
-        {/* Add Serum Remote form */}
         <div className="space-y-4 w-full pb-4">
           <TokenSelect
             label="Destination Token"

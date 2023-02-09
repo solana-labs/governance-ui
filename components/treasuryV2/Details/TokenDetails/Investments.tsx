@@ -37,7 +37,7 @@ export default function Investments(props: Props) {
   ] = useState<ActiveInvestment | null>(null)
 
   const [alternativeInvestment, setAlternativeInvestment] = useState<
-    'Marinade' | 'Lido' | 'Serum' | null
+    'Marinade' | 'Lido' | 'Poseidon' | null
   >(null)
 
   const investments = useAccountInvestments({
@@ -141,7 +141,7 @@ export default function Investments(props: Props) {
                       switch (investment.protocolName) {
                         case 'Marinade':
                         case 'Lido':
-                        case 'Serum': {
+                        case 'Poseidon': {
                           setAlternativeInvestment(investment.protocolName)
                           setProposedInvestment(null)
                           break
@@ -213,7 +213,7 @@ export default function Investments(props: Props) {
               <ConvertToStSol />
             </Modal>
           )}
-          {alternativeInvestment === 'Serum' && (
+          {alternativeInvestment === 'Poseidon' && (
             <Modal
               isOpen
               sizeClassName="sm:max-w-3xl"

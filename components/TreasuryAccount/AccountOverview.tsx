@@ -333,7 +333,7 @@ const AccountOverview = () => {
       handledTokenSymbol: '',
       handledTokenImgSrc: currentTokenImg,
       protocolLogoSrc:
-        'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt/logo.png',
+        'https://user-images.githubusercontent.com/32071703/149460918-3694084f-2a37-4c95-93d3-b5aaf078d444.png',
       strategyName: 'Trade',
       strategyDescription: '',
       createProposalFcn: () => null,
@@ -675,6 +675,7 @@ export const StrategyCard = ({
     handledTokenSymbol,
     apy,
     apyHeader,
+    noProtocol,
   } = strat
   const currentPositionFtm = new BigNumber(
     currentDeposits.toFixed(2)
@@ -700,9 +701,9 @@ export const StrategyCard = ({
           <div className="w-8 h-8 mr-3 rounded-full"></div>
         )}
         <div>
-          <p className="text-xs">{`${strategyName} ${handledTokenSymbol} on ${protocolName}${
-            strategySubtext ? ` - ${strategySubtext}` : ''
-          }`}</p>
+          <p className="text-xs">{`${strategyName} ${handledTokenSymbol} ${
+            noProtocol ? '' : `on ${protocolName}`
+          }${strategySubtext ? ` - ${strategySubtext}` : ''}`}</p>
           {(handledTokenSymbol || currentPositionFtm !== '0') && (
             <p className="font-bold text-fgd-1">{`${currentPositionFtm} ${handledTokenSymbol}`}</p>
           )}
