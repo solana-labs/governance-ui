@@ -1,26 +1,20 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react'
 import * as yup from 'yup'
 
-import {
-  Governance,
-  ProgramAccount,
-  serializeInstructionToBase64,
-} from '@solana/spl-governance'
-import { PublicKey } from '@solana/web3.js'
+import {Governance, ProgramAccount, serializeInstructionToBase64,} from '@solana/spl-governance'
+import {PublicKey} from '@solana/web3.js'
 import Input from '@components/inputs/Input'
 import useRealm from '@hooks/useRealm'
-import { isFormValid } from '@utils/formValidation'
-import {
-  DepositReserveLiquidityAndObligationCollateralForm,
-  UiInstruction,
-} from '@utils/uiTypes/proposalCreationTypes'
+import {isFormValid} from '@utils/formValidation'
+import {DepositReserveLiquidityAndObligationCollateralForm, UiInstruction,} from '@utils/uiTypes/proposalCreationTypes'
 import useWalletStore from 'stores/useWalletStore'
-import { NewProposalContext } from '../../../new'
+import {NewProposalContext} from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { SunriseStakeClient, Environment } from '@sunrisestake/client'
+import {Environment, SunriseStakeClient} from '@sunrisestake/client'
 import useWallet from "@hooks/useWallet";
-import { BN } from '@coral-xyz/anchor'
+import {BN} from '@coral-xyz/anchor'
+import {WalletAdapterNetwork} from "@solana/wallet-adapter-base";
 
 const DepositForm = ({
   index,
@@ -44,28 +38,30 @@ const DepositForm = ({
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
-  const sunriseStakeStateAddress = Environment[cluster].sunriseStakeStateAddress
+  const sunriseStakeStateAddress = useMemo(() => {
+    const environment = cluster === 'mainnet' ? WalletAdapterNetwork.Mainnet : cluster as WalletAdapterNetwork;
+    return Environment[environment].state;
+  }, [cluster]);
 
   const [ client, setClient ] = useState<SunriseStakeClient>()
 
   useEffect(() => {
-    if (!anchorProvider) return;
+    if (!anchorProvider || !sunriseStakeStateAddress) return;
     SunriseStakeClient.get(anchorProvider, sunriseStakeStateAddress, {
       verbose: Boolean(process.env.REACT_APP_VERBOSE)
     }).then(setClient)
-  }, [anchorProvider]);
+  }, [anchorProvider, sunriseStakeStateAddress]);
 
-  const handleSetForm = ({ propertyName, value }) => {
+  const handleSetForm = useCallback(({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
-  }
+  }, [form]);
 
   const validateInstruction = async (): Promise<boolean> => {
     const { isValid, validationErrors } = await isFormValid(schema, form)
     setFormErrors(validationErrors)
     return isValid
   }
-  console.log(form.governedAccount)
 
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
@@ -85,7 +81,7 @@ const DepositForm = ({
         governance: form.governedAccount?.governance,
       }
     }
-    const tx = await client.deposit(new BN(form.uiAmount).mul(new BN(10).pow(new BN(9))));
+    const tx = await client.deposit(new BN(form.uiAmount).mul(new BN(10).pow(new BN(9))));  // convert the amount to lamports
     const serializedInstructions = tx.instructions.map(serializeInstructionToBase64);
 
     return {

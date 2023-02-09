@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import cx from 'classnames'
-import { PencilIcon, PlusCircleIcon } from '@heroicons/react/outline'
+import { PencilIcon, PlusCircleIcon, UsersIcon } from '@heroicons/react/outline'
 import { useRouter } from 'next/router'
 
 import { Mint } from '@models/treasury/Asset'
@@ -20,13 +20,29 @@ import MintIcon from '../../icons/MintIcon'
 import CouncilMintIcon from '../../icons/CouncilMintIcon'
 import CommunityMintIcon from '../../icons/CommunityMintIcon'
 import TokenIcon from '../../icons/TokenIcon'
+import { GoverningTokenType } from '@solana/spl-governance'
+import useProgramVersion from '@hooks/useProgramVersion'
 
 interface Props {
   className?: string
   mint: Mint
 }
 
+const useTokenType = (govpop: 'community' | 'council' | undefined) => {
+  const { config } = useRealm()
+  switch (govpop) {
+    case undefined:
+      return undefined
+    case 'community':
+      return config?.account.communityTokenConfig.tokenType
+    case 'council':
+      return config?.account.councilTokenConfig.tokenType
+  }
+}
+
 export default function Header(props: Props) {
+  const programVersion = useProgramVersion()
+
   const [addMemberModalOpen, setAddMemberModalOpen] = useState(false)
   const [createMetadataModalOpen, setCreateMetadataModalOpen] = useState(false)
   const {
@@ -43,12 +59,20 @@ export default function Header(props: Props) {
   const connected = useWalletStore((s) => s.connected)
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
+  const tokenType = useTokenType(props.mint.tokenRole)
+
+  const membership =
+    programVersion >= 3
+      ? tokenType === GoverningTokenType.Membership
+      : props.mint.tokenRole === 'council'
+
+  const typeLabel = membership ? 'Membership' : 'Token Mint'
 
   const subheading =
     props.mint.tokenRole === 'community'
-      ? 'Community Token Mint'
+      ? 'Community ' + typeLabel
       : props.mint.tokenRole === 'council'
-      ? 'Council Token Mint'
+      ? 'Council ' + typeLabel
       : ''
 
   let addNewMemberTooltip: string | undefined
@@ -101,6 +125,8 @@ export default function Header(props: Props) {
             <div className="h-10 relative w-10">
               {realmInfo?.ogImage && !!props.mint.tokenRole ? (
                 <img className="h-10 w-10" src={realmInfo.ogImage} />
+              ) : membership ? (
+                <UsersIcon className="h-10 w-10" />
               ) : (
                 <TokenIcon className="h-10 w-10 fill-fgd-1" />
               )}
@@ -126,7 +152,12 @@ export default function Header(props: Props) {
                 ) : (
                   <CouncilMintIcon className="h-4 w-4 stroke-white/50" />
                 ))}
-              <div>Total Supply</div>
+              <div>
+                Total{' '}
+                {tokenType === GoverningTokenType.Membership
+                  ? 'Members'
+                  : 'Supply'}
+              </div>
             </div>
             <div className="flex items-baseline space-x-1">
               <div className="text-xl text-fgd-1 font-bold">
@@ -143,7 +174,7 @@ export default function Header(props: Props) {
           disabled={!!addNewMemberTooltip}
           tooltipMessage={addNewMemberTooltip}
           onClick={() => {
-            if (props.mint.tokenRole === 'council') {
+            if (membership) {
               setAddMemberModalOpen(true)
             } else {
               router.push(
@@ -156,7 +187,7 @@ export default function Header(props: Props) {
         >
           <div className="flex items-center justify-center">
             <PlusCircleIcon className="h-4 w-4 mr-1" />
-            {props.mint.tokenRole === 'council' ? 'Add Member' : 'Mint Tokens'}
+            {membership ? 'Add Member' : 'Mint Tokens'}
           </div>
         </SecondaryButton>
         <SecondaryButton
@@ -181,7 +212,10 @@ export default function Header(props: Props) {
           sizeClassName="sm:max-w-3xl"
           onClose={() => setAddMemberModalOpen(false)}
         >
-          <AddMemberForm close={() => setAddMemberModalOpen(false)} />
+          <AddMemberForm
+            close={() => setAddMemberModalOpen(false)}
+            mintAccount={props.mint.raw}
+          />
         </Modal>
       )}
       {createMetadataModalOpen && (
