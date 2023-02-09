@@ -324,11 +324,11 @@ const AccountOverview = () => {
       strategyDescription: '',
       createProposalFcn: () => null,
     }
-    const serumStrategy = {
+    const tradeStrategy = {
       liquidity: 0,
       protocolSymbol: '',
       apy: '',
-      protocolName: 'Serum',
+      protocolName: 'Solana',
       handledMint: '',
       handledTokenSymbol: '',
       handledTokenImgSrc: currentTokenImg,
@@ -358,7 +358,7 @@ const AccountOverview = () => {
           <StrategyCard
             onClick={() => setTradeSerumInfo({ tokenAccount: currentAccount })}
             currentDeposits={0}
-            strat={serumStrategy}
+            strat={tradeStrategy}
           ></StrategyCard>
         )}
       </>

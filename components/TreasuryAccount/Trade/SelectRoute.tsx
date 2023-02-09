@@ -16,7 +16,10 @@ const RouteCard: React.FC<{ route: Route }> = ({ route }) => {
   )
 }
 
-const SelectRoute: React.FC<{ routes: Route[] }> = ({ routes }) => {
+const SelectRoute: React.FC<{
+  routes: Route[]
+  onSelect: (route: Route) => void
+}> = ({ routes, onSelect }) => {
   const [route, setRoute] = useState<Route>()
   const platforms = route
     ? route.marketInfos.map((market) => market.label).join(' + ')
@@ -29,7 +32,7 @@ const SelectRoute: React.FC<{ routes: Route[] }> = ({ routes }) => {
       value={platforms}
       onChange={(value) => {
         setRoute(value)
-        console.log('selected', value)
+        onSelect(value)
       }}
     >
       {routes.map((route, index) => (

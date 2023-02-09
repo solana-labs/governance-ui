@@ -42,7 +42,7 @@ const TokenSelect: React.FC<{
       {results.length > 0 && (
         <Select
           noMaxWidth={true}
-          value={''}
+          value={'please select token'}
           onChange={(value) => {
             setSelectedToken(value)
             onSelect(value)
