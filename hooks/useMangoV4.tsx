@@ -68,7 +68,7 @@ export default function UseMangoV4() {
     const val = docs?.find((x) => x.name === name)
 
     if (val) {
-      return `- ${val.docs}`
+      return `${val.docs}`
     } else {
       return ''
     }

@@ -20,6 +20,7 @@ export enum InstructionInputType {
 
 export interface InstructionInput {
   label: string
+  subtitle?: string
   initialValue: any
   name: string
   type: InstructionInputType
@@ -176,6 +177,7 @@ const InstructionInput = ({
         return (
           <Input
             min={input.min}
+            subtitle={input.subtitle}
             label={input.label}
             value={form[input.name]}
             type={input.inputType!}
