@@ -170,6 +170,7 @@ const ConfigureNftPluginCollection = ({
   ]
   return (
     <>
+      {form && (
       <InstructionForm
         outerForm={form}
         setForm={setForm}
@@ -177,6 +178,7 @@ const ConfigureNftPluginCollection = ({
         setFormErrors={setFormErrors}
         formErrors={formErrors}
       ></InstructionForm>
+      )}
     </>
   )
 }
