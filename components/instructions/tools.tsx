@@ -28,6 +28,7 @@ import { LIDO_INSTRUCTIONS } from './programs/lido'
 import { NAME_SERVICE_INSTRUCTIONS } from './programs/nameService'
 import { TOKEN_AUCTION_INSTRUCTIONS } from './programs/tokenAuction'
 import { VALIDATORDAO_INSTRUCTIONS } from './programs/validatordao'
+import { POSEIDON_INSTRUCTIONS } from './programs/poseidon'
 
 export const V3_DEFAULT_GOVERNANCE_PROGRAM_ID =
   '7e75Nwsz8i5i4NiDa43CNzKJ4AeQGyRimha46VKTM1Ls'
@@ -301,6 +302,7 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...NAME_SERVICE_INSTRUCTIONS,
   ...TOKEN_AUCTION_INSTRUCTIONS,
   ...VALIDATORDAO_INSTRUCTIONS,
+  ...POSEIDON_INSTRUCTIONS,
 }
 
 export async function getInstructionDescriptor(
@@ -314,6 +316,7 @@ export async function getInstructionDescriptor(
   } else {
     descriptors = INSTRUCTION_DESCRIPTORS[instruction.programId.toBase58()]
   }
+  console.log('instruction descriptor', instruction.data[0])
 
   // Make it work for program with one instruction like ATA program
   // and for the one with multiple instructions
