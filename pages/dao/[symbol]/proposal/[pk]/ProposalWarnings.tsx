@@ -111,7 +111,7 @@ const useProposalSafetyCheck = () => {
     })
 
     return realmConfigWarnings
-  }, [config, instructions, realm?.owner, realmInfo])
+  }, [config, instructions, realmInfo])
 
   return realmConfigWarnings
 }
