@@ -67,7 +67,6 @@ type TradeOnSerumForm = {
   assetMint: string
   reclaimDate: Date
   reclaimAddress: string
-  bound: Bound
   description: string
   title: string
 }
@@ -156,16 +155,6 @@ const formSchema = (
               return true
             }
           ),
-        bound: yup
-          .number()
-          .typeError('bound is required')
-          .test(
-            'bound',
-            'bound must be 0 (Lower) or 1 (Upper)',
-            function (bound: number) {
-              return bound === 0 || bound === 1
-            }
-          ),
       })
       // Check the Bound and Order Side are viable
       .test('bound', 'Some check against other values', function (val) {
@@ -196,7 +185,6 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
       'A proposal to trade some asset for another using Serum. PLEASE EXPLAIN IN MORE DETAIL',
     serumRemoteProgramId: serumRemoteProgramId.toString(),
     assetMint: tokenAccount.extensions.mint!.publicKey.toString(),
-    bound: 1,
     // Default reclaim date of 10 days
     reclaimDate: new Date(new Date().getTime() + 1_000 * 3600 * 24 * 10),
     // The reclaim address must be the same account where the initial assets come from
