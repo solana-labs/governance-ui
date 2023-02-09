@@ -7,8 +7,6 @@ import useProgramVersion from '@hooks/useProgramVersion'
 import useRealm from '@hooks/useRealm'
 import {
   createRevokeGoverningTokens,
-  Governance,
-  ProgramAccount,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
