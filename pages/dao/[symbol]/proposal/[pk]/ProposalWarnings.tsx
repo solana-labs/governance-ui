@@ -81,7 +81,7 @@ const SetGovernanceConfig = () => (
 )
 
 const useProposalSafetyCheck = () => {
-  const { config, realmInfo, realm } = useRealm()
+  const { config, realmInfo } = useRealm()
   const { instructions } = useProposal()
   const realmConfigWarnings = useMemo(() => {
     if (realmInfo === undefined || config === undefined) return undefined
@@ -91,7 +91,7 @@ const useProposalSafetyCheck = () => {
     )
 
     const realmConfigWarnings = ixs.map((ix) => {
-      if (realm?.owner.equals(ix.programId) && ix.data[0] === 19) {
+      if (ix.programId.equals(realmInfo.programId) && ix.data[0] === 19) {
         return 'setGovernanceConfig'
       }
       if (ix.programId.equals(realmInfo.programId) && ix.data[0] === 22) {
@@ -102,12 +102,16 @@ const useProposalSafetyCheck = () => {
           (a) => a.isWritable && a.pubkey.equals(config.pubkey)
         ) !== undefined
       ) {
-        return 'ThirdPartyInstructionWritesConfig'
+        if (ix.programId.equals(realmInfo.programId)) {
+          return 'setRealmConfig'
+        } else {
+          return 'ThirdPartyInstructionWritesConfig'
+        }
       }
     })
 
     return realmConfigWarnings
-  }, [config, instructions, realm?.owner, realmInfo])
+  }, [config, instructions, realmInfo])
 
   return realmConfigWarnings
 }

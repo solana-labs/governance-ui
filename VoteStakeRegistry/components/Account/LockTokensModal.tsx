@@ -6,7 +6,7 @@ import Modal from '@components/Modal'
 import { QuestionMarkCircleIcon } from '@heroicons/react/outline'
 import useRealm from '@hooks/useRealm'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { RpcContext } from '@solana/spl-governance'
 import {
   fmtMintAmount,

@@ -1,4 +1,4 @@
-import { AnchorProvider } from '@project-serum/anchor'
+import { AnchorProvider } from '@coral-xyz/anchor'
 import { PublicKey } from '@solana/web3.js'
 import { ConnectionContext } from '@utils/connection'
 import { WalletSigner } from '@solana/spl-governance'
@@ -68,7 +68,7 @@ export default function UseMangoV4() {
     const val = docs?.find((x) => x.name === name)
 
     if (val) {
-      return `- ${val.docs}`
+      return `${val.docs}`
     } else {
       return ''
     }

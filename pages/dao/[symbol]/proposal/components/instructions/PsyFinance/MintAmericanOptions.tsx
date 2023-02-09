@@ -34,7 +34,7 @@ import {
 import useWallet from '@hooks/useWallet'
 import { getATA } from '@utils/ataTools'
 import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
-import { Program } from '@project-serum/anchor'
+import { Program } from '@coral-xyz/anchor'
 
 const formReducer = (
   state: PsyFinanceMintAmericanOptionsForm,

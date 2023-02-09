@@ -292,9 +292,8 @@ const PerpEdit = ({
       name: 'oraclePk',
     },
     {
-      label: `Oracle Configuration Filter ${getAdditionalLabelInfo(
-        'confFilter'
-      )}`,
+      label: `Oracle Confidence Filter`,
+      subtitle: getAdditionalLabelInfo('confFilter'),
       initialValue: form.oracleConfFilter,
       type: InstructionInputType.INPUT,
       inputType: 'number',
@@ -308,193 +307,189 @@ const PerpEdit = ({
       name: 'baseDecimals',
     },
     {
-      label: `Stable Price Delay Growth Limit ${getAdditionalLabelInfo(
-        'stablePriceDelayGrowthLimit'
-      )}`,
+      label: `Stable Price Delay Growth Limit`,
+      subtitle: getAdditionalLabelInfo('stablePriceDelayGrowthLimit'),
       initialValue: form.stablePriceDelayGrowthLimit,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'stablePriceDelayGrowthLimit',
     },
     {
-      label: `Stable Price Growth Limit ${getAdditionalLabelInfo(
-        'stablePriceGrowthLimit'
-      )}`,
+      label: `Stable Price Growth Limit`,
+      subtitle: getAdditionalLabelInfo('stablePriceGrowthLimit'),
       initialValue: form.stablePriceGrowthLimit,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'stablePriceGrowthLimit',
     },
     {
-      label: `Maint Base Asset Weight ${getAdditionalLabelInfo(
-        'maintBaseAssetWeight'
-      )}`,
+      label: `Maintenance Base Asset Weight`,
+      subtitle: getAdditionalLabelInfo('maintBaseAssetWeight'),
       initialValue: form.maintBaseAssetWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'maintBaseAssetWeight',
     },
     {
-      label: `Init Base Asset Weight ${getAdditionalLabelInfo(
-        'initBaseAssetWeight'
-      )}`,
+      label: `Init Base Asset Weight`,
+      subtitle: getAdditionalLabelInfo('initBaseAssetWeight'),
       initialValue: form.initBaseAssetWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'initBaseAssetWeight',
     },
     {
-      label: `Maint Base Liab Weight ${getAdditionalLabelInfo(
-        'maintBaseLiabWeight'
-      )}`,
+      label: `Maintenance Base Liab Weight`,
+      subtitle: getAdditionalLabelInfo('maintBaseLiabWeight'),
       initialValue: form.maintBaseLiabWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'maintBaseLiabWeight',
     },
     {
-      label: `Init Base Liab Weight ${getAdditionalLabelInfo(
-        'initBaseLiabWeight'
-      )}`,
+      label: `Init Base Liab Weight`,
+      subtitle: getAdditionalLabelInfo('initBaseLiabWeight'),
       initialValue: form.initBaseLiabWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'initBaseLiabWeight',
     },
     {
-      label: `Maint Pnl Asset Weight ${getAdditionalLabelInfo(
-        'maintPnlAssetWeight'
-      )}`,
+      label: `Maintenance Pnl Asset Weight`,
+      subtitle: getAdditionalLabelInfo('maintPnlAssetWeight'),
       initialValue: form.maintPnlAssetWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'maintPnlAssetWeight',
     },
     {
-      label: `Liquidation Fee ${getAdditionalLabelInfo('liquidationFee')}`,
+      label: `Liquidation Fee`,
+      subtitle: getAdditionalLabelInfo('liquidationFee'),
       initialValue: form.liquidationFee,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'liquidationFee',
     },
     {
-      label: `Init Pnl Asset Weight ${getAdditionalLabelInfo(
-        'initPnlAssetWeight'
-      )}`,
+      label: `Init Pnl Asset Weight`,
+      subtitle: getAdditionalLabelInfo('initPnlAssetWeight'),
       initialValue: form.initPnlAssetWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'initPnlAssetWeight',
     },
     {
-      label: `Maker Fee ${getAdditionalLabelInfo('makerFee')}`,
+      label: `Maker Fee`,
+      subtitle: getAdditionalLabelInfo('makerFee'),
       initialValue: form.makerFee,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'makerFee',
     },
     {
-      label: `Taker Fee ${getAdditionalLabelInfo('takerFee')}`,
+      label: `Taker Fee`,
+      subtitle: getAdditionalLabelInfo('takerFee'),
       initialValue: form.takerFee,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'takerFee',
     },
     {
-      label: `Fee Penalty ${getAdditionalLabelInfo('feePenalty')}`,
+      label: `Fee Penalty`,
+      subtitle: getAdditionalLabelInfo('feePenalty'),
       initialValue: form.feePenalty,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'feePenalty',
     },
     {
-      label: `Group Insurance Fund ${getAdditionalLabelInfo(
-        'groupInsuranceFund'
-      )}`,
+      label: `Group Insurance Fund`,
+      subtitle: getAdditionalLabelInfo('groupInsuranceFund'),
       initialValue: form.groupInsuranceFund,
       type: InstructionInputType.SWITCH,
       name: 'groupInsuranceFund',
     },
     {
-      label: `Reduce Only ${getAdditionalLabelInfo('reduceOnly')}`,
+      label: `Reduce Only`,
+      subtitle: getAdditionalLabelInfo('reduceOnly'),
       initialValue: form.reduceOnly,
       type: InstructionInputType.SWITCH,
       name: 'reduceOnly',
     },
     {
-      label: `Reset Stable Price ${getAdditionalLabelInfo('resetStablePrice')}`,
+      label: `Reset Stable Price`,
+      subtitle: getAdditionalLabelInfo('resetStablePrice'),
       initialValue: form.resetStablePrice,
       type: InstructionInputType.SWITCH,
       name: 'resetStablePrice',
     },
     {
-      label: `Settle Fee Flat ${getAdditionalLabelInfo('settleFeeFlat')}`,
+      label: `Settle Fee Flat`,
+      subtitle: getAdditionalLabelInfo('settleFeeFlat'),
       initialValue: form.settleFeeFlat,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'settleFeeFlat',
     },
     {
-      label: `Settle Fee Amount Threshold ${getAdditionalLabelInfo(
-        'settleFeeAmountThreshold'
-      )}`,
+      label: `Settle Fee Amount Threshold`,
+      subtitle: getAdditionalLabelInfo('settleFeeAmountThreshold'),
       initialValue: form.settleFeeAmountThreshold,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'settleFeeAmountThreshold',
     },
     {
-      label: `Settle Fee Fraction Low Health ${getAdditionalLabelInfo(
-        'settleFeeFractionLowHealth'
-      )}`,
+      label: `Settle Fee Fraction Low Health`,
+      subtitle: getAdditionalLabelInfo('settleFeeFractionLowHealth'),
       initialValue: form.settleFeeFractionLowHealth,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'settleFeeFractionLowHealth',
     },
     {
-      label: `Stable Price Delay Interval Seconds ${getAdditionalLabelInfo(
-        'stablePriceDelayIntervalSeconds'
-      )}`,
+      label: `Stable Price Delay Interval Seconds`,
+      subtitle: getAdditionalLabelInfo('stablePriceDelayIntervalSeconds'),
       initialValue: form.stablePriceDelayIntervalSeconds,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'stablePriceDelayIntervalSeconds',
     },
     {
-      label: `Settle Pnl Limit Factor ${getAdditionalLabelInfo(
-        'settlePnlLimitFactor'
-      )}`,
+      label: `Settle Pnl Limit Factor`,
+      subtitle: getAdditionalLabelInfo('settlePnlLimitFactor'),
       initialValue: form.settlePnlLimitFactor,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'settlePnlLimitFactor',
     },
     {
-      label: `Settle Pnl Limit Window Size ${getAdditionalLabelInfo(
-        'settlePnlLimitWindowSize'
-      )}`,
+      label: `Settle Pnl Limit Window Size`,
+      subtitle: getAdditionalLabelInfo('settlePnlLimitWindowSize'),
       initialValue: form.settlePnlLimitWindowSize,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'settlePnlLimitWindowSize',
     },
     {
-      label: `Min Funding ${getAdditionalLabelInfo('minFunding')}`,
+      label: `Min Funding`,
+      subtitle: getAdditionalLabelInfo('minFunding'),
       initialValue: form.minFunding,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'minFunding',
     },
     {
-      label: `Max Funding ${getAdditionalLabelInfo('maxFunding')}`,
+      label: `Max Funding`,
+      subtitle: getAdditionalLabelInfo('maxFunding'),
       initialValue: form.maxFunding,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'maxFunding',
     },
     {
-      label: `Impact Quantity ${getAdditionalLabelInfo('impactQuantity')}`,
+      label: `Impact Quantity`,
+      subtitle: getAdditionalLabelInfo('impactQuantity'),
       initialValue: form.impactQuantity,
       type: InstructionInputType.INPUT,
       inputType: 'number',

@@ -30,11 +30,15 @@ export const Primary = forwardRef<HTMLButtonElement, Props>(function Primary(
         'text-white',
         'tracking-normal',
         'transition-colors',
+        'dark:bg-sky-400',
+        'dark:text-neutral-900',
         rest.className,
         !pending && 'active:bg-sky-500',
+        !pending && 'dark:active:bg-sky-400',
         'disabled:bg-zinc-300',
         'disabled:cursor-not-allowed',
         !pending && 'hover:bg-sky-400',
+        !pending && 'dark:hover:bg-sky-300',
         pending && 'cursor-not-allowed',
       )}
       onClick={(e) => {

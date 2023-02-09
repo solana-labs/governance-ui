@@ -15,7 +15,7 @@ import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
-import { web3 } from '@project-serum/anchor'
+import { web3 } from '@coral-xyz/anchor'
 
 const REALMS_PUBLIC_KEY = new web3.PublicKey(
   'BUxZD6aECR5B5MopyvvYqJxwSKDBhx2jSSo1U32en6mj'
@@ -75,8 +75,8 @@ const solanaWalletToDialectWallet = (
         (msg) => wallet.signMessage(msg)
       : undefined,
 
-    signTransaction: wallet.signTransaction,
-    signAllTransactions: wallet.signAllTransactions,
+    signTransaction: wallet.signTransaction as any,
+    signAllTransactions: wallet.signAllTransactions as any,
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     diffieHellman: wallet.wallet?.adapter?._wallet?.diffieHellman

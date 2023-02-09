@@ -28,7 +28,7 @@ import {
   closeAccount,
   initializeAccount,
 } from '@project-serum/serum/lib/token-instructions'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { Token } from '@solana/spl-token'
 
 interface StakingOptionArgs {

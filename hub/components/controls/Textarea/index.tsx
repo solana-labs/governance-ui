@@ -21,6 +21,10 @@ export function Textarea(props: Props) {
         'hover:border-zinc-400',
         'focus:border-sky-500',
         'placeholder:text-neutral-400',
+        'dark:bg-neutral-800',
+        'dark:border-neutral-700',
+        'dark:placeholder:text-neutral-600',
+        'dark:text-neutral-50',
         className,
       )}
       {...rest}

@@ -1,5 +1,19 @@
 [
   {
+    "symbol": "CAS",
+    "displayName": "Cyborg Ape Society",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "6ENR4hciiwNTEF2NJCyCjryxVZqd2gWRV1Dt2dsrZNQt",
+    "bannerImage": "/realms/Ukraine/img/Flag_of_Ukraine.svg",
+    "ogImage": "https://static.wixstatic.com/media/a456a9_0337b7b036a142baa2abaa4b4df14f5b~mv2.gif",
+    "website": "https://cyborg-apes.com",
+    "keywords": "Crypto, Solana, SOL, SPL, Cross-Chain, Trading, Vibes, Data",
+    "twitter": "@cyborgapes_nft",
+    "discord": "https://discord.gg/9ue6ktyu",
+    "shortDescription": "Cyborg Apes Society Mission DAO",
+    "sortRank": 3
+  },
+  {
     "symbol": "Ukraine",
     "displayName": "Ukraine.SOL",
     "programId": "gUAedF544JeE6NYbQakQvribHykUNgaPJqcgf3UQVnY",
@@ -1096,15 +1110,15 @@
     "ogImage": "/realms/bacDao/logo_bulls.png",
     "website": "https://bullsarmyclub.com/"
   },
-  {
+ {
     "symbol": "EPCT",
     "category": "web3",
-    "bannerImage": "https://bafybeib4syqxnch4sf3rw6tuh62sun4cfu3ix4fprb7gff65v6zx74auv4.ipfs.w3s.link/BuidlersCollectiveSamples.jpg",
+    "bannerImage": "https://bafybeigyh52dlntjyn4lyajvt7v5d2vtifjhyaklu3j5rhkpihhbb3wkwa.ipfs.w3s.link/BuidlToEarnTwitterHeader.png",
     "displayName": "Epics",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "DCdCsuUjg6MnULfEmBUmvg1heggnLrKSFdp5uTRSKuwR",
-    "ogImage": "/realms/Epics/Epics-logo.svg",
-    "shortDescription": "Buidl to Earn. Epics is a decentralized crowdsourcing platform for incentivizing open-source software development.",
+    "ogImage": "/realms/Epics/Epics-logo-background.png",
+    "shortDescription": "Buidl to Earn. Epics is a decentralized crowdsourcing platform for incentivizing open source software development.",
     "sortRank": 3,
     "website": "https://epics.dev",
     "twitter": "@EpicsDAO2",
@@ -2942,6 +2956,23 @@
     "discord": "https://discord.com/invite/hhbgab4bsD"
   },
   {
+    "symbol": "THIRD",
+    "category": "defi",
+    "bannerImage": "https://raw.githubusercontent.com/third-markets/Logo/main/bg-third-logo.png",
+    "displayName": "Third DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "ERJ8RLGJNHkKBvaqcsaJwChX5f1Y7wmgoZ1WB5TgdiQG",
+    "communityMint": "7bzmxz5TmbyVQLULo6hLRwi52rKwn4d2RWDces4uvZc4",
+    "ogImage": "https://raw.githubusercontent.com/third-markets/Logo/main/third_logo_500.png",
+    "shortDescription": "Trade selected tokens directly from your wallet with lightning speed and near-zero fees",
+    "sortRank": 3,
+    "website": "https://third.markets",
+    "keywords": "Third Markets, Third, REALM, Governance, Swap, Jupiter, jup-ag, Jupiter Aggregator, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, BTC, USD, Tokens, SPL Tokens",
+    "twitter": "@ThirdMarkets",
+    "discord": "https://discord.gg/HBefBzQcdy",
+    "github": "https://github.com/third-markets"
+  },
+  {
     "symbol": "xLPFi",
     "displayName": "LP Finance xGovernance",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -2965,5 +2996,15 @@
     "twitter": "@HackerzDAO",
     "discord": "https://discord.gg/zfQWsKMQCn",
     "ogImage": "/realms/HackerzDAO/img/HackerzDAO_PFP.png"
+  },
+  {
+    "symbol": "Hadeswap Governance",
+    "displayName": "Hadeswap Governance",
+    "shortDescription": "Largest NFT AMM on Solana",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "HgcYAkXFT1ENpUCjBZWc1TjAAFacUwdGZRNhTHx9cuo",
+    "ogImage": "/realms/HadeswapGovernance/hadeswap_logo.jpg",
+    "website": "https://hadeswap.com",
+    "twitter": "@hadeswap"
   }
 ]
