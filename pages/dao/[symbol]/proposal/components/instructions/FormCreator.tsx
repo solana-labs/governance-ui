@@ -130,6 +130,7 @@ const InstructionInput = ({
         return (
           <Select
             label={input.label}
+            subtitle={input.subtitle}
             // Note that this is different from native selects, which simply use the value as the value, not the name-value pair.
             value={form[input.name]?.name}
             placeholder="Please select..."
@@ -215,6 +216,7 @@ const InstructionInput = ({
       case InstructionInputType.TEXTAREA:
         return (
           <Textarea
+            subtitle={input.subtitle}
             label={input.label}
             placeholder={input.placeholder}
             wrapperClassName="mb-5"
@@ -232,6 +234,9 @@ const InstructionInput = ({
         return (
           <div className="text-sm mb-3">
             <div className="mb-2">{input.label}</div>
+            {input.subtitle && (
+              <p className="text-fgd-3 mb-1 -mt-2">{input.subtitle}</p>
+            )}
             <div className="flex flex-row text-xs items-center">
               <Switch
                 checked={form[input.name]}

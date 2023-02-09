@@ -16,6 +16,7 @@ const TextareaProps = ({
   className,
   wrapperClassName = 'w-full',
   disabled,
+  subtitle,
   label,
   suffix,
   error = '',
@@ -26,7 +27,7 @@ const TextareaProps = ({
   return (
     <div className={`flex-col relative ${wrapperClassName}`}>
       {label && <StyledLabel>{label}</StyledLabel>}
-
+      {subtitle && <p className="text-fgd-3 mb-1 -mt-2">{subtitle}</p>}
       <textarea
         value={value}
         onChange={onChange}
