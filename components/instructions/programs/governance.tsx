@@ -51,12 +51,25 @@ export const GOVERNANCE_INSTRUCTIONS = {
           connection,
           realm.owner
         )
-
-        const args = deserializeBorsh(
-          getGovernanceInstructionSchema(programVersion),
-          SetGovernanceConfigArgs,
-          Buffer.from(data)
-        ) as SetGovernanceConfigArgs
+        let args: SetGovernanceConfigArgs = {} as SetGovernanceConfigArgs
+        let proposalProgramVersion = programVersion
+        for (
+          let propProgVersion = programVersion;
+          propProgVersion >= 0;
+          propProgVersion--
+        ) {
+          try {
+            args = deserializeBorsh(
+              getGovernanceInstructionSchema(programVersion),
+              SetGovernanceConfigArgs,
+              Buffer.from(data)
+            ) as SetGovernanceConfigArgs
+            proposalProgramVersion = propProgVersion
+            break
+          } catch (e) {
+            console.log(e)
+          }
+        }
 
         const communityMint = await tryGetMint(
           connection,
@@ -72,7 +85,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
           governance.account.config.minCommunityTokensToCreateProposal.toString() ===
           DISABLED_VOTER_WEIGHT.toString()
 
-        return programVersion >= 3 ? (
+        return proposalProgramVersion >= 3 ? (
           <>
             <h1>Current config</h1>
             <div className="space-y-3">
@@ -418,12 +431,25 @@ export const GOVERNANCE_INSTRUCTIONS = {
           tryGetRealmConfig(connection, realm.owner, realm.pubkey),
           dryRunInstruction(connection, walletMoq, instructionMoq),
         ])
-
-        const args = deserializeBorsh(
-          getGovernanceInstructionSchema(programVersion),
-          SetRealmConfigArgs,
-          Buffer.from(data)
-        ) as SetRealmConfigArgs
+        let args: SetRealmConfigArgs = {} as SetRealmConfigArgs
+        let proposalProgramVersion = programVersion
+        for (
+          let propProgVersion = programVersion;
+          propProgVersion >= 0;
+          propProgVersion--
+        ) {
+          try {
+            args = deserializeBorsh(
+              getGovernanceInstructionSchema(propProgVersion),
+              SetRealmConfigArgs,
+              Buffer.from(data)
+            ) as SetRealmConfigArgs
+            proposalProgramVersion = propProgVersion
+            break
+          } catch (e) {
+            console.log(e)
+          }
+        }
 
         const possibleRealmConfigsAccounts = simulationResults.response.accounts?.filter(
           (x) => x?.owner === realm.owner.toBase58()
@@ -451,7 +477,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
 
         return isLoading ? (
           <Loading></Loading>
-        ) : programVersion >= 3 ? (
+        ) : proposalProgramVersion >= 3 ? (
           <>
             <p>
               {`minCommunityTokensToCreateGovernance:

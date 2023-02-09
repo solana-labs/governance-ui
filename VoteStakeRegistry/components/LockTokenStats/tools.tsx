@@ -1,5 +1,5 @@
-import { BN } from '@project-serum/anchor'
-import { bs58 } from '@project-serum/anchor/dist/cjs/utils/bytes'
+import { BN } from '@coral-xyz/anchor'
+import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes'
 import {
   ProposalTransaction,
   getGovernanceSchemaForAccount,

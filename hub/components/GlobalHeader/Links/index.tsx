@@ -35,6 +35,8 @@ export function Links(props: Props) {
           <Link passHref href={link.href} key={i}>
             <NavigationMenu.Link
               className={cx(
+                'dark:text-neutral-400',
+                'dark:hover:text-neutral-200',
                 'block',
                 'group',
                 'py-2',

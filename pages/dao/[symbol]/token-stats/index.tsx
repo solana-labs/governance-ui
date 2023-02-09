@@ -5,7 +5,7 @@ import { MANGO_DAO_TREASURY } from '@components/instructions/tools'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import { SearchIcon, UserCircleIcon } from '@heroicons/react/outline'
 import useRealm from '@hooks/useRealm'
-import { BN, BorshInstructionCoder } from '@project-serum/anchor'
+import { BN, BorshInstructionCoder } from '@coral-xyz/anchor'
 import {
   GovernanceAccountType,
   InstructionExecutionStatus,
