@@ -205,12 +205,12 @@ export async function createProposal(args: Args) {
       }
     }
 
-    if (
-      switchboardPluginsPks.includes(pluginPublicKeyStr) &&
-      votingPlugins.switchboardClient
-    ) {
-      client = votingPlugins.switchboardClient;
-    }
+    // if (
+    //   switchboardPluginsPks.includes(pluginPublicKeyStr) &&
+    //   votingPlugins.switchboardClient
+    // ) {
+    //   client = votingPlugins.switchboardClient;
+    // }
 
     if (
       gatewayPluginsPks.includes(pluginPublicKeyStr) &&
