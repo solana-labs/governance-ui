@@ -34,9 +34,13 @@ export const useIsInCoolOffTime = () => {
   const endOfProposalAndCoolOffTime = canFinalizeAt
     ? dayjs(1000 * canFinalizeAt!)
     : undefined
+
   const isInCoolOffTime = endOfProposalAndCoolOffTime
-    ? dayjs().isBefore(endOfProposalAndCoolOffTime)
+    ? dayjs().isBefore(endOfProposalAndCoolOffTime) &&
+      mainVotingEndedAt &&
+      dayjs().isAfter(mainVotingEndedAt * 1000)
     : undefined
+
   return !!isInCoolOffTime && proposal!.account.state !== ProposalState.Defeated
 }
 
