@@ -2406,10 +2406,10 @@
     crypto-hash "^1.3.0"
     form-data "^4.0.0"
 
-"@mithraic-labs/poseidon@0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@mithraic-labs/poseidon/-/poseidon-0.0.3.tgz#6e6adfa5357e4f9b4aed1eda9dd614b4bc1d3f07"
-  integrity sha512-LoB0BL+W06P/HX+LLTBCS7TC58zd8zFCcUt4D3OiIDAsiznvH8fS1uzbm9Updy8ss7kNotlXeGKwpWU8KTtH2A==
+"@mithraic-labs/poseidon@^0.0.4":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@mithraic-labs/poseidon/-/poseidon-0.0.4.tgz#a3b598df5c558553c4d7503021e92593b6394a2c"
+  integrity sha512-C3XwV2eRZeiHTsIVRxIl416PtRutNabIvpF4er5EpfRflbn+rtr2/xpiL1unyNg3MGAlXUFIk0K2GDmNDuuItQ==
   dependencies:
     "@raydium-io/raydium-sdk" "^1.1.0-beta.55"
 
@@ -3072,27 +3072,6 @@
     superstruct "^0.15.4"
     toml "^3.0.0"
 
-"@project-serum/anchor@0.26.0":
-  version "0.26.0"
-  resolved "https://registry.yarnpkg.com/@project-serum/anchor/-/anchor-0.26.0.tgz#99e15a3923a5d10514f8185b2d3909e5699d60d5"
-  integrity sha512-Nq+COIjE1135T7qfnOHEn7E0q39bQTgXLFk837/rgFe6Hkew9WML7eHsS+lSYD2p3OJaTiUOHTAq1lHy36oIqQ==
-  dependencies:
-    "@coral-xyz/borsh" "^0.26.0"
-    "@solana/web3.js" "^1.68.0"
-    base64-js "^1.5.1"
-    bn.js "^5.1.2"
-    bs58 "^4.0.1"
-    buffer-layout "^1.2.2"
-    camelcase "^6.3.0"
-    cross-fetch "^3.1.5"
-    crypto-hash "^1.3.0"
-    eventemitter3 "^4.0.7"
-    js-sha256 "^0.9.0"
-    pako "^2.0.3"
-    snake-case "^3.0.4"
-    superstruct "^0.15.4"
-    toml "^3.0.0"
-
 "@project-serum/anchor@^0.11.1":
   version "0.11.1"
   resolved "https://registry.yarnpkg.com/@project-serum/anchor/-/anchor-0.11.1.tgz#155bff2c70652eafdcfd5559c81a83bb19cec9ff"
@@ -3159,7 +3138,7 @@
   resolved "https://registry.yarnpkg.com/@project-serum/associated-token/-/associated-token-0.1.1.tgz#9acf745e84dad21e2ea26e06694704b9d698e532"
   integrity sha512-Zc1wdqragbDiyBVagzIbIsMe37P7fgkArWZPIj+jJjDIoznlmYMK6ASU5mtdDZrPJ7sNABF/lzZ3+jvCCcU+oA==
 
-"@project-serum/borsh@0.2.5", "@project-serum/borsh@^0.2.2", "@project-serum/borsh@^0.2.3", "@project-serum/borsh@^0.2.4", "@project-serum/borsh@^0.2.5":
+"@project-serum/borsh@^0.2.2", "@project-serum/borsh@^0.2.3", "@project-serum/borsh@^0.2.4", "@project-serum/borsh@^0.2.5":
   version "0.2.5"
   resolved "https://registry.yarnpkg.com/@project-serum/borsh/-/borsh-0.2.5.tgz#6059287aa624ecebbfc0edd35e4c28ff987d8663"
   integrity sha512-UmeUkUoKdQ7rhx6Leve1SssMR/Ghv8qrEiyywyxSWg7ooV7StdpPBhciiy5eB3T0qU1BXvdRNC8TdrkxK7WC5Q==
@@ -5098,7 +5077,7 @@
     "@wallet-standard/app" "^1.0.0"
     "@wallet-standard/base" "^1.0.0"
 
-"@solana/web3.js@1.42.0", "@solana/web3.js@1.56.0", "@solana/web3.js@1.66.2", "@solana/web3.js@^1.16.1", "@solana/web3.js@^1.17.0", "@solana/web3.js@^1.20.0", "@solana/web3.js@^1.21.0", "@solana/web3.js@^1.22.0", "@solana/web3.js@^1.24.1", "@solana/web3.js@^1.29.2", "@solana/web3.js@^1.30.2", "@solana/web3.js@^1.31.0", "@solana/web3.js@^1.32.0", "@solana/web3.js@^1.35.0", "@solana/web3.js@^1.35.1", "@solana/web3.js@^1.36.0", "@solana/web3.js@^1.37.1", "@solana/web3.js@^1.42.0", "@solana/web3.js@^1.43.5", "@solana/web3.js@^1.44.3", "@solana/web3.js@^1.48.0", "@solana/web3.js@^1.56.2", "@solana/web3.js@^1.59.1", "@solana/web3.js@^1.63.0", "@solana/web3.js@^1.63.1", "@solana/web3.js@^1.66.2", "@solana/web3.js@^1.68.0":
+"@solana/web3.js@1.42.0", "@solana/web3.js@1.56.0", "@solana/web3.js@1.66.2", "@solana/web3.js@1.73.0", "@solana/web3.js@^1.16.1", "@solana/web3.js@^1.17.0", "@solana/web3.js@^1.20.0", "@solana/web3.js@^1.21.0", "@solana/web3.js@^1.22.0", "@solana/web3.js@^1.24.1", "@solana/web3.js@^1.29.2", "@solana/web3.js@^1.30.2", "@solana/web3.js@^1.31.0", "@solana/web3.js@^1.32.0", "@solana/web3.js@^1.35.0", "@solana/web3.js@^1.35.1", "@solana/web3.js@^1.36.0", "@solana/web3.js@^1.37.1", "@solana/web3.js@^1.42.0", "@solana/web3.js@^1.43.5", "@solana/web3.js@^1.44.3", "@solana/web3.js@^1.48.0", "@solana/web3.js@^1.56.2", "@solana/web3.js@^1.59.1", "@solana/web3.js@^1.63.0", "@solana/web3.js@^1.63.1", "@solana/web3.js@^1.66.2", "@solana/web3.js@^1.68.0":
   version "1.66.2"
   resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.66.2.tgz#80b43c5868b846124fe3ebac7d3943930c3fa60c"
   integrity sha512-RyaHMR2jGmaesnYP045VLeBGfR/gAW3cvZHzMFGg7bkO+WOYOYp1nEllf0/la4U4qsYGKCsO9eEevR5fhHiVHg==
