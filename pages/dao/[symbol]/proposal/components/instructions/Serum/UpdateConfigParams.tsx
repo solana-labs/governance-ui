@@ -11,7 +11,7 @@ import { useContext, useEffect, useState } from 'react'
 import useSerumGovStore, { ConfigAccountType } from 'stores/useSerumGovStore'
 import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
-import * as anchor from '@project-serum/anchor'
+import * as anchor from '@coral-xyz/anchor'
 
 const UpdateConfigParams = ({
   index,

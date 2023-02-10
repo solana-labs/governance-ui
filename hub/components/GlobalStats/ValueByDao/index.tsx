@@ -1,3 +1,4 @@
+import type { BigNumber } from 'bignumber.js';
 import React from 'react';
 
 import * as common from '../common';
@@ -8,6 +9,11 @@ interface Props {
   className?: string;
   valueByDao: {
     [dao: string]: number;
+  };
+  valueByDaoAndTokens: {
+    [name: string]: {
+      [token: string]: number;
+    };
   };
 }
 
@@ -32,8 +38,9 @@ export function ValueByDao(props: Props) {
       <div
         className={cx(
           'grid',
-          'grid-cols-[max-content,1fr]',
-          'gap-4',
+          'grid-cols-[repeat(5,max-content)]',
+          'gap-y-4',
+          'gap-x-8',
           'mt-2',
           'max-h-96',
           'overflow-y-auto',
@@ -41,18 +48,61 @@ export function ValueByDao(props: Props) {
       >
         {Object.entries(props.valueByDao)
           .sort((a, b) => b[1] - a[1])
-          .map(([dao, value]) => (
-            <React.Fragment key={dao}>
-              <div>{dao}</div>
-              <div>
-                $
-                {formatNumber(value, undefined, {
-                  maximumFractionDigits: 2,
-                  minimumFractionDigits: 2,
-                })}
-              </div>
-            </React.Fragment>
-          ))}
+          .map(([dao, value]) => {
+            const daoTokens = props.valueByDaoAndTokens[dao] || {};
+            const daoTokensSorted = Object.entries(daoTokens)
+              .sort((a, b) => b[1] - a[1])
+              .slice(0, 3);
+
+            return (
+              <React.Fragment key={dao}>
+                <div>{dao}</div>
+                <div>
+                  $
+                  {formatNumber(value, undefined, {
+                    maximumFractionDigits: 2,
+                    minimumFractionDigits: 2,
+                  })}
+                </div>
+                <div>
+                  {daoTokensSorted[0]
+                    ? `${daoTokensSorted[0][0]} $${formatNumber(
+                        daoTokensSorted[0][1],
+                        undefined,
+                        {
+                          maximumFractionDigits: 2,
+                          minimumFractionDigits: 2,
+                        },
+                      )}`
+                    : null}
+                </div>
+                <div>
+                  {daoTokensSorted[1]
+                    ? `${daoTokensSorted[1][0]} $${formatNumber(
+                        daoTokensSorted[1][1],
+                        undefined,
+                        {
+                          maximumFractionDigits: 2,
+                          minimumFractionDigits: 2,
+                        },
+                      )}`
+                    : null}
+                </div>
+                <div>
+                  {daoTokensSorted[2]
+                    ? `${daoTokensSorted[2][0]} $${formatNumber(
+                        daoTokensSorted[2][1],
+                        undefined,
+                        {
+                          maximumFractionDigits: 2,
+                          minimumFractionDigits: 2,
+                        },
+                      )}`
+                    : null}
+                </div>
+              </React.Fragment>
+            );
+          })}
       </div>
     </section>
   );

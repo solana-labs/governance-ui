@@ -11,7 +11,7 @@ import { AssetAccount } from '@utils/uiTypes/assets'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import Input from '@components/inputs/Input'
 import Tooltip from '@components/Tooltip'
-import { Program } from '@project-serum/anchor'
+import { Program } from '@coral-xyz/anchor'
 import {
   PsyAmericanIdl,
   PSY_AMERICAN_PROGRAM_ID,

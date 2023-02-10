@@ -1,4 +1,4 @@
-import { BN, Program, Provider, web3 } from '@project-serum/anchor'
+import { BN, Program, Provider, web3 } from '@coral-xyz/anchor'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,

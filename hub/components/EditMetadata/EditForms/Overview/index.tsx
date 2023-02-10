@@ -30,6 +30,7 @@ function trimAbout(
       return !isEmpty(a.content) || !!a.heading;
     })
     .map((a) => {
+      // eslint-disable-next-line
       const { __typename, ...rest } = a;
       return rest;
     });
@@ -52,6 +53,7 @@ function trimResources(
       return !!r.url || !!r.title;
     })
     .map((r) => {
+      // eslint-disable-next-line
       const { __typename, ...rest } = r;
       return {
         ...rest,

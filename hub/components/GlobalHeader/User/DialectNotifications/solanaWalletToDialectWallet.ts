@@ -14,7 +14,7 @@ export function solanaWalletToDialectWallet(
   }
 
   return {
-    publicKey: wallet.publicKey!,
+    publicKey: wallet.publicKey,
     signMessage: wallet.signMessage,
     signTransaction: wallet.signTransaction,
     signAllTransactions: wallet.signAllTransactions,

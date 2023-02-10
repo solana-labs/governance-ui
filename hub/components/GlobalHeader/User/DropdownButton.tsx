@@ -25,6 +25,12 @@ export function DropdownButton(props: Props) {
           'w-full',
           'active:bg-neutral-300',
           'hover:bg-neutral-200',
+          'dark:fill-neutral-400',
+          'dark:text-neutral-400',
+          'dark:active:bg-neutral-600',
+          'dark:hover:bg-neutral-700',
+          'dark:hover:text-neutral-200',
+          'dark:hover:fill-neutral-200',
         )}
       />
     </NavigationMenu.Item>
