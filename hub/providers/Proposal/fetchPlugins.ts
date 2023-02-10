@@ -23,13 +23,13 @@ export async function fetchPlugins(
     vsrClient,
     nftClient,
     gatewayClient,
-    switchboardClient,
+    //switchboardClient,
     pythClient,
   ] = await Promise.all([
     VsrClient.connect(anchorProvider, programPublicKey, isDevnet),
     NftVoterClient.connect(anchorProvider, isDevnet),
     GatewayClient.connect(anchorProvider, isDevnet),
-    SwitchboardQueueVoterClient.connect(anchorProvider, isDevnet),
+    //SwitchboardQueueVoterClient.connect(anchorProvider, isDevnet),
     PythClient.connect(anchorProvider, connection.rpcEndpoint),
   ]);
 
@@ -37,7 +37,7 @@ export async function fetchPlugins(
     vsrClient,
     nftClient,
     gatewayClient,
-    switchboardClient,
+    //switchboardClient,
     pythClient,
   };
 }

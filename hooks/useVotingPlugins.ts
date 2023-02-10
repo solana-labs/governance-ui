@@ -54,7 +54,7 @@ export function useVotingPlugins() {
     handleSetVsrClient,
     handleSetNftClient,
     handleSetGatewayClient,
-    handleSetSwitchboardClient,
+    //handleSetSwitchboardClient,
     handleSetNftRegistrar,
     handleSetGatewayRegistrar,
     handleSetPythClient,
@@ -313,7 +313,7 @@ export function useVotingPlugins() {
       }
 
       handleSetNftClient(wallet, connection)
-      handleSetSwitchboardClient(wallet, connection)
+      //handleSetSwitchboardClient(wallet, connection)
       handleSetGatewayClient(wallet, connection)
       handleSetPythClient(wallet, connection)
     }
@@ -395,6 +395,8 @@ export function useVotingPlugins() {
         }
       }
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleSwitchboardPlugin = () => {
       if (
         switchboardClient &&
@@ -423,7 +425,7 @@ export function useVotingPlugins() {
       handleNftplugin()
       handleGatewayPlugin()
       handleVsrPlugin()
-      handleSwitchboardPlugin()
+      //handleSwitchboardPlugin()
       handlePythPlugin()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
