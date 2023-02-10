@@ -2,7 +2,7 @@ import React, {useCallback, useContext, useEffect, useMemo, useState} from 'reac
 import * as yup from 'yup'
 
 import {Governance, ProgramAccount, serializeInstructionToBase64,} from '@solana/spl-governance'
-import {PublicKey} from '@solana/web3.js'
+import {LAMPORTS_PER_SOL, PublicKey} from '@solana/web3.js'
 import Input from '@components/inputs/Input'
 import useRealm from '@hooks/useRealm'
 import {isFormValid} from '@utils/formValidation'
@@ -11,10 +11,29 @@ import useWalletStore from 'stores/useWalletStore'
 import {NewProposalContext} from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import {Environment, SunriseStakeClient} from '@sunrisestake/client'
+import {SunriseStakeClient} from '@sunrisestake/client'
 import useWallet from "@hooks/useWallet";
-import {BN} from '@coral-xyz/anchor'
+import {AnchorProvider, BN} from '@coral-xyz/anchor'
 import {WalletAdapterNetwork} from "@solana/wallet-adapter-base";
+import {AssetAccount} from "@utils/uiTypes/assets";
+import {ConnectionContext} from "@utils/connection";
+
+export const governedAccountToAnchor = (
+    connection: ConnectionContext,
+    governedAccount: AssetAccount
+): AnchorProvider => {
+  const options = AnchorProvider.defaultOptions()
+  return new AnchorProvider(
+      connection.current,
+      {
+        publicKey: governedAccount.governance.pubkey,
+        // noop signers, as we use this just to pass the public key
+        signTransaction: async (tx) => tx,
+        signAllTransactions: async (txs) => txs,
+      },
+      options
+  )
+}
 
 const DepositForm = ({
   index,
@@ -38,19 +57,19 @@ const DepositForm = ({
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
-  const sunriseStakeStateAddress = useMemo(() => {
-    const environment = cluster === 'mainnet' ? WalletAdapterNetwork.Mainnet : cluster as WalletAdapterNetwork;
-    return Environment[environment].state;
+  const sunriseEnvironment = useMemo<WalletAdapterNetwork>(() => {
+    return cluster === 'mainnet' ? WalletAdapterNetwork.Mainnet : cluster as WalletAdapterNetwork;
   }, [cluster]);
 
   const [ client, setClient ] = useState<SunriseStakeClient>()
+  const solAccounts = useMemo(() => assetAccounts.filter(a => a.isSol), [assetAccounts]);
 
   useEffect(() => {
-    if (!anchorProvider || !sunriseStakeStateAddress) return;
-    SunriseStakeClient.get(anchorProvider, sunriseStakeStateAddress, {
+    if (!form.governedAccount || !sunriseEnvironment) return;
+    SunriseStakeClient.get(governedAccountToAnchor(connection, form.governedAccount), sunriseEnvironment, {
       verbose: Boolean(process.env.REACT_APP_VERBOSE)
     }).then(setClient)
-  }, [anchorProvider, sunriseStakeStateAddress]);
+  }, [connection, form.governedAccount, sunriseEnvironment]);
 
   const handleSetForm = useCallback(({ propertyName, value }) => {
     setFormErrors({})
@@ -75,13 +94,22 @@ const DepositForm = ({
       !form.governedAccount.isSol ||  // TODO filter governed accounts by SOL only
       !wallet?.publicKey
     ) {
+      console.log('Invalid form', {
+        connection,
+        isValid,
+        programId,
+        client,
+        governance: form.governedAccount?.governance,
+        isSol: form.governedAccount?.isSol,
+        wallet: wallet?.publicKey,
+      })
       return {
         serializedInstruction: '',
         isValid: false,
         governance: form.governedAccount?.governance,
       }
     }
-    const tx = await client.deposit(new BN(form.uiAmount).mul(new BN(10).pow(new BN(9))));  // convert the amount to lamports
+    const tx = await client.deposit(new BN(Number(form.uiAmount) * LAMPORTS_PER_SOL));  // convert the amount to lamports
     const serializedInstructions = tx.instructions.map(serializeInstructionToBase64);
 
     return {
@@ -125,7 +153,7 @@ const DepositForm = ({
     <>
       <GovernedAccountSelect
         label="Wallet"
-        governedAccounts={assetAccounts}
+        governedAccounts={solAccounts}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedAccount' })
         }}
