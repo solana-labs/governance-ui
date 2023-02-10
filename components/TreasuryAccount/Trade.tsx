@@ -7,16 +7,15 @@ import {
   getMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
 import tokenPriceService from '@utils/services/tokenPrice'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import AccountLabel from './BaseAccountHeader'
 import {
-  Bound,
   getProgramId,
-  IDL as SerumRemoteIDL,
+  IDL as PoseidonIDL,
   pdas,
-  SerumRemote,
-} from '@mithraic-labs/serum-remote'
+  Poseidon,
+} from '@mithraic-labs/poseidon'
 import useWalletStore from 'stores/useWalletStore'
 import {
   ArrowCircleDownIcon,
@@ -56,14 +55,14 @@ import TokenSelect from '@components/inputs/TokenSelect'
 import { TokenInfo } from '@solana/spl-token-registry'
 import DateTimePicker from '@components/inputs/DateTimePicker'
 
-export type TradeOnSerumProps = { tokenAccount: AssetAccount }
+export type TradeProps = { tokenAccount: AssetAccount }
 
 export const SUPPORTED_TRADE_PLATFORMS = ['Raydium', 'Openbook']
 
-type TradeOnSerumForm = {
+type TradeForm = {
   amount: number
   limitPrice: number
-  serumRemoteProgramId: string
+  poseidonProgramId: string
   assetMint: string
   reclaimDate: Date
   reclaimAddress: string
@@ -112,14 +111,14 @@ const formSchema = (
               return val > 0
             }
           ),
-        serumRemoteProgramId: yup
+        poseidonProgramId: yup
           .string()
           .test(
-            'serumRemoteProgramId',
-            'serumRemoteProgramId must be valid PublicKey',
-            function (serumRemoteProgramId: string) {
+            'poseidonProgramId',
+            'poseidonProgramId must be valid PublicKey',
+            function (poseidonProgramId: string) {
               try {
-                getValidatedPublickKey(serumRemoteProgramId)
+                getValidatedPublickKey(poseidonProgramId)
               } catch (err) {
                 return false
               }
@@ -166,24 +165,24 @@ const formSchema = (
   )
 }
 
-const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
+const Trade: React.FC<TradeProps> = ({ tokenAccount }) => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const router = useRouter()
   const connection = useWalletStore((s) => s.connection)
   const { wallet, anchorProvider } = useWallet()
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const { handleCreateProposal } = useCreateProposal()
-  const serumRemoteProgramId = getProgramId(connection.cluster)
+  const poseidonProgramId = getProgramId(connection.cluster)
   const { canUseTransferInstruction } = useGovernanceAssets()
   const { canChooseWhoVote, symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
-  const [form, setForm] = useState<TradeOnSerumForm>({
+  const [form, setForm] = useState<TradeForm>({
     amount: 0,
     limitPrice: 0,
-    title: 'Diversify treasury with Serum',
+    title: 'Diversify treasury with Poseidon',
     description:
-      'A proposal to trade some asset for another using Serum. PLEASE EXPLAIN IN MORE DETAIL',
-    serumRemoteProgramId: serumRemoteProgramId.toString(),
+      'A proposal to trade some asset for another using Poseidon. PLEASE EXPLAIN IN MORE DETAIL',
+    poseidonProgramId: poseidonProgramId.toString(),
     assetMint: tokenAccount.extensions.mint!.publicKey.toString(),
     // Default reclaim date of 10 days
     reclaimDate: new Date(new Date().getTime() + 1_000 * 3600 * 24 * 10),
@@ -233,9 +232,9 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
       throw new Error('destinationToken must have decimals')
     }
     if (wallet && wallet.publicKey && anchorProvider && isValid) {
-      const program = new Program<SerumRemote>(
-        SerumRemoteIDL,
-        serumRemoteProgramId,
+      const program = new Program<Poseidon>(
+        PoseidonIDL,
+        poseidonProgramId,
         anchorProvider
       )
       // The minimum expected output amount
@@ -490,4 +489,4 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
   )
 }
 
-export default TradeOnSerum
+export default Trade

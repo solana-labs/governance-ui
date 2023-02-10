@@ -13,7 +13,7 @@ import DepositModal from 'Strategies/components/DepositModal'
 import Modal from '@components/Modal'
 import ConvertToMsol from '@components/TreasuryAccount/ConvertToMsol'
 import ConvertToStSol from '@components/TreasuryAccount/ConvertToStSol'
-import TradeOnSerum from '@components/TreasuryAccount/TradeOnSerum'
+import Trade from '@components/TreasuryAccount/Trade'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useWalletStore from 'stores/useWalletStore'
 
@@ -219,7 +219,7 @@ export default function Investments(props: Props) {
               sizeClassName="sm:max-w-3xl"
               onClose={() => setAlternativeInvestment(null)}
             >
-              <TradeOnSerum tokenAccount={props.asset.raw} />
+              <Trade tokenAccount={props.asset.raw} />
             </Modal>
           )}
         </div>

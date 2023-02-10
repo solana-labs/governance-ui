@@ -39,7 +39,7 @@ import {
 } from 'Strategies/protocols/mango/tools'
 import useMarketStore from 'Strategies/store/marketStore'
 import LoadingRows from './LoadingRows'
-import TradeOnSerum, { TradeOnSerumProps } from './TradeOnSerum'
+import TradeOnSerum, { TradeOnSerumProps } from './Trade'
 import { AccountType } from '@utils/uiTypes/assets'
 import CreateAta from './CreateAta'
 import {
