@@ -206,6 +206,9 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
   const tokenInfo = tokenPriceService.getTokenInfo(
     mintAccount.publicKey.toString()
   )
+  const inputTokenSym = tokenInfo?.symbol
+    ? tokenInfo?.symbol
+    : `${mintAccount.publicKey.toString().substring(0, 6)}...`
 
   const totalValue = useTotalTokenValue({
     amount: getMintDecimalAmountFromNatural(
@@ -406,11 +409,7 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
             }
           />
           <Input
-            label={`Amount of ${
-              tokenInfo?.symbol
-                ? tokenInfo?.symbol
-                : `${mintAccount.publicKey.toString().substring(0, 6)}...`
-            } to trade with`}
+            label={`Amount of ${inputTokenSym} to trade with`}
             value={form.amount}
             type="number"
             onChange={(evt) =>
@@ -434,7 +433,7 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
             calendarIcon={null}
           />
           <Input
-            label={`Limit Price (${destinationToken?.symbol} per ${tokenInfo?.symbol})`}
+            label={`Limit Price (${destinationToken?.symbol} per ${inputTokenSym})`}
             value={form.limitPrice}
             type="number"
             onChange={(evt) =>
