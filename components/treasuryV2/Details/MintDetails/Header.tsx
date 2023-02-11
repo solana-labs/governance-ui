@@ -84,20 +84,20 @@ export default function Header(props: Props) {
 
   if (props.mint.tokenRole === 'council') {
     if (!connected) {
-      addNewMemberTooltip = 'Connect your wallet to add new council member'
+      addNewMemberTooltip =
+        'Connect your wallet to add or remove council members'
     } else if (!canMintRealmCouncilToken()) {
       addNewMemberTooltip =
-        'Your realm need mint governance for council token to add new member'
+        'Your realm needs mint governance for council token to add or remove members'
     } else if (!canUseMintInstruction) {
       addNewMemberTooltip =
-        "You don't have enough governance power to add new council member"
+        "You don't have enough governance power to add or remove council members"
     }
   } else {
     if (!connected) {
       addNewMemberTooltip = 'You must connect your wallet'
     } else if (!canUseMintInstruction) {
-      addNewMemberTooltip =
-        "You don't have enough governance power to mint new tokens"
+      addNewMemberTooltip = "You don't have enough governance power"
     }
   }
 
