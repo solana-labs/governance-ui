@@ -32,14 +32,19 @@ import useProgramVersion from '@hooks/useProgramVersion'
 import { useRouter } from 'next/router'
 import { Instructions } from '@utils/uiTypes/proposalCreationTypes'
 import { abbreviateAddress } from '@utils/formatting'
+import useGovernanceForGovernedAddress from '@hooks/useGovernanceForGovernedAddress'
+import useProposalCreationButtonTooltip from '@hooks/useProposalCreationButtonTooltip'
+import Tooltip from '@components/Tooltip'
 
 const RevokeMembership: FC<{ member: PublicKey; mint: PublicKey }> = ({
   member,
   mint,
 }) => {
   const { symbol, realm } = useRealm()
+
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
+  const governance = useGovernanceForGovernedAddress(mint)
 
   const govpop =
     realm !== undefined &&
@@ -58,23 +63,31 @@ const RevokeMembership: FC<{ member: PublicKey; mint: PublicKey }> = ({
   // note the lack of space is not a typo
   const proposalTitle = `Remove ${govpop}member ${abbrevAddress}`
 
+  console.log(governance, 'AAAAAA')
+  const tooltipContent = useProposalCreationButtonTooltip(
+    governance ? [governance] : []
+  )
+
   return (
     <>
-      <LinkButton
-        className=" fill-red-400 text-red-400 flex items-center whitespace-nowrap"
-        onClick={() =>
-          router.push(
-            fmtUrlWithCluster(
-              `/dao/${symbol}/proposal/new?i=${
-                Instructions.RevokeGoverningTokens
-              }&t=${proposalTitle}&memberKey=${member.toString()}`
+      <Tooltip content={tooltipContent}>
+        <LinkButton
+          disabled={!!tooltipContent}
+          className=" fill-red-400 text-red-400 flex items-center whitespace-nowrap"
+          onClick={() =>
+            router.push(
+              fmtUrlWithCluster(
+                `/dao/${symbol}/proposal/new?i=${
+                  Instructions.RevokeGoverningTokens
+                }&t=${proposalTitle}&memberKey=${member.toString()}`
+              )
             )
-          )
-        }
-      >
-        <XCircleIcon className="flex-shrink-0 h-5 mr-2 w-5" />
-        Revoke Membership
-      </LinkButton>
+          }
+        >
+          <XCircleIcon className="flex-shrink-0 h-5 mr-2 w-5" />
+          Revoke Membership
+        </LinkButton>
+      </Tooltip>
     </>
   )
 }
