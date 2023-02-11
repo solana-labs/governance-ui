@@ -31,11 +31,32 @@ import { LinkButton } from '@components/Button'
 import useProgramVersion from '@hooks/useProgramVersion'
 import { useRouter } from 'next/router'
 import { Instructions } from '@utils/uiTypes/proposalCreationTypes'
+import { abbreviateAddress } from '@utils/formatting'
 
-const RevokeMembership: FC<{ member: PublicKey }> = ({ member }) => {
-  const { symbol } = useRealm()
+const RevokeMembership: FC<{ member: PublicKey; mint: PublicKey }> = ({
+  member,
+  mint,
+}) => {
+  const { symbol, realm } = useRealm()
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
+
+  const govpop =
+    realm !== undefined &&
+    (mint.equals(realm.account.communityMint)
+      ? 'community '
+      : realm.account.config.councilMint &&
+        mint.equals(realm.account.config.councilMint)
+      ? 'council '
+      : '')
+  let abbrevAddress: string
+  try {
+    abbrevAddress = abbreviateAddress(member)
+  } catch {
+    abbrevAddress = ''
+  }
+  // note the lack of space is not a typo
+  const proposalTitle = `Remove ${govpop}member ${abbrevAddress}`
 
   return (
     <>
@@ -46,7 +67,7 @@ const RevokeMembership: FC<{ member: PublicKey }> = ({ member }) => {
             fmtUrlWithCluster(
               `/dao/${symbol}/proposal/new?i=${
                 Instructions.RevokeGoverningTokens
-              }&memberKey=${member.toString()}`
+              }&t=${proposalTitle}&memberKey=${member.toString()}`
             )
           )
         }
@@ -229,8 +250,15 @@ const MemberOverview = ({ member }: { member: Member }) => {
             Explorer
             <ExternalLinkIcon className="flex-shrink-0 h-4 ml-1 w-4" />
           </a>
-          {programVersion >= 3 && (
-            <RevokeMembership member={new PublicKey(member.walletAddress)} />
+          {programVersion >= 3 && realm !== undefined && (
+            <RevokeMembership
+              member={new PublicKey(member.walletAddress)}
+              mint={
+                !councilVotes.isZero() && realm.account.config.councilMint
+                  ? realm.account.config.councilMint
+                  : realm.account.communityMint
+              }
+            />
           )}
         </div>
       </div>
