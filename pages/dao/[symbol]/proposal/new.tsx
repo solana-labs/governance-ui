@@ -181,7 +181,7 @@ const New = () => {
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [form, setForm] = useState({
-    title: '',
+    title: typeof router.query['t'] === 'string' ? router.query['t'] : '',
     description: '',
   })
   const [formErrors, setFormErrors] = useState({})
