@@ -1,9 +1,11 @@
 import { EndpointTypes } from '@models/types'
-import { PublicKey } from '@solana/web3.js'
+import { Connection, PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
+import { getNetworkFromEndpoint } from '@utils/connection'
 import asFindable from '@utils/queries/asFindable'
 import { tryGetMint } from '@utils/tokens'
 import useWalletStore from 'stores/useWalletStore'
+import queryClient from './queryClient'
 
 export const mintInfoQueryKeys = {
   all: (cluster: EndpointTypes) => [cluster, 'MintInfo'],
@@ -31,4 +33,18 @@ export const useMintInfoByPubkeyQuery = (pubkey?: PublicKey) => {
   })
 
   return query
+}
+
+export const fetchMintInfoByPubkey = (
+  connection: Connection,
+  pubkey: PublicKey
+) => {
+  const cluster = getNetworkFromEndpoint(connection.rpcEndpoint)
+  return queryClient.fetchQuery({
+    queryKey: mintInfoQueryKeys.byPubkey(cluster, pubkey),
+    queryFn: () =>
+      asFindable((...x: Parameters<typeof tryGetMint>) =>
+        tryGetMint(...x).then((x) => x?.account)
+      )(connection, pubkey),
+  })
 }

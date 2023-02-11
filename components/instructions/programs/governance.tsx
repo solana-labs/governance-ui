@@ -1,4 +1,5 @@
 import Loading from '@components/Loading'
+import { fetchMintInfoByPubkey } from '@hooks/queries/mintInfo'
 import {
   AccountMetaData,
   deserializeBorsh,
@@ -10,6 +11,7 @@ import {
   InstructionData,
   ProgramAccount,
   RealmConfigAccount,
+  RevokeGoverningTokensArgs,
   SetRealmAuthorityAction,
   SetRealmAuthorityArgs,
   tryGetRealmConfig,
@@ -24,6 +26,7 @@ import { DISABLED_VOTER_WEIGHT, SIMULATION_WALLET } from '@tools/constants'
 import { fmtVoterWeightThresholdMintAmount } from '@tools/governance/units'
 import {
   fmtBNAmount,
+  fmtBnMintDecimals,
   fmtMintAmount,
   getDaysFromTimestamp,
   getHoursFromTimestamp,
@@ -659,6 +662,73 @@ export const GOVERNANCE_INSTRUCTIONS = {
                 )}
               </p>
             </div>
+          </>
+        )
+      },
+    },
+    26: {
+      name: 'Revoke Governing Tokens',
+      /// Revokes (burns) membership governing tokens for the given TokenOwnerRecord and hence takes away governance power from the TokenOwner
+      /// Note: If there are active votes for the TokenOwner then the vote weights won't be updated automatically
+      ///
+      ///  0. `[]` Realm account
+      ///  1. `[writable]` Governing Token Holding account. PDA seeds: ['governance',realm, governing_token_mint]
+      ///  2. `[writable]` TokenOwnerRecord account. PDA seeds: ['governance',realm, governing_token_mint, governing_token_owner]
+      ///  3. `[writable]` GoverningTokenMint
+      ///  4. `[signer]` Revoke authority which can be either of:
+      ///                1) GoverningTokenMint mint_authority to forcefully revoke the membership tokens
+      ///                2) GoverningTokenOwner who voluntarily revokes their own membership
+      ///  5. `[]` RealmConfig account. PDA seeds: ['realm-config', realm]
+      ///  6. `[]` SPL Token program
+      accounts: [
+        {
+          name: 'Realm',
+        },
+        {
+          name: 'Governing Token Holding',
+        },
+        {
+          name: 'Token Owner Record',
+        },
+        {
+          name: 'Governing Token Mint',
+        },
+        {
+          name: 'Governing Token Mint Authority',
+        },
+        { name: 'Realm Config Account' },
+        { name: 'SPL Token Program' },
+      ],
+      getDataUI: async (
+        connection: Connection,
+        data: Uint8Array,
+        accounts: AccountMetaData[]
+      ) => {
+        const realm = await getRealm(connection, accounts[0].pubkey)
+        const programVersion = await getGovernanceProgramVersion(
+          connection,
+          realm.owner
+        )
+        const mintInfoQuery = await fetchMintInfoByPubkey(
+          connection,
+          accounts[3].pubkey
+        )
+
+        const args = deserializeBorsh(
+          getGovernanceInstructionSchema(programVersion),
+          RevokeGoverningTokensArgs,
+          Buffer.from(data)
+        ) as RevokeGoverningTokensArgs
+
+        return (
+          <>
+            <p>
+              amount:{' '}
+              {mintInfoQuery.result !== undefined
+                ? fmtBnMintDecimals(args.amount, mintInfoQuery.result.decimals)
+                : 'loading mint info...'}{' '}
+              ({args.amount.toString()})
+            </p>
           </>
         )
       },
