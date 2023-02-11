@@ -13,6 +13,7 @@ import { PublicKey } from '@solana/web3.js'
 import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
 import { validateSolAddress } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
+import { useRouter } from 'next/router'
 import React, {
   FC,
   useCallback,
@@ -50,6 +51,28 @@ const RevokeGoverningTokens: FC<{
   const { realmInfo, realm } = useRealm()
   const programId: PublicKey | undefined = realmInfo?.programId
   const programVersion = useProgramVersion()
+
+  // populate form from url params
+  const { query } = useRouter()
+  useEffect(() => {
+    const q = query as Form
+
+    if (q.memberKey !== undefined) {
+      setForm((prev) => ({ ...prev, memberKey: q.memberKey }))
+    }
+    if (q.membershipPopulation !== undefined) {
+      const x = q.membershipPopulation
+      if (x !== 'community' && x !== 'council')
+        throw new Error('url query provided invalid parameter')
+      setForm((prev) => ({
+        ...prev,
+        membershipPopulation: x,
+      }))
+    }
+    if (q.amount !== undefined) {
+      setForm((prev) => ({ ...prev, amount: q.amount?.[0] }))
+    }
+  }, [query])
 
   // If there's only one membership type, we can just select that for the user.
   // @asktree style note: I create a new variable rather than using `setForm` here because I don't like side effects
