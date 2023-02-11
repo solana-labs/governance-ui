@@ -2,6 +2,7 @@ import Loading from '@components/Loading'
 import { fetchMintInfoByPubkey } from '@hooks/queries/mintInfo'
 import {
   AccountMetaData,
+  DepositGoverningTokensArgs,
   deserializeBorsh,
   getGovernance,
   getGovernanceInstructionSchema,
@@ -39,6 +40,70 @@ const governanceProgramId = 'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
 
 export const GOVERNANCE_INSTRUCTIONS = {
   [governanceProgramId]: {
+    1: {
+      /// Deposits governing tokens (Community or Council) to Governance Realm and establishes your voter weight to be used for voting within the Realm
+      /// Note: If subsequent (top up) deposit is made and there are active votes for the Voter then the vote weights won't be updated automatically
+      /// It can be done by relinquishing votes on active Proposals and voting again with the new weight
+      ///
+      ///  0. `[]` Realm account
+      ///  1. `[writable]` Governing Token Holding account. PDA seeds: ['governance',realm, governing_token_mint]
+      ///  2. `[writable]` Governing Token Source account. It can be either spl-token TokenAccount or MintAccount
+      ///      Tokens will be transferred or minted to the Holding account
+      ///  3. `[signer]` Governing Token Owner account
+      ///  4. `[signer]` Governing Token Source account authority
+      ///      It should be owner for TokenAccount and mint_authority for MintAccount
+      ///  5. `[writable]` TokenOwnerRecord account. PDA seeds: ['governance',realm, governing_token_mint, governing_token_owner]
+      ///  6. `[signer]` Payer
+      ///  7. `[]` System
+      ///  8. `[]` SPL Token program
+      ///  9. `[]` RealmConfig account. PDA seeds: ['realm-config', realm]
+      name: 'Deposit Governing Tokens',
+      accounts: [
+        { name: 'Realm' },
+        { name: 'Governing Token Holding' },
+        { name: 'Mint' },
+        { name: 'Governing Token Owner' },
+        { name: 'Mint Authority' },
+        { name: 'Token Owner Record' },
+        { name: 'Payer' },
+        { name: 'System' },
+        { name: 'SPL Token Program' },
+        { name: 'Realm Config' },
+      ],
+      getDataUI: async (
+        connection: Connection,
+        data: Uint8Array,
+        accounts: AccountMetaData[]
+      ) => {
+        const realm = await getRealm(connection, accounts[0].pubkey)
+        const programVersion = await getGovernanceProgramVersion(
+          connection,
+          realm.owner
+        )
+        const mintInfoQuery = await fetchMintInfoByPubkey(
+          connection,
+          accounts[2].pubkey
+        )
+
+        const args = deserializeBorsh(
+          getGovernanceInstructionSchema(programVersion),
+          DepositGoverningTokensArgs,
+          Buffer.from(data)
+        ) as DepositGoverningTokensArgs
+
+        return (
+          <>
+            <p>
+              amount:{' '}
+              {mintInfoQuery.result !== undefined
+                ? fmtBnMintDecimals(args.amount, mintInfoQuery.result.decimals)
+                : 'loading mint info...'}{' '}
+              ({args.amount.toString()})
+            </p>
+          </>
+        )
+      },
+    },
     19: {
       name: 'Set Governance Config',
       accounts: [{ name: 'Governance' }],
