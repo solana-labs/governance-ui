@@ -661,6 +661,7 @@ export enum Instructions {
   RemoveKeyFromDID,
   AddServiceToDID,
   RemoveServiceFromDID,
+  RevokeGoverningTokens,
 
   SunriseDeposit,
   // uncomment when the forms are ready

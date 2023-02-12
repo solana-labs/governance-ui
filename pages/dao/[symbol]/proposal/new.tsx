@@ -145,6 +145,7 @@ import TokenAddBank from './components/instructions/Mango/MangoV4/TokenAddBank'
 import PsyFinanceBurnWriterTokenForQuote from './components/instructions/PsyFinance/BurnWriterTokenForQuote'
 import PsyFinanceClaimUnderlyingPostExpiration from './components/instructions/PsyFinance/ClaimUnderlyingPostExpiration'
 import PsyFinanceExerciseOption from './components/instructions/PsyFinance/ExerciseOption'
+import RevokeGoverningTokens from './components/instructions/SplGov/RevokeGoverningTokens'
 import SunriseDepositForm from './components/instructions/Sunrise/DepositForm'
 
 const TITLE_LENGTH_LIMIT = 130
@@ -181,7 +182,7 @@ const New = () => {
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [form, setForm] = useState({
-    title: '',
+    title: typeof router.query['t'] === 'string' ? router.query['t'] : '',
     description: '',
   })
   const [formErrors, setFormErrors] = useState({})
@@ -568,6 +569,7 @@ const New = () => {
       [Instructions.RemoveKeyFromDID]: RemoveKeyFromDID,
       [Instructions.AddServiceToDID]: AddServiceToDID,
       [Instructions.RemoveServiceFromDID]: RemoveServiceFromDID,
+      [Instructions.RevokeGoverningTokens]: RevokeGoverningTokens,
       [Instructions.SunriseDeposit]: SunriseDepositForm,
     }),
     [governance?.pubkey.toBase58()]
