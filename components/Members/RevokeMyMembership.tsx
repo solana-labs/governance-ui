@@ -113,16 +113,23 @@ const Form: FC<{ closeModal: () => void }> = ({ closeModal }) => {
 
     setIsLoading(true)
 
-    await sendTransactionsV3({
-      connection: connection.current,
-      wallet: wallet,
-      transactionInstructions: [
-        { instructionsSet: [{ transactionInstruction: ix }] },
-      ],
-    })
+    try {
+      await sendTransactionsV3({
+        connection: connection.current,
+        wallet: wallet,
+        transactionInstructions: [
+          { instructionsSet: [{ transactionInstruction: ix }] },
+        ],
+      })
+      closeModal()
+      // refresh window?
+    } catch {
+      setIsLoading(false)
+    }
 
     setIsLoading(false)
   }, [
+    closeModal,
     connection,
     form.amount,
     governance,
