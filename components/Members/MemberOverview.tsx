@@ -35,11 +35,14 @@ import { abbreviateAddress } from '@utils/formatting'
 import useGovernanceForGovernedAddress from '@hooks/useGovernanceForGovernedAddress'
 import useProposalCreationButtonTooltip from '@hooks/useProposalCreationButtonTooltip'
 import Tooltip from '@components/Tooltip'
+import RevokeMyMembership from './RevokeMyMembership'
 
 const RevokeMembership: FC<{ member: PublicKey; mint: PublicKey }> = ({
   member,
   mint,
 }) => {
+  const wallet = useWalletStore((s) => s.current)
+
   const { symbol, realm } = useRealm()
 
   const router = useRouter()
@@ -68,7 +71,7 @@ const RevokeMembership: FC<{ member: PublicKey; mint: PublicKey }> = ({
     governance ? [governance] : []
   )
 
-  return (
+  return !wallet?.publicKey?.equals(member) ? (
     <>
       <Tooltip content={tooltipContent}>
         <LinkButton
@@ -89,6 +92,8 @@ const RevokeMembership: FC<{ member: PublicKey; mint: PublicKey }> = ({
         </LinkButton>
       </Tooltip>
     </>
+  ) : (
+    <RevokeMyMembership />
   )
 }
 
