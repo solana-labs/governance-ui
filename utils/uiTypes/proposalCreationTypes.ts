@@ -387,6 +387,7 @@ export interface MangoMakeChangeReferralFeeParams2 {
   refMngoRequired2: number
 }
 
+/* PsyOptions American options */
 export interface PsyFinanceMintAmericanOptionsForm {
   contractSize: number
   expirationUnixTimestamp: number
@@ -398,6 +399,26 @@ export interface PsyFinanceMintAmericanOptionsForm {
   underlyingMint: PublicKey | undefined
   writerTokenDestinationAccount: string
 }
+
+export interface PsyFinanceBurnWriterForQuote {
+  size: number
+  writerTokenAccount: AssetAccount | undefined
+  quoteDestination: string
+}
+
+export interface PsyFinanceClaimUnderlyingPostExpiration {
+  size: number
+  writerTokenAccount: AssetAccount | undefined
+  underlyingDestination: string
+}
+
+export interface PsyFinanceExerciseOption {
+  size: number
+  optionTokenAccount: AssetAccount | undefined
+  quoteAssetAccount: AssetAccount | undefined
+}
+
+/* End PsyOptions American options */
 
 export interface ForesightHasGovernedAccount {
   governedAccount: AssetAccount
@@ -589,10 +610,18 @@ export enum Instructions {
   MangoSwapSpotMarket,
   MangoV4PerpCreate,
   MangoV4PerpEdit,
-  MangoV4Serum3RegisterMarket,
+  MangoV4OpenBookRegisterMarket,
+  MangoV4OpenBookEditMarket,
   MangoV4TokenEdit,
   MangoV4TokenRegister,
   MangoV4TokenRegisterTrustless,
+  MangoV4GroupEdit,
+  MangoV4IxGateSet,
+  MangoV4AltSet,
+  MangoV4AltExtend,
+  MangoV4StubOracleCreate,
+  MangoV4StubOracleSet,
+  MangoV4TokenAddBank,
   MeanCreateAccount,
   MeanCreateStream,
   MeanFundAccount,
@@ -601,6 +630,9 @@ export enum Instructions {
   Mint,
   None,
   ProgramUpgrade,
+  PsyFinanceBurnWriterForQuote,
+  PsyFinanceClaimUnderlyingPostExpiration,
+  PsyFinanceExerciseOption,
   PsyFinanceMintAmericanOptions,
   RealmConfig,
   RefreshSolendObligation,
@@ -628,6 +660,7 @@ export enum Instructions {
   RemoveKeyFromDID,
   AddServiceToDID,
   RemoveServiceFromDID,
+  RevokeGoverningTokens,
 }
 
 export type createParams = [

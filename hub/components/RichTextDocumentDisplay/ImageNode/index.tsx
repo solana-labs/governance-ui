@@ -9,6 +9,7 @@ interface Props {
   onExpand?(): void;
 }
 
+// eslint-disable-next-line
 export function ImageNode(props: Props) {
   return <div />;
 }

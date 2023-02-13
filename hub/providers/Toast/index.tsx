@@ -82,6 +82,9 @@ function ToastItem(props: ToastModel & { onOpenChange(open: boolean): void }) {
           'text-left',
           'translate-x-full',
           'transition-all',
+          'dark:bg-neutral-900',
+          'dark:border',
+          'dark:border-neutral-600',
           'hover:scale-105',
           show ? 'opacity-100' : 'opacity-0',
           show ? 'h-auto' : 'h-0',
@@ -95,13 +98,18 @@ function ToastItem(props: ToastModel & { onOpenChange(open: boolean): void }) {
             })}
           </div>
           <Toast.Title
-            className={cx('text-neutral-900', 'text-sm', 'font-bold')}
+            className={cx(
+              'text-neutral-900',
+              'text-sm',
+              'font-bold',
+              'dark:text-white',
+            )}
           >
             {props.title || defaultTitle(props)}
           </Toast.Title>
         </div>
         <div className="pl-6">
-          <Toast.Description className="text-sm text-zinc-500">
+          <Toast.Description className="text-sm text-neutral-500">
             {props.message}
           </Toast.Description>
         </div>

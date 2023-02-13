@@ -4,13 +4,15 @@ import {
 } from '@dialectlabs/react-ui';
 import { PublicKey } from '@solana/web3.js';
 
+import cx from '@hub/lib/cx';
+
 export const REALMS_PUBLIC_KEY = new PublicKey(
   'BUxZD6aECR5B5MopyvvYqJxwSKDBhx2jSSo1U32en6mj',
 );
 
 export const themeVariables: IncomingThemeVariables = {
   dark: {
-    bellButton: `${defaultVariables.dark.bellButton} bg-transparent !shadow-none text-neutral-700 h-10 rounded-full w-10 hover:bg-bkg-3`,
+    bellButton: `${defaultVariables.dark.bellButton} bg-transparent !shadow-none text-neutral-300 h-10 rounded-full w-10 hover:bg-bkg-3`,
     iconButton: `${defaultVariables.dark.iconButton} hover:opacity-100 bg-transparent`,
     adornmentButton: `${defaultVariables.dark.adornmentButton} bg-sky-500 hover:!bg-sky-400 active:bg-sky-500 rounded transition-colors`,
     buttonLoading: `${defaultVariables.dark.buttonLoading} rounded-full min-h-[40px]`,
@@ -32,7 +34,21 @@ export const themeVariables: IncomingThemeVariables = {
     secondaryDangerButton: `${defaultVariables.dark.secondaryDangerButton} rounded-full`,
   },
   light: {
-    bellButton: `${defaultVariables.light.bellButton} w-10 h-10 border-none bg-transparent shadow-none text-neutral-600 active:bg-neutral-300 hover:bg-neutral-200`,
+    bellButton: cx(
+      defaultVariables.light.bellButton,
+      'bg-transparent',
+      'border-none',
+      'h-10',
+      'shadow-none',
+      'text-neutral-600',
+      'w-10',
+      'active:bg-neutral-300',
+      'hover:bg-neutral-200',
+      'dark:text-neutral-400',
+      'dark:hover:text-neutral-200',
+      'dark:active:bg-neutral-600',
+      'dark:hover:bg-neutral-700',
+    ),
     iconButton: `${defaultVariables.light.iconButton} hover:opacity-100 bg-transparent`,
     buttonLoading: `${defaultVariables.light.buttonLoading} rounded-full min-h-[40px]`,
     adornmentButton: `${defaultVariables.light.adornmentButton} bg-sky-500 hover:!bg-sky-400 active:bg-sky-500 rounded transition-colors`,
@@ -44,7 +60,11 @@ export const themeVariables: IncomingThemeVariables = {
       toggleBackgroundActive: 'bg-sky-500',
     },
     textStyles: {
-      input: `${defaultVariables.light.textStyles.input} text-neutral-900 placeholder:text-fgd-3`,
+      input: cx(
+        defaultVariables.light.textStyles.input,
+        'text-neutral-900',
+        'placeholder:text-fgd-3',
+      ),
       body: `${defaultVariables.light.textStyles.body} text-neutral-900`,
       small: `${defaultVariables.light.textStyles.small} text-neutral-900`,
       xsmall: `${defaultVariables.light.textStyles.xsmall} text-neutral-900`,

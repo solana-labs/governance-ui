@@ -77,7 +77,7 @@ const ProposalCard = ({ proposalPk, proposal }: ProposalCardProps) => {
                 votesData._programVersion !== 1 &&
                 votesData._programVersion !== 2 &&
                 votesData.veto !== undefined &&
-                votesData.veto.voteProgress > 0 ? (
+                (votesData.veto.voteProgress ?? 0) > 0 ? (
                   <>
                     <div className="border-r border-fgd-4 hidden lg:block" />
 

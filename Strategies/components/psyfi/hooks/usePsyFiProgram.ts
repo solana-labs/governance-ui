@@ -1,4 +1,4 @@
-import { AnchorProvider, Program } from '@project-serum/anchor'
+import { AnchorProvider, Program } from '@coral-xyz/anchor'
 import { PsyFiEuros, PsyFiIdl } from 'psyfi-euros-test'
 import { useMemo } from 'react'
 import useWalletStore from 'stores/useWalletStore'

@@ -5,12 +5,17 @@ import {
   // Account,
   // Transaction,
 } from '@solana/web3.js'
-import { AccountMetaData, InstructionData } from '@solana/spl-governance'
+import {
+  AccountMetaData,
+  InstructionData,
+  ProgramAccount,
+  Realm,
+} from '@solana/spl-governance'
 
 import { BPF_UPGRADEABLE_LOADER_INSTRUCTIONS } from './programs/bpfUpgradeableLoader'
 import { GOVERNANCE_INSTRUCTIONS } from './programs/governance'
 import { MANGO_INSTRUCTIONS } from './programs/mango'
-import { getProgramName, isGovernanceProgram } from './programs/names'
+import { getProgramName } from './programs/names'
 import { RAYDIUM_INSTRUCTIONS } from './programs/raydium'
 import { SPL_TOKEN_INSTRUCTIONS } from './programs/splToken'
 import { SYSTEM_INSTRUCTIONS } from './programs/system'
@@ -305,10 +310,11 @@ export const INSTRUCTION_DESCRIPTORS = {
 
 export async function getInstructionDescriptor(
   connection: ConnectionContext,
-  instruction: InstructionData
+  instruction: InstructionData,
+  realm?: ProgramAccount<Realm> | undefined
 ) {
   let descriptors: any
-  if (isGovernanceProgram(instruction.programId)) {
+  if (realm && instruction.programId.equals(realm.owner)) {
     descriptors =
       GOVERNANCE_INSTRUCTIONS['GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw']
   } else {

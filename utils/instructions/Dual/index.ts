@@ -28,7 +28,7 @@ import {
   closeAccount,
   initializeAccount,
 } from '@project-serum/serum/lib/token-instructions'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { Token } from '@solana/spl-token'
 
 interface StakingOptionArgs {
@@ -144,17 +144,6 @@ export async function getConfigInstruction({
       serializeInstructionToBase64(configInstruction)
     )
 
-    const nameInstruction = await so.createNameTokenInstruction(
-      new BN(form.strike),
-      form.soName,
-      form.payer.extensions.transferAddress!,
-      baseMint
-    )
-    
-    additionalSerializedInstructions.push(
-      serializeInstructionToBase64(nameInstruction)
-    )
-
     const initStrikeInstruction = await so.createInitStrikeInstruction(
       new BN(form.strike),
       form.soName,
@@ -164,6 +153,17 @@ export async function getConfigInstruction({
     )
     additionalSerializedInstructions.push(
       serializeInstructionToBase64(initStrikeInstruction)
+    )
+
+    const nameInstruction = await so.createNameTokenInstruction(
+      new BN(form.strike),
+      form.soName,
+      form.payer.extensions.transferAddress!,
+      baseMint
+    )
+    
+    additionalSerializedInstructions.push(
+      serializeInstructionToBase64(nameInstruction)
     )
 
     const soMint = await so.soMint(form.strike, form.soName, baseMint)

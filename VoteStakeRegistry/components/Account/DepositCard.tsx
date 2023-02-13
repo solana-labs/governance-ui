@@ -24,7 +24,7 @@ import { abbreviateAddress } from '@utils/formatting'
 import { notify } from '@utils/notifications'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import dayjs from 'dayjs'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 
 const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const { getOwnedDeposits } = useDepositStore()

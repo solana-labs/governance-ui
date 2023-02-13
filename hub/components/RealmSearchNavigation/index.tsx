@@ -129,8 +129,12 @@ export const RealmSearchNavigation = forwardRef<HTMLInputElement, Props>(
                 'placeholder:transition-colors',
                 'focus:placeholder:text-neutral-300',
                 'focus:outline-none',
+                'dark:bg-neutral-900',
+                'dark:border-neutral-700',
+                'dark:placeholder:text-neutral-400',
+                'dark:focus:placeholder:text-neutral-200',
               )}
-              placeholder="Communities"
+              placeholder="Organizations"
               ref={inputRef}
               value={text}
               onChange={(e) => setText(e.currentTarget.value)}
@@ -145,10 +149,12 @@ export const RealmSearchNavigation = forwardRef<HTMLInputElement, Props>(
                 'left-4',
                 'top-1/2',
                 'w-4',
+                'dark:fill-neutral-400',
               )}
             />
             <button
               className={cx(
+                'dark:text-neutral-400',
                 '-translate-y-1/2',
                 'absolute',
                 'focus:opacity-100',
@@ -186,6 +192,7 @@ export const RealmSearchNavigation = forwardRef<HTMLInputElement, Props>(
               align="start"
               sideOffset={4}
               className={cx(
+                'dark:bg-neutral-900',
                 'drop-shadow-lg',
                 'bg-white',
                 'overflow-hidden',
@@ -215,11 +222,13 @@ export const RealmSearchNavigation = forwardRef<HTMLInputElement, Props>(
                               'gap-x-2',
                               'grid-cols-[24px,1fr]',
                               'grid',
+                              'group',
                               'items-center',
                               'p-2',
                               'transition-colors',
                               'w-full',
                               'hover:bg-neutral-200',
+                              'dark:hover:bg-neutral-700',
                             )}
                             onClick={() => {
                               setText('');
@@ -231,7 +240,15 @@ export const RealmSearchNavigation = forwardRef<HTMLInputElement, Props>(
                               iconUrl={option.iconUrl}
                               name={option.name}
                             />
-                            <div className="text-sm text-neutral-900">
+                            <div
+                              className={cx(
+                                'text-sm',
+                                'text-neutral-900',
+                                'transition-colors',
+                                'dark:text-neutral-400',
+                                'dark:group-hover:text-neutral-200',
+                              )}
+                            >
                               {option.name}
                             </div>
                           </a>
@@ -252,11 +269,13 @@ export const RealmSearchNavigation = forwardRef<HTMLInputElement, Props>(
                           'gap-x-2',
                           'grid-cols-[24px,1fr]',
                           'grid',
+                          'group',
                           'items-center',
                           'p-2',
                           'transition-colors',
                           'w-full',
                           'hover:bg-neutral-200',
+                          'dark:hover:bg-neutral-700',
                         )}
                         onClick={() => {
                           setText('');
@@ -268,7 +287,15 @@ export const RealmSearchNavigation = forwardRef<HTMLInputElement, Props>(
                           iconUrl={option.iconUrl}
                           name={option.name}
                         />
-                        <div className="text-sm text-neutral-900">
+                        <div
+                          className={cx(
+                            'text-sm',
+                            'text-neutral-900',
+                            'transition-colors',
+                            'dark:text-neutral-400',
+                            'dark:group-hover:text-neutral-200',
+                          )}
+                        >
                           {option.name}
                         </div>
                       </a>

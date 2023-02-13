@@ -16,7 +16,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { Config } from '@blockworks-foundation/mango-client'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { MangoV3ReimbursementClient } from '@blockworks-foundation/mango-v3-reimbursement-lib/dist'
-import { AnchorProvider, BN } from '@project-serum/anchor'
+import { AnchorProvider, BN } from '@coral-xyz/anchor'
 import { NodeWallet } from '@project-serum/common'
 import { notify } from '@utils/notifications'
 import ClaimMangoTokensTableRow, {
