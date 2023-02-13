@@ -3,35 +3,22 @@ import { ProgramAccount, Realm } from '@solana/spl-governance'
 import { Registrar, VotingMintConfig } from '../sdk/types'
 
 export const calcMultiplier = ({
-  lockedScaledFactor,
+  baselineScaledFactor,
   maxExtraLockupScaledFactor,
   lockupSecs,
-  minimumRequiredLockupSecs,
   lockupSaturationSecs,
 }: {
-  lockedScaledFactor: number
+  baselineScaledFactor: number
   maxExtraLockupScaledFactor: number
   lockupSecs: number
-  minimumRequiredLockupSecs: number
   lockupSaturationSecs: number
 }): number => {
   let multiplier = 0
 
-  if (lockupSecs > minimumRequiredLockupSecs) {
-    multiplier =
-      (Math.min(
-        (lockupSecs - minimumRequiredLockupSecs) /
-          (lockupSaturationSecs - minimumRequiredLockupSecs),
-        1
-      ) *
-        maxExtraLockupScaledFactor) /
-      lockedScaledFactor
-  } else {
-    multiplier =
-      (Math.min(lockupSecs / minimumRequiredLockupSecs, 1) *
-        lockedScaledFactor) /
-      lockedScaledFactor
-  }
+  multiplier =
+    (Math.min(lockupSecs / lockupSaturationSecs, 1) *
+      maxExtraLockupScaledFactor) /
+    baselineScaledFactor
 
   return multiplier
 }
@@ -53,23 +40,20 @@ export const calcLockupMultiplier = ({
 
   if (mintCfg && !mintCfg.mint.equals(PublicKey.default)) {
     const {
+      baselineVoteWeightScaledFactor,
       lockupSaturationSecs,
-      minimumRequiredLockupSecs,
-      lockedVoteWeightScaledFactor,
       maxExtraLockupVoteWeightScaledFactor,
       // genesisVotePowerMultiplier = 1,
       // genesisVotePowerMultiplierExpirationTs
     } = mintCfg as VotingMintConfig
-    const lockedScaledFactorNum = lockedVoteWeightScaledFactor.toNumber()
+    const baselineScaledFactorNum = baselineVoteWeightScaledFactor.toNumber()
     const maxExtraLockupVoteWeightScaledFactorNum = maxExtraLockupVoteWeightScaledFactor.toNumber()
-    const minimumRequiredLockupSecsNum = minimumRequiredLockupSecs.toNumber()
     const lockupSaturationSecsNum = lockupSaturationSecs.toNumber()
 
     multiplier = calcMultiplier({
-      lockedScaledFactor: lockedScaledFactorNum,
+      baselineScaledFactor: baselineScaledFactorNum,
       maxExtraLockupScaledFactor: maxExtraLockupVoteWeightScaledFactorNum,
       lockupSecs,
-      minimumRequiredLockupSecs: minimumRequiredLockupSecsNum,
       lockupSaturationSecs: lockupSaturationSecsNum,
     })
   }

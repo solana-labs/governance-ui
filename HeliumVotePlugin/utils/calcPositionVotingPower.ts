@@ -16,8 +16,7 @@ export const calcPositionVotingPower = ({
   if (mintCfg) {
     const {
       lockupSaturationSecs,
-      minimumRequiredLockupSecs,
-      lockedVoteWeightScaledFactor,
+      baselineVoteWeightScaledFactor,
       maxExtraLockupVoteWeightScaledFactor,
       // genesisVotePowerMultiplier = 1,
       // genesisVotePowerMultiplierExpirationTs,
@@ -28,16 +27,14 @@ export const calcPositionVotingPower = ({
     const currTs = lockupKind === 'constant' ? lockup.startTs : new BN(now)
     const lockupSecs = lockup.endTs.sub(currTs).toNumber()
     const amountLockedNative = position!.amountDepositedNative.toNumber()
-    const lockedScaledFactorNum = lockedVoteWeightScaledFactor.toNumber()
+    const baselineScaledFactorNum = baselineVoteWeightScaledFactor.toNumber()
     const maxExtraLockupVoteWeightScaledFactorNum = maxExtraLockupVoteWeightScaledFactor.toNumber()
-    const minimumRequiredLockupSecsNum = minimumRequiredLockupSecs.toNumber()
     const lockupSaturationSecsNum = lockupSaturationSecs.toNumber()
 
     const multiplier = calcMultiplier({
-      lockedScaledFactor: lockedScaledFactorNum,
+      baselineScaledFactor: baselineScaledFactorNum,
       maxExtraLockupScaledFactor: maxExtraLockupVoteWeightScaledFactorNum,
       lockupSecs,
-      minimumRequiredLockupSecs: minimumRequiredLockupSecsNum,
       lockupSaturationSecs: lockupSaturationSecsNum,
     })
 

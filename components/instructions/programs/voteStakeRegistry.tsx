@@ -336,10 +336,9 @@ const heliumConfigVotingMintIx = (programId: PublicKey) => ({
 
         const {
           args: {
-            maxExtraLockupVoteWeightScaledFactor,
+            baselineVoteWeightScaledFactor,
             lockupSaturationSecs,
-            lockedVoteWeightScaledFactor,
-            minimumRequiredLockupSecs,
+            maxExtraLockupVoteWeightScaledFactor,
             // genesisVotePowerMultiplier,
             // genesisVotePowerMultiplierExpirationTs,
           },
@@ -349,18 +348,9 @@ const heliumConfigVotingMintIx = (programId: PublicKey) => ({
           <div className="space-y-3">
             <div>Index: {decodedInstructionData?.args.idx}</div>
             <div>Digit shifts: {decodedInstructionData?.args.digitShift}</div>
-            <div>Unlocked factor: 0</div>
             <div>
-              Lockup factor: {lockedVoteWeightScaledFactor.toNumber() / 1e9} (
-              {lockedVoteWeightScaledFactor.toNumber()})
-            </div>
-            <div>
-              Minimum Required lockup time:{' '}
-              {decodedInstructionData &&
-                getFormattedStringFromDays(
-                  secsToDays(minimumRequiredLockupSecs.toNumber())
-                )}{' '}
-              (secs: {minimumRequiredLockupSecs.toNumber()})
+              Unlocked factor: {baselineVoteWeightScaledFactor.toNumber() / 1e9}{' '}
+              ({baselineVoteWeightScaledFactor.toNumber()})
             </div>
             <div>
               Max lockup time:{' '}
@@ -372,9 +362,10 @@ const heliumConfigVotingMintIx = (programId: PublicKey) => ({
             </div>
             <div>
               Max multiplier:{' '}
-              {getUnscaledFactor(
-                maxExtraLockupVoteWeightScaledFactor.toNumber()
-              )}
+              {getUnscaledFactor(baselineVoteWeightScaledFactor.toNumber()) +
+                getUnscaledFactor(
+                  maxExtraLockupVoteWeightScaledFactor.toNumber()
+                )}
             </div>
             {/* Additional Genesis Multiplier not configurable through UI */}
             {/* <div>
