@@ -25,7 +25,7 @@ config = withTM({
     return config
   },
 
-  pageExtensions: ['mdx', 'md', 'jsx', 'tsx'], // .ts files are not pages
+  pageExtensions: ['mdx', 'md', 'jsx', 'tsx', 'api.ts'], // .ts files are not pages
 
   env: {
     MAIN_VIEW_SHOW_MAX_TOP_TOKENS_NUM:
