@@ -43,7 +43,6 @@ import { calcMintMultiplier } from 'VoteStakeRegistry/tools/deposits'
 import ButtonGroup from '@components/ButtonGroup'
 import InlineNotification from '@components/InlineNotification'
 import Tooltip from '@components/Tooltip'
-//import Switch from '@components/Switch'
 import { notify } from '@utils/notifications'
 
 const YES = 'Yes'

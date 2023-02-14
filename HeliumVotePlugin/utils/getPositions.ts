@@ -32,7 +32,6 @@ export const getPositions = async (
 
   const keypair = Keypair.generate()
   const metaplex = new Metaplex(connection).use(keypairIdentity(keypair))
-
   const registrarPk = registrarKey(realmPk, communityMintPk)[0]
   const registrar = (await client.program.account.registrar.fetch(
     registrarPk

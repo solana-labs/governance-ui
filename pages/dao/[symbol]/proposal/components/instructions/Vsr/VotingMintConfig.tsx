@@ -18,11 +18,7 @@ import { getValidatedPublickKey } from '@utils/validations'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getScaledFactor } from '@utils/tokens'
-import {
-  daysToSecs,
-  yearsToDays,
-  yearsToSecs,
-} from 'VoteStakeRegistry/tools/dateTools'
+import { yearsToSecs } from 'VoteStakeRegistry/tools/dateTools'
 import { BN, web3 } from '@project-serum/anchor'
 import { PublicKey } from '@solana/web3.js'
 import {
@@ -48,7 +44,6 @@ interface ConfigureVotingMintForm {
   baselineVoteWeightFactor?: number
   grantAuthority?: AssetAccount | undefined
   lockedVoteWeightFactor?: number
-  minimumRequiredLockup?: number
   genesisVotePowerMultiplier?: number
   genesisVotePowerMultiplierExpTs?: number
 }
@@ -123,15 +118,11 @@ const VotingMintConfig = ({
       mintIndex,
       mintDigitShift,
       baselineVoteWeightFactor,
-      lockedVoteWeightFactor,
-      minimumRequiredLockup,
       maxLockupFactor,
       lockupSaturation,
       grantAuthority,
     } = {
       baselineVoteWeightFactor: 0,
-      lockedVoteWeightFactor: 0,
-      minimumRequiredLockup: 0,
       ...form,
     }
 
@@ -143,11 +134,7 @@ const VotingMintConfig = ({
 
     const mint = new PublicKey(form.mint)
     const baselineScaledFactor = getScaledFactor(baselineVoteWeightFactor)
-    const lockedScaledFactor = getScaledFactor(lockedVoteWeightFactor)
     const maxLockupScaledFactor = getScaledFactor(maxLockupFactor)
-    const minimumRequiredLockupSecs = new BN(
-      daysToSecs(Math.ceil(yearsToDays(minimumRequiredLockup))).toString()
-    )
     const lockupSaturationSecs = new BN(
       yearsToSecs(lockupSaturation).toString()
     )
@@ -187,8 +174,7 @@ const VotingMintConfig = ({
         .configureVotingMintV0({
           idx: mintIndex,
           digitShift: mintDigitShift,
-          lockedVoteWeightScaledFactor: lockedScaledFactor,
-          minimumRequiredLockupSecs,
+          baselineVoteWeightScaledFactor: baselineScaledFactor,
           maxExtraLockupVoteWeightScaledFactor: maxLockupScaledFactor,
           genesisVotePowerMultiplier: 1,
           genesisVotePowerMultiplierExpirationTs: new BN(0),
@@ -340,35 +326,14 @@ const VotingMintConfig = ({
       name: 'mintDigitShift',
       type: InstructionInputType.INPUT,
     },
-    ...(!showHeliumFields
-      ? [
-          {
-            label: 'mint unlocked factor',
-            initialValue: form?.baselineVoteWeightFactor || 0,
-            min: 0,
-            inputType: 'number',
-            name: 'baselineVoteWeightFactor',
-            type: InstructionInputType.INPUT,
-          },
-        ]
-      : [
-          {
-            label: 'mint lockup factor',
-            initialValue: form?.lockedVoteWeightFactor || 0,
-            min: 0,
-            inputType: 'number',
-            name: 'lockedVoteWeightFactor',
-            type: InstructionInputType.INPUT,
-          },
-          {
-            label: 'mint min required lockup saturation (years)',
-            initialValue: form?.minimumRequiredLockup || 0,
-            min: 0,
-            inputType: 'number',
-            name: 'minimumRequiredLockup',
-            type: InstructionInputType.INPUT,
-          },
-        ]),
+    {
+      label: 'mint unlocked factor',
+      initialValue: form?.baselineVoteWeightFactor || 0,
+      min: 0,
+      inputType: 'number',
+      name: 'baselineVoteWeightFactor',
+      type: InstructionInputType.INPUT,
+    },
     {
       label: 'max extra vote weight',
       initialValue: form?.maxLockupFactor || 0,

@@ -118,7 +118,7 @@ export const LockTokensAccount: React.FC<{
       console.log(e)
       notify({
         type: 'error',
-        message: "Can't fetch deposits",
+        message: "Can't fetch positions",
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
@@ -192,7 +192,7 @@ export const LockTokensAccount: React.FC<{
       : 0
 
   const lockedTokensPrice =
-    amountLocked && mint && realm?.account.communityMint
+    amountLocked.gte(new BN(0)) && mint && realm?.account.communityMint
       ? getMintDecimalAmountFromNatural(mint, amountLocked).toNumber() *
         tokenPriceService.getUSDTokenPrice(
           realm?.account.communityMint.toBase58()
@@ -366,14 +366,6 @@ export const LockTokensAccount: React.FC<{
           <LockTokensModal
             isOpen={isLockModalOpen}
             maxLockupAmount={maxLockupAmount}
-            minLockupTimeInDays={secsToDays(
-              ((communityVotingMintCfg as any)
-                ?.minimumRequiredLockupSecs as BN).toNumber() || 0
-            )}
-            maxLockupTimeInDays={secsToDays(
-              ((communityVotingMintCfg as any)
-                ?.lockupSaturationSecs as BN).toNumber() || 0
-            )}
             calcMultiplierFn={handleCalcLockupMultiplier}
             onClose={() => setIsLockModalOpen(false)}
             onSubmit={handleLockTokens}
