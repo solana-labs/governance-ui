@@ -640,7 +640,7 @@ export enum Instructions {
   // SwitchboardAdmitOracle,
   // SwitchboardRevokeOracle,
   Transfer,
-  TransferDomainName,
+  // TransferDomainName,
   UpdateTokenMetadata,
   // VotingMintConfig,
   // WithdrawFromCastle,

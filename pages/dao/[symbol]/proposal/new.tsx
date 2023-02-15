@@ -487,6 +487,7 @@ const New = () => {
       // [Instructions.ChangeMakeDonation]: ChangeDonation,
       [Instructions.CreateTokenMetadata]: CreateTokenMetadata,
       [Instructions.UpdateTokenMetadata]: UpdateTokenMetadata,
+      [Instructions.RevokeGoverningTokens]: RevokeGoverningTokens,
       // [Instructions.SagaPreOrder]: SagaPreOrder,
       // [Instructions.DepositToMangoAccount]: MakeDepositToMangoAccount,
       // [Instructions.DepositToMangoAccountCsv]: MakeDepositToMangoAccountCsv,
@@ -546,7 +547,6 @@ const New = () => {
       // [Instructions.RemoveKeyFromDID]: RemoveKeyFromDID,
       // [Instructions.AddServiceToDID]: AddServiceToDID,
       // [Instructions.RemoveServiceFromDID]: RemoveServiceFromDID,
-      [Instructions.RevokeGoverningTokens]: RevokeGoverningTokens,
     }),
     [governance?.pubkey.toBase58()]
   )

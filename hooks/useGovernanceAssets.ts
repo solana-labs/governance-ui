@@ -365,10 +365,10 @@ export default function useGovernanceAssets() {
       isVisible: canUseTokenTransferInstruction,
       packageId: PackageEnum.Common,
     },
-    [Instructions.TransferDomainName]: {
-      name: 'SNS Transfer Out Domain Name',
-      packageId: PackageEnum.Common,
-    },
+    // [Instructions.TransferDomainName]: {
+    //   name: 'SNS Transfer Out Domain Name',
+    //   packageId: PackageEnum.Common,
+    // },
     [Instructions.UpdateTokenMetadata]: {
       name: 'Update Token Metadata',
       isVisible: canUseAuthorityInstruction,
