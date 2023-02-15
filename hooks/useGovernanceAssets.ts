@@ -274,7 +274,10 @@ export default function useGovernanceAssets() {
        ██      ██    ██ ██  ██  ██ ██  ██  ██ ██    ██ ██  ██ ██
         ██████  ██████  ██      ██ ██      ██  ██████  ██   ████
      */
-
+    [Instructions.RevokeGoverningTokens]: {
+      name: 'Revoke Membership',
+      packageId: PackageEnum.Common,
+    },
     [Instructions.Base64]: {
       name: 'Execute Custom Instruction',
       packageId: PackageEnum.Common,

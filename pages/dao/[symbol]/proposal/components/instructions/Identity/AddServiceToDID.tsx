@@ -115,6 +115,7 @@ const AddServiceToDID = ({
 
   return (
     <>
+      {form && (
       <InstructionForm
         outerForm={form}
         setForm={setForm}
@@ -122,6 +123,7 @@ const AddServiceToDID = ({
         setFormErrors={setFormErrors}
         formErrors={formErrors}
       ></InstructionForm>
+      )}
     </>
   )
 }

@@ -1,6 +1,11 @@
 import React, { useState } from 'react'
 import cx from 'classnames'
-import { PencilIcon, PlusCircleIcon, UsersIcon } from '@heroicons/react/outline'
+import {
+  PencilIcon,
+  PlusCircleIcon,
+  UsersIcon,
+  XCircleIcon,
+} from '@heroicons/react/outline'
 import { useRouter } from 'next/router'
 
 import { Mint } from '@models/treasury/Asset'
@@ -79,20 +84,20 @@ export default function Header(props: Props) {
 
   if (props.mint.tokenRole === 'council') {
     if (!connected) {
-      addNewMemberTooltip = 'Connect your wallet to add new council member'
+      addNewMemberTooltip =
+        'Connect your wallet to add or remove council members'
     } else if (!canMintRealmCouncilToken()) {
       addNewMemberTooltip =
-        'Your realm need mint governance for council token to add new member'
+        'Your realm needs mint governance for council token to add or remove members'
     } else if (!canUseMintInstruction) {
       addNewMemberTooltip =
-        "You don't have enough governance power to add new council member"
+        "You don't have enough governance power to add or remove council members"
     }
   } else {
     if (!connected) {
       addNewMemberTooltip = 'You must connect your wallet'
     } else if (!canUseMintInstruction) {
-      addNewMemberTooltip =
-        "You don't have enough governance power to mint new tokens"
+      addNewMemberTooltip = "You don't have enough governance power"
     }
   }
 
@@ -170,6 +175,7 @@ export default function Header(props: Props) {
       </div>
       <div className="flex flex-col space-y-2 max-h-[128px] justify-center">
         <SecondaryButton
+          small={membership}
           className="w-48"
           disabled={!!addNewMemberTooltip}
           tooltipMessage={addNewMemberTooltip}
@@ -190,7 +196,28 @@ export default function Header(props: Props) {
             {membership ? 'Add Member' : 'Mint Tokens'}
           </div>
         </SecondaryButton>
+        {membership && programVersion >= 3 && (
+          <SecondaryButton
+            className="w-48"
+            small={membership}
+            disabled={!!addNewMemberTooltip}
+            tooltipMessage={addNewMemberTooltip}
+            onClick={() => {
+              router.push(
+                fmtUrlWithCluster(
+                  `/dao/${symbol}/proposal/new?i=${Instructions.RevokeGoverningTokens}&membershipPopulation=${props.mint.tokenRole}`
+                )
+              )
+            }}
+          >
+            <div className="flex items-center justify-center">
+              <XCircleIcon className="h-4 w-4 mr-1" />
+              Remove Member
+            </div>
+          </SecondaryButton>
+        )}
         <SecondaryButton
+          small={membership}
           className="w-48"
           disabled={!canUseAuthorityInstruction}
           tooltipMessage={

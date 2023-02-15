@@ -128,6 +128,7 @@ const CreateVsrRegistrar = ({
   ]
   return (
     <>
+      {form && (
       <InstructionForm
         outerForm={form}
         setForm={setForm}
@@ -135,6 +136,7 @@ const CreateVsrRegistrar = ({
         setFormErrors={setFormErrors}
         formErrors={formErrors}
       ></InstructionForm>
+      )}
     </>
   )
 }
