@@ -6,7 +6,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Tooltip from '@components/Tooltip'
 import useWalletStore from 'stores/useWalletStore'
 import Modal from '@components/Modal'
-import AddMemberForm from '@components/Members/AddMemberForm'
+import { AddCouncilMemberForm } from '@components/Members/AddMemberForm'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import { LinkButton } from '@components/Button'
 import MembersTabs from '@components/Members/MembersTabs'
@@ -194,7 +194,7 @@ const Members = () => {
           onClose={() => setOpenAddMemberModal(false)}
           isOpen={openAddMemberModal}
         >
-          <AddMemberForm close={() => setOpenAddMemberModal(false)} />
+          <AddCouncilMemberForm close={() => setOpenAddMemberModal(false)} />
         </Modal>
       )}
     </div>

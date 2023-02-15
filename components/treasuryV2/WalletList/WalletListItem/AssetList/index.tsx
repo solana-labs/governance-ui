@@ -148,6 +148,7 @@ export default function AssetList(props: Props) {
     [props.assets]
   )
 
+  // NOTE possible source of bugs, state wont update if props do.
   const [others, setOthers] = useState<
     (Mint | Programs | Unknown | Domains | RealmAuthority)[]
   >(othersFromProps)

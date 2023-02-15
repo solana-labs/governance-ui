@@ -29,11 +29,15 @@ export const Secondary = forwardRef<HTMLButtonElement, Props>(
           'text-sky-500',
           'tracking-normal',
           'transition-colors',
+          'dark:border-sky-400',
+          'dark:text-sky-400',
           rest.className,
           'disabled:border-zinc-300',
           'disabled:cursor-not-allowed',
           !pending && 'hover:bg-sky-100',
           !pending && 'active:bg-sky-200',
+          !pending && 'hover:bg-sky-400/10',
+          !pending && 'active:bg-sky-400/20',
           pending && 'cursor-not-allowed',
         )}
         onClick={(e) => {

@@ -28,7 +28,6 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
 import NftVotingCountingModal from '@components/NftVotingCountingModal'
 import { getResourcePathPart } from '@tools/core/resources'
-import useInitWallet from '@hooks/useInitWallet'
 import queryClient from '@hooks/queries/queryClient'
 import useSerumGovStore from 'stores/useSerumGovStore'
 import Footer from './Footer'
@@ -63,7 +62,6 @@ interface Props {
 
 export function App(props: Props) {
   useHydrateStore()
-  useInitWallet()
   handleRouterHistory()
   useVotingPlugins()
   handleGovernanceAssetsStore()
@@ -145,7 +143,7 @@ export function App(props: Props) {
   useEffect(() => {
     if (
       prevStringifyPossibleNftsAccounts !==
-        JSON.stringify(possibleNftsAccounts) &&
+      JSON.stringify(possibleNftsAccounts) &&
       realm?.pubkey
     ) {
       getNfts(possibleNftsAccounts, connection)

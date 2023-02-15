@@ -1,5 +1,5 @@
 import * as yup from 'yup'
-import * as anchor from '@project-serum/anchor'
+import * as anchor from '@coral-xyz/anchor'
 import { yupResolver } from '@hookform/resolvers/yup'
 import useWallet from '@hooks/useWallet'
 import {

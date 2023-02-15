@@ -7,7 +7,7 @@ import {
 import { RpcContext } from '@solana/spl-governance'
 import { sendTransaction } from 'utils/send'
 
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { withVoteRegistryDeposit } from '../sdk/withVoteRegistryDeposit'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 

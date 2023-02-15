@@ -18,7 +18,7 @@ import {
 } from '@solana/spl-governance'
 import { getMaxVoterWeightRecord as getPluginMaxVoterWeightRecord } from '@utils/plugin/accounts'
 import { notify } from '@utils/notifications'
-import * as anchor from '@project-serum/anchor'
+import * as anchor from '@coral-xyz/anchor'
 import * as sbv2 from '@switchboard-xyz/switchboard-v2'
 import sbIdl from 'SwitchboardVotePlugin/switchboard_v2.json'
 import gonIdl from 'SwitchboardVotePlugin/gameofnodes.json'
@@ -54,7 +54,7 @@ export function useVotingPlugins() {
     handleSetVsrClient,
     handleSetNftClient,
     handleSetGatewayClient,
-    handleSetSwitchboardClient,
+    //handleSetSwitchboardClient,
     handleSetNftRegistrar,
     handleSetGatewayRegistrar,
     handleSetPythClient,
@@ -91,6 +91,7 @@ export function useVotingPlugins() {
     (s) => s.state.currentRealmVotingClient
   )
   const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
+
   const nftMintRegistrar = useVotePluginsClientStore(
     (s) => s.state.nftMintRegistrar
   )
@@ -307,14 +308,17 @@ export function useVotingPlugins() {
   }
   useEffect(() => {
     if (wallet) {
-      handleSetVsrClient(wallet, connection, currentPluginPk)
+      if (currentPluginPk) {
+        handleSetVsrClient(wallet, connection, currentPluginPk)
+      }
+
       handleSetNftClient(wallet, connection)
-      handleSetSwitchboardClient(wallet, connection)
+      //handleSetSwitchboardClient(wallet, connection)
       handleSetGatewayClient(wallet, connection)
       handleSetPythClient(wallet, connection)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [connection.endpoint, wallet, currentPluginPk])
+  }, [connection.endpoint, wallet, currentPluginPk?.toBase58()])
 
   useEffect(() => {
     const handleVsrPlugin = () => {
@@ -391,6 +395,8 @@ export function useVotingPlugins() {
         }
       }
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleSwitchboardPlugin = () => {
       if (
         switchboardClient &&
@@ -419,7 +425,7 @@ export function useVotingPlugins() {
       handleNftplugin()
       handleGatewayPlugin()
       handleVsrPlugin()
-      handleSwitchboardPlugin()
+      //handleSwitchboardPlugin()
       handlePythPlugin()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree

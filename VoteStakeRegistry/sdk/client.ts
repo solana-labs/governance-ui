@@ -1,4 +1,4 @@
-import { Program, Provider, web3 } from '@project-serum/anchor'
+import { Program, Provider, web3 } from '@coral-xyz/anchor'
 import { IDL, VoterStakeRegistry } from './voter_stake_registry'
 
 export const DEFAULT_VSR_ID = new web3.PublicKey(
@@ -13,17 +13,13 @@ export class VsrClient {
 
   static connect(
     provider: Provider,
-    programId?: web3.PublicKey,
+    programId: web3.PublicKey,
     devnet?: boolean
   ): VsrClient {
     const idl = IDL
 
     return new VsrClient(
-      new Program<VoterStakeRegistry>(
-        idl,
-        programId || DEFAULT_VSR_ID,
-        provider
-      ),
+      new Program<VoterStakeRegistry>(idl, programId, provider),
       devnet
     )
   }

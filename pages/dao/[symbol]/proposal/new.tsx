@@ -68,8 +68,8 @@ import VoteBySwitch from './components/VoteBySwitch'
 // import MakeChangePerpMarket from './components/instructions/Mango/MakeChangePerpMarket'
 // import MakeAddOracle from './components/instructions/Mango/MakeAddOracle'
 // import MakeAddSpotMarket from './components/instructions/Mango/MakeAddSpotMarket'
-import StakeValidator from './components/instructions/Validators/StakeValidator'
-import DeactivateValidatorStake from './components/instructions/Validators/DeactivateStake'
+// import StakeValidator from './components/instructions/Validators/StakeValidator'
+// import DeactivateValidatorStake from './components/instructions/Validators/DeactivateStake'
 // import WithdrawValidatorStake from './components/instructions/Validators/WithdrawStake'
 // import MakeChangeSpotMarket from './components/instructions/Mango/MakeChangeSpotMarket'
 // import MakeCreatePerpMarket from './components/instructions/Mango/MakeCreatePerpMarket'
@@ -116,7 +116,7 @@ import classNames from 'classnames'
 // import Serum3RegisterMarket from './components/instructions/Mango/MangoV4/Serum3RegisterMarket'
 // import PerpCreate from './components/instructions/Mango/MangoV4/PerpCreate'
 // import TokenRegisterTrustless from './components/instructions/Mango/MangoV4/TokenRegisterTrustless'
-import TransferDomainName from './components/instructions/TransferDomainName'
+// import TransferDomainName from './components/instructions/TransferDomainName'
 // import DepositForm from './components/instructions/Everlend/DepositForm'
 // import WithdrawForm from './components/instructions/Everlend/WithdrawForm'
 // import InitUser from './components/instructions/Serum/InitUser'
@@ -134,6 +134,7 @@ import SelectInstructionType from '@components/SelectInstructionType'
 // import RemoveServiceFromDID from './components/instructions/Identity/RemoveServiceFromDID'
 // import DualWithdraw from './components/instructions/Dual/DualWithdraw'
 // import DualExercise from './components/instructions/Dual/DualExercise'
+import RevokeGoverningTokens from './components/instructions/SplGov/RevokeGoverningTokens'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -169,7 +170,7 @@ const New = () => {
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [form, setForm] = useState({
-    title: '',
+    title: typeof router.query['t'] === 'string' ? router.query['t'] : '',
     description: '',
   })
   const [formErrors, setFormErrors] = useState({})
@@ -489,11 +490,11 @@ const New = () => {
       // [Instructions.SagaPreOrder]: SagaPreOrder,
       // [Instructions.DepositToMangoAccount]: MakeDepositToMangoAccount,
       // [Instructions.DepositToMangoAccountCsv]: MakeDepositToMangoAccountCsv,
-      [Instructions.StakeValidator]: StakeValidator,
-      [Instructions.DeactivateValidatorStake]: DeactivateValidatorStake,
+      // [Instructions.StakeValidator]: StakeValidator,
+      // [Instructions.DeactivateValidatorStake]: DeactivateValidatorStake,
       // [Instructions.WithdrawValidatorStake]: WithdrawValidatorStake,
       // [Instructions.DifferValidatorStake]: null,
-      [Instructions.TransferDomainName]: TransferDomainName,
+      // [Instructions.TransferDomainName]: TransferDomainName,
       // [Instructions.EverlendDeposit]: DepositForm,
       // [Instructions.EverlendWithdraw]: WithdrawForm,
       // [Instructions.SerumInitUser]: InitUser,
@@ -545,8 +546,9 @@ const New = () => {
       // [Instructions.RemoveKeyFromDID]: RemoveKeyFromDID,
       // [Instructions.AddServiceToDID]: AddServiceToDID,
       // [Instructions.RemoveServiceFromDID]: RemoveServiceFromDID,
+      [Instructions.RevokeGoverningTokens]: RevokeGoverningTokens,
     }),
-    []
+    [governance?.pubkey.toBase58()]
   )
 
   const getCurrentInstruction = useCallback(
@@ -581,7 +583,7 @@ const New = () => {
       )
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    []
+    [governance?.pubkey.toBase58()]
   )
 
   const titleTooLong = form.title.length > TITLE_LENGTH_LIMIT

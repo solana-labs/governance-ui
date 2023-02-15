@@ -54,10 +54,35 @@ const ThirdPartyInstructionWritesConfigWarning = () => (
   </div>
 )
 
+const SetGovernanceConfig = () => (
+  <div className="rounded-md bg-yellow-50 p-4">
+    <div className="flex">
+      <div className="flex-shrink-0">
+        <ExclamationCircleIcon
+          className="h-5 w-5 text-yellow-400"
+          aria-hidden="true"
+        />
+      </div>
+      <div className="ml-3">
+        <h3 className="text-sm font-medium text-yellow-800">
+          Instructions like this one are dangerous
+        </h3>
+        <div className="mt-2">
+          <p className="text-sm text-yellow-700">
+            This proposal writes to your governance configuration, this could
+            affect how votes are counted. Both the instruction data AND accounts
+            list contain parameters. Do not pass this proposal if there are any
+            accounts you do not recognize.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+)
+
 const useProposalSafetyCheck = () => {
   const { config, realmInfo } = useRealm()
   const { instructions } = useProposal()
-
   const realmConfigWarnings = useMemo(() => {
     if (realmInfo === undefined || config === undefined) return undefined
 
@@ -66,7 +91,10 @@ const useProposalSafetyCheck = () => {
     )
 
     const realmConfigWarnings = ixs.map((ix) => {
-      if (ix.programId.equals(realmInfo.programId) && ix.data[0] == 22) {
+      if (ix.programId.equals(realmInfo.programId) && ix.data[0] === 19) {
+        return 'setGovernanceConfig'
+      }
+      if (ix.programId.equals(realmInfo.programId) && ix.data[0] === 22) {
         return 'setRealmConfig'
       }
       if (
@@ -74,7 +102,11 @@ const useProposalSafetyCheck = () => {
           (a) => a.isWritable && a.pubkey.equals(config.pubkey)
         ) !== undefined
       ) {
-        return 'ThirdPartyInstructionWritesConfig'
+        if (ix.programId.equals(realmInfo.programId)) {
+          return 'setRealmConfig'
+        } else {
+          return 'ThirdPartyInstructionWritesConfig'
+        }
       }
     })
 
@@ -88,6 +120,7 @@ const ProposalWarnings = () => {
   const warnings = useProposalSafetyCheck()
   return (
     <>
+      {warnings?.includes('setGovernanceConfig') && <SetGovernanceConfig />}
       {warnings?.includes('setRealmConfig') && <SetRealmConfigWarning />}
       {warnings?.includes('ThirdPartyInstructionWritesConfig') && (
         <ThirdPartyInstructionWritesConfigWarning />

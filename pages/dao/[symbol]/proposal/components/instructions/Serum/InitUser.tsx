@@ -19,7 +19,7 @@ import useWalletStore from 'stores/useWalletStore'
 import useSerumGovStore from 'stores/useSerumGovStore'
 import useWallet from '@hooks/useWallet'
 import { NewProposalContext } from '../../../new'
-import { findProgramAddressSync } from '@project-serum/anchor/dist/cjs/utils/pubkey'
+import { findProgramAddressSync } from '@coral-xyz/anchor/dist/cjs/utils/pubkey'
 
 const InitUser = ({
   index,

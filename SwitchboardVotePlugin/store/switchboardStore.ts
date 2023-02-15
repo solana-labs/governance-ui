@@ -1,4 +1,4 @@
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import create, { State } from 'zustand'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'

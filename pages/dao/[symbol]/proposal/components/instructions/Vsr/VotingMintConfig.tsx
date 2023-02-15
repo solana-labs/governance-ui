@@ -20,7 +20,7 @@ import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getScaledFactor } from '@utils/tokens'
 import { yearsToSecs } from 'VoteStakeRegistry/tools/dateTools'
-import { BN, web3 } from '@project-serum/anchor'
+import { BN, web3 } from '@coral-xyz/anchor'
 import { PublicKey } from '@solana/web3.js'
 import {
   emptyPk,
@@ -68,7 +68,7 @@ const VotingMintConfig = ({
     ) {
       const vsrClient = VsrClient.connect(
         anchorProvider,
-        form?.programId ? new web3.PublicKey(form.programId) : undefined
+        form?.programId ? new web3.PublicKey(form.programId) : DEFAULT_VSR_ID
       )
       const digitShift = form.mintDigitShift
       const unlockedScaledFactor = getScaledFactor(form.mintUnlockedFactor)
@@ -270,6 +270,7 @@ const VotingMintConfig = ({
   ]
   return (
     <>
+      {form && (
       <InstructionForm
         outerForm={form}
         setForm={setForm}
@@ -277,6 +278,7 @@ const VotingMintConfig = ({
         setFormErrors={setFormErrors}
         formErrors={formErrors}
       ></InstructionForm>
+      )}
     </>
   )
 }

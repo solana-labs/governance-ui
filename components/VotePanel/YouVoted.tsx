@@ -22,6 +22,7 @@ import {
   useVoterTokenRecord,
   useIsVoting,
   useProposalVoteRecordQuery,
+  useIsInCoolOffTime,
 } from './hooks'
 import assertUnreachable from '@utils/typescript/assertUnreachable'
 import { useHasVoteTimeExpired } from '@hooks/useHasVoteTimeExpired'
@@ -44,7 +45,7 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
     useNftPluginStore((s) => s.state.maxVoteRecord)?.pubkey || undefined
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
   const isVoting = useIsVoting()
-
+  const isInCoolOffTime = useIsInCoolOffTime()
   const [isLoading, setIsLoading] = useState(false)
 
   const { data } = useProposalVoteRecordQuery(quorum)
@@ -97,7 +98,8 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
       if (
         proposal !== undefined &&
         proposal?.account.state === ProposalState.Voting &&
-        hasVoteTimeExpired
+        hasVoteTimeExpired &&
+        !isInCoolOffTime
       ) {
         await withFinalizeVote(
           instructions,
@@ -167,7 +169,7 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
           assertUnreachable(vote.voteType)
         )}
       </div>
-      {isVoting && (
+      {(isVoting || isInCoolOffTime) && (
         <div className="items-center justify-center flex w-full gap-5">
           <div className="flex flex-col gap-6 items-center">
             <SecondaryButton
@@ -179,6 +181,12 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
             >
               Withdraw
             </SecondaryButton>
+            {isInCoolOffTime && (
+              <div className="text-xs">
+                Warning: If you withdraw your vote now you can only deny the
+                proposal its not possible to vote yes during cool off time
+              </div>
+            )}
           </div>
         </div>
       )}

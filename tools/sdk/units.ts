@@ -1,4 +1,4 @@
-import { BN, ProgramAccount } from '@project-serum/anchor'
+import { BN, ProgramAccount } from '@coral-xyz/anchor'
 import { MintInfo } from '@solana/spl-token'
 import { TokenInfoWithoutDecimals } from '@utils/services/tokenPrice'
 import { BigNumber } from 'bignumber.js'

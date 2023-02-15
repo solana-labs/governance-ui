@@ -9,7 +9,8 @@ interface Value {
   connect(): Promise<PublicKey>;
   publicKey?: PublicKey;
   signMessage: NonNullable<WalletContextState['signMessage']>;
-  signTransation: NonNullable<WalletContextState['signTransaction']>;
+  signTransaction: NonNullable<WalletContextState['signTransaction']>;
+  signAllTransactions: NonNullable<WalletContextState['signAllTransactions']>;
 }
 
 export const DEFAULT: Value = {
@@ -20,7 +21,10 @@ export const DEFAULT: Value = {
   signMessage: async () => {
     throw new Error('Not implemented');
   },
-  signTransation: async () => {
+  signTransaction: async () => {
+    throw new Error('Not implemented');
+  },
+  signAllTransactions: async () => {
     throw new Error('Not implemented');
   },
 };
@@ -44,9 +48,13 @@ function WalletProviderInner(props: Props) {
           const { signMessage } = await getAdapter();
           return signMessage(message);
         },
-        signTransation: async (transaction) => {
+        signTransaction: async (transaction) => {
           const { signTransaction } = await getAdapter();
           return signTransaction(transaction);
+        },
+        signAllTransactions: async (transactions) => {
+          const { signAllTransactions } = await getAdapter();
+          return signAllTransactions(transactions);
         },
       }}
     >

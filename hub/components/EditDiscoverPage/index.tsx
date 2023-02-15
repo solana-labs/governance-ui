@@ -31,6 +31,7 @@ function buildFormStateFromData(data: gql.DiscoverPage) {
 function removeExtraneousFields<T extends { __typename?: string }>(
   item: T,
 ): Omit<T, '__typename'> {
+  // eslint-disable-next-line
   const { __typename, ...rest } = item;
   return rest;
 }
@@ -105,8 +106,6 @@ export function EditDiscoverPage(props: Props) {
       setFormState(buildFormStateFromData(result.data.discoverPage));
     }
   }, [result]);
-
-  console.log(result);
 
   return (
     <article className={props.className}>
@@ -283,6 +282,7 @@ export function EditDiscoverPage(props: Props) {
                             (r) => r.publicKey,
                           ),
                           spotlight: (formState?.spotlight || []).map((s) => {
+                            // eslint-disable-next-line
                             const { realm, ...rest } = s;
                             return removeExtraneousFields({
                               ...rest,

@@ -63,6 +63,10 @@ const Footer = () => {
         >
           Solana
         </a>
+
+        <div className="opacity-70">
+          Powered by <span className="font-bold">Solana</span>
+        </div>
       </div>
     </div>
   )

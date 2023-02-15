@@ -5,12 +5,17 @@ import {
   // Account,
   // Transaction,
 } from '@solana/web3.js'
-import { AccountMetaData, InstructionData } from '@solana/spl-governance'
+import {
+  AccountMetaData,
+  InstructionData,
+  ProgramAccount,
+  Realm,
+} from '@solana/spl-governance'
 
 import { BPF_UPGRADEABLE_LOADER_INSTRUCTIONS } from './programs/bpfUpgradeableLoader'
 import { GOVERNANCE_INSTRUCTIONS } from './programs/governance'
 import { MANGO_INSTRUCTIONS } from './programs/mango'
-import { getProgramName, isGovernanceProgram } from './programs/names'
+import { getProgramName } from './programs/names'
 import { RAYDIUM_INSTRUCTIONS } from './programs/raydium'
 import { SPL_TOKEN_INSTRUCTIONS } from './programs/splToken'
 import { SYSTEM_INSTRUCTIONS } from './programs/system'
@@ -24,7 +29,6 @@ import { ConnectionContext } from '@utils/connection'
 import { NFT_VOTER_INSTRUCTIONS } from './programs/nftVotingClient'
 import { PROGRAM_IDS } from '@castlefinance/vault-sdk'
 import { FORESIGHT_INSTRUCTIONS } from './programs/foresight'
-import { SAGA_PHONE } from './programs/SagaPhone'
 import { LIDO_INSTRUCTIONS } from './programs/lido'
 import { NAME_SERVICE_INSTRUCTIONS } from './programs/nameService'
 import { TOKEN_AUCTION_INSTRUCTIONS } from './programs/tokenAuction'
@@ -306,17 +310,17 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...NFT_VOTER_INSTRUCTIONS,
   ...STREAMFLOW_INSTRUCTIONS,
   ...NAME_SERVICE_INSTRUCTIONS,
-  ...SAGA_PHONE,
   ...TOKEN_AUCTION_INSTRUCTIONS,
   ...VALIDATORDAO_INSTRUCTIONS,
 }
 
 export async function getInstructionDescriptor(
   connection: ConnectionContext,
-  instruction: InstructionData
+  instruction: InstructionData,
+  realm?: ProgramAccount<Realm> | undefined
 ) {
   let descriptors: any
-  if (isGovernanceProgram(instruction.programId)) {
+  if (realm && instruction.programId.equals(realm.owner)) {
     descriptors =
       GOVERNANCE_INSTRUCTIONS['GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw']
   } else {

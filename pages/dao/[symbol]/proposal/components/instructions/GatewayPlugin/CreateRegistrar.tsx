@@ -196,6 +196,7 @@ const CreateGatewayPluginRegistrar = ({
 
   return (
     <>
+      {form && (
       <InstructionForm
         outerForm={form}
         setForm={setForm}
@@ -203,6 +204,7 @@ const CreateGatewayPluginRegistrar = ({
         setFormErrors={setFormErrors}
         formErrors={formErrors}
       ></InstructionForm>
+      )}
     </>
   )
 }

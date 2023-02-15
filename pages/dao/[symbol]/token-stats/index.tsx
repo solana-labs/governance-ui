@@ -5,7 +5,7 @@ import { MANGO_DAO_TREASURY } from '@components/instructions/tools'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import { SearchIcon, UserCircleIcon } from '@heroicons/react/outline'
 import useRealm from '@hooks/useRealm'
-import { BN, BorshInstructionCoder } from '@project-serum/anchor'
+import { BN, BorshInstructionCoder } from '@coral-xyz/anchor'
 import {
   GovernanceAccountType,
   InstructionExecutionStatus,
@@ -45,6 +45,7 @@ import {
 } from '@components/TableElements'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { abbreviateAddress } from '@utils/formatting'
+import { getDepositType } from 'VoteStakeRegistry/tools/deposits'
 const VestingVsTime = dynamic(
   () => import('VoteStakeRegistry/components/LockTokenStats/VestingVsTime'),
   {
@@ -142,44 +143,90 @@ const LockTokenStats = () => {
         x.deposit.lockup.startTs.toNumber() * 1000 -
         y.deposit.lockup.startTs.toNumber() * 1000
     )
+
     const months: dayjs.Dayjs[] = []
     const vestingPerMonth = {}
     const currentDate = dayjs()
-    const oldestDate = dayjs().subtract(monthsNumber, 'month')
+    // Make sure we capture the full monthly vesting amount for the last month
+    const oldestDate = dayjs().add(monthsNumber, 'month').endOf('month')
+
     for (let i = 0; i < monthsNumber; i++) {
-      const date = dayjs().subtract(i, 'month')
+      // add months so we get the current month onward
+      const date = dayjs().add(i, 'month')
       months.push(date)
       vestingPerMonth[date.format('MMM')] = []
     }
+
     for (const depositWithWallet of depositsWithWalletsSortedByDate) {
       const unixLockupStart =
         depositWithWallet.deposit.lockup.startTs.toNumber() * 1000
       const unixLockupEnd =
         depositWithWallet.deposit.lockup.endTs.toNumber() * 1000
-      const isPossibleToVest =
-        typeof depositWithWallet.deposit.lockup.kind.monthly !== 'undefined' &&
-        currentDate.isAfter(unixLockupStart) &&
-        oldestDate.isBefore(unixLockupEnd)
+      const depositType = getDepositType(depositWithWallet.deposit)
+
+      const finalUnlockDate = dayjs(unixLockupEnd)
+      const vestingStart = dayjs(unixLockupStart)
+
+      const monthlyPossibleVest =
+        depositType == 'monthly' &&
+        finalUnlockDate.isAfter(currentDate) &&
+        vestingStart.isBefore(oldestDate)
+
+      const cliffPossibleVest =
+        depositType == 'cliff' &&
+        finalUnlockDate.isAfter(currentDate) &&
+        finalUnlockDate.isBefore(oldestDate)
+      const isPossibleToVest = monthlyPossibleVest || cliffPossibleVest
 
       if (isPossibleToVest) {
-        const vestingCount = Math.ceil(
-          dayjs(unixLockupEnd).diff(unixLockupStart, 'month', true)
-        )
-        const vestingAmount = depositWithWallet.deposit.amountInitiallyLockedNative.divn(
-          vestingCount
-        )
-        for (let i = 1; i <= vestingCount; i++) {
-          const nextVestinDays = i * DAYS_PER_MONTH
-          const vestingDate = dayjs(unixLockupStart).add(nextVestinDays, 'day')
+        let vestingAmount = new BN(0)
+        if (depositType === 'monthly') {
+          const vestingCount = Math.ceil(
+            dayjs(unixLockupEnd).diff(unixLockupStart, 'month', true)
+          )
+          vestingAmount = depositWithWallet.deposit.amountInitiallyLockedNative.divn(
+            vestingCount
+          )
+          // Monthly vesting needs to be calculated over time
+          for (let i = 1; i <= vestingCount; i++) {
+            const nextVestinDays = i * DAYS_PER_MONTH
+            const vestingDate = dayjs(unixLockupStart).add(
+              nextVestinDays,
+              'day'
+            )
+            for (const date of months) {
+              if (
+                //@ts-ignore
+                vestingDate.isBetween(
+                  date.startOf('month'),
+                  date.endOf('month')
+                )
+              ) {
+                vestingPerMonth[date.format('MMM')] = [
+                  ...vestingPerMonth[date.format('MMM')],
+                  {
+                    vestingDate,
+                    vestingAmount,
+                  },
+                ]
+              }
+            }
+          }
+        } else if (depositType === 'cliff') {
+          vestingAmount = depositWithWallet.deposit.amountInitiallyLockedNative
+          // Find the month the cliff period ends in and bucket it
           for (const date of months) {
             if (
-              //@ts-ignore
-              vestingDate.isBetween(date.startOf('month'), date.endOf('month'))
+              // @ts-ignore
+              finalUnlockDate.isBetween(
+                date.startOf('month'),
+                date.endOf('month')
+              )
             ) {
               vestingPerMonth[date.format('MMM')] = [
                 ...vestingPerMonth[date.format('MMM')],
                 {
-                  vestingDate,
+                  finalUnlockDate,
                   vestingAmount,
                 },
               ]
@@ -496,7 +543,7 @@ const LockTokenStats = () => {
                         .toNumber(),
                     }
                   }),
-                ].reverse()}
+                ]}
                 fmtAmount={fmtAmount}
               ></VestingVsTime>
             </div>

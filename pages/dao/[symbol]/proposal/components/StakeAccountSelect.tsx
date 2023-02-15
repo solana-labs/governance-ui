@@ -2,7 +2,7 @@ import Select from '@components/inputs/Select'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import React, { useEffect } from 'react'
-import { web3 } from '@project-serum/anchor'
+import { web3 } from '@coral-xyz/anchor'
 import { StakeAccount, StakeState } from '@utils/uiTypes/assets'
 
 export function getStakeAccountLabelInfo(acc: StakeAccount | undefined) {
