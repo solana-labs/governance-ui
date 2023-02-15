@@ -5,9 +5,10 @@ import tokenPriceService from '@utils/services/tokenPrice'
 import { parseMintAccountData, parseTokenAccountData } from '@utils/tokens'
 import { InstructionDescriptorFactory } from '../tools'
 
-const common_instructions = (
-  programId: web3.PublicKey
-): Record<number, InstructionDescriptorFactory> => ({
+const common_instructions = (): Record<
+  number,
+  InstructionDescriptorFactory
+> => ({
   72: {
     name: 'Initialize Trade',
     accounts: [
@@ -93,10 +94,7 @@ const common_instructions = (
 })
 
 export const POSEIDON_INSTRUCTIONS = {
-  Euq2W1fbG8nYqErqp9dJekesj67p3B4y78aDYbgzVuj1: common_instructions(
-    new web3.PublicKey('Euq2W1fbG8nYqErqp9dJekesj67p3B4y78aDYbgzVuj1')
-  ),
-  oBRem4fksRF79j3wRkqMHdJfTzxbEEd73JgN3mFQjSK: common_instructions(
-    new web3.PublicKey('oBRem4fksRF79j3wRkqMHdJfTzxbEEd73JgN3mFQjSK')
-  ),
+  Euq2W1fbG8nYqErqp9dJekesj67p3B4y78aDYbgzVuj1: common_instructions(),
+  oBRem4fksRF79j3wRkqMHdJfTzxbEEd73JgN3mFQjSK: common_instructions(),
+  '8TJjyzq3iXc48MgV6TD5DumKKwfWKU14Jr9pwgnAbpzs': common_instructions(),
 }
