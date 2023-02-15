@@ -151,7 +151,7 @@ const Proposal = () => {
                   voteData._programVersion !== 1 &&
                   voteData._programVersion !== 2 &&
                   voteData.veto !== undefined &&
-                  voteData.veto.voteProgress > 0 ? (
+                  (voteData.veto.voteProgress ?? 0) > 0 ? (
                     <div className="pb-3">
                       <VetoProgress
                         votesRequired={voteData.veto.votesRequired}

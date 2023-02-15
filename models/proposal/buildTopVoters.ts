@@ -53,7 +53,8 @@ export function buildTopVoters(
   tokenOwnerRecords: ProgramAccount<TokenOwnerRecord>[],
   realm: ProgramAccount<Realm>,
   proposal: ProgramAccount<Proposal>,
-  governingTokenMint: MintInfo
+  governingTokenMint: MintInfo,
+  undecidedVoterWeightByWallets: { [walletPk: string]: BN }
 ): VoterDisplayData[] {
   const maxVote = calculateMaxVoteScore(realm, proposal, governingTokenMint)
 
@@ -64,22 +65,29 @@ export function buildTopVoters(
   const undecidedData = tokenOwnerRecords
     .filter(
       (tokenOwnerRecord) =>
-        !tokenOwnerRecord.account.governingTokenDepositAmount.isZero() &&
         !electoralVotes.some(
           (voteRecord) =>
             voteRecord.account.governingTokenOwner.toBase58() ===
             tokenOwnerRecord.account.governingTokenOwner.toBase58()
         )
     )
-    .map((record) =>
-      buildResults(
+    .map((record) => {
+      const tokenAmount = Object.keys(undecidedVoterWeightByWallets).length
+        ? record.account.governingTokenDepositAmount.add(
+            undecidedVoterWeightByWallets[
+              record.account.governingTokenOwner.toBase58()
+            ] || new BN(0)
+          )
+        : record.account.governingTokenDepositAmount
+      return buildResults(
         record.account.governingTokenOwner,
-        record.account.governingTokenDepositAmount,
+        tokenAmount,
         VoteType.Undecided,
         maxVote,
         governingTokenMint.decimals
       )
-    )
+    })
+    .filter((x) => !x.votesCast.isZero())
 
   const noVoteData = electoralVotes
     .filter((record) => record.account.getNoVoteWeight()?.gt(ZERO))

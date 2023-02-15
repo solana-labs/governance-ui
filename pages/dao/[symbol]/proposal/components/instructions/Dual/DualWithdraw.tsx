@@ -28,11 +28,10 @@ const DualWithdraw = ({
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
+  const { assetAccounts } = useGovernanceAssets()
   const [governedAccount, setGovernedAccount] = useState<
     ProgramAccount<Governance> | undefined
   >(undefined)
-
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
   const handleSetForm = ({ propertyName, value }) => {
@@ -80,7 +79,7 @@ const DualWithdraw = ({
       <Tooltip content="Treasury owned account receiving the tokens back.">
         <GovernedAccountSelect
           label="Base Treasury"
-          governedAccounts={governedTokenAccountsWithoutNfts}
+          governedAccounts={assetAccounts}
           onChange={(value) => {
             handleSetForm({ value, propertyName: 'baseTreasury' })
           }}
@@ -88,6 +87,7 @@ const DualWithdraw = ({
           error={formErrors['baseTreasury']}
           shouldBeGoverned={shouldBeGoverned}
           governance={governance}
+          type="token"
         ></GovernedAccountSelect>
       </Tooltip>
     </>

@@ -318,7 +318,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
     async fetchRealm(programId: PublicKey, realmId: PublicKey) {
       const set = get().set
       const connection = get().connection.current
-      const programVersion = get().selectedRealm.programVersion
       const connectionContext = get().connection
       const realms = get().realms
       const realm = realms[realmId.toBase58()]
@@ -370,6 +369,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         ),
         getRealmConfigAccountOrDefault(connection, programId, realmId),
       ])
+
       //during the upgrade from v2 to v3 some values are undefined
       //we need to ensure the defaults that
       //match the program:
@@ -382,40 +382,16 @@ const useWalletStore = create<WalletStore>((set, get) => ({
               VoteThresholdType.YesVotePercentage
         )
         .map((x) => x.pubkey)
-      const governancesWithDefaultValues =
-        programVersion >= 3
-          ? governances.map((x) => {
-              if (
-                governancesToSetDefaultValues.find((pk) => pk.equals(x.pubkey))
-              ) {
-                const currentConfig = x.account.config
-                return {
-                  ...x,
-                  account: {
-                    ...x.account,
-                    config: {
-                      ...currentConfig,
-                      votingCoolOffTime: 0,
-                      depositExemptProposalCount: 10,
-                      councilVoteThreshold:
-                        currentConfig.communityVoteThreshold,
-                      councilVetoVoteThreshold:
-                        currentConfig.communityVoteThreshold,
-                      councilVoteTipping: currentConfig.communityVoteTipping,
-                      communityVetoVoteThreshold: new VoteThreshold({
-                        type: VoteThresholdType.Disabled,
-                      }),
-                    },
-                  },
-                }
-              } else {
-                return x
-              }
-            })
-          : governances
+
+      const governancesWithDefaultValues = governances.map((x) => {
+        if (governancesToSetDefaultValues.find((pk) => pk.equals(x.pubkey))) {
+          return getGovernanceWithDefaultValues(x)
+        } else {
+          return x
+        }
+      })
 
       const governancesMap = accountsToPubkeyMap(governancesWithDefaultValues)
-
       set((s) => {
         s.selectedRealm.config = config
         s.selectedRealm.realm = realm
@@ -556,10 +532,17 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         ? GoverningTokenRole.Community
         : GoverningTokenRole.Council
 
+      const isGovernanceInNeedForDefaultValues =
+        governance.account.config.councilVoteThreshold.value === 0 &&
+        governance.account.config.councilVoteThreshold.type ===
+          VoteThresholdType.YesVotePercentage
+      const governanceWithDefaultValues = isGovernanceInNeedForDefaultValues
+        ? getGovernanceWithDefaultValues(governance)
+        : governance
       set((s) => {
         s.selectedProposal.proposal = proposal
         s.selectedProposal.descriptionLink = proposal.account.descriptionLink
-        s.selectedProposal.governance = governance
+        s.selectedProposal.governance = governanceWithDefaultValues
         s.selectedProposal.realm = realm
         s.selectedProposal.instructions = accountsToPubkeyMap(instructions)
         s.selectedProposal.voteRecordsByVoter = voteRecordsByVoter
@@ -604,5 +587,28 @@ const useWalletStore = create<WalletStore>((set, get) => ({
     },
   },
 }))
+
+const getGovernanceWithDefaultValues = (
+  governance: ProgramAccount<Governance>
+) => {
+  return {
+    ...governance,
+    account: {
+      ...governance.account,
+      config: {
+        ...governance.account.config,
+        votingCoolOffTime: 0,
+        depositExemptProposalCount: 10,
+        councilVoteThreshold: governance.account.config.communityVoteThreshold,
+        councilVetoVoteThreshold:
+          governance.account.config.communityVoteThreshold,
+        councilVoteTipping: governance.account.config.communityVoteTipping,
+        communityVetoVoteThreshold: new VoteThreshold({
+          type: VoteThresholdType.Disabled,
+        }),
+      },
+    },
+  }
+}
 
 export default useWalletStore

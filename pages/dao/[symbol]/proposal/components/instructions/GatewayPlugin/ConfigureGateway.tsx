@@ -143,6 +143,7 @@ const ConfigureGatewayPlugin = ({
   ]
   return (
     <>
+      {form && (
       <InstructionForm
         outerForm={form}
         setForm={setForm}
@@ -150,6 +151,7 @@ const ConfigureGatewayPlugin = ({
         setFormErrors={setFormErrors}
         formErrors={formErrors}
       ></InstructionForm>
+      )}
     </>
   )
 }

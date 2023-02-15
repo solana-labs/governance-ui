@@ -7,7 +7,7 @@ import {
 import { RpcContext, TOKEN_PROGRAM_ID } from '@solana/spl-governance'
 import { sendTransaction } from 'utils/send'
 
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { LockupType } from 'VoteStakeRegistry/sdk/accounts'
 import { withCreateNewDeposit } from '../sdk/withCreateNewDeposit'
 import { getPeriod } from 'VoteStakeRegistry/tools/deposits'

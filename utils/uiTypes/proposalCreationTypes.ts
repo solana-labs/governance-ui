@@ -264,11 +264,6 @@ export interface MangoRemoveOracleForm {
   oraclePk: NameValue | null
 }
 
-export interface SagaPhoneForm {
-  governedAccount: AssetAccount | null
-  quantity: number
-}
-
 export interface MangoRemovePerpMarketForm {
   governedAccount: AssetAccount | null
   mangoGroup: NameValue | null
@@ -390,6 +385,39 @@ export interface MangoMakeChangeReferralFeeParams2 {
   refShareCentibps2: number
   refMngoRequired2: number
 }
+
+/* PsyOptions American options */
+export interface PsyFinanceMintAmericanOptionsForm {
+  contractSize: number
+  expirationUnixTimestamp: number
+  optionTokenDestinationAccount: string
+  quoteMint: string
+  size: number | undefined
+  strike: number
+  underlyingAccount: AssetAccount | undefined
+  underlyingMint: PublicKey | undefined
+  writerTokenDestinationAccount: string
+}
+
+export interface PsyFinanceBurnWriterForQuote {
+  size: number
+  writerTokenAccount: AssetAccount | undefined
+  quoteDestination: string
+}
+
+export interface PsyFinanceClaimUnderlyingPostExpiration {
+  size: number
+  writerTokenAccount: AssetAccount | undefined
+  underlyingDestination: string
+}
+
+export interface PsyFinanceExerciseOption {
+  size: number
+  optionTokenAccount: AssetAccount | undefined
+  quoteAssetAccount: AssetAccount | undefined
+}
+
+/* End PsyOptions American options */
 
 export interface ForesightHasGovernedAccount {
   governedAccount: AssetAccount
@@ -543,7 +571,7 @@ export enum Instructions {
   // CreateSolendObligationAccount,
   CreateTokenMetadata,
   // CreateVsrRegistrar,
-  DeactivateValidatorStake,
+  // DeactivateValidatorStake,
   // DepositIntoCastle,
   // DepositIntoGoblinGold,
   // DepositIntoVolt,
@@ -593,6 +621,10 @@ export enum Instructions {
   Mint,
   None,
   ProgramUpgrade,
+  // PsyFinanceBurnWriterForQuote,
+  // PsyFinanceClaimUnderlyingPostExpiration,
+  // PsyFinanceExerciseOption,
+  // PsyFinanceMintAmericanOptions,
   RealmConfig,
   // RefreshSolendObligation,
   // RefreshSolendReserve,
@@ -604,11 +636,11 @@ export enum Instructions {
   // SerumInitUser,
   // SerumUpdateGovConfigAuthority,
   // SerumUpdateGovConfigParams,
-  StakeValidator,
+  // StakeValidator,
   // SwitchboardAdmitOracle,
   // SwitchboardRevokeOracle,
   Transfer,
-  TransferDomainName,
+  // TransferDomainName,
   UpdateTokenMetadata,
   // VotingMintConfig,
   // WithdrawFromCastle,
@@ -620,6 +652,7 @@ export enum Instructions {
   // RemoveKeyFromDID,
   // AddServiceToDID,
   // RemoveServiceFromDID,
+  RevokeGoverningTokens,
 }
 
 export type createParams = [

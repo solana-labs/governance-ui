@@ -2,10 +2,6 @@ import ImageIcon from '@carbon/icons-react/lib/Image';
 import { produce } from 'immer';
 
 import { FieldDescription } from '../common/FieldDescription';
-import { FieldHeader } from '../common/FieldHeader';
-import { FieldIconPreview } from '../common/FieldIconPreview';
-import { SecondaryRed } from '@hub/components/controls/Button';
-import { Input } from '@hub/components/controls/Input';
 
 import { Item } from './Item';
 
@@ -28,6 +24,7 @@ function trimGallery(
       return !!g.url;
     })
     .map((g) => {
+      // eslint-disable-next-line
       const { __typename, ...rest } = g;
       return rest;
     });

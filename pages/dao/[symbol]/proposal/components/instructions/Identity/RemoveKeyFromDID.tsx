@@ -106,6 +106,7 @@ const RemoveKeyFromDID = ({
 
   return (
     <>
+      {form && (
       <InstructionForm
         outerForm={form}
         setForm={setForm}
@@ -113,6 +114,7 @@ const RemoveKeyFromDID = ({
         setFormErrors={setFormErrors}
         formErrors={formErrors}
       ></InstructionForm>
+      )}
     </>
   )
 }

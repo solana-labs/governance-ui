@@ -1,5 +1,5 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { withVoteRegistryWithdraw } from '../sdk/withVoteRegistryWithdraw'
 import { RpcContext } from '@solana/spl-governance'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'

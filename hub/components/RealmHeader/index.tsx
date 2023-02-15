@@ -12,11 +12,10 @@ import ProgressBarRound from '@carbon/icons-react/lib/ProgressBarRound';
 import UserFollow from '@carbon/icons-react/lib/UserFollow';
 import WalletIcon from '@carbon/icons-react/lib/Wallet';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
-import { useWallet } from '@solana/wallet-adapter-react';
 import type { PublicKey } from '@solana/web3.js';
 import { pipe } from 'fp-ts/lib/function';
 import Link from 'next/link';
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useMediaQuery } from 'react-responsive';
 
 import * as Button from '@hub/components/controls/Button';
@@ -24,7 +23,6 @@ import { HeaderTokenPrice } from '@hub/components/HeaderTokenPrice';
 import { Twitter } from '@hub/components/icons/Twitter';
 import * as RealmBanner from '@hub/components/RealmBanner';
 import * as RealmHeaderIcon from '@hub/components/RealmHeaderIcon';
-import { useCluster } from '@hub/hooks/useCluster';
 import { useMutation } from '@hub/hooks/useMutation';
 import { useQuery } from '@hub/hooks/useQuery';
 import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
@@ -61,70 +59,13 @@ interface Props extends BaseProps {
   websiteUrl?: string | null;
 }
 
-interface Jupiter {
-  init(args: any): any;
-}
-
-async function importJupiter() {
-  const script = new Promise<any>((res, rej) => {
-    const existing = document.getElementById(
-      'jupiter-load-script',
-    ) as HTMLScriptElement | null;
-
-    if (existing) {
-      res({});
-    } else {
-      const el = document.createElement('script');
-      el.onload = res;
-      el.onerror = rej;
-      el.id = 'jupiter-load-script';
-      el.type = 'text/javascript';
-      el.src = 'https://terminal.jup.ag/main.js';
-      document.head.append(el);
-    }
-  });
-
-  const css = new Promise((res, rej) => {
-    const existing = document.getElementById(
-      'jupiter-load-styles',
-    ) as HTMLLinkElement | null;
-
-    if (existing) {
-      res({});
-    } else {
-      const el = document.createElement('link');
-      el.onload = res;
-      el.onerror = rej;
-      el.id = 'jupiter-load-styles';
-      el.rel = 'stylesheet';
-      el.href = 'https://terminal.jup.ag/main.css';
-      document.head.append(el);
-    }
-  });
-
-  return Promise.all([script, css]).then(() => {
-    return (window as any).Jupiter as Jupiter;
-  });
-}
-
 export function Content(props: Props) {
-  const { wallet } = useWallet();
-  const [cluster] = useCluster();
-  const endpoint = useMemo(() => cluster.connection.rpcEndpoint, [
-    cluster.connection,
-  ]);
-
-  const mint = useMemo(() => props.token?.mint.toString(), [props.token?.mint]);
-  const initJupiter = useCallback(async () => {
-    const jupiter = await importJupiter();
-
-    jupiter.init({
-      mode: 'outputOnly',
-      mint,
-      endpoint,
-      passThroughWallet: wallet,
-    });
-  }, [mint, endpoint, wallet]);
+  const jupiterDirectLink = useMemo(() => {
+    if (props.token?.mint) {
+      return `https://jup.ag/swap/USDC-${props.token?.mint.toString()}?inAmount=1`;
+    }
+    return 'https://jup.ag';
+  }, [props.token]);
 
   const showFullLinkList = useMediaQuery({ query: '(min-width: 768px)' });
   const hasExternalLinks = !!(
@@ -257,13 +198,13 @@ export function Content(props: Props) {
             {props.token && (
               <a
                 className="ml-2"
-                onClick={initJupiter}
+                href={jupiterDirectLink}
                 target="_blank"
                 rel="noreferrer"
               >
-                <Button.Primary className="w-36 text-white">
+                <Button.Primary className="w-40 text-white">
                   <ProgressBarRound className="h-4 w-4 mr-1.5" />
-                  Buy #{props.token.symbol}
+                  Explore #{props.token.symbol}
                 </Button.Primary>
               </a>
             )}

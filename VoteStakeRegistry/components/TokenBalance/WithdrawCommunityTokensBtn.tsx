@@ -1,7 +1,7 @@
 import { SecondaryButton } from '@components/Button'
 import useRealm from '@hooks/useRealm'
 import { getUnrelinquishedVoteRecords } from '@models/api'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import {
   getProposal,
   ProposalState,
