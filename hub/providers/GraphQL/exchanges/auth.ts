@@ -1,36 +1,67 @@
 import { makeOperation } from '@urql/core';
 import { authExchange } from '@urql/exchange-auth';
 
-export const auth = authExchange<{ token?: string }>({
+export const auth = authExchange<{ token?: string; cluster?: string }>({
   addAuthToOperation: ({ authState, operation }) => {
     const token = authState?.token || localStorage.getItem('user');
 
-    if (!token) {
-      return operation;
+    let enchancedOperation = operation;
+
+    if (authState?.cluster === 'devnet') {
+      const fetchOptions =
+        typeof enchancedOperation.context.fetchOptions === 'function'
+          ? enchancedOperation.context.fetchOptions()
+          : enchancedOperation.context.fetchOptions || {};
+
+      enchancedOperation = makeOperation(
+        enchancedOperation.kind,
+        enchancedOperation,
+        {
+          ...enchancedOperation.context,
+          fetchOptions: {
+            ...fetchOptions,
+            headers: {
+              ...fetchOptions.headers,
+              'x-environment': 'devnet',
+            },
+          },
+        },
+      );
     }
 
-    const fetchOptions =
-      typeof operation.context.fetchOptions === 'function'
-        ? operation.context.fetchOptions()
-        : operation.context.fetchOptions || {};
+    if (token) {
+      const fetchOptions =
+        typeof enchancedOperation.context.fetchOptions === 'function'
+          ? enchancedOperation.context.fetchOptions()
+          : enchancedOperation.context.fetchOptions || {};
 
-    return makeOperation(operation.kind, operation, {
-      ...operation.context,
-      fetchOptions: {
-        ...fetchOptions,
-        headers: {
-          ...fetchOptions.headers,
-          Authorization: `Bearer ${token}`,
+      enchancedOperation = makeOperation(
+        enchancedOperation.kind,
+        enchancedOperation,
+        {
+          ...enchancedOperation.context,
+          fetchOptions: {
+            ...fetchOptions,
+            headers: {
+              ...fetchOptions.headers,
+              Authorization: `Bearer ${token}`,
+            },
+          },
         },
-      },
-    });
+      );
+    }
+
+    return enchancedOperation;
   },
   getAuth: async ({ authState }) => {
     if (!authState) {
-      const token = localStorage.getItem('user');
+      const token = localStorage.getItem('user') || undefined;
+      const cluster = location.search.includes('cluster=devnet')
+        ? 'devnet'
+        : undefined;
 
-      if (token) {
-        return { token };
+      if (token || cluster) {
+        return { cluster, token };
       }
     }
 

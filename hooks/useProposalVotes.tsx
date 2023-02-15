@@ -1,4 +1,5 @@
-import { Proposal } from '@solana/spl-governance'
+import { BN } from '@coral-xyz/anchor'
+import { Proposal, ProposalState } from '@solana/spl-governance'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { getProposalMaxVoteWeight } from '../models/voteWeights'
 import { calculatePct, fmtTokenAmount } from '../utils/formatting'
@@ -59,6 +60,7 @@ export default function useProposalVotes(proposal?: Proposal) {
 
   const yesVotePct = calculatePct(proposal.getYesVoteCount(), maxVoteWeight)
   const yesVoteProgress = (yesVotePct / voteThresholdPct) * 100
+
   const isMultiProposal = proposal?.options?.length > 1
   const yesVoteCount = !isMultiProposal
     ? fmtTokenAmount(proposal.getYesVoteCount(), proposalMint.decimals)
@@ -75,10 +77,12 @@ export default function useProposalVotes(proposal?: Proposal) {
   const relativeYesVotes = getRelativeVoteCount(yesVoteCount)
   const relativeNoVotes = getRelativeVoteCount(noVoteCount)
   const rawYesVotesRequired = minimumYesVotes - yesVoteCount
+  const actualVotesRequired = rawYesVotesRequired < 0 ? 0 : rawYesVotesRequired
+
   const yesVotesRequired =
     proposalMint.decimals == 0
-      ? Math.ceil(rawYesVotesRequired)
-      : rawYesVotesRequired
+      ? Math.ceil(actualVotesRequired)
+      : actualVotesRequired
 
   const results = {
     voteThresholdPct,
@@ -130,8 +134,23 @@ export default function useProposalVotes(proposal?: Proposal) {
       veto: undefined,
     }
 
-  const isPluginCommunityVeto = maxVoteRecord && !isCommunityVote
+  const vetoVoteCount = fmtTokenAmount(
+    proposal.vetoVoteWeight,
+    vetoMintInfo.decimals
+  )
+  // its impossible to accurately know the veto votes required for a finalized, non-vetoed proposal
+  if (proposal.isVoteFinalized() && proposal.state !== ProposalState.Vetoed)
+    return {
+      _programVersion: programVersion,
+      ...results,
+      veto: {
+        votesRequired: undefined,
+        voteCount: vetoVoteCount,
+        voteProgress: undefined,
+      },
+    }
 
+  const isPluginCommunityVeto = maxVoteRecord && !isCommunityVote
   const vetoMaxVoteWeight = isPluginCommunityVeto
     ? maxVoteRecord.account.maxVoterWeight
     : getProposalMaxVoteWeight(
@@ -141,21 +160,16 @@ export default function useProposalVotes(proposal?: Proposal) {
         vetoMintPk
       )
 
-  const vetoVoteCount = fmtTokenAmount(
-    proposal.vetoVoteWeight,
-    vetoMintInfo.decimals
-  )
-
   const vetoVoteProgress = calculatePct(
     proposal.vetoVoteWeight,
     vetoMaxVoteWeight
   )
 
-  const minimumVetoVotes =
-    fmtTokenAmount(vetoMaxVoteWeight, vetoMintInfo.decimals) *
-    (vetoThreshold.value / 100)
+  const minimumVetoVotes = vetoMaxVoteWeight
+    ?.div(new BN(10).pow(new BN(vetoMintInfo.decimals ?? 0)))
+    .muln(vetoThreshold.value / 100)
 
-  const vetoVotesRequired = minimumVetoVotes - vetoVoteCount
+  const vetoVotesRequired = minimumVetoVotes.subn(vetoVoteCount).toString()
 
   return {
     _programVersion: programVersion,

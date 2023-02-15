@@ -6,8 +6,9 @@ import {
   ProposalState,
   ProposalTransaction,
   RpcContext,
+  withExecuteTransaction,
 } from '@solana/spl-governance'
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { CheckCircleIcon, PlayIcon, RefreshIcon } from '@heroicons/react/solid'
 import Button from '@components/Button'
 import Tooltip from '@components/Tooltip'
@@ -16,12 +17,64 @@ import { getProgramVersionForRealm } from '@models/registry/api'
 import { executeInstructions } from 'actions/executeInstructions'
 import useWalletStore from 'stores/useWalletStore'
 import { notify } from '@utils/notifications'
+import useProgramVersion from '@hooks/useProgramVersion'
+import { abbreviateAddress } from '@utils/formatting'
 
 export enum PlayState {
   Played,
   Unplayed,
   Playing,
   Error,
+}
+
+const useSignersNeeded = (
+  proposalInstructions: ProgramAccount<ProposalTransaction>[],
+  proposal: ProgramAccount<Proposal>
+) => {
+  const { realm } = useRealm()
+  const programVersion = useProgramVersion()
+
+  const [signersNeeded, setSignersNeeded] = useState<PublicKey[]>()
+
+  useEffect(() => {
+    const x = async () => {
+      console.log('i ran the check')
+
+      if (realm?.owner === undefined) return undefined
+
+      const executionInstructions: TransactionInstruction[] = []
+
+      await Promise.all(
+        proposalInstructions.map((instruction) =>
+          // withExecuteTransaction function mutates 'executionInstructions'
+          withExecuteTransaction(
+            executionInstructions,
+            realm.owner,
+            programVersion,
+            proposal.account.governance,
+            proposal.pubkey,
+            instruction.pubkey,
+            [instruction.account.getSingleInstruction()]
+          )
+        )
+      )
+
+      const signers = executionInstructions
+        .flatMap((x) => x.keys)
+        .filter((x) => x.isSigner)
+        .map((x) => x.pubkey)
+      setSignersNeeded(signers)
+    }
+    x()
+  }, [
+    programVersion,
+    proposal.account.governance,
+    proposal.pubkey,
+    proposalInstructions,
+    realm?.owner,
+  ])
+
+  return signersNeeded
 }
 
 export function ExecuteAllInstructionButton({
@@ -79,6 +132,14 @@ export function ExecuteAllInstructionButton({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [isPassedExecutionSlot, rpcContext.connection, currentSlot])
 
+  const signersNeeded = useSignersNeeded(proposalInstructions, proposal)
+  const otherSignerNeeded =
+    signersNeeded === undefined
+      ? undefined
+      : signersNeeded.filter(
+          (x) => !wallet?.publicKey || !x.equals(wallet?.publicKey)
+        ).length > 0
+
   const onExecuteInstructions = async () => {
     setPlaying(PlayState.Playing)
 
@@ -126,8 +187,15 @@ export function ExecuteAllInstructionButton({
       <Button
         className={className}
         small={small ?? true}
-        disabled={!connected}
+        disabled={!connected || otherSignerNeeded}
         onClick={onExecuteInstructions}
+        tooltipMessage={
+          otherSignerNeeded && signersNeeded !== undefined
+            ? `This proposal must be executed by ${abbreviateAddress(
+                signersNeeded[0]
+              )}`
+            : undefined
+        }
       >
         {label}
         {proposalInstructions.length > 1

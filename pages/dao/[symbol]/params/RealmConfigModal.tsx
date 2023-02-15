@@ -140,7 +140,7 @@ const RealmConfigModal = ({ closeProposalModal, isProposalModalOpen }) => {
               // Pass the payer only if RealmConfigAccount doens't exist and needs to be created
               // TODO: If payer is passed then only the payer can execute the proposal
               //       We should use the DAO Wallet instead, and top it up if there is not enough SOL there
-              realmConfig ? wallet.publicKey : undefined
+              !realmConfig ? wallet.publicKey : undefined
             )
           : await createSetRealmConfig(
               realmInfo.programId,
@@ -167,7 +167,7 @@ const RealmConfigModal = ({ closeProposalModal, isProposalModalOpen }) => {
               // Pass the payer only if RealmConfigAccount doens't exist and needs to be created
               // TODO: If payer is passed then only the payer can execute the proposal
               //       We should use the DAO Wallet instead, and top it up if there is not enough SOL there
-              realmConfig ? wallet.publicKey : undefined
+              !realmConfig ? wallet.publicKey : undefined
             )
 
       serializedInstruction = serializeInstructionToBase64(instruction)
@@ -239,7 +239,7 @@ const RealmConfigModal = ({ closeProposalModal, isProposalModalOpen }) => {
           <VoteBySwitch
             checked={voteByCouncil}
             onChange={() => {
-              setVoteByCouncil(voteByCouncil)
+              setVoteByCouncil(!voteByCouncil)
             }}
           />
         )}

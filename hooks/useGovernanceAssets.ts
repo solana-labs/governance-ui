@@ -271,7 +271,10 @@ export default function useGovernanceAssets() {
        ██      ██    ██ ██  ██  ██ ██  ██  ██ ██    ██ ██  ██ ██
         ██████  ██████  ██      ██ ██      ██  ██████  ██   ████
      */
-
+    [Instructions.RevokeGoverningTokens]: {
+      name: 'Revoke Membership',
+      packageId: PackageEnum.Common,
+    },
     [Instructions.Base64]: {
       name: 'Execute Custom Instruction',
       packageId: PackageEnum.Common,
@@ -302,10 +305,10 @@ export default function useGovernanceAssets() {
       isVisible: canUseAuthorityInstruction,
       packageId: PackageEnum.Common,
     },
-    [Instructions.DeactivateValidatorStake]: {
-      name: 'Deactivate validator stake',
-      packageId: PackageEnum.Common,
-    },
+    // [Instructions.DeactivateValidatorStake]: {
+    //   name: 'Deactivate validator stake',
+    //   packageId: PackageEnum.Common,
+    // },
     // [Instructions.DifferValidatorStake]: {
     //   name: 'Differ validator stake',
     //   // Not to be used for now
@@ -353,10 +356,10 @@ export default function useGovernanceAssets() {
     //   isVisible: canUseTokenTransferInstruction,
     //   packageId: PackageEnum.Common,
     // },
-    [Instructions.StakeValidator]: {
-      name: 'Stake A Validator',
-      packageId: PackageEnum.Common,
-    },
+    // [Instructions.StakeValidator]: {
+    //   name: 'Stake A Validator',
+    //   packageId: PackageEnum.Common,
+    // },
     [Instructions.Transfer]: {
       name: 'Transfer Tokens',
       isVisible: canUseTokenTransferInstruction,
@@ -709,6 +712,31 @@ export default function useGovernanceAssets() {
     // [Instructions.MeanTransferStream]: {
     //   name: 'Payment Stream: Transfer stream',
     //   packageId: PackageEnum.MeanFinance,
+    // },
+
+    /*
+      ██████  ███████ ██    ██  ███████ ██ ███    ██  █████  ███    ██  ██████ ███████
+      ██   ██ ██       ██  ██   ██      ██ ████   ██ ██   ██ ████   ██ ██      ██     
+      ██████  ███████   ████    █████   ██ ██ ██  ██ ███████ ██ ██  ██ ██      █████  
+      ██           ██    ██     ██      ██ ██  ██ ██ ██   ██ ██  ██ ██ ██      ██      
+      ██      ███████    ██     ██      ██ ██   ████ ██   ██ ██   ████  ██████ ███████ 
+    */
+
+    // [Instructions.PsyFinanceMintAmericanOptions]: {
+    //   name: ' Mint American Options',
+    //   packageId: PackageEnum.PsyFinance,
+    // },
+    // [Instructions.PsyFinanceBurnWriterForQuote]: {
+    //   name: 'Claim Quote with Writer Token',
+    //   packageId: PackageEnum.PsyFinance,
+    // },
+    // [Instructions.PsyFinanceClaimUnderlyingPostExpiration]: {
+    //   name: 'Claim Underlying (post expiration)',
+    //   packageId: PackageEnum.PsyFinance,
+    // },
+    // [Instructions.PsyFinanceExerciseOption]: {
+    //   name: 'Exercise Option',
+    //   packageId: PackageEnum.PsyFinance,
     // },
 
     /*

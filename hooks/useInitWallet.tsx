@@ -1,3 +1,4 @@
+import { useWallet } from '@solana/wallet-adapter-react'
 import { useEffect, useMemo } from 'react'
 
 import useWalletStore from '../stores/useWalletStore'
@@ -13,6 +14,7 @@ import useLocalStorageState from './useLocalStorageState'
 const SECONDS = 1000
 
 export default function useInitWallet() {
+  const { wallets } = useWallet()
   const {
     connection,
     current: wallet,
@@ -51,8 +53,9 @@ export default function useInitWallet() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [selectedProviderUrl, savedProviderUrl])
 
-  const provider = useMemo(() => getWalletProviderByUrl(selectedProviderUrl), [
+  const provider = useMemo(() => getWalletProviderByUrl(selectedProviderUrl, wallets), [
     selectedProviderUrl,
+    wallets,
   ])
 
   // save selection in local storage

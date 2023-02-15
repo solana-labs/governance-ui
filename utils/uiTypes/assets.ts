@@ -1,4 +1,4 @@
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { Governance, ProgramAccount } from '@solana/spl-governance'
 import { AccountInfo, MintInfo, u64 } from '@solana/spl-token'
 import { ParsedAccountData, PublicKey } from '@solana/web3.js'

@@ -1,6 +1,5 @@
 import ChevronRightIcon from '@carbon/icons-react/lib/ChevronRight';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import { abbreviateNumber } from '@hub/lib/abbreviateNumber';
@@ -23,7 +22,6 @@ interface BountyData {
 export function Bounties(props: Props) {
   const [bounties, setBounties] = useState([]);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {

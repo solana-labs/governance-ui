@@ -17,7 +17,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { SYSVAR_RENT_PUBKEY } from '@solana/web3.js'
 import { getRegistrarPDA } from 'VoteStakeRegistry/sdk/accounts'
 import { DEFAULT_VSR_ID, VsrClient } from 'VoteStakeRegistry/sdk/client'
-import { web3 } from '@project-serum/anchor'
+import { web3 } from '@coral-xyz/anchor'
 import useWallet from '@hooks/useWallet'
 
 interface CreateVsrRegistrarForm {
@@ -50,7 +50,7 @@ const CreateVsrRegistrar = ({
     ) {
       const vsrClient = VsrClient.connect(
         anchorProvider,
-        form?.programId ? new web3.PublicKey(form.programId) : undefined
+        form?.programId ? new web3.PublicKey(form.programId) : DEFAULT_VSR_ID
       )
       const { registrar, registrarBump } = await getRegistrarPDA(
         realm!.pubkey,
@@ -128,6 +128,7 @@ const CreateVsrRegistrar = ({
   ]
   return (
     <>
+      {form && (
       <InstructionForm
         outerForm={form}
         setForm={setForm}
@@ -135,6 +136,7 @@ const CreateVsrRegistrar = ({
         setFormErrors={setFormErrors}
         formErrors={formErrors}
       ></InstructionForm>
+      )}
     </>
   )
 }

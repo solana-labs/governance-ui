@@ -1,14 +1,19 @@
+import { EndpointTypes } from '@models/types'
 import { getVoteRecord } from '@solana/spl-governance'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
+import { getNetworkFromEndpoint } from '@utils/connection'
 import asFindable from '@utils/queries/asFindable'
 import useWalletStore from 'stores/useWalletStore'
 import { useAddressQuery_SelectedProposalVoteRecord } from './addresses/voteRecord'
 import queryClient from './queryClient'
 
 export const voteRecordQueryKeys = {
-  all: ['VoteRecord'],
-  byPubkey: (k: PublicKey) => [...voteRecordQueryKeys.all, k.toString()],
+  all: (cluster: EndpointTypes) => [cluster, 'VoteRecord'],
+  byPubkey: (cluster: EndpointTypes, k: PublicKey) => [
+    ...voteRecordQueryKeys.all(cluster),
+    k.toString(),
+  ],
 }
 
 // currently unused
@@ -27,7 +32,9 @@ export const useVoteRecordByPubkeyQuery = (pubkey?: PublicKey) => {
 
   const enabled = pubkey !== undefined
   const query = useQuery({
-    queryKey: enabled ? voteRecordQueryKeys.byPubkey(pubkey) : undefined,
+    queryKey: enabled
+      ? voteRecordQueryKeys.byPubkey(connection.cluster, pubkey)
+      : undefined,
     queryFn: async () => {
       if (!enabled) throw new Error()
       return asFindable(getVoteRecord)(connection.current, pubkey)
@@ -41,8 +48,10 @@ export const useVoteRecordByPubkeyQuery = (pubkey?: PublicKey) => {
 export const fetchVoteRecordByPubkey = (
   connection: Connection,
   pubkey: PublicKey
-) =>
-  queryClient.fetchQuery({
-    queryKey: voteRecordQueryKeys.byPubkey(pubkey),
+) => {
+  const cluster = getNetworkFromEndpoint(connection.rpcEndpoint)
+  return queryClient.fetchQuery({
+    queryKey: voteRecordQueryKeys.byPubkey(cluster, pubkey),
     queryFn: () => asFindable(getVoteRecord)(connection, pubkey),
   })
+}

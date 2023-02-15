@@ -5,7 +5,7 @@ import {
   withSetRealmAuthority,
 } from '@solana/spl-governance'
 import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js'
-import { AnchorProvider, Wallet } from '@project-serum/anchor'
+import { AnchorProvider, Wallet } from '@coral-xyz/anchor'
 import {
   SequenceType,
   sendTransactionsV3,
@@ -37,13 +37,13 @@ export default async function createNFTRealm({
   wallet,
 
   collectionAddress,
-  nftCollectionCount,
 
   ...params
 }: NFTRealm) {
   const options = AnchorProvider.defaultOptions()
   const provider = new AnchorProvider(connection, wallet as Wallet, options)
   const nftClient = await NftVoterClient.connect(provider)
+  const { nftCollectionCount } = params
 
   const {
     communityMintGovPk,

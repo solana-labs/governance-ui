@@ -1,5 +1,5 @@
 import { Treasury } from '@mean-dao/msp'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { Governance, ProgramAccount } from '@solana/spl-governance'
 import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'

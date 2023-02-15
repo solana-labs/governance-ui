@@ -1,5 +1,3 @@
-import { PublicKey } from '@solana/web3.js';
-
 import { Realm } from '../gql';
 import { SmallCard } from '@hub/components/DiscoverPage/SmallCard';
 import { NFT as NFTIcon } from '@hub/components/icons/NFT';

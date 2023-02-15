@@ -10,6 +10,7 @@ import { Asset, Token } from './Asset'
 export interface CommonRules {
   maxVotingTime: number
   minInstructionHoldupTime: number
+  votingCoolOffSeconds: number
 }
 
 export interface Rules {

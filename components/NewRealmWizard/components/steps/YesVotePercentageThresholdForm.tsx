@@ -32,11 +32,15 @@ export const CouncilYesVotePercentageSchema = {
     .transform((value) => (isNaN(value) ? 0 : value))
     .max(100, 'Approval cannot require more than 100% of votes')
     .min(1, 'Quorum must be at least 1% of member')
-    .when('$_programVersion', (_programVersion, schema) => {
-      if (_programVersion >= 3) {
-        return schema.required('Council yes threshold is required')
+    .when(
+      ['$_programVersion', '$addCouncil'],
+      // @ts-expect-error yup types are wrong https://github.com/jquense/yup/issues/649
+      (_programVersion, addCouncil, schema) => {
+        if (_programVersion >= 3 && addCouncil) {
+          return schema.required('Council yes threshold is required')
+        }
       }
-    }),
+    ),
 }
 
 export interface CouncilYesVotePercentage {

@@ -78,7 +78,9 @@ const useSubmitVote = ({
     const confirmationCallback = async () => {
       await refetchProposals()
       // TODO refine this to only invalidate the one query
-      await queryClient.invalidateQueries(voteRecordQueryKeys.all)
+      await queryClient.invalidateQueries(
+        voteRecordQueryKeys.all(connection.cluster)
+      )
     }
 
     try {

@@ -6,7 +6,7 @@ import {
 import { SwitchboardQueueVoterClient } from '../SwitchboardVotePlugin/SwitchboardQueueVoterClient'
 import { getRegistrarPDA, Registrar } from 'VoteStakeRegistry/sdk/accounts'
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts'
-import { AnchorProvider, Wallet } from '@project-serum/anchor'
+import { AnchorProvider, Wallet } from '@coral-xyz/anchor'
 import { tryGetNftRegistrar, tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { ConnectionContext } from '@utils/connection'
@@ -35,7 +35,7 @@ interface UseVotePluginsClientStore extends State {
   handleSetVsrClient: (
     wallet: SignerWalletAdapter | undefined,
     connection: ConnectionContext,
-    programId?: PublicKey
+    programId: PublicKey
   ) => void
   handleSetNftClient: (
     wallet: SignerWalletAdapter | undefined,
@@ -191,11 +191,10 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
           connection.cluster
         )
 
-        const maxVoterWeight = (
-          await pythClient.stakeConnection.program.methods
+        const updateMaxVoterWeightKeys = await pythClient.stakeConnection.program.methods
             .updateMaxVoterWeight()
-            .pubkeys()
-        ).maxVoterRecord
+            .pubkeys();
+        const maxVoterWeight = updateMaxVoterWeightKeys.maxVoterRecord as PublicKey;
 
         set((s) => {
           s.state.pythClient = pythClient
