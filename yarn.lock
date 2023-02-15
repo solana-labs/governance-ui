@@ -2406,10 +2406,10 @@
     crypto-hash "^1.3.0"
     form-data "^4.0.0"
 
-"@mithraic-labs/poseidon@^0.0.4":
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/@mithraic-labs/poseidon/-/poseidon-0.0.4.tgz#a3b598df5c558553c4d7503021e92593b6394a2c"
-  integrity sha512-C3XwV2eRZeiHTsIVRxIl416PtRutNabIvpF4er5EpfRflbn+rtr2/xpiL1unyNg3MGAlXUFIk0K2GDmNDuuItQ==
+"@mithraic-labs/poseidon@^0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@mithraic-labs/poseidon/-/poseidon-0.0.5.tgz#68416ec2adf26af6f916cc251f8ad733152ae9f2"
+  integrity sha512-CqpeoDTdeTFuNDfGG2yuEi0XL+dyAmMe8EMOobrTbGl9OtGq48JxRI2lKuV8vL9YiEZ1m8r5hKAoameNBDmVPw==
   dependencies:
     "@raydium-io/raydium-sdk" "^1.1.0-beta.55"
 
