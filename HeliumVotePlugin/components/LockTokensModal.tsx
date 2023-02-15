@@ -7,10 +7,7 @@ import ButtonGroup from '@components/ButtonGroup'
 import Input from '@components/inputs/Input'
 import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import { precision } from '@utils/formatting'
-import {
-  getFormattedStringFromDays,
-  yearsToDays,
-} from 'VoteStakeRegistry/tools/dateTools'
+import { yearsToDays } from 'VoteStakeRegistry/tools/dateTools'
 import Tooltip from '@components/Tooltip'
 import { QuestionMarkCircleIcon } from '@heroicons/react/solid'
 import { notify } from '@utils/notifications'
@@ -67,7 +64,6 @@ export interface LockTokensModalFormValues {
 
 export const LockTokensModal: React.FC<{
   isOpen: boolean
-  minLockupTimeInDays?: number
   maxLockupTimeInDays?: number
   maxLockupAmount: number
   calcMultiplierFn: (lockupPeriodInDays: number) => number
@@ -75,7 +71,6 @@ export const LockTokensModal: React.FC<{
   onSubmit: (values: LockTokensModalFormValues) => Promise<void>
 }> = ({
   isOpen = false,
-  minLockupTimeInDays = 0,
   maxLockupTimeInDays = Infinity,
   maxLockupAmount,
   calcMultiplierFn,
@@ -88,7 +83,6 @@ export const LockTokensModal: React.FC<{
   const [showLockupKindInfo, setShowLockupKindInfo] = useState<boolean>(false)
   const mintMinAmount = mint ? getMintMinAmountAsDecimal(mint) : 1
   const currentPrecision = precision(mintMinAmount)
-  const hasMinLockup = minLockupTimeInDays && minLockupTimeInDays > 0
   const hasMaxLockup = maxLockupTimeInDays && maxLockupTimeInDays !== Infinity
   const lockupMoreThenDepositedOptions = [
     { value: false, display: 'No' },
@@ -99,19 +93,9 @@ export const LockTokensModal: React.FC<{
     { value: LockupKind.constant, display: 'Constant' },
   ]
 
-  const lockupPeriodOptions = [
-    ...(hasMinLockup
-      ? [
-          {
-            value: minLockupTimeInDays,
-            display: 'min',
-          },
-        ]
-      : []),
-    ...defaultLockupPeriods.filter(
-      (lp) => lp.value >= minLockupTimeInDays && lp.value <= maxLockupTimeInDays
-    ),
-  ]
+  const lockupPeriodOptions = defaultLockupPeriods.filter(
+    (lp) => lp.value <= maxLockupTimeInDays
+  )
 
   const { setValue, watch, handleSubmit } = useForm<LockTokensModalFormValues>({
     defaultValues: {
@@ -175,16 +159,6 @@ export const LockTokensModal: React.FC<{
     <Modal onClose={onClose} isOpen={isOpen}>
       <form onSubmit={handleOnSubmit}>
         <h2 className="mb-4 flex flex-row items-center">Lock Tokens</h2>
-        {hasMinLockup && !showLockupKindInfo ? (
-          <div className="bg-bkg-3 rounded-md w-full p-4 mb-4 font-normal text-xs">
-            <div>
-              There is a minimum required lockup time of{' '}
-              <span className="bont-bold text-sm text-primary-light">
-                {getFormattedStringFromDays(minLockupTimeInDays)}
-              </span>
-            </div>
-          </div>
-        ) : null}
         {!showLockupKindInfo && (
           <>
             <div className="flex items-center justify-between">
@@ -259,7 +233,7 @@ export const LockTokensModal: React.FC<{
                 <Input
                   className="mb-4"
                   type="number"
-                  min={hasMinLockup ? minLockupTimeInDays : 1}
+                  min={1}
                   max={hasMaxLockup ? maxLockupTimeInDays : Infinity}
                   value={lockupPeriodInDays}
                   step={1}
@@ -269,11 +243,7 @@ export const LockTokensModal: React.FC<{
                   onBlur={({ target: { value } }) => {
                     setValue(
                       'lockupPeriodInDays',
-                      value > minLockupTimeInDays
-                        ? value > maxLockupTimeInDays
-                          ? maxLockupTimeInDays
-                          : value
-                        : minLockupTimeInDays
+                      value > maxLockupTimeInDays ? maxLockupTimeInDays : value
                     )
                   }}
                 />

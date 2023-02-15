@@ -1,6 +1,6 @@
 import create, { State } from 'zustand'
 import { BN } from '@project-serum/anchor'
-import { PositionWithVotingMint } from 'HeliumVotePlugin/sdk/types'
+import { PositionWithMeta } from 'HeliumVotePlugin/sdk/types'
 import {
   GetPositionsArgs as GetPosArgs,
   getPositions,
@@ -8,7 +8,7 @@ import {
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
 
 interface HeliumVsrStoreState {
-  positions: PositionWithVotingMint[]
+  positions: PositionWithMeta[]
   amountLocked: BN
   votingPower: BN
   isLoading: boolean

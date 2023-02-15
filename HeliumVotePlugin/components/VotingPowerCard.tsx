@@ -23,7 +23,7 @@ export const VotingPowerCard: React.FC<{
 }> = ({ inAccountDetails }) => {
   const { fmtUrlWithCluster } = useQueryContext()
   const [hasGovPower, setHasGovPower] = useState(false)
-  const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
+  const [tokenOwnerRecordPk, setTokenOwnerRecordPk] = useState('')
   const { councilMint, mint, realm, symbol, config } = useRealm()
   const [connected, wallet] = useWalletStore((s) => [s.connected, s.current])
   const councilDepositVisible = !!councilMint
@@ -43,7 +43,7 @@ export const VotingPowerCard: React.FC<{
         defaultMint!,
         wallet!.publicKey!
       )
-      setTokenOwneRecordPk(tokenOwnerRecordAddress.toBase58())
+      setTokenOwnerRecordPk(tokenOwnerRecordAddress.toBase58())
     }
     if (realm && wallet?.connected) {
       getTokenOwnerRecord()

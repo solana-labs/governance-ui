@@ -320,7 +320,8 @@ export const TokenDeposit = ({
         await client.withRelinquishVote(
           instructions,
           proposal,
-          voteRecord.pubkey
+          voteRecord.pubkey,
+          depositTokenRecord!.pubkey
         )
       }
     }

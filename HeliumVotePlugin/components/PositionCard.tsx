@@ -3,7 +3,7 @@ import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
 import { fmtMintAmount } from '@tools/sdk/units'
-import { PositionWithVotingMint } from '../sdk/types'
+import { PositionWithMeta } from '../sdk/types'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { abbreviateAddress } from '@utils/formatting'
 import { useNft } from '@hooks/useNft'
@@ -17,7 +17,7 @@ import { BN } from '@project-serum/anchor'
 import Button from '@components/Button'
 
 export interface PositionCardProps {
-  position: PositionWithVotingMint
+  position: PositionWithMeta
 }
 
 export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {

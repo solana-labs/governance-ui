@@ -88,6 +88,7 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
       connection.current,
       connection.endpoint
     )
+
     try {
       setIsLoading(true)
       const instructions: TransactionInstruction[] = []

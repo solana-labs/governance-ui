@@ -5,7 +5,7 @@ import { registrarKey, positionKey } from '@helium/voter-stake-registry-sdk'
 import { tryGetMint } from '@utils/tokens'
 import { calcPositionVotingPower } from './calcPositionVotingPower'
 import { HeliumVsrClient } from '../sdk/client'
-import { Registrar, Position, PositionWithVotingMint } from '../sdk/types'
+import { Registrar, Position, PositionWithMeta } from '../sdk/types'
 import { chunks } from '@utils/helpers'
 
 export interface GetPositionsArgs {
@@ -17,7 +17,7 @@ export interface GetPositionsArgs {
 }
 
 export interface GetPositionsReturn {
-  positions: PositionWithVotingMint[]
+  positions: PositionWithMeta[]
   amountLocked: BN
   votingPower: BN
 }
@@ -26,7 +26,7 @@ export const getPositions = async (
   args: GetPositionsArgs
 ): Promise<GetPositionsReturn> => {
   const { realmPk, walletPk, communityMintPk, client, connection } = args
-  const positions: PositionWithVotingMint[] = []
+  const positions: PositionWithMeta[] = []
   let amountLocked: BN = new BN(0)
   let votingPower: BN = new BN(0)
 
@@ -48,7 +48,6 @@ export const getPositions = async (
   ).filter((nft) => nft.collection?.address.equals(registrar.collection))
 
   const posKeys = nfts.map((nft) => positionKey((nft as any).mintAddress)[0])
-
   const positionAccountInfos = (
     await Promise.all(
       chunks(posKeys, 99).map((chunk) =>
@@ -67,14 +66,15 @@ export const getPositions = async (
           ) as Position
       )
       .map(
-        (pos) =>
+        (pos, idx) =>
           ({
             ...pos,
+            pubkey: posKeys[idx],
             votingMint: {
               ...mintCfgs[pos.votingMintConfigIdx],
               mint: mints[mintCfgs[pos.votingMintConfigIdx].mint.toBase58()],
             },
-          } as PositionWithVotingMint)
+          } as PositionWithMeta)
       )
       .filter((pos) => {
         const lockup = pos.lockup

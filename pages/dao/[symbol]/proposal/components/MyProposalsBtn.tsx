@@ -201,7 +201,8 @@ const MyProposalsBn = () => {
       await client.withRelinquishVote(
         instructions,
         proposal,
-        ownVoteRecordsByProposal[proposal.pubkey.toBase58()].pubkey
+        ownVoteRecordsByProposal[proposal.pubkey.toBase58()].pubkey,
+        voterTokenRecord!.pubkey
       )
       return inst
     }

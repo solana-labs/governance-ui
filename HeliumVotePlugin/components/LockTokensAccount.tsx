@@ -24,7 +24,7 @@ import tokenPriceService from '@utils/services/tokenPrice'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import { abbreviateAddress } from '@utils/formatting'
 import Button from '@components/Button'
-import { daysToSecs, secsToDays } from 'VoteStakeRegistry/tools/dateTools'
+import { daysToSecs } from 'VoteStakeRegistry/tools/dateTools'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { LockCommunityTokensBtn } from './LockCommunityTokensBtn'
 import { LockTokensModal, LockTokensModalFormValues } from './LockTokensModal'
@@ -156,10 +156,6 @@ export const LockTokensAccount: React.FC<{
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [realm?.pubkey.toBase58(), wallet?.connected, tokenOwnerRecordPk])
-
-  const communityVotingMintCfg = vsrRegistrar?.votingMints.find((vm) =>
-    vm.mint.equals(realm!.account.communityMint)
-  )
 
   const hasTokensInWallet =
     realmTokenAccount && realmTokenAccount.account.amount.gt(new BN(0))

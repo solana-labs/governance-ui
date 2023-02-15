@@ -15,6 +15,7 @@ import { BN } from '@project-serum/anchor'
 import Link from 'next/link'
 import useQueryContext from '@hooks/useQueryContext'
 import InlineNotification from '@components/InlineNotification'
+import { getTokenOwnerRecordAddress } from '@solana/spl-governance'
 
 interface Props {
   className?: string
@@ -23,9 +24,17 @@ interface Props {
 export default function LockedCommunityNFTRecordVotingPower(props: Props) {
   const { fmtUrlWithCluster } = useQueryContext()
   const [amount, setAmount] = useState(new BigNumber(0))
-  const { mint, realm, realmTokenAccount, symbol, tokenRecords } = useRealm()
+  const {
+    councilMint,
+    mint,
+    realm,
+    realmTokenAccount,
+    symbol,
+    config,
+  } = useRealm()
   const { proposal } = useProposal()
   const connected = useWalletStore((s) => s.connected)
+  const [tokenOwnerRecordPk, setTokenOwnerRecordPk] = useState('')
   const loadingPositions = useHeliumVsrStore((s) => s.state.isLoading)
   const votingPower = useHeliumVsrStore((s) => s.state.votingPower)
   const amountLocked = useHeliumVsrStore((s) => s.state.amountLocked)
@@ -37,17 +46,30 @@ export default function LockedCommunityNFTRecordVotingPower(props: Props) {
     }
   }, [mint, votingPower])
 
+  useEffect(() => {
+    const getTokenOwnerRecord = async () => {
+      const defaultMint =
+        !mint?.supply.isZero() ||
+        config?.account.communityTokenConfig.maxVoterWeightAddin
+          ? realm!.account.communityMint
+          : !councilMint?.supply.isZero()
+          ? realm!.account.config.councilMint
+          : undefined
+      const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
+        realm!.owner,
+        realm!.pubkey,
+        defaultMint!,
+        wallet!.publicKey!
+      )
+      setTokenOwnerRecordPk(tokenOwnerRecordAddress.toBase58())
+    }
+    if (realm && wallet?.connected) {
+      getTokenOwnerRecord()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+  }, [realm?.pubkey.toBase58(), wallet?.connected])
+
   const isLoading = loadingPositions || !(votingPower && mint)
-
-  const currentTokenOwnerRecord =
-    wallet && wallet.publicKey
-      ? tokenRecords[wallet.publicKey.toBase58()]
-      : null
-
-  const tokenOwnerRecordPk = currentTokenOwnerRecord
-    ? currentTokenOwnerRecord.pubkey
-    : null
-
   const communityMint = realm?.account.communityMint
 
   const tokenName =
@@ -93,40 +115,40 @@ export default function LockedCommunityNFTRecordVotingPower(props: Props) {
 
   return (
     <div className={`${props.className} -mt-10`}>
+      <div className="mb-4 flex justify-end">
+        <Link
+          href={fmtUrlWithCluster(
+            `/dao/${symbol}/account/${tokenOwnerRecordPk}`
+          )}
+        >
+          <a
+            className={`default-transition flex items-center text-fgd-2 text-sm transition-all hover:text-fgd-3 ${
+              !connected || !tokenOwnerRecordPk
+                ? 'opacity-0 pointer-events-none'
+                : ''
+            }`}
+          >
+            View
+            <ChevronRightIcon className="flex-shrink-0 h-6 w-6" />
+          </a>
+        </Link>
+      </div>
+      {hasTokensInWallet && connected ? (
+        <div className="mb-4">
+          <InlineNotification
+            desc={`You have ${tokensToShow} ${
+              amountLocked ? `more` : ``
+            } ${tokenName} available to lock.`}
+            type="info"
+          />
+        </div>
+      ) : null}
       {amount.isZero() ? (
         <div className={'text-xs text-white/50'}>
           You do not have any voting power in this dao.
         </div>
       ) : (
         <>
-          <div className="mb-4 flex justify-end">
-            <Link
-              href={fmtUrlWithCluster(
-                `/dao/${symbol}/account/${tokenOwnerRecordPk}`
-              )}
-            >
-              <a
-                className={`default-transition flex items-center text-fgd-2 text-sm transition-all hover:text-fgd-3 ${
-                  !connected || !tokenOwnerRecordPk
-                    ? 'opacity-50 pointer-events-none'
-                    : ''
-                }`}
-              >
-                View
-                <ChevronRightIcon className="flex-shrink-0 h-6 w-6" />
-              </a>
-            </Link>
-          </div>
-          {hasTokensInWallet && connected ? (
-            <div className="mb-4">
-              <InlineNotification
-                desc={`You have ${tokensToShow} ${
-                  amountLocked ? `more` : ``
-                } ${tokenName} available to lock.`}
-                type="info"
-              />
-            </div>
-          ) : null}
           <div className={'p-3 rounded-md bg-bkg-1'}>
             <div className="text-white/50 text-xs">{tokenName} Votes</div>
             <div className="flex items-center justify-between mt-1">

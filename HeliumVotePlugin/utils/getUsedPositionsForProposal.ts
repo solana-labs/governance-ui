@@ -4,18 +4,18 @@ import { HeliumVsrClient } from '../sdk/client'
 import { PositionWithMeta } from '../sdk/types'
 import { chunks } from '@utils/helpers'
 
-export interface GetUnusedPositionsForProposalArgs {
+export interface GetUsedPositionsForProposalArgs {
   connection: Connection
   client: HeliumVsrClient
   positions: PositionWithMeta[]
   proposalPk: PublicKey
 }
 
-export const getUnusedPositionsForProposal = async (
-  args: GetUnusedPositionsForProposalArgs
+export const getUsedPositionsForProposal = async (
+  args: GetUsedPositionsForProposalArgs
 ): Promise<PositionWithMeta[]> => {
   const { connection, client, positions, proposalPk } = args
-  const unusedPositions: PositionWithMeta[] = []
+  const usedPositions: PositionWithMeta[] = []
   const nftVoteRecordKeys = positions.map(
     (pos) => nftVoteRecordKey(proposalPk, pos.mint, client.program.programId)[0]
   )
@@ -28,9 +28,9 @@ export const getUnusedPositionsForProposal = async (
     )
   ).flat()
 
-  unusedPositions.push(
-    ...positions.filter((_pos, idx) => !nftVoteRecordAccountInfos[idx])
+  usedPositions.push(
+    ...positions.filter((_pos, idx) => !!nftVoteRecordAccountInfos[idx])
   )
 
-  return unusedPositions
+  return usedPositions
 }
