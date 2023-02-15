@@ -39,7 +39,7 @@ import {
 } from 'Strategies/protocols/mango/tools'
 import useMarketStore from 'Strategies/store/marketStore'
 import LoadingRows from './LoadingRows'
-import TradeOnSerum, { TradeOnSerumProps } from './Trade'
+import TradeOnSerum, { TradeProps } from './Trade'
 import { AccountType } from '@utils/uiTypes/assets'
 import CreateAta from './CreateAta'
 import {
@@ -99,10 +99,7 @@ const AccountOverview = () => {
     setProposedInvestment,
   ] = useState<InvestmentType | null>(null)
   const [isCopied, setIsCopied] = useState<boolean>(false)
-  const [
-    tradeSerumInfo,
-    setTradeSerumInfo,
-  ] = useState<TradeOnSerumProps | null>(null)
+  const [tradeSerumInfo, setTradeSerumInfo] = useState<TradeProps | null>(null)
   const strategyMint = currentAccount?.isSol
     ? WSOL_MINT
     : currentAccount?.extensions.token?.account.mint.toString()

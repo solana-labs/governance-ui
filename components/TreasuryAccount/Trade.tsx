@@ -10,12 +10,6 @@ import tokenPriceService from '@utils/services/tokenPrice'
 import React, { useCallback, useMemo, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import AccountLabel from './BaseAccountHeader'
-import {
-  getProgramId,
-  IDL as PoseidonIDL,
-  pdas,
-  Poseidon,
-} from '@mithraic-labs/poseidon'
 import useWalletStore from 'stores/useWalletStore'
 import {
   ArrowCircleDownIcon,
@@ -54,6 +48,11 @@ import useWallet from '@hooks/useWallet'
 import TokenSelect from '@components/inputs/TokenSelect'
 import { TokenInfo } from '@solana/spl-token-registry'
 import DateTimePicker from '@components/inputs/DateTimePicker'
+import {
+  Poseidon,
+  IDL as PoseidonIDL,
+} from '@utils/instructions/PsyFinance/PoseidonIdl'
+import { deriveAllBoundedStrategyKeysV2 } from '@utils/instructions/PsyFinance/poseidon'
 
 export type TradeProps = { tokenAccount: AssetAccount }
 
@@ -165,6 +164,10 @@ const formSchema = (
   )
 }
 
+export const poseidonProgramId = new web3.PublicKey(
+  '8TJjyzq3iXc48MgV6TD5DumKKwfWKU14Jr9pwgnAbpzs'
+)
+
 const Trade: React.FC<TradeProps> = ({ tokenAccount }) => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const router = useRouter()
@@ -172,7 +175,6 @@ const Trade: React.FC<TradeProps> = ({ tokenAccount }) => {
   const { wallet, anchorProvider } = useWallet()
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const { handleCreateProposal } = useCreateProposal()
-  const poseidonProgramId = getProgramId(connection.cluster)
   const { canUseTransferInstruction } = useGovernanceAssets()
   const { canChooseWhoVote, symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
@@ -255,7 +257,7 @@ const Trade: React.FC<TradeProps> = ({ tokenAccount }) => {
       const {
         collateralAccount,
         boundedStrategy: boundedStrategyKey,
-      } = pdas.deriveAllBoundedStrategyKeysV2(
+      } = deriveAllBoundedStrategyKeysV2(
         program,
         new web3.PublicKey(form.assetMint),
         {
