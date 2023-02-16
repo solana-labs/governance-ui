@@ -7,6 +7,7 @@ import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { secsToDays } from 'VoteStakeRegistry/tools/dateTools'
+import { notify } from '@utils/notifications'
 
 export const useUnlockPosition = ({
   registrarPk,

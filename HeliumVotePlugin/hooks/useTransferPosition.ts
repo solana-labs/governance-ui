@@ -6,8 +6,9 @@ import { PositionWithMeta } from '../sdk/types'
 import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
+import { secsToDays } from 'VoteStakeRegistry/tools/dateTools'
 
-export const useExtendPosition = ({
+export const useTransferPosition = ({
   registrarPk,
 }: {
   registrarPk: PublicKey | undefined
@@ -19,11 +20,11 @@ export const useExtendPosition = ({
   const { realm, realmInfo } = useRealm()
   const { error, loading, execute } = useAsyncCallback(
     async ({
-      position,
-      lockupPeriodsInDays,
+      sourcePosition,
+      targetPosition,
     }: {
-      position: PositionWithMeta
-      lockupPeriodsInDays: number
+      sourcePosition: PositionWithMeta
+      targetPosition: PositionWithMeta
     }) => {
       const isInvalid =
         !connection ||
@@ -35,23 +36,34 @@ export const useExtendPosition = ({
         !wallet ||
         !realmInfo ||
         !realmInfo.programVersion ||
-        position.numActiveVotes > 0
+        sourcePosition.numActiveVotes > 0 ||
+        targetPosition.numActiveVotes > 0
 
       if (loading) return
 
       if (isInvalid) {
-        throw new Error('Unable to Extend Position, Invalid params')
+        throw new Error('Unable to Transfer Position, Invalid params')
       } else {
         const instructions: TransactionInstruction[] = []
 
         instructions.push(
           await client.program.methods
-            .resetLockupV0({
-              kind: position.lockup.kind,
-              periods: lockupPeriodsInDays,
-            } as any)
+            .transferV0({
+              amount: sourcePosition.amountDepositedNative,
+            })
             .accounts({
-              position: position.pubkey,
+              sourcePosition: sourcePosition.pubkey,
+              targetPosition: targetPosition.pubkey,
+              depositMint: realm.account.communityMint,
+            })
+            .instruction()
+        )
+
+        instructions.push(
+          await client.program.methods
+            .closePositionV0()
+            .accounts({
+              position: sourcePosition.pubkey,
             })
             .instruction()
         )
@@ -63,8 +75,8 @@ export const useExtendPosition = ({
           wallet,
           connection: connection.current,
           signers: [],
-          sendingMessage: `Extending`,
-          successMessage: `Extension successful`,
+          sendingMessage: `Transfering`,
+          successMessage: `Transfer successful`,
         })
       }
     }
@@ -73,6 +85,6 @@ export const useExtendPosition = ({
   return {
     error,
     loading,
-    extendPosition: execute,
+    transferPosition: execute,
   }
 }

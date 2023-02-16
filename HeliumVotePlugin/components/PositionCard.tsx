@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState, useEffect } from 'react'
 import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
@@ -6,8 +6,6 @@ import { fmtMintAmount } from '@tools/sdk/units'
 import { PositionWithMeta } from '../sdk/types'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { abbreviateAddress } from '@utils/formatting'
-import { useNft } from '@hooks/useNft'
-import { calcPositionVotingPower } from 'HeliumVotePlugin/utils/calcPositionVotingPower'
 import {
   daysToSecs,
   getMinDurationFmt,
@@ -17,14 +15,17 @@ import {
 import { useUnixNow } from '@hooks/useUnixNow'
 import { BN } from '@project-serum/anchor'
 import Button from '@components/Button'
-import { useUnlockPosition } from 'HeliumVotePlugin/hooks/useUnlockPosition'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import {
   LockTokensModal,
   LockTokensModalFormValues,
 } from 'HeliumVotePlugin/components/LockTokensModal'
+import { TransferTokensModal } from './TransferTokensModal'
 import { calcLockupMultiplier } from 'HeliumVotePlugin/utils/calcLockupMultiplier'
+import { useUnlockPosition } from 'HeliumVotePlugin/hooks/useUnlockPosition'
 import { useExtendPosition } from 'HeliumVotePlugin/hooks/useExtendPosition'
+import { useTransferPosition } from 'HeliumVotePlugin/hooks/useTransferPosition'
+import { notify } from '@utils/notifications'
 
 export interface PositionCardProps {
   position: PositionWithMeta
@@ -32,10 +33,19 @@ export interface PositionCardProps {
 
 export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
   const { unixNow = 0 } = useUnixNow()
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
   const [isExtendModalOpen, setIsExtendModalOpen] = useState(false)
+  const [transferablePositions, setTransferablePositions] = useState<
+    PositionWithMeta[]
+  >([])
+
   // const [isDelegateModalOpen, setIsDelegateModalOpen] = useState(false)
-  // const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
   const { realm, realmInfo, tokenRecords, ownTokenRecord } = useRealm()
+  const [isLoading, positions, getPositions] = useHeliumVsrStore((s) => [
+    s.state.isLoading,
+    s.state.positions,
+    s.getPositions,
+  ])
   const [
     currentClient,
     vsrClient,
@@ -64,26 +74,53 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
     registrarPk: vsrRegistrarPk || undefined,
   })
 
-  const [isLoading, getPositions] = useHeliumVsrStore((s) => [
-    s.state.isLoading,
-    s.getPositions,
-  ])
+  const {
+    loading: isTransfering,
+    error: transferingError,
+    transferPosition,
+  } = useTransferPosition({
+    registrarPk: vsrRegistrarPk || undefined,
+  })
 
-  const { _error, loading, _nft } = useNft(position.mint)
   const [
     connection,
     wallet,
     { fetchRealm, fetchWalletTokenAccounts },
   ] = useWalletStore((s) => [s.connection.current, s.current, s.actions])
 
+  useEffect(() => {
+    if (position && unixNow && positions.length > 0) {
+      const lockup = position.lockup
+      const lockupKind = Object.keys(lockup.kind)[0]
+      const positionLockupPeriodInDays = secsToDays(
+        lockupKind === 'constant'
+          ? lockup.endTs.sub(lockup.startTs).toNumber()
+          : lockup.endTs.sub(new BN(unixNow || 0)).toNumber()
+      )
+
+      setTransferablePositions(
+        positions.filter((pos) => {
+          const lockup = pos.lockup
+          const lockupKind = Object.keys(lockup.kind)[0]
+          const lockupPeriodInDays = secsToDays(
+            lockupKind === 'constant'
+              ? lockup.endTs.sub(lockup.startTs).toNumber()
+              : lockup.endTs.sub(new BN(unixNow)).toNumber()
+          )
+
+          return (
+            !position.pubkey.equals(pos.pubkey) &&
+            lockupPeriodInDays >= positionLockupPeriodInDays
+          )
+        })
+      )
+    }
+  }, [position, unixNow, positions, setTransferablePositions])
+
   const lockup = position.lockup
   const lockupKind = Object.keys(lockup.kind)[0] as string
   const lockupExpired =
     lockupKind !== 'constant' && lockup.endTs.sub(new BN(unixNow)).lt(new BN(0))
-  const votingPower = calcPositionVotingPower({
-    position,
-    registrar: vsrRegistrar as any,
-  })
   const lockedTokens = fmtMintAmount(
     position.votingMint.mint.account,
     position.amountDepositedNative
@@ -121,10 +158,16 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
   }
 
   const handleUnlock = async () => {
-    await unlockPosition({ position })
-
-    if (!unlockingError) {
-      await refetchState()
+    try {
+      await unlockPosition({ position })
+      if (!unlockingError) {
+        await refetchState()
+      }
+    } catch (e) {
+      notify({
+        type: 'error',
+        message: e.message || 'Unable to unlock tokens',
+      })
     }
   }
 
@@ -135,6 +178,17 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
     })
 
     if (!extendingError) {
+      await refetchState()
+    }
+  }
+
+  const handleTransferTokens = async (targetPosition: PositionWithMeta) => {
+    await transferPosition({
+      sourcePosition: position,
+      targetPosition,
+    })
+
+    if (!transferingError) {
       await refetchState()
     }
   }
@@ -150,7 +204,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
 
   return (
     <div className="border border-fgd-4 rounded-lg flex flex-col">
-      {loading ? (
+      {isLoading ? (
         <>
           <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-md" />
           <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-md" />
@@ -175,7 +229,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
             className="p-4 rounded-lg flex flex-col h-full"
             style={{ minHeight: '220px' }}
           >
-            <div className="flex flex-row flex-wrap">
+            <div className="flex flex-row flex-wrap mb-4">
               <CardLabel
                 label="Lockup Type"
                 value={lockupKind.charAt(0).toUpperCase() + lockupKind.slice(1)}
@@ -183,9 +237,9 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
               {isRealmCommunityMint && (
                 <CardLabel
                   label="Vote Multiplier"
-                  value={(votingPower.isZero()
+                  value={(position.votingPower.isZero()
                     ? 0
-                    : votingPower.toNumber() /
+                    : position.votingPower.toNumber() /
                       position.amountDepositedNative.toNumber()
                   ).toFixed(2)}
                 />
@@ -203,31 +257,38 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
               <Button
                 style={{ marginTop: 'auto' }}
                 className="w-full"
-                onClick={console.log}
+                onClick={() => console.log('CLOSE')}
               >
-                Close Deposit
+                Close
               </Button>
             ) : (
-              <>
-                {isConstant ? (
+              <div
+                className="flex flex-col gap-2"
+                style={{ marginTop: 'auto' }}
+              >
+                <Button
+                  onClick={() => setIsExtendModalOpen(true)}
+                  isLoading={isExtending}
+                  disabled={isExtending}
+                >
+                  Extend
+                </Button>
+                <Button
+                  disabled={transferablePositions.length == 0}
+                  onClick={() => setIsTransferModalOpen(true)}
+                >
+                  Transfer
+                </Button>
+                {isConstant && (
                   <Button
-                    style={{ marginTop: 'auto' }}
-                    className="w-full"
                     onClick={handleUnlock}
                     isLoading={isUnlocking}
                     disabled={isUnlocking}
                   >
                     Start Unlock
                   </Button>
-                ) : (
-                  <Button
-                    style={{ marginTop: 'auto' }}
-                    onClick={() => setIsExtendModalOpen(true)}
-                  >
-                    Extend
-                  </Button>
                 )}
-              </>
+              </div>
             )}
           </div>
         </>
@@ -243,6 +304,14 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
           calcMultiplierFn={handleCalcLockupMultiplier}
           onClose={() => setIsExtendModalOpen(false)}
           onSubmit={handleExtendTokens}
+        />
+      )}
+      {isTransferModalOpen && (
+        <TransferTokensModal
+          isOpen={isTransferModalOpen}
+          positions={transferablePositions}
+          onClose={() => setIsTransferModalOpen(false)}
+          onSubmit={handleTransferTokens}
         />
       )}
     </div>

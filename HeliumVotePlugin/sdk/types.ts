@@ -1,5 +1,5 @@
 import { PublicKey } from '@solana/web3.js'
-import { IdlAccounts, IdlTypes } from '@project-serum/anchor'
+import { BN, IdlAccounts, IdlTypes } from '@project-serum/anchor'
 import { VoterStakeRegistry as HeliumVoterStakeRegistry } from '@helium/idls/lib/types/voter_stake_registry'
 import { TokenProgramAccount } from '@utils/tokens'
 import { MintInfo } from '@solana/spl-token'
@@ -19,6 +19,7 @@ export interface Position extends Omit<PositionV0, 'lockup'> {
 }
 export interface PositionWithMeta extends Position {
   pubkey: PublicKey
+  votingPower: BN
   votingMint: VotingMintConfig & {
     mint: TokenProgramAccount<MintInfo>
   }

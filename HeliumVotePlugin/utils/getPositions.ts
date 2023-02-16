@@ -70,6 +70,10 @@ export const getPositions = async (
           ({
             ...pos,
             pubkey: posKeys[idx],
+            votingPower: calcPositionVotingPower({
+              position: pos,
+              registrar,
+            }),
             votingMint: {
               ...mintCfgs[pos.votingMintConfigIdx],
               mint: mints[mintCfgs[pos.votingMintConfigIdx].mint.toBase58()],

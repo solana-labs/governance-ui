@@ -345,6 +345,7 @@ export const LockTokensModal: React.FC<{
               <Button
                 className="mb-4"
                 type="submit"
+                isLoading={isSubmitting}
                 disabled={
                   mode == 'lock'
                     ? !amount ||
