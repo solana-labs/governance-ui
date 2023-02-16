@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
@@ -9,40 +9,72 @@ import { abbreviateAddress } from '@utils/formatting'
 import { useNft } from '@hooks/useNft'
 import { calcPositionVotingPower } from 'HeliumVotePlugin/utils/calcPositionVotingPower'
 import {
+  daysToSecs,
   getMinDurationFmt,
   getTimeLeftFromNowFmt,
+  secsToDays,
 } from 'VoteStakeRegistry/tools/dateTools'
 import { useUnixNow } from '@hooks/useUnixNow'
 import { BN } from '@project-serum/anchor'
 import Button from '@components/Button'
+import { useUnlockPosition } from 'HeliumVotePlugin/hooks/useUnlockPosition'
+import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
+import {
+  LockTokensModal,
+  LockTokensModalFormValues,
+} from 'HeliumVotePlugin/components/LockTokensModal'
+import { calcLockupMultiplier } from 'HeliumVotePlugin/utils/calcLockupMultiplier'
+import { useExtendPosition } from 'HeliumVotePlugin/hooks/useExtendPosition'
 
 export interface PositionCardProps {
   position: PositionWithMeta
 }
 
 export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
-  const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false)
-  const [isExtendModalOpen, setIsExtendModalOpen] = useState(false)
-  const [isDelegateModalOpen, setIsDelegateModalOpen] = useState(false)
-  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
-  const [positionMetadata, setPositionMetadata] = useState()
   const { unixNow = 0 } = useUnixNow()
+  const [isExtendModalOpen, setIsExtendModalOpen] = useState(false)
+  // const [isDelegateModalOpen, setIsDelegateModalOpen] = useState(false)
+  // const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
   const { realm, realmInfo, tokenRecords, ownTokenRecord } = useRealm()
-  const [vsrClient, vsrRegistrar] = useVotePluginsClientStore((s) => [
+  const [
+    currentClient,
+    vsrClient,
+    vsrRegistrar,
+    vsrRegistrarPk,
+  ] = useVotePluginsClientStore((s) => [
+    s.state.currentRealmVotingClient,
     s.state.heliumVsrClient,
     s.state.heliumVsrRegistrar,
+    s.state.voteStakeRegistryRegistrarPk,
   ])
-  const { error, loading, nft } = useNft(position.mint)
-  const [connection, wallet, endpoint] = useWalletStore((s) => [
-    s.connection.current,
-    s.current,
-    s.connection.endpoint,
-  ])
+
   const {
-    fetchRealm,
-    fetchWalletTokenAccounts,
-    fetchOwnVoteRecords,
-  } = useWalletStore((s) => s.actions)
+    loading: isExtending,
+    error: extendingError,
+    extendPosition,
+  } = useExtendPosition({
+    registrarPk: vsrRegistrarPk || undefined,
+  })
+
+  const {
+    loading: isUnlocking,
+    error: unlockingError,
+    unlockPosition,
+  } = useUnlockPosition({
+    registrarPk: vsrRegistrarPk || undefined,
+  })
+
+  const [isLoading, getPositions] = useHeliumVsrStore((s) => [
+    s.state.isLoading,
+    s.getPositions,
+  ])
+
+  const { _error, loading, _nft } = useNft(position.mint)
+  const [
+    connection,
+    wallet,
+    { fetchRealm, fetchWalletTokenAccounts },
+  ] = useWalletStore((s) => [s.connection.current, s.current, s.actions])
 
   const lockup = position.lockup
   const lockupKind = Object.keys(lockup.kind)[0] as string
@@ -64,6 +96,48 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
   const tokenInfo = tokenPriceService.getTokenInfo(
     position.votingMint.mint.publicKey.toBase58()
   )
+
+  const handleCalcLockupMultiplier = useCallback(
+    (lockupPeriodInDays: number) =>
+      calcLockupMultiplier({
+        lockupSecs: daysToSecs(lockupPeriodInDays),
+        registrar: vsrRegistrar,
+        realm,
+      }),
+    [realm, vsrRegistrar]
+  )
+
+  const refetchState = async () => {
+    fetchWalletTokenAccounts()
+    fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+    await getPositions({
+      votingClient: currentClient,
+      realmPk: realm!.pubkey,
+      communityMintPk: realm!.account.communityMint,
+      walletPk: wallet!.publicKey!,
+      client: vsrClient!,
+      connection,
+    })
+  }
+
+  const handleUnlock = async () => {
+    await unlockPosition({ position })
+
+    if (!unlockingError) {
+      await refetchState()
+    }
+  }
+
+  const handleExtendTokens = async (values: LockTokensModalFormValues) => {
+    await extendPosition({
+      position,
+      lockupPeriodsInDays: values.lockupPeriodInDays,
+    })
+
+    if (!extendingError) {
+      await refetchState()
+    }
+  }
 
   const CardLabel = ({ label, value }) => {
     return (
@@ -139,19 +213,37 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
                   <Button
                     style={{ marginTop: 'auto' }}
                     className="w-full"
-                    onClick={console.log}
+                    onClick={handleUnlock}
+                    isLoading={isUnlocking}
+                    disabled={isUnlocking}
                   >
                     Start Unlock
                   </Button>
                 ) : (
-                  <Button style={{ marginTop: 'auto' }} onClick={console.log}>
-                    Call To Action
+                  <Button
+                    style={{ marginTop: 'auto' }}
+                    onClick={() => setIsExtendModalOpen(true)}
+                  >
+                    Extend
                   </Button>
                 )}
               </>
             )}
           </div>
         </>
+      )}
+      {isExtendModalOpen && (
+        <LockTokensModal
+          mode="extend"
+          isOpen={isExtendModalOpen}
+          minLockupTimeInDays={Math.ceil(
+            secsToDays(position.lockup.endTs.sub(new BN(unixNow)).toNumber())
+          )}
+          maxLockupAmount={position.amountDepositedNative.toNumber()}
+          calcMultiplierFn={handleCalcLockupMultiplier}
+          onClose={() => setIsExtendModalOpen(false)}
+          onSubmit={handleExtendTokens}
+        />
       )}
     </div>
   )

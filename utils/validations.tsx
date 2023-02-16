@@ -911,7 +911,9 @@ export const getRealmCfgSchema = ({
               if (val) {
                 try {
                   getValidatedPublickKey(val)
-                  if ([...nftPluginsPks].includes(val)) {
+                  if (
+                    [...nftPluginsPks, ...heliumVsrPluginsPks].includes(val)
+                  ) {
                     return true
                   } else {
                     return this.createError({
@@ -1048,7 +1050,9 @@ export const getRealmCfgSchema = ({
               if (val) {
                 try {
                   getValidatedPublickKey(val)
-                  if ([...nftPluginsPks].includes(val)) {
+                  if (
+                    [...nftPluginsPks, ...heliumVsrPluginsPks].includes(val)
+                  ) {
                     return true
                   } else {
                     return this.createError({

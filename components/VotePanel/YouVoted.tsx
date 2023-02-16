@@ -178,7 +178,7 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
               onClick={() => submitRelinquishVote()}
               disabled={!isWithdrawEnabled || isLoading}
             >
-              Withdraw
+              Relinquish Vote
             </SecondaryButton>
           </div>
         </div>

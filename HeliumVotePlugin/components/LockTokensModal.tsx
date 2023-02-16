@@ -7,12 +7,15 @@ import ButtonGroup from '@components/ButtonGroup'
 import Input from '@components/inputs/Input'
 import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import { precision } from '@utils/formatting'
-import { yearsToDays } from 'VoteStakeRegistry/tools/dateTools'
+import {
+  getFormattedStringFromDays,
+  yearsToDays,
+} from 'VoteStakeRegistry/tools/dateTools'
 import Tooltip from '@components/Tooltip'
 import { QuestionMarkCircleIcon } from '@heroicons/react/solid'
 import { notify } from '@utils/notifications'
 
-const defaultLockupPeriods = [
+export const defaultLockupPeriods = [
   {
     value: yearsToDays(1),
     display: '1y',
@@ -64,6 +67,8 @@ export interface LockTokensModalFormValues {
 
 export const LockTokensModal: React.FC<{
   isOpen: boolean
+  mode?: 'lock' | 'extend'
+  minLockupTimeInDays?: number
   maxLockupTimeInDays?: number
   maxLockupAmount: number
   calcMultiplierFn: (lockupPeriodInDays: number) => number
@@ -71,6 +76,8 @@ export const LockTokensModal: React.FC<{
   onSubmit: (values: LockTokensModalFormValues) => Promise<void>
 }> = ({
   isOpen = false,
+  mode = 'lock',
+  minLockupTimeInDays = 0,
   maxLockupTimeInDays = Infinity,
   maxLockupAmount,
   calcMultiplierFn,
@@ -83,6 +90,7 @@ export const LockTokensModal: React.FC<{
   const [showLockupKindInfo, setShowLockupKindInfo] = useState<boolean>(false)
   const mintMinAmount = mint ? getMintMinAmountAsDecimal(mint) : 1
   const currentPrecision = precision(mintMinAmount)
+  const hasMinLockup = minLockupTimeInDays && minLockupTimeInDays > 0
   const hasMaxLockup = maxLockupTimeInDays && maxLockupTimeInDays !== Infinity
   const lockupMoreThenDepositedOptions = [
     { value: false, display: 'No' },
@@ -93,9 +101,19 @@ export const LockTokensModal: React.FC<{
     { value: LockupKind.constant, display: 'Constant' },
   ]
 
-  const lockupPeriodOptions = defaultLockupPeriods.filter(
-    (lp) => lp.value <= maxLockupTimeInDays
-  )
+  const lockupPeriodOptions = [
+    ...(hasMinLockup
+      ? [
+          {
+            value: minLockupTimeInDays,
+            display: 'min',
+          },
+        ]
+      : []),
+    ...defaultLockupPeriods.filter(
+      (lp) => lp.value > minLockupTimeInDays && lp.value <= maxLockupTimeInDays
+    ),
+  ]
 
   const { setValue, watch, handleSubmit } = useForm<LockTokensModalFormValues>({
     defaultValues: {
@@ -158,50 +176,71 @@ export const LockTokensModal: React.FC<{
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
       <form onSubmit={handleOnSubmit}>
-        <h2 className="mb-4 flex flex-row items-center">Lock Tokens</h2>
+        <h2 className="mb-4 flex flex-row items-center">
+          {
+            {
+              lock: 'Lock Tokens',
+              extend: 'Extend Lockup',
+            }[mode]
+          }
+        </h2>
+        {hasMinLockup && !showLockupKindInfo ? (
+          <div className="bg-bkg-3 rounded-md w-full p-4 mb-4 font-normal text-xs">
+            <div>
+              There is a minimum required lockup time of{' '}
+              <span className="bont-bold text-sm text-primary-light">
+                {getFormattedStringFromDays(minLockupTimeInDays)}
+              </span>
+            </div>
+          </div>
+        ) : null}
         {!showLockupKindInfo && (
           <>
-            <div className="flex items-center justify-between">
-              <div className={labelClasses}>Lockup Type</div>
-              <LinkButton
-                className="mb-2"
-                onClick={() => setShowLockupKindInfo(true)}
-              >
-                About Lockup Types
-              </LinkButton>
-            </div>
-            <div className="mb-4">
-              <ButtonGroup
-                activeValue={lockupKind!.display}
-                className="h-10"
-                values={lockupKindOptions.map((lt) => lt.display)}
-                onChange={(kind) =>
-                  setValue(
-                    'lockupKind',
-                    lockupKindOptions.find((lt) => lt.display === kind)!
-                  )
-                }
-              />
-            </div>
-            <div className="mb-4">
-              <div className={`${labelClasses} flex justify-between`}>
-                Amount to Lock
-                <LinkButton
-                  className="text-primary-light"
-                  onClick={() => setValue('amount', maxLockupAmount)}
-                >
-                  Max: {maxLockupAmount}
-                </LinkButton>
-              </div>
-              <Input
-                max={maxLockupAmount}
-                min={mintMinAmount}
-                value={amount}
-                type="number"
-                onChange={(e) => setValue('amount', +e.target.value)}
-                step={mintMinAmount}
-              />
-            </div>
+            {mode === 'lock' && (
+              <>
+                <div className="flex items-center justify-between">
+                  <div className={labelClasses}>Lockup Type</div>
+                  <LinkButton
+                    className="mb-2"
+                    onClick={() => setShowLockupKindInfo(true)}
+                  >
+                    About Lockup Types
+                  </LinkButton>
+                </div>
+                <div className="mb-4">
+                  <ButtonGroup
+                    activeValue={lockupKind!.display}
+                    className="h-10"
+                    values={lockupKindOptions.map((lt) => lt.display)}
+                    onChange={(kind) =>
+                      setValue(
+                        'lockupKind',
+                        lockupKindOptions.find((lt) => lt.display === kind)!
+                      )
+                    }
+                  />
+                </div>
+                <div className="mb-4">
+                  <div className={`${labelClasses} flex justify-between`}>
+                    Amount to Lock
+                    <LinkButton
+                      className="text-primary-light"
+                      onClick={() => setValue('amount', maxLockupAmount)}
+                    >
+                      Max: {maxLockupAmount}
+                    </LinkButton>
+                  </div>
+                  <Input
+                    max={maxLockupAmount}
+                    min={mintMinAmount}
+                    value={amount}
+                    type="number"
+                    onChange={(e) => setValue('amount', +e.target.value)}
+                    step={mintMinAmount}
+                  />
+                </div>
+              </>
+            )}
             <div className="mb-4">
               <div className="flex items-center justify-between">
                 <div className={labelClasses}>Duration</div>
@@ -233,7 +272,7 @@ export const LockTokensModal: React.FC<{
                 <Input
                   className="mb-4"
                   type="number"
-                  min={1}
+                  min={hasMinLockup ? minLockupTimeInDays : 1}
                   max={hasMaxLockup ? maxLockupTimeInDays : Infinity}
                   value={lockupPeriodInDays}
                   step={1}
@@ -243,7 +282,11 @@ export const LockTokensModal: React.FC<{
                   onBlur={({ target: { value } }) => {
                     setValue(
                       'lockupPeriodInDays',
-                      value > maxLockupTimeInDays ? maxLockupTimeInDays : value
+                      value > minLockupTimeInDays
+                        ? value > maxLockupTimeInDays
+                          ? maxLockupTimeInDays
+                          : value
+                        : minLockupTimeInDays
                     )
                   }}
                 />
@@ -303,14 +346,23 @@ export const LockTokensModal: React.FC<{
                 className="mb-4"
                 type="submit"
                 disabled={
-                  !amount ||
-                  !maxLockupAmount ||
-                  !lockupPeriodInDays ||
-                  lockupPeriodInDays === 0 ||
-                  isSubmitting
+                  mode == 'lock'
+                    ? !amount ||
+                      !maxLockupAmount ||
+                      !lockupPeriodInDays ||
+                      lockupPeriodInDays === 0 ||
+                      isSubmitting
+                    : !lockupPeriodInDays ||
+                      lockupPeriodInDays === 0 ||
+                      isSubmitting
                 }
               >
-                Lock Tokens
+                {
+                  {
+                    lock: 'Lock Tokens',
+                    extend: 'Extend Lockup',
+                  }[mode]
+                }
               </Button>
               <SecondaryButton onClick={onClose}>Cancel</SecondaryButton>
             </div>

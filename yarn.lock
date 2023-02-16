@@ -1554,10 +1554,10 @@
     js-sha256 "^0.9.0"
     multiformats "^9.6.4"
 
-"@helium/idls@0.0.32", "@helium/idls@^0.0.32":
-  version "0.0.32"
-  resolved "https://registry.yarnpkg.com/@helium/idls/-/idls-0.0.32.tgz#5b5ce1b8fabfbe6494d1fa0b1eb202dd19f4e2c6"
-  integrity sha512-74s0qqHdwk/X5iWPcGxytOIsrjeLo4xB87koy99/2Tilht085pu0RdEnM9TwTg3Nx7zaRTcr82yt1cjOySoCFg==
+"@helium/idls@0.0.33", "@helium/idls@^0.0.33":
+  version "0.0.33"
+  resolved "https://registry.yarnpkg.com/@helium/idls/-/idls-0.0.33.tgz#8c691e65b09fa55a635c8946bd4d7ae246249660"
+  integrity sha512-ho7wToqUujCooIBMCy+8KSW/voFd750jLvmZTyr93CROIjRvDrGrhBiDcL4ojHLV4K2Ubrh+wYbpDWWJe88B/w==
   dependencies:
     "@coral-xyz/anchor" "0.26.0"
     "@solana/web3.js" "^1.43.4"
@@ -1565,10 +1565,10 @@
     borsh "^0.7.0"
     bs58 "^4.0.1"
 
-"@helium/spl-utils@^0.0.32":
-  version "0.0.32"
-  resolved "https://registry.yarnpkg.com/@helium/spl-utils/-/spl-utils-0.0.32.tgz#f665611767b398eb2d6024d9b9e5ddbee40e9191"
-  integrity sha512-VWp3Ve02X2fOd49Nojfw4yDDFH/Iqi/iZ9AbeTJMpfWSQsixFULVeBGADQQFa4xiIYynI3x+zX5Uo1wzgZuxlw==
+"@helium/spl-utils@^0.0.33":
+  version "0.0.33"
+  resolved "https://registry.yarnpkg.com/@helium/spl-utils/-/spl-utils-0.0.33.tgz#cd52c244b5c56bfcd3f65efe797bfd5fa0d15579"
+  integrity sha512-jPUML/pyM17zHlsyaWON201EfqvaDp1MTKUvLWAqOvNDb5Q4vk9/+1SE+hIYbqG8c7uzRPN9/EAt6JBcNiGI5A==
   dependencies:
     "@coral-xyz/anchor" "0.26.0"
     "@helium/address" "^4.8.1"
@@ -1578,14 +1578,14 @@
     borsh "^0.7.0"
     bs58 "^5.0.0"
 
-"@helium/voter-stake-registry-sdk@0.0.32":
-  version "0.0.32"
-  resolved "https://registry.yarnpkg.com/@helium/voter-stake-registry-sdk/-/voter-stake-registry-sdk-0.0.32.tgz#e40d39188bc5fbf8c76173172624f30bf68dd806"
-  integrity sha512-7NyIx1dsYzxAv3/nN4XqVY7LPGDZNtPn6HuPYXu5WUjARrc/MEIK1gpvPyKPDU90MJ580hZwF2WDyVx4r9hPXw==
+"@helium/voter-stake-registry-sdk@0.0.33":
+  version "0.0.33"
+  resolved "https://registry.yarnpkg.com/@helium/voter-stake-registry-sdk/-/voter-stake-registry-sdk-0.0.33.tgz#e3c53c1813bae5e8ba36fc1d432e9a17640d0b20"
+  integrity sha512-7cGRGduPdD51ek47IBqlnNb7+jxKPe89O+I2BpEhVhOO9cnW0dkOfxaZqeaiaPHOLbmKTCoFtJ/vhtbbWZki8Q==
   dependencies:
     "@coral-xyz/anchor" "0.26.0"
-    "@helium/idls" "^0.0.32"
-    "@helium/spl-utils" "^0.0.32"
+    "@helium/idls" "^0.0.33"
+    "@helium/spl-utils" "^0.0.33"
     "@metaplex-foundation/mpl-token-metadata" "^2.2.3"
     "@solana/spl-token" "^0.3.6"
     bn.js "^5.2.0"
