@@ -82,18 +82,52 @@ const ParamsView = ({ activeGovernance, openGovernanceProposalModal }) => {
               />
             </>
           )}
-          <AddressField
-            label="Vote Threshold Percentage"
-            padding
-            val={`${activeGovernance.account.config.communityVoteThreshold.value}%`}
-          />
-          <AddressField
-            label="Vote Tipping"
-            padding
-            val={
-              VoteTipping[activeGovernance.account.config.voteTipping as any]
-            }
-          />
+          {activeGovernance.account.config?.communityVoteThreshold?.value && (
+            <AddressField
+              label="Community Vote Threshold Percentage"
+              padding
+              val={`${activeGovernance.account.config.communityVoteThreshold.value}%`}
+            />
+          )}
+          {activeGovernance.account.config?.councilVoteThreshold?.value && (
+            <AddressField
+              label="Council Vote Threshold Percentage"
+              padding
+              val={`${activeGovernance.account.config.councilVoteThreshold.value}%`}
+            />
+          )}
+          {console.log(activeGovernance.account.config.communityVoteTipping)}
+          {programVersion >= 3 ? (
+            <>
+              <AddressField
+                label="Community Vote Tipping"
+                padding
+                val={
+                  VoteTipping[
+                    activeGovernance.account.config.communityVoteTipping as any
+                  ]
+                }
+              />
+              <AddressField
+                label="Council Vote Tipping"
+                padding
+                val={
+                  VoteTipping[
+                    activeGovernance.account.config.councilVoteTipping as any
+                  ]
+                }
+              />
+            </>
+          ) : (
+            <AddressField
+              label="Vote Tipping"
+              padding
+              val={
+                VoteTipping[activeGovernance.account.config.voteTipping as any]
+              }
+            />
+          )}
+
           <div className="flex">
             <Button
               disabled={
