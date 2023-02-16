@@ -38,7 +38,6 @@ const useSignersNeeded = (
 
   useEffect(() => {
     const x = async () => {
-      console.log('i ran the check')
 
       if (realm?.owner === undefined) return undefined
 

@@ -83,14 +83,8 @@ const MakeChangeQuoteParams = ({
 
       const client = new MangoClient(connection, groupConfig.mangoProgramId)
       const mangoGroup = await client.getMangoGroup(groupConfig.publicKey)
-      console.log(mangoGroup)
       const rootBanks = await mangoGroup.loadRootBanks(connection)
       const rootBank = rootBanks[QUOTE_INDEX]
-      console.log(
-        rootBank?.optimalRate.toNumber(),
-        rootBank?.optimalUtil.toNumber(),
-        rootBank?.maxRate.toNumber()
-      )
       const instruction = makeChangeSpotMarketParamsInstruction(
         groupConfig.mangoProgramId,
         mangoGroup.publicKey,

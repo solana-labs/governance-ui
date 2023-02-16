@@ -90,8 +90,7 @@ const SwitchboardAdmitOracle = ({
       new PublicKey(qPk),
       new PublicKey(oPk)
     )[0]
-    console.log('P:')
-    console.log(p)
+    console.log('P:', p)
 
     const grantTx = await grantPermissionTx(
       addinProgram,

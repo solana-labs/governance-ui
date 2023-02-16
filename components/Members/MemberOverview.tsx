@@ -63,7 +63,6 @@ const RevokeMembership: FC<{ member: PublicKey; mint: PublicKey }> = ({
   // note the lack of space is not a typo
   const proposalTitle = `Remove ${govpop}member ${abbrevAddress}`
 
-  console.log(governance, 'AAAAAA')
   const tooltipContent = useProposalCreationButtonTooltip(
     governance ? [governance] : []
   )

@@ -163,7 +163,6 @@ const fetchGsrmBalance = async (
       ? new PublicKey(ownerAddress)
       : ownerAddress
 
-  console.log(owner.toBase58(), gsrmMint.toBase58())
   const ata = await getAssociatedTokenAddress(gsrmMint, owner, true)
   const tokenBalance = await connection.getTokenAccountBalance(ata, 'confirmed')
   return tokenBalance.value
