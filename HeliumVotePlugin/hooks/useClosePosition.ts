@@ -1,4 +1,5 @@
 import useWallet from '@hooks/useWallet'
+import { BN } from '@project-serum/anchor'
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { useAsyncCallback } from 'react-async-hook'
 import { sendTransaction } from '@utils/send'
@@ -6,8 +7,10 @@ import { PositionWithMeta } from '../sdk/types'
 import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
+import { useUnixNow } from '@hooks/useUnixNow'
 
-export const useTransferPosition = () => {
+export const useClosePosition = () => {
+  const { unixNow } = useUnixNow()
   const { connection, wallet } = useWallet()
   const { realm, realmInfo } = useRealm()
   const [{ client }, registrarPk] = useVotePluginsClientStore((s) => [
@@ -15,13 +18,9 @@ export const useTransferPosition = () => {
     s.state.voteStakeRegistryRegistrarPk,
   ])
   const { error, loading, execute } = useAsyncCallback(
-    async ({
-      sourcePosition,
-      targetPosition,
-    }: {
-      sourcePosition: PositionWithMeta
-      targetPosition: PositionWithMeta
-    }) => {
+    async ({ position }: { position: PositionWithMeta }) => {
+      const lockup = position.lockup
+      const lockupKind = Object.keys(lockup.kind)[0]
       const isInvalid =
         !connection ||
         !connection.current ||
@@ -32,24 +31,27 @@ export const useTransferPosition = () => {
         !wallet ||
         !realmInfo ||
         !realmInfo.programVersion ||
-        sourcePosition.numActiveVotes > 0 ||
-        targetPosition.numActiveVotes > 0
+        position.numActiveVotes > 0 ||
+        // lockupExpired
+        !(
+          lockupKind !== 'constant' &&
+          lockup.endTs.sub(new BN(unixNow!)).lt(new BN(0))
+        )
 
       if (loading) return
 
       if (isInvalid) {
-        throw new Error('Unable to Transfer Position, Invalid params')
+        throw new Error('Unable to Close Position, Invalid params')
       } else {
         const instructions: TransactionInstruction[] = []
 
         instructions.push(
           await client.program.methods
-            .transferV0({
-              amount: sourcePosition.amountDepositedNative,
+            .withdrawV0({
+              amount: position.amountDepositedNative,
             })
             .accounts({
-              sourcePosition: sourcePosition.pubkey,
-              targetPosition: targetPosition.pubkey,
+              position: position.pubkey,
               depositMint: realm.account.communityMint,
             })
             .instruction()
@@ -59,7 +61,7 @@ export const useTransferPosition = () => {
           await client.program.methods
             .closePositionV0()
             .accounts({
-              position: sourcePosition.pubkey,
+              position: position.pubkey,
             })
             .instruction()
         )
@@ -71,8 +73,8 @@ export const useTransferPosition = () => {
           wallet,
           connection: connection.current,
           signers: [],
-          sendingMessage: `Transfering`,
-          successMessage: `Transfer successful`,
+          sendingMessage: `Closing`,
+          successMessage: `Closed successfuly`,
         })
       }
     }
@@ -81,6 +83,6 @@ export const useTransferPosition = () => {
   return {
     error,
     loading,
-    transferPosition: execute,
+    closePosition: execute,
   }
 }

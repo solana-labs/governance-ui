@@ -28,7 +28,7 @@ const Button: FunctionComponent<ButtonProps> = ({
   return (
     <button
       className={`${className} default-transition font-bold px-4 rounded-full ${
-        small ? 'py-1' : 'py-2.5'
+        small ? 'py-2' : 'py-2.5'
       } text-sm focus:outline-none ${
         disabled
           ? 'bg-fgd-4 cursor-not-allowed text-fgd-3'

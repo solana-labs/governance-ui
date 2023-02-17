@@ -1,5 +1,5 @@
 import useWallet from '@hooks/useWallet'
-import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
+import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { useAsyncCallback } from 'react-async-hook'
 import { sendTransaction } from '@utils/send'
 import { PositionWithMeta } from '../sdk/types'
@@ -7,18 +7,14 @@ import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { secsToDays } from 'VoteStakeRegistry/tools/dateTools'
-import { notify } from '@utils/notifications'
 
-export const useUnlockPosition = ({
-  registrarPk,
-}: {
-  registrarPk: PublicKey | undefined
-}) => {
-  const { client } = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  )
+export const useUnlockPosition = () => {
   const { connection, wallet } = useWallet()
   const { realm, realmInfo } = useRealm()
+  const [{ client }, registrarPk] = useVotePluginsClientStore((s) => [
+    s.state.currentRealmVotingClient,
+    s.state.voteStakeRegistryRegistrarPk,
+  ])
   const { error, loading, execute } = useAsyncCallback(
     async ({ position }: { position: PositionWithMeta }) => {
       const isInvalid =

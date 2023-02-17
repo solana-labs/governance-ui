@@ -18,16 +18,13 @@ import { LockupKind } from 'HeliumVotePlugin/components/LockTokensModal'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 
-export const useCreatePosition = ({
-  registrarPk,
-}: {
-  registrarPk: PublicKey | undefined
-}) => {
-  const { client } = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  )
+export const useCreatePosition = () => {
   const { connection, wallet } = useWallet()
   const { realm, realmInfo } = useRealm()
+  const [{ client }, registrarPk] = useVotePluginsClientStore((s) => [
+    s.state.currentRealmVotingClient,
+    s.state.voteStakeRegistryRegistrarPk,
+  ])
   const { error, loading, execute } = useAsyncCallback(
     async ({
       amount,
@@ -125,7 +122,6 @@ export const useCreatePosition = ({
 
         const tx = new Transaction()
         tx.add(...instructions)
-
         await sendTransaction({
           transaction: tx,
           wallet,

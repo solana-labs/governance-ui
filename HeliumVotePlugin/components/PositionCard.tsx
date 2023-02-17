@@ -26,6 +26,7 @@ import { useUnlockPosition } from 'HeliumVotePlugin/hooks/useUnlockPosition'
 import { useExtendPosition } from 'HeliumVotePlugin/hooks/useExtendPosition'
 import { useTransferPosition } from 'HeliumVotePlugin/hooks/useTransferPosition'
 import { notify } from '@utils/notifications'
+import { useClosePosition } from 'HeliumVotePlugin/hooks/useClosePosition'
 
 export interface PositionCardProps {
   position: PositionWithMeta
@@ -33,6 +34,7 @@ export interface PositionCardProps {
 
 export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
   const { unixNow = 0 } = useUnixNow()
+  const [isDelegated, setIsDelegated] = useState(false)
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
   const [isExtendModalOpen, setIsExtendModalOpen] = useState(false)
   const [transferablePositions, setTransferablePositions] = useState<
@@ -50,37 +52,35 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
     currentClient,
     vsrClient,
     vsrRegistrar,
-    vsrRegistrarPk,
   ] = useVotePluginsClientStore((s) => [
     s.state.currentRealmVotingClient,
     s.state.heliumVsrClient,
     s.state.heliumVsrRegistrar,
-    s.state.voteStakeRegistryRegistrarPk,
   ])
 
   const {
     loading: isExtending,
     error: extendingError,
     extendPosition,
-  } = useExtendPosition({
-    registrarPk: vsrRegistrarPk || undefined,
-  })
+  } = useExtendPosition()
 
   const {
     loading: isUnlocking,
     error: unlockingError,
     unlockPosition,
-  } = useUnlockPosition({
-    registrarPk: vsrRegistrarPk || undefined,
-  })
+  } = useUnlockPosition()
 
   const {
     loading: isTransfering,
     error: transferingError,
     transferPosition,
-  } = useTransferPosition({
-    registrarPk: vsrRegistrarPk || undefined,
-  })
+  } = useTransferPosition()
+
+  const {
+    loading: isClosing,
+    error: closingError,
+    closePosition,
+  } = useClosePosition()
 
   const [
     connection,
@@ -160,6 +160,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
   const handleUnlock = async () => {
     try {
       await unlockPosition({ position })
+
       if (!unlockingError) {
         await refetchState()
       }
@@ -193,6 +194,23 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
     }
   }
 
+  const handleClose = async () => {
+    try {
+      await closePosition({
+        position,
+      })
+
+      if (!closingError) {
+        await refetchState()
+      }
+    } catch (e) {
+      notify({
+        type: 'error',
+        message: e.message || 'Unable to close position',
+      })
+    }
+  }
+
   const CardLabel = ({ label, value }) => {
     return (
       <div className="flex flex-col w-1/2 py-2">
@@ -202,6 +220,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
     )
   }
 
+  const isSubmitting = isExtending || isClosing || isTransfering || isUnlocking
   return (
     <div className="border border-fgd-4 rounded-lg flex flex-col">
       {isLoading ? (
@@ -253,42 +272,73 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
                 }
               />
             </div>
-            {lockupExpired ? (
+            {isDelegated ? (
               <Button
-                style={{ marginTop: 'auto' }}
-                className="w-full"
-                onClick={() => console.log('CLOSE')}
+                className="w-full mt-auto"
+                onClick={() => console.log('Undelegate')}
+                disabled={isSubmitting}
+                isLoading={isSubmitting}
               >
-                Close
+                UnDelegate
               </Button>
             ) : (
-              <div
-                className="flex flex-col gap-2"
-                style={{ marginTop: 'auto' }}
-              >
-                <Button
-                  onClick={() => setIsExtendModalOpen(true)}
-                  isLoading={isExtending}
-                  disabled={isExtending}
-                >
-                  Extend
-                </Button>
-                <Button
-                  disabled={transferablePositions.length == 0}
-                  onClick={() => setIsTransferModalOpen(true)}
-                >
-                  Transfer
-                </Button>
-                {isConstant && (
+              <>
+                {lockupExpired ? (
                   <Button
-                    onClick={handleUnlock}
-                    isLoading={isUnlocking}
-                    disabled={isUnlocking}
+                    className="w-full mt-auto"
+                    isLoading={isSubmitting}
+                    disabled={isSubmitting}
+                    onClick={handleClose}
                   >
-                    Start Unlock
+                    Close
                   </Button>
+                ) : (
+                  <div className="flex flex-col gap-2 mt-auto">
+                    <div
+                      className="flex flex-row gap-2 justify-center"
+                      style={{ marginTop: 'auto' }}
+                    >
+                      <Button
+                        className="w-full"
+                        onClick={() => setIsExtendModalOpen(true)}
+                        isLoading={isSubmitting}
+                        disabled={isSubmitting}
+                      >
+                        Extend
+                      </Button>
+                      <Button
+                        className="w-full"
+                        onClick={() => setIsTransferModalOpen(true)}
+                        disabled={
+                          transferablePositions.length == 0 || isSubmitting
+                        }
+                        isLoading={isSubmitting}
+                      >
+                        Transfer
+                      </Button>
+                    </div>
+                    {isConstant && (
+                      <Button
+                        onClick={handleUnlock}
+                        disabled={isSubmitting}
+                        isLoading={isSubmitting}
+                      >
+                        Unlock
+                      </Button>
+                    )}
+                    {
+                      <Button
+                        className="w-full mt-auto"
+                        onClick={() => console.log('Undelegate')}
+                        disabled={isSubmitting}
+                        isLoading={isSubmitting}
+                      >
+                        Delegate
+                      </Button>
+                    }
+                  </div>
                 )}
-              </div>
+              </>
             )}
           </div>
         </>

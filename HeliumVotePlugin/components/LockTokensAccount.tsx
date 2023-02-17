@@ -57,16 +57,12 @@ export const LockTokensAccount: React.FC<{
     currentClient,
     vsrClient,
     vsrRegistrar,
-    vsrRegistrarPk,
   ] = useVotePluginsClientStore((s) => [
     s.state.currentRealmVotingClient,
     s.state.heliumVsrClient,
     s.state.heliumVsrRegistrar,
-    s.state.voteStakeRegistryRegistrarPk,
   ])
-  const { error, createPosition } = useCreatePosition({
-    registrarPk: vsrRegistrarPk || undefined,
-  })
+  const { error, createPosition } = useCreatePosition()
   const [isOwnerOfPositions, setIsOwnerOfPositions] = useState(true)
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
   const [
