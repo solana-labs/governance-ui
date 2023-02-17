@@ -117,7 +117,6 @@ const CastleDeposit = ({
           ? v.cluster == Clusters.mainnetBeta
           : v.cluster == Clusters.devnet
       )
-      console.log(vaults)
       setCastleVaults(vaults)
     }
     getCastleConfig()

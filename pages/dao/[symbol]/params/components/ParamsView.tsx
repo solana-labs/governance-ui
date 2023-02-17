@@ -96,7 +96,6 @@ const ParamsView = ({ activeGovernance, openGovernanceProposalModal }) => {
               val={`${activeGovernance.account.config.councilVoteThreshold.value}%`}
             />
           )}
-          {console.log(activeGovernance.account.config.communityVoteTipping)}
           {programVersion >= 3 ? (
             <>
               <AddressField

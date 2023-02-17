@@ -55,17 +55,6 @@ export const executeInstructions = async (
       }
     })
 
-    console.log(
-      'txes',
-      txes,
-      txes.map((x) =>
-        x.instructionsSet.map((x) =>
-          x.transactionInstruction.keys
-            .filter((x) => x.isSigner)
-            .map((x) => x.pubkey.toString())
-        )
-      )
-    )
     await sendTransactionsV3({
       connection,
       wallet,

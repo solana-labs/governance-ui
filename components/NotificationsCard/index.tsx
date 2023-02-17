@@ -220,7 +220,6 @@ const NotificationsCard = ({
             telegramId: localTelegram === '' ? null : localTelegram,
           })
           if (alertRes) {
-            console.log('alert res')
             results.push(alertRes)
           }
         }
