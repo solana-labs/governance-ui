@@ -16,6 +16,7 @@ import ConvertToStSol from '@components/TreasuryAccount/ConvertToStSol'
 import TradeOnSerum from '@components/TreasuryAccount/TradeOnSerum'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useWalletStore from 'stores/useWalletStore'
+import MangoModal from '@components/TreasuryAccount/MangoModal'
 
 interface Props {
   className?: string
@@ -202,7 +203,7 @@ export default function Investments(props: Props) {
               sizeClassName="sm:max-w-3xl"
               onClose={() => setAlternativeInvestment(null)}
             >
-              asdasd
+              <MangoModal></MangoModal>
             </Modal>
           )}
           {alternativeInvestment === 'Marinade' && (
