@@ -34,14 +34,13 @@ export interface PositionCardProps {
 
 export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
   const { unixNow = 0 } = useUnixNow()
-  const [isDelegated, setIsDelegated] = useState(false)
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
   const [isExtendModalOpen, setIsExtendModalOpen] = useState(false)
+  const [isDelegateModalOpen, setIsDelegateModalOpen] = useState(false)
   const [transferablePositions, setTransferablePositions] = useState<
     PositionWithMeta[]
   >([])
 
-  // const [isDelegateModalOpen, setIsDelegateModalOpen] = useState(false)
   const { realm, realmInfo, tokenRecords, ownTokenRecord } = useRealm()
   const [isLoading, positions, getPositions] = useHeliumVsrStore((s) => [
     s.state.isLoading,
@@ -272,7 +271,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
                 }
               />
             </div>
-            {isDelegated ? (
+            {position.isDelegated ? (
               <Button
                 className="w-full mt-auto"
                 onClick={() => console.log('Undelegate')}

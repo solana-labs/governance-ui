@@ -2,6 +2,7 @@ import { BN } from '@project-serum/anchor'
 import { keypairIdentity, Metaplex } from '@metaplex-foundation/js'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import { registrarKey, positionKey } from '@helium/voter-stake-registry-sdk'
+import { delegatedPositionKey } from '@helium/helium-sub-daos-sdk'
 import { tryGetMint } from '@utils/tokens'
 import { calcPositionVotingPower } from './calcPositionVotingPower'
 import { HeliumVsrClient } from '../sdk/client'
@@ -56,6 +57,15 @@ export const getPositions = async (
     )
   ).flat()
 
+  const delegatedPosKeys = posKeys.map(
+    (posKey) => delegatedPositionKey(posKey)[0]
+  )
+  const delegatedPositionAccountInfos = await Promise.all(
+    chunks(delegatedPosKeys, 99).map((chunk) =>
+      connection.getMultipleAccountsInfo(chunk)
+    )
+  )
+
   positions.push(
     ...positionAccountInfos
       .map(
@@ -65,21 +75,21 @@ export const getPositions = async (
             pos!.data
           ) as Position
       )
-      .map(
-        (pos, idx) =>
-          ({
-            ...pos,
-            pubkey: posKeys[idx],
-            votingPower: calcPositionVotingPower({
-              position: pos,
-              registrar,
-            }),
-            votingMint: {
-              ...mintCfgs[pos.votingMintConfigIdx],
-              mint: mints[mintCfgs[pos.votingMintConfigIdx].mint.toBase58()],
-            },
-          } as PositionWithMeta)
-      )
+      .map((pos, idx) => {
+        return {
+          ...pos,
+          pubkey: posKeys[idx],
+          isDelegated: !!delegatedPositionAccountInfos[idx],
+          votingPower: calcPositionVotingPower({
+            position: pos,
+            registrar,
+          }),
+          votingMint: {
+            ...mintCfgs[pos.votingMintConfigIdx],
+            mint: mints[mintCfgs[pos.votingMintConfigIdx].mint.toBase58()],
+          },
+        } as PositionWithMeta
+      })
       .filter((pos) => {
         const lockup = pos.lockup
         const lockupKind = Object.keys(lockup.kind)[0]
