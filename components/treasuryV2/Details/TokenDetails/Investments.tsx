@@ -37,7 +37,7 @@ export default function Investments(props: Props) {
   ] = useState<ActiveInvestment | null>(null)
 
   const [alternativeInvestment, setAlternativeInvestment] = useState<
-    'Marinade' | 'Lido' | 'Serum' | null
+    'Marinade' | 'Lido' | 'Serum' | 'Mango' | null
   >(null)
 
   const investments = useAccountInvestments({
@@ -141,6 +141,7 @@ export default function Investments(props: Props) {
                       switch (investment.protocolName) {
                         case 'Marinade':
                         case 'Lido':
+                        case 'Mango':
                         case 'Serum': {
                           setAlternativeInvestment(investment.protocolName)
                           setProposedInvestment(null)
@@ -194,6 +195,15 @@ export default function Investments(props: Props) {
               strategyName={proposedInvestment.strategyName}
               createProposalFcn={proposedInvestment.createProposalFcn}
             />
+          )}
+          {alternativeInvestment === 'Mango' && (
+            <Modal
+              isOpen
+              sizeClassName="sm:max-w-3xl"
+              onClose={() => setAlternativeInvestment(null)}
+            >
+              asdasd
+            </Modal>
           )}
           {alternativeInvestment === 'Marinade' && (
             <Modal
