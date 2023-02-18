@@ -1,4 +1,4 @@
-import { Program, Provider, web3 } from '@project-serum/anchor'
+import { Program, Provider, web3 } from '@coral-xyz/anchor'
 import { IDL, VoterStakeRegistry } from './voter_stake_registry'
 
 export const DEFAULT_VSR_ID = new web3.PublicKey(

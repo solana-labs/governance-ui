@@ -2,11 +2,14 @@ import useRealm from '@hooks/useRealm'
 import React, { useEffect, useMemo, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import {
+  getProposalDepositsByDepositPayer,
   ProgramAccount,
   Proposal,
+  ProposalDeposit,
   ProposalState,
   withCancelProposal,
   withFinalizeVote,
+  withRefundProposalDeposit,
   withRelinquishVote,
 } from '@solana/spl-governance'
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
@@ -43,11 +46,17 @@ const MyProposalsBn = () => {
   const ownNftVoteRecordsFilterd = ownNftVoteRecords
   const maxVoterWeight =
     useNftPluginStore((s) => s.state.maxVoteRecord)?.pubkey || undefined
-  const { realm, programId } = useWalletStore((s) => s.selectedRealm)
+  const { realm, programId, programVersion } = useWalletStore(
+    (s) => s.selectedRealm
+  )
   const { refetchProposals } = useWalletStore((s) => s.actions)
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
+  const [
+    proposalsWithDepositedTokens,
+    setProposalsWithDepositedTokens,
+  ] = useState<ProgramAccount<ProposalDeposit>[]>([])
   const {
     proposals,
     ownTokenRecord,
@@ -313,6 +322,46 @@ const MyProposalsBn = () => {
     )
     setOwnNftVoteRecords(nftVoteRecordsFiltered)
   }
+  const releaseSol = async () => {
+    const instructions: TransactionInstruction[] = []
+    for (const proposalDeposit of proposalsWithDepositedTokens) {
+      await withRefundProposalDeposit(
+        instructions,
+        programId!,
+        programVersion,
+        proposalDeposit.account.proposal,
+        proposalDeposit.account.depositPayer
+      )
+    }
+    await sendTransactionsV3({
+      connection,
+      wallet: wallet!,
+      transactionInstructions: instructions.map((x, idx) => ({
+        instructionsSet: txBatchesToInstructionSetWithSigners([x], [], idx),
+        sequenceType: SequenceType.Parallel,
+      })),
+    })
+    getSolDeposits()
+  }
+  const getSolDeposits = async () => {
+    const solDeposits = await getProposalDepositsByDepositPayer(
+      connection,
+      realm!.owner,
+      wallet!.publicKey!
+    )
+
+    setProposalsWithDepositedTokens(solDeposits)
+  }
+  useEffect(() => {
+    if (
+      wallet?.publicKey &&
+      modalIsOpen &&
+      realmInfo!.programVersion &&
+      realmInfo!.programVersion > 2
+    ) {
+      getSolDeposits()
+    }
+  }, [wallet?.publicKey?.toBase58(), modalIsOpen, realmInfo?.programVersion])
   useEffect(() => {
     if (wallet?.publicKey && isNftMode && client.client && modalIsOpen) {
       getNftsVoteRecord()
@@ -337,6 +386,16 @@ const MyProposalsBn = () => {
             <h3 className="mb-4 flex flex-col">
               Your proposals {isLoading && <Loading w="50px"></Loading>}
             </h3>
+            {proposalsWithDepositedTokens.length !== 0 && (
+              <div>
+                <div className="mb-4">
+                  You have some sol to be released from proposals deposits
+                </div>
+                <Button className="mb-4" onClick={releaseSol}>
+                  Release sol
+                </Button>
+              </div>
+            )}
             <ProposalList
               title="Drafts"
               fcn={cleanDrafts}

@@ -18,7 +18,7 @@ import {
   RpcContext,
   TokenOwnerRecord,
 } from '@solana/spl-governance'
-import { Program } from '@project-serum/anchor'
+import { Program } from '@coral-xyz/anchor'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { PublicKey } from '@solana/web3.js'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'

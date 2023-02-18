@@ -17,7 +17,7 @@ import {
   SystemProgram,
   TransactionInstruction,
 } from '@solana/web3.js'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { Marinade, MarinadeConfig } from '@marinade.finance/marinade-ts-sdk'
 import {
   getMintNaturalAmountFromDecimal,

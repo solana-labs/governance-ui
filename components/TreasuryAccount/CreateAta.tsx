@@ -91,7 +91,6 @@ const CreateAta = ({
     createCallback()
   }
 
-  console.log(isLoading, validatedTypedMint, foundByNameToken)
   return (
     <div>
       <h3 className="mb-4 flex items-center">Create token account</h3>

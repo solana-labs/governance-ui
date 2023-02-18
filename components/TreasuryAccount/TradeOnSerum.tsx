@@ -34,7 +34,7 @@ import useRealm from '@hooks/useRealm'
 import Button from '@components/Button'
 import Tooltip from '@components/Tooltip'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { BN, Program, web3 } from '@project-serum/anchor'
+import { BN, Program, web3 } from '@coral-xyz/anchor'
 import { getValidatedPublickKey } from '@utils/validations'
 import { validateInstruction } from '@utils/instructionTools'
 import {

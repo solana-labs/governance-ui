@@ -54,6 +54,7 @@ export const graphcache = async (
       DiscoverPage: (page) => String(page.version as number),
       DiscoverPageSpotlightItem: (item) => item.publicKey as string,
       DiscoverPageSpotlightItemStat: () => null,
+      GovernanceRules: (rules) => rules.governanceAddress as string,
       Realm: (realm) => realm.publicKey as string,
       RealmAboutSection: () => null,
       RealmDocumentation: () => null,
@@ -83,6 +84,7 @@ export const graphcache = async (
       RealmProposalUserVote: () => null,
       RealmProposalVoteBreakdown: () => null,
       RealmTreasury: (treasury) => treasury.belongsTo as string,
+      TokenBasedGovernanceRules: () => null,
       User: (user) => user.publicKey as string,
     },
     updates: {

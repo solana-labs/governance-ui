@@ -18,6 +18,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { Filters } from '@components/ProposalFilter'
 import { TokenOwnerRecordAsset } from '@models/treasury/Asset'
 import { arrayToRecord } from '@tools/core/script'
+import { InitialSorting } from '@components/ProposalSorting'
 
 const VotingFilter: Filters = {
   Cancelled: false,
@@ -128,7 +129,8 @@ export default function useRealmProposals(
 
         const votingProposals = filterProposals(
           Object.entries(proposals),
-          VotingFilter
+          VotingFilter,
+          InitialSorting
         )
 
         if (!active) return

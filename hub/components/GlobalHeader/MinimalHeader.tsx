@@ -24,6 +24,7 @@ export function MinimalHeader(props: Props) {
         'flex',
         'items-center',
         'justify-center',
+        'dark:bg-neutral-800',
       )}
       style={{
         paddingRight: 'var(--removed-body-scroll-bar-size)',
@@ -43,7 +44,10 @@ export function MinimalHeader(props: Props) {
           )}
         >
           <div className={cx('flex', 'items-center')}>
-            <Logo compressed={!showExpandedUserDropdown} />
+            <Logo
+              className="text-[#201F27] dark:text-neutral-50"
+              compressed={!showExpandedUserDropdown}
+            />
           </div>
           <div className="flex items-center">
             <User compressed={!showExpandedUserDropdown} />

@@ -108,6 +108,7 @@ const RemoveServiceFromDID = ({
 
   return (
     <>
+      {form && (
       <InstructionForm
         outerForm={form}
         setForm={setForm}
@@ -115,6 +116,7 @@ const RemoveServiceFromDID = ({
         setFormErrors={setFormErrors}
         formErrors={formErrors}
       ></InstructionForm>
+      )}
     </>
   )
 }

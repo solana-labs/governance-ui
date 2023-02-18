@@ -74,7 +74,6 @@ export const executeTransaction = async (
         })
       )
     )
-    console.log('sent preExecutionTransactions', preExecutionTransactions)
   }
 
   // Some proposals require additional adjacent transactions due to tx size limits

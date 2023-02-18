@@ -106,6 +106,7 @@ const CreateNftPluginMaxVoterWeightRecord = ({
   ]
   return (
     <>
+      {form && (
       <InstructionForm
         outerForm={form}
         setForm={setForm}
@@ -113,6 +114,7 @@ const CreateNftPluginMaxVoterWeightRecord = ({
         setFormErrors={setFormErrors}
         formErrors={formErrors}
       ></InstructionForm>
+      )}
     </>
   )
 }
