@@ -30,6 +30,7 @@ export enum PackageEnum {
   Serum,
   Solend,
   Streamflow,
+  Sunrise,
   Switchboard,
   VsrPlugin,
   Dual,
@@ -661,6 +662,12 @@ export enum Instructions {
   AddServiceToDID,
   RemoveServiceFromDID,
   RevokeGoverningTokens,
+
+  SunriseDeposit,
+  // uncomment when the forms are ready
+  // SunriseLiquidWithdraw,
+  // SunriseOrderWithdraw,
+  // SunriseClaimOrder,
 }
 
 export type createParams = [

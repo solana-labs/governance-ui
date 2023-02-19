@@ -78,7 +78,7 @@ export const governanceInstructionInput = (
 })
 
 export const instructionInputs: Record<string, InstructionInput> = {
-  did: {
+  amount: {
     label: 'DID',
     initialValue: 'did:sol:',
     inputType: 'text',

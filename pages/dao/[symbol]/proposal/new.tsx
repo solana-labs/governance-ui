@@ -146,6 +146,7 @@ import PsyFinanceBurnWriterTokenForQuote from './components/instructions/PsyFina
 import PsyFinanceClaimUnderlyingPostExpiration from './components/instructions/PsyFinance/ClaimUnderlyingPostExpiration'
 import PsyFinanceExerciseOption from './components/instructions/PsyFinance/ExerciseOption'
 import RevokeGoverningTokens from './components/instructions/SplGov/RevokeGoverningTokens'
+import SunriseDepositForm from './components/instructions/Sunrise/DepositForm'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -569,6 +570,7 @@ const New = () => {
       [Instructions.AddServiceToDID]: AddServiceToDID,
       [Instructions.RemoveServiceFromDID]: RemoveServiceFromDID,
       [Instructions.RevokeGoverningTokens]: RevokeGoverningTokens,
+      [Instructions.SunriseDeposit]: SunriseDepositForm,
     }),
     [governance?.pubkey.toBase58()]
   )
