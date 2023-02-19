@@ -1,6 +1,7 @@
-import { BN, PublicKey } from '@blockworks-foundation/mango-client'
 import { MangoV3ReimbursementClient } from '@blockworks-foundation/mango-v3-reimbursement-lib/dist'
+import { BN } from '@coral-xyz/anchor'
 import { CheckIcon } from '@heroicons/react/solid'
+import { PublicKey } from '@solana/web3.js'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { useEffect, useState } from 'react'
 

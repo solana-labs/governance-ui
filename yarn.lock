@@ -356,25 +356,7 @@
     toformat "^2.0.0"
     yargs "^17.0.1"
 
-"@blockworks-foundation/mango-client@3.6.14":
-  version "3.6.14"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-client/-/mango-client-3.6.14.tgz#00c46c815d78b20ffe0e9ef78ad3240c87bd49a4"
-  integrity sha512-uYjLXftjyfyOc6JYoRojTu7ZkbeboZqZhlpFm/7xl/dgg98KxQjRKyuHbdTdeAJCE9YtEUhKX2Cz5rVWDnWRlQ==
-  dependencies:
-    "@project-serum/anchor" "^0.21.0"
-    "@project-serum/serum" "^0.13.65"
-    "@project-serum/sol-wallet-adapter" "^0.2.0"
-    "@solana/spl-token" "^0.1.6"
-    "@solana/web3.js" "^1.43.5"
-    big.js "^6.1.1"
-    bn.js "^5.1.0"
-    buffer-layout "^1.2.1"
-    cross-fetch "^3.1.5"
-    dotenv "^10.0.0"
-    toformat "^2.0.0"
-    yargs "^17.0.1"
-
-"@blockworks-foundation/mango-client@^3.6.20":
+"@blockworks-foundation/mango-client@3.6.20", "@blockworks-foundation/mango-client@^3.6.20":
   version "3.6.20"
   resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-client/-/mango-client-3.6.20.tgz#66ed0ae4545959fdc31ca1918de0f931de579d41"
   integrity sha512-Te0i52KUyp5e8jQQZlIMsTy9fKIfefPHvkA8+NRGIH80kQcnJKKfzw3T1NxaDsc3KFMZwpuN3m4afDNpKTuF0g==

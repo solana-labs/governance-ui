@@ -9,7 +9,6 @@ import {
 import dayjs from 'dayjs'
 import { tryGetTokenMint } from '@utils/tokens'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
-import { ASSET_TYPE, MARKET_MODE } from 'Strategies/protocols/mango/tools'
 
 function displayInstructionArgument(decodedArgs, argName) {
   return (
@@ -615,3 +614,41 @@ MANGO_INSTRUCTIONS['4skJ85cdxQAFVKbcGgfun8iZPL7BadVYXG3kGEGkufqA'] =
   MANGO_INSTRUCTIONS['mv3ekLzLbnVPNxjSKvqBpU3ZeZXPQdEC3bp5MDEBG68']
 MANGO_INSTRUCTIONS['5mUyxYoFX2fyQ5A34jErFBRipC5rQNQ8gC2K73qV6xiJ'] =
   MANGO_INSTRUCTIONS['mv3ekLzLbnVPNxjSKvqBpU3ZeZXPQdEC3bp5MDEBG68']
+
+const ASSET_TYPE = [
+  {
+    name: 'Token',
+    value: 0,
+  },
+  {
+    name: 'Perp',
+    value: 1,
+  },
+]
+
+const MARKET_MODE = [
+  {
+    name: 'Default',
+    value: 0,
+  },
+  {
+    name: 'Active',
+    value: 1,
+  },
+  {
+    name: 'Close Only',
+    value: 2,
+  },
+  {
+    name: 'Force Close Only',
+    value: 3,
+  },
+  {
+    name: 'Inactive',
+    value: 4,
+  },
+  {
+    name: 'Swapping Spot Market',
+    value: 5,
+  },
+]

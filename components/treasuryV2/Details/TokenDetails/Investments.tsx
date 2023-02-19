@@ -182,8 +182,6 @@ export default function Investments(props: Props) {
           {proposedInvestment && (
             <DepositModal
               governedTokenAccount={props.asset.raw}
-              mangoAccounts={investments.data.mangoAccounts}
-              currentPosition={proposedInvestment.investedAmount}
               apy={proposedInvestment.apy}
               handledMint={proposedInvestment.handledMint}
               onClose={() => {

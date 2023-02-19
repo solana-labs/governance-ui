@@ -1,11 +1,11 @@
-import { BN, WalletAdapter } from '@blockworks-foundation/mango-client'
+import { WalletAdapter } from '@blockworks-foundation/mango-client'
 import {
   VaultConfig,
   DeploymentEnvs,
   Clusters,
 } from '@castlefinance/vault-core'
 import { VaultClient } from '@castlefinance/vault-sdk'
-import { AnchorProvider } from '@coral-xyz/anchor'
+import { AnchorProvider, BN } from '@coral-xyz/anchor'
 import { AnchorWallet } from '@friktion-labs/friktion-sdk/dist/cjs/src/miscUtils'
 import {
   serializeInstructionToBase64,
