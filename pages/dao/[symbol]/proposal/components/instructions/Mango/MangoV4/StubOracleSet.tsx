@@ -17,7 +17,7 @@ import InstructionForm, {
   InstructionInputType,
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
-import { I80F48 } from '@blockworks-foundation/mango-client'
+import { I80F48 } from '@blockworks-foundation/mango-v4'
 
 interface StubOracleSetForm {
   governedAccount: AssetAccount | null

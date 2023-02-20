@@ -1,4 +1,3 @@
-import { Config, MangoClient } from '@blockworks-foundation/mango-client'
 import Input from '@components/inputs/Input'
 import { GrantInstruction } from '@components/instructions/programs/voteStakeRegistry'
 import { MANGO_DAO_TREASURY } from '@components/instructions/tools'
@@ -18,10 +17,7 @@ import { useEffect, useRef, useState } from 'react'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
-import {
-  DAYS_PER_MONTH,
-  SECS_PER_MONTH,
-} from 'VoteStakeRegistry/tools/dateTools'
+import { DAYS_PER_MONTH } from 'VoteStakeRegistry/tools/dateTools'
 import InfoBox from 'VoteStakeRegistry/components/LockTokenStats/InfoBox'
 import { AddressImage, DisplayAddress } from '@cardinal/namespaces-components'
 import { LockupType } from 'VoteStakeRegistry/sdk/accounts'
@@ -84,10 +80,7 @@ const LockTokenStats = () => {
     DepoistWithVoter[]
   >([])
   const [unlockedFromGrants, setUnlockedFromGrants] = useState(new BN(0))
-  const [
-    liquidityMiningEmissionPerMonth,
-    setLiqudiityMiningEmissionPerMonth,
-  ] = useState(new BN(0))
+  const [liquidityMiningEmissionPerMonth] = useState(new BN(0))
   const [vestPerMonthStats, setVestPerMonthStats] = useState<{
     [key: string]: { vestingDate: dayjs.Dayjs; vestingAmount: BN }[]
   }>({})
@@ -375,40 +368,6 @@ const LockTokenStats = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [depositsWithWallets.length, givenGrantsTokenAmounts.length])
-  useEffect(() => {
-    const mngoPerpMarket = async () => {
-      const GROUP = connection.cluster === 'devnet' ? 'devnet.2' : 'mainnet.1'
-      const groupConfig = Config.ids().getGroupWithName(GROUP)!
-      const client = new MangoClient(
-        connection.current,
-        groupConfig.mangoProgramId
-      )
-      const group = await client.getMangoGroup(groupConfig.publicKey)
-      const perpMarkets = await Promise.all([
-        ...groupConfig!.perpMarkets.map((x) =>
-          group.loadPerpMarket(
-            connection.current,
-            x.marketIndex,
-            x.baseDecimals,
-            x.quoteDecimals
-          )
-        ),
-      ])
-
-      const emissionPerMonth = perpMarkets
-        .reduce(
-          (acc, next) => acc.iadd(next.liquidityMiningInfo.mngoPerPeriod),
-          new BN(0)
-        )
-        .muln(SECS_PER_MONTH)
-        .div(perpMarkets[0].liquidityMiningInfo.targetPeriodLength)
-      setLiqudiityMiningEmissionPerMonth(emissionPerMonth)
-    }
-    if (symbol === 'MNGO') {
-      mngoPerpMarket()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [connection.cluster])
   useEffect(() => {
     setPaginatedWallets(paginateWallets(0))
     pagination?.current?.setPage(0)

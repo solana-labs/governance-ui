@@ -14,7 +14,6 @@ import {
   AccountInfo as AccountInfoGeneric,
 } from '@solana/web3.js'
 import { AccountInfo, MintInfo } from '@solana/spl-token'
-import { TokenAccountLayout } from '@blockworks-foundation/mango-client'
 import {
   AUXILIARY_TOKEN_ACCOUNTS,
   DEFAULT_NATIVE_SOL_MINT,
@@ -555,7 +554,7 @@ const getTokenAccountsInfo = async (
           filters: [
             {
               // number of bytes
-              dataSize: TokenAccountLayout.span,
+              dataSize: 165,
             },
             {
               memcmp: {

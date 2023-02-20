@@ -14,7 +14,6 @@ import {
 
 import { BPF_UPGRADEABLE_LOADER_INSTRUCTIONS } from './programs/bpfUpgradeableLoader'
 import { GOVERNANCE_INSTRUCTIONS } from './programs/governance'
-import { MANGO_INSTRUCTIONS } from './programs/mango'
 import { getProgramName } from './programs/names'
 import { RAYDIUM_INSTRUCTIONS } from './programs/raydium'
 import { SPL_TOKEN_INSTRUCTIONS } from './programs/splToken'
@@ -291,7 +290,6 @@ export interface InstructionDescriptor {
 export const INSTRUCTION_DESCRIPTORS = {
   ...SPL_TOKEN_INSTRUCTIONS,
   ...BPF_UPGRADEABLE_LOADER_INSTRUCTIONS,
-  ...MANGO_INSTRUCTIONS,
   ...RAYDIUM_INSTRUCTIONS,
   ...MARINADE_INSTRUCTIONS,
   ...LIDO_INSTRUCTIONS,

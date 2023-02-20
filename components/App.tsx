@@ -20,7 +20,6 @@ import TransactionLoader from '@components/TransactionLoader'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useHydrateStore from '@hooks/useHydrateStore'
-import useMarketStore from 'Strategies/store/marketStore'
 import useMembers from '@components/Members/useMembers'
 import useRealm from '@hooks/useRealm'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
@@ -30,7 +29,7 @@ import NftVotingCountingModal from '@components/NftVotingCountingModal'
 import { getResourcePathPart } from '@tools/core/resources'
 import queryClient from '@hooks/queries/queryClient'
 import useSerumGovStore from 'stores/useSerumGovStore'
-import { WalletProvider } from '@hub/providers/Wallet';
+import { WalletProvider } from '@hub/providers/Wallet'
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -69,7 +68,6 @@ export function App(props: Props) {
   useEffect(() => {
     tokenPriceService.fetchSolanaTokenList()
   }, [])
-  const { loadMarket } = useMarketStore()
   const { governedTokenAccounts } = useGovernanceAssets()
   const possibleNftsAccounts = governedTokenAccounts.filter(
     (x) => x.isSol || x.isNft
@@ -101,12 +99,6 @@ export function App(props: Props) {
       symbol as string
     )}/favicon.ico?v=${Date.now()}`
 
-  useEffect(() => {
-    if (realm?.pubkey) {
-      loadMarket(connection, connection.cluster)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [connection.cluster, realm?.pubkey.toBase58()])
   useEffect(() => {
     if (
       realm &&
