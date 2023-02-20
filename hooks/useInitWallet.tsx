@@ -135,7 +135,6 @@ export default function useInitWallet() {
 
   // refresh regularly
   useInterval(async () => {
-    console.log('refresh')
     // @ts-ignore
     const currentAddress = window?.solana?._publicKey?.toBase58()
     const staleAddress = wallet?.publicKey?.toString()
