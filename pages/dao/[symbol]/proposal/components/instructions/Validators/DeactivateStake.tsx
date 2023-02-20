@@ -20,7 +20,7 @@ import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes'
 import { StakeAccount, StakeState } from '@utils/uiTypes/assets'
 import StakeAccountSelect from '../../StakeAccountSelect'
-import { getFilteredProgramAccounts } from '@blockworks-foundation/mango-client'
+import { getFilteredProgramAccounts } from '@utils/helpers'
 
 const DeactivateValidatorStake = ({
   index,

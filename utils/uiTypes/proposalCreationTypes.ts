@@ -558,7 +558,6 @@ export interface JoinDAOForm {
 export enum Instructions {
   Base64,
   ChangeMakeDonation,
-  ClaimMangoTokens,
   ClaimPendingDeposit,
   ClaimPendingWithdraw,
   Clawback,

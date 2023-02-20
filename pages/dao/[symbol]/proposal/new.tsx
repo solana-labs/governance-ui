@@ -110,7 +110,6 @@ import GrantForm from './components/instructions/Serum/GrantForm'
 import JoinDAO from './components/instructions/JoinDAO'
 import UpdateConfigAuthority from './components/instructions/Serum/UpdateConfigAuthority'
 import UpdateConfigParams from './components/instructions/Serum/UpdateConfigParams'
-import ClaimMangoTokens from './components/instructions/Mango/ClaimTokens'
 import { StyledLabel } from '@components/inputs/styles'
 import SelectInstructionType from '@components/SelectInstructionType'
 import AddKeyToDID from './components/instructions/Identity/AddKeyToDID'
@@ -531,7 +530,6 @@ const New = () => {
       [Instructions.SerumUpdateGovConfigParams]: UpdateConfigParams,
       [Instructions.SerumUpdateGovConfigAuthority]: UpdateConfigAuthority,
       [Instructions.JoinDAO]: JoinDAO,
-      [Instructions.ClaimMangoTokens]: ClaimMangoTokens,
       [Instructions.AddKeyToDID]: AddKeyToDID,
       [Instructions.RemoveKeyFromDID]: RemoveKeyFromDID,
       [Instructions.AddServiceToDID]: AddServiceToDID,

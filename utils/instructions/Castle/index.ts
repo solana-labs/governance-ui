@@ -1,4 +1,3 @@
-import { WalletAdapter } from '@blockworks-foundation/mango-client'
 import {
   VaultConfig,
   DeploymentEnvs,
@@ -24,6 +23,7 @@ import {
   TransactionInstruction,
   Keypair,
   Connection,
+  Transaction,
 } from '@solana/web3.js'
 import { ConnectionContext, getNetworkFromEndpoint } from '@utils/connection'
 import { validateInstruction } from '@utils/instructionTools'
@@ -395,4 +395,13 @@ export const getCastleVaults = async () => {
   const configResponse = await fetch('https://api.castle.finance/configs')
   const vaults = (await configResponse.json()) as VaultConfig<DeploymentEnvs>[]
   return vaults
+}
+
+interface WalletAdapter {
+  publicKey: PublicKey
+  connected: boolean
+  signTransaction: (transaction: Transaction) => Promise<Transaction>
+  signAllTransactions: (transaction: Transaction[]) => Promise<Transaction[]>
+  connect: () => any
+  disconnect: () => any
 }
