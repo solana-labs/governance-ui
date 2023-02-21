@@ -23,7 +23,6 @@ export enum PackageEnum {
   GoblinGold,
   Identity,
   NftPlugin,
-  MangoMarketV3,
   MangoMarketV4,
   MeanFinance,
   PsyFinance,

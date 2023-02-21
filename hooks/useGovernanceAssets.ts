@@ -202,11 +202,6 @@ export default function useGovernanceAssets() {
     [PackageEnum.NftPlugin]: {
       name: 'NFT Plugin',
     },
-    [PackageEnum.MangoMarketV3]: {
-      name: 'Mango Market v3',
-      isVisible: symbol === 'MNGO',
-      image: '/img/mango.png',
-    },
     [PackageEnum.MangoMarketV4]: {
       name: 'Mango Market v4',
       image: '/img/mango.png',
@@ -240,6 +235,8 @@ export default function useGovernanceAssets() {
     },
     [PackageEnum.VsrPlugin]: {
       name: 'Vsr Plugin',
+      isVisible:
+        currentPluginPk && vsrPluginsPks.includes(currentPluginPk.toBase58()),
     },
   }
 
