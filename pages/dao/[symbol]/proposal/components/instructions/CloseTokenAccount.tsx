@@ -232,7 +232,6 @@ const CloseTokenAccount = ({
   ]
   return (
     <>
-      {form && (
       <InstructionForm
         outerForm={form}
         setForm={setForm}
@@ -240,7 +239,6 @@ const CloseTokenAccount = ({
         setFormErrors={setFormErrors}
         formErrors={formErrors}
       ></InstructionForm>
-      )}
     </>
   )
 }
