@@ -2,9 +2,137 @@ import { MangoClient } from '@blockworks-foundation/mango-v4'
 import { AnchorProvider, BorshInstructionCoder } from '@coral-xyz/anchor'
 import { Wallet } from '@marinade.finance/marinade-ts-sdk'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
+// import { snakeCase } from 'snake-case'
+// import { sha256 } from 'js-sha256'
 
+//in case of mango discriminator is string sum of two first numbers in data array e.g `${data[0]}${data[1]}`
 const instructions = () => ({
-  8: {
+  12451: {
+    name: 'Alt Extend',
+    accounts: [
+      { name: 'Group' },
+      { name: 'Admin' },
+      { name: 'Payer' },
+      { name: 'Address Lookup Table' },
+    ],
+    getDataUI: async (
+      connection: Connection,
+      data: Uint8Array
+      //accounts: AccountMetaData[]
+    ) => {
+      const info = await displayArgs(connection, data)
+      try {
+        return <div>{info}</div>
+      } catch (e) {
+        console.log(e)
+        return <div>{JSON.stringify(data)}</div>
+      }
+    },
+  },
+  23568: {
+    name: 'Alt Set',
+    accounts: [
+      { name: 'Group' },
+      { name: 'Admin' },
+      { name: 'Address Lookup Table' },
+    ],
+    getDataUI: async (
+      connection: Connection,
+      data: Uint8Array
+      //accounts: AccountMetaData[]
+    ) => {
+      const info = await displayArgs(connection, data)
+      try {
+        return <div>{info}</div>
+      } catch (e) {
+        console.log(e)
+        return <div>{JSON.stringify(data)}</div>
+      }
+    },
+  },
+  201177: {
+    name: 'Ix Gate Set',
+    accounts: [{ name: 'Group' }, { name: 'Admin' }],
+    getDataUI: async (
+      connection: Connection,
+      data: Uint8Array
+      //accounts: AccountMetaData[]
+    ) => {
+      const info = await displayArgs(connection, data)
+      try {
+        return <div>{info}</div>
+      } catch (e) {
+        console.log(e)
+        return <div>{JSON.stringify(data)}</div>
+      }
+    },
+  },
+  124114: {
+    name: 'Perp edit',
+    accounts: [
+      { name: 'Group' },
+      { name: 'Admin' },
+      { name: 'Perp Market' },
+      { name: 'Oracle' },
+    ],
+    getDataUI: async (
+      connection: Connection,
+      data: Uint8Array
+      //accounts: AccountMetaData[]
+    ) => {
+      const info = await displayArgs(connection, data)
+      try {
+        return <div>{info}</div>
+      } catch (e) {
+        console.log(e)
+        return <div>{JSON.stringify(data)}</div>
+      }
+    },
+  },
+  109198: {
+    name: 'Stub oracle set',
+    accounts: [{ name: 'Group' }, { name: 'Admin' }, { name: 'Oracle' }],
+    getDataUI: async (
+      connection: Connection,
+      data: Uint8Array
+      //accounts: AccountMetaData[]
+    ) => {
+      const info = await displayArgs(connection, data)
+      try {
+        return <div>{info}</div>
+      } catch (e) {
+        console.log(e)
+        return <div>{JSON.stringify(data)}</div>
+      }
+    },
+  },
+  16388: {
+    name: 'Token add bank',
+    accounts: [
+      { name: 'Group' },
+      { name: 'Admin' },
+      { name: 'Mint' },
+      { name: 'Existing Bank' },
+      { name: 'Bank' },
+      { name: 'Vault' },
+      { name: 'Mint Info' },
+      { name: 'Payer' },
+    ],
+    getDataUI: async (
+      connection: Connection,
+      data: Uint8Array
+      //accounts: AccountMetaData[]
+    ) => {
+      const info = await displayArgs(connection, data)
+      try {
+        return <div>{info}</div>
+      } catch (e) {
+        console.log(e)
+        return <div>{JSON.stringify(data)}</div>
+      }
+    },
+  },
+  888: {
     name: 'Edit Group',
     accounts: [{ name: 'Group' }, { name: 'Admin' }],
     getDataUI: async (
@@ -21,7 +149,7 @@ const instructions = () => ({
       }
     },
   },
-  172: {
+  17263: {
     name: 'Create Stub Oracle',
     accounts: [
       { name: 'Group' },
@@ -44,7 +172,7 @@ const instructions = () => ({
       }
     },
   },
-  109: {
+  10928: {
     name: 'Register Token',
     accounts: [
       { name: 'Group' },
@@ -70,7 +198,7 @@ const instructions = () => ({
       }
     },
   },
-  40: {
+  4014: {
     name: 'Register Openbook Market',
     accounts: [
       { name: 'Group' },
@@ -97,7 +225,7 @@ const instructions = () => ({
       }
     },
   },
-  56: {
+  5645: {
     name: 'Register Trustless Token',
     accounts: [
       { name: 'Group' },
@@ -123,7 +251,7 @@ const instructions = () => ({
       }
     },
   },
-  49: {
+  49115: {
     name: 'Edit Market',
     accounts: [{ name: 'Group' }, { name: 'Admin' }, { name: 'Market' }],
     getDataUI: async (
@@ -140,7 +268,7 @@ const instructions = () => ({
       }
     },
   },
-  145: {
+  145204: {
     name: 'Edit Token',
     accounts: [
       { name: 'Group' },
@@ -162,7 +290,7 @@ const instructions = () => ({
       }
     },
   },
-  124: {
+  9347: {
     name: 'Create Perp Market',
     accounts: [
       { name: 'Group' },
@@ -212,6 +340,16 @@ const getArgs = async (connection: Connection, data: Uint8Array) => {
     client.program.idl
   ).decode(Buffer.from(data))?.data as any
 
+  //   console.log(
+  //     client.program.idl.instructions.map((ix) => {
+  //       const sh = sighash('global', ix.name)
+  //       return {
+  //         name: ix.name,
+  //         sh: `${sh[0]}${sh[1]}`,
+  //       }
+  //     })
+  //   )
+
   const args = {}
   for (const key of Object.keys(decodedInstructionData)) {
     const val = decodedInstructionData[key]
@@ -235,3 +373,10 @@ const displayArgs = async (connection: Connection, data: Uint8Array) => {
     </div>
   )
 }
+
+//need yarn add js-sha256 snakeCase
+// function sighash(nameSpace: string, ixName: string): Buffer {
+//   const name = snakeCase(ixName)
+//   const preimage = `${nameSpace}:${name}`
+//   return Buffer.from(sha256.digest(preimage)).slice(0, 8)
+// }

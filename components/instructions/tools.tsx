@@ -328,6 +328,12 @@ export async function getInstructionDescriptor(
   const descriptor = !instruction.data.length
     ? descriptors
     : descriptors && descriptors[instruction.data[0]]
+    ? descriptors[instruction.data[0]]
+    : //backup if first number is same for couple of instructions inside same idl
+    descriptors[`${instruction.data[0]}${instruction.data[1]}`]
+    ? descriptors[`${instruction.data[0]}${instruction.data[1]}`]
+    : descriptors
+
   const dataUI = (descriptor?.getDataUI &&
     (await descriptor?.getDataUI(
       connection.current,
