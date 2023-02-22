@@ -21,6 +21,169 @@ const instructions = () => ({
       }
     },
   },
+  172: {
+    name: 'Create Stub Oracle',
+    accounts: [
+      { name: 'Group' },
+      { name: 'Oracle' },
+      { name: 'Admin' },
+      { name: 'Mint' },
+      { name: 'Payer' },
+    ],
+    getDataUI: async (
+      connection: Connection,
+      data: Uint8Array
+      //accounts: AccountMetaData[]
+    ) => {
+      const info = await displayArgs(connection, data)
+      try {
+        return <div>{info}</div>
+      } catch (e) {
+        console.log(e)
+        return <div>{JSON.stringify(data)}</div>
+      }
+    },
+  },
+  109: {
+    name: 'Register Token',
+    accounts: [
+      { name: 'Group' },
+      { name: 'Admin' },
+      { name: 'Mint' },
+      { name: 'Bank' },
+      { name: 'Vault' },
+      { name: 'Mint Info' },
+      { name: 'Oracle' },
+      { name: 'Payer' },
+    ],
+    getDataUI: async (
+      connection: Connection,
+      data: Uint8Array
+      //accounts: AccountMetaData[]
+    ) => {
+      const info = await displayArgs(connection, data)
+      try {
+        return <div>{info}</div>
+      } catch (e) {
+        console.log(e)
+        return <div>{JSON.stringify(data)}</div>
+      }
+    },
+  },
+  40: {
+    name: 'Register Openbook Market',
+    accounts: [
+      { name: 'Group' },
+      { name: 'Admin' },
+      { name: 'Openbook Program' },
+      { name: 'Openbook External Market' },
+      { name: 'Openbook Market' },
+      { name: 'Index Reservation' },
+      { name: 'Quote Nank' },
+      { name: 'Base Bank' },
+      { name: 'Payer' },
+    ],
+    getDataUI: async (
+      connection: Connection,
+      data: Uint8Array
+      //accounts: AccountMetaData[]
+    ) => {
+      const info = await displayArgs(connection, data)
+      try {
+        return <div>{info}</div>
+      } catch (e) {
+        console.log(e)
+        return <div>{JSON.stringify(data)}</div>
+      }
+    },
+  },
+  56: {
+    name: 'Register Trustless Token',
+    accounts: [
+      { name: 'Group' },
+      { name: 'Fast Listing Admin' },
+      { name: 'Mint' },
+      { name: 'Bank' },
+      { name: 'Vault' },
+      { name: 'Mint Info' },
+      { name: 'Oracle' },
+      { name: 'Payer' },
+    ],
+    getDataUI: async (
+      connection: Connection,
+      data: Uint8Array
+      //accounts: AccountMetaData[]
+    ) => {
+      const info = await displayArgs(connection, data)
+      try {
+        return <div>{info}</div>
+      } catch (e) {
+        console.log(e)
+        return <div>{JSON.stringify(data)}</div>
+      }
+    },
+  },
+  49: {
+    name: 'Edit Market',
+    accounts: [{ name: 'Group' }, { name: 'Admin' }, { name: 'Market' }],
+    getDataUI: async (
+      connection: Connection,
+      data: Uint8Array
+      //accounts: AccountMetaData[]
+    ) => {
+      const info = await displayArgs(connection, data)
+      try {
+        return <div>{info}</div>
+      } catch (e) {
+        console.log(e)
+        return <div>{JSON.stringify(data)}</div>
+      }
+    },
+  },
+  145: {
+    name: 'Edit Token',
+    accounts: [
+      { name: 'Group' },
+      { name: 'Admin' },
+      { name: 'Mint Info' },
+      { name: 'Oracle' },
+    ],
+    getDataUI: async (
+      connection: Connection,
+      data: Uint8Array
+      //accounts: AccountMetaData[]
+    ) => {
+      const info = await displayArgs(connection, data)
+      try {
+        return <div>{info}</div>
+      } catch (e) {
+        console.log(e)
+        return <div>{JSON.stringify(data)}</div>
+      }
+    },
+  },
+  124: {
+    name: 'Create Perp Market',
+    accounts: [
+      { name: 'Group' },
+      { name: 'Admin' },
+      { name: 'Oracle' },
+      { name: 'Perp Market' },
+    ],
+    getDataUI: async (
+      connection: Connection,
+      data: Uint8Array
+      //accounts: AccountMetaData[]
+    ) => {
+      const info = await displayArgs(connection, data)
+      try {
+        return <div>{info}</div>
+      } catch (e) {
+        console.log(e)
+        return <div>{JSON.stringify(data)}</div>
+      }
+    },
+  },
 })
 
 export const MANGO_V4_INSTRUCTIONS = {
