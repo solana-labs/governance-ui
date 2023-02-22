@@ -38,8 +38,11 @@
     "@castlefinance/vault-sdk": "3.6.2",
     "@civic/profile": "0.1.2",
     "@civic/solana-gateway-react": "0.11.0",
+    "@coral-xyz/anchor": "0.26.0",
+    "@coral-xyz/borsh": "0.26.0",
     "@dialectlabs/react-sdk-blockchain-solana": "1.0.0-beta.3",
     "@dialectlabs/react-ui": "1.1.0-beta.5",
+    "@dual-finance/airdrop": "0.0.4",
     "@dual-finance/staking-options": "0.0.17",
     "@emotion/react": "11.9.0",
     "@emotion/styled": "11.8.1",
@@ -59,8 +62,6 @@
     "@nivo/bar": "0.79.1",
     "@nivo/core": "0.79.0",
     "@notifi-network/notifi-react-hooks": "0.18.2",
-    "@coral-xyz/anchor": "0.26.0",
-    "@coral-xyz/borsh": "0.26.0",
     "@project-serum/common": "0.0.1-beta.3",
     "@project-serum/serum": "0.13.65",
     "@project-serum/sol-wallet-adapter": "0.2.6",
@@ -226,7 +227,7 @@
     "dset": "3.1.2",
     "**/@solana/spl-token-registry/cross-fetch/node-fetch": "2.6.7"
   },
-  "browser":{
+  "browser": {
     "child_process": false
   },
   "browserslist": [

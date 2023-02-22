@@ -580,6 +580,7 @@ export enum Instructions {
   DepositToMangoAccount,
   DepositToMangoAccountCsv,
   DifferValidatorStake,
+  DualFinanceAirdrop,
   DualFinanceExercise,
   DualFinanceStakingOption,
   DualFinanceWithdraw,
@@ -732,6 +733,12 @@ export interface ValidatorWithdrawStakeForm {
   governedTokenAccount: AssetAccount | undefined
   stakingAccount: StakeAccount | undefined
   amount: number
+}
+
+export interface DualFinanceAirdropForm {
+  root: string
+  amount: number
+  treasury: AssetAccount | undefined
 }
 
 export interface DualFinanceStakingOptionForm {

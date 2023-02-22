@@ -551,6 +551,49 @@ export const getFriktionWithdrawSchema = () => {
   })
 }
 
+export const getDualFinanceAirdropSchema = () => {
+  return yup.object().shape({
+    root: yup.string().required('Root is required')
+    .test(
+      'destination',
+      'Account validation error',
+      async function (val: string) {
+        if (val) {
+          try {
+            const root = val.split(',').map(function(item) {
+              return parseInt(item, 10);
+            });
+            if (root.length !== 32) {
+              return this.createError({
+                message: 'Expected 32 bytes'
+              })
+            }
+            for (const byte of root) {
+              if (byte < 0 || byte >= 256) {
+                return this.createError({
+                  message: 'Invalid byte'
+                })
+              }
+            }
+            return true
+          } catch (e) {
+            console.log(e)
+            return this.createError({
+              message: `${e}`,
+            })
+          }
+        } else {
+          return this.createError({
+            message: `Root is required`,
+          })
+        }
+      }
+    ),
+    treasury: yup.object().typeError('Treasury is required'),
+    amount: yup.number().typeError('Amount is required')
+  })
+}
+
 export const getDualFinanceStakingOptionSchema = () => {
   return yup.object().shape({
     soName: yup.string().required('Staking option name is required'),
