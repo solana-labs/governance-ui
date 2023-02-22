@@ -12,7 +12,7 @@ import { WalletAdapter } from '@solana/wallet-adapter-base'
 import { Airdrop, AirdropConfigureContext } from '@dual-finance/airdrop'
 import { Keypair } from '@solana/web3.js'
 import { BN } from '@coral-xyz/anchor'
-import { getMintDecimalAmount, getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
+import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
 
 interface AirdropArgs {
   connection: ConnectionContext
@@ -41,9 +41,14 @@ export async function getAirdropInstruction({
         form.treasury.extensions.mint?.account.decimals
     );
 
-    const root = form.root.split(',').map(function(item) {
-        return parseInt(item, 10);
-    });
+    let root: number[] = [];
+    try {
+        root = Array.from(Uint8Array.from(Buffer.from(form.root, 'hex')));
+    } catch (err) {
+        root = form.root.split(',').map(function(item) {
+            return parseInt(item, 10);
+        });
+    }
     const airdropTransactionContext: AirdropConfigureContext = await airdrop.createConfigMerkleTransactionFromRoot(
         form.treasury.pubkey, // source
         form.treasury.extensions.token!.account.owner!, // authority

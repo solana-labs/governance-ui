@@ -60,7 +60,7 @@ const DualAirdrop = ({
 
   return (
     <>
-      <Tooltip content="Merkle root of the airdrop. Can be generated using this: https://github.com/Dual-Finance/airdrop-sdk/blob/master/src/utils/balance_tree.ts#L48">
+      <Tooltip content="Merkle root of the airdrop. https://github.com/Dual-Finance/airdrop-sdk/blob/97d97492bdb926f150a6436a68a77eda35fc7095/src/utils/balance_tree.ts#L40">
       <Input
         label="Root"
         value={form.root}

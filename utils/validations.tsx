@@ -578,10 +578,16 @@ export const getDualFinanceAirdropSchema = () => {
             return true
           } catch (e) {
             console.log(e)
-            return this.createError({
-              message: `${e}`,
-            })
           }
+          try {
+            Uint8Array.from(Buffer.from(val, 'hex'));
+            return true;
+          } catch (e) {
+            console.log(e)
+          }
+          return this.createError({
+            message: `Could not parse`,
+          });
         } else {
           return this.createError({
             message: `Root is required`,
