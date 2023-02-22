@@ -3006,5 +3006,18 @@
     "ogImage": "/realms/HadeswapGovernance/hadeswap_logo.jpg",
     "website": "https://hadeswap.com",
     "twitter": "@hadeswap"
+  },
+  {
+    "symbol": "Clack DAO",
+    "displayName": "Clack DAO",
+    "shortDescription": "Clack - Meme Token at Solana BlockChain",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "5qfNPr56sGqoH7dTDBqVWqnhHZqYj7AcouoiHFDV9ZU3",
+    "communityMint": "2Y6sQjp2PiwnQpMPSvGGYFNSQGY24YubNYXtrB9ufon9",
+    "ogImage": "realms/ClackDAO/logo.png",
+    "discord": "https://discord.gg/BfkCHQkUTq",
+    "github": "https://github.com/clackinu",
+    "website": "https://clack.uno",
+    "twitter": "@clack_inu"
   }
 ]
