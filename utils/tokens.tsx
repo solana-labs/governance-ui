@@ -26,13 +26,13 @@ import { BN } from '@coral-xyz/anchor'
 import { abbreviateAddress } from './formatting'
 import BigNumber from 'bignumber.js'
 import { AssetAccount } from '@utils/uiTypes/assets'
-import { I80F48 } from '@blockworks-foundation/mango-client'
 import { NFTWithMeta } from './uiTypes/VotePlugin'
 import { ConnectionContext } from './connection'
 import {
   HOLAPLEX_GRAPQL_URL_DEVNET,
   HOLAPLEX_GRAPQL_URL_MAINNET,
 } from '@tools/constants'
+import { I80F48 } from '@blockworks-foundation/mango-v4'
 
 export type TokenAccount = AccountInfo
 export type MintAccount = MintInfo

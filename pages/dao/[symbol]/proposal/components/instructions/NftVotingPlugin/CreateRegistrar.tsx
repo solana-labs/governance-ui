@@ -114,7 +114,6 @@ const CreateNftPluginRegistrar = ({
   ]
   return (
     <>
-      {form && (
       <InstructionForm
         outerForm={form}
         setForm={setForm}
@@ -122,7 +121,6 @@ const CreateNftPluginRegistrar = ({
         setFormErrors={setFormErrors}
         formErrors={formErrors}
       ></InstructionForm>
-      )}
     </>
   )
 }

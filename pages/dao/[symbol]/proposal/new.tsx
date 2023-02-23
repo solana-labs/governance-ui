@@ -45,8 +45,6 @@ import ProgramUpgrade from './components/instructions/bpfUpgradeableLoader/Progr
 import CreateAssociatedTokenAccount from './components/instructions/CreateAssociatedTokenAccount'
 import CustomBase64 from './components/instructions/CustomBase64'
 import Empty from './components/instructions/Empty'
-import MakeChangeMaxAccounts from './components/instructions/Mango/MakeChangeMaxAccounts'
-import MakeChangeReferralFeeParams from './components/instructions/Mango/MakeChangeReferralFeeParams'
 import Mint from './components/instructions/Mint'
 import CreateObligationAccount from './components/instructions/Solend/CreateObligationAccount'
 import DepositReserveLiquidityAndObligationCollateral from './components/instructions/Solend/DepositReserveLiquidityAndObligationCollateral'
@@ -65,14 +63,9 @@ import SwitchboardRevokeOracle from './components/instructions/Switchboard/Revok
 import FriktionWithdraw from './components/instructions/Friktion/FriktionWithdraw'
 import FriktionClaimPendingDeposit from './components/instructions/Friktion/FriktionClaimPendingDeposit'
 import FriktionClaimPendingWithdraw from './components/instructions/Friktion/FriktionClaimPendingWithdraw'
-import MakeChangePerpMarket from './components/instructions/Mango/MakeChangePerpMarket'
-import MakeAddOracle from './components/instructions/Mango/MakeAddOracle'
-import MakeAddSpotMarket from './components/instructions/Mango/MakeAddSpotMarket'
 import StakeValidator from './components/instructions/Validators/StakeValidator'
 import DeactivateValidatorStake from './components/instructions/Validators/DeactivateStake'
 import WithdrawValidatorStake from './components/instructions/Validators/WithdrawStake'
-import MakeChangeSpotMarket from './components/instructions/Mango/MakeChangeSpotMarket'
-import MakeCreatePerpMarket from './components/instructions/Mango/MakeCreatePerpMarket'
 import useCreateProposal from '@hooks/useCreateProposal'
 import CastleDeposit from './components/instructions/Castle/CastleDeposit'
 import MakeInitMarketParams from './components/instructions/Foresight/MakeInitMarketParams'
@@ -96,19 +89,11 @@ import VotingMintConfig from './components/instructions/Vsr/VotingMintConfig'
 import CreateVsrRegistrar from './components/instructions/Vsr/CreateRegistrar'
 import GoblinGoldDeposit from './components/instructions/GoblinGold/GoblinGoldDeposit'
 import GoblinGoldWithdraw from './components/instructions/GoblinGold/GoblinGoldWithdraw'
-import MakeSetMarketMode from './components/instructions/Mango/MakeSetMarketMode'
 import CreateGatewayPluginRegistrar from './components/instructions/GatewayPlugin/CreateRegistrar'
 import ConfigureGatewayPlugin from './components/instructions/GatewayPlugin/ConfigureGateway'
-import MakeChangeQuoteParams from './components/instructions/Mango/MakeChangeQuoteParams'
 import CreateTokenMetadata from './components/instructions/CreateTokenMetadata'
 import UpdateTokenMetadata from './components/instructions/UpdateTokenMetadata'
 import classNames from 'classnames'
-import MakeRemoveSpotMarket from './components/instructions/Mango/MakeRemoveSpotMarket'
-import MakeRemovePerpMarket from './components/instructions/Mango/MakeRemovePerpMarket'
-import MakeSwapSpotMarket from './components/instructions/Mango/MakeSwapSpotMarket'
-import MakeRemoveOracle from './components/instructions/Mango/MakeRemoveOracle'
-import MakeDepositToMangoAccount from './components/instructions/Mango/MakeDepositToMangoAccount'
-import MakeDepositToMangoAccountCsv from './components/instructions/Mango/MakeDepositToMangoAccountCsv'
 import TokenRegister from './components/instructions/Mango/MangoV4/TokenRegister'
 import EditToken from './components/instructions/Mango/MangoV4/EditToken'
 import PerpEdit from './components/instructions/Mango/MangoV4/PerpEdit'
@@ -121,12 +106,10 @@ import TransferDomainName from './components/instructions/TransferDomainName'
 import DepositForm from './components/instructions/Everlend/DepositForm'
 import WithdrawForm from './components/instructions/Everlend/WithdrawForm'
 import InitUser from './components/instructions/Serum/InitUser'
-import MakeChangeReferralFeeParams2 from './components/instructions/Mango/MakeChangeReferralFeeParams2'
 import GrantForm from './components/instructions/Serum/GrantForm'
 import JoinDAO from './components/instructions/JoinDAO'
 import UpdateConfigAuthority from './components/instructions/Serum/UpdateConfigAuthority'
 import UpdateConfigParams from './components/instructions/Serum/UpdateConfigParams'
-import ClaimMangoTokens from './components/instructions/Mango/ClaimTokens'
 import { StyledLabel } from '@components/inputs/styles'
 import SelectInstructionType from '@components/SelectInstructionType'
 import AddKeyToDID from './components/instructions/Identity/AddKeyToDID'
@@ -434,20 +417,6 @@ const New = () => {
       [Instructions.Mint]: Mint,
       [Instructions.Base64]: CustomBase64,
       [Instructions.None]: Empty,
-      [Instructions.MangoAddOracle]: MakeAddOracle,
-      [Instructions.MangoAddSpotMarket]: MakeAddSpotMarket,
-      [Instructions.MangoChangeMaxAccounts]: MakeChangeMaxAccounts,
-      [Instructions.MangoChangePerpMarket]: MakeChangePerpMarket,
-      [Instructions.MangoChangeReferralFeeParams]: MakeChangeReferralFeeParams,
-      [Instructions.MangoChangeReferralFeeParams2]: MakeChangeReferralFeeParams2,
-      [Instructions.MangoChangeSpotMarket]: MakeChangeSpotMarket,
-      [Instructions.MangoCreatePerpMarket]: MakeCreatePerpMarket,
-      [Instructions.MangoSetMarketMode]: MakeSetMarketMode,
-      [Instructions.MangoChangeQuoteParams]: MakeChangeQuoteParams,
-      [Instructions.MangoRemoveSpotMarket]: MakeRemoveSpotMarket,
-      [Instructions.MangoRemovePerpMarket]: MakeRemovePerpMarket,
-      [Instructions.MangoSwapSpotMarket]: MakeSwapSpotMarket,
-      [Instructions.MangoRemoveOracle]: MakeRemoveOracle,
       [Instructions.MangoV4TokenRegister]: TokenRegister,
       [Instructions.MangoV4TokenEdit]: EditToken,
       [Instructions.MangoV4GroupEdit]: GroupEdit,
@@ -512,8 +481,6 @@ const New = () => {
       [Instructions.ChangeMakeDonation]: ChangeDonation,
       [Instructions.CreateTokenMetadata]: CreateTokenMetadata,
       [Instructions.UpdateTokenMetadata]: UpdateTokenMetadata,
-      [Instructions.DepositToMangoAccount]: MakeDepositToMangoAccount,
-      [Instructions.DepositToMangoAccountCsv]: MakeDepositToMangoAccountCsv,
       [Instructions.StakeValidator]: StakeValidator,
       [Instructions.DeactivateValidatorStake]: DeactivateValidatorStake,
       [Instructions.WithdrawValidatorStake]: WithdrawValidatorStake,
@@ -565,7 +532,6 @@ const New = () => {
       [Instructions.SerumUpdateGovConfigParams]: UpdateConfigParams,
       [Instructions.SerumUpdateGovConfigAuthority]: UpdateConfigAuthority,
       [Instructions.JoinDAO]: JoinDAO,
-      [Instructions.ClaimMangoTokens]: ClaimMangoTokens,
       [Instructions.AddKeyToDID]: AddKeyToDID,
       [Instructions.RemoveKeyFromDID]: RemoveKeyFromDID,
       [Instructions.AddServiceToDID]: AddServiceToDID,

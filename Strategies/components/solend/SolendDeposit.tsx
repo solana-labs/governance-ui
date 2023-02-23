@@ -1,4 +1,3 @@
-import { PublicKey } from '@blockworks-foundation/mango-client'
 import Button, { LinkButton } from '@components/Button'
 import Input from '@components/inputs/Input'
 import Loading from '@components/Loading'
@@ -33,6 +32,7 @@ import {
   SolendSubStrategy,
 } from 'Strategies/protocols/solend'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import { PublicKey } from '@solana/web3.js'
 
 const SOL_BUFFER = 0.02
 

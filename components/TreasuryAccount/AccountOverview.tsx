@@ -1,10 +1,6 @@
 import Button, { LinkButton } from '@components/Button'
 import { getExplorerUrl } from '@components/explorer/tools'
-import {
-  getAccountName,
-  WSOL_MINT,
-  WSOL_MINT_PK,
-} from '@components/instructions/tools'
+import { getAccountName, WSOL_MINT } from '@components/instructions/tools'
 import Modal from '@components/Modal'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
@@ -31,13 +27,6 @@ import useStrategiesStore from 'Strategies/store/useStrategiesStore'
 import DepositModal from 'Strategies/components/DepositModal'
 import { SolendStrategy, TreasuryStrategy } from 'Strategies/types/types'
 import BigNumber from 'bignumber.js'
-import { MangoAccount } from '@blockworks-foundation/mango-client'
-import {
-  calculateAllDepositsInMangoAccountsForMint,
-  MANGO,
-  tryGetMangoAccountsForOwner,
-} from 'Strategies/protocols/mango/tools'
-import useMarketStore from 'Strategies/store/marketStore'
 import LoadingRows from './LoadingRows'
 import TradeOnSerum, { TradeOnSerumProps } from './TradeOnSerum'
 import { AccountType } from '@utils/uiTypes/assets'
@@ -81,8 +70,6 @@ const AccountOverview = () => {
   const isLoadingRecentActivity = useTreasuryAccountStore(
     (s) => s.isLoadingRecentActivity
   )
-  const market = useMarketStore((s) => s)
-  const [mngoAccounts, setMngoAccounts] = useState<MangoAccount[]>([])
   const [openNftDepositModal, setOpenNftDepositModal] = useState(false)
   const [openCommonSendModal, setOpenCommonSendModal] = useState(false)
   const [openMsolConvertModal, setOpenMsolConvertModal] = useState(false)
@@ -166,26 +153,6 @@ const AccountOverview = () => {
       }) as Array<InvestmentType>
     }
 
-    const handleGetMangoAccounts = async () => {
-      const currentAccountMint = currentAccount?.isSol
-        ? WSOL_MINT_PK
-        : currentAccount?.extensions.token?.account.mint
-      const currentPositions = calculateAllDepositsInMangoAccountsForMint(
-        mngoAccounts,
-        currentAccountMint!,
-        market
-      )
-      if (currentPositions > 0) {
-        return strategies
-          .map((invest) => ({
-            ...invest,
-            investedAmount: currentPositions,
-          }))
-          .filter((x) => x.protocolName === MANGO)
-      }
-      return []
-    }
-
     const handleEverlendAccounts = async (): Promise<InvestmentType[]> => {
       const everlendStrategy = visibleInvestments.filter(
         (strat) => strat.protocolName === EVERLEND
@@ -214,9 +181,6 @@ const AccountOverview = () => {
 
     const loadData = async () => {
       const requests = [] as Array<Promise<Array<InvestmentType>>>
-      if (visibleInvestments.filter((x) => x.protocolName === MANGO).length) {
-        requests.push(handleGetMangoAccounts())
-      }
       if (visibleInvestments.filter((x) => x.protocolName === SOLEND).length) {
         requests.push(getSlndCTokens())
       }
@@ -239,19 +203,7 @@ const AccountOverview = () => {
 
     loadData()
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [currentAccount, mngoAccounts, visibleInvestments.length])
-  useEffect(() => {
-    const getMangoAcccounts = async () => {
-      const accounts = await tryGetMangoAccountsForOwner(
-        market,
-        currentAccount!.governance!.pubkey
-      )
-      setMngoAccounts(accounts ? accounts : [])
-    }
-    if (currentAccount) {
-      getMangoAcccounts()
-    }
-  }, [currentAccount, market])
+  }, [currentAccount, visibleInvestments.length])
 
   useEffect(() => {
     if (isCopied) {
@@ -563,8 +515,6 @@ const AccountOverview = () => {
       {proposedInvestment && (
         <DepositModal
           governedTokenAccount={currentAccount}
-          mangoAccounts={mngoAccounts}
-          currentPosition={proposedInvestment.investedAmount}
           apy={proposedInvestment.apy}
           handledMint={proposedInvestment.handledMint}
           onClose={() => {

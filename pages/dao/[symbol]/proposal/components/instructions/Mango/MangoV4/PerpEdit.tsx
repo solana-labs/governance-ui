@@ -11,7 +11,6 @@ import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
-import { BN } from '@blockworks-foundation/mango-client'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, {
   InstructionInput,
@@ -20,6 +19,7 @@ import InstructionForm, {
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { PerpMarketIndex } from '@blockworks-foundation/mango-v4'
 import { getChangedValues, getNullOrTransform } from '@utils/mangoV4Tools'
+import { BN } from '@coral-xyz/anchor'
 
 type NameMarketIndexVal = {
   name: string
