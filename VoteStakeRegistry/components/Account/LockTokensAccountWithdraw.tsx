@@ -6,8 +6,6 @@ import {
 } from '@tools/sdk/units'
 import { useEffect, useMemo, useState } from 'react'
 import LockTokensModal from './LockTokensModal'
-import DepositCommunityTokensBtn from '../TokenBalance/DepositCommunityTokensBtn'
-import WithDrawCommunityTokens from '../TokenBalance/WithdrawCommunityTokensBtn'
 import DepositCard from './DepositCard'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import VotingPowerBox from '../TokenBalance/VotingPowerBox'
@@ -266,13 +264,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
             My governance power{' '}
           </h1>
 
-          <div className="ml-auto flex flex-row">
-            <DepositCommunityTokensBtn
-              inAccountDetails={true}
-              className="mr-3"
-            />
-            <WithDrawCommunityTokens />
-          </div>
+          <div className="ml-auto flex flex-row"></div>
         </div>
         {!isOwnerOfDeposits && connected && (
           <div className="pb-6">
@@ -367,7 +359,11 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
                 {deposits
                   //we filter out one deposits that is used to store none locked community tokens
                   ?.map((x, idx) => (
-                    <DepositCard deposit={x} key={idx}></DepositCard>
+                    <DepositCard
+                      deposit={x}
+                      key={idx}
+                      vsrClient={client}
+                    ></DepositCard>
                   ))}
                 <div className="border border-fgd-4 flex flex-col items-center justify-center p-6 rounded-lg">
                   <LightningBoltIcon className="h-8 mb-2 text-primary-light w-8" />
