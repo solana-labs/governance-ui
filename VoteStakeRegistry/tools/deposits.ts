@@ -27,13 +27,17 @@ const DEPOSIT_EVENT_NAME = 'DepositEntryInfo'
 // Note: when running a local validator ensure the account is copied from devnet: --clone ENmcpFCpxN1CqyUjuog9yyUVfdXBKF3LVCwLr7grJZpk -ud
 const simulationWallet = new PublicKey(SIMULATION_WALLET)
 
-const logsToEvents = <T extends Idl>(program: Program<T>, logs: string[], walletPk: string):{
+const logsToEvents = <T extends Idl>(
+  program: Program<T>,
+  logs: string[],
+  walletPk: string
+): {
   walletPk: string
   event: any
 }[] => {
   const parser = new EventParser(program.programId, program.coder)
-  const errors = parser.parseLogs(logs);
-  return [...errors].map((event) =>({ event, walletPk }));
+  const errors = parser.parseLogs(logs)
+  return [...errors].map((event) => ({ event, walletPk }))
 }
 
 export const getDeposits = async ({
@@ -256,7 +260,9 @@ export const getVotingPowersForWallets = async ({
     const logsJsons = await Promise.all(simulations.map((x) => x.json()))
     for (const logJson of logsJsons) {
       for (const result of logJson) {
-        events.push(...logsToEvents(client.program, result.result.value.logs!, result.id))
+        events.push(
+          ...logsToEvents(client.program, result.result.value.logs!, result.id)
+        )
       }
     }
 
@@ -388,7 +394,7 @@ const getDepositsAdditionalInfoEvents = async (
     transaction.add(logVoterInfoIx)
     const batchOfDeposits = await connection.simulateTransaction(transaction)
     const logEvents = parser.parseLogs(batchOfDeposits.value.logs!)
-    events.push(...[...logEvents]);
+    events.push(...[...logEvents])
   }
   return events
 }
