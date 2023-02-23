@@ -25,11 +25,19 @@ import { notify } from '@utils/notifications'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import dayjs from 'dayjs'
 import { BN } from '@coral-xyz/anchor'
+import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 
-const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
+const DepositCard = ({
+  deposit,
+  vsrClient,
+}: {
+  deposit: DepositWithMintAccount
+  vsrClient?: VsrClient | undefined
+}) => {
   const { getOwnedDeposits } = useDepositStore()
   const { realm, realmInfo, tokenRecords, ownTokenRecord } = useRealm()
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
+  const actualClient = vsrClient || client
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection.current)
   const endpoint = useWalletStore((s) => s.connection.endpoint)
@@ -71,7 +79,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       tokenOwnerRecordPubKey:
         tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey,
       depositIndex: depositEntry.index,
-      client: client,
+      client: actualClient,
       splProgramId: realm!.owner!,
       splProgramVersion: getProgramVersionForRealm(realmInfo!),
     })
@@ -79,7 +87,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       realmPk: realm!.pubkey,
       communityMintPk: realm!.account.communityMint,
       walletPk: wallet!.publicKey!,
-      client: client!,
+      client: actualClient!,
       connection,
     })
     await fetchWalletTokenAccounts()
@@ -102,13 +110,13 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       realmPk: realm!.pubkey!,
       depositIndex: deposit.index,
       communityMintPk: realm!.account.communityMint,
-      client,
+      client: actualClient,
     })
     await getOwnedDeposits({
       realmPk: realm!.pubkey,
       communityMintPk: realm!.account.communityMint,
       walletPk: wallet!.publicKey!,
-      client: client!,
+      client: actualClient!,
       connection,
     })
   }
