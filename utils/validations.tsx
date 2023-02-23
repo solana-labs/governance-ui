@@ -560,6 +560,17 @@ export const getDualFinanceAirdropSchema = () => {
       async function (val: string) {
         if (val) {
           try {
+            const arr = Uint8Array.from(Buffer.from(val, 'hex'));
+            if (arr.length !== 32) {
+              return this.createError({
+                message: 'Expected 32 bytes'
+              })
+            }
+            return true;
+          } catch (e) {
+            console.log(e)
+          }
+          try {
             const root = val.split(',').map(function(item) {
               return parseInt(item, 10);
             });
@@ -576,12 +587,6 @@ export const getDualFinanceAirdropSchema = () => {
               }
             }
             return true
-          } catch (e) {
-            console.log(e)
-          }
-          try {
-            Uint8Array.from(Buffer.from(val, 'hex'));
-            return true;
           } catch (e) {
             console.log(e)
           }
