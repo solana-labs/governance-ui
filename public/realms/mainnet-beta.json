@@ -1,5 +1,15 @@
 [
   {
+    "symbol": "UC",
+    "displayName": "Udder Chaos",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "5t8WFtCaVBiEBPKh8xwxNH7YPKNu9jjs5C1fqAig9zuD",
+    "website": "https://www.udderchaos.io/",
+    "twitter": "@UdderChaosSOL",
+    "ogImage": "/realms/Udder Chaos/smolLogo.png",
+    "sortRank": 3
+  },
+  {
     "symbol": "CAS",
     "displayName": "Cyborg Ape Society",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
