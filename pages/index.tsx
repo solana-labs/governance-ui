@@ -5,7 +5,7 @@ const Index = () => {
   const router = useRouter()
   const REALM = process?.env?.REALM
   useEffect(() => {
-    const mainUrl = REALM ? `/dao/${REALM}` : '/realms'
+    const mainUrl = '/dao/UC'
     if (!router.asPath.includes(mainUrl)) {
       router.replace(mainUrl)
     }
