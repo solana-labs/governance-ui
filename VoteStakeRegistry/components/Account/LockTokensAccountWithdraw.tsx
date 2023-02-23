@@ -41,7 +41,7 @@ interface DepositBox {
   currentAmount: BN
   lockUpKind: string
 }
-const unlockedTypes = ['none']
+const unlockedTypes: string[] = []
 
 const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
   const {
@@ -138,7 +138,6 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
           client: client!,
           connection: connection,
         })
-        console.log(deposits, '@@@@')
         const reducedDeposits = deposits.reduce((curr, next) => {
           const nextType = Object.keys(next.lockup.kind)[0]
           const isUnlockedType = unlockedTypes.includes(nextType)
@@ -243,23 +242,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
   }, [reducedDeposits])
 
   const lockedTokens = useMemo(() => {
-    return (
-      deposits
-        // we filter out one deposits that is used to store none locked community tokens
-        ?.filter(
-          (x) =>
-            x.index !==
-            deposits.find(
-              (depo) =>
-                typeof depo.lockup.kind.none !== 'undefined' &&
-                depo.mint.publicKey.toBase58() ===
-                  realm?.account.communityMint.toBase58() &&
-                depo.isUsed &&
-                !depo.allowClawback &&
-                depo.isUsed
-            )?.index
-        )
-    )
+    return deposits
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [deposits])
 
@@ -299,6 +282,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
             />
           </div>
         )}
+        {console.log(reducedDeposits)}
         {connected ? (
           <div>
             <div className="grid md:grid-cols-3 grid-flow-row gap-4 pb-8">
@@ -382,19 +366,6 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
               >
                 {deposits
                   //we filter out one deposits that is used to store none locked community tokens
-                  ?.filter(
-                    (x) =>
-                      x.index !==
-                      deposits.find(
-                        (depo) =>
-                          typeof depo.lockup.kind.none !== 'undefined' &&
-                          depo.mint.publicKey.toBase58() ===
-                            realm?.account.communityMint.toBase58() &&
-                          depo.isUsed &&
-                          !depo.allowClawback &&
-                          depo.isUsed
-                      )?.index
-                  )
                   ?.map((x, idx) => (
                     <DepositCard deposit={x} key={idx}></DepositCard>
                   ))}
