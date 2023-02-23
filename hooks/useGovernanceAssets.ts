@@ -397,6 +397,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,
     },
+    [Instructions.DualFinanceAirdrop]: {
+      name: 'Airdrop',
+      isVisible: canUseTransferInstruction,
+      packageId: PackageEnum.Dual,
+    },
 
     /*
       ███████ ██    ██ ███████ ██████  ██      ███████ ███    ██ ██████
