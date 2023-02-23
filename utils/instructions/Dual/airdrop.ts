@@ -49,8 +49,6 @@ export async function getAirdropInstruction({
             return parseInt(item, 10);
         });
     }
-    console.log(form.treasury.extensions.token!.account.owner!.toBase58());
-    console.log(form.treasury);
     const airdropTransactionContext: AirdropConfigureContext = await airdrop.createConfigMerkleTransactionFromRoot(
         form.treasury.pubkey, // source
         form.treasury.extensions.token!.account.owner!, // authority
