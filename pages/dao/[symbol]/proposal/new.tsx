@@ -125,6 +125,7 @@ import PsyFinanceClaimUnderlyingPostExpiration from './components/instructions/P
 import PsyFinanceExerciseOption from './components/instructions/PsyFinance/ExerciseOption'
 import RevokeGoverningTokens from './components/instructions/SplGov/RevokeGoverningTokens'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
+import SetMintAuthority from './components/instructions/SetMintAuthroity'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -531,6 +532,7 @@ const New = () => {
       [Instructions.AddServiceToDID]: AddServiceToDID,
       [Instructions.RemoveServiceFromDID]: RemoveServiceFromDID,
       [Instructions.RevokeGoverningTokens]: RevokeGoverningTokens,
+      [Instructions.SetMintAuthority]: SetMintAuthority,
     }),
     [governance?.pubkey.toBase58()]
   )

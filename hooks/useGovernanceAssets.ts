@@ -373,7 +373,10 @@ export default function useGovernanceAssets() {
       name: 'Withdraw validator stake',
       packageId: PackageEnum.Common,
     },
-
+    [Instructions.SetMintAuthority]: {
+      name: 'Set Mint Authority',
+      packageId: PackageEnum.Common,
+    },
     /*
       ██████  ██    ██  █████  ██          ███████ ██ ███    ██  █████  ███    ██  ██████ ███████
       ██   ██ ██    ██ ██   ██ ██          ██      ██ ████   ██ ██   ██ ████   ██ ██      ██

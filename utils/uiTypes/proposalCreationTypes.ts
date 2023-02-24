@@ -643,6 +643,7 @@ export enum Instructions {
   AddServiceToDID,
   RemoveServiceFromDID,
   RevokeGoverningTokens,
+  SetMintAuthority,
 }
 
 export type createParams = [
