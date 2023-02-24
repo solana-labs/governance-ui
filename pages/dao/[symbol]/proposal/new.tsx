@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, {
   createContext,
@@ -8,11 +7,7 @@ import React, {
   useState,
 } from 'react'
 import * as yup from 'yup'
-import {
-  ArrowLeftIcon,
-  PlusCircleIcon,
-  XCircleIcon,
-} from '@heroicons/react/outline'
+import { PlusCircleIcon, XCircleIcon } from '@heroicons/react/outline'
 import {
   getInstructionDataFromBase64,
   Governance,
@@ -129,6 +124,7 @@ import PsyFinanceBurnWriterTokenForQuote from './components/instructions/PsyFina
 import PsyFinanceClaimUnderlyingPostExpiration from './components/instructions/PsyFinance/ClaimUnderlyingPostExpiration'
 import PsyFinanceExerciseOption from './components/instructions/PsyFinance/ExerciseOption'
 import RevokeGoverningTokens from './components/instructions/SplGov/RevokeGoverningTokens'
+import PreviousRouteBtn from '@components/PreviousRouteBtn'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -584,12 +580,7 @@ const New = () => {
         }`}
       >
         <>
-          <Link href={fmtUrlWithCluster(`/dao/${symbol}/`)}>
-            <a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">
-              <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
-              Back
-            </a>
-          </Link>
+          <PreviousRouteBtn></PreviousRouteBtn>
           <div className="border-b border-fgd-4 pb-4 pt-2">
             <div className="flex items-center justify-between">
               <h1>

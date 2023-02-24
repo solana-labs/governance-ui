@@ -187,6 +187,7 @@ export async function getTransferInstruction({
         )
       )
     }
+
     const transferIx = Token.createTransferInstruction(
       TOKEN_PROGRAM_ID,
       sourceAccount!,
