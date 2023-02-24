@@ -20,10 +20,10 @@ const NavBar = () => {
           <div className="flex cursor-pointer sm:items-center min-w-[36px]">
             <picture>
               <source
-                srcSet="/img/logotype-realms-blue-white.svg"
+                srcSet="/img/smolLogo.png"
                 media="(min-width: 640px)"
               />
-              <img src="/img/logo-realms.svg" className="w-8 h-8 sm:w-24" />
+              <img src="/img/smolLogo.png" className="w-16 h-16 sm:w-22" />
             </picture>
           </div>
         </Link>

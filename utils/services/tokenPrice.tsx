@@ -4,7 +4,6 @@ import { mergeDeepRight } from 'ramda'
 
 import { notify } from '@utils/notifications'
 import { WSOL_MINT } from '@components/instructions/tools'
-import overrides from 'public/realms/token-overrides.json'
 
 //this service provide prices it is not recommended to get anything more from here besides token name or price.
 //decimals from metadata can be different from the realm on chain one
@@ -35,11 +34,6 @@ class TokenPriceService {
       const tokenList = tokens.filterByClusterSlug('mainnet-beta').getList()
       if (tokenList && tokenList.length) {
         this._tokenList = tokenList.map((token) => {
-          const override = overrides[token.address]
-
-          if (override) {
-            return mergeDeepRight(token, override)
-          }
 
           return token
         })
