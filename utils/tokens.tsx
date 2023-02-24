@@ -28,11 +28,8 @@ import BigNumber from 'bignumber.js'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { NFTWithMeta } from './uiTypes/VotePlugin'
 import { ConnectionContext } from './connection'
-import {
-  HOLAPLEX_GRAPQL_URL_DEVNET,
-  HOLAPLEX_GRAPQL_URL_MAINNET,
-} from '@tools/constants'
 import { I80F48 } from '@blockworks-foundation/mango-v4'
+import { Metaplex } from '@metaplex-foundation/js'
 
 export type TokenAccount = AccountInfo
 export type MintAccount = MintInfo
@@ -380,52 +377,20 @@ export const deserializeMint = (data: Buffer) => {
   return mintInfo as MintInfo
 }
 
-const fetchNftsFromHolaplexIndexer = async (
-  owner: PublicKey,
-  cluster: string
-) => {
-  const result = await fetch(
+const fetchNftsFromHelius = async (owner: PublicKey, cluster: string) => {
+  const endpoint =
     cluster === 'devnet'
-      ? HOLAPLEX_GRAPQL_URL_DEVNET
-      : HOLAPLEX_GRAPQL_URL_MAINNET,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        query: `
-        query nfts($owners: [PublicKey!]) {
-            nfts(
-              owners: $owners,
-               limit: 10000, offset: 0) {
-              name
-              mintAddress
-              address
-              image
-              tokenAccountAddress
-              updateAuthorityAddress
-              collection {
-                creators {
-                  verified
-                  address
-                }
-                mintAddress
-              }
+      ? 'https://rpc-devnet.helius.xyz/?api-key=d1762eb4-cdcf-4a01-8c05-8de3b7703641'
+      : 'https://rpc.helius.xyz/?api-key=d1762eb4-cdcf-4a01-8c05-8de3b7703641'
 
-            }
+  const metaplex = new Metaplex(new Connection(endpoint))
 
-        }
-      `,
-        variables: {
-          owners: [owner.toBase58()],
-        },
-      }),
-    }
-  )
+  const nfts = await metaplex.nfts().findAllByOwner({
+    owner,
+  })
 
-  const body = await result.json()
-  return body.data
+  // @ts-ignore
+  return Promise.all(nfts.map((nft) => metaplex.nfts().load({ metadata: nft })))
 }
 
 export const getNfts = async (
@@ -441,15 +406,31 @@ const getNftsFromHolaplex = async (
   connection: ConnectionContext
 ): Promise<NFTWithMeta[]> => {
   try {
-    const data = await fetchNftsFromHolaplexIndexer(ownerPk, connection.cluster)
-    return data.nfts.map((nft) => {
-      return {
-        ...nft,
-        getAssociatedTokenAccount: async () => {
-          return nft.tokenAccountAddress
-        },
-      }
-    })
+    const resp = await fetchNftsFromHelius(ownerPk, connection.cluster)
+
+    return resp.map((nft) => ({
+      image: nft.json?.image || '',
+      name: nft.json?.name || '',
+      description: nft.json?.description || '',
+      properties: {
+        category: '',
+        files: [],
+      },
+      collection: {
+        mintAddress: nft.collection?.address.toBase58() || '',
+        creators: nft.creators.map((creator) => ({
+          verified: creator.verified,
+          address: creator.address.toBase58(),
+        })),
+        verified: nft.collection?.verified,
+      },
+      mintAddress: nft.collection?.address.toBase58() || '',
+      address: nft.address.toBase58(),
+      tokenAccountAddress: nft.updateAuthorityAddress.toBase58(),
+      getAssociatedTokenAccount: async () => {
+        return nft.updateAuthorityAddress.toBase58()
+      },
+    }))
   } catch (error) {
     notify({
       type: 'error',
