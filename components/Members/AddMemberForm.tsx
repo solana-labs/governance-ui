@@ -71,8 +71,7 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
   const schema = getMintSchema({ form: { ...form, mintAccount }, connection })
 
   const mintMinAmount = mintInfo?.found
-    ? // @ts-expect-error this discrimination fails on 4.6 but not future versions of TS
-      new BigNumber(1).shiftedBy(mintInfo.result.decimals).toNumber()
+    ? new BigNumber(1).shiftedBy(mintInfo.result.decimals).toNumber()
     : 1
 
   const currentPrecision = precision(mintMinAmount)
