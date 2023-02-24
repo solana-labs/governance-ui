@@ -94,8 +94,8 @@ export const SPL_TOKEN_INSTRUCTIONS = {
       accounts: [{ name: 'Mint', important: true }, { name: 'Mint Authority' }],
       getDataUI: async (
         connection: Connection,
-        data: Uint8Array,
-        accounts: AccountMetaData[]
+        data: Uint8Array
+        //accounts: AccountMetaData[]
       ) => {
         interface SetAuthorityInstructionData {
           instruction: TokenInstruction.SetAuthority
