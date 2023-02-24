@@ -129,7 +129,7 @@ export const SPL_TOKEN_INSTRUCTIONS = {
         return (
           <>
             {authorityParams ? (
-              <>
+              <div className="space-x-3">
                 <div>
                   New authority:{' '}
                   {authorityParams.newAuthority.equals(SYSTEM_PROGRAM_ID)
@@ -143,7 +143,7 @@ export const SPL_TOKEN_INSTRUCTIONS = {
                   Authority type:{' '}
                   {authorityTypes[authorityParams.authorityType]}
                 </div>
-              </>
+              </div>
             ) : (
               <div>{JSON.stringify(data)}</div>
             )}
