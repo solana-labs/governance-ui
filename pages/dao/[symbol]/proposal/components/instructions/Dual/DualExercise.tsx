@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useCallback, useState } from 'react'
 import { ProgramAccount, Governance } from '@solana/spl-governance'
 import {
-  UiInstruction,
   DualFinanceExerciseForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
@@ -42,25 +41,27 @@ const DualExercise = ({
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-  function getInstruction(): Promise<UiInstruction> {
+  const schema = getDualFinanceExerciseSchema();
+
+  const getInstruction = useCallback(() => {
     return getExerciseInstruction({
       connection,
       form,
       schema,
       setFormErrors,
       wallet,
-    })
-  }
+    });
+  }, [connection, form, schema, setFormErrors, wallet]);
+  
   useEffect(() => {
-    handleSetInstructions(
-      { governedAccount: governedAccount, getInstruction },
-      index
-    )
-  }, [form])
+    handleSetInstructions({ governedAccount: governedAccount, getInstruction }, index);
+  }, [form, getInstruction, governedAccount, handleSetInstructions, index]);
+  
   useEffect(() => {
-    setGovernedAccount(form.baseTreasury?.governance)
-  }, [form.baseTreasury])
-  const schema = getDualFinanceExerciseSchema()
+    setGovernedAccount(form.baseTreasury?.governance);
+  }, [form.baseTreasury]);
+  
+  
 
   // TODO: Find the name from metaplex from a token lookup once that is
   // connected to the program.

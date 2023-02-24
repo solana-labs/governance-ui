@@ -1,5 +1,5 @@
 import useRealm from '@hooks/useRealm'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useCallback, useMemo, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import {
   getProposalDepositsByDepositPayer,
@@ -343,15 +343,16 @@ const MyProposalsBn = () => {
     })
     getSolDeposits()
   }
-  const getSolDeposits = async () => {
+  const getSolDeposits = useCallback(async () => {
     const solDeposits = await getProposalDepositsByDepositPayer(
       connection,
       realm!.owner,
       wallet!.publicKey!
     )
-
+  
     setProposalsWithDepositedTokens(solDeposits)
-  }
+  }, [connection, realm, setProposalsWithDepositedTokens, wallet])
+  
   useEffect(() => {
     if (
       wallet?.publicKey &&
@@ -361,7 +362,8 @@ const MyProposalsBn = () => {
     ) {
       getSolDeposits()
     }
-  }, [wallet?.publicKey?.toBase58(), modalIsOpen, realmInfo?.programVersion])
+  }, [getSolDeposits, modalIsOpen, realmInfo, wallet?.publicKey])
+  
   useEffect(() => {
     if (wallet?.publicKey && isNftMode && client.client && modalIsOpen) {
       getNftsVoteRecord()

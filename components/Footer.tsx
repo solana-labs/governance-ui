@@ -2,8 +2,6 @@ import Link from 'next/link'
 import cx from 'classnames'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 
-import SocialIcons from '@components/SocialIcons'
-
 const Footer = () => {
   const { REALM } = process.env
 
@@ -56,7 +54,6 @@ const Footer = () => {
         <div
           className={cx('flex', 'flex-col', 'items-center', 'justify-center')}
         >
-          <SocialIcons className="mb-5" />
           <div className="flex flex-col justify-center sm:space-x-2 text-center text-sm opacity-70 sm:flex-row sm:text-sm sm:text-left">
             <div className="flex-shrink-0">
               © 2023 Solana Technology Services LLC
@@ -87,11 +84,11 @@ const Footer = () => {
           href="https://docs.realms.today/"
         >
           <ExternalLinkIcon className="w-4 h-4 mr-2 stroke-current" />
-          <div>Read the Docs</div>
+          <div>Realm Docs</div>
         </a>
 
         <div className="opacity-70">
-          Powered by <span className="font-bold">Solana</span>
+          Powered by <span className="font-bold">Solana and Realms</span>
         </div>
       </div>
     </div>
