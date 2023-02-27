@@ -10,7 +10,6 @@ import {
 } from '@utils/uiTypes/proposalCreationTypes'
 import { WalletAdapter } from '@solana/wallet-adapter-base'
 import { Airdrop, AirdropConfigureContext } from '@dual-finance/airdrop'
-import { Keypair } from '@solana/web3.js'
 import { BN } from '@coral-xyz/anchor'
 import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
 
@@ -65,7 +64,6 @@ export async function getAirdropInstruction({
     return {
       serializedInstruction,
       additionalSerializedInstructions,
-      signers: airdropTransactionContext.signers as Keypair[],
       isValid: true,
       governance: form.treasury?.governance,
     }
