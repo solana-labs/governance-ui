@@ -29,6 +29,7 @@ interface PerpCreateForm {
   oraclePk: string
   name: string
   oracleConfFilter: number
+  maxStalenessSlots: string
   baseDecimals: number
   quoteLotSize: number
   baseLotSize: number
@@ -78,6 +79,7 @@ const PerpCreate = ({
   const [form, setForm] = useState<PerpCreateForm>({
     governedAccount: null,
     oracleConfFilter: 0.1,
+    maxStalenessSlots: '',
     oraclePk: '',
     name: '',
     baseDecimals: 6,
@@ -173,7 +175,10 @@ const PerpCreate = ({
           form.name,
           {
             confFilter: Number(form.oracleConfFilter),
-            maxStalenessSlots: null,
+            maxStalenessSlots:
+              form.maxStalenessSlots !== ''
+                ? Number(form.maxStalenessSlots)
+                : null,
           },
           Number(form.baseDecimals),
           new BN(form.quoteLotSize),
@@ -266,7 +271,6 @@ const PerpCreate = ({
       type: InstructionInputType.INPUT,
       name: 'oraclePk',
     },
-
     {
       label: `Oracle Confidence Filter`,
       subtitle: getAdditionalLabelInfo('confFilter'),
@@ -274,6 +278,14 @@ const PerpCreate = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'oracleConfFilter',
+    },
+    {
+      label: `Max Staleness Slots`,
+      subtitle: getAdditionalLabelInfo('maxStalenessSlots'),
+      initialValue: form.maxStalenessSlots,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'maxStalenessSlots',
     },
     {
       label: 'Base Decimals',

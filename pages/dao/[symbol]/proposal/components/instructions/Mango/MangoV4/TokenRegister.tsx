@@ -25,6 +25,7 @@ interface TokenRegisterForm {
   mintPk: string
   oraclePk: string
   oracleConfFilter: number
+  maxStalenessSlots: string
   name: string
   adjustmentFactor: number
   util0: number
@@ -66,6 +67,7 @@ const TokenRegister = ({
   const [form, setForm] = useState<TokenRegisterForm>({
     governedAccount: null,
     mintPk: '',
+    maxStalenessSlots: '',
     oraclePk: '',
     oracleConfFilter: 0.1,
     name: '',
@@ -113,7 +115,10 @@ const TokenRegister = ({
           form.name,
           {
             confFilter: Number(form.oracleConfFilter),
-            maxStalenessSlots: null,
+            maxStalenessSlots:
+              form.maxStalenessSlots !== ''
+                ? Number(form.maxStalenessSlots)
+                : null,
           },
           {
             adjustmentFactor: Number(form.adjustmentFactor),
@@ -203,6 +208,14 @@ const TokenRegister = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'oracleConfFilter',
+    },
+    {
+      label: `Max Staleness Slots`,
+      subtitle: getAdditionalLabelInfo('maxStalenessSlots'),
+      initialValue: form.maxStalenessSlots,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'maxStalenessSlots',
     },
     {
       label: 'Token Name',

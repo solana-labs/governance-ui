@@ -30,6 +30,7 @@ interface PerpEditForm {
   perp: null | NameMarketIndexVal
   oraclePk: string
   oracleConfFilter: number
+  maxStalenessSlots: number
   baseDecimals: number
   maintBaseAssetWeight: number
   initBaseAssetWeight: number
@@ -63,6 +64,7 @@ const defaultFormValues = {
   perp: null,
   oraclePk: '',
   oracleConfFilter: 0,
+  maxStalenessSlots: 0,
   baseDecimals: 0,
   maintBaseAssetWeight: 0,
   initBaseAssetWeight: 0,
@@ -141,14 +143,28 @@ const PerpEdit = ({
         form.perp!.value
       )!
       const values = getChangedValues<PerpEditForm>(originalFormValues, form)
+      const oracleConfFilter = getNullOrTransform(
+        values.oracleConfFilter,
+        null,
+        Number
+      )
+      const maxStalenessSlots = getNullOrTransform(
+        values.maxStalenessSlots,
+        null,
+        Number
+      )
+      const isThereNeedOfSendingOracleConfig =
+        oracleConfFilter || maxStalenessSlots
       //Mango instruction call and serialize
       const ix = await mangoClient!.program.methods
         .perpEditMarket(
           getNullOrTransform(values.oraclePk, PublicKey),
-          {
-            confFilter: Number(form.oracleConfFilter),
-            maxStalenessSlots: null,
-          },
+          isThereNeedOfSendingOracleConfig
+            ? {
+                confFilter: Number(form.oracleConfFilter),
+                maxStalenessSlots: maxStalenessSlots,
+              }
+            : null,
           getNullOrTransform(values.baseDecimals, null, Number),
           getNullOrTransform(values.maintBaseAssetWeight, null, Number),
           getNullOrTransform(values.initBaseAssetWeight, null, Number),
@@ -242,6 +258,7 @@ const PerpEdit = ({
         ...form,
         oraclePk: currentPerp.oracle.toBase58(),
         oracleConfFilter: currentPerp.oracleConfig.confFilter.toNumber(),
+        maxStalenessSlots: currentPerp.oracleConfig.maxStalenessSlots.toNumber(),
         baseDecimals: currentPerp.baseDecimals,
         maintBaseAssetWeight: currentPerp.maintBaseAssetWeight.toNumber(),
         initBaseAssetWeight: currentPerp.initBaseAssetWeight.toNumber(),
@@ -309,6 +326,14 @@ const PerpEdit = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'oracleConfFilter',
+    },
+    {
+      label: `Max Staleness Slots`,
+      subtitle: getAdditionalLabelInfo('maxStalenessSlots'),
+      initialValue: form.maxStalenessSlots,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'maxStalenessSlots',
     },
     {
       label: 'Base Decimals',

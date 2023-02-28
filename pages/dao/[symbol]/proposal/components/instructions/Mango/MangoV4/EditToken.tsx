@@ -30,6 +30,7 @@ interface EditTokenForm {
   token: null | NamePkVal
   oraclePk: string
   oracleConfFilter: number
+  maxStalenessSlots: number
   mintPk: string
   name: string
   adjustmentFactor: number
@@ -64,6 +65,7 @@ const defaultFormValues = {
   token: null,
   oraclePk: '',
   oracleConfFilter: 0,
+  maxStalenessSlots: 0,
   mintPk: '',
   name: '',
   adjustmentFactor: 0,
@@ -146,23 +148,55 @@ const EditToken = ({
         bank.tokenIndex
       )!
       const values = getChangedValues<EditTokenForm>(originalFormValues, form)
+      const oracleConfFilter = getNullOrTransform(
+        values.oracleConfFilter,
+        null,
+        Number
+      )
+      const maxStalenessSlots = getNullOrTransform(
+        values.maxStalenessSlots,
+        null,
+        Number
+      )
+      const isThereNeedOfSendingOracleConfig =
+        oracleConfFilter || maxStalenessSlots
+
+      const rateConfigs = {
+        adjustmentFactor: getNullOrTransform(
+          values.adjustmentFactor,
+          null,
+          Number
+        ),
+        util0: getNullOrTransform(values.util0, null, Number),
+        rate0: getNullOrTransform(values.rate0, null, Number),
+        util1: getNullOrTransform(values.util1, null, Number),
+        rate1: getNullOrTransform(values.rate1, null, Number),
+        maxRate: getNullOrTransform(values.maxRate, null, Number),
+      }
+      const isThereNeedOfSendingRateConfigs = Object.values(rateConfigs).filter(
+        (x) => x !== null
+      ).length
       //Mango instruction call and serialize
       const ix = await mangoClient!.program.methods
         .tokenEdit(
           getNullOrTransform(values.oraclePk, PublicKey),
-          {
-            confFilter: Number(form.oracleConfFilter),
-            maxStalenessSlots: null,
-          },
+          isThereNeedOfSendingOracleConfig
+            ? {
+                confFilter: Number(form.oracleConfFilter),
+                maxStalenessSlots: maxStalenessSlots,
+              }
+            : null,
           values.groupInsuranceFund,
-          {
-            adjustmentFactor: Number(form.adjustmentFactor),
-            util0: Number(form.util0),
-            rate0: Number(form.rate0),
-            util1: Number(form.util1),
-            rate1: Number(form.rate1),
-            maxRate: Number(form.maxRate),
-          },
+          isThereNeedOfSendingRateConfigs
+            ? {
+                adjustmentFactor: Number(form.adjustmentFactor),
+                util0: Number(form.util0),
+                rate0: Number(form.rate0),
+                util1: Number(form.util1),
+                rate1: Number(form.rate1),
+                maxRate: Number(form.maxRate),
+              }
+            : null,
           getNullOrTransform(values.loanFeeRate, null, Number),
           getNullOrTransform(values.loanOriginationFeeRate, null, Number),
           getNullOrTransform(values.maintAssetWeight, null, Number),
@@ -250,6 +284,7 @@ const EditToken = ({
         ...form,
         oraclePk: currentToken.oracle.toBase58(),
         oracleConfFilter: currentToken.oracleConfig.confFilter.toNumber(),
+        maxStalenessSlots: currentToken.oracleConfig.maxStalenessSlots.toNumber(),
         mintPk: currentToken.mint.toBase58(),
         name: currentToken.name,
         adjustmentFactor: currentToken.adjustmentFactor.toNumber(),
@@ -326,6 +361,14 @@ const EditToken = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'oracleConfFilter',
+    },
+    {
+      label: `Max Staleness Slots`,
+      subtitle: getAdditionalLabelInfo('maxStalenessSlots'),
+      initialValue: form.maxStalenessSlots,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'maxStalenessSlots',
     },
     {
       label: 'Token Name',
