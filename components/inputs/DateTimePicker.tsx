@@ -1,42 +1,59 @@
-import React from 'react'
-import ReactDateTimePicker from 'react-datetime-picker/dist/entry.nostyle'
-import { StyledLabel } from './styles'
+import React, { useState } from 'react'
+import { inputClasses, InputClasses, StyledLabel } from './styles'
 
-const DateTimePicker: React.FC<{
+type DateTimePickerProps = {
   value: Date
   onChange: (value: Date) => void
   minDate: Date
-  disableClock: boolean
   label?: string
-  wrapperClassName?: string
   subtitle?: string
-  required?: boolean
-  clearIcon?: string | null
-  calendarIcon?: string | null
-}> = ({
+  wrapperClassName?: string
+} & InputClasses
+
+const DateTimePicker: React.FC<DateTimePickerProps> = ({
   value,
   onChange,
   minDate,
-  disableClock,
   label,
   wrapperClassName = 'w-full',
   subtitle,
-  required,
-  clearIcon,
-  calendarIcon,
+  className = '',
+  disabled,
+  error,
+  noMaxWidth = false,
+  useDefaultStyle = true,
+  showErrorState = false,
 }) => {
+  const [internalDate, setInternalDate] = useState(
+    value.toISOString().substring(0, value.toISOString().indexOf('T') + 6)
+  )
+  console.log(value, internalDate)
   return (
     <div className={`flex flex-col relative ${wrapperClassName}`}>
       {label && <StyledLabel>{label}</StyledLabel>}
       {subtitle && <p className="text-fgd-3 mb-1 -mt-2">{subtitle}</p>}
-      <ReactDateTimePicker
-        onChange={onChange}
-        value={value}
-        disableClock={disableClock}
-        minDate={minDate}
-        required={required}
-        clearIcon={clearIcon}
-        calendarIcon={calendarIcon}
+      <input
+        className={inputClasses({
+          className,
+          disabled,
+          error,
+          noMaxWidth,
+          useDefaultStyle,
+          showErrorState,
+        })}
+        type="datetime-local"
+        value={internalDate}
+        min={minDate
+          .toISOString()
+          .substring(0, minDate.toISOString().indexOf('T') + 6)}
+        onChange={(evt) => {
+          setInternalDate(evt.target.value)
+          const date = new Date(evt.target.value)
+          if (isFinite(date.getTime())) {
+            onChange(date)
+          }
+        }}
+        step={60}
       />
     </div>
   )

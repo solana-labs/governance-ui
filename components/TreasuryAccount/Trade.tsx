@@ -427,11 +427,9 @@ const Trade: React.FC<TradeProps> = ({ tokenAccount }) => {
             label={'Trade expiration'}
             onChange={(value) => setForm((f) => ({ ...f, reclaimDate: value }))}
             value={form.reclaimDate}
-            disableClock={true}
             minDate={minReclaimDate}
-            required={true}
-            clearIcon={null}
-            calendarIcon={null}
+            error={formErrors['reclaimDate']}
+            noMaxWidth={true}
           />
           <Input
             label={`Limit Price (${destinationToken?.symbol} per ${inputTokenSym})`}
