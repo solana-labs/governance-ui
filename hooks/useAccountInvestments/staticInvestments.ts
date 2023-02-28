@@ -29,6 +29,19 @@ export const getSolInvestments = () => [
     strategyDescription: '',
     createProposalFcn: () => null,
   },
+  {
+    liquidity: 0,
+    protocolSymbol: '',
+    apy: '',
+    protocolName: 'Mango',
+    handledMint: '',
+    handledTokenSymbol: '',
+    handledTokenImgSrc: '',
+    protocolLogoSrc: 'https://alpha.mango.markets/logos/logo-mark.svg',
+    strategyName: 'Trade',
+    strategyDescription: '',
+    createProposalFcn: () => null,
+  },
 ]
 
 export const getTokenInvestments = (tokenImg: string) => [

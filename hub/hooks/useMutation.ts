@@ -15,6 +15,7 @@ import * as RE from '@hub/types/Result';
 
 function convertResponse<Variables = any, A = any, O = any, I = any>(
   type: Type<A, O, I>,
+  //@ts-ignore
   resp: UseMutationState<I, Variables>,
 ): RE.Result<TypeOf<Type<A, O, I>>, CombinedError> {
   if (resp.fetching) {
@@ -62,6 +63,7 @@ export function useMutation<Variables = object, A = any, O = any, I = any>(
     >
   >,
 ] {
+  //@ts-ignore
   const [resp, run] = _useMutation<I, Variables>(query);
   const result = convertResponse<Variables, A, O, I>(responseType, resp);
 

@@ -1,6 +1,6 @@
 import { AccountInfo, PublicKey } from '@solana/web3.js'
 import { AccountLayout } from '@solana/spl-token'
-import { BN } from '@blockworks-foundation/mango-client'
+import { BN } from '@coral-xyz/anchor'
 
 interface TokenAccount {
   amount: BN

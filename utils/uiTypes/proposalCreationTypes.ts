@@ -23,7 +23,6 @@ export enum PackageEnum {
   GoblinGold,
   Identity,
   NftPlugin,
-  MangoMarketV3,
   MangoMarketV4,
   MeanFinance,
   PsyFinance,
@@ -558,7 +557,6 @@ export interface JoinDAOForm {
 export enum Instructions {
   Base64,
   ChangeMakeDonation,
-  ClaimMangoTokens,
   ClaimPendingDeposit,
   ClaimPendingWithdraw,
   Clawback,
@@ -577,9 +575,8 @@ export enum Instructions {
   DepositIntoGoblinGold,
   DepositIntoVolt,
   DepositReserveLiquidityAndObligationCollateral,
-  DepositToMangoAccount,
-  DepositToMangoAccountCsv,
   DifferValidatorStake,
+  DualFinanceAirdrop,
   DualFinanceExercise,
   DualFinanceStakingOption,
   DualFinanceWithdraw,
@@ -594,20 +591,6 @@ export enum Instructions {
   Grant,
   InitSolendObligationAccount,
   JoinDAO,
-  MangoAddOracle,
-  MangoAddSpotMarket,
-  MangoChangeMaxAccounts,
-  MangoChangePerpMarket,
-  MangoChangeQuoteParams,
-  MangoChangeReferralFeeParams,
-  MangoChangeReferralFeeParams2,
-  MangoChangeSpotMarket,
-  MangoCreatePerpMarket,
-  MangoRemoveOracle,
-  MangoRemovePerpMarket,
-  MangoRemoveSpotMarket,
-  MangoSetMarketMode,
-  MangoSwapSpotMarket,
   MangoV4PerpCreate,
   MangoV4PerpEdit,
   MangoV4OpenBookRegisterMarket,
@@ -661,6 +644,7 @@ export enum Instructions {
   AddServiceToDID,
   RemoveServiceFromDID,
   RevokeGoverningTokens,
+  SetMintAuthority,
 }
 
 export type createParams = [
@@ -732,6 +716,12 @@ export interface ValidatorWithdrawStakeForm {
   governedTokenAccount: AssetAccount | undefined
   stakingAccount: StakeAccount | undefined
   amount: number
+}
+
+export interface DualFinanceAirdropForm {
+  root: string
+  amount: number
+  treasury: AssetAccount | undefined
 }
 
 export interface DualFinanceStakingOptionForm {

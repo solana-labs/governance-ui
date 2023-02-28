@@ -40,8 +40,11 @@ const TokenAddBank = ({
   const { mangoGroup, mangoClient } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
-  const governedProgramAccounts = assetAccounts.filter(
-    (x) => x.type === AccountType.SOL
+  const solAccounts = assetAccounts.filter(
+    (x) =>
+      x.type === AccountType.SOL &&
+      mangoGroup?.admin &&
+      x.extensions.transferAddress?.equals(mangoGroup.admin)
   )
   const [tokens, setTokens] = useState<NamePkVal[]>([])
   const shouldBeGoverned = !!(index !== 0 && governance)
@@ -145,7 +148,7 @@ const TokenAddBank = ({
       type: InstructionInputType.GOVERNED_ACCOUNT,
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governance,
-      options: governedProgramAccounts,
+      options: solAccounts,
     },
     {
       label: 'Tokens',

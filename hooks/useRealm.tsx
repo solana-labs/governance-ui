@@ -1,4 +1,3 @@
-import { BN, PublicKey } from '@blockworks-foundation/mango-client'
 import { ProgramAccount, TokenOwnerRecord } from '@solana/spl-governance'
 import { isPublicKey } from '@tools/core/pubkey'
 import { useRouter } from 'next/router'
@@ -31,6 +30,8 @@ import {
 } from './useVotingPlugins'
 import useGatewayPluginStore from '../GatewayPlugin/store/gatewayPluginStore'
 import useSwitchboardPluginStore from 'SwitchboardVotePlugin/store/switchboardStore'
+import { BN } from '@coral-xyz/anchor'
+import { PublicKey } from '@solana/web3.js'
 
 export default function useRealm() {
   const router = useRouter()

@@ -1,4 +1,3 @@
-import { MangoAccount } from '@blockworks-foundation/mango-client'
 import {
   ProgramAccount,
   Realm,
@@ -8,7 +7,6 @@ import {
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
 import { AssetAccount } from '@utils/uiTypes/assets'
-import { MarketStore } from 'Strategies/store/marketStore'
 import {
   CreateSolendStrategyParams,
   SolendSubStrategy,
@@ -75,7 +73,6 @@ export type HandleCreateProposalWithStrategy = (
   proposalIndex: number,
   prerequisiteInstructions: TransactionInstruction[],
   isDraft: boolean,
-  market?: MarketStore,
   client?: VotingClient
 ) => Promise<PublicKey>
 
@@ -89,7 +86,6 @@ export type MNGODepositForm = {
   delegateDeposit: boolean
   delegateAddress: string
   mangoAccountPk: PublicKey | null
-  mangoAccounts: MangoAccount[]
   title: string
   description: string
   proposalCount: number

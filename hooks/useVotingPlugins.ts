@@ -405,7 +405,6 @@ export function useVotingPlugins() {
       ) {
         // Switchboard: don't think we need this
         //handleSetNftRegistrar(nftClient!, realm)
-        console.log('Switchboard')
         if (connected) {
           handleSetCurrentRealmVotingClient({
             client: switchboardClient,

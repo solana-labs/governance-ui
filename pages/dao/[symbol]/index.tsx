@@ -249,8 +249,16 @@ const REALM = () => {
         const ownTokenRecord =
           selectedProposal.proposal.governingTokenMint.toBase58() ===
           realm.account.communityMint.toBase58()
-            ? tokenRecords[wallet.publicKey!.toBase58()]
-            : councilTokenOwnerRecords[wallet.publicKey!.toBase58()]
+            ? tokenRecords[
+                selectedCommunityDelegate
+                  ? selectedCommunityDelegate
+                  : wallet.publicKey!.toBase58()
+              ]
+            : councilTokenOwnerRecords[
+                selectedCouncilDelegate
+                  ? selectedCouncilDelegate
+                  : wallet.publicKey!.toBase58()
+              ]
 
         const instructions: TransactionInstruction[] = []
 

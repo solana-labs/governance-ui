@@ -349,19 +349,33 @@ const MyProposalsBn = () => {
       realm!.owner,
       wallet!.publicKey!
     )
-
-    setProposalsWithDepositedTokens(solDeposits)
+    const filterdSolDeposits = solDeposits.filter((x) => {
+      const proposalState =
+        proposals[x.account.proposal.toBase58()].account.state
+      return (
+        proposalState !== ProposalState.Draft &&
+        proposalState !== ProposalState.Voting &&
+        proposalState !== ProposalState.SigningOff
+      )
+    })
+    setProposalsWithDepositedTokens(filterdSolDeposits)
   }
   useEffect(() => {
     if (
       wallet?.publicKey &&
       modalIsOpen &&
       realmInfo!.programVersion &&
-      realmInfo!.programVersion > 2
+      realmInfo!.programVersion > 2 &&
+      Object.keys(proposals).length
     ) {
       getSolDeposits()
     }
-  }, [wallet?.publicKey?.toBase58(), modalIsOpen, realmInfo?.programVersion])
+  }, [
+    wallet?.publicKey?.toBase58(),
+    modalIsOpen,
+    realmInfo?.programVersion,
+    Object.keys(proposals).length,
+  ])
   useEffect(() => {
     if (wallet?.publicKey && isNftMode && client.client && modalIsOpen) {
       getNftsVoteRecord()

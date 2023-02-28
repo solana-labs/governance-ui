@@ -11,8 +11,8 @@ import useWalletStore from 'stores/useWalletStore'
 import { FORM_NAME as MULTISIG_WALLET_FORM } from 'pages/realms/new/multisig'
 import { FORM_NAME as COMMUNITY_TOKEN_FORM } from 'pages/realms/new/community-token'
 import { useProgramVersionByIdQuery } from '@hooks/queries/useProgramVersionQuery'
-import { PublicKey } from '@blockworks-foundation/mango-client'
 import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
+import { PublicKey } from '@solana/web3.js'
 
 export const Section = ({ children }) => {
   return (

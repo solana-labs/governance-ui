@@ -98,7 +98,6 @@ function RealmsGrid({
   }, [cluster])
 
   const onSortEnd = (oldIndex: number, newIndex: number) => {
-    console.log(arrayMove(gridRealms, oldIndex, newIndex))
     setGridRealms((array) => arrayMove(array, oldIndex, newIndex))
     localStorage.setItem(
       STORAGE_REALMS,

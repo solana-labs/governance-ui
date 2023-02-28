@@ -16,6 +16,7 @@ import ConvertToStSol from '@components/TreasuryAccount/ConvertToStSol'
 import Trade from '@components/TreasuryAccount/Trade'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useWalletStore from 'stores/useWalletStore'
+import MangoModal from '@components/TreasuryAccount/MangoModal'
 
 interface Props {
   className?: string
@@ -37,7 +38,7 @@ export default function Investments(props: Props) {
   ] = useState<ActiveInvestment | null>(null)
 
   const [alternativeInvestment, setAlternativeInvestment] = useState<
-    'Marinade' | 'Lido' | 'Poseidon' | null
+    'Marinade' | 'Lido' | 'Poseidon' | 'Mango' | null
   >(null)
 
   const investments = useAccountInvestments({
@@ -141,6 +142,7 @@ export default function Investments(props: Props) {
                       switch (investment.protocolName) {
                         case 'Marinade':
                         case 'Lido':
+                        case 'Mango':
                         case 'Poseidon': {
                           setAlternativeInvestment(investment.protocolName)
                           setProposedInvestment(null)
@@ -180,8 +182,6 @@ export default function Investments(props: Props) {
           {proposedInvestment && (
             <DepositModal
               governedTokenAccount={props.asset.raw}
-              mangoAccounts={investments.data.mangoAccounts}
-              currentPosition={proposedInvestment.investedAmount}
               apy={proposedInvestment.apy}
               handledMint={proposedInvestment.handledMint}
               onClose={() => {
@@ -194,6 +194,15 @@ export default function Investments(props: Props) {
               strategyName={proposedInvestment.strategyName}
               createProposalFcn={proposedInvestment.createProposalFcn}
             />
+          )}
+          {alternativeInvestment === 'Mango' && (
+            <Modal
+              isOpen
+              sizeClassName="sm:max-w-3xl"
+              onClose={() => setAlternativeInvestment(null)}
+            >
+              <MangoModal account={props.asset.raw}></MangoModal>
+            </Modal>
           )}
           {alternativeInvestment === 'Marinade' && (
             <Modal
