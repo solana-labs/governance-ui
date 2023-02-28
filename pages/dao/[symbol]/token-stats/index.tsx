@@ -51,6 +51,8 @@ const VestingVsTime = dynamic(
 const isBetween = require('dayjs/plugin/isBetween')
 dayjs.extend(isBetween)
 
+const mainMangoVaultPk = 'Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z'
+
 const LockTokenStats = () => {
   const walletsPerPage = 10
   const pagination = useRef<{ setPage: (val) => void }>(null)
@@ -114,12 +116,14 @@ const LockTokenStats = () => {
   const mngoValut = governedTokenAccounts.find(
     (x) =>
       x.extensions.mint?.publicKey.toBase58() ===
-      realm?.account.communityMint.toBase58()
+        realm?.account.communityMint.toBase58() &&
+      x.extensions.transferAddress?.toBase58() === mainMangoVaultPk
   )
   const mngoLocked = depositsWithWallets.reduce(
     (acc, curr) => acc.add(curr.deposit.amountDepositedNative),
     new BN(0)
   )
+
   const circulatingSupply =
     mngoValut && mint
       ? mint.supply.sub(mngoValut.extensions.amount!).sub(mngoLocked)

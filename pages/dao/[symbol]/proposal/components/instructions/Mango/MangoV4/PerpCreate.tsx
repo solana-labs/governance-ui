@@ -36,9 +36,9 @@ interface PerpCreateForm {
   initBaseAssetWeight: number
   maintBaseLiabWeight: number
   initBaseLiabWeight: number
-  maintPnlAssetWeight: number
-  initPnlAssetWeight: number
-  liquidationFee: number
+  maintOverallAssetWeight: number
+  initOverallAssetWeight: number
+  baseLiquidationFee: number
   makerFee: number
   takerFee: number
   feePenalty: number
@@ -52,6 +52,7 @@ interface PerpCreateForm {
   settleTokenIndex: number
   settlePnlLimitFactor: number
   settlePnlLimitWindowSize: number
+  positivePnlLiquidationFee: number
 }
 
 const PerpCreate = ({
@@ -86,9 +87,9 @@ const PerpCreate = ({
     initBaseAssetWeight: 0.95,
     maintBaseLiabWeight: 1.025,
     initBaseLiabWeight: 1.05,
-    maintPnlAssetWeight: 1,
-    initPnlAssetWeight: 1,
-    liquidationFee: 0.0125,
+    maintOverallAssetWeight: 1,
+    initOverallAssetWeight: 1,
+    baseLiquidationFee: 0.0125,
     makerFee: -0.0001,
     takerFee: 0.0004,
     feePenalty: 5,
@@ -102,6 +103,7 @@ const PerpCreate = ({
     settleTokenIndex: 0,
     settlePnlLimitFactor: 1.0,
     settlePnlLimitWindowSize: 2 * 60 * 60,
+    positivePnlLiquidationFee: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -180,9 +182,9 @@ const PerpCreate = ({
           Number(form.initBaseAssetWeight),
           Number(form.maintBaseLiabWeight),
           Number(form.initBaseLiabWeight),
-          Number(form.maintPnlAssetWeight),
-          Number(form.initPnlAssetWeight),
-          Number(form.liquidationFee),
+          Number(form.maintOverallAssetWeight),
+          Number(form.initOverallAssetWeight),
+          Number(form.baseLiquidationFee),
           Number(form.makerFee),
           Number(form.takerFee),
           Number(form.minFunding),
@@ -195,7 +197,8 @@ const PerpCreate = ({
           Number(form.settleFeeFractionLowHealth),
           Number(form.settleTokenIndex),
           Number(form.settlePnlLimitFactor),
-          new BN(form.settlePnlLimitWindowSize)
+          new BN(form.settlePnlLimitWindowSize),
+          Number(form.positivePnlLiquidationFee)
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -304,12 +307,20 @@ const PerpCreate = ({
       name: 'maintBaseAssetWeight',
     },
     {
-      label: `Init Base Asset Weight`,
-      subtitle: getAdditionalLabelInfo('initBaseAssetWeight'),
-      initialValue: form.initBaseAssetWeight,
+      label: `Maintenance Base Liab Weight`,
+      subtitle: getAdditionalLabelInfo('maintBaseLiabWeight'),
+      initialValue: form.maintBaseLiabWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
-      name: 'initBaseAssetWeight',
+      name: 'maintBaseLiabWeight',
+    },
+    {
+      label: `Maint Overall Asset Weight`,
+      subtitle: getAdditionalLabelInfo('maintOverallAssetWeight'),
+      initialValue: form.maintOverallAssetWeight,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'maintOverallAssetWeight',
     },
     {
       label: `Init Base Liab Weight`,
@@ -320,36 +331,28 @@ const PerpCreate = ({
       name: 'initBaseLiabWeight',
     },
     {
-      label: `Maintenance Base Liab Weight`,
-      subtitle: getAdditionalLabelInfo('maintBaseLiabWeight'),
-      initialValue: form.maintBaseLiabWeight,
+      label: `Init Base Asset Weight`,
+      subtitle: getAdditionalLabelInfo('initBaseAssetWeight'),
+      initialValue: form.initBaseAssetWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
-      name: 'maintBaseLiabWeight',
+      name: 'initBaseAssetWeight',
     },
     {
-      label: `Maintenance Pnl Asset Weight`,
-      subtitle: getAdditionalLabelInfo('maintPnlAssetWeight'),
-      initialValue: form.maintPnlAssetWeight,
+      label: `Base Liquidation Fee`,
+      subtitle: getAdditionalLabelInfo('baseLiquidationFee'),
+      initialValue: form.baseLiquidationFee,
       type: InstructionInputType.INPUT,
       inputType: 'number',
-      name: 'maintPnlAssetWeight',
+      name: 'baseLiquidationFee',
     },
     {
-      label: `Liquidation Fee`,
-      subtitle: getAdditionalLabelInfo('liquidationFee'),
-      initialValue: form.liquidationFee,
+      label: `Init Overall Asset Weight`,
+      subtitle: getAdditionalLabelInfo('initOverallAssetWeight'),
+      initialValue: form.initOverallAssetWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
-      name: 'liquidationFee',
-    },
-    {
-      label: `Init Pnl Asset Weight`,
-      subtitle: getAdditionalLabelInfo('initPnlAssetWeight'),
-      initialValue: form.initPnlAssetWeight,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'initPnlAssetWeight',
+      name: 'initOverallAssetWeight',
     },
     {
       label: `Maker Fee`,
@@ -453,6 +456,14 @@ const PerpCreate = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'impactQuantity',
+    },
+    {
+      label: `Positive Pnl Liquidation Fee`,
+      subtitle: getAdditionalLabelInfo('positivePnlLiquidationFee'),
+      initialValue: form.positivePnlLiquidationFee,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'positivePnlLiquidationFee',
     },
   ]
   return (

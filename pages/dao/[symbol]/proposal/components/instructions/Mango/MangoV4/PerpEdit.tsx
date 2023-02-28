@@ -35,9 +35,9 @@ interface PerpEditForm {
   initBaseAssetWeight: number
   maintBaseLiabWeight: number
   initBaseLiabWeight: number
-  maintPnlAssetWeight: number
-  initPnlAssetWeight: number
-  liquidationFee: number
+  maintOverallAssetWeight: number
+  initOverallAssetWeight: number
+  baseLiquidationFee: number
   makerFee: number
   takerFee: number
   feePenalty: number
@@ -55,6 +55,7 @@ interface PerpEditForm {
   settlePnlLimitWindowSize: number
   reduceOnly: boolean
   resetStablePrice: boolean
+  positivePnlLiquidationFee: number
 }
 
 const defaultFormValues = {
@@ -67,9 +68,9 @@ const defaultFormValues = {
   initBaseAssetWeight: 0,
   maintBaseLiabWeight: 0,
   initBaseLiabWeight: 0,
-  maintPnlAssetWeight: 0,
-  initPnlAssetWeight: 0,
-  liquidationFee: 0,
+  maintOverallAssetWeight: 0,
+  initOverallAssetWeight: 0,
+  baseLiquidationFee: 0,
   makerFee: 0,
   takerFee: 0,
   feePenalty: 0,
@@ -87,6 +88,7 @@ const defaultFormValues = {
   settlePnlLimitWindowSize: 0,
   reduceOnly: false,
   resetStablePrice: false,
+  positivePnlLiquidationFee: 0,
 }
 
 const PerpEdit = ({
@@ -152,9 +154,9 @@ const PerpEdit = ({
           getNullOrTransform(values.initBaseAssetWeight, null, Number),
           getNullOrTransform(values.maintBaseLiabWeight, null, Number),
           getNullOrTransform(values.initBaseLiabWeight, null, Number),
-          getNullOrTransform(values.maintPnlAssetWeight, null, Number),
-          getNullOrTransform(values.initPnlAssetWeight, null, Number),
-          getNullOrTransform(values.liquidationFee, null, Number),
+          getNullOrTransform(values.maintOverallAssetWeight, null, Number),
+          getNullOrTransform(values.initOverallAssetWeight, null, Number),
+          getNullOrTransform(values.baseLiquidationFee, null, Number),
           getNullOrTransform(values.makerFee, null, Number),
           getNullOrTransform(values.takerFee, null, Number),
           getNullOrTransform(values.minFunding, null, Number),
@@ -175,7 +177,8 @@ const PerpEdit = ({
           getNullOrTransform(values.settlePnlLimitFactor, null, Number),
           getNullOrTransform(values.settlePnlLimitWindowSize, BN),
           values.reduceOnly,
-          values.resetStablePrice
+          values.resetStablePrice,
+          getNullOrTransform(values.positivePnlLiquidationFee, null, Number)
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -244,9 +247,9 @@ const PerpEdit = ({
         initBaseAssetWeight: currentPerp.initBaseAssetWeight.toNumber(),
         maintBaseLiabWeight: currentPerp.maintBaseLiabWeight.toNumber(),
         initBaseLiabWeight: currentPerp.initBaseLiabWeight.toNumber(),
-        maintPnlAssetWeight: currentPerp.maintPnlAssetWeight.toNumber(),
-        initPnlAssetWeight: currentPerp.initPnlAssetWeight.toNumber(),
-        liquidationFee: currentPerp.liquidationFee.toNumber(),
+        maintOverallAssetWeight: currentPerp.maintOverallAssetWeight.toNumber(),
+        initOverallAssetWeight: currentPerp.initOverallAssetWeight.toNumber(),
+        liquidationFee: currentPerp.baseLiquidationFee.toNumber(),
         makerFee: currentPerp.makerFee.toNumber(),
         takerFee: currentPerp.takerFee.toNumber(),
         feePenalty: currentPerp.feePenalty,
@@ -266,6 +269,9 @@ const PerpEdit = ({
         settlePnlLimitWindowSize: currentPerp.settlePnlLimitWindowSizeTs.toNumber(),
         reduceOnly: currentPerp.reduceOnly,
         resetStablePrice: false,
+        positivePnlLiquidationFee:
+          //@ts-ignore
+          currentPerp.positivePnlLiquidationFee?.toNumber() || 0,
       }
       setForm({
         ...vals,
@@ -336,20 +342,20 @@ const PerpEdit = ({
       name: 'maintBaseAssetWeight',
     },
     {
-      label: `Init Base Asset Weight`,
-      subtitle: getAdditionalLabelInfo('initBaseAssetWeight'),
-      initialValue: form.initBaseAssetWeight,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'initBaseAssetWeight',
-    },
-    {
       label: `Maintenance Base Liab Weight`,
       subtitle: getAdditionalLabelInfo('maintBaseLiabWeight'),
       initialValue: form.maintBaseLiabWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'maintBaseLiabWeight',
+    },
+    {
+      label: `Maint Overall Asset Weight`,
+      subtitle: getAdditionalLabelInfo('maintOverallAssetWeight'),
+      initialValue: form.maintOverallAssetWeight,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'maintOverallAssetWeight',
     },
     {
       label: `Init Base Liab Weight`,
@@ -360,28 +366,29 @@ const PerpEdit = ({
       name: 'initBaseLiabWeight',
     },
     {
-      label: `Maintenance Pnl Asset Weight`,
-      subtitle: getAdditionalLabelInfo('maintPnlAssetWeight'),
-      initialValue: form.maintPnlAssetWeight,
+      label: `Init Base Asset Weight`,
+      subtitle: getAdditionalLabelInfo('initBaseAssetWeight'),
+      initialValue: form.initBaseAssetWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
-      name: 'maintPnlAssetWeight',
+      name: 'initBaseAssetWeight',
+    },
+
+    {
+      label: `Base Liquidation Fee`,
+      subtitle: getAdditionalLabelInfo('baseLiquidationFee'),
+      initialValue: form.baseLiquidationFee,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'baseLiquidationFee',
     },
     {
-      label: `Liquidation Fee`,
-      subtitle: getAdditionalLabelInfo('liquidationFee'),
-      initialValue: form.liquidationFee,
+      label: `Init Overall Asset Weight`,
+      subtitle: getAdditionalLabelInfo('initOverallAssetWeight'),
+      initialValue: form.initOverallAssetWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
-      name: 'liquidationFee',
-    },
-    {
-      label: `Init Pnl Asset Weight`,
-      subtitle: getAdditionalLabelInfo('initPnlAssetWeight'),
-      initialValue: form.initPnlAssetWeight,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'initPnlAssetWeight',
+      name: 'initOverallAssetWeight',
     },
     {
       label: `Maker Fee`,
@@ -499,6 +506,14 @@ const PerpEdit = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'impactQuantity',
+    },
+    {
+      label: `Positive Pnl Liquidation Fee`,
+      subtitle: getAdditionalLabelInfo('positivePnlLiquidationFee'),
+      initialValue: form.positivePnlLiquidationFee,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'positivePnlLiquidationFee',
     },
   ]
   return (
