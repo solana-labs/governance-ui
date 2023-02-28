@@ -324,7 +324,6 @@ export async function getInstructionDescriptor(
   } else {
     descriptors = INSTRUCTION_DESCRIPTORS[instruction.programId.toBase58()]
   }
-  console.log('instruction descriptor', instruction.data[0])
 
   // Make it work for program with one instruction like ATA program
   // and for the one with multiple instructions
