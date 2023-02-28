@@ -336,20 +336,20 @@ const PerpEdit = ({
       name: 'maintBaseAssetWeight',
     },
     {
-      label: `Init Base Asset Weight`,
-      subtitle: getAdditionalLabelInfo('initBaseAssetWeight'),
-      initialValue: form.initBaseAssetWeight,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'initBaseAssetWeight',
-    },
-    {
       label: `Maintenance Base Liab Weight`,
       subtitle: getAdditionalLabelInfo('maintBaseLiabWeight'),
       initialValue: form.maintBaseLiabWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'maintBaseLiabWeight',
+    },
+    {
+      label: `Maintenance Pnl Asset Weight`,
+      subtitle: getAdditionalLabelInfo('maintPnlAssetWeight'),
+      initialValue: form.maintPnlAssetWeight,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'maintPnlAssetWeight',
     },
     {
       label: `Init Base Liab Weight`,
@@ -360,13 +360,14 @@ const PerpEdit = ({
       name: 'initBaseLiabWeight',
     },
     {
-      label: `Maintenance Pnl Asset Weight`,
-      subtitle: getAdditionalLabelInfo('maintPnlAssetWeight'),
-      initialValue: form.maintPnlAssetWeight,
+      label: `Init Base Asset Weight`,
+      subtitle: getAdditionalLabelInfo('initBaseAssetWeight'),
+      initialValue: form.initBaseAssetWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
-      name: 'maintPnlAssetWeight',
+      name: 'initBaseAssetWeight',
     },
+
     {
       label: `Liquidation Fee`,
       subtitle: getAdditionalLabelInfo('liquidationFee'),
