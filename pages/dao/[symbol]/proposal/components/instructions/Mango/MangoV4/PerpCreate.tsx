@@ -52,6 +52,7 @@ interface PerpCreateForm {
   settleTokenIndex: number
   settlePnlLimitFactor: number
   settlePnlLimitWindowSize: number
+  positivePnlLiquidationFee: number
 }
 
 const PerpCreate = ({
@@ -102,6 +103,7 @@ const PerpCreate = ({
     settleTokenIndex: 0,
     settlePnlLimitFactor: 1.0,
     settlePnlLimitWindowSize: 2 * 60 * 60,
+    positivePnlLiquidationFee: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -195,7 +197,8 @@ const PerpCreate = ({
           Number(form.settleFeeFractionLowHealth),
           Number(form.settleTokenIndex),
           Number(form.settlePnlLimitFactor),
-          new BN(form.settlePnlLimitWindowSize)
+          new BN(form.settlePnlLimitWindowSize),
+          Number(form.positivePnlLiquidationFee)
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -453,6 +456,14 @@ const PerpCreate = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'impactQuantity',
+    },
+    {
+      label: `Positive Pnl Liquidation Fee`,
+      subtitle: getAdditionalLabelInfo('positivePnlLiquidationFee'),
+      initialValue: form.positivePnlLiquidationFee,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'positivePnlLiquidationFee',
     },
   ]
   return (

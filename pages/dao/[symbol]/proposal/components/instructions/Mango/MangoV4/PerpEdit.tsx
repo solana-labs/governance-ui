@@ -55,6 +55,7 @@ interface PerpEditForm {
   settlePnlLimitWindowSize: number
   reduceOnly: boolean
   resetStablePrice: boolean
+  positivePnlLiquidationFee: number
 }
 
 const defaultFormValues = {
@@ -87,6 +88,7 @@ const defaultFormValues = {
   settlePnlLimitWindowSize: 0,
   reduceOnly: false,
   resetStablePrice: false,
+  positivePnlLiquidationFee: 0,
 }
 
 const PerpEdit = ({
@@ -175,7 +177,8 @@ const PerpEdit = ({
           getNullOrTransform(values.settlePnlLimitFactor, null, Number),
           getNullOrTransform(values.settlePnlLimitWindowSize, BN),
           values.reduceOnly,
-          values.resetStablePrice
+          values.resetStablePrice,
+          getNullOrTransform(values.positivePnlLiquidationFee, null, Number)
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -266,6 +269,9 @@ const PerpEdit = ({
         settlePnlLimitWindowSize: currentPerp.settlePnlLimitWindowSizeTs.toNumber(),
         reduceOnly: currentPerp.reduceOnly,
         resetStablePrice: false,
+        positivePnlLiquidationFee:
+          //@ts-ignore
+          currentPerp.positivePnlLiquidationFee?.toNumber() || 0,
       }
       setForm({
         ...vals,
@@ -500,6 +506,14 @@ const PerpEdit = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'impactQuantity',
+    },
+    {
+      label: `Positive Pnl Liquidation Fee`,
+      subtitle: getAdditionalLabelInfo('positivePnlLiquidationFee'),
+      initialValue: form.positivePnlLiquidationFee,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'positivePnlLiquidationFee',
     },
   ]
   return (
