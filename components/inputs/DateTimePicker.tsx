@@ -27,7 +27,6 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
   const [internalDate, setInternalDate] = useState(
     value.toISOString().substring(0, value.toISOString().indexOf('T') + 6)
   )
-  console.log(value, internalDate)
   return (
     <div className={`flex flex-col relative ${wrapperClassName}`}>
       {label && <StyledLabel>{label}</StyledLabel>}
