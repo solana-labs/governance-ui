@@ -123,7 +123,7 @@ const LockTokenStats = () => {
     (acc, curr) => acc.add(curr.deposit.amountDepositedNative),
     new BN(0)
   )
-  console.log(mngoValut)
+
   const circulatingSupply =
     mngoValut && mint
       ? mint.supply.sub(mngoValut.extensions.amount!).sub(mngoLocked)
