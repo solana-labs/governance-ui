@@ -36,9 +36,9 @@ interface PerpCreateForm {
   initBaseAssetWeight: number
   maintBaseLiabWeight: number
   initBaseLiabWeight: number
-  maintPnlAssetWeight: number
-  initPnlAssetWeight: number
-  liquidationFee: number
+  maintOverallAssetWeight: number
+  initOverallAssetWeight: number
+  baseLiquidationFee: number
   makerFee: number
   takerFee: number
   feePenalty: number
@@ -86,9 +86,9 @@ const PerpCreate = ({
     initBaseAssetWeight: 0.95,
     maintBaseLiabWeight: 1.025,
     initBaseLiabWeight: 1.05,
-    maintPnlAssetWeight: 1,
-    initPnlAssetWeight: 1,
-    liquidationFee: 0.0125,
+    maintOverallAssetWeight: 1,
+    initOverallAssetWeight: 1,
+    baseLiquidationFee: 0.0125,
     makerFee: -0.0001,
     takerFee: 0.0004,
     feePenalty: 5,
@@ -180,9 +180,9 @@ const PerpCreate = ({
           Number(form.initBaseAssetWeight),
           Number(form.maintBaseLiabWeight),
           Number(form.initBaseLiabWeight),
-          Number(form.maintPnlAssetWeight),
-          Number(form.initPnlAssetWeight),
-          Number(form.liquidationFee),
+          Number(form.maintOverallAssetWeight),
+          Number(form.initOverallAssetWeight),
+          Number(form.baseLiquidationFee),
           Number(form.makerFee),
           Number(form.takerFee),
           Number(form.minFunding),
@@ -312,12 +312,12 @@ const PerpCreate = ({
       name: 'maintBaseLiabWeight',
     },
     {
-      label: `Maintenance Pnl Asset Weight`,
-      subtitle: getAdditionalLabelInfo('maintPnlAssetWeight'),
-      initialValue: form.maintPnlAssetWeight,
+      label: `Maint Overall Asset Weight`,
+      subtitle: getAdditionalLabelInfo('maintOverallAssetWeight'),
+      initialValue: form.maintOverallAssetWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
-      name: 'maintPnlAssetWeight',
+      name: 'maintOverallAssetWeight',
     },
     {
       label: `Init Base Liab Weight`,
@@ -336,20 +336,20 @@ const PerpCreate = ({
       name: 'initBaseAssetWeight',
     },
     {
-      label: `Liquidation Fee`,
-      subtitle: getAdditionalLabelInfo('liquidationFee'),
-      initialValue: form.liquidationFee,
+      label: `Base Liquidation Fee`,
+      subtitle: getAdditionalLabelInfo('baseLiquidationFee'),
+      initialValue: form.baseLiquidationFee,
       type: InstructionInputType.INPUT,
       inputType: 'number',
-      name: 'liquidationFee',
+      name: 'baseLiquidationFee',
     },
     {
-      label: `Init Pnl Asset Weight`,
-      subtitle: getAdditionalLabelInfo('initPnlAssetWeight'),
-      initialValue: form.initPnlAssetWeight,
+      label: `Init Overall Asset Weight`,
+      subtitle: getAdditionalLabelInfo('initOverallAssetWeight'),
+      initialValue: form.initOverallAssetWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
-      name: 'initPnlAssetWeight',
+      name: 'initOverallAssetWeight',
     },
     {
       label: `Maker Fee`,
