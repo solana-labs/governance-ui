@@ -32,7 +32,7 @@ export async function getAirdropInstruction({
 
   const serializedInstruction = ''
   const additionalSerializedInstructions: string[] = []
-  if (isValid && form.treasury && wallet?.publicKey && form.treasury.extensions.mint?.account.decimals) {
+  if (isValid && form.treasury && wallet?.publicKey && form.treasury.extensions.mint?.account.decimals !== undefined) {
     const airdrop = new Airdrop(connection.endpoint)
 
     const amountNatural: BN  = getMintNaturalAmountFromDecimalAsBN(
