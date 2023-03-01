@@ -102,7 +102,7 @@ const PerpCreate = ({
     settleFeeFractionLowHealth: 0.01,
     settleTokenIndex: 0,
     settlePnlLimitFactor: 1.0,
-    settlePnlLimitWindowSize: 2 * 60 * 60,
+    settlePnlLimitWindowSize: 60 * 60,
     positivePnlLiquidationFee: 0,
   })
   const [formErrors, setFormErrors] = useState({})

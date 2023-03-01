@@ -1,5 +1,5 @@
 import { MangoClient } from '@blockworks-foundation/mango-v4'
-import { AnchorProvider, BorshInstructionCoder } from '@coral-xyz/anchor'
+import { AnchorProvider, BN, BorshInstructionCoder } from '@coral-xyz/anchor'
 import { Wallet } from '@marinade.finance/marinade-ts-sdk'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 // import { snakeCase } from 'snake-case'
@@ -354,7 +354,12 @@ const getArgs = async (connection: Connection, data: Uint8Array) => {
   for (const key of Object.keys(decodedInstructionData)) {
     const val = decodedInstructionData[key]
     if (val !== null) {
-      if (typeof val === 'object' && !Array.isArray(val)) {
+      console.log(val)
+      if (
+        typeof val === 'object' &&
+        !Array.isArray(val) &&
+        !(val instanceof BN)
+      ) {
         for (const innerKey of Object.keys(val)) {
           const innerVal = val[innerKey]
           args[`${key}.${innerKey}`] = innerVal
