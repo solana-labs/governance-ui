@@ -81,7 +81,10 @@ const OpenBookRegisterMarket = ({
         .accounts({
           group: mangoGroup!.publicKey,
           admin: form.governedAccount.extensions.transferAddress,
-          serumProgram: OPENBOOK_PROGRAM_ID[connection.cluster],
+          serumProgram:
+            OPENBOOK_PROGRAM_ID[
+              connection.cluster === 'mainnet' ? 'mainnet-beta' : 'devnet'
+            ],
           serumMarketExternal: new PublicKey(form.openBookMarketExternalPk),
           baseBank: mangoGroup!.getFirstBankByMint(
             new PublicKey(form.baseBankMintPk)
