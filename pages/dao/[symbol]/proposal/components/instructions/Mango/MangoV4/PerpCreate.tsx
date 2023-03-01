@@ -109,10 +109,7 @@ const PerpCreate = ({
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
-  const handleSetForm = ({ propertyName, value }) => {
-    setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
-  }
+
   const validateInstruction = async (): Promise<boolean> => {
     const { isValid, validationErrors } = await isFormValid(schema, form)
     setFormErrors(validationErrors)
@@ -132,7 +129,10 @@ const PerpCreate = ({
       const bids = new Keypair()
       const asks = new Keypair()
       const eventQueue = new Keypair()
-      const perpMarketIndex = mangoGroup!.perpMarketsMapByName.size
+      const perpMarketIndex =
+        mangoGroup!.perpMarketsMapByMarketIndex.size === 0
+          ? 0
+          : Math.max(...[...mangoGroup!.perpMarketsMapByMarketIndex.keys()]) + 1
       const bookSideSize = mangoClient!.program.coder.accounts.size(
         (mangoClient!.program.account.bookSide as any)._idlAccount
       )
@@ -229,13 +229,7 @@ const PerpCreate = ({
     }
     return obj
   }
-  useEffect(() => {
-    handleSetForm({
-      propertyName: 'programId',
-      value: programId?.toString(),
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [realmInfo?.programId])
+
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
