@@ -357,7 +357,8 @@ const getArgs = async (connection: Connection, data: Uint8Array) => {
       if (
         typeof val === 'object' &&
         !Array.isArray(val) &&
-        !(val instanceof BN)
+        !(val instanceof BN) &&
+        !(val instanceof PublicKey)
       ) {
         for (const innerKey of Object.keys(val)) {
           const innerVal = val[innerKey]
