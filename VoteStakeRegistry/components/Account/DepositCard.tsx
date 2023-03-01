@@ -164,7 +164,9 @@ const DepositCard = ({
         <div className="flex flex-row flex-wrap">
           <CardLabel
             label="Lockup Type"
-            value={typeName.charAt(0).toUpperCase() + typeName.slice(1)}
+            value={`${typeName.charAt(0).toUpperCase() + typeName.slice(1)} ${
+              isVest ? `(${type})` : ''
+            }`}
           />
           <CardLabel
             label="Allow dao to clawback"
@@ -187,7 +189,11 @@ const DepositCard = ({
                 `${getMintDecimalAmount(
                   deposit.mint.account,
                   deposit.vestingRate
-                ).toFormat(0)} p/mo`
+                ).toFormat(0)} ${
+                  typeof deposit.lockup.kind.monthly !== 'undefined'
+                    ? 'p/mo'
+                    : 'p/d'
+                }`
               }
             />
           )}
