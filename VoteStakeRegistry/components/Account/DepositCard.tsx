@@ -126,8 +126,8 @@ const DepositCard = ({
     deposit.currentlyLocked.add(deposit.available)
   )
   const type = Object.keys(deposit.lockup.kind)[0] as LockupType
-  const typeName = type !== 'monthly' ? type : 'Vested'
-  const isVest = type === 'monthly'
+  const isVest = type === 'monthly' || type === 'daily'
+  const typeName = !isVest ? type : 'Vested'
   const isRealmCommunityMint =
     deposit.mint.publicKey.toBase58() ===
     realm?.account.communityMint.toBase58()
@@ -164,7 +164,9 @@ const DepositCard = ({
         <div className="flex flex-row flex-wrap">
           <CardLabel
             label="Lockup Type"
-            value={typeName.charAt(0).toUpperCase() + typeName.slice(1)}
+            value={`${typeName.charAt(0).toUpperCase() + typeName.slice(1)} ${
+              isVest ? `(${type})` : ''
+            }`}
           />
           <CardLabel
             label="Allow dao to clawback"
@@ -187,7 +189,11 @@ const DepositCard = ({
                 `${getMintDecimalAmount(
                   deposit.mint.account,
                   deposit.vestingRate
-                ).toFormat(0)} p/mo`
+                ).toFormat(0)} ${
+                  typeof deposit.lockup.kind.monthly !== 'undefined'
+                    ? 'p/mo'
+                    : 'p/d'
+                }`
               }
             />
           )}

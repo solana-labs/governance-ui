@@ -19,7 +19,7 @@ export interface votingMint {
   mint: PublicKey
 }
 
-export type LockupType = 'none' | 'monthly' | 'cliff' | 'constant' | 'daily' //there is also daily type but not used on ui yet
+export type LockupType = 'none' | 'monthly' | 'cliff' | 'constant' | 'daily'
 export interface Registrar {
   governanceProgramId: PublicKey
   realm: PublicKey
