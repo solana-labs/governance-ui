@@ -126,8 +126,8 @@ const DepositCard = ({
     deposit.currentlyLocked.add(deposit.available)
   )
   const type = Object.keys(deposit.lockup.kind)[0] as LockupType
-  const typeName = type !== 'monthly' && type !== 'daily' ? type : 'Vested'
   const isVest = type === 'monthly' || type === 'daily'
+  const typeName = !isVest ? type : 'Vested'
   const isRealmCommunityMint =
     deposit.mint.publicKey.toBase58() ===
     realm?.account.communityMint.toBase58()
