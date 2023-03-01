@@ -354,7 +354,6 @@ const getArgs = async (connection: Connection, data: Uint8Array) => {
   for (const key of Object.keys(decodedInstructionData)) {
     const val = decodedInstructionData[key]
     if (val !== null) {
-      console.log(val)
       if (
         typeof val === 'object' &&
         !Array.isArray(val) &&
