@@ -24,6 +24,7 @@ interface OpenBookRegisterMarketForm {
   openBookMarketExternalPk: string
   baseBankMintPk: string
   quoteBankMintPk: string
+  openBookProgram: string
   name: string
 }
 
@@ -52,14 +53,14 @@ const OpenBookRegisterMarket = ({
     openBookMarketExternalPk: '',
     baseBankMintPk: '',
     quoteBankMintPk: '',
+    openBookProgram: OPENBOOK_PROGRAM_ID[
+      connection.cluster === 'mainnet' ? 'mainnet-beta' : 'devnet'
+    ].toBase58(),
     name: '',
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
-  const handleSetForm = ({ propertyName, value }) => {
-    setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
-  }
+
   const validateInstruction = async (): Promise<boolean> => {
     const { isValid, validationErrors } = await isFormValid(schema, form)
     setFormErrors(validationErrors)
@@ -74,14 +75,18 @@ const OpenBookRegisterMarket = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const marketIndex = mangoGroup!.serum3ExternalMarketsMap.size
+      const marketIndex =
+        mangoGroup!.serum3MarketsMapByMarketIndex.size === 0
+          ? 0
+          : Math.max(...[...mangoGroup!.serum3MarketsMapByMarketIndex.keys()]) +
+            1
 
       const ix = await mangoClient!.program.methods
         .serum3RegisterMarket(marketIndex, form.name)
         .accounts({
           group: mangoGroup!.publicKey,
           admin: form.governedAccount.extensions.transferAddress,
-          serumProgram: OPENBOOK_PROGRAM_ID[connection.cluster],
+          serumProgram: new PublicKey(form.openBookProgram),
           serumMarketExternal: new PublicKey(form.openBookMarketExternalPk),
           baseBank: mangoGroup!.getFirstBankByMint(
             new PublicKey(form.baseBankMintPk)
@@ -103,19 +108,13 @@ const OpenBookRegisterMarket = ({
     return obj
   }
   useEffect(() => {
-    handleSetForm({
-      propertyName: 'programId',
-      value: programId?.toString(),
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [realmInfo?.programId])
-  useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
+
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
@@ -155,6 +154,12 @@ const OpenBookRegisterMarket = ({
       initialValue: form.quoteBankMintPk,
       type: InstructionInputType.INPUT,
       name: 'quoteBankMintPk',
+    },
+    {
+      label: 'Openbook Program',
+      initialValue: form.openBookProgram,
+      type: InstructionInputType.INPUT,
+      name: 'openBookProgram',
     },
   ]
 
