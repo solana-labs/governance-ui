@@ -269,7 +269,7 @@ const PerpEdit = ({
         settlePnlLimitWindowSize: currentPerp.settlePnlLimitWindowSizeTs.toNumber(),
         reduceOnly: currentPerp.reduceOnly,
         resetStablePrice: false,
-        positivePnlLiquidationFee: currentPerp.positivePnlLiquidationFee.val.toNumber(),
+        positivePnlLiquidationFee: currentPerp.positivePnlLiquidationFee.toNumber(),
       }
       setForm({
         ...vals,
