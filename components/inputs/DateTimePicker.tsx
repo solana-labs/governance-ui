@@ -1,19 +1,47 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { inputClasses, InputClasses, StyledLabel } from './styles'
 
 type DateTimePickerProps = {
   value: Date
   onChange: (value: Date) => void
-  minDate: Date
   label?: string
   subtitle?: string
   wrapperClassName?: string
 } & InputClasses
 
+const parseDate = (date: Date): string => {
+  const isoString = toISOStringWithTimezone(date)
+  const substr = isoString.substring(0, isoString.indexOf('T') + 6)
+  return substr
+}
+
+const toISOStringWithTimezone = (date: Date) => {
+  const tzOffset = -date.getTimezoneOffset()
+  const diff = tzOffset >= 0 ? '+' : '-'
+  const pad = (n: number, len = 2) =>
+    `${Math.floor(Math.abs(n))}`.padStart(len, '0')
+  return (
+    pad(date.getFullYear(), 4) +
+    '-' +
+    pad(date.getMonth() + 1) +
+    '-' +
+    pad(date.getDate()) +
+    'T' +
+    pad(date.getHours()) +
+    ':' +
+    pad(date.getMinutes()) +
+    ':' +
+    pad(date.getSeconds()) +
+    diff +
+    pad(tzOffset / 60) +
+    ':' +
+    pad(tzOffset % 60)
+  )
+}
+
 const DateTimePicker: React.FC<DateTimePickerProps> = ({
   value,
   onChange,
-  minDate,
   label,
   wrapperClassName = 'w-full',
   subtitle,
@@ -24,9 +52,6 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
   useDefaultStyle = true,
   showErrorState = false,
 }) => {
-  const [internalDate, setInternalDate] = useState(
-    value.toISOString().substring(0, value.toISOString().indexOf('T') + 6)
-  )
   return (
     <div className={`flex flex-col relative ${wrapperClassName}`}>
       {label && <StyledLabel>{label}</StyledLabel>}
@@ -41,12 +66,9 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
           showErrorState,
         })}
         type="datetime-local"
-        value={internalDate}
-        min={minDate
-          .toISOString()
-          .substring(0, minDate.toISOString().indexOf('T') + 6)}
+        value={parseDate(value)}
         onChange={(evt) => {
-          setInternalDate(evt.target.value)
+          if (!evt.target['validity'].valid) return
           const date = new Date(evt.target.value)
           if (isFinite(date.getTime())) {
             onChange(date)

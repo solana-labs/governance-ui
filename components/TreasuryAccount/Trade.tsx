@@ -7,7 +7,7 @@ import {
   getMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
 import tokenPriceService from '@utils/services/tokenPrice'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import AccountLabel from './BaseAccountHeader'
 import useWalletStore from 'stores/useWalletStore'
@@ -362,18 +362,6 @@ const Trade: React.FC<TradeProps> = ({ tokenAccount }) => {
     wallet,
   ])
 
-  const minReclaimDate = useMemo(() => {
-    const date = new Date()
-    let currentSeconds = date.getSeconds()
-    currentSeconds += currentAccount?.governance?.account?.config
-      .minInstructionHoldUpTime
-      ? currentAccount?.governance?.account?.config.minInstructionHoldUpTime +
-        5 * 60
-      : 60 * 60 * 24 * 5
-    date.setSeconds(currentSeconds)
-    return date
-  }, [currentAccount])
-
   return (
     <>
       <div>
@@ -427,7 +415,6 @@ const Trade: React.FC<TradeProps> = ({ tokenAccount }) => {
             label={'Trade expiration'}
             onChange={(value) => setForm((f) => ({ ...f, reclaimDate: value }))}
             value={form.reclaimDate}
-            minDate={minReclaimDate}
             error={formErrors['reclaimDate']}
             noMaxWidth={true}
           />
