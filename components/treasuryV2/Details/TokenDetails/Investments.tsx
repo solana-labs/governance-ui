@@ -13,7 +13,7 @@ import DepositModal from 'Strategies/components/DepositModal'
 import Modal from '@components/Modal'
 import ConvertToMsol from '@components/TreasuryAccount/ConvertToMsol'
 import ConvertToStSol from '@components/TreasuryAccount/ConvertToStSol'
-import TradeOnSerum from '@components/TreasuryAccount/TradeOnSerum'
+import Trade from '@components/TreasuryAccount/Trade'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useWalletStore from 'stores/useWalletStore'
 import MangoModal from '@components/TreasuryAccount/MangoModal'
@@ -38,7 +38,7 @@ export default function Investments(props: Props) {
   ] = useState<ActiveInvestment | null>(null)
 
   const [alternativeInvestment, setAlternativeInvestment] = useState<
-    'Marinade' | 'Lido' | 'Serum' | 'Mango' | null
+    'Marinade' | 'Lido' | 'Poseidon' | 'Mango' | null
   >(null)
 
   const investments = useAccountInvestments({
@@ -143,7 +143,7 @@ export default function Investments(props: Props) {
                         case 'Marinade':
                         case 'Lido':
                         case 'Mango':
-                        case 'Serum': {
+                        case 'Poseidon': {
                           setAlternativeInvestment(investment.protocolName)
                           setProposedInvestment(null)
                           break
@@ -222,13 +222,13 @@ export default function Investments(props: Props) {
               <ConvertToStSol />
             </Modal>
           )}
-          {alternativeInvestment === 'Serum' && (
+          {alternativeInvestment === 'Poseidon' && (
             <Modal
               isOpen
               sizeClassName="sm:max-w-3xl"
               onClose={() => setAlternativeInvestment(null)}
             >
-              <TradeOnSerum tokenAccount={props.asset.raw} />
+              <Trade tokenAccount={props.asset.raw} />
             </Modal>
           )}
         </div>

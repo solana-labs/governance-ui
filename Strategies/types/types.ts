@@ -31,6 +31,8 @@ export interface TreasuryStrategy {
   //item and modal to strategywrapper component based on generic components
   isGenericItem?: boolean
   createProposalFcn: any
+  /** When true, does not display protocol or name */
+  noProtocol?: boolean
 }
 
 export type MangoStrategy = TreasuryStrategy & {

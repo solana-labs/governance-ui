@@ -28,7 +28,7 @@ import DepositModal from 'Strategies/components/DepositModal'
 import { SolendStrategy, TreasuryStrategy } from 'Strategies/types/types'
 import BigNumber from 'bignumber.js'
 import LoadingRows from './LoadingRows'
-import TradeOnSerum, { TradeOnSerumProps } from './TradeOnSerum'
+import TradeOnSerum, { TradeProps } from './Trade'
 import { AccountType } from '@utils/uiTypes/assets'
 import CreateAta from './CreateAta'
 import {
@@ -86,10 +86,7 @@ const AccountOverview = () => {
     setProposedInvestment,
   ] = useState<InvestmentType | null>(null)
   const [isCopied, setIsCopied] = useState<boolean>(false)
-  const [
-    tradeSerumInfo,
-    setTradeSerumInfo,
-  ] = useState<TradeOnSerumProps | null>(null)
+  const [tradeSerumInfo, setTradeSerumInfo] = useState<TradeProps | null>(null)
   const strategyMint = currentAccount?.isSol
     ? WSOL_MINT
     : currentAccount?.extensions.token?.account.mint.toString()
@@ -276,16 +273,16 @@ const AccountOverview = () => {
       strategyDescription: '',
       createProposalFcn: () => null,
     }
-    const serumStrategy = {
+    const tradeStrategy = {
       liquidity: 0,
       protocolSymbol: '',
       apy: '',
-      protocolName: 'Serum',
+      protocolName: 'Solana',
       handledMint: '',
       handledTokenSymbol: '',
       handledTokenImgSrc: currentTokenImg,
       protocolLogoSrc:
-        'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt/logo.png',
+        'https://user-images.githubusercontent.com/32071703/149460918-3694084f-2a37-4c95-93d3-b5aaf078d444.png',
       strategyName: 'Trade',
       strategyDescription: '',
       createProposalFcn: () => null,
@@ -310,7 +307,7 @@ const AccountOverview = () => {
           <StrategyCard
             onClick={() => setTradeSerumInfo({ tokenAccount: currentAccount })}
             currentDeposits={0}
-            strat={serumStrategy}
+            strat={tradeStrategy}
           ></StrategyCard>
         )}
       </>
@@ -625,6 +622,7 @@ export const StrategyCard = ({
     handledTokenSymbol,
     apy,
     apyHeader,
+    noProtocol,
   } = strat
   const currentPositionFtm = new BigNumber(
     currentDeposits.toFixed(2)
@@ -650,9 +648,9 @@ export const StrategyCard = ({
           <div className="w-8 h-8 mr-3 rounded-full"></div>
         )}
         <div>
-          <p className="text-xs">{`${strategyName} ${handledTokenSymbol} on ${protocolName}${
-            strategySubtext ? ` - ${strategySubtext}` : ''
-          }`}</p>
+          <p className="text-xs">{`${strategyName} ${handledTokenSymbol} ${
+            noProtocol ? '' : `on ${protocolName}`
+          }${strategySubtext ? ` - ${strategySubtext}` : ''}`}</p>
           {(handledTokenSymbol || currentPositionFtm !== '0') && (
             <p className="font-bold text-fgd-1">{`${currentPositionFtm} ${handledTokenSymbol}`}</p>
           )}
