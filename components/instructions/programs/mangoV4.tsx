@@ -353,11 +353,13 @@ const getArgs = async (connection: Connection, data: Uint8Array) => {
   const args = {}
   for (const key of Object.keys(decodedInstructionData)) {
     const val = decodedInstructionData[key]
+    console.log(val)
     if (val !== null) {
       if (
         typeof val === 'object' &&
         !Array.isArray(val) &&
-        !(val instanceof BN)
+        !(val instanceof BN) &&
+        !(val instanceof PublicKey)
       ) {
         for (const innerKey of Object.keys(val)) {
           const innerVal = val[innerKey]
