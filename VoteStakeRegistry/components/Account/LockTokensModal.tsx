@@ -25,6 +25,8 @@ import {
   getMinDurationInDays,
   SECS_PER_DAY,
   getFormattedStringFromDays,
+  secsToDays,
+  yearsToSecs,
 } from 'VoteStakeRegistry/tools/dateTools'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { voteRegistryStartUnlock } from 'VoteStakeRegistry/actions/voteRegistryStartUnlock'
@@ -72,6 +74,13 @@ const LockTokensModal = ({
   const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
     (s) => s.actions
   )
+  const fiveYearsSecs = yearsToSecs(5)
+  const maxLockupSecs =
+    (realm &&
+      voteStakeRegistryRegistrar?.votingMints
+        .find((x) => x.mint.equals(realm.account.communityMint))
+        ?.lockupSaturationSecs.toNumber()) ||
+    fiveYearsSecs
 
   const lockupPeriods: Period[] = [
     {
@@ -98,12 +107,14 @@ const LockTokensModal = ({
       defaultValue: 1,
       display: 'Custom',
     },
-  ].filter((x) =>
-    depositToUnlock
-      ? getMinDurationInDays(depositToUnlock) <= x.defaultValue ||
-        x.display === 'Custom'
-      : true
-  )
+  ]
+    .filter((x) =>
+      depositToUnlock
+        ? getMinDurationInDays(depositToUnlock) <= x.defaultValue ||
+          x.display === 'Custom'
+        : true
+    )
+    .filter((x) => x.defaultValue <= secsToDays(maxLockupSecs))
 
   const maxNonCustomDaysLockup = lockupPeriods
     .map((x) => x.defaultValue)
