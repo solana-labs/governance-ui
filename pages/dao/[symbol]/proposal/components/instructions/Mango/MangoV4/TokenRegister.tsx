@@ -43,6 +43,7 @@ interface TokenRegisterForm {
   minVaultToDepositsRatio: number
   netBorrowLimitWindowSizeTs: number
   netBorrowLimitPerWindowQuote: number
+  tokenIndex: number
 }
 
 const TokenRegister = ({
@@ -87,6 +88,7 @@ const TokenRegister = ({
     minVaultToDepositsRatio: 0.2,
     netBorrowLimitWindowSizeTs: 24 * 60 * 60,
     netBorrowLimitPerWindowQuote: toNative(1000000, 6).toNumber(),
+    tokenIndex: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -105,14 +107,9 @@ const TokenRegister = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const tokenIndex =
-        mangoGroup!.banksMapByTokenIndex.size === 0
-          ? 0
-          : Math.max(...[...mangoGroup!.banksMapByTokenIndex.keys()]) + 1
-
       const ix = await mangoClient!.program.methods
         .tokenRegister(
-          Number(tokenIndex),
+          Number(form.tokenIndex),
           form.name,
           {
             confFilter: Number(form.oracleConfFilter),
@@ -173,6 +170,16 @@ const TokenRegister = ({
       .nullable()
       .required('Program governed account is required'),
   })
+  useEffect(() => {
+    const tokenIndex =
+      !mangoGroup || mangoGroup?.banksMapByTokenIndex.size === 0
+        ? 0
+        : Math.max(...[...mangoGroup!.banksMapByTokenIndex.keys()]) + 1
+    setForm({
+      ...form,
+      tokenIndex: tokenIndex,
+    })
+  }, [mangoGroup?.banksMapByTokenIndex.size])
 
   const inputs: InstructionInput[] = [
     {
@@ -217,6 +224,13 @@ const TokenRegister = ({
       initialValue: form.name,
       type: InstructionInputType.INPUT,
       name: 'name',
+    },
+    {
+      label: `Token Index`,
+      initialValue: form.tokenIndex,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'tokenIndex',
     },
     {
       label: `Interest rate adjustment factor`,

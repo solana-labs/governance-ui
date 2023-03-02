@@ -25,6 +25,7 @@ interface OpenBookRegisterMarketForm {
   baseBankMintPk: string
   quoteBankMintPk: string
   openBookProgram: string
+  marketIndex: number
   name: string
 }
 
@@ -53,6 +54,7 @@ const OpenBookRegisterMarket = ({
     openBookMarketExternalPk: '',
     baseBankMintPk: '',
     quoteBankMintPk: '',
+    marketIndex: 0,
     openBookProgram: OPENBOOK_PROGRAM_ID[
       connection.cluster === 'mainnet' ? 'mainnet-beta' : 'devnet'
     ].toBase58(),
@@ -75,14 +77,8 @@ const OpenBookRegisterMarket = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const marketIndex =
-        mangoGroup!.serum3MarketsMapByMarketIndex.size === 0
-          ? 0
-          : Math.max(...[...mangoGroup!.serum3MarketsMapByMarketIndex.keys()]) +
-            1
-
       const ix = await mangoClient!.program.methods
-        .serum3RegisterMarket(marketIndex, form.name)
+        .serum3RegisterMarket(Number(form.marketIndex), form.name)
         .accounts({
           group: mangoGroup!.publicKey,
           admin: form.governedAccount.extensions.transferAddress,
@@ -121,6 +117,18 @@ const OpenBookRegisterMarket = ({
       .nullable()
       .required('Program governed account is required'),
   })
+
+  useEffect(() => {
+    const marketIndex =
+      !mangoGroup || mangoGroup?.serum3MarketsMapByMarketIndex.size === 0
+        ? 0
+        : Math.max(...[...mangoGroup!.serum3MarketsMapByMarketIndex.keys()]) + 1
+    setForm({
+      ...form,
+      marketIndex: marketIndex,
+    })
+  }, [mangoGroup?.serum3MarketsMapByMarketIndex.size])
+
   const inputs: InstructionInput[] = [
     {
       label: 'Governance',
@@ -136,6 +144,13 @@ const OpenBookRegisterMarket = ({
       initialValue: form.name,
       type: InstructionInputType.INPUT,
       name: 'name',
+    },
+    {
+      label: `Market Index`,
+      initialValue: form.marketIndex,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'marketIndex',
     },
     {
       label: 'Openbook Market External',

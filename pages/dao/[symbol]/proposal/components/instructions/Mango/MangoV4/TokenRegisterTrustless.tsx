@@ -23,6 +23,7 @@ interface TokenRegisterTrustlessForm {
   mintPk: string
   oraclePk: string
   name: string
+  tokenIndex: number
 }
 
 const TokenRegisterTrustless = ({
@@ -49,6 +50,7 @@ const TokenRegisterTrustless = ({
     mintPk: '',
     oraclePk: '',
     name: '',
+    tokenIndex: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -67,13 +69,9 @@ const TokenRegisterTrustless = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const tokenIndex =
-        mangoGroup!.banksMapByTokenIndex.size === 0
-          ? 0
-          : Math.max(...[...mangoGroup!.banksMapByTokenIndex.keys()]) + 1
       //Mango instruction call and serialize
       const ix = await mangoClient!.program.methods
-        .tokenRegisterTrustless(tokenIndex, form.name)
+        .tokenRegisterTrustless(Number(form.tokenIndex), form.name)
         .accounts({
           group: mangoGroup!.publicKey,
           fastListingAdmin: form.governedAccount.extensions.transferAddress,
@@ -107,6 +105,18 @@ const TokenRegisterTrustless = ({
       .nullable()
       .required('Program governed account is required'),
   })
+
+  useEffect(() => {
+    const tokenIndex =
+      !mangoGroup || mangoGroup?.banksMapByTokenIndex.size === 0
+        ? 0
+        : Math.max(...[...mangoGroup!.banksMapByTokenIndex.keys()]) + 1
+    setForm({
+      ...form,
+      tokenIndex: tokenIndex,
+    })
+  }, [mangoGroup?.banksMapByTokenIndex.size])
+
   const inputs: InstructionInput[] = [
     {
       label: 'Governance',
@@ -134,6 +144,13 @@ const TokenRegisterTrustless = ({
       initialValue: form.name,
       type: InstructionInputType.INPUT,
       name: 'name',
+    },
+    {
+      label: `Token Index`,
+      initialValue: form.tokenIndex,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'tokenIndex',
     },
   ]
 
