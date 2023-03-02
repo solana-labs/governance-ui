@@ -22,8 +22,8 @@ import { OPENBOOK_PROGRAM_ID } from '@blockworks-foundation/mango-v4'
 interface OpenBookRegisterMarketForm {
   governedAccount: AssetAccount | null
   openBookMarketExternalPk: string
-  baseBankMintPk: string
-  quoteBankMintPk: string
+  baseBankPk: string
+  quoteBankPk: string
   openBookProgram: string
   marketIndex: number
   name: string
@@ -52,8 +52,8 @@ const OpenBookRegisterMarket = ({
   const [form, setForm] = useState<OpenBookRegisterMarketForm>({
     governedAccount: null,
     openBookMarketExternalPk: '',
-    baseBankMintPk: '',
-    quoteBankMintPk: '',
+    baseBankPk: '',
+    quoteBankPk: '',
     marketIndex: 0,
     openBookProgram: OPENBOOK_PROGRAM_ID[
       connection.cluster === 'mainnet' ? 'mainnet-beta' : 'devnet'
@@ -84,12 +84,8 @@ const OpenBookRegisterMarket = ({
           admin: form.governedAccount.extensions.transferAddress,
           serumProgram: new PublicKey(form.openBookProgram),
           serumMarketExternal: new PublicKey(form.openBookMarketExternalPk),
-          baseBank: mangoGroup!.getFirstBankByMint(
-            new PublicKey(form.baseBankMintPk)
-          ).publicKey,
-          quoteBank: mangoGroup!.getFirstBankByMint(
-            new PublicKey(form.quoteBankMintPk)
-          ).publicKey,
+          baseBank: new PublicKey(form.baseBankPk),
+          quoteBank: new PublicKey(form.quoteBankPk),
           payer: form.governedAccount.extensions.transferAddress,
         })
         .instruction()
@@ -159,16 +155,16 @@ const OpenBookRegisterMarket = ({
       name: 'openBookMarketExternalPk',
     },
     {
-      label: 'Base Bank Mint',
-      initialValue: form.baseBankMintPk,
+      label: 'Base Bank ',
+      initialValue: form.baseBankPk,
       type: InstructionInputType.INPUT,
-      name: 'baseBankMintPk',
+      name: 'baseBankPk',
     },
     {
-      label: 'Quote Bank Mint',
-      initialValue: form.quoteBankMintPk,
+      label: 'Quote Bank',
+      initialValue: form.quoteBankPk,
       type: InstructionInputType.INPUT,
-      name: 'quoteBankMintPk',
+      name: 'quoteBankPk',
     },
     {
       label: 'Openbook Program',
