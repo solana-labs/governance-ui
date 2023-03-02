@@ -54,6 +54,7 @@ interface PerpCreateForm {
   settlePnlLimitFactor: number
   settlePnlLimitWindowSize: number
   positivePnlLiquidationFee: number
+  perpMarketIndex: number
 }
 
 const PerpCreate = ({
@@ -82,6 +83,7 @@ const PerpCreate = ({
     maxStalenessSlots: '',
     oraclePk: '',
     name: '',
+    perpMarketIndex: 0,
     baseDecimals: 6,
     quoteLotSize: 10,
     baseLotSize: 100,
@@ -129,10 +131,7 @@ const PerpCreate = ({
       const bids = new Keypair()
       const asks = new Keypair()
       const eventQueue = new Keypair()
-      const perpMarketIndex =
-        mangoGroup!.perpMarketsMapByMarketIndex.size === 0
-          ? 0
-          : Math.max(...[...mangoGroup!.perpMarketsMapByMarketIndex.keys()]) + 1
+
       const bookSideSize = mangoClient!.program.coder.accounts.size(
         (mangoClient!.program.account.bookSide as any)._idlAccount
       )
@@ -171,7 +170,7 @@ const PerpCreate = ({
       ]
       const ix = await mangoClient!.program.methods
         .perpCreateMarket(
-          Number(perpMarketIndex),
+          Number(form.perpMarketIndex),
           form.name,
           {
             confFilter: Number(form.oracleConfFilter),
@@ -243,6 +242,18 @@ const PerpCreate = ({
       .nullable()
       .required('Program governed account is required'),
   })
+
+  useEffect(() => {
+    const perpMarketIndex =
+      !mangoGroup || mangoGroup?.perpMarketsMapByMarketIndex.size === 0
+        ? 0
+        : Math.max(...[...mangoGroup!.perpMarketsMapByMarketIndex.keys()]) + 1
+    setForm({
+      ...form,
+      perpMarketIndex: perpMarketIndex,
+    })
+  }, [mangoGroup?.perpMarketsMapByMarketIndex.size])
+
   const inputs: InstructionInput[] = [
     {
       label: 'Governance',
@@ -260,6 +271,13 @@ const PerpCreate = ({
       name: 'name',
     },
     {
+      label: `Perp Market Index`,
+      initialValue: form.perpMarketIndex,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'perpMarketIndex',
+    },
+    {
       label: 'Oracle PublicKey',
       initialValue: form.oraclePk,
       type: InstructionInputType.INPUT,
@@ -273,6 +291,7 @@ const PerpCreate = ({
       inputType: 'number',
       name: 'oracleConfFilter',
     },
+
     {
       label: `Max Staleness Slots`,
       subtitle: getAdditionalLabelInfo('maxStalenessSlots'),
