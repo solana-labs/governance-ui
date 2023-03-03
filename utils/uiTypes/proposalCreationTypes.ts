@@ -747,4 +747,5 @@ export interface DualFinanceExerciseForm {
 export interface DualFinanceWithdrawForm {
   soName: string | undefined
   baseTreasury: AssetAccount | undefined
+  mintPk: string | undefined
 }
