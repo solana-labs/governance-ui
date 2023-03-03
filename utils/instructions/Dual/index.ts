@@ -378,6 +378,7 @@ export async function getWithdrawInstruction({
           new PublicKey(form.mintPk!)
         )
       : await so.createWithdrawInstruction(form.soName, authority!, destination)
+
     additionalSerializedInstructions.push(
       serializeInstructionToBase64(withdrawInstruction)
     )
@@ -391,6 +392,8 @@ export async function getWithdrawInstruction({
       isValid: true,
       governance: form.baseTreasury?.governance,
       additionalSerializedInstructions,
+      chunkSplitByDefault: true,
+      chunkBy: 2,
     }
   }
 
