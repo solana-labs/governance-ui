@@ -348,7 +348,7 @@ export async function getWithdrawInstruction({
         space,
         'processed'
       )
-      //Creating checking account on the fly with same mint as base and owner
+      //Creating checking account on the fly with given mint
       //made to be more safe - instructions don't have access to main treasury
       helperTokenAccount = new Keypair()
       //run as prerequsite instructions payer is connected wallet
