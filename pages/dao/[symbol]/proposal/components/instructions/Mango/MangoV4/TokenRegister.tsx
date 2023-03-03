@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import useRealm from '@hooks/useRealm'
 import { PublicKey, SYSVAR_RENT_PUBKEY } from '@solana/web3.js'
 import * as yup from 'yup'
-import { isFormValid } from '@utils/formValidation'
+import { isFormValid, validatePubkey } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -169,6 +169,20 @@ const TokenRegister = ({
       .object()
       .nullable()
       .required('Program governed account is required'),
+    oraclePk: yup
+      .string()
+      .required()
+      .test('is-valid-address', 'Please enter a valid PublicKey', (value) =>
+        value ? validatePubkey(value) : true
+      ),
+    mintPk: yup
+      .string()
+      .required()
+      .test('is-valid-address1', 'Please enter a valid PublicKey', (value) =>
+        value ? validatePubkey(value) : true
+      ),
+    name: yup.string().required(),
+    tokenIndex: yup.string().required(),
   })
   useEffect(() => {
     const tokenIndex =

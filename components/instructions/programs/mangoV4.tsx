@@ -207,7 +207,7 @@ const instructions = () => ({
       { name: 'Openbook External Market' },
       { name: 'Openbook Market' },
       { name: 'Index Reservation' },
-      { name: 'Quote Nank' },
+      { name: 'Quote Bank' },
       { name: 'Base Bank' },
       { name: 'Payer' },
     ],
