@@ -1,6 +1,7 @@
 import { PublicKey } from '@solana/web3.js'
 import { BN, IdlAccounts, IdlTypes } from '@project-serum/anchor'
 import { VoterStakeRegistry as HeliumVoterStakeRegistry } from '@helium/idls/lib/types/voter_stake_registry'
+import { HeliumSubDaos } from '@helium/idls/lib/types/helium_sub_daos'
 import { TokenProgramAccount } from '@utils/tokens'
 import { MintInfo } from '@solana/spl-token'
 
@@ -27,3 +28,8 @@ export interface PositionWithMeta extends Position {
 }
 export type LockupKind = IdlTypes<HeliumVoterStakeRegistry>['LockupKind']
 export type InitializePositionV0Args = IdlTypes<HeliumVoterStakeRegistry>['InitializePositionArgsV0']
+
+export type SubDao = IdlAccounts<HeliumSubDaos>['subDaoV0']
+export interface SubDaoWithMeta extends SubDao {
+  pubkey: PublicKey
+}

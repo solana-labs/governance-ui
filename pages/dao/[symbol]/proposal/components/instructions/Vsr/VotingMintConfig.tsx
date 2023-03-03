@@ -107,7 +107,10 @@ const VotingMintConfig = ({
     }
 
     if (heliumVsrPluginsPks.includes(form.programId)) {
-      vsrClient = await HeliumVsrClient.connect(anchorProvider)
+      vsrClient = await HeliumVsrClient.connect(
+        anchorProvider,
+        new PublicKey(form.programId)
+      )
     }
 
     if (!vsrClient) {

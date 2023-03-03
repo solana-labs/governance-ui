@@ -3,7 +3,7 @@ import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
 import { fmtMintAmount } from '@tools/sdk/units'
-import { PositionWithMeta } from '../sdk/types'
+import { PositionWithMeta, SubDaoWithMeta } from '../sdk/types'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { abbreviateAddress } from '@utils/formatting'
 import {
@@ -13,7 +13,7 @@ import {
   secsToDays,
 } from 'VoteStakeRegistry/tools/dateTools'
 import { useUnixNow } from '@hooks/useUnixNow'
-import { BN } from '@project-serum/anchor'
+import { BN, web3 } from '@project-serum/anchor'
 import Button from '@components/Button'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import {
@@ -27,6 +27,8 @@ import { useExtendPosition } from 'HeliumVotePlugin/hooks/useExtendPosition'
 import { useTransferPosition } from 'HeliumVotePlugin/hooks/useTransferPosition'
 import { notify } from '@utils/notifications'
 import { useClosePosition } from 'HeliumVotePlugin/hooks/useClosePosition'
+import { HNT_MINT } from '@helium/spl-utils'
+import { DelegateTokensModal } from './DelegateTokensModal'
 
 export interface PositionCardProps {
   position: PositionWithMeta
@@ -40,7 +42,8 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
   const [transferablePositions, setTransferablePositions] = useState<
     PositionWithMeta[]
   >([])
-
+  // TODO (BRY)
+  const [delegableSubDaos, setDelegableSubDaos] = useState<SubDaoWithMeta[]>([])
   const { realm, realmInfo, tokenRecords, ownTokenRecord } = useRealm()
   const [isLoading, positions, getPositions] = useHeliumVsrStore((s) => [
     s.state.isLoading,
@@ -120,14 +123,23 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
   const lockupKind = Object.keys(lockup.kind)[0] as string
   const lockupExpired =
     lockupKind !== 'constant' && lockup.endTs.sub(new BN(unixNow)).lt(new BN(0))
+
   const lockedTokens = fmtMintAmount(
     position.votingMint.mint.account,
     position.amountDepositedNative
   )
-  const isRealmCommunityMint =
-    position.votingMint.mint.publicKey.toBase58() ===
-    realm?.account.communityMint.toBase58()
+
   const isConstant = lockupKind === 'constant'
+  const isRealmCommunityMint =
+    realm?.account.communityMint &&
+    realm.account.communityMint.equals(position.votingMint.mint.publicKey)
+
+  const canDelegate =
+    isRealmCommunityMint &&
+    (realm.account.communityMint.equals(HNT_MINT) ||
+      realm.account.communityMint.equals(
+        new web3.PublicKey('D5Eb8q17xYsfGFNKxy3GCkSn9QpAmmLHX6wjceEmatTq')
+      ))
 
   const tokenInfo = tokenPriceService.getTokenInfo(
     position.votingMint.mint.publicKey.toBase58()
@@ -190,6 +202,36 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
 
     if (!transferingError) {
       await refetchState()
+    }
+  }
+
+  const handleDelegateTokens = async (targetSubDao: SubDaoWithMeta) => {
+    // TODO (BRY)
+    console.log('delegate')
+    // await delegatePosition({
+    //   position,
+    //   targetSubDao
+    // })
+
+    // if (!delegatingError) {
+    //   await refetchState()
+    // }
+  }
+
+  const handleUndelegateTokens = async () => {
+    try {
+      // TODO (BRY)
+      console.log('undelegate')
+      // await undelegatePosition({ position })
+
+      // if (!undelegatingError) {
+      //   await refetchState()
+      // }
+    } catch (e) {
+      notify({
+        type: 'error',
+        message: e.message || 'Unable to undelegate tokens',
+      })
     }
   }
 
@@ -271,74 +313,73 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
                 }
               />
             </div>
-            {position.isDelegated ? (
-              <Button
-                className="w-full mt-auto"
-                onClick={() => console.log('Undelegate')}
-                disabled={isSubmitting}
-                isLoading={isSubmitting}
-              >
-                UnDelegate
-              </Button>
-            ) : (
-              <>
-                {lockupExpired ? (
-                  <Button
-                    className="w-full mt-auto"
-                    isLoading={isSubmitting}
-                    disabled={isSubmitting}
-                    onClick={handleClose}
-                  >
-                    Close
-                  </Button>
-                ) : (
-                  <div className="flex flex-col gap-2 mt-auto">
-                    <div
-                      className="flex flex-row gap-2 justify-center"
-                      style={{ marginTop: 'auto' }}
+            <div style={{ marginTop: 'auto' }}>
+              {position.isDelegated ? (
+                <Button
+                  className="w-full"
+                  onClick={() => console.log('Undelegate')}
+                  disabled={isSubmitting}
+                  isLoading={isSubmitting}
+                >
+                  UnDelegate
+                </Button>
+              ) : (
+                <>
+                  {lockupExpired ? (
+                    <Button
+                      className="w-full"
+                      isLoading={isSubmitting}
+                      disabled={isClosing}
+                      onClick={handleClose}
                     >
-                      <Button
-                        className="w-full"
-                        onClick={() => setIsExtendModalOpen(true)}
-                        isLoading={isSubmitting}
-                        disabled={isSubmitting}
-                      >
-                        Extend
-                      </Button>
-                      <Button
-                        className="w-full"
-                        onClick={() => setIsTransferModalOpen(true)}
-                        disabled={
-                          transferablePositions.length == 0 || isSubmitting
-                        }
-                        isLoading={isSubmitting}
-                      >
-                        Transfer
-                      </Button>
+                      Close
+                    </Button>
+                  ) : (
+                    <div className="flex flex-col gap-2">
+                      <div className="flex flex-row gap-2 justify-center">
+                        <Button
+                          className="w-full"
+                          onClick={() => setIsExtendModalOpen(true)}
+                          disabled={isSubmitting}
+                          isLoading={isExtending}
+                        >
+                          Extend
+                        </Button>
+                        <Button
+                          className="w-full"
+                          onClick={() => setIsTransferModalOpen(true)}
+                          disabled={
+                            transferablePositions.length == 0 || isSubmitting
+                          }
+                          isLoading={isTransfering}
+                        >
+                          Transfer
+                        </Button>
+                      </div>
+                      {isConstant && (
+                        <Button
+                          onClick={handleUnlock}
+                          disabled={isSubmitting}
+                          isLoading={isUnlocking}
+                        >
+                          Unlock
+                        </Button>
+                      )}
+                      {canDelegate && (
+                        <Button
+                          className="w-full"
+                          onClick={() => setIsDelegateModalOpen(true)}
+                          disabled={isSubmitting}
+                          isLoading={isSubmitting}
+                        >
+                          Delegate
+                        </Button>
+                      )}
                     </div>
-                    {isConstant && (
-                      <Button
-                        onClick={handleUnlock}
-                        disabled={isSubmitting}
-                        isLoading={isSubmitting}
-                      >
-                        Unlock
-                      </Button>
-                    )}
-                    {
-                      <Button
-                        className="w-full mt-auto"
-                        onClick={() => console.log('Undelegate')}
-                        disabled={isSubmitting}
-                        isLoading={isSubmitting}
-                      >
-                        Delegate
-                      </Button>
-                    }
-                  </div>
-                )}
-              </>
-            )}
+                  )}
+                </>
+              )}
+            </div>
           </div>
         </>
       )}
@@ -361,6 +402,14 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
           positions={transferablePositions}
           onClose={() => setIsTransferModalOpen(false)}
           onSubmit={handleTransferTokens}
+        />
+      )}
+      {isDelegateModalOpen && (
+        <DelegateTokensModal
+          isOpen={isDelegateModalOpen}
+          subDaos={delegableSubDaos}
+          onClose={() => setIsDelegateModalOpen(false)}
+          onSubmit={handleDelegateTokens}
         />
       )}
     </div>

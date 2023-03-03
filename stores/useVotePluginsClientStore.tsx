@@ -48,7 +48,8 @@ interface UseVotePluginsClientStore extends State {
   ) => void
   handleSetHeliumVsrClient: (
     wallet: SignerWalletAdapter | undefined,
-    connection: ConnectionContext
+    connection: ConnectionContext,
+    programId: PublicKey
   ) => void
   handleSetNftClient: (
     wallet: SignerWalletAdapter | undefined,
@@ -130,7 +131,7 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
         s.state.vsrClient = vsrClient
       })
     },
-    handleSetHeliumVsrClient: async (wallet, connection) => {
+    handleSetHeliumVsrClient: async (wallet, connection, programId) => {
       const options = AnchorProvider.defaultOptions()
       const provider = new AnchorProvider(
         connection.current,
@@ -140,6 +141,7 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
 
       const heliumVsrClient = await HeliumVsrClient.connect(
         provider,
+        programId,
         connection.cluster === 'devnet'
       )
 

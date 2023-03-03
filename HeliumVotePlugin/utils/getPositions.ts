@@ -8,6 +8,7 @@ import { calcPositionVotingPower } from './calcPositionVotingPower'
 import { HeliumVsrClient } from '../sdk/client'
 import { Registrar, Position, PositionWithMeta } from '../sdk/types'
 import { chunks } from '@utils/helpers'
+import { HNT_MINT } from '@helium/spl-utils'
 
 export interface GetPositionsArgs {
   realmPk: PublicKey
@@ -60,11 +61,14 @@ export const getPositions = async (
   const delegatedPosKeys = posKeys.map(
     (posKey) => delegatedPositionKey(posKey)[0]
   )
-  const delegatedPositionAccountInfos = await Promise.all(
-    chunks(delegatedPosKeys, 99).map((chunk) =>
-      connection.getMultipleAccountsInfo(chunk)
-    )
-  )
+
+  const delegatedPositionAccountInfos = communityMintPk.equals(HNT_MINT)
+    ? await Promise.all(
+        chunks(delegatedPosKeys, 99).map((chunk) =>
+          connection.getMultipleAccountsInfo(chunk)
+        )
+      )
+    : []
 
   positions.push(
     ...positionAccountInfos

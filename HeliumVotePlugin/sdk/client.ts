@@ -1,4 +1,4 @@
-import { Program, Provider } from '@project-serum/anchor'
+import { Program, Provider, web3 } from '@project-serum/anchor'
 import { VoterStakeRegistry } from '@helium/idls/lib/types/voter_stake_registry'
 import { PROGRAM_ID, init } from '@helium/voter-stake-registry-sdk'
 
@@ -10,10 +10,12 @@ export class HeliumVsrClient {
 
   static async connect(
     provider: Provider,
+    programId: web3.PublicKey = PROGRAM_ID,
     devnet?: boolean
   ): Promise<HeliumVsrClient> {
+    console.log(programId.toBase58())
     return new HeliumVsrClient(
-      (await init(provider as any, PROGRAM_ID, null)) as any,
+      (await init(provider as any, programId, null)) as any,
       devnet
     )
   }
