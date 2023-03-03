@@ -370,11 +370,14 @@ export async function getWithdrawInstruction({
       destination = helperTokenAccount.publicKey
     }
 
-    const withdrawInstruction = await so.createWithdrawInstruction(
-      form.soName,
-      authority!,
-      destination
-    )
+    const withdrawInstruction = form.baseTreasury.isSol
+      ? await so.createWithdrawInstructionWithMint(
+          form.soName,
+          authority!,
+          destination,
+          new PublicKey(form.mintPk!)
+        )
+      : await so.createWithdrawInstruction(form.soName, authority!, destination)
     additionalSerializedInstructions.push(
       serializeInstructionToBase64(withdrawInstruction)
     )
