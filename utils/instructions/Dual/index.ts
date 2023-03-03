@@ -161,7 +161,7 @@ export async function getConfigInstruction({
       form.payer.extensions.transferAddress!,
       baseMint
     )
-    
+
     additionalSerializedInstructions.push(
       serializeInstructionToBase64(nameInstruction)
     )
@@ -333,13 +333,47 @@ export async function getWithdrawInstruction({
 
   const serializedInstruction = ''
   const additionalSerializedInstructions: string[] = []
+  const prerequisiteInstructions: TransactionInstruction[] = []
+  let helperTokenAccount: Keypair | null = null
   if (isValid && form.soName && form.baseTreasury && wallet?.publicKey) {
     const so = getStakingOptionsApi(connection)
+    const authority = form.baseTreasury.isSol
+      ? form.baseTreasury.extensions.transferAddress
+      : form.baseTreasury.extensions.token!.account.owner!
+    let destination = form.baseTreasury.pubkey
+    if (form.baseTreasury.isSol) {
+      const baseMint = form.mintPk
+      const space = 165
+      const rent = await connection.current.getMinimumBalanceForRentExemption(
+        space,
+        'processed'
+      )
+      //Creating checking account on the fly with same mint as base and owner
+      //made to be more safe - instructions don't have access to main treasury
+      helperTokenAccount = new Keypair()
+      //run as prerequsite instructions payer is connected wallet
+      prerequisiteInstructions.push(
+        SystemProgram.createAccount({
+          fromPubkey: wallet.publicKey,
+          newAccountPubkey: helperTokenAccount.publicKey,
+          lamports: rent,
+          space: space,
+          programId: TOKEN_PROGRAM_ID,
+        }),
+        //initialized account with same mint as base
+        initializeAccount({
+          account: helperTokenAccount.publicKey,
+          mint: new PublicKey(baseMint!),
+          owner: form.baseTreasury.governance.pubkey,
+        })
+      )
+      destination = helperTokenAccount.publicKey
+    }
 
     const withdrawInstruction = await so.createWithdrawInstruction(
       form.soName,
-      form.baseTreasury.extensions.token!.account.owner!,
-      form.baseTreasury.pubkey
+      authority!,
+      destination
     )
     additionalSerializedInstructions.push(
       serializeInstructionToBase64(withdrawInstruction)
@@ -347,6 +381,10 @@ export async function getWithdrawInstruction({
 
     return {
       serializedInstruction,
+      prerequisiteInstructions: prerequisiteInstructions,
+      prerequisiteInstructionsSigners: helperTokenAccount
+        ? [helperTokenAccount]
+        : [],
       isValid: true,
       governance: form.baseTreasury?.governance,
       additionalSerializedInstructions,

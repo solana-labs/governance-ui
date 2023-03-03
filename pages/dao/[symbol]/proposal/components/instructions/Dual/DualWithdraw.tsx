@@ -24,6 +24,7 @@ const DualWithdraw = ({
   const [form, setForm] = useState<DualFinanceWithdrawForm>({
     soName: undefined,
     baseTreasury: undefined,
+    mintPk: undefined,
   })
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
@@ -53,6 +54,9 @@ const DualWithdraw = ({
       index
     )
   }, [form])
+  useEffect(() => {
+    handleSetForm({ value: undefined, propertyName: 'mintPk' })
+  }, [form.baseTreasury])
   useEffect(() => {
     setGovernedAccount(form.baseTreasury?.governance)
   }, [form.baseTreasury])
@@ -90,6 +94,20 @@ const DualWithdraw = ({
           type="token"
         ></GovernedAccountSelect>
       </Tooltip>
+      {form.baseTreasury?.isSol && (
+        <Input
+          label="Mint"
+          value={form.mintPk}
+          type="text"
+          onChange={(evt) =>
+            handleSetForm({
+              value: evt.target.value,
+              propertyName: 'mintPk',
+            })
+          }
+          error={formErrors['mintPk']}
+        />
+      )}
     </>
   )
 }
