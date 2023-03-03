@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import useRealm from '@hooks/useRealm'
 import { AccountMeta, PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
-import { isFormValid } from '@utils/formValidation'
+import { isFormValid, validatePubkey } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -259,7 +259,7 @@ const EditToken = ({
       )
       setTokens(currentTokens)
     }
-    if (wallet?.publicKey) {
+    if (wallet?.publicKey && mangoGroup) {
       getTokens()
     }
   }, [mangoGroup?.publicKey.toBase58()])
@@ -315,6 +315,19 @@ const EditToken = ({
       .object()
       .nullable()
       .required('Program governed account is required'),
+    mintPk: yup
+      .string()
+      .required()
+      .test('is-valid-address1', 'Please enter a valid PublicKey', (value) =>
+        value ? validatePubkey(value) : true
+      ),
+    oraclePk: yup
+      .string()
+      .required()
+      .test('is-valid-address2', 'Please enter a valid PublicKey', (value) =>
+        value ? validatePubkey(value) : true
+      ),
+    name: yup.string().required(),
   })
   const inputs: InstructionInput[] = [
     {
