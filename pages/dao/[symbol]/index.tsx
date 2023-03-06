@@ -58,6 +58,8 @@ const REALM = () => {
   const {
     realm,
     realmInfo,
+    mint,
+    councilMint,
     proposals,
     governances,
     tokenRecords,
@@ -128,7 +130,15 @@ const REALM = () => {
   }, [JSON.stringify(filteredProposals)])
 
   useEffect(() => {
-    let proposals = filterProposals(allProposals, filters, sorting)
+    let proposals = filterProposals(
+      allProposals,
+      filters,
+      sorting,
+      realm,
+      governances,
+      councilMint,
+      mint
+    )
 
     if (proposalSearch) {
       proposals = proposals.filter(([, v]) =>
@@ -142,7 +152,15 @@ const REALM = () => {
   }, [filters, proposalSearch, sorting])
 
   useEffect(() => {
-    const proposals = filterProposals(allProposals, filters, sorting)
+    const proposals = filterProposals(
+      allProposals,
+      filters,
+      sorting,
+      realm,
+      governances,
+      councilMint,
+      mint
+    )
     setDisplayedProposals(proposals)
     setFilteredProposals(proposals)
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
@@ -188,7 +206,15 @@ const REALM = () => {
     if (multiVoteMode) {
       setFilteredProposals(votingProposals)
     } else {
-      const proposals = filterProposals(allProposals, filters, sorting)
+      const proposals = filterProposals(
+        allProposals,
+        filters,
+        sorting,
+        realm,
+        governances,
+        councilMint,
+        mint
+      )
       setFilteredProposals(proposals)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree

@@ -133,7 +133,7 @@ export function ExecuteAllInstructionButton({
   }, [isPassedExecutionSlot, rpcContext.connection, currentSlot])
 
   const signersNeeded = useSignersNeeded(proposalInstructions, proposal)
-  console.log(signersNeeded)
+
   const otherSignerNeeded =
     signersNeeded === undefined
       ? undefined
