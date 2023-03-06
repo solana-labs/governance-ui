@@ -332,7 +332,7 @@ export async function getInstructionDescriptor(
     : descriptors && descriptors[instruction.data[0]]
     ? descriptors[instruction.data[0]]
     : //backup if first number is same for couple of instructions inside same idl
-    descriptors[`${instruction.data[0]}${instruction.data[1]}`]
+    descriptors && descriptors[`${instruction.data[0]}${instruction.data[1]}`]
     ? descriptors[`${instruction.data[0]}${instruction.data[1]}`]
     : descriptors
 
