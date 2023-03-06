@@ -31,6 +31,7 @@ import { AssetType } from 'models/treasury/Asset'
 import CommunityMintIcon from '@components/treasuryV2/icons/CommunityMintIcon'
 import CouncilMintIcon from '@components/treasuryV2/icons/CouncilMintIcon'
 import MintIcon from '@components/treasuryV2/icons/MintIcon'
+import { getAccountName } from '@components/instructions/tools'
 
 function exists<T>(item: T | null | undefined): item is T {
   return item !== null || item !== undefined
@@ -221,6 +222,84 @@ const GovernedAccountSelect = ({
     )
   }
 
+  function getProgramView(value?: AssetAccount | null, selected = false) {
+    if (!value) {
+      return null
+    }
+
+    const wallet = wallets.find(({ account }) =>
+      account.pubkey.equals(value.pubkey)
+    )
+
+    if (!wallet) {
+      return null
+    }
+
+    const accountName = value.isSol
+      ? getSolAccountLabel(value).tokenAccountName
+      : value.isToken
+      ? getTokenAccountLabelInfo(value).tokenAccountName
+      : getMintAccountLabelInfo(value).mintAccountName
+
+    const walletInfo = RE.isOk(treasuryInfo)
+      ? treasuryInfo.data.wallets.find(
+          (wallet) =>
+            wallet.governanceAddress === value.governance.pubkey.toBase58()
+        )
+      : null
+
+    const programName = getAccountName(value.governance.account.governedAccount)
+
+    return (
+      <div className="grid grid-cols-[40px,1fr,max-content] gap-x-4 text-fgd-1 items-center w-full">
+        <div>
+          <UnselectedWalletIcon className="h-10 w-10 stroke-white/50" />
+        </div>
+        <div>
+          {accountName ? (
+            <div className="mb-0.5 truncate w-full">{accountName}</div>
+          ) : (
+            <div className="mb-0.5 truncate w-full">
+              {abbreviateAddress(wallet.walletAddress)}
+            </div>
+          )}
+          <div className="space-y-0.5 text-xs text-fgd-3">
+            <div>Rules: {abbreviateAddress(value.governance.pubkey)}</div>
+          </div>
+
+          <div className="space-y-0.5 text-xs text-fgd-3">
+            Program:{' '}
+            {programName
+              ? programName
+              : abbreviateAddress(value.governance.account.governedAccount)}
+          </div>
+        </div>
+        {walletInfo ? (
+          <div className={cx('flex flex-col items-end', selected && 'pr-2')}>
+            <div className="font-bold text-white text-sm mb-1">
+              ${walletInfo.totalValue.toFormat(2)}
+            </div>
+            <AssetsPreviewIconList
+              showMints
+              showRealmAuthority
+              assets={walletInfo.assets}
+              className="h-4"
+            />
+          </div>
+        ) : (
+          <div className={cx('flex flex-col items-end', selected && 'pr-2')}>
+            <div className="bg-bkg-2 px-2 py-1 rounded h-4 w-12 animate-pulse mb-1">
+              &nbsp;
+            </div>
+            <div className="bg-bkg-2 px-2 py-1 rounded h-4 w-16 animate-pulse">
+              &nbsp;
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
+
   function getTokenView(value?: AssetAccount | null) {
     if (!value) {
       return null
@@ -362,6 +441,8 @@ const GovernedAccountSelect = ({
             ? getTokenView(value)
             : type === 'mint'
             ? getMintView(value)
+            : value?.type === AccountType.PROGRAM
+            ? getProgramView(value, true)
             : getWalletView(value, true)
         }
         placeholder="Please select..."
@@ -421,7 +502,10 @@ const GovernedAccountSelect = ({
                     governance?.pubkey?.toBase58()
               )
               .map((wallet) => {
-                const label = getWalletView(wallet.account)
+                const label =
+                  wallet.account.type === AccountType.PROGRAM
+                    ? getProgramView(wallet.account)
+                    : getWalletView(wallet.account)
 
                 return label ? (
                   <Select.Option
