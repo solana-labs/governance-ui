@@ -4,29 +4,30 @@ import Modal from '@components/Modal'
 import Button, { SecondaryButton } from '@components/Button'
 import { notify } from '@utils/notifications'
 import { SubDaoWithMeta } from 'HeliumVotePlugin/sdk/types'
+import { useSubDaos } from 'HeliumVotePlugin/hooks/useSubDaos'
 
 export interface DelegateTokensModalProps {
   isOpen: boolean
-  subDaos: SubDaoWithMeta[]
   onClose: () => void
   onSubmit: (subDao: SubDaoWithMeta) => Promise<void>
 }
 
 export const DelegateTokensModal: React.FC<DelegateTokensModalProps> = ({
   isOpen,
-  subDaos,
   onClose,
   onSubmit,
 }) => {
+  const { loading, error, result: subDaos } = useSubDaos()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedSubDaoPk, setSelectedSubDaoPk] = useState<PublicKey | null>(
     null
   )
+
   const handleOnSubmit = async () => {
     try {
       setIsSubmitting(true)
       await onSubmit(
-        subDaos.find((subDao) => subDao.pubkey.equals(selectedSubDaoPk!))!
+        subDaos!.find((subDao) => subDao.pubkey.equals(selectedSubDaoPk!))!
       )
       onClose()
     } catch (e) {
@@ -41,29 +42,37 @@ export const DelegateTokensModal: React.FC<DelegateTokensModalProps> = ({
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
       <h2 className="mb-4 flex flex-row items-center">Delegate Tokens</h2>
-      <div className="bg-bkg-3 rounded-md w-full p-4 mb-4 font-normal text-xs">
-        <div>Select an exisitng subdao to delegate too</div>
-        <br />
-        <div>
-          Once delegated, you cant perform any actions on this postion until you
-          undelegate
+      {loading ? (
+        <div className="bg-bkg-3 rounded-md w-full p-4 mb-4 font-normal text-xs">
+          <div>Fetching Delegatable SubDaos</div>
         </div>
-        <div className="w-full flex flex-col gap-2">
-          {subDaos.map((subDao) => {
-            const isSelected = selectedSubDaoPk?.equals(subDao.pubkey)
+      ) : (
+        <div className="bg-bkg-3 rounded-md w-full p-4 mb-4 font-normal text-xs">
+          <div>Select an exisitng subdao to delegate too</div>
+          <br />
+          <div>
+            Once delegated, you cant perform any actions on this postion until
+            you undelegate
+          </div>
+          <div className="w-full flex flex-col gap-2">
+            {subDaos?.map((subDao) => {
+              const isSelected = selectedSubDaoPk?.equals(subDao.pubkey)
 
-            return (
-              <div
-                className={`border rounded-md flex flex-row w-full p-4 hover:border-fgd-3 hover:bg-bkg-3 hover:cursor-pointer ${
-                  isSelected ? 'bg-bkg-3 border-fgd-3' : 'border-fgd-4'
-                }`}
-                onClick={() => setSelectedSubDaoPk(subDao.pubkey)}
-                key={subDao.pubkey.toBase58()}
-              ></div>
-            )
-          })}
+              return (
+                <div
+                  className={`border rounded-md flex flex-row w-full p-4 hover:border-fgd-3 hover:bg-bkg-3 hover:cursor-pointer ${
+                    isSelected ? 'bg-bkg-3 border-fgd-3' : 'border-fgd-4'
+                  }`}
+                  onClick={() => setSelectedSubDaoPk(subDao.pubkey)}
+                  key={subDao.pubkey.toBase58()}
+                >
+                  {subDao.pubkey.toBase58()}
+                </div>
+              )
+            })}
+          </div>
         </div>
-      </div>
+      )}
       <div className="flex flex-col pt-4">
         <Button
           className="mb-4"

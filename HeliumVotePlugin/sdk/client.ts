@@ -13,9 +13,8 @@ export class HeliumVsrClient {
     programId: web3.PublicKey = PROGRAM_ID,
     devnet?: boolean
   ): Promise<HeliumVsrClient> {
-    console.log(programId.toBase58())
     return new HeliumVsrClient(
-      (await init(provider as any, programId, null)) as any,
+      (await init(provider as any, programId)) as any,
       devnet
     )
   }

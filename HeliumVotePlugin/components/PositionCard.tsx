@@ -42,9 +42,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
   const [transferablePositions, setTransferablePositions] = useState<
     PositionWithMeta[]
   >([])
-  // TODO (BRY)
-  const [delegableSubDaos, setDelegableSubDaos] = useState<SubDaoWithMeta[]>([])
-  const { realm, realmInfo, tokenRecords, ownTokenRecord } = useRealm()
+  const { realm, realmInfo } = useRealm()
   const [isLoading, positions, getPositions] = useHeliumVsrStore((s) => [
     s.state.isLoading,
     s.state.positions,
@@ -404,10 +402,9 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
           onSubmit={handleTransferTokens}
         />
       )}
-      {isDelegateModalOpen && (
+      {canDelegate && isDelegateModalOpen && (
         <DelegateTokensModal
           isOpen={isDelegateModalOpen}
-          subDaos={delegableSubDaos}
           onClose={() => setIsDelegateModalOpen(false)}
           onSubmit={handleDelegateTokens}
         />
