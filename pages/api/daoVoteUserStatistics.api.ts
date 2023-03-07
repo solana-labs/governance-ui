@@ -78,7 +78,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     title: proposalsByGovernance
       .flatMap((pbg) => pbg)
       .find((p) => p.pubkey.equals(x.account.proposal))?.account.name,
-    vote: YesNoVote[x.account.vote!.toYesNoVote()!],
+    vote: x.account.vote ? YesNoVote[x.account.vote!.toYesNoVote()!] : null,
   }))
 
   res.status(200).json({
