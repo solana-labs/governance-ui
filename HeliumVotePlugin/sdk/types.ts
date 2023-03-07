@@ -4,6 +4,7 @@ import { VoterStakeRegistry as HeliumVoterStakeRegistry } from '@helium/idls/lib
 import { HeliumSubDaos } from '@helium/idls/lib/types/helium_sub_daos'
 import { TokenProgramAccount } from '@utils/tokens'
 import { MintInfo } from '@solana/spl-token'
+import { Sft } from '@metaplex-foundation/js'
 
 export type Truthy<T> = T extends false | '' | 0 | null | undefined ? never : T // from lodash
 export const truthy = <T>(value: T): value is Truthy<T> => !!value
@@ -30,6 +31,7 @@ export type LockupKind = IdlTypes<HeliumVoterStakeRegistry>['LockupKind']
 export type InitializePositionV0Args = IdlTypes<HeliumVoterStakeRegistry>['InitializePositionArgsV0']
 
 export type SubDao = IdlAccounts<HeliumSubDaos>['subDaoV0']
-export interface SubDaoWithMeta extends SubDao {
+export interface SubDaoWithMeta extends Omit<SubDao, 'dntMint'> {
   pubkey: PublicKey
+  dntMetadata: Sft
 }

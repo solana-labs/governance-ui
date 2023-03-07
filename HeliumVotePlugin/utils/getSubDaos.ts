@@ -1,13 +1,14 @@
 import { AnchorProvider, Program } from '@project-serum/anchor'
-import { Connection, PublicKey } from '@solana/web3.js'
-import { SubDao, SubDaoWithMeta } from '../sdk/types'
-import { PROGRAM_ID, init, subDaoKey } from '@helium/helium-sub-daos-sdk'
-import { chunks } from '@utils/helpers'
+import { keypairIdentity, Metaplex } from '@metaplex-foundation/js'
+import { bs58 } from '@project-serum/anchor/dist/cjs/utils/bytes'
+import { Connection, Keypair, PublicKey } from '@solana/web3.js'
+import { SubDaoWithMeta } from '../sdk/types'
+import { PROGRAM_ID, init, daoKey } from '@helium/helium-sub-daos-sdk'
+import { HNT_MINT } from '@helium/spl-utils'
 
 export const getSubDaos = async (
   connection: Connection,
   provider: AnchorProvider,
-  dao: PublicKey,
   programId: PublicKey = PROGRAM_ID
 ): Promise<SubDaoWithMeta[]> => {
   try {
@@ -15,28 +16,35 @@ export const getSubDaos = async (
     const idl = await Program.fetchIdl(programId, provider)
     const hsdProgram = await init(provider as any, programId, idl)
 
-    /* const subDaoKeys = DNT_KEYS.map((dnt) => subDaoKey(dnt, programId)[0])
-    const subDaoAccountInfos = (
-      await Promise.all(
-        chunks(subDaoKeys, 99).map((chunk) =>
-          connection.getMultipleAccountsInfo(chunk)
-        )
+    const keypair = Keypair.generate()
+    const metaplex = new Metaplex(connection).use(keypairIdentity(keypair))
+    const dao = await daoKey(HNT_MINT, programId)[0]
+    const subdaos = await hsdProgram.account.subDaoV0.all([
+      {
+        memcmp: {
+          offset: 8,
+          bytes: bs58.encode(dao.toBuffer()),
+        },
+      },
+    ])
+
+    const dntMetadatas = await Promise.all(
+      subdaos.map(async (subDao) =>
+        metaplex.nfts().findByMint({
+          mintAddress: subDao.account.dntMint,
+        })
       )
-    ).flat()
+    )
 
     subDaos.push(
-      ...subDaoAccountInfos
-        .map(
-          (subDao) =>
-            hsdProgram.coder.accounts.decode('SubDaoV0', subDao!.data) as SubDao
-        )
-        .map((subDao, idx) => {
-          return {
-            ...subDao,
-            pubkey: subDaoKeys[idx],
-          } as SubDaoWithMeta
-        })
-    ) */
+      ...subdaos.map((subDao, idx) => {
+        return {
+          ...subDao.account,
+          pubkey: subDao.publicKey,
+          dntMetadata: dntMetadatas[idx],
+        } as SubDaoWithMeta
+      })
+    )
 
     return subDaos
   } catch (error) {

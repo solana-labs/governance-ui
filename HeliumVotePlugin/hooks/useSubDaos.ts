@@ -8,6 +8,9 @@ import { getSubDaos } from '../utils/getSubDaos'
 export const useSubDaos = (
   programId: web3.PublicKey = PROGRAM_ID
 ): UseAsyncReturn<SubDaoWithMeta[]> => {
-  const { anchorProvider: provider, connection } = useWallet()
-  return useAsync(getSubDaos, [connection.current, provider, programId])
+  const {
+    connection: { current },
+    anchorProvider: provider,
+  } = useWallet()
+  return useAsync(getSubDaos, [current, provider, programId])
 }

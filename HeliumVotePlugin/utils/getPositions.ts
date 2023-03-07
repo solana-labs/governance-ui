@@ -50,7 +50,7 @@ export const getPositions = async (
   ).filter((nft) => nft.collection?.address.equals(registrar.collection))
 
   const posKeys = nfts.map((nft) => positionKey((nft as any).mintAddress)[0])
-  const positionAccountInfos = (
+  const positionAccInfos = (
     await Promise.all(
       chunks(posKeys, 99).map((chunk) =>
         connection.getMultipleAccountsInfo(chunk)
@@ -62,7 +62,7 @@ export const getPositions = async (
     (posKey) => delegatedPositionKey(posKey)[0]
   )
 
-  const delegatedPositionAccountInfos = communityMintPk.equals(HNT_MINT)
+  const delegatedPositionAccInfos = communityMintPk.equals(HNT_MINT)
     ? await Promise.all(
         chunks(delegatedPosKeys, 99).map((chunk) =>
           connection.getMultipleAccountsInfo(chunk)
@@ -71,7 +71,7 @@ export const getPositions = async (
     : []
 
   positions.push(
-    ...positionAccountInfos
+    ...positionAccInfos
       .map(
         (pos) =>
           client.program.coder.accounts.decode(
@@ -83,7 +83,7 @@ export const getPositions = async (
         return {
           ...pos,
           pubkey: posKeys[idx],
-          isDelegated: !!delegatedPositionAccountInfos[idx],
+          isDelegated: !!delegatedPositionAccInfos[idx],
           votingPower: calcPositionVotingPower({
             position: pos,
             registrar,
