@@ -17,7 +17,7 @@ import { abbreviateAddress } from '@utils/formatting'
 import { useEffect, useMemo, useState } from 'react'
 import useLocalStorageState from '../hooks/useLocalStorageState'
 import useWalletStore from '../stores/useWalletStore'
-import { getWalletProviderByUrl } from '../utils/wallet-adapters'
+import { getWalletProviderByName } from '../utils/wallet-adapters'
 import Switch from './Switch'
 import { TwitterIcon } from './icons'
 import { notify } from '@utils/notifications'
@@ -46,15 +46,15 @@ const ConnectWalletButton = (props) => {
   const {
     connected,
     current,
-    providerUrl,
+    providerName,
     connection,
     set: setWalletStore,
   } = useWalletStore((s) => s)
 
-  const provider = useMemo(() => getWalletProviderByUrl(providerUrl, wallets), [
-    providerUrl,
-    wallets,
-  ])
+  const provider = useMemo(
+    () => getWalletProviderByName(providerName, wallets),
+    [providerName, wallets]
+  )
 
   useEffect(() => {
     if (connection.cluster !== currentCluster) {
@@ -209,7 +209,7 @@ const ConnectWalletButton = (props) => {
                           className="flex items-center w-full p-2 font-normal default-transition h-9 hover:bg-bkg-3 hover:cursor-pointer hover:rounded focus:outline-none"
                           onClick={() =>
                             setWalletStore((s) => {
-                              s.providerUrl = url
+                              s.providerName = name
                             })
                           }
                         >
