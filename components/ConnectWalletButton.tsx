@@ -175,7 +175,7 @@ const ConnectWalletButton = (props) => {
               <>
                 {isLoading ? <Loading></Loading> : 'Connect'}
                 <StyledWalletProviderLabel className="font-normal text-fgd-3">
-                  {provider?.name}
+                  {provider?.adapter?.name}
                 </StyledWalletProviderLabel>
               </>
             )}
@@ -203,7 +203,7 @@ const ConnectWalletButton = (props) => {
                       ({ adapter }) =>
                         adapter.readyState !== WalletReadyState.Unsupported
                     )
-                    .map(({ adapter: { icon, name, url } }) => (
+                    .map(({ adapter: { icon, name } }) => (
                       <Menu.Item key={name}>
                         <button
                           className="flex items-center w-full p-2 font-normal default-transition h-9 hover:bg-bkg-3 hover:cursor-pointer hover:rounded focus:outline-none"
@@ -216,7 +216,7 @@ const ConnectWalletButton = (props) => {
                           <img src={icon} className="w-4 h-4 mr-2" />
                           <span className="text-sm">{name}</span>
 
-                          {provider?.url === url ? (
+                          {provider?.adapter?.name === name ? (
                             <CheckCircleIcon className="w-5 h-5 ml-2 text-green" />
                           ) : null}
                         </button>
