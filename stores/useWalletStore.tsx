@@ -84,7 +84,7 @@ interface WalletStore extends State {
     tokenRole?: GoverningTokenRole
     proposalOwner: ProgramAccount<TokenOwnerRecord> | undefined
   }
-  providerUrl: string | undefined
+  providerName: string | undefined
   tokenAccounts: TokenProgramAccount<TokenAccount>[]
   set: (x: any) => void
   actions: any
@@ -136,7 +136,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
   ownVoteRecordsByProposal: {},
   selectedRealm: INITIAL_REALM_STATE,
   selectedProposal: INITIAL_PROPOSAL_STATE,
-  providerUrl: undefined,
+  providerName: undefined,
   tokenAccounts: [],
   switchboardProgram: undefined,
   selectedCouncilDelegate: undefined,

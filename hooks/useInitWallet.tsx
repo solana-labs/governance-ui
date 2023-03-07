@@ -5,7 +5,7 @@ import useWalletStore from '../stores/useWalletStore'
 import { notify } from '../utils/notifications'
 import {
   DEFAULT_PROVIDER,
-  getWalletProviderByUrl,
+  getWalletProviderByName,
 } from '../utils/wallet-adapters'
 
 import useInterval from './useInterval'
@@ -18,14 +18,14 @@ export default function useInitWallet() {
   const {
     connection,
     current: wallet,
-    providerUrl: selectedProviderUrl,
+    providerName: selectedProviderName,
     set: setWalletStore,
     actions,
   } = useWalletStore((state) => state)
 
-  const [savedProviderUrl, setSavedProviderUrl] = useLocalStorageState(
-    'walletProvider',
-    DEFAULT_PROVIDER.url
+  const [savedProviderName, setSavedProviderName] = useLocalStorageState(
+    'walletProviderV2',
+    DEFAULT_PROVIDER.name
   )
 
   async function flipWalletByTurningOffAndOn() {
@@ -45,26 +45,26 @@ export default function useInitWallet() {
 
   // initialize selection from local storage
   useEffect(() => {
-    if (!selectedProviderUrl) {
+    if (!selectedProviderName) {
       setWalletStore((s) => {
-        s.providerUrl = savedProviderUrl
+        s.providerName = savedProviderName
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [selectedProviderUrl, savedProviderUrl])
+  }, [selectedProviderName, savedProviderName])
 
-  const provider = useMemo(() => getWalletProviderByUrl(selectedProviderUrl, wallets), [
-    selectedProviderUrl,
-    wallets,
-  ])
+  const provider = useMemo(
+    () => getWalletProviderByName(selectedProviderName, wallets),
+    [savedProviderName, wallets]
+  )
 
   // save selection in local storage
   useEffect(() => {
-    if (selectedProviderUrl && selectedProviderUrl != savedProviderUrl) {
-      setSavedProviderUrl(selectedProviderUrl)
+    if (selectedProviderName && selectedProviderName != savedProviderName) {
+      setSavedProviderName(selectedProviderName)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [selectedProviderUrl])
+  }, [selectedProviderName])
 
   useEffect(() => {
     if (provider) {

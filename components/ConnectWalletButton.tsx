@@ -17,7 +17,7 @@ import { abbreviateAddress } from '@utils/formatting'
 import { useEffect, useMemo, useState } from 'react'
 import useLocalStorageState from '../hooks/useLocalStorageState'
 import useWalletStore from '../stores/useWalletStore'
-import { getWalletProviderByUrl } from '../utils/wallet-adapters'
+import { getWalletProviderByName } from '../utils/wallet-adapters'
 import Switch from './Switch'
 import { TwitterIcon } from './icons'
 import { notify } from '@utils/notifications'
@@ -46,15 +46,15 @@ const ConnectWalletButton = (props) => {
   const {
     connected,
     current,
-    providerUrl,
+    providerName,
     connection,
     set: setWalletStore,
   } = useWalletStore((s) => s)
 
-  const provider = useMemo(() => getWalletProviderByUrl(providerUrl, wallets), [
-    providerUrl,
-    wallets,
-  ])
+  const provider = useMemo(
+    () => getWalletProviderByName(providerName, wallets),
+    [providerName, wallets]
+  )
 
   useEffect(() => {
     if (connection.cluster !== currentCluster) {
@@ -175,7 +175,7 @@ const ConnectWalletButton = (props) => {
               <>
                 {isLoading ? <Loading></Loading> : 'Connect'}
                 <StyledWalletProviderLabel className="font-normal text-fgd-3">
-                  {provider?.name}
+                  {provider?.adapter?.name}
                 </StyledWalletProviderLabel>
               </>
             )}
@@ -203,20 +203,20 @@ const ConnectWalletButton = (props) => {
                       ({ adapter }) =>
                         adapter.readyState !== WalletReadyState.Unsupported
                     )
-                    .map(({ adapter: { icon, name, url } }) => (
+                    .map(({ adapter: { icon, name } }) => (
                       <Menu.Item key={name}>
                         <button
                           className="flex items-center w-full p-2 font-normal default-transition h-9 hover:bg-bkg-3 hover:cursor-pointer hover:rounded focus:outline-none"
                           onClick={() =>
                             setWalletStore((s) => {
-                              s.providerUrl = url
+                              s.providerName = name
                             })
                           }
                         >
                           <img src={icon} className="w-4 h-4 mr-2" />
                           <span className="text-sm">{name}</span>
 
-                          {provider?.url === url ? (
+                          {provider?.adapter?.name === name ? (
                             <CheckCircleIcon className="w-5 h-5 ml-2 text-green" />
                           ) : null}
                         </button>
