@@ -111,7 +111,7 @@ export async function prepareRealmCreation({
   const mintsSetupSigners: Keypair[] = []
   const initialCouncilTokenAmount = 1
 
-  const walletPk = getWalletPublicKey(wallet)
+  const walletPk = getWalletPublicKey(wallet as any)
   const programIdPk = new PublicKey(programIdAddress)
   const programVersion = await getGovernanceProgramVersion(
     connection,
