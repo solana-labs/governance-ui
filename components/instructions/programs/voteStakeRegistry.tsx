@@ -311,6 +311,18 @@ const heliumInitializeRegistrarIx = (_programId: PublicKey) => ({
   },
 })
 
+const heliumCreateMaxVoterWeightRecordIx = (_programId: PublicKey) => ({
+  144: {
+    name: 'Create Max Voter Weight Record',
+    accounts: [
+      { name: 'Max Voter Weight Record' },
+      { name: 'Registrar' },
+      { name: 'Realm governing token mint' },
+      { name: 'Payer' },
+    ],
+  },
+})
+
 const heliumConfigVotingMintIx = (programId: PublicKey) => ({
   46: {
     name: 'Configure voting mint',
@@ -412,6 +424,7 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
   // and has slightly different accounts for voting mint config
   [HELIUM_VSR_PROGRAM_ID.toBase58()]: [
     heliumInitializeRegistrarIx,
+    heliumCreateMaxVoterWeightRecordIx,
     heliumConfigVotingMintIx,
   ].reduce(
     (acc, ix) => ({

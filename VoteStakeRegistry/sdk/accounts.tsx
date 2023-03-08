@@ -77,7 +77,6 @@ export const getRegistrarPDA = async (
     registrarBump,
   }
 }
-
 export const getVoterPDA = async (
   registrar: PublicKey,
   walletPk: PublicKey,

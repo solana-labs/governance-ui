@@ -43,6 +43,7 @@ import {
   nftVoteRecordKey,
   registrarKey,
   voterWeightRecordKey,
+  maxVoterWeightRecordKey,
 } from '@helium/voter-stake-registry-sdk'
 import { getUnusedPositionsForProposal } from 'HeliumVotePlugin/utils/getUnusedPositionsForProposal'
 import { getUsedPositionsForProposal } from 'HeliumVotePlugin/utils/getUsedPositionsForProposal'
@@ -199,11 +200,11 @@ export class VotingClient {
 
     if (this.client instanceof HeliumVsrClient) {
       const remainingAccounts: AccountData[] = []
-      const registrar = registrarKey(
+      const [registrar] = registrarKey(
         realm.pubkey,
         realm.account.communityMint,
         clientProgramId
-      )[0]
+      )
 
       for (const pos of this.heliumVsrVotingPositions) {
         const tokenAccount = await getAssociatedTokenAddress(pos.mint, walletPk)
@@ -214,11 +215,17 @@ export class VotingClient {
         )
       }
 
-      const voterWeightPk = voterWeightRecordKey(
+      const [voterWeightPk] = voterWeightRecordKey(
         registrar,
         walletPk,
         clientProgramId
-      )[0]
+      )
+
+      const [maxVoterWeightPk] = maxVoterWeightRecordKey(
+        realm.pubkey,
+        realm.account.communityMint,
+        clientProgramId
+      )
 
       instructions.push(
         await (this.client as HeliumVsrClient).program.methods
@@ -237,7 +244,7 @@ export class VotingClient {
 
       return {
         voterWeightPk,
-        maxVoterWeightRecord: undefined,
+        maxVoterWeightRecord: maxVoterWeightPk,
       }
     }
 
@@ -399,11 +406,11 @@ export class VotingClient {
         this.client.devent ? 'devnet' : 'mainnet'
       )
 
-      const registrar = registrarKey(
+      const [registrar] = registrarKey(
         realm.pubkey,
         realm.account.communityMint,
         clientProgramId
-      )[0]
+      )
 
       const unusedPositions = await getUnusedPositionsForProposal({
         connection,
@@ -412,20 +419,26 @@ export class VotingClient {
         proposalPk: proposal.pubkey,
       })
 
-      const voterWeightPk = voterWeightRecordKey(
+      const [voterWeightPk] = voterWeightRecordKey(
         registrar,
         walletPk,
         clientProgramId
-      )[0]
+      )
+
+      const [maxVoterWeightPk] = maxVoterWeightRecordKey(
+        realm.pubkey,
+        realm.account.communityMint,
+        clientProgramId
+      )
 
       for (let i = 0; i < unusedPositions.length; i++) {
         const pos = unusedPositions[i]
         const tokenAccount = await getAssociatedTokenAddress(pos.mint, walletPk)
-        const nftVoteRecord = nftVoteRecordKey(
+        const [nftVoteRecord] = nftVoteRecordKey(
           proposal.pubkey,
           pos.mint,
           clientProgramId
-        )[0]
+        )
 
         remainingAccounts.push(
           new AccountData(tokenAccount),
@@ -459,7 +472,7 @@ export class VotingClient {
 
       return {
         voterWeightPk,
-        maxVoterWeightRecord: undefined,
+        maxVoterWeightRecord: maxVoterWeightPk,
       }
     }
 
@@ -556,17 +569,17 @@ export class VotingClient {
         this.client.devent ? 'devnet' : 'mainnet'
       )
 
-      const registrar = registrarKey(
+      const [registrar] = registrarKey(
         realm.pubkey,
         realm.account.communityMint,
         clientProgramId
-      )[0]
+      )
 
-      const voterWeightPk = voterWeightRecordKey(
+      const [voterWeightPk] = voterWeightRecordKey(
         registrar,
         walletPk,
         clientProgramId
-      )[0]
+      )
 
       const usedPositions = await getUsedPositionsForProposal({
         connection,
@@ -577,11 +590,11 @@ export class VotingClient {
 
       for (let i = 0; i < usedPositions.length; i++) {
         const pos = usedPositions[i]
-        const nftVoteRecord = nftVoteRecordKey(
+        const [nftVoteRecord] = nftVoteRecordKey(
           proposal.pubkey,
           pos.mint,
           clientProgramId
-        )[0]
+        )
 
         remainingAccounts.push(
           new AccountData(nftVoteRecord, false, true),

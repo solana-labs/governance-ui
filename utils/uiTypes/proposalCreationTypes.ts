@@ -551,6 +551,7 @@ export enum Instructions {
   CreateSolendObligationAccount,
   CreateTokenMetadata,
   CreateVsrRegistrar,
+  CreateVsrMaxVoterWeightRecord,
   DeactivateValidatorStake,
   DepositIntoCastle,
   DepositIntoGoblinGold,

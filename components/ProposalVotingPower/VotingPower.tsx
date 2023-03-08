@@ -34,7 +34,6 @@ enum Type {
   NFT,
   Community,
   LockedCommunityNFTRecord,
-  LockedCouncilNFTRecord,
 }
 
 function getTypes(
@@ -95,7 +94,7 @@ function getTypes(
       isDepositVisible(councilMint, realm?.account.config.councilMint) &&
       tokenRole === GoverningTokenRole.Council
     ) {
-      types.push(Type.LockedCouncilNFTRecord)
+      types.push(Type.Council)
     }
   } else if (tokenRole === GoverningTokenRole.Council) {
     types.push(Type.Council)
@@ -168,8 +167,6 @@ export default function VotingPower(props: Props) {
             return <NftVotingPower key={type} />
           case Type.LockedCommunityNFTRecord:
             return <LockedCommunityNFTRecordVotingPower key={type} />
-          case Type.LockedCouncilNFTRecord:
-            return <div>TODO (BRY): Build out comp</div>
         }
       })}
     </div>
