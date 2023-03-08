@@ -48,7 +48,7 @@ export async function getAirdropInstruction({
             return parseInt(item, 10);
         });
     }
-    const airdropTransactionContext: AirdropConfigureContext = await airdrop.createConfigMerkleTransactionFromRoot(
+    const airdropTransactionContext: AirdropConfigureContext = await airdrop.createConfigMerkleTransaction(
         form.treasury.pubkey, // source
         form.treasury.extensions.token!.account.owner!, // authority
         amountNatural,
