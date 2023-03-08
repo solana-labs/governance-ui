@@ -41,24 +41,28 @@ const GovernancePowerTitle = () => {
 
   useEffect(() => {
     const getTokenOwnerRecord = async () => {
+      if (realm === undefined) return
+      if (!wallet?.publicKey) return
+
       const defaultMint = !mint?.supply.isZero()
-        ? realm!.account.communityMint
+        ? realm.account.communityMint
         : !councilMint?.supply.isZero()
-        ? realm!.account.config.councilMint
+        ? realm.account.config.councilMint
         : undefined
+
+      if (defaultMint === undefined) return
+
       const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
-        realm!.owner,
-        realm!.pubkey,
-        defaultMint!,
-        wallet!.publicKey!
+        realm.owner,
+        realm.pubkey,
+        defaultMint,
+        wallet?.publicKey
       )
       setTokenOwneRecordPk(tokenOwnerRecordAddress.toBase58())
     }
-    if (realm && wallet?.connected) {
-      getTokenOwnerRecord()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [realm?.pubkey.toBase58(), wallet?.connected])
+    getTokenOwnerRecord()
+  }, [councilMint?.supply, mint?.supply, realm, wallet?.publicKey])
+
   return (
     <div className="flex items-center justify-between mb-4">
       <h3 className="mb-0">My governance power</h3>
