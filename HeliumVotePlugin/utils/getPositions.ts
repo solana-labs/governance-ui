@@ -33,6 +33,7 @@ export const getPositions = async (
   let votingPower: BN = new BN(0)
 
   const keypair = Keypair.generate()
+  const now = new BN(Math.round(new Date().getTime() / 1000))
   const metaplex = new Metaplex(connection).use(keypairIdentity(keypair))
   const registrarPk = registrarKey(realmPk, communityMintPk)[0]
   const registrar = (await client.program.account.registrar.fetch(
@@ -84,6 +85,7 @@ export const getPositions = async (
           ...pos,
           pubkey: posKeys[idx],
           isDelegated: !!delegatedPositionAccInfos[idx],
+          hasGenesisMultiplier: pos.genesisEnd.gt(now),
           votingPower: calcPositionVotingPower({
             position: pos,
             registrar,

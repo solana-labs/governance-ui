@@ -13,30 +13,32 @@ export const calcPositionVotingPower = ({
   const mintCfgs = registrar?.votingMints || []
   const mintCfg = position ? mintCfgs[position.votingMintConfigIdx] : undefined
 
-  if (mintCfg) {
+  if (position && mintCfg) {
     const {
       lockupSaturationSecs,
       baselineVoteWeightScaledFactor,
       maxExtraLockupVoteWeightScaledFactor,
-      // genesisVotePowerMultiplier = 1,
-      // genesisVotePowerMultiplierExpirationTs,
+      genesisVotePowerMultiplier = 1,
     } = mintCfg as VotingMintConfig
-    const now = Math.round(new Date().getTime() / 1000)
+    const now = new BN(Math.round(new Date().getTime() / 1000))
+    const hasGenesisMultiplier = position.genesisEnd.gt(now)
     const lockup = position!.lockup
     const lockupKind = Object.keys(lockup.kind as LockupKind)[0]
-    const currTs = lockupKind === 'constant' ? lockup.startTs : new BN(now)
+    const currTs = lockupKind === 'constant' ? lockup.startTs : now
     const lockupSecs = lockup.endTs.sub(currTs).toNumber()
     const amountLockedNative = position!.amountDepositedNative.toNumber()
     const baselineScaledFactorNum = baselineVoteWeightScaledFactor.toNumber()
     const maxExtraLockupVoteWeightScaledFactorNum = maxExtraLockupVoteWeightScaledFactor.toNumber()
     const lockupSaturationSecsNum = lockupSaturationSecs.toNumber()
 
-    const multiplier = calcMultiplier({
-      baselineScaledFactor: baselineScaledFactorNum,
-      maxExtraLockupScaledFactor: maxExtraLockupVoteWeightScaledFactorNum,
-      lockupSecs,
-      lockupSaturationSecs: lockupSaturationSecsNum,
-    })
+    const multiplier =
+      (hasGenesisMultiplier ? genesisVotePowerMultiplier : 1) *
+      calcMultiplier({
+        baselineScaledFactor: baselineScaledFactorNum,
+        maxExtraLockupScaledFactor: maxExtraLockupVoteWeightScaledFactorNum,
+        lockupSecs,
+        lockupSaturationSecs: lockupSaturationSecsNum,
+      })
 
     votingPower = new BN(amountLockedNative * multiplier)
   }

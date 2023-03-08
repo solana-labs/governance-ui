@@ -330,9 +330,15 @@ export const LockTokensAccount: React.FC<{
               }`}
             >
               {!isLoading &&
-                positions.map((pos, idx) => (
-                  <PositionCard key={idx} position={pos} />
-                ))}
+                positions
+                  .sort((a, b) => {
+                    return a.hasGenesisMultiplier
+                      ? -1
+                      : a.lockup.endTs.lt(b.lockup.endTs)
+                      ? 1
+                      : 0
+                  })
+                  .map((pos, idx) => <PositionCard key={idx} position={pos} />)}
               <div className="border border-fgd-4 flex flex-col items-center justify-center p-6 rounded-lg">
                 <LightningBoltIcon className="h-8 mb-2 text-primary-light w-8" />
                 <p className="flex text-center pb-6">

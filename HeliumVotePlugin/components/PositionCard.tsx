@@ -86,13 +86,13 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
 
   const {
     loading: isDelegating,
-    error: delegationError,
+    error: delegatingError,
     delegatePosition,
   } = useDelegatePosition()
 
   const {
     loading: isUndelegating,
-    error: undelegationError,
+    error: undelegatingError,
     undelegatePosition,
   } = useUndelegatePosition()
 
@@ -123,6 +123,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
           )
 
           return (
+            !pos.hasGenesisMultiplier &&
             !position.pubkey.equals(pos.pubkey) &&
             lockupPeriodInDays >= positionLockupPeriodInDays
           )
@@ -131,7 +132,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
     }
   }, [position, unixNow, positions, setTransferablePositions])
 
-  const lockup = position.lockup
+  const { lockup, hasGenesisMultiplier, votingMint } = position
   const lockupKind = Object.keys(lockup.kind)[0] as string
   const lockupExpired =
     lockupKind !== 'constant' && lockup.endTs.sub(new BN(unixNow)).lt(new BN(0))
@@ -224,26 +225,24 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
       subDao,
     })
 
-    if (!delegationError) {
+    if (!delegatingError) {
       await refetchState()
     }
   }
 
   const handleUndelegateTokens = async () => {
-    // TODO (bry)
-    console.log('UnDelegate')
-    // try {
-    //   await undelegatePosition({ position })
+    try {
+      await undelegatePosition({ position })
 
-    //   if (!undelegatingError) {
-    //     await refetchState()
-    //   }
-    // } catch (e) {
-    //   notify({
-    //     type: 'error',
-    //     message: e.message || 'Unable to undelegate tokens',
-    //   })
-    // }
+      if (!undelegatingError) {
+        await refetchState()
+      }
+    } catch (e) {
+      notify({
+        type: 'error',
+        message: e.message || 'Unable to undelegate tokens',
+      })
+    }
   }
 
   const handleClose = async () => {
@@ -273,9 +272,23 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
   }
 
   const isSubmitting =
-    isExtending || isClosing || isTransfering || isUnlocking || isDelegating
+    isExtending ||
+    isClosing ||
+    isTransfering ||
+    isUnlocking ||
+    isDelegating ||
+    isUndelegating
+
   return (
-    <div className="border border-fgd-4 rounded-lg flex flex-col">
+    <div className="relative border overflow-hidden border-fgd-4 rounded-lg flex flex-col">
+      {hasGenesisMultiplier && (
+        <div
+          className="absolute bg-primary-light px-8 transform rotate-45 top-4 text-bkg-2 text-xs font-bold"
+          style={{ right: '-36px' }}
+        >
+          GENESIS
+        </div>
+      )}
       {isLoading ? (
         <>
           <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-md" />
@@ -324,14 +337,20 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
                     : getTimeLeftFromNowFmt(position.lockup as any)
                 }
               />
+              {hasGenesisMultiplier && (
+                <CardLabel
+                  label="Genesis Multiplier"
+                  value={votingMint.genesisVotePowerMultiplier}
+                />
+              )}
             </div>
             <div style={{ marginTop: 'auto' }}>
               {position.isDelegated ? (
                 <Button
                   className="w-full"
-                  onClick={() => console.log('Undelegate')}
+                  onClick={handleUndelegateTokens}
                   disabled={isSubmitting}
-                  isLoading={isSubmitting}
+                  isLoading={isUndelegating}
                 >
                   UnDelegate
                 </Button>
@@ -357,16 +376,18 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
                         >
                           Extend
                         </Button>
-                        <Button
-                          className="w-full"
-                          onClick={() => setIsTransferModalOpen(true)}
-                          disabled={
-                            transferablePositions.length == 0 || isSubmitting
-                          }
-                          isLoading={isTransfering}
-                        >
-                          Transfer
-                        </Button>
+                        {!hasGenesisMultiplier && (
+                          <Button
+                            className="w-full"
+                            onClick={() => setIsTransferModalOpen(true)}
+                            disabled={
+                              transferablePositions.length == 0 || isSubmitting
+                            }
+                            isLoading={isTransfering}
+                          >
+                            Transfer
+                          </Button>
+                        )}
                       </div>
                       {isConstant && (
                         <Button

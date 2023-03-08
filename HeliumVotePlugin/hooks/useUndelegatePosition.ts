@@ -33,7 +33,7 @@ export const useUndelegatePosition = () => {
       if (loading) return
 
       if (isInvalid || !hsdProgram) {
-        throw new Error('Unable to Delegate Position, Invalid params')
+        throw new Error('Unable to Undelegate Position, Invalid params')
       } else {
         const instructions: TransactionInstruction[] = []
         const delegatedPosKey = delegatedPositionKey(position.pubkey)[0]
