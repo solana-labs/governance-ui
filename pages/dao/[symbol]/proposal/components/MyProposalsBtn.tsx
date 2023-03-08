@@ -32,7 +32,6 @@ import {
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
 import useQueryContext from '@hooks/useQueryContext'
-import { useRouter } from 'next/router'
 
 const MyProposalsBn = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
