@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import useRealm from '@hooks/useRealm'
 import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
-import { isFormValid } from '@utils/formValidation'
+import { isFormValid, validatePubkey } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -17,7 +17,7 @@ import InstructionForm, {
   InstructionInputType,
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
-import { I80F48 } from '@blockworks-foundation/mango-client'
+import { I80F48 } from '@blockworks-foundation/mango-v4'
 
 interface StubOracleSetForm {
   governedAccount: AssetAccount | null
@@ -36,8 +36,11 @@ const StubOracleSet = ({
   const { mangoClient, mangoGroup } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
-  const governedProgramAccounts = assetAccounts.filter(
-    (x) => x.type === AccountType.SOL
+  const solAccounts = assetAccounts.filter(
+    (x) =>
+      x.type === AccountType.SOL &&
+      mangoGroup?.admin &&
+      x.extensions.transferAddress?.equals(mangoGroup.admin)
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
@@ -48,10 +51,7 @@ const StubOracleSet = ({
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
-  const handleSetForm = ({ propertyName, value }) => {
-    setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
-  }
+
   const validateInstruction = async (): Promise<boolean> => {
     const { isValid, validationErrors } = await isFormValid(schema, form)
     setFormErrors(validationErrors)
@@ -84,13 +84,7 @@ const StubOracleSet = ({
     }
     return obj
   }
-  useEffect(() => {
-    handleSetForm({
-      propertyName: 'programId',
-      value: programId?.toString(),
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [realmInfo?.programId])
+
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
@@ -103,6 +97,13 @@ const StubOracleSet = ({
       .object()
       .nullable()
       .required('Program governed account is required'),
+    price: yup.string().required(),
+    oraclePk: yup
+      .string()
+      .required()
+      .test('is-valid-address', 'Please enter a valid PublicKey', (value) =>
+        value ? validatePubkey(value) : true
+      ),
   })
   const inputs: InstructionInput[] = [
     {
@@ -112,7 +113,7 @@ const StubOracleSet = ({
       type: InstructionInputType.GOVERNED_ACCOUNT,
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governance,
-      options: governedProgramAccounts,
+      options: solAccounts,
     },
     {
       label: 'Price',

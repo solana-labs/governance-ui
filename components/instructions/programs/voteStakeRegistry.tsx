@@ -1,9 +1,5 @@
 import { Wallet } from '@marinade.finance/marinade-ts-sdk'
-import {
-  AnchorProvider,
-  BN,
-  BorshInstructionCoder,
-} from '@project-serum/anchor'
+import { AnchorProvider, BN, BorshInstructionCoder } from '@coral-xyz/anchor'
 import { AccountMetaData } from '@solana/spl-governance'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import { fmtMintAmount } from '@tools/sdk/units'
@@ -228,6 +224,16 @@ const common_instructions = (programId: PublicKey) => ({
                       decodedInstructionData.amount.div(new BN(periods))
                     )}{' '}
                     p/m
+                  </div>
+                )}
+                {lockupKind === 'daily' && periods && (
+                  <div>
+                    Vested:{' '}
+                    {fmtMintAmount(
+                      mint!.account,
+                      decodedInstructionData.amount.div(new BN(periods))
+                    )}{' '}
+                    p/d
                   </div>
                 )}
                 {logoUrl && (

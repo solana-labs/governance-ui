@@ -8,6 +8,16 @@ export const StyledLabel = styled.div`
 export const StyledSuffix = styled.div`
   ${tw`absolute right-0 text-xs flex items-center pr-2 h-full bg-transparent text-fgd-4`}
 `
+
+export interface InputClasses {
+  className?: string
+  disabled?: boolean
+  error: string
+  noMaxWidth?: boolean
+  useDefaultStyle?: boolean
+  showErrorState?: boolean
+}
+
 export const inputClasses = ({
   className = '',
   disabled,
@@ -15,7 +25,7 @@ export const inputClasses = ({
   noMaxWidth = false,
   useDefaultStyle = true,
   showErrorState = false,
-}) => {
+}: InputClasses) => {
   const disabledStyle =
     'cursor-not-allowed opacity-50 text-fgd-3 border bg-bkg-1 border-bkg-4'
 

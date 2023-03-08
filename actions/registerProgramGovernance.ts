@@ -17,6 +17,7 @@ import { RpcContext } from '@solana/spl-governance'
 import { sendTransaction } from '@utils/send'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
 import { trySentryLog } from '@utils/logs'
+import { createSetUpgradeAuthority } from '@tools/sdk/bpfUpgradeableLoader/createSetUpgradeAuthority'
 
 export const registerProgramGovernance = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -56,13 +57,22 @@ export const registerProgramGovernance = async (
         realm.pubkey,
         governedAccount,
         config,
-        transferAuthority!,
+        false,
         walletPubkey,
         tokenOwnerRecord.pubkey,
         walletPubkey,
         governanceAuthority,
         plugin?.voterWeightPk
       )
+      if (transferAuthority) {
+        const transferUpgradeAuthIx = await createSetUpgradeAuthority(
+          governedAccount,
+          walletPubkey,
+          governanceAddress
+        )
+        instructions.push(transferUpgradeAuthIx)
+      }
+
       break
     }
     default: {

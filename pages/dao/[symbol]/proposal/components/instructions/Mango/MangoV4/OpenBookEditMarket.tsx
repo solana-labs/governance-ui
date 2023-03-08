@@ -41,8 +41,11 @@ const OpenBookEditMarket = ({
   const { mangoClient, mangoGroup } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
-  const governedProgramAccounts = assetAccounts.filter(
-    (x) => x.type === AccountType.SOL
+  const solAccounts = assetAccounts.filter(
+    (x) =>
+      x.type === AccountType.SOL &&
+      mangoGroup?.admin &&
+      x.extensions.transferAddress?.equals(mangoGroup.admin)
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
@@ -54,10 +57,7 @@ const OpenBookEditMarket = ({
   const [currentMarkets, setCurrentMarkets] = useState<NameMarketIndexVal[]>([])
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
-  const handleSetForm = ({ propertyName, value }) => {
-    setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
-  }
+
   const validateInstruction = async (): Promise<boolean> => {
     const { isValid, validationErrors } = await isFormValid(schema, form)
     setFormErrors(validationErrors)
@@ -94,13 +94,7 @@ const OpenBookEditMarket = ({
     }
     return obj
   }
-  useEffect(() => {
-    handleSetForm({
-      propertyName: 'programId',
-      value: programId?.toString(),
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [realmInfo?.programId])
+
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
@@ -150,7 +144,7 @@ const OpenBookEditMarket = ({
       type: InstructionInputType.GOVERNED_ACCOUNT,
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governance,
-      options: governedProgramAccounts,
+      options: solAccounts,
     },
     {
       label: 'Market',

@@ -8,7 +8,7 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js'
 import * as yup from 'yup'
-import { isFormValid } from '@utils/formValidation'
+import { isFormValid, validatePubkey } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -16,19 +16,20 @@ import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
-import { BN } from '@blockworks-foundation/mango-client'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, {
   InstructionInput,
   InstructionInputType,
 } from '../../FormCreator'
 import UseMangoV4 from '@hooks/useMangoV4'
+import { BN } from '@coral-xyz/anchor'
 
 interface PerpCreateForm {
   governedAccount: AssetAccount | null
   oraclePk: string
   name: string
   oracleConfFilter: number
+  maxStalenessSlots: string
   baseDecimals: number
   quoteLotSize: number
   baseLotSize: number
@@ -36,9 +37,9 @@ interface PerpCreateForm {
   initBaseAssetWeight: number
   maintBaseLiabWeight: number
   initBaseLiabWeight: number
-  maintPnlAssetWeight: number
-  initPnlAssetWeight: number
-  liquidationFee: number
+  maintOverallAssetWeight: number
+  initOverallAssetWeight: number
+  baseLiquidationFee: number
   makerFee: number
   takerFee: number
   feePenalty: number
@@ -52,6 +53,8 @@ interface PerpCreateForm {
   settleTokenIndex: number
   settlePnlLimitFactor: number
   settlePnlLimitWindowSize: number
+  positivePnlLiquidationFee: number
+  perpMarketIndex: number
 }
 
 const PerpCreate = ({
@@ -65,8 +68,11 @@ const PerpCreate = ({
   const { mangoClient, mangoGroup, getAdditionalLabelInfo } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
-  const governedProgramAccounts = assetAccounts.filter(
-    (x) => x.type === AccountType.SOL
+  const solAccounts = assetAccounts.filter(
+    (x) =>
+      x.type === AccountType.SOL &&
+      mangoGroup?.admin &&
+      x.extensions.transferAddress?.equals(mangoGroup?.admin)
   )
   const { connection } = useWalletStore()
   const shouldBeGoverned = !!(index !== 0 && governance)
@@ -74,8 +80,10 @@ const PerpCreate = ({
   const [form, setForm] = useState<PerpCreateForm>({
     governedAccount: null,
     oracleConfFilter: 0.1,
+    maxStalenessSlots: '',
     oraclePk: '',
     name: '',
+    perpMarketIndex: 0,
     baseDecimals: 6,
     quoteLotSize: 10,
     baseLotSize: 100,
@@ -83,9 +91,9 @@ const PerpCreate = ({
     initBaseAssetWeight: 0.95,
     maintBaseLiabWeight: 1.025,
     initBaseLiabWeight: 1.05,
-    maintPnlAssetWeight: 1,
-    initPnlAssetWeight: 1,
-    liquidationFee: 0.0125,
+    maintOverallAssetWeight: 1,
+    initOverallAssetWeight: 1,
+    baseLiquidationFee: 0.0125,
     makerFee: -0.0001,
     takerFee: 0.0004,
     feePenalty: 5,
@@ -98,14 +106,12 @@ const PerpCreate = ({
     settleFeeFractionLowHealth: 0.01,
     settleTokenIndex: 0,
     settlePnlLimitFactor: 1.0,
-    settlePnlLimitWindowSize: 2 * 60 * 60,
+    settlePnlLimitWindowSize: 60 * 60,
+    positivePnlLiquidationFee: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
-  const handleSetForm = ({ propertyName, value }) => {
-    setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
-  }
+
   const validateInstruction = async (): Promise<boolean> => {
     const { isValid, validationErrors } = await isFormValid(schema, form)
     setFormErrors(validationErrors)
@@ -125,7 +131,7 @@ const PerpCreate = ({
       const bids = new Keypair()
       const asks = new Keypair()
       const eventQueue = new Keypair()
-      const perpMarketIndex = mangoGroup!.perpMarketsMapByName.size
+
       const bookSideSize = mangoClient!.program.coder.accounts.size(
         (mangoClient!.program.account.bookSide as any)._idlAccount
       )
@@ -164,11 +170,14 @@ const PerpCreate = ({
       ]
       const ix = await mangoClient!.program.methods
         .perpCreateMarket(
-          Number(perpMarketIndex),
+          Number(form.perpMarketIndex),
           form.name,
           {
             confFilter: Number(form.oracleConfFilter),
-            maxStalenessSlots: null,
+            maxStalenessSlots:
+              form.maxStalenessSlots !== ''
+                ? Number(form.maxStalenessSlots)
+                : null,
           },
           Number(form.baseDecimals),
           new BN(form.quoteLotSize),
@@ -177,9 +186,9 @@ const PerpCreate = ({
           Number(form.initBaseAssetWeight),
           Number(form.maintBaseLiabWeight),
           Number(form.initBaseLiabWeight),
-          Number(form.maintPnlAssetWeight),
-          Number(form.initPnlAssetWeight),
-          Number(form.liquidationFee),
+          Number(form.maintOverallAssetWeight),
+          Number(form.initOverallAssetWeight),
+          Number(form.baseLiquidationFee),
           Number(form.makerFee),
           Number(form.takerFee),
           Number(form.minFunding),
@@ -192,7 +201,8 @@ const PerpCreate = ({
           Number(form.settleFeeFractionLowHealth),
           Number(form.settleTokenIndex),
           Number(form.settlePnlLimitFactor),
-          new BN(form.settlePnlLimitWindowSize)
+          new BN(form.settlePnlLimitWindowSize),
+          Number(form.positivePnlLiquidationFee)
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -218,13 +228,7 @@ const PerpCreate = ({
     }
     return obj
   }
-  useEffect(() => {
-    handleSetForm({
-      propertyName: 'programId',
-      value: programId?.toString(),
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [realmInfo?.programId])
+
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
@@ -237,7 +241,27 @@ const PerpCreate = ({
       .object()
       .nullable()
       .required('Program governed account is required'),
+    name: yup.string().required(),
+    perpMarketIndex: yup.string().required(),
+    oraclePk: yup
+      .string()
+      .required()
+      .test('is-valid-address', 'Please enter a valid PublicKey', (value) =>
+        value ? validatePubkey(value) : true
+      ),
   })
+
+  useEffect(() => {
+    const perpMarketIndex =
+      !mangoGroup || mangoGroup?.perpMarketsMapByMarketIndex.size === 0
+        ? 0
+        : Math.max(...[...mangoGroup!.perpMarketsMapByMarketIndex.keys()]) + 1
+    setForm({
+      ...form,
+      perpMarketIndex: perpMarketIndex,
+    })
+  }, [mangoGroup?.perpMarketsMapByMarketIndex.size])
+
   const inputs: InstructionInput[] = [
     {
       label: 'Governance',
@@ -246,7 +270,7 @@ const PerpCreate = ({
       type: InstructionInputType.GOVERNED_ACCOUNT,
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governance,
-      options: governedProgramAccounts,
+      options: solAccounts,
     },
     {
       label: 'Perp Name',
@@ -255,20 +279,34 @@ const PerpCreate = ({
       name: 'name',
     },
     {
+      label: `Perp Market Index`,
+      initialValue: form.perpMarketIndex,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'perpMarketIndex',
+    },
+    {
       label: 'Oracle PublicKey',
       initialValue: form.oraclePk,
       type: InstructionInputType.INPUT,
       name: 'oraclePk',
     },
-
     {
-      label: `Oracle Configuration Filter ${getAdditionalLabelInfo(
-        'confFilter'
-      )}`,
+      label: `Oracle Confidence Filter`,
+      subtitle: getAdditionalLabelInfo('confFilter'),
       initialValue: form.oracleConfFilter,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'oracleConfFilter',
+    },
+
+    {
+      label: `Max Staleness Slots`,
+      subtitle: getAdditionalLabelInfo('maxStalenessSlots'),
+      initialValue: form.maxStalenessSlots,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'maxStalenessSlots',
     },
     {
       label: 'Base Decimals',
@@ -278,179 +316,187 @@ const PerpCreate = ({
       name: 'baseDecimals',
     },
     {
-      label: `Quote Lot Size ${getAdditionalLabelInfo('quoteLotSize')}`,
+      label: `Quote Lot Size`,
+      subtitle: getAdditionalLabelInfo('quoteLotSize'),
       initialValue: form.quoteLotSize,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'quoteLotSize',
     },
     {
-      label: `Base Lot Size ${getAdditionalLabelInfo('baseLotSize')}`,
+      label: `Base Lot Size`,
+      subtitle: getAdditionalLabelInfo('baseLotSize'),
       initialValue: form.baseLotSize,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'baseLotSize',
     },
     {
-      label: `Maint Base Asset Weight ${getAdditionalLabelInfo(
-        'maintBaseAssetWeight'
-      )}`,
+      label: `Maintenance Base Asset Weight`,
+      subtitle: getAdditionalLabelInfo('maintBaseAssetWeight'),
       initialValue: form.maintBaseAssetWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'maintBaseAssetWeight',
     },
     {
-      label: `Init Base Asset Weight ${getAdditionalLabelInfo(
-        'initBaseAssetWeight'
-      )}`,
+      label: `Init Base Asset Weight`,
+      subtitle: getAdditionalLabelInfo('initBaseAssetWeight'),
       initialValue: form.initBaseAssetWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'initBaseAssetWeight',
     },
     {
-      label: `Init Base Liab Weight ${getAdditionalLabelInfo(
-        'initBaseLiabWeight'
-      )}`,
-      initialValue: form.initBaseLiabWeight,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'initBaseLiabWeight',
-    },
-    {
-      label: `Maint Base Liab Weight ${getAdditionalLabelInfo(
-        'maintBaseLiabWeight'
-      )}`,
+      label: `Maintenance Base Liab Weight`,
+      subtitle: getAdditionalLabelInfo('maintBaseLiabWeight'),
       initialValue: form.maintBaseLiabWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'maintBaseLiabWeight',
     },
     {
-      label: `Maint Pnl Asset Weight ${getAdditionalLabelInfo(
-        'maintPnlAssetWeight'
-      )}`,
-      initialValue: form.maintPnlAssetWeight,
+      label: `Init Base Liab Weight`,
+      subtitle: getAdditionalLabelInfo('initBaseLiabWeight'),
+      initialValue: form.initBaseLiabWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
-      name: 'maintPnlAssetWeight',
+      name: 'initBaseLiabWeight',
     },
     {
-      label: `Liquidation Fee ${getAdditionalLabelInfo('liquidationFee')}`,
-      initialValue: form.liquidationFee,
+      label: `Maint Overall Asset Weight`,
+      subtitle: getAdditionalLabelInfo('maintOverallAssetWeight'),
+      initialValue: form.maintOverallAssetWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
-      name: 'liquidationFee',
+      name: 'maintOverallAssetWeight',
     },
     {
-      label: `Init Pnl Asset Weight ${getAdditionalLabelInfo(
-        'initPnlAssetWeight'
-      )}`,
-      initialValue: form.initPnlAssetWeight,
+      label: `Init Overall Asset Weight`,
+      subtitle: getAdditionalLabelInfo('initOverallAssetWeight'),
+      initialValue: form.initOverallAssetWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
-      name: 'initPnlAssetWeight',
+      name: 'initOverallAssetWeight',
     },
     {
-      label: `Maker Fee ${getAdditionalLabelInfo('makerFee')}`,
+      label: `Base Liquidation Fee`,
+      subtitle: getAdditionalLabelInfo('baseLiquidationFee'),
+      initialValue: form.baseLiquidationFee,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'baseLiquidationFee',
+    },
+    {
+      label: `Maker Fee`,
+      subtitle: getAdditionalLabelInfo('makerFee'),
       initialValue: form.makerFee,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'makerFee',
     },
     {
-      label: `Taker Fee ${getAdditionalLabelInfo('takerFee')}`,
+      label: `Taker Fee`,
+      subtitle: getAdditionalLabelInfo('takerFee'),
       initialValue: form.takerFee,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'takerFee',
     },
     {
-      label: `Fee Penalty ${getAdditionalLabelInfo('feePenalty')}`,
+      label: `Fee Penalty`,
+      subtitle: getAdditionalLabelInfo('feePenalty'),
       initialValue: form.feePenalty,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'feePenalty',
     },
     {
-      label: `Group Insurance Fund ${getAdditionalLabelInfo(
-        'groupInsuranceFund'
-      )}`,
+      label: `Group Insurance Fund`,
+      subtitle: getAdditionalLabelInfo('groupInsuranceFund'),
       initialValue: form.groupInsuranceFund,
       type: InstructionInputType.SWITCH,
       name: 'groupInsuranceFund',
     },
     {
-      label: `Settle Fee Flat ${getAdditionalLabelInfo('settleFeeFlat')}`,
+      label: `Settle Fee Flat`,
+      subtitle: getAdditionalLabelInfo('settleFeeFlat'),
       initialValue: form.settleFeeFlat,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'settleFeeFlat',
     },
     {
-      label: `Settle Fee Amount Threshold ${getAdditionalLabelInfo(
-        'settleFeeAmountThreshold'
-      )}`,
+      label: `Settle Fee Amount Threshold`,
+      subtitle: getAdditionalLabelInfo('settleFeeAmountThreshold'),
       initialValue: form.settleFeeAmountThreshold,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'settleFeeAmountThreshold',
     },
     {
-      label: `Settle Fee Fraction Low Health ${getAdditionalLabelInfo(
-        'settleFeeFractionLowHealth'
-      )}`,
+      label: `Settle Fee Fraction Low Health`,
+      subtitle: getAdditionalLabelInfo('settleFeeFractionLowHealth'),
       initialValue: form.settleFeeFractionLowHealth,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'settleFeeFractionLowHealth',
     },
     {
-      label: `Settle Token Index ${getAdditionalLabelInfo('settleTokenIndex')}`,
+      label: `Settle Token Index`,
+      subtitle: getAdditionalLabelInfo('settleTokenIndex'),
       initialValue: form.settleTokenIndex,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'settleTokenIndex',
     },
     {
-      label: `Settle Pnl Limit Factor ${getAdditionalLabelInfo(
-        'settlePnlLimitFactor'
-      )}`,
+      label: `Settle Pnl Limit Factor`,
+      subtitle: getAdditionalLabelInfo('settlePnlLimitFactor'),
       initialValue: form.settlePnlLimitFactor,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'settlePnlLimitFactor',
     },
     {
-      label: `Settle Pnl Limit Window Size ${getAdditionalLabelInfo(
-        'settlePnlLimitWindowSize'
-      )}`,
+      label: `Settle Pnl Limit Window Size`,
+      subtitle: getAdditionalLabelInfo('settlePnlLimitWindowSize'),
       initialValue: form.settlePnlLimitWindowSize,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'settlePnlLimitWindowSize',
     },
     {
-      label: `Min Funding ${getAdditionalLabelInfo('minFunding')}`,
+      label: `Min Funding`,
+      subtitle: getAdditionalLabelInfo('minFunding'),
       initialValue: form.minFunding,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'minFunding',
     },
     {
-      label: `Max Funding ${getAdditionalLabelInfo('maxFunding')}`,
+      label: `Max Funding`,
+      subtitle: getAdditionalLabelInfo('maxFunding'),
       initialValue: form.maxFunding,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'maxFunding',
     },
     {
-      label: `Impact Quantity ${getAdditionalLabelInfo('impactQuantity')}`,
+      label: `Impact Quantity`,
+      subtitle: getAdditionalLabelInfo('impactQuantity'),
       initialValue: form.impactQuantity,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'impactQuantity',
+    },
+    {
+      label: `Positive Pnl Liquidation Fee`,
+      subtitle: getAdditionalLabelInfo('positivePnlLiquidationFee'),
+      initialValue: form.positivePnlLiquidationFee,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'positivePnlLiquidationFee',
     },
   ]
   return (

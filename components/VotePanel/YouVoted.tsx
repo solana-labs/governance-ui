@@ -181,6 +181,12 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
             >
               Withdraw
             </SecondaryButton>
+            {isInCoolOffTime && (
+              <div className="text-xs">
+                Warning: If you withdraw your vote now you can only deny the
+                proposal its not possible to vote yes during cool off time
+              </div>
+            )}
           </div>
         </div>
       )}

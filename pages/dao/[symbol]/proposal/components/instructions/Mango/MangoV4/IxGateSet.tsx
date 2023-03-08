@@ -18,61 +18,9 @@ import InstructionForm, {
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { buildIxGate } from '@blockworks-foundation/mango-v4'
+import { IxGateParams } from '@blockworks-foundation/mango-v4/dist/types/src/clientIxParamBuilder'
 
-interface IxGateSetForm {
-  governedAccount: AssetAccount | null
-  accountClose: boolean
-  accountCreate: boolean
-  accountEdit: boolean
-  accountExpand: boolean
-  accountToggleFreeze: boolean
-  altExtend: boolean
-  altSet: boolean
-  flashLoan: boolean
-  groupClose: boolean
-  groupCreate: boolean
-  groupToggleHalt: boolean
-  healthRegion: boolean
-  perpCancelAllOrders: boolean
-  perpCancelAllOrdersBySide: boolean
-  perpCancelOrder: boolean
-  perpCancelOrderByClientOrderId: boolean
-  perpCloseMarket: boolean
-  perpConsumeEvents: boolean
-  perpCreateMarket: boolean
-  perpDeactivatePosition: boolean
-  perpEditMarket: boolean
-  perpLiqBasePosition: boolean
-  perpLiqForceCancelOrders: boolean
-  perpLiqQuoteAndBankruptcy: boolean
-  perpPlaceOrder: boolean
-  perpSettleFees: boolean
-  perpSettlePnl: boolean
-  perpUpdateFunding: boolean
-  serum3CancelAllOrders: boolean
-  serum3CancelOrder: boolean
-  serum3CloseOpenOrders: boolean
-  serum3CreateOpenOrders: boolean
-  serum3DeregisterMarket: boolean
-  serum3EditMarket: boolean
-  serum3LiqForceCancelOrders: boolean
-  serum3PlaceOrder: boolean
-  serum3RegisterMarket: boolean
-  serum3SettleFunds: boolean
-  stubOracleClose: boolean
-  stubOracleCreate: boolean
-  stubOracleSet: boolean
-  tokenAddBank: boolean
-  tokenDeposit: boolean
-  tokenDeregister: boolean
-  tokenEdit: boolean
-  tokenLiqBankruptcy: boolean
-  tokenLiqWithToken: boolean
-  tokenRegister: boolean
-  tokenRegisterTrustless: boolean
-  tokenUpdateIndexAndRate: boolean
-  tokenWithdraw: boolean
-}
+type IxGateSetForm = IxGateParams & { governedAccount: AssetAccount | null }
 
 const IxGateSet = ({
   index,
@@ -85,71 +33,73 @@ const IxGateSet = ({
   const { mangoClient, mangoGroup } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
-  const governedProgramAccounts = assetAccounts.filter(
-    (x) => x.type === AccountType.SOL
+  const solAccounts = assetAccounts.filter(
+    (x) =>
+      x.type === AccountType.SOL &&
+      ((mangoGroup?.admin &&
+        x.extensions.transferAddress?.equals(mangoGroup.admin)) ||
+        (mangoGroup?.securityAdmin &&
+          x.extensions.transferAddress?.equals(mangoGroup.securityAdmin)))
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<IxGateSetForm>({
     governedAccount: null,
-    accountClose: true,
-    accountCreate: true,
-    accountEdit: true,
-    accountExpand: true,
-    accountToggleFreeze: true,
-    altExtend: true,
-    altSet: true,
-    flashLoan: true,
-    groupClose: true,
-    groupCreate: true,
-    groupToggleHalt: true,
-    healthRegion: true,
-    perpCancelAllOrders: true,
-    perpCancelAllOrdersBySide: true,
-    perpCancelOrder: true,
-    perpCancelOrderByClientOrderId: true,
-    perpCloseMarket: true,
-    perpConsumeEvents: true,
-    perpCreateMarket: true,
-    perpDeactivatePosition: true,
-    perpEditMarket: true,
-    perpLiqBasePosition: true,
-    perpLiqForceCancelOrders: true,
-    perpLiqQuoteAndBankruptcy: true,
-    perpPlaceOrder: true,
-    perpSettleFees: true,
-    perpSettlePnl: true,
-    perpUpdateFunding: true,
-    serum3CancelAllOrders: true,
-    serum3CancelOrder: true,
-    serum3CloseOpenOrders: true,
-    serum3CreateOpenOrders: true,
-    serum3DeregisterMarket: true,
-    serum3EditMarket: true,
-    serum3LiqForceCancelOrders: true,
-    serum3PlaceOrder: true,
-    serum3RegisterMarket: true,
-    serum3SettleFunds: true,
-    stubOracleClose: true,
-    stubOracleCreate: true,
-    stubOracleSet: true,
-    tokenAddBank: true,
-    tokenDeposit: true,
-    tokenDeregister: true,
-    tokenEdit: true,
-    tokenLiqBankruptcy: true,
-    tokenLiqWithToken: true,
-    tokenRegister: true,
-    tokenRegisterTrustless: true,
-    tokenUpdateIndexAndRate: true,
-    tokenWithdraw: true,
+    AccountClose: true,
+    AccountCreate: true,
+    AccountEdit: true,
+    AccountExpand: true,
+    AccountToggleFreeze: true,
+    AltExtend: true,
+    AltSet: true,
+    FlashLoan: true,
+    GroupClose: true,
+    GroupCreate: true,
+    GroupToggleHalt: true,
+    HealthRegion: true,
+    PerpCancelAllOrders: true,
+    PerpCancelAllOrdersBySide: true,
+    PerpCancelOrder: true,
+    PerpCancelOrderByClientOrderId: true,
+    PerpCloseMarket: true,
+    PerpConsumeEvents: true,
+    PerpCreateMarket: true,
+    PerpDeactivatePosition: true,
+    PerpEditMarket: true,
+    PerpLiqBaseOrPositivePnl: true,
+    PerpLiqForceCancelOrders: true,
+    PerpLiqNegativePnlOrBankruptcy: true,
+    PerpPlaceOrder: true,
+    PerpSettleFees: true,
+    PerpSettlePnl: true,
+    PerpUpdateFunding: true,
+    Serum3CancelAllOrders: true,
+    Serum3CancelOrder: true,
+    Serum3CloseOpenOrders: true,
+    Serum3CreateOpenOrders: true,
+    Serum3DeregisterMarket: true,
+    Serum3EditMarket: true,
+    Serum3LiqForceCancelOrders: true,
+    Serum3PlaceOrder: true,
+    Serum3RegisterMarket: true,
+    Serum3SettleFunds: true,
+    StubOracleClose: true,
+    StubOracleCreate: true,
+    StubOracleSet: true,
+    TokenAddBank: true,
+    TokenDeposit: true,
+    TokenDeregister: true,
+    TokenEdit: true,
+    TokenLiqBankruptcy: true,
+    TokenLiqWithToken: true,
+    TokenRegister: true,
+    TokenRegisterTrustless: true,
+    TokenUpdateIndexAndRate: true,
+    TokenWithdraw: true,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
-  const handleSetForm = ({ propertyName, value }) => {
-    setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
-  }
+
   const validateInstruction = async (): Promise<boolean> => {
     const { isValid, validationErrors } = await isFormValid(schema, form)
     setFormErrors(validationErrors)
@@ -188,13 +138,7 @@ const IxGateSet = ({
     }
     return obj
   }
-  useEffect(() => {
-    handleSetForm({
-      propertyName: 'programId',
-      value: programId?.toString(),
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [realmInfo?.programId])
+
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
@@ -216,313 +160,313 @@ const IxGateSet = ({
       type: InstructionInputType.GOVERNED_ACCOUNT,
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governance,
-      options: governedProgramAccounts,
+      options: solAccounts,
     },
     {
       label: 'Account Close',
-      initialValue: form.accountClose,
+      initialValue: form.AccountClose,
       type: InstructionInputType.SWITCH,
-      name: 'accountClose',
+      name: 'AccountClose',
     },
     {
       label: 'Account Create',
-      initialValue: form.accountCreate,
+      initialValue: form.AccountCreate,
       type: InstructionInputType.SWITCH,
-      name: 'accountCreate',
+      name: 'AccountCreate',
     },
     {
       label: 'Account Edit',
-      initialValue: form.accountEdit,
+      initialValue: form.AccountEdit,
       type: InstructionInputType.SWITCH,
-      name: 'accountEdit',
+      name: 'AccountEdit',
     },
     {
       label: 'Account Expand',
-      initialValue: form.accountExpand,
+      initialValue: form.AccountExpand,
       type: InstructionInputType.SWITCH,
-      name: 'accountExpand',
+      name: 'AccountExpand',
     },
     {
       label: 'Account Toggle Freeze',
-      initialValue: form.accountToggleFreeze,
+      initialValue: form.AccountToggleFreeze,
       type: InstructionInputType.SWITCH,
-      name: 'accountToggleFreeze',
+      name: 'AccountToggleFreeze',
     },
     {
       label: 'Alt Extend',
-      initialValue: form.altExtend,
+      initialValue: form.AltExtend,
       type: InstructionInputType.SWITCH,
-      name: 'altExtend',
+      name: 'AltExtend',
     },
     {
       label: 'Alt Set',
-      initialValue: form.altSet,
+      initialValue: form.AltSet,
       type: InstructionInputType.SWITCH,
-      name: 'altSet',
+      name: 'AltSet',
     },
     {
       label: 'Flash Loan',
-      initialValue: form.flashLoan,
+      initialValue: form.FlashLoan,
       type: InstructionInputType.SWITCH,
-      name: 'flashLoan',
+      name: 'FlashLoan',
     },
     {
       label: 'Group Close',
-      initialValue: form.groupClose,
+      initialValue: form.GroupClose,
       type: InstructionInputType.SWITCH,
-      name: 'groupClose',
+      name: 'GroupClose',
     },
     {
       label: 'Group Create',
-      initialValue: form.groupCreate,
+      initialValue: form.GroupCreate,
       type: InstructionInputType.SWITCH,
-      name: 'groupCreate',
+      name: 'GroupCreate',
     },
     {
       label: 'Group Toggle Halt',
-      initialValue: form.groupToggleHalt,
+      initialValue: form.GroupToggleHalt,
       type: InstructionInputType.SWITCH,
-      name: 'groupToggleHalt',
+      name: 'GroupToggleHalt',
     },
     {
       label: 'Health Region',
-      initialValue: form.healthRegion,
+      initialValue: form.HealthRegion,
       type: InstructionInputType.SWITCH,
-      name: 'healthRegion',
+      name: 'HealthRegion',
     },
     {
       label: 'Perp Cancel All Orders',
-      initialValue: form.perpCancelAllOrders,
+      initialValue: form.PerpCancelAllOrders,
       type: InstructionInputType.SWITCH,
-      name: 'perpCancelAllOrders',
+      name: 'PerpCancelAllOrders',
     },
     {
       label: 'Perp Cancel All Orders By Side',
-      initialValue: form.perpCancelAllOrdersBySide,
+      initialValue: form.PerpCancelAllOrdersBySide,
       type: InstructionInputType.SWITCH,
-      name: 'perpCancelAllOrdersBySide',
+      name: 'PerpCancelAllOrdersBySide',
     },
     {
       label: 'Perp Cancel Order',
-      initialValue: form.perpCancelOrder,
+      initialValue: form.PerpCancelOrder,
       type: InstructionInputType.SWITCH,
-      name: 'perpCancelOrder',
+      name: 'PerpCancelOrder',
     },
     {
       label: 'Perp Cancel Order By Client Order Id',
-      initialValue: form.perpCancelOrderByClientOrderId,
+      initialValue: form.PerpCancelOrderByClientOrderId,
       type: InstructionInputType.SWITCH,
-      name: 'perpCancelOrderByClientOrderId',
+      name: 'PerpCancelOrderByClientOrderId',
     },
     {
       label: 'Perp Close Market',
-      initialValue: form.perpCloseMarket,
+      initialValue: form.PerpCloseMarket,
       type: InstructionInputType.SWITCH,
-      name: 'perpCloseMarket',
+      name: 'PerpCloseMarket',
     },
     {
       label: 'Perp Consume Events',
-      initialValue: form.perpConsumeEvents,
+      initialValue: form.PerpConsumeEvents,
       type: InstructionInputType.SWITCH,
-      name: 'perpConsumeEvents',
+      name: 'PerpConsumeEvents',
     },
     {
       label: 'Perp Create Market',
-      initialValue: form.perpCreateMarket,
+      initialValue: form.PerpCreateMarket,
       type: InstructionInputType.SWITCH,
-      name: 'perpCreateMarket',
+      name: 'PerpCreateMarket',
     },
     {
       label: 'Perp Deactivate Position',
-      initialValue: form.perpDeactivatePosition,
+      initialValue: form.PerpDeactivatePosition,
       type: InstructionInputType.SWITCH,
-      name: 'perpDeactivatePosition',
+      name: 'PerpDeactivatePosition',
     },
     {
       label: 'Perp Edit Market',
-      initialValue: form.perpEditMarket,
+      initialValue: form.PerpEditMarket,
       type: InstructionInputType.SWITCH,
-      name: 'perpEditMarket',
+      name: 'PerpEditMarket',
     },
     {
-      label: 'Perp Liq Base Position',
-      initialValue: form.perpLiqBasePosition,
+      label: 'Perp Liq Base Or Positive Pnl',
+      initialValue: form.PerpLiqBaseOrPositivePnl,
       type: InstructionInputType.SWITCH,
-      name: 'perpLiqBasePosition',
+      name: 'PerpLiqBaseOrPositivePnl',
+    },
+    {
+      label: 'Perp Liq Negative Pnl Or Bankruptcy',
+      initialValue: form.PerpLiqNegativePnlOrBankruptcy,
+      type: InstructionInputType.SWITCH,
+      name: 'PerpLiqNegativePnlOrBankruptcy',
     },
     {
       label: 'Perp Liq Force Cancel Orders',
-      initialValue: form.perpLiqForceCancelOrders,
+      initialValue: form.PerpLiqForceCancelOrders,
       type: InstructionInputType.SWITCH,
-      name: 'perpLiqForceCancelOrders',
-    },
-    {
-      label: 'Perp Liq Quote And Bankruptcy',
-      initialValue: form.perpLiqQuoteAndBankruptcy,
-      type: InstructionInputType.SWITCH,
-      name: 'perpLiqQuoteAndBankruptcy',
+      name: 'PerpLiqForceCancelOrders',
     },
     {
       label: 'Perp Place Order',
-      initialValue: form.perpPlaceOrder,
+      initialValue: form.PerpPlaceOrder,
       type: InstructionInputType.SWITCH,
-      name: 'perpPlaceOrder',
+      name: 'PerpPlaceOrder',
     },
     {
       label: 'Perp Settle Fees',
-      initialValue: form.perpSettleFees,
+      initialValue: form.PerpSettleFees,
       type: InstructionInputType.SWITCH,
-      name: 'perpSettleFees',
+      name: 'PerpSettleFees',
     },
     {
       label: 'Perp Settle Pnl',
-      initialValue: form.perpSettlePnl,
+      initialValue: form.PerpSettlePnl,
       type: InstructionInputType.SWITCH,
-      name: 'perpSettlePnl',
+      name: 'PerpSettlePnl',
     },
     {
       label: 'Perp Update Funding',
-      initialValue: form.perpUpdateFunding,
+      initialValue: form.PerpUpdateFunding,
       type: InstructionInputType.SWITCH,
-      name: 'perpUpdateFunding',
+      name: 'PerpUpdateFunding',
     },
     {
       label: 'Serum 3 Cancel All Orders',
-      initialValue: form.serum3CancelAllOrders,
+      initialValue: form.Serum3CancelAllOrders,
       type: InstructionInputType.SWITCH,
-      name: 'serum3CancelAllOrders',
+      name: 'Serum3CancelAllOrders',
     },
     {
       label: 'Serum 3 Cancel Order',
-      initialValue: form.serum3CancelOrder,
+      initialValue: form.Serum3CancelOrder,
       type: InstructionInputType.SWITCH,
-      name: 'serum3CancelOrder',
+      name: 'Serum3CancelOrder',
     },
     {
       label: 'Serum 3 Close Open Orders',
-      initialValue: form.serum3CloseOpenOrders,
+      initialValue: form.Serum3CloseOpenOrders,
       type: InstructionInputType.SWITCH,
-      name: 'serum3CloseOpenOrders',
+      name: 'Serum3CloseOpenOrders',
     },
     {
       label: 'Serum 3 Create Open Orders',
-      initialValue: form.serum3CreateOpenOrders,
+      initialValue: form.Serum3CreateOpenOrders,
       type: InstructionInputType.SWITCH,
-      name: 'serum3CreateOpenOrders',
+      name: 'Serum3CreateOpenOrders',
     },
     {
       label: 'Serum 3 Deregister Market',
-      initialValue: form.serum3DeregisterMarket,
+      initialValue: form.Serum3DeregisterMarket,
       type: InstructionInputType.SWITCH,
-      name: 'serum3DeregisterMarket',
+      name: 'Serum3DeregisterMarket',
     },
     {
       label: 'Serum 3 Edit Market',
-      initialValue: form.serum3EditMarket,
+      initialValue: form.Serum3EditMarket,
       type: InstructionInputType.SWITCH,
-      name: 'serum3EditMarket',
+      name: 'Serum3EditMarket',
     },
     {
       label: 'Serum 3 Liq Force Cancel Orders',
-      initialValue: form.serum3LiqForceCancelOrders,
+      initialValue: form.Serum3LiqForceCancelOrders,
       type: InstructionInputType.SWITCH,
-      name: 'serum3LiqForceCancelOrders',
+      name: 'Serum3LiqForceCancelOrders',
     },
     {
       label: 'Serum 3 Place Order',
-      initialValue: form.serum3PlaceOrder,
+      initialValue: form.Serum3PlaceOrder,
       type: InstructionInputType.SWITCH,
-      name: 'serum3PlaceOrder',
+      name: 'Serum3PlaceOrder',
     },
     {
       label: 'Serum 3 Register Market',
-      initialValue: form.serum3RegisterMarket,
+      initialValue: form.Serum3RegisterMarket,
       type: InstructionInputType.SWITCH,
-      name: 'serum3RegisterMarket',
+      name: 'Serum3RegisterMarket',
     },
     {
       label: 'Serum 3 Settle Funds',
-      initialValue: form.serum3SettleFunds,
+      initialValue: form.Serum3SettleFunds,
       type: InstructionInputType.SWITCH,
-      name: 'serum3SettleFunds',
+      name: 'Serum3SettleFunds',
     },
     {
       label: 'Stub Oracle Close',
-      initialValue: form.stubOracleClose,
+      initialValue: form.StubOracleClose,
       type: InstructionInputType.SWITCH,
-      name: 'stubOracleClose',
+      name: 'StubOracleClose',
     },
     {
       label: 'Stub Oracle Create',
-      initialValue: form.stubOracleCreate,
+      initialValue: form.StubOracleCreate,
       type: InstructionInputType.SWITCH,
-      name: 'stubOracleCreate',
+      name: 'StubOracleCreate',
     },
     {
       label: 'Stub Oracle Set',
-      initialValue: form.stubOracleSet,
+      initialValue: form.StubOracleSet,
       type: InstructionInputType.SWITCH,
-      name: 'stubOracleSet',
+      name: 'StubOracleSet',
     },
     {
       label: 'Token Add Bank',
-      initialValue: form.tokenAddBank,
+      initialValue: form.TokenAddBank,
       type: InstructionInputType.SWITCH,
-      name: 'tokenAddBank',
+      name: 'TokenAddBank',
     },
     {
       label: 'Token Deposit',
-      initialValue: form.tokenDeposit,
+      initialValue: form.TokenDeposit,
       type: InstructionInputType.SWITCH,
-      name: 'tokenDeposit',
+      name: 'TokenDeposit',
     },
     {
       label: 'Token Deregister',
-      initialValue: form.tokenDeregister,
+      initialValue: form.TokenDeregister,
       type: InstructionInputType.SWITCH,
-      name: 'tokenDeregister',
+      name: 'TokenDeregister',
     },
     {
       label: 'Token Edit',
-      initialValue: form.tokenEdit,
+      initialValue: form.TokenEdit,
       type: InstructionInputType.SWITCH,
-      name: 'tokenEdit',
+      name: 'TokenEdit',
     },
     {
       label: 'Token Liq Bankruptcy',
-      initialValue: form.tokenLiqBankruptcy,
+      initialValue: form.TokenLiqBankruptcy,
       type: InstructionInputType.SWITCH,
-      name: 'tokenLiqBankruptcy',
+      name: 'TokenLiqBankruptcy',
     },
     {
       label: 'Token Liq With Token',
-      initialValue: form.tokenLiqWithToken,
+      initialValue: form.TokenLiqWithToken,
       type: InstructionInputType.SWITCH,
-      name: 'tokenLiqWithToken',
+      name: 'TokenLiqWithToken',
     },
     {
       label: 'Token Register',
-      initialValue: form.tokenRegister,
+      initialValue: form.TokenRegister,
       type: InstructionInputType.SWITCH,
-      name: 'tokenRegister',
+      name: 'TokenRegister',
     },
     {
       label: 'Token Register Trustless',
-      initialValue: form.tokenRegisterTrustless,
+      initialValue: form.TokenRegisterTrustless,
       type: InstructionInputType.SWITCH,
-      name: 'tokenRegisterTrustless',
+      name: 'TokenRegisterTrustless',
     },
     {
       label: 'Token Update Index And Rate',
-      initialValue: form.tokenUpdateIndexAndRate,
+      initialValue: form.TokenUpdateIndexAndRate,
       type: InstructionInputType.SWITCH,
-      name: 'tokenUpdateIndexAndRate',
+      name: 'TokenUpdateIndexAndRate',
     },
     {
       label: 'Token Withdraw',
-      initialValue: form.tokenWithdraw,
+      initialValue: form.TokenWithdraw,
       type: InstructionInputType.SWITCH,
-      name: 'tokenWithdraw',
+      name: 'TokenWithdraw',
     },
   ]
 

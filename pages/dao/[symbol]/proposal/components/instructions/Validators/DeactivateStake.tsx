@@ -14,13 +14,13 @@ import {
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
 import useWalletStore from 'stores/useWalletStore'
-import { web3 } from '@project-serum/anchor'
+import { web3 } from '@coral-xyz/anchor'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-import { getFilteredProgramAccounts } from '@blockworks-foundation/mango-client'
-import { bs58 } from '@project-serum/anchor/dist/cjs/utils/bytes'
+import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes'
 import { StakeAccount, StakeState } from '@utils/uiTypes/assets'
 import StakeAccountSelect from '../../StakeAccountSelect'
+import { getFilteredProgramAccounts } from '@utils/helpers'
 
 const DeactivateValidatorStake = ({
   index,

@@ -1,4 +1,4 @@
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { MaxVoterWeightRecord, ProgramAccount } from '@solana/spl-governance'
 import { NFTWithMeta, VotingClient } from '@utils/uiTypes/VotePlugin'
 import create, { State } from 'zustand'

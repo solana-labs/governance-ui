@@ -30,7 +30,8 @@ export default function WalletList(props: Props) {
       const expandedKey = expanded
         ? 'address' in expanded
           ? expanded.address
-          : expanded.name
+          : //@ts-ignore
+            expanded.name
         : undefined
 
       setExpanded((current) => {

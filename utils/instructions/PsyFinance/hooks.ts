@@ -1,7 +1,7 @@
 import {
   Program,
   ProgramAccount as AnchorProgramAccount,
-} from '@project-serum/anchor'
+} from '@coral-xyz/anchor'
 import { useEffect, useMemo, useState } from 'react'
 import useWallet from '@hooks/useWallet'
 import { OptionMarket, PSY_AMERICAN_PROGRAM_ID } from './index'

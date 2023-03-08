@@ -16,10 +16,10 @@ import useRealm from '@hooks/useRealm'
 import { buildTopVoters, VoteType } from '@models/proposal'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { getLockTokensVotingPowerPerWallet } from 'VoteStakeRegistry/tools/deposits'
-import { BN } from '@project-serum/anchor'
-import { PublicKey } from '@blockworks-foundation/mango-client'
+import { BN } from '@coral-xyz/anchor'
 import useWalletStore from 'stores/useWalletStore'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
+import { PublicKey } from '@solana/web3.js'
 
 export { VoteType }
 

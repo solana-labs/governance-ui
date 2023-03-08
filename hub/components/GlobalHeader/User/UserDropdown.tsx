@@ -46,6 +46,10 @@ export function UserDropdown(props: Props) {
           'transition-colors',
           'active:bg-neutral-300',
           'hover:bg-neutral-200',
+          'dark:text-neutral-400',
+          'dark:hover:bg-neutral-700',
+          'dark:active:bg-neutral-600',
+          'dark:hover:text-neutral-200',
           !props.compressed && 'w-48',
         )}
       >
@@ -55,7 +59,7 @@ export function UserDropdown(props: Props) {
             <div className="truncate flex-shrink">{username}</div>
           )}
         </div>
-        <ChevronDownIcon className="h-4 w-4 fill-neutral-900 flex-shrink-0" />
+        <ChevronDownIcon className="h-4 w-4 fill-neutral-900 flex-shrink-0 dark:fill-neutral-400" />
       </NavigationMenu.Trigger>
       <NavigationMenu.Content
         className={cx(
@@ -65,6 +69,7 @@ export function UserDropdown(props: Props) {
           'overflow-hidden',
           'rounded',
           'w-48',
+          'dark:bg-neutral-900',
           !!props.compressed && 'right-3',
         )}
       >

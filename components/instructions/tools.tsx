@@ -5,12 +5,16 @@ import {
   // Account,
   // Transaction,
 } from '@solana/web3.js'
-import { AccountMetaData, InstructionData } from '@solana/spl-governance'
+import {
+  AccountMetaData,
+  InstructionData,
+  ProgramAccount,
+  Realm,
+} from '@solana/spl-governance'
 
 import { BPF_UPGRADEABLE_LOADER_INSTRUCTIONS } from './programs/bpfUpgradeableLoader'
 import { GOVERNANCE_INSTRUCTIONS } from './programs/governance'
-import { MANGO_INSTRUCTIONS } from './programs/mango'
-import { getProgramName, isGovernanceProgram } from './programs/names'
+import { getProgramName } from './programs/names'
 import { RAYDIUM_INSTRUCTIONS } from './programs/raydium'
 import { SPL_TOKEN_INSTRUCTIONS } from './programs/splToken'
 import { SYSTEM_INSTRUCTIONS } from './programs/system'
@@ -28,6 +32,8 @@ import { LIDO_INSTRUCTIONS } from './programs/lido'
 import { NAME_SERVICE_INSTRUCTIONS } from './programs/nameService'
 import { TOKEN_AUCTION_INSTRUCTIONS } from './programs/tokenAuction'
 import { VALIDATORDAO_INSTRUCTIONS } from './programs/validatordao'
+import { POSEIDON_INSTRUCTIONS } from './programs/poseidon'
+import { MANGO_V4_INSTRUCTIONS } from './programs/mangoV4'
 
 export const V3_DEFAULT_GOVERNANCE_PROGRAM_ID =
   '7e75Nwsz8i5i4NiDa43CNzKJ4AeQGyRimha46VKTM1Ls'
@@ -48,9 +54,11 @@ export const ACCOUNT_NAMES = {
   AQeo6r6jdwnmf48AMejgoKdUGtV8qzbVJH42Gb5sWdi: 'Deprecated: Mango IDO program',
   '9pDEi3yT9ooT1uw1PApQDYK65advJs4Nt65EJG1m59Yq':
     'Mango Developer Council Mint',
-
   Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z: 'Mango DAO MNGO Treasury Vault',
   '7zGXUAeUkY9pEGfApsY26amibvqsf2dmty1cbtxHdfaQ': 'Mango DAO Wallet Governance',
+  '7D6tGmaMyC8i73Q8X2Fec2S1Zb5rkyai6pctdMqHpHWT':
+    'Mango DAO Fast Listing Governance',
+  Fmt4596j4uBvYutwQ2ZBw7RGw9EngR8yNijdqemnpiaB: 'Mango DAO Fast Listing Wallet',
   '5tgfd6XgwiXB9otEnzFpXK11m7Q7yZUaAJzWK4oT5UGF': 'Mango DAO Wallet',
   '9RGoboEjmaAjSCXsKi6p6zJucnwF3Eg5NUN9jPS6ziL3': 'Mango DAO MNGO Treasury',
   '3r1tQ2qaR5teYPEyGoHwZeZfMU1zxD5FAAmtAJPbj9xX':
@@ -287,7 +295,6 @@ export interface InstructionDescriptor {
 export const INSTRUCTION_DESCRIPTORS = {
   ...SPL_TOKEN_INSTRUCTIONS,
   ...BPF_UPGRADEABLE_LOADER_INSTRUCTIONS,
-  ...MANGO_INSTRUCTIONS,
   ...RAYDIUM_INSTRUCTIONS,
   ...MARINADE_INSTRUCTIONS,
   ...LIDO_INSTRUCTIONS,
@@ -301,14 +308,17 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...NAME_SERVICE_INSTRUCTIONS,
   ...TOKEN_AUCTION_INSTRUCTIONS,
   ...VALIDATORDAO_INSTRUCTIONS,
+  ...POSEIDON_INSTRUCTIONS,
+  ...MANGO_V4_INSTRUCTIONS,
 }
 
 export async function getInstructionDescriptor(
   connection: ConnectionContext,
-  instruction: InstructionData
+  instruction: InstructionData,
+  realm?: ProgramAccount<Realm> | undefined
 ) {
   let descriptors: any
-  if (isGovernanceProgram(instruction.programId)) {
+  if (realm && instruction.programId.equals(realm.owner)) {
     descriptors =
       GOVERNANCE_INSTRUCTIONS['GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw']
   } else {
@@ -320,6 +330,12 @@ export async function getInstructionDescriptor(
   const descriptor = !instruction.data.length
     ? descriptors
     : descriptors && descriptors[instruction.data[0]]
+    ? descriptors[instruction.data[0]]
+    : //backup if first number is same for couple of instructions inside same idl
+    descriptors && descriptors[`${instruction.data[0]}${instruction.data[1]}`]
+    ? descriptors[`${instruction.data[0]}${instruction.data[1]}`]
+    : descriptors
+
   const dataUI = (descriptor?.getDataUI &&
     (await descriptor?.getDataUI(
       connection.current,

@@ -1,4 +1,4 @@
-import { PublicKey } from '@blockworks-foundation/mango-client'
+import { PublicKey } from '@solana/web3.js'
 
 export const paramsForTokenSale = function (
   participants: number,

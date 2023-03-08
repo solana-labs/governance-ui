@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import useRealm from '@hooks/useRealm'
 import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
-import { isFormValid } from '@utils/formValidation'
+import { isFormValid, validatePubkey } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -16,7 +16,7 @@ import InstructionForm, {
   InstructionInputType,
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { getChangedValues, getNullOrTransform } from '@utils/mangoV4Tools'
 
 type GroupEditForm = {
@@ -50,8 +50,13 @@ const GroupEdit = ({
   const { mangoClient, mangoGroup, getAdditionalLabelInfo } = UseMangoV4()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
-  const governedProgramAccounts = assetAccounts.filter(
-    (x) => x.type === AccountType.SOL
+  const solAccounts = assetAccounts.filter(
+    (x) =>
+      x.type === AccountType.SOL &&
+      ((mangoGroup?.admin &&
+        x.extensions.transferAddress?.equals(mangoGroup.admin)) ||
+        (mangoGroup?.securityAdmin &&
+          x.extensions.transferAddress?.equals(mangoGroup.securityAdmin)))
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
@@ -61,10 +66,7 @@ const GroupEdit = ({
   const [form, setForm] = useState<GroupEditForm>({ ...defaultFormValues })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
-  const handleSetForm = ({ propertyName, value }) => {
-    setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
-  }
+
   const validateInstruction = async (): Promise<boolean> => {
     const { isValid, validationErrors } = await isFormValid(schema, form)
     setFormErrors(validationErrors)
@@ -105,13 +107,7 @@ const GroupEdit = ({
     }
     return obj
   }
-  useEffect(() => {
-    handleSetForm({
-      propertyName: 'programId',
-      value: programId?.toString(),
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [realmInfo?.programId])
+
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
@@ -124,6 +120,27 @@ const GroupEdit = ({
       .object()
       .nullable()
       .required('Program governed account is required'),
+    admin: yup
+      .string()
+      .required()
+      .test('is-valid-address', 'Please enter a valid PublicKey', (value) =>
+        value ? validatePubkey(value) : true
+      ),
+    fastListingAdmin: yup
+      .string()
+      .required()
+      .test('is-valid-address1', 'Please enter a valid PublicKey', (value) =>
+        value ? validatePubkey(value) : true
+      ),
+    securityAdmin: yup
+      .string()
+      .required()
+      .test('is-valid-address2', 'Please enter a valid PublicKey', (value) =>
+        value ? validatePubkey(value) : true
+      ),
+    testing: yup.string().required(),
+    version: yup.string().required(),
+    depositLimitQuote: yup.string().required(),
   })
   useEffect(() => {
     const getGroupParams = async () => {
@@ -153,44 +170,48 @@ const GroupEdit = ({
       type: InstructionInputType.GOVERNED_ACCOUNT,
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governance,
-      options: governedProgramAccounts,
+      options: solAccounts,
     },
     {
-      label: `Admin ${getAdditionalLabelInfo('admin')}`,
+      label: `Admin`,
+      subtitle: getAdditionalLabelInfo('admin'),
       initialValue: form.admin,
       type: InstructionInputType.INPUT,
       name: 'admin',
     },
     {
-      label: `Fast Listing Admin ${getAdditionalLabelInfo('fastListingAdmin')}`,
+      label: `Fast Listing Admin`,
+      subtitle: getAdditionalLabelInfo('fastListingAdmin'),
       initialValue: form.fastListingAdmin,
       type: InstructionInputType.INPUT,
       name: 'fastListingAdmin',
     },
     {
-      label: `Security Admin ${getAdditionalLabelInfo('securityAdmin')}`,
+      label: `Security Admin`,
+      subtitle: getAdditionalLabelInfo('securityAdmin'),
       initialValue: form.securityAdmin,
       type: InstructionInputType.INPUT,
       name: 'securityAdmin',
     },
     {
-      label: `Testing ${getAdditionalLabelInfo('testing')}`,
+      label: `Testing`,
+      subtitle: getAdditionalLabelInfo('testing'),
       initialValue: form.testing,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'testing',
     },
     {
-      label: `Version ${getAdditionalLabelInfo('version')}`,
+      label: `Version`,
+      subtitle: getAdditionalLabelInfo('version'),
       initialValue: form.version,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'version',
     },
     {
-      label: `Deposit Limit Quote ${getAdditionalLabelInfo(
-        'depositLimitQuote'
-      )}`,
+      label: `Deposit Limit Quote`,
+      subtitle: getAdditionalLabelInfo('depositLimitQuote'),
       initialValue: form.depositLimitQuote,
       type: InstructionInputType.INPUT,
       inputType: 'number',

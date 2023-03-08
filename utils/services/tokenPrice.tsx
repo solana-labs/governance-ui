@@ -4,7 +4,6 @@ import { mergeDeepRight } from 'ramda'
 
 import { notify } from '@utils/notifications'
 import { WSOL_MINT } from '@components/instructions/tools'
-import { MANGO_MINT } from 'Strategies/protocols/mango/tools'
 import overrides from 'public/realms/token-overrides.json'
 
 //this service provide prices it is not recommended to get anything more from here besides token name or price.
@@ -55,7 +54,7 @@ class TokenPriceService {
   }
   async fetchTokenPrices(mintAddresses: string[]) {
     if (mintAddresses.length) {
-      const mintAddressesWithSol = [...mintAddresses, WSOL_MINT, MANGO_MINT]
+      const mintAddressesWithSol = [...mintAddresses, WSOL_MINT]
       const symbols = mintAddressesWithSol.join(',')
       try {
         const response = await axios.get(`${endpoint}?ids=${symbols}`)

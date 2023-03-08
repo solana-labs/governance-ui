@@ -16,15 +16,15 @@ import {
 import { NewProposalContext } from '../../../new'
 import { isFormValid } from '@utils/formValidation'
 import useWalletStore from 'stores/useWalletStore'
-import { web3 } from '@project-serum/anchor'
+import { web3 } from '@coral-xyz/anchor'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-import { getFilteredProgramAccounts } from '@blockworks-foundation/mango-client'
 import StakeAccountSelect from '../../StakeAccountSelect'
 import Input from '@components/inputs/Input'
-import { bs58 } from '@project-serum/anchor/dist/cjs/utils/bytes'
+import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes'
 import { StakeAccount, StakeState } from '@utils/uiTypes/assets'
 import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
+import { getFilteredProgramAccounts } from '@utils/helpers'
 
 const WithdrawValidatorStake = ({
   index,
