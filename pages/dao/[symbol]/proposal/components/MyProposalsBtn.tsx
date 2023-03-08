@@ -31,6 +31,8 @@ import {
   SequenceType,
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
+import useQueryContext from '@hooks/useQueryContext'
+import { useRouter } from 'next/router'
 
 const MyProposalsBn = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
@@ -483,6 +485,8 @@ const ProposalList = ({
   proposals: ProgramAccount<Proposal>[]
   isLoading: boolean
 }) => {
+  const { fmtUrlWithCluster } = useQueryContext()
+  const { symbol } = useRealm()
   return (
     <>
       {' '}
@@ -516,7 +520,16 @@ const ProposalList = ({
             className="text-xs border-fgd-4 border px-3 py-2 mb-3 rounded-lg"
             key={x.pubkey.toBase58()}
           >
-            {x.account.name}
+            <a
+              className="underline cursor-pointer"
+              href={fmtUrlWithCluster(
+                `/dao/${symbol}/proposal/${x.pubkey.toBase58()}`
+              )}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {x.account.name}
+            </a>
           </div>
         ))}
       </div>
