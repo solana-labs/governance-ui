@@ -29,6 +29,8 @@ import { notify } from '@utils/notifications'
 import { useClosePosition } from 'HeliumVotePlugin/hooks/useClosePosition'
 import { HNT_MINT } from '@helium/spl-utils'
 import { DelegateTokensModal } from './DelegateTokensModal'
+import { useDelegatePosition } from 'HeliumVotePlugin/hooks/useDelegatePosition'
+import { useUndelegatePosition } from 'HeliumVotePlugin/hooks/useUndelegatePosition'
 
 export interface PositionCardProps {
   position: PositionWithMeta
@@ -81,6 +83,18 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
     error: closingError,
     closePosition,
   } = useClosePosition()
+
+  const {
+    loading: isDelegating,
+    error: delegationError,
+    delegatePosition,
+  } = useDelegatePosition()
+
+  const {
+    loading: isUndelegating,
+    error: undelegationError,
+    undelegatePosition,
+  } = useUndelegatePosition()
 
   const [
     connection,
@@ -135,6 +149,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
   const canDelegate =
     isRealmCommunityMint &&
     (realm.account.communityMint.equals(HNT_MINT) ||
+      // TODO (Bry): Remove vv
       realm.account.communityMint.equals(
         new web3.PublicKey('D5Eb8q17xYsfGFNKxy3GCkSn9QpAmmLHX6wjceEmatTq')
       ))
@@ -203,34 +218,32 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
     }
   }
 
-  const handleDelegateTokens = async (targetSubDao: SubDaoWithMeta) => {
-    // TODO (BRY)
-    console.log('delegate')
-    // await delegatePosition({
-    //   position,
-    //   targetSubDao
-    // })
+  const handleDelegateTokens = async (subDao: SubDaoWithMeta) => {
+    await delegatePosition({
+      position,
+      subDao,
+    })
 
-    // if (!delegatingError) {
-    //   await refetchState()
-    // }
+    if (!delegationError) {
+      await refetchState()
+    }
   }
 
   const handleUndelegateTokens = async () => {
-    try {
-      // TODO (BRY)
-      console.log('undelegate')
-      // await undelegatePosition({ position })
+    // TODO (bry)
+    console.log('UnDelegate')
+    // try {
+    //   await undelegatePosition({ position })
 
-      // if (!undelegatingError) {
-      //   await refetchState()
-      // }
-    } catch (e) {
-      notify({
-        type: 'error',
-        message: e.message || 'Unable to undelegate tokens',
-      })
-    }
+    //   if (!undelegatingError) {
+    //     await refetchState()
+    //   }
+    // } catch (e) {
+    //   notify({
+    //     type: 'error',
+    //     message: e.message || 'Unable to undelegate tokens',
+    //   })
+    // }
   }
 
   const handleClose = async () => {
@@ -259,7 +272,8 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
     )
   }
 
-  const isSubmitting = isExtending || isClosing || isTransfering || isUnlocking
+  const isSubmitting =
+    isExtending || isClosing || isTransfering || isUnlocking || isDelegating
   return (
     <div className="border border-fgd-4 rounded-lg flex flex-col">
       {isLoading ? (
@@ -368,7 +382,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
                           className="w-full"
                           onClick={() => setIsDelegateModalOpen(true)}
                           disabled={isSubmitting}
-                          isLoading={isSubmitting}
+                          isLoading={isDelegating}
                         >
                           Delegate
                         </Button>

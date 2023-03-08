@@ -1,11 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { PublicKey } from '@solana/web3.js'
 import Modal from '@components/Modal'
 import Button, { SecondaryButton } from '@components/Button'
 import { notify } from '@utils/notifications'
 import { SubDaoWithMeta } from 'HeliumVotePlugin/sdk/types'
 import { useSubDaos } from 'HeliumVotePlugin/hooks/useSubDaos'
-import { TruncableElement } from 'react-headless-pagination'
 import { LoadingDots } from '@components/Loading'
 
 export interface DelegateTokensModalProps {
@@ -24,6 +23,15 @@ export const DelegateTokensModal: React.FC<DelegateTokensModalProps> = ({
   const [selectedSubDaoPk, setSelectedSubDaoPk] = useState<PublicKey | null>(
     null
   )
+
+  useEffect(() => {
+    if (error) {
+      notify({
+        type: 'error',
+        message: error.message || 'Unable to fetch subdaos',
+      })
+    }
+  }, [error])
 
   const handleOnSubmit = async () => {
     try {
