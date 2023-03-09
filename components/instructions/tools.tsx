@@ -186,6 +186,9 @@ export const ACCOUNT_NAMES = {
 
 // Blacklisted governances which should not be displayed in the UI
 // TODO: Add this to on-chain metadata to Governance account
+// Hidden accounts that are unusable due to wrong configuration e.g 60% vote threshold
+// on 5b token supply
+// hidden legacy accounts to declutter UI
 export const HIDDEN_GOVERNANCES = new Map<string, string>([
   ['HfWc8M6Df5wtLg8xg5vti4QKAo9KG4nL5gKQ8B2sjfYC', ''],
   ['A3Fb876sEiUmDWgrJ1fShASstw8b5wHB6XETzQa8VM7S', ''],
@@ -198,6 +201,7 @@ export const HIDDEN_GOVERNANCES = new Map<string, string>([
 
 // Blacklisted proposals which should not be displayed in the UI
 // TODO: Add this to on-chain metadata to Proposal account
+// hidden legacy accounts to declutter UI
 export const HIDDEN_PROPOSALS = new Map<string, string>([
   ['E8XgiVpDJgDf4XgBKjZnMs3S1K7cmibtbDqjw5aNobCZ', ''],
   ['DrhhwYXaY4fvTBoQdNtgwEoTjuQswvDQLfVcgUXgP1Mx', ''],
@@ -232,6 +236,8 @@ export const CHAT_PROGRAM_ID = new PublicKey(
 export const WSOL_MINT = 'So11111111111111111111111111111111111111112'
 export const WSOL_MINT_PK = new PublicKey(WSOL_MINT)
 
+//Hidden accounts that has some shitcoins with 0 value inside but freeze authority
+//blocks closing them hidden only to make ui more clean
 const HIDDEN_MNGO_TREASURES = [
   'GZQSF4Fh9xK7rf9WBEhawXYFw8qPXeatZLUqVQeuW3X8',
   'J6jYLFDWeeGwg4u2TXhKDCcH4fSzJFQyDE2VSv2drRkg',
