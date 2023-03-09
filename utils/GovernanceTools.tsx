@@ -11,6 +11,7 @@ import { BN } from '@coral-xyz/anchor'
 import {
   getMintNaturalAmountFromDecimal,
   getTimestampFromDays,
+  getTimestampFromHours,
   parseMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
 import { isDisabledVoterWeight } from '@tools/governance/units'
@@ -61,7 +62,7 @@ export function getGovernanceConfigFromV2Form(
         values.mintDecimals
       )
 
-  const voteTippig = values.voteTipping || 0
+  const voteTippig = values.voteTipping ?? VoteTipping.Disabled
 
   return new GovernanceConfig({
     communityVoteThreshold: communityVoteThreshold,
@@ -82,7 +83,7 @@ export function getGovernanceConfigFromV2Form(
     councilVetoVoteThreshold: councilVetoVoteThreshold,
     communityVetoVoteThreshold: communityVetoVoteThreshold,
     //defaults in v2 there is no votingCoolOffTime and depositExemptProposalCount
-    votingCoolOffTime: 0,
+    votingCoolOffTime: getTimestampFromHours(12),
     depositExemptProposalCount: 10,
   })
 }

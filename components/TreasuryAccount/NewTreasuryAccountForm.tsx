@@ -53,7 +53,7 @@ const defaultFormValues = {
   minInstructionHoldUpTime: 0,
   maxVotingTime: 3,
   voteThreshold: 60,
-  voteTipping: VoteTipping.Strict,
+  voteTipping: VoteTipping.Disabled,
 } as const
 
 const SOL = 'SOL'
@@ -189,7 +189,7 @@ const NewAccountForm = () => {
                     minCouncilTokensToCreateProposal: '1',
                     minInstructionHoldUpTime: form.minInstructionHoldUpTime.toString(),
                     maxVotingTime: form.maxVotingTime.toString(),
-                    votingCoolOffTime: '0',
+                    votingCoolOffTime: '12',
                     depositExemptProposalCount: '10',
                     communityVoteThreshold: form.voteThreshold.toString(),
                     communityVetoVoteThreshold: 'disabled',
