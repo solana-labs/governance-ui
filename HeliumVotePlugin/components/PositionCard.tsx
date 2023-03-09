@@ -13,7 +13,7 @@ import {
   secsToDays,
 } from 'VoteStakeRegistry/tools/dateTools'
 import { useUnixNow } from '@hooks/useUnixNow'
-import { BN, web3 } from '@project-serum/anchor'
+import { BN } from '@project-serum/anchor'
 import Button from '@components/Button'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import {
@@ -148,12 +148,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
     realm.account.communityMint.equals(position.votingMint.mint.publicKey)
 
   const canDelegate =
-    isRealmCommunityMint &&
-    (realm.account.communityMint.equals(HNT_MINT) ||
-      // TODO (Bry): Remove vv
-      realm.account.communityMint.equals(
-        new web3.PublicKey('D5Eb8q17xYsfGFNKxy3GCkSn9QpAmmLHX6wjceEmatTq')
-      ))
+    isRealmCommunityMint && realm.account.communityMint.equals(HNT_MINT)
 
   const tokenInfo = tokenPriceService.getTokenInfo(
     position.votingMint.mint.publicKey.toBase58()
