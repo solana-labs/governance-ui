@@ -552,7 +552,17 @@ export const getFriktionWithdrawSchema = () => {
   })
 }
 
-export const getDualFinanceAirdropSchema = () => {
+export const getDualFinanceGovernanceAirdropSchema = () => {
+  return yup.object().shape({
+    amountPerVoter: yup.number().typeError('Amount per voter is required'),
+    eligibilityStart: yup.number().typeError('Eligibility start is required'),
+    eligibilityEnd: yup.number().typeError('Eligibility end is required'),
+    treasury: yup.object().typeError('Treasury is required'),
+    amount: yup.number().typeError('Amount is required'),
+  })
+}
+
+export const getDualFinanceMerkleAirdropSchema = () => {
   return yup.object().shape({
     root: yup
       .string()
