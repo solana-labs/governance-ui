@@ -1,6 +1,4 @@
-import {
-  serializeInstructionToBase64,
-} from '@solana/spl-governance'
+import { serializeInstructionToBase64 } from '@solana/spl-governance'
 
 import { ConnectionContext } from '@utils/connection'
 import { validateInstruction } from '@utils/instructionTools'
@@ -21,7 +19,7 @@ interface AirdropArgs {
   wallet: WalletAdapter | undefined
 }
 
-export async function getAirdropInstruction({
+export async function getMerkleAirdropInstruction({
   connection,
   wallet,
   form,
@@ -32,33 +30,101 @@ export async function getAirdropInstruction({
 
   const serializedInstruction = ''
   const additionalSerializedInstructions: string[] = []
-  if (isValid && form.treasury && wallet?.publicKey && form.treasury.extensions.mint?.account.decimals !== undefined) {
+  if (
+    isValid &&
+    form.treasury &&
+    wallet?.publicKey &&
+    form.treasury.extensions.mint?.account.decimals !== undefined
+  ) {
     const airdrop = new Airdrop(connection.endpoint)
 
-    const amountNatural: BN  = getMintNaturalAmountFromDecimalAsBN(
-        form.amount,
-        form.treasury.extensions.mint?.account.decimals
-    );
+    const amountNatural: BN = getMintNaturalAmountFromDecimalAsBN(
+      form.amount,
+      form.treasury.extensions.mint?.account.decimals
+    )
 
-    let root: number[] = [];
+    let root: number[] = []
     try {
-        root = Array.from(Uint8Array.from(Buffer.from(form.root, 'hex')));
+      root = Array.from(Uint8Array.from(Buffer.from(form.root, 'hex')))
     } catch (err) {
-        root = form.root.split(',').map(function(item) {
-            return parseInt(item, 10);
-        });
+      root = form.root.split(',').map(function (item) {
+        return parseInt(item, 10)
+      })
     }
     const airdropTransactionContext: AirdropConfigureContext = await airdrop.createConfigMerkleTransaction(
-        form.treasury.pubkey, // source
-        form.treasury.extensions.token!.account.owner!, // authority
-        amountNatural,
-        root,
-    );
+      form.treasury.pubkey, // source
+      form.treasury.extensions.token!.account.owner!, // authority
+      amountNatural,
+      root
+    )
 
-    for (const instruction of airdropTransactionContext.transaction.instructions) {
-        additionalSerializedInstructions.push(
-            serializeInstructionToBase64(instruction)
-        )
+    for (const instruction of airdropTransactionContext.transaction
+      .instructions) {
+      additionalSerializedInstructions.push(
+        serializeInstructionToBase64(instruction)
+      )
+    }
+
+    return {
+      serializedInstruction,
+      additionalSerializedInstructions,
+      isValid: true,
+      governance: form.treasury?.governance,
+    }
+  }
+
+  return {
+    serializedInstruction,
+    isValid: false,
+    governance: form.treasury?.governance,
+    additionalSerializedInstructions: [],
+  }
+}
+
+export async function getGovernanceAirdropInstruction({
+  connection,
+  wallet,
+  form,
+  schema,
+  setFormErrors,
+}: AirdropArgs): Promise<UiInstruction> {
+  const isValid = await validateInstruction({ schema, form, setFormErrors })
+
+  const serializedInstruction = ''
+  const additionalSerializedInstructions: string[] = []
+  if (
+    isValid &&
+    form.treasury &&
+    wallet?.publicKey &&
+    form.treasury.extensions.mint?.account.decimals !== undefined
+  ) {
+    const airdrop = new Airdrop(connection.endpoint)
+
+    const totalAmountNatural: BN = getMintNaturalAmountFromDecimalAsBN(
+      form.amount,
+      form.treasury.extensions.mint?.account.decimals
+    )
+
+    const amountPerVoterNatural: BN = getMintNaturalAmountFromDecimalAsBN(
+      form.amountPerVoter,
+      form.treasury.extensions.mint?.account.decimals
+    )
+
+    const airdropTransactionContext: AirdropConfigureContext = await airdrop.createConfigGovernanceTransaction(
+      form.treasury.pubkey, // source
+      form.treasury.extensions.token!.account.owner!, // authority
+      totalAmountNatural,
+      amountPerVoterNatural,
+      new BN(form.eligibilityStart),
+      new BN(form.eligibilityEnd),
+      form.treasury.governance.pubkey, // reward voters of the treasury's governance
+    )
+
+    for (const instruction of airdropTransactionContext.transaction
+      .instructions) {
+      additionalSerializedInstructions.push(
+        serializeInstructionToBase64(instruction)
+      )
     }
 
     return {
