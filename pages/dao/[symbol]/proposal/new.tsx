@@ -134,7 +134,6 @@ import RemoveServiceFromDID from './components/instructions/Identity/RemoveServi
 import DualWithdraw from './components/instructions/Dual/DualWithdraw'
 import DualExercise from './components/instructions/Dual/DualExercise'
 import PsyFinanceMintAmericanOptions from './components/instructions/PsyFinance/MintAmericanOptions'
-import CreateVsrMaxVoterWeightRecord from './components/instructions/Vsr/CreateMaxVoterWeightRecord'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -483,7 +482,6 @@ const New = () => {
       [Instructions.CloseTokenAccount]: CloseTokenAccount,
       [Instructions.VotingMintConfig]: VotingMintConfig,
       [Instructions.CreateVsrRegistrar]: CreateVsrRegistrar,
-      [Instructions.CreateVsrMaxVoterWeightRecord]: CreateVsrMaxVoterWeightRecord,
       [Instructions.CreateGatewayPluginRegistrar]: CreateGatewayPluginRegistrar,
       [Instructions.ConfigureGatewayPlugin]: ConfigureGatewayPlugin,
       [Instructions.ChangeMakeDonation]: ChangeDonation,
