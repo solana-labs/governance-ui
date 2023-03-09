@@ -28,6 +28,7 @@ import { parseMintMaxVoteWeight } from '@tools/governance/units'
 import {
   getTimestampFromDays,
   getMintNaturalAmountFromDecimalAsBN,
+  getTimestampFromHours,
 } from '@tools/sdk/units'
 import { withCreateMint } from '@tools/sdk/splToken/withCreateMint'
 import { withCreateAssociatedTokenAccount } from '@tools/sdk/splToken/withCreateAssociatedTokenAccount'
@@ -329,13 +330,13 @@ export async function prepareRealmCreation({
     minInstructionHoldUpTime: 0,
     // max voting time 3 days
     maxVotingTime: getTimestampFromDays(maxVotingTimeInDays),
-    communityVoteTipping: VoteTipping.Strict,
+    communityVoteTipping: VoteTipping.Disabled,
     councilVoteTipping: VoteTipping.Strict,
     minCouncilTokensToCreateProposal: new BN(initialCouncilTokenAmount),
     councilVoteThreshold: councilVoteThreshold,
     councilVetoVoteThreshold: councilVetoVoteThreshold,
     communityVetoVoteThreshold: communityVetoVoteThreshold,
-    votingCoolOffTime: 0,
+    votingCoolOffTime: getTimestampFromHours(12),
     depositExemptProposalCount: 10,
   })
 
