@@ -62,7 +62,6 @@ export interface LockTokensModalFormValues {
   amount: number
   lockupPeriod: { value: number; display: string }
   lockupPeriodInDays: number
-  lockupMoreThenDeposited: { value: boolean; display: string }
 }
 
 export const LockTokensModal: React.FC<{
@@ -92,10 +91,6 @@ export const LockTokensModal: React.FC<{
   const currentPrecision = precision(mintMinAmount)
   const hasMinLockup = minLockupTimeInDays && minLockupTimeInDays > 0
   const hasMaxLockup = maxLockupTimeInDays && maxLockupTimeInDays !== Infinity
-  const lockupMoreThenDepositedOptions = [
-    { value: false, display: 'No' },
-    { value: true, display: 'Yes' },
-  ]
   const lockupKindOptions = [
     { value: LockupKind.cliff, display: 'Cliff' },
     { value: LockupKind.constant, display: 'Constant' },
@@ -120,17 +115,10 @@ export const LockTokensModal: React.FC<{
       lockupKind: lockupKindOptions[0],
       lockupPeriod: lockupPeriodOptions[0],
       lockupPeriodInDays: lockupPeriodOptions[0].value,
-      lockupMoreThenDeposited: lockupMoreThenDepositedOptions[0],
     },
   })
 
-  const {
-    lockupKind,
-    amount,
-    lockupPeriod,
-    lockupPeriodInDays,
-    lockupMoreThenDeposited,
-  } = watch()
+  const { lockupKind, amount, lockupPeriod, lockupPeriodInDays } = watch()
 
   // validateAmountOnChange
   useEffect(() => {
@@ -171,8 +159,6 @@ export const LockTokensModal: React.FC<{
 
   const labelClasses = 'mb-2 text-fgd-2 text-sm'
   const lockupMultiplier = calcMultiplierFn(lockupPeriodInDays)
-  // TODO (BRY): Add lockupMoreThenDeposited logic
-  // backwards compatability for preexisting LockTokensModal
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
       <form onSubmit={handleOnSubmit}>
