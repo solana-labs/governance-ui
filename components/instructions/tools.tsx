@@ -199,8 +199,8 @@ export const HIDDEN_GOVERNANCES = new Map<string, string>([
   ['G8JgCHfca7PehBwRp1Q91smJ9CXAd8K9e9CpfVjyD2MP', ''],
 ])
 
-// Blacklisted proposals which should not be displayed in the UI
 // TODO: Add this to on-chain metadata to Proposal account
+// Blacklisted proposals which should not be displayed in the UI
 // hidden legacy accounts to declutter UI
 export const HIDDEN_PROPOSALS = new Map<string, string>([
   ['E8XgiVpDJgDf4XgBKjZnMs3S1K7cmibtbDqjw5aNobCZ', ''],
@@ -238,7 +238,6 @@ export const WSOL_MINT_PK = new PublicKey(WSOL_MINT)
 
 //Hidden accounts that has some shit coins with 0 value inside but freeze authority
 //blocks closing them
-//hidden only to make ui more clean
 const HIDDEN_MNGO_TREASURES = [
   'GZQSF4Fh9xK7rf9WBEhawXYFw8qPXeatZLUqVQeuW3X8',
   'J6jYLFDWeeGwg4u2TXhKDCcH4fSzJFQyDE2VSv2drRkg',
