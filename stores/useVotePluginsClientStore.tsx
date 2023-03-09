@@ -22,7 +22,7 @@ import { tryGetGatewayRegistrar } from '../GatewayPlugin/sdk/api'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { Registrar as HeliumVsrRegistrar } from 'HeliumVotePlugin/sdk/types'
-import { registrarKey } from '@helium/voter-stake-registry-sdk'
+import * as heliumVsrSdk from '@helium/voter-stake-registry-sdk'
 
 interface UseVotePluginsClientStore extends State {
   state: {
@@ -164,11 +164,11 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
     },
     handleSetHeliumVsrRegistrar: async (client, realm) => {
       const clientProgramId = client!.program.programId
-      const registrar = registrarKey(
+      const [registrar] = heliumVsrSdk.registrarKey(
         realm!.pubkey,
         realm!.account.communityMint,
         clientProgramId
-      )[0]
+      )
 
       const existingRegistrar = await tryGetHeliumRegistrar(registrar, client!)
 

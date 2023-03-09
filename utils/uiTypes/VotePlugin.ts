@@ -233,10 +233,11 @@ export class VotingClient {
             voterWeightAction: {
               [type]: {},
             },
-            owner: walletPk,
           } as any)
           .accounts({
             registrar,
+            owner: walletPk,
+            voterWeightRecord: voterWeightPk,
           })
           .remainingAccounts(remainingAccounts.slice(0, 10))
           .instruction()

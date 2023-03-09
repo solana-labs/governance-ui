@@ -1,16 +1,19 @@
 import create, { State } from 'zustand'
 import { BN } from '@project-serum/anchor'
+import { ProgramAccount } from '@solana/spl-governance'
 import { PositionWithMeta } from 'HeliumVotePlugin/sdk/types'
 import {
   GetPositionsArgs as GetPosArgs,
   getPositions,
 } from '../utils/getPositions'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
+import { MaxVoterWeightRecord } from '@solana/spl-governance'
 
 interface HeliumVsrStoreState {
   positions: PositionWithMeta[]
   amountLocked: BN
   votingPower: BN
+  maxVoteRecord: ProgramAccount<MaxVoterWeightRecord> | null
   isLoading: boolean
 }
 
@@ -21,6 +24,9 @@ interface GetPositionsArgs extends GetPosArgs {
 interface HeliumVsrStore extends State {
   state: HeliumVsrStoreState
   resetState: () => void
+  setMaxVoterWeight: (
+    maxVoterRecord: ProgramAccount<MaxVoterWeightRecord> | null
+  ) => void
   getPositions: (args: GetPositionsArgs) => Promise<void>
 }
 
@@ -28,6 +34,7 @@ const defaultState: HeliumVsrStoreState = {
   positions: [],
   amountLocked: new BN(0),
   votingPower: new BN(0),
+  maxVoteRecord: null,
   isLoading: false,
 }
 
@@ -39,6 +46,11 @@ const useHeliumVsrStore = create<HeliumVsrStore>((set, _get) => ({
     set((s) => {
       s.state = { ...defaultState }
     }),
+  setMaxVoterWeight: (maxVoterRecord) => {
+    set((s) => {
+      s.state.maxVoteRecord = maxVoterRecord
+    })
+  },
   getPositions: async ({ votingClient, ...args }) => {
     set((s) => {
       s.state.isLoading = true

@@ -290,6 +290,19 @@ const grantIx = (programId: PublicKey) => ({
   },
 })
 
+// TODO (Bry) figure out for common
+const createMaxVoterWeightRecordIx = (_programId: PublicKey) => ({
+  144: {
+    name: 'Create Max Voter Weight Record',
+    accounts: [
+      { name: 'Max Voter Weight Record' },
+      { name: 'Registrar' },
+      { name: 'Realm governing token mint' },
+      { name: 'Payer' },
+    ],
+  },
+})
+
 const heliumInitializeRegistrarIx = (_programId: PublicKey) => ({
   120: {
     name: 'Initialize registrar',
@@ -402,7 +415,13 @@ const heliumConfigVotingMintIx = (programId: PublicKey) => ({
 })
 
 const common_instructions = (programId: PublicKey) =>
-  [clawbackIx, createRegistrarIx, configVotingMintIx, grantIx].reduce(
+  [
+    clawbackIx,
+    createRegistrarIx,
+    configVotingMintIx,
+    grantIx,
+    createMaxVoterWeightRecordIx,
+  ].reduce(
     (acc, ix) => ({
       ...acc,
       ...ix(programId),

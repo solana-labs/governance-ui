@@ -27,8 +27,8 @@ import { STAKING_ADDRESS as PYTH_STAKING_ADDRESS } from 'pyth-staking-api'
 import useGatewayPluginStore from '../GatewayPlugin/store/gatewayPluginStore'
 import { getGatekeeperNetwork } from '../GatewayPlugin/sdk/accounts'
 import { NFTWithMeta } from '@utils/uiTypes/VotePlugin'
-import { PROGRAM_ID as HELIUM_VSR_PROGRAM_ID } from '@helium/voter-stake-registry-sdk'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
+import * as heliumVsrSdk from '@helium/voter-stake-registry-sdk'
 
 export const vsrPluginsPks: string[] = [
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo',
@@ -36,7 +36,9 @@ export const vsrPluginsPks: string[] = [
   'VotEn9AWwTFtJPJSMV5F9jsMY6QwWM5qn3XP9PATGW7',
 ]
 
-export const heliumVsrPluginsPks: string[] = [HELIUM_VSR_PROGRAM_ID.toBase58()]
+export const heliumVsrPluginsPks: string[] = [
+  heliumVsrSdk.PROGRAM_ID.toBase58(),
+]
 
 export const nftPluginsPks: string[] = [
   'GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw',
@@ -69,26 +71,10 @@ export function useVotingPlugins() {
     handleSetCurrentRealmVotingClient,
   } = useVotePluginsClientStore()
 
-  const {
-    setVotingNfts,
-    setMaxVoterWeight,
-    setIsLoadingNfts,
-  } = useNftPluginStore()
-
-  const { getPositions } = useHeliumVsrStore()
-
-  const {
-    setIsLoadingGatewayToken,
-    setGatekeeperNetwork,
-  } = useGatewayPluginStore()
-
-  const {
-    setIsLoading,
-    setVotingPower,
-    setOracleKeys,
-    setInstructions,
-  } = useSwitchboardPluginStore()
-
+  const nftStore = useNftPluginStore()
+  const heliumStore = useHeliumVsrStore()
+  const gatewayStore = useGatewayPluginStore()
+  const switchboardStore = useSwitchboardPluginStore()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const connected = useWalletStore((s) => s.connected)
@@ -123,12 +109,12 @@ export function useVotingPlugins() {
     []
 
   const handleGetNfts = async () => {
-    setIsLoadingNfts(true)
+    nftStore.setIsLoadingNfts(true)
     try {
       const nfts = await getNfts(wallet!.publicKey!, connection)
       const votingNfts = nfts.filter(getIsFromCollection)
       const nftsWithMeta = votingNfts
-      setVotingNfts(nftsWithMeta, currentClient, nftMintRegistrar)
+      nftStore.setVotingNfts(nftsWithMeta, currentClient, nftMintRegistrar)
     } catch (e) {
       console.log(e)
       notify({
@@ -136,30 +122,45 @@ export function useVotingPlugins() {
         type: 'error',
       })
     }
-    setIsLoadingNfts(false)
+    nftStore.setIsLoadingNfts(false)
   }
 
   const handleGetHeliumVsrVoting = async () => {
-    const isInvalid =
-      !realm ||
-      !wallet ||
-      !wallet.publicKey ||
-      !currentPluginPk ||
-      !heliumVsrClient ||
-      !heliumVsrPluginsPks.includes(currentPluginPk.toBase58())
+    if (
+      realm &&
+      currentPluginPk &&
+      heliumVsrPluginsPks.includes(currentPluginPk.toBase58())
+    ) {
+      const [maxVoterRecord] = heliumVsrSdk.maxVoterWeightRecordKey(
+        realm.pubkey,
+        realm.account.communityMint,
+        currentPluginPk
+      )
 
-    if (!isInvalid) {
       try {
-        await getPositions({
-          realmPk: realm.pubkey,
-          communityMintPk: realm.account.communityMint,
-          walletPk: wallet.publicKey!,
-          connection: connection.current,
-          client: heliumVsrClient,
-          votingClient: currentClient,
-        })
-      } catch (e) {
-        console.log(e)
+        const mvwr = await getMaxVoterWeightRecord(
+          connection.current,
+          maxVoterRecord
+        )
+        heliumStore.setMaxVoterWeight(mvwr)
+      } catch (_e) {
+        console.log("Couldn't get max voter weight record. Setting to null.")
+        heliumStore.setMaxVoterWeight(null)
+      }
+
+      if (wallet && wallet.publicKey && heliumVsrClient) {
+        try {
+          await heliumStore.getPositions({
+            realmPk: realm.pubkey,
+            communityMintPk: realm.account.communityMint,
+            walletPk: wallet.publicKey!,
+            connection: connection.current,
+            client: heliumVsrClient,
+            votingClient: currentClient,
+          })
+        } catch (e) {
+          console.log(e)
+        }
       }
     }
   }
@@ -169,7 +170,7 @@ export function useVotingPlugins() {
       return
     }
 
-    setIsLoading(true)
+    switchboardStore.setIsLoading(true)
 
     try {
       const options = anchor.AnchorProvider.defaultOptions()
@@ -266,8 +267,11 @@ export function useVotingPlugins() {
         }
       }
 
-      setOracleKeys(myNodesForRealm, currentClient)
-      setInstructions(setVoterWeightInstructions, currentClient)
+      switchboardStore.setOracleKeys(myNodesForRealm, currentClient)
+      switchboardStore.setInstructions(
+        setVoterWeightInstructions,
+        currentClient
+      )
 
       try {
         const [
@@ -284,14 +288,14 @@ export function useVotingPlugins() {
           )
           if (vwr && vwr.account.realm.equals(realm.pubkey)) {
             // get voting power
-            setVotingPower(vwr.account.voterWeight)
+            switchboardStore.setVotingPower(vwr.account.voterWeight)
           } else {
             // 'no sb governance'
-            setVotingPower(new anchor.BN(0))
+            switchboardStore.setVotingPower(new anchor.BN(0))
           }
         } catch (e) {
           console.log("Couldn't get voter weight record. Setting to zero.")
-          setVotingPower(new anchor.BN(0))
+          switchboardStore.setVotingPower(new anchor.BN(0))
         }
       } catch (e) {
         console.log("Couldn't get VWR")
@@ -300,12 +304,12 @@ export function useVotingPlugins() {
     } catch (e) {
       console.log(e)
     }
-    setIsLoading(false)
+    switchboardStore.setIsLoading(false)
   }
 
   const handleRegisterGatekeeperNetwork = async () => {
     if (realm && gatewayClient) {
-      setIsLoadingGatewayToken(true)
+      gatewayStore.setIsLoadingGatewayToken(true)
 
       try {
         const gatekeeperNetwork = await getGatekeeperNetwork(
@@ -313,7 +317,7 @@ export function useVotingPlugins() {
           realm
         )
 
-        setGatekeeperNetwork(gatekeeperNetwork)
+        gatewayStore.setGatekeeperNetwork(gatekeeperNetwork)
       } catch (e) {
         console.log(e)
         notify({
@@ -321,7 +325,7 @@ export function useVotingPlugins() {
           type: 'error',
         })
       }
-      setIsLoadingGatewayToken(false)
+      gatewayStore.setIsLoadingGatewayToken(false)
     }
   }
 
@@ -336,10 +340,10 @@ export function useVotingPlugins() {
         connection.current,
         maxVoterWeightRecord
       )
-      setMaxVoterWeight(existingMaxVoterRecord)
+      nftStore.setMaxVoterWeight(existingMaxVoterRecord)
     } catch (e) {
       console.log(e)
-      setMaxVoterWeight(null)
+      nftStore.setMaxVoterWeight(null)
     }
   }
 
@@ -358,9 +362,8 @@ export function useVotingPlugins() {
     if (wallet) {
       if (currentPluginPk) {
         handleSetVsrClient(wallet, connection, currentPluginPk)
+        handleSetHeliumVsrClient(wallet, connection, currentPluginPk)
       }
-
-      handleSetHeliumVsrClient(wallet, connection)
       handleSetNftClient(wallet, connection)
       handleSetSwitchboardClient(wallet, connection)
       handleSetGatewayClient(wallet, connection)
@@ -533,8 +536,8 @@ export function useVotingPlugins() {
       handleGetHeliumVsrVoting()
       handleGetSwitchboardVoting()
     } else {
-      setVotingNfts([], currentClient, nftMintRegistrar)
-      setMaxVoterWeight(null)
+      nftStore.setVotingNfts([], currentClient, nftMintRegistrar)
+      nftStore.setMaxVoterWeight(null)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [

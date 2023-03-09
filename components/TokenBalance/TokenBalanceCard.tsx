@@ -33,13 +33,13 @@ import { notify } from '@utils/notifications'
 import { ExclamationIcon } from '@heroicons/react/outline'
 import { useEffect, useState } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { vsrPluginsPks } from '@hooks/useVotingPlugins'
 import { REALM_ID as PYTH_REALM_ID } from 'pyth-staking-api'
 import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 import SerumGovernanceTokenWrapper from './SerumGovernanceTokenWrapper'
 import getNumTokens from '@components/ProposalVotingPower/getNumTokens'
 import VotingPowerPct from '@components/ProposalVotingPower/VotingPowerPct'
+import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 
 const TokenBalanceCard = ({
   proposal,
@@ -150,8 +150,8 @@ export const TokenDeposit = ({
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
-  const maxVoterWeight =
-    useNftPluginStore((s) => s.state.maxVoteRecord)?.pubkey || undefined
+
+  const maxVoterWeight = useMaxVoteRecord()?.pubkey || undefined
   const {
     realm,
     realmInfo,
