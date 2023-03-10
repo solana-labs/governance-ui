@@ -46,6 +46,10 @@ import {
 } from '@utils/uiTypes/assets'
 import group from '@utils/group'
 
+const additionalPossibleMintAccounts = {
+  Mango: [new PublicKey('EGk8Gw7Z484mzAKb7GwCcqrZd4KwwsyU2Dv9woY6uDQu')],
+}
+
 const tokenAccountOwnerOffset = 32
 
 interface SolAccInfo {
@@ -646,14 +650,31 @@ const getSolAccountsInfo = async (
 
 const loadMintGovernanceAccounts = async (
   connection: ConnectionContext,
-  mintGovernances: ProgramAccount<Governance>[]
+  governances: ProgramAccount<Governance>[],
+  possibleMintAccountPks: PublicKey[]
 ) => {
-  const mintGovernancesMintInfo = await getMultipleAccountInfoChunked(
+  const possibleMintAccounts = await getMultipleAccountInfoChunked(
     connection.current,
-    mintGovernances.map((x) => x.account.governedAccount)
+    possibleMintAccountPks
   )
-
-  return getMintAccounts(mintGovernances, mintGovernancesMintInfo)
+  const mintGovernances: ProgramAccount<Governance>[] = []
+  const mintAccounts: AccountInfoGeneric<Buffer>[] = []
+  for (const possibleMintAccount of possibleMintAccounts) {
+    if (possibleMintAccount) {
+      const data = Buffer.from(possibleMintAccount.data)
+      const parsedMintInfo = parseMintAccountData(data) as MintInfo
+      const ownerGovernance = governances.find(
+        (g) =>
+          parsedMintInfo?.mintAuthority &&
+          g.pubkey.equals(parsedMintInfo.mintAuthority)
+      )
+      if (ownerGovernance) {
+        mintGovernances.push(ownerGovernance)
+        mintAccounts.push(possibleMintAccount)
+      }
+    }
+  }
+  return getMintAccounts(mintGovernances, mintAccounts)
 }
 
 const loadGovernedTokenAccounts = async (
@@ -709,11 +730,15 @@ const getAccountsForGovernances = async (
   (AccountTypeMint | AccountTypeProgram | AssetAccount | AccountTypeGeneric)[]
 > => {
   // 1 - Sort different types of governances
-  const mintGovernances = getGovernancesByAccountTypes(governancesArray, [
-    GovernanceAccountType.MintGovernanceV1,
-    GovernanceAccountType.MintGovernanceV2,
-  ])
-
+  const possibleMintAccountPks = [
+    realm.account.communityMint,
+    realm.account.config.councilMint,
+  ].filter((x) => typeof x !== 'undefined') as PublicKey[]
+  const additionalMintAccounts =
+    additionalPossibleMintAccounts[realm.account.name]
+  if (additionalMintAccounts) {
+    possibleMintAccountPks.push(...additionalMintAccounts)
+  }
   const programGovernances = getGovernancesByAccountTypes(governancesArray, [
     GovernanceAccountType.ProgramGovernanceV1,
     GovernanceAccountType.ProgramGovernanceV2,
@@ -722,7 +747,8 @@ const getAccountsForGovernances = async (
   // 2 - Load accounts related to mint governances
   const mintAccounts = await loadMintGovernanceAccounts(
     connection,
-    mintGovernances
+    governancesArray,
+    possibleMintAccountPks
   )
 
   // 3 - Load accounts related to program governances
