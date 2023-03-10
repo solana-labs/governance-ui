@@ -10,10 +10,10 @@ import {
   GovernanceConfig,
   GoverningTokenConfigAccountArgs,
   SetRealmAuthorityAction,
+  TOKEN_PROGRAM_ID,
   VoteTipping,
   WalletSigner,
   withCreateGovernance,
-  withCreateMintGovernance,
   withCreateNativeTreasury,
   withCreateRealm,
   withCreateTokenOwnerRecord,
@@ -37,6 +37,7 @@ import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 
 import BN from 'bn.js'
 import { createGovernanceThresholds } from './configs'
+import { Token } from '@solana/spl-token'
 
 export interface Web3Context {
   connection: Connection
@@ -139,13 +140,6 @@ export async function prepareRealmCreation({
     communityAbsoluteMaxVoteWeight
   )
 
-  // If we're using an existing community mint check if we can create a governance for it
-  // 1) The mint must have mintAuthority
-  // 2) The current wallet must be the authority
-  let createCommunityMintGovernance = communityMintAccount?.account.mintAuthority?.equals(
-    walletPk
-  )
-
   console.log('Prepare realm - community mint address', existingCommunityMintPk)
   console.log('Prepare realm - community mint account', communityMintAccount)
 
@@ -175,8 +169,6 @@ export async function prepareRealmCreation({
       communityMintDecimals,
       walletPk
     )
-    // If we create the mint then always create a governance for it
-    createCommunityMintGovernance = true
   }
 
   console.log(
@@ -340,54 +332,51 @@ export async function prepareRealmCreation({
     depositExemptProposalCount: 10,
   })
 
-  const communityMintGovPk = createCommunityMintGovernance
-    ? await withCreateMintGovernance(
-        realmInstructions,
-        programIdPk,
-        programVersion,
-        realmPk,
-        communityMintPk,
-        config,
-        transferCommunityMintAuthority,
-        walletPk,
-        PublicKey.default,
-        walletPk,
-        walletPk
-      )
-    : await withCreateGovernance(
-        realmInstructions,
-        programIdPk,
-        programVersion,
-        realmPk,
-        communityMintPk,
-        config,
-        PublicKey.default,
-        walletPk,
-        walletPk
-      )
-
-  await withCreateNativeTreasury(
+  const mainGovernancePk = await withCreateGovernance(
     realmInstructions,
     programIdPk,
     programVersion,
-    communityMintGovPk,
+    realmPk,
+    undefined,
+    config,
+    PublicKey.default,
+    walletPk,
     walletPk
   )
 
-  if (councilMintPk && councilMintHasMintAuthority) {
-    await withCreateMintGovernance(
-      realmInstructions,
-      programIdPk,
-      programVersion,
-      realmPk,
-      councilMintPk,
-      config,
-      transferCouncilMintAuthority,
+  const nativeTreasuryAddress = await withCreateNativeTreasury(
+    realmInstructions,
+    programIdPk,
+    programVersion,
+    mainGovernancePk,
+    walletPk
+  )
+  if (transferCommunityMintAuthority) {
+    const ix = Token.createSetAuthorityInstruction(
+      TOKEN_PROGRAM_ID,
+      communityMintPk,
+      nativeTreasuryAddress,
+      'MintTokens',
       walletPk,
-      PublicKey.default,
-      walletPk,
-      walletPk
+      []
     )
+    realmInstructions.push(ix)
+  }
+
+  if (
+    councilMintPk &&
+    councilMintHasMintAuthority &&
+    transferCouncilMintAuthority
+  ) {
+    const ix = Token.createSetAuthorityInstruction(
+      TOKEN_PROGRAM_ID,
+      councilMintPk,
+      nativeTreasuryAddress,
+      'MintTokens',
+      walletPk,
+      []
+    )
+    realmInstructions.push(ix)
   }
 
   // Set the community governance as the realm authority
@@ -398,13 +387,13 @@ export async function prepareRealmCreation({
       programVersion,
       realmPk,
       walletPk,
-      communityMintGovPk,
+      mainGovernancePk,
       SetRealmAuthorityAction.SetChecked
     )
   }
 
   return {
-    communityMintGovPk,
+    mainGovernancePk,
     communityMintPk,
     councilMintPk,
     realmPk,
