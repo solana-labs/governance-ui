@@ -446,7 +446,7 @@ const GovernedAccountSelect = ({
             : getWalletView(value, true)
         }
         placeholder="Please select..."
-        value={value?.governance?.account.governedAccount.toBase58()}
+        value={value?.pubkey}
         error={error}
         noMaxWidth={noMaxWidth}
       >

@@ -66,33 +66,21 @@ export default function useGovernanceAssets() {
     return governancesFiltered
   }
 
-  function canUseGovernanceForInstruction(types: GovernanceAccountType[]) {
+  function canUseGovernanceForInstruction(types: AccountType[]) {
     return (
       realm &&
-      getGovernancesByAccountTypes(types).some((govAcc) =>
-        ownVoterWeight.canCreateProposal(govAcc.account.config)
-      )
+      assetAccounts
+        .filter((x) => types.find((t) => t === x.type))
+        .some((govAcc) =>
+          ownVoterWeight.canCreateProposal(govAcc.governance.account.config)
+        )
     )
   }
-  const canMintRealmCommunityToken = () => {
-    const governances = getGovernancesByAccountTypes([
-      GovernanceAccountType.MintGovernanceV1,
-      GovernanceAccountType.MintGovernanceV2,
-    ])
-    return !!governances.find((govAcc) =>
-      realm?.account.communityMint.equals(govAcc.account.governedAccount)
-    )
-  }
-  const canMintRealmCouncilToken = () => {
-    const governances = getGovernancesByAccountTypes([
-      GovernanceAccountType.MintGovernanceV1,
-      GovernanceAccountType.MintGovernanceV2,
-    ])
 
-    return !!governances.find(
+  const canMintRealmCouncilToken = () => {
+    return !!assetAccounts.find(
       (x) =>
-        x.account.governedAccount.toBase58() ==
-        realm?.account.config.councilMint?.toBase58()
+        x.pubkey.toBase58() == realm?.account.config.councilMint?.toBase58()
     )
   }
   const canUseTransferInstruction = governedTokenAccounts.some((acc) => {
@@ -106,13 +94,11 @@ export default function useGovernanceAssets() {
   })
 
   const canUseProgramUpgradeInstruction = canUseGovernanceForInstruction([
-    GovernanceAccountType.ProgramGovernanceV1,
-    GovernanceAccountType.ProgramGovernanceV2,
+    AccountType.PROGRAM,
   ])
 
   const canUseMintInstruction = canUseGovernanceForInstruction([
-    GovernanceAccountType.MintGovernanceV1,
-    GovernanceAccountType.MintGovernanceV2,
+    AccountType.MINT,
   ])
 
   const canUseAnyInstruction =
@@ -852,7 +838,6 @@ export default function useGovernanceAssets() {
     auxiliaryTokenAccounts,
     availableInstructions,
     availablePackages,
-    canMintRealmCommunityToken,
     canMintRealmCouncilToken,
     canUseAuthorityInstruction,
     canUseMintInstruction,
