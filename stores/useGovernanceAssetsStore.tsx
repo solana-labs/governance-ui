@@ -8,11 +8,7 @@ import {
   TOKEN_PROGRAM_ID,
   ProgramAccount,
 } from '@solana/spl-governance'
-import {
-  ParsedAccountData,
-  PublicKey,
-  AccountInfo as AccountInfoGeneric,
-} from '@solana/web3.js'
+import { ParsedAccountData, PublicKey } from '@solana/web3.js'
 import { AccountInfo, MintInfo } from '@solana/spl-token'
 import {
   AUXILIARY_TOKEN_ACCOUNTS,
@@ -342,7 +338,7 @@ const getTokenAssetAccounts = async (
 
 const getMintAccounts = (
   mintGovernances: ProgramAccount<Governance>[],
-  mintGovernancesMintInfo: (AccountInfoGeneric<Buffer> | null)[]
+  mintGovernancesMintInfo: (MintInfo & { publicKey: PublicKey })[]
 ) => {
   const accounts: AccountTypeMint[] = []
   mintGovernancesMintInfo.forEach((mintAccountInfo, index) => {
@@ -352,9 +348,7 @@ const getMintAccounts = (
         `Missing mintAccountInfo for: ${mintGovernnace?.pubkey.toBase58()}`
       )
     }
-    const data = Buffer.from(mintAccountInfo.data)
-    const parsedMintInfo = parseMintAccountData(data) as MintInfo
-    const account = new AccountTypeMint(mintGovernnace!, parsedMintInfo)
+    const account = new AccountTypeMint(mintGovernnace!, mintAccountInfo)
     if (account) {
       accounts.push(account)
     }
@@ -658,8 +652,10 @@ const loadMintGovernanceAccounts = async (
     possibleMintAccountPks
   )
   const mintGovernances: ProgramAccount<Governance>[] = []
-  const mintAccounts: AccountInfoGeneric<Buffer>[] = []
-  for (const possibleMintAccount of possibleMintAccounts) {
+  const mintAccounts: (MintInfo & { publicKey: PublicKey })[] = []
+  for (const index in possibleMintAccounts) {
+    const possibleMintAccount = possibleMintAccounts[index]
+    const pk = possibleMintAccountPks[index]
     if (possibleMintAccount) {
       const data = Buffer.from(possibleMintAccount.data)
       const parsedMintInfo = parseMintAccountData(data) as MintInfo
@@ -670,7 +666,7 @@ const loadMintGovernanceAccounts = async (
       )
       if (ownerGovernance) {
         mintGovernances.push(ownerGovernance)
-        mintAccounts.push(possibleMintAccount)
+        mintAccounts.push({ ...parsedMintInfo, publicKey: pk })
       }
     }
   }
@@ -729,22 +725,25 @@ const getAccountsForGovernances = async (
 ): Promise<
   (AccountTypeMint | AccountTypeProgram | AssetAccount | AccountTypeGeneric)[]
 > => {
-  // 1 - Sort different types of governances
-  const possibleMintAccountPks = [
-    realm.account.communityMint,
-    realm.account.config.councilMint,
-  ].filter((x) => typeof x !== 'undefined') as PublicKey[]
-  const additionalMintAccounts =
-    additionalPossibleMintAccounts[realm.account.name]
-  if (additionalMintAccounts) {
-    possibleMintAccountPks.push(...additionalMintAccounts)
-  }
   const programGovernances = getGovernancesByAccountTypes(governancesArray, [
     GovernanceAccountType.ProgramGovernanceV1,
     GovernanceAccountType.ProgramGovernanceV2,
   ])
 
-  // 2 - Load accounts related to mint governances
+  // 2 - Load accounts related to mint
+  //due to long request for mint accounts that are owned by every governance
+  //we fetch
+  const possibleMintAccountPks = [
+    realm.account.communityMint,
+    realm.account.config.councilMint,
+  ].filter((x) => typeof x !== 'undefined') as PublicKey[]
+
+  const additionalMintAccounts =
+    additionalPossibleMintAccounts[realm.account.name]
+  if (additionalMintAccounts) {
+    possibleMintAccountPks.push(...additionalMintAccounts)
+  }
+
   const mintAccounts = await loadMintGovernanceAccounts(
     connection,
     governancesArray,
