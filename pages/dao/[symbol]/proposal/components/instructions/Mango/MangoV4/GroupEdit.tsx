@@ -18,6 +18,22 @@ import InstructionForm, {
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { BN } from '@coral-xyz/anchor'
 import { getChangedValues, getNullOrTransform } from '@utils/mangoV4Tools'
+import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
+import Switch from '@components/Switch'
+
+const keyToLabel = {
+  admin: 'Admin',
+  fastListingAdmin: 'Fast Listing Admin',
+  securityAdmin: 'Security Admin',
+  testing: 'Testing',
+  version: 'Version',
+  depositLimitQuote: 'Deposit limit quote',
+  feePayWithMngo: 'Fee Pay With MNGO',
+  feesMngoBonusRate: 'Fees MNGO Bonus Rate',
+  feesSwapMangoAccount: 'Fees Swap Mango Account',
+  feesMngoTokenIndex: 'Fees MNGO Token Index',
+  feesExpiryInterval: 'Fees Expiry Interval',
+}
 
 type GroupEditForm = {
   governedAccount: AssetAccount | null
@@ -74,6 +90,7 @@ const GroupEdit = ({
     ...defaultFormValues,
   })
   const [form, setForm] = useState<GroupEditForm>({ ...defaultFormValues })
+  const [forcedValues, setForcedValues] = useState<string[]>([])
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
 
@@ -91,8 +108,11 @@ const GroupEdit = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const values = getChangedValues<GroupEditForm>(originalFormValues, form)
-
+      const values = getChangedValues<GroupEditForm>(
+        originalFormValues,
+        form,
+        forcedValues
+      )
       //Mango instruction call and serialize
       const ix = await mangoClient!.program.methods
         .groupEdit(
@@ -130,7 +150,7 @@ const GroupEdit = ({
       index
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form])
+  }, [form, forcedValues])
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
@@ -181,7 +201,6 @@ const GroupEdit = ({
         feesExpiryInterval:
           mangoGroup!.buybackFeesExpiryInterval?.toNumber() || 0,
       }
-      console.log(vals)
       setForm({
         ...vals,
       })
@@ -203,28 +222,28 @@ const GroupEdit = ({
       options: solAccounts,
     },
     {
-      label: `Admin`,
+      label: keyToLabel['admin'],
       subtitle: getAdditionalLabelInfo('admin'),
       initialValue: form.admin,
       type: InstructionInputType.INPUT,
       name: 'admin',
     },
     {
-      label: `Fast Listing Admin`,
+      label: keyToLabel['fastListingAdmin'],
       subtitle: getAdditionalLabelInfo('fastListingAdmin'),
       initialValue: form.fastListingAdmin,
       type: InstructionInputType.INPUT,
       name: 'fastListingAdmin',
     },
     {
-      label: `Security Admin`,
+      label: keyToLabel['securityAdmin'],
       subtitle: getAdditionalLabelInfo('securityAdmin'),
       initialValue: form.securityAdmin,
       type: InstructionInputType.INPUT,
       name: 'securityAdmin',
     },
     {
-      label: `Testing`,
+      label: keyToLabel['testing'],
       subtitle: getAdditionalLabelInfo('testing'),
       initialValue: form.testing,
       type: InstructionInputType.INPUT,
@@ -232,7 +251,7 @@ const GroupEdit = ({
       name: 'testing',
     },
     {
-      label: `Version`,
+      label: keyToLabel['version'],
       subtitle: getAdditionalLabelInfo('version'),
       initialValue: form.version,
       type: InstructionInputType.INPUT,
@@ -240,7 +259,7 @@ const GroupEdit = ({
       name: 'version',
     },
     {
-      label: `Deposit Limit Quote`,
+      label: keyToLabel['depositLimitQuote'],
       subtitle: getAdditionalLabelInfo('depositLimitQuote'),
       initialValue: form.depositLimitQuote,
       type: InstructionInputType.INPUT,
@@ -248,14 +267,14 @@ const GroupEdit = ({
       name: 'depositLimitQuote',
     },
     {
-      label: 'Fees pay with MNGO',
+      label: keyToLabel['feePayWithMngo'],
       initialValue: form.feePayWithMngo,
       subtitle: getAdditionalLabelInfo('buybackFees'),
       type: InstructionInputType.SWITCH,
       name: 'feePayWithMngo',
     },
     {
-      label: `Fees MNGO Bonus Rate`,
+      label: keyToLabel['feesMngoBonusRate'],
       subtitle: getAdditionalLabelInfo('buybackFeesMngoBonusFactor'),
       initialValue: form.feesMngoBonusRate,
       type: InstructionInputType.INPUT,
@@ -263,14 +282,14 @@ const GroupEdit = ({
       name: 'feesMngoBonusRate',
     },
     {
-      label: `Fees Swap Mango Account`,
+      label: keyToLabel['feesSwapMangoAccount'],
       subtitle: getAdditionalLabelInfo('buybackFeesSwapMangoAccount'),
       initialValue: form.feesSwapMangoAccount,
       type: InstructionInputType.INPUT,
       name: 'feesSwapMangoAccount',
     },
     {
-      label: `Fees MNGO Token Index`,
+      label: keyToLabel['feesMngoTokenIndex'],
       subtitle: getAdditionalLabelInfo('mngoTokenIndex'),
       initialValue: form.feesMngoTokenIndex,
       type: InstructionInputType.INPUT,
@@ -278,7 +297,7 @@ const GroupEdit = ({
       name: 'feesMngoTokenIndex',
     },
     {
-      label: `Fees Expiry Interval`,
+      label: keyToLabel['feesExpiryInterval'],
       subtitle: getAdditionalLabelInfo('feesExpiryInterval'),
       initialValue: form.feesExpiryInterval,
       type: InstructionInputType.INPUT,
@@ -290,13 +309,45 @@ const GroupEdit = ({
   return (
     <>
       {form && (
-        <InstructionForm
-          outerForm={form}
-          setForm={setForm}
-          inputs={inputs}
-          setFormErrors={setFormErrors}
-          formErrors={formErrors}
-        ></InstructionForm>
+        <>
+          <InstructionForm
+            outerForm={form}
+            setForm={setForm}
+            inputs={inputs}
+            setFormErrors={setFormErrors}
+            formErrors={formErrors}
+          ></InstructionForm>
+          <AdvancedOptionsDropdown title="More">
+            <h3>Force values</h3>
+            <div>
+              {Object.keys(defaultFormValues)
+                .filter((x) => x !== 'governedAccount')
+                .map((key) => (
+                  <>
+                    <div className="text-sm mb-3">
+                      <div className="mb-2">{keyToLabel[key]}</div>
+                      <div className="flex flex-row text-xs items-center">
+                        <Switch
+                          checked={
+                            forcedValues.find((x) => x === key) ? true : false
+                          }
+                          onChange={(checked) => {
+                            if (checked) {
+                              setForcedValues([...forcedValues, key])
+                            } else {
+                              setForcedValues([
+                                ...forcedValues.filter((x) => x !== key),
+                              ])
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </>
+                ))}
+            </div>
+          </AdvancedOptionsDropdown>
+        </>
       )}
     </>
   )
