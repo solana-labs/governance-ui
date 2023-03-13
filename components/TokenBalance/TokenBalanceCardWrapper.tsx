@@ -13,9 +13,7 @@ import {
 import GatewayCard from '@components/Gateway/GatewayCard'
 import ClaimUnreleasedNFTs from './ClaimUnreleasedNFTs'
 import Link from 'next/link'
-import { getTokenOwnerRecordAddress } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
-import { useEffect, useState } from 'react'
 import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
 
 const LockPluginTokenBalanceCard = dynamic(
