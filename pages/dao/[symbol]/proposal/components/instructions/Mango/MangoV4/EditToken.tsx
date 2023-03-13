@@ -381,7 +381,7 @@ const EditToken = ({
       options: solAccounts,
     },
     {
-      label: 'Tokens',
+      label: 'Token',
       name: 'token',
       type: InstructionInputType.SELECT,
       initialValue: form.token,
