@@ -27,6 +27,11 @@ type GroupEditForm = {
   testing: number
   version: number
   depositLimitQuote: number
+  feePayWithMngo: boolean | null
+  feesMngoBonusRate: number | null
+  feesSwapMangoAccount: string | null
+  feesMngoTokenIndex: number | null
+  feesExpiryInterval: number | null
 }
 
 const defaultFormValues = {
@@ -37,6 +42,11 @@ const defaultFormValues = {
   testing: 0,
   version: 0,
   depositLimitQuote: 0,
+  feePayWithMngo: false,
+  feesMngoBonusRate: 0,
+  feesSwapMangoAccount: '',
+  feesMngoTokenIndex: 0,
+  feesExpiryInterval: 0,
 }
 
 const GroupEdit = ({
@@ -82,6 +92,7 @@ const GroupEdit = ({
       wallet?.publicKey
     ) {
       const values = getChangedValues<GroupEditForm>(originalFormValues, form)
+
       //Mango instruction call and serialize
       const ix = await mangoClient!.program.methods
         .groupEdit(
@@ -90,7 +101,12 @@ const GroupEdit = ({
           getNullOrTransform(values.securityAdmin, PublicKey),
           getNullOrTransform(values.testing, null, Number),
           getNullOrTransform(values.version, null, Number),
-          getNullOrTransform(values.depositLimitQuote, BN)
+          getNullOrTransform(values.depositLimitQuote, BN),
+          getNullOrTransform(values.feePayWithMngo, null),
+          getNullOrTransform(values.feesMngoBonusRate, null, Number),
+          getNullOrTransform(values.feesSwapMangoAccount, PublicKey),
+          getNullOrTransform(values.feesMngoTokenIndex, null, Number),
+          getNullOrTransform(values.feesExpiryInterval, BN)
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -138,6 +154,12 @@ const GroupEdit = ({
       .test('is-valid-address2', 'Please enter a valid PublicKey', (value) =>
         value ? validatePubkey(value) : true
       ),
+    feesSwapMangoAccount: yup
+      .string()
+      .nullable()
+      .test('is-valid-address3', 'Please enter a valid PublicKey', (value) =>
+        value ? validatePubkey(value) : true
+      ),
     testing: yup.string().required(),
     version: yup.string().required(),
     depositLimitQuote: yup.string().required(),
@@ -151,7 +173,15 @@ const GroupEdit = ({
         securityAdmin: mangoGroup!.securityAdmin.toBase58(),
         testing: mangoGroup!.testing,
         version: mangoGroup!.version,
+        feePayWithMngo: mangoGroup!.buybackFees || false,
+        feesMngoBonusRate: mangoGroup!.buybackFeesMngoBonusFactor || 0,
+        feesSwapMangoAccount:
+          mangoGroup!.buybackFeesSwapMangoAccount?.toBase58() || '',
+        feesMngoTokenIndex: mangoGroup!.mngoTokenIndex || 0,
+        feesExpiryInterval:
+          mangoGroup!.buybackFeesExpiryInterval?.toNumber() || 0,
       }
+      console.log(vals)
       setForm({
         ...vals,
       })
@@ -216,6 +246,44 @@ const GroupEdit = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'depositLimitQuote',
+    },
+    {
+      label: 'Fees pay with MNGO',
+      initialValue: form.feePayWithMngo,
+      subtitle: getAdditionalLabelInfo('buybackFees'),
+      type: InstructionInputType.SWITCH,
+      name: 'feePayWithMngo',
+    },
+    {
+      label: `Fees MNGO Bonus Rate`,
+      subtitle: getAdditionalLabelInfo('buybackFeesMngoBonusFactor'),
+      initialValue: form.feesMngoBonusRate,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'feesMngoBonusRate',
+    },
+    {
+      label: `Fees Swap Mango Account`,
+      subtitle: getAdditionalLabelInfo('buybackFeesSwapMangoAccount'),
+      initialValue: form.feesSwapMangoAccount,
+      type: InstructionInputType.INPUT,
+      name: 'feesSwapMangoAccount',
+    },
+    {
+      label: `Fees MNGO Token Index`,
+      subtitle: getAdditionalLabelInfo('mngoTokenIndex'),
+      initialValue: form.feesMngoTokenIndex,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'feesMngoTokenIndex',
+    },
+    {
+      label: `Fees Expiry Interval`,
+      subtitle: getAdditionalLabelInfo('feesExpiryInterval'),
+      initialValue: form.feesExpiryInterval,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'feesExpiryInterval',
     },
   ]
 

@@ -215,7 +215,8 @@ const EditToken = ({
           getNullOrTransform(values.depositWeightScaleStartQuote, null, Number),
           values.resetStablePrice,
           values.resetNetBorrowLimit,
-          values.reduceOnly
+          values.reduceOnly,
+          getNullOrTransform(values.name, null)
         )
         .accounts({
           group: mangoGroup!.publicKey,

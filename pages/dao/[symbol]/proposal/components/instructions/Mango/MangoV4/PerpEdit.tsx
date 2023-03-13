@@ -29,6 +29,7 @@ interface PerpEditForm {
   governedAccount: AssetAccount | null
   perp: null | NameMarketIndexVal
   oraclePk: string
+  name: string
   oracleConfFilter: number
   maxStalenessSlots: number
   baseDecimals: number
@@ -61,6 +62,7 @@ interface PerpEditForm {
 
 const defaultFormValues = {
   governedAccount: null,
+  name: '',
   perp: null,
   oraclePk: '',
   oracleConfFilter: 0,
@@ -191,7 +193,8 @@ const PerpEdit = ({
           getNullOrTransform(values.settlePnlLimitWindowSize, BN),
           values.reduceOnly,
           values.resetStablePrice,
-          getNullOrTransform(values.positivePnlLiquidationFee, null, Number)
+          getNullOrTransform(values.positivePnlLiquidationFee, null, Number),
+          getNullOrTransform(values.name, null)
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -254,6 +257,7 @@ const PerpEdit = ({
       const vals = {
         ...form,
         oraclePk: currentPerp.oracle.toBase58(),
+        name: currentPerp.name,
         oracleConfFilter: currentPerp.oracleConfig.confFilter.toNumber(),
         maxStalenessSlots: currentPerp.oracleConfig.maxStalenessSlots.toNumber(),
         baseDecimals: currentPerp.baseDecimals,
@@ -307,6 +311,12 @@ const PerpEdit = ({
       type: InstructionInputType.SELECT,
       initialValue: form.perp,
       options: perps,
+    },
+    {
+      label: 'Name',
+      initialValue: form.name,
+      type: InstructionInputType.INPUT,
+      name: 'name',
     },
     {
       label: 'Oracle',
