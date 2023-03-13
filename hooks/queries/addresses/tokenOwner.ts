@@ -17,7 +17,7 @@ export const useAddressQuery_CouncilTokenOwner = () => {
       ? new PublicKey(selectedCouncilDelegator)
       : wallet?.publicKey ?? undefined
 
-  return useAdressQuery_TokenOwnerRecord(
+  return useAddressQuery_TokenOwnerRecord(
     realm?.owner,
     realm?.pubkey,
     realm?.account.config.councilMint,
@@ -39,7 +39,7 @@ export const useAddressQuery_CommunityTokenOwner = () => {
       : // I wanted to eliminate `null` as a possible type
         wallet?.publicKey ?? undefined
 
-  return useAdressQuery_TokenOwnerRecord(
+  return useAddressQuery_TokenOwnerRecord(
     realm?.owner,
     realm?.pubkey,
     realm?.account.communityMint,
@@ -47,7 +47,7 @@ export const useAddressQuery_CommunityTokenOwner = () => {
   )
 }
 
-export const useAdressQuery_TokenOwnerRecord = (
+export const useAddressQuery_TokenOwnerRecord = (
   programId?: PublicKey,
   realmPk?: PublicKey,
   governingTokenMint?: PublicKey,
