@@ -182,6 +182,18 @@ export const ACCOUNT_NAMES = {
 
   //Serum DAO
   '5xinfvkvL5NZ6BG3cDtFdTbVuMutqGXkDBuhncfmzPr2': 'Serum SRM Grant Treasury',
+
+  //Kaimana DAO
+
+  '3X9EEzWbpCzRmLxbTFoddux9faLxTMVFwjTSTXQ4W8ar': 'Kaiman dao community wallet',
+  '4Amtnu7TjDHYLyKMMvoCTDHW18a2dEMdS3sAoE96JwQz':
+    'Kaiman dao community wallet governance',
+  FXCgiZvkm9mAr6ZC9NnqNSeWZWZSmHDDZxCmzgaeShki: 'Kaiman dao council wallet',
+  yrtHtvgyPgWFrRDDMpBEva2f888kDrGnwHYEdM7fSFT:
+    'Kaiman dao council wallet governance',
+  '714JsESwkxjDZTaxD2TNe7vqMG52yxug8vaXug5VKBqd':
+    'Kaiman dao council mint governance',
+  '9rFYGii2nQz74qg5PTYViPj46E82PrJguEC2QvbZVuwk': 'Kaiman dao council mint',
 }
 
 // TODO: Add this to on-chain metadata to Governance account
