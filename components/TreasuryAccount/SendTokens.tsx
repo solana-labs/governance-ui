@@ -479,11 +479,6 @@ const SendTokens = ({
       </div>
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
         <Button
-          disabled={
-            !canUseTransferInstruction ||
-            isLoading ||
-            (isNFT && !selectedNfts.length)
-          }
           className="ml-auto"
           onClick={isNft ? handleProposeNftSend : handleProposeTransfer}
           isLoading={isLoading}

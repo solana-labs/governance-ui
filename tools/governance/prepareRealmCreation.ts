@@ -360,6 +360,17 @@ export async function prepareRealmCreation({
       walletPk,
       []
     )
+    if (communityMintAccount?.account.freezeAuthority) {
+      const freezeMintAuthorityPassIx = Token.createSetAuthorityInstruction(
+        TOKEN_PROGRAM_ID,
+        communityMintPk,
+        nativeTreasuryAddress,
+        'FreezeAccount',
+        walletPk,
+        []
+      )
+      realmInstructions.push(freezeMintAuthorityPassIx)
+    }
     realmInstructions.push(ix)
   }
 
@@ -376,6 +387,17 @@ export async function prepareRealmCreation({
       walletPk,
       []
     )
+    if (councilMintAccount?.account.freezeAuthority) {
+      const freezeMintAuthorityPassIx = Token.createSetAuthorityInstruction(
+        TOKEN_PROGRAM_ID,
+        councilMintPk,
+        nativeTreasuryAddress,
+        'FreezeAccount',
+        walletPk,
+        []
+      )
+      realmInstructions.push(freezeMintAuthorityPassIx)
+    }
     realmInstructions.push(ix)
   }
 
