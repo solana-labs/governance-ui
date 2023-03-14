@@ -645,9 +645,13 @@ const getSolAccountsInfo = async (
 const loadMintGovernanceAccounts = async (
   connection: ConnectionContext,
   governances: ProgramAccount<Governance>[],
-  possibleMintAccountPks: PublicKey[],
-  additionalPossibleOwnersAccounts: AssetAccount[]
+  possibleMintAccountPks: PublicKey[]
 ) => {
+  const nativeAccountAddresses = await Promise.all(
+    governances.map((governance) =>
+      getNativeTreasuryAddress(governance.owner, governance.pubkey)
+    )
+  )
   const possibleMintAccounts = await getMultipleAccountInfoChunked(
     connection.current,
     possibleMintAccountPks
@@ -665,16 +669,18 @@ const loadMintGovernanceAccounts = async (
           parsedMintInfo?.mintAuthority &&
           g.pubkey.equals(parsedMintInfo.mintAuthority)
       )
-      const solAccountParent = additionalPossibleOwnersAccounts
-        .filter((x) => x.isSol)
-        .find(
-          (g) =>
-            parsedMintInfo?.mintAuthority &&
-            g.extensions.transferAddress!.equals(parsedMintInfo.mintAuthority)
-        )
-      if (ownerGovernance || solAccountParent) {
+      const solAccountPk = nativeAccountAddresses.find(
+        (x) =>
+          parsedMintInfo?.mintAuthority &&
+          x.equals(parsedMintInfo.mintAuthority)
+      )
+      if (ownerGovernance || solAccountPk) {
         mintGovernances.push(
-          solAccountParent ? solAccountParent.governance : ownerGovernance!
+          solAccountPk
+            ? governances[
+                nativeAccountAddresses.findIndex((x) => x.equals(solAccountPk))
+              ]
+            : ownerGovernance!
         )
         mintAccounts.push({ ...parsedMintInfo, publicKey: pk })
       }
@@ -767,8 +773,7 @@ const getAccountsForGovernances = async (
   const mintAccounts = await loadMintGovernanceAccounts(
     connection,
     governancesArray,
-    possibleMintAccountPks,
-    governedTokenAccounts
+    possibleMintAccountPks
   )
 
   // 4 - Call to fetch token prices for every token account's mints
