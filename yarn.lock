@@ -356,10 +356,10 @@
     toformat "^2.0.0"
     yargs "^17.0.1"
 
-"@blockworks-foundation/mango-v4@0.9.2":
-  version "0.9.2"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4/-/mango-v4-0.9.2.tgz#c60748c8da85f7fe582841b0ee020366372a2c4b"
-  integrity sha512-5Fx7EZAmXfM4kIMFlvGbP7WvLIH+yaMLpdzc+s/nFww2mNYbkf/8U1J1r2KFKb6S30m+l6AGD15n1EssQgXLFQ==
+"@blockworks-foundation/mango-v4@0.9.5":
+  version "0.9.5"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4/-/mango-v4-0.9.5.tgz#d931a85aa2fa3ff23feaf701dc41d67b0e7aaa01"
+  integrity sha512-osxZgbz+CNndIOk+eW29PRKI+NAWZzG3sFLAqsBzQOIi7ehHjNWUovX93EXbt6XLElf0HanX7gAH6tUiKsAsnA==
   dependencies:
     "@coral-xyz/anchor" "^0.26.0"
     "@project-serum/serum" "0.13.65"

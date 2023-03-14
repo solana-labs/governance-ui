@@ -184,6 +184,7 @@ const GroupEdit = ({
     version: yup.string().required(),
     depositLimitQuote: yup.string().required(),
   })
+
   useEffect(() => {
     const getGroupParams = async () => {
       const vals = {
@@ -193,13 +194,11 @@ const GroupEdit = ({
         securityAdmin: mangoGroup!.securityAdmin.toBase58(),
         testing: mangoGroup!.testing,
         version: mangoGroup!.version,
-        feePayWithMngo: mangoGroup!.buybackFees || false,
-        feesMngoBonusRate: mangoGroup!.buybackFeesMngoBonusFactor || 0,
-        feesSwapMangoAccount:
-          mangoGroup!.buybackFeesSwapMangoAccount?.toBase58() || '',
-        feesMngoTokenIndex: mangoGroup!.mngoTokenIndex || 0,
-        feesExpiryInterval:
-          mangoGroup!.buybackFeesExpiryInterval?.toNumber() || 0,
+        feePayWithMngo: mangoGroup!.buybackFees,
+        feesMngoBonusRate: mangoGroup!.buybackFeesMngoBonusFactor,
+        feesSwapMangoAccount: mangoGroup!.buybackFeesSwapMangoAccount?.toBase58(),
+        feesMngoTokenIndex: mangoGroup!.mngoTokenIndex,
+        feesExpiryInterval: mangoGroup!.buybackFeesExpiryInterval?.toNumber(),
       }
       setForm({
         ...vals,
