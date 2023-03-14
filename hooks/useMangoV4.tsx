@@ -41,7 +41,7 @@ export default function UseMangoV4() {
       clientCluster,
       MANGO_V4_ID[clientCluster]
     )
-
+    console.log(client.program.idl)
     return client
   }
 
