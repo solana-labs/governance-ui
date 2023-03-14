@@ -49,6 +49,7 @@ export const LockTokensAccount: React.FC<{
     councilMint,
     config,
   } = useRealm()
+
   const tokenOwnerRecordWalletPk = Object.keys(tokenRecords)?.find(
     (key) => tokenRecords[key]?.pubkey?.toBase58() === tokenOwnerRecordPk
   )
@@ -83,12 +84,14 @@ export const LockTokensAccount: React.FC<{
     votingPower,
     amountLocked,
     getPositions,
+    resetState,
   ] = useHeliumVsrStore((s) => [
     s.state.isLoading,
     s.state.positions,
     s.state.votingPower,
     s.state.amountLocked,
     s.getPositions,
+    s.resetState,
   ])
 
   const handleGetPositions = useCallback(async () => {
@@ -109,6 +112,8 @@ export const LockTokensAccount: React.FC<{
           client: vsrClient,
           connection: connection,
         })
+      } else if (!wallet?.connected) {
+        resetState()
       }
     } catch (e) {
       notify({
@@ -123,7 +128,7 @@ export const LockTokensAccount: React.FC<{
     ;(async () => {
       await handleGetPositions()
     })()
-  }, [vsrClient, handleGetPositions])
+  }, [isOwnerOfPositions, vsrClient, handleGetPositions])
 
   useEffect(() => {
     const getTokenOwnerRecord = async () => {
@@ -342,9 +347,18 @@ export const LockTokensAccount: React.FC<{
               <div className="border border-fgd-4 flex flex-col items-center justify-center p-6 rounded-lg">
                 <LightningBoltIcon className="h-8 mb-2 text-primary-light w-8" />
                 <p className="flex text-center pb-6">
-                  Increase your voting power by<br></br> locking your tokens.
+                  Increase your voting power by locking your tokens.
                 </p>
-                <Button onClick={() => setIsLockModalOpen(true)}>
+                <Button
+                  onClick={() => setIsLockModalOpen(true)}
+                  disabled={!hasTokensInWallet}
+                  {...(hasTokensInWallet
+                    ? {}
+                    : {
+                        tooltipMessage:
+                          "You don't have any governance tokens in your wallet to lock.",
+                      })}
+                >
                   <div className="flex items-center">
                     <LockClosedIcon className="h-5 mr-1.5 w-5" />
                     <span>Lock Tokens</span>

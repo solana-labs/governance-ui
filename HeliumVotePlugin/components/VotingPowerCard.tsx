@@ -85,7 +85,9 @@ export const VotingPowerCard: React.FC<{
               Connect your wallet to see governance power
             </div>
           )}
-          <TokenDepositLock mint={mint} setHasGovPower={setHasGovPower} />
+          {connected && (
+            <TokenDepositLock mint={mint} setHasGovPower={setHasGovPower} />
+          )}
           {councilDepositVisible && (
             <div className="mt-4">
               <TokenDeposit
@@ -113,11 +115,10 @@ const TokenDepositLock = ({
   setHasGovPower,
 }: {
   mint: MintInfo | undefined
-  inAccountDetails?: boolean
   setHasGovPower: (hasGovPower: boolean) => void
 }) => {
   const { realm, realmTokenAccount } = useRealm()
-  const connected = useWalletStore((s) => s.connected)
+  const [connected] = useWalletStore((s) => [s.connected])
   const [amountLocked, votingPower] = useHeliumVsrStore((s) => [
     s.state.amountLocked,
     s.state.votingPower,
@@ -125,8 +126,10 @@ const TokenDepositLock = ({
 
   const tokenName =
     getMintMetadata(realm?.account.communityMint)?.name ?? realm?.account.name
+
   const hasTokensInWallet =
     realmTokenAccount && realmTokenAccount.account.amount.gt(new BN(0))
+
   const availableTokens =
     hasTokensInWallet && mint
       ? fmtMintAmount(mint, realmTokenAccount?.account.amount as BN)

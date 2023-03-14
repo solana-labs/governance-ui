@@ -840,11 +840,6 @@ export default function useGovernanceAssets() {
       isVisible: canUseAuthorityInstruction,
       packageId: PackageEnum.VsrPlugin,
     },
-    [Instructions.CreateVsrMaxVoterWeightRecord]: {
-      name: 'Vote Escrowed Tokens: Create Max Voter Weight',
-      isVisible: canUseAuthorityInstruction,
-      packageId: PackageEnum.VsrPlugin,
-    },
     [Instructions.VotingMintConfig]: {
       name: 'Vote Escrowed Tokens: Configure Voting Mint',
       isVisible: canUseAuthorityInstruction,

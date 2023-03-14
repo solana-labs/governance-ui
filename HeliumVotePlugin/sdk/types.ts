@@ -6,9 +6,6 @@ import { TokenProgramAccount } from '@utils/tokens'
 import { MintInfo } from '@solana/spl-token'
 import { Sft } from '@metaplex-foundation/js'
 
-export type Truthy<T> = T extends false | '' | 0 | null | undefined ? never : T // from lodash
-export const truthy = <T>(value: T): value is Truthy<T> => !!value
-
 export type VotingMintConfig = IdlTypes<HeliumVoterStakeRegistry>['VotingMintConfigV0']
 type RegistrarV0 = IdlAccounts<HeliumVoterStakeRegistry>['registrar']
 export type Lockup = IdlTypes<HeliumVoterStakeRegistry>['Lockup']

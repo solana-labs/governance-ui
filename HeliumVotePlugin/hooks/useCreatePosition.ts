@@ -12,7 +12,7 @@ import {
 import { useAsyncCallback } from 'react-async-hook'
 import { positionKey } from '@helium/voter-stake-registry-sdk'
 import { sendTransaction } from '@utils/send'
-import { truthy } from '../sdk/types'
+import { truthy } from '@utils/truthy'
 import useRealm from '@hooks/useRealm'
 import { LockupKind } from 'HeliumVotePlugin/components/LockTokensModal'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'

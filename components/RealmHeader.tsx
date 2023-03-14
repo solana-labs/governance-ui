@@ -8,7 +8,7 @@ import { ExternalLinkIcon } from '@heroicons/react/outline'
 import { getRealmExplorerHost } from 'tools/routing'
 
 import useMembersStore from 'stores/useMembersStore'
-import { heliumVsrPluginsPks, vsrPluginsPks } from '@hooks/useVotingPlugins'
+import { vsrPluginsPks } from '@hooks/useVotingPlugins'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 
 const RealmHeader = () => {
@@ -19,11 +19,6 @@ const RealmHeader = () => {
   const isDefaultVsrMode =
     config?.account.communityTokenConfig.voterWeightAddin &&
     vsrPluginsPks.includes(
-      config?.account.communityTokenConfig.voterWeightAddin?.toBase58()
-    )
-  const isHeliumVsrMode =
-    config?.account.communityTokenConfig.voterWeightAddin &&
-    heliumVsrPluginsPks.includes(
       config?.account.communityTokenConfig.voterWeightAddin?.toBase58()
     )
   const isBackNavVisible = realmInfo?.symbol !== REALM // hide backnav for the default realm

@@ -299,12 +299,14 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedCouncilDelegate = councilDelegate
       })
     },
+
     selectCommunityDelegate(communityDelegate) {
       const set = get().set
       set((s) => {
         s.selectedCommunityDelegate = communityDelegate
       })
     },
+
     async fetchAllRealms(programId: PublicKey) {
       const connection = get().connection.current
       const set = get().set

@@ -147,12 +147,12 @@ export function useVotingPlugins() {
         heliumStore.setMaxVoterWeight(null)
       }
 
-      if (wallet && wallet.publicKey && heliumVsrClient) {
+      if (heliumVsrClient && connected && currentClient.walletPk) {
         try {
           await heliumStore.getPositions({
             realmPk: realm.pubkey,
             communityMintPk: realm.account.communityMint,
-            walletPk: wallet.publicKey!,
+            walletPk: currentClient.walletPk,
             connection: connection.current,
             client: heliumVsrClient,
             votingClient: currentClient,
