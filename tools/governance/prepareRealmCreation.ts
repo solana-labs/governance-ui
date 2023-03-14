@@ -314,6 +314,7 @@ export async function prepareRealmCreation({
     params._programVersion === 3 ? params.councilYesVotePercentage : 'disabled'
   )
 
+  const VOTING_COOLOFF_TIME_DEFAULT = getTimestampFromHours(12)
   // Put community and council mints under the realm governance with default config
   const config = new GovernanceConfig({
     communityVoteThreshold: communityVoteThreshold,
@@ -321,14 +322,17 @@ export async function prepareRealmCreation({
     // Do not use instruction hold up time
     minInstructionHoldUpTime: 0,
     // max voting time 3 days
-    maxVotingTime: getTimestampFromDays(maxVotingTimeInDays),
+    // baseVotingTime is incorrectly called maxVotingTime in the sdk
+    // votingCoolOffTime is added to maxVotingTime... for some reason... and must be subtracted here.
+    maxVotingTime:
+      getTimestampFromDays(maxVotingTimeInDays) - VOTING_COOLOFF_TIME_DEFAULT,
     communityVoteTipping: VoteTipping.Disabled,
     councilVoteTipping: VoteTipping.Strict,
     minCouncilTokensToCreateProposal: new BN(initialCouncilTokenAmount),
     councilVoteThreshold: councilVoteThreshold,
     councilVetoVoteThreshold: councilVetoVoteThreshold,
     communityVetoVoteThreshold: communityVetoVoteThreshold,
-    votingCoolOffTime: getTimestampFromHours(12),
+    votingCoolOffTime: VOTING_COOLOFF_TIME_DEFAULT,
     depositExemptProposalCount: 10,
   })
 
