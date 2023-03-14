@@ -112,7 +112,7 @@ export default function NFTWizard() {
             formData.transferCouncilMintAuthority ?? true,
           councilWalletPks:
             formData?.memberAddresses?.map((w) => new PublicKey(w)) || [],
-          transferCommunityMintAuthority: false, // delay this until we have created NFT instructions
+          transferCommunityMintAuthority: true,
 
           // (useSupplyFactor = true && communityMintSupplyFactor = undefined) => FULL_SUPPLY_FRACTION
           useSupplyFactor: true,
