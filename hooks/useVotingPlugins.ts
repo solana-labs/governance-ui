@@ -136,7 +136,6 @@ export function useVotingPlugins() {
         realm.account.communityMint,
         currentPluginPk
       )
-
       try {
         const mvwr = await getMaxVoterWeightRecord(
           connection.current,

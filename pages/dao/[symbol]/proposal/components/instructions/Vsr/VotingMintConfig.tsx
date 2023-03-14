@@ -18,7 +18,7 @@ import { getValidatedPublickKey } from '@utils/validations'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getScaledFactor } from '@utils/tokens'
-import { yearsToSecs } from 'VoteStakeRegistry/tools/dateTools'
+import { yearsToSecs } from '@utils/dateTools'
 import { BN, web3 } from '@project-serum/anchor'
 import { PublicKey } from '@solana/web3.js'
 import {

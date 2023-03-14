@@ -49,7 +49,6 @@ export const getPositions = async (
   const nfts = (
     await metaplex.nfts().findAllByOwner({ owner: walletPk })
   ).filter((nft) => nft.collection?.address.equals(registrar.collection))
-
   const posKeys = nfts.map((nft) => positionKey((nft as any).mintAddress)[0])
   const positionAccInfos = (
     await Promise.all(
@@ -64,11 +63,13 @@ export const getPositions = async (
   )
 
   const delegatedPositionAccInfos = communityMintPk.equals(HNT_MINT)
-    ? await Promise.all(
-        chunks(delegatedPosKeys, 99).map((chunk) =>
-          connection.getMultipleAccountsInfo(chunk)
+    ? (
+        await Promise.all(
+          chunks(delegatedPosKeys, 99).map((chunk) =>
+            connection.getMultipleAccountsInfo(chunk)
+          )
         )
-      )
+      ).flat()
     : []
 
   positions.push(

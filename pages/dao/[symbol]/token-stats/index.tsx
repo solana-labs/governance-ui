@@ -21,14 +21,12 @@ import useWalletStore from 'stores/useWalletStore'
 import {
   DAYS_PER_MONTH,
   SECS_PER_MONTH,
-} from 'VoteStakeRegistry/tools/dateTools'
+  getMinDurationFmt,
+  getTimeLeftFromNowFmt,
+} from '@utils/dateTools'
 import InfoBox from 'VoteStakeRegistry/components/LockTokenStats/InfoBox'
 import { AddressImage, DisplayAddress } from '@cardinal/namespaces-components'
 import { LockupType } from 'VoteStakeRegistry/sdk/accounts'
-import {
-  getMinDurationFmt,
-  getTimeLeftFromNowFmt,
-} from 'VoteStakeRegistry/tools/dateTools'
 import {
   DepoistWithVoter,
   DepositWithWallet,
@@ -611,8 +609,11 @@ const LockTokenStats = () => {
                       </Td>
                       <Td>
                         {isConstant
-                          ? getMinDurationFmt(x.deposit.lockup as any)
-                          : getTimeLeftFromNowFmt(x.deposit.lockup as any)}
+                          ? getMinDurationFmt(
+                              x.deposit.lockup.startTs,
+                              x.deposit.lockup.endTs
+                            )
+                          : getTimeLeftFromNowFmt(x.deposit.lockup.endTs)}
                       </Td>
                       <Td>{lockedTokens}</Td>
                     </TrBody>
@@ -664,8 +665,11 @@ const LockTokenStats = () => {
                         </div>
                         <div className="text-fgd-2 text-sm">
                           {isConstant
-                            ? getMinDurationFmt(x.deposit.lockup as any)
-                            : getTimeLeftFromNowFmt(x.deposit.lockup as any)}
+                            ? getMinDurationFmt(
+                                x.deposit.lockup.startTs,
+                                x.deposit.lockup.endTs
+                              )
+                            : getTimeLeftFromNowFmt(x.deposit.lockup.endTs)}
                         </div>
                       </div>
                     </div>

@@ -77,7 +77,6 @@ export function App(props: Props) {
   )
   const { getNfts } = useTreasuryAccountStore()
   const { getOwnedDeposits, resetDepositState } = useDepositStore()
-  // const { getPositions, resetState: resetHeliumVsrState } = useHeliumVsrStore()
   const { realm, ownTokenRecord, realmInfo, symbol, config } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)

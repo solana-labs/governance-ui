@@ -2,12 +2,9 @@ import React, { useState } from 'react'
 import { PublicKey } from '@solana/web3.js'
 import Modal from '@components/Modal'
 import Button, { SecondaryButton } from '@components/Button'
-import {
-  getMinDurationFmt,
-  getTimeLeftFromNowFmt,
-} from 'VoteStakeRegistry/tools/dateTools'
+import { getMinDurationFmt, getTimeLeftFromNowFmt } from '@utils/dateTools'
 import { notify } from '@utils/notifications'
-import { PositionWithMeta } from 'HeliumVotePlugin/sdk/types'
+import { PositionWithMeta } from '../sdk/types'
 
 export interface TransferTokensModalProps {
   isOpen: boolean
@@ -91,8 +88,8 @@ export const TransferTokensModal: React.FC<TransferTokensModalProps> = ({
                 label={isConstant ? 'Min. Duration' : 'Time left'}
                 value={
                   isConstant
-                    ? getMinDurationFmt(pos.lockup as any)
-                    : getTimeLeftFromNowFmt(pos.lockup as any)
+                    ? getMinDurationFmt(pos.lockup.startTs, pos.lockup.endTs)
+                    : getTimeLeftFromNowFmt(pos.lockup.endTs)
                 }
               />
             </div>

@@ -6,7 +6,7 @@ import { PositionWithMeta } from '../sdk/types'
 import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
-import { secsToDays } from 'VoteStakeRegistry/tools/dateTools'
+import { secsToDays } from '@utils/dateTools'
 
 export const useUnlockPosition = () => {
   const { connection, wallet } = useWallet()

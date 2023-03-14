@@ -6,10 +6,7 @@ import { getMintDecimalAmount } from '@tools/sdk/units'
 import { useMemo } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { LockupType } from 'VoteStakeRegistry/sdk/accounts'
-import {
-  getMinDurationFmt,
-  getTimeLeftFromNowFmt,
-} from 'VoteStakeRegistry/tools/dateTools'
+import { getMinDurationFmt, getTimeLeftFromNowFmt } from '@utils/dateTools'
 import { DepositWithWallet } from './tools'
 
 const LockTokenRow = ({
@@ -71,8 +68,11 @@ const LockTokenRow = ({
       <div>{typeName}</div>
       <div>
         {isConstant
-          ? getMinDurationFmt(depositWithWallet.deposit.lockup as any)
-          : getTimeLeftFromNowFmt(depositWithWallet.deposit.lockup as any)}
+          ? getMinDurationFmt(
+              depositWithWallet.deposit.lockup.startTs,
+              depositWithWallet.deposit.lockup.endTs
+            )
+          : getTimeLeftFromNowFmt(depositWithWallet.deposit.lockup.endTs)}
       </div>
       <div>{lockedTokens}</div>
     </div>

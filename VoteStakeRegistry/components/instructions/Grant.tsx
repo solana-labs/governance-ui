@@ -29,7 +29,7 @@ import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/Govern
 import { lockupTypes } from 'VoteStakeRegistry/tools/types'
 import Select from '@components/inputs/Select'
 import Switch from '@components/Switch'
-import { getFormattedStringFromDays } from 'VoteStakeRegistry/tools/dateTools'
+import { getFormattedStringFromDays } from '@utils/dateTools'
 import * as yup from 'yup'
 import { getGrantInstruction } from 'VoteStakeRegistry/actions/getGrantInstruction'
 import { getRegistrarPDA } from 'VoteStakeRegistry/sdk/accounts'

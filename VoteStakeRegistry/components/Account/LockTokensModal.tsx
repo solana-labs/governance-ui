@@ -19,13 +19,7 @@ import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { voteRegistryLockDeposit } from 'VoteStakeRegistry/actions/voteRegistryLockDeposit'
 import { DepositWithMintAccount } from 'VoteStakeRegistry/sdk/accounts'
-import {
-  yearsToDays,
-  daysToMonths,
-  getMinDurationInDays,
-  SECS_PER_DAY,
-  getFormattedStringFromDays,
-} from 'VoteStakeRegistry/tools/dateTools'
+import { getMinDurationInDays } from '@utils/dateTools'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { voteRegistryStartUnlock } from 'VoteStakeRegistry/actions/voteRegistryStartUnlock'
 import {
@@ -44,6 +38,12 @@ import ButtonGroup from '@components/ButtonGroup'
 import InlineNotification from '@components/InlineNotification'
 import Tooltip from '@components/Tooltip'
 import { notify } from '@utils/notifications'
+import {
+  daysToMonths,
+  getFormattedStringFromDays,
+  SECS_PER_DAY,
+  yearsToDays,
+} from '@utils/dateTools'
 
 const YES = 'Yes'
 const NO = 'No'
@@ -98,8 +98,10 @@ const LockTokensModal = ({
     },
   ].filter((x) =>
     depositToUnlock
-      ? getMinDurationInDays(depositToUnlock.lockup) <= x.defaultValue ||
-        x.display === 'Custom'
+      ? getMinDurationInDays(
+          depositToUnlock.lockup.startTs,
+          depositToUnlock.lockup.endTs
+        ) <= x.defaultValue || x.display === 'Custom'
       : true
   )
 

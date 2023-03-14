@@ -16,7 +16,7 @@ import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
 import useWalletStore from 'stores/useWalletStore'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import { MintInfo } from '@solana/spl-token'
-import VotingPowerBox from 'VoteStakeRegistry/components/TokenBalance/VotingPowerBox'
+import { VotingPowerBox } from './VotingPowerBox'
 
 export const VotingPowerCard: React.FC<{
   inAccountDetails?: boolean

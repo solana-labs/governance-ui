@@ -17,7 +17,7 @@ import {
   getFormattedStringFromDays,
   secsToDays,
   SECS_PER_DAY,
-} from 'VoteStakeRegistry/tools/dateTools'
+} from '@utils/dateTools'
 import { calcMultiplier } from 'VoteStakeRegistry/tools/deposits'
 import { VoterStakeRegistry as HeliumVSR } from '@helium/idls/lib/types/voter_stake_registry'
 import { PROGRAM_ID as HELIUM_VSR_PROGRAM_ID } from '@helium/voter-stake-registry-sdk'

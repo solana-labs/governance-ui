@@ -4,6 +4,7 @@ import { MintInfo } from '@solana/spl-token'
 import { PublicKey, Transaction, Connection } from '@solana/web3.js'
 import { SIMULATION_WALLET } from '@tools/constants'
 import { ConnectionContext } from '@utils/connection'
+import { DAYS_PER_MONTH } from '@utils/dateTools'
 import { chunks } from '@utils/helpers'
 import { TokenProgramAccount, tryGetMint } from '@utils/tokens'
 import {
@@ -18,7 +19,6 @@ import {
 } from 'VoteStakeRegistry/sdk/accounts'
 import { tryGetVoter, tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
-import { DAYS_PER_MONTH } from './dateTools'
 import { MONTHLY } from './types'
 
 const VOTER_INFO_EVENT_NAME = 'VoterInfo'

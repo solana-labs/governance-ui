@@ -23,14 +23,11 @@ import {
 } from '@components/InstructionOptions'
 import dayjs from 'dayjs'
 import {
-  getFormattedStringFromDays,
-  SECS_PER_DAY,
-} from 'VoteStakeRegistry/tools/dateTools'
-import {
   getCastleReconcileInstruction,
   getCastleRefreshInstruction,
 } from '@utils/instructions/Castle'
 import Wallet from '@project-serum/sol-wallet-adapter'
+import { getFormattedStringFromDays, SECS_PER_DAY } from '@utils/dateTools'
 
 export enum PlayState {
   Played,

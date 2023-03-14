@@ -3,34 +3,34 @@ import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
 import { fmtMintAmount } from '@tools/sdk/units'
-import { PositionWithMeta, SubDaoWithMeta } from '../sdk/types'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { abbreviateAddress } from '@utils/formatting'
-import {
-  daysToSecs,
-  getMinDurationFmt,
-  getTimeLeftFromNowFmt,
-  secsToDays,
-} from 'VoteStakeRegistry/tools/dateTools'
 import { useUnixNow } from '@hooks/useUnixNow'
 import { BN } from '@project-serum/anchor'
 import Button from '@components/Button'
-import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
+import { HNT_MINT } from '@helium/spl-utils'
+import { notify } from '@utils/notifications'
+import {
+  daysToSecs,
+  secsToDays,
+  getMinDurationFmt,
+  getTimeLeftFromNowFmt,
+} from '@utils/dateTools'
+import { PositionWithMeta, SubDaoWithMeta } from '../sdk/types'
+import useHeliumVsrStore from '../hooks/useHeliumVsrStore'
 import {
   LockTokensModal,
   LockTokensModalFormValues,
-} from 'HeliumVotePlugin/components/LockTokensModal'
+} from '../components/LockTokensModal'
 import { TransferTokensModal } from './TransferTokensModal'
-import { calcLockupMultiplier } from 'HeliumVotePlugin/utils/calcLockupMultiplier'
-import { useUnlockPosition } from 'HeliumVotePlugin/hooks/useUnlockPosition'
-import { useExtendPosition } from 'HeliumVotePlugin/hooks/useExtendPosition'
-import { useTransferPosition } from 'HeliumVotePlugin/hooks/useTransferPosition'
-import { notify } from '@utils/notifications'
-import { useClosePosition } from 'HeliumVotePlugin/hooks/useClosePosition'
-import { HNT_MINT } from '@helium/spl-utils'
+import { calcLockupMultiplier } from '../utils/calcLockupMultiplier'
+import { useUnlockPosition } from '../hooks/useUnlockPosition'
+import { useExtendPosition } from '../hooks/useExtendPosition'
+import { useTransferPosition } from '../hooks/useTransferPosition'
+import { useClosePosition } from '../hooks/useClosePosition'
 import { DelegateTokensModal } from './DelegateTokensModal'
-import { useDelegatePosition } from 'HeliumVotePlugin/hooks/useDelegatePosition'
-import { useUndelegatePosition } from 'HeliumVotePlugin/hooks/useUndelegatePosition'
+import { useDelegatePosition } from '../hooks/useDelegatePosition'
+import { useUndelegatePosition } from '../hooks/useUndelegatePosition'
 
 export interface PositionCardProps {
   position: PositionWithMeta
@@ -278,10 +278,10 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
     <div className="relative border overflow-hidden border-fgd-4 rounded-lg flex flex-col">
       {hasGenesisMultiplier && (
         <div
-          className="absolute bg-primary-light px-8 transform rotate-45 top-4 text-bkg-2 text-xs font-bold"
-          style={{ right: '-36px' }}
+          className="absolute bg-primary-light px-8 transform rotate-45 text-bkg-2 text-xs font-bold"
+          style={{ top: '18px', right: '-36px' }}
         >
-          GENESIS
+          Landrush
         </div>
       )}
       {isLoading ? (
@@ -317,10 +317,12 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
               {isRealmCommunityMint && (
                 <CardLabel
                   label="Vote Multiplier"
-                  value={(position.votingPower.isZero()
-                    ? 0
-                    : position.votingPower.toNumber() /
-                      position.amountDepositedNative.toNumber()
+                  value={(
+                    (position.votingPower.isZero()
+                      ? 0
+                      : position.votingPower.toNumber() /
+                        position.amountDepositedNative.toNumber()) /
+                      votingMint.genesisVotePowerMultiplier || 1
                   ).toFixed(2)}
                 />
               )}
@@ -328,14 +330,17 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
                 label={isConstant ? 'Min. Duration' : 'Time left'}
                 value={
                   isConstant
-                    ? getMinDurationFmt(position.lockup as any)
-                    : getTimeLeftFromNowFmt(position.lockup as any)
+                    ? getMinDurationFmt(
+                        position.lockup.startTs,
+                        position.lockup.endTs
+                      )
+                    : getTimeLeftFromNowFmt(position.lockup.endTs)
                 }
               />
               {hasGenesisMultiplier && (
                 <CardLabel
-                  label="Genesis Multiplier"
-                  value={votingMint.genesisVotePowerMultiplier}
+                  label="Landrush"
+                  value={`${votingMint.genesisVotePowerMultiplier}x`}
                 />
               )}
             </div>

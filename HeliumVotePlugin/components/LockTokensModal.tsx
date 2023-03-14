@@ -10,7 +10,7 @@ import { precision } from '@utils/formatting'
 import {
   getFormattedStringFromDays,
   yearsToDays,
-} from 'VoteStakeRegistry/tools/dateTools'
+} from '@utils/dateTools'
 import Tooltip from '@components/Tooltip'
 import { QuestionMarkCircleIcon } from '@heroicons/react/solid'
 import { notify } from '@utils/notifications'
