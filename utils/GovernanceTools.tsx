@@ -72,7 +72,9 @@ export function getGovernanceConfigFromV2Form(
     minInstructionHoldUpTime: getTimestampFromDays(
       values.minInstructionHoldUpTime
     ),
-    maxVotingTime: getTimestampFromDays(values.maxVotingTime),
+    // we must subtract votingCoolOffTime from maxVotingTime due to sdk bug
+    maxVotingTime:
+      getTimestampFromDays(values.maxVotingTime) - getTimestampFromHours(12),
     // Use 1 as default for council tokens.
     // Council tokens are rare and possession of any amount of council tokens should be sufficient to be allowed to create proposals
     // If it turns to be a wrong assumption then it should be exposed in the UI
