@@ -55,7 +55,7 @@
     "@mean-dao/msp": "3.0.1-alpha.13",
     "@metaplex-foundation/js": "0.17.5",
     "@metaplex-foundation/mpl-token-metadata": "~2.5.1",
-    "@multifarm/solana-realms": "1.0.4",
+    "@multifarm/solana-realms": "1.0.6",
     "@next/bundle-analyzer": "12.1.5",
     "@nivo/bar": "0.79.1",
     "@nivo/core": "0.79.0",

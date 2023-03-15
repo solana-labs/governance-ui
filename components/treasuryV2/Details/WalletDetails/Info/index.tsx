@@ -7,7 +7,10 @@ import { Wallet } from '@models/treasury/Wallet'
 import Dashboard from './Dashboard'
 import Tab from './Tab'
 import Rules from './Rules'
-import { SolanaBreakdowns } from '@multifarm/solana-realms'
+import {
+  SolanaBreakdowns,
+  MultifarmNftExplorer,
+} from '@multifarm/solana-realms'
 
 import { useTabState } from '../../tabState'
 
@@ -15,6 +18,7 @@ enum Choice {
   Dashboard = 'Dashboard',
   Rules = 'Rules',
   Treasury = 'Treasury',
+  NFT = 'NFTs',
 }
 
 interface Props {
@@ -36,6 +40,7 @@ export default function Info(props: Props) {
           <Tab value={Choice.Dashboard}>Activity</Tab>
           {hasRules && <Tab value={Choice.Rules}>Rules</Tab>}
           <Tab value={Choice.Treasury}>Treasury</Tab>
+          <Tab value={Choice.NFT}>NFTs</Tab>
         </Tabs.List>
         <Tabs.Content value={Choice.Dashboard}>
           <Dashboard className="py-8" wallet={props.wallet} />
@@ -45,6 +50,9 @@ export default function Info(props: Props) {
         </Tabs.Content>
         <Tabs.Content value={Choice.Treasury}>
           <SolanaBreakdowns wallet={props.wallet} />
+        </Tabs.Content>
+        <Tabs.Content value={Choice.NFT}>
+          <MultifarmNftExplorer className="py-8" wallet={props.wallet} />
         </Tabs.Content>
       </Tabs.Root>
     </article>

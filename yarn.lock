@@ -2386,10 +2386,10 @@
     crypto-hash "^1.3.0"
     form-data "^4.0.0"
 
-"@multifarm/solana-realms@1.0.4":
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/@multifarm/solana-realms/-/solana-realms-1.0.4.tgz#d2f6d181254c3ee4845778a0bc8e475d7546b072"
-  integrity sha512-0y9uzL5p1e9VzyokiqzcLyACIkNOgfAL7D72hjkBtmruDLRiCk5Xgth7Dw+6VbqQ4JvgL5ajiKpAQnZccxG10A==
+"@multifarm/solana-realms@1.0.6":
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@multifarm/solana-realms/-/solana-realms-1.0.6.tgz#0891f7e05973f311dd7381450363a9ff9be3f3f2"
+  integrity sha512-raxbJxZGofnfezNXr/yRWxJ/gwtG8HWdbTn5rcIXRZFVq4rZ3JF+kVx6z8JClrk1FbAYWOxLifkwLl3u7PJ/KA==
   dependencies:
     "@multifarm/widget-components" "^0.0.16"
     bignumber.js "^9.1.1"

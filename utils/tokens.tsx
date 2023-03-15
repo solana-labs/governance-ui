@@ -405,12 +405,16 @@ const fetchNftsFromHolaplexIndexer = async (
               image
               tokenAccountAddress
               updateAuthorityAddress
+              purchases {
+                price
+              }
               collection {
                 creators {
                   verified
                   address
                 }
                 mintAddress
+                floorPrice
               }
 
             }
