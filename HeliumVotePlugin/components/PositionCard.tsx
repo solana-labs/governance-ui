@@ -34,9 +34,13 @@ import { useUndelegatePosition } from '../hooks/useUndelegatePosition'
 
 export interface PositionCardProps {
   position: PositionWithMeta
+  isOwner: boolean
 }
 
-export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
+export const PositionCard: React.FC<PositionCardProps> = ({
+  position,
+  isOwner,
+}) => {
   const { unixNow = 0 } = useUnixNow()
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
   const [isExtendModalOpen, setIsExtendModalOpen] = useState(false)
@@ -344,75 +348,78 @@ export const PositionCard: React.FC<PositionCardProps> = ({ position }) => {
                 />
               )}
             </div>
-            <div style={{ marginTop: 'auto' }}>
-              {position.isDelegated ? (
-                <Button
-                  className="w-full"
-                  onClick={handleUndelegateTokens}
-                  disabled={isSubmitting}
-                  isLoading={isUndelegating}
-                >
-                  UnDelegate
-                </Button>
-              ) : (
-                <>
-                  {lockupExpired ? (
-                    <Button
-                      className="w-full"
-                      isLoading={isSubmitting}
-                      disabled={isClosing}
-                      onClick={handleClose}
-                    >
-                      Close
-                    </Button>
-                  ) : (
-                    <div className="flex flex-col gap-2">
-                      <div className="flex flex-row gap-2 justify-center">
-                        <Button
-                          className="w-full"
-                          onClick={() => setIsExtendModalOpen(true)}
-                          disabled={isSubmitting}
-                          isLoading={isExtending}
-                        >
-                          Extend
-                        </Button>
-                        {!hasGenesisMultiplier && (
+            {isOwner && (
+              <div style={{ marginTop: 'auto' }}>
+                {position.isDelegated ? (
+                  <Button
+                    className="w-full"
+                    onClick={handleUndelegateTokens}
+                    disabled={isSubmitting}
+                    isLoading={isUndelegating}
+                  >
+                    UnDelegate
+                  </Button>
+                ) : (
+                  <>
+                    {lockupExpired ? (
+                      <Button
+                        className="w-full"
+                        isLoading={isSubmitting}
+                        disabled={isClosing}
+                        onClick={handleClose}
+                      >
+                        Close
+                      </Button>
+                    ) : (
+                      <div className="flex flex-col gap-2">
+                        <div className="flex flex-row gap-2 justify-center">
                           <Button
                             className="w-full"
-                            onClick={() => setIsTransferModalOpen(true)}
-                            disabled={
-                              transferablePositions.length == 0 || isSubmitting
-                            }
-                            isLoading={isTransfering}
+                            onClick={() => setIsExtendModalOpen(true)}
+                            disabled={isSubmitting}
+                            isLoading={isExtending}
                           >
-                            Transfer
+                            Extend
+                          </Button>
+                          {!hasGenesisMultiplier && (
+                            <Button
+                              className="w-full"
+                              onClick={() => setIsTransferModalOpen(true)}
+                              disabled={
+                                transferablePositions.length == 0 ||
+                                isSubmitting
+                              }
+                              isLoading={isTransfering}
+                            >
+                              Transfer
+                            </Button>
+                          )}
+                        </div>
+                        {isConstant && (
+                          <Button
+                            onClick={handleUnlock}
+                            disabled={isSubmitting}
+                            isLoading={isUnlocking}
+                          >
+                            Unlock
+                          </Button>
+                        )}
+                        {canDelegate && (
+                          <Button
+                            className="w-full"
+                            onClick={() => setIsDelegateModalOpen(true)}
+                            disabled={isSubmitting}
+                            isLoading={isDelegating}
+                          >
+                            Delegate
                           </Button>
                         )}
                       </div>
-                      {isConstant && (
-                        <Button
-                          onClick={handleUnlock}
-                          disabled={isSubmitting}
-                          isLoading={isUnlocking}
-                        >
-                          Unlock
-                        </Button>
-                      )}
-                      {canDelegate && (
-                        <Button
-                          className="w-full"
-                          onClick={() => setIsDelegateModalOpen(true)}
-                          disabled={isSubmitting}
-                          isLoading={isDelegating}
-                        >
-                          Delegate
-                        </Button>
-                      )}
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
           </div>
         </>
       )}

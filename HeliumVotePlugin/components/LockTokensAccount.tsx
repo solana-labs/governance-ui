@@ -295,32 +295,36 @@ export const LockTokensAccount: React.FC<{
                       />
                     )}
                   </div>
-                  <div className={mainBoxesClasses}>
-                    <p className="text-fgd-3">{`${tokenName} Available`}</p>
-                    <span className="hero-text">
-                      {availableTokensDisplay}
-                      {availableTokensPrice ? (
-                        <span className="font-normal text-xs ml-2">
-                          <span className="text-fgd-3">≈</span>$
-                          {Intl.NumberFormat('en', {
-                            notation: 'compact',
-                          }).format(availableTokensPrice)}
+                  {isOwnerOfPositions && (
+                    <>
+                      <div className={mainBoxesClasses}>
+                        <p className="text-fgd-3">{`${tokenName} Available`}</p>
+                        <span className="hero-text">
+                          {availableTokensDisplay}
+                          {availableTokensPrice ? (
+                            <span className="font-normal text-xs ml-2">
+                              <span className="text-fgd-3">≈</span>$
+                              {Intl.NumberFormat('en', {
+                                notation: 'compact',
+                              }).format(availableTokensPrice)}
+                            </span>
+                          ) : null}
                         </span>
-                      ) : null}
-                    </span>
-                  </div>
-                  <div className={mainBoxesClasses}>
-                    <p className="text-fgd-3">Locked</p>
-                    <span className="hero-text">
-                      {amountLockedDisplay}
-                      <span className="font-normal text-xs ml-2">
-                        <span className="text-fgd-3">≈</span>$
-                        {Intl.NumberFormat('en', {
-                          notation: 'compact',
-                        }).format(lockedTokensPrice)}
-                      </span>
-                    </span>
-                  </div>
+                      </div>
+                      <div className={mainBoxesClasses}>
+                        <p className="text-fgd-3">Locked</p>
+                        <span className="hero-text">
+                          {amountLockedDisplay}
+                          <span className="font-normal text-xs ml-2">
+                            <span className="text-fgd-3">≈</span>$
+                            {Intl.NumberFormat('en', {
+                              notation: 'compact',
+                            }).format(lockedTokensPrice)}
+                          </span>
+                        </span>
+                      </div>
+                    </>
+                  )}
                 </>
               )}
             </div>
@@ -339,28 +343,36 @@ export const LockTokensAccount: React.FC<{
                       ? 1
                       : 0
                   })
-                  .map((pos, idx) => <PositionCard key={idx} position={pos} />)}
-              <div className="border border-fgd-4 flex flex-col items-center justify-center p-6 rounded-lg">
-                <LightningBoltIcon className="h-8 mb-2 text-primary-light w-8" />
-                <p className="flex text-center pb-6">
-                  Increase your voting power by locking your tokens.
-                </p>
-                <Button
-                  onClick={() => setIsLockModalOpen(true)}
-                  disabled={!hasTokensInWallet}
-                  {...(hasTokensInWallet
-                    ? {}
-                    : {
-                        tooltipMessage:
-                          "You don't have any governance tokens in your wallet to lock.",
-                      })}
-                >
-                  <div className="flex items-center">
-                    <LockClosedIcon className="h-5 mr-1.5 w-5" />
-                    <span>Lock Tokens</span>
-                  </div>
-                </Button>
-              </div>
+                  .map((pos, idx) => (
+                    <PositionCard
+                      key={idx}
+                      position={pos}
+                      isOwner={isOwnerOfPositions}
+                    />
+                  ))}
+              {isOwnerOfPositions && (
+                <div className="border border-fgd-4 flex flex-col items-center justify-center p-6 rounded-lg">
+                  <LightningBoltIcon className="h-8 mb-2 text-primary-light w-8" />
+                  <p className="flex text-center pb-6">
+                    Increase your voting power by locking your tokens.
+                  </p>
+                  <Button
+                    onClick={() => setIsLockModalOpen(true)}
+                    disabled={!hasTokensInWallet}
+                    {...(hasTokensInWallet
+                      ? {}
+                      : {
+                          tooltipMessage:
+                            "You don't have any governance tokens in your wallet to lock.",
+                        })}
+                  >
+                    <div className="flex items-center">
+                      <LockClosedIcon className="h-5 mr-1.5 w-5" />
+                      <span>Lock Tokens</span>
+                    </div>
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         ) : (
@@ -378,7 +390,11 @@ export const LockTokensAccount: React.FC<{
             onSubmit={handleLockTokens}
           />
         )}
-        <div className="mt-4">
+        <div
+          className={`mt-4 ${
+            !isOwnerOfPositions ? 'opacity-0.8 pointer-events-none' : ''
+          }`}
+        >
           <TokenDeposit
             mint={councilMint}
             tokenRole={GoverningTokenRole.Council}
@@ -387,7 +403,7 @@ export const LockTokensAccount: React.FC<{
           />
         </div>
       </div>
-      {connected && children}
+      {connected && isOwnerOfPositions && children}
     </div>
   )
 }

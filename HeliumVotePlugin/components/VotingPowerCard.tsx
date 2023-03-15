@@ -46,7 +46,7 @@ export const VotingPowerCard: React.FC<{
         realm!.owner,
         realm!.pubkey,
         defaultMint!,
-        currentClient.walletPk!
+        currentClient!.walletPk!
       )
       setTokenOwnerRecordPk(tokenOwnerRecordAddress.toBase58())
     }
@@ -98,7 +98,11 @@ export const VotingPowerCard: React.FC<{
             </div>
           )}
           {connected && (
-            <TokenDepositLock mint={mint} setHasGovPower={setHasGovPower} />
+            <TokenDepositLock
+              mint={mint}
+              setHasGovPower={setHasGovPower}
+              isSameWallet={wallet!.publicKey!.equals(currentClient!.walletPk!)}
+            />
           )}
           {councilDepositVisible && (
             <div className="mt-4">
@@ -125,9 +129,11 @@ export const VotingPowerCard: React.FC<{
 const TokenDepositLock = ({
   mint,
   setHasGovPower,
+  isSameWallet = false,
 }: {
   mint: MintInfo | undefined
   setHasGovPower: (hasGovPower: boolean) => void
+  isSameWallet: boolean
 }) => {
   const { realm, realmTokenAccount } = useRealm()
   const [connected] = useWalletStore((s) => [s.connected])
@@ -172,7 +178,7 @@ const TokenDepositLock = ({
   if (!mint || mint.supply.isZero()) return null
   return (
     <>
-      {hasTokensInWallet && connected ? (
+      {isSameWallet && hasTokensInWallet && connected ? (
         <div className="pt-2">
           <InlineNotification
             desc={`You have ${tokensToShow} ${
