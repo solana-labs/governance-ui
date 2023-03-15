@@ -84,14 +84,12 @@ export const LockTokensAccount: React.FC<{
     votingPower,
     amountLocked,
     getPositions,
-    resetState,
   ] = useHeliumVsrStore((s) => [
     s.state.isLoading,
     s.state.positions,
     s.state.votingPower,
     s.state.amountLocked,
     s.getPositions,
-    s.resetState,
   ])
 
   const handleGetPositions = useCallback(async () => {
@@ -112,8 +110,6 @@ export const LockTokensAccount: React.FC<{
           client: vsrClient,
           connection: connection,
         })
-      } else if (!wallet?.connected) {
-        resetState()
       }
     } catch (e) {
       notify({

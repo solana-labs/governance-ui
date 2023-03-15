@@ -17,6 +17,7 @@ import useWalletStore from 'stores/useWalletStore'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import { MintInfo } from '@solana/spl-token'
 import { VotingPowerBox } from './VotingPowerBox'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 
 export const VotingPowerCard: React.FC<{
   inAccountDetails?: boolean
@@ -26,6 +27,9 @@ export const VotingPowerCard: React.FC<{
   const [tokenOwnerRecordPk, setTokenOwnerRecordPk] = useState('')
   const { councilMint, mint, realm, symbol, config } = useRealm()
   const [connected, wallet] = useWalletStore((s) => [s.connected, s.current])
+  const [currentClient] = useVotePluginsClientStore((s) => [
+    s.state.currentRealmVotingClient,
+  ])
   const councilDepositVisible = !!councilMint
 
   useEffect(() => {
@@ -37,19 +41,27 @@ export const VotingPowerCard: React.FC<{
           : !councilMint?.supply.isZero()
           ? realm!.account.config.councilMint
           : undefined
+
       const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
         realm!.owner,
         realm!.pubkey,
         defaultMint!,
-        wallet!.publicKey!
+        currentClient.walletPk!
       )
       setTokenOwnerRecordPk(tokenOwnerRecordAddress.toBase58())
     }
-    if (realm && wallet?.connected) {
+
+    if (realm && wallet?.connected && currentClient.walletPk) {
       getTokenOwnerRecord()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [realm?.pubkey.toBase58(), wallet?.connected])
+  }, [
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+    realm?.pubkey.toBase58(),
+    wallet?.connected,
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+    currentClient.walletPk?.toBase58(),
+  ])
 
   const isLoading = !mint || !councilMint
   return (
@@ -145,6 +157,8 @@ const TokenDepositLock = ({
       hasTokensInWallet
     ) {
       setHasGovPower(true)
+    } else {
+      setHasGovPower(false)
     }
   }, [availableTokens, amountLocked, hasTokensInWallet, setHasGovPower])
 
