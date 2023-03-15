@@ -1,9 +1,7 @@
 import Input from '@components/inputs/Input'
-import Select from '@components/inputs/Select'
 import AmountSlider from '@components/Slider'
 import Switch from '@components/Switch'
 import useRealm from '@hooks/useRealm'
-import { VoteTipping } from '@solana/spl-governance'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import {
   fmtPercentage,
@@ -24,7 +22,6 @@ export interface BaseGovernanceFormFieldsV2 {
   minInstructionHoldUpTime: number
   maxVotingTime: number
   voteThreshold: number
-  voteTipping: VoteTipping
 }
 
 const BaseGovernanceFormV2 = ({
@@ -220,24 +217,6 @@ const BaseGovernanceFormV2 = ({
           }}
         />
       </div>
-      <Select
-        label="Vote tipping"
-        value={VoteTipping[form.voteTipping as any]}
-        onChange={(selected) =>
-          handleSetForm({
-            value: selected,
-            propertyName: 'voteTipping',
-          })
-        }
-      >
-        {Object.keys(VoteTipping)
-          .filter((vt) => typeof VoteTipping[vt as any] === 'string')
-          .map((vt) => (
-            <Select.Option key={vt} value={vt}>
-              {VoteTipping[vt as any]}{' '}
-            </Select.Option>
-          ))}
-      </Select>
     </>
   )
 }

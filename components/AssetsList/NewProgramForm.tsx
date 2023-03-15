@@ -54,7 +54,7 @@ const defaultFormValues = {
   maxVotingTime: 3,
   voteThreshold: 60,
   transferAuthority: true,
-  voteTipping: VoteTipping.Strict,
+  councilVoteTipping: VoteTipping.Strict,
 } as const
 
 const NewProgramForm = () => {
@@ -113,21 +113,16 @@ const NewProgramForm = () => {
           connection.current,
           connection.endpoint
         )
-
-        const governanceConfigValues = {
-          minTokensToCreateProposal: form.minCommunityTokensToCreateProposal,
-          minInstructionHoldUpTime: form.minInstructionHoldUpTime,
-          maxVotingTime: form.maxVotingTime,
-          voteThresholdPercentage: form.voteThreshold,
-          mintDecimals: realmMint.decimals,
-          voteTipping: form.voteTipping,
-        }
         const governanceConfig =
           realmInfo!.programVersion === 2
-            ? getGovernanceConfigFromV2Form(
-                realmInfo!.programVersion!,
-                governanceConfigValues
-              )
+            ? getGovernanceConfigFromV2Form(realmInfo!.programVersion!, {
+                minTokensToCreateProposal:
+                  form.minCommunityTokensToCreateProposal,
+                minInstructionHoldUpTime: form.minInstructionHoldUpTime,
+                maxVotingTime: form.maxVotingTime,
+                voteThresholdPercentage: form.voteThreshold,
+                mintDecimals: realmMint.decimals,
+              })
             : new GovernanceConfig(
                 transform(
                   transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig(
@@ -149,8 +144,8 @@ const NewProgramForm = () => {
                     communityVetoVoteThreshold: 'disabled',
                     councilVoteThreshold: form.voteThreshold.toString(),
                     councilVetoVoteThreshold: form.voteThreshold.toString(),
-                    communityVoteTipping: form.voteTipping,
-                    councilVoteTipping: form.voteTipping,
+                    communityVoteTipping: VoteTipping.Disabled,
+                    councilVoteTipping: VoteTipping.Strict,
                     _programVersion: 3,
                   }
                 )[0]

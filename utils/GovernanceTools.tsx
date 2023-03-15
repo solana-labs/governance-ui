@@ -27,7 +27,6 @@ export interface GovernanceConfigValues {
   maxVotingTime: number
   voteThresholdPercentage: number
   mintDecimals: number
-  voteTipping?: VoteTipping
   votingCoolOffTime?: number
   depositExemptProposalCount?: number
 }
@@ -62,8 +61,6 @@ export function getGovernanceConfigFromV2Form(
         values.mintDecimals
       )
 
-  const voteTippig = values.voteTipping ?? VoteTipping.Disabled
-
   return new GovernanceConfig({
     communityVoteThreshold: communityVoteThreshold,
     minCommunityTokensToCreateProposal: new BN(
@@ -79,8 +76,8 @@ export function getGovernanceConfigFromV2Form(
     // Council tokens are rare and possession of any amount of council tokens should be sufficient to be allowed to create proposals
     // If it turns to be a wrong assumption then it should be exposed in the UI
     minCouncilTokensToCreateProposal: new BN(1),
-    communityVoteTipping: voteTippig,
-    councilVoteTipping: voteTippig,
+    communityVoteTipping: VoteTipping.Disabled,
+    councilVoteTipping: VoteTipping.Strict,
     councilVoteThreshold: councilVoteThreshold,
     councilVetoVoteThreshold: councilVetoVoteThreshold,
     communityVetoVoteThreshold: communityVetoVoteThreshold,
