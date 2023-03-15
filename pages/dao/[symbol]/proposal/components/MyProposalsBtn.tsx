@@ -163,7 +163,7 @@ const MyProposalsBn = () => {
       await refetchProposals()
     } catch (e) {
       console.log(e)
-      notify({ type: 'error', message: 'Something wnet wrong' })
+      notify({ type: 'error', message: `Something went wrong ${e}` })
     }
     setIsLoading(false)
   }

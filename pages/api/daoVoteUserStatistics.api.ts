@@ -75,18 +75,21 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     realm.owner
   )
 
-  const votes = Object.values(voteRecordByVoter).map((x) => ({
-    title: proposalsByGovernance
-      .flatMap((pbg) => pbg)
-      .find((p) => p.pubkey.equals(x.account.proposal))?.account.name,
-    vote: x.account.vote
-      ? YesNoVote[x.account.vote!.toYesNoVote()!]
-      : x.account.voteWeight?.yes
-      ? 'Yes'
-      : x.account.voteWeight?.no
-      ? 'No'
-      : null,
-  }))
+  const votes = Object.values(voteRecordByVoter)
+    .map((x) => ({
+      title: proposalsByGovernance
+        .flatMap((pbg) => pbg)
+        .find((p) => p.pubkey.equals(x.account.proposal))?.account.name,
+      proposaPK: x.account.proposal.toBase58(),
+      vote: x.account.vote
+        ? YesNoVote[x.account.vote!.toYesNoVote()!]
+        : x.account.voteWeight?.yes
+        ? 'Yes'
+        : x.account.voteWeight?.no
+        ? 'No'
+        : null,
+    }))
+    .filter((x) => x.title)
 
   res.status(200).json({
     yesCount: votes.filter((x) => x.vote === YesNoVote[0]).length,
