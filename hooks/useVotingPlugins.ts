@@ -112,7 +112,7 @@ export function useVotingPlugins() {
     } catch (e) {
       console.log(e)
       notify({
-        message: "Something went wrong can't fetch nfts",
+        message: `Something went wrong can't fetch nfts: ${e}`,
         type: 'error',
       })
     }
