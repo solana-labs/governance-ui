@@ -10,6 +10,7 @@ import Tabs from '@components/Tabs'
 import Select from '@components/inputs/Select'
 import Button from '@components/Button'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { useRouter } from 'next/router'
 
 import RealmConfigModal from './RealmConfigModal'
 import GovernanceConfigModal from './GovernanceConfigModal'
@@ -26,9 +27,12 @@ import { ExclamationIcon } from '@heroicons/react/outline'
 import Tooltip from '@components/Tooltip'
 import { AccountType } from '@utils/uiTypes/assets'
 import { MintMaxVoteWeightSourceType } from '@solana/spl-governance'
+import useQueryContext from '@hooks/useQueryContext'
 
 const Params = () => {
-  const { realm, mint, config } = useRealm()
+  const router = useRouter()
+  const { fmtUrlWithCluster } = useQueryContext()
+  const { realm, mint, config, symbol } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const {
     canUseAuthorityInstruction,
@@ -97,9 +101,6 @@ const Params = () => {
   }
   const closeMetadataCreationModal = () => {
     setIsMetadataCreationModalOpen(false)
-  }
-  const openGovernanceProposalModal = () => {
-    setIsGovernanceProposalModalOpen(true)
   }
   const closeGovernanceProposalModal = () => {
     setIsGovernanceProposalModalOpen(false)
@@ -347,7 +348,13 @@ const Params = () => {
                   {activeTab === 'Params' && (
                     <ParamsView
                       activeGovernance={activeGovernance}
-                      openGovernanceProposalModal={openGovernanceProposalModal}
+                      openGovernanceProposalModal={() =>
+                        router.push(
+                          fmtUrlWithCluster(
+                            `/realm/${symbol}/governance/${activeGovernance.pubkey.toBase58()}/edit`
+                          )
+                        )
+                      }
                     />
                   )}
                   {activeTab === 'Accounts' && (
