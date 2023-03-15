@@ -41,7 +41,7 @@ export type BaseGovernanceFormFieldsV3 = {
 }
 
 type Transformer<T extends Record<keyof U, any>, U> = {
-  [K in keyof U]: (x: T[K]) => U[K]
+  [K in keyof U]: (x: T[K], o: T) => U[K]
 }
 
 // @agrippa I use this functional pattern instead of referencing values directly when transforming, so as to reduce surface area for typos
@@ -85,7 +85,10 @@ export const transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig = (
   Omit<GovernanceConfig & { _programVersion: 3 }, 'reserved'>
 > => ({
   minInstructionHoldUpTime: (x) => getTimestampFromDays(parseFloat(x)),
-  maxVotingTime: (x) => getTimestampFromDays(parseFloat(x)),
+  // the sdk erroneously adds votingCoolOffTime to maxVotingTime, and it must be subtracted here
+  maxVotingTime: (x, o) =>
+    getTimestampFromDays(parseFloat(x)) -
+    getTimestampFromHours(parseFloat(o.votingCoolOffTime)),
   minCommunityTokensToCreateProposal: (x) =>
     x === 'disabled'
       ? DISABLED_VOTER_WEIGHT
