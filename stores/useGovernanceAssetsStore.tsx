@@ -3,7 +3,6 @@ import axios from 'axios'
 import {
   getNativeTreasuryAddress,
   Governance,
-  GovernanceAccountType,
   Realm,
   TOKEN_PROGRAM_ID,
   ProgramAccount,
@@ -47,6 +46,7 @@ const additionalPossibleMintAccounts = {
 }
 
 const tokenAccountOwnerOffset = 32
+const programAccountOwnerOffset = 13
 
 interface SolAccInfo {
   governancePk: PublicKey
@@ -356,10 +356,23 @@ const getMintAccounts = (
   return accounts
 }
 
-const getProgramAssetAccounts = (
-  programGovernances: ProgramAccount<Governance>[]
-): AccountTypeProgram[] => {
-  return programGovernances.map(
+const getProgramAssetAccounts = async (
+  connection: ConnectionContext,
+  governancesArray: ProgramAccount<Governance>[]
+): Promise<AccountTypeProgram[]> => {
+  const nativeAccountAddresses = await Promise.all(
+    governancesArray.map((governance) =>
+      getNativeTreasuryAddress(governance.owner, governance.pubkey)
+    )
+  )
+  const possibleOwnersPk = [
+    ...nativeAccountAddresses.map((x) => x),
+    ...governancesArray.map((x) => x.pubkey),
+  ]
+  //todo get owner
+  const pubkeys = await getProgramAccountInfo(connection, possibleOwnersPk)
+  console.log(pubkeys.map((x) => x.toBase58()))
+  return governancesArray.map(
     (programGov) => new AccountTypeProgram(programGov)
   )
 }
@@ -369,15 +382,6 @@ const getGenericAssetAccounts = (
 ): AccountTypeGeneric[] => {
   return genericGovernances.map(
     (programGov) => new AccountTypeGeneric(programGov)
-  )
-}
-
-const getGovernancesByAccountTypes = (
-  governancesArray: ProgramAccount<Governance>[],
-  types: GovernanceAccountType[]
-): ProgramAccount<Governance>[] => {
-  return governancesArray.filter((gov) =>
-    types.some((t) => gov.account.accountType === t)
   )
 }
 
@@ -741,13 +745,11 @@ const getAccountsForGovernances = async (
 ): Promise<
   (AccountTypeMint | AccountTypeProgram | AssetAccount | AccountTypeGeneric)[]
 > => {
-  const programGovernances = getGovernancesByAccountTypes(governancesArray, [
-    GovernanceAccountType.ProgramGovernanceV1,
-    GovernanceAccountType.ProgramGovernanceV2,
-  ])
-
   // 1 - Load accounts related to program governances
-  const programAccounts = getProgramAssetAccounts(programGovernances)
+  const programAccounts = await getProgramAssetAccounts(
+    connection,
+    governancesArray
+  )
 
   // 2 - Load token accounts behind any type of governance
   const governedTokenAccounts = await loadGovernedTokenAccounts(
@@ -808,4 +810,114 @@ const getAccountsForGovernances = async (
   )
 
   return [...accounts, ...genericGovernances]
+}
+
+const getProgramAccountInfo = async (
+  { endpoint, current }: ConnectionContext,
+  publicKeys: PublicKey[]
+): Promise<PublicKey[]> => {
+  const { data: exetuableAccountInfoJson } = await axios.post<
+    unknown,
+    {
+      data: {
+        result: {
+          account: {
+            data: [string, 'base64']
+          }
+          pubkey: string
+        }[]
+      }[]
+    }
+  >(
+    endpoint,
+    publicKeys.map((publicKey) => ({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'getProgramAccounts',
+      params: [
+        'BPFLoaderUpgradeab1e11111111111111111111111',
+        {
+          commitment: current.commitment,
+          encoding: 'base64',
+          filters: [
+            {
+              memcmp: {
+                // number of bytes
+                offset: programAccountOwnerOffset,
+                bytes: publicKey.toBase58(),
+              },
+            },
+          ],
+        },
+      ],
+    }))
+  )
+
+  if (!exetuableAccountInfoJson) {
+    throw new Error(
+      `Cannot load information about program accounts ${publicKeys.map((x) =>
+        x.toBase58()
+      )}`
+    )
+  }
+
+  const executableDataPks = exetuableAccountInfoJson.reduce(
+    (executableAccountInfo, { result }) => {
+      result.forEach(({ pubkey }) => {
+        const publicKey = new PublicKey(pubkey)
+        executableAccountInfo.push(publicKey)
+      })
+
+      return executableAccountInfo
+    },
+    [] as PublicKey[]
+  )
+  const { data: programAccountInfoJson } = await axios.post<
+    unknown,
+    {
+      data: {
+        result: {
+          account: {
+            data: [string, 'base64']
+          }
+          pubkey: string
+        }[]
+      }[]
+    }
+  >(
+    endpoint,
+    executableDataPks.map((publicKey) => ({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'getProgramAccounts',
+      params: [
+        'BPFLoaderUpgradeab1e11111111111111111111111',
+        {
+          commitment: current.commitment,
+          encoding: 'base64',
+          filters: [
+            {
+              memcmp: {
+                // number of bytes
+                offset: 4,
+                bytes: publicKey.toBase58(),
+              },
+            },
+          ],
+        },
+      ],
+    }))
+  )
+  const programDataPks = programAccountInfoJson.reduce(
+    (programAccountInfo, { result }) => {
+      result.forEach(({ pubkey }) => {
+        const publicKey = new PublicKey(pubkey)
+        programAccountInfo.push(publicKey)
+      })
+
+      return programAccountInfo
+    },
+    [] as PublicKey[]
+  )
+  return programDataPks
 }
