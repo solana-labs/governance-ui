@@ -146,21 +146,6 @@ export function useVotingPlugins() {
         console.log("Couldn't get max voter weight record. Setting to null.")
         heliumStore.setMaxVoterWeight(null)
       }
-
-      if (heliumVsrClient && connected && currentClient.walletPk) {
-        try {
-          await heliumStore.getPositions({
-            realmPk: realm.pubkey,
-            communityMintPk: realm.account.communityMint,
-            walletPk: currentClient.walletPk,
-            connection: connection.current,
-            client: heliumVsrClient,
-            votingClient: currentClient,
-          })
-        } catch (e) {
-          console.log(e)
-        }
-      }
     }
   }
 

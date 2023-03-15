@@ -16,6 +16,7 @@ import Link from 'next/link'
 import useQueryContext from '@hooks/useQueryContext'
 import InlineNotification from '@components/InlineNotification'
 import { getTokenOwnerRecordAddress } from '@solana/spl-governance'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 
 interface Props {
   className?: string
@@ -33,12 +34,14 @@ export default function LockedCommunityNFTRecordVotingPower(props: Props) {
     config,
   } = useRealm()
   const { proposal } = useProposal()
-  const connected = useWalletStore((s) => s.connected)
+  const [connected, wallet] = useWalletStore((s) => [s.connected, s.current])
+  const [currentClient] = useVotePluginsClientStore((s) => [
+    s.state.currentRealmVotingClient,
+  ])
   const [tokenOwnerRecordPk, setTokenOwnerRecordPk] = useState('')
   const loadingPositions = useHeliumVsrStore((s) => s.state.isLoading)
   const votingPower = useHeliumVsrStore((s) => s.state.votingPower)
   const amountLocked = useHeliumVsrStore((s) => s.state.amountLocked)
-  const wallet = useWalletStore((s) => s.current)
 
   useEffect(() => {
     if (mint && votingPower) {
@@ -59,15 +62,21 @@ export default function LockedCommunityNFTRecordVotingPower(props: Props) {
         realm!.owner,
         realm!.pubkey,
         defaultMint!,
-        wallet!.publicKey!
+        currentClient!.walletPk!
       )
       setTokenOwnerRecordPk(tokenOwnerRecordAddress.toBase58())
     }
-    if (realm && wallet?.connected) {
+    if (realm && wallet?.connected && currentClient.walletPk) {
       getTokenOwnerRecord()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [realm?.pubkey.toBase58(), wallet?.connected])
+  }, [
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+    realm?.pubkey.toBase58(),
+    wallet?.connected,
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+    currentClient.walletPk?.toBase58(),
+  ])
 
   const isLoading = loadingPositions || !(votingPower && mint)
   const communityMint = realm?.account.communityMint
@@ -113,6 +122,7 @@ export default function LockedCommunityNFTRecordVotingPower(props: Props) {
     )
   }
 
+  const isSameWallet = wallet!.publicKey!.equals(currentClient.walletPk!)
   return (
     <div className={`${props.className} -mt-10`}>
       <div className="mb-4 flex justify-end">
@@ -133,7 +143,7 @@ export default function LockedCommunityNFTRecordVotingPower(props: Props) {
           </a>
         </Link>
       </div>
-      {hasTokensInWallet && connected ? (
+      {isSameWallet && hasTokensInWallet && connected ? (
         <div className="mb-4">
           <InlineNotification
             desc={`You have ${tokensToShow} ${

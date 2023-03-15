@@ -48,7 +48,7 @@ export async function castVote(
   { connection, wallet, programId, walletPubkey }: RpcContext,
   realm: ProgramAccount<Realm>,
   proposal: ProgramAccount<Proposal>,
-  tokeOwnerRecord: ProgramAccount<TokenOwnerRecord>,
+  tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>,
   voteKind: VoteKind,
   message?: ChatMessageBody | undefined,
   votingPlugin?: VotingClient,
@@ -71,7 +71,7 @@ export async function castVote(
   const plugin = await votingPlugin?.withCastPluginVote(
     instructions,
     proposal,
-    tokeOwnerRecord
+    tokenOwnerRecord
   )
 
   // It is not clear that defining these extraneous fields, `deny` and `veto`, is actually necessary.
@@ -118,7 +118,7 @@ export async function castVote(
     proposal.account.governance,
     proposal.pubkey,
     proposal.account.tokenOwnerRecord,
-    tokeOwnerRecord.pubkey,
+    tokenOwnerRecord.pubkey,
     governanceAuthority,
     tokenMint,
     vote,
@@ -130,7 +130,7 @@ export async function castVote(
   if (message) {
     const plugin = await votingPlugin?.withUpdateVoterWeightRecord(
       instructions,
-      tokeOwnerRecord,
+      tokenOwnerRecord,
       'commentProposal'
     )
 
@@ -142,7 +142,7 @@ export async function castVote(
       realm.pubkey,
       proposal.account.governance,
       proposal.pubkey,
-      tokeOwnerRecord.pubkey,
+      tokenOwnerRecord.pubkey,
       governanceAuthority,
       payer,
       undefined,

@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react'
 import {
   Proposal,
   ProgramAccount,
@@ -52,29 +53,49 @@ interface Props {
 }
 
 export default function ProposalMyVoteBadge(props: Props) {
-  const { realm } = useRealm()
-  const communityDelegateVoteRecords = useWalletStore(
-    (s) => s.communityDelegateVoteRecordsByProposal
-  )
-  const councilDelegateVoteRecords = useWalletStore(
-    (s) => s.councilDelegateVoteRecordsByProposal
-  )
-  const ownVoteRecords = useWalletStore((s) => s.ownVoteRecordsByProposal)
+  const { realm, ownTokenRecord } = useRealm()
+  const [ownVoteRecord, setOwnVoteRecord] = useState<
+    ProgramAccount<VoteRecord> | undefined
+  >(undefined)
+  const [
+    ownVoteRecords,
+    communityDelegateVoteRecords,
+    councilDelegateVoteRecords,
+  ] = useWalletStore((s) => [
+    s.ownVoteRecordsByProposal,
+    s.communityDelegateVoteRecordsByProposal,
+    s.councilDelegateVoteRecordsByProposal,
+  ])
 
-  const ownVoteRecord = getOwnVoteRecord(
+  useEffect(() => {
+    setOwnVoteRecord(undefined)
+    const voteRecord = getOwnVoteRecord(
+      communityDelegateVoteRecords,
+      councilDelegateVoteRecords,
+      ownVoteRecords,
+      props.proposal,
+      realm
+    )
+    if (
+      voteRecord?.account.governingTokenOwner.equals(
+        ownTokenRecord!.account!.governingTokenOwner
+      )
+    ) {
+      setOwnVoteRecord(voteRecord)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+  }, [
+    setOwnVoteRecord,
     communityDelegateVoteRecords,
     councilDelegateVoteRecords,
     ownVoteRecords,
-    props.proposal,
-    realm
-  )
+  ])
 
   if (!ownVoteRecord) {
     return null
   }
 
   const isYes = isYesVote(ownVoteRecord.account)
-
   return (
     <Tooltip content={isYes ? 'You voted "Yes"' : 'You voted "No"'}>
       <div

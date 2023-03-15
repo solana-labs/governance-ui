@@ -26,7 +26,7 @@ export const VotingPowerCard: React.FC<{
   const [hasGovPower, setHasGovPower] = useState(false)
   const [tokenOwnerRecordPk, setTokenOwnerRecordPk] = useState('')
   const { councilMint, mint, realm, symbol, config } = useRealm()
-  const [connected, wallet] = useWalletStore((s) => [s.connected, s.current])
+  const [wallet] = useWalletStore((s) => [s.current])
   const [currentClient] = useVotePluginsClientStore((s) => [
     s.state.currentRealmVotingClient,
   ])
@@ -64,6 +64,13 @@ export const VotingPowerCard: React.FC<{
   ])
 
   const isLoading = !mint || !councilMint
+  const isConnected =
+    wallet &&
+    currentClient &&
+    wallet.connected &&
+    wallet.publicKey &&
+    currentClient.walletPk
+
   return (
     <>
       <div className="flex items-center justify-between">
@@ -75,7 +82,7 @@ export const VotingPowerCard: React.FC<{
         >
           <a
             className={`default-transition flex items-center text-fgd-2 text-sm transition-all hover:text-fgd-3 ${
-              !connected || !tokenOwnerRecordPk
+              !isConnected || !tokenOwnerRecordPk
                 ? 'opacity-50 pointer-events-none'
                 : ''
             }`}
@@ -87,21 +94,21 @@ export const VotingPowerCard: React.FC<{
       </div>
       {!isLoading ? (
         <>
-          {!hasGovPower && !inAccountDetails && connected && (
+          {!hasGovPower && !inAccountDetails && isConnected && (
             <div className={'text-xs text-white/50 mt-8'}>
               You do not have any governance power in this dao
             </div>
           )}
-          {!connected && (
+          {!isConnected && (
             <div className={'text-xs text-white/50 mt-8'}>
               Connect your wallet to see governance power
             </div>
           )}
-          {connected && (
+          {isConnected && (
             <TokenDepositLock
               mint={mint}
               setHasGovPower={setHasGovPower}
-              isSameWallet={wallet!.publicKey!.equals(currentClient!.walletPk!)}
+              isSameWallet={wallet.publicKey!.equals(currentClient.walletPk!)}
             />
           )}
           {councilDepositVisible && (
