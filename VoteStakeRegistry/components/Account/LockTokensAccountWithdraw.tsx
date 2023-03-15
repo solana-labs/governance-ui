@@ -176,7 +176,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
         setReducedDeposits([])
       }
     } catch (e) {
-      console.log(e, '@@@@')
+      console.log(e)
       notify({
         type: 'error',
         message: "Can't fetch deposits",
@@ -274,7 +274,6 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
             />
           </div>
         )}
-        {console.log(reducedDeposits)}
         {connected ? (
           <div>
             <div className="grid md:grid-cols-3 grid-flow-row gap-4 pb-8">
