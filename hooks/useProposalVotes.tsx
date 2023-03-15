@@ -38,8 +38,11 @@ export default function useProposalVotes(proposal?: Proposal) {
     proposal?.governingTokenMint.toBase58() ===
     realm?.account.communityMint.toBase58()
   const isPluginCommunityVoting = maxVoteRecord && isCommunityVote
+
   const voteThresholdPct = isCommunityVote
     ? governance.config.communityVoteThreshold.value
+      ? governance.config.communityVoteThreshold.value
+      : 0
     : programVersion > 2
     ? governance.config.councilVoteThreshold.value
     : governance.config.communityVoteThreshold.value
