@@ -170,6 +170,7 @@ const EXCLUDED_REALMS = new Map<string, string>([
   ['Hd7hrf1fyZN5ZkuCerpfXs4UCAgoHELyiscE4utaKhSx', ''],
   ['9K6P7vbAPqZ8hHsDbShLZat9bFdWzA52QAgJThGeWui5', ''], // BonkDAO (council only)
   ['C556EiXyMWU62Ed7rrGipZrRHWnUm3hPvufUzcdXsj2V', ''], //Mango security council duplicate
+  ['HnLuYmBxDxK1MCihHJVFnNudUTpLPc2km6xNcRQ8KPdj', ''], // df test
 ])
 
 // Returns all known realms from all known spl-gov instances which are not certified
