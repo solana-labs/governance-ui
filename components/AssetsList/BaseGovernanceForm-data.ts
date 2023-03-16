@@ -82,7 +82,8 @@ export const transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig = (
   communityMintDecimals: number,
   councilMintDecimals: number
 ): Transformer<
-  BaseGovernanceFormFieldsV3,
+  //community votetipping should be disabled by default and is absent from the forms now
+  BaseGovernanceFormFieldsV3 & { communityVoteTipping: VoteTipping.Disabled },
   Omit<GovernanceConfig & { _programVersion: 3 }, 'reserved'>
 > => ({
   minInstructionHoldUpTime: (x) => getTimestampFromDays(parseFloat(x)),
@@ -114,7 +115,7 @@ export const transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig = (
     x === 'disabled'
       ? { type: VoteThresholdType.Disabled, value: undefined }
       : { type: VoteThresholdType.YesVotePercentage, value: parseInt(x) },
-  communityVoteTipping: () => VoteTipping.Disabled,
+  communityVoteTipping: (x) => x,
   councilVoteTipping: (x) => x,
   votingCoolOffTime: (x) => getTimestampFromHours(parseFloat(x)),
   depositExemptProposalCount: (x) => parseFloat(x),
