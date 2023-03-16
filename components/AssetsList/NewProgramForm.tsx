@@ -16,7 +16,7 @@ import { isFormValid } from 'utils/formValidation'
 import { getGovernanceConfigFromV2Form } from 'utils/GovernanceTools'
 import { notify } from 'utils/notifications'
 import { useRouter } from 'next/router'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import * as yup from 'yup'
 import BaseGovernanceForm, {
@@ -26,10 +26,7 @@ import { registerProgramGovernance } from 'actions/registerProgramGovernance'
 import { GovernanceType } from '@solana/spl-governance'
 import Switch from 'components/Switch'
 import { debounce } from '@utils/debounce'
-import {
-  DISABLED_VOTER_WEIGHT,
-  MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
-} from '@tools/constants'
+import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { getMintDecimalAmount } from '@tools/sdk/units'
@@ -38,6 +35,7 @@ import {
   transform,
   transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig,
 } from './BaseGovernanceForm-data'
+import useProgramVersion from '@hooks/useProgramVersion'
 
 type BaseGovernanceFormFields =
   | BaseGovernanceFormFieldsV3
@@ -52,9 +50,6 @@ const defaultFormValues = {
   // TODO: This is temp. fix to avoid wrong default for Multisig DAOs
   // This should be dynamic and set to 1% of the community mint supply or
   // MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY when supply is 0
-  minCommunityTokensToCreateProposal: MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
-  // TODO support v3
-  _programVersion: 2,
   minInstructionHoldUpTime: 0,
   maxVotingTime: 3,
   voteThreshold: 60,
@@ -80,9 +75,7 @@ const NewProgramForm = () => {
   const connection = useWalletStore((s) => s.connection)
   const connected = useWalletStore((s) => s.connected)
   const { fetchRealm } = useWalletStore((s) => s.actions)
-  const [form, setForm] = useState<NewProgramForm>({
-    ...defaultFormValues,
-  })
+  const [form, setForm] = useState<NewProgramForm | undefined>()
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
   const tokenOwnerRecord = ownVoterWeight.canCreateGovernanceUsingCouncilTokens()
@@ -90,8 +83,48 @@ const NewProgramForm = () => {
     : realm && ownVoterWeight.canCreateGovernanceUsingCommunityTokens(realm)
     ? ownVoterWeight.communityTokenRecord
     : undefined
+  const programVersion = useProgramVersion()
+  useEffect(() => {
+    if (realm === undefined) return
+
+    if (programVersion <= 2) {
+      setForm({
+        _programVersion: 2,
+        ...defaultFormValues,
+        minCommunityTokensToCreateProposal: (realmMint?.supply.isZero()
+          ? MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY
+          : realmMint
+          ? getMintDecimalAmount(realmMint!, realmMint!.supply).toNumber() *
+            0.01
+          : 0
+        ).toString(),
+      })
+    } else {
+      setForm({
+        _programVersion: 3,
+        /* in days */
+        minInstructionHoldUpTime: '0',
+        /* in days */
+        maxVotingTime: '3',
+        minCommunityTokensToCreateProposal: '1',
+        minCouncilTokensToCreateProposal: '0',
+        votingCoolOffTime: '12',
+        depositExemptProposalCount: '10',
+        communityVoteThreshold: '60',
+        communityVetoVoteThreshold: 'disabled',
+        councilVoteThreshold: '60',
+        councilVetoVoteThreshold: '60',
+        councilVoteTipping: VoteTipping.Strict,
+        transferAuthority: true,
+        programId: '',
+      })
+    }
+    // realmMint needs to be memoized.......
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [realm, programVersion, JSON.stringify(realmMint)])
 
   const handleSetForm = ({ propertyName, value }) => {
+    if (form === undefined) return
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
@@ -105,6 +138,9 @@ const NewProgramForm = () => {
       }
       if (!tokenOwnerRecord) {
         throw "You don't have enough governance power to create a new program governance"
+      }
+      if (!form) {
+        throw new Error()
       }
       const { isValid, validationErrors } = await isFormValid(schema, form)
       setFormErrors(validationErrors)
@@ -161,68 +197,60 @@ const NewProgramForm = () => {
       setIsLoading(false)
     }
   }
-  //if you altering this look at useEffect for form.programId
-  const schema = yup.object().shape({
-    programId: yup
-      .string()
-      .test(
-        'programIdTest',
-        'program id validation error',
-        async function (val: string) {
-          if (val) {
-            try {
-              const pubKey = tryParseKey(val)
-              if (!pubKey) {
-                return this.createError({
-                  message: `Invalid account address`,
-                })
-              }
+  const schema = useMemo(
+    () =>
+      yup.object().shape({
+        programId: yup
+          .string()
+          .test(
+            'programIdTest',
+            'program id validation error',
+            async function (val: string) {
+              if (val) {
+                try {
+                  const pubKey = tryParseKey(val)
+                  if (!pubKey) {
+                    return this.createError({
+                      message: `Invalid account address`,
+                    })
+                  }
 
-              const accountData = await connection.current.getParsedAccountInfo(
-                pubKey
-              )
-              if (!accountData || !accountData.value) {
+                  const accountData = await connection.current.getParsedAccountInfo(
+                    pubKey
+                  )
+                  if (!accountData || !accountData.value) {
+                    return this.createError({
+                      message: `Account not found`,
+                    })
+                  }
+                  return true
+                } catch (e) {
+                  return this.createError({
+                    message: `Invalid account address`,
+                  })
+                }
+              } else {
                 return this.createError({
-                  message: `Account not found`,
+                  message: `Program id is required`,
                 })
               }
-              return true
-            } catch (e) {
-              return this.createError({
-                message: `Invalid account address`,
-              })
             }
-          } else {
-            return this.createError({
-              message: `Program id is required`,
-            })
-          }
-        }
-      ),
-  })
+          ),
+      }),
+    [connection]
+  )
+
   useEffect(() => {
-    if (form.programId) {
+    if (form?.programId) {
       //now validation contains only programId if more fields come it would be good to reconsider this method.
       debounce.debounceFcn(async () => {
         const { validationErrors } = await isFormValid(schema, form)
         setFormErrors(validationErrors)
       })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form.programId])
-  useEffect(() => {
-    setForm({
-      ...form,
-      minCommunityTokensToCreateProposal: (realmMint?.supply.isZero()
-        ? MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY
-        : realmMint
-        ? getMintDecimalAmount(realmMint!, realmMint!.supply).toNumber() * 0.01
-        : 0
-      ).toString(),
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [JSON.stringify(realmMint)])
-  return (
+  }, [form, schema])
+
+  return form === undefined ? null : (
     <div className="space-y-3">
       <PreviousRouteBtn />
       <div className="border-b border-fgd-4 pb-4 pt-2">
