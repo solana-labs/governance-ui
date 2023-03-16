@@ -230,14 +230,15 @@ export class VotingClient {
       instructions.push(
         await (this.client as HeliumVsrClient).program.methods
           .updateVoterWeightRecordV0({
+            owner: walletPk,
             voterWeightAction: {
               [type]: {},
             },
           } as any)
           .accounts({
             registrar,
-            owner: walletPk,
             voterWeightRecord: voterWeightPk,
+            voterTokenOwnerRecord: tokenOwnerRecord.pubkey,
           })
           .remainingAccounts(remainingAccounts.slice(0, 10))
           .instruction()
