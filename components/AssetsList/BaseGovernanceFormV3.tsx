@@ -329,37 +329,31 @@ export const BaseGovernanceFormV3 = ({
                   </div>
                 )
               })}
-
-              <Select
-                label={`${capitalized} vote tipping`}
-                value={
-                  VoteTipping[
-                    govPop === 'community'
-                      ? form.communityVoteTipping
-                      : form.councilVoteTipping
-                  ]
-                }
-                onChange={(selected) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    ...(govPop === 'community'
-                      ? {
-                          communityVoteTipping: selected,
-                        }
-                      : {
-                          councilVoteTipping: selected,
-                        }),
-                  }))
-                }
-              >
-                {Object.keys(VoteTipping)
-                  .filter((vt) => typeof VoteTipping[vt as any] === 'string')
-                  .map((vt) => (
-                    <Select.Option key={vt} value={vt}>
-                      {VoteTipping[vt as any]}{' '}
-                    </Select.Option>
-                  ))}
-              </Select>
+              {
+                // DISABLE vote tipping for community due to exploit
+                govPop === 'council' && (
+                  <Select
+                    label={`${capitalized} vote tipping`}
+                    value={VoteTipping[form.councilVoteTipping]}
+                    onChange={(selected) =>
+                      setForm((prev) => ({
+                        ...prev,
+                        councilVoteTipping: selected,
+                      }))
+                    }
+                  >
+                    {Object.keys(VoteTipping)
+                      .filter(
+                        (vt) => typeof VoteTipping[vt as any] === 'string'
+                      )
+                      .map((vt) => (
+                        <Select.Option key={vt} value={vt}>
+                          {VoteTipping[vt as any]}{' '}
+                        </Select.Option>
+                      ))}
+                  </Select>
+                )
+              }
             </React.Fragment>
           )
         })}

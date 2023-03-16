@@ -41,10 +41,16 @@ import { getMintDecimalAmount } from '@tools/sdk/units'
 import {
   transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig,
   transform,
+  BaseGovernanceFormFieldsV3,
 } from '@components/AssetsList/BaseGovernanceForm-data'
-interface NewTreasuryAccountForm extends BaseGovernanceFormFieldsV2 {
+
+type NewTreasuryAccountForm = (
+  | BaseGovernanceFormFieldsV3
+  | BaseGovernanceFormFieldsV2
+) & {
   mintAddress: string
 }
+
 const defaultFormValues = {
   // TODO support v3
   _programVersion: 2,
@@ -159,46 +165,23 @@ const NewAccountForm = () => {
           connection.endpoint
         )
 
-        const governanceConfigValues = {
-          minTokensToCreateProposal: form.minCommunityTokensToCreateProposal,
-          minInstructionHoldUpTime: form.minInstructionHoldUpTime,
-          maxVotingTime: form.maxVotingTime,
-          voteThresholdPercentage: form.voteThreshold,
-          mintDecimals: realmMint.decimals,
-          voteTipping: form.voteTipping,
-        }
-
         const governanceConfig =
-          realmInfo!.programVersion === 2
-            ? getGovernanceConfigFromV2Form(
-                realmInfo!.programVersion!,
-                governanceConfigValues
-              )
+          form._programVersion === 2
+            ? getGovernanceConfigFromV2Form(realmInfo!.programVersion!, {
+                minTokensToCreateProposal:
+                  form.minCommunityTokensToCreateProposal,
+                minInstructionHoldUpTime: form.minInstructionHoldUpTime,
+                maxVotingTime: form.maxVotingTime,
+                voteThresholdPercentage: form.voteThreshold,
+                mintDecimals: realmMint.decimals,
+              })
             : new GovernanceConfig(
                 transform(
                   transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig(
                     realmMint.decimals,
                     councilMint?.decimals || 0
                   ),
-                  {
-                    minCommunityTokensToCreateProposal:
-                      form.minCommunityTokensToCreateProposal ===
-                      DISABLED_VOTER_WEIGHT.toString()
-                        ? 'disabled'
-                        : form.minCommunityTokensToCreateProposal,
-                    minCouncilTokensToCreateProposal: '1',
-                    minInstructionHoldUpTime: form.minInstructionHoldUpTime.toString(),
-                    maxVotingTime: form.maxVotingTime.toString(),
-                    votingCoolOffTime: '12',
-                    depositExemptProposalCount: '10',
-                    communityVoteThreshold: form.voteThreshold.toString(),
-                    communityVetoVoteThreshold: 'disabled',
-                    councilVoteThreshold: form.voteThreshold.toString(),
-                    councilVetoVoteThreshold: form.voteThreshold.toString(),
-                    communityVoteTipping: form.voteTipping,
-                    councilVoteTipping: form.voteTipping,
-                    _programVersion: 3,
-                  }
+                  { ...form, communityVoteTipping: VoteTipping.Disabled }
                 )[0]
               )
 
@@ -313,11 +296,12 @@ const NewAccountForm = () => {
   useEffect(() => {
     setForm({
       ...form,
-      minCommunityTokensToCreateProposal: realmMint?.supply.isZero()
+      minCommunityTokensToCreateProposal: (realmMint?.supply.isZero()
         ? MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY
         : realmMint
         ? getMintDecimalAmount(realmMint!, realmMint!.supply).toNumber() * 0.01
-        : 0,
+        : 0
+      ).toString(),
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(realmMint)])

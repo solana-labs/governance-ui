@@ -34,10 +34,15 @@ import { getProgramVersionForRealm } from '@models/registry/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { getMintDecimalAmount } from '@tools/sdk/units'
 import {
+  BaseGovernanceFormFieldsV3,
   transform,
   transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig,
 } from './BaseGovernanceForm-data'
-interface NewProgramForm extends BaseGovernanceFormFieldsV2 {
+
+type BaseGovernanceFormFields =
+  | BaseGovernanceFormFieldsV3
+  | BaseGovernanceFormFieldsV2
+type NewProgramForm = BaseGovernanceFormFields & {
   programId: string
   transferAuthority: boolean
 }
@@ -114,7 +119,7 @@ const NewProgramForm = () => {
           connection.endpoint
         )
         const governanceConfig =
-          realmInfo!.programVersion === 2
+          form._programVersion === 2
             ? getGovernanceConfigFromV2Form(realmInfo!.programVersion!, {
                 minTokensToCreateProposal:
                   form.minCommunityTokensToCreateProposal,
@@ -129,25 +134,7 @@ const NewProgramForm = () => {
                     realmMint.decimals,
                     councilMint?.decimals || 0
                   ),
-                  {
-                    minCommunityTokensToCreateProposal:
-                      form.minCommunityTokensToCreateProposal ===
-                      DISABLED_VOTER_WEIGHT.toString()
-                        ? 'disabled'
-                        : form.minCommunityTokensToCreateProposal,
-                    minCouncilTokensToCreateProposal: '1',
-                    minInstructionHoldUpTime: form.minInstructionHoldUpTime.toString(),
-                    maxVotingTime: form.maxVotingTime.toString(),
-                    votingCoolOffTime: '12',
-                    depositExemptProposalCount: '10',
-                    communityVoteThreshold: form.voteThreshold.toString(),
-                    communityVetoVoteThreshold: 'disabled',
-                    councilVoteThreshold: form.voteThreshold.toString(),
-                    councilVetoVoteThreshold: form.voteThreshold.toString(),
-                    communityVoteTipping: VoteTipping.Disabled,
-                    councilVoteTipping: VoteTipping.Strict,
-                    _programVersion: 3,
-                  }
+                  { ...form, communityVoteTipping: VoteTipping.Disabled }
                 )[0]
               )
         await registerProgramGovernance(
@@ -226,11 +213,12 @@ const NewProgramForm = () => {
   useEffect(() => {
     setForm({
       ...form,
-      minCommunityTokensToCreateProposal: realmMint?.supply.isZero()
+      minCommunityTokensToCreateProposal: (realmMint?.supply.isZero()
         ? MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY
         : realmMint
         ? getMintDecimalAmount(realmMint!, realmMint!.supply).toNumber() * 0.01
-        : 0,
+        : 0
+      ).toString(),
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(realmMint)])

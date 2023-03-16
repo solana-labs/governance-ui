@@ -35,7 +35,8 @@ export type BaseGovernanceFormFieldsV3 = {
   communityVetoVoteThreshold: string | 'disabled'
   councilVoteThreshold: string | 'disabled'
   councilVetoVoteThreshold: string | 'disabled'
-  communityVoteTipping: VoteTipping
+  // community vote tipping is disabled due to exploit
+  //communityVoteTipping: VoteTipping
   councilVoteTipping: VoteTipping
   _programVersion: 3
 }
@@ -70,7 +71,7 @@ export const transformerGovernanceConfig_2_BaseGovernanceFormFieldsV3 = (
     x.type === VoteThresholdType.Disabled ? 'disabled' : x.value!.toString(),
   councilVetoVoteThreshold: (x) =>
     x.type === VoteThresholdType.Disabled ? 'disabled' : x.value!.toString(),
-  communityVoteTipping: (x) => x,
+  // communityVoteTipping: (x) => x,
   councilVoteTipping: (x) => x,
   votingCoolOffTime: (x) => getHoursFromTimestamp(x).toString(),
   depositExemptProposalCount: (x) => x.toString(),
@@ -113,7 +114,7 @@ export const transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig = (
     x === 'disabled'
       ? { type: VoteThresholdType.Disabled, value: undefined }
       : { type: VoteThresholdType.YesVotePercentage, value: parseInt(x) },
-  communityVoteTipping: (x) => x,
+  communityVoteTipping: () => VoteTipping.Disabled,
   councilVoteTipping: (x) => x,
   votingCoolOffTime: (x) => getTimestampFromHours(parseFloat(x)),
   depositExemptProposalCount: (x) => parseFloat(x),

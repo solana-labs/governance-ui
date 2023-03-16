@@ -8,6 +8,7 @@ import {
   GovernanceConfig,
   ProgramAccount,
   serializeInstructionToBase64,
+  VoteTipping,
 } from '@solana/spl-governance'
 import { validateInstruction } from '@utils/instructionTools'
 import useWalletStore from 'stores/useWalletStore'
@@ -116,7 +117,6 @@ const GovernanceConfigModal = ({
         ),
         maxVotingTime: getDaysFromTimestamp(config.maxVotingTime),
         voteThreshold: config.communityVoteThreshold.value!,
-        voteTipping: config.communityVoteTipping,
       })
     } else {
       const baseForm = transform(
@@ -165,7 +165,6 @@ const GovernanceConfigModal = ({
               maxVotingTime: form.maxVotingTime,
               voteThresholdPercentage: form.voteThreshold,
               mintDecimals: mint!.decimals,
-              voteTipping: form.voteTipping,
             })
           : new GovernanceConfig(
               transform(
@@ -173,7 +172,7 @@ const GovernanceConfigModal = ({
                   mint.decimals,
                   councilMint?.decimals ?? 0
                 ),
-                form
+                { ...form, communityVoteTipping: VoteTipping.Disabled }
               )[0]
             )
 
