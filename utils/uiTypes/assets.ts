@@ -82,9 +82,9 @@ export class AccountTypeProgram implements AssetAccount {
   type: AccountType
   extensions: AccountExtension
   pubkey: PublicKey
-  constructor(governance: ProgramAccount<Governance>) {
+  constructor(governance: ProgramAccount<Governance>, programId: PublicKey) {
     this.governance = governance
-    this.pubkey = governance.account.governedAccount
+    this.pubkey = programId
     this.type = AccountType.PROGRAM
     this.extensions = {}
   }

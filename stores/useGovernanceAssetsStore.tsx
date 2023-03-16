@@ -369,11 +369,14 @@ const getProgramAssetAccounts = async (
     ...nativeAccountAddresses.map((x) => x),
     ...governancesArray.map((x) => x.pubkey),
   ]
-  //todo get owner
-  const pubkeys = await getProgramAccountInfo(connection, possibleOwnersPk)
-  console.log(pubkeys.map((x) => x.toBase58()))
-  return governancesArray.map(
-    (programGov) => new AccountTypeProgram(programGov)
+
+  const programs = await getProgramAccountInfo(connection, possibleOwnersPk)
+  return programs.map(
+    (program) =>
+      new AccountTypeProgram(
+        governancesArray.find((x) => x.pubkey.equals(program.owner))!,
+        program.programId
+      )
   )
 }
 
@@ -745,20 +748,6 @@ const getAccountsForGovernances = async (
 ): Promise<
   (AccountTypeMint | AccountTypeProgram | AssetAccount | AccountTypeGeneric)[]
 > => {
-  // 1 - Load accounts related to program governances
-  const programAccounts = await getProgramAssetAccounts(
-    connection,
-    governancesArray
-  )
-
-  // 2 - Load token accounts behind any type of governance
-  const governedTokenAccounts = await loadGovernedTokenAccounts(
-    connection,
-    realm,
-    governancesArray
-  )
-
-  // 3 - Load accounts related to mint
   //due to long request for mint accounts that are owned by every governance
   //we fetch
   const possibleMintAccountPks = [
@@ -772,11 +761,22 @@ const getAccountsForGovernances = async (
     possibleMintAccountPks.push(...additionalMintAccounts)
   }
 
-  const mintAccounts = await loadMintGovernanceAccounts(
-    connection,
-    governancesArray,
-    possibleMintAccountPks
-  )
+  // 1 - Load accounts related to program governances
+  // 2 - Load token accounts behind any type of governance
+  // 3 - Load accounts related to mint
+  const [
+    programAccounts,
+    governedTokenAccounts,
+    mintAccounts,
+  ] = await Promise.all([
+    getProgramAssetAccounts(connection, governancesArray),
+    loadGovernedTokenAccounts(connection, realm, governancesArray),
+    loadMintGovernanceAccounts(
+      connection,
+      governancesArray,
+      possibleMintAccountPks
+    ),
+  ])
 
   // 4 - Call to fetch token prices for every token account's mints
   await tokenPriceService.fetchTokenPrices(
@@ -815,7 +815,7 @@ const getAccountsForGovernances = async (
 const getProgramAccountInfo = async (
   { endpoint, current }: ConnectionContext,
   publicKeys: PublicKey[]
-): Promise<PublicKey[]> => {
+): Promise<{ owner: PublicKey; programId: PublicKey }[]> => {
   const { data: exetuableAccountInfoJson } = await axios.post<
     unknown,
     {
@@ -832,7 +832,7 @@ const getProgramAccountInfo = async (
     endpoint,
     publicKeys.map((publicKey) => ({
       jsonrpc: '2.0',
-      id: 1,
+      id: publicKey.toBase58(),
       method: 'getProgramAccounts',
       params: [
         'BPFLoaderUpgradeab1e11111111111111111111111',
@@ -860,18 +860,20 @@ const getProgramAccountInfo = async (
       )}`
     )
   }
-
-  const executableDataPks = exetuableAccountInfoJson.reduce(
-    (executableAccountInfo, { result }) => {
+  const executableDataPks = (exetuableAccountInfoJson as any).reduce(
+    (executableAccountInfo, { result, id }) => {
       result.forEach(({ pubkey }) => {
-        const publicKey = new PublicKey(pubkey)
-        executableAccountInfo.push(publicKey)
+        const executableDataPk = new PublicKey(pubkey)
+        executableAccountInfo.push({
+          executableDataPk: executableDataPk,
+          owner: new PublicKey(id),
+        })
       })
 
       return executableAccountInfo
     },
-    [] as PublicKey[]
-  )
+    []
+  ) as { owner: PublicKey; executableDataPk: PublicKey }[]
   const { data: programAccountInfoJson } = await axios.post<
     unknown,
     {
@@ -886,9 +888,9 @@ const getProgramAccountInfo = async (
     }
   >(
     endpoint,
-    executableDataPks.map((publicKey) => ({
+    executableDataPks.map((obj) => ({
       jsonrpc: '2.0',
-      id: 1,
+      id: obj.owner,
       method: 'getProgramAccounts',
       params: [
         'BPFLoaderUpgradeab1e11111111111111111111111',
@@ -900,7 +902,7 @@ const getProgramAccountInfo = async (
               memcmp: {
                 // number of bytes
                 offset: 4,
-                bytes: publicKey.toBase58(),
+                bytes: obj.executableDataPk.toBase58(),
               },
             },
           ],
@@ -908,16 +910,16 @@ const getProgramAccountInfo = async (
       ],
     }))
   )
-  const programDataPks = programAccountInfoJson.reduce(
-    (programAccountInfo, { result }) => {
+  const programDataPks = (programAccountInfoJson as any).reduce(
+    (programAccountInfo, { result, id }) => {
       result.forEach(({ pubkey }) => {
-        const publicKey = new PublicKey(pubkey)
-        programAccountInfo.push(publicKey)
+        const programId = new PublicKey(pubkey)
+        programAccountInfo.push({ programId, owner: new PublicKey(id) })
       })
 
       return programAccountInfo
     },
-    [] as PublicKey[]
-  )
+    []
+  ) as { owner: PublicKey; programId: PublicKey }[]
   return programDataPks
 }

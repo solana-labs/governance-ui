@@ -8,12 +8,12 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { TerminalIcon } from '@heroicons/react/outline'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { GovernanceAccountType } from '@solana/spl-governance'
 import EmptyState from '@components/EmptyState'
 import {
   NEW_PROGRAM_VIEW,
   renderAddNewAssetTooltip,
 } from 'pages/dao/[symbol]/assets'
+import { AccountType } from '@utils/uiTypes/assets'
 
 const AssetsCompactWrapper = () => {
   const router = useRouter()
@@ -40,11 +40,10 @@ const AssetsCompactWrapper = () => {
   const goToNewAssetForm = () => {
     router.push(fmtUrlWithCluster(`/dao/${symbol}${NEW_PROGRAM_VIEW}`))
   }
-  const { getGovernancesByAccountTypes } = useGovernanceAssets()
-  const programGovernances = getGovernancesByAccountTypes([
-    GovernanceAccountType.ProgramGovernanceV1,
-    GovernanceAccountType.ProgramGovernanceV2,
-  ])
+  const { assetAccounts } = useGovernanceAssets()
+  const programGovernances = assetAccounts
+    .filter((x) => x.type === AccountType.PROGRAM)
+    .map((x) => x.governance)
 
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
