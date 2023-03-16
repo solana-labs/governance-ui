@@ -10,14 +10,13 @@ import {
 } from '@heroicons/react/outline'
 import { VoteTipping } from '@solana/spl-governance'
 import cx from 'classnames'
-import React, { useState } from 'react'
+import React from 'react'
 import { BigNumber } from 'bignumber.js'
 import { useRouter } from 'next/router'
 
 import { formatNumber } from '@utils/formatNumber'
 import { ntext } from '@utils/ntext'
 import { Wallet } from '@models/treasury/Wallet'
-import GovernanceConfigModal from 'pages/dao/[symbol]/params/GovernanceConfigModal'
 import useRealm from '@hooks/useRealm'
 import Tooltip from '@components/Tooltip'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
@@ -85,7 +84,6 @@ interface Props {
 }
 
 export default function Rules(props: Props) {
-  const [editRulesOpen, setEditRulesOpen] = useState(false)
   const { ownVoterWeight, symbol } = useRealm()
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
@@ -294,13 +292,6 @@ export default function Rules(props: Props) {
         </div>
       ) : (
         <div>This Wallet has no rules</div>
-      )}
-      {editRulesOpen && props.wallet.governanceAccount && (
-        <GovernanceConfigModal
-          isProposalModalOpen
-          governance={props.wallet.governanceAccount}
-          closeProposalModal={() => setEditRulesOpen(false)}
-        />
       )}
     </section>
   )

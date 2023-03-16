@@ -13,7 +13,6 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { useRouter } from 'next/router'
 
 import RealmConfigModal from './RealmConfigModal'
-import GovernanceConfigModal from './GovernanceConfigModal'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { getAccountName } from '@components/instructions/tools'
 import useWalletStore from 'stores/useWalletStore'
@@ -71,10 +70,6 @@ const Params = () => {
   const [isRealmProposalModalOpen, setIsRealmProposalModalOpen] = useState(
     false
   )
-  const [
-    isGovernanceProposalModalOpen,
-    setIsGovernanceProposalModalOpen,
-  ] = useState(false)
   const [activeGovernance, setActiveGovernance] = useState<any>(null)
   const [activeTab, setActiveTab] = useState('Params')
   const [isRealmAuthorityModalOpen, setRealmAuthorityModalIsOpen] = useState(
@@ -101,9 +96,6 @@ const Params = () => {
   }
   const closeMetadataCreationModal = () => {
     setIsMetadataCreationModalOpen(false)
-  }
-  const closeGovernanceProposalModal = () => {
-    setIsGovernanceProposalModalOpen(false)
   }
   const openSetRealmAuthorityModal = () => {
     setRealmAuthorityModalIsOpen(true)
@@ -134,13 +126,6 @@ const Params = () => {
           isProposalModalOpen={isRealmProposalModalOpen}
           closeProposalModal={closeRealmProposalModal}
         ></RealmConfigModal>
-      )}
-      {isGovernanceProposalModalOpen && activeGovernance && (
-        <GovernanceConfigModal
-          governance={activeGovernance}
-          isProposalModalOpen={isGovernanceProposalModalOpen}
-          closeProposalModal={closeGovernanceProposalModal}
-        ></GovernanceConfigModal>
       )}
       {isRealmAuthorityModalOpen && (
         <SetRealmAuthorityModal
