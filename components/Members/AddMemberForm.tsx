@@ -143,8 +143,7 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
       }
 
       const goofySillyArrayForBuilderPattern = []
-      const tokenMint = mintAccount.governance.account.governedAccount
-
+      const tokenMint = mintAccount.pubkey
       // eslint-disable-next-line
       const tokenOwnerRecordPk = await withDepositGoverningTokens(
         goofySillyArrayForBuilderPattern,
@@ -387,8 +386,7 @@ const useCouncilMintAccount = () => {
     () =>
       assetAccounts.find(
         (x) =>
-          x.governance?.account.governedAccount.toBase58() ===
-          realm?.account.config.councilMint?.toBase58()
+          x.pubkey.toBase58() === realm?.account.config.councilMint?.toBase58()
       ),
     [assetAccounts, realm?.account.config.councilMint]
   )

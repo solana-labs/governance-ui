@@ -721,6 +721,9 @@ export interface ValidatorWithdrawStakeForm {
 export interface DualFinanceAirdropForm {
   root: string
   amount: number
+  eligibilityStart: number
+  eligibilityEnd: number
+  amountPerVoter: number
   treasury: AssetAccount | undefined
 }
 

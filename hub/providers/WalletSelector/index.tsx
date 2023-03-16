@@ -9,14 +9,13 @@ import {
 import type { PublicKey } from '@solana/web3.js';
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 
-import { WALLET_PROVIDERS } from 'utils/wallet-adapters';
-
 import { RealmCircle } from '@hub/components/branding/RealmCircle';
 import { SolanaLogo } from '@hub/components/branding/SolanaLogo';
 import * as Dialog from '@hub/components/controls/Dialog';
 import { useCluster } from '@hub/hooks/useCluster';
 import { useToast, ToastType } from '@hub/hooks/useToast';
 import cx from '@hub/lib/cx';
+import { WALLET_PROVIDERS } from '@utils/wallet-adapters';
 
 interface Wallet {
   publicKey: PublicKey;

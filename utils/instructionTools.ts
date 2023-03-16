@@ -310,9 +310,11 @@ export async function getTransferNftInstruction({
       mintPK,
       wallet: wallet!,
     })
+    console.log(needToCreateAta)
     //we push this createATA instruction to transactions to create right before creating proposal
     //we don't want to create ata only when instruction is serialized
     if (needToCreateAta) {
+      console.log('create atas')
       prerequisiteInstructions.push(
         Token.createAssociatedTokenAccountInstruction(
           ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID

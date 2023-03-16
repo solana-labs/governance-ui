@@ -10,9 +10,9 @@ import Tabs from '@components/Tabs'
 import Select from '@components/inputs/Select'
 import Button from '@components/Button'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { useRouter } from 'next/router'
 
 import RealmConfigModal from './RealmConfigModal'
-import GovernanceConfigModal from './GovernanceConfigModal'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { getAccountName } from '@components/instructions/tools'
 import useWalletStore from 'stores/useWalletStore'
@@ -26,9 +26,12 @@ import { ExclamationIcon } from '@heroicons/react/outline'
 import Tooltip from '@components/Tooltip'
 import { AccountType } from '@utils/uiTypes/assets'
 import { MintMaxVoteWeightSourceType } from '@solana/spl-governance'
+import useQueryContext from '@hooks/useQueryContext'
 
 const Params = () => {
-  const { realm, mint, config } = useRealm()
+  const router = useRouter()
+  const { fmtUrlWithCluster } = useQueryContext()
+  const { realm, mint, config, symbol } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const {
     canUseAuthorityInstruction,
@@ -67,10 +70,6 @@ const Params = () => {
   const [isRealmProposalModalOpen, setIsRealmProposalModalOpen] = useState(
     false
   )
-  const [
-    isGovernanceProposalModalOpen,
-    setIsGovernanceProposalModalOpen,
-  ] = useState(false)
   const [activeGovernance, setActiveGovernance] = useState<any>(null)
   const [activeTab, setActiveTab] = useState('Params')
   const [isRealmAuthorityModalOpen, setRealmAuthorityModalIsOpen] = useState(
@@ -97,12 +96,6 @@ const Params = () => {
   }
   const closeMetadataCreationModal = () => {
     setIsMetadataCreationModalOpen(false)
-  }
-  const openGovernanceProposalModal = () => {
-    setIsGovernanceProposalModalOpen(true)
-  }
-  const closeGovernanceProposalModal = () => {
-    setIsGovernanceProposalModalOpen(false)
   }
   const openSetRealmAuthorityModal = () => {
     setRealmAuthorityModalIsOpen(true)
@@ -133,13 +126,6 @@ const Params = () => {
           isProposalModalOpen={isRealmProposalModalOpen}
           closeProposalModal={closeRealmProposalModal}
         ></RealmConfigModal>
-      )}
-      {isGovernanceProposalModalOpen && activeGovernance && (
-        <GovernanceConfigModal
-          governance={activeGovernance}
-          isProposalModalOpen={isGovernanceProposalModalOpen}
-          closeProposalModal={closeGovernanceProposalModal}
-        ></GovernanceConfigModal>
       )}
       {isRealmAuthorityModalOpen && (
         <SetRealmAuthorityModal
@@ -347,7 +333,13 @@ const Params = () => {
                   {activeTab === 'Params' && (
                     <ParamsView
                       activeGovernance={activeGovernance}
-                      openGovernanceProposalModal={openGovernanceProposalModal}
+                      openGovernanceProposalModal={() =>
+                        router.push(
+                          fmtUrlWithCluster(
+                            `/realm/${symbol}/governance/${activeGovernance.pubkey.toBase58()}/edit`
+                          )
+                        )
+                      }
                     />
                   )}
                   {activeTab === 'Accounts' && (

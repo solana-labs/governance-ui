@@ -74,7 +74,6 @@ const TokenRegisterTrustless = ({
         .tokenRegisterTrustless(Number(form.tokenIndex), form.name)
         .accounts({
           group: mangoGroup!.publicKey,
-          fastListingAdmin: form.governedAccount.extensions.transferAddress,
           mint: new PublicKey(form.mintPk),
           oracle: new PublicKey(form.oraclePk),
           payer: form.governedAccount.extensions.transferAddress,

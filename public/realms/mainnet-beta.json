@@ -3019,5 +3019,32 @@
     "github": "https://github.com/clackinu",
     "website": "https://clack.uno",
     "twitter": "@clack_inu"
+  },
+  {
+    "symbol": "BRDOT",
+    "category": "others",
+    "bannerImage": "/realms/brdot/banner_brdot.png",
+    "displayName": "BRDOT DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "3HDYDcQQ75kLKnQT3EkU8MXWLrYFjE4sF1Bu1m359Gxz",
+    "ogImage": "/realms/brdot/brdot_dao_logo.png",
+    "shortDescription": "Bridging the Gap to Connectivity, Freedom, and Development in Latin America",
+    "discord": "https://discord.gg/XcWVHM2Z",
+    "github": "https://github.com/brdot",
+    "website": "https://brdot.com.br"
+    
+  },
+  { 
+    "symbol": "SAO",
+    "category":"nft",
+    "displayName": "Sator DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "7yAiT2bUg5MwBzT3K9BvhcZdtHr5z8AnCGWa2iPJjB3T",
+    "ogImage": "/realms/SatorDAO/SatorLogo.png",
+    "bannerImage": "https://i.imgur.com/1rNmAIj.jpg",
+    "shortDescription": "Sator brings traditional TV and movies into Web3 through NFT-VOD and token-gated staking.",
+    "website": "https://sator.io",
+    "discord": "https://discord.gg/qftzCFrHNQ",
+    "twitter": "https://twitter.com/SatorSAO" 
   }
 ]

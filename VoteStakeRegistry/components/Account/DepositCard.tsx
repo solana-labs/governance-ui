@@ -161,7 +161,7 @@ const DepositCard = ({
         className="p-4 rounded-lg flex flex-col h-full"
         style={{ minHeight: '290px' }}
       >
-        <div className="flex flex-row flex-wrap">
+        <div className="flex flex-wrap">
           <CardLabel
             label="Lockup Type"
             value={`${typeName.charAt(0).toUpperCase() + typeName.slice(1)} ${

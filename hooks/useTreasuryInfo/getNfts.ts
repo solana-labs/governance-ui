@@ -13,6 +13,10 @@ const query = gql`
         address
         name
         image
+        floorPrice
+      }
+      purchases {
+        price
       }
       image
       name

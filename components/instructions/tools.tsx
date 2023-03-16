@@ -182,10 +182,25 @@ export const ACCOUNT_NAMES = {
 
   //Serum DAO
   '5xinfvkvL5NZ6BG3cDtFdTbVuMutqGXkDBuhncfmzPr2': 'Serum SRM Grant Treasury',
+
+  //Kaimana DAO
+
+  '3X9EEzWbpCzRmLxbTFoddux9faLxTMVFwjTSTXQ4W8ar': 'Kaiman dao community wallet',
+  '4Amtnu7TjDHYLyKMMvoCTDHW18a2dEMdS3sAoE96JwQz':
+    'Kaiman dao community wallet governance',
+  FXCgiZvkm9mAr6ZC9NnqNSeWZWZSmHDDZxCmzgaeShki: 'Kaiman dao council wallet',
+  yrtHtvgyPgWFrRDDMpBEva2f888kDrGnwHYEdM7fSFT:
+    'Kaiman dao council wallet governance',
+  '714JsESwkxjDZTaxD2TNe7vqMG52yxug8vaXug5VKBqd':
+    'Kaiman dao council mint governance',
+  '9rFYGii2nQz74qg5PTYViPj46E82PrJguEC2QvbZVuwk': 'Kaiman dao council mint',
 }
 
-// Blacklisted governances which should not be displayed in the UI
 // TODO: Add this to on-chain metadata to Governance account
+// Blacklisted governances which should not be displayed in the UI
+// Hidden accounts that are unusable due to wrong configuration e.g
+// 60% vote threshold on 5b token supply
+// hidden legacy accounts to declutter UI
 export const HIDDEN_GOVERNANCES = new Map<string, string>([
   ['HfWc8M6Df5wtLg8xg5vti4QKAo9KG4nL5gKQ8B2sjfYC', ''],
   ['A3Fb876sEiUmDWgrJ1fShASstw8b5wHB6XETzQa8VM7S', ''],
@@ -196,8 +211,9 @@ export const HIDDEN_GOVERNANCES = new Map<string, string>([
   ['G8JgCHfca7PehBwRp1Q91smJ9CXAd8K9e9CpfVjyD2MP', ''],
 ])
 
-// Blacklisted proposals which should not be displayed in the UI
 // TODO: Add this to on-chain metadata to Proposal account
+// Blacklisted proposals which should not be displayed in the UI
+// hidden legacy accounts to declutter UI
 export const HIDDEN_PROPOSALS = new Map<string, string>([
   ['E8XgiVpDJgDf4XgBKjZnMs3S1K7cmibtbDqjw5aNobCZ', ''],
   ['DrhhwYXaY4fvTBoQdNtgwEoTjuQswvDQLfVcgUXgP1Mx', ''],
@@ -232,6 +248,8 @@ export const CHAT_PROGRAM_ID = new PublicKey(
 export const WSOL_MINT = 'So11111111111111111111111111111111111111112'
 export const WSOL_MINT_PK = new PublicKey(WSOL_MINT)
 
+//Hidden accounts that has some shit coins with 0 value inside but freeze authority
+//blocks closing them
 const HIDDEN_MNGO_TREASURES = [
   'GZQSF4Fh9xK7rf9WBEhawXYFw8qPXeatZLUqVQeuW3X8',
   'J6jYLFDWeeGwg4u2TXhKDCcH4fSzJFQyDE2VSv2drRkg',
