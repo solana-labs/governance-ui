@@ -842,7 +842,6 @@ const getProgramAccountInfo = async (
           filters: [
             {
               memcmp: {
-                // number of bytes
                 offset: programAccountOwnerOffset,
                 bytes: publicKey.toBase58(),
               },
@@ -900,7 +899,6 @@ const getProgramAccountInfo = async (
           filters: [
             {
               memcmp: {
-                // number of bytes
                 offset: 4,
                 bytes: obj.executableDataPk.toBase58(),
               },

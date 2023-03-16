@@ -159,7 +159,7 @@ const NewProgramForm = () => {
       <PreviousRouteBtn />
       <div className="border-b border-fgd-4 pb-4 pt-2">
         <div className="flex items-center justify-between">
-          <h1>Transfer program upgrade authority </h1>
+          <h1>Add program to wallet</h1>
         </div>
       </div>
       <Input
@@ -175,7 +175,7 @@ const NewProgramForm = () => {
         error={formErrors['programId']}
       />
       <GovernedAccountSelect
-        label="New Authority"
+        label="Wallet"
         governedAccounts={assetAccounts.filter((x) => x.isSol)}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'authority' })

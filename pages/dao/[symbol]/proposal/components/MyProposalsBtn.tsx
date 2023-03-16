@@ -280,7 +280,7 @@ const MyProposalsBn = () => {
       instructions.push(relinquishNftVoteIx)
     }
     try {
-      const insertChunks = chunks(instructions, 10).map((txBatch, batchIdx) => {
+      const insertChunks = chunks(instructions, 5).map((txBatch, batchIdx) => {
         return {
           instructionsSet: txBatchesToInstructionSetWithSigners(
             txBatch,
