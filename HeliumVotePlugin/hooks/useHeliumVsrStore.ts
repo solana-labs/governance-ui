@@ -21,6 +21,10 @@ interface GetPositionsArgs extends GetPosArgs {
   votingClient: VotingClient
 }
 
+interface PropagatePositionsArgs {
+  votingClient: VotingClient
+}
+
 interface HeliumVsrStore extends State {
   state: HeliumVsrStoreState
   resetState: () => void
@@ -28,6 +32,7 @@ interface HeliumVsrStore extends State {
     maxVoterRecord: ProgramAccount<MaxVoterWeightRecord> | null
   ) => void
   getPositions: (args: GetPositionsArgs) => Promise<void>
+  propagatePositions: (args: PropagatePositionsArgs) => void
 }
 
 const defaultState: HeliumVsrStoreState = {
@@ -42,10 +47,11 @@ const useHeliumVsrStore = create<HeliumVsrStore>((set, _get) => ({
   state: {
     ...defaultState,
   },
-  resetState: () =>
+  resetState: () => {
     set((s) => {
       s.state = { ...defaultState }
-    }),
+    })
+  },
   setMaxVoterWeight: (maxVoterRecord) => {
     set((s) => {
       s.state.maxVoteRecord = maxVoterRecord
@@ -71,6 +77,9 @@ const useHeliumVsrStore = create<HeliumVsrStore>((set, _get) => ({
         s.state.isLoading = false
       })
     }
+  },
+  propagatePositions: ({ votingClient }) => {
+    votingClient._setCurrentHeliumVsrPositions(_get().state.positions)
   },
 }))
 

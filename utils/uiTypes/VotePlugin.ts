@@ -463,7 +463,6 @@ export class VotingClient {
             })
             .accounts({
               registrar,
-              voterAuthority: walletPk,
               voterTokenOwnerRecord: tokenOwnerRecord.pubkey,
             })
             .remainingAccounts(chunk)
@@ -615,7 +614,6 @@ export class VotingClient {
             .relinquishVoteV0()
             .accounts({
               registrar,
-              voterAuthority: walletPk,
               voterTokenOwnerRecord: tokenOwnerRecord,
               proposal: proposal.pubkey,
               governance: proposal.account.governance,

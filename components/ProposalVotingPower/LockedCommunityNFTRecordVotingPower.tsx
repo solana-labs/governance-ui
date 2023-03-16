@@ -29,19 +29,36 @@ export default function LockedCommunityNFTRecordVotingPower(props: Props) {
     councilMint,
     mint,
     realm,
+    ownTokenRecord,
     realmTokenAccount,
     symbol,
     config,
   } = useRealm()
   const { proposal } = useProposal()
   const [connected, wallet] = useWalletStore((s) => [s.connected, s.current])
+  const [tokenOwnerRecordPk, setTokenOwnerRecordPk] = useState('')
   const [currentClient] = useVotePluginsClientStore((s) => [
     s.state.currentRealmVotingClient,
   ])
-  const [tokenOwnerRecordPk, setTokenOwnerRecordPk] = useState('')
-  const loadingPositions = useHeliumVsrStore((s) => s.state.isLoading)
-  const votingPower = useHeliumVsrStore((s) => s.state.votingPower)
-  const amountLocked = useHeliumVsrStore((s) => s.state.amountLocked)
+  const [
+    loadingPositions,
+    votingPower,
+    amountLocked,
+    positions,
+    propagatePositions,
+  ] = useHeliumVsrStore((s) => [
+    s.state.isLoading,
+    s.state.votingPower,
+    s.state.amountLocked,
+    s.state.positions,
+    s.propagatePositions,
+  ])
+
+  useEffect(() => {
+    if (currentClient.heliumVsrVotingPositions.length !== positions.length) {
+      propagatePositions({ votingClient: currentClient })
+    }
+  }, [positions, currentClient, propagatePositions])
 
   useEffect(() => {
     if (mint && votingPower) {
@@ -62,11 +79,11 @@ export default function LockedCommunityNFTRecordVotingPower(props: Props) {
         realm!.owner,
         realm!.pubkey,
         defaultMint!,
-        currentClient!.walletPk!
+        ownTokenRecord!.account.governingTokenOwner
       )
       setTokenOwnerRecordPk(tokenOwnerRecordAddress.toBase58())
     }
-    if (realm && wallet?.connected && currentClient.walletPk) {
+    if (realm && wallet?.connected && ownTokenRecord) {
       getTokenOwnerRecord()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
@@ -75,7 +92,7 @@ export default function LockedCommunityNFTRecordVotingPower(props: Props) {
     realm?.pubkey.toBase58(),
     wallet?.connected,
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    currentClient.walletPk?.toBase58(),
+    ownTokenRecord?.account.governingTokenOwner.toBase58(),
   ])
 
   const isLoading = loadingPositions || !(votingPower && mint)
@@ -122,7 +139,12 @@ export default function LockedCommunityNFTRecordVotingPower(props: Props) {
     )
   }
 
-  const isSameWallet = wallet!.publicKey!.equals(currentClient.walletPk!)
+  const isSameWallet =
+    wallet &&
+    wallet.publicKey &&
+    ownTokenRecord &&
+    wallet.publicKey.equals(ownTokenRecord.account.governingTokenOwner)
+
   return (
     <div className={`${props.className} -mt-10`}>
       <div className="mb-4 flex justify-end">

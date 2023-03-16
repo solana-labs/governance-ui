@@ -17,7 +17,6 @@ import useWalletStore from 'stores/useWalletStore'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import { MintInfo } from '@solana/spl-token'
 import { VotingPowerBox } from './VotingPowerBox'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 
 export const VotingPowerCard: React.FC<{
   inAccountDetails?: boolean
@@ -25,11 +24,15 @@ export const VotingPowerCard: React.FC<{
   const { fmtUrlWithCluster } = useQueryContext()
   const [hasGovPower, setHasGovPower] = useState(false)
   const [tokenOwnerRecordPk, setTokenOwnerRecordPk] = useState('')
-  const { councilMint, mint, realm, symbol, config } = useRealm()
+  const {
+    councilMint,
+    ownTokenRecord,
+    mint,
+    realm,
+    symbol,
+    config,
+  } = useRealm()
   const [wallet] = useWalletStore((s) => [s.current])
-  const [currentClient] = useVotePluginsClientStore((s) => [
-    s.state.currentRealmVotingClient,
-  ])
   const councilDepositVisible = !!councilMint
 
   useEffect(() => {
@@ -46,12 +49,12 @@ export const VotingPowerCard: React.FC<{
         realm!.owner,
         realm!.pubkey,
         defaultMint!,
-        currentClient!.walletPk!
+        ownTokenRecord!.account.governingTokenOwner
       )
       setTokenOwnerRecordPk(tokenOwnerRecordAddress.toBase58())
     }
 
-    if (realm && wallet?.connected && currentClient.walletPk) {
+    if (realm && wallet?.connected && ownTokenRecord) {
       getTokenOwnerRecord()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
@@ -60,16 +63,21 @@ export const VotingPowerCard: React.FC<{
     realm?.pubkey.toBase58(),
     wallet?.connected,
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    currentClient.walletPk?.toBase58(),
+    ownTokenRecord?.account.governingTokenOwner.toBase58(),
   ])
 
   const isLoading = !mint || !councilMint
+
   const isConnected =
     wallet &&
-    currentClient &&
+    ownTokenRecord &&
     wallet.connected &&
     wallet.publicKey &&
-    currentClient.walletPk
+    ownTokenRecord.account.governingTokenOwner
+
+  const isSameWallet =
+    isConnected &&
+    wallet!.publicKey!.equals(ownTokenRecord!.account.governingTokenOwner)
 
   return (
     <>
@@ -108,7 +116,7 @@ export const VotingPowerCard: React.FC<{
             <TokenDepositLock
               mint={mint}
               setHasGovPower={setHasGovPower}
-              isSameWallet={wallet.publicKey!.equals(currentClient.walletPk!)}
+              isSameWallet={isSameWallet!}
             />
           )}
           {councilDepositVisible && (

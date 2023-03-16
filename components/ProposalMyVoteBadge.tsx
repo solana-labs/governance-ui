@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Proposal,
   ProgramAccount,
@@ -7,7 +7,6 @@ import {
 } from '@solana/spl-governance'
 import classNames from 'classnames'
 import { ThumbUpIcon, ThumbDownIcon } from '@heroicons/react/solid'
-
 import { isYesVote } from '@models/voteRecords'
 import useRealm from '@hooks/useRealm'
 import useWalletStore from '../stores/useWalletStore'
