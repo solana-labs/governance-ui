@@ -78,7 +78,7 @@ const NewProgramForm = () => {
         const transferUpgradeAuthIx = await createSetUpgradeAuthority(
           new PublicKey(form.programId),
           wallet!.publicKey!,
-          form.authority!.extensions.transferAddress!
+          form.authority!.governance.nativeTreasuryAddress
         )
         const transaction = new Transaction()
         transaction.add(transferUpgradeAuthIx)
@@ -154,6 +154,15 @@ const NewProgramForm = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.programId])
+  useEffect(() => {
+    const wallet = assetAccounts.find(
+      (x) =>
+        x.governance.nativeTreasuryAddress.toBase58() === router.query?.wallet
+    )
+    if (wallet) {
+      handleSetForm({ value: wallet, propertyName: 'authority' })
+    }
+  }, [router.query, assetAccounts])
   return (
     <div className="space-y-3">
       <PreviousRouteBtn />
@@ -174,7 +183,6 @@ const NewProgramForm = () => {
         }
         error={formErrors['programId']}
       />
-      {console.log(form.authority?.governance.nativeTreasuryAddress.toBase58())}
       <GovernedAccountSelect
         label="Wallet"
         governedAccounts={assetAccounts.filter((x) => x.governance.pubkey)}

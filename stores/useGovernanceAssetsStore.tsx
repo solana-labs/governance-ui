@@ -6,6 +6,7 @@ import {
   Realm,
   TOKEN_PROGRAM_ID,
   ProgramAccount,
+  GovernanceAccountType,
 } from '@solana/spl-governance'
 import { ParsedAccountData, PublicKey } from '@solana/web3.js'
 import { AccountInfo, MintInfo } from '@solana/spl-token'
@@ -356,7 +357,13 @@ const getProgramAssetAccounts = async (
 ): Promise<AccountTypeProgram[]> => {
   const possibleOwnersPk = [
     ...governancesArray.map((x) => x.nativeTreasuryAddress),
-    ...governancesArray.map((x) => x.pubkey),
+    ...governancesArray
+      .filter(
+        (x) =>
+          x.account.accountType === GovernanceAccountType.ProgramGovernanceV1 ||
+          x.account.accountType === GovernanceAccountType.ProgramGovernanceV2
+      )
+      .map((x) => x.pubkey),
   ]
 
   const programs = await getProgramAccountInfo(connection, possibleOwnersPk)
@@ -841,6 +848,10 @@ const getProgramAccountInfo = async (
               },
             },
           ],
+          dataSlice: {
+            offset: 0,
+            length: 0,
+          },
         },
       ],
     }))
@@ -898,6 +909,10 @@ const getProgramAccountInfo = async (
               },
             },
           ],
+          dataSlice: {
+            offset: 0,
+            length: 0,
+          },
         },
       ],
     }))
