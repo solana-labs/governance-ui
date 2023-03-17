@@ -3022,7 +3022,7 @@
   },
   {
     "symbol": "BRDOT",
-    "category": "others",
+    "category": "web3",
     "bannerImage": "/realms/brdot/banner_brdot.png",
     "displayName": "BRDOT DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -3046,5 +3046,17 @@
     "website": "https://sator.io",
     "discord": "https://discord.gg/qftzCFrHNQ",
     "twitter": "https://twitter.com/SatorSAO" 
+  },
+  { 
+    "symbol": "Safecows",
+    "category":"web3",
+    "displayName": "Safecows",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "6RQAna7aWHLVwfYRFGyM8kpnBXNGkMNCGfvuwYuuvpFU",
+    "ogImage": "/realms/safecows/logo.png",
+    "bannerImage": "/realms/safecows/banner.png",
+    "shortDescription": "Take Action for the Zero Hunger by mining for Proof-of-Health over Helium Network.",
+    "website": "https://safecows.com",
+    "discord": "https://discord.gg/aQCeMSWs"
   }
 ]
