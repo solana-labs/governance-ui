@@ -370,7 +370,11 @@ const getProgramAssetAccounts = async (
   return programs.map(
     (program) =>
       new AccountTypeProgram(
-        governancesArray.find((x) => x.pubkey.equals(program.owner))!,
+        governancesArray.find(
+          (x) =>
+            x.pubkey.equals(program.owner) ||
+            x.nativeTreasuryAddress.equals(program.owner)
+        )!,
         program.programId
       )
   )
