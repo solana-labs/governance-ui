@@ -157,9 +157,9 @@ const NewProgramForm = () => {
   useEffect(() => {
     const wallet = assetAccounts.find(
       (x) =>
-        x.governance.nativeTreasuryAddress.toBase58() === router.query?.wallet
+        x.governance.nativeTreasuryAddress?.toBase58() === router.query?.wallet
     )
-    if (wallet) {
+    if (wallet && router.query?.wallet) {
       handleSetForm({ value: wallet, propertyName: 'authority' })
     }
   }, [router.query, assetAccounts])
@@ -200,7 +200,7 @@ const NewProgramForm = () => {
             isLoading={isLoading}
             onClick={handleCreate}
           >
-            Transfer
+            Add
           </Button>
         </Tooltip>
       </div>
