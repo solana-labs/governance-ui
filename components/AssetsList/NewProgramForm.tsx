@@ -174,7 +174,7 @@ const NewProgramForm = () => {
         }
         error={formErrors['programId']}
       />
-      {console.log(form.authority?.extensions.transferAddress)}
+      {console.log(form.authority?.governance.nativeTreasuryAddress.toBase58())}
       <GovernedAccountSelect
         label="Wallet"
         governedAccounts={assetAccounts.filter((x) => x.governance.pubkey)}
