@@ -17,8 +17,8 @@ import { debounce } from '@utils/debounce'
 import { createSetUpgradeAuthority } from '@tools/sdk/bpfUpgradeableLoader/createSetUpgradeAuthority'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { sendTransaction } from '@utils/send'
-import GovernedAccountSelect from '@components/inputs/GovernedAccountSelect'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
+import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect'
 interface NewProgramForm {
   programId: string
   authority: null | AssetAccount
@@ -174,14 +174,16 @@ const NewProgramForm = () => {
         }
         error={formErrors['programId']}
       />
+      {console.log(form.authority?.extensions.transferAddress)}
       <GovernedAccountSelect
         label="Wallet"
-        governedAccounts={assetAccounts.filter((x) => x.isSol)}
+        governedAccounts={assetAccounts.filter((x) => x.governance.pubkey)}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'authority' })
         }}
         value={form.authority}
         error={formErrors['authority']}
+        type="wallet"
       ></GovernedAccountSelect>
       <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
         <Tooltip content={!connected && 'Please connect your wallet'}>
